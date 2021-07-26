@@ -9,6 +9,7 @@ import {
   NumberInput,
   Popconfirm,
 } from '@/components'
+import { DOSAGE_RULE } from '@/utils/constants'
 import DetailsContext from '../../Details/DetailsContext'
 import SectionHeader from '../SectionHeader'
 import DosageRuleTable from './DosageRule'
@@ -19,7 +20,7 @@ const AutoCalculateDosage = ({
   values,
   ...restProps
 }) => {
-  const [ruleType, setRuleType] = useState('default')
+  const [ruleType, setRuleType] = useState(DOSAGE_RULE.default)
   const { isEditingDosageRule } = useContext(DetailsContext)
   console.log(ruleType, values)
   useEffect(() => {
@@ -38,12 +39,16 @@ const AutoCalculateDosage = ({
     if (isEditingDosageRule || clickedItem === ruleType) {
       e.stopPropagation()
       e.preventDefault()
+      return
     }
 
     switchingRuleType = clickedItem
 
     //Currently the list is empty, not require to show the prompt.
-    if (values.medicationInstructionRule?.length == 0) {
+    if (
+      !values.medicationInstructionRule ||
+      values.medicationInstructionRule?.length == 0
+    ) {
       e.stopPropagation()
       e.preventDefault()
       handleRuleTypeChange()
@@ -180,29 +185,38 @@ const AutoCalculateDosage = ({
               onConfirm={handleRuleTypeChange}
               disabled={isEditingDosageRule}
             >
-              <span data-ruletype='default' onClick={handleRuleTypeClick}>
+              <span
+                data-ruletype={DOSAGE_RULE.default}
+                onClick={handleRuleTypeClick}
+              >
                 <Radio
-                  value='default'
-                  checked={ruleType === 'default'}
-                  data-ruletype='default'
+                  value={DOSAGE_RULE.default}
+                  checked={ruleType === DOSAGE_RULE.default}
+                  data-ruletype={DOSAGE_RULE.default}
                   disabled={isEditingDosageRule}
                 >
                   Default
                 </Radio>
               </span>
-              <span data-ruletype='age' onClick={handleRuleTypeClick}>
+              <span
+                data-ruletype={DOSAGE_RULE.age}
+                onClick={handleRuleTypeClick}
+              >
                 <Radio
-                  value='age'
-                  checked={ruleType === 'age'}
+                  value={DOSAGE_RULE.age}
+                  checked={ruleType === DOSAGE_RULE.age}
                   disabled={isEditingDosageRule}
                 >
                   by Age
                 </Radio>
               </span>
-              <span data-ruletype='weight' onClick={handleRuleTypeClick}>
+              <span
+                data-ruletype={DOSAGE_RULE.weight}
+                onClick={handleRuleTypeClick}
+              >
                 <Radio
-                  value='weight'
-                  checked={ruleType === 'weight'}
+                  value={DOSAGE_RULE.weight}
+                  checked={ruleType === DOSAGE_RULE.weight}
                   disabled={isEditingDosageRule}
                 >
                   by Weight
