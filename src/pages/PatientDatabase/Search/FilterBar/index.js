@@ -68,13 +68,13 @@ class FilterBar extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem md={3}>
+            <GridItem md={2}>
               <FastField
                 name='dobfrom'
                 render={args => <DatePicker {...args} label='DOB From' />}
               />
             </GridItem>
-            <GridItem md={3}>
+            <GridItem md={2}>
               <FastField
                 name='dobto'
                 render={args => <DatePicker {...args} label='DOB To' />}

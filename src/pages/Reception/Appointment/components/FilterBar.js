@@ -104,13 +104,13 @@ const FilterBar = props => {
             )}
           />
         </GridItem>
-        <GridItem xs md={2}>
+        <GridItem xs md={1}>
           <FastField
             name='dobfrom'
             render={args => <DatePicker {...args} label='DOB From' />}
           />
         </GridItem>
-        <GridItem xs md={2}>
+        <GridItem xs md={1}>
           <FastField
             name='dobto'
             render={args => <DatePicker {...args} label='DOB To' />}

@@ -147,19 +147,19 @@ const FilterBar = ({
             )}
           />
         </GridItem>
-        <GridItem md={2}>
+        <GridItem  md={1}>
           <FastField
             name='dobfrom'
             render={args => <DatePicker {...args} label='DOB From' />}
           />
         </GridItem>
-        <GridItem md={2}>
+        <GridItem md={1}>
           <FastField
             name='dobto'
             render={args => <DatePicker {...args} label='DOB To' />}
           />
         </GridItem>
-        <GridItem md={2}>
+        <GridItem md={4}>
           <Field
             name='filterByDoctor'
             render={args => (
