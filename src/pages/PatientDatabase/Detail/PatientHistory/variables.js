@@ -29,11 +29,6 @@ const addContent = (type, props) => {
     case PATIENT_HISTORY_TABS.INVOICE:
       return <InvoiceHistory mode='integrated' {...props} />
     case PATIENT_HISTORY_TABS.NURSENOTES:
-      const accessRight = Authorized.check(
-        'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
-      )
-      if (!accessRight || accessRight.rights === 'disable' || !patientIsActive)
-        return <ViewPatientNurseNotes {...props} />
       return <PatientNurseNotes {...props} />
     case PATIENT_HISTORY_TABS.DEPOSIT:
       return <PatientDeposit {...props} />
