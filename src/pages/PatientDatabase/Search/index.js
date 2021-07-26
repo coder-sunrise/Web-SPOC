@@ -113,8 +113,8 @@ class PatientSearch extends PureComponent {
     if (height < 300) height = 300
     const newChildren = (
       <React.Fragment>
-        <div className='filterBar'>
-          <FilterBar {...restProps} simple={simple} />
+        <div style={{maxWidth : 1000}}>
+          <FilterBar {...restProps} simple={simple}/>
         </div>
         <Grid
           simple={simple}

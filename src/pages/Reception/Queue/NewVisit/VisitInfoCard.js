@@ -63,6 +63,10 @@ const styles = theme => ({
       },
     },
   },
+  visitGroupLabel: {
+    fontSize: '0.7rem',
+    fontWeight: 300,
+  },
 })
 
 const amountProps = {
@@ -363,8 +367,9 @@ const VisitInfoCard = ({
         <GridItem xs md={3}>
           <Authorized authority='queue.visitgroup'>
             <React.Fragment>
+              <div className={classes.visitGroupLabel}>Visit Group Number</div>
               <Select
-              valueField='visitGroup'
+              valueField='order'
               labelField='displayValue'
               value={values.visitGroup}
               disabled={isVisitReadonlyAfterSigned}
@@ -379,14 +384,12 @@ const VisitInfoCard = ({
               }
               handleFilter={(input, option) => {
                 return option.data.visitGroup.toString().toLowerCase().indexOf(input.toString().toLowerCase()) >= 0 ||
-                option.data.patientName.toString().toLowerCase().indexOf(input.toString().toLowerCase()) >= 0 ||          
-                option.data.patientName === ''
+                option.data.patientName.toString().toLowerCase().indexOf(input.toString().toLowerCase()) >= 0 ||     
+                input === ''
               }
               }
-              label={formatMessage({
-                id: 'reception.queue.visitRegistration.visitGroup',
-              })}
-              dropdownStyle={{ minWidth: "20%", maxHeight: "200px", overflowY: 'auto' }}
+              placeholder='Visit Group No., Patient Name'
+              dropdownStyle={{ minWidth: "20%" }}
               onClear={handleVisitGroupChange}
               onSelect={handleVisitGroupChange}
               renderDropdown={(option) => {

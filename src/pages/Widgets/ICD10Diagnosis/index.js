@@ -200,18 +200,13 @@ class ICD10Diagnosis extends PureComponent {
           }}
         />
 
-        <AuthorizedContext>
-          {(r) => {
-            if (r.rights !== 'enable') return null
-            return (
+        <Authorized authority={"queue.consultation.widgets.diagnosis"}>
               <div>
-                <Button size="sm" color="primary" onClick={this.handleAddDiagnosisClick}>
+                <Button size="sm" color="primary" onClick={this.handleAddDiagnosisClick} >
                   <Add /> Add Diagnosis
                 </Button>
               </div>
-            )
-          }}
-        </AuthorizedContext>
+        </Authorized>
       </div>
     )
   }

@@ -352,7 +352,18 @@ export default createListViewModel({
       },
       *updateQueueListing ({ payload }, { call, put }) {
         const response = yield call(service.updateQueueListing, payload)
-
+        if(response) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              list: [],
+            },
+          }) 
+          yield put({
+            type: 'getSessionInfo',
+            payload,
+          })
+        }
         return true
       },
     },

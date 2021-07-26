@@ -186,8 +186,7 @@ class PatientNurseNotes extends PureComponent {
                     height: 'calc(100vh - 305px)',
                   }}
                 >
-                <Timeline style={{ marginLeft: 10, marginTop: 10 }}>
-                  <div
+                <div
                     style={{
                       height: 'calc(100vh - 350px)',
                       marginTop: '25px',
@@ -195,6 +194,7 @@ class PatientNurseNotes extends PureComponent {
                       overflow: 'scroll',
                     }}
                   >
+                <Timeline style={{ marginLeft: 10, marginTop: 10 }}>
                     {list.map(i => {
                       const { createDate, createByUserFK } = i
                       const canEdit =
@@ -214,8 +214,8 @@ class PatientNurseNotes extends PureComponent {
                         </Timeline.Item>
                       )
                     })}
-                  </div>
                   </Timeline>
+                  </div>
                 </CardContainer>
               </div>
             </GridItem>

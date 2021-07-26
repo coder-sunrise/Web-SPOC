@@ -43,6 +43,8 @@ const AppointmentSearch = ({
       type: 'appointment/query',
       payload: {
         apiCriteria: {
+          dobfrom: '1900-01-01',
+          dobto: '9999-12-31',
           doctor: defaultDoctor.join(),
           isIncludeRescheduledByClinic: true,
           isIncludeHistory: true,
