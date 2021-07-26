@@ -19,7 +19,7 @@ const { Secured } = Authorized
 }))
 @withFormikExtend({
   mapPropsToValues: ({ patient }) => {
-    console.log(patient)
+    // console.log(patient)
     return {}
   },
 })

@@ -997,7 +997,11 @@ class Main extends React.Component {
     // console.log('main', { values })
     return (
       <div className={classes.root}>
-        <PatientBanner extraCmt={this.getExtraComponent()} {...this.props} />
+        <PatientBanner 
+          from='Consultation'
+          extraCmt={this.getExtraComponent()}
+          {...this.props}
+        />
         <Authorized.Context.Provider value={matches}>
           <Layout
             {...this.props}

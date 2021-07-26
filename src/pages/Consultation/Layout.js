@@ -66,6 +66,7 @@ class Layout extends PureComponent {
     // console.log(window.innerHeight)
     this.delayedResize = _.debounce(this.resize, 300)
     window.addEventListener('resize', this.delayedResize)
+    window.addEventListener('scroll', this.setBannerHeight)
     this.delayedChangeLayout = _.debounce(this.changeLayout, 300)
     this.ordersRef = React.createRef()
     this.myRefs = []
@@ -180,8 +181,13 @@ class Layout extends PureComponent {
     localStorage.setItem('consultationLayout', JSON.stringify(defaultLayout))
   }
 
+  componentDidMount () {
+    this.setBannerHeight()
+  }
+
   componentWillUnmount () {
     window.removeEventListener('resize', this.delayedResize)
+    window.removeEventListener('scroll', this.setBannerHeight)
     $(window.mainPanel).css('overflow', 'auto')
 
     this.state.currentLayout.widgets.map((id) => {
@@ -192,8 +198,17 @@ class Layout extends PureComponent {
 
   resize = (e) => {
     // console.log(e)
+    this.setBannerHeight()
     this.setState({
       rowHeight: this.getLayoutRowHeight(),
+    })
+  }
+
+  setBannerHeight = () => {
+    const banner = document.getElementById('patientBanner')
+    const bannerHeight = banner ? banner.offsetHeight : 0   
+    this.setState({
+      bannerHeight: bannerHeight,
     })
   }
 
@@ -595,7 +610,7 @@ class Layout extends PureComponent {
               marginTop: 0,
               position: 'sticky',
               overflowY: 'auto',
-              top: headerHeight + 100,
+              top: headerHeight + this.state.bannerHeight || 0,
               zIndex: 1000,
               borderRadius: 0,
               marginBottom: 0,

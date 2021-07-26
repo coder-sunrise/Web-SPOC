@@ -1160,50 +1160,59 @@ class Form extends React.PureComponent {
         <SizeContainer size='sm'>
           <React.Fragment>
             {values.patientProfileFK && <div style={{ marginTop: -20 }}>
-              <PatientBanner extraCmt={
-                <div style={{
-                display: 'flex',
-                alignItems: 'flex-end',
-                justifyContent: 'flex-end',
-                height: '100%',
-                paddingBottom: 10,
-              }}>
-                  {actualizePreOrderAccessRight.rights !== 'hidden' && <Link disabled={actualizePreOrderAccessRight.rights === 'disable'} >
-                    <span style={{ textDecoration: 'underline' }} onClick={(e) => {
-                      e.preventDefault()
-                      if (actualizePreOrderAccessRight.rights === 'disable') return
-                      if (draftPreOrderItem.length)
-                      {
-                        if (values.id && mode === 'series') {
-                          dispatch({
-                            type: 'global/updateAppState',
-                            payload: {
-                              openConfirm: true,
-                              isInformType: true,
-                              openConfirmText: 'ok',
-                              openConfirmContent: `Pre-Order is not allowed for entire series appointment.`,
-                            },
-                          })
-                          return
-                        }
-                        if (!values.id && isEnableRecurrence) {
-                          dispatch({
-                            type: 'global/updateAppState',
-                            payload: {
-                              openConfirm: true,
-                              isInformType: true,
-                              openConfirmText: 'ok',
-                              openConfirmContent: `Pre-Order is not allowed for recurring appointment.`,
-                            },
-                          })
-                          return
-                        }
-                        this.openSelectPreOrder()
-                      }
-                    }}>{`Pre-Order(${draftPreOrderItem.length})`}</span>
-                  </Link>
-                  }
-                </div>} />
+              <PatientBanner
+                from='Appointment'
+                onSelectPreOrder={this.onSelectPreOrder}
+                activePreOrderItem={draftPreOrderItem}
+                isEnableRecurrence={isEnableRecurrence}
+                apptId={values.id}
+                apptMode={mode}
+                {...this.props}
+              //   extraCmt={
+              //   <div style={{
+              //   display: 'flex',
+              //   alignItems: 'flex-end',
+              //   justifyContent: 'flex-end',
+              //   height: '100%',
+              //   paddingBottom: 10,
+              // }}>
+              //     {actualizePreOrderAccessRight.rights !== 'hidden' && <Link disabled={actualizePreOrderAccessRight.rights === 'disable'} >
+              //       <span style={{ textDecoration: 'underline' }} onClick={(e) => {
+              //         e.preventDefault()
+              //         if (actualizePreOrderAccessRight.rights === 'disable') return
+              //         if (draftPreOrderItem.length)
+              //         {
+              //           if (values.id && mode === 'series') {
+              //             dispatch({
+              //               type: 'global/updateAppState',
+              //               payload: {
+              //                 openConfirm: true,
+              //                 isInformType: true,
+              //                 openConfirmText: 'ok',
+              //                 openConfirmContent: `Pre-Order is not allowed for entire series appointment.`,
+              //               },
+              //             })
+              //             return
+              //           }
+              //           if (!values.id && isEnableRecurrence) {
+              //             dispatch({
+              //               type: 'global/updateAppState',
+              //               payload: {
+              //                 openConfirm: true,
+              //                 isInformType: true,
+              //                 openConfirmText: 'ok',
+              //                 openConfirmContent: `Pre-Order is not allowed for recurring appointment.`,
+              //               },
+              //             })
+              //             return
+              //           }
+              //           this.openSelectPreOrder()
+              //         }
+              //       }}>{`Pre-Order(${draftPreOrderItem.length})`}</span>
+              //     </Link>
+              //     }
+              // </div>} 
+                />
             </div>}
             <GridContainer
               className={classnames(classes.formContent)}
@@ -1368,14 +1377,14 @@ class Form extends React.PureComponent {
             >
               <RescheduleForm onConfirmReschedule={this.onConfirmReschedule} />
             </CommonModal>
-            <CommonModal
+            {/*<CommonModal
               open={showSelectPreOrder}
               title='Select Pre-Order'
               onClose={this.closeSelectPreOrder}
               maxWidth='lg'
             >
               <SelectPreOrder onSelectPreOrder={this.onSelectPreOrder} activePreOrderItem={draftPreOrderItem} />
-            </CommonModal>
+            </CommonModal>*/}
           </React.Fragment>
         </SizeContainer>
       </LoadingWrapper>

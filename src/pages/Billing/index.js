@@ -904,7 +904,7 @@ class Billing extends Component {
 
     return (
       <LoadingWrapper loading={loading} text='Getting billing info...'>
-        <PatientBanner />
+        <PatientBanner from='Billing' />
         <div className={classes.accordionContainer}>
           <LoadingWrapper linear loading={dispenseLoading}>
             <Accordion
