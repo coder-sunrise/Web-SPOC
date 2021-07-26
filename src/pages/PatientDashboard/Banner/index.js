@@ -271,7 +271,7 @@ class Banner extends PureComponent {
   getSchemeList = schemeDataList => {
     return schemeDataList.map(s => (
       <span
-        style={{ paddingRight: 5 }}
+        style={{ paddingRight: 5, display: 'inline-block' }}
       >
         <Link>
           <span
