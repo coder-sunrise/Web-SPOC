@@ -187,7 +187,7 @@ const ApplyClaims = ({
   }
 
   const updateOriginalInvoiceItemList = () => {
-    const _resultInvoiceItems = invoice.invoiceItems.map((item) => {
+    const _resultInvoiceItems = invoice.invoiceItems.filter(item => !item.isPreOrder || item.isChargeToday).map((item) => {
       const computeInvoicePayerSubtotal = (subtotal, invoicePayer) => {
         if (invoicePayer.isCancelled) return roundTo(subtotal)
         const _invoicePayerItem = invoicePayer.invoicePayerItem.find(
@@ -230,7 +230,7 @@ const ApplyClaims = ({
             {
               ...invoicePayer,
               invoicePayerItem: invoicePayer.invoicePayerItem.map((item) => {
-                const original = invoice.invoiceItems.find(
+                const original = invoice.invoiceItems.filter(item => !item.isPreOrder || item.isChargeToday).find(
                   (originalItem) =>
                     invoicePayer.id
                       ? originalItem.id === item.invoiceItemFK
@@ -451,7 +451,7 @@ const ApplyClaims = ({
 
     const newInvoiceItems = getInvoiceItems(
       schemeConfig,
-      values.invoice.invoiceItems,
+      values.invoice.invoiceItems.filter(item => !item.isPreOrder || item.isChargeToday),
       tempInvoicePayer[index] ? tempInvoicePayer[index].invoicePayerItem : [],
       // index,
     )
@@ -1005,7 +1005,7 @@ const ApplyClaims = ({
                 payer.payerTypeFK === INVOICE_PAYER_TYPE.COMPANY,
             )
             .map((i) => i.companyFK)}
-          invoiceItems={invoice.invoiceItems.map((invoiceItem) => ({
+          invoiceItems={invoice.invoiceItems.filter(item => !item.isPreOrder || item.isChargeToday).map((invoiceItem) => ({
             ...invoiceItem,
             itemName: invoiceItem.itemDescription,
             schemeCoverage: 100,

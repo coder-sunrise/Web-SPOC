@@ -452,7 +452,10 @@ export const CANNED_TEXT_TYPE = {
   RADIOLOGYINSTRUCTION: 8,
 }
 
-export const CANNED_TEXT_TYPE_BASE_TEXT = [ CANNED_TEXT_TYPE.MEDICALCERTIFICATE, CANNED_TEXT_TYPE.RADIOLOGYINSTRUCTION ]
+export const CANNED_TEXT_TYPE_BASE_TEXT = [
+  CANNED_TEXT_TYPE.MEDICALCERTIFICATE,
+  CANNED_TEXT_TYPE.RADIOLOGYINSTRUCTION,
+]
 
 export const DENTAL_CANNED_TEXT_TYPE_FIELD = {
   1: 'clinicalNotes',
@@ -581,5 +584,18 @@ export const DIAGNOSIS_TYPE = {
 }
 
 export const SERVICE_CENTER_CATEGORY = {
+  INTERNALLABSERVICECENTER: 3,
   INTERNALRADIOLOGYSERVICECENTER: 4,
+}
+
+export const DOSAGE_RULE_OPERATOR = {
+  to: 'to',
+  lessThan: 'less than',
+  moreThan: 'more than',
+}
+
+export const DOSAGE_RULE = {
+  age: 'age',
+  weight: 'weight',
+  default: 'default',
 }

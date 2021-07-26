@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
 import moment from 'moment'
+import { Tag } from 'antd'
 import Delete from '@material-ui/icons/Delete'
 import Warning from '@material-ui/icons/Error'
 // common components
@@ -453,7 +454,7 @@ class AddCrNote extends Component {
           defaultSorting={[
             { columnName: 'packageGlobalId', direction: 'asc' },
           ]}
-          rows={creditNoteItem}
+          rows={creditNoteItem.filter(cn => !cn.isPreOrder || cn.isChargeToday)}
           columns={CrNoteColumns}
           columnExtensions={[
             {
@@ -470,6 +471,7 @@ class AddCrNote extends Component {
                     >
                       {row.itemType}
                       {this.drugMixtureIndicator(row)}
+                      {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
                     </div>
                   </div>
                 )

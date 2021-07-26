@@ -26,7 +26,7 @@ export const InventoryMasterOption = props => {
       name: 'Medication',
       authority: 'inventorymaster.medication',
       content: addContent(1, props),
-      component: MedicationV2,
+      component: Medication,
     },
     {
       id: '1',

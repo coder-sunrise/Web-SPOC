@@ -52,7 +52,11 @@ const tabHeader = (tabName, detailsProps) => {
         return errorHeader
       }
       if (
-        (code || displayValue || revenueCategoryFK || effectiveDates || inventoryVaccinationMedisaveVaccination) &&
+        (code ||
+          displayValue ||
+          revenueCategoryFK ||
+          effectiveDates ||
+          inventoryVaccinationMedisaveVaccination) &&
         tabName === 'General'
       ) {
         return errorHeader

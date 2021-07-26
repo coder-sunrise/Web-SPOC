@@ -56,6 +56,10 @@ export default createListViewModel({
             return {
               ...o,
               effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
+              genericMedication: o.genericMedication
+                ? o.genericMedication.id
+                : null,
+              medicationGroup: o.medicationGroup ? o.medicationGroup.id : null,
               dispensingUOM: o.dispensingUOM ? o.dispensingUOM.id : null,
               favouriteSupplier: o.favouriteSupplier
                 ? o.favouriteSupplier.id

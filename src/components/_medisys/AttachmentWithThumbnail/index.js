@@ -31,7 +31,7 @@ import Thumbnail from './Thumbnail'
 
 const allowedFiles = '.png, .jpg, .jpeg, .xls, .xlsx, .doc, .docx, .pdf'
 
-const getFileExtension = (filename) => {
+const getFileExtension = filename => {
   return filename.split('.').pop()
 }
 
@@ -49,7 +49,7 @@ const AttachmentMenuItems = [
 ]
 
 class AttachmentWithThumbnail extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       showPopper: false,
@@ -62,25 +62,25 @@ class AttachmentWithThumbnail extends Component {
     this.popperRef = React.createRef()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.onRef(this)
   }
 
-  setDownloading = (val) => {
+  setDownloading = val => {
     this.setState({ downloading: val })
   }
 
-  setUploading = (val) => {
+  setUploading = val => {
     this.setState({ uploading: val })
   }
 
-  setErrorText = (val) => {
+  setErrorText = val => {
     this.setState({
       errorText: val,
     })
   }
 
-  stopUploading = (reason) => {
+  stopUploading = reason => {
     this.setErrorText(reason)
     this.setUploading(false)
     this.props.dispatch({
@@ -102,17 +102,11 @@ class AttachmentWithThumbnail extends Component {
       fileCategory,
     } = this.props
 
-    const type = corAttchementTypes.find((o) => o.type === attachmentType) || {}
+    const type = corAttchementTypes.find(o => o.type === attachmentType) || {}
     const fileStatusFK = FILE_STATUS.UPLOADED
     const fileExtension = getFileExtension(name).toLowerCase()
     let _thumbnailDto
-    if (
-      [
-        'jpg',
-        'jpeg',
-        'png',
-      ].includes(fileExtension)
-    ) {
+    if (['jpg', 'jpeg', 'png'].includes(fileExtension)) {
       // const imgEle = document.createElement('img')
       // imgEle.src = `data:image/${fileExtension};base64,${base64File}`
       const imgSrc = `data:image/${fileExtension};base64,${base64File}`
@@ -125,10 +119,7 @@ class AttachmentWithThumbnail extends Component {
         thumbnailSize,
         fileExtension,
       )
-      let [
-        base64Prefix,
-        thumbnailData,
-      ] = thumbnail.split(',')
+      let [base64Prefix, thumbnailData] = thumbnail.split(',')
 
       _thumbnailDto = {
         fileExtension: '.png',
@@ -153,7 +144,7 @@ class AttachmentWithThumbnail extends Component {
     return originalFile
   }
 
-  mapToFileDto = async (file) => {
+  mapToFileDto = async file => {
     // file type and file size validation
     const base64 = await convertToBase64(file)
     const dtos = await this.generateFileDto(file.name, file.size, base64)
@@ -176,7 +167,7 @@ class AttachmentWithThumbnail extends Component {
     })
   }
 
-  validateFiles = (files) => {
+  validateFiles = files => {
     const {
       attachments = [],
       maxFilesAllowUpload,
@@ -186,9 +177,7 @@ class AttachmentWithThumbnail extends Component {
     // const numberOfNewFiles = Object.keys(files).length
     let totalFilesSize = 0
     const maxUploadSize = 31457280
-    const filesArray = [
-      ...files,
-    ]
+    const filesArray = [...files]
 
     const currentFilesLength = filesArray.length + attachments.length
 
@@ -199,7 +188,7 @@ class AttachmentWithThumbnail extends Component {
 
     if (restrictFileTypes.length > 0) {
       const invalidFileExist = filesArray.some(
-        (file) => !restrictFileTypes.includes(file.type),
+        file => !restrictFileTypes.includes(file.type),
       )
 
       if (invalidFileExist) {
@@ -211,10 +200,10 @@ class AttachmentWithThumbnail extends Component {
     }
 
     filesArray &&
-      filesArray.forEach((o) => {
+      filesArray.forEach(o => {
         totalFilesSize += o.size
       })
-    attachments.forEach((o) => {
+    attachments.forEach(o => {
       if (!o.isDeleted) {
         totalFilesSize += o.fileSize
       }
@@ -227,7 +216,7 @@ class AttachmentWithThumbnail extends Component {
     return true
   }
 
-  beginUpload = async (dtos) => {
+  beginUpload = async dtos => {
     const { dispatch, handleUpdateAttachments } = this.props
 
     const uploadResponse = await uploadFile(dtos)
@@ -252,7 +241,7 @@ class AttachmentWithThumbnail extends Component {
     })
   }
 
-  onFileChange = async (event) => {
+  onFileChange = async event => {
     try {
       this.setUploading(true)
       this.props.dispatch({
@@ -287,7 +276,7 @@ class AttachmentWithThumbnail extends Component {
     }
   }
 
-  onUploadFromScan = async (datas) => {
+  onUploadFromScan = async datas => {
     try {
       this.setUploading(true)
       this.props.dispatch({
@@ -308,7 +297,7 @@ class AttachmentWithThumbnail extends Component {
       }
 
       const selectedFilesDto = await Promise.all(
-        datas.map((m) => this.generateFileDto(m.name, m.size, m.imgData)),
+        datas.map(m => this.generateFileDto(m.name, m.size, m.imgData)),
       )
 
       await this.beginUpload(selectedFilesDto)
@@ -317,7 +306,7 @@ class AttachmentWithThumbnail extends Component {
     }
   }
 
-  clearValue = (e) => {
+  clearValue = e => {
     e.target.value = null
   }
 
@@ -334,13 +323,13 @@ class AttachmentWithThumbnail extends Component {
     })
   }
 
-  onClick = async (attachment) => {
+  onClick = async attachment => {
     this.setDownloading(true)
     await downloadAttachment(attachment)
     this.setDownloading(false)
   }
 
-  onDropDownClick = (selectedAttachmentType) => {
+  onDropDownClick = selectedAttachmentType => {
     this.props.handleSelectedAttachmentType(selectedAttachmentType)
     if (this.state.uploadFrom === 'scan') {
       this.props.handleOpenScanner()
@@ -349,7 +338,7 @@ class AttachmentWithThumbnail extends Component {
     }
   }
 
-  render () {
+  render() {
     const {
       classes,
       cardStyles,
@@ -372,11 +361,12 @@ class AttachmentWithThumbnail extends Component {
       hideRemarks = false,
       disableScanner = false,
       handleOpenScanner,
+      extenstions = '',
     } = this.props
     let { showPopper, uploading, errorText, downloading } = this.state
 
     const fileAttachments = attachments.filter(
-      (attachment) =>
+      attachment =>
         (!attachmentType ||
           attachment.attachmentType === attachmentType ||
           filterTypes.indexOf(attachment.attachmentType) >= 0) &&
@@ -387,7 +377,7 @@ class AttachmentWithThumbnail extends Component {
       <Fragment>
         {withDropDown ? (
           <ClickAwayListener
-            onClickAway={(e) => {
+            onClickAway={e => {
               this.setState({
                 showPopper: false,
                 uploadFrom: undefined,
@@ -398,7 +388,7 @@ class AttachmentWithThumbnail extends Component {
               <Button
                 color='primary'
                 size='sm'
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation()
                   this.setState({
                     showPopper: true,
@@ -407,7 +397,7 @@ class AttachmentWithThumbnail extends Component {
                 }}
                 disabled={isReadOnly || uploading || global.disableSave}
                 className={fileAttachments.length >= 1 ? classes.uploadBtn : ''}
-                buttonRef={(node) => {
+                buttonRef={node => {
                   this.popperRef = node
                 }}
               >
@@ -417,7 +407,7 @@ class AttachmentWithThumbnail extends Component {
                 <Button
                   color='primary'
                   size='sm'
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation()
                     this.setState({
                       showPopper: true,
@@ -454,7 +444,7 @@ class AttachmentWithThumbnail extends Component {
                   >
                     <Paper className={classes.dropdown}>
                       <MenuList role='menu'>
-                        {AttachmentMenuItems.map((m) => {
+                        {AttachmentMenuItems.map(m => {
                           return (
                             <Authorized authority={m.authority}>
                               <MenuItem
@@ -519,11 +509,11 @@ class AttachmentWithThumbnail extends Component {
           <GridContainer>
             {fileAttachments.map((attachment, index) => {
               let indexInAllAttachments = attachments.findIndex(
-                (item) => item.id === attachment.id,
+                item => item.id === attachment.id,
               )
               if (attachment.fileIndexFK)
                 indexInAllAttachments = attachments.findIndex(
-                  (item) => item.fileIndexFK === attachment.fileIndexFK,
+                  item => item.fileIndexFK === attachment.fileIndexFK,
                 )
               return (
                 <Thumbnail
@@ -558,7 +548,7 @@ class AttachmentWithThumbnail extends Component {
         <input
           style={{ display: 'none' }}
           type='file'
-          accept={allowedFiles}
+          accept={extenstions ? extenstions : allowedFiles}
           id='uploadVisitAttachment'
           ref={this.inputEl}
           multiple={allowedMultiple}

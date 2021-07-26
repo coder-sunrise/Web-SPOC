@@ -1,20 +1,43 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { connect } from 'dva'
+import { FastField } from 'formik'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
 import {
+  Radio,
+  Card,
+  Anchor,
+  Select,
+  Menu,
+  PageHeader,
+  Button as AntBtn,
+} from 'antd'
+import { UserOutlined, DownOutlined, LinkOutlined } from '@ant-design/icons'
+import {
   errMsgForOutOfRange as errMsg,
+  getTranslationValue,
   navigateDirtyCheck,
   roundTo,
 } from '@/utils/utils'
-import { ProgressButton, Button, withFormikExtend, Tabs } from '@/components'
+import {
+  ProgressButton,
+  Button,
+  withFormikExtend,
+  Tabs,
+  Switch,
+  CardContainer,
+} from '@/components'
 import Yup from '@/utils/yup'
+import { headerHeight } from 'mui-pro-jss'
 import { getBizSession } from '@/services/queue'
 import { AuthorizationWrapper } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
-import { MedicationDetailOption } from './variables'
-
 const { Secured } = Authorized
+import General from './General'
+import Pricing from '../../Pricing'
+import Stock from '../../Stock'
+import Setting from './Setting'
+import DetailsContext, { DetailsContextProvider } from './DetailsContext'
 
 const styles = () => ({
   actionDiv: {
@@ -26,6 +49,31 @@ const styles = () => ({
     paddingBottom: 10,
   },
 })
+
+const currentScrollStyle = {
+  color: '#40a9ff',
+  backgroundColor: '#fff',
+  borderColor: '#40a9ff',
+}
+
+const sections = ['General', 'Setting', 'Pricing', 'Stock']
+
+const CardTitle = ({ children }) => (
+  <div style={{ fontWeight: 500, fontSize: '1.2rem' }}> {children}</div>
+)
+
+function validateIndication(item) {
+  const parent = this.parent
+
+  if (!parent.isMultiLanguage) return true
+
+  if (parent.isMultiLanguage)
+    return (
+      (parent.indication && parent.indicationSecondary) ||
+      (!parent.indication && !parent.indicationSecondary)
+    )
+}
+
 const Detail = ({
   classes,
   dispatch,
@@ -38,13 +86,6 @@ const Detail = ({
   theme,
   ...props
 }) => {
-  const { currentTab } = medication
-
-  const [
-    hasActiveSession,
-    setHasActiveSession,
-  ] = useState(true)
-
   const detailProps = {
     medicationDetail,
     dispatch,
@@ -54,6 +95,31 @@ const Detail = ({
     hasActiveSession,
     ...props,
   }
+
+  const {
+    isMultiLanguage,
+    setCurrentLanguage,
+    currentLanguage,
+    isEditingDosageRule,
+    primaryPrintoutLanguage,
+    secondaryPrintoutLanguage,
+  } = useContext(DetailsContext)
+
+  useEffect(() => window.addEventListener('resize', resizeHandler))
+  const [windowHeight, setWindowHeith] = useState(window.innerHeight)
+  const [currentScrollPosition, setCurrentScrollPosition] = useState('general')
+  const [placeHolderHeight, setPlaceHolderHeight] = useState(0)
+
+  const { clinicSettings } = props
+
+  const resizeHandler = () => {
+    setWindowHeith(window.innerHeight)
+    setPlaceHolderHeight(calculatePlaceHolderHeight())
+  }
+
+  const { currentTab } = medication
+
+  const [hasActiveSession, setHasActiveSession] = useState(true)
 
   const stockProps = {
     medicationDetail,
@@ -76,6 +142,10 @@ const Detail = ({
   }
 
   useEffect(() => {
+    setPlaceHolderHeight(calculatePlaceHolderHeight())
+  }, [])
+
+  useEffect(() => {
     if (medicationDetail.currentId) {
       checkHasActiveSession()
       let tempCode
@@ -85,7 +155,7 @@ const Detail = ({
         payload: {
           id: medicationDetail.currentId,
         },
-      }).then(async (med) => {
+      }).then(async med => {
         const { sddfk } = med
         if (sddfk) {
           await dispatch({
@@ -93,7 +163,7 @@ const Detail = ({
             payload: {
               id: sddfk,
             },
-          }).then((sdd) => {
+          }).then(sdd => {
             const { data } = sdd
             const { code, name } = data[0]
             tempCode = code
@@ -111,57 +181,169 @@ const Detail = ({
     }
   }, [])
 
+  const onAnchorClick = id => {
+    const parentElement = document.getElementById('card-holder')
+    const element = document.getElementById(id)
+    try {
+      if (parentElement && element) {
+        const screenPosition = element.getBoundingClientRect()
+        const { scrollTop } = parentElement
+        const { top, left } = screenPosition
+
+        parentElement.scrollTo({
+          // scrolled top position + element top position - Nav header height
+          top: scrollTop + top - 120,
+          left,
+          behavior: 'smooth',
+        })
+        setCurrentScrollPosition(id)
+      }
+    } catch (error) {
+      console.error({ error })
+    }
+  }
+
+  const calculatePlaceHolderHeight = () => {
+    try {
+      const parentElement = document.getElementById('card-holder')
+      const stockElement = document.getElementById('stock')
+
+      if (parentElement && stockElement) {
+        const placeHolderHeight =
+          parentElement.offsetHeight - stockElement.offsetHeight
+        return placeHolderHeight
+      }
+    } catch (error) {
+      console.error({ error })
+    }
+  }
+
   return (
     <React.Fragment>
-      {/* <NavPills
-        color='primary'
-        onChange={(event, active) => {
-          history.push(
-            getAppendUrl({
-              t: active,
+      <div>
+        <PageHeader
+          style={{ backgroundColor: 'white' }}
+          title={
+            <>
+              <FastField
+                name='code'
+                render={args => <span>{args.field.value}</span>}
+              ></FastField>
+              <FastField
+                name='displayValue'
+                render={args => (
+                  <span
+                    style={{
+                      fontSize: '0.9rem',
+                      fontWeight: 400,
+                      marginLeft: 5,
+                    }}
+                  >
+                    {args.field.value}
+                  </span>
+                )}
+              ></FastField>
+            </>
+          }
+          ghost={false}
+          extra={[
+            ...sections.map(s => {
+              const currentStyle =
+                currentScrollPosition === s.toLocaleLowerCase()
+                  ? currentScrollStyle
+                  : {}
+              return (
+                <AntBtn
+                  id={`btn-${s.toLowerCase()}`}
+                  style={{ marginLeft: 3, ...currentStyle }}
+                  size='sm'
+                  type='link'
+                  color='primary'
+                  onClick={() => onAnchorClick(s.toLowerCase())}
+                >
+                  {s} <LinkOutlined />
+                </AntBtn>
+              )
             }),
-          )
-        }}
-        contentStyle={{ margin: '0 -5px' }}
-        tabs={[
-          {
-            tabButton: 'General',
-            tabContent: <DetailPanel {...detailProps} />,
-          },
-          {
-            tabButton: 'Setting',
-            tabContent: <Setting {...detailProps} />,
-          },
-          {
-            tabButton: 'Pricing',
-            tabContent: <Pricing {...detailProps} />,
-          },
-          {
-            tabButton: 'Stock',
-            tabContent: (
-              <Stock
-                medicationDetail={medicationDetail}
-                values={values}
-                setFieldValue={setFieldValue}
+
+            isMultiLanguage && (
+              <Select
+                defaultValue={currentLanguage}
+                onChange={value => {
+                  setCurrentLanguage(value)
+                }}
+                options={[
+                  {
+                    label: primaryPrintoutLanguage,
+                    value: primaryPrintoutLanguage,
+                  },
+                  {
+                    label: secondaryPrintoutLanguage,
+                    value: secondaryPrintoutLanguage,
+                  },
+                ]}
               />
             ),
-          },
-        ]}
-      /> */}
-      {/* <CardContainer
-        hideHeader
-        style={{
-          margin: theme.spacing(2),
-        }}
-
-        
-      > */}
-      <Tabs
-        style={{ marginTop: 20 }}
-        defaultActiveKey='0'
-        options={MedicationDetailOption(detailProps, stockProps)}
-      />
-      {/* </CardContainer> */}
+          ]}
+        ></PageHeader>
+        <div
+          id='card-holder'
+          style={{
+            marginTop: 10,
+            height: windowHeight - 200,
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            position: 'sticky',
+          }}
+        >
+          <Card
+            onMouseEnter={e => {
+              setCurrentScrollPosition(e.currentTarget.id)
+            }}
+            title={<CardTitle>General</CardTitle>}
+            id='general'
+          >
+            <General {...detailProps} />
+          </Card>
+          <Card
+            onMouseEnter={e => {
+              setCurrentScrollPosition(e.currentTarget.id)
+            }}
+            title={<CardTitle>Setting</CardTitle>}
+            id='setting'
+            style={{ marginTop: 16 }}
+          >
+            <Setting {...detailProps} />
+          </Card>
+          <Card
+            onMouseEnter={e => {
+              setCurrentScrollPosition(e.currentTarget.id)
+            }}
+            title={<CardTitle>Pricing</CardTitle>}
+            id='pricing'
+            style={{ marginTop: 16 }}
+          >
+            <Pricing {...detailProps} />
+          </Card>
+          <Card
+            onMouseEnter={e => {
+              setCurrentScrollPosition(e.currentTarget.id)
+            }}
+            title={<CardTitle>Stock</CardTitle>}
+            id='stock'
+            style={{ marginTop: 16 }}
+          >
+            <Stock {...detailProps} />
+          </Card>
+          <div
+            onMouseEnter={e => {
+              setCurrentScrollPosition('stock')
+            }}
+            id='scroll-placeholder'
+            style={{ height: placeHolderHeight }}
+          ></div>
+        </div>
+      </div>
       <div className={classes.actionDiv}>
         <Button
           authority='none'
@@ -175,11 +357,18 @@ const Detail = ({
         <ProgressButton
           submitKey='medicationDetail/submit'
           onClick={handleSubmit}
+          disabled={isEditingDosageRule}
         />
       </div>
     </React.Fragment>
   )
 }
+
+const DetailsWithProvider = props => (
+  <DetailsContextProvider>
+    <Detail {...props}></Detail>
+  </DetailsContextProvider>
+)
 export default compose(
   withStyles(styles, { withTheme: true }),
   connect(({ medication, medicationDetail, clinicSettings }) => ({
@@ -189,55 +378,115 @@ export default compose(
   })),
   withFormikExtend({
     enableReinitialize: true,
-    mapPropsToValues: ({ medicationDetail }) => {
-      const returnValue = medicationDetail.entity
+    mapPropsToValues: ({ medicationDetail, clinicSettings }) => {
+      const medicationDetails = medicationDetail.entity
         ? medicationDetail.entity
         : medicationDetail.default
-
-      let chas = []
-      const { isChasAcuteClaimable, isChasChronicClaimable, isMedisaveClaimable } = returnValue
+      const {
+        primaryPrintoutLanguage,
+        secondaryPrintoutLanguage,
+      } = clinicSettings
+      const isMultiLanguage =
+        primaryPrintoutLanguage && secondaryPrintoutLanguage ? true : false
+      let checkboxGroup = []
+      const {
+        isChasAcuteClaimable,
+        isChasChronicClaimable,
+        isMedisaveClaimable,
+        isExclusive,
+        isDisplayInLeaflet,
+        isOnlyClinicInternalUsage,
+        inventoryMedication_MedicationIngredient,
+        inventoryMedication_MedicationSideEffect,
+        inventoryMedication_MedicationPrecaution,
+        inventoryMedication_MedicationContraIndication,
+        inventoryMedication_MedicationInteraction,
+      } = medicationDetails
       if (isChasAcuteClaimable) {
-        chas.push('isChasAcuteClaimable')
+        checkboxGroup.push('isChasAcuteClaimable')
       }
       if (isChasChronicClaimable) {
-        chas.push('isChasChronicClaimable')
+        checkboxGroup.push('isChasChronicClaimable')
       }
       if (isMedisaveClaimable) {
-        chas.push('isMedisaveClaimable')
+        checkboxGroup.push('isMedisaveClaimable')
       }
-      // const { sddfk } = returnValue
-      // if (sddfk) {
-      //   console.log('sddfk', sddfk)
-      //   // console.log('sddfk', this.props)
-      //   this.props
-      //     .dispatch({
-      //       type: 'sddDetail/queryOne',
-      //       payload: {
-      //         id: sddfk,
-      //       },
-      //     })
-      //     .then((sdd) => {
-      //       const { data } = sdd
-      //       const { code, name } = data[0]
-      //       console.log('data', data)
-      //     })
-      // }
+      if (isExclusive) {
+        checkboxGroup.push('isExclusive')
+      }
+      if (isDisplayInLeaflet) {
+        checkboxGroup.push('isDisplayInLeaflet')
+      }
+      if (isOnlyClinicInternalUsage) {
+        checkboxGroup.push('isOnlyClinicInternalUsage')
+      }
+
+      let indicationSecondary
+      if (isMultiLanguage)
+        indicationSecondary = getTranslationValue(
+          medicationDetails.translationData,
+          secondaryPrintoutLanguage,
+          'indication',
+        )
+
+      let medicationIngredients = inventoryMedication_MedicationIngredient?.map(
+        item => item.medicationIngredientFK,
+      )
+
+      let medicationSideEffects = inventoryMedication_MedicationSideEffect
+        ?.sort(item => item.sequence)
+        .map(item => item.medicationSideEffectFK)
+
+      let medicationPrecautions = inventoryMedication_MedicationPrecaution
+        ?.sort(item => item.sequence)
+        .map(item => item.medicationPrecautionFK)
+
+      let medicationContraindications = inventoryMedication_MedicationContraIndication
+        ?.sort(item => item.sequence)
+        .map(item => item.medicationContraIndicationFK)
+
+      let medicationInteractions = inventoryMedication_MedicationInteraction
+        ?.sort(item => item.sequence)
+        .map(item => item.medicationInteractionFK)
 
       return {
-        ...returnValue,
-        chas,
+        ...medicationDetails,
+        medicationIngredients,
+        medicationSideEffects,
+        medicationPrecautions,
+        medicationContraindications,
+        medicationInteractions,
+        isMultiLanguage,
+        indicationSecondary,
+        checkboxGroup,
         sddCode: medicationDetail.sddCode,
         sddDescription: medicationDetail.sddDescription,
       }
     },
     validationSchema: Yup.object().shape({
       code: Yup.string().when('id', {
-        is: (id) => !!id,
-        then: Yup.string().trim().required(),
+        is: id => !!id,
+        then: Yup.string()
+          .trim()
+          .required(),
       }),
       displayValue: Yup.string().required(),
       revenueCategoryFK: Yup.number().required(),
-      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+      indication: Yup.string().test(
+        'oneOfRequired',
+        'Please enter indication in both languages',
+        validateIndication,
+      ),
+      indicationSecondary: Yup.string().test(
+        'oneOfRequired',
+        'Please enter indication in both languages',
+        validateIndication,
+      ),
+      isMultiLanguage: Yup.boolean(),
+      effectiveDates: Yup.array()
+        .of(Yup.date())
+        .min(2)
+        .required(),
       prescribingUOMFK: Yup.number().required(),
       prescriptionToDispenseConversion: Yup.number().required(),
       dispensingUOMFK: Yup.number().required(),
@@ -249,7 +498,8 @@ export default compose(
         .min(0, 'Markup Margin must between 0 and 999,999.9')
         .max(999999.9, 'Markup Margin must between 0 and 999,999.9'),
 
-      sellingPrice: Yup.number().required()
+      sellingPrice: Yup.number()
+        .required()
         .min(0, errMsg('Selling Price'))
         .max(999999.99, errMsg('Selling Price')),
 
@@ -267,7 +517,19 @@ export default compose(
     }),
 
     handleSubmit: (values, { props, resetForm }) => {
-      const { id, medicationStock, effectiveDates, ...restValues } = values
+      const {
+        id,
+        medicationStock,
+        effectiveDates,
+        attachment,
+        medicationIngredients = [],
+        medicationSideEffects = [],
+        medicationPrecautions = [],
+        medicationInteractions = [],
+        medicationContraindications = [],
+        medicationInstructionRule = [],
+        ...restValues
+      } = values
       const { dispatch, history, onConfirm, medicationDetail } = props
 
       let defaultMedicationStock = medicationStock
@@ -282,39 +544,136 @@ export default compose(
         ]
       }
 
-      let chas = {
+      let checkboxGroup = {
         isChasAcuteClaimable: false,
         isChasChronicClaimable: false,
         isMedisaveClaimable: false,
+        isExclusive: false,
+        isDisplayInLeaflet: false,
+        isOnlyClinicInternalUsage: false,
       }
-      values.chas.forEach((o) => {
-        if (o === 'isChasAcuteClaimable') {
-          chas[o] = true
-        } else if (o === 'isChasChronicClaimable') {
-          chas[o] = true
-        } else if (o === 'isMedisaveClaimable') {
-          chas[o] = true
-        }
+      values.checkboxGroup.forEach(o => {
+        checkboxGroup[o] = true
       })
+
+      const fileInfo = {}
+      if (attachment) {
+        const newAttach = attachment.filter(
+          a => !a.isDeleted && a.fileIndexFK === undefined,
+        )[0]
+        fileInfo.fileIndexFK = newAttach?.id
+        fileInfo.fileName = newAttach?.fileName
+      }
+
+      let medicationIngredientList = undefined
+      const allOptionId = -99
+
+      if (medicationIngredients) {
+        medicationIngredientList = medicationIngredients
+          .filter(m => m !== allOptionId)
+          .map(m => {
+            return { medicationIngredientFK: m, inventoryMedicationFK: id }
+          })
+      }
+
+      let sideEffectList = undefined
+      if (medicationSideEffects) {
+        sideEffectList = medicationSideEffects.map((item, index) => {
+          return {
+            medicationSideEffectFK: item,
+            sequence: index,
+            inventoryMedicationFK: id,
+          }
+        })
+      }
+
+      let precautionList = undefined
+      if (medicationPrecautions) {
+        precautionList = medicationPrecautions.map((item, index) => {
+          return {
+            medicationPrecautionFK: item,
+            sequence: index,
+            inventoryMedicationFK: id,
+          }
+        })
+      }
+
+      let contraIndicationList = undefined
+      if (medicationContraindications) {
+        contraIndicationList = medicationContraindications.map(
+          (item, index) => {
+            return {
+              medicationContraIndicationFK: item,
+              sequence: index,
+              inventoryMedicationFK: id,
+            }
+          },
+        )
+      }
+
+      let interactionList = undefined
+      if (medicationInteractions) {
+        interactionList = medicationInteractions.map((item, index) => {
+          return {
+            medicationInteractionFK: item,
+            sequence: index,
+            inventoryMedicationFK: id,
+          }
+        })
+      }
+
+      let finalMedicationInstructionRule = [...medicationInstructionRule]
+      let deletedItems = []
+      const originalValues = medicationDetail.entity.medicationInstructionRule
+
+      if (originalValues) {
+        if (medicationInstructionRule.length === 0)
+          deletedItems = originalValues.map(item => ({
+            ...item,
+            isDeleted: true,
+          }))
+        else {
+          deletedItems = originalValues
+            .filter(
+              orig =>
+                medicationInstructionRule.findIndex(d => d.id === orig.id) ===
+                -1,
+            )
+            .map(item => ({ ...item, isDeleted: true }))
+        }
+
+        if (deletedItems)
+          finalMedicationInstructionRule = [
+            ...finalMedicationInstructionRule,
+            ...deletedItems,
+          ]
+      }
       const payload = {
         ...restValues,
-        ...chas,
+        ...checkboxGroup,
+        ...fileInfo,
         id,
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
         medicationStock: defaultMedicationStock,
         suggestSellingPrice: roundTo(restValues.suggestSellingPrice),
+        inventoryMedication_MedicationIngredient: medicationIngredientList,
+        inventoryMedication_MedicationSideEffect: sideEffectList,
+        inventoryMedication_MedicationPrecaution: precautionList,
+        inventoryMedication_MedicationContraIndication: contraIndicationList,
+        inventoryMedication_MedicationInteraction: interactionList,
+        medicationInstructionRule: finalMedicationInstructionRule,
       }
 
       dispatch({
         type: 'medicationDetail/upsert',
         payload,
-      }).then((r) => {
+      }).then(r => {
         if (r) {
           // if (onConfirm) onConfirm()
-          // dispatch({
-          //   type: 'medicationDetail/query',
-          // })
+          dispatch({
+            type: 'medicationDetail/reset',
+          })
           resetForm()
           history.push('/inventory/master')
         }
@@ -323,4 +682,4 @@ export default compose(
 
     displayName: 'InventoryMedicationDetail',
   }),
-)(Secured('inventorymaster.medication')(Detail))
+)(Secured('inventorymaster.medication')(DetailsWithProvider))

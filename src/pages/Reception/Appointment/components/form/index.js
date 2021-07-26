@@ -1146,15 +1146,14 @@ class Form extends React.PureComponent {
     const _disableAppointmentDate =
       this.shouldDisableAppointmentDate() || !patientIsActive
 
-    const { newPreOrderItem = [] } = patientProfile || {}
-    const draftPreOrderItem = [...newPreOrderItem.filter(po => !appointmentPreOrderItem.find(apo => !apo.isDeleted && apo.actualizedPreOrderItemFK === po.id)),
+    const { pendingPreOrderItem = [] } = patientProfile || {}
+    const draftPreOrderItem = [...pendingPreOrderItem.filter(x => x.preOrderItemStatus === 'New').filter(po => !appointmentPreOrderItem.find(apo => !apo.isDeleted && apo.actualizedPreOrderItemFK === po.id)),
     ...appointmentPreOrderItem.filter(apo => apo.isDeleted).map(apo => {
       const { isDeleted, ...resetPreOrderItem } = apo
       return { ...resetPreOrderItem, id: resetPreOrderItem.actualizedPreOrderItemFK }
     })]
 
     const actualizePreOrderAccessRight = Authorized.check('appointment.actualizepreorder') || { rights: 'hidden' }
-
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer size='sm'>

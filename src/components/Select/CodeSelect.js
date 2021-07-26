@@ -5,7 +5,7 @@ import Select from '../Antd/AntdSelect'
 
 @connect(({ codetable }) => ({ codetable }))
 class CodeSelect extends React.PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     // console.log({ props })
     if (
@@ -46,7 +46,7 @@ class CodeSelect extends React.PureComponent {
     }
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.code !== nextProps.code) {
       const { codetable, dispatch, code } = nextProps
       const isExisted = codetable[code.toLowerCase()]
@@ -65,11 +65,14 @@ class CodeSelect extends React.PureComponent {
     }
   }
 
-  render () {
-    const { codetable, code, localFilter } = this.props
+  render() {
+    const { codetable, code, localFilter, formatCodes } = this.props
     const options =
       code !== undefined ? codetable[code.toLowerCase()] || [] : []
     const filteredOptions = localFilter ? options.filter(localFilter) : options
+    const formattedFilteredOptions = formatCodes
+      ? formatCodes(filteredOptions)
+      : filteredOptions
     let selectProps = this.props
     if (
       this.props.maxTagCount === undefined &&
@@ -80,7 +83,7 @@ class CodeSelect extends React.PureComponent {
     }
     return (
       <Select
-        options={filteredOptions || []}
+        options={formattedFilteredOptions || []}
         valueField='id'
         {...selectProps}
         onChange={(values, opts) => {

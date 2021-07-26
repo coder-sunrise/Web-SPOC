@@ -33,6 +33,7 @@ import FormFieldName from './formField'
 // misc utils
 import { formikMapPropsToValues, formikHandleSubmit } from './miscUtils'
 import { VISIT_STATUS } from '../variables'
+import PreOrderCard from './PreOrderCard'
 
 const styles = (theme) => ({
   gridContainer: {
@@ -58,7 +59,7 @@ const styles = (theme) => ({
     '& > p': {
       fontSize: '1.1rem',
     },
-  },
+  },  
   readOnlyChip: {
     position: 'absolute',
     zIndex: 20,
@@ -66,6 +67,8 @@ const styles = (theme) => ({
     right: 0,
   },
 })
+
+const preOrderActualizationAccessRight =  Authorized.check('queue.visitregistrationdetails.preorder'); //  || { rights: 'hidden' }
 
 const getHeight = (propsHeight) => {
   if (propsHeight < 0) return '100%'
@@ -482,6 +485,12 @@ class NewVisit extends PureComponent {
                             />
                           </CommonCard>
                         </GridItem>
+                        {preOrderActualizationAccessRight.rights !== 'hidden' && (<GridItem xs={12} className={classes.row}>
+                          <CommonCard title='Pre-Order Actualization'>
+                          <PreOrderCard {...this.props} values={values} visitPreOrderItem= {values.visitPreOrderItem} dispatch={dispatch}/>
+                          </CommonCard>
+                         </GridItem>)}
+                        
                         <GridItem xs={12} className={classes.row}>
                           <div ref={this.myRef}>
                             <Accordion

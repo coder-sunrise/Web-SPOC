@@ -282,13 +282,10 @@ const getVisitDoctorUserId = props => {
             ? ` For ${item.duration} day(s)`
             : ''
 
-          instruction += `${
-            item.usageMethodDisplayValue ? item.usageMethodDisplayValue : ''
-          } ${item.dosageDisplayValue ? item.dosageDisplayValue : ''} ${
-            item.prescribeUOMDisplayValue ? item.prescribeUOMDisplayValue : ''
-          } ${
-            item.drugFrequencyDisplayValue ? item.drugFrequencyDisplayValue : ''
-          }${itemDuration}${nextStepdose}`
+          instruction += `${item.usageMethodDisplayValue ? item.usageMethodDisplayValue : ''
+            } ${item.dosageDisplayValue ? item.dosageDisplayValue : ''} ${item.prescribeUOMDisplayValue ? item.prescribeUOMDisplayValue : ''
+            } ${item.drugFrequencyDisplayValue ? item.drugFrequencyDisplayValue : ''
+            }${itemDuration}${nextStepdose}`
         }
       }
       return instruction
@@ -656,12 +653,12 @@ class Medication extends PureComponent {
     const isEdit = !!values.id
     const newPrescriptionInstruction = isEdit
       ? [
-          ...corPrescriptionItemInstruction.map(i => ({
-            ...i,
-            isDeleted: true,
-          })),
-          defaultInstruction,
-        ]
+        ...corPrescriptionItemInstruction.map(i => ({
+          ...i,
+          isDeleted: true,
+        })),
+        defaultInstruction,
+      ]
       : [defaultInstruction]
 
     setFieldValue('corPrescriptionItemInstruction', newPrescriptionInstruction)
@@ -705,12 +702,12 @@ class Medication extends PureComponent {
       }
       const newPrescriptionPrecaution = isEdit
         ? [
-            ...corPrescriptionItemPrecaution.map(i => ({
-              ...i,
-              isDeleted: true,
-            })),
-            defaultPrecaution,
-          ]
+          ...corPrescriptionItemPrecaution.map(i => ({
+            ...i,
+            isDeleted: true,
+          })),
+          defaultPrecaution,
+        ]
         : [defaultPrecaution]
 
       setFieldValue(`corPrescriptionItemPrecaution`, newPrescriptionPrecaution)
@@ -829,7 +826,7 @@ class Medication extends PureComponent {
     }
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     if (nextProps.orders.type === this.props.type)
       if (
         (!this.props.global.openAdjustment &&
@@ -1231,7 +1228,7 @@ class Medication extends PureComponent {
     }, 300)
   }
 
-  render() {
+  render () {
     const {
       theme,
       classes,
@@ -1506,9 +1503,8 @@ class Medication extends PureComponent {
                                       {`${o.name} - `}
                                     </span>
                                     <span>
-                                      {`${o.message}${
-                                        index < cautions.length - 1 ? '; ' : ''
-                                      }`}
+                                      {`${o.message}${index < cautions.length - 1 ? '; ' : ''
+                                        }`}
                                     </span>
                                   </span>
                                 )
@@ -1657,7 +1653,8 @@ class Medication extends PureComponent {
                                   return (
                                     <CodeSelect
                                       label={formatMessage({
-                                        id: 'inventory.master.setting.uom',
+                                        id:
+                                          'inventory.master.setting.prescribeUOM',
                                       })}
                                       allowClear={false}
                                       code='ctMedicationUnitOfMeasurement'
@@ -2053,52 +2050,89 @@ class Medication extends PureComponent {
           <GridContainer>
             <GridItem xs={8} className={classes.editor}>
               {values.visitPurposeFK !== VISIT_TYPE.RETAIL &&
-              !values.isDrugMixture &&
-              !values.isPackage ? (
-                <FastField
-                  name='isExternalPrescription'
-                  render={args => {
-                    if (args.field.value) {
-                      setDisable(true)
-                    } else {
-                      setDisable(false)
-                    }
-                    return (
-                      <Checkbox
-                        label='External Prescription'
-                        {...args}
-                        onChange={e => {
-                          if (e.target.value) {
-                            this.props.setFieldValue('adjAmount', 0)
-                            this.props.setFieldValue(
-                              'totalAfterItemAdjustment',
-                              0,
-                            )
-                            this.props.setFieldValue('totalPrice', 0)
-                            this.props.setFieldValue('expiryDate', undefined)
-                            this.props.setFieldValue('batchNo', undefined)
-                            this.props.setFieldValue('isMinus', true)
-                            this.props.setFieldValue('isExactAmount', true)
-                            this.props.setFieldValue('adjValue', 0)
+                !values.isDrugMixture &&
+                !values.isPackage ? (
+                  <div>
+                    <div style={{ display: 'inline-block' }}>
+                      <FastField
+                        name='isExternalPrescription'
+                        render={args => {
+                          if (args.field.value) {
+                            setDisable(true)
                           } else {
-                            this.props.setFieldValue(
-                              'expiryDate',
-                              this.state.expiryDate,
-                            )
-                            this.props.setFieldValue(
-                              'batchNo',
-                              this.state.batchNo,
-                            )
-                            setTimeout(() => {
-                              this.calculateQuantity()
-                            }, 1)
+                            setDisable(false)
                           }
-                          setDisable(e.target.value)
+                          return (
+                            <Checkbox
+                              label='External Prescription'
+                              {...args}
+                              onChange={e => {
+                                if (e.target.value) {
+                                  this.props.setFieldValue('adjAmount', 0)
+                                  this.props.setFieldValue(
+                                    'totalAfterItemAdjustment',
+                                    0,
+                                  )
+                                  this.props.setFieldValue('totalPrice', 0)
+                                  this.props.setFieldValue('expiryDate', undefined)
+                                  this.props.setFieldValue('batchNo', undefined)
+                                  this.props.setFieldValue('isMinus', true)
+                                  this.props.setFieldValue('isExactAmount', true)
+                                  this.props.setFieldValue('adjValue', 0)
+                                } else {
+                                  this.props.setFieldValue(
+                                    'expiryDate',
+                                    this.state.expiryDate,
+                                  )
+                                  this.props.setFieldValue(
+                                    'batchNo',
+                                    this.state.batchNo,
+                                  )
+                                  setTimeout(() => {
+                                    this.calculateQuantity()
+                                  }, 1)
+                                }
+                                setDisable(e.target.value)
+                              }}
+                            />
+                          )
                         }}
                       />
-                    )
-                  }}
-                />
+                    </div>
+                    {values.type === '1' && <div style={{ display: 'inline-block' }}>
+                      <FastField
+                        name='isPreOrder'
+                        render={args => {
+                          return (
+                            <Checkbox
+                              label='Pre-Order'
+                              {...args}
+                              onChange={e => {
+                                if (!e.target.value) {
+                                  setFieldValue('isChargeToday', false)
+                                }
+                              }}
+                            />
+                          )
+                        }}
+                      />
+                    </div>
+                    }
+                    {values.isPreOrder && <div style={{ display: 'inline-block' }}>
+                      <FastField
+                        name='isChargeToday'
+                        render={args => {
+                          return (
+                            <Checkbox
+                              label='Charge Today'
+                              {...args}
+                            />
+                          )
+                        }}
+                      />
+                    </div>
+                    }
+                  </div>
               ) : (
                 ''
               )}
