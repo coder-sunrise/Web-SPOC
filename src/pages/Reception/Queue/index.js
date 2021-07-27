@@ -639,6 +639,7 @@ class Queue extends React.Component {
             version,
           },
         }).then(o => {
+          console.log('111111', o)
           if (o)
             if (o.updateByUserFK !== this.props.user.id) {
               const { clinicianprofile = [] } = this.props.codetable

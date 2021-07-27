@@ -401,6 +401,8 @@ export default compose(
         inventoryMedication_MedicationPrecaution,
         inventoryMedication_MedicationContraIndication,
         inventoryMedication_MedicationInteraction,
+        isDispensedByPharmacy,
+        isNurseActualizable,
       } = medicationDetails
       if (isChasAcuteClaimable) {
         checkboxGroup.push('isChasAcuteClaimable')
@@ -419,6 +421,12 @@ export default compose(
       }
       if (isOnlyClinicInternalUsage) {
         checkboxGroup.push('isOnlyClinicInternalUsage')
+      }
+      if (isDispensedByPharmacy) {
+        checkboxGroup.push('isDispensedByPharmacy')
+      }
+      if (isNurseActualizable) {
+        checkboxGroup.push('isNurseActualizable')
       }
 
       let indicationSecondary

@@ -214,6 +214,13 @@ const Detail = ({
                             },
                           })
                         }
+                        arr.push({
+                          id: 'isNurseActualizable',
+                          name: 'Nurse Actualizable',
+                          layoutConfig: {
+                            style: {},
+                          },
+                        })
                         return arr
                       })()
                       }

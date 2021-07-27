@@ -513,9 +513,9 @@ class Radiology extends PureComponent {
                                 type,
                                 packageGlobalId: '',
                                 performingUserFK: getVisitDoctorUserId(this.props),
-                                isDisplayValueChangable: r.isDisplayValueChangable
+                                isDisplayValueChangable: r.isDisplayValueChangable,
+                                isNurseActualizeRequired: r.isNurseActualizable
                               }
-                              console.log('isDisplayValueChangable', r.isDisplayValueChangable)
                               this.getServiceCenterService(newService)
                               setFieldValue('radiologyItems', [...radiologyItems, newService])
                               setFieldValue('editServiceId', newService.serviceFK)

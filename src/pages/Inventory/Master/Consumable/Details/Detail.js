@@ -105,13 +105,13 @@ const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
                       valueField='id'
                       textField='name'
                       options={
-                        (()=>{
+                        (() => {
                           var arr = []
-                          if(clinicSettings.isEnableCHAS){
+                          if (clinicSettings.isEnableCHAS) {
                             arr.push(...[{
                               id: 'isChasAcuteClaimable',
                               name: 'CHAS Acute Claimable',
-    
+
                               layoutConfig: {
                                 style: {},
                               },
@@ -119,15 +119,30 @@ const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
                             {
                               id: 'isChasChronicClaimable',
                               name: 'CHAS Chronic Claimable',
-    
+
                               layoutConfig: {
                                 style: {},
                               },
-                            }])
+                              },
+                            ])
                           }
+                          arr.push(...[{
+                            id: 'isDispensedByPharmacy',
+                            name: 'Dispensed by Pharmacy',
+                            layoutConfig: {
+                              style: {},
+                            },
+                          },
+                          {
+                            id: 'isNurseActualizable',
+                            name: 'Nurse Actualizable',
+                            layoutConfig: {
+                              style: {},
+                            },
+                          },])
                           return arr
                         })()}
-                      onChange={(e, s) => {}}
+                      onChange={(e, s) => { }}
                       {...args}
                     />
                   )}

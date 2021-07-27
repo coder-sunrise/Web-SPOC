@@ -72,6 +72,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       inventoryvaccination = [],
       inventoryconsumable = [],
       doctorprofile,
+      ctservice = [],
     } = codetable
 
     const { doctorProfileFK } = visitRegistration.entity.visit
@@ -221,6 +222,8 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           remainingQuantity: packageItem.quantity,
           performingUserFK: visitDoctorUserId,
           packageGlobalId,
+          isDispensedByPharmacy: medication.isDispensedByPharmacy,
+          isNurseActualizeRequired: medication.isNurseActualizable,
         }
       }
       return item
@@ -286,6 +289,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           type: packageItem.type,
           subject: vaccination.displayValue,
           isGenerateCertificate: vaccination.isAutoGenerateCertificate,
+          isNurseActualizeRequired: vaccination.isNurseActualizable,
         }
       }
 
@@ -326,6 +330,9 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       packageName,
       packageItem,
     ) => {
+      const service = ctservice.find(
+        (item) => item.id === packageItem.serviceCenterServiceFK,
+      )
       let item
       item = {
         isActive: packageItem.isActive,
@@ -350,6 +357,8 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
         remainingQuantity: packageItem.quantity,
         performingUserFK: visitDoctorUserId,
         packageGlobalId,
+        isNurseActualizeRequired: service.isNurseActualizable,
+        serviceCenterCategoryFK: service.serviceCenterCategoryFK
       }
       return item
     }
@@ -400,6 +409,8 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
         remainingQuantity: packageItem.quantity,
         performingUserFK: visitDoctorUserId,
         packageGlobalId,
+        isDispensedByPharmacy: consumable.isDispensedByPharmacy,
+        isNurseActualizeRequired: consumable.isNurseActualizable,
       }
 
       return item
@@ -448,6 +459,11 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
         packageItems[index],
       )
       if (newOrder) {
+        let type = packageItems[index].type
+        if (packageItems[index].type === '3') {
+          if (newOrder.serviceCenterCategoryFK === 3) { type = '9' }
+          else if (newOrder.serviceCenterCategoryFK === 4) { type = '10' }
+        }
         const data = {
           isOrderedByDoctor:
             user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
@@ -455,7 +471,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           ...newOrder,
           subject: packageItems[index].name,
           isDeleted: false,
-          type: packageItems[index].type,
+          type,
         }
         datas.push(data)
         nextSequence += 1
