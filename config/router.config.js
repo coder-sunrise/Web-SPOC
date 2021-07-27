@@ -1077,10 +1077,10 @@ const _routes = [
             authority: ['settings.clinicsetting.medicationingredient'],
           },
           {
-            path: '/setting/clinicdrugallergy',
-            name: 'clinicdrugallergy',
-            component: './Setting/ClinicDrugAllergy',
-            authority: ['settings.clinicsetting.clinicdrugallergy'],
+            path: '/setting/drugallergy',
+            name: 'drugallergy',
+            component: './Setting/DrugAllergy',
+            authority: ['settings.clinicsetting.drugallergy'],
           },
           {
             path: '/setting/medicationcontraindication',

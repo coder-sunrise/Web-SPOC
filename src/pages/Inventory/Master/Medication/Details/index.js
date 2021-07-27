@@ -105,7 +105,8 @@ const Detail = ({
     secondaryPrintoutLanguage,
   } = useContext(DetailsContext)
 
-  useEffect(() => window.addEventListener('resize', resizeHandler))
+  useEffect(() => window.addEventListener('resize', resizeHandler), [])
+
   const [windowHeight, setWindowHeith] = useState(window.innerHeight)
   const [currentScrollPosition, setCurrentScrollPosition] = useState('general')
   const [placeHolderHeight, setPlaceHolderHeight] = useState(0)

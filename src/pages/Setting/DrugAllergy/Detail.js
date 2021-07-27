@@ -15,8 +15,8 @@ import {
 const styles = theme => ({})
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingClinicDrugAllergy }) =>
-    settingClinicDrugAllergy.entity || settingClinicDrugAllergy.default,
+  mapPropsToValues: ({ settingDrugAllergy }) =>
+    settingDrugAllergy.entity || settingDrugAllergy.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
@@ -29,25 +29,24 @@ const styles = theme => ({})
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
 
-
     dispatch({
-      type: 'settingClinicDrugAllergy/upsert',
+      type: 'settingDrugAllergy/upsert',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
-        clinicdrugallergyStatusFK: 1,
+        drugallergyStatusFK: 1,
       },
     }).then(r => {
       if (r) {
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'settingClinicDrugAllergy/query',
+          type: 'settingDrugAllergy/query',
         })
       }
     })
   },
-  displayName: 'ClinicDrugAllergyDetail',
+  displayName: 'DrugAllergyDetail',
 })
 class Detail extends PureComponent {
   render() {
@@ -99,9 +98,14 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='sortOrder'
-                render={(args) => {
+                render={args => {
                   return (
-                    <NumberInput label='Sort Order' precision={0} rowsMax={4} {...args} />
+                    <NumberInput
+                      label='Sort Order'
+                      precision={0}
+                      rowsMax={4}
+                      {...args}
+                    />
                   )
                 }}
               />

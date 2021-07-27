@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
-import { EditableTableGrid, notification } from '@/components'
+import { EditableTableGrid, notification, Icon } from '@/components'
 
 @connect(({ user }) => ({
   user,
@@ -12,25 +12,15 @@ class AllergyGrid extends PureComponent {
     rowChanges: {},
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { type, codetable } = this.props
-    const allergyList = [
-      ...codetable.ctdrugallergy, 
-      ...codetable.ctclinicdrugallergy
-      .map((ct, index) => {
-        return {
-          ...ct, 
-          id: codetable.ctdrugallergy.length + ct.id,
-        }
-      })
-    ]
 
     // const compareDate = (a, b) =>
     //   a.toLocaleString().localeCompare(b.toLocaleString())
     let colName = 'allergyName'
-    if(type === 'Allergy') colName = 'allergyFK'
-    if(type === 'Ingredient') colName = 'ingredientFK'
+    if (type === 'Allergy') colName = 'allergyFK'
+    if (type === 'Ingredient') colName = 'ingredientFK'
     // console.log('type',type)
 
     this.tableParas = {
@@ -47,7 +37,6 @@ class AllergyGrid extends PureComponent {
         {
           columnName: 'onsetDate',
           type: 'date',
-          // compare: compareDate,
         },
         {
           columnName: 'ingredientFK',
@@ -57,14 +46,20 @@ class AllergyGrid extends PureComponent {
           autoComplete: true,
           filterOption: (val, option) => {
             let { rows } = this.props
-            return rows.filter((r) => !r.isDeleted).map((o) => o.ingredientFK).indexOf(option.value) < 0
+            return (
+              rows
+                .filter(r => !r.isDeleted)
+                .map(o => o.ingredientFK)
+                .indexOf(option.value) < 0
+            )
           },
           onChange: ({ val, option, row }) => {
             if (option) {
               let { rows } = this.props
               if (
                 rows.filter(
-                  (o) => !o.isDeleted && o.ingredientFK === val && o.id !== row.id,
+                  o =>
+                    !o.isDeleted && o.ingredientFK === val && o.id !== row.id,
                 ).length > 0
               ) {
                 notification.error({
@@ -78,30 +73,35 @@ class AllergyGrid extends PureComponent {
         },
         {
           columnName: 'allergyFK',
-          type: 'select',
-          valueField: 'id',
-          labelField: 'name',
+          type: 'codeSelect',
+          labelField: 'displayValue',
           label: 'Allergy Name',
-          options: allergyList,
+          valueField: 'id',
+          code: 'ctdrugallergy',
           autoComplete: true,
           filterOption: (val, option) => {
             let { rows } = this.props
-            return rows.filter((r) => !r.isDeleted).map((o) => o.allergyFK).indexOf(option.value) < 0
+            return (
+              rows
+                .filter(r => !r.isDeleted)
+                .map(o => o.allergyFK)
+                .indexOf(option.value) < 0
+            )
           },
           onChange: ({ val, option, row }) => {
             if (option) {
               let { rows } = this.props
               if (
                 rows.filter(
-                  (o) => !o.isDeleted && o.allergyFK === val && o.id !== row.id,
+                  o => !o.isDeleted && o.allergyFK === val && o.id !== row.id,
                 ).length > 0
               ) {
                 notification.error({
                   message: 'The Allergy record already exists.',
                 })
               }
-              // row.allergyCode = option.code || option.name
-              row.allergyName = option.name
+
+              row.allergyName = option.displayValue
             }
           },
         },
@@ -129,8 +129,8 @@ class AllergyGrid extends PureComponent {
     }
 
     this.commitChanges = props.setArrayValue
-    this.onAddedRowsChange = (addedRows) => {
-      return addedRows.map((row) => ({
+    this.onAddedRowsChange = addedRows => {
+      return addedRows.map(row => ({
         onsetDate: moment(),
         patientAllergyStatusFK: 1,
         ...row,
@@ -141,7 +141,7 @@ class AllergyGrid extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const { isEditable, rows, schema } = this.props
     return (
       <EditableTableGrid
