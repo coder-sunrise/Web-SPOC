@@ -409,10 +409,11 @@ const General = ({
             name='drugAllergyFK'
             render={args => (
               <CodeSelect
+                multiple
                 label={formatMessage({
                   id: 'inventory.master.medication.drugAllergy',
                 })}
-                code='ctclinicdrugallergy'
+                code='ctdrugallergy'
                 {...args}
               />
             )}
