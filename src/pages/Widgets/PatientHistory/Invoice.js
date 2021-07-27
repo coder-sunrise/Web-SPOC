@@ -3,7 +3,7 @@ import { Table } from 'antd'
 import moment from 'moment'
 import numeral from 'numeral'
 import { Tag } from 'antd'
-import { currencySymbol } from '@/utils/config'
+import { currencySymbol,currencyFormat } from '@/utils/config'
 import { GridContainer, GridItem, TextField, Tooltip } from '@/components'
 import { VISIT_TYPE } from '@/utils/constants'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
@@ -25,7 +25,7 @@ const wrapCellTextStyle = {
   whiteSpace: 'pre-wrap',
 }
 
-const drugMixtureIndicator = (row) => {
+const drugMixtureIndicator = row => {
   if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
 
   return (
@@ -60,13 +60,46 @@ const baseColumns = [
           <div style={wrapCellTextStyle}>
             {row.isDrugMixture ? 'Drug Mixture' : row.itemType}
             {drugMixtureIndicator(row)}
-            {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
+            {row.isPreOrder && (
+              <Tooltip title='Pre-Order'>
+                <Tag
+                  color='#4255bd'
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    right: -10,
+                    borderRadius: 10,
+                  }}
+                >
+                  Pre
+                </Tag>
+              </Tooltip>
+            )}
           </div>
         </div>
       )
     },
   },
-  { dataIndex: 'itemName', title: 'Name', width: 250 },
+  {
+    dataIndex: 'itemName',
+    title: 'Name',
+    width: 250,
+    render: (text, row) => (
+      <Tooltip
+        title={
+          <div>
+            {`Code/Name: ${row.code} / ${row.name}`}
+            <br />
+            {`UniPrice/UOM: ${currencySymbol}${numeral(row.unitPrice).format(
+              currencyFormat,
+            )} / ${row.dispenseUOMDisplayValue || '-'}`}
+          </div>
+        }
+      >
+        <div style={wrapCellTextStyle}>{text}</div>
+      </Tooltip>
+    ),
+  },
   {
     dataIndex: 'description',
     title: 'Instructions',
@@ -95,7 +128,10 @@ const baseColumns = [
     title: 'Total',
     width: 100,
     align: 'right',
-    render: (text, row) => showCurrency((row.isPreOrder && !row.isChargeToday) ? 0 : row.totalAfterItemAdjustment),
+    render: (text, row) =>
+      showCurrency(
+        row.isPreOrder && !row.isChargeToday ? 0 : row.totalAfterItemAdjustment,
+      ),
   },
 ]
 
@@ -136,8 +172,7 @@ export default ({ current, theme, isFullScreen = true }) => {
       />
       <GridContainer style={{ paddingTop: theme.spacing(2) }}>
         <GridItem xs={12} sm={6} md={isFullScreen ? 8 : 6}>
-          {current.invoice &&
-          current.invoice.remark && (
+          {current.invoice && current.invoice.remark && (
             <div style={{ marginLeft: -8 }}>
               <span style={{ fontWeight: 500 }}>Invoice Remarks:</span>
               <TextField
