@@ -16,7 +16,7 @@ const styles = () => ({
     borderRadius: '16px',
     lineHeight: 1,
     display: 'inline-block',
-    textTransform: 'uppercase',
+    // textTransform: 'uppercase',
     fontSize: '.75rem',
     fontWeight: 700,
     textAlign: 'center',
