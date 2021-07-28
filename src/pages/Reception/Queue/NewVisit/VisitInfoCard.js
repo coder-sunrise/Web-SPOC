@@ -442,8 +442,8 @@ const VisitInfoCard = ({
             icon={null}
             visible={visitGroupPopup}
             content={<div>
-              <p>- Search by existing group number or patient name</p>
-              <p>- Selecting visit group will set Cons. Ready to "No"</p>
+              <p>- Search by existing group number or patient name.</p>
+              <p>- Selecting visit group will set Cons. Ready to "No".</p>
             </div>}>
             <IconButton
               size='small'
