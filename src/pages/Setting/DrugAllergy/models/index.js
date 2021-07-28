@@ -3,11 +3,11 @@ import moment from 'moment'
 import service from '../services'
 
 export default createListViewModel({
-  namespace: 'settingClinicDrugAllergy',
+  namespace: 'settingDrugAllergy',
   config: {
     codetable: {
       message: 'DrugAllergy updated',
-      code: 'ctclinicdrugallergy',
+      code: 'ctdrugallergy',
     },
   },
   param: {

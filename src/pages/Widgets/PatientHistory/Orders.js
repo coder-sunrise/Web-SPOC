@@ -1,19 +1,17 @@
 import { Table } from 'antd'
 import numeral from 'numeral'
 import { Tag } from 'antd'
-import { currencySymbol } from '@/utils/config'
+import { currencySymbol, currencyFormat } from '@/utils/config'
 import tablestyles from './PatientHistoryStyle.less'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
-import {
-  Tooltip,
-} from '@/components'
+import { Tooltip } from '@/components'
 
 const wrapCellTextStyle = {
   wordWrap: 'break-word',
   whiteSpace: 'pre-wrap',
 }
 
-const drugMixtureIndicator = (row) => {
+const drugMixtureIndicator = row => {
   if (row.type !== 'Medication' || !row.isDrugMixture) return null
 
   return (
@@ -41,23 +39,62 @@ export default ({ current }) => {
                   <div style={wrapCellTextStyle}>
                     {row.isDrugMixture ? 'Drug Mixture' : row.type}
                     {drugMixtureIndicator(row)}
-                    {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
+                    {row.isPreOrder && (
+                      <Tooltip title='Pre-Order'>
+                        <Tag
+                          color='#4255bd'
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            right: -10,
+                            borderRadius: 10,
+                          }}
+                        >
+                          Pre
+                        </Tag>
+                      </Tooltip>
+                    )}
                   </div>
                 </div>
               )
             },
           },
-          { dataIndex: 'name', title: 'Name', width: 250 },
+          {
+            dataIndex: 'name',
+            title: 'Name',
+            width: 250,
+            render: (text, row) => (
+              <Tooltip
+                title={
+                  <div>
+                    {`Code/Name: ${row.code} / ${row.name}`}
+                    <br />
+                    {`UniPrice/UOM: ${currencySymbol}${numeral(
+                      row.unitPrice,
+                    ).format(currencyFormat)} / ${row.dispenseUOMDisplayValue ||
+                      '-'}`}
+                  </div>
+                }
+              >
+                <div style={wrapCellTextStyle}>{text}</div>
+              </Tooltip>
+            ),
+          },
           {
             dataIndex: 'description',
             title: 'Instructions',
-            render: (text) => <div style={wrapCellTextStyle}>{text}</div>,
+            render: (text, row) => (
+              <Tooltip title={row.description}>
+                <div style={wrapCellTextStyle}>{text}</div>
+              </Tooltip>
+            ),
+
             width: 250,
           },
           {
             dataIndex: 'remarks',
             title: 'Remarks',
-            render: (text) => <div style={wrapCellTextStyle}>{text}</div>,
+            render: text => <div style={wrapCellTextStyle}>{text}</div>,
           },
           {
             dataIndex: 'quantity',
@@ -107,7 +144,9 @@ export default ({ current }) => {
                 }}
               >
                 {`${currencySymbol}${numeral(
-                  (row.isPreOrder && !row.isChargeToday) ? 0 : (row.totalAfterItemAdjustment || 0),
+                  row.isPreOrder && !row.isChargeToday
+                    ? 0
+                    : row.totalAfterItemAdjustment || 0,
                 ).format('0,0.00')}`}
               </div>
             ),
