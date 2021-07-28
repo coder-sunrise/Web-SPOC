@@ -20,14 +20,14 @@ export const StatusIndicator = {
 export const modelKey = 'queueLog/'
 
 export const VISIT_STATUS = {
-  WAITING: 'WAITING',
-  IN_CONS: 'IN CONS',
-  PAUSED: 'PAUSED',
-  DISPENSE: 'DISPENSE',
-  BILLING: 'BILLING',
-  ORDER_UPDATED: 'ORDER UPDATED',
-  COMPLETED: 'COMPLETED',
-  UPCOMING_APPT: 'UPCOMING APPT.',
+  WAITING: 'Waiting',
+  IN_CONS: 'In Cons',
+  PAUSED: 'Paused',
+  DISPENSE: 'Dispense',
+  BILLING: 'Billing',
+  ORDER_UPDATED: 'Order Updated',
+  COMPLETED: 'Completed',
+  UPCOMING_APPT: 'Upcoming Appt.',
 }
 
 export const filterMap = {

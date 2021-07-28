@@ -84,7 +84,7 @@ const VisitStatusTag = (props) => {
     event.stopPropagation()
   }
 
-  switch (value.toUpperCase()) {
+  switch (value) {
     case VISIT_STATUS.WAITING:
       colorTag = 'blue'
       break
@@ -130,7 +130,7 @@ const VisitStatusTag = (props) => {
       }
       onDoubleClick={handleDoubleClick}
     >
-      <span>
+      <span style={{ fontSize: '0.87rem', fontWeight: 400, letterSpacing: 'inherit', }}>
         {visitType && visitPurposeFK !== VISIT_TYPE.CONS ? (
           `${value} (${visitType.displayName})`
         ) : (

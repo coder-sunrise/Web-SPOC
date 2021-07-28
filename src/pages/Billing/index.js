@@ -27,6 +27,7 @@ import {
   INVOICE_PAYER_TYPE,
   PACKAGE_SIGNATURE_CHECK_OPTION,
 } from '@/utils/constants'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import Authorized from '@/utils/Authorized'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
@@ -373,7 +374,7 @@ class Billing extends Component {
       if (isSchemesValid) {
         const payload = constructPayload(values)
         const defaultCallback = async () => {
-          if (visitStatus === 'COMPLETED') {
+          if (visitStatus === VISIT_STATUS.COMPLETED) {
             notification.success({
               message: 'Billing Completed',
             })
@@ -532,7 +533,7 @@ class Billing extends Component {
   checkInvoiceOutstanding = async () => {
     const { dispatch, values, setFieldValue } = this.props
     await setFieldValue('mode', 'save')
-    await setFieldValue('visitStatus', 'COMPLETED')
+    await setFieldValue('visitStatus', VISIT_STATUS.COMPLETED)
 
     const { invoice, invoicePayer = [] } = values
     const { outstandingBalance = 0 } = invoice
@@ -676,7 +677,7 @@ class Billing extends Component {
       ...values,
       invoicePayment,
       mode: 'save',
-      visitStatus: 'BILLING',
+      visitStatus: VISIT_STATUS.BILLING,
     }
     await setValues(_newValues)
     await this.calculateOutstandingBalance(invoicePayment)
@@ -709,7 +710,7 @@ class Billing extends Component {
       ...values,
       invoicePayment: _newInvoicePayment,
       mode: 'save',
-      visitStatus: 'BILLING',
+      visitStatus: VISIT_STATUS.BILLING,
     }
     await setValues(_newValues)
     await this.calculateOutstandingBalance(_newInvoicePayment)
@@ -817,8 +818,8 @@ class Billing extends Component {
     const { visitStatus } = values
     if (
       visitStatus &&
-      visitStatus !== 'BILLING' &&
-      visitStatus !== 'COMPLETED'
+      visitStatus !== VISIT_STATUS.BILLING &&
+      visitStatus !== VISIT_STATUS.COMPLETED
     ) {
       showRefreshOrder = true
     }
