@@ -27,7 +27,7 @@ import Authorized from '@/utils/Authorized'
 // utils
 import { findGetParameter, commonDataReaderTransform } from '@/utils/utils'
 import { VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
-import { DoctorProfileSelect } from '@/components/_medisys'
+import { DoctorProfileSelect,ServePatientButton } from '@/components/_medisys'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import { getReportContext } from '@/services/report'
 import * as WidgetConfig from './config'
@@ -462,11 +462,16 @@ class PatientHistory extends Component {
           {!isNurseNote && (
             <div style={{ fontSize: '0.9em' }}>
               <div style={{ fontWeight: 500 }}>
-                {`${moment(visitDate).format('DD MMM YYYY')} (Time In: ${moment(
-                  timeIn,
-                ).format('HH:mm')} Time Out: ${
-                  timeOut ? moment(timeOut).format('HH:mm') : '-'
-                })${docotrName ? ` - ${docotrName}` : ''}`}
+                <span>
+                  {`${moment(visitDate).format('DD MMM YYYY')} (Time In: ${moment(
+                    timeIn,
+                  ).format('HH:mm')} Time Out: ${
+                    timeOut ? moment(timeOut).format('HH:mm') : '-'
+                  })${docotrName ? ` - ${docotrName}` : ''}`}
+                </span>
+                <span style={{marginLeft:5,marginTop:-10}}>
+                  <ServePatientButton servingPersons={row.servingByList} justShow={true}/>
+                </span>
               </div>
               <span>
                 {`${visitPurposeName}, Last Update By: ${LastUpdateBy ||
@@ -1270,7 +1275,7 @@ class PatientHistory extends Component {
       ConsultationDocument: consultationDocument,
       ReportContext: reportContext,
     }
-    console.log(payload)
+    // console.log(payload)
     const payload1 = [
       {
         ReportId: 68,
