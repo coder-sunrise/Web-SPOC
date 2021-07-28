@@ -317,7 +317,7 @@ export const menuData = [
   {
     authority: 'settings.clinicsetting.medicationsideeffect',
     title: 'Clinic Setting',
-    text: 'Medication Side-Effect',
+    text: 'Medication Side Effect',
     url: '/setting/medicationsideeffect',
   },
   {
