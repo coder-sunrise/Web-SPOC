@@ -10,11 +10,11 @@ import Assignment from '@material-ui/icons/Assignment'
 import Description from '@material-ui/icons/Description'
 
 export const StatusIndicator = {
-  ALL: 'all',
-  APPOINTMENT: 'appointment',
-  WAITING: 'waiting',
-  IN_PROGRESS: 'in progress',
-  COMPLETED: 'completed',
+  ALL: 'All',
+  APPOINTMENT: 'Appointment',
+  WAITING: 'Waiting',
+  IN_PROGRESS: 'In Progress',
+  COMPLETED: 'Completed',
 }
 
 export const modelKey = 'queueLog/'
