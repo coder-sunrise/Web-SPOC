@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react'
 import moment from 'moment'
 // components
-import { DoctorLabel, CallingQueueButton } from '@/components/_medisys'
+import { DoctorLabel, CallingQueueButton,ServePatientButton } from '@/components/_medisys'
 import {
   CodeSelect,
   DateFormatter,
@@ -150,6 +150,7 @@ export const QueueTableConfig = {
     { name: 'queueNo', title: 'Q. No.' },
     { name: 'visitGroup', title: 'Group No.' },
     { name: 'consReady', title: 'Cons. Ready' },
+    { name: 'servingBy', title: 'Serving By' },
     { name: 'patientReferenceNo', title: 'Ref. No.' },
     { name: 'patientName', title: 'Patient Name' },
     { name: 'orderCreateTime', title: 'Order Created Time' },
@@ -337,5 +338,32 @@ export const QueueColumnExtensions = [
   {
     columnName: 'visitOrderTemplate',
     width: 180,
+  },
+  {
+    columnName: 'servingBy',
+    width: 130,
+    render: (row) => {
+      const servingPersons = row.servingByList && row.servingByList.map(o=> o.servingBy).join(', ')
+      return (
+        <Fragment>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'left',
+            }}
+          >
+            <span style={{overflow:'hidden',textOverflow:'ellipsis'}}>{servingPersons}</span>
+            <div>
+              {row.visitFK && (
+                <Authorized authority='queue.servepatient'>
+                  <ServePatientButton visitFK={row.visitFK} servingPersons={row.servingByList}/>
+                </Authorized>
+                )}
+            </div>
+          </div>
+        </Fragment>
+      )
+    },
   },
 ]
