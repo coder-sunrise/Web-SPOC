@@ -687,11 +687,11 @@ class Medication extends PureComponent {
         )
         setFieldValue(
           `corPrescriptionItemPrecaution[${i}].precaution`,
-          im.medicationPrecaution.name,
+          im.medicationPrecautionName,
         )
         setFieldValue(
           `corPrescriptionItemPrecaution[${i}].precautionCode`,
-          im.medicationPrecaution.code,
+          im.medicationPrecautionCode,
         )
         setFieldValue(`corPrescriptionItemPrecaution[${i}].sequence`, i)
       })

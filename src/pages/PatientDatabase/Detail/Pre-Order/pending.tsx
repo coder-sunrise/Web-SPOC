@@ -432,7 +432,14 @@ const PendingPreOrder: React.FC = (props: any) => {
     ],
   }
 
-  if (!medications || !vaccinations) {
+  if (
+    !medications ||
+    !vaccinations ||
+    !consumables ||
+    !services ||
+    !labs ||
+    !radiology
+  ) {
     return <Loading />
   }
 
