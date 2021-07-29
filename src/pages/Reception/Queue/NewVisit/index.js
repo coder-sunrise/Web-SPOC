@@ -26,6 +26,7 @@ import VitalSignCard from './VitalSignCard'
 import ReferralCard from './ReferralCard'
 import EyeVisualAcuityCard from './EyeVisualAcuityCard'
 import RefractionFormCard from './RefractionFormCard'
+import PrintLabLabelButton from '@/components/_medisys/PatientInfoSideBanner/PatientLabelBtn'
 
 // import ParticipantCard from './ParticipantCard'
 import VisitValidationSchema from './validationScheme'
@@ -425,6 +426,23 @@ class NewVisit extends PureComponent {
             >
               <PatientBanner
                 from='VisitReg'
+                extraCmt={              
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-evenly',
+                      height: '100%',
+                      width: '90%',
+                    }}
+                  >
+                    <PrintLabLabelButton
+                      patientId={patientInfo.id}
+                      clinicSettings={clinicSettings}
+                      isEnableScanner
+                    />
+                  </div>
+                }
                 {...this.props}
               />
             </div> 
