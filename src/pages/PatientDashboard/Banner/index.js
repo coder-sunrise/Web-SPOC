@@ -63,7 +63,7 @@ const styles = theme => ({
   patient,
   codetable,
   ctschemetype: codetable.ctschemetype || [],
-  refreshingChasBalance: loading.effects['patient/refreshChasBalance'],
+  refreshingBalance: loading.effects['patient/refreshChasBalance'] || loading.effects['patient/refreshMedisaveBalance'],
 }))
 class Banner extends PureComponent {
   state = {
@@ -269,25 +269,153 @@ class Banner extends PureComponent {
   }
 
   getSchemeList = schemeDataList => {
+    const chasOrMedisave = (schemeDataList || []).filter(
+      o =>
+        o.schemeTypeFK <= 6 ||
+        this.isMedisave(o.schemeTypeFK)
+    )
     return schemeDataList.map(s => (
       <span
         style={{ paddingRight: 5, display: 'inline-block' }}
       >
+        {chasOrMedisave && 
+          chasOrMedisave.find(list => s.schemeTypeFK === list.schemeTypeFK) 
+        ? (<Popover
+          icon={null}
+          content={<div>
+              <div>
+                {s.coPaymentSchemeFK ||
+                  schemeDataList.filter(p =>
+                    this.isMedisave(p.schemeTypeFK),
+                  )[0] === s
+                  ? s.copaymentSchemeName
+                  : s.schemeTypeName}
+                <span style={{ bottom: -2 }}>
+                  {s.schemeTypeFK <= 6 && (
+                    <IconButton
+                      onClick={this.refreshChasBalance}
+                    >
+                      <Refresh />
+                    </IconButton>
+                  )}
+                  {this.isMedisave(s.schemeTypeFK) &&
+                    schemeDataList.filter(p =>
+                      this.isMedisave(p.schemeTypeFK),
+                    )[0] === s && (
+                      <IconButton
+                        onClick={this.refreshMedisaveBalance}
+                      >
+                        <Refresh />
+                      </IconButton>
+                    )}
+                </span>
+              </div>
+              {s.schemeType && (
+                <div style={{ marginTop: 15 }}>
+                  {s.schemeType}
+                </div>
+              )}
+              {this.isMedisave(s.schemeTypeFK) && (
+                <div>
+                  Payer: {s.payerName} (
+                  {s.payerAccountNo})
+                </div>
+              )}
+              {s.validFrom && (
+                <div>
+                  Validity:{' '}
+                  {s.validFrom ? (
+                    <DatePicker
+                      text
+                      format={dateFormatLong}
+                      value={s.validFrom}
+                    />
+                  ) : (
+                    ''
+                  )}
+                  &nbsp;-&nbsp;
+                  {s.validTo ? (
+                    <DatePicker
+                      text
+                      format={dateFormatLong}
+                      value={s.validTo}
+                    />
+                  ) : (
+                    ''
+                  )}
+                </div>
+              )}
+              {s.schemeTypeFK !== 15 ? (
+                <div>
+                  Balance:{' '}
+                  <NumberInput
+                    text
+                    currency
+                    value={s.balance}
+                  />
+                </div>
+              ) : (
+                ''
+              )}
+              {s.schemeTypeFK <= 6 ? (
+                <div>
+                  Patient Acute Visit Balance:{' '}
+                  <NumberInput
+                    text
+                    currency
+                    value={
+                      s.acuteVisitPatientBalance
+                    }
+                  />
+                </div>
+              ) : (
+                ''
+              )}
+              {s.schemeTypeFK <= 6 ? (
+                <div>
+                  Patient Acute Clinic Balance:{' '}
+                  <NumberInput
+                    text
+                    currency
+                    value={s.acuteVisitClinicBalance}
+                  />
+                </div>
+              ) : (
+                ''
+              )}
+              </div>
+            }
+          trigger='click'
+          placement='bottom'
+        >
         <Link>
-          <span
-            style={{
-              color: 'black',
-              textDecoration: 'underline',
-              whiteSpace: 'nowrap',
-            }}
-            onClick={e => {
-              this.openScheme()
-            }}
-          >
-            {s.copaymentSchemeName || s.schemeTypeName}
-            {s.validTo ? ` (Exp: ${moment(s.validTo).format('DD/MM/YYYY')})` : ''}
-          </span>
-        </Link>
+            <span
+              style={{
+                color: 'black',
+                textDecoration: 'underline',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {s.copaymentSchemeName || s.schemeTypeName}
+              {s.validTo ? ` (Exp: ${moment(s.validTo).format('DD/MM/YYYY')})` : ''}
+            </span>
+          </Link>
+      </Popover>)
+        : (<Link>
+            <span
+              style={{
+                color: 'black',
+                textDecoration: 'underline',
+                whiteSpace: 'nowrap',
+              }}
+              onClick={e => {
+                this.openScheme()
+              }}
+            >
+              {s.copaymentSchemeName || s.schemeTypeName}
+              {s.validTo ? ` (Exp: ${moment(s.validTo).format('DD/MM/YYYY')})` : ''}
+            </span>
+          </Link>)}
       </span>
     ))
   }
@@ -655,16 +783,16 @@ class Banner extends PureComponent {
     const {
       // patientInfo = {},
       extraCmt,
-	  preOrderCmt,
+      preOrderCmt,
       from = '',
       patient,
       codetable,
       classes,
-	  activePreOrderItem,
-	  onSelectPreOrder,
-	  isEnableRecurrence,
-	  apptId,
-	  apptMode,
+      activePreOrderItem,
+      onSelectPreOrder,
+      isEnableRecurrence,
+      apptId,
+      apptMode,
       style = {
         position: 'sticky',
         overflowY: 'auto',
@@ -676,7 +804,7 @@ class Banner extends PureComponent {
         backgroundColor: '#f0f8ff',
         marginTop: '-8px',
       },
-      refreshingChasBalance,
+      refreshingBalance,
     } = props
 	
     const actualizePreOrderAccessRight = Authorized.check('appointment.actualizepreorder') || { rights: 'hidden' }
@@ -991,8 +1119,25 @@ class Banner extends PureComponent {
                 </Link>}
               </GridItem>
               <GridItem xs={6} md={4} className={classes.cell}>
-                <span className={classes.header}>Scheme: </span>
-                {this.getSchemeList(schemeDataList)}
+                <LoadingWrapper
+                  loading={refreshingBalance}
+                  text='Retrieving balance...'
+                >
+                  <span className={classes.header}>Scheme: </span>
+                  <span style={{ bottom: -2 }}>
+                        {entity.isActive &&
+                          (entity.patientScheme || []).filter(
+                            o =>
+                              o.schemeTypeFK <= 6 ||
+                              this.isMedisave(o.schemeTypeFK),
+                          ).length > 0 && (
+                            <IconButton onClick={this.refreshGovtBalance}>
+                              <Refresh />
+                            </IconButton>
+                          )}
+                      </span>
+                  {this.getSchemeList(_.orderBy(schemeDataList, ['schemeTypeFK'], ['asc']))}
+                </LoadingWrapper>
               </GridItem>
               <GridItem xs={6} md={3} className={classes.cell}>
                 <span className={classes.header}>Non-Claimable Info: </span>
