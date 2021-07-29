@@ -201,6 +201,9 @@ export default {
   'menu.wardmanagement': 'Ward Management',
   'menu.patient-monitoring': 'Patient Monitoring',
 
+  'menu.radiology': 'Radiology Center',
+  'menu.radiology.worklist': 'Worklist',
+
   'menu.not-found': 'Not Found',
   'menu.forbidden': 'Forbidden',
 }

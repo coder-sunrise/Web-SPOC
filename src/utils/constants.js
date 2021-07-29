@@ -360,6 +360,7 @@ export const VISIT_TYPE = {
   CONS: 1,
   RETAIL: 2,
   BILL_FIRST: 3,
+  MC: 4,
 }
 
 export const VISIT_TYPE_NAME = [
@@ -374,6 +375,10 @@ export const VISIT_TYPE_NAME = [
   {
     visitPurposeFK: VISIT_TYPE.BILL_FIRST,
     displayName: 'BILL-FIRST',
+  },
+  {
+    visitPurposeFK: VISIT_TYPE.MC,
+    displayName: 'MC',
   },
 ]
 

@@ -93,6 +93,7 @@ class AntdDatePicker extends PureComponent {
   static defaultProps = {
     local: true,
     dateOnly: true,
+    bordered: false,
   }
 
   constructor(props) {
@@ -107,6 +108,7 @@ class AntdDatePicker extends PureComponent {
       showTime,
       endDay,
       dateOnly,
+      bordered,
     } = props
     const v =
       field.value !== undefined && field.value !== ''
