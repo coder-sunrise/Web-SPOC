@@ -711,14 +711,8 @@ class Queue extends React.Component {
     const { dispatch } = this.props
     const visitId = row.id
     dispatch({
-      type: `${modelKey}updateQueueListing`,
+      type: 'queueLog/updateQueueListing',
       payload: row,
-    }).then(r => {
-      if (r) {
-        dispatch({
-          type: `${modelKey}refresh`,
-        })
-      }
     })
   }
   

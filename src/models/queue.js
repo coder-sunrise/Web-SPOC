@@ -115,6 +115,9 @@ export default createListViewModel({
         if (startAndResumeRight && startAndResumeRight.rights === 'hidden') {
           startConsultPermissionIsHidden = true
         }
+
+        const servePatientRight = Authorized.check('queue.servepatient')
+
         yield put({
           type: 'updateState',
           payload: {
@@ -123,8 +126,8 @@ export default createListViewModel({
             hideSelfOnlyFilter: startConsultPermissionIsHidden,
             selfOnly: !queueLogState._modifiedSelftOnly
               ? userRole &&
-                userRole.clinicRoleFK === 1 &&
-                !startConsultPermissionIsHidden
+                ((userRole.clinicRoleFK === 1 && !startConsultPermissionIsHidden) 
+                  || (userRole.clinicRoleFK === 2 && servePatientRight && servePatientRight.rights !== 'hidden'))
               : queueLogState.selfOnly,
           },
         })
@@ -352,8 +355,27 @@ export default createListViewModel({
       },
       *updateQueueListing ({ payload }, { call, put }) {
         const response = yield call(service.updateQueueListing, payload)
-
+        if(response) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              list: [],
+            },
+          }) 
+          yield put({
+            type: 'getSessionInfo',
+            payload,
+          })
+        }
         return true
+      },
+      *setServingPerson ({ payload}, {call,put}){
+        const response = yield call(service.setServingPerson, payload.visitFK)
+        if(response){
+          yield put({
+            type: 'getSessionInfo',
+          })
+        }
       },
     },
     reducers: {

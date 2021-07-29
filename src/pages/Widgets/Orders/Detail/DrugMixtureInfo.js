@@ -6,11 +6,11 @@ const DrugMixtureInfo = ({ values = {}, isShowTooltip = true }) => {
   const drugMixtureDetails = (rows = []) => {
     if (rows.length > 0) {
       let number = 0
-      return rows.map((row) => {
+      return rows.map(row => {
         number += 1
         return (
           <p>
-            {number}. {row.drugName} - {row.quantity} {row.uomCode}
+            {number}. {row.drugName} - {row.quantity} {row.uomDisplayValue}
           </p>
         )
       })
@@ -29,6 +29,7 @@ const DrugMixtureInfo = ({ values = {}, isShowTooltip = true }) => {
             fontSize: 14,
           }}
         >
+          <strong>Drug Mixture</strong>
           {drugMixtureDetails(values)}
         </div>
       }

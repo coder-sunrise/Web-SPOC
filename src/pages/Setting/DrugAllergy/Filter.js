@@ -15,9 +15,11 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingClinicDrugAllergy }) => {return {...(settingClinicDrugAllergy.filter || {}),type:false}},
+  mapPropsToValues: ({ settingDrugAllergy }) => {
+    return { ...(settingDrugAllergy.filter || {}), type: false }
+  },
   handleSubmit: () => {},
-  displayName: 'ClinicDrugAllergyFilter',
+  displayName: 'DrugAllergyFilter',
 })
 class Filter extends PureComponent {
   render() {
@@ -73,9 +75,9 @@ class Filter extends PureComponent {
                 onClick={() => {
                   const { codeDisplayValue, isActive, type } = this.props.values
                   this.props.dispatch({
-                    type: 'settingClinicDrugAllergy/query',
+                    type: 'settingDrugAllergy/query',
                     payload: {
-                      apiCriteria:{Type:type},
+                      apiCriteria: { Type: type },
                       isActive,
                       group: [
                         {
@@ -95,7 +97,7 @@ class Filter extends PureComponent {
                 color='primary'
                 onClick={() => {
                   this.props.dispatch({
-                    type: 'settingClinicDrugAllergy/updateState',
+                    type: 'settingDrugAllergy/updateState',
                     payload: {
                       entity: undefined,
                     },

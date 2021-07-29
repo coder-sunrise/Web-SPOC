@@ -102,7 +102,7 @@ class PatientDetail extends PureComponent {
     hasActiveSession: false,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     let schemas = schema(props)
     this.widgets = [
@@ -135,14 +135,7 @@ class PatientDetail extends PureComponent {
           loader: () => import('./EmergencyContact'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return (
-              <Cmpnet
-                schema={
-                  schemas.emergencyContact
-                }
-                {...p}
-              />
-            )
+            return <Cmpnet schema={schemas.emergencyContact} {...p} />
           },
           loading: Loading,
         }),
@@ -316,10 +309,13 @@ class PatientDetail extends PureComponent {
       }
     }
 
-    const preOrderListAccessRight = Authorized.check('patientdatabase.modifypreorder')
-    if(preOrderListAccessRight){
-      const hiddenPreOrderListAccessRight = preOrderListAccessRight.rights === 'hidden'
-      if(hiddenPreOrderListAccessRight){
+    const preOrderListAccessRight = Authorized.check(
+      'patientdatabase.modifypreorder',
+    )
+    if (preOrderListAccessRight) {
+      const hiddenPreOrderListAccessRight =
+        preOrderListAccessRight.rights === 'hidden'
+      if (hiddenPreOrderListAccessRight) {
         this.widgets = this.widgets.filter(t => t.id !== '11')
       }
     }
@@ -330,11 +326,11 @@ class PatientDetail extends PureComponent {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.checkHasActiveSession()
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     const { dispatch } = this.props
     const menuErrors = {}
     dispatch({
@@ -445,6 +441,7 @@ class PatientDetail extends PureComponent {
       })
     }
     const isFormValid = await validateForm()
+
     if (!_.isEmpty(isFormValid)) {
       dispatch({
         type: 'global/updateState',
@@ -499,7 +496,7 @@ class PatientDetail extends PureComponent {
     this.setState({ selectedMenu })
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { errors, dispatch, patient, values, validateForm } = nextProps
     // validateForm(values).then((o) => {
     //   console.log(o)
@@ -523,7 +520,7 @@ class PatientDetail extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const {
       theme,
       classes,
@@ -648,11 +645,11 @@ class PatientDetail extends PureComponent {
                 style={
                   height > 0
                     ? {
-                      height: height - 95 - 20,
-                      overflow: 'auto',
-                      padding: 4,
-                      paddingTop: 20,
-                    }
+                        height: height - 95 - 20,
+                        overflow: 'auto',
+                        padding: 4,
+                        paddingTop: 20,
+                      }
                     : { padding: 4, paddingTop: 20 }
                 }
               >

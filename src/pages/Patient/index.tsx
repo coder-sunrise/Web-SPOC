@@ -2,9 +2,12 @@ import { PageContainer, Icon } from '@/components'
 import { ProTable, Select, Input, Button } from '@medisys/component'
 import patientService from '@/services/patient'
 import { connect, history } from 'umi'
+import { formatMessage } from 'umi'
 import { getAppendUrl } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 
+import { TextField, DatePicker } from '@/components'
+import { useState, useRef } from 'react'
 const { queryList, upsert, query, remove } = patientService
 const api = {
   remove,
@@ -46,7 +49,7 @@ const defaultColumns = [
     dataIndex: 'lastVisitDate',
     valueType: 'dateTime',
     render: (_dom: any, entity: any) =>
-      entity.lastVisitDate?.format('L') || '-',
+      entity.lastVisitDate?.format('DD MMM yyyy') || '-',
     width: 120,
     search: false,
   },
@@ -67,18 +70,33 @@ const defaultColumns = [
     search: false,
   },
   {
-    key:'dob',
+    key: 'dob',
     dataIndex: 'dob',
     title: 'DOB',
-    render: (_dom: any, entity: any) => entity.dob?.format('L') || '-',
+    render: (_dom: any, entity: any) => entity.dob?.format('DD MMM yyyy') || '-',
     width: 100,
     search: false,
   },
-  { key:'race', dataIndex: 'race', title: 'Race', search: false },
-  { key: 'nationality', dataIndex: 'nationality', title: 'Nationality', search: false },
-  { key: 'mobileNo', dataIndex: 'mobileNo', title: 'Mobile No.', search: false },
+  { key: 'race', dataIndex: 'race', title: 'Race', search: false },
+  {
+    key: 'nationality',
+    dataIndex: 'nationality',
+    title: 'Nationality',
+    search: false,
+  },
+  {
+    key: 'mobileNo',
+    dataIndex: 'mobileNo',
+    title: 'Mobile No.',
+    search: false,
+  },
   { key: 'homeNo', dataIndex: 'homeNo', title: 'Home No.', search: false },
-  { key: 'officeNo', dataIndex: 'officeNo', title: 'Office No.', search: false },
+  {
+    key: 'officeNo',
+    dataIndex: 'officeNo',
+    title: 'Office No.',
+    search: false,
+  },
   {
     key: 'outstandingBalance',
     dataIndex: 'outstandingBalance',
@@ -87,19 +105,44 @@ const defaultColumns = [
     search: false,
     align: 'right',
   },
-
   // { dataIndex: 'action', title: 'Action', search: false },
   {
     // title: 'Patient Name, Acc No., Patient Ref. No., Contact No.',
     hideInTable: true,
+    title: '',
     dataIndex: 'search',
     renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
       if (type === 'form') {
         return null
       }
       return (
-        <Input placeholder='Patient Name, Acc No., Patient Ref. No., Contact No.' />
+        <TextField
+          style={{ width: 350 }}
+          label={formatMessage({
+            id: 'reception.queue.patientSearchPlaceholder',
+          })}
+        />
       )
+    },
+  },
+  {
+    // title: 'Patient Name, Acc No., Patient Ref. No., Contact No.',
+    hideInTable: true,
+    title: '',
+    dataIndex: 'dobfrom',
+    renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
+      return (
+        <DatePicker style={{ width: 150 }} label='DOB From' placeholder='' />
+      )
+    },
+  },
+  {
+    // title: 'Patient Name, Acc No., Patient Ref. No., Contact No.',
+    hideInTable: true,
+    title: '',
+    dataIndex: 'dobto',
+    renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
+      return <DatePicker style={{ width: 150 }} label='DOB To' placeholder='' />
     },
   },
 ]
@@ -124,42 +167,56 @@ const showPatient = row => {
   )
 }
 const saveColumnsSetting = (dispatch, columnsSetting) => {
-   dispatch({
-      type: 'patient/saveUserPreference',
-      payload: {
-        userPreferenceDetails: {
-          value: columnsSetting,
-          Identifier: 'PatientDatabaseColumnSetting',
-        },
-        itemIdentifier: 'PatientDatabaseColumnSetting',
-        type: '4',
+  dispatch({
+    type: 'patient/saveUserPreference',
+    payload: {
+      userPreferenceDetails: {
+        value: columnsSetting,
+        Identifier: 'PatientDatabaseColumnSetting',
       },
-    }).then((result)=>{
-      dispatch({
-        type: 'patient/updateState',
-        payload: {
-          favPatDBColumnSetting: columnsSetting,
-        },
-      })
+      itemIdentifier: 'PatientDatabaseColumnSetting',
+      type: '4',
+    },
+  }).then(result => {
+    dispatch({
+      type: 'patient/updateState',
+      payload: {
+        favPatDBColumnSetting: columnsSetting,
+      },
     })
+  })
 }
 
-const PatientIndex = ({ dispatch, patient:{ favPatDBColumnSetting={} }}) => {
+const PatientIndex = ({
+  dispatch,
+  patient: { favPatDBColumnSetting = {} },
+}) => {
   return (
     <PageContainer pageHeaderRender={false}>
       <ProTable
+        search={{span:8}}
         rowSelection={false}
         columns={defaultColumns}
         api={api}
-        // search={{
-        //   optionRender: (searchConfig, formProps, dom) => {
-        //     console.log(dom)
-        //     return [dom, <Button>HELLO TEST</Button>]
-        //   },
-        // }}
+        search={{
+          optionRender: (searchConfig, formProps, dom) => {
+            return (
+              <div
+                style={{
+                  display: 'inline',
+                  float: 'left',
+                  width: 200,
+                  marginTop: 15,
+                }}
+              >
+                {dom[0]} {dom[1]}
+              </div>
+            )
+          },
+        }}
         columnsStateMap={favPatDBColumnSetting}
-        onColumnsStateChange={(map)=> saveColumnsSetting(dispatch,map)}
-        options={{ density:false, reload:false, }}
+        onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
+        options={{ density: false, reload: false }}
         toolBarRender={() => {
           return [
             <Button
@@ -201,11 +258,13 @@ const PatientIndex = ({ dispatch, patient:{ favPatDBColumnSetting={} }}) => {
             },
           },
         ]}
-        beforeSearchSubmit={({ search, ...values }) => {
+        beforeSearchSubmit={({ search, dobfrom, dobto, ...values }) => {
           return {
             ...values,
             apiCriteria: {
               searchValue: search,
+              dobfrom: dobfrom,
+              dobto: dobto,
               includeinactive: true,
             },
           }

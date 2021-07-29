@@ -225,8 +225,7 @@ const PendingPreOrder: React.FC = (props: any) => {
 
     const { option, row } = e
     ;(row.quantity = undefined),
-      (row.amount = undefined),
-      (row.sourceRecordFK = undefined),
+      (row.amount = 0),
       (row.itemName = undefined),
       (row.preOrderVaccinationItem = undefined),
       (row.preOrderServiceItem = undefined),
@@ -237,33 +236,41 @@ const PendingPreOrder: React.FC = (props: any) => {
     const { row, option } = e
     row.itemName = option?.combinDisplayValue
     if (row.preOrderItemType === preOrderItemCategory[0].value)
-      row.preOrderMedicationItem = { InventoryMedicationFK: row.sourceRecordFK }
+      row.preOrderMedicationItem = { InventoryMedicationFK: option.id }
     else if (row.preOrderItemType === preOrderItemCategory[1].value)
-      row.preOrderConsumableItem = { InventoryConsumableFK: row.sourceRecordFK }
+      row.preOrderConsumableItem = { InventoryConsumableFK: option.id }
     else if (row.preOrderItemType === preOrderItemCategory[2].value)
       row.preOrderVaccinationItem = {
-        InventoryVaccinationFK: row.sourceRecordFK,
+        InventoryVaccinationFK: option.id,
       }
     else if (
       row.preOrderItemType === preOrderItemCategory[3].value ||
       row.preOrderItemType == preOrderItemCategory[4].value ||
       row.preOrderItemType == preOrderItemCategory[5].value
     )
-      row.preOrderServiceItem = { ServiceCenterServiceFK: row.sourceRecordFK }
+      row.preOrderServiceItem = { ServiceCenterServiceFK: option.id }
     row.quantity = undefined
-    row.amount = undefined
+    row.amount = 0
     row.remarks = undefined
   }
 
   const handelQuantityChanged = e => {
     const { row, value } = e
-    const { preOrderItemType } = row
+    const {
+      preOrderItemType,
+      preOrderMedicationItem = {},
+      preOrderServiceItem = {},
+      preOrderVaccinationItem = {},
+      preOrderConsumableItem = {},
+    } = row
     if (!preOrderItemType) {
       return
     }
 
     if (medications && preOrderItemType === preOrderItemCategory[0].value) {
-      const item = medications.find(m => m.id === row.sourceRecordFK)
+      const item = medications.find(
+        m => m.id === preOrderMedicationItem.InventoryMedicationFK,
+      )
       if (item) {
         const { sellingPrice } = item
         row.amount = sellingPrice * value
@@ -271,7 +278,9 @@ const PendingPreOrder: React.FC = (props: any) => {
     }
 
     if (consumables && preOrderItemType === preOrderItemCategory[1].value) {
-      const item = consumables.find(m => m.id === row.sourceRecordFK)
+      const item = consumables.find(
+        m => m.id === preOrderConsumableItem.InventoryConsumableFK,
+      )
       if (item) {
         const { sellingPrice } = item
         row.amount = sellingPrice * value
@@ -279,7 +288,9 @@ const PendingPreOrder: React.FC = (props: any) => {
     }
 
     if (vaccinations && preOrderItemType === preOrderItemCategory[2].value) {
-      const item = vaccinations.find(m => m.id === row.sourceRecordFK)
+      const item = vaccinations.find(
+        m => m.id === preOrderVaccinationItem.InventoryVaccinationFK,
+      )
       if (item) {
         const { sellingPrice } = item
         row.amount = sellingPrice * value
@@ -287,26 +298,32 @@ const PendingPreOrder: React.FC = (props: any) => {
     }
 
     if (services && preOrderItemType === preOrderItemCategory[3].value) {
-      const item = services.find(m => m.id === row.sourceRecordFK)
+      const item = services.find(
+        m => m.id === preOrderServiceItem.ServiceCenterServiceFK,
+      )
       if (item) {
-        const { sellingPrice } = item
-        row.amount = sellingPrice * value
+        const { unitPrice } = item
+        row.amount = unitPrice * value
       }
     }
 
     if (labs && preOrderItemType === preOrderItemCategory[4].value) {
-      const item = labs.find(m => m.id === row.sourceRecordFK)
+      const item = labs.find(
+        m => m.id === preOrderServiceItem.ServiceCenterServiceFK,
+      )
       if (item) {
-        const { sellingPrice } = item
-        row.amount = sellingPrice * value
+        const { unitPrice } = item
+        row.amount = unitPrice * value
       }
     }
 
     if (radiology && preOrderItemType === preOrderItemCategory[5].value) {
-      const item = radiology.find(m => m.id === row.sourceRecordFK)
+      const item = radiology.find(
+        m => m.id === preOrderServiceItem.ServiceCenterServiceFK,
+      )
       if (item) {
-        const { sellingPrice } = item
-        row.amount = sellingPrice * value
+        const { unitPrice } = item
+        row.amount = unitPrice * value
       }
     }
   }
@@ -318,7 +335,7 @@ const PendingPreOrder: React.FC = (props: any) => {
   const tableParas = {
     columns: [
       { name: 'preOrderItemType', title: 'Type' },
-      { name: 'sourceRecordFK', title: 'Name' },
+      { name: 'itemName', title: 'Name' },
       { name: 'quantity', title: 'Order Qty.' },
       { name: 'orderByUserFK', title: 'Order By' },
       { name: 'orderDate', title: 'Order Date' },
@@ -339,7 +356,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         isDisabled: row => !isEditable(row),
       },
       {
-        columnName: 'sourceRecordFK',
+        columnName: 'itemName',
         type: 'select',
         labelField: 'combinDisplayValue',
         valueField: 'id',
@@ -359,7 +376,8 @@ const PendingPreOrder: React.FC = (props: any) => {
         render: row => {
           return (
             <span>
-              {row.quantity.toFixed(1)} {row.dispenseUOM}
+              {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}
+              {row.dispenseUOM}
             </span>
           )
         },
@@ -389,7 +407,8 @@ const PendingPreOrder: React.FC = (props: any) => {
         columnName: 'remarks',
         maxLength: 100,
         sortingEnabled: false,
-        isDisabled: row => !isEditable(row),
+        isDisabled: row =>
+          addPreOrderAccessRight.rights === 'enable' ? false : true,
       },
       {
         columnName: 'amount',
@@ -413,7 +432,14 @@ const PendingPreOrder: React.FC = (props: any) => {
     ],
   }
 
-  if (!medications || !vaccinations) {
+  if (
+    !medications ||
+    !vaccinations ||
+    !consumables ||
+    !services ||
+    !labs ||
+    !radiology
+  ) {
     return <Loading />
   }
 
@@ -429,7 +455,11 @@ const PendingPreOrder: React.FC = (props: any) => {
           showAddCommand:
             addPreOrderAccessRight.rights === 'enable' ? true : false,
           isDeletable: row => {
-            return deletePreOrderAccessRight.rights === 'enable' ? true : false // && row.preOrderItemStatus ==='New' ? true : false;
+            return deletePreOrderAccessRight.rights === 'enable' &&
+              row.hasPaid === false &&
+              row.preOrderItemStatus === 'New'
+              ? true
+              : false
           },
           showCommandColumn:
             deletePreOrderAccessRight.rights === 'hidden' ? false : true,
@@ -442,6 +472,7 @@ const PendingPreOrder: React.FC = (props: any) => {
                 orderByUser: clinicianProfile?.userProfile.userName,
                 preOrderItemStatus: 'New',
                 hasPaid: false,
+                amount: 0,
                 preOrderVaccinationItem: undefined,
                 preOrderServiceItem: undefined,
                 preOrderMedicationItem: undefined,

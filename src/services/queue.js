@@ -49,3 +49,10 @@ export const updateQueueListing = async (params) => {
   })
   return response
 }
+
+export const setServingPerson = async (visitFK) => {
+  const response = await request(`${queueAPIUrl}/SetServingPerson/${visitFK}`, {
+    method: 'POST',
+  })
+  return response
+}
