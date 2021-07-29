@@ -82,10 +82,6 @@ const getVisitDoctorUserId = (props) => {
       'The amount should be more than 0.00',
     ),
     performingUserFK: Yup.number().required(),
-    newServiceName: Yup.string().when('isDisplayValueChangable', {
-      is: (isDisplayValueChangable) => isDisplayValueChangable,
-      then: Yup.string().trim().required(),
-    }),
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
@@ -213,8 +209,8 @@ class Service extends PureComponent {
         unitPrice: serviceCenterService.unitPrice,
         total: serviceCenterService.unitPrice,
         quantity: 1,
-        isDisplayValueChangable: this.state.services.find((o) => o.value === serviceFK)
-          .isDisplayValueChangable,
+        isDisplayValueChangable: (console.log("isDisplayValueChangable",this.state.services,serviceFK) ,this.state.services.find((o) => o.value === serviceFK)
+          .isDisplayValueChangable),
       }
     }
 
