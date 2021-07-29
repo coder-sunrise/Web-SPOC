@@ -34,7 +34,7 @@ const WorkitemTitle = ({ item }) => (
 )
 
 const WorkitemBody = ({ item }) => {
-  const { setShowDetails } = useContext(WorlistContext)
+  const { setDetailsId } = useContext(WorlistContext)
 
   return (
     <div
@@ -79,7 +79,7 @@ const WorkitemBody = ({ item }) => {
             textAlign: 'left',
           }}
           onClick={() => {
-            setShowDetails(true)
+            setDetailsId(item.id)
           }}
         >
           Details
@@ -107,7 +107,7 @@ const WorkitemBody = ({ item }) => {
             justifySelf: 'center',
           }}
         >
-          {item.visitPurpose !== VISIT_TYPE.MC ? 'O/P' : 'MC'}
+          {item.visitPurposeFK !== VISIT_TYPE.MC ? 'O/P' : 'MC'}
         </span>
       </div>
     </div>

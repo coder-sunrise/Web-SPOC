@@ -4,14 +4,14 @@ import { useSelector } from 'dva'
 const WorklistContext = createContext(null)
 
 export const WorklistContextProvider = props => {
-  const [showDetails, setShowDetails] = useState(false)
+  const [detailsId, setDetailsId] = useState(null)
 
   return (
     // this is the provider providing state
     <WorklistContext.Provider
       value={{
-        showDetails,
-        setShowDetails,
+        detailsId,
+        setDetailsId,
       }}
     >
       {props.children}

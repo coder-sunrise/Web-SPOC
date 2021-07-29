@@ -4,13 +4,10 @@ import service from '../../services'
 
 export default createFormViewModel({
   namespace: 'radiologyDetails',
-  config: {
-    queryOnLoad: false,
-  }, //TODO:: Remove this config later if needed to load
   param: {
     service,
     state: {
-      patient: {},
+      default: {},
     },
     subscriptions: ({ dispatch, history, searchField }) => {
       history.listen(loct => {
@@ -19,17 +16,30 @@ export default createFormViewModel({
     },
 
     effects: {
-      *initState({ payload }, { call, select, put, take }) {
+      *queryDone({ payload }, { call, select, put, take }) {
+        console.log('querydone')
+
         yield put({
           type: 'patient/query',
-          payload: { id: 7 },
+          payload: { id: 22 },
         })
 
         yield take('patient/query/@@end')
+
+        const patientInfo = yield select(st => st.patient)
+
+        yield put({
+          type: 'updateState',
+          payload: {
+            entity: {
+              name: 'testing',
+              patientInfo,
+            },
+          },
+        })
       },
+      *initState({ payload }, { call, select, put, take }) {},
     },
-    reducers: {
-      queryDone(st, { payload }) {},
-    },
+    reducers: {},
   },
 })

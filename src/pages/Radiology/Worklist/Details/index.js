@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useContext } from 'react'
 import { useSelector, useDispatch } from 'dva'
+import { Typography, Input } from 'antd'
 import { GridContainer, GridItem, TextField } from '@/components'
 import Banner from '@/pages/PatientDashboard/Banner'
 import { ExaminationSteps } from '../../Components'
-import { Typography, Input } from 'antd'
+import WorklistContext from '../WorklistContext'
 
 const RightAlignGridItem = ({ children, md = 6 }) => {
   return (
@@ -13,18 +14,24 @@ const RightAlignGridItem = ({ children, md = 6 }) => {
   )
 }
 
-const RadiologyDetails = ({ id = 7 }) => {
-  const patient = useSelector(state => state.patient)
+const RadiologyDetails = () => {
   const dispatch = useDispatch()
+  const { detailsId } = useContext(WorklistContext)
+  const entity = useSelector(state => state.radiologyDetails)
+
+  console.log('entity', entity)
 
   useEffect(() => {
-    dispatch({ type: 'radiologyDetails/initState', payload: { id: 7 } })
-  }, [id])
+    dispatch({ type: 'radiologyDetails/query', payload: { id: detailsId } })
+  }, [detailsId])
 
   return (
     <GridContainer style={{ height: 600, overflowY: 'scroll' }}>
       <GridItem md={12}>
-        <Banner patientInfo={patient} style={{ position: 'relative' }} />
+        <Banner
+          patientInfo={entity.patientInfo}
+          style={{ position: 'relative' }}
+        />
       </GridItem>
       <GridItem md={12}>
         <ExaminationSteps />

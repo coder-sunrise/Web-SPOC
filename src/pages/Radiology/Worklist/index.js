@@ -26,6 +26,7 @@ const columns = [
         orderDate: '14 May 2021 03:15 PM',
         isUrgent: true,
         id: 1,
+        patientProfileFK: 22,
         visit: {
           queueNo: '1.0',
           doctorName: 'Dr. Jin SangRong',
@@ -176,6 +177,7 @@ const columns = [
         orderDate: '14 May 2021 03:15 PM',
         isUrgent: false,
         id: 1,
+        patientProfileFK: 3,
         visit: {
           queueNo: '5.0',
           doctorName: 'Dr. Jin SangRong',
@@ -188,7 +190,7 @@ const columns = [
 
 const RadiologyWorklist = () => {
   const dispatch = useDispatch()
-  const { showDetails, setShowDetails } = useContext(WorklistContext)
+  const { detailsId, setDetailsId } = useContext(WorklistContext)
   const model = useSelector(s => s.radiologyWorklist)
 
   useEffect(() => {
@@ -207,10 +209,10 @@ const RadiologyWorklist = () => {
     >
       <Worklist columns={columns} />
       <CommonModal
-        open={showDetails}
+        open={detailsId !== null}
         title='Radiology Examination Details'
         onClose={() => {
-          setShowDetails(false)
+          setDetailsId(null)
         }}
         onConfirm={() => {}}
         showFooter={true}
