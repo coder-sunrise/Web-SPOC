@@ -44,30 +44,23 @@ class AllergyGrid extends PureComponent {
           code: 'ctmedicationingredient',
           label: 'Allergy Name',
           autoComplete: true,
-          filterOption: (val, option) => {
-            let { rows } = this.props
-            return (
-              rows
-                .filter(r => !r.isDeleted)
-                .map(o => o.ingredientFK)
-                .indexOf(option.value) < 0
-            )
-          },
           onChange: ({ val, option, row }) => {
             if (option) {
               let { rows } = this.props
               if (
                 rows.filter(
-                  o =>
-                    !o.isDeleted && o.ingredientFK === val && o.id !== row.id,
+                  o => !o.isDeleted && o.ingredientFK === val && o.id !== row.id,
                 ).length > 0
               ) {
+                row.ingredientFK = null
                 notification.error({
                   message: 'The Allergy record already exists.',
                 })
               }
-              // row.allergyCode = option.code || option.name
-              row.allergyName = option.name
+              else {
+                // row.allergyCode = option.code || option.name
+                row.allergyName = option.name
+              }
             }
           },
         },
@@ -79,15 +72,6 @@ class AllergyGrid extends PureComponent {
           valueField: 'id',
           code: 'ctdrugallergy',
           autoComplete: true,
-          filterOption: (val, option) => {
-            let { rows } = this.props
-            return (
-              rows
-                .filter(r => !r.isDeleted)
-                .map(o => o.allergyFK)
-                .indexOf(option.value) < 0
-            )
-          },
           onChange: ({ val, option, row }) => {
             if (option) {
               let { rows } = this.props
@@ -96,6 +80,7 @@ class AllergyGrid extends PureComponent {
                   o => !o.isDeleted && o.allergyFK === val && o.id !== row.id,
                 ).length > 0
               ) {
+                row.allergyFK = null
                 notification.error({
                   message: 'The Allergy record already exists.',
                 })
