@@ -209,8 +209,8 @@ class Service extends PureComponent {
         unitPrice: serviceCenterService.unitPrice,
         total: serviceCenterService.unitPrice,
         quantity: 1,
-        isDisplayValueChangable: (console.log("isDisplayValueChangable",this.state.services,serviceFK) ,this.state.services.find((o) => o.value === serviceFK)
-          .isDisplayValueChangable),
+        isDisplayValueChangable: this.state.services.find((o) => o.value === serviceFK)
+          .isDisplayValueChangable,
       }
     }
 
