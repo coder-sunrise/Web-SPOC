@@ -47,7 +47,7 @@ const schema = Yup.object().shape({
   ),
   corDiagnosis: Yup.array().of(
     Yup.object().shape({
-      validityDays :  Yup.number().min(1,'Number must be greater than 1').nullable(true),
+      validityDays :  Yup.number().min(0,'Number must be greater than 0').nullable(true),
       })
     ),
 
