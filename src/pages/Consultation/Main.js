@@ -308,8 +308,8 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
     ) {
       if (
         visitRegistration.entity.visit.visitStatus &&
-        visitRegistration.entity.visit.visitStatus !== 'IN CONS' &&
-        visitRegistration.entity.visit.visitStatus !== 'WAITING'
+        visitRegistration.entity.visit.visitStatus !== VISIT_STATUS.IN_CONS &&
+        visitRegistration.entity.visit.visitStatus !== VISIT_STATUS.WAITING
       ) {
         window.g_app._store.dispatch({
           type: 'global/updateAppState',
@@ -712,7 +712,7 @@ class Main extends React.Component {
             <Authorized authority="patientdashboard.startresumeconsultation">
               {({ rights }) => {
                 //
-                return rights === 'enable' && [ 'IN CONS', 'WAITING' ].includes(visit.visitStatus) && values.id ? (
+                return rights === 'enable' && [ VISIT_STATUS.IN_CONS, VISIT_STATUS.WAITING ].includes(visit.visitStatus) && values.id ? (
                   <GridItem>
                     <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
                       <Timer
@@ -799,12 +799,12 @@ class Main extends React.Component {
               )}
               <Authorized authority="patientdashboard.startresumeconsultation">
                 <React.Fragment>
-                  {[ 'IN CONS', 'WAITING' ].includes(visit.visitStatus) && (
+                  {[ VISIT_STATUS.IN_CONS, VISIT_STATUS.WAITING ].includes(visit.visitStatus) && (
                     <ProgressButton onClick={this.pauseConsultation} color="info" icon={null}>
                       Pause
                     </ProgressButton>
                   )}
-                  {visit.visitStatus === 'PAUSED' && (
+                  {visit.visitStatus === VISIT_STATUS.PAUSED && (
                     <ProgressButton onClick={this.resumeConsultation} color="info" icon={null}>
                       Resume
                     </ProgressButton>
@@ -977,7 +977,7 @@ class Main extends React.Component {
     // const { summary } = orders
     // const { adjustments, total, gst, totalWithGst } = summary
     const matches = {
-      rights: rights === 'enable' && visit.visitStatus === 'PAUSED' ? 'disable' : rights,
+      rights: rights === 'enable' && visit.visitStatus === VISIT_STATUS.PAUSED ? 'disable' : rights,
     }
     // console.log(matches)
     // console.log('main', { values })

@@ -138,14 +138,14 @@ const _routes = [
         component: './Patient',
       },
       // Patient Database
-      {
-        path: '/patientdb',
-        icon: 'icon-team',
-        name: 'patient',
-        moduleName: 'PatientDataBase',
-        authority: ['patientdatabase'],
-        specialist: ['GP', 'Dental'],
-        component: './PatientDatabase/Search',
+      // {
+      //   path: '/patientdb',
+      //   icon: 'icon-team',
+      //   name: 'patient',
+      //   moduleName: 'PatientDataBase',
+      //   authority: ['patientdatabase'],
+      //   specialist: ['GP', 'Dental'],
+      //   component: './PatientDatabase/Search',
         // routes: [
         //   // {
         //   //   path: '/patientdb/new',
@@ -186,7 +186,7 @@ const _routes = [
         //     ],
         //   },
         // ],
-      },
+      // },
       //
       // SMS
       {
