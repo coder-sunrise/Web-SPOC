@@ -1,5 +1,7 @@
 import React, { memo, useEffect, useState } from 'react'
 import { withStyles } from '@material-ui/core'
+// antd
+import InfoCircleOutlined from '@ant-design/icons/InfoCircleOutlined'
 // formik
 import { Field } from 'formik'
 // umi
@@ -16,6 +18,8 @@ import {
   Select,
   ClinicianSelect,
   Switch,
+  Popover,
+  IconButton,
 } from '@/components'
 // medisys components
 import {
@@ -97,6 +101,7 @@ const VisitInfoCard = ({
   ...restProps
 }) => {
   const [visitGroupMessage, setVisitGroupMessage] = useState()
+  const [visitGroupPopup, setVisitGroupPopup] = useState(false)
 
   const disableConsReady = Authorized.check('queue.modifyconsultationready')
 
@@ -175,6 +180,19 @@ const VisitInfoCard = ({
     setFieldValue(FormField['visit.visitGroupRef'], op && op.data.visitGroup === op.data.order ? op.data.order : null)
     setVisitGroupMessage(op && op.data.visitGroup === op.data.order ? 'New group create with ' + op.data.patientName : null)
   }
+
+  const handleVisitGroupFocus = (v, op) => {
+    setVisitGroupPopup(true)
+  }
+
+  const handleVisitGroupBlur = (v, op) => {
+    setVisitGroupPopup(false)
+  }
+
+  const handleVisitGroupToggle = (v, op) => {
+    setVisitGroupPopup(!visitGroupPopup)
+  }
+  
   
   const { values } = restProps
   let totalTempCharge = 0
@@ -367,7 +385,6 @@ const VisitInfoCard = ({
         <GridItem xs md={3}>
           <Authorized authority='queue.visitgroup'>
             <React.Fragment>
-              <div className={classes.visitGroupLabel}>Visit Group Number</div>
               <Select
               valueField='order'
               labelField='displayValue'
@@ -388,10 +405,12 @@ const VisitInfoCard = ({
                 input === ''
               }
               }
-              placeholder='Visit Group No., Patient Name'
+              label='Visit Group Number'
               dropdownStyle={{ minWidth: "20%" }}
               onClear={handleVisitGroupChange}
               onSelect={handleVisitGroupChange}
+              onFocus={handleVisitGroupFocus}
+              onBlur={handleVisitGroupBlur}
               renderDropdown={(option) => {
                 return <div>
                   <span style={{ position: 'absolute'}}><b>{option.visitGroup === option.order ? '' : option.visitGroup}</b></span>
@@ -417,7 +436,23 @@ const VisitInfoCard = ({
             </React.Fragment>
           </Authorized>
         </GridItem>
-        <GridItem xs md={3} />
+        <GridItem xs md={3}>  
+          <Popover 
+            trigger='click'
+            icon={null}
+            visible={visitGroupPopup}
+            content={<div>
+              <p>- Search by existing group number or patient name.</p>
+              <p>- Selecting visit group will set Cons. Ready to "No".</p>
+            </div>}>
+            <IconButton
+              size='small'
+              onClick={handleVisitGroupToggle} 
+            >
+              <InfoCircleOutlined />
+            </IconButton>
+          </Popover>
+        </GridItem>
         {showAdjusment &&
         ((ctinvoiceadjustment || []).length > 0 ||
           (copaymentScheme || []).length > 0) ? (
