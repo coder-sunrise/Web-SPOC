@@ -39,7 +39,7 @@ const PendingPreOrder: React.FC = (props: any) => {
 
   const commitChanges = ({ rows }) => {
     const { setFieldValue, values } = props
-    setFieldValue('pendingPreOrderItem', rows)
+    setFieldValue('listingPreOrderItem', rows)
   }
 
   const fetchCodeTable = async (
@@ -376,7 +376,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         render: row => {
           return (
             <span>
-              {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}
+              {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}{' '}
               {row.dispenseUOM}
             </span>
           )
@@ -446,7 +446,7 @@ const PendingPreOrder: React.FC = (props: any) => {
   return (
     <>
       <FastEditableTableGrid
-        rows={getFilteredRows(values.pendingPreOrderItem)}
+        rows={getFilteredRows(values.listingPreOrderItem)}
         schema={schema}
         FuncProps={{
           pager: false,
