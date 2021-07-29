@@ -69,7 +69,6 @@ class Layout extends PureComponent {
     // console.log(window.innerHeight)
     this.delayedResize = _.debounce(this.resize, 300)
     window.addEventListener('resize', this.delayedResize)
-    window.addEventListener('scroll', this.setBannerHeight)
     this.delayedChangeLayout = _.debounce(this.changeLayout, 300)
     this.ordersRef = React.createRef()
     this.myRefs = []
@@ -188,7 +187,6 @@ class Layout extends PureComponent {
 
   componentWillUnmount () {
     window.removeEventListener('resize', this.delayedResize)
-    window.removeEventListener('scroll', this.setBannerHeight)
     $(window.mainPanel).css('overflow', 'auto')
 
     this.state.currentLayout.widgets.map((id) => {
@@ -207,10 +205,12 @@ class Layout extends PureComponent {
 
   setBannerHeight = () => {
     const banner = document.getElementById('patientBanner')
-    const bannerHeight = banner ? banner.offsetHeight : 0   
+    const bannerHeight = banner ? banner.offsetHeight : 0
     this.setState({
       bannerHeight: bannerHeight,
     })
+    if(bannerHeight === 0)
+        setTimeout(this.setBannerHeight, 1000)
   }
 
   showWidgetManagePanel = (event) => {
