@@ -24,6 +24,7 @@ import Call from '@material-ui/icons/Call'
 import Authorized from '@/utils/Authorized'
 import Detail from '@/pages/Setting/ReferralSource/Detail'
 import ReferralPersonDetail from '@/pages/Setting/ReferralPerson/Detail'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 
 const { queryList, query } = service
 const styles = theme => ({
@@ -291,7 +292,7 @@ class ReferralCard extends PureComponent {
     let disabled = true
     if (
       isPatientProfileEdit ||
-      values.visitStatus === 'WAITING' ||
+      values.visitStatus === VISIT_STATUS.WAITING ||
       !isVisitReadonlyAfterSigned
     ) {
       disabled = false

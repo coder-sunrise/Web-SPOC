@@ -192,25 +192,25 @@ export const menuData = [
   {
     authority: 'settings.clinicsetting.casetype',
     title: 'Clinic Setting',
-    text: 'CASE Type',
+    text: 'Case Type',
     url: '/setting/casetype',
   },
   {
     authority: 'settings.clinicsetting.casedescription',
     title: 'Clinic Setting',
-    text: 'CASE DESCRIPTION',
+    text: 'Case Description',
     url: '/setting/casedescription',
   },
   {
     authority: 'settings.clinicsetting.refractiontesttype',
     title: 'Clinic Setting',
-    text: 'REFRACTION TEST TYPE',
+    text: 'Refraction Test Type',
     url: '/setting/refractiontesttype',
   },
   {
     authority: 'settings.clinicsetting.tag',
     title: 'Clinic Setting',
-    text: 'TAG',
+    text: 'Tag',
     url: '/setting/tag',
   },
   {
@@ -305,31 +305,31 @@ export const menuData = [
   {
     authority: 'settings.clinicsetting.medicationcontraindication',
     title: 'Clinic Setting',
-    text: 'MEDICATION CONTRA-INDICATION',
+    text: 'Medication Contra-Indication',
     url: '/setting/medicationcontraindication',
   },
   {
     authority: 'settings.clinicsetting.medicationinteraction',
     title: 'Clinic Setting',
-    text: 'MEDICATION INTERACTION',
+    text: 'Medication Interaction',
     url: '/setting/medicationinteraction',
   },
   {
     authority: 'settings.clinicsetting.medicationsideeffect',
     title: 'Clinic Setting',
-    text: 'MEDICATION SIDE EFFECT',
+    text: 'Medication Side Effect',
     url: '/setting/medicationsideeffect',
   },
   {
     authority: 'settings.clinicsetting.genericmedication',
     title: 'Clinic Setting',
-    text: 'GENERIC MEDICATION',
+    text: 'Generic Medication',
     url: '/setting/genericmedication',
   },
   {
     authority: 'settings.clinicsetting.administrationroute',
     title: 'Clinic Setting',
-    text: 'ROUTE OF ADMINISTRATION',
+    text: 'Route of Administration',
     url: '/setting/administrationroute',
   },
 ]

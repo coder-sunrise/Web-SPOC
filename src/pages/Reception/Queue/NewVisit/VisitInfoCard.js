@@ -29,6 +29,7 @@ import {
   AttachmentWithThumbnail,
 } from '@/components/_medisys'
 import { VISIT_TYPE } from '@/utils/constants'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
 import { roundTo } from '@/utils/utils'
 import numeral from 'numeral'
@@ -205,7 +206,7 @@ const VisitInfoCard = ({
   let showNotApplyAdjustment =
     totalTempCharge !== (values.visitOrderTemplateTotal || 0)
   let showAdjusment =
-    values.visitStatus === 'WAITING' || values.visitStatus === 'UPCOMING APPT.'
+    values.visitStatus === VISIT_STATUS.WAITING || values.visitStatus === VISIT_STATUS.UPCOMING_APPT
 
   const { isEnablePackage = false } = clinicSettings.settings
 
