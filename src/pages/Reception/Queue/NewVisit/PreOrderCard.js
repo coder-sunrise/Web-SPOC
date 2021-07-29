@@ -4,6 +4,7 @@ import { withStyles } from '@material-ui/core'
 import basicStyle from '@/assets/jss/material-dashboard-pro-react/layouts/basicLayout'
 import service from '@/services/patient'
 import numeral from 'numeral'
+import moment from 'moment'
 import {
   TextField,
   GridContainer,
@@ -55,11 +56,11 @@ class PreOrderCard extends PureComponent {
         FuncProps={{pager:false}}
         getRowId={(row)=> row.visitPreOrderItemFK}
         columns={[
-          { name: 'preOrderItemType', title: 'Category' },
+          { name: 'preOrderItemType', title: 'Type' },
           { name: 'itemName', title: 'Name' },
-          { name: 'quantity', title: 'Quantity' },
+          { name: 'quantity', title: 'Order Qty.' },
           { name: 'orderByUser', title: 'Order By' },
-          { name: 'orderDate', title: 'Order Date & Time' },
+          { name: 'orderDate', title: 'Order Date' },
           { name: 'remarks', title: 'Remarks' },
           { name: 'amount', title: 'Amount' },
           { name: 'hasPaid', title: 'Paid' },
@@ -91,8 +92,10 @@ class PreOrderCard extends PureComponent {
             columnName:'orderDate',
             sortingEnabled:false,
             type:'date',
-            showTime:true,
             width:180,
+            render:(row) => {
+              return <span>{moment(row.orderDate).format('DD MMM YYYY HH:mm')}</span>
+            }
           },
           {
             columnName: 'remarks',

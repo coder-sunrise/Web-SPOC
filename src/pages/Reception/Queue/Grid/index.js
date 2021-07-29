@@ -111,14 +111,20 @@ class Grid extends React.Component {
       ...queueList,
     ]
 
-    if (selfOnly)
+    if (selfOnly){
+      const servePatientRight = Authorized.check('queue.servepatient')
+      const userRole = user.data.clinicianProfile.userProfile.role
+      const userFK = user.data.clinicianProfile.userProfile.id
+      const isServePatientEnable = userRole && userRole.clinicRoleFK === 2 && servePatientRight && servePatientRight.rights !== 'hidden'
+
       data = data.filter((item) => {
-        if (!item.doctor) return false
+        if (!item.doctor && !isServePatientEnable) return false
         const { doctor: { id } } = item
         return clinicianProfile.doctorProfile
           ? id === clinicianProfile.doctorProfile.id
-          : false
+          : item.servingByList.filter(o=> o.servingByUserFK === userFK).length > 0
       })
+    }
 
     return filterData(filter, data, searchQuery)
   }

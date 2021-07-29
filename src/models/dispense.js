@@ -13,6 +13,7 @@ export default createFormViewModel({
       loadCount: 0,
       totalWithGST: 0,
       visitID: undefined,
+      servingPersons: [],
       default: {
         corAttachment: [],
         corPatientNoteVitalSign: [],
@@ -81,6 +82,31 @@ export default createFormViewModel({
           },
         })
         yield take('query/@@end')
+
+        yield put({
+          type: 'getServingPersons',
+          payload: { visitFK: visitID },
+        })
+      },
+
+      *getServingPersons({payload},{call,put}){
+        const response = yield call(service.getServingPersons, payload)
+        if (response)
+          yield put({
+            type: 'updateState',
+            payload: {
+              servingPersons: response.data,
+            },
+          })
+      },
+
+      *setServingPerson({payload},{call,put}){
+        const response = yield call(service.setServingPerson, payload)
+        if (response)
+          yield put({
+            type: 'getServingPersons',
+            payload: payload,
+          })
       },
 
       *start({ payload }, { call, put }) {

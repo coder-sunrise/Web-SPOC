@@ -3,6 +3,7 @@ import { getUniqueGUID, convertToQuery } from '@/utils/utils'
 import * as service from '@/services/common'
 
 const url = '/api/dispense'
+const urlQueue = '/api/queue'
 
 const fns = {
   remove: params => service.remove(url, params),
@@ -93,5 +94,19 @@ const fns = {
   removeAddOrderDetails: params => service.remove(`${url}/retailOrder`, params),
   removeBillFirstVisit: params =>
     service.remove(`${url}/billFirstOrder`, params),
+
+  getServingPersons: async params => {
+    const r = await request(`${urlQueue}/getServingPersons/${params.visitFK}`, {
+      method: 'GET',
+    })
+    return r
+  },
+  setServingPerson: async params => {
+    const r = await request(`${urlQueue}/setServingPerson/${params.visitFK}`, {
+      method: 'POST',
+    })
+    return r
+  },
+  
 }
 export default fns

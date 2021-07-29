@@ -10,24 +10,24 @@ import Assignment from '@material-ui/icons/Assignment'
 import Description from '@material-ui/icons/Description'
 
 export const StatusIndicator = {
-  ALL: 'all',
-  APPOINTMENT: 'appointment',
-  WAITING: 'waiting',
-  IN_PROGRESS: 'in progress',
-  COMPLETED: 'completed',
+  ALL: 'All',
+  APPOINTMENT: 'Appointment',
+  WAITING: 'Waiting',
+  IN_PROGRESS: 'In Progress',
+  COMPLETED: 'Completed',
 }
 
 export const modelKey = 'queueLog/'
 
 export const VISIT_STATUS = {
-  WAITING: 'WAITING',
-  IN_CONS: 'IN CONS',
-  PAUSED: 'PAUSED',
-  DISPENSE: 'DISPENSE',
-  BILLING: 'BILLING',
-  ORDER_UPDATED: 'ORDER UPDATED',
-  COMPLETED: 'COMPLETED',
-  UPCOMING_APPT: 'UPCOMING APPT.',
+  WAITING: 'Waiting',
+  IN_CONS: 'In Cons',
+  PAUSED: 'Paused',
+  DISPENSE: 'Dispense',
+  BILLING: 'Billing',
+  ORDER_UPDATED: 'Order Updated',
+  COMPLETED: 'Completed',
+  UPCOMING_APPT: 'Upcoming Appt.',
 }
 
 export const filterMap = {

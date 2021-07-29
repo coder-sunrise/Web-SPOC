@@ -451,6 +451,9 @@ export const defaultTheme = createMuiTheme({
       },
     },
     MuiButton: {
+      root: {
+        textTransform: 'none',
+      },
       contained: defaultButton,
       outlined: {
         ...defaultButton,

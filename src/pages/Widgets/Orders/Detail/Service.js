@@ -82,10 +82,6 @@ const getVisitDoctorUserId = (props) => {
       'The amount should be more than 0.00',
     ),
     performingUserFK: Yup.number().required(),
-    newServiceName: Yup.string().when('isDisplayValueChangable', {
-      is: (isDisplayValueChangable) => isDisplayValueChangable,
-      then: Yup.string().trim().required(),
-    }),
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
