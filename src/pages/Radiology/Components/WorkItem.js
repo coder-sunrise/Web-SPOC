@@ -1,41 +1,49 @@
 import React, { Fragment, useState, useEffect, useContext } from 'react'
 import { Typography, Card } from 'antd'
 import ProCard from '@ant-design/pro-card'
-import { Icon } from '@/components'
+import moment from 'moment'
+import { Icon, dateFormatLongWithTimeNoSec12h } from '@/components'
 import { VISIT_TYPE, VISIT_TYPE_NAME } from '@/utils/constants'
+import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import WorlistContext from '../Worklist/WorklistContext'
 
 const blueColor = '#1890f8'
 
-const WorkitemTitle = ({ item }) => (
-  <div
-    style={{
-      display: 'flex',
-      width: '100%',
-      fontSize: '0.9rem',
-      borderBottom: '#cdcdcd solid 1px',
-      padding: 8,
-    }}
-  >
-    <div style={{ marginRight: 'auto' }}>
-      <div style={{ color: blueColor, fontWeight: 500 }}>
-        {item.patient.name}
+const WorkitemTitle = ({ item }) => {
+  const age = calculateAgeFromDOB(item.patientInfo.dob)
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        width: '100%',
+        fontSize: '0.9rem',
+        borderBottom: '#cdcdcd solid 1px',
+        padding: 8,
+      }}
+    >
+      <div style={{ marginRight: 'auto' }}>
+        <div style={{ color: blueColor, fontWeight: 500 }}>
+          {item.patientInfo.name}
+        </div>
+        <div>{item.patientInfo.patientReferenceNo}</div>
       </div>
-      <div>{item.patient.patientReferenceNo}</div>
-    </div>
-    <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-      <div>
-        <Icon type='male' style={{ color: blueColor, fontSize: 15 }} />{' '}
-        {item.patient.age} {item.patient.age === 1 ? 'Yr' : 'Yrs'}
+      <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
+        <div>
+          <Icon type='male' style={{ color: blueColor, fontSize: 15 }} />
+          {age} {age === 1 ? 'Yr' : 'Yrs'}
+        </div>
+        <div>{item.patientInfo.patientAccountNo}</div>
       </div>
-      <div>{item.patient.patientAccountNo}</div>
     </div>
-  </div>
-)
+  )
+}
 
 const WorkitemBody = ({ item }) => {
   const { setDetailsId } = useContext(WorlistContext)
-
+  const orderDate = moment(item.generateDate).format(
+    dateFormatLongWithTimeNoSec12h,
+  )
   return (
     <div
       style={{
@@ -56,11 +64,11 @@ const WorkitemBody = ({ item }) => {
         <div style={{ marginRight: 'auto', flexGrow: 1 }}>
           <div style={{ fontWeight: 500 }}>{item.itemDescription}</div>
           <div>{item.accessionNo}</div>
-          <div>{item.visit.doctorName}</div>
-          <div>{item.orderDate}</div>
+          <div>{item.visitInfo.doctorName}</div>
+          <div>{orderDate}</div>
         </div>
         <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-          <div>Q.No.: {item.visit.queueNo}</div>
+          <div>Q.No.: {item.visitInfo.queueNo}</div>
         </div>
       </div>
       <div

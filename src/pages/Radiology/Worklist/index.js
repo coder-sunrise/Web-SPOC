@@ -2,202 +2,63 @@ import React, { Fragment, useState, useEffect, useContext } from 'react'
 import ProCard from '@ant-design/pro-card'
 import { compose } from 'redux'
 import { useSelector, useDispatch, connect } from 'dva'
+import { RadiologyWorkitemStatus } from '@/utils/constants'
+import _ from 'lodash'
 import { CommonModal } from '@/components'
 import RadiologyDetails from './Details'
 import { Worklist, WorklistFilter } from '../Components'
 import WorklistContext, { WorklistContextProvider } from './WorklistContext'
 
-const columns = [
+const columnsTemplate = [
   {
     backgroundColor: '#009933',
     title: 'New',
-    workitems: [
-      {
-        patient: {
-          name: 'Annie Moon',
-          age: 20,
-          patientReferenceNo: 'PT-000007',
-          patientAccountNo: 'S9388399',
-          gender: 'female',
-        },
-        accessionNo: '202130230001',
-        itemDescription: 'X-Ray(Head)',
-        isNurseActualized: true,
-        orderDate: '14 May 2021 03:15 PM',
-        isUrgent: true,
-        id: 1,
-        patientProfileFK: 22,
-        visit: {
-          queueNo: '1.0',
-          doctorName: 'Dr. Jin SangRong',
-          visitPurposeFK: 4,
-        },
-      },
-      {
-        patient: {
-          name: 'Annie Sun',
-          age: 11,
-          patientReferenceNo: 'PT-000008',
-          patientAccountNo: 'S32432399',
-          gender: 'female',
-        },
-        accessionNo: '202130230002',
-        itemDescription: 'X-Ray(Leg)',
-        orderDate: '14 May 2021 03:15 PM',
-        id: 2,
-        visit: {
-          queueNo: '1.0',
-          doctorName: 'Dr. Jin SangRong',
-        },
-      },
-      {
-        patient: {
-          name: 'David Ross',
-          age: 49,
-          patientReferenceNo: 'PT-000009',
-          patientAccountNo: 'S323232499',
-          gender: 'male',
-        },
-        accessionNo: '202130230003',
-        itemDescription: 'X-Ray(Leg)',
-        orderDate: '14 May 2021 03:15 PM',
-        id: 3,
-        visit: {
-          queueNo: '1.0',
-          doctorName: 'Dr. Jin SangRong',
-        },
-      },
-      {
-        patient: {
-          name: 'Monica',
-          age: 49,
-          patientReferenceNo: 'PT-000010',
-          patientAccountNo: 'S32432332',
-          gender: 'female',
-        },
-        id: 4,
-        accessionNo: '202130230004',
-        itemDescription: 'X-Ray(Leg)',
-        orderDate: '14 May 2021 03:15 PM',
-        visit: {
-          queueNo: '1.0',
-          doctorName: 'Dr. Jin SangRong',
-        },
-      },
-    ],
+    workitems: [],
   },
   {
     backgroundColor: '#960',
     title: 'In Progress',
-    workitems: [
-      {
-        patient: {
-          name: 'Annie Moon',
-          age: 20,
-          patientReferenceNo: 'PT-000007',
-          patientAccountNo: 'S9388399',
-          gender: 'female',
-        },
-        accessionNo: '202130230001',
-        itemDescription: 'X-Ray(Head)',
-        isNurseActualized: true,
-        orderDate: '14 May 2021 03:15 PM',
-        isUrgent: true,
-        id: 1,
-        visit: {
-          queueNo: '1.0',
-          doctorName: 'Dr. Jin SangRong',
-          visitPurposeFK: 4,
-        },
-      },
-    ],
+    workitems: [],
   },
   {
     backgroundColor: '#099',
     title: 'Pending Report',
-    workitems: [
-      {
-        patient: {
-          name: 'Annie Moon',
-          age: 20,
-          patientReferenceNo: 'PT-000007',
-          patientAccountNo: 'S9388399',
-          gender: 'female',
-        },
-        accessionNo: '202130230001',
-        itemDescription: 'X-Ray(Head)',
-        isNurseActualized: true,
-        orderDate: '14 May 2021 03:15 PM',
-        isUrgent: true,
-        id: 1,
-        visit: {
-          queueNo: '1.0',
-          doctorName: 'Dr. Jin SangRong',
-          visitPurposeFK: 4,
-        },
-      },
-    ],
+    workitems: [],
   },
   { backgroundColor: '#366', title: 'Completed', workitems: [] },
   {
     backgroundColor: '#797979',
     title: 'Cancelled',
-    workitems: [
-      {
-        patient: {
-          name: 'Annie Moon',
-          age: 20,
-          patientReferenceNo: 'PT-000007',
-          patientAccountNo: 'S9388399',
-          gender: 'female',
-        },
-        accessionNo: '202130230001',
-        itemDescription: 'X-Ray(Head)',
-        isNurseActualized: true,
-        orderDate: '14 May 2021 03:15 PM',
-        isUrgent: true,
-        id: 1,
-        visit: {
-          queueNo: '1.0',
-          doctorName: 'Dr. Jin SangRong',
-          visitPurposeFK: 4,
-        },
-      },
-      {
-        patient: {
-          name: 'Annie Moon',
-          age: 20,
-          patientReferenceNo: 'PT-000007',
-          patientAccountNo: 'S9388399',
-          gender: 'female',
-        },
-        accessionNo: '202130230001',
-        itemDescription: 'X-Ray(Head)',
-        isNurseActualized: false,
-        orderDate: '14 May 2021 03:15 PM',
-        isUrgent: false,
-        id: 1,
-        patientProfileFK: 3,
-        visit: {
-          queueNo: '5.0',
-          doctorName: 'Dr. Jin SangRong',
-          visitPurposeFK: 1,
-        },
-      },
-    ],
+    workitems: [],
   },
 ]
 
 const RadiologyWorklist = () => {
   const dispatch = useDispatch()
-  const { detailsId, setDetailsId } = useContext(WorklistContext)
-  const model = useSelector(s => s.radiologyWorklist)
+  const [columns, setColumns] = useState([])
+  const entity = useSelector(s => s.radiologyWorklist)
 
   useEffect(() => {
     dispatch({
       type: 'radiologyWorklist/query',
     })
   }, [])
+
+  useEffect(() => {
+    if (entity && entity.list) {
+      const worklist = entity.list.map(w => ({
+        ...w,
+        status: RadiologyWorkitemStatus[w.statusFK],
+      }))
+
+      const mapped = columnsTemplate.map(item => ({
+        ...item,
+        workitems: worklist.filter(w => w.status === item.title),
+      }))
+
+      setColumns(mapped)
+    }
+  }, [entity])
 
   return (
     <ProCard
@@ -208,20 +69,7 @@ const RadiologyWorklist = () => {
       title={<WorklistFilter />}
     >
       <Worklist columns={columns} />
-      <CommonModal
-        open={detailsId !== null}
-        title='Radiology Examination Details'
-        onClose={() => {
-          setDetailsId(null)
-        }}
-        onConfirm={() => {}}
-        showFooter={true}
-        maxWidth='lg'
-        overrideLoading
-        observe=''
-      >
-        <RadiologyDetails />
-      </CommonModal>
+      <RadiologyDetails />
     </ProCard>
   )
 }

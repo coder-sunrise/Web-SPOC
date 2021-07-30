@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Form, Button } from 'antd'
 import Search from '@material-ui/icons/Search'
+import { useDispatch } from 'dva'
 import {
   TextField,
   DatePicker,
@@ -12,10 +13,11 @@ import { formatMessage } from 'umi'
 
 export const WorklistFilter = () => {
   const [form] = Form.useForm()
+  const dispatch = useDispatch()
 
   return (
     <Form form={form} layout='inline' initialValues={{}}>
-      <Form.Item name='general'>
+      <Form.Item name='searchValue'>
         <TextField
           label={formatMessage({ id: 'radiology.search.general' })}
           style={{ width: 350 }}
@@ -58,7 +60,13 @@ export const WorklistFilter = () => {
           color='primary'
           icon={<Search />}
           onClick={() => {
-            console.log('form.value', form.getFieldsValue(true))
+            const { searchValue } = form.getFieldsValue(true)
+            dispatch({
+              type: 'radiologyWorklist/query',
+              payload: {
+                apiCriteria: searchValue ? { searchValue } : undefined,
+              },
+            })
           }}
         >
           {formatMessage({ id: 'form.search' })}

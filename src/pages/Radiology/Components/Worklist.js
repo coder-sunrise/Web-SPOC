@@ -13,9 +13,9 @@ export const Worklist = ({ columns }) => {
       setColumnPercentage(100 / columns.length)
     }
   }, [columns])
-
+  window.mapped = columns
   const gridStyle = {
-    gridTemplateColumns: '1fr' + columns.reduce(r => r + '1fr '), //fraction to set same fraction for all columns
+    gridTemplateColumns: columns.reduce(r => r + '1fr ', ''), //fraction to set same fraction for all columns
     display: 'grid',
     height: '100%',
     columnGap: 15,

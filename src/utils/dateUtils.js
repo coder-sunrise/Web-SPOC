@@ -15,15 +15,12 @@ export const formatDateToText = (value = undefined, parseFormat) => {
   return value
 }
 
-export const calculateAgeFromDOB = (dob) =>
+export const calculateAgeFromDOB = dob =>
   Math.floor(moment.duration(moment().diff(dob)).asYears())
 
-export const formatDatesToUTC = (dates) => {
+export const formatDatesToUTC = dates => {
   if (Array.isArray(dates) && dates.length > 0) {
-    return [
-      moment(dates[0]).formatUTC(),
-      moment(dates[1]).formatUTC(false),
-    ]
+    return [moment(dates[0]).formatUTC(), moment(dates[1]).formatUTC(false)]
   }
 
   return []
