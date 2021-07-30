@@ -22,6 +22,7 @@ import {
   ProgressButton,
   Tooltip,
   Popover,
+  DatePicker,
 } from '@/components'
 // sub components
 import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
@@ -65,7 +66,7 @@ const FilterBar = props => {
 
   const renderDropdown = option => <DoctorLabel doctor={option} />
 
-  const { filterByDoctor = [] } = values
+  const { filterByDoctor = [], dobfrom, dobto } = values
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
   const [showFilterTemplate, setShowFilterTemplate] = useState(false)
 
@@ -101,6 +102,18 @@ const FilterBar = props => {
                 })}
               />
             )}
+          />
+        </GridItem>
+        <GridItem xs md={1}>
+          <FastField
+            name='dobfrom'
+            render={args => <DatePicker {...args} label='DOB From' />}
+          />
+        </GridItem>
+        <GridItem xs md={1}>
+          <FastField
+            name='dobto'
+            render={args => <DatePicker {...args} label='DOB To' />}
           />
         </GridItem>
         {isDayView && (
@@ -233,7 +246,7 @@ const FilterBar = props => {
           </div>
         </GridItem>
 
-        <GridItem md={4} style={{ textAlign: 'center' }}>
+        <GridItem xs md={8}>
           <ProgressButton
             icon={<Search />}
             color='primary'
@@ -248,13 +261,9 @@ const FilterBar = props => {
           >
             Search Appointment
           </ProgressButton>
-        </GridItem>
-
-        <GridItem xs md={12}>
           <Authorized authority='appointment.newappointment'>
             <Button
               color='primary'
-              size='sm'
               onClick={onAddAppointmentClick}
               disabled={loading}
             >
@@ -266,7 +275,6 @@ const FilterBar = props => {
           <Authorized authority='settings.clinicsetting.doctorblock'>
             <Button
               color='primary'
-              size='sm'
               onClick={onDoctorEventClick}
               disabled={loading}
             >
@@ -295,10 +303,16 @@ export default compose(
       filterByDoctor,
       filterBySingleDoctor,
       filterByApptType,
+      dobfrom,
+      dobto,
+      search,
     }) => {
       count += 1
 
       return {
+        dobfrom,
+        dobto,
+        search,
         filterByDoctor: [...filterByDoctor],
         filterBySingleDoctor,
         filterByApptType: filterByApptType || [-99],

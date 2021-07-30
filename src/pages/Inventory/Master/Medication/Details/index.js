@@ -101,9 +101,12 @@ const Detail = ({
     setCurrentLanguage,
     currentLanguage,
     isEditingDosageRule,
+    primaryPrintoutLanguage,
+    secondaryPrintoutLanguage,
   } = useContext(DetailsContext)
 
-  useEffect(() => window.addEventListener('resize', resizeHandler))
+  useEffect(() => window.addEventListener('resize', resizeHandler), [])
+
   const [windowHeight, setWindowHeith] = useState(window.innerHeight)
   const [currentScrollPosition, setCurrentScrollPosition] = useState('general')
   const [placeHolderHeight, setPlaceHolderHeight] = useState(0)
@@ -271,8 +274,14 @@ const Detail = ({
                   setCurrentLanguage(value)
                 }}
                 options={[
-                  { label: 'JP', value: 'JP' },
-                  { label: 'EN', value: 'EN' },
+                  {
+                    label: primaryPrintoutLanguage,
+                    value: primaryPrintoutLanguage,
+                  },
+                  {
+                    label: secondaryPrintoutLanguage,
+                    value: secondaryPrintoutLanguage,
+                  },
                 ]}
               />
             ),
@@ -624,13 +633,15 @@ export default compose(
             ...item,
             isDeleted: true,
           }))
-        else
+        else {
           deletedItems = originalValues
             .filter(
               orig =>
-                !medicationInstructionRule.findIndex(d => d.id === orig.id),
+                medicationInstructionRule.findIndex(d => d.id === orig.id) ===
+                -1,
             )
             .map(item => ({ ...item, isDeleted: true }))
+        }
 
         if (deletedItems)
           finalMedicationInstructionRule = [

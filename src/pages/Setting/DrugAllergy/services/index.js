@@ -1,6 +1,6 @@
 import * as service from '@/services/common'
 
-const url = '/api/ctclinicdrugallergy'
+const url = '/api/ctdrugallergy'
 
 const fns = {
   // remove: (params) => service.remove(url, params),

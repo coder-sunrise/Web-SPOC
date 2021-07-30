@@ -9,6 +9,7 @@ import Timer from '@material-ui/icons/Timer'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { Divider } from '@material-ui/core'
+import { currencySymbol, currencyFormat } from '@/utils/config'
 import { Link } from 'umi'
 
 import numeral from 'numeral'
@@ -36,61 +37,42 @@ export default ({
 }) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
   const { total, gst, totalWithGST, subTotal } = summary
-  const [
-    checkedStatusIncldGST,
-    setCheckedStatusIncldGST,
-  ] = useState(isGSTInclusive)
+  const [checkedStatusIncldGST, setCheckedStatusIncldGST] = useState(
+    isGSTInclusive,
+  )
 
-  const [
-    isExistPackage,
-    setIsExistPackage,
-  ] = useState(false)
+  const [isExistPackage, setIsExistPackage] = useState(false)
 
-  const [
-    expandedGroups,
-    setExpandedGroups,
-  ] = useState([])
+  const [expandedGroups, setExpandedGroups] = useState([])
 
-  const handleExpandedGroupsChange = (e) => {
+  const handleExpandedGroupsChange = e => {
     setExpandedGroups(e)
   }
 
-  useEffect(
-    () => {
-      setCheckedStatusIncldGST(orders.isGSTInclusive)
+  useEffect(() => {
+    setCheckedStatusIncldGST(orders.isGSTInclusive)
 
-      const settings = JSON.parse(localStorage.getItem('clinicSettings'))
-      const { isEnablePackage = false } = settings
+    const settings = JSON.parse(localStorage.getItem('clinicSettings'))
+    const { isEnablePackage = false } = settings
 
-      const packageItems = rows.filter(
-        (item) => item.isPackage && !item.isDeleted,
+    const packageItems = rows.filter(item => item.isPackage && !item.isDeleted)
+    const existPackage = isEnablePackage && packageItems.length > 0
+    setIsExistPackage(existPackage)
+
+    if (existPackage && rows) {
+      const groups = rows.reduce(
+        (distinct, data) =>
+          distinct.includes(data.packageGlobalId)
+            ? [...distinct]
+            : [...distinct, data.packageGlobalId],
+        [],
       )
-      const existPackage = isEnablePackage && packageItems.length > 0
-      setIsExistPackage(existPackage)
 
-      if (existPackage && rows) {
-        const groups = rows.reduce(
-          (distinct, data) =>
-            distinct.includes(data.packageGlobalId)
-              ? [
-                ...distinct,
-              ]
-              : [
-                ...distinct,
-                data.packageGlobalId,
-              ],
-          [],
-        )
+      setExpandedGroups(groups)
+    }
+  }, [orders])
 
-        setExpandedGroups(groups)
-      }
-    },
-    [
-      orders,
-    ],
-  )
-
-  const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
+  const adjustments = finalAdjustments.filter(o => !o.isDeleted)
 
   const OrderAccessRight = () => {
     let editAccessRight = ''
@@ -102,9 +84,9 @@ export default ({
     return editAccessRight
   }
 
-  const OrderItemAccessRight = (row) => {
+  const OrderItemAccessRight = row => {
     let editAccessRight
-    const orderType = orderTypes.find((item) => item.value === row.type) || {
+    const orderType = orderTypes.find(item => item.value === row.type) || {
       accessRight: '',
     }
     editAccessRight = orderType.accessRight
@@ -129,7 +111,7 @@ export default ({
     return editAccessRight
   }
 
-  const editRow = (row) => {
+  const editRow = row => {
     if (row.isPreOrderActualize) return
     if (!row.isActive && row.type !== '5' && !row.isDrugMixture) return
 
@@ -158,8 +140,7 @@ export default ({
           type: row.type,
         },
       })
-    }
-    else {
+    } else {
       dispatch({
         type: 'orders/updateState',
         payload: {
@@ -170,10 +151,12 @@ export default ({
     }
     if (row.type === '7') {
       const treatment =
-        (codetable.cttreatment || [])
-          .find((o) => o.isActive && o.id === row.treatmentFK) || {}
-      const action = (codetable.ctchartmethod || [])
-        .find((o) => o.id === treatment.chartMethodFK)
+        (codetable.cttreatment || []).find(
+          o => o.isActive && o.id === row.treatmentFK,
+        ) || {}
+      const action = (codetable.ctchartmethod || []).find(
+        o => o.id === treatment.chartMethodFK,
+      )
       dispatch({
         type: 'dentalChartComponent/updateState',
         payload: {
@@ -206,7 +189,7 @@ export default ({
     })
   }
 
-  const editAdjustment = (adj) => {
+  const editAdjustment = adj => {
     dispatch({
       type: 'global/updateState',
       payload: {
@@ -230,7 +213,7 @@ export default ({
     })
   }
   const totalItems = [
-    ...adjustments.map((o) => ({
+    ...adjustments.map(o => ({
       columnName: 'totalAfterItemAdjustment',
       type: `${o.uid}`,
     })),
@@ -259,7 +242,7 @@ export default ({
             }}
             controlStyle={{ fontWeight: 500 }}
             checked={checkedStatusIncldGST}
-            onChange={(e) => {
+            onChange={e => {
               dispatch({
                 type: 'orders/updateState',
                 payload: {
@@ -279,7 +262,7 @@ export default ({
 
   totalItems.push({ columnName: 'totalAfterItemAdjustment', type: 'total' })
   totalItems.push({ columnName: 'totalAfterItemAdjustment', type: 'subTotal' })
-  adjustments.forEach((adj) => {
+  adjustments.forEach(adj => {
     messages[adj.uid] = (
       <div
         style={{
@@ -336,7 +319,8 @@ export default ({
                       payload: {
                         uid: adj.uid,
                       },
-                    })}
+                    })
+                  }
                 />
               </Button>
             </Tooltip>
@@ -353,10 +337,10 @@ export default ({
     whiteSpace: 'pre-wrap',
   }
 
-  const drugMixtureIndicator = (row) => {
+  const drugMixtureIndicator = row => {
     if (row.type !== '1' || !row.isDrugMixture) return null
     const activePrescriptionItemDrugMixture = row.corPrescriptionItemDrugMixture.filter(
-      (item) => !item.isDeleted,
+      item => !item.isDeleted,
     )
 
     return (
@@ -369,7 +353,7 @@ export default ({
     )
   }
 
-  const packageDrawdownIndicator = (row) => {
+  const packageDrawdownIndicator = row => {
     if (!row.isPackage) return null
 
     return (
@@ -394,7 +378,7 @@ export default ({
     let label = 'Package'
     let totalPrice = 0
     if (!rows) return ''
-    const data = rows.filter((item) => item.packageGlobalId === row.value)
+    const data = rows.filter(item => item.packageGlobalId === row.value)
     if (data.length > 0) {
       totalPrice = _.sumBy(data, 'totalAfterItemAdjustment') || 0
       label = `${data[0].packageCode} - ${data[0].packageName} (Total: `
@@ -403,16 +387,15 @@ export default ({
       <span style={{ verticalAlign: 'middle', paddingRight: 8 }}>
         <strong>
           {label}
-          <NumberInput text currency value={totalPrice} />
-          )
+          <NumberInput text currency value={totalPrice} />)
         </strong>
       </span>
     )
   }
 
-  const getDisplayName = (row) => {
+  const getDisplayName = row => {
     if (row.type === '10' || row.type === '3') {
-      if (row.newServiceName && row.newServiceName.trim() !== "") {
+      if (row.newServiceName && row.newServiceName.trim() !== '') {
         return row.newServiceName
       }
     }
@@ -438,11 +421,12 @@ export default ({
       rows={(rows || []).map(r => {
         return {
           ...r,
-          totalAfterItemAdjustment: (r.isPreOrder && !r.isChargeToday) ? 0 : r.totalAfterItemAdjustment
+          totalAfterItemAdjustment:
+            r.isPreOrder && !r.isChargeToday ? 0 : r.totalAfterItemAdjustment,
         }
       })}
       onRowDoubleClick={editRow}
-      getRowId={(r) => r.uid}
+      getRowId={r => r.uid}
       columns={[
         { name: 'type', title: 'Type' },
         { name: 'subject', title: 'Name' },
@@ -459,18 +443,12 @@ export default ({
       ]}
       FuncProps={{
         pager: false,
-        fixedHiddenColumns: [
-          'packageGlobalId',
-        ],
+        fixedHiddenColumns: ['packageGlobalId'],
         grouping: isExistPackage,
         groupingConfig: {
           state: {
-            grouping: [
-              { columnName: 'packageGlobalId' },
-            ],
-            expandedGroups: [
-              ...expandedGroups,
-            ],
+            grouping: [{ columnName: 'packageGlobalId' }],
+            expandedGroups: [...expandedGroups],
             onExpandedGroupsChange: handleExpandedGroupsChange,
           },
           row: {
@@ -507,7 +485,7 @@ export default ({
                   </span>
                 )
               }
-              const adj = adjustments.find((o) => `${o.uid}` === type)
+              const adj = adjustments.find(o => `${o.uid}` === type)
               if (adj) {
                 return (
                   <span style={{ float: 'right', paddingRight: 70 }}>
@@ -521,7 +499,7 @@ export default ({
           },
           row: {
             messages,
-            totalRowComponent: (p) => {
+            totalRowComponent: p => {
               const { children, ...restProps } = p
               let newChildren = []
               if (isExistPackage) {
@@ -548,7 +526,7 @@ export default ({
 
               return <Table.Row>{newChildren}</Table.Row>
             },
-            itemComponent: (p) => {
+            itemComponent: p => {
               return (
                 <div className={classes.summaryRow}>
                   {messages[p.type]}
@@ -556,7 +534,7 @@ export default ({
                 </div>
               )
             },
-            totalCellComponent: (p) => {
+            totalCellComponent: p => {
               const { children, column } = p
               if (column.name === 'totalAfterItemAdjustment') {
                 const items = children.props.children
@@ -665,8 +643,8 @@ export default ({
         {
           columnName: 'type',
           width: 140,
-          render: (row) => {
-            const otype = orderTypes.find((o) => o.value === row.type)
+          render: row => {
+            const otype = orderTypes.find(o => o.value === row.type)
             let texts = []
 
             if (row.type === '1') {
@@ -687,10 +665,26 @@ export default ({
 
             return (
               <div style={{ position: 'relative' }}>
-              <div style={wrapCellTextStyle}>
-                <Tooltip title={texts}><span>{texts}</span></Tooltip>
-                {drugMixtureIndicator(row)}
-                  {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
+                <div style={wrapCellTextStyle}>
+                  <Tooltip title={texts}>
+                    <span>{texts}</span>
+                  </Tooltip>
+                  {drugMixtureIndicator(row)}
+                  {row.isPreOrder && (
+                    <Tooltip title='Pre-Order'>
+                      <Tag
+                        color='#4255bd'
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          right: -10,
+                          borderRadius: 10,
+                        }}
+                      >
+                        Pre
+                      </Tag>
+                    </Tooltip>
+                  )}
                 </div>
               </div>
             )
@@ -698,47 +692,54 @@ export default ({
         },
         {
           columnName: 'subject',
-          render: (row) => {
+          render: row => {
             return (
-              <div style={wrapCellTextStyle}>
-                {packageDrawdownIndicator(row)}
-                {row.type === '10' &&
-                  <div style={{
-                    position: 'relative',
-                  }}
-                  >
-                  <Tooltip title='Draft'>
-                    <Timer style={{
-                      position: 'absolute',
-                      top: 2,
-                      color: 'red',
-                      transform: 'scale(1.4,1.4)',
-                    }}
-                    />
-                  </Tooltip>
+              <Tooltip 
+                title={
+                  <div>
+                      {`Code/Name: ${row.serviceCode || row.drugCode || row.consumableCode || row.vaccinationCode} / ${getDisplayName(row)}`}<br />
+                      {`UnitPrice/UOM: ${currencySymbol}${numeral(row.unitPrice,).format(currencyFormat)} / ${row.dispenseUOMDisplayValue || row.unitOfMeasurement || row.uomDisplayValue || '-'}`}
                   </div>
                 }
-                <div
-                  style={{
-                    position: 'relative',
-                    left: row.isPackage || row.type === '10' ? 22 : 0,
-                  }}
-                >
-                  {getDisplayName(row)}
+              >
+                <div style={wrapCellTextStyle}>
+                  {packageDrawdownIndicator(row)}
+                  {row.type === '10' && (
+                    <div
+                      style={{
+                        position: 'relative',
+                      }}
+                    >
+                      <Tooltip title='Draft'>
+                        <Timer
+                          style={{
+                            position: 'absolute',
+                            top: 2,
+                            color: 'red',
+                            transform: 'scale(1.4,1.4)',
+                          }}
+                        />
+                      </Tooltip>
+                    </div>
+                  )}
+                  <div
+                    style={{
+                      position: 'relative',
+                      left: row.isPackage || row.type === '10' ? 22 : 0,
+                    }}
+                  >
+                    {getDisplayName(row)}
+                  </div>
                 </div>
-              </div>
+              </Tooltip>
             )
           },
         },
         {
           columnName: 'description',
           width: isFullScreen ? 300 : isExistPackage ? 120 : 160,
-          observeFields: [
-            'instruction',
-            'remark',
-            'remarks',
-          ],
-          render: (row) => {
+          observeFields: ['instruction', 'remark', 'remarks'],
+          render: row => {
             return (
               <Tooltip title={row.instruction}>
                 <div
@@ -767,22 +768,26 @@ export default ({
           columnName: 'quantity',
           type: 'number',
           width: 100,
-          render: (row) => {
+          render: row => {
             let qty = '0.0'
             if (row.type === '1' || row.type === '5') {
-              qty = `${numeral(row.quantity || 0).format(
-                '0,0.0',
-              )} ${row.dispenseUOMDisplayValue}`
+              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${
+                row.dispenseUOMDisplayValue
+              }`
             } else if (row.type === '2') {
-              qty = `${numeral(row.quantity || 0).format(
-                '0,0.0',
-              )} ${row.uomDisplayValue}`
-            } else if (row.type === '3' || row.type === '7' || row.type === '10') {
+              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${
+                row.uomDisplayValue
+              }`
+            } else if (
+              row.type === '3' ||
+              row.type === '7' ||
+              row.type === '10'
+            ) {
               qty = `${numeral(row.quantity || 0).format('0,0.0')}`
             } else if (row.type === '4') {
-              qty = `${numeral(row.quantity || 0).format(
-                '0,0.0',
-              )} ${row.unitOfMeasurement}`
+              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${
+                row.unitOfMeasurement
+              }`
             }
             return (
               <Tooltip title={qty}>
@@ -796,7 +801,7 @@ export default ({
           width: 70,
           align: 'center',
           sortingEnabled: false,
-          render: (row) => {
+          render: row => {
             if (row.type === '7' && from !== 'EditOrder') return null
 
             const editAccessRight = OrderItemAccessRight(row)
@@ -817,8 +822,8 @@ export default ({
                         isEditingEntity ||
                         (!row.isActive &&
                           row.type !== '5' &&
-                          !row.isDrugMixture)
-                        || row.isPreOrderActualize
+                          !row.isDrugMixture) ||
+                        row.isPreOrderActualize
                       }
                     >
                       <Edit />
@@ -829,8 +834,7 @@ export default ({
                       size='sm'
                       color='danger'
                       justIcon
-                      disabled={isEditingEntity
-                        || row.isPreOrderActualize}
+                      disabled={isEditingEntity || row.isPreOrderActualize}
                     >
                       <Delete
                         onClick={() => {

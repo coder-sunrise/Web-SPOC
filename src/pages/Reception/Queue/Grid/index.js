@@ -29,8 +29,6 @@ import Authorized from '@/utils/Authorized'
 
 const styles = theme => ({
   switchContainer: {
-    lineHeight: '1em',
-    height: '100%',
     color: 'currentColor',
     borderRadius: 0,
     '& .ant-switch-handle': {
@@ -113,14 +111,20 @@ class Grid extends React.Component {
       ...queueList,
     ]
 
-    if (selfOnly)
+    if (selfOnly){
+      const servePatientRight = Authorized.check('queue.servepatient')
+      const userRole = user.data.clinicianProfile.userProfile.role
+      const userFK = user.data.clinicianProfile.userProfile.id
+      const isServePatientEnable = userRole && userRole.clinicRoleFK === 2 && servePatientRight && servePatientRight.rights !== 'hidden'
+
       data = data.filter((item) => {
-        if (!item.doctor) return false
+        if (!item.doctor && !isServePatientEnable) return false
         const { doctor: { id } } = item
         return clinicianProfile.doctorProfile
           ? id === clinicianProfile.doctorProfile.id
-          : false
+          : item.servingByList.filter(o=> o.servingByUserFK === userFK).length > 0
       })
+    }
 
     return filterData(filter, data, searchQuery)
   }
@@ -212,14 +216,9 @@ class Grid extends React.Component {
 
     const queueConfig = {
       ...QueueTableConfig,
-      columns: QueueTableConfig.columns.reduce((cols, column) => {
-        if(['consReady','visitGroup'].indexOf(column.name) < 0 || (
-          (showConsReady && showConsReady.rights !== 'hidden' && column.name === 'consReady') || 
-          (showVisitGroup && showVisitGroup.rights !== 'hidden' && column.name === 'visitGroup')
-        ))
-          cols.push(column)
-        return cols
-      }, []),
+      columns: QueueTableConfig.columns
+      .filter(col => showConsReady && showConsReady.rights === 'hidden' ? col.name !== 'consReady' : true)
+      .filter(col => showVisitGroup && showVisitGroup.rights === 'hidden' ? col.name !== 'visitGroup' : true)
     }
 
     const isLoading = showingVisitRegistration ? false : loading
@@ -265,12 +264,13 @@ class Grid extends React.Component {
                     return <Switch
                       className={classes.switchContainer}
                       value={row.consReady}
-                      onChange={(checked, event) => {
+                      onClick={(checked, event) => {
                         this.props.onQueueListing({
                           ...row,
                           consReady: checked,
                         })
                       }}
+                      disabled={showConsReady && showConsReady.rights !== 'enable'}
                       {...this.props}
                     />
                   },

@@ -12,6 +12,7 @@ import {
   CodeSelect,
   GridItem,
   TextField,
+  DatePicker,
   ProgressButton,
 } from '@/components'
 import { MobileNumberInput } from '@/components/_medisys'
@@ -63,7 +64,23 @@ const PatientInfoInput = ({
           />
         </div>
       </GridItem>
-      <GridItem xs md={5}>
+      <GridItem xs md={2}>
+        <div className={classnames(classes.buttonGroup)}>
+          <FastField
+            name='dobfrom'
+            render={args => <DatePicker {...args} label='DOB From' />}
+          />
+        </div>
+      </GridItem>
+      <GridItem xs md={2}>
+        <div className={classnames(classes.buttonGroup)}>
+          <FastField
+            name='dobto'
+            render={args => <DatePicker {...args} label='DOB To' />}
+          />
+        </div>
+      </GridItem>
+      <GridItem xs md={4} >
         <div className={classnames(classes.buttonGroup)}>
           {!isRegisteredPatient ? (
             <React.Fragment>
@@ -123,7 +140,6 @@ const PatientInfoInput = ({
           )}
         </div>
       </GridItem>
-      <GridItem ms md={3} />
       <GridItem xs md={3}>
         {isEdit ? (
           <TextField value={values.patientName} label='Patient Name' disabled />

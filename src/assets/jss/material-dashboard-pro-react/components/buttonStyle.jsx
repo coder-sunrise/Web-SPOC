@@ -32,8 +32,8 @@ const buttonStyle = {
     marginRight: 8,
     fontSize: '1rem',
     fontWeight: '400',
-    textTransform: 'uppercase',
-    letterSpacing: '0',
+    // textTransform: 'uppercase',
+    // letterSpacing: '0',
     willChange: 'box-shadow, transform',
     transition:
       'box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -514,7 +514,7 @@ const buttonStyle = {
   },
   sm: {
     padding: '3px 10px !important',
-    fontSize: '0.7rem !important',
+    fontSize: '0.87rem !important',
     lineHeight: '1.5',
     borderRadius: '0.2rem',
   },

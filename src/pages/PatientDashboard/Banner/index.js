@@ -3,13 +3,18 @@ import { Link } from 'umi'
 import { connect } from 'dva'
 import _ from 'lodash'
 import moment from 'moment'
+import { Drawer } from 'antd'
 import { Paper } from '@material-ui/core'
 import { headerHeight } from 'mui-pro-jss'
 import Warning from '@material-ui/icons/Error'
 import Edit from '@material-ui/icons/Edit'
 import Refresh from '@material-ui/icons/Sync'
 import { getAppendUrl } from '@/utils/utils'
+import classnames from 'classnames'
+import { withStyles } from '@material-ui/core/styles'
 import PatientNurseNotes from '@/pages/PatientDatabase/Detail/PatientNurseNotes'
+import SelectPreOrder from '@/pages/Reception/Appointment/components/form/SelectPreOrder'
+import PatientDetail from '@/pages/PatientDatabase/Detail'
 import { MoreButton, LoadingWrapper } from '@/components/_medisys'
 import {
   GridContainer,
@@ -30,6 +35,7 @@ import { currencySymbol } from '@/utils/config'
 import { control } from '@/components/Decorator'
 import Block from './Block'
 import HistoryDiagnosis from './HistoryDiagnosis'
+import { SwitcherTwoTone } from '@ant-design/icons'
 
 const headerStyles = {
   color: 'darkblue',
@@ -38,12 +44,26 @@ const headerStyles = {
   // style={{ color: 'darkblue' }}
 }
 
+const styles = theme => ({
+  header: {
+    color: 'darkblue',
+    fontWeight: 500,
+    position: 'relative',
+  },
+  cell: {
+    margin: '3px 0',
+  },
+  part: {
+    display: 'inline-block',
+  },
+})
+
 @control()
 @connect(({ patient, codetable, loading }) => ({
   patient,
   codetable,
   ctschemetype: codetable.ctschemetype || [],
-  refreshingChasBalance: loading.effects['patient/refreshChasBalance'],
+  refreshingBalance: loading.effects['patient/refreshChasBalance'] || loading.effects['patient/refreshMedisaveBalance'],
 }))
 class Banner extends PureComponent {
   state = {
@@ -53,14 +73,16 @@ class Banner extends PureComponent {
     currPatientCoPaymentSchemeFK: 0,
     currentSchemeType: 0,
     showNotesModal: false,
+    showSchemeModal: false,
+    showPreOrderModal: false,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.fetchCodeTables()
   }
 
-  componentWillMount () {
+  componentWillMount() {
     const { dispatch } = this.props
     dispatch({
       type: 'codetable/fetchCodes',
@@ -68,9 +90,37 @@ class Banner extends PureComponent {
     })
   }
 
-  getAllergyLink (data) {
+  getAllergyData() {
+    const { patient } = this.props
+    const { entity } = patient
+    const { info } = entity
+    const { patientAllergy = [], patientAllergyMetaData = [] } = entity
+    const da = _.orderBy(patientAllergy, ['type'], ['asc'])
+    const allergyData = da.reduce((data, current) => {
+      if (!data) return current.allergyName
+      return `${data}, ${current.allergyName}`
+    }, '')
+
+    this.setState({
+      showWarning: da.length ? true : false,
+    })
+
+    // console.log('getAllergyData', allergyData)
+    return (
+      entity &&
+      entity.isActive && (
+        <span style={{ marginTop: 5 }}>{allergyData || '-'}</span>
+      )
+    )
+  }
+
+  getAllergyLink(data) {
     const { props } = this
-    const { patient, codetable: { ctg6pd = [] }, } = props
+    const {
+      patient,
+      codetable: { ctg6pd = [] },
+      from,
+    } = props
     const { entity } = patient
     const info = entity
     const { patientAllergy = [], patientAllergyMetaData = [] } = info
@@ -96,7 +146,7 @@ class Banner extends PureComponent {
     }
     let g6PD
     if (patientAllergyMetaData.length > 0) {
-      g6PD = ctg6pd.find((o) => o.id === patientAllergyMetaData[0].g6PDFK)
+      g6PD = ctg6pd.find(o => o.id === patientAllergyMetaData[0].g6PDFK)
     }
     return (
       entity &&
@@ -147,12 +197,17 @@ class Banner extends PureComponent {
               )}
 
               <div>
-                <span style={{
-                  color: 'darkblue',
-                  fontWeight: 500,
-                  position: 'relative',
-                  fontSize: '16.1px'
-                }}>G6PD: </span>{g6PD ? g6PD.name : '-'}
+                <span
+                  style={{
+                    color: 'darkblue',
+                    fontWeight: 500,
+                    position: 'relative',
+                    fontSize: '16.1px',
+                  }}
+                >
+                  G6PD:{' '}
+                </span>
+                {g6PD ? g6PD.name : '-'}
               </div>
             </div>
           )}
@@ -187,6 +242,182 @@ class Banner extends PureComponent {
         code: 'copaymentscheme',
       },
     })
+  }
+
+  openNotes = () => this.setState({ showNotesModal: true })
+  closeNotes = () => this.setState({ showNotesModal: false })
+  openPreOrders = () => this.setState({ showPreOrderModal: true })
+  closePreOrders = () => this.setState({ showPreOrderModal: false })
+  openScheme = () => this.setState({ showSchemeModal: true })
+  closeScheme = () => this.setState({ showSchemeModal: false })
+  openPatientProfile = () => {
+    if(this.props.from !== 'Appointment') return
+    const { dispatch, patient } = this.props
+    const { entity } = patient 
+    this.setState({ showPatientProfile: true })
+  }
+  closePatientProfile = () => {
+    const { dispatch, patient } = this.props
+    const { entity } = patient
+    dispatch({
+      type: 'patient/query',
+      payload: {
+        id: entity.id,
+      },
+    })
+    this.setState({ showPatientProfile: false })
+  }
+
+  getSchemeList = schemeDataList => {
+    const chasOrMedisave = (schemeDataList || []).filter(
+      o =>
+        o.schemeTypeFK <= 6 ||
+        this.isMedisave(o.schemeTypeFK)
+    )
+    return schemeDataList.map(s => (
+      <span
+        style={{ paddingRight: 5, display: 'inline-block' }}
+      >
+        {chasOrMedisave && 
+          chasOrMedisave.find(list => s.schemeTypeFK === list.schemeTypeFK) 
+        ? (<Popover
+          icon={null}
+          content={<div>
+              <div>
+                {s.coPaymentSchemeFK ||
+                  schemeDataList.filter(p =>
+                    this.isMedisave(p.schemeTypeFK),
+                  )[0] === s
+                  ? s.copaymentSchemeName
+                  : s.schemeTypeName}
+                <span style={{ bottom: -2 }}>
+                  {s.schemeTypeFK <= 6 && (
+                    <IconButton
+                      onClick={this.refreshChasBalance}
+                    >
+                      <Refresh />
+                    </IconButton>
+                  )}
+                  {this.isMedisave(s.schemeTypeFK) &&
+                    schemeDataList.filter(p =>
+                      this.isMedisave(p.schemeTypeFK),
+                    )[0] === s && (
+                      <IconButton
+                        onClick={this.refreshMedisaveBalance}
+                      >
+                        <Refresh />
+                      </IconButton>
+                    )}
+                </span>
+              </div>
+              {s.schemeType && (
+                <div style={{ marginTop: 15 }}>
+                  {s.schemeType}
+                </div>
+              )}
+              {this.isMedisave(s.schemeTypeFK) && (
+                <div>
+                  Payer: {s.payerName} (
+                  {s.payerAccountNo})
+                </div>
+              )}
+              {s.validFrom && (
+                <div>
+                  Validity:{' '}
+                  {s.validFrom ? (
+                    <DatePicker
+                      text
+                      format={dateFormatLong}
+                      value={s.validFrom}
+                    />
+                  ) : (
+                    ''
+                  )}
+                  &nbsp;-&nbsp;
+                  {s.validTo ? (
+                    <DatePicker
+                      text
+                      format={dateFormatLong}
+                      value={s.validTo}
+                    />
+                  ) : (
+                    ''
+                  )}
+                </div>
+              )}
+              {s.schemeTypeFK !== 15 ? (
+                <div>
+                  Balance:{' '}
+                  <NumberInput
+                    text
+                    currency
+                    value={s.balance}
+                  />
+                </div>
+              ) : (
+                ''
+              )}
+              {s.schemeTypeFK <= 6 ? (
+                <div>
+                  Patient Acute Visit Balance:{' '}
+                  <NumberInput
+                    text
+                    currency
+                    value={
+                      s.acuteVisitPatientBalance
+                    }
+                  />
+                </div>
+              ) : (
+                ''
+              )}
+              {s.schemeTypeFK <= 6 ? (
+                <div>
+                  Patient Acute Clinic Balance:{' '}
+                  <NumberInput
+                    text
+                    currency
+                    value={s.acuteVisitClinicBalance}
+                  />
+                </div>
+              ) : (
+                ''
+              )}
+              </div>
+            }
+          trigger='click'
+          placement='bottom'
+        >
+        <Link>
+            <span
+              style={{
+                color: 'black',
+                textDecoration: 'underline',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {s.copaymentSchemeName || s.schemeTypeName}
+              {s.validTo ? ` (Exp: ${moment(s.validTo).format('DD/MM/YYYY')})` : ''}
+            </span>
+          </Link>
+      </Popover>)
+        : (<Link>
+            <span
+              style={{
+                color: 'black',
+                textDecoration: 'underline',
+                whiteSpace: 'nowrap',
+              }}
+              onClick={e => {
+                this.openScheme()
+              }}
+            >
+              {s.copaymentSchemeName || s.schemeTypeName}
+              {s.validTo ? ` (Exp: ${moment(s.validTo).format('DD/MM/YYYY')})` : ''}
+            </span>
+          </Link>)}
+      </span>
+    ))
   }
 
   refreshGovtBalance = () => {
@@ -264,14 +495,6 @@ class Banner extends PureComponent {
         }
       }
     })
-  }
-
-  openNotes = () => {
-    this.setState({showNotesModal:true})
-  }
-
-  closeNotes = () => {
-    this.setState({showNotesModal:false})
   }
 
   refreshMedisaveBalance = () => {
@@ -418,12 +641,12 @@ class Banner extends PureComponent {
       statusDescription: refreshedSchemeData.statusDescription,
       acuteBalanceStatusCode:
         !_.isEmpty(refreshedSchemeData) &&
-          refreshedSchemeData.isSuccessful === false
+        refreshedSchemeData.isSuccessful === false
           ? 'ERROR'
           : undefined,
       chronicBalanceStatusCode:
         !_.isEmpty(refreshedSchemeData) &&
-          refreshedSchemeData.isSuccessful === false
+        refreshedSchemeData.isSuccessful === false
           ? 'ERROR'
           : chronicStatus,
       isSuccessful:
@@ -491,7 +714,7 @@ class Banner extends PureComponent {
     }
   }
 
-  displayMedicalProblemData (entity = { patientHistoryDiagnosis: [] }) {
+  displayMedicalProblemData(entity = { patientHistoryDiagnosis: [] }) {
     let medicalProblemData = '-'
     const { patientHistoryDiagnosis = [] } = entity
 
@@ -531,26 +754,62 @@ class Banner extends PureComponent {
     )
   }
 
-  render () {
+  onViewPatientProfile = (event) => {
+	event.preventDefault()
+    const { patient, history, from, dispatch } = this.props
+    const { entity } = patient
+    const info = entity
+
+	this.props.dispatch({
+		type: 'global/updateState',
+		payload: {
+		  fullscreen: true,
+		  showPatientInfoPanel: true,
+		},
+	  })
+  }
+
+  getBannerMd =() => {
+	const { from, extraCmt } = this.props
+	if(from === 'Consultation')
+		return 9
+	if(extraCmt)
+		return 11
+	return 12
+  }
+
+  render() {
     const { props } = this
     const {
       // patientInfo = {},
       extraCmt,
+      preOrderCmt,
+      from = '',
       patient,
       codetable,
+      classes,
+      activePreOrderItem,
+      onSelectPreOrder,
+      isEnableRecurrence,
+      apptId,
+      apptMode,
       style = {
         position: 'sticky',
         overflowY: 'auto',
         top: headerHeight,
-        zIndex: 1000,
-        paddingLeft: 16,
-        paddingRight: 16,
+        zIndex: 998,
+        // paddingLeft: 16,
+        // paddingRight: 16,
         // maxHeight: 100,
         backgroundColor: '#f0f8ff',
-        marginTop:'-8px',
+        marginTop: '-8px',
       },
-      refreshingChasBalance,
+      refreshingBalance,
     } = props
+	
+    const actualizePreOrderAccessRight = Authorized.check('appointment.actualizepreorder') || { rights: 'hidden' }
+
+	const onSelectPreOrders = () => {this.props.onSelectPreOrder}
 
     const { entity } = patient
     if (!entity)
@@ -560,6 +819,7 @@ class Banner extends PureComponent {
         </Paper>
       )
     const { ctsalutation = [] } = codetable
+    // console.log('banner', entity)
     const info = entity
     const salt = ctsalutation.find(o => o.id === info.salutationFK) || {}
     const name = `${salt.name || ''} ${info.name}`
@@ -593,83 +853,183 @@ class Banner extends PureComponent {
     const viewPatientProfileAccess = Authorized.check(
       'patientdatabase.patientprofiledetails',
     )
-    // console.log('banner-render',schemeDataList)
+
+    const g6PD =
+      codetable.ctg6pd &&
+      codetable.ctg6pd.length > 0 &&
+      entity.patientAllergyMetaData.length > 0
+        ? codetable.ctg6pd.find(
+            o => o.id === entity.patientAllergyMetaData[0].g6PDFK,
+          )
+        : null
+
+    // console.log('banner-render', schemeDataList)
+	// console.log('info',info)
     return (
-      // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
-      <Paper style={style}>
+      <Paper id='patientBanner' style={style}>
         {/* Please do not change the height below (By default is 100) */}
-        <GridContainer style={{ height: 100 }}>
-          {/* <GridItem xs={6} md={1} gutter={0}>
-            <CardAvatar testimonial square>
-              <img src={avatar} alt='...' />
-            </CardAvatar>
-          </GridItem> */}
-          <GridItem xs={6} md={2}>
-            <Block
-              h3={
-                <div>
-                  <Link
-                    to={getAppendUrl({
-                      md: 'pt',
-                      cmt: 1,
-                      pid: info.id,
-                    })}
-                    disabled={
-                      !viewPatientProfileAccess ||
-                      (viewPatientProfileAccess &&
-                        viewPatientProfileAccess.rights !== 'enable')
-                    }
-                    tabIndex='-1'
-                  >
-                    <Tooltip title={name} placement='bottom-start'>
-                      <span
-                        style={{
-                          whiteSpace: 'nowrap',
-                          textOverflow: 'ellipsis',
-                          textDecoration: 'underline',
-                          display: 'inline-block',
-                          width: '100%',
-                          overflow: 'hidden',
-                        }}
-                      >
-                        {name}
-                      </span>
-                    </Tooltip>
-                  </Link>
-                </div>
-              }
-              body={
-                <div>
-                  <div>
-                    {info.patientAccountNo}
-                    {', '}
+        <GridContainer
+          style={{ minHeight: 100, width: '100%', padding: '5px 0' }}
+        >
+          <GridItem xs={9} md={this.getBannerMd()}>
+            <GridContainer>
+              <GridItem xs={6} md={5} className={classes.cell}>
+                <Link
+                  className={classes.header}
+                  style={{
+                    display: 'inline-flex',
+                    paddingRight: 5,
+                  }}
+                  to={getAppendUrl({
+                    md: 'pt',
+                    cmt: 1,
+                    pid: info.id,
+                  })}
+                  disabled={
+                    !viewPatientProfileAccess ||
+                    (viewPatientProfileAccess &&
+                      viewPatientProfileAccess.rights !== 'enable')
+                  }
+                  tabIndex='-1'
+                >
+                  <Tooltip title={name} placement='bottom-start'>
+                    <span
+                      style={{
+                        // whiteSpace: 'nowrap',
+                        textOverflow: 'ellipsis',
+                        textDecoration: 'underline',
+                        display: 'inline-block',
+                        width: '100%',
+                        overflow: 'hidden',
+						            fontWeight: 500,
+                        fontSize: '1.1rem',
+                        color: 'rgb(75, 172, 198)',
+                      }}
+                    >
+                      {name}
+                    </span>
+                  </Tooltip>
+                </Link>
+                <span className={classes.part}>{info.patientAccountNo}</span>
+                {', '}
+                <span className={classes.part}>
+                  <CodeSelect
+                    className={classes.part}
+                    text
+                    code='ctNationality'
+                    value={info.nationalityFK}
+                  />
+                </span>
+                {', '}
+                <span className={classes.part}>
+                  {year > 1 ? `${year} yrs` : `${year} yr`}
+                </span>
+                {', '}
+                <span className={classes.part}>
+                  {
                     <CodeSelect
+                      code='ctGender'
+                      // optionLabelLength={1}
                       text
-                      code='ctNationality'
-                      value={info.nationalityFK}
+                      value={info.genderFK}
                     />
-                  </div>
-                  <div>
-                    {year > 1 ? `${year} yrs` : `${year} yr`},&nbsp;
-                    {
-                      <CodeSelect
-                        code='ctGender'
-                        // optionLabelLength={1}
+                  }
+                </span>
+                {', '}
+                <span className={classes.part}>
+                  <DatePicker
+                    className={classes.part}
+                    text
+                    format={dateFormatLong}
+                    value={info.dob}
+                  />
+                </span>
+                <span className={classes.part}>
+                  <Link className={classes.header}>
+                    <span
+                      onClick={e => {
+                        this.openNotes()
+                      }}
+                    >
+                      <SwitcherTwoTone />
+                    </span>
+                  </Link>
+                </span>
+              </GridItem>
+              <GridItem xs={6} md={2} className={classes.cell}>
+                <span className={classes.header}>Tag: </span>
+                <span>
+                  {info.patientTag.length > 0
+                    ? info.patientTag.map(t => t.tagName).join(', ')
+                    : '-'}
+                </span>
+              </GridItem>
+              <GridItem xs={6} md={3} className={classes.cell}>
+                <span
+                  style={{
+                    ...headerStyles,
+                    color: info.patientMedicalHistory.highRiskCondition
+                      ? 'red'
+                      : headerStyles.color,
+                  }}
+                >
+                  HRP:{' '}
+                </span>
+                <span>{info.patientMedicalHistory.highRiskCondition}</span>
+              </GridItem>
+              <GridItem xs={6} md={2} className={classes.cell}>
+                <span
+                  style={{
+                    ...headerStyles,
+                    color: info.outstandingBalance ? 'red' : headerStyles.color,
+                  }}
+                >
+                  O/S Bal.:{' '}
+                </span>
+                <Tooltip
+                  title={
+                    info.outstandingBalance
+                      ? `${currencySymbol}${_.round(
+                          info.outstandingBalance,
+                          2,
+                        )}`
+                      : ''
+                  }
+                >
+                  <span
+                    style={{
+                      fontWeight: 500,
+                      marginTop: 5,
+                    }}
+                  >
+                    {info.outstandingBalance ? (
+                      <NumberInput
                         text
-                        value={info.genderFK}
+                        currency
+                        value={_.round(info.outstandingBalance, 2)}
                       />
-                    }
-                    {', '}
-                    <DatePicker text format={dateFormatLong} value={info.dob} />
-                  </div>
-                </div>
-              }
-            />
-          </GridItem>
-          <GridItem xs={6} md={2}>
-            <Block
-              header={
-                <div
+                    ) : (
+                      '-'
+                    )}
+                  </span>
+                </Tooltip>
+              </GridItem>
+              <GridItem xs={6} md={4} className={classes.cell}>
+                <span className={classes.header}>Persistent Diagnosis: </span>
+                <span>
+                  {info.patientHistoryDiagnosis.length > 0
+                    ? info.patientHistoryDiagnosis
+                        .map(d => d.diagnosisDescription)
+                        .join(', ')
+                    : '-'}
+                </span>
+              </GridItem>
+              <GridItem xs={6} md={3} className={classes.cell}>
+                <span className={classes.header}>Patient Request: </span>
+                <span>{info.patientRequest || '-'}</span>
+              </GridItem>
+              <GridItem xs={6} md={3} className={classes.cell}>
+                <span
                   style={{
                     ...headerStyles,
                     color: this.state.showWarning ? 'red' : headerStyles.color,
@@ -683,316 +1043,180 @@ class Banner extends PureComponent {
                       marginLeft: this.state.showWarning ? 20 : 'inherit',
                     }}
                   >
-                    Allergies
+                    {'Allergies:'}
                   </span>
-                  <span style={{ position: 'absolute', bottom: -2 }}>
-                    {this.getAllergyLink('link')}
-                  </span>
-                </div>
-              }
-              body={this.getAllergyLink(' ')}
-            />
-          </GridItem>
-          <GridItem xs={6} md={2}>
-            <Block
-              header={<b style={headerStyles}>Medical Problem</b>}
-              body={this.displayMedicalProblemData(entity)}
-            />
-          </GridItem>
-          <GridItem xs={6} md={2}>
-            <LoadingWrapper
-              loading={refreshingChasBalance}
-              text='Retrieving balance...'
-            >
-              <Block
-                header={
-                  <div style={headerStyles}>
-                    Scheme
-                    <span style={{ bottom: -2 }}>
-                      {entity.isActive &&
-                        (entity.patientScheme || []).filter(
-                          o =>
-                            o.schemeTypeFK <= 6 ||
-                            this.isMedisave(o.schemeTypeFK),
-                        ).length > 0 && (
-                          <IconButton onClick={this.refreshGovtBalance}>
-                            <Refresh />
-                          </IconButton>
-                        )}
-                    </span>
-                    {schemeDataList.length > 0 && (
-                      <Popover
-                        icon={null}
-                        content={schemeDataList
-                          .sort((a, b) => a.schemeTypeFK - b.schemeTypeFK)
-                          .map(o => {
-                            let schemeData = o
-                            return (
-                              <div style={{ marginBottom: 15 }}>
-                                <div>
-                                  {schemeData.coPaymentSchemeFK ||
-                                    schemeDataList.filter(p =>
-                                      this.isMedisave(p.schemeTypeFK),
-                                    )[0] === schemeData
-                                    ? schemeData.copaymentSchemeName
-                                    : schemeData.schemeTypeName}
-                                  <span style={{ bottom: -2 }}>
-                                    {schemeData.schemeTypeFK <= 6 && (
-                                      <IconButton
-                                        onClick={this.refreshChasBalance}
-                                      >
-                                        <Refresh />
-                                      </IconButton>
-                                    )}
-                                    {this.isMedisave(schemeData.schemeTypeFK) &&
-                                      schemeDataList.filter(p =>
-                                        this.isMedisave(p.schemeTypeFK),
-                                      )[0] === schemeData && (
-                                        <IconButton
-                                          onClick={this.refreshMedisaveBalance}
-                                        >
-                                          <Refresh />
-                                        </IconButton>
-                                      )}
-                                  </span>
-                                </div>
-                                {schemeData.schemeType && (
-                                  <div style={{ marginTop: 15 }}>
-                                    {schemeData.schemeType}
-                                  </div>
-                                )}
-                                {this.isMedisave(schemeData.schemeTypeFK) && (
-                                  <div>
-                                    Payer: {schemeData.payerName} (
-                                    {schemeData.payerAccountNo})
-                                  </div>
-                                )}
-                                {schemeData.validFrom && (
-                                  <div>
-                                    Validity:{' '}
-                                    {schemeData.validFrom ? (
-                                      <DatePicker
-                                        text
-                                        format={dateFormatLong}
-                                        value={schemeData.validFrom}
-                                      />
-                                    ) : (
-                                      ''
-                                    )}
-                                    &nbsp;-&nbsp;
-                                    {schemeData.validTo ? (
-                                      <DatePicker
-                                        text
-                                        format={dateFormatLong}
-                                        value={schemeData.validTo}
-                                      />
-                                    ) : (
-                                      ''
-                                    )}
-                                  </div>
-                                )}
-                                {schemeData.schemeTypeFK !== 15 ? (
-                                  <div>
-                                    Balance:{' '}
-                                    <NumberInput
-                                      text
-                                      currency
-                                      value={schemeData.balance}
-                                    />
-                                  </div>
-                                ) : (
-                                  ''
-                                )}
-                                {schemeData.schemeTypeFK <= 6 ? (
-                                  <div>
-                                    Patient Acute Visit Balance:{' '}
-                                    <NumberInput
-                                      text
-                                      currency
-                                      value={
-                                        schemeData.acuteVisitPatientBalance
-                                      }
-                                    />
-                                  </div>
-                                ) : (
-                                  ''
-                                )}
-                                {schemeData.schemeTypeFK <= 6 ? (
-                                  <div>
-                                    Patient Acute Clinic Balance:{' '}
-                                    <NumberInput
-                                      text
-                                      currency
-                                      value={schemeData.acuteVisitClinicBalance}
-                                    />
-                                  </div>
-                                ) : (
-                                  ''
-                                )}
-                              </div>
-                            )
-                          })}
-                        trigger='click'
-                        placement='rightTop'
-                      >
-                        <div
-                          style={{
-                            display: 'inline-block',
-                            marginLeft: -5,
-                          }}
-                        >
-                          <MoreButton />
-                        </div>
-                      </Popover>
-                    )}
-                  </div>
-                }
-                body={
-                  <div style={{ marginTop: 4 }}>
-                    {schemeDataList.length > 0 ? (
-                      <div>
-                        {schemeDataList
-                          .reduce((_schemeDataList, scheme) => {
-                            if (
-                              !this.isMedisave(scheme.schemeTypeFK) ||
-                              _schemeDataList.filter(data =>
-                                this.isMedisave(data.schemeTypeFK),
-                              ).length === 0
-                            )
-                              _schemeDataList.push(scheme)
-                            return _schemeDataList
-                          }, [])
-                          .sort((a, b) => a.schemeTypeFK - b.schemeTypeFK)
-                          .slice(0, 2)
-                          .map(o => {
-                            const schemeData = o
-                            const isMedisave = this.isMedisave(
-                              schemeData.schemeTypeFK,
-                            )
-                            const displayString = `
-                          ${schemeData.coPaymentSchemeFK || isMedisave
-                                ? schemeData.copaymentSchemeName || ''
-                                : schemeData.schemeTypeName || ''
-                              }
-                          ${!isMedisave ? '(Exp:' : ''} 
-                          ${!isMedisave && schemeData.validTo
-                                ? moment(schemeData.validTo).format(
-                                  'DD MMM YYYY)',
-                                )
-                              : ''
-                              }
-                          ${!isMedisave && !schemeData.validTo ? '-)' : ''}
-                          `
-                            return (
-                              <div style={{ display: 'flex', marginTop: 3 }}>
-                                {schemeData.statusDescription && (
-                                  <div
-                                    style={{
-                                      width: 25,
-                                    }}
-                                  >
-                                    <Tooltip
-                                      title={schemeData.statusDescription}
-                                    >
-                                      <Warning
-                                        color='error'
-                                        style={{ position: 'absolute' }}
-                                      />
-                                    </Tooltip>
-                                  </div>
-                                )}
-                                {
-                                  <Tooltip title={displayString}>
-                                    <div
-                                      style={{
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        display: 'inline-block',
-                                        textOverflow: 'ellipsis',
-                                        width: '100%',
-                                      }}
-                                    >
-                                      {displayString}
-                                    </div>
-                                  </Tooltip>
-                                }
-                              </div>
-                            )
-                          })}
-                      </div>
-                    ) : (
-                      '-'
-                    )}
-                  </div>
-                }
-              />
-            </LoadingWrapper>
-          </GridItem>
-          <GridItem xs={6} md={1}>
-            <Block
-              header={<div style={headerStyles}>Outstanding</div>}
-              body={
-                <Tooltip
-                  title={
-                    info.outstandingBalance
-                      ? `${currencySymbol}${_.round(
-                        info.outstandingBalance,
-                        2,
-                      )}`
-                      : ''
-                  }
-                >
-                  <div
-                    style={{
-                      fontWeight: 500,
-                      marginTop: 5
+                </span>
+                <span>{this.getAllergyLink('link')}</span>
+                <span>{this.getAllergyData()}</span>
+              </GridItem>
+              <GridItem xs={6} md={2} className={classes.cell}>
+                <Link className={classes.header}>
+                  <span
+                    style={{ textDecoration: 'underline' }}
+                    onClick={e => {
+                      this.openNotes()
                     }}
                   >
-                    {info.outstandingBalance ? (
-                      <NumberInput
-                        text
-                        currency
-                        value={_.round(info.outstandingBalance, 2)}
-                      />
-                    ) : (
-                      '-'
-                    )}
-                  </div>
-                </Tooltip>
-              }
-            />
-          </GridItem>
-          <GridItem xs={6} md={2}>
-          <Block
-          body={
-            <div
-              style={{
-              fontWeight: 500,
-              marginTop: 5
-              }}>
-              <Link>
-                <span style={{textDecoration:'underline'}} onClick={(e) => {this.openNotes()}}>
-                Notes
+                    Notes
+                  </span>
+                </Link>
+              </GridItem>
+              <GridItem xs={6} md={7} className={classes.cell}>
+                <span className={classes.header}>Long Term Medication: </span>
+                <span>
+                  {info.patientMedicalHistory.longTermMedication || '-'}
                 </span>
-              </Link>
-            </div>
-          }/>
+              </GridItem>
+              <GridItem xs={6} md={3} className={classes.cell}>
+                <div>
+                  <span className={classes.header}>G6PD: </span>
+                  <span>{g6PD ? g6PD.name : '-'}</span>
+                </div>
+              </GridItem>
+              <GridItem xs={6} md={2} className={classes.cell}>
+                {actualizePreOrderAccessRight.rights !== 'hidden' && <Link 
+					className={classes.header}
+					disabled={actualizePreOrderAccessRight.rights === 'disable'}
+				>
+                  <span
+                    style={{ textDecoration: 'underline' }}
+                    onClick={e => {
+					  e.preventDefault()
+					  console.log('onlick', apptId, isEnableRecurrence, apptMode)
+                      if (actualizePreOrderAccessRight.rights === 'disable') return
+                      if (activePreOrderItem && activePreOrderItem.length)
+                      {
+                        if (apptId && apptMode === 'series') {
+                          dispatch({
+                            type: 'global/updateAppState',
+                            payload: {
+                              openConfirm: true,
+                              isInformType: true,
+                              openConfirmText: 'ok',
+                              openConfirmContent: `Pre-Order is not allowed for entire series appointment.`,
+                            },
+                          })
+                          return
+                        }
+                        if (!apptId && isEnableRecurrence) {
+                          dispatch({
+                            type: 'global/updateAppState',
+                            payload: {
+                              openConfirm: true,
+                              isInformType: true,
+                              openConfirmText: 'ok',
+                              openConfirmContent: `Pre-Order is not allowed for recurring appointment.`,
+                            },
+                          })
+                          return
+                        }
+                      }
+					  this.openPreOrders()
+                    }}
+                  >
+				  	{`Pre-Order (${activePreOrderItem ? activePreOrderItem.length : 0})`}
+                  </span>
+                </Link>}
+              </GridItem>
+              <GridItem xs={6} md={4} className={classes.cell}>
+                <LoadingWrapper
+                  loading={refreshingBalance}
+                  text='Retrieving balance...'
+                >
+                  <span className={classes.header}>Scheme: </span>
+                  <span style={{ bottom: -2 }}>
+                        {entity.isActive &&
+                          (entity.patientScheme || []).filter(
+                            o =>
+                              o.schemeTypeFK <= 6 ||
+                              this.isMedisave(o.schemeTypeFK),
+                          ).length > 0 && (
+                            <IconButton onClick={this.refreshGovtBalance}>
+                              <Refresh />
+                            </IconButton>
+                          )}
+                      </span>
+                  {this.getSchemeList(_.orderBy(schemeDataList, ['schemeTypeFK'], ['asc']))}
+                </LoadingWrapper>
+              </GridItem>
+              <GridItem xs={6} md={3} className={classes.cell}>
+                <span className={classes.header}>Non-Claimable Info: </span>
+                <span>{info.nonClaimableInfo || '-'}</span>
+              </GridItem>
+              <GridItem xs={6} md={3} className={classes.cell}>
+                <span className={classes.header}>Payment Info: </span>
+                <span>{info.paymentInfo || '-'}</span>
+              </GridItem>
+              <GridItem xs={6} md={2} className={classes.cell}>
+                <Link
+                  className={classes.header}
+                  style={{
+                    display: 'inline-flex',
+                    paddingRight: 10,
+                    textDecoration: 'underline',
+                  }}
+                  to={getAppendUrl({
+                    md: 'pt',
+                    cmt: 1,
+                    pid: info.id,
+                  })}
+                  // disabled={}
+                  tabIndex='-1'
+                >
+                  Lab Results
+                </Link>
+              </GridItem>
+            </GridContainer>
           </GridItem>
-          <GridItem xs={1} md={1}>
+          <GridItem xs={3} md={12 - this.getBannerMd()}>
             {extraCmt}
           </GridItem>
         </GridContainer>
         <CommonModal
+          open={this.state.showPatientProfile}
+          onClose={this.closePatientProfile}
+          title='Patient Profile'
+          observe='PatientDetail'
+          authority='patient'
+          fullScreen
+          overrideLoading
+          showFooter={false}
+        >
+          <PatientDetail 
+            history={this.props.history}
+            linkProps={{
+              to: '#',
+            }}
+            onClose={this.closePatientProfile}
+          />
+        </CommonModal>
+        <CommonModal
           open={this.state.showNotesModal}
           title='Notes'
           onClose={this.closeNotes}
-          maxWidth='lg'>
-          <PatientNurseNotes {...this.props}  />
+          maxWidth='lg'
+        >
+          <PatientNurseNotes {...this.props} />
+        </CommonModal>
+        <CommonModal
+          open={this.state.showPreOrderModal}
+          title='Pre-Orders'
+          onClose={this.closePreOrders}
+          maxWidth='lg'
+        >
+			<SelectPreOrder onSelectPreOrder={this.onSelectPreOrder} activePreOrderItem={activePreOrderItem} />
+        </CommonModal>
+        <CommonModal
+          open={this.state.showSchemeModal}
+          title='Scheme Details'
+          onClose={this.closeScheme}
+          maxWidth='lg'
+        >
+          <Paper />
         </CommonModal>
       </Paper>
-      // </Affix>
     )
   }
 }
 
-export default Banner
+export default withStyles(styles, { withTheme: true })(Banner)

@@ -64,7 +64,7 @@ class MedicalHistory extends PureComponent {
                 return (
                   <OutlinedTextField
                     label='Prevalence of high-risk medical conditions (HRP)'
-                    maxLength={1000}
+                    maxLength={200}
                     rows={1}
                     disabled={disabledByAccessRight || disableEditHighRiskPatient}
                     {...args}

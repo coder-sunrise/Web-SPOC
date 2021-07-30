@@ -28,7 +28,7 @@ const menuData = [
   {
     title: 'Support',
     text: 'Queue Processor',
-    url: '/support/QueueProcessor',
+    url: '/support/queueprocessor',
     icon: <FormatListNumberedOutlinedIcon />,
   },
 ]

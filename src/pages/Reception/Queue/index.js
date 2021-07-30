@@ -473,7 +473,7 @@ class Queue extends React.Component {
       return false
     }
 
-    if (visitStatus === 'IN CONS') {
+    if (visitStatus === VISIT_STATUS.IN_CONS) {
       if (id !== doctorProfile.id) {
         notification.error({
           message: `You cannot resume other doctor's consultation.`,
@@ -534,7 +534,7 @@ class Queue extends React.Component {
         // dispense
         const isInitialLoading =
           row.visitPurposeFK === VISIT_TYPE.RETAIL &&
-          row.visitStatus === 'WAITING'
+          row.visitStatus === VISIT_STATUS.WAITING
         const version = Date.now()
         dispatch({
           type: `dispense/start`,
@@ -607,7 +607,7 @@ class Queue extends React.Component {
         if (valid) {
           const version = Date.now()
 
-          if (row.visitStatus === 'PAUSED') {
+          if (row.visitStatus === VISIT_STATUS.PAUSED) {
             dispatch({
               type: `consultation/resume`,
               payload: {
@@ -711,14 +711,8 @@ class Queue extends React.Component {
     const { dispatch } = this.props
     const visitId = row.id
     dispatch({
-      type: `${modelKey}updateQueueListing`,
+      type: 'queueLog/updateQueueListing',
       payload: row,
-    }).then(r => {
-      if (r) {
-        dispatch({
-          type: `${modelKey}refresh`,
-        })
-      }
     })
   }
   

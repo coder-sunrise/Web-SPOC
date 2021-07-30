@@ -5,14 +5,14 @@ import { notification } from '@/components'
 import { getCodes } from '@/utils/codetable'
 
 let schemeTypes = []
-getCodes('ctSchemeType').then((codetableData) => {
+getCodes('ctSchemeType').then(codetableData => {
   schemeTypes = codetableData
 })
 
 // prettier-ignore
 const _multiples = [2, 7, 6, 5, 4, 3, 2]
-Yup.addMethod(Yup.string, 'NRIC', function (message) {
-  return this.test('isValidNRIC', message, function (value = '') {
+Yup.addMethod(Yup.string, 'NRIC', function(message) {
+  return this.test('isValidNRIC', message, function(value = '') {
     const { parent, createError } = this
 
     const { patientAccountNoTypeFK, accountNoTypeFK, dob } = parent
@@ -112,16 +112,18 @@ const schemaDemographic = {
   name: Yup.string().required(),
   dob: Yup.date().required(),
   patientAccountNoTypeFK: Yup.number().required(),
-  patientAccountNo: Yup.string().NRIC().required(),
+  patientAccountNo: Yup.string()
+    .NRIC()
+    .required(),
   genderFK: Yup.number().required(),
   nationalityFK: Yup.number().required(),
-  referredBy: Yup.string(), 
+  referredBy: Yup.string(),
   referralSourceFK: Yup.number().when('referredBy', {
     is: 'Company',
     then: Yup.number().required(),
   }),
   referredByPatientFK: Yup.number().when('referredBy', {
-    is: (value) => value === 'Patient',
+    is: value => value === 'Patient',
     then: Yup.number().required(),
   }),
   contact: Yup.object().shape({
@@ -138,62 +140,70 @@ const pecValidationSchema = Yup.object().shape({
 })
 const schemaEmergencyContact = {
   patientEmergencyContact: Yup.array()
-    .compact((v) => v.isDeleted)
+    .compact(v => v.isDeleted)
     .of(pecValidationSchema),
   patientFamilyMember: Yup.array()
-  .compact((v)=> v.isDeleted)
-  .of(
-    Yup.object().shape({
-      relationshipFK:Yup.number().required(),
-    }),
-  ),
+    .compact(v => v.isDeleted)
+    .of(
+      Yup.object().shape({
+        relationshipFK: Yup.number().required(),
+      }),
+    ),
 }
 
 const schemaAllergies = {
-  patientAllergyMetaData: Yup.array().compact((v) => v.isDeleted).of(
-    Yup.object().shape({
-      noAllergies: Yup.boolean(),
-      // isG6PDConfirmed: Yup.boolean(),
-      g6PDFK: Yup.number(),
-    }),
-  ),
-  patientAllergy: Yup.array().compact((v) => v.isDeleted).of(
-    Yup.object().shape({
-      type: Yup.string().required(),
-      allergyFK: Yup.number().when('type', {
-        is: 'Allergy',
-        then: Yup.number().required(),
+  patientAllergyMetaData: Yup.array()
+    .compact(v => v.isDeleted)
+    .of(
+      Yup.object().shape({
+        noAllergies: Yup.boolean(),
+        // isG6PDConfirmed: Yup.boolean(),
+        g6PDFK: Yup.number(),
       }),
-      ingredientFK: Yup.number().when('type', {
-        is: 'Ingredient',
-        then: Yup.number().required(),
+    ),
+  patientAllergy: Yup.array()
+    .compact(v => v.isDeleted)
+    .of(
+      Yup.object().shape({
+        type: Yup.string().required(),
+        allergyFK: Yup.number().when('type', {
+          is: 'Allergy',
+          then: Yup.number().required(),
+        }),
+        ingredientFK: Yup.number().when('type', {
+          is: 'Ingredient',
+          then: Yup.number().required(),
+        }),
+        allergyName: Yup.string().required(),
+        allergyReactionFK: Yup.number().required(),
+        patientAllergyStatusFK: Yup.number().required(),
+        // adverseReaction: Yup.string(),
+        // onsetDate: Yup.date(),
       }),
-      allergyName: Yup.string().required(),
-      allergyReactionFK: Yup.number().required(),
-      patientAllergyStatusFK: Yup.number().required(),
-      // adverseReaction: Yup.string(),
-      // onsetDate: Yup.date(),
-    }),
-  ),
+    ),
 }
 
 const schemaSchemes = {
   patientScheme: Yup.array()
-    .compact((v) => v.isDeleted)
-    .unique((v) => `${v.schemeTypeFK}-${v.coPaymentSchemeFK}`, 'error', () => {
-      notification.error({
-        message: 'The Schemes record already exists in the system',
-      })
-    })
+    .compact(v => v.isDeleted)
+    .unique(
+      v => `${v.schemeTypeFK}-${v.coPaymentSchemeFK}`,
+      'error',
+      () => {
+        notification.error({
+          message: 'The Schemes record already exists in the system',
+        })
+      },
+    )
     .of(
       Yup.object().shape({
         schemeTypeFK: Yup.number().required(),
         // accountNumber: Yup.string().required(),
         coPaymentSchemeFK: Yup.number().when('schemeTypeFK', {
-          is: (val) => {
+          is: val => {
             return (
               val ===
-              schemeTypes.find((o) => o.code.toUpperCase() === 'CORPORATE').id
+              schemeTypes.find(o => o.code.toUpperCase() === 'CORPORATE').id
             )
           },
 
@@ -201,61 +211,73 @@ const schemaSchemes = {
           otherwise: Yup.number(),
         }),
         validRange: Yup.array().when('schemeTypeFK', {
-          is: (val) => {
-            const st = schemeTypes.find((o) => o.id === val)
+          is: val => {
+            const st = schemeTypes.find(o => o.id === val)
             if (!st) return false
             const notMedisaveOrPhpc =
-              [
-                'MEDIVISIT',
-                'FLEXIMEDI',
-                'OPSCAN',
-              ].indexOf(st.code) < 0 && !st.code.startsWith('PHPC')
+              ['MEDIVISIT', 'FLEXIMEDI', 'OPSCAN'].indexOf(st.code) < 0 &&
+              !st.code.startsWith('PHPC')
 
             const isCorporate = st.id === 15
             return notMedisaveOrPhpc && !isCorporate
           },
-          then: Yup.array().of(Yup.date()).required().min(2),
+          then: Yup.array()
+            .of(Yup.date())
+            .required()
+            .min(2),
         }),
       }),
     ),
-  schemePayer: Yup.array().compact((v) => v.isDeleted)
-  .unique((v) => `${v.schemeFK}-${v.payerID}`, 'error', () => {
-    notification.error({
-      message: 'Medisave Payer record already exists in the system',
-    })
-  })
-  .of(
-    Yup.object().shape({
-      payerName: Yup.string().required(),
-      payerID: Yup.string().required(),
-      relationshipFK: Yup.number().required().when('schemeFK', {
-        is: (val) => {
-          const st = schemeTypes.find((o) => o.id === val)
-          if (!st) return false
-          return st.code === 'FLEXIMEDI'
-        },
-        then: Yup.number().max(2, 
-        '“Patient Is” must be “SELF” or “SPOUSE” for Flexi-Medisave'),
+  schemePayer: Yup.array()
+    .compact(v => v.isDeleted)
+    .unique(
+      v => `${v.schemeFK}-${v.payerID}`,
+      'error',
+      () => {
+        notification.error({
+          message: 'Medisave Payer record already exists in the system',
+        })
+      },
+    )
+    .of(
+      Yup.object().shape({
+        payerName: Yup.string().required(),
+        payerID: Yup.string().required(),
+        relationshipFK: Yup.number()
+          .required()
+          .when('schemeFK', {
+            is: val => {
+              const st = schemeTypes.find(o => o.id === val)
+              if (!st) return false
+              return st.code === 'FLEXIMEDI'
+            },
+            then: Yup.number().max(
+              2,
+              '“Patient Is” must be “SELF” or “SPOUSE” for Flexi-Medisave',
+            ),
+          }),
+        schemeFK: Yup.number().required(),
+        dob: Yup.date()
+          .required()
+          .when('schemeFK', {
+            is: val => {
+              const st = schemeTypes.find(o => o.id === val)
+              if (!st) return false
+              return st.code === 'FLEXIMEDI'
+            },
+            then: Yup.date().max(
+              moment().subtract(65, 'years'),
+              'Payer DOB must be greater than or equal to 65 for Flexi-Medisave',
+            ),
+          }),
       }),
-      schemeFK: Yup.number().required(),
-      dob: Yup.date().required().when('schemeFK', {
-        is: (val) => {
-          const st = schemeTypes.find((o) => o.id === val)
-          if (!st) return false
-          return st.code === 'FLEXIMEDI'
-        },
-        then: Yup.date().max(moment().subtract(65, 'years'), 
-        'Payer DOB must be greater than or equal to 65 for Flexi-Medisave'),
-      }),
-    }),
-  ),
+    ),
 }
-const schema = (props) => {
+const schema = props => {
   const { clinicSettings } = props
   if (!clinicSettings.isNationalityMandatoryInRegistration) {
     schemaDemographic.nationalityFK = Yup.number()
-  }
-  else {
+  } else {
     schemaDemographic.nationalityFK = Yup.number().required()
   }
   if (!clinicSettings.isContactNoMandatoryInRegistration) {
@@ -268,8 +290,7 @@ const schema = (props) => {
         countryCodeFK: Yup.string(),
       }),
     })
-  }
-  else {
+  } else {
     schemaDemographic.contact = Yup.object().shape({
       contactEmailAddress: Yup.object().shape({
         emailAddress: Yup.string().email(),
@@ -293,4 +314,4 @@ const schema = (props) => {
   patientDatabaseSchema.emergencyContact = schemaEmergencyContact
   return patientDatabaseSchema
 }
-export default schema  
+export default schema

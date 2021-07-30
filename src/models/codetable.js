@@ -35,14 +35,14 @@ export default createListViewModel({
       })
     },
     effects: {
-      *fetchAllCachedCodetable (_, { call, put }) {
+      *fetchAllCachedCodetable(_, { call, put }) {
         const response = yield call(getAllCodes)
         yield put({
           type: 'updateState',
           payload: response,
         })
       },
-      *refreshCodes ({ payload }, { call, put }) {
+      *refreshCodes({ payload }, { call, put }) {
         // console.log('refreshCodes')
         const { code } = payload
         const response = yield call(getCodes, { ...payload, refresh: true })
@@ -56,14 +56,14 @@ export default createListViewModel({
         })
         return response
       },
-      *fetchCodes ({ payload }, { select, call, put }) {
+      *fetchCodes({ payload }, { select, call, put }) {
         let ctcode
         if (typeof payload === 'object') {
           ctcode = payload.code.toLowerCase()
         } else {
           ctcode = payload.toLowerCase()
         }
-        const codetableState = yield select((state) => state.codetable)
+        const codetableState = yield select(state => state.codetable)
 
         if (ctcode !== undefined) {
           if (codetableState[ctcode] === undefined || payload.force) {
@@ -85,18 +85,18 @@ export default createListViewModel({
 
         return []
       },
-      *batchFetch ({ payload }, { all, call, put }) {
+      *batchFetch({ payload }, { all, call, put }) {
         const { codes } = payload
         // console.time('batch fetch')
         const responses = yield all(
-          codes.map((code) => put({ type: 'fetchCodes', payload: { code } })),
+          codes.map(code => put({ type: 'fetchCodes', payload: { code } })),
         )
         // console.timeEnd('batch fetch')
         return responses
       },
     },
     reducers: {
-      saveCodetable (state, { payload }) {
+      saveCodetable(state, { payload }) {
         return { ...state, [payload.code.toLowerCase()]: payload.data }
       },
     },

@@ -328,15 +328,15 @@ const General = ({
                     Hint:
                   </span>
                   {currentLanguage === primaryPrintoutLanguage ? (
-                    <FastField
+                    <Field
                       name='indicationSecondary'
                       render={args => <span>{args.field.value}</span>}
-                    ></FastField>
+                    ></Field>
                   ) : (
-                    <FastField
+                    <Field
                       name='indication'
                       render={args => <span>{args.field.value}</span>}
-                    ></FastField>
+                    ></Field>
                   )}
                 </div>
               </GridItem>
@@ -395,10 +395,11 @@ const General = ({
             name='drugAllergyFK'
             render={args => (
               <CodeSelect
+                multiple
                 label={formatMessage({
                   id: 'inventory.master.medication.drugAllergy',
                 })}
-                code='ctclinicdrugallergy'
+                code='ctdrugallergy'
                 {...args}
               />
             )}
