@@ -678,11 +678,15 @@ const DosageRuleTable = ({
             >
               Edit
             </Typography.Link>
-            <Typography.Link
-              disabled={editingKey !== ''}
-              onClick={() => deleteData(record.key)}
-            >
-              Delete
+            <Typography.Link disabled={editingKey !== ''}>
+              <Popconfirm
+                title='Sure to delete?'
+                cancelText='No'
+                okText='Yes'
+                onConfirm={() => deleteData(record.key)}
+              >
+                Delete
+              </Popconfirm>
             </Typography.Link>
           </div>
         )
