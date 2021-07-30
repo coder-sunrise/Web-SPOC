@@ -282,7 +282,6 @@ const VisitInfoCard = ({
                   })}
                   disabled={isVisitReadonlyAfterSigned}
                   authority='none'
-                  noDefaultValue
                   {...args}
                 />
               )}
