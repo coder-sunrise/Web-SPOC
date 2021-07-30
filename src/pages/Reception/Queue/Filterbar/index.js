@@ -118,7 +118,7 @@ const Filterbar = props => {
             || (clinicRoleFK === 2 && servePatientRight && servePatientRight.rights !== 'hidden')) && (
               <div className={classes.switch}>
                 <Checkbox
-                  label='Visit assign to me only'
+                  label='My Patient Only'
                   onChange={onSwitchClick}
                   checked={selfOnly}
                 />

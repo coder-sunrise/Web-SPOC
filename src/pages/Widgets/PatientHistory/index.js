@@ -462,21 +462,21 @@ class PatientHistory extends Component {
           {!isNurseNote && (
             <div style={{ fontSize: '0.9em' }}>
               <div style={{ fontWeight: 500 }}>
+                {`${moment(visitDate).format('DD MMM YYYY')} (Time In: ${moment(
+                  timeIn,
+                ).format('HH:mm')} Time Out: ${
+                  timeOut ? moment(timeOut).format('HH:mm') : '-'
+                })${docotrName ? ` - ${docotrName}` : ''}`}
+              </div>
+              <div>
                 <span>
-                  {`${moment(visitDate).format('DD MMM YYYY')} (Time In: ${moment(
-                    timeIn,
-                  ).format('HH:mm')} Time Out: ${
-                    timeOut ? moment(timeOut).format('HH:mm') : '-'
-                  })${docotrName ? ` - ${docotrName}` : ''}`}
+                  {`${visitPurposeName}, Last Update By: ${LastUpdateBy ||
+                    ''} on ${moment(signOffDate).format('DD MMM YYYY HH:mm')}`}
                 </span>
-                <span style={{marginLeft:5,marginTop:-10}}>
-                  <ServePatientButton servingPersons={row.servingByList} justShow={true}/>
+                <span style={{marginLeft:5}}>
+                  {row.servingByList?.length >0 ? `Served by ${row.servingByList.map(x=>x.servingBy).join(', ')}.`:null}
                 </span>
               </div>
-              <span>
-                {`${visitPurposeName}, Last Update By: ${LastUpdateBy ||
-                  ''} on ${moment(signOffDate).format('DD MMM YYYY HH:mm')}`}
-              </span>
             </div>
           )}
           {!isNurseNote && (
