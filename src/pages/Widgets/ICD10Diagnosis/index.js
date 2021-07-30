@@ -182,7 +182,7 @@ class ICD10Diagnosis extends PureComponent {
               return (
                 <Authorized authority={"queue.consultation.widgets.diagnosis"}>
                 <div key={v.uid}>
-                <ICD10DiagnosisItem
+                {(diagnosis.favouriteDiagnosisLanguage && <ICD10DiagnosisItem
                   {...this.props}
                   index={i}
                   arrayHelpers={arrayHelpers}
@@ -192,7 +192,7 @@ class ICD10Diagnosis extends PureComponent {
                   icD10DiagnosisCode={v.icD10DiagnosisCode}
                   favouriteDiagnosisMessage={v.favouriteDiagnosisMessage}
                   favouriteDiagnosis={diagnosis.favouriteDiagnosis || []}
-                />
+                />)}
               </div>
               </Authorized>
               )
