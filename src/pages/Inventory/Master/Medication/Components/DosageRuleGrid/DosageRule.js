@@ -17,6 +17,8 @@ import { GridContainer, GridItem, CodeSelect, Popover } from '@/components'
 import DetailsContext from '../../Details/DetailsContext'
 import { DOSAGE_RULE, DOSAGE_RULE_OPERATOR } from '@/utils/constants'
 
+const maxNumOfRule = 5
+
 const EditableRow = ({ index, ...props }) => {
   return <tr {...props} style={{ verticalAlign: 'top' }} />
 }
@@ -372,6 +374,7 @@ const DosageRuleTable = ({
                     name={['operator']}
                     style={{
                       margin: 0,
+                      justifyContent: 'center',
                     }}
                   >
                     <Select
@@ -723,7 +726,8 @@ const DosageRuleTable = ({
         rowClassName='editable-row'
         pagination={false}
       />
-      {(rule !== DOSAGE_RULE.default || data.length === 0) && (
+      {((rule !== DOSAGE_RULE.default && data.length < maxNumOfRule) ||
+        data.length === 0) && (
         <Button
           disabled={editingKey !== ''}
           onClick={() => {
