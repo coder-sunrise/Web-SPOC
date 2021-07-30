@@ -51,25 +51,25 @@ html {
 // .ant-calendar-date {
 //   line-height: 24px;
 // }
-// .ant-notification-notice {
-//   padding: 0;
-//   border-radius: 0;
-//   box-shadow: none;
-//   background: none;
-//   line-height: inherit;
-//   margin-bottom: 0;
-// }
-// .ant-notification {
-//   z-index: 10000;
-//   width: auto;
-// }
-// .ant-notification-notice-close {
-//   color: white;
-//   top: 38px;
-//   &:hover {
-//     color: white;
-//   }
-// }
+.ant-notification-notice {
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: none;
+  line-height: inherit;
+  margin-bottom: 0;
+}
+.ant-notification {
+  z-index: 10000;
+  width: auto;
+}
+.ant-notification-notice-close {
+  color: white;
+  top: 38px;
+  &:hover {
+    color: white;
+  }
+}
 
 // .ant-input-number-disabled .ant-input-number-input,
 // .ant-input-number-disabled {
