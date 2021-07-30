@@ -153,6 +153,7 @@ class PatientDashboard extends PureComponent {
     return (
       <div className={classes.root}>
         <Banner
+        from='PatientDashboard'
           extraCmt={
             visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
               <div

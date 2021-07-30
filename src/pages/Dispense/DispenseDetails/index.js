@@ -103,6 +103,7 @@ const DispenseDetails = ({
   servingPersons=[],
   visit,
   doctorprofile=[],
+  patient,
 }) => {
   const {
     prescription,
@@ -388,13 +389,13 @@ const DispenseDetails = ({
              {!isRetailVisit && (
                 <Authorized authority='queue.servepatient'>
                   <ServePatientButton 
+                    patientName={patient.callingName}
                     justIcon={false}
-                    visitFK={values.id} 
                     servingPersons={servingPersons}
                     onConfirm={()=>{
                       dispatch({
                         type: 'dispense/setServingPerson',
-                        payload: { visitFK: values.id },
+                        payload: { visitFK: visit.id },
                       })
                     }}
                     />
@@ -686,11 +687,12 @@ const DispenseDetails = ({
 
 export default compose(
   withStyles(styles, { name: 'DispenseDetailsGrid' }),
-  connect(({ codetable, clinicSettings, dispense, visitRegistration }) => ({
+  connect(({ codetable, clinicSettings, dispense, visitRegistration, patient }) => ({
     codetable,
     clinicSettings,
     servingPersons: dispense.servingPersons,
     visit: visitRegistration.entity.visit,
     doctorprofile: codetable.doctorprofile || [],
+    patient: patient.entity || {},
   })),
 )(DispenseDetails)

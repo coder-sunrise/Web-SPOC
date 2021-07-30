@@ -357,7 +357,7 @@ export const QueueColumnExtensions = [
             <div>
               {row.visitFK && (
                 <Authorized authority='queue.servepatient'>
-                  <ServePatientButton visitFK={row.visitFK} servingPersons={row.servingByList}/>
+                  <ServePatientButton visitFK={row.visitFK} servingPersons={row.servingByList} patientName={row.patientName}/>
                 </Authorized>
                 )}
             </div>

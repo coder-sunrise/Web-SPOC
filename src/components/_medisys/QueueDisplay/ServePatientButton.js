@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { withStyles } from '@material-ui/core'
 import { connect } from 'dva'
 import { compose } from 'redux'
-import { CheckCircleFilled, PlusCircleFilled } from '@ant-design/icons'
+import { UserAddOutlined } from '@ant-design/icons'
 
 import { notification, Tooltip, Button, ProgressButton } from '@/components'
 
@@ -11,6 +11,7 @@ const ServePatientButton = ({
   servingPersons = [],
   justShow = false,
   user,
+  patientName,
   visitFK,
   justIcon = true,
   onConfirm = null,
@@ -23,7 +24,7 @@ const ServePatientButton = ({
       payload: {
         openConfirm: true,
         openConfirmTitle: 'Patient Serving',
-        openConfirmContent: 'Are you sure to serve this patient ?',
+        openConfirmContent: `Are you sure to serve patient ${patientName} ?`,
         onConfirmSave: () => {
           if(onConfirm)
             onConfirm()
@@ -51,22 +52,22 @@ const ServePatientButton = ({
 
   const btn = !justIcon ? (
     <ProgressButton
-      color={isAnyServing ? 'success' : 'primary'}
+      color={'primary'}
       size='sm'
       onClick={handleServingBy}
-      icon={isAnyServing ? <CheckCircleFilled /> : <PlusCircleFilled />}
+      icon={<UserAddOutlined />}
     >
       Serve Patient
     </ProgressButton>
   ) : (
     <Button
-      className='noPadding'
-      color={isAnyServing ? 'success' : 'primary'}
+      color='primary'
+      size='sm'
       justIcon
       style={{ marginRight: '0px' }}
       onClick={handleServingBy}
     >
-      {isAnyServing ? <CheckCircleFilled /> : <PlusCircleFilled />}
+      <UserAddOutlined />
     </Button>
   )
 
@@ -88,7 +89,7 @@ const ServePatientButton = ({
 export default React.memo(
   compose(
     connect(({ user }) => ({
-      user: user.data,
+      user: user.data || {},
     })),
   )(ServePatientButton),
 )
