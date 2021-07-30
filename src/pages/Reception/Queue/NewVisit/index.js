@@ -436,11 +436,11 @@ class NewVisit extends PureComponent {
                       width: '90%',
                     }}
                   >
-                    <PrintLabLabelButton
+                    {patientInfo && <PrintLabLabelButton
                       patientId={patientInfo.id}
                       clinicSettings={clinicSettings}
                       isEnableScanner
-                    />
+                    />}
                   </div>
                 }
                 {...this.props}
