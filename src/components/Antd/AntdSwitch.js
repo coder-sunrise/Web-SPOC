@@ -152,6 +152,7 @@ class AntdSwitch extends React.PureComponent {
     const { classes, mode, onChange, ...restProps } = props
     const labelProps = {
       shrink: restProps.label && restProps.label.length > 0,
+      title: restProps.tooltip || restProps.label,
     }
 
     return (

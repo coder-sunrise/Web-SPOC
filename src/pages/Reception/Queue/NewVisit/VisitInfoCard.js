@@ -358,6 +358,7 @@ const VisitInfoCard = ({
                     label={formatMessage({
                       id: 'reception.queue.visitRegistration.consReady',
                     })}
+                    tooltip='Consultation Ready'
                     disabled={(disableConsReady && disableConsReady.rights === 'Disable') || isVisitReadonlyAfterSigned}
                     {...args}
                   />
