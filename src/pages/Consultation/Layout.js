@@ -181,6 +181,10 @@ class Layout extends PureComponent {
     localStorage.setItem('consultationLayout', JSON.stringify(defaultLayout))
   }
 
+  componentDidMount () {
+    this.setBannerHeight()
+  }
+
   componentWillUnmount () {
     window.removeEventListener('resize', this.delayedResize)
     $(window.mainPanel).css('overflow', 'auto')
@@ -193,9 +197,20 @@ class Layout extends PureComponent {
 
   resize = (e) => {
     // console.log(e)
+    this.setBannerHeight()
     this.setState({
       rowHeight: this.getLayoutRowHeight(),
     })
+  }
+
+  setBannerHeight = () => {
+    const banner = document.getElementById('patientBanner')
+    const bannerHeight = banner ? banner.offsetHeight : 0
+    this.setState({
+      bannerHeight: bannerHeight,
+    })
+    if(bannerHeight === 0)
+        setTimeout(this.setBannerHeight, 1000)
   }
 
   showWidgetManagePanel = (event) => {
@@ -594,7 +609,7 @@ class Layout extends PureComponent {
               marginTop: 0,
               position: 'sticky',
               overflowY: 'auto',
-              top: headerHeight + 100,
+              top: headerHeight + this.state.bannerHeight || 0,
               zIndex: 1000,
               borderRadius: 0,
               marginBottom: 0,

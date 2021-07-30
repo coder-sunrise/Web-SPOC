@@ -144,9 +144,10 @@ class GlobalModalContainer extends PureComponent {
           <ChangePassword userID={loggedInUserID} />
         </CommonModal>
         <Drawer
-          width='100%'
+          zIndex={1390}
+          height='100%'
           title='Patient Profile'
-          placement='right'
+          placement='top'
           headerStyle={{
             textAlign: 'center',
           }}
