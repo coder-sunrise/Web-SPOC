@@ -153,6 +153,12 @@ class Event extends React.PureComponent {
               </span>
               {hasConflict && <ErrorOutline className={classes.icon} />}
               {isEnableRecurrence && <Cached />}
+              {stage && stage.trim()!='' &&
+              <Tooltip title={stage} style={{float:'right'}}>
+                <LocalOfferIcon
+                  style={{ color: stageColorHex, float: 'right'}}
+                />
+              </Tooltip>}
             </div>
           </div>
         ) : (
