@@ -73,6 +73,20 @@ const styles = (theme) => ({
       color: color(infoColor).darken(0.2).hex(),
     },
   },
+
+  sortIcon: {
+    visibility: 'hidden',
+    verticalAlign: 'text-top',
+  },
+
+  sortLabel: {
+    '& span': {
+      display: 'inline',
+    },
+    '&:hover $sortIcon': {
+      visibility: 'visible',
+    },
+  },
 })
 
 export default styles

@@ -189,11 +189,6 @@ const VisitInfoCard = ({
   const handleVisitGroupBlur = (v, op) => {
     setVisitGroupPopup(false)
   }
-
-  const handleVisitGroupToggle = (v, op) => {
-    setVisitGroupPopup(!visitGroupPopup)
-  }
-  
   
   const { values } = restProps
   let totalTempCharge = 0
@@ -358,6 +353,7 @@ const VisitInfoCard = ({
                     label={formatMessage({
                       id: 'reception.queue.visitRegistration.consReady',
                     })}
+                    tooltip='Ready for Consultaton'
                     disabled={(disableConsReady && disableConsReady.rights === 'Disable') || isVisitReadonlyAfterSigned}
                     {...args}
                   />
@@ -439,7 +435,6 @@ const VisitInfoCard = ({
         </GridItem>
         <GridItem xs md={3}>  
           <Popover 
-            trigger='click'
             icon={null}
             visible={visitGroupPopup}
             content={<div>
@@ -448,7 +443,8 @@ const VisitInfoCard = ({
             </div>}>
             <IconButton
               size='small'
-              onClick={handleVisitGroupToggle} 
+              onMouseOver={handleVisitGroupFocus} 
+              onMouseOut={handleVisitGroupBlur} 
             >
               <InfoCircleOutlined />
             </IconButton>

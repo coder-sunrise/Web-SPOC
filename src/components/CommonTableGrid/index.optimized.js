@@ -54,6 +54,8 @@ import {
 } from '@devexpress/dx-react-grid-material-ui'
 import MenuItem from '@material-ui/core/MenuItem'
 import MenuList from '@material-ui/core/MenuList'
+import ArrowDownward from '@material-ui/icons/ArrowDownward';
+import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import SettingsApplicationsIcon from '@material-ui/icons/SettingsApplications'
 import * as userService from '@/services/user'
 import { control } from '@/components/Decorator'
@@ -107,6 +109,12 @@ const getIndexedRows = (rows = [], pagerConfig = {}) => {
     }
   })
 }
+const SortingIcon = ({ direction }) => (
+  direction === 'asc'
+    ? <ArrowUpward style={{ fontSize: '18px' }} />
+    : <ArrowDownward style={{ fontSize: '18px' }} />
+)
+
 let uniqueGid = 0
 @connect(({ loading, global }, { type }) => {
   return {
@@ -229,28 +237,32 @@ class CommonTableGrid extends PureComponent {
     this.TableHeaderRow = ({ row, ...restProps }) => (
       <TableHeaderRow
         {...restProps}
-        titleComponent={({ children }) => {
-          return (
-            <Tooltip title={children} placement='top'>
-              <div>{children}</div>
-            </Tooltip>
-          )
-        }}
+        // titleComponent={({ children }) => {
+        //   return (
+        //     <Tooltip title={children} placement='top'>
+        //       <div>{children}</div>
+        //     </Tooltip>
+        //   )
+        // }}
         sortLabelComponent={({ children, ...p }) => {
-          // console.log({ children, p })
-
+          const { classes } = this.props
           return (
-            <TableHeaderRow.SortLabel
-              {...p}
-              getMessage={(ps) => {
-                // console.log(ps)
-                return ''
-              }}
-            >
-              <Tooltip title={children} placement='top'>
-                <div>{children}</div>
+            // <TableHeaderRow.SortLabel
+            //   {...p}
+            //   getMessage={(ps) => {
+            //     // console.log(ps)
+            //     return ''
+            //   }}
+            // >
+              <Tooltip title={p.column.fullTitle || children} placement='top'>
+                <div className={classes.sortLabel} onClick={p.disabled ? null : p.onSort}>
+                  <span style={{display: 'inline-block'}}>{children}</span>
+                  {!p.disabled && (<span className={classes.sortIcon}>
+                    <SortingIcon direction={p.direction}/>
+                  </span>)}
+                </div>
               </Tooltip>
-            </TableHeaderRow.SortLabel>
+            // </TableHeaderRow.SortLabel>
           )
         }}
       />
