@@ -255,6 +255,7 @@ class Vaccination extends PureComponent {
 
   changeVaccination = (v, op = {}) => {
     const { setFieldValue, values, disableEdit, codetable } = this.props
+    setFieldValue('isNurseActualizeRequired', op.isNurseActualizable)
     let defaultBatch
     if (op.vaccinationStock) {
       defaultBatch = op.vaccinationStock.find((o) => o.isDefault === true)

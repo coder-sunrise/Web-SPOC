@@ -58,6 +58,7 @@ const getType = (typeId) => {
       inventorymedication = [],
       inventoryvaccination = [],
       inventoryconsumable = [],
+      ctservice = []
     } = codetable  
 
     let datas = []
@@ -187,6 +188,8 @@ const getType = (typeId) => {
           remainingQuantity: packageItem.remainingQuantity,
           performingUserFK: packageItem.performingUserFK,
           packageGlobalId: packageItem.packageGlobalId,
+          isDispensedByPharmacy: medication.isDispensedByPharmacy,
+          isNurseActualizeRequired: medication.isNurseActualizable,
         }
       }
       return item
@@ -247,12 +250,16 @@ const getType = (typeId) => {
           performingUserFK: packageItem.performingUserFK,
           packageGlobalId: packageItem.packageGlobalId,
           corVaccinationCert: [],
+          isNurseActualizeRequired: vaccination.isNurseActualizable,
         }
       }
       return item
     }
 
     const getServiceCenterServiceFromPackage = (packageItem) => {      
+      const service = ctservice.find(
+        (item) => item.id === packageItem.serviceCenterServiceFK,
+      )
       let item
       if (packageItem.isActive) {
         item = {
@@ -278,6 +285,8 @@ const getType = (typeId) => {
           remainingQuantity: packageItem.remainingQuantity,
           performingUserFK: packageItem.performingUserFK,   
           packageGlobalId: packageItem.packageGlobalId,
+          isNurseActualizeRequired: service.isNurseActualizable,
+          serviceCenterCategoryFK: service.serviceCenterCategoryFK
         }
       }
       return item
@@ -323,6 +332,8 @@ const getType = (typeId) => {
           remainingQuantity: packageItem.remainingQuantity,
           performingUserFK: packageItem.performingUserFK,
           packageGlobalId: packageItem.packageGlobalId,
+          isDispensedByPharmacy: consumable.isDispensedByPharmacy,
+          isNurseActualizeRequired: consumable.isNurseActualizable,
         }
       }
 
@@ -353,6 +364,11 @@ const getType = (typeId) => {
       for (let index = 0; index < consumeItems.length; index++) {
         const newOrder = getItemFromPackage(consumeItems[index])
         if (newOrder) {
+          let type = pendingPackage[index].type
+          if (pendingPackage[index].type === '3') {
+            if (newOrder.serviceCenterCategoryFK === 3) { type = '9' }
+            else if (newOrder.serviceCenterCategoryFK === 4) { type = '10' }
+          }
           const data = {
             isOrderedByDoctor:
               user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
@@ -360,7 +376,7 @@ const getType = (typeId) => {
             ...newOrder,
             subject: consumeItems[index].itemName,
             isDeleted: false,
-            type: getType(consumeItems[index].invoiceItemTypeFK),
+            type,
             packageDrawdown: consumeItems[index].packageDrawdown,
             packageDrawdownAsAtDate: consumeItems[index].packageDrawdownAsAtDate,
             packageDrawdownFK: consumeItems[index].id,

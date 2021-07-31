@@ -599,3 +599,17 @@ export const DOSAGE_RULE = {
   weight: 'weight',
   default: 'default',
 }
+
+export const RADIOLOGY_WORKITEM_STATUS = {
+  NEW: 1,
+  INPROGRESS: 2,
+  PENDINGREPORT: 3,
+  COMPLETED: 4,
+  CANCCELED: 5,
+}
+
+export const NURSE_WORKITEM_STATUS = {
+  NEW: 1,
+  ACTUALIZED: 2,
+  CANCCELED: 3,
+}

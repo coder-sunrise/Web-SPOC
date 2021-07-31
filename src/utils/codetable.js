@@ -475,6 +475,7 @@ const getServices = data => {
         code: o[0].code,
         name: o[0].displayValue,
         serviceCategoryFK: o[0].serviceCategoryFK,
+        isNurseActualizable: o[0].isNurseActualizable,
         serviceCenters: o.map(m => {
           return {
             value: m.serviceCenterId,
