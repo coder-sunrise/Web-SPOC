@@ -1037,6 +1037,7 @@ class Form extends React.PureComponent {
     })
     this.updatePreOrderSequence(appointmentPreOrderItem)
     setFieldValue("currentAppointment.appointmentPreOrderItem", [...appointmentPreOrderItem])
+    setFieldValue('currentAppointment.dirty', true)
     this.setState({ showSelectPreOrder: false })
   }
 
@@ -1092,6 +1093,7 @@ class Form extends React.PureComponent {
     }
     this.updatePreOrderSequence(appointmentPreOrderItem)
     setFieldValue("currentAppointment.appointmentPreOrderItem", [...appointmentPreOrderItem])
+    setFieldValue('currentAppointment.dirty', true)
   }
 
   setBannerHeight = () => {
@@ -1160,11 +1162,17 @@ class Form extends React.PureComponent {
       this.shouldDisableAppointmentDate() || !patientIsActive
 
     const { pendingPreOrderItem = [] } = patientProfile || {}
-    const draftPreOrderItem = [...pendingPreOrderItem.filter(x => x.preOrderItemStatus === 'New').filter(po => !appointmentPreOrderItem.find(apo => !apo.isDeleted && apo.actualizedPreOrderItemFK === po.id)),
-    ...appointmentPreOrderItem.filter(apo => apo.isDeleted).map(apo => {
-      const { isDeleted, ...resetPreOrderItem } = apo
-      return { ...resetPreOrderItem, id: resetPreOrderItem.actualizedPreOrderItemFK }
-    })]
+
+    const draftPreOrderItem = pendingPreOrderItem.map(po => {
+      const selectPreOrder = appointmentPreOrderItem.find(apo => !apo.isDeleted && apo.actualizedPreOrderItemFK === po.id)
+      if (selectPreOrder) {
+        return {
+          ...po,
+          preOrderItemStatus: selectPreOrder.isDeleted ? 'New' : 'Actualizing'
+        }
+      }
+      return { ...po }
+    })
 
     const actualizePreOrderAccessRight = Authorized.check('appointment.actualizepreorder') || { rights: 'hidden' }
 
@@ -1177,6 +1185,7 @@ class Form extends React.PureComponent {
                 from='Appointment'
                 onSelectPreOrder={this.onSelectPreOrder}
                 activePreOrderItem={draftPreOrderItem}
+                disablePreOrder={disableDataGrid}
                 isEnableRecurrence={isEnableRecurrence}
                 apptId={values.id}
                 apptMode={mode}
@@ -1254,7 +1263,7 @@ class Form extends React.PureComponent {
                     />
                   </GridItem>
                   <GridItem xs md={12}>
-                    {this.showPreOrder() && <PreOrder {...this.props} deletePreOrderItem={this.deletePreOrderItem}></PreOrder>}
+                    {this.showPreOrder() && <PreOrder {...this.props} deletePreOrderItem={this.deletePreOrderItem} disabled={disableDataGrid}></PreOrder>}
                   </GridItem>
                 </GridItem>
 

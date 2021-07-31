@@ -40,7 +40,11 @@ export const DataGridColExtensions = [
     render: row => {
       return (
         <div style={{ position: 'relative' }}>
-          <div style={wrapCellTextStyle}>
+          <div style={{
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+            paddingRight: row.isPreOrder ? 34 : 0
+          }}>
             {row.itemType}
             {drugMixtureIndicator(row)}
             {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
