@@ -226,6 +226,8 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           ],
           performingUserFK: visitDoctorUserId,
           packageGlobalId: '',
+          isDispensedByPharmacy: inventoryMedication.isDispensedByPharmacy,
+          isNurseActualizeRequired: inventoryMedication.isNurseActualizable,
         }
       }
       return item
@@ -287,6 +289,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           type: orderSetItem.type,
           subject: inventoryVaccination.displayValue,
           isGenerateCertificate: inventoryVaccination.isAutoGenerateCertificate,
+          isNurseActualizeRequired: inventoryVaccination.isNurseActualizable,
         }
       }
       console.log('item', item)
@@ -352,6 +355,8 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           subject: service.displayValue,
           performingUserFK: visitDoctorUserId,
           packageGlobalId: '',
+          isNurseActualizeRequired: service.isNurseActualizable,
+          serviceCenterCategoryFK: service.serviceCenterCategoryFK
         }
       }
       return item
@@ -389,6 +394,8 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
           performingUserFK: visitDoctorUserId,
           packageGlobalId: '',
+          isDispensedByPharmacy: inventoryConsumable.isDispensedByPharmacy,
+          isNurseActualizeRequired: inventoryConsumable.isNurseActualizable,
         }
       }
 
@@ -420,6 +427,11 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
     for (let index = 0; index < orderSetItems.length; index++) {
       const newOrder = getOrderFromOrderSet(orderSetCode, orderSetItems[index])
       if (newOrder) {
+        let type = orderSetItems[index].type
+        if (orderSetItems[index].type === '3') {
+          if (newOrder.serviceCenterCategoryFK === 3) { type = '9' }
+          else if (newOrder.serviceCenterCategoryFK === 4) { type = '10' }
+        }
         const data = {
           isOrderedByDoctor:
             user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
@@ -427,7 +439,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           ...newOrder,
           subject: orderSetItems[index].name,
           isDeleted: false,
-          type: orderSetItems[index].type,
+          type,
         }
         datas.push(data)
         nextSequence += 1

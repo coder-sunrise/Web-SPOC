@@ -159,12 +159,18 @@ export default compose(
         : consumableDetail.default
 
       let chas = []
-      const { isChasAcuteClaimable, isChasChronicClaimable } = returnValue
+      const { isChasAcuteClaimable, isChasChronicClaimable, isDispensedByPharmacy, isNurseActualizable } = returnValue
       if (isChasAcuteClaimable) {
         chas.push('isChasAcuteClaimable')
       }
       if (isChasChronicClaimable) {
         chas.push('isChasChronicClaimable')
+      }
+      if (isDispensedByPharmacy) {
+        chas.push('isDispensedByPharmacy')
+      }
+      if (isNurseActualizable) {
+        chas.push('isNurseActualizable')
       }
 
       return {
@@ -229,11 +235,19 @@ export default compose(
       let chas = {
         isChasAcuteClaimable: false,
         isChasChronicClaimable: false,
+        isDispensedByPharmacy: false,
+        isNurseActualizable: false,
       }
       values.chas.forEach(o => {
         if (o === 'isChasAcuteClaimable') {
           chas[o] = true
         } else if (o === 'isChasChronicClaimable') {
+          chas[o] = true
+        }
+        else if (o === 'isDispensedByPharmacy') {
+          chas[o] = true
+        }
+        else if (o === 'isNurseActualizable') {
           chas[o] = true
         }
       })

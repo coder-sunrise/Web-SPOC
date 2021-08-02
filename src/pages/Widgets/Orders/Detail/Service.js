@@ -373,10 +373,13 @@ class Service extends PureComponent {
                               (m) => m.value === serviceCenterFK,
                             ),
                         )}
-                        onChange={() =>
+                        onChange={(v, op = {}) => {
+                          setFieldValue('isNurseActualizeRequired', op.isNurseActualizable)
+
                           setTimeout(() => {
                             this.getServiceCenterService()
                           }, 1)}
+                        }
                         disabled={values.isPackage}
                         {...args}
                       />
