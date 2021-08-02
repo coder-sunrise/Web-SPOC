@@ -32,6 +32,7 @@
     "docker:push": "npm run docker-hub:build && npm run docker:tag && docker push chenshuai2144/ant-design-pro"
   },
   "dependencies": {
+    "@ant-design/pro-card": "^1.14.8",
     "@ant-design/pro-layout": "^6.19.4",
     "@babel/runtime": "^7.1.5",
     "@devexpress/dx-grid-core": "2.2.1",
