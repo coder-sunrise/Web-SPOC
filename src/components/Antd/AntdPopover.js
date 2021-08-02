@@ -5,7 +5,6 @@ export default ({
   icon = (
     <ErrorOutline
       style={{
-        position: 'absolute',
         color: 'orange',
         top: 15,
       }}
@@ -13,18 +12,26 @@ export default ({
   ),
   children,
   content,
+  title,
   ...props
 }) => {
+  const getTitle = () => {
+    if (title) {
+      return (
+        <div style={{ display: 'flex' }}>
+          {icon !== null || icon !== undefined ? icon : ''}
+          {title}
+        </div>
+      )
+    }
+  }
+
   return (
     <Popover
-      content={
-        <div>
-          {icon}
-          {content}
-        </div>
-      }
+      content={<div>{content}</div>}
       trigger='click'
       {...props}
+      title={getTitle()}
     >
       {children}
     </Popover>

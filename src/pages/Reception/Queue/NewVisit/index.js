@@ -95,7 +95,7 @@ const getHeight = (propsHeight) => {
     queueLog,
     loading,
     visitRegistration,
-    patientInfo: patient.entity,
+    patientInfo: patient.entity || {},
     doctorProfiles: codetable.doctorprofile,
     ctinvoiceadjustment: codetable.ctinvoiceadjustment,
   }),
@@ -470,7 +470,7 @@ class NewVisit extends PureComponent {
                           isVisitReadonlyAfterSigned={isReadonlyAfterSigned}
                           isSigned={values.isLastClinicalObjectRecordSigned}
                           existingQNo={existingQNo}
-                          copaymentScheme={patientInfo?.patientScheme.filter(t => t.schemeTypeFK === 15)}
+                          copaymentScheme={(patientInfo?.patientScheme || []).filter(t => t.schemeTypeFK === 15)}
                           handleUpdateAttachments={this.updateAttachments}
                           attachments={values.visitAttachment}
                           visitType={values.visitPurposeFK}

@@ -6,7 +6,7 @@ const DetailsContext = createContext(null)
 export const DetailsContextProvider = props => {
   const { settings } = useSelector(state => state.clinicSettings)
   const context = { isMultilanguage: false }
-  const [currentLanguage = 'EN', setCurrentLanguage] = useState()
+  const [currentLanguage, setCurrentLanguage] = useState()
   const [languageLabel, setLanguageLabel] = useState()
   const [isMultiLanguage = false, setIsMultiLanguage] = useState()
   const [primaryPrintoutLanguage, setPrimaryPrintoutLanguage] = useState()

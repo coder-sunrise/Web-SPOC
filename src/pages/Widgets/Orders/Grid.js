@@ -647,9 +647,13 @@ export default ({
 
             return (
               <div style={{ position: 'relative' }}>
-                <div style={wrapCellTextStyle}>
+                <div style={{
+                  wordWrap: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                  paddingRight: row.isPreOrder ? 34 : 0
+                }}>
                   <Tooltip title={texts}>
-                    <span>{texts}</span>
+                    <span >{texts}</span>
                   </Tooltip>
                   {drugMixtureIndicator(row)}
                   {row.isPreOrder && (
@@ -662,9 +666,7 @@ export default ({
                           right: -10,
                           borderRadius: 10,
                         }}
-                      >
-                        Pre
-                      </Tag>
+                      > Pre</Tag>
                     </Tooltip>
                   )}
                 </div>

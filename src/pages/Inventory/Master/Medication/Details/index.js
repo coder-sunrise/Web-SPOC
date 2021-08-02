@@ -515,6 +515,9 @@ export default compose(
       criticalThreshold: Yup.number()
         .min(0, 'Critical Threshold must between 0 and 999,999.9')
         .max(999999.9, 'Critical Threshold must between 0 and 999,999.9'),
+      excessThreshold: Yup.number()
+        .min(0, 'Excess Threshold must between 0 and 999,999.9')
+        .max(999999.9, 'Excess Threshold must between 0 and 999,999.9'),
     }),
 
     handleSubmit: (values, { props, resetForm }) => {
@@ -562,6 +565,7 @@ export default compose(
         const newAttach = attachment.filter(
           a => !a.isDeleted && a.fileIndexFK === undefined,
         )[0]
+
         fileInfo.fileIndexFK = newAttach?.id
         fileInfo.fileName = newAttach?.fileName
       }
@@ -625,29 +629,31 @@ export default compose(
 
       let finalMedicationInstructionRule = [...medicationInstructionRule]
       let deletedItems = []
-      const originalValues = medicationDetail.entity.medicationInstructionRule
+      if (medicationDetail.entity) {
+        const originalValues = medicationDetail.entity.medicationInstructionRule
 
-      if (originalValues) {
-        if (medicationInstructionRule.length === 0)
-          deletedItems = originalValues.map(item => ({
-            ...item,
-            isDeleted: true,
-          }))
-        else {
-          deletedItems = originalValues
-            .filter(
-              orig =>
-                medicationInstructionRule.findIndex(d => d.id === orig.id) ===
-                -1,
-            )
-            .map(item => ({ ...item, isDeleted: true }))
+        if (originalValues) {
+          if (medicationInstructionRule.length === 0)
+            deletedItems = originalValues.map(item => ({
+              ...item,
+              isDeleted: true,
+            }))
+          else {
+            deletedItems = originalValues
+              .filter(
+                orig =>
+                  medicationInstructionRule.findIndex(d => d.id === orig.id) ===
+                  -1,
+              )
+              .map(item => ({ ...item, isDeleted: true }))
+          }
+
+          if (deletedItems)
+            finalMedicationInstructionRule = [
+              ...finalMedicationInstructionRule,
+              ...deletedItems,
+            ]
         }
-
-        if (deletedItems)
-          finalMedicationInstructionRule = [
-            ...finalMedicationInstructionRule,
-            ...deletedItems,
-          ]
       }
       const payload = {
         ...restValues,
