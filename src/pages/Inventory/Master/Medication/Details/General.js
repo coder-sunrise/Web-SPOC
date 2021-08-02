@@ -396,6 +396,7 @@ const General = ({
             render={args => (
               <CodeSelect
                 multiple
+                labelField='displayValue'
                 label={formatMessage({
                   id: 'inventory.master.medication.drugAllergy',
                 })}
