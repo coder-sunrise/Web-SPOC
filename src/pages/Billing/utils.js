@@ -1,13 +1,14 @@
 import moment from 'moment'
 import { notification } from '@/components'
 import { INVOICE_ITEM_TYPE, INVOICE_PAYER_TYPE } from '@/utils/constants'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 
 export const constructPayload = (values) => {
   const {
     concurrencyToken,
     visitId,
     visitPurposeFK,
-    visitStatus = 'BILLING',
+    visitStatus = VISIT_STATUS.BILLING,
     invoice,
     invoicePayer = [],
     invoicePayment = [],

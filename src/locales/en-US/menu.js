@@ -142,7 +142,7 @@ export default {
   'menu.claimSubmission.medisave': 'Medisave',
   'menu.claimSubmission.patientInvoice': 'Patient Invoice',
   'menu.setting.consumableuom': 'Consumable UOM',
-  'menu.setting.medicationUOM': 'Medication UOM',
+  'menu.setting.medicationuom': 'Medication UOM',
   'menu.setting.medicationgroup': 'Medication Group',
   'menu.setting.consumablegroup': 'Consumable Category',
   'menu.setting.medicationdosage': 'Medication Dosage',

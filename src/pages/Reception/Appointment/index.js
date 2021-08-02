@@ -323,7 +323,10 @@ class Appointment extends React.PureComponent {
 
     if (
       isHistory &&
-      [APPOINTMENT_STATUS.RESCHEDULED].includes(appointmentStatusFk)
+      [
+        APPOINTMENT_STATUS.RESCHEDULED,
+        APPOINTMENT_STATUS.PFA_RESCHEDULED,
+      ].includes(appointmentStatusFk)
     )
       return
 

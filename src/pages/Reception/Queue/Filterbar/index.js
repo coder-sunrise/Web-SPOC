@@ -39,7 +39,11 @@ const Filterbar = props => {
     setSearch,
     loading,
   } = props
+
   const onSwitchClick = () => dispatch({ type: 'queueLog/toggleSelfOnly' })
+  const clinicRoleFK = user.clinicianProfile.userProfile.role?.clinicRoleFK
+  const servePatientRight = Authorized.check('queue.servepatient')
+
   return (
     <div className='div-reception-header'>
       <GridContainer
@@ -109,11 +113,12 @@ const Filterbar = props => {
               <FormattedMessage id='reception.queue.createPatient' />
             </Button>
           </Authorized>
-          {user.clinicianProfile.userProfile.role?.clinicRoleFK === 1 &&
-            !hideSelfOnlyFilter && (
+
+          {((clinicRoleFK === 1 && !hideSelfOnlyFilter)
+            || (clinicRoleFK === 2 && servePatientRight && servePatientRight.rights !== 'hidden')) && (
               <div className={classes.switch}>
                 <Checkbox
-                  label='Visit assign to me only'
+                  label='My Patient Only'
                   onChange={onSwitchClick}
                   checked={selfOnly}
                 />

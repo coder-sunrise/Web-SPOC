@@ -374,15 +374,15 @@ export const VISIT_TYPE = {
 export const VISIT_TYPE_NAME = [
   {
     visitPurposeFK: VISIT_TYPE.CONS,
-    displayName: 'CONSULTATION',
+    displayName: 'Consultation',
   },
   {
     visitPurposeFK: VISIT_TYPE.RETAIL,
-    displayName: 'RETAIL',
+    displayName: 'Retail',
   },
   {
     visitPurposeFK: VISIT_TYPE.BILL_FIRST,
-    displayName: 'BILL-FIRST',
+    displayName: 'Bill-First',
   },
   {
     visitPurposeFK: VISIT_TYPE.MC,

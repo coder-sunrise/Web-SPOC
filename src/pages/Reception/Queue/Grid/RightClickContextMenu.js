@@ -66,7 +66,7 @@ class RightClickContextMenu extends React.Component {
       return false
     }
 
-    if (visitStatus === 'IN CONS') {
+    if (visitStatus === VISIT_STATUS.IN_CONS) {
       if (id !== doctorProfile.id) {
         notification.error({
           message: `You cannot resume other doctor's consultation.`,

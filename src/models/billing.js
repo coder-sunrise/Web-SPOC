@@ -5,6 +5,7 @@ import { getAppendUrl } from '@/utils/utils'
 import * as service from '@/pages/Billing/services'
 import dispenseService from '@/services/dispense'
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 
 const { unlock } = dispenseService
 export default createFormViewModel({
@@ -133,7 +134,7 @@ export default createFormViewModel({
           })
           yield take('billing/query/@@end')
 
-          if (visitStatus === 'COMPLETED') {
+          if (visitStatus === VISIT_STATUS.COMPLETED) {
             sendQueueNotification({
               message: 'Visit completed.',
               queueNo: entity.queueNo,

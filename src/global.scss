@@ -51,25 +51,25 @@ html {
 // .ant-calendar-date {
 //   line-height: 24px;
 // }
-// .ant-notification-notice {
-//   padding: 0;
-//   border-radius: 0;
-//   box-shadow: none;
-//   background: none;
-//   line-height: inherit;
-//   margin-bottom: 0;
-// }
-// .ant-notification {
-//   z-index: 10000;
-//   width: auto;
-// }
-// .ant-notification-notice-close {
-//   color: white;
-//   top: 38px;
-//   &:hover {
-//     color: white;
-//   }
-// }
+.ant-notification-notice {
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: none;
+  line-height: inherit;
+  margin-bottom: 0;
+}
+.ant-notification {
+  z-index: 10000;
+  width: auto;
+}
+.ant-notification-notice-close {
+  color: white;
+  top: 38px;
+  &:hover {
+    color: white;
+  }
+}
 
 // .ant-input-number-disabled .ant-input-number-input,
 // .ant-input-number-disabled {
@@ -424,9 +424,13 @@ html {
 .ant-pro-page-container-children-content {
   margin: 8px 8px 0 !important;
 }
-// .ant-select-arrow {
-//   right: 3px;
-// }
+.ant-select-arrow,
+.ant-select-clear {
+  right: 3px;
+}
+.ant-select-single:not(.ant-select-customize-input) .ant-select-selector .ant-select-selection-search-input {
+  height: 18px;
+}
 // --- IMPORTANT: do not remove this css class ---
 // search visually-hidden to see the usage
 .visually-hidden {
