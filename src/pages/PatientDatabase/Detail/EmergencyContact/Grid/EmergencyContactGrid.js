@@ -12,6 +12,7 @@ import {
 import Loading from '@/components/PageLoading/index'
 import service from '@/services/patient'
 import { getUniqueId } from '@/utils/utils'
+import styles from './Grid.less'
 
 const { query } = service
 class EmergencyContactGrid extends PureComponent {
@@ -279,6 +280,7 @@ class EmergencyContactGrid extends PureComponent {
           {...this.tableParas}
         />
         <CommonModal
+          className={styles.deepCommonModal}
           open={this.state.showModal}
           title='Search Patient'
           onClose={this.toggleModal}
