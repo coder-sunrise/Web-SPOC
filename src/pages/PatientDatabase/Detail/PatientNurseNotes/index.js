@@ -56,9 +56,11 @@ const styles = () => ({
   handleSubmit: async (values, component) => {
     const { props, resetForm } = component
     const { dispatch, history, patient, onConfirm } = props
-
-    const { id } = values
+    const { id, notes } = values
     const isEdit = id !== undefined && id > 0
+
+    if (notes.trim() === '') return
+
     const response = await dispatch({
       type: 'patientNurseNotes/upsert',
       payload: { ...values },
@@ -169,8 +171,11 @@ class PatientNurseNotes extends PureComponent {
       user,
     } = this.props
     const { clinicianProfile } = user.data
-    const modifyNotesAccessRight = Authorized.check('patientdatabase.patientprofiledetails.patienthistory.nursenotes') || {rights: 'hidden'}
-    const isEditableNotes = modifyNotesAccessRight.rights === 'enable' ? true : false
+    const modifyNotesAccessRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
+    ) || { rights: 'hidden' }
+    const isEditableNotes =
+      modifyNotesAccessRight.rights === 'enable' ? true : false
 
     return (
       <GridContainer>
@@ -186,7 +191,7 @@ class PatientNurseNotes extends PureComponent {
                     height: 'calc(100vh - 305px)',
                   }}
                 >
-                <div
+                  <div
                     style={{
                       height: 'calc(100vh - 350px)',
                       marginTop: '25px',
@@ -194,27 +199,27 @@ class PatientNurseNotes extends PureComponent {
                       overflow: 'scroll',
                     }}
                   >
-                <Timeline style={{ marginLeft: 10, marginTop: 10 }}>
-                    {list.map(i => {
-                      const { createDate, createByUserFK } = i
-                      const canEdit =
-                        clinicianProfile.userProfileFK === createByUserFK &&
-                        moment(createDate)
-                          .utc()
-                          .formatUTC(true) === moment().formatUTC(true)
-                      return (
-                        <Timeline.Item style={{marginTop: 2 }}>
-                        <PatientNurseNotesContent
-                          entity={i}
-                          dispatch={dispatch}
-                          canEdit={canEdit}
-                          handleEdit={this.handleEdit}
-                          isEditableNotes = {isEditableNotes}
-                        />
-                        </Timeline.Item>
-                      )
-                    })}
-                  </Timeline>
+                    <Timeline style={{ marginLeft: 10, marginTop: 10 }}>
+                      {list.map(i => {
+                        const { createDate, createByUserFK } = i
+                        const canEdit =
+                          clinicianProfile.userProfileFK === createByUserFK &&
+                          moment(createDate)
+                            .utc()
+                            .formatUTC(true) === moment().formatUTC(true)
+                        return (
+                          <Timeline.Item style={{ marginTop: 2 }}>
+                            <PatientNurseNotesContent
+                              entity={i}
+                              dispatch={dispatch}
+                              canEdit={canEdit}
+                              handleEdit={this.handleEdit}
+                              isEditableNotes={isEditableNotes}
+                            />
+                          </Timeline.Item>
+                        )
+                      })}
+                    </Timeline>
                   </div>
                 </CardContainer>
               </div>
@@ -256,7 +261,11 @@ class PatientNurseNotes extends PureComponent {
             </GridItem>
 
             <GridItem md={12} style={{ textAlign: 'end' }}>
-              <Button color='primary' onClick={this.props.handleSubmit} disabled={!isEditableNotes}>
+              <Button
+                color='primary'
+                onClick={this.props.handleSubmit}
+                disabled={!isEditableNotes}
+              >
                 Save
               </Button>
             </GridItem>
