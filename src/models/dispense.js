@@ -3,6 +3,7 @@ import { createFormViewModel } from 'medisys-model'
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import { notification } from '@/components'
 import service from '../services/dispense'
+import Authorized from '@/utils/Authorized'
 
 export default createFormViewModel({
   namespace: 'dispense',
@@ -83,10 +84,13 @@ export default createFormViewModel({
         })
         yield take('query/@@end')
 
-        yield put({
-          type: 'getServingPersons',
-          payload: { visitFK: visitID },
-        })
+        const servePatientRight = Authorized.check('queue.servepatient')
+        if(servePatientRight && servePatientRight.rights !== 'hidden'){
+          yield put({
+            type: 'getServingPersons',
+            payload: { visitFK: visitID },
+          })
+        }
       },
 
       *getServingPersons({payload},{call,put}){
