@@ -523,7 +523,7 @@ class Demographic extends PureComponent {
                         label='Patient Tags:'
                         tagCategory='Patient'
                         defaultTagNames={this.state.patientTags}
-                        {...args}
+                        disabled={!values.isActive}
                         onChange={(value, tags) =>
                           this.handleTagPanelChange(
                             value,
@@ -531,6 +531,7 @@ class Demographic extends PureComponent {
                             args.form.setFieldValue,
                           )
                         }
+                        {...args}
                       ></TagPanel>
                     )}
                   />

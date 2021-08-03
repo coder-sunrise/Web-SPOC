@@ -17,6 +17,13 @@ import { GridContainer, GridItem, CodeSelect, Popover } from '@/components'
 import DetailsContext from '../../Details/DetailsContext'
 import { DOSAGE_RULE, DOSAGE_RULE_OPERATOR } from '@/utils/constants'
 
+const maxNumOfRule = 5
+
+const formItemStyle = {
+  margin: 0,
+  justifyContent: 'center',
+}
+
 const EditableRow = ({ index, ...props }) => {
   return <tr {...props} style={{ verticalAlign: 'top' }} />
 }
@@ -278,12 +285,6 @@ const DosageRuleTable = ({
         (currentRange.min <= item.min && currentRange.max >= item.max),
     )
 
-    console.group('range conflict validation')
-    console.log('ranges', ranges)
-    console.log('currentRange', currentRange)
-    console.log('conflict', conflict)
-    console.groupEnd()
-
     if (conflict.length > 0) {
       rangeValidationErrorMessage = 'Range conflicting with other rules.'
       rangeValidationErrorDetails = conflict.map(item => (
@@ -351,12 +352,7 @@ const DosageRuleTable = ({
               <GridContainer gutter={4}>
                 <GridItem md={3}>
                   {selectedOperator === DOSAGE_RULE_OPERATOR.to && (
-                    <Form.Item
-                      name={['leftOperand']}
-                      style={{
-                        margin: 0,
-                      }}
-                    >
+                    <Form.Item name={['leftOperand']} style={formItemStyle}>
                       <SingleDecimalInput
                         style={{ width: 75, marginRight: 3 }}
                         min={0}
@@ -368,13 +364,9 @@ const DosageRuleTable = ({
                 </GridItem>
 
                 <GridItem md={6}>
-                  <Form.Item
-                    name={['operator']}
-                    style={{
-                      margin: 0,
-                    }}
-                  >
+                  <Form.Item name={['operator']} style={formItemStyle}>
                     <Select
+                      getPopupContainer={node => node.parentNode}
                       value={selectedOperator}
                       style={{ width: 110 }}
                       onChange={val => {
@@ -396,12 +388,7 @@ const DosageRuleTable = ({
                   </Form.Item>
                 </GridItem>
                 <GridItem md={3}>
-                  <Form.Item
-                    name={['rightOperand']}
-                    style={{
-                      margin: 0,
-                    }}
-                  >
+                  <Form.Item name={['rightOperand']} style={formItemStyle}>
                     <SingleDecimalInput
                       style={{ width: 75, marginRight: 3 }}
                       min={0}
@@ -468,9 +455,7 @@ const DosageRuleTable = ({
             {editing ? (
               <Form.Item
                 name={['prescribingDosageFK']}
-                style={{
-                  margin: 0,
-                }}
+                style={formItemStyle}
                 rules={[
                   {
                     required: true,
@@ -479,6 +464,7 @@ const DosageRuleTable = ({
                 ]}
               >
                 <Select
+                  getPopupContainer={node => node.parentNode}
                   options={codetable.ctmedicationdosage?.map(item => {
                     return { label: item.displayValue, value: item.id }
                   })}
@@ -525,9 +511,7 @@ const DosageRuleTable = ({
             {editing ? (
               <Form.Item
                 name={['medicationFrequencyFK']}
-                style={{
-                  margin: 0,
-                }}
+                style={formItemStyle}
                 rules={[
                   {
                     required: true,
@@ -536,6 +520,7 @@ const DosageRuleTable = ({
                 ]}
               >
                 <Select
+                  getPopupContainer={node => node.parentNode}
                   options={codetable.ctmedicationfrequency?.map(item => {
                     return { label: item.displayValue, value: item.id }
                   })}
@@ -569,9 +554,7 @@ const DosageRuleTable = ({
             {editing ? (
               <Form.Item
                 name={['duration']}
-                style={{
-                  margin: 0,
-                }}
+                style={formItemStyle}
                 rules={[
                   {
                     required: true,
@@ -611,9 +594,7 @@ const DosageRuleTable = ({
             {editing ? (
               <Form.Item
                 name={['dispensingQuantity']}
-                style={{
-                  margin: 0,
-                }}
+                style={formItemStyle}
                 rules={[
                   {
                     required: true,
@@ -678,11 +659,15 @@ const DosageRuleTable = ({
             >
               Edit
             </Typography.Link>
-            <Typography.Link
-              disabled={editingKey !== ''}
-              onClick={() => deleteData(record.key)}
-            >
-              Delete
+            <Typography.Link disabled={editingKey !== ''}>
+              <Popconfirm
+                title='Sure to delete?'
+                cancelText='No'
+                okText='Yes'
+                onConfirm={() => deleteData(record.key)}
+              >
+                Delete
+              </Popconfirm>
             </Typography.Link>
           </div>
         )
@@ -719,7 +704,8 @@ const DosageRuleTable = ({
         rowClassName='editable-row'
         pagination={false}
       />
-      {(rule !== DOSAGE_RULE.default || data.length === 0) && (
+      {((rule !== DOSAGE_RULE.default && data.length < maxNumOfRule) ||
+        data.length === 0) && (
         <Button
           disabled={editingKey !== ''}
           onClick={() => {

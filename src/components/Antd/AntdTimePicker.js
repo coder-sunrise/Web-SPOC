@@ -39,6 +39,8 @@ const STYLES = (theme) => ({
   timePickerContainer: {
     width: '100%',
     backgroundColor: 'transparent',
+    border: 0,
+    padding: 0,
       '& > input': {
       // erase all border, and box-shadow
       border: 'none',
@@ -54,6 +56,9 @@ const STYLES = (theme) => ({
     },
     '& .ant-time-picker-input': {
       fontSize: 'inherit',
+    },
+    '&.ant-picker-focused': {
+      boxShadow: 'none !important',
     },
   },
 })

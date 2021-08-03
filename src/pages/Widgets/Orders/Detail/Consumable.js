@@ -168,6 +168,9 @@ class Consumable extends PureComponent {
   changeConsumable = (v, op = {}) => {
     const { setFieldValue, values, disableEdit } = this.props
 
+    setFieldValue('isDispensedByPharmacy', op.isDispensedByPharmacy)
+    setFieldValue('isNurseActualizeRequired', op.isNurseActualizable)
+
     let defaultBatch
     if (op.consumableStock) {
       defaultBatch = op.consumableStock.find((o) => o.isDefault === true)

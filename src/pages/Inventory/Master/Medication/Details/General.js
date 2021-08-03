@@ -69,6 +69,20 @@ const generalOptions = [
     },
   },
   {
+    id: 'isDispensedByPharmacy',
+    name: 'Dispensed by Pharmacy',
+    layoutConfig: {
+      style: {},
+    },
+  },
+  {
+    id: 'isNurseActualizable',
+    name: 'Nurse Actualizable',
+    layoutConfig: {
+      style: {},
+    },
+  },
+  {
     id: 'isDisplayInLeaflet',
     name: 'Display in Leaflet',
     layoutConfig: {
@@ -396,6 +410,7 @@ const General = ({
             render={args => (
               <CodeSelect
                 multiple
+                labelField='displayValue'
                 label={formatMessage({
                   id: 'inventory.master.medication.drugAllergy',
                 })}

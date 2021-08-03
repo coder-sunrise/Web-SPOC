@@ -25,6 +25,8 @@ const sharedMedicationValue = {
   corPrescriptionItemDrugMixture: [],
   isDrugMixture: false,
   isClaimable: true,
+  isDispensedByPharmacy: false,
+  isNurseActualizeRequired: false,
 }
 const initialState = {
   rows: [],
@@ -38,6 +40,7 @@ const initialState = {
     isMinus: true,
     adjValue: 0,
     isExactAmount: true,
+    isNurseActualizeRequired: false,
   },
   defaultVaccination: {
     vaccinationGivenDate: moment(),
@@ -47,6 +50,7 @@ const initialState = {
     adjValue: 0,
     isExactAmount: true,
     corVaccinationCert: [],
+    isNurseActualizeRequired: false,
   },
   defaultConsumable: {
     quantity: 1,
@@ -54,6 +58,8 @@ const initialState = {
     isMinus: true,
     adjValue: 0,
     isExactAmount: true,
+    isDispensedByPharmacy: false,
+    isNurseActualizeRequired: false,
   },
   defaultOrderSet: {
     orderSetItems: [],

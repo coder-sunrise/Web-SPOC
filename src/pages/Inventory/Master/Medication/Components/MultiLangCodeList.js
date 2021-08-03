@@ -60,10 +60,10 @@ const MultiLangCodeList = ({
   }
 
   useEffect(() => {
-    if (data) {
+    if (data && currentCodesetList) {
       setCodeList(
-        currentCodesetList
-          ? currentCodesetList.filter(c => data.includes(c.id))
+        currentCodesetList.length > 0
+          ? data.map(item => currentCodesetList.find(c => c.id === item))
           : [],
       )
     }
@@ -79,6 +79,7 @@ const MultiLangCodeList = ({
       style={{ height: 200, overflow: 'auto' }}
       dataSource={codeList}
       renderItem={(item, i) => {
+        console.log('item', item)
         return (
           <div style={{ padding: 10, display: 'flex' }}>
             <span

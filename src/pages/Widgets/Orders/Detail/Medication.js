@@ -138,6 +138,7 @@ const getVisitDoctorUserId = props => {
     }
     if (type === '5') {
       v.drugCode = 'MISC'
+      v.isDispensedByPharmacy = true
     }
     if (v.uid) {
       if (v.adjAmount <= 0) {
@@ -595,6 +596,9 @@ class Medication extends PureComponent {
   ) => {
     const { setFieldValue, values, codetable, visitRegistration, patient } = this.props
 
+    setFieldValue('isDispensedByPharmacy', op.isDispensedByPharmacy)
+    setFieldValue('isNurseActualizeRequired', op.isNurseActualizable)
+
     let defaultBatch
     if (op.medicationStock) {
       defaultBatch = op.medicationStock.find(o => o.isDefault === true)
@@ -967,6 +971,8 @@ class Medication extends PureComponent {
     row.drugCode = option.code
     row.drugName = option.displayValue
     row.revenueCategoryFK = option.revenueCategory.id
+    row.isDispensedByPharmacy = option.isDispensedByPharmacy
+    row.isNurseActualizeRequired = option.isNurseActualizable
 
     const defaultBatch = this.getMixtureItemBatchStock(row).find(
       batch => batch.isDefault,
@@ -1080,6 +1086,20 @@ class Medication extends PureComponent {
           currentMedication,
         )
       }
+    }
+
+    if (activeDrugMixtureRows.find(r => r.isDispensedByPharmacy)) {
+      setFieldValue('isDispensedByPharmacy', true)
+    }
+    else {
+      setFieldValue('isDispensedByPharmacy', false)
+    }
+
+    if (activeDrugMixtureRows.find(r => r.isNurseActualizeRequired)) {
+      setFieldValue('isNurseActualizeRequired', true)
+    }
+    else {
+      setFieldValue('isNurseActualizeRequired', false)
     }
 
     setFieldValue('quantity', totalQuantity)

@@ -280,6 +280,7 @@ class ReferralCard extends PureComponent {
       clinicSettings,
       isVisitReadonlyAfterSigned,
       mode,
+      patient,
     } = this.props
     const {
       referralList,
@@ -296,6 +297,9 @@ class ReferralCard extends PureComponent {
       !isVisitReadonlyAfterSigned
     ) {
       disabled = false
+    }
+    if(patient.entity && !patient.entity.isActive) {
+      disabled = true
     }
 
     const cfg = {

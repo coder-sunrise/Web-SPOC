@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useDispatch } from 'dva'
 import moment from 'moment'
-import { Tag, Input, Tooltip, Select, Divider } from 'antd'
+import { Tag, Input, Tooltip, Select, Divider, Typography } from 'antd'
 import { SaveFilled, PlusOutlined } from '@ant-design/icons'
 import * as service from '../../services/tag'
 import Authorized from '@/utils/Authorized'
@@ -10,7 +10,8 @@ export interface TagPanelProps {
   tagCategory: 'Service' | 'Patient'
   onChange: (value: string[], tags: object[]) => void
   defaultTagNames: string[]
-  label: string
+  label: string,
+  disabled: Boolean,
 }
 
 type Tag = {
@@ -27,6 +28,7 @@ const TagPanel: React.FC<TagPanelProps> = ({
   onChange,
   defaultTagNames = [],
   label,
+  disabled,
 }) => {
   const [inputVisible, setInputVisible] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -120,21 +122,21 @@ const TagPanel: React.FC<TagPanelProps> = ({
 
   return (
     <div>
-      <label>{label} </label>
+      <Typography.Text disabled={disabled}>{label} </Typography.Text>
 
       {currentTagNames.map((tag, index) => {
         {
           const tagElem = (
             <Tag
               key={tag}
-              style={{ margin: '3px' }}
-              closable={true}
+              style={disabled ? { cursor: 'no-drop', margin: '3px' } : { margin: '3px' }}
+              closable={!disabled}
               onClose={() => handleRemoveTag(tag)}
             >
               <span>{tag}</span>
             </Tag>
           )
-          return (
+          return disabled ? tagElem : (
             <Tooltip title={tag} key={tag}>
               {tagElem}
             </Tooltip>
@@ -193,7 +195,7 @@ const TagPanel: React.FC<TagPanelProps> = ({
           ))}
         </Select>
       )}
-      {!inputVisible && (
+      {!disabled && !inputVisible && (
         <Tag className='site-tag-plus' onClick={showInput}>
           <PlusOutlined /> New Tag
         </Tag>

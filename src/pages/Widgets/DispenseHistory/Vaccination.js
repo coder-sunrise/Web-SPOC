@@ -38,7 +38,8 @@ export default ({ classes, current, fieldName = '' }) => {
       render: (text, row) => {
         return (
           <div style={{ position: 'relative' }}>
-            <div className={classes.wrapCellTextStyle}>
+            <div className={classes.wrapCellTextStyle}
+              style={{ paddingRight: row.isPreOrder ? 34 : 0 }}>
               {row.name}
               {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
             </div>
