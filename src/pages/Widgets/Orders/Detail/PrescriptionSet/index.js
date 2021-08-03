@@ -13,6 +13,7 @@ import {
   openCautionAlertPrompt,
   ReplaceCertificateTeplate,
 } from '@/pages/Widgets/Orders/utils'
+import Authorized from '@/utils/Authorized'
 import { getUniqueId } from '@/utils/utils'
 import FitlerBar from './FilterBar'
 import Grid from './Grid'
@@ -24,12 +25,12 @@ import { getClinicianProfile } from '../../../ConsultationDocument/utils'
     loading,
     codetable,
     user,
-    visitRegistration
+    visitRegistration,
   }) => ({
     loading,
     codetable,
     user,
-    visitRegistration
+    visitRegistration,
   }),
 )
 @withFormik({
@@ -41,15 +42,25 @@ import { getClinicianProfile } from '../../../ConsultationDocument/utils'
 class PrescriptionSetList extends PureComponent {
   constructor (props) {
     super(props)
+
+    this.generalAccessRight = { rights: 'hidden' }// Authorized.check('queue.consultation.order.medication.generalprescriptionset') || { rights: 'hidden' }
+    this.personalAccessRight = Authorized.check('queue.consultation.order.medication.personalprescriptionset') || { rights: 'hidden' }
+
+    let defaultType = 'All'
+    if (this.generalAccessRight.rights === 'hidden') {
+      defaultType = 'Personal'
+    }
+    if (this.personalAccessRight.rights === 'hidden') {
+      defaultType = 'General'
+    }
     this.state = {
       addedPrescriptionSets: [],
       searchName: '',
-      pageIndex: 0,
       loadPrescriptionSets: [],
-      totalPrescriptionSets: 0,
       activeKey: [],
       showPrescriptionSetDetailModal: false,
-      isNewPrescriptionSet: false
+      isNewPrescriptionSet: false,
+      selectType: defaultType
     }
   }
 
@@ -434,41 +445,33 @@ class PrescriptionSetList extends PureComponent {
     this.setState(
       {
         searchName,
-        pageIndex: 0,
         loadPrescriptionSets: [],
         addedPrescriptionSets: [],
-        totalPrescriptionSets: 0,
         activeKey: [],
       },
       this.searchPrescriptionSet,
     )
   }
 
-  handelLoadMore = () => {
-    this.searchPrescriptionSet()
-  }
-
   searchPrescriptionSet = () => {
     const {
       searchName,
-      pageIndex,
     } = this.state
-    const { dispatch, clinicSettings, user } = this.props
-    const { viewVisitPageSize = 10 } = clinicSettings
+    const { dispatch, user } = this.props
     dispatch({
       type: 'prescriptionSet/query',
       payload: {
         prescriptionSetName: searchName,
-        current: pageIndex + 1,
-        pageSize: viewVisitPageSize,
+        pageSize: 99999,
         group: [
           {
             ownedByUserFK: user.data.id,
-            isShared: true,
+            type: 'General',
             combineCondition: 'or',
           },
         ],
-        sorting: [{ columnName: 'prescriptionSetName', direction: 'asc' }]
+        sorting: [{ columnName: 'sortOrder', direction: 'asc' },
+        { columnName: 'prescriptionSetName', direction: 'asc' }]
       },
     }).then((r) => {
       if (r) {
@@ -479,8 +482,6 @@ class PrescriptionSetList extends PureComponent {
               ...preState.loadPrescriptionSets,
               ...(r.data || []),
             ],
-            totalPrescriptionSets: r.totalRecords,
-            pageIndex: preState.pageIndex + 1,
             activeKey: [
               ...preState.activeKey,
               ...(r.data || []).map((o) => o.id),
@@ -519,10 +520,8 @@ class PrescriptionSetList extends PureComponent {
     }).then(r => {
       this.setState(
         {
-          pageIndex: 0,
           loadPrescriptionSets: [],
           addedPrescriptionSets: [],
-          totalPrescriptionSets: 0,
           activeKey: [],
         },
         this.searchPrescriptionSet,
@@ -564,10 +563,8 @@ class PrescriptionSetList extends PureComponent {
     if (isUpdateEntity) {
       this.setState(
         {
-          pageIndex: 0,
           loadPrescriptionSets: [],
           addedPrescriptionSets: [],
-          totalPrescriptionSets: 0,
           activeKey: [],
         },
         this.searchPrescriptionSet,
@@ -576,12 +573,12 @@ class PrescriptionSetList extends PureComponent {
   }
 
   render () {
-    const { loading, footer, clinicSettings } = this.props
-    const { viewVisitPageSize = 10 } = clinicSettings
-    const { pageIndex, loadPrescriptionSets = [], totalPrescriptionSets, activeKey, addedPrescriptionSets = [], showPrescriptionSetDetailModal, isNewPrescriptionSet } = this.state
-    const moreData = totalPrescriptionSets > pageIndex * viewVisitPageSize
+    const { loading, footer } = this.props
+    const { loadPrescriptionSets = [], activeKey, addedPrescriptionSets = [], showPrescriptionSetDetailModal, isNewPrescriptionSet, selectType } = this.state
     const show = loading.effects['medicationHistory/queryMedicationHistory']
     const setectPrescriptionSet = loadPrescriptionSets.filter(ps => addedPrescriptionSets.indexOf(ps.id) >= 0)
+    const disableFilterPrescriptionSet = this.generalAccessRight.rights === 'hidden' || this.personalAccessRight.rights === 'hidden'
+
     return (
       <LoadingWrapper
         loading={show}
@@ -592,24 +589,28 @@ class PrescriptionSetList extends PureComponent {
             handelNewPrescriptionSet={() => {
               this.setState({ showPrescriptionSetDetailModal: true, isNewPrescriptionSet: true })
             }}
-            selectItemCount={setectPrescriptionSet.reduce(
-              (totalCount, item) => totalCount + item.prescriptionSetItem.length,
-              0,
-            )}
+            selectItemCount={setectPrescriptionSet.length}
             handelSearch={this.handelSearch}
+            selectType={selectType}
+            typeChange={(e) => {
+              this.setState({ selectType: e.target.value })
+            }}
+            generalAccessRight={this.generalAccessRight}
+            personalAccessRight={this.personalAccessRight}
             {...this.props}
           />
           <Grid
             onSelectMedication={this.onSelectMedication}
             onSelectItems={this.onSelectItems}
             addedPrescriptionSets={this.state.addedPrescriptionSets}
-            moreData={moreData}
-            handelLoadMore={this.handelLoadMore}
             loadPrescriptionSets={loadPrescriptionSets}
             activeKey={activeKey}
             clickCollapseHeader={this.clickCollapseHeader}
             handelDelete={this.deletePrescriptionSet}
             handelEdit={this.editPrescriptionSet}
+            selectType={selectType}
+            generalAccessRight={this.generalAccessRight}
+            personalAccessRight={this.personalAccessRight}
             {...this.props}
           />
         </div>
@@ -632,7 +633,9 @@ class PrescriptionSetList extends PureComponent {
           overrideLoading
           cancelText='Cancel'
         >
-          <Details {...this.props} />
+          <Details {...this.props}
+            generalAccessRight={this.generalAccessRight}
+            personalAccessRight={this.personalAccessRight} />
         </CommonModal>
       </LoadingWrapper>
     )

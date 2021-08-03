@@ -5,7 +5,6 @@ import _ from 'lodash'
 import { withStyles, Divider } from '@material-ui/core'
 import { Collapse } from 'antd'
 import { Edit, Delete } from '@material-ui/icons'
-import Authorized from '@/utils/Authorized'
 // common components
 import {
   GridItem,
@@ -18,6 +17,7 @@ import {
 // utils
 import { primaryColor, dangerColor, grayColor } from '@/assets/jss'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
+import DeleteWithPopover from '@/pages/Billing/components/DeleteWithPopover'
 import CustomStyle from '../AddMedicationFromPast/CustomStyle.less'
 
 const styles = () => ({
@@ -26,14 +26,14 @@ const styles = () => ({
     overflow: 'hidden',
     display: 'inline-block',
     textOverflow: 'ellipsis',
-    width: 300,
+    width: 320,
     paddingLeft: 8,
     float: 'left',
     marginTop: 6,
   },
   instructionColumn: {
     display: 'inline-block',
-    width: 440,
+    width: 420,
     paddingLeft: 8,
     float: 'left',
     marginTop: 6,
@@ -70,6 +70,9 @@ class Grid extends PureComponent {
       handelDelete,
       handelEdit,
       user,
+      selectType,
+      generalAccessRight,
+      personalAccessRight
     } = this.props
 
     const drugMixtureIndicator = (row) => {
@@ -82,7 +85,7 @@ class Grid extends PureComponent {
       )
     }
 
-    return loadPrescriptionSets.map((o) => {
+    return loadPrescriptionSets.filter(set => selectType === 'All' || set.type === selectType).map((o) => {
       const items = _.orderBy(
         (o.prescriptionSetItem || []).filter((drug) => {
           return !isRetail || !drug.isExternalPrescription
@@ -97,25 +100,29 @@ class Grid extends PureComponent {
 
       const isSelect = addedPrescriptionSets.indexOf(o.id) >= 0
       const selectEnable = items.filter(item => (item.isDrugMixture || (item.isActive && item.inventoryDispenseUOMFK === item.dispenseUOMFK))).length > 0
+
+      const editEnable = (o.type === 'General' && generalAccessRight.rights === "enable") || (o.type === 'Personal' && personalAccessRight.rights === "enable")
       return {
         header: (
           <div
             onClick={() => {
               clickCollapseHeader(o.id)
             }}
-            style={{ display: 'flex', padding: '3px 0px 8px 0px' }}
+            style={{ display: 'relative', padding: '3px 0px 8px 0px', height: 36 }}
           >
             <div style={{
-              marginLeft: 5, marginTop: 14,
-              width: 250,
+              marginLeft: 5, marginTop: 14
             }}>
+              {o.sortOrder >= 0 ? `${o.sortOrder}. ` : ''}
               <Tooltip title={o.prescriptionSetName}>
-                <span>
+                <span style={{ fontWeight: 500 }}>
                   {o.prescriptionSetName}
                 </span>
               </Tooltip>
             </div>
-            <div style={{ alignItems: 'center', marginLeft: 8, position: 'relative' }}>
+
+            <div style={{ position: 'absolute', top: 20, right: 110 }}> {`create user${selectType === 'All' ? `(${o.type})` : ''}`}</div>
+            <div style={{ position: 'absolute', top: 8, right: 75 }}>
               {!isSelect ? <span
                 className={classes.addIcon}
                 style={{ color: selectEnable ? primaryColor : grayColor }}
@@ -144,39 +151,39 @@ class Grid extends PureComponent {
                   </span>
                 </span>
               }
-              {user.data.id === o.ownedByUserFK &&
-                <Authorized authority='queue.consultation.order.prescriptionset'>
-                  <Button justIcon color='primary' style={{ position: 'absolute', top: 0, marginLeft: 6 }} onClick={(event) => {
-                    event.stopPropagation()
-                    handelEdit(o)
-                  }}> <Edit />
-                  </Button>
-                </Authorized>
-              }
-              {user.data.id === o.ownedByUserFK &&
-                <Authorized authority='queue.consultation.order.prescriptionset'>
-                  <Button justIcon color='danger' style={{ position: 'absolute', top: 0, left: 60 }} onClick={(event) => {
-                    event.stopPropagation()
-                    handelDelete(o.id)
-                  }}> <Delete />
-                  </Button>
-                </Authorized>
-              }
             </div>
-            <div
-              style={{
-                marginLeft: 'auto',
-                alignItems: 'center',
-                marginRight: 3,
-              }}
-            >
-              <span className='material-icons'>
-                {activeKey.find((key) => key === o.id) ? (
-                  'expand_more'
-                ) : (
-                  'navigate_next'
-                )}
-              </span>
+            <Button style={{ position: 'absolute', top: 8, right: 35 }}
+              disabled={!editEnable}
+              justIcon
+              color='primary'
+              onClick={(event) => {
+                event.stopPropagation()
+                handelEdit(o)
+              }}> <Edit />
+            </Button>
+
+            {false && <Button style={{ position: 'absolute', top: 8, right: 0 }}
+              disabled={!editEnable}
+              justIcon
+              color='danger'
+              onClick={(event) => {
+                event.stopPropagation()
+                handelDelete(o.id)
+              }}> <Delete />
+
+            </Button>
+            }
+            <div style={{ position: 'absolute', top: 8, right: 0 }}>
+              <DeleteWithPopover
+                index={o.id}
+                title='Delete Prescription Set'
+                contentText='Confirm to remove this prescription set?'
+                isFromCollapseHeader
+                onConfirmDelete={() => {
+                  handelDelete(o.id)
+                }}
+                disabled={!editEnable}
+              />
             </div>
           </div>
         ),
@@ -196,7 +203,6 @@ class Grid extends PureComponent {
               return (
                 <div
                   style={{
-                    background: isSelect ? 'lightGray' : 'white',
                     width: '100%',
                     fontSize: 14,
                   }}
@@ -246,8 +252,6 @@ class Grid extends PureComponent {
     const {
       type,
       height,
-      handelLoadMore,
-      moreData,
       isRetail,
       activeKey,
     } = this.props
@@ -286,23 +290,6 @@ class Grid extends PureComponent {
                 )
               })}
             </Collapse>
-            {moreData && (
-              <div
-                style={{
-                  display: 'inline-Block',
-                  float: 'right',
-                  marginRight: 10,
-                  marginTop: 8,
-                }}
-              >
-                <a
-                  style={{ textDecoration: 'underline', fontStyle: 'italic' }}
-                  onClick={handelLoadMore}
-                >
-                  Load More
-                </a>
-              </div>
-            )}
           </div>
           <div
             style={{
@@ -310,43 +297,25 @@ class Grid extends PureComponent {
               paddingTop: 10,
             }}
           >
-            <div
-              style={{
-                display: 'inline-Block',
-              }}
-            >
-              {type === '1' && (
+            <span>
+              Note:&nbsp;
+              <span style={{ color: 'red', fontStyle: 'italic' }}>
+                <sup>#1&nbsp;</sup>
+              </span>
+              inactive medication &nbsp;&nbsp;
+              <span style={{ color: 'red', fontStyle: 'italic' }}>
+                <sup>#2&nbsp;</sup>
+              </span>
+              dispensing UOM is changed&nbsp;&nbsp;
+              {!isRetail && (
                 <span>
-                  Note:&nbsp;
                   <span style={{ color: 'red', fontStyle: 'italic' }}>
-                    <sup>#1&nbsp;</sup>
+                    <sup>#3&nbsp;</sup>
                   </span>
-                  inactive medication &nbsp;&nbsp;
-                  <span style={{ color: 'red', fontStyle: 'italic' }}>
-                    <sup>#2&nbsp;</sup>
-                  </span>
-                  dispensing UOM is changed&nbsp;&nbsp;
-                  {!isRetail && (
-                    <span>
-                      <span style={{ color: 'red', fontStyle: 'italic' }}>
-                        <sup>#3&nbsp;</sup>
-                      </span>
-                      external prescription
-                    </span>
-                  )}
+                  external prescription
                 </span>
               )}
-              {type === '2' && (
-                <span>
-                  Note:&nbsp;<span
-                    style={{ color: 'red', fontStyle: 'italic' }}
-                  >
-                    <sup>#1&nbsp;</sup>
-                  </span>
-                  inactive vaccination
-                </span>
-              )}
-            </div>
+            </span>
           </div>
         </div>
       )

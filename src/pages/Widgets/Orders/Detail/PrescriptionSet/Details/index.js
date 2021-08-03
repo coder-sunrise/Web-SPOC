@@ -13,14 +13,16 @@ import {
   DateRangePicker,
   NumberInput,
   CodeSelect,
-  Checkbox
+  RadioGroup
 } from '@/components'
 import PrescriptionItem from './PrescriptionItem'
 import Grid from './Grid'
 
 const Detail = (props) => {
-  const { theme, footer, handleSubmit, values, setFieldValue, codetable } = props
-
+  const { theme, footer, handleSubmit, values, setFieldValue, codetable, generalAccessRight, personalAccessRight, prescriptionSet } = props
+  const typeEnable = generalAccessRight.rights === 'enable' && personalAccessRight.rights === 'enable'
+  const containsMedication = (prescriptionSet.prescriptionSetItems || []).filter(ps => !ps.isDeleted).length > 0
+  const containsInactiveMedication = (prescriptionSet.prescriptionSetItems || []).filter(ps => !ps.isDeleted && !ps.isActive).length > 0
   return (
     <React.Fragment>
       <GridContainer>
@@ -33,21 +35,46 @@ const Detail = (props) => {
                   label='Prescription Set Name'
                   {...args}
                   autocomplete='off'
-                  maxLength={200}
+                  maxLength={100}
                   autoFocus
                 />
               )
             }}
           />
         </GridItem>
-
-        <GridItem xs={6} style={{ marginTop: theme.spacing(2) }}>
+        <GridItem md={2}>
           <FastField
-            name='isShared'
+            name='sortOrder'
+            render={(args) => {
+              return (
+                <NumberInput
+                  label='Sort Order'
+                  precision={0}
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+
+        <GridItem xs={4} style={{ marginTop: theme.spacing(2) }}>
+          <FastField
+            name='type'
             render={args => {
               return (
-                <Checkbox
-                  label='Shared'
+                <RadioGroup
+                  disabled={!typeEnable}
+                  label=''
+                  options={[
+                    {
+                      value: 'General',
+                      label: 'General',
+                    },
+                    {
+                      value: 'Personal',
+                      label: 'Personal',
+                    },
+                  ]}
                   {...args}
                 />
               )
@@ -68,13 +95,33 @@ const Detail = (props) => {
         </div>
 
         <Grid {...props} />
+
+        {!containsMedication &&
+          <GridItem xs={12} style={{ marginTop: theme.spacing(1), color: 'red' }}>
+            At least one medication is required
+          </GridItem>
+        }
+        <GridItem xs={12} style={{ marginTop: theme.spacing(1) }}>
+          <span>
+            Note:&nbsp;
+            <span style={{ color: 'red', fontStyle: 'italic' }}>
+              <sup>#1&nbsp;</sup>
+            </span>
+            inactive medication &nbsp;&nbsp;
+            <span style={{ color: 'red', fontStyle: 'italic' }}>
+              <sup>#2&nbsp;</sup>
+            </span>
+            dispensing UOM is changed&nbsp;&nbsp;
+          </span>
+          {containsInactiveMedication && <span style={{ color: 'red', marginLeft: 20 }}>Remove inactive medication to save prescription set</span>}
+        </GridItem>
       </GridContainer>
       {footer &&
         footer({
           onConfirm: handleSubmit,
           confirmBtnText: 'Save',
           confirmProps: {
-            disabled: (values.prescriptionSetItem || []).filter(ps => !ps.isDeleted).length <= 0,
+            disabled: !containsMedication || containsInactiveMedication,
           },
         })}
     </React.Fragment>
@@ -87,23 +134,29 @@ export default compose(
   })),
   withFormikExtend({
     enableReinitialize: true,
-    mapPropsToValues: ({ prescriptionSet, user }) => {
+    mapPropsToValues: ({ prescriptionSet, user, generalAccessRight }) => {
+      let defaultType = 'General'
+      if (generalAccessRight.rights !== 'enable') {
+        defaultType = 'Personal'
+      }
       return {
-        ...(prescriptionSet.entity || prescriptionSet.default),
-        prescriptionSetItem: prescriptionSet.prescriptionSetItems,
-        ownedByUserFK: user.data.id
+        ...(prescriptionSet.entity || {
+          ...prescriptionSet.default, type: defaultType,
+          ownedByUserFK: user.data.id
+        }),
       }
     },
     validationSchema: Yup.object().shape({
       prescriptionSetName: Yup.string().required(),
     }),
     handleSubmit: (values, { props, resetForm }) => {
-      const { dispatch, onConfirm } = props
+      const { dispatch, onConfirm, prescriptionSet } = props
 
       dispatch({
         type: 'prescriptionSet/upsert',
         payload: {
           ...values,
+          prescriptionSetItem: prescriptionSet.prescriptionSetItems || []
         },
       }).then((r) => {
         if (r) {

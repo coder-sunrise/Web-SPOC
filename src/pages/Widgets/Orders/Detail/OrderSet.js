@@ -24,6 +24,7 @@ import {
   ReplaceCertificateTeplate,
 } from '@/pages/Widgets/Orders/utils'
 import Authorized from '@/utils/Authorized'
+import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 import { getClinicianProfile } from '../../ConsultationDocument/utils'
 
 @connect(
@@ -89,39 +90,39 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
     }
     let showNoTemplate
 
-    const { doctorProfileFK } = visitRegistration.entity.visit
+    const { doctorProfileFK, weight } = visitRegistration.entity.visit
     const visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK)
       .clinicianProfile.userProfileFK
 
-    const getInstruction = inventoryMedication => {
+    const getInstruction = (inventoryMedication, matchInstruction) => {
       let instruction = ''
       const usageMethod = ctmedicationusage.find(
         codeTableItem =>
           codeTableItem.id === inventoryMedication.medicationUsageFK,
       )
       instruction += `${usageMethod ? usageMethod.name : ''} `
-      const dosage = ctmedicationdosage.find(
-        codeTableItem =>
-          codeTableItem.id === inventoryMedication.prescribingDosageFK,
-      )
-      instruction += `${dosage ? dosage.displayValue : ''} `
+      const dosage = matchInstruction?.prescribingDosage
+      instruction += `${dosage ? dosage.name : ''} `
       const prescribe = ctmedicationunitofmeasurement.find(
         codeTableItem =>
           codeTableItem.id === inventoryMedication.prescribingUOMFK,
       )
       instruction += `${prescribe ? prescribe.name : ''} `
-      const drugFrequency = ctmedicationfrequency.find(
-        codeTableItem =>
-          codeTableItem.id === inventoryMedication.medicationFrequencyFK,
-      )
-      instruction += `${drugFrequency ? drugFrequency.displayValue : ''} For `
-      instruction += `${inventoryMedication.duration ? inventoryMedication.duration : ''
+      const drugFrequency = matchInstruction.medicationFrequency
+      instruction += `${drugFrequency ? mdrugFrequency.name : ''} For `
+      instruction += `${matchInstruction.duration ? matchInstruction.duration : ''
         } day(s)`
       return instruction
     }
 
     const getOrderMedicationFromOrderSet = (orderSetCode, orderSetItem) => {
       const { inventoryMedication } = orderSetItem
+      const { medicationInstructionRule = [] } = inventoryMedication
+      let age
+      if (dob) {
+        age = Math.floor(moment.duration(moment().diff(dob)).asYears())
+      }
+      var matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weight))
 
       let item
       if (inventoryMedication.isActive === true) {
@@ -131,13 +132,8 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
         const medicationusage = ctmedicationusage.find(
           usage => usage.id === inventoryMedication.medicationUsageFK,
         )
-        const medicationfrequency = ctmedicationfrequency.find(
-          frequency =>
-            frequency.id === inventoryMedication.medicationFrequencyFK,
-        )
-        const medicationdosage = ctmedicationdosage.find(
-          dosage => dosage.id === inventoryMedication.prescribingDosageFK,
-        )
+        const medicationfrequency = matchInstruction?.medicationFrequency
+        const medicationdosage = matchInstruction?.medicationFrequency
         const medicationprescribingUOM = ctmedicationunitofmeasurement.find(
           uom => uom.id === inventoryMedication.prescribingUOMFK,
         )
@@ -181,7 +177,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
             : undefined,
           batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
           isExternalPrescription: false,
-          instruction: getInstruction(inventoryMedication),
+          instruction: getInstruction(inventoryMedication, matchInstruction),
           dispenseUOMFK: inventoryMedication.dispensingUOMFK,
           dispenseUOMCode: medicationdispensingUOM
             ? medicationdispensingUOM.code
@@ -200,10 +196,10 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
               usageMethodDisplayValue: medicationusage
                 ? medicationusage.name
                 : undefined,
-              dosageFK: inventoryMedication.prescribingDosageFK,
+              dosageFK: medicationdosage ? medicationdosage.id : undefined,
               dosageCode: medicationdosage ? medicationdosage.code : undefined,
               dosageDisplayValue: medicationdosage
-                ? medicationdosage.displayValue
+                ? medicationdosage.name
                 : undefined,
               prescribeUOMFK: inventoryMedication.prescribingUOMFK,
               prescribeUOMCode: medicationprescribingUOM
@@ -212,14 +208,14 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
               prescribeUOMDisplayValue: medicationprescribingUOM
                 ? medicationprescribingUOM.name
                 : undefined,
-              drugFrequencyFK: inventoryMedication.medicationFrequencyFK,
+              drugFrequencyFK: medicationfrequency ? medicationfrequency.id : undefined,
               drugFrequencyCode: medicationfrequency
                 ? medicationfrequency.code
                 : undefined,
               drugFrequencyDisplayValue: medicationfrequency
-                ? medicationfrequency.displayValue
+                ? medicationfrequency.name
                 : undefined,
-              duration: inventoryMedication.duration,
+              duration: matchInstruction?.duration,
               stepdose: 'AND',
               sequence: 0,
             },

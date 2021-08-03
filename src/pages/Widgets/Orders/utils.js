@@ -2,6 +2,7 @@ import { Divider } from '@material-ui/core'
 import Authorized from '@/utils/Authorized'
 import { htmlDecodeByRegExp } from '@/utils/utils'
 import { tagList } from '@/utils/codes'
+import { DOSAGE_RULE, DOSAGE_RULE_OPERATOR } from '@/utils/constants'
 
 const getCautionAlertContent = (cuationItems) => () => {
   return (
@@ -182,6 +183,33 @@ const ReplaceCertificateTeplate = (templateContent, newVaccination) => {
   })
   return msg
 }
+
+const isMatchInstructionRule = (rule, age, weight) => {
+  let isMatch = false;
+  if (rule.ruleType == DOSAGE_RULE.default) {
+    isMatch = true;
+  }
+  else if (rule.ruleType == DOSAGE_RULE.age) {
+    if (age >= 0) {
+      if ((rule.operator == DOSAGE_RULE_OPERATOR.to && age >= rule.leftOperand && age <= rule.rightOperand)
+        || (rule.operator == DOSAGE_RULE_OPERATOR.lessThan && age < rule.rightOperand)
+        || (rule.operator == DOSAGE_RULE_OPERATOR.moreThan && age > rule.rightOperand)) {
+        isMatch = true;
+      }
+    }
+  }
+  else if (rule.ruleType == DOSAGE_RULE.weight) {
+    if (weight >= 0) {
+      if ((rule.operator == DOSAGE_RULE_OPERATOR.to && weight >= rule.leftOperand && weight <= rule.rightOperand)
+        || (rule.operator == DOSAGE_RULE_OPERATOR.lessThan && weight < rule.rightOperand)
+        || (rule.operator == DOSAGE_RULE_OPERATOR.moreThan && weight > rule.rightOperand)) {
+        isMatch = true;
+      }
+    }
+  }
+  return isMatch;
+}
+
 export {
   getCautionAlertContent,
   openCautionAlertPrompt,
@@ -189,4 +217,5 @@ export {
   getRetailCautionAlertContent,
   GetOrderItemAccessRight,
   ReplaceCertificateTeplate,
+  isMatchInstructionRule,
 }

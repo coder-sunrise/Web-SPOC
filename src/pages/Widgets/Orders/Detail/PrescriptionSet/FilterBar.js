@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core'
 import { Field } from 'formik'
 import { Link } from 'umi'
 import Search from '@material-ui/icons/Search'
+import Add from '@material-ui/icons/Add'
 import Authorized from '@/utils/Authorized'
 // custom component
 import {
@@ -11,6 +12,7 @@ import {
   TextField,
   Checkbox,
   ProgressButton,
+  RadioGroup
 } from '@/components'
 import { primaryColor } from '@/assets/jss'
 import { FilterBarDate } from '@/components/_medisys'
@@ -30,51 +32,73 @@ const styles = () => ({
 })
 
 const FilterBar = (props) => {
-  const { handelSearch, type, selectItemCount, handelNewPrescriptionSet } = props
-  const prescriptionSetAccessRight = Authorized.check('queue.consultation.order.prescriptionset') || {}
+  const { handelSearch, type, selectItemCount, handelNewPrescriptionSet, selectType, typeChange,
+    generalAccessRight, personalAccessRight, theme
+  } = props
+
+  const disableFilterPrescriptionSet = generalAccessRight.rights === 'hidden' || personalAccessRight.rights === 'hidden'
+  const addPrescriptionSetEnable = generalAccessRight.rights === 'enable' || personalAccessRight.rights === 'enable'
+
   return (
     <Fragment>
       <GridContainer>
-        <GridItem md={6} style={{ paddingRight: 140 }}>
-          <div style={{ position: 'relative' }}>
+        <GridItem md={4} >
             <Field
               name='searchName'
               render={(args) => (
                 <TextField
                   {...args}
                   label='Prescription Set Name'
+                  maxLength={100}
                 />
               )}
             />
+        </GridItem>
+        <GridItem md={8} style={{ marginTop: theme.spacing(2) }}>
+          <div style={{ position: 'relative' }}>
             <ProgressButton
-              style={{ position: 'absolute', right: -140, top: 10 }}
               color='primary'
+              size='sm'
               icon={<Search />}
               onClick={handelSearch}
             >
               Search
             </ProgressButton>
-          </div>
-        </GridItem>
-
-        <GridItem
-          md={6}
-          justify='flex-end'
-          alignItems='center'
-          container
-          style={{ paddingRight: 150 }}
-        >
-          <div style={{ position: 'relative' }}>
-            {prescriptionSetAccessRight.rights === 'enable' &&
-              <Link onClick={(e) => {
-                e.preventDefault()
-                handelNewPrescriptionSet()
-              }}><span style={{ textDecoration: 'underline' }}>Add New Prescription Set</span></Link>
-            }
-            <div style={{ position: 'absolute', right: -150, top: 0 }}>
+            <ProgressButton
+              disabled={!addPrescriptionSetEnable}
+              color='primary'
+              size='sm'
+              icon={<Add />}
+              onClick={handelNewPrescriptionSet}
+            >
+              Add New
+            </ProgressButton>
+            <div
+              style={{ display: 'inline-block', marginLeft: 10 }}>
+              <RadioGroup
+                disabled={disableFilterPrescriptionSet}
+                value={selectType}
+                label=''
+                onChange={typeChange}
+                options={[
+                  {
+                    value: 'All',
+                    label: 'All',
+                  },
+                  {
+                    value: 'General',
+                    label: 'General',
+                  },
+                  {
+                    value: 'Personal',
+                    label: 'Personal',
+                  },
+                ]}
+              />
+            </div>
+            <div style={{ position: 'absolute', right: 0, top: 10 }}>
               <span >
-                <span style={{ color: 'red' }}>{selectItemCount || 0}</span>{' '}
-                {selectItemCount > 1 ? 'item(s)' : 'item'} selected
+                <span style={{ color: 'red' }}>{selectItemCount || 0}</span> set selected
               </span>
             </div>
           </div>

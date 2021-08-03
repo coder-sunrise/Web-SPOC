@@ -33,7 +33,6 @@ export default ({
   codetable,
   theme,
   isFullScreen = false,
-  newPrescriptionSet
 }) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
   const { total, gst, totalWithGST, subTotal } = summary
@@ -402,17 +401,6 @@ export default ({
     return row.subject
   }
 
-  const newPrescriptionSetButton = () => {
-    const prescriptionSetAccessRight = Authorized.check('queue.consultation.order.prescriptionset') || {}
-    if (prescriptionSetAccessRight.rights === 'enable')
-      return <div style={{ position: 'absolute', top: 8, left: 12 }}>
-        <Link onClick={(e) => {
-          e.preventDefault()
-          newPrescriptionSet()
-        }}><span style={{ textDecoration: 'underline' }}>Save as Prescription Set</span></Link>
-      </div>
-  }
-
   return (
     <CommonTableGrid
       size='sm'
@@ -504,9 +492,7 @@ export default ({
               let newChildren = []
               if (isExistPackage) {
                 newChildren = [
-                  <Table.Cell colSpan={3} key={1} style={{ position: 'relative' }}>
-                    {newPrescriptionSetButton()}
-                  </Table.Cell>,
+                  <Table.Cell colSpan={3} key={1} style={{ position: 'relative' }} />,
                   React.cloneElement(children[6], {
                     colSpan: 3,
                     ...restProps,
@@ -514,9 +500,7 @@ export default ({
                 ]
               } else {
                 newChildren = [
-                  <Table.Cell colSpan={2} key={1} style={{ position: 'relative' }}>
-                    {newPrescriptionSetButton()}
-                  </Table.Cell>,
+                  <Table.Cell colSpan={2} key={1} style={{ position: 'relative' }} />,
                   React.cloneElement(children[5], {
                     colSpan: 2,
                     ...restProps,

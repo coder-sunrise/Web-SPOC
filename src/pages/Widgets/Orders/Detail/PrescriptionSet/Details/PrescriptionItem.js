@@ -26,8 +26,10 @@ import {
   Select,
   notification
 } from '@/components'
-import LowStockInfo from '../../LowStockInfo'
 import { currencySymbol } from '@/utils/config'
+import CannedTextButton from '@/pages/Widgets/Orders/Detail/CannedTextButton'
+import { CANNED_TEXT_TYPE } from '@/utils/constants'
+import LowStockInfo from '../../LowStockInfo'
 
 const getCautions = (
   inventorymedication = [],
@@ -363,13 +365,6 @@ class Detail extends PureComponent {
         usageMethodDisplayValue: op.medicationUsage
           ? op.medicationUsage.name
           : undefined,
-        dosageFK: op.prescribingDosage ? op.prescribingDosage.id : undefined,
-        dosageCode: op.prescribingDosage
-          ? op.prescribingDosage.code
-          : undefined,
-        dosageDisplayValue: op.prescribingDosage
-          ? op.prescribingDosage.name
-          : undefined,
         prescribeUOMFK: op.prescribingUOM ? op.prescribingUOM.id : undefined,
         prescribeUOMCode: op.prescribingUOM
           ? op.prescribingUOM.code
@@ -377,16 +372,6 @@ class Detail extends PureComponent {
         prescribeUOMDisplayValue: op.prescribingUOM
           ? op.prescribingUOM.name
           : undefined,
-        drugFrequencyFK: op.medicationFrequency
-          ? op.medicationFrequency.id
-          : undefined,
-        drugFrequencyCode: op.medicationFrequency
-          ? op.medicationFrequency.code
-          : undefined,
-        drugFrequencyDisplayValue: op.medicationFrequency
-          ? op.medicationFrequency.name
-          : undefined,
-        duration: op.duration,
       }
     }
 
@@ -417,11 +402,11 @@ class Detail extends PureComponent {
         )
         setFieldValue(
           `prescriptionSetItemPrecaution[${i}].precaution`,
-          im.medicationPrecaution.name,
+          im.medicationPrecaution?.name,
         )
         setFieldValue(
           `prescriptionSetItemPrecaution[${i}].precautionCode`,
-          im.medicationPrecaution.code,
+          im.medicationPrecaution?.code,
         )
         setFieldValue(`prescriptionSetItemPrecaution[${i}].sequence`, i)
       })
@@ -444,6 +429,8 @@ class Detail extends PureComponent {
     }
 
     setFieldValue('dispenseUOMFK', op.dispensingUOM ? op.dispensingUOM.id : [])
+    setFieldValue('inventoryDispenseUOMFK', op.dispensingUOM ? op.dispensingUOM.id : [])
+
     setFieldValue(
       'dispenseUOMDisplayValue',
       op.dispensingUOM ? op.dispensingUOM.name : [],
@@ -476,7 +463,6 @@ class Detail extends PureComponent {
     const {
       codetable: { inventorymedication = [] },
     } = this.props
-
     return inventorymedication.reduce((p, c) => {
       const { code, displayValue, sellingPrice = 0, dispensingUOM = {} } = c
       const { name: uomName = '' } = dispensingUOM
@@ -665,46 +651,39 @@ class Detail extends PureComponent {
     const { form } = this.descriptionArrayHelpers
     let newTotalQuantity = 0
 
-    if (
-      medication &&
-      currentMedication &&
-      currentMedication.dispensingQuantity
-    ) {
-      newTotalQuantity = currentMedication.dispensingQuantity
-    } else {
-      const prescriptionItem = form.values.prescriptionSetItemInstruction.filter(
-        item => !item.isDeleted,
-      )
-      const dosageUsageList = codetable.ctmedicationdosage
-      const medicationFrequencyList = codetable.ctmedicationfrequency
-      for (let i = 0; i < prescriptionItem.length; i++) {
-        if (
-          prescriptionItem[i].dosageFK &&
-          prescriptionItem[i].drugFrequencyFK &&
-          prescriptionItem[i].duration
-        ) {
-          const dosage = dosageUsageList.find(
-            o => o.id === prescriptionItem[i].dosageFK,
-          )
 
-          const frequency = medicationFrequencyList.find(
-            o => o.id === prescriptionItem[i].drugFrequencyFK,
-          )
-
-          newTotalQuantity +=
-            dosage.multiplier *
-            frequency.multiplier *
-            prescriptionItem[i].duration
-        }
-      }
-
-      newTotalQuantity = Math.ceil(newTotalQuantity * 10) / 10 || 0
-      const { prescriptionToDispenseConversion } = currentMedication
-      if (prescriptionToDispenseConversion)
-        newTotalQuantity = Math.ceil(
-          newTotalQuantity / prescriptionToDispenseConversion,
+    const prescriptionItem = form.values.prescriptionSetItemInstruction.filter(
+      item => !item.isDeleted,
+    )
+    const dosageUsageList = codetable.ctmedicationdosage
+    const medicationFrequencyList = codetable.ctmedicationfrequency
+    for (let i = 0; i < prescriptionItem.length; i++) {
+      if (
+        prescriptionItem[i].dosageFK &&
+        prescriptionItem[i].drugFrequencyFK &&
+        prescriptionItem[i].duration
+      ) {
+        const dosage = dosageUsageList.find(
+          o => o.id === prescriptionItem[i].dosageFK,
         )
+
+        const frequency = medicationFrequencyList.find(
+          o => o.id === prescriptionItem[i].drugFrequencyFK,
+        )
+
+        newTotalQuantity +=
+          dosage.multiplier *
+          frequency.multiplier *
+          prescriptionItem[i].duration
+      }
     }
+
+    newTotalQuantity = Math.ceil(newTotalQuantity * 10) / 10 || 0
+    const { prescriptionToDispenseConversion } = currentMedication
+    if (prescriptionToDispenseConversion)
+      newTotalQuantity = Math.ceil(
+        newTotalQuantity / prescriptionToDispenseConversion,
+      )
     setFieldValue(`quantity`, newTotalQuantity)
   }
 
@@ -754,7 +733,7 @@ class Detail extends PureComponent {
       )
     }
 
-    row.quantity = option.dispensingQuantity || 0
+    row.quantity = 0
     row.uomfk = option.dispensingUOM.id
     row.uomCode = option.dispensingUOM.code
     row.uomDisplayValue = option.dispensingUOM.name
@@ -963,7 +942,7 @@ class Detail extends PureComponent {
       from,
     } = this.props
 
-    const { isDrugMixture, prescriptionSetItemDrugMixture = [], isEditMedication, cautions = [], drugName } = values
+    const { isDrugMixture, prescriptionSetItemDrugMixture = [], isEditMedication, cautions = [], drugName, remarks } = values
 
     const commonSelectProps = {
       handleFilter: this.filterOptions,
@@ -997,7 +976,7 @@ class Detail extends PureComponent {
                         {...args}
                         style={{ paddingRight: 20 }}
                       />
-                      <LowStockInfo sourceType='medication' {...this.props} />
+                      <LowStockInfo sourceType='prescriptionSet' {...this.props} />
                     </div>
                   )
                 }}
@@ -1177,7 +1156,6 @@ class Detail extends PureComponent {
                       style={{
                         whiteSpace: 'nowrap',
                         textOverflow: 'ellipsis',
-                        //display: 'inline-block',
                         width: '100%',
                         overflow: 'hidden',
                         paddingTop: 3,
@@ -1208,7 +1186,7 @@ class Detail extends PureComponent {
                         <div key={i}>
                           <GridContainer>
                             {activeIndex > 0 && (
-                              <GridItem xs={2}>
+                              <GridItem xs={3}>
                                 <FastField
                                   name={`prescriptionSetItemInstruction[${i}].stepdose`}
                                   render={args => {
@@ -1231,8 +1209,8 @@ class Detail extends PureComponent {
                                 />
                               </GridItem>
                             )}
-                            {activeIndex > 0 && <GridItem xs={10} />}
-                            <GridItem xs={2}>
+                            {activeIndex > 0 && <GridItem xs={9} />}
+                            <GridItem xs={3}>
                               <Field
                                 name={`prescriptionSetItemInstruction[${i}].usageMethodFK`}
                                 render={args => {
@@ -1334,7 +1312,7 @@ class Detail extends PureComponent {
                                 }}
                               />
                             </GridItem>
-                            <GridItem xs={3}>
+                            <GridItem xs={2}>
                               <FastField
                                 name={`prescriptionSetItemInstruction[${i}].drugFrequencyFK`}
                                 render={args => {
@@ -1529,13 +1507,26 @@ class Detail extends PureComponent {
             </GridItem>
           </GridContainer>
 
-          <GridItem xs={7} className={classes.editor}>
-            <FastField
-              name='remarks'
-              render={args => {
-                return <TextField rowsMax='5' label='Remarks' {...args} />
-              }}
-            />
+          <GridItem xs={7} className={classes.editor} style={{ paddingRight: 35 }}>
+            <div style={{ position: 'relative' }}>
+              <FastField
+                name='remarks'
+                render={args => {
+                  return <TextField rowsMax='5' label='Remarks' {...args} />
+                }}
+              />
+              <CannedTextButton
+                cannedTextTypeFK={CANNED_TEXT_TYPE.MEDICATIONREMARKS}
+                style={{
+                  position: 'absolute', bottom: 0,
+                  right: -35,
+                }}
+                handleSelectCannedText={(cannedText) => {
+                  const newRemaks = `${remarks ? (remarks + ' ') : ''}${cannedText.text || ''}`.substring(0, 2000)
+                  setFieldValue('remarks', newRemaks)
+                }}
+              />
+            </div>
           </GridItem>
 
           <GridItem xs={2} className={classes.editor}>
@@ -1553,7 +1544,7 @@ class Detail extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={3} className={classes.editor}>
+          <GridItem xs={2} className={classes.editor}>
             <Field
               name='dispenseUOMFK'
               render={args => {

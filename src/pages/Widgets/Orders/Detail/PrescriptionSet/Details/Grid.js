@@ -13,7 +13,7 @@ const wrapCellTextStyle = {
   whiteSpace: 'pre-wrap',
 }
 
-const Grid = ({ values: { prescriptionSetItem = [] }, prescriptionSet, dispatch }) => {
+const Grid = ({ prescriptionSet, dispatch }) => {
 
   const editRow = (row) => {
     if (!row.isActive && !row.isDrugMixture) return
@@ -42,12 +42,11 @@ const Grid = ({ values: { prescriptionSetItem = [] }, prescriptionSet, dispatch 
       </div>
     )
   }
-
   return <CommonTableGrid
     size='sm'
     style={{ margin: 0 }}
     forceRender
-    rows={prescriptionSetItem}
+    rows={(prescriptionSet.prescriptionSetItems || []).filter(item => !item.isDeleted)}
     onRowDoubleClick={editRow}
     getRowId={(r) => r.uid}
     FuncProps={{
@@ -57,13 +56,14 @@ const Grid = ({ values: { prescriptionSetItem = [] }, prescriptionSet, dispatch 
       { name: 'type', title: 'Type' },
       { name: 'drugName', title: 'Name' },
       { name: 'instruction', title: 'Instructions' },
+      { name: 'precaution', title: 'Precautions' },
       { name: 'quantity', title: 'Qty.' },
       { name: 'actions', title: 'Actions' },
     ]}
     columnExtensions={[
       {
         columnName: 'type',
-        width: 160,
+        width: 150,
         render: (row) => {
           let texts = []
           if (row.isDrugMixture === true) texts = 'Drug Mixture'
@@ -71,13 +71,26 @@ const Grid = ({ values: { prescriptionSetItem = [] }, prescriptionSet, dispatch 
             texts = [
               'Medication',
               row.isExternalPrescription === true ? '(Ext.)' : '',
-              row.isActive ? '' : '(Inactive)',
             ].join(' ')
           }
 
+          let warningLabel
+          if (!row.isActive && !row.isDrugMixture) {
+            warningLabel = '#1'
+          } else if (!row.isDrugMixture && row.inventoryDispenseUOMFK !== row.dispenseUOMFK) {
+            warningLabel = '#2'
+          }
           return (
             <div style={wrapCellTextStyle}>
-              <Tooltip title={texts}><span>{texts}</span></Tooltip>
+              <Tooltip title={texts}>
+                <span>
+                  {warningLabel && (
+                    <span style={{ color: 'red', fontStyle: 'italic' }}>
+                      <sup>{warningLabel}&nbsp;</sup>
+                    </span>
+                  )}<span>{texts}</span>
+                </span>
+              </Tooltip>
               {drugMixtureIndicator(row)}
             </div>
           )
@@ -85,7 +98,7 @@ const Grid = ({ values: { prescriptionSetItem = [] }, prescriptionSet, dispatch 
       },
       {
         columnName: 'instruction',
-        width: 240,
+        width: 180,
         render: (row) => {
           return (
             <Tooltip title={row.instruction}>
@@ -102,9 +115,24 @@ const Grid = ({ values: { prescriptionSetItem = [] }, prescriptionSet, dispatch 
         },
       },
       {
+        columnName: 'precaution',
+        width: 200,
+        render: (row) => {
+          const { prescriptionSetItemPrecaution = [] } = row
+          return <div style={{ position: 'relative' }}>
+            {prescriptionSetItemPrecaution.map(precaution => {
+              return <div style={{
+                wordWrap: 'break-word',
+                whiteSpace: 'pre-wrap',
+              }}>{precaution.precaution}</div>
+            })}
+          </div>
+        }
+      },
+      {
         columnName: 'quantity',
         type: 'number',
-        width: 140,
+        width: 120,
         render: (row) => {
           const qty = `${numeral(row.quantity || 0).format(
             '0,0.0',

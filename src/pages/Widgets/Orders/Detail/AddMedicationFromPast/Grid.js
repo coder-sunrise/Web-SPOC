@@ -22,14 +22,14 @@ const styles = () => ({
     overflow: 'hidden',
     display: 'inline-block',
     textOverflow: 'ellipsis',
-    width: 300,
+    width: 330,
     paddingLeft: 8,
     float: 'left',
     marginTop: 6,
   },
   instructionColumn: {
     display: 'inline-block',
-    width: 340,
+    width: 400,
     paddingLeft: 8,
     float: 'left',
     marginTop: 6,
@@ -39,14 +39,8 @@ const styles = () => ({
     overflow: 'hidden',
     display: 'inline-block',
     textOverflow: 'ellipsis',
-    width: 120,
+    width: 150,
     paddingLeft: 8,
-    float: 'left',
-    marginTop: 6,
-  },
-  totalPriceColumn: {
-    width: 120,
-    paddingRight: 8,
     float: 'left',
     marginTop: 6,
   },
@@ -119,9 +113,9 @@ class Grid extends PureComponent {
             onClick={() => {
               clickCollapseHeader(o.id)
             }}
-            style={{ display: 'flex', paddingTop: 6 }}
+            style={{ display: 'flex', padding: '3px 0px 8px 0px', height: 36 }}
           >
-            <div style={{ marginLeft: 5, alignItems: 'center' }}>
+            <div style={{ marginLeft: 5, alignItems: 'center', marginTop: 14 }}>
               <span>
                 Visit Date:&nbsp;{moment(o.visitDate).format('DD MMM YYYY')}
               </span>
@@ -148,7 +142,7 @@ class Grid extends PureComponent {
                 </span>
                 <span
                   style={{
-                    marginLeft: 30,
+                    marginLeft: 30, marginTop: 14
                   }}
                 >
                   Add All
@@ -233,11 +227,6 @@ class Grid extends PureComponent {
                             item.uomDisplayValue}`}
                         </span>
                       </Tooltip>
-                    </div>
-                    <div className={classes.totalPriceColumn}>
-                      <span style={{ float: 'right' }}>
-                        <NumberInput text currency value={item.totalPrice} />
-                      </span>
                     </div>
                     <div className={classes.actionColumn}>
                       {item.isActive &&

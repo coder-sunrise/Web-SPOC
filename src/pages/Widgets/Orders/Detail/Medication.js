@@ -35,9 +35,14 @@ import Authorized from '@/utils/Authorized'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
 import { DoctorProfileSelect } from '@/components/_medisys'
 import moment from 'moment'
+import CannedTextButton from '@/pages/Widgets/Orders/Detail/CannedTextButton'
+import { CANNED_TEXT_TYPE } from '@/utils/constants'
+import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
 import PrescriptionSet from './PrescriptionSet'
+import consultationDocument from '@/models/consultationDocument'
+import { SubscriptionsOutlined } from '@material-ui/icons'
 
 const authorityCfg = {
   '1': 'queue.consultation.order.medication',
@@ -104,11 +109,12 @@ const getVisitDoctorUserId = props => {
   return visitDoctorUserId
 }
 
-@connect(({ global, codetable, visitRegistration, user }) => ({
+@connect(({ global, codetable, visitRegistration, user, patient }) => ({
   global,
   codetable,
   visitRegistration,
   user,
+  patient
 }))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type, codetable, visitRegistration }) => {
@@ -427,46 +433,39 @@ class Medication extends PureComponent {
     let newTotalQuantity = 0
 
     // when select medication, TotalQuantity = dispensingQuantity, else calculate quantity by Instructions
-    if (
-      medication &&
-      currentMedication &&
-      currentMedication.dispensingQuantity
-    ) {
-      newTotalQuantity = currentMedication.dispensingQuantity
-    } else {
-      const prescriptionItem = form.values.corPrescriptionItemInstruction.filter(
-        item => !item.isDeleted,
-      )
-      const dosageUsageList = codetable.ctmedicationdosage
-      const medicationFrequencyList = codetable.ctmedicationfrequency
-      for (let i = 0; i < prescriptionItem.length; i++) {
-        if (
-          prescriptionItem[i].dosageFK &&
-          prescriptionItem[i].drugFrequencyFK &&
-          prescriptionItem[i].duration
-        ) {
-          const dosage = dosageUsageList.find(
-            o => o.id === prescriptionItem[i].dosageFK,
-          )
 
-          const frequency = medicationFrequencyList.find(
-            o => o.id === prescriptionItem[i].drugFrequencyFK,
-          )
-
-          newTotalQuantity +=
-            dosage.multiplier *
-            frequency.multiplier *
-            prescriptionItem[i].duration
-        }
-      }
-
-      newTotalQuantity = Math.ceil(newTotalQuantity * 10) / 10 || 0
-      const { prescriptionToDispenseConversion } = currentMedication
-      if (prescriptionToDispenseConversion)
-        newTotalQuantity = Math.ceil(
-          newTotalQuantity / prescriptionToDispenseConversion,
+    const prescriptionItem = form.values.corPrescriptionItemInstruction.filter(
+      item => !item.isDeleted,
+    )
+    const dosageUsageList = codetable.ctmedicationdosage
+    const medicationFrequencyList = codetable.ctmedicationfrequency
+    for (let i = 0; i < prescriptionItem.length; i++) {
+      if (
+        prescriptionItem[i].dosageFK &&
+        prescriptionItem[i].drugFrequencyFK &&
+        prescriptionItem[i].duration
+      ) {
+        const dosage = dosageUsageList.find(
+          o => o.id === prescriptionItem[i].dosageFK,
         )
+
+        const frequency = medicationFrequencyList.find(
+          o => o.id === prescriptionItem[i].drugFrequencyFK,
+        )
+
+        newTotalQuantity +=
+          dosage.multiplier *
+          frequency.multiplier *
+          prescriptionItem[i].duration
+      }
     }
+
+    newTotalQuantity = Math.ceil(newTotalQuantity * 10) / 10 || 0
+    const { prescriptionToDispenseConversion } = currentMedication
+    if (prescriptionToDispenseConversion)
+      newTotalQuantity = Math.ceil(
+        newTotalQuantity / prescriptionToDispenseConversion,
+      )
     setFieldValue(`quantity`, newTotalQuantity)
 
     if (
@@ -594,7 +593,7 @@ class Medication extends PureComponent {
       medicationStock: [],
     },
   ) => {
-    const { setFieldValue, values } = this.props
+    const { setFieldValue, values, codetable, visitRegistration, patient } = this.props
 
     let defaultBatch
     if (op.medicationStock) {
@@ -615,7 +614,19 @@ class Medication extends PureComponent {
       stepdose: 'AND',
     }
 
+    let matchInstruction
     if (op.id) {
+      const { weight } = visitRegistration.entity.visit
+      const { dob } = patient.entity
+      const { medicationInstructionRule = [] } = op
+      let age
+      if (dob) {
+        age = Math.floor(moment.duration(moment().diff(dob)).asYears())
+      }
+      matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weight))
+      const medicationfrequency = matchInstruction?.medicationFrequency
+      const medicationdosage = matchInstruction?.medicationFrequency
+
       defaultInstruction = {
         ...defaultInstruction,
         usageMethodFK: op.medicationUsage ? op.medicationUsage.id : undefined,
@@ -625,12 +636,12 @@ class Medication extends PureComponent {
         usageMethodDisplayValue: op.medicationUsage
           ? op.medicationUsage.name
           : undefined,
-        dosageFK: op.prescribingDosage ? op.prescribingDosage.id : undefined,
-        dosageCode: op.prescribingDosage
-          ? op.prescribingDosage.code
+        dosageFK: medicationdosage ? medicationdosage.id : undefined,
+        dosageCode: medicationdosage
+          ? medicationdosage.code
           : undefined,
-        dosageDisplayValue: op.prescribingDosage
-          ? op.prescribingDosage.name
+        dosageDisplayValue: medicationdosage
+          ? medicationdosage.name
           : undefined,
         prescribeUOMFK: op.prescribingUOM ? op.prescribingUOM.id : undefined,
         prescribeUOMCode: op.prescribingUOM
@@ -639,16 +650,16 @@ class Medication extends PureComponent {
         prescribeUOMDisplayValue: op.prescribingUOM
           ? op.prescribingUOM.name
           : undefined,
-        drugFrequencyFK: op.medicationFrequency
-          ? op.medicationFrequency.id
+        drugFrequencyFK: medicationfrequency
+          ? medicationfrequency.id
           : undefined,
-        drugFrequencyCode: op.medicationFrequency
-          ? op.medicationFrequency.code
+        drugFrequencyCode: medicationfrequency
+          ? medicationfrequency.code
           : undefined,
-        drugFrequencyDisplayValue: op.medicationFrequency
-          ? op.medicationFrequency.name
+        drugFrequencyDisplayValue: medicationfrequency
+          ? medicationfrequency.name
           : undefined,
-        duration: op.duration,
+        duration: matchInstruction?.duration,
       }
     }
 
@@ -732,10 +743,7 @@ class Medication extends PureComponent {
       setFieldValue('isMinus', true)
       setFieldValue('isExactAmount', true)
       setFieldValue('adjValue', 0)
-
-      setTimeout(() => {
-        this.calculateQuantity(op)
-      }, 1)
+      setFieldValue('quantity', matchInstruction?.dispensingQuantity)
 
       if (op) {
         const { codetable, openPrescription } = this.props
@@ -867,7 +875,6 @@ class Medication extends PureComponent {
     const { handleSubmit, validateForm, values, codetable } = this.props
     const validateResult = await validateForm()
     const isFormValid = _.isEmpty(validateResult)
-    console.log(validateResult)
     if (isFormValid) {
       const {
         type,
@@ -917,7 +924,7 @@ class Medication extends PureComponent {
 
   handleDrugMixtureItemOnChange = e => {
     const { option, row } = e
-    const { values, setFieldValue } = this.props
+    const { values, setFieldValue, visitRegistration, patient } = this.props
     const { drugName = '' } = values
     const rs = values.corPrescriptionItemDrugMixture.filter(
       o =>
@@ -941,7 +948,16 @@ class Medication extends PureComponent {
       )
     }
 
-    row.quantity = option.dispensingQuantity || 0
+    const { weight } = visitRegistration.entity.visit
+    const { dob } = patient.entity
+    const { medicationInstructionRule = [] } = option
+    let age
+    if (dob) {
+      age = Math.floor(moment.duration(moment().diff(dob)).asYears())
+    }
+    const matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weight))
+
+    row.quantity = matchInstruction?.dispensingQuantity || 0
     row.uomfk = option.dispensingUOM.id
     row.uomCode = option.dispensingUOM.code
     row.uomDisplayValue = option.dispensingUOM.name
@@ -1126,7 +1142,7 @@ class Medication extends PureComponent {
           },
           dropdownMatchSelectWidth: false,
           dropdownStyle: {
-            width: 500,
+            width: 600,
           },
           renderDropdown: (option) => {
             return this.renderMedication(option)
@@ -1265,15 +1281,25 @@ class Medication extends PureComponent {
   }
 
   renderMedication = (option) => {
-    const { combinDisplayValue = '', medicationGroup = {} } = option
+    const { combinDisplayValue = '', medicationGroup = {}, stock = 0, dispensingUOM = {} } = option
+    const { name: uomName = '' } = dispensingUOM
     return <div style={{ marginTop: 5, }} >
       <div style={{
-        width: 340, display: 'inline-block',
+        width: 320, display: 'inline-block',
         whiteSpace: 'nowrap',
         textOverflow: 'ellipsis',
         overflow: 'hidden',
         height: '100%',
       }} title={combinDisplayValue}>{combinDisplayValue}</div>
+      <div style={{
+        width: 120, display: 'inline-block',
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden',
+        marginLeft: 6,
+        height: '100%',
+        color: stock < 0 ? 'red' : 'black'
+      }} title={medicationGroup.name || ''} > {stock} {uomName}</div>
       <div style={{
         width: 120, display: 'inline-block',
         whiteSpace: 'nowrap',
@@ -1297,7 +1323,7 @@ class Medication extends PureComponent {
       from,
     } = this.props
 
-    const { isEditMedication, cautions = [], drugName } = values
+    const { isEditMedication, cautions = [], drugName, remarks } = values
     const { showAddFromPastModal, showAddFromPrescriptionSetModal } = this.state
 
     const commonSelectProps = {
@@ -1313,7 +1339,9 @@ class Medication extends PureComponent {
         .rights !== 'enable'
     const accessRight = authorityCfg[values.type]
 
-    const prescriptionSetAccessRight = Authorized.check('queue.consultation.order.prescriptionset') || { rights: 'hidden' }
+    const generalAccessRight = Authorized.check('queue.consultation.order.medication.generalprescriptionset') || { rights: 'hidden' }
+    const personalAccessRight = Authorized.check('queue.consultation.order.medication.personalprescriptionset') || { rights: 'hidden' }
+    const showPrescriptionSet = generalAccessRight.rights !== 'hidden' || personalAccessRight.rights !== 'hidden'
     return (
       <Authorized authority={GetOrderItemAccessRight(from, accessRight)}>
         <div>
@@ -1337,7 +1365,7 @@ class Medication extends PureComponent {
                           handleFilter={this.filterMedicationOptions}
                           dropdownMatchSelectWidth={false}
                           dropdownStyle={{
-                            width: 500,
+                            width: 600,
                           }}
                           renderDropdown={this.renderMedication}
                           {...args}
@@ -1462,7 +1490,7 @@ class Medication extends PureComponent {
                 {!openPrescription && !isEditMedication && (
                   <div
                     style={{ position: 'absolute', left: 110, top: 0 }}>
-                    <Tooltip title='Add From Past'>
+                    <Tooltip title={`Add Medication From patient's History`}>
                       <ProgressButton
                         color='primary'
                         icon={<Add />}
@@ -1471,13 +1499,13 @@ class Medication extends PureComponent {
                         History
                       </ProgressButton>
                     </Tooltip>
-                    {prescriptionSetAccessRight.rights !== 'hidden' && <Tooltip title='Add From Prescription Set'>
+                    {showPrescriptionSet && < Tooltip title='Add Medication From Prescription Set'>
                       <ProgressButton
                         color='primary'
                         icon={<Add />}
                         onClick={this.onSearchPrescriptionSet}
                       >
-                        Pres. Set
+                        Prescription Set
                       </ProgressButton>
                     </Tooltip>
                     }
@@ -1595,7 +1623,6 @@ class Medication extends PureComponent {
                       style={{
                         whiteSpace: 'nowrap',
                         textOverflow: 'ellipsis',
-                        display: 'inline-block',
                         width: '100%',
                         overflow: 'hidden',
                         paddingTop: 3,
@@ -2088,13 +2115,25 @@ class Medication extends PureComponent {
             )}
           </GridContainer>
           <GridContainer>
-            <GridItem xs={8} className={classes.editor}>
-              <FastField
-                name='remarks'
-                render={args => {
-                  return <TextField rowsMax='5' label='Remarks' {...args} />
-                }}
-              />
+            <GridItem xs={8} className={classes.editor} style={{ paddingRight: 35 }}>
+              <div style={{ position: 'relative' }}>
+                <FastField
+                  name='remarks'
+                  render={args => {
+                    return <TextField rowsMax='5' label='Remarks' {...args} />
+                  }}
+                /><CannedTextButton
+                  cannedTextTypeFK={CANNED_TEXT_TYPE.MEDICATIONREMARKS}
+                  style={{
+                    position: 'absolute', bottom: 0,
+                    right: -35,
+                  }}
+                  handleSelectCannedText={(cannedText) => {
+                    const newRemaks = `${remarks ? (remarks + ' ') : ''}${cannedText.text || ''}`.substring(0, 2000)
+                    setFieldValue('remarks', newRemaks)
+                  }}
+                />
+              </div>
             </GridItem>
             <GridItem xs={3} className={classes.editor}>
               <Field
@@ -2372,7 +2411,7 @@ class Medication extends PureComponent {
           })}
           <CommonModal
             open={showAddFromPastModal}
-            title='Add Medication From Past'
+            title="Add Medication From Patient's History"
             onClose={this.toggleAddFromPastModal}
             onConfirm={this.toggleAddFromPastModal}
             maxWidth='md'

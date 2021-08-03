@@ -108,35 +108,6 @@ class Orders extends PureComponent {
     }
   }
 
-  newPrescriptionSet = async () => {
-    const { dispatch, orders: { rows = [] } } = this.props
-    await dispatch({
-      type: 'prescriptionSet/updateState',
-      payload: {
-        entity: undefined,
-        prescriptionSetItems: rows.filter(r => !r.isDeleted && r.type === '1').map((drug, index) => {
-          return {
-            ...drug,
-            id: undefined,
-            uid: getUniqueId(),
-            prescriptionSetItemPrecaution: drug.corPrescriptionItemPrecaution.filter(p => !p.isDeleted).map(p => {
-              return { ...p, id: undefined }
-            }),
-            prescriptionSetItemInstruction: drug.corPrescriptionItemInstruction.filter(i => !i.isDeleted).map(i => {
-              return { ...i, id: undefined }
-            }),
-            prescriptionSetItemDrugMixture: drug.corPrescriptionItemDrugMixture.filter(dm => !dm.isDeleted).map(dm => {
-              return { ...dm, id: undefined }
-            }),
-            sequence: index
-          }
-        })
-      }
-    })
-
-    this.setState({ showPrescriptionSetDetailModal: true })
-  }
-
   toggleShowPrescriptionSetDetailModal = () => {
     const { dispatch } = this.props
     dispatch({
@@ -161,7 +132,6 @@ class Orders extends PureComponent {
 
         <Grid
           {...props}
-          newPrescriptionSet={this.newPrescriptionSet}
           // summary={this.state}
           // handleAddAdjustment={this.addAdjustment}
         />

@@ -22,6 +22,7 @@ import {
   ReplaceCertificateTeplate,
 } from '@/pages/Widgets/Orders/utils'
 import { DURATION_UNIT } from '@/utils/constants'
+import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 import { getClinicianProfile } from '../../ConsultationDocument/utils'
 
 @connect(
@@ -74,7 +75,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       doctorprofile,
     } = codetable
 
-    const { doctorProfileFK } = visitRegistration.entity.visit
+    const { doctorProfileFK, weight } = visitRegistration.entity.visit
     const visitDoctorUserId = doctorprofile.find(
       (d) => d.id === doctorProfileFK,
     ).clinicianProfile.userProfileFK
@@ -95,18 +96,18 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
 
     const packageGlobalId = getUniqueGUID()
 
-    const getInstruction = (medication) => {
+    const getInstruction = (medication, matchInstruction) => {
       let instruction = ''
       const usageMethod = medication.medicationUsage
       instruction += `${usageMethod ? usageMethod.name : ''} `
-      const dosage = medication.prescribingDosage
+      const dosage = matchInstruction?.prescribingDosage
       instruction += `${dosage ? dosage.name : ''} `
       const prescribe = medication.prescribingUOM
       instruction += `${prescribe ? prescribe.name : ''} `
-      const drugFrequency = medication.medicationFrequency
+      const drugFrequency = matchInstruction.medicationFrequency
       instruction += `${drugFrequency ? drugFrequency.name : ''}`
-      const itemDuration = medication.duration
-        ? ` For ${medication.duration} day(s)`
+      const itemDuration = matchInstruction.duration
+        ? ` For ${matchInstruction.duration} day(s)`
         : ''
       instruction += itemDuration
       return instruction
@@ -120,13 +121,19 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       const medication = inventorymedication.find(
         (item) => item.id === packageItem.inventoryMedicationFK,
       )
+      const { medicationInstructionRule = [] } = medication
+      let age
+      if (dob) {
+        age = Math.floor(moment.duration(moment().diff(dob)).asYears())
+      }
+      var matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weight))
 
       let item
       if (medication.isActive === true) {
         const medicationdispensingUOM = medication.dispensingUOM
         const medicationusage = medication.medicationUsage
-        const medicationfrequency = medication.medicationFrequency
-        const medicationdosage = medication.prescribingDosage
+        const medicationfrequency = matchInstruction?.medicationFrequency
+        const medicationdosage = matchInstruction?.medicationFrequency
         const medicationprescribingUOM = medication.prescribingUOM
         const medicationPrecautions =
           medication.inventoryMedication_MedicationPrecaution
@@ -165,7 +172,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
             : undefined,
           batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
           isExternalPrescription: false,
-          instruction: getInstruction(medication),
+          instruction: getInstruction(medication, matchInstruction),
           dispenseUOMFK: medication.dispensingUOM.id,
           dispenseUOMCode: medicationdispensingUOM
             ? medicationdispensingUOM.code
@@ -183,8 +190,8 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
               usageMethodDisplayValue: medicationusage
                 ? medicationusage.name
                 : undefined,
-              dosageFK: medication.prescribingDosage
-                ? medication.prescribingDosage.id
+              dosageFK: medicationdosage
+                ? medicationdosage.id
                 : undefined,
               dosageCode: medicationdosage ? medicationdosage.code : undefined,
               dosageDisplayValue: medicationdosage
@@ -208,7 +215,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
               drugFrequencyDisplayValue: medicationfrequency
                 ? medicationfrequency.name
                 : undefined,
-              duration: medication.duration,
+              duration: matchInstruction?.duration,
               stepdose: 'AND',
               sequence: 0,
             },
