@@ -264,6 +264,7 @@ class Grid extends React.Component {
                     return <Switch
                       className={classes.switchContainer}
                       value={row.consReady}
+                      preventToggle
                       onClick={(checked, event) => {
                         this.props.onQueueListing({
                           ...row,
