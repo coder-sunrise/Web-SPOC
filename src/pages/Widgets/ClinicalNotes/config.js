@@ -32,6 +32,7 @@ export const defaultConfigs = {
       scribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.CLINICALNOTES,
       cannedTextTypeFK: CANNED_TEXT_TYPE.NOTE,
       index: 2,
+      height: 390,
     },
     {
       authority: 'queue.consultation.clinicalnotes.plan',
