@@ -19,9 +19,45 @@ import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import PackageDrawdownInfo from '@/pages/Widgets/Orders/Detail/PackageDrawdownInfo'
 import { InventoryTypes } from '@/utils/codes'
 import CONSTANTS from './DispenseDetails/constants'
+import { UnorderedListOutlined, CheckOutlined } from '@ant-design/icons'
+import { NURSE_WORKITEM_STATUS } from '@/utils/constants'
 
 export const tableConfig = {
   FuncProps: { pager: false },
+}
+
+export const actualizeTableConfig = selectable => {
+  return {
+    FuncProps: {
+      pager: false,
+      selectable: selectable,
+      selectConfig: {
+        showSelectAll: true,
+        rowSelectionEnabled: row => {
+          const {
+            isNurseActualizeRequired = false,
+            workitem: {
+              nurseWorkitem: { statusFK },
+            },
+          } = row
+
+          return (
+            isNurseActualizeRequired &&
+            statusFK !== NURSE_WORKITEM_STATUS.ACTUALIZED
+          )
+        },
+      },
+    },
+  }
+}
+
+export const getRowId = (r, idPrefix) => {
+  const suffix = r.type
+  if (idPrefix === 'OtherOrders') {
+    const itemFK = r.invoiceItemFK || r.sourceFK
+    return `${idPrefix}-${r.id}-${itemFK}-${suffix}`
+  }
+  return `${idPrefix}-${r.id}-${suffix}`
 }
 
 const columnWidth = '10%'
@@ -63,6 +99,60 @@ const packageDrawdownIndicator = row => {
     </div>
   )
 }
+
+const checkActualizable = row => {
+  const {
+    isNurseActualizeRequired = false,
+    workitem: {
+      nurseWorkitem: { statusFK },
+    },
+  } = row
+  return { isNurseActualizeRequired, statusFK }
+}
+
+export const isActualizable = row => {
+  const { isNurseActualizeRequired, statusFK } = checkActualizable(row)
+  return isNurseActualizeRequired && [NURSE_WORKITEM_STATUS.NEW,NURSE_WORKITEM_STATUS.CANCCELED].indexOf(statusFK) > -1
+}
+
+const actualizationButton = (row, buttonClickCallback) => {
+  let actualizationBtn = null
+  const { isNurseActualizeRequired, statusFK } = checkActualizable(row)
+
+  if (isNurseActualizeRequired) {
+    if ([NURSE_WORKITEM_STATUS.NEW,NURSE_WORKITEM_STATUS.CANCCELED].indexOf(statusFK) > -1) {
+      actualizationBtn = (
+        <Tooltip title='Todo'>
+          <Button
+            color='primary'
+            justIcon
+            onClick={() =>
+              buttonClickCallback(row, NURSE_WORKITEM_STATUS.NEW)
+            }
+          >
+            <UnorderedListOutlined />
+          </Button>
+        </Tooltip>
+      )
+    } else if (statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED) {
+      actualizationBtn = (
+        <Tooltip title='Actualized'>
+          <Button
+            color='success'
+            justIcon
+            onClick={() =>
+              buttonClickCallback(row, NURSE_WORKITEM_STATUS.ACTUALIZED)
+            }
+          >
+            <CheckOutlined />
+          </Button>
+        </Tooltip>
+      )
+    }
+  }
+  return actualizationBtn
+}
+
 
 export const PrescriptionColumns = [
   // { name: 'id', title: 'id' },
@@ -117,6 +207,7 @@ export const PrescriptionColumnExtensions = (
   onPrint,
   inventorymedication = [],
   handleSelectedBatch,
+  onActualizeBtnClick,
 ) => [
   { columnName: 'unitPrice', width: 100, type: 'currency' },
   {
@@ -299,24 +390,27 @@ export const PrescriptionColumnExtensions = (
   {
     columnName: 'action',
     align: 'center',
-    width: 60,
+    width: 70,
     render: row => {
       return (
-        <Tooltip
-          title={
-            <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
-          }
-        >
-          <Button
-            color='primary'
-            onClick={() => {
-              onPrint({ type: CONSTANTS.DRUG_LABEL, row })
-            }}
-            justIcon
+        <div>
+          {actualizationButton(row,onActualizeBtnClick)}
+          <Tooltip
+            title={
+              <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
+            }
           >
-            <Print />
-          </Button>
-        </Tooltip>
+            <Button
+              color='primary'
+              onClick={() => {
+                onPrint({ type: CONSTANTS.DRUG_LABEL, row })
+              }}
+              justIcon
+            >
+              <Print />
+            </Button>
+          </Tooltip>
+        </div>
       )
     },
   },
@@ -365,6 +459,7 @@ export const VaccinationColumnExtensions = (
   viewOnly = false,
   inventoryvaccination = [],
   handleSelectedBatch = () => {},
+  onActualizeBtnClick,
 ) => [
   {
     columnName: 'name',
@@ -524,7 +619,7 @@ export const VaccinationColumnExtensions = (
   {
     columnName: 'action',
     width: 60,
-    render: () => <div />,
+    render: () => actualizationButton(row,onActualizeBtnClick),
   },
 ]
 
@@ -565,7 +660,7 @@ export const OtherOrdersColumns = [
 
 const compareString = (a, b) => a.localeCompare(b)
 
-export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
+export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint,onActualizeBtnClick) => [
   {
     columnName: 'type',
     compare: compareString,
@@ -707,7 +802,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
       const { type } = r
 
       if (type === 'Service' || type === 'Consumable' || type === 'Treatment')
-        return null
+        return actualizationButton(r,onActualizeBtnClick)
       return (
         <Tooltip title='Print'>
           <Button

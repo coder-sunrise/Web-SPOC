@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import { compose } from 'redux'
 import _ from 'lodash'
 // material ui
-import { Paper, withStyles } from '@material-ui/core'
+import { Paper, withStyles, Link } from '@material-ui/core'
 import Print from '@material-ui/icons/Print'
 import Refresh from '@material-ui/icons/Refresh'
 import Edit from '@material-ui/icons/Edit'
@@ -20,6 +20,7 @@ import {
   TextField,
   CommonModal,
   NumberInput,
+  notification,
 } from '@/components'
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import Authorized from '@/utils/Authorized'
@@ -27,12 +28,15 @@ import {
   VISIT_TYPE,
   NOTIFICATION_TYPE,
   NOTIFICATION_STATUS,
+  NURSE_WORKITEM_STATUS,
 } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
 // sub components
 import TableData from './TableData'
 import VaccinationGrid from './VaccinationGrid'
 import DrugLabelSelection from './DrugLabelSelection'
+import NurseActualization from './NurseActualization'
+
 // variables
 import {
   PrescriptionColumns,
@@ -43,6 +47,9 @@ import {
   OtherOrdersColumnExtensions,
   PackageColumns,
   PackageColumnExtensions,
+  actualizeTableConfig,
+  getRowId,
+  isActualizable,
 } from '../variables'
 
 import CONSTANTS from './constants'
@@ -303,6 +310,102 @@ const DispenseDetails = ({
     )
   }
 
+  const [selectedPrescriptionRows, setSelectedPrescriptionRows] = useState([])
+  const [selectedVaccinationRows, setSelectedVaccinationRows] = useState([])
+  const [selectedOtherOrderRows, setSelectedOtherOrderRows] = useState([])
+  const [selectedActualizeRecords, setSelectedActualizeRecords] = useState([])
+  const [showNurseActualization, setShowNurseActualization] = useState(false)
+
+  const isShowActualizeSelection = (records = []) => {
+    return records.filter(x => isActualizable(x)).length > 0
+  }
+
+  const handleSelectionChange = (type, value) => {
+    console.log('handleSelectionChange', type, value)
+    switch (type) {
+      case 'Prescription':
+        setSelectedPrescriptionRows(value)
+        break
+      case 'Vaccination':
+        setSelectedVaccinationRows(value)
+        break
+      case 'OtherOrders':
+        setSelectedOtherOrderRows(value)
+        break
+    }
+  }
+
+  const onActualizeBtnClick = (row, status) => {
+    switch (status) {
+      case NURSE_WORKITEM_STATUS.NEW:
+      case NURSE_WORKITEM_STATUS.CANCCELED:
+        console.log('onActualizeBtnClick.TODO', row)
+        setSelectedActualizeRecords([row])
+        setShowNurseActualization(true)
+        break
+      case NURSE_WORKITEM_STATUS.ACTUALIZED:
+        console.log('onActualizeBtnClick.ACTUALIZED', row)
+        setSelectedActualizeRecords([row])
+        setShowNurseActualization(true)
+        break
+    }
+  } 
+
+  const handleMultiActualizationClick = type => {
+    let selectedRows = []
+    let records = []
+    switch (type) {
+      case 'Prescription':
+        selectedRows = selectedPrescriptionRows
+        records = prescription
+        break
+      case 'Vaccination':
+        selectedRows = selectedVaccinationRows
+        records = vaccination
+        break
+      case 'OtherOrders':
+        selectedRows = selectedOtherOrderRows
+        records = otherOrder
+        break
+    }
+    if (selectedRows.length > 0) {
+      let selectedRecords = records.filter(
+        x => selectedRows.indexOf(getRowId(x, type)) > -1,
+      )
+      setSelectedActualizeRecords(selectedRecords)
+      //TODO there should be propmt window : actualization widnow meanwhile get histroy from server by selectedActualizeRecords
+      console.log(
+        'handleMultiActualizationClick.selectedActualizeRecords',
+        selectedRecords,
+      )
+      
+    } else {
+      notification.error({
+        message: 'Please select at least one order item to actualize.',
+      })
+    }
+  }
+
+  const actualizeSelectedItemButton = (type, records = []) => {
+    if (records.filter(x => isActualizable(x)).length > 0) {
+      return (
+        <Link
+          style={{ marginLeft: 10, textDecoration: 'underline' }}
+          onClick={() => {
+            handleMultiActualizationClick(type)
+          }}
+        >
+          Actualize Selected Item
+        </Link>
+      )
+    }
+    return null
+  }
+
+  const onNurseActualizationClose = () => {
+    setShowNurseActualization(false)
+  }
+
   return (
     <React.Fragment>
       <GridContainer>
@@ -479,7 +582,11 @@ const DispenseDetails = ({
           <Paper className={classes.paper}>
             <TableData
               title='Prescription'
-              idPrefix='prescription'
+              titleExtend={actualizeSelectedItemButton('Prescription',prescription)}
+              selection={selectedPrescriptionRows}
+              onSelectionChange={(value)=>{ handleSelectionChange('Prescription',value) }}
+              {...actualizeTableConfig(isShowActualizeSelection(prescription))}
+              idPrefix='Prescription'
               forceRender
               columns={PrescriptionColumns}
               colExtensions={PrescriptionColumnExtensions(
@@ -487,17 +594,23 @@ const DispenseDetails = ({
                 onPrint,
                 inventorymedication,
                 handleSelectedBatch,
+                onActualizeBtnClick,
               )}
               data={prescription}
             />
             <VaccinationGrid
               title='Vaccination'
-              idPrefix='vaccination'
+              titleExtend={actualizeSelectedItemButton('Vaccination',vaccination)}
+              selection={selectedVaccinationRows}
+              onSelectionChange={(value)=>{ handleSelectionChange('Vaccination',value) }}
+              {...actualizeTableConfig(isShowActualizeSelection(vaccination))}
+              idPrefix='Vaccination'
               columns={VaccinationColumn}
               colExtensions={VaccinationColumnExtensions(
                 viewOnly,
                 inventoryvaccination,
                 handleSelectVaccinationBatch,
+                onActualizeBtnClick,
               )}
               data={vaccination}
               visitPurposeFK={visitPurposeFK}
@@ -505,9 +618,13 @@ const DispenseDetails = ({
 
             <TableData
               title='Other Orders'
-              idPrefix='otherOrders'
+              titleExtend={actualizeSelectedItemButton('OtherOrders',otherOrder)}
+              selection={selectedOtherOrderRows}
+              onSelectionChange={(value)=>{ handleSelectionChange('OtherOrders',value) }}
+              {...actualizeTableConfig(isShowActualizeSelection(otherOrder))}
+              idPrefix='OtherOrders'
               columns={OtherOrdersColumns}
-              colExtensions={OtherOrdersColumnExtensions(viewOnly, onPrint)}
+              colExtensions={OtherOrdersColumnExtensions(viewOnly, onPrint, onActualizeBtnClick)}
               data={otherOrder}
             />
 
@@ -681,6 +798,25 @@ const DispenseDetails = ({
           </GridContainer>
         </div>
       </CommonModal>
+      <CommonModal
+        title='Actualization'
+        open={showNurseActualization}
+        observe='DispenseDetails'
+        onClose={() => {
+          onNurseActualizationClose()
+        }}
+      >
+        <NurseActualization
+          actualizeItems={selectedActualizeRecords}
+          codetable={codetable}
+          handleDrugLabelSelected={onDrugLabelSelected}
+          handleDrugLabelNoChanged={onDrugLabelNoChanged}
+          handleSubmit={() => {
+            onNurseActualizationClose()
+            notification.info("save success")
+          }}
+        />
+      </CommonModal>
     </React.Fragment>
   )
 }
@@ -691,7 +827,7 @@ export default compose(
     codetable,
     clinicSettings,
     servingPersons: dispense.servingPersons,
-    visit: visitRegistration.entity.visit,
+    visit: visitRegistration?.entity?.visit || {},
     doctorprofile: codetable.doctorprofile || [],
     patient: patient.entity || {},
   })),

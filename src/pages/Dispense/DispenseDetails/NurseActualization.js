@@ -1,0 +1,49 @@
+import React from 'react'
+// common components
+import { GridContainer, GridItem } from '@/components'
+
+import {
+  DrugLabelSelectionColumns,
+  DrugLabelSelectionColumnExtensions,
+} from '../variables'
+import TableData from './TableData'
+
+class NurseActualization extends React.PureComponent {
+  render () {
+    const {
+      footer,
+      handleSubmit,
+      prescription, 
+      handleDrugLabelSelected,
+      handleDrugLabelNoChanged,
+    } = this.props  
+    const printLabelDisabled = !prescription.some((x) => x.selected === true)
+    return (
+      <div>
+        <GridContainer>
+          <GridItem md={12}>
+            <TableData
+              forceRender
+              idPrefix='prescription'
+              columns={DrugLabelSelectionColumns}
+              colExtensions={DrugLabelSelectionColumnExtensions(handleDrugLabelSelected, handleDrugLabelNoChanged)}
+              data={prescription}
+            />
+          </GridItem>
+        </GridContainer>
+        {footer &&
+          footer({
+            cancelProps: {
+            },
+            confirmProps: {
+              disabled: printLabelDisabled,
+            },
+            onConfirm: handleSubmit,
+            confirmBtnText: 'Print',
+          })}
+      </div>
+    )
+  }
+}
+
+export default NurseActualization
