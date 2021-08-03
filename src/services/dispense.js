@@ -96,7 +96,7 @@ const fns = {
     service.remove(`${url}/billFirstOrder`, params),
 
   getServingPersons: async params => {
-    const r = await request(`${url}/getServingPersons/${params.visitFK}`, {
+    const r = await request(`${urlQueue}/getServingPersons/${params.visitFK}`, {
       method: 'GET',
     })
     return r
