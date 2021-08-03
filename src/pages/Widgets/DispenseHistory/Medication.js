@@ -1,6 +1,5 @@
 import React from 'react'
 import { CardContainer } from '@/components'
-import { Tag } from 'antd'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import numeral from 'numeral'
 import { currencySymbol } from '@/utils/config'
@@ -10,6 +9,7 @@ import tablestyles from '../PatientHistory/PatientHistoryStyle.less'
 import {
   Tooltip,
 } from '@/components'
+import { FileCopySharp } from '@material-ui/icons'
 
 export default ({ classes, current, fieldName = '' }) => {
   const drugMixtureIndicator = (row) => {
@@ -53,10 +53,26 @@ export default ({ classes, current, fieldName = '' }) => {
         return (
           <div style={{ position: 'relative' }}>
             <div className={classes.wrapCellTextStyle}
-              style={{ paddingRight: row.isPreOrder ? 34 : 0 }}>
+              style={{ paddingRight: row.isPreOrder ? 24 : 0 }}>
               {row.name}
               {drugMixtureIndicator(row)}
-              {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
+              {row.isPreOrder &&
+                <Tooltip title='Pre-Order'>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      right: -6,
+                      borderRadius: 10,
+                      backgroundColor: '#4255bd',
+                      fontWeight: 500,
+                      color: 'white',
+                      fontSize: '0.7rem',
+                      padding: '1px 3px',
+                      height: 20,
+                    }}
+                  > Pre</div>
+                </Tooltip>}
             </div>
           </div>
         )
@@ -100,7 +116,36 @@ export default ({ classes, current, fieldName = '' }) => {
       width: 90,
       render: (text, row) => showCurrency((row.isPreOrder && !row.isChargeToday) ? 0 : row.totalAfterItemAdjustment),
     },
-    { dataIndex: 'remarks', title: 'Remarks' },
+    {
+      dataIndex: 'remarks', title: 'Remarks', render: (text, row) => {
+        const existsDrugLabelRemarks = row.drugLabelRemarks && row.drugLabelRemarks.trim() !== ''
+        return <div style={{ position: 'relative', paddingRight: existsDrugLabelRemarks ? 10 : 0 }}>
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+            }}
+          >{row.remarks || ' '}</div>
+          {existsDrugLabelRemarks &&
+            <div style={{
+              position: 'absolute',
+              bottom: -2,
+              right: -5,
+            }}>
+              <Tooltip title={
+                <div>
+                  <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
+                  <div>{row.drugLabelRemarks}
+                  </div>
+                </div>
+              }>
+                <FileCopySharp style={{ color: 'blue' }} />
+              </Tooltip>
+            </div>
+          }
+        </div>
+      },
+    }
   ]
 
   return (

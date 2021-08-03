@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
 import moment from 'moment'
-import { Tag } from 'antd'
 import Delete from '@material-ui/icons/Delete'
 import Warning from '@material-ui/icons/Error'
 // common components
@@ -467,12 +466,28 @@ class AddCrNote extends Component {
                       style={{
                         wordWrap: 'break-word',
                         whiteSpace: 'pre-wrap',
-                        paddingRight: row.isPreOrder ? 34 : 0
+                        paddingRight: row.isPreOrder ? 24 : 0
                       }}
                     >
                       {row.itemType}
                       {this.drugMixtureIndicator(row)}
-                      {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
+                      {row.isPreOrder &&
+                        <Tooltip title='Pre-Order'>
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: 0,
+                              right: -6,
+                              borderRadius: 10,
+                              backgroundColor: '#4255bd',
+                              fontWeight: 500,
+                              color: 'white',
+                              fontSize: '0.7rem',
+                              padding: '1px 3px',
+                              height: 20,
+                            }}
+                          > Pre</div>
+                        </Tooltip>}
                     </div>
                   </div>
                 )

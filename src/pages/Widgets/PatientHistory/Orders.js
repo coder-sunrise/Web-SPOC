@@ -1,10 +1,10 @@
 import { Table } from 'antd'
 import numeral from 'numeral'
-import { Tag } from 'antd'
 import { currencySymbol, currencyFormat } from '@/utils/config'
 import tablestyles from './PatientHistoryStyle.less'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import { Tooltip } from '@/components'
+import { FileCopySharp } from '@material-ui/icons'
 
 const wrapCellTextStyle = {
   wordWrap: 'break-word',
@@ -36,22 +36,29 @@ export default ({ current }) => {
             render: (text, row) => {
               return (
                 <div style={{ position: 'relative' }}>
-                  <div style={wrapCellTextStyle}>
+                  <div style={{
+                    wordWrap: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                    paddingRight: row.isPreOrder ? 24 : 0
+                  }}>
                     {row.isDrugMixture ? 'Drug Mixture' : row.type}
                     {drugMixtureIndicator(row)}
                     {row.isPreOrder && (
                       <Tooltip title='Pre-Order'>
-                        <Tag
-                          color='#4255bd'
+                        <div
                           style={{
                             position: 'absolute',
                             top: 0,
-                            right: -10,
+                            right: -6,
                             borderRadius: 10,
+                            backgroundColor: '#4255bd',
+                            fontWeight: 500,
+                            color: 'white',
+                            fontSize: '0.7rem',
+                            padding: '1px 3px',
+                            height: 20,
                           }}
-                        >
-                          Pre
-                        </Tag>
+                        > Pre</div>
                       </Tooltip>
                     )}
                   </div>
@@ -94,7 +101,34 @@ export default ({ current }) => {
           {
             dataIndex: 'remarks',
             title: 'Remarks',
-            render: text => <div style={wrapCellTextStyle}>{text}</div>,
+            render: (text, row) => {
+              const existsDrugLabelRemarks = row.drugLabelRemarks && row.drugLabelRemarks.trim() !== ''
+              return <div style={{ position: 'relative', paddingRight: existsDrugLabelRemarks ? 10 : 0 }}>
+                <div
+                  style={{
+                    wordWrap: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >{row.remarks || ' '}</div>
+                {existsDrugLabelRemarks &&
+                  <div style={{
+                    position: 'absolute',
+                    bottom: -2,
+                    right: -5,
+                  }}>
+                    <Tooltip title={
+                      <div>
+                        <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
+                        <div>{row.drugLabelRemarks}
+                        </div>
+                      </div>
+                    }>
+                      <FileCopySharp style={{ color: 'blue' }} />
+                    </Tooltip>
+                  </div>
+                }
+              </div>
+            },
           },
           {
             dataIndex: 'quantity',

@@ -2,7 +2,6 @@ import React from 'react'
 import { Table } from 'antd'
 import moment from 'moment'
 import numeral from 'numeral'
-import { Tag } from 'antd'
 import { currencySymbol,currencyFormat } from '@/utils/config'
 import { GridContainer, GridItem, TextField, Tooltip } from '@/components'
 import { VISIT_TYPE } from '@/utils/constants'
@@ -57,22 +56,29 @@ const baseColumns = [
     render: (text, row) => {
       return (
         <div style={{ position: 'relative' }}>
-          <div style={wrapCellTextStyle}>
+          <div style={{
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+            paddingRight: row.isPreOrder ? 24 : 0
+          }}>
             {row.isDrugMixture ? 'Drug Mixture' : row.itemType}
             {drugMixtureIndicator(row)}
             {row.isPreOrder && (
               <Tooltip title='Pre-Order'>
-                <Tag
-                  color='#4255bd'
+                <div
                   style={{
                     position: 'absolute',
                     top: 0,
-                    right: -10,
+                    right: -6,
                     borderRadius: 10,
+                    backgroundColor: '#4255bd',
+                    fontWeight: 500,
+                    color: 'white',
+                    fontSize: '0.7rem',
+                    padding: '1px 3px',
+                    height: 20,
                   }}
-                >
-                  Pre
-                </Tag>
+                > Pre</div>
               </Tooltip>
             )}
           </div>

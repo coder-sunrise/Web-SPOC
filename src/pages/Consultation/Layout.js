@@ -525,6 +525,7 @@ class Layout extends PureComponent {
       clinicInfo,
       onSaveLayout = (f) => f,
       onSaveFavouriteDiagnosisLanguage = (s) => s,
+      values,
     } = restProps
     const widgetProps = {
       status: 'consultation',
@@ -781,6 +782,7 @@ class Layout extends PureComponent {
                             {...widgetProps}
                             {...w.restProps}
                             isFullScreen={state.fullScreenWidget === id}
+                            corVitalSign={[...(values.corPatientNoteVitalSign || [])]}
                           />
                         </SizeContainer>
                       </div>

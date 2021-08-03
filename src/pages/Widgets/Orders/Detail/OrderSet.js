@@ -66,6 +66,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       visitRegistration,
       patient,
       consultationDocument: { rows = [] },
+      corVitalSign = []
     } = props
     const {
       ctmedicationusage,
@@ -90,9 +91,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
     }
     let showNoTemplate
 
-    const { doctorProfileFK, weight } = visitRegistration.entity.visit
-    console.log('visitRegistration.entity.visit', visitRegistration.entity.visit)
-    console.log('weight', weight)
+    const { doctorProfileFK } = visitRegistration.entity.visit
     const visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK)
       .clinicianProfile.userProfileFK
 
@@ -120,11 +119,21 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
     const getOrderMedicationFromOrderSet = (orderSetCode, orderSetItem) => {
       const { inventoryMedication } = orderSetItem
       const { medicationInstructionRule = [] } = inventoryMedication
+
+      let weightKG
+      const activeVitalSign = corVitalSign.find(vs => !vs.isDeleted)
+      if (activeVitalSign) {
+        weightKG = activeVitalSign.weightKG
+      }
+      else {
+        weightKG = visitRegistration.entity.visit.weightKG
+      }
+
       let age
       if (dob) {
         age = Math.floor(moment.duration(moment().diff(dob)).asYears())
       }
-      var matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weight))
+      var matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weightKG))
 
       let item
       if (inventoryMedication.isActive === true) {
@@ -290,7 +299,6 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           isNurseActualizeRequired: inventoryVaccination.isNurseActualizable,
         }
       }
-      console.log('item', item)
       let newCORVaccinationCert = []
       if (item.isGenerateCertificate) {
         const { documenttemplate = [] } = codetable

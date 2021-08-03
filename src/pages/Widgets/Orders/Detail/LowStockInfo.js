@@ -8,7 +8,7 @@ import { IconButton, Popover, Tooltip } from '@/components'
 import { DOSAGE_RULE, DOSAGE_RULE_OPERATOR } from '@/utils/constants'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 
-const LowStockInfo = ({ sourceType, values = {}, codetable, visitRegistration = {}, patient = {} }) => {
+const LowStockInfo = ({ sourceType, values = {}, codetable, visitRegistration = {}, patient = {}, corVitalSign = [] }) => {
   const {
     inventorymedication = [],
     inventoryconsumable = [],
@@ -93,14 +93,22 @@ const LowStockInfo = ({ sourceType, values = {}, codetable, visitRegistration = 
         const strDosage = `${ruleStr === '' ? "" : `${ruleStr}, `}${medicationUsage.name || ''} ${prescribingDosage.name || ''} ${prescribingUOM.name || ''} ${medicationFrequency.name || ''}${durationStr}${dispenseStr}`
         let isMatchInstruction
         if (sourceType === 'medication') {
-          const { entity = {} } = visitRegistration
-          const { visit = {} } = entity
           const { entity: patientEntity = {} } = patient
+
+          let weightKG
+          const activeVitalSign = corVitalSign.find(vs => !vs.isDeleted)
+          if (activeVitalSign) {
+            weightKG = activeVitalSign.weightKG
+          }
+          else {
+            weightKG = visitRegistration.entity?.visit?.weightKG
+          }
+
           let age
           if (patientEntity.dob) {
             age = Math.floor(moment.duration(moment().diff(patientEntity.dob)).asYears())
           }
-          isMatchInstruction = isMatchInstructionRule(instruction, age, visit.weightKG)
+          isMatchInstruction = isMatchInstructionRule(instruction, age, weightKG)
         }
 
         return {

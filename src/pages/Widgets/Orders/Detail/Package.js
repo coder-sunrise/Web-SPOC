@@ -390,8 +390,6 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
         unitOfMeasurement = consumable.uom ? consumable.uom.name : undefined
       }
 
-      console.log('consumable', consumable)
-
       item = {
         inventoryConsumableFK: packageItem.inventoryConsumableFK,
         isActive: packageItem.isActive,
@@ -523,6 +521,44 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
 class Package extends PureComponent {
   constructor (props) {
     super(props)
+    const { dispatch } = props
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctservice',
+        force: true,
+        filter: {
+          'serviceFKNavigation.IsActive': true,
+          'serviceCenterFKNavigation.IsActive': true,
+          combineCondition: 'and',
+        },
+      },
+    })
+
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventorymedication',
+        force: true,
+        isActive: true,
+      },
+    })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventoryvaccination',
+        force: true,
+        isActive: true,
+      },
+    })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventoryconsumable',
+        force: true,
+        isActive: true,
+      },
+    })
 
     const calUnitPrice = (e) => {
       const { row } = e

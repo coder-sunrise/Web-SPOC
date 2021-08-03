@@ -3,7 +3,6 @@ import numeral from 'numeral'
 import { qtyFormat } from '@/utils/config'
 // dva
 import { connect } from 'dva'
-import { Tag } from 'antd'
 import Yup from '@/utils/yup'
 // material ui
 import { withStyles } from '@material-ui/core'
@@ -296,10 +295,26 @@ class EditInvoice extends Component {
                   return (
                     <div style={{ position: 'relative' }}>
                       <div className={classes.wrapCellTextStyle}
-                        style={{ paddingRight: row.isPreOrder ? 34 : 0 }}>
+                        style={{ paddingRight: row.isPreOrder ? 24 : 0 }}>
                         {row.itemType}
                         {this.drugMixtureIndicator(row)}
-                        {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
+                        {row.isPreOrder &&
+                          <Tooltip title='Pre-Order'>
+                            <div
+                              style={{
+                                position: 'absolute',
+                                top: 0,
+                                right: -6,
+                                borderRadius: 10,
+                                backgroundColor: '#4255bd',
+                                fontWeight: 500,
+                                color: 'white',
+                                fontSize: '0.7rem',
+                                padding: '1px 3px',
+                                height: 20,
+                              }}
+                            > Pre</div>
+                          </Tooltip>}
                       </div>
                     </div>
                   )

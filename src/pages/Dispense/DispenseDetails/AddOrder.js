@@ -516,6 +516,7 @@ export default compose(
                   batchNo: o.batchNo,
                   dispensedQuanity: o.dispensedQuanity,
                   isDeleted: o.isDeleted,
+                  drugLabelRemarks: o.drugLabelRemarks,
                   retailPrescriptionItem: {
                     ...restO,
                     drugName: o.drugName,

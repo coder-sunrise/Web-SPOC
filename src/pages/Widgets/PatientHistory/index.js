@@ -27,7 +27,7 @@ import Authorized from '@/utils/Authorized'
 // utils
 import { findGetParameter, commonDataReaderTransform } from '@/utils/utils'
 import { VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
-import { DoctorProfileSelect,ServePatientButton } from '@/components/_medisys'
+import { DoctorProfileSelect, ServePatientButton } from '@/components/_medisys'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import { getReportContext } from '@/services/report'
 import * as WidgetConfig from './config'
@@ -126,7 +126,7 @@ const styles = theme => ({
   }),
 })
 class PatientHistory extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.widgets = WidgetConfig.widgets(
       props,
@@ -160,7 +160,7 @@ class PatientHistory extends Component {
     }
   }
 
-  componentWillMount() {
+  componentWillMount () {
     const { dispatch } = this.props
 
     dispatch({
@@ -204,7 +204,7 @@ class PatientHistory extends Component {
     })
   }
 
-  componentDidMount() {
+  componentDidMount () {
     window.addEventListener('resize', () => {
       this.setState({ currentHeight: window.innerHeight })
     })
@@ -270,13 +270,13 @@ class PatientHistory extends Component {
       payload: {
         visitFromDate: visitFromDate
           ? moment(visitFromDate)
-              .startOf('day')
-              .formatUTC()
+            .startOf('day')
+            .formatUTC()
           : undefined,
         visitToDate: visitToDate
           ? moment(visitToDate)
-              .endOf('day')
-              .formatUTC(false)
+            .endOf('day')
+            .formatUTC(false)
           : undefined,
         isAllDate,
         pageIndex: pageIndex + 1,
@@ -387,12 +387,7 @@ class PatientHistory extends Component {
 
     return (
       <div
-        style={{
-          paddingLeft: 5,
-          paddingRight: 5,
-          paddingTop: 2,
-          paddingBottom: 2,
-        }}
+        style={{ display: 'flex', padding: '3px 0px 8px 0px', height: 36 }}
         onClick={() => {
           this.setState(preState => {
             if (preState.activeKey.find(key => key === row.currentId)) {
@@ -410,183 +405,178 @@ class PatientHistory extends Component {
           })
         }}
       >
-        <div style={{ display: 'flex' }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
-            {fromModule !== 'Consultation' && (
-              <div
-                style={{
-                  marginTop: fromModule === 'History' ? -12 : -16,
-                  marginLeft: 5,
-                  height: 24,
-                  width: 30,
-                }}
-                onClick={event => {
-                  event.stopPropagation()
-                }}
-              >
-                <Checkbox
-                  label=''
-                  checked={isSelect}
-                  onChange={e => this.selectOnChange(e, row)}
-                />
-              </div>
-            )}
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              marginLeft: fromModule !== 'Consultation' ? -14 : 0,
-            }}
-          >
-            <span className='material-icons'>
-              {this.state.activeKey.find(key => key === row.currentId)
-                ? 'expand_more'
-                : 'navigate_next'}
-            </span>
-          </div>
-          {isNurseNote && (
-            <div style={{ fontSize: '0.9em' }}>
-              <div style={{ fontWeight: 500 }}>
-                {`${moment(visitDate).format(
-                  'DD MMM YYYY HH:MM',
-                )} - Notes${docotrName ? ` - ${docotrName}` : ''}`}
-              </div>
-            </div>
-          )}
-          {!isNurseNote && (
-            <div style={{ fontSize: '0.9em' }}>
-              <div style={{ fontWeight: 500 }}>
-                {`${moment(visitDate).format('DD MMM YYYY')} (Time In: ${moment(
-                  timeIn,
-                ).format('HH:mm')} Time Out: ${
-                  timeOut ? moment(timeOut).format('HH:mm') : '-'
-                })${docotrName ? ` - ${docotrName}` : ''}`}
-              </div>
-              <div>
-                <span>
-                  {`${visitPurposeName}, Last Update By: ${LastUpdateBy ||
-                    ''} on ${moment(signOffDate).format('DD MMM YYYY HH:mm')}`}
-                </span>
-                <span style={{marginLeft:5}}>
-                  {row.servingByList?.length >0 ? `Served by ${row.servingByList.map(x=>x.servingBy).join(', ')}.`:null}
-                </span>
-              </div>
-            </div>
-          )}
-          {!isNurseNote && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          {fromModule !== 'Consultation' && (
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
+                marginTop: fromModule === 'History' ? -12 : -16,
+                marginLeft: 5,
+                height: 24,
+                width: 30,
+              }}
+              onClick={event => {
+                event.stopPropagation()
               }}
             >
-              {patientIsActive &&
-                !isRetailVisit &&
-                fromModule !== 'Consultation' &&
-                fromModule !== 'History' && (
-                  <Authorized authority='patientdashboard.editconsultation'>
-                    <Tooltip title='Edit Consultation'>
-                      <Button
-                        color='primary'
-                        style={{ marginLeft: theme.spacing(2) }}
-                        size='sm'
-                        justIcon
-                        onClick={event => {
-                          event.stopPropagation()
-
-                          dispatch({
-                            type: `consultation/edit`,
-                            payload: {
-                              id: row.id,
-                              version: patientHistory.version,
-                            },
-                          }).then(o => {
-                            if (o) {
-                              if (o.updateByUserFK !== user.data.id) {
-                                const { clinicianprofile = [] } = codetable
-                                const version = Date.now()
-                                const editingUser = clinicianprofile.find(
-                                  m => m.userProfileFK === o.updateByUserFK,
-                                ) || {
-                                  name: 'Someone',
-                                }
-                                dispatch({
-                                  type: 'global/updateAppState',
-                                  payload: {
-                                    openConfirm: true,
-                                    openConfirmContent: `${editingUser.name} is currently editing the patient note, do you want to overwrite?`,
-                                    onConfirmSave: () => {
-                                      dispatch({
-                                        type: `consultation/overwrite`,
-                                        payload: {
-                                          id: row.id,
-                                          version,
-                                        },
-                                      }).then(c => {
-                                        dispatch({
-                                          type: 'patient/closePatientModal',
-                                        })
-                                        history.push(
-                                          `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${c.id}&v=${version}`,
-                                        )
-                                      })
-                                    },
-                                  },
-                                })
-                              } else {
-                                dispatch({
-                                  type: 'patient/closePatientModal',
-                                })
-                                history.push(
-                                  `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
-                                )
-                              }
-                            }
-                          })
-                        }}
-                      >
-                        <Edit />
-                      </Button>
-                    </Tooltip>
-                  </Authorized>
-                )}
+              <Checkbox
+                label=''
+                checked={isSelect}
+                onChange={e => this.selectOnChange(e, row)}
+              />
             </div>
           )}
-          {!isNurseNote &&
-            settings.showConsultationVersioning &&
-            !isRetailVisit && (
-              <div
-                style={{
-                  marginLeft: 'auto',
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginRight: 10,
-                }}
-              >
-                <Tooltip title='View History'>
-                  <span
-                    className='material-icons'
-                    style={{ color: 'gray' }}
-                    onClick={event => {
-                      event.stopPropagation()
-                      this.setState({
-                        showHistoryDetails: true,
-                        selectHistory: { ...row },
-                      })
-                    }}
-                  >
-                    history
-                  </span>
-                </Tooltip>
-              </div>
-            )}
         </div>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            marginLeft: fromModule !== 'Consultation' ? -14 : 0,
+          }}
+        >
+          <span className='material-icons'>
+            {this.state.activeKey.find(key => key === row.currentId)
+              ? 'expand_more'
+              : 'navigate_next'}
+          </span>
+        </div>
+        {isNurseNote && (
+          <div style={{ fontSize: '0.9em', fontWeight: 500, marginTop: 12 }}>
+            {`${moment(visitDate).format(
+              'DD MMM YYYY HH:MM',
+            )} - Notes${docotrName ? ` - ${docotrName}` : ''}`}
+          </div>
+        )}
+        {!isNurseNote && (
+          <div style={{ fontSize: '0.9em' }}>
+            <div style={{ fontWeight: 500, marginTop: 4 }}>
+              {`${moment(visitDate).format('DD MMM YYYY')} (Time In: ${moment(
+                timeIn,
+              ).format('HH:mm')} Time Out: ${timeOut ? moment(timeOut).format('HH:mm') : '-'
+                })${docotrName ? ` - ${docotrName}` : ''}`}
+            </div>
+            <div style={{ marginTop: 18 }}>
+              <span>
+                {`${visitPurposeName}, Last Update By: ${LastUpdateBy ||
+                  ''} on ${moment(signOffDate).format('DD MMM YYYY HH:mm')}`}
+              </span>
+              <span style={{ marginLeft: 5 }}>
+                {row.servingByList?.length > 0 ? `Served by ${row.servingByList.map(x => x.servingBy).join(', ')}.` : null}
+              </span>
+            </div>
+          </div>
+        )}
+        {!isNurseNote && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            {patientIsActive &&
+              !isRetailVisit &&
+              fromModule !== 'Consultation' &&
+              fromModule !== 'History' && (
+                <Authorized authority='patientdashboard.editconsultation'>
+                  <Tooltip title='Edit Consultation'>
+                    <Button
+                      color='primary'
+                      style={{ marginLeft: theme.spacing(2) }}
+                      size='sm'
+                      justIcon
+                      onClick={event => {
+                        event.stopPropagation()
+
+                        dispatch({
+                          type: `consultation/edit`,
+                          payload: {
+                            id: row.id,
+                            version: patientHistory.version,
+                          },
+                        }).then(o => {
+                          if (o) {
+                            if (o.updateByUserFK !== user.data.id) {
+                              const { clinicianprofile = [] } = codetable
+                              const version = Date.now()
+                              const editingUser = clinicianprofile.find(
+                                m => m.userProfileFK === o.updateByUserFK,
+                              ) || {
+                                name: 'Someone',
+                              }
+                              dispatch({
+                                type: 'global/updateAppState',
+                                payload: {
+                                  openConfirm: true,
+                                  openConfirmContent: `${editingUser.name} is currently editing the patient note, do you want to overwrite?`,
+                                  onConfirmSave: () => {
+                                    dispatch({
+                                      type: `consultation/overwrite`,
+                                      payload: {
+                                        id: row.id,
+                                        version,
+                                      },
+                                    }).then(c => {
+                                      dispatch({
+                                        type: 'patient/closePatientModal',
+                                      })
+                                      history.push(
+                                        `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${c.id}&v=${version}`,
+                                      )
+                                    })
+                                  },
+                                },
+                              })
+                            } else {
+                              dispatch({
+                                type: 'patient/closePatientModal',
+                              })
+                              history.push(
+                                `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
+                              )
+                            }
+                          }
+                        })
+                      }}
+                    >
+                      <Edit />
+                    </Button>
+                  </Tooltip>
+                </Authorized>
+              )}
+          </div>
+        )}
+        {!isNurseNote &&
+          settings.showConsultationVersioning &&
+          !isRetailVisit && (
+            <div
+              style={{
+                marginLeft: 'auto',
+                display: 'flex',
+                alignItems: 'center',
+                marginRight: 10,
+              }}
+            >
+              <Tooltip title='View History'>
+                <span
+                  className='material-icons'
+                  style={{ color: 'gray' }}
+                  onClick={event => {
+                    event.stopPropagation()
+                    this.setState({
+                      showHistoryDetails: true,
+                      selectHistory: { ...row },
+                    })
+                  }}
+                >
+                  history
+                </span>
+              </Tooltip>
+            </div>
+          )}
       </div>
     )
   }
@@ -786,8 +776,8 @@ class PatientHistory extends Component {
         patientAllergy: allergies.length
           ? allergies.map(o => o.allergyName).join(', ')
           : patientNoAllergies
-          ? 'NKDA'
-          : '',
+            ? 'NKDA'
+            : '',
         patientSocialHistory: socialHistory,
         patientFamilyHistory: familyHistory,
         patientMajorInvestigation: medicalHistory,
@@ -1198,27 +1188,20 @@ class PatientHistory extends Component {
               current.patientNoteVitalSigns.map(o => {
                 return {
                   visitFK: current.currentId,
-                  temperatureC: `${
-                    o.temperatureC ? numeral(o.temperatureC).format('0.0') : 0.0
-                  } \u00b0C`,
-                  bpSysMMHG: `${
-                    o.bpSysMMHG ? numeral(o.bpSysMMHG).format('0.0') : 0.0
-                  } mmHg`,
-                  bpDiaMMHG: `${
-                    o.bpDiaMMHG ? numeral(o.bpDiaMMHG).format('0.0') : 0.0
-                  } mmHg`,
-                  pulseRateBPM: `${
-                    o.pulseRateBPM ? numeral(o.pulseRateBPM).format('0.0') : 0.0
-                  } bpm`,
-                  weightKG: `${
-                    o.weightKG ? numeral(o.weightKG).format('0.0') : 0.0
-                  } KG`,
-                  heightCM: `${
-                    o.heightCM ? numeral(o.heightCM).format('0.0') : 0.0
-                  } CM`,
-                  bmi: `${
-                    o.bmi ? numeral(o.bmi).format('0.0') : 0.0
-                  } kg/m\u00b2`,
+                  temperatureC: `${o.temperatureC ? numeral(o.temperatureC).format('0.0') : 0.0
+                    } \u00b0C`,
+                  bpSysMMHG: `${o.bpSysMMHG ? numeral(o.bpSysMMHG).format('0.0') : 0.0
+                    } mmHg`,
+                  bpDiaMMHG: `${o.bpDiaMMHG ? numeral(o.bpDiaMMHG).format('0.0') : 0.0
+                    } mmHg`,
+                  pulseRateBPM: `${o.pulseRateBPM ? numeral(o.pulseRateBPM).format('0.0') : 0.0
+                    } bpm`,
+                  weightKG: `${o.weightKG ? numeral(o.weightKG).format('0.0') : 0.0
+                    } KG`,
+                  heightCM: `${o.heightCM ? numeral(o.heightCM).format('0.0') : 0.0
+                    } CM`,
+                  bmi: `${o.bmi ? numeral(o.bmi).format('0.0') : 0.0
+                    } kg/m\u00b2`,
                 }
               }),
             )
@@ -1275,7 +1258,6 @@ class PatientHistory extends Component {
       ConsultationDocument: consultationDocument,
       ReportContext: reportContext,
     }
-    // console.log(payload)
     const payload1 = [
       {
         ReportId: 68,
@@ -1323,44 +1305,40 @@ class PatientHistory extends Component {
                 render={args => <Checkbox {...args} label='All Date' />}
               />
             </div>
-            <div style={{ display: 'inline-Block' }}>
-              <Field
-                name='selectCategories'
-                render={args => (
-                  <CodeSelect
-                    valueField='value'
-                    label='Categories'
-                    mode='multiple'
-                    style={{ width: 240 }}
-                    options={this.getCategoriesOptions()}
-                    {...args}
-                  />
-                )}
-              />
-            </div>
-            <div style={{ display: 'inline-Block', marginLeft: 10 }}>
-              <Field
-                name='selectDoctors'
-                render={args => (
-                  <DoctorProfileSelect
-                    style={{ width: 240 }}
-                    label='Doctors'
-                    mode='multiple'
-                    {...args}
-                    allValue={-99}
-                    allValueOption={{
-                      id: -99,
-                      clinicianProfile: {
-                        name: 'All',
-                        isActive: true,
-                      },
-                    }}
-                    labelField='clinicianProfile.name'
-                    localFilter={option => option.clinicianProfile.isActive}
-                  />
-                )}
-              />
-            </div>
+            <Field
+              name='selectCategories'
+              render={args => (
+                <CodeSelect
+                  valueField='value'
+                  label='Categories'
+                  mode='multiple'
+                  style={{ width: 240, display: 'inline-Block', marginBottom: -16 }}
+                  options={this.getCategoriesOptions()}
+                  {...args}
+                />
+              )}
+            />
+            <Field
+              name='selectDoctors'
+              render={args => (
+                <DoctorProfileSelect
+                  style={{ width: 240, display: 'inline-Block', marginLeft: 10, marginBottom: -16 }}
+                  label='Doctors'
+                  mode='multiple'
+                  {...args}
+                  allValue={-99}
+                  allValueOption={{
+                    id: -99,
+                    clinicianProfile: {
+                      name: 'All',
+                      isActive: true,
+                    },
+                  }}
+                  labelField='clinicianProfile.name'
+                  localFilter={option => option.clinicianProfile.isActive}
+                />
+              )}
+            />
             <div style={{ display: 'inline-Block', marginLeft: 5 }}>
               <ProgressButton
                 color='primary'
@@ -1377,7 +1355,7 @@ class PatientHistory extends Component {
           <div
             style={{
               position: 'relative',
-              bottom: -8,
+              bottom: -4,
             }}
           >
             <div style={{ display: 'inline-Block' }}>
@@ -1478,7 +1456,7 @@ class PatientHistory extends Component {
     const { isAllDate } = values
     return (
       <div>
-        <div style={{ display: 'flex' }}>
+        <div style={{ display: 'flex', marginBottom: isFullScreen ? 10 : 0 }}>
           <div>
             <div
               style={{
@@ -1506,44 +1484,40 @@ class PatientHistory extends Component {
                 render={args => <Checkbox {...args} label='All Date' />}
               />
             </div>
-            <div style={{ display: 'inline-Block' }}>
-              <Field
-                name='selectCategories'
-                render={args => (
-                  <CodeSelect
-                    valueField='value'
-                    label='Categories'
-                    mode='multiple'
-                    style={{ width: !isFullScreen ? 150 : 240 }}
-                    options={this.getCategoriesOptions()}
-                    {...args}
-                  />
-                )}
-              />
-            </div>
-            <div style={{ display: 'inline-Block', marginLeft: 10 }}>
-              <Field
-                name='selectDoctors'
-                render={args => (
-                  <DoctorProfileSelect
-                    style={{ width: !isFullScreen ? 150 : 240 }}
-                    label='Doctors'
-                    mode='multiple'
-                    {...args}
-                    allValue={-99}
-                    allValueOption={{
-                      id: -99,
-                      clinicianProfile: {
-                        name: 'All',
-                        isActive: true,
-                      },
-                    }}
-                    labelField='clinicianProfile.name'
-                    localFilter={option => option.clinicianProfile.isActive}
-                  />
-                )}
-              />
-            </div>
+            <Field
+              name='selectCategories'
+              render={args => (
+                <CodeSelect
+                  valueField='value'
+                  label='Categories'
+                  mode='multiple'
+                  style={{ width: !isFullScreen ? 150 : 240, display: 'inline-Block', marginBottom: -16 }}
+                  options={this.getCategoriesOptions()}
+                  {...args}
+                />
+              )}
+            />
+            <Field
+              name='selectDoctors'
+              render={args => (
+                <DoctorProfileSelect
+                  style={{ width: !isFullScreen ? 150 : 240, display: 'inline-Block', marginLeft: 10, marginBottom: -16 }}
+                  label='Doctors'
+                  mode='multiple'
+                  {...args}
+                  allValue={-99}
+                  allValueOption={{
+                    id: -99,
+                    clinicianProfile: {
+                      name: 'All',
+                      isActive: true,
+                    },
+                  }}
+                  labelField='clinicianProfile.name'
+                  localFilter={option => option.clinicianProfile.isActive}
+                />
+              )}
+            />
             {isFullScreen && (
               <div style={{ display: 'inline-Block', marginLeft: 5 }}>
                 <ProgressButton
@@ -1751,7 +1725,7 @@ class PatientHistory extends Component {
     this.queryVisitHistory()
   }
 
-  render() {
+  render () {
     const { clinicSettings, scriblenotes, fromModule } = this.props
     const cfg = {}
     const {

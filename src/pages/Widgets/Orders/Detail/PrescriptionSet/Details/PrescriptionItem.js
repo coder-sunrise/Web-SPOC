@@ -1285,7 +1285,7 @@ class Detail extends PureComponent {
                               />
                             </GridItem>
                             <GridItem xs={2}>
-                              <FastField
+                              <Field
                                 name={`prescriptionSetItemInstruction[${i}].prescribeUOMFK`}
                                 render={args => {
                                   return (
@@ -1305,6 +1305,7 @@ class Detail extends PureComponent {
                                           op ? op.name : undefined,
                                         )
                                       }}
+                                      disabled={!values.isDrugMixture}
                                       {...commonSelectProps}
                                       {...args}
                                     />
@@ -1507,7 +1508,7 @@ class Detail extends PureComponent {
             </GridItem>
           </GridContainer>
 
-          <GridItem xs={7} className={classes.editor} style={{ paddingRight: 35 }}>
+          <GridItem xs={8} className={classes.editor} style={{ paddingRight: 35 }}>
             <div style={{ position: 'relative' }}>
               <FastField
                 name='remarks'
