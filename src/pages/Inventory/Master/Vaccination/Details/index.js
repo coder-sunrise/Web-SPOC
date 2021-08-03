@@ -168,6 +168,7 @@ export default compose(
         isChasChronicClaimable,
         isMedisaveClaimable,
         isAutoGenerateCertificate,
+        isNurseActualizable
       } = returnValue
       if (isChasAcuteClaimable) {
         schemes.push('isChasAcuteClaimable')
@@ -180,6 +181,9 @@ export default compose(
       }
       if (isAutoGenerateCertificate) {
         schemes.push('isAutoGenerateCertificate')
+      }
+      if (isNurseActualizable) {
+        schemes.push('isNurseActualizable')
       }
 
       return {
@@ -244,6 +248,7 @@ export default compose(
         isChasChronicClaimable: false,
         isMedisaveClaimable: false,
         isAutoGenerateCertificate: false,
+        isNurseActualizable: false
       }
       values.schemes.forEach((o) => {
         if (o === 'isChasAcuteClaimable') {
@@ -253,6 +258,8 @@ export default compose(
         } else if (o === 'isMedisaveClaimable') {
           schemes[o] = true
         } else if (o === 'isAutoGenerateCertificate') {
+          schemes[o] = true
+        } else if (o === 'isNurseActualizable') {
           schemes[o] = true
         }
       })

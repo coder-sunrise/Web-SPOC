@@ -5,12 +5,13 @@ import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 //import CheckCircle from '@material-ui/icons/CheckCircle'
-import Timer from '@material-ui/icons/Timer'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { Divider } from '@material-ui/core'
+import Cross from '@material-ui/icons/HighlightOff'
 import { currencySymbol, currencyFormat } from '@/utils/config'
 import numeral from 'numeral'
+import { RADIOLOGY_WORKITEM_STATUS, NURSE_WORKITEM_STATUS } from '@/utils/constants'
 import {
   CommonTableGrid,
   Button,
@@ -109,6 +110,16 @@ export default ({
   }
 
   const editRow = row => {
+    const { workitem = {} } = row
+    const { nurseWorkitem = {}, radiologyWorkitem = {} } = workitem
+    const { nuseActualize = [] } = nurseWorkitem
+    if (!row.isPreOrder) {
+      if ((row.type === '10' && radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCCELED)
+        || nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED) {
+        return
+      }
+    }
+
     if (row.isPreOrderActualize) return
     if (!row.isActive && row.type !== '5' && !row.isDrugMixture) return
 
@@ -399,6 +410,47 @@ export default ({
     return row.subject
   }
 
+  const radiologyWorkitemStatus = (radiologyWorkitemStatusFK) => {
+    if (radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.NEW)
+      return <Tooltip title='New'>
+        <div style={{
+          position: 'absolute',
+          top: 1,
+          right: 0,
+          borderRadius: 8,
+          height: 16,
+          width: 16,
+          border: '2px solid #4876FF'
+        }} />
+      </Tooltip>
+
+    if (radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT
+      || radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED
+      || radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS)
+      return <Tooltip title={radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS ? 'In Progress' : 'Completed'} >
+        <div style={{
+          position: 'absolute',
+          top: 1,
+          right: 0,
+          borderRadius: 8,
+          height: 16,
+          width: 16,
+          backgroundColor: radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS ? '#4876FF' : '#008B00',
+        }} />
+      </Tooltip >
+    if (radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.CANCCELED)
+      return <Tooltip title='Cancelled'>
+        <div style={{
+          position: 'absolute',
+          top: 1,
+          right: 0,
+        }} >
+          <Cross style={{ color: 'red', height: 20, width: 20 }} color='red' />
+        </div>
+      </Tooltip>
+    return ''
+  }
+
   return (
     <CommonTableGrid
       size='sm'
@@ -645,6 +697,13 @@ export default ({
               ].join(' ')
             }
 
+            let radiologyWorkitemStatusFK
+            if (row.type === '10' && !row.isPreOrder) {
+              const { workitem = {} } = row
+              const { radiologyWorkitem = {} } = workitem
+              radiologyWorkitemStatusFK = radiologyWorkitem.statusFK
+            }
+
             return (
               <div style={{ position: 'relative' }}>
                 <div style={{
@@ -669,6 +728,7 @@ export default ({
                       > Pre</Tag>
                     </Tooltip>
                   )}
+                  {radiologyWorkitemStatusFK && radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
                 </div>
               </div>
             )
@@ -688,28 +748,10 @@ export default ({
               >
                 <div style={wrapCellTextStyle}>
                   {packageDrawdownIndicator(row)}
-                  {row.type === '10' && (
-                    <div
-                      style={{
-                        position: 'relative',
-                      }}
-                    >
-                      <Tooltip title='Draft'>
-                        <Timer
-                          style={{
-                            position: 'absolute',
-                            top: 2,
-                            color: 'red',
-                            transform: 'scale(1.4,1.4)',
-                          }}
-                        />
-                      </Tooltip>
-                    </div>
-                  )}
                   <div
                     style={{
                       position: 'relative',
-                      left: row.isPackage || row.type === '10' ? 22 : 0,
+                      left: row.isPackage ? 22 : 0,
                     }}
                   >
                     {getDisplayName(row)}
@@ -789,11 +831,44 @@ export default ({
             if (row.type === '7' && from !== 'EditOrder') return null
 
             const editAccessRight = OrderItemAccessRight(row)
-
+            const { workitem = {} } = row
+            const { nurseWorkitem = {}, radiologyWorkitem = {} } = workitem
+            const { nuseActualize = [] } = nurseWorkitem
+            let editMessage = 'Edit'
+            let deleteMessage = 'Delete'
+            let editEnable = true
+            let deleteEnable = true
+            if (!row.isPreOrder) {
+              if (row.type === '10') {
+                if ([RADIOLOGY_WORKITEM_STATUS.INPROGRESS, RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT, RADIOLOGY_WORKITEM_STATUS.COMPLETED].indexOf(radiologyWorkitem.statusFK) >= 0) {
+                  deleteEnable = false
+                  deleteMessage = 'No modification is allowed on processed order'
+                }
+                if (radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCCELED) {
+                  editEnable = false
+                }
+              }
+              else {
+                if (nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED) {
+                  editEnable = false
+                  deleteEnable = false
+                  const lastNuseActualize = _.orderBy(
+                    nuseActualize,
+                    [
+                      'actulizeDate',
+                    ],
+                    [
+                      'desc',
+                    ],
+                  )[0]
+                  deleteMessage = editMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
+                }
+              }
+            }
             return (
               <Authorized authority={editAccessRight}>
                 <div>
-                  <Tooltip title='Edit'>
+                  <Tooltip title={editMessage}>
                     <Button
                       size='sm'
                       onClick={() => {
@@ -807,18 +882,19 @@ export default ({
                         (!row.isActive &&
                           row.type !== '5' &&
                           !row.isDrugMixture) ||
-                        row.isPreOrderActualize
+                        row.isPreOrderActualize ||
+                        !editEnable
                       }
                     >
                       <Edit />
                     </Button>
                   </Tooltip>
-                  <Tooltip title='Delete'>
+                  <Tooltip title={deleteMessage}>
                     <Button
                       size='sm'
                       color='danger'
                       justIcon
-                      disabled={isEditingEntity || row.isPreOrderActualize}
+                      disabled={isEditingEntity || row.isPreOrderActualize || !deleteEnable}
                     >
                       <Delete
                         onClick={() => {

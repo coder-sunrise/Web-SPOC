@@ -69,6 +69,20 @@ const generalOptions = [
     },
   },
   {
+    id: 'isDispensedByPharmacy',
+    name: 'Dispensed by Pharmacy',
+    layoutConfig: {
+      style: {},
+    },
+  },
+  {
+    id: 'isNurseActualizable',
+    name: 'Nurse Actualizable',
+    layoutConfig: {
+      style: {},
+    },
+  },
+  {
     id: 'isDisplayInLeaflet',
     name: 'Display in Leaflet',
     layoutConfig: {
