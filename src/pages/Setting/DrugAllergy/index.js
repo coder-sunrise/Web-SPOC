@@ -24,6 +24,13 @@ class DrugAllergy extends PureComponent {
 
   componentDidMount() {
     this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ltdrugallergysource',
+      },
+    })
+
+    this.props.dispatch({
       type: 'settingDrugAllergy/query',
     })
   }

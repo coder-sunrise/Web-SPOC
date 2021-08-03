@@ -402,6 +402,7 @@ export default compose(
         inventoryMedication_MedicationPrecaution,
         inventoryMedication_MedicationContraIndication,
         inventoryMedication_MedicationInteraction,
+        inventoryMedication_DrugAllergy,
         isDispensedByPharmacy,
         isNurseActualizable,
       } = medicationDetails
@@ -442,6 +443,10 @@ export default compose(
         item => item.medicationIngredientFK,
       )
 
+      let drugAllergies = inventoryMedication_DrugAllergy?.map(
+        item => item.drugAllergyFK,
+      )
+
       let medicationSideEffects = inventoryMedication_MedicationSideEffect
         ?.sort(item => item.sequence)
         .map(item => item.medicationSideEffectFK)
@@ -461,6 +466,7 @@ export default compose(
       return {
         ...medicationDetails,
         medicationIngredients,
+        drugAllergies,
         medicationSideEffects,
         medicationPrecautions,
         medicationContraindications,
@@ -540,6 +546,7 @@ export default compose(
         medicationInteractions = [],
         medicationContraindications = [],
         medicationInstructionRule = [],
+        drugAllergies = [],
         ...restValues
       } = values
       const { dispatch, history, onConfirm, medicationDetail } = props
@@ -586,6 +593,15 @@ export default compose(
           .filter(m => m !== allOptionId)
           .map(m => {
             return { medicationIngredientFK: m, inventoryMedicationFK: id }
+          })
+      }
+
+      let drugAllergyList = undefined
+      if (drugAllergies) {
+        drugAllergyList = drugAllergies
+          .filter(m => m !== allOptionId)
+          .map(m => {
+            return { drugAllergyFK: m, inventoryMedicationFK: id }
           })
       }
 
@@ -677,6 +693,7 @@ export default compose(
         inventoryMedication_MedicationPrecaution: precautionList,
         inventoryMedication_MedicationContraIndication: contraIndicationList,
         inventoryMedication_MedicationInteraction: interactionList,
+        inventoryMedication_DrugAllergy: drugAllergyList,
         medicationInstructionRule: finalMedicationInstructionRule,
       }
 

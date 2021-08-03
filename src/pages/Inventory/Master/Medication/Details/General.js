@@ -406,10 +406,11 @@ const General = ({
         </GridItem>
         <GridItem xs={12} md={4}>
           <FastField
-            name='drugAllergyFK'
+            name='drugAllergies'
             render={args => (
               <CodeSelect
-                multiple
+                disableAll
+                mode='multiple'
                 labelField='displayValue'
                 label={formatMessage({
                   id: 'inventory.master.medication.drugAllergy',
