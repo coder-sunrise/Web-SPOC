@@ -84,13 +84,10 @@ export default createFormViewModel({
         })
         yield take('query/@@end')
 
-        const servePatientRight = Authorized.check('queue.servepatient')
-        if(servePatientRight && servePatientRight.rights !== 'hidden'){
-          yield put({
-            type: 'getServingPersons',
-            payload: { visitFK: visitID },
-          })
-        }
+        yield put({
+          type: 'getServingPersons',
+          payload: { visitFK: visitID },
+        })
       },
 
       *getServingPersons({payload},{call,put}){
