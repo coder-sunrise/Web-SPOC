@@ -107,6 +107,19 @@ const fns = {
     })
     return r
   },
-  
+  getActualization : async params => {
+    const r = await request(`${url}/getActualization`, {
+      method: 'GET',
+      body: params
+    })
+    return r
+  },
+  saveActualization : async params => {
+    const r = await request(`${url}/saveActualization`, {
+      method: 'POST',
+      body: params
+    })
+    return r
+  },
 }
 export default fns

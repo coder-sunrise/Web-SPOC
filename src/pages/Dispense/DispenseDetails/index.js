@@ -374,10 +374,18 @@ const DispenseDetails = ({
       )
       setSelectedActualizeRecords(selectedRecords)
       //TODO there should be propmt window : actualization widnow meanwhile get histroy from server by selectedActualizeRecords
+      let nurseWorkitemIds = selectedRecords.map(x=>x.workitem?.nurseWorkitem?.id)
       console.log(
         'handleMultiActualizationClick.selectedActualizeRecords',
         selectedRecords,
+        nurseWorkitemIds
       )
+      dispatch({
+        type: 'dispense/getActualization',
+        payload: { nurseWorkitemIds },
+      }).then(r => {
+       console.log('dispense/getActualization',r)
+      })
       
     } else {
       notification.error({

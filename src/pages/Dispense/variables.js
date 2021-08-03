@@ -37,8 +37,8 @@ export const actualizeTableConfig = selectable => {
           const {
             isNurseActualizeRequired = false,
             workitem: {
-              nurseWorkitem: { statusFK },
-            },
+              nurseWorkitem: { statusFK } = {},
+            } = {},
           } = row
 
           return (
@@ -104,8 +104,8 @@ const checkActualizable = row => {
   const {
     isNurseActualizeRequired = false,
     workitem: {
-      nurseWorkitem: { statusFK },
-    },
+      nurseWorkitem: { statusFK } = {},
+    } = {},
   } = row
   return { isNurseActualizeRequired, statusFK }
 }
