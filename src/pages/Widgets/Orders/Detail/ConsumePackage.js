@@ -63,7 +63,7 @@ const getType = (typeId) => {
       inventoryconsumable = [],
       ctservice = []
     } = codetable
-    const { weight } = visitRegistration.entity.visit
+    const { weightKG } = visitRegistration.entity.visit
     const { dob } = patient.entity
     let datas = []
     const updateRows = () => {
@@ -83,9 +83,9 @@ const getType = (typeId) => {
       instruction += `${dosage ? dosage.name : ''} `
       const prescribe = medication.prescribingUOM
       instruction += `${prescribe ? prescribe.name : ''} `
-      const drugFrequency = matchInstruction.medicationFrequency
+      const drugFrequency = matchInstruction?.medicationFrequency
       instruction += `${drugFrequency ? drugFrequency.name : ''}`
-      const itemDuration = matchInstruction.duration
+      const itemDuration = matchInstruction?.duration
         ? ` For ${matchInstruction.duration} day(s)`
         : ''
       instruction += itemDuration
@@ -102,7 +102,7 @@ const getType = (typeId) => {
       if (dob) {
         age = Math.floor(moment.duration(moment().diff(dob)).asYears())
       }
-      var matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weight))
+      var matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weightKG))
 
       let item
       if (medication.isActive === true) {

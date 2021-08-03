@@ -100,7 +100,7 @@ const LowStockInfo = ({ sourceType, values = {}, codetable, visitRegistration = 
           if (patientEntity.dob) {
             age = Math.floor(moment.duration(moment().diff(patientEntity.dob)).asYears())
           }
-          isMatchInstruction = isMatchInstructionRule(instruction, age, visit.weight)
+          isMatchInstruction = isMatchInstructionRule(instruction, age, visit.weightKG)
         }
 
         return {

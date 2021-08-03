@@ -91,6 +91,8 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
     let showNoTemplate
 
     const { doctorProfileFK, weight } = visitRegistration.entity.visit
+    console.log('visitRegistration.entity.visit', visitRegistration.entity.visit)
+    console.log('weight', weight)
     const visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK)
       .clinicianProfile.userProfileFK
 
@@ -108,9 +110,9 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           codeTableItem.id === inventoryMedication.prescribingUOMFK,
       )
       instruction += `${prescribe ? prescribe.name : ''} `
-      const drugFrequency = matchInstruction.medicationFrequency
-      instruction += `${drugFrequency ? mdrugFrequency.name : ''} For `
-      instruction += `${matchInstruction.duration ? matchInstruction.duration : ''
+      const drugFrequency = matchInstruction?.medicationFrequency
+      instruction += `${drugFrequency ? drugFrequency.name : ''} For `
+      instruction += `${matchInstruction?.duration ? matchInstruction.duration : ''
         } day(s)`
       return instruction
     }

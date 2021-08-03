@@ -76,7 +76,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       ctservice = [],
     } = codetable
 
-    const { doctorProfileFK, weight } = visitRegistration.entity.visit
+    const { doctorProfileFK, weightKG } = visitRegistration.entity.visit
     const visitDoctorUserId = doctorprofile.find(
       (d) => d.id === doctorProfileFK,
     ).clinicianProfile.userProfileFK
@@ -105,9 +105,9 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       instruction += `${dosage ? dosage.name : ''} `
       const prescribe = medication.prescribingUOM
       instruction += `${prescribe ? prescribe.name : ''} `
-      const drugFrequency = matchInstruction.medicationFrequency
+      const drugFrequency = matchInstruction?.medicationFrequency
       instruction += `${drugFrequency ? drugFrequency.name : ''}`
-      const itemDuration = matchInstruction.duration
+      const itemDuration = matchInstruction?.duration
         ? ` For ${matchInstruction.duration} day(s)`
         : ''
       instruction += itemDuration
@@ -127,7 +127,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       if (dob) {
         age = Math.floor(moment.duration(moment().diff(dob)).asYears())
       }
-      var matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weight))
+      var matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weightKG))
 
       let item
       if (medication.isActive === true) {

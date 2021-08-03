@@ -620,14 +620,14 @@ class Medication extends PureComponent {
 
     let matchInstruction
     if (op.id) {
-      const { weight } = visitRegistration.entity.visit
+      const { weightKG } = visitRegistration.entity.visit
       const { dob } = patient.entity
       const { medicationInstructionRule = [] } = op
       let age
       if (dob) {
         age = Math.floor(moment.duration(moment().diff(dob)).asYears())
       }
-      matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weight))
+      matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weightKG))
       const medicationfrequency = matchInstruction?.medicationFrequency
       const medicationdosage = matchInstruction?.medicationFrequency
 
@@ -952,14 +952,14 @@ class Medication extends PureComponent {
       )
     }
 
-    const { weight } = visitRegistration.entity.visit
+    const { weightKG } = visitRegistration.entity.visit
     const { dob } = patient.entity
     const { medicationInstructionRule = [] } = option
     let age
     if (dob) {
       age = Math.floor(moment.duration(moment().diff(dob)).asYears())
     }
-    const matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weight))
+    const matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weightKG))
 
     row.quantity = matchInstruction?.dispensingQuantity || 0
     row.uomfk = option.dispensingUOM.id

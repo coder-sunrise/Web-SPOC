@@ -22,6 +22,7 @@ export default ({
   index,
   arrayHelpers,
   handleCalculateBMI,
+  weightOnChange,
   ...props
 }) => {
   const [show, setShow] = useState(false)
@@ -115,6 +116,7 @@ export default ({
                   setTimeout(() => {
                     handleCalculateBMI(index)
                   }, 1)
+                  weightOnChange()
                 }}
                 min={0}
                 max={999}
