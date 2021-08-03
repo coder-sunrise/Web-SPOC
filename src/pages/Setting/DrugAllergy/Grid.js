@@ -6,6 +6,7 @@ import { CommonTableGrid, Button, Tooltip } from '@/components'
 class Grid extends PureComponent {
   configs = {
     columns: [
+      { name: 'drugAllergySourceFK', title: 'Source' },
       { name: 'code', title: 'Code' },
       { name: 'displayValue', title: 'Display Value' },
       { name: 'description', title: 'Description' },
@@ -14,6 +15,12 @@ class Grid extends PureComponent {
       { name: 'action', title: 'Action' },
     ],
     columnExtensions: [
+      {
+        columnName: 'drugAllergySourceFK',
+        width: 100,
+        type: 'codeSelect',
+        code: 'ltdrugallergysource',
+      },
       { columnName: 'code', width: 200 },
       {
         columnName: 'sortOrder',
