@@ -3,6 +3,7 @@ import { createFormViewModel } from 'medisys-model'
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import { notification } from '@/components'
 import service from '../services/dispense'
+import Authorized from '@/utils/Authorized'
 
 export default createFormViewModel({
   namespace: 'dispense',
