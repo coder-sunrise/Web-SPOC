@@ -17,15 +17,16 @@ export default createFormViewModel({
 
     effects: {
       *queryDone({ payload }, { call, select, put, take }) {
+        const radiologyDetails = yield select(st => st.radiologyDetails)
+
         yield put({
           type: 'patient/query',
-          payload: { id: 22 },
+          payload: { id: radiologyDetails.entity.patientProfileFK },
         })
 
         yield take('patient/query/@@end')
 
         const patientInfo = yield select(st => st.patient)
-        const radiologyDetails = yield select(st => st.radiologyDetails)
       },
       *initState({ payload }, { call, select, put, take }) {},
     },
