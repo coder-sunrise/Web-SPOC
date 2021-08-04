@@ -47,6 +47,15 @@ const styles = () => ({
   printButtonStyle: {
     marginLeft: 'auto',
   },
+  rightIcon: {
+    position: 'absolute',
+    bottom: 2,
+    fontWeight: 500,
+    color: 'white',
+    fontSize: '0.7rem',
+    padding: '2px 3px',
+    height: 20,
+  }
 })
 
 const InvoiceHistory = ({

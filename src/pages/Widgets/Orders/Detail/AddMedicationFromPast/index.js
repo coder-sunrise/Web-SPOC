@@ -349,8 +349,6 @@ class PastMedication extends PureComponent {
             isDispensedByPharmacy = true
           if (itemCorPrescriptionItemDrugMixture.find(dm => dm.isNurseActualizeRequired))
             isNurseActualizeRequired = true
-          if (itemCorPrescriptionItemDrugMixture.find(dm => dm.isExclusive))
-            isExclusive = true
         }
 
         return {

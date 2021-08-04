@@ -9,13 +9,11 @@ const wrapCellTextStyle = {
   whiteSpace: 'pre-wrap',
 }
 
-const drugMixtureIndicator = row => {
+const drugMixtureIndicator = (row, right) => {
   if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
 
   return (
-    <div style={{ position: 'relative', top: 2 }}>
-      <DrugMixtureInfo values={row.prescriptionDrugMixture} />
-    </div>
+    <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
   )
 }
 
@@ -37,32 +35,41 @@ export const DataGridColExtensions = [
     columnName: 'itemType',
     width: 300,
     render: row => {
+      let paddingRight = 0
+      if (row.isPreOrder) {
+        paddingRight = 24
+      }
+      if (row.isDrugMixture) {
+        paddingRight = 10
+      }
       return (
         <div style={{ position: 'relative' }}>
           <div style={{
             wordWrap: 'break-word',
             whiteSpace: 'pre-wrap',
-            paddingRight: row.isPreOrder ? 24 : 0
+            paddingRight: paddingRight
           }}>
             {row.itemType}
-            {drugMixtureIndicator(row)}
-            {row.isPreOrder &&
-              <Tooltip title='Pre-Order'>
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    right: -6,
+            <div style={{ position: 'relative', top: 2 }}>
+              {drugMixtureIndicator(row, -20)}
+              {row.isPreOrder &&
+                <Tooltip title='Pre-Order'>
+                  <div
+                    style={{
+                      position: 'absolute',
+                    bottom: 2,
+                    right: -30,
                     borderRadius: 10,
                     backgroundColor: '#4255bd',
                     fontWeight: 500,
                     color: 'white',
                     fontSize: '0.7rem',
-                    padding: '1px 3px',
-                    height: 20,
-                  }}
-                > Pre</div>
-              </Tooltip>}
+                      padding: '2px 3px',
+                      height: 20,
+                    }}
+                  > Pre</div>
+                </Tooltip>}
+            </div>
           </div>
         </div>
       )

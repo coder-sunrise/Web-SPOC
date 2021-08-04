@@ -346,19 +346,17 @@ export default ({
     whiteSpace: 'pre-wrap',
   }
 
-  const drugMixtureIndicator = row => {
+  const drugMixtureIndicator = (row, right) => {
     if (row.type !== '1' || !row.isDrugMixture) return null
     const activePrescriptionItemDrugMixture = row.corPrescriptionItemDrugMixture.filter(
       item => !item.isDeleted,
     )
 
     return (
-      <div style={{ position: 'relative', top: 2 }}>
-        <DrugMixtureInfo
-          values={activePrescriptionItemDrugMixture}
-          isShowTooltip={false}
-        />
-      </div>
+      <DrugMixtureInfo
+        values={activePrescriptionItemDrugMixture}
+        isShowTooltip={false} right={right}
+      />
     )
   }
 
@@ -416,8 +414,8 @@ export default ({
       return <Tooltip title='New'>
         <div style={{
           position: 'absolute',
-          top: 1,
-          right: 0,
+          bottom: 2,
+          right: -20,
           borderRadius: 8,
           height: 16,
           width: 16,
@@ -431,8 +429,8 @@ export default ({
       return <Tooltip title={radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS ? 'In Progress' : 'Completed'} >
         <div style={{
           position: 'absolute',
-          top: 1,
-          right: 0,
+          bottom: 2,
+          right: -20,
           borderRadius: 8,
           height: 16,
           width: 16,
@@ -443,8 +441,8 @@ export default ({
       return <Tooltip title='Cancelled'>
         <div style={{
           position: 'absolute',
-          top: 1,
-          right: 0,
+          bottom: 2,
+          right: -20,
         }} >
           <Cross style={{ color: 'red', height: 20, width: 20 }} color='red' />
         </div>
@@ -705,36 +703,56 @@ export default ({
               radiologyWorkitemStatusFK = radiologyWorkitem.statusFK
             }
 
+            let paddingRight = 0
+            if (row.isPreOrder && row.isExclusive) {
+              paddingRight = 52
+            }
+            else if (row.isPreOrder || row.isExclusive) {
+              paddingRight = 24
+            }
+
+            if (row.isDrugMixture || radiologyWorkitemStatusFK) {
+              paddingRight = 10
+            }
+
             return (
               <div style={{ position: 'relative' }}>
                 <div style={{
                   wordWrap: 'break-word',
                   whiteSpace: 'pre-wrap',
-                  paddingRight: row.isPreOrder ? 24 : 0
+                  paddingRight: paddingRight
                 }}>
                   <Tooltip title={texts}>
                     <span >{texts}</span>
                   </Tooltip>
-                  {drugMixtureIndicator(row)}
-                  {row.isPreOrder && (
-                    <Tooltip title='Pre-Order'>
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: 0,
-                          right: -6,
-                          borderRadius: 10,
-                          backgroundColor: '#4255bd',
-                          fontWeight: 500,
-                          color: 'white',
-                          fontSize: '0.7rem',
-                          padding: '1px 3px',
-                          height: 20,
-                        }}
-                      > Pre</div>
-                    </Tooltip>
-                  )}
-                  {radiologyWorkitemStatusFK && radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
+                  <div style={{ position: 'relative', top: 2 }}>
+                    {drugMixtureIndicator(row, -20)}
+                    {row.isExclusive && (
+                      <Tooltip title='Exclusive'>
+                        <div
+                          className={classes.rightIcon}
+                          style={{
+                            right: -30,
+                            borderRadius: 4,
+                            backgroundColor: 'green',
+                          }}
+                        >Excl.</div>
+                      </Tooltip>
+                    )}
+                    {row.isPreOrder && (
+                      <Tooltip title='Pre-Order'>
+                        <div
+                          className={classes.rightIcon}
+                          style={{
+                            right: row.isExclusive ? -60 : -30,
+                            borderRadius: 10,
+                            backgroundColor: '#4255bd',
+                          }}
+                        > Pre</div>
+                      </Tooltip>
+                    )}
+                    {radiologyWorkitemStatusFK && radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
+                  </div>
                 </div>
               </div>
             )
@@ -744,26 +762,28 @@ export default ({
           columnName: 'subject',
           render: row => {
             return (
-              <Tooltip 
-                title={
-                  <div>
+              <div style={{ position: 'relative' }}>
+                <Tooltip
+                  title={
+                    <div>
                       {`Code/Name: ${row.serviceCode || row.drugCode || row.consumableCode || row.vaccinationCode} / ${getDisplayName(row)}`}<br />
                       {`UnitPrice/UOM: ${currencySymbol}${numeral(row.unitPrice,).format(currencyFormat)} / ${row.dispenseUOMDisplayValue || row.unitOfMeasurement || row.uomDisplayValue || '-'}`}
+                    </div>
+                  }
+                >
+                  <div style={wrapCellTextStyle}>
+                    {packageDrawdownIndicator(row)}
+                    <div
+                      style={{
+                        position: 'relative',
+                        left: row.isPackage ? 22 : 0,
+                      }}
+                    >
+                      {getDisplayName(row)}
+                    </div>
                   </div>
-                }
-              >
-                <div style={wrapCellTextStyle}>
-                  {packageDrawdownIndicator(row)}
-                  <div
-                    style={{
-                      position: 'relative',
-                      left: row.isPackage ? 22 : 0,
-                    }}
-                  >
-                    {getDisplayName(row)}
-                  </div>
-                </div>
-              </Tooltip>
+                </Tooltip>
+              </div>
             )
           },
         },
@@ -803,13 +823,11 @@ export default ({
           render: row => {
             let qty = '0.0'
             if (row.type === '1' || row.type === '5') {
-              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${
-                row.dispenseUOMDisplayValue
-              }`
+              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${row.dispenseUOMDisplayValue
+                }`
             } else if (row.type === '2') {
-              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${
-                row.uomDisplayValue
-              }`
+              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${row.uomDisplayValue
+                }`
             } else if (
               row.type === '3' ||
               row.type === '7' ||
@@ -817,9 +835,8 @@ export default ({
             ) {
               qty = `${numeral(row.quantity || 0).format('0,0.0')}`
             } else if (row.type === '4') {
-              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${
-                row.unitOfMeasurement
-              }`
+              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${row.unitOfMeasurement
+                }`
             }
             return (
               <Tooltip title={qty}>

@@ -76,6 +76,15 @@ const styles = (theme) => ({
     color: 'red',
     fontWeight: 500,
   },
+  rightIcon: {
+    position: 'absolute',
+    bottom: 2,
+    fontWeight: 500,
+    color: 'white',
+    fontSize: '0.7rem',
+    padding: '2px 3px',
+    height: 20,
+  }
 })
 @withFormikExtend({
   mapPropsToValues: ({ patientHistory }) => {},

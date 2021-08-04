@@ -40,23 +40,19 @@ export default ({ classes, current, fieldName = '' }) => {
             <div className={classes.wrapCellTextStyle}
               style={{ paddingRight: row.isPreOrder ? 24 : 0 }}>
               {row.name}
-              {row.isPreOrder &&
-                <Tooltip title='Pre-Order'>
-                  <div
+              <div style={{ position: 'relative', top: 2 }}>
+                {row.isPreOrder &&
+                  <Tooltip title='Pre-Order'>
+                    <div
+                    className={classes.rightIcon}
                     style={{
-                      position: 'absolute',
-                      top: 0,
-                      right: -6,
-                      borderRadius: 10,
-                      backgroundColor: '#4255bd',
-                      fontWeight: 500,
-                      color: 'white',
-                      fontSize: '0.7rem',
-                      padding: '1px 3px',
-                      height: 20,
-                    }}
-                  > Pre</div>
-                </Tooltip>}
+                        right: -30,
+                        borderRadius: 10,
+                        backgroundColor: '#4255bd',
+                      }}
+                    > Pre</div>
+                  </Tooltip>}
+              </div>
             </div>
           </div>
         )

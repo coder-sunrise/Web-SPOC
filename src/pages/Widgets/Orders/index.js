@@ -44,6 +44,15 @@ const styles = (theme) => ({
     margin: '3px 0 3px 0',
     height: 20,
   },
+  rightIcon: {
+    position: 'absolute',
+    bottom: 2,
+    fontWeight: 500,
+    color: 'white',
+    fontSize: '0.7rem',
+    padding: '2px 3px',
+    height: 20,
+  }
 })
 // @skeleton()
 @connect(({ orders, codetable, clinicInfo }) => ({

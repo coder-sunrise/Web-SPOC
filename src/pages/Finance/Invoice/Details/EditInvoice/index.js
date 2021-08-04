@@ -48,6 +48,15 @@ const styles = theme => ({
     wordWrap: 'break-word',
     whiteSpace: 'pre-wrap',
   },
+  rightIcon: {
+    position: 'absolute',
+    bottom: 2,
+    fontWeight: 500,
+    color: 'white',
+    fontSize: '0.7rem',
+    padding: '2px 3px',
+    height: 20,
+  }
 })
 
 const itemSchema = Yup.object().shape({
@@ -225,17 +234,15 @@ class EditInvoice extends Component {
     setFieldValue(`invoiceItem[${index}].adjAmt`, finalAmount.adjAmount)
   }
 
-  drugMixtureIndicator = row => {
+  drugMixtureIndicator = (row, right) => {
     if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
 
     return (
-      <div style={{ position: 'relative', top: 2 }}>
-        <DrugMixtureInfo values={row.prescriptionDrugMixture} />
-      </div>
+      <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
     )
   }
 
-  render() {
+  render () {
     const { classes, values } = this.props
     const {
       invoiceItem = [],
@@ -292,29 +299,32 @@ class EditInvoice extends Component {
                 width: 300,
                 disabled: true,
                 render: row => {
+                  let paddingRight = 0
+                  if (row.isPreOrder) {
+                    paddingRight = 24
+                  }
+                  if (row.isDrugMixture) {
+                    paddingRight = 10
+                  }
                   return (
                     <div style={{ position: 'relative' }}>
                       <div className={classes.wrapCellTextStyle}
-                        style={{ paddingRight: row.isPreOrder ? 24 : 0 }}>
+                        style={{ paddingRight: paddingRight }}>
                         {row.itemType}
-                        {this.drugMixtureIndicator(row)}
-                        {row.isPreOrder &&
-                          <Tooltip title='Pre-Order'>
-                            <div
+                        <div style={{ position: 'relative', top: 2 }}>
+                          {this.drugMixtureIndicator(row, -20)}
+                          {row.isPreOrder &&
+                            <Tooltip title='Pre-Order'>
+                              <div
+                              className={classes.rightIcon}
                               style={{
-                                position: 'absolute',
-                                top: 0,
-                                right: -6,
+                                  right: -30,
                                 borderRadius: 10,
-                                backgroundColor: '#4255bd',
-                                fontWeight: 500,
-                                color: 'white',
-                                fontSize: '0.7rem',
-                                padding: '1px 3px',
-                                height: 20,
-                              }}
-                            > Pre</div>
-                          </Tooltip>}
+                                  backgroundColor: '#4255bd',
+                                }}
+                              > Pre</div>
+                            </Tooltip>}
+                        </div>
                       </div>
                     </div>
                   )

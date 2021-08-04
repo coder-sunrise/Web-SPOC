@@ -751,7 +751,10 @@ class Medication extends PureComponent {
       setFieldValue('isMinus', true)
       setFieldValue('isExactAmount', true)
       setFieldValue('adjValue', 0)
-      setFieldValue('quantity', matchInstruction?.dispensingQuantity)
+      setFieldValue('quantity', matchInstruction?.dispensingQuantity || 0)
+      let unitprice = op.sellingPrice || 0
+      setFieldValue('unitPrice', unitprice)
+      this.updateTotalPrice(unitprice * (matchInstruction?.dispensingQuantity || 0))
 
       if (op) {
         const { codetable, openPrescription } = this.props
@@ -985,7 +988,6 @@ class Medication extends PureComponent {
     row.revenueCategoryFK = option.revenueCategory.id
     row.isDispensedByPharmacy = option.isDispensedByPharmacy
     row.isNurseActualizeRequired = option.isNurseActualizable
-    row.isExclusive = option.isExclusive
 
     const defaultBatch = this.getMixtureItemBatchStock(row).find(
       batch => batch.isDefault,
@@ -1113,13 +1115,6 @@ class Medication extends PureComponent {
     }
     else {
       setFieldValue('isNurseActualizeRequired', false)
-    }
-
-    if (activeDrugMixtureRows.find(r => r.isExclusive)) {
-      setFieldValue('isExclusive', true)
-    }
-    else {
-      setFieldValue('isExclusive', false)
     }
 
     setFieldValue('quantity', totalQuantity)
@@ -1321,30 +1316,32 @@ class Medication extends PureComponent {
   }
 
   renderMedication = (option) => {
-    const { combinDisplayValue = '', medicationGroup = {}, stock = 0, dispensingUOM = {} } = option
+    const { combinDisplayValue = '', medicationGroup = {}, stock = 0, dispensingUOM = {}, isExclusive } = option
     const { name: uomName = '' } = dispensingUOM
     return <div style={{ marginTop: 5, }} >
       <div style={{ width: 330, display: 'inline-block', }}>
         <div style={{
-          maxWidth: 290, display: 'inline-block',
+          maxWidth: isExclusive ? 290 : 330, display: 'inline-block',
           whiteSpace: 'nowrap',
           textOverflow: 'ellipsis',
           overflow: 'hidden',
           height: '100%',
         }} title={combinDisplayValue}>{combinDisplayValue}</div>
 
-        <div style={{
-          display: 'inline-block', height: '100%',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-        }}>
+        {isExclusive &&
           <div style={{
-            backgroundColor: 'green', color: 'white',
-            height: 22, borderRadius: 4,
-            padding: '1px 5px',
-            fontWeight: 500,
-          }}>Excl.</div>
-        </div>
+            display: 'inline-block', height: '100%',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              backgroundColor: 'green', color: 'white',
+              height: 22, borderRadius: 4,
+              padding: '1px 5px',
+              fontWeight: 500,
+            }}>Excl.</div>
+          </div>
+        }
       </div>
       <div style={{
         width: 120, display: 'inline-block',

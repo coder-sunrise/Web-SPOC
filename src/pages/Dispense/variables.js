@@ -3,7 +3,6 @@ import Print from '@material-ui/icons/Print'
 import { FileCopySharp } from '@material-ui/icons'
 import { FormattedMessage } from 'umi'
 import numeral from 'numeral'
-import { Tag } from 'antd'
 import { currencySymbol, currencyFormat } from '@/utils/config'
 import {
   NumberInput,
@@ -27,7 +26,7 @@ export const tableConfig = {
 
 const columnWidth = '10%'
 
-const lowStockIndicator = (row, itemIdFieldName) => {
+const lowStockIndicator = (row, itemIdFieldName, right) => {
   const currentType = InventoryTypes.find(type => type.name === row.type)
   if (!currentType) return null
 
@@ -38,17 +37,15 @@ const lowStockIndicator = (row, itemIdFieldName) => {
   // If is drug mixture, show drug mixture indicator
   const isDrugMixture = currentType.name === 'Medication' && row.isDrugMixture
 
-  return (
-    <div style={{ position: 'relative', top: 2 }}>
-      {isDrugMixture ? (
-        <DrugMixtureInfo values={row.prescriptionDrugMixture} />
-      ) : (
-        <LowStockInfo
-          sourceType={currentType.name.toLowerCase()}
-          values={values}
-        />
-      )}
-    </div>
+  return (isDrugMixture ? (
+    <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
+  ) : (
+    <LowStockInfo
+      sourceType={currentType.name.toLowerCase()}
+      values={values}
+        right={right}
+      />
+    )
   )
 }
 
@@ -64,7 +61,6 @@ const packageDrawdownIndicator = row => {
     </div>
   )
 }
-
 export const PrescriptionColumns = [
   // { name: 'id', title: 'id' },
   {
@@ -124,45 +120,77 @@ export const PrescriptionColumnExtensions = (
       columnName: 'name',
       width: '30%',
       render: row => {
+        let paddingRight = 10
+        let right = -20
+        if (row.isPreOrder && row.isExclusive) {
+          paddingRight = 70
+          right = -80
+        }
+        else if (row.isPreOrder || row.isExclusive) {
+          paddingRight = 40
+          right = -50
+        }
         return (
-          <Tooltip
-            title={
-              <div>
-                {`Code/Name: ${row.code} / ${row.name}`}
-                <br />
-                {`UnitPrice/UOM: ${currencySymbol}${numeral(row.unitPrice).format(
-                  currencyFormat,
-                )} / ${row.orderUOM}`}
-              </div>
-            }
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+              paddingRight: paddingRight
+            }}
           >
-            <div style={{ position: 'relative' }}>
-              <div
-                style={{
-                  wordWrap: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                }}
-              >
-                {row.name}
-                {row.isPreOrder && (
+            <Tooltip
+              title={
+                <div>
+                  {`Code/Name: ${row.code} / ${row.name}`}
+                  <br />
+                  {`UnitPrice/UOM: ${currencySymbol}${numeral(row.unitPrice).format(
+                    currencyFormat,
+                  )} / ${row.orderUOM}`}
+                </div>
+              }
+            >
+              <span>{row.name}</span>
+            </Tooltip>
+            <div style={{ position: 'relative', top: 2 }}>
+              {row.isExclusive && (
+                <Tooltip title='Exclusive'>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 2,
+                      right: -30,
+                      borderRadius: 4,
+                      backgroundColor: 'green',
+                      fontWeight: 500,
+                      color: 'white',
+                      fontSize: '0.7rem',
+                      padding: '2px 3px',
+                      height: 20,
+                    }}
+                  >Excl.</div>
+                </Tooltip>
+              )}
+              {row.isPreOrder &&
                   <Tooltip title='Pre-Order'>
-                    <Tag
-                      color='#4255bd'
+                <div
                       style={{
                         position: 'absolute',
-                        top: 0,
-                        right: 10,
+                    bottom: 2,
+                    right: row.isExclusive ? -60 : -30,
                         borderRadius: 10,
+                    backgroundColor: '#4255bd',
+                    fontWeight: 500,
+                    color: 'white',
+                    fontSize: '0.7rem',
+                    padding: '2px 3px',
+                    height: 20,
                       }}
-                    >
-                      Pre
-                    </Tag>
+                > Pre</div>
                   </Tooltip>
-                )}
-                {lowStockIndicator(row, 'inventoryMedicationFK')}
+              }
+              {lowStockIndicator(row, 'inventoryMedicationFK', right)}
               </div>
-            </div>
-          </Tooltip>
+          </div>
         )
       },
     },
@@ -187,31 +215,36 @@ export const PrescriptionColumnExtensions = (
       width: '30%',
       render: (row) => {
         const existsDrugLabelRemarks = row.drugLabelRemarks && row.drugLabelRemarks.trim() !== ''
-        return <div style={{ position: 'relative', paddingRight: existsDrugLabelRemarks ? 10 : 0 }}>
+        return <div style={{ position: 'relative' }} >
           <div
             style={{
               wordWrap: 'break-word',
               whiteSpace: 'pre-wrap',
+              paddingRight: existsDrugLabelRemarks ? 10 : 0
             }}
-          >{row.remarks || ' '}</div>
-          {existsDrugLabelRemarks &&
-            <div style={{
-              position: 'absolute',
-              bottom: -2,
-              right: -5,
-            }}>
-              <Tooltip title={
-                <div>
-                  <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
-                  <div>{row.drugLabelRemarks}
+          >
+            {row.remarks || ' '}
+            <div style={{ position: 'relative', top: 2 }}>
+              {existsDrugLabelRemarks &&
+                <div style={{
+                  position: 'absolute',
+                bottom: 2,
+                right: -8,
+              }}>
+                <Tooltip title={
+                  <div>
+                    <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
+                    <div>{row.drugLabelRemarks}
+                    </div>
                   </div>
+                }>
+                    <FileCopySharp style={{ color: '#4255bd' }} />
+                  </Tooltip>
                 </div>
-              }>
-                <FileCopySharp style={{ color: 'blue' }} />
-              </Tooltip>
+              }
             </div>
-          }
-        </div>
+          </div>
+        </div >
       }
     },
     {
@@ -399,45 +432,54 @@ export const VaccinationColumnExtensions = (
       columnName: 'name',
       width: '60%',
       render: row => {
+        let paddingRight = 10
+        let right = -20
+        if (row.isPreOrder) {
+          paddingRight = paddingRight + 30
+          right = -50
+        }
         return (
-          <Tooltip
-            title={
-              <div>
-                {`Code/Name: ${row.code} / ${row.name}`}
-                <br />
-                {`UnitPrice/UOM: ${currencySymbol}${numeral(row.unitPrice).format(
-                  currencyFormat,
-                )} / ${row.dispenseUOM}`}
-              </div>
-            }
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+              paddingRight: paddingRight
+            }}
           >
-            <div style={{ position: 'relative' }}>
-              <div
-                style={{
-                  wordWrap: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                }}
-              >
-                {row.name}
+            <Tooltip
+              title={
+                <div>
+                  {`Code/Name: ${row.code} / ${row.name}`}
+                  <br />
+                  {`UnitPrice/UOM: ${currencySymbol}${numeral(row.unitPrice).format(
+                    currencyFormat,
+                  )} / ${row.dispenseUOM}`}
+                </div>
+              }
+            ><span> {row.name}</span>
+            </Tooltip>
+            <div style={{ position: 'relative', top: 2 }}>
                 {row.isPreOrder && (
                   <Tooltip title='Pre-Order'>
-                    <Tag
-                      color='#4255bd'
+                  <div
                       style={{
                         position: 'absolute',
-                        top: 0,
-                        right: 10,
+                      bottom: 2,
+                      right: -30,
                         borderRadius: 10,
+                      backgroundColor: '#4255bd',
+                      fontWeight: 500,
+                      color: 'white',
+                      fontSize: '0.7rem',
+                      padding: '2px 3px',
+                      height: 20,
                       }}
-                    >
-                      Pre
-                    </Tag>
+                  > Pre</div>
                   </Tooltip>
                 )}
-                {lowStockIndicator(row, 'inventoryVaccinationFK')}
+              {lowStockIndicator(row, 'inventoryVaccinationFK', right)}
               </div>
-            </div>
-          </Tooltip>
+          </div>
         )
       },
     },
@@ -606,24 +648,30 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
             style={{
               wordWrap: 'break-word',
               whiteSpace: 'pre-wrap',
+              paddingRight: row.isPreOrder ? 24 : 0
             }}
           >
             {row.type}
-            {row.isPreOrder && (
-              <Tooltip title='Pre-Order'>
-                <Tag
-                  color='#4255bd'
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    right: -10,
-                    borderRadius: 10,
-                  }}
-                >
-                  Pre
-                </Tag>
-              </Tooltip>
-            )}
+            <div style={{ position: 'relative', top: 2 }}>
+              {row.isPreOrder && (
+                <Tooltip title='Pre-Order'>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 2,
+                      right: -30,
+                      borderRadius: 10,
+                      backgroundColor: '#4255bd',
+                      fontWeight: 500,
+                      color: 'white',
+                      fontSize: '0.7rem',
+                      padding: '2px 3px',
+                      height: 20,
+                    }}
+                  > Pre</div>
+                </Tooltip>
+              )}
+            </div>
           </div>
         </div>
       )
@@ -655,7 +703,9 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
               }}
             >
               {row.description}
-              {lowStockIndicator(row, 'itemFK')}
+              <div style={{ position: 'relative', top: 2 }}>
+                {lowStockIndicator(row, 'itemFK')}
+              </div>
             </div>
           </div>
         </Tooltip>
@@ -935,9 +985,30 @@ export const PackageColumnExtensions = onPrint => [
           style={{
             wordWrap: 'break-word',
             whiteSpace: 'pre-wrap',
+            paddingRight: 24
           }}
         >
           {row.type}
+          <div style={{ position: 'relative', top: 2 }}>
+            {row.isExclusive && (
+              <Tooltip title='Exclusive'>
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: 2,
+                    right: -30,
+                    borderRadius: 4,
+                    backgroundColor: 'green',
+                    fontWeight: 500,
+                    color: 'white',
+                    fontSize: '0.7rem',
+                    padding: '2px 3px',
+                    height: 20,
+                  }}
+                >Excl.</div>
+              </Tooltip>
+            )}
+          </div>
         </div>
       )
     },
@@ -976,7 +1047,9 @@ export const PackageColumnExtensions = onPrint => [
             >
               {row.description}
             </div>
-            {lowStockIndicator(row, 'itemFK')}
+            <div style={{ position: 'relative', top: 2 }}>
+              {lowStockIndicator(row, 'itemFK')}
+            </div>
           </div>
         </Tooltip>
       )
@@ -985,6 +1058,39 @@ export const PackageColumnExtensions = onPrint => [
   {
     columnName: 'remarks',
     width: '40%',
+    render: (row) => {
+      const existsDrugLabelRemarks = row.drugLabelRemarks && row.drugLabelRemarks.trim() !== ''
+      return <div style={{ position: 'relative' }} >
+        <div
+          style={{
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+            paddingRight: existsDrugLabelRemarks ? 10 : 0
+          }}
+        >
+          {row.remarks || ' '}
+          <div style={{ position: 'relative', top: 2 }}>
+            {existsDrugLabelRemarks &&
+              <div style={{
+                position: 'absolute',
+                bottom: 2,
+                right: -8,
+              }}>
+                <Tooltip title={
+                  <div>
+                    <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
+                    <div>{row.drugLabelRemarks}
+                    </div>
+                  </div>
+                }>
+                  <FileCopySharp style={{ color: '#4255bd' }} />
+                </Tooltip>
+              </div>
+            }
+          </div>
+        </div>
+      </div >
+    }
   },
   {
     columnName: 'packageConsumeQuantity',

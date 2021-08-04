@@ -8,7 +8,7 @@ import { IconButton, Popover, Tooltip } from '@/components'
 import { DOSAGE_RULE, DOSAGE_RULE_OPERATOR } from '@/utils/constants'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 
-const LowStockInfo = ({ sourceType, values = {}, codetable, visitRegistration = {}, patient = {}, corVitalSign = [] }) => {
+const LowStockInfo = ({ sourceType, values = {}, codetable, visitRegistration = {}, patient = {}, corVitalSign = [], right = -5 }) => {
   const {
     inventorymedication = [],
     inventoryconsumable = [],
@@ -175,7 +175,7 @@ const LowStockInfo = ({ sourceType, values = {}, codetable, visitRegistration = 
           style={{
             position: 'absolute',
             bottom: 2,
-            right: -5,
+            right: right,
           }}
           size='medium'
         >
