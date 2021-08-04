@@ -200,6 +200,7 @@ const getType = (typeId) => {
           packageGlobalId: packageItem.packageGlobalId,
           isDispensedByPharmacy: medication.isDispensedByPharmacy,
           isNurseActualizeRequired: medication.isNurseActualizable,
+          isExclusive: medication.isExclusive,
         }
       }
       return item

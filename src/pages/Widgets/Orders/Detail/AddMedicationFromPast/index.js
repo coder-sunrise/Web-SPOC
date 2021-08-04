@@ -195,6 +195,7 @@ class PastMedication extends PureComponent {
         let itemDrugCaution
         let isDispensedByPharmacy
         let isNurseActualizeRequired
+        let isExclusive
         if (item.inventoryMedicationFK) {
           // Normal Drug
           let drug = inventorymedication.find(
@@ -265,6 +266,7 @@ class PastMedication extends PureComponent {
           itemDrugCaution = drug.caution
           isDispensedByPharmacy = drug.isDispensedByPharmacy
           isNurseActualizeRequired = drug.isNurseActualizable
+          isExclusive = drug.isExclusive
         } else if (item.isDrugMixture) {
           // Drug Mixture
           itemExpiryDate = item.expiryDate
@@ -347,6 +349,8 @@ class PastMedication extends PureComponent {
             isDispensedByPharmacy = true
           if (itemCorPrescriptionItemDrugMixture.find(dm => dm.isNurseActualizeRequired))
             isNurseActualizeRequired = true
+          if (itemCorPrescriptionItemDrugMixture.find(dm => dm.isExclusive))
+            isExclusive = true
         }
 
         return {
@@ -384,7 +388,8 @@ class PastMedication extends PureComponent {
           performingUserFK: this.getVisitDoctorUserId(this.props),
           packageGlobalId: '',
           isDispensedByPharmacy,
-          isNurseActualizeRequired
+          isNurseActualizeRequired,
+          isExclusive
         }
       }),
     )

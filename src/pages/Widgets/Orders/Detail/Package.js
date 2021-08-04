@@ -231,6 +231,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           packageGlobalId,
           isDispensedByPharmacy: medication.isDispensedByPharmacy,
           isNurseActualizeRequired: medication.isNurseActualizable,
+          isExclusive: medication.isExclusive,
         }
       }
       return item

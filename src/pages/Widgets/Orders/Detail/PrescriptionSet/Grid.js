@@ -121,7 +121,9 @@ class Grid extends PureComponent {
               </Tooltip>
             </div>
 
-            <div style={{ position: 'absolute', top: 20, right: 110 }}> {`create user${selectType === 'All' ? `(${o.type})` : ''}`}</div>
+            {(selectType === 'All' || selectType === 'General') &&
+              <div style={{ position: 'absolute', top: 20, right: 110 }}> {`${o.ownedByUser}(${o.type})`}</div>
+            }
             <div style={{ position: 'absolute', top: 8, right: 75 }}>
               {!isSelect ? <span
                 className={classes.addIcon}

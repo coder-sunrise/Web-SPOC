@@ -43,7 +43,7 @@ class PrescriptionSetList extends PureComponent {
   constructor (props) {
     super(props)
 
-    this.generalAccessRight = { rights: 'hidden' }// Authorized.check('queue.consultation.order.medication.generalprescriptionset') || { rights: 'hidden' }
+    this.generalAccessRight = Authorized.check('queue.consultation.order.medication.generalprescriptionset') || { rights: 'hidden' }
     this.personalAccessRight = Authorized.check('queue.consultation.order.medication.personalprescriptionset') || { rights: 'hidden' }
 
     let defaultType = 'All'
@@ -193,6 +193,9 @@ class PrescriptionSetList extends PureComponent {
           let ItemPrecautions = []
           let itemCorPrescriptionItemDrugMixture = []
           let itemDrugCaution
+          let isDispensedByPharmacy
+          let isNurseActualizeRequired
+          let isExclusive
           if (item.inventoryMedicationFK) {
             // Normal Drug
             let drug = inventorymedication.find(
@@ -261,6 +264,9 @@ class PrescriptionSetList extends PureComponent {
             itemDrugCode = drug.code
             itemDrugName = drug.displayValue
             itemDrugCaution = drug.caution
+            isDispensedByPharmacy = drug.isDispensedByPharmacy
+            isNurseActualizeRequired = drug.isNurseActualizable
+            isExclusive = drug.isExclusive
           } else if (item.isDrugMixture) {
             // Drug Mixture
             itemExpiryDate = item.expiryDate
@@ -334,6 +340,13 @@ class PrescriptionSetList extends PureComponent {
                 }),
               )
             }
+
+            if (itemCorPrescriptionItemDrugMixture.find(dm => dm.isDispensedByPharmacy))
+              isDispensedByPharmacy = true
+            if (itemCorPrescriptionItemDrugMixture.find(dm => dm.isNurseActualizeRequired))
+              isNurseActualizeRequired = true
+            if (itemCorPrescriptionItemDrugMixture.find(dm => dm.isExclusive))
+              isExclusive = true
           }
 
           return {
@@ -370,6 +383,9 @@ class PrescriptionSetList extends PureComponent {
             caution: itemDrugCaution,
             performingUserFK: this.getVisitDoctorUserId(this.props),
             packageGlobalId: '',
+            isDispensedByPharmacy,
+            isNurseActualizeRequired,
+            isExclusive
           }
         }),
       )
