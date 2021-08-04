@@ -23,6 +23,7 @@ export default ({
   arrayHelpers,
   handleCalculateBMI,
   weightOnChange,
+  handelDelete,
   ...props
 }) => {
   const [show, setShow] = useState(false)
@@ -112,7 +113,12 @@ export default ({
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.weight.suffix',
                 })}
-                onChange={e => {
+                onChange={async (e) => {
+                  const { form } = arrayHelpers
+                  await form.setFieldValue(
+                    `corPatientNoteVitalSign[${index}].weightKG`,
+                    e.target.value,
+                  )
                   setTimeout(() => {
                     handleCalculateBMI(index)
                   }, 1)
@@ -210,12 +216,13 @@ export default ({
           </Popover> */}
           <Popconfirm
             title='Confirm to remove this Vital Sign?'
-            onConfirm={() => {
+            onConfirm={async () => {
               const { form } = arrayHelpers
-              form.setFieldValue(
+              await form.setFieldValue(
                 `corPatientNoteVitalSign[${index}].isDeleted`,
                 true,
               )
+              handelDelete()
             }}
           >
             <Button

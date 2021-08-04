@@ -59,15 +59,15 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
   handleSubmit: (values, { props, onConfirm, setValues, resetForm }) => {
     const {
       dispatch,
-      orders,
+      orders = {},
       codetable,
       getNextSequence,
       user,
       visitRegistration,
       patient,
       consultationDocument: { rows = [] },
-      corVitalSign = []
     } = props
+    const { corVitalSign = [] } = orders
     const {
       ctmedicationusage,
       ctmedicationunitofmeasurement,

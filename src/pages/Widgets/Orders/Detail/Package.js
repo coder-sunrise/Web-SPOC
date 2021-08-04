@@ -60,7 +60,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
   handleSubmit: (values, { props, onConfirm, setValues, resetForm }) => {
     const {
       dispatch,
-      orders,
+      orders = {},
       codetable,
       getNextSequence,
       user,
@@ -68,6 +68,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       patient,
       consultationDocument: { rows = [] },
     } = props
+    const { corVitalSign = [] } = orders
     const {
       inventorymedication = [],
       inventoryvaccination = [],
@@ -76,7 +77,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       ctservice = [],
     } = codetable
 
-    const { doctorProfileFK, weightKG } = visitRegistration.entity.visit
+    const { doctorProfileFK } = visitRegistration.entity.visit
     const visitDoctorUserId = doctorprofile.find(
       (d) => d.id === doctorProfileFK,
     ).clinicianProfile.userProfileFK
@@ -123,6 +124,15 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
         (item) => item.id === packageItem.inventoryMedicationFK,
       )
       const { medicationInstructionRule = [] } = medication
+      let weightKG
+      const activeVitalSign = corVitalSign.find(vs => !vs.isDeleted)
+      if (activeVitalSign) {
+        weightKG = activeVitalSign.weightKG
+      }
+      else {
+        weightKG = visitRegistration.entity.visit.weightKG
+      }
+
       let age
       if (dob) {
         age = Math.floor(moment.duration(moment().diff(dob)).asYears())

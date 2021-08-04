@@ -415,7 +415,7 @@ export default ({
         <div style={{
           position: 'absolute',
           bottom: 2,
-          right: -20,
+          right: -15,
           borderRadius: 8,
           height: 16,
           width: 16,

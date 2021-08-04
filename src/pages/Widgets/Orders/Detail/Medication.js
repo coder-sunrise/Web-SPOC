@@ -589,7 +589,8 @@ class Medication extends PureComponent {
       medicationStock: [],
     },
   ) => {
-    const { setFieldValue, values, codetable, visitRegistration, patient, corVitalSign = [] } = this.props
+    const { setFieldValue, values, codetable, visitRegistration, patient, orders = {} } = this.props
+    const { corVitalSign = [] } = orders
 
     setFieldValue('isDispensedByPharmacy', op.isDispensedByPharmacy)
     setFieldValue('isNurseActualizeRequired', op.isNurseActualizable)
@@ -1373,8 +1374,10 @@ class Medication extends PureComponent {
       setFieldValue,
       setDisable,
       from,
+      orders = {}
     } = this.props
 
+    const { corVitalSign = [] } = orders
     const { isEditMedication, cautions = [], drugName, remarks, drugLabelRemarks } = values
     const { showAddFromPastModal, showAddFromPrescriptionSetModal } = this.state
 
@@ -1424,7 +1427,7 @@ class Medication extends PureComponent {
                           style={{ paddingRight: 20 }}
                           disabled={values.isPackage}
                         />
-                        <LowStockInfo sourceType='medication' {...this.props} />
+                        <LowStockInfo sourceType='medication' {...this.props} corVitalSign={corVitalSign} />
                       </div>
                     )
                   }}

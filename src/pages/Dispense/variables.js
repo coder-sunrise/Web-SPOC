@@ -229,7 +229,7 @@ export const PrescriptionColumnExtensions = (
                 <div style={{
                   position: 'absolute',
                 bottom: 2,
-                right: -8,
+                right: -15,
               }}>
                 <Tooltip title={
                   <div>
@@ -1074,7 +1074,7 @@ export const PackageColumnExtensions = onPrint => [
               <div style={{
                 position: 'absolute',
                 bottom: 2,
-                right: -8,
+              right: -15,
               }}>
                 <Tooltip title={
                   <div>

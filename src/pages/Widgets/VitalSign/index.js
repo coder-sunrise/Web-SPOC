@@ -53,13 +53,23 @@ class index extends PureComponent {
       heightCM: undefined,
       bmi: undefined,
     })
+
+    this.updateCORVitalSign([...(this.arrayHelpers.form.values.corPatientNoteVitalSign || []),
+    {
+      temperatureC: undefined,
+      bpSysMMHG: undefined,
+      bpDiaMMHG: undefined,
+      pulseRateBPM: undefined,
+      weightKG: undefined,
+      heightCM: undefined,
+      bmi: undefined,
+    }])
   }
 
   handleCalculateBMI = i => {
     const { form } = this.arrayHelpers
     const { heightCM, weightKG } = form.values.corPatientNoteVitalSign[i]
     const { setFieldValue, setFieldTouched } = form
-    // console.log(heightCM, weightKG, form.values.corPatientNoteVitalSign[i])
     if (heightCM && weightKG) {
       const heightM = heightCM / 100
       const bmi = weightKG / heightM ** 2
@@ -69,6 +79,15 @@ class index extends PureComponent {
     }
   }
 
+  updateCORVitalSign = (vitalSign) => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'orders/updateState',
+      payload: {
+        corVitalSign: vitalSign
+      }
+    })
+  }
   render() {
     const { theme, values, classes } = this.props
     return (
@@ -87,8 +106,12 @@ class index extends PureComponent {
                       index={i}
                       arrayHelpers={arrayHelpers}
                       handleCalculateBMI={this.handleCalculateBMI}
+                      handelDelete={() => {
+                        this.updateCORVitalSign([...(this.arrayHelpers.form.values.corPatientNoteVitalSign || [])])
+                      }}
                       weightOnChange={
                         () => {
+                          this.updateCORVitalSign([...(this.arrayHelpers.form.values.corPatientNoteVitalSign || [])])
                           this.setState({ showWarningMessage: true })
                           setTimeout(() => {
                             this.setState({ showWarningMessage: false })

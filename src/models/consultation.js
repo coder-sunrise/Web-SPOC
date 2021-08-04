@@ -499,6 +499,7 @@ export default createFormViewModel({
             isGSTInclusive: data.isGstInclusive,
             gstValue: data.gstValue,
             corPackage: data.corPackage,
+            corVitalSign: data.corPatientNoteVitalSign || []
           },
         })
 
