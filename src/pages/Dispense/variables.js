@@ -21,7 +21,7 @@ import { InventoryTypes } from '@/utils/codes'
 import CONSTANTS from './DispenseDetails/constants'
 import { UnorderedListOutlined, CheckOutlined } from '@ant-design/icons'
 import { NURSE_WORKITEM_STATUS } from '@/utils/constants'
-
+import Authorized from '@/utils/Authorized'
 export const tableConfig = {
   FuncProps: { pager: false },
 }
@@ -120,19 +120,25 @@ const actualizationButton = (row, buttonClickCallback) => {
   const { isNurseActualizeRequired, statusFK } = checkActualizable(row)
 
   if (isNurseActualizeRequired) {
-    if ([NURSE_WORKITEM_STATUS.NEW,NURSE_WORKITEM_STATUS.CANCCELED].indexOf(statusFK) > -1) {
+    if (
+      [NURSE_WORKITEM_STATUS.NEW, NURSE_WORKITEM_STATUS.CANCCELED].indexOf(
+        statusFK,
+      ) > -1
+    ) {
       actualizationBtn = (
-        <Tooltip title='Todo'>
-          <Button
-            color='primary'
-            justIcon
-            onClick={() =>
-              buttonClickCallback(row, NURSE_WORKITEM_STATUS.NEW)
-            }
-          >
-            <UnorderedListOutlined />
-          </Button>
-        </Tooltip>
+        <Authorized authority='dispense.actualizeorderitems'>
+          <Tooltip title='Todo'>
+            <Button
+              color='primary'
+              justIcon
+              onClick={() =>
+                buttonClickCallback(row, NURSE_WORKITEM_STATUS.NEW)
+              }
+            >
+              <UnorderedListOutlined />
+            </Button>
+          </Tooltip>
+        </Authorized>
       )
     } else if (statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED) {
       actualizationBtn = (

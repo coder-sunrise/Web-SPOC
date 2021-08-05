@@ -313,15 +313,18 @@ const DispenseDetails = ({
   const [selectedPrescriptionRows, setSelectedPrescriptionRows] = useState([])
   const [selectedVaccinationRows, setSelectedVaccinationRows] = useState([])
   const [selectedOtherOrderRows, setSelectedOtherOrderRows] = useState([])
-  const [selectedActualizeRecords, setSelectedActualizeRecords] = useState([])
-  const [showNurseActualization, setShowNurseActualization] = useState(false)
+  const [selectedActualizeRows, setSelectedActualizeRows] = useState([])
+  const [showActualization, setShowActualization] = useState(false)
+  const [actualizationStatus, setActualizationStatus] = useState(-1)
 
   const isShowActualizeSelection = (records = []) => {
-    return records.filter(x => isActualizable(x)).length > 0
+    let actualizeOrderItemsRight = Authorized.check('dispense.actualizeorderitems')
+    let viewable = actualizeOrderItemsRight && actualizeOrderItemsRight.right !== 'hidden'
+
+    return viewable && records.filter(x => isActualizable(x)).length > 0
   }
 
   const handleSelectionChange = (type, value) => {
-    console.log('handleSelectionChange', type, value)
     switch (type) {
       case 'Prescription':
         setSelectedPrescriptionRows(value)
@@ -336,19 +339,9 @@ const DispenseDetails = ({
   }
 
   const onActualizeBtnClick = (row, status) => {
-    switch (status) {
-      case NURSE_WORKITEM_STATUS.NEW:
-      case NURSE_WORKITEM_STATUS.CANCCELED:
-        console.log('onActualizeBtnClick.TODO', row)
-        setSelectedActualizeRecords([row])
-        setShowNurseActualization(true)
-        break
-      case NURSE_WORKITEM_STATUS.ACTUALIZED:
-        console.log('onActualizeBtnClick.ACTUALIZED', row)
-        setSelectedActualizeRecords([row])
-        setShowNurseActualization(true)
-        break
-    }
+    setSelectedActualizeRows([row])
+    setActualizationStatus(status)
+    setShowActualization(true)
   } 
 
   const handleMultiActualizationClick = type => {
@@ -372,21 +365,9 @@ const DispenseDetails = ({
       let selectedRecords = records.filter(
         x => selectedRows.indexOf(getRowId(x, type)) > -1,
       )
-      setSelectedActualizeRecords(selectedRecords)
-      //TODO there should be propmt window : actualization widnow meanwhile get histroy from server by selectedActualizeRecords
-      let nurseWorkitemIds = selectedRecords.map(x=>x.workitem?.nurseWorkitem?.id)
-      console.log(
-        'handleMultiActualizationClick.selectedActualizeRecords',
-        selectedRecords,
-        nurseWorkitemIds
-      )
-      dispatch({
-        type: 'dispense/getActualization',
-        payload: { nurseWorkitemIds },
-      }).then(r => {
-       console.log('dispense/getActualization',r)
-      })
-      
+      setSelectedActualizeRows(selectedRecords)
+      setActualizationStatus(NURSE_WORKITEM_STATUS.NEW)
+      setShowActualization(true)
     } else {
       notification.error({
         message: 'Please select at least one order item to actualize.',
@@ -397,21 +378,23 @@ const DispenseDetails = ({
   const actualizeSelectedItemButton = (type, records = []) => {
     if (records.filter(x => isActualizable(x)).length > 0) {
       return (
-        <Link
-          style={{ marginLeft: 10, textDecoration: 'underline' }}
-          onClick={() => {
-            handleMultiActualizationClick(type)
-          }}
-        >
-          Actualize Selected Item
-        </Link>
+        <Authorized authority='dispense.actualizeorderitems'>
+          <Link
+            style={{ marginLeft: 10, textDecoration: 'underline' }}
+            onClick={() => {
+              handleMultiActualizationClick(type)
+            }}
+          >
+            Actualize Selected Item
+          </Link>
+        </Authorized>
       )
     }
     return null
   }
 
   const onNurseActualizationClose = () => {
-    setShowNurseActualization(false)
+    setShowActualization(false)
   }
 
   return (
@@ -807,22 +790,19 @@ const DispenseDetails = ({
         </div>
       </CommonModal>
       <CommonModal
+        maxWidth='lg'
         title='Actualization'
-        open={showNurseActualization}
+        open={showActualization}
         observe='DispenseDetails'
-        onClose={() => {
-          onNurseActualizationClose()
-        }}
+        onClose={onNurseActualizationClose}
+        onConfirm={onNurseActualizationClose}
+        showFooter={false}
       >
         <NurseActualization
-          actualizeItems={selectedActualizeRecords}
-          codetable={codetable}
-          handleDrugLabelSelected={onDrugLabelSelected}
-          handleDrugLabelNoChanged={onDrugLabelNoChanged}
-          handleSubmit={() => {
-            onNurseActualizationClose()
-            notification.info("save success")
-          }}
+          status={actualizationStatus}
+          nurseWorkitemIds={selectedActualizeRows.map(x => x.workitem?.nurseWorkitem?.id).join(',')}
+          dispatch={dispatch}
+          handleSubmit={onNurseActualizationClose}
         />
       </CommonModal>
     </React.Fragment>

@@ -89,13 +89,18 @@ export default createFormViewModel({
         })
       },
 
-      *getActualization({payload},{call,put}){
-        const response = yield call(service.getActualization, payload)
+      *addActualize({payload},{call,put}){
+        const response = yield call(service.addActualize, payload)
         return response
       },
 
-      *saveActualization({payload},{call,put}){
-        const response = yield call(service.saveActualization, payload)
+      *getActualize({payload},{call,put}){
+        const response = yield call(service.getActualize, payload)
+        return response
+      },
+
+      *cancelActualize({payload},{call,put}){
+        const response = yield call(service.cancelActualize, payload)
         return response
       },
 

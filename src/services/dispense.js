@@ -107,16 +107,22 @@ const fns = {
     })
     return r
   },
-  getActualization : async params => {
-    const r = await request(`${url}/getActualization`, {
-      method: 'GET',
+  addActualize : async params => {
+    const r = await request(`${url}/addActualize`, {
+      method: 'POST',
       body: params
     })
     return r
   },
-  saveActualization : async params => {
-    const r = await request(`${url}/saveActualization`, {
-      method: 'POST',
+  getActualize : async params => {
+    const r = await request(`${url}/getActualize/${params.status}?nurseWorkitemIds=${params.nurseWorkitemIds}`, {
+      method: 'GET',
+    })
+    return r
+  },
+  cancelActualize : async params => {
+    const r = await request(`${url}/cancelActualize`, {
+      method: 'PUT',
       body: params
     })
     return r

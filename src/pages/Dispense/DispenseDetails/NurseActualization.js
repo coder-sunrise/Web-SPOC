@@ -1,46 +1,303 @@
 import React from 'react'
 // common components
-import { GridContainer, GridItem } from '@/components'
-
 import {
-  DrugLabelSelectionColumns,
-  DrugLabelSelectionColumnExtensions,
-} from '../variables'
-import TableData from './TableData'
+  GridContainer,
+  GridItem,
+  CommonTableGrid,
+  Button,
+  DatePicker,
+  TextField,
+  CommonModal,
+} from '@/components'
+import { NURSE_WORKITEM_STATUS } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
+import moment from 'moment'
+import DeleteConfirmation from './DeleteConfirmation'
+
+const dateTimeFormat = 'DD MMM YYYY HH:mm'
+const localDateTime = value => {
+  return value
+    ? moment(value)
+        .utc()
+        .format(dateTimeFormat)
+    : null
+}
+const dateColumnWidth = 140
+
+const detailsColumns = [
+  { name: 'type', title: 'Type' },
+  { name: 'name', title: 'Name' },
+  { name: 'qty', title: 'Qty.' },
+  { name: 'orderBy', title: 'Order By' },
+  { name: 'orderDate', title: 'Order Date' },
+  { name: 'instruction', title: 'Instructions' },
+  { name: 'accessionNo', title: 'Accession No.' },
+  { name: 'orderRemarks', title: 'Order Remarks' },
+]
+
+const actualizedColumns = [
+  { name: 'actulizeByUser', title: 'Actualize By' },
+  { name: 'actulizeDate', title: 'Actualize Date' },
+  { name: 'actulizeRemarks', title: 'Actualize Remarks', witdh: 140 },
+]
+
+const colDetailsExtensions = [
+  { columnName: 'type', witdh: 80 },
+  { columnName: 'name' },
+  { columnName: 'qty', width: 60 },
+  { columnName: 'orderBy' },
+  {
+    columnName: 'orderDate',
+    width: dateColumnWidth,
+    render: r => localDateTime(r.orderDate),
+  },
+  { columnName: 'instruction' },
+  { columnName: 'accessionNo' },
+  { columnName: 'orderRemarks' },
+  { columnName: 'actulizeByUser' },
+  {
+    columnName: 'actulizeDate',
+    width: dateColumnWidth,
+    render: r => localDateTime(r.actulizeDate),
+  },
+  { columnName: 'actulizeRemarks' },
+  { columnName: 'cancelBy' },
+  {
+    columnName: 'cancelDate',
+    width: dateColumnWidth,
+    render: r => localDateTime(r.cancelDate),
+  },
+  { columnName: 'cancelReasons' },
+]
+
+const historyColumns = [
+  { name: 'type', title: 'Type' },
+  { name: 'name', title: 'Name' },
+  { name: 'qty', title: 'Qty.' },
+  { name: 'orderBy', title: 'Order By' },
+  { name: 'orderDate', title: 'Order Date' },
+  { name: 'instruction', title: 'Instructions' },
+  { name: 'accessionNo', title: 'Accession No.' },
+  { name: 'orderRemarks', title: 'Order Remarks' },
+  { name: 'actualizeByUser', title: 'Actualize By' },
+  { name: 'actualizeDate', title: 'Actualize Date' },
+  { name: 'actualizeRemarks', title: 'Actualize Remarks' },
+  { name: 'cancelByUser', title: 'Cancel By' },
+  { name: 'cancelDate', title: 'Cancel Date' },
+  { name: 'cancelReasons', title: 'Reasons' },
+]
+
+const historyColumnExtensions = [
+  { columnName: 'type', witdh: 80 },
+  { columnName: 'name' },
+  { columnName: 'qty', width: 60 },
+  { columnName: 'orderBy' },
+  {
+    columnName: 'orderDate',
+    width: dateColumnWidth,
+    render: r => localDateTime(r.orderDate),
+  },
+  { columnName: 'instruction' },
+  { columnName: 'accessionNo' },
+  { columnName: 'orderRemarks' },
+  { columnName: 'actualizeByUser' },
+  {
+    columnName: 'actualizeDate',
+    width: dateColumnWidth,
+    render: r => localDateTime(r.actualizeDate),
+  },
+  { columnName: 'actualizeRemarks' },
+  { columnName: 'cancelByUser' },
+  {
+    columnName: 'cancelDate',
+    width: dateColumnWidth,
+    render: r => localDateTime(r.cancelDate),
+  },
+  { columnName: 'cancelReasons', witdh: 140 },
+]
 
 class NurseActualization extends React.PureComponent {
-  render () {
-    const {
-      footer,
-      handleSubmit,
-      prescription, 
-      handleDrugLabelSelected,
-      handleDrugLabelNoChanged,
-    } = this.props  
-    const printLabelDisabled = !prescription.some((x) => x.selected === true)
+  state = {
+    status: 0,
+    remarks: '',
+    actualize: [],
+    history: [],
+    showCancelConfirmation: false,
+  }
+
+  componentWillMount = () => {
+    const { dispatch, nurseWorkitemIds='', status = 0 } = this.props
+    dispatch({
+      type: 'dispense/getActualize',
+      payload: { status, nurseWorkitemIds },
+    }).then(r => {
+      if (r && r.data) {
+        this.setState({
+          status: status,
+          actualize: r.data.nurseActualize,
+          history: r.data.nurseWorkitemHistory,
+        })
+      }
+    })
+  }
+
+  getColumns = () => {
+    switch (this.state.status) {
+      case NURSE_WORKITEM_STATUS.NEW:
+      case NURSE_WORKITEM_STATUS.CANCCELED:
+        return detailsColumns
+      case NURSE_WORKITEM_STATUS.ACTUALIZED:
+        return [...detailsColumns, ...actualizedColumns]
+    }
+  }
+
+  actualize = () => {
+    this.props
+      .dispatch({
+        type: 'dispense/addActualize',
+        payload: {
+          remarks: this.state.remarks,
+          nurseActualize: this.state.actualize,
+        },
+      })
+      .then(r => {
+        this.props.handleSubmit()
+      })
+  }
+
+  cancel = () => {
+    this.setState({ showCancelConfirmation: true })
+  }
+
+  confirmCancel = (reasons) => {
+    this.props
+      .dispatch({
+        type: 'dispense/cancelActualize',
+        payload: {
+          remarks: reasons,
+          nurseActualize: this.state.actualize,
+        },
+      })
+      .then(r => {
+        this.closeCancelConfirmation()
+        this.props.handleSubmit()
+      })
+  }
+
+  closeCancelConfirmation = () => {
+    this.setState({ showCancelConfirmation: false })
+  }
+
+  render() {
+    const { handleSubmit } = this.props
+    const { actualize, history, status } = this.state
+
+    const actualizeViewable = status > 0
+    const historyViewable = this.state.history?.length > 0
+    const remarksViewable =
+      [NURSE_WORKITEM_STATUS.NEW, NURSE_WORKITEM_STATUS.CANCCELED].indexOf(
+        status,
+      ) > -1
+    const actualizeBtnViewable = remarksViewable
+    const cancelBtnViewable = NURSE_WORKITEM_STATUS.ACTUALIZED === status
+
     return (
       <div>
-        <GridContainer>
-          <GridItem md={12}>
-            <TableData
-              forceRender
-              idPrefix='prescription'
-              columns={DrugLabelSelectionColumns}
-              colExtensions={DrugLabelSelectionColumnExtensions(handleDrugLabelSelected, handleDrugLabelNoChanged)}
-              data={prescription}
-            />
-          </GridItem>
-        </GridContainer>
-        {footer &&
-          footer({
-            cancelProps: {
-            },
-            confirmProps: {
-              disabled: printLabelDisabled,
-            },
-            onConfirm: handleSubmit,
-            confirmBtnText: 'Print',
-          })}
+        {actualizeViewable && (
+          <GridContainer style={{ marginBottom: 20 }}>
+            <GridItem lg={12}>
+              <div>
+                <h5>Details</h5>
+                <CommonTableGrid
+                  minHeight={100}
+                  size='sm'
+                  getRowId={r => r.id}
+                  columns={this.getColumns()}
+                  columnExtensions={colDetailsExtensions}
+                  rows={actualize}
+                  FuncProps={{ pager: false }}
+                />
+              </div>
+            </GridItem>
+          </GridContainer>
+        )}
+        {historyViewable && (
+          <GridContainer style={{ marginBottom: 10 }}>
+            <GridItem lg={12}>
+              <div>
+                <h5>{status > 0 ? 'Actualization History' : 'Details'}</h5>
+                <CommonTableGrid
+                  minHeight={100}
+                  size='sm'
+                  getRowId={r => r.id}
+                  columns={historyColumns}
+                  columnExtensions={historyColumnExtensions}
+                  rows={history}
+                  FuncProps={{ pager: false }}
+                />
+              </div>
+            </GridItem>
+          </GridContainer>
+        )}
+        {remarksViewable && (
+          <Authorized authorized='dispense.actualizeorderitems'>
+            <GridContainer>
+              <GridItem lg={12}>
+                <DatePicker
+                  label='Actualize at'
+                  format={dateTimeFormat}
+                  value={new Date()}
+                  disabled={true}
+                  showTime
+                  timeFormat
+                />
+              </GridItem>
+            </GridContainer>
+            <GridContainer>
+              <GridItem lg={12}>
+                <TextField
+                  label='Remarks'
+                  disabled={false}
+                  value={this.state.remarks}
+                  onChange={e => {
+                    this.setState({ remarks: e.target.value })
+                  }}
+                />
+              </GridItem>
+            </GridContainer>
+          </Authorized>
+        )}
+        {actualizeViewable && (
+          <GridContainer>
+            <GridItem lg={12}>
+              <div style={{ marginTop: 10, marginBottom: 10 }} align='right'>
+                {actualizeBtnViewable && (
+                  <Authorized authorized='dispense.actualizeorderitems'>
+                    <Button color='success' onClick={this.actualize}>
+                      Actualize
+                    </Button>
+                  </Authorized>
+                )}
+                {cancelBtnViewable && (
+                  <Authorized authorized='dispense.cancelactualizeorderitems'>
+                    <Button color='warning' onClick={this.cancel}>
+                      Cancel Actualization
+                    </Button>
+                  </Authorized>
+                )}
+              </div>
+            </GridItem>
+          </GridContainer>
+        )}
+
+        <CommonModal
+          open={this.state.showCancelConfirmation}
+          title='Alert'
+          onClose={this.closeCancelConfirmation}
+          maxWidth='sm'
+        >
+          <DeleteConfirmation showIcon message='Please indicate reason for cancellation' handleSubmit={this.confirmCancel}  />
+        </CommonModal>
       </div>
     )
   }
