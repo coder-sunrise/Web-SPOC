@@ -625,7 +625,7 @@ export const VaccinationColumnExtensions = (
   {
     columnName: 'action',
     width: 60,
-    render: () => actualizationButton(row,onActualizeBtnClick),
+    render: (row) => actualizationButton(row,onActualizeBtnClick),
   },
 ]
 
