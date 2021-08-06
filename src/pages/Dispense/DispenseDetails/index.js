@@ -790,19 +790,36 @@ const DispenseDetails = ({
         </div>
       </CommonModal>
       <CommonModal
-        maxWidth='lg'
+        maxWidth='xl'
         title='Actualization'
         open={showActualization}
         observe='DispenseDetails'
         onClose={onNurseActualizationClose}
-        onConfirm={onNurseActualizationClose}
-        showFooter={false}
       >
         <NurseActualization
           status={actualizationStatus}
           nurseWorkitemIds={selectedActualizeRows.map(x => x.workitem?.nurseWorkitem?.id).join(',')}
           dispatch={dispatch}
-          handleSubmit={onNurseActualizationClose}
+          handleSubmit={()=>{
+            onNurseActualizationClose()
+            const version = Date.now()
+            dispatch({
+              type: 'dispense/query',
+              payload: {
+                id: values.id,
+                version: version,
+              },
+            }).then((r)=>{
+              console.log('query dispense',r)
+              dispatch({
+                type: 'dispense/updateState',
+                payload: {
+                  entity: r,
+                  version: version,
+                },
+              })
+            })
+          }}
         />
       </CommonModal>
     </React.Fragment>

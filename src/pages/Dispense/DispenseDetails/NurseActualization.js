@@ -189,7 +189,6 @@ class NurseActualization extends React.PureComponent {
   }
 
   render() {
-    const { handleSubmit } = this.props
     const { actualize, history, status } = this.state
 
     const actualizeViewable = status > 0
@@ -267,28 +266,36 @@ class NurseActualization extends React.PureComponent {
             </GridContainer>
           </Authorized>
         )}
-        {actualizeViewable && (
-          <GridContainer>
-            <GridItem lg={12}>
-              <div style={{ marginTop: 10, marginBottom: 10 }} align='right'>
-                {actualizeBtnViewable && (
-                  <Authorized authorized='dispense.actualizeorderitems'>
-                    <Button color='success' onClick={this.actualize}>
-                      Actualize
-                    </Button>
-                  </Authorized>
-                )}
-                {cancelBtnViewable && (
-                  <Authorized authorized='dispense.cancelactualizeorderitems'>
-                    <Button color='warning' onClick={this.cancel}>
-                      Cancel Actualization
-                    </Button>
-                  </Authorized>
-                )}
-              </div>
-            </GridItem>
-          </GridContainer>
-        )}
+        <GridContainer>
+          <GridItem lg={12}>
+            <div style={{ marginTop: 10, marginBottom: 10 }} align='right'>
+              {actualizeViewable && actualizeBtnViewable && (
+                <Authorized authorized='dispense.actualizeorderitems'>
+                  <Button color='success' onClick={this.actualize}>
+                    Actualize
+                  </Button>
+                </Authorized>
+              )}
+              {actualizeViewable && cancelBtnViewable && (
+                <Authorized authorized='dispense.cancelactualizeorderitems'>
+                  <Button color='warning' onClick={this.cancel}>
+                    Cancel Actualization
+                  </Button>
+                </Authorized>
+              )}
+              {!actualizeViewable && (
+                <Button
+                  color='primary'
+                  onClick={() => {
+                    this.props.onClose()
+                  }}
+                >
+                  Close
+                </Button>
+              )}
+            </div>
+          </GridItem>
+        </GridContainer>
 
         <CommonModal
           open={this.state.showCancelConfirmation}
@@ -296,7 +303,11 @@ class NurseActualization extends React.PureComponent {
           onClose={this.closeCancelConfirmation}
           maxWidth='sm'
         >
-          <DeleteConfirmation showIcon message='Please indicate reason for cancellation' handleSubmit={this.confirmCancel}  />
+          <DeleteConfirmation
+            showIcon
+            message='Please indicate reason for cancellation'
+            handleSubmit={this.confirmCancel}
+          />
         </CommonModal>
       </div>
     )

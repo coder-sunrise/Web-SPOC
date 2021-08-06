@@ -607,7 +607,6 @@ class PatientHistory extends Component {
       currentOrders: orders,
       showActualizationHistory: true,
     })
-    console.log('current', orders,this.state)
   }
 
   closeActualizationHistory = () => {
@@ -1889,15 +1888,16 @@ class PatientHistory extends Component {
           />
         </CommonModal>
         <CommonModal
-          className={customtyles.deepCommomModel}
-          maxWidth='lg'
+          maxWidth='xl'
           title='Actualization History'
+          className={customtyles.deepCommomModel}
           open={this.state.showActualizationHistory}
           onClose={this.closeActualizationHistory}
         >
           <NurseActualization
             nurseWorkitemIds={this.state.currentOrders.map(x => x.nurseWorkitemFK).join(',')}
             dispatch={this.props.dispatch}
+            onClose={this.closeActualizationHistory}
           />
         </CommonModal>
       </div>
