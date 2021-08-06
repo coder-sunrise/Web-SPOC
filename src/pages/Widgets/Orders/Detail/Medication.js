@@ -43,7 +43,7 @@ import AddFromPast from './AddMedicationFromPast'
 import PrescriptionSet from './PrescriptionSet'
 import consultationDocument from '@/models/consultationDocument'
 import { SubscriptionsOutlined } from '@material-ui/icons'
-import { relative } from 'path'
+import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
 
 const authorityCfg = {
   '1': 'queue.consultation.order.medication',
@@ -56,14 +56,49 @@ const drugMixtureItemSchema = Yup.object().shape({
   totalPrice: Yup.number().min(0),
 })
 
-const getCautions = (
+const showCautions = (
   inventorymedication = [],
-  openPrescription,
   isDrugMixture,
   corPrescriptionItemDrugMixture = [],
   inventoryMedicationFK,
+  patient
 ) => {
-  let Cautions = []
+  const { entity = {} } = patient
+  const { patientAllergy = [] } = entity
+  let cautions = []
+  let allergys = []
+
+  const insertAllergys = (inventoryMedicationFK) => {
+    let drug = inventorymedication.find(
+      (medication) => medication.id === inventoryMedicationFK,
+    )
+    if (!drug) return
+    drug.inventoryMedication_DrugAllergy.forEach(allergy => {
+      var drugAllergy = patientAllergy.find(a => a.type === 'Allergy' && a.allergyFK === allergy.drugAllergyFK)
+      if (drugAllergy) {
+        allergys.push({
+          drugName: drug.displayValue,
+          allergyName: drugAllergy.allergyName,
+          allergyType: 'Drug',
+          allergyReaction: drugAllergy.allergyReaction,
+          onsetDate: drugAllergy.onsetDate,
+          id: inventoryMedicationFK,
+        })
+      }
+    })
+    drug.inventoryMedication_MedicationIngredient.forEach(ingredient => {
+      var drugIngredient = patientAllergy.find(a => a.type === 'Ingredient' && a.ingredientFK === ingredient.medicationIngredientFK)
+      allergys.push({
+        drugName: drug.displayValue,
+        allergyName: drugIngredient.allergyName,
+        allergyType: 'Ingredient',
+        allergyReaction: drugIngredient.allergyReaction,
+        onsetDate: drugIngredient.onsetDate,
+        id: inventoryMedicationFK,
+      })
+    })
+  }
+
   if (isDrugMixture) {
     corPrescriptionItemDrugMixture
       .filter(o => !o.isDeleted)
@@ -71,31 +106,44 @@ const getCautions = (
         const selectMedication = inventorymedication.find(
           medication => medication.id === item.inventoryMedicationFK,
         )
-        if (
-          selectMedication &&
-          selectMedication.caution &&
-          selectMedication.caution.trim().length
-        ) {
-          Cautions.push({
-            id: item.id,
-            name: selectMedication.displayValue || '',
-            message: selectMedication.caution,
-          })
+        if (selectMedication) {
+          if (
+            selectMedication.caution &&
+            selectMedication.caution.trim().length
+          ) {
+            cautions.push({
+              type: 'Medication',
+              subject: selectMedication.displayValue,
+              caution: selectMedication.caution,
+              id: item.id,
+            })
+          }
+
+          insertAllergys(item.inventoryMedicationFK)
         }
       })
-  } else if (!openPrescription) {
+  } else {
     const selectMedication = inventorymedication.find(
       medication => medication.id === inventoryMedicationFK,
     )
+    insertAllergys(inventoryMedicationFK)
+
     if (
       selectMedication &&
       selectMedication.caution &&
       selectMedication.caution.trim().length
     ) {
-      Cautions.push({ message: selectMedication.caution })
+      cautions.push({
+        type: 'Medication',
+        subject: selectMedication.displayValue,
+        caution: selectMedication.caution,
+        id: inventoryMedicationFK,
+      })
     }
   }
-  return Cautions
+  if (cautions.length || allergys.length) {
+    openCautionAlertPrompt(cautions, allergys, [], () => { })
+  }
 }
 
 const getVisitDoctorUserId = props => {
@@ -188,14 +236,6 @@ const getVisitDoctorUserId = props => {
 
     const { inventorymedication = [] } = codetable
 
-    let cautions = getCautions(
-      inventorymedication,
-      type === '5',
-      isDrugMixture,
-      newCorPrescriptionItemDrugMixture,
-      v.inventoryMedicationFK,
-    )
-
     const medication = inventorymedication.find(
       item => item.id === v.inventoryMedicationFK,
     )
@@ -209,7 +249,6 @@ const getVisitDoctorUserId = props => {
         newCorPrescriptionItemDrugMixture.length > 0
           ? newCorPrescriptionItemDrugMixture
           : [],
-      cautions,
       selectedMedication: medication || {
         medicationStock: [],
       },
@@ -591,7 +630,6 @@ class Medication extends PureComponent {
   ) => {
     const { setFieldValue, values, codetable, visitRegistration, patient, orders = {} } = this.props
     const { corVitalSign = [] } = orders
-
     setFieldValue('isDispensedByPharmacy', op.isDispensedByPharmacy)
     setFieldValue('isNurseActualizeRequired', op.isNurseActualizable)
     setFieldValue('isExclusive', op.isExclusive)
@@ -758,18 +796,16 @@ class Medication extends PureComponent {
       this.updateTotalPrice(unitprice * (matchInstruction?.dispensingQuantity || 0))
 
       if (op) {
-        const { codetable, openPrescription } = this.props
+        const { codetable } = this.props
         const { inventorymedication = [] } = codetable
-        let cautions = getCautions(
+
+        showCautions(
           inventorymedication,
-          openPrescription,
           values.isDrugMixture,
           values.corPrescriptionItemDrugMixture,
           op.id,
+          patient,
         )
-        setFieldValue('cautions', cautions)
-      } else {
-        setFieldValue('cautions', [])
       }
       this.onExpiryDateChange()
     }
@@ -934,9 +970,9 @@ class Medication extends PureComponent {
     return batchNoOptions
   }
 
-  handleDrugMixtureItemOnChange = e => {
+  handleDrugMixtureItemOnChange = (e, a) => {
     const { option, row } = e
-    const { values, setFieldValue, visitRegistration, patient, corVitalSign = [] } = this.props
+    const { values, setFieldValue, visitRegistration, patient, corVitalSign = [], codetable } = this.props
     const { drugName = '' } = values
     const rs = values.corPrescriptionItemDrugMixture.filter(
       o =>
@@ -957,6 +993,15 @@ class Medication extends PureComponent {
           ? option.displayValue
           : `${drugName}/${option.displayValue}`
         ).substring(0, 60),
+      )
+      const { inventorymedication = [] } = codetable
+      showCautions(
+        inventorymedication,
+        values.isDrugMixture,
+        [...values.corPrescriptionItemDrugMixture.filter(o => o.id !== e.row.id),
+        { inventoryMedicationFK: option.id }],
+        null,
+        patient,
       )
     }
 
@@ -1063,8 +1108,6 @@ class Medication extends PureComponent {
 
       tempDrugMixtureRows = newArray
       setFieldValue('corPrescriptionItemDrugMixture', newArray)
-      const newCautions = [...values.cautions].filter(o => o.id !== deleted[0])
-      setFieldValue('cautions', newCautions)
     } else {
       let _rows = this.checkIsDrugMixtureItemUnique({ rows, changed })
       if (added) {
@@ -1187,49 +1230,12 @@ class Medication extends PureComponent {
           onChange: e => {
             const { values, setFieldValue } = this.props
             const { row = {} } = e
-            let newCautions = [...values.cautions]
             if (e.option) {
               this.handleDrugMixtureItemOnChange(e)
-
               const {
                 codetable: { inventorymedication = [] },
               } = this.props
-              const selectMedication = inventorymedication.find(
-                medication => medication.id === e.row.inventoryMedicationFK,
-              )
-              if (
-                selectMedication &&
-                selectMedication.caution &&
-                selectMedication.caution.trim().length
-              ) {
-                const existsCaution = newCautions.find(o => o.id === row.id)
-                if (existsCaution) {
-                  newCautions = newCautions.map(o => {
-                    return {
-                      ...o,
-                      name: selectMedication.displayValue || '',
-                      message:
-                        o.id === row.id ? selectMedication.caution : o.message,
-                    }
-                  })
-                } else {
-                  newCautions = [
-                    ...newCautions,
-                    {
-                      id: row.id,
-                      name: selectMedication.displayValue || '',
-                      message: selectMedication.caution,
-                    },
-                  ]
-                }
-              } else {
-                newCautions = newCautions.filter(o => o.id !== row.id)
-              }
-            } else {
-              newCautions = newCautions.filter(o => o.id !== row.id)
             }
-
-            setFieldValue('cautions', newCautions)
           },
         },
         {
@@ -1378,7 +1384,7 @@ class Medication extends PureComponent {
     } = this.props
 
     const { corVitalSign = [] } = orders
-    const { isEditMedication, cautions = [], drugName, remarks, drugLabelRemarks } = values
+    const { isEditMedication, drugName, remarks, drugLabelRemarks } = values
     const { showAddFromPastModal, showAddFromPrescriptionSetModal } = this.state
 
     const commonSelectProps = {
@@ -1527,7 +1533,6 @@ class Medication extends PureComponent {
                               }
 
                               setDisable(false)
-                              this.props.setFieldValue('cautions', [])
 
                               this.props.dispatch({
                                 type: 'global/updateState',
@@ -1616,77 +1621,6 @@ class Medication extends PureComponent {
                   >
                     Instructions
                   </div>
-                  {cautions.length > 0 && (
-                    <Alert
-                      message={
-                        <Tooltip
-                          useTooltip2
-                          title={
-                            <div>
-                              <div style={{ fontWeight: 500 }}>Cautions:</div>
-                              {cautions.map(o => {
-                                if (values.isDrugMixture) {
-                                  return (
-                                    <div style={{ marginLeft: 10 }}>
-                                      <span>
-                                        <span
-                                          style={{
-                                            fontWeight: 500,
-                                          }}
-                                        >
-                                          {`${o.name} - `}
-                                        </span>
-                                        <span>{o.message}</span>
-                                      </span>
-                                    </div>
-                                  )
-                                }
-                                return (
-                                  <div style={{ marginLeft: 10 }}>
-                                    <span>{o.message}</span>
-                                  </div>
-                                )
-                              })}
-                            </div>
-                          }
-                        >
-                          <span>
-                            {[...cautions].reverse().map((o, index) => {
-                              if (values.isDrugMixture) {
-                                return (
-                                  <span>
-                                    <span
-                                      style={{
-                                        fontWeight: 500,
-                                      }}
-                                    >
-                                      {`${o.name} - `}
-                                    </span>
-                                    <span>
-                                      {`${o.message}${index < cautions.length - 1 ? '; ' : ''
-                                        }`}
-                                    </span>
-                                  </span>
-                                )
-                              }
-                              return <span>{o.message}</span>
-                            })}
-                          </span>
-                        </Tooltip>
-                      }
-                      banner
-                      style={{
-                        whiteSpace: 'nowrap',
-                        textOverflow: 'ellipsis',
-                        width: '100%',
-                        overflow: 'hidden',
-                        paddingTop: 3,
-                        paddingBottom: 3,
-                        lineHeight: '25px',
-                        fontSize: '0.85rem',
-                      }}
-                    />
-                  )}
                 </div>
                 <FieldArray
                   name='corPrescriptionItemInstruction'

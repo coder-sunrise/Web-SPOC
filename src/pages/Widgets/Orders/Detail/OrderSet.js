@@ -553,11 +553,62 @@ class OrderSet extends PureComponent {
     }
 
     this.changeOrderSet = (v, op) => {
-      const { setValues, values, orderTypes } = this.props
+      const { setValues, values, orderTypes, codetable, patient } = this.props
+      const { inventorymedication = [] } = codetable
+      const { entity = {} } = patient
+      const { patientAllergy = [] } = entity
       let rows = []
+      let cautions = []
+      let allergys = []
+      const insertAllergys = (inventoryMedicationFK) => {
+        let drug = inventorymedication.find(
+          (medication) => medication.id === inventoryMedicationFK,
+        )
+        if (!drug) return
+        drug.inventoryMedication_DrugAllergy.forEach(allergy => {
+          var drugAllergy = patientAllergy.find(a => a.type === 'Allergy' && a.allergyFK === allergy.drugAllergyFK)
+          if (drugAllergy) {
+            allergys.push({
+              drugName: drug.displayValue,
+              allergyName: drugAllergy.allergyName,
+              allergyType: 'Drug',
+              allergyReaction: drugAllergy.allergyReaction,
+              onsetDate: drugAllergy.onsetDate,
+              id: inventoryMedicationFK,
+            })
+          }
+        })
+        drug.inventoryMedication_MedicationIngredient.forEach(ingredient => {
+          var drugIngredient = patientAllergy.find(a => a.type === 'Ingredient' && a.ingredientFK === ingredient.medicationIngredientFK)
+          allergys.push({
+            drugName: drug.displayValue,
+            allergyName: drugIngredient.allergyName,
+            allergyType: 'Ingredient',
+            allergyReaction: drugIngredient.allergyReaction,
+            onsetDate: drugIngredient.onsetDate,
+            id: inventoryMedicationFK,
+          })
+        })
+      }
+
       if (op && op.medicationOrderSetItem) {
         rows = rows.concat(
           op.medicationOrderSetItem.map(o => {
+            if (o.caution && o.caution.trim() !== '' &&
+              !cautions.find((f) => f.type === 'Medication' && f.id === o.inventoryMedicationFK)) {
+              cautions.push({
+                type: 'Medication',
+                subject: o.medicationName,
+                caution: o.caution,
+                id: o.inventoryMedicationFK,
+              })
+            }
+
+            if (!allergys.find(
+              (f) => f.id === o.inventoryMedicationFK,
+            )) {
+              insertAllergys(o.inventoryMedicationFK)
+            }
             return {
               ...o,
               name: o.medicationName,
@@ -576,6 +627,15 @@ class OrderSet extends PureComponent {
       if (op && op.vaccinationOrderSetItem) {
         rows = rows.concat(
           op.vaccinationOrderSetItem.map(o => {
+            if (o.caution && o.caution.trim() !== '' &&
+              !cautions.find((c) => c.type === 'Vaccination' && c.id === o.inventoryVaccinationFK)) {
+              cautions.push({
+                type: 'Vaccination',
+                subject: o.vaccinationName,
+                caution: o.caution,
+                id: o.inventoryVaccinationFK,
+              })
+            }
             return {
               ...o,
               name: o.vaccinationName,
@@ -636,11 +696,8 @@ class OrderSet extends PureComponent {
         orderSetCode: op ? op.code : '',
       })
 
-      const hasCautionItems = rows.filter(
-        f => f.caution && f.caution.trim().length > 0,
-      )
-      if (hasCautionItems.length > 0) {
-        openCautionAlertPrompt(hasCautionItems, () => { })
+      if (cautions.length || allergys.length) {
+        openCautionAlertPrompt(cautions, allergys, [], () => { })
       }
     }
 

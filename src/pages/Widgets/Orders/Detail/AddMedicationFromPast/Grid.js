@@ -14,6 +14,7 @@ import {
 } from '@/components'
 // utils
 import { primaryColor } from '@/assets/jss'
+import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import CustomStyle from './CustomStyle.less'
 
 const styles = () => ({
@@ -54,6 +55,19 @@ const styles = () => ({
   },
 })
 class Grid extends PureComponent {
+  drugMixtureIndicator = (row, right) => {
+    const activePrescriptionItemDrugMixture = (row.corPrescriptionItemDrugMixture || row.retailPrescriptionItemDrugMixture || []).filter(
+      item => !item.isDeleted,
+    )
+
+    return (
+      <DrugMixtureInfo
+        values={activePrescriptionItemDrugMixture}
+        isShowTooltip={false} right={right}
+      />
+    )
+  }
+
   Visits = () => {
     const {
       classes,
@@ -142,6 +156,7 @@ class Grid extends PureComponent {
                 </span>
                 <span
                   style={{
+                    position: 'absolute', marginTop: -2,
                     marginLeft: 30, marginTop: 14
                   }}
                 >
@@ -190,7 +205,8 @@ class Grid extends PureComponent {
                   }}
                 >
                   <GridContainer>
-                    <div className={classes.nameColumn}>
+                    <div className={classes.nameColumn}
+                      style={{ paddingRight: item.isDrugMixture ? 20 : 0 }}>
                       {warningLabel && (
                         <span style={{ color: 'red', fontStyle: 'italic' }}>
                           <sup>{warningLabel}&nbsp;</sup>
@@ -199,6 +215,9 @@ class Grid extends PureComponent {
                       <Tooltip title={item.drugName || item.vaccinationName}>
                         <span>{item.drugName || item.vaccinationName}</span>
                       </Tooltip>
+                      <div style={{ position: 'relative', top: 2 }}>
+                        {item.isDrugMixture && this.drugMixtureIndicator(item, -20)}
+                      </div>
                     </div>
                     <div className={classes.instructionColumn}>
                       <Tooltip

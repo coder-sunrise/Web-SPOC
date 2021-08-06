@@ -99,25 +99,25 @@ class PastMedication extends PureComponent {
         instruction += `${item.usageMethodDisplayValue
           ? item.usageMethodDisplayValue
           : ''} ${item.dosageDisplayValue
-          ? item.dosageDisplayValue
-          : ''} ${item.prescribeUOMDisplayValue
-          ? item.prescribeUOMDisplayValue
-          : ''} ${item.drugFrequencyDisplayValue
-          ? item.drugFrequencyDisplayValue
-          : ''}${itemDuration}${nextStepdose}`
+            ? item.dosageDisplayValue
+            : ''} ${item.prescribeUOMDisplayValue
+              ? item.prescribeUOMDisplayValue
+              : ''} ${item.drugFrequencyDisplayValue
+                ? item.drugFrequencyDisplayValue
+                : ''}${itemDuration}${nextStepdose}`
       }
     }
     return instruction
   }
-    
+
   getVisitDoctorUserId = props => {
     const { doctorprofile } = props.codetable
-    const { doctorProfileFK } = props.visitRegistration.entity.visit   
+    const { doctorProfileFK } = props.visitRegistration.entity.visit
     let visitDoctorUserId
     if (doctorprofile && doctorProfileFK) {
       visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
     }
-  
+
     return visitDoctorUserId
   }
 
@@ -503,8 +503,8 @@ class PastMedication extends PureComponent {
                 issuedByUserFK: clinicianProfile.userProfileFK,
                 subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
                   ''}, ${Math.floor(
-                  moment.duration(moment().diff(dob)).asYears(),
-                )}`,
+                    moment.duration(moment().diff(dob)).asYears(),
+                  )}`,
                 content: ReplaceCertificateTeplate(
                   defaultTemplate.templateContent,
                   newVaccination,
@@ -557,46 +557,98 @@ class PastMedication extends PureComponent {
   }
 
   handleSubmit = () => {
-    const { dispatch, onConfirm, type } = this.props
+    const { dispatch, onConfirm, type, codetable, patient } = this.props
+    const { inventorymedication = [] } = codetable
+    const { entity = {} } = patient
+    const { patientAllergy = [] } = entity
     let data = []
-    const cautionItems = []
+    let cautionItems = []
+    let allergys = []
+
+    const insertAllergys = (inventoryMedicationFK) => {
+      let drug = inventorymedication.find(
+        (medication) => medication.id === inventoryMedicationFK,
+      )
+      if (!drug) return
+      drug.inventoryMedication_DrugAllergy.forEach(allergy => {
+        var drugAllergy = patientAllergy.find(a => a.type === 'Allergy' && a.allergyFK === allergy.drugAllergyFK)
+        if (drugAllergy) {
+          allergys.push({
+            drugName: drug.displayValue,
+            allergyName: drugAllergy.allergyName,
+            allergyType: 'Drug',
+            allergyReaction: drugAllergy.allergyReaction,
+            onsetDate: drugAllergy.onsetDate,
+            id: inventoryMedicationFK,
+          })
+        }
+      })
+      drug.inventoryMedication_MedicationIngredient.forEach(ingredient => {
+        var drugIngredient = patientAllergy.find(a => a.type === 'Ingredient' && a.ingredientFK === ingredient.medicationIngredientFK)
+        allergys.push({
+          drugName: drug.displayValue,
+          allergyName: drugIngredient.allergyName,
+          allergyType: 'Ingredient',
+          allergyReaction: drugIngredient.allergyReaction,
+          onsetDate: drugIngredient.onsetDate,
+          id: inventoryMedicationFK,
+        })
+      })
+    }
+
     if (type === '1') {
       data = this.GetNewMedication()
       data.map((m) => {
         if (m.isDrugMixture) {
           const mixtureItems = m.corPrescriptionItemDrugMixture || []
           mixtureItems
-            .filter((i) => i.caution && i.caution.trim().length > 0)
-            .map((mixture) => {
-              if (
+            .forEach((mixture) => {
+              if (mixture.caution && mixture.caution.trim().length &&
                 !cautionItems.find(
-                  (f) => f.id === mixture.inventoryMedicationFK,
+                  (f) => f.type === 'Medication' && f.id === mixture.inventoryMedicationFK,
                 )
               ) {
                 cautionItems.push({
+                  type: 'Medication',
                   subject: mixture.subject,
                   caution: mixture.caution,
                   id: mixture.inventoryMedicationFK,
                 })
               }
+
+              if (!allergys.find(
+                (f) => f.id === mixture.inventoryMedicationFK,
+              )) {
+                insertAllergys(mixture.inventoryMedicationFK)
+              }
             })
-        } else if (
-          m.caution &&
-          m.caution.trim().length > 0 &&
-          !cautionItems.find((f) => f.id === m.inventoryMedicationFK)
-        ) {
-          cautionItems.push({
-            subject: m.subject,
-            caution: m.caution,
-            id: m.inventoryMedicationFK,
-          })
+        } else {
+          if (
+            m.caution &&
+            m.caution.trim().length > 0 &&
+            !cautionItems.find((f) => f.type === 'Medication' && f.id === m.inventoryMedicationFK)
+          ) {
+            cautionItems.push({
+              type: 'Medication',
+              subject: m.subject,
+              caution: m.caution,
+              id: m.inventoryMedicationFK,
+            })
+          }
+
+          if (!allergys.find(
+            (f) => f.id === m.inventoryMedicationFK,
+          )) {
+            insertAllergys(m.inventoryMedicationFK)
+          }
         }
       })
     } else if (type === '2') {
       data = this.GetNewVaccination()
       data.filter((f) => f.caution && f.caution.trim().length > 0).map((m) => {
-        if (!cautionItems.find((c) => c.id === m.inventoryVaccinationFK)) {
+        if (!cautionItems.find((c) => c.type === 'Vaccination' && c.id === m.inventoryVaccinationFK)) {
           cautionItems.push({
+            type: 'Vaccination',
             subject: m.subject,
             caution: m.caution,
             id: m.inventoryVaccinationFK,
@@ -614,8 +666,8 @@ class PastMedication extends PureComponent {
       })
     }
 
-    if (cautionItems.length > 0) {
-      openCautionAlertPrompt(cautionItems, updateRows)
+    if (cautionItems.length || allergys.length) {
+      openCautionAlertPrompt(cautionItems, allergys, [], updateRows)
     } else {
       updateRows()
     }

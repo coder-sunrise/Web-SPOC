@@ -39,6 +39,7 @@ const AddOrder = ({
   location,
   clinicInfo,
   isFirstLoad,
+  patient
 }) => {
   const displayExistingOrders = async (id, servicesList) => {
     const r = await dispatch({
@@ -50,7 +51,41 @@ const AddOrder = ({
     })
 
     if (r) {
+      let allergys = []
+      const { patientAllergy = [] } = patient
+
       const { retailInvoiceAdjustment, retailInvoiceItem } = r
+
+      const insertAllergys = (inventoryMedicationFK) => {
+        let drug = inventorymedication.find(
+          (medication) => medication.id === inventoryMedicationFK,
+        )
+        if (!drug) return
+        drug.inventoryMedication_DrugAllergy.forEach(allergy => {
+          var drugAllergy = patientAllergy.find(a => a.type === 'Allergy' && a.allergyFK === allergy.drugAllergyFK)
+          if (drugAllergy) {
+            allergys.push({
+              drugName: drug.displayValue,
+              allergyName: drugAllergy.allergyName,
+              allergyType: 'Drug',
+              allergyReaction: drugAllergy.allergyReaction,
+              onsetDate: drugAllergy.onsetDate,
+              id: inventoryMedicationFK,
+            })
+          }
+        })
+        drug.inventoryMedication_MedicationIngredient.forEach(ingredient => {
+          var drugIngredient = patientAllergy.find(a => a.type === 'Ingredient' && a.ingredientFK === ingredient.medicationIngredientFK)
+          allergys.push({
+            drugName: drug.displayValue,
+            allergyName: drugIngredient.allergyName,
+            allergyType: 'Ingredient',
+            allergyReaction: drugIngredient.allergyReaction,
+            onsetDate: drugIngredient.onsetDate,
+            id: inventoryMedicationFK,
+          })
+        })
+      }
 
       const mapRetailItemPropertyToOrderProperty = o => {
         let obj
@@ -62,12 +97,18 @@ const AddOrder = ({
               ...restValues
             } = o.retailVisitInvoiceDrug.retailPrescriptionItem
 
+            if (!allergys.find(
+              (f) => f.id === o.retailVisitInvoiceDrug.inventoryMedicationFK,
+            )) {
+              insertAllergys(o.retailVisitInvoiceDrug.inventoryMedicationFK)
+            }
+
             let medicationItem
             if (o.retailVisitInvoiceDrug.inventoryMedicationFK) {
               medicationItem = inventorymedication.find(
                 medication =>
                   medication.id ===
-                    o.retailVisitInvoiceDrug.inventoryMedicationFK &&
+                  o.retailVisitInvoiceDrug.inventoryMedicationFK &&
                   medication.isActive,
               )
             } else {
@@ -78,7 +119,7 @@ const AddOrder = ({
             obj = {
               type:
                 o.retailVisitInvoiceDrug.inventoryMedicationFK ||
-                o.retailVisitInvoiceDrug.retailPrescriptionItem.isDrugMixture
+                  o.retailVisitInvoiceDrug.retailPrescriptionItem.isDrugMixture
                   ? o.invoiceItemTypeFK.toString()
                   : ORDER_TYPE_TAB.OPENPRESCRIPTION,
               ...o.retailVisitInvoiceDrug,
@@ -112,7 +153,7 @@ const AddOrder = ({
             const { serviceId, serviceCenterId } = servicesList.find(
               s =>
                 s.serviceCenter_ServiceId ===
-                  o.retailVisitInvoiceService.serviceCenterServiceFK &&
+                o.retailVisitInvoiceService.serviceCenterServiceFK &&
                 s.isActive,
             )
             const serviceItem = ctservice.find(
@@ -138,7 +179,7 @@ const AddOrder = ({
             const consumableItem = inventoryconsumable.find(
               consumable =>
                 consumable.id ===
-                  o.retailVisitInvoiceConsumable.inventoryConsumableFK &&
+                o.retailVisitInvoiceConsumable.inventoryConsumableFK &&
                 consumable.isActive,
             )
             obj = {
@@ -216,18 +257,20 @@ const AddOrder = ({
           })
       }
 
-      if (isVaccinationExist.length > 0 || cuationItems.length > 0) {
+      if (isVaccinationExist.length || cuationItems.length || allergys.length) {
         dispatch({
           type: 'global/updateAppState',
           payload: {
             openConfirm: true,
-            openConfirmContent:
-              isVaccinationExist.length > 0
-                ? getRetailCautionAlertContent(cuationItems, isVaccinationExist)
-                : getCautionAlertContent(cuationItems),
+            customWidth: 'md',
+            openConfirmContent: getCautionAlertContent(cuationItems.map(x => {
+              return {
+                ...x, type: x.type === 1 ? 'Medication' : 'Vaccination'
+              }
+            }), allergys, isVaccinationExist),
             alignContent: 'left',
             isInformType: true,
-            onConfirmSave: () => {},
+            onConfirmSave: () => { },
           },
         })
       }
@@ -499,8 +542,8 @@ export default compose(
                 subTotal: roundTo(o.totalPrice),
                 itemRevenueCategoryFK: o.isDrugMixture
                   ? getDrugMixtureRevenueCategory(
-                      o.corPrescriptionItemDrugMixture,
-                    )
+                    o.corPrescriptionItemDrugMixture,
+                  )
                   : revenueCategory.id,
                 // "adjType": "string",
                 // "adjValue": 0,

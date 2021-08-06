@@ -76,8 +76,6 @@ class Grid extends PureComponent {
     } = this.props
 
     const drugMixtureIndicator = (row) => {
-      if (!row.isDrugMixture) return null
-
       return (
         <div style={{ position: 'relative', top: 3 }}>
           <DrugMixtureInfo values={row.prescriptionSetItemDrugMixture || []} />
@@ -210,7 +208,8 @@ class Grid extends PureComponent {
                   }}
                 >
                   <GridContainer>
-                    <div className={classes.nameColumn}>
+                    <div className={classes.nameColumn}
+                      style={{ paddingRight: item.isDrugMixture ? 20 : 0 }}>
                       {warningLabel && (
                         <span style={{ color: 'red', fontStyle: 'italic' }}>
                           <sup>{warningLabel}&nbsp;</sup>
@@ -219,7 +218,9 @@ class Grid extends PureComponent {
                       <Tooltip title={item.drugName}>
                         <span>{item.drugName}</span>
                       </Tooltip>
-                      {drugMixtureIndicator(item)}
+                      <div style={{ position: 'relative', top: 2 }}>
+                        {item.isDrugMixture && drugMixtureIndicator(item, -20)}
+                      </div>
                     </div>
                     <div className={classes.instructionColumn}>
                       <Tooltip

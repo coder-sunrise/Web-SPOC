@@ -401,39 +401,89 @@ class PrescriptionSetList extends PureComponent {
   }
 
   handleSubmit = () => {
-    const { dispatch, onConfirm } = this.props
+    const { dispatch, onConfirm, codetable, patient } = this.props
+    const { inventorymedication = [] } = codetable
+    const { entity = {} } = patient
+    const { patientAllergy = [] } = entity
     let data = []
     const cautionItems = []
+    let allergys = []
+
+    const insertAllergys = (inventoryMedicationFK) => {
+      let drug = inventorymedication.find(
+        (medication) => medication.id === inventoryMedicationFK,
+      )
+      if (!drug) return
+      drug.inventoryMedication_DrugAllergy.forEach(allergy => {
+        var drugAllergy = patientAllergy.find(a => a.type === 'Allergy' && a.allergyFK === allergy.drugAllergyFK)
+        if (drugAllergy) {
+          allergys.push({
+            drugName: drug.displayValue,
+            allergyName: drugAllergy.allergyName,
+            allergyType: 'Drug',
+            allergyReaction: drugAllergy.allergyReaction,
+            onsetDate: drugAllergy.onsetDate,
+            id: inventoryMedicationFK,
+          })
+        }
+      })
+      drug.inventoryMedication_MedicationIngredient.forEach(ingredient => {
+        var drugIngredient = patientAllergy.find(a => a.type === 'Ingredient' && a.ingredientFK === ingredient.medicationIngredientFK)
+        allergys.push({
+          drugName: drug.displayValue,
+          allergyName: drugIngredient.allergyName,
+          allergyType: 'Ingredient',
+          allergyReaction: drugIngredient.allergyReaction,
+          onsetDate: drugIngredient.onsetDate,
+          id: inventoryMedicationFK,
+        })
+      })
+    }
 
     data = this.GetNewMedication()
     data.map((m) => {
       if (m.isDrugMixture) {
         const mixtureItems = m.prescriptionSetItemDrugMixture || []
         mixtureItems
-          .filter((i) => i.caution && i.caution.trim().length > 0)
-          .map((mixture) => {
-            if (
+          .forEach((mixture) => {
+            if (mixture.caution && mixture.caution.trim().length &&
               !cautionItems.find(
                 (f) => f.id === mixture.inventoryMedicationFK,
               )
             ) {
               cautionItems.push({
+                type: 'Medication',
                 subject: mixture.subject,
                 caution: mixture.caution,
                 id: mixture.inventoryMedicationFK,
               })
             }
+
+            if (!allergys.find(
+              (f) => f.id === mixture.inventoryMedicationFK,
+            )) {
+              insertAllergys(mixture.inventoryMedicationFK)
+            }
           })
-      } else if (
-        m.caution &&
-        m.caution.trim().length > 0 &&
-        !cautionItems.find((f) => f.id === m.inventoryMedicationFK)
-      ) {
-        cautionItems.push({
-          subject: m.subject,
-          caution: m.caution,
-          id: m.inventoryMedicationFK,
-        })
+      } else {
+        if (
+          m.caution &&
+          m.caution.trim().length > 0 &&
+          !cautionItems.find((f) => f.id === m.inventoryMedicationFK)
+        ) {
+          cautionItems.push({
+            type: 'Medication',
+            subject: m.subject,
+            caution: m.caution,
+            id: m.inventoryMedicationFK,
+          })
+        }
+
+        if (!allergys.find(
+          (f) => f.id === m.inventoryMedicationFK,
+        )) {
+          insertAllergys(m.inventoryMedicationFK)
+        }
       }
     })
 
@@ -446,8 +496,8 @@ class PrescriptionSetList extends PureComponent {
       })
     }
 
-    if (cautionItems.length > 0) {
-      openCautionAlertPrompt(cautionItems, updateRows)
+    if (cautionItems.length || allergys.length) {
+      openCautionAlertPrompt(cautionItems, allergys, [], updateRows)
     } else {
       updateRows()
     }
