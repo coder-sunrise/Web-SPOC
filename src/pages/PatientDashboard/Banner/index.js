@@ -1085,7 +1085,7 @@ class Banner extends PureComponent {
                             payload: {
                               openConfirm: true,
                               isInformType: true,
-                              openConfirmText: 'ok',
+                              openConfirmText: 'Ok',
                               openConfirmContent: `Pre-Order is not allowed for entire series appointment.`,
                             },
                           })
@@ -1097,7 +1097,7 @@ class Banner extends PureComponent {
                             payload: {
                               openConfirm: true,
                               isInformType: true,
-                              openConfirmText: 'ok',
+                              openConfirmText: 'Ok',
                               openConfirmContent: `Pre-Order is not allowed for recurring appointment.`,
                             },
                           })

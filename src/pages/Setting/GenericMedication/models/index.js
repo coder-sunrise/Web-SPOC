@@ -5,7 +5,7 @@ import service from '../services'
 export default createListViewModel({
   namespace: 'settingGenericMedication',
   codetable: {
-    message: 'Generic Medication updated',
+    message: 'Generic Drug updated',
     code: 'ctgenericmedication',
   },
   param: {

@@ -56,9 +56,9 @@ class ServiceCenter extends PureComponent {
           observe='MedicationContraIndicationDetail'
           title={
             settingMedicationContraIndication.entity ? (
-              'Edit Medication Contra-Indication'
+              'Edit Medication Contraindication'
             ) : (
-              'Add Medication Contra-Indication'
+                'Add Medication Contraindication'
             )
           }
           maxWidth='md'

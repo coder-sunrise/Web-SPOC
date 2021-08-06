@@ -54,7 +54,7 @@ class GenericMedication extends PureComponent {
         <CommonModal
           open={settingGenericMedication.showModal}
           observe='GenericMedicationDetail'
-          title={settingGenericMedication.entity ? 'Edit Generic Medication' : 'Add Generic Medication'}
+          title={settingGenericMedication.entity ? 'Edit Generic Drug' : 'Add Generic Drug'}
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}
