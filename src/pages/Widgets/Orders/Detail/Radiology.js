@@ -18,6 +18,7 @@ import {
   FastField,
   Field,
   Tooltip,
+  FieldSet
 } from '@/components'
 import { currencySymbol } from '@/utils/config'
 import Authorized from '@/utils/Authorized'
@@ -26,6 +27,7 @@ import { getServices } from '@/utils/codetable'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
 import { CANNED_TEXT_TYPE, SERVICE_CENTER_CATEGORY } from '@/utils/constants'
+import { RADIOLOGY_WORKITEM_STATUS } from '@/utils/constants'
 import CannedTextButton from './CannedTextButton'
 
 const { CheckableTag } = Tag
@@ -58,10 +60,7 @@ const styles = (theme) => ({
     border: '1px solid rgba(0, 0, 0, 0.42)', fontSize: '0.85rem', padding: '3px 10px',
   },
   groupPanel: {
-    border: '1px solid rgba(0, 0, 0, 0.42)', position: 'relative', padding: 10, marginTop: 10, borderRadius: 5,
-  },
-  groupPanelTitle: {
-    fontSize: '0.85rem', position: 'absolute', top: '-10px', left: '10px', backgroundColor: 'white', padding: '0px 5px',
+    margin: '0px 5px', maxHeight: 170, overflowY: 'auto', overflowX: 'hidden'
   },
   checkServiceItem: {
     display: 'inline-block',
@@ -83,6 +82,13 @@ const styles = (theme) => ({
   },
   checkServiceCheckBox: {
     display: 'inline-block', marginRight: '-16px', position: 'absolute', top: '-3px', right: 0,
+  },
+  legend: {
+    width: 'fit-content',
+    fontSize: '0.85rem',
+    margin: `${theme.spacing(1)}px ${theme.spacing(1)}px 0px`,
+    padding: `0px ${theme.spacing(1)}px`,
+    fontWeight: 500
   },
 })
 
@@ -405,10 +411,16 @@ class Radiology extends PureComponent {
       filterServices = services.filter(s => radiologyItems.find(r => r.serviceFK === s.value)
         || ((selectTag === 'All' || s.serviceTags.find(st => st.value === selectTag))
           && (selectCategory === 'All' || s.serviceCategoryFK === selectCategory)
-          && (s.code.indexOf(filterService) >= 0 || s.name.indexOf(filterService) >= 0)
+        && (s.code.toUpperCase().indexOf(filterService.toUpperCase()) >= 0 || s.name.toUpperCase().indexOf(filterService.toUpperCase()) >= 0)
         )
       )
     }
+
+    const { workitem = {}, isPreOrder } = editService
+    const { radiologyWorkitem = {} } = workitem
+    const isStartedRadiology = !isPreOrder && [RADIOLOGY_WORKITEM_STATUS.INPROGRESS, RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT, RADIOLOGY_WORKITEM_STATUS.COMPLETED].indexOf(radiologyWorkitem.statusFK) >= 0
+
+    console.log('editService', isStartedRadiology)
     return (
       <Authorized
         authority={GetOrderItemAccessRight(
@@ -473,9 +485,8 @@ class Radiology extends PureComponent {
               />
             </GridItem>
             <GridItem xs={12}>
-              <div className={classes.groupPanel}>
-                <div className={classes.groupPanelTitle}>Service</div>
-                <div style={{ maxHeight: 170, overflowY: 'auto', overflowX: 'hidden' }}>
+              <FieldSet classes={this.props.classes} size='sm' title='Service' style={{ fontSize: '0.85rem' }}>
+                <div className={classes.groupPanel} >
                   {filterServices.map(r => {
                     return <div style={{ backgroundColor: editServiceId === r.value ? 'lightgreen' : 'white', borderColor: this.isValidate(r) ? '#99CC99' : 'red' }}
                       className={classes.checkServiceItem}
@@ -509,9 +520,9 @@ class Radiology extends PureComponent {
                                 type,
                                 packageGlobalId: '',
                                 performingUserFK: getVisitDoctorUserId(this.props),
-                                isDisplayValueChangable: r.isDisplayValueChangable
+                                isDisplayValueChangable: r.isDisplayValueChangable,
+                                isNurseActualizeRequired: r.isNurseActualizable
                               }
-                              console.log('isDisplayValueChangable', r.isDisplayValueChangable)
                               this.getServiceCenterService(newService)
                               setFieldValue('radiologyItems', [...radiologyItems, newService])
                               setFieldValue('editServiceId', newService.serviceFK)
@@ -534,7 +545,7 @@ class Radiology extends PureComponent {
                     </div>
                   })}
                 </div>
-              </div>
+              </FieldSet>
             </GridItem>
             <GridItem xs={12}>
               <div>
@@ -561,7 +572,7 @@ class Radiology extends PureComponent {
                 render={(args) => {
                   return (
                     <Select
-                      disabled={!editServiceId}
+                      disabled={!editServiceId || isStartedRadiology}
                       allowClear={false}
                       label='Service Center Name'
                       options={serviceCenters.filter(
@@ -588,7 +599,7 @@ class Radiology extends PureComponent {
                 render={(args) => {
                   return (
                     <NumberInput
-                      disabled={!editServiceId}
+                      disabled={!editServiceId || isStartedRadiology}
                       label='Quantity'
                       style={{
                         marginLeft: theme.spacing(7),
@@ -618,7 +629,7 @@ class Radiology extends PureComponent {
             <GridItem xs={8} className={classes.editor} style={{ paddingRight: 35 }}>
               <div style={{ position: 'relative' }}>
                 <TextField value={editService.instruction}
-                  disabled={!editServiceId}
+                  disabled={!editServiceId || isStartedRadiology}
                   label='Instruction'
                   onChange={(e) => {
                     editService.instruction = e.target.value
@@ -626,14 +637,14 @@ class Radiology extends PureComponent {
                   }}
                 />
                 <CannedTextButton
-                  disabled={!editServiceId}
+                  disabled={!editServiceId || isStartedRadiology}
                   cannedTextTypeFK={CANNED_TEXT_TYPE.RADIOLOGYINSTRUCTION}
                   style={{
                     position: 'absolute', bottom: 0,
                     right: -35,
                   }}
                   handleSelectCannedText={(cannedText) => {
-                    editService.instruction = `${editService.instruction} ${cannedText.text || ''}`.substring(0, 2000)
+                    editService.instruction = `${editService.instruction ? (editService.instruction + ' ') : ''}${cannedText.text || ''}`.substring(0, 2000)
                     setFieldValue('radiologyItems', [...radiologyItems])
                   }}
                 />
@@ -670,7 +681,7 @@ class Radiology extends PureComponent {
             <GridItem xs={8} className={classes.editor}>
               <TextField
                 value={editService.remark}
-                disabled={!editServiceId}
+                disabled={!editServiceId || isStartedRadiology}
                 label='Remarks'
                 onChange={(e) => {
                   editService.remark = e.target.value
@@ -761,8 +772,8 @@ class Radiology extends PureComponent {
             {editServiceId && editService.isDisplayValueChangable ? <GridItem xs={8} className={classes.editor}>
               <TextField
                 value={editService.newServiceName}
-                disabled={!editServiceId}
-                label='New Service Name'
+                disabled={!editServiceId || isStartedRadiology}
+                label='New Service Display Name'
                 maxLength={255}
                 onChange={(e) => {
                   editService.newServiceName = e.target.value
@@ -776,7 +787,7 @@ class Radiology extends PureComponent {
                     <span style={{ fontSize: '0.85rem', position: 'absolute', bottom: '4px', fontWeight: 500 }}>Priority: </span>
                     <div style={{ marginLeft: 60, marginTop: 14 }}>
                       <RadioGroup
-                        disabled={!editServiceId}
+                        disabled={!editServiceId || isStartedRadiology}
                         value={editService.priority || 'Normal'}
                         label=''
                         onChange={(e) => {
@@ -799,7 +810,7 @@ class Radiology extends PureComponent {
                   <div style={{ display: 'inline-block', marginLeft: 20 }}>
                     <Checkbox
                       checked={editService.isPreOrder || false}
-                      disabled={!editServiceId}
+                      disabled={!editServiceId || isStartedRadiology}
                       style={{ position: 'absolute', bottom: 2 }}
                       label='Pre-Order'
                       onChange={(e) => {
@@ -810,17 +821,16 @@ class Radiology extends PureComponent {
                         setFieldValue('radiologyItems', [...radiologyItems])
                       }}
                     />
-                    {editService.isPreOrder &&
-                      <Checkbox
-                        checked={editService.isChargeToday || false}
-                        disabled={!editServiceId}
-                        style={{ position: 'absolute', bottom: 2, left: '330px' }}
-                        label='Charge Today'
-                        onChange={(e) => {
-                          editService.isChargeToday = e.target.value
-                          setFieldValue('radiologyItems', [...radiologyItems])
-                        }}
-                      />
+                    {editService.isPreOrder && <Checkbox
+                      checked={editService.isChargeToday || false}
+                      disabled={!editServiceId || isStartedRadiology}
+                      style={{ position: 'absolute', bottom: 2, left: '330px' }}
+                      label='Charge Today'
+                      onChange={(e) => {
+                        editService.isChargeToday = e.target.value
+                        setFieldValue('radiologyItems', [...radiologyItems])
+                      }}
+                    />
                     }
                   </div>
                 </div>
@@ -854,7 +864,7 @@ class Radiology extends PureComponent {
                     <span style={{ fontSize: '0.85rem', position: 'absolute', bottom: '4px', fontWeight: 500 }}>Priority: </span>
                     <div style={{ marginLeft: 60, marginTop: 14 }}>
                       <RadioGroup
-                        disabled={!editServiceId}
+                      disabled={!editServiceId || isStartedRadiology}
                         value={editService.priority || 'Normal'}
                         label=''
                         onChange={(e) => {
@@ -877,7 +887,7 @@ class Radiology extends PureComponent {
                   <div style={{ display: 'inline-block', marginLeft: 20 }}>
                     <Checkbox
                       checked={editService.isPreOrder || false}
-                      disabled={!editServiceId}
+                    disabled={!editServiceId || isStartedRadiology}
                       style={{ position: 'absolute', bottom: 0 }}
                       label='Pre-Order'
                       onChange={(e) => {
@@ -888,17 +898,16 @@ class Radiology extends PureComponent {
                         setFieldValue('radiologyItems', [...radiologyItems])
                       }}
                     />
-                    {editService.isPreOrder &&
-                      <Checkbox
-                        checked={editService.isChargeToday || false}
-                        disabled={!editServiceId}
-                        style={{ position: 'absolute', bottom: 0, left: '330px' }}
-                        label='Charge Today'
-                        onChange={(e) => {
-                          editService.isChargeToday = e.target.value
-                          setFieldValue('radiologyItems', [...radiologyItems])
-                        }}
-                      />
+                  {editService.isPreOrder && <Checkbox
+                    checked={editService.isChargeToday || false}
+                    disabled={!editServiceId || isStartedRadiology}
+                    style={{ position: 'absolute', bottom: 0, left: '330px' }}
+                    label='Charge Today'
+                    onChange={(e) => {
+                      editService.isChargeToday = e.target.value
+                      setFieldValue('radiologyItems', [...radiologyItems])
+                    }}
+                  />
                     }
                   </div>
                 </div>

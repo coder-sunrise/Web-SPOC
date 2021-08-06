@@ -74,7 +74,8 @@ const defaultPatientEntity = {
       isConsent: false,
     },
   ],
-  patientPackage: []
+  patientPackage: [],
+  pendingPreOrderItem: [],
 }
 
 export default createFormViewModel({
@@ -92,14 +93,14 @@ export default createFormViewModel({
     subscriptions: ({ dispatch, history }) => {
       history.listen(async loct => {
         const { query = {}, pathname } = loct
-        if(pathname === '/patient'){
+        if (pathname === '/patient') {
           dispatch({
             type: 'getUserPreference',
             payload: {
               type: '4',
             },
-          }).then((response)=>{
-            if(response){
+          }).then(response => {
+            if (response) {
               const { favPatDBColumnSetting } = response
               dispatch({
                 type: 'updateState',
@@ -132,7 +133,7 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *initState ({ payload }, { put, select, take }) {
+      *initState({ payload }, { put, select, take }) {
         yield put({ type: 'initAllergyCodetable' })
         yield put({ type: 'initSchemeCodetable' })
         let { currentId, version, md, newPatient } = payload
@@ -165,7 +166,7 @@ export default createFormViewModel({
             },
           })
       },
-      *initAllergyCodetable (_, { put }) {
+      *initAllergyCodetable(_, { put }) {
         yield put({
           type: 'codetable/fetchCodes',
           payload: {
@@ -175,18 +176,8 @@ export default createFormViewModel({
             },
           },
         })
-
-        yield put({
-          type: 'codetable/fetchCodes',
-          payload: {
-            code: 'ctclinicdrugallergy',
-            filter: {
-              isActive: true,
-            },
-          },
-        })
       },
-      *initSchemeCodetable (_, { put }) {
+      *initSchemeCodetable(_, { put }) {
         yield put({
           type: 'codetable/fetchCodes',
           payload: {
@@ -208,11 +199,11 @@ export default createFormViewModel({
           },
         })
       },
-      *waitLoadComplete (_, { take }) {
+      *waitLoadComplete(_, { take }) {
         yield take('patient/query/@@end')
         return ''
       },
-      *closePatientModal ({ payload }, { all, put, select }) {
+      *closePatientModal({ payload }, { all, put, select }) {
         const patientState = yield select(st => st.patient)
 
         if (patientState.shouldQueryOnClose) {
@@ -275,7 +266,7 @@ export default createFormViewModel({
           }),
         ])
       },
-      *openPatientModal ({ payload = { callback: undefined } }, { put }) {
+      *openPatientModal({ payload = { callback: undefined } }, { put }) {
         if (payload.callback) {
           yield put({
             type: 'updateState',
@@ -290,7 +281,7 @@ export default createFormViewModel({
           }),
         )
       },
-      *refreshChasBalance ({ payload }, { call }) {
+      *refreshChasBalance({ payload }, { call }) {
         const {
           patientAccountNo,
           patientCoPaymentSchemeFK,
@@ -317,7 +308,7 @@ export default createFormViewModel({
 
         return result
       },
-      *refreshMedisaveBalance ({ payload }, { call }) {
+      *refreshMedisaveBalance({ payload }, { call }) {
         const {
           patientAccountNo,
           isSaveToDb = false,
@@ -341,7 +332,7 @@ export default createFormViewModel({
 
         return data
       },
-      *queryDone ({ payload }, { put }) {
+      *queryDone({ payload }, { put }) {
         const { data } = payload
         // console.log(payload)
         data.patientScheme.forEach(ps => {
@@ -363,7 +354,7 @@ export default createFormViewModel({
           },
         })
       },
-      *queryDeposit ({ payload }, { select, call, put }) {
+      *queryDeposit({ payload }, { select, call, put }) {
         const response = yield call(service.queryDeposit, payload)
         if (response && response.status === '200') {
           const { data = {} } = response
@@ -393,7 +384,7 @@ export default createFormViewModel({
           })
         }
       },
-      *saveUserPreference ({ payload }, { call, put, select }) {
+      *saveUserPreference({ payload }, { call, put, select }) {
         const r = yield call(saveUserPreference, {
           userPreferenceDetails: JSON.stringify(payload.userPreferenceDetails),
           itemIdentifier: payload.itemIdentifier,
@@ -403,7 +394,7 @@ export default createFormViewModel({
 
         return false
       },
-      *getUserPreference ({ payload }, { call, put }) {
+      *getUserPreference({ payload }, { call, put }) {
         const r = yield call(getUserPreference, payload.type)
         const { status, data } = r
         if (status === '200') {
@@ -412,12 +403,14 @@ export default createFormViewModel({
             let favPatDBColumnSetting
             if (payload.type === '4') {
               favPatDBColumnSetting = parsedFavPatDBColumnSetting.find(
-                (o) => o.Identifier === 'PatientDatabaseColumnSetting'
+                o => o.Identifier === 'PatientDatabaseColumnSetting',
               )
             }
-        if (parsedFavPatDBColumnSetting.length > 0) {
+            if (parsedFavPatDBColumnSetting.length > 0) {
               const resultFavPatDBColumnSetting = {
-                favPatDBColumnSetting: favPatDBColumnSetting ? favPatDBColumnSetting.value : [],
+                favPatDBColumnSetting: favPatDBColumnSetting
+                  ? favPatDBColumnSetting.value
+                  : [],
               }
               return resultFavPatDBColumnSetting
             }
@@ -427,7 +420,7 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      updateDefaultEntity (state, { payload }) {
+      updateDefaultEntity(state, { payload }) {
         const { patientName } = payload
         return {
           ...state,

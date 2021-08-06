@@ -356,24 +356,37 @@ export const ADD_ON_FEATURE = {
   MIMS: 2,
 }
 
+export const RadiologyWorkitemStatus = {
+  1: 'New',
+  2: 'In Progress',
+  3: 'Pending Report',
+  4: 'Completed',
+  5: 'Cancelled',
+}
+
 export const VISIT_TYPE = {
   CONS: 1,
   RETAIL: 2,
   BILL_FIRST: 3,
+  MC: 4,
 }
 
 export const VISIT_TYPE_NAME = [
   {
     visitPurposeFK: VISIT_TYPE.CONS,
-    displayName: 'CONSULTATION',
+    displayName: 'Consultation',
   },
   {
     visitPurposeFK: VISIT_TYPE.RETAIL,
-    displayName: 'RETAIL',
+    displayName: 'Retail',
   },
   {
     visitPurposeFK: VISIT_TYPE.BILL_FIRST,
-    displayName: 'BILL-FIRST',
+    displayName: 'Bill-First',
+  },
+  {
+    visitPurposeFK: VISIT_TYPE.MC,
+    displayName: 'MC',
   },
 ]
 
@@ -452,7 +465,10 @@ export const CANNED_TEXT_TYPE = {
   RADIOLOGYINSTRUCTION: 8,
 }
 
-export const CANNED_TEXT_TYPE_BASE_TEXT = [ CANNED_TEXT_TYPE.MEDICALCERTIFICATE, CANNED_TEXT_TYPE.RADIOLOGYINSTRUCTION ]
+export const CANNED_TEXT_TYPE_BASE_TEXT = [
+  CANNED_TEXT_TYPE.MEDICALCERTIFICATE,
+  CANNED_TEXT_TYPE.RADIOLOGYINSTRUCTION,
+]
 
 export const DENTAL_CANNED_TEXT_TYPE_FIELD = {
   1: 'clinicalNotes',
@@ -581,5 +597,32 @@ export const DIAGNOSIS_TYPE = {
 }
 
 export const SERVICE_CENTER_CATEGORY = {
+  INTERNALLABSERVICECENTER: 3,
   INTERNALRADIOLOGYSERVICECENTER: 4,
+}
+
+export const DOSAGE_RULE_OPERATOR = {
+  to: 'to',
+  lessThan: 'less than',
+  moreThan: 'more than',
+}
+
+export const DOSAGE_RULE = {
+  age: 'age',
+  weight: 'weight',
+  default: 'default',
+}
+
+export const RADIOLOGY_WORKITEM_STATUS = {
+  NEW: 1,
+  INPROGRESS: 2,
+  PENDINGREPORT: 3,
+  COMPLETED: 4,
+  CANCCELED: 5,
+}
+
+export const NURSE_WORKITEM_STATUS = {
+  NEW: 1,
+  ACTUALIZED: 2,
+  CANCCELED: 3,
 }

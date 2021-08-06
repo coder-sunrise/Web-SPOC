@@ -46,7 +46,6 @@ class ICD10Diagnosis extends PureComponent {
             favouriteDiagnosisLanguage: favouriteLanguage,
           },
         })
-        console.log('IdDiagnosisRun', favouriteLanguage)
       }
     })
   }
@@ -109,7 +108,6 @@ class ICD10Diagnosis extends PureComponent {
         type: '7',
       },
     }).then((r) => {
-      console.log('getResultDiagnosis', r)
       if (r) {
         dispatch({
           type: 'diagnosis/getUserPreference',
@@ -184,7 +182,7 @@ class ICD10Diagnosis extends PureComponent {
               return (
                 <Authorized authority={"queue.consultation.widgets.diagnosis"}>
                 <div key={v.uid}>
-                <ICD10DiagnosisItem
+                {(diagnosis.favouriteDiagnosisLanguage && <ICD10DiagnosisItem
                   {...this.props}
                   index={i}
                   arrayHelpers={arrayHelpers}
@@ -194,7 +192,7 @@ class ICD10Diagnosis extends PureComponent {
                   icD10DiagnosisCode={v.icD10DiagnosisCode}
                   favouriteDiagnosisMessage={v.favouriteDiagnosisMessage}
                   favouriteDiagnosis={diagnosis.favouriteDiagnosis || []}
-                />
+                />)}
               </div>
               </Authorized>
               )
@@ -202,18 +200,13 @@ class ICD10Diagnosis extends PureComponent {
           }}
         />
 
-        <AuthorizedContext>
-          {(r) => {
-            if (r.rights !== 'enable') return null
-            return (
+        <Authorized authority={"queue.consultation.widgets.diagnosis"}>
               <div>
-                <Button size="sm" color="primary" onClick={this.handleAddDiagnosisClick}>
+                <Button size="sm" color="primary" onClick={this.handleAddDiagnosisClick} >
                   <Add /> Add Diagnosis
                 </Button>
               </div>
-            )
-          }}
-        </AuthorizedContext>
+        </Authorized>
       </div>
     )
   }

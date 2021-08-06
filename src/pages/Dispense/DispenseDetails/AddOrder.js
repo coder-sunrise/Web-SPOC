@@ -506,6 +506,8 @@ export default compose(
                 // "adjValue": 0,
                 isDrugMixture: o.isDrugMixture,
                 isClaimable: o.isDrugMixture ? o.isClaimable : true,
+                isDispensedByPharmacy: o.isDispensedByPharmacy,
+                isNurseActualizeRequired: o.isNurseActualizeRequired,
                 retailVisitInvoiceDrug: {
                   id: o.innerLayerId,
                   concurrencyToken: o.innerLayerConcurrencyToken,
@@ -557,6 +559,8 @@ export default compose(
                 itemRevenueCategoryFK: revenueCategoryFK,
                 isDrugMixture: false,
                 isClaimable: true,
+                isDispensedByPharmacy: o.isDispensedByPharmacy,
+                isNurseActualizeRequired: o.isNurseActualizeRequired,
                 retailVisitInvoiceService: {
                   id: o.innerLayerId,
                   concurrencyToken: o.innerLayerConcurrencyToken,
@@ -592,6 +596,8 @@ export default compose(
                 itemRevenueCategoryFK: revenueCategory.id,
                 isDrugMixture: false,
                 isClaimable: true,
+                isDispensedByPharmacy: o.isDispensedByPharmacy,
+                isNurseActualizeRequired: o.isNurseActualizeRequired,
                 retailVisitInvoiceConsumable: {
                   id: o.innerLayerId,
                   concurrencyToken: o.innerLayerConcurrencyToken,

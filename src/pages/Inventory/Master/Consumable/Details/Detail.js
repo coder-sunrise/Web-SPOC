@@ -14,6 +14,7 @@ import {
   Field,
 } from '@/components'
 import SharedContainer from '../../SharedContainer'
+import clinicSettings from '@/models/clinicSettings'
 
 const styles = () => ({})
 
@@ -103,25 +104,45 @@ const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
                       simple
                       valueField='id'
                       textField='name'
-                      options={[
-                        {
-                          id: 'isChasAcuteClaimable',
-                          name: 'CHAS Acute Claimable',
+                      options={
+                        (() => {
+                          var arr = []
+                          if (clinicSettings.isEnableCHAS) {
+                            arr.push(...[{
+                              id: 'isChasAcuteClaimable',
+                              name: 'CHAS Acute Claimable',
 
-                          layoutConfig: {
-                            style: {},
-                          },
-                        },
-                        {
-                          id: 'isChasChronicClaimable',
-                          name: 'CHAS Chronic Claimable',
+                              layoutConfig: {
+                                style: {},
+                              },
+                            },
+                            {
+                              id: 'isChasChronicClaimable',
+                              name: 'CHAS Chronic Claimable',
 
-                          layoutConfig: {
-                            style: {},
+                              layoutConfig: {
+                                style: {},
+                              },
+                              },
+                            ])
+                          }
+                          arr.push(...[{
+                            id: 'isDispensedByPharmacy',
+                            name: 'Dispensed by Pharmacy',
+                            layoutConfig: {
+                              style: {},
+                            },
                           },
-                        },
-                      ]}
-                      onChange={(e, s) => {}}
+                          {
+                            id: 'isNurseActualizable',
+                            name: 'Nurse Actualizable',
+                            layoutConfig: {
+                              style: {},
+                            },
+                          },])
+                          return arr
+                        })()}
+                      onChange={(e, s) => { }}
                       {...args}
                     />
                   )}

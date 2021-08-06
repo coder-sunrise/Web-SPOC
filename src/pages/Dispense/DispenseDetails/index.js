@@ -46,6 +46,7 @@ import {
 } from '../variables'
 
 import CONSTANTS from './constants'
+import { ServePatientButton } from '@/components/_medisys'
 
 const styles = theme => ({
   paper: {
@@ -99,6 +100,10 @@ const DispenseDetails = ({
   onDrugLabelNoChanged,
   selectedDrugs,
   clinicSettings,
+  servingPersons=[],
+  visit,
+  doctorprofile=[],
+  patient,
 }) => {
   const {
     prescription,
@@ -120,6 +125,8 @@ const DispenseDetails = ({
 
   const { inventorymedication, inventoryvaccination } = codetable
   const { settings = [] } = clinicSettings
+  const currentDoc = doctorprofile.filter(x=>x.id === visit.doctorProfileFK)
+  const docInfo = currentDoc && currentDoc.length > 0 ? currentDoc[0].clinicianProfile : {}
 
   const handleSelectedBatch = (e, op = {}, row) => {
     if (op && op.length > 0) {
@@ -299,7 +306,7 @@ const DispenseDetails = ({
   return (
     <React.Fragment>
       <GridContainer>
-        <GridItem justify='flex-start' md={6} className={classes.actionButtons}>
+        <GridItem justify='flex-start' md={7} className={classes.actionButtons}>
           {!viewOnly && !isRetailVisit && (
             <Button
               color='info'
@@ -331,9 +338,11 @@ const DispenseDetails = ({
             {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
             Patient Label
           </Button>
+          {visit.orderCreateTime && (<span style={{color:'#999999'}}>Order created by <span style={{fontWeight:500}}>{`${docInfo.title ? `${docInfo.title}.` : null}${docInfo.name}`} at {visit.orderCreateTime.format('DD MMM yyyy HH:mm')}</span> </span>)}
+          {servingPersons.length > 0 && (<span>Served by <span style={{fontWeight:500}}>{`${servingPersons.map(x=>x.servingBy).join(', ')}.`}</span></span>)}
         </GridItem>
         {!viewOnly && (
-          <GridItem className={classes.rightActionButtons} md={6}>
+          <GridItem className={classes.rightActionButtons} md={5}>
             {/* isBillFirstVisit && (
               <div
                 style={{
@@ -376,6 +385,21 @@ const DispenseDetails = ({
               >
                 Add Order
               </ProgressButton>
+            )}
+             {!isRetailVisit && (
+                <Authorized authority='queue.servepatient'>
+                  <ServePatientButton 
+                    patientName={patient.callingName}
+                    justIcon={false}
+                    servingPersons={servingPersons}
+                    onConfirm={()=>{
+                      dispatch({
+                        type: 'dispense/setServingPerson',
+                        payload: { visitFK: visit.id },
+                      })
+                    }}
+                    />
+                </Authorized>
             )}
             {!isRetailVisit && (
               <Authorized authority='queue.dispense.editorder'>
@@ -663,8 +687,12 @@ const DispenseDetails = ({
 
 export default compose(
   withStyles(styles, { name: 'DispenseDetailsGrid' }),
-  connect(({ codetable, clinicSettings }) => ({
+  connect(({ codetable, clinicSettings, dispense, visitRegistration, patient }) => ({
     codetable,
     clinicSettings,
+    servingPersons: dispense.servingPersons,
+    visit: visitRegistration.entity.visit,
+    doctorprofile: codetable.doctorprofile || [],
+    patient: patient.entity || {},
   })),
 )(DispenseDetails)

@@ -16,6 +16,7 @@ import finance from './en-US/finance'
 import reception from './en-US/reception'
 import general from './en-US/general'
 import claimsubmission from './en-US/claimSubmission'
+import radiology from './en-US/radiology'
 
 export default {
   'navBar.lang': 'Languages',
@@ -44,4 +45,5 @@ export default {
   ...inventory,
   ...sms,
   ...claimsubmission,
+  ...radiology,
 }

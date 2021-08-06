@@ -176,68 +176,53 @@ const Detail = ({
                       simple
                       valueField='id'
                       textField='name'
-                      options={
-                        clinicSettings.isMedisaveEnable
-                          ? [
-                              {
-                                id: 'isAutoGenerateCertificate',
-                                name: 'Auto Generate Certificate',
+                      options={(()=>{
+                        var arr = []
+                        arr.push({
+                          id: 'isAutoGenerateCertificate',
+                          name: 'Auto Generate Certificate',
 
-                                layoutConfig: {
-                                  style: {},
-                                },
-                              },
-                              {
-                                id: 'isChasAcuteClaimable',
-                                name: 'CHAS Acute Claimable',
+                          layoutConfig: {
+                            style: {},
+                          },
+                        })
+                        if(clinicSettings.isEnableCHAS){
+                          arr.push(...[{
+                            id: 'isChasAcuteClaimable',
+                            name: 'CHAS Acute Claimable',
+  
+                            layoutConfig: {
+                              style: {},
+                            },
+                          },
+                          {
+                            id: 'isChasChronicClaimable',
+                            name: 'CHAS Chronic Claimable',
+  
+                            layoutConfig: {
+                              style: {},
+                            },
+                          }])
+                        }
+                        if(clinicSettings.isEnableMedisave){
+                          arr.push({
+                            id: 'isMedisaveClaimable',
+                            name: 'CDMP Claimable',
 
-                                layoutConfig: {
-                                  style: {},
-                                },
-                              },
-                              {
-                                id: 'isChasChronicClaimable',
-                                name: 'CHAS Chronic Claimable',
-
-                                layoutConfig: {
-                                  style: {},
-                                },
-                              },
-                              {
-                                id: 'isMedisaveClaimable',
-                                name: 'CDMP Claimable',
-
-                                layoutConfig: {
-                                  style: {},
-                                },
-                              },
-                            ]
-                          : [
-                              {
-                                id: 'isAutoGenerateCertificate',
-                                name: 'Auto Generate Certificate',
-
-                                layoutConfig: {
-                                  style: {},
-                                },
-                              },
-                              {
-                                id: 'isChasAcuteClaimable',
-                                name: 'CHAS Acute Claimable',
-
-                                layoutConfig: {
-                                  style: {},
-                                },
-                              },
-                              {
-                                id: 'isChasChronicClaimable',
-                                name: 'CHAS Chronic Claimable',
-
-                                layoutConfig: {
-                                  style: {},
-                                },
-                              },
-                            ]
+                            layoutConfig: {
+                              style: {},
+                            },
+                          })
+                        }
+                        arr.push({
+                          id: 'isNurseActualizable',
+                          name: 'Nurse Actualizable',
+                          layoutConfig: {
+                            style: {},
+                          },
+                        })
+                        return arr
+                      })()
                       }
                       onChange={(e, s) => {
                         if (s.isMedisaveClaimable !== undefined)
@@ -357,7 +342,7 @@ const Detail = ({
                 <div
                   style={{
                     display:
-                      clinicSettings.isMedisaveEnable &&
+                      clinicSettings.isEnableMedisave &&
                       values.isMedisaveClaimable
                         ? ''
                         : 'none',

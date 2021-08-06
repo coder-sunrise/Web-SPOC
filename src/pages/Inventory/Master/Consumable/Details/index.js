@@ -46,10 +46,7 @@ const Detail = ({
   values,
   errors,
 }) => {
-  const [
-    hasActiveSession,
-    setHasActiveSession,
-  ] = useState(true)
+  const [hasActiveSession, setHasActiveSession] = useState(true)
 
   const detailProps = {
     consumableDetail,
@@ -162,12 +159,18 @@ export default compose(
         : consumableDetail.default
 
       let chas = []
-      const { isChasAcuteClaimable, isChasChronicClaimable } = returnValue
+      const { isChasAcuteClaimable, isChasChronicClaimable, isDispensedByPharmacy, isNurseActualizable } = returnValue
       if (isChasAcuteClaimable) {
         chas.push('isChasAcuteClaimable')
       }
       if (isChasChronicClaimable) {
         chas.push('isChasChronicClaimable')
+      }
+      if (isDispensedByPharmacy) {
+        chas.push('isDispensedByPharmacy')
+      }
+      if (isNurseActualizable) {
+        chas.push('isNurseActualizable')
       }
 
       return {
@@ -177,12 +180,17 @@ export default compose(
     },
     validationSchema: Yup.object().shape({
       code: Yup.string().when('id', {
-        is: (id) => !!id,
-        then: Yup.string().trim().required(),
+        is: id => !!id,
+        then: Yup.string()
+          .trim()
+          .required(),
       }),
       displayValue: Yup.string().required(),
       revenueCategoryFK: Yup.string().required(),
-      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+      effectiveDates: Yup.array()
+        .of(Yup.date())
+        .min(2)
+        .required(),
       uomfk: Yup.number().required(),
       averageCostPrice: Yup.number()
         .min(0, 'Average Cost Price must between 0 and 999,999.9999')
@@ -192,7 +200,8 @@ export default compose(
         .min(0, 'Markup Margin must between 0 and 999,999.9')
         .max(999999.9, 'Markup Margin must between 0 and 999,999.9'),
 
-      sellingPrice: Yup.number().required()
+      sellingPrice: Yup.number()
+        .required()
         .min(0, errMsg('Selling Price'))
         .max(999999.99, errMsg('Selling Price')),
 
@@ -226,11 +235,19 @@ export default compose(
       let chas = {
         isChasAcuteClaimable: false,
         isChasChronicClaimable: false,
+        isDispensedByPharmacy: false,
+        isNurseActualizable: false,
       }
-      values.chas.forEach((o) => {
+      values.chas.forEach(o => {
         if (o === 'isChasAcuteClaimable') {
           chas[o] = true
         } else if (o === 'isChasChronicClaimable') {
+          chas[o] = true
+        }
+        else if (o === 'isDispensedByPharmacy') {
+          chas[o] = true
+        }
+        else if (o === 'isNurseActualizable') {
           chas[o] = true
         }
       })
@@ -245,7 +262,7 @@ export default compose(
           consumableStock: defaultConsumableStock,
           suggestSellingPrice: roundTo(restValues.suggestSellingPrice),
         },
-      }).then((r) => {
+      }).then(r => {
         if (r) {
           resetForm()
           history.push('/inventory/master?t=1')

@@ -5,6 +5,7 @@ import StarBorder from '@material-ui/icons/StarBorder'
 import Star from '@material-ui/icons/Star'
 import { Select, Tooltip, GridItem, Button, RadioGroup } from '@/components'
 import { queryList } from '@/services/common'
+import Authorized from '@/utils/Authorized'
 
 const ICD10DiagnosisSelect = ({
   dispatch,
@@ -21,6 +22,9 @@ const ICD10DiagnosisSelect = ({
   handelSaveDiagnosisAsFavourite,
   ...props
 }) => {
+
+  const accessRight = Authorized.check('queue.consultation.widgets.diagnosis')
+
   let selectProps = props
   const initMaxTagCount = props.field && props.field.value && props.field.value.length === 1 ? 1 : 0
   const [ maxTagCount, setMaxTagCount ] = useState(
@@ -39,7 +43,7 @@ const ICD10DiagnosisSelect = ({
       setcurrentDiagnosisLanguage(diagnosis.favouriteDiagnosisLanguage)
       setLabelValue(diagnosis.favouriteDiagnosisLanguage === 'EN' ? 'displayvalue' : 'JpnDisplayValue')
     },
-    [ diagnosis ]
+    [ diagnosis.favouriteDiagnosisLanguage ]
   )
 
   const onICD10DiagnosisSearch = async (v) => {
@@ -149,14 +153,14 @@ const ICD10DiagnosisSelect = ({
                   height: 28,
                   cursor: 'pointer',
                 }}
-                onClick={handelSaveDiagnosisAsFavourite}
+                onClick={accessRight.rights === 'enable' ? handelSaveDiagnosisAsFavourite : null}
               />
             </Tooltip>
           ) : (
             <Tooltip title="Click to add to favourite">
               <StarBorder
                 style={{ color: 'gray', width: 28, height: 28, cursor: 'pointer' }}
-                onClick={handelSaveDiagnosisAsFavourite}
+                onClick={accessRight.rights === 'enable' ? handelSaveDiagnosisAsFavourite : null}
               />
             </Tooltip>
           )}

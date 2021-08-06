@@ -255,6 +255,7 @@ class Vaccination extends PureComponent {
 
   changeVaccination = (v, op = {}) => {
     const { setFieldValue, values, disableEdit, codetable } = this.props
+    setFieldValue('isNurseActualizeRequired', op.isNurseActualizable)
     let defaultBatch
     if (op.vaccinationStock) {
       defaultBatch = op.vaccinationStock.find((o) => o.isDefault === true)
@@ -1023,7 +1024,7 @@ class Vaccination extends PureComponent {
               />
             </GridItem>
             <GridItem xs={5} className={classes.editor}>
-              {values.isPackage && (
+              {values.isPackage ? (
                 <Field
                   name='performingUserFK'
                   render={(args) => (
@@ -1034,6 +1035,40 @@ class Vaccination extends PureComponent {
                     />
                   )}
                 />
+              ) : (
+                <div>
+                  <FastField
+                    name='isPreOrder'
+                    render={args => {
+                      return (
+                        <Checkbox
+                          label='Pre-Order'
+                          style={{ position: 'absolute', bottom: 2 }}
+                          {...args}
+                          onChange={e => {
+                            if (!e.target.value) {
+                              setFieldValue('isChargeToday', false)
+                            }
+                          }}
+                        />
+                      )
+                    }}
+                  />
+                  {values.isPreOrder &&
+                    <FastField
+                      name='isChargeToday'
+                      render={args => {
+                        return (
+                          <Checkbox
+                            style={{ position: 'absolute', bottom: 2, left: '100px' }}
+                            label='Charge Today'
+                            {...args}
+                          />
+                        )
+                      }}
+                    />
+                  }
+                </div>
               )}
             </GridItem>
             <GridItem xs={3} className={classes.editor}>

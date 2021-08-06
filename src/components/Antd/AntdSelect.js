@@ -401,6 +401,7 @@ class AntdSelect extends React.PureComponent {
         newVal = _.reject(newVal, v => v === allValue)
         newVal = newVal.slice(-maxSelected)
       }
+
       this.resizeChoiceContents()
     }
     let proceed = true
@@ -653,6 +654,18 @@ class AntdSelect extends React.PureComponent {
         // onMouseLeave={onMouseLeave}
       >
         <Select
+          getPopupContainer={node => {
+            var customInputContainer = node.closest(
+              '[class^="MuiFormControl-root"]',
+            )
+            //Get the container of the wrapper custom component.
+            //The dropdown position will remain if not stick to the wrapper component.
+            if (customInputContainer && customInputContainer.parentNode) {
+              return customInputContainer.parentNode
+            }
+
+            return document.body
+          }}
           className={classnames([classes.selectContainer, className])}
           dropdownClassName={classnames(classes.dropdownMenu)}
           showSearch

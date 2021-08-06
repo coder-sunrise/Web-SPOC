@@ -27,7 +27,7 @@ import Authorized from '@/utils/Authorized'
 // utils
 import { findGetParameter, commonDataReaderTransform } from '@/utils/utils'
 import { VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
-import { DoctorProfileSelect } from '@/components/_medisys'
+import { DoctorProfileSelect,ServePatientButton } from '@/components/_medisys'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import { getReportContext } from '@/services/report'
 import * as WidgetConfig from './config'
@@ -468,10 +468,15 @@ class PatientHistory extends Component {
                   timeOut ? moment(timeOut).format('HH:mm') : '-'
                 })${docotrName ? ` - ${docotrName}` : ''}`}
               </div>
-              <span>
-                {`${visitPurposeName}, Last Update By: ${LastUpdateBy ||
-                  ''} on ${moment(signOffDate).format('DD MMM YYYY HH:mm')}`}
-              </span>
+              <div>
+                <span>
+                  {`${visitPurposeName}, Last Update By: ${LastUpdateBy ||
+                    ''} on ${moment(signOffDate).format('DD MMM YYYY HH:mm')}`}
+                </span>
+                <span style={{marginLeft:5}}>
+                  {row.servingByList?.length >0 ? `Served by ${row.servingByList.map(x=>x.servingBy).join(', ')}.`:null}
+                </span>
+              </div>
             </div>
           )}
           {!isNurseNote && (
@@ -1270,7 +1275,7 @@ class PatientHistory extends Component {
       ConsultationDocument: consultationDocument,
       ReportContext: reportContext,
     }
-    console.log(payload)
+    // console.log(payload)
     const payload1 = [
       {
         ReportId: 68,

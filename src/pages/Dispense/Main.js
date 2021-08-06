@@ -516,6 +516,7 @@ class Main extends Component {
             onReloadClick={() => {
               reloadDispense(this.props)
             }}
+            {...this.props}
           />
         </CommonModal>
         <ViewPatientHistory top='213px' />

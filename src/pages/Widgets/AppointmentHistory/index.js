@@ -10,12 +10,13 @@ import {
   GridItem,
   Checkbox,
 } from '@/components'
+
 import { APPOINTMENT_STATUSOPTIONS } from '@/utils/constants'
 import { queryList as queryAppointments } from '@/services/calendar'
 import Authorized from '@/utils/Authorized'
 import { previousApptTableParams } from './variables'
 
-const styles = (theme) => ({
+const styles = theme => ({
   gridRow: {
     marginTop: theme.spacing(1),
   },
@@ -38,19 +39,17 @@ class AppointmentHistory extends PureComponent {
     patientProfileFK: undefined,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     if (this.props.patient && this.props.patient.id > 0) {
       this.getAppts(this.props.patient.id, false)
     }
   }
 
-  async getAppts (patientId, showRecheduledByClinic) {
+  async getAppts(patientId, showRecheduledByClinic) {
     const { user, dispatch } = this.props
     const commonParams = {
       combineCondition: 'and',
-      sorting: [
-        { columnName: 'appointmentDate', direction: 'desc' },
-      ],
+      sorting: [{ columnName: 'appointmentDate', direction: 'desc' }],
     }
 
     const viewOtherApptAccessRight = Authorized.check(
@@ -72,9 +71,7 @@ class AppointmentHistory extends PureComponent {
       },
     })
 
-    const [
-      previous,
-    ] = await Promise.all([
+    const [previous] = await Promise.all([
       queryAppointments({
         apiCriteria: {
           isIncludeHistory: true,
@@ -98,7 +95,7 @@ class AppointmentHistory extends PureComponent {
     })
   }
 
-  async UNSAFE_componentWillReceiveProps (nextProps) {
+  async UNSAFE_componentWillReceiveProps(nextProps) {
     const { patient } = nextProps
 
     if (this.state.patientProfileFK !== patient.id && patient.id > 0) {
@@ -109,10 +106,10 @@ class AppointmentHistory extends PureComponent {
     }
   }
 
-  reBuildApptDatas (data) {
-    return data.map((o) => {
+  reBuildApptDatas(data) {
+    return data.map(o => {
       const firstAppointment = o.appointment_Resources.find(
-        (item) => item.sortOrder === 0,
+        item => item.sortOrder === 0,
       )
       let startTime = ''
       let doctor = 0
@@ -129,7 +126,7 @@ class AppointmentHistory extends PureComponent {
       }
       const apptStatusId = parseInt(o.appointmentStatusFk, 10)
       const apptStatus = APPOINTMENT_STATUSOPTIONS.find(
-        (m) => m.id === apptStatusId,
+        m => m.id === apptStatusId,
       )
 
       const newRow = {
@@ -145,11 +142,11 @@ class AppointmentHistory extends PureComponent {
     })
   }
 
-  toggleShowRecheduledByClinic = (e) => {
+  toggleShowRecheduledByClinic = e => {
     this.getAppts(this.props.patient.id, e.target.value)
   }
 
-  render () {
+  render() {
     const { previousAppt } = this.state
     const { mainDivHeight = 700 } = this.props
     let height = mainDivHeight - 300

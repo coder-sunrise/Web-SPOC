@@ -30,6 +30,9 @@ import {
   GridContainer,
   GridItem,
   Select,
+  Field,
+  FastField,
+  CodeSelect,
 } from '@/components'
 // sub components
 import { control } from '@/components/Decorator'
@@ -76,8 +79,6 @@ class Layout extends PureComponent {
     const { userDefaultLayout, clinicInfo, consultation } = props
 
 
-    const { favouriteDiagnosisLanguage } = consultation
-    this.favouriteDiagnosisLanguage = favouriteDiagnosisLanguage
 
     let { defaultConsultationTemplate = '[]' } = clinicInfo
     // console.log(defaultConsultationTemplate)
@@ -180,6 +181,10 @@ class Layout extends PureComponent {
     localStorage.setItem('consultationLayout', JSON.stringify(defaultLayout))
   }
 
+  componentDidMount () {
+    this.setBannerHeight()
+  }
+
   componentWillUnmount () {
     window.removeEventListener('resize', this.delayedResize)
     $(window.mainPanel).css('overflow', 'auto')
@@ -192,9 +197,20 @@ class Layout extends PureComponent {
 
   resize = (e) => {
     // console.log(e)
+    this.setBannerHeight()
     this.setState({
       rowHeight: this.getLayoutRowHeight(),
     })
+  }
+
+  setBannerHeight = () => {
+    const banner = document.getElementById('patientBanner')
+    const bannerHeight = banner ? banner.offsetHeight : 0
+    this.setState({
+      bannerHeight: bannerHeight,
+    })
+    if(bannerHeight === 0)
+        setTimeout(this.setBannerHeight, 1000)
   }
 
   showWidgetManagePanel = (event) => {
@@ -490,11 +506,10 @@ class Layout extends PureComponent {
   }
 
   setLanguageVersion = (v) => {
-    this.favouriteDiagnosisLanguage = v
     this.props.dispatch({
       type: 'consultation/updateState',
       payload: {
-        favouriteDiagnosisLanguage: this.favouriteDiagnosisLanguage,
+        favouriteDiagnosisLanguage: v,
       },
     })
   }
@@ -517,8 +532,7 @@ class Layout extends PureComponent {
     }
 
     const { isEnableJapaneseICD10Diagnosis, diagnosisDataSource } = clinicSettings
-
-    this.favouriteDiagnosisLanguage = diagnosis.favouriteDiagnosisLanguage
+    const {favouriteDiagnosisLanguage} = diagnosis
 
     const layoutCfg = {
       className: classnames({
@@ -595,7 +609,7 @@ class Layout extends PureComponent {
               marginTop: 0,
               position: 'sticky',
               overflowY: 'auto',
-              top: headerHeight + 100,
+              top: headerHeight + this.state.bannerHeight || 0,
               zIndex: 1000,
               borderRadius: 0,
               marginBottom: 0,
@@ -879,50 +893,50 @@ class Layout extends PureComponent {
                   </div>
                   <Divider light />
                   <div className={classes.fabDiv}>
-                    <Templates {...restProps} />
-                  </div>
+                  <h5
+                    style={{
+                      fontWeight: 500,
+                      lineHeight: 1.3,
+                      position: 'absolute',
+                    }}
+                  >
+                    Manage Layout
+                  </h5>
+                  <CustomInputWrapper
+                    label=""
+                    style={{ paddingTop: 25 }}
+                    strongLabel
+                    labelProps={{
+                      shrink: true,
+                    }}
+                  >
+                    <ProgressButton
+                      style={{ margin: theme.spacing(1, 0) }}
+                      onClick={() => {
+                        onSaveLayout(this.state.currentLayout)
+                      }}
+                    >
+                      Save Layout as My Favourite
+                    </ProgressButton>
+                    <ul
+                      style={{
+                        listStyle: 'square',
+                        paddingLeft: 16,
+                        fontSize: 'smaller',
+                      }}
+                    >
+                      <li>
+                        <p>Save current consultation layout as my favourite.</p>
+                      </li>
+                      <li>
+                        <p>System will use favourite layout for new consultation.</p>
+                      </li>
+                    </ul>
+                  </CustomInputWrapper>
+                </div>
                   <Divider light />
                   <div className={classes.fabDiv}>
-                    <h5
-                      style={{
-                        fontWeight: 500,
-                        lineHeight: 1.3,
-                        position: 'absolute',
-                      }}
-                    >
-                      Manage Layout
-                    </h5>
-                    <CustomInputWrapper
-                      label=""
-                      style={{ paddingTop: 25 }}
-                      strongLabel
-                      labelProps={{
-                        shrink: true,
-                      }}
-                    >
-                      <ProgressButton
-                        style={{ margin: theme.spacing(1, 0) }}
-                        onClick={() => {
-                          onSaveLayout(this.state.currentLayout)
-                        }}
-                      >
-                        Save as My Favourite
-                      </ProgressButton>
-                      <ul
-                        style={{
-                          listStyle: 'square',
-                          paddingLeft: 16,
-                          fontSize: 'smaller',
-                        }}
-                      >
-                        <li>
-                          <p>Save current consultation layout as my favourite.</p>
-                        </li>
-                        <li>
-                          <p>System will use favourite layout for new consultation.</p>
-                        </li>
-                      </ul>
-                    </CustomInputWrapper>
+                    <Templates {...restProps} />
                   </div>
                   <Divider light />
                   <div className={classes.fabDiv}>
@@ -939,22 +953,28 @@ class Layout extends PureComponent {
                             <h5 style={{ fontWeight: 500, lineHeight: 1.3 }}>Favourite Diagnosis Language </h5>
                           </GridItem>
                           <GridItem xs={8}>
-                            <Select
-                              label="Language"
-                              strongLabel
-                              value={this.favouriteDiagnosisLanguage}
-                              options={languageCategory}
-                              dropdownMatchSelectWidth={false}
-                              onChange={(v) => {
-                                this.setLanguageVersion(v)
-                              }}
-                            />
+                          <Field
+                          render={() => (
+                            <CodeSelect
+                            label="Diagnosis Language"
+                            labelField='name'
+                            valueField='value'
+                            value={favouriteDiagnosisLanguage}
+                            options={languageCategory}
+                            dropdownMatchSelectWidth={false}
+                            onChange={(v) => {
+                              this.setLanguageVersion(v)
+                            }}
+                            {...restProps}
+                          />
+                          )}
+                          />
                           </GridItem>
                           <GridItem xs={3} style={{ marginTop: 15, marginLeft: 20 }}>
                             <ProgressButton
                               disabled={false}
                               onClick={() => {
-                                onSaveFavouriteDiagnosisLanguage(this.favouriteDiagnosisLanguage)
+                                onSaveFavouriteDiagnosisLanguage(favouriteDiagnosisLanguage)
                               }}
                             >
                               Save{' '}

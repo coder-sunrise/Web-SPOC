@@ -1,11 +1,15 @@
 import React from 'react'
 import { CardContainer } from '@/components'
+import { Tag } from 'antd'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import numeral from 'numeral'
 import { currencySymbol } from '@/utils/config'
 import moment from 'moment'
 import { Table } from 'antd'
 import tablestyles from '../PatientHistory/PatientHistoryStyle.less'
+import {
+  Tooltip,
+} from '@/components'
 
 export default ({ classes, current, fieldName = '' }) => {
   const drugMixtureIndicator = (row) => {
@@ -48,9 +52,11 @@ export default ({ classes, current, fieldName = '' }) => {
       render: (text, row) => {
         return (
           <div style={{ position: 'relative' }}>
-            <div className={classes.wrapCellTextStyle}>
+            <div className={classes.wrapCellTextStyle}
+              style={{ paddingRight: row.isPreOrder ? 34 : 0 }}>
               {row.name}
               {drugMixtureIndicator(row)}
+              {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
             </div>
           </div>
         )
@@ -92,7 +98,7 @@ export default ({ classes, current, fieldName = '' }) => {
       title: 'Total',
       align: 'right',
       width: 90,
-      render: (text, row) => showCurrency(row.totalAfterItemAdjustment),
+      render: (text, row) => showCurrency((row.isPreOrder && !row.isChargeToday) ? 0 : row.totalAfterItemAdjustment),
     },
     { dataIndex: 'remarks', title: 'Remarks' },
   ]

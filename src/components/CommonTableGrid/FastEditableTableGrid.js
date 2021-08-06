@@ -30,17 +30,17 @@ import { updateGlobalState } from './EditCellComponents/utils'
 
 let uniqueGid = 0
 
-const styles = (theme) => ({})
+const styles = theme => ({})
 window.$tempGridRow = {}
 
 class EditableTableGrid extends PureComponent {
   static defaultProps = {
     EditingProps: {},
-    getRowId: (r) => r.id,
+    getRowId: r => r.id,
     idField: 'id',
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { EditingProps = {}, id } = props
     this.state = {
@@ -74,7 +74,7 @@ class EditableTableGrid extends PureComponent {
   //   return null
   // }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     // dectect if datasource changed outside grid, reset grid data cache
     if (Array.isArray(nextProps.rows) && Array.isArray(this.props.rows)) {
       if (
@@ -95,7 +95,7 @@ class EditableTableGrid extends PureComponent {
 
           let { rows } = nextProps
           if (schema)
-            rows = rows.map((o) => {
+            rows = rows.map(o => {
               if (getRowId(o))
                 try {
                   schema.validateSync(o, {
@@ -122,80 +122,18 @@ class EditableTableGrid extends PureComponent {
     }
   }
 
-  // shouldComponentUpdate (nextProps, nextState) {
-  //   if (!_.isEqual(this.state, nextState)) {
-  //     return true
-  //   }
-  //   if (Array.isArray(nextProps.rows) && Array.isArray(this.props.rows)) {
-  //     // console.log(nextProps.rows, this.props.rows)
-  //     const propEqual = _.isEqual(
-  //       nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
-  //       this.props.rows.map(({ _errors, rowIndex, ...o }, i) => o),
-  //     )
-  //     if (!propEqual) return true
-  //     const cacheEqual = !window.$tempGridRow[this.gridId]
-  //       ? false
-  //       : _.isEqual(
-  //           Object.values(window.$tempGridRow[this.gridId]).map(
-  //             ({ _errors, rowIndex, ...o }, i) => o,
-  //           ),
-  //           nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
-  //         )
-
-  //     if (!cacheEqual) {
-  //       // dectect if datasource changed outside grid, reset grid data cache
-  //       window.$tempGridRow[
-  //         this.gridId
-  //       ] = nextProps.rows.reduce((ary, item) => {
-
-  //         return {
-  //           ...ary,
-
-  //           [item[nextProps.getRowId(item)]]: item
-  //         }
-  //       }, {})
-  //       return true
-  //       // console.log(
-  //       //   window.$tempGridRow[this.gridId],
-  //       //   Object.values(window.$tempGridRow[this.gridId] || []).map(
-  //       //     ({ _errors, rowIndex, ...o }, i) => o,
-  //       //   ),
-  //       //   nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
-  //       //   difference(
-  //       //     Object.values(window.$tempGridRow[this.gridId] || []).map(
-  //       //       ({ _errors, rowIndex, ...o }, i) => o,
-  //       //     ),
-  //       //     nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
-  //       //   ),
-  //       // )
-  //     }
-  //     if (
-  //       cacheEqual &&
-  //       Object.values(window.$tempGridRow[this.gridId]).find(
-  //         (o) => !o._errors || o._errors.length > 0,
-  //       )
-  //     ) {
-  //       // console.log(window.$tempGridRow[this.gridId])
-  //       console.log('1', this.props, nextProps)
-  //       return true
-  //     }
-  //     return !cacheEqual
-  //   }
-  //   return true
-  // }
-
-  getErrorCells = (props) => {
+  getErrorCells = props => {
     const { getRowId } = props || this.props
 
     const errorRows = Object.values(window.$tempGridRow[this.gridId]).filter(
-      (o) => o._errors && o._errors.length && !o.isDeleted,
+      o => o._errors && o._errors.length && !o.isDeleted,
     )
     const errorCells = []
-    errorRows.forEach((r) => {
+    errorRows.forEach(r => {
       const { _errors } = r
       const rowId = getRowId(r)
       if (rowId)
-        _errors.forEach((e) => {
+        _errors.forEach(e => {
           const { path } = e
           errorCells.push({
             rowId,
@@ -207,26 +145,9 @@ class EditableTableGrid extends PureComponent {
     return errorCells
   }
 
-  _onEditingCellsChange = (editingCells) => {
+  _onEditingCellsChange = editingCells => {
     setTimeout(() => {
       const errorCells = this.getErrorCells()
-      // const { global } = window.g_app._store.getState()
-      // if (window.$tempGridRow[this.gridId] && errorCells.length) {
-      //   if (!global.disableSave)
-      //     window.g_app._store.dispatch({
-      //       type: 'global/updateState',
-      //       payload: {
-      //         disableSave: true,
-      //       },
-      //     })
-      // } else if (!errorCells.length && global.disableSave) {
-      //   window.g_app._store.dispatch({
-      //     type: 'global/updateState',
-      //     payload: {
-      //       disableSave: false,
-      //     },
-      //   })
-      // }
 
       this.setState({
         errorCells,
@@ -238,9 +159,7 @@ class EditableTableGrid extends PureComponent {
 
     if (editingCells.length > 1) {
       this.setState({
-        editingCells: [
-          editingCells[editingCells.length - 1],
-        ], // force to active lastest cell to edit mode
+        editingCells: [editingCells[editingCells.length - 1]], // force to active lastest cell to edit mode
       })
     } else {
       this.setState({
@@ -249,7 +168,7 @@ class EditableTableGrid extends PureComponent {
     }
   }
 
-  _onAddedRowsChange = (addedRows) => {
+  _onAddedRowsChange = addedRows => {
     // console.log('_onAddedRowsChange', addedRows)
     let row = addedRows
     if (this.props.EditingProps.onAddedRowsChange) {
@@ -268,7 +187,7 @@ class EditableTableGrid extends PureComponent {
     return row
   }
 
-  _onEditingRowIdsChange = (ids) => {
+  _onEditingRowIdsChange = ids => {
     const { EditingProps, rows } = this.props
     const { onEditingRowIdsChange } = EditingProps
     let newIds = ids
@@ -281,7 +200,7 @@ class EditableTableGrid extends PureComponent {
     })
   }
 
-  _onDeletedRowIdsChange = (ids) => {
+  _onDeletedRowIdsChange = ids => {
     const { EditingProps, rows } = this.props
     const { onDeletedRowIdsChange } = EditingProps
 
@@ -294,7 +213,7 @@ class EditableTableGrid extends PureComponent {
     })
   }
 
-  _onRowChangesChange = (changes) => {
+  _onRowChangesChange = changes => {
     // console.log('_onRowChangesChange', changes)
     const { EditingProps, rows } = this.props
     const { onRowChangesChange } = EditingProps
@@ -312,20 +231,16 @@ class EditableTableGrid extends PureComponent {
   onRowDoubleClick = (row, e) => {
     const { getRowId } = this.props
     if (
-      [
-        'svg',
-      ].indexOf(e.target.nodeName) < 0 &&
-      !this.state.editingRowIds.find((o) => o === getRowId(row))
+      ['svg'].indexOf(e.target.nodeName) < 0 &&
+      !this.state.editingRowIds.find(o => o === getRowId(row))
     ) {
       const { onRowDoubleClick, EditingProps, rows } = this.props
       const { onEditingRowIdsChange } = EditingProps
       if (onRowDoubleClick) {
         onRowDoubleClick()
       } else {
-        this.setState((prevState) => {
-          const ids = prevState.editingRowIds.concat([
-            getRowId(row),
-          ])
+        this.setState(prevState => {
+          const ids = prevState.editingRowIds.concat([getRowId(row)])
           if (prevState.editingRowIds.length === 0) {
             window.g_app._store.dispatch({
               type: 'global/updateState',
@@ -348,20 +263,13 @@ class EditableTableGrid extends PureComponent {
   _onCommitChanges = ({ added, changed, deleted }) => {
     // console.log('_onCommitChanges')
     const { EditingProps, rows = [], schema, getRowId } = this.props
-    const { onCommitChanges = (f) => f } = EditingProps
+    const { onCommitChanges = f => f } = EditingProps
     let shouldUpdate = false
     if (added && Object.values(added)[0]) shouldUpdate = true
     if (changed && Object.values(changed)[0]) shouldUpdate = true
     if (deleted && deleted.length > 0) shouldUpdate = true
     if (!shouldUpdate) return
 
-    // console.log(added, changed, deleted, rows)
-
-    // this.setState({
-
-    // })
-    // console.log('commitChanges', added, changed, deleted, rows)
-    // const { values, setFieldValue } = this.props
     let newRows = _.cloneDeep(rows)
     if (added) {
       // console.log(added, window.$tempGridRow, window.$tempGridRow[this.gridId])
@@ -369,7 +277,7 @@ class EditableTableGrid extends PureComponent {
         window.$tempGridRow[this.gridId] = {}
       const tempNewData = window.$tempGridRow[this.gridId][undefined] || {}
       // console.log(tempNewData)
-      added = added.map((o) => {
+      added = added.map(o => {
         const id = getUniqueNumericId()
         window.$tempGridRow[this.gridId][getRowId(o)] = {
           id,
@@ -388,16 +296,18 @@ class EditableTableGrid extends PureComponent {
     }
 
     if (changed) {
-      newRows = newRows.filter((o) => !!o).map((row) => {
-        const n = changed[getRowId(row)]
-          ? {
-              ...row,
-              ...window.$tempGridRow[this.gridId][getRowId(row)],
-              ...changed[getRowId(row)],
-            }
-          : row
-        return n
-      })
+      newRows = newRows
+        .filter(o => !!o)
+        .map(row => {
+          const n = changed[getRowId(row)]
+            ? {
+                ...row,
+                ...window.$tempGridRow[this.gridId][getRowId(row)],
+                ...changed[getRowId(row)],
+              }
+            : row
+          return n
+        })
     }
 
     if (deleted) {
@@ -407,12 +317,12 @@ class EditableTableGrid extends PureComponent {
       // }).then(setArrayValue)
       // console.log(deleted)
       if (deleted[0] === undefined) {
-        newRows = newRows.filter((o) => getRowId(o) !== undefined)
+        newRows = newRows.filter(o => getRowId(o) !== undefined)
       }
-      const deletedEcs = newRows.filter((row) =>
-        deleted.find((o) => o === getRowId(row)),
+      const deletedEcs = newRows.filter(row =>
+        deleted.find(o => o === getRowId(row)),
       )
-      deletedEcs.forEach((o) => {
+      deletedEcs.forEach(o => {
         o.isDeleted = true
         delete window.$tempGridRow[this.gridId][getRowId(o)]
       })
@@ -463,7 +373,7 @@ class EditableTableGrid extends PureComponent {
       if (added || changed) {
         window.$tempGridRow[this.gridId] = {}
       }
-      updatedRows.forEach((r) => {
+      updatedRows.forEach(r => {
         if (!window.$tempGridRow[this.gridId][r.id])
           window.$tempGridRow[this.gridId][r.id] = {}
         window.$tempGridRow[this.gridId][r.id] = r
@@ -491,16 +401,12 @@ class EditableTableGrid extends PureComponent {
         {(matches = { rights: 'enable' }) => {
           return (
             <React.Fragment>
-              {showAddCommand &&
-              matches &&
-              matches.rights !== 'disable' && (
+              {showAddCommand && matches && matches.rights !== 'disable' && (
                 <Button
                   // hideIfNoEditRights
-                  onClick={(e) => {
+                  onClick={e => {
                     this._onCommitChanges({
-                      added: this._onAddedRowsChange([
-                        {},
-                      ]),
+                      added: this._onAddedRowsChange([{}]),
                     })
                   }}
                   color='primary'
@@ -520,7 +426,7 @@ class EditableTableGrid extends PureComponent {
     )
   }
 
-  containerComponent = (p) => {
+  containerComponent = p => {
     const { theme, FuncProps = {} } = this.props
 
     return (
@@ -569,7 +475,7 @@ class EditableTableGrid extends PureComponent {
   //   console.log('componentDidUpdate', window.$tempGridRow)
   // }
 
-  render () {
+  render() {
     // console.log('redner',this.gridId)
     const {
       theme,
@@ -583,7 +489,7 @@ class EditableTableGrid extends PureComponent {
           title: 'Delete this row?',
         },
         onRowDelete,
-        isDeletable = (f) => true,
+        isDeletable = f => true,
         messages = {
           commitCommand: 'Save',
           editCommand: 'Edit',
@@ -599,7 +505,9 @@ class EditableTableGrid extends PureComponent {
 
     // console.log('editabletablegrid', props.rows)
 
-    const { FuncProps: { pager = true } } = {
+    const {
+      FuncProps: { pager = true },
+    } = {
       FuncProps: {},
       ...props,
     }
@@ -634,7 +542,7 @@ class EditableTableGrid extends PureComponent {
                 //   col.fixed = 'right'
                 // }
                 let cols = tableColumns.filter(
-                  (c) => c.type !== TableEditColumn.COLUMN_TYPE,
+                  c => c.type !== TableEditColumn.COLUMN_TYPE,
                 )
 
                 if (showCommandColumn) {
@@ -705,20 +613,17 @@ class EditableTableGrid extends PureComponent {
                 showDeleteCommand={showDeleteCommand}
                 commandComponent={CommandComponent}
                 width={
-                  [
-                    'readonly',
-                    'disable',
-                  ].includes(matches ? matches.rights : '') ? (
-                    0
-                  ) : (
-                    'auto'
+                  ['readonly', 'disable'].includes(
+                    matches ? matches.rights : '',
                   )
+                    ? 0
+                    : 'auto'
                 }
-                cellComponent={(cellProps) => {
+                cellComponent={cellProps => {
                   const { children, ...p } = cellProps
                   return (
                     <Table.Cell {...p}>
-                      {children.map((o) => {
+                      {children.map(o => {
                         if (o) {
                           return React.cloneElement(o, {
                             row: p.row,
@@ -786,10 +691,7 @@ EditableTableGrid.propTypes = {
     onEditingRowIdsChange: PropTypes.func,
     onRowChangesChange: PropTypes.func,
     onCommitChanges: PropTypes.func,
-    EditCell: PropTypes.oneOfType([
-      PropTypes.object,
-      PropTypes.func,
-    ]),
+    EditCell: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
   }),
 }
 

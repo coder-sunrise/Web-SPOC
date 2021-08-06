@@ -10,35 +10,42 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingClinicDrugAllergy, global }) => ({
-  settingClinicDrugAllergy,
+@connect(({ settingDrugAllergy, global }) => ({
+  settingDrugAllergy,
   mainDivHeight: global.mainDivHeight,
 }))
-@withSettingBase({ modelName: 'settingClinicDrugAllergy' })
-class ClinicDrugAllergy extends PureComponent {
+@withSettingBase({ modelName: 'settingDrugAllergy' })
+class DrugAllergy extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
-      type: 'settingClinicDrugAllergy/query',
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ltdrugallergysource',
+      },
+    })
+
+    this.props.dispatch({
+      type: 'settingDrugAllergy/query',
     })
   }
 
   toggleModal = () => {
     this.props.dispatch({
-      type: 'settingClinicDrugAllergy/updateState',
+      type: 'settingDrugAllergy/updateState',
       payload: {
-        showModal: !this.props.settingClinicDrugAllergy.showModal,
+        showModal: !this.props.settingDrugAllergy.showModal,
       },
     })
   }
 
-  render () {
-    const { settingClinicDrugAllergy, mainDivHeight = 700 } = this.props
+  render() {
+    const { settingDrugAllergy, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
@@ -51,9 +58,11 @@ class ClinicDrugAllergy extends PureComponent {
         </div>
         <Grid {...this.props} height={height} />
         <CommonModal
-          open={settingClinicDrugAllergy.showModal}
-          observe='ClinicDrugAllergyDetail'
-          title={settingClinicDrugAllergy.entity ? 'Edit Drug Allergy' : 'Add Drug Allergy'}
+          open={settingDrugAllergy.showModal}
+          observe='DrugAllergyDetail'
+          title={
+            settingDrugAllergy.entity ? 'Edit Drug Allergy' : 'Add Drug Allergy'
+          }
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}
@@ -66,4 +75,4 @@ class ClinicDrugAllergy extends PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(ClinicDrugAllergy)
+export default withStyles(styles, { withTheme: true })(DrugAllergy)

@@ -2,6 +2,7 @@ import moment from 'moment'
 import Print from '@material-ui/icons/Print'
 import { FormattedMessage } from 'umi'
 import numeral from 'numeral'
+import { Tag } from 'antd'
 import { currencySymbol, currencyFormat } from '@/utils/config'
 import {
   NumberInput,
@@ -123,17 +124,44 @@ export const PrescriptionColumnExtensions = (
     width: '30%',
     render: row => {
       return (
-        <div style={{ position: 'relative' }}>
-          <div
-            style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-            }}
-          >
-            {row.name}
-            {lowStockIndicator(row, 'inventoryMedicationFK')}
+        <Tooltip
+          title={
+            <div>
+              {`Code/Name: ${row.code} / ${row.name}`}
+              <br />
+              {`UnitPrice/UOM: ${currencySymbol}${numeral(row.unitPrice).format(
+                currencyFormat,
+              )} / ${row.orderUOM}`}
+            </div>
+          }
+        >
+          <div style={{ position: 'relative' }}>
+            <div
+              style={{
+                wordWrap: 'break-word',
+                whiteSpace: 'pre-wrap',
+              }}
+            >
+              {row.name}
+              {row.isPreOrder && (
+                <Tooltip title='Pre-Order'>
+                  <Tag
+                    color='#4255bd'
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      right: 10,
+                      borderRadius: 10,
+                    }}
+                  >
+                    Pre
+                  </Tag>
+                </Tooltip>
+              )}
+              {lowStockIndicator(row, 'inventoryMedicationFK')}
+            </div>
           </div>
-        </div>
+        </Tooltip>
       )
     },
   },
@@ -161,6 +189,17 @@ export const PrescriptionColumnExtensions = (
     columnName: 'totalAfterItemAdjustment',
     width: 110,
     type: 'currency',
+    render: row => (
+      <NumberInput
+        value={
+          row.isPreOrder && !row.isChargeToday
+            ? 0
+            : row.totalAfterItemAdjustment
+        }
+        text
+        currency
+      />
+    ),
   },
   {
     columnName: 'adjAmt',
@@ -332,17 +371,44 @@ export const VaccinationColumnExtensions = (
     width: '60%',
     render: row => {
       return (
-        <div style={{ position: 'relative' }}>
-          <div
-            style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-            }}
-          >
-            {row.name}
-            {lowStockIndicator(row, 'inventoryVaccinationFK')}
+        <Tooltip
+          title={
+            <div>
+              {`Code/Name: ${row.code} / ${row.name}`}
+              <br />
+              {`UnitPrice/UOM: ${currencySymbol}${numeral(row.unitPrice).format(
+                currencyFormat,
+              )} / ${row.dispenseUOM}`}
+            </div>
+          }
+        >
+          <div style={{ position: 'relative' }}>
+            <div
+              style={{
+                wordWrap: 'break-word',
+                whiteSpace: 'pre-wrap',
+              }}
+            >
+              {row.name}
+              {row.isPreOrder && (
+                <Tooltip title='Pre-Order'>
+                  <Tag
+                    color='#4255bd'
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      right: 10,
+                      borderRadius: 10,
+                    }}
+                  >
+                    Pre
+                  </Tag>
+                </Tooltip>
+              )}
+              {lowStockIndicator(row, 'inventoryVaccinationFK')}
+            </div>
           </div>
-        </div>
+        </Tooltip>
       )
     },
   },
@@ -370,6 +436,17 @@ export const VaccinationColumnExtensions = (
     columnName: 'totalAfterItemAdjustment',
     width: 110,
     type: 'currency',
+    render: row => (
+      <NumberInput
+        value={
+          row.isPreOrder && !row.isChargeToday
+            ? 0
+            : row.totalAfterItemAdjustment
+        }
+        text
+        currency
+      />
+    ),
   },
   {
     columnName: 'adjAmt',
@@ -495,13 +572,30 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     width: 160,
     render: row => {
       return (
-        <div
-          style={{
-            wordWrap: 'break-word',
-            whiteSpace: 'pre-wrap',
-          }}
-        >
-          {row.type}
+        <div style={{ position: 'relative' }}>
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {row.type}
+            {row.isPreOrder && (
+              <Tooltip title='Pre-Order'>
+                <Tag
+                  color='#4255bd'
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    right: -10,
+                    borderRadius: 10,
+                  }}
+                >
+                  Pre
+                </Tag>
+              </Tooltip>
+            )}
+          </div>
         </div>
       )
     },
@@ -512,11 +606,18 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     width: '60%',
     render: row => {
       const { code = '', description = '', unitPrice = 0 } = row
-      const title = `${description} - ${code} (${currencySymbol}${numeral(
-        unitPrice,
-      ).format(currencyFormat)})`
       return (
-        <Tooltip title={title}>
+        <Tooltip
+          title={
+            <div>
+              {`Code/Name: ${code} / ${description}`}
+              <br />
+              {`UnitPrice/UOM: ${currencySymbol}${numeral(unitPrice).format(
+                currencyFormat,
+              )} / ${row.dispenseUOM || '-'}`}
+            </div>
+          }
+        >
           <div style={{ position: 'relative' }}>
             <div
               style={{
@@ -589,7 +690,11 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
           text
           currency
           showZero
-          value={row.totalAfterItemAdjustment}
+          value={
+            row.isPreOrder && !row.isChargeToday
+              ? 0
+              : row.totalAfterItemAdjustment
+          }
         />
       )
     },
@@ -815,11 +920,18 @@ export const PackageColumnExtensions = onPrint => [
     width: '60%',
     render: row => {
       const { code = '', description = '', unitPrice = 0 } = row
-      const title = `${description} - ${code} (${currencySymbol}${numeral(
-        unitPrice,
-      ).format(currencyFormat)})`
       return (
-        <Tooltip title={title}>
+        <Tooltip
+          title={
+            <div>
+              {`Code/Name: ${code} / ${description}`}
+              <br />
+              {`UnitPrice/UOM: ${currencySymbol}${numeral(unitPrice).format(
+                currencyFormat,
+              )} / ${row.dispenseUOM || '-'}`}
+            </div>
+          }
+        >
           <div
             style={{
               wordWrap: 'break-word',

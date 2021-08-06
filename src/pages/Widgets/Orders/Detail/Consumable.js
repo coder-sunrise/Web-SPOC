@@ -13,6 +13,7 @@ import {
   Field,
   DatePicker,
   Switch,
+  Checkbox
 } from '@/components'
 
 import Authorized from '@/utils/Authorized'
@@ -166,6 +167,9 @@ class Consumable extends PureComponent {
 
   changeConsumable = (v, op = {}) => {
     const { setFieldValue, values, disableEdit } = this.props
+
+    setFieldValue('isDispensedByPharmacy', op.isDispensedByPharmacy)
+    setFieldValue('isNurseActualizeRequired', op.isNurseActualizable)
 
     let defaultBatch
     if (op.consumableStock) {
@@ -654,7 +658,7 @@ class Consumable extends PureComponent {
           </GridContainer>
           <GridContainer>
             <GridItem xs={8} className={classes.editor}>
-              {values.isPackage && (
+              {values.isPackage ? (
                 <Field
                   name='performingUserFK'
                   render={(args) => (
@@ -665,6 +669,41 @@ class Consumable extends PureComponent {
                     />
                   )}
                 />
+              ) : (
+                <div>
+                  <div style={{ display: 'inline-block' }}>
+                    <FastField
+                      name='isPreOrder'
+                      render={args => {
+                        return (
+                          <Checkbox
+                            label='Pre-Order'
+                            {...args}
+                            onChange={e => {
+                              if (!e.target.value) {
+                                setFieldValue('isChargeToday', false)
+                              }
+                            }}
+                          />
+                        )
+                      }}
+                    />
+                  </div>
+                  {values.isPreOrder && <div style={{ display: 'inline-block' }}>
+                    <FastField
+                      name='isChargeToday'
+                      render={args => {
+                        return (
+                          <Checkbox
+                            label='Charge Today'
+                            {...args}
+                          />
+                        )
+                      }}
+                    />
+                  </div>
+                  }
+                </div>
               )}
             </GridItem>
             <GridItem xs={3} className={classes.editor}>

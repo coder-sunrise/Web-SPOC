@@ -496,6 +496,8 @@ export default createListViewModel({
             APPOINTMENT_STATUS.TURNEDUPLATE,
             APPOINTMENT_STATUS.PFA_NOSHOW,
           ].join(),
+          dobfrom: '1900-01-01',
+          dobto: '9999-12-31',
         }
         // const getCalendarListPayload = {
         //   apptDateFrom: start,

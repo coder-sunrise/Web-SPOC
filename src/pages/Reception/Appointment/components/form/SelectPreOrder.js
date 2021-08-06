@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import numeral from 'numeral'
+import moment from 'moment'
+import _ from 'lodash'
 import { qtyFormat } from '@/utils/config'
 import { CommonTableGrid, Button, CardContainer } from '@/components'
 import { queryList as queryAppointments } from '@/services/calendar'
@@ -10,7 +12,6 @@ const SelectPreOrder = ({ activePreOrderItem = [], onSelectPreOrder, footer, mai
     selectedPreOrders,
     setSelectedPreOrders,
   ] = useState([])
-
   let height = mainDivHeight - 200
   if (height < 300) height = 300
 
@@ -27,14 +28,22 @@ const SelectPreOrder = ({ activePreOrderItem = [], onSelectPreOrder, footer, mai
   return <div>
     <CommonTableGrid
       size='sm'
-      rows={activePreOrderItem}
+      rows={_.orderBy(
+        activePreOrderItem,
+        [
+          'orderDate',
+        ],
+        [
+          'desc',
+        ],
+      )}
       forceRender
       FuncProps={{
         pager: false,
         selectable: true,
         selectConfig: {
           showSelectAll: true,
-          rowSelectionEnabled: (row) => true,
+          rowSelectionEnabled: (row) => row.preOrderItemStatus === 'New',
         },
       }}
       TableProps={{
@@ -44,14 +53,15 @@ const SelectPreOrder = ({ activePreOrderItem = [], onSelectPreOrder, footer, mai
       onSelectionChange={handleSelectionChange}
       getRowId={(row) => row.id}
       columns={[
-        { name: 'preOrderItemType', title: 'Category' },
+        { name: 'preOrderItemType', title: 'Type' },
         { name: 'itemName', title: 'Name' },
-        { name: 'quantity', title: 'Quantity' },
+        { name: 'quantity', title: 'Order Qty.' },
         { name: 'orderByUser', title: 'Order By' },
-        { name: 'orderDate', title: 'Order Date & Time' },
+        { name: 'orderDate', title: 'Order Date' },
         { name: 'remarks', title: 'Remarks' },
         { name: 'amount', title: 'Amount' },
         { name: 'hasPaid', title: 'Paid' },
+        { name: 'preOrderItemStatus', title: 'Status' },
       ]}
       columnExtensions={[
         {
@@ -67,10 +77,11 @@ const SelectPreOrder = ({ activePreOrderItem = [], onSelectPreOrder, footer, mai
           },
         },
         { columnName: 'orderByUser', sortingEnabled: false },
-        { columnName: 'orderDate', sortingEnabled: false, type: 'date', showTime: true, width: 180 },
+        { columnName: 'orderDate', sortingEnabled: false, type: 'date', width: 140, render: (row) => <span>{moment(row.orderDate).format('DD MMM YYYY HH:mm')}</span> },
         { columnName: 'remarks', sortingEnabled: false },
         { columnName: 'amount', sortingEnabled: false, type: 'currency', width: 90 },
         { columnName: 'hasPaid', sortingEnabled: false, width: 50, render: (row) => row.hasPaid ? 'Yes' : 'No' },
+        { columnName: 'preOrderItemStatus', sortingEnabled: false, width: 100 },
       ]}
     />
     {footer &&

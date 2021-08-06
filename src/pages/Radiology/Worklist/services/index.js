@@ -1,9 +1,8 @@
 import * as service from '@/services/common'
 
-const url = '/api/ctclinicdrugallergy'
+const url = '/api/radiologyWorklist'
 
 const fns = {
-  // remove: (params) => service.remove(url, params),
   query: params => service.query(url, params),
   queryList: params => service.queryList(url, params),
   upsert: params => service.upsert(url, params),

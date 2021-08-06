@@ -1,10 +1,14 @@
 import React from 'react'
 import { CardContainer } from '@/components'
 import numeral from 'numeral'
+import { Tag } from 'antd'
 import { currencySymbol } from '@/utils/config'
 import moment from 'moment'
 import { Table } from 'antd'
 import tablestyles from '../PatientHistory/PatientHistoryStyle.less'
+import {
+  Tooltip,
+} from '@/components'
 
 export default ({ classes, current, fieldName = '' }) => {
   const showCurrency = (value = 0) => {
@@ -29,7 +33,20 @@ export default ({ classes, current, fieldName = '' }) => {
         <span>{moment(row.visitDate).format('DD MMM YYYY')}</span>
       ),
     },
-    { dataIndex: 'description', title: 'Name', width: 250 },
+    {
+      dataIndex: 'description', title: 'Name', width: 250,
+      render: (text, row) => {
+        return (
+          <div style={{ position: 'relative' }}>
+            <div className={classes.wrapCellTextStyle}
+              style={{ paddingRight: row.isPreOrder ? 34 : 0 }}>
+              {row.description}
+              {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
+            </div>
+          </div>
+        )
+      }
+    },
     { dataIndex: 'serviceCenter', title: 'Service Center', width: 120 },
     {
       dataIndex: 'quantity',
@@ -61,7 +78,7 @@ export default ({ classes, current, fieldName = '' }) => {
       title: 'Total',
       align: 'right',
       width: 90,
-      render: (text, row) => showCurrency(row.totalAfterItemAdjustment),
+      render: (text, row) => showCurrency((row.isPreOrder && !row.isChargeToday) ? 0 : row.totalAfterItemAdjustment),
     },
     { dataIndex: 'remarks', title: 'Remarks' },
   ]

@@ -193,6 +193,8 @@ class PastMedication extends PureComponent {
         let ItemPrecautions = []
         let itemCorPrescriptionItemDrugMixture = []
         let itemDrugCaution
+        let isDispensedByPharmacy
+        let isNurseActualizeRequired
         if (item.inventoryMedicationFK) {
           // Normal Drug
           let drug = inventorymedication.find(
@@ -261,6 +263,8 @@ class PastMedication extends PureComponent {
           itemDrugCode = drug.code
           itemDrugName = drug.displayValue
           itemDrugCaution = drug.caution
+          isDispensedByPharmacy = drug.isDispensedByPharmacy
+          isNurseActualizeRequired = drug.isNurseActualizable
         } else if (item.isDrugMixture) {
           // Drug Mixture
           itemExpiryDate = item.expiryDate
@@ -333,10 +337,16 @@ class PastMedication extends PureComponent {
                   isNew: true,
                   subject: o.drugName,
                   caution: drug.caution,
+                  isDispensedByPharmacy: drug.isDispensedByPharmacy,
+                  isNurseActualizeRequired: drug.isNurseActualizable
                 }
               }),
             )
           }
+          if (itemCorPrescriptionItemDrugMixture.find(dm => dm.isDispensedByPharmacy))
+            isDispensedByPharmacy = true
+          if (itemCorPrescriptionItemDrugMixture.find(dm => dm.isNurseActualizeRequired))
+            isNurseActualizeRequired = true
         }
 
         return {
@@ -373,6 +383,8 @@ class PastMedication extends PureComponent {
           caution: itemDrugCaution,
           performingUserFK: this.getVisitDoctorUserId(this.props),
           packageGlobalId: '',
+          isDispensedByPharmacy,
+          isNurseActualizeRequired
         }
       }),
     )
@@ -471,6 +483,7 @@ class PastMedication extends PureComponent {
           isGenerateCertificate: vaccination.isAutoGenerateCertificate,
           performingUserFK: this.getVisitDoctorUserId(this.props),
           packageGlobalId: '',
+          isNurseActualizeRequired: vaccination.isNurseActualizable,
         }
         let newCORVaccinationCert = []
         if (newVaccination.isGenerateCertificate) {

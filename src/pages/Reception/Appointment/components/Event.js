@@ -9,8 +9,10 @@ import Cached from '@material-ui/icons/Cached'
 // big calendar
 import BigCalendar from 'react-big-calendar'
 // common components
-import { Popper } from '@/components'
+import { Popper,Tooltip } from '@/components'
 // assets
+import LocalOfferIcon from '@material-ui/icons/LocalOffer';
+
 import customDropdownStyle from '@/assets/jss/material-dashboard-pro-react/components/customDropdownStyle'
 import ApptPopover from './ApptPopover'
 import DoctorBlockPopover from './DoctorBlockPopover'
@@ -123,6 +125,9 @@ class Event extends React.PureComponent {
 
     if (event.isDoctorBlock)
       OverlayComponent = <DoctorBlockPopover popoverEvent={event} />
+
+    const {stage,stageColorHex} = event
+
     return (
       <Popper
         stopOnClickPropagation
@@ -148,16 +153,30 @@ class Event extends React.PureComponent {
               </span>
               {hasConflict && <ErrorOutline className={classes.icon} />}
               {isEnableRecurrence && <Cached />}
+              {stage && stage.trim()!=='' &&
+              <Tooltip title={stage} style={{float:'right'}}>
+                <LocalOfferIcon
+                  style={{ color: stageColorHex, float: 'right'}}
+                />
+              </Tooltip>}
             </div>
           </div>
         ) : (
-          <div className={otherViewClass}>
-            <div className={classes.title}>
-              <span>{title ? title.toUpperCase() : ''}</span>
+          <div>
+            <div className={otherViewClass} style={{float:'left'}}>
+              <div className={classes.title}>
+                <span>{title ? title.toUpperCase() : ''}</span>
+              </div>
+              <span className={classes.blockDiv}>
+                {subtitle ? subtitle.toUpperCase() : ''}
+              </span>
             </div>
-            <span className={classes.blockDiv}>
-              {subtitle ? subtitle.toUpperCase() : ''}
-            </span>
+            {stage && stage.trim()!=='' &&
+              <Tooltip title={stage} style={{float:'right'}}>
+                <LocalOfferIcon
+                  style={{ color: stageColorHex, float: 'right'}}
+                />
+              </Tooltip>}
           </div>
         )}
       </Popper>

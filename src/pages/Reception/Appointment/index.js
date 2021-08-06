@@ -25,7 +25,7 @@ import {
 } from './utils'
 // utils
 
-const styles = (theme) => ({
+const styles = theme => ({
   popover: {
     pointerEvents: 'none',
   },
@@ -46,19 +46,14 @@ const styles = (theme) => ({
 
 export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>
   event.isDoctorEvent
-    ? [
-        ...massaged,
-      ]
+    ? [...massaged]
     : [
         ...massaged,
         {
           ...event,
           visitStatus: VISIT_STATUS.UPCOMING_APPT,
           startTime: event.appointment_Resources.reduce(
-            (resources, res) => [
-              ...resources,
-              res.startTime,
-            ],
+            (resources, res) => [...resources, res.startTime],
             [],
           ),
         },
@@ -81,6 +76,8 @@ class Appointment extends React.PureComponent {
     selectedSlot: {},
     filter: {
       search: '',
+      dobfrom: '1900-01-01',
+      dobto: '9999-12-31',
       filterByApptType: [],
       filterByDoctor: [],
     },
@@ -89,10 +86,15 @@ class Appointment extends React.PureComponent {
     selectedDoctorEventFK: -1,
   }
 
-  async componentWillMount () {
+  async componentWillMount() {
     const { dispatch, clinicInfo } = this.props
-    const startOfMonth = moment().startOf('month').formatUTC()
-    const endOfMonth = moment().endOf('month').endOf('day').formatUTC(false)
+    const startOfMonth = moment()
+      .startOf('month')
+      .formatUTC()
+    const endOfMonth = moment()
+      .endOf('month')
+      .endOf('day')
+      .formatUTC(false)
 
     dispatch({
       type: 'calendar/query',
@@ -169,39 +171,38 @@ class Appointment extends React.PureComponent {
         }
 
         resources = response
-          .filter((clinician) => clinician.clinicianProfile.isActive)
-          .filter(
-            (_, index) =>
-              filterDoctors.length > 0
-                ? filterDoctors.includes(_.clinicianProfile.id)
-                : index < 5,
+          .filter(clinician => clinician.clinicianProfile.isActive)
+          .filter((_, index) =>
+            filterDoctors.length > 0
+              ? filterDoctors.includes(_.clinicianProfile.id)
+              : index < 5,
           )
-          .map((clinician) => ({
+          .map(clinician => ({
             clinicianFK: clinician.clinicianProfile.id,
             doctorName: clinician.clinicianProfile.name,
           }))
       } else {
         resources = response
-          .filter((clinician) => clinician.clinicianProfile.isActive)
-          .filter((activeclinician) => {
+          .filter(clinician => clinician.clinicianProfile.isActive)
+          .filter(activeclinician => {
             const { user } = this.props
             return (
               activeclinician.clinicianProfile.id ===
               user.data.clinicianProfile.id
             )
           })
-          .map((clinician) => ({
+          .map(clinician => ({
             clinicianFK: clinician.clinicianProfile.id,
             doctorName: clinician.clinicianProfile.name,
           }))
       }
-      filterByDoctor = resources.map((res) => res.clinicianFK)
+      filterByDoctor = resources.map(res => res.clinicianFK)
       filterBySingleDoctor =
         resources && resources.length ? resources[0].clinicianFK : undefined
 
-      this.setState((preState) => ({
+      this.setState(() => ({
         filter: {
-          ...(filter || preState.filter),
+          ...filter,
           filterByDoctor,
           filterBySingleDoctor,
         },
@@ -229,7 +230,7 @@ class Appointment extends React.PureComponent {
     })
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     const { dispatch } = this.props
     // reset doctor profile codetable
     dispatch({
@@ -277,27 +278,23 @@ class Appointment extends React.PureComponent {
       payload: { entity: null },
     })
 
-    history.push(
-      getRemovedUrl([
-        'md',
-        'pid',
-        'apptid',
-      ]),
-    )
+    history.push(getRemovedUrl(['md', 'pid', 'apptid']))
   }
 
-  moveEvent = (props) => {
+  moveEvent = props => {
     this.setState({
       isDragging: false,
     })
   }
 
-  onSelectSlot = (props) => {
-    const { start, end, resourceId } = props || {}
+  onSelectSlot = props => {
+    const { start, end, resourceId, action } = props || {}
     const createApptAccessRight = Authorized.check('appointment.newappointment')
 
     if (createApptAccessRight && createApptAccessRight.rights !== 'enable')
       return
+
+    if (action === 'select' || action === 'click') return
 
     const selectedSlot = {
       allDay: start - end === 0,
@@ -305,7 +302,6 @@ class Appointment extends React.PureComponent {
       end,
       resourceId,
     }
-
     this.setState({
       selectedSlot,
       isDragging: false,
@@ -313,7 +309,7 @@ class Appointment extends React.PureComponent {
     })
   }
 
-  onSelectEvent = (selectedEvent) => {
+  onDoubleClickEvent = doubleClickEvent => {
     const {
       id,
       appointmentFK,
@@ -323,12 +319,13 @@ class Appointment extends React.PureComponent {
       appointmentStatusFk,
       isHistory,
       isDoctorBlock,
-    } = selectedEvent
+    } = doubleClickEvent
+
     if (
       isHistory &&
-      ![
-        APPOINTMENT_STATUS.DRAFT,
-        APPOINTMENT_STATUS.CONFIRMED,
+      [
+        APPOINTMENT_STATUS.RESCHEDULED,
+        APPOINTMENT_STATUS.PFA_RESCHEDULED,
       ].includes(appointmentStatusFk)
     )
       return
@@ -381,7 +378,7 @@ class Appointment extends React.PureComponent {
               mode: 'single',
             },
           })
-          .then((response) => {
+          .then(response => {
             if (response) {
               this.setState({
                 selectedDoctorEventFK: id,
@@ -424,7 +421,7 @@ class Appointment extends React.PureComponent {
               mode: 'single',
             },
           })
-          .then((response) => {
+          .then(response => {
             if (response)
               this.setState({
                 selectedAppointmentFK: selectedAppointmentID,
@@ -467,8 +464,15 @@ class Appointment extends React.PureComponent {
     })
   }
 
-  onFilterUpdate = (filter) => {
-    const { filterByDoctor = [] } = filter
+  onFilterUpdate = filter => {
+    const {
+      filterByDoctor = [],
+      dobfrom,
+      dobto,
+      search,
+      filterByApptType,
+      filterBySingleDoctor,
+    } = filter
     const { doctorprofile } = this.props
 
     const newResources = doctorprofile.reduce(
@@ -481,14 +485,19 @@ class Appointment extends React.PureComponent {
                 doctorName: doctor.clinicianProfile.name,
               },
             ]
-          : [
-              ...resources,
-            ],
+          : [...resources],
       [],
     )
 
-    this.setState((preState) => ({
-      filter: { ...preState.filter, ...filter },
+    this.setState(() => ({
+      filter: {
+        dobfrom: dobfrom || undefined,
+        dobto: dobto || undefined,
+        search: search || undefined,
+        filterByApptType: filterByApptType,
+        filterByDoctor: filterByDoctor,
+        filterBySingleDoctor: filterBySingleDoctor,
+      },
       resources: newResources.length > 0 ? newResources : null,
     }))
   }
@@ -547,7 +556,7 @@ class Appointment extends React.PureComponent {
         // isEditedAsSingleAppointment,
         mode: isEditedAsSingle ? 'single' : 'series',
       },
-    }).then((response) => {
+    }).then(response => {
       if (response)
         this.setState({
           isDragging: false,
@@ -586,14 +595,14 @@ class Appointment extends React.PureComponent {
   toggleSearchAppointmentModal = async () => {
     await this.queryCodetables()
 
-    this.setState((prevState) => {
+    this.setState(prevState => {
       return {
         showSearchAppointmentModal: !prevState.showSearchAppointmentModal,
       }
     })
   }
 
-  render () {
+  render() {
     const {
       calendar: CalendarModel,
       calendarLoading,
@@ -628,6 +637,9 @@ class Appointment extends React.PureComponent {
       <CardContainer hideHeader size='sm'>
         <FilterBar
           dispatch={dispatch}
+          search={filter.search}
+          dobfrom={filter.dobfrom}
+          dobto={filter.dobto}
           loading={calendarLoading}
           filterByDoctor={filter.filterByDoctor}
           filterBySingleDoctor={filter.filterBySingleDoctor}
@@ -643,7 +655,7 @@ class Appointment extends React.PureComponent {
               resources={resources}
               filter={filter}
               handleSelectSlot={this.onSelectSlot}
-              handleSelectEvent={this.onSelectEvent}
+              handleDoubleClick={this.onDoubleClickEvent}
               handleMoveEvent={this.moveEvent}
               handleEventMouseOver={this.onEventMouseOver}
               handleOnDragStart={this.handleOnDragStart}
@@ -673,7 +685,7 @@ class Appointment extends React.PureComponent {
                     ? selectedSlot.resourceId
                     : filter.filterBySingleDoctor,
               }}
-              onHistoryRowSelected={this.onSelectEvent}
+              onHistoryRowSelected={this.onDoubleClickEvent}
             />
           )}
         </CommonModal>
@@ -696,7 +708,10 @@ class Appointment extends React.PureComponent {
           onClose={this.closeSeriesConfirmation}
           maxWidth='sm'
         >
-          <SeriesConfirmation eventType={eventType} onConfirmClick={this.editSeriesConfirmation} />
+          <SeriesConfirmation
+            eventType={eventType}
+            onConfirmClick={this.editSeriesConfirmation}
+          />
         </CommonModal>
 
         <CommonModal
@@ -706,7 +721,7 @@ class Appointment extends React.PureComponent {
           maxWidth='xl'
         >
           <AppointmentSearch
-            handleSelectEvent={this.onSelectEvent}
+            handleDoubleClick={this.onDoubleClickEvent}
             handleAddAppointmentClick={this.handleAddAppointmentClick}
             currentUser={user.data.clinicianProfile.id}
             doctorprofile={doctorprofile}

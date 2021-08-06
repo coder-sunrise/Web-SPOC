@@ -6,6 +6,7 @@ import { CommonTableGrid, Button, Tooltip } from '@/components'
 class Grid extends PureComponent {
   configs = {
     columns: [
+      { name: 'drugAllergySourceFK', title: 'Source' },
       { name: 'code', title: 'Code' },
       { name: 'displayValue', title: 'Display Value' },
       { name: 'description', title: 'Description' },
@@ -14,12 +15,24 @@ class Grid extends PureComponent {
       { name: 'action', title: 'Action' },
     ],
     columnExtensions: [
+      {
+        columnName: 'drugAllergySourceFK',
+        width: 100,
+        type: 'codeSelect',
+        code: 'ltdrugallergysource',
+      },
       { columnName: 'code', width: 200 },
       {
         columnName: 'sortOrder',
         width: 120,
-        render: (row) => {
-          return <p>{row.sortOrder === null || row.sortOrder === undefined ? '-' : row.sortOrder}</p>
+        render: row => {
+          return (
+            <p>
+              {row.sortOrder === null || row.sortOrder === undefined
+                ? '-'
+                : row.sortOrder}
+            </p>
+          )
         },
       },
       {
@@ -33,9 +46,8 @@ class Grid extends PureComponent {
       {
         columnName: 'action',
         align: 'center',
-        render: (row) => {
-          if(!row.isUserMaintainable)
-            return null
+        render: row => {
+          if (!row.isUserMaintainable) return null
           return (
             <Tooltip title='Edit Drug Allergy'>
               <Button
@@ -56,25 +68,25 @@ class Grid extends PureComponent {
   }
 
   editRow = (row, e) => {
-    const { dispatch, settingClinicDrugAllergy } = this.props
-    const { list } = settingClinicDrugAllergy
+    const { dispatch, settingDrugAllergy } = this.props
+    const { list } = settingDrugAllergy
     const { isUserMaintainable } = row
 
     dispatch({
-      type: 'settingClinicDrugAllergy/updateState',
+      type: 'settingDrugAllergy/updateState',
       payload: {
         showModal: isUserMaintainable,
-        entity: list.find((o) => o.id === row.id),
+        entity: list.find(o => o.id === row.id),
       },
     })
   }
 
-  render () {
+  render() {
     const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
-        type='settingClinicDrugAllergy'
+        type='settingDrugAllergy'
         onRowDoubleClick={this.editRow}
         TableProps={{
           height,

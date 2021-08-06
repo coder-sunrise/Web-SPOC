@@ -69,6 +69,8 @@ const applyFilter = (filter, data, isDayView) => {
     filterByApptType,
     filterByDoctor,
     search = '',
+    dobfrom = '1900-01-01',
+    dobto = '9999-12-31',
     filterBySingleDoctor,
   } = filter
   const viewOtherApptAccessRight = Authorized.check(
@@ -82,21 +84,19 @@ const applyFilter = (filter, data, isDayView) => {
     return []
   }
 
-  let returnData = [
-    ...data,
-  ]
+  let returnData = [...data]
 
   try {
     // filter by patient name and ignore doctorblock
     if (search !== '') {
       const _searchStr = search.toLowerCase()
-      returnData = returnData.filter((eachData) => {
+      returnData = returnData.filter(eachData => {
         if (eachData.isDoctorBlock) return true
         const { patientProfile, patientName, patientContactNo } = eachData
         if (patientProfile) {
           const { contactNumbers = [] } = patientProfile
           const mobile = contactNumbers.find(
-            (item) => item.numberTypeFK === 1,
+            item => item.numberTypeFK === 1,
           ) || { number: '' }
 
           return (
@@ -114,10 +114,17 @@ const applyFilter = (filter, data, isDayView) => {
       })
     }
 
+    //filter by DOB From , DOB To
+    returnData = returnData.filter(eachData => {
+      const { patientProfile, patientName, patientContactNo } = eachData
+
+      return patientProfile.dob >= dobfrom && patientProfile.dob <= dobto
+    })
+
     // filter by doctor
     if (isDayView) {
       if (filterByDoctor.length > 0 && filterByDoctor.indexOf(-99) !== 0) {
-        returnData = returnData.filter((eachData) => {
+        returnData = returnData.filter(eachData => {
           if (eachData.isDoctorBlock)
             return filterByDoctor.includes(eachData.doctor.clinicianProfile.id)
 
@@ -125,7 +132,7 @@ const applyFilter = (filter, data, isDayView) => {
         })
       }
     } else {
-      returnData = returnData.filter((eachData) => {
+      returnData = returnData.filter(eachData => {
         if (eachData.isDoctorBlock)
           return filterBySingleDoctor === eachData.doctor.clinicianProfile.id
 
@@ -136,7 +143,7 @@ const applyFilter = (filter, data, isDayView) => {
     // filter by appointment type
     if (filterByApptType.length > 0 && !filterByApptType.includes(-99)) {
       returnData = returnData.filter(
-        (eachData) =>
+        eachData =>
           eachData.isDoctorBlock ||
           filterByApptType.includes(eachData.appointmentTypeFK),
       )
@@ -154,7 +161,7 @@ const MonthDateHeader = withStyles(styles, { name: 'MonthDateHeader' })(
   }))(({ classes, date, onDrillDown, label, publicHolidayList }) => {
     let holidayLabel = ''
     const momentDate = moment(date)
-    const publicHoliday = publicHolidayList.filter((item) => {
+    const publicHoliday = publicHolidayList.filter(item => {
       const momentStartDate = moment(item.startDate)
       const momentEndDate = moment(item.endDate)
 
@@ -164,7 +171,7 @@ const MonthDateHeader = withStyles(styles, { name: 'MonthDateHeader' })(
     })
 
     if (publicHoliday.length > 0) {
-      holidayLabel = publicHoliday.map((item) => item.displayValue).join(', ')
+      holidayLabel = publicHoliday.map(item => item.displayValue).join(', ')
 
       return (
         <Tooltip
@@ -193,7 +200,6 @@ const CalendarView = ({
   dispatch,
   // --- event handlers ---
   handleSelectSlot,
-  handleSelectEvent,
   handleDoubleClick,
   handleOnDragStart,
   handleEventMouseOver,
@@ -209,12 +215,12 @@ const CalendarView = ({
   loading,
   appointmentTypes,
 }) => {
-  const _draggableAccessor = (event) => {
+  const _draggableAccessor = event => {
     if (event.isEnableRecurrence) return false
     if (event.doctor) return false
     return true
   }
-  const _eventColors = (event) => {
+  const _eventColors = event => {
     const { doctor } = event
 
     if (doctor) {
@@ -228,13 +234,13 @@ const CalendarView = ({
     let appointmentType
     if (calendarView !== BigCalendar.Views.MONTH) {
       appointmentType = appointmentTypes.find(
-        (item) => item.id === event.appointmentTypeFK,
+        item => item.id === event.appointmentTypeFK,
       )
     } else {
       const appointmentTypeFK = getFirstAppointmentType(event)
       appointmentType =
         appointmentTypeFK !== null &&
-        appointmentTypes.find((item) => item.id === appointmentTypeFK)
+        appointmentTypes.find(item => item.id === appointmentTypeFK)
     }
 
     return {
@@ -246,11 +252,11 @@ const CalendarView = ({
     }
   }
 
-  const _customDayPropGetter = (date) => {
+  const _customDayPropGetter = date => {
     // const { publicHolidays } = this.props
     // console.log({ date })
     const momentDate = moment(date)
-    const publicHoliday = publicHolidays.find((item) => {
+    const publicHoliday = publicHolidays.find(item => {
       const momentStartDate = moment(item.startDate)
       const momentEndDate = moment(item.endDate)
 
@@ -269,7 +275,7 @@ const CalendarView = ({
     return {}
   }
 
-  const _jumpToDate = (date) => {
+  const _jumpToDate = date => {
     dispatch({
       type: 'calendar/navigateCalendar',
       payload: { date },
@@ -277,7 +283,7 @@ const CalendarView = ({
     // this.props.dispatch({ type: 'calendar/setCurrentViewDate', date })
   }
 
-  const _onViewChange = (view) => {
+  const _onViewChange = view => {
     dispatch({
       type: 'calendar/navigateCalendar',
       payload: { view },
@@ -288,7 +294,7 @@ const CalendarView = ({
     })
   }
 
-  const _moveEvent = (props) => {
+  const _moveEvent = props => {
     handleMoveEvent({ props })
 
     // const { handleMoveEvent } = this.props
@@ -304,7 +310,9 @@ const CalendarView = ({
   }
 
   const _jumpToSelectedValue = (value, type, currentDate) => {
-    const desiredDate = moment(currentDate).add(value, type).toDate()
+    const desiredDate = moment(currentDate)
+      .add(value, type)
+      .toDate()
 
     dispatch({
       type: 'calendar/navigateCalendar',
@@ -312,7 +320,7 @@ const CalendarView = ({
     })
   }
 
-  const Toolbar = (toolbarProps) => {
+  const Toolbar = toolbarProps => {
     return (
       <CalendarToolbar
         {...toolbarProps}
@@ -323,7 +331,7 @@ const CalendarView = ({
     )
   }
 
-  const EventComponent = (eventProps) => {
+  const EventComponent = eventProps => {
     return (
       <Event
         {...eventProps}
@@ -333,105 +341,94 @@ const CalendarView = ({
     )
   }
 
-  const eventList = useMemo(
-    () => {
-      if (calendarView === BigCalendar.Views.MONTH)
-        return calendarEvents.reduce((events, appointment) => {
-          const { appointment_Resources: apptResources = [] } = appointment
-
-          // TODO: need to fix sortOrder calculation, should exclude deleted appointments when calculating sortOrder
-          const firstApptRes = apptResources.find(
-            (item) => item.isPrimaryClinician,
-          )
-
-          if (!firstApptRes) return events
-
-          const firstClinicianFK =
-            firstApptRes !== undefined ? firstApptRes.clinicianFK : undefined
-
-          const firstAppointmentTypeFK =
-            firstApptRes !== undefined
-              ? firstApptRes.appointmentTypeFK
-              : undefined
-
-          return [
-            ...events,
-            {
-              ...appointment,
-              appointmentTypeFK: firstAppointmentTypeFK,
-              clinicianFK: firstClinicianFK,
-              resourceId: firstClinicianFK,
-              clinicianName: !firstApptRes
-                ? undefined
-                : firstApptRes.clinicianName,
-              start: moment(
-                `${appointment.appointmentDate} ${firstApptRes.startTime}`,
-                `${serverDateFormat} HH:mm`,
-              ).toDate(),
-              end: moment(
-                `${appointment.appointmentDate} ${firstApptRes.endTime}`,
-                `${serverDateFormat} HH:mm`,
-              ).toDate(),
-            },
-          ]
-        }, [])
+  const eventList = useMemo(() => {
+    if (calendarView === BigCalendar.Views.MONTH)
       return calendarEvents.reduce((events, appointment) => {
-        const {
-          appointmentDate,
-          patientProfile,
-          patientName,
-          patientContactNo,
-          isEnableRecurrence,
-          appointment_Resources: apptResources,
-          appointmentRemarks,
-          appointmentStatusFk,
-          bookedByUser,
-          createDate,
-          isEditedAsSingleAppointment,
-        } = appointment
+        const { appointment_Resources: apptResources = [] } = appointment
 
-        const apptEvents = apptResources.map((item) => ({
-          ...item,
-          resourceId: item.clinicianFK,
-          clinicianFK: item.clinicianFK,
-          patientProfile,
-          patientName,
-          patientContactNo,
-          isEnableRecurrence,
-          appointmentRemarks,
-          appointmentStatusFk,
-          bookedByUser,
-          createDate,
-          isEditedAsSingleAppointment,
-          start: moment(
-            `${appointmentDate} ${item.startTime}`,
-            `${serverDateFormat} HH:mm`,
-          ).toDate(),
-          end: moment(
-            `${appointmentDate} ${item.endTime}`,
-            `${serverDateFormat} HH:mm`,
-          ).toDate(),
-        }))
+        // TODO: need to fix sortOrder calculation, should exclude deleted appointments when calculating sortOrder
+        const firstApptRes = apptResources.find(item => item.isPrimaryClinician)
+
+        if (!firstApptRes) return events
+
+        const firstClinicianFK =
+          firstApptRes !== undefined ? firstApptRes.clinicianFK : undefined
+
+        const firstAppointmentTypeFK =
+          firstApptRes !== undefined
+            ? firstApptRes.appointmentTypeFK
+            : undefined
 
         return [
           ...events,
-          ...apptEvents,
+          {
+            ...appointment,
+            appointmentTypeFK: firstAppointmentTypeFK,
+            clinicianFK: firstClinicianFK,
+            resourceId: firstClinicianFK,
+            clinicianName: !firstApptRes
+              ? undefined
+              : firstApptRes.clinicianName,
+            start: moment(
+              `${appointment.appointmentDate} ${firstApptRes.startTime}`,
+              `${serverDateFormat} HH:mm`,
+            ).toDate(),
+            end: moment(
+              `${appointment.appointmentDate} ${firstApptRes.endTime}`,
+              `${serverDateFormat} HH:mm`,
+            ).toDate(),
+          },
         ]
       }, [])
-    },
-    [
-      calendarView,
-      calendarEvents,
-    ],
-  )
+    return calendarEvents.reduce((events, appointment) => {
+      const {
+        appointmentDate,
+        patientProfile,
+        patientName,
+        patientContactNo,
+        isEnableRecurrence,
+        appointment_Resources: apptResources,
+        appointmentRemarks,
+        appointmentStatusFk,
+        bookedByUser,
+        createDate,
+        isEditedAsSingleAppointment,
+      } = appointment
 
+      const apptEvents = apptResources.map(item => ({
+        ...item,
+        resourceId: item.clinicianFK,
+        clinicianFK: item.clinicianFK,
+        patientProfile,
+        patientName,
+        patientContactNo,
+        isEnableRecurrence,
+        appointmentRemarks,
+        appointmentStatusFk,
+        bookedByUser,
+        createDate,
+        isEditedAsSingleAppointment,
+        stageColorHex: appointment.stageColorHex,
+        stage: appointment.stage,
+        start: moment(
+          `${appointmentDate} ${item.startTime}`,
+          `${serverDateFormat} HH:mm`,
+        ).toDate(),
+        end: moment(
+          `${appointmentDate} ${item.endTime}`,
+          `${serverDateFormat} HH:mm`,
+        ).toDate(),
+      }))
+      return [...events, ...apptEvents]
+    }, [])
+  }, [calendarView, calendarEvents])
   const filtered = useMemo(
     () =>
       applyFilter(
         filter,
         [
           ...eventList,
-          ...doctorBlocks.map((item) => ({
+          ...doctorBlocks.map(item => ({
             ...item,
             isDoctorBlock: true,
             resourceId: item.doctor.clinicianProfile.id,
@@ -441,12 +438,7 @@ const CalendarView = ({
         ],
         calendarView === BigCalendar.Views.DAY,
       ),
-    [
-      calendarView,
-      filter,
-      doctorBlocks,
-      eventList,
-    ],
+    [calendarView, filter, doctorBlocks, eventList],
   )
 
   return (
@@ -495,7 +487,6 @@ const CalendarView = ({
         dayPropGetter={_customDayPropGetter}
         // slotPropGetter={TimeSlotComponent}
         onSelectSlot={handleSelectSlot}
-        onSelectEvent={handleSelectEvent}
         onDoubleClickEvent={handleDoubleClick}
         onDragStart={handleOnDragStart}
         // #endregion --- event handlers ---

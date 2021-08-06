@@ -13,6 +13,7 @@ import Loading from '@/components/PageLoading/index'
 import service from '@/services/patient'
 import { getUniqueId,getAppendUrl,navigateDirtyCheck ,onComponentDidMount} from '@/utils/utils'
 import { Link } from 'umi'
+import styles from './Grid.less'
 
 const { query } = service
 class FamilyMemberGrid extends PureComponent {
@@ -53,7 +54,9 @@ class FamilyMemberGrid extends PureComponent {
           }
           return(
             <div>
-              <Link
+              {this.props.patient.entity.id === row.familyMemberFK
+              ?row.name
+              :<Link
                 to={targetUrl}
                 onClick={e => {
                   navigateDirtyCheck({
@@ -90,7 +93,7 @@ class FamilyMemberGrid extends PureComponent {
                   >
                 {row.name}
               </span>
-              </Link>
+              </Link>}
             </div>
           )
         },
@@ -280,6 +283,7 @@ class FamilyMemberGrid extends PureComponent {
           {...this.tableParas}
         />
         <CommonModal
+          className={styles.deepCommonModal}
           open={this.state.showModal}
           title='Search Patient'
           onClose={this.toggleModal}

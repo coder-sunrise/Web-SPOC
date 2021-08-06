@@ -1,4 +1,6 @@
 import numeral from 'numeral'
+import { Tag } from 'antd'
+import { NumberInput, Tooltip } from '@/components'
 import { qtyFormat } from '@/utils/config'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import PackageDrawdownInfo from '@/pages/Widgets/Orders/Detail/PackageDrawdownInfo'
@@ -38,9 +40,14 @@ export const DataGridColExtensions = [
     render: row => {
       return (
         <div style={{ position: 'relative' }}>
-          <div style={wrapCellTextStyle}>
+          <div style={{
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+            paddingRight: row.isPreOrder ? 34 : 0
+          }}>
             {row.itemType}
             {drugMixtureIndicator(row)}
+            {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
           </div>
         </div>
       )
@@ -80,5 +87,6 @@ export const DataGridColExtensions = [
     type: 'currency',
     currency: true,
     width: 200,
+    render: (row) => <NumberInput value={(row.isPreOrder && !row.isChargeToday) ? 0 : row.totalAfterItemAdjustment} text currency />
   },
 ]

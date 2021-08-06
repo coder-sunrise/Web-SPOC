@@ -142,7 +142,7 @@ export default {
   'menu.claimSubmission.medisave': 'Medisave',
   'menu.claimSubmission.patientInvoice': 'Patient Invoice',
   'menu.setting.consumableuom': 'Consumable UOM',
-  'menu.setting.medicationUOM': 'Medication UOM',
+  'menu.setting.medicationuom': 'Medication UOM',
   'menu.setting.medicationgroup': 'Medication Group',
   'menu.setting.consumablegroup': 'Consumable Category',
   'menu.setting.medicationdosage': 'Medication Dosage',
@@ -168,7 +168,7 @@ export default {
   'menu.setting.medicationsideeffect': 'Medication Side Effect',
   'menu.setting.genericmedication': 'Generic Medication',
   'menu.setting.medicationingredient': 'Drug Ingredient',
-  'menu.setting.clinicdrugallergy': 'Drug Allergy',
+  'menu.setting.drugallergy': 'Drug Allergy',
   'menu.setting.administrationroute': 'Route of Administration',
 
   'menu.report': 'Report',
@@ -200,6 +200,9 @@ export default {
 
   'menu.wardmanagement': 'Ward Management',
   'menu.patient-monitoring': 'Patient Monitoring',
+
+  'menu.radiology': 'Radiology Center',
+  'menu.radiology.worklist': 'Worklist',
 
   'menu.not-found': 'Not Found',
   'menu.forbidden': 'Forbidden',

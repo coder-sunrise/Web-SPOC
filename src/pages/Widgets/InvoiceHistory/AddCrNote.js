@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
 import moment from 'moment'
+import { Tag } from 'antd'
 import Delete from '@material-ui/icons/Delete'
 import Warning from '@material-ui/icons/Error'
 // common components
@@ -26,6 +27,7 @@ import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 import CrNoteForm from '@/pages/Finance/Invoice/components/modal/AddCrNote/CrNoteForm'
 import Summary from '@/pages/Finance/Invoice/components/modal/AddCrNote/Summary'
 import MiscCrNote from '@/pages/Finance/Invoice/components/modal/AddCrNote/MiscCrNote'
+import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 
 @connect(({ invoiceCreditNote }) => ({
   invoiceCreditNote,
@@ -338,6 +340,16 @@ class AddCrNote extends Component {
     }
   }
 
+  drugMixtureIndicator = (row) => {
+    if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
+
+    return (
+      <div style={{ position: 'relative', top: 2 }}>
+        <DrugMixtureInfo values={row.prescriptionDrugMixture} />
+      </div>
+    )
+  }
+
   render () {
     const { handleSubmit, onConfirm, values, invoiceDetail } = this.props
     const { creditNoteItem, finalCredit, payerType } = values
@@ -426,9 +438,30 @@ class AddCrNote extends Component {
           defaultSorting={[
             { columnName: 'packageGlobalId', direction: 'asc' },
           ]}
-          rows={creditNoteItem}
+          rows={creditNoteItem.filter(cn => !cn.isPreOrder || cn.isChargeToday)}
           columns={CrNoteColumns}
           columnExtensions={[
+            {
+              columnName: 'itemType',
+              width: 150,
+              render: (row) => {
+                return (
+                  <div style={{ position: 'relative' }}>
+                    <div
+                      style={{
+                        wordWrap: 'break-word',
+                        whiteSpace: 'pre-wrap',
+                        paddingRight: row.isPreOrder ? 34 : 0
+                      }}
+                    >
+                      {row.itemType}
+                      {this.drugMixtureIndicator(row)}
+                      {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
+                    </div>
+                  </div>
+                )
+              },
+            },
             {
               columnName: 'quantity',
               width: 150,

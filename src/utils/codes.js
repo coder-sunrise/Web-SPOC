@@ -1736,13 +1736,32 @@ export const costPriceTypes = [
   },
 ]
 
-const preOrderItemCategory = {
-  Medication: 'Medication',
-  Vaccination: 'Vaccination',
-  Service: 'Service',
-  Lab: 'Lab',
-  Radiology: 'Radiology',
-}
+const preOrderItemCategory = [
+  {
+    value: 'Medication',
+    name: 'Medication',
+  },
+  {
+    value: 'Consumable',
+    name: 'Consumable',
+  },
+  {
+    value: 'Vaccination',
+    name: 'Vaccination',
+  },
+  {
+    value: 'Service',
+    name: 'Service',
+  },
+  {
+    value: 'Lab',
+    name: 'Lab',
+  },
+  {
+    value: 'Radiology',
+    name: 'Radiology',
+  },
+]
 
 export const documentTemplateTypes = [
   {

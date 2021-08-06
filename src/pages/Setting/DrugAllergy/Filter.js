@@ -12,27 +12,18 @@ import {
   TextField,
   Select,
   ProgressButton,
+  CodeSelect,
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingClinicDrugAllergy }) => {return {...(settingClinicDrugAllergy.filter || {}),type:false}},
+  mapPropsToValues: ({ settingDrugAllergy }) => {
+    return { ...(settingDrugAllergy.filter || {}), type: false }
+  },
   handleSubmit: () => {},
-  displayName: 'ClinicDrugAllergyFilter',
+  displayName: 'DrugAllergyFilter',
 })
 class Filter extends PureComponent {
   render() {
-    const drugAllergyTypes = [
-      {
-        value: false,
-        name: 'Drug Allergy',
-        render: () => <span>Clinic</span>,
-      },
-      {
-        value: true,
-        name: 'MIMS',
-        render: () => <span>Master</span>,
-      },
-    ]
     const { classes } = this.props
     return (
       <div className={classes.filterBar}>
@@ -53,15 +44,21 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-          {/* user can see MIMS here
-           <GridItem xs={6} md={2}>
+
+          <GridItem xs={6} md={2}>
             <FastField
-              name='type'
+              name='drugAllergySourceFK'
               render={args => {
-                return <Select label='Type' options={drugAllergyTypes} {...args} allowClear={false} />
+                return (
+                  <CodeSelect
+                    label='Source'
+                    code='ltdrugallergysource'
+                    {...args}
+                  />
+                )
               }}
             />
-          </GridItem> */}
+          </GridItem>
         </GridContainer>
 
         <GridContainer>
@@ -71,12 +68,17 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={<Search />}
                 onClick={() => {
-                  const { codeDisplayValue, isActive, type } = this.props.values
+                  const {
+                    codeDisplayValue,
+                    isActive,
+                    drugAllergySourceFK,
+                    type,
+                  } = this.props.values
                   this.props.dispatch({
-                    type: 'settingClinicDrugAllergy/query',
+                    type: 'settingDrugAllergy/query',
                     payload: {
-                      apiCriteria:{Type:type},
                       isActive,
+                      drugAllergySourceFK,
                       group: [
                         {
                           code: codeDisplayValue,
@@ -95,7 +97,7 @@ class Filter extends PureComponent {
                 color='primary'
                 onClick={() => {
                   this.props.dispatch({
-                    type: 'settingClinicDrugAllergy/updateState',
+                    type: 'settingDrugAllergy/updateState',
                     payload: {
                       entity: undefined,
                     },

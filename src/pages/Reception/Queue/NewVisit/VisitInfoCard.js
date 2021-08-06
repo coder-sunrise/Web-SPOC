@@ -1,5 +1,7 @@
 import React, { memo, useEffect, useState } from 'react'
 import { withStyles } from '@material-ui/core'
+// antd
+import InfoCircleOutlined from '@ant-design/icons/InfoCircleOutlined'
 // formik
 import { Field } from 'formik'
 // umi
@@ -16,6 +18,8 @@ import {
   Select,
   ClinicianSelect,
   Switch,
+  Popover,
+  IconButton,
 } from '@/components'
 // medisys components
 import {
@@ -25,6 +29,7 @@ import {
   AttachmentWithThumbnail,
 } from '@/components/_medisys'
 import { VISIT_TYPE } from '@/utils/constants'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
 import { roundTo } from '@/utils/utils'
 import numeral from 'numeral'
@@ -63,6 +68,10 @@ const styles = theme => ({
       },
     },
   },
+  visitGroupLabel: {
+    fontSize: '0.7rem',
+    fontWeight: 300,
+  },
 })
 
 const amountProps = {
@@ -93,6 +102,7 @@ const VisitInfoCard = ({
   ...restProps
 }) => {
   const [visitGroupMessage, setVisitGroupMessage] = useState()
+  const [visitGroupPopup, setVisitGroupPopup] = useState(false)
 
   const disableConsReady = Authorized.check('queue.modifyconsultationready')
 
@@ -171,6 +181,14 @@ const VisitInfoCard = ({
     setFieldValue(FormField['visit.visitGroupRef'], op && op.data.visitGroup === op.data.order ? op.data.order : null)
     setVisitGroupMessage(op && op.data.visitGroup === op.data.order ? 'New group create with ' + op.data.patientName : null)
   }
+
+  const handleVisitGroupFocus = (v, op) => {
+    setVisitGroupPopup(true)
+  }
+
+  const handleVisitGroupBlur = (v, op) => {
+    setVisitGroupPopup(false)
+  }
   
   const { values } = restProps
   let totalTempCharge = 0
@@ -183,7 +201,7 @@ const VisitInfoCard = ({
   let showNotApplyAdjustment =
     totalTempCharge !== (values.visitOrderTemplateTotal || 0)
   let showAdjusment =
-    values.visitStatus === 'WAITING' || values.visitStatus === 'UPCOMING APPT.'
+    values.visitStatus === VISIT_STATUS.WAITING || values.visitStatus === VISIT_STATUS.UPCOMING_APPT
 
   const { isEnablePackage = false } = clinicSettings.settings
 
@@ -259,7 +277,6 @@ const VisitInfoCard = ({
                   })}
                   disabled={isVisitReadonlyAfterSigned}
                   authority='none'
-                  noDefaultValue
                   {...args}
                 />
               )}
@@ -335,6 +352,7 @@ const VisitInfoCard = ({
                     label={formatMessage({
                       id: 'reception.queue.visitRegistration.consReady',
                     })}
+                    tooltip='Ready for Consultaton'
                     disabled={(disableConsReady && disableConsReady.rights === 'Disable') || isVisitReadonlyAfterSigned}
                     {...args}
                   />
@@ -364,7 +382,7 @@ const VisitInfoCard = ({
           <Authorized authority='queue.visitgroup'>
             <React.Fragment>
               <Select
-              valueField='visitGroup'
+              valueField='order'
               labelField='displayValue'
               value={values.visitGroup}
               disabled={isVisitReadonlyAfterSigned}
@@ -379,16 +397,16 @@ const VisitInfoCard = ({
               }
               handleFilter={(input, option) => {
                 return option.data.visitGroup.toString().toLowerCase().indexOf(input.toString().toLowerCase()) >= 0 ||
-                option.data.patientName.toString().toLowerCase().indexOf(input.toString().toLowerCase()) >= 0 ||          
-                option.data.patientName === ''
+                option.data.patientName.toString().toLowerCase().indexOf(input.toString().toLowerCase()) >= 0 ||     
+                input === ''
               }
               }
-              label={formatMessage({
-                id: 'reception.queue.visitRegistration.visitGroup',
-              })}
-              dropdownStyle={{ minWidth: "20%", maxHeight: "200px", overflowY: 'auto' }}
+              label='Visit Group Number'
+              dropdownStyle={{ minWidth: "20%" }}
               onClear={handleVisitGroupChange}
               onSelect={handleVisitGroupChange}
+              onFocus={handleVisitGroupFocus}
+              onBlur={handleVisitGroupBlur}
               renderDropdown={(option) => {
                 return <div>
                   <span style={{ position: 'absolute'}}><b>{option.visitGroup === option.order ? '' : option.visitGroup}</b></span>
@@ -414,7 +432,23 @@ const VisitInfoCard = ({
             </React.Fragment>
           </Authorized>
         </GridItem>
-        <GridItem xs md={3} />
+        <GridItem xs md={3}>  
+          <Popover 
+            icon={null}
+            visible={visitGroupPopup}
+            content={<div>
+              <p>- Search by existing group number or patient name.</p>
+              <p>- Selecting visit group will set Cons. Ready to "No".</p>
+            </div>}>
+            <IconButton
+              size='small'
+              onMouseOver={handleVisitGroupFocus} 
+              onMouseOut={handleVisitGroupBlur} 
+            >
+              <InfoCircleOutlined />
+            </IconButton>
+          </Popover>
+        </GridItem>
         {showAdjusment &&
         ((ctinvoiceadjustment || []).length > 0 ||
           (copaymentScheme || []).length > 0) ? (
