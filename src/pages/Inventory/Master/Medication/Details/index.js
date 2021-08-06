@@ -402,6 +402,7 @@ export default compose(
         inventoryMedication_MedicationPrecaution,
         inventoryMedication_MedicationContraIndication,
         inventoryMedication_MedicationInteraction,
+        inventoryMedication_DrugAllergy,
         isDispensedByPharmacy,
         isNurseActualizable,
       } = medicationDetails
@@ -442,6 +443,10 @@ export default compose(
         item => item.medicationIngredientFK,
       )
 
+      let drugAllergies = inventoryMedication_DrugAllergy?.map(
+        item => item.drugAllergyFK,
+      )
+
       let medicationSideEffects = inventoryMedication_MedicationSideEffect
         ?.sort(item => item.sequence)
         .map(item => item.medicationSideEffectFK)
@@ -461,6 +466,7 @@ export default compose(
       return {
         ...medicationDetails,
         medicationIngredients,
+        drugAllergies,
         medicationSideEffects,
         medicationPrecautions,
         medicationContraindications,
@@ -523,6 +529,9 @@ export default compose(
       criticalThreshold: Yup.number()
         .min(0, 'Critical Threshold must between 0 and 999,999.9')
         .max(999999.9, 'Critical Threshold must between 0 and 999,999.9'),
+      excessThreshold: Yup.number()
+        .min(0, 'Excess Threshold must between 0 and 999,999.9')
+        .max(999999.9, 'Excess Threshold must between 0 and 999,999.9'),
     }),
 
     handleSubmit: (values, { props, resetForm }) => {
@@ -537,6 +546,7 @@ export default compose(
         medicationInteractions = [],
         medicationContraindications = [],
         medicationInstructionRule = [],
+        drugAllergies = [],
         ...restValues
       } = values
       const { dispatch, history, onConfirm, medicationDetail } = props
@@ -570,6 +580,7 @@ export default compose(
         const newAttach = attachment.filter(
           a => !a.isDeleted && a.fileIndexFK === undefined,
         )[0]
+
         fileInfo.fileIndexFK = newAttach?.id
         fileInfo.fileName = newAttach?.fileName
       }
@@ -582,6 +593,15 @@ export default compose(
           .filter(m => m !== allOptionId)
           .map(m => {
             return { medicationIngredientFK: m, inventoryMedicationFK: id }
+          })
+      }
+
+      let drugAllergyList = undefined
+      if (drugAllergies) {
+        drugAllergyList = drugAllergies
+          .filter(m => m !== allOptionId)
+          .map(m => {
+            return { drugAllergyFK: m, inventoryMedicationFK: id }
           })
       }
 
@@ -633,29 +653,31 @@ export default compose(
 
       let finalMedicationInstructionRule = [...medicationInstructionRule]
       let deletedItems = []
-      const originalValues = medicationDetail.entity.medicationInstructionRule
+      if (medicationDetail.entity) {
+        const originalValues = medicationDetail.entity.medicationInstructionRule
 
-      if (originalValues) {
-        if (medicationInstructionRule.length === 0)
-          deletedItems = originalValues.map(item => ({
-            ...item,
-            isDeleted: true,
-          }))
-        else {
-          deletedItems = originalValues
-            .filter(
-              orig =>
-                medicationInstructionRule.findIndex(d => d.id === orig.id) ===
-                -1,
-            )
-            .map(item => ({ ...item, isDeleted: true }))
+        if (originalValues) {
+          if (medicationInstructionRule.length === 0)
+            deletedItems = originalValues.map(item => ({
+              ...item,
+              isDeleted: true,
+            }))
+          else {
+            deletedItems = originalValues
+              .filter(
+                orig =>
+                  medicationInstructionRule.findIndex(d => d.id === orig.id) ===
+                  -1,
+              )
+              .map(item => ({ ...item, isDeleted: true }))
+          }
+
+          if (deletedItems)
+            finalMedicationInstructionRule = [
+              ...finalMedicationInstructionRule,
+              ...deletedItems,
+            ]
         }
-
-        if (deletedItems)
-          finalMedicationInstructionRule = [
-            ...finalMedicationInstructionRule,
-            ...deletedItems,
-          ]
       }
       const payload = {
         ...restValues,
@@ -671,6 +693,7 @@ export default compose(
         inventoryMedication_MedicationPrecaution: precautionList,
         inventoryMedication_MedicationContraIndication: contraIndicationList,
         inventoryMedication_MedicationInteraction: interactionList,
+        inventoryMedication_DrugAllergy: drugAllergyList,
         medicationInstructionRule: finalMedicationInstructionRule,
       }
 

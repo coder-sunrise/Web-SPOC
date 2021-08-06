@@ -356,10 +356,19 @@ export const ADD_ON_FEATURE = {
   MIMS: 2,
 }
 
+export const RadiologyWorkitemStatus = {
+  1: 'New',
+  2: 'In Progress',
+  3: 'Pending Report',
+  4: 'Completed',
+  5: 'Cancelled',
+}
+
 export const VISIT_TYPE = {
   CONS: 1,
   RETAIL: 2,
   BILL_FIRST: 3,
+  MC: 4,
 }
 
 export const VISIT_TYPE_NAME = [
@@ -374,6 +383,10 @@ export const VISIT_TYPE_NAME = [
   {
     visitPurposeFK: VISIT_TYPE.BILL_FIRST,
     displayName: 'Bill-First',
+  },
+  {
+    visitPurposeFK: VISIT_TYPE.MC,
+    displayName: 'MC',
   },
 ]
 

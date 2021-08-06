@@ -77,12 +77,12 @@ class Banner extends PureComponent {
     showPreOrderModal: false,
   }
 
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.fetchCodeTables()
   }
 
-  componentWillMount() {
+  componentWillMount () {
     const { dispatch } = this.props
     dispatch({
       type: 'codetable/fetchCodes',
@@ -90,7 +90,7 @@ class Banner extends PureComponent {
     })
   }
 
-  getAllergyData() {
+  getAllergyData () {
     const { patient } = this.props
     const { entity } = patient
     const { info } = entity
@@ -105,7 +105,6 @@ class Banner extends PureComponent {
       showWarning: da.length ? true : false,
     })
 
-    // console.log('getAllergyData', allergyData)
     return (
       entity &&
       entity.isActive && (
@@ -114,7 +113,7 @@ class Banner extends PureComponent {
     )
   }
 
-  getAllergyLink(data) {
+  getAllergyLink (data) {
     const { props } = this
     const {
       patient,
@@ -251,9 +250,9 @@ class Banner extends PureComponent {
   openScheme = () => this.setState({ showSchemeModal: true })
   closeScheme = () => this.setState({ showSchemeModal: false })
   openPatientProfile = () => {
-    if(this.props.from !== 'Appointment') return
+    if (this.props.from !== 'Appointment') return
     const { dispatch, patient } = this.props
-    const { entity } = patient 
+    const { entity } = patient
     this.setState({ showPatientProfile: true })
   }
   closePatientProfile = () => {
@@ -278,11 +277,11 @@ class Banner extends PureComponent {
       <span
         style={{ paddingRight: 5, display: 'inline-block' }}
       >
-        {chasOrMedisave && 
-          chasOrMedisave.find(list => s.schemeTypeFK === list.schemeTypeFK) 
-        ? (<Popover
-          icon={null}
-          content={<div>
+        {chasOrMedisave &&
+          chasOrMedisave.find(list => s.schemeTypeFK === list.schemeTypeFK)
+          ? (<Popover
+            icon={null}
+            content={<div>
               <div>
                 {s.coPaymentSchemeFK ||
                   schemeDataList.filter(p =>
@@ -383,25 +382,25 @@ class Banner extends PureComponent {
               ) : (
                 ''
               )}
-              </div>
+            </div>
             }
-          trigger='click'
-          placement='bottom'
-        >
-        <Link>
-            <span
-              style={{
-                color: 'black',
-                textDecoration: 'underline',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {s.copaymentSchemeName || s.schemeTypeName}
-              {s.validTo ? ` (Exp: ${moment(s.validTo).format('DD/MM/YYYY')})` : ''}
-            </span>
-          </Link>
-      </Popover>)
-        : (<Link>
+            trigger='click'
+            placement='bottom'
+          >
+            <Link>
+              <span
+                style={{
+                  color: 'black',
+                  textDecoration: 'underline',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {s.copaymentSchemeName || s.schemeTypeName}
+                {s.validTo ? ` (Exp: ${moment(s.validTo).format('DD/MM/YYYY')})` : ''}
+              </span>
+            </Link>
+          </Popover>)
+          : (<Link>
             <span
               style={{
                 color: 'black',
@@ -441,7 +440,6 @@ class Banner extends PureComponent {
         patientProfileId: entity.id,
       },
     }).then(result => {
-      // console.log('result ==========', result)
       if (result) {
         dispatch({
           type: 'patient/query',
@@ -641,12 +639,12 @@ class Banner extends PureComponent {
       statusDescription: refreshedSchemeData.statusDescription,
       acuteBalanceStatusCode:
         !_.isEmpty(refreshedSchemeData) &&
-        refreshedSchemeData.isSuccessful === false
+          refreshedSchemeData.isSuccessful === false
           ? 'ERROR'
           : undefined,
       chronicBalanceStatusCode:
         !_.isEmpty(refreshedSchemeData) &&
-        refreshedSchemeData.isSuccessful === false
+          refreshedSchemeData.isSuccessful === false
           ? 'ERROR'
           : chronicStatus,
       isSuccessful:
@@ -714,7 +712,7 @@ class Banner extends PureComponent {
     }
   }
 
-  displayMedicalProblemData(entity = { patientHistoryDiagnosis: [] }) {
+  displayMedicalProblemData (entity = { patientHistoryDiagnosis: [] }) {
     let medicalProblemData = '-'
     const { patientHistoryDiagnosis = [] } = entity
 
@@ -755,30 +753,30 @@ class Banner extends PureComponent {
   }
 
   onViewPatientProfile = (event) => {
-	event.preventDefault()
+    event.preventDefault()
     const { patient, history, from, dispatch } = this.props
     const { entity } = patient
     const info = entity
 
-	this.props.dispatch({
-		type: 'global/updateState',
-		payload: {
-		  fullscreen: true,
-		  showPatientInfoPanel: true,
-		},
-	  })
+    this.props.dispatch({
+      type: 'global/updateState',
+      payload: {
+        fullscreen: true,
+        showPatientInfoPanel: true,
+      },
+    })
   }
 
-  getBannerMd =() => {
-	const { from, extraCmt } = this.props
-	if(from === 'Consultation')
-		return 9
-	if(extraCmt)
-		return 11
-	return 12
+  getBannerMd = () => {
+    const { from, extraCmt } = this.props
+    if (from === 'Consultation')
+      return 9
+    if (extraCmt)
+      return 11
+    return 12
   }
 
-  render() {
+  render () {
     const { props } = this
     const {
       // patientInfo = {},
@@ -805,11 +803,11 @@ class Banner extends PureComponent {
         marginTop: '-8px',
       },
       refreshingBalance,
+      disablePreOrder,
+      dispatch
     } = props
-	
-    const actualizePreOrderAccessRight = Authorized.check('appointment.actualizepreorder') || { rights: 'hidden' }
 
-	const onSelectPreOrders = () => {this.props.onSelectPreOrder}
+    const actualizePreOrderAccessRight = Authorized.check('appointment.actualizepreorder') || { rights: 'hidden' }
 
     const { entity } = patient
     if (!entity)
@@ -819,7 +817,6 @@ class Banner extends PureComponent {
         </Paper>
       )
     const { ctsalutation = [] } = codetable
-    // console.log('banner', entity)
     const info = entity
     const salt = ctsalutation.find(o => o.id === info.salutationFK) || {}
     const name = `${salt.name || ''} ${info.name}`
@@ -856,15 +853,13 @@ class Banner extends PureComponent {
 
     const g6PD =
       codetable.ctg6pd &&
-      codetable.ctg6pd.length > 0 &&
-      entity.patientAllergyMetaData.length > 0
+        codetable.ctg6pd.length > 0 &&
+        entity.patientAllergyMetaData.length > 0
         ? codetable.ctg6pd.find(
-            o => o.id === entity.patientAllergyMetaData[0].g6PDFK,
-          )
+          o => o.id === entity.patientAllergyMetaData[0].g6PDFK,
+        )
         : null
 
-    // console.log('banner-render', schemeDataList)
-	// console.log('info',info)
     return (
       <Paper id='patientBanner' style={style}>
         {/* Please do not change the height below (By default is 100) */}
@@ -901,7 +896,7 @@ class Banner extends PureComponent {
                         display: 'inline-block',
                         width: '100%',
                         overflow: 'hidden',
-						            fontWeight: 500,
+                        fontWeight: 500,
                         fontSize: '1.1rem',
                         color: 'rgb(75, 172, 198)',
                       }}
@@ -990,9 +985,9 @@ class Banner extends PureComponent {
                   title={
                     info.outstandingBalance
                       ? `${currencySymbol}${_.round(
-                          info.outstandingBalance,
-                          2,
-                        )}`
+                        info.outstandingBalance,
+                        2,
+                      )}`
                       : ''
                   }
                 >
@@ -1019,8 +1014,8 @@ class Banner extends PureComponent {
                 <span>
                   {info.patientHistoryDiagnosis.length > 0
                     ? info.patientHistoryDiagnosis
-                        .map(d => d.diagnosisDescription)
-                        .join(', ')
+                      .map(d => d.diagnosisDescription)
+                      .join(', ')
                     : '-'}
                 </span>
               </GridItem>
@@ -1074,18 +1069,16 @@ class Banner extends PureComponent {
                 </div>
               </GridItem>
               <GridItem xs={6} md={2} className={classes.cell}>
-                {actualizePreOrderAccessRight.rights !== 'hidden' && <Link 
-					className={classes.header}
-					disabled={actualizePreOrderAccessRight.rights === 'disable'}
-				>
+                {actualizePreOrderAccessRight.rights !== 'hidden' && <Link
+                  className={classes.header}
+                  disabled={actualizePreOrderAccessRight.rights === 'disable' || disablePreOrder}
+                >
                   <span
                     style={{ textDecoration: 'underline' }}
                     onClick={e => {
-					  e.preventDefault()
-					  console.log('onlick', apptId, isEnableRecurrence, apptMode)
-                      if (actualizePreOrderAccessRight.rights === 'disable') return
-                      if (activePreOrderItem && activePreOrderItem.length)
-                      {
+                      e.preventDefault()
+                      if (actualizePreOrderAccessRight.rights === 'disable' || disablePreOrder) return
+                      if (activePreOrderItem && activePreOrderItem.length) {
                         if (apptId && apptMode === 'series') {
                           dispatch({
                             type: 'global/updateAppState',
@@ -1111,10 +1104,10 @@ class Banner extends PureComponent {
                           return
                         }
                       }
-					  this.openPreOrders()
+                      this.openPreOrders()
                     }}
                   >
-				  	{`Pre-Order (${activePreOrderItem ? activePreOrderItem.length : 0})`}
+                    {`Pre-Order (${activePreOrderItem ? activePreOrderItem.length : 0})`}
                   </span>
                 </Link>}
               </GridItem>
@@ -1125,17 +1118,17 @@ class Banner extends PureComponent {
                 >
                   <span className={classes.header}>Scheme: </span>
                   <span style={{ bottom: -2 }}>
-                        {entity.isActive &&
-                          (entity.patientScheme || []).filter(
-                            o =>
-                              o.schemeTypeFK <= 6 ||
-                              this.isMedisave(o.schemeTypeFK),
-                          ).length > 0 && (
-                            <IconButton onClick={this.refreshGovtBalance}>
-                              <Refresh />
-                            </IconButton>
-                          )}
-                      </span>
+                    {entity.isActive &&
+                      (entity.patientScheme || []).filter(
+                        o =>
+                          o.schemeTypeFK <= 6 ||
+                          this.isMedisave(o.schemeTypeFK),
+                      ).length > 0 && (
+                        <IconButton onClick={this.refreshGovtBalance}>
+                          <Refresh />
+                        </IconButton>
+                      )}
+                  </span>
                   {this.getSchemeList(_.orderBy(schemeDataList, ['schemeTypeFK'], ['asc']))}
                 </LoadingWrapper>
               </GridItem>
@@ -1182,7 +1175,7 @@ class Banner extends PureComponent {
           overrideLoading
           showFooter={false}
         >
-          <PatientDetail 
+          <PatientDetail
             history={this.props.history}
             linkProps={{
               to: '#',
@@ -1204,7 +1197,11 @@ class Banner extends PureComponent {
           onClose={this.closePreOrders}
           maxWidth='lg'
         >
-			<SelectPreOrder onSelectPreOrder={this.onSelectPreOrder} activePreOrderItem={activePreOrderItem} />
+          <SelectPreOrder onSelectPreOrder={(select) => {
+            if (onSelectPreOrder)
+              onSelectPreOrder(select)
+            this.closePreOrders()
+          }} activePreOrderItem={activePreOrderItem} />
         </CommonModal>
         <CommonModal
           open={this.state.showSchemeModal}

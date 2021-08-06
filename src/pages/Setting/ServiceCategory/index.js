@@ -10,20 +10,21 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingServiceCategory, global }) => ({
+@connect(({ settingServiceCategory, global, clinicSettings }) => ({
   settingServiceCategory,
   global,
   mainDivHeight: global.mainDivHeight,
+  clinicSettings: clinicSettings.settings,
 }))
 @withSettingBase({ modelName: 'settingServiceCategory' })
 class ServiceCategory extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingServiceCategory/query',
     })
@@ -38,7 +39,7 @@ class ServiceCategory extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingServiceCategory, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
@@ -55,11 +56,9 @@ class ServiceCategory extends PureComponent {
           open={settingServiceCategory.showModal}
           observe='ServiceCategoryDetail'
           title={
-            settingServiceCategory.entity ? (
-              'Edit Service Category'
-            ) : (
-              'Add Service Category'
-            )
+            settingServiceCategory.entity
+              ? 'Edit Service Category'
+              : 'Add Service Category'
           }
           maxWidth='md'
           bodyNoPadding

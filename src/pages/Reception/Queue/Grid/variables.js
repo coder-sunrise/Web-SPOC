@@ -149,7 +149,7 @@ export const QueueTableConfig = {
     { name: 'visitStatus', title: 'Status' },
     { name: 'queueNo', title: 'Q. No.' },
     { name: 'visitGroup', title: 'Group No.' },
-    { name: 'consReady', title: 'Cons. Ready' },
+    { name: 'consReady', title: 'Cons. Ready', fullTitle: 'Ready for Consultation' },
     { name: 'servingBy', title: 'Serving By' },
     { name: 'patientReferenceNo', title: 'Ref. No.' },
     { name: 'patientName', title: 'Patient Name' },

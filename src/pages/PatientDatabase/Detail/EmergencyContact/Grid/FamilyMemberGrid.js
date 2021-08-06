@@ -13,6 +13,7 @@ import Loading from '@/components/PageLoading/index'
 import service from '@/services/patient'
 import { getUniqueId,getAppendUrl,navigateDirtyCheck ,onComponentDidMount} from '@/utils/utils'
 import { Link } from 'umi'
+import styles from './Grid.less'
 
 const { query } = service
 class FamilyMemberGrid extends PureComponent {
@@ -282,6 +283,7 @@ class FamilyMemberGrid extends PureComponent {
           {...this.tableParas}
         />
         <CommonModal
+          className={styles.deepCommonModal}
           open={this.state.showModal}
           title='Search Patient'
           onClose={this.toggleModal}

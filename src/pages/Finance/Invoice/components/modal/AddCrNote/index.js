@@ -467,6 +467,7 @@ class AddCrNote extends Component {
                       style={{
                         wordWrap: 'break-word',
                         whiteSpace: 'pre-wrap',
+                        paddingRight: row.isPreOrder ? 34 : 0
                       }}
                     >
                       {row.itemType}

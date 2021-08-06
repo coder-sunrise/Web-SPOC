@@ -45,7 +45,7 @@ class PreOrderCard extends PureComponent {
   render () {
     const {values,visitPreOrderItem=[]} = this.props
 
-  console.log('visitPreOrderItem',visitPreOrderItem)
+  // console.log('visitPreOrderItem',visitPreOrderItem)
 
     return (
       <div>

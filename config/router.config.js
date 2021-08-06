@@ -126,6 +126,24 @@ const _routes = [
           // },
         ],
       },
+      {
+        path: '/radiology',
+        icon: 'icon-radiology',
+        name: 'radiology',
+        moduleName: 'Radiology',
+        //authority: ['reception'], TODO:: to replace with actual permission
+        specialist: ['GP', 'Dental'],
+        routes: [
+          {
+            path: '/radiology/worklist',
+            name: 'worklist',
+            component: './Radiology/Worklist',
+            mini: 'RW',
+            exact: true,
+            //authority: ['reception/queue'], TODO:: to replace with actual permission
+          },
+        ],
+      },
       //
       // Patient New
       {
