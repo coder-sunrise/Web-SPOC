@@ -20,9 +20,9 @@ const localDateTime = value => {
     ? moment(value)
         .utc()
         .format(dateTimeFormat)
-    : null
+    : '-'
 }
-const dateColumnWidth = 140
+const renderRemarks = value => value && value.trim() !== '' ? value : '-'
 
 const detailsColumns = [
   { name: 'type', title: 'Type' },
@@ -38,36 +38,21 @@ const detailsColumns = [
 const actualizedColumns = [
   { name: 'actulizeByUser', title: 'Actualize By' },
   { name: 'actulizeDate', title: 'Actualize Date' },
-  { name: 'actulizeRemarks', title: 'Actualize Remarks', witdh: 140 },
+  { name: 'actulizeRemarks', title: 'Actualize Remarks' },
 ]
 
 const colDetailsExtensions = [
-  { columnName: 'type', witdh: 80 },
+  { columnName: 'type', width: 100 },
   { columnName: 'name' },
-  { columnName: 'qty', width: 60 },
-  { columnName: 'orderBy' },
-  {
-    columnName: 'orderDate',
-    width: dateColumnWidth,
-    render: r => localDateTime(r.orderDate),
-  },
-  { columnName: 'instruction' },
-  { columnName: 'accessionNo' },
-  { columnName: 'orderRemarks' },
-  { columnName: 'actulizeByUser' },
-  {
-    columnName: 'actulizeDate',
-    width: dateColumnWidth,
-    render: r => localDateTime(r.actulizeDate),
-  },
-  { columnName: 'actulizeRemarks' },
-  { columnName: 'cancelBy' },
-  {
-    columnName: 'cancelDate',
-    width: dateColumnWidth,
-    render: r => localDateTime(r.cancelDate),
-  },
-  { columnName: 'cancelReasons' },
+  { columnName: 'qty', width: 100, align: 'right' },
+  { columnName: 'orderBy', width: 130 },
+  { columnName: 'orderDate', width: 140, render: r => localDateTime(r.orderDate) },
+  { columnName: 'instruction', render: r => renderRemarks(r.instruction) },
+  { columnName: 'accessionNo', render: r => renderRemarks(r.accessionNo)  },
+  { columnName: 'orderRemarks', render: r => renderRemarks(r.orderRemarks) },
+  { columnName: 'actulizeByUser', width: 130 },
+  { columnName: 'actulizeDate', width: 140, render: r => localDateTime(r.actulizeDate) },
+  { columnName: 'actulizeRemarks', render: r => renderRemarks(r.actulizeRemarks) },
 ]
 
 const historyColumns = [
@@ -88,32 +73,20 @@ const historyColumns = [
 ]
 
 const historyColumnExtensions = [
-  { columnName: 'type', witdh: 80 },
+  { columnName: 'type', width: 100 },
   { columnName: 'name' },
-  { columnName: 'qty', width: 60 },
-  { columnName: 'orderBy' },
-  {
-    columnName: 'orderDate',
-    width: dateColumnWidth,
-    render: r => localDateTime(r.orderDate),
-  },
-  { columnName: 'instruction' },
-  { columnName: 'accessionNo' },
-  { columnName: 'orderRemarks' },
-  { columnName: 'actualizeByUser' },
-  {
-    columnName: 'actualizeDate',
-    width: dateColumnWidth,
-    render: r => localDateTime(r.actualizeDate),
-  },
-  { columnName: 'actualizeRemarks' },
-  { columnName: 'cancelByUser' },
-  {
-    columnName: 'cancelDate',
-    width: dateColumnWidth,
-    render: r => localDateTime(r.cancelDate),
-  },
-  { columnName: 'cancelReasons', witdh: 140 },
+  { columnName: 'qty', width: 100, align: 'right'},
+  { columnName: 'orderBy', width: 130 },
+  { columnName: 'orderDate', width: 140, render: r => localDateTime(r.orderDate) },
+  { columnName: 'instruction', render: r => renderRemarks(r.instruction)  },
+  { columnName: 'accessionNo', render: r => renderRemarks(r.accessionNo)  },
+  { columnName: 'orderRemarks', render: r => renderRemarks(r.orderRemarks) },
+  { columnName: 'actualizeByUser', width: 130 },
+  { columnName: 'actualizeDate', width: 140, render: r => localDateTime(r.actualizeDate) },
+  { columnName: 'actualizeRemarks', render: r => renderRemarks(r.actualizeRemarks) },
+  { columnName: 'cancelByUser', width: 130, render: r => renderRemarks(r.cancelByUser) },
+  { columnName: 'cancelDate', width: 140, render: r => localDateTime(r.cancelDate) },
+  { columnName: 'cancelReasons', render: r => renderRemarks(r.cancelReasons) },
 ]
 
 class NurseActualization extends React.PureComponent {
@@ -268,7 +241,7 @@ class NurseActualization extends React.PureComponent {
         )}
         <GridContainer>
           <GridItem lg={12}>
-            <div style={{ marginTop: 10, marginBottom: 10 }} align='right'>
+            <div style={{ marginTop: 8, marginBottom: 10 }} align='right'>
               {actualizeViewable && actualizeBtnViewable && (
                 <Authorized authorized='dispense.actualizeorderitems'>
                   <Button color='success' onClick={this.actualize}>
