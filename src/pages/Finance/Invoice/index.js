@@ -12,10 +12,11 @@ import InvoiceDataGrid from './components/InvoiceDataGrid'
 // styles
 import styles from './styles'
 
-@connect(({ invoiceList, global }) => ({
+@connect(({ invoiceList, global, clinicSettings }) => ({
   invoiceList,
   global,
   mainDivHeight: global.mainDivHeight,
+  clinicSettings: clinicSettings.settings
 }))
 class Invoice extends React.Component {
   componentDidMount () {
@@ -33,7 +34,7 @@ class Invoice extends React.Component {
   }
 
   render () {
-    const { classes, mainDivHeight = 700 } = this.props
+    const { classes, mainDivHeight = 700, clinicSettings } = this.props
     let height =
       mainDivHeight -
       140 -
@@ -49,6 +50,7 @@ class Invoice extends React.Component {
           handleRowDoubleClick={this.onRowDoubleClick}
           {...this.props}
           height={height}
+          isEnableCHAS={clinicSettings.isEnableCHAS}
         />
         <div className='footerBar'>
           <p className={classes.footerNote}>

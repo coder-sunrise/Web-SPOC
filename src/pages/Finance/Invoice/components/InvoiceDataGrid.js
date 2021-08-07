@@ -8,11 +8,20 @@ import {
   TableConfig,
 } from '../variables'
 
-const InvoiceDataGrid = ({ handleRowDoubleClick, height }) => {
+const getColumns = (isEnableCHAS)=> {
+  return InvoiceGridColumns.filter(x=> {
+    if(x.name === 'governmentOutstanding')
+      return isEnableCHAS
+    else
+      return true
+  })
+}
+
+const InvoiceDataGrid = ({ handleRowDoubleClick, height, isEnableCHAS }) => {
   return (
     <CommonTableGrid
       type='invoiceList'
-      columns={InvoiceGridColumns}
+      columns={getColumns(isEnableCHAS)}
       columnExtensions={InvoiceGridColExtensions}
       onRowDoubleClick={handleRowDoubleClick}
       TableProps={{
