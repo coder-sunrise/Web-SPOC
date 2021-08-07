@@ -546,7 +546,7 @@ class PatientDetail extends PureComponent {
       ) || {}
     const CurrentComponent = currentMenu.component
     const currentItemDisabled =
-      ['1', '2', '3', '4'].includes(currentMenu.id) &&
+      ['1', '2', '3', '4', '9', '11'].includes(currentMenu.id) &&
       !patientIsActiveOrCreating
 
     return (
