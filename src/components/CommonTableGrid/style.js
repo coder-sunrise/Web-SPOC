@@ -76,7 +76,10 @@ const styles = (theme) => ({
 
   sortIcon: {
     visibility: 'hidden',
-    verticalAlign: 'text-top',
+    verticalAlign: 'middle',
+    '& svg': {
+      verticalAlign: 'middle',
+    }
   },
 
   sortLabel: {
