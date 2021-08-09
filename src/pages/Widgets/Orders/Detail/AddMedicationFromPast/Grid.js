@@ -14,6 +14,7 @@ import {
 } from '@/components'
 // utils
 import { primaryColor } from '@/assets/jss'
+import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import CustomStyle from './CustomStyle.less'
 
 const styles = () => ({
@@ -22,14 +23,14 @@ const styles = () => ({
     overflow: 'hidden',
     display: 'inline-block',
     textOverflow: 'ellipsis',
-    width: 300,
+    width: 330,
     paddingLeft: 8,
     float: 'left',
     marginTop: 6,
   },
   instructionColumn: {
     display: 'inline-block',
-    width: 340,
+    width: 400,
     paddingLeft: 8,
     float: 'left',
     marginTop: 6,
@@ -39,14 +40,8 @@ const styles = () => ({
     overflow: 'hidden',
     display: 'inline-block',
     textOverflow: 'ellipsis',
-    width: 120,
+    width: 150,
     paddingLeft: 8,
-    float: 'left',
-    marginTop: 6,
-  },
-  totalPriceColumn: {
-    width: 120,
-    paddingRight: 8,
     float: 'left',
     marginTop: 6,
   },
@@ -60,6 +55,19 @@ const styles = () => ({
   },
 })
 class Grid extends PureComponent {
+  drugMixtureIndicator = (row, right) => {
+    const activePrescriptionItemDrugMixture = (row.corPrescriptionItemDrugMixture || row.retailPrescriptionItemDrugMixture || []).filter(
+      item => !item.isDeleted,
+    )
+
+    return (
+      <DrugMixtureInfo
+        values={activePrescriptionItemDrugMixture}
+        isShowTooltip={false} right={right}
+      />
+    )
+  }
+
   Visits = () => {
     const {
       classes,
@@ -119,9 +127,9 @@ class Grid extends PureComponent {
             onClick={() => {
               clickCollapseHeader(o.id)
             }}
-            style={{ display: 'flex', paddingTop: 6 }}
+            style={{ display: 'flex', padding: '3px 0px 8px 0px', height: 36 }}
           >
-            <div style={{ marginLeft: 5, alignItems: 'center' }}>
+            <div style={{ marginLeft: 5, alignItems: 'center', marginTop: 14 }}>
               <span>
                 Visit Date:&nbsp;{moment(o.visitDate).format('DD MMM YYYY')}
               </span>
@@ -148,7 +156,8 @@ class Grid extends PureComponent {
                 </span>
                 <span
                   style={{
-                    marginLeft: 30,
+                    position: 'absolute', marginTop: -2,
+                    marginLeft: 30, marginTop: 14
                   }}
                 >
                   Add All
@@ -196,7 +205,8 @@ class Grid extends PureComponent {
                   }}
                 >
                   <GridContainer>
-                    <div className={classes.nameColumn}>
+                    <div className={classes.nameColumn}
+                      style={{ paddingRight: item.isDrugMixture ? 20 : 0 }}>
                       {warningLabel && (
                         <span style={{ color: 'red', fontStyle: 'italic' }}>
                           <sup>{warningLabel}&nbsp;</sup>
@@ -205,6 +215,9 @@ class Grid extends PureComponent {
                       <Tooltip title={item.drugName || item.vaccinationName}>
                         <span>{item.drugName || item.vaccinationName}</span>
                       </Tooltip>
+                      <div style={{ position: 'relative', top: 2 }}>
+                        {item.isDrugMixture && this.drugMixtureIndicator(item, -20)}
+                      </div>
                     </div>
                     <div className={classes.instructionColumn}>
                       <Tooltip
@@ -233,11 +246,6 @@ class Grid extends PureComponent {
                             item.uomDisplayValue}`}
                         </span>
                       </Tooltip>
-                    </div>
-                    <div className={classes.totalPriceColumn}>
-                      <span style={{ float: 'right' }}>
-                        <NumberInput text currency value={item.totalPrice} />
-                      </span>
                     </div>
                     <div className={classes.actionColumn}>
                       {item.isActive &&

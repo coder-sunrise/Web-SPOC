@@ -2,13 +2,13 @@ import React from 'react'
 import { Table } from 'antd'
 import moment from 'moment'
 import numeral from 'numeral'
-import { Tag } from 'antd'
-import { currencySymbol,currencyFormat } from '@/utils/config'
+import { currencySymbol, currencyFormat } from '@/utils/config'
 import { GridContainer, GridItem, TextField, Tooltip } from '@/components'
 import { VISIT_TYPE } from '@/utils/constants'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import AmountSummary from './AmountSummary'
 import tablestyles from './PatientHistoryStyle.less'
+import { mergeClasses } from '@material-ui/styles'
 
 const numberstyle = {
   color: 'darkBlue',
@@ -25,13 +25,11 @@ const wrapCellTextStyle = {
   whiteSpace: 'pre-wrap',
 }
 
-const drugMixtureIndicator = row => {
+const drugMixtureIndicator = (row, right) => {
   if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
 
   return (
-    <div style={{ position: 'relative', top: 5 }}>
-      <DrugMixtureInfo values={row.prescriptionDrugMixture} />
-    </div>
+    <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
   )
 }
 
@@ -49,95 +47,122 @@ const showCurrency = (value = 0) => {
   )
 }
 
-const baseColumns = [
-  {
-    dataIndex: 'itemType',
-    title: 'Type',
-    width: 140,
-    render: (text, row) => {
-      return (
-        <div style={{ position: 'relative' }}>
-          <div style={wrapCellTextStyle}>
-            {row.isDrugMixture ? 'Drug Mixture' : row.itemType}
-            {drugMixtureIndicator(row)}
-            {row.isPreOrder && (
-              <Tooltip title='Pre-Order'>
-                <Tag
-                  color='#4255bd'
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    right: -10,
-                    borderRadius: 10,
-                  }}
-                >
-                  Pre
-                </Tag>
-              </Tooltip>
-            )}
-          </div>
-        </div>
-      )
-    },
-  },
-  {
-    dataIndex: 'itemName',
-    title: 'Name',
-    width: 250,
-    render: (text, row) => (
-      <Tooltip
-        title={
-          <div>
-            {`Code/Name: ${row.code} / ${row.name}`}
-            <br />
-            {`UniPrice/UOM: ${currencySymbol}${numeral(row.unitPrice).format(
-              currencyFormat,
-            )} / ${row.dispenseUOMDisplayValue || '-'}`}
-          </div>
+const baseColumns = (classes) => {
+  return [
+    {
+      dataIndex: 'itemType',
+      title: 'Type',
+      width: 140,
+      render: (text, row) => {
+        let paddingRight = 0
+        if (row.isPreOrder && row.isExclusive) {
+          paddingRight = 52
         }
-      >
-        <div style={wrapCellTextStyle}>{text}</div>
-      </Tooltip>
-    ),
-  },
-  {
-    dataIndex: 'description',
-    title: 'Instructions',
-  },
-  {
-    dataIndex: 'quantity',
-    title: 'Qty.',
-    align: 'right',
-    width: 80,
-    render: (text, row) => (
-      <div style={numberstyle}>
-        {`${numeral(row.quantity || 0).format('0,0.0')}`}
-      </div>
-    ),
-  },
-  { dataIndex: 'dispenseUOMDisplayValue', title: 'UOM', width: 80 },
-  {
-    dataIndex: 'adjAmt',
-    title: 'Adj.',
-    width: 100,
-    align: 'right',
-    render: (text, row) => showCurrency(row.adjAmt),
-  },
-  {
-    dataIndex: 'totalAfterItemAdjustment',
-    title: 'Total',
-    width: 100,
-    align: 'right',
-    render: (text, row) =>
-      showCurrency(
-        row.isPreOrder && !row.isChargeToday ? 0 : row.totalAfterItemAdjustment,
+        else if (row.isPreOrder || row.isExclusive) {
+          paddingRight = 24
+        }
+        if (row.isDrugMixture) {
+          paddingRight = 10
+        }
+        return (
+          <div style={{ position: 'relative' }}>
+            <div style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+              paddingRight: paddingRight
+            }}>
+              {row.isDrugMixture ? 'Drug Mixture' : row.itemType}
+              <div style={{ position: 'relative', top: 2 }}>
+                {drugMixtureIndicator(row, -20)}
+                {row.isExclusive && (
+                  <Tooltip title='Exclusive'>
+                    <div
+                      className={classes.rightIcon}
+                      style={{
+                        right: -30,
+                        borderRadius: 4,
+                        backgroundColor: 'green',
+                      }}
+                    >Excl.</div>
+                  </Tooltip>
+                )}
+                {row.isPreOrder && (
+                  <Tooltip title='Pre-Order'>
+                    <div
+                      className={classes.rightIcon}
+                      style={{
+                        right: row.isExclusive ? -60 : -30,
+                        borderRadius: 10,
+                        backgroundColor: '#4255bd',
+                      }}
+                    > Pre</div>
+                  </Tooltip>
+                )}
+              </div>
+            </div>
+          </div>
+        )
+      },
+    },
+    {
+      dataIndex: 'itemName',
+      title: 'Name',
+      width: 250,
+      render: (text, row) => (
+        <Tooltip
+          title={
+            <div>
+              {`Code/Name: ${row.code} / ${row.name}`}
+              <br />
+              {`UniPrice/UOM: ${currencySymbol}${numeral(row.unitPrice).format(
+                currencyFormat,
+              )} / ${row.dispenseUOMDisplayValue || '-'}`}
+            </div>
+          }
+        >
+          <div style={wrapCellTextStyle}>{text}</div>
+        </Tooltip>
       ),
-  },
-]
+    },
+    {
+      dataIndex: 'description',
+      title: 'Instructions',
+    },
+    {
+      dataIndex: 'quantity',
+      title: 'Qty.',
+      align: 'right',
+      width: 80,
+      render: (text, row) => (
+        <div style={numberstyle}>
+          {`${numeral(row.quantity || 0).format('0,0.0')}`}
+        </div>
+      ),
+    },
+    { dataIndex: 'dispenseUOMDisplayValue', title: 'UOM', width: 80 },
+    {
+      dataIndex: 'adjAmt',
+      title: 'Adj.',
+      width: 100,
+      align: 'right',
+      render: (text, row) => showCurrency(row.adjAmt),
+    },
+    {
+      dataIndex: 'totalAfterItemAdjustment',
+      title: 'Total',
+      width: 100,
+      align: 'right',
+      render: (text, row) =>
+        showCurrency(
+          row.isPreOrder && !row.isChargeToday ? 0 : row.totalAfterItemAdjustment,
+        ),
+    },
+  ]
+}
 
-export default ({ current, theme, isFullScreen = true }) => {
+export default ({ current, theme, isFullScreen = true, classes }) => {
   let invoiceAdjustmentData = []
-  let columns = baseColumns
+  let columns = baseColumns(classes)
 
   if (current.invoice) {
     const { invoiceAdjustment = [] } = current.invoice

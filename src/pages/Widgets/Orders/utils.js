@@ -1,9 +1,13 @@
+import { Table } from 'antd'
+import moment from 'moment'
 import { Divider } from '@material-ui/core'
 import Authorized from '@/utils/Authorized'
 import { htmlDecodeByRegExp } from '@/utils/utils'
 import { tagList } from '@/utils/codes'
+import { DOSAGE_RULE, DOSAGE_RULE_OPERATOR } from '@/utils/constants'
+import tablestyles from '@/pages/Widgets/PatientHistory/PatientHistoryStyle.less'
 
-const getCautionAlertContent = (cuationItems) => () => {
+const getCautionAlertContent = (cautionItems = [], allergyItems = [], vaccinationItems = []) => () => {
   return (
     <div
       style={{
@@ -13,7 +17,57 @@ const getCautionAlertContent = (cuationItems) => () => {
       }}
     >
       <div style={{ margin: 5 }}>
-        {cuationItems.length > 0 && (
+        {allergyItems.length > 0 && (
+          <div>
+            <p>
+              <h4
+                style={{ fontWeight: 400, textAlign: 'left', marginBottom: 10 }}
+              >
+                Patient Allergy
+              </h4>
+            </p>
+            <Table
+              size='small'
+              bordered
+              pagination={false}
+              columns={[
+                {
+                  dataIndex: 'drugName',
+                  title: 'Medication Name',
+                  width: 200,
+                },
+                {
+                  dataIndex: 'allergyName',
+                  title: 'Allergy Name',
+                },
+                {
+                  dataIndex: 'allergyType',
+                  title: 'Allergy Type',
+                  width: 100,
+                },
+                {
+                  dataIndex: 'allergyReaction',
+                  title: 'Allergy Reaction',
+                  width: 150,
+                },
+                {
+                  dataIndex: 'onsetDate',
+                  title: 'Onset Date',
+                  width: 100,
+                  render: (text, row) => <span>{row.onsetDate ? moment(row.onsetDate).format("DD MMM YYYY") : '-'}</span>
+                }
+              ]}
+              dataSource={allergyItems}
+              rowClassName={(record, index) => {
+                return index % 2 === 0 ? tablestyles.once : tablestyles.two
+              }}
+              className={tablestyles.table}
+            />
+          </div>
+        )}
+      </div>
+      <div style={{ margin: 5 }}>
+        {cautionItems.length > 0 && (
           <div>
             <p>
               <h4
@@ -22,112 +76,77 @@ const getCautionAlertContent = (cuationItems) => () => {
                 Cautions
               </h4>
             </p>
+            <Table
+              size='small'
+              bordered
+              pagination={false}
+              columns={[
+                {
+                  dataIndex: 'type',
+                  title: 'Type',
+                  width: 100,
+                },
+                {
+                  dataIndex: 'subject',
+                  title: 'Name',
+                  width: 200,
+                },
+                {
+                  dataIndex: 'caution',
+                  title: 'Cautions',
+                }
+              ]}
+              dataSource={cautionItems}
+              rowClassName={(record, index) => {
+                return index % 2 === 0 ? tablestyles.once : tablestyles.two
+              }}
+              className={tablestyles.table}
+            />
           </div>
         )}
-        {cuationItems.map((m) => (
-          <div
-            style={{
-              display: 'flex',
-              marginLeft: 20,
-              marginTop: 5,
-              marginBottom: 5,
-            }}
-          >
-            <div
-              style={{
-                width: 150,
-                textAlign: 'left',
-                display: 'inline-table',
-              }}
-            >
-              <span>
-                <b>{m.subject} - </b>
-              </span>
-            </div>
-            <div style={{ textAlign: 'left' }}>{m.caution}</div>
-          </div>
-        ))}
       </div>
-    </div>
-  )
-}
-
-const getRetailCautionAlertContent = (
-  cuationItems = [],
-  ignoreVaccinationItems = [],
-) => () => {
-  return (
-    <div
-      style={{
-        minHeight: 80,
-        display: 'grid',
-        alignItems: 'center',
-      }}
-    >
       <div style={{ margin: 5 }}>
-        {cuationItems.length > 0 && (
+        {vaccinationItems.length > 0 && (
           <div>
             <p>
-              <h4 style={{ fontWeight: 400 }}>Cautions</h4>
+              <h4
+                style={{ fontWeight: 400, textAlign: 'left', marginBottom: 10 }}
+              >
+                Vaccination item(s) will not to ne added.
+              </h4>
             </p>
+            <Table
+              size='small'
+              bordered
+              pagination={false}
+              columns={[
+                {
+                  dataIndex: 'subject',
+                  title: 'Vaccination Name',
+                  width: 700,
+                },
+              ]}
+              dataSource={vaccinationItems}
+              rowClassName={(record, index) => {
+                return index % 2 === 0 ? tablestyles.once : tablestyles.two
+              }}
+              className={tablestyles.table}
+            />
           </div>
         )}
-
-        {cuationItems.map((m) => (
-          <div
-            style={{
-              display: 'flex',
-              marginLeft: 20,
-              marginTop: 5,
-              marginBottom: 5,
-            }}
-          >
-            <div
-              style={{
-                width: 150,
-                textAlign: 'left',
-                display: 'inline-table',
-              }}
-            >
-              <span>
-                <b>{m.subject} - </b>
-              </span>
-            </div>
-            <div style={{ textAlign: 'left' }}>{m.caution}</div>
-          </div>
-        ))}
       </div>
-      {ignoreVaccinationItems.length > 0 &&
-      cuationItems.length > 0 && (
-        <Divider light style={{ marginBottom: 10, marginTop: 10 }} />
-      )}
-      {ignoreVaccinationItems.length > 0 && (
-        <div style={{ marginLeft: 5, marginRight: 5 }}>
-          <p>
-            <h4 style={{ fontWeight: 400 }}>
-              Vaccination item(s) will not be added.
-            </h4>
-          </p>
-          <div style={{ marginLeft: 20 }}>
-            {ignoreVaccinationItems.map((item) => (
-              <p>
-                <b>{item.subject}</b>
-              </p>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   )
 }
 
-const openCautionAlertPrompt = (cautionItems, onClose) => {
+const openCautionAlertPrompt = (cautionItems = [], allergyItems = [], vaccinationItems = [], onClose) => {
   window.g_app._store.dispatch({
     type: 'global/updateAppState',
     payload: {
       openConfirm: true,
       isInformType: true,
-      openConfirmContent: getCautionAlertContent(cautionItems),
+      customWidth: 'md',
+      openConfirmContent: getCautionAlertContent(cautionItems, allergyItems, vaccinationItems),
       openConfirmText: 'OK',
       onConfirmClose: onClose,
     },
@@ -135,24 +154,24 @@ const openCautionAlertPrompt = (cautionItems, onClose) => {
 }
 
 const openCautionAlertOnStartConsultation = (o) => {
-  const { corPrescriptionItem = [], corVaccinationItem = [] } = o
+  const { corPrescriptionItem = [], corVaccinationItem = [], drugAllergys = [] } = o
   const drugItems = corPrescriptionItem
     .filter((i) => i.caution && i.caution.trim().length > 0)
     .map((m) => {
-      return { subject: m.drugName, caution: m.caution }
+      return { type: 'Medication', subject: m.drugName, caution: m.caution }
     })
   const vaccinationItems = corVaccinationItem
     .filter((i) => i.caution && i.caution.trim().length > 0)
     .map((m) => {
-      return { subject: m.vaccinationName, caution: m.caution }
+      return { type: 'Vaccination', subject: m.vaccinationName, caution: m.caution }
     })
-  const hasCautionItems = [
+  const cautionItems = [
     ...drugItems,
     ...vaccinationItems,
   ]
 
-  if (hasCautionItems.length > 0) {
-    openCautionAlertPrompt(hasCautionItems)
+  if (cautionItems.length) {
+    openCautionAlertPrompt(cautionItems, drugAllergys, [])
   }
 }
 
@@ -182,11 +201,38 @@ const ReplaceCertificateTeplate = (templateContent, newVaccination) => {
   })
   return msg
 }
+
+const isMatchInstructionRule = (rule, age, weight) => {
+  let isMatch = false;
+  if (rule.ruleType == DOSAGE_RULE.default) {
+    isMatch = true;
+  }
+  else if (rule.ruleType == DOSAGE_RULE.age) {
+    if (age >= 0) {
+      if ((rule.operator == DOSAGE_RULE_OPERATOR.to && age >= rule.leftOperand && age <= rule.rightOperand)
+        || (rule.operator == DOSAGE_RULE_OPERATOR.lessThan && age < rule.rightOperand)
+        || (rule.operator == DOSAGE_RULE_OPERATOR.moreThan && age > rule.rightOperand)) {
+        isMatch = true;
+      }
+    }
+  }
+  else if (rule.ruleType == DOSAGE_RULE.weight) {
+    if (weight >= 0) {
+      if ((rule.operator == DOSAGE_RULE_OPERATOR.to && weight >= rule.leftOperand && weight <= rule.rightOperand)
+        || (rule.operator == DOSAGE_RULE_OPERATOR.lessThan && weight < rule.rightOperand)
+        || (rule.operator == DOSAGE_RULE_OPERATOR.moreThan && weight > rule.rightOperand)) {
+        isMatch = true;
+      }
+    }
+  }
+  return isMatch;
+}
+
 export {
   getCautionAlertContent,
   openCautionAlertPrompt,
   openCautionAlertOnStartConsultation,
-  getRetailCautionAlertContent,
   GetOrderItemAccessRight,
   ReplaceCertificateTeplate,
+  isMatchInstructionRule,
 }

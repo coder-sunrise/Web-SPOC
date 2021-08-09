@@ -92,6 +92,7 @@ const FilterBar = (props) => {
             </div>
             <div style={{ display: 'inline-Block', marginLeft: 10 }}>
               <ProgressButton
+                size='sm'
                 color='primary'
                 icon={<Search />}
                 onClick={handelSearch}

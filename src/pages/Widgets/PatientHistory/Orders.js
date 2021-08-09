@@ -1,27 +1,25 @@
 import { Table } from 'antd'
 import numeral from 'numeral'
-import { Tag } from 'antd'
 import { currencySymbol, currencyFormat } from '@/utils/config'
 import tablestyles from './PatientHistoryStyle.less'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import { Tooltip } from '@/components'
+import { FileCopySharp } from '@material-ui/icons'
 
 const wrapCellTextStyle = {
   wordWrap: 'break-word',
   whiteSpace: 'pre-wrap',
 }
 
-const drugMixtureIndicator = row => {
+const drugMixtureIndicator = (row, right) => {
   if (row.type !== 'Medication' || !row.isDrugMixture) return null
 
   return (
-    <div style={{ position: 'relative', top: 5 }}>
-      <DrugMixtureInfo values={row.prescriptionDrugMixture} />
-    </div>
+    <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
   )
 }
 
-export default ({ current }) => {
+export default ({ current, classes }) => {
   return (
     <div style={{ marginBottom: 8, marginTop: 8 }}>
       <Table
@@ -34,26 +32,51 @@ export default ({ current }) => {
             title: 'Type',
             width: 140,
             render: (text, row) => {
+              let paddingRight = 0
+              if (row.isPreOrder && row.isExclusive) {
+                paddingRight = 52
+              }
+              else if (row.isPreOrder || row.isExclusive) {
+                paddingRight = 24
+              }
+              if (row.isDrugMixture) {
+                paddingRight = 10
+              }
               return (
                 <div style={{ position: 'relative' }}>
-                  <div style={wrapCellTextStyle}>
+                  <div style={{
+                    wordWrap: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                    paddingRight: paddingRight
+                  }}>
                     {row.isDrugMixture ? 'Drug Mixture' : row.type}
-                    {drugMixtureIndicator(row)}
-                    {row.isPreOrder && (
-                      <Tooltip title='Pre-Order'>
-                        <Tag
-                          color='#4255bd'
-                          style={{
-                            position: 'absolute',
-                            top: 0,
-                            right: -10,
-                            borderRadius: 10,
-                          }}
-                        >
-                          Pre
-                        </Tag>
-                      </Tooltip>
-                    )}
+                    <div style={{ position: 'relative', top: 2 }}>
+                      {drugMixtureIndicator(row, -20)}
+                      {row.isExclusive && (
+                        <Tooltip title='Exclusive'>
+                          <div
+                            className={classes.rightIcon}
+                            style={{
+                              right: -30,
+                              borderRadius: 4,
+                              backgroundColor: 'green',
+                            }}
+                          >Excl.</div>
+                        </Tooltip>
+                      )}
+                      {row.isPreOrder && (
+                        <Tooltip title='Pre-Order'>
+                          <div
+                            className={classes.rightIcon}
+                            style={{
+                              right: row.isExclusive ? -60 : -30,
+                              borderRadius: 10,
+                              backgroundColor: '#4255bd',
+                            }}
+                          > Pre</div>
+                        </Tooltip>
+                      )}
+                    </div>
                   </div>
                 </div>
               )
@@ -94,7 +117,35 @@ export default ({ current }) => {
           {
             dataIndex: 'remarks',
             title: 'Remarks',
-            render: text => <div style={wrapCellTextStyle}>{text}</div>,
+            render: (text, row) => {
+              const existsDrugLabelRemarks = row.drugLabelRemarks && row.drugLabelRemarks.trim() !== ''
+              return <div style={{ position: 'relative' }}>
+                <div
+                  style={{
+                    wordWrap: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                    paddingRight: existsDrugLabelRemarks ? 10 : 0,
+                  }}
+                >{row.remarks || ' '}</div>
+                {existsDrugLabelRemarks &&
+                  <div style={{
+                    position: 'absolute',
+                    bottom: -2,
+                  right: -8,
+                  }}>
+                    <Tooltip title={
+                      <div>
+                        <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
+                        <div>{row.drugLabelRemarks}
+                        </div>
+                      </div>
+                    }>
+                    <FileCopySharp style={{ color: '#4255bd' }} />
+                    </Tooltip>
+                  </div>
+                }
+              </div>
+            },
           },
           {
             dataIndex: 'quantity',

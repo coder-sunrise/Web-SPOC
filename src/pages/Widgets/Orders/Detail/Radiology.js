@@ -202,8 +202,8 @@ class Radiology extends PureComponent {
         filter: {
           'serviceFKNavigation.IsActive': true,
           'serviceCenterFKNavigation.IsActive': true,
-          'serviceCenterFKNavigation.ServiceCenterCategoryFK': SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
           combineCondition: 'and',
+          apiCriteria: { ServiceCenterType: 'Radiology' }
         },
       },
     }).then((list) => {
@@ -420,7 +420,6 @@ class Radiology extends PureComponent {
     const { radiologyWorkitem = {} } = workitem
     const isStartedRadiology = !isPreOrder && [RADIOLOGY_WORKITEM_STATUS.INPROGRESS, RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT, RADIOLOGY_WORKITEM_STATUS.COMPLETED].indexOf(radiologyWorkitem.statusFK) >= 0
 
-    console.log('editService', isStartedRadiology)
     return (
       <Authorized
         authority={GetOrderItemAccessRight(

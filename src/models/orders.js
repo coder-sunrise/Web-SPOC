@@ -27,6 +27,7 @@ const sharedMedicationValue = {
   isClaimable: true,
   isDispensedByPharmacy: false,
   isNurseActualizeRequired: false,
+  isExclusive: false,
 }
 const initialState = {
   rows: [],

@@ -24,6 +24,7 @@ const DeleteWithPopover = ({
   extraCmd,
   onConfirmDelete,
   onCancelClick,
+  isFromCollapseHeader
 }) => {
   const [
     show,
@@ -32,12 +33,18 @@ const DeleteWithPopover = ({
 
   const toggleVisibleChange = () => setShow(!show)
 
-  const handleCancelClick = () => {
+  const handleCancelClick = (event) => {
+    if (isFromCollapseHeader) {
+      event.stopPropagation()
+    }
     toggleVisibleChange()
     if (onCancelClick) onCancelClick(index)
   }
 
-  const onConfirmClick = () => {
+  const onConfirmClick = (event) => {
+    if (isFromCollapseHeader) {
+      event.stopPropagation()
+    }
     onConfirmDelete(index, toggleVisibleChange)
     // toggleVisibleChange()
   }
@@ -45,7 +52,7 @@ const DeleteWithPopover = ({
   return (
     <Popover
       title={title}
-      trigger='click'
+      //trigger='click'
       anchorOrigin={{
         vertical: 'top',
         horizontal: 'left',
@@ -72,7 +79,12 @@ const DeleteWithPopover = ({
       }
     >
       <Tooltip title={title}>
-        <Button justIcon color='danger' disabled={disabled}>
+        <Button justIcon color='danger' disabled={disabled} onClick={(event) => {
+          if (isFromCollapseHeader) {
+            event.stopPropagation()
+          }
+          setShow(true)
+        }}>
           <Delete />
         </Button>
       </Tooltip>

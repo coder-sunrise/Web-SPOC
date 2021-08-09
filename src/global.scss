@@ -698,6 +698,20 @@ tr[class*='TableSelectRow-selected-'] {
   background-color: #c8dafd !important;
 }
 
+button[class^='MuiButton-root-'],
+button[class*='MuiButton-root-'] {
+ text-transform: none !important;
+}
+
+button[class^='BasicComponent-contained-'],
+button[class*='BasicComponent-contained-'] {
+  span{
+    span{
+      margin-left: 0px !important;
+    }
+  }
+}
+
 @-webkit-keyframes fadeInFromNone {
   0% {
     display: none;

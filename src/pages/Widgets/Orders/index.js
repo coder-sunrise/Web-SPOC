@@ -2,6 +2,7 @@ import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
 import { withStyles, Divider, Paper, IconButton } from '@material-ui/core'
+import { getUniqueId } from '@/utils/utils'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
 import {
@@ -33,6 +34,7 @@ import { sumReducer, calculateAdjustAmount } from '@/utils/utils'
 
 import Grid from './Grid'
 import Detail from './Detail/index'
+import Details from './Detail/PrescriptionSet/Details'
 
 const styles = (theme) => ({
   rightAlign: {
@@ -42,6 +44,15 @@ const styles = (theme) => ({
     margin: '3px 0 3px 0',
     height: 20,
   },
+  rightIcon: {
+    position: 'absolute',
+    bottom: 2,
+    fontWeight: 500,
+    color: 'white',
+    fontSize: '0.7rem',
+    padding: '2px 3px',
+    height: 20,
+  }
 })
 // @skeleton()
 @connect(({ orders, codetable, clinicInfo }) => ({
@@ -55,6 +66,7 @@ class Orders extends PureComponent {
     gst: 0,
     totalWithGst: 0,
     adjustments: [],
+    showPrescriptionSetDetailModal: false,
   }
 
   componentWillMount () {
@@ -105,6 +117,20 @@ class Orders extends PureComponent {
     }
   }
 
+  toggleShowPrescriptionSetDetailModal = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'prescriptionSet/updateState',
+      payload: {
+        entity: undefined,
+        prescriptionSetItems: [],
+        editPrescriptionSetItem: undefined
+      }
+    })
+
+    this.setState({ showPrescriptionSetDetailModal: false })
+  }
+
   render () {
     const { props } = this
     const { className, footer, ...restProps } = props
@@ -119,6 +145,19 @@ class Orders extends PureComponent {
           // handleAddAdjustment={this.addAdjustment}
         />
         {/* {this.generateFinalAmount()} */}
+        <CommonModal
+          open={this.state.showPrescriptionSetDetailModal}
+          title='Add New Prescription Set'
+          onClose={this.toggleShowPrescriptionSetDetailModal}
+          onConfirm={this.toggleShowPrescriptionSetDetailModal}
+          observe='PrescriptionSetDetail'
+          maxWidth='md'
+          showFooter={false}
+          overrideLoading
+          cancelText='Cancel'
+        >
+          <Details {...this.props} />
+        </CommonModal>
       </div>
     )
   }

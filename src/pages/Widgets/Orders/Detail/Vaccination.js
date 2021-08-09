@@ -668,7 +668,6 @@ class Vaccination extends PureComponent {
                     style={{
                       whiteSpace: 'nowrap',
                       textOverflow: 'ellipsis',
-                      display: 'inline-block',
                       width: '100%',
                       overflow: 'hidden',
                       paddingTop: 3,

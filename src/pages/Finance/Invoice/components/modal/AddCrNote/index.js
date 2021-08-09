@@ -2,9 +2,9 @@ import React, { Component } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
 import moment from 'moment'
-import { Tag } from 'antd'
 import Delete from '@material-ui/icons/Delete'
 import Warning from '@material-ui/icons/Error'
+import { withStyles } from '@material-ui/core'
 // common components
 import {
   CommonTableGrid,
@@ -29,6 +29,17 @@ import Summary from './Summary'
 import MiscCrNote from './MiscCrNote'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 
+const styles = theme => ({
+  rightIcon: {
+    position: 'absolute',
+    bottom: 2,
+    fontWeight: 500,
+    color: 'white',
+    fontSize: '0.7rem',
+    padding: '2px 3px',
+    height: 20,
+  }
+})
 @connect(({ invoiceCreditNote, invoiceDetail }) => ({
   invoiceCreditNote,
   invoiceDetail: invoiceDetail.entity,
@@ -133,9 +144,9 @@ class AddCrNote extends Component {
     const { isEnablePackage = false } = settings
     const packageItems = creditNoteItem.filter(item => item.isPackage)
     const existPackage = isEnablePackage && packageItems.length > 0
-      this.setState({
-        isExistPackage: existPackage,
-      })
+    this.setState({
+      isExistPackage: existPackage,
+    })
 
     this.expandAllPackages(values)
   }
@@ -148,15 +159,15 @@ class AddCrNote extends Component {
         (distinct, data) =>
           distinct.includes(data.packageGlobalId)
             ? [
-                ...distinct,
-              ]
+              ...distinct,
+            ]
             : [
-                ...distinct,
-                data.packageGlobalId,
-              ],
+              ...distinct,
+              data.packageGlobalId,
+            ],
         [],
       )
-  
+
       this.setState({
         expandedGroups: groups,
       })
@@ -169,7 +180,7 @@ class AddCrNote extends Component {
     })
   }
 
-  handleEditRow = (row) => {}
+  handleEditRow = (row) => { }
 
   handleCalcCrNoteItem = (selection = undefined) => {
     const { invoiceDetail, invoiceCreditNote } = this.props
@@ -195,8 +206,8 @@ class AddCrNote extends Component {
     const gstAmount =
       invoiceDetail.gstValue >= 0
         ? finalCreditTotal /
-          (1 + invoiceDetail.gstValue / 100) *
-          (invoiceDetail.gstValue / 100)
+        (1 + invoiceDetail.gstValue / 100) *
+        (invoiceDetail.gstValue / 100)
         : 0
     setFieldValue('gstAmount', roundTo(gstAmount))
     setFieldValue('subTotal', roundTo(finalCreditTotal) - roundTo(gstAmount))
@@ -206,13 +217,13 @@ class AddCrNote extends Component {
     const { values, setFieldValue } = this.props
 
     let newSelection = selection
-    if (this.state.isExistPackage) {      
+    if (this.state.isExistPackage) {
       // If is select a package item, should auto select all items under the package
       const newSelect = selection.find(i => !this.state.selectedRows.includes(i))
-      if (newSelect) {        
+      if (newSelect) {
         const item = values.creditNoteItem.find(i => i.id === newSelect)
         if (item && item.isPackage) {
-          const otherItems = values.creditNoteItem.filter(i => i.packageGlobalId === item.packageGlobalId && i.id !== newSelect && !i.isSelected)          
+          const otherItems = values.creditNoteItem.filter(i => i.packageGlobalId === item.packageGlobalId && i.id !== newSelect && !i.isSelected)
           if (otherItems && otherItems.length > 0) {
             otherItems.forEach(i => {
               i.isSelected = true
@@ -322,7 +333,8 @@ class AddCrNote extends Component {
     }, 0)
     setFieldValue('creditNoteItem', [
       ...creditNoteItem,
-      { ...newItem, 
+      {
+        ...newItem,
         id: tempID,
         packageGlobalId: '',
       },
@@ -355,13 +367,11 @@ class AddCrNote extends Component {
     }
   }
 
-  drugMixtureIndicator = (row) => {
+  drugMixtureIndicator = (row, right) => {
     if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
 
     return (
-      <div style={{ position: 'relative', top: 2 }}>
-        <DrugMixtureInfo values={row.prescriptionDrugMixture} />
-      </div>
+      <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
     )
   }
 
@@ -377,7 +387,7 @@ class AddCrNote extends Component {
           </span>
         )
       }
-  
+
       let label = 'Package'
       if (!creditNoteItem) return ''
       const data = creditNoteItem.filter(
@@ -461,18 +471,37 @@ class AddCrNote extends Component {
               columnName: 'itemType',
               width: 150,
               render: (row) => {
+                let paddingRight = 0
+                if (row.isPreOrder) {
+                  paddingRight = 24
+                }
+                if (row.isDrugMixture) {
+                  paddingRight = 10
+                }
                 return (
                   <div style={{ position: 'relative' }}>
                     <div
                       style={{
                         wordWrap: 'break-word',
                         whiteSpace: 'pre-wrap',
-                        paddingRight: row.isPreOrder ? 34 : 0
+                        paddingRight: paddingRight
                       }}
                     >
                       {row.itemType}
-                      {this.drugMixtureIndicator(row)}
-                      {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
+                      <div style={{ position: 'relative', top: 2 }}>
+                        {this.drugMixtureIndicator(row, -20)}
+                        {row.isPreOrder &&
+                          <Tooltip title='Pre-Order'>
+                            <div
+                            className={classes.rightIcon}
+                            style={{
+                              right: -30,
+                              borderRadius: 10,
+                              backgroundColor: '#4255bd',
+                              }}
+                            > Pre</div>
+                          </Tooltip>}
+                      </div>
                     </div>
                   </div>
                 )
@@ -495,7 +524,7 @@ class AddCrNote extends Component {
                     />
                   )
                 }
-                
+
                 return (
                   <Field
                     name={`creditNoteItem[${row.rowIndex}].quantity`}
@@ -531,7 +560,7 @@ class AddCrNote extends Component {
                       )
                     }}
                   />
-                )                
+                )
               },
             },
             {
@@ -584,7 +613,7 @@ class AddCrNote extends Component {
                     />
                   )
                 }
-                
+
                 return (
                   <Field
                     name={`creditNoteItem[${row.rowIndex}].totalAfterGST`}
@@ -599,7 +628,7 @@ class AddCrNote extends Component {
                       </SizeContainer>
                     )}
                   />
-                )                
+                )
               },
             },
 
@@ -641,7 +670,7 @@ class AddCrNote extends Component {
           handleAddMiscItem={this.handleAddMiscItem}
           handleCalcFinalTotal={this.handleCalcCrNoteItem}
           gstValue={values.gstValue}
-          // {...this.props}
+        // {...this.props}
         />
 
         <GridContainer>
@@ -670,5 +699,4 @@ class AddCrNote extends Component {
     )
   }
 }
-
-export default AddCrNote
+export default withStyles(styles)(AddCrNote)

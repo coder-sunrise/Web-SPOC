@@ -14,6 +14,7 @@ import {
   serverDateTimeFormatFull,
   notification,
   DatePicker,
+  Tooltip
 } from '@/components'
 import Yup from '@/utils/yup'
 import { getUniqueId, getUniqueGUID, roundTo } from '@/utils/utils'
@@ -22,6 +23,8 @@ import {
   ReplaceCertificateTeplate,
 } from '@/pages/Widgets/Orders/utils'
 import { DURATION_UNIT } from '@/utils/constants'
+import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
+import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
 import { getClinicianProfile } from '../../ConsultationDocument/utils'
 
 @connect(
@@ -59,7 +62,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
   handleSubmit: (values, { props, onConfirm, setValues, resetForm }) => {
     const {
       dispatch,
-      orders,
+      orders = {},
       codetable,
       getNextSequence,
       user,
@@ -67,6 +70,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       patient,
       consultationDocument: { rows = [] },
     } = props
+    const { corVitalSign = [] } = orders
     const {
       inventorymedication = [],
       inventoryvaccination = [],
@@ -96,18 +100,18 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
 
     const packageGlobalId = getUniqueGUID()
 
-    const getInstruction = (medication) => {
+    const getInstruction = (medication, matchInstruction) => {
       let instruction = ''
       const usageMethod = medication.medicationUsage
       instruction += `${usageMethod ? usageMethod.name : ''} `
-      const dosage = medication.prescribingDosage
+      const dosage = matchInstruction?.prescribingDosage
       instruction += `${dosage ? dosage.name : ''} `
       const prescribe = medication.prescribingUOM
       instruction += `${prescribe ? prescribe.name : ''} `
-      const drugFrequency = medication.medicationFrequency
+      const drugFrequency = matchInstruction?.medicationFrequency
       instruction += `${drugFrequency ? drugFrequency.name : ''}`
-      const itemDuration = medication.duration
-        ? ` For ${medication.duration} day(s)`
+      const itemDuration = matchInstruction?.duration
+        ? ` For ${matchInstruction.duration} day(s)`
         : ''
       instruction += itemDuration
       return instruction
@@ -121,13 +125,28 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       const medication = inventorymedication.find(
         (item) => item.id === packageItem.inventoryMedicationFK,
       )
+      const { medicationInstructionRule = [] } = medication
+      let weightKG
+      const activeVitalSign = corVitalSign.find(vs => !vs.isDeleted)
+      if (activeVitalSign) {
+        weightKG = activeVitalSign.weightKG
+      }
+      else {
+        weightKG = visitRegistration.entity.visit.weightKG
+      }
+
+      let age
+      if (dob) {
+        age = Math.floor(moment.duration(moment().diff(dob)).asYears())
+      }
+      var matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weightKG))
 
       let item
       if (medication.isActive === true) {
         const medicationdispensingUOM = medication.dispensingUOM
         const medicationusage = medication.medicationUsage
-        const medicationfrequency = medication.medicationFrequency
-        const medicationdosage = medication.prescribingDosage
+        const medicationfrequency = matchInstruction?.medicationFrequency
+        const medicationdosage = matchInstruction?.medicationFrequency
         const medicationprescribingUOM = medication.prescribingUOM
         const medicationPrecautions =
           medication.inventoryMedication_MedicationPrecaution
@@ -166,7 +185,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
             : undefined,
           batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
           isExternalPrescription: false,
-          instruction: getInstruction(medication),
+          instruction: getInstruction(medication, matchInstruction),
           dispenseUOMFK: medication.dispensingUOM.id,
           dispenseUOMCode: medicationdispensingUOM
             ? medicationdispensingUOM.code
@@ -184,8 +203,8 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
               usageMethodDisplayValue: medicationusage
                 ? medicationusage.name
                 : undefined,
-              dosageFK: medication.prescribingDosage
-                ? medication.prescribingDosage.id
+              dosageFK: medicationdosage
+                ? medicationdosage.id
                 : undefined,
               dosageCode: medicationdosage ? medicationdosage.code : undefined,
               dosageDisplayValue: medicationdosage
@@ -209,7 +228,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
               drugFrequencyDisplayValue: medicationfrequency
                 ? medicationfrequency.name
                 : undefined,
-              duration: medication.duration,
+              duration: matchInstruction?.duration,
               stepdose: 'AND',
               sequence: 0,
             },
@@ -224,6 +243,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           packageGlobalId,
           isDispensedByPharmacy: medication.isDispensedByPharmacy,
           isNurseActualizeRequired: medication.isNurseActualizable,
+          isExclusive: medication.isExclusive,
         }
       }
       return item
@@ -383,8 +403,6 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
         unitOfMeasurement = consumable.uom ? consumable.uom.name : undefined
       }
 
-      console.log('consumable', consumable)
-
       item = {
         inventoryConsumableFK: packageItem.inventoryConsumableFK,
         isActive: packageItem.isActive,
@@ -461,8 +479,10 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       if (newOrder) {
         let type = packageItems[index].type
         if (packageItems[index].type === '3') {
-          if (newOrder.serviceCenterCategoryFK === 3) { type = '9' }
-          else if (newOrder.serviceCenterCategoryFK === 4) { type = '10' }
+          if (newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER
+            || newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE) { type = '9' }
+          else if (newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER
+            || newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE) { type = '10' }
         }
         const data = {
           isOrderedByDoctor:
@@ -516,8 +536,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
 class Package extends PureComponent {
   constructor (props) {
     super(props)
-
-    const { dispatch } = props
+    const { dispatch, classes } = props
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
@@ -590,6 +609,33 @@ class Package extends PureComponent {
           type: 'text',
           sortingEnabled: false,
           disabled: true,
+          render: row => {
+            return <div style={{ position: 'relative' }}>
+              <div style={{
+                wordWrap: 'break-word',
+                whiteSpace: 'pre-wrap',
+                paddingRight: row.isExclusive ? 24 : 0
+              }}>
+                <Tooltip title={row.typeName}>
+                  <span >{row.typeName}</span>
+                </Tooltip>
+                <div style={{ position: 'relative', top: 2 }}>
+                  {row.isExclusive && (
+                    <Tooltip title='Exclusive'>
+                      <div
+                        className={classes.rightIcon}
+                        style={{
+                          right: -30,
+                          borderRadius: 4,
+                          backgroundColor: 'green',
+                        }}
+                      >Excl.</div>
+                    </Tooltip>
+                  )}
+                </div>
+              </div>
+            </div>
+          },
         },
         {
           columnName: 'name',
@@ -660,11 +706,64 @@ class Package extends PureComponent {
     }
 
     this.changePackage = (v, op) => {
-      const { setValues, values, orderTypes } = this.props
+      const { setValues, values, orderTypes, codetable, patient } = this.props
+      const { inventorymedication = [], ctservice = [] } = codetable
+      const { entity = {} } = patient
+      const { patientAllergy = [] } = entity
       let rows = []
+      let cautions = []
+      let allergys = []
+      const insertAllergys = (inventoryMedicationFK) => {
+        let drug = inventorymedication.find(
+          (medication) => medication.id === inventoryMedicationFK,
+        )
+        if (!drug) return
+        drug.inventoryMedication_DrugAllergy.forEach(allergy => {
+          var drugAllergy = patientAllergy.find(a => a.type === 'Allergy' && a.allergyFK === allergy.drugAllergyFK)
+          if (drugAllergy) {
+            allergys.push({
+              drugName: drug.displayValue,
+              allergyName: drugAllergy.allergyName,
+              allergyType: 'Drug',
+              allergyReaction: drugAllergy.allergyReaction,
+              onsetDate: drugAllergy.onsetDate,
+              id: inventoryMedicationFK,
+            })
+          }
+        })
+        drug.inventoryMedication_MedicationIngredient.forEach(ingredient => {
+          var drugIngredient = patientAllergy.find(a => a.type === 'Ingredient' && a.ingredientFK === ingredient.medicationIngredientFK)
+          allergys.push({
+            drugName: drug.displayValue,
+            allergyName: drugIngredient.allergyName,
+            allergyType: 'Ingredient',
+            allergyReaction: drugIngredient.allergyReaction,
+            onsetDate: drugIngredient.onsetDate,
+            id: inventoryMedicationFK,
+          })
+        })
+      }
       if (op && op.medicationPackageItem) {
         rows = rows.concat(
           op.medicationPackageItem.map((o) => {
+            if (o.caution && o.caution.trim() !== '' &&
+              !cautions.find((f) => f.type === 'Medication' && f.id === o.inventoryMedicationFK)) {
+              cautions.push({
+                type: 'Medication',
+                subject: o.medicationName,
+                caution: o.caution,
+                id: o.inventoryMedicationFK,
+              })
+            }
+
+            if (!allergys.find(
+              (f) => f.id === o.inventoryMedicationFK,
+            )) {
+              insertAllergys(o.inventoryMedicationFK)
+            }
+            const medication = inventorymedication.find(
+              (item) => item.id === o.inventoryMedicationFK,
+            )
             return {
               ...o,
               name: o.medicationName,
@@ -676,6 +775,7 @@ class Package extends PureComponent {
               isActive: o.isActive === true,
               caution: o.caution,
               subject: o.medicationName,
+              isExclusive: medication.isExclusive
             }
           }),
         )
@@ -683,6 +783,15 @@ class Package extends PureComponent {
       if (op && op.vaccinationPackageItem) {
         rows = rows.concat(
           op.vaccinationPackageItem.map((o) => {
+            if (o.caution && o.caution.trim() !== '' &&
+              !cautions.find((c) => c.type === 'Vaccination' && c.id === o.inventoryVaccinationFK)) {
+              cautions.push({
+                type: 'Vaccination',
+                subject: o.vaccinationName,
+                caution: o.caution,
+                id: o.inventoryVaccinationFK,
+              })
+            }
             return {
               ...o,
               name: o.vaccinationName,
@@ -701,13 +810,21 @@ class Package extends PureComponent {
       if (op && op.servicePackageItem) {
         rows = rows.concat(
           op.servicePackageItem.map((o) => {
+            const service = ctservice.find(
+              (item) => item.id === o.serviceCenterServiceFK,
+            )
+            let typeName = 'Service'
+            if (service.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER
+              || service.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE) { typeName = "Lab" }
+            else if (service.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER
+              || service.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE) { typeName = 'Radiology' }
             return {
               ...o,
               name: o.serviceName,
               uid: getUniqueId(),
               type: '3',
               typeName:
-                orderTypes.find((type) => type.value === '3').name +
+                typeName +
                 (o.isActive ? '' : ' (Inactive)'),
               isActive: o.isActive === true,
             }
@@ -742,11 +859,8 @@ class Package extends PureComponent {
         expiryDate: untilDate,
       })
 
-      const hasCautionItems = rows.filter(
-        (f) => f.caution && f.caution.trim().length > 0,
-      )
-      if (hasCautionItems.length > 0) {
-        openCautionAlertPrompt(hasCautionItems, () => { })
+      if (cautions.length || allergys.length) {
+        openCautionAlertPrompt(cautions, allergys, [], () => { })
       }
     }
 

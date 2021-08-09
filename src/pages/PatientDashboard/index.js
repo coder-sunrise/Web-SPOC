@@ -1,5 +1,6 @@
 import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'dva'
+import { history } from 'umi'
 import { withStyles } from '@material-ui/core'
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 import { findGetParameter } from '@/utils/utils'
@@ -141,7 +142,6 @@ class PatientDashboard extends PureComponent {
     const {
       patientDashboard,
       global,
-      history,
       visitRegistration,
       patient: { entity: patientProfile },
     } = resetProps

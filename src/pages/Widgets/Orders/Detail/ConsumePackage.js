@@ -11,6 +11,8 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { DoctorProfileSelect, DoctorLabel } from '@/components/_medisys'
+import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
+import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
 
 const getNextSequence = (props) => {
   const { orders: { rows } } = props
@@ -46,21 +48,24 @@ const getType = (typeId) => {
   return type
 }
 
-@connect(({ codetable }) => ({
+@connect(({ codetable, visitRegistration, patient }) => ({
   codetable,
+  visitRegistration,
+  patient
 }))
 @withFormikExtend({
   mapPropsToValues: ({ consultation }) => consultation.entity,
-  handleSubmit: (values, {props}) => {
-    const { dispatch, onConfirm, user, codetable } = props
+  handleSubmit: (values, { props }) => {
+    const { dispatch, onConfirm, user, codetable, visitRegistration, patient } = props
     const { pendingPackage } = values
     const {
       inventorymedication = [],
       inventoryvaccination = [],
       inventoryconsumable = [],
       ctservice = []
-    } = codetable  
-
+    } = codetable
+    const { weightKG } = visitRegistration.entity.visit
+    const { dob } = patient.entity
     let datas = []
     const updateRows = () => {
       dispatch({
@@ -71,20 +76,20 @@ const getType = (typeId) => {
       })
     }
 
-    const getInstruction = (medication) => {
+    const getInstruction = (medication, matchInstruction) => {
       let instruction = ''
       const usageMethod = medication.medicationUsage
       instruction += `${usageMethod ? usageMethod.name : ''} `
-      const dosage = medication.prescribingDosage
+      const dosage = matchInstruction?.prescribingDosage
       instruction += `${dosage ? dosage.name : ''} `
       const prescribe = medication.prescribingUOM
       instruction += `${prescribe ? prescribe.name : ''} `
-      const drugFrequency = medication.medicationFrequency
+      const drugFrequency = matchInstruction?.medicationFrequency
       instruction += `${drugFrequency ? drugFrequency.name : ''}`
-      const itemDuration = medication.duration
-          ? ` For ${medication.duration} day(s)`
-          : ''
-          instruction += itemDuration
+      const itemDuration = matchInstruction?.duration
+        ? ` For ${matchInstruction.duration} day(s)`
+        : ''
+      instruction += itemDuration
       return instruction
     }
 
@@ -93,16 +98,22 @@ const getType = (typeId) => {
         (item) =>
           item.id === packageItem.inventoryMedicationFK,
       )
-    
+      const { medicationInstructionRule = [] } = medication
+      let age
+      if (dob) {
+        age = Math.floor(moment.duration(moment().diff(dob)).asYears())
+      }
+      var matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weightKG))
+
       let item
       if (medication.isActive === true) {
         const medicationdispensingUOM = medication.dispensingUOM
         const medicationusage = medication.medicationUsage
-        const medicationfrequency = medication.medicationFrequency
-        const medicationdosage = medication.prescribingDosage
+        const medicationfrequency = matchInstruction?.medicationFrequency
+        const medicationdosage = matchInstruction?.medicationFrequency
         const medicationprescribingUOM = medication.prescribingUOM
         const medicationPrecautions =
-        medication.inventoryMedication_MedicationPrecaution
+          medication.inventoryMedication_MedicationPrecaution
         const isDefaultBatchNo = medication.medicationStock.find(
           (o) => o.isDefault === true,
         )
@@ -117,7 +128,7 @@ const getType = (typeId) => {
             }
           }),
         )
-    
+
         item = {
           isActive: medication.isActive,
           inventoryMedicationFK: medication.id,
@@ -132,13 +143,13 @@ const getType = (typeId) => {
           adjValue: 0,
           isClaimable: true,
           totalAfterItemAdjustment: 0,
-          totalAfterOverallAdjustment: 0,          
+          totalAfterOverallAdjustment: 0,
           expiryDate: isDefaultBatchNo
             ? isDefaultBatchNo.expiryDate
             : undefined,
           batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
           isExternalPrescription: false,
-          instruction: getInstruction(medication),
+          instruction: getInstruction(medication, matchInstruction),
           dispenseUOMFK: medication.dispensingUOM.id,
           dispenseUOMCode: medicationdispensingUOM
             ? medicationdispensingUOM.code
@@ -156,7 +167,7 @@ const getType = (typeId) => {
               usageMethodDisplayValue: medicationusage
                 ? medicationusage.name
                 : undefined,
-              dosageFK: medication.prescribingDosage.id,
+              dosageFK: medicationdosage ? medicationdosage.id : undefined,
               dosageCode: medicationdosage ? medicationdosage.code : undefined,
               dosageDisplayValue: medicationdosage
                 ? medicationdosage.name
@@ -175,7 +186,7 @@ const getType = (typeId) => {
               drugFrequencyDisplayValue: medicationfrequency
                 ? medicationfrequency.name
                 : undefined,
-              duration: medication.duration,
+              duration: matchInstruction?.duration,
               stepdose: 'AND',
               sequence: 0,
             },
@@ -190,6 +201,7 @@ const getType = (typeId) => {
           packageGlobalId: packageItem.packageGlobalId,
           isDispensedByPharmacy: medication.isDispensedByPharmacy,
           isNurseActualizeRequired: medication.isNurseActualizable,
+          isExclusive: medication.isExclusive,
         }
       }
       return item
@@ -283,7 +295,7 @@ const getType = (typeId) => {
           defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
           packageConsumeQuantity: packageItem.consumeQuantity,
           remainingQuantity: packageItem.remainingQuantity,
-          performingUserFK: packageItem.performingUserFK,   
+          performingUserFK: packageItem.performingUserFK,
           packageGlobalId: packageItem.packageGlobalId,
           isNurseActualizeRequired: service.isNurseActualizable,
           serviceCenterCategoryFK: service.serviceCenterCategoryFK
@@ -339,7 +351,7 @@ const getType = (typeId) => {
 
       return item
     }
-    
+
     const getItemFromPackage = (packageItem) => {
       let item
       if (packageItem.invoiceItemTypeFK === 1) {
@@ -354,7 +366,7 @@ const getType = (typeId) => {
       if (packageItem.invoiceItemTypeFK === 4) {
         item = getServiceCenterServiceFromPackage(packageItem)
       }
-      
+
       return item
     }
 
@@ -366,8 +378,10 @@ const getType = (typeId) => {
         if (newOrder) {
           let type = pendingPackage[index].type
           if (pendingPackage[index].type === '3') {
-            if (newOrder.serviceCenterCategoryFK === 3) { type = '9' }
-            else if (newOrder.serviceCenterCategoryFK === 4) { type = '10' }
+            if (newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER
+              || newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE) { type = '9' }
+            else if (newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER
+              || newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE) { type = '10' }
           }
           const data = {
             isOrderedByDoctor:
@@ -407,12 +421,12 @@ class ConsumePackage extends Component {
       disabled: true,
       render: (row) => {
         let texts = []
-  
+
         texts = [
           row.itemName,
           row.isActive ? '' : '(Inactive)',
         ].join(' ')
-  
+
         return (
           <div>
             {texts}
@@ -468,6 +482,17 @@ class ConsumePackage extends Component {
 
   constructor (props) {
     super(props)
+    const { dispatch } = props
+    const codeTableNameArray = [
+      'ctmedicationfrequency',
+      'ctmedicationdosage',
+    ]
+    dispatch({
+      type: 'codetable/batchFetch',
+      payload: {
+        codes: codeTableNameArray,
+      },
+    })
 
     const newColumnExtensions = this.gridColumnExtensions.map((column) => {
       if (column.columnName === 'consumeQuantity') {
@@ -499,7 +524,7 @@ class ConsumePackage extends Component {
           },
         }
       }
-      
+
       return { ...column }
     })
 
@@ -523,12 +548,12 @@ class ConsumePackage extends Component {
         (distinct, data) =>
           distinct.includes(data.patientPackageFK.toString())
             ? [
-                ...distinct,
-              ]
+              ...distinct,
+            ]
             : [
-                ...distinct,
-                data.patientPackageFK.toString(),
-              ],
+              ...distinct,
+              data.patientPackageFK.toString(),
+            ],
         [],
       )
 
@@ -540,7 +565,7 @@ class ConsumePackage extends Component {
 
   render () {
     const { footer, values, setFieldValue, theme } = this.props
-    const {pendingPackage} = values
+    const { pendingPackage } = values
 
     const pendingPackageSchema = Yup.object().shape({
       consumeQuantity: Yup.number().required()
@@ -571,7 +596,7 @@ class ConsumePackage extends Component {
         expandedGroups: e,
       })
     }
-    
+
     const packageGroupCellContent = ({ row }) => {
       if (row.value === undefined || row.value === '')
         return null
@@ -591,18 +616,18 @@ class ConsumePackage extends Component {
           <strong>
             {label}
             <NumberInput text currency value={data[0].packageTotalPrice} />
-            )              
+            )
           </strong>
           <span style={{ marginLeft: theme.spacing(5) }}>
             {expiryDateLabel}
-          </span>      
+          </span>
         </span>
       )
     }
 
     return (
       <CardContainer hideHeader>
-        <div>          
+        <div>
           <EditableTableGrid
             size='sm'
             forceRender
@@ -634,9 +659,9 @@ class ConsumePackage extends Component {
           />
         </div>
         {footer && footer({
-            onConfirm: this.props.handleSubmit,
-            confirmBtnText: 'Confirm',
-          })}
+          onConfirm: this.props.handleSubmit,
+          confirmBtnText: 'Confirm',
+        })}
       </CardContainer>
     )
   }

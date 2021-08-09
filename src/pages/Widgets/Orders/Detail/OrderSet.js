@@ -14,6 +14,7 @@ import {
   Field,
   NumberInput,
   notification,
+  Tooltip
 } from '@/components'
 import Yup from '@/utils/yup'
 import { getUniqueId } from '@/utils/utils'
@@ -24,6 +25,8 @@ import {
   ReplaceCertificateTeplate,
 } from '@/pages/Widgets/Orders/utils'
 import Authorized from '@/utils/Authorized'
+import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
+import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
 import { getClinicianProfile } from '../../ConsultationDocument/utils'
 
 @connect(
@@ -58,7 +61,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
   handleSubmit: (values, { props, onConfirm, setValues, resetForm }) => {
     const {
       dispatch,
-      orders,
+      orders = {},
       codetable,
       getNextSequence,
       user,
@@ -66,6 +69,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       patient,
       consultationDocument: { rows = [] },
     } = props
+    const { corVitalSign = [] } = orders
     const {
       ctmedicationusage,
       ctmedicationunitofmeasurement,
@@ -93,35 +97,45 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
     const visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK)
       .clinicianProfile.userProfileFK
 
-    const getInstruction = inventoryMedication => {
+    const getInstruction = (inventoryMedication, matchInstruction) => {
       let instruction = ''
       const usageMethod = ctmedicationusage.find(
         codeTableItem =>
           codeTableItem.id === inventoryMedication.medicationUsageFK,
       )
       instruction += `${usageMethod ? usageMethod.name : ''} `
-      const dosage = ctmedicationdosage.find(
-        codeTableItem =>
-          codeTableItem.id === inventoryMedication.prescribingDosageFK,
-      )
-      instruction += `${dosage ? dosage.displayValue : ''} `
+      const dosage = matchInstruction?.prescribingDosage
+      instruction += `${dosage ? dosage.name : ''} `
       const prescribe = ctmedicationunitofmeasurement.find(
         codeTableItem =>
           codeTableItem.id === inventoryMedication.prescribingUOMFK,
       )
       instruction += `${prescribe ? prescribe.name : ''} `
-      const drugFrequency = ctmedicationfrequency.find(
-        codeTableItem =>
-          codeTableItem.id === inventoryMedication.medicationFrequencyFK,
-      )
-      instruction += `${drugFrequency ? drugFrequency.displayValue : ''} For `
-      instruction += `${inventoryMedication.duration ? inventoryMedication.duration : ''
+      const drugFrequency = matchInstruction?.medicationFrequency
+      instruction += `${drugFrequency ? drugFrequency.name : ''} For `
+      instruction += `${matchInstruction?.duration ? matchInstruction.duration : ''
         } day(s)`
       return instruction
     }
 
     const getOrderMedicationFromOrderSet = (orderSetCode, orderSetItem) => {
       const { inventoryMedication } = orderSetItem
+      const { medicationInstructionRule = [] } = inventoryMedication
+
+      let weightKG
+      const activeVitalSign = corVitalSign.find(vs => !vs.isDeleted)
+      if (activeVitalSign) {
+        weightKG = activeVitalSign.weightKG
+      }
+      else {
+        weightKG = visitRegistration.entity.visit.weightKG
+      }
+
+      let age
+      if (dob) {
+        age = Math.floor(moment.duration(moment().diff(dob)).asYears())
+      }
+      var matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weightKG))
 
       let item
       if (inventoryMedication.isActive === true) {
@@ -131,13 +145,8 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
         const medicationusage = ctmedicationusage.find(
           usage => usage.id === inventoryMedication.medicationUsageFK,
         )
-        const medicationfrequency = ctmedicationfrequency.find(
-          frequency =>
-            frequency.id === inventoryMedication.medicationFrequencyFK,
-        )
-        const medicationdosage = ctmedicationdosage.find(
-          dosage => dosage.id === inventoryMedication.prescribingDosageFK,
-        )
+        const medicationfrequency = matchInstruction?.medicationFrequency
+        const medicationdosage = matchInstruction?.medicationFrequency
         const medicationprescribingUOM = ctmedicationunitofmeasurement.find(
           uom => uom.id === inventoryMedication.prescribingUOMFK,
         )
@@ -181,7 +190,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
             : undefined,
           batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
           isExternalPrescription: false,
-          instruction: getInstruction(inventoryMedication),
+          instruction: getInstruction(inventoryMedication, matchInstruction),
           dispenseUOMFK: inventoryMedication.dispensingUOMFK,
           dispenseUOMCode: medicationdispensingUOM
             ? medicationdispensingUOM.code
@@ -200,10 +209,10 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
               usageMethodDisplayValue: medicationusage
                 ? medicationusage.name
                 : undefined,
-              dosageFK: inventoryMedication.prescribingDosageFK,
+              dosageFK: medicationdosage ? medicationdosage.id : undefined,
               dosageCode: medicationdosage ? medicationdosage.code : undefined,
               dosageDisplayValue: medicationdosage
-                ? medicationdosage.displayValue
+                ? medicationdosage.name
                 : undefined,
               prescribeUOMFK: inventoryMedication.prescribingUOMFK,
               prescribeUOMCode: medicationprescribingUOM
@@ -212,14 +221,14 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
               prescribeUOMDisplayValue: medicationprescribingUOM
                 ? medicationprescribingUOM.name
                 : undefined,
-              drugFrequencyFK: inventoryMedication.medicationFrequencyFK,
+              drugFrequencyFK: medicationfrequency ? medicationfrequency.id : undefined,
               drugFrequencyCode: medicationfrequency
                 ? medicationfrequency.code
                 : undefined,
               drugFrequencyDisplayValue: medicationfrequency
-                ? medicationfrequency.displayValue
+                ? medicationfrequency.name
                 : undefined,
-              duration: inventoryMedication.duration,
+              duration: matchInstruction?.duration,
               stepdose: 'AND',
               sequence: 0,
             },
@@ -228,6 +237,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           packageGlobalId: '',
           isDispensedByPharmacy: inventoryMedication.isDispensedByPharmacy,
           isNurseActualizeRequired: inventoryMedication.isNurseActualizable,
+          isExclusive: inventoryMedication.isExclusive,
         }
       }
       return item
@@ -292,7 +302,6 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           isNurseActualizeRequired: inventoryVaccination.isNurseActualizable,
         }
       }
-      console.log('item', item)
       let newCORVaccinationCert = []
       if (item.isGenerateCertificate) {
         const { documenttemplate = [] } = codetable
@@ -356,7 +365,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           performingUserFK: visitDoctorUserId,
           packageGlobalId: '',
           isNurseActualizeRequired: service.isNurseActualizable,
-          serviceCenterCategoryFK: service.serviceCenterCategoryFK
+          serviceCenterCategoryFK: serviceCenter.serviceCenterCategoryFK
         }
       }
       return item
@@ -429,8 +438,10 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       if (newOrder) {
         let type = orderSetItems[index].type
         if (orderSetItems[index].type === '3') {
-          if (newOrder.serviceCenterCategoryFK === 3) { type = '9' }
-          else if (newOrder.serviceCenterCategoryFK === 4) { type = '10' }
+          if (newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER
+            || newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE) { type = '9' }
+          else if (newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER
+            || newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE) { type = '10' }
         }
         const data = {
           isOrderedByDoctor:
@@ -467,7 +478,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
 class OrderSet extends PureComponent {
   constructor (props) {
     super(props)
-    const { dispatch } = props
+    const { dispatch, classes } = props
     const codeTableNameArray = [
       'ctmedicationusage',
       'ctmedicationunitofmeasurement',
@@ -495,10 +506,31 @@ class OrderSet extends PureComponent {
         {
           columnName: 'typeName',
           render: row => {
-            if (row.isActive === true) {
-              return <CustomInput text value={row.typeName} />
-            }
-            return <CustomInput text inActive value={row.typeName} />
+            return <div style={{ position: 'relative' }}>
+              <div style={{
+                wordWrap: 'break-word',
+                whiteSpace: 'pre-wrap',
+                paddingRight: row.isExclusive ? 24 : 0
+              }}>
+                <Tooltip title={row.typeName}>
+                  <span >{row.typeName}</span>
+                </Tooltip>
+                <div style={{ position: 'relative', top: 2 }}>
+                  {row.isExclusive && (
+                    <Tooltip title='Exclusive'>
+                      <div
+                        className={classes.rightIcon}
+                        style={{
+                          right: -30,
+                          borderRadius: 4,
+                          backgroundColor: 'green',
+                        }}
+                      >Excl.</div>
+                    </Tooltip>
+                  )}
+                </div>
+              </div>
+            </div>
           },
         },
         {
@@ -546,11 +578,62 @@ class OrderSet extends PureComponent {
     }
 
     this.changeOrderSet = (v, op) => {
-      const { setValues, values, orderTypes } = this.props
+      const { setValues, values, orderTypes, codetable, patient } = this.props
+      const { inventorymedication = [] } = codetable
+      const { entity = {} } = patient
+      const { patientAllergy = [] } = entity
       let rows = []
+      let cautions = []
+      let allergys = []
+      const insertAllergys = (inventoryMedicationFK) => {
+        let drug = inventorymedication.find(
+          (medication) => medication.id === inventoryMedicationFK,
+        )
+        if (!drug) return
+        drug.inventoryMedication_DrugAllergy.forEach(allergy => {
+          var drugAllergy = patientAllergy.find(a => a.type === 'Allergy' && a.allergyFK === allergy.drugAllergyFK)
+          if (drugAllergy) {
+            allergys.push({
+              drugName: drug.displayValue,
+              allergyName: drugAllergy.allergyName,
+              allergyType: 'Drug',
+              allergyReaction: drugAllergy.allergyReaction,
+              onsetDate: drugAllergy.onsetDate,
+              id: inventoryMedicationFK,
+            })
+          }
+        })
+        drug.inventoryMedication_MedicationIngredient.forEach(ingredient => {
+          var drugIngredient = patientAllergy.find(a => a.type === 'Ingredient' && a.ingredientFK === ingredient.medicationIngredientFK)
+          allergys.push({
+            drugName: drug.displayValue,
+            allergyName: drugIngredient.allergyName,
+            allergyType: 'Ingredient',
+            allergyReaction: drugIngredient.allergyReaction,
+            onsetDate: drugIngredient.onsetDate,
+            id: inventoryMedicationFK,
+          })
+        })
+      }
+
       if (op && op.medicationOrderSetItem) {
         rows = rows.concat(
           op.medicationOrderSetItem.map(o => {
+            if (o.caution && o.caution.trim() !== '' &&
+              !cautions.find((f) => f.type === 'Medication' && f.id === o.inventoryMedicationFK)) {
+              cautions.push({
+                type: 'Medication',
+                subject: o.medicationName,
+                caution: o.caution,
+                id: o.inventoryMedicationFK,
+              })
+            }
+
+            if (!allergys.find(
+              (f) => f.id === o.inventoryMedicationFK,
+            )) {
+              insertAllergys(o.inventoryMedicationFK)
+            }
             return {
               ...o,
               name: o.medicationName,
@@ -562,6 +645,7 @@ class OrderSet extends PureComponent {
               isActive: o.inventoryMedication.isActive === true,
               caution: o.inventoryMedication.caution,
               subject: o.medicationName,
+              isExclusive: o.inventoryMedication.isExclusive,
             }
           }),
         )
@@ -569,6 +653,15 @@ class OrderSet extends PureComponent {
       if (op && op.vaccinationOrderSetItem) {
         rows = rows.concat(
           op.vaccinationOrderSetItem.map(o => {
+            if (o.caution && o.caution.trim() !== '' &&
+              !cautions.find((c) => c.type === 'Vaccination' && c.id === o.inventoryVaccinationFK)) {
+              cautions.push({
+                type: 'Vaccination',
+                subject: o.vaccinationName,
+                caution: o.caution,
+                id: o.inventoryVaccinationFK,
+              })
+            }
             return {
               ...o,
               name: o.vaccinationName,
@@ -587,16 +680,23 @@ class OrderSet extends PureComponent {
       if (op && op.serviceOrderSetItem) {
         rows = rows.concat(
           op.serviceOrderSetItem.map(o => {
+            let typeName = 'Service'
+            const { service } = o
+            const serviceCenterService = service.ctServiceCenter_ServiceNavigation[0]
+            const serviceCenter = serviceCenterService.serviceCenterFKNavigation
+            if (serviceCenter.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER
+              || serviceCenter.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE) { typeName = "Lab" }
+            else if (serviceCenter.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER
+              || serviceCenter.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE) { typeName = 'Radiology' }
             return {
               ...o,
               name: o.serviceName,
               uid: getUniqueId(),
               type: '3',
               typeName:
-                orderTypes.find(type => type.value === '3').name +
-                (o.service.isActive &&
-                  o.service.ctServiceCenter_ServiceNavigation[0]
-                    .serviceCenterFKNavigation.isActive === true
+                typeName +
+                (service.isActive &&
+                  serviceCenter.isActive === true
                   ? ''
                   : ' (Inactive)'),
               isActive:
@@ -629,11 +729,8 @@ class OrderSet extends PureComponent {
         orderSetCode: op ? op.code : '',
       })
 
-      const hasCautionItems = rows.filter(
-        f => f.caution && f.caution.trim().length > 0,
-      )
-      if (hasCautionItems.length > 0) {
-        openCautionAlertPrompt(hasCautionItems, () => { })
+      if (cautions.length || allergys.length) {
+        openCautionAlertPrompt(cautions, allergys, [], () => { })
       }
     }
 

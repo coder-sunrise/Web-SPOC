@@ -1,7 +1,6 @@
 import React from 'react'
 import { CardContainer } from '@/components'
 import numeral from 'numeral'
-import { Tag } from 'antd'
 import { currencySymbol } from '@/utils/config'
 import moment from 'moment'
 import { Table } from 'antd'
@@ -39,9 +38,21 @@ export default ({ classes, current, fieldName = '' }) => {
         return (
           <div style={{ position: 'relative' }}>
             <div className={classes.wrapCellTextStyle}
-              style={{ paddingRight: row.isPreOrder ? 34 : 0 }}>
+              style={{ paddingRight: row.isPreOrder ? 24 : 0 }}>
               {row.description}
-              {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
+              <div style={{ position: 'relative', top: 2 }}>
+                {row.isPreOrder &&
+                  <Tooltip title='Pre-Order'>
+                    <div
+                    className={classes.rightIcon}
+                    style={{
+                        right: -30,
+                      borderRadius: 10,
+                        backgroundColor: '#4255bd',
+                      }}
+                    > Pre</div>
+                  </Tooltip>}
+              </div>
             </div>
           </div>
         )
