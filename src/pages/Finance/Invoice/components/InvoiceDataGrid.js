@@ -8,20 +8,21 @@ import {
   TableConfig,
 } from '../variables'
 
-const getColumns = (isEnableCHAS)=> {
+const getColumns = ({isEnableCHAS,isEnableMedisave})=> {
   return InvoiceGridColumns.filter(x=> {
     if(x.name === 'governmentOutstanding')
-      return isEnableCHAS
+      return isEnableCHAS || isEnableMedisave
     else
       return true
   })
 }
 
-const InvoiceDataGrid = ({ handleRowDoubleClick, height, isEnableCHAS }) => {
+const InvoiceDataGrid = ({ handleRowDoubleClick, height, clinicSettings }) => {
+  console.log('clinicSettings',clinicSettings)
   return (
     <CommonTableGrid
       type='invoiceList'
-      columns={getColumns(isEnableCHAS)}
+      columns={getColumns(clinicSettings)}
       columnExtensions={InvoiceGridColExtensions}
       onRowDoubleClick={handleRowDoubleClick}
       TableProps={{

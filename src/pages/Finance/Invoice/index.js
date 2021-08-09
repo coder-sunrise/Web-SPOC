@@ -34,7 +34,7 @@ class Invoice extends React.Component {
   }
 
   render () {
-    const { classes, mainDivHeight = 700, clinicSettings } = this.props
+    const { classes, mainDivHeight = 700 } = this.props
     let height =
       mainDivHeight -
       140 -
@@ -50,7 +50,6 @@ class Invoice extends React.Component {
           handleRowDoubleClick={this.onRowDoubleClick}
           {...this.props}
           height={height}
-          isEnableCHAS={clinicSettings.isEnableCHAS}
         />
         <div className='footerBar'>
           <p className={classes.footerNote}>
