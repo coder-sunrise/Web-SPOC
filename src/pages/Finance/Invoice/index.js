@@ -12,10 +12,11 @@ import InvoiceDataGrid from './components/InvoiceDataGrid'
 // styles
 import styles from './styles'
 
-@connect(({ invoiceList, global }) => ({
+@connect(({ invoiceList, global, clinicSettings }) => ({
   invoiceList,
   global,
   mainDivHeight: global.mainDivHeight,
+  clinicSettings: clinicSettings.settings
 }))
 class Invoice extends React.Component {
   componentDidMount () {
