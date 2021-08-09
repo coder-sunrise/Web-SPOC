@@ -20,10 +20,10 @@ const getRowId = row => row.id
 class InvoiceListing extends PureComponent {
   state = {
     columns: [
-      { name: 'invoiceNo', title: 'Invoice No' },
+      { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'patientName', title: 'Patient Name' },
-      { name: 'copayerPayableAmount', title: 'Total Payable Amt' },
+      { name: 'copayerPayableAmount', title: 'Total Payable Amt.' },
       { name: 'copayerOutstanding', title: 'Outstanding' },
       { name: 'payAmount', title: 'Payment', nonEditable: false },
     ],
