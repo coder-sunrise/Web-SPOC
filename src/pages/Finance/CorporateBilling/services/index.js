@@ -1,12 +1,21 @@
-import { stringify } from 'qs'
+import * as service from '@/services/common'
 import request from '@/utils/request'
 
-export async function queryList (params) {
-  const entities = await request(`/api/fake_list?${stringify(params)}`)
-  return {
-    data: {
-      entities,
-      filter: {},
-    },
-  }
+const url = '/api/CorporateBilling'
+const bizSessionUrl = '/api/bizSession'
+const coPayerInvoiceUrl = '/api/Invoice/CoPayerInvoices'
+
+const fns = {
+  queryList: params => service.queryList(url, params),
+  query: params => {
+    return service.query(url, params)
+  },
+
+  queryBizSession: params => service.queryList(bizSessionUrl, params),
+
+  queryCompany: params => service.query(`${url}`, params),
+
+  queryCoPayerInvoice: params => service.queryList(coPayerInvoiceUrl, params),
 }
+
+export default fns

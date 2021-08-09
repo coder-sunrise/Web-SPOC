@@ -405,12 +405,18 @@ const _routes = [
           //   // component: './Finance/CorporateBilling',
           // },
           {
-            path: '/finance/billing/:companyName',
+            path: '/finance/billing',
+            name: 'corporate-billing',
+            mini: 'CB',
+            component: './Finance/CorporateBilling',
+            authority: [ 'finance/corporatebilling' ],
+          },
+          {
+            path: '/finance/billing/details/:id',
             name: 'corporate-billing/detail',
             hideInMenu: true,
-            authority: ['finance/corporatebilling'],
-            // component:
-            //   './Finance/CorporateBilling/Detail/CorporateBillingDetail',
+            component: './Finance/CorporateBilling/Details',
+            authority: [ 'finance/corporatebilling' ],
           },
           {
             path: '/finance/deposit',

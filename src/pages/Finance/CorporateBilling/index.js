@@ -1,47 +1,52 @@
-import React, { PureComponent } from 'react'
-import { FormattedMessage, formatMessage } from 'umi'
+import React, { useState, useEffect } from 'react'
+import { compose } from 'redux'
+import { connect } from 'dva'
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core/styles'
-import Authorized from '@/utils/Authorized'
-
-import {
-  PageHeaderWrapper,
-  Card,
-  CardHeader,
-  CardIcon,
-  CardBody,
-} from '@/components'
+import { CardContainer } from '@/components'
 import FilterBar from './FilterBar'
 import CorporateBillingGrid from './CorporateBillingGrid'
 
-const styles = () => ({
-  header: {
-    marginTop: 0,
-    color: 'black',
-  },
-})
+const styles = () => ({})
+const CorporateBilling = ({
+  classes,
+  dispatch,
+  history,
+  corporateBilling,
+  mainDivHeight = 700,
+}) => {
 
-class CorporateBilling extends PureComponent {
-  render() {
-    const { classes } = this.props
-    return (
-      <PageHeaderWrapper
-        title={<FormattedMessage id='app.forms.basic.title' />}
-        content={<FormattedMessage id='app.forms.basic.description' />}
-      >
-        <Authorized authority='finance/corporatebilling'>
-          <Card>
-            <CardBody>
-              <h4 className={classes.cardIconTitle}>
-                {formatMessage({ id: 'finance.corporate-billing.title' })}
-              </h4>
-              <FilterBar />
-              <CorporateBillingGrid />
-            </CardBody>
-          </Card>
-        </Authorized>
-      </PageHeaderWrapper>
-    )
+  let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+  if (height < 300) height = 300
+
+  const onRowDoubleClick = (row) => {
+    history.push(`/finance/billing/details/${row.id}`)
   }
+
+  const props = {
+    classes,
+    dispatch,
+    history,
+    corporateBilling,
+    onRowDoubleClick,
+    gridHeight: height,
+  }
+
+  return (
+    <CardContainer hideHeader>
+      <div className='filterBar'>
+        <FilterBar {...props} />
+      </div>
+      <CorporateBillingGrid {...props}/>
+    </CardContainer>
+  )
 }
 
-export default withStyles(styles)(CorporateBilling)
+export default compose(
+  withStyles(styles),
+  React.memo,
+  connect(({ corporateBilling, global }) => ({
+    corporateBilling,
+    mainDivHeight: global.mainDivHeight,
+  })),
+)(CorporateBilling)

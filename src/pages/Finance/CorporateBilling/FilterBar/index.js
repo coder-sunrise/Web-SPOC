@@ -1,101 +1,114 @@
-import React, { PureComponent } from 'react'
-import { connect } from 'dva'
+import React from 'react'
 import { FastField, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi'
-import Replay from '@material-ui/icons/Replay'
-
+import Search from '@material-ui/icons/Search'
 import { withStyles } from '@material-ui/core'
-import { GridContainer, GridItem, Select, Button, Tooltip } from '@/components'
+import { standardRowHeight } from 'mui-pro-jss'
+import { compose } from 'redux'
+import {
+  GridContainer,
+  GridItem,
+  Button,
+  TextField,
+  CodeSelect,
+  Select,
+  ProgressButton,
+} from '@/components'
+import { osBalanceStatus, status } from '@/utils/codes'
+import Authorized from '@/utils/Authorized'
 
-const styles = {
+const styles = theme => ({
   filterBar: {
     marginBottom: '10px',
   },
   filterBtn: {
-    paddingTop: '13px',
+    lineHeight: standardRowHeight,
     textAlign: 'left',
+    '& > button': {
+      marginRight: theme.spacing.unit,
+    },
   },
-}
-
-@connect(({ corporateBilling }) => ({ corporateBilling }))
-@withFormik({
-  mapPropsToValues: () => {},
 })
-class FilterBar extends PureComponent {
-  handleRefresh = () => {
-    const { dispatch } = this.props
-    dispatch({
-      type: 'corporateBilling/fetchList',
-    })
-  }
 
-  render() {
-    const { classes } = this.props
-    return (
-      <div className={classes.filterBar}>
-        <GridContainer spacing={8}>
-          <GridItem xs sm={12} md={3}>
-            <FastField
-              name='ExpenseType'
-              render={args => {
-                return (
-                  <Select
-                    label={formatMessage({
-                      id: 'finance.corporate-billing.status',
-                    })}
-                    options={[
-                      { name: 'Chris', value: 'Chris' },
-                      { name: 'Patrik', value: 'Patrik' },
-                      { name: 'Teo Jiayan', value: 'Teo Jiayan' },
-                      { name: 'Jack', value: 'Jack' },
-                      { name: 'Jason', value: 'Jason' },
-                      { name: 'Dave', value: 'Dave' },
-                    ]}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs sm={12} md={3}>
-            <FastField
-              name='ExpenseType'
-              render={args => {
-                return (
-                  <Select
-                    label={formatMessage({
-                      id: 'finance.corporate-billing.outstandingBalance',
-                    })}
-                    options={[
-                      { name: 'Chris', value: 'Chris' },
-                      { name: 'Patrik', value: 'Patrik' },
-                      { name: 'Teo Jiayan', value: 'Teo Jiayan' },
-                      { name: 'Jack', value: 'Jack' },
-                      { name: 'Jason', value: 'Jason' },
-                      { name: 'Dave', value: 'Dave' },
-                    ]}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem>
-            <div className={classes.filterBtn}>
-              <Button
-                variant='contained'
-                color='primary'
-                onClick={this.handleRefresh}
-              >
-                <Replay />
-                <FormattedMessage id='form.refresh' />
-              </Button>
-            </div>
-          </GridItem>
-        </GridContainer>
-      </div>
-    )
-  }
+const FilterBar = ({ classes, handleSubmit }) => {
+  return (
+    <div className={classes.filterBar}>
+      <GridContainer>
+        <GridItem xs={4} md={3} style={{ position: 'relative' }}>
+          <FastField
+            name='copayerFK'
+            render={args => {
+              return (
+                <CodeSelect
+                  {...args}
+                  label='Company'
+                  code='ctCopayer'
+                  labelField='displayValue'
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem xs={4} md={3}>
+          <FastField
+            name='outstandingBalanceStatus'
+            render={args => {
+              return (
+                <Select
+                  label='O/S Balance'
+                  options={osBalanceStatus}
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem xs={4} md={3}>
+          <FastField
+            name='isActive'
+            render={args => {
+              return <Select label='Status' {...args} options={status} />
+            }}
+          />
+        </GridItem>
+        <GridItem xs={12}>
+          <div className={classes.filterBtn}>
+            <ProgressButton
+              icon={<Search />}
+              variant='contained'
+              color='primary'
+              onClick={handleSubmit}
+            >
+              <FormattedMessage id='form.search' />
+            </ProgressButton>
+          </div>
+        </GridItem>
+      </GridContainer>
+    </div>
+  )
 }
 
-export default withStyles(styles)(FilterBar)
+export default compose(
+  withStyles(styles, { withTheme: true }),
+  withFormik({
+    mapPropsToValues: () => ({
+      copayerFK: 'All Company',
+    }),
+    handleSubmit:(values, { props}) => {
+
+      const { copayerFK, isActive, outstandingBalanceStatus } = values
+
+      props.dispatch({
+        type: 'corporateBilling/query',
+        payload: {
+          id: typeof copayerFK === 'number' ? copayerFK : undefined,
+          isActive,
+          apiCriteria: {
+            outstandingBalanceStatus: outstandingBalanceStatus === 'all' ? undefined : outstandingBalanceStatus,
+          }
+        },
+      })
+    },
+  }),
+  React.memo,
+)(FilterBar)
