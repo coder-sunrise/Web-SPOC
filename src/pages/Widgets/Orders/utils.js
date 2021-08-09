@@ -154,7 +154,7 @@ const openCautionAlertPrompt = (cautionItems = [], allergyItems = [], vaccinatio
 }
 
 const openCautionAlertOnStartConsultation = (o) => {
-  const { corPrescriptionItem = [], corVaccinationItem = [], drugAllergys = [] } = o
+  const { corPrescriptionItem = [], corVaccinationItem = [], drugAllergies = [] } = o
   const drugItems = corPrescriptionItem
     .filter((i) => i.caution && i.caution.trim().length > 0)
     .map((m) => {
@@ -171,7 +171,7 @@ const openCautionAlertOnStartConsultation = (o) => {
   ]
 
   if (cautionItems.length) {
-    openCautionAlertPrompt(cautionItems, drugAllergys, [])
+    openCautionAlertPrompt(cautionItems, drugAllergies, [])
   }
 }
 
