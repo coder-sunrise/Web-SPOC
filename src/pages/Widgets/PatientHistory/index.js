@@ -220,7 +220,7 @@ class PatientHistory extends Component {
   }
 
   getCategoriesOptions = () => {
-    const { clinicInfo } = this.props
+    const { clinicInfo, clinicSettings } = this.props
     const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
     let categories = []
     if (clinicTypeFK === CLINIC_TYPE.GP) {
@@ -230,6 +230,16 @@ class PatientHistory extends Component {
     } else if (clinicTypeFK === CLINIC_TYPE.EYE) {
       categories = WidgetConfig.EyeCategory
     }
+
+    const { settings = {} } = clinicSettings
+    const { isEnableClinicNoteHistory = false,
+      isEnableClinicNoteChiefComplaints = false,
+      isEnableClinicNotes = false,
+      isEnableClinicNotePlan = false } = settings
+    categories = categories.filter(c => (c !== WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY || isEnableClinicNoteHistory)
+      && (c !== WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS || isEnableClinicNoteChiefComplaints)
+      && (c !== WidgetConfig.WIDGETS_ID.CLINICAL_NOTE || isEnableClinicNotes)
+      && (c !== WidgetConfig.WIDGETS_ID.PLAN || isEnableClinicNotePlan))
 
     return WidgetConfig.categoryTypes
       .filter(o => {
@@ -261,7 +271,7 @@ class PatientHistory extends Component {
       setFieldValue,
       values,
     } = this.props
-    const { settings = [] } = clinicSettings
+    const { settings = {} } = clinicSettings
     const { viewVisitPageSize = 10 } = settings
 
     let visitFromDate
@@ -1747,7 +1757,7 @@ class PatientHistory extends Component {
       currentHeight,
       isLoadingData,
     } = this.state
-    const { settings = [] } = clinicSettings
+    const { settings = {} } = clinicSettings
     const { viewVisitPageSize = 10 } = settings
     const moreData = totalVisits > pageIndex * viewVisitPageSize
     let otherHeight = 0

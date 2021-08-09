@@ -12,6 +12,7 @@ export const defaultConfigs = {
       cannedTextTypeFK: CANNED_TEXT_TYPE.HISTORY,
       index: 0,
       height: 390,
+      enableSetting: 'isEnableClinicNoteHistory'
     },
     {
       authority: 'queue.consultation.clinicalnotes.chiefcomplaints',
@@ -22,6 +23,8 @@ export const defaultConfigs = {
       scribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.CHIEFCOMPLAINTS,
       cannedTextTypeFK: CANNED_TEXT_TYPE.CHIEFCOMPLAINTS,
       index: 1,
+      height: 390,
+      enableSetting: 'isEnableClinicNoteChiefComplaints'
     },
     {
       authority: 'queue.consultation.clinicalnotes.clinicalnotes',
@@ -33,6 +36,7 @@ export const defaultConfigs = {
       cannedTextTypeFK: CANNED_TEXT_TYPE.NOTE,
       index: 2,
       height: 390,
+      enableSetting: 'isEnableClinicNotes'
     },
     {
       authority: 'queue.consultation.clinicalnotes.plan',
@@ -43,6 +47,8 @@ export const defaultConfigs = {
       scribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.PLAN,
       cannedTextTypeFK: CANNED_TEXT_TYPE.PLAN,
       index: 3,
+      height: 390,
+      enableSetting: 'isEnableClinicNotePlan'
     },
   ],
 }

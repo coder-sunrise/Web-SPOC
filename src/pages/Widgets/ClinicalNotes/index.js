@@ -65,6 +65,7 @@ const styles = theme => ({
     consultation,
     visitRegistration,
     loading,
+    clinicSettings
   }) => ({
     clinicInfo,
     clinicalnotes,
@@ -72,6 +73,7 @@ const styles = theme => ({
     consultation,
     visitRegistration,
     loading,
+    clinicSettings: clinicSettings.settings || clinicSettings.default,
   }),
 )
 class ClinicalNotes extends Component {
@@ -81,7 +83,8 @@ class ClinicalNotes extends Component {
 
   constructor(props) {
     super(props)
-    const config = getConfig()
+    const { clinicSettings } = props
+    const config = getConfig(clinicSettings)
     const contents = getContent(config)
     this.state = {
       showCannedText: false,

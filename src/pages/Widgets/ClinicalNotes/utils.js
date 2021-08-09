@@ -2,10 +2,10 @@ import { CLINIC_TYPE } from '@/utils/constants'
 // import defaultConfigs, { dentalConfigs } from './config'
 import { defaultConfigs } from './config'
 
-export const getConfig = () => {
+export const getConfig = (clinicSettings = {}) => {
   return {
     ...defaultConfigs,
-    fields: defaultConfigs.fields.filter(note => note.category === 'Note')
+    fields: defaultConfigs.fields.filter(note => clinicSettings[note.enableSetting] === true)
   }
 }
 
