@@ -74,7 +74,7 @@ class Grid extends PureComponent {
             width: 100,
             render: (row) => {
               return (
-                <Tooltip title='Edit Medication Contra-Indication' placement='bottom'>
+                <Tooltip title='Edit Medication Contraindication' placement='bottom'>
                   <Button
                     size='sm'
                     onClick={() => {

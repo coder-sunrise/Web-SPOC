@@ -7,7 +7,7 @@ export default createListViewModel({
   namespace: 'settingMedicationContraIndication',
   config: {
     codetable: {
-      message: 'Medication Contra-Indication updated',
+      message: 'Medication Contraindication updated',
       code: 'ctmedicationcontraindication',
     },
   },

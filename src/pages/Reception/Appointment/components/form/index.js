@@ -1053,7 +1053,7 @@ class Form extends React.PureComponent {
         type: 'global/updateAppState',
         payload: {
           openConfirm: true,
-          openConfirmText: 'ok',
+          openConfirmText: 'OK',
           openConfirmContent: `Check Recurrence will remove all Pre-Order.`,
           onConfirmSave: () => {
             setFieldValue("currentAppointment.appointmentPreOrderItem", [])

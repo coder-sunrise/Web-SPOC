@@ -305,7 +305,7 @@ export const menuData = [
   {
     authority: 'settings.clinicsetting.medicationcontraindication',
     title: 'Clinic Setting',
-    text: 'Medication Contra-Indication',
+    text: 'Medication Contraindication',
     url: '/setting/medicationcontraindication',
   },
   {
@@ -323,7 +323,7 @@ export const menuData = [
   {
     authority: 'settings.clinicsetting.genericmedication',
     title: 'Clinic Setting',
-    text: 'Generic Medication',
+    text: 'Generic Drug',
     url: '/setting/genericmedication',
   },
   {
