@@ -455,13 +455,7 @@ export default ({
       size='sm'
       style={{ margin: 0 }}
       forceRender
-      rows={(rows || []).map(r => {
-        return {
-          ...r,
-          totalAfterItemAdjustment:
-            r.isPreOrder && !r.isChargeToday ? 0 : r.totalAfterItemAdjustment,
-        }
-      })}
+      rows={(rows || [])}
       onRowDoubleClick={editRow}
       getRowId={r => r.uid}
       columns={[
@@ -815,6 +809,13 @@ export default ({
           columnName: 'totalAfterItemAdjustment',
           type: 'currency',
           width: 100,
+          render: (row) => {
+            let showAmount = row.totalAfterItemAdjustment || 0
+            if (row.isPreOrder && !row.isChargeToday)
+              showAmount = 0
+
+            return <span style={{ fontWeight: 500, color: 'darkblue' }}>{`${currencySymbol}${numeral(showAmount).format(currencyFormat)}`}</span>
+          }
         },
         {
           columnName: 'quantity',

@@ -14,6 +14,7 @@ import {
   serverDateTimeFormatFull,
   notification,
   DatePicker,
+  Tooltip
 } from '@/components'
 import Yup from '@/utils/yup'
 import { getUniqueId, getUniqueGUID, roundTo } from '@/utils/utils'
@@ -23,6 +24,7 @@ import {
 } from '@/pages/Widgets/Orders/utils'
 import { DURATION_UNIT } from '@/utils/constants'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
+import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
 import { getClinicianProfile } from '../../ConsultationDocument/utils'
 
 @connect(
@@ -477,8 +479,10 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       if (newOrder) {
         let type = packageItems[index].type
         if (packageItems[index].type === '3') {
-          if (newOrder.serviceCenterCategoryFK === 3) { type = '9' }
-          else if (newOrder.serviceCenterCategoryFK === 4) { type = '10' }
+          if (newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER
+            || newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE) { type = '9' }
+          else if (newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER
+            || newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE) { type = '10' }
         }
         const data = {
           isOrderedByDoctor:
@@ -532,7 +536,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
 class Package extends PureComponent {
   constructor (props) {
     super(props)
-    const { dispatch } = props
+    const { dispatch, classes } = props
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
@@ -605,6 +609,33 @@ class Package extends PureComponent {
           type: 'text',
           sortingEnabled: false,
           disabled: true,
+          render: row => {
+            return <div style={{ position: 'relative' }}>
+              <div style={{
+                wordWrap: 'break-word',
+                whiteSpace: 'pre-wrap',
+                paddingRight: row.isExclusive ? 24 : 0
+              }}>
+                <Tooltip title={row.typeName}>
+                  <span >{row.typeName}</span>
+                </Tooltip>
+                <div style={{ position: 'relative', top: 2 }}>
+                  {row.isExclusive && (
+                    <Tooltip title='Exclusive'>
+                      <div
+                        className={classes.rightIcon}
+                        style={{
+                          right: -30,
+                          borderRadius: 4,
+                          backgroundColor: 'green',
+                        }}
+                      >Excl.</div>
+                    </Tooltip>
+                  )}
+                </div>
+              </div>
+            </div>
+          },
         },
         {
           columnName: 'name',
@@ -676,7 +707,7 @@ class Package extends PureComponent {
 
     this.changePackage = (v, op) => {
       const { setValues, values, orderTypes, codetable, patient } = this.props
-      const { inventorymedication = [] } = codetable
+      const { inventorymedication = [], ctservice = [] } = codetable
       const { entity = {} } = patient
       const { patientAllergy = [] } = entity
       let rows = []
@@ -730,6 +761,9 @@ class Package extends PureComponent {
             )) {
               insertAllergys(o.inventoryMedicationFK)
             }
+            const medication = inventorymedication.find(
+              (item) => item.id === o.inventoryMedicationFK,
+            )
             return {
               ...o,
               name: o.medicationName,
@@ -741,6 +775,7 @@ class Package extends PureComponent {
               isActive: o.isActive === true,
               caution: o.caution,
               subject: o.medicationName,
+              isExclusive: medication.isExclusive
             }
           }),
         )
@@ -775,13 +810,21 @@ class Package extends PureComponent {
       if (op && op.servicePackageItem) {
         rows = rows.concat(
           op.servicePackageItem.map((o) => {
+            const service = ctservice.find(
+              (item) => item.id === o.serviceCenterServiceFK,
+            )
+            let typeName = 'Service'
+            if (service.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER
+              || service.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE) { typeName = "Lab" }
+            else if (service.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER
+              || service.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE) { typeName = 'Radiology' }
             return {
               ...o,
               name: o.serviceName,
               uid: getUniqueId(),
               type: '3',
               typeName:
-                orderTypes.find((type) => type.value === '3').name +
+                typeName +
                 (o.isActive ? '' : ' (Inactive)'),
               isActive: o.isActive === true,
             }

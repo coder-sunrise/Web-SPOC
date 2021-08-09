@@ -12,6 +12,7 @@ import {
 import Yup from '@/utils/yup'
 import { DoctorProfileSelect, DoctorLabel } from '@/components/_medisys'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
+import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
 
 const getNextSequence = (props) => {
   const { orders: { rows } } = props
@@ -377,8 +378,10 @@ const getType = (typeId) => {
         if (newOrder) {
           let type = pendingPackage[index].type
           if (pendingPackage[index].type === '3') {
-            if (newOrder.serviceCenterCategoryFK === 3) { type = '9' }
-            else if (newOrder.serviceCenterCategoryFK === 4) { type = '10' }
+            if (newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER
+              || newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE) { type = '9' }
+            else if (newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER
+              || newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE) { type = '10' }
           }
           const data = {
             isOrderedByDoctor:

@@ -14,6 +14,7 @@ import {
   Field,
   NumberInput,
   notification,
+  Tooltip
 } from '@/components'
 import Yup from '@/utils/yup'
 import { getUniqueId } from '@/utils/utils'
@@ -25,6 +26,7 @@ import {
 } from '@/pages/Widgets/Orders/utils'
 import Authorized from '@/utils/Authorized'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
+import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
 import { getClinicianProfile } from '../../ConsultationDocument/utils'
 
 @connect(
@@ -363,7 +365,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           performingUserFK: visitDoctorUserId,
           packageGlobalId: '',
           isNurseActualizeRequired: service.isNurseActualizable,
-          serviceCenterCategoryFK: service.serviceCenterCategoryFK
+          serviceCenterCategoryFK: serviceCenter.serviceCenterCategoryFK
         }
       }
       return item
@@ -436,8 +438,10 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       if (newOrder) {
         let type = orderSetItems[index].type
         if (orderSetItems[index].type === '3') {
-          if (newOrder.serviceCenterCategoryFK === 3) { type = '9' }
-          else if (newOrder.serviceCenterCategoryFK === 4) { type = '10' }
+          if (newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER
+            || newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE) { type = '9' }
+          else if (newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER
+            || newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE) { type = '10' }
         }
         const data = {
           isOrderedByDoctor:
@@ -474,7 +478,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
 class OrderSet extends PureComponent {
   constructor (props) {
     super(props)
-    const { dispatch } = props
+    const { dispatch, classes } = props
     const codeTableNameArray = [
       'ctmedicationusage',
       'ctmedicationunitofmeasurement',
@@ -502,10 +506,31 @@ class OrderSet extends PureComponent {
         {
           columnName: 'typeName',
           render: row => {
-            if (row.isActive === true) {
-              return <CustomInput text value={row.typeName} />
-            }
-            return <CustomInput text inActive value={row.typeName} />
+            return <div style={{ position: 'relative' }}>
+              <div style={{
+                wordWrap: 'break-word',
+                whiteSpace: 'pre-wrap',
+                paddingRight: row.isExclusive ? 24 : 0
+              }}>
+                <Tooltip title={row.typeName}>
+                  <span >{row.typeName}</span>
+                </Tooltip>
+                <div style={{ position: 'relative', top: 2 }}>
+                  {row.isExclusive && (
+                    <Tooltip title='Exclusive'>
+                      <div
+                        className={classes.rightIcon}
+                        style={{
+                          right: -30,
+                          borderRadius: 4,
+                          backgroundColor: 'green',
+                        }}
+                      >Excl.</div>
+                    </Tooltip>
+                  )}
+                </div>
+              </div>
+            </div>
           },
         },
         {
@@ -620,6 +645,7 @@ class OrderSet extends PureComponent {
               isActive: o.inventoryMedication.isActive === true,
               caution: o.inventoryMedication.caution,
               subject: o.medicationName,
+              isExclusive: o.inventoryMedication.isExclusive,
             }
           }),
         )
@@ -654,16 +680,23 @@ class OrderSet extends PureComponent {
       if (op && op.serviceOrderSetItem) {
         rows = rows.concat(
           op.serviceOrderSetItem.map(o => {
+            let typeName = 'Service'
+            const { service } = o
+            const serviceCenterService = service.ctServiceCenter_ServiceNavigation[0]
+            const serviceCenter = serviceCenterService.serviceCenterFKNavigation
+            if (serviceCenter.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER
+              || serviceCenter.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE) { typeName = "Lab" }
+            else if (serviceCenter.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER
+              || serviceCenter.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE) { typeName = 'Radiology' }
             return {
               ...o,
               name: o.serviceName,
               uid: getUniqueId(),
               type: '3',
               typeName:
-                orderTypes.find(type => type.value === '3').name +
-                (o.service.isActive &&
-                  o.service.ctServiceCenter_ServiceNavigation[0]
-                    .serviceCenterFKNavigation.isActive === true
+                typeName +
+                (service.isActive &&
+                  serviceCenter.isActive === true
                   ? ''
                   : ' (Inactive)'),
               isActive:
