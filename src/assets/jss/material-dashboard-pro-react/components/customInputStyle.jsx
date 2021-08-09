@@ -49,6 +49,7 @@ const customInputStyle = {
     },
   },
   text: {
+    width:'100% !important',
     // color: 'transparent',
     color: 'inherit',
 
@@ -65,10 +66,12 @@ const customInputStyle = {
     },
   },
   textInput: {
+    width:'100%',
     color: 'currentColor',
     cursor: 'initial !important',
     fontSize: 'inherit',
     '& > div': {
+      width:'100%',
       '& > p': {
         minHeight: 24,
         display: 'inline-block',
