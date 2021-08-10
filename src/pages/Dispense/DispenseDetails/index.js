@@ -798,7 +798,7 @@ const DispenseDetails = ({
       >
         <NurseActualization
           status={actualizationStatus}
-          nurseWorkitemIds={selectedActualizeRows.map(x => x.workitem?.nurseWorkitem?.id).join(',')}
+          nurseWorkitemIds={selectedActualizeRows.map(x => x.workitem?.nurseWorkitem?.id).filter(x=>x).join(',')}
           dispatch={dispatch}
           handleSubmit={()=>{
             onNurseActualizationClose()

@@ -1895,7 +1895,7 @@ class PatientHistory extends Component {
           onClose={this.closeActualizationHistory}
         >
           <NurseActualization
-            nurseWorkitemIds={this.state.currentOrders.map(x => x.nurseWorkitemFK).join(',')}
+            nurseWorkitemIds={this.state.currentOrders.map(x => x.nurseWorkitemFK).filter(x=>x).join(',')}
             dispatch={this.props.dispatch}
             onClose={this.closeActualizationHistory}
           />
