@@ -691,7 +691,7 @@ export default compose(
     codetable,
     clinicSettings,
     servingPersons: dispense.servingPersons,
-    visit: visitRegistration.entity.visit,
+    visit: visitRegistration?.entity?.visit || {},
     doctorprofile: codetable.doctorprofile || [],
     patient: patient.entity || {},
   })),
