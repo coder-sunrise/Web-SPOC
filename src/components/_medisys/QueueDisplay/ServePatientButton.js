@@ -24,7 +24,7 @@ const ServePatientButton = ({
       payload: {
         openConfirm: true,
         openConfirmTitle: 'Patient Serving',
-        openConfirmContent: `Are you sure to serve patient ${patientName} ?`,
+        openConfirmContent: `Are you sure to serve patient ${patientName}?`,
         onConfirmSave: () => {
           if(onConfirm)
             onConfirm()

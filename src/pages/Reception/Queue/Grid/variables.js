@@ -47,6 +47,12 @@ const compareQueueNo = (a, b) => {
   return floatA < floatB ? -1 : 1
 }
 
+const mapServingPersonsString = (servingByList) => servingByList && servingByList.map(o=> o.servingBy).join(', ')
+
+const compareServingPerson = (a, b) => {
+  return compareString(mapServingPersonsString(a), mapServingPersonsString(b))
+}
+
 export const FuncConfig = {
   pager: false,
   sort: true,
@@ -150,7 +156,7 @@ export const QueueTableConfig = {
     { name: 'queueNo', title: 'Q. No.' },
     { name: 'visitGroup', title: 'Group No.' },
     { name: 'consReady', title: 'Cons. Ready', fullTitle: 'Ready for Consultation' },
-    { name: 'servingBy', title: 'Serving By' },
+    { name: 'servingByList', title: 'Serving By' },
     { name: 'patientReferenceNo', title: 'Ref. No.' },
     { name: 'patientName', title: 'Patient Name' },
     { name: 'orderCreateTime', title: 'Order Created Time' },
@@ -340,10 +346,11 @@ export const QueueColumnExtensions = [
     width: 180,
   },
   {
-    columnName: 'servingBy',
+    columnName: 'servingByList',
+    compare: compareServingPerson,
     width: 130,
     render: (row) => {
-      const servingPersons = row.servingByList && row.servingByList.map(o=> o.servingBy).join(', ')
+      const servingPersons = mapServingPersonsString(row.servingByList)
       return (
         <Fragment>
           <div
@@ -353,7 +360,9 @@ export const QueueColumnExtensions = [
               alignItems: 'left',
             }}
           >
-            <span style={{overflow:'hidden',textOverflow:'ellipsis'}}>{servingPersons}</span>
+            <Tooltip title={servingPersons}>
+              <span style={{overflow:'hidden',textOverflow:'ellipsis'}}>{servingPersons}</span>
+            </Tooltip>
             <div>
               {row.visitFK && (
                 <Authorized authority='queue.servepatient'>
