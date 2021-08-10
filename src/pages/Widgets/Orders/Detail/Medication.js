@@ -6,7 +6,7 @@ import Delete from '@material-ui/icons/Delete'
 import { formatMessage } from 'umi'
 import { isNumber } from 'util'
 import { Alert } from 'antd'
-import { VISIT_TYPE } from '@/utils/constants'
+import { VISIT_TYPE, CANNED_TEXT_TYPE } from '@/utils/constants'
 import {
   Button,
   GridContainer,
@@ -32,11 +32,10 @@ import Yup from '@/utils/yup'
 import { calculateAdjustAmount, getUniqueId } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
 import Authorized from '@/utils/Authorized'
-import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
+import { GetOrderItemAccessRight, getDrugAllergy } from '@/pages/Widgets/Orders/utils'
 import { DoctorProfileSelect } from '@/components/_medisys'
 import moment from 'moment'
 import CannedTextButton from '@/pages/Widgets/Orders/Detail/CannedTextButton'
-import { CANNED_TEXT_TYPE } from '@/utils/constants'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
@@ -73,32 +72,10 @@ const showCautions = (
       (medication) => medication.id === inventoryMedicationFK,
     )
     if (!drug) return
-    drug.inventoryMedication_DrugAllergy.forEach(allergy => {
-      var drugAllergy = patientAllergy.find(a => a.type === 'Allergy' && a.allergyFK === allergy.drugAllergyFK)
-      if (drugAllergy) {
-        allergys.push({
-          drugName: drug.displayValue,
-          allergyName: drugAllergy.allergyName,
-          allergyType: 'Drug',
-          allergyReaction: drugAllergy.allergyReaction,
-          onsetDate: drugAllergy.onsetDate,
-          id: inventoryMedicationFK,
-        })
-      }
-    })
-    drug.inventoryMedication_MedicationIngredient.forEach(ingredient => {
-      var drugIngredient = patientAllergy.find(a => a.type === 'Ingredient' && a.ingredientFK === ingredient.medicationIngredientFK)
-      if (drugIngredient) {
-        allergys.push({
-          drugName: drug.displayValue,
-          allergyName: drugIngredient.allergyName,
-          allergyType: 'Ingredient',
-          allergyReaction: drugIngredient.allergyReaction,
-          onsetDate: drugIngredient.onsetDate,
-          id: inventoryMedicationFK,
-        })
-      }
-    })
+    const newAllergys = getDrugAllergy(drug, patientAllergy)
+    if (newAllergys.length) {
+      allergys = [...allergys, ...newAllergys]
+    }
   }
 
   if (isDrugMixture) {
@@ -1224,10 +1201,10 @@ class Medication extends PureComponent {
   renderMedication = (option) => {
     const { combinDisplayValue = '', medicationGroup = {}, stock = 0, dispensingUOM = {}, isExclusive } = option
     const { name: uomName = '' } = dispensingUOM
-    return <div style={{ marginTop: 5, }} >
-      <div style={{ width: 330, display: 'inline-block', }}>
+    return <div style={{ height: 22 }} >
+      <div style={{ width: 320, display: 'inline-block', }}>
         <div style={{
-          maxWidth: isExclusive ? 290 : 330, display: 'inline-block',
+          maxWidth: isExclusive ? 280 : 320, display: 'inline-block',
           whiteSpace: 'nowrap',
           textOverflow: 'ellipsis',
           overflow: 'hidden',

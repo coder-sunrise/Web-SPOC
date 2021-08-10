@@ -632,3 +632,14 @@ export const NURSE_WORKITEM_STATUS = {
   ACTUALIZED: 2,
   CANCCELED: 3,
 }
+
+export const ALLERGY_TYPE = {
+  DRUGALLERGY: 'Drug',
+  DRUGINGREDIENTALLERGY: 'Ingredient',
+}
+
+export const PATIENT_ALLERGY_TYPE = {
+  ALLERGY: 'Allergy',
+  INGREDIENT: 'Ingredient',
+  NONALLERGY: 'NonAllergy'
+}

@@ -330,7 +330,7 @@ class Detail extends PureComponent {
 
   renderMedication = (option) => {
     const { combinDisplayValue = '', medicationGroup = {} } = option
-    return <div style={{ marginTop: 5, }} >
+    return <div style={{ height: 22 }} >
       <div style={{
         width: 340, display: 'inline-block',
         whiteSpace: 'nowrap',

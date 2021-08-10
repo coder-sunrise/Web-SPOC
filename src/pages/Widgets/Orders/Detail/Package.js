@@ -22,9 +22,8 @@ import {
   openCautionAlertPrompt,
   ReplaceCertificateTeplate,
 } from '@/pages/Widgets/Orders/utils'
-import { DURATION_UNIT } from '@/utils/constants'
-import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
-import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
+import { DURATION_UNIT, SERVICE_CENTER_CATEGORY, } from '@/utils/constants'
+import { isMatchInstructionRule, getDrugAllergy } from '@/pages/Widgets/Orders/utils'
 import { getClinicianProfile } from '../../ConsultationDocument/utils'
 
 @connect(
@@ -718,32 +717,10 @@ class Package extends PureComponent {
           (medication) => medication.id === inventoryMedicationFK,
         )
         if (!drug) return
-        drug.inventoryMedication_DrugAllergy.forEach(allergy => {
-          var drugAllergy = patientAllergy.find(a => a.type === 'Allergy' && a.allergyFK === allergy.drugAllergyFK)
-          if (drugAllergy) {
-            allergys.push({
-              drugName: drug.displayValue,
-              allergyName: drugAllergy.allergyName,
-              allergyType: 'Drug',
-              allergyReaction: drugAllergy.allergyReaction,
-              onsetDate: drugAllergy.onsetDate,
-              id: inventoryMedicationFK,
-            })
-          }
-        })
-        drug.inventoryMedication_MedicationIngredient.forEach(ingredient => {
-          var drugIngredient = patientAllergy.find(a => a.type === 'Ingredient' && a.ingredientFK === ingredient.medicationIngredientFK)
-          if (drugIngredient) {
-            allergys.push({
-            drugName: drug.displayValue,
-            allergyName: drugIngredient.allergyName,
-            allergyType: 'Ingredient',
-            allergyReaction: drugIngredient.allergyReaction,
-            onsetDate: drugIngredient.onsetDate,
-            id: inventoryMedicationFK,
-          })
-          }
-        })
+        const newAllergys = getDrugAllergy(drug, patientAllergy)
+        if (newAllergys.length) {
+          allergys = [...allergys, ...newAllergys]
+        }
       }
       if (op && op.medicationPackageItem) {
         rows = rows.concat(

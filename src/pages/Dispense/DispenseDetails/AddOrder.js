@@ -18,6 +18,7 @@ import { roundTo, getUniqueId } from '@/utils/utils'
 import {
   getRetailCautionAlertContent,
   getCautionAlertContent,
+  getDrugAllergy
 } from '@/pages/Widgets/Orders/utils'
 import Order from '../../Widgets/Orders'
 
@@ -61,32 +62,10 @@ const AddOrder = ({
           (medication) => medication.id === inventoryMedicationFK,
         )
         if (!drug) return
-        drug.inventoryMedication_DrugAllergy.forEach(allergy => {
-          var drugAllergy = patientAllergy.find(a => a.type === 'Allergy' && a.allergyFK === allergy.drugAllergyFK)
-          if (drugAllergy) {
-            allergys.push({
-              drugName: drug.displayValue,
-              allergyName: drugAllergy.allergyName,
-              allergyType: 'Drug',
-              allergyReaction: drugAllergy.allergyReaction,
-              onsetDate: drugAllergy.onsetDate,
-              id: inventoryMedicationFK,
-            })
-          }
-        })
-        drug.inventoryMedication_MedicationIngredient.forEach(ingredient => {
-          var drugIngredient = patientAllergy.find(a => a.type === 'Ingredient' && a.ingredientFK === ingredient.medicationIngredientFK)
-          if (drugIngredient) {
-          allergys.push({
-            drugName: drug.displayValue,
-            allergyName: drugIngredient.allergyName,
-            allergyType: 'Ingredient',
-            allergyReaction: drugIngredient.allergyReaction,
-            onsetDate: drugIngredient.onsetDate,
-            id: inventoryMedicationFK,
-          })
-          }
-        })
+        const newAllergys = getDrugAllergy(drug, patientAllergy)
+        if (newAllergys.length) {
+          allergys = [...allergys, ...newAllergys]
+        }
       }
 
       const mapRetailItemPropertyToOrderProperty = o => {
