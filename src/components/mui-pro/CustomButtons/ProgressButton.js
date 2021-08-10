@@ -61,7 +61,7 @@ class ProgressButton extends React.PureComponent {
         )}
 
         {!rest.justIcon && (
-          <span style={{ marginLeft: icon === null ? 'inherit' : 8 }}>
+          <span style={{ marginLeft: icon === null ? 'inherit' : 0 }}>
             {children || text}
           </span>
         )}
