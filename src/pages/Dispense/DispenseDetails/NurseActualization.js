@@ -22,7 +22,6 @@ const localDateTime = value => {
         .format(dateTimeFormat)
     : '-'
 }
-const renderRemarks = value => value && value.trim() !== '' ? value : '-'
 
 const detailsColumns = [
   { name: 'type', title: 'Type' },
@@ -47,12 +46,12 @@ const colDetailsExtensions = [
   { columnName: 'qty', width: 80, align: 'right', render: r=> `${r.qty}${(r.uom && r.uom.trim() !== '' ? ` ${r.uom}` : '')}` },
   { columnName: 'orderBy', width: 130 },
   { columnName: 'orderDate', width: 140, render: r => localDateTime(r.orderDate) },
-  { columnName: 'instruction', render: r => renderRemarks(r.instructions) },
-  { columnName: 'accessionNo', width:100, render: r => renderRemarks(r.accessionNo)  },
-  { columnName: 'orderRemarks', render: r => renderRemarks(r.orderRemarks) },
+  { columnName: 'instruction' },
+  { columnName: 'accessionNo'  },
+  { columnName: 'orderRemarks' },
   { columnName: 'actulizeByUser', width: 130 },
   { columnName: 'actulizeDate', width: 140, render: r => localDateTime(r.actulizeDate) },
-  { columnName: 'actulizeRemarks', render: r => renderRemarks(r.actulizeRemarks) },
+  { columnName: 'actulizeRemarks' },
 ]
 
 const historyColumns = [
@@ -78,15 +77,15 @@ const historyColumnExtensions = [
   { columnName: 'qty', width: 80, align: 'right', render: r=> `${r.qty}${(r.uom && r.uom.trim() !== '' ? ` ${r.uom}` : '')}`},
   { columnName: 'orderBy', width: 130 },
   { columnName: 'orderDate', width: 140, render: r => localDateTime(r.orderDate) },
-  { columnName: 'instructions', render: r => renderRemarks(r.instructions)  },
-  { columnName: 'accessionNo', width:100, render: r => renderRemarks(r.accessionNo)  },
-  { columnName: 'orderRemarks', render: r => renderRemarks(r.orderRemarks) },
+  { columnName: 'instructions' },
+  { columnName: 'accessionNo', width:100 },
+  { columnName: 'orderRemarks' },
   { columnName: 'actualizeByUser', width: 130 },
   { columnName: 'actualizeDate', width: 140, render: r => localDateTime(r.actualizeDate) },
-  { columnName: 'actualizeRemarks', render: r => renderRemarks(r.actualizeRemarks) },
-  { columnName: 'cancelByUser', width: 130, render: r => renderRemarks(r.cancelByUser) },
+  { columnName: 'actualizeRemarks' },
+  { columnName: 'cancelByUser', width: 130},
   { columnName: 'cancelDate', width: 140, render: r => localDateTime(r.cancelDate) },
-  { columnName: 'cancelReasons', render: r => renderRemarks(r.cancelReasons) },
+  { columnName: 'cancelReasons' },
 ]
 
 class NurseActualization extends React.PureComponent {
