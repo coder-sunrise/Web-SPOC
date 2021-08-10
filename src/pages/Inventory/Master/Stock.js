@@ -198,7 +198,7 @@ const Stock = ({
                 size='sm'
                 onClick={() => handleDeleteStock(row)}
                 justIcon
-                color='primary'
+                color='danger'
                 disabled={row.isDeleted}
               >
                 <Delete />
