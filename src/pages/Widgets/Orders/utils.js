@@ -176,7 +176,13 @@ const openCautionAlertOnStartConsultation = (o) => {
   ]
 
   if (cautionItems.length) {
-    openCautionAlertPrompt(cautionItems, drugAllergies, [])
+    console.log('drugAllergies', drugAllergies)
+    openCautionAlertPrompt(cautionItems, drugAllergies.map(allergy => {
+      return {
+        ...allergy,
+        allergyType: allergy.allergyType === PATIENT_ALLERGY_TYPE.ALLERGY ? ALLERGY_TYPE.DRUGALLERGY : ALLERGY_TYPE.DRUGINGREDIENTALLERGY
+      }
+    }), [])
   }
 }
 
