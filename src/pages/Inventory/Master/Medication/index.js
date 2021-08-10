@@ -10,7 +10,6 @@ import Grid from '../Grid'
 const styles = () => ({})
 
 const Medication = ({ dispatch, history, medication, values }) => {
-  // console.log('medication', medication)
   const [tableParas, setTableParas] = useState({
     columns: [
       { name: 'code', title: 'Code' },
