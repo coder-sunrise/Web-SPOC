@@ -16,6 +16,7 @@ export default createListViewModel({
           {
             precaution: '',
             sequence: 0,
+            uid: getUniqueId()
           },
         ],
         prescriptionSetItemInstruction: [
@@ -23,6 +24,7 @@ export default createListViewModel({
             sequence: 0,
             stepdose: 'AND',
             unitPrice: 0,
+            uid: getUniqueId()
           },
         ],
         prescriptionSetItemDrugMixture: [],

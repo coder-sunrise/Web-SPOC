@@ -29,7 +29,7 @@ import {
   Switch,
 } from '@/components'
 import Yup from '@/utils/yup'
-import { calculateAdjustAmount } from '@/utils/utils'
+import { calculateAdjustAmount, getUniqueId } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
 import Authorized from '@/utils/Authorized'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
@@ -88,14 +88,16 @@ const showCautions = (
     })
     drug.inventoryMedication_MedicationIngredient.forEach(ingredient => {
       var drugIngredient = patientAllergy.find(a => a.type === 'Ingredient' && a.ingredientFK === ingredient.medicationIngredientFK)
-      allergys.push({
-        drugName: drug.displayValue,
-        allergyName: drugIngredient.allergyName,
-        allergyType: 'Ingredient',
-        allergyReaction: drugIngredient.allergyReaction,
-        onsetDate: drugIngredient.onsetDate,
-        id: inventoryMedicationFK,
-      })
+      if (drugIngredient) {
+        allergys.push({
+          drugName: drug.displayValue,
+          allergyName: drugIngredient.allergyName,
+          allergyType: 'Ingredient',
+          allergyReaction: drugIngredient.allergyReaction,
+          onsetDate: drugIngredient.onsetDate,
+          id: inventoryMedicationFK,
+        })
+      }
     })
   }
 
@@ -220,6 +222,7 @@ const getVisitDoctorUserId = props => {
       return {
         ...precaution,
         sequence,
+        uid: precaution.uid || getUniqueId()
       }
     })
 
@@ -241,6 +244,12 @@ const getVisitDoctorUserId = props => {
     )
     return {
       ...v,
+      corPrescriptionItemInstruction: v.corPrescriptionItemInstruction.map(i => {
+        return {
+          ...i,
+          uid: i.uid || getUniqueId()
+        }
+      }),
       corPrescriptionItemPrecaution:
         newCorPrescriptionItemPrecaution.length > 0
           ? newCorPrescriptionItemPrecaution
@@ -301,7 +310,6 @@ const getVisitDoctorUserId = props => {
       },
     ),
     performingUserFK: Yup.number().required(),
-    expiryDate: Yup.date().min(moment(), 'EXPIRED!'),
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
@@ -358,12 +366,6 @@ const getVisitDoctorUserId = props => {
     activeInstruction.forEach((item, index) => {
       item.sequence = index + 1
     })
-    let { batchNo } = values
-    if (batchNo instanceof Array) {
-      if (batchNo && batchNo.length > 0) {
-        batchNo = batchNo[0]
-      }
-    }
 
     if (values.corPrescriptionItemDrugMixture) {
       const activeDrugMixtureItems = values.corPrescriptionItemDrugMixture.filter(
@@ -384,7 +386,6 @@ const getVisitDoctorUserId = props => {
       instruction,
       subject: currentType.getSubject({ ...values }),
       isDeleted: false,
-      batchNo,
       adjValue:
         values.adjAmount < 0
           ? -Math.abs(values.adjValue)
@@ -417,8 +418,6 @@ const getVisitDoctorUserId = props => {
 })
 class Medication extends PureComponent {
   state = {
-    batchNo: '',
-    expiryDate: '',
     showAddFromPastModal: false,
     showAddFromPrescriptionSetModal: false,
   }
@@ -633,16 +632,6 @@ class Medication extends PureComponent {
     setFieldValue('isDispensedByPharmacy', op.isDispensedByPharmacy)
     setFieldValue('isNurseActualizeRequired', op.isNurseActualizable)
     setFieldValue('isExclusive', op.isExclusive)
-
-    let defaultBatch
-    if (op.medicationStock) {
-      defaultBatch = op.medicationStock.find(o => o.isDefault === true)
-      if (defaultBatch)
-        this.setState({
-          batchNo: defaultBatch.batchNo,
-          expiryDate: defaultBatch.expiryDate,
-        })
-    }
     setFieldValue('costPrice', op.averageCostPrice || 0)
     const {
       corPrescriptionItemInstruction = [],
@@ -652,6 +641,7 @@ class Medication extends PureComponent {
     let defaultInstruction = {
       sequence: 0,
       stepdose: 'AND',
+      uid: getUniqueId()
     }
 
     let matchInstruction
@@ -722,17 +712,6 @@ class Medication extends PureComponent {
       : [defaultInstruction]
 
     setFieldValue('corPrescriptionItemInstruction', newPrescriptionInstruction)
-
-    if (
-      values.isExternalPrescription === undefined ||
-      values.isExternalPrescription === false
-    ) {
-      setFieldValue('batchNo', defaultBatch ? defaultBatch.batchNo : undefined)
-      setFieldValue(
-        'expiryDate',
-        defaultBatch ? defaultBatch.expiryDate : undefined,
-      )
-    }
     setFieldValue('isActive', op.isActive)
     setFieldValue('selectedMedication', op)
 
@@ -759,6 +738,7 @@ class Medication extends PureComponent {
       const defaultPrecaution = {
         precaution: '',
         sequence: 0,
+        uid: getUniqueId()
       }
       const newPrescriptionPrecaution = isEdit
         ? [
@@ -807,7 +787,6 @@ class Medication extends PureComponent {
           patient,
         )
       }
-      this.onExpiryDateChange()
     }
   }
 
@@ -955,21 +934,6 @@ class Medication extends PureComponent {
     return false
   }
 
-  getMixtureItemBatchStock = row => {
-    let batchNoOptions = []
-
-    const { codetable } = this.props
-    const { inventorymedication = [] } = codetable
-    const currentItem = inventorymedication.find(
-      o => o.id === row.inventoryMedicationFK,
-    )
-    if (currentItem) {
-      batchNoOptions = currentItem.medicationStock
-    }
-
-    return batchNoOptions
-  }
-
   handleDrugMixtureItemOnChange = (e, a) => {
     const { option, row } = e
     const { values, setFieldValue, visitRegistration, patient, corVitalSign = [], codetable } = this.props
@@ -1034,37 +998,11 @@ class Medication extends PureComponent {
     row.revenueCategoryFK = option.revenueCategory.id
     row.isDispensedByPharmacy = option.isDispensedByPharmacy
     row.isNurseActualizeRequired = option.isNurseActualizable
-
-    const defaultBatch = this.getMixtureItemBatchStock(row).find(
-      batch => batch.isDefault,
-    )
-    if (defaultBatch) {
-      row.batchNo = defaultBatch.batchNo
-      row.batchNoId = defaultBatch.id
-      row.expiryDate = defaultBatch.expiryDate
-    }
-    this.onExpiryDateChange()
   }
 
   handleDrugMixtureItemQuantityOnChange = e => {
     const { row } = e
     row.totalPrice = row.unitPrice * row.quantity
-  }
-
-  handleMixtureItemSelectedBatch = e => {
-    const { option, row, val } = e
-
-    if (option.length > 0) {
-      const { expiryDate, id, batchNo } = option[0]
-      row.batchNo = batchNo
-      row.expiryDate = expiryDate
-      row.batchNoId = id
-    } else {
-      row.batchNo = val[0]
-      row.batchNoId = undefined
-      row.expiryDate = undefined
-    }
-    this.onExpiryDateChange()
   }
 
   checkIsDrugMixtureItemUnique = ({ rows, changed }) => {
@@ -1207,8 +1145,6 @@ class Medication extends PureComponent {
         { name: 'quantity', title: 'Quantity' },
         { name: 'uomfk', title: 'UOM' },
         { name: 'totalPrice', title: 'Total' },
-        { name: 'batchNo', title: 'Batch No.' },
-        { name: 'expiryDate', title: 'Expiry Date' },
       ],
       columnExtensions: [
         {
@@ -1240,7 +1176,7 @@ class Medication extends PureComponent {
         },
         {
           columnName: 'quantity',
-          width: 70,
+          width: 100,
           type: 'number',
           format: '0.0',
           sortingEnabled: false,
@@ -1251,7 +1187,7 @@ class Medication extends PureComponent {
         },
         {
           columnName: 'uomfk',
-          width: 70,
+          width: 100,
           type: 'codeSelect',
           code: 'ctMedicationUnitOfMeasurement',
           labelField: 'name',
@@ -1260,51 +1196,14 @@ class Medication extends PureComponent {
         },
         {
           columnName: 'totalPrice',
-          width: 95,
+          width: 100,
           type: 'number',
           currency: true,
           sortingEnabled: false,
           isDisabled: row => row.inventoryMedicationFK === undefined,
         },
-        {
-          columnName: 'batchNo',
-          type: 'select',
-          width: 115,
-          sortingEnabled: false,
-          mode: 'tags',
-          maxSelected: 1,
-          labelField: 'batchNo',
-          valueField: 'batchNo',
-          disableAll: true,
-          options: this.getMixtureItemBatchStock,
-          onChange: e => {
-            this.handleMixtureItemSelectedBatch(e)
-          },
-          render: row => {
-            return <TextField text value={row.batchNo} />
-          },
-          isDisabled: row => row.inventoryMedicationFK === undefined,
-        },
-        {
-          columnName: 'expiryDate',
-          type: 'date',
-          width: 110,
-          sortingEnabled: false,
-          isDisabled: row => row.inventoryMedicationFK === undefined,
-        },
       ],
     }
-  }
-
-  onExpiryDateChange = async () => {
-    window.setTimeout(async () => {
-      const { handleSubmit, validateForm } = this.props
-      const validateResult = await validateForm()
-      const isFormValid = _.isEmpty(validateResult)
-      if (!isFormValid) {
-        handleSubmit()
-      }
-    }, 300)
   }
 
   filterMedicationOptions = (input = '', option) => {
@@ -1419,7 +1318,7 @@ class Medication extends PureComponent {
                       >
                         <CodeSelect
                           temp
-                          label='Medication Name'
+                          label='Medication Name, Drug Group'
                           labelField='combinDisplayValue'
                           onChange={this.changeMedication}
                           options={this.getMedicationOptions()}
@@ -1634,7 +1533,10 @@ class Medication extends PureComponent {
                     return activeRows.map((val, activeIndex) => {
                       if (val && val.isDeleted) return null
                       const i = values.corPrescriptionItemInstruction.findIndex(
-                        item => _.isEqual(item, val),
+                        item =>
+                          val.id
+                            ? item.id === val.id
+                            : val.uid === item.uid,
                       )
 
                       return (
@@ -1837,6 +1739,7 @@ class Medication extends PureComponent {
                                   {
                                     stepdose: 'AND',
                                     sequence: activeRows.length + 1,
+                                    uid: getUniqueId()
                                   },
                                 )}
                               </div>
@@ -1890,7 +1793,7 @@ class Medication extends PureComponent {
                         cor =>
                           val.id
                             ? cor.id === val.id
-                            : val.sequence === cor.sequence,
+                            : val.uid === cor.uid,
                       )
 
                       return (
@@ -1946,6 +1849,7 @@ class Medication extends PureComponent {
                                           day: 1,
                                           precaution: '1',
                                           sequence: newMaxSeq,
+                                          uid: getUniqueId()
                                         },
                                       )}
                                     </div>
@@ -2154,20 +2058,10 @@ class Medication extends PureComponent {
                                     0,
                                   )
                                   this.props.setFieldValue('totalPrice', 0)
-                                  this.props.setFieldValue('expiryDate', undefined)
-                                  this.props.setFieldValue('batchNo', undefined)
                                   this.props.setFieldValue('isMinus', true)
                                   this.props.setFieldValue('isExactAmount', true)
                                   this.props.setFieldValue('adjValue', 0)
                                 } else {
-                                  this.props.setFieldValue(
-                                    'expiryDate',
-                                    this.state.expiryDate,
-                                  )
-                                  this.props.setFieldValue(
-                                    'batchNo',
-                                    this.state.batchNo,
-                                  )
                                   setTimeout(() => {
                                     this.calculateQuantity()
                                   }, 1)

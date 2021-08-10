@@ -76,6 +76,7 @@ const AddOrder = ({
         })
         drug.inventoryMedication_MedicationIngredient.forEach(ingredient => {
           var drugIngredient = patientAllergy.find(a => a.type === 'Ingredient' && a.ingredientFK === ingredient.medicationIngredientFK)
+          if (drugIngredient) {
           allergys.push({
             drugName: drug.displayValue,
             allergyName: drugIngredient.allergyName,
@@ -84,6 +85,7 @@ const AddOrder = ({
             onsetDate: drugIngredient.onsetDate,
             id: inventoryMedicationFK,
           })
+          }
         })
       }
 

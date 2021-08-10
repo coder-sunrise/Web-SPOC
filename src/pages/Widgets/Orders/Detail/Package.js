@@ -733,7 +733,8 @@ class Package extends PureComponent {
         })
         drug.inventoryMedication_MedicationIngredient.forEach(ingredient => {
           var drugIngredient = patientAllergy.find(a => a.type === 'Ingredient' && a.ingredientFK === ingredient.medicationIngredientFK)
-          allergys.push({
+          if (drugIngredient) {
+            allergys.push({
             drugName: drug.displayValue,
             allergyName: drugIngredient.allergyName,
             allergyType: 'Ingredient',
@@ -741,6 +742,7 @@ class Package extends PureComponent {
             onsetDate: drugIngredient.onsetDate,
             id: inventoryMedicationFK,
           })
+          }
         })
       }
       if (op && op.medicationPackageItem) {

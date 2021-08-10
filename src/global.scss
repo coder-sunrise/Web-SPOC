@@ -701,11 +701,7 @@ tr[class*='TableSelectRow-selected-'] {
 button[class^='MuiButton-root-'],
 button[class*='MuiButton-root-'] {
  text-transform: none !important;
-}
-
-button[class^='BasicComponent-contained-'],
-button[class*='BasicComponent-contained-'] {
-  span{
+ span{
     span{
       margin-left: 0px !important;
     }

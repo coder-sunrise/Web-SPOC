@@ -223,7 +223,7 @@ export default ({
   }
   const totalItems = [
     ...adjustments.map(o => ({
-      columnName: 'totalAfterItemAdjustment',
+      columnName: 'currentTotal',
       type: `${o.uid}`,
     })),
   ]
@@ -267,10 +267,10 @@ export default ({
       </div>
     )
   }
-  totalItems.push({ columnName: 'totalAfterItemAdjustment', type: 'gst' })
+  totalItems.push({ columnName: 'currentTotal', type: 'gst' })
 
-  totalItems.push({ columnName: 'totalAfterItemAdjustment', type: 'total' })
-  totalItems.push({ columnName: 'totalAfterItemAdjustment', type: 'subTotal' })
+  totalItems.push({ columnName: 'currentTotal', type: 'total' })
+  totalItems.push({ columnName: 'currentTotal', type: 'subTotal' })
   adjustments.forEach(adj => {
     messages[adj.uid] = (
       <div
@@ -455,7 +455,9 @@ export default ({
       size='sm'
       style={{ margin: 0 }}
       forceRender
-      rows={(rows || [])}
+      rows={(rows || []).map(r => {
+        return { ...r, currentTotal: (!r.isPreOrder || r.isChargeToday) ? r.totalAfterItemAdjustment : 0 }
+      })}
       onRowDoubleClick={editRow}
       getRowId={r => r.uid}
       columns={[
@@ -464,7 +466,7 @@ export default ({
         { name: 'description', title: 'Instructions' },
         { name: 'quantity', title: 'Qty.' },
         { name: 'adjAmount', title: 'Adj.' },
-        { name: 'totalAfterItemAdjustment', title: 'Total' },
+        { name: 'currentTotal', title: 'Total' },
         { name: 'actions', title: 'Actions' },
         { name: 'packageGlobalId', title: 'Package' },
       ]}
@@ -563,7 +565,7 @@ export default ({
             },
             totalCellComponent: p => {
               const { children, column } = p
-              if (column.name === 'totalAfterItemAdjustment') {
+              if (column.name === 'currentTotal') {
                 const items = children.props.children
                 const itemAdj = items.splice(0, items.length - 3)
                 const itemGST = items.splice(items.length - 3, items.length - 2)
@@ -806,16 +808,9 @@ export default ({
           width: 80,
         },
         {
-          columnName: 'totalAfterItemAdjustment',
+          columnName: 'currentTotal',
           type: 'currency',
-          width: 100,
-          render: (row) => {
-            let showAmount = row.totalAfterItemAdjustment || 0
-            if (row.isPreOrder && !row.isChargeToday)
-              showAmount = 0
-
-            return <span style={{ fontWeight: 500, color: 'darkblue' }}>{`${currencySymbol}${numeral(showAmount).format(currencyFormat)}`}</span>
-          }
+          width: 100
         },
         {
           columnName: 'quantity',

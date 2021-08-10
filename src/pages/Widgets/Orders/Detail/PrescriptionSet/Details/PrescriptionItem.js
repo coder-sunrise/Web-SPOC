@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import Yup from '@/utils/yup'
 import { connect } from 'dva'
+import { getUniqueId } from '@/utils/utils'
 import { compose } from 'redux'
 import classnames from 'classnames'
 import { Divider } from '@material-ui/core'
@@ -109,6 +110,7 @@ const drugMixtureItemSchema = Yup.object().shape({
       return {
         ...precaution,
         sequence,
+        uid: precaution.uid || getUniqueId()
       }
     })
 
@@ -137,6 +139,12 @@ const drugMixtureItemSchema = Yup.object().shape({
     )
     return {
       ...v,
+      prescriptionSetItemInstruction: v.prescriptionSetItemInstruction.map(i => {
+        return {
+          ...i,
+          uid: i.uid || getUniqueId()
+        }
+      }),
       prescriptionSetItemPrecaution:
         newPrescriptionSetItemPrecaution.length > 0
           ? newPrescriptionSetItemPrecaution
@@ -353,6 +361,7 @@ class Detail extends PureComponent {
     let defaultInstruction = {
       sequence: 0,
       stepdose: 'AND',
+      uid: getUniqueId()
     }
 
     if (op.id) {
@@ -414,6 +423,7 @@ class Detail extends PureComponent {
       const defaultPrecaution = {
         precaution: '',
         sequence: 0,
+        uid: getUniqueId()
       }
       const newPrescriptionPrecaution = isEdit
         ? [
@@ -963,7 +973,7 @@ class Detail extends PureComponent {
                     <div style={{ position: 'relative' }} >
                       <CodeSelect
                         temp
-                        label='Medication Name'
+                        label='Medication Name, Drug Group'
                         labelField='combinDisplayValue'
                         onChange={this.changeMedication}
                         options={this.getMedicationOptions()}
@@ -1179,7 +1189,10 @@ class Detail extends PureComponent {
                     return activeRows.map((val, activeIndex) => {
                       if (val && val.isDeleted) return null
                       const i = values.prescriptionSetItemInstruction.findIndex(
-                        item => _.isEqual(item, val),
+                        cor =>
+                          val.id
+                            ? cor.id === val.id
+                            : val.uid === cor.uid,
                       )
 
                       return (
@@ -1381,6 +1394,7 @@ class Detail extends PureComponent {
                                   {
                                     stepdose: 'AND',
                                     sequence: activeRows.length + 1,
+                                    uid: getUniqueId()
                                   },
                                 )}
                               </div>
@@ -1435,7 +1449,7 @@ class Detail extends PureComponent {
                         cor =>
                           val.id
                             ? cor.id === val.id
-                            : val.sequence === cor.sequence,
+                            : val.uid === cor.uid,
                       )
 
                       return (
@@ -1491,6 +1505,7 @@ class Detail extends PureComponent {
                                           day: 1,
                                           precaution: '1',
                                           sequence: newMaxSeq,
+                                          uid: getUniqueId()
                                         },
                                       )}
                                     </div>
