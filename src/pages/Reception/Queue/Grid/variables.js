@@ -353,7 +353,9 @@ export const QueueColumnExtensions = [
               alignItems: 'left',
             }}
           >
-            <span style={{overflow:'hidden',textOverflow:'ellipsis'}}>{servingPersons}</span>
+            <Tooltip title={servingPersons}>
+              <span style={{overflow:'hidden',textOverflow:'ellipsis'}}>{servingPersons}</span>
+            </Tooltip>
             <div>
               {row.visitFK && (
                 <Authorized authority='queue.servepatient'>
