@@ -389,7 +389,7 @@ const DispenseDetails = ({
              {!isRetailVisit && (
                 <Authorized authority='queue.servepatient'>
                   <ServePatientButton 
-                    patientName={patient.callingName}
+                    patientName={patient.name}
                     justIcon={false}
                     servingPersons={servingPersons}
                     onConfirm={()=>{
