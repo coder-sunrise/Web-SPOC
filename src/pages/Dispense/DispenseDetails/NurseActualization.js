@@ -44,11 +44,11 @@ const actualizedColumns = [
 const colDetailsExtensions = [
   { columnName: 'type', width: 100 },
   { columnName: 'name' },
-  { columnName: 'qty', width: 100, align: 'right', render: r=> `${r.qty}${(r.uom && r.uom.trim() !== '' ? ` ${r.uom}` : '')}` },
+  { columnName: 'qty', width: 80, align: 'right', render: r=> `${r.qty}${(r.uom && r.uom.trim() !== '' ? ` ${r.uom}` : '')}` },
   { columnName: 'orderBy', width: 130 },
   { columnName: 'orderDate', width: 140, render: r => localDateTime(r.orderDate) },
   { columnName: 'instruction', render: r => renderRemarks(r.instructions) },
-  { columnName: 'accessionNo', render: r => renderRemarks(r.accessionNo)  },
+  { columnName: 'accessionNo', width:100, render: r => renderRemarks(r.accessionNo)  },
   { columnName: 'orderRemarks', render: r => renderRemarks(r.orderRemarks) },
   { columnName: 'actulizeByUser', width: 130 },
   { columnName: 'actulizeDate', width: 140, render: r => localDateTime(r.actulizeDate) },
@@ -75,7 +75,7 @@ const historyColumns = [
 const historyColumnExtensions = [
   { columnName: 'type', width: 100 },
   { columnName: 'name' },
-  { columnName: 'qty', width: 100, align: 'right', render: r=> `${r.qty}${(r.uom && r.uom.trim() !== '' ? ` ${r.uom}` : '')}`},
+  { columnName: 'qty', width: 80, align: 'right', render: r=> `${r.qty}${(r.uom && r.uom.trim() !== '' ? ` ${r.uom}` : '')}`},
   { columnName: 'orderBy', width: 130 },
   { columnName: 'orderDate', width: 140, render: r => localDateTime(r.orderDate) },
   { columnName: 'instructions', render: r => renderRemarks(r.instructions)  },
@@ -117,7 +117,7 @@ class NurseActualization extends React.PureComponent {
   getColumns = () => {
     switch (this.state.status) {
       case NURSE_WORKITEM_STATUS.NEW:
-      case NURSE_WORKITEM_STATUS.CANCCELED:
+      case NURSE_WORKITEM_STATUS.CANCELLED:
         return detailsColumns
       case NURSE_WORKITEM_STATUS.ACTUALIZED:
         return [...detailsColumns, ...actualizedColumns]
@@ -167,13 +167,18 @@ class NurseActualization extends React.PureComponent {
     const actualizeViewable = status > 0
     const historyViewable = this.state.history?.length > 0
     const remarksViewable =
-      [NURSE_WORKITEM_STATUS.NEW, NURSE_WORKITEM_STATUS.CANCCELED].indexOf(
+      [NURSE_WORKITEM_STATUS.NEW, NURSE_WORKITEM_STATUS.CANCELLED].indexOf(
         status,
       ) > -1
     const actualizeBtnViewable = remarksViewable
     const cancelBtnViewable = NURSE_WORKITEM_STATUS.ACTUALIZED === status
 
-    return (
+    const actualizeRight = Authorized.check('dispense.actualizeorderitems')
+    const cancelActualizeRight = Authorized.check('dispense.cancelactualizeorderitems')
+    const isDisabledActualize = actualizeRight && actualizeRight.rights === 'disable'
+    const isDisabledCancelActualize =  cancelActualizeRight && cancelActualizeRight.rights === 'disable'
+
+      return (
       <div>
         {actualizeViewable && (
           <GridContainer style={{ marginBottom: 20 }}>
@@ -244,14 +249,14 @@ class NurseActualization extends React.PureComponent {
             <div style={{ marginTop: 8, marginBottom: 10 }} align='right'>
               {actualizeViewable && actualizeBtnViewable && (
                 <Authorized authorized='dispense.actualizeorderitems'>
-                  <Button color='success' onClick={this.actualize}>
+                  <Button color='success' onClick={this.actualize} disabled={isDisabledActualize}>
                     Actualize
                   </Button>
                 </Authorized>
               )}
               {actualizeViewable && cancelBtnViewable && (
                 <Authorized authorized='dispense.cancelactualizeorderitems'>
-                  <Button color='warning' onClick={this.cancel}>
+                  <Button color='warning' onClick={this.cancel} disabled={isDisabledCancelActualize}>
                     Cancel Actualization
                   </Button>
                 </Authorized>

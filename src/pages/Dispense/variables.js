@@ -112,7 +112,7 @@ const checkActualizable = row => {
 
 export const isActualizable = row => {
   const { isNurseActualizeRequired, statusFK } = checkActualizable(row)
-  return isNurseActualizeRequired && [NURSE_WORKITEM_STATUS.NEW,NURSE_WORKITEM_STATUS.CANCCELED].indexOf(statusFK) > -1
+  return isNurseActualizeRequired && [NURSE_WORKITEM_STATUS.NEW,NURSE_WORKITEM_STATUS.CANCELLED].indexOf(statusFK) > -1
 }
 
 const actualizationButton = (row, buttonClickCallback) => {
@@ -121,13 +121,13 @@ const actualizationButton = (row, buttonClickCallback) => {
 
   if (isNurseActualizeRequired) {
     if (
-      [NURSE_WORKITEM_STATUS.NEW, NURSE_WORKITEM_STATUS.CANCCELED].indexOf(
+      [NURSE_WORKITEM_STATUS.NEW, NURSE_WORKITEM_STATUS.CANCELLED].indexOf(
         statusFK,
       ) > -1
     ) {
       actualizationBtn = (
         <Authorized authority='dispense.actualizeorderitems'>
-          <Tooltip title='Todo'>
+          <Tooltip title='To do'>
             <Button
               color='primary'
               justIcon

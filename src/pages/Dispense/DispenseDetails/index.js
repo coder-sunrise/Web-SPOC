@@ -319,7 +319,7 @@ const DispenseDetails = ({
 
   const isShowActualizeSelection = (records = []) => {
     let actualizeOrderItemsRight = Authorized.check('dispense.actualizeorderitems')
-    let viewable = actualizeOrderItemsRight && actualizeOrderItemsRight.right !== 'hidden'
+    let viewable = actualizeOrderItemsRight && actualizeOrderItemsRight.rights !== 'hidden'
 
     return viewable && records.filter(x => isActualizable(x)).length > 0
   }
@@ -379,7 +379,7 @@ const DispenseDetails = ({
     if (records.filter(x => isActualizable(x)).length > 0) {
       return (
         <Authorized authority='dispense.actualizeorderitems'>
-          <Link
+          <Link component="button"
             style={{ marginLeft: 10, textDecoration: 'underline' }}
             onClick={() => {
               handleMultiActualizationClick(type)
@@ -810,7 +810,6 @@ const DispenseDetails = ({
                 version: version,
               },
             }).then((r)=>{
-              console.log('query dispense',r)
               dispatch({
                 type: 'dispense/updateState',
                 payload: {
