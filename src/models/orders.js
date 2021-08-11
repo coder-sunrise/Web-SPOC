@@ -13,6 +13,7 @@ const sharedMedicationValue = {
     {
       precaution: '',
       sequence: 0,
+      uid: getUniqueId()
     },
   ],
   corPrescriptionItemInstruction: [
@@ -20,6 +21,7 @@ const sharedMedicationValue = {
       sequence: 0,
       stepdose: 'AND',
       unitPrice: 0,
+      uid: getUniqueId()
     },
   ],
   corPrescriptionItemDrugMixture: [],

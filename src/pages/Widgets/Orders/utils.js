@@ -4,7 +4,12 @@ import { Divider } from '@material-ui/core'
 import Authorized from '@/utils/Authorized'
 import { htmlDecodeByRegExp } from '@/utils/utils'
 import { tagList } from '@/utils/codes'
-import { DOSAGE_RULE, DOSAGE_RULE_OPERATOR } from '@/utils/constants'
+import {
+  DOSAGE_RULE,
+  DOSAGE_RULE_OPERATOR,
+  ALLERGY_TYPE,
+  PATIENT_ALLERGY_TYPE,
+} from '@/utils/constants'
 import tablestyles from '@/pages/Widgets/PatientHistory/PatientHistoryStyle.less'
 
 const getCautionAlertContent = (cautionItems = [], allergyItems = [], vaccinationItems = []) => () => {
@@ -47,7 +52,7 @@ const getCautionAlertContent = (cautionItems = [], allergyItems = [], vaccinatio
                 },
                 {
                   dataIndex: 'allergyReaction',
-                  title: 'Allergy Reaction',
+                  title: 'Allergic Reaction',
                   width: 150,
                 },
                 {
@@ -171,7 +176,12 @@ const openCautionAlertOnStartConsultation = (o) => {
   ]
 
   if (cautionItems.length) {
-    openCautionAlertPrompt(cautionItems, drugAllergies, [])
+    openCautionAlertPrompt(cautionItems, drugAllergies.map(allergy => {
+      return {
+        ...allergy,
+        allergyType: allergy.allergyType === PATIENT_ALLERGY_TYPE.ALLERGY ? ALLERGY_TYPE.DRUGALLERGY : ALLERGY_TYPE.DRUGINGREDIENTALLERGY
+      }
+    }), [])
   }
 }
 
@@ -228,6 +238,37 @@ const isMatchInstructionRule = (rule, age, weight) => {
   return isMatch;
 }
 
+const getDrugAllergy = (drug, patientAllergy) => {
+  let allergys = []
+  drug.inventoryMedication_DrugAllergy.forEach(allergy => {
+    var drugAllergy = patientAllergy.find(a => a.type === PATIENT_ALLERGY_TYPE.ALLERGY && a.allergyFK === allergy.drugAllergyFK)
+    if (drugAllergy) {
+      allergys.push({
+        drugName: drug.displayValue,
+        allergyName: drugAllergy.allergyName,
+        allergyType: ALLERGY_TYPE.DRUGALLERGY,
+        allergyReaction: drugAllergy.allergyReaction,
+        onsetDate: drugAllergy.onsetDate,
+        id: drug.id,
+      })
+    }
+  })
+  drug.inventoryMedication_MedicationIngredient.forEach(ingredient => {
+    var drugIngredient = patientAllergy.find(a => a.type === PATIENT_ALLERGY_TYPE.INGREDIENT && a.ingredientFK === ingredient.medicationIngredientFK)
+    if (drugIngredient) {
+      allergys.push({
+        drugName: drug.displayValue,
+        allergyName: drugIngredient.allergyName,
+        allergyType: ALLERGY_TYPE.DRUGINGREDIENTALLERGY,
+        allergyReaction: drugIngredient.allergyReaction,
+        onsetDate: drugIngredient.onsetDate,
+        id: drug.id,
+      })
+    }
+  })
+  return allergys
+}
+
 export {
   getCautionAlertContent,
   openCautionAlertPrompt,
@@ -235,4 +276,5 @@ export {
   GetOrderItemAccessRight,
   ReplaceCertificateTeplate,
   isMatchInstructionRule,
+  getDrugAllergy
 }

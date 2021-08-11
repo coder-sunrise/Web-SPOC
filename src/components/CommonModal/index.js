@@ -130,7 +130,7 @@ class CommonModal extends React.PureComponent {
                 authority='none'
                 {...cancelProps}
               >
-                Ok
+                OK
               </Button>
             ) : (
               <Fragment>

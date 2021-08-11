@@ -29,7 +29,16 @@ const SelectPreOrder = ({ activePreOrderItem = [], onSelectPreOrder, footer, mai
     <CommonTableGrid
       size='sm'
       rows={_.orderBy(
-        activePreOrderItem,
+        activePreOrderItem.map(row => {
+          const { quantity, dispenseUOM = '' } = row
+          const displayQty = `${numeral(quantity).format(qtyFormat,)} ${dispenseUOM}`
+          return {
+            ...row,
+            orderDateDisplay: moment(row.orderDate).format('DD MMM YYYY HH:mm'),
+            displayQty,
+            hasPaid: row.hasPaid ? 'Yes' : 'No',
+          }
+        }),
         [
           'orderDate',
         ],
@@ -55,32 +64,23 @@ const SelectPreOrder = ({ activePreOrderItem = [], onSelectPreOrder, footer, mai
       columns={[
         { name: 'preOrderItemType', title: 'Type' },
         { name: 'itemName', title: 'Name' },
-        { name: 'quantity', title: 'Order Qty.' },
+        { name: 'displayQty', title: 'Order Qty.' },
         { name: 'orderByUser', title: 'Order By' },
-        { name: 'orderDate', title: 'Order Date' },
+        { name: 'orderDateDisplay', title: 'Order Date' },
         { name: 'remarks', title: 'Remarks' },
         { name: 'amount', title: 'Amount' },
         { name: 'hasPaid', title: 'Paid' },
         { name: 'preOrderItemStatus', title: 'Status' },
       ]}
       columnExtensions={[
-        {
-          columnName: 'preOrderItemType', sortingEnabled: false, width: 120,
-        },
+        { columnName: 'preOrderItemType', sortingEnabled: false, width: 120, },
         { columnName: 'itemName', sortingEnabled: false },
-        {
-          columnName: 'quantity', sortingEnabled: false, width: 120, render: row => {
-            const { quantity, dispenseUOM = '' } = row
-            return `${numeral(quantity).format(
-              qtyFormat,
-            )} ${dispenseUOM}`
-          },
-        },
+        { columnName: 'displayQty', sortingEnabled: false, width: 120 },
         { columnName: 'orderByUser', sortingEnabled: false },
-        { columnName: 'orderDate', sortingEnabled: false, type: 'date', width: 140, render: (row) => <span>{moment(row.orderDate).format('DD MMM YYYY HH:mm')}</span> },
+        { columnName: 'orderDateDisplay', sortingEnabled: false, width: 140 },
         { columnName: 'remarks', sortingEnabled: false },
         { columnName: 'amount', sortingEnabled: false, type: 'currency', width: 90 },
-        { columnName: 'hasPaid', sortingEnabled: false, width: 50, render: (row) => row.hasPaid ? 'Yes' : 'No' },
+        { columnName: 'hasPaid', sortingEnabled: false, width: 50 },
         { columnName: 'preOrderItemStatus', sortingEnabled: false, width: 100 },
       ]}
     />

@@ -110,6 +110,8 @@ class GlobalModalContainer extends PureComponent {
         alignContent: undefined,
         additionalInfo: undefined,
         isInformType: undefined,
+        onConfirmClose: undefined,
+        customWidth: undefined
       },
     })
   }

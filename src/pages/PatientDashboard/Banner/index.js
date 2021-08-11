@@ -1071,39 +1071,39 @@ class Banner extends PureComponent {
               <GridItem xs={6} md={2} className={classes.cell}>
                 {actualizePreOrderAccessRight.rights !== 'hidden' && <Link
                   className={classes.header}
-                  disabled={actualizePreOrderAccessRight.rights === 'disable' || disablePreOrder}
+                  disabled={actualizePreOrderAccessRight.rights === 'disable' || disablePreOrder || !activePreOrderItem || !activePreOrderItem.length}
                 >
                   <span
                     style={{ textDecoration: 'underline' }}
                     onClick={e => {
                       e.preventDefault()
-                      if (actualizePreOrderAccessRight.rights === 'disable' || disablePreOrder) return
-                      if (activePreOrderItem && activePreOrderItem.length) {
-                        if (apptId && apptMode === 'series') {
-                          dispatch({
-                            type: 'global/updateAppState',
-                            payload: {
-                              openConfirm: true,
-                              isInformType: true,
-                              openConfirmText: 'OK',
-                              openConfirmContent: `Pre-Order is not allowed for entire series appointment.`,
-                            },
-                          })
-                          return
-                        }
-                        if (!apptId && isEnableRecurrence) {
-                          dispatch({
-                            type: 'global/updateAppState',
-                            payload: {
-                              openConfirm: true,
-                              isInformType: true,
-                              openConfirmText: 'OK',
-                              openConfirmContent: `Pre-Order is not allowed for recurring appointment.`,
-                            },
-                          })
-                          return
-                        }
+                      if (actualizePreOrderAccessRight.rights === 'disable' || disablePreOrder || !activePreOrderItem || !activePreOrderItem.length) return
+
+                      if (apptId && apptMode === 'series') {
+                        dispatch({
+                          type: 'global/updateAppState',
+                          payload: {
+                            openConfirm: true,
+                            isInformType: true,
+                            openConfirmText: 'OK',
+                            openConfirmContent: `Pre-Order is not allowed for entire series appointment.`,
+                          },
+                        })
+                        return
                       }
+                      if (!apptId && isEnableRecurrence) {
+                        dispatch({
+                          type: 'global/updateAppState',
+                          payload: {
+                            openConfirm: true,
+                            isInformType: true,
+                            openConfirmText: 'OK',
+                            openConfirmContent: `Pre-Order is not allowed for recurring appointment.`,
+                          },
+                        })
+                        return
+                      }
+
                       this.openPreOrders()
                     }}
                   >
