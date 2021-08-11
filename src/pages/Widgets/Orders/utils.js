@@ -175,7 +175,7 @@ const openCautionAlertOnStartConsultation = (o) => {
     ...vaccinationItems,
   ]
 
-  if (cautionItems.length) {
+  if (cautionItems.length || drugAllergies.length) {
     openCautionAlertPrompt(cautionItems, drugAllergies.map(allergy => {
       return {
         ...allergy,
