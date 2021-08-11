@@ -515,8 +515,10 @@ class PrescriptionSetList extends PureComponent {
             combineCondition: 'or',
           },
         ],
-        sorting: [{ columnName: 'sortOrder', direction: 'asc' },
-        { columnName: 'prescriptionSetName', direction: 'asc' }]
+        sorting: [
+          { columnName: 'type', direction: 'desc' },
+          { columnName: 'sortOrder', direction: 'asc' },
+          { columnName: 'prescriptionSetName', direction: 'asc' }]
       },
     }).then((r) => {
       if (r) {
