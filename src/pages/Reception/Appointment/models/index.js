@@ -165,7 +165,7 @@ export default createListViewModel({
         const { filterTemplates } = st
 
         if (id) {
-          const { filterByDoctor, filterByApptType } = filterTemplates.find(
+          const { filterByDoctor, filterByApptType, dobfrom, dobto } = filterTemplates.find(
             template => template.id === id,
           )
           return {
@@ -173,6 +173,8 @@ export default createListViewModel({
             currentFilterTemplate: {
               filterByDoctor,
               filterByApptType,
+              dobfrom,
+              dobto,
             },
           }
         }

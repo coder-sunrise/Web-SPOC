@@ -118,14 +118,14 @@ class Appointment extends React.PureComponent {
       },
     })
 
-    let filter
+    let filter //= this.state.filter
     const filterTemplate = await dispatch({
       type: 'appointment/getFilterTemplate',
     })
     if (filterTemplate) {
       const { currentFilterTemplate } = filterTemplate
       if (currentFilterTemplate) {
-        const { filterByDoctor, filterByApptType } = currentFilterTemplate
+        const { filterByDoctor, filterByApptType, dobfrom, dobto } = currentFilterTemplate
         filter = {
           filterByDoctor,
           filterByApptType,
@@ -133,6 +133,8 @@ class Appointment extends React.PureComponent {
             filterByDoctor && filterByDoctor.length
               ? filterByDoctor[0]
               : undefined,
+          dobfrom,    
+          dobto,    
         }
       }
     }
