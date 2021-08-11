@@ -139,7 +139,7 @@ const drugMixtureItemSchema = Yup.object().shape({
     )
     return {
       ...v,
-      prescriptionSetItemInstruction: v.prescriptionSetItemInstruction.map(i => {
+      prescriptionSetItemInstruction: (v.prescriptionSetItemInstruction || []).map(i => {
         return {
           ...i,
           uid: i.uid || getUniqueId()

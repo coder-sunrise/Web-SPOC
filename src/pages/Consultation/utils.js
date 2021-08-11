@@ -8,7 +8,7 @@ import OrderSet from '@/pages/Widgets/Orders/Detail/OrderSet'
 import Treatment from '@/pages/Widgets/Orders/Detail/Treatment'
 import Package from '@/pages/Widgets/Orders/Detail/Package'
 import Radiology from '@/pages/Widgets/Orders/Detail/Radiology'
-import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
+import { SERVICE_CENTER_CATEGORY, RADIOLOGY_CATEGORY } from '@/utils/constants'
 
 const orderTypes = [
   {
@@ -27,7 +27,7 @@ const orderTypes = [
     value: '3',
     prop: 'corService',
     accessRight: 'queue.consultation.order.service',
-    filter: r => r.serviceCenterCategoryFK !== SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
+    filter: r => RADIOLOGY_CATEGORY.indexOf(r.serviceCenterCategoryFK) < 0,
     getSubject: r => r.serviceName,
     component: props => <Service {...props} />,
   },
@@ -37,7 +37,7 @@ const orderTypes = [
     prop: 'corService',
     accessRight: 'queue.consultation.order.radiology',
     getSubject: r => r.serviceName,
-    filter: r => r.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
+    filter: r => RADIOLOGY_CATEGORY.indexOf(r.serviceCenterCategoryFK) >= 0,
     component: props => <Radiology {...props} />,
   },
   {

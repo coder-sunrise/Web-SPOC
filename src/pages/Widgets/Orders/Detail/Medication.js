@@ -221,7 +221,7 @@ const getVisitDoctorUserId = props => {
     )
     return {
       ...v,
-      corPrescriptionItemInstruction: v.corPrescriptionItemInstruction.map(i => {
+      corPrescriptionItemInstruction: (v.corPrescriptionItemInstruction || []).map(i => {
         return {
           ...i,
           uid: i.uid || getUniqueId()

@@ -259,7 +259,9 @@ class Radiology extends PureComponent {
       const serviceCenterService =
         this.state.serviceCenterServices.find(
           (o) => o.serviceId === serviceFK && o.isDefault,
-        ) || {}
+        ) || this.state.serviceCenterServices.find(
+          (o) => o.serviceId === serviceFK,
+        )
       if (serviceCenterService) {
         obj(serviceCenterService)
         editService.serviceCenterFK = serviceCenterService.serviceCenterId
@@ -276,7 +278,7 @@ class Radiology extends PureComponent {
       this.state.serviceCenterServices.find(
         (o) =>
           o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
-      ) || {}
+      )
     if (serviceCenterService) {
       obj(serviceCenterService)
       editService.isMinus = true
@@ -629,7 +631,7 @@ class Radiology extends PureComponent {
               <div style={{ position: 'relative' }}>
                 <TextField value={editService.instruction}
                   disabled={!editServiceId || isStartedRadiology}
-                  label='Instruction'
+                  label='Instructions'
                   onChange={(e) => {
                     editService.instruction = e.target.value
                     setFieldValue('radiologyItems', [...radiologyItems])
