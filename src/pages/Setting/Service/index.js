@@ -8,7 +8,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
   detailHeaderContainer: { position: 'relative', lineHeight: '45px' },
   detailHeader: {
@@ -30,9 +30,13 @@ const styles = (theme) => ({
 class Service extends PureComponent {
   state = { open: false }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingClinicService/query',
+      payload: {},
+    })
+    this.props.dispatch({
+      type: 'settingClinicService/getServiceCenter',
       payload: {},
     })
   }
@@ -40,7 +44,7 @@ class Service extends PureComponent {
   toggleModal = () => {
     const { dispatch } = this.props
 
-    this.setState((prevState) => {
+    this.setState(prevState => {
       return { open: !prevState.open }
     })
 
@@ -54,7 +58,7 @@ class Service extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const { settingClinicService, mainDivHeight = 700 } = this.props
     const { open } = this.state
     const cfg = {

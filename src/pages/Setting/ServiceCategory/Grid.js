@@ -20,7 +20,7 @@ class Grid extends PureComponent {
   }
 
   render() {
-    const { height, clinicSettings } = this.props
+    const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
@@ -33,9 +33,6 @@ class Grid extends PureComponent {
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
           { name: 'description', title: 'Description' },
-          ...(clinicSettings.isEnableLabModule
-            ? [{ name: 'isPanelItemRequired', title: 'Panel Item Required' }]
-            : []),
           { name: 'isActive', title: 'Status' },
           {
             name: 'action',

@@ -25,6 +25,18 @@ export default createListViewModel({
       })
     },
     effects: {
+      *getServiceCenter({ payload }, { call, put, select, take }) {
+        const response = yield call(service.getServiceCenter, payload)
+        const { data, status } = response
+        if (status === '200') {
+          yield put({
+            type: 'setServiceCenter',
+            payload: data,
+          })
+          return data
+        }
+        return false
+      },
       *export(_, { call }) {
         const result = yield call(service.export)
         return result
@@ -56,6 +68,12 @@ export default createListViewModel({
         return {
           ...st,
           entity: data,
+        }
+      },
+      setServiceCenter(state, { payload }) {
+        return {
+          ...state,
+          serviceCenterList: [...payload.data],
         }
       },
     },
