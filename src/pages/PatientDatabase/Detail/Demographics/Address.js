@@ -92,7 +92,7 @@ class Address extends Component {
     const response = await queryList('/api/streetAddress', {
       apiCriteria: {
         searchValue: value,
-        searchType: type
+        searchType: ''
       },
       pagesize: 10
     })
@@ -238,7 +238,6 @@ class Address extends Component {
                   onOptionSelected={onOptionSelected}
                   renderOption={this.renderOption}
                   valuePath='postalCode'
-                  query={async (value) => { return await this.searchAddress(value, 'BlkHseNo') }}
                   {...args} />
               }}
             />
@@ -259,7 +258,6 @@ class Address extends Component {
                   onOptionSelected={onOptionSelected}
                   renderOption={this.renderOption}
                   valuePath='postalCode'
-                  query={async (value) => { return await this.searchAddress(value, 'Building') }}
                   {...args}
                 />
               }}
@@ -273,7 +271,6 @@ class Address extends Component {
                   onOptionSelected={onOptionSelected}
                   renderOption={this.renderOption}
                   valuePath='postalCode'
-                  query={async (value) => { return await this.searchAddress(value, 'Street') }}
                   {...args}
                 />
               }}
