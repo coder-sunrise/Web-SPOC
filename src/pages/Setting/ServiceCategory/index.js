@@ -14,11 +14,10 @@ const styles = theme => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingServiceCategory, global, clinicSettings }) => ({
+@connect(({ settingServiceCategory, global }) => ({
   settingServiceCategory,
   global,
   mainDivHeight: global.mainDivHeight,
-  clinicSettings: clinicSettings.settings,
 }))
 @withSettingBase({ modelName: 'settingServiceCategory' })
 class ServiceCategory extends PureComponent {

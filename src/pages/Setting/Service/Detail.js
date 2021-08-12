@@ -23,7 +23,6 @@ import {
   CheckboxGroup,
   TagPanel,
 } from '@/components'
-import codetable from '@/models/codetable'
 import { tagCategory } from '@/utils/codes'
 
 const styles = theme => ({
@@ -51,36 +50,12 @@ const itemSchema = Yup.object().shape({
     .required()
     .min(0, 'Unit Price must be greater than or equal to $0.00'),
 })
-
-const checkboxOptions = [
-  {
-    id: 'isPushToWorkStation',
-    name: 'Push to Worklist',
-  },
-  {
-    id: 'isNurseActualizable',
-    name: 'Nurse Actualize',
-  },
-  {
-    id: 'isRequiredSpecimen',
-    name: 'Specimen Required',
-  },
-  {
-    id: 'isRequiredSpecimenPanelItem',
-    name: 'Specify Panel Item When Add Specimen',
-  },
-]
-
-const isRequiredSpecimen = 'isRequiredSpecimen'
-const isRequiredSpecimenPanelItem = 'isRequiredSpecimenPanelItem'
-
 const modalityItemSchema = Yup.object().shape({
   modalityFK: Yup.string().required(),
 })
 
-@connect(({ clinicSettings, codetable }) => ({
+@connect(({ clinicSettings }) => ({
   clinicSettings,
-  ctServiceCategory: codetable.ctservicecategory || [],
 }))
 @withFormikExtend({
   mapPropsToValues: ({ settingClinicService }) => {
@@ -120,13 +95,9 @@ const modalityItemSchema = Yup.object().shape({
       .of(modalityItemSchema),
   }),
   handleSubmit: (values, { props, resetForm }) => {
-    const { effectiveDates, chkOptions = [], ...restValues } = values
+    const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
     const selectedOptions = {}
-
-    checkboxOptions.forEach(
-      o => (selectedOptions[o.id] = chkOptions.includes(o.id)),
-    )
 
     dispatch({
       type: 'settingClinicService/upsert',
@@ -283,7 +254,7 @@ class Detail extends PureComponent {
       ctService_Tag = [],
       isRequiredSpecimen = false,
     } = this.props.values
-    const { ctServiceCategory, dispatch } = this.props
+    const { dispatch } = this.props
 
     dispatch({
       type: 'codetable/fetchCodes',
@@ -300,20 +271,6 @@ class Detail extends PureComponent {
             .map(t => t.displayValue),
         })
       }
-    })
-
-    const isPanelItemRequired =
-      ctServiceCategory.filter(c => c.id === serviceCategoryFK)[0]
-        ?.isPanelItemRequired || false
-
-    this.setState({
-      isPanelItemRequired,
-      checkboxOptions: checkboxOptions.filter(
-        o => isRequiredSpecimen || o.id !== 'isRequiredSpecimenPanelItem',
-      ),
-      checkboxOptionValues: checkboxOptions
-        .filter(o => this.props.values[o.id])
-        .map(v => v.id),
     })
   }
 
@@ -399,10 +356,11 @@ class Detail extends PureComponent {
     return rows
   }
 
-  commitChanges = ({ rows, changed }) => {
+  commitChanges = temp => {
+    const { rows, changed } = temp
     const _rows = this.checkIsServiceCenterUnique({ rows, changed })
-    const { setFieldValue, values } = this.props
 
+    const { setFieldValue, values } = this.props
     _rows.forEach((val, i) => {
       val.serviceFK = values.id
       val.serviceCenterFKNavigation = null
@@ -423,12 +381,22 @@ class Detail extends PureComponent {
       }
     }
 
+    const hiddenFields = this.getHiddenFields(_rows)
+
+    //Reset the field if the fields are being hidden
+    if (hiddenFields.includes('ctService_Tag'))
+      setFieldValue('ctService_Tag', [])
+    if (hiddenFields.includes('panelItems')) setFieldValue('panelItems', [])
+    if (hiddenFields.includes('isRequiredSpecimenPanelItem'))
+      setFieldValue('isRequiredSpecimenPanelItem', false)
+
     setFieldValue('ctServiceCenter_ServiceNavigation', _rows)
     this.setState(() => {
       return {
         serviceSettings: _rows,
       }
     })
+
     return _rows
   }
 
@@ -544,22 +512,54 @@ class Detail extends PureComponent {
     setFieldValue('ctService_Tag', [...currentTags, ...deletedTags])
   }
 
-  handleCheckOptionChange = async (e, setFieldValue) => {
-    //Only can check isRequiredSpecimenPanelItem option if isRequiredSpecimen not checked
-    const newValues = e.target.value.filter(
-      v =>
-        e.target.value.includes(isRequiredSpecimen) ||
-        v !== isRequiredSpecimenPanelItem,
-    )
-    await setFieldValue('chkOptions', newValues)
+  getHiddenFields = serviceSettings => {
+    const radioAndLabCategories = {
+      internalRadiology: 3,
+      internalLab: 4,
+      externalRadiology: 5,
+      externalLab: 6,
+    }
 
-    this.setState({
-      checkboxOptions: checkboxOptions.filter(
-        o =>
-          e.target.value.includes('isRequiredSpecimen') ||
-          o.id !== isRequiredSpecimenPanelItem,
-      ),
-    })
+    const hiddenFields = []
+    const { settingClinicService, clinicSettings, setFieldValue } = this.props
+    const { serviceCenterList = [], entity } = settingClinicService
+
+    const { isEnableNurseWorkItem } = clinicSettings.settings
+
+    const radioAndLabServiceCenterIds = serviceCenterList
+      .filter(sc =>
+        Object.values(radioAndLabCategories).includes(
+          sc.serviceCenterCategoryFK,
+        ),
+      )
+      .map(sc => sc.id)
+
+    const internalLabServiceCenterIds = serviceCenterList
+      .filter(
+        sc => radioAndLabCategories.internalLab === sc.serviceCenterCategoryFK,
+      )
+      .map(sc => sc.id)
+
+    if (
+      serviceSettings.findIndex(sc =>
+        radioAndLabServiceCenterIds.includes(sc.serviceCenterFK),
+      ) === -1
+    ) {
+      hiddenFields.push('ctService_Tag')
+    }
+
+    const hasInternalLabServiceCenter =
+      serviceSettings.findIndex(sc =>
+        internalLabServiceCenterIds.includes(sc.serviceCenterFK),
+      ) !== -1
+    if (!hasInternalLabServiceCenter) {
+      hiddenFields.push('panelItems')
+      hiddenFields.push('isRequiredSpecimenPanelItem')
+    }
+
+    if (isEnableNurseWorkItem) hiddenFields.push('actualizedByNurse')
+
+    return hiddenFields
   }
 
   render() {
@@ -587,6 +587,7 @@ class Detail extends PureComponent {
       serviceSettings.filter(row => !row.isDeleted).length === 0
     const { settings = [] } = clinicSettings
 
+    const hiddenFields = this.getHiddenFields(this.state.serviceSettings)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(2) }}>
@@ -645,25 +646,6 @@ class Detail extends PureComponent {
                           label='Service Category'
                           code='CTServiceCategory'
                           labelField='displayValue'
-                          onChange={async (values, opts) => {
-                            if (opts === undefined || opts === null) {
-                              this.setState({
-                                isPanelItemRequired: false,
-                              })
-                            } else {
-                              this.setState({
-                                isPanelItemRequired: opts.isPanelItemRequired,
-                              })
-                            }
-
-                            await args.form.setFieldValue('chkOptions', [])
-
-                            this.setState({
-                              checkboxOptions: checkboxOptions.filter(
-                                o => o.id !== 'isRequiredSpecimenPanelItem',
-                              ),
-                            })
-                          }}
                           {...args}
                         />
                       )
@@ -699,24 +681,34 @@ class Detail extends PureComponent {
                     }}
                   />
                 </GridItem>
-                <GridItem xs={6}>
-                  <FastField
-                    name='panelItems'
-                    render={args => {
-                      return (
-                        <CodeSelect
-                          mode='multiple'
-                          maxTagCount='responsive'
-                          maxTagPlaceholder={<span>...</span>}
-                          disableAll
-                          label='Panel Items'
-                          code='CTRevenueCategory'
-                          {...args}
-                        />
-                      )
-                    }}
-                  />
-                </GridItem>
+                {!hiddenFields.includes('panelItems') && (
+                  <GridItem xs={12}>
+                    <FastField
+                      name='panelItems'
+                      render={args => {
+                        return (
+                          <CodeSelect
+                            mode='multiple'
+                            maxTagCount='responsive'
+                            maxTagPlaceholder={<span>...</span>}
+                            onChange={val => {
+                              //If all panel items are removed, set false to Specify Panel Item toggle
+                              if (!val || val.length === 0)
+                                args.form.setFieldValue(
+                                  'isRequiredSpecimenPanelItem',
+                                  false,
+                                )
+                            }}
+                            disableAll
+                            label='Panel Items'
+                            code='CTRevenueCategory'
+                            {...args}
+                          />
+                        )
+                      }}
+                    />
+                  </GridItem>
+                )}
                 {settings.isEnableMedisave && (
                   <GridItem xs={12}>
                     <FastField
@@ -737,52 +729,29 @@ class Detail extends PureComponent {
                     />
                   </GridItem>
                 )}
-                {isPanelItemRequired && (
+
+                {!hiddenFields.includes('ctService_Tag') && (
                   <GridItem xs={12}>
                     <Field
-                      name='chkOptions'
+                      name='ctService_Tag'
                       render={args => (
-                        <CheckboxGroup
-                          style={{
-                            marginTop: theme.spacing(1),
-                          }}
-                          simple
-                          valueField='id'
-                          textField='name'
-                          defaultValue={this.state.checkboxOptionValues}
-                          onChange={e =>
-                            this.handleCheckOptionChange(
-                              e,
+                        <TagPanel
+                          label='Tags:'
+                          tagCategory='Service'
+                          defaultTagNames={this.state.serviceTags}
+                          {...args}
+                          onChange={(value, tags) =>
+                            this.handleTagPanelChange(
+                              value,
+                              tags,
                               args.form.setFieldValue,
                             )
                           }
-                          options={this.state.checkboxOptions}
-                          {...args}
-                        />
+                        ></TagPanel>
                       )}
                     />
                   </GridItem>
                 )}
-                <GridItem xs={12}>
-                  <Field
-                    name='ctService_Tag'
-                    render={args => (
-                      <TagPanel
-                        label='Tags:'
-                        tagCategory='Service'
-                        defaultTagNames={this.state.serviceTags}
-                        {...args}
-                        onChange={(value, tags) =>
-                          this.handleTagPanelChange(
-                            value,
-                            tags,
-                            args.form.setFieldValue,
-                          )
-                        }
-                      ></TagPanel>
-                    )}
-                  />
-                </GridItem>
                 <GridItem xs={12}>
                   <GridContainer>
                     <GridItem xs={4}>
@@ -818,6 +787,38 @@ class Detail extends PureComponent {
                         }}
                       />
                     </GridItem>
+                    {!hiddenFields.includes('actualizedByNurse') && (
+                      <GridItem xs={4}>
+                        <Field
+                          name='actualizedByNurse'
+                          render={args => {
+                            return (
+                              <Switch label='Actualized by Nurse' {...args} />
+                            )
+                          }}
+                        />
+                      </GridItem>
+                    )}
+
+                    {!hiddenFields.includes('isRequiredSpecimenPanelItem') && (
+                      <GridItem xs={4}>
+                        <Field
+                          name='isRequiredSpecimenPanelItem'
+                          render={args => {
+                            return (
+                              <Switch
+                                disabled={
+                                  !this.props.values.panelItems ||
+                                  this.props.values.panelItems.length === 0
+                                }
+                                label='Specify Panel Item'
+                                {...args}
+                              />
+                            )
+                          }}
+                        />
+                      </GridItem>
+                    )}
                   </GridContainer>
                 </GridItem>
               </GridContainer>

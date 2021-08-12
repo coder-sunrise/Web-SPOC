@@ -2,6 +2,7 @@ import * as service from '@/services/common'
 import request from '@/utils/request'
 
 const url = '/api/ctservice'
+const getServiceCenterUrl = '/api/ctservicecenter'
 
 const fns = {
   // remove: (params) => service.remove(url, params),
@@ -19,7 +20,7 @@ const fns = {
   },
   queryList: params => service.queryList(url, params),
   upsert: params => service.upsert(url, params),
-
+  getServiceCenter: params => service.queryList(getServiceCenterUrl, params),
   export: () => {
     return request(`${url}/export`, {
       method: 'GET',
