@@ -143,12 +143,6 @@ class CorporateBillingGrid extends PureComponent {
         apiCriteria: {
           outstandingBalanceStatus: undefined,
         },
-        sort: [
-          {
-            sortby: this.FuncConfig.sortConfig.defaultSorting[0].columnName,
-            order: this.FuncConfig.sortConfig.defaultSorting[0].direction,
-          },
-        ],
       },
     })
   }
