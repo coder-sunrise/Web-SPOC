@@ -522,11 +522,18 @@ class Detail extends PureComponent {
   }
 
   handleReset = () => {
-    const { setValues, prescriptionSet } = this.props
+    const { setValues, prescriptionSet, dispatch } = this.props
 
     setValues({
       ...prescriptionSet.defaultPrescriptionSetItem,
       selectedMedication: {},
+    })
+
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: false,
+      },
     })
   }
 
@@ -754,8 +761,11 @@ class Detail extends PureComponent {
 
   handleDrugMixtureItemOnChange = e => {
     const { option, row } = e
-    const { values, setFieldValue } = this.props
+    const { values, setFieldValue, codetable } = this.props
     const { drugName = '' } = values
+    const activeDrugMixtureRows = (values.prescriptionSetItemDrugMixture || []).filter(
+      item => !item.isDeleted,
+    )
     const rs = values.prescriptionSetItemDrugMixture.filter(
       o =>
         !o.isDeleted &&
@@ -764,6 +774,9 @@ class Detail extends PureComponent {
     )
     if (rs.length > 0) {
       e.row.inventoryMedicationFK = undefined
+      if (activeDrugMixtureRows[0].id === row.id) {
+        this.changeMedication()
+      }
       notification.warn({
         message: 'The medication already exist in the list',
       })
@@ -776,6 +789,18 @@ class Detail extends PureComponent {
           : `${drugName}/${option.displayValue}`
         ).substring(0, 60),
       )
+      if (activeDrugMixtureRows[0].id === row.id) {
+        const { inventorymedication = [] } = codetable
+        const currentMedication = inventorymedication.find(
+          o => o.id === row.inventoryMedicationFK,
+        )
+        if (currentMedication) {
+          this.changeMedication(
+            activeDrugMixtureRows[0].inventoryMedicationFK,
+            currentMedication,
+          )
+        }
+      }
     }
 
     row.quantity = 0
@@ -798,12 +823,10 @@ class Detail extends PureComponent {
         const currentMedication = inventorymedication.find(
           o => o.id === actviceItem[1].inventoryMedicationFK,
         )
-        if (currentMedication) {
           this.changeMedication(
             actviceItem[1].inventoryMedicationFK,
             currentMedication,
           )
-        }
       }
       const newArray = tempArray.map(o => {
         if (o.id === deleted[0]) {
@@ -845,22 +868,6 @@ class Detail extends PureComponent {
       totalQuantity += item.quantity || 0
     })
 
-    if (
-      !deleted &&
-      activeDrugMixtureRows.length === 1 &&
-      activeDrugMixtureRows[0].inventoryMedicationFK
-    ) {
-      const { inventorymedication = [] } = codetable
-      const currentMedication = inventorymedication.find(
-        o => o.id === activeDrugMixtureRows[0].inventoryMedicationFK,
-      )
-      if (currentMedication) {
-        this.changeMedication(
-          activeDrugMixtureRows[0].inventoryMedicationFK,
-          currentMedication,
-        )
-      }
-    }
 
     setFieldValue('quantity', totalQuantity)
   }
@@ -932,6 +939,24 @@ class Detail extends PureComponent {
               }
             } else {
               newCautions = newCautions.filter(o => o.id !== row.id)
+              row.quantity = undefined
+              row.uomfk = null
+              row.uomCode = undefined
+              row.uomDisplayValue = undefined
+              row.costPrice = undefined
+              row.unitPrice = undefined
+              row.totalPrice = undefined
+              row.drugCode = undefined
+              row.drugName = undefined
+              row.revenueCategoryFK = undefined
+              row.isDispensedByPharmacy = undefined
+              row.isNurseActualizeRequired = undefined
+              const activeDrugMixtureRows = (values.prescriptionSetItemDrugMixture || []).filter(
+                item => !item.isDeleted,
+              )
+              if (activeDrugMixtureRows[0].id === row.id) {
+                this.changeMedication()
+              }
             }
 
             setFieldValue('cautions', newCautions)

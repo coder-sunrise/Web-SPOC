@@ -146,7 +146,7 @@ class Grid extends PureComponent {
               </Tooltip>
             </div>
 
-            {selectType !== 'Personal' &&
+            {selectType === 'All' &&
               <div style={{ left: 410, position: 'absolute', top: 8 }}>
                 {o.type === 'General' ?
                   <Tag className={classes.tagStyle} style={{ border: '1px solid #99CC99', color: '#7CD55E', backgroundColor: '#F6FFED' }}>General</Tag>
@@ -163,9 +163,9 @@ class Grid extends PureComponent {
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap', right: 110, maxWidth: 300,
               }}>
-                <Tooltip title={`Last Modified By: ${o.ownedByUser}`}>
+              <Tooltip title={`Last Modified By: ${o.updateByUserTitle && o.updateByUserTitle.trim().length ? `${o.updateByUserTitle}.` : ''}${o.updateByUser || ''}`}>
                   <span style={{ lineHeight: '24px' }}>
-                    {`Last Modified By: ${o.ownedByUser}`}
+                  {`Last Modified By: ${o.updateByUserTitle && o.updateByUserTitle.trim().length ? `${o.updateByUserTitle}.` : ''}${o.updateByUser || ''}`}
                   </span>
                 </Tooltip>
               </div>

@@ -5,6 +5,8 @@ import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
 import { formatMessage } from 'umi'
 import { isNumber } from 'util'
+import { qtyFormat } from '@/utils/config'
+import numeral from 'numeral'
 import { Alert } from 'antd'
 import { VISIT_TYPE, CANNED_TEXT_TYPE } from '@/utils/constants'
 import {
@@ -798,7 +800,7 @@ class Medication extends PureComponent {
   }
 
   handleReset = () => {
-    const { setValues, orders } = this.props
+    const { setValues, orders, dispatch } = this.props
 
     setValues({
       ...orders.defaultMedication,
@@ -809,6 +811,13 @@ class Medication extends PureComponent {
         medicationStock: [],
       },
       performingUserFK: getVisitDoctorUserId(this.props),
+    })
+
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: false,
+      },
     })
   }
 
@@ -917,6 +926,9 @@ class Medication extends PureComponent {
     const { values, setFieldValue, visitRegistration, patient, orders = {}, codetable } = this.props
     const { corVitalSign = [] } = orders
     const { drugName = '' } = values
+    const activeDrugMixtureRows = (values.corPrescriptionItemDrugMixture || []).filter(
+      item => !item.isDeleted,
+    )
     const rs = values.corPrescriptionItemDrugMixture.filter(
       o =>
         !o.isDeleted &&
@@ -925,6 +937,9 @@ class Medication extends PureComponent {
     )
     if (rs.length > 0) {
       e.row.inventoryMedicationFK = undefined
+      if (activeDrugMixtureRows[0].id === row.id) {
+        this.changeMedication()
+      }
       notification.warn({
         message: 'The medication already exist in the list',
       })
@@ -946,6 +961,17 @@ class Medication extends PureComponent {
         null,
         patient,
       )
+      if (activeDrugMixtureRows[0].id === row.id) {
+        const currentMedication = inventorymedication.find(
+          o => o.id === row.inventoryMedicationFK,
+        )
+        if (currentMedication) {
+          this.changeMedication(
+            activeDrugMixtureRows[0].inventoryMedicationFK,
+            currentMedication,
+          )
+        }
+      }
     }
 
     let weightKG
@@ -1016,12 +1042,10 @@ class Medication extends PureComponent {
         const currentMedication = inventorymedication.find(
           o => o.id === actviceItem[1].inventoryMedicationFK,
         )
-        if (currentMedication) {
-          this.changeMedication(
-            actviceItem[1].inventoryMedicationFK,
-            currentMedication,
-          )
-        }
+        this.changeMedication(
+          actviceItem[1].inventoryMedicationFK,
+          currentMedication,
+        )
       }
 
       const newArray = tempArray.map(o => {
@@ -1062,24 +1086,6 @@ class Medication extends PureComponent {
       totalQuantity += item.quantity || 0
       totalPrice += item.totalPrice || 0
     })
-
-    // If add first medication, set the mixed drug's details (instruction, precaution, uom, batchNo and etc.)
-    if (
-      !deleted &&
-      activeDrugMixtureRows.length === 1 &&
-      activeDrugMixtureRows[0].inventoryMedicationFK
-    ) {
-      const { inventorymedication = [] } = codetable
-      const currentMedication = inventorymedication.find(
-        o => o.id === activeDrugMixtureRows[0].inventoryMedicationFK,
-      )
-      if (currentMedication) {
-        this.changeMedication(
-          activeDrugMixtureRows[0].inventoryMedicationFK,
-          currentMedication,
-        )
-      }
-    }
 
     if (activeDrugMixtureRows.find(r => r.isDispensedByPharmacy)) {
       setFieldValue('isDispensedByPharmacy', true)
@@ -1168,6 +1174,26 @@ class Medication extends PureComponent {
                 codetable: { inventorymedication = [] },
               } = this.props
             }
+            else {
+              row.quantity = undefined
+              row.uomfk = null
+              row.uomCode = undefined
+              row.uomDisplayValue = undefined
+              row.costPrice = undefined
+              row.unitPrice = undefined
+              row.totalPrice = undefined
+              row.drugCode = undefined
+              row.drugName = undefined
+              row.revenueCategoryFK = undefined
+              row.isDispensedByPharmacy = undefined
+              row.isNurseActualizeRequired = undefined
+              const activeDrugMixtureRows = (values.corPrescriptionItemDrugMixture || []).filter(
+                item => !item.isDeleted,
+              )
+              if (activeDrugMixtureRows[0].id === row.id) {
+                this.changeMedication()
+              }
+            }
           },
         },
         {
@@ -1253,7 +1279,7 @@ class Medication extends PureComponent {
         marginLeft: 6,
         height: '100%',
         color: stock < 0 ? 'red' : 'black'
-      }} title={`${stock || 0} ${uomName || ''}`} > {stock}</div>
+      }} title={`${numeral(stock || 0).format(qtyFormat)} ${uomName || ''}`} > {numeral(stock || 0).format(qtyFormat)}</div>
       <div style={{
         width: 120, display: 'inline-block',
         whiteSpace: 'nowrap',
