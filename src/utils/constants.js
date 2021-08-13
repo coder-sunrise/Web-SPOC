@@ -648,3 +648,5 @@ export const PATIENT_ALLERGY_TYPE = {
   INGREDIENT: 'Ingredient',
   NONALLERGY: 'NonAllergy'
 }
+
+export const ENABLE_PRESCRIPTION_SET_CLINIC_ROLE = [1]

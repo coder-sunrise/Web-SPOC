@@ -74,28 +74,28 @@ const baseColumns = (classes) => {
               {row.isDrugMixture ? 'Drug Mixture' : row.itemType}
               <div style={{ position: 'relative', top: 2 }}>
                 {drugMixtureIndicator(row, -20)}
-                {row.isExclusive && (
-                  <Tooltip title='Exclusive'>
-                    <div
-                      className={classes.rightIcon}
-                      style={{
-                        right: -30,
-                        borderRadius: 4,
-                        backgroundColor: 'green',
-                      }}
-                    >Excl.</div>
-                  </Tooltip>
-                )}
                 {row.isPreOrder && (
                   <Tooltip title='Pre-Order'>
                     <div
                       className={classes.rightIcon}
                       style={{
-                        right: row.isExclusive ? -60 : -30,
+                        right: -27,
                         borderRadius: 10,
                         backgroundColor: '#4255bd',
                       }}
                     > Pre</div>
+                  </Tooltip>
+                )}
+                {row.isExclusive && (
+                  <Tooltip title='Exclusive Drug'>
+                    <div
+                      className={classes.rightIcon}
+                      style={{
+                        right: row.isPreOrder ? -60 : -30,
+                        borderRadius: 4,
+                        backgroundColor: 'green',
+                      }}
+                    >Excl.</div>
                   </Tooltip>
                 )}
               </div>

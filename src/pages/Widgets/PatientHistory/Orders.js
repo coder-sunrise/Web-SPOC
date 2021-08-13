@@ -19,7 +19,7 @@ const drugMixtureIndicator = (row, right) => {
   )
 }
 
-export default ({ current, classes }) => {
+export default ({ current, classes, showDrugLabelRemark }) => {
   return (
     <div style={{ marginBottom: 8, marginTop: 8 }}>
       <Table
@@ -52,28 +52,28 @@ export default ({ current, classes }) => {
                     {row.isDrugMixture ? 'Drug Mixture' : row.type}
                     <div style={{ position: 'relative', top: 2 }}>
                       {drugMixtureIndicator(row, -20)}
-                      {row.isExclusive && (
-                        <Tooltip title='Exclusive'>
-                          <div
-                            className={classes.rightIcon}
-                            style={{
-                              right: -30,
-                              borderRadius: 4,
-                              backgroundColor: 'green',
-                            }}
-                          >Excl.</div>
-                        </Tooltip>
-                      )}
                       {row.isPreOrder && (
                         <Tooltip title='Pre-Order'>
                           <div
                             className={classes.rightIcon}
                             style={{
-                              right: row.isExclusive ? -60 : -30,
+                              right: -27,
                               borderRadius: 10,
                               backgroundColor: '#4255bd',
                             }}
                           > Pre</div>
+                        </Tooltip>
+                      )}
+                      {row.isExclusive && (
+                        <Tooltip title='Exclusive Drug'>
+                          <div
+                            className={classes.rightIcon}
+                            style={{
+                              right: row.isPreOrder ? -60 : -30,
+                              borderRadius: 4,
+                              backgroundColor: 'green',
+                            }}
+                          >Excl.</div>
                         </Tooltip>
                       )}
                     </div>
@@ -118,7 +118,7 @@ export default ({ current, classes }) => {
             dataIndex: 'remarks',
             title: 'Remarks',
             render: (text, row) => {
-              const existsDrugLabelRemarks = row.drugLabelRemarks && row.drugLabelRemarks.trim() !== ''
+              const existsDrugLabelRemarks = showDrugLabelRemark && row.drugLabelRemarks && row.drugLabelRemarks.trim() !== ''
               return <div style={{ position: 'relative' }}>
                 <div
                   style={{

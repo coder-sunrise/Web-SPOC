@@ -13,6 +13,20 @@ const wrapCellTextStyle = {
   whiteSpace: 'pre-wrap',
 }
 
+const rightIcon = {
+  position: 'absolute',
+  bottom: 2,
+  fontWeight: 500,
+  color: 'white',
+  fontSize: '0.7rem',
+  padding: '2px 3px',
+  height: 20,
+  right: -30,
+  borderRadius: 4,
+  backgroundColor: 'green',
+  cursor: 'pointer'
+}
+
 const Grid = ({ prescriptionSet, dispatch }) => {
 
   const editRow = (row) => {
@@ -27,19 +41,16 @@ const Grid = ({ prescriptionSet, dispatch }) => {
     }
   }
 
-  const drugMixtureIndicator = (row) => {
-    if (!row.isDrugMixture) return null
+  const drugMixtureIndicator = (row, right) => {
     const activePrescriptionSetItemDrugMixture = row.prescriptionSetItemDrugMixture.filter(
       (item) => !item.isDeleted,
     )
 
     return (
-      <div style={{ position: 'relative', top: 2 }}>
         <DrugMixtureInfo
           values={activePrescriptionSetItemDrugMixture}
-          isShowTooltip={false}
-        />
-      </div>
+        isShowTooltip={false} right={right}
+      />
     )
   }
   return <CommonTableGrid
@@ -66,6 +77,7 @@ const Grid = ({ prescriptionSet, dispatch }) => {
         width: 150,
         render: (row) => {
           let texts = []
+          const firstInstruction = (row.prescriptionSetItemInstruction || []).find(item => !item.isDeleted)
           if (row.isDrugMixture === true) texts = 'Drug Mixture'
           else {
             texts = [
@@ -77,11 +89,22 @@ const Grid = ({ prescriptionSet, dispatch }) => {
           let warningLabel
           if (!row.isActive && !row.isDrugMixture) {
             warningLabel = '#1'
-          } else if (!row.isDrugMixture && row.inventoryDispenseUOMFK !== row.dispenseUOMFK) {
+          } else if (!row.isDrugMixture
+            && (row.inventoryDispenseUOMFK !== row.dispenseUOMFK
+              || firstInstruction?.prescribeUOMFK !== row.inventoryPrescribingUOMFK)) {
             warningLabel = '#2'
           }
+
+          let paddingRight = 0
+          if (row.isExclusive) {
+            paddingRight = 24
+          }
+          if (row.isDrugMixture) {
+            paddingRight = 10
+          }
           return (
-            <div style={wrapCellTextStyle}>
+            <div style={wrapCellTextStyle}
+              style={{ paddingRight: paddingRight }}>
               <Tooltip title={texts}>
                 <span>
                   {warningLabel && (
@@ -91,7 +114,14 @@ const Grid = ({ prescriptionSet, dispatch }) => {
                   )}<span>{texts}</span>
                 </span>
               </Tooltip>
-              {drugMixtureIndicator(row)}
+              <div style={{ position: 'relative' }}>
+                {row.isDrugMixture && drugMixtureIndicator(row, -20)}
+                {row.isExclusive && (
+                  <Tooltip title='Exclusive Drug'>
+                    <div style={rightIcon}>Excl.</div>
+                  </Tooltip>
+                )}
+              </div>
             </div>
           )
         },

@@ -13,16 +13,22 @@ import {
   DateRangePicker,
   NumberInput,
   CodeSelect,
-  RadioGroup
+  RadioGroup,
 } from '@/components'
 import PrescriptionItem from './PrescriptionItem'
 import Grid from './Grid'
 
 const Detail = (props) => {
-  const { theme, footer, handleSubmit, values, setFieldValue, codetable, generalAccessRight, personalAccessRight, prescriptionSet } = props
-  const typeEnable = generalAccessRight.rights === 'enable' && personalAccessRight.rights === 'enable'
+  const { theme, footer, handleSubmit, values, setFieldValue, codetable, generalAccessRight, prescriptionSet } = props
+  const typeEnable = generalAccessRight.rights === 'enable'
   const containsMedication = (prescriptionSet.prescriptionSetItems || []).filter(ps => !ps.isDeleted).length > 0
   const containsInactiveMedication = (prescriptionSet.prescriptionSetItems || []).filter(ps => !ps.isDeleted && !ps.isActive).length > 0
+  const containsUOMChangedMedication = (prescriptionSet.prescriptionSetItems || []).filter(ps => {
+    const firstInstruction = (ps.prescriptionSetItemInstruction || []).find(item => !item.isDeleted)
+    return !ps.isDeleted && !ps.isDrugMixture
+      && (ps.inventoryDispenseUOMFK !== ps.dispenseUOMFK
+        || firstInstruction?.prescribeUOMFK !== ps.inventoryPrescribingUOMFK)
+  }).length > 0
   return (
     <React.Fragment>
       <GridContainer>
@@ -101,6 +107,11 @@ const Detail = (props) => {
             At least one medication is required
           </GridItem>
         }
+        {containsUOMChangedMedication &&
+          <GridItem xs={12} style={{ marginTop: theme.spacing(1), color: 'red' }}>
+            Update dispense/prescribe UOM to save the prescription set
+          </GridItem>
+        }
         <GridItem xs={12} style={{ marginTop: theme.spacing(1) }}>
           <span>
             Note:&nbsp;
@@ -111,9 +122,9 @@ const Detail = (props) => {
             <span style={{ color: 'red', fontStyle: 'italic' }}>
               <sup>#2&nbsp;</sup>
             </span>
-            dispensing UOM is changed&nbsp;&nbsp;
+            dispense/prescribe UOM is changed&nbsp;&nbsp;
           </span>
-          {containsInactiveMedication && <span style={{ color: 'red', marginLeft: 20 }}>Remove inactive medication to save prescription set</span>}
+          {containsInactiveMedication && <span style={{ color: 'red', marginLeft: 20 }}>Remove inactive medication to save the prescription set</span>}
         </GridItem>
       </GridContainer>
       {footer &&
@@ -121,7 +132,7 @@ const Detail = (props) => {
           onConfirm: handleSubmit,
           confirmBtnText: 'Save',
           confirmProps: {
-            disabled: !containsMedication || containsInactiveMedication,
+            disabled: !containsMedication || containsInactiveMedication || containsUOMChangedMedication,
           },
         })}
     </React.Fragment>
@@ -151,7 +162,6 @@ export default compose(
     }),
     handleSubmit: (values, { props, resetForm }) => {
       const { dispatch, onConfirm, prescriptionSet } = props
-
       dispatch({
         type: 'prescriptionSet/upsert',
         payload: {

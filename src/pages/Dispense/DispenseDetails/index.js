@@ -124,7 +124,7 @@ const DispenseDetails = ({
   } = invoice
 
   const { inventorymedication, inventoryvaccination } = codetable
-  const { settings = [] } = clinicSettings
+  const { settings = {} } = clinicSettings
   const currentDoc = doctorprofile.filter(x=>x.id === visit.doctorProfileFK)
   const docInfo = currentDoc && currentDoc.length > 0 ? currentDoc[0].clinicianProfile : {}
 
@@ -303,6 +303,8 @@ const DispenseDetails = ({
     )
   }
 
+  const { labelPrinterSize } = settings
+  const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
   return (
     <React.Fragment>
       <GridContainer>
@@ -487,6 +489,7 @@ const DispenseDetails = ({
                 onPrint,
                 inventorymedication,
                 handleSelectedBatch,
+                showDrugLabelRemark
               )}
               data={prescription}
             />
@@ -516,7 +519,7 @@ const DispenseDetails = ({
                 title='Package'
                 idPrefix='package'
                 columns={PackageColumns}
-                colExtensions={PackageColumnExtensions(onPrint)}
+                colExtensions={PackageColumnExtensions(onPrint, showDrugLabelRemark)}
                 data={packageItem}
                 FuncProps={{
                   pager: false,

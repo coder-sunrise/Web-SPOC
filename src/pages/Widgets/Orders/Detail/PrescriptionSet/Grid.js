@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import moment from 'moment'
 import _ from 'lodash'
+import { Tag } from 'antd'
 // material ui
 import { withStyles, Divider } from '@material-ui/core'
 import { Collapse } from 'antd'
@@ -56,6 +57,22 @@ const styles = () => ({
     cursor: 'pointer',
     color: dangerColor,
   },
+  tagStyle: {
+    fontSize: '0.85rem',
+    padding: '1px 3px',
+    fontWeight: 500,
+    borderRadius: 4
+  },
+  rightIcon: {
+    position: 'absolute',
+    bottom: 2,
+    fontWeight: 500,
+    color: 'white',
+    fontSize: '0.7rem',
+    padding: '2px 3px',
+    height: 20,
+    cursor: 'pointer'
+  }
 })
 class Grid extends PureComponent {
   PrescriptionSets = () => {
@@ -72,14 +89,11 @@ class Grid extends PureComponent {
       user,
       selectType,
       generalAccessRight,
-      personalAccessRight
     } = this.props
 
-    const drugMixtureIndicator = (row) => {
+    const drugMixtureIndicator = (row, right) => {
       return (
-        <div style={{ position: 'relative', top: 3 }}>
-          <DrugMixtureInfo values={row.prescriptionSetItemDrugMixture || []} />
-        </div>
+        <DrugMixtureInfo values={row.prescriptionSetItemDrugMixture || []} right={right} />
       )
     }
 
@@ -97,9 +111,17 @@ class Grid extends PureComponent {
       )
 
       const isSelect = addedPrescriptionSets.indexOf(o.id) >= 0
-      const selectEnable = items.filter(item => (item.isDrugMixture || (item.isActive && item.inventoryDispenseUOMFK === item.dispenseUOMFK))).length > 0
+      const selectEnable = items.filter(item => {
+        const firstInstruction = (item.prescriptionSetItemInstruction || []).find(item => !item.isDeleted)
+        if (item.isDrugMixture || (item.isActive
+          && item.inventoryDispenseUOMFK === item.dispenseUOMFK
+          && firstInstruction?.prescribeUOMFK === item.inventoryPrescribingUOMFK
+        )) {
+          return true
+        }
+      }).length === items.length
 
-      const editEnable = (o.type === 'General' && generalAccessRight.rights === "enable") || (o.type === 'Personal' && personalAccessRight.rights === "enable")
+      const editEnable = (o.type === 'Personal' || generalAccessRight.rights === "enable")
       return {
         header: (
           <div
@@ -109,23 +131,50 @@ class Grid extends PureComponent {
             style={{ display: 'relative', padding: '3px 0px 8px 0px', height: 36 }}
           >
             <div style={{
-              marginLeft: 5, marginTop: 14
+              left: 5, position: 'absolute', top: 10,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              width: 400,
+              height: 24
             }}>
               {o.sortOrder >= 0 ? `${o.sortOrder}. ` : ''}
               <Tooltip title={o.prescriptionSetName}>
-                <span style={{ fontWeight: 500 }}>
+                <span style={{ fontWeight: 500, lineHeight: '24px' }}>
                   {o.prescriptionSetName}
                 </span>
               </Tooltip>
             </div>
 
-            {(selectType === 'All' || selectType === 'General') &&
-              <div style={{ position: 'absolute', top: 20, right: 110 }}> {`${o.ownedByUser}(${o.type})`}</div>
+            {selectType !== 'Personal' &&
+              <div style={{ left: 410, position: 'absolute', top: 8 }}>
+                {o.type === 'General' ?
+                  <Tag className={classes.tagStyle} style={{ border: '1px solid #99CC99', color: '#7CD55E', backgroundColor: '#F6FFED' }}>General</Tag>
+                  :
+                  <Tag className={classes.tagStyle} style={{ border: '1px solid lightblue', color: '#354497', backgroundColor: '#E6F7FF' }}>Personal</Tag>
+                }
+              </div>
+            }
+
+            {o.type === 'General' &&
+              <div style={{
+                position: 'absolute', top: 10,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap', right: 110, maxWidth: 300,
+              }}>
+                <Tooltip title={`Last Modified By: ${o.ownedByUser}`}>
+                  <span style={{ lineHeight: '24px' }}>
+                    {`Last Modified By: ${o.ownedByUser}`}
+                  </span>
+                </Tooltip>
+              </div>
             }
             <div style={{ position: 'absolute', top: 8, right: 75 }}>
               {!isSelect ? <span
                 className={classes.addIcon}
                 style={{ color: selectEnable ? primaryColor : grayColor }}
+                title={selectEnable ? '' : 'Edit the prescription set to proceed'}
                 onClick={selectEnable ? (event) => {
                   event.stopPropagation()
                   onSelectItems(o.id)
@@ -192,13 +241,24 @@ class Grid extends PureComponent {
         content: (
           <div>
             {items.map((item) => {
+              const firstInstruction = (item.prescriptionSetItemInstruction || []).find(item => !item.isDeleted)
               let warningLabel
               if (!item.isActive && !item.isDrugMixture) {
                 warningLabel = '#1'
-              } else if (!item.isDrugMixture && item.inventoryDispenseUOMFK !== item.dispenseUOMFK) {
+              } else if (!item.isDrugMixture
+                && (item.inventoryDispenseUOMFK !== item.dispenseUOMFK
+                  || firstInstruction?.prescribeUOMFK !== item.inventoryPrescribingUOMFK)) {
                 warningLabel = '#2'
               } else if (item.isExternalPrescription) {
                 warningLabel = '#3'
+              }
+
+              let paddingRight = 0
+              if (item.isExclusive) {
+                paddingRight = 34
+              }
+              if (item.isDrugMixture) {
+                paddingRight = 20
               }
               return (
                 <div
@@ -209,7 +269,7 @@ class Grid extends PureComponent {
                 >
                   <GridContainer>
                     <div className={classes.nameColumn}
-                      style={{ paddingRight: item.isDrugMixture ? 20 : 0 }}>
+                      style={{ paddingRight: paddingRight }}>
                       {warningLabel && (
                         <span style={{ color: 'red', fontStyle: 'italic' }}>
                           <sup>{warningLabel}&nbsp;</sup>
@@ -218,8 +278,20 @@ class Grid extends PureComponent {
                       <Tooltip title={item.drugName}>
                         <span>{item.drugName}</span>
                       </Tooltip>
-                      <div style={{ position: 'relative', top: 2 }}>
+                      <div style={{ position: 'relative' }}>
                         {item.isDrugMixture && drugMixtureIndicator(item, -20)}
+                        {item.isExclusive && (
+                          <Tooltip title='Exclusive Drug'>
+                            <div
+                              className={classes.rightIcon}
+                              style={{
+                                right: -30,
+                                borderRadius: 4,
+                                backgroundColor: 'green',
+                              }}
+                            >Excl.</div>
+                          </Tooltip>
+                        )}
                       </div>
                     </div>
                     <div className={classes.instructionColumn}>
@@ -309,7 +381,7 @@ class Grid extends PureComponent {
               <span style={{ color: 'red', fontStyle: 'italic' }}>
                 <sup>#2&nbsp;</sup>
               </span>
-              dispensing UOM is changed&nbsp;&nbsp;
+              dispense/prescribe UOM is changed&nbsp;&nbsp;
               {!isRetail && (
                 <span>
                   <span style={{ color: 'red', fontStyle: 'italic' }}>

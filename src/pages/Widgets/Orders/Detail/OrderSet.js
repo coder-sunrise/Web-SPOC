@@ -517,7 +517,7 @@ class OrderSet extends PureComponent {
                 </Tooltip>
                 <div style={{ position: 'relative', top: 2 }}>
                   {row.isExclusive && (
-                    <Tooltip title='Exclusive'>
+                    <Tooltip title='Exclusive Drug'>
                       <div
                         className={classes.rightIcon}
                         style={{

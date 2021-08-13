@@ -31,6 +31,7 @@ import { currencySymbol } from '@/utils/config'
 import CannedTextButton from '@/pages/Widgets/Orders/Detail/CannedTextButton'
 import { CANNED_TEXT_TYPE } from '@/utils/constants'
 import LowStockInfo from '../../LowStockInfo'
+import { useForkRef } from '@material-ui/core'
 
 const getCautions = (
   inventorymedication = [],
@@ -139,9 +140,12 @@ const drugMixtureItemSchema = Yup.object().shape({
     )
     return {
       ...v,
+      dispenseUOMFK: isDrugMixture ? v.dispenseUOMFK : v.inventoryDispenseUOMFK,
+      dispenseUOMDisplayValue: isDrugMixture ? v.dispenseUOMDisplayValue : medication?.dispensingUOM?.name,
       prescriptionSetItemInstruction: (v.prescriptionSetItemInstruction || []).map(i => {
         return {
           ...i,
+          prescribeUOMFK: isDrugMixture ? i.prescribeUOMFK : v.inventoryPrescribingUOMFK,
           uid: i.uid || getUniqueId()
         }
       }),
@@ -196,7 +200,13 @@ const drugMixtureItemSchema = Yup.object().shape({
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
-    const { dispatch, prescriptionSet } = props
+    const { dispatch, prescriptionSet, codetable } = props
+    const {
+      ctmedicationdosage,
+      ctmedicationusage,
+      ctmedicationfrequency,
+      ctmedicationunitofmeasurement
+    } = codetable
 
     const getNextSequence = () => {
       const { prescriptionSet: { prescriptionSetItems = [] } } = props
@@ -233,9 +243,14 @@ const drugMixtureItemSchema = Yup.object().shape({
             ? ` For ${item.duration} day(s)`
             : ''
 
-          instruction += `${item.usageMethodDisplayValue ? item.usageMethodDisplayValue : ''
-            } ${item.dosageDisplayValue ? item.dosageDisplayValue : ''} ${item.prescribeUOMDisplayValue ? item.prescribeUOMDisplayValue : ''
-            } ${item.drugFrequencyDisplayValue ? item.drugFrequencyDisplayValue : ''
+          const dosage = ctmedicationdosage.find(d => d.id === item.dosageFK)
+          const usage = ctmedicationusage.find(u => u.id === item.usageMethodFK)
+          const frequency = ctmedicationfrequency.find(f => f.id === item.drugFrequencyFK)
+          const uom = ctmedicationunitofmeasurement.find(m => m.id === item.prescribeUOMFK)
+
+          instruction += `${usage?.name || ''
+            } ${dosage?.displayValue || ''} ${uom?.name || ''
+            } ${frequency?.displayValue || ''
             }${itemDuration}${nextStepdose}`
         }
       }
@@ -329,15 +344,33 @@ class Detail extends PureComponent {
   }
 
   renderMedication = (option) => {
-    const { combinDisplayValue = '', medicationGroup = {} } = option
+    const { combinDisplayValue = '', medicationGroup = {}, stock = 0, dispensingUOM = {}, isExclusive } = option
+    const { name: uomName = '' } = dispensingUOM
     return <div style={{ height: 22 }} >
-      <div style={{
-        width: 340, display: 'inline-block',
-        whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
-        overflow: 'hidden',
-        height: '100%',
-      }} title={combinDisplayValue}>{combinDisplayValue}</div>
+      <div style={{ width: 440, display: 'inline-block', }}>
+        <div style={{
+          maxWidth: isExclusive ? 400 : 440, display: 'inline-block',
+          whiteSpace: 'nowrap',
+          textOverflow: 'ellipsis',
+          overflow: 'hidden',
+          height: '100%',
+        }} title={combinDisplayValue}>{combinDisplayValue}</div>
+
+        {isExclusive &&
+          <div style={{
+            display: 'inline-block', height: '100%',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              backgroundColor: 'green', color: 'white',
+              height: 22, borderRadius: 4,
+              padding: '1px 5px',
+              fontWeight: 500,
+            }} title='Exclusive Drug'>Excl.</div>
+          </div>
+        }
+      </div>
       <div style={{
         width: 120, display: 'inline-block',
         whiteSpace: 'nowrap',
@@ -438,8 +471,9 @@ class Detail extends PureComponent {
       setFieldValue(`prescriptionSetItemPrecaution`, newPrescriptionPrecaution)
     }
 
-    setFieldValue('dispenseUOMFK', op.dispensingUOM ? op.dispensingUOM.id : [])
-    setFieldValue('inventoryDispenseUOMFK', op.dispensingUOM ? op.dispensingUOM.id : [])
+    setFieldValue('dispenseUOMFK', op.dispensingUOM ? op.dispensingUOM.id : undefined)
+    setFieldValue('inventoryDispenseUOMFK', op.dispensingUOM ? op.dispensingUOM.id : undefined)
+    setFieldValue('inventoryPrescribingUOMFK', op.prescribingUOM ? op.prescribingUOM.id : undefined)
 
     setFieldValue(
       'dispenseUOMDisplayValue',
@@ -448,6 +482,7 @@ class Detail extends PureComponent {
 
     if (!values.isDrugMixture) {
       setFieldValue('drugName', op.displayValue)
+      setFieldValue('isExclusive', op.isExclusive)
 
       setTimeout(() => {
         this.calculateQuantity(op)
@@ -757,7 +792,19 @@ class Detail extends PureComponent {
 
     if (deleted) {
       const tempArray = [...values.prescriptionSetItemDrugMixture]
-
+      const actviceItem = tempArray.filter(i => !i.isDeleted)
+      if (actviceItem.length > 1 && actviceItem[0].id === deleted[0]) {
+        const { inventorymedication = [] } = codetable
+        const currentMedication = inventorymedication.find(
+          o => o.id === actviceItem[1].inventoryMedicationFK,
+        )
+        if (currentMedication) {
+          this.changeMedication(
+            actviceItem[1].inventoryMedicationFK,
+            currentMedication,
+          )
+        }
+      }
       const newArray = tempArray.map(o => {
         if (o.id === deleted[0]) {
           return {
@@ -774,8 +821,13 @@ class Detail extends PureComponent {
       setFieldValue('prescriptionSetItemDrugMixture', newArray)
       const newCautions = [...values.cautions].filter(o => o.id !== deleted[0])
       setFieldValue('cautions', newCautions)
+
+      if (!newArray.find(i => !i.isDeleted)) {
+        this.changeMedication()
+      }
     } else {
       let _rows = this.checkIsDrugMixtureItemUnique({ rows, changed })
+
       if (added) {
         _rows = [...values.prescriptionSetItemDrugMixture, rows[0]]
       }
@@ -831,7 +883,7 @@ class Detail extends PureComponent {
           },
           dropdownMatchSelectWidth: false,
           dropdownStyle: {
-            width: 500,
+            width: 600,
           },
           renderDropdown: (option) => {
             return this.renderMedication(option)
@@ -980,7 +1032,7 @@ class Detail extends PureComponent {
                         handleFilter={this.filterMedicationOptions}
                         dropdownMatchSelectWidth={false}
                         dropdownStyle={{
-                          width: 500,
+                          width: 600,
                         }}
                         renderDropdown={this.renderMedication}
                         {...args}
@@ -1019,7 +1071,7 @@ class Detail extends PureComponent {
                 >
                   <span
                     style={{
-                      color: 'red',
+                      color: 'gray',
                       fontSize: '0.75rem',
                       fontWeight: 500,
                     }}
