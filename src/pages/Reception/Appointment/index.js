@@ -5,6 +5,7 @@ import moment from 'moment'
 import { withStyles } from '@material-ui/core'
 // common component
 import { CardContainer, CommonModal } from '@/components'
+import { ReportViewer } from '@/components/_medisys'
 // sub component
 import BigCalendar from 'react-big-calendar'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
@@ -285,6 +286,31 @@ class Appointment extends React.PureComponent {
     this.setState({
       isDragging: false,
     })
+  }
+
+  printDailyAppointmentReport = (date,clinicianFK) => {
+    this.reportDailyAppt(date,date,clinicianFK)
+  }
+
+  reportDailyAppt = (start, end, resourceId) => {
+    this.setState({
+      selectedSlot: { start, end, resourceId },
+      showDailyAppointmentListingReport: true,
+    })
+  }
+
+  createDailyApptListingPayload = ({ start, end, resourceId }) => {
+    var payload = {
+      apptDateFrom: moment(start)
+        .set({ hour: 0, minute: 0, second: 0, millisecond:0 })
+        .toDate(),
+      apptDateto: moment(end)
+        .set({ hour: 23, minute: 59, second: 59 })
+        .toDate(),
+      doctor: resourceId,
+    }
+    console.log('report payload',payload)
+    return payload
   }
 
   onSelectSlot = props => {
@@ -602,6 +628,14 @@ class Appointment extends React.PureComponent {
     })
   }
 
+  toggleDailyAppointmentListingReport = () => {
+    this.setState(prevState => {
+      return {
+        showDailyAppointmentListingReport: !prevState.showDailyAppointmentListingReport,
+      }
+    })
+  }
+
   render() {
     const {
       calendar: CalendarModel,
@@ -620,6 +654,7 @@ class Appointment extends React.PureComponent {
       selectedAppointmentFK,
       showSearchAppointmentModal,
       eventType,
+      showDailyAppointmentListingReport,
     } = this.state
 
     const { currentViewAppointment, mode, calendarView } = CalendarModel
@@ -659,6 +694,7 @@ class Appointment extends React.PureComponent {
               handleMoveEvent={this.moveEvent}
               handleEventMouseOver={this.onEventMouseOver}
               handleOnDragStart={this.handleOnDragStart}
+              printDailyAppointmentReport={this.printDailyAppointmentReport}
             />
           </div>
         </Authorized>
@@ -725,6 +761,22 @@ class Appointment extends React.PureComponent {
             handleAddAppointmentClick={this.handleAddAppointmentClick}
             currentUser={user.data.clinicianProfile.id}
             doctorprofile={doctorprofile}
+          />
+        </CommonModal>
+
+        <CommonModal
+          open={showDailyAppointmentListingReport}
+          onClose={this.toggleDailyAppointmentListingReport}
+          title='Daily Appointment Listing'
+          maxWidth='lg'
+        >
+          <ReportViewer
+            showTopDivider={false}
+            reportID={81}
+            reportParameters={{
+              ...this.createDailyApptListingPayload(selectedSlot),
+            }}
+            defaultScale={1.5}
           />
         </CommonModal>
       </CardContainer>
