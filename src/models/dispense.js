@@ -90,6 +90,21 @@ export default createFormViewModel({
         })
       },
 
+      *addActualize({payload},{call,put}){
+        const response = yield call(service.addActualize, payload)
+        return response
+      },
+
+      *getActualize({payload},{call,put}){
+        const response = yield call(service.getActualize, payload)
+        return response
+      },
+
+      *cancelActualize({payload},{call,put}){
+        const response = yield call(service.cancelActualize, payload)
+        return response
+      },
+
       *getServingPersons({payload},{call,put}){
         const response = yield call(service.getServingPersons, payload)
         if (response)
