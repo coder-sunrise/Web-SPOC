@@ -111,7 +111,6 @@ const drugMixtureItemSchema = Yup.object().shape({
       return {
         ...precaution,
         sequence,
-        uid: precaution.uid || getUniqueId()
       }
     })
 
@@ -146,7 +145,6 @@ const drugMixtureItemSchema = Yup.object().shape({
         return {
           ...i,
           prescribeUOMFK: isDrugMixture ? i.prescribeUOMFK : v.inventoryPrescribingUOMFK,
-          uid: i.uid || getUniqueId()
         }
       }),
       prescriptionSetItemPrecaution:

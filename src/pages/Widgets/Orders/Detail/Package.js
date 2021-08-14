@@ -185,7 +185,9 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
           isExternalPrescription: false,
           instruction: getInstruction(medication, matchInstruction),
-          dispenseUOMFK: medication.dispensingUOM.id,
+          dispenseUOMFK: medication?.dispensingUOM?.id,
+          inventoryDispenseUOMFK: medication?.dispensingUOM?.id,
+          inventoryPrescribingUOMFK: medication?.prescribingUOM?.id,
           dispenseUOMCode: medicationdispensingUOM
             ? medicationdispensingUOM.code
             : undefined,

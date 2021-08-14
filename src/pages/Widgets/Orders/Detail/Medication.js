@@ -203,7 +203,6 @@ const getVisitDoctorUserId = props => {
       return {
         ...precaution,
         sequence,
-        uid: precaution.uid || getUniqueId()
       }
     })
 
@@ -225,12 +224,6 @@ const getVisitDoctorUserId = props => {
     )
     return {
       ...v,
-      corPrescriptionItemInstruction: (v.corPrescriptionItemInstruction || []).map(i => {
-        return {
-          ...i,
-          uid: i.uid || getUniqueId()
-        }
-      }),
       corPrescriptionItemPrecaution:
         newCorPrescriptionItemPrecaution.length > 0
           ? newCorPrescriptionItemPrecaution
@@ -731,7 +724,9 @@ class Medication extends PureComponent {
       setFieldValue(`corPrescriptionItemPrecaution`, newPrescriptionPrecaution)
     }
 
-    setFieldValue('dispenseUOMFK', op.dispensingUOM ? op.dispensingUOM.id : [])
+    setFieldValue('dispenseUOMFK', op?.dispensingUOM?.id)
+    setFieldValue('inventoryDispenseUOMFK', op?.dispensingUOM?.id)
+    setFieldValue('inventoryPrescribingUOMFK', op?.prescribingUOM?.id)
     setFieldValue(
       'dispenseUOMCode',
       op.dispensingUOM ? op.dispensingUOM.code : [],
@@ -1279,7 +1274,7 @@ class Medication extends PureComponent {
         marginLeft: 6,
         height: '100%',
         color: stock < 0 ? 'red' : 'black'
-      }} title={`${numeral(stock || 0).format(qtyFormat)} ${uomName || ''}`} > {numeral(stock || 0).format(qtyFormat)}</div>
+      }} title={`Current Stock: ${numeral(stock || 0).format(qtyFormat)} ${uomName || ''}`} > {numeral(stock || 0).format(qtyFormat)}</div>
       <div style={{
         width: 120, display: 'inline-block',
         whiteSpace: 'nowrap',

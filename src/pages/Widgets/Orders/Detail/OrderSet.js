@@ -192,6 +192,8 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           isExternalPrescription: false,
           instruction: getInstruction(inventoryMedication, matchInstruction),
           dispenseUOMFK: inventoryMedication.dispensingUOMFK,
+          inventoryDispenseUOMFK: inventoryMedication.dispensingUOMFK,
+          inventoryPrescribingUOMFK: inventoryMedication.prescribingUOMFK,
           dispenseUOMCode: medicationdispensingUOM
             ? medicationdispensingUOM.code
             : undefined,

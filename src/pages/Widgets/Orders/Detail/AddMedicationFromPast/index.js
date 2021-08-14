@@ -187,6 +187,8 @@ class PastMedication extends PureComponent {
         let itemDispenseUOMCode
         let itemDispenseUOMDisplayValue
         let itemDispenseUOMFK
+        let itemInventoryDispenseUOMFK
+        let itemInventoryPrescribingUOMFK
         let itemDrugCode
         let itemDrugName
         let itemTotalPrice
@@ -262,6 +264,8 @@ class PastMedication extends PureComponent {
           itemDispenseUOMFK = drug.dispensingUOM
             ? drug.dispensingUOM.id
             : undefined
+          itemInventoryDispenseUOMFK = drug?.dispensingUOM?.id
+          itemInventoryPrescribingUOMFK = drug?.prescribingUOM?.id
           itemDrugCode = drug.code
           itemDrugName = drug.displayValue
           itemDrugCaution = drug.caution
@@ -367,6 +371,8 @@ class PastMedication extends PureComponent {
           dispenseUOMCode: itemDispenseUOMCode,
           dispenseUOMDisplayValue: itemDispenseUOMDisplayValue,
           dispenseUOMFK: itemDispenseUOMFK,
+          inventoryDispenseUOMFK: itemInventoryDispenseUOMFK,
+          inventoryPrescribingUOMFK: itemInventoryPrescribingUOMFK,
           drugCode: itemDrugCode,
           drugName: itemDrugName,
           instruction,
