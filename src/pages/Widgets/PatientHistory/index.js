@@ -10,7 +10,7 @@ import { Field } from 'formik'
 import numeral from 'numeral'
 import Search from '@material-ui/icons/Search'
 // material ui
-import { withStyles } from '@material-ui/core'
+import { withStyles, Link } from '@material-ui/core'
 // common components
 import {
   CardContainer,
@@ -34,6 +34,7 @@ import * as WidgetConfig from './config'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import HistoryDetails from './HistoryDetails'
 import customtyles from './PatientHistoryStyle.less'
+import NurseActualization from '@/pages/Dispense/DispenseDetails/NurseActualization'
 
 const defaultValue = {
   visitDate: [
@@ -167,6 +168,8 @@ class PatientHistory extends Component {
       totalVisits: 0,
       currentHeight: window.innerHeight,
       isLoadingData: true,
+      currentOrders: [],
+      showActualizationHistory: false,
     }
   }
 
@@ -609,6 +612,17 @@ class PatientHistory extends Component {
     return true
   }
 
+  viewActualizationHistory = orders => {
+    this.setState({
+      currentOrders: orders,
+      showActualizationHistory: true,
+    })
+  }
+
+  closeActualizationHistory = () => {
+    this.setState({ currentOrders: [], showActualizationHistory: false })
+  }
+
   getDetailPanel = history => {
     const { isFullScreen = true, classes, clinicSettings } = this.props
     const { visitPurposeFK, isNurseNote, nurseNotes } = history
@@ -688,7 +702,22 @@ class PatientHistory extends Component {
                     fontSize: '0.85rem',
                   }}
                 >
-                  {o.name}
+                  <span>{o.name}</span>
+                  {o.name === 'Orders' && current.isExistsActualizationHistory && (
+                    <span>
+                      <Link
+                        style={{
+                          marginLeft: 10,
+                          textDecoration: 'underline',
+                        }}
+                        onClick={() => {
+                          this.viewActualizationHistory(current.orders)
+                        }}
+                      >
+                        Actualization History
+                      </Link>
+                    </span>
+                  )}
                 </span>
                 {Widget ? (
                   <Widget
@@ -1855,6 +1884,19 @@ class PatientHistory extends Component {
             closeHistoryDetails={this.closeHistoryDetails}
             selectHistory={selectHistory}
             scribbleNoteUpdateState={this.scribbleNoteUpdateState}
+          />
+        </CommonModal>
+        <CommonModal
+          maxWidth='xl'
+          title='Actualization History'
+          className={customtyles.deepCommomModel}
+          open={this.state.showActualizationHistory}
+          onClose={this.closeActualizationHistory}
+        >
+          <NurseActualization
+            nurseWorkitemIds={this.state.currentOrders.map(x => x.nurseWorkitemFK).filter(x=>x).join(',')}
+            dispatch={this.props.dispatch}
+            onClose={this.closeActualizationHistory}
           />
         </CommonModal>
       </div>

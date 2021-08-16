@@ -107,6 +107,25 @@ const fns = {
     })
     return r
   },
-  
+  addActualize : async params => {
+    const r = await request(`${url}/addActualize`, {
+      method: 'POST',
+      body: params
+    })
+    return r
+  },
+  getActualize : async params => {
+    const r = await request(`${url}/getActualize/${params.status}?nurseWorkitemIds=${params.nurseWorkitemIds}`, {
+      method: 'GET',
+    })
+    return r
+  },
+  cancelActualize : async params => {
+    const r = await request(`${url}/cancelActualize`, {
+      method: 'PUT',
+      body: params
+    })
+    return r
+  },
 }
 export default fns

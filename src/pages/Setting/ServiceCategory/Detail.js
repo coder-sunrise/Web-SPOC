@@ -52,7 +52,7 @@ class Detail extends PureComponent {
 
   render() {
     const { props } = this
-    const { theme, footer, settingServiceCategory, clinicSettings } = props
+    const { theme, footer, settingServiceCategory } = props
     // console.log('detail', props)
     return (
       <React.Fragment>
@@ -91,24 +91,6 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
-            {clinicSettings.isEnableLabModule && (
-              <GridItem md={6}>
-                <FastField
-                  name='isPanelItemRequired'
-                  render={args => {
-                    return (
-                      <Switch
-                        checkedChildren='Yes'
-                        unCheckedChildren='No'
-                        label='Panel Item Required'
-                        defaultChecked
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-            )}
             <GridItem md={12}>
               <FastField
                 name='description'

@@ -3,7 +3,7 @@ import { withStyles } from '@material-ui/core'
 // common component
 import { CommonTableGrid } from '@/components'
 // variables
-import { tableConfig } from '../variables'
+import { tableConfig, getRowId } from '../variables'
 // utils
 import { getUniqueGUID } from '@/utils/utils'
 
@@ -20,27 +20,21 @@ const TableData = ({
   classes,
   idPrefix,
   title,
+  titleExtend,
   height,
   columns,
   colExtensions,
   data,
   ...props
 }) => {
-  const getRowId = (r) => {
-    const suffix = r.type
-    if (idPrefix === 'otherOrders') {
-      const itemFK = r.invoiceItemFK || r.sourceFK
-      return `${idPrefix}-${r.id}-${itemFK}-${suffix}`
-    }
-    return `${idPrefix}-${r.id}-${suffix}`
-  }
+  
   return (
     <div className={classes.tableContainer}>
-      <h5>{title}</h5>
+      <div><h5 style={{display:'inline-block'}}>{title}</h5>{titleExtend}</div>
       <CommonTableGrid
         size='sm'
         // height={height}
-        getRowId={getRowId}
+        getRowId={(r)=>getRowId(r,idPrefix)}
         columns={columns}
         columnExtensions={colExtensions}
         rows={data}
