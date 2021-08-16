@@ -92,9 +92,8 @@ class Address extends Component {
     const response = await queryList('/api/streetAddress', {
       apiCriteria: {
         searchValue: value,
-        searchType: ''
       },
-      pagesize: 10
+      pagesize: 50
     })
     if (response && response.data) {
       return response.data.data || []
@@ -233,13 +232,7 @@ class Address extends Component {
           <GridItem xs={12} md={4}>
             <FastField
               name={`${prefix}blockNo`}
-              render={(args) => {
-                return <AutoSuggestion label='Block No.'
-                  onOptionSelected={onOptionSelected}
-                  renderOption={this.renderOption}
-                  valuePath='postalCode'
-                  {...args} />
-              }}
+              render={(args) => <TextField label='Block No.' {...args} />}
             />
           </GridItem>
           <GridItem xs={12} md={4}>
@@ -253,27 +246,13 @@ class Address extends Component {
           <GridItem xs={12} md={4}>
             <FastField
               name={`${prefix}buildingName`}
-              render={(args) => {
-                return <AutoSuggestion label='Building Name'
-                  onOptionSelected={onOptionSelected}
-                  renderOption={this.renderOption}
-                  valuePath='postalCode'
-                  {...args}
-                />
-              }}
+              render={(args) => <TextField label='Building Name' {...args} />}
             />
           </GridItem>
           <GridItem xs={12} md={4}>
             <FastField
               name={`${prefix}street`}
-              render={(args) => {
-                return <AutoSuggestion label='Street'
-                  onOptionSelected={onOptionSelected}
-                  renderOption={this.renderOption}
-                  valuePath='postalCode'
-                  {...args}
-                />
-              }}
+              render={(args) => <TextField label='Street' {...args} />}
             />
           </GridItem>
           <GridItem xs={12} md={4}>
