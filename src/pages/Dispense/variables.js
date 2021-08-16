@@ -459,29 +459,28 @@ export const PrescriptionColumnExtensions = (
     {
       columnName: 'action',
       align: 'center',
-      width: 60,
-      width: 70,
+    width: 70,
       render: row => {
         return (
-          <div>
-            {actualizationButton(row, onActualizeBtnClick)}
-            <Tooltip
-              title={
-                <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
-              }
+        <div>
+          {actualizationButton(row,onActualizeBtnClick)}
+          <Tooltip
+            title={
+              <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
+            }
+          >
+            <Button
+              color='primary'
+              onClick={() => {
+                onPrint({ type: CONSTANTS.DRUG_LABEL, row })
+              }}
+              justIcon
             >
-              <Button
-                color='primary'
-                onClick={() => {
-                  onPrint({ type: CONSTANTS.DRUG_LABEL, row })
-                }}
-                justIcon
-              >
-                <Print />
-              </Button>
-            </Tooltip>
-          </div>
-        )
+              <Print />
+            </Button>
+          </Tooltip>
+        </div>
+      )
       },
     },
   ]
@@ -528,7 +527,7 @@ export const VaccinationColumn = [
 export const VaccinationColumnExtensions = (
   viewOnly = false,
   inventoryvaccination = [],
-  handleSelectedBatch = () => { },
+  handleSelectedBatch = () => {},
   onActualizeBtnClick,
 ) => [
     {
@@ -698,8 +697,7 @@ export const VaccinationColumnExtensions = (
     {
       columnName: 'action',
       width: 60,
-      render: () => <div />,
-      render: (row) => actualizationButton(row, onActualizeBtnClick),
+    render: (row) => actualizationButton(row,onActualizeBtnClick),
     },
   ]
 

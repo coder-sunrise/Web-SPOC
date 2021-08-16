@@ -66,8 +66,8 @@ const maxTime = new Date(
 
 const applyFilter = (filter, data, isDayView) => {
   const {
-    filterByApptType,
-    filterByDoctor,
+    filterByApptType = [],
+    filterByDoctor = [],
     search = '',
     dobfrom = '1900-01-01',
     dobto = '9999-12-31',

@@ -127,7 +127,8 @@ class Event extends React.PureComponent {
       OverlayComponent = <DoctorBlockPopover popoverEvent={event} />
 
     const {stage,stageColorHex} = event
-
+    const showStage = stage && stage.trim()!==''
+    const stageDivStyle = {float:'left',...(showStage?{width:'100%',marginLeft:'-20px',paddingLeft:'20px'}:{})}
     return (
       <Popper
         stopOnClickPropagation
@@ -153,7 +154,7 @@ class Event extends React.PureComponent {
               </span>
               {hasConflict && <ErrorOutline className={classes.icon} />}
               {isEnableRecurrence && <Cached />}
-              {stage && stage.trim()!=='' &&
+              {showStage &&
               <Tooltip title={stage} style={{float:'right'}}>
                 <LocalOfferIcon
                   style={{ color: stageColorHex, float: 'right'}}
@@ -163,7 +164,7 @@ class Event extends React.PureComponent {
           </div>
         ) : (
           <div>
-            <div className={otherViewClass} style={{float:'left'}}>
+            <div className={otherViewClass} style={stageDivStyle}>
               <div className={classes.title}>
                 <span>{title ? title.toUpperCase() : ''}</span>
               </div>
@@ -171,7 +172,7 @@ class Event extends React.PureComponent {
                 {subtitle ? subtitle.toUpperCase() : ''}
               </span>
             </div>
-            {stage && stage.trim()!=='' &&
+            {showStage &&
               <Tooltip title={stage} style={{float:'right'}}>
                 <LocalOfferIcon
                   style={{ color: stageColorHex, float: 'right'}}

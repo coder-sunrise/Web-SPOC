@@ -35,6 +35,8 @@ const Templates = ({
   filterByApptType,
   handleFilterTemplate,
   handleApplyTemplate,
+  dobfrom = null,
+  dobto = null,
 }) => {
   const [
     templateName,
@@ -71,6 +73,8 @@ const Templates = ({
         ...selectedTemplate,
         filterByDoctor,
         filterByApptType,
+        dobfrom,
+        dobto,
         isDeleted: !!requestDelete,
         isFavorite: !!saveAsFavorite,
       }
@@ -87,6 +91,8 @@ const Templates = ({
         id: newId,
         filterByDoctor,
         filterByApptType,
+        dobfrom,
+        dobto,
         isFavorite: !!saveAsFavorite,
         templateName,
       }

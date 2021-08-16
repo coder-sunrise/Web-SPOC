@@ -118,14 +118,19 @@ class Appointment extends React.PureComponent {
       },
     })
 
-    let filter
+    let filter //= this.state.filter
     const filterTemplate = await dispatch({
       type: 'appointment/getFilterTemplate',
     })
     if (filterTemplate) {
       const { currentFilterTemplate } = filterTemplate
       if (currentFilterTemplate) {
-        const { filterByDoctor, filterByApptType } = currentFilterTemplate
+        const {
+          filterByDoctor,
+          filterByApptType,
+          dobfrom,
+          dobto,
+        } = currentFilterTemplate
         filter = {
           filterByDoctor,
           filterByApptType,
@@ -133,6 +138,8 @@ class Appointment extends React.PureComponent {
             filterByDoctor && filterByDoctor.length
               ? filterByDoctor[0]
               : undefined,
+          dobfrom,
+          dobto,
         }
       }
     }
@@ -464,6 +471,13 @@ class Appointment extends React.PureComponent {
     })
   }
 
+  onFilterClick = filter => {
+    this.props.dispatch({
+      type: 'calendar/filterCalendar',
+      payload: { ...filter },
+    })
+  }
+
   onFilterUpdate = filter => {
     const {
       filterByDoctor = [],
@@ -489,17 +503,30 @@ class Appointment extends React.PureComponent {
       [],
     )
 
+    const updFilter = {
+      dobfrom: dobfrom || undefined,
+      dobto: dobto || undefined,
+      search: search || undefined,
+      filterByApptType: filterByApptType,
+      filterByDoctor: filterByDoctor,
+      filterBySingleDoctor: filterBySingleDoctor,
+    }
+
     this.setState(() => ({
-      filter: {
-        dobfrom: dobfrom || undefined,
-        dobto: dobto || undefined,
-        search: search || undefined,
-        filterByApptType: filterByApptType,
-        filterByDoctor: filterByDoctor,
-        filterBySingleDoctor: filterBySingleDoctor,
-      },
+      filter: { ...updFilter },
       resources: newResources.length > 0 ? newResources : null,
     }))
+
+    this.props.dispatch({
+      type: 'calendar/filterCalendar',
+      payload: {
+        search: updFilter.search,
+        dobfrom: updFilter.dobfrom,
+        dobto: updFilter.dobto,
+        doctor: updFilter.filterByDoctor,
+        appType: updFilter.filterByApptType,
+      },
+    })
   }
 
   handleAddAppointmentClick = () => {
@@ -645,6 +672,7 @@ class Appointment extends React.PureComponent {
           filterBySingleDoctor={filter.filterBySingleDoctor}
           filterByApptType={filter.filterByApptType}
           handleUpdateFilter={this.onFilterUpdate}
+          onFilterClick={this.onFilterClick}
           onDoctorEventClick={this.handleDoctorEventClick}
           onAddAppointmentClick={this.handleAddAppointmentClick}
           toggleSearchAppointmentModal={this.toggleSearchAppointmentModal}
