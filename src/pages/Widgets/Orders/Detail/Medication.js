@@ -1241,7 +1241,7 @@ class Medication extends PureComponent {
   renderMedication = (option) => {
     const { combinDisplayValue = '', medicationGroup = {}, stock = 0, dispensingUOM = {}, isExclusive } = option
     const { name: uomName = '' } = dispensingUOM
-    return <div style={{ height: 22 }} >
+    return <div style={{ height: 22, lineHeight: '22px', }} >
       <div style={{ width: 390, display: 'inline-block', }}>
         <div style={{
           maxWidth: isExclusive ? 350 : 390, display: 'inline-block',
@@ -1253,17 +1253,19 @@ class Medication extends PureComponent {
 
         {isExclusive &&
           <div style={{
-            display: 'inline-block', height: '100%',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}>
-            <div style={{
-              backgroundColor: 'green', color: 'white',
-              height: 22, borderRadius: 4,
-              padding: '1px 5px',
-              fontWeight: 500,
-          }} title='Exclusive Drug'>Excl.</div>
-          </div>
+          backgroundColor: 'green',
+          color: 'white',
+          fontSize: '0.7rem',
+          position: 'relative',
+          left: '3px',
+          top: '-6px',
+          display: 'inline-block',
+          height: 18,
+          lineHeight: '18px',
+          borderRadius: 4,
+          padding: '1px 3px',
+          fontWeight: 500,
+        }} title='Exclusive Drug'>Excl.</div>
         }
       </div>
       <div style={{
