@@ -110,7 +110,7 @@ const checkActualizable = row => {
 
 export const isActualizable = row => {
   const { isNurseActualizeRequired, statusFK } = checkActualizable(row)
-  return isNurseActualizeRequired && [NURSE_WORKITEM_STATUS.NEW,NURSE_WORKITEM_STATUS.CANCELLED].indexOf(statusFK) > -1
+  return isNurseActualizeRequired && [NURSE_WORKITEM_STATUS.NEW, NURSE_WORKITEM_STATUS.CANCELLED].indexOf(statusFK) > -1
 }
 
 const actualizationButton = (row, buttonClickCallback) => {
@@ -211,6 +211,7 @@ export const PrescriptionColumnExtensions = (
   inventorymedication = [],
   handleSelectedBatch,
   onActualizeBtnClick,
+  showDrugLabelRemark
 ) => [
     { columnName: 'unitPrice', width: 100, type: 'currency' },
     {
@@ -249,13 +250,31 @@ export const PrescriptionColumnExtensions = (
               <span>{row.name}</span>
             </Tooltip>
             <div style={{ position: 'relative', top: 2 }}>
-              {row.isExclusive && (
-                <Tooltip title='Exclusive'>
+              {row.isPreOrder &&
+                <Tooltip title='Pre-Order'>
                   <div
                     style={{
                       position: 'absolute',
                       bottom: 2,
-                      right: -30,
+                    right: -27,
+                    borderRadius: 10,
+                    backgroundColor: '#4255bd',
+                      fontWeight: 500,
+                      color: 'white',
+                      fontSize: '0.7rem',
+                      padding: '2px 3px',
+                      height: 20,
+                    }}
+                > Pre</div>
+                </Tooltip>
+              }
+              {row.isExclusive && (
+                <Tooltip title='Exclusive Drug'>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 2,
+                      right: row.isPreOrder ? -60 : -30,
                       borderRadius: 4,
                       backgroundColor: 'green',
                       fontWeight: 500,
@@ -267,26 +286,8 @@ export const PrescriptionColumnExtensions = (
                   >Excl.</div>
                 </Tooltip>
               )}
-              {row.isPreOrder &&
-                  <Tooltip title='Pre-Order'>
-                <div
-                      style={{
-                        position: 'absolute',
-                    bottom: 2,
-                    right: row.isExclusive ? -60 : -30,
-                        borderRadius: 10,
-                    backgroundColor: '#4255bd',
-                    fontWeight: 500,
-                    color: 'white',
-                    fontSize: '0.7rem',
-                    padding: '2px 3px',
-                    height: 20,
-                      }}
-                > Pre</div>
-                  </Tooltip>
-              }
               {lowStockIndicator(row, 'inventoryMedicationFK', right)}
-              </div>
+            </div>
           </div>
         )
       },
@@ -311,7 +312,7 @@ export const PrescriptionColumnExtensions = (
       columnName: 'remarks',
       width: '30%',
       render: (row) => {
-        const existsDrugLabelRemarks = row.drugLabelRemarks && row.drugLabelRemarks.trim() !== ''
+        const existsDrugLabelRemarks = showDrugLabelRemark && row.drugLabelRemarks && row.drugLabelRemarks.trim() !== ''
         return <div style={{ position: 'relative' }} >
           <div
             style={{
@@ -560,26 +561,26 @@ export const VaccinationColumnExtensions = (
             ><span> {row.name}</span>
             </Tooltip>
             <div style={{ position: 'relative', top: 2 }}>
-                {row.isPreOrder && (
-                  <Tooltip title='Pre-Order'>
+              {row.isPreOrder && (
+                <Tooltip title='Pre-Order'>
                   <div
-                      style={{
-                        position: 'absolute',
+                    style={{
+                      position: 'absolute',
                       bottom: 2,
                       right: -30,
-                        borderRadius: 10,
+                      borderRadius: 10,
                       backgroundColor: '#4255bd',
                       fontWeight: 500,
                       color: 'white',
                       fontSize: '0.7rem',
                       padding: '2px 3px',
                       height: 20,
-                      }}
+                    }}
                   > Pre</div>
-                  </Tooltip>
-                )}
+                </Tooltip>
+              )}
               {lowStockIndicator(row, 'inventoryVaccinationFK', right)}
-              </div>
+            </div>
           </div>
         )
       },
@@ -737,7 +738,7 @@ export const OtherOrdersColumns = [
 
 const compareString = (a, b) => a.localeCompare(b)
 
-export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint,onActualizeBtnClick) => [
+export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint, onActualizeBtnClick) => [
   {
     columnName: 'type',
     compare: compareString,
@@ -887,7 +888,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint,onActualiz
       const { type } = r
 
       if (type === 'Service' || type === 'Consumable' || type === 'Treatment')
-        return actualizationButton(r,onActualizeBtnClick)
+        return actualizationButton(r, onActualizeBtnClick)
       return (
         <Tooltip title='Print'>
           <Button
@@ -1074,7 +1075,7 @@ export const PackageColumns = [
   },
 ]
 
-export const PackageColumnExtensions = onPrint => [
+export const PackageColumnExtensions = (onPrint, showDrugLabelRemark) => [
   {
     columnName: 'type',
     compare: compareString,
@@ -1092,7 +1093,7 @@ export const PackageColumnExtensions = onPrint => [
           {row.type}
           <div style={{ position: 'relative', top: 2 }}>
             {row.isExclusive && (
-              <Tooltip title='Exclusive'>
+              <Tooltip title='Exclusive Drug'>
                 <div
                   style={{
                     position: 'absolute',
@@ -1160,7 +1161,7 @@ export const PackageColumnExtensions = onPrint => [
     columnName: 'remarks',
     width: '40%',
     render: (row) => {
-      const existsDrugLabelRemarks = row.drugLabelRemarks && row.drugLabelRemarks.trim() !== ''
+      const existsDrugLabelRemarks = showDrugLabelRemark && row.drugLabelRemarks && row.drugLabelRemarks.trim() !== ''
       return <div style={{ position: 'relative' }} >
         <div
           style={{

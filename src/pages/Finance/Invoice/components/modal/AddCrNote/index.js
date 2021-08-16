@@ -38,6 +38,7 @@ const styles = theme => ({
     fontSize: '0.7rem',
     padding: '2px 3px',
     height: 20,
+    cursor: 'pointer'
   }
 })
 @connect(({ invoiceCreditNote, invoiceDetail }) => ({

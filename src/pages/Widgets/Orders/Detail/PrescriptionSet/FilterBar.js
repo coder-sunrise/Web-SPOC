@@ -33,11 +33,10 @@ const styles = () => ({
 
 const FilterBar = (props) => {
   const { handelSearch, type, selectItemCount, handelNewPrescriptionSet, selectType, typeChange,
-    generalAccessRight, personalAccessRight, theme
+    generalAccessRight, theme
   } = props
 
-  const disableFilterPrescriptionSet = generalAccessRight.rights === 'hidden' || personalAccessRight.rights === 'hidden'
-  const addPrescriptionSetEnable = generalAccessRight.rights === 'enable' || personalAccessRight.rights === 'enable'
+  const disableFilterPrescriptionSet = generalAccessRight.rights === 'hidden'
 
   return (
     <Fragment>
@@ -65,7 +64,6 @@ const FilterBar = (props) => {
               Search
             </ProgressButton>
             <ProgressButton
-              disabled={!addPrescriptionSetEnable}
               color='primary'
               size='sm'
               icon={<Add />}

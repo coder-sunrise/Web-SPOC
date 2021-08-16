@@ -45,14 +45,10 @@ class PrescriptionSetList extends PureComponent {
     super(props)
 
     this.generalAccessRight = Authorized.check('queue.consultation.order.medication.generalprescriptionset') || { rights: 'hidden' }
-    this.personalAccessRight = Authorized.check('queue.consultation.order.medication.personalprescriptionset') || { rights: 'hidden' }
 
     let defaultType = 'All'
     if (this.generalAccessRight.rights === 'hidden') {
       defaultType = 'Personal'
-    }
-    if (this.personalAccessRight.rights === 'hidden') {
-      defaultType = 'General'
     }
     this.state = {
       addedPrescriptionSets: [],
@@ -424,7 +420,7 @@ class PrescriptionSetList extends PureComponent {
     data = this.GetNewMedication()
     data.map((m) => {
       if (m.isDrugMixture) {
-        const mixtureItems = m.prescriptionSetItemDrugMixture || []
+        const mixtureItems = m.corPrescriptionItemDrugMixture || []
         mixtureItems
           .forEach((mixture) => {
             if (mixture.caution && mixture.caution.trim().length &&
@@ -515,8 +511,10 @@ class PrescriptionSetList extends PureComponent {
             combineCondition: 'or',
           },
         ],
-        sorting: [{ columnName: 'sortOrder', direction: 'asc' },
-        { columnName: 'prescriptionSetName', direction: 'asc' }]
+        sorting: [
+          { columnName: 'type', direction: 'desc' },
+          { columnName: 'sortOrder', direction: 'asc' },
+          { columnName: 'prescriptionSetName', direction: 'asc' }]
       },
     }).then((r) => {
       if (r) {
@@ -622,7 +620,7 @@ class PrescriptionSetList extends PureComponent {
     const { loadPrescriptionSets = [], activeKey, addedPrescriptionSets = [], showPrescriptionSetDetailModal, isNewPrescriptionSet, selectType } = this.state
     const show = loading.effects['medicationHistory/queryMedicationHistory']
     const setectPrescriptionSet = loadPrescriptionSets.filter(ps => addedPrescriptionSets.indexOf(ps.id) >= 0)
-    const disableFilterPrescriptionSet = this.generalAccessRight.rights === 'hidden' || this.personalAccessRight.rights === 'hidden'
+    const disableFilterPrescriptionSet = this.generalAccessRight.rights === 'hidden'
 
     return (
       <LoadingWrapper
@@ -631,7 +629,31 @@ class PrescriptionSetList extends PureComponent {
       >
         <div>
           <FitlerBar
-            handelNewPrescriptionSet={() => {
+            handelNewPrescriptionSet={async () => {
+              const { dispatch, orders: { rows = [] } } = this.props
+              await dispatch({
+                type: 'prescriptionSet/updateState',
+                payload: {
+                  entity: undefined,
+                  prescriptionSetItems: rows.filter(r => !r.isDeleted && r.type === '1').map((drug, index) => {
+                    return {
+                      ...drug,
+                      id: undefined,
+                      uid: getUniqueId(),
+                      prescriptionSetItemPrecaution: drug.corPrescriptionItemPrecaution.filter(p => !p.isDeleted).map(p => {
+                        return { ...p, id: undefined }
+                      }),
+                      prescriptionSetItemInstruction: drug.corPrescriptionItemInstruction.filter(i => !i.isDeleted).map(i => {
+                        return { ...i, id: undefined }
+                      }),
+                      prescriptionSetItemDrugMixture: drug.corPrescriptionItemDrugMixture.filter(dm => !dm.isDeleted).map(dm => {
+                        return { ...dm, id: undefined }
+                      }),
+                      sequence: index
+                    }
+                  })
+                }
+              })
               this.setState({ showPrescriptionSetDetailModal: true, isNewPrescriptionSet: true })
             }}
             selectItemCount={setectPrescriptionSet.length}
@@ -641,7 +663,6 @@ class PrescriptionSetList extends PureComponent {
               this.setState({ selectType: e.target.value })
             }}
             generalAccessRight={this.generalAccessRight}
-            personalAccessRight={this.personalAccessRight}
             {...this.props}
           />
           <Grid
@@ -655,7 +676,6 @@ class PrescriptionSetList extends PureComponent {
             handelEdit={this.editPrescriptionSet}
             selectType={selectType}
             generalAccessRight={this.generalAccessRight}
-            personalAccessRight={this.personalAccessRight}
             {...this.props}
           />
         </div>
@@ -679,8 +699,7 @@ class PrescriptionSetList extends PureComponent {
           cancelText='Cancel'
         >
           <Details {...this.props}
-            generalAccessRight={this.generalAccessRight}
-            personalAccessRight={this.personalAccessRight} />
+            generalAccessRight={this.generalAccessRight} />
         </CommonModal>
       </LoadingWrapper>
     )

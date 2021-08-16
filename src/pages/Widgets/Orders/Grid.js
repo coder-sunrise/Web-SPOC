@@ -419,7 +419,8 @@ export default ({
           borderRadius: 8,
           height: 16,
           width: 16,
-          border: '2px solid #4876FF'
+          border: '2px solid #4876FF',
+          cursor: 'pointer'
         }} />
       </Tooltip>
 
@@ -435,6 +436,7 @@ export default ({
           height: 16,
           width: 16,
           backgroundColor: radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS ? '#4876FF' : '#008B00',
+          cursor: 'pointer'
         }} />
       </Tooltip >
     if (radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.CANCCELED)
@@ -443,6 +445,7 @@ export default ({
           position: 'absolute',
           bottom: 2,
           right: -20,
+          cursor: 'pointer'
         }} >
           <Cross style={{ color: 'red', height: 20, width: 20 }} color='red' />
         </div>
@@ -723,28 +726,28 @@ export default ({
                   </Tooltip>
                   <div style={{ position: 'relative', top: 2 }}>
                     {drugMixtureIndicator(row, -20)}
-                    {row.isExclusive && (
-                      <Tooltip title='Exclusive'>
-                        <div
-                          className={classes.rightIcon}
-                          style={{
-                            right: -30,
-                            borderRadius: 4,
-                            backgroundColor: 'green',
-                          }}
-                        >Excl.</div>
-                      </Tooltip>
-                    )}
                     {row.isPreOrder && (
                       <Tooltip title='Pre-Order'>
                         <div
                           className={classes.rightIcon}
                           style={{
-                            right: row.isExclusive ? -60 : -30,
+                            right: -27,
                             borderRadius: 10,
                             backgroundColor: '#4255bd',
                           }}
                         > Pre</div>
+                      </Tooltip>
+                    )}
+                    {row.isExclusive && (
+                      <Tooltip title='Exclusive Drug'>
+                        <div
+                          className={classes.rightIcon}
+                          style={{
+                            right: row.isPreOrder ? -60 : -30,
+                            borderRadius: 4,
+                            backgroundColor: 'green',
+                          }}
+                        >Excl.</div>
                       </Tooltip>
                     )}
                     {radiologyWorkitemStatusFK && radiologyWorkitemStatus(radiologyWorkitemStatusFK)}

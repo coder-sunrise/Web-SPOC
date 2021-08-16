@@ -82,7 +82,7 @@ const LowStockInfo = ({ sourceType, values = {}, codetable, visitRegistration = 
           dispenseStr = `, dispense ${dispensingQuantity} ${dispensingUOM.name || ''}`
         }
         if (ruleType === DOSAGE_RULE.age || DOSAGE_RULE.weight) {
-          const unitStr = DOSAGE_RULE.age ? 'yrs' : 'kgs'
+          const unitStr = ruleType === DOSAGE_RULE.age ? 'yrs' : 'kgs'
           if (operator === DOSAGE_RULE_OPERATOR.lessThan || operator === DOSAGE_RULE_OPERATOR.moreThan) {
             ruleStr = `${operator} ${rightOperand}${unitStr}`
           }
@@ -118,11 +118,11 @@ const LowStockInfo = ({ sourceType, values = {}, codetable, visitRegistration = 
         }
       })
 
-      return instructions.map((instruction, index) => {
+      return instructions.length ? instructions.map((instruction, index) => {
         return <div style={{ color: instruction.isMatchInstruction ? 'green' : 'black' }}>
           {`${index + 1}. ${instruction.strDisplayValue}`}
         </div>
-      })
+      }) : '-'
     }
     if (sourceType === 'medication' || sourceType === 'prescriptionSet') {
       return <div style={{ fontSize: 14, maxWidth: 700 }}>

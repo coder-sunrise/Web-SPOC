@@ -108,6 +108,7 @@ const styles = theme => ({
     fontSize: '0.7rem',
     padding: '2px 3px',
     height: 20,
+    cursor: 'pointer'
   }
 })
 @connect(
@@ -623,7 +624,7 @@ class PatientHistory extends Component {
   }
 
   getDetailPanel = history => {
-    const { isFullScreen = true, classes } = this.props
+    const { isFullScreen = true, classes, clinicSettings } = this.props
     const { visitPurposeFK, isNurseNote, nurseNotes } = history
     if (isNurseNote) {
       let e = document.createElement('div')
@@ -679,6 +680,10 @@ class PatientHistory extends Component {
       )
     })
 
+    const { settings = {} } = clinicSettings
+    const { labelPrinterSize } = settings
+    const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
+
     return (
       <div
         style={{
@@ -721,6 +726,7 @@ class PatientHistory extends Component {
                     {...this.props}
                     setFieldValue={this.props.setFieldValue}
                     isFullScreen={isFullScreen}
+                    showDrugLabelRemark={showDrugLabelRemark}
                   />
                 ) : (
                   ''

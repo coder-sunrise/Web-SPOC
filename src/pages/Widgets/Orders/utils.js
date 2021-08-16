@@ -175,7 +175,7 @@ const openCautionAlertOnStartConsultation = (o) => {
     ...vaccinationItems,
   ]
 
-  if (cautionItems.length) {
+  if (cautionItems.length || drugAllergies.length) {
     openCautionAlertPrompt(cautionItems, drugAllergies.map(allergy => {
       return {
         ...allergy,
@@ -213,29 +213,29 @@ const ReplaceCertificateTeplate = (templateContent, newVaccination) => {
 }
 
 const isMatchInstructionRule = (rule, age, weight) => {
-  let isMatch = false;
-  if (rule.ruleType == DOSAGE_RULE.default) {
-    isMatch = true;
+  let isMatch = false
+  if (rule.ruleType === DOSAGE_RULE.default) {
+    isMatch = true
   }
-  else if (rule.ruleType == DOSAGE_RULE.age) {
+  else if (rule.ruleType === DOSAGE_RULE.age) {
     if (age >= 0) {
-      if ((rule.operator == DOSAGE_RULE_OPERATOR.to && age >= rule.leftOperand && age <= rule.rightOperand)
-        || (rule.operator == DOSAGE_RULE_OPERATOR.lessThan && age < rule.rightOperand)
-        || (rule.operator == DOSAGE_RULE_OPERATOR.moreThan && age > rule.rightOperand)) {
-        isMatch = true;
+      if ((rule.operator === DOSAGE_RULE_OPERATOR.to && age >= rule.leftOperand && age <= rule.rightOperand)
+        || (rule.operator === DOSAGE_RULE_OPERATOR.lessThan && age < rule.rightOperand)
+        || (rule.operator === DOSAGE_RULE_OPERATOR.moreThan && age > rule.rightOperand)) {
+        isMatch = true
       }
     }
   }
-  else if (rule.ruleType == DOSAGE_RULE.weight) {
+  else if (rule.ruleType === DOSAGE_RULE.weight) {
     if (weight >= 0) {
-      if ((rule.operator == DOSAGE_RULE_OPERATOR.to && weight >= rule.leftOperand && weight <= rule.rightOperand)
-        || (rule.operator == DOSAGE_RULE_OPERATOR.lessThan && weight < rule.rightOperand)
-        || (rule.operator == DOSAGE_RULE_OPERATOR.moreThan && weight > rule.rightOperand)) {
-        isMatch = true;
+      if ((rule.operator === DOSAGE_RULE_OPERATOR.to && weight >= rule.leftOperand && weight <= rule.rightOperand)
+        || (rule.operator === DOSAGE_RULE_OPERATOR.lessThan && weight < rule.rightOperand)
+        || (rule.operator === DOSAGE_RULE_OPERATOR.moreThan && weight > rule.rightOperand)) {
+        isMatch = true
       }
     }
   }
-  return isMatch;
+  return isMatch
 }
 
 const getDrugAllergy = (drug, patientAllergy) => {

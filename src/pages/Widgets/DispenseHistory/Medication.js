@@ -34,7 +34,7 @@ export default ({ classes, current, fieldName = '' }) => {
     )
   }
 
-  const tableColumns = [
+  const tableColumns = (showDrugLabelRemark) => [
     {
       dataIndex: 'visitDate',
       title: 'Date',
@@ -65,29 +65,29 @@ export default ({ classes, current, fieldName = '' }) => {
               {row.name}
               <div style={{ position: 'relative', top: 2 }}>
                 {drugMixtureIndicator(row, -20)}
-                {row.isExclusive && (
-                  <Tooltip title='Exclusive'>
+                {row.isPreOrder &&
+                  <Tooltip title='Pre-Order'>
                     <div
                       className={classes.rightIcon}
                       style={{
-                        right: -30,
+                        right: -27,
+                        borderRadius: 10,
+                        backgroundColor: '#4255bd',
+                      }}
+                    > Pre</div>
+                  </Tooltip>}
+                {row.isExclusive && (
+                  <Tooltip title='Exclusive Drug'>
+                    <div
+                      className={classes.rightIcon}
+                      style={{
+                        right: row.isPreOrder ? -60 : -30,
                         borderRadius: 4,
                         backgroundColor: 'green',
                       }}
                     >Excl.</div>
                   </Tooltip>
                 )}
-                {row.isPreOrder &&
-                  <Tooltip title='Pre-Order'>
-                    <div
-                    className={classes.rightIcon}
-                    style={{
-                      right: row.isExclusive ? -60 : -30,
-                      borderRadius: 10,
-                      backgroundColor: '#4255bd',
-                      }}
-                    > Pre</div>
-                  </Tooltip>}
               </div>
             </div>
           </div>
@@ -134,7 +134,7 @@ export default ({ classes, current, fieldName = '' }) => {
     },
     {
       dataIndex: 'remarks', title: 'Remarks', render: (text, row) => {
-        const existsDrugLabelRemarks = row.drugLabelRemarks && row.drugLabelRemarks.trim() !== ''
+        const existsDrugLabelRemarks = showDrugLabelRemark && row.drugLabelRemarks && row.drugLabelRemarks.trim() !== ''
         return <div style={{ position: 'relative' }}>
           <div
             style={{

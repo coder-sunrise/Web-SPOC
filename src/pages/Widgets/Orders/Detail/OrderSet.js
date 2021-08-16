@@ -192,6 +192,8 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           isExternalPrescription: false,
           instruction: getInstruction(inventoryMedication, matchInstruction),
           dispenseUOMFK: inventoryMedication.dispensingUOMFK,
+          inventoryDispenseUOMFK: inventoryMedication.dispensingUOMFK,
+          inventoryPrescribingUOMFK: inventoryMedication.prescribingUOMFK,
           dispenseUOMCode: medicationdispensingUOM
             ? medicationdispensingUOM.code
             : undefined,
@@ -517,7 +519,7 @@ class OrderSet extends PureComponent {
                 </Tooltip>
                 <div style={{ position: 'relative', top: 2 }}>
                   {row.isExclusive && (
-                    <Tooltip title='Exclusive'>
+                    <Tooltip title='Exclusive Drug'>
                       <div
                         className={classes.rightIcon}
                         style={{
