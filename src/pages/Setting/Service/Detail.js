@@ -387,8 +387,8 @@ class Detail extends PureComponent {
     if (hiddenFields.includes('ctService_Tag'))
       setFieldValue('ctService_Tag', [])
     if (hiddenFields.includes('panelItems')) setFieldValue('panelItems', [])
-    if (hiddenFields.includes('isRequiredSpecimenPanelItem'))
-      setFieldValue('isRequiredSpecimenPanelItem', false)
+    if (hiddenFields.includes('isRequiredSpecifyPanelItem'))
+      setFieldValue('isRequiredSpecifyPanelItem', false)
 
     setFieldValue('ctServiceCenter_ServiceNavigation', _rows)
     this.setState(() => {
@@ -554,7 +554,7 @@ class Detail extends PureComponent {
       ) !== -1
     if (!hasInternalLabServiceCenter) {
       hiddenFields.push('panelItems')
-      hiddenFields.push('isRequiredSpecimenPanelItem')
+      hiddenFields.push('isRequiredSpecifyPanelItem')
     }
 
     if (isEnableNurseWorkItem) hiddenFields.push('actualizedByNurse')
@@ -695,7 +695,7 @@ class Detail extends PureComponent {
                               //If all panel items are removed, set false to Specify Panel Item toggle
                               if (!val || val.length === 0)
                                 args.form.setFieldValue(
-                                  'isRequiredSpecimenPanelItem',
+                                  'isRequiredSpecifyPanelItem',
                                   false,
                                 )
                             }}
@@ -800,10 +800,10 @@ class Detail extends PureComponent {
                       </GridItem>
                     )}
 
-                    {!hiddenFields.includes('isRequiredSpecimenPanelItem') && (
+                    {!hiddenFields.includes('isRequiredSpecifyPanelItem') && (
                       <GridItem xs={4}>
                         <Field
-                          name='isRequiredSpecimenPanelItem'
+                          name='isRequiredSpecifyPanelItem'
                           render={args => {
                             return (
                               <Switch
