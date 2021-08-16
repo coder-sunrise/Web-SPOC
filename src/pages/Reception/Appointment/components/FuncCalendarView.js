@@ -214,6 +214,7 @@ const CalendarView = ({
   filter,
   loading,
   appointmentTypes,
+  apptTimeSlotDuration = 30 ,
 }) => {
   const _draggableAccessor = event => {
     if (event.isEnableRecurrence) return false
@@ -466,7 +467,7 @@ const CalendarView = ({
         selectable='ignoreEvents'
         resizable={false}
         showMultiDayTimes={false}
-        step={15}
+        step={apptTimeSlotDuration}
         timeslots={1}
         longPressThreshold={500}
         tooltipAccessor={null}
@@ -495,7 +496,7 @@ const CalendarView = ({
   )
 }
 
-export default connect(({ calendar, codetable, loading, doctorBlock }) => ({
+export default connect(({ calendar, codetable, loading, doctorBlock, clinicSettings }) => ({
   displayDate: calendar.currentViewDate,
   calendarView: calendar.calendarView,
   calendarEvents: calendar.list || [],
@@ -503,4 +504,5 @@ export default connect(({ calendar, codetable, loading, doctorBlock }) => ({
   doctorBlocks: doctorBlock.list || [],
   appointmentTypes: codetable.ctappointmenttype || [],
   loading: loading.models.calendar,
+  apptTimeSlotDuration: clinicSettings.settings.apptTimeSlotDuration,
 }))(CalendarView)
