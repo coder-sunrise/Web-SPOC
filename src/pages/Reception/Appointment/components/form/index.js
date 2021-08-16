@@ -23,7 +23,7 @@ import {
 import { LoadingWrapper, Recurrence } from '@/components/_medisys'
 // custom components
 import PatientProfile from '@/pages/PatientDatabase/Detail'
-import { getAppendUrl } from '@/utils/utils'
+import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 import { APPOINTMENT_STATUS, APPOINTMENT_CANCELLEDBY } from '@/utils/constants'
 import { getBizSession } from '@/services/queue'
 import Authorized from '@/utils/Authorized'
@@ -901,7 +901,7 @@ class Form extends React.PureComponent {
     onClose()
   }
 
-  actualizeAppointment = () => {
+  getVisregUrl = () => {
     const { datagrid } = this.state
     const { values, history } = this.props
     const primaryDoctorResource = datagrid.find(
@@ -921,9 +921,7 @@ class Form extends React.PureComponent {
       parameters.pdroomid = firstResource.roomFk
     }
 
-    this.onCloseFormClick()
-
-    history.push(getAppendUrl(parameters))
+    return getAppendUrl(parameters)
   }
 
   onViewPatientProfile = () => {
@@ -1213,7 +1211,10 @@ class Form extends React.PureComponent {
                     onViewPatientProfileClick={this.onViewPatientProfile}
                     onSearchPatientClick={this.onSearchPatient}
                     onCreatePatientClick={this.togglePatientProfileModal}
-                    onRegisterToVisitClick={this.actualizeAppointment}
+                    onRegisterToVisitClick={navigateDirtyCheck({
+                      redirectUrl: this.getVisregUrl(),
+                      onProceed: this.onCloseFormClick.bind(this),
+                    })}
                     patientContactNo={values.patientContactNo}
                     patientName={values.patientName}
                     patientProfileFK={values.patientProfileFK}

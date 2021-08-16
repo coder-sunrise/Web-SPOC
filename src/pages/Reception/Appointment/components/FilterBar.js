@@ -77,12 +77,16 @@ const FilterBar = props => {
     const {
       filterByApptType: appTypes,
       filterByDoctor: doctors,
+      dobfrom,
+      dobto,
     } = selectedTemplate
 
     handleUpdateFilter({
       ...values,
       filterByApptType: appTypes,
       filterByDoctor: doctors,
+      dobfrom,
+      dobto,
       filterBySingleDoctor: doctors && doctors.length ? doctors[0] : undefined,
     })
   }
@@ -224,6 +228,8 @@ const FilterBar = props => {
                         : []
                     }
                     filterByApptType={values.filterByApptType}
+                    dobfrom={values.dobfrom}
+                    dobto={values.dobto}
                     handleFilterTemplate={handleFilterTemplate}
                     handleApplyTemplate={handleApplyTemplate}
                   />

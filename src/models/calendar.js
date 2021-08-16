@@ -518,6 +518,55 @@ export default createListViewModel({
         const response = yield call(service.updateLinking, payload)
         return response
       },
+      *filterCalendar({ payload }, { all, select, put }) {
+        const calendarState = yield select(state => state.calendar)
+        const { search, dobfrom, dobto, doctor = [], appType = [] } = payload
+        const {targetDate, targetView} = calendarState
+
+        let start
+        let end
+        let calendarView = 'month'
+
+        if (targetView === BigCalendar.Views.WEEK) calendarView = 'week'
+        if (targetView === BigCalendar.Views.DAY) calendarView = 'day'
+
+        start = moment(targetDate)
+          .startOf(calendarView)
+          .formatUTC()
+        end = moment(targetDate)
+          .endOf(calendarView)
+          .endOf('day')
+          .formatUTC(false)
+        const getCalendarListPayload = {
+          searchValue: search,
+          doctor: doctor.join(),
+          appType: appType.join(),
+          apptDateFrom: start,
+          apptDateTo: end,
+          appStatus: [
+            APPOINTMENT_STATUS.CONFIRMED,
+            APPOINTMENT_STATUS.DRAFT,
+            APPOINTMENT_STATUS.TURNEDUP,
+            APPOINTMENT_STATUS.RESCHEDULED,
+            APPOINTMENT_STATUS.PFA_RESCHEDULED,
+            APPOINTMENT_STATUS.PFA_CANCELLED,
+            APPOINTMENT_STATUS.TURNEDUPLATE,
+            APPOINTMENT_STATUS.PFA_NOSHOW,
+          ].join(),
+          dobfrom: dobfrom || '1900-01-01',
+          dobto: dobto || '9999-12-31',
+        }
+
+        yield all([
+          put({ type: 'getCalendarList', payload: getCalendarListPayload }),
+          put({
+            type: 'doctorBlock/query',
+            payload: {
+              lgteql_startDateTime: start,
+            },
+          }),
+        ])
+      },
     },
     reducers: {
       saveConflict(state, { payload }) {
