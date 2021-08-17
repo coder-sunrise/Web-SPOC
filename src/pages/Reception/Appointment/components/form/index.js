@@ -24,7 +24,7 @@ import { LoadingWrapper, Recurrence } from '@/components/_medisys'
 // custom components
 import PatientProfile from '@/pages/PatientDatabase/Detail'
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
-import { APPOINTMENT_STATUS, APPOINTMENT_CANCELLEDBY } from '@/utils/constants'
+import { APPOINTMENT_STATUS, APPOINTMENT_CANCELLEDBY, CANNED_TEXT_TYPE } from '@/utils/constants'
 import { getBizSession } from '@/services/queue'
 import Authorized from '@/utils/Authorized'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
@@ -40,6 +40,7 @@ import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
 import RescheduleForm from './RescheduleForm'
 import PreOrder from './PreOrder'
 import SelectPreOrder from './SelectPreOrder'
+import CannedTextButton from './CannedTextButton'
 // utils
 import {
   ValidationSchema,
@@ -1119,6 +1120,7 @@ class Form extends React.PureComponent {
       patientProfile,
       visitRegistration: { visitOrderTemplateOptions = [] },
       dispatch,
+      setFieldValue,
     } = this.props
 
     const {
@@ -1237,6 +1239,7 @@ class Form extends React.PureComponent {
                     />
                   </GridItem>
                   <GridItem xs md={12}>
+                  <div style={{ position: 'relative' }}>
                     <Field
                       name='currentAppointment.appointmentRemarks'
                       render={(args) => (
@@ -1250,6 +1253,20 @@ class Form extends React.PureComponent {
                         />
                       )}
                     />
+                      <CannedTextButton
+                        disabled={disableDataGrid}
+                        cannedTextTypeFK={CANNED_TEXT_TYPE.APPOINTMENTREMARKS}
+                        style={{
+                          position: 'absolute', top: 1, right: -33,
+                        }}
+                        handleSelectCannedText={(cannedText) => {
+                          console.log(cannedText)
+                          const remarks = currentAppointment.appointmentRemarks
+                          const newRemaks = `${remarks ? (remarks + ' ') : ''}${cannedText.text || ''}`.substring(0, 2000)
+                          setFieldValue('currentAppointment.appointmentRemarks', newRemaks)
+                        }}
+                      />
+                    </div>
                   </GridItem>
                   <GridItem xs md={12}>
                     <Recurrence
