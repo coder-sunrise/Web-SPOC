@@ -80,23 +80,20 @@ export const ValidationSchema = Yup.object().shape({
 const convertReccurenceDaysOfTheWeek = (week = '') =>
   week.split(', ').map((eachDay) => parseInt(eachDay, 10))
 
-const calculateDuration = (startTime, endTime) => {
-  const hour = endTime.diff(startTime, 'hour')
-  const minute = roundTo((endTime.diff(startTime, 'minute') / 60 - hour) * 60)
-
+const calculateDuration = (durationMinutes) => {
+  const hour = Math.floor(durationMinutes/60)
+  const minute = durationMinutes%60
   return { hour, minute }
 }
 
-const constructDefaultNewRow = (selectedSlot) => {
+const constructDefaultNewRow = (selectedSlot, apptTimeIntervel) => {
+
   let defaultNewRow = { isPrimaryClinician: true, id: getUniqueNumericId() }
   selectedSlot = selectedSlot || {}
   const startTime = moment(selectedSlot.start)
   const selectedEndTime = moment(selectedSlot.end)
 
-  const { hour = 0, minute = 15 } = calculateDuration(
-    startTime,
-    selectedEndTime,
-  )
+  const { hour = 0, minute = 15 } = calculateDuration(apptTimeIntervel)
   const endTime = moment(selectedSlot.start)
     .add(hour, 'hour')
     .add(minute, 'minute')
@@ -120,6 +117,7 @@ export const mapPropsToValues = ({
   patientProfile: patientEntity,
   user,
   clinicianProfiles,
+  apptTimeIntervel,
 }) => {
   let _patientProfileFK
   let _patientContactNo
@@ -149,7 +147,7 @@ export const mapPropsToValues = ({
     currentAppointment: {
       appointmentDate: moment((selectedSlot || {}).start).formatUTC(),
       appointments_Resources: [
-        constructDefaultNewRow(selectedSlot),
+        constructDefaultNewRow(selectedSlot, apptTimeIntervel),
       ],
     },
     appointmentStatusFk: APPOINTMENT_STATUS.DRAFT,
