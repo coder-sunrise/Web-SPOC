@@ -72,7 +72,7 @@ const createPayload = (values, viewOtherApptAccessRight, isActiveDoctor) => {
       bookBy: bookBy.length > 0 ? bookBy : undefined,
       doctor: selectedDoctor.length > 0 ? selectedDoctor : undefined,
       room: filterByRoomBlockGroup > 0 ? filterByRoomBlockGroup : undefined,
-      SearchText: searchValue || undefined,
+      SearchText: searchValue || '',
       ApptType:
         filterByApptType.length > 0 && filterByApptType.indexOf(-99) < 0
           ? filterByApptType
@@ -126,7 +126,7 @@ const FilterBar = ({
   const renderDropdown = option => <DoctorLabel doctor={option} />
 
   const toggleReport = () => {
-    if (!values.searchValue) return
+    // if (!values.searchValue) return
     setShowReport(!showReport)
   }
 
@@ -350,12 +350,12 @@ const FilterBar = ({
 
 export default memo(
   withFormikExtend({
-    validationSchema: Yup.object().shape({
-      searchValue: Yup.string().when('isPrint', {
-        is: v => v === true,
-        then: Yup.string().required(),
-      }),
-    }),
+    // validationSchema: Yup.object().shape({
+    //   searchValue: Yup.string().when('isPrint', {
+    //     is: v => v === true,
+    //     then: Yup.string().required(),
+    //   }),
+    // }),
     handleSubmit: (values, { props }) => {
       const { dispatch, viewOtherApptAccessRight, isActiveDoctor } = props
 
