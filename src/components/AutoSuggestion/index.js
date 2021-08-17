@@ -1,8 +1,9 @@
 import React, { PureComponent } from 'react'
 import withStyles from '@material-ui/core/styles/withStyles'
 import { control } from '@/components/Decorator'
-import { AutoComplete } from 'antd'
+import { AutoComplete,Input } from 'antd'
 import PropTypes from 'prop-types'
+import { BaseInput } from '@/components'
 
 const STYLES = (theme) => {
   return {
@@ -87,32 +88,24 @@ class AutoSuggestion extends PureComponent {
     const { label } = this.props
     const { value, isFocused } = this.state
 
-    return <div style={{ marginTop: 5, marginBottom: 5 }}>
-
-      <label style={{
-        height: 19,
-        display: 'block',
-        fontSize: '13px',
-        color: 'rgba(0, 0, 0, 0.54)', paddingTop: 1,
-        fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
-        fontWeight: 'inherit',
-      }} >{(isFocused || value) ? label : ''}
-      </label>
+    return (
       <AutoComplete
         value={value}
         defaultValue={value}
         dataSource={this.renderDataSource()}
-        style={{ width: '100%' }}
+        style={{ width: '100%', cursor:'default' }}
         onSelect={this.onOptionSelect}
         onChange={this.onChange}
         onSearch={this.onSearch}
         optionLabelProp='value'
-        placeholder={isFocused || value ? '' : label}
+        // placeholder={isFocused || value ? '' : label}
         onFocus={this.onFocus}
         onBlur={this.onBlur}
+        onClick={()=>{ this.input.refEl.focus() }}
       >
+        <BaseInput label={label} ref={(node)=>{this.input=node}}/>
       </AutoComplete>
-    </div >
+    )
   }
 }
 

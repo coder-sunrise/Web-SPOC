@@ -107,6 +107,10 @@ class BaseInput extends React.PureComponent {
     this.refEl = ref
   }
 
+  focus = () => {}
+  
+  blur = () => {}
+
   getClass = (classes) => {
     const {
       success,
