@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useRef  } from 'react'
 import { connect } from 'dva'
 // moment
 import moment from 'moment'
@@ -8,7 +8,7 @@ import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 // material ui
 import { withStyles } from '@material-ui/core'
 // components
-import { serverDateFormat, Tooltip } from '@/components'
+import { serverDateFormat, Tooltip, Button } from '@/components'
 // medisys components
 import { LoadingWrapper } from '@/components/_medisys'
 // setting
@@ -21,6 +21,7 @@ import TimeSlotComponent from './TimeSlotComponent'
 import { getFirstAppointmentType } from './form/formUtils'
 // assets
 import { primaryColor } from '@/assets/jss'
+import { PrinterOutlined } from '@ant-design/icons'
 
 const styles = () => ({
   customMaxWidth: {
@@ -41,6 +42,22 @@ const styles = () => ({
     fontSize: '0.9rem',
     fontWeight: '450',
     color: '#fff',
+  },
+
+})
+
+const calendarViewstyles = () => ({
+  dayHeaderContainer: {
+    height:'100%',
+    '& > span:last-child': {
+      float:'right',
+      visibility: 'hidden',
+    },
+    '&:hover': {
+      '& > span:last-child': {
+        visibility: 'visible',
+      },
+    },
   },
 })
 
@@ -214,7 +231,12 @@ const CalendarView = ({
   filter,
   loading,
   appointmentTypes,
+  apptTimeSlotDuration = 30 ,
+  printDailyAppointmentReport,
+  classes,
 }) => {
+  const calendar = useRef(null);
+
   const _draggableAccessor = event => {
     if (event.isEnableRecurrence) return false
     if (event.doctor) return false
@@ -444,6 +466,7 @@ const CalendarView = ({
   return (
     <LoadingWrapper loading={loading} text='Loading appointments...'>
       <DragAndDropCalendar
+        ref={calendar}
         components={{
           // https://github.com/intljusticemission/react-big-calendar/blob/master/src/Calendar.js
           toolbar: Toolbar,
@@ -451,6 +474,29 @@ const CalendarView = ({
           timeSlotWrapper: TimeSlotComponent,
           month: {
             dateHeader: MonthDateHeader,
+          },
+          resourceHeader: props => {
+            var { date } = calendar?.current.props
+            var { clinicianFK } = props?.resource
+            return (
+              <div className={classes.dayHeaderContainer}>
+                <span>{props.label}</span>
+                <span>
+                  <Button
+                    size='sm'
+                    color='transparent'
+                    justIcon
+                    onClick={() => {
+                      var { date } = calendar?.current.props
+                      var { clinicianFK } = props?.resource
+                      printDailyAppointmentReport(date, clinicianFK)
+                    }}
+                  >
+                    <PrinterOutlined />
+                  </Button>
+                </span>
+              </div>
+            )
           },
         }}
         localizer={localizer}
@@ -466,7 +512,7 @@ const CalendarView = ({
         selectable='ignoreEvents'
         resizable={false}
         showMultiDayTimes={false}
-        step={15}
+        step={apptTimeSlotDuration}
         timeslots={1}
         longPressThreshold={500}
         tooltipAccessor={null}
@@ -495,7 +541,7 @@ const CalendarView = ({
   )
 }
 
-export default connect(({ calendar, codetable, loading, doctorBlock }) => ({
+const _CalendarView = connect(({ calendar, codetable, loading, doctorBlock, clinicSettings }) => ({
   displayDate: calendar.currentViewDate,
   calendarView: calendar.calendarView,
   calendarEvents: calendar.list || [],
@@ -503,4 +549,7 @@ export default connect(({ calendar, codetable, loading, doctorBlock }) => ({
   doctorBlocks: doctorBlock.list || [],
   appointmentTypes: codetable.ctappointmenttype || [],
   loading: loading.models.calendar,
+  apptTimeSlotDuration: clinicSettings.settings.apptTimeSlotDuration,
 }))(CalendarView)
+
+export default withStyles(calendarViewstyles, { name:"CalendarView", withTheme: true })(_CalendarView)

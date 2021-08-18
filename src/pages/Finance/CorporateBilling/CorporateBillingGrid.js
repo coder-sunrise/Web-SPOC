@@ -3,27 +3,30 @@ import { status } from '@/utils/codes'
 import MoreVert from '@material-ui/icons/MoreVert'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { Button, CommonTableGrid, Tooltip, dateFormatLong } from '@/components'
+import Authorized from '@/utils/Authorized'
 
 const CellBase = props => {
   const { column, row, onRowDoubleClick } = props
   if (column.name === 'Action') {
     return (
-      <Table.Cell {...props}>
-        <Tooltip id='tooltip-left' title='View Details' placement='bottom'>
-          <Button
-            size='sm'
-            onClick={() => {
-              onRowDoubleClick(row)
-            }}
-            justIcon
-            round
-            color='primary'
-            style={{ marginRight: 5 }}
-          >
-            <MoreVert />
-          </Button>
-        </Tooltip>
-      </Table.Cell>
+      <Authorized authority='corporatebilling.corporatebillingdetails'>
+        <Table.Cell {...props}>
+          <Tooltip id='tooltip-left' title='View Details' placement='bottom'>
+            <Button
+              size='sm'
+              onClick={() => {
+                onRowDoubleClick(row)
+              }}
+              justIcon
+              round
+              color='primary'
+              style={{ marginRight: 5 }}
+            >
+              <MoreVert />
+            </Button>
+          </Tooltip>
+        </Table.Cell>
+      </Authorized>
     )
   }
   return <Table.Cell {...props} />
@@ -34,7 +37,6 @@ export const Cell = CellBase
 class CorporateBillingGrid extends PureComponent {
   state = {
     columns: [
-      { name: 'isActive', title: 'Status' },
       { name: 'displayValue', title: 'Company' },
       { name: 'outstandingBalance', title: 'O/S Balance' },
       { name: 'lastPaymentDate', title: 'Last Payment' },
@@ -42,6 +44,7 @@ class CorporateBillingGrid extends PureComponent {
       { name: 'officeNo', title: 'Office No.' },
       { name: 'faxNo', title: 'Fax No.' },
       { name: 'email', title: 'Email' },
+      { name: 'isActive', title: 'Status' },
       { name: 'Action', title: 'Action' },
     ],
     columnExtensions: [

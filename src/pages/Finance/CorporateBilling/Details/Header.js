@@ -54,7 +54,7 @@ class Header extends PureComponent {
     return (
       <CardContainer hideHeader size='sm'>
         <GridContainer gutter={theme.spacing(3)}>
-          <GridItem md={4} xs={12} className={classes.gridItem}>
+          <GridItem md={3} xs={6} className={classes.gridItem}>
             <Field
               name='company.displayValue'
               render={args => (
@@ -63,7 +63,7 @@ class Header extends PureComponent {
             />
           </GridItem>
 
-          <GridItem md={4} xs={12} className={classes.gridItem}>
+          <GridItem md={3} xs={6} className={classes.gridItem}>
             <FastField
               name='company.outstandingBalance'
               render={args => (
