@@ -7,6 +7,11 @@ import { BaseInput } from '@/components'
 
 const STYLES = (theme) => {
   return {
+    dropdownClass:{
+      '& div > .rc-virtual-list > .rc-virtual-list-holder':{
+        maxHeight: '350px !important',
+      }
+    }
   }
 }
 
@@ -85,7 +90,7 @@ class AutoSuggestion extends PureComponent {
   }
 
   render () {
-    const { label } = this.props
+    const { label, classes } = this.props
     const { value, isFocused } = this.state
 
     return (
@@ -102,6 +107,8 @@ class AutoSuggestion extends PureComponent {
         onFocus={this.onFocus}
         onBlur={this.onBlur}
         onClick={()=>{ this.input.refEl.focus() }}
+        dropdownClassName={classes.dropdownClass}
+        dropdownMatchSelectWidth={false}
       >
         <BaseInput label={label} ref={(node)=>{this.input=node}}/>
       </AutoComplete>

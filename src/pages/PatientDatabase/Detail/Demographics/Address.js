@@ -63,22 +63,22 @@ class Address extends Component {
     const textStyle = { overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }
     return <div>
       <GridContainer >
-        <GridItem xs={6} md={6} >
+        <GridItem xs={3} md={3} >
           <Tooltip title={`Postal Code: ${option.postalCode || ''}`}>
             <div style={textStyle}><span style={{ fontWeight: 500 }}>Postal Code: </span>{option.postalCode || '-'}</div>
           </Tooltip>
         </GridItem>
-        <GridItem xs={6} md={6} >
+        <GridItem xs={2} md={2} >
           <Tooltip title={`Block No.: ${option.blkHseNo || ''}`}>
             <div style={textStyle}><span style={{ fontWeight: 500 }}>Block No.: </span> {option.blkHseNo || '-'}</div>
           </Tooltip>
         </GridItem>
-        <GridItem xs={12} md={12} >
+        <GridItem xs={3} md={3} >
           <Tooltip title={`Street: ${option.street || ''}`}>
             <div style={textStyle}><span style={{ fontWeight: 500 }}>Street: </span>{option.street || '-'} </div>
           </Tooltip>
         </GridItem>
-        <GridItem xs={12} md={12} >
+        <GridItem xs={4} md={4} >
           <Tooltip title={`Building Name: ${option.building || ''}`}>
             <div style={textStyle}><span style={{ fontWeight: 500 }}>Building Name: </span>{option.building || '-'} </div>
           </Tooltip>
