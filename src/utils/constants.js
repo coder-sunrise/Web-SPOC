@@ -364,6 +364,14 @@ export const RadiologyWorkitemStatus = {
   5: 'Cancelled',
 }
 
+export const PharmacyWorkitemStatus = {
+  1: 'New',
+  2: 'Prepared',
+  3: 'Verified',
+  4: 'Dispensed',
+  5: 'Completed',
+}
+
 export const VISIT_TYPE = {
   CONS: 1,
   RETAIL: 2,

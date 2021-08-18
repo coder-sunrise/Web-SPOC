@@ -32,7 +32,7 @@ const WorlklistColumnTitle = ({ title, workItemCount }) => {
     >
       <Typography.Title
         level={4}
-        style={{ color: 'white', gridColumnStart: 2 }}
+        style={{ color: 'white', gridColumnStart: 2, marginBottom: 5 }}
       >
         {title}
       </Typography.Title>
