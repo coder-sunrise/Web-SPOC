@@ -4,8 +4,9 @@ import ProCard from '@ant-design/pro-card'
 import { Icon } from '@/components'
 import { WorklistColumn } from './WorklistColumn'
 import { Workitem } from './WorkItem'
+import { PharmacyWorkItem } from './PharmacyWorkItem'
 
-export const Worklist = ({ columns }) => {
+export const Worklist = ({ columns, worklistType = 'Radiology' }) => {
   const [columnPercentage, setColumnPercentage] = useState(100)
 
   useEffect(() => {
@@ -18,13 +19,13 @@ export const Worklist = ({ columns }) => {
     gridTemplateColumns: columns.reduce(r => r + '1fr ', ''), //fraction to set same fraction for all columns
     display: 'grid',
     height: '100%',
-    columnGap: 15,
+    columnGap: 6,
   }
 
   return (
     <div style={gridStyle}>
       {columns.map((column, index) => (
-        <WorklistColumn data={column} renderWorkitem={Workitem} />
+        <WorklistColumn data={column} renderWorkitem={worklistType === 'Radiology' ? Workitem : PharmacyWorkItem} />
       ))}
     </div>
   )

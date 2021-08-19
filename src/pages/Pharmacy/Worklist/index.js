@@ -3,8 +3,10 @@ import ProCard from '@ant-design/pro-card'
 import { compose } from 'redux'
 import { useSelector, useDispatch, connect } from 'dva'
 import { PharmacyWorkitemStatus } from '@/utils/constants'
+import Refresh from '@material-ui/icons/Refresh'
+import moment from 'moment'
 import _ from 'lodash'
-import { CommonModal } from '@/components'
+import { CommonModal, Button } from '@/components'
 import { Worklist } from '@/pages/Radiology/Components'
 import { WorklistContextProvider } from '@/pages/Radiology/Worklist/WorklistContext'
 import PharmacyDetails from './Details'
@@ -31,7 +33,7 @@ const columnsTemplate = [
     workitems: []
   },
   {
-    backgroundColor: '#366',
+    backgroundColor: '#5F5F5F',
     title: 'Completed',
     workitems: [],
   },
@@ -65,6 +67,7 @@ const PharmacyWorklist = () => {
   }, [entity])
 
   return (
+    <div style={{ position: 'relative', height: '100%', }}>
     <ProCard
       style={{
         height: '100%',
@@ -72,9 +75,16 @@ const PharmacyWorklist = () => {
       gutter={[16, 16]}
       title={<WorklistFilter />}
     >
-      <Worklist columns={columns} />
+        <Worklist columns={columns} worklistType='Pharmacy' />
       <PharmacyDetails />
     </ProCard>
+      <div style={{ position: 'absolute', right: 0, top: 50 }}>
+        <div style={{ marginRight: 20 }}>
+          <span style={{ color: '#1890f8' }}>Last Refresh: {moment().format('hh:mm A')}</span>
+          <Button color='primary' justIcon style={{ margin: '0px 6px' }}><Refresh /></Button>
+          <span style={{ fontWeight: 500 }}>Now Serving:</span><span style={{ color: '#1890f8' }}>1.0(genery)</span></div>
+      </div>
+    </div>
   )
 }
 

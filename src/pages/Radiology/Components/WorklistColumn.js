@@ -9,6 +9,7 @@ const defaultColumnStyle = {
   borderRadius: 5,
   display: 'flex',
   flexDirection: 'column',
+  padding: 2
 }
 
 const columnBodyStyle = {
@@ -17,7 +18,7 @@ const columnBodyStyle = {
   flex: '1 1 auto',
   overflow: 'auto',
   height: 0,
-  padding: '0 8px',
+  padding: '3px',
 }
 
 const WorlklistColumnTitle = ({ title, workItemCount }) => {

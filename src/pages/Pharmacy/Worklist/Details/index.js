@@ -10,6 +10,7 @@ import {
 import Banner from '@/pages/PatientDashboard/Banner'
 import { ExaminationSteps } from '@/pages/Radiology/Components'
 import WorklistContext from '@/pages/Radiology/Worklist/WorklistContext'
+import Details from './Details'
 
 const RightAlignGridItem = ({ children, md = 6 }) => {
   return (
@@ -23,9 +24,6 @@ const PharmacyDetails = () => {
   const dispatch = useDispatch()
   const { detailsId, setDetailsId } = useContext(WorklistContext)
   const [showModal, setShowModal] = useState(false)
-  const details = useSelector(state => state.pharmacyDetails)
-  const patientBannerEntity = useSelector(state => state.patient)
-  const [workitem, setWorkItem] = useState({})
 
   useEffect(() => {
     if (detailsId) {
@@ -33,10 +31,6 @@ const PharmacyDetails = () => {
       setShowModal(true)
     }
   }, [detailsId])
-
-  useEffect(() => {
-    if (details && details.entity) setWorkItem(details.entity)
-  }, [details])
 
   return (
     <CommonModal
@@ -47,11 +41,12 @@ const PharmacyDetails = () => {
         setDetailsId(null)
         setShowModal(false)
       }}
-      maxWidth='lg'
+      fullScreen
       overrideLoading
       observe=''
+      showFooter={false}
     >
-      <div>Orders</div>
+      <Details />
     </CommonModal>
   )
 }
