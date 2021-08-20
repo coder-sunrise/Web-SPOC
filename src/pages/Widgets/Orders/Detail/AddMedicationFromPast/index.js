@@ -336,6 +336,9 @@ class PastMedication extends PureComponent {
                   uomfk: o.uomfk,
                   uomCode: o.uomCode,
                   uomDisplayValue: o.uomDisplayValue,
+                  prescribeUOMFK: o.prescribeUOMFK,
+                  prescribeUOMCode: o.prescribeUOMCode,
+                  prescribeUOMDisplayValue: o.prescribeUOMDisplayValue,
                   batchNo: o.batchNo,
                   expiryDate: o.expiryDate,
                   revenueCategoryFK: o.revenueCategoryFK,
@@ -345,7 +348,10 @@ class PastMedication extends PureComponent {
                   subject: o.drugName,
                   caution: drug.caution,
                   isDispensedByPharmacy: drug.isDispensedByPharmacy,
-                  isNurseActualizeRequired: drug.isNurseActualizable
+                  isNurseActualizeRequired: drug.isNurseActualizable,
+                  inventoryDispenseUOMFK: o.uomfk,
+                  inventoryPrescribingUOMFK: o.prescribeUOMFK,
+                  isActive: o.isActive
                 }
               }),
             )
