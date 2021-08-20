@@ -94,14 +94,6 @@ class CorporateBillingDetails extends PureComponent {
     const payload = {
       lgteql_invoiceDate: invoiceStartDate || undefined,
       lsteql_invoiceDate: invoiceEndDate || undefined,
-      lgt_OutstandingBalance:
-        outstandingBalanceStatus === 'yes' && outstandingBalanceStatus !== 'all'
-          ? '0'
-          : undefined,
-      lsteql_OutstandingBalance:
-        outstandingBalanceStatus === 'no' && outstandingBalanceStatus !== 'all'
-          ? '0'
-          : undefined,
       pagesize,
       group: [
         {
