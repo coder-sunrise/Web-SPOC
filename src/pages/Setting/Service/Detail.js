@@ -557,7 +557,7 @@ class Detail extends PureComponent {
       hiddenFields.push('isRequiredSpecifyPanelItem')
     }
 
-    if (isEnableNurseWorkItem) hiddenFields.push('actualizedByNurse')
+    if (!isEnableNurseWorkItem) hiddenFields.push('actualizedByNurse')
 
     return hiddenFields
   }
