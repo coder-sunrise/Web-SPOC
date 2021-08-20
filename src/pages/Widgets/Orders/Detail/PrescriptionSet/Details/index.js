@@ -17,7 +17,19 @@ import {
 } from '@/components'
 import PrescriptionItem from './PrescriptionItem'
 import Grid from './Grid'
-
+const UOMChanged = (item) => {
+  const firstInstruction = (item.prescriptionSetItemInstruction || []).find(item => !item.isDeleted)
+  if (item.isDrugMixture) {
+    const drugMixtures = item.prescriptionSetItemDrugMixture || []
+    if (drugMixtures.find(drugMixture => drugMixture.inventoryDispenseUOMFK !== drugMixture.uomfk
+      || drugMixture.inventoryPrescribingUOMFK !== drugMixture.prescribeUOMFK)) {
+      return true
+    }
+    return false
+  }
+  return (item.inventoryDispenseUOMFK !== item.dispenseUOMFK
+    || firstInstruction?.prescribeUOMFK !== item.inventoryPrescribingUOMFK)
+}
 const Detail = (props) => {
   const { theme, footer, handleSubmit, values, setFieldValue, codetable, generalAccessRight, prescriptionSet } = props
   const typeEnable = generalAccessRight.rights === 'enable'
@@ -25,9 +37,7 @@ const Detail = (props) => {
   const containsInactiveMedication = (prescriptionSet.prescriptionSetItems || []).filter(ps => !ps.isDeleted && !ps.isActive).length > 0
   const containsUOMChangedMedication = (prescriptionSet.prescriptionSetItems || []).filter(ps => {
     const firstInstruction = (ps.prescriptionSetItemInstruction || []).find(item => !item.isDeleted)
-    return !ps.isDeleted && !ps.isDrugMixture
-      && (ps.inventoryDispenseUOMFK !== ps.dispenseUOMFK
-        || firstInstruction?.prescribeUOMFK !== ps.inventoryPrescribingUOMFK)
+    return !ps.isDeleted && UOMChanged(ps)
   }).length > 0
   return (
     <React.Fragment>
@@ -122,7 +132,7 @@ const Detail = (props) => {
             <span style={{ color: 'red', fontStyle: 'italic' }}>
               <sup>#2&nbsp;</sup>
             </span>
-            dispense/prescribe UOM is changed&nbsp;&nbsp;
+            dispense/prescribe UOM changed&nbsp;&nbsp;
           </span>
           {containsInactiveMedication && <span style={{ color: 'red', marginLeft: 20 }}>Remove inactive medication to save the prescription set</span>}
         </GridItem>

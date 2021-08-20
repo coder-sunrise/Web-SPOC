@@ -273,7 +273,7 @@ class PrescriptionSetList extends PureComponent {
             itemDispenseUOMCode = item.dispenseUOMCode
             itemDispenseUOMDisplayValue = item.dispenseUOMDisplayValue
             itemDispenseUOMFK = item.dispenseUOMFK
-            itemDrugCode = item.drugCode
+            itemDrugCode = 'DrugMixture'
             itemDrugName = item.drugName
             itemTotalPrice = item.totalPrice
             newTotalQuantity = item.quantity
@@ -325,6 +325,9 @@ class PrescriptionSetList extends PureComponent {
                     uomfk: o.uomfk,
                     uomCode: o.uomCode,
                     uomDisplayValue: o.uomDisplayValue,
+                    prescribeUOMFK: o.prescribeUOMFK,
+                    prescribeUOMCode: o.prescribeUOMCode,
+                    prescribeUOMDisplayValue: o.prescribeUOMDisplayValue,
                     batchNo: o.batchNo,
                     expiryDate: o.expiryDate,
                     revenueCategoryFK: o.revenueCategoryFK,
@@ -333,6 +336,9 @@ class PrescriptionSetList extends PureComponent {
                     isNew: true,
                     subject: o.drugName,
                     caution: drug.caution,
+                    inventoryDispenseUOMFK: o.uomfk,
+                    inventoryPrescribingUOMFK: o.prescribeUOMFK,
+                    isActive: o.isActive
                   }
                 }),
               )

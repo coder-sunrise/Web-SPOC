@@ -805,8 +805,14 @@ class Detail extends PureComponent {
     row.uomfk = option.dispensingUOM.id
     row.uomCode = option.dispensingUOM.code
     row.uomDisplayValue = option.dispensingUOM.name
+    row.prescribeUOMFK = option.prescribingUOM.id
+    row.prescribeUOMCode = option.prescribingUOM.code
+    row.prescribeUOMDisplayValue = option.prescribingUOM.name
     row.drugName = option.displayValue
     row.revenueCategoryFK = option.revenueCategory.id
+    row.inventoryDispenseUOMFK = option.dispensingUOM.id
+    row.inventoryPrescribingUOMFK = option.prescribingUOM.id
+    row.isActive = option.isActive
   }
 
   commitDrugMixtureItemChanges = ({ rows, deleted, added, changed }) => {
@@ -941,6 +947,9 @@ class Detail extends PureComponent {
               row.uomfk = null
               row.uomCode = undefined
               row.uomDisplayValue = undefined
+              row.prescribeUOMFK = null
+              row.prescribeUOMCode = undefined
+              row.prescribeUOMDisplayValue = undefined
               row.costPrice = undefined
               row.unitPrice = undefined
               row.totalPrice = undefined
@@ -1393,7 +1402,7 @@ class Detail extends PureComponent {
                                           op ? op.name : undefined,
                                         )
                                       }}
-                                      disabled={!values.isDrugMixture}
+                                      disabled
                                       {...commonSelectProps}
                                       {...args}
                                     />
@@ -1641,7 +1650,7 @@ class Detail extends PureComponent {
               render={args => {
                 return (
                   <CodeSelect
-                    disabled={!values.isDrugMixture}
+                    disabled
                     label='Dispense UOM'
                     allowClear={false}
                     code='ctMedicationUnitOfMeasurement'

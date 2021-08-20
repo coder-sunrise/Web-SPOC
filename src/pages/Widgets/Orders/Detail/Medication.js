@@ -998,6 +998,12 @@ class Medication extends PureComponent {
     row.revenueCategoryFK = option.revenueCategory.id
     row.isDispensedByPharmacy = option.isDispensedByPharmacy
     row.isNurseActualizeRequired = option.isNurseActualizable
+    row.prescribeUOMFK = option.prescribingUOM.id
+    row.prescribeUOMCode = option.prescribingUOM.code
+    row.prescribeUOMDisplayValue = option.prescribingUOM.name
+    row.inventoryDispenseUOMFK = option.dispensingUOM.id
+    row.inventoryPrescribingUOMFK = option.prescribingUOM.id
+    row.isActive = option.isActive
   }
 
   handleDrugMixtureItemQuantityOnChange = e => {
@@ -1182,6 +1188,9 @@ class Medication extends PureComponent {
               row.revenueCategoryFK = undefined
               row.isDispensedByPharmacy = undefined
               row.isNurseActualizeRequired = undefined
+              row.prescribeUOMFK = null
+              row.prescribeUOMCode = undefined
+              row.prescribeUOMDisplayValue = undefined
               const activeDrugMixtureRows = (values.corPrescriptionItemDrugMixture || []).filter(
                 item => !item.isDeleted,
               )
@@ -1787,7 +1796,7 @@ class Medication extends PureComponent {
                                           op ? op.name : undefined,
                                         )
                                       }}
-                                      disabled={!openPrescription && !values.isDrugMixture}
+                                      disabled={!openPrescription}
                                       {...commonSelectProps}
                                       {...args}
                                     />
@@ -2080,7 +2089,7 @@ class Medication extends PureComponent {
                 render={args => {
                   return (
                     <CodeSelect
-                      disabled={!openPrescription && !values.isDrugMixture}
+                      disabled={!openPrescription}
                       label='Dispense UOM'
                       allowClear={false}
                       code='ctMedicationUnitOfMeasurement'

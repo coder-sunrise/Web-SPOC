@@ -75,6 +75,22 @@ const styles = () => ({
   }
 })
 class Grid extends PureComponent {
+  enableSelectItem = (item) => {
+    const firstInstruction = (item.prescriptionSetItemInstruction || []).find(item => !item.isDeleted)
+    if (item.isDrugMixture) {
+      const drugMixtures = item.prescriptionSetItemDrugMixture || []
+      if (drugMixtures.find(drugMixture => !drugMixture.isActive
+        || drugMixture.inventoryDispenseUOMFK !== drugMixture.uomfk
+        || drugMixture.inventoryPrescribingUOMFK !== drugMixture.prescribeUOMFK)) {
+        return false
+      }
+      return true
+    }
+    return (item.isActive
+      && item.inventoryDispenseUOMFK === item.dispenseUOMFK
+      && firstInstruction?.prescribeUOMFK === item.inventoryPrescribingUOMFK)
+  }
+
   PrescriptionSets = () => {
     const {
       classes,
@@ -111,16 +127,7 @@ class Grid extends PureComponent {
       )
 
       const isSelect = addedPrescriptionSets.indexOf(o.id) >= 0
-      const selectEnable = items.filter(item => {
-        const firstInstruction = (item.prescriptionSetItemInstruction || []).find(item => !item.isDeleted)
-        if (item.isDrugMixture || (item.isActive
-          && item.inventoryDispenseUOMFK === item.dispenseUOMFK
-          && firstInstruction?.prescribeUOMFK === item.inventoryPrescribingUOMFK
-        )) {
-          return true
-        }
-      }).length === items.length
-
+      const selectEnable = !items.find(item => !this.enableSelectItem(item))
       const editEnable = (o.type === 'Personal' || generalAccessRight.rights === "enable")
       return {
         header: (
@@ -165,7 +172,7 @@ class Grid extends PureComponent {
               }}>
               <Tooltip title={`Last Modified By: ${o.updateByUserTitle && o.updateByUserTitle.trim().length ? `${o.updateByUserTitle}.` : ''}${o.updateByUser || ''}`}>
                   <span style={{ lineHeight: '24px' }}>
-                  {`Last Modified By: ${o.updateByUserTitle && o.updateByUserTitle.trim().length ? `${o.updateByUserTitle}.` : ''}${o.updateByUser || ''}`}
+                  {`Last Modified By: ${o.updateByUserTitle && o.updateByUserTitle.trim().length ? `${o.updateByUserTitle}. ` : ''}${o.updateByUser || ''}`}
                   </span>
                 </Tooltip>
               </div>
@@ -243,14 +250,26 @@ class Grid extends PureComponent {
             {items.map((item) => {
               const firstInstruction = (item.prescriptionSetItemInstruction || []).find(item => !item.isDeleted)
               let warningLabel
-              if (!item.isActive && !item.isDrugMixture) {
-                warningLabel = '#1'
-              } else if (!item.isDrugMixture
-                && (item.inventoryDispenseUOMFK !== item.dispenseUOMFK
-                  || firstInstruction?.prescribeUOMFK !== item.inventoryPrescribingUOMFK)) {
-                warningLabel = '#2'
-              } else if (item.isExternalPrescription) {
-                warningLabel = '#3'
+              if (item.isDrugMixture) {
+                const drugMixtures = item.prescriptionSetItemDrugMixture || []
+                if (drugMixtures.find(drugMixture => !drugMixture.isActive)) {
+                  warningLabel = '#1'
+                }
+                else if (drugMixtures.find(drugMixture => drugMixture.inventoryDispenseUOMFK !== drugMixture.uomfk
+                  || drugMixture.inventoryPrescribingUOMFK !== drugMixture.prescribeUOMFK)) {
+                  warningLabel = '#2'
+                }
+              }
+              else {
+                if (!item.isActive) {
+                  warningLabel = '#1'
+                }
+                else if (item.inventoryDispenseUOMFK !== item.dispenseUOMFK
+                  || firstInstruction?.prescribeUOMFK !== item.inventoryPrescribingUOMFK) {
+                  warningLabel = '#2'
+                } else if (item.isExternalPrescription) {
+                  warningLabel = '#3'
+                }
               }
 
               let paddingRight = 0
@@ -381,7 +400,7 @@ class Grid extends PureComponent {
               <span style={{ color: 'red', fontStyle: 'italic' }}>
                 <sup>#2&nbsp;</sup>
               </span>
-              dispense/prescribe UOM is changed&nbsp;&nbsp;
+              dispense/prescribe UOM changed&nbsp;&nbsp;
               {!isRetail && (
                 <span>
                   <span style={{ color: 'red', fontStyle: 'italic' }}>
