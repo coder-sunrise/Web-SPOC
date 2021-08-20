@@ -275,7 +275,7 @@ class PrescriptionSetList extends PureComponent {
             itemDispenseUOMFK = item.dispenseUOMFK
             itemDrugCode = 'DrugMixture'
             itemDrugName = item.drugName
-            itemTotalPrice = item.totalPrice
+            itemTotalPrice = 0
             newTotalQuantity = item.quantity
 
             let precautionIndex = 0
@@ -316,25 +316,25 @@ class PrescriptionSetList extends PureComponent {
                   drugMixtureIndex += 1
                   return {
                     inventoryMedicationFK: o.inventoryMedicationFK,
-                    drugCode: o.drugCode,
-                    drugName: o.drugName,
+                    drugCode: drug.code,
+                    drugName: drug.displayValue,
                     quantity: o.quantity,
-                    costPrice: o.costPrice,
-                    unitPrice: o.unitPrice,
-                    totalPrice: o.totalPrice,
-                    uomfk: o.uomfk,
-                    uomCode: o.uomCode,
-                    uomDisplayValue: o.uomDisplayValue,
-                    prescribeUOMFK: o.prescribeUOMFK,
-                    prescribeUOMCode: o.prescribeUOMCode,
-                    prescribeUOMDisplayValue: o.prescribeUOMDisplayValue,
+                    costPrice: drug.averageCostPrice || 0,
+                    unitPrice: drug.sellingPrice || 0,
+                    totalPrice: (drug.sellingPrice || 0) * o.quantity,
+                    uomfk: drug.dispensingUOM.id,
+                    uomCode: drug.dispensingUOM.code,
+                    uomDisplayValue: drug.dispensingUOM.name,
+                    prescribeUOMFK: drug.prescribingUOM.id,
+                    prescribeUOMCode: drug.prescribingUOM.code,
+                    prescribeUOMDisplayValue: drug.prescribingUOM.name,
                     batchNo: o.batchNo,
                     expiryDate: o.expiryDate,
-                    revenueCategoryFK: o.revenueCategoryFK,
+                    revenueCategoryFK: drug.revenueCategory.id,
                     sequence: currentDrugMixtureSequence,
                     isDeleted: false,
                     isNew: true,
-                    subject: o.drugName,
+                    subject: drug.displayValue,
                     caution: drug.caution,
                     inventoryDispenseUOMFK: o.uomfk,
                     inventoryPrescribingUOMFK: o.prescribeUOMFK,
