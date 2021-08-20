@@ -32,11 +32,6 @@ const columnsTemplate = [
     title: 'Dispensed',
     workitems: []
   },
-  {
-    backgroundColor: '#5F5F5F',
-    title: 'Completed',
-    workitems: [],
-  },
 ]
 
 const PharmacyWorklist = () => {
@@ -80,7 +75,7 @@ const PharmacyWorklist = () => {
     </ProCard>
       <div style={{ position: 'absolute', right: 0, top: 50 }}>
         <div style={{ marginRight: 20 }}>
-          <span style={{ color: '#1890f8' }}>Last Refresh: {moment().format('hh:mm A')}</span>
+          <span style={{ color: '#1890f8' }}>Last Refresh: {moment().format('HH:mm')}</span>
           <Button color='primary' justIcon style={{ margin: '0px 6px' }}><Refresh /></Button>
           <span style={{ fontWeight: 500 }}>Now Serving:</span><span style={{ color: '#1890f8' }}>1.0(genery)</span></div>
       </div>

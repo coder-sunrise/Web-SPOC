@@ -16,7 +16,6 @@ const printPrescription = (visitID) => {
 }
 
 const WorkitemTitle = ({ item }) => {
-  console.log('item', item)
   const age = item.patientInfo.dob ? calculateAgeFromDOB(item.patientInfo.dob) : 0
   let gender
   let genderColor
@@ -46,13 +45,15 @@ const WorkitemTitle = ({ item }) => {
       </div>
       <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
         <div>
-          <Tooltip title='Family Numbers'>
-            <Icon type='team' style={{ color: 'red', fontSize: '1rem', marginRight: 3 }} />
-          </Tooltip>
+          {item.patientInfo.isInFamilyGroup &&
+            <Tooltip title='Family Numbers'>
+              <Icon type='team' style={{ color: 'red', fontSize: '1rem', marginRight: 3 }} />
+            </Tooltip>
+          }
           <Tooltip title={gender}>
             <Icon type={gender} style={{ color: genderColor, fontSize: '1rem', marginRight: 3 }} />
           </Tooltip>
-          <span style={{ fontSize: '0.7rem' }}> {age} {age > 1 ? 'Yrs' : 'Yr'}</span>
+          <span> {age} {age > 1 ? 'Yrs' : 'Yr'}</span>
         </div>
         <div>{item.patientInfo.patientAccountNo}</div>
       </div>
@@ -70,7 +71,7 @@ const WorkitemBody = ({ item }) => {
       style={{
         display: 'flex',
         width: '100%',
-        fontSize: '0.8rem',
+        fontSize: '0.9rem',
         lineHeight: '1.6rem',
         padding: '3px 8px',
         flexDirection: 'column',
@@ -83,7 +84,7 @@ const WorkitemBody = ({ item }) => {
         }}
       >
         <div style={{ marginRight: 'auto', flexGrow: 1 }}>
-          <div>{`${item.visitInfo.doctorTitle && item.visitInfo.doctorTitle.trim().length ? `${item.visitInfo.doctorTitle}.` : ''}${item.visitInfo.doctorName || ''}`}</div>
+          <div style={{ fontSize: '1rem', fontWeight: 500 }}>{`${item.visitInfo.doctorTitle && item.visitInfo.doctorTitle.trim().length ? `${item.visitInfo.doctorTitle}. ` : ''}${item.visitInfo.doctorName || ''}`}</div>
           <div><FileDoneOutlined style={{ color: blueColor, fontSize: '1rem', marginRight: 3 }} />{orderDate}</div>
         </div>
         <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
@@ -92,7 +93,7 @@ const WorkitemBody = ({ item }) => {
             <Tooltip title='Paid'>
               <Icon type='Dollar' style={{ color: 'green', fontSize: '1rem', marginRight: 3 }} />
             </Tooltip>
-            {moment().format('hh:mm A, DD MMM')}
+            {moment().format('HH:mm, DD MMM')}
           </div>
         </div>
       </div>
@@ -116,7 +117,7 @@ const WorkitemBody = ({ item }) => {
           underline
           style={{
             cursor: 'pointer',
-            marginLeft: 8
+            marginLeft: 10
           }}
           onClick={() => {
             printPrescription(item.visitFK)
@@ -124,9 +125,11 @@ const WorkitemBody = ({ item }) => {
         >
           Print Prescription
         </Typography.Text>
-        <Tooltip title='Order updated by doctor'>
-          <Warning style={{ color: 'red', marginLeft: 8, position: 'relative', bottom: '-4px' }} />
+        {item.isOrderUpdate &&
+          <Tooltip title='Order updated by doctor'>
+          <Warning style={{ color: 'red', marginLeft: 10, position: 'relative', bottom: '-4px', fontSize: '1rem' }} />
         </Tooltip>
+        }
       </div>
     </div>
   )
