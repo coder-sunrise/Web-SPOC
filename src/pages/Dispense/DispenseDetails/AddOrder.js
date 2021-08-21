@@ -236,24 +236,24 @@ const AddOrder = ({
               })
             }
           })
-      }
 
-      if (isVaccinationExist.length || cuationItems.length || allergys.length) {
-        dispatch({
-          type: 'global/updateAppState',
-          payload: {
-            openConfirm: true,
-            customWidth: 'md',
-            openConfirmContent: getCautionAlertContent(cuationItems.map(x => {
-              return {
-                ...x, type: x.type === 1 ? 'Medication' : 'Vaccination'
-              }
-            }), allergys, isVaccinationExist),
-            alignContent: 'left',
-            isInformType: true,
-            onConfirmSave: () => { },
-          },
-        })
+        if (isVaccinationExist.length || cuationItems.length || allergys.length) {
+          dispatch({
+            type: 'global/updateAppState',
+            payload: {
+              openConfirm: true,
+              customWidth: 'md',
+              openConfirmContent: getCautionAlertContent(cuationItems.map(x => {
+                return {
+                  ...x, type: x.type === 1 ? 'Medication' : 'Vaccination'
+                }
+              }), allergys, isVaccinationExist),
+              alignContent: 'left',
+              isInformType: true,
+              onConfirmSave: () => { },
+            },
+          })
+        }
       }
 
       const rowsWithoutVaccination = newRows
@@ -541,6 +541,7 @@ export default compose(
                   dispensedQuanity: o.dispensedQuanity,
                   isDeleted: o.isDeleted,
                   drugLabelRemarks: o.drugLabelRemarks,
+                  isExclusive: o.isExclusive,
                   retailPrescriptionItem: {
                     ...restO,
                     drugName: o.drugName,

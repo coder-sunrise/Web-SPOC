@@ -30,7 +30,7 @@ import style from './style'
     consultation,
     consultationDocument,
     orders,
-    patient: patient.entity,
+    patient: patient.entity || {},
     clinicSettings,
     forms,
   }),
