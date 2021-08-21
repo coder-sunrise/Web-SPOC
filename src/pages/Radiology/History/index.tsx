@@ -1,9 +1,4 @@
-import {
-  PageContainer,
-  Select,
-  TextField,
-  DatePicker,
-} from '@/components'
+import { PageContainer, Select, TextField, DatePicker } from '@/components'
 import { ProTable, Input, Button, Select as MSelect } from '@medisys/component'
 import service from './services'
 import { connect, history } from 'umi'
@@ -12,13 +7,13 @@ import { getAppendUrl } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import { RadiologyWorkitemStatus, VISIT_TYPE_NAME } from '@/utils/constants'
 import { PrinterOutlined, UnorderedListOutlined } from '@ant-design/icons'
-import {
-  DoctorProfileSelect,
-} from '@/components/_medisys'
+import { DoctorProfileSelect } from '@/components/_medisys'
 
 import WorklistContext, {
   WorklistContextProvider,
 } from '../Worklist/WorklistContext'
+import { Fragment, useContext } from 'react'
+import RadiologyDetails from '../Worklist/Details'
 
 const { queryList, query } = service
 const api = {
@@ -109,27 +104,27 @@ const defaultColumns = [
     dataIndex: 'status',
     sorter: false,
     search: false,
-    renderText:(item, { type, defaultRender, ...rest }, form) => Object.values(RadiologyWorkitemStatus)[item-1],
+    renderText: (item, { type, defaultRender, ...rest }, form) =>
+      Object.values(RadiologyWorkitemStatus)[item - 1],
   },
-  {
-    key: 'action',
-    title: 'Action',
-    dataIndex: 'action',
-    align: 'center',
-    sorter: false,
-    search: false,
-    render: (item, { type, defaultRender, ...rest }, form) => {
-      return (
-        <Button
-          onClick={() => {
-            showHistoryDetails(item)
-          }}
-          type='primary'
-          icon={<UnorderedListOutlined />}
-        />
-      )
-    },
-  },
+  // {
+  //   key: 'action',
+  //   title: 'Action',
+  //   dataIndex: 'action',
+  //   align: 'center',
+  //   sorter: false,
+  //   search: false,
+  //   render: (item, { type, defaultRender, ...rest }, form) => {
+  //     return (
+  //       <Button
+  //         onClick={() => {
+  //         }}
+  //         type='primary'
+  //         icon={<UnorderedListOutlined />}
+  //       />
+  //     )
+  //   },
+  // },
   {
     hideInTable: true,
     title: '',
@@ -226,7 +221,7 @@ const defaultColumns = [
     hideInTable: true,
     title: '',
     dataIndex: 'searchOrderedBy',
-    valueType:'select',
+    valueType: 'select',
     renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
       return (
         <DoctorProfileSelect
@@ -305,100 +300,102 @@ const defaultColumns = [
   },
 ]
 
-const showHistoryDetails = row => {}
+const RadiologyWorklistHistoryIndex = ({ dispatch, radiologyHisotry }) => {
+  const { setDetailsId } = useContext(WorklistContext)
 
-const RadiologyWorklistHistoryIndex = ({
-  dispatch,
-  radiologyHisotry,
-}) => {
   return (
-    <PageContainer pageHeaderRender={false}>
-      <ProTable
-        form={{ span: 4 }}
-        rowSelection={false}
-        columns={defaultColumns}
-        api={api}
-        search={{
-          searchText: 'SEARCH',
-          resetText: 'RESET',
-          optionRender: (searchConfig, formProps, dom) => {
-            return (
-              <div
-                style={{
-                  display: 'inline',
-                  float: 'right',
-                  width: 200,
-                  //marginTop: 15,
-                }}
-              >
-                {dom[1]} {dom[0]}
-              </div>
-            )
-          },
-        }}
-        options={{ density: false, reload: false }}
-        toolBarRender={() => {
-          return [
-            <Button type='primary' icon={<PrinterOutlined />} color='primary'>
-              PRINT
-            </Button>,
-          ]
-        }}
-        onRowDblClick={showHistoryDetails}
-        defaultColumns={[]}
-        // features={[
-        //   {
-        //     code: 'details',
-        //     render: row => {
-        //       return (
-        //         <Button
-        //           onClick={() => {
-        //             showHistoryDetails(row)
-        //           }}
-        //           type='primary'
-        //           icon={<Icon type='list' />}
-        //         />
-        //       )
-        //     },
-        //   },
-        // ]}
-        beforeSearchSubmit={({
-          searchAccessionNo,
-          searchOrderDateForm,
-          searchOrderDateTo,
-          searchPatient,
-          searchVisitType,
-          searchStatus,
-          searchOrderedBy,
-          searchPriority,
-          searchRadiographer,
-          searchModality,
-          ...values
-        }) => {
-          return {
-            ...values,
-            apiCriteria: {
-              accessionNo: searchAccessionNo,
-              orderDateForm: searchOrderDateForm,
-              orderDateTo: searchOrderDateTo,
-              searchValue: searchPatient,
-              visitType: searchVisitType,
-              status: searchStatus,
-              orderedBy: searchOrderedBy,
-              priority: searchPriority,
-              radiographer: searchRadiographer,
-              modality: searchModality,
+    <Fragment>
+      <PageContainer pageHeaderRender={false}>
+        <ProTable
+          form={{ span: 4 }}
+          rowSelection={false}
+          columns={defaultColumns}
+          api={api}
+          search={{
+            searchText: 'SEARCH',
+            resetText: 'RESET',
+            optionRender: (searchConfig, formProps, dom) => {
+              return (
+                <div
+                  style={{
+                    display: 'inline',
+                    float: 'right',
+                    width: 200,
+                    //marginTop: 15,
+                  }}
+                >
+                  {dom[1]} {dom[0]}
+                </div>
+              )
             },
-          }
-        }}
-        scroll={{ x: 1100 }}
-      />
-    </PageContainer>
+          }}
+          options={{ density: false, reload: false }}
+          toolBarRender={() => {
+            return [
+              <Button type='primary' icon={<PrinterOutlined />} color='primary'>
+                PRINT
+              </Button>,
+            ]
+          }}
+          onRowDblClick={row => {
+            setDetailsId(row.id)
+          }}
+          defaultColumns={['options']}
+          features={[
+            {
+              code: 'details',
+              render: row => {
+                return (
+                  <Button
+                    onClick={() => {
+                      setDetailsId(row.id)
+                    }}
+                    type='primary'
+                    icon={<UnorderedListOutlined />}
+                  />
+                )
+              },
+            },
+          ]}
+          beforeSearchSubmit={({
+            searchAccessionNo,
+            searchOrderDateForm,
+            searchOrderDateTo,
+            searchPatient,
+            searchVisitType,
+            searchStatus,
+            searchOrderedBy,
+            searchPriority,
+            searchRadiographer,
+            searchModality,
+            ...values
+          }) => {
+            return {
+              ...values,
+              apiCriteria: {
+                accessionNo: searchAccessionNo,
+                orderDateForm: searchOrderDateForm,
+                orderDateTo: searchOrderDateTo,
+                searchValue: searchPatient,
+                visitType: searchVisitType,
+                status: searchStatus,
+                orderedBy: searchOrderedBy,
+                priority: searchPriority,
+                radiographer: searchRadiographer,
+                modality: searchModality,
+              },
+            }
+          }}
+          scroll={{ x: 1100 }}
+        />
+      </PageContainer>
+      <RadiologyDetails />
+    </Fragment>
   )
 }
 
 // @ts-ignore
-connect(({ radiologyHisotry, codetable }) => {
+connect(({ radiologyHisotry }) => {
   return {
     radiologyHisotry,
   }
