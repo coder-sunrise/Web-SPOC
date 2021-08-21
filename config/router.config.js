@@ -142,6 +142,14 @@ const _routes = [
             exact: true,
             //authority: ['reception/queue'], TODO:: to replace with actual permission
           },
+          {
+            path: '/radiology/history',
+            name: 'History',
+            component: './Radiology/History',
+            mini: 'RW',
+            exact: true,
+            //authority: ['reception/queue'], TODO:: to replace with actual permission
+          },
         ],
       },
       //
