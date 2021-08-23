@@ -332,8 +332,9 @@ class Detail extends PureComponent {
       const lowerCaseInput = input.toLowerCase()
 
       const { props } = option
-      const { combinDisplayValue = '', medicationGroup = {} } = props.data
-      match = combinDisplayValue.toLowerCase().indexOf(lowerCaseInput) >= 0
+      const { code = '', displayValue = '', medicationGroup = {} } = props.data
+      match = code.toLowerCase().indexOf(lowerCaseInput) >= 0
+        || displayValue.toLowerCase().indexOf(lowerCaseInput) >= 0
         || (medicationGroup.name || '').toLowerCase().indexOf(lowerCaseInput) >= 0
     } catch (error) {
       match = false
@@ -342,41 +343,62 @@ class Detail extends PureComponent {
   }
 
   renderMedication = (option) => {
-    const { combinDisplayValue = '', medicationGroup = {}, stock = 0, dispensingUOM = {}, isExclusive } = option
+    const { code, displayValue, sellingPrice = 0, medicationGroup = {}, stock = 0, dispensingUOM = {}, isExclusive } = option
     const { name: uomName = '' } = dispensingUOM
-    return <div style={{ height: 22 }} >
-      <div style={{ width: 440, display: 'inline-block', }}>
-        <div style={{
-          maxWidth: isExclusive ? 400 : 440, display: 'inline-block',
-          whiteSpace: 'nowrap',
-          textOverflow: 'ellipsis',
-          overflow: 'hidden',
-          height: '100%',
-        }} title={combinDisplayValue}>{combinDisplayValue}</div>
+
+    return <div style={{ height: 40, lineHeight: '40px', borderBottom: '1px solid #cccccc' }} >
+      <div style={{
+        height: '20px',
+        lineHeight: '20px',
+      }}>
+        <Tooltip title={<div>
+          <span style={{ fontWeight: 500 }}>{`${displayValue} - `}</span>
+          <span>{code}</span>
+        </div>}>
+          <div style={{
+            width: 535,
+            display: 'inline-block',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+          }} ><span style={{ fontWeight: 500 }}>{`${displayValue} - `}</span>
+            <span>{code}</span>
+          </div>
+        </Tooltip>
 
         {isExclusive &&
           <div style={{
-            display: 'inline-block', height: '100%',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-          }}>
-            <div style={{
-              backgroundColor: 'green', color: 'white',
-              height: 22, borderRadius: 4,
-              padding: '1px 5px',
-              fontWeight: 500,
-            }} title='Exclusive Drug'>Excl.</div>
-          </div>
+          backgroundColor: 'green',
+          color: 'white',
+          fontSize: '0.7rem',
+          position: 'relative',
+          right: '0px',
+          marginLeft: 3,
+          top: '-6px',
+          display: 'inline-block',
+          height: 18,
+          lineHeight: '18px',
+          borderRadius: 4,
+          padding: '1px 3px',
+          fontWeight: 500,
+        }} title='Exclusive Drug'>Excl.</div>
         }
       </div>
       <div style={{
-        width: 120, display: 'inline-block',
-        whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
-        overflow: 'hidden',
-        marginLeft: 6,
-        height: '100%',
-      }} title={medicationGroup.name || ''} > {medicationGroup.name || ''}</div>
+        height: '20px',
+        lineHeight: '20px',
+      }}>
+        <Tooltip title={medicationGroup.name || ''} >
+          <div style={{
+            width: 570, display: 'inline-block',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+            height: '100%',
+          }}> {medicationGroup.name || ''}
+          </div>
+        </Tooltip>
+      </div>
     </div >
   }
 
@@ -511,9 +533,7 @@ class Detail extends PureComponent {
       const { name: uomName = '' } = dispensingUOM
       let opt = {
         ...c,
-        combinDisplayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
-          2,
-        )} / ${uomName})`,
+        combinDisplayValue: `${displayValue} - ${code}`,
       }
       return [...p, opt]
     }, [])
@@ -900,6 +920,7 @@ class Detail extends PureComponent {
             return this.renderMedication(option)
           },
           sortingEnabled: false,
+          showOptionTitle: false,
           onChange: e => {
             const { values, setFieldValue } = this.props
             const { row = {} } = e
@@ -1069,6 +1090,7 @@ class Detail extends PureComponent {
                         renderDropdown={this.renderMedication}
                         {...args}
                         style={{ paddingRight: 20 }}
+                        showOptionTitle={false}
                       />
                       <LowStockInfo sourceType='prescriptionSet' {...this.props} />
                     </div>
