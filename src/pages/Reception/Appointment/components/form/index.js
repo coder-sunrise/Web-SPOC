@@ -1240,6 +1240,7 @@ class Form extends React.PureComponent {
                   </GridItem>
                   <GridItem xs md={12}>
                   <div style={{ position: 'relative' }}>
+                    <span>Appointment Remarks</span>
                     <Field
                       name='currentAppointment.appointmentRemarks'
                       render={(args) => (
@@ -1257,7 +1258,7 @@ class Form extends React.PureComponent {
                         disabled={disableDataGrid}
                         cannedTextTypeFK={CANNED_TEXT_TYPE.APPOINTMENTREMARKS}
                         style={{
-                          position: 'absolute', top: 1, right: -33,
+                          position: 'absolute', top: -5, right: -7,
                         }}
                         handleSelectCannedText={(cannedText) => {
                           console.log(cannedText)

@@ -197,12 +197,11 @@ const CannedTextButton = ({
         }
       >
         <Button style={style}
-          justIcon
           size='sm'
-          color='transparent'
+          color='info'
           onClick={handleMainButtonClick}
           disabled={disabled}
-        > <ListAlt />
+        > Canned Text
         </Button>
       </Popover>
       <CommonModal
