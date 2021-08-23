@@ -68,7 +68,8 @@ const CannedTextButton = ({
   handleSelectCannedText,
   user,
   style,
-  disabled
+  disabled,
+  buttonType='icon',
 }) => {
   const [
     show,
@@ -196,14 +197,29 @@ const CannedTextButton = ({
           </div>
         }
       >
-        <Button style={style}
-          justIcon
-          size='sm'
-          color='transparent'
-          onClick={handleMainButtonClick}
-          disabled={disabled}
-        > <ListAlt />
-        </Button>
+        {buttonType === 'text' ? (
+          <Button
+            style={style}
+            size='sm'
+            color='info'
+            onClick={handleMainButtonClick}
+            disabled={disabled}
+          >
+            Canned Text
+          </Button>
+        ) : (
+          <Button
+            style={style}
+            size='sm'
+            justIcon
+            color='transparent'
+            onClick={handleMainButtonClick}
+            disabled={disabled}
+          >
+            <ListAlt />
+          </Button>
+        )}
+
       </Popover>
       <CommonModal
         open={showCannedText}

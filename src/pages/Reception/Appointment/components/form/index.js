@@ -40,7 +40,7 @@ import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
 import RescheduleForm from './RescheduleForm'
 import PreOrder from './PreOrder'
 import SelectPreOrder from './SelectPreOrder'
-import CannedTextButton from './CannedTextButton'
+import CannedTextButton from '@/pages/Widgets/Orders/Detail/CannedTextButton'
 // utils
 import {
   ValidationSchema,
@@ -1255,13 +1255,13 @@ class Form extends React.PureComponent {
                       )}
                     />
                       <CannedTextButton
+                        buttonType='text'
                         disabled={disableDataGrid}
                         cannedTextTypeFK={CANNED_TEXT_TYPE.APPOINTMENTREMARKS}
                         style={{
                           position: 'absolute', top: -5, right: -7,
                         }}
                         handleSelectCannedText={(cannedText) => {
-                          console.log(cannedText)
                           const remarks = currentAppointment.appointmentRemarks
                           const newRemaks = `${remarks ? (remarks + ' ') : ''}${cannedText.text || ''}`.substring(0, 2000)
                           setFieldValue('currentAppointment.appointmentRemarks', newRemaks)
