@@ -2056,12 +2056,13 @@ class Medication extends PureComponent {
                                     <div
                                       style={{
                                         position: 'relative',
+                                        marginBottom: 5,
                                       }}
                                     >
                                       <span
                                         style={{
                                           position: 'absolute',
-                                          bottom: 4,
+                                          top: 5,
                                         }}
                                       >
                                         {activeIndex + 1}.
@@ -2098,7 +2099,7 @@ class Medication extends PureComponent {
                                           day: 1,
                                           precaution: '1',
                                           sequence: newMaxSeq,
-                                          uid: getUniqueId()
+                                          uid: getUniqueId(),
                                         },
                                       )}
                                     </div>

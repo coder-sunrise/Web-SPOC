@@ -1622,7 +1622,7 @@ class Detail extends PureComponent {
                                       <span
                                         style={{
                                           position: 'absolute',
-                                          bottom: 4,
+                                          top: 10,
                                         }}
                                       >
                                         {activeIndex + 1}.
@@ -1659,7 +1659,7 @@ class Detail extends PureComponent {
                                           day: 1,
                                           precaution: '1',
                                           sequence: newMaxSeq,
-                                          uid: getUniqueId()
+                                          uid: getUniqueId(),
                                         },
                                       )}
                                     </div>
