@@ -1397,7 +1397,7 @@ class Medication extends PureComponent {
               }}
             >
               {' '}
-              {medicationGroup.name || ''}
+              {medicationGroup.name ? `Grp.: ${medicationGroup.name}` : ''}
             </div>
           </Tooltip>
         </div>
@@ -1566,7 +1566,7 @@ class Medication extends PureComponent {
                           handleFilter={this.filterMedicationOptions}
                           dropdownMatchSelectWidth={false}
                           dropdownStyle={{
-                            width: 600, 
+                            width: 600,
                           }}
                           className='ant-select-dropdown-bottom-bordered'
                           dropdownClassName='ant-select-dropdown-bottom-bordered'
