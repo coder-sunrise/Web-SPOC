@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { useSelector, useDispatch } from 'dva'
-import { Typography, Input } from 'antd'
-import { Alert } from 'antd'
+import { useDispatch, connect } from 'dva'
+import { Typography, Input, Alert } from 'antd'
+import { compose } from 'redux'
 import moment from 'moment'
+import { history } from 'umi'
 import Warning from '@material-ui/icons/Error'
 import {
   GridContainer,
@@ -11,13 +12,17 @@ import {
   Button,
   CheckboxGroup,
   Switch,
-  CommonTableGrid
+  CommonTableGrid,
+  CommonModal,
+  withFormikExtend,
 } from '@/components'
+import { navigateDirtyCheck } from '@/utils/utils'
 import { VISIT_TYPE } from '@/utils/constants'
 import Banner from '@/pages/PatientDashboard/Banner'
 import { MenuOutlined } from '@ant-design/icons'
 import { PharmacySteps } from '../../Components'
 import Block from '@/pages/PatientDashboard/Banner/Block'
+import AddOrder from '@/pages/Dispense/DispenseDetails/AddOrder'
 
 const ContentGridItem = ({ children, title }) => {
   return (
@@ -30,16 +35,16 @@ const ContentGridItem = ({ children, title }) => {
           left: '-130px',
           fontWeight: 500
         }}>{title}</div>
-        <div style={{ marginLeft: 3 }}> {children}</div>
+        <div style={{ marginLeft: 6 }}> {children}</div>
       </div>
     </GridItem>
   )
 }
 
 const Details = (props) => {
-  const details = useSelector(state => state.pharmacyDetails)
-  const patientBannerEntity = useSelector(state => state.patient)
-  const workitem = details.entity || {}
+  const { pharmacyDetails, patient, dispatch } = props
+  const [showEditOrderModal, setShowEditOrderModal] = useState(false)
+  const workitem = pharmacyDetails.entity || {}
   const statusHistory = [...(workitem.pharmarcyWorklistHistory || []),
   {
     statusFK: workitem.statusFK,
@@ -47,10 +52,38 @@ const Details = (props) => {
     actionByUser: workitem.updateByUser,
     actionByUserTitle: workitem.updateByUserTitle
   }]
+  const { corDiagnosis = [], visitPurposeFK } = workitem
+
+  const editOrder = e => {
+    const _editOrder = () => {
+      dispatch({
+        type: 'dispense/query',
+        payload: {
+          id: workitem.visitFK,
+          version: Date.now(),
+        },
+      }).then(r => {
+        setShowEditOrderModal(true)
+      })
+    }
+    if (visitPurposeFK === VISIT_TYPE.RETAIL) {
+      _editOrder()
+    } else {
+      navigateDirtyCheck({
+        onProceed: _editOrder,
+      })(e)
+    }
+  }
+
+  const reloadPharmacy = () => {
+    dispatch({ type: 'pharmacyDetails/query', payload: { id: workitem.id } })
+    setShowEditOrderModal(false)
+  }
+
   return <div>
     <div style={{ maxHeight: 800, overflowY: 'scroll', marginBottom: 10 }}>
       <Banner
-        patientInfo={patientBannerEntity}
+        patientInfo={patient}
         style={{ position: 'relative' }}
       />
       <div style={{ marginTop: 16 }}>
@@ -62,17 +95,17 @@ const Details = (props) => {
             <Typography.Title level={5}>Order Details</Typography.Title>
           </GridItem>
           <ContentGridItem title='Queue No.:'>{workitem.queueNo}</ContentGridItem>
-          <ContentGridItem title='Diagnosis:'>Asthma</ContentGridItem>
+          <ContentGridItem title='Diagnosis:'>{corDiagnosis.length ? workitem.corDiagnosis.map(d => d.diagnosisDescription).join(', ') : '-'}</ContentGridItem>
           <ContentGridItem title='Visit Type:'>{workitem.visitType}</ContentGridItem>
           <ContentGridItem title='Order By:'>{`${workitem.generateByUserTitle && workitem.generateByUserTitle.trim().length ? `${workitem.generateByUserTitle}. ` : ''}${workitem.generateByUser || ''}`}</ContentGridItem>
           <ContentGridItem title='Order Created Time:'>{moment(workitem.generateDate).format('HH:mm, DD MMM YYYY')}</ContentGridItem>
-          <ContentGridItem title='Group:'>{workitem.visitGroup || ''}</ContentGridItem>
-          <ContentGridItem title='Family History:'>{workitem.familyHistory || ''}</ContentGridItem>
-          <ContentGridItem title='Social History:'>{workitem.socialHistory || ''}</ContentGridItem>
-          <ContentGridItem title='Medical History:'>{workitem.medicalHistory || ''}</ContentGridItem>
+          <ContentGridItem title='Group:'>{(workitem.visitGroup && workitem.visitGroup.trim().length) ? workitem.visitGroup : '-'}</ContentGridItem>
+          <ContentGridItem title='Family History:'>{(workitem.familyHistory && workitem.familyHistory.trim().length) ? workitem.familyHistory : '-'}</ContentGridItem>
+          <ContentGridItem title='Social History:'>{(workitem.socialHistory && workitem.socialHistory.trim().length) ? workitem.socialHistory : '-'}</ContentGridItem>
+          <ContentGridItem title='Medical History:'>{(workitem.medicalHistory && workitem.medicalHistory.trim().length) ? workitem.medicalHistory : '-'}</ContentGridItem>
           <GridItem md={8}>
             <Alert
-              message="Doctor amended prescription at 10:40 PM"
+              message={`${workitem.latestOrderUpdateUser} amended prescription at ${moment(workitem.latestOrderUpdateDate).format("HH:mm")}`}
               banner
               style={{
                 whiteSpace: 'nowrap',
@@ -222,11 +255,42 @@ const Details = (props) => {
           onClose()
         }}>Cancel</Button>
         {workitem.visitPurposeFK == VISIT_TYPE.RETAIL ?
-          <Button color='success' size='sm'>Add Order</Button>
-          : <Button color='success' size='sm'>Edit Order</Button>}
+          <Button color='success' size='sm' onClick={editOrder}>Add Order</Button>
+          : <Button color='success' size='sm' onClick={editOrder}>Edit Order</Button>}
         <Button color='primary' size='sm'>Prepared</Button>
       </GridItem>
     </GridContainer>
+    <CommonModal
+      open={showEditOrderModal}
+      title='Edit Order'
+      showFooter={true}
+      onClose={() => {
+        setShowEditOrderModal(false)
+      }}
+      maxWidth='md'
+      observe='OrderPage'
+      showFooter={false}
+    >
+      <AddOrder
+        visitType={visitPurposeFK}
+        onReloadClick={reloadPharmacy}
+        {...props}
+        history={history}
+      />
+    </CommonModal>
   </div >
 }
-export default Details
+
+export default compose(
+  connect(({ pharmacyDetails, patient }) => ({
+    pharmacyDetails,
+    patient,
+  })),
+  withFormikExtend({
+    enableReinitialize: true,
+    mapPropsToValues: () => ({}),
+    //validationSchema: Yup.object().shape({}),
+    handleSubmit: () => { },
+    displayName: 'PharmarcyWorklistDetail',
+  })
+)(Details)

@@ -47,7 +47,7 @@ const AddOrder = ({
       type: 'dispense/queryAddOrderDetails',
       payload: {
         invoiceId: id,
-        isInitialLoading: location.query.isInitialLoading,
+        isInitialLoading: location?.query?.isInitialLoading,
       },
     })
 

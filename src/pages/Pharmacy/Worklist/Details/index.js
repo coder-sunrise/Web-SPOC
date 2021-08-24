@@ -43,7 +43,7 @@ const PharmacyDetails = () => {
       }}
       fullScreen
       overrideLoading
-      observe=''
+      observe='PharmarcyWorklistDetail'
       showFooter={false}
     >
       <Details />

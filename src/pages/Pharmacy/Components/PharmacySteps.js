@@ -11,6 +11,9 @@ const showIcon = (statusFK, currentStatusFK) => {
   if (currentStatusFK === 4 || statusFK <= currentStatusFK) {
     return <CheckCircleFilled style={{ color: '#33CC33' }} />
   }
+  if (statusFK === currentStatusFK + 1) {
+    return <div style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: '#33CC33' }}></div>
+  }
   return <div style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: '#999999' }}></div>
 }
 
