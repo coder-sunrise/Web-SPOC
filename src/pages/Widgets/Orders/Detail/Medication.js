@@ -1251,97 +1251,158 @@ class Medication extends PureComponent {
     const { code, displayValue, sellingPrice = 0, medicationGroup = {}, stock = 0, dispensingUOM = {}, isExclusive } = option
     const { name: uomName = '' } = dispensingUOM
 
-    return <div style={{ height: 40, lineHeight: '40px', borderBottom: '1px solid #cccccc' }} >
-      <div style={{
-        height: '20px',
-        lineHeight: '20px',
-      }}>
-        <Tooltip title={<div>
-          <span style={{ fontWeight: 500 }}>{`${displayValue} - `}</span>
-          <span>{code}</span>
-        </div>}>
-          <div style={{
-            width: 535,
-            display: 'inline-block',
-            whiteSpace: 'nowrap',
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-          }} ><span style={{ fontWeight: 500 }}>{`${displayValue} - `}</span>
-            <span>{code}</span>
-          </div>
-        </Tooltip>
+    return (
+      <div
+        style={{
+          height: 40,
+          lineHeight: '40px',
+        }}
+      >
+        <div
+          style={{
+            height: '20px',
+            lineHeight: '20px',
+          }}
+        >
+          <Tooltip
+            useTooltip2
+            title={
+              <div>
+                <div
+                  style={{ fontWeight: 'bold' }}
+                >{`Name: ${displayValue}`}</div>
+                <div>{`Code: ${code}`}</div>
+              </div>
+            }
+          >
+            <div
+              style={{
+                width: 535,
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+              }}
+            >
+              <span
+                style={{ fontWeight: '550', fontSize: 15 }}
+              >{`${displayValue} - `}</span>
+              <span>{code}</span>
+            </div>
+          </Tooltip>
 
-        {isExclusive &&
-          <div style={{
-          backgroundColor: 'green',
-          color: 'white',
-          fontSize: '0.7rem',
-          position: 'relative',
-          right: '0px',
-          marginLeft: 3,
-          top: '-6px',
-          display: 'inline-block',
-          height: 18,
-          lineHeight: '18px',
-          borderRadius: 4,
-          padding: '1px 3px',
-          fontWeight: 500,
-        }} title='Exclusive Drug'>Excl.</div>
-        }
+          {isExclusive && (
+            <div
+              style={{
+                backgroundColor: 'green',
+                color: 'white',
+                fontSize: '0.7rem',
+                position: 'relative',
+                right: '0px',
+                marginLeft: 3,
+                top: '-6px',
+                display: 'inline-block',
+                height: 18,
+                lineHeight: '18px',
+                borderRadius: 4,
+                padding: '1px 3px',
+                fontWeight: 500,
+              }}
+              title='Exclusive Drug'
+            >
+              Excl.
+            </div>
+          )}
+        </div>
+        <div
+          style={{
+            height: '20px',
+            lineHeight: '20px',
+          }}
+        >
+          <Tooltip
+            title={
+              <div>
+                Unit Price:
+                <span
+                  style={{ color: 'darkblue' }}
+                >{` ${currencySymbol}${sellingPrice.toFixed(2)}`}</span>
+              </div>
+            }
+          >
+            <div
+              style={{
+                width: 130,
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                height: '100%',
+              }}
+            >
+              Unit Price:
+              <span
+                style={{ color: 'darkblue' }}
+              >{` ${currencySymbol}${sellingPrice.toFixed(2)}`}</span>
+            </div>
+          </Tooltip>
+
+          <Tooltip
+            title={
+              <div>
+                Stock:{' '}
+                <span
+                  style={{
+                    color: stock < 0 ? 'red' : 'black',
+                  }}
+                >{` ${numeral(stock || 0).format(qtyFormat)} `}</span>
+                {uomName || ''}
+              </div>
+            }
+          >
+            <div
+              style={{
+                width: 150,
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                marginLeft: 3,
+                height: '100%',
+              }}
+            >
+              Stock:{' '}
+              <span
+                style={{
+                  color: stock < 0 ? 'red' : 'black',
+                }}
+              >{` ${numeral(stock || 0).format(qtyFormat)} `}</span>
+              {uomName || ''}
+            </div>
+          </Tooltip>
+
+          <Tooltip
+            useTooltip2
+            title={medicationGroup.name ? `Group: ${medicationGroup.name}` : ''}
+          >
+            <div
+              style={{
+                width: 290,
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                marginLeft: 3,
+                height: '100%',
+              }}
+            >
+              {' '}
+              {medicationGroup.name || ''}
+            </div>
+          </Tooltip>
+        </div>
       </div>
-      <div style={{
-        height: '20px',
-        lineHeight: '20px',
-      }}>
-
-        <Tooltip title={<div>
-          Unit Price:
-          <span style={{ color: 'darkblue' }}>{` ${currencySymbol}${sellingPrice.toFixed(2)}`}</span>
-        </div>}>
-          <div style={{
-            width: 130, display: 'inline-block',
-            whiteSpace: 'nowrap',
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            height: '100%',
-          }} >
-            Unit Price:
-            <span style={{ color: 'darkblue' }}>{` ${currencySymbol}${sellingPrice.toFixed(2)}`}</span>
-          </div>
-        </Tooltip>
-
-        <Tooltip title={<div>
-          Stock: <span style={{
-            color: stock < 0 ? 'red' : 'black'
-          }}>{` ${numeral(stock || 0).format(qtyFormat)} `}</span>{uomName || ''}
-        </div>}>
-          <div style={{
-            width: 150, display: 'inline-block',
-            whiteSpace: 'nowrap',
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            marginLeft: 3,
-            height: '100%',
-          }} >
-            Stock: <span style={{
-              color: stock < 0 ? 'red' : 'black'
-            }}>{` ${numeral(stock || 0).format(qtyFormat)} `}</span>{uomName || ''}
-          </div>
-        </Tooltip>
-
-        <Tooltip title={medicationGroup.name || ''} >
-          <div style={{
-            width: 290, display: 'inline-block',
-            whiteSpace: 'nowrap',
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            marginLeft: 3,
-            height: '100%',
-          }}> {medicationGroup.name || ''}
-          </div>
-        </Tooltip>
-      </div>
-    </div >
+    )
   }
 
   renderOthers = () => {
@@ -1505,8 +1566,10 @@ class Medication extends PureComponent {
                           handleFilter={this.filterMedicationOptions}
                           dropdownMatchSelectWidth={false}
                           dropdownStyle={{
-                            width: 600,
+                            width: 600, 
                           }}
+                          className='ant-select-dropdown-bottom-bordered'
+                          dropdownClassName='ant-select-dropdown-bottom-bordered'
                           renderDropdown={this.renderMedication}
                           {...args}
                           style={{ paddingRight: 20 }}
@@ -1514,7 +1577,11 @@ class Medication extends PureComponent {
                           showOptionTitle={false}
                           id='medication'
                         />
-                        <LowStockInfo sourceType='medication' {...this.props} corVitalSign={corVitalSign} />
+                        <LowStockInfo
+                          sourceType='medication'
+                          {...this.props}
+                          corVitalSign={corVitalSign}
+                        />
                       </div>
                     )
                   }}

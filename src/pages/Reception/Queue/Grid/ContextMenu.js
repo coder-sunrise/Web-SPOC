@@ -16,7 +16,7 @@ import {
   VISIT_STATUS,
 } from '../variables'
 
-const styles = (theme) => ({
+const styles = theme => ({
   leftAlign: {
     justifyContent: 'start',
   },
@@ -36,10 +36,21 @@ const styles = (theme) => ({
         fontSize: '0.8rem',
         color: primaryColor,
       },
+      '& svg': {
+        fontSize: '0.8rem',
+        color: primaryColor,
+        position: 'relative',
+        top: '5px',
+      },
     },
     '& > .ant-menu-item-disabled': {
-      '& span, & svg': {
+      '& span': {
         color: 'rgba(0, 0, 0, 0.25) !important',
+      },
+      '& svg': {
+        color: 'rgba(0, 0, 0, 0.25) !important',
+        position: 'relative',
+        top: '5px',
       },
     },
   },
