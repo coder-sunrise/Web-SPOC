@@ -12,7 +12,8 @@ import {
   TextField,
   Checkbox,
   ProgressButton,
-  RadioGroup
+  RadioGroup,
+  Button
 } from '@/components'
 import { primaryColor } from '@/assets/jss'
 import { FilterBarDate } from '@/components/_medisys'
@@ -63,14 +64,14 @@ const FilterBar = (props) => {
             >
               Search
             </ProgressButton>
-            <ProgressButton
+            <Button
               color='primary'
               size='sm'
               icon={<Add />}
               onClick={handelNewPrescriptionSet}
             >
               Add New
-            </ProgressButton>
+            </Button>
             <div
               style={{ display: 'inline-block', marginLeft: 10 }}>
               <RadioGroup
