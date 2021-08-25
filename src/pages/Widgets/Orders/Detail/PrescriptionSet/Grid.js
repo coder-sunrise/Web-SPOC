@@ -59,9 +59,9 @@ const styles = () => ({
   },
   tagStyle: {
     fontSize: '0.85rem',
-    padding: '1px 3px',
-    fontWeight: 500,
-    borderRadius: 4
+    padding: '2px 5px',
+    fontWeight: 'normal',
+    borderRadius: 4,
   },
   rightIcon: {
     position: 'absolute',
@@ -71,8 +71,8 @@ const styles = () => ({
     fontSize: '0.7rem',
     padding: '2px 3px',
     height: 20,
-    cursor: 'pointer'
-  }
+    cursor: 'pointer',
+  },
 })
 class Grid extends PureComponent {
   enableSelectItem = (item) => {
