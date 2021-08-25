@@ -127,24 +127,6 @@ const _routes = [
         ],
       },
       {
-        path: '/pharmacy',
-        icon: 'icon-plus-square',
-        name: 'pharmacy',
-        moduleName: 'Pharmacy',
-        //authority: ['pharmacy'], TODO:: to replace with actual permission
-        specialist: ['GP', 'Dental'],
-        routes: [
-          {
-            path: '/pharmacy/worklist',
-            name: 'worklist',
-            component: './Pharmacy/Worklist',
-            mini: 'PW',
-            exact: true,
-            //authority: ['pharmacy/worklist'], TODO:: to replace with actual permission
-          },
-        ],
-      },
-      {
         path: '/radiology',
         icon: 'icon-radiology',
         name: 'radiology',
@@ -159,6 +141,24 @@ const _routes = [
             mini: 'RW',
             exact: true,
             //authority: ['reception/queue'], TODO:: to replace with actual permission
+          },
+        ],
+      },
+      {
+        path: '/pharmacy',
+        icon: 'icon-plus-square',
+        name: 'pharmacy',
+        moduleName: 'Pharmacy',
+        authority: ['pharmacy'],
+        //specialist: ['GP', 'Dental'],
+        routes: [
+          {
+            path: '/pharmacy/worklist',
+            name: 'worklist',
+            component: './Pharmacy/Worklist',
+            mini: 'PW',
+            exact: true,
+            //authority: ['pharmacy/worklist'],
           },
         ],
       },

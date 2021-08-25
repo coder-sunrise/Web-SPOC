@@ -89,12 +89,14 @@ const WorkitemBody = ({ item }) => {
         </div>
         <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
           <div>Q. No.: {item.visitInfo.queueNo}</div>
-          <div>
-            <Tooltip title='Paid'>
-              <Icon type='Dollar' style={{ color: 'green', fontSize: '1rem', marginRight: 3 }} />
-            </Tooltip>
-            {moment().format('HH:mm, DD MMM')}
+          {item.isPaid &&
+            <div>
+              <Tooltip title='Paid'>
+                <Icon type='Dollar' style={{ color: 'green', fontSize: '1rem', marginRight: 3 }} />
+              </Tooltip>
+            {moment(item.paymentDate).format('HH:mm, DD MMM')}
           </div>
+          }
         </div>
       </div>
       <div

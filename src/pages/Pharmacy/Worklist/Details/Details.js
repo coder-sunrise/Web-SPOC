@@ -254,10 +254,12 @@ const Details = (props) => {
           const { onClose } = props
           onClose()
         }}>Cancel</Button>
-        {workitem.visitPurposeFK == VISIT_TYPE.RETAIL ?
+        {workitem.statusFK === 1 && (workitem.visitPurposeFK == VISIT_TYPE.RETAIL ?
           <Button color='success' size='sm' onClick={editOrder}>Add Order</Button>
-          : <Button color='success' size='sm' onClick={editOrder}>Edit Order</Button>}
-        <Button color='primary' size='sm'>Prepared</Button>
+          : <Button color='success' size='sm' onClick={editOrder}>Edit Order</Button>)}
+        {workitem.statusFK === 1 && <Button color='primary' size='sm'>Prepared</Button>}
+        {workitem.statusFK === 2 && <Button color='primary' size='sm'>Verify</Button>}
+        {workitem.statusFK === 3 && <Button color='primary' size='sm'>Complete</Button>}
       </GridItem>
     </GridContainer>
     <CommonModal
