@@ -1158,9 +1158,11 @@ class Medication extends PureComponent {
           },
           dropdownMatchSelectWidth: false,
           dropdownStyle: {
-            width: 600,
+            maxWidth: 600,
+            width: '600px!important',
           },
-          renderDropdown: (option) => {
+          dropdownClassName: 'ant-select-dropdown-bottom-bordered',
+          renderDropdown: option => {
             return this.renderMedication(option)
           },
           sortingEnabled: false,
@@ -1173,8 +1175,7 @@ class Medication extends PureComponent {
               const {
                 codetable: { inventorymedication = [] },
               } = this.props
-            }
-            else {
+            } else {
               row.quantity = undefined
               row.uomfk = null
               row.uomCode = undefined
@@ -1190,9 +1191,9 @@ class Medication extends PureComponent {
               row.prescribeUOMFK = null
               row.prescribeUOMCode = undefined
               row.prescribeUOMDisplayValue = undefined
-              const activeDrugMixtureRows = (values.corPrescriptionItemDrugMixture || []).filter(
-                item => !item.isDeleted,
-              )
+              const activeDrugMixtureRows = (
+                values.corPrescriptionItemDrugMixture || []
+              ).filter(item => !item.isDeleted)
               if (activeDrugMixtureRows[0].id === row.id) {
                 this.changeMedication()
               }
@@ -1568,7 +1569,6 @@ class Medication extends PureComponent {
                           dropdownStyle={{
                             width: 600,
                           }}
-                          className='ant-select-dropdown-bottom-bordered'
                           dropdownClassName='ant-select-dropdown-bottom-bordered'
                           renderDropdown={this.renderMedication}
                           {...args}
