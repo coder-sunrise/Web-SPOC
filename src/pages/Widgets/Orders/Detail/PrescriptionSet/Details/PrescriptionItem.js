@@ -957,7 +957,8 @@ class Detail extends PureComponent {
           options: this.getMedicationOptions,
           handleFilter: (input, option) => {
             return this.filterMedicationOptions(input, option)
-          },
+          }, 
+          width:595,
           dropdownMatchSelectWidth: false,
           dropdownStyle: {
             width: 600,
@@ -1046,8 +1047,7 @@ class Detail extends PureComponent {
           isDisabled: row => row.inventoryMedicationFK === undefined,
         },
         {
-          columnName: 'uomfk',
-          width: 250,
+          columnName: 'uomfk', 
           type: 'codeSelect',
           code: 'ctMedicationUnitOfMeasurement',
           labelField: 'name',
@@ -1122,7 +1122,7 @@ class Detail extends PureComponent {
                 name='inventoryMedicationFK'
                 render={args => {
                   return (
-                    <div style={{ position: 'relative' }} >
+                    <div style={{ position: 'relative' }}>
                       <CodeSelect
                         temp
                         label='Medication Name, Drug Group'
@@ -1131,7 +1131,7 @@ class Detail extends PureComponent {
                         options={this.getMedicationOptions()}
                         handleFilter={this.filterMedicationOptions}
                         dropdownMatchSelectWidth={false}
-                        dropdownClassName ='ant-select-dropdown-bottom-bordered'
+                        dropdownClassName='ant-select-dropdown-bottom-bordered'
                         dropdownStyle={{
                           width: 600,
                         }}
@@ -1140,7 +1140,10 @@ class Detail extends PureComponent {
                         style={{ paddingRight: 20 }}
                         showOptionTitle={false}
                       />
-                      <LowStockInfo sourceType='prescriptionSet' {...this.props} />
+                      <LowStockInfo
+                        sourceType='prescriptionSet'
+                        {...this.props}
+                      />
                     </div>
                   )
                 }}

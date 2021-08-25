@@ -1156,6 +1156,7 @@ class Medication extends PureComponent {
           handleFilter: (input, option) => {
             return this.filterMedicationOptions(input, option)
           },
+          width: 400,
           dropdownMatchSelectWidth: false,
           dropdownStyle: {
             maxWidth: 600,
@@ -1213,7 +1214,6 @@ class Medication extends PureComponent {
         },
         {
           columnName: 'uomfk',
-          width: 100,
           type: 'codeSelect',
           code: 'ctMedicationUnitOfMeasurement',
           labelField: 'name',
