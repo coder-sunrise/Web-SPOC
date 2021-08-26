@@ -148,7 +148,7 @@ const _routes = [
             component: './Radiology/History',
             mini: 'RW',
             exact: true,
-            //authority: ['reception/queue'], TODO:: to replace with actual permission
+            // authority: ['radiology/worklisthistory'],
           },
         ],
       },

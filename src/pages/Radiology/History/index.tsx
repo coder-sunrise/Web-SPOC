@@ -1,19 +1,39 @@
-import { PageContainer, Select, TextField, DatePicker } from '@/components'
-import { ProTable, Input, Button, Select as MSelect } from '@medisys/component'
+import {
+  PageContainer,
+  Select,
+  TextField,
+  DatePicker,
+  Popper,
+  CommonTableGrid,
+  CodeSelect,
+  Tooltip,
+} from '@/components'
+import { ProTable, Input, Button } from '@medisys/component'
+
 import service from './services'
 import { connect, history } from 'umi'
 import { formatMessage } from 'umi'
 import { getAppendUrl } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
-import { RadiologyWorkitemStatus, VISIT_TYPE_NAME } from '@/utils/constants'
+import {
+  RadiologyWorkitemStatus,
+  VISIT_TYPE_NAME,
+  VISIT_TYPE,
+} from '@/utils/constants'
 import { PrinterOutlined, UnorderedListOutlined } from '@ant-design/icons'
-import { DoctorProfileSelect } from '@/components/_medisys'
-
+import moment from 'moment'
 import WorklistContext, {
   WorklistContextProvider,
 } from '../Worklist/WorklistContext'
 import { Fragment, useContext } from 'react'
 import RadiologyDetails from '../Worklist/Details'
+import { compose } from 'redux'
+import React, { useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'dva'
+import _ from 'lodash'
+import LinkIcon from '@material-ui/icons/Link'
+import IconButton from '@/components/Button/IconButton'
+import { withStyles } from '@material-ui/core'
 
 const { queryList, query } = service
 const api = {
@@ -24,294 +44,549 @@ const api = {
   query,
 }
 
-const defaultColumns = [
-  {
-    key: 'accessionNo',
-    title: 'Accession No.',
-    dataIndex: 'accessionNo',
-    sorter: true,
-    search: false,
-  },
-  {
-    key: 'patientName',
-    title: 'Patient Name',
-    dataIndex: 'patientName',
-    sorter: true,
-    search: false,
-  },
-  {
-    key: 'patientReferenceNo',
-    title: 'Ref. No.',
-    dataIndex: 'patientReferenceNo',
-    sorter: true,
-    search: false,
-  },
-  {
-    key: 'patientAccountNo',
-    title: 'Acc. No.',
-    dataIndex: 'patientAccountNo',
-    sorter: true,
-    search: false,
-  },
-  {
-    key: 'orderTime',
-    title: 'Order Time',
-    dataIndex: 'orderTime',
-    valueType: 'dateTime',
-    render: (_dom: any, entity: any) =>
-      entity.orderTime?.format('yyyy-MM-DD HH:mm:ss') || '-',
-    sorter: true,
-    search: false,
-  },
-  {
-    key: 'orderedBy',
-    title: 'Ordered By',
-    dataIndex: 'orderedBy',
-    sorter: false,
-    search: false,
-  },
-  {
-    key: 'radiographer',
-    title: 'Radiographer',
-    dataIndex: 'radiographer',
-    sorter: false,
-    search: false,
-  },
-  {
-    key: 'priority',
-    title: 'Priority',
-    dataIndex: 'priority',
-    sorter: false,
-    search: false,
-  },
-  {
-    key: 'drInstruction',
-    title: 'Dr. Instruction',
-    dataIndex: 'drInstruction',
-    sorter: false,
-    search: false,
-  },
-  {
-    key: 'visitType',
-    title: 'Visit Type',
-    dataIndex: 'visitType',
-    sorter: false,
-    search: false,
-  },
-  {
-    key: 'status',
-    title: 'Status',
-    dataIndex: 'status',
-    sorter: false,
-    search: false,
-    renderText: (item, { type, defaultRender, ...rest }, form) =>
-      Object.values(RadiologyWorkitemStatus)[item - 1],
-  },
-  // {
-  //   key: 'action',
-  //   title: 'Action',
-  //   dataIndex: 'action',
-  //   align: 'center',
-  //   sorter: false,
-  //   search: false,
-  //   render: (item, { type, defaultRender, ...rest }, form) => {
-  //     return (
-  //       <Button
-  //         onClick={() => {
-  //         }}
-  //         type='primary'
-  //         icon={<UnorderedListOutlined />}
-  //       />
-  //     )
-  //   },
-  // },
-  {
-    hideInTable: true,
-    title: '',
-    dataIndex: 'searchAccessionNo',
-    renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-      return <TextField style={{ width: 250 }} label='Accession No' />
-    },
-  },
-  {
-    // search: OrderDateFrom,
-    hideInTable: true,
-    title: '',
-    dataIndex: 'searchOrderDateForm',
-    renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-      return (
-        <DatePicker
-          style={{ width: 250 }}
-          label='Order Date Form'
-          placeholder=''
-        />
-      )
-    },
-  },
-  {
-    // title: OrderDateTo
-    hideInTable: true,
-    title: '',
-    dataIndex: 'searchOrderDateTo',
-    renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-      return (
-        <DatePicker
-          style={{ width: 250 }}
-          label='Order Date To'
-          placeholder=''
-        />
-      )
-    },
-  },
-  {
-    // search: Patient Name/Acc. No./Ref. No.
-    hideInTable: true,
-    title: '',
-    dataIndex: 'searchPatient',
-    renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-      if (type === 'form') {
-        return null
-      }
-      return (
-        <TextField
-          style={{ width: 250 }}
-          label={'Patient Name/Acc. No./Ref. No.'}
-        />
-      )
-    },
-  },
-  {
-    // title: Visit Type
-    hideInTable: true,
-    title: '',
-    dataIndex: 'searchVisitType',
-    renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-      return (
-        <Select
-          label='Visit Type'
-          options={Object.values(VISIT_TYPE_NAME).map(o => {
-            return { value: o.visitPurposeFK, name: o.displayName }
-          })}
-          placeholder=''
-          style={{ width: 250 }}
-        />
-      )
-    },
-  },
-  {
-    // title: Status
-    hideInTable: true,
-    title: '',
-    dataIndex: 'searchStatus',
-    renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-      return (
-        <Select
-          label='Status'
-          options={Object.entries(RadiologyWorkitemStatus).map(o => {
-            return { value: o[0], name: o[1] }
-          })}
-          placeholder=''
-          style={{ width: 250 }}
-        />
-      )
-    },
-  },
-  {
-    // search: Ordered By
-    hideInTable: true,
-    title: '',
-    dataIndex: 'searchOrderedBy',
-    valueType: 'select',
-    renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-      return (
-        <DoctorProfileSelect
-          style={{ width: 250 }}
-          valueField='clinicianProfile.userProfileFK'
-          remoteFilter={{
-            'clinicianProfile.isActive': true,
-          }}
-          labelField='clinicianProfile.name'
-          placeholder=''
-          label='Ordered By'
-        />
-      )
-    },
-  },
-  {
-    // search: Priority
-    hideInTable: true,
-    title: '',
-    dataIndex: 'searchPriority',
-    renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-      return (
-        <Select
-          label='Priority'
-          options={[
-            {
-              value: 'Normal',
-              name: 'Normal',
-            },
-            {
-              value: 'Urgent',
-              name: 'Urgent',
-            },
-          ]}
-          placeholder=''
-          style={{ width: 250 }}
-        />
-      )
-    },
-  },
-  {
-    // search: Radiographer
-    hideInTable: true,
-    title: '',
-    dataIndex: 'searchRadiographer',
-    renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-      return (
-        <DoctorProfileSelect
-          style={{ width: 250 }}
-          valueField='clinicianProfile.userProfileFK'
-          remoteFilter={{
-            'clinicianProfile.isActive': true,
-          }}
-          labelField='clinicianProfile.name'
-          placeholder=''
-          label='Radiographer'
-        />
-      )
-    },
-  },
-  {
-    // search: Modality
-    hideInTable: true,
-    title: '',
-    dataIndex: 'searchModality',
-    renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-      return (
-        <Select
-          label='Modality'
-          options={[]}
-          placeholder=''
-          style={{ width: 250 }}
-        />
-      )
-    },
-  },
-]
+const style = theme => ({})
 
-const RadiologyWorklistHistoryIndex = ({ dispatch, radiologyHisotry }) => {
-  const { setDetailsId } = useContext(WorklistContext)
+const orderDateForm = moment()
+  .add(-1, 'week')
+  .toDate()
+const orderDateTo = moment().toDate()
+
+const saveColumnsSetting = (dispatch, columnsSetting) => {
+  dispatch({
+    type: 'radiologyHisotry/saveUserPreference',
+    payload: {
+      userPreferenceDetails: {
+        value: columnsSetting,
+        Identifier: 'RadiologyHistoryColumnSetting',
+      },
+      itemIdentifier: 'RadiologyHistoryColumnSetting',
+      type: '4', //grid setting type
+    },
+  }).then(result => {
+    dispatch({
+      type: 'radiologyHisotry/updateState',
+      payload: {
+        radiologyHistoryColumnSetting: columnsSetting,
+      },
+    })
+  })
+}
+
+const defaultColumns = (codetable, setDetailsId) => {
+  return [
+    {
+      key: 'accessionNo',
+      title: 'Accession No.',
+      dataIndex: 'accessionNo',
+      sorter: true,
+      search: false,
+      width: 120,
+      fixed: 'left',
+      render: (_dom: any, entity: any) => {
+        return (
+          <span>
+            <span>{entity.accessionNo}</span>
+            {entity.isCombinedOrder && (
+              <Popper
+                overlay={
+                  <div style={{ width: 381, padding: 5 }}>
+                    <CommonTableGrid
+                      rows={entity.combinedOrders.map((o, i) => {
+                        return { no: i + 1, ...o }
+                      })}
+                      columns={[
+                        { name: 'no', title: 'No.' },
+                        { name: 'accessionNo', title: 'Accession No.' },
+                        { name: 'examination', title: 'Examination' },
+                        { name: 'isPrimary', title: 'Primary' },
+                      ]}
+                      columnExtensions={[
+                        { columnName: 'no', width: 60, sortingEnabled: false },
+                        {
+                          columnName: 'accessionNo',
+                          width: 110,
+                          sortingEnabled: false,
+                        },
+                        {
+                          columnName: 'examination',
+                          width: 120,
+                          sortingEnabled: false,
+                        },
+                        {
+                          columnName: 'isPrimary',
+                          width: 80,
+                          sortingEnabled: false,
+                          render: r => {
+                            return r.isPrimary ? 'Yes' : 'No'
+                          },
+                        },
+                      ]}
+                      FuncProps={{
+                        pager: false,
+                      }}
+                    />
+                  </div>
+                }
+              >
+                <IconButton color='transparent' style={{ marginTop: -2 }}>
+                  <LinkIcon color='primary' />
+                </IconButton>
+              </Popper>
+            )}
+          </span>
+        )
+      },
+    },
+    {
+      key: 'orderDate',
+      title: 'Order Date',
+      dataIndex: 'orderDate',
+      valueType: 'dateTime',
+      render: (_dom: any, entity: any) =>
+        entity.orderTime?.format('yyyy-MM-DD HH:mm:ss') || '-',
+      sorter: true,
+      search: false,
+      width: 145,
+      fixed: 'left',
+    },
+    {
+      key: 'examination',
+      title: 'Examination',
+      dataIndex: 'examination',
+      sorter: false,
+      search: false,
+      fixed: 'left',
+      width: 160,
+    },
+    {
+      key: 'patientName',
+      title: 'Patient Name',
+      dataIndex: 'patientName',
+      sorter: false,
+      search: false,
+      fixed: 'left',
+      width: 200,
+    },
+    {
+      key: 'patientReferenceNo',
+      title: 'Ref. No.',
+      dataIndex: 'patientReferenceNo',
+      sorter: false,
+      search: false,
+      width: 100,
+    },
+    {
+      key: 'patientAccountNo',
+      title: 'Acc. No.',
+      dataIndex: 'patientAccountNo',
+      sorter: false,
+      search: false,
+      width: 100,
+    },
+    {
+      key: 'genderAge',
+      title: 'Gender/Age',
+      dataIndex: 'genderAge',
+      sorter: false,
+      search: false,
+      render: (_dom: any, entity: any) =>
+        `${entity.gender?.substring(0, 1)}/${Math.floor(
+          entity.dob?.toDate()?.duration('year'),
+        )}`,
+      width: 100,
+    },
+    {
+      key: 'priority',
+      title: 'Priority',
+      dataIndex: 'priority',
+      sorter: false,
+      search: false,
+      width: 85,
+      render: (_dom: any, entity: any) => {
+        return (
+          <span style={{ color: entity.priority === 'Urgent' ? 'red' : '' }}>
+            {entity.priority}
+          </span>
+        )
+      },
+    },
+    {
+      key: 'visitType',
+      title: 'Visit Type',
+      dataIndex: 'visitType',
+      sorter: false,
+      search: false,
+      width: 85,
+    },
+    {
+      key: 'visitDoctor',
+      title: 'Visit Doctor',
+      dataIndex: 'visitDoctor',
+      sorter: false,
+      search: false,
+      width: 130,
+    },
+    {
+      key: 'radiographer',
+      title: 'Radiographer',
+      dataIndex: 'radiographer',
+      sorter: false,
+      search: false,
+      width: 130,
+    },
+    {
+      key: 'modality',
+      title: 'Modality',
+      dataIndex: 'modality',
+      sorter: false,
+      search: false,
+      width: 130,
+    },
+    {
+      key: 'completedDate',
+      title: 'Completed Date',
+      dataIndex: 'completedDate',
+      valueType: 'dateTime',
+      render: (_dom: any, entity: any) =>
+        entity.completedDate?.format('yyyy-MM-DD HH:mm:ss') || '-',
+      sorter: false,
+      search: false,
+      width: 145,
+    },
+    {
+      key: 'cancelledDate',
+      title: 'Cancelled Date',
+      dataIndex: 'cancelledDate',
+      valueType: 'dateTime',
+      render: (_dom: any, entity: any) =>
+        entity.cancelledDate?.format('yyyy-MM-DD HH:mm:ss') || '-',
+      sorter: false,
+      search: false,
+      width: 145,
+    },
+    {
+      key: 'status',
+      title: 'Status',
+      dataIndex: 'status',
+      sorter: false,
+      search: false,
+      renderText: (item, { type, defaultRender, ...rest }, form) =>
+        Object.values(RadiologyWorkitemStatus)[item - 1],
+      width: 100,
+      fixed: 'right',
+    },
+    {
+      key: 'action',
+      title: 'Action',
+      dataIndex: 'action',
+      align: 'center',
+      sorter: false,
+      search: false,
+      fixed: 'right',
+      width: 80,
+      render: (item, { type, defaultRender, ...rest }, form) => {
+        return (
+          <Button
+            onClick={() => {
+              setDetailsId(rest.id)
+            }}
+            type='primary'
+            icon={<UnorderedListOutlined />}
+          />
+        )
+      },
+    },
+    {
+      hideInTable: true,
+      title: '',
+      dataIndex: 'searchAccessionNo',
+      renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
+        return <TextField style={{ width: 250 }} label='Accession No' />
+      },
+    },
+    {
+      // search: OrderDateFrom,
+      hideInTable: true,
+      title: '',
+      dataIndex: 'searchOrderDateForm',
+      initialValue: orderDateForm,
+      renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
+        return (
+          <DatePicker
+            style={{ width: 250 }}
+            label='Order Date Form'
+            placeholder=''
+          />
+        )
+      },
+    },
+    {
+      // title: OrderDateTo
+      hideInTable: true,
+      title: '',
+      dataIndex: 'searchOrderDateTo',
+      initialValue: orderDateTo,
+      renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
+        return (
+          <DatePicker
+            style={{ width: 250 }}
+            label='Order Date To'
+            placeholder=''
+          />
+        )
+      },
+    },
+    {
+      // search: Patient Name/Acc. No./Ref. No.
+      hideInTable: true,
+      title: '',
+      dataIndex: 'searchPatient',
+      renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
+        if (type === 'form') {
+          return null
+        }
+        return (
+          <TextField
+            style={{ width: 250 }}
+            label={'Patient Name/Acc. No./Ref. No.'}
+          />
+        )
+      },
+    },
+    {
+      // title: Visit Type
+      hideInTable: true,
+      title: '',
+      dataIndex: 'searchVisitType',
+      renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
+        const visitTypeOptions = Object.values(VISIT_TYPE_NAME)
+          .filter(x => x.visitPurposeFK !== VISIT_TYPE.RETAIL)
+          .map(o => {
+            return { value: o.visitPurposeFK, name: o.displayName }
+          })
+        return (
+          <Select
+            label='Visit Type'
+            mode='multiple'
+            options={visitTypeOptions}
+            placeholder=''
+            style={{ width: 250 }}
+            maxTagCount={0}
+            maxTagPlaceholder='Modalities'
+          />
+        )
+      },
+    },
+    {
+      // search: Modality
+      hideInTable: true,
+      title: '',
+      dataIndex: 'searchModality',
+      renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
+        const modalityOptions = codetable.ctmodality || []
+        return (
+          <Select
+            label='Modality'
+            mode='multiple'
+            options={modalityOptions}
+            valueField='id'
+            placeholder=''
+            style={{ width: 250 }}
+            maxTagCount={0}
+            maxTagPlaceholder='Modalities'
+          />
+        )
+      },
+    },
+    {
+      // search: Examination
+      hideInTable: true,
+      title: '',
+      dataIndex: 'searchExamination',
+      renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
+        const service = (codetable.ctservice || []).filter(
+          x => x.serviceCenterCategoryFK === 4,
+        )
+        const serviceOptions = Object.values(
+          _.groupBy(service, 'serviceId'),
+        ).map(x => {
+          return { value: x[0].serviceId, name: x[0].displayValue }
+        })
+        return (
+          <Select
+            label='Examination'
+            mode='multiple'
+            options={serviceOptions}
+            placeholder=''
+            style={{ width: 250 }}
+            maxTagCount={0}
+            maxTagPlaceholder='Examinations'
+          />
+        )
+      },
+    },
+    {
+      // search: VisitDoctor
+      hideInTable: true,
+      title: '',
+      dataIndex: 'searchVisitDoctor',
+      valueType: 'select',
+      renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
+        const visitDoctorOptions = (codetable.doctorprofile || []).map(x => {
+          return {
+            value: x.clinicianProfile.userProfileFK,
+            name: x.clinicianProfile.name,
+            doctorMCRNo: x.doctorMCRNo,
+            clinicianProfile: x.clinicianProfile,
+          }
+        })
+        return (
+          <Select
+            label='Visit Doctor'
+            mode='multiple'
+            options={visitDoctorOptions}
+            placeholder=''
+            style={{ width: 250 }}
+            maxTagCount={0}
+            maxTagPlaceholder='Doctors'
+            // renderDropdown={(option) => <DoctorLabel doctor={option} />}
+          />
+        )
+      },
+    },
+    {
+      // search: Priority
+      hideInTable: true,
+      title: '',
+      dataIndex: 'searchPriority',
+      renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
+        return (
+          <Select
+            label='Priority'
+            options={[
+              {
+                value: 'Normal',
+                name: 'Normal',
+              },
+              {
+                value: 'Urgent',
+                name: 'Urgent',
+              },
+            ]}
+            placeholder=''
+            style={{ width: 250 }}
+          />
+        )
+      },
+    },
+    {
+      // search: Radiographer
+      hideInTable: true,
+      title: '',
+      dataIndex: 'searchRadiographer',
+      renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
+        const radiographer = (codetable.clinicianprofile || []).filter(
+          x => x.userProfile.role.id === 4 /*replace to radiographer role id*/,
+        )
+        const radiographerOptions = radiographer.map(x => {
+          return { value: x.userProfile.id, name: x.name }
+        })
+        return (
+          <Select
+            label='Radiographer'
+            mode='multiple'
+            options={radiographerOptions}
+            placeholder=''
+            style={{ width: 250 }}
+            maxTagCount={0}
+            maxTagPlaceholder='Radiographers'
+          />
+        )
+      },
+    },
+    {
+      // title: Status
+      hideInTable: true,
+      title: '',
+      dataIndex: 'searchStatus',
+      renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
+        return (
+          <Select
+            label='Status'
+            mode='multiple'
+            options={[
+              { value: 4, name: 'Completed' },
+              { value: 5, name: 'Cancelled' },
+            ]}
+            placeholder=''
+            style={{ width: 250 }}
+            maxTagCount={0}
+            maxTagPlaceholder='Statuses'
+          />
+        )
+      },
+    },
+  ]
+}
+
+const RadiologyWorklistHistoryIndex = ({
+  radiologyHisotry: { radiologyHistoryColumnSetting = [] },
+  codetable,
+  classes,
+}) => {
+  const dispatch = useDispatch()
+  const { detailsId, setDetailsId } = useContext(WorklistContext)
+
+  useEffect(() => {
+    dispatch({
+      force: true,
+      type: 'codetable/fetchCodes',
+      payload: { code: 'ctservice' },
+      filter: {
+        'serviceFKNavigation.IsActive': true,
+        'serviceCenterFKNavigation.ServiceCenterCategoryFK': 4,
+        combineCondition: 'and',
+      },
+    })
+    dispatch({
+      force: true,
+      type: 'codetable/fetchCodes',
+      payload: { code: 'ctmodality' },
+    })
+    dispatch({
+      force: true,
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'doctorprofile',
+        filter: {
+          'clinicianProfile.isActive': true,
+        },
+      },
+    })
+    dispatch({
+      force: true,
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'clinicianprofile',
+        filter: {
+          isActive: true,
+        },
+      },
+    })
+  })
+
+  const columns = defaultColumns(codetable, setDetailsId)
 
   return (
     <Fragment>
       <PageContainer pageHeaderRender={false}>
         <ProTable
-          form={{ span: 4 }}
           rowSelection={false}
-          columns={defaultColumns}
+          columns={columns}
           api={api}
           search={{
+            collapsed: false,
+            collapseRender: false,
             searchText: 'SEARCH',
             resetText: 'RESET',
             optionRender: (searchConfig, formProps, dom) => {
@@ -321,7 +596,7 @@ const RadiologyWorklistHistoryIndex = ({ dispatch, radiologyHisotry }) => {
                     display: 'inline',
                     float: 'right',
                     width: 200,
-                    //marginTop: 15,
+                    marginTop: 15,
                   }}
                 >
                   {dom[1]} {dom[0]}
@@ -330,6 +605,8 @@ const RadiologyWorklistHistoryIndex = ({ dispatch, radiologyHisotry }) => {
             },
           }}
           options={{ density: false, reload: false }}
+          columnsStateMap={radiologyHistoryColumnSetting}
+          onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
           toolBarRender={() => {
             return [
               <Button type='primary' icon={<PrinterOutlined />} color='primary'>
@@ -337,10 +614,8 @@ const RadiologyWorklistHistoryIndex = ({ dispatch, radiologyHisotry }) => {
               </Button>,
             ]
           }}
-          onRowDblClick={row => {
-            setDetailsId(row.id)
-          }}
-          defaultColumns={['options']}
+          defaultColumns={[]}
+          pagination={{ pageSize: 50 }}
           features={[
             {
               code: 'details',
@@ -364,7 +639,8 @@ const RadiologyWorklistHistoryIndex = ({ dispatch, radiologyHisotry }) => {
             searchPatient,
             searchVisitType,
             searchStatus,
-            searchOrderedBy,
+            searchVisitDoctor,
+            searchExamination,
             searchPriority,
             searchRadiographer,
             searchModality,
@@ -377,12 +653,29 @@ const RadiologyWorklistHistoryIndex = ({ dispatch, radiologyHisotry }) => {
                 orderDateForm: searchOrderDateForm,
                 orderDateTo: searchOrderDateTo,
                 searchValue: searchPatient,
-                visitType: searchVisitType,
-                status: searchStatus,
-                orderedBy: searchOrderedBy,
+                visitType:
+                  searchVisitType?.indexOf(-99) > -1
+                    ? null
+                    : searchVisitType?.join(),
+                modality:
+                  searchModality?.indexOf(-99) > -1
+                    ? null
+                    : searchModality?.join(),
+                examination:
+                  searchExamination?.indexOf(-99) > -1
+                    ? null
+                    : searchExamination?.join(),
+                visitDoctor:
+                  searchVisitDoctor?.indexOf(-99) > -1
+                    ? null
+                    : searchVisitDoctor?.join(),
                 priority: searchPriority,
-                radiographer: searchRadiographer,
-                modality: searchModality,
+                radiographer:
+                  searchRadiographer?.indexOf(-99) > -1
+                    ? null
+                    : searchRadiographer?.join(),
+                status:
+                  searchStatus?.indexOf(-99) > -1 ? null : searchStatus?.join(),
               },
             }
           }}
@@ -395,11 +688,6 @@ const RadiologyWorklistHistoryIndex = ({ dispatch, radiologyHisotry }) => {
 }
 
 // @ts-ignore
-connect(({ radiologyHisotry }) => {
-  return {
-    radiologyHisotry,
-  }
-})(RadiologyWorklistHistoryIndex)
 
 const HistoryIndex = props => (
   <WorklistContextProvider>
@@ -407,4 +695,11 @@ const HistoryIndex = props => (
   </WorklistContextProvider>
 )
 
-export default HistoryIndex
+const historyIndex = compose(
+  connect(({ radiologyHisotry, codetable }) => ({
+    radiologyHisotry,
+    codetable,
+  })),
+)(HistoryIndex)
+
+export default withStyles(style, { name: 'RadiologyHistory' })(historyIndex)
