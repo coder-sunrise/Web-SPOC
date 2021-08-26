@@ -93,6 +93,7 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
         type: 'number',
         precision: 1,
         width: 120,
+        sortingEnabled: false,
         render: row => {
           return (
             <span>

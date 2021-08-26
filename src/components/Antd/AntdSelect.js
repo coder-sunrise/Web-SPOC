@@ -508,7 +508,7 @@ class AntdSelect extends React.PureComponent {
   }
 
   getSelectOptions = (source, renderDropdown) => {
-    const { valueField, labelField, optionLabelLength = 0, mode } = this.props
+    const { valueField, labelField, optionLabelLength = 0, mode, showOptionTitle = true } = this.props
 
     return source
       .map(s => {
@@ -528,7 +528,7 @@ class AntdSelect extends React.PureComponent {
         return (
           <Select.Option
             data={option}
-            title={option.label}
+            title={showOptionTitle ? option.label : undefined}
             label={
               optionLabelLength
                 ? option.label.substring(0, optionLabelLength)
