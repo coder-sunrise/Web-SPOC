@@ -131,7 +131,7 @@ const _routes = [
         icon: 'icon-radiology',
         name: 'radiology',
         moduleName: 'Radiology',
-        //authority: ['reception'], TODO:: to replace with actual permission
+        authority: ['radiology'], 
         specialist: ['GP', 'Dental'],
         routes: [
           {
@@ -148,7 +148,7 @@ const _routes = [
             component: './Radiology/History',
             mini: 'RW',
             exact: true,
-            // authority: ['radiology/worklisthistory'],
+            authority: ['radiology/worklisthistory'],
           },
         ],
       },
