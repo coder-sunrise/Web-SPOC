@@ -78,8 +78,7 @@ class Appointment extends React.PureComponent {
     selectedSlot: {},
     filter: {
       search: '',
-      dobfrom: '1900-01-01',
-      dobto: '9999-12-31',
+      dob: null,
       filterByApptType: [],
       filterByDoctor: [],
     },
@@ -130,8 +129,7 @@ class Appointment extends React.PureComponent {
         const {
           filterByDoctor,
           filterByApptType,
-          dobfrom,
-          dobto,
+          dob,
         } = currentFilterTemplate
         filter = {
           filterByDoctor,
@@ -140,8 +138,7 @@ class Appointment extends React.PureComponent {
             filterByDoctor && filterByDoctor.length
               ? filterByDoctor[0]
               : undefined,
-          dobfrom,
-          dobto,
+          dob,
         }
       }
     }
@@ -508,8 +505,7 @@ class Appointment extends React.PureComponent {
   onFilterUpdate = filter => {
     const {
       filterByDoctor = [],
-      dobfrom,
-      dobto,
+      dob,
       search,
       filterByApptType,
       filterBySingleDoctor,
@@ -531,8 +527,7 @@ class Appointment extends React.PureComponent {
     )
 
     const updFilter = {
-      dobfrom: dobfrom || undefined,
-      dobto: dobfrom || undefined,
+      dob: dob || undefined,
       search: search || undefined,
       filterByApptType: filterByApptType,
       filterByDoctor: filterByDoctor,
@@ -548,8 +543,7 @@ class Appointment extends React.PureComponent {
       type: 'calendar/filterCalendar',
       payload: {
         search: updFilter.search,
-        dobfrom: updFilter.dobfrom,
-        dobto: updFilter.dobto,
+        dob: updFilter.dob,
         doctor: updFilter.filterByDoctor,
         appType: updFilter.filterByApptType,
       },
@@ -702,8 +696,7 @@ class Appointment extends React.PureComponent {
         <FilterBar
           dispatch={dispatch}
           search={filter.search}
-          dobfrom={filter.dobfrom}
-          dobto={filter.dobto}
+          dob={filter.dob}
           loading={calendarLoading}
           filterByDoctor={filter.filterByDoctor}
           filterBySingleDoctor={filter.filterBySingleDoctor}

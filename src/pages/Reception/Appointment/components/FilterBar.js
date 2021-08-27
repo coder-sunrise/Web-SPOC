@@ -66,7 +66,7 @@ const FilterBar = props => {
 
   const renderDropdown = option => <DoctorLabel doctor={option} />
 
-  const { filterByDoctor = [], dobfrom, dobto } = values
+  const { filterByDoctor = [], dob } = values
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
   const [showFilterTemplate, setShowFilterTemplate] = useState(false)
 
@@ -77,16 +77,14 @@ const FilterBar = props => {
     const {
       filterByApptType: appTypes,
       filterByDoctor: doctors,
-      dobfrom,
-      dobto,
+      dob,
     } = selectedTemplate
 
     handleUpdateFilter({
       ...values,
       filterByApptType: appTypes,
       filterByDoctor: doctors,
-      dobfrom,
-      dobto,
+      dob,
       filterBySingleDoctor: doctors && doctors.length ? doctors[0] : undefined,
     })
   }
@@ -110,7 +108,7 @@ const FilterBar = props => {
         </GridItem>
         <GridItem xs md={1}>
           <FastField
-            name='dobfrom'
+            name='dob'
             render={args => <DatePicker {...args} label='DOB' />}
           />
         </GridItem>
@@ -222,8 +220,7 @@ const FilterBar = props => {
                         : []
                     }
                     filterByApptType={values.filterByApptType}
-                    dobfrom={values.dobfrom}
-                    dobto={values.dobfrom}
+                    dob={values.dob}
                     handleFilterTemplate={handleFilterTemplate}
                     handleApplyTemplate={handleApplyTemplate}
                   />
@@ -303,15 +300,13 @@ export default compose(
       filterByDoctor,
       filterBySingleDoctor,
       filterByApptType,
-      dobfrom,
-      dobto,
+      dob,
       search,
     }) => {
       count += 1
 
       return {
-        dobfrom,
-        dobto,
+        dob,
         search,
         filterByDoctor: [...filterByDoctor],
         filterBySingleDoctor,

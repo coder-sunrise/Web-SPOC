@@ -302,8 +302,7 @@ class Form extends React.PureComponent {
         // ],
         apiCriteria: {
           searchValue: values.search,
-          dobfrom: values.dobfrom,
-          dobto: values.dobfrom,
+          dob: values.dob,
         },
       },
     })

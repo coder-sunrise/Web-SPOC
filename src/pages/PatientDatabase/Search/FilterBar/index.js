@@ -36,11 +36,10 @@ const styles = theme => ({
 })
 
 @withFormik({
-  mapPropsToValues: ({ search, dobfrom, dobto }) => {
+  mapPropsToValues: ({ search, dob }) => {
     return {
       search,
-      dobfrom,
-      dobto,
+      dob,
     }
   },
 })
@@ -70,7 +69,7 @@ class FilterBar extends PureComponent {
             </GridItem>
             <GridItem md={2}>
               <FastField
-                name='dobfrom'
+                name='dob'
                 render={args => <DatePicker {...args} label='DOB' />}
               />
             </GridItem>
@@ -88,7 +87,7 @@ class FilterBar extends PureComponent {
                     //   type: 'patientSearch/updateFilter',
                     //   payload: this.props.values,
                     // })
-                    const { search, dobfrom, dobto } = this.props.values
+                    const { search, dob } = this.props.values
                     const prefix = this.props.values.isExactSearch
                       ? 'eql_'
                       : 'like_'
@@ -107,8 +106,7 @@ class FilterBar extends PureComponent {
                         // ],
                         apiCriteria: {
                           searchValue: search,
-                          dobfrom: dobfrom,
-                          dobto: dobfrom,
+                          dob: dob,
                           includeinactive: window.location.pathname.includes(
                             'patientdb',
                           ),
