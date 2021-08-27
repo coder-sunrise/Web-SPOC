@@ -496,8 +496,7 @@ export default createListViewModel({
             APPOINTMENT_STATUS.TURNEDUPLATE,
             APPOINTMENT_STATUS.PFA_NOSHOW,
           ].join(),
-          dobfrom: '1900-01-01',
-          dobto: '9999-12-31',
+          dob: null,
         }
         // const getCalendarListPayload = {
         //   apptDateFrom: start,
@@ -520,7 +519,7 @@ export default createListViewModel({
       },
       *filterCalendar({ payload }, { all, select, put }) {
         const calendarState = yield select(state => state.calendar)
-        const { search, dobfrom, dobto, doctor = [], appType = [] } = payload
+        const { search, dob, doctor = [], appType = [] } = payload
         const {targetDate, targetView} = calendarState
 
         let start
@@ -553,8 +552,7 @@ export default createListViewModel({
             APPOINTMENT_STATUS.TURNEDUPLATE,
             APPOINTMENT_STATUS.PFA_NOSHOW,
           ].join(),
-          dobfrom: dobfrom || '1900-01-01',
-          dobto: dobto || '9999-12-31',
+          dob: dob,
         }
 
         yield all([

@@ -78,6 +78,22 @@ class Grid extends PureComponent {
     )
   }
 
+  enableSelectItem = (item) => {
+    const firstInstruction = (item.corPrescriptionItemInstruction || []).find(item => !item.isDeleted)
+    if (item.isDrugMixture) {
+      const drugMixtures = item.corPrescriptionItemDrugMixture || item.retailPrescriptionItemDrugMixture || []
+      if (drugMixtures.find(drugMixture => !drugMixture.isActive
+        || drugMixture.inventoryDispenseUOMFK !== drugMixture.uomfk
+        || drugMixture.inventoryPrescribingUOMFK !== drugMixture.prescribeUOMFK)) {
+        return false
+      }
+      return true
+    }
+    return (item.isActive
+      && item.inventoryDispenseUOMFK === item.dispenseUOMFK
+      && firstInstruction?.prescribeUOMFK === item.inventoryPrescribingUOMFK)
+  }
+
   Visits = () => {
     const {
       classes,
@@ -133,13 +149,7 @@ class Grid extends PureComponent {
       }
 
       const enableItem = items.filter(
-        (item) => {
-          const firstInstruction = (item.corPrescriptionItemInstruction || []).find(item => !item.isDeleted)
-          return item.isDrugMixture
-            || (item.isActive
-              && item.inventoryDispenseUOMFK === item.dispenseUOMFK
-              && firstInstruction?.prescribeUOMFK === item.inventoryPrescribingUOMFK)
-        }
+        (item) => this.enableSelectItem(item)
       )
 
       return {
@@ -206,14 +216,26 @@ class Grid extends PureComponent {
               let addedItem = addedItems.find((added) => added.id === item.id)
               const firstInstruction = (item.corPrescriptionItemInstruction || []).find(item => !item.isDeleted)
               let warningLabel
-              if (!item.isActive) {
-                warningLabel = '#1'
-              } else if (!item.isDrugMixture
-                && (item.inventoryDispenseUOMFK !== item.dispenseUOMFK
-                  || firstInstruction?.prescribeUOMFK !== item.inventoryPrescribingUOMFK)) {
-                warningLabel = '#2'
-              } else if (item.isExternalPrescription) {
-                warningLabel = '#3'
+              if (item.isDrugMixture) {
+                const drugMixtures = item.corPrescriptionItemDrugMixture || item.retailPrescriptionItemDrugMixture || []
+                if (drugMixtures.find(drugMixture => !drugMixture.isActive)) {
+                  warningLabel = '#1'
+                }
+                else if (drugMixtures.find(drugMixture => drugMixture.inventoryDispenseUOMFK !== drugMixture.uomfk
+                  || drugMixture.inventoryPrescribingUOMFK !== drugMixture.prescribeUOMFK)) {
+                  warningLabel = '#2'
+                }
+              }
+              else {
+                if (!item.isActive) {
+                  warningLabel = '#1'
+                }
+                else if (item.inventoryDispenseUOMFK !== item.dispenseUOMFK
+                  || firstInstruction?.prescribeUOMFK !== item.inventoryPrescribingUOMFK) {
+                  warningLabel = '#2'
+                } else if (item.isExternalPrescription) {
+                  warningLabel = '#3'
+                }
               }
 
               let paddingRight = 0
@@ -302,10 +324,7 @@ class Grid extends PureComponent {
                       </Tooltip>
                     </div>
                     <div className={classes.actionColumn}>
-                      {item.isActive
-                        && item.inventoryDispenseUOMFK === item.dispenseUOMFK
-                        && firstInstruction?.prescribeUOMFK === item.inventoryPrescribingUOMFK
-                        && (!addedItem ? (
+                      {this.enableSelectItem(item) && (!addedItem ? (
                           <span
                             className='material-icons'
                             style={{
@@ -431,7 +450,7 @@ class Grid extends PureComponent {
                   <span style={{ color: 'red', fontStyle: 'italic' }}>
                     <sup>#2&nbsp;</sup>
                   </span>
-                  dispense/prescribe UOM is changed&nbsp;&nbsp;
+                  dispense/prescribe UOM changed&nbsp;&nbsp;
                   {!isRetail && (
                     <span>
                       <span style={{ color: 'red', fontStyle: 'italic' }}>

@@ -587,9 +587,7 @@ class Medication extends PureComponent {
       const { name: uomName = '' } = dispensingUOM
       let opt = {
         ...c,
-        combinDisplayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
-          2,
-        )} / ${uomName})`,
+        combinDisplayValue: `${displayValue} - ${code}`,
       }
       return [...p, opt]
     }, [])
@@ -998,6 +996,12 @@ class Medication extends PureComponent {
     row.revenueCategoryFK = option.revenueCategory.id
     row.isDispensedByPharmacy = option.isDispensedByPharmacy
     row.isNurseActualizeRequired = option.isNurseActualizable
+    row.prescribeUOMFK = option.prescribingUOM.id
+    row.prescribeUOMCode = option.prescribingUOM.code
+    row.prescribeUOMDisplayValue = option.prescribingUOM.name
+    row.inventoryDispenseUOMFK = option.dispensingUOM.id
+    row.inventoryPrescribingUOMFK = option.prescribingUOM.id
+    row.isActive = option.isActive
   }
 
   handleDrugMixtureItemQuantityOnChange = e => {
@@ -1152,14 +1156,18 @@ class Medication extends PureComponent {
           handleFilter: (input, option) => {
             return this.filterMedicationOptions(input, option)
           },
+          width: 400,
           dropdownMatchSelectWidth: false,
           dropdownStyle: {
-            width: 600,
+            maxWidth: 600,
+            width: '600px!important',
           },
-          renderDropdown: (option) => {
+          dropdownClassName: 'ant-select-dropdown-bottom-bordered',
+          renderDropdown: option => {
             return this.renderMedication(option)
           },
           sortingEnabled: false,
+          showOptionTitle: false,
           onChange: e => {
             const { values, setFieldValue } = this.props
             const { row = {} } = e
@@ -1168,8 +1176,7 @@ class Medication extends PureComponent {
               const {
                 codetable: { inventorymedication = [] },
               } = this.props
-            }
-            else {
+            } else {
               row.quantity = undefined
               row.uomfk = null
               row.uomCode = undefined
@@ -1182,9 +1189,12 @@ class Medication extends PureComponent {
               row.revenueCategoryFK = undefined
               row.isDispensedByPharmacy = undefined
               row.isNurseActualizeRequired = undefined
-              const activeDrugMixtureRows = (values.corPrescriptionItemDrugMixture || []).filter(
-                item => !item.isDeleted,
-              )
+              row.prescribeUOMFK = null
+              row.prescribeUOMCode = undefined
+              row.prescribeUOMDisplayValue = undefined
+              const activeDrugMixtureRows = (
+                values.corPrescriptionItemDrugMixture || []
+              ).filter(item => !item.isDeleted)
               if (activeDrugMixtureRows[0].id === row.id) {
                 this.changeMedication()
               }
@@ -1204,7 +1214,6 @@ class Medication extends PureComponent {
         },
         {
           columnName: 'uomfk',
-          width: 100,
           type: 'codeSelect',
           code: 'ctMedicationUnitOfMeasurement',
           labelField: 'name',
@@ -1229,8 +1238,9 @@ class Medication extends PureComponent {
       const lowerCaseInput = input.toLowerCase()
 
       const { props } = option
-      const { combinDisplayValue = '', medicationGroup = {} } = props.data
-      match = combinDisplayValue.toLowerCase().indexOf(lowerCaseInput) >= 0
+      const { code = '', displayValue = '', medicationGroup = {} } = props.data
+      match = code.toLowerCase().indexOf(lowerCaseInput) >= 0
+        || displayValue.toLowerCase().indexOf(lowerCaseInput) >= 0
         || (medicationGroup.name || '').toLowerCase().indexOf(lowerCaseInput) >= 0
     } catch (error) {
       match = false
@@ -1239,53 +1249,161 @@ class Medication extends PureComponent {
   }
 
   renderMedication = (option) => {
-    const { combinDisplayValue = '', medicationGroup = {}, stock = 0, dispensingUOM = {}, isExclusive } = option
+    const { code, displayValue, sellingPrice = 0, medicationGroup = {}, stock = 0, dispensingUOM = {}, isExclusive } = option
     const { name: uomName = '' } = dispensingUOM
-    return <div style={{ height: 22, lineHeight: '22px', }} >
-      <div style={{ width: 390, display: 'inline-block', }}>
-        <div style={{
-          maxWidth: isExclusive ? 350 : 390, display: 'inline-block',
-          whiteSpace: 'nowrap',
-          textOverflow: 'ellipsis',
-          overflow: 'hidden',
-          height: '100%',
-        }} title={combinDisplayValue}>{combinDisplayValue}</div>
 
-        {isExclusive &&
-          <div style={{
-          backgroundColor: 'green',
-          color: 'white',
-          fontSize: '0.7rem',
-          position: 'relative',
-          left: '3px',
-          top: '-6px',
-          display: 'inline-block',
-          height: 18,
-          lineHeight: '18px',
-          borderRadius: 4,
-          padding: '1px 3px',
-          fontWeight: 500,
-        }} title='Exclusive Drug'>Excl.</div>
-        }
+    return (
+      <div
+        style={{
+          height: 40,
+          lineHeight: '40px',
+        }}
+      >
+        <div
+          style={{
+            height: '20px',
+            lineHeight: '20px',
+          }}
+        >
+          <Tooltip
+            useTooltip2
+            title={
+              <div>
+                <div
+                  style={{ fontWeight: 'bold' }}
+                >{`Name: ${displayValue}`}</div>
+                <div>{`Code: ${code}`}</div>
+              </div>
+            }
+          >
+            <div
+              style={{
+                width: 535,
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+              }}
+            >
+              <span
+                style={{ fontWeight: '550', fontSize: 15 }}
+              >{`${displayValue} - `}</span>
+              <span>{code}</span>
+            </div>
+          </Tooltip>
+
+          {isExclusive && (
+            <div
+              style={{
+                backgroundColor: 'green',
+                color: 'white',
+                fontSize: '0.7rem',
+                position: 'relative',
+                right: '0px',
+                marginLeft: 3,
+                top: '-6px',
+                display: 'inline-block',
+                height: 18,
+                lineHeight: '18px',
+                borderRadius: 4,
+                padding: '1px 3px',
+                fontWeight: 500,
+              }}
+              title='Exclusive Drug'
+            >
+              Excl.
+            </div>
+          )}
+        </div>
+        <div
+          style={{
+            height: '20px',
+            lineHeight: '20px',
+          }}
+        >
+          <Tooltip
+            title={
+              <div>
+                Unit Price:
+                <span
+                  style={{ color: 'darkblue' }}
+                >{` ${currencySymbol}${sellingPrice.toFixed(2)}`}</span>
+              </div>
+            }
+          >
+            <div
+              style={{
+                width: 130,
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                height: '100%',
+              }}
+            >
+              Unit Price:
+              <span
+                style={{ color: 'darkblue' }}
+              >{` ${currencySymbol}${sellingPrice.toFixed(2)}`}</span>
+            </div>
+          </Tooltip>
+
+          <Tooltip
+            title={
+              <div>
+                Stock:{' '}
+                <span
+                  style={{
+                    color: stock < 0 ? 'red' : 'black',
+                  }}
+                >{` ${numeral(stock || 0).format(qtyFormat)} `}</span>
+                {uomName || ''}
+              </div>
+            }
+          >
+            <div
+              style={{
+                width: 150,
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                marginLeft: 3,
+                height: '100%',
+              }}
+            >
+              Stock:{' '}
+              <span
+                style={{
+                  color: stock < 0 ? 'red' : 'black',
+                }}
+              >{` ${numeral(stock || 0).format(qtyFormat)} `}</span>
+              {uomName || ''}
+            </div>
+          </Tooltip>
+
+          <Tooltip
+            useTooltip2
+            title={medicationGroup.name ? `Group: ${medicationGroup.name}` : ''}
+          >
+            <div
+              style={{
+                width: 290,
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                marginLeft: 3,
+                height: '100%',
+              }}
+            >
+              {' '}
+              {medicationGroup.name ? `Grp.: ${medicationGroup.name}` : ''}
+            </div>
+          </Tooltip>
+        </div>
       </div>
-      <div style={{
-        width: 50, display: 'inline-block',
-        whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
-        overflow: 'hidden',
-        marginLeft: 6,
-        height: '100%',
-        color: stock < 0 ? 'red' : 'black'
-      }} title={`Current Stock: ${numeral(stock || 0).format(qtyFormat)} ${uomName || ''}`} > {numeral(stock || 0).format(qtyFormat)}</div>
-      <div style={{
-        width: 120, display: 'inline-block',
-        whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
-        overflow: 'hidden',
-        marginLeft: 6,
-        height: '100%',
-      }} title={medicationGroup.name || ''} > {medicationGroup.name || ''}</div>
-    </div >
+    )
   }
 
   renderOthers = () => {
@@ -1451,12 +1569,19 @@ class Medication extends PureComponent {
                           dropdownStyle={{
                             width: 600,
                           }}
+                          dropdownClassName='ant-select-dropdown-bottom-bordered'
                           renderDropdown={this.renderMedication}
                           {...args}
                           style={{ paddingRight: 20 }}
                           disabled={values.isPackage}
+                          showOptionTitle={false}
+                          id='medication'
                         />
-                        <LowStockInfo sourceType='medication' {...this.props} corVitalSign={corVitalSign} />
+                        <LowStockInfo
+                          sourceType='medication'
+                          {...this.props}
+                          corVitalSign={corVitalSign}
+                        />
                       </div>
                     )
                   }}
@@ -1787,7 +1912,7 @@ class Medication extends PureComponent {
                                           op ? op.name : undefined,
                                         )
                                       }}
-                                      disabled={!openPrescription && !values.isDrugMixture}
+                                      disabled={!openPrescription}
                                       {...commonSelectProps}
                                       {...args}
                                     />
@@ -1931,12 +2056,13 @@ class Medication extends PureComponent {
                                     <div
                                       style={{
                                         position: 'relative',
+                                        marginBottom: 5,
                                       }}
                                     >
                                       <span
                                         style={{
                                           position: 'absolute',
-                                          bottom: 4,
+                                          top: 5,
                                         }}
                                       >
                                         {activeIndex + 1}.
@@ -1973,7 +2099,7 @@ class Medication extends PureComponent {
                                           day: 1,
                                           precaution: '1',
                                           sequence: newMaxSeq,
-                                          uid: getUniqueId()
+                                          uid: getUniqueId(),
                                         },
                                       )}
                                     </div>
@@ -2080,7 +2206,7 @@ class Medication extends PureComponent {
                 render={args => {
                   return (
                     <CodeSelect
-                      disabled={!openPrescription && !values.isDrugMixture}
+                      disabled={!openPrescription}
                       label='Dispense UOM'
                       allowClear={false}
                       code='ctMedicationUnitOfMeasurement'

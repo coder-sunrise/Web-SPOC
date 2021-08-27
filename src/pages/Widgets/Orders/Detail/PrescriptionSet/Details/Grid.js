@@ -87,12 +87,24 @@ const Grid = ({ prescriptionSet, dispatch }) => {
           }
 
           let warningLabel
-          if (!row.isActive && !row.isDrugMixture) {
-            warningLabel = '#1'
-          } else if (!row.isDrugMixture
-            && (row.inventoryDispenseUOMFK !== row.dispenseUOMFK
-              || firstInstruction?.prescribeUOMFK !== row.inventoryPrescribingUOMFK)) {
-            warningLabel = '#2'
+          if (row.isDrugMixture) {
+            const drugMixtures = row.prescriptionSetItemDrugMixture || []
+            if (drugMixtures.find(drugMixture => !drugMixture.isActive)) {
+              warningLabel = '#1'
+            }
+            else if (drugMixtures.find(drugMixture => drugMixture.inventoryDispenseUOMFK !== drugMixture.uomfk
+              || drugMixture.inventoryPrescribingUOMFK !== drugMixture.prescribeUOMFK)) {
+              warningLabel = '#2'
+            }
+          }
+          else {
+            if (!row.isActive) {
+              warningLabel = '#1'
+            }
+            else if (row.inventoryDispenseUOMFK !== row.dispenseUOMFK
+              || firstInstruction?.prescribeUOMFK !== row.inventoryPrescribingUOMFK) {
+              warningLabel = '#2'
+            }
           }
 
           let paddingRight = 0

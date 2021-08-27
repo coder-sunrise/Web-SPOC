@@ -12,7 +12,44 @@ import {
   GridItem,
   TextField,
   withFormikExtend,
+  Tooltip,
 } from '@/components'
+
+import { TagTwoTone } from '@ant-design/icons'
+import LocalOfferIcon from '@material-ui/icons/LocalOffer';
+
+const AppointmentStageColors = {
+  Draft: '#E36C0A',
+  Confirmed: '#548DD4',
+  Registered: '#47CFFF',
+  Consultation: '#FF5353',
+  Billing: '#97E551',
+  Completed: '#00B853',
+}
+
+const AppointmentSlotPreview = ({color}) =>{
+  return (
+    <div>
+      {Object.entries(AppointmentStageColors).map(x=> {
+      return (
+        <div style={{background:color,marginBottom:6,paddingTop:2}}>
+          <span style={{color:'white',fontSize:'80%',marginLeft:5,display:'inline-block'}}>
+            <div style={{fontWeight:'bold'}}>09:00AM - 10:00AM</div>
+            <div style={{lineHeight:'1em'}}>Jenny Moon</div>
+          </span>
+          <span style={{float:'right',marginTop:6,marginRight:6}}>
+            <Tooltip title={x[0]}>
+                <LocalOfferIcon
+                  style={{ color: x[1], float: 'right'}}
+                />
+              </Tooltip>
+          </span>
+        </div>
+      )
+    })}
+    </div>
+  )
+}
 
 const Form = ({ classes, footer, setFieldValue, handleSubmit, values }) => {
   const onColorChange = (color) => {
@@ -61,11 +98,17 @@ const Form = ({ classes, footer, setFieldValue, handleSubmit, values }) => {
               )}
             />
           </GridItem>
-          <GridItem md={12} className={classes.colorPicker}>
+          <GridItem md={6} className={classes.colorPicker}>
             <span className={classes.label}>Appointment Type Color</span>
             <ChromePicker
               color={values.tagColorHex}
               onChangeComplete={onColorChange}
+            />
+          </GridItem>
+          <GridItem md={6} className={classes.colorPicker}>
+            <span className={classes.label}>Appointment Slot Preview</span>
+            <AppointmentSlotPreview
+              color={values.tagColorHex}
             />
           </GridItem>
         </GridItem>

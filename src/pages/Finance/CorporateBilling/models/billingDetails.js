@@ -100,6 +100,12 @@ export default createListViewModel({
           }),
         }
       },
+      resetFilterValues(state, { payload }) {
+        return {
+          ...state,
+          filterValues: { ...defaultFilterValues },
+        }
+      },
     },
   },
 })
