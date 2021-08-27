@@ -86,8 +86,7 @@ const applyFilter = (filter, data, isDayView) => {
     filterByApptType = [],
     filterByDoctor = [],
     search = '',
-    dobfrom = '1900-01-01',
-    dobto = '9999-12-31',
+    dob = null,
     filterBySingleDoctor,
   } = filter
   const viewOtherApptAccessRight = Authorized.check(
@@ -135,7 +134,7 @@ const applyFilter = (filter, data, isDayView) => {
     returnData = returnData.filter(eachData => {
       const { patientProfile, patientName, patientContactNo } = eachData
 
-      return patientProfile.dob >= dobfrom && patientProfile.dob <= dobto
+      return patientProfile.dob == dob
     })
 
     // filter by doctor
