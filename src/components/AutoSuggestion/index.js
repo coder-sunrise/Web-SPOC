@@ -4,6 +4,7 @@ import { control } from '@/components/Decorator'
 import { AutoComplete,Input } from 'antd'
 import PropTypes from 'prop-types'
 import { BaseInput } from '@/components'
+import _ from 'lodash'
 
 const STYLES = (theme) => {
   return {
@@ -50,12 +51,6 @@ class AutoSuggestion extends PureComponent {
     }
   }
 
-  delaySearchTimeoutID = 0
-  delaySearch = async (value) => {
-    clearTimeout(this.delaySearchTimeoutID)
-    this.delaySearchTimeoutID = setTimeout(async ()=>{ await this.onSearch(value) },500)
-  }
-
   onSearch = async (value) => {
     if (this.props.query) {
       this.setState({
@@ -68,6 +63,8 @@ class AutoSuggestion extends PureComponent {
       })
     }
   }
+
+  delaySearch = _.debounce(this.onSearch.bind(this), 500)
 
   onOptionSelect = (value, option) => {
     const { valuePath = 'value', onOptionSelected } = this.props
