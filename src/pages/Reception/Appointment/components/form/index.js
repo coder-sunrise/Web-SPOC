@@ -1246,10 +1246,11 @@ class Form extends React.PureComponent {
                         <OutlinedTextField
                           {...args}
                           disabled={disableDataGrid}
-                          rows='2'
+                          rows='5'
                           multiline
                           maxLength={2000}
-                          label='Appointment Remarks'
+                          label=''
+                          className={classes.apptRemarksMultiline}
                         />
                       )}
                     />
