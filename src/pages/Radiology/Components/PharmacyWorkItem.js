@@ -16,14 +16,14 @@ const printPrescription = (visitID) => {
 }
 
 const WorkitemTitle = ({ item }) => {
-  const age = item.patientInfo.dob ? calculateAgeFromDOB(item.patientInfo.dob) : 0
+  const age = item.dob ? calculateAgeFromDOB(item.dob) : 0
   let gender
   let genderColor
-  if (item.patientInfo.genderFK === 1) {
+  if (item.genderFK === 1) {
     gender = 'female'
     genderColor = 'pink'
   }
-  else if (item.patientInfo.genderFK === 2) {
+  else if (item.genderFK === 2) {
     gender = 'male'
     genderColor = blueColor
   }
@@ -39,13 +39,13 @@ const WorkitemTitle = ({ item }) => {
     >
       <div style={{ marginRight: 'auto' }}>
         <div style={{ color: blueColor, fontWeight: 500, fontSize: '1rem' }}>
-          {item.patientInfo.name}
+          {item.name}
         </div>
-        <div>{item.patientInfo.patientReferenceNo}</div>
+        <div>{item.patientReferenceNo}</div>
       </div>
       <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
         <div>
-          {item.patientInfo.isInFamilyGroup &&
+          {item.isInFamilyGroup &&
             <Tooltip title='Family Numbers'>
               <Icon type='team' style={{ color: 'red', fontSize: '1rem', marginRight: 3 }} />
             </Tooltip>
@@ -55,7 +55,7 @@ const WorkitemTitle = ({ item }) => {
           </Tooltip>
           <span> {age} {age > 1 ? 'Yrs' : 'Yr'}</span>
         </div>
-        <div>{item.patientInfo.patientAccountNo}</div>
+        <div>{item.patientAccountNo}</div>
       </div>
     </div >
   )
@@ -84,11 +84,11 @@ const WorkitemBody = ({ item }) => {
         }}
       >
         <div style={{ marginRight: 'auto', flexGrow: 1 }}>
-          <div style={{ fontSize: '1rem', fontWeight: 500 }}>{`${item.visitInfo.doctorTitle && item.visitInfo.doctorTitle.trim().length ? `${item.visitInfo.doctorTitle}. ` : ''}${item.visitInfo.doctorName || ''}`}</div>
+          <div style={{ fontSize: '1rem', fontWeight: 500 }}>{`${item.doctorTitle && item.doctorTitle.trim().length ? `${item.doctorTitle}. ` : ''}${item.doctorName || ''}`}</div>
           <div><FileDoneOutlined style={{ color: blueColor, fontSize: '1rem', marginRight: 3 }} />{orderDate}</div>
         </div>
         <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-          <div>Q. No.: {item.visitInfo.queueNo}</div>
+          <div>Q. No.: {item.queueNo}</div>
           {item.isPaid &&
             <div>
               <Tooltip title='Paid'>

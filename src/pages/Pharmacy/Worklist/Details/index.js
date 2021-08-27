@@ -20,7 +20,7 @@ const RightAlignGridItem = ({ children, md = 6 }) => {
   )
 }
 
-const PharmacyDetails = () => {
+const PharmacyDetails = ({ refreshClick }) => {
   const dispatch = useDispatch()
   const { detailsId, setDetailsId } = useContext(WorklistContext)
   const [showModal, setShowModal] = useState(false)
@@ -45,6 +45,11 @@ const PharmacyDetails = () => {
       overrideLoading
       observe='PharmarcyWorklistDetail'
       showFooter={false}
+      onConfirm={() => {
+        refreshClick()
+        setDetailsId(null)
+        setShowModal(false)
+      }}
     >
       <Details />
     </CommonModal>

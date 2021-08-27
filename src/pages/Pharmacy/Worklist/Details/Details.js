@@ -2,8 +2,10 @@ import React, { useEffect, useState, useContext } from 'react'
 import { useDispatch, connect } from 'dva'
 import { Typography, Input, Alert } from 'antd'
 import { compose } from 'redux'
+import numeral from 'numeral'
 import moment from 'moment'
 import { history } from 'umi'
+import { withStyles } from '@material-ui/core'
 import Warning from '@material-ui/icons/Error'
 import {
   GridContainer,
@@ -15,14 +17,39 @@ import {
   CommonTableGrid,
   CommonModal,
   withFormikExtend,
+  NumberInput
 } from '@/components'
 import { navigateDirtyCheck } from '@/utils/utils'
-import { VISIT_TYPE } from '@/utils/constants'
+import { VISIT_TYPE, PHARMACY_STATUS, PHARMACY_ACTION } from '@/utils/constants'
+import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import Banner from '@/pages/PatientDashboard/Banner'
 import { MenuOutlined } from '@ant-design/icons'
 import { PharmacySteps } from '../../Components'
 import Block from '@/pages/PatientDashboard/Banner/Block'
 import AddOrder from '@/pages/Dispense/DispenseDetails/AddOrder'
+
+const drugMixtureIndicator = (row, right) => {
+  return (
+    <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
+  )
+}
+
+const styles = (theme) => ({
+  wrapCellTextStyle: {
+    wordWrap: 'break-word',
+    whiteSpace: 'pre-wrap',
+  },
+  rightIcon: {
+    position: 'absolute',
+    bottom: 2,
+    fontWeight: 500,
+    color: 'white',
+    fontSize: '0.7rem',
+    padding: '2px 3px',
+    height: 20,
+    cursor: 'pointer'
+  }
+})
 
 const ContentGridItem = ({ children, title }) => {
   return (
@@ -42,8 +69,10 @@ const ContentGridItem = ({ children, title }) => {
 }
 
 const Details = (props) => {
-  const { pharmacyDetails, patient, dispatch } = props
+  const { pharmacyDetails, patient, dispatch, classes } = props
   const [showEditOrderModal, setShowEditOrderModal] = useState(false)
+  const [printlanguage, setPrintlanguage] = useState(['EN'])
+  const [showLanguage, setShowLanguage] = useState('EN')
   const workitem = pharmacyDetails.entity || {}
   const statusHistory = [...(workitem.pharmarcyWorklistHistory || []),
   {
@@ -75,11 +104,19 @@ const Details = (props) => {
     }
   }
 
+  const updatePharmacy = (actionType) => {
+    dispatch({ type: 'pharmacyDetails/upsert', payload: { ...workitem, actionType } }).then(
+      r => {
+        const { onConfirm } = props
+        onConfirm()
+      }
+    )
+  }
+
   const reloadPharmacy = () => {
     dispatch({ type: 'pharmacyDetails/query', payload: { id: workitem.id } })
     setShowEditOrderModal(false)
   }
-
   return <div>
     <div style={{ maxHeight: 800, overflowY: 'scroll', marginBottom: 10 }}>
       <Banner
@@ -143,6 +180,17 @@ const Details = (props) => {
               unCheckedChildren='JP'
               unCheckedValue='JP'
               label=''
+              value={showLanguage}
+              onChange={v => {
+                setShowLanguage(v)
+                const { setFieldValue } = props
+                setFieldValue('orderItems', props.values.orderItems.map(item => {
+                  return {
+                    ...item,
+                    language: v
+                  }
+                }))
+              }}
             />
           </GridItem>
           <GridItem style={{ marginTop: 8 }}>
@@ -150,25 +198,12 @@ const Details = (props) => {
               forceRender
               size='sm'
               FuncProps={{ pager: false }}
-              rows={[{
-                type: 'Medication',
-                itemCode: 'Drug A',
-                itemName: 'Drug A',
-                dispenseUOM: 'tablets',
-                orderQuantity: 1,
-                stock: 2,
-                batchNo: 'X12345',
-                expiryDate: '31 Oct 2023',
-                instruction: 'Take 5mg 3 times a day for 5 day(s)',
-                drugInteraction: 'dairy products',
-                drugContraindication: 'GL Bleeding',
-                remarks: 'apply on left ears'
-              }]}
-              columns={[{ name: 'type', title: 'Type' },
+              rows={props.values?.orderItems || []}
+              columns={[{ name: 'invoiceItemTypeFK', title: 'Type' },
               { name: 'itemCode', title: 'Code' },
               { name: 'itemName', title: 'Name' },
               { name: 'dispenseUOM', title: 'UOM' },
-              { name: 'orderQuantity', title: 'Ordered' },
+                { name: 'quantity', title: 'Ordered' },
               { name: 'dispenseQuantity', title: 'Dispensed' },
               { name: 'stock', title: 'Bal. Qty.' },
               { name: 'batchNo', title: 'Batch No.' },
@@ -180,38 +215,101 @@ const Details = (props) => {
               { name: 'action', title: 'Action' },
               ]}
               columnExtensions={[{
-                columnName: 'type',
+                columnName: 'invoiceItemTypeFK',
                 width: 110,
-                sortingEnabled: false
+                sortingEnabled: false,
+                render: (row) => {
+                  return row.invoiceItemTypeFK == 1 ? 'Medication' : 'Consumable'
+                }
               },
               {
                 columnName: 'itemCode',
                 width: 100,
                 sortingEnabled: false
               },
-              {
+                {
+                  columnName: 'itemName',
+                  width: 200,
+                  sortingEnabled: false,
+                  render: (row) => {
+                    let paddingRight = 0
+                    if (row.isExclusive) {
+                      paddingRight = 24
+                    }
+                    if (row.isDrugMixture) {
+                      paddingRight = 10
+                    }
+                    return (
+                      <div style={{ position: 'relative' }}>
+                        <div className={classes.wrapCellTextStyle}
+                          style={{ paddingRight: paddingRight }}>
+                          {row.itemName}
+                          <div style={{ position: 'relative', top: 2 }}>
+                            {row.isDrugMixture && drugMixtureIndicator(row, -20)}
+                            {row.isExclusive && (
+                              <Tooltip title='Exclusive Drug'>
+                                <div
+                                  className={classes.rightIcon}
+                                  style={{
+                                    right: row.isPreOrder ? -60 : -30,
+                                    borderRadius: 4,
+                                    backgroundColor: 'green',
+                                  }}
+                                >Excl.</div>
+                              </Tooltip>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  }
+                },
+                {
                 columnName: 'dispenseUOM',
                 width: 80,
                 sortingEnabled: false
               },
               {
-                columnName: 'orderQuantity',
+                columnName: 'quantity',
                 width: 80,
-                sortingEnabled: false
+                sortingEnabled: false,
+                render: (row) => numeral(row.quantity).format('0.0')
               },
               {
                 columnName: 'dispenseQuantity',
                 width: 80,
-                sortingEnabled: false
+                sortingEnabled: false,
+                render: (row) => {
+                  return <NumberInput
+                    label=''
+                    step={1}
+                    min={0}
+                    max={row.stock}
+                    precision={1}
+                    value={row.dispenseQuantity}
+                    onChange={v => {
+                      const { setFieldValue } = props
+                      setFieldValue('orderItems', [...props.values.orderItems.map(item => {
+                        return {
+                          ...item,
+                          dispenseQuantity: item.id === row.id ? v.target.value : item.dispenseQuantity
+                        }
+                      })])
+                    }}
+                  />
+                }
               },
               {
                 columnName: 'stock',
-                width: 80,
-                sortingEnabled: false
+                width: 100,
+                sortingEnabled: false,
+                render: (row) => {
+                  return `${numeral(row.stock).format('0.0')} ${row.dispenseUOM}`
+                }
               },
               {
                 columnName: 'batchNo',
-                width: 80,
+                width: 100,
                 sortingEnabled: false
               },
               {
@@ -219,7 +317,21 @@ const Details = (props) => {
                 width: 100,
                 sortingEnabled: false
               },
-              {
+                {
+                  columnName: 'drugInteraction',
+                  sortingEnabled: false,
+                  render: (row) => {
+                    return '' // row.drugInteraction.find(i => i.language === row.language).value
+                  }
+                },
+                {
+                  columnName: 'drugContraindication',
+                  sortingEnabled: false,
+                  render: (row) => {
+                    return ''// row.drugContraindication.find(i => i.language === row.language).value
+                  }
+                },
+                {
                 columnName: 'action',
                 width: 60,
                 sortingEnabled: false,
@@ -239,11 +351,15 @@ const Details = (props) => {
           <Button color='primary' size='sm'>Print leaflet/Drug Summary Label</Button>
           <Button color='primary' size='sm'>Print Drug Label</Button>
           <CheckboxGroup
+            value={printlanguage}
             style={{ position: 'absolute', bottom: '-5px', marginLeft: '6px' }}
             options={[
               { value: 'EN', label: 'EN' },
               { value: 'JP', label: 'JP' },
-            ]} />
+            ]}
+            onChange={v => {
+              setPrintlanguage(v.target.value)
+            }} />
         </div>
       </GridItem>
       <GridItem md={4} style={{
@@ -254,12 +370,13 @@ const Details = (props) => {
           const { onClose } = props
           onClose()
         }}>Cancel</Button>
-        {workitem.statusFK === 1 && (workitem.visitPurposeFK == VISIT_TYPE.RETAIL ?
+        {workitem.statusFK === PHARMACY_STATUS.NEW && (workitem.visitPurposeFK == VISIT_TYPE.RETAIL ?
           <Button color='success' size='sm' onClick={editOrder}>Add Order</Button>
           : <Button color='success' size='sm' onClick={editOrder}>Edit Order</Button>)}
-        {workitem.statusFK === 1 && <Button color='primary' size='sm'>Prepared</Button>}
-        {workitem.statusFK === 2 && <Button color='primary' size='sm'>Verify</Button>}
-        {workitem.statusFK === 3 && <Button color='primary' size='sm'>Complete</Button>}
+        {workitem.statusFK !== PHARMACY_STATUS.NEW && <Button color='primary' size='sm' onClick={() => updatePharmacy(PHARMACY_ACTION.BACKTONEW)}>Back To New</Button>}
+        {workitem.statusFK === PHARMACY_STATUS.NEW && <Button color='primary' size='sm' onClick={() => updatePharmacy(PHARMACY_ACTION.PREPARE)}>Prepared</Button>}
+        {workitem.statusFK === PHARMACY_STATUS.PREPARED && <Button color='primary' size='sm' onClick={() => updatePharmacy(PHARMACY_ACTION.VERIFY)}>Verify</Button>}
+        {workitem.statusFK === PHARMACY_STATUS.VERIFIED && <Button color='primary' size='sm' onClick={() => updatePharmacy(PHARMACY_ACTION.COMPLETE)}>Complete</Button>}
       </GridItem>
     </GridContainer>
     <CommonModal
@@ -275,6 +392,7 @@ const Details = (props) => {
     >
       <AddOrder
         visitType={visitPurposeFK}
+        isFirstLoad={false}
         onReloadClick={reloadPharmacy}
         {...props}
         history={history}
@@ -284,13 +402,18 @@ const Details = (props) => {
 }
 
 export default compose(
+  withStyles(styles),
   connect(({ pharmacyDetails, patient }) => ({
     pharmacyDetails,
     patient,
   })),
   withFormikExtend({
     enableReinitialize: true,
-    mapPropsToValues: () => ({}),
+    mapPropsToValues: ({ pharmacyDetails }) => {
+      return {
+        orderItems: pharmacyDetails.entity?.pharmacyOrderItem || []
+      }
+    },
     //validationSchema: Yup.object().shape({}),
     handleSubmit: () => { },
     displayName: 'PharmarcyWorklistDetail',

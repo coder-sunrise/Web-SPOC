@@ -3,12 +3,13 @@ import moment from 'moment'
 import _ from 'lodash'
 import { CheckCircleFilled } from '@ant-design/icons'
 import { pharmacyStatus } from '@/utils/codes'
+import { PHARMACY_STATUS } from '@/utils/constants'
 import styles from './PharmacyStep.less'
 
 const { Step } = Steps
 
 const showIcon = (statusFK, currentStatusFK) => {
-  if (currentStatusFK === 4 || statusFK <= currentStatusFK) {
+  if (currentStatusFK === PHARMACY_STATUS.DISPENSED || statusFK <= currentStatusFK) {
     return <CheckCircleFilled style={{ color: '#33CC33' }} />
   }
   if (statusFK === currentStatusFK + 1) {

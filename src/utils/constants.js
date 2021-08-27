@@ -658,3 +658,17 @@ export const PATIENT_ALLERGY_TYPE = {
 }
 
 export const ENABLE_PRESCRIPTION_SET_CLINIC_ROLE = [1]
+
+export const PHARMACY_STATUS = {
+  NEW: 1,
+  PREPARED: 2,
+  VERIFIED: 3,
+  DISPENSED: 4,
+}
+
+export const PHARMACY_ACTION = {
+  BACKTONEW: 'Back To New',
+  PREPARE: 'Prepare',
+  VERIFY: 'Verify',
+  COMPLETE: 'Complete',
+}
