@@ -53,7 +53,7 @@ class AutoSuggestion extends PureComponent {
   delaySearchTimeoutID = 0
   delaySearch = async (value) => {
     clearTimeout(this.delaySearchTimeoutID)
-    this.delaySearchTimeoutID = setTimeout(async ()=>{ await this.onSearch(value) },200)
+    this.delaySearchTimeoutID = setTimeout(async ()=>{ await this.onSearch(value) },500)
   }
 
   onSearch = async (value) => {
