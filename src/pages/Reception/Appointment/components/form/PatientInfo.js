@@ -68,15 +68,7 @@ const PatientInfoInput = ({
         <div className={classnames(classes.buttonGroup)}>
           <FastField
             name='dobfrom'
-            render={args => <DatePicker {...args} label='DOB From' />}
-          />
-        </div>
-      </GridItem>
-      <GridItem xs md={2}>
-        <div className={classnames(classes.buttonGroup)}>
-          <FastField
-            name='dobto'
-            render={args => <DatePicker {...args} label='DOB To' />}
+            render={args => <DatePicker {...args} label='DOB' />}
           />
         </div>
       </GridItem>

@@ -111,13 +111,7 @@ const FilterBar = props => {
         <GridItem xs md={1}>
           <FastField
             name='dobfrom'
-            render={args => <DatePicker {...args} label='DOB From' />}
-          />
-        </GridItem>
-        <GridItem xs md={1}>
-          <FastField
-            name='dobto'
-            render={args => <DatePicker {...args} label='DOB To' />}
+            render={args => <DatePicker {...args} label='DOB' />}
           />
         </GridItem>
         {isDayView && (
@@ -229,7 +223,7 @@ const FilterBar = props => {
                     }
                     filterByApptType={values.filterByApptType}
                     dobfrom={values.dobfrom}
-                    dobto={values.dobto}
+                    dobto={values.dobfrom}
                     handleFilterTemplate={handleFilterTemplate}
                     handleApplyTemplate={handleApplyTemplate}
                   />

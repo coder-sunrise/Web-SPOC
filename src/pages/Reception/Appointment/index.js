@@ -532,7 +532,7 @@ class Appointment extends React.PureComponent {
 
     const updFilter = {
       dobfrom: dobfrom || undefined,
-      dobto: dobto || undefined,
+      dobto: dobfrom || undefined,
       search: search || undefined,
       filterByApptType: filterByApptType,
       filterByDoctor: filterByDoctor,

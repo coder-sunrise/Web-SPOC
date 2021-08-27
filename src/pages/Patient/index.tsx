@@ -132,17 +132,8 @@ const defaultColumns = [
     dataIndex: 'dobfrom',
     renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
       return (
-        <DatePicker style={{ width: 150 }} label='DOB From' placeholder='' />
+        <DatePicker style={{ width: 150 }} label='DOB' placeholder='' />
       )
-    },
-  },
-  {
-    // title: 'Patient Name, Acc No., Patient Ref. No., Contact No.',
-    hideInTable: true,
-    title: '',
-    dataIndex: 'dobto',
-    renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-      return <DatePicker style={{ width: 150 }} label='DOB To' placeholder='' />
     },
   },
 ]
@@ -264,7 +255,7 @@ const PatientIndex = ({
             apiCriteria: {
               searchValue: search,
               dobfrom: dobfrom,
-              dobto: dobto,
+              dobto: dobfrom,
               includeinactive: true,
             },
           }

@@ -71,13 +71,7 @@ class FilterBar extends PureComponent {
             <GridItem md={2}>
               <FastField
                 name='dobfrom'
-                render={args => <DatePicker {...args} label='DOB From' />}
-              />
-            </GridItem>
-            <GridItem md={2}>
-              <FastField
-                name='dobto'
-                render={args => <DatePicker {...args} label='DOB To' />}
+                render={args => <DatePicker {...args} label='DOB' />}
               />
             </GridItem>
           </Authorized>
@@ -114,7 +108,7 @@ class FilterBar extends PureComponent {
                         apiCriteria: {
                           searchValue: search,
                           dobfrom: dobfrom,
-                          dobto: dobto,
+                          dobto: dobfrom,
                           includeinactive: window.location.pathname.includes(
                             'patientdb',
                           ),
