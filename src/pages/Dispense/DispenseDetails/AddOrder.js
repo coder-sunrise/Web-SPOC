@@ -18,7 +18,6 @@ import { roundTo, getUniqueId } from '@/utils/utils'
 import {
   getRetailCautionAlertContent,
   getCautionAlertContent,
-  getDrugAllergy
 } from '@/pages/Widgets/Orders/utils'
 import Order from '../../Widgets/Orders'
 
@@ -40,7 +39,6 @@ const AddOrder = ({
   location,
   clinicInfo,
   isFirstLoad,
-  patient
 }) => {
   const displayExistingOrders = async (id, servicesList) => {
     const r = await dispatch({
@@ -52,22 +50,8 @@ const AddOrder = ({
     })
 
     if (r) {
-      let allergys = []
-      const { patientAllergy = [] } = patient
 
-      const { retailInvoiceAdjustment, retailInvoiceItem } = r
-
-      const insertAllergys = (inventoryMedicationFK) => {
-        let drug = inventorymedication.find(
-          (medication) => medication.id === inventoryMedicationFK,
-        )
-        if (!drug) return
-        const newAllergys = getDrugAllergy(drug, patientAllergy)
-        if (newAllergys.length) {
-          allergys = [...allergys, ...newAllergys]
-        }
-      }
-
+      const { retailInvoiceAdjustment, retailInvoiceItem, drugAllergies = [] } = r
       const mapRetailItemPropertyToOrderProperty = o => {
         let obj
         switch (o.invoiceItemTypeFK) {
@@ -77,12 +61,6 @@ const AddOrder = ({
               retailPrescriptionItemPrecaution,
               ...restValues
             } = o.retailVisitInvoiceDrug.retailPrescriptionItem
-
-            if (!allergys.find(
-              (f) => f.id === o.retailVisitInvoiceDrug.inventoryMedicationFK,
-            )) {
-              insertAllergys(o.retailVisitInvoiceDrug.inventoryMedicationFK)
-            }
 
             let medicationItem
             if (o.retailVisitInvoiceDrug.inventoryMedicationFK) {
@@ -237,7 +215,7 @@ const AddOrder = ({
             }
           })
 
-        if (isVaccinationExist.length || cuationItems.length || allergys.length) {
+        if (isVaccinationExist.length || cuationItems.length || drugAllergies.length) {
           dispatch({
             type: 'global/updateAppState',
             payload: {
@@ -247,7 +225,7 @@ const AddOrder = ({
                 return {
                   ...x, type: x.type === 1 ? 'Medication' : 'Vaccination'
                 }
-              }), allergys, isVaccinationExist),
+              }), drugAllergies, isVaccinationExist),
               alignContent: 'left',
               isInformType: true,
               onConfirmSave: () => { },
