@@ -50,6 +50,12 @@ class AutoSuggestion extends PureComponent {
     }
   }
 
+  delaySearchTimeoutID = 0
+  delaySearch = async (value) => {
+    clearTimeout(this.delaySearchTimeoutID)
+    this.delaySearchTimeoutID = setTimeout(async ()=>{ await this.onSearch(value) },200)
+  }
+
   onSearch = async (value) => {
     if (this.props.query) {
       this.setState({
@@ -101,7 +107,7 @@ class AutoSuggestion extends PureComponent {
         style={{ width: '100%', cursor:'default' }}
         onSelect={this.onOptionSelect}
         onChange={this.onChange}
-        onSearch={this.onSearch}
+        onSearch={this.delaySearch}
         optionLabelProp='value'
         // placeholder={isFocused || value ? '' : label}
         onFocus={this.onFocus}
