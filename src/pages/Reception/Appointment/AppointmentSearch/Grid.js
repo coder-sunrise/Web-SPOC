@@ -140,7 +140,7 @@ class Grid extends PureComponent {
         getRowId={(row) => row.uid}
         columns={[
           { name: 'patientName', title: 'Patient' },
-          { name: 'patientReferenceNo', title: 'Ref. No.' },
+          { name: 'patientRefrenceNo', title: 'Ref. No.' },
           { name: 'patientAccountNo', title: 'Acc. No.' },
           { name: 'patientContactNo', title: 'Contact No.' },
           { name: 'appointmentDate', title: 'Appt Date' },
@@ -159,11 +159,10 @@ class Grid extends PureComponent {
           {
             columnName: 'patientName',
             sortingEnabled: false,
-            disabled:true,
           },
           {
-            columnName: 'patientReferenceNo',
-            sortBy: 'patientReferenceNo',
+            columnName: 'patientRefrenceNo',
+            sortBy: 'patientRefrenceNo',
             width: 130,
           },
           {
