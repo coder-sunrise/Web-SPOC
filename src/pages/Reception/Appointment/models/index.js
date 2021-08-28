@@ -144,7 +144,7 @@ export default createListViewModel({
           pagination: {
             ...st.pagination,
             current: data.currentPage || 1,
-            pagesize: data.pageSize || 10,
+            pagesize: data.pageSize || 100,
             totalRecords: data.totalRecords,
             sorting,
           },

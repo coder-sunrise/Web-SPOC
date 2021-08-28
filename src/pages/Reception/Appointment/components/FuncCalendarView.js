@@ -133,8 +133,7 @@ const applyFilter = (filter, data, isDayView) => {
     //filter by DOB From , DOB To
     returnData = returnData.filter(eachData => {
       const { patientProfile, patientName, patientContactNo } = eachData
-
-      return patientProfile.dob == dob
+      return !dob || patientProfile.dob == dob
     })
 
     // filter by doctor
@@ -398,6 +397,8 @@ const CalendarView = ({
               `${appointment.appointmentDate} ${firstApptRes.endTime}`,
               `${serverDateFormat} HH:mm`,
             ).toDate(),
+            updateByUser:appointment.updateByUser,
+            updateDate:appointment.updateDate,
           },
         ]
       }, [])
@@ -414,6 +415,8 @@ const CalendarView = ({
         bookedByUser,
         createDate,
         isEditedAsSingleAppointment,
+        updateByUser,
+        updateDate,
       } = appointment
 
       const apptEvents = apptResources.map(item => ({
@@ -439,6 +442,8 @@ const CalendarView = ({
           `${appointmentDate} ${item.endTime}`,
           `${serverDateFormat} HH:mm`,
         ).toDate(),
+        updateByUser,
+        updateDate,
       }))
       return [...events, ...apptEvents]
     }, [])

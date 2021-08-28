@@ -963,14 +963,14 @@ class Banner extends PureComponent {
                 <span
                   style={{
                     ...headerStyles,
-                    color: info.patientMedicalHistory.highRiskCondition
+                    color: info.patientMedicalHistory?.highRiskCondition
                       ? 'red'
                       : headerStyles.color,
                   }}
                 >
                   HRP:{' '}
                 </span>
-                <span>{info.patientMedicalHistory.highRiskCondition}</span>
+                <span>{info.patientMedicalHistory?.highRiskCondition}</span>
               </GridItem>
               <GridItem xs={6} md={2} className={classes.cell}>
                 <span

@@ -48,6 +48,7 @@ const AppointmentSearch = ({
           isIncludeRescheduledByClinic: true,
           isIncludeHistory: true,
         },
+        pagesize:100,
       },
     })
     return () => {

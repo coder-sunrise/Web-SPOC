@@ -314,7 +314,6 @@ class Appointment extends React.PureComponent {
         .toDate(),
       doctor: resourceId,
     }
-    console.log('report payload',payload)
     return payload
   }
 
@@ -466,7 +465,6 @@ class Appointment extends React.PureComponent {
 
   onEventMouseOver = (event, syntheticEvent) => {
     const { isDragging } = this.state
-
     !isDragging &&
       this.setState({
         showPopup: event !== null,
@@ -728,7 +726,7 @@ class Appointment extends React.PureComponent {
           onClose={this.closeAppointmentForm}
           onConfirm={this.closeAppointmentForm}
           showFooter={false}
-          maxWidth='xl'
+          fullScreen
           overrideLoading
           observe='AppointmentForm'
         >

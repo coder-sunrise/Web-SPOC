@@ -539,7 +539,7 @@ export default createListViewModel({
         const getCalendarListPayload = {
           searchValue: search,
           doctor: doctor.join(),
-          appType: appType.join(),
+          appType: appType.length == 0 || appType.indexOf(-99) > -1 ? null : appType.join(),
           apptDateFrom: start,
           apptDateTo: end,
           appStatus: [
