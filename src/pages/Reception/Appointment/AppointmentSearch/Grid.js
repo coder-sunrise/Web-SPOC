@@ -15,7 +15,7 @@ import {
 // utils
 import Authorized from '@/utils/Authorized'
 import { AppointmentTypeLabel } from '@/components/_medisys'
-import { APPOINTMENT_STATUS } from '@/utils/constants'
+import { APPOINTMENT_STATUS, mapApptStatus } from '@/utils/constants'
 
 const styles = (theme) => ({
   subRow: {
@@ -100,35 +100,6 @@ class Grid extends PureComponent {
         {newchildren}
       </Table.Row>
     )
-  }
-
-  mapApptStatus = statusFK => {
-    let status = ''
-    switch (statusFK) {
-      case APPOINTMENT_STATUS.CANCELLED:
-      case APPOINTMENT_STATUS.PFA_CANCELLED:
-        status = 'Cancelled'
-        break
-      case APPOINTMENT_STATUS.CONFIRMED:
-        status = 'Confirmed'
-        break
-      case APPOINTMENT_STATUS.DELETED:
-        status = 'Deleted'
-        break
-      case APPOINTMENT_STATUS.DRAFT:
-        status = 'Drafted'
-        break
-      case APPOINTMENT_STATUS.TURNEDUP:
-      case APPOINTMENT_STATUS.TURNEDUPLATE:
-      case APPOINTMENT_STATUS.PFA_NOSHOW:
-        status = 'Last Confirmed'
-        break
-      case APPOINTMENT_STATUS.RESCHEDULED:
-      case APPOINTMENT_STATUS.PFA_RESCHEDULED:
-        status = 'Rescheduled'
-        break
-    }
-    return status
   }
 
   render () {
@@ -239,7 +210,7 @@ class Grid extends PureComponent {
             columnName: 'updateByUser',
             sortingEnabled: false,
             render:(row)=> {
-              const content = `${this.mapApptStatus(row.appointmentStatusFk)} by ${row.updateByUser}`
+              const content = `${mapApptStatus(row.appointmentStatusFk)} by ${row.updateByUser}`
               return <Tooltip title={content}><span>{content}</span></Tooltip>
             }
           },
