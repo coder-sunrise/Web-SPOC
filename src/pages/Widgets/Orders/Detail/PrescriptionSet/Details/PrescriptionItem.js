@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import Yup from '@/utils/yup'
 import { connect } from 'dva'
-import { getUniqueId } from '@/utils/utils'
+import { getUniqueId, getTranslationValue } from '@/utils/utils'
 import { compose } from 'redux'
 import classnames from 'classnames'
 import { Divider } from '@material-ui/core'
@@ -79,9 +79,10 @@ const drugMixtureItemSchema = Yup.object().shape({
   quantity: Yup.number().min(0),
 })
 
-@connect(({ prescriptionSet, codetable }) => ({
+@connect(({ prescriptionSet, codetable, clinicSettings }) => ({
   prescriptionSet,
-  codetable
+  codetable,
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 @withFormikExtend({
   enableReinitialize: true,
@@ -198,8 +199,10 @@ const drugMixtureItemSchema = Yup.object().shape({
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
-    const { dispatch, prescriptionSet, codetable } = props
+    const { dispatch, prescriptionSet, codetable, clinicSettings } = props
+    const { primaryPrintoutLanguage = 'EN', secondaryPrintoutLanguage = '' } = clinicSettings
     const {
+      inventorymedication,
       ctmedicationdosage,
       ctmedicationusage,
       ctmedicationfrequency,
@@ -218,7 +221,12 @@ const drugMixtureItemSchema = Yup.object().shape({
       return nextSequence
     }
 
-    const getInstruction = (instructions) => {
+    if (!values.isDrugMixture) {
+      const medication = inventorymedication.find(drug => drug.id === values.inventoryMedicationFK)
+      values.drugName = medication?.displayValue
+    }
+
+    const getInstruction = (instructions, language) => {
       let instruction = ''
       let nextStepdose = ''
       const activeInstructions = instructions
@@ -246,16 +254,30 @@ const drugMixtureItemSchema = Yup.object().shape({
           const frequency = ctmedicationfrequency.find(f => f.id === item.drugFrequencyFK)
           const uom = ctmedicationunitofmeasurement.find(m => m.id === item.prescribeUOMFK)
 
-          instruction += `${usage?.name || ''
-            } ${dosage?.displayValue || ''} ${uom?.name || ''
-            } ${frequency?.displayValue || ''
-            }${itemDuration}${nextStepdose}`
+          instruction += `${getTranslationValue(
+            usage?.translationData,
+            language,
+            'displayValue',
+          )} ${getTranslationValue(
+            dosage?.translationData,
+            language,
+            'displayValue',
+          )} ${getTranslationValue(
+            uom?.translationData,
+            language,
+            'displayValue',
+          )} ${getTranslationValue(
+            frequency?.translationData,
+            language,
+            'displayValue',
+          )}${itemDuration}${nextStepdose}`
         }
       }
       return instruction
     }
 
-    const instruction = getInstruction(values.prescriptionSetItemInstruction)
+    const instruction = getInstruction(values.prescriptionSetItemInstruction, primaryPrintoutLanguage)
+    let secondInstruction = secondaryPrintoutLanguage !== '' ? getInstruction(values.prescriptionSetItemInstruction, secondaryPrintoutLanguage) : ''
 
     const prescriptionSetItemPrecaution = values.prescriptionSetItemPrecaution.filter(
       i => i.medicationPrecautionFK !== undefined,
@@ -281,6 +303,8 @@ const drugMixtureItemSchema = Yup.object().shape({
       )
       // reorder and overwrite sequence, get combined drug name
       activeDrugMixtureItems.forEach((item, index) => {
+        const medication = inventorymedication.find(drug => drug.id === item.inventoryMedicationFK)
+        item.drugName = medication?.displayValue
         if (item.isNew && item.id < 0) item.id = undefined
       })
     }
@@ -290,6 +314,7 @@ const drugMixtureItemSchema = Yup.object().shape({
       ...values,
       prescriptionSetItemPrecaution,
       instruction,
+      secondInstruction,
       isDeleted: false,
     }
 
@@ -1050,7 +1075,7 @@ class Detail extends PureComponent {
           columnName: 'uomfk', 
           type: 'codeSelect',
           code: 'ctMedicationUnitOfMeasurement',
-          labelField: 'name',
+          labelField: 'displayValue',
           sortingEnabled: false,
           disabled: true,
         },
@@ -1403,6 +1428,7 @@ class Detail extends PureComponent {
                                           marginLeft: 15,
                                           paddingRight: 15,
                                         }}
+                                        labelField='displayValue'
                                         code='ctMedicationUsage'
                                         onChange={(v, op = {}) => {
                                           setFieldValue(
@@ -1411,7 +1437,7 @@ class Detail extends PureComponent {
                                           )
                                           setFieldValue(
                                             `prescriptionSetItemInstruction[${i}].usageMethodDisplayValue`,
-                                            op ? op.name : undefined,
+                                            op ? op.displayValue : undefined,
                                           )
                                         }}
                                         {...commonSelectProps}
@@ -1465,6 +1491,7 @@ class Detail extends PureComponent {
                                       })}
                                       allowClear={false}
                                       code='ctMedicationUnitOfMeasurement'
+                                      labelField='displayValue'
                                       onChange={(v, op = {}) => {
                                         setFieldValue(
                                           `prescriptionSetItemInstruction[${i}].prescribeUOMCode`,
@@ -1472,7 +1499,7 @@ class Detail extends PureComponent {
                                         )
                                         setFieldValue(
                                           `prescriptionSetItemInstruction[${i}].prescribeUOMDisplayValue`,
-                                          op ? op.name : undefined,
+                                          op ? op.displayValue : undefined,
                                         )
                                       }}
                                       disabled
@@ -1727,6 +1754,7 @@ class Detail extends PureComponent {
                     label='Dispense UOM'
                     allowClear={false}
                     code='ctMedicationUnitOfMeasurement'
+                    labelField='displayValue'
                     onChange={(v, op = {}) => {
                       setFieldValue(
                         'dispenseUOMCode',
@@ -1734,7 +1762,7 @@ class Detail extends PureComponent {
                       )
                       setFieldValue(
                         'dispenseUOMDisplayValue',
-                        op ? op.name : undefined,
+                        op ? op.displayValue : undefined,
                       )
                     }}
                     {...args}

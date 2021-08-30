@@ -17,7 +17,7 @@ import {
   Tooltip
 } from '@/components'
 import Yup from '@/utils/yup'
-import { getUniqueId, getUniqueGUID, roundTo } from '@/utils/utils'
+import { getUniqueId, getUniqueGUID, roundTo, getTranslationValue } from '@/utils/utils'
 import {
   openCautionAlertPrompt,
   ReplaceCertificateTeplate,
@@ -25,6 +25,7 @@ import {
 import { DURATION_UNIT, SERVICE_CENTER_CATEGORY, } from '@/utils/constants'
 import { isMatchInstructionRule, getDrugAllergy } from '@/pages/Widgets/Orders/utils'
 import { getClinicianProfile } from '../../ConsultationDocument/utils'
+import { CollectionsOutlined } from '@material-ui/icons'
 
 @connect(
   ({
@@ -34,6 +35,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
     visitRegistration,
     consultationDocument,
     patient,
+    clinicSettings,
   }) => ({
     global,
     codetable,
@@ -41,6 +43,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
     visitRegistration,
     consultationDocument,
     patient,
+    clinicSettings: clinicSettings.settings || clinicSettings.default,
   }),
 )
 @withFormikExtend({
@@ -68,9 +71,15 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       visitRegistration,
       patient,
       consultationDocument: { rows = [] },
+      clinicSettings,
     } = props
+    const { primaryPrintoutLanguage = 'EN', secondaryPrintoutLanguage = '' } = clinicSettings
     const { corVitalSign = [] } = orders
     const {
+      ctmedicationusage = [],
+      ctmedicationunitofmeasurement = [],
+      ctmedicationfrequency = [],
+      ctmedicationdosage = [],
       inventorymedication = [],
       inventoryvaccination = [],
       inventoryconsumable = [],
@@ -99,20 +108,31 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
 
     const packageGlobalId = getUniqueGUID()
 
-    const getInstruction = (medication, matchInstruction) => {
-      let instruction = ''
-      const usageMethod = medication.medicationUsage
-      instruction += `${usageMethod ? usageMethod.name : ''} `
-      const dosage = matchInstruction?.prescribingDosage
-      instruction += `${dosage ? dosage.name : ''} `
-      const prescribe = medication.prescribingUOM
-      instruction += `${prescribe ? prescribe.name : ''} `
-      const drugFrequency = matchInstruction?.medicationFrequency
-      instruction += `${drugFrequency ? drugFrequency.name : ''}`
-      const itemDuration = matchInstruction?.duration
-        ? ` For ${matchInstruction.duration} day(s)`
-        : ''
-      instruction += itemDuration
+    const getInstruction = (medication, matchInstruction, language) => {
+      const usage = ctmedicationusage.find(usage => usage.id === medication.medicationUsage?.id)
+      const uom = ctmedicationunitofmeasurement.find(uom => uom.id === medication.prescribingUOM.id)
+      const frequency = ctmedicationfrequency.find(frequency => frequency.id === matchInstruction?.medicationFrequency?.id)
+      const dosage = ctmedicationdosage.find(dosage => dosage.id === matchInstruction?.prescribingDosage?.id)
+
+      const itemDuration = matchInstruction?.duration ? ` For ${matchInstruction.duration} day(s)` : ''
+
+      const instruction = `${getTranslationValue(
+        usage?.translationData,
+        language,
+        'displayValue',
+      )} ${getTranslationValue(
+        dosage?.translationData,
+        language,
+        'displayValue',
+      )} ${getTranslationValue(
+        uom?.translationData,
+        language,
+        'displayValue',
+      )} ${getTranslationValue(
+        frequency?.translationData,
+        language,
+        'displayValue',
+      )}${itemDuration}`
       return instruction
     }
 
@@ -139,7 +159,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
         age = Math.floor(moment.duration(moment().diff(dob)).asYears())
       }
       var matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weightKG))
-
+      const uom = ctmedicationunitofmeasurement.find(uom => uom.id === medication.dispensingUOM.id)
       let item
       if (medication.isActive === true) {
         const medicationdispensingUOM = medication.dispensingUOM
@@ -184,16 +204,24 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
             : undefined,
           batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
           isExternalPrescription: false,
-          instruction: getInstruction(medication, matchInstruction),
+          instruction: getInstruction(medication, matchInstruction, primaryPrintoutLanguage),
+          secondInstruction: secondaryPrintoutLanguage !== '' ? getInstruction(medication, matchInstruction, secondaryPrintoutLanguage) : '',
           dispenseUOMFK: medication?.dispensingUOM?.id,
           inventoryDispenseUOMFK: medication?.dispensingUOM?.id,
           inventoryPrescribingUOMFK: medication?.prescribingUOM?.id,
           dispenseUOMCode: medicationdispensingUOM
             ? medicationdispensingUOM.code
             : undefined,
-          dispenseUOMDisplayValue: medicationdispensingUOM
-            ? medicationdispensingUOM.name
-            : undefined,
+          dispenseUOMDisplayValue: getTranslationValue(
+            uom?.translationData,
+            primaryPrintoutLanguage,
+            'displayValue',
+          ),
+          secondDispenseUOMDisplayValue: secondaryPrintoutLanguage !== '' ? getTranslationValue(
+            uom?.translationData,
+            secondaryPrintoutLanguage,
+            'displayValue',
+          ) : '',
           corPrescriptionItemPrecaution: currentMedicationPrecautions,
           corPrescriptionItemInstruction: [
             {
@@ -573,6 +601,15 @@ class Package extends PureComponent {
         code: 'inventoryconsumable',
         force: true,
         isActive: true,
+      },
+    })
+    dispatch({
+      type: 'codetable/batchFetch',
+      payload: {
+        codes: ['ctmedicationusage',
+          'ctmedicationunitofmeasurement',
+          'ctmedicationfrequency',
+          'ctmedicationdosage'],
       },
     })
 

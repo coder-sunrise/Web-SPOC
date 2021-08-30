@@ -31,7 +31,7 @@ import {
   Switch,
 } from '@/components'
 import Yup from '@/utils/yup'
-import { calculateAdjustAmount, getUniqueId } from '@/utils/utils'
+import { calculateAdjustAmount, getUniqueId, getTranslationValue } from '@/utils/utils'
 import { ENABLE_PRESCRIPTION_SET_CLINIC_ROLE } from '@/utils/constants'
 import { currencySymbol } from '@/utils/config'
 import Authorized from '@/utils/Authorized'
@@ -287,9 +287,45 @@ const getVisitDoctorUserId = props => {
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
-    const { dispatch, currentType, getNextSequence, user, orders } = props
+    const { dispatch, currentType, getNextSequence, user, orders, clinicSettings, codetable, openPrescription } = props
+    const { primaryPrintoutLanguage = 'EN', secondaryPrintoutLanguage = '' } = clinicSettings
+    const { inventorymedication = [],
+      ctmedicationusage = [],
+      ctmedicationunitofmeasurement = [],
+      ctmedicationfrequency = [],
+      ctmedicationdosage = [],
+    } = codetable
 
-    const getInstruction = instructions => {
+    if (!values.isDrugMixture && !openPrescription) {
+      const medication = inventorymedication.find(drug => drug.id === values.inventoryMedicationFK)
+      const uom = ctmedicationunitofmeasurement.find(uom => uom.id === medication?.dispensingUOM?.id)
+      values.drugName = medication?.displayValue
+      values.dispenseUOMDisplayValue = getTranslationValue(
+        uom?.translationData,
+        primaryPrintoutLanguage,
+        'displayValue',
+      )
+      values.secondDispenseUOMDisplayValue = secondaryPrintoutLanguage !== '' ? getTranslationValue(
+        uom?.translationData,
+        secondaryPrintoutLanguage,
+        'displayValue',
+      ) : ''
+    }
+    else {
+      const uom = ctmedicationunitofmeasurement.find(uom => uom.id === values.DispenseUOMFK)
+      values.dispenseUOMDisplayValue = getTranslationValue(
+        uom?.translationData,
+        primaryPrintoutLanguage,
+        'displayValue',
+      )
+      values.secondDispenseUOMDisplayValue = secondaryPrintoutLanguage !== '' ? getTranslationValue(
+        uom?.translationData,
+        secondaryPrintoutLanguage,
+        'displayValue',
+      ) : ''
+    }
+
+    const getInstruction = (instructions, language) => {
       let instruction = ''
       let nextStepdose = ''
       const activeInstructions = instructions
@@ -298,6 +334,10 @@ const getVisitDoctorUserId = props => {
       if (activeInstructions) {
         for (let index = 0; index < activeInstructions.length; index++) {
           let item = activeInstructions[index]
+          const usage = ctmedicationusage.find(usage => usage.id === item.usageMethodFK)
+          const uom = ctmedicationunitofmeasurement.find(uom => uom.id === item.prescribeUOMFK)
+          const frequency = ctmedicationfrequency.find(frequency => frequency.id === item.drugFrequencyFK)
+          const dosage = ctmedicationdosage.find(dosage => dosage.id === item.dosageFK)
           if (instruction !== '') {
             instruction += ' '
           }
@@ -312,16 +352,30 @@ const getVisitDoctorUserId = props => {
             ? ` For ${item.duration} day(s)`
             : ''
 
-          instruction += `${item.usageMethodDisplayValue ? item.usageMethodDisplayValue : ''
-            } ${item.dosageDisplayValue ? item.dosageDisplayValue : ''} ${item.prescribeUOMDisplayValue ? item.prescribeUOMDisplayValue : ''
-            } ${item.drugFrequencyDisplayValue ? item.drugFrequencyDisplayValue : ''
-            }${itemDuration}${nextStepdose}`
+          instruction += `${getTranslationValue(
+            usage?.translationData,
+            language,
+            'displayValue',
+          )} ${getTranslationValue(
+            dosage?.translationData,
+            language,
+            'displayValue',
+          )} ${getTranslationValue(
+            uom?.translationData,
+            language,
+            'displayValue',
+          )} ${getTranslationValue(
+            frequency?.translationData,
+            language,
+            'displayValue',
+          )}${itemDuration}${nextStepdose}`
         }
       }
       return instruction
     }
 
-    const instruction = getInstruction(values.corPrescriptionItemInstruction)
+    const instruction = getInstruction(values.corPrescriptionItemInstruction, primaryPrintoutLanguage)
+    const secondInstruction = secondaryPrintoutLanguage !== '' ? getInstruction(values.corPrescriptionItemInstruction, secondaryPrintoutLanguage) : ''
 
     const corPrescriptionItemPrecaution = values.corPrescriptionItemPrecaution.filter(
       i => i.medicationPrecautionFK !== undefined,
@@ -338,6 +392,15 @@ const getVisitDoctorUserId = props => {
 
     // reorder and overwrite sequence
     activeInstruction.forEach((item, index) => {
+      const usage = ctmedicationusage.find(usage => usage.id === item.usageMethodFK)
+      const prescribeUOM = ctmedicationunitofmeasurement.find(uom => uom.id === item.prescribeUOMFK)
+      const drugFrequency = ctmedicationfrequency.find(frequency => frequency.id === item.drugFrequencyFK)
+      const dosage = ctmedicationdosage.find(dosage => dosage.id === item.dosageFK)
+      item.usageMethodDisplayValue = usage?.displayValue
+      item.prescribeUOMDisplayValue = prescribeUOM?.displayValue
+      item.drugFrequencyDisplayValue = drugFrequency?.displayValue
+      item.dosageDisplayValue = dosage?.displayValue
+
       item.sequence = index + 1
     })
 
@@ -347,6 +410,13 @@ const getVisitDoctorUserId = props => {
       )
       // reorder and overwrite sequence, get combined drug name
       activeDrugMixtureItems.forEach((item, index) => {
+        const medication = inventorymedication.find(drug => drug.id === item.inventoryMedicationFK)
+        const uom = ctmedicationunitofmeasurement.find(uom => uom.id === item.uomFK)
+        const prescribeUOM = ctmedicationunitofmeasurement.find(uom => uom.id === item.prescribeUOMFK)
+        item.drugName = medication?.displayValue
+        item.uomDisplayValue = uom?.displayValue
+        item.prescribeUOMDisplayValue = prescribeUOM?.displayValue
+
         if (item.isNew && item.id < 0) item.id = undefined
       })
     }
@@ -358,6 +428,7 @@ const getVisitDoctorUserId = props => {
       ...values,
       corPrescriptionItemPrecaution,
       instruction,
+      secondInstruction,
       subject: currentType.getSubject({ ...values }),
       isDeleted: false,
       adjValue:
@@ -1216,7 +1287,7 @@ class Medication extends PureComponent {
           columnName: 'uomfk',
           type: 'codeSelect',
           code: 'ctMedicationUnitOfMeasurement',
-          labelField: 'name',
+          labelField: 'displayValue',
           sortingEnabled: false,
           disabled: true,
         },
@@ -1839,6 +1910,7 @@ class Medication extends PureComponent {
                                           marginLeft: 15,
                                           paddingRight: 15,
                                         }}
+                                        labelField='displayValue'
                                         code='ctMedicationUsage'
                                         onChange={(v, op = {}) => {
                                           setFieldValue(
@@ -1847,7 +1919,7 @@ class Medication extends PureComponent {
                                           )
                                           setFieldValue(
                                             `corPrescriptionItemInstruction[${i}].usageMethodDisplayValue`,
-                                            op ? op.name : undefined,
+                                            op ? op.displayValue : undefined,
                                           )
                                         }}
                                         {...commonSelectProps}
@@ -1902,6 +1974,7 @@ class Medication extends PureComponent {
                                       })}
                                       allowClear={false}
                                       code='ctMedicationUnitOfMeasurement'
+                                      labelField='displayValue'
                                       onChange={(v, op = {}) => {
                                         setFieldValue(
                                           `corPrescriptionItemInstruction[${i}].prescribeUOMCode`,
@@ -1909,7 +1982,7 @@ class Medication extends PureComponent {
                                         )
                                         setFieldValue(
                                           `corPrescriptionItemInstruction[${i}].prescribeUOMDisplayValue`,
-                                          op ? op.name : undefined,
+                                          op ? op.displayValue : undefined,
                                         )
                                       }}
                                       disabled={!openPrescription}
@@ -2210,6 +2283,7 @@ class Medication extends PureComponent {
                       label='Dispense UOM'
                       allowClear={false}
                       code='ctMedicationUnitOfMeasurement'
+                      labelField='displayValue'
                       onChange={(v, op = {}) => {
                         setFieldValue(
                           'dispenseUOMCode',
@@ -2217,7 +2291,7 @@ class Medication extends PureComponent {
                         )
                         setFieldValue(
                           'dispenseUOMDisplayValue',
-                          op ? op.name : undefined,
+                          op ? op.displayValue : undefined,
                         )
                       }}
                       {...args}

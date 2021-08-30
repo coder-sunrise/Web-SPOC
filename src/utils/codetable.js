@@ -156,6 +156,18 @@ const tenantCodesMap = new Map([
     },
   ],
   [
+    'ctmedicationunitofmeasurement',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctmedicationusage',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
     'copaymentscheme',
     {
       ...defaultParams,

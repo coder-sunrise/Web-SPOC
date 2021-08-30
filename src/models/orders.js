@@ -137,7 +137,7 @@ export default createListViewModel({
         const getCertificate = (vaccination, uid) => {
           const corVaccinationCert =
             vaccination.type === '2'
-              ? vaccination.corVaccinationCert.map(vc => {
+              ? (vaccination.corVaccinationCert || []).map(vc => {
                   return {
                     ...vc,
                     vaccinationUFK: uid,

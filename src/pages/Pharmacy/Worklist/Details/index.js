@@ -1,24 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { useSelector, useDispatch } from 'dva'
-import { Typography, Input } from 'antd'
-import {
-  GridContainer,
-  ProgressButton,
-  GridItem,
-  CommonModal,
-} from '@/components'
-import Banner from '@/pages/PatientDashboard/Banner'
-import { ExaminationSteps } from '@/pages/Radiology/Components'
+import { useDispatch } from 'dva'
+import { CommonModal } from '@/components'
 import WorklistContext from '@/pages/Radiology/Worklist/WorklistContext'
 import Details from './Details'
-
-const RightAlignGridItem = ({ children, md = 6 }) => {
-  return (
-    <GridItem md={md} style={{ textAlign: 'right' }}>
-      {children}
-    </GridItem>
-  )
-}
 
 const PharmacyDetails = ({ refreshClick }) => {
   const dispatch = useDispatch()
@@ -27,6 +11,14 @@ const PharmacyDetails = ({ refreshClick }) => {
 
   useEffect(() => {
     if (detailsId) {
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'inventorymedication' },
+      })
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'ctmedicationunitofmeasurement' },
+      })
       dispatch({ type: 'pharmacyDetails/query', payload: { id: detailsId } })
       setShowModal(true)
     }

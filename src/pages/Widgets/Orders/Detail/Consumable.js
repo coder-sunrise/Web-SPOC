@@ -86,13 +86,18 @@ const getVisitDoctorUserId = (props) => {
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
-    const { dispatch, currentType, getNextSequence, user, orders } = props
+    const { dispatch, currentType, getNextSequence, user, orders, codetable } = props
+    const { inventoryconsumable = [] } = codetable
     let { batchNo } = values
     if (batchNo instanceof Array) {
       if (batchNo && batchNo.length > 0) {
         batchNo = batchNo[0]
       }
     }
+
+    const consumable = inventoryconsumable.find(c => c.id === values.inventoryConsumableFK)
+    values.consumableName = consumable?.displayValue
+    values.unitOfMeasurement = consumable?.uom?.name
 
     const data = {
       isOrderedByDoctor:

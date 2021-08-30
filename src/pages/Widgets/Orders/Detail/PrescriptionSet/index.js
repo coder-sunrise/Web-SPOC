@@ -15,7 +15,7 @@ import {
   getDrugAllergy
 } from '@/pages/Widgets/Orders/utils'
 import Authorized from '@/utils/Authorized'
-import { getUniqueId } from '@/utils/utils'
+import { getUniqueId, getTranslationValue } from '@/utils/utils'
 import FitlerBar from './FilterBar'
 import Grid from './Grid'
 import Details from './Details'
@@ -27,11 +27,13 @@ import { getClinicianProfile } from '../../../ConsultationDocument/utils'
     codetable,
     user,
     visitRegistration,
+    clinicSettings
   }) => ({
     loading,
     codetable,
     user,
     visitRegistration,
+    clinicSettings: clinicSettings.settings || clinicSettings.default,
   }),
 )
 @withFormik({
@@ -71,7 +73,14 @@ class PrescriptionSetList extends PureComponent {
     })
   }
 
-  getInstruction = (instructions) => {
+  getInstruction = (instructions, language) => {
+    const { codetable } = this.props
+    const {
+      ctmedicationusage,
+      ctmedicationdosage,
+      ctmedicationunitofmeasurement,
+      ctmedicationfrequency,
+    } = codetable
     let instruction = ''
     let nextStepdose = ''
     const activeInstructions = instructions
@@ -80,6 +89,10 @@ class PrescriptionSetList extends PureComponent {
     if (activeInstructions) {
       for (let index = 0; index < activeInstructions.length; index++) {
         let item = activeInstructions[index]
+        const usage = ctmedicationusage.find(usage => usage.id === item.usageMethodFK)
+        const uom = ctmedicationunitofmeasurement.find(uom => uom.id === item.prescribeUOMFK)
+        const frequency = ctmedicationfrequency.find(frequency => frequency.id === item.drugFrequencyFK)
+        const dosage = ctmedicationdosage.find(dosage => dosage.id === item.dosageFK)
         if (instruction !== '') {
           instruction += ' '
         }
@@ -92,15 +105,23 @@ class PrescriptionSetList extends PureComponent {
 
         const itemDuration = item.duration ? ` For ${item.duration} day(s)` : ''
 
-        instruction += `${item.usageMethodDisplayValue
-          ? item.usageMethodDisplayValue
-          : ''} ${item.dosageDisplayValue
-            ? item.dosageDisplayValue
-            : ''} ${item.prescribeUOMDisplayValue
-              ? item.prescribeUOMDisplayValue
-              : ''} ${item.drugFrequencyDisplayValue
-                ? item.drugFrequencyDisplayValue
-                : ''}${itemDuration}${nextStepdose}`
+        instruction += `${getTranslationValue(
+          usage?.translationData,
+          language,
+          'displayValue',
+        )} ${getTranslationValue(
+          dosage?.translationData,
+          language,
+          'displayValue',
+        )} ${getTranslationValue(
+          uom?.translationData,
+          language,
+          'displayValue',
+        )} ${getTranslationValue(
+          frequency?.translationData,
+          language,
+          'displayValue',
+        )}${itemDuration}${nextStepdose}`
       }
     }
     return instruction
@@ -118,7 +139,8 @@ class PrescriptionSetList extends PureComponent {
   }
 
   GetNewMedication = () => {
-    const { getNextSequence, codetable, isRetail } = this.props
+    const { getNextSequence, codetable, isRetail, clinicSettings } = this.props
+    const { primaryPrintoutLanguage = 'EN', secondaryPrintoutLanguage = '' } = clinicSettings
     const {
       inventorymedication,
       ctmedicationusage,
@@ -155,13 +177,13 @@ class PrescriptionSetList extends PureComponent {
             return {
               usageMethodFK: usage ? usage.id : undefined,
               usageMethodCode: usage ? usage.code : undefined,
-              usageMethodDisplayValue: usage ? usage.name : undefined,
+              usageMethodDisplayValue: usage ? usage.displayVaue : undefined,
               dosageFK: dosage ? dosage.id : undefined,
               dosageCode: dosage ? dosage.code : undefined,
               dosageDisplayValue: dosage ? dosage.displayValue : undefined,
               prescribeUOMFK: uom ? uom.id : undefined,
               prescribeUOMCode: uom ? uom.code : undefined,
-              prescribeUOMDisplayValue: uom ? uom.name : undefined,
+              prescribeUOMDisplayValue: uom ? uom.displayValue : undefined,
               drugFrequencyFK: frequency ? frequency.id : undefined,
               drugFrequencyCode: frequency ? frequency.code : undefined,
               drugFrequencyDisplayValue: frequency
@@ -174,7 +196,8 @@ class PrescriptionSetList extends PureComponent {
             }
           })
 
-          let instruction = this.getInstruction(itemInstructions)
+          const instruction = this.getInstruction(itemInstructions, primaryPrintoutLanguage)
+          const secondInstruction = secondaryPrintoutLanguage !== '' ? this.getInstruction(itemInstructions, secondaryPrintoutLanguage) : ''
 
           let itemExpiryDate
           let itemBatchNo
@@ -182,6 +205,7 @@ class PrescriptionSetList extends PureComponent {
           let itemUnitPrice
           let itemDispenseUOMCode
           let itemDispenseUOMDisplayValue
+          let itemSecondDispenseUOMDisplayValue
           let itemDispenseUOMFK
           let itemDrugCode
           let itemDrugName
@@ -250,10 +274,17 @@ class PrescriptionSetList extends PureComponent {
             itemDispenseUOMCode = drug.dispensingUOM
               ? drug.dispensingUOM.code
               : undefined
-
-            itemDispenseUOMDisplayValue = drug.dispensingUOM
-              ? drug.dispensingUOM.name
-              : undefined
+            const uom = ctmedicationunitofmeasurement.find(uom => uom.id === drug?.dispensingUOM?.id)
+            itemDispenseUOMDisplayValue = getTranslationValue(
+              uom?.translationData,
+              primaryPrintoutLanguage,
+              'displayValue',
+            )
+            itemSecondDispenseUOMDisplayValue = secondaryPrintoutLanguage !== '' ? getTranslationValue(
+              uom?.translationData,
+              secondaryPrintoutLanguage,
+              'displayValue',
+            ) : ''
 
             itemDispenseUOMFK = drug.dispensingUOM
               ? drug.dispensingUOM.id
@@ -271,7 +302,17 @@ class PrescriptionSetList extends PureComponent {
             itemCostPrice = item.costPrice || 0
             itemUnitPrice = item.unitPrice || 0
             itemDispenseUOMCode = item.dispenseUOMCode
-            itemDispenseUOMDisplayValue = item.dispenseUOMDisplayValue
+            const uom = ctmedicationunitofmeasurement.find(uom => uom.id === item.dispenseUOMFK)
+            itemDispenseUOMDisplayValue = getTranslationValue(
+              uom?.translationData,
+              primaryPrintoutLanguage,
+              'displayValue',
+            )
+            itemSecondDispenseUOMDisplayValue = secondaryPrintoutLanguage !== '' ? getTranslationValue(
+              uom?.translationData,
+              secondaryPrintoutLanguage,
+              'displayValue',
+            ) : ''
             itemDispenseUOMFK = item.dispenseUOMFK
             itemDrugCode = 'DrugMixture'
             itemDrugName = item.drugName
@@ -364,10 +405,12 @@ class PrescriptionSetList extends PureComponent {
             unitPrice: itemUnitPrice,
             dispenseUOMCode: itemDispenseUOMCode,
             dispenseUOMDisplayValue: itemDispenseUOMDisplayValue,
+            secondDispenseUOMDisplayValue: itemSecondDispenseUOMDisplayValue,
             dispenseUOMFK: itemDispenseUOMFK,
             drugCode: itemDrugCode,
             drugName: itemDrugName,
             instruction,
+            secondInstruction,
             inventoryMedicationFK: item.inventoryMedicationFK,
             isActive: true,
             isDeleted: false,
