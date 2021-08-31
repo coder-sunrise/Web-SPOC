@@ -16,12 +16,18 @@ import {
 import Authorized from '@/utils/Authorized'
 import { AppointmentTypeLabel } from '@/components/_medisys'
 import { APPOINTMENT_STATUS, mapApptStatus } from '@/utils/constants'
+import { grayColors } from '@/assets/jss'
 
 const styles = (theme) => ({
   subRow: {
     '& > td:first-child': {
       paddingLeft: theme.spacing(1),
     },
+  },
+  disabledRow: {
+    '& > td':{
+      color: grayColors[3],
+    }
   },
 })
 
@@ -88,15 +94,16 @@ class Grid extends PureComponent {
       handleDoubleClick(selectedData)
     }
 
+    const disabledRowClass = isDisabledRow() ? ` ${classes.disabledRow}` : null
     if (row.countNumber === 1) {
       return (
-        <Table.Row {...p} onDoubleClick={doubleClick}>
+        <Table.Row {...p} onDoubleClick={doubleClick} className={disabledRowClass}>
           {newchildren}
         </Table.Row>
       )
     }
     return (
-      <Table.Row {...p} className={classes.subRow} onDoubleClick={doubleClick}>
+      <Table.Row {...p} className={classes.subRow + disabledRowClass} onDoubleClick={doubleClick}>
         {newchildren}
       </Table.Row>
     )

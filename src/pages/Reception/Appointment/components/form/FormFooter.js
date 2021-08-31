@@ -59,7 +59,7 @@ const FormFooter = ({
           </Button>
         </Authorized>
         <Button
-          disabled={disabledCheckAvailability || isTurnedUp}
+          disabled={disabledCheckAvailability || isTurnedUp ||　isCancelled}
           color='success'
           onClick={handleValidateClick}
         >
@@ -78,7 +78,7 @@ const FormFooter = ({
         )}
         <Authorized authority='appointment.appointmentdetails'>
           <Button
-            disabled={disabled || isTurnedUp || !patientIsActive}
+            disabled={disabled || isTurnedUp || isCancelled || !patientIsActive}
             onClick={handleConfirmClick}
             color='primary'
           >
