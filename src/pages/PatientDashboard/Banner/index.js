@@ -759,7 +759,7 @@ class Banner extends PureComponent {
   }
 
   getBannerMd = () => {
-    const { from, extraCmt } = this.props
+    const { from, extraCmt } = this.props    
     if (from === 'Consultation' || from === 'PatientDashboard') return 9
     if (extraCmt) return 11
     return 12
@@ -934,6 +934,18 @@ class Banner extends PureComponent {
                     value={info.dob}
                   />
                 </span>
+                {', '}
+                <span className={classes.part}>
+                  {'(+'}
+                  <CodeSelect
+                    className={classes.part}
+                    text
+                    code='ctcountrycode'
+                    labelField='code'
+                    value={info.contact?.mobileContactNumber?.countryCodeFK}
+                  />
+                  {`) ${info.contact?.mobileContactNumber?.number}`}
+                </span>
                 <span className={classes.part}>
                   <Link className={classes.header}>
                     <span
@@ -958,14 +970,14 @@ class Banner extends PureComponent {
                 <span
                   style={{
                     ...headerStyles,
-                    color: info.patientMedicalHistory.highRiskCondition
+                    color: info.patientMedicalHistory?.highRiskCondition
                       ? 'red'
                       : headerStyles.color,
                   }}
                 >
                   HRP:{' '}
                 </span>
-                <span>{info.patientMedicalHistory.highRiskCondition}</span>
+                <span>{info.patientMedicalHistory?.highRiskCondition}</span>
               </GridItem>
               <GridItem xs={6} md={2} className={classes.cell}>
                 <span
@@ -1056,7 +1068,7 @@ class Banner extends PureComponent {
               <GridItem xs={6} md={7} className={classes.cell}>
                 <span className={classes.header}>Long Term Medication: </span>
                 <span>
-                  {info.patientMedicalHistory.longTermMedication || '-'}
+                  {info.patientMedicalHistory?.longTermMedication || '-'}
                 </span>
               </GridItem>
               <GridItem xs={6} md={3} className={classes.cell}>

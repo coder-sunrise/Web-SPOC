@@ -9,6 +9,7 @@ import { formatMessage } from 'umi'
 import { withStyles, Fab, Paper } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
 import Search from '@material-ui/icons/Search'
+import Refresh from '@material-ui/icons/Refresh'
 import BookmarkIcon from '@material-ui/icons/Bookmark'
 import { connect } from 'dva'
 import { compose } from 'redux'
@@ -242,14 +243,13 @@ const FilterBar = props => {
             </Popover>
           </div>
         </GridItem>
-
-        <GridItem xs md={8}>
+        <GridItem xs md={3}>
           <ProgressButton
-            icon={<Search />}
+            icon={<Refresh />}
             color='primary'
             onClick={onFilterClick}
           >
-            Filter
+            Refresh
           </ProgressButton>
           <ProgressButton
             icon={<Search />}
@@ -258,6 +258,8 @@ const FilterBar = props => {
           >
             Search Appointment
           </ProgressButton>
+        </GridItem>
+        <GridItem xs md={8}>
           <Authorized authority='appointment.newappointment'>
             <Button
               color='primary'

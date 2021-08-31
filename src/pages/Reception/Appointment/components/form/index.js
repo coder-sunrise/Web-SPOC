@@ -1195,11 +1195,11 @@ class Form extends React.PureComponent {
               className={classnames(classes.formContent)}
               alignItems='flex-start'
               style={{
-                height: this.props.height - (this.state.bannerHeight || 0) - 100,
+                height: this.props.height - (this.state.bannerHeight || 0),// - 100,
                 overflow: 'auto',
               }}
             >
-              <GridItem container xs={12} md={7}>
+              <GridItem container xs={12} md={6}>
                 <GridItem
                   container
                   xs
@@ -1224,7 +1224,7 @@ class Form extends React.PureComponent {
                     values={values}
                     hasActiveSession={this.state.hasActiveSession}
                   />
-                  <AppointmentDateInput disabled={_disableAppointmentDate} visitOrderTemplateOptions={visitOrderTemplateOptions} />
+                  <AppointmentDateInput disabled={_disableAppointmentDate} visitOrderTemplateOptions={visitOrderTemplateOptions} patientProfileFK={values.patientProfileFK}/>
                   <GridItem xs md={12} className={classes.verticalSpacing}>
                     <AppointmentDataGrid
                       validationSchema={gridValidationSchema}
@@ -1303,7 +1303,7 @@ class Form extends React.PureComponent {
                   />
                 </GridItem>
               </GridItem>
-              <GridItem xs={12} md={5}>
+              <GridItem xs={12} md={6}>
                 <CardContainer
                   hideHeader
                   className={classes.appointmentHistory}

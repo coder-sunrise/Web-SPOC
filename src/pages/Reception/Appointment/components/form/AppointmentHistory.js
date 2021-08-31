@@ -21,9 +21,10 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ patient, user }) => ({
+@connect(({ patient, user, codetable }) => ({
   patient: patient.entity || {},
   user,
+  appointmentTypes: codetable.ctappointmenttype,
 }))
 class AppointmentHistory extends PureComponent {
   state = {
@@ -196,6 +197,7 @@ class AppointmentHistory extends PureComponent {
   render () {
     const { classes, theme, handleRowDoubleClick } = this.props
     const { previousAppt, futureAppt, loadingAppt } = this.state
+
     return (
       <LoadingWrapper loading={loadingAppt} text='loading...'>
         <div>
@@ -206,7 +208,7 @@ class AppointmentHistory extends PureComponent {
               size='sm'
               rows={futureAppt}
               onRowDoubleClick={handleRowDoubleClick}
-              {...futureApptTableParams}
+              {...futureApptTableParams(this.props.appointmentTypes)}
             />
 
             <h4
@@ -219,7 +221,7 @@ class AppointmentHistory extends PureComponent {
             <CommonTableGrid
               size='sm'
               rows={previousAppt}
-              {...previousApptTableParams}
+              {...previousApptTableParams(this.props.appointmentTypes)}
             />
           </CardContainer>
         </div>
