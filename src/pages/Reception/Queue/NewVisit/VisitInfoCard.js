@@ -386,7 +386,9 @@ const VisitInfoCard = ({
               labelField='displayValue'
               value={values.visitGroup}
               disabled={isVisitReadonlyAfterSigned}
-              options={[...queueLog.list.filter(q => patientInfo && patientInfo.name !== q.patientName).map(l => {                      
+              options={[...queueLog.list.filter((q, i, a) => {
+                return patientInfo && patientInfo.name !== q.patientName && a.map(m => m.patientName).indexOf(q.patientName) === i
+              }).map(l => {
                   return {
                     visitGroup: l.visitGroup || l.id,
                     displayValue: l.visitGroup || 'New Group Number',
@@ -436,6 +438,7 @@ const VisitInfoCard = ({
           <Popover 
             icon={null}
             visible={visitGroupPopup}
+            placement='rightTop'
             content={<div>
               <p>- Search by existing group number or patient name.</p>
               <p>- Selecting visit group will set Cons. Ready to "No".</p>

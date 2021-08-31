@@ -396,7 +396,7 @@ class Banner extends PureComponent {
                 }}
               >
                 {s.copaymentSchemeName || s.schemeTypeName}
-                {s.validTo ? ` (Exp: ${moment(s.validTo).format('DD/MM/YYYY')})` : ''}
+                {s.validTo ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})` : ''}
               </span>
             </Link>
           </Popover>)
@@ -412,7 +412,7 @@ class Banner extends PureComponent {
               }}
             >
               {s.copaymentSchemeName || s.schemeTypeName}
-              {s.validTo ? ` (Exp: ${moment(s.validTo).format('DD/MM/YYYY')})` : ''}
+              {s.validTo ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})` : ''}
             </span>
           </Link>)}
       </span>
@@ -769,7 +769,7 @@ class Banner extends PureComponent {
 
   getBannerMd = () => {
     const { from, extraCmt } = this.props
-    if (from === 'Consultation')
+    if (from === 'Consultation' || from === 'PatientDashboard')
       return 9
     if (extraCmt)
       return 11
@@ -1197,15 +1197,18 @@ class Banner extends PureComponent {
           onClose={this.closePreOrders}
           maxWidth='lg'
         >
-          <SelectPreOrder onSelectPreOrder={(select) => {
-            if (onSelectPreOrder)
-              onSelectPreOrder(select)
-            this.closePreOrders()
-          }} activePreOrderItem={activePreOrderItem} />
+          <SelectPreOrder 
+            disabled={from !== 'Appointment'}
+            onSelectPreOrder={(select) => {
+              if (onSelectPreOrder)
+                onSelectPreOrder(select)
+              this.closePreOrders()
+            }} 
+            activePreOrderItem={activePreOrderItem} />
         </CommonModal>
         <CommonModal
           open={this.state.showSchemeModal}
-          title='Scheme Details'
+          title='Co-Payer Details'
           onClose={this.closeScheme}
           maxWidth='lg'
         >
