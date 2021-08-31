@@ -382,7 +382,7 @@ class Banner extends PureComponent {
               >
                 {s.copaymentSchemeName || s.schemeTypeName}
                 {s.validTo
-                  ? ` (Exp: ${moment(s.validTo).format('DD/MM/YYYY')})`
+                  ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`
                   : ''}
               </span>
             </Link>
@@ -401,7 +401,7 @@ class Banner extends PureComponent {
             >
               {s.copaymentSchemeName || s.schemeTypeName}
               {s.validTo
-                ? ` (Exp: ${moment(s.validTo).format('DD/MM/YYYY')})`
+                ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`
                 : ''}
             </span>
           </Link>
@@ -760,7 +760,7 @@ class Banner extends PureComponent {
 
   getBannerMd = () => {
     const { from, extraCmt } = this.props
-    if (from === 'Consultation') return 9
+    if (from === 'Consultation' || from === 'PatientDashboard') return 9
     if (extraCmt) return 11
     return 12
   }
@@ -1212,6 +1212,7 @@ class Banner extends PureComponent {
           maxWidth='lg'
         >
           <SelectPreOrder
+            disabled={from !== 'Appointment'}
             onSelectPreOrder={select => {
               if (onSelectPreOrder) onSelectPreOrder(select)
               this.closePreOrders()
@@ -1221,7 +1222,7 @@ class Banner extends PureComponent {
         </CommonModal>
         <CommonModal
           open={this.state.showSchemeModal}
-          title='Scheme Details'
+          title='Co-Payer Details'
           onClose={this.closeScheme}
           maxWidth='lg'
         >

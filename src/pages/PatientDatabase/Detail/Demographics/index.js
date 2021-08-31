@@ -67,7 +67,7 @@ class Demographic extends PureComponent {
             .filter(
               t =>
                 t.category === 'Patient' 
-                && values.patientTag.findIndex(st => st.tagFK === t.id) !== -1,
+                && values.patientTag && values.patientTag.findIndex(st => st.tagFK === t.id) !== -1,
             )
             .map(t => t.displayValue),
         })
@@ -167,7 +167,6 @@ class Demographic extends PureComponent {
     const { props } = this
     const { values, theme, setFieldValue, classes, dispatch } = props
     const { isPatientNameAutoUpperCase } = props.clinicSettings
-
     return (
       <div>
         <GridContainer gutter={0}>
@@ -523,7 +522,7 @@ class Demographic extends PureComponent {
                         label='Patient Tags:'
                         tagCategory='Patient'
                         defaultTagNames={this.state.patientTags}
-                        disabled={!values.isActive}
+                        disabled={values.isActive === false}
                         onChange={(value, tags) =>
                           this.handleTagPanelChange(
                             value,
