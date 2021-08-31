@@ -800,6 +800,10 @@ class Banner extends PureComponent {
       'appointment.actualizepreorder',
     ) || { rights: 'hidden' }
 
+    const notesHistoryAccessRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
+    ) || { rights: 'hidden' }
+
     const { entity } = patient
     if (!entity)
       return (
@@ -1036,11 +1040,7 @@ class Banner extends PureComponent {
                 <span>{this.getAllergyData()}</span>
               </GridItem>
               <GridItem xs={6} md={2} className={classes.cell}>
-                <Authorized
-                  authority={
-                    'patientdatabase.patientprofiledetails.patienthistory.nursenotes'
-                  }
-                >
+                {notesHistoryAccessRight.rights !== 'hidden' && (
                   <Link className={classes.header}>
                     <span
                       style={{ textDecoration: 'underline' }}
@@ -1051,7 +1051,7 @@ class Banner extends PureComponent {
                       Notes
                     </span>
                   </Link>
-                </Authorized>
+                )}
               </GridItem>
               <GridItem xs={6} md={7} className={classes.cell}>
                 <span className={classes.header}>Long Term Medication: </span>
