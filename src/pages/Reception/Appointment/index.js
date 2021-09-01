@@ -314,7 +314,6 @@ class Appointment extends React.PureComponent {
         .toDate(),
       doctor: resourceId,
     }
-    console.log('report payload',payload)
     return payload
   }
 
