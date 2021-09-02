@@ -59,6 +59,19 @@ const calendarViewstyles = () => ({
       },
     },
   },
+  calendarHeightSettingStyle:{
+    '& .rbc-time-view > .rbc-time-content > .rbc-time-column':{
+      height:1400,
+      '& > .rbc-timeslot-group':{
+        minHeight:'unset',
+        '& > div':{
+          minHeight:'unset !important',
+          maxHeight:'unset !important',
+          height:'100%',
+        },
+      }
+    },
+  },
 })
 
 const DragAndDropCalendar = withDragAndDrop(BigCalendar)
@@ -211,6 +224,12 @@ const MonthDateHeader = withStyles(styles, { name: 'MonthDateHeader' })(
   }),
 )
 
+const changeTimeRulerExtentPixel = (height) => {
+  var calendarView = Object.values(document.styleSheets).filter(x=> x.ownerNode.dataset.meta === 'CalendarView')
+  var heightStyle = Object.values(calendarView[0].cssRules).filter(x=>x.selectorText.includes('CalendarView-calendarHeightSettingStyle'))[0]
+  heightStyle.style.height = `${height||1400}px`
+}
+
 const CalendarView = ({
   dispatch,
   // --- event handlers ---
@@ -229,11 +248,14 @@ const CalendarView = ({
   filter,
   loading,
   appointmentTypes,
-  apptTimeSlotDuration = 30 ,
+  apptTimeSlotDuration = 15 ,
+  apptTimeRulerExtent = 1400 ,
   printDailyAppointmentReport,
   classes,
 }) => {
   const calendar = useRef(null);
+
+  changeTimeRulerExtentPixel(apptTimeRulerExtent)
 
   const _draggableAccessor = event => {
     if (event.isEnableRecurrence) return false
@@ -517,6 +539,7 @@ const CalendarView = ({
         resizable={false}
         showMultiDayTimes={false}
         step={apptTimeSlotDuration}
+        className={classes.calendarHeightSettingStyle}
         timeslots={1}
         longPressThreshold={500}
         tooltipAccessor={null}
@@ -554,6 +577,7 @@ const _CalendarView = connect(({ calendar, codetable, loading, doctorBlock, clin
   appointmentTypes: codetable.ctappointmenttype || [],
   loading: loading.models.calendar,
   apptTimeSlotDuration: clinicSettings.settings.apptTimeSlotDuration,
+  apptTimeRulerExtent: clinicSettings.settings.apptTimeRulerExtent,
 }))(CalendarView)
 
 export default withStyles(calendarViewstyles, { name:"CalendarView", withTheme: true })(_CalendarView)
