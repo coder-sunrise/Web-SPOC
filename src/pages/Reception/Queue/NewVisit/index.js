@@ -426,7 +426,8 @@ class NewVisit extends PureComponent {
             >
               <PatientBanner
                 from='VisitReg'
-                extraCmt={              
+                activePreOrderItem={patientInfo?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
+                extraCmt={
                   <div
                     style={{
                       display: 'flex',
@@ -438,7 +439,7 @@ class NewVisit extends PureComponent {
                   >
                     {patientInfo && <PrintLabLabelButton
                       patientId={patientInfo.id}
-                      clinicSettings={clinicSettings}
+                      clinicSettings={clinicSettings?.settings}
                       isEnableScanner
                     />}
                   </div>
