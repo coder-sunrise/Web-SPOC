@@ -3,5 +3,5 @@ export default {
   'app.exception.description.403': "Sorry, you don't have access to this page",
   'app.exception.description.404': 'Sorry, the page you visited does not exist',
   'app.exception.description.500':
-    'Sorry, something is wrong. Please click REFRESH button and try again',
+    'Sorry, something is wrong. Please click Refresh and try again',
 }
