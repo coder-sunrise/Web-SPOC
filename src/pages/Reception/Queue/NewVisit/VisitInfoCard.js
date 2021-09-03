@@ -407,8 +407,8 @@ const VisitInfoCard = ({
               dropdownStyle={{ minWidth: "20%" }}
               onClear={handleVisitGroupChange}
               onSelect={handleVisitGroupChange}
-              onFocus={handleVisitGroupFocus}
-              onBlur={handleVisitGroupBlur}
+              // onFocus={handleVisitGroupFocus}
+              // onBlur={handleVisitGroupBlur}
               renderDropdown={(option) => {
                 return <div>
                   <span style={{ position: 'absolute'}}><b>{option.visitGroup === option.order ? '' : option.visitGroup}</b></span>
@@ -435,22 +435,24 @@ const VisitInfoCard = ({
           </Authorized>
         </GridItem>
         <GridItem xs md={3}>  
-          <Popover 
-            icon={null}
-            visible={visitGroupPopup}
-            placement='rightTop'
-            content={<div>
-              <p>- Search by existing group number or patient name.</p>
-              <p>- Selecting visit group will set Cons. Ready to "No".</p>
-            </div>}>
-            <IconButton
-              size='small'
-              onMouseOver={handleVisitGroupFocus} 
-              onMouseOut={handleVisitGroupBlur} 
-            >
-              <InfoCircleOutlined />
-            </IconButton>
-          </Popover>
+          <Authorized authority='queue.visitgroup'>
+            <Popover 
+              icon={null}
+              visible={visitGroupPopup}
+              placement='topLeft'
+              content={<div>
+                <p>- Search by existing group number or patient name.</p>
+                <p>- Selecting visit group will set Cons. Ready to "No".</p>
+              </div>}>
+              <IconButton
+                size='small'
+                onMouseOver={handleVisitGroupFocus} 
+                onMouseOut={handleVisitGroupBlur} 
+              >
+                <InfoCircleOutlined />
+              </IconButton>
+            </Popover>
+          </Authorized>
         </GridItem>
         {showAdjusment &&
         ((ctinvoiceadjustment || []).length > 0 ||
