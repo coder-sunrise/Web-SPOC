@@ -131,13 +131,14 @@ class Dispense extends PureComponent {
   }
 
   render () {
-    const { classes, dispense, loading } = this.props
+    const { classes, dispense, loading, patient } = this.props
     const { editingOrder } = dispense
     return (
       <div className={classes.root}>
         <LoadingWrapper loading={loading.models.dispense}>
           <Banner
-            patientInfo={dispense.patientInfo}
+            from='Dispense' 
+            activePreOrderItem={patient?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
             extraCmt={this.getExtraComponent()}
           />
           <SizeContainer size='sm'>

@@ -967,6 +967,7 @@ class Main extends React.Component {
       formik,
       rights,
       disabled,
+      patient,
       ...resetProps
     } = this.props
 
@@ -979,12 +980,12 @@ class Main extends React.Component {
     const matches = {
       rights: rights === 'enable' && visit.visitStatus === VISIT_STATUS.PAUSED ? 'disable' : rights,
     }
-    // console.log(matches)
     // console.log('main', { values })
     return (
       <div className={classes.root}>
         <PatientBanner 
           from='Consultation'
+          activePreOrderItem={patient?.entity?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
           extraCmt={this.getExtraComponent()}
           {...this.props}
         />
