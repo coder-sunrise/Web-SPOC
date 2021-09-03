@@ -237,34 +237,28 @@ class CommonTableGrid extends PureComponent {
     this.TableHeaderRow = ({ row, ...restProps }) => (
       <TableHeaderRow
         {...restProps}
-        // titleComponent={({ children }) => {
-        //   return (
-        //     <Tooltip title={children} placement='top'>
-        //       <div>{children}</div>
-        //     </Tooltip>
-        //   )
-        // }}
-        sortLabelComponent={({ children, ...p }) => {
-          const { classes } = this.props
+        titleComponent={({ children }) => {
           return (
-            // <TableHeaderRow.SortLabel
-            //   {...p}
-            //   getMessage={(ps) => {
-            //     // console.log(ps)
-            //     return ''
-            //   }}
-            // >
-              <Tooltip title={p.column.fullTitle || children} placement='top'>
-                <div className={classes.sortLabel} onClick={p.disabled ? null : p.onSort}>
-                  <span style={{display: 'inline-block'}}>{children}</span>
-                  {!p.disabled && (<span className={classes.sortIcon}>
-                    <SortingIcon direction={p.direction}/>
-                  </span>)}
-                </div>
-              </Tooltip>
-            // </TableHeaderRow.SortLabel>
+            <Tooltip title={children} placement='top'>
+              <div>{children}</div>
+            </Tooltip>
           )
         }}
+        sortLabelComponent={({ children, ...p }) => {
+          return (
+            <TableHeaderRow.SortLabel
+              {...p}
+              getMessage={() => {
+                return ''
+              }}
+            >
+            <Tooltip title={children} placement='top'>
+            <div>{children}</div>
+          </Tooltip>
+            </TableHeaderRow.SortLabel>
+          )
+        }
+      }
       />
     )
 
@@ -1215,7 +1209,6 @@ class CommonTableGrid extends PureComponent {
                 />
               )}
               {header && <HeaderRow showSortingControls />}
-
               {extraRow.map((o) => o)}
               {pager && <PagingPanel pageSizes={pageSizes} {...pagerConfig} />}
               {grouping && (

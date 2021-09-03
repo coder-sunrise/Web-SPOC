@@ -40,10 +40,24 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
         width: 180,
         options: () => preOrderItemCategory,
         isDisabled: () => true,
+        render: row => {
+          return (
+            <Tooltip title={row.preOrderItemType}>
+              <div>{row.preOrderItemType}</div>
+            </Tooltip>
+          )
+        },
       },
       {
         columnName: 'itemName',
         isDisabled: () => true,
+        render: row => {
+          return (
+            <Tooltip title={row.itemName}>
+              <div>{row.itemName}</div>
+            </Tooltip>
+          )
+        },
       },
       {
         columnName: 'quantity',
@@ -52,9 +66,17 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
         width: 100,
         render: row => {
           return (
-            <span>
-              {row.quantity.toFixed(1)} {row.dispenseUOM}
-            </span>
+            <Tooltip
+              title={
+                <span>
+                  {row.quantity.toFixed(1)} {row.dispenseUOM}
+                </span>
+              }
+            >
+              <span>
+                {row.quantity.toFixed(1)} {row.dispenseUOM}
+              </span>
+            </Tooltip>
           )
         },
         isDisabled: () => true,
@@ -64,6 +86,13 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
         width: 150,
         type: 'text',
         isDisabled: () => true,
+        render: row => {
+          return (
+            <Tooltip title={row.orderByUser}>
+              <div>{row.orderByUser}</div>
+            </Tooltip>
+          )
+        },
       },
       {
         columnName: 'orderDate',
@@ -81,6 +110,13 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
         maxLength: 100,
         sortingEnabled: false,
         isDisabled: () => true,
+        render: row => {
+          return (
+            <Tooltip title={row.remarks}>
+              <div>{row.remarks}</div>
+            </Tooltip>
+          )
+        },
       },
       {
         columnName: 'amount',
@@ -96,9 +132,17 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
         sortingEnabled: false,
         render: row => {
           return (
-            <span>
-              {row.actualizedQuantity.toFixed(1)} {row.dispenseUOM}
-            </span>
+            <Tooltip
+              title={
+                <span>
+                  {row.actualizedQuantity.toFixed(1)} {row.dispenseUOM}
+                </span>
+              }
+            >
+              <span>
+                {row.actualizedQuantity.toFixed(1)} {row.dispenseUOM}
+              </span>
+            </Tooltip>
           )
         },
         isDisabled: () => true,
@@ -108,7 +152,11 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
         type: 'text',
         isDisabled: () => true,
         render: row => {
-          return row.actualizedByUser ? row.actualizedByUser : '-'
+          return (
+            <Tooltip title={row.actualizedByUser ? row.actualizedByUser : '-'}>
+              <div>{row.actualizedByUser ? row.actualizedByUser : '-'}</div>
+            </Tooltip>
+          )
         },
       },
       {

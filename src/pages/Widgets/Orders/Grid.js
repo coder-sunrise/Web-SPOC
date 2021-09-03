@@ -12,7 +12,10 @@ import { currencySymbol, currencyFormat } from '@/utils/config'
 import { Link } from 'umi'
 
 import numeral from 'numeral'
-import { RADIOLOGY_WORKITEM_STATUS, NURSE_WORKITEM_STATUS } from '@/utils/constants'
+import {
+  RADIOLOGY_WORKITEM_STATUS,
+  NURSE_WORKITEM_STATUS,
+} from '@/utils/constants'
 import {
   CommonTableGrid,
   Button,
@@ -115,8 +118,11 @@ export default ({
     const { nurseWorkitem = {}, radiologyWorkitem = {} } = workitem
     const { nuseActualize = [] } = nurseWorkitem
     if (!row.isPreOrder) {
-      if ((row.type === '10' && radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCCELED)
-        || nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED) {
+      if (
+        (row.type === '10' &&
+          radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCCELED) ||
+        nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
+      ) {
         return
       }
     }
@@ -355,7 +361,8 @@ export default ({
     return (
       <DrugMixtureInfo
         values={activePrescriptionItemDrugMixture}
-        isShowTooltip={false} right={right}
+        isShowTooltip={true}
+        right={right}
       />
     )
   }
@@ -409,47 +416,74 @@ export default ({
     return row.subject
   }
 
-  const radiologyWorkitemStatus = (radiologyWorkitemStatusFK) => {
+  const radiologyWorkitemStatus = radiologyWorkitemStatusFK => {
     if (radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.NEW)
-      return <Tooltip title='New'>
-        <div style={{
-          position: 'absolute',
-          bottom: 2,
-          right: -15,
-          borderRadius: 8,
-          height: 16,
-          width: 16,
-          border: '2px solid #4876FF',
-          cursor: 'pointer'
-        }} />
-      </Tooltip>
+      return (
+        <Tooltip title='New'>
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 2,
+              right: -15,
+              borderRadius: 8,
+              height: 16,
+              width: 16,
+              border: '2px solid #4876FF',
+              cursor: 'pointer',
+            }}
+          />
+        </Tooltip>
+      )
 
-    if (radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT
-      || radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED
-      || radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS)
-      return <Tooltip title={radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS ? 'In Progress' : 'Completed'} >
-        <div style={{
-          position: 'absolute',
-          bottom: 2,
-          right: -20,
-          borderRadius: 8,
-          height: 16,
-          width: 16,
-          backgroundColor: radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS ? '#4876FF' : '#008B00',
-          cursor: 'pointer'
-        }} />
-      </Tooltip >
+    if (
+      radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT ||
+      radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
+      radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
+    )
+      return (
+        <Tooltip
+          title={
+            radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
+              ? 'In Progress'
+              : 'Completed'
+          }
+        >
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 2,
+              right: -20,
+              borderRadius: 8,
+              height: 16,
+              width: 16,
+              backgroundColor:
+                radiologyWorkitemStatusFK ===
+                RADIOLOGY_WORKITEM_STATUS.INPROGRESS
+                  ? '#4876FF'
+                  : '#008B00',
+              cursor: 'pointer',
+            }}
+          />
+        </Tooltip>
+      )
     if (radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.CANCCELED)
-      return <Tooltip title='Cancelled'>
-        <div style={{
-          position: 'absolute',
-          bottom: 2,
-          right: -20,
-          cursor: 'pointer'
-        }} >
-          <Cross style={{ color: 'red', height: 20, width: 20 }} color='red' />
-        </div>
-      </Tooltip>
+      return (
+        <Tooltip title='Cancelled'>
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 2,
+              right: -20,
+              cursor: 'pointer',
+            }}
+          >
+            <Cross
+              style={{ color: 'red', height: 20, width: 20 }}
+              color='red'
+            />
+          </div>
+        </Tooltip>
+      )
     return ''
   }
 
@@ -459,7 +493,11 @@ export default ({
       style={{ margin: 0 }}
       forceRender
       rows={(rows || []).map(r => {
-        return { ...r, currentTotal: (!r.isPreOrder || r.isChargeToday) ? r.totalAfterItemAdjustment : 0 }
+        return {
+          ...r,
+          currentTotal:
+            !r.isPreOrder || r.isChargeToday ? r.totalAfterItemAdjustment : 0,
+        }
       })}
       onRowDoubleClick={editRow}
       getRowId={r => r.uid}
@@ -540,7 +578,11 @@ export default ({
               let newChildren = []
               if (isExistPackage) {
                 newChildren = [
-                  <Table.Cell colSpan={3} key={1} style={{ position: 'relative' }} />,
+                  <Table.Cell
+                    colSpan={3}
+                    key={1}
+                    style={{ position: 'relative' }}
+                  />,
                   React.cloneElement(children[6], {
                     colSpan: 3,
                     ...restProps,
@@ -548,7 +590,11 @@ export default ({
                 ]
               } else {
                 newChildren = [
-                  <Table.Cell colSpan={2} key={1} style={{ position: 'relative' }} />,
+                  <Table.Cell
+                    colSpan={2}
+                    key={1}
+                    style={{ position: 'relative' }}
+                  />,
                   React.cloneElement(children[5], {
                     colSpan: 2,
                     ...restProps,
@@ -705,8 +751,7 @@ export default ({
             let paddingRight = 0
             if (row.isPreOrder && row.isExclusive) {
               paddingRight = 52
-            }
-            else if (row.isPreOrder || row.isExclusive) {
+            } else if (row.isPreOrder || row.isExclusive) {
               paddingRight = 24
             }
 
@@ -716,13 +761,15 @@ export default ({
 
             return (
               <div style={{ position: 'relative' }}>
-                <div style={{
-                  wordWrap: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                  paddingRight: paddingRight
-                }}>
+                <div
+                  style={{
+                    wordWrap: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                    paddingRight: paddingRight,
+                  }}
+                >
                   <Tooltip title={texts}>
-                    <span >{texts}</span>
+                    <span>{texts}</span>
                   </Tooltip>
                   <div style={{ position: 'relative', top: 2 }}>
                     {drugMixtureIndicator(row, -20)}
@@ -735,7 +782,10 @@ export default ({
                             borderRadius: 10,
                             backgroundColor: '#4255bd',
                           }}
-                        > Pre</div>
+                        >
+                          {' '}
+                          Pre
+                        </div>
                       </Tooltip>
                     )}
                     {row.isExclusive && (
@@ -747,10 +797,13 @@ export default ({
                             borderRadius: 4,
                             backgroundColor: 'green',
                           }}
-                        >Excl.</div>
+                        >
+                          Excl.
+                        </div>
                       </Tooltip>
                     )}
-                    {radiologyWorkitemStatusFK && radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
+                    {radiologyWorkitemStatusFK &&
+                      radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
                   </div>
                 </div>
               </div>
@@ -765,8 +818,12 @@ export default ({
                 <Tooltip
                   title={
                     <div>
-                      {`Code/Name: ${row.serviceCode || row.drugCode || row.consumableCode || row.vaccinationCode} / ${getDisplayName(row)}`}<br />
-                      {`UnitPrice/UOM: ${currencySymbol}${numeral(row.unitPrice,).format(currencyFormat)} / ${row.dispenseUOMDisplayValue || row.unitOfMeasurement || row.uomDisplayValue || '-'}`}
+                      {`Code: ${row.serviceCode ||
+                        row.drugCode ||
+                        row.consumableCode ||
+                        row.vaccinationCode}`}
+                      <br />
+                      {`Name: ${getDisplayName(row)}`}
                     </div>
                   }
                 >
@@ -813,7 +870,7 @@ export default ({
         {
           columnName: 'currentTotal',
           type: 'currency',
-          width: 100
+          width: 100,
         },
         {
           columnName: 'quantity',
@@ -822,11 +879,13 @@ export default ({
           render: row => {
             let qty = '0.0'
             if (row.type === '1' || row.type === '5') {
-              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${row.dispenseUOMDisplayValue
-                }`
+              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${
+                row.dispenseUOMDisplayValue
+              }`
             } else if (row.type === '2') {
-              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${row.uomDisplayValue
-                }`
+              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${
+                row.uomDisplayValue
+              }`
             } else if (
               row.type === '3' ||
               row.type === '7' ||
@@ -834,8 +893,9 @@ export default ({
             ) {
               qty = `${numeral(row.quantity || 0).format('0,0.0')}`
             } else if (row.type === '4') {
-              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${row.unitOfMeasurement
-                }`
+              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${
+                row.unitOfMeasurement
+              }`
             }
             return (
               <Tooltip title={qty}>
@@ -862,26 +922,33 @@ export default ({
             let deleteEnable = true
             if (!row.isPreOrder) {
               if (row.type === '10') {
-                if ([RADIOLOGY_WORKITEM_STATUS.INPROGRESS, RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT, RADIOLOGY_WORKITEM_STATUS.COMPLETED].indexOf(radiologyWorkitem.statusFK) >= 0) {
+                if (
+                  [
+                    RADIOLOGY_WORKITEM_STATUS.INPROGRESS,
+                    RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT,
+                    RADIOLOGY_WORKITEM_STATUS.COMPLETED,
+                  ].indexOf(radiologyWorkitem.statusFK) >= 0
+                ) {
                   deleteEnable = false
-                  deleteMessage = 'No modification is allowed on processed order'
+                  deleteMessage =
+                    'No modification is allowed on processed order'
                 }
-                if (radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCCELED) {
+                if (
+                  radiologyWorkitem.statusFK ===
+                  RADIOLOGY_WORKITEM_STATUS.CANCCELED
+                ) {
                   editEnable = false
                 }
-              }
-              else {
-                if (nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED) {
+              } else {
+                if (
+                  nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
+                ) {
                   editEnable = false
                   deleteEnable = false
                   const lastNuseActualize = _.orderBy(
                     nuseActualize,
-                    [
-                      'actulizeDate',
-                    ],
-                    [
-                      'desc',
-                    ],
+                    ['actulizeDate'],
+                    ['desc'],
                   )[0]
                   deleteMessage = editMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
                 }
@@ -916,7 +983,11 @@ export default ({
                       size='sm'
                       color='danger'
                       justIcon
-                      disabled={isEditingEntity || row.isPreOrderActualize || !deleteEnable}
+                      disabled={
+                        isEditingEntity ||
+                        row.isPreOrderActualize ||
+                        !deleteEnable
+                      }
                     >
                       <Delete
                         onClick={() => {
