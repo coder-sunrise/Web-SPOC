@@ -16,7 +16,7 @@ export default () => (
           window.location.reload(true)
         }}
       >
-        Refresh page
+        Refresh
       </Button>
     }
     desc={formatMessage({ id: 'app.exception.description.500' })}
