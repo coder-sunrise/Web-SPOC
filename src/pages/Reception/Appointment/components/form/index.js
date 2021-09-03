@@ -1120,6 +1120,7 @@ class Form extends React.PureComponent {
       visitRegistration: { visitOrderTemplateOptions = [] },
       dispatch,
       setFieldValue,
+      handleCopyAppointmentClick,
     } = this.props
 
     const {
@@ -1313,6 +1314,7 @@ class Form extends React.PureComponent {
                     handleRowDoubleClick={(data) => {
                       onHistoryRowSelected({ ...data, isHistory: true })
                     }}
+                    handleCopyAppointmentClick={handleCopyAppointmentClick}
                   />
                 </CardContainer>
               </GridItem>
