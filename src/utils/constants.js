@@ -681,3 +681,9 @@ export const mapApptStatus = statusFK => {
   }
   return status
 }
+
+export const INVALID_APPOINTMENT_STATUS = [
+  APPOINTMENT_STATUS.RESCHEDULED,
+  APPOINTMENT_STATUS.PFA_RESCHEDULED,
+  APPOINTMENT_STATUS.DELETED,
+]

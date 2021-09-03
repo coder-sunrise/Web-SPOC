@@ -9,6 +9,7 @@ const AppointmentSearch = ({
   dispatch,
   handleDoubleClick,
   handleAddAppointmentClick,
+  handleCopyAppointmentClick,
   appointment,
   currentUser,
   doctorprofile = [],
@@ -92,6 +93,7 @@ const AppointmentSearch = ({
         />
       </div>
       <Grid
+      handleCopyAppointmentClick={handleCopyAppointmentClick}
       handleDoubleClick={(data) => {
         handleDoubleClick({ ...data, isHistory: true })
         }}

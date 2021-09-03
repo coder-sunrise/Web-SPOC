@@ -50,7 +50,6 @@ class AppointmentHistory extends PureComponent {
   async getAppts (patientId) {
     this.setState({ loadingAppt: true })
     try {
-      // console.log('getAppts', patientId)
       const { user, dispatch } = this.props
       const commonParams = {
         combineCondition: 'and',
@@ -195,7 +194,7 @@ class AppointmentHistory extends PureComponent {
   }
 
   render () {
-    const { classes, theme, handleRowDoubleClick } = this.props
+    const { classes, theme, handleRowDoubleClick, appointmentTypes, handleCopyAppointmentClick } = this.props
     const { previousAppt, futureAppt, loadingAppt } = this.state
 
     return (
@@ -208,7 +207,7 @@ class AppointmentHistory extends PureComponent {
               size='sm'
               rows={futureAppt}
               onRowDoubleClick={handleRowDoubleClick}
-              {...futureApptTableParams(this.props.appointmentTypes)}
+              {...futureApptTableParams(appointmentTypes)}
             />
 
             <h4
@@ -221,7 +220,7 @@ class AppointmentHistory extends PureComponent {
             <CommonTableGrid
               size='sm'
               rows={previousAppt}
-              {...previousApptTableParams(this.props.appointmentTypes)}
+              {...previousApptTableParams(appointmentTypes,handleCopyAppointmentClick)}
             />
           </CardContainer>
         </div>

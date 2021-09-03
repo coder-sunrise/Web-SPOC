@@ -11,12 +11,14 @@ import {
   timeFormat,
   timeFormat24HourWithSecond,
   Tooltip,
+  Button,
 } from '@/components'
 // utils
 import Authorized from '@/utils/Authorized'
 import { AppointmentTypeLabel } from '@/components/_medisys'
-import { APPOINTMENT_STATUS, mapApptStatus } from '@/utils/constants'
+import { mapApptStatus, INVALID_APPOINTMENT_STATUS} from '@/utils/constants'
 import { grayColors } from '@/assets/jss'
+import { FileAddTwoTone } from '@ant-design/icons'
 
 const styles = (theme) => ({
   subRow: {
@@ -30,12 +32,6 @@ const styles = (theme) => ({
     }
   },
 })
-
-const DimmedApptStatus = [
-  APPOINTMENT_STATUS.RESCHEDULED,
-  APPOINTMENT_STATUS.PFA_RESCHEDULED,
-  APPOINTMENT_STATUS.DELETED,
-]
 
 @connect(({ codetable }) => ({
   appointmentTypes: codetable.ctappointmenttype,
@@ -79,7 +75,7 @@ class Grid extends PureComponent {
     }
 
     const isDisabledRow = () => {
-      return (DimmedApptStatus.indexOf(selectedData.appointmentStatusFk) > -1)
+      return (INVALID_APPOINTMENT_STATUS.indexOf(selectedData.appointmentStatusFk) > -1)
     }
 
     const doubleClick = () => {
@@ -110,7 +106,7 @@ class Grid extends PureComponent {
   }
 
   render () {
-    const { height } = this.props
+    const { height, handleCopyAppointmentClick } = this.props
     return (
       <CommonTableGrid
         style={{ marginTop: 10 }}
@@ -132,6 +128,7 @@ class Grid extends PureComponent {
           { name: 'bookOn', title: 'Book On' },
           { name: 'updateByUser', title: 'Update By' },
           { name: 'updateDate', title: 'Update On' },
+          { name: 'action', title: 'Action' },
         ]}
         columnExtensions={[
           {
@@ -227,6 +224,25 @@ class Grid extends PureComponent {
             width: 140,
             sortingEnabled: false,
             render:(row)=> moment(row.updateDate).format('DD MMM YYYY HH:mm')
+          },
+          {
+            columnName: 'action',
+            width: 60,
+            sortingEnabled: false,
+            align:'center',
+            render:(row)=> {
+              const accessRight = Authorized.check('appointment.appointmentdetails')
+              const createApptAccessRight = Authorized.check('appointment.newappointment')
+              if (!accessRight ||  accessRight.rights !== 'enable' || !createApptAccessRight || createApptAccessRight.rights !== 'enable')
+                return
+              return INVALID_APPOINTMENT_STATUS.indexOf(row.appointmentStatusFk) === -1 && (
+                <Tooltip title='Copy'>
+                  <Button color='transparent' style={{float:'right'}} justIcon onClick={()=>handleCopyAppointmentClick(row.appointmentFK)}>
+                    <FileAddTwoTone />
+                  </Button>
+                </Tooltip>
+              )
+            }
           },
         ]}
         TableProps={{ rowComponent: this.appointmentRow, height }}
