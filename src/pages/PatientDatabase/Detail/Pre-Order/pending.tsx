@@ -4,7 +4,7 @@ import moment from 'moment'
 import { currencySymbol } from '@/utils/config'
 import _ from 'lodash'
 import Authorized from '@/utils/Authorized'
-import { FastEditableTableGrid } from '@/components'
+import { FastEditableTableGrid, Tooltip } from '@/components'
 import Loading from '@/components/PageLoading/index'
 import { preOrderItemCategory } from '@/utils/codes'
 import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
@@ -354,6 +354,13 @@ const PendingPreOrder: React.FC = (props: any) => {
         options: () => preOrderItemCategory,
         onChange: handleCategoryChanged,
         isDisabled: row => !isEditable(row),
+        render: row => {
+          return (
+            <Tooltip title={row.preOrderItemType}>
+              <div>{row.preOrderItemType}</div>
+            </Tooltip>
+          )
+        },
       },
       {
         columnName: 'itemName',
@@ -362,8 +369,12 @@ const PendingPreOrder: React.FC = (props: any) => {
         valueField: 'id',
         options: generateItemDataSource,
         onChange: handleItemChanged,
-        render: (row, option) => {
-          return <div>{row.itemName}</div>
+        render: row => {
+          return (
+            <Tooltip title={row.itemName}>
+              <div>{row.itemName}</div>
+            </Tooltip>
+          )
         },
         isDisabled: row => !isEditable(row),
       },
@@ -375,10 +386,19 @@ const PendingPreOrder: React.FC = (props: any) => {
         onChange: handelQuantityChanged,
         render: row => {
           return (
-            <span>
-              {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}{' '}
-              {row.dispenseUOM}
-            </span>
+            <Tooltip
+              title={
+                <span>
+                  {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}{' '}
+                  {row.dispenseUOM}
+                </span>
+              }
+            >
+              <span>
+                {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}{' '}
+                {row.dispenseUOM}
+              </span>
+            </Tooltip>
           )
         },
         isDisabled: row => !isEditable(row),
@@ -388,7 +408,11 @@ const PendingPreOrder: React.FC = (props: any) => {
         width: 150,
         type: 'text',
         render: row => {
-          return row.orderByUser
+          return (
+            <Tooltip title={row.orderByUser}>
+              <div>{row.orderByUser}</div>
+            </Tooltip>
+          )
         },
         isDisabled: () => true,
       },
@@ -409,6 +433,13 @@ const PendingPreOrder: React.FC = (props: any) => {
         sortingEnabled: false,
         isDisabled: row =>
           addPreOrderAccessRight.rights === 'enable' ? false : true,
+        render: row => {
+          return (
+            <Tooltip title={row.remarks}>
+              <div>{row.remarks}</div>
+            </Tooltip>
+          )
+        },
       },
       {
         columnName: 'amount',
