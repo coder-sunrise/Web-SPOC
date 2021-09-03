@@ -1,8 +1,8 @@
 import moment from 'moment'
 import { timeFormat, CodeSelect, Tooltip } from '@/components'
-import { DoctorLabel } from '@/components/_medisys'
+import { DoctorLabel, AppointmentTypeLabel } from '@/components/_medisys'
 import { dateFormatLong } from '@/utils/format'
-import { APPOINTMENT_STATUS } from '@/utils/constants'
+import { APPOINTMENT_STATUS, mapApptStatus } from '@/utils/constants'
 
 import ErrorPopover from './ErrorPopover'
 import ApptDuration from './ApptDuration'
@@ -25,8 +25,8 @@ export const AppointmentDataColExtensions = [
     code: 'doctorprofile',
     labelField: 'clinicianProfile.name',
     valueField: 'clinicianProfile.id',
-    localFilter: (o) => o.clinicianProfile.isActive,
-    renderDropdown: (option) => <DoctorLabel doctor={option} />,
+    localFilter: o => o.clinicianProfile.isActive,
+    renderDropdown: option => <DoctorLabel doctor={option} />,
   },
   {
     columnName: 'appointmentTypeFK',
@@ -48,7 +48,7 @@ export const AppointmentDataColExtensions = [
     width: 110,
     format: timeFormat,
     allowClear: false,
-    onChange: (props) => {
+    onChange: props => {
       const { row } = props
       const { apptDurationHour = 0, apptDurationMinute = 0 } = row
       let { startTime } = row
@@ -83,94 +83,145 @@ export const initialAptInfo = {
   isEnableRecurrence: false,
 }
 
-export const commonExt = [
-  {
-    columnName: 'appointmentStatus',
-    // type: 'codeSelect',
-    // code: 'ltappointmentstatus',
-    render: (row) => {
-      let color
-      const redColorStatus = [
-        APPOINTMENT_STATUS.PFA_CANCELLED,
-        APPOINTMENT_STATUS.PFA_NOSHOW,
-        APPOINTMENT_STATUS.PFA_RESCHEDULED,
-        APPOINTMENT_STATUS.TURNEDUPLATE,
-      ]
-      if (redColorStatus.includes(row.appointmentStatusFk)) color = 'red'
-      if (row.appointmentStatusFk === APPOINTMENT_STATUS.CONFIRMED)
-        color = 'green'
-
-      return (
-        <div
-          style={{
-            color,
-          }}
-        >
-          <span>{row.appointmentStatus}</span>
-        </div>
-      )
-    },
-  },
-  {
-    columnName: 'appointmentDate',
-    format: dateFormatLong,
-    type: 'date',
-  },
-  {
-    columnName: 'startTime',
-    type: 'time',
-    sortingEnabled: false,
-  },
-  {
-    columnName: 'doctor',
-    type: 'codeSelect',
-    code: 'clinicianprofile',
-    valueField: 'id',
-    labelField: 'name',
-  },
-  {
-    columnName: 'cancellationReason',
-    render: (row) => {
-      const { cancellationReason = '', rescheduleReason = '' } = row
-      let reasons = []
-      if (cancellationReason !== '') reasons.push(cancellationReason)
-      if (rescheduleReason !== '') reasons.push(rescheduleReason)
-      const title = reasons.join(', ')
-      return (
-        <Tooltip title={title}>
-          <span>{title}</span>
-        </Tooltip>
-      )
-    },
-  },
-]
-
-export const previousApptTableParams = {
-  columns: [
-    { name: 'appointmentDate', title: 'Date' },
-    { name: 'startTime', title: 'Time' },
-    { name: 'doctor', title: 'Doctor' },
-    { name: 'appointmentStatus', title: 'Status' },
+export const commonExt = appointmentTypes => {
+  return [
     {
-      name: 'cancellationReason',
-      title: 'Reason',
+      columnName: 'appointmentStatus',
+      // type: 'codeSelect',
+      // code: 'ltappointmentstatus',
+      render: row => {
+        let color
+        const redColorStatus = [
+          APPOINTMENT_STATUS.PFA_CANCELLED,
+          APPOINTMENT_STATUS.PFA_NOSHOW,
+          APPOINTMENT_STATUS.PFA_RESCHEDULED,
+          APPOINTMENT_STATUS.TURNEDUPLATE,
+        ]
+        if (redColorStatus.includes(row.appointmentStatusFk)) color = 'red'
+        if (row.appointmentStatusFk === APPOINTMENT_STATUS.CONFIRMED)
+          color = 'green'
+
+        return (
+          <div
+            style={{
+              color,
+            }}
+          >
+            <span>{row.appointmentStatus}</span>
+          </div>
+        )
+      },
     },
-    { name: 'appointmentRemarks', title: 'Remarks' },
-  ],
-  columnExtensions: [
-    ...commonExt,
-  ],
+    {
+      columnName: 'appointmentDate',
+      format: dateFormatLong,
+      type: 'date',
+    },
+    {
+      columnName: 'startTime',
+      type: 'time',
+      sortingEnabled: false,
+    },
+    {
+      columnName: 'doctor',
+      type: 'codeSelect',
+      code: 'clinicianprofile',
+      valueField: 'id',
+      labelField: 'name',
+    },
+    {
+      columnName: 'cancellationReason',
+      render: row => {
+        const { cancellationReason = '', rescheduleReason = '' } = row
+        let reasons = []
+        if (cancellationReason !== '') reasons.push(cancellationReason)
+        if (rescheduleReason !== '') reasons.push(rescheduleReason)
+        const title = reasons.join(', ')
+        return (
+          <Tooltip title={title}>
+            <span>{title}</span>
+          </Tooltip>
+        )
+      },
+    },
+    {
+      columnName: 'appointmentTypeFK',
+      sortingEnabled: false,
+      render: row => {
+        const { appointmentTypeFK } = row
+        const appointmentType = appointmentTypes.find(
+          item => item.id === appointmentTypeFK,
+        )
+        if (!appointmentType) return null
+        return (
+          <AppointmentTypeLabel
+            color={appointmentType.tagColorHex}
+            label={appointmentType.displayValue}
+          />
+        )
+      },
+    },
+    {
+      columnName: 'updateByUser',
+      sortingEnabled: false,
+      render: row => {
+        const content = `${mapApptStatus(row.appointmentStatusFk)} by ${row.updateByUser}`
+        return (
+          <Tooltip title={content}>
+            <span>{content}</span>
+          </Tooltip>
+        )
+      },
+    },
+    {
+      columnName: 'updateDate',
+      type: 'date',
+      sortingEnabled: false,
+      width:140,
+      render: row => {
+        const content = moment(row.updateDate).format('DD MMM YYYY HH:mm')
+        return (
+          <Tooltip title={content}>
+            <span>{content}</span>
+          </Tooltip>
+        )
+      },
+    },
+  ]
 }
 
-export const futureApptTableParams = {
-  columns: [
-    { name: 'appointmentDate', title: 'Date' },
-    { name: 'startTime', title: 'Time' },
-    { name: 'doctor', title: 'Doctor' },
-    { name: 'appointmentStatus', title: 'Status' },
-    { name: 'appointmentRemarks', title: 'Remarks' },
-  ],
-  columnExtensions: [
-    ...commonExt,
-  ],
+export const previousApptTableParams = appointmentTypes => {
+  return {
+    columns: [
+      { name: 'appointmentDate', title: 'Date' },
+      { name: 'startTime', title: 'Time' },
+      { name: 'doctor', title: 'Doctor' },
+      { name: 'appointmentTypeFK', title: 'Appt Type' },
+      { name: 'appointmentStatus', title: 'Status' },
+      {
+        name: 'cancellationReason',
+        title: 'Reason',
+      },
+      { name: 'appointmentRemarks', title: 'Remarks' },
+      { name: 'updateByUser', title: 'Update By' },
+      { name: 'updateDate', title: 'Update On' },
+    ],
+    columnExtensions: [...commonExt(appointmentTypes)],
+  }
+}
+
+export const futureApptTableParams = appointmentTypes => {
+  return {
+    columns: [
+      { name: 'appointmentDate', title: 'Date' },
+      { name: 'startTime', title: 'Time' },
+      { name: 'doctor', title: 'Doctor' },
+      { name: 'appointmentTypeFK', title: 'Appt Type' },
+      { name: 'appointmentStatus', title: 'Status' },
+      { name: 'appointmentRemarks', title: 'Remarks' },
+      { name: 'updateByUser', title: 'Update By' },
+      { name: 'updateDate', title: 'Update On' },
+    ],
+    columnExtensions: [...commonExt(appointmentTypes)],
+  }
 }

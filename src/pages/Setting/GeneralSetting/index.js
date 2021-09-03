@@ -27,8 +27,10 @@ import {
   CheckboxGroup,
   WarningSnackbar,
   CodeSelect,
+  TextField,
 } from '@/components'
 import { navigateDirtyCheck } from '@/utils/utils'
+import { hourOptions, minuteOptions} from '@/pages/Reception/Appointment/components/form/ApptDuration'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -203,6 +205,42 @@ class GeneralSetting extends PureComponent {
     })
   }
 
+  calcApptDuration = durationMinutes => {
+    const apptDurationHour = Math.floor(durationMinutes/60)
+    const apptDurationMinute = durationMinutes%60
+    return { apptDurationHour, apptDurationMinute }
+  }
+
+  setApptDurationH = (setFieldValue, durationMinutes, hour) => {
+    const { apptDurationHour, apptDurationMinute } = this.calcApptDuration(durationMinutes)
+    const newValue = apptDurationMinute + hour * 60
+    setFieldValue('apptTimeSlotDuration.settingValue', newValue)
+  }
+
+  setApptDurationM = (setFieldValue, durationMinutes, minute) => {
+    const { apptDurationHour, apptDurationMinute } = this.calcApptDuration(durationMinutes)
+    const newValue = apptDurationHour * 60 + minute
+    setFieldValue('apptTimeSlotDuration.settingValue', newValue)
+  }
+
+  appointmentTimeslotSetupPropsChange = () => {
+    const apptTimeRulerExtent = this.props.values?.apptTimeRulerExtent?.settingValue || 1400
+    const apptTimeIntervel = this.props.values?.apptTimeIntervel?.settingValue || 15
+    const apptTimeSlotDuration = this.props.values?.apptTimeSlotDuration?.settingValue || 15
+
+    const isDefaultSetting = !(apptTimeRulerExtent != 1400 || apptTimeIntervel != 15 || apptTimeSlotDuration != 15)
+    return isDefaultSetting
+  }
+
+  setApptTimeslotSettingsDefault = (e) => {
+    const { setFieldValue } = this.props
+    if(e.target.value){
+      setFieldValue('apptTimeRulerExtent.settingValue',1400)
+      setFieldValue('apptTimeIntervel.settingValue',15)
+      setFieldValue('apptTimeSlotDuration.settingValue',15)
+    }
+  }
+
   render () {
     const {
       classes,
@@ -214,6 +252,9 @@ class GeneralSetting extends PureComponent {
       ...restProps
     } = this.props
     const { hasActiveSession, autoPrintOnSignOff, autoPrintOnCompletePayment } = this.state
+    const durationMinutes = values?.apptTimeSlotDuration?.settingValue || 15
+    const { apptDurationHour , apptDurationMinute } = this.calcApptDuration(durationMinutes)
+    const isApptDefaultSetting = this.appointmentTimeslotSetupPropsChange()
     return (
       <React.Fragment>
         {hasActiveSession && (
@@ -451,6 +492,88 @@ class GeneralSetting extends PureComponent {
                 }}
               />
             </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <h5>Appointment Timeslot setup</h5>
+              <Field
+                name='apptDefaultSettingsCheckbox'
+                render={(args) => {
+                  return (
+                    <Checkbox
+                      label='Use System Default Setting'
+                      mode='default'
+                      disabled={!!hasActiveSession}
+                      checked={isApptDefaultSetting}
+                      onChange={this.setApptTimeslotSettingsDefault}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={2}>
+              <Field
+                  name='apptTimeRulerExtent.settingValue'
+                  render={(args) => (
+                    <TextField
+                      label='Appointment Time Grid Height (PIXELS)'
+                      {...args}
+                      disabled={!!hasActiveSession}
+                    />
+                  )}
+                />
+            </GridItem>
+            <GridItem md={2}>
+              <Field
+                  name='apptTimeIntervel.settingValue'
+                  render={(args) => (
+                    <TextField
+                      label='Appointment Time Grid Interval (MINS)'
+                      {...args}
+                      disabled={!!hasActiveSession}
+                    />
+                  )}
+                />
+            </GridItem>
+            <GridContainer>
+              <GridItem md={2}>
+                <h5 style={{ color: '#AAA' }}>Appointment Duration</h5>
+              </GridItem>
+              <GridContainer>
+                <GridItem md={1}>
+                  <Field
+                    name='apptTimeSlotDuration.settingValue'
+                    render={args => (
+                      <Select
+                        allowClear={false}
+                        label='Hours'
+                        options={hourOptions}
+                        value={apptDurationHour}
+                        onChange={(value)=>this.setApptDurationH(this.props.setFieldValue,durationMinutes,value)}
+                        disabled={!!hasActiveSession}
+                      />
+                    )}
+                  />
+                </GridItem>
+                <GridItem md={1}>
+                  <Field
+                    name='apptTimeSlotDuration.settingValue'
+                    render={args => (
+                      <Select
+                        allowClear={false}
+                        label='Minutes'
+                        options={minuteOptions}
+                        value={apptDurationMinute}
+                        onChange={(value)=>this.setApptDurationM(this.props.setFieldValue,durationMinutes,value)}
+                        disabled={!!hasActiveSession}
+                      />
+                    )}
+                  />
+                </GridItem>
+              </GridContainer>
+            </GridContainer>
           </GridContainer>
           <div
             className={classes.actionBtn}

@@ -28,10 +28,11 @@ const styles = theme => ({
   },
 })
 
-@connect(({ patient, user, global }) => ({
+@connect(({ patient, user, global, codetable }) => ({
   patient: patient.entity || {},
   user,
   mainDivHeight: global.mainDivHeight,
+  appointmentTypes: codetable.ctappointmenttype,
 }))
 class AppointmentHistory extends PureComponent {
   state = {
@@ -169,7 +170,7 @@ class AppointmentHistory extends PureComponent {
                 height,
               }}
               rows={previousAppt}
-              {...previousApptTableParams}
+              {...previousApptTableParams(this.props.appointmentTypes)}
             />
           </GridItem>
         </GridContainer>
