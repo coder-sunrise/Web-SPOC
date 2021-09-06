@@ -759,7 +759,7 @@ class Banner extends PureComponent {
   }
 
   getBannerMd = () => {
-    const { from, extraCmt } = this.props    
+    const { from, extraCmt } = this.props
     if (from === 'Consultation' || from === 'PatientDashboard') return 9
     if (extraCmt) return 11
     return 12
@@ -1085,24 +1085,13 @@ class Banner extends PureComponent {
                 {preOrderAccessRight.rights === 'enable' && (
                   <Link
                     className={classes.header}
-                    disabled={
-                      preOrderAccessRight.rights === 'disable'
-                      // disablePreOrder ||
-                      // !activePreOrderItem ||
-                      // !activePreOrderItem.length
-                    }
+                    disabled={preOrderAccessRight.rights === 'disable'}
                   >
                     <span
                       style={{ textDecoration: 'underline' }}
                       onClick={e => {
                         e.preventDefault()
-                        if (
-                          preOrderAccessRight.rights === 'disable'
-                          // disablePreOrder ||
-                          // !activePreOrderItem ||
-                          // !activePreOrderItem.length
-                        )
-                          return
+                        if (preOrderAccessRight.rights === 'disable') return
 
                         if (apptId && apptMode === 'series') {
                           dispatch({
@@ -1228,7 +1217,10 @@ class Banner extends PureComponent {
           maxWidth='lg'
         >
           <SelectPreOrder
-            disabled={from !== 'Appointment' || actualizePreOrderAccessRight.rights !=='enable'}
+            disabled={
+              from !== 'Appointment' ||
+              actualizePreOrderAccessRight.rights !== 'enable'
+            }
             onSelectPreOrder={select => {
               if (onSelectPreOrder) onSelectPreOrder(select)
               this.closePreOrders()
