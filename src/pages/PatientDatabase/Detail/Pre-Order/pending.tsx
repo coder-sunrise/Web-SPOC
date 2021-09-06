@@ -8,13 +8,18 @@ import { FastEditableTableGrid, Tooltip } from '@/components'
 import Loading from '@/components/PageLoading/index'
 import { preOrderItemCategory } from '@/utils/codes'
 import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
+import Yup from '@/utils/yup'
 // interface IPendingPreOrderProps {
 // }
+
+const preOrderSchema = Yup.object().shape({
+  preOrderItemType: Yup.string().required(),
+  itemName:  Yup.string().required(),
+})
 
 const PendingPreOrder: React.FC = (props: any) => {
   const {
     values,
-    schema,
     user: {
       data: { clinicianProfile },
     },
@@ -236,19 +241,19 @@ const PendingPreOrder: React.FC = (props: any) => {
     const { row, option } = e
     row.itemName = option?.combinDisplayValue
     if (row.preOrderItemType === preOrderItemCategory[0].value)
-      row.preOrderMedicationItem = { InventoryMedicationFK: option.id }
+      row.preOrderMedicationItem = { InventoryMedicationFK: option?.id }
     else if (row.preOrderItemType === preOrderItemCategory[1].value)
-      row.preOrderConsumableItem = { InventoryConsumableFK: option.id }
+      row.preOrderConsumableItem = { InventoryConsumableFK: option?.id }
     else if (row.preOrderItemType === preOrderItemCategory[2].value)
       row.preOrderVaccinationItem = {
-        InventoryVaccinationFK: option.id,
+        InventoryVaccinationFK: option?.id,
       }
     else if (
       row.preOrderItemType === preOrderItemCategory[3].value ||
       row.preOrderItemType == preOrderItemCategory[4].value ||
       row.preOrderItemType == preOrderItemCategory[5].value
     )
-      row.preOrderServiceItem = { ServiceCenterServiceFK: option.id }
+      row.preOrderServiceItem = { ServiceCenterServiceFK: option?.id }
     row.quantity = undefined
     row.amount = 0
     row.remarks = undefined
@@ -478,7 +483,7 @@ const PendingPreOrder: React.FC = (props: any) => {
     <>
       <FastEditableTableGrid
         rows={getFilteredRows(values.listingPreOrderItem)}
-        schema={schema}
+        schema={preOrderSchema}
         FuncProps={{
           pager: false,
         }}

@@ -524,7 +524,7 @@ class NewVisit extends PureComponent {
                             />
                           </CommonCard>
                         </GridItem>
-                        {preOrderActualizationAccessRight && preOrderActualizationAccessRight.rights !== 'hidden' && (<GridItem xs={12} className={classes.row}>
+                        {values.visitPreOrderItem.length !== 0 && (<GridItem xs={12} className={classes.row}>
                           <CommonCard title='Pre-Order Actualization'>
                           <PreOrderCard {...this.props} values={values} visitPreOrderItem= {values.visitPreOrderItem} dispatch={dispatch}/>
                           </CommonCard>
