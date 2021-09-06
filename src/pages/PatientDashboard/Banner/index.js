@@ -796,8 +796,12 @@ class Banner extends PureComponent {
       dispatch,
     } = props
 
+    const preOrderAccessRight = Authorized.check(
+      'patientdatabase.modifypreorder',
+    ) || { rights: 'hidden' }
+
     const actualizePreOrderAccessRight = Authorized.check(
-      'appointment.actualizepreorder',
+      'patientdatabase.modifypreorder.actualizepreorder',
     ) || { rights: 'hidden' }
 
     const notesHistoryAccessRight = Authorized.check(
@@ -1078,14 +1082,14 @@ class Banner extends PureComponent {
                 </div>
               </GridItem>
               <GridItem xs={6} md={2} className={classes.cell}>
-                {actualizePreOrderAccessRight.rights !== 'hidden' && (
+                {preOrderAccessRight.rights === 'enable' && (
                   <Link
                     className={classes.header}
                     disabled={
-                      actualizePreOrderAccessRight.rights === 'disable' ||
-                      disablePreOrder ||
-                      !activePreOrderItem ||
-                      !activePreOrderItem.length
+                      preOrderAccessRight.rights === 'disable'
+                      // disablePreOrder ||
+                      // !activePreOrderItem ||
+                      // !activePreOrderItem.length
                     }
                   >
                     <span
@@ -1093,10 +1097,10 @@ class Banner extends PureComponent {
                       onClick={e => {
                         e.preventDefault()
                         if (
-                          actualizePreOrderAccessRight.rights === 'disable' ||
-                          disablePreOrder ||
-                          !activePreOrderItem ||
-                          !activePreOrderItem.length
+                          preOrderAccessRight.rights === 'disable'
+                          // disablePreOrder ||
+                          // !activePreOrderItem ||
+                          // !activePreOrderItem.length
                         )
                           return
 
@@ -1224,7 +1228,7 @@ class Banner extends PureComponent {
           maxWidth='lg'
         >
           <SelectPreOrder
-            disabled={from !== 'Appointment'}
+            disabled={from !== 'Appointment' || actualizePreOrderAccessRight.rights !=='enable'}
             onSelectPreOrder={select => {
               if (onSelectPreOrder) onSelectPreOrder(select)
               this.closePreOrders()
