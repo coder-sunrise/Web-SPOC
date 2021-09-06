@@ -283,11 +283,11 @@ class BasicLayout extends React.PureComponent {
 
   render() {
     const { classes, loading, theme, route, clinicSettings: { settings = [] }, ...props } = this.props  
-    const hiddenByClinicSetting = (!settings.isEnableCHAS && !settings.isEnableMedisave && current.name === 'claimSubmission') // special cases here
     const routesConfig = {
       ...route,
       routes: route.routes.map(current => {
-        if(hiddenByClinicSetting || Authorized.check(current.authority)?.rights === 'hidden') {
+        const clinicSettingDisabledRoutes = current.clinicSetting && current.clinicSetting.filter(s => typeof settings[s] === 'boolean' && !settings[s]).length >= current.clinicSetting.length
+        if(clinicSettingDisabledRoutes || Authorized.check(current.authority)?.rights === 'hidden') {
           return {
             ...current,
             hideInMenu: true,
@@ -297,8 +297,8 @@ class BasicLayout extends React.PureComponent {
         return {
           ...current,
           routes: current.routes?.map(route => {
-            const accessRightHidden = Authorized.check(route.authority)?.rights === 'hidden'
-            if(accessRightHidden)
+            const clinicSettingDisabledRoute = route.clinicSetting && route.clinicSetting.filter(s => typeof settings[s] === 'boolean' && !settings[s]).length >= route.clinicSetting.length
+            if(clinicSettingDisabledRoute || Authorized.check(route.authority)?.rights === 'hidden')
             {
               return {
                 ...route,
