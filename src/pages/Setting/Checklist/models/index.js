@@ -4,12 +4,6 @@ import service from '../services'
 
 export default createListViewModel({
   namespace: 'settingChecklist',
-  // config: {
-  //   codetable: {
-  //     message: 'Checklist updated',
-  //     code: 'ctchecklist',
-  //   },
-  // },
   param: {
     service,
     state: {
@@ -21,25 +15,6 @@ export default createListViewModel({
         ],
         description: '',
       },
-      checklist: [
-        {
-          name: 'Observation 1',
-          isAllowMultipleNature: false,
-          natures: [
-            { id: 1, name: 'nature 1' },
-            { id: 2, name: 'nature 2' },
-            { id: 3, name: 'nature 3 nature 1nature 1nature 1nature 1nature 1nature 1nature 1nature 1nature 1nature 1nature 1nature 1nature 1nature 1nature 1nature 1' },
-            { id: 4, name: 'nature 4' },
-            { id: 5, name: 'nature 5' },
-            { id: 6, name: 'nature 6' },
-          ],
-        },
-        {
-          name: 'Observation 2',
-          isAllowMultipleNature: false,
-          natures: [{ name: 'nature 1' }],
-        },
-      ],
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {

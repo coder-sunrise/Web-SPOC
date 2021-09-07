@@ -1,14 +1,8 @@
 import React, { PureComponent } from 'react'
 import { FastField } from 'formik'
-import { Tabs, Input } from 'antd'
+import { Tabs } from 'antd'
 import _ from 'lodash'
-import {
-  GridContainer,
-  GridItem,
-  TextField,
-  EditableTableGrid,
-  Button,
-} from '@/components'
+import { GridContainer, GridItem, TextField } from '@/components'
 import ChecklistObservation from './ChecklistObservation'
 
 const { TabPane } = Tabs
@@ -210,11 +204,7 @@ class ChecklistSubject extends PureComponent {
               item.displayValue
                 ? {}
                 : {
-                    // borderBottom: '1px solid red',
-                    //minWidth: '30px',
-                    //display: 'inline-block',
                     color: 'red',
-                    //textAlign: 'right',
                   }
             }
           >

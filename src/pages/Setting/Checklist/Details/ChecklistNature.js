@@ -1,12 +1,9 @@
 import React, { PureComponent } from 'react'
-import { FastField } from 'formik'
 import _ from 'lodash'
 import {
   GridContainer,
   GridItem,
-  TextField,
   EditableTableGrid,
-  Button,
 } from '@/components'
 import Yup from '@/utils/yup'
 
@@ -161,24 +158,12 @@ class ChecklistNature extends PureComponent {
   }
 
   render() {
-    // const { subjectIndex, observationIndex, values } = this.props
-
-    // const checklistSubject = values.checklistSubject || []
-    // const checklistNature =
-    //   checklistSubject[subjectIndex].checklistObservation[observationIndex]
-    //     .checklistNature
-
     const { checklistNature } = this.state
 
     const EditingProps = {
       showAddCommand: true,
       onCommitChanges: this.commitChanges,
     }
-
-    // console.log(
-    //   'checklistObservation[ChecklistNature]: ',
-    //   checklistSubject[subjectIndex].checklistObservation[observationIndex],
-    // )
 
     return (
       <GridContainer>

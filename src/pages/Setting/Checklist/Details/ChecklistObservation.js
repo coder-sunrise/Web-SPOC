@@ -161,7 +161,6 @@ class ChecklistObservation extends PureComponent {
                                   style={{ fontSize: '14px !important' }}
                                   render={args => (
                                     <Checkbox
-                                      className='ChecklistCheckbox'
                                       label='Allow select multiple nature'
                                       inputLabel=' '
                                       {...args}
