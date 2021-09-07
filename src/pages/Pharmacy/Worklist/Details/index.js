@@ -13,7 +13,11 @@ const PharmacyDetails = ({ refreshClick }) => {
     if (detailsId) {
       dispatch({
         type: 'codetable/fetchCodes',
-        payload: { code: 'inventorymedication' },
+        payload: { code: 'inventorymedication', force: true },
+      })
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'inventoryconsumable', force: true },
       })
       dispatch({
         type: 'codetable/fetchCodes',
@@ -24,23 +28,27 @@ const PharmacyDetails = ({ refreshClick }) => {
     }
   }, [detailsId])
 
+  const closeForm = () => {
+    setDetailsId(null)
+    setShowModal(false)
+    dispatch({ type: 'pharmacyDetails/updateState', entity: undefined })
+  }
+
   return (
     <CommonModal
       open={showModal}
       title='Pharmacy Details'
       showFooter={true}
       onClose={() => {
-        setDetailsId(null)
-        setShowModal(false)
+       closeForm()
       }}
       fullScreen
       overrideLoading
       observe='PharmarcyWorklistDetail'
       showFooter={false}
       onConfirm={() => {
-        refreshClick()
-        setDetailsId(null)
-        setShowModal(false)
+        closeForm()
+        refreshClick()       
       }}
     >
       <Details />

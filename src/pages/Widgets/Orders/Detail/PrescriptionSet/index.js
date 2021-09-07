@@ -12,7 +12,7 @@ import { withFormik } from 'formik'
 import {
   openCautionAlertPrompt,
   ReplaceCertificateTeplate,
-  getDrugAllergy
+  getDrugAllergy,
 } from '@/pages/Widgets/Orders/utils'
 import Authorized from '@/utils/Authorized'
 import { getUniqueId, getTranslationValue } from '@/utils/utils'
@@ -21,21 +21,13 @@ import Grid from './Grid'
 import Details from './Details'
 import { getClinicianProfile } from '../../../ConsultationDocument/utils'
 
-@connect(
-  ({
-    loading,
-    codetable,
-    user,
-    visitRegistration,
-    clinicSettings
-  }) => ({
-    loading,
-    codetable,
-    user,
-    visitRegistration,
-    clinicSettings: clinicSettings.settings || clinicSettings.default,
-  }),
-)
+@connect(({ loading, codetable, user, visitRegistration, clinicSettings }) => ({
+  loading,
+  codetable,
+  user,
+  visitRegistration,
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
+}))
 @withFormik({
   displayName: 'PrescriptionSetList',
   validationSchema: Yup.object().shape({}),
@@ -43,10 +35,12 @@ import { getClinicianProfile } from '../../../ConsultationDocument/utils'
   handleSubmit: () => ({}),
 })
 class PrescriptionSetList extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
-    this.generalAccessRight = Authorized.check('queue.consultation.order.medication.generalprescriptionset') || { rights: 'hidden' }
+    this.generalAccessRight = Authorized.check(
+      'queue.consultation.order.medication.generalprescriptionset',
+    ) || { rights: 'hidden' }
 
     let defaultType = 'All'
     if (this.generalAccessRight.rights === 'hidden') {
@@ -59,15 +53,15 @@ class PrescriptionSetList extends PureComponent {
       activeKey: [],
       showPrescriptionSetDetailModal: false,
       isNewPrescriptionSet: false,
-      selectType: defaultType
+      selectType: defaultType,
     }
   }
 
-  componentWillMount () {
+  componentWillMount() {
     this.searchPrescriptionSet()
   }
 
-  setAddedPrescriptionSets = (v) => {
+  setAddedPrescriptionSets = v => {
     this.setState({
       addedPrescriptionSets: v,
     })
@@ -84,15 +78,23 @@ class PrescriptionSetList extends PureComponent {
     let instruction = ''
     let nextStepdose = ''
     const activeInstructions = instructions
-      ? instructions.filter((item) => !item.isDeleted)
+      ? instructions.filter(item => !item.isDeleted)
       : undefined
     if (activeInstructions) {
       for (let index = 0; index < activeInstructions.length; index++) {
         let item = activeInstructions[index]
-        const usage = ctmedicationusage.find(usage => usage.id === item.usageMethodFK)
-        const uom = ctmedicationunitofmeasurement.find(uom => uom.id === item.prescribeUOMFK)
-        const frequency = ctmedicationfrequency.find(frequency => frequency.id === item.drugFrequencyFK)
-        const dosage = ctmedicationdosage.find(dosage => dosage.id === item.dosageFK)
+        const usage = ctmedicationusage.find(
+          usage => usage.id === item.usageMethodFK,
+        )
+        const uom = ctmedicationunitofmeasurement.find(
+          uom => uom.id === item.prescribeUOMFK,
+        )
+        const frequency = ctmedicationfrequency.find(
+          frequency => frequency.id === item.drugFrequencyFK,
+        )
+        const dosage = ctmedicationdosage.find(
+          dosage => dosage.id === item.dosageFK,
+        )
         if (instruction !== '') {
           instruction += ' '
         }
@@ -132,7 +134,8 @@ class PrescriptionSetList extends PureComponent {
     const { doctorProfileFK } = props.visitRegistration.entity.visit
     let visitDoctorUserId
     if (doctorprofile && doctorProfileFK) {
-      visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
+      visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK)
+        .clinicianProfile.userProfileFK
     }
 
     return visitDoctorUserId
@@ -140,7 +143,10 @@ class PrescriptionSetList extends PureComponent {
 
   GetNewMedication = () => {
     const { getNextSequence, codetable, isRetail, clinicSettings } = this.props
-    const { primaryPrintoutLanguage = 'EN', secondaryPrintoutLanguage = '' } = clinicSettings
+    const {
+      primaryPrintoutLanguage = 'EN',
+      secondaryPrintoutLanguage = '',
+    } = clinicSettings
     const {
       inventorymedication,
       ctmedicationusage,
@@ -151,298 +157,353 @@ class PrescriptionSetList extends PureComponent {
 
     const { loadPrescriptionSets = [], addedPrescriptionSets = [] } = this.state
 
-    const setectPrescriptionSet = loadPrescriptionSets.filter(ps => addedPrescriptionSets.indexOf(ps.id) >= 0)
+    const setectPrescriptionSet = loadPrescriptionSets.filter(
+      ps => addedPrescriptionSets.indexOf(ps.id) >= 0,
+    )
     let data = []
     let sequence = getNextSequence()
     setectPrescriptionSet.forEach(ps => {
       data = data.concat(
-        ps.prescriptionSetItem.filter(drug => !isRetail || !drug.isExternalPrescription).map((item) => {
-          let currentSequence = sequence
-          sequence += 1
+        ps.prescriptionSetItem
+          .filter(drug => !isRetail || !drug.isExternalPrescription)
+          .map(item => {
+            let currentSequence = sequence
+            sequence += 1
 
-          let itemInstructions = item.prescriptionSetItemInstruction
-          itemInstructions = itemInstructions.map((instruction) => {
-            let usage = ctmedicationusage.find(
-              (drugusage) => drugusage.id === instruction.usageMethodFK,
-            )
-            let dosage = ctmedicationdosage.find(
-              (drugdosage) => drugdosage.id === instruction.dosageFK,
-            )
-            let uom = ctmedicationunitofmeasurement.find(
-              (druguom) => druguom.id === instruction.prescribeUOMFK,
-            )
-            let frequency = ctmedicationfrequency.find(
-              (drugfrequency) => drugfrequency.id === instruction.drugFrequencyFK,
-            )
-            return {
-              usageMethodFK: usage ? usage.id : undefined,
-              usageMethodCode: usage ? usage.code : undefined,
-              usageMethodDisplayValue: usage ? usage.displayVaue : undefined,
-              dosageFK: dosage ? dosage.id : undefined,
-              dosageCode: dosage ? dosage.code : undefined,
-              dosageDisplayValue: dosage ? dosage.displayValue : undefined,
-              prescribeUOMFK: uom ? uom.id : undefined,
-              prescribeUOMCode: uom ? uom.code : undefined,
-              prescribeUOMDisplayValue: uom ? uom.displayValue : undefined,
-              drugFrequencyFK: frequency ? frequency.id : undefined,
-              drugFrequencyCode: frequency ? frequency.code : undefined,
-              drugFrequencyDisplayValue: frequency
-                ? frequency.displayValue
-                : undefined,
-              duration: instruction.duration,
-              sequence: instruction.sequence,
-              stepdose: instruction.stepdose,
-              isDeleted: false,
-            }
-          })
-
-          const instruction = this.getInstruction(itemInstructions, primaryPrintoutLanguage)
-          const secondInstruction = secondaryPrintoutLanguage !== '' ? this.getInstruction(itemInstructions, secondaryPrintoutLanguage) : ''
-
-          let itemExpiryDate
-          let itemBatchNo
-          let itemCostPrice
-          let itemUnitPrice
-          let itemDispenseUOMCode
-          let itemDispenseUOMDisplayValue
-          let itemSecondDispenseUOMDisplayValue
-          let itemDispenseUOMFK
-          let itemDrugCode
-          let itemDrugName
-          let itemTotalPrice
-          let newTotalQuantity
-          let ItemPrecautions = []
-          let itemCorPrescriptionItemDrugMixture = []
-          let itemDrugCaution
-          let isDispensedByPharmacy
-          let isNurseActualizeRequired
-          let isExclusive
-          if (item.inventoryMedicationFK) {
-            // Normal Drug
-            let drug = inventorymedication.find(
-              (medication) => medication.id === item.inventoryMedicationFK,
-            )
-            let defaultBatch = drug.medicationStock.find(
-              (o) => o.isDefault === true,
-            )
-
-            let precautionIndex = 0
-            if (
-              drug.inventoryMedication_MedicationPrecaution &&
-              drug.inventoryMedication_MedicationPrecaution.length > 0
-            ) {
-              ItemPrecautions = ItemPrecautions.concat(
-                drug.inventoryMedication_MedicationPrecaution.map((o) => {
-                  let currentPrecautionSequence = precautionIndex
-                  precautionIndex += 1
-                  return {
-                    medicationPrecautionFK: o.medicationPrecautionFK,
-                    precaution: o.medicationPrecaution.name,
-                    precautionCode: o.medicationPrecaution.code,
-                    sequence: currentPrecautionSequence,
-                    isDeleted: false,
-                  }
-                }),
+            let itemInstructions = item.prescriptionSetItemInstruction
+            itemInstructions = itemInstructions.map(instruction => {
+              let usage = ctmedicationusage.find(
+                drugusage => drugusage.id === instruction.usageMethodFK,
               )
-            } else {
-              ItemPrecautions = [
-                {
-                  precaution: '',
-                  sequence: 0,
-                },
-              ]
-            }
-
-            newTotalQuantity = item.quantity
-
-            itemTotalPrice = item.isExternalPrescription
-              ? 0
-              : newTotalQuantity * drug.sellingPrice
-
-            itemExpiryDate =
-              !item.isExternalPrescription && defaultBatch
-                ? defaultBatch.expiryDate
-                : undefined
-            itemBatchNo =
-              !item.isExternalPrescription && defaultBatch
-                ? defaultBatch.batchNo
-                : undefined
-
-            itemCostPrice = drug.averageCostPrice
-            itemUnitPrice = drug.sellingPrice
-
-            itemDispenseUOMCode = drug.dispensingUOM
-              ? drug.dispensingUOM.code
-              : undefined
-            const uom = ctmedicationunitofmeasurement.find(uom => uom.id === drug?.dispensingUOM?.id)
-            itemDispenseUOMDisplayValue = getTranslationValue(
-              uom?.translationData,
-              primaryPrintoutLanguage,
-              'displayValue',
-            )
-            itemSecondDispenseUOMDisplayValue = secondaryPrintoutLanguage !== '' ? getTranslationValue(
-              uom?.translationData,
-              secondaryPrintoutLanguage,
-              'displayValue',
-            ) : ''
-
-            itemDispenseUOMFK = drug.dispensingUOM
-              ? drug.dispensingUOM.id
-              : undefined
-            itemDrugCode = drug.code
-            itemDrugName = drug.displayValue
-            itemDrugCaution = drug.caution
-            isDispensedByPharmacy = drug.isDispensedByPharmacy
-            isNurseActualizeRequired = drug.isNurseActualizable
-            isExclusive = drug.isExclusive
-          } else if (item.isDrugMixture) {
-            // Drug Mixture
-            itemExpiryDate = item.expiryDate
-            itemBatchNo = item.batchNo
-            itemCostPrice = item.costPrice || 0
-            itemUnitPrice = item.unitPrice || 0
-            itemDispenseUOMCode = item.dispenseUOMCode
-            const uom = ctmedicationunitofmeasurement.find(uom => uom.id === item.dispenseUOMFK)
-            itemDispenseUOMDisplayValue = getTranslationValue(
-              uom?.translationData,
-              primaryPrintoutLanguage,
-              'displayValue',
-            )
-            itemSecondDispenseUOMDisplayValue = secondaryPrintoutLanguage !== '' ? getTranslationValue(
-              uom?.translationData,
-              secondaryPrintoutLanguage,
-              'displayValue',
-            ) : ''
-            itemDispenseUOMFK = item.dispenseUOMFK
-            itemDrugCode = 'DrugMixture'
-            itemDrugName = item.drugName
-            itemTotalPrice = 0
-            newTotalQuantity = item.quantity
-
-            let precautionIndex = 0
-            const precautions = item.prescriptionSetItemPrecaution
-            if (precautions && precautions.length > 0) {
-              ItemPrecautions = ItemPrecautions.concat(
-                precautions.map((o) => {
-                  let currentPrecautionSequence = precautionIndex
-                  precautionIndex += 1
-                  return {
-                    medicationPrecautionFK: o.medicationPrecautionFK,
-                    precaution: o.precaution,
-                    precautionCode: o.precautionCode,
-                    sequence: currentPrecautionSequence,
-                    isDeleted: false,
-                  }
-                }),
+              let dosage = ctmedicationdosage.find(
+                drugdosage => drugdosage.id === instruction.dosageFK,
               )
-            } else {
-              ItemPrecautions = [
-                {
-                  precaution: '',
-                  sequence: 0,
-                },
-              ]
-            }
+              let uom = ctmedicationunitofmeasurement.find(
+                druguom => druguom.id === instruction.prescribeUOMFK,
+              )
+              let frequency = ctmedicationfrequency.find(
+                drugfrequency =>
+                  drugfrequency.id === instruction.drugFrequencyFK,
+              )
+              return {
+                usageMethodFK: usage ? usage.id : undefined,
+                usageMethodCode: usage ? usage.code : undefined,
+                usageMethodDisplayValue: usage ? usage.displayVaue : undefined,
+                dosageFK: dosage ? dosage.id : undefined,
+                dosageCode: dosage ? dosage.code : undefined,
+                dosageDisplayValue: dosage ? dosage.displayValue : undefined,
+                prescribeUOMFK: uom ? uom.id : undefined,
+                prescribeUOMCode: uom ? uom.code : undefined,
+                prescribeUOMDisplayValue: uom ? uom.displayValue : undefined,
+                drugFrequencyFK: frequency ? frequency.id : undefined,
+                drugFrequencyCode: frequency ? frequency.code : undefined,
+                drugFrequencyDisplayValue: frequency
+                  ? frequency.displayValue
+                  : undefined,
+                duration: instruction.duration,
+                sequence: instruction.sequence,
+                stepdose: instruction.stepdose,
+                isDeleted: false,
+              }
+            })
 
-            let drugMixtureIndex = 0
-            const drugMixtures =
-              item.prescriptionSetItemDrugMixture
-            if (drugMixtures && drugMixtures.length > 0) {
-              itemCorPrescriptionItemDrugMixture = itemCorPrescriptionItemDrugMixture.concat(
-                drugMixtures.map((o) => {
-                  let drug = inventorymedication.find(
-                    (medication) => medication.id === o.inventoryMedicationFK,
+            const instruction = this.getInstruction(
+              itemInstructions,
+              primaryPrintoutLanguage,
+            )
+            const secondInstruction =
+              secondaryPrintoutLanguage !== ''
+                ? this.getInstruction(
+                    itemInstructions,
+                    secondaryPrintoutLanguage,
                   )
-                  let currentDrugMixtureSequence = drugMixtureIndex
-                  drugMixtureIndex += 1
-                  return {
-                    inventoryMedicationFK: o.inventoryMedicationFK,
-                    drugCode: drug.code,
-                    drugName: drug.displayValue,
-                    quantity: o.quantity,
-                    costPrice: drug.averageCostPrice || 0,
-                    unitPrice: drug.sellingPrice || 0,
-                    totalPrice: (drug.sellingPrice || 0) * o.quantity,
-                    uomfk: drug.dispensingUOM.id,
-                    uomCode: drug.dispensingUOM.code,
-                    uomDisplayValue: drug.dispensingUOM.name,
-                    prescribeUOMFK: drug.prescribingUOM.id,
-                    prescribeUOMCode: drug.prescribingUOM.code,
-                    prescribeUOMDisplayValue: drug.prescribingUOM.name,
-                    batchNo: o.batchNo,
-                    expiryDate: o.expiryDate,
-                    revenueCategoryFK: drug.revenueCategory.id,
-                    sequence: currentDrugMixtureSequence,
-                    isDeleted: false,
-                    isNew: true,
-                    subject: drug.displayValue,
-                    caution: drug.caution,
-                    inventoryDispenseUOMFK: o.uomfk,
-                    inventoryPrescribingUOMFK: o.prescribeUOMFK,
-                    isActive: o.isActive
-                  }
-                }),
+                : ''
+
+            let itemExpiryDate
+            let itemBatchNo
+            let itemCostPrice
+            let itemUnitPrice
+            let itemDispenseUOMCode
+            let itemDispenseUOMDisplayValue
+            let itemSecondDispenseUOMDisplayValue
+            let itemDispenseUOMFK
+            let itemDrugCode
+            let itemDrugName
+            let itemTotalPrice
+            let newTotalQuantity
+            let ItemPrecautions = []
+            let itemCorPrescriptionItemDrugMixture = []
+            let itemDrugCaution
+            let isDispensedByPharmacy
+            let isNurseActualizeRequired
+            let isExclusive
+            if (item.inventoryMedicationFK) {
+              // Normal Drug
+              let drug = inventorymedication.find(
+                medication => medication.id === item.inventoryMedicationFK,
               )
+              let defaultBatch = drug.medicationStock.find(
+                o => o.isDefault === true,
+              )
+
+              let precautionIndex = 0
+              if (
+                drug.inventoryMedication_MedicationPrecaution &&
+                drug.inventoryMedication_MedicationPrecaution.length > 0
+              ) {
+                ItemPrecautions = ItemPrecautions.concat(
+                  drug.inventoryMedication_MedicationPrecaution.map(o => {
+                    let currentPrecautionSequence = precautionIndex
+                    precautionIndex += 1
+                    return {
+                      medicationPrecautionFK: o.medicationPrecautionFK,
+                      precaution: o.medicationPrecaution.name,
+                      precautionCode: o.medicationPrecaution.code,
+                      sequence: currentPrecautionSequence,
+                      isDeleted: false,
+                    }
+                  }),
+                )
+              } else {
+                ItemPrecautions = [
+                  {
+                    precaution: '',
+                    sequence: 0,
+                  },
+                ]
+              }
+
+              newTotalQuantity = item.quantity
+
+              itemTotalPrice = item.isExternalPrescription
+                ? 0
+                : newTotalQuantity * drug.sellingPrice
+
+              itemExpiryDate =
+                !item.isExternalPrescription && defaultBatch
+                  ? defaultBatch.expiryDate
+                  : undefined
+              itemBatchNo =
+                !item.isExternalPrescription && defaultBatch
+                  ? defaultBatch.batchNo
+                  : undefined
+
+              itemCostPrice = drug.averageCostPrice
+              itemUnitPrice = drug.sellingPrice
+
+              itemDispenseUOMCode = drug.dispensingUOM
+                ? drug.dispensingUOM.code
+                : undefined
+              const uom = ctmedicationunitofmeasurement.find(
+                uom => uom.id === drug?.dispensingUOM?.id,
+              )
+              itemDispenseUOMDisplayValue = getTranslationValue(
+                uom?.translationData,
+                primaryPrintoutLanguage,
+                'displayValue',
+              )
+              itemSecondDispenseUOMDisplayValue =
+                secondaryPrintoutLanguage !== ''
+                  ? getTranslationValue(
+                      uom?.translationData,
+                      secondaryPrintoutLanguage,
+                      'displayValue',
+                    )
+                  : ''
+
+              itemDispenseUOMFK = drug.dispensingUOM
+                ? drug.dispensingUOM.id
+                : undefined
+              itemDrugCode = drug.code
+              itemDrugName = drug.displayValue
+              itemDrugCaution = drug.caution
+              isDispensedByPharmacy = drug.isDispensedByPharmacy
+              isNurseActualizeRequired = drug.isNurseActualizable
+              isExclusive = drug.isExclusive
+            } else if (item.isDrugMixture) {
+              // Drug Mixture
+              itemExpiryDate = item.expiryDate
+              itemBatchNo = item.batchNo
+              itemCostPrice = item.costPrice || 0
+              itemUnitPrice = item.unitPrice || 0
+              itemDispenseUOMCode = item.dispenseUOMCode
+              const uom = ctmedicationunitofmeasurement.find(
+                uom => uom.id === item.dispenseUOMFK,
+              )
+              itemDispenseUOMDisplayValue = getTranslationValue(
+                uom?.translationData,
+                primaryPrintoutLanguage,
+                'displayValue',
+              )
+              itemSecondDispenseUOMDisplayValue =
+                secondaryPrintoutLanguage !== ''
+                  ? getTranslationValue(
+                      uom?.translationData,
+                      secondaryPrintoutLanguage,
+                      'displayValue',
+                    )
+                  : ''
+              itemDispenseUOMFK = item.dispenseUOMFK
+              itemDrugCode = 'DrugMixture'
+              itemDrugName = item.drugName
+              itemTotalPrice = 0
+              newTotalQuantity = item.quantity
+
+              let precautionIndex = 0
+              const precautions = item.prescriptionSetItemPrecaution
+              if (precautions && precautions.length > 0) {
+                ItemPrecautions = ItemPrecautions.concat(
+                  precautions.map(o => {
+                    let currentPrecautionSequence = precautionIndex
+                    precautionIndex += 1
+                    return {
+                      medicationPrecautionFK: o.medicationPrecautionFK,
+                      precaution: o.precaution,
+                      precautionCode: o.precautionCode,
+                      sequence: currentPrecautionSequence,
+                      isDeleted: false,
+                    }
+                  }),
+                )
+              } else {
+                ItemPrecautions = [
+                  {
+                    precaution: '',
+                    sequence: 0,
+                  },
+                ]
+              }
+
+              let drugMixtureIndex = 0
+              const drugMixtures = item.prescriptionSetItemDrugMixture
+              if (drugMixtures && drugMixtures.length > 0) {
+                itemCorPrescriptionItemDrugMixture = itemCorPrescriptionItemDrugMixture.concat(
+                  drugMixtures.map(o => {
+                    const drug = inventorymedication.find(
+                      medication => medication.id === o.inventoryMedicationFK,
+                    )
+                    let currentDrugMixtureSequence = drugMixtureIndex
+                    drugMixtureIndex += 1
+
+                    const uom = ctmedicationunitofmeasurement.find(
+                      uom => uom.id === drug.dispensingUOM.id,
+                    )
+                    return {
+                      inventoryMedicationFK: o.inventoryMedicationFK,
+                      drugCode: drug.code,
+                      drugName: drug.displayValue,
+                      quantity: o.quantity,
+                      costPrice: drug.averageCostPrice || 0,
+                      unitPrice: drug.sellingPrice || 0,
+                      totalPrice: (drug.sellingPrice || 0) * o.quantity,
+                      uomfk: drug.dispensingUOM.id,
+                      uomCode: drug.dispensingUOM.code,
+                      uomDisplayValue: getTranslationValue(
+                        uom?.translationData,
+                        primaryPrintoutLanguage,
+                        'displayValue',
+                      ),
+                      secondUOMDisplayValue:
+                        secondaryPrintoutLanguage !== ''
+                          ? getTranslationValue(
+                              uom?.translationData,
+                              secondaryPrintoutLanguage,
+                              'displayValue',
+                            )
+                          : '',
+                      prescribeUOMFK: drug.prescribingUOM.id,
+                      prescribeUOMCode: drug.prescribingUOM.code,
+                      prescribeUOMDisplayValue: drug.prescribingUOM.name,
+                      batchNo: o.batchNo,
+                      expiryDate: o.expiryDate,
+                      revenueCategoryFK: drug.revenueCategory.id,
+                      sequence: currentDrugMixtureSequence,
+                      isDeleted: false,
+                      isNew: true,
+                      subject: drug.displayValue,
+                      caution: drug.caution,
+                      isDispensedByPharmacy: drug.isDispensedByPharmacy,
+                      isNurseActualizeRequired: drug.isNurseActualizable,
+                      inventoryDispenseUOMFK: drug.dispensingUOM.id,
+                      inventoryPrescribingUOMFK: drug.prescribingUOM.id,
+                      isActive: drug.isActive,
+                    }
+                  }),
+                )
+              }
+
+              if (
+                itemCorPrescriptionItemDrugMixture.find(
+                  dm => dm.isDispensedByPharmacy,
+                )
+              )
+                isDispensedByPharmacy = true
+              if (
+                itemCorPrescriptionItemDrugMixture.find(
+                  dm => dm.isNurseActualizeRequired,
+                )
+              )
+                isNurseActualizeRequired = true
             }
 
-            if (itemCorPrescriptionItemDrugMixture.find(dm => dm.isDispensedByPharmacy))
-              isDispensedByPharmacy = true
-            if (itemCorPrescriptionItemDrugMixture.find(dm => dm.isNurseActualizeRequired))
-              isNurseActualizeRequired = true
-          }
-
-          return {
-            type: '1',
-            adjAmount: 0,
-            adjType: 'ExactAmount',
-            adjValue: 0,
-            expiryDate: itemExpiryDate,
-            batchNo: itemBatchNo,
-            corPrescriptionItemInstruction: itemInstructions,
-            corPrescriptionItemPrecaution: ItemPrecautions,
-            corPrescriptionItemDrugMixture: itemCorPrescriptionItemDrugMixture,
-            costPrice: itemCostPrice,
-            unitPrice: itemUnitPrice,
-            dispenseUOMCode: itemDispenseUOMCode,
-            dispenseUOMDisplayValue: itemDispenseUOMDisplayValue,
-            secondDispenseUOMDisplayValue: itemSecondDispenseUOMDisplayValue,
-            dispenseUOMFK: itemDispenseUOMFK,
-            drugCode: itemDrugCode,
-            drugName: itemDrugName,
-            instruction,
-            secondInstruction,
-            inventoryMedicationFK: item.inventoryMedicationFK,
-            isActive: true,
-            isDeleted: false,
-            quantity: newTotalQuantity,
-            remarks: item.remarks,
-            sequence: currentSequence,
-            subject: item.drugName,
-            totalPrice: itemTotalPrice,
-            totalAfterItemAdjustment: itemTotalPrice,
-            isExternalPrescription: item.isExternalPrescription,
-            visitPurposeFK: undefined,
-            isDrugMixture: item.isDrugMixture,
-            isClaimable: item.isClaimable,
-            caution: itemDrugCaution,
-            performingUserFK: this.getVisitDoctorUserId(this.props),
-            packageGlobalId: '',
-            isDispensedByPharmacy,
-            isNurseActualizeRequired,
-            isExclusive
-          }
-        }),
+            return {
+              type: '1',
+              adjAmount: 0,
+              adjType: 'ExactAmount',
+              adjValue: 0,
+              expiryDate: itemExpiryDate,
+              batchNo: itemBatchNo,
+              corPrescriptionItemInstruction: itemInstructions,
+              corPrescriptionItemPrecaution: ItemPrecautions,
+              corPrescriptionItemDrugMixture: itemCorPrescriptionItemDrugMixture,
+              costPrice: itemCostPrice,
+              unitPrice: itemUnitPrice,
+              dispenseUOMCode: itemDispenseUOMCode,
+              dispenseUOMDisplayValue: itemDispenseUOMDisplayValue,
+              secondDispenseUOMDisplayValue: itemSecondDispenseUOMDisplayValue,
+              dispenseUOMFK: itemDispenseUOMFK,
+              drugCode: itemDrugCode,
+              drugName: itemDrugName,
+              instruction,
+              secondInstruction,
+              inventoryMedicationFK: item.inventoryMedicationFK,
+              isActive: true,
+              isDeleted: false,
+              quantity: newTotalQuantity,
+              remarks: item.remarks,
+              sequence: currentSequence,
+              subject: item.drugName,
+              totalPrice: itemTotalPrice,
+              totalAfterItemAdjustment: itemTotalPrice,
+              isExternalPrescription: item.isExternalPrescription,
+              visitPurposeFK: undefined,
+              isDrugMixture: item.isDrugMixture,
+              isClaimable: item.isClaimable,
+              caution: itemDrugCaution,
+              performingUserFK: this.getVisitDoctorUserId(this.props),
+              packageGlobalId: '',
+              isDispensedByPharmacy,
+              isNurseActualizeRequired,
+              isExclusive,
+            }
+          }),
       )
     })
     return data
   }
 
-  onSelectItems = (prescriptionSetId) => {
+  onSelectItems = prescriptionSetId => {
     if (this.state.addedPrescriptionSets.indexOf(prescriptionSetId) < 0) {
-      this.setAddedPrescriptionSets([...this.state.addedPrescriptionSets, prescriptionSetId])
-    }
-    else {
-      this.setAddedPrescriptionSets([...this.state.addedPrescriptionSets.filter(ps => ps !== prescriptionSetId)])
+      this.setAddedPrescriptionSets([
+        ...this.state.addedPrescriptionSets,
+        prescriptionSetId,
+      ])
+    } else {
+      this.setAddedPrescriptionSets([
+        ...this.state.addedPrescriptionSets.filter(
+          ps => ps !== prescriptionSetId,
+        ),
+      ])
     }
   }
 
@@ -455,9 +516,9 @@ class PrescriptionSetList extends PureComponent {
     const cautionItems = []
     let allergys = []
 
-    const insertAllergys = (inventoryMedicationFK) => {
+    const insertAllergys = inventoryMedicationFK => {
       let drug = inventorymedication.find(
-        (medication) => medication.id === inventoryMedicationFK,
+        medication => medication.id === inventoryMedicationFK,
       )
       if (!drug) return
       const newAllergys = getDrugAllergy(drug, patientAllergy)
@@ -467,35 +528,32 @@ class PrescriptionSetList extends PureComponent {
     }
 
     data = this.GetNewMedication()
-    data.map((m) => {
+    data.map(m => {
       if (m.isDrugMixture) {
         const mixtureItems = m.corPrescriptionItemDrugMixture || []
-        mixtureItems
-          .forEach((mixture) => {
-            if (mixture.caution && mixture.caution.trim().length &&
-              !cautionItems.find(
-                (f) => f.id === mixture.inventoryMedicationFK,
-              )
-            ) {
-              cautionItems.push({
-                type: 'Medication',
-                subject: mixture.subject,
-                caution: mixture.caution,
-                id: mixture.inventoryMedicationFK,
-              })
-            }
+        mixtureItems.forEach(mixture => {
+          if (
+            mixture.caution &&
+            mixture.caution.trim().length &&
+            !cautionItems.find(f => f.id === mixture.inventoryMedicationFK)
+          ) {
+            cautionItems.push({
+              type: 'Medication',
+              subject: mixture.subject,
+              caution: mixture.caution,
+              id: mixture.inventoryMedicationFK,
+            })
+          }
 
-            if (!allergys.find(
-              (f) => f.id === mixture.inventoryMedicationFK,
-            )) {
-              insertAllergys(mixture.inventoryMedicationFK)
-            }
-          })
+          if (!allergys.find(f => f.id === mixture.inventoryMedicationFK)) {
+            insertAllergys(mixture.inventoryMedicationFK)
+          }
+        })
       } else {
         if (
           m.caution &&
           m.caution.trim().length > 0 &&
-          !cautionItems.find((f) => f.id === m.inventoryMedicationFK)
+          !cautionItems.find(f => f.id === m.inventoryMedicationFK)
         ) {
           cautionItems.push({
             type: 'Medication',
@@ -505,9 +563,7 @@ class PrescriptionSetList extends PureComponent {
           })
         }
 
-        if (!allergys.find(
-          (f) => f.id === m.inventoryMedicationFK,
-        )) {
+        if (!allergys.find(f => f.id === m.inventoryMedicationFK)) {
           insertAllergys(m.inventoryMedicationFK)
         }
       }
@@ -544,9 +600,7 @@ class PrescriptionSetList extends PureComponent {
   }
 
   searchPrescriptionSet = () => {
-    const {
-      searchName,
-    } = this.state
+    const { searchName } = this.state
     const { dispatch, user } = this.props
     dispatch({
       type: 'prescriptionSet/query',
@@ -563,11 +617,12 @@ class PrescriptionSetList extends PureComponent {
         sorting: [
           { columnName: 'type', direction: 'desc' },
           { columnName: 'sortOrder', direction: 'asc' },
-          { columnName: 'prescriptionSetName', direction: 'asc' }]
+          { columnName: 'prescriptionSetName', direction: 'asc' },
+        ],
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
-        this.setState((preState) => {
+        this.setState(preState => {
           return {
             ...preState,
             loadPrescriptionSets: [
@@ -576,7 +631,7 @@ class PrescriptionSetList extends PureComponent {
             ],
             activeKey: [
               ...preState.activeKey,
-              ...(r.data || []).map((o) => o.id),
+              ...(r.data || []).map(o => o.id),
             ],
           }
         })
@@ -584,31 +639,30 @@ class PrescriptionSetList extends PureComponent {
     })
   }
 
-  clickCollapseHeader = (prescriptionSetID) => {
-    this.setState((preState) => {
-      if (preState.activeKey.find((key) => key === prescriptionSetID)) {
+  clickCollapseHeader = prescriptionSetID => {
+    this.setState(preState => {
+      if (preState.activeKey.find(key => key === prescriptionSetID)) {
         return {
           ...preState,
-          activeKey: preState.activeKey.filter((key) => key !== prescriptionSetID),
+          activeKey: preState.activeKey.filter(
+            key => key !== prescriptionSetID,
+          ),
         }
       }
       return {
         ...preState,
-        activeKey: [
-          ...preState.activeKey,
-          prescriptionSetID,
-        ],
+        activeKey: [...preState.activeKey, prescriptionSetID],
       }
     })
   }
 
-  deletePrescriptionSet = (prescriptionSetID) => {
+  deletePrescriptionSet = prescriptionSetID => {
     const { dispatch } = this.props
     dispatch({
       type: 'prescriptionSet/delete',
       payload: {
-        id: prescriptionSetID
-      }
+        id: prescriptionSetID,
+      },
     }).then(r => {
       this.setState(
         {
@@ -621,36 +675,41 @@ class PrescriptionSetList extends PureComponent {
     })
   }
 
-  editPrescriptionSet = async (prescriptionSet) => {
+  editPrescriptionSet = async prescriptionSet => {
     const { dispatch } = this.props
     await dispatch({
       type: 'prescriptionSet/updateState',
       payload: {
         entity: { ...prescriptionSet },
-        prescriptionSetItems: [...prescriptionSet.prescriptionSetItem.map(psi => {
-          return {
-            ...psi,
-            uid: getUniqueId()
-          }
-        })]
-      }
+        prescriptionSetItems: [
+          ...prescriptionSet.prescriptionSetItem.map(psi => {
+            return {
+              ...psi,
+              uid: getUniqueId(),
+            }
+          }),
+        ],
+      },
     })
 
     this.setState({ showPrescriptionSetDetailModal: true })
   }
 
-  toggleShowPrescriptionSetDetailModal = (isUpdateEntity) => {
+  toggleShowPrescriptionSetDetailModal = isUpdateEntity => {
     const { dispatch } = this.props
     dispatch({
       type: 'prescriptionSet/updateState',
       payload: {
         entity: undefined,
         prescriptionSetItems: [],
-        editPrescriptionSetItem: undefined
-      }
+        editPrescriptionSetItem: undefined,
+      },
     })
 
-    this.setState({ showPrescriptionSetDetailModal: false, isNewPrescriptionSet: false })
+    this.setState({
+      showPrescriptionSetDetailModal: false,
+      isNewPrescriptionSet: false,
+    })
 
     if (isUpdateEntity) {
       this.setState(
@@ -664,51 +723,72 @@ class PrescriptionSetList extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const { loading, footer } = this.props
-    const { loadPrescriptionSets = [], activeKey, addedPrescriptionSets = [], showPrescriptionSetDetailModal, isNewPrescriptionSet, selectType } = this.state
+    const {
+      loadPrescriptionSets = [],
+      activeKey,
+      addedPrescriptionSets = [],
+      showPrescriptionSetDetailModal,
+      isNewPrescriptionSet,
+      selectType,
+    } = this.state
     const show = loading.effects['medicationHistory/queryMedicationHistory']
-    const setectPrescriptionSet = loadPrescriptionSets.filter(ps => addedPrescriptionSets.indexOf(ps.id) >= 0)
-    const disableFilterPrescriptionSet = this.generalAccessRight.rights === 'hidden'
+    const setectPrescriptionSet = loadPrescriptionSets.filter(
+      ps => addedPrescriptionSets.indexOf(ps.id) >= 0,
+    )
+    const disableFilterPrescriptionSet =
+      this.generalAccessRight.rights === 'hidden'
 
     return (
-      <LoadingWrapper
-        loading={show}
-        text='Retrieving prescription set list...'
-      >
+      <LoadingWrapper loading={show} text='Retrieving prescription set list...'>
         <div>
           <FitlerBar
             handelNewPrescriptionSet={async () => {
-              const { dispatch, orders: { rows = [] } } = this.props
+              const {
+                dispatch,
+                orders: { rows = [] },
+              } = this.props
               await dispatch({
                 type: 'prescriptionSet/updateState',
                 payload: {
                   entity: undefined,
-                  prescriptionSetItems: rows.filter(r => !r.isDeleted && r.type === '1').map((drug, index) => {
-                    return {
-                      ...drug,
-                      id: undefined,
-                      uid: getUniqueId(),
-                      prescriptionSetItemPrecaution: drug.corPrescriptionItemPrecaution.filter(p => !p.isDeleted).map(p => {
-                        return { ...p, id: undefined }
-                      }),
-                      prescriptionSetItemInstruction: drug.corPrescriptionItemInstruction.filter(i => !i.isDeleted).map(i => {
-                        return { ...i, id: undefined }
-                      }),
-                      prescriptionSetItemDrugMixture: drug.corPrescriptionItemDrugMixture.filter(dm => !dm.isDeleted).map(dm => {
-                        return { ...dm, id: undefined }
-                      }),
-                      sequence: index
-                    }
-                  })
-                }
+                  prescriptionSetItems: rows
+                    .filter(r => !r.isDeleted && r.type === '1')
+                    .map((drug, index) => {
+                      return {
+                        ...drug,
+                        id: undefined,
+                        uid: getUniqueId(),
+                        prescriptionSetItemPrecaution: drug.corPrescriptionItemPrecaution
+                          .filter(p => !p.isDeleted)
+                          .map(p => {
+                            return { ...p, id: undefined }
+                          }),
+                        prescriptionSetItemInstruction: drug.corPrescriptionItemInstruction
+                          .filter(i => !i.isDeleted)
+                          .map(i => {
+                            return { ...i, id: undefined }
+                          }),
+                        prescriptionSetItemDrugMixture: drug.corPrescriptionItemDrugMixture
+                          .filter(dm => !dm.isDeleted)
+                          .map(dm => {
+                            return { ...dm, id: undefined }
+                          }),
+                        sequence: index,
+                      }
+                    }),
+                },
               })
-              this.setState({ showPrescriptionSetDetailModal: true, isNewPrescriptionSet: true })
+              this.setState({
+                showPrescriptionSetDetailModal: true,
+                isNewPrescriptionSet: true,
+              })
             }}
             selectItemCount={setectPrescriptionSet.length}
             handelSearch={this.handelSearch}
             selectType={selectType}
-            typeChange={(e) => {
+            typeChange={e => {
               this.setState({ selectType: e.target.value })
             }}
             generalAccessRight={this.generalAccessRight}
@@ -738,7 +818,9 @@ class PrescriptionSetList extends PureComponent {
           })}
         <CommonModal
           open={showPrescriptionSetDetailModal}
-          title={`${isNewPrescriptionSet ? 'Add New' : 'Edit'} Prescription Set`}
+          title={`${
+            isNewPrescriptionSet ? 'Add New' : 'Edit'
+          } Prescription Set`}
           onClose={this.toggleShowPrescriptionSetDetailModal}
           onConfirm={() => this.toggleShowPrescriptionSetDetailModal(true)}
           observe='PrescriptionSetDetail'
@@ -747,8 +829,10 @@ class PrescriptionSetList extends PureComponent {
           overrideLoading
           cancelText='Cancel'
         >
-          <Details {...this.props}
-            generalAccessRight={this.generalAccessRight} />
+          <Details
+            {...this.props}
+            generalAccessRight={this.generalAccessRight}
+          />
         </CommonModal>
       </LoadingWrapper>
     )

@@ -20,7 +20,10 @@ import {
   CommonModal,
 } from '@/components'
 import Yup from '@/utils/yup'
-import { convertToConsultation } from '@/pages/Consultation/utils'
+import {
+  convertToConsultation,
+  isPharmacyOrderUpdated,
+} from '@/pages/Consultation/utils'
 // utils
 import { getAppendUrl } from '@/utils/utils'
 import { widgets } from '@/utils/widgets'
@@ -58,9 +61,10 @@ const discardConsultation = async ({ dispatch, dispense }) => {
   }
 }
 const styles = () => ({})
-@connect(({ consultation, user }) => ({
+@connect(({ consultation, user, clinicSettings }) => ({
   consultation,
   user,
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 @withFormikExtend({
   authority: ['queue.dispense.editorder'],
@@ -180,13 +184,20 @@ class EditOrder extends Component {
   }
 
   signOrder = async () => {
-    const { values, validateForm, handleSubmit, forms } = this.props
+    const {
+      values,
+      validateForm,
+      handleSubmit,
+      forms,
+      clinicSettings,
+    } = this.props
     if (forms.rows.filter(o => o.statusFK === 1 && !o.isDeleted).length > 0) {
       notification.warning({
         message: `Draft forms found, please finalize it before save.`,
       })
       return
     }
+    const { isEnablePharmacyModule } = clinicSettings
     const isFormValid = await validateForm()
     if (!_.isEmpty(isFormValid)) {
       handleSubmit()
@@ -210,7 +221,12 @@ class EditOrder extends Component {
                       color: 'red',
                     }}
                   />
-                  <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>
+                  <h3
+                    style={{
+                      marginLeft: '10px',
+                      display: 'inline-block',
+                    }}
+                  >
                     Unable to save, total amount cannot be{' '}
                     <span style={{ fontWeight: 400 }}>negative</span>.
                   </h3>
@@ -239,7 +255,11 @@ class EditOrder extends Component {
 
       const signResult = await dispatch({
         type: `consultation/signOrder`,
-        payload,
+        payload: {
+          ...payload,
+          isPharmacyOrderUpdated:
+            isEnablePharmacyModule && isPharmacyOrderUpdated(orders),
+        },
       })
       if (signResult) {
         const { visitRegistration } = this.props

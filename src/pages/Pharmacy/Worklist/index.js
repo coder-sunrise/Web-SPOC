@@ -7,6 +7,7 @@ import { PharmacyWorkitemStatus } from '@/utils/constants'
 import Refresh from '@material-ui/icons/Refresh'
 import moment from 'moment'
 import _ from 'lodash'
+import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import { HistoryOutlined } from '@ant-design/icons'
 import { CommonModal, Button, Tooltip } from '@/components'
 import { Worklist } from '@/pages/Radiology/Components'
@@ -32,7 +33,7 @@ const columnsTemplate = [
   {
     backgroundColor: '#366',
     title: 'Dispensed',
-    workitems: []
+    workitems: [],
   },
 ]
 
@@ -51,12 +52,71 @@ const PharmacyWorklist = () => {
 
   useEffect(() => {
     if (entity && entity.list) {
-      const worklist = entity.list.filter(w => w.patientReferenceNo.toUpperCase().indexOf(filterValue.toUpperCase()) >= 0
-        || w.patientAccountNo.toUpperCase().indexOf(filterValue.toUpperCase()) >= 0
-        || w.name.toUpperCase().indexOf(filterValue.toUpperCase()) >= 0).map(w => ({
-        ...w,
-        status: PharmacyWorkitemStatus[w.statusFK],
-      }))
+      const worklist = entity.list
+        .filter(
+          w =>
+            w.patientReferenceNo
+              .toUpperCase()
+              .indexOf(filterValue.toUpperCase()) >= 0 ||
+            w.patientAccountNo
+              .toUpperCase()
+              .indexOf(filterValue.toUpperCase()) >= 0 ||
+            w.name.toUpperCase().indexOf(filterValue.toUpperCase()) >= 0,
+        )
+        .map(w => {
+          let groupVisit = []
+          if (w.visitGroup && w.visitGroup.trim().length) {
+            groupVisit = entity.list
+              .filter(
+                l =>
+                  l.visitGroup === w.visitGroup &&
+                  l.patientProfileFK !== w.patientProfileFK,
+              )
+              .map(l => {
+                const age = l.dob ? calculateAgeFromDOB(l.dob) : 0
+                let gender = '-'
+                if (l.genderFK === 1) {
+                  gender = 'F'
+                } else if (l.genderFK === 2) {
+                  gender = 'M'
+                }
+                return {
+                  id: l.id,
+                  queueNo: l.queueNo,
+                  name: l.name,
+                  gender,
+                  patientProfileFK: l.patientProfileFK,
+                  age: `${age} ${age > 1 ? 'Yrs' : 'Yr'}`,
+                }
+              })
+          }
+
+          groupVisit = _.orderBy(
+            groupVisit,
+            ['patientProfileFK', 'queueNo'],
+            ['asc'],
+          )
+
+          let prePatientProfileFK
+          groupVisit.forEach(gv => {
+            if (gv.patientProfileFK !== prePatientProfileFK) {
+              gv.countNumber = 1
+              gv.rowSpan = groupVisit.filter(
+                g => g.patientProfileFK === gv.patientProfileFK,
+              ).length
+              prePatientProfileFK = gv.patientProfileFK
+            } else {
+              gv.countNumber = 0
+              gv.rowSpan = 0
+            }
+          })
+
+          return {
+            ...w,
+            status: PharmacyWorkitemStatus[w.statusFK],
+            groupVisit,
+          }
+        })
 
       const mapped = columnsTemplate.map(item => ({
         ...item,
@@ -75,7 +135,7 @@ const PharmacyWorklist = () => {
   }
 
   const debouncedAction = _.debounce(
-    (e) => {
+    e => {
       setFilterValue(e.target.value)
     },
     100,
@@ -85,38 +145,61 @@ const PharmacyWorklist = () => {
     },
   )
   return (
-    <div style={{ position: 'relative', height: '100%', }}>
+    <div style={{ position: 'relative', height: '100%' }}>
       <ProCard
         style={{
           height: '100%',
         }}
         gutter={[16, 16]}
-        title={<WorklistFilter valueChange={debouncedAction} filterValue={filterValue} />}
+        title={
+          <WorklistFilter
+            valueChange={debouncedAction}
+            filterValue={filterValue}
+          />
+        }
       >
         <Worklist columns={columns} worklistType='Pharmacy' />
         <PharmacyDetails refreshClick={refreshClick} />
       </ProCard>
 
       <div>
-        <div style={{ position: 'absolute', top: 25, right: 175, width: 300, textAlign: 'right' }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: 25,
+            right: 175,
+            width: 300,
+            textAlign: 'right',
+          }}
+        >
           <p style={{ fontWeight: 500 }}>Now Serving:</p>
           <Tooltip title='1.0(genery)'>
-            <p style={{
-              color: '#1890f8',
-              textOverflow: 'ellipsis',
-              overflow: 'hidden',
-              whiteSpace: 'nowrap',
-              marginTop: 4
-            }}>1.0(genery)</p>
+            <p
+              style={{
+                color: '#1890f8',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                marginTop: 4,
+              }}
+            >
+              1.0(genery)
+            </p>
           </Tooltip>
         </div>
 
         <Tooltip title=''>
           <span
             className='material-icons'
-            style={{ color: 'gray', position: 'absolute', top: 22, right: 143, width: 26, height: 26 }}
-            onClick={event => {
+            style={{
+              color: 'gray',
+              position: 'absolute',
+              top: 22,
+              right: 143,
+              width: 26,
+              height: 26,
             }}
+            onClick={event => {}}
           >
             history
           </span>
@@ -124,12 +207,26 @@ const PharmacyWorklist = () => {
 
         <div style={{ position: 'absolute', top: 25, right: 50 }}>
           <p style={{ fontWeight: 500 }}>Last Refresh:</p>
-          <p style={{ color: '#1890f8', marginTop: 4 }}> {refreshDate.format('HH:mm')}</p>
+          <p style={{ color: '#1890f8', marginTop: 4 }}>
+            {' '}
+            {refreshDate.format('HH:mm')}
+          </p>
         </div>
 
-        <Button color='primary' justIcon
-          style={{ position: 'absolute', top: 22, right: 10, width: 26, height: 26 }}
-          onClick={refreshClick}><Refresh /></Button>
+        <Button
+          color='primary'
+          justIcon
+          style={{
+            position: 'absolute',
+            top: 22,
+            right: 10,
+            width: 26,
+            height: 26,
+          }}
+          onClick={refreshClick}
+        >
+          <Refresh />
+        </Button>
       </div>
     </div>
   )

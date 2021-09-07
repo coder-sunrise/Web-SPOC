@@ -2,11 +2,13 @@ import React, { useState, useContext } from 'react'
 import { connect } from 'dva'
 import { Typography, Alert, Select } from 'antd'
 import { compose } from 'redux'
+import _ from 'lodash'
 import numeral from 'numeral'
 import moment from 'moment'
 import { history } from 'umi'
 import { withStyles } from '@material-ui/core'
 import Warning from '@material-ui/icons/Error'
+import Refresh from '@material-ui/icons/Refresh'
 import {
   GridContainer,
   GridItem,
@@ -16,24 +18,26 @@ import {
   CommonModal,
   withFormikExtend,
   NumberInput,
-  Tooltip
+  Tooltip,
+  FastField,
+  notification,
 } from '@/components'
 import { FileCopySharp } from '@material-ui/icons'
-import { navigateDirtyCheck, getTranslationValue } from '@/utils/utils'
+import { Table } from '@devexpress/dx-react-grid-material-ui'
+import {
+  navigateDirtyCheck,
+  getTranslationValue,
+  getUniqueId,
+} from '@/utils/utils'
 import { VISIT_TYPE, PHARMACY_STATUS, PHARMACY_ACTION } from '@/utils/constants'
-import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import Banner from '@/pages/PatientDashboard/Banner'
 import { MenuOutlined } from '@ant-design/icons'
 import { PharmacySteps } from '../../Components'
+import RedispenseForm from '../../Components/RedispenseForm'
 import AddOrder from '@/pages/Dispense/DispenseDetails/AddOrder'
+import { bool } from 'prop-types'
 
-const drugMixtureIndicator = (row, right) => {
-  return (
-    <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
-  )
-}
-
-const styles = (theme) => ({
+const styles = theme => ({
   wrapCellTextStyle: {
     wordWrap: 'break-word',
     whiteSpace: 'pre-wrap',
@@ -46,45 +50,65 @@ const styles = (theme) => ({
     fontSize: '0.7rem',
     padding: '2px 3px',
     height: 20,
-    cursor: 'pointer'
-  }
+    cursor: 'pointer',
+  },
+  subRow: {
+    '& > td:first-child': {
+      paddingLeft: theme.spacing(1),
+    },
+  },
 })
 
 const ContentGridItem = ({ children, title }) => {
   return (
     <GridItem md={4} style={{ paddingLeft: 130, marginBottom: 8 }}>
       <div style={{ position: 'relative' }}>
-        <div style={{
-          width: 130,
-          textAlign: 'right',
-          position: 'absolute',
-          left: '-130px',
-          fontWeight: 500
-        }}>{title}</div>
+        <div
+          style={{
+            width: 130,
+            textAlign: 'right',
+            position: 'absolute',
+            left: '-130px',
+            fontWeight: 500,
+          }}
+        >
+          {title}
+        </div>
         <div style={{ marginLeft: 6 }}> {children}</div>
       </div>
     </GridItem>
   )
 }
 
-const Details = (props) => {
-  const { pharmacyDetails, patient, dispatch, classes, clinicSettings, codetable } = props
+const Details = props => {
   const {
-    inventorymedication = [],
-    ctmedicationunitofmeasurement = [],
-  } = codetable
-  const { primaryPrintoutLanguage = 'EN', secondaryPrintoutLanguage = '', labelPrinterSize } = clinicSettings
+    pharmacyDetails,
+    patient,
+    dispatch,
+    classes,
+    clinicSettings,
+    codetable,
+  } = props
+  const { inventorymedication = [] } = codetable
+  const {
+    primaryPrintoutLanguage = 'EN',
+    secondaryPrintoutLanguage = '',
+    labelPrinterSize,
+  } = clinicSettings
   const [showEditOrderModal, setShowEditOrderModal] = useState(false)
+  const [showRedispenseFormModal, setShowRedispenseFormModal] = useState(false)
   const [printlanguage, setPrintlanguage] = useState([primaryPrintoutLanguage])
   const [showLanguage, setShowLanguage] = useState(primaryPrintoutLanguage)
   const workitem = pharmacyDetails.entity || {}
-  const statusHistory = [...(workitem.pharmarcyWorklistHistory || []),
-  {
-    statusFK: workitem.statusFK,
-    actionDate: workitem.updateDate,
-    actionByUser: workitem.updateByUser,
-    actionByUserTitle: workitem.updateByUserTitle
-  }]
+  const statusHistory = [
+    ...(workitem.pharmarcyWorklistHistory || []),
+    {
+      statusFK: workitem.statusFK,
+      actionDate: workitem.updateDate,
+      actionByUser: workitem.updateByUser,
+      actionByUserTitle: workitem.updateByUserTitle,
+    },
+  ]
   const { corDiagnosis = [], visitPurposeFK } = workitem
 
   const editOrder = e => {
@@ -108,13 +132,119 @@ const Details = (props) => {
     }
   }
 
-  const updatePharmacy = (actionType) => {
-    dispatch({ type: 'pharmacyDetails/upsert', payload: { ...workitem, actionType } }).then(
-      r => {
-        const { onConfirm } = props
-        onConfirm()
+  const getPaload = actionType => {
+    const { id, concurrencyToken } = workitem
+
+    const getTransaction = item => {
+      const {
+        stockFK,
+        batchNo,
+        expiryDate,
+        dispenseQuantity,
+        uomDisplayValue,
+        secondUOMDisplayValue,
+      } = item
+      return {
+        stockFK,
+        batchNo,
+        expiryDate,
+        transactionQty: dispenseQuantity,
+        uomDisplayValue,
+        secondUOMDisplayValue,
       }
-    )
+    }
+    let newPharmacyOrderItem = []
+    if (actionType === PHARMACY_ACTION.PREPARE) {
+      const pharmacyOrderItem = pharmacyDetails.entity?.pharmacyOrderItem || []
+      pharmacyOrderItem.forEach(item => {
+        if (item.invoiceItemTypeFK === 1) {
+          if (item.isDrugMixture) {
+            let newPrescriptionDrugMixture = []
+            item.prescriptionDrugMixture
+              .filter(drugMixture => drugMixture.isDispensedByPharmacy)
+              .forEach(drugMixture => {
+                const orderItem = props.values.orderItems.filter(
+                  oi =>
+                    oi.dispenseQuantity > 0 &&
+                    oi.drugMixtureFK === drugMixture.id,
+                )
+                if (orderItem.length) {
+                  newPrescriptionDrugMixture.push({
+                    id: drugMixture.id,
+                    concurrencyToken: drugMixture.concurrencyToken,
+                    inventoryMedicationFK: drugMixture.inventoryMedicationFK,
+                    pharmacyOrderItemTransaction: orderItem.map(i =>
+                      getTransaction(i),
+                    ),
+                  })
+                }
+              })
+            newPharmacyOrderItem.push({
+              id: item.id,
+              isDrugMixture: item.isDrugMixture,
+              concurrencyToken: item.concurrencyToken,
+              invoiceItemTypeFK: item.invoiceItemTypeFK,
+              inventoryFK: item.inventoryFK,
+              prescriptionDrugMixture: newPrescriptionDrugMixture,
+            })
+          } else if (item.inventoryFK && !item.isExternalPrescription) {
+            const orderItem = props.values.orderItems.filter(
+              oi =>
+                oi.invoiceItemTypeFK === item.invoiceItemTypeFK &&
+                oi.id === item.id &&
+                oi.dispenseQuantity > 0,
+            )
+            if (orderItem.length) {
+              newPharmacyOrderItem.push({
+                id: item.id,
+                isDrugMixture: item.isDrugMixture,
+                concurrencyToken: item.concurrencyToken,
+                invoiceItemTypeFK: item.invoiceItemTypeFK,
+                inventoryFK: item.inventoryFK,
+                pharmacyOrderItemTransaction: orderItem.map(i =>
+                  getTransaction(i),
+                ),
+              })
+            }
+          }
+        } else {
+          const orderItem = props.values.orderItems.filter(
+            oi =>
+              oi.invoiceItemTypeFK === item.invoiceItemTypeFK &&
+              oi.id === item.id &&
+              oi.dispenseQuantity > 0,
+          )
+          if (orderItem.length) {
+            newPharmacyOrderItem.push({
+              id: item.id,
+              concurrencyToken: item.concurrencyToken,
+              invoiceItemTypeFK: item.invoiceItemTypeFK,
+              inventoryFK: item.inventoryFK,
+              pharmacyOrderItemTransaction: orderItem.map(i =>
+                getTransaction(i),
+              ),
+            })
+          }
+        }
+      })
+    }
+    return { id, concurrencyToken, pharmacyOrderItem: newPharmacyOrderItem }
+  }
+
+  const updatePharmacy = (actionType, redispenseValues = {}) => {
+    const { redispenseBy, redispenseReason } = redispenseValues
+    dispatch({
+      type: 'pharmacyDetails/upsert',
+      payload: {
+        ...getPaload(actionType),
+        actionType,
+        redispenseBy,
+        redispenseReason,
+      },
+    }).then(r => {
+      const { onConfirm } = props
+      onConfirm()
+    })
   }
 
   const reloadPharmacy = () => {
@@ -122,436 +252,920 @@ const Details = (props) => {
     setShowEditOrderModal(false)
   }
 
-  const getInstruction = (row) => {
+  const getInstruction = row => {
     if (row.invoiceItemTypeFK !== 1) return ''
-    return row.language.isShowFirstValue ? row.instruction : row.secondInstruction
+    return row.language.isShowFirstValue
+      ? row.instruction
+      : row.secondInstruction
   }
 
-  const getDrugInteraction = (row) => {
+  const getDrugInteraction = row => {
     if (row.invoiceItemTypeFK !== 1) return ''
-    var medication = inventorymedication.find(m => m.id === row.inventoryFK) || {}
-    const {
-      inventoryMedication_MedicationInteraction = []
-    } = medication
+    var medication =
+      inventorymedication.find(m => m.id === row.inventoryFK) || {}
+    const { inventoryMedication_MedicationInteraction = [] } = medication
     if (!inventoryMedication_MedicationInteraction.length) return '-'
     return (
       <div>
         {inventoryMedication_MedicationInteraction.map(item => {
-          return <p> {getTranslationValue(
-            item.translationData,
-            row.language.value,
-            'displayValue',
-          )}
-          </p>
+          return (
+            <p>
+              {getTranslationValue(
+                item.translationData,
+                row.language.value,
+                'displayValue',
+              )}
+            </p>
+          )
         })}
       </div>
     )
   }
 
-  const getDrugContraIndication = (row) => {
+  const getDrugContraIndication = row => {
     if (row.invoiceItemTypeFK !== 1) return ''
-    var medication = inventorymedication.find(m => m.id === row.inventoryFK) || {}
-    const {
-      inventoryMedication_MedicationContraIndication = [],
-    } = medication
+    var medication =
+      inventorymedication.find(m => m.id === row.inventoryFK) || {}
+    const { inventoryMedication_MedicationContraIndication = [] } = medication
     if (!inventoryMedication_MedicationContraIndication.length) return '-'
     return (
       <div>
         {inventoryMedication_MedicationContraIndication.map(item => {
-          return <p> {getTranslationValue(
-            item.translationData,
-            row.language.value,
-            'displayValue',
-          )}
-          </p>
+          return (
+            <p>
+              {getTranslationValue(
+                item.translationData,
+                row.language.value,
+                'displayValue',
+              )}
+            </p>
+          )
         })}
       </div>
     )
   }
 
-  const getDispenseUOM = (row) => {
-    if (row.invoiceItemTypeFK !== 1) return ''
-    var medication = inventorymedication.find(m => m.id === row.inventoryFK) || {}
-    var uom = ctmedicationunitofmeasurement.find(m => m.id === medication?.dispensingUOM?.id) || {}
-    return getTranslationValue(
-      uom.translationData,
-      row.language.value,
-      'displayValue',
-    )
+  const getDispenseUOM = row => {
+    if (row.invoiceItemTypeFK === 1) {
+      return row.language.value === primaryPrintoutLanguage
+        ? row.uomDisplayValue
+        : row.secondUOMDisplayValue
+    } else {
+      return row.uomDisplayValue
+    }
   }
 
-  const getUOM = (row) => {
+  const getUOM = row => {
     if (row.invoiceItemTypeFK !== 1) return row.dispenseUOM
-    return row.language.isShowFirstValue ? row.dispenseUOM : row.secondDispenseUOM
+    return row.language.isShowFirstValue
+      ? row.dispenseUOM
+      : row.secondDispenseUOM
+  }
+
+  const getType = row => {
+    let type = 'Consumable'
+    if (row.invoiceItemTypeFK === 1) {
+      type = 'Medication'
+      if (!row.isDrugMixture && !row.inventoryFK) {
+        type = 'Open Prescription'
+      } else if (row.isExternalPrescription) {
+        type = 'Medication (Ext.)'
+      }
+    }
+    return type
   }
 
   const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
-  return <div>
-    <div style={{ maxHeight: 800, overflowY: 'scroll', marginBottom: 10 }}>
-      <Banner
-        patientInfo={patient}
-        style={{ position: 'relative' }}
-      />
-      <div style={{ marginTop: 16 }}>
-        <GridContainer>
-          <GridItem>
-            <PharmacySteps statusHistory={statusHistory} currentStatusFK={workitem.statusFK} />
-          </GridItem>
-          <GridItem md={12}>
-            <Typography.Title level={5}>Order Details</Typography.Title>
-          </GridItem>
-          <ContentGridItem title='Queue No.:'>{workitem.queueNo}</ContentGridItem>
-          <ContentGridItem title='Diagnosis:'>{corDiagnosis.length ? workitem.corDiagnosis.map(d => d.diagnosisDescription).join(', ') : '-'}</ContentGridItem>
-          <ContentGridItem title='Visit Type:'>{workitem.visitType}</ContentGridItem>
-          <ContentGridItem title='Order By:'>{`${workitem.generateByUserTitle && workitem.generateByUserTitle.trim().length ? `${workitem.generateByUserTitle}. ` : ''}${workitem.generateByUser || ''}`}</ContentGridItem>
-          <ContentGridItem title='Order Created Time:'>{moment(workitem.generateDate).format('HH:mm, DD MMM YYYY')}</ContentGridItem>
-          <ContentGridItem title='Group:'>{(workitem.visitGroup && workitem.visitGroup.trim().length) ? workitem.visitGroup : '-'}</ContentGridItem>
-          <ContentGridItem title='Family History:'>{(workitem.familyHistory && workitem.familyHistory.trim().length) ? workitem.familyHistory : '-'}</ContentGridItem>
-          <ContentGridItem title='Social History:'>{(workitem.socialHistory && workitem.socialHistory.trim().length) ? workitem.socialHistory : '-'}</ContentGridItem>
-          <ContentGridItem title='Medical History:'>{(workitem.medicalHistory && workitem.medicalHistory.trim().length) ? workitem.medicalHistory : '-'}</ContentGridItem>
-          <GridItem md={6}>
-            <Alert
-              message={`${workitem.latestOrderUpdateUser} amended prescription at ${moment(workitem.latestOrderUpdateDate).format("HH:mm")}`}
-              banner
-              style={{
-                whiteSpace: 'nowrap',
-                textOverflow: 'ellipsis',
-                width: '100%',
-                overflow: 'hidden',
-                padding: '3px 6px',
-                lineHeight: '25px',
-                fontSize: '0.85rem',
-              }}
-              icon={<Warning style={{ color: 'red' }} />}
-            />
-          </GridItem>
-          <GridItem md={6} style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-          }}>
 
-            <Typography.Text
-              underline
-              style={{
-                cursor: 'pointer', color: '#1890f8', position: 'relative', top: '6px'
-              }}
-              onClick={() => {
+  const orderItemRow = p => {
+    const { classes } = props
+    const { row, children, tableRow } = p
+    let newchildren = []
 
+    const batchColumns = children.slice(5, 10)
+
+    if (row.countNumber === 1) {
+      newchildren.push(
+        children
+          .filter((value, index) => index < 5)
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.rowspan,
+            },
+          })),
+      )
+
+      newchildren.push(batchColumns)
+
+      newchildren.push(
+        children
+          .filter((value, index) => index > 9)
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.rowspan,
+            },
+          })),
+      )
+    } else {
+      newchildren.push(batchColumns)
+    }
+
+    const selectedData = {
+      ...tableRow.row,
+      doctor: null,
+    }
+
+    if (row.countNumber === 1) {
+      return <Table.Row {...p}>{newchildren}</Table.Row>
+    }
+    return (
+      <Table.Row {...p} className={classes.subRow}>
+        {newchildren}
+      </Table.Row>
+    )
+  }
+
+  const onConfirmRedispense = redispenseValues => {
+    updatePharmacy(PHARMACY_ACTION.REDISPENSE, redispenseValues)
+    setShowRedispenseFormModal(false)
+  }
+
+  const closeRedispenseForm = () => {
+    setShowRedispenseFormModal(false)
+  }
+
+  const onPrepare = () => {
+    const { orderItems = [] } = props.values || {}
+
+    const isOverStock = () => {
+      let isOverStock = false
+      for (let index = 0; index < orderItems.length; index++) {
+        if (orderItems[index].stockFK && !orderItems[index].isDefault) {
+          var items = orderItems.filter(
+            oi =>
+              oi.invoiceItemTypeFK === orderItems[index].invoiceItemTypeFK &&
+              oi.stockFK === orderItems[index].stockFK &&
+              oi.inventoryFK === orderItems[index].inventoryFK,
+          )
+          if (orderItems[index].stock < _.sumBy(items, 'dispenseQuantity')) {
+            isOverStock = true
+            break
+          }
+        }
+      }
+      return isOverStock
+    }
+
+    const isPartialPrepare = () => {
+      let isPartialPrepare = false
+      for (let index = 0; index < orderItems.length; index++) {
+        var items = orderItems.filter(
+          oi =>
+            oi.invoiceItemTypeFK === orderItems[index].invoiceItemTypeFK &&
+            oi.id === orderItems[index].id &&
+            oi.inventoryFK === orderItems[index].inventoryFK,
+        )
+        if (orderItems[index].quantity > _.sumBy(items, 'dispenseQuantity')) {
+          isPartialPrepare = true
+          break
+        }
+      }
+    }
+
+    if (isOverStock()) {
+      notification.error({
+        message: 'inventory dispense more than total stock.',
+      })
+      return
+    }
+    if (isPartialPrepare()) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmContent: () => {
+            return (
+              <div>
+                <h3>There are partially prepared item.</h3>
+                <h3>Confirm to proceed?</h3>
+              </div>
+            )
+          },
+          openConfirmText: 'Confirm',
+          onConfirmSave: () => updatePharmacy(PHARMACY_ACTION.PREPARE),
+        },
+      })
+    } else {
+      updatePharmacy(PHARMACY_ACTION.PREPARE)
+    }
+  }
+  return (
+    <div>
+      <div style={{ maxHeight: 800, overflowY: 'scroll', marginBottom: 10 }}>
+        <Banner patientInfo={patient} style={{ position: 'relative' }} />
+        <div style={{ marginTop: 16 }}>
+          <GridContainer>
+            <GridItem>
+              <PharmacySteps
+                statusHistory={statusHistory}
+                currentStatusFK={workitem.statusFK}
+              />
+            </GridItem>
+            <GridItem md={12}>
+              <Typography.Title level={5}>Order Details</Typography.Title>
+            </GridItem>
+            <ContentGridItem title='Queue No.:'>
+              {workitem.queueNo}
+            </ContentGridItem>
+            <ContentGridItem title='Diagnosis:'>
+              {corDiagnosis.length
+                ? workitem.corDiagnosis
+                    .map(d => d.diagnosisDescription)
+                    .join(', ')
+                : '-'}
+            </ContentGridItem>
+            <ContentGridItem title='Visit Type:'>
+              {workitem.visitType}
+            </ContentGridItem>
+            <ContentGridItem title='Order By:'>{`${
+              workitem.generateByUserTitle &&
+              workitem.generateByUserTitle.trim().length
+                ? `${workitem.generateByUserTitle}. `
+                : ''
+            }${workitem.generateByUser || ''}`}</ContentGridItem>
+            <ContentGridItem title='Order Created Time:'>
+              {moment(workitem.generateDate).format('HH:mm, DD MMM YYYY')}
+            </ContentGridItem>
+            <ContentGridItem title='Group:'>
+              {workitem.visitGroup && workitem.visitGroup.trim().length
+                ? workitem.visitGroup
+                : '-'}
+            </ContentGridItem>
+            <ContentGridItem title='Family History:'>
+              {workitem.familyHistory && workitem.familyHistory.trim().length
+                ? workitem.familyHistory
+                : '-'}
+            </ContentGridItem>
+            <ContentGridItem title='Social History:'>
+              {workitem.socialHistory && workitem.socialHistory.trim().length
+                ? workitem.socialHistory
+                : '-'}
+            </ContentGridItem>
+            <ContentGridItem title='Medical History:'>
+              {workitem.medicalHistory && workitem.medicalHistory.trim().length
+                ? workitem.medicalHistory
+                : '-'}
+            </ContentGridItem>
+            <GridItem md={6} style={{ paddingRight: 40 }}>
+              {workitem.isOrderUpdate && (
+                <div style={{ position: 'relative' }}>
+                  <Alert
+                    message={`${
+                      workitem.latestOrderUpdateUser
+                    } amended prescription at ${moment(
+                      workitem.latestOrderUpdateDate,
+                    ).format('HH:mm')}`}
+                    banner
+                    style={{
+                      whiteSpace: 'nowrap',
+                      textOverflow: 'ellipsis',
+                      width: '100%',
+                      overflow: 'hidden',
+                      padding: '3px 6px',
+                      lineHeight: '25px',
+                      fontSize: '0.85rem',
+                    }}
+                    icon={<Warning style={{ color: 'red' }} />}
+                  />
+                  <Button
+                    color='primary'
+                    justIcon
+                    style={{
+                      position: 'absolute',
+                      right: -40,
+                      top: 3,
+                      width: 26,
+                      height: 26,
+                    }}
+                    onClick={() => {
+                      dispatch({
+                        type: 'pharmacyDetails/query',
+                        payload: { id: workitem.id },
+                      })
+                    }}
+                  >
+                    <Refresh />
+                  </Button>
+                </div>
+              )}
+            </GridItem>
+            <GridItem
+              md={6}
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
               }}
             >
-              Journal History
-            </Typography.Text>
+              <Typography.Text
+                underline
+                style={{
+                  cursor: 'pointer',
+                  color: '#1890f8',
+                  position: 'relative',
+                  top: '6px',
+                }}
+                onClick={() => {}}
+              >
+                Journal History
+              </Typography.Text>
 
-            {secondaryPrintoutLanguage !== '' &&
-              <Select
-                style={{ marginLeft: 16 }}
-                value={showLanguage}
-              options={[
-                {
-                  label: primaryPrintoutLanguage,
-                  value: primaryPrintoutLanguage,
-                },
-                {
-                  label: secondaryPrintoutLanguage,
-                  value: secondaryPrintoutLanguage,
-                },
-              ]}
-              onChange={(v) => {
-                setShowLanguage(v)
-                const { setFieldValue } = props
-                setFieldValue('orderItems', props.values.orderItems.map(item => {
-                  return {
-                    ...item,
-                    language: {
-                      value: v,
-                      isShowFirstValue: v === primaryPrintoutLanguage
-                    }
-                  }
-                }))
-              }}
-            />
-            }
-          </GridItem>
-          <GridItem style={{ marginTop: 8 }}>
-            <CommonTableGrid
-              forceRender
-              size='sm'
-              FuncProps={{ pager: false }}
-              rows={props.values?.orderItems || []}
-              columns={[
-                { name: 'invoiceItemTypeFK', title: 'Type' },
-                { name: 'itemCode', title: 'Code' },
-                { name: 'itemName', title: 'Name' },
-                { name: 'dispenseUOM', title: 'UOM' },
-                { name: 'quantity', title: 'Ordered' },
-                { name: 'dispenseQuantity', title: 'Dispensed' },
-                { name: 'stock', title: 'Bal. Qty.' },
-                { name: 'batchNo', title: 'Batch No.' },
-                { name: 'expiryDate', title: 'Expiry Date' },
-                { name: 'instruction', title: `Instruction${secondaryPrintoutLanguage !== '' ? `(${showLanguage})` : ''}` },
-                { name: 'drugInteraction', title: `Drug Interaction${secondaryPrintoutLanguage !== '' ? `(${showLanguage})` : ''}` },
-                { name: 'drugContraindication', title: `Contraindication${secondaryPrintoutLanguage !== '' ? `(${showLanguage})` : ''}` },
-                { name: 'remarks', title: 'Remarks' },
-                { name: 'action', title: 'Action' },
-              ]}
-              columnExtensions={[
-                {
-                  columnName: 'invoiceItemTypeFK',
-                  width: 110,
-                  sortingEnabled: false,
-                  render: (row) => {
-                    let type = 'Consumable'
-                    if (row.invoiceItemTypeFK == 1) {
-                      if (row.isDrugMixture)
-                        type = 'Drug Mixture'
-                      else if (!row.inventoryMedicationFK) {
-                        type = 'Open Prescription'
+              {secondaryPrintoutLanguage !== '' && (
+                <Select
+                  style={{ marginLeft: 16 }}
+                  value={showLanguage}
+                  options={[
+                    {
+                      label: primaryPrintoutLanguage,
+                      value: primaryPrintoutLanguage,
+                    },
+                    {
+                      label: secondaryPrintoutLanguage,
+                      value: secondaryPrintoutLanguage,
+                    },
+                  ]}
+                  onChange={v => {
+                    setShowLanguage(v)
+                    const { setFieldValue } = props
+                    setFieldValue(
+                      'orderItems',
+                      props.values.orderItems.map(item => {
+                        return {
+                          ...item,
+                          language: {
+                            value: v,
+                            isShowFirstValue: v === primaryPrintoutLanguage,
+                          },
+                        }
+                      }),
+                    )
+                  }}
+                />
+              )}
+            </GridItem>
+            <GridItem style={{ marginTop: 8 }}>
+              <CommonTableGrid
+                forceRender
+                size='sm'
+                FuncProps={{
+                  pager: false,
+                  grouping: true,
+                  groupingConfig: {
+                    state: {
+                      grouping: [{ columnName: 'dispenseGroupId' }],
+                      defaultExpandedGroups: props.values.defaultExpandedGroups,
+                    },
+                    row: {
+                      contentComponent: group => {
+                        const { row } = group
+                        const groupRow = props.values.orderItems.find(
+                          data => data.dispenseGroupId === row.value,
+                        )
+                        if (row.value === 'NormalDispense')
+                          return (
+                            <span style={{ fontWeight: 500 }}>
+                              Normal Dispense Items
+                            </span>
+                          )
+                        if (row.value === 'NoNeedToDispense')
+                          return (
+                            <span style={{ fontWeight: 500 }}>
+                              No Need To Dispense Items
+                            </span>
+                          )
+                        return (
+                          <span>
+                            <span style={{ fontWeight: 500 }}>
+                              {'Drug Mixture: '}
+                            </span>
+                            {groupRow.drugMixtureName}
+                          </span>
+                        )
+                      },
+                    },
+                  },
+                }}
+                rows={props.values.orderItems || []}
+                getRowId={r => r.uid}
+                columns={[
+                  { name: 'dispenseGroupId', title: '' },
+                  { name: 'invoiceItemTypeFK', title: 'Type' },
+                  { name: 'itemCode', title: 'Code' },
+                  { name: 'itemName', title: 'Name' },
+                  { name: 'dispenseUOM', title: 'UOM' },
+                  {
+                    name: 'quantity',
+                    title: (
+                      <div>
+                        <p style={{ height: 16 }}>Ordered</p>
+                        <p style={{ height: 16 }}>Qty.</p>
+                      </div>
+                    ),
+                  },
+                  {
+                    name: 'dispenseQuantity',
+                    title: (
+                      <div>
+                        <p style={{ height: 16 }}>Dispensed</p>
+                        <p style={{ height: 16 }}>Qty.</p>
+                      </div>
+                    ),
+                  },
+                  {
+                    name: 'stock',
+                    title: (
+                      <div>
+                        <p style={{ height: 16 }}>Stock</p>
+                        <p style={{ height: 16 }}>Qty.</p>
+                      </div>
+                    ),
+                  },
+                  {
+                    name: 'stockBalance',
+                    title: (
+                      <div>
+                        <p style={{ height: 16 }}>Balance</p>
+                        <p style={{ height: 16 }}>Qty.</p>
+                      </div>
+                    ),
+                  },
+                  { name: 'batchNo', title: 'Batch No.' },
+                  { name: 'expiryDate', title: 'Expiry Date' },
+                  {
+                    name: 'instruction',
+                    title: `Instruction${
+                      secondaryPrintoutLanguage !== ''
+                        ? `(${showLanguage})`
+                        : ''
+                    }`,
+                  },
+                  {
+                    name: 'drugInteraction',
+                    title: `Drug Interaction${
+                      secondaryPrintoutLanguage !== ''
+                        ? `(${showLanguage})`
+                        : ''
+                    }`,
+                  },
+                  {
+                    name: 'drugContraindication',
+                    title: `Contraindication${
+                      secondaryPrintoutLanguage !== ''
+                        ? `(${showLanguage})`
+                        : ''
+                    }`,
+                  },
+                  { name: 'remarks', title: 'Remarks' },
+                  { name: 'action', title: 'Action' },
+                ]}
+                columnExtensions={[
+                  {
+                    columnName: 'invoiceItemTypeFK',
+                    width: 110,
+                    sortingEnabled: false,
+                    render: row => {
+                      const type = getType(row)
+                      return (
+                        <Tooltip title={type}>
+                          <span>{type}</span>
+                        </Tooltip>
+                      )
+                    },
+                  },
+                  {
+                    columnName: 'itemCode',
+                    width: 100,
+                    sortingEnabled: false,
+                  },
+                  {
+                    columnName: 'itemName',
+                    width: 200,
+                    sortingEnabled: false,
+                    render: row => {
+                      let paddingRight = 0
+                      if (row.isExclusive) {
+                        paddingRight = 24
                       }
-                      else { type = 'Medication' }
-                    }
-                    return <Tooltip title={type}><span>{type}</span></Tooltip>
-                  }
-                },
-                {
-                  columnName: 'itemCode',
-                  width: 100,
-                  sortingEnabled: false
-                },
-                {
-                  columnName: 'itemName',
-                  width: 200,
-                  sortingEnabled: false,
-                  render: (row) => {
-                    let paddingRight = 0
-                    if (row.isExclusive) {
-                      paddingRight = 24
-                    }
-                    if (row.isDrugMixture) {
-                      paddingRight = 10
-                    }
-                    return (
-                      <div style={{ position: 'relative' }}>
-                        <div className={classes.wrapCellTextStyle}
-                          style={{ paddingRight: paddingRight }}>
-                          {row.itemName}
-                          <div style={{ position: 'relative', top: 2 }}>
-                            {row.isDrugMixture && drugMixtureIndicator(row, -20)}
-                            {row.isExclusive && (
-                              <Tooltip title='Exclusive Drug'>
-                                <div
-                                  className={classes.rightIcon}
-                                  style={{
-                                    right: -30,
-                                    borderRadius: 4,
-                                    backgroundColor: 'green',
-                                  }}
-                                >Excl.</div>
-                              </Tooltip>
-                            )}
+                      return (
+                        <div style={{ position: 'relative' }}>
+                          <div
+                            className={classes.wrapCellTextStyle}
+                            style={{ paddingRight: paddingRight }}
+                          >
+                            {row.itemName}
+                            <div style={{ position: 'relative', top: 2 }}>
+                              {row.isExclusive && (
+                                <Tooltip title='Exclusive Drug'>
+                                  <div
+                                    className={classes.rightIcon}
+                                    style={{
+                                      right: -30,
+                                      borderRadius: 4,
+                                      backgroundColor: 'green',
+                                    }}
+                                  >
+                                    Excl.
+                                  </div>
+                                </Tooltip>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )
-                  }
-                },
-                {
-                  columnName: 'dispenseUOM',
-                  width: 80,
-                  sortingEnabled: false,
-                  render: (row) => getUOM(row)
-                },
-                {
-                  columnName: 'quantity',
-                  width: 80,
-                  sortingEnabled: false,
-                  render: (row) => {
-                    const qty = numeral(row.quantity).format('0.0')
-                    return (
-                      <Tooltip title={qty}><span>{qty}</span></Tooltip>
-                    )
-                  }
-                },
-                {
-                  columnName: 'dispenseQuantity',
-                  width: 80,
-                  sortingEnabled: false,
-                  render: (row) => {
-                    if (row.statusFK !== PHARMACY_STATUS.NEW || row.isExternalPrescription) {
-                      const dispenseQty = `${numeral(row.dispenseQuantity).format('0.0')}`
-                      return (
-                        <Tooltip title={dispenseQty}><span>{dispenseQty}</span></Tooltip>
                       )
-                    }
-                    return <NumberInput
-                      label=''
-                      step={1}
-                      min={0}
-                      max={row.stock}
-                      precision={1}
-                      value={row.dispenseQuantity}
-                      onChange={v => {
-                        const { setFieldValue } = props
-                        setFieldValue('prescription[${row.rowIndex}]dispenseQuantity', v.target.value)
-                      }}
-                    />
-                  }
-                },
-                {
-                  columnName: 'stock',
-                  width: 100,
-                  sortingEnabled: false,
-                  render: (row) => {
-                    const stock = `${numeral(row.stock).format('0.0')} ${getDispenseUOM(row)}`
-                    return (
-                      <Tooltip title={stock}><span>{stock}</span></Tooltip>
-                    )
-                  }
-                },
-                {
-                  columnName: 'batchNo',
-                  width: 100,
-                  sortingEnabled: false
-                },
-                {
-                  columnName: 'expiryDate',
-                  width: 100,
-                  sortingEnabled: false
-                },
-                {
-                  columnName: 'instruction',
-                  sortingEnabled: false,
-                  render: (row) => {
-                    const instruction = getInstruction(row)
-                    return (
-                      <Tooltip title={instruction}><span>{instruction}</span></Tooltip>
-                    )
-                  }
-                },
-                {
-                  columnName: 'drugInteraction',
-                  sortingEnabled: false,
-                  render: (row) => {
-                    const interaction = getDrugInteraction(row)
-                    return (
-                      <Tooltip title={interaction}><span>{interaction}</span></Tooltip>
-                    )
-                  }
-                },
-                {
-                  columnName: 'drugContraindication',
-                  sortingEnabled: false,
-                  render: (row) => {
-                    const contraIndication = getDrugContraIndication(row)
-                    return (
-                      <Tooltip title={contraIndication}><span>{contraIndication}</span></Tooltip>
-                    )
-                  }
-                },
-                {
-                  columnName: 'remarks',
-                  sortingEnabled: false,
-                  render: (row) => {
-                    const existsDrugLabelRemarks = showDrugLabelRemark && row.drugLabelRemarks && row.drugLabelRemarks.trim() !== ''
-                    return <div style={{ position: 'relative' }} >
-                      <div
-                        style={{
-                          wordWrap: 'break-word',
-                          whiteSpace: 'pre-wrap',
-                          paddingRight: existsDrugLabelRemarks ? 10 : 0
-                        }}
-                      >
-                        {row.remarks || ' '}
-                        <div style={{ position: 'relative', top: 2 }}>
-                          {existsDrugLabelRemarks &&
-                            <div style={{
-                              position: 'absolute',
-                              bottom: 2,
-                              right: -15,
-                            }}>
-                              <Tooltip title={
-                                <div>
-                                  <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
-                                  <div>{row.drugLabelRemarks}
-                                  </div>
+                    },
+                  },
+                  {
+                    columnName: 'dispenseUOM',
+                    width: 80,
+                    sortingEnabled: false,
+                    render: row => {
+                      const uom = getUOM(row)
+                      return (
+                        <Tooltip title={uom}>
+                          <span>{uom}</span>
+                        </Tooltip>
+                      )
+                    },
+                  },
+                  {
+                    columnName: 'quantity',
+                    width: 80,
+                    sortingEnabled: false,
+                    render: row => {
+                      const qty = numeral(row.quantity).format('0.0')
+                      return (
+                        <Tooltip title={qty}>
+                          <span>{qty}</span>
+                        </Tooltip>
+                      )
+                    },
+                  },
+                  {
+                    columnName: 'dispenseQuantity',
+                    width: 80,
+                    sortingEnabled: false,
+                    render: row => {
+                      if (
+                        row.statusFK !== PHARMACY_STATUS.NEW ||
+                        row.isExternalPrescription ||
+                        (!row.isDrugMixture && !row.inventoryFK)
+                      ) {
+                        const dispenseQty =
+                          row.isExternalPrescription ||
+                          (!row.isDrugMixture && !row.inventoryFK) ||
+                          !row.isDispensedByPharmacy
+                            ? '-'
+                            : `${numeral(row.dispenseQuantity).format('0.0')}`
+                        return (
+                          <Tooltip title={dispenseQty}>
+                            <span>{dispenseQty}</span>
+                          </Tooltip>
+                        )
+                      }
+                      return (
+                        <FastField
+                          name={`orderItems[${row.rowIndex}]dispenseQuantity`}
+                          render={args => {
+                            return (
+                              <NumberInput
+                                label=''
+                                step={1}
+                                max={row.isDefault ? undefined : row.stock}
+                                min={0}
+                                disabled={!row.isDispensedByPharmacy}
+                                precision={1}
+                                {...args}
+                              />
+                            )
+                          }}
+                        />
+                      )
+                    },
+                  },
+                  {
+                    columnName: 'stock',
+                    width: 100,
+                    sortingEnabled: false,
+                    render: row => {
+                      const stock = row.stock
+                        ? `${numeral(row.stock).format('0.0')} ${getDispenseUOM(
+                            row,
+                          )}`
+                        : '-'
+                      return (
+                        <Tooltip title={stock}>
+                          <span>{stock}</span>
+                        </Tooltip>
+                      )
+                    },
+                  },
+                  {
+                    columnName: 'stockBalance',
+                    width: 100,
+                    sortingEnabled: false,
+                    render: row => {
+                      const stock = row.stockBalance
+                        ? `${numeral(row.stockBalance).format(
+                            '0.0',
+                          )} ${getDispenseUOM(row)}`
+                        : '-'
+                      return (
+                        <Tooltip title={stock}>
+                          <span>{stock}</span>
+                        </Tooltip>
+                      )
+                    },
+                  },
+                  {
+                    columnName: 'batchNo',
+                    width: 100,
+                    sortingEnabled: false,
+                  },
+                  {
+                    columnName: 'expiryDate',
+                    width: 100,
+                    sortingEnabled: false,
+                    render: row => {
+                      const expiryDate = row.expiryDate
+                        ? moment(row.expiryDate).format('DD MMM YYYY')
+                        : '-'
+                      return (
+                        <Tooltip title={expiryDate}>
+                          <span>{expiryDate}</span>
+                        </Tooltip>
+                      )
+                    },
+                  },
+                  {
+                    columnName: 'instruction',
+                    sortingEnabled: false,
+                    render: row => {
+                      const instruction = getInstruction(row)
+                      return (
+                        <Tooltip title={instruction}>
+                          <span>{instruction}</span>
+                        </Tooltip>
+                      )
+                    },
+                  },
+                  {
+                    columnName: 'drugInteraction',
+                    sortingEnabled: false,
+                    render: row => {
+                      const interaction = getDrugInteraction(row)
+                      return (
+                        <Tooltip title={interaction}>
+                          <span>{interaction}</span>
+                        </Tooltip>
+                      )
+                    },
+                  },
+                  {
+                    columnName: 'drugContraindication',
+                    sortingEnabled: false,
+                    render: row => {
+                      const contraIndication = getDrugContraIndication(row)
+                      return (
+                        <Tooltip title={contraIndication}>
+                          <span>{contraIndication}</span>
+                        </Tooltip>
+                      )
+                    },
+                  },
+                  {
+                    columnName: 'remarks',
+                    sortingEnabled: false,
+                    render: row => {
+                      const existsDrugLabelRemarks =
+                        showDrugLabelRemark &&
+                        row.drugLabelRemarks &&
+                        row.drugLabelRemarks.trim() !== ''
+                      return (
+                        <div style={{ position: 'relative' }}>
+                          <div
+                            style={{
+                              wordWrap: 'break-word',
+                              whiteSpace: 'pre-wrap',
+                              paddingRight: existsDrugLabelRemarks ? 10 : 0,
+                            }}
+                          >
+                            {row.remarks || ' '}
+                            <div style={{ position: 'relative', top: 2 }}>
+                              {existsDrugLabelRemarks && (
+                                <div
+                                  style={{
+                                    position: 'absolute',
+                                    bottom: 2,
+                                    right: -15,
+                                  }}
+                                >
+                                  <Tooltip
+                                    title={
+                                      <div>
+                                        <div style={{ fontWeight: 500 }}>
+                                          Drug Label Remarks
+                                        </div>
+                                        <div>{row.drugLabelRemarks}</div>
+                                      </div>
+                                    }
+                                  >
+                                    <FileCopySharp
+                                      style={{ color: '#4255bd' }}
+                                    />
+                                  </Tooltip>
                                 </div>
-                              }>
-                                <FileCopySharp style={{ color: '#4255bd' }} />
-                              </Tooltip>
+                              )}
                             </div>
-                          }
+                          </div>
                         </div>
-                      </div>
-                    </div >
-                  }
-                },
-                {
-                  columnName: 'action',
-                  width: 60,
-                  sortingEnabled: false,
-                  render: (row) => {
-                    return <Button justIcon color='primary'><MenuOutlined /></Button>
-                  }
-                },]}>
-            </CommonTableGrid>
-          </GridItem>
-        </GridContainer>
-      </div>
-    </div>
-    <GridContainer>
-      <GridItem md={8} >
-        <div style={{ position: 'relative' }}>
-          <Button color='primary' size='sm'>Print Prescription</Button>
-          <Button color='primary' size='sm'>Print leaflet/Drug Summary Label</Button>
-          <Button color='primary' size='sm'>Print Drug Label</Button>
-          <CheckboxGroup
-            value={printlanguage}
-            style={{ position: 'absolute', bottom: '-5px', marginLeft: '6px' }}
-            options={[
-              { value: 'EN', label: 'EN' },
-              { value: 'JP', label: 'JP' },
-            ]}
-            onChange={v => {
-              setPrintlanguage(v.target.value)
-            }} />
+                      )
+                    },
+                  },
+                  {
+                    columnName: 'action',
+                    width: 60,
+                    sortingEnabled: false,
+                    render: row => {
+                      return (
+                        <Button justIcon color='primary'>
+                          <MenuOutlined />
+                        </Button>
+                      )
+                    },
+                  },
+                ]}
+                TableProps={{ rowComponent: orderItemRow }}
+              />
+            </GridItem>
+          </GridContainer>
         </div>
-      </GridItem>
-      <GridItem md={4} style={{
-        display: 'flex',
-        justifyContent: 'flex-end',
-      }} >
-        <Button color='danger' size='sm' onClick={() => {
-          const { onClose } = props
-          onClose()
-        }}>Cancel</Button>
-        {workitem.statusFK === PHARMACY_STATUS.NEW && (workitem.visitPurposeFK == VISIT_TYPE.RETAIL ?
-          <Button color='success' size='sm' onClick={editOrder}>Add Order</Button>
-          : <Button color='success' size='sm' onClick={editOrder}>Edit Order</Button>)}
-        {workitem.statusFK !== PHARMACY_STATUS.NEW && <Button color='primary' size='sm' onClick={() => updatePharmacy(PHARMACY_ACTION.BACKTONEW)}>Back To New</Button>}
-        {workitem.statusFK === PHARMACY_STATUS.NEW && <Button color='primary' size='sm' onClick={() => updatePharmacy(PHARMACY_ACTION.PREPARE)}>Prepared</Button>}
-        {workitem.statusFK === PHARMACY_STATUS.PREPARED && <Button color='primary' size='sm' onClick={() => updatePharmacy(PHARMACY_ACTION.VERIFY)}>Verify</Button>}
-        {workitem.statusFK === PHARMACY_STATUS.VERIFIED && <Button color='primary' size='sm' onClick={() => updatePharmacy(PHARMACY_ACTION.COMPLETE)}>Complete</Button>}
-      </GridItem>
-    </GridContainer>
-    <CommonModal
-      open={showEditOrderModal}
-      title='Edit Order'
-      showFooter={true}
-      onClose={() => {
-        setShowEditOrderModal(false)
-      }}
-      maxWidth='md'
-      observe='OrderPage'
-      showFooter={false}
-    >
-      <AddOrder
-        visitType={visitPurposeFK}
-        isFirstLoad={false}
-        onReloadClick={reloadPharmacy}
-        {...props}
-        history={history}
-      />
-    </CommonModal>
-  </div >
+      </div>
+      <GridContainer>
+        <GridItem md={8}>
+          <div style={{ position: 'relative' }}>
+            <Button color='primary' size='sm'>
+              Print Prescription
+            </Button>
+            <Button color='primary' size='sm'>
+              Print leaflet/Drug Summary Label
+            </Button>
+            <Button color='primary' size='sm'>
+              Print Drug Label
+            </Button>
+            {secondaryPrintoutLanguage !== '' && (
+              <CheckboxGroup
+                value={printlanguage}
+                style={{
+                  position: 'absolute',
+                  bottom: '-5px',
+                  marginLeft: '6px',
+                }}
+                options={[
+                  { value: 'EN', label: 'EN' },
+                  { value: 'JP', label: 'JP' },
+                ]}
+                onChange={v => {
+                  setPrintlanguage(v.target.value)
+                }}
+              />
+            )}
+          </div>
+        </GridItem>
+        <GridItem
+          md={4}
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+          }}
+        >
+          <Button
+            color='danger'
+            size='sm'
+            onClick={() => {
+              if (
+                workitem.statusFK !== PHARMACY_STATUS.NEW &&
+                !props.values.orderItems.length
+              ) {
+                updatePharmacy(PHARMACY_ACTION.CANCEL)
+              } else {
+                const { onClose } = props
+                onClose()
+              }
+            }}
+          >
+            {workitem.statusFK !== PHARMACY_STATUS.NEW &&
+            !props.values.orderItems.length
+              ? 'Cancel'
+              : 'Close'}
+          </Button>
+          {workitem.statusFK === PHARMACY_STATUS.NEW && (
+            <Button
+              color='success'
+              size='sm'
+              disabled={
+                workitem.isOrderUpdate || !props.values.orderItems.length
+              }
+              onClick={editOrder}
+            >
+              {workitem.visitPurposeFK == VISIT_TYPE.RETAIL
+                ? 'Add Order'
+                : 'Edit Order'}
+            </Button>
+          )}
+          {workitem.statusFK !== PHARMACY_STATUS.NEW && (
+            <Button
+              color='primary'
+              size='sm'
+              onClick={() => {
+                setShowRedispenseFormModal(true)
+              }}
+              disabled={!props.values.orderItems.length}
+            >
+              Re-dispense
+            </Button>
+          )}
+          {workitem.statusFK === PHARMACY_STATUS.NEW && (
+            <Button
+              color='primary'
+              size='sm'
+              onClick={onPrepare}
+              disabled={
+                workitem.isOrderUpdate || !props.values.orderItems.length
+              }
+            >
+              Prepare
+            </Button>
+          )}
+          {workitem.statusFK === PHARMACY_STATUS.PREPARED && (
+            <Button
+              color='primary'
+              size='sm'
+              onClick={() => updatePharmacy(PHARMACY_ACTION.VERIFY)}
+              disabled={
+                workitem.isOrderUpdate || !props.values.orderItems.length
+              }
+            >
+              Verify
+            </Button>
+          )}
+          {workitem.statusFK === PHARMACY_STATUS.VERIFIED && (
+            <Button
+              color='primary'
+              size='sm'
+              onClick={() => updatePharmacy(PHARMACY_ACTION.COMPLETE)}
+              disabled={
+                workitem.isOrderUpdate || !props.values.orderItems.length
+              }
+            >
+              Complete
+            </Button>
+          )}
+        </GridItem>
+      </GridContainer>
+      <CommonModal
+        open={showEditOrderModal}
+        title='Edit Order'
+        showFooter={true}
+        onClose={() => {
+          setShowEditOrderModal(false)
+        }}
+        maxWidth='md'
+        observe='OrderPage'
+        showFooter={false}
+      >
+        <AddOrder
+          visitType={visitPurposeFK}
+          isFirstLoad={false}
+          onReloadClick={reloadPharmacy}
+          {...props}
+          history={history}
+        />
+      </CommonModal>
+      <CommonModal
+        open={showRedispenseFormModal}
+        title='Alert'
+        onClose={closeRedispenseForm}
+        maxWidth='sm'
+        cancelText='Cancel'
+        observe='RedispenseForm'
+      >
+        <RedispenseForm onConfirmRedispense={onConfirmRedispense} />
+      </CommonModal>
+    </div>
+  )
 }
 
 export default compose(
@@ -560,27 +1174,377 @@ export default compose(
     pharmacyDetails,
     patient,
     clinicSettings: clinicSettings.settings || clinicSettings.default,
-    codetable
+    codetable,
   })),
   withFormikExtend({
     enableReinitialize: true,
-    mapPropsToValues: ({ pharmacyDetails, clinicSettings }) => {
-      const { primaryPrintoutLanguage = 'EN' } = clinicSettings
-      return {
-        orderItems: (pharmacyDetails.entity?.pharmacyOrderItem || []).map(item => {
-          return {
-            ...item,
-            language: {
-              value: primaryPrintoutLanguage,
-              isShowFirstValue: true,
-            },
-            statusFK: pharmacyDetails.entity?.statusFK
+    mapPropsToValues: ({ pharmacyDetails, clinicSettings, codetable }) => {
+      if (!pharmacyDetails.entity) return { orderItems: [] }
+      const {
+        inventorymedication = [],
+        inventoryconsumable = [],
+        ctmedicationunitofmeasurement = [],
+      } = codetable
+      const {
+        primaryPrintoutLanguage = 'EN',
+        secondaryPrintoutLanguage = '',
+      } = clinicSettings
+      let orderItems = []
+
+      const defaultItem = (item, groupName) => {
+        return {
+          ...item,
+          language: {
+            value: primaryPrintoutLanguage,
+            isShowFirstValue: true,
+          },
+          statusFK: pharmacyDetails.entity?.statusFK,
+          dispenseGroupId: groupName,
+          countNumber: 1,
+          rowspan: 1,
+          uid: getUniqueId(),
+        }
+      }
+
+      const generateFromDrugmixture = item => {
+        const drugMixtures = _.orderBy(
+          item.prescriptionDrugMixture,
+          ['sequence'],
+          ['asc'],
+        )
+        drugMixtures.forEach(drugMixture => {
+          const detaultDrugMixture = {
+            ...defaultItem(item, `DrugMixture-${item.id}`),
+            drugMixtureFK: drugMixture.id,
+            inventoryFK: drugMixture.inventoryMedicationFK,
+            itemCode: drugMixture.drugCode,
+            itemName: drugMixture.drugName,
+            quantity: drugMixture.quantity,
+            dispenseUOM: drugMixture.uomDisplayValue,
+            secondDispenseUOM: drugMixture.secondUOMDisplayValue,
+            isDispensedByPharmacy: drugMixture.isDispensedByPharmacy,
+            drugMixtureName: item.itemName,
+          }
+          if (!drugMixture.isDispensedByPharmacy) {
+            orderItems.push({
+              ...detaultDrugMixture,
+            })
+          } else {
+            if (pharmacyDetails.entity?.statusFK === PHARMACY_STATUS.NEW) {
+              const inventoryItem = inventorymedication.find(
+                drug => drug.id === drugMixture.inventoryMedicationFK,
+              )
+              const uom =
+                ctmedicationunitofmeasurement.find(
+                  m => m.id === inventoryItem?.dispensingUOM?.id,
+                ) || {}
+              const primaryUOMDisplayValue = getTranslationValue(
+                uom.translationData,
+                primaryPrintoutLanguage,
+                'displayValue',
+              )
+              const secondUOMDisplayValue =
+                secondaryPrintoutLanguage !== ''
+                  ? getTranslationValue(
+                      uom.translationData,
+                      secondaryPrintoutLanguage,
+                      'displayValue',
+                    )
+                  : ''
+              const inventoryItemStock = _.orderBy(
+                (inventoryItem?.medicationStock || []).filter(
+                  s => s.isDefault || s.stock > 0,
+                ),
+                ['isDefault', 'expiryDate'],
+                ['asc'],
+              )
+              let remainQty = drugMixture.quantity
+              if (inventoryItem && inventoryItemStock.length) {
+                inventoryItemStock.forEach((itemStock, index) => {
+                  const {
+                    id,
+                    batchNo,
+                    expiryDate,
+                    stock,
+                    isDefault,
+                  } = itemStock
+                  if (remainQty >= 0) {
+                    let dispenseQuantity = 0
+                    if (isDefault || remainQty >= stock) {
+                      dispenseQuantity = remainQty
+                      remainQty = -1
+                    } else {
+                      remainQty = dispenseQuantity = remainQty - stock
+                    }
+                    orderItems.push({
+                      ...detaultDrugMixture,
+                      dispenseQuantity: dispenseQuantity,
+                      batchNo,
+                      expiryDate,
+                      stock,
+                      stockBalance: stock - dispenseQuantity,
+                      stockFK: id,
+                      uomDisplayValue: primaryUOMDisplayValue,
+                      secondUOMDisplayValue: secondUOMDisplayValue,
+                      isDefault,
+                      countNumber: index === 0 ? 1 : 0,
+                      rowspan: index === 0 ? inventoryItemStock.length : 0,
+                    })
+                  }
+                })
+              } else {
+                orderItems.push({
+                  ...detaultDrugMixture,
+                })
+              }
+            } else {
+              if ((drugMixture.pharmacyOrderItemTransaction || []).length) {
+                drugMixture.pharmacyOrderItemTransaction.forEach(
+                  (itemTransaction, index) => {
+                    const {
+                      stockFK,
+                      batchNo,
+                      expiryDate,
+                      oldQty,
+                      transactionQty,
+                      uomDisplayValue,
+                      secondUOMDisplayValue,
+                    } = itemTransaction
+                    orderItems.push({
+                      ...detaultDrugMixture,
+                      dispenseQuantity: transactionQty,
+                      batchNo,
+                      expiryDate,
+                      stock: oldQty,
+                      stockBalance: oldQty - transactionQty,
+                      stockFK: stockFK,
+                      uomDisplayValue,
+                      secondUOMDisplayValue,
+                      drugMixtureName: item.itemName,
+                      countNumber: index === 0 ? 1 : 0,
+                      rowspan:
+                        index === 0
+                          ? drugMixture.pharmacyOrderItemTransaction.length
+                          : 0,
+                    })
+                  },
+                )
+              } else {
+                orderItems.push({
+                  ...detaultDrugMixture,
+                })
+              }
+            }
           }
         })
       }
+
+      const generateFromItemTransaction = (item, groupName) => {
+        if ((item.pharmacyOrderItemTransaction || []).length) {
+          item.pharmacyOrderItemTransaction.forEach(
+            (itemTransaction, index) => {
+              const {
+                stockFK,
+                batchNo,
+                expiryDate,
+                oldQty,
+                transactionQty,
+                uomDisplayValue,
+                secondUOMDisplayValue,
+              } = itemTransaction
+              orderItems.push({
+                ...defaultItem(item, groupName),
+                dispenseQuantity: transactionQty,
+                batchNo,
+                expiryDate,
+                stock: oldQty,
+                stockBalance: oldQty - transactionQty,
+                stockFK: stockFK,
+                uomDisplayValue,
+                secondUOMDisplayValue,
+                countNumber: index === 0 ? 1 : 0,
+                rowspan:
+                  index === 0 ? item.pharmacyOrderItemTransaction.length : 0,
+              })
+            },
+          )
+        } else {
+          orderItems.push(defaultItem(item, groupName))
+        }
+      }
+
+      const generateFromNormalMedication = item => {
+        const groupName = 'NormalDispense'
+        if (pharmacyDetails.entity?.statusFK === PHARMACY_STATUS.NEW) {
+          const inventoryItem = inventorymedication.find(
+            drug => drug.id === item.inventoryFK,
+          )
+
+          const uom =
+            ctmedicationunitofmeasurement.find(
+              m => m.id === inventoryItem?.dispensingUOM?.id,
+            ) || {}
+          const primaryUOMDisplayValue = getTranslationValue(
+            uom.translationData,
+            primaryPrintoutLanguage,
+            'displayValue',
+          )
+          const secondUOMDisplayValue =
+            secondaryPrintoutLanguage !== ''
+              ? getTranslationValue(
+                  uom.translationData,
+                  secondaryPrintoutLanguage,
+                  'displayValue',
+                )
+              : ''
+
+          const inventoryItemStock = _.orderBy(
+            (inventoryItem?.medicationStock || []).filter(
+              s => s.isDefault || s.stock > 0,
+            ),
+            ['isDefault', 'expiryDate'],
+            ['asc'],
+          )
+          let remainQty = item.quantity
+          if (inventoryItem && inventoryItemStock.length) {
+            inventoryItemStock.forEach((itemStock, index) => {
+              const { id, batchNo, expiryDate, stock, isDefault } = itemStock
+              if (remainQty >= 0) {
+                let dispenseQuantity = 0
+                if (isDefault || remainQty >= stock) {
+                  dispenseQuantity = remainQty
+                  remainQty = -1
+                } else {
+                  remainQty = dispenseQuantity = remainQty - stock
+                }
+                orderItems.push({
+                  ...defaultItem(item, groupName),
+                  dispenseQuantity: dispenseQuantity,
+                  batchNo,
+                  expiryDate,
+                  stock,
+                  stockBalance: stock - dispenseQuantity,
+                  stockFK: id,
+                  uomDisplayValue: primaryUOMDisplayValue,
+                  secondUOMDisplayValue: secondUOMDisplayValue,
+                  isDefault,
+                  countNumber: index === 0 ? 1 : 0,
+                  rowspan: index === 0 ? inventoryItemStock.length : 0,
+                })
+              }
+            })
+          } else {
+            orderItems.push(defaultItem(item, groupName))
+          }
+        } else {
+          generateFromItemTransaction(item, groupName)
+        }
+      }
+
+      const generateFromNormalConsumable = item => {
+        if (pharmacyDetails.entity?.statusFK === PHARMACY_STATUS.NEW) {
+          const inventoryItem = inventoryconsumable.find(
+            drug => drug.id === item.inventoryFK,
+          )
+          const inventoryItemStock = _.orderBy(
+            (inventoryItem?.consumableStock || []).filter(
+              s => s.isDefault || s.stock > 0,
+            ),
+            ['isDefault', 'expiryDate'],
+            ['asc'],
+          )
+          let remainQty = item.quantity
+          if (inventoryItem && inventoryItemStock.length) {
+            inventoryItemStock.forEach((itemStock, index) => {
+              const { id, batchNo, expiryDate, stock, isDefault } = itemStock
+              if (remainQty >= 0) {
+                let dispenseQuantity = 0
+                if (isDefault || remainQty >= stock) {
+                  dispenseQuantity = remainQty
+                  remainQty = -1
+                } else {
+                  remainQty = dispenseQuantity = remainQty - stock
+                }
+                orderItems.push({
+                  ...defaultItem(item, 'NormalDispense'),
+                  dispenseQuantity: dispenseQuantity,
+                  batchNo,
+                  expiryDate,
+                  stock,
+                  stockBalance: stock - dispenseQuantity,
+                  stockFK: id,
+                  uomDisplayValue: inventoryItem?.uom?.name,
+                  isDefault,
+                  countNumber: index === 0 ? 1 : 0,
+                  rowspan: index === 0 ? inventoryItemStock.length : 0,
+                })
+              }
+            })
+          } else {
+            orderItems.push(defaultItem(item, 'NormalDispense'))
+          }
+        } else {
+          generateFromItemTransaction(item, 'NormalDispense')
+        }
+      }
+
+      const pharmacyOrderItem = pharmacyDetails.entity?.pharmacyOrderItem || []
+      const sortOrderItems = [
+        ...pharmacyOrderItem.filter(
+          item =>
+            item.invoiceItemTypeFK === 1 &&
+            item.inventoryFK &&
+            !item.isExternalPrescription,
+        ),
+        ...pharmacyOrderItem.filter(item => item.invoiceItemTypeFK !== 1),
+        ...pharmacyOrderItem.filter(
+          item => item.invoiceItemTypeFK === 1 && item.isDrugMixture,
+        ),
+        ...pharmacyOrderItem.filter(
+          item =>
+            item.invoiceItemTypeFK === 1 &&
+            (item.isExternalPrescription ||
+              (!item.isDrugMixture && !item.inventoryFK)),
+        ),
+      ]
+      sortOrderItems.forEach(item => {
+        if (pharmacyDetails.entity?.statusFK === PHARMACY_STATUS.NEW) {
+          if (item.invoiceItemTypeFK === 1) {
+            if (item.isDrugMixture) {
+              generateFromDrugmixture(item)
+            } else if (!item.inventoryFK || item.isExternalPrescription) {
+              orderItems.push(defaultItem(item, 'NoNeedToDispense'))
+            } else {
+              generateFromNormalMedication(item)
+            }
+          } else {
+            generateFromNormalConsumable(item)
+          }
+        } else {
+          if (item.invoiceItemTypeFK === 1) {
+            if (item.isDrugMixture) {
+              generateFromDrugmixture(item)
+            } else if (!item.inventoryFK || item.isExternalPrescription) {
+              orderItems.push(defaultItem(item, 'NoNeedToDispense'))
+            } else {
+              generateFromNormalMedication(item)
+            }
+          } else {
+            generateFromNormalConsumable(item)
+          }
+        }
+      })
+
+      const defaultExpandedGroups = _.uniqBy(orderItems, 'dispenseGroupId').map(
+        o => o.dispenseGroupId,
+      )
+      return {
+        orderItems,
+        defaultExpandedGroups,
+      }
     },
     //validationSchema: Yup.object().shape({}),
-    handleSubmit: () => { },
+    handleSubmit: () => {},
     displayName: 'PharmarcyWorklistDetail',
-  })
+  }),
 )(Details)

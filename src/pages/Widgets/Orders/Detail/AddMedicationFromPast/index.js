@@ -20,8 +20,12 @@ import Grid from './Grid'
 import { getClinicianProfile } from '../../../ConsultationDocument/utils'
 
 const defaultValue = {
-  visitFromDate: moment(new Date()).startOf('day').toDate(),
-  visitToDate: moment(new Date()).endOf('day').toDate(),
+  visitFromDate: moment(new Date())
+    .startOf('day')
+    .toDate(),
+  visitToDate: moment(new Date())
+    .endOf('day')
+    .toDate(),
   searchName: '',
   isAllDate: true,
 }
@@ -52,12 +56,16 @@ const defaultValue = {
   handleSubmit: () => ({}),
 })
 class PastMedication extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       addedItems: [],
-      visitFromDate: moment(new Date()).startOf('day').toDate(),
-      visitToDate: moment(new Date()).endOf('day').toDate(),
+      visitFromDate: moment(new Date())
+        .startOf('day')
+        .toDate(),
+      visitToDate: moment(new Date())
+        .endOf('day')
+        .toDate(),
       searchName: '',
       isAllDate: true,
       pageIndex: 0,
@@ -67,11 +75,11 @@ class PastMedication extends PureComponent {
     }
   }
 
-  componentWillMount () {
+  componentWillMount() {
     this.searchHistory()
   }
 
-  setAddedItems = (v) => {
+  setAddedItems = v => {
     this.setState({
       addedItems: v,
     })
@@ -88,15 +96,23 @@ class PastMedication extends PureComponent {
     let instruction = ''
     let nextStepdose = ''
     const activeInstructions = instructions
-      ? instructions.filter((item) => !item.isDeleted)
+      ? instructions.filter(item => !item.isDeleted)
       : undefined
     if (activeInstructions) {
       for (let index = 0; index < activeInstructions.length; index++) {
         let item = activeInstructions[index]
-        const usage = ctmedicationusage.find(usage => usage.id === item.usageMethodFK)
-        const uom = ctmedicationunitofmeasurement.find(uom => uom.id === item.prescribeUOMFK)
-        const frequency = ctmedicationfrequency.find(frequency => frequency.id === item.drugFrequencyFK)
-        const dosage = ctmedicationdosage.find(dosage => dosage.id === item.dosageFK)
+        const usage = ctmedicationusage.find(
+          usage => usage.id === item.usageMethodFK,
+        )
+        const uom = ctmedicationunitofmeasurement.find(
+          uom => uom.id === item.prescribeUOMFK,
+        )
+        const frequency = ctmedicationfrequency.find(
+          frequency => frequency.id === item.drugFrequencyFK,
+        )
+        const dosage = ctmedicationdosage.find(
+          dosage => dosage.id === item.dosageFK,
+        )
         if (instruction !== '') {
           instruction += ' '
         }
@@ -136,7 +152,8 @@ class PastMedication extends PureComponent {
     const { doctorProfileFK } = props.visitRegistration.entity.visit
     let visitDoctorUserId
     if (doctorprofile && doctorProfileFK) {
-      visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
+      visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK)
+        .clinicianProfile.userProfileFK
     }
 
     return visitDoctorUserId
@@ -144,7 +161,10 @@ class PastMedication extends PureComponent {
 
   GetNewMedication = () => {
     const { getNextSequence, codetable, type, clinicSettings } = this.props
-    const { primaryPrintoutLanguage = 'EN', secondaryPrintoutLanguage = '' } = clinicSettings
+    const {
+      primaryPrintoutLanguage = 'EN',
+      secondaryPrintoutLanguage = '',
+    } = clinicSettings
     const {
       inventorymedication,
       ctmedicationusage,
@@ -157,25 +177,25 @@ class PastMedication extends PureComponent {
     let data = []
     let sequence = getNextSequence()
     data = data.concat(
-      medications.map((item) => {
+      medications.map(item => {
         let currentSequence = sequence
         sequence += 1
 
         let itemInstructions =
           item.corPrescriptionItemInstruction ||
           item.retailPrescriptionItemInstruction
-        itemInstructions = itemInstructions.map((instruction) => {
+        itemInstructions = itemInstructions.map(instruction => {
           let usage = ctmedicationusage.find(
-            (drugusage) => drugusage.id === instruction.usageMethodFK,
+            drugusage => drugusage.id === instruction.usageMethodFK,
           )
           let dosage = ctmedicationdosage.find(
-            (drugdosage) => drugdosage.id === instruction.dosageFK,
+            drugdosage => drugdosage.id === instruction.dosageFK,
           )
           let uom = ctmedicationunitofmeasurement.find(
-            (druguom) => druguom.id === instruction.prescribeUOMFK,
+            druguom => druguom.id === instruction.prescribeUOMFK,
           )
           let frequency = ctmedicationfrequency.find(
-            (drugfrequency) => drugfrequency.id === instruction.drugFrequencyFK,
+            drugfrequency => drugfrequency.id === instruction.drugFrequencyFK,
           )
           return {
             usageMethodFK: usage ? usage.id : undefined,
@@ -199,8 +219,14 @@ class PastMedication extends PureComponent {
           }
         })
 
-        const instruction = this.getInstruction(itemInstructions, primaryPrintoutLanguage)
-        const secondInstruction = secondaryPrintoutLanguage !== '' ? this.getInstruction(itemInstructions, secondaryPrintoutLanguage) : ''
+        const instruction = this.getInstruction(
+          itemInstructions,
+          primaryPrintoutLanguage,
+        )
+        const secondInstruction =
+          secondaryPrintoutLanguage !== ''
+            ? this.getInstruction(itemInstructions, secondaryPrintoutLanguage)
+            : ''
 
         let itemExpiryDate
         let itemBatchNo
@@ -225,10 +251,10 @@ class PastMedication extends PureComponent {
         if (item.inventoryMedicationFK) {
           // Normal Drug
           let drug = inventorymedication.find(
-            (medication) => medication.id === item.inventoryMedicationFK,
+            medication => medication.id === item.inventoryMedicationFK,
           )
           let defaultBatch = drug.medicationStock.find(
-            (o) => o.isDefault === true,
+            o => o.isDefault === true,
           )
 
           let precautionIndex = 0
@@ -237,7 +263,7 @@ class PastMedication extends PureComponent {
             drug.inventoryMedication_MedicationPrecaution.length > 0
           ) {
             ItemPrecautions = ItemPrecautions.concat(
-              drug.inventoryMedication_MedicationPrecaution.map((o) => {
+              drug.inventoryMedication_MedicationPrecaution.map(o => {
                 let currentPrecautionSequence = precautionIndex
                 precautionIndex += 1
                 return {
@@ -280,17 +306,22 @@ class PastMedication extends PureComponent {
             ? drug.dispensingUOM.code
             : undefined
 
-          const uom = ctmedicationunitofmeasurement.find(uom => uom.id === drug?.dispensingUOM?.id)
+          const uom = ctmedicationunitofmeasurement.find(
+            uom => uom.id === drug?.dispensingUOM?.id,
+          )
           itemDispenseUOMDisplayValue = getTranslationValue(
             uom?.translationData,
             primaryPrintoutLanguage,
             'displayValue',
           )
-          itemSecondDispenseUOMDisplayValue = secondaryPrintoutLanguage !== '' ? getTranslationValue(
-            uom?.translationData,
-            secondaryPrintoutLanguage,
-            'displayValue',
-          ) : ''
+          itemSecondDispenseUOMDisplayValue =
+            secondaryPrintoutLanguage !== ''
+              ? getTranslationValue(
+                  uom?.translationData,
+                  secondaryPrintoutLanguage,
+                  'displayValue',
+                )
+              : ''
 
           itemDispenseUOMFK = drug.dispensingUOM
             ? drug.dispensingUOM.id
@@ -310,17 +341,22 @@ class PastMedication extends PureComponent {
           itemCostPrice = item.costPrice || 0
           itemUnitPrice = item.unitPrice || 0
           itemDispenseUOMCode = item.dispenseUOMCode
-          const uom = ctmedicationunitofmeasurement.find(uom => uom.id === item.dispenseUOMFK)
+          const uom = ctmedicationunitofmeasurement.find(
+            uom => uom.id === item.dispenseUOMFK,
+          )
           itemDispenseUOMDisplayValue = getTranslationValue(
             uom?.translationData,
             primaryPrintoutLanguage,
             'displayValue',
           )
-          itemSecondDispenseUOMDisplayValue = secondaryPrintoutLanguage !== '' ? getTranslationValue(
-            uom?.translationData,
-            secondaryPrintoutLanguage,
-            'displayValue',
-          ) : ''
+          itemSecondDispenseUOMDisplayValue =
+            secondaryPrintoutLanguage !== ''
+              ? getTranslationValue(
+                  uom?.translationData,
+                  secondaryPrintoutLanguage,
+                  'displayValue',
+                )
+              : ''
           itemDispenseUOMFK = item.dispenseUOMFK
           itemDrugCode = item.drugCode
           itemDrugName = item.drugName
@@ -333,7 +369,7 @@ class PastMedication extends PureComponent {
             item.retailPrescriptionItemPrecaution
           if (precautions && precautions.length > 0) {
             ItemPrecautions = ItemPrecautions.concat(
-              precautions.map((o) => {
+              precautions.map(o => {
                 let currentPrecautionSequence = precautionIndex
                 precautionIndex += 1
                 return {
@@ -360,46 +396,70 @@ class PastMedication extends PureComponent {
             item.retailPrescriptionItemDrugMixture
           if (drugMixtures && drugMixtures.length > 0) {
             itemCorPrescriptionItemDrugMixture = itemCorPrescriptionItemDrugMixture.concat(
-              drugMixtures.map((o) => {
+              drugMixtures.map(o => {
                 let drug = inventorymedication.find(
-                  (medication) => medication.id === o.inventoryMedicationFK,
+                  medication => medication.id === o.inventoryMedicationFK,
                 )
                 let currentDrugMixtureSequence = drugMixtureIndex
                 drugMixtureIndex += 1
+
+                const uom = ctmedicationunitofmeasurement.find(
+                  uom => uom.id === drug.dispensingUOM.id,
+                )
                 return {
                   inventoryMedicationFK: o.inventoryMedicationFK,
-                  drugCode: o.drugCode,
-                  drugName: o.drugName,
+                  drugCode: drug.code,
+                  drugName: drug.displayValue,
                   quantity: o.quantity,
-                  costPrice: o.costPrice,
-                  unitPrice: o.unitPrice,
-                  totalPrice: o.totalPrice,
-                  uomfk: o.uomfk,
-                  uomCode: o.uomCode,
-                  uomDisplayValue: o.uomDisplayValue,
-                  prescribeUOMFK: o.prescribeUOMFK,
-                  prescribeUOMCode: o.prescribeUOMCode,
-                  prescribeUOMDisplayValue: o.prescribeUOMDisplayValue,
+                  costPrice: drug.averageCostPrice || 0,
+                  unitPrice: drug.sellingPrice || 0,
+                  totalPrice: (drug.sellingPrice || 0) * o.quantity,
+                  uomfk: drug.dispensingUOM.id,
+                  uomCode: drug.dispensingUOM.code,
+                  uomDisplayValue: getTranslationValue(
+                    uom?.translationData,
+                    primaryPrintoutLanguage,
+                    'displayValue',
+                  ),
+                  secondUOMDisplayValue:
+                    secondaryPrintoutLanguage !== ''
+                      ? getTranslationValue(
+                          uom?.translationData,
+                          secondaryPrintoutLanguage,
+                          'displayValue',
+                        )
+                      : '',
+                  prescribeUOMFK: drug.prescribingUOM.id,
+                  prescribeUOMCode: drug.prescribingUOM.code,
+                  prescribeUOMDisplayValue: drug.prescribingUOM.name,
                   batchNo: o.batchNo,
                   expiryDate: o.expiryDate,
-                  revenueCategoryFK: o.revenueCategoryFK,
+                  revenueCategoryFK: drug.revenueCategory.id,
                   sequence: currentDrugMixtureSequence,
                   isDeleted: false,
                   isNew: true,
-                  subject: o.drugName,
+                  subject: drug.displayValue,
                   caution: drug.caution,
                   isDispensedByPharmacy: drug.isDispensedByPharmacy,
                   isNurseActualizeRequired: drug.isNurseActualizable,
-                  inventoryDispenseUOMFK: o.uomfk,
-                  inventoryPrescribingUOMFK: o.prescribeUOMFK,
-                  isActive: o.isActive
+                  inventoryDispenseUOMFK: drug.dispensingUOM.id,
+                  inventoryPrescribingUOMFK: drug.prescribingUOM.id,
+                  isActive: drug.isActive,
                 }
               }),
             )
           }
-          if (itemCorPrescriptionItemDrugMixture.find(dm => dm.isDispensedByPharmacy))
+          if (
+            itemCorPrescriptionItemDrugMixture.find(
+              dm => dm.isDispensedByPharmacy,
+            )
+          )
             isDispensedByPharmacy = true
-          if (itemCorPrescriptionItemDrugMixture.find(dm => dm.isNurseActualizeRequired))
+          if (
+            itemCorPrescriptionItemDrugMixture.find(
+              dm => dm.isNurseActualizeRequired,
+            )
+          )
             isNurseActualizeRequired = true
         }
 
@@ -443,7 +503,7 @@ class PastMedication extends PureComponent {
           packageGlobalId: '',
           isDispensedByPharmacy,
           isNurseActualizeRequired,
-          isExclusive
+          isExclusive,
         }
       }),
     )
@@ -474,8 +534,8 @@ class PastMedication extends PureComponent {
     const { entity } = patient
     const { name, patientAccountNo, genderFK, dob } = entity
     const { ctgender = [] } = codetable
-    const gender = ctgender.find((o) => o.id === genderFK) || {}
-    const allDocs = rows.filter((s) => !s.isDeleted)
+    const gender = ctgender.find(o => o.id === genderFK) || {}
+    const allDocs = rows.filter(s => !s.isDeleted)
     let nextSequence = 1
     if (allDocs && allDocs.length > 0) {
       const { sequence: documentSequence } = _.maxBy(allDocs, 'sequence')
@@ -483,27 +543,27 @@ class PastMedication extends PureComponent {
     }
     let showNoTemplate
     data = data.concat(
-      vaccinations.map((item) => {
+      vaccinations.map(item => {
         let currentSequence = sequence
         sequence += 1
 
         let vaccination = inventoryvaccination.find(
-          (vacc) => vacc.id === item.inventoryVaccinationFK,
+          vacc => vacc.id === item.inventoryVaccinationFK,
         )
         let defaultBatch = vaccination.vaccinationStock.find(
-          (o) => o.isDefault === true,
+          o => o.isDefault === true,
         )
 
         let usage = ctvaccinationusage.find(
-          (vaccUsage) => vaccUsage.id === item.usageMethodFK,
+          vaccUsage => vaccUsage.id === item.usageMethodFK,
         )
 
         let dosage = ctmedicationdosage.find(
-          (vaccdosage) => vaccdosage.id === item.dosageFK,
+          vaccdosage => vaccdosage.id === item.dosageFK,
         )
 
         let uom = ctvaccinationunitofmeasurement.find(
-          (vaccuom) => vaccuom.id === item.uomfk,
+          vaccuom => vaccuom.id === item.uomfk,
         )
         let newTotalQuantity = item.quantity
 
@@ -548,7 +608,7 @@ class PastMedication extends PureComponent {
         if (newVaccination.isGenerateCertificate) {
           const { documenttemplate = [] } = codetable
           const defaultTemplate = documenttemplate.find(
-            (dt) =>
+            dt =>
               dt.isDefaultTemplate === true && dt.documentTemplateTypeFK === 3,
           )
           if (defaultTemplate) {
@@ -559,8 +619,8 @@ class PastMedication extends PureComponent {
                 issuedByUserFK: clinicianProfile.userProfileFK,
                 subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
                   ''}, ${Math.floor(
-                    moment.duration(moment().diff(dob)).asYears(),
-                  )}`,
+                  moment.duration(moment().diff(dob)).asYears(),
+                )}`,
                 content: ReplaceCertificateTeplate(
                   defaultTemplate.templateContent,
                   newVaccination,
@@ -588,23 +648,23 @@ class PastMedication extends PureComponent {
     return data
   }
 
-  onSelectItems = (items) => {
-    let addedItems = this.state.addedItems.map((o) => {
+  onSelectItems = items => {
+    let addedItems = this.state.addedItems.map(o => {
       return {
         ...o,
       }
     })
 
     if (items instanceof Array) {
-      items.forEach((item) => {
-        if (!addedItems.find((o) => o.id === item.id)) {
+      items.forEach(item => {
+        if (!addedItems.find(o => o.id === item.id)) {
           addedItems.push(item)
         }
       })
     } else {
-      let exxistsItem = addedItems.find((o) => o.id === items.id)
+      let exxistsItem = addedItems.find(o => o.id === items.id)
       if (exxistsItem) {
-        addedItems = addedItems.filter((o) => o.id !== items.id)
+        addedItems = addedItems.filter(o => o.id !== items.id)
       } else {
         addedItems.push(items)
       }
@@ -621,9 +681,9 @@ class PastMedication extends PureComponent {
     let cautionItems = []
     let allergys = []
 
-    const insertAllergys = (inventoryMedicationFK) => {
+    const insertAllergys = inventoryMedicationFK => {
       let drug = inventorymedication.find(
-        (medication) => medication.id === inventoryMedicationFK,
+        medication => medication.id === inventoryMedicationFK,
       )
       if (!drug) return
       const newAllergys = getDrugAllergy(drug, patientAllergy)
@@ -634,35 +694,38 @@ class PastMedication extends PureComponent {
 
     if (type === '1') {
       data = this.GetNewMedication()
-      data.map((m) => {
+      data.map(m => {
         if (m.isDrugMixture) {
           const mixtureItems = m.corPrescriptionItemDrugMixture || []
-          mixtureItems
-            .forEach((mixture) => {
-              if (mixture.caution && mixture.caution.trim().length &&
-                !cautionItems.find(
-                  (f) => f.type === 'Medication' && f.id === mixture.inventoryMedicationFK,
-                )
-              ) {
-                cautionItems.push({
-                  type: 'Medication',
-                  subject: mixture.subject,
-                  caution: mixture.caution,
-                  id: mixture.inventoryMedicationFK,
-                })
-              }
+          mixtureItems.forEach(mixture => {
+            if (
+              mixture.caution &&
+              mixture.caution.trim().length &&
+              !cautionItems.find(
+                f =>
+                  f.type === 'Medication' &&
+                  f.id === mixture.inventoryMedicationFK,
+              )
+            ) {
+              cautionItems.push({
+                type: 'Medication',
+                subject: mixture.subject,
+                caution: mixture.caution,
+                id: mixture.inventoryMedicationFK,
+              })
+            }
 
-              if (!allergys.find(
-                (f) => f.id === mixture.inventoryMedicationFK,
-              )) {
-                insertAllergys(mixture.inventoryMedicationFK)
-              }
-            })
+            if (!allergys.find(f => f.id === mixture.inventoryMedicationFK)) {
+              insertAllergys(mixture.inventoryMedicationFK)
+            }
+          })
         } else {
           if (
             m.caution &&
             m.caution.trim().length > 0 &&
-            !cautionItems.find((f) => f.type === 'Medication' && f.id === m.inventoryMedicationFK)
+            !cautionItems.find(
+              f => f.type === 'Medication' && f.id === m.inventoryMedicationFK,
+            )
           ) {
             cautionItems.push({
               type: 'Medication',
@@ -672,25 +735,30 @@ class PastMedication extends PureComponent {
             })
           }
 
-          if (!allergys.find(
-            (f) => f.id === m.inventoryMedicationFK,
-          )) {
+          if (!allergys.find(f => f.id === m.inventoryMedicationFK)) {
             insertAllergys(m.inventoryMedicationFK)
           }
         }
       })
     } else if (type === '2') {
       data = this.GetNewVaccination()
-      data.filter((f) => f.caution && f.caution.trim().length > 0).map((m) => {
-        if (!cautionItems.find((c) => c.type === 'Vaccination' && c.id === m.inventoryVaccinationFK)) {
-          cautionItems.push({
-            type: 'Vaccination',
-            subject: m.subject,
-            caution: m.caution,
-            id: m.inventoryVaccinationFK,
-          })
-        }
-      })
+      data
+        .filter(f => f.caution && f.caution.trim().length > 0)
+        .map(m => {
+          if (
+            !cautionItems.find(
+              c =>
+                c.type === 'Vaccination' && c.id === m.inventoryVaccinationFK,
+            )
+          ) {
+            cautionItems.push({
+              type: 'Vaccination',
+              subject: m.subject,
+              caution: m.caution,
+              id: m.inventoryVaccinationFK,
+            })
+          }
+        })
     }
 
     const updateRows = () => {
@@ -747,10 +815,14 @@ class PastMedication extends PureComponent {
       type: 'medicationHistory/queryMedicationHistory',
       payload: {
         visitFromDate: visitFromDate
-          ? moment(visitFromDate).startOf('day').formatUTC()
+          ? moment(visitFromDate)
+              .startOf('day')
+              .formatUTC()
           : undefined,
         visitToDate: visitToDate
-          ? moment(visitToDate).endOf('day').formatUTC(false)
+          ? moment(visitToDate)
+              .endOf('day')
+              .formatUTC(false)
           : undefined,
         searchName,
         isAllDate,
@@ -759,46 +831,37 @@ class PastMedication extends PureComponent {
         patientProfileId: patientProfileFK,
         IsSearchMedication: type === '1',
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
-        this.setState((preState) => {
+        this.setState(preState => {
           return {
             ...preState,
-            loadVisits: [
-              ...preState.loadVisits,
-              ...r.list,
-            ],
+            loadVisits: [...preState.loadVisits, ...r.list],
             totalVisits: r.totalVisits,
             pageIndex: preState.pageIndex + 1,
-            activeKey: [
-              ...preState.activeKey,
-              ...r.list.map((o) => o.id),
-            ],
+            activeKey: [...preState.activeKey, ...r.list.map(o => o.id)],
           }
         })
       }
     })
   }
 
-  clickCollapseHeader = (visitID) => {
-    this.setState((preState) => {
-      if (preState.activeKey.find((key) => key === visitID)) {
+  clickCollapseHeader = visitID => {
+    this.setState(preState => {
+      if (preState.activeKey.find(key => key === visitID)) {
         return {
           ...preState,
-          activeKey: preState.activeKey.filter((key) => key !== visitID),
+          activeKey: preState.activeKey.filter(key => key !== visitID),
         }
       }
       return {
         ...preState,
-        activeKey: [
-          ...preState.activeKey,
-          visitID,
-        ],
+        activeKey: [...preState.activeKey, visitID],
       }
     })
   }
 
-  render () {
+  render() {
     const { loading, type, footer, clinicSettings } = this.props
     const { viewVisitPageSize = 10 } = clinicSettings
     const { pageIndex, loadVisits, totalVisits, activeKey } = this.state

@@ -14,7 +14,7 @@ const getSequence = (sequence, maxSeq) => {
   return sequence || maxSeq
 }
 
-const ParseEyeFormData = (response) => {
+const ParseEyeFormData = response => {
   const { corEyeRefractionForm, corEyeExaminationForm } = response
   let refractionFormData = {}
   let examinationFormData = {}
@@ -49,8 +49,10 @@ const checkMultiplePendingPackages = (response = {}) => {
   if (pendingPackage) {
     const packages = pendingPackage.reduce(
       (distinct, data) =>
-        distinct.includes(data.patientPackageFK) ? [ ...distinct ] : [ ...distinct, data.patientPackageFK ],
-      []
+        distinct.includes(data.patientPackageFK)
+          ? [...distinct]
+          : [...distinct, data.patientPackageFK],
+      [],
     )
 
     if (packages && packages.length > 1) {
@@ -70,7 +72,7 @@ export default createFormViewModel({
         corAttachment: [],
         corPatientNoteVitalSign: [],
       },
-      selectedWidgets: [ '1' ],
+      selectedWidgets: ['1'],
       showSignOffModal: false,
       printData: [],
     },
@@ -78,7 +80,10 @@ export default createFormViewModel({
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
 
-        if (pathname.indexOf('/reception/queue/consultation') === 0 && Number(query.cid)) {
+        if (
+          pathname.indexOf('/reception/queue/consultation') === 0 &&
+          Number(query.cid)
+        ) {
           dispatch({
             type: 'initState',
             payload: {
@@ -93,7 +98,7 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *initState ({ payload }, { call, put, select, take }) {
+      *initState({ payload }, { call, put, select, take }) {
         const { queueID, patientID, version } = payload
 
         let visit
@@ -103,7 +108,7 @@ export default createFormViewModel({
             payload: { id: queueID, version },
           })
           yield take('visitRegistration/query/@@end')
-          const visitRegistration = yield select((st) => st.visitRegistration)
+          const visitRegistration = yield select(st => st.visitRegistration)
           visit = visitRegistration.entity.visit
           if (!visit) return
         } else {
@@ -129,7 +134,7 @@ export default createFormViewModel({
         })
       },
 
-      *start ({ payload }, { call, put, select, take }) {
+      *start({ payload }, { call, put, select, take }) {
         yield put({
           type: 'updateState',
           payload: {
@@ -146,7 +151,9 @@ export default createFormViewModel({
             payload: {
               entity: response,
               version: payload.version,
-              haveMultiplePendingPackages: checkMultiplePendingPackages(response),
+              haveMultiplePendingPackages: checkMultiplePendingPackages(
+                response,
+              ),
             },
           })
 
@@ -166,8 +173,8 @@ export default createFormViewModel({
         }
         return response
       },
-      *pause ({ payload }, { call, put, select }) {
-        const visitRegistration = yield select((state) => state.visitRegistration)
+      *pause({ payload }, { call, put, select }) {
+        const visitRegistration = yield select(state => state.visitRegistration)
         const { entity } = visitRegistration
 
         const response = yield call(service.pause, payload)
@@ -182,8 +189,8 @@ export default createFormViewModel({
         return response
       },
 
-      *resume ({ payload }, { call, put, select }) {
-        const visitRegistration = yield select((state) => state.visitRegistration)
+      *resume({ payload }, { call, put, select }) {
+        const visitRegistration = yield select(state => state.visitRegistration)
         const { entity } = visitRegistration
         yield put({
           type: 'updateState',
@@ -217,7 +224,7 @@ export default createFormViewModel({
         }
         return response
       },
-      *edit ({ payload }, { call, put }) {
+      *edit({ payload }, { call, put }) {
         const response = yield call(service.edit, payload.id)
         if (response) {
           yield put({
@@ -237,7 +244,7 @@ export default createFormViewModel({
         }
         return response
       },
-      *overwrite ({ payload }, { call, put }) {
+      *overwrite({ payload }, { call, put }) {
         const response = yield call(service.overwrite, payload.id)
         if (response) {
           yield put({
@@ -256,8 +263,8 @@ export default createFormViewModel({
         }
         return response
       },
-      *sign ({ payload }, { call, put, select }) {
-        const visitRegistration = yield select((state) => state.visitRegistration)
+      *sign({ payload }, { call, put, select }) {
+        const visitRegistration = yield select(state => state.visitRegistration)
         const { entity } = visitRegistration
 
         const response = yield call(service.sign, payload)
@@ -269,8 +276,8 @@ export default createFormViewModel({
         }
         return response
       },
-      *discard ({ payload }, { call, put, select }) {
-        const visitRegistration = yield select((state) => state.visitRegistration)
+      *discard({ payload }, { call, put, select }) {
+        const visitRegistration = yield select(state => state.visitRegistration)
         const { entity } = visitRegistration
 
         const response = yield call(service.discardDetails, payload)
@@ -283,8 +290,8 @@ export default createFormViewModel({
         }
         return response
       },
-      *saveLayout ({ payload }, { call, put, select }) {
-        const user = yield select((st) => st.user)
+      *saveLayout({ payload }, { call, put, select }) {
+        const user = yield select(st => st.user)
         const response = yield call(service.saveLayout, user.data.id, {
           userPreferenceDetails: JSON.stringify(payload),
         })
@@ -292,7 +299,7 @@ export default createFormViewModel({
         return response
       },
 
-      *saveUserPreference ({ payload }, { call, put, select }) {
+      *saveUserPreference({ payload }, { call, put, select }) {
         const r = yield call(saveUserPreference, {
           userPreferenceDetails: JSON.stringify(payload.userPreferenceDetails),
           itemIdentifier: payload.itemIdentifier,
@@ -303,7 +310,7 @@ export default createFormViewModel({
         return false
       },
 
-      *getUserPreference ({ payload }, { call, put }) {
+      *getUserPreference({ payload }, { call, put }) {
         const r = yield call(getUserPreference, payload.type)
         const { status, data } = r
 
@@ -311,14 +318,19 @@ export default createFormViewModel({
           if (data) {
             const parsedFavouriteDiagnosisLanguage = JSON.parse(data)
             let favouriteDiagnosisLanguage
-            if (payload.type === USER_PREFERENCE_TYPE['FAVOURITEDIAGNOSISLANGUAGESETTING']) {
+            if (
+              payload.type ===
+              USER_PREFERENCE_TYPE['FAVOURITEDIAGNOSISLANGUAGESETTING']
+            ) {
               favouriteDiagnosisLanguage = parsedFavouriteDiagnosisLanguage.find(
-                (o) => o.Identifier === 'FavouriteDiagnosisLanguage'
+                o => o.Identifier === 'FavouriteDiagnosisLanguage',
               )
             }
             if (parsedFavouriteDiagnosisLanguage.length > 0) {
               const resultFavouriteDiagnosisLanguage = {
-                favouriteDiagnosisLanguage: favouriteDiagnosisLanguage ? favouriteDiagnosisLanguage.value : [],
+                favouriteDiagnosisLanguage: favouriteDiagnosisLanguage
+                  ? favouriteDiagnosisLanguage.value
+                  : [],
               }
               yield put({
                 type: 'updateState',
@@ -331,7 +343,7 @@ export default createFormViewModel({
         return null
       },
 
-      *editOrder ({ payload }, { call, put, take }) {
+      *editOrder({ payload }, { call, put, take }) {
         const response = yield call(service.editOrder, payload.id)
         const { queueID } = payload
 
@@ -349,7 +361,9 @@ export default createFormViewModel({
             payload: {
               entity: response,
               version: payload.version,
-              haveMultiplePendingPackages: checkMultiplePendingPackages(response),
+              haveMultiplePendingPackages: checkMultiplePendingPackages(
+                response,
+              ),
             },
           })
           yield put({
@@ -361,15 +375,15 @@ export default createFormViewModel({
         }
         return response
       },
-      *signOrder ({ payload }, { call, put }) {
+      *signOrder({ payload }, { call, put }) {
         const response = yield call(service.signOrder, payload)
         return response
       },
-      *completeBillFirstOrder ({ payload }, { call, put }) {
+      *completeBillFirstOrder({ payload }, { call, put }) {
         const response = yield call(service.completeOrder, payload)
         return response
       },
-      *closeModal ({}, { call, put, take }) {
+      *closeModal({}, { call, put, take }) {
         yield put({
           type: 'global/updateAppState',
           payload: {
@@ -382,13 +396,13 @@ export default createFormViewModel({
 
         history.push('/reception/queue')
       },
-      *queryDone ({ payload }, { call, put, select, take }) {
+      *queryDone({ payload }, { call, put, select, take }) {
         const { data, page } = payload
         if (!data) return null
         let cdRows = []
-        consultationDocumentTypes.forEach((p) => {
+        consultationDocumentTypes.forEach(p => {
           cdRows = cdRows.concat(
-            (data[p.prop] || []).map((o) => {
+            (data[p.prop] || []).map(o => {
               const d = {
                 uid: getUniqueId(),
                 type: p.value,
@@ -396,14 +410,14 @@ export default createFormViewModel({
                 ...o,
               }
               return p.convert ? p.convert(d) : d
-            })
+            }),
           )
         })
 
         let formRows = []
-        formTypes.forEach((p) => {
+        formTypes.forEach(p => {
           formRows = formRows.concat(
-            (data[p.prop] || []).map((o) => {
+            (data[p.prop] || []).map(o => {
               const d = {
                 uid: getUniqueId(),
                 type: p.value,
@@ -412,7 +426,7 @@ export default createFormViewModel({
                 formData: JSON.parse(o.formData),
               }
               return d
-            })
+            }),
           )
         })
         yield put({
@@ -424,14 +438,16 @@ export default createFormViewModel({
 
         let oRows = []
         if (page !== 'edit order') {
-          orderTypes.forEach((p) => {
-            const datas = (p.filter ? data[p.prop].filter(p.filter) : data[p.prop]) || []
+          orderTypes.forEach(p => {
+            const datas =
+              (p.filter ? data[p.prop].filter(p.filter) : data[p.prop]) || []
 
             let maxSeq = 0
-            if (datas && datas.length > 0) maxSeq = _.maxBy(datas, 'sequence').sequence
+            if (datas && datas.length > 0)
+              maxSeq = _.maxBy(datas, 'sequence').sequence
 
             oRows = oRows.concat(
-              datas.map((o) => {
+              datas.map(o => {
                 if (!o.sequence) maxSeq += 1
                 const d = {
                   uid: getUniqueId(),
@@ -447,12 +463,14 @@ export default createFormViewModel({
                 }
                 let instructionArray = []
                 if (d.corPrescriptionItemInstruction) {
-                  instructionArray = d.corPrescriptionItemInstruction.map((instruction) => {
-                    return {
-                      ...instruction,
-                      stepdose: instruction.stepdose || 'AND',
-                    }
-                  })
+                  instructionArray = d.corPrescriptionItemInstruction.map(
+                    instruction => {
+                      return {
+                        ...instruction,
+                        stepdose: instruction.stepdose || 'AND',
+                      }
+                    },
+                  )
                   newObj = {
                     ...newObj,
                     corPrescriptionItemInstruction: instructionArray,
@@ -461,19 +479,21 @@ export default createFormViewModel({
 
                 if (p.value === '2') {
                   // put auto generated certificate to document
-                  newObj.corVaccinationCert = newObj.corVaccinationCert.map((vc) => {
-                    return {
-                      ...vc,
-                      uid: getUniqueId(),
-                      type: '3',
-                      vaccinationUFK: newObj.uid,
-                    }
-                  })
+                  newObj.corVaccinationCert = newObj.corVaccinationCert.map(
+                    vc => {
+                      return {
+                        ...vc,
+                        uid: getUniqueId(),
+                        type: '3',
+                        vaccinationUFK: newObj.uid,
+                      }
+                    },
+                  )
                   cdRows = cdRows.concat(newObj.corVaccinationCert)
                 }
 
                 return p.convert ? p.convert(newObj) : newObj
-              })
+              }),
             )
           })
         }
@@ -490,8 +510,11 @@ export default createFormViewModel({
           payload: {
             type: '1',
             rows: _.sortBy(oRows, 'sequence'),
-            _originalRows: _.sortBy(oRows, 'sequence'),
-            finalAdjustments: data.corOrderAdjustment.map((o) => ({
+            _originalRows: _.sortBy(
+              oRows.map(r => ({ ...r })),
+              'sequence',
+            ),
+            finalAdjustments: data.corOrderAdjustment.map(o => ({
               ...o,
               uid: o.id,
             })),
@@ -499,7 +522,7 @@ export default createFormViewModel({
             isGSTInclusive: data.isGstInclusive,
             gstValue: data.gstValue,
             corPackage: data.corPackage,
-            corVitalSign: data.corPatientNoteVitalSign || []
+            corVitalSign: data.corPatientNoteVitalSign || [],
           },
         })
 
@@ -511,7 +534,7 @@ export default createFormViewModel({
           },
         })
 
-        data.corDiagnosis = data.corDiagnosis.map((diagnosis) => {
+        data.corDiagnosis = data.corDiagnosis.map(diagnosis => {
           return {
             ...diagnosis,
             defaultIsPersist: diagnosis.isPersist,
@@ -534,10 +557,10 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      showSignOffModal (state, { payload }) {
+      showSignOffModal(state, { payload }) {
         return { ...state, ...payload }
       },
-      closeSignOffModal (state) {
+      closeSignOffModal(state) {
         return { ...state, showSignOffModal: false, printData: [] }
       },
     },

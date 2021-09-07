@@ -60,7 +60,7 @@ const medisaveOptions = [
   },
 ]
 
-const generalOptions = [
+let generalOptions = [
   {
     id: 'isOnlyClinicInternalUsage',
     name: 'Only Internal Usage',
@@ -97,6 +97,10 @@ const generalOptions = [
     },
   },
 ]
+
+if (!clinicSettings.isEnablePharmacyModule) {
+  generalOptions = generalOptions.filter(o => o.id !== 'isDispensedByPharmacy')
+}
 
 const General = ({
   medicationDetail,
