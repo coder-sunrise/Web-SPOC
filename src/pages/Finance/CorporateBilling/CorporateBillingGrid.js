@@ -137,6 +137,15 @@ class CorporateBillingGrid extends PureComponent {
     },
   }
 
+  constructor(props) {
+    super(props)
+
+    this.props.dispatch({
+      type: 'corporateBilling/fetchCompany',
+    })
+
+  }
+
   componentDidMount() {
     this.props.dispatch({
       type: 'corporateBilling/query',

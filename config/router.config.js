@@ -1089,6 +1089,12 @@ const _routes = [
             authority: ['settings.clinicsetting.invoiceadjustment'],
           },
           {
+            path: '/setting/checklist',
+            name: 'checklist',
+            component: './Setting/Checklist',
+            authority: ['settings.clinicsetting.checklist'],
+          },
+          {
             path: '/setting/tag',
             name: 'tag',
             component: './Setting/tag',
