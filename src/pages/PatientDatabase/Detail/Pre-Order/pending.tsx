@@ -4,17 +4,22 @@ import moment from 'moment'
 import { currencySymbol } from '@/utils/config'
 import _ from 'lodash'
 import Authorized from '@/utils/Authorized'
-import { FastEditableTableGrid } from '@/components'
+import { FastEditableTableGrid, Tooltip } from '@/components'
 import Loading from '@/components/PageLoading/index'
 import { preOrderItemCategory } from '@/utils/codes'
 import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
+import Yup from '@/utils/yup'
 // interface IPendingPreOrderProps {
 // }
+
+const preOrderSchema = Yup.object().shape({
+  preOrderItemType: Yup.string().required(),
+  itemName:  Yup.string().required(),
+})
 
 const PendingPreOrder: React.FC = (props: any) => {
   const {
     values,
-    schema,
     user: {
       data: { clinicianProfile },
     },
@@ -236,19 +241,19 @@ const PendingPreOrder: React.FC = (props: any) => {
     const { row, option } = e
     row.itemName = option?.combinDisplayValue
     if (row.preOrderItemType === preOrderItemCategory[0].value)
-      row.preOrderMedicationItem = { InventoryMedicationFK: option.id }
+      row.preOrderMedicationItem = { InventoryMedicationFK: option?.id }
     else if (row.preOrderItemType === preOrderItemCategory[1].value)
-      row.preOrderConsumableItem = { InventoryConsumableFK: option.id }
+      row.preOrderConsumableItem = { InventoryConsumableFK: option?.id }
     else if (row.preOrderItemType === preOrderItemCategory[2].value)
       row.preOrderVaccinationItem = {
-        InventoryVaccinationFK: option.id,
+        InventoryVaccinationFK: option?.id,
       }
     else if (
       row.preOrderItemType === preOrderItemCategory[3].value ||
       row.preOrderItemType == preOrderItemCategory[4].value ||
       row.preOrderItemType == preOrderItemCategory[5].value
     )
-      row.preOrderServiceItem = { ServiceCenterServiceFK: option.id }
+      row.preOrderServiceItem = { ServiceCenterServiceFK: option?.id }
     row.quantity = undefined
     row.amount = 0
     row.remarks = undefined
@@ -354,6 +359,13 @@ const PendingPreOrder: React.FC = (props: any) => {
         options: () => preOrderItemCategory,
         onChange: handleCategoryChanged,
         isDisabled: row => !isEditable(row),
+        render: row => {
+          return (
+            <Tooltip title={row.preOrderItemType}>
+              <div>{row.preOrderItemType}</div>
+            </Tooltip>
+          )
+        },
       },
       {
         columnName: 'itemName',
@@ -362,8 +374,12 @@ const PendingPreOrder: React.FC = (props: any) => {
         valueField: 'id',
         options: generateItemDataSource,
         onChange: handleItemChanged,
-        render: (row, option) => {
-          return <div>{row.itemName}</div>
+        render: row => {
+          return (
+            <Tooltip title={row.itemName}>
+              <div>{row.itemName}</div>
+            </Tooltip>
+          )
         },
         isDisabled: row => !isEditable(row),
       },
@@ -375,10 +391,19 @@ const PendingPreOrder: React.FC = (props: any) => {
         onChange: handelQuantityChanged,
         render: row => {
           return (
-            <span>
-              {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}{' '}
-              {row.dispenseUOM}
-            </span>
+            <Tooltip
+              title={
+                <span>
+                  {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}{' '}
+                  {row.dispenseUOM}
+                </span>
+              }
+            >
+              <span>
+                {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}{' '}
+                {row.dispenseUOM}
+              </span>
+            </Tooltip>
           )
         },
         isDisabled: row => !isEditable(row),
@@ -388,7 +413,11 @@ const PendingPreOrder: React.FC = (props: any) => {
         width: 150,
         type: 'text',
         render: row => {
-          return row.orderByUser
+          return (
+            <Tooltip title={row.orderByUser}>
+              <div>{row.orderByUser}</div>
+            </Tooltip>
+          )
         },
         isDisabled: () => true,
       },
@@ -409,6 +438,13 @@ const PendingPreOrder: React.FC = (props: any) => {
         sortingEnabled: false,
         isDisabled: row =>
           addPreOrderAccessRight.rights === 'enable' ? false : true,
+        render: row => {
+          return (
+            <Tooltip title={row.remarks}>
+              <div>{row.remarks}</div>
+            </Tooltip>
+          )
+        },
       },
       {
         columnName: 'amount',
@@ -447,7 +483,7 @@ const PendingPreOrder: React.FC = (props: any) => {
     <>
       <FastEditableTableGrid
         rows={getFilteredRows(values.listingPreOrderItem)}
-        schema={schema}
+        schema={preOrderSchema}
         FuncProps={{
           pager: false,
         }}

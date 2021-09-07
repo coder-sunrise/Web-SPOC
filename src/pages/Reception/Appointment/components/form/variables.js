@@ -1,9 +1,10 @@
 import moment from 'moment'
-import { timeFormat, CodeSelect, Tooltip } from '@/components'
+import { timeFormat, CodeSelect, Tooltip, Button } from '@/components'
 import { DoctorLabel, AppointmentTypeLabel } from '@/components/_medisys'
 import { dateFormatLong } from '@/utils/format'
-import { APPOINTMENT_STATUS, mapApptStatus } from '@/utils/constants'
-
+import { APPOINTMENT_STATUS, mapApptStatus, INVALID_APPOINTMENT_STATUS } from '@/utils/constants'
+import { FileAddTwoTone } from '@ant-design/icons'
+import Authorized from '@/utils/Authorized'
 import ErrorPopover from './ErrorPopover'
 import ApptDuration from './ApptDuration'
 
@@ -83,7 +84,7 @@ export const initialAptInfo = {
   isEnableRecurrence: false,
 }
 
-export const commonExt = appointmentTypes => {
+export const commonExt = (appointmentTypes,handleCopyAppointmentClick) => {
   return [
     {
       columnName: 'appointmentStatus',
@@ -177,7 +178,7 @@ export const commonExt = appointmentTypes => {
       columnName: 'updateDate',
       type: 'date',
       sortingEnabled: false,
-      width:140,
+      width: 140,
       render: row => {
         const content = moment(row.updateDate).format('DD MMM YYYY HH:mm')
         return (
@@ -187,10 +188,29 @@ export const commonExt = appointmentTypes => {
         )
       },
     },
+    {
+      columnName: 'action',
+      width: 60,
+      sortingEnabled: false,
+      align:'center',
+      render:(row)=> {
+        const accessRight = Authorized.check('appointment.appointmentdetails')
+        const createApptAccessRight = Authorized.check('appointment.newappointment')
+        if (!accessRight ||  accessRight.rights !== 'enable' || !createApptAccessRight || createApptAccessRight.rights !== 'enable')
+          return
+        return INVALID_APPOINTMENT_STATUS.indexOf(row.appointmentStatusFk) === -1 && (
+          <Tooltip title='Copy'>
+            <Button color='transparent' style={{float:'right'}} justIcon onClick={()=>handleCopyAppointmentClick(row.id)}>
+              <FileAddTwoTone />
+            </Button>
+          </Tooltip>
+        )
+      }
+    },
   ]
 }
 
-export const previousApptTableParams = appointmentTypes => {
+export const previousApptTableParams = (appointmentTypes,handleCopyAppointmentClick) => {
   return {
     columns: [
       { name: 'appointmentDate', title: 'Date' },
@@ -205,8 +225,9 @@ export const previousApptTableParams = appointmentTypes => {
       { name: 'appointmentRemarks', title: 'Remarks' },
       { name: 'updateByUser', title: 'Update By' },
       { name: 'updateDate', title: 'Update On' },
+      { name: 'action', title: 'Action' },
     ],
-    columnExtensions: [...commonExt(appointmentTypes)],
+    columnExtensions: [...commonExt(appointmentTypes,handleCopyAppointmentClick)],
   }
 }
 

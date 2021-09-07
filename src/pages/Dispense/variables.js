@@ -36,9 +36,7 @@ export const actualizeTableConfig = selectable => {
         rowSelectionEnabled: row => {
           const {
             isNurseActualizeRequired = false,
-            workitem: {
-              nurseWorkitem: { statusFK } = {},
-            } = {},
+            workitem: { nurseWorkitem: { statusFK } = {} } = {},
           } = row
 
           return (
@@ -73,15 +71,14 @@ const lowStockIndicator = (row, itemIdFieldName, right) => {
   // If is drug mixture, show drug mixture indicator
   const isDrugMixture = currentType.name === 'Medication' && row.isDrugMixture
 
-  return (isDrugMixture ? (
+  return isDrugMixture ? (
     <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
   ) : (
     <LowStockInfo
       sourceType={currentType.name.toLowerCase()}
       values={values}
-        right={right}
-      />
-    )
+      right={right}
+    />
   )
 }
 
@@ -101,16 +98,19 @@ const packageDrawdownIndicator = row => {
 const checkActualizable = row => {
   const {
     isNurseActualizeRequired = false,
-    workitem: {
-      nurseWorkitem: { statusFK } = {},
-    } = {},
+    workitem: { nurseWorkitem: { statusFK } = {} } = {},
   } = row
   return { isNurseActualizeRequired, statusFK }
 }
 
 export const isActualizable = row => {
   const { isNurseActualizeRequired, statusFK } = checkActualizable(row)
-  return isNurseActualizeRequired && [NURSE_WORKITEM_STATUS.NEW, NURSE_WORKITEM_STATUS.CANCELLED].indexOf(statusFK) > -1
+  return (
+    isNurseActualizeRequired &&
+    [NURSE_WORKITEM_STATUS.NEW, NURSE_WORKITEM_STATUS.CANCELLED].indexOf(
+      statusFK,
+    ) > -1
+  )
 }
 
 const actualizationButton = (row, buttonClickCallback) => {
@@ -211,92 +211,95 @@ export const PrescriptionColumnExtensions = (
   inventorymedication = [],
   handleSelectedBatch,
   onActualizeBtnClick,
-  showDrugLabelRemark
+  showDrugLabelRemark,
 ) => [
-    { columnName: 'unitPrice', width: 100, type: 'currency' },
-    {
-      columnName: 'name',
-      width: '30%',
-      render: row => {
-        let paddingRight = 10
-        let right = -20
-        if (row.isPreOrder && row.isExclusive) {
-          paddingRight = 70
-          right = -80
-        }
-        else if (row.isPreOrder || row.isExclusive) {
-          paddingRight = 40
-          right = -50
-        }
-        return (
-          <div
-            style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-              paddingRight: paddingRight
-            }}
+  { columnName: 'unitPrice', width: 120,align:'right', type: 'currency' },
+  {
+    columnName: 'name',
+    width: '30%',
+    render: row => {
+      let paddingRight = 10
+      let right = -20
+      if (row.isPreOrder && row.isExclusive) {
+        paddingRight = 70
+        right = -80
+      } else if (row.isPreOrder || row.isExclusive) {
+        paddingRight = 40
+        right = -50
+      }
+      return (
+        <div
+          style={{
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+            paddingRight: paddingRight,
+          }}
+        >
+          <Tooltip
+            title={
+              <div>
+                {`Code: ${row.code}`}
+                <br />
+                {`Name: ${row.name}`}
+              </div>
+            }
           >
-            <Tooltip
-              title={
-                <div>
-                  {`Code/Name: ${row.code} / ${row.name}`}
-                  <br />
-                  {`UnitPrice/UOM: ${currencySymbol}${numeral(row.unitPrice).format(
-                    currencyFormat,
-                  )} / ${row.orderUOM}`}
-                </div>
-              }
-            >
-              <span>{row.name}</span>
-            </Tooltip>
-            <div style={{ position: 'relative', top: 2 }}>
-              {row.isPreOrder &&
-                <Tooltip title='Pre-Order'>
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: 2,
+            <span>{row.name}</span>
+          </Tooltip>
+          <div style={{ position: 'relative', top: 2 }}>
+            {row.isPreOrder && (
+              <Tooltip title='Pre-Order'>
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: 2,
                     right: -27,
                     borderRadius: 10,
                     backgroundColor: '#4255bd',
-                      fontWeight: 500,
-                      color: 'white',
-                      fontSize: '0.7rem',
-                      padding: '2px 3px',
-                      height: 20,
-                    }}
-                > Pre</div>
-                </Tooltip>
-              }
-              {row.isExclusive && (
-                <Tooltip title='Exclusive Drug'>
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: 2,
-                      right: row.isPreOrder ? -60 : -30,
-                      borderRadius: 4,
-                      backgroundColor: 'green',
-                      fontWeight: 500,
-                      color: 'white',
-                      fontSize: '0.7rem',
-                      padding: '2px 3px',
-                      height: 20,
-                    }}
-                  >Excl.</div>
-                </Tooltip>
-              )}
-              {lowStockIndicator(row, 'inventoryMedicationFK', right)}
-            </div>
+                    fontWeight: 500,
+                    color: 'white',
+                    fontSize: '0.7rem',
+                    padding: '2px 3px',
+                    height: 20,
+                  }}
+                >
+                  {' '}
+                  Pre
+                </div>
+              </Tooltip>
+            )}
+            {row.isExclusive && (
+              <Tooltip title='Exclusive Drug'>
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: 2,
+                    right: row.isPreOrder ? -60 : -30,
+                    borderRadius: 4,
+                    backgroundColor: 'green',
+                    fontWeight: 500,
+                    color: 'white',
+                    fontSize: '0.7rem',
+                    padding: '2px 3px',
+                    height: 20,
+                  }}
+                >
+                  Excl.
+                </div>
+              </Tooltip>
+            )}
+            {lowStockIndicator(row, 'inventoryMedicationFK', right)}
           </div>
-        )
-      },
+        </div>
+      )
     },
-    {
-      columnName: 'instruction',
-      width: '40%',
-      render: row => {
-        return (
+  },
+  {
+    columnName: 'instruction',
+    width: '40%',
+    render: row => {
+      return (
+        <Tooltip title={<div>{row.instruction}</div>}>
           <div
             style={{
               wordWrap: 'break-word',
@@ -305,165 +308,179 @@ export const PrescriptionColumnExtensions = (
           >
             {row.instruction}
           </div>
-        )
-      },
+        </Tooltip>
+      )
     },
-    {
-      columnName: 'remarks',
-      width: '30%',
-      render: (row) => {
-        const existsDrugLabelRemarks = showDrugLabelRemark && row.drugLabelRemarks && row.drugLabelRemarks.trim() !== ''
-        return <div style={{ position: 'relative' }} >
+  },
+  {
+    columnName: 'remarks',
+    width: '30%',
+    render: row => {
+      const existsDrugLabelRemarks =
+        showDrugLabelRemark &&
+        row.drugLabelRemarks &&
+        row.drugLabelRemarks.trim() !== ''
+      return (
+        <div style={{ position: 'relative' }}>
           <div
             style={{
               wordWrap: 'break-word',
               whiteSpace: 'pre-wrap',
-              paddingRight: existsDrugLabelRemarks ? 10 : 0
+              paddingRight: existsDrugLabelRemarks ? 10 : 0,
             }}
           >
             {row.remarks || ' '}
             <div style={{ position: 'relative', top: 2 }}>
-              {existsDrugLabelRemarks &&
-                <div style={{
-                  position: 'absolute',
-                bottom: 2,
-                right: -15,
-              }}>
-                <Tooltip title={
-                  <div>
-                    <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
-                    <div>{row.drugLabelRemarks}
-                    </div>
-                  </div>
-                }>
+              {existsDrugLabelRemarks && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: 2,
+                    right: -15,
+                  }}
+                >
+                  <Tooltip
+                    title={
+                      <div>
+                        <div style={{ fontWeight: 500 }}>
+                          Drug Label Remarks
+                        </div>
+                        <div>{row.drugLabelRemarks}</div>
+                      </div>
+                    }
+                  >
                     <FileCopySharp style={{ color: '#4255bd' }} />
                   </Tooltip>
                 </div>
-              }
+              )}
             </div>
           </div>
-        </div >
-      }
+        </div>
+      )
     },
-    {
-      columnName: 'totalAfterItemAdjustment',
-      width: 110,
-      type: 'currency',
-      render: row => (
-        <NumberInput
-          value={
-            row.isPreOrder && !row.isChargeToday
-              ? 0
-              : row.totalAfterItemAdjustment
-          }
-          text
-          currency
-        />
-      ),
-    },
-    {
-      columnName: 'adjAmt',
-      width: 100,
-      type: 'currency',
-    },
-    {
-      columnName: 'dispensedQuanity',
-      type: 'number',
-      width: 130,
-      render: row => {
-        let qty = `${numeral(row.dispensedQuanity || 0).format(
-          '0,0.0',
-        )} ${row.dispenseUOM || ''}`
-        return (
-          <Tooltip title={qty}>
-            <span>{qty}</span>
-          </Tooltip>
-        )
-      },
-    },
-    {
-      columnName: 'orderedQuantity',
-      type: 'number',
-      width: 130,
-      render: row => {
-        let qty = `${numeral(row.orderedQuantity || 0).format(
-          '0,0.0',
-        )} ${row.orderUOM || ''}`
-        return (
-          <Tooltip title={qty}>
-            <span>{qty}</span>
-          </Tooltip>
-        )
-      },
-    },
-    {
-      columnName: 'batchNo',
-      width: 150,
-      render: row => {
-        const currentItem = inventorymedication.find(
-          o => o.id === row.inventoryMedicationFK,
-        )
-        let batchNoOptions = []
-        if (currentItem) {
-          batchNoOptions = currentItem.medicationStock
+  },
+  {
+    columnName: 'totalAfterItemAdjustment',
+    width: 110,
+    align:'right',
+    type: 'currency',
+    render: row => (
+      <NumberInput
+        value={
+          row.isPreOrder && !row.isChargeToday
+            ? 0
+            : row.totalAfterItemAdjustment
         }
-        return (
-          <FastField
-            name={`prescription[${row.rowIndex}]batchNo`}
-            render={args => {
-              const restProps = viewOnly ? { value: row.batchNo } : { ...args }
-              return (
-                <Select
-                  simple
-                  options={batchNoOptions}
-                  mode='tags'
-                  // valueField='id'
-                  valueField='batchNo'
-                  labelField='batchNo'
-                  maxSelected={1}
-                  disableAll
-                  disabled={viewOnly}
-                  onChange={(e, op = {}) => handleSelectedBatch(e, op, row)}
-                  {...restProps}
-                />
-              )
-            }}
-          />
-        )
-      },
+        text
+        currency
+      />
+    ),
+  },
+  {
+    columnName: 'adjAmt',
+    width: 110,
+    align:'right',
+    type: 'currency',
+  },
+  {
+    columnName: 'dispensedQuanity',
+    type: 'number',
+    width: 130,
+    render: row => {
+      let qty = `${numeral(row.dispensedQuanity || 0).format(
+        '0,0.0',
+      )} ${row.dispenseUOM || ''}`
+      return (
+        <Tooltip title={qty}>
+          <span>{qty}</span>
+        </Tooltip>
+      )
     },
-    {
-      columnName: 'expiryDate',
-      width: 130,
-      render: row => {
-        return (
-          <FastField
-            name={`prescription[${row.rowIndex}]expiryDate`}
-            render={args => {
-              const restProps = viewOnly ? { value: row.expiryDate } : { ...args }
+  },
+  {
+    columnName: 'orderedQuantity',
+    type: 'number',
+    align:'right',
+    width: 130,
+    render: row => {
+      let qty = `${numeral(row.orderedQuantity || 0).format(
+        '0,0.0',
+      )} ${row.orderUOM || ''}`
+      return (
+        <Tooltip title={qty}>
+          <span>{qty}</span>
+        </Tooltip>
+      )
+    },
+  },
+  {
+    columnName: 'batchNo',
+    width: 150,
+    render: row => {
+      const currentItem = inventorymedication.find(
+        o => o.id === row.inventoryMedicationFK,
+      )
+      let batchNoOptions = []
+      if (currentItem) {
+        batchNoOptions = currentItem.medicationStock
+      }
+      return (
+        <FastField
+          name={`prescription[${row.rowIndex}]batchNo`}
+          render={args => {
+            const restProps = viewOnly ? { value: row.batchNo } : { ...args }
+            return (
+              <Select
+                simple
+                options={batchNoOptions}
+                mode='tags'
+                // valueField='id'
+                valueField='batchNo'
+                labelField='batchNo'
+                maxSelected={1}
+                disableAll
+                disabled={viewOnly}
+                onChange={(e, op = {}) => handleSelectedBatch(e, op, row)}
+                {...restProps}
+              />
+            )
+          }}
+        />
+      )
+    },
+  },
+  {
+    columnName: 'expiryDate',
+    width: 130,
+    render: row => {
+      return (
+        <FastField
+          name={`prescription[${row.rowIndex}]expiryDate`}
+          render={args => {
+            const restProps = viewOnly ? { value: row.expiryDate } : { ...args }
 
-              return (
-                <DatePicker
-                  text={viewOnly}
-                  disabled={viewOnly}
-                  disabledDate={d => !d || d.isBefore(moment().add('days', -1))}
-                  simple
-                  {...restProps}
-                />
-              )
-            }}
-          />
-        )
-      },
+            return (
+              <DatePicker
+                text={viewOnly}
+                disabled={viewOnly}
+                disabledDate={d => !d || d.isBefore(moment().add('days', -1))}
+                simple
+                {...restProps}
+              />
+            )
+          }}
+        />
+      )
     },
-    {
-      columnName: 'action',
-      align: 'center',
+  },
+  {
+    columnName: 'action',
+    align: 'center',
     width: 70,
-      render: row => {
-        return (
+    render: row => {
+      return (
         <div>
-          {actualizationButton(row,onActualizeBtnClick)}
+          {actualizationButton(row, onActualizeBtnClick)}
           <Tooltip
             title={
               <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
@@ -481,9 +498,9 @@ export const PrescriptionColumnExtensions = (
           </Tooltip>
         </div>
       )
-      },
     },
-  ]
+  },
+]
 
 export const VaccinationColumn = [
   {
@@ -530,176 +547,180 @@ export const VaccinationColumnExtensions = (
   handleSelectedBatch = () => {},
   onActualizeBtnClick,
 ) => [
-    {
-      columnName: 'name',
-      width: '60%',
-      render: row => {
-        let paddingRight = 10
-        let right = -20
-        if (row.isPreOrder) {
-          paddingRight = paddingRight + 30
-          right = -50
-        }
-        return (
-          <div
-            style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-              paddingRight: paddingRight
-            }}
+  {
+    columnName: 'name',
+    width: '60%',
+    render: row => {
+      let paddingRight = 10
+      let right = -20
+      if (row.isPreOrder) {
+        paddingRight = paddingRight + 30
+        right = -50
+      }
+      return (
+        <div
+          style={{
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+            paddingRight: paddingRight,
+          }}
+        >
+          <Tooltip
+            title={
+              <div>
+                {`Code: ${row.code}`}
+                <br />
+                {`Name: ${row.name}`}
+              </div>
+            }
           >
-            <Tooltip
-              title={
-                <div>
-                  {`Code/Name: ${row.code} / ${row.name}`}
-                  <br />
-                  {`UnitPrice/UOM: ${currencySymbol}${numeral(row.unitPrice).format(
-                    currencyFormat,
-                  )} / ${row.dispenseUOM}`}
-                </div>
-              }
-            ><span> {row.name}</span>
-            </Tooltip>
-            <div style={{ position: 'relative', top: 2 }}>
-              {row.isPreOrder && (
-                <Tooltip title='Pre-Order'>
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: 2,
-                      right: -30,
-                      borderRadius: 10,
-                      backgroundColor: '#4255bd',
-                      fontWeight: 500,
-                      color: 'white',
-                      fontSize: '0.7rem',
-                      padding: '2px 3px',
-                      height: 20,
-                    }}
-                  > Pre</div>
-                </Tooltip>
-              )}
-              {lowStockIndicator(row, 'inventoryVaccinationFK', right)}
-            </div>
-          </div>
-        )
-      },
-    },
-    {
-      columnName: 'remarks',
-      width: '40%',
-    },
-    {
-      columnName: 'dispensedQuanity',
-      type: 'number',
-      width: 130,
-      render: row => {
-        let qty = `${numeral(row.dispensedQuanity || 0).format(
-          '0,0.0',
-        )} ${row.dispenseUOM || ''}`
-        return (
-          <Tooltip title={qty}>
-            <span>{qty}</span>
+            <span> {row.name}</span>
           </Tooltip>
-        )
-      },
+          <div style={{ position: 'relative', top: 2 }}>
+            {row.isPreOrder && (
+              <Tooltip title='Pre-Order'>
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: 2,
+                    right: -30,
+                    borderRadius: 10,
+                    backgroundColor: '#4255bd',
+                    fontWeight: 500,
+                    color: 'white',
+                    fontSize: '0.7rem',
+                    padding: '2px 3px',
+                    height: 20,
+                  }}
+                >
+                  {' '}
+                  Pre
+                </div>
+              </Tooltip>
+            )}
+            {lowStockIndicator(row, 'inventoryVaccinationFK', right)}
+          </div>
+        </div>
+      )
     },
-    { columnName: 'unitPrice', width: 100, type: 'currency' },
-    {
-      columnName: 'totalAfterItemAdjustment',
-      width: 110,
-      type: 'currency',
-      render: row => (
-        <NumberInput
-          value={
-            row.isPreOrder && !row.isChargeToday
-              ? 0
-              : row.totalAfterItemAdjustment
-          }
-          text
-          currency
-        />
-      ),
+  },
+  {
+    columnName: 'remarks',
+    width: '40%',
+  },
+  {
+    columnName: 'dispensedQuanity',
+    type: 'number',
+    width: 130,
+    render: row => {
+      let qty = `${numeral(row.dispensedQuanity || 0).format(
+        '0,0.0',
+      )} ${row.dispenseUOM || ''}`
+      return (
+        <Tooltip title={qty}>
+          <span>{qty}</span>
+        </Tooltip>
+      )
     },
-    {
-      columnName: 'adjAmt',
-      width: 100,
-      type: 'currency',
-    },
-    {
-      columnName: 'batchNo',
-      width: 150,
-      render: row => {
-        const currentItem = inventoryvaccination.find(
-          o => o.id === row.inventoryVaccinationFK,
-        )
-        let batchNoOptions = []
-        if (currentItem) {
-          batchNoOptions = currentItem.vaccinationStock
+  },
+  { columnName: 'unitPrice', width: 120,align:'right', type: 'currency' },
+  {
+    columnName: 'totalAfterItemAdjustment',
+    width: 110,
+    align:'right',
+    type: 'currency',
+    render: row => (
+      <NumberInput
+        value={
+          row.isPreOrder && !row.isChargeToday
+            ? 0
+            : row.totalAfterItemAdjustment
         }
+        text
+        currency
+      />
+    ),
+  },
+  {
+    columnName: 'adjAmt',
+    width: 110,
+    align:'right',
+    type: 'currency',
+  },
+  {
+    columnName: 'batchNo',
+    width: 150,
+    render: row => {
+      const currentItem = inventoryvaccination.find(
+        o => o.id === row.inventoryVaccinationFK,
+      )
+      let batchNoOptions = []
+      if (currentItem) {
+        batchNoOptions = currentItem.vaccinationStock
+      }
 
-        return (
-          <FastField
-            name={`vaccination[${row.rowIndex}]batchNo`}
-            render={args => {
-              const restProps = viewOnly ? { value: row.batchNo } : { ...args }
-              return (
-                <Select
-                  simple
-                  options={batchNoOptions}
-                  mode='tags'
-                  // valueField='id'
-                  valueField='batchNo'
-                  labelField='batchNo'
-                  maxSelected={1}
-                  disableAll
-                  disabled={viewOnly}
-                  onChange={(e, op = {}) => handleSelectedBatch(e, op, row)}
-                  {...restProps}
-                />
-              )
-              // return (
-              //   <TextField
-              //     simple
-              //     text={viewOnly}
-              //     disabled={viewOnly}
-              //     {...restProps}
-              //   />
-              // )
-            }}
-          />
-        )
-      },
+      return (
+        <FastField
+          name={`vaccination[${row.rowIndex}]batchNo`}
+          render={args => {
+            const restProps = viewOnly ? { value: row.batchNo } : { ...args }
+            return (
+              <Select
+                simple
+                options={batchNoOptions}
+                mode='tags'
+                // valueField='id'
+                valueField='batchNo'
+                labelField='batchNo'
+                maxSelected={1}
+                disableAll
+                disabled={viewOnly}
+                onChange={(e, op = {}) => handleSelectedBatch(e, op, row)}
+                {...restProps}
+              />
+            )
+            // return (
+            //   <TextField
+            //     simple
+            //     text={viewOnly}
+            //     disabled={viewOnly}
+            //     {...restProps}
+            //   />
+            // )
+          }}
+        />
+      )
     },
-    {
-      columnName: 'expiryDate',
-      width: 130,
-      render: row => {
-        return (
-          <FastField
-            name={`vaccination[${row.rowIndex}]expiryDate`}
-            render={args => {
-              const restProps = viewOnly ? { value: row.expiryDate } : { ...args }
-              return (
-                <DatePicker
-                  disabledDate={d => !d || d.isBefore(moment().add('days', -1))}
-                  text={viewOnly}
-                  disabled={viewOnly}
-                  simple
-                  {...restProps}
-                />
-              )
-            }}
-          />
-        )
-      },
+  },
+  {
+    columnName: 'expiryDate',
+    width: 130,
+    render: row => {
+      return (
+        <FastField
+          name={`vaccination[${row.rowIndex}]expiryDate`}
+          render={args => {
+            const restProps = viewOnly ? { value: row.expiryDate } : { ...args }
+            return (
+              <DatePicker
+                disabledDate={d => !d || d.isBefore(moment().add('days', -1))}
+                text={viewOnly}
+                disabled={viewOnly}
+                simple
+                {...restProps}
+              />
+            )
+          }}
+        />
+      )
     },
-    {
-      columnName: 'action',
-      width: 60,
-    render: (row) => actualizationButton(row,onActualizeBtnClick),
-    },
-  ]
+  },
+  {
+    columnName: 'action',
+    width: 60,
+    render: row => actualizationButton(row, onActualizeBtnClick),
+  },
+]
 
 export const OtherOrdersColumns = [
   {
@@ -708,7 +729,7 @@ export const OtherOrdersColumns = [
   },
   {
     name: 'description',
-    title: 'Description',
+    title: 'Name',
   },
   {
     name: 'remarks',
@@ -738,7 +759,11 @@ export const OtherOrdersColumns = [
 
 const compareString = (a, b) => a.localeCompare(b)
 
-export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint, onActualizeBtnClick) => [
+export const OtherOrdersColumnExtensions = (
+  viewOnly = false,
+  onPrint,
+  onActualizeBtnClick,
+) => [
   {
     columnName: 'type',
     compare: compareString,
@@ -750,7 +775,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint, onActuali
             style={{
               wordWrap: 'break-word',
               whiteSpace: 'pre-wrap',
-              paddingRight: row.isPreOrder ? 24 : 0
+              paddingRight: row.isPreOrder ? 24 : 0,
             }}
           >
             {row.type}
@@ -770,7 +795,10 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint, onActuali
                       padding: '2px 3px',
                       height: 20,
                     }}
-                  > Pre</div>
+                  >
+                    {' '}
+                    Pre
+                  </div>
                 </Tooltip>
               )}
             </div>
@@ -789,11 +817,9 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint, onActuali
         <Tooltip
           title={
             <div>
-              {`Code/Name: ${code} / ${description}`}
+              {`Code: ${code}`}
               <br />
-              {`UnitPrice/UOM: ${currencySymbol}${numeral(unitPrice).format(
-                currencyFormat,
-              )} / ${row.dispenseUOM || '-'}`}
+              {`Name: ${description}`}
             </div>
           }
         >
@@ -821,6 +847,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint, onActuali
   {
     columnName: 'quantity',
     type: 'number',
+    align:'right',
     width: 130,
     render: row => {
       let qty = `${numeral(row.quantity || 0).format(
@@ -837,7 +864,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint, onActuali
     columnName: 'unitPrice',
     // type: 'currency',
     align: 'right',
-    width: 100,
+    width: 120,
     render: row => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
@@ -849,7 +876,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint, onActuali
     columnName: 'adjAmt',
     // type: 'currency',
     align: 'right',
-    width: 100,
+    width: 110,
     render: row => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
@@ -937,47 +964,48 @@ export const DrugLabelSelectionColumnExtensions = (
   handleDrugLabelSelected,
   handleDrugLabelNoChanged,
 ) => [
-    {
-      columnName: 'code',
-      width: 150,
-      render: row => {
-        return (
-          <div style={{ position: 'relative' }}>
-            <div
-              style={{
-                wordWrap: 'break-word',
-                whiteSpace: 'pre-wrap',
-              }}
-            >
-              {row.code}
-            </div>
+  {
+    columnName: 'code',
+    width: 150,
+    render: row => {
+      return (
+        <div style={{ position: 'relative' }}>
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {row.code}
           </div>
-        )
-      },
+        </div>
+      )
     },
-    {
-      columnName: 'name',
-      width: 210,
-      render: row => {
-        return (
-          <div style={{ position: 'relative' }}>
-            <div
-              style={{
-                wordWrap: 'break-word',
-                whiteSpace: 'pre-wrap',
-              }}
-            >
-              {row.name}
-            </div>
+  },
+  {
+    columnName: 'name',
+    width: 210,
+    render: row => {
+      return (
+        <div style={{ position: 'relative' }}>
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {row.name}
           </div>
-        )
-      },
+        </div>
+      )
     },
-    {
-      columnName: 'instruction',
-      width: 260,
-      render: row => {
-        return (
+  },
+  {
+    columnName: 'instruction',
+    width: 260,
+    render: row => {
+      return (
+        <Tooltip title={<div>{row.instruction}</div>}>
           <div
             style={{
               wordWrap: 'break-word',
@@ -986,59 +1014,60 @@ export const DrugLabelSelectionColumnExtensions = (
           >
             {row.instruction}
           </div>
-        )
-      },
+        </Tooltip>
+      )
     },
-    {
-      columnName: 'dispensedQuanity',
-      type: 'number',
-      width: 100,
-      render: row => {
-        return (
-          <span>
-            {row.dispensedQuanity} {row.dispenseUOM}
-          </span>
-        )
-      },
+  },
+  {
+    columnName: 'dispensedQuanity',
+    type: 'number',
+    width: 100,
+    render: row => {
+      return (
+        <span>
+          {row.dispensedQuanity} {row.dispenseUOM}
+        </span>
+      )
     },
-    {
-      columnName: 'no',
-      type: 'number',
-      width: 100,
-      render: row => {
-        return (
-          <p>
-            <NumberInput
-              max={99}
-              precision={0}
-              min={1}
-              value={row.no}
-              defaultValue={1}
-              onChange={obj => {
-                handleDrugLabelNoChanged(row.id, obj.target.value)
-              }}
-            />
-          </p>
-        )
-      },
-    },
-    {
-      columnName: 'print',
-      align: 'center',
-      width: 80,
-      render: row => {
-        return (
-          <Checkbox
+  },
+  {
+    columnName: 'no',
+    type: 'number',
+    width: 100,
+    render: row => {
+      return (
+        <p>
+          <NumberInput
+            max={99}
+            precision={0}
+            min={1}
+            value={row.no}
+            defaultValue={1}
             onChange={obj => {
-              handleDrugLabelSelected(row.id, obj.target.value)
+              handleDrugLabelNoChanged(row.id, obj.target.value)
             }}
-            checked={row.selected}
-            simple
           />
-        )
-      },
+        </p>
+      )
     },
-  ]
+  },
+  {
+    columnName: 'print',
+    align: 'center',
+    width: 80,
+    render: row => {
+      return (
+        <Checkbox
+          onChange={obj => {
+            handleDrugLabelSelected(row.id, obj.target.value)
+          }}
+          checked={row.selected}
+          simple
+        />
+      )
+    },
+  },
+]
 
 export const PackageColumns = [
   {
@@ -1087,7 +1116,7 @@ export const PackageColumnExtensions = (onPrint, showDrugLabelRemark) => [
           style={{
             wordWrap: 'break-word',
             whiteSpace: 'pre-wrap',
-            paddingRight: 24
+            paddingRight: 24,
           }}
         >
           {row.type}
@@ -1107,7 +1136,9 @@ export const PackageColumnExtensions = (onPrint, showDrugLabelRemark) => [
                     padding: '2px 3px',
                     height: 20,
                   }}
-                >Excl.</div>
+                >
+                  Excl.
+                </div>
               </Tooltip>
             )}
           </div>
@@ -1126,11 +1157,9 @@ export const PackageColumnExtensions = (onPrint, showDrugLabelRemark) => [
         <Tooltip
           title={
             <div>
-              {`Code/Name: ${code} / ${description}`}
+              {`Code: ${code}`}
               <br />
-              {`UnitPrice/UOM: ${currencySymbol}${numeral(unitPrice).format(
-                currencyFormat,
-              )} / ${row.dispenseUOM || '-'}`}
+              {`Name: ${description}`}
             </div>
           }
         >
@@ -1160,39 +1189,49 @@ export const PackageColumnExtensions = (onPrint, showDrugLabelRemark) => [
   {
     columnName: 'remarks',
     width: '40%',
-    render: (row) => {
-      const existsDrugLabelRemarks = showDrugLabelRemark && row.drugLabelRemarks && row.drugLabelRemarks.trim() !== ''
-      return <div style={{ position: 'relative' }} >
-        <div
-          style={{
-            wordWrap: 'break-word',
-            whiteSpace: 'pre-wrap',
-            paddingRight: existsDrugLabelRemarks ? 10 : 0
-          }}
-        >
-          {row.remarks || ' '}
-          <div style={{ position: 'relative', top: 2 }}>
-            {existsDrugLabelRemarks &&
-              <div style={{
-                position: 'absolute',
-                bottom: 2,
-              right: -15,
-              }}>
-                <Tooltip title={
-                  <div>
-                    <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
-                    <div>{row.drugLabelRemarks}
-                    </div>
-                  </div>
-                }>
-                  <FileCopySharp style={{ color: '#4255bd' }} />
-                </Tooltip>
-              </div>
-            }
+    render: row => {
+      const existsDrugLabelRemarks =
+        showDrugLabelRemark &&
+        row.drugLabelRemarks &&
+        row.drugLabelRemarks.trim() !== ''
+      return (
+        <div style={{ position: 'relative' }}>
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+              paddingRight: existsDrugLabelRemarks ? 10 : 0,
+            }}
+          >
+            {row.remarks || ' '}
+            <div style={{ position: 'relative', top: 2 }}>
+              {existsDrugLabelRemarks && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: 2,
+                    right: -15,
+                  }}
+                >
+                  <Tooltip
+                    title={
+                      <div>
+                        <div style={{ fontWeight: 500 }}>
+                          Drug Label Remarks
+                        </div>
+                        <div>{row.drugLabelRemarks}</div>
+                      </div>
+                    }
+                  >
+                    <FileCopySharp style={{ color: '#4255bd' }} />
+                  </Tooltip>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div >
-    }
+      )
+    },
   },
   {
     columnName: 'packageConsumeQuantity',

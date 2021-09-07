@@ -552,6 +552,32 @@ class Appointment extends React.PureComponent {
     this.onSelectSlot({ start: new Date(), end: new Date() })
   }
 
+  handleCopyAppointmentClick = (selectedAppointmentID) => {
+    let shouldShowApptForm = true
+    if (this.state.showAppointmentForm) {
+      this.setState({
+        selectedAppointmentFK: undefined,
+        showAppointmentForm: false,
+        isDragging: false,
+      })
+    }
+    this.props.dispatch({
+      type: 'calendar/copyAppointment',
+      payload: {
+        id: selectedAppointmentID,
+        mode: 'single',
+        bookedByUserFk: this.props.user.data.id,
+      },
+    }).then(response => {
+      if (response)
+        this.setState({
+          selectedAppointmentFK: selectedAppointmentID,
+          showAppointmentForm: shouldShowApptForm,
+          isDragging: false,
+        })
+    })
+  }
+
   handleDoctorEventClick = () => {
     const { showDoctorEventModal } = this.state
     this.setState({ showDoctorEventModal: !showDoctorEventModal })
@@ -744,6 +770,7 @@ class Appointment extends React.PureComponent {
               }}
               onHistoryRowSelected={this.onDoubleClickEvent}
               apptTimeIntervel={apptTimeIntervel}
+              handleCopyAppointmentClick={this.handleCopyAppointmentClick}
             />
           )}
         </CommonModal>
@@ -781,6 +808,7 @@ class Appointment extends React.PureComponent {
           <AppointmentSearch
             handleDoubleClick={this.onDoubleClickEvent}
             handleAddAppointmentClick={this.handleAddAppointmentClick}
+            handleCopyAppointmentClick={this.handleCopyAppointmentClick}
             currentUser={user.data.clinicianProfile.id}
             doctorprofile={doctorprofile}
           />

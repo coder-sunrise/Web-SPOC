@@ -19,34 +19,33 @@ const DrugMixtureInfo = ({ values = {}, isShowTooltip = true, right = -5 }) => {
   }
 
   return (
-    <Popover
-      icon={null}
-      placement='bottomLeft'
-      arrowPointAtCenter
-      content={
-        <div
-          style={{
-            fontSize: 14,
-          }}
-        >
-          <strong>Drug Mixture</strong>
-          {drugMixtureDetails(values)}
-        </div>
+    <Tooltip
+      title={
+        isShowTooltip ? (
+          <div
+            style={{
+              fontSize: 14,
+            }}
+          >
+            <strong>Drug Mixture</strong>
+            {drugMixtureDetails(values)}
+          </div>
+        ) : (
+          ''
+        )
       }
     >
-      <Tooltip title={isShowTooltip ? 'Drug Mixture' : ''}>
-        <IconButton
-          style={{
-            position: 'absolute',
-            bottom: 2,
-            right: right,
-          }}
-          size='medium'
-        >
-          <LocalHospital color='primary' />
-        </IconButton>
-      </Tooltip>
-    </Popover>
+      <IconButton
+        style={{
+          position: 'absolute',
+          bottom: 2,
+          right: right,
+        }}
+        size='medium'
+      >
+        <LocalHospital color='primary' />
+      </IconButton>
+    </Tooltip>
   )
 }
 

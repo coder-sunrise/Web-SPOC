@@ -226,7 +226,7 @@ const MonthDateHeader = withStyles(styles, { name: 'MonthDateHeader' })(
 
 const changeTimeRulerExtentPixel = (height) => {
   var calendarView = Object.values(document.styleSheets).filter(x=> x.ownerNode.dataset.meta === 'CalendarView')
-  var heightStyle = Object.values(calendarView[0].cssRules).filter(x=>x.selectorText.includes('CalendarView-calendarHeightSettingStyle'))[0]
+  var heightStyle = Object.values(calendarView[0].cssRules).filter(x=>x.selectorText.endsWith('rbc-time-column'))[0]
   heightStyle.style.height = `${height||1400}px`
 }
 

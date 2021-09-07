@@ -13,16 +13,17 @@ import { connect } from 'dva'
   // Add validation
   validationSchema: Yup.object().shape({
     category: Yup.string().required(),
-    displayValue: Yup.string().required().matches(/^[a-zA-Z0-9]+$/, 'Cannot enter special characters'),
+    displayValue: Yup.string().required().matches(/^[0-9a-zA-Z \b]+$/, 'Cannot enter special characters'),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
-    const { effectiveDates, ...restValues } = values
+    const { effectiveDates,displayValue, ...restValues } = values
     const { dispatch, onConfirm } = props
     dispatch({
       type: 'settingTag/upsert',
       payload: {
         ...restValues,
+        displayValue : displayValue.trim(),
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
       },

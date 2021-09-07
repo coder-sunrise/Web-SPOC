@@ -1067,8 +1067,8 @@ class Form extends React.PureComponent {
   showPreOrder = () => {
     const { values, mode } = this.props
     const { isEnableRecurrence, patientProfileFK } = values
-    const actualizePreOrderAccessRight = Authorized.check('appointment.actualizepreorder') || { rights: 'hidden' }
-    if (actualizePreOrderAccessRight.rights === 'hidden') return false
+    const actualizePreOrderAccessRight = Authorized.check('patientdatabase.modifypreorder') || { rights: 'hidden' }
+    if (actualizePreOrderAccessRight.rights !== 'enable') return false
     if (values.id) {
       return mode !== 'series'
     }
@@ -1120,6 +1120,7 @@ class Form extends React.PureComponent {
       visitRegistration: { visitOrderTemplateOptions = [] },
       dispatch,
       setFieldValue,
+      handleCopyAppointmentClick,
     } = this.props
 
     const {
@@ -1313,6 +1314,7 @@ class Form extends React.PureComponent {
                     handleRowDoubleClick={(data) => {
                       onHistoryRowSelected({ ...data, isHistory: true })
                     }}
+                    handleCopyAppointmentClick={handleCopyAppointmentClick}
                   />
                 </CardContainer>
               </GridItem>
