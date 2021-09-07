@@ -28,9 +28,7 @@ const wrapCellTextStyle = {
 const drugMixtureIndicator = (row, right) => {
   if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
 
-  return (
-    <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
-  )
+  return <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
 }
 
 const showCurrency = (value = 0) => {
@@ -47,7 +45,7 @@ const showCurrency = (value = 0) => {
   )
 }
 
-const baseColumns = (classes) => {
+const baseColumns = classes => {
   return [
     {
       dataIndex: 'itemType',
@@ -57,8 +55,7 @@ const baseColumns = (classes) => {
         let paddingRight = 0
         if (row.isPreOrder && row.isExclusive) {
           paddingRight = 52
-        }
-        else if (row.isPreOrder || row.isExclusive) {
+        } else if (row.isPreOrder || row.isExclusive) {
           paddingRight = 24
         }
         if (row.isDrugMixture) {
@@ -66,11 +63,13 @@ const baseColumns = (classes) => {
         }
         return (
           <div style={{ position: 'relative' }}>
-            <div style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-              paddingRight: paddingRight
-            }}>
+            <div
+              style={{
+                wordWrap: 'break-word',
+                whiteSpace: 'pre-wrap',
+                paddingRight: paddingRight,
+              }}
+            >
               {row.isDrugMixture ? 'Drug Mixture' : row.itemType}
               <div style={{ position: 'relative', top: 2 }}>
                 {drugMixtureIndicator(row, -20)}
@@ -83,7 +82,10 @@ const baseColumns = (classes) => {
                         borderRadius: 10,
                         backgroundColor: '#4255bd',
                       }}
-                    > Pre</div>
+                    >
+                      {' '}
+                      Pre
+                    </div>
                   </Tooltip>
                 )}
                 {row.isExclusive && (
@@ -95,7 +97,9 @@ const baseColumns = (classes) => {
                         borderRadius: 4,
                         backgroundColor: 'green',
                       }}
-                    >Excl.</div>
+                    >
+                      Excl.
+                    </div>
                   </Tooltip>
                 )}
               </div>
@@ -112,11 +116,9 @@ const baseColumns = (classes) => {
         <Tooltip
           title={
             <div>
-              {`Code/Name: ${row.code} / ${row.name}`}
+              {`Code: ${row.itemCode}`}
               <br />
-              {`UniPrice/UOM: ${currencySymbol}${numeral(row.unitPrice).format(
-                currencyFormat,
-              )} / ${row.dispenseUOMDisplayValue || '-'}`}
+              {`Name: ${row.itemName}`}
             </div>
           }
         >
@@ -127,6 +129,11 @@ const baseColumns = (classes) => {
     {
       dataIndex: 'description',
       title: 'Instructions',
+      render: (text, row) => (
+        <Tooltip title={row.description}>
+          <div style={wrapCellTextStyle}>{text}</div>
+        </Tooltip>
+      ),
     },
     {
       dataIndex: 'quantity',
@@ -134,12 +141,26 @@ const baseColumns = (classes) => {
       align: 'right',
       width: 80,
       render: (text, row) => (
-        <div style={numberstyle}>
-          {`${numeral(row.quantity || 0).format('0,0.0')}`}
-        </div>
+        <Tooltip
+          title={<div>{`${numeral(row.quantity || 0).format('0,0.0')}`}</div>}
+        >
+          <div style={numberstyle}>
+            {`${numeral(row.quantity || 0).format('0,0.0')}`}
+          </div>
+        </Tooltip>
       ),
     },
-    { dataIndex: 'dispenseUOMDisplayValue', title: 'UOM', width: 80 },
+    {
+      dataIndex: 'dispenseUOMDisplayValue',
+      title: 'UOM',
+      width: 80,
+      render: (text, row) => (
+        <Tooltip
+          title = {row.dispenseUOMDisplayValue}>
+          <div style={wrapCellTextStyle}>{text}</div>
+        </Tooltip>
+      ),
+    },
     {
       dataIndex: 'adjAmt',
       title: 'Adj.',
@@ -154,7 +175,9 @@ const baseColumns = (classes) => {
       align: 'right',
       render: (text, row) =>
         showCurrency(
-          row.isPreOrder && !row.isChargeToday ? 0 : row.totalAfterItemAdjustment,
+          row.isPreOrder && !row.isChargeToday
+            ? 0
+            : row.totalAfterItemAdjustment,
         ),
     },
   ]

@@ -14,9 +14,7 @@ const wrapCellTextStyle = {
 const drugMixtureIndicator = (row, right) => {
   if (row.type !== 'Medication' || !row.isDrugMixture) return null
 
-  return (
-    <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
-  )
+  return <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
 }
 
 export default ({ current, classes, showDrugLabelRemark }) => {
@@ -35,8 +33,7 @@ export default ({ current, classes, showDrugLabelRemark }) => {
               let paddingRight = 0
               if (row.isPreOrder && row.isExclusive) {
                 paddingRight = 52
-              }
-              else if (row.isPreOrder || row.isExclusive) {
+              } else if (row.isPreOrder || row.isExclusive) {
                 paddingRight = 24
               }
               if (row.isDrugMixture) {
@@ -44,11 +41,13 @@ export default ({ current, classes, showDrugLabelRemark }) => {
               }
               return (
                 <div style={{ position: 'relative' }}>
-                  <div style={{
-                    wordWrap: 'break-word',
-                    whiteSpace: 'pre-wrap',
-                    paddingRight: paddingRight
-                  }}>
+                  <div
+                    style={{
+                      wordWrap: 'break-word',
+                      whiteSpace: 'pre-wrap',
+                      paddingRight: paddingRight,
+                    }}
+                  >
                     {row.isDrugMixture ? 'Drug Mixture' : row.type}
                     <div style={{ position: 'relative', top: 2 }}>
                       {drugMixtureIndicator(row, -20)}
@@ -61,7 +60,10 @@ export default ({ current, classes, showDrugLabelRemark }) => {
                               borderRadius: 10,
                               backgroundColor: '#4255bd',
                             }}
-                          > Pre</div>
+                          >
+                            {' '}
+                            Pre
+                          </div>
                         </Tooltip>
                       )}
                       {row.isExclusive && (
@@ -73,7 +75,9 @@ export default ({ current, classes, showDrugLabelRemark }) => {
                               borderRadius: 4,
                               backgroundColor: 'green',
                             }}
-                          >Excl.</div>
+                          >
+                            Excl.
+                          </div>
                         </Tooltip>
                       )}
                     </div>
@@ -90,12 +94,9 @@ export default ({ current, classes, showDrugLabelRemark }) => {
               <Tooltip
                 title={
                   <div>
-                    {`Code/Name: ${row.code} / ${row.name}`}
+                    {`Code: ${row.code}`}
                     <br />
-                    {`UniPrice/UOM: ${currencySymbol}${numeral(
-                      row.unitPrice,
-                    ).format(currencyFormat)} / ${row.dispenseUOMDisplayValue ||
-                      '-'}`}
+                    {`Name: ${row.name}`}
                   </div>
                 }
               >
@@ -118,33 +119,45 @@ export default ({ current, classes, showDrugLabelRemark }) => {
             dataIndex: 'remarks',
             title: 'Remarks',
             render: (text, row) => {
-              const existsDrugLabelRemarks = showDrugLabelRemark && row.drugLabelRemarks && row.drugLabelRemarks.trim() !== ''
-              return <div style={{ position: 'relative' }}>
-                <div
-                  style={{
-                    wordWrap: 'break-word',
-                    whiteSpace: 'pre-wrap',
-                    paddingRight: existsDrugLabelRemarks ? 10 : 0,
-                  }}
-                >{row.remarks || ' '}</div>
-                {existsDrugLabelRemarks &&
-                  <div style={{
-                    position: 'absolute',
-                    bottom: -2,
-                  right: -8,
-                  }}>
-                    <Tooltip title={
-                      <div>
-                        <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
-                        <div>{row.drugLabelRemarks}
-                        </div>
-                      </div>
-                    }>
-                    <FileCopySharp style={{ color: '#4255bd' }} />
-                    </Tooltip>
+              const existsDrugLabelRemarks =
+                showDrugLabelRemark &&
+                row.drugLabelRemarks &&
+                row.drugLabelRemarks.trim() !== ''
+              return (
+                <div style={{ position: 'relative' }}>
+                  <div
+                    style={{
+                      wordWrap: 'break-word',
+                      whiteSpace: 'pre-wrap',
+                      paddingRight: existsDrugLabelRemarks ? 10 : 0,
+                    }}
+                  >
+                    {row.remarks || ' '}
                   </div>
-                }
-              </div>
+                  {existsDrugLabelRemarks && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: -2,
+                        right: -8,
+                      }}
+                    >
+                      <Tooltip
+                        title={
+                          <div>
+                            <div style={{ fontWeight: 500 }}>
+                              Drug Label Remarks
+                            </div>
+                            <div>{row.drugLabelRemarks}</div>
+                          </div>
+                        }
+                      >
+                        <FileCopySharp style={{ color: '#4255bd' }} />
+                      </Tooltip>
+                    </div>
+                  )}
+                </div>
+              )
             },
           },
           {
@@ -153,17 +166,32 @@ export default ({ current, classes, showDrugLabelRemark }) => {
             align: 'right',
             width: 80,
             render: (text, row) => (
-              <div
-                style={{
-                  color: 'darkBlue',
-                  fontWeight: 500,
-                }}
+              <Tooltip
+                title={
+                  <div>{`${numeral(row.quantity || 0).format('0,0.0')}`}</div>
+                }
               >
-                {`${numeral(row.quantity || 0).format('0,0.0')}`}
-              </div>
+                <div
+                  style={{
+                    color: 'darkBlue',
+                    fontWeight: 500,
+                  }}
+                >
+                  {`${numeral(row.quantity || 0).format('0,0.0')}`}
+                </div>
+              </Tooltip>
             ),
           },
-          { dataIndex: 'dispenseUOMDisplayValue', title: 'UOM', width: 80 },
+          {
+            dataIndex: 'dispenseUOMDisplayValue',
+            title: 'UOM',
+            width: 80,
+            render: (text, row) => (
+              <Tooltip title={row.dispenseUOMDisplayValue}>
+                <div style={wrapCellTextStyle}>{text}</div>
+              </Tooltip>
+            ),
+          },
           {
             dataIndex: 'adjAmt',
             title: 'Adj.',

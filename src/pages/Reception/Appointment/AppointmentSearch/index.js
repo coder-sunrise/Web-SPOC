@@ -9,6 +9,7 @@ const AppointmentSearch = ({
   dispatch,
   handleDoubleClick,
   handleAddAppointmentClick,
+  handleCopyAppointmentClick,
   appointment,
   currentUser,
   doctorprofile = [],
@@ -48,6 +49,7 @@ const AppointmentSearch = ({
           isIncludeRescheduledByClinic: true,
           isIncludeHistory: true,
         },
+        pagesize:100,
       },
     })
     return () => {
@@ -91,6 +93,7 @@ const AppointmentSearch = ({
         />
       </div>
       <Grid
+      handleCopyAppointmentClick={handleCopyAppointmentClick}
       handleDoubleClick={(data) => {
         handleDoubleClick({ ...data, isHistory: true })
         }}

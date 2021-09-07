@@ -426,7 +426,8 @@ class NewVisit extends PureComponent {
             >
               <PatientBanner
                 from='VisitReg'
-                extraCmt={              
+                activePreOrderItem={patientInfo?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
+                extraCmt={
                   <div
                     style={{
                       display: 'flex',
@@ -438,7 +439,7 @@ class NewVisit extends PureComponent {
                   >
                     {patientInfo && <PrintLabLabelButton
                       patientId={patientInfo.id}
-                      clinicSettings={clinicSettings}
+                      clinicSettings={clinicSettings?.settings}
                       isEnableScanner
                     />}
                   </div>
@@ -523,7 +524,7 @@ class NewVisit extends PureComponent {
                             />
                           </CommonCard>
                         </GridItem>
-                        {preOrderActualizationAccessRight && preOrderActualizationAccessRight.rights !== 'hidden' && (<GridItem xs={12} className={classes.row}>
+                        {values.visitPreOrderItem.length !== 0 && (<GridItem xs={12} className={classes.row}>
                           <CommonCard title='Pre-Order Actualization'>
                           <PreOrderCard {...this.props} values={values} visitPreOrderItem= {values.visitPreOrderItem} dispatch={dispatch}/>
                           </CommonCard>

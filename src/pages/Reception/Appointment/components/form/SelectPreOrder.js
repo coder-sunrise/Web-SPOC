@@ -7,7 +7,7 @@ import { CommonTableGrid, Button, CardContainer } from '@/components'
 import { queryList as queryAppointments } from '@/services/calendar'
 import { InventoryTypes } from '@/utils/codes'
 
-const SelectPreOrder = ({ activePreOrderItem = [], onSelectPreOrder, footer, mainDivHeight }) => {
+const SelectPreOrder = ({ activePreOrderItem = [], onSelectPreOrder, footer, mainDivHeight, disabled }) => {
   const [
     selectedPreOrders,
     setSelectedPreOrders,
@@ -49,7 +49,7 @@ const SelectPreOrder = ({ activePreOrderItem = [], onSelectPreOrder, footer, mai
       forceRender
       FuncProps={{
         pager: false,
-        selectable: true,
+        selectable: !disabled,
         selectConfig: {
           showSelectAll: true,
           rowSelectionEnabled: (row) => row.preOrderItemStatus === 'New',
@@ -89,7 +89,7 @@ const SelectPreOrder = ({ activePreOrderItem = [], onSelectPreOrder, footer, mai
         onConfirm: onConfirm,
         confirmBtnText: 'Actualize',
         confirmProps: {
-          disabled: !selectedPreOrders.length,
+          disabled: !selectedPreOrders.length || disabled,
         },
       })}
   </div>

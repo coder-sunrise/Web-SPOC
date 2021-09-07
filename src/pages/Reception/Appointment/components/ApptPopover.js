@@ -45,6 +45,11 @@ const styles = (theme) => ({
     display: 'flex',
     alignItems: 'center',
   },
+  updateOnStyle:{
+    '& > div > div > div > div > input':{
+      color:'black !important',
+    }
+  },
 })
 
 const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
@@ -63,6 +68,8 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
     startTime,
     endTime,
     clinicianName,
+    updateByUser,
+    updateDate,
   } = popoverEvent
 
   const date = moment(appointmentDate)
@@ -149,6 +156,12 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
         </GridItem>
         <GridItem md={6}>
           <DatePicker disabled label='Book On' value={createDate} />
+        </GridItem>
+        <GridItem md={6}>
+          <TextField disabled label='Update By' value={updateByUser} />
+        </GridItem>
+        <GridItem md={6}>
+          <TextField disabled label='Update On' value={moment(updateDate).format('DD MMM YYYY HH:mm')} />
         </GridItem>
         <GridItem md={12}>
           <TextField

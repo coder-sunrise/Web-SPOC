@@ -1796,7 +1796,6 @@ class Medication extends PureComponent {
                         <TextField
                           label='Open Prescription Name'
                           {...args}
-                          autocomplete='nope'
                         />
                       </div>
                     )
@@ -1815,7 +1814,6 @@ class Medication extends PureComponent {
                           <TextField
                             label='Drug Mixture'
                             {...args}
-                            autocomplete='nope'
                             maxLength={60}
                           />
                         </div>

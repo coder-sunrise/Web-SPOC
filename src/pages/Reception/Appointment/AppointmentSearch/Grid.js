@@ -10,16 +10,26 @@ import {
   CommonTableGrid,
   timeFormat,
   timeFormat24HourWithSecond,
+  Tooltip,
+  Button,
 } from '@/components'
 // utils
 import Authorized from '@/utils/Authorized'
 import { AppointmentTypeLabel } from '@/components/_medisys'
+import { mapApptStatus, INVALID_APPOINTMENT_STATUS} from '@/utils/constants'
+import { grayColors } from '@/assets/jss'
+import { FileAddTwoTone } from '@ant-design/icons'
 
 const styles = (theme) => ({
   subRow: {
     '& > td:first-child': {
       paddingLeft: theme.spacing(1),
     },
+  },
+  disabledRow: {
+    '& > td':{
+      color: grayColors[3],
+    }
   },
 })
 
@@ -64,31 +74,39 @@ class Grid extends PureComponent {
       doctor: null,
     }
 
+    const isDisabledRow = () => {
+      return (INVALID_APPOINTMENT_STATUS.indexOf(selectedData.appointmentStatusFk) > -1)
+    }
+
     const doubleClick = () => {
       const accessRight = Authorized.check('appointment.appointmentdetails')
 
       if (!accessRight || (accessRight && accessRight.rights !== 'enable'))
         return
 
+      if(isDisabledRow())
+        return
+      
       handleDoubleClick(selectedData)
     }
 
+    const disabledRowClass = isDisabledRow() ? ` ${classes.disabledRow}` : null
     if (row.countNumber === 1) {
       return (
-        <Table.Row {...p} onDoubleClick={doubleClick}>
+        <Table.Row {...p} onDoubleClick={doubleClick} className={disabledRowClass}>
           {newchildren}
         </Table.Row>
       )
     }
     return (
-      <Table.Row {...p} className={classes.subRow} onDoubleClick={doubleClick}>
+      <Table.Row {...p} className={classes.subRow + disabledRowClass} onDoubleClick={doubleClick}>
         {newchildren}
       </Table.Row>
     )
   }
 
   render () {
-    const { height } = this.props
+    const { height, handleCopyAppointmentClick } = this.props
     return (
       <CommonTableGrid
         style={{ marginTop: 10 }}
@@ -96,23 +114,31 @@ class Grid extends PureComponent {
         getRowId={(row) => row.uid}
         columns={[
           { name: 'patientName', title: 'Patient' },
-          { name: 'patientAccountNo', title: 'Account No.' },
+          { name: 'patientRefrenceNo', title: 'Ref. No.' },
+          { name: 'patientAccountNo', title: 'Acc. No.' },
           { name: 'patientContactNo', title: 'Contact No.' },
           { name: 'appointmentDate', title: 'Appt Date' },
-          { name: 'apptTime', title: 'Appt Time' },
+          { name: 'duration', title: 'Duration' },
           { name: 'doctor', title: 'Doctor' },
           { name: 'appointmentTypeFK', title: 'Appt Type' },
           { name: 'roomFk', title: 'Room' },
-          { name: 'duration', title: 'Duration' },
           { name: 'appointmentRemarks', title: 'Remarks' },
           { name: 'appointmentStatusFk', title: 'Appt Status' },
           { name: 'bookedByUser', title: 'Book By' },
           { name: 'bookOn', title: 'Book On' },
+          { name: 'updateByUser', title: 'Update By' },
+          { name: 'updateDate', title: 'Update On' },
+          { name: 'action', title: 'Action' },
         ]}
         columnExtensions={[
           {
             columnName: 'patientName',
             sortingEnabled: false,
+          },
+          {
+            columnName: 'patientRefrenceNo',
+            sortBy: 'patientRefrenceNo',
+            width: 130,
           },
           {
             columnName: 'patientAccountNo',
@@ -127,15 +153,12 @@ class Grid extends PureComponent {
           {
             columnName: 'appointmentDate',
             type: 'date',
-            width: 100,
+            width: 140,
+            render: (row) => `${moment(row.appointmentDate).format('DD MMM YYYY')} ${moment(row.apptTime, 'HH:mm').format('HH:mm')}`
           },
           {
-            columnName: 'apptTime',
+            columnName: 'duration',
             sortingEnabled: false,
-            render: (row) =>
-              moment(row.apptTime, timeFormat24HourWithSecond).format(
-                timeFormat,
-              ),
             width: 80,
           },
           {
@@ -168,11 +191,6 @@ class Grid extends PureComponent {
             sortingEnabled: false,
           },
           {
-            columnName: 'duration',
-            sortingEnabled: false,
-            width: 120,
-          },
-          {
             columnName: 'appointmentRemarks',
             sortingEnabled: false,
           },
@@ -192,8 +210,52 @@ class Grid extends PureComponent {
             type: 'date',
             width: 100,
           },
+          {
+            columnName: 'updateByUser',
+            sortingEnabled: false,
+            render:(row)=> {
+              const content = `${mapApptStatus(row.appointmentStatusFk)} by ${row.updateByUser}`
+              return <Tooltip title={content}><span>{content}</span></Tooltip>
+            }
+          },
+          {
+            columnName: 'updateDate',
+            type: 'date',
+            width: 140,
+            sortingEnabled: false,
+            render:(row)=> moment(row.updateDate).format('DD MMM YYYY HH:mm')
+          },
+          {
+            columnName: 'action',
+            width: 60,
+            sortingEnabled: false,
+            align:'center',
+            render:(row)=> {
+              const accessRight = Authorized.check('appointment.appointmentdetails')
+              const createApptAccessRight = Authorized.check('appointment.newappointment')
+              if (!accessRight ||  accessRight.rights !== 'enable' || !createApptAccessRight || createApptAccessRight.rights !== 'enable')
+                return
+              return INVALID_APPOINTMENT_STATUS.indexOf(row.appointmentStatusFk) === -1 && (
+                <Tooltip title='Copy'>
+                  <Button color='transparent' style={{float:'right'}} justIcon onClick={()=>handleCopyAppointmentClick(row.appointmentFK)}>
+                    <FileAddTwoTone />
+                  </Button>
+                </Tooltip>
+              )
+            }
+          },
         ]}
         TableProps={{ rowComponent: this.appointmentRow, height }}
+        FuncConfig={{
+          pager: true,
+          pagerDefaultState: {
+            pagesize: 100,
+          },
+          sort: true,
+          sortConfig: {
+            defaultSorting: [{ columnName: 'appointmentDate', direction: 'asc' }],
+          },
+        }}
       />
     )
   }

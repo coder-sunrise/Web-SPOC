@@ -314,7 +314,7 @@ class PatientDetail extends PureComponent {
     )
     if (preOrderListAccessRight) {
       const hiddenPreOrderListAccessRight =
-        preOrderListAccessRight.rights === 'hidden'
+        preOrderListAccessRight.rights !== 'enable'
       if (hiddenPreOrderListAccessRight) {
         this.widgets = this.widgets.filter(t => t.id !== '11')
       }

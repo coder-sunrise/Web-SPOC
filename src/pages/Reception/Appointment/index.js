@@ -314,7 +314,6 @@ class Appointment extends React.PureComponent {
         .toDate(),
       doctor: resourceId,
     }
-    console.log('report payload',payload)
     return payload
   }
 
@@ -466,7 +465,6 @@ class Appointment extends React.PureComponent {
 
   onEventMouseOver = (event, syntheticEvent) => {
     const { isDragging } = this.state
-
     !isDragging &&
       this.setState({
         showPopup: event !== null,
@@ -552,6 +550,32 @@ class Appointment extends React.PureComponent {
 
   handleAddAppointmentClick = () => {
     this.onSelectSlot({ start: new Date(), end: new Date() })
+  }
+
+  handleCopyAppointmentClick = (selectedAppointmentID) => {
+    let shouldShowApptForm = true
+    if (this.state.showAppointmentForm) {
+      this.setState({
+        selectedAppointmentFK: undefined,
+        showAppointmentForm: false,
+        isDragging: false,
+      })
+    }
+    this.props.dispatch({
+      type: 'calendar/copyAppointment',
+      payload: {
+        id: selectedAppointmentID,
+        mode: 'single',
+        bookedByUserFk: this.props.user.data.id,
+      },
+    }).then(response => {
+      if (response)
+        this.setState({
+          selectedAppointmentFK: selectedAppointmentID,
+          showAppointmentForm: shouldShowApptForm,
+          isDragging: false,
+        })
+    })
   }
 
   handleDoctorEventClick = () => {
@@ -728,7 +752,7 @@ class Appointment extends React.PureComponent {
           onClose={this.closeAppointmentForm}
           onConfirm={this.closeAppointmentForm}
           showFooter={false}
-          maxWidth='xl'
+          fullScreen
           overrideLoading
           observe='AppointmentForm'
         >
@@ -746,6 +770,7 @@ class Appointment extends React.PureComponent {
               }}
               onHistoryRowSelected={this.onDoubleClickEvent}
               apptTimeIntervel={apptTimeIntervel}
+              handleCopyAppointmentClick={this.handleCopyAppointmentClick}
             />
           )}
         </CommonModal>
@@ -783,6 +808,7 @@ class Appointment extends React.PureComponent {
           <AppointmentSearch
             handleDoubleClick={this.onDoubleClickEvent}
             handleAddAppointmentClick={this.handleAddAppointmentClick}
+            handleCopyAppointmentClick={this.handleCopyAppointmentClick}
             currentUser={user.data.clinicianProfile.id}
             doctorprofile={doctorprofile}
           />

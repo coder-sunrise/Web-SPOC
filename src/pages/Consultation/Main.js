@@ -1235,6 +1235,7 @@ class Main extends React.Component {
       formik,
       rights,
       disabled,
+      patient,
       ...resetProps
     } = this.props
 
@@ -1260,6 +1261,7 @@ class Main extends React.Component {
       <div className={classes.root}>
         <PatientBanner
           from='Consultation'
+          activePreOrderItem={patient?.entity?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
           extraCmt={this.getExtraComponent()}
           {...this.props}
         />

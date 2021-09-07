@@ -131,7 +131,7 @@ const _routes = [
         icon: 'icon-radiology',
         name: 'radiology',
         moduleName: 'Radiology',
-        //authority: ['reception'], TODO:: to replace with actual permission
+        authority: ['radiology'], 
         specialist: ['GP', 'Dental'],
         routes: [
           {
@@ -141,6 +141,14 @@ const _routes = [
             mini: 'RW',
             exact: true,
             //authority: ['reception/queue'], TODO:: to replace with actual permission
+          },
+          {
+            path: '/radiology/history',
+            name: 'History',
+            component: './Radiology/History',
+            mini: 'RW',
+            exact: true,
+            authority: ['radiology/worklisthistory'],
           },
         ],
       },
@@ -749,6 +757,7 @@ const _routes = [
         moduleName: 'Claim Submission',
         hideChildrenInMenu: true,
         authority: ['claimsubmission'],
+        clinicSetting: ['isEnableCHAS','isEnableMedisave'],
         specialist: ['GP'],
         routes: [
           {
@@ -762,6 +771,7 @@ const _routes = [
             name: 'chas',
             component: './ClaimSubmission/chas',
             authority: ['claimsubmission'],
+            clinicSetting: ['isEnableCHAS'],
           },
           {
             path: '/claim-submission/chas/invoice/:invoiceNo',
@@ -775,6 +785,7 @@ const _routes = [
             name: 'medisave',
             component: './ClaimSubmission/medisave',
             authority: ['claimsubmission'],
+            clinicSetting: ['isEnableMedisave'],
           },
           {
             path: '/claim-submission/medisave/invoice/:invoiceNo',

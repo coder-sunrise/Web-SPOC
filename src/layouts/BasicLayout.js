@@ -222,6 +222,7 @@ class BasicLayout extends React.PureComponent {
       location,
       history,
     } = this.props
+
     const shouldProceed = await this.checkShouldProceedRender()
     if (!shouldProceed) {
       // system version is lower than db, should do a refresh
@@ -281,7 +282,35 @@ class BasicLayout extends React.PureComponent {
   // };
 
   render() {
-    const { classes, loading, theme, ...props } = this.props
+    const { classes, loading, theme, route, clinicSettings: { settings = [] }, ...props } = this.props  
+    const routesConfig = {
+      ...route,
+      routes: route.routes.map(current => {
+        const clinicSettingDisabledRoutes = current.clinicSetting && current.clinicSetting.filter(s => typeof settings[s] === 'boolean' && !settings[s]).length >= current.clinicSetting.length
+        if(clinicSettingDisabledRoutes || Authorized.check(current.authority)?.rights === 'hidden') {
+          return {
+            ...current,
+            hideInMenu: true,
+          }
+        }
+
+        return {
+          ...current,
+          routes: current.routes?.map(route => {
+            const clinicSettingDisabledRoute = route.clinicSetting && route.clinicSetting.filter(s => typeof settings[s] === 'boolean' && !settings[s]).length >= route.clinicSetting.length
+            if(clinicSettingDisabledRoute || Authorized.check(route.authority)?.rights === 'hidden')
+            {
+              return {
+                ...route,
+                hideInMenu: true,
+              }
+            }
+            return route
+          }),
+        }
+      },[]),
+    }
+
     NProgress.start()
     if (!loading.global) {
       NProgress.done()
@@ -299,7 +328,7 @@ class BasicLayout extends React.PureComponent {
               <ProLayout
                 // {...defaultProps}
                 {...props.setting}
-                route={props.route}
+                route={routesConfig}
                 className={styles.root}
                 headerContentRender={p => (
                   <HeaderBreadcrumb breadcrumb={p.breadcrumb} />
@@ -340,8 +369,9 @@ class BasicLayout extends React.PureComponent {
 }
 
 export default withStyles(appStyle)(
-  connect(({ loading, setting }) => ({
+  connect(({ loading, setting, clinicSettings }) => ({
     // menuData: menu.menuData,
+    clinicSettings,
     setting,
     loading,
   }))(BasicLayout),

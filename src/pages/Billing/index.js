@@ -905,7 +905,10 @@ class Billing extends Component {
 
     return (
       <LoadingWrapper loading={loading} text='Getting billing info...'>
-        <PatientBanner from='Billing' />
+        <PatientBanner 
+          from='Billing' 
+          activePreOrderItem={patient?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
+        />
         <div className={classes.accordionContainer}>
           <LoadingWrapper linear loading={dispenseLoading}>
             <Accordion
