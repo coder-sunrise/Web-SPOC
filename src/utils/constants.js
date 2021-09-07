@@ -652,3 +652,38 @@ export const PATIENT_ALLERGY_TYPE = {
 }
 
 export const ENABLE_PRESCRIPTION_SET_CLINIC_ROLE = [1]
+
+export const mapApptStatus = statusFK => {
+  let status = ''
+  switch (statusFK) {
+    case APPOINTMENT_STATUS.CANCELLED:
+    case APPOINTMENT_STATUS.PFA_CANCELLED:
+      status = 'Cancelled'
+      break
+    case APPOINTMENT_STATUS.CONFIRMED:
+      status = 'Confirmed'
+      break
+    case APPOINTMENT_STATUS.DELETED:
+      status = 'Deleted'
+      break
+    case APPOINTMENT_STATUS.DRAFT:
+      status = 'Drafted'
+      break
+    case APPOINTMENT_STATUS.TURNEDUP:
+    case APPOINTMENT_STATUS.TURNEDUPLATE:
+    case APPOINTMENT_STATUS.PFA_NOSHOW:
+      status = 'Last Confirmed'
+      break
+    case APPOINTMENT_STATUS.RESCHEDULED:
+    case APPOINTMENT_STATUS.PFA_RESCHEDULED:
+      status = 'Rescheduled'
+      break
+  }
+  return status
+}
+
+export const INVALID_APPOINTMENT_STATUS = [
+  APPOINTMENT_STATUS.RESCHEDULED,
+  APPOINTMENT_STATUS.PFA_RESCHEDULED,
+  APPOINTMENT_STATUS.DELETED,
+]

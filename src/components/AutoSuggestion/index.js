@@ -4,6 +4,7 @@ import { control } from '@/components/Decorator'
 import { AutoComplete,Input } from 'antd'
 import PropTypes from 'prop-types'
 import { BaseInput } from '@/components'
+import _ from 'lodash'
 
 const STYLES = (theme) => {
   return {
@@ -63,6 +64,8 @@ class AutoSuggestion extends PureComponent {
     }
   }
 
+  delaySearch = _.debounce(this.onSearch.bind(this), 500)
+
   onOptionSelect = (value, option) => {
     const { valuePath = 'value', onOptionSelected } = this.props
     const { filterOptions = [] } = this.state
@@ -101,7 +104,7 @@ class AutoSuggestion extends PureComponent {
         style={{ width: '100%', cursor:'default' }}
         onSelect={this.onOptionSelect}
         onChange={this.onChange}
-        onSearch={this.onSearch}
+        onSearch={this.delaySearch}
         optionLabelProp='value'
         // placeholder={isFocused || value ? '' : label}
         onFocus={this.onFocus}

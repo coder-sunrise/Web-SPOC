@@ -139,7 +139,7 @@ export default createListViewModel({
             ...restFormikValues
           } = formikValues
 
-          const isEdit = formikValues.id !== undefined
+          const isEdit = formikValues.id !== undefined && !formikValues.isCopyedAppt
           let isRecurrenceChanged =
             formikValues.isEnableRecurrence &&
             compareDto(
@@ -284,6 +284,20 @@ export default createListViewModel({
             appointments,
             recurrenceDto: recurrence,
           }
+          if (restFormikValues.isCopyedAppt) {
+            savePayload = {
+              ...savePayload,
+              id: 0,
+              appointments: savePayload.appointments.map(appt => ({
+                ...appt,
+                id: 0,
+                appointmentGroupFK: 0,
+                appointments_Resources: appt.appointments_Resources.map(
+                  res => ({ ...res, id: 0, appointmentFK: 0 }),
+                ),
+              })),
+            }
+          }
           if (validate) {
             return yield put({
               type: 'validate',
@@ -348,6 +362,39 @@ export default createListViewModel({
             payload,
           })
           return data
+        }
+        return false
+      },
+      *copyAppointment({ payload }, { call, put }) {
+        const result = yield call(service.query, payload)
+        const { status, data } = result
+        if (parseInt(status, 10) === 200) {
+          const copyAppt = {
+            ...data,
+            appointments: data.appointments.map(item => ({
+              ...item,
+              appointmentDate: moment().formatUTC(),
+              appointmentStatusFk: undefined,//undefined is new, will updated to Darft
+              isEditedAsSingleAppointment: false,
+              appointmentPreOrderItem:[],
+            })),
+            bookedByUserFk: payload.bookedByUserFk,
+            isEnableRecurrence:false,
+            isCopyedAppt:true,
+          }
+          yield put({
+            type: 'setViewAppointment',
+            data: copyAppt,
+          })
+          yield put({
+            type: 'setEditType',
+            payload: payload.mode,
+          })
+          yield put({
+            type: 'cachePayload',
+            payload,
+          })
+          return copyAppt
         }
         return false
       },
@@ -496,8 +543,7 @@ export default createListViewModel({
             APPOINTMENT_STATUS.TURNEDUPLATE,
             APPOINTMENT_STATUS.PFA_NOSHOW,
           ].join(),
-          dobfrom: '1900-01-01',
-          dobto: '9999-12-31',
+          dob: null,
         }
         // const getCalendarListPayload = {
         //   apptDateFrom: start,
@@ -520,8 +566,8 @@ export default createListViewModel({
       },
       *filterCalendar({ payload }, { all, select, put }) {
         const calendarState = yield select(state => state.calendar)
-        const { search, dobfrom, dobto, doctor = [], appType = [] } = payload
-        const {targetDate, targetView} = calendarState
+        const { search, dob, doctor = [], appType = [] } = payload
+        const { targetDate, targetView } = calendarState
 
         let start
         let end
@@ -540,7 +586,10 @@ export default createListViewModel({
         const getCalendarListPayload = {
           searchValue: search,
           doctor: doctor.join(),
-          appType: appType.join(),
+          appType:
+            appType.length == 0 || appType.indexOf(-99) > -1
+              ? null
+              : appType.join(),
           apptDateFrom: start,
           apptDateTo: end,
           appStatus: [
@@ -553,8 +602,7 @@ export default createListViewModel({
             APPOINTMENT_STATUS.TURNEDUPLATE,
             APPOINTMENT_STATUS.PFA_NOSHOW,
           ].join(),
-          dobfrom: dobfrom || '1900-01-01',
-          dobto: dobto || '9999-12-31',
+          dob: dob,
         }
 
         yield all([

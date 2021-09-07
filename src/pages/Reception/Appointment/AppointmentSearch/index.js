@@ -9,6 +9,7 @@ const AppointmentSearch = ({
   dispatch,
   handleDoubleClick,
   handleAddAppointmentClick,
+  handleCopyAppointmentClick,
   appointment,
   currentUser,
   doctorprofile = [],
@@ -43,12 +44,12 @@ const AppointmentSearch = ({
       type: 'appointment/query',
       payload: {
         apiCriteria: {
-          dobfrom: '1900-01-01',
-          dobto: '9999-12-31',
+          dob: null,
           doctor: defaultDoctor.join(),
           isIncludeRescheduledByClinic: true,
           isIncludeHistory: true,
         },
+        pagesize:100,
       },
     })
     return () => {
@@ -92,6 +93,7 @@ const AppointmentSearch = ({
         />
       </div>
       <Grid
+      handleCopyAppointmentClick={handleCopyAppointmentClick}
       handleDoubleClick={(data) => {
         handleDoubleClick({ ...data, isHistory: true })
         }}

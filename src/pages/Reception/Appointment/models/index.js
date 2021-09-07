@@ -144,7 +144,7 @@ export default createListViewModel({
           pagination: {
             ...st.pagination,
             current: data.currentPage || 1,
-            pagesize: data.pageSize || 10,
+            pagesize: data.pageSize || 100,
             totalRecords: data.totalRecords,
             sorting,
           },
@@ -165,7 +165,7 @@ export default createListViewModel({
         const { filterTemplates } = st
 
         if (id) {
-          const { filterByDoctor, filterByApptType, dobfrom, dobto } = filterTemplates.find(
+          const { filterByDoctor, filterByApptType, dob } = filterTemplates.find(
             template => template.id === id,
           )
           return {
@@ -173,8 +173,7 @@ export default createListViewModel({
             currentFilterTemplate: {
               filterByDoctor,
               filterByApptType,
-              dobfrom,
-              dobto,
+              dob,
             },
           }
         }

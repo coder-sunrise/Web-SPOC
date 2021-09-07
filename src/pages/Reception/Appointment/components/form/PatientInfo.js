@@ -67,20 +67,12 @@ const PatientInfoInput = ({
       <GridItem xs md={2}>
         <div className={classnames(classes.buttonGroup)}>
           <FastField
-            name='dobfrom'
-            render={args => <DatePicker {...args} label='DOB From' />}
+            name='dob'
+            render={args => <DatePicker {...args} label='DOB' />}
           />
         </div>
       </GridItem>
-      <GridItem xs md={2}>
-        <div className={classnames(classes.buttonGroup)}>
-          <FastField
-            name='dobto'
-            render={args => <DatePicker {...args} label='DOB To' />}
-          />
-        </div>
-      </GridItem>
-      <GridItem xs md={4} >
+      <GridItem xs md={4}>
         <div className={classnames(classes.buttonGroup)}>
           {!isRegisteredPatient ? (
             <React.Fragment>
@@ -112,16 +104,18 @@ const PatientInfoInput = ({
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <Authorized authority='patientdatabase.patientprofiledetails'>
-                <Button
-                  color='primary'
-                  size='sm'
-                  // className={classes.patientNameButton}
-                  onClick={onViewPatientProfileClick}
-                >
-                  Patient Profile
-                </Button>
-              </Authorized>
+              {!isRegisteredPatient && (
+                <Authorized authority='patientdatabase.patientprofiledetails'>
+                  <Button
+                    color='primary'
+                    size='sm'
+                    // className={classes.patientNameButton}
+                    onClick={onViewPatientProfileClick}
+                  >
+                    Patient Profile
+                  </Button>
+                </Authorized>
+              )}
               {hasActiveSession && (
                 <Authorized authority='queue.registervisit'>
                   <Button
@@ -140,51 +134,59 @@ const PatientInfoInput = ({
           )}
         </div>
       </GridItem>
-      <GridItem xs md={3}>
-        {isEdit ? (
-          <TextField value={values.patientName} label='Patient Name' disabled />
-        ) : (
-          <FastField
-            name='patientName'
-            render={args => {
-              return (
-                <TextField
+      {!isRegisteredPatient && (
+        <React.Fragment>
+          <GridItem xs md={3}>
+            {isEdit ? (
+              <TextField
+                value={values.patientName}
+                label='Patient Name'
+                disabled
+              />
+            ) : (
+              <FastField
+                name='patientName'
+                render={args => {
+                  return (
+                    <TextField
+                      {...args}
+                      // autoFocus
+                      defaultValue={undefined}
+                      label='Patient Name'
+                      loseFocusOnEnterPressed
+                    />
+                  )
+                }}
+              />
+            )}
+          </GridItem>
+          <GridItem xs md={3}>
+            <Field
+              name='countryCodeFK'
+              render={args => (
+                <CodeSelect
+                  allowClear={false}
+                  label='Country Code'
+                  code='ctcountrycode'
+                  disabled={isRegisteredPatient || disabled || isEdit}
                   {...args}
-                  // autoFocus
-                  defaultValue={undefined}
-                  label='Patient Name'
-                  loseFocusOnEnterPressed
                 />
-              )
-            }}
-          />
-        )}
-      </GridItem>
-      <GridItem xs md={3}>
-        <Field
-          name='countryCodeFK'
-          render={args => (
-            <CodeSelect
-              allowClear={false}
-              label='Country Code'
-              code='ctcountrycode'
-              disabled={isRegisteredPatient || disabled || isEdit}
-              {...args}
+              )}
             />
-          )}
-        />
-      </GridItem>
-      <GridItem xs md={3}>
-        <Field
-          name='patientContactNo'
-          render={args => (
-            <MobileNumberInput
-              {...args}
-              disabled={isRegisteredPatient || disabled || isEdit}
+          </GridItem>
+          <GridItem xs md={3}>
+            <Field
+              name='patientContactNo'
+              render={args => (
+                <MobileNumberInput
+                  {...args}
+                  disabled={isRegisteredPatient || disabled || isEdit}
+                />
+              )}
             />
-          )}
-        />
-      </GridItem>
+          </GridItem>
+        </React.Fragment>
+      )}
     </React.Fragment>
   )
 }

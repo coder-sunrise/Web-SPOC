@@ -386,7 +386,9 @@ const VisitInfoCard = ({
               labelField='displayValue'
               value={values.visitGroup}
               disabled={isVisitReadonlyAfterSigned}
-              options={[...queueLog.list.filter(q => patientInfo && patientInfo.name !== q.patientName).map(l => {                      
+              options={[...queueLog.list.filter((q, i, a) => {
+                return patientInfo && patientInfo.name !== q.patientName && a.map(m => m.patientName).indexOf(q.patientName) === i
+              }).map(l => {
                   return {
                     visitGroup: l.visitGroup || l.id,
                     displayValue: l.visitGroup || 'New Group Number',
@@ -405,8 +407,8 @@ const VisitInfoCard = ({
               dropdownStyle={{ minWidth: "20%" }}
               onClear={handleVisitGroupChange}
               onSelect={handleVisitGroupChange}
-              onFocus={handleVisitGroupFocus}
-              onBlur={handleVisitGroupBlur}
+              // onFocus={handleVisitGroupFocus}
+              // onBlur={handleVisitGroupBlur}
               renderDropdown={(option) => {
                 return <div>
                   <span style={{ position: 'absolute'}}><b>{option.visitGroup === option.order ? '' : option.visitGroup}</b></span>
@@ -433,21 +435,24 @@ const VisitInfoCard = ({
           </Authorized>
         </GridItem>
         <GridItem xs md={3}>  
-          <Popover 
-            icon={null}
-            visible={visitGroupPopup}
-            content={<div>
-              <p>- Search by existing group number or patient name.</p>
-              <p>- Selecting visit group will set Cons. Ready to "No".</p>
-            </div>}>
-            <IconButton
-              size='small'
-              onMouseOver={handleVisitGroupFocus} 
-              onMouseOut={handleVisitGroupBlur} 
-            >
-              <InfoCircleOutlined />
-            </IconButton>
-          </Popover>
+          <Authorized authority='queue.visitgroup'>
+            <Popover 
+              icon={null}
+              visible={visitGroupPopup}
+              placement='topLeft'
+              content={<div>
+                <p>- Search by existing group number or patient name.</p>
+                <p>- Selecting visit group will set Cons. Ready to "No".</p>
+              </div>}>
+              <IconButton
+                size='small'
+                onMouseOver={handleVisitGroupFocus} 
+                onMouseOut={handleVisitGroupBlur} 
+              >
+                <InfoCircleOutlined />
+              </IconButton>
+            </Popover>
+          </Authorized>
         </GridItem>
         {showAdjusment &&
         ((ctinvoiceadjustment || []).length > 0 ||

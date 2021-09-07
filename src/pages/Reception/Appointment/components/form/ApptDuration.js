@@ -3,7 +3,7 @@ import moment from 'moment'
 import _ from 'lodash'
 import { GridContainer, GridItem, Select } from '@/components'
 
-const hourOptions = [
+export const hourOptions = [
   { name: '0 HR', value: 0 },
   { name: '1 HR', value: 1 },
   { name: '2 HR', value: 2 },
@@ -14,7 +14,7 @@ const hourOptions = [
   { name: '7 HR', value: 7 },
   { name: '8 HR', value: 8 },
 ]
-const minuteOptions = [
+export const minuteOptions = [
   { name: '0 MINS', value: 0 },
   { name: '5 MINS', value: 5 },
   { name: '10 MINS', value: 10 },

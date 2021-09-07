@@ -9,6 +9,7 @@ import { formatMessage } from 'umi'
 import { withStyles, Fab, Paper } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
 import Search from '@material-ui/icons/Search'
+import Refresh from '@material-ui/icons/Refresh'
 import BookmarkIcon from '@material-ui/icons/Bookmark'
 import { connect } from 'dva'
 import { compose } from 'redux'
@@ -66,7 +67,7 @@ const FilterBar = props => {
 
   const renderDropdown = option => <DoctorLabel doctor={option} />
 
-  const { filterByDoctor = [], dobfrom, dobto } = values
+  const { filterByDoctor = [], dob } = values
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
   const [showFilterTemplate, setShowFilterTemplate] = useState(false)
 
@@ -77,16 +78,14 @@ const FilterBar = props => {
     const {
       filterByApptType: appTypes,
       filterByDoctor: doctors,
-      dobfrom,
-      dobto,
+      dob,
     } = selectedTemplate
 
     handleUpdateFilter({
       ...values,
       filterByApptType: appTypes,
       filterByDoctor: doctors,
-      dobfrom,
-      dobto,
+      dob,
       filterBySingleDoctor: doctors && doctors.length ? doctors[0] : undefined,
     })
   }
@@ -110,14 +109,8 @@ const FilterBar = props => {
         </GridItem>
         <GridItem xs md={1}>
           <FastField
-            name='dobfrom'
-            render={args => <DatePicker {...args} label='DOB From' />}
-          />
-        </GridItem>
-        <GridItem xs md={1}>
-          <FastField
-            name='dobto'
-            render={args => <DatePicker {...args} label='DOB To' />}
+            name='dob'
+            render={args => <DatePicker {...args} label='DOB' />}
           />
         </GridItem>
         {isDayView && (
@@ -228,8 +221,7 @@ const FilterBar = props => {
                         : []
                     }
                     filterByApptType={values.filterByApptType}
-                    dobfrom={values.dobfrom}
-                    dobto={values.dobto}
+                    dob={values.dob}
                     handleFilterTemplate={handleFilterTemplate}
                     handleApplyTemplate={handleApplyTemplate}
                   />
@@ -251,14 +243,13 @@ const FilterBar = props => {
             </Popover>
           </div>
         </GridItem>
-
-        <GridItem xs md={8}>
+        <GridItem xs md={3}>
           <ProgressButton
-            icon={<Search />}
+            icon={<Refresh />}
             color='primary'
             onClick={onFilterClick}
           >
-            Filter
+            Refresh
           </ProgressButton>
           <ProgressButton
             icon={<Search />}
@@ -267,6 +258,8 @@ const FilterBar = props => {
           >
             Search Appointment
           </ProgressButton>
+        </GridItem>
+        <GridItem xs md={8}>
           <Authorized authority='appointment.newappointment'>
             <Button
               color='primary'
@@ -309,15 +302,13 @@ export default compose(
       filterByDoctor,
       filterBySingleDoctor,
       filterByApptType,
-      dobfrom,
-      dobto,
+      dob,
       search,
     }) => {
       count += 1
 
       return {
-        dobfrom,
-        dobto,
+        dob,
         search,
         filterByDoctor: [...filterByDoctor],
         filterBySingleDoctor,

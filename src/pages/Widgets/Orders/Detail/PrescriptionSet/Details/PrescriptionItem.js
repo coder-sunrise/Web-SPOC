@@ -342,70 +342,106 @@ class Detail extends PureComponent {
     return match
   }
 
-  renderMedication = (option) => {
-    const { code, displayValue, sellingPrice = 0, medicationGroup = {}, stock = 0, dispensingUOM = {}, isExclusive } = option
+  renderMedication = option => {
+    const {
+      code,
+      displayValue,
+      sellingPrice = 0,
+      medicationGroup = {},
+      stock = 0,
+      dispensingUOM = {},
+      isExclusive,
+    } = option
     const { name: uomName = '' } = dispensingUOM
 
-    return <div style={{ height: 40, lineHeight: '40px', borderBottom: '1px solid #cccccc' }} >
-      <div style={{
-        height: '20px',
-        lineHeight: '20px',
-      }}>
-        <Tooltip title={<div>
-          <span style={{ fontWeight: 500 }}>{`${displayValue} - `}</span>
-          <span>{code}</span>
-        </div>}>
-          <div style={{
-            width: 535,
-            display: 'inline-block',
-            whiteSpace: 'nowrap',
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-          }} ><span style={{ fontWeight: 500 }}>{`${displayValue} - `}</span>
-            <span>{code}</span>
-          </div>
-        </Tooltip>
+    return (
+      <div style={{ height: 40, lineHeight: '40px' }}>
+        <div
+          style={{
+            height: '20px',
+            lineHeight: '20px',
+          }}
+        >
+          <Tooltip
+            useTooltip2
+            title={
+              <div>
+                <div
+                  style={{ fontWeight: 'bold' }}
+                >{`Name: ${displayValue}`}</div>
+                <div>{`Code: ${code}`}</div>
+              </div>
+            }
+          >
+            <div
+              style={{
+                width: 535,
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+              }}
+            >
+              <span
+                style={{ fontWeight: 550, fontSize: 15 }}
+              >{`${displayValue} - `}</span>
+              <span>{code}</span>
+            </div>
+          </Tooltip>
 
-        {isExclusive &&
-          <div style={{
-          backgroundColor: 'green',
-          color: 'white',
-          fontSize: '0.7rem',
-          position: 'relative',
-          right: '0px',
-          marginLeft: 3,
-          top: '-6px',
-          display: 'inline-block',
-          height: 18,
-          lineHeight: '18px',
-          borderRadius: 4,
-          padding: '1px 3px',
-          fontWeight: 500,
-        }} title='Exclusive Drug'>Excl.</div>
-        }
+          {isExclusive && (
+            <div
+              style={{
+                backgroundColor: 'green',
+                color: 'white',
+                fontSize: '0.7rem',
+                position: 'relative',
+                right: '0px',
+                marginLeft: 3,
+                top: '-6px',
+                display: 'inline-block',
+                height: 18,
+                lineHeight: '18px',
+                borderRadius: 4,
+                padding: '1px 3px',
+                fontWeight: 500,
+              }}
+              title='Exclusive Drug'
+            >
+              Excl.
+            </div>
+          )}
+        </div>
+        <div
+          style={{
+            height: '20px',
+            lineHeight: '20px',
+          }}
+        >
+          <Tooltip
+            useTooltip2
+            title={medicationGroup.name ? `Group: ${medicationGroup.name}` : ''}
+          >
+            <div
+              style={{
+                width: 570,
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                height: '100%',
+              }}
+            >
+              {' '}
+              {medicationGroup.name ? `Grp.: ${medicationGroup.name}` : ''}
+            </div>
+          </Tooltip>
+        </div>
       </div>
-      <div style={{
-        height: '20px',
-        lineHeight: '20px',
-      }}>
-        <Tooltip title={medicationGroup.name || ''} >
-          <div style={{
-            width: 570, display: 'inline-block',
-            whiteSpace: 'nowrap',
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            height: '100%',
-          }}> {medicationGroup.name || ''}
-          </div>
-        </Tooltip>
-      </div>
-    </div >
+    )
   }
 
-  changeMedication = (
-    v,
-    op = {},
-  ) => {
+  changeMedication = (v, op = {}) => {
     const { setFieldValue, values } = this.props
     const {
       prescriptionSetItemInstruction = [],
@@ -414,7 +450,7 @@ class Detail extends PureComponent {
     let defaultInstruction = {
       sequence: 0,
       stepdose: 'AND',
-      uid: getUniqueId()
+      uid: getUniqueId(),
     }
 
     if (op.id) {
@@ -440,12 +476,12 @@ class Detail extends PureComponent {
     const isEdit = !!values.id
     const newPrescriptionInstruction = isEdit
       ? [
-        ...prescriptionSetItemInstruction.map(i => ({
-          ...i,
-          isDeleted: true,
-        })),
-        defaultInstruction,
-      ]
+          ...prescriptionSetItemInstruction.map(i => ({
+            ...i,
+            isDeleted: true,
+          })),
+          defaultInstruction,
+        ]
       : [defaultInstruction]
 
     setFieldValue('prescriptionSetItemInstruction', newPrescriptionInstruction)
@@ -476,24 +512,33 @@ class Detail extends PureComponent {
       const defaultPrecaution = {
         precaution: '',
         sequence: 0,
-        uid: getUniqueId()
+        uid: getUniqueId(),
       }
       const newPrescriptionPrecaution = isEdit
         ? [
-          ...prescriptionSetItemPrecaution.map(i => ({
-            ...i,
-            isDeleted: true,
-          })),
-          defaultPrecaution,
-        ]
+            ...prescriptionSetItemPrecaution.map(i => ({
+              ...i,
+              isDeleted: true,
+            })),
+            defaultPrecaution,
+          ]
         : [defaultPrecaution]
 
       setFieldValue(`prescriptionSetItemPrecaution`, newPrescriptionPrecaution)
     }
 
-    setFieldValue('dispenseUOMFK', op.dispensingUOM ? op.dispensingUOM.id : undefined)
-    setFieldValue('inventoryDispenseUOMFK', op.dispensingUOM ? op.dispensingUOM.id : undefined)
-    setFieldValue('inventoryPrescribingUOMFK', op.prescribingUOM ? op.prescribingUOM.id : undefined)
+    setFieldValue(
+      'dispenseUOMFK',
+      op.dispensingUOM ? op.dispensingUOM.id : undefined,
+    )
+    setFieldValue(
+      'inventoryDispenseUOMFK',
+      op.dispensingUOM ? op.dispensingUOM.id : undefined,
+    )
+    setFieldValue(
+      'inventoryPrescribingUOMFK',
+      op.prescribingUOM ? op.prescribingUOM.id : undefined,
+    )
 
     setFieldValue(
       'dispenseUOMDisplayValue',
@@ -562,10 +607,13 @@ class Detail extends PureComponent {
       <React.Fragment>
         <Divider />
 
-        <div style={{
-          textAlign: 'right', marginTop: theme.spacing(2),
-          marginBottom: theme.spacing(1),
-        }}>
+        <div
+          style={{
+            textAlign: 'right',
+            marginTop: theme.spacing(2),
+            marginBottom: theme.spacing(1),
+          }}
+        >
           <Button
             color='danger'
             size='sm'
@@ -721,7 +769,6 @@ class Detail extends PureComponent {
     const { form } = this.descriptionArrayHelpers
     let newTotalQuantity = 0
 
-
     const prescriptionItem = form.values.prescriptionSetItemInstruction.filter(
       item => !item.isDeleted,
     )
@@ -781,9 +828,9 @@ class Detail extends PureComponent {
     const { option, row } = e
     const { values, setFieldValue, codetable } = this.props
     const { drugName = '' } = values
-    const activeDrugMixtureRows = (values.prescriptionSetItemDrugMixture || []).filter(
-      item => !item.isDeleted,
-    )
+    const activeDrugMixtureRows = (
+      values.prescriptionSetItemDrugMixture || []
+    ).filter(item => !item.isDeleted)
     const rs = values.prescriptionSetItemDrugMixture.filter(
       o =>
         !o.isDeleted &&
@@ -847,10 +894,10 @@ class Detail extends PureComponent {
         const currentMedication = inventorymedication.find(
           o => o.id === actviceItem[1].inventoryMedicationFK,
         )
-          this.changeMedication(
-            actviceItem[1].inventoryMedicationFK,
-            currentMedication,
-          )
+        this.changeMedication(
+          actviceItem[1].inventoryMedicationFK,
+          currentMedication,
+        )
       }
       const newArray = tempArray.map(o => {
         if (o.id === deleted[0]) {
@@ -892,7 +939,6 @@ class Detail extends PureComponent {
       totalQuantity += item.quantity || 0
     })
 
-
     setFieldValue('quantity', totalQuantity)
   }
 
@@ -911,12 +957,14 @@ class Detail extends PureComponent {
           options: this.getMedicationOptions,
           handleFilter: (input, option) => {
             return this.filterMedicationOptions(input, option)
-          },
+          }, 
+          width:595,
           dropdownMatchSelectWidth: false,
           dropdownStyle: {
             width: 600,
           },
-          renderDropdown: (option) => {
+          dropdownClassName: 'ant-select-dropdown-bottom-bordered',
+          renderDropdown: option => {
             return this.renderMedication(option)
           },
           sortingEnabled: false,
@@ -979,9 +1027,9 @@ class Detail extends PureComponent {
               row.revenueCategoryFK = undefined
               row.isDispensedByPharmacy = undefined
               row.isNurseActualizeRequired = undefined
-              const activeDrugMixtureRows = (values.prescriptionSetItemDrugMixture || []).filter(
-                item => !item.isDeleted,
-              )
+              const activeDrugMixtureRows = (
+                values.prescriptionSetItemDrugMixture || []
+              ).filter(item => !item.isDeleted)
               if (activeDrugMixtureRows[0].id === row.id) {
                 this.changeMedication()
               }
@@ -999,8 +1047,7 @@ class Detail extends PureComponent {
           isDisabled: row => row.inventoryMedicationFK === undefined,
         },
         {
-          columnName: 'uomfk',
-          width: 250,
+          columnName: 'uomfk', 
           type: 'codeSelect',
           code: 'ctMedicationUnitOfMeasurement',
           labelField: 'name',
@@ -1075,7 +1122,7 @@ class Detail extends PureComponent {
                 name='inventoryMedicationFK'
                 render={args => {
                   return (
-                    <div style={{ position: 'relative' }} >
+                    <div style={{ position: 'relative' }}>
                       <CodeSelect
                         temp
                         label='Medication Name, Drug Group'
@@ -1084,6 +1131,7 @@ class Detail extends PureComponent {
                         options={this.getMedicationOptions()}
                         handleFilter={this.filterMedicationOptions}
                         dropdownMatchSelectWidth={false}
+                        dropdownClassName='ant-select-dropdown-bottom-bordered'
                         dropdownStyle={{
                           width: 600,
                         }}
@@ -1092,7 +1140,10 @@ class Detail extends PureComponent {
                         style={{ paddingRight: 20 }}
                         showOptionTitle={false}
                       />
-                      <LowStockInfo sourceType='prescriptionSet' {...this.props} />
+                      <LowStockInfo
+                        sourceType='prescriptionSet'
+                        {...this.props}
+                      />
                     </div>
                   )
                 }}
@@ -1574,7 +1625,7 @@ class Detail extends PureComponent {
                                       <span
                                         style={{
                                           position: 'absolute',
-                                          bottom: 4,
+                                          top: 10,
                                         }}
                                       >
                                         {activeIndex + 1}.
@@ -1611,7 +1662,7 @@ class Detail extends PureComponent {
                                           day: 1,
                                           precaution: '1',
                                           sequence: newMaxSeq,
-                                          uid: getUniqueId()
+                                          uid: getUniqueId(),
                                         },
                                       )}
                                     </div>

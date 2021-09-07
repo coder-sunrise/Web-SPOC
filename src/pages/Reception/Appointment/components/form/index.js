@@ -302,8 +302,7 @@ class Form extends React.PureComponent {
         // ],
         apiCriteria: {
           searchValue: values.search,
-          dobfrom: values.dobfrom,
-          dobto: values.dobto,
+          dob: values.dob,
         },
       },
     })
@@ -1068,8 +1067,8 @@ class Form extends React.PureComponent {
   showPreOrder = () => {
     const { values, mode } = this.props
     const { isEnableRecurrence, patientProfileFK } = values
-    const actualizePreOrderAccessRight = Authorized.check('appointment.actualizepreorder') || { rights: 'hidden' }
-    if (actualizePreOrderAccessRight.rights === 'hidden') return false
+    const actualizePreOrderAccessRight = Authorized.check('patientdatabase.modifypreorder') || { rights: 'hidden' }
+    if (actualizePreOrderAccessRight.rights !== 'enable') return false
     if (values.id) {
       return mode !== 'series'
     }
@@ -1121,6 +1120,7 @@ class Form extends React.PureComponent {
       visitRegistration: { visitOrderTemplateOptions = [] },
       dispatch,
       setFieldValue,
+      handleCopyAppointmentClick,
     } = this.props
 
     const {
@@ -1196,11 +1196,11 @@ class Form extends React.PureComponent {
               className={classnames(classes.formContent)}
               alignItems='flex-start'
               style={{
-                height: this.props.height - (this.state.bannerHeight || 0) - 100,
+                height: this.props.height - (this.state.bannerHeight || 0),// - 100,
                 overflow: 'auto',
               }}
             >
-              <GridItem container xs={12} md={7}>
+              <GridItem container xs={12} md={6}>
                 <GridItem
                   container
                   xs
@@ -1225,7 +1225,7 @@ class Form extends React.PureComponent {
                     values={values}
                     hasActiveSession={this.state.hasActiveSession}
                   />
-                  <AppointmentDateInput disabled={_disableAppointmentDate} visitOrderTemplateOptions={visitOrderTemplateOptions} />
+                  <AppointmentDateInput disabled={_disableAppointmentDate} visitOrderTemplateOptions={visitOrderTemplateOptions} patientProfileFK={values.patientProfileFK}/>
                   <GridItem xs md={12} className={classes.verticalSpacing}>
                     <AppointmentDataGrid
                       validationSchema={gridValidationSchema}
@@ -1247,10 +1247,11 @@ class Form extends React.PureComponent {
                         <OutlinedTextField
                           {...args}
                           disabled={disableDataGrid}
-                          rows='2'
+                          rows='5'
                           multiline
                           maxLength={2000}
-                          label='Appointment Remarks'
+                          label=''
+                          className={classes.apptRemarksMultiline}
                         />
                       )}
                     />
@@ -1303,7 +1304,7 @@ class Form extends React.PureComponent {
                   />
                 </GridItem>
               </GridItem>
-              <GridItem xs={12} md={5}>
+              <GridItem xs={12} md={6}>
                 <CardContainer
                   hideHeader
                   className={classes.appointmentHistory}
@@ -1313,6 +1314,7 @@ class Form extends React.PureComponent {
                     handleRowDoubleClick={(data) => {
                       onHistoryRowSelected({ ...data, isHistory: true })
                     }}
+                    handleCopyAppointmentClick={handleCopyAppointmentClick}
                   />
                 </CardContainer>
               </GridItem>

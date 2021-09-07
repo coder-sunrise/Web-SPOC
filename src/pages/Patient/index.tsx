@@ -126,23 +126,14 @@ const defaultColumns = [
     },
   },
   {
-    // title: 'Patient Name, Acc No., Patient Ref. No., Contact No.',
+    // title: dob
     hideInTable: true,
     title: '',
-    dataIndex: 'dobfrom',
+    dataIndex: 'dob',
     renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
       return (
-        <DatePicker style={{ width: 150 }} label='DOB From' placeholder='' />
+        <DatePicker style={{ width: 150 }} label='DOB' placeholder='' />
       )
-    },
-  },
-  {
-    // title: 'Patient Name, Acc No., Patient Ref. No., Contact No.',
-    hideInTable: true,
-    title: '',
-    dataIndex: 'dobto',
-    renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-      return <DatePicker style={{ width: 150 }} label='DOB To' placeholder='' />
     },
   },
 ]
@@ -258,13 +249,12 @@ const PatientIndex = ({
             },
           },
         ]}
-        beforeSearchSubmit={({ search, dobfrom, dobto, ...values }) => {
+        beforeSearchSubmit={({ search, dob, ...values }) => {
           return {
             ...values,
             apiCriteria: {
               searchValue: search,
-              dobfrom: dobfrom,
-              dobto: dobto,
+              dob: dob,
               includeinactive: true,
             },
           }

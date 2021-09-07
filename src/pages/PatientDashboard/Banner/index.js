@@ -63,7 +63,9 @@ const styles = theme => ({
   patient,
   codetable,
   ctschemetype: codetable.ctschemetype || [],
-  refreshingBalance: loading.effects['patient/refreshChasBalance'] || loading.effects['patient/refreshMedisaveBalance'],
+  refreshingBalance:
+    loading.effects['patient/refreshChasBalance'] ||
+    loading.effects['patient/refreshMedisaveBalance'],
 }))
 class Banner extends PureComponent {
   state = {
@@ -77,12 +79,12 @@ class Banner extends PureComponent {
     showPreOrderModal: false,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.fetchCodeTables()
   }
 
-  componentWillMount () {
+  componentWillMount() {
     const { dispatch } = this.props
     dispatch({
       type: 'codetable/fetchCodes',
@@ -90,7 +92,7 @@ class Banner extends PureComponent {
     })
   }
 
-  getAllergyData () {
+  getAllergyData() {
     const { patient } = this.props
     const { entity } = patient
     const { info } = entity
@@ -113,7 +115,7 @@ class Banner extends PureComponent {
     )
   }
 
-  getAllergyLink (data) {
+  getAllergyLink(data) {
     const { props } = this
     const {
       patient,
@@ -269,120 +271,103 @@ class Banner extends PureComponent {
 
   getSchemeList = schemeDataList => {
     const chasOrMedisave = (schemeDataList || []).filter(
-      o =>
-        o.schemeTypeFK <= 6 ||
-        this.isMedisave(o.schemeTypeFK)
+      o => o.schemeTypeFK <= 6 || this.isMedisave(o.schemeTypeFK),
     )
     return schemeDataList.map(s => (
-      <span
-        style={{ paddingRight: 5, display: 'inline-block' }}
-      >
+      <span style={{ paddingRight: 5, display: 'inline-block' }}>
         {chasOrMedisave &&
-          chasOrMedisave.find(list => s.schemeTypeFK === list.schemeTypeFK)
-          ? (<Popover
+        chasOrMedisave.find(list => s.schemeTypeFK === list.schemeTypeFK) ? (
+          <Popover
             icon={null}
-            content={<div>
+            content={
               <div>
-                {s.coPaymentSchemeFK ||
+                <div>
+                  {s.coPaymentSchemeFK ||
                   schemeDataList.filter(p =>
                     this.isMedisave(p.schemeTypeFK),
                   )[0] === s
-                  ? s.copaymentSchemeName
-                  : s.schemeTypeName}
-                <span style={{ bottom: -2 }}>
-                  {s.schemeTypeFK <= 6 && (
-                    <IconButton
-                      onClick={this.refreshChasBalance}
-                    >
-                      <Refresh />
-                    </IconButton>
-                  )}
-                  {this.isMedisave(s.schemeTypeFK) &&
-                    schemeDataList.filter(p =>
-                      this.isMedisave(p.schemeTypeFK),
-                    )[0] === s && (
-                      <IconButton
-                        onClick={this.refreshMedisaveBalance}
-                      >
+                    ? s.copaymentSchemeName
+                    : s.schemeTypeName}
+                  <span style={{ bottom: -2 }}>
+                    {s.schemeTypeFK <= 6 && (
+                      <IconButton onClick={this.refreshChasBalance}>
                         <Refresh />
                       </IconButton>
                     )}
-                </span>
+                    {this.isMedisave(s.schemeTypeFK) &&
+                      schemeDataList.filter(p =>
+                        this.isMedisave(p.schemeTypeFK),
+                      )[0] === s && (
+                        <IconButton onClick={this.refreshMedisaveBalance}>
+                          <Refresh />
+                        </IconButton>
+                      )}
+                  </span>
+                </div>
+                {s.schemeType && (
+                  <div style={{ marginTop: 15 }}>{s.schemeType}</div>
+                )}
+                {this.isMedisave(s.schemeTypeFK) && (
+                  <div>
+                    Payer: {s.payerName} ({s.payerAccountNo})
+                  </div>
+                )}
+                {s.validFrom && (
+                  <div>
+                    Validity:{' '}
+                    {s.validFrom ? (
+                      <DatePicker
+                        text
+                        format={dateFormatLong}
+                        value={s.validFrom}
+                      />
+                    ) : (
+                      ''
+                    )}
+                    &nbsp;-&nbsp;
+                    {s.validTo ? (
+                      <DatePicker
+                        text
+                        format={dateFormatLong}
+                        value={s.validTo}
+                      />
+                    ) : (
+                      ''
+                    )}
+                  </div>
+                )}
+                {s.schemeTypeFK !== 15 ? (
+                  <div>
+                    Balance: <NumberInput text currency value={s.balance} />
+                  </div>
+                ) : (
+                  ''
+                )}
+                {s.schemeTypeFK <= 6 ? (
+                  <div>
+                    Patient Acute Visit Balance:{' '}
+                    <NumberInput
+                      text
+                      currency
+                      value={s.acuteVisitPatientBalance}
+                    />
+                  </div>
+                ) : (
+                  ''
+                )}
+                {s.schemeTypeFK <= 6 ? (
+                  <div>
+                    Patient Acute Clinic Balance:{' '}
+                    <NumberInput
+                      text
+                      currency
+                      value={s.acuteVisitClinicBalance}
+                    />
+                  </div>
+                ) : (
+                  ''
+                )}
               </div>
-              {s.schemeType && (
-                <div style={{ marginTop: 15 }}>
-                  {s.schemeType}
-                </div>
-              )}
-              {this.isMedisave(s.schemeTypeFK) && (
-                <div>
-                  Payer: {s.payerName} (
-                  {s.payerAccountNo})
-                </div>
-              )}
-              {s.validFrom && (
-                <div>
-                  Validity:{' '}
-                  {s.validFrom ? (
-                    <DatePicker
-                      text
-                      format={dateFormatLong}
-                      value={s.validFrom}
-                    />
-                  ) : (
-                    ''
-                  )}
-                  &nbsp;-&nbsp;
-                  {s.validTo ? (
-                    <DatePicker
-                      text
-                      format={dateFormatLong}
-                      value={s.validTo}
-                    />
-                  ) : (
-                    ''
-                  )}
-                </div>
-              )}
-              {s.schemeTypeFK !== 15 ? (
-                <div>
-                  Balance:{' '}
-                  <NumberInput
-                    text
-                    currency
-                    value={s.balance}
-                  />
-                </div>
-              ) : (
-                ''
-              )}
-              {s.schemeTypeFK <= 6 ? (
-                <div>
-                  Patient Acute Visit Balance:{' '}
-                  <NumberInput
-                    text
-                    currency
-                    value={
-                      s.acuteVisitPatientBalance
-                    }
-                  />
-                </div>
-              ) : (
-                ''
-              )}
-              {s.schemeTypeFK <= 6 ? (
-                <div>
-                  Patient Acute Clinic Balance:{' '}
-                  <NumberInput
-                    text
-                    currency
-                    value={s.acuteVisitClinicBalance}
-                  />
-                </div>
-              ) : (
-                ''
-              )}
-            </div>
             }
             trigger='click'
             placement='bottom'
@@ -396,11 +381,14 @@ class Banner extends PureComponent {
                 }}
               >
                 {s.copaymentSchemeName || s.schemeTypeName}
-                {s.validTo ? ` (Exp: ${moment(s.validTo).format('DD/MM/YYYY')})` : ''}
+                {s.validTo
+                  ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`
+                  : ''}
               </span>
             </Link>
-          </Popover>)
-          : (<Link>
+          </Popover>
+        ) : (
+          <Link>
             <span
               style={{
                 color: 'black',
@@ -412,9 +400,12 @@ class Banner extends PureComponent {
               }}
             >
               {s.copaymentSchemeName || s.schemeTypeName}
-              {s.validTo ? ` (Exp: ${moment(s.validTo).format('DD/MM/YYYY')})` : ''}
+              {s.validTo
+                ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`
+                : ''}
             </span>
-          </Link>)}
+          </Link>
+        )}
       </span>
     ))
   }
@@ -639,12 +630,12 @@ class Banner extends PureComponent {
       statusDescription: refreshedSchemeData.statusDescription,
       acuteBalanceStatusCode:
         !_.isEmpty(refreshedSchemeData) &&
-          refreshedSchemeData.isSuccessful === false
+        refreshedSchemeData.isSuccessful === false
           ? 'ERROR'
           : undefined,
       chronicBalanceStatusCode:
         !_.isEmpty(refreshedSchemeData) &&
-          refreshedSchemeData.isSuccessful === false
+        refreshedSchemeData.isSuccessful === false
           ? 'ERROR'
           : chronicStatus,
       isSuccessful:
@@ -712,7 +703,7 @@ class Banner extends PureComponent {
     }
   }
 
-  displayMedicalProblemData (entity = { patientHistoryDiagnosis: [] }) {
+  displayMedicalProblemData(entity = { patientHistoryDiagnosis: [] }) {
     let medicalProblemData = '-'
     const { patientHistoryDiagnosis = [] } = entity
 
@@ -752,7 +743,7 @@ class Banner extends PureComponent {
     )
   }
 
-  onViewPatientProfile = (event) => {
+  onViewPatientProfile = event => {
     event.preventDefault()
     const { patient, history, from, dispatch } = this.props
     const { entity } = patient
@@ -769,14 +760,12 @@ class Banner extends PureComponent {
 
   getBannerMd = () => {
     const { from, extraCmt } = this.props
-    if (from === 'Consultation')
-      return 9
-    if (extraCmt)
-      return 11
+    if (from === 'Consultation' || from === 'PatientDashboard') return 9
+    if (extraCmt) return 11
     return 12
   }
 
-  render () {
+  render() {
     const { props } = this
     const {
       // patientInfo = {},
@@ -804,10 +793,20 @@ class Banner extends PureComponent {
       },
       refreshingBalance,
       disablePreOrder,
-      dispatch
+      dispatch,
     } = props
 
-    const actualizePreOrderAccessRight = Authorized.check('appointment.actualizepreorder') || { rights: 'hidden' }
+    const preOrderAccessRight = Authorized.check(
+      'patientdatabase.modifypreorder',
+    ) || { rights: 'hidden' }
+
+    const actualizePreOrderAccessRight = Authorized.check(
+      'patientdatabase.modifypreorder.actualizepreorder',
+    ) || { rights: 'hidden' }
+
+    const notesHistoryAccessRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
+    ) || { rights: 'hidden' }
 
     const { entity } = patient
     if (!entity)
@@ -853,11 +852,11 @@ class Banner extends PureComponent {
 
     const g6PD =
       codetable.ctg6pd &&
-        codetable.ctg6pd.length > 0 &&
-        entity.patientAllergyMetaData.length > 0
+      codetable.ctg6pd.length > 0 &&
+      entity.patientAllergyMetaData.length > 0
         ? codetable.ctg6pd.find(
-          o => o.id === entity.patientAllergyMetaData[0].g6PDFK,
-        )
+            o => o.id === entity.patientAllergyMetaData[0].g6PDFK,
+          )
         : null
 
     return (
@@ -939,6 +938,18 @@ class Banner extends PureComponent {
                     value={info.dob}
                   />
                 </span>
+                {', '}
+                <span className={classes.part}>
+                  {'(+'}
+                  <CodeSelect
+                    className={classes.part}
+                    text
+                    code='ctcountrycode'
+                    labelField='code'
+                    value={info.contact?.mobileContactNumber?.countryCodeFK}
+                  />
+                  {`) ${info.contact?.mobileContactNumber?.number}`}
+                </span>
                 <span className={classes.part}>
                   <Link className={classes.header}>
                     <span
@@ -963,14 +974,14 @@ class Banner extends PureComponent {
                 <span
                   style={{
                     ...headerStyles,
-                    color: info.patientMedicalHistory.highRiskCondition
+                    color: info.patientMedicalHistory?.highRiskCondition
                       ? 'red'
                       : headerStyles.color,
                   }}
                 >
                   HRP:{' '}
                 </span>
-                <span>{info.patientMedicalHistory.highRiskCondition}</span>
+                <span>{info.patientMedicalHistory?.highRiskCondition}</span>
               </GridItem>
               <GridItem xs={6} md={2} className={classes.cell}>
                 <span
@@ -985,9 +996,9 @@ class Banner extends PureComponent {
                   title={
                     info.outstandingBalance
                       ? `${currencySymbol}${_.round(
-                        info.outstandingBalance,
-                        2,
-                      )}`
+                          info.outstandingBalance,
+                          2,
+                        )}`
                       : ''
                   }
                 >
@@ -1014,8 +1025,8 @@ class Banner extends PureComponent {
                 <span>
                   {info.patientHistoryDiagnosis.length > 0
                     ? info.patientHistoryDiagnosis
-                      .map(d => d.diagnosisDescription)
-                      .join(', ')
+                        .map(d => d.diagnosisDescription)
+                        .join(', ')
                     : '-'}
                 </span>
               </GridItem>
@@ -1045,21 +1056,23 @@ class Banner extends PureComponent {
                 <span>{this.getAllergyData()}</span>
               </GridItem>
               <GridItem xs={6} md={2} className={classes.cell}>
-                <Link className={classes.header}>
-                  <span
-                    style={{ textDecoration: 'underline' }}
-                    onClick={e => {
-                      this.openNotes()
-                    }}
-                  >
-                    Notes
-                  </span>
-                </Link>
+                {notesHistoryAccessRight.rights !== 'hidden' && (
+                  <Link className={classes.header}>
+                    <span
+                      style={{ textDecoration: 'underline' }}
+                      onClick={e => {
+                        this.openNotes()
+                      }}
+                    >
+                      Notes
+                    </span>
+                  </Link>
+                )}
               </GridItem>
               <GridItem xs={6} md={7} className={classes.cell}>
                 <span className={classes.header}>Long Term Medication: </span>
                 <span>
-                  {info.patientMedicalHistory.longTermMedication || '-'}
+                  {info.patientMedicalHistory?.longTermMedication || '-'}
                 </span>
               </GridItem>
               <GridItem xs={6} md={3} className={classes.cell}>
@@ -1069,47 +1082,51 @@ class Banner extends PureComponent {
                 </div>
               </GridItem>
               <GridItem xs={6} md={2} className={classes.cell}>
-                {actualizePreOrderAccessRight.rights !== 'hidden' && <Link
-                  className={classes.header}
-                  disabled={actualizePreOrderAccessRight.rights === 'disable' || disablePreOrder || !activePreOrderItem || !activePreOrderItem.length}
-                >
-                  <span
-                    style={{ textDecoration: 'underline' }}
-                    onClick={e => {
-                      e.preventDefault()
-                      if (actualizePreOrderAccessRight.rights === 'disable' || disablePreOrder || !activePreOrderItem || !activePreOrderItem.length) return
-
-                      if (apptId && apptMode === 'series') {
-                        dispatch({
-                          type: 'global/updateAppState',
-                          payload: {
-                            openConfirm: true,
-                            isInformType: true,
-                            openConfirmText: 'OK',
-                            openConfirmContent: `Pre-Order is not allowed for entire series appointment.`,
-                          },
-                        })
-                        return
-                      }
-                      if (!apptId && isEnableRecurrence) {
-                        dispatch({
-                          type: 'global/updateAppState',
-                          payload: {
-                            openConfirm: true,
-                            isInformType: true,
-                            openConfirmText: 'OK',
-                            openConfirmContent: `Pre-Order is not allowed for recurring appointment.`,
-                          },
-                        })
-                        return
-                      }
-
-                      this.openPreOrders()
-                    }}
+                {preOrderAccessRight.rights === 'enable' && (
+                  <Link
+                    className={classes.header}
+                    disabled={preOrderAccessRight.rights === 'disable'}
                   >
-                    {`Pre-Order (${activePreOrderItem ? activePreOrderItem.length : 0})`}
-                  </span>
-                </Link>}
+                    <span
+                      style={{ textDecoration: 'underline' }}
+                      onClick={e => {
+                        e.preventDefault()
+                        if (preOrderAccessRight.rights === 'disable') return
+
+                        if (apptId && apptMode === 'series') {
+                          dispatch({
+                            type: 'global/updateAppState',
+                            payload: {
+                              openConfirm: true,
+                              isInformType: true,
+                              openConfirmText: 'OK',
+                              openConfirmContent: `Pre-Order is not allowed for entire series appointment.`,
+                            },
+                          })
+                          return
+                        }
+                        if (!apptId && isEnableRecurrence) {
+                          dispatch({
+                            type: 'global/updateAppState',
+                            payload: {
+                              openConfirm: true,
+                              isInformType: true,
+                              openConfirmText: 'OK',
+                              openConfirmContent: `Pre-Order is not allowed for recurring appointment.`,
+                            },
+                          })
+                          return
+                        }
+
+                        this.openPreOrders()
+                      }}
+                    >
+                      {`Pre-Order (${
+                        activePreOrderItem ? activePreOrderItem.length : 0
+                      })`}
+                    </span>
+                  </Link>
+                )}
               </GridItem>
               <GridItem xs={6} md={4} className={classes.cell}>
                 <LoadingWrapper
@@ -1129,7 +1146,9 @@ class Banner extends PureComponent {
                         </IconButton>
                       )}
                   </span>
-                  {this.getSchemeList(_.orderBy(schemeDataList, ['schemeTypeFK'], ['asc']))}
+                  {this.getSchemeList(
+                    _.orderBy(schemeDataList, ['schemeTypeFK'], ['asc']),
+                  )}
                 </LoadingWrapper>
               </GridItem>
               <GridItem xs={6} md={3} className={classes.cell}>
@@ -1197,15 +1216,21 @@ class Banner extends PureComponent {
           onClose={this.closePreOrders}
           maxWidth='lg'
         >
-          <SelectPreOrder onSelectPreOrder={(select) => {
-            if (onSelectPreOrder)
-              onSelectPreOrder(select)
-            this.closePreOrders()
-          }} activePreOrderItem={activePreOrderItem} />
+          <SelectPreOrder
+            disabled={
+              from !== 'Appointment' ||
+              actualizePreOrderAccessRight.rights !== 'enable'
+            }
+            onSelectPreOrder={select => {
+              if (onSelectPreOrder) onSelectPreOrder(select)
+              this.closePreOrders()
+            }}
+            activePreOrderItem={activePreOrderItem}
+          />
         </CommonModal>
         <CommonModal
           open={this.state.showSchemeModal}
-          title='Scheme Details'
+          title='Co-Payer Details'
           onClose={this.closeScheme}
           maxWidth='lg'
         >

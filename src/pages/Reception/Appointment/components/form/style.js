@@ -98,6 +98,12 @@ const styles = (theme) => ({
     height: '100%',
     overflow: 'auto',
   },
+  apptRemarksMultiline:{
+    '& > Div > Div':{
+      paddingTop: '5px !important',
+      paddingBottom: '5px !important',
+    }
+  },
 })
 
 export default styles
