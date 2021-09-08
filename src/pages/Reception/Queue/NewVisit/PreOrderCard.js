@@ -31,21 +31,12 @@ const styles = (theme) => ({
 }))
 class PreOrderCard extends PureComponent {
 
-  deletePreOrderItem = (actualizedPreOrderItemFK) => {
-    const { values, setFieldValue } = this.props
-    const { visitPreOrderItem = [] } = values
-    var item = visitPreOrderItem.find(item => item.actualizedPreOrderItemFK === actualizedPreOrderItemFK)
-    if (item) {
-      item.isDeleted = true
-      setFieldValue("visitPreOrderItem", [...visitPreOrderItem])
-    }
-  }
 
 
   render () {
-    const {values,visitPreOrderItem=[]} = this.props
+    const {values,deletePreOrderItem} = this.props
+    const {visitPreOrderItem =[]} = values
 
-  // console.log('visitPreOrderItem',visitPreOrderItem)
 
     return (
       <div>
@@ -117,12 +108,14 @@ class PreOrderCard extends PureComponent {
             columnName: 'action',
             width:60,
             render: (row)=> {
-              return <Authorized authority='appointment.actualizepreorder'>
+              return <Authorized authority='patientdatabase.modifypreorder.actualizepreorder'>
                 <Button size='sm'
                 justIcon
                 color='danger'
                 onClick={()=>{
-                    this.deletePreOrderItem(row.actualizedPreOrderItemFK)
+                  if(deletePreOrderItem){
+                    deletePreOrderItem(row.actualizedPreOrderItemFK)
+                  }
                 }}
                 >
                 <Delete/>

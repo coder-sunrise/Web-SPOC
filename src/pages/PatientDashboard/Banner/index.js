@@ -1218,7 +1218,7 @@ class Banner extends PureComponent {
         >
           <SelectPreOrder
             disabled={
-              from !== 'Appointment' ||
+              !(from === 'Appointment' || from === 'VisitReg') ||
               actualizePreOrderAccessRight.rights !== 'enable'
             }
             onSelectPreOrder={select => {
