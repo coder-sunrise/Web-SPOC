@@ -332,4 +332,10 @@ export const menuData = [
     text: 'Route of Administration',
     url: '/setting/administrationroute',
   },
+  {
+    authority: 'settings.clinicsetting.checklist',
+    title: 'Clinic Setting',
+    text: 'Checklist',
+    url: '/setting/checklist',
+  },
 ]

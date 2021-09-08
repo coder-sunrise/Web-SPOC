@@ -170,6 +170,7 @@ export default {
   'menu.setting.medicationingredient': 'Drug Ingredient',
   'menu.setting.drugallergy': 'Drug Allergy',
   'menu.setting.administrationroute': 'Route of Administration',
+  'menu.setting.checklist': 'Checklist',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',
