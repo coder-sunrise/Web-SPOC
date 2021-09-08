@@ -291,6 +291,14 @@ class PatientDetail extends PureComponent {
       },
     ]
 
+    const { dispatch } = props
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctappointmenttype',
+      },
+    })
+
     const accessRight = Authorized.check(
       'patientdatabase.patientprofiledetails.medicalhistory',
     )
