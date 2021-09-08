@@ -31,11 +31,10 @@ import {
 } from '@/utils/utils'
 import { VISIT_TYPE, PHARMACY_STATUS, PHARMACY_ACTION } from '@/utils/constants'
 import Banner from '@/pages/PatientDashboard/Banner'
+import AddOrder from '@/pages/Dispense/DispenseDetails/AddOrder'
 import { MenuOutlined } from '@ant-design/icons'
 import { PharmacySteps } from '../../Components'
 import RedispenseForm from '../../Components/RedispenseForm'
-import AddOrder from '@/pages/Dispense/DispenseDetails/AddOrder'
-import { bool } from 'prop-types'
 
 const styles = theme => ({
   wrapCellTextStyle: {
@@ -61,14 +60,14 @@ const styles = theme => ({
 
 const ContentGridItem = ({ children, title }) => {
   return (
-    <GridItem md={4} style={{ paddingLeft: 130, marginBottom: 8 }}>
+    <GridItem md={4} style={{ paddingLeft: 135, marginBottom: 8 }}>
       <div style={{ position: 'relative' }}>
         <div
           style={{
-            width: 130,
+            width: 135,
             textAlign: 'right',
             position: 'absolute',
-            left: '-130px',
+            left: '-135px',
             fontWeight: 500,
           }}
         >
@@ -342,12 +341,12 @@ const Details = props => {
     const { row, children, tableRow } = p
     let newchildren = []
 
-    const batchColumns = children.slice(5, 10)
+    const batchColumns = children.slice(6, 11)
 
     if (row.countNumber === 1) {
       newchildren.push(
         children
-          .filter((value, index) => index < 5)
+          .filter((value, index) => index < 6)
           .map(item => ({
             ...item,
             props: {
@@ -361,7 +360,7 @@ const Details = props => {
 
       newchildren.push(
         children
-          .filter((value, index) => index > 9)
+          .filter((value, index) => index > 10)
           .map(item => ({
             ...item,
             props: {
@@ -555,6 +554,8 @@ const Details = props => {
                       dispatch({
                         type: 'pharmacyDetails/query',
                         payload: { id: workitem.id },
+                      }).then(r => {
+                        console.log('1111', r)
                       })
                     }}
                   >
@@ -843,6 +844,7 @@ const Details = props => {
                               <NumberInput
                                 label=''
                                 step={1}
+                                format='0.0'
                                 max={row.isDefault ? undefined : row.stock}
                                 min={0}
                                 disabled={!row.isDispensedByPharmacy}
@@ -877,11 +879,13 @@ const Details = props => {
                     width: 100,
                     sortingEnabled: false,
                     render: row => {
-                      const stock = row.stockBalance
-                        ? `${numeral(row.stockBalance).format(
-                            '0.0',
-                          )} ${getDispenseUOM(row)}`
-                        : '-'
+                      const balStock = row.stock - row.dispenseQuantity
+                      const stock =
+                        balStock || balStock === 0
+                          ? `${numeral(balStock).format(
+                              '0.0',
+                            )} ${getDispenseUOM(row)}`
+                          : '-'
                       return (
                         <Tooltip title={stock}>
                           <span>{stock}</span>
@@ -1270,11 +1274,12 @@ export default compose(
                   } = itemStock
                   if (remainQty >= 0) {
                     let dispenseQuantity = 0
-                    if (isDefault || remainQty >= stock) {
+                    if (isDefault || remainQty <= stock) {
                       dispenseQuantity = remainQty
                       remainQty = -1
                     } else {
-                      remainQty = dispenseQuantity = remainQty - stock
+                      dispenseQuantity = stock
+                      remainQty = remainQty - stock
                     }
                     orderItems.push({
                       ...detaultDrugMixture,
@@ -1282,7 +1287,6 @@ export default compose(
                       batchNo,
                       expiryDate,
                       stock,
-                      stockBalance: stock - dispenseQuantity,
                       stockFK: id,
                       uomDisplayValue: primaryUOMDisplayValue,
                       secondUOMDisplayValue: secondUOMDisplayValue,
@@ -1316,7 +1320,6 @@ export default compose(
                       batchNo,
                       expiryDate,
                       stock: oldQty,
-                      stockBalance: oldQty - transactionQty,
                       stockFK: stockFK,
                       uomDisplayValue,
                       secondUOMDisplayValue,
@@ -1358,7 +1361,6 @@ export default compose(
                 batchNo,
                 expiryDate,
                 stock: oldQty,
-                stockBalance: oldQty - transactionQty,
                 stockFK: stockFK,
                 uomDisplayValue,
                 secondUOMDisplayValue,
@@ -1411,11 +1413,12 @@ export default compose(
               const { id, batchNo, expiryDate, stock, isDefault } = itemStock
               if (remainQty >= 0) {
                 let dispenseQuantity = 0
-                if (isDefault || remainQty >= stock) {
+                if (isDefault || remainQty <= stock) {
                   dispenseQuantity = remainQty
                   remainQty = -1
                 } else {
-                  remainQty = dispenseQuantity = remainQty - stock
+                  dispenseQuantity = stock
+                  remainQty = remainQty - stock
                 }
                 orderItems.push({
                   ...defaultItem(item, groupName),
@@ -1423,7 +1426,6 @@ export default compose(
                   batchNo,
                   expiryDate,
                   stock,
-                  stockBalance: stock - dispenseQuantity,
                   stockFK: id,
                   uomDisplayValue: primaryUOMDisplayValue,
                   secondUOMDisplayValue: secondUOMDisplayValue,
@@ -1459,11 +1461,12 @@ export default compose(
               const { id, batchNo, expiryDate, stock, isDefault } = itemStock
               if (remainQty >= 0) {
                 let dispenseQuantity = 0
-                if (isDefault || remainQty >= stock) {
+                if (isDefault || remainQty <= stock) {
                   dispenseQuantity = remainQty
                   remainQty = -1
                 } else {
-                  remainQty = dispenseQuantity = remainQty - stock
+                  dispenseQuantity = stock
+                  remainQty = remainQty - stock
                 }
                 orderItems.push({
                   ...defaultItem(item, 'NormalDispense'),
@@ -1471,7 +1474,6 @@ export default compose(
                   batchNo,
                   expiryDate,
                   stock,
-                  stockBalance: stock - dispenseQuantity,
                   stockFK: id,
                   uomDisplayValue: inventoryItem?.uom?.name,
                   isDefault,

@@ -19,7 +19,7 @@ export const Worklist = ({ columns, worklistType = 'Radiology' }) => {
     gridTemplateColumns: columns.reduce(r => r + '1fr ', ''), //fraction to set same fraction for all columns
     display: 'grid',
     height: '100%',
-    columnGap: 6,
+    columnGap: 4,
   }
 
   return (

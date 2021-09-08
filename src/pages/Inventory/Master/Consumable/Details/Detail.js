@@ -15,11 +15,15 @@ import {
   Field,
 } from '@/components'
 import SharedContainer from '../../SharedContainer'
-import clinicSettings from '@/models/clinicSettings'
 
 const styles = () => ({})
 
-const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
+const Detail = ({
+  consumableDetail,
+  hasActiveSession,
+  theme,
+  clinicSettings,
+}) => {
   return (
     <SharedContainer>
       <div
@@ -239,6 +243,9 @@ const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
   )
 }
 export default compose(
+  connect(({ clinicSettings }) => ({
+    clinicSettings: clinicSettings.settings,
+  })),
   withStyles(styles, { withTheme: true }),
   React.memo,
 )(Detail)

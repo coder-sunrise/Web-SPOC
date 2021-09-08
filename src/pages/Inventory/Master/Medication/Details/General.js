@@ -60,7 +60,7 @@ const medisaveOptions = [
   },
 ]
 
-let generalOptions = [
+const generalOptions = [
   {
     id: 'isOnlyClinicInternalUsage',
     name: 'Only Internal Usage',
@@ -97,10 +97,6 @@ let generalOptions = [
     },
   },
 ]
-
-if (!clinicSettings.isEnablePharmacyModule) {
-  generalOptions = generalOptions.filter(o => o.id !== 'isDispensedByPharmacy')
-}
 
 const General = ({
   medicationDetail,
@@ -170,7 +166,13 @@ const General = ({
       checkboxOptions.push(...medisaveOptions)
     }
 
-    checkboxOptions.push(...generalOptions)
+    if (!clinicSettings.isEnablePharmacyModule) {
+      checkboxOptions.push(
+        ...generalOptions.filter(o => o.id !== 'isDispensedByPharmacy'),
+      )
+    } else {
+             checkboxOptions.push(...generalOptions)
+           }
     return checkboxOptions
   }
 
