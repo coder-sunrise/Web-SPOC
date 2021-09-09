@@ -15,6 +15,7 @@ import {
   Button,
   Select,
   RadioGroup,
+  Tooltip,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 import { qtyFormat } from '@/utils/config'
@@ -66,6 +67,21 @@ class PreOrderCard extends PureComponent {
           {
             columnName:'itemName',
             sortingEnabled:false,
+            render: row => {
+              return (
+                <Tooltip
+                  title={
+                    <div>
+                      {`Code: ${row.code}`}
+                      <br />
+                      {`Name: ${row.itemName}`}
+                    </div>
+                  }
+                >
+                  <div>{row.itemName}</div>
+                </Tooltip>
+              )
+            },
           },
           {
             columnName: 'quantity', sortingEnabled: false, width: 120, render: row => {

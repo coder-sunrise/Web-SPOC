@@ -217,24 +217,30 @@ const VisitInfoCard = ({
 
   let visitTypeSettingsObj = undefined
   let visitPurpose = undefined
-
-  if(visitTypeSetting){
-    visitTypeSettingsObj = JSON.parse(visitTypeSetting)
-  }    
+  if (visitTypeSetting) {
+    try {
+      visitTypeSettingsObj = JSON.parse(visitTypeSetting)
+    } catch {}
+  }
 
   const mapVisitType = (visitpurpose, visitTypeSettingsObj) => {
-    return visitpurpose.map((item, index) => {
-      const { name, code,sortOrder, ...rest } = item
-      const vstType = visitTypeSettingsObj ? visitTypeSettingsObj[index] : undefined
-      return {
-        ...rest,
-        name: vstType?.displayValue || name,
-        code: vstType?.code || code,
-        isEnabled: vstType?.isEnabled || 'true',
-        sortOrder: vstType?.sortOrder || 0,
-        customTooltipField : `${vstType?.code || code} - ${vstType?.displayValue || name}` 
-      }
-    }).sort((a, b) => a.sortOrder >= b.sortOrder ? 1 : -1)
+    return visitpurpose
+      .map((item, index) => {
+        const { name, code, sortOrder, ...rest } = item
+        const vstType = visitTypeSettingsObj
+          ? visitTypeSettingsObj[index]
+          : undefined
+        return {
+          ...rest,
+          name: vstType?.displayValue || name,
+          code: vstType?.code || code,
+          isEnabled: vstType?.isEnabled || 'true',
+          sortOrder: vstType?.sortOrder || 0,
+          customTooltipField: `${vstType?.code ||
+            code} - ${vstType?.displayValue || name}`,
+        }
+      })
+      .sort((a, b) => (a.sortOrder >= b.sortOrder ? 1 : -1))
   }
 
   if ((ctvisitpurpose || []).length > 0) {
@@ -243,40 +249,45 @@ const VisitInfoCard = ({
     )
   }
 
-  const familyMembers = patientInfo?.patientFamilyGroup?.patientFamilyMember.map(mem => mem.name)
-  const visitGroups = [...queueLog.list.filter((q, i, a) => {
-    return patientInfo && patientInfo.name !== q.patientName && a.map(m => m.patientName).indexOf(q.patientName) === i
-  }).map(l => {
-      console.log(familyMembers, familyMembers?.indexOf(l.patientName) >= 0)
-      return {
-        visitGroup: l.visitGroup || l.id,
-        displayValue: l.visitGroup || 'New Group Number',
-        patientName: l.patientName,
-        order: l.id,
-        isFamilyMember: familyMembers?.indexOf(l.patientName) >= 0,
-      }
-    })]
+  const familyMembers = patientInfo?.patientFamilyGroup?.patientFamilyMember.map(
+    mem => mem.name,
+  )
+  const visitGroups = [
+    ...queueLog.list
+      .filter((q, i, a) => {
+        return (
+          patientInfo &&
+          patientInfo.name !== q.patientName &&
+          a.map(m => m.patientName).indexOf(q.patientName) === i
+        )
+      })
+      .map(l => {
+        console.log(familyMembers, familyMembers?.indexOf(l.patientName) >= 0)
+        return {
+          visitGroup: l.visitGroup || l.id,
+          displayValue: l.visitGroup || 'New Group Number',
+          patientName: l.patientName,
+          order: l.id,
+          isFamilyMember: familyMembers?.indexOf(l.patientName) >= 0,
+        }
+      }),
+  ]
 
   useEffect(() => {
     const noVisitGroup = !values.visitGroup
-    if(noVisitGroup && familyMembers)
-    {
+    if (noVisitGroup && familyMembers) {
       const groupsList = visitGroups.map(vg => vg.patientName)
       familyMembers.some(member => {
         const group = groupsList.indexOf(member) >= 0
-        if(group)
-        {
+        if (group) {
           setVisitGroupMessage(`Family member ${member} is registered in queue`)
           return true
         }
         return false
       })
-    }
-    else if (!noVisitGroup)
-      return
-    else
-      setVisitGroupMessage(null)
-  },[values, familyMembers])
+    } else if (!noVisitGroup) return
+    else setVisitGroupMessage(null)
+  }, [values, familyMembers])
 
   return (
     <CommonCard title='Visit Information'>
@@ -459,50 +470,71 @@ const VisitInfoCard = ({
           <Authorized authority='queue.visitgroup'>
             <React.Fragment>
               <Select
-              valueField='order'
-              labelField='displayValue'
-              value={values.visitGroup}
-              disabled={isVisitReadonlyAfterSigned}
-              options={visitGroups}
-              handleFilter={(input, option) => {
-                return option.data.visitGroup.toString().toLowerCase().indexOf(input.toString().toLowerCase()) >= 0 ||
-                option.data.patientName.toString().toLowerCase().indexOf(input.toString().toLowerCase()) >= 0 ||     
-                input === ''
-              }
-              }
-              label='Visit Group Number'
-              dropdownStyle={{ minWidth: "20%" }}
-              onClear={handleVisitGroupChange}
-              onSelect={handleVisitGroupChange}
-              // onFocus={handleVisitGroupFocus}
-              // onBlur={handleVisitGroupBlur}
-              renderDropdown={(option) => {
-                return <GridContainer>
-                  <GridItem sm={2} md={2}>
-                    <b>{option.visitGroup === option.order ? '' : option.visitGroup}</b>
-                  </GridItem>
-                  <GridItem sm={9} md={9} style={{ overflow: 'hidden' }}>
-                    {option.patientName}
-                  </GridItem>
-                  {option.isFamilyMember ? <GridItem sm={1} md={1}><Icon type='family'/></GridItem> : ''}
-                </GridContainer>
-              }}
-            />
-              {visitGroupMessage && <div style={{ position: 'relative'}}>
-                <Alert
-                  message={visitGroupMessage}
-                  type='warning'
-                  showIcon={false}
-                  style={{
-                    position: 'absolute',
-                    maxWidth: '440px',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    padding: '0 3px',
-                    fontSize: '0.85rem',
-                  }}
-                />
-              </div>}
+                valueField='order'
+                labelField='displayValue'
+                value={values.visitGroup}
+                disabled={isVisitReadonlyAfterSigned}
+                options={visitGroups}
+                handleFilter={(input, option) => {
+                  return (
+                    option.data.visitGroup
+                      .toString()
+                      .toLowerCase()
+                      .indexOf(input.toString().toLowerCase()) >= 0 ||
+                    option.data.patientName
+                      .toString()
+                      .toLowerCase()
+                      .indexOf(input.toString().toLowerCase()) >= 0 ||
+                    input === ''
+                  )
+                }}
+                label='Visit Group Number'
+                dropdownStyle={{ minWidth: '20%' }}
+                onClear={handleVisitGroupChange}
+                onSelect={handleVisitGroupChange}
+                // onFocus={handleVisitGroupFocus}
+                // onBlur={handleVisitGroupBlur}
+                renderDropdown={option => {
+                  return (
+                    <GridContainer>
+                      <GridItem sm={2} md={2}>
+                        <b>
+                          {option.visitGroup === option.order
+                            ? ''
+                            : option.visitGroup}
+                        </b>
+                      </GridItem>
+                      <GridItem sm={9} md={9} style={{ overflow: 'hidden' }}>
+                        {option.patientName}
+                      </GridItem>
+                      {option.isFamilyMember ? (
+                        <GridItem sm={1} md={1}>
+                          <Icon type='family' />
+                        </GridItem>
+                      ) : (
+                        ''
+                      )}
+                    </GridContainer>
+                  )
+                }}
+              />
+              {visitGroupMessage && (
+                <div style={{ position: 'relative' }}>
+                  <Alert
+                    message={visitGroupMessage}
+                    type='warning'
+                    showIcon={false}
+                    style={{
+                      position: 'absolute',
+                      maxWidth: '440px',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      padding: '0 3px',
+                      fontSize: '0.85rem',
+                    }}
+                  />
+                </div>
+              )}
             </React.Fragment>
           </Authorized>
         </GridItem>
