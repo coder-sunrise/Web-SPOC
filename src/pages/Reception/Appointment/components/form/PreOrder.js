@@ -4,7 +4,7 @@ import numeral from 'numeral'
 import { qtyFormat } from '@/utils/config'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
-import { CommonTableGrid, Button } from '@/components'
+import { CommonTableGrid, Button, Tooltip } from '@/components'
 import { queryList as queryAppointments } from '@/services/calendar'
 import Authorized from '@/utils/Authorized'
 import { LoadingWrapper } from '@/components/_medisys'
@@ -60,7 +60,25 @@ const PreOrder = ({ values, deletePreOrderItem, disabled }) => {
         ]}
         columnExtensions={[
           { columnName: 'preOrderItemType', sortingEnabled: false, width: 120 },
-          { columnName: 'itemName', sortingEnabled: false },
+          {
+            columnName: 'itemName',
+            sortingEnabled: false,
+            render: row => {
+              return (
+                <Tooltip
+                  title={
+                    <div>
+                      {`Code: ${row.code}`}
+                      <br />
+                      {`Name: ${row.itemName}`}
+                    </div>
+                  }
+                >
+                  <div>{row.itemName}</div>
+                </Tooltip>
+              )
+            },
+          },
           { columnName: 'displayQty', sortingEnabled: false, width: 120 },
           { columnName: 'orderByUser', sortingEnabled: false },
           { columnName: 'orderDateDisplay', sortingEnabled: false, width: 140 },

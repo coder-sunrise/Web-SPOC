@@ -217,24 +217,30 @@ const VisitInfoCard = ({
 
   let visitTypeSettingsObj = undefined
   let visitPurpose = undefined
-
-  if(visitTypeSetting){
-    visitTypeSettingsObj = JSON.parse(visitTypeSetting)
-  }    
+  if (visitTypeSetting) {
+    try {
+      visitTypeSettingsObj = JSON.parse(visitTypeSetting)
+    } catch {}
+  }
 
   const mapVisitType = (visitpurpose, visitTypeSettingsObj) => {
-    return visitpurpose.map((item, index) => {
-      const { name, code,sortOrder, ...rest } = item
-      const vstType = visitTypeSettingsObj ? visitTypeSettingsObj[index] : undefined
-      return {
-        ...rest,
-        name: vstType?.displayValue || name,
-        code: vstType?.code || code,
-        isEnabled: vstType?.isEnabled || 'true',
-        sortOrder: vstType?.sortOrder || 0,
-        customTooltipField : `${vstType?.code || code} - ${vstType?.displayValue || name}` 
-      }
-    }).sort((a, b) => a.sortOrder >= b.sortOrder ? 1 : -1)
+    return visitpurpose
+      .map((item, index) => {
+        const { name, code, sortOrder, ...rest } = item
+        const vstType = visitTypeSettingsObj
+          ? visitTypeSettingsObj[index]
+          : undefined
+        return {
+          ...rest,
+          name: vstType?.displayValue || name,
+          code: vstType?.code || code,
+          isEnabled: vstType?.isEnabled || 'true',
+          sortOrder: vstType?.sortOrder || 0,
+          customTooltipField: `${vstType?.code ||
+            code} - ${vstType?.displayValue || name}`,
+        }
+      })
+      .sort((a, b) => (a.sortOrder >= b.sortOrder ? 1 : -1))
   }
 
   if ((ctvisitpurpose || []).length > 0) {
