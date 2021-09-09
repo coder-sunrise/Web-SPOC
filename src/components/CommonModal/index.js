@@ -285,7 +285,7 @@ class CommonModal extends React.PureComponent {
       loading,
       adaptFullWidth = true,
       maxWidth = 'md',
-      maxHeight,
+      fullHeight,
       bodyNoPadding = false,
       theme,
       disableBackdropClick = true,
@@ -333,7 +333,7 @@ class CommonModal extends React.PureComponent {
     return (
       <React.Fragment>
         <Dialog
-          classes={this.props.fullHeight ? { paper: classes.dialogPaper } : ''}
+          classes={fullHeight ? { paper: classes.dialogPaper } : ''}
           className={classnames(classControl)}
           disableBackdropClick={disableBackdropClick}
           open={open}
