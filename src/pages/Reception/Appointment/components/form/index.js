@@ -1066,9 +1066,9 @@ class Form extends React.PureComponent {
 
   showPreOrder = () => {
     const { values, mode } = this.props
-    const { isEnableRecurrence, patientProfileFK } = values
-    const actualizePreOrderAccessRight = Authorized.check('patientdatabase.modifypreorder') || { rights: 'hidden' }
-    if (actualizePreOrderAccessRight.rights !== 'enable') return false
+    const { isEnableRecurrence, patientProfileFK,currentAppointment } = values
+    const {appointmentPreOrderItem = {}} = currentAppointment
+    if (!appointmentPreOrderItem.length) return false
     if (values.id) {
       return mode !== 'series'
     }
