@@ -23,6 +23,15 @@ function Transition(props) {
   return <Fade {...props} />
 }
 function getContainerHeight(props) {
+  if (props.fullHeight)
+    return (
+      window.innerHeight +
+      26 +
+      (props.showFooter ? 54 : 0) +
+      (props.bodyNoPadding ? -16 : 0) +
+      (props.maxWidth === 'lg' ? 63 : 0)
+    )
+
   return (
     window.innerHeight -
     58 -
@@ -276,6 +285,7 @@ class CommonModal extends React.PureComponent {
       loading,
       adaptFullWidth = true,
       maxWidth = 'md',
+      maxHeight,
       bodyNoPadding = false,
       theme,
       disableBackdropClick = true,
@@ -323,6 +333,7 @@ class CommonModal extends React.PureComponent {
     return (
       <React.Fragment>
         <Dialog
+          classes={this.props.fullHeight ? { paper: classes.dialogPaper } : ''}
           className={classnames(classControl)}
           disableBackdropClick={disableBackdropClick}
           open={open}
