@@ -97,6 +97,7 @@ const getHeight = propsHeight => {
     patientInfo: patient.entity || {},
     doctorProfiles: codetable.doctorprofile,
     ctinvoiceadjustment: codetable.ctinvoiceadjustment,
+    ctvisitpurpose : codetable.ctvisitpurpose,
   }),
 )
 @withFormikExtend({
@@ -163,6 +164,16 @@ class NewVisit extends PureComponent {
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctinvoiceadjustment',
+        force: true,
+        filter: {
+          isActive: true,
+        },
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctvisitpurpose',
         force: true,
         filter: {
           isActive: true,
