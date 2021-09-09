@@ -89,7 +89,17 @@ class PreOrderCard extends PureComponent {
               width: 120,
               render: row => {
                 const { quantity, dispenseUOM = '' } = row
-                return `${numeral(quantity).format(qtyFormat)} ${dispenseUOM}`
+                return (
+                  <Tooltip
+                    title={`${numeral(quantity).format(
+                      qtyFormat,
+                    )} ${dispenseUOM}`}
+                  >
+                    <div>
+                      {numeral(quantity).format(qtyFormat)} {dispenseUOM}
+                    </div>
+                  </Tooltip>
+                )
               },
             },
             {

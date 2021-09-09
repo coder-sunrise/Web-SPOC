@@ -224,6 +224,7 @@ export const formikMapPropsToValues = ({
             amount,
             hasPaid,
             dispenseUOM,
+            code,
           } = po
           return {
             actualizedPreOrderItemFK,
@@ -236,6 +237,7 @@ export const formikMapPropsToValues = ({
             amount,
             hasPaid,
             dispenseUOM,
+            code,
           }
         })
       }
