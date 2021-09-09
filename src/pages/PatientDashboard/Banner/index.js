@@ -28,6 +28,7 @@ import {
   Popover,
   NumberInput,
   CommonModal,
+  notification,
 } from '@/components'
 
 import Authorized from '@/utils/Authorized'
@@ -775,7 +776,7 @@ class Banner extends PureComponent {
       patient,
       codetable,
       classes,
-      activePreOrderItem,
+      activePreOrderItems,
       onSelectPreOrder,
       isEnableRecurrence,
       apptId,
@@ -807,6 +808,10 @@ class Banner extends PureComponent {
     const notesHistoryAccessRight = Authorized.check(
       'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
     ) || { rights: 'hidden' }
+
+    const viewPatientProfileAccess = Authorized.check(
+      'patientdatabase.patientprofiledetails',
+    )
 
     const { entity } = patient
     if (!entity)
@@ -846,10 +851,6 @@ class Banner extends PureComponent {
         schemeDataList.push(this.getSchemePayerDetails(row))
       })
 
-    const viewPatientProfileAccess = Authorized.check(
-      'patientdatabase.patientprofiledetails',
-    )
-
     const g6PD =
       codetable.ctg6pd &&
       codetable.ctg6pd.length > 0 &&
@@ -858,6 +859,9 @@ class Banner extends PureComponent {
             o => o.id === entity.patientAllergyMetaData[0].g6PDFK,
           )
         : null
+
+    const pendingPreOrderItems =
+      entity.pendingPreOrderItem?.filter(item => !item.isDeleted) || []
 
     return (
       <Paper id='patientBanner' style={style}>
@@ -1091,38 +1095,38 @@ class Banner extends PureComponent {
                       style={{ textDecoration: 'underline' }}
                       onClick={e => {
                         e.preventDefault()
-                        if (preOrderAccessRight.rights === 'disable') return
+                        if (preOrderAccessRight.rights === 'disable') {
+                          notification.error({
+                            message: 'Current user is not authorized to access',
+                          })
+                          return
+                        }
 
-                        if (apptId && apptMode === 'series') {
-                          dispatch({
-                            type: 'global/updateAppState',
-                            payload: {
-                              openConfirm: true,
-                              isInformType: true,
-                              openConfirmText: 'OK',
-                              openConfirmContent: `Pre-Order is not allowed for entire series appointment.`,
-                            },
+                        if (
+                          disablePreOrder &&
+                          disablePreOrder.some(cond => {
+                            if (cond.condition) {
+                              dispatch({
+                                type: 'global/updateAppState',
+                                payload: {
+                                  openConfirm: true,
+                                  isInformType: true,
+                                  openConfirmText: 'OK',
+                                  openConfirmContent: cond.message,
+                                },
+                              })
+                              return true
+                            }
+                            return false
                           })
+                        )
                           return
-                        }
-                        if (!apptId && isEnableRecurrence) {
-                          dispatch({
-                            type: 'global/updateAppState',
-                            payload: {
-                              openConfirm: true,
-                              isInformType: true,
-                              openConfirmText: 'OK',
-                              openConfirmContent: `Pre-Order is not allowed for recurring appointment.`,
-                            },
-                          })
-                          return
-                        }
 
                         this.openPreOrders()
                       }}
                     >
                       {`Pre-Order (${
-                        activePreOrderItem ? activePreOrderItem.length : 0
+                        activePreOrderItems ? activePreOrderItems.length : pendingPreOrderItems && pendingPreOrderItems.length || 0
                       })`}
                     </span>
                   </Link>
@@ -1225,7 +1229,8 @@ class Banner extends PureComponent {
               if (onSelectPreOrder) onSelectPreOrder(select)
               this.closePreOrders()
             }}
-            activePreOrderItem={activePreOrderItem}
+            activePreOrderItem={activePreOrderItems || pendingPreOrderItems}
+            actualizePreOrderAccessRight={actualizePreOrderAccessRight}
           />
         </CommonModal>
         <CommonModal

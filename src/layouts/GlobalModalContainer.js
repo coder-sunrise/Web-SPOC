@@ -28,7 +28,8 @@ const styles = () => ({
 @connect(({ global, user, report, systemMessage }) => ({
   global,
   report,
-  loggedInUserID: user.data && user.data.id, systemMessage
+  loggedInUserID: user.data && user.data.id,
+  systemMessage,
 }))
 class GlobalModalContainer extends PureComponent {
   // componentDidMount () {
@@ -36,12 +37,12 @@ class GlobalModalContainer extends PureComponent {
   //   console.log(para)
   // }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this._timer = null
   }
 
-  componentDidUpdate (preProps) {
+  componentDidUpdate(preProps) {
     if (
       !preProps.global.showSessionTimeout &&
       this.props.global.showSessionTimeout === true
@@ -111,13 +112,20 @@ class GlobalModalContainer extends PureComponent {
         additionalInfo: undefined,
         isInformType: undefined,
         onConfirmClose: undefined,
-        customWidth: undefined
+        customWidth: undefined,
       },
     })
   }
 
-  render () {
-    const { global, report, dispatch, loggedInUserID, classes, systemMessage: { entity = {} } } = this.props
+  render() {
+    const {
+      global,
+      report,
+      dispatch,
+      loggedInUserID,
+      classes,
+      systemMessage: { entity = {} },
+    } = this.props
     const { title = '' } = entity
     return (
       <div>
@@ -145,6 +153,7 @@ class GlobalModalContainer extends PureComponent {
         >
           <ChangePassword userID={loggedInUserID} />
         </CommonModal>
+
         <Drawer
           zIndex={1390}
           height='100%'
@@ -217,6 +226,7 @@ class GlobalModalContainer extends PureComponent {
           onClose={this.closeVisitRegistration}
           onConfirm={this.closeVisitRegistration}
           maxWidth='lg'
+          fullHeight
           observe='VisitRegistration'
         >
           <VisitRegistration history={this.props.history} />
@@ -246,8 +256,7 @@ class GlobalModalContainer extends PureComponent {
                   >
                     {global.secondConfirmText || 'Pause'}
                   </Button>
-                ) : null
-                }
+                ) : null}
                 {!global.onConfirmSave ? (
                   // Will be confusing if onConfirmSave is not null, this button should be hidden
                   <Button
@@ -261,15 +270,14 @@ class GlobalModalContainer extends PureComponent {
                   >
                     {global.openConfirmText || 'Confirm'}
                   </Button>
-                  ) : null
-                }
+                ) : null}
               </Fragment>
             ) : null,
             onConfirm: global.onConfirmSave
               ? () => {
-                global.onConfirmSave()
-                this.closeConfirmationPrompt()
-              }
+                  global.onConfirmSave()
+                  this.closeConfirmationPrompt()
+                }
               : undefined,
           }}
           onClose={() => {

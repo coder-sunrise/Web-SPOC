@@ -70,7 +70,6 @@ const styles = theme => ({
   },
 })
 
-
 const getHeight = propsHeight => {
   if (propsHeight < 0) return '100%'
 
@@ -467,8 +466,9 @@ class NewVisit extends PureComponent {
               <div style={{ padding: 8, marginTop: -20 }}>
                 <PatientBanner
                   from='VisitReg'
+                  // activePreOrderItem={patientInfo?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
                   onSelectPreOrder={this.onSelectPreOrder}
-                  activePreOrderItem={draftPreOrderItem}
+                  activePreOrderItems={draftPreOrderItem}
                   extraCmt={
                     <div
                       style={{
@@ -573,7 +573,8 @@ class NewVisit extends PureComponent {
                             />
                           </CommonCard>
                         </GridItem>
-                        {values.visitPreOrderItem?.length !== 0 && (
+                        {values.visitPreOrderItem &&
+                          values.visitPreOrderItem?.length !== 0 && (
                           <GridItem xs={12} className={classes.row}>
                             <CommonCard title='Pre-Order Actualization'>
                               <PreOrderCard

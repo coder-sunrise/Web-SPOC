@@ -23,7 +23,7 @@ import CommonTableGrid from '@/components/CommonTableGrid'
 import { ContactSupportOutlined } from '@material-ui/icons'
 import { Delete } from '@material-ui/icons'
 const { queryList, query } = service
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 @connect(({ clinicSettings, patient }) => ({
@@ -31,13 +31,13 @@ const styles = (theme) => ({
   patient,
 }))
 class PreOrderCard extends PureComponent {
+  render() {
+    const { values, deletePreOrderItem } = this.props
+    const { visitPreOrderItem = [] } = values
 
-
-
-  render () {
-    const {values,deletePreOrderItem} = this.props
-    const {visitPreOrderItem =[]} = values
-
+    const actualizePreOrderAccessRight = Authorized.check(
+      'patientdatabase.modifypreorder.actualizepreorder',
+    ) || { rights: 'hidden' }
 
     return (
       <div>
@@ -90,57 +90,8 @@ class PreOrderCard extends PureComponent {
                 qtyFormat,
               )} ${dispenseUOM}`
             },
-          },
-          {
-            columnName: 'orderByUser',
-            sortingEnabled: false,
-          },
-          {
-            columnName:'orderDate',
-            sortingEnabled:false,
-            type:'date',
-            width:180,
-            render:(row) => {
-              return <span>{moment(row.orderDate).format('DD MMM YYYY HH:mm')}</span>
-            }
-          },
-          {
-            columnName: 'remarks',
-            sortingEnabled: false,
-          },
-          {
-            columnName: 'amount',
-            sortingEnabled:false,
-            type: 'currency',
-            width:90,
-          },
-          {
-            columnName: 'hasPaid',
-            sortingEnabled:false,
-            width:50,
-            render: (row)=> row.hasPaid ?'Yes' : 'No',
-          },
-          {
-            columnName: 'action',
-            width:60,
-            render: (row)=> {
-              return <Authorized authority='patientdatabase.modifypreorder.actualizepreorder'>
-                <Button size='sm'
-                justIcon
-                color='danger'
-                onClick={()=>{
-                  if(deletePreOrderItem){
-                    deletePreOrderItem(row.actualizedPreOrderItemFK)
-                  }
-                }}
-                >
-                <Delete/>
-                </Button>
-              </Authorized>
-            }
-          },
-        ]}
-      />
+          ]}
+        />
       </div>
     )
   }

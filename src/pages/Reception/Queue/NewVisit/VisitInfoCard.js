@@ -262,7 +262,6 @@ const VisitInfoCard = ({
         )
       })
       .map(l => {
-        console.log(familyMembers, familyMembers?.indexOf(l.patientName) >= 0)
         return {
           visitGroup: l.visitGroup || l.id,
           displayValue: l.visitGroup || 'New Group Number',

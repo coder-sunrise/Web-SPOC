@@ -3,7 +3,7 @@ import numeral from 'numeral'
 import moment from 'moment'
 import _ from 'lodash'
 import { qtyFormat } from '@/utils/config'
-import { CommonTableGrid, Button, CardContainer,Tooltip } from '@/components'
+import { CommonTableGrid, Button, CardContainer, Tooltip } from '@/components'
 import { queryList as queryAppointments } from '@/services/calendar'
 import { InventoryTypes } from '@/utils/codes'
 
@@ -13,6 +13,7 @@ const SelectPreOrder = ({
   footer,
   mainDivHeight,
   disabled,
+  actualizePreOrderAccessRight,
 }) => {
   const [selectedPreOrders, setSelectedPreOrders] = useState([])
   let height = mainDivHeight - 200
@@ -121,7 +122,8 @@ const SelectPreOrder = ({
       />
       {footer &&
         footer({
-          onConfirm: onConfirm,
+          onConfirm:
+            actualizePreOrderAccessRight.rights === 'enable' ? onConfirm : null,
           confirmBtnText: 'Actualize',
           confirmProps: {
             disabled: !selectedPreOrders.length || disabled,

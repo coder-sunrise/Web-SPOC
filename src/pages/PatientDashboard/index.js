@@ -154,7 +154,7 @@ class PatientDashboard extends PureComponent {
       <div className={classes.root}>
         <Banner
           from='PatientDashboard'
-          activePreOrderItem={patientProfile?.listingPreOrderItem.filter(item => !item.isDeleted) || []}
+          // activePreOrderItem={patientProfile?.listingPreOrderItem.filter(item => !item.isDeleted) || []}
           extraCmt={
             visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
               <div

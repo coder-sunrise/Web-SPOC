@@ -36,6 +36,10 @@ const notificationsStyle = theme => ({
   modalSectionTitle: {
     marginTop: "30px",
   },
+  dialogPaper: {
+      minHeight: '100vh',
+      maxHeight: '100vh',
+  },
   ...modalStyle(theme),
 })
 

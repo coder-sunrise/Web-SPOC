@@ -17,6 +17,11 @@ const PreOrder = ({ values, deletePreOrderItem, disabled }) => {
   const {
     currentAppointment: { appointmentPreOrderItem = [] },
   } = values
+
+  const actualizePreOrderAccessRight = Authorized.check(
+    'patientdatabase.modifypreorder.actualizepreorder',
+  ) || { rights: 'hidden' }
+
   return (
     <div>
       <div style={{ margin: '6px 0px' }}>Pre-Order Actualization</div>
@@ -90,21 +95,21 @@ const PreOrder = ({ values, deletePreOrderItem, disabled }) => {
             width: 60,
             render: row => {
               return (
-                <Authorized authority='patientdatabase.modifypreorder.actualizepreorder'>
+                 actualizePreOrderAccessRight.rights ==='enable' && (
                   <Button
-                    size='sm'
-                    justIcon
-                    color='danger'
-                    disabled={row.disabled}
-                    onClick={() => {
-                      if (deletePreOrderItem) {
-                        deletePreOrderItem(row.actualizedPreOrderItemFK)
-                      }
-                    }}
-                  >
-                    <Delete />
-                  </Button>
-                </Authorized>
+                  size='sm'
+                  justIcon
+                  color='danger'
+                  disabled={row.disabled}
+                  onClick={() => {
+                    if (deletePreOrderItem) {
+                      deletePreOrderItem(row.actualizedPreOrderItemFK)
+                    }
+                  }}
+                >
+                  <Delete />
+                </Button>
+                )
               )
             },
           },

@@ -506,7 +506,7 @@ const PendingPreOrder: React.FC = (props: any) => {
               : false
           },
           showCommandColumn:
-            deletePreOrderAccessRight.rights === 'hidden' ? false : true,
+            deletePreOrderAccessRight.rights === 'enable' ? true : false,
           onCommitChanges: commitChanges,
           onAddedRowsChange: (rows: any) => {
             return rows.map(o => {
