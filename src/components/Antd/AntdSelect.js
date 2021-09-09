@@ -534,7 +534,7 @@ class AntdSelect extends React.PureComponent {
         return (
           <Select.Option
             data={option}
-            title={showOptionTitle ? option.label : undefined}
+            title={showOptionTitle ? option.customTooltipField || option.label: undefined} 
             label={
               optionLabelLength
                 ? option.label.substring(0, optionLabelLength)

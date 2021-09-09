@@ -70,10 +70,6 @@ const styles = theme => ({
   },
 })
 
-const preOrderActualizationAccessRight = Authorized.check(
-  'queue.visitregistrationdetails.preorder',
-) //  || { rights: 'hidden' }
-
 const getHeight = propsHeight => {
   if (propsHeight < 0) return '100%'
 
@@ -100,6 +96,7 @@ const getHeight = propsHeight => {
     patientInfo: patient.entity || {},
     doctorProfiles: codetable.doctorprofile,
     ctinvoiceadjustment: codetable.ctinvoiceadjustment,
+    ctvisitpurpose : codetable.ctvisitpurpose,
   }),
 )
 @withFormikExtend({
@@ -166,6 +163,16 @@ class NewVisit extends PureComponent {
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctinvoiceadjustment',
+        force: true,
+        filter: {
+          isActive: true,
+        },
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctvisitpurpose',
         force: true,
         filter: {
           isActive: true,
@@ -319,6 +326,39 @@ class NewVisit extends PureComponent {
     if (bannerHeight === 0) setTimeout(this.setBannerHeight, 1000)
   }
 
+  onSelectPreOrder = (selectPreOrder = []) => {
+    const { values, setFieldValue } = this.props
+    let { visitPreOrderItem = [] } = values
+    selectPreOrder.forEach(po => {
+      let currentPreOrder = visitPreOrderItem.find(
+        apo => apo.actualizedPreOrderItemFK === po.id,
+      )
+      if (currentPreOrder) {
+        currentPreOrder.isDeleted = false
+      } else {
+        const { id, ...restPreOrderItem } = po
+        visitPreOrderItem = [...visitPreOrderItem, { ...restPreOrderItem, actualizedPreOrderItemFK: id }]
+      }
+    })
+    setFieldValue('visitPreOrderItem', [...visitPreOrderItem])
+  }
+
+  deletePreOrderItem = (actualizedPreOrderItemFK) => {
+    const { values, setFieldValue } = this.props
+    let { visitPreOrderItem = [] } = values
+
+    var item = visitPreOrderItem.find(poi => poi.actualizedPreOrderItemFK === actualizedPreOrderItemFK)
+    if (item) {
+      if (item.id) {
+        item.isDeleted = true
+      }
+      else {
+        visitPreOrderItem = [...visitPreOrderItem.filter(poi => poi.actualizedPreOrderItemFK !== actualizedPreOrderItemFK)]
+      }
+    }
+    setFieldValue("visitPreOrderItem", [...visitPreOrderItem])
+  }
+
   render() {
     const {
       classes,
@@ -340,6 +380,9 @@ class NewVisit extends PureComponent {
       ctinvoiceadjustment,
       codetable,
     } = this.props
+
+    const { visitPreOrderItem = [] } = values
+
     if (expandRefractionForm) {
       let div = $(this.myRef.current).find('div[aria-expanded]:eq(1)')
       if (div.attr('aria-expanded') === 'false') div.click()
@@ -361,7 +404,8 @@ class NewVisit extends PureComponent {
     const isReadOnly =
       (values.visitStatus !== VISIT_STATUS.WAITING &&
         values.visitStatus !== VISIT_STATUS.UPCOMING_APPT) ||
-      !patientInfo || !patientInfo.isActive
+      !patientInfo ||
+      !patientInfo.isActive
     const isReadonlyAfterSigned =
       clinicSettings.settings.isVisitEditableAfterEndConsultation &&
       values.isLastClinicalObjectRecordSigned
@@ -392,6 +436,24 @@ class NewVisit extends PureComponent {
     if (!values.referredBy) {
       this.props.setFieldValue('referredBy', referralType)
     }
+
+    const draftPreOrderItem = patientInfo?.pendingPreOrderItem
+      ?.filter(item => !item.isDeleted)
+      .map(po => {
+        const selectPreOrder = visitPreOrderItem.find(
+          apo => !apo.isDeleted && apo.actualizedPreOrderItemFK === po.id,
+        )
+        if (selectPreOrder) {
+          return {
+            ...po,
+            preOrderItemStatus: selectPreOrder.isDeleted
+              ? 'New'
+              : 'Actualizing',
+          }
+        }
+        return { ...po }
+      })
+
     return (
       <React.Fragment>
         <LoadingWrapper
@@ -405,6 +467,8 @@ class NewVisit extends PureComponent {
                 <PatientBanner
                   from='VisitReg'
                   // activePreOrderItem={patientInfo?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
+                  onSelectPreOrder={this.onSelectPreOrder}
+                  // activePreOrderItem={draftPreOrderItem}
                   extraCmt={
                     <div
                       style={{
@@ -510,18 +574,17 @@ class NewVisit extends PureComponent {
                           </CommonCard>
                         </GridItem>
                         {values.visitPreOrderItem &&
-                          values.visitPreOrderItem.length !== 0 && (
-                            <GridItem xs={12} className={classes.row}>
-                              <CommonCard title='Pre-Order Actualization'>
-                                <PreOrderCard
-                                  {...this.props}
-                                  values={values}
-                                  visitPreOrderItem={values.visitPreOrderItem}
-                                  dispatch={dispatch}
-                                />
-                              </CommonCard>
-                            </GridItem>
-                          )}
+                          values.visitPreOrderItem?.length !== 0 && (
+                          <GridItem xs={12} className={classes.row}>
+                            <CommonCard title='Pre-Order Actualization'>
+                              <PreOrderCard
+                                {...this.props}
+                                deletePreOrderItem={this.deletePreOrderItem}
+                                dispatch={dispatch}
+                              />
+                            </CommonCard>
+                          </GridItem>
+                        )}
                         <GridItem xs={12} className={classes.row}>
                           <div ref={this.myRef}>
                             <Accordion

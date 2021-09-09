@@ -1,5 +1,5 @@
 import React from 'react'
-import { FastField, withFormik } from 'formik'
+import { FastField, withFormik, Field } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import { withStyles } from '@material-ui/core'
@@ -30,20 +30,24 @@ const styles = theme => ({
   },
 })
 
-const FilterBar = ({ classes, handleSubmit }) => {
+const FilterBar = ({
+  classes,
+  handleSubmit,
+  corporateBilling: { ctCoPayer },
+}) => {
   return (
     <div className={classes.filterBar}>
       <GridContainer>
         <GridItem xs={4} md={3} style={{ position: 'relative' }}>
-          <FastField
+          <Field
             name='copayerFK'
             render={args => {
               return (
                 <CodeSelect
-                  {...args}
+                  options={ctCoPayer}
                   label='Company'
-                  code='ctCopayer'
-                  labelField='displayValue'
+                  labelField='name'
+                  {...args}
                 />
               )
             }}
@@ -94,8 +98,7 @@ export default compose(
     mapPropsToValues: () => ({
       copayerFK: 'All Company',
     }),
-    handleSubmit:(values, { props}) => {
-
+    handleSubmit: (values, { props }) => {
       const { copayerFK, isActive, outstandingBalanceStatus } = values
 
       props.dispatch({
@@ -104,8 +107,11 @@ export default compose(
           id: typeof copayerFK === 'number' ? copayerFK : undefined,
           isActive,
           apiCriteria: {
-            outstandingBalanceStatus: outstandingBalanceStatus === 'all' ? undefined : outstandingBalanceStatus,
-          }
+            outstandingBalanceStatus:
+              outstandingBalanceStatus === 'all'
+                ? undefined
+                : outstandingBalanceStatus,
+          },
         },
       })
     },

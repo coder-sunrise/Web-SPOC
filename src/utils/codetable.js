@@ -248,6 +248,12 @@ const tenantCodesMap = new Map([
       ...defaultParams,
     },
   ],
+  [
+    'ctchecklist',
+    {
+      ...defaultParams,
+    },
+  ],
 ])
 
 // always get latest codetable
@@ -261,12 +267,7 @@ const convertExcludeFields = [
   'refresh',
 ]
 
-const fetchAndSaveCodeTable = async (
-  code,
-  params,
-  refresh = false,
-  temp = false,
-) => {
+const fetchCodeTable = async (code, params, isReturnStatusCode = false) => {
   let useGeneral = params === undefined || Object.keys(params).length === 0
   const baseURL = '/api/CodeTable'
   // const generalCodetableURL = `${baseURL}?excludeInactiveCodes=true&ctnames=`
@@ -303,6 +304,21 @@ const fetchAndSaveCodeTable = async (
   if (parseInt(statusCode, 10) === 200) {
     newData = [...data.data]
   }
+
+  if (isReturnStatusCode === true) {
+    return { statusCode, newData }
+  }
+
+  return newData
+}
+
+const fetchAndSaveCodeTable = async (
+  code,
+  params,
+  refresh = false,
+  temp = false,
+) => {
+  const { statusCode, newData } = await fetchCodeTable(code, params, true)
 
   if (parseInt(statusCode, 10) === 200) {
     if (skipCache.includes(code)) return newData
@@ -557,6 +573,7 @@ export {
   getCodes,
   getServices,
   fetchAndSaveCodeTable,
+  fetchCodeTable,
   checkIsCodetableAPI,
   getTenantCodes,
   getAllCodes,

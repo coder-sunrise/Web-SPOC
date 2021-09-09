@@ -55,7 +55,7 @@ const PreOrder = ({ values, deletePreOrderItem, disabled }) => {
         { columnName: 'hasPaid', sortingEnabled: false, width: 50 },
         {
           columnName: 'action', width: 60, render: (row) => {
-            return <Authorized authority='appointment.actualizepreorder'>
+            return <Authorized authority='patientdatabase.modifypreorder.actualizepreorder'>
               <Button size='sm'
                 justIcon
                 color='danger'

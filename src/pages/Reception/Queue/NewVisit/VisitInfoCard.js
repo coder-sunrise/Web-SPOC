@@ -100,6 +100,7 @@ const VisitInfoCard = ({
   patientInfo,
   clinicSettings,
   queueLog,
+  ctvisitpurpose,
   ...restProps
 }) => {
   const [visitGroupMessage, setVisitGroupMessage] = useState()
@@ -212,7 +213,35 @@ const VisitInfoCard = ({
     values.visitStatus === VISIT_STATUS.WAITING ||
     values.visitStatus === VISIT_STATUS.UPCOMING_APPT
 
-  const { isEnablePackage = false } = clinicSettings.settings
+  const { isEnablePackage = false, visitTypeSetting } = clinicSettings.settings
+
+  let visitTypeSettingsObj = undefined
+  let visitPurpose = undefined
+
+  if(visitTypeSetting){
+    visitTypeSettingsObj = JSON.parse(visitTypeSetting)
+  }    
+
+  const mapVisitType = (visitpurpose, visitTypeSettingsObj) => {
+    return visitpurpose.map((item, index) => {
+      const { name, code,sortOrder, ...rest } = item
+      const vstType = visitTypeSettingsObj ? visitTypeSettingsObj[index] : undefined
+      return {
+        ...rest,
+        name: vstType?.displayValue || name,
+        code: vstType?.code || code,
+        isEnabled: vstType?.isEnabled || 'true',
+        sortOrder: vstType?.sortOrder || 0,
+        customTooltipField : `${vstType?.code || code} - ${vstType?.displayValue || name}` 
+      }
+    }).sort((a, b) => a.sortOrder >= b.sortOrder ? 1 : -1)
+  }
+
+  if ((ctvisitpurpose || []).length > 0) {
+    visitPurpose = mapVisitType(ctvisitpurpose, visitTypeSettingsObj).filter(
+      vstType => vstType['isEnabled'] === 'true',
+    )
+  }
 
   const familyMembers = patientInfo?.patientFamilyGroup?.patientFamilyMember.map(
     mem => mem.name,
@@ -266,7 +295,7 @@ const VisitInfoCard = ({
                   id: 'reception.queue.visitRegistration.visitType',
                 })}
                 onChange={(v, op = {}) => handleVisitTypeChange(v, op)}
-                code='ctvisitpurpose'
+                options={visitPurpose || []}
                 allowClear={false}
                 {...args}
               />

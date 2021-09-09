@@ -1188,7 +1188,6 @@ class Form extends React.PureComponent {
       return { ...po }
     })
 
-    const actualizePreOrderAccessRight = Authorized.check('appointment.actualizepreorder') || { rights: 'hidden' }
 
     return (
       <LoadingWrapper loading={show} text='Loading...'>
