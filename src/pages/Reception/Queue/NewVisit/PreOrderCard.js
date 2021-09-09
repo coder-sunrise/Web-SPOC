@@ -42,53 +42,110 @@ class PreOrderCard extends PureComponent {
     return (
       <div>
         <CommonTableGrid
-        forceRender
-        size='sm'
-        rows={visitPreOrderItem.filter(x=>!x.isDeleted)}
-        FuncProps={{pager:false}}
-        getRowId={(row)=> row.visitPreOrderItemFK}
-        columns={[
-          { name: 'preOrderItemType', title: 'Type' },
-          { name: 'itemName', title: 'Name' },
-          { name: 'quantity', title: 'Order Qty.' },
-          { name: 'orderByUser', title: 'Order By' },
-          { name: 'orderDate', title: 'Order Date' },
-          { name: 'remarks', title: 'Remarks' },
-          { name: 'amount', title: 'Amount' },
-          { name: 'hasPaid', title: 'Paid' },
-          { name: 'action', title: 'Action' },
-        ]}
-        columnExtensions={[
-          {
-            columnName:'preOrderItemType',
-            sortingEnabled:false,
-            width: 120
-          },
-          {
-            columnName:'itemName',
-            sortingEnabled:false,
-            render: row => {
-              return (
-                <Tooltip
-                  title={
-                    <div>
-                      {`Code: ${row.code}`}
-                      <br />
-                      {`Name: ${row.itemName}`}
-                    </div>
-                  }
-                >
-                  <div>{row.itemName}</div>
-                </Tooltip>
-              )
+          forceRender
+          size='sm'
+          rows={visitPreOrderItem.filter(x => !x.isDeleted)}
+          FuncProps={{ pager: false }}
+          getRowId={row => row.visitPreOrderItemFK}
+          columns={[
+            { name: 'preOrderItemType', title: 'Type' },
+            { name: 'itemName', title: 'Name' },
+            { name: 'quantity', title: 'Order Qty.' },
+            { name: 'orderByUser', title: 'Order By' },
+            { name: 'orderDate', title: 'Order Date' },
+            { name: 'remarks', title: 'Remarks' },
+            { name: 'amount', title: 'Amount' },
+            { name: 'hasPaid', title: 'Paid' },
+            { name: 'action', title: 'Action' },
+          ]}
+          columnExtensions={[
+            {
+              columnName: 'preOrderItemType',
+              sortingEnabled: false,
+              width: 120,
             },
-          },
-          {
-            columnName: 'quantity', sortingEnabled: false, width: 120, render: row => {
-              const { quantity, dispenseUOM = '' } = row
-              return `${numeral(quantity).format(
-                qtyFormat,
-              )} ${dispenseUOM}`
+            {
+              columnName: 'itemName',
+              sortingEnabled: false,
+              render: row => {
+                return (
+                  <Tooltip
+                    title={
+                      <div>
+                        {`Code: ${row.code}`}
+                        <br />
+                        {`Name: ${row.itemName}`}
+                      </div>
+                    }
+                  >
+                    <div>{row.itemName}</div>
+                  </Tooltip>
+                )
+              },
+            },
+            {
+              columnName: 'quantity',
+              sortingEnabled: false,
+              width: 120,
+              render: row => {
+                const { quantity, dispenseUOM = '' } = row
+                return `${numeral(quantity).format(qtyFormat)} ${dispenseUOM}`
+              },
+            },
+            {
+              columnName: 'orderByUser',
+              sortingEnabled: false,
+            },
+            {
+              columnName: 'orderDate',
+              sortingEnabled: false,
+              type: 'date',
+              width: 180,
+              render: row => {
+                return (
+                  <span>
+                    {moment(row.orderDate).format('DD MMM YYYY HH:mm')}
+                  </span>
+                )
+              },
+            },
+            {
+              columnName: 'remarks',
+              sortingEnabled: false,
+            },
+            {
+              columnName: 'amount',
+              sortingEnabled: false,
+              type: 'currency',
+              width: 90,
+            },
+            {
+              columnName: 'hasPaid',
+              sortingEnabled: false,
+              width: 50,
+              render: row => (row.hasPaid ? 'Yes' : 'No'),
+            },
+            {
+              columnName: 'action',
+              width: 60,
+              render: row => {
+                return (
+                  actualizePreOrderAccessRight.rights === 'enable' && (
+                    <Button
+                      size='sm'
+                      justIcon
+                      color='danger'
+                      onClick={() => {
+                        if (deletePreOrderItem) {
+                          deletePreOrderItem(row.actualizedPreOrderItemFK)
+                        }
+                      }}
+                    >
+                      <Delete />
+                    </Button>
+                  )
+                )
+              },
             },
           ]}
         />
