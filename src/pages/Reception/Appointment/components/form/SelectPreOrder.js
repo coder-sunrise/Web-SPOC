@@ -7,7 +7,7 @@ import { CommonTableGrid, Button, CardContainer } from '@/components'
 import { queryList as queryAppointments } from '@/services/calendar'
 import { InventoryTypes } from '@/utils/codes'
 
-const SelectPreOrder = ({ activePreOrderItem = [], onSelectPreOrder, footer, mainDivHeight, disabled }) => {
+const SelectPreOrder = ({ activePreOrderItem = [], onSelectPreOrder, footer, mainDivHeight, disabled, actualizePreOrderAccessRight }) => {
   const [
     selectedPreOrders,
     setSelectedPreOrders,
@@ -86,7 +86,7 @@ const SelectPreOrder = ({ activePreOrderItem = [], onSelectPreOrder, footer, mai
     />
     {footer &&
       footer({
-        onConfirm: onConfirm,
+        onConfirm: actualizePreOrderAccessRight.rights=== 'enable' ?  onConfirm : null,
         confirmBtnText: 'Actualize',
         confirmProps: {
           disabled: !selectedPreOrders.length || disabled,
