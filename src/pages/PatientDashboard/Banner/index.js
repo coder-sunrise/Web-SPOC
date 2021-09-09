@@ -1226,6 +1226,7 @@ class Banner extends PureComponent {
               this.closePreOrders()
             }}
             activePreOrderItem={activePreOrderItem}
+            actualizePreOrderAccessRight={actualizePreOrderAccessRight}
           />
         </CommonModal>
         <CommonModal
