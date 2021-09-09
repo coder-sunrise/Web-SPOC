@@ -36,11 +36,11 @@ import style from './style'
   }),
 )
 class Dispense extends PureComponent {
-  componentDidMount () {
+  componentDidMount() {
     this.getCodeTables()
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     const { dispatch } = this.props
     dispatch({
       type: 'orders/reset',
@@ -130,15 +130,15 @@ class Dispense extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { classes, dispense, loading, patient } = this.props
     const { editingOrder } = dispense
     return (
       <div className={classes.root}>
         <LoadingWrapper loading={loading.models.dispense}>
           <Banner
-            from='Dispense' 
-            activePreOrderItem={patient?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
+            from='Dispense'
+            // activePreOrderItem={patient?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
             extraCmt={this.getExtraComponent()}
           />
           <SizeContainer size='sm'>

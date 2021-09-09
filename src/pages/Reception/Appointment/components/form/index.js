@@ -1145,6 +1145,20 @@ class Form extends React.PureComponent {
     const disableFooterButton = this.shouldDisableButtonAction()
     const disableCheckAvailabilityFooterButton = this.shouldDisableCheckAvailabilityButtonAction()
     const disableDataGrid = this.shouldDisableDatagrid()
+    const disablePreOrderConditions = [
+      {
+        condition: disableDataGrid,
+        message: `Pre-Order is not allowed for current appointment status.`,
+      },
+      {
+        condition: values.id && mode == 'series',
+        message: `Pre-Order is not allowed for entire series appointment.`,
+      },
+      {
+        condition: !values.id && isEnableRecurrence,
+        message: `Pre-Order is not allowed for recurring appointment.`,
+      },
+    ]
 
     const _datagrid =
       conflicts.length > 0
@@ -1183,11 +1197,8 @@ class Form extends React.PureComponent {
               <PatientBanner
                 from='Appointment'
                 onSelectPreOrder={this.onSelectPreOrder}
-                activePreOrderItem={draftPreOrderItem}
-                disablePreOrder={disableDataGrid}
-                isEnableRecurrence={isEnableRecurrence}
-                apptId={values.id}
-                apptMode={mode}
+                disablePreOrder={disablePreOrderConditions}
+                activePreOrderItems={draftPreOrderItem}
                 {...this.props}
                 />
             </div>}
