@@ -1,4 +1,3 @@
-
 import { Breadcrumb } from 'antd'
 import React, { useState, useRef } from 'react'
 import { useIntl, Link } from 'umi'
@@ -7,8 +6,8 @@ import { Theme } from '@material-ui/core/styles/createMuiTheme'
 import { withStyles } from '@material-ui/styles'
 
 interface IHeaderBreadcrumbProps {
-  breadcrumb: any;
-  classes: any;
+  breadcrumb: any
+  classes: any
 }
 
 const styles = (theme: Theme) => ({
@@ -25,7 +24,7 @@ const styles = (theme: Theme) => ({
   },
 })
 
-const HeaderBreadcrumb: React.FC<IHeaderBreadcrumbProps> = (props) => {
+const HeaderBreadcrumb: React.FC<IHeaderBreadcrumbProps> = props => {
   const { breadcrumb, classes } = props
   const { pathname } = window.location
   const { formatMessage } = useIntl()
@@ -36,13 +35,16 @@ const HeaderBreadcrumb: React.FC<IHeaderBreadcrumbProps> = (props) => {
       const url = `/${pathSnippets.slice(0, index + 1).join('/')}`
       const breadcrumbItem = breadcrumb[url]
       if (breadcrumbItem && breadcrumbItem.name) {
+        const breadcrumbName = formatMessage({ id: breadcrumbItem.locale })
         return (
           <Breadcrumb.Item key={url}>
-            {
-              pathname === url
-                ? <span className={classes.breadcrumbtext}>{breadcrumbItem.name}</span>
-                : (<Link to={url}><span className={classes.breadcrumblink}>{breadcrumbItem.name}</span></Link>)
-            }
+            {pathname === url ? (
+              <span className={classes.breadcrumbtext}>{breadcrumbName}</span>
+            ) : (
+              <Link to={url}>
+                <span className={classes.breadcrumblink}>{breadcrumbName}</span>
+              </Link>
+            )}
           </Breadcrumb.Item>
         )
       }
@@ -50,13 +52,25 @@ const HeaderBreadcrumb: React.FC<IHeaderBreadcrumbProps> = (props) => {
     })
 
     const breadcrumbItems = [
-      <Breadcrumb.Item key="home">
-        <Link to="/"> <span className={classes.breadcrumblink}> {formatMessage({ id: 'menu.home' })}</span></Link>
+      <Breadcrumb.Item key='home'>
+        <Link to='/'>
+          {' '}
+          <span className={classes.breadcrumblink}>
+            {' '}
+            {formatMessage({ id: 'menu.home' })}
+          </span>
+        </Link>
       </Breadcrumb.Item>,
     ].concat(extraBreadcrumbItems)
 
-    return <div style={{ display: 'inline-block' }}> <Breadcrumb separator={<RightOutlined style={{ fontWeight: 700 }} />}>{breadcrumbItems}</Breadcrumb></div>
-
+    return (
+      <div style={{ display: 'inline-block' }}>
+        {' '}
+        <Breadcrumb separator={<RightOutlined style={{ fontWeight: 700 }} />}>
+          {breadcrumbItems}
+        </Breadcrumb>
+      </div>
+    )
   }
   return <></>
 }
