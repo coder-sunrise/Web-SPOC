@@ -61,7 +61,17 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
               className={classes.wrapCellTextStyle}
               style={{ paddingRight: paddingRight }}
             >
-              {row.name}
+              <Tooltip
+                title={
+                  <div>
+                    {`Code: ${row.code}`}
+                    <br />
+                    {`Name: ${row.name}`}
+                  </div>
+                }
+              >
+                <div>{row.name}</div>
+              </Tooltip>
               <div style={{ position: 'relative', top: 2 }}>
                 {drugMixtureIndicator(row, -20)}
                 {row.isPreOrder && (
@@ -103,6 +113,11 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
       dataIndex: 'instruction',
       title: 'Instructions',
       width: 200,
+      render: text =>(
+          <Tooltip title={text}>
+            <div>{text}</div>
+          </Tooltip>
+        )
     },
     {
       dataIndex: 'dispensedQuanity',
@@ -110,12 +125,29 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
       align: 'right',
       width: 80,
       render: (text, row) => (
-        <div className={classes.numberstyle}>
-          {`${numeral(row.dispensedQuanity || 0).format('0,0.00')}`}
-        </div>
+        <Tooltip
+          title={
+            <div className={classes.numberstyle}>
+              {`${numeral(row.dispensedQuanity || 0).format('0,0.00')}`}
+            </div>
+          }
+        >
+          <div className={classes.numberstyle}>
+            {`${numeral(row.dispensedQuanity || 0).format('0,0.00')}`}
+          </div>
+        </Tooltip>
       ),
     },
-    { dataIndex: 'dispenseUOM', title: 'UOM', width: 90 },
+    {
+      dataIndex: 'dispenseUOM',
+      title: 'UOM',
+      width: 90,
+      render: text => (
+        <Tooltip title={text}>
+          <div>{text}</div>
+        </Tooltip>
+      ),
+    },
     {
       dataIndex: 'totalPrice',
       title: 'Subtotal',
@@ -152,15 +184,18 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
           row.drugLabelRemarks.trim() !== ''
         return (
           <div style={{ position: 'relative' }}>
-            <div
-              style={{
-                wordWrap: 'break-word',
-                whiteSpace: 'pre-wrap',
-                paddingRight: existsDrugLabelRemarks ? 10 : 0,
-              }}
-            >
-              {row.remarks || ' '}
-            </div>
+            <Tooltip title={row.remarks || ' '}>
+              <div
+                style={{
+                  wordWrap: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                  paddingRight: existsDrugLabelRemarks ? 10 : 0,
+                }}
+              >
+                {row.remarks || ' '}
+              </div>
+            </Tooltip>
+
             {existsDrugLabelRemarks && (
               <div
                 style={{
