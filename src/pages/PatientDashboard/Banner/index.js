@@ -776,7 +776,7 @@ class Banner extends PureComponent {
       patient,
       codetable,
       classes,
-      // activePreOrderItem,
+      activePreOrderItems,
       onSelectPreOrder,
       isEnableRecurrence,
       apptId,
@@ -1126,7 +1126,7 @@ class Banner extends PureComponent {
                       }}
                     >
                       {`Pre-Order (${
-                        pendingPreOrderItems ? pendingPreOrderItems.length : 0
+                        activePreOrderItems ? activePreOrderItems.length : pendingPreOrderItems && pendingPreOrderItems.length || 0
                       })`}
                     </span>
                   </Link>
@@ -1229,7 +1229,7 @@ class Banner extends PureComponent {
               if (onSelectPreOrder) onSelectPreOrder(select)
               this.closePreOrders()
             }}
-            activePreOrderItem={pendingPreOrderItems}
+            activePreOrderItem={activePreOrderItems || pendingPreOrderItems}
           />
         </CommonModal>
         <CommonModal

@@ -1198,6 +1198,7 @@ class Form extends React.PureComponent {
                 from='Appointment'
                 onSelectPreOrder={this.onSelectPreOrder}
                 disablePreOrder={disablePreOrderConditions}
+                activePreOrderItems={draftPreOrderItem}
                 {...this.props}
                 />
             </div>}

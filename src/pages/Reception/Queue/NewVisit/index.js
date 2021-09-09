@@ -468,7 +468,7 @@ class NewVisit extends PureComponent {
                   from='VisitReg'
                   // activePreOrderItem={patientInfo?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
                   onSelectPreOrder={this.onSelectPreOrder}
-                  // activePreOrderItem={draftPreOrderItem}
+                  activePreOrderItems={draftPreOrderItem}
                   extraCmt={
                     <div
                       style={{
