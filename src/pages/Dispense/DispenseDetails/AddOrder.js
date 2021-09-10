@@ -3,8 +3,10 @@ import { withStyles } from '@material-ui/core/styles'
 import _ from 'lodash'
 import { connect } from 'dva'
 import { compose } from 'redux'
+import moment from 'moment'
 import { SizeContainer, withFormikExtend } from '@/components'
 import { convertToConsultation } from '@/pages/Consultation/utils'
+import { sendNotification } from '@/utils/realtime'
 import {
   VISIT_TYPE,
   INVOICE_ITEM_TYPE_BY_NAME,
@@ -315,6 +317,7 @@ export default compose(
       clinicInfo,
       forms,
       clinicSettings,
+      user,
     }) => ({
       dispense,
       orders,
@@ -323,6 +326,7 @@ export default compose(
       clinicInfo,
       forms,
       clinicSettings: clinicSettings.settings || clinicSettings.default,
+      user,
     }),
   ),
   withFormikExtend({
@@ -339,6 +343,7 @@ export default compose(
         history,
         forms,
         clinicSettings,
+        user,
       } = props
       const { rows, summary, finalAdjustments } = orders
       const { addOrderDetails } = dispense
@@ -665,12 +670,12 @@ export default compose(
         }
 
         const retailInvoiceItem = rows.map(mapRetailItemPropertyToApi)
-
+        const isPharmacyOrderUpdated =
+          isEnablePharmacyModule && isPharmacyOrderUpdated(orders)
         const payload = {
           ...addOrderDetails,
           ...summary,
-          isPharmacyOrderUpdated:
-            isEnablePharmacyModule && isPharmacyOrderUpdated(orders),
+          isPharmacyOrderUpdated,
           retailInvoiceItem,
           retailInvoiceAdjustment: finalAdjustments,
         }
@@ -680,6 +685,23 @@ export default compose(
           payload,
         }).then(r => {
           if (r) {
+            if (isPharmacyOrderUpdated) {
+              const userProfile = user.data.clinicianProfile
+              const userName = `${
+                userProfile.title && userProfile.title.trim().length
+                  ? `${userProfile.title}. ${userProfile.name || ''}`
+                  : `${userProfile.name || ''}`
+              }`
+              const message = `${userName} amended prescription at ${moment().format(
+                'HH:mm',
+              )}`
+              sendNotification('PharmacyOrderUpdate', {
+                type: NOTIFICATION_TYPE.CONSULTAION,
+                status: NOTIFICATION_STATUS.OK,
+                message,
+                visitID: dispense.visitID,
+              })
+            }
             if (onConfirm) onConfirm()
             history.push({
               pathname: history.location.pathname,

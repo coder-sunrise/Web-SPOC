@@ -29,6 +29,7 @@ import {
   getTranslationValue,
   getUniqueId,
 } from '@/utils/utils'
+import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE, PHARMACY_STATUS, PHARMACY_ACTION } from '@/utils/constants'
 import Banner from '@/pages/PatientDashboard/Banner'
 import AddOrder from '@/pages/Dispense/DispenseDetails/AddOrder'
@@ -55,6 +56,27 @@ const styles = theme => ({
     '& > td:first-child': {
       paddingLeft: theme.spacing(1),
     },
+  },
+  contentPanel: {
+    maxHeight: 800,
+    overflowY: 'scroll',
+    marginBottom: 10,
+  },
+  alertStyle: {
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+    width: '100%',
+    overflow: 'hidden',
+    padding: '3px 6px',
+    lineHeight: '25px',
+    fontSize: '0.85rem',
+  },
+  refreshButton: {
+    position: 'absolute',
+    right: -40,
+    top: 3,
+    width: 26,
+    height: 26,
   },
 })
 
@@ -462,9 +484,49 @@ const Details = props => {
       updatePharmacy(PHARMACY_ACTION.PREPARE)
     }
   }
+
+  const refreshClick = () => {
+    dispatch({
+      type: 'pharmacyDetails/query',
+      payload: { id: workitem.id },
+    }).then(r => {
+      if (!r) {
+        dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            openConfirm: true,
+            isInformType: true,
+            openConfirmText: 'OK',
+            openConfirmContent: `Pharmacy workitem has been remove by others, click Ok to close.`,
+            onConfirmClose: () => {
+              const { onClose } = props
+              if (onClose) {
+                onClose()
+              }
+            },
+          },
+        })
+      }
+    })
+  }
+
+  const isOrderUpdate =
+    workitem.isPharmacyOrderUpdate ||
+    workitem.isPharmacyOrderDiscard ||
+    workitem.isOrderUpdate
+  const updateMessage = `${
+    workitem.updateByUserTitle && workitem.updateByUserTitle.trim().length
+      ? `${workitem.updateByUserTitle}. ${workitem.updateByUser || ''}`
+      : `${workitem.updateByUser || ''}`
+  } amended prescription at ${moment(workitem.updateDate).format('HH:mm')}`
+
+  const currentMessage =
+    workitem.isPharmacyOrderUpdate || workitem.isPharmacyOrderDiscard
+      ? workitem.updateMessage
+      : updateMessage
   return (
-    <div>
-      <div style={{ maxHeight: 800, overflowY: 'scroll', marginBottom: 10 }}>
+    <div style={{ marginTop: -20 }}>
+      <div className={classes.contentPanel}>
         <Banner patientInfo={patient} style={{ position: 'relative' }} />
         <div style={{ marginTop: 16 }}>
           <GridContainer>
@@ -520,44 +582,19 @@ const Details = props => {
                 : '-'}
             </ContentGridItem>
             <GridItem md={6} style={{ paddingRight: 40 }}>
-              {workitem.isOrderUpdate && (
+              {isOrderUpdate && (
                 <div style={{ position: 'relative' }}>
                   <Alert
-                    message={`${
-                      workitem.latestOrderUpdateUser
-                    } amended prescription at ${moment(
-                      workitem.latestOrderUpdateDate,
-                    ).format('HH:mm')}`}
+                    message={currentMessage}
                     banner
-                    style={{
-                      whiteSpace: 'nowrap',
-                      textOverflow: 'ellipsis',
-                      width: '100%',
-                      overflow: 'hidden',
-                      padding: '3px 6px',
-                      lineHeight: '25px',
-                      fontSize: '0.85rem',
-                    }}
+                    className={classes.alertStyle}
                     icon={<Warning style={{ color: 'red' }} />}
                   />
                   <Button
                     color='primary'
                     justIcon
-                    style={{
-                      position: 'absolute',
-                      right: -40,
-                      top: 3,
-                      width: 26,
-                      height: 26,
-                    }}
-                    onClick={() => {
-                      dispatch({
-                        type: 'pharmacyDetails/query',
-                        payload: { id: workitem.id },
-                      }).then(r => {
-                        console.log('1111', r)
-                      })
-                    }}
+                    className={classes.refreshButton}
+                    onClick={refreshClick}
                   >
                     <Refresh />
                   </Button>
@@ -1076,66 +1113,68 @@ const Details = props => {
               : 'Close'}
           </Button>
           {workitem.statusFK === PHARMACY_STATUS.NEW && (
-            <Button
-              color='success'
-              size='sm'
-              disabled={
-                workitem.isOrderUpdate || !props.values.orderItems.length
-              }
-              onClick={editOrder}
-            >
-              {workitem.visitPurposeFK == VISIT_TYPE.RETAIL
-                ? 'Add Order'
-                : 'Edit Order'}
-            </Button>
+            <Authorized authority={'pharmacyworklist.editorder'}>
+              <Button
+                color='success'
+                size='sm'
+                disabled={isOrderUpdate || !props.values.orderItems.length}
+                onClick={editOrder}
+              >
+                {workitem.visitPurposeFK == VISIT_TYPE.RETAIL
+                  ? 'Add Order'
+                  : 'Edit Order'}
+              </Button>
+            </Authorized>
           )}
           {workitem.statusFK !== PHARMACY_STATUS.NEW && (
-            <Button
-              color='primary'
-              size='sm'
-              onClick={() => {
-                setShowRedispenseFormModal(true)
-              }}
-              disabled={!props.values.orderItems.length}
-            >
-              Re-dispense
-            </Button>
+            <Authorized authority={'pharmacyworklist.redispenseorder'}>
+              <Button
+                color='primary'
+                size='sm'
+                onClick={() => {
+                  setShowRedispenseFormModal(true)
+                }}
+                disabled={!props.values.orderItems.length}
+              >
+                Re-dispense
+              </Button>
+            </Authorized>
           )}
           {workitem.statusFK === PHARMACY_STATUS.NEW && (
-            <Button
-              color='primary'
-              size='sm'
-              onClick={onPrepare}
-              disabled={
-                workitem.isOrderUpdate || !props.values.orderItems.length
-              }
-            >
-              Prepare
-            </Button>
+            <Authorized authority={'pharmacyworklist.prepareorder'}>
+              <Button
+                color='primary'
+                size='sm'
+                onClick={onPrepare}
+                disabled={isOrderUpdate || !props.values.orderItems.length}
+              >
+                Prepare
+              </Button>
+            </Authorized>
           )}
           {workitem.statusFK === PHARMACY_STATUS.PREPARED && (
-            <Button
-              color='primary'
-              size='sm'
-              onClick={() => updatePharmacy(PHARMACY_ACTION.VERIFY)}
-              disabled={
-                workitem.isOrderUpdate || !props.values.orderItems.length
-              }
-            >
-              Verify
-            </Button>
+            <Authorized authority={'pharmacyworklist.verifyorder'}>
+              <Button
+                color='primary'
+                size='sm'
+                onClick={() => updatePharmacy(PHARMACY_ACTION.VERIFY)}
+                disabled={isOrderUpdate || !props.values.orderItems.length}
+              >
+                Verify
+              </Button>
+            </Authorized>
           )}
           {workitem.statusFK === PHARMACY_STATUS.VERIFIED && (
-            <Button
-              color='primary'
-              size='sm'
-              onClick={() => updatePharmacy(PHARMACY_ACTION.COMPLETE)}
-              disabled={
-                workitem.isOrderUpdate || !props.values.orderItems.length
-              }
-            >
-              Complete
-            </Button>
+            <Authorized authority={'pharmacyworklist.dispenseorder'}>
+              <Button
+                color='primary'
+                size='sm'
+                onClick={() => updatePharmacy(PHARMACY_ACTION.COMPLETE)}
+                disabled={isOrderUpdate || !props.values.orderItems.length}
+              >
+                Complete
+              </Button>
+            </Authorized>
           )}
         </GridItem>
       </GridContainer>
@@ -1181,7 +1220,7 @@ export default compose(
     codetable,
   })),
   withFormikExtend({
-    enableReinitialize: true,
+    enableReinitialize: false,
     mapPropsToValues: ({ pharmacyDetails, clinicSettings, codetable }) => {
       if (!pharmacyDetails.entity) return { orderItems: [] }
       const {

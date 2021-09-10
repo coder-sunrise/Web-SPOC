@@ -159,7 +159,7 @@ const _routes = [
         moduleName: 'Pharmacy',
         authority: ['pharmacy'],
         clinicSetting: ['isEnablePharmacyModule'],
-        //specialist: ['GP', 'Dental'],
+        specialist: ['GP', 'Dental'],
         routes: [
           {
             path: '/pharmacy/worklist',
@@ -167,7 +167,7 @@ const _routes = [
             component: './Pharmacy/Worklist',
             mini: 'PW',
             exact: true,
-            //authority: ['pharmacy/worklist'],
+            authority: ['pharmacy/pharmacyworklist'],
           },
         ],
       },

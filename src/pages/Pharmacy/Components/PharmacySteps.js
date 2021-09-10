@@ -45,7 +45,7 @@ const getStatusStep = (status, statusHistory, currentStatusFK) => {
   )
   return (
     <Step
-      title={status.name}
+      title={<span style={{ fontWeight: 500 }}>{status.name}</span>}
       icon={showIcon(status.statusFK, currentStatusFK)}
       subTitle={
         lastStatus

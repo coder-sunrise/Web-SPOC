@@ -2,6 +2,9 @@ import React, { Fragment, useState, useEffect, useContext } from 'react'
 import { Typography, Card } from 'antd'
 import ProCard from '@ant-design/pro-card'
 import moment from 'moment'
+import { connect } from 'dva'
+import { compose } from 'redux'
+import numeral from 'numeral'
 import { withStyles } from '@material-ui/core'
 import {
   Icon,
@@ -22,12 +25,12 @@ const blueColor = '#1890f8'
 const styles = theme => ({
   mainPanel: {
     height: 140,
-    margin: '5px',
+    margin: '8px 3px',
     borderRadius: 6,
-    border: '#cdcdcd solid 2px',
+    border: '#cdcdcd solid 1px',
+    padding: 3,
   },
   titlePanel: {
-    display: 'flex',
     width: '100%',
     fontSize: '0.9rem',
     borderBottom: '#cdcdcd solid 1px',
@@ -44,12 +47,10 @@ const styles = theme => ({
     },
   },
   bodayPanel: {
-    display: 'flex',
     width: '100%',
     fontSize: '0.9rem',
     lineHeight: '1.6rem',
     padding: '3px 8px',
-    flexDirection: 'column',
   },
   warningIcon: {
     color: 'red',
@@ -75,26 +76,37 @@ const WorkitemTitle = ({ item, classes }) => {
   }
   return (
     <div className={classes.titlePanel}>
-      <div style={{ marginRight: 'auto' }}>
+      <div style={{ position: 'relative', paddingRight: 70 }}>
+        <Tooltip title={item.name}>
+          <div
+            className={classes.commonText}
+            style={{
+              color: blueColor,
+              fontWeight: 500,
+              fontSize: '1rem',
+            }}
+          >
+            {item.name}
+          </div>
+        </Tooltip>
         <div
           style={{
-            color: blueColor,
-            fontWeight: 500,
-            fontSize: '1rem',
-            width: 'calc(100% - 20px)',
+            width: 70,
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            textAlign: 'right',
           }}
         >
-          {item.name}
-        </div>
-        <div>{item.patientReferenceNo}</div>
-      </div>
-      <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-        <div>
           {gender && (
             <Tooltip title={gender}>
               <Icon
                 type={gender}
-                style={{ color: genderColor, fontSize: '1rem', marginRight: 3 }}
+                style={{
+                  color: genderColor,
+                  fontSize: '1rem',
+                  marginRight: 3,
+                }}
               />
             </Tooltip>
           )}
@@ -102,17 +114,33 @@ const WorkitemTitle = ({ item, classes }) => {
             {age} {age > 1 ? 'Yrs' : 'Yr'}
           </span>
         </div>
-        <div>{item.patientAccountNo}</div>
+      </div>
+      <div style={{ position: 'relative', paddingRight: 90 }}>
+        <Tooltip title={item.patientReferenceNo}>
+          <div className={classes.commonText}>{item.patientReferenceNo}</div>
+        </Tooltip>
+        <Tooltip title={item.patientAccountNo}>
+          <div
+            className={classes.commonText}
+            style={{
+              width: 90,
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              textAlign: 'right',
+            }}
+          >
+            {item.patientAccountNo}
+          </div>
+        </Tooltip>
       </div>
     </div>
   )
 }
 
-const WorkitemBody = ({ item, classes }) => {
+const WorkitemBody = ({ item, classes, clinicSettings }) => {
   const { setDetailsId } = useContext(WorlistContext)
-  const orderDate = moment(item.generateDate).format(
-    dateFormatLongWithTimeNoSec12h,
-  )
+  const orderDate = moment(item.generateDate).format('DD MMM YYYY HH:mm')
 
   const visitGroup = item => {
     const visitGroupRow = p => {
@@ -203,41 +231,63 @@ const WorkitemBody = ({ item, classes }) => {
   }
 
   const showGroup = item.visitGroup && item.visitGroup.trim().length
+  const doctorName = `${
+    item.doctorTitle && item.doctorTitle.trim().length
+      ? `${item.doctorTitle}. `
+      : ''
+  }${item.doctorName || ''}`
+
+  const { isQueueNoDecimal } = clinicSettings
+  const queueNo =
+    !item.queueNo || !item.queueNo.trim().length
+      ? '-'
+      : numeral(item.queueNo).format(isQueueNoDecimal ? '0.0' : '0')
   return (
     <div className={classes.bodayPanel}>
-      <div
-        style={{
-          display: 'flex',
-          width: '100%',
-        }}
-      >
-        <div style={{ marginRight: 'auto', flexGrow: 1 }}>
-          <div style={{ fontSize: '1rem', fontWeight: 500 }}>{`${
-            item.doctorTitle && item.doctorTitle.trim().length
-              ? `${item.doctorTitle}. `
-              : ''
-          }${item.doctorName || ''}`}</div>
-          <div>
+      <div style={{ position: 'relative', paddingRight: 90 }}>
+        <Tooltip title={doctorName}>
+          <div className={classes.commonText}>{doctorName}</div>
+        </Tooltip>
+        <div
+          style={{
+            width: 90,
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            textAlign: 'right',
+          }}
+        >
+          Q. No.: {queueNo}
+        </div>
+      </div>
+      <div style={{ position: 'relative', paddingRight: 150 }}>
+        <Tooltip title={`Order Created Time: ${orderDate}`}>
+          <div className={classes.commonText}>
             <FileDoneOutlined
-              style={{ color: blueColor, fontSize: '1rem', marginRight: 3 }}
+              style={{ color: blueColor, fontSize: '0.9rem', marginRight: 3 }}
             />
             {orderDate}
           </div>
-        </div>
-        <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-          <div>Q. No.: {item.queueNo}</div>
-          {item.isPaid && (
-            <div>
-              <Tooltip title='Paid'>
-                <Icon
-                  type='Dollar'
-                  style={{ color: 'green', fontSize: '1rem', marginRight: 3 }}
-                />
-              </Tooltip>
-              {moment(item.paymentDate).format('HH:mm, DD MMM')}
-            </div>
-          )}
-        </div>
+        </Tooltip>
+        {item.isPaid && (
+          <div
+            style={{
+              width: 150,
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              textAlign: 'right',
+            }}
+          >
+            <Tooltip title='Paid'>
+              <Icon
+                type='Dollar'
+                style={{ color: 'green', fontSize: '1rem', marginRight: 3 }}
+              />
+            </Tooltip>
+            {moment(item.paymentDate).format('DD MMM YYYY HH:mm')}
+          </div>
+        )}
       </div>
       <div
         style={{
@@ -304,14 +354,22 @@ const WorkitemBody = ({ item, classes }) => {
 const PharmacyWorkItem = props => {
   const { item, classes } = props
   return (
-    <div key={item.id} className={classes.mainPanel}>
+    <div
+      key={item.id}
+      className={classes.mainPanel}
+      style={{
+        backgroundColor: item.isPaid ? '#D3FED1' : 'white',
+      }}
+    >
       <WorkitemTitle {...props} />
       <WorkitemBody {...props} />
     </div>
   )
 }
 
-export default withStyles(styles, {
-  withTheme: true,
-  name: 'PharmacyWorkItem',
-})(PharmacyWorkItem)
+export default compose(
+  withStyles(styles),
+  connect(({ clinicSettings }) => ({
+    clinicSettings: clinicSettings.settings || clinicSettings.default,
+  })),
+)(PharmacyWorkItem)

@@ -117,7 +117,6 @@ const PharmacyWorklist = () => {
             groupVisit,
           }
         })
-
       const mapped = columnsTemplate.map(item => ({
         ...item,
         workitems: worklist.filter(w => w.status === item.title),

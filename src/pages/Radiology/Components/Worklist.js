@@ -19,13 +19,18 @@ export const Worklist = ({ columns, worklistType = 'Radiology' }) => {
     gridTemplateColumns: columns.reduce(r => r + '1fr ', ''), //fraction to set same fraction for all columns
     display: 'grid',
     height: '100%',
-    columnGap: 4,
+    columnGap: 15,
   }
 
+  const gridStyle2 = { height: '100%', display: 'flex' }
+
   return (
-    <div style={gridStyle}>
+    <div style={worklistType === 'Radiology' ? gridStyle : gridStyle2}>
       {columns.map((column, index) => (
         <WorklistColumn
+          columnPercentage={
+            worklistType === 'Radiology' ? 100 : columnPercentage
+          }
           data={column}
           renderWorkitem={
             worklistType === 'Radiology'

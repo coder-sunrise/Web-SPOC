@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import _ from 'lodash'
 import { history } from 'umi'
-
+import moment from 'moment'
 import { connect } from 'dva'
 import withStyles from '@material-ui/core/styles/withStyles'
 // common component
@@ -190,6 +190,7 @@ class EditOrder extends Component {
       handleSubmit,
       forms,
       clinicSettings,
+      user,
     } = this.props
     if (forms.rows.filter(o => o.statusFK === 1 && !o.isDeleted).length > 0) {
       notification.warning({
@@ -252,13 +253,13 @@ class EditOrder extends Component {
         orders,
         forms,
       })
-
+      const isPharmacyOrderUpdated =
+        isEnablePharmacyModule && isPharmacyOrderUpdated(orders)
       const signResult = await dispatch({
         type: `consultation/signOrder`,
         payload: {
           ...payload,
-          isPharmacyOrderUpdated:
-            isEnablePharmacyModule && isPharmacyOrderUpdated(orders),
+          isPharmacyOrderUpdated,
         },
       })
       if (signResult) {
@@ -271,6 +272,24 @@ class EditOrder extends Component {
           message: 'Completed Consultation',
           visitID: id,
         })
+
+        if (isPharmacyOrderUpdated) {
+          const userProfile = user.data.clinicianProfile
+          const userName = `${
+            userProfile.title && userProfile.title.trim().length
+              ? `${userProfile.title}. ${userProfile.name || ''}`
+              : `${userProfile.name || ''}`
+          }`
+          const message = `${userName} amended prescription at ${moment().format(
+            'HH:mm',
+          )}`
+          sendNotification('PharmacyOrderUpdate', {
+            type: NOTIFICATION_TYPE.CONSULTAION,
+            status: NOTIFICATION_STATUS.OK,
+            message,
+            visitID: id,
+          })
+        }
 
         notification.success({
           message: 'Order signed',

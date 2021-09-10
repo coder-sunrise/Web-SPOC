@@ -3,6 +3,7 @@ import { connect } from 'dva'
 import { history } from 'umi'
 import _ from 'lodash'
 import numeral from 'numeral'
+import moment from 'moment'
 import Timer from 'react-compound-timer'
 import { sendNotification } from '@/utils/realtime'
 import { withStyles } from '@material-ui/core'
@@ -189,9 +190,17 @@ const saveConsultation = ({
     corEyeRefractionForm,
     orders = {},
     forms = {},
+    user,
+    clinicSettings,
   } = props
   let settings = JSON.parse(localStorage.getItem('clinicSettings'))
   const { diagnosisDataSource } = settings
+
+  const { isEnablePharmacyModule } = clinicSettings
+  if (isEnablePharmacyModule) {
+    values.isPharmacyOrderUpdated = isPharmacyOrderUpdated(orders)
+  }
+
   const onConfirmSave = () => {
     const newValues = convertToConsultation(
       {
@@ -247,6 +256,23 @@ const saveConsultation = ({
             visitID: id,
           })
         }
+        if (values.isPharmacyOrderUpdated) {
+          const userProfile = user.data.clinicianProfile
+          const userName = `${
+            userProfile.title && userProfile.title.trim().length
+              ? `${userProfile.title}. ${userProfile.name || ''}`
+              : `${userProfile.name || ''}`
+          }`
+          const message = `${userName} amended prescription at ${moment().format(
+            'HH:mm',
+          )}`
+          sendNotification('PharmacyOrderUpdate', {
+            type: NOTIFICATION_TYPE.CONSULTAION,
+            status: NOTIFICATION_STATUS.OK,
+            message,
+            visitID: id,
+          })
+        }
 
         sessionStorage.removeItem(`${values.id}_consultationTimer`)
         if (successCallback) {
@@ -270,11 +296,31 @@ const saveConsultation = ({
   }
 }
 
-const discardConsultation = ({ dispatch, values }) => {
+const discardConsultation = ({ dispatch, values, user, visitRegistration }) => {
   if (values.id) {
     dispatch({
       type: `consultation/discard`,
       payload: cleanConsultation(values),
+    }).then(r => {
+      if (r && values.versionNumber === 1) {
+        const { entity: visit = {} } = visitRegistration
+        const { id } = visit
+        const userProfile = user.data.clinicianProfile
+        const userName = `${
+          userProfile.title && userProfile.title.trim().length
+            ? `${userProfile.title}. ${userProfile.name || ''}`
+            : `${userProfile.name || ''}`
+        }`
+        const message = `${userName} discard prescription at ${moment().format(
+          'HH:mm',
+        )}`
+        sendNotification('PharmacyOrderDiscard', {
+          type: NOTIFICATION_TYPE.CONSULTAION,
+          status: NOTIFICATION_STATUS.OK,
+          message,
+          visitID: id,
+        })
+      }
     })
   } else {
     dispatch({
@@ -297,9 +343,14 @@ const pauseConsultation = ({
     corEyeRefractionForm,
     orders = {},
     forms = {},
+    user,
+    visitRegistration,
   } = rest
   let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-  const { diagnosisDataSource } = settings
+  const { diagnosisDataSource, isEnablePharmacyModule } = settings
+  if (isEnablePharmacyModule) {
+    values.isPharmacyOrderUpdated = isPharmacyOrderUpdated(orders)
+  }
   const newValues = convertToConsultation(
     {
       ...values,
@@ -341,6 +392,25 @@ const pauseConsultation = ({
       notification.success({
         message: 'Consultation paused.',
       })
+      if (values.isPharmacyOrderUpdated) {
+        const { entity: visit = {} } = visitRegistration
+        const { id } = visit
+        const userProfile = user.data.clinicianProfile
+        const userName = `${
+          userProfile.title && userProfile.title.trim().length
+            ? `${userProfile.title}. ${userProfile.name || ''}`
+            : `${userProfile.name || ''}`
+        }`
+        const message = `${userName} amended prescription at ${moment().format(
+          'HH:mm',
+        )}`
+        sendNotification('PharmacyOrderUpdate', {
+          type: NOTIFICATION_TYPE.CONSULTAION,
+          status: NOTIFICATION_STATUS.OK,
+          message,
+          visitID: id,
+        })
+      }
     }
   })
 }
@@ -759,12 +829,11 @@ class Main extends React.Component {
   }
 
   signOffOnly = () => {
-    const { values, dispatch } = this.props
-
+    const { values } = this.props
     saveConsultation({
       props: {
-        values,
         ...this.props,
+        values,
       },
       successMessage: 'Consultation signed',
       shouldPromptConfirm: false,
@@ -845,232 +914,212 @@ class Main extends React.Component {
   // discardConsultation =
 
   getExtraComponent = () => {
-                              const {
-                                theme,
-                                classes,
-                                values,
-                                orders = {},
-                                visitRegistration,
-                                clinicSettings,
-                              } = this.props
-                              const {
-                                entity: vistEntity = {},
-                              } = visitRegistration
-                              // if (!vistEntity) return null
-                              const { visit = {}, queueNo } = vistEntity
-                              const { summary } = orders
-                              // const { adjustments, total, gst, totalWithGst } = summary
+    const {
+      theme,
+      classes,
+      values,
+      orders = {},
+      visitRegistration,
+      clinicSettings,
+    } = this.props
+    const { entity: vistEntity = {} } = visitRegistration
+    // if (!vistEntity) return null
+    const { visit = {}, queueNo } = vistEntity
+    const { summary } = orders
+    // const { adjustments, total, gst, totalWithGst } = summary
 
-                              return (
-                                <SizeContainer size='sm'>
-                                  <div
-                                    style={{
-                                      textAlign: 'center',
-                                      paddingTop: theme.spacing(1),
-                                      paddingBottom: theme.spacing(1),
-                                      height: '100%',
-                                    }}
-                                  >
-                                    <GridContainer
-                                      // className={classes.actionPanel}
-                                      direction='column'
-                                      justify='space-evenly'
-                                      alignItems='center'
-                                    >
-                                      <Authorized authority='patientdashboard.startresumeconsultation'>
-                                        {({ rights }) => {
-                                          //
-                                          return rights === 'enable' &&
-                                            [
-                                              VISIT_STATUS.IN_CONS,
-                                              VISIT_STATUS.WAITING,
-                                            ].includes(visit.visitStatus) &&
-                                            values.id ? (
-                                            <GridItem>
-                                              <h5
-                                                style={{
-                                                  marginTop: -3,
-                                                  fontWeight: 'bold',
-                                                }}
-                                              >
-                                                <Timer
-                                                  initialTime={
-                                                    Number(
-                                                      sessionStorage.getItem(
-                                                        `${values.id}_consultationTimer`,
-                                                      ),
-                                                    ) ||
-                                                    values.duration ||
-                                                    0
-                                                  }
-                                                  direction='forward'
-                                                  startImmediately={
-                                                    this.state.recording
-                                                  }
-                                                >
-                                                  {({
-                                                    start,
-                                                    resume,
-                                                    pause,
-                                                    stop,
-                                                    reset,
-                                                    getTimerState,
-                                                    getTime,
-                                                  }) => {
-                                                    sessionStorage.setItem(
-                                                      `${values.id}_consultationTimer`,
-                                                      getTime(),
-                                                    )
-                                                    return (
-                                                      <React.Fragment>
-                                                        <TimerIcon
-                                                          style={{
-                                                            height: 17,
-                                                            top: 2,
-                                                            left: -5,
-                                                            position:
-                                                              'relative',
-                                                          }}
-                                                        />
-                                                        <Timer.Hours
-                                                          formatValue={value =>
-                                                            `${numeral(
-                                                              value,
-                                                            ).format('00')} : `
-                                                          }
-                                                        />
-                                                        <Timer.Minutes
-                                                          formatValue={value =>
-                                                            `${numeral(
-                                                              value,
-                                                            ).format('00')} : `
-                                                          }
-                                                        />
-                                                        <Timer.Seconds
-                                                          formatValue={value =>
-                                                            `${numeral(
-                                                              value,
-                                                            ).format('00')}`
-                                                          }
-                                                        />
-                                                      </React.Fragment>
-                                                    )
-                                                  }}
-                                                </Timer>
-                                              </h5>
-                                            </GridItem>
-                                          ) : null
-                                        }}
-                                      </Authorized>
-                                      {clinicSettings.showTotalInvoiceAmtInConsultation ? (
-                                        <GridItem>
-                                          <h4
-                                            style={{
-                                              position: 'relative',
-                                              marginTop: 0,
-                                            }}
-                                          >
-                                            Total Invoice
-                                            {summary && (
-                                              <span>
-                                                &nbsp;:&nbsp;
-                                                <NumberInput
-                                                  text
-                                                  currency
-                                                  value={summary.totalWithGST}
-                                                />
-                                                {summary.totalWithGST < 0 ? (
-                                                  <Tooltip
-                                                    title='Total invoice amount is negative.'
-                                                    placement='bottom-start'
-                                                  >
-                                                    <span>
-                                                      <Warining
-                                                        style={{
-                                                          position: 'absolute',
-                                                          top: '2px',
-                                                          width: '1.3rem',
-                                                          height: '1.3rem',
-                                                          color: '#faad14',
-                                                        }}
-                                                      />
-                                                    </span>
-                                                  </Tooltip>
-                                                ) : (
-                                                  undefined
-                                                )}
-                                              </span>
-                                            )}
-                                          </h4>
-                                        </GridItem>
-                                      ) : null}
-                                      <GridItem style={{ display: 'flex' }}>
-                                        <Authorized authority='openqueuedisplay'>
-                                          <div style={{ marginRight: 10 }}>
-                                            <CallingQueueButton
-                                              qId={queueNo}
-                                              roomNo={visit.roomFK}
-                                              doctor={visit.doctorProfileFK}
-                                            />
-                                          </div>
-                                        </Authorized>
-                                        {values.status !== 'PAUSED' && (
-                                          <ProgressButton
-                                            color='danger'
-                                            onClick={navigateDirtyCheck({
-                                              displayName: formName,
-                                              confirmText: 'Confirm',
-                                              redirectUrl: '/reception/queue',
-                                              showSecondConfirmButton: false,
-                                              openConfirmContent: discardMessage,
-                                            })}
-                                            icon={null}
-                                          >
-                                            Discard
-                                          </ProgressButton>
-                                        )}
-                                        <Authorized authority='patientdashboard.startresumeconsultation'>
-                                          <React.Fragment>
-                                            {[
-                                              VISIT_STATUS.IN_CONS,
-                                              VISIT_STATUS.WAITING,
-                                            ].includes(visit.visitStatus) && (
-                                              <ProgressButton
-                                                onClick={this.pauseConsultation}
-                                                color='info'
-                                                icon={null}
-                                              >
-                                                Pause
-                                              </ProgressButton>
-                                            )}
-                                            {visit.visitStatus ===
-                                              VISIT_STATUS.PAUSED && (
-                                              <ProgressButton
-                                                onClick={
-                                                  this.resumeConsultation
-                                                }
-                                                color='info'
-                                                icon={null}
-                                              >
-                                                Resume
-                                              </ProgressButton>
-                                            )}
-                                          </React.Fragment>
-                                        </Authorized>
+    return (
+      <SizeContainer size='sm'>
+        <div
+          style={{
+            textAlign: 'center',
+            paddingTop: theme.spacing(1),
+            paddingBottom: theme.spacing(1),
+            height: '100%',
+          }}
+        >
+          <GridContainer
+            // className={classes.actionPanel}
+            direction='column'
+            justify='space-evenly'
+            alignItems='center'
+          >
+            <Authorized authority='patientdashboard.startresumeconsultation'>
+              {({ rights }) => {
+                //
+                return rights === 'enable' &&
+                  [VISIT_STATUS.IN_CONS, VISIT_STATUS.WAITING].includes(
+                    visit.visitStatus,
+                  ) &&
+                  values.id ? (
+                  <GridItem>
+                    <h5
+                      style={{
+                        marginTop: -3,
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      <Timer
+                        initialTime={
+                          Number(
+                            sessionStorage.getItem(
+                              `${values.id}_consultationTimer`,
+                            ),
+                          ) ||
+                          values.duration ||
+                          0
+                        }
+                        direction='forward'
+                        startImmediately={this.state.recording}
+                      >
+                        {({
+                          start,
+                          resume,
+                          pause,
+                          stop,
+                          reset,
+                          getTimerState,
+                          getTime,
+                        }) => {
+                          sessionStorage.setItem(
+                            `${values.id}_consultationTimer`,
+                            getTime(),
+                          )
+                          return (
+                            <React.Fragment>
+                              <TimerIcon
+                                style={{
+                                  height: 17,
+                                  top: 2,
+                                  left: -5,
+                                  position: 'relative',
+                                }}
+                              />
+                              <Timer.Hours
+                                formatValue={value =>
+                                  `${numeral(value).format('00')} : `
+                                }
+                              />
+                              <Timer.Minutes
+                                formatValue={value =>
+                                  `${numeral(value).format('00')} : `
+                                }
+                              />
+                              <Timer.Seconds
+                                formatValue={value =>
+                                  `${numeral(value).format('00')}`
+                                }
+                              />
+                            </React.Fragment>
+                          )
+                        }}
+                      </Timer>
+                    </h5>
+                  </GridItem>
+                ) : null
+              }}
+            </Authorized>
+            {clinicSettings.showTotalInvoiceAmtInConsultation ? (
+              <GridItem>
+                <h4
+                  style={{
+                    position: 'relative',
+                    marginTop: 0,
+                  }}
+                >
+                  Total Invoice
+                  {summary && (
+                    <span>
+                      &nbsp;:&nbsp;
+                      <NumberInput text currency value={summary.totalWithGST} />
+                      {summary.totalWithGST < 0 ? (
+                        <Tooltip
+                          title='Total invoice amount is negative.'
+                          placement='bottom-start'
+                        >
+                          <span>
+                            <Warining
+                              style={{
+                                position: 'absolute',
+                                top: '2px',
+                                width: '1.3rem',
+                                height: '1.3rem',
+                                color: '#faad14',
+                              }}
+                            />
+                          </span>
+                        </Tooltip>
+                      ) : (
+                        undefined
+                      )}
+                    </span>
+                  )}
+                </h4>
+              </GridItem>
+            ) : null}
+            <GridItem style={{ display: 'flex' }}>
+              <Authorized authority='openqueuedisplay'>
+                <div style={{ marginRight: 10 }}>
+                  <CallingQueueButton
+                    qId={queueNo}
+                    roomNo={visit.roomFK}
+                    doctor={visit.doctorProfileFK}
+                  />
+                </div>
+              </Authorized>
+              {values.status !== 'PAUSED' && (
+                <ProgressButton
+                  color='danger'
+                  onClick={navigateDirtyCheck({
+                    displayName: formName,
+                    confirmText: 'Confirm',
+                    redirectUrl: '/reception/queue',
+                    showSecondConfirmButton: false,
+                    openConfirmContent: discardMessage,
+                  })}
+                  icon={null}
+                >
+                  Discard
+                </ProgressButton>
+              )}
+              <Authorized authority='patientdashboard.startresumeconsultation'>
+                <React.Fragment>
+                  {[VISIT_STATUS.IN_CONS, VISIT_STATUS.WAITING].includes(
+                    visit.visitStatus,
+                  ) && (
+                    <ProgressButton
+                      onClick={this.pauseConsultation}
+                      color='info'
+                      icon={null}
+                    >
+                      Pause
+                    </ProgressButton>
+                  )}
+                  {visit.visitStatus === VISIT_STATUS.PAUSED && (
+                    <ProgressButton
+                      onClick={this.resumeConsultation}
+                      color='info'
+                      icon={null}
+                    >
+                      Resume
+                    </ProgressButton>
+                  )}
+                </React.Fragment>
+              </Authorized>
 
-                                        <ProgressButton
-                                          color='primary'
-                                          onClick={this.handleSignOffClick}
-                                          icon={null}
-                                        >
-                                          Sign Off
-                                        </ProgressButton>
-                                      </GridItem>
-                                    </GridContainer>
-                                  </div>
-                                </SizeContainer>
-                              )
-                            }
+              <ProgressButton
+                color='primary'
+                onClick={this.handleSignOffClick}
+                icon={null}
+              >
+                Sign Off
+              </ProgressButton>
+            </GridItem>
+          </GridContainer>
+        </div>
+      </SizeContainer>
+    )
+  }
 
   saveLayout = layout => {
     this.props
@@ -1145,40 +1194,32 @@ class Main extends React.Component {
       exist[p] = [...currentValue[p], ...v[p]]
     })
     if (v.corDoctorNote && v.corDoctorNote.length > 0) {
-                                                         if (
-                                                           exist.corDoctorNote &&
-                                                           exist.corDoctorNote
-                                                             .length > 0
-                                                         ) {
-                                                           const {
-                                                             chiefComplaints = '',
-                                                             clinicianNote = '',
-                                                             plan = '',
-                                                           } = exist.corDoctorNote[0]
+      if (exist.corDoctorNote && exist.corDoctorNote.length > 0) {
+        const {
+          chiefComplaints = '',
+          clinicianNote = '',
+          plan = '',
+        } = exist.corDoctorNote[0]
 
-                                                           if (chiefComplaints)
-                                                             exist.corDoctorNote[0].chiefComplaints = `${chiefComplaints}<br/>${v.corDoctorNote[0].chiefComplaints}`
-                                                           else
-                                                             exist.corDoctorNote[0].chiefComplaints =
-                                                               v.corDoctorNote[0].chiefComplaints
+        if (chiefComplaints)
+          exist.corDoctorNote[0].chiefComplaints = `${chiefComplaints}<br/>${v.corDoctorNote[0].chiefComplaints}`
+        else
+          exist.corDoctorNote[0].chiefComplaints =
+            v.corDoctorNote[0].chiefComplaints
 
-                                                           if (clinicianNote)
-                                                             exist.corDoctorNote[0].clinicianNote = `${clinicianNote}<br/>${v.corDoctorNote[0].clinicianNote}`
-                                                           else
-                                                             exist.corDoctorNote[0].clinicianNote =
-                                                               v.corDoctorNote[0].clinicianNote
+        if (clinicianNote)
+          exist.corDoctorNote[0].clinicianNote = `${clinicianNote}<br/>${v.corDoctorNote[0].clinicianNote}`
+        else
+          exist.corDoctorNote[0].clinicianNote =
+            v.corDoctorNote[0].clinicianNote
 
-                                                           if (plan)
-                                                             exist.corDoctorNote[0].plan = `${plan}<br/>${v.corDoctorNote[0].plan}`
-                                                           else
-                                                             exist.corDoctorNote[0].plan =
-                                                               v.corDoctorNote[0].plan
-                                                         } else {
-                                                           exist.corDoctorNote = [
-                                                             ...v.corDoctorNote,
-                                                           ]
-                                                         }
-                                                       }
+        if (plan)
+          exist.corDoctorNote[0].plan = `${plan}<br/>${v.corDoctorNote[0].plan}`
+        else exist.corDoctorNote[0].plan = v.corDoctorNote[0].plan
+      } else {
+        exist.corDoctorNote = [...v.corDoctorNote]
+      }
+    }
     this.props.dispatch({
       type: 'consultation/updateState',
       payload: {
@@ -1261,7 +1302,11 @@ class Main extends React.Component {
       <div className={classes.root}>
         <PatientBanner
           from='Consultation'
-          activePreOrderItem={patient?.entity?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
+          activePreOrderItem={
+            patient?.entity?.listingPreOrderItem?.filter(
+              item => !item.isDeleted,
+            ) || []
+          }
           extraCmt={this.getExtraComponent()}
           {...this.props}
         />

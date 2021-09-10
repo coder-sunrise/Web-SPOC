@@ -10,6 +10,7 @@ const defaultColumnStyle = {
   display: 'flex',
   flexDirection: 'column',
   padding: 1,
+  margin: '0px 4px',
 }
 
 const columnBodyStyle = {
@@ -58,11 +59,12 @@ const WorklistColumnBody = ({ data, renderWorkitem }) => (
   </div>
 )
 
-export const WorklistColumn = ({ data, renderWorkitem }) => (
+export const WorklistColumn = ({ data, renderWorkitem, columnPercentage }) => (
   <div
     style={{
       ...defaultColumnStyle,
       backgroundColor: data.backgroundColor,
+      width: `${columnPercentage}%`,
     }}
   >
     <WorlklistColumnTitle

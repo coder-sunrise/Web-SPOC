@@ -23,8 +23,28 @@ const PharmacyDetails = ({ refreshClick }) => {
         type: 'codetable/fetchCodes',
         payload: { code: 'ctmedicationunitofmeasurement' },
       })
-      dispatch({ type: 'pharmacyDetails/query', payload: { id: detailsId } })
-      setShowModal(true)
+      dispatch({
+        type: 'pharmacyDetails/query',
+        payload: { id: detailsId },
+      }).then(r => {
+        if (r) {
+          setShowModal(true)
+        } else {
+          setDetailsId(undefined)
+          dispatch({
+            type: 'global/updateAppState',
+            payload: {
+              openConfirm: true,
+              isInformType: true,
+              openConfirmText: 'OK',
+              openConfirmContent: `Pharmacy workitem has been remove by others, click Ok to refresh worklist.`,
+              onConfirmClose: () => {
+                refreshClick()
+              },
+            },
+          })
+        }
+      })
     }
   }, [detailsId])
 
@@ -37,10 +57,10 @@ const PharmacyDetails = ({ refreshClick }) => {
   return (
     <CommonModal
       open={showModal}
-      title='Pharmacy Details'
+      title='Dispensary Details'
       showFooter={true}
       onClose={() => {
-       closeForm()
+        closeForm()
       }}
       fullScreen
       overrideLoading
@@ -48,7 +68,7 @@ const PharmacyDetails = ({ refreshClick }) => {
       showFooter={false}
       onConfirm={() => {
         closeForm()
-        refreshClick()       
+        refreshClick()
       }}
     >
       <Details />
