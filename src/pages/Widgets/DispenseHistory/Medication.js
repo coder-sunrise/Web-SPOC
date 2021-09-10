@@ -6,12 +6,10 @@ import { currencySymbol } from '@/utils/config'
 import moment from 'moment'
 import { Table } from 'antd'
 import tablestyles from '../PatientHistory/PatientHistoryStyle.less'
-import {
-  Tooltip,
-} from '@/components'
+import { Tooltip } from '@/components'
 import { FileCopySharp } from '@material-ui/icons'
 
-export default ({ classes, current, fieldName = '' }) => {
+export default ({ classes, current, fieldName = '', clinicSettings }) => {
   const drugMixtureIndicator = (row, right) => {
     if (row.type !== 'Medication' || !row.isDrugMixture) return null
 
@@ -34,7 +32,7 @@ export default ({ classes, current, fieldName = '' }) => {
     )
   }
 
-  const tableColumns = (showDrugLabelRemark) => [
+  const tableColumns = showDrugLabelRemark => [
     {
       dataIndex: 'visitDate',
       title: 'Date',
@@ -51,8 +49,7 @@ export default ({ classes, current, fieldName = '' }) => {
         let paddingRight = 0
         if (row.isPreOrder && row.isExclusive) {
           paddingRight = 52
-        }
-        else if (row.isPreOrder || row.isExclusive) {
+        } else if (row.isPreOrder || row.isExclusive) {
           paddingRight = 24
         }
         if (row.isDrugMixture) {
@@ -60,12 +57,24 @@ export default ({ classes, current, fieldName = '' }) => {
         }
         return (
           <div style={{ position: 'relative' }}>
-            <div className={classes.wrapCellTextStyle}
-              style={{ paddingRight: paddingRight }}>
-              {row.name}
+            <div
+              className={classes.wrapCellTextStyle}
+              style={{ paddingRight: paddingRight }}
+            >
+              <Tooltip
+                title={
+                  <div>
+                    {`Code: ${row.code}`}
+                    <br />
+                    {`Name: ${row.name}`}
+                  </div>
+                }
+              >
+                <div>{row.name}</div>
+              </Tooltip>
               <div style={{ position: 'relative', top: 2 }}>
                 {drugMixtureIndicator(row, -20)}
-                {row.isPreOrder &&
+                {row.isPreOrder && (
                   <Tooltip title='Pre-Order'>
                     <div
                       className={classes.rightIcon}
@@ -74,8 +83,12 @@ export default ({ classes, current, fieldName = '' }) => {
                         borderRadius: 10,
                         backgroundColor: '#4255bd',
                       }}
-                    > Pre</div>
-                  </Tooltip>}
+                    >
+                      {' '}
+                      Pre
+                    </div>
+                  </Tooltip>
+                )}
                 {row.isExclusive && (
                   <Tooltip title='Exclusive Drug'>
                     <div
@@ -85,7 +98,9 @@ export default ({ classes, current, fieldName = '' }) => {
                         borderRadius: 4,
                         backgroundColor: 'green',
                       }}
-                    >Excl.</div>
+                    >
+                      Excl.
+                    </div>
                   </Tooltip>
                 )}
               </div>
@@ -98,6 +113,11 @@ export default ({ classes, current, fieldName = '' }) => {
       dataIndex: 'instruction',
       title: 'Instructions',
       width: 200,
+      render: text =>(
+          <Tooltip title={text}>
+            <div>{text}</div>
+          </Tooltip>
+        )
     },
     {
       dataIndex: 'dispensedQuanity',
@@ -105,12 +125,29 @@ export default ({ classes, current, fieldName = '' }) => {
       align: 'right',
       width: 80,
       render: (text, row) => (
-        <div className={classes.numberstyle}>
-          {`${numeral(row.dispensedQuanity || 0).format('0,0.00')}`}
-        </div>
+        <Tooltip
+          title={
+            <div className={classes.numberstyle}>
+              {`${numeral(row.dispensedQuanity || 0).format('0,0.00')}`}
+            </div>
+          }
+        >
+          <div className={classes.numberstyle}>
+            {`${numeral(row.dispensedQuanity || 0).format('0,0.00')}`}
+          </div>
+        </Tooltip>
       ),
     },
-    { dataIndex: 'dispenseUOM', title: 'UOM', width: 90 },
+    {
+      dataIndex: 'dispenseUOM',
+      title: 'UOM',
+      width: 90,
+      render: text => (
+        <Tooltip title={text}>
+          <div>{text}</div>
+        </Tooltip>
+      ),
+    },
     {
       dataIndex: 'totalPrice',
       title: 'Subtotal',
@@ -130,40 +167,63 @@ export default ({ classes, current, fieldName = '' }) => {
       title: 'Total',
       align: 'right',
       width: 90,
-      render: (text, row) => showCurrency((row.isPreOrder && !row.isChargeToday) ? 0 : row.totalAfterItemAdjustment),
+      render: (text, row) =>
+        showCurrency(
+          row.isPreOrder && !row.isChargeToday
+            ? 0
+            : row.totalAfterItemAdjustment,
+        ),
     },
     {
-      dataIndex: 'remarks', title: 'Remarks', render: (text, row) => {
-        const existsDrugLabelRemarks = showDrugLabelRemark && row.drugLabelRemarks && row.drugLabelRemarks.trim() !== ''
-        return <div style={{ position: 'relative' }}>
-          <div
-            style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-              paddingRight: existsDrugLabelRemarks ? 10 : 0
-            }}
-          >{row.remarks || ' '}</div>
-          {existsDrugLabelRemarks &&
-            <div style={{
-              position: 'absolute',
-              bottom: -2,
-            right: -8,
-            }}>
-              <Tooltip title={
-                <div>
-                  <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
-                  <div>{row.drugLabelRemarks}
-                  </div>
-                </div>
-              }>
-              <FileCopySharp style={{ color: '#4255bd' }} />
-              </Tooltip>
-            </div>
-          }
-        </div>
+      dataIndex: 'remarks',
+      title: 'Remarks',
+      render: (text, row) => {
+        const existsDrugLabelRemarks =
+          showDrugLabelRemark &&
+          row.drugLabelRemarks &&
+          row.drugLabelRemarks.trim() !== ''
+        return (
+          <div style={{ position: 'relative' }}>
+            <Tooltip title={row.remarks || ' '}>
+              <div
+                style={{
+                  wordWrap: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                  paddingRight: existsDrugLabelRemarks ? 10 : 0,
+                }}
+              >
+                {row.remarks || ' '}
+              </div>
+            </Tooltip>
+
+            {existsDrugLabelRemarks && (
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: -2,
+                  right: -8,
+                }}
+              >
+                <Tooltip
+                  title={
+                    <div>
+                      <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
+                      <div>{row.drugLabelRemarks}</div>
+                    </div>
+                  }
+                >
+                  <FileCopySharp style={{ color: '#4255bd' }} />
+                </Tooltip>
+              </div>
+            )}
+          </div>
+        )
       },
-    }
+    },
   ]
+
+  const { labelPrinterSize } = clinicSettings.settings
+  const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
 
   return (
     <CardContainer hideHeader size='sm' style={{ margin: 0 }}>
@@ -171,7 +231,7 @@ export default ({ classes, current, fieldName = '' }) => {
         size='small'
         bordered
         pagination={false}
-        columns={tableColumns}
+        columns={tableColumns(showDrugLabelRemark)}
         dataSource={current.prescription || []}
         rowClassName={(record, index) => {
           return index % 2 === 0 ? tablestyles.once : tablestyles.two

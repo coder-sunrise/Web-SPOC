@@ -14,7 +14,7 @@ import Yup from '@/utils/yup'
 
 const preOrderSchema = Yup.object().shape({
   preOrderItemType: Yup.string().required(),
-  itemName:  Yup.string().required(),
+  itemName: Yup.string().required(),
 })
 
 const PendingPreOrder: React.FC = (props: any) => {
@@ -376,8 +376,16 @@ const PendingPreOrder: React.FC = (props: any) => {
         onChange: handleItemChanged,
         render: row => {
           return (
-            <Tooltip title={row.itemName}>
-              <div>{row.itemName}</div>
+            <Tooltip
+              title={
+                <div>
+                  {`Code: ${row.code}`}
+                  <br />
+                  {`Name: ${row.itemName}`}
+                </div>
+              }
+            >
+            <div>{row.itemName}</div>
             </Tooltip>
           )
         },
@@ -498,7 +506,7 @@ const PendingPreOrder: React.FC = (props: any) => {
               : false
           },
           showCommandColumn:
-            deletePreOrderAccessRight.rights === 'hidden' ? false : true,
+            deletePreOrderAccessRight.rights === 'enable' ? true : false,
           onCommitChanges: commitChanges,
           onAddedRowsChange: (rows: any) => {
             return rows.map(o => {

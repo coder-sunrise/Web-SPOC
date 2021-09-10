@@ -5,9 +5,7 @@ import { currencySymbol } from '@/utils/config'
 import moment from 'moment'
 import { Table } from 'antd'
 import tablestyles from '../PatientHistory/PatientHistoryStyle.less'
-import {
-  Tooltip,
-} from '@/components'
+import { Tooltip } from '@/components'
 
 export default ({ classes, current, fieldName = '' }) => {
   const showCurrency = (value = 0) => {
@@ -33,41 +31,76 @@ export default ({ classes, current, fieldName = '' }) => {
       ),
     },
     {
-      dataIndex: 'description', title: 'Name', width: 250,
+      dataIndex: 'description',
+      title: 'Name',
+      width: 250,
       render: (text, row) => {
         return (
           <div style={{ position: 'relative' }}>
-            <div className={classes.wrapCellTextStyle}
-              style={{ paddingRight: row.isPreOrder ? 24 : 0 }}>
-              {row.description}
+            <div
+              className={classes.wrapCellTextStyle}
+              style={{ paddingRight: row.isPreOrder ? 24 : 0 }}
+            >
+              <Tooltip
+                title={
+                  <div>
+                    {`Code: ${row.code}`}
+                    <br />
+                    {`Name: ${row.description}`}
+                  </div>
+                }
+              >
+                <div>{row.description}</div>
+              </Tooltip>
               <div style={{ position: 'relative', top: 2 }}>
-                {row.isPreOrder &&
+                {row.isPreOrder && (
                   <Tooltip title='Pre-Order'>
                     <div
-                    className={classes.rightIcon}
-                    style={{
+                      className={classes.rightIcon}
+                      style={{
                         right: -30,
-                      borderRadius: 10,
+                        borderRadius: 10,
                         backgroundColor: '#4255bd',
                       }}
-                    > Pre</div>
-                  </Tooltip>}
+                    >
+                      {' '}
+                      Pre
+                    </div>
+                  </Tooltip>
+                )}
               </div>
             </div>
           </div>
         )
-      }
+      },
     },
-    { dataIndex: 'serviceCenter', title: 'Service Center', width: 120 },
+    {
+      dataIndex: 'serviceCenter',
+      title: 'Service Center',
+      width: 120,
+      render: text => (
+        <Tooltip title={text}>
+          <div>{text}</div>
+        </Tooltip>
+      ),
+    },
     {
       dataIndex: 'quantity',
       title: 'Qty.',
       align: 'right',
       width: 80,
       render: (text, row) => (
-        <div className={classes.numberstyle}>
-          {`${numeral(row.quantity || 0).format('0,0.0')}`}
-        </div>
+        <Tooltip
+          title={
+            <div className={classes.numberstyle}>
+              {`${numeral(row.quantity || 0).format('0,0.0')}`}
+            </div>
+          }
+        >
+          <div className={classes.numberstyle}>
+            {`${numeral(row.quantity || 0).format('0,0.0')}`}
+          </div>
+        </Tooltip>
       ),
     },
     {
@@ -89,9 +122,22 @@ export default ({ classes, current, fieldName = '' }) => {
       title: 'Total',
       align: 'right',
       width: 90,
-      render: (text, row) => showCurrency((row.isPreOrder && !row.isChargeToday) ? 0 : row.totalAfterItemAdjustment),
+      render: (text, row) =>
+        showCurrency(
+          row.isPreOrder && !row.isChargeToday
+            ? 0
+            : row.totalAfterItemAdjustment,
+        ),
     },
-    { dataIndex: 'remarks', title: 'Remarks' },
+    {
+      dataIndex: 'remarks',
+      title: 'Remarks',
+      render: text => (
+        <Tooltip title={text}>
+          <div>{text}</div>
+        </Tooltip>
+      ),
+    },
   ]
   return (
     <CardContainer hideHeader size='sm' style={{ margin: 0 }}>

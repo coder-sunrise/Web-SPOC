@@ -53,9 +53,17 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
         isDisabled: () => true,
         render: row => {
           return (
-            <Tooltip title={row.itemName}>
-              <div>{row.itemName}</div>
-            </Tooltip>
+            <Tooltip
+            title={
+              <div>
+                {`Code: ${row.code}`}
+                <br />
+                {`Name: ${row.itemName}`}
+              </div>
+            }
+          >
+          <div>{row.itemName}</div>
+          </Tooltip>
           )
         },
       },

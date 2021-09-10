@@ -1066,9 +1066,9 @@ class Form extends React.PureComponent {
 
   showPreOrder = () => {
     const { values, mode } = this.props
-    const { isEnableRecurrence, patientProfileFK } = values
-    const actualizePreOrderAccessRight = Authorized.check('patientdatabase.modifypreorder') || { rights: 'hidden' }
-    if (actualizePreOrderAccessRight.rights !== 'enable') return false
+    const { isEnableRecurrence, patientProfileFK,currentAppointment } = values
+    const {appointmentPreOrderItem = {}} = currentAppointment
+    if (!appointmentPreOrderItem.length) return false
     if (values.id) {
       return mode !== 'series'
     }
@@ -1145,6 +1145,20 @@ class Form extends React.PureComponent {
     const disableFooterButton = this.shouldDisableButtonAction()
     const disableCheckAvailabilityFooterButton = this.shouldDisableCheckAvailabilityButtonAction()
     const disableDataGrid = this.shouldDisableDatagrid()
+    const disablePreOrderConditions = [
+      {
+        condition: disableDataGrid,
+        message: `Pre-Order is not allowed for current appointment status.`,
+      },
+      {
+        condition: values.id && mode == 'series',
+        message: `Pre-Order is not allowed for entire series appointment.`,
+      },
+      {
+        condition: !values.id && isEnableRecurrence,
+        message: `Pre-Order is not allowed for recurring appointment.`,
+      },
+    ]
 
     const _datagrid =
       conflicts.length > 0
@@ -1174,7 +1188,6 @@ class Form extends React.PureComponent {
       return { ...po }
     })
 
-    const actualizePreOrderAccessRight = Authorized.check('appointment.actualizepreorder') || { rights: 'hidden' }
 
     return (
       <LoadingWrapper loading={show} text='Loading...'>
@@ -1184,11 +1197,8 @@ class Form extends React.PureComponent {
               <PatientBanner
                 from='Appointment'
                 onSelectPreOrder={this.onSelectPreOrder}
-                activePreOrderItem={draftPreOrderItem}
-                disablePreOrder={disableDataGrid}
-                isEnableRecurrence={isEnableRecurrence}
-                apptId={values.id}
-                apptMode={mode}
+                disablePreOrder={disablePreOrderConditions}
+                activePreOrderItems={draftPreOrderItem}
                 {...this.props}
                 />
             </div>}

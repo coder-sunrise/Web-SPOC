@@ -22,9 +22,7 @@ const DoctorLabel = ({ doctor, hideMCR = false }) => {
     // console.log({ error })
   }
   return (
-    <Tooltip title={label}>
       <span>{label}</span>
-    </Tooltip>
   )
 }
 

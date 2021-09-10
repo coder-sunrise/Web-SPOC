@@ -20,5 +20,5 @@ export default {
   pwa: false,
   appTitle: 'Medicloud',
   logo: '/favicon.png',
-  iconfontUrl: '//at.alicdn.com/t/font_2702442_n32s2210k1.js', // full icon list refer to https://at.alicdn.com/t/project/2702442/d297b0d1-e355-4494-b189-ed46c9dc01af.html?spm=a313x.7781069.1998910419.35
+  iconfontUrl: '//at.alicdn.com/t/font_2702442_om12xihkgel.js', // full icon list refer to https://at.alicdn.com/t/project/2702442/d297b0d1-e355-4494-b189-ed46c9dc01af.html?spm=a313x.7781069.1998910419.35
 }

@@ -508,7 +508,13 @@ class AntdSelect extends React.PureComponent {
   }
 
   getSelectOptions = (source, renderDropdown) => {
-    const { valueField, labelField, optionLabelLength = 0, mode, showOptionTitle = true } = this.props
+    const {
+      valueField,
+      labelField,
+      optionLabelLength = 0,
+      mode,
+      showOptionTitle = true,
+    } = this.props
 
     return source
       .map(s => {
@@ -528,7 +534,7 @@ class AntdSelect extends React.PureComponent {
         return (
           <Select.Option
             data={option}
-            title={showOptionTitle ? option.label : undefined}
+            title={showOptionTitle ? option.customTooltipField || option.label: undefined} 
             label={
               optionLabelLength
                 ? option.label.substring(0, optionLabelLength)
@@ -654,18 +660,6 @@ class AntdSelect extends React.PureComponent {
         // onMouseLeave={onMouseLeave}
       >
         <Select
-          // getPopupContainer={node => {
-          //   var customInputContainer = node.closest(
-          //     '[class^="MuiFormControl-root"]',
-          //   )
-          //   //Get the container of the wrapper custom component.
-          //   //The dropdown position will remain if not stick to the wrapper component.
-          //   if (customInputContainer && customInputContainer.parentNode) {
-          //     return customInputContainer.parentNode
-          //   }
-
-          //   return document.body
-          // }}
           className={classnames([classes.selectContainer, className])}
           dropdownClassName={classnames(classes.dropdownMenu)}
           showSearch
@@ -711,6 +705,28 @@ class AntdSelect extends React.PureComponent {
               </p>
             )
           }
+          getPopupContainer={node => {
+            //Issue: The dropdown position will be fixed on scroll if not stick to the wrapper component.
+
+            //Get the MUI CustomInput container of the wrapper custom component.
+            var customInputContainer = node.closest(
+              '[class^="MuiFormControl-root"]',
+            )
+            //Get the underlying modal component of the wrapper custom component.
+            var customModalContainer = node.closest(
+              '[class^="MuiDialog-container"],[class^="ant-drawer"]',
+            )
+
+            //Only fix Select popup container if used as GlobalModalContainer
+            if (
+              customInputContainer &&
+              customModalContainer &&
+              customInputContainer.parentNode
+            ) {
+              return customInputContainer.parentNode
+            }
+            return document.body
+          }}
           {...cfg}
           {...restProps}
         >
