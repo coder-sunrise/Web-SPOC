@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react'
 import { useSelector, useDispatch } from 'dva'
 import _ from 'lodash'
 import ReactDOM from 'react-dom'
-import './DosageRule.less'
+import styles from './DosageRule.less'
 import {
   Table,
   Input,
@@ -16,6 +16,10 @@ import {
 import { GridContainer, GridItem, CodeSelect, Popover } from '@/components'
 import DetailsContext from '../../Details/DetailsContext'
 import { DOSAGE_RULE, DOSAGE_RULE_OPERATOR } from '@/utils/constants'
+import Edit from '@material-ui/icons/Edit'
+import Save from '@material-ui/icons/Save'
+import Cancel from '@material-ui/icons/Cancel'
+import Delete from '@material-ui/icons/Delete'
 
 const maxNumOfRule = 5
 
@@ -188,17 +192,6 @@ const DosageRuleTable = ({
 
     const validAgeExpressioin = /^(([0-9]+)|(0.5))+$/
 
-    if (rule === DOSAGE_RULE.age) {
-      if (
-        (leftOperand && !validAgeExpressioin.test(leftOperand)) ||
-        (rightOperand && !validAgeExpressioin.test(rightOperand))
-      ) {
-        rangeValidationErrorMessage =
-          'Invalid age range. 0.5 (6 months) or full year only.'
-        validationSuccess = false
-      }
-    }
-
     if (rule === DOSAGE_RULE.age || rule === DOSAGE_RULE.weight) {
       if (!operator) {
         rangeValidationErrorMessage = `Required.`
@@ -227,6 +220,16 @@ const DosageRuleTable = ({
           rightOperand === 0
         ) {
           rangeValidationErrorMessage = `Invalid ${rule} range.`
+          validationSuccess = false
+        }
+      }
+      if (rule === DOSAGE_RULE.age) {
+        if (
+          (leftOperand && !validAgeExpressioin.test(leftOperand)) ||
+          (rightOperand && !validAgeExpressioin.test(rightOperand))
+        ) {
+          rangeValidationErrorMessage =
+            'Invalid age range. 0.5 (6 months) or full year only.'
           validationSuccess = false
         }
       }
@@ -636,37 +639,45 @@ const DosageRuleTable = ({
       render: (item = {}, record) => {
         const editing = isEditing(record)
         return editing ? (
-          <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-            <Typography.Link onClick={() => save(record.key)}>
-              Save
-            </Typography.Link>
-            <Typography.Link>
-              <Popconfirm
-                title='Sure to cancel?'
-                cancelText='No'
-                okText='Yes'
-                onConfirm={() => cancel(record.key)}
-              >
-                <a>Cancel</a>
-              </Popconfirm>
-            </Typography.Link>
-          </div>
+          <>
+            <div
+              style={{ display: 'flex', justifyContent: 'space-around' }}
+              title='Save'
+            >
+              <Typography.Link onClick={() => save(record.key)}>
+                <Save />
+              </Typography.Link>
+              <Typography.Link title='Cancel'>
+                <Popconfirm
+                  title='Sure to cancel?'
+                  cancelText='No'
+                  okText='Yes'
+                  onConfirm={() => cancel(record.key)}
+                >
+                  <Cancel style={{color: '#f5222d' }} />
+                </Popconfirm>
+              </Typography.Link>
+            </div>
+          </>
         ) : (
-          <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+          <div
+            style={{ display: 'flex', justifyContent: 'space-around' }}
+            title='Edit'
+          >
             <Typography.Link
               disabled={editingKey !== ''}
               onClick={() => edit(record)}
             >
-              Edit
+              <Edit />
             </Typography.Link>
-            <Typography.Link disabled={editingKey !== ''}>
+            <Typography.Link disabled={editingKey !== ''} title='Delete'>
               <Popconfirm
                 title='Sure to delete?'
                 cancelText='No'
                 okText='Yes'
                 onConfirm={() => deleteData(record.key)}
               >
-                Delete
+                <Delete style={{color: '#f5222d' }} />
               </Popconfirm>
             </Typography.Link>
           </div>
@@ -701,7 +712,7 @@ const DosageRuleTable = ({
         bordered
         dataSource={data}
         columns={mergedColumns}
-        rowClassName='editable-row'
+        rowClassName={(record, index) => isEditing(record) ? styles.editingRow : styles.editableRow}
         pagination={false}
       />
       {((rule !== DOSAGE_RULE.default && data.length < maxNumOfRule) ||

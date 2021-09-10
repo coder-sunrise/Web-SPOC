@@ -1309,7 +1309,7 @@ class Medication extends PureComponent {
                 padding: '1px 3px',
                 fontWeight: 500,
               }}
-              title='Exclusive Drug'
+              title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'
             >
               Excl.
             </div>

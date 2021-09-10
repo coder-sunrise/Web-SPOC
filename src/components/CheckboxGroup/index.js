@@ -2,7 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 import withStyles from '@material-ui/core/styles/withStyles'
 import CustomInput from 'mui-pro-components/CustomInput'
-import { Checkbox, FormControlLabel } from '@material-ui/core'
+import { Checkbox, FormControlLabel, Tooltip } from '@material-ui/core'
 import regularFormsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/regularFormsStyle'
 import { control } from '@/components/Decorator'
 import Authorized from '@/utils/Authorized'
@@ -122,29 +122,35 @@ class CheckboxGroup extends React.Component {
       >
         {options.map((o) => {
           const v = `${o[valueField]}`
-
+          
           return (
-            <div
-              className={`${classes.checkboxAndRadio} ${vertical
-                ? ''
-                : classes.checkboxAndRadioHorizontal}`}
-              key={v}
+            <Tooltip 
+              title={o.tooltip || ''}
+              disableFocusListener
             >
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={state[v]}
-                    onChange={this.handleChange(v)}
-                    value={v}
-                    color='primary'
-                    disabled={o.disabled || disabled}
+              <div
+                className={`${classes.checkboxAndRadio} ${vertical
+                  ? ''
+                  : classes.checkboxAndRadioHorizontal}`}
+                key={v}
+              >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                      style={o.disabled ? { pointerEvents: "none" } : {}}
+                        checked={state[v]}
+                        onChange={this.handleChange(v)}
+                        value={v}
+                        color='primary'
+                        disabled={o.disabled || disabled}
+                      />
+                    }
+                    label={
+                      <span dangerouslySetInnerHTML={{ __html: o[textField] }} />
+                    }
                   />
-                }
-                label={
-                  <span dangerouslySetInnerHTML={{ __html: o[textField] }} />
-                }
-              />
-            </div>
+              </div>
+            </Tooltip>
           )
         })}
       </div>

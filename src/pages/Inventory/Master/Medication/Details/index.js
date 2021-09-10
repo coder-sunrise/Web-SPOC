@@ -421,13 +421,13 @@ export default compose(
       if (isDisplayInLeaflet) {
         checkboxGroup.push('isDisplayInLeaflet')
       }
-      if (isOnlyClinicInternalUsage) {
+      if (isOnlyClinicInternalUsage || !medicationDetails.id) {
         checkboxGroup.push('isOnlyClinicInternalUsage')
       }
-      if (isDispensedByPharmacy) {
+      if (isDispensedByPharmacy || !medicationDetails.id) {
         checkboxGroup.push('isDispensedByPharmacy')
       }
-      if (isNurseActualizable) {
+      if (isNurseActualizable || !medicationDetails.id) {
         checkboxGroup.push('isNurseActualizable')
       }
 

@@ -269,7 +269,7 @@ export const PrescriptionColumnExtensions = (
               </Tooltip>
             )}
             {row.isExclusive && (
-              <Tooltip title='Exclusive Drug'>
+              <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                 <div
                   style={{
                     position: 'absolute',
@@ -1122,7 +1122,7 @@ export const PackageColumnExtensions = (onPrint, showDrugLabelRemark) => [
           {row.type}
           <div style={{ position: 'relative', top: 2 }}>
             {row.isExclusive && (
-              <Tooltip title='Exclusive Drug'>
+              <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                 <div
                   style={{
                     position: 'absolute',

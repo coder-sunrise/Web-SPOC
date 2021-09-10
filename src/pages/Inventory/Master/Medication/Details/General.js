@@ -23,80 +23,9 @@ import SharedContainer from '../../SharedContainer'
 import useTranslation from '@/utils/hooks/useTranslation'
 import Sdd from '../../Sdd'
 import DetailsContext from './DetailsContext'
+import { getBizSession } from '@/services/queue'
 
 const styles = () => ({})
-
-const chasOptions = [
-  {
-    id: 'isChasAcuteClaimable',
-    name: 'CHAS Acute Claimable',
-    layoutConfig: {
-      style: {},
-    },
-  },
-  {
-    id: 'isChasChronicClaimable',
-    name: 'CHAS Chronic Claimable',
-    layoutConfig: {
-      style: {},
-    },
-  },
-]
-
-const medisaveOptions = [
-  {
-    id: 'isMedisaveClaimable',
-    name: 'CDMP Claimable',
-    layoutConfig: {
-      style: {},
-    },
-  },
-  {
-    id: 'isMedisaveClaimable',
-    name: 'CDMP Claimable',
-    layoutConfig: {
-      style: {},
-    },
-  },
-]
-
-const generalOptions = [
-  {
-    id: 'isOnlyClinicInternalUsage',
-    name: 'Only Internal Usage',
-    layoutConfig: {
-      style: {},
-    },
-  },
-  {
-    id: 'isDispensedByPharmacy',
-    name: 'Dispensed by Pharmacy',
-    layoutConfig: {
-      style: {},
-    },
-  },
-  {
-    id: 'isNurseActualizable',
-    name: 'Nurse Actualizable',
-    layoutConfig: {
-      style: {},
-    },
-  },
-  {
-    id: 'isDisplayInLeaflet',
-    name: 'Display in Leaflet',
-    layoutConfig: {
-      style: {},
-    },
-  },
-  {
-    id: 'isExclusive',
-    name: 'Exclusive',
-    layoutConfig: {
-      style: {},
-    },
-  },
-]
 
 const General = ({
   medicationDetail,
@@ -104,13 +33,14 @@ const General = ({
   setFieldValue,
   sddDetail,
   theme,
-  hasActiveSession,
+  // hasActiveSession,
   clinicSettings,
   values,
   attachment,
   ...props
 }) => {
   const [toggle, setToggle] = useState(false)
+  const [hasActiveSession, setHasActiveSession] = useState(true)
   const {
     primaryPrintoutLanguage,
     isMultiLanguage,
@@ -129,6 +59,7 @@ const General = ({
   const [attachments, setAttachments] = useState([])
 
   useEffect(() => {
+    checkHasActiveSession()
     if (entity && entity.fileIndexFK) {
       const attach = [
         {
@@ -142,6 +73,16 @@ const General = ({
       return
     }
   }, [entity])
+
+  const checkHasActiveSession = async () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await getBizSession(bizSessionPayload)
+    const { data } = result.data
+
+    setHasActiveSession(data.length > 0)
+  }
 
   const toggleModal = () => {
     setToggle(!toggle)
@@ -157,6 +98,59 @@ const General = ({
   }
 
   const getCheckboxOptions = () => {
+    const chasOptions = [
+      {
+        id: 'isChasAcuteClaimable',
+        name: 'CHAS Acute Claimable',
+        layoutConfig: {
+          style: {},
+        },
+      },
+      {
+        id: 'isChasChronicClaimable',
+        name: 'CHAS Chronic Claimable',
+        layoutConfig: {
+          style: {},
+        },
+      },
+    ]
+    
+    const medisaveOptions = [
+      {
+        id: 'isMedisaveClaimable',
+        name: 'CDMP Claimable',
+        layoutConfig: {
+          style: {},
+        },
+      },
+    ]
+    
+    let generalOptions = [
+      {
+        id: 'isOnlyClinicInternalUsage',
+        name: 'Orderable',
+        tooltip: 'Item is orderable and dispensable to patient',
+        disabled: hasActiveSession && values.id,
+        layoutConfig: {
+          style: {},
+        },
+      },
+      {
+        id: 'isExclusive',
+        name: 'Exclusive',
+        layoutConfig: {
+          style: {},
+        },
+      },
+      {
+        id: 'isDisplayInLeaflet',
+        name: 'Display in Leaflet',
+        layoutConfig: {
+          style: {},
+        },
+      },
+    ]
+    
     let checkboxOptions = []
     if (clinicSettings.isEnableCHAS) {
       checkboxOptions.push(...chasOptions)
@@ -164,6 +158,32 @@ const General = ({
 
     if (clinicSettings.isEnableMedisave) {
       checkboxOptions.push(...medisaveOptions)
+    }
+
+    if (clinicSettings.isEnablePharmacyModule) {
+      generalOptions.splice(2,0,
+        {
+          id: 'isDispensedByPharmacy',
+          name: 'Dispensed by Pharmacy',
+          tooltip: 'Item’s stock is deducted and dispense by pharmacy. If unchecked the setting, stock deduction will take place during finalization of patient\'s order',
+          disabled: hasActiveSession && values.id,
+          layoutConfig: {
+            style: {},
+          },
+        },)
+    }
+
+    if (clinicSettings.isEnableNurseWorkItem) {
+      generalOptions.splice(3,0, 
+      {
+        id: 'isNurseActualizable',
+        name: 'Nurse Actualizable',
+        tooltip: 'Item will generate task for nurse to actualize',
+        disabled: hasActiveSession && values.id,
+        layoutConfig: {
+          style: {},
+        },
+      },)
     }
 
     checkboxOptions.push(...generalOptions)

@@ -129,7 +129,7 @@ const Grid = ({ prescriptionSet, dispatch }) => {
               <div style={{ position: 'relative' }}>
                 {row.isDrugMixture && drugMixtureIndicator(row, -20)}
                 {row.isExclusive && (
-                  <Tooltip title='Exclusive Drug'>
+                  <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                     <div style={rightIcon}>Excl.</div>
                   </Tooltip>
                 )}
