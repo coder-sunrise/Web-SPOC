@@ -12,22 +12,23 @@ import {
   Field,
   withFormikExtend,
   Switch,
-  Checkbox
+  Checkbox,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 import Yup from '@/utils/yup'
 import { getServices } from '@/utils/codetable'
+import { VISIT_TYPE } from '@/utils/constants'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
 import { DoctorProfileSelect } from '@/components/_medisys'
 
-const getVisitDoctorUserId = (props) => {
+const getVisitDoctorUserId = props => {
   const { doctorprofile } = props.codetable
   const { doctorProfileFK } = props.visitRegistration.entity.visit
   let visitDoctorUserId
   if (doctorprofile && doctorProfileFK) {
-    visitDoctorUserId = doctorprofile.find((d) => d.id === doctorProfileFK)
+    visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK)
       .clinicianProfile.userProfileFK
   }
 
@@ -63,13 +64,13 @@ const getVisitDoctorUserId = (props) => {
         const { doctorProfileFK } = visitRegistration.entity.visit
         if (doctorprofile && doctorProfileFK) {
           v.performingUserFK = doctorprofile.find(
-            (d) => d.id === doctorProfileFK,
+            d => d.id === doctorProfileFK,
           ).clinicianProfile.userProfileFK
         }
       }
     }
 
-    return { ...v, type }
+    return { ...v, type, visitPurposeFK: orders.visitPurposeFK }
   },
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
@@ -116,7 +117,7 @@ const getVisitDoctorUserId = (props) => {
   displayName: 'OrderPage',
 })
 class Service extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { dispatch } = props
 
@@ -129,10 +130,10 @@ class Service extends PureComponent {
           'serviceFKNavigation.IsActive': true,
           'serviceCenterFKNavigation.IsActive': true,
           combineCondition: 'and',
-          apiCriteria: { ServiceCenterType: 'Normal' }
+          apiCriteria: { ServiceCenterType: 'Normal' },
         },
       },
-    }).then((list) => {
+    }).then(list => {
       // eslint-disable-next-line compat/compat
       const {
         services = [],
@@ -145,7 +146,7 @@ class Service extends PureComponent {
 
         const serviceCenterService =
           serviceCenterServices.find(
-            (o) => o.serviceId === serviceFK && o.isDefault,
+            o => o.serviceId === serviceFK && o.isDefault,
           ) || {}
 
         const { unitPrice = 0 } = serviceCenterService || {}
@@ -156,10 +157,7 @@ class Service extends PureComponent {
             2,
           )})`,
         }
-        return [
-          ...p,
-          opt,
-        ]
+        return [...p, opt]
       }, [])
 
       this.setState({
@@ -174,7 +172,7 @@ class Service extends PureComponent {
     }
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.orders.type === this.props.type)
       if (
         (!this.props.global.openAdjustment &&
@@ -197,27 +195,26 @@ class Service extends PureComponent {
   getServiceCenterService = () => {
     const { values, setValues } = this.props
     const { serviceFK, serviceCenterFK } = values
-    const obj = (serviceCenterService) => {
+    const obj = serviceCenterService => {
       return {
         ...values,
         isActive: serviceCenterService.isActive,
         serviceCenterServiceFK: serviceCenterService.serviceCenter_ServiceId,
-        serviceCode: this.state.services.find((o) => o.value === serviceFK)
-          .code,
-        serviceName: this.state.services.find((o) => o.value === serviceFK)
-          .name,
+        serviceCode: this.state.services.find(o => o.value === serviceFK).code,
+        serviceName: this.state.services.find(o => o.value === serviceFK).name,
         unitPrice: serviceCenterService.unitPrice,
         total: serviceCenterService.unitPrice,
         quantity: 1,
-        isDisplayValueChangable: this.state.services.find((o) => o.value === serviceFK)
-          .isDisplayValueChangable,
+        isDisplayValueChangable: this.state.services.find(
+          o => o.value === serviceFK,
+        ).isDisplayValueChangable,
       }
     }
 
     if (serviceFK && !serviceCenterFK) {
       const serviceCenterService =
         this.state.serviceCenterServices.find(
-          (o) => o.serviceId === serviceFK && o.isDefault,
+          o => o.serviceId === serviceFK && o.isDefault,
         ) || {}
       if (serviceCenterService) {
         setValues({
@@ -235,8 +232,7 @@ class Service extends PureComponent {
 
     const serviceCenterService =
       this.state.serviceCenterServices.find(
-        (o) =>
-          o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
+        o => o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
       ) || {}
     if (serviceCenterService) {
       setValues({
@@ -249,7 +245,7 @@ class Service extends PureComponent {
     }
   }
 
-  updateTotalPrice = (v) => {
+  updateTotalPrice = v => {
     if (v || v === 0) {
       const { isExactAmount, isMinus, adjValue, isPackage } = this.props.values
       if (isPackage) return
@@ -287,7 +283,7 @@ class Service extends PureComponent {
     })
   }
 
-  onAdjustmentConditionChange = (v) => {
+  onAdjustmentConditionChange = v => {
     const { values } = this.props
     const { isMinus, adjValue, isExactAmount } = values
     if (!isNumber(adjValue)) return
@@ -333,7 +329,7 @@ class Service extends PureComponent {
     return false
   }
 
-  render () {
+  render() {
     const {
       theme,
       classes,
@@ -360,26 +356,29 @@ class Service extends PureComponent {
             <GridItem xs={8}>
               <Field
                 name='serviceFK'
-                render={(args) => {
+                render={args => {
                   return (
                     <div id={`autofocus_${values.type}`}>
                       <Select
                         label='Service Name'
                         labelField='combinDisplayValue'
                         options={services.filter(
-                          (o) =>
+                          o =>
                             !serviceCenterFK ||
                             o.serviceCenters.find(
-                              (m) => m.value === serviceCenterFK,
+                              m => m.value === serviceCenterFK,
                             ),
                         )}
                         onChange={(v, op = {}) => {
-                          setFieldValue('isNurseActualizeRequired', op.isNurseActualizable)
+                          setFieldValue(
+                            'isNurseActualizeRequired',
+                            op.isNurseActualizable,
+                          )
 
                           setTimeout(() => {
                             this.getServiceCenterService()
-                          }, 1)}
-                        }
+                          }, 1)
+                        }}
                         disabled={values.isPackage}
                         {...args}
                       />
@@ -393,7 +392,7 @@ class Service extends PureComponent {
                 <GridItem xs={3}>
                   <Field
                     name='packageConsumeQuantity'
-                    render={(args) => {
+                    render={args => {
                       return (
                         <NumberInput
                           label='Consumed Quantity'
@@ -417,13 +416,13 @@ class Service extends PureComponent {
                 <GridItem xs={1}>
                   <Field
                     name='remainingQuantity'
-                    render={(args) => {
+                    render={args => {
                       return (
                         <NumberInput
                           style={{
                             marginTop: theme.spacing(3),
                           }}
-                          formatter={(v) => `/ ${parseFloat(v).toFixed(1)}`}
+                          formatter={v => `/ ${parseFloat(v).toFixed(1)}`}
                           text
                           {...args}
                         />
@@ -437,7 +436,7 @@ class Service extends PureComponent {
               <GridItem xs={3}>
                 <Field
                   name='quantity'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <NumberInput
                         label='Quantity'
@@ -447,7 +446,7 @@ class Service extends PureComponent {
                         }}
                         step={1}
                         min={values.minQuantity}
-                        onChange={(e) => {
+                        onChange={e => {
                           if (values.unitPrice) {
                             const total = e.target.value * values.unitPrice
                             setFieldValue('total', total)
@@ -466,19 +465,20 @@ class Service extends PureComponent {
             <GridItem xs={8}>
               <Field
                 name='serviceCenterFK'
-                render={(args) => {
+                render={args => {
                   return (
                     <Select
                       label='Service Center Name'
                       options={serviceCenters.filter(
-                        (o) =>
+                        o =>
                           !serviceFK ||
-                          o.services.find((m) => m.value === serviceFK),
+                          o.services.find(m => m.value === serviceFK),
                       )}
                       onChange={() =>
                         setTimeout(() => {
                           this.getServiceCenterService()
-                        }, 1)}
+                        }, 1)
+                      }
                       disabled={values.isPackage}
                       {...args}
                     />
@@ -489,7 +489,7 @@ class Service extends PureComponent {
             <GridItem xs={3}>
               <Field
                 name='total'
-                render={(args) => {
+                render={args => {
                   return (
                     <NumberInput
                       label='Total'
@@ -499,7 +499,7 @@ class Service extends PureComponent {
                       }}
                       min={0}
                       currency
-                      onChange={(e) => {
+                      onChange={e => {
                         this.updateTotalPrice(e.target.value)
                       }}
                       disabled={totalPriceReadonly || values.isPackage}
@@ -514,7 +514,7 @@ class Service extends PureComponent {
             <GridItem xs={8} className={classes.editor}>
               <FastField
                 name='remark'
-                render={(args) => {
+                render={args => {
                   return <TextField rowsMax='5' label='Remarks' {...args} />
                 }}
               />
@@ -526,7 +526,7 @@ class Service extends PureComponent {
                 >
                   <Field
                     name='isMinus'
-                    render={(args) => {
+                    render={args => {
                       return (
                         <Switch
                           checkedChildren='-'
@@ -546,7 +546,7 @@ class Service extends PureComponent {
                 </div>
                 <Field
                   name='adjValue'
-                  render={(args) => {
+                  render={args => {
                     args.min = 0
                     if (values.isExactAmount) {
                       return (
@@ -593,7 +593,7 @@ class Service extends PureComponent {
               <div style={{ marginTop: theme.spacing(2) }}>
                 <Field
                   name='isExactAmount'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <Switch
                         checkedChildren='$'
@@ -618,8 +618,14 @@ class Service extends PureComponent {
               {values.isDisplayValueChangable && (
                 <FastField
                   name='newServiceName'
-                  render={(args) => {
-                    return <TextField rowsMax='5' label='New Service Name' {...args} />
+                  render={args => {
+                    return (
+                      <TextField
+                        rowsMax='5'
+                        label='New Service Name'
+                        {...args}
+                      />
+                    )
                   }}
                 />
               )}
@@ -630,7 +636,7 @@ class Service extends PureComponent {
               {values.isPackage ? (
                 <Field
                   name='performingUserFK'
-                  render={(args) => (
+                  render={args => (
                     <DoctorProfileSelect
                       label='Performed By'
                       {...args}
@@ -639,45 +645,51 @@ class Service extends PureComponent {
                   )}
                 />
               ) : (
-                <div>
-                  <FastField
-                    name='isPreOrder'
-                    render={args => {
-                      return (
-                        <Checkbox
-                          label='Pre-Order'
-                          style={{ position: 'absolute', bottom: 2 }}
-                          {...args}
-                          onChange={e => {
-                            if (!e.target.value) {
-                              setFieldValue('isChargeToday', false)
-                            }
-                          }}
-                        />
-                      )
-                    }}
-                  />
-                  {values.isPreOrder &&
+                values.visitPurposeFK !== VISIT_TYPE.RETAIL && (
+                  <div>
                     <FastField
-                      name='isChargeToday'
+                      name='isPreOrder'
                       render={args => {
                         return (
                           <Checkbox
-                            style={{ position: 'absolute', bottom: 2, left: '100px' }}
-                            label='Charge Today'
+                            label='Pre-Order'
+                            style={{ position: 'absolute', bottom: 2 }}
                             {...args}
+                            onChange={e => {
+                              if (!e.target.value) {
+                                setFieldValue('isChargeToday', false)
+                              }
+                            }}
                           />
                         )
                       }}
                     />
-                  }
-                </div>
+                    {values.isPreOrder && (
+                      <FastField
+                        name='isChargeToday'
+                        render={args => {
+                          return (
+                            <Checkbox
+                              style={{
+                                position: 'absolute',
+                                bottom: 2,
+                                left: '100px',
+                              }}
+                              label='Charge Today'
+                              {...args}
+                            />
+                          )
+                        }}
+                      />
+                    )}
+                  </div>
+                )
               )}
             </GridItem>
             <GridItem xs={3} className={classes.editor}>
               <Field
                 name='totalAfterItemAdjustment'
-                render={(args) => {
+                render={args => {
                   return (
                     <NumberInput
                       label='Total After Adj'
