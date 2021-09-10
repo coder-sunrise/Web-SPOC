@@ -71,7 +71,7 @@ const PharmacyDetails = ({ refreshClick }) => {
         refreshClick()
       }}
     >
-      <Details />
+      <Details refreshClick={refreshClick} />
     </CommonModal>
   )
 }

@@ -489,24 +489,6 @@ const Details = props => {
     dispatch({
       type: 'pharmacyDetails/query',
       payload: { id: workitem.id },
-    }).then(r => {
-      if (!r) {
-        dispatch({
-          type: 'global/updateAppState',
-          payload: {
-            openConfirm: true,
-            isInformType: true,
-            openConfirmText: 'OK',
-            openConfirmContent: `Pharmacy workitem has been remove by others, click Ok to close.`,
-            onConfirmClose: () => {
-              const { onClose } = props
-              if (onClose) {
-                onClose()
-              }
-            },
-          },
-        })
-      }
     })
   }
 
@@ -524,6 +506,10 @@ const Details = props => {
     workitem.isPharmacyOrderUpdate || workitem.isPharmacyOrderDiscard
       ? workitem.updateMessage
       : updateMessage
+
+  const pharmacyOrderItemCount = (
+    pharmacyDetails.entity?.pharmacyOrderItem || []
+  ).length
   return (
     <div style={{ marginTop: -20 }}>
       <div className={classes.contentPanel}>
@@ -590,14 +576,16 @@ const Details = props => {
                     className={classes.alertStyle}
                     icon={<Warning style={{ color: 'red' }} />}
                   />
-                  <Button
-                    color='primary'
-                    justIcon
-                    className={classes.refreshButton}
-                    onClick={refreshClick}
-                  >
-                    <Refresh />
-                  </Button>
+                  {!workitem.isPharmacyOrderDiscard && (
+                    <Button
+                      color='primary'
+                      justIcon
+                      className={classes.refreshButton}
+                      onClick={refreshClick}
+                    >
+                      <Refresh />
+                    </Button>
+                  )}
                 </div>
               )}
             </GridItem>
@@ -1098,7 +1086,7 @@ const Details = props => {
             onClick={() => {
               if (
                 workitem.statusFK !== PHARMACY_STATUS.NEW &&
-                !props.values.orderItems.length
+                !pharmacyOrderItemCount
               ) {
                 updatePharmacy(PHARMACY_ACTION.CANCEL)
               } else {
@@ -1108,7 +1096,7 @@ const Details = props => {
             }}
           >
             {workitem.statusFK !== PHARMACY_STATUS.NEW &&
-            !props.values.orderItems.length
+            !pharmacyOrderItemCount
               ? 'Cancel'
               : 'Close'}
           </Button>
@@ -1117,7 +1105,7 @@ const Details = props => {
               <Button
                 color='success'
                 size='sm'
-                disabled={isOrderUpdate || !props.values.orderItems.length}
+                disabled={isOrderUpdate || !pharmacyOrderItemCount}
                 onClick={editOrder}
               >
                 {workitem.visitPurposeFK == VISIT_TYPE.RETAIL
@@ -1134,7 +1122,9 @@ const Details = props => {
                 onClick={() => {
                   setShowRedispenseFormModal(true)
                 }}
-                disabled={!props.values.orderItems.length}
+                disabled={
+                  !pharmacyOrderItemCount || workitem.isPharmacyOrderDiscard
+                }
               >
                 Re-dispense
               </Button>
@@ -1146,7 +1136,7 @@ const Details = props => {
                 color='primary'
                 size='sm'
                 onClick={onPrepare}
-                disabled={isOrderUpdate || !props.values.orderItems.length}
+                disabled={isOrderUpdate || !pharmacyOrderItemCount}
               >
                 Prepare
               </Button>
@@ -1158,7 +1148,7 @@ const Details = props => {
                 color='primary'
                 size='sm'
                 onClick={() => updatePharmacy(PHARMACY_ACTION.VERIFY)}
-                disabled={isOrderUpdate || !props.values.orderItems.length}
+                disabled={isOrderUpdate || !pharmacyOrderItemCount}
               >
                 Verify
               </Button>
@@ -1170,7 +1160,7 @@ const Details = props => {
                 color='primary'
                 size='sm'
                 onClick={() => updatePharmacy(PHARMACY_ACTION.COMPLETE)}
-                disabled={isOrderUpdate || !props.values.orderItems.length}
+                disabled={isOrderUpdate || !pharmacyOrderItemCount}
               >
                 Complete
               </Button>
@@ -1220,7 +1210,7 @@ export default compose(
     codetable,
   })),
   withFormikExtend({
-    enableReinitialize: false,
+    enableReinitialize: true,
     mapPropsToValues: ({ pharmacyDetails, clinicSettings, codetable }) => {
       if (!pharmacyDetails.entity) return { orderItems: [] }
       const {

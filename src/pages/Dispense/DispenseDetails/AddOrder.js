@@ -670,12 +670,12 @@ export default compose(
         }
 
         const retailInvoiceItem = rows.map(mapRetailItemPropertyToApi)
-        const isPharmacyOrderUpdated =
+        const isPharmacyOrderUpdate =
           isEnablePharmacyModule && isPharmacyOrderUpdated(orders)
         const payload = {
           ...addOrderDetails,
           ...summary,
-          isPharmacyOrderUpdated,
+          isPharmacyOrderUpdated: isPharmacyOrderUpdate,
           retailInvoiceItem,
           retailInvoiceAdjustment: finalAdjustments,
         }
@@ -685,7 +685,7 @@ export default compose(
           payload,
         }).then(r => {
           if (r) {
-            if (isPharmacyOrderUpdated) {
+            if (isPharmacyOrderUpdate) {
               const userProfile = user.data.clinicianProfile
               const userName = `${
                 userProfile.title && userProfile.title.trim().length

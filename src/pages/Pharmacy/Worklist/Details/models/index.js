@@ -60,6 +60,7 @@ export default createFormViewModel({
               entity: {
                 ...entity,
                 isPharmacyOrderUpdate: true,
+                isPharmacyOrderDiscard:false,
                 updateMessage: message,
               },
             },
@@ -76,6 +77,7 @@ export default createFormViewModel({
             payload: {
               entity: {
                 ...entity,
+                isPharmacyOrderUpdate: false,
                 isPharmacyOrderDiscard: true,
                 updateMessage: message,
               },
