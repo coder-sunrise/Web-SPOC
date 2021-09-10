@@ -189,6 +189,7 @@ const Stock = ({
         sortingEnabled: false,
         align: 'center',
         render: row => {
+          if (row.isDefault) return ''
           return (
             <Tooltip
               title={`Delete ${objectType().name} batch`}

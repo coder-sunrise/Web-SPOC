@@ -10,6 +10,7 @@ import {
   NumberInput,
 } from '@/components'
 import Yup from '@/utils/yup'
+import { getTranslationValue } from '@/utils/utils'
 import { DoctorProfileSelect, DoctorLabel } from '@/components/_medisys'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
@@ -48,20 +49,26 @@ const getType = (typeId) => {
   return type
 }
 
-@connect(({ codetable, visitRegistration, patient }) => ({
+@connect(({ codetable, visitRegistration, patient, clinicSettings }) => ({
   codetable,
   visitRegistration,
-  patient
+  patient,
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 @withFormikExtend({
   mapPropsToValues: ({ consultation }) => consultation.entity,
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, user, codetable, visitRegistration, patient } = props
+    const { dispatch, onConfirm, user, codetable, visitRegistration, patient, clinicSettings } = props
+    const { primaryPrintoutLanguage = 'EN', secondaryPrintoutLanguage = '' } = clinicSettings
     const { pendingPackage } = values
     const {
       inventorymedication = [],
       inventoryvaccination = [],
       inventoryconsumable = [],
+      ctmedicationusage = [],
+      ctmedicationunitofmeasurement = [],
+      ctmedicationfrequency = [],
+      ctmedicationdosage = [],
       ctservice = []
     } = codetable
     const { weightKG } = visitRegistration.entity.visit
@@ -76,20 +83,31 @@ const getType = (typeId) => {
       })
     }
 
-    const getInstruction = (medication, matchInstruction) => {
-      let instruction = ''
-      const usageMethod = medication.medicationUsage
-      instruction += `${usageMethod ? usageMethod.name : ''} `
-      const dosage = matchInstruction?.prescribingDosage
-      instruction += `${dosage ? dosage.name : ''} `
-      const prescribe = medication.prescribingUOM
-      instruction += `${prescribe ? prescribe.name : ''} `
-      const drugFrequency = matchInstruction?.medicationFrequency
-      instruction += `${drugFrequency ? drugFrequency.name : ''}`
-      const itemDuration = matchInstruction?.duration
-        ? ` For ${matchInstruction.duration} day(s)`
-        : ''
-      instruction += itemDuration
+    const getInstruction = (medication, matchInstruction, language) => {
+      const usage = ctmedicationusage.find(usage => usage.id === medication.medicationUsage?.id)
+      const uom = ctmedicationunitofmeasurement.find(uom => uom.id === medication.prescribingUOM.id)
+      const frequency = ctmedicationfrequency.find(frequency => frequency.id === matchInstruction?.medicationFrequency?.id)
+      const dosage = ctmedicationdosage.find(dosage => dosage.id === matchInstruction?.prescribingDosage?.id)
+
+      const itemDuration = matchInstruction?.duration ? ` For ${matchInstruction.duration} day(s)` : ''
+
+      const instruction = `${getTranslationValue(
+        usage?.translationData,
+        language,
+        'displayValue',
+      )} ${getTranslationValue(
+        dosage?.translationData,
+        language,
+        'displayValue',
+      )} ${getTranslationValue(
+        uom?.translationData,
+        language,
+        'displayValue',
+      )} ${getTranslationValue(
+        frequency?.translationData,
+        language,
+        'displayValue',
+      )}${itemDuration}`
       return instruction
     }
 
@@ -104,7 +122,9 @@ const getType = (typeId) => {
         age = Math.floor(moment.duration(moment().diff(dob)).asYears())
       }
       var matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weightKG))
-
+      const medicationfrequency = matchInstruction?.medicationFrequency
+      const medicationdosage = matchInstruction?.medicationFrequency
+      const uom = ctmedicationunitofmeasurement.find(uom => uom.id === medication.dispensingUOM.id)
       let item
       if (medication.isActive === true) {
         const medicationdispensingUOM = medication.dispensingUOM
@@ -149,27 +169,37 @@ const getType = (typeId) => {
             : undefined,
           batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
           isExternalPrescription: false,
-          instruction: getInstruction(medication, matchInstruction),
+          instruction: getInstruction(medication, matchInstruction, primaryPrintoutLanguage),
+          secondInstruction: secondaryPrintoutLanguage !== '' ? getInstruction(medication, matchInstruction, secondaryPrintoutLanguage) : '',
           dispenseUOMFK: medication?.dispensingUOM?.id,
           inventoryDispenseUOMFK: medication?.dispensingUOM?.id,
           inventoryPrescribingUOMFK: medication?.prescribingUOM?.id,
           dispenseUOMCode: medicationdispensingUOM
             ? medicationdispensingUOM.code
             : undefined,
-          dispenseUOMDisplayValue: medicationdispensingUOM
-            ? medicationdispensingUOM.name
-            : undefined,
+          dispenseUOMDisplayValue: getTranslationValue(
+            uom?.translationData,
+            primaryPrintoutLanguage,
+            'displayValue',
+          ),
+          secondDispenseUOMDisplayValue: secondaryPrintoutLanguage !== '' ? getTranslationValue(
+            uom?.translationData,
+            secondaryPrintoutLanguage,
+            'displayValue',
+          ) : '',
           corPrescriptionItemPrecaution: currentMedicationPrecautions,
           corPrescriptionItemInstruction: [
             {
-              usageMethodFK: medication.medicationUsage.id,
+              usageMethodFK: medication.medicationUsage?.id,
               usageMethodCode: medicationusage
                 ? medicationusage.code
                 : undefined,
               usageMethodDisplayValue: medicationusage
                 ? medicationusage.name
                 : undefined,
-              dosageFK: medicationdosage ? medicationdosage.id : undefined,
+              dosageFK: medicationdosage
+                ? medicationdosage.id
+                : undefined,
               dosageCode: medicationdosage ? medicationdosage.code : undefined,
               dosageDisplayValue: medicationdosage
                 ? medicationdosage.name
@@ -181,7 +211,9 @@ const getType = (typeId) => {
               prescribeUOMDisplayValue: medicationprescribingUOM
                 ? medicationprescribingUOM.name
                 : undefined,
-              drugFrequencyFK: medication.medicationFrequency.id,
+              drugFrequencyFK: medicationfrequency
+                ? medicationfrequency.id
+                : undefined,
               drugFrequencyCode: medicationfrequency
                 ? medicationfrequency.code
                 : undefined,
@@ -372,14 +404,21 @@ const getType = (typeId) => {
       return item
     }
 
+    const getType = (invoiceItemTypeFK) => {
+      if (invoiceItemTypeFK === 1) return '1'
+      if (invoiceItemTypeFK === 2) return '4'
+      if (invoiceItemTypeFK === 3) return '2'
+      if (invoiceItemTypeFK === 4) return '3'
+    }
+
     if (pendingPackage) {
       const consumeItems = pendingPackage.filter(p => p.consumeQuantity > 0 && p.isActive)
       let nextSequence = getNextSequence(props)
       for (let index = 0; index < consumeItems.length; index++) {
         const newOrder = getItemFromPackage(consumeItems[index])
         if (newOrder) {
-          let type = pendingPackage[index].type
-          if (pendingPackage[index].type === '3') {
+          let type = getType(pendingPackage[index].invoiceItemTypeFK)
+          if (type === '3') {
             if (newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER
               || newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE) { type = '9' }
             else if (newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER
@@ -486,6 +525,8 @@ class ConsumePackage extends Component {
     super(props)
     const { dispatch } = props
     const codeTableNameArray = [
+      'ctmedicationusage',
+      'ctmedicationunitofmeasurement',
       'ctmedicationfrequency',
       'ctmedicationdosage',
     ]

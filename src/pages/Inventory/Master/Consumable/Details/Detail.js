@@ -2,6 +2,7 @@ import React from 'react'
 import { formatMessage } from 'umi'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
+import { connect } from 'dva'
 import { compose } from 'redux'
 import {
   CodeSelect,
@@ -14,11 +15,15 @@ import {
   Field,
 } from '@/components'
 import SharedContainer from '../../SharedContainer'
-import clinicSettings from '@/models/clinicSettings'
 
 const styles = () => ({})
 
-const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
+const Detail = ({
+  consumableDetail,
+  hasActiveSession,
+  theme,
+  clinicSettings,
+}) => {
   return (
     <SharedContainer>
       <div
@@ -104,45 +109,49 @@ const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
                       simple
                       valueField='id'
                       textField='name'
-                      options={
-                        (() => {
-                          var arr = []
-                          if (clinicSettings.isEnableCHAS) {
-                            arr.push(...[{
-                              id: 'isChasAcuteClaimable',
-                              name: 'CHAS Acute Claimable',
+                      options={(() => {
+                        var arr = []
+                        if (clinicSettings.isEnableCHAS) {
+                          arr.push(
+                            ...[
+                              {
+                                id: 'isChasAcuteClaimable',
+                                name: 'CHAS Acute Claimable',
 
-                              layoutConfig: {
-                                style: {},
+                                layoutConfig: {
+                                  style: {},
+                                },
                               },
-                            },
-                            {
-                              id: 'isChasChronicClaimable',
-                              name: 'CHAS Chronic Claimable',
+                              {
+                                id: 'isChasChronicClaimable',
+                                name: 'CHAS Chronic Claimable',
 
-                              layoutConfig: {
-                                style: {},
+                                layoutConfig: {
+                                  style: {},
+                                },
                               },
-                              },
-                            ])
-                          }
-                          arr.push(...[{
+                            ],
+                          )
+                        }
+                        if (clinicSettings.isEnablePharmacyModule) {
+                          arr.push({
                             id: 'isDispensedByPharmacy',
                             name: 'Dispensed by Pharmacy',
                             layoutConfig: {
                               style: {},
                             },
+                          })
+                        }
+                        arr.push({
+                          id: 'isNurseActualizable',
+                          name: 'Nurse Actualizable',
+                          layoutConfig: {
+                            style: {},
                           },
-                          {
-                            id: 'isNurseActualizable',
-                            name: 'Nurse Actualizable',
-                            layoutConfig: {
-                              style: {},
-                            },
-                          },])
-                          return arr
-                        })()}
-                      onChange={(e, s) => { }}
+                        })
+                        return arr
+                      })()}
+                      onChange={(e, s) => {}}
                       {...args}
                     />
                   )}
@@ -234,6 +243,9 @@ const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
   )
 }
 export default compose(
+  connect(({ clinicSettings }) => ({
+    clinicSettings: clinicSettings.settings,
+  })),
   withStyles(styles, { withTheme: true }),
   React.memo,
 )(Detail)

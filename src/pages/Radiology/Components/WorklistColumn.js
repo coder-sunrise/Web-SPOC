@@ -9,6 +9,8 @@ const defaultColumnStyle = {
   borderRadius: 5,
   display: 'flex',
   flexDirection: 'column',
+  padding: 1,
+  margin: '0px 4px',
 }
 
 const columnBodyStyle = {
@@ -17,7 +19,7 @@ const columnBodyStyle = {
   flex: '1 1 auto',
   overflow: 'auto',
   height: 0,
-  padding: '0 8px',
+  padding: '3px',
 }
 
 const WorlklistColumnTitle = ({ title, workItemCount }) => {
@@ -32,7 +34,7 @@ const WorlklistColumnTitle = ({ title, workItemCount }) => {
     >
       <Typography.Title
         level={4}
-        style={{ color: 'white', gridColumnStart: 2 }}
+        style={{ color: 'white', gridColumnStart: 2, marginBottom: 5 }}
       >
         {title}
       </Typography.Title>
@@ -57,11 +59,12 @@ const WorklistColumnBody = ({ data, renderWorkitem }) => (
   </div>
 )
 
-export const WorklistColumn = ({ data, renderWorkitem }) => (
+export const WorklistColumn = ({ data, renderWorkitem, columnPercentage }) => (
   <div
     style={{
       ...defaultColumnStyle,
       backgroundColor: data.backgroundColor,
+      width: `${columnPercentage}%`,
     }}
   >
     <WorlklistColumnTitle

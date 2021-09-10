@@ -131,7 +131,7 @@ const _routes = [
         icon: 'icon-radiology',
         name: 'radiology',
         moduleName: 'Radiology',
-        authority: ['radiology'], 
+        authority: ['radiology'],
         specialist: ['GP', 'Dental'],
         routes: [
           {
@@ -149,6 +149,25 @@ const _routes = [
             mini: 'RW',
             exact: true,
             authority: ['radiology/worklisthistory'],
+          },
+        ],
+      },
+      {
+        path: '/pharmacy',
+        icon: 'icon-plus-square',
+        name: 'pharmacy',
+        moduleName: 'Pharmacy',
+        authority: ['pharmacy'],
+        clinicSetting: ['isEnablePharmacyModule'],
+        specialist: ['GP', 'Dental'],
+        routes: [
+          {
+            path: '/pharmacy/worklist',
+            name: 'worklist',
+            component: './Pharmacy/Worklist',
+            mini: 'PW',
+            exact: true,
+            authority: ['pharmacy/pharmacyworklist'],
           },
         ],
       },
@@ -172,46 +191,46 @@ const _routes = [
       //   authority: ['patientdatabase'],
       //   specialist: ['GP', 'Dental'],
       //   component: './PatientDatabase/Search',
-        // routes: [
-        //   // {
-        //   //   path: '/patientdb/new',
-        //   //   name: 'new',
-        //   //   mini: 'NP',
-        //   //   component: './PatientDatabase/New',
-        //   //   hideChildrenInMenu: true,
-        //   //   routes: [
-        //   //     {
-        //   //       path: '/patientdb/new/personal',
-        //   //       name: 'Personal Info',
-        //   //       // component: './PatientDatabase/Personal',
-        //   //     },
-        //   //     {
-        //   //       path: '/patientdb/new/emergency',
-        //   //       name: 'Emergency Contact',
-        //   //       // component: './PatientDatabase/EmergencyContact',
-        //   //     },
-        //   //     {
-        //   //       path: '/patientdb/new/allergies',
-        //   //       name: 'Allergies',
-        //   //       // component: './PatientDatabase/Allergies',
-        //   //     },
-        //   //     {
-        //   //       path: '/patientdb/new/schemes',
-        //   //       name: 'Schemes',
-        //   //       // component: './PatientDatabase/Schemes',
-        //   //     },
-        //   //   ],
-        //   // },
-        //   {
-        //     path: '/patientdb/search',
-        //     name: 'search',
-        //     mini: 'SP',
-        //     component: './PatientDatabase/Search',
-        //     authority: [
-        //       'patientdatabase',
-        //     ],
-        //   },
-        // ],
+      // routes: [
+      //   // {
+      //   //   path: '/patientdb/new',
+      //   //   name: 'new',
+      //   //   mini: 'NP',
+      //   //   component: './PatientDatabase/New',
+      //   //   hideChildrenInMenu: true,
+      //   //   routes: [
+      //   //     {
+      //   //       path: '/patientdb/new/personal',
+      //   //       name: 'Personal Info',
+      //   //       // component: './PatientDatabase/Personal',
+      //   //     },
+      //   //     {
+      //   //       path: '/patientdb/new/emergency',
+      //   //       name: 'Emergency Contact',
+      //   //       // component: './PatientDatabase/EmergencyContact',
+      //   //     },
+      //   //     {
+      //   //       path: '/patientdb/new/allergies',
+      //   //       name: 'Allergies',
+      //   //       // component: './PatientDatabase/Allergies',
+      //   //     },
+      //   //     {
+      //   //       path: '/patientdb/new/schemes',
+      //   //       name: 'Schemes',
+      //   //       // component: './PatientDatabase/Schemes',
+      //   //     },
+      //   //   ],
+      //   // },
+      //   {
+      //     path: '/patientdb/search',
+      //     name: 'search',
+      //     mini: 'SP',
+      //     component: './PatientDatabase/Search',
+      //     authority: [
+      //       'patientdatabase',
+      //     ],
+      //   },
+      // ],
       // },
       //
       // SMS
@@ -417,14 +436,14 @@ const _routes = [
             name: 'corporate-billing',
             mini: 'CB',
             component: './Finance/CorporateBilling',
-            authority: [ 'finance/corporatebilling' ],
+            authority: ['finance/corporatebilling'],
           },
           {
             path: '/finance/billing/details/:id',
             name: 'corporate-billing/detail',
             hideInMenu: true,
             component: './Finance/CorporateBilling/Details',
-            authority: [ 'finance/corporatebilling' ],
+            authority: ['finance/corporatebilling'],
           },
           {
             path: '/finance/deposit',
@@ -739,7 +758,7 @@ const _routes = [
         moduleName: 'Claim Submission',
         hideChildrenInMenu: true,
         authority: ['claimsubmission'],
-        clinicSetting: ['isEnableCHAS','isEnableMedisave'],
+        clinicSetting: ['isEnableCHAS', 'isEnableMedisave'],
         specialist: ['GP'],
         routes: [
           {

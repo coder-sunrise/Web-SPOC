@@ -43,6 +43,7 @@ const Medication = ({ dispatch, history, medication, values }) => {
       columnName: 'dispensingUOM',
       type: 'codeSelect',
       code: 'ctmedicationunitofmeasurement',
+      labelField: 'displayValue',
       sortBy: 'DispensingUOMFkNavigation.DisplayValue',
     },
     {

@@ -166,7 +166,13 @@ const General = ({
       checkboxOptions.push(...medisaveOptions)
     }
 
-    checkboxOptions.push(...generalOptions)
+    if (!clinicSettings.isEnablePharmacyModule) {
+      checkboxOptions.push(
+        ...generalOptions.filter(o => o.id !== 'isDispensedByPharmacy'),
+      )
+    } else {
+             checkboxOptions.push(...generalOptions)
+           }
     return checkboxOptions
   }
 

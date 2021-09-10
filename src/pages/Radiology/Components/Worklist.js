@@ -4,8 +4,9 @@ import ProCard from '@ant-design/pro-card'
 import { Icon } from '@/components'
 import { WorklistColumn } from './WorklistColumn'
 import { Workitem } from './WorkItem'
+import PharmacyWorkItem from './PharmacyWorkItem'
 
-export const Worklist = ({ columns }) => {
+export const Worklist = ({ columns, worklistType = 'Radiology' }) => {
   const [columnPercentage, setColumnPercentage] = useState(100)
 
   useEffect(() => {
@@ -21,10 +22,24 @@ export const Worklist = ({ columns }) => {
     columnGap: 15,
   }
 
+  const gridStyle2 = { height: '100%', display: 'flex' }
+
   return (
-    <div style={gridStyle}>
+    <div style={worklistType === 'Radiology' ? gridStyle : gridStyle2}>
       {columns.map((column, index) => (
-        <WorklistColumn data={column} renderWorkitem={Workitem} />
+        <WorklistColumn
+          columnPercentage={
+            worklistType === 'Radiology' ? 100 : columnPercentage
+          }
+          data={column}
+          renderWorkitem={
+            worklistType === 'Radiology'
+              ? Workitem
+              : item => {
+                  return <PharmacyWorkItem item={item} />
+                }
+          }
+        />
       ))}
     </div>
   )

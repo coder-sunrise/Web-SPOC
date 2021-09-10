@@ -314,10 +314,173 @@ const cleanConsultation = values => {
   }
 }
 
+const isPharmacyOrderUpdated = orders => {
+  const { rows, _originalRows } = orders
+
+  let isUpdatedPharmacy = false
+  const isPushToPharmacy = item => {
+    let isPushToPharmacy = false
+    if (item.type === '1' || item.type === '4') {
+      isPushToPharmacy = item.isDispensedByPharmacy
+    }
+    return isPushToPharmacy
+  }
+
+  const generateMedication = item => {
+    return {
+      adjAmount: item.adjAmount,
+      adjType: item.adjType,
+      adjValue: item.adjValue,
+      costPrice: item.costPrice,
+      dispenseUOMCode: item.dispenseUOMCode,
+      dispenseUOMDisplayValue: item.dispenseUOMDisplayValue,
+      dispenseUOMFK: item.dispenseUOMFK,
+      drugCode: item.drugCode,
+      drugName: item.drugName,
+      gstAmount: item.gstAmount,
+      instruction: item.instruction,
+      inventoryMedicationFK: item.inventoryMedicationFK,
+      isChargeToday: item.isChargeToday,
+      isClaimable: item.isClaimable,
+      isDeleted: item.isDeleted,
+      isDispensedByPharmacy: item.isDispensedByPharmacy,
+      isDrugMixture: item.isDrugMixture,
+      isExclusive: item.isExclusive,
+      isNurseActualizeRequired: item.isNurseActualizeRequired,
+      isPreOrder: item.isPreOrder,
+      performingUserFK: item.performingUserFK,
+      quantity: item.quantity,
+      remarks: item.remarks,
+      secondInstruction: item.secondInstruction,
+      seconDispenseUOMDisplayValue: item.seconDispenseUOMDisplayValue,
+      totalAfterGST: item.totalAfterGST,
+      totalAfterItemAdjustment: item.totalAfterItemAdjustment,
+      totalAfterOverallAdjustment: item.totalAfterOverallAdjustment,
+      totalPrice: item.totalPrice,
+      unitPrice: item.unitPrice,
+    }
+  }
+
+  const generateConsumable = item => {
+    return {
+      adjAmount: item.adjAmount,
+      adjType: item.adjType,
+      adjValue: item.adjValue,
+      batchNo: item.batchNo,
+      consumableCode: item.consumableCode,
+      consumableName: item.consumableName,
+      gstAmount: item.gstAmount,
+      inventoryConsumableFK: item.inventoryConsumableFK,
+      isChargeToday: item.isChargeToday,
+      isDeleted: item.isDeleted,
+      isDispensedByPharmacy: item.isDispensedByPharmacy,
+      isNurseActualizeRequired: item.isNurseActualizeRequired,
+      isPreOrder: item.isPreOrder,
+      performingUserFK: item.performingUserFK,
+      quantity: item.quantity,
+      remark: item.remark,
+      totalAfterGST: item.totalAfterGST,
+      totalAfterItemAdjustment: item.totalAfterItemAdjustment,
+      totalAfterOverallAdjustment: item.totalAfterOverallAdjustment,
+      totalPrice: item.totalPrice,
+      unitOfMeasurement: item.unitOfMeasurement,
+      unitPrice: item.unitPrice,
+    }
+  }
+
+  const generateDrudMixture = item => {
+    return {
+      costPrice: item.costPrice,
+      drugCode: item.drugCode,
+      drugName: item.drugName,
+      inventoryMedicationFK: item.inventoryMedicationFK,
+      isDeleted: item.isDeleted,
+      isDispensedByPharmacy: item.isDispensedByPharmacy,
+      isNurseActualizeRequired: item.isNurseActualizeRequired,
+      prescribeUOMCode: item.prescribeUOMCode,
+      prescribeUOMDisplayValue: item.prescribeUOMDisplayValue,
+      prescribeUOMFK: item.prescribeUOMFK,
+      quantity: item.quantity,
+      revenueCategoryFK: item.revenueCategoryFK,
+      totalPrice: item.totalPrice,
+      unitPrice: item.unitPrice,
+      uomCode: item.uomCode,
+      uomDisplayValue: item.uomDisplayValue,
+      uomfk: item.uomfk,
+      secondUOMDisplayValue: item.secondUOMDisplayValue,
+    }
+  }
+
+  const isItemUpdate = item => {
+    const currentRow = rows.find(r => r.id === item.id && r.type === item.type)
+    const isEqual =
+      item.type === '1'
+        ? _.isEqual(generateMedication(item), generateMedication(currentRow))
+        : _.isEqual(generateConsumable(item), generateConsumable(currentRow))
+    return !isEqual
+  }
+
+  const isItemDrugMixtureUpdate = (item, drugMixture) => {
+    const currentDrugMixture = drugMixture.find(r => r.id === item.id)
+    const isEqual = _.isEqual(
+      generateDrudMixture(item),
+      generateDrudMixture(currentDrugMixture),
+    )
+    return !isEqual
+  }
+
+  const pharmacyOrder = _originalRows.filter(r => isPushToPharmacy(r))
+  for (let index = 0; index < pharmacyOrder.length; index++) {
+    if (pharmacyOrder[index].type === '1') {
+      if (isItemUpdate(pharmacyOrder[index])) {
+        isUpdatedPharmacy = true
+        break
+      }
+
+      if (pharmacyOrder[index].isDrugMixture) {
+        const currentRow = rows.find(
+          r =>
+            r.id === pharmacyOrder[index].id &&
+            r.type === pharmacyOrder[index].type,
+        )
+
+        if (currentRow.corPrescriptionItemDrugMixture.find(d => !d.id)) {
+          isUpdatedPharmacy = true
+          break
+        }
+        const drugMixture = pharmacyOrder[index].corPrescriptionItemDrugMixture
+        for (let i = 0; i < drugMixture.length; i++) {
+          if (
+            isItemDrugMixtureUpdate(
+              drugMixture[i],
+              currentRow.corPrescriptionItemDrugMixture,
+            )
+          ) {
+            isUpdatedPharmacy = true
+            return
+          }
+        }
+      }
+    } else {
+      if (isItemUpdate(pharmacyOrder[index])) {
+        isUpdatedPharmacy = true
+        break
+      }
+    }
+  }
+
+  if (!isUpdatedPharmacy) {
+    isUpdatedPharmacy =
+      rows.filter(r => !r.id && isPushToPharmacy(r)).length > 0
+  }
+  return isUpdatedPharmacy
+}
+
 export {
   orderTypes,
   cleanConsultation,
   convertToConsultation,
   convertConsultationDocument,
   cleanFields,
+  isPharmacyOrderUpdated,
 }
