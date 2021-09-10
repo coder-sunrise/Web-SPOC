@@ -182,7 +182,7 @@ export default compose(
       if (isAutoGenerateCertificate) {
         schemes.push('isAutoGenerateCertificate')
       }
-      if (isNurseActualizable) {
+      if (isNurseActualizable || !returnValue.id) {
         schemes.push('isNurseActualizable')
       }
 

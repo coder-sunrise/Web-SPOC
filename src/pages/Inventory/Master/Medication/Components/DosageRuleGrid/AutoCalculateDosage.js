@@ -22,7 +22,7 @@ const AutoCalculateDosage = ({
 }) => {
   const [ruleType, setRuleType] = useState(DOSAGE_RULE.default)
   const { isEditingDosageRule } = useContext(DetailsContext)
-  console.log(ruleType, values)
+  // console.log(ruleType, values)
   useEffect(() => {
     if (
       values.medicationInstructionRule &&

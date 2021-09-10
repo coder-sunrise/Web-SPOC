@@ -282,7 +282,7 @@ class Grid extends PureComponent {
                           </Tooltip>
                         )}
                         {item.isExclusive && (
-                          <Tooltip title='Exclusive Drug'>
+                          <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                             <div
                               className={classes.rightIcon}
                               style={{

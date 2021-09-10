@@ -24,6 +24,7 @@ const Detail = ({
   theme,
   clinicSettings,
 }) => {
+  const { settings = [] } = clinicSettings
   return (
     <SharedContainer>
       <div
@@ -111,7 +112,7 @@ const Detail = ({
                       textField='name'
                       options={(() => {
                         var arr = []
-                        if (clinicSettings.isEnableCHAS) {
+                        if (settings.isEnableCHAS) {
                           arr.push(
                             ...[
                               {
@@ -133,22 +134,59 @@ const Detail = ({
                             ],
                           )
                         }
-                        if (clinicSettings.isEnablePharmacyModule) {
-                          arr.push({
-                            id: 'isDispensedByPharmacy',
-                            name: 'Dispensed by Pharmacy',
-                            layoutConfig: {
-                              style: {},
+
+                        arr.push(
+                          ...[
+                            {
+                              id: 'isOnlyClinicInternalUsage',
+                              name: 'Orderable',
+                              tooltip:
+                                'Item is orderable and dispensable to patient',
+                              disabled:
+                                hasActiveSession && consumableDetail.entity?.id,
+                              layoutConfig: {
+                                style: {},
+                              },
                             },
-                          })
-                        }
-                        arr.push({
-                          id: 'isNurseActualizable',
-                          name: 'Nurse Actualizable',
-                          layoutConfig: {
-                            style: {},
-                          },
-                        })
+                          ],
+                        )
+
+                        if (settings.isEnablePharmacyModule)
+                          arr.push(
+                            ...[
+                              {
+                                id: 'isDispensedByPharmacy',
+                                name: 'Dispense by Pharmacy',
+                                tooltip:
+                                  "Item’s stock is deducted and dispense by pharmacy. If unchecked the setting, stock deduction will take place during finalization of patient's order",
+                                disabled:
+                                  hasActiveSession &&
+                                  consumableDetail.entity?.id,
+                                layoutConfig: {
+                                  style: {},
+                                },
+                              },
+                            ],
+                          )
+
+                        if (settings.isEnableNurseWorkItem)
+                          arr.push(
+                            ...[
+                              {
+                                id: 'isNurseActualizable',
+                                name: 'Actualize by Nurse',
+                                tooltip:
+                                  'Item will generate task for nurse to actualize',
+                                disabled:
+                                  hasActiveSession &&
+                                  consumableDetail.entity?.id,
+                                layoutConfig: {
+                                  style: {},
+                                },
+                              },
+                            ],
+                          )
+
                         return arr
                       })()}
                       onChange={(e, s) => {}}
