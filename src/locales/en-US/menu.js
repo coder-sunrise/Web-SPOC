@@ -205,6 +205,9 @@ export default {
   'menu.radiology': 'Radiology Center',
   'menu.radiology.worklist': 'Worklist',
 
+  'menu.pharmacy': 'Pharmacy',
+  'menu.pharmacy.worklist': 'Worklist',
+
   'menu.not-found': 'Not Found',
   'menu.forbidden': 'Forbidden',
 }

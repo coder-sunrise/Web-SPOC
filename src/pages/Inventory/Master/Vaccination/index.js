@@ -51,6 +51,7 @@ const Vaccination = ({
       columnName: 'dispensingUOM',
       type: 'codeSelect',
       code: 'ctmedicationunitofmeasurement',
+      labelField: 'displayValue',
       sortBy: 'dispensingUOMFkNavigation.displayValue',
       width: 110,
     },

@@ -3,8 +3,10 @@ import { withStyles } from '@material-ui/core/styles'
 import _ from 'lodash'
 import { connect } from 'dva'
 import { compose } from 'redux'
+import moment from 'moment'
 import { SizeContainer, withFormikExtend } from '@/components'
 import { convertToConsultation } from '@/pages/Consultation/utils'
+import { sendNotification } from '@/utils/realtime'
 import {
   VISIT_TYPE,
   INVOICE_ITEM_TYPE_BY_NAME,
@@ -15,6 +17,7 @@ import {
   NOTIFICATION_STATUS,
 } from '@/utils/constants'
 import { roundTo, getUniqueId } from '@/utils/utils'
+import { isPharmacyOrderUpdated } from '@/pages/Consultation/utils'
 import {
   getRetailCautionAlertContent,
   getCautionAlertContent,
@@ -45,13 +48,16 @@ const AddOrder = ({
       type: 'dispense/queryAddOrderDetails',
       payload: {
         invoiceId: id,
-        isInitialLoading: location.query.isInitialLoading,
+        isInitialLoading: location?.query?.isInitialLoading,
       },
     })
 
     if (r) {
-
-      const { retailInvoiceAdjustment, retailInvoiceItem, drugAllergies = [] } = r
+      const {
+        retailInvoiceAdjustment,
+        retailInvoiceItem,
+        drugAllergies = [],
+      } = r
       const mapRetailItemPropertyToOrderProperty = o => {
         let obj
         switch (o.invoiceItemTypeFK) {
@@ -67,7 +73,7 @@ const AddOrder = ({
               medicationItem = inventorymedication.find(
                 medication =>
                   medication.id ===
-                  o.retailVisitInvoiceDrug.inventoryMedicationFK &&
+                    o.retailVisitInvoiceDrug.inventoryMedicationFK &&
                   medication.isActive,
               )
             } else {
@@ -78,7 +84,7 @@ const AddOrder = ({
             obj = {
               type:
                 o.retailVisitInvoiceDrug.inventoryMedicationFK ||
-                  o.retailVisitInvoiceDrug.retailPrescriptionItem.isDrugMixture
+                o.retailVisitInvoiceDrug.retailPrescriptionItem.isDrugMixture
                   ? o.invoiceItemTypeFK.toString()
                   : ORDER_TYPE_TAB.OPENPRESCRIPTION,
               ...o.retailVisitInvoiceDrug,
@@ -112,7 +118,7 @@ const AddOrder = ({
             const { serviceId, serviceCenterId } = servicesList.find(
               s =>
                 s.serviceCenter_ServiceId ===
-                o.retailVisitInvoiceService.serviceCenterServiceFK &&
+                  o.retailVisitInvoiceService.serviceCenterServiceFK &&
                 s.isActive,
             )
             const serviceItem = ctservice.find(
@@ -138,7 +144,7 @@ const AddOrder = ({
             const consumableItem = inventoryconsumable.find(
               consumable =>
                 consumable.id ===
-                o.retailVisitInvoiceConsumable.inventoryConsumableFK &&
+                  o.retailVisitInvoiceConsumable.inventoryConsumableFK &&
                 consumable.isActive,
             )
             obj = {
@@ -215,20 +221,29 @@ const AddOrder = ({
             }
           })
 
-        if (isVaccinationExist.length || cuationItems.length || drugAllergies.length) {
+        if (
+          isVaccinationExist.length ||
+          cuationItems.length ||
+          drugAllergies.length
+        ) {
           dispatch({
             type: 'global/updateAppState',
             payload: {
               openConfirm: true,
               customWidth: 'md',
-              openConfirmContent: getCautionAlertContent(cuationItems.map(x => {
-                return {
-                  ...x, type: x.type === 1 ? 'Medication' : 'Vaccination'
-                }
-              }), drugAllergies, isVaccinationExist),
+              openConfirmContent: getCautionAlertContent(
+                cuationItems.map(x => {
+                  return {
+                    ...x,
+                    type: x.type === 1 ? 'Medication' : 'Vaccination',
+                  }
+                }),
+                drugAllergies,
+                isVaccinationExist,
+              ),
               alignContent: 'left',
               isInformType: true,
-              onConfirmSave: () => { },
+              onConfirmSave: () => {},
             },
           })
         }
@@ -246,6 +261,7 @@ const AddOrder = ({
         type: 'orders/updateState',
         payload: {
           rows: rowsWithoutVaccination,
+          _originalRows: rowsWithoutVaccination.map(r => ({ ...r })),
           finalAdjustments: newRetailInvoiceAdjustment,
           isGSTInclusive: r.isGSTInclusive,
           gstValue: r.gstValue,
@@ -293,13 +309,24 @@ const AddOrder = ({
 export default compose(
   withStyles(styles, { withTheme: true }),
   connect(
-    ({ dispense, orders, codetable, consultation, clinicInfo, forms }) => ({
+    ({
+      dispense,
+      orders,
+      codetable,
+      consultation,
+      clinicInfo,
+      forms,
+      clinicSettings,
+      user,
+    }) => ({
       dispense,
       orders,
       consultation,
       codetable,
       clinicInfo,
       forms,
+      clinicSettings: clinicSettings.settings || clinicSettings.default,
+      user,
     }),
   ),
   withFormikExtend({
@@ -315,9 +342,12 @@ export default compose(
         visitType,
         history,
         forms,
+        clinicSettings,
+        user,
       } = props
       const { rows, summary, finalAdjustments } = orders
       const { addOrderDetails } = dispense
+      const { isEnablePharmacyModule } = clinicSettings
       if (visitType === VISIT_TYPE.RETAIL) {
         const removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions = existingIDArray => instructionOrPrecaution => {
           if (existingIDArray.includes(instructionOrPrecaution.id)) {
@@ -501,8 +531,8 @@ export default compose(
                 subTotal: roundTo(o.totalPrice),
                 itemRevenueCategoryFK: o.isDrugMixture
                   ? getDrugMixtureRevenueCategory(
-                    o.corPrescriptionItemDrugMixture,
-                  )
+                      o.corPrescriptionItemDrugMixture,
+                    )
                   : revenueCategory.id,
                 // "adjType": "string",
                 // "adjValue": 0,
@@ -640,10 +670,12 @@ export default compose(
         }
 
         const retailInvoiceItem = rows.map(mapRetailItemPropertyToApi)
-
+        const isPharmacyOrderUpdate =
+          isEnablePharmacyModule && isPharmacyOrderUpdated(orders)
         const payload = {
           ...addOrderDetails,
           ...summary,
+          isPharmacyOrderUpdated: isPharmacyOrderUpdate,
           retailInvoiceItem,
           retailInvoiceAdjustment: finalAdjustments,
         }
@@ -653,6 +685,23 @@ export default compose(
           payload,
         }).then(r => {
           if (r) {
+            if (isPharmacyOrderUpdate) {
+              const userProfile = user.data.clinicianProfile
+              const userName = `${
+                userProfile.title && userProfile.title.trim().length
+                  ? `${userProfile.title}. ${userProfile.name || ''}`
+                  : `${userProfile.name || ''}`
+              }`
+              const message = `${userName} amended prescription at ${moment().format(
+                'HH:mm',
+              )}`
+              sendNotification('PharmacyOrderUpdate', {
+                type: NOTIFICATION_TYPE.CONSULTAION,
+                status: NOTIFICATION_STATUS.OK,
+                message,
+                visitID: dispense.visitID,
+              })
+            }
             if (onConfirm) onConfirm()
             history.push({
               pathname: history.location.pathname,

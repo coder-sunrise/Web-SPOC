@@ -64,7 +64,7 @@ const defaultColumns = [
         readonly
         code='ctmedicationunitofmeasurement'
         value={entity?.dispensingUOM?.id}
-        displayField='name'
+        displayField='displayValue'
         valueField='id'
       />
     ),

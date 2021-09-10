@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import _ from 'lodash'
+import moment from 'moment'
 // material ui
 import { Paper, withStyles, Link } from '@material-ui/core'
 import Print from '@material-ui/icons/Print'
@@ -107,10 +108,11 @@ const DispenseDetails = ({
   onDrugLabelNoChanged,
   selectedDrugs,
   clinicSettings,
-  servingPersons=[],
+  servingPersons = [],
   visit,
-  doctorprofile=[],
+  doctorprofile = [],
   patient,
+  user,
 }) => {
   const {
     prescription,
@@ -132,8 +134,9 @@ const DispenseDetails = ({
 
   const { inventorymedication, inventoryvaccination } = codetable
   const { settings = {} } = clinicSettings
-  const currentDoc = doctorprofile.filter(x=>x.id === visit.doctorProfileFK)
-  const docInfo = currentDoc && currentDoc.length > 0 ? currentDoc[0].clinicianProfile : {}
+  const currentDoc = doctorprofile.filter(x => x.id === visit.doctorProfileFK)
+  const docInfo =
+    currentDoc && currentDoc.length > 0 ? currentDoc[0].clinicianProfile : {}
 
   const handleSelectedBatch = (e, op = {}, row) => {
     if (op && op.length > 0) {
@@ -155,6 +158,22 @@ const DispenseDetails = ({
 
   const discardCallback = r => {
     if (r) {
+      const userProfile = user.data.clinicianProfile
+      const userName = `${
+        userProfile.title && userProfile.title.trim().length
+          ? `${userProfile.title}. ${userProfile.name || ''}`
+          : `${userProfile.name || ''}`
+      }`
+      const message = `${userName} discard prescription at ${moment().format(
+        'HH:mm',
+      )}`
+      sendNotification('PharmacyOrderDiscard', {
+        type: NOTIFICATION_TYPE.CONSULTAION,
+        status: NOTIFICATION_STATUS.OK,
+        message,
+        visitID: values.id,
+      })
+
       history.push('/reception/queue')
     }
   }
@@ -167,14 +186,15 @@ const DispenseDetails = ({
         id,
       },
     }).then(r => {
-      sendNotification('EditedConsultation', {
-        type: NOTIFICATION_TYPE.CONSULTAION,
-        status: NOTIFICATION_STATUS.OK,
-        message: 'Completed Consultation',
-        visitID: values.id,
-      })
-      discardCallback(r)
-    })
+                   sendNotification('EditedConsultation', {
+                     type: NOTIFICATION_TYPE.CONSULTAION,
+                     status: NOTIFICATION_STATUS.OK,
+                     message: 'Completed Consultation',
+                     visitID: values.id,
+                   })
+
+                   discardCallback(r)
+                 })
   }
 
   const discardBillOrder = () => {
@@ -318,8 +338,11 @@ const DispenseDetails = ({
   const [actualizationStatus, setActualizationStatus] = useState(-1)
 
   const isShowActualizeSelection = (records = []) => {
-    let actualizeOrderItemsRight = Authorized.check('dispense.actualizeorderitems')
-    let viewable = actualizeOrderItemsRight && actualizeOrderItemsRight.rights !== 'hidden'
+    let actualizeOrderItemsRight = Authorized.check(
+      'dispense.actualizeorderitems',
+    )
+    let viewable =
+      actualizeOrderItemsRight && actualizeOrderItemsRight.rights !== 'hidden'
 
     return viewable && records.filter(x => isActualizable(x)).length > 0
   }
@@ -339,10 +362,10 @@ const DispenseDetails = ({
   }
 
   const onActualizeBtnClick = (row, status) => {
-    setSelectedActualizeRows([row])
-    setActualizationStatus(status)
-    setShowActualization(true)
-  } 
+                                                 setSelectedActualizeRows([row])
+                                                 setActualizationStatus(status)
+                                                 setShowActualization(true)
+                                               }
 
   const handleMultiActualizationClick = type => {
     let selectedRows = []
@@ -379,7 +402,8 @@ const DispenseDetails = ({
     if (records.filter(x => isActualizable(x)).length > 0) {
       return (
         <Authorized authority='dispense.actualizeorderitems'>
-          <Link component="button"
+          <Link
+            component='button'
             style={{ marginLeft: 10, textDecoration: 'underline' }}
             onClick={() => {
               handleMultiActualizationClick(type)
@@ -434,8 +458,23 @@ const DispenseDetails = ({
             {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
             Patient Label
           </Button>
-          {visit.orderCreateTime && (<span style={{color:'#999999'}}>Order created by <span style={{fontWeight:500}}>{`${docInfo.title ? `${docInfo.title}.` : null}${docInfo.name}`} at {visit.orderCreateTime.format('DD MMM yyyy HH:mm')}</span> </span>)}
-          {servingPersons.length > 0 && (<span>Served by <span style={{fontWeight:500}}>{`${servingPersons.map(x=>x.servingBy).join(', ')}.`}</span></span>)}
+          {visit.orderCreateTime && (
+            <span style={{ color: '#999999' }}>
+              Order created by{' '}
+              <span style={{ fontWeight: 500 }}>
+                {`${docInfo.title ? `${docInfo.title}.` : null}${docInfo.name}`}{' '}
+                at {visit.orderCreateTime.format('DD MMM yyyy HH:mm')}
+              </span>{' '}
+            </span>
+          )}
+          {servingPersons.length > 0 && (
+            <span>
+              Served by{' '}
+              <span style={{ fontWeight: 500 }}>{`${servingPersons
+                .map(x => x.servingBy)
+                .join(', ')}.`}</span>
+            </span>
+          )}
         </GridItem>
         {!viewOnly && (
           <GridItem className={classes.rightActionButtons} md={5}>
@@ -482,20 +521,20 @@ const DispenseDetails = ({
                 Add Order
               </ProgressButton>
             )}
-             {!isRetailVisit && (
-                <Authorized authority='queue.servepatient'>
-                  <ServePatientButton 
-                    patientName={patient.name}
-                    justIcon={false}
-                    servingPersons={servingPersons}
-                    onConfirm={()=>{
-                      dispatch({
-                        type: 'dispense/setServingPerson',
-                        payload: { visitFK: visit.id },
-                      })
-                    }}
-                    />
-                </Authorized>
+            {!isRetailVisit && (
+              <Authorized authority='queue.servepatient'>
+                <ServePatientButton
+                  patientName={patient.name}
+                  justIcon={false}
+                  servingPersons={servingPersons}
+                  onConfirm={() => {
+                    dispatch({
+                      type: 'dispense/setServingPerson',
+                      payload: { visitFK: visit.id },
+                    })
+                  }}
+                />
+              </Authorized>
             )}
             {!isRetailVisit && (
               <Authorized authority='queue.dispense.editorder'>
@@ -575,9 +614,14 @@ const DispenseDetails = ({
           <Paper className={classes.paper}>
             <TableData
               title='Prescription'
-              titleExtend={actualizeSelectedItemButton('Prescription',prescription)}
+              titleExtend={actualizeSelectedItemButton(
+                'Prescription',
+                prescription,
+              )}
               selection={selectedPrescriptionRows}
-              onSelectionChange={(value)=>{ handleSelectionChange('Prescription',value) }}
+              onSelectionChange={value => {
+                handleSelectionChange('Prescription', value)
+              }}
               {...actualizeTableConfig(isShowActualizeSelection(prescription))}
               idPrefix='Prescription'
               forceRender
@@ -588,15 +632,20 @@ const DispenseDetails = ({
                 inventorymedication,
                 handleSelectedBatch,
                 onActualizeBtnClick,
-                showDrugLabelRemark
+                showDrugLabelRemark,
               )}
               data={prescription}
             />
             <VaccinationGrid
               title='Vaccination'
-              titleExtend={actualizeSelectedItemButton('Vaccination',vaccination)}
+              titleExtend={actualizeSelectedItemButton(
+                'Vaccination',
+                vaccination,
+              )}
               selection={selectedVaccinationRows}
-              onSelectionChange={(value)=>{ handleSelectionChange('Vaccination',value) }}
+              onSelectionChange={value => {
+                handleSelectionChange('Vaccination', value)
+              }}
               {...actualizeTableConfig(isShowActualizeSelection(vaccination))}
               idPrefix='Vaccination'
               columns={VaccinationColumn}
@@ -612,13 +661,22 @@ const DispenseDetails = ({
 
             <TableData
               title='Other Orders'
-              titleExtend={actualizeSelectedItemButton('OtherOrders',otherOrder)}
+              titleExtend={actualizeSelectedItemButton(
+                'OtherOrders',
+                otherOrder,
+              )}
               selection={selectedOtherOrderRows}
-              onSelectionChange={(value)=>{ handleSelectionChange('OtherOrders',value) }}
+              onSelectionChange={value => {
+                handleSelectionChange('OtherOrders', value)
+              }}
               {...actualizeTableConfig(isShowActualizeSelection(otherOrder))}
               idPrefix='OtherOrders'
               columns={OtherOrdersColumns}
-              colExtensions={OtherOrdersColumnExtensions(viewOnly, onPrint, onActualizeBtnClick)}
+              colExtensions={OtherOrdersColumnExtensions(
+                viewOnly,
+                onPrint,
+                onActualizeBtnClick,
+              )}
               data={otherOrder}
             />
 
@@ -627,7 +685,10 @@ const DispenseDetails = ({
                 title='Package'
                 idPrefix='package'
                 columns={PackageColumns}
-                colExtensions={PackageColumnExtensions(onPrint, showDrugLabelRemark)}
+                colExtensions={PackageColumnExtensions(
+                  onPrint,
+                  showDrugLabelRemark,
+                )}
                 data={packageItem}
                 FuncProps={{
                   pager: false,
@@ -801,9 +862,12 @@ const DispenseDetails = ({
       >
         <NurseActualization
           status={actualizationStatus}
-          nurseWorkitemIds={selectedActualizeRows.map(x => x.workitem?.nurseWorkitem?.id).filter(x=>x).join(',')}
+          nurseWorkitemIds={selectedActualizeRows
+            .map(x => x.workitem?.nurseWorkitem?.id)
+            .filter(x => x)
+            .join(',')}
           dispatch={dispatch}
-          handleSubmit={()=>{
+          handleSubmit={() => {
             onNurseActualizationClose()
             const version = Date.now()
             dispatch({
@@ -812,7 +876,7 @@ const DispenseDetails = ({
                 id: values.id,
                 version: version,
               },
-            }).then((r)=>{
+            }).then(r => {
               dispatch({
                 type: 'dispense/updateState',
                 payload: {
@@ -830,12 +894,22 @@ const DispenseDetails = ({
 
 export default compose(
   withStyles(styles, { name: 'DispenseDetailsGrid' }),
-  connect(({ codetable, clinicSettings, dispense, visitRegistration, patient }) => ({
-    codetable,
-    clinicSettings,
-    servingPersons: dispense.servingPersons,
-    visit: visitRegistration?.entity?.visit || {},
-    doctorprofile: codetable.doctorprofile || [],
-    patient: patient.entity || {},
-  })),
+  connect(
+    ({
+      codetable,
+      clinicSettings,
+      dispense,
+      visitRegistration,
+      patient,
+      user,
+    }) => ({
+      codetable,
+      clinicSettings,
+      servingPersons: dispense.servingPersons,
+      visit: visitRegistration?.entity?.visit || {},
+      doctorprofile: codetable.doctorprofile || [],
+      patient: patient.entity || {},
+      user,
+    }),
+  ),
 )(DispenseDetails)

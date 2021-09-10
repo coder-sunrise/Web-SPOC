@@ -13,9 +13,9 @@ import {
   Field,
   DatePicker,
   Switch,
-  Checkbox
+  Checkbox,
 } from '@/components'
-
+import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
@@ -25,12 +25,12 @@ import moment from 'moment'
 import LowStockInfo from './LowStockInfo'
 import { DoctorProfileSelect } from '@/components/_medisys'
 
-const getVisitDoctorUserId = (props) => {
+const getVisitDoctorUserId = props => {
   const { doctorprofile } = props.codetable
   const { doctorProfileFK } = props.visitRegistration.entity.visit
   let visitDoctorUserId
   if (doctorprofile && doctorProfileFK) {
-    visitDoctorUserId = doctorprofile.find((d) => d.id === doctorProfileFK)
+    visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK)
       .clinicianProfile.userProfileFK
   }
 
@@ -64,13 +64,13 @@ const getVisitDoctorUserId = (props) => {
         const { doctorProfileFK } = visitRegistration.entity.visit
         if (doctorprofile && doctorProfileFK) {
           v.performingUserFK = doctorprofile.find(
-            (d) => d.id === doctorProfileFK,
+            d => d.id === doctorProfileFK,
           ).clinicianProfile.userProfileFK
         }
       }
     }
 
-    return { ...v, type }
+    return { ...v, type, visitPurposeFK: orders.visitPurposeFK }
   },
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
@@ -86,13 +86,27 @@ const getVisitDoctorUserId = (props) => {
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
-    const { dispatch, currentType, getNextSequence, user, orders } = props
+    const {
+      dispatch,
+      currentType,
+      getNextSequence,
+      user,
+      orders,
+      codetable,
+    } = props
+    const { inventoryconsumable = [] } = codetable
     let { batchNo } = values
     if (batchNo instanceof Array) {
       if (batchNo && batchNo.length > 0) {
         batchNo = batchNo[0]
       }
     }
+
+    const consumable = inventoryconsumable.find(
+      c => c.id === values.inventoryConsumableFK,
+    )
+    values.consumableName = consumable?.displayValue
+    values.unitOfMeasurement = consumable?.uom?.name
 
     const data = {
       isOrderedByDoctor:
@@ -123,7 +137,7 @@ const getVisitDoctorUserId = (props) => {
   displayName: 'OrderPage',
 })
 class Consumable extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     let selectedConsumable = {
@@ -135,7 +149,7 @@ class Consumable extends PureComponent {
     const { inventoryConsumableFK } = values
 
     const consumable = inventoryConsumableFK
-      ? inventoryconsumable.find((item) => item.id === inventoryConsumableFK)
+      ? inventoryconsumable.find(item => item.id === inventoryConsumableFK)
       : undefined
 
     if (consumable) selectedConsumable = consumable
@@ -147,7 +161,9 @@ class Consumable extends PureComponent {
   }
 
   getConsumableOptions = () => {
-    const { codetable: { inventoryconsumable = [] } } = this.props
+    const {
+      codetable: { inventoryconsumable = [] },
+    } = this.props
 
     return inventoryconsumable.reduce((p, c) => {
       const { code, displayValue, sellingPrice = 0, uom = {} } = c
@@ -158,10 +174,7 @@ class Consumable extends PureComponent {
           2,
         )} / ${uomName})`,
       }
-      return [
-        ...p,
-        opt,
-      ]
+      return [...p, opt]
     }, [])
   }
 
@@ -173,7 +186,7 @@ class Consumable extends PureComponent {
 
     let defaultBatch
     if (op.consumableStock) {
-      defaultBatch = op.consumableStock.find((o) => o.isDefault === true)
+      defaultBatch = op.consumableStock.find(o => o.isDefault === true)
       if (defaultBatch)
         this.setState({
           batchNo: defaultBatch.batchNo,
@@ -207,7 +220,7 @@ class Consumable extends PureComponent {
     this.onExpiryDateChange()
   }
 
-  updateTotalPrice = (v) => {
+  updateTotalPrice = v => {
     if (v || v === 0) {
       const { isExactAmount, isMinus, adjValue, isPackage } = this.props.values
       if (isPackage) return
@@ -256,7 +269,7 @@ class Consumable extends PureComponent {
     }
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.orders.type === this.props.type)
       if (
         (!this.props.global.openAdjustment &&
@@ -285,7 +298,7 @@ class Consumable extends PureComponent {
       const { inventoryConsumableFK } = nextValues
 
       const consumable = inventoryConsumableFK
-        ? inventoryconsumable.find((item) => item.id === inventoryConsumableFK)
+        ? inventoryconsumable.find(item => item.id === inventoryConsumableFK)
         : undefined
       if (consumable)
         this.setState({
@@ -312,7 +325,7 @@ class Consumable extends PureComponent {
     return false
   }
 
-  onAdjustmentConditionChange = (v) => {
+  onAdjustmentConditionChange = v => {
     const { values } = this.props
     const { isMinus, adjValue, isExactAmount } = values
     if (!isNumber(adjValue)) return
@@ -358,7 +371,7 @@ class Consumable extends PureComponent {
     }, 300)
   }
 
-  render () {
+  render() {
     const {
       theme,
       values,
@@ -385,7 +398,7 @@ class Consumable extends PureComponent {
             <GridItem xs={8}>
               <Field
                 name='inventoryConsumableFK'
-                render={(args) => {
+                render={args => {
                   return (
                     <div
                       id={`autofocus_${values.type}`}
@@ -412,7 +425,7 @@ class Consumable extends PureComponent {
                 <GridItem xs={3}>
                   <Field
                     name='packageConsumeQuantity'
-                    render={(args) => {
+                    render={args => {
                       return (
                         <NumberInput
                           label='Consumed Quantity'
@@ -436,13 +449,13 @@ class Consumable extends PureComponent {
                 <GridItem xs={1}>
                   <Field
                     name='remainingQuantity'
-                    render={(args) => {
+                    render={args => {
                       return (
                         <NumberInput
                           style={{
                             marginTop: theme.spacing(3),
                           }}
-                          formatter={(v) => `/ ${parseFloat(v).toFixed(1)}`}
+                          formatter={v => `/ ${parseFloat(v).toFixed(1)}`}
                           text
                           {...args}
                         />
@@ -456,7 +469,7 @@ class Consumable extends PureComponent {
               <GridItem xs={3}>
                 <FastField
                   name='quantity'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <NumberInput
                         label='Quantity'
@@ -466,7 +479,7 @@ class Consumable extends PureComponent {
                         }}
                         step={1}
                         min={1}
-                        onChange={(e) => {
+                        onChange={e => {
                           if (values.unitPrice) {
                             const total = e.target.value * values.unitPrice
                             setFieldValue('totalPrice', total)
@@ -486,7 +499,7 @@ class Consumable extends PureComponent {
             <GridItem xs={4} className={classes.editor}>
               <Field
                 name='batchNo'
-                render={(args) => {
+                render={args => {
                   return (
                     <CodeSelect
                       mode='tags'
@@ -515,7 +528,7 @@ class Consumable extends PureComponent {
             <GridItem xs={4} className={classes.editor}>
               <FastField
                 name='expiryDate'
-                render={(args) => {
+                render={args => {
                   return (
                     <DatePicker
                       label='Expiry Date'
@@ -532,7 +545,7 @@ class Consumable extends PureComponent {
             <GridItem xs={3} className={classes.editor}>
               <Field
                 name='totalPrice'
-                render={(args) => {
+                render={args => {
                   return (
                     <NumberInput
                       label='Total'
@@ -541,7 +554,7 @@ class Consumable extends PureComponent {
                         paddingRight: theme.spacing(6),
                       }}
                       currency
-                      onChange={(e) => {
+                      onChange={e => {
                         this.updateTotalPrice(e.target.value)
                       }}
                       min={0}
@@ -557,7 +570,7 @@ class Consumable extends PureComponent {
             <GridItem xs={8} className={classes.editor}>
               <FastField
                 name='remark'
-                render={(args) => {
+                render={args => {
                   return <TextField rowsMax='5' label='Remarks' {...args} />
                 }}
               />
@@ -569,7 +582,7 @@ class Consumable extends PureComponent {
                 >
                   <Field
                     name='isMinus'
-                    render={(args) => {
+                    render={args => {
                       return (
                         <Switch
                           checkedChildren='-'
@@ -589,7 +602,7 @@ class Consumable extends PureComponent {
                 </div>
                 <Field
                   name='adjValue'
-                  render={(args) => {
+                  render={args => {
                     args.min = 0
                     if (values.isExactAmount) {
                       return (
@@ -636,7 +649,7 @@ class Consumable extends PureComponent {
               <div style={{ marginTop: theme.spacing(2) }}>
                 <Field
                   name='isExactAmount'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <Switch
                         checkedChildren='$'
@@ -661,7 +674,7 @@ class Consumable extends PureComponent {
               {values.isPackage ? (
                 <Field
                   name='performingUserFK'
-                  render={(args) => (
+                  render={args => (
                     <DoctorProfileSelect
                       label='Performed By'
                       {...args}
@@ -670,46 +683,44 @@ class Consumable extends PureComponent {
                   )}
                 />
               ) : (
-                <div>
-                  <div style={{ display: 'inline-block' }}>
-                    <FastField
-                      name='isPreOrder'
-                      render={args => {
-                        return (
-                          <Checkbox
-                            label='Pre-Order'
-                            {...args}
-                            onChange={e => {
-                              if (!e.target.value) {
-                                setFieldValue('isChargeToday', false)
-                              }
-                            }}
-                          />
-                        )
-                      }}
-                    />
+                values.visitPurposeFK !== VISIT_TYPE.RETAIL && (
+                  <div>
+                    <div style={{ display: 'inline-block' }}>
+                      <FastField
+                        name='isPreOrder'
+                        render={args => {
+                          return (
+                            <Checkbox
+                              label='Pre-Order'
+                              {...args}
+                              onChange={e => {
+                                if (!e.target.value) {
+                                  setFieldValue('isChargeToday', false)
+                                }
+                              }}
+                            />
+                          )
+                        }}
+                      />
+                    </div>
+                    {values.isPreOrder && (
+                      <div style={{ display: 'inline-block' }}>
+                        <FastField
+                          name='isChargeToday'
+                          render={args => {
+                            return <Checkbox label='Charge Today' {...args} />
+                          }}
+                        />
+                      </div>
+                    )}
                   </div>
-                  {values.isPreOrder && <div style={{ display: 'inline-block' }}>
-                    <FastField
-                      name='isChargeToday'
-                      render={args => {
-                        return (
-                          <Checkbox
-                            label='Charge Today'
-                            {...args}
-                          />
-                        )
-                      }}
-                    />
-                  </div>
-                  }
-                </div>
+                )
               )}
             </GridItem>
             <GridItem xs={3} className={classes.editor}>
               <FastField
                 name='totalAfterItemAdjustment'
-                render={(args) => {
+                render={args => {
                   return (
                     <NumberInput
                       label='Total After Adj'

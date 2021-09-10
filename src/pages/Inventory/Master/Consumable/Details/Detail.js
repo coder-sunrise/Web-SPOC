@@ -2,6 +2,7 @@ import React from 'react'
 import { formatMessage } from 'umi'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
+import { connect } from 'dva'
 import { compose } from 'redux'
 import {
   CodeSelect,
@@ -17,7 +18,12 @@ import SharedContainer from '../../SharedContainer'
 
 const styles = () => ({})
 
-const Detail = ({ consumableDetail, hasActiveSession, theme, clinicSettings }) => {
+const Detail = ({
+  consumableDetail,
+  hasActiveSession,
+  theme,
+  clinicSettings,
+}) => {
   const { settings = [] } = clinicSettings
   return (
     <SharedContainer>
@@ -104,64 +110,86 @@ const Detail = ({ consumableDetail, hasActiveSession, theme, clinicSettings }) =
                       simple
                       valueField='id'
                       textField='name'
-                      options={
-                        (() => {
-                          var arr = []
-                          if (settings.isEnableCHAS) {
-                            arr.push(...[{
-                              id: 'isChasAcuteClaimable',
-                              name: 'CHAS Acute Claimable',
+                      options={(() => {
+                        var arr = []
+                        if (settings.isEnableCHAS) {
+                          arr.push(
+                            ...[
+                              {
+                                id: 'isChasAcuteClaimable',
+                                name: 'CHAS Acute Claimable',
 
-                              layoutConfig: {
-                                style: {},
+                                layoutConfig: {
+                                  style: {},
+                                },
                               },
-                            },
+                              {
+                                id: 'isChasChronicClaimable',
+                                name: 'CHAS Chronic Claimable',
+
+                                layoutConfig: {
+                                  style: {},
+                                },
+                              },
+                            ],
+                          )
+                        }
+
+                        arr.push(
+                          ...[
                             {
-                              id: 'isChasChronicClaimable',
-                              name: 'CHAS Chronic Claimable',
-
+                              id: 'isOnlyClinicInternalUsage',
+                              name: 'Orderable',
+                              tooltip:
+                                'Item is orderable and dispensable to patient',
+                              disabled:
+                                hasActiveSession && consumableDetail.entity?.id,
                               layoutConfig: {
                                 style: {},
                               },
-                              },
-                            ])
-                          }
-
-                          arr.push(...[{
-                            id: 'isOnlyClinicInternalUsage',
-                            name: 'Orderable',
-                            tooltip: 'Item is orderable and dispensable to patient',
-                            disabled: hasActiveSession && consumableDetail.entity?.id,
-                            layoutConfig: {
-                              style: {},
                             },
-                          }])
+                          ],
+                        )
 
-                          if(settings.isEnablePharmacyModule)
-                            arr.push(...[{
-                              id: 'isDispensedByPharmacy',
-                              name: 'Dispense by Pharmacy',
-                              tooltip: 'Item’s stock is deducted and dispense by pharmacy. If unchecked the setting, stock deduction will take place during finalization of patient\'s order',         
-                              disabled: hasActiveSession && consumableDetail.entity?.id,
-                              layoutConfig: {
-                                style: {},
+                        if (settings.isEnablePharmacyModule)
+                          arr.push(
+                            ...[
+                              {
+                                id: 'isDispensedByPharmacy',
+                                name: 'Dispense by Pharmacy',
+                                tooltip:
+                                  "Item’s stock is deducted and dispense by pharmacy. If unchecked the setting, stock deduction will take place during finalization of patient's order",
+                                disabled:
+                                  hasActiveSession &&
+                                  consumableDetail.entity?.id,
+                                layoutConfig: {
+                                  style: {},
+                                },
                               },
-                            },])
+                            ],
+                          )
 
-                          if(settings.isEnableNurseWorkItem)
-                            arr.push(...[{
-                              id: 'isNurseActualizable',
-                              name: 'Actualize by Nurse',
-                              tooltip: 'Item will generate task for nurse to actualize',
-                              disabled: hasActiveSession && consumableDetail.entity?.id,
-                              layoutConfig: {
-                                style: {},
+                        if (settings.isEnableNurseWorkItem)
+                          arr.push(
+                            ...[
+                              {
+                                id: 'isNurseActualizable',
+                                name: 'Actualize by Nurse',
+                                tooltip:
+                                  'Item will generate task for nurse to actualize',
+                                disabled:
+                                  hasActiveSession &&
+                                  consumableDetail.entity?.id,
+                                layoutConfig: {
+                                  style: {},
+                                },
                               },
-                            },])
-                          
-                          return arr
-                        })()}
-                      onChange={(e, s) => { }}
+                            ],
+                          )
+
+                        return arr
+                      })()}
+                      onChange={(e, s) => {}}
                       {...args}
                     />
                   )}
@@ -253,6 +281,9 @@ const Detail = ({ consumableDetail, hasActiveSession, theme, clinicSettings }) =
   )
 }
 export default compose(
+  connect(({ clinicSettings }) => ({
+    clinicSettings: clinicSettings.settings,
+  })),
   withStyles(styles, { withTheme: true }),
   React.memo,
 )(Detail)

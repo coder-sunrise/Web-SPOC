@@ -364,6 +364,14 @@ export const RadiologyWorkitemStatus = {
   5: 'Cancelled',
 }
 
+export const PharmacyWorkitemStatus = {
+  1: 'New',
+  2: 'Prepared',
+  3: 'Verified',
+  4: 'Dispensed',
+  5: 'Completed',
+}
+
 export const VISIT_TYPE = {
   CONS: 1,
   RETAIL: 2,
@@ -601,18 +609,18 @@ export const DIAGNOSIS_TYPE = {
 }
 
 export const SERVICE_CENTER_CATEGORY = {
-  INTERNALSERVICECENTRE: 1,
-  EXTERNALSERVICECENTRE: 2,
-  INTERNALLABSERVICECENTER: 3,
-  INTERNALRADIOLOGYSERVICECENTER: 4,
-  EXTERNALLABSERVICECENTRE: 5,
-  EXTERNALRADIOLOGYSERVICECENTRE: 6
-}
+         INTERNALSERVICECENTRE: 1,
+         EXTERNALSERVICECENTRE: 2,
+         INTERNALLABSERVICECENTER: 3,
+         INTERNALRADIOLOGYSERVICECENTER: 4,
+         EXTERNALLABSERVICECENTRE: 5,
+         EXTERNALRADIOLOGYSERVICECENTRE: 6,
+       }
 
 export const RADIOLOGY_CATEGORY = [
-  SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
-  SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE
-]
+         SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
+         SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE,
+       ]
 
 export const DOSAGE_RULE_OPERATOR = {
   to: 'to',
@@ -646,10 +654,10 @@ export const ALLERGY_TYPE = {
 }
 
 export const PATIENT_ALLERGY_TYPE = {
-  ALLERGY: 'Allergy',
-  INGREDIENT: 'Ingredient',
-  NONALLERGY: 'NonAllergy'
-}
+         ALLERGY: 'Allergy',
+         INGREDIENT: 'Ingredient',
+         NONALLERGY: 'NonAllergy',
+       }
 
 export const ENABLE_PRESCRIPTION_SET_CLINIC_ROLE = [1]
 
@@ -687,3 +695,18 @@ export const INVALID_APPOINTMENT_STATUS = [
   APPOINTMENT_STATUS.PFA_RESCHEDULED,
   APPOINTMENT_STATUS.DELETED,
 ]
+
+export const PHARMACY_STATUS = {
+    NEW: 1,
+    PREPARED: 2,
+    VERIFIED: 3,
+    DISPENSED: 4,
+}
+
+export const PHARMACY_ACTION = {
+    REDISPENSE: 'Redispense',
+    PREPARE: 'Prepare',
+    VERIFY: 'Verify',
+    COMPLETE: 'Complete',
+    CANCEL: 'Cancel',
+}

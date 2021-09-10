@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import _ from 'lodash'
 import { history } from 'umi'
-
+import moment from 'moment'
 import { connect } from 'dva'
 import withStyles from '@material-ui/core/styles/withStyles'
 // common component
@@ -20,7 +20,10 @@ import {
   CommonModal,
 } from '@/components'
 import Yup from '@/utils/yup'
-import { convertToConsultation } from '@/pages/Consultation/utils'
+import {
+  convertToConsultation,
+  isPharmacyOrderUpdated,
+} from '@/pages/Consultation/utils'
 // utils
 import { getAppendUrl } from '@/utils/utils'
 import { widgets } from '@/utils/widgets'
@@ -58,9 +61,10 @@ const discardConsultation = async ({ dispatch, dispense }) => {
   }
 }
 const styles = () => ({})
-@connect(({ consultation, user }) => ({
+@connect(({ consultation, user, clinicSettings }) => ({
   consultation,
   user,
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 @withFormikExtend({
   authority: ['queue.dispense.editorder'],
@@ -180,13 +184,21 @@ class EditOrder extends Component {
   }
 
   signOrder = async () => {
-    const { values, validateForm, handleSubmit, forms } = this.props
+    const {
+      values,
+      validateForm,
+      handleSubmit,
+      forms,
+      clinicSettings,
+      user,
+    } = this.props
     if (forms.rows.filter(o => o.statusFK === 1 && !o.isDeleted).length > 0) {
       notification.warning({
         message: `Draft forms found, please finalize it before save.`,
       })
       return
     }
+    const { isEnablePharmacyModule } = clinicSettings
     const isFormValid = await validateForm()
     if (!_.isEmpty(isFormValid)) {
       handleSubmit()
@@ -210,7 +222,12 @@ class EditOrder extends Component {
                       color: 'red',
                     }}
                   />
-                  <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>
+                  <h3
+                    style={{
+                      marginLeft: '10px',
+                      display: 'inline-block',
+                    }}
+                  >
                     Unable to save, total amount cannot be{' '}
                     <span style={{ fontWeight: 400 }}>negative</span>.
                   </h3>
@@ -236,10 +253,14 @@ class EditOrder extends Component {
         orders,
         forms,
       })
-
+      const isPharmacyOrderUpdate =
+        isEnablePharmacyModule && isPharmacyOrderUpdated(orders)
       const signResult = await dispatch({
         type: `consultation/signOrder`,
-        payload,
+        payload: {
+          ...payload,
+          isPharmacyOrderUpdate,
+        },
       })
       if (signResult) {
         const { visitRegistration } = this.props
@@ -251,6 +272,24 @@ class EditOrder extends Component {
           message: 'Completed Consultation',
           visitID: id,
         })
+
+        if (isPharmacyOrderUpdate) {
+          const userProfile = user.data.clinicianProfile
+          const userName = `${
+            userProfile.title && userProfile.title.trim().length
+              ? `${userProfile.title}. ${userProfile.name || ''}`
+              : `${userProfile.name || ''}`
+          }`
+          const message = `${userName} amended prescription at ${moment().format(
+            'HH:mm',
+          )}`
+          sendNotification('PharmacyOrderUpdate', {
+            type: NOTIFICATION_TYPE.CONSULTAION,
+            status: NOTIFICATION_STATUS.OK,
+            message,
+            visitID: id,
+          })
+        }
 
         notification.success({
           message: 'Order signed',

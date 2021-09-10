@@ -118,6 +118,11 @@ let i = 0
       visitRegistration,
       consultationDocument: { rows = [] },
     } = props
+    const { inventoryvaccination = [],
+      ctvaccinationusage = [],
+      ctmedicationdosage = [],
+      ctvaccinationunitofmeasurement = []
+    } = codetable
     let { batchNo } = values
     if (batchNo instanceof Array) {
       if (batchNo && batchNo.length > 0) {
@@ -179,6 +184,17 @@ let i = 0
         }
       }
     }
+
+    const vaccination = inventoryvaccination.find(c => c.id === values.inventoryVaccinationFK)
+    values.vaccinationName = vaccination.displayValue
+
+    const usage = ctvaccinationusage.find(c => c.id === values.usageMethodFK)
+    const dosage = ctmedicationdosage.find(c => c.id === values.dosageFK)
+    const uom = ctvaccinationunitofmeasurement.find(c => c.id === values.uomfk)
+
+    values.usageMethodDisplayValue = usage?.name
+    values.dosageDisplayValue = dosage?.displayValue
+    values.uomDisplayValue = uom?.name
 
     const data = {
       isOrderedByDoctor:
@@ -547,7 +563,6 @@ class Vaccination extends PureComponent {
       const { handleSubmit, validateForm } = this.props
       const validateResult = await validateForm()
       const isFormValid = _.isEmpty(validateResult)
-      console.log(validateResult)
       if (!isFormValid) {
         handleSubmit()
       }

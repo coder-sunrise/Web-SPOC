@@ -1784,6 +1784,29 @@ export const documentTemplateTypes = [
 
 const isPanelItemRequired = [ { value: false, name: 'No' }, { value: true, name: 'Yes' } ]
 
+const pharmacyStatus = [
+  {
+    statusFK: 1,
+    name: 'Order'
+  },
+  {
+    statusFK: 2,
+    name: 'Prepared'
+  },
+  {
+    statusFK: 3,
+    name: 'Verified'
+  },
+  {
+    statusFK: 4,
+    name: 'Dispensed'
+  },
+  {
+    statusFK: 5,
+    name: 'Completed'
+  }
+]
+
 export {
   appointmentStatus,
   status,
@@ -1821,4 +1844,5 @@ export {
   tagCategory,
   isPanelItemRequired,
   languageCategory,
+  pharmacyStatus
 }

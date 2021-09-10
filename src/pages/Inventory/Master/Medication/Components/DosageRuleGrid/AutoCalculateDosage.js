@@ -81,7 +81,7 @@ const AutoCalculateDosage = ({
               label={formatMessage({
                 id: 'inventory.master.setting.usage',
               })}
-              labelField='name'
+              labelField='displayValue'
               code='ctMedicationUsage'
               {...args}
             />
@@ -96,7 +96,7 @@ const AutoCalculateDosage = ({
               label={formatMessage({
                 id: 'inventory.master.setting.prescribeUOM',
               })}
-              labelField='name'
+              labelField='displayValue'
               code='ctmedicationunitofmeasurement'
               {...args}
             />
@@ -111,7 +111,7 @@ const AutoCalculateDosage = ({
               label={formatMessage({
                 id: 'inventory.master.setting.dispenseUOM',
               })}
-              labelField='name'
+              labelField='displayValue'
               code='ctmedicationunitofmeasurement'
               {...args}
             />
@@ -143,7 +143,7 @@ const AutoCalculateDosage = ({
                   style={{ marginTop: 15 }}
                   label=''
                   text
-                  labelField='name'
+                  labelField='displayValue'
                   optionLabelLength={optionLabelLength}
                   code='ctmedicationunitofmeasurement'
                   {...args}
@@ -163,7 +163,7 @@ const AutoCalculateDosage = ({
                   style={{ marginTop: 15 }}
                   label=''
                   text
-                  labelField='name'
+                  labelField='displayValue'
                   optionLabelLength={optionLabelLength}
                   code='ctmedicationunitofmeasurement'
                   {...args}
