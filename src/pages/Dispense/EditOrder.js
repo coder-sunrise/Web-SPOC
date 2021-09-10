@@ -253,13 +253,13 @@ class EditOrder extends Component {
         orders,
         forms,
       })
-      const isPharmacyOrderUpdated =
+      const isPharmacyOrderUpdate =
         isEnablePharmacyModule && isPharmacyOrderUpdated(orders)
       const signResult = await dispatch({
         type: `consultation/signOrder`,
         payload: {
           ...payload,
-          isPharmacyOrderUpdated,
+          isPharmacyOrderUpdate,
         },
       })
       if (signResult) {
@@ -273,7 +273,7 @@ class EditOrder extends Component {
           visitID: id,
         })
 
-        if (isPharmacyOrderUpdated) {
+        if (isPharmacyOrderUpdate) {
           const userProfile = user.data.clinicianProfile
           const userName = `${
             userProfile.title && userProfile.title.trim().length
