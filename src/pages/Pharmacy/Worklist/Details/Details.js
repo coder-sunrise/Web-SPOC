@@ -1608,7 +1608,6 @@ export default compose(
       const defaultExpandedGroups = _.uniqBy(orderItems, 'dispenseGroupId').map(
         o => o.dispenseGroupId,
       )
-      console.log('orderItems', orderItems)
       return {
         orderItems,
         defaultExpandedGroups,
