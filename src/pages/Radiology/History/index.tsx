@@ -301,7 +301,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       title: '',
       dataIndex: 'searchAccessionNo',
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-        return <TextField style={{ width: 250 }} label='Accession No' />
+        return <TextField style={{ width: 250 }} label='Accession No.' />
       },
     },
     {
@@ -348,7 +348,7 @@ const defaultColumns = (codetable, setDetailsId) => {
         return (
           <TextField
             style={{ width: 250 }}
-            label={'Patient Name/Acc. No./Ref. No.'}
+            label={'Patient Name, Acc. No., Patient Ref. No.'}
           />
         )
       },
