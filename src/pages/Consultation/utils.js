@@ -238,8 +238,7 @@ const convertToConsultation = (
               }),
             }
           })
-      }
-      else {
+      } else {
         values[p.prop] = orderRows.filter(o => o.type === p.value)
       }
     }
@@ -327,6 +326,7 @@ const isPharmacyOrderUpdated = orders => {
   }
 
   const generateMedication = item => {
+    if (!item) return {}
     return {
       adjAmount: item.adjAmount,
       adjType: item.adjType,

@@ -51,7 +51,11 @@ const PharmacyDetails = ({ refreshClick }) => {
   const closeForm = () => {
     setDetailsId(null)
     setShowModal(false)
-    dispatch({ type: 'pharmacyDetails/updateState', entity: undefined })
+    dispatch({
+      type: 'pharmacyDetails/updateState',
+      payload: { entity: undefined },
+    })
+    refreshClick()
   }
 
   return (
@@ -68,7 +72,6 @@ const PharmacyDetails = ({ refreshClick }) => {
       showFooter={false}
       onConfirm={() => {
         closeForm()
-        refreshClick()
       }}
     >
       <Details refreshClick={refreshClick} />
