@@ -1651,7 +1651,7 @@ class Medication extends PureComponent {
                         {...args}
                         onChange={e => {
                           if (!e.target.value) {
-                            setFieldValue('isChargeToday', false)
+                            this.props.setFieldValue('isChargeToday', false)
                           }
                         }}
                       />

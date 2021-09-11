@@ -58,7 +58,7 @@ const styles = theme => ({
     },
   },
   contentPanel: {
-    maxHeight: 800,
+    maxHeight: 850,
     overflowY: 'scroll',
     marginBottom: 10,
   },
@@ -145,11 +145,10 @@ const Details = props => {
       })
     }
     if (visitPurposeFK === VISIT_TYPE.RETAIL) {
-      _editOrder()
-    } else {
       navigateDirtyCheck({
         onProceed: _editOrder,
       })(e)
+    } else {
     }
   }
 
@@ -270,7 +269,6 @@ const Details = props => {
 
   const reloadPharmacy = () => {
     dispatch({ type: 'pharmacyDetails/query', payload: { id: workitem.id } })
-    setShowEditOrderModal(false)
   }
 
   const getInstruction = row => {
@@ -846,15 +844,11 @@ const Details = props => {
                     render: row => {
                       if (
                         row.statusFK !== PHARMACY_STATUS.NEW ||
-                        row.isExternalPrescription ||
-                        (!row.isDrugMixture && !row.inventoryFK)
+                        !row.stockFK
                       ) {
-                        const dispenseQty =
-                          row.isExternalPrescription ||
-                          (!row.isDrugMixture && !row.inventoryFK) ||
-                          !row.isDispensedByPharmacy
-                            ? '-'
-                            : `${numeral(row.dispenseQuantity).format('0.0')}`
+                        const dispenseQty = !row.stockFK
+                          ? '-'
+                          : `${numeral(row.dispenseQuantity).format('0.0')}`
                         return (
                           <Tooltip title={dispenseQty}>
                             <span>{dispenseQty}</span>
@@ -1036,7 +1030,10 @@ const Details = props => {
                     },
                   },
                 ]}
-                TableProps={{ rowComponent: orderItemRow }}
+                TableProps={{
+                  height: 450,
+                  rowComponent: orderItemRow,
+                }}
               />
             </GridItem>
           </GridContainer>
@@ -1045,13 +1042,13 @@ const Details = props => {
       <GridContainer>
         <GridItem md={8}>
           <div style={{ position: 'relative' }}>
-            <Button color='primary' size='sm'>
+            <Button color='primary' size='sm' disabled={isOrderUpdate}>
               Print Prescription
             </Button>
-            <Button color='primary' size='sm'>
+            <Button color='primary' size='sm' disabled={isOrderUpdate}>
               Print leaflet/Drug Summary Label
             </Button>
-            <Button color='primary' size='sm'>
+            <Button color='primary' size='sm' disabled={isOrderUpdate}>
               Print Drug Label
             </Button>
             {secondaryPrintoutLanguage !== '' && (
@@ -1173,6 +1170,15 @@ const Details = props => {
         title='Edit Order'
         showFooter={true}
         onClose={() => {
+          dispatch({
+            type: 'orders/reset',
+          })
+          setShowEditOrderModal(false)
+        }}
+        onConfirm={() => {
+          dispatch({
+            type: 'orders/reset',
+          })
           setShowEditOrderModal(false)
         }}
         maxWidth='md'
@@ -1292,7 +1298,7 @@ export default compose(
                 ['asc'],
               )
               let remainQty = drugMixture.quantity
-              if (inventoryItem && inventoryItemStock.length) {
+              if (remainQty > 0 && inventoryItem && inventoryItemStock.length) {
                 inventoryItemStock.forEach((itemStock, index) => {
                   const {
                     id,
@@ -1301,7 +1307,7 @@ export default compose(
                     stock,
                     isDefault,
                   } = itemStock
-                  if (remainQty >= 0) {
+                  if (remainQty > 0) {
                     let dispenseQuantity = 0
                     if (isDefault || remainQty <= stock) {
                       dispenseQuantity = remainQty
@@ -1321,10 +1327,17 @@ export default compose(
                       secondUOMDisplayValue: secondUOMDisplayValue,
                       isDefault,
                       countNumber: index === 0 ? 1 : 0,
-                      rowspan: index === 0 ? inventoryItemStock.length : 0,
+                      rowspan: 0,
                     })
                   }
                 })
+                const firstItem = orderItems.find(
+                  i =>
+                    (i.drugMixtureFK === drugMixture.id && i.countNumber === 1),
+                )
+                firstItem.rowspan = orderItems.filter(
+                  i => (i.drugMixtureFK === drugMixture.id),
+                ).length
               } else {
                 orderItems.push({
                   ...detaultDrugMixture,
@@ -1437,10 +1450,10 @@ export default compose(
             ['asc'],
           )
           let remainQty = item.quantity
-          if (inventoryItem && inventoryItemStock.length) {
+          if (remainQty > 0 && inventoryItem && inventoryItemStock.length) {
             inventoryItemStock.forEach((itemStock, index) => {
               const { id, batchNo, expiryDate, stock, isDefault } = itemStock
-              if (remainQty >= 0) {
+              if (remainQty > 0) {
                 let dispenseQuantity = 0
                 if (isDefault || remainQty <= stock) {
                   dispenseQuantity = remainQty
@@ -1460,10 +1473,23 @@ export default compose(
                   secondUOMDisplayValue: secondUOMDisplayValue,
                   isDefault,
                   countNumber: index === 0 ? 1 : 0,
-                  rowspan: index === 0 ? inventoryItemStock.length : 0,
+                  rowspan: 0,
                 })
               }
             })
+            const firstItem = orderItems.find(
+              i =>
+                i.invoiceItemTypeFK === item.invoiceItemTypeFK &&
+                i.isDrugMixture === item.isDrugMixture &&
+                i.id === item.id &&
+                i.countNumber === 1,
+            )
+            firstItem.rowspan = orderItems.filter(
+              i =>
+                i.invoiceItemTypeFK === item.invoiceItemTypeFK &&
+                i.isDrugMixture === item.isDrugMixture &&
+                i.id === item.id,
+            ).length
           } else {
             orderItems.push(defaultItem(item, groupName))
           }
@@ -1485,10 +1511,10 @@ export default compose(
             ['asc'],
           )
           let remainQty = item.quantity
-          if (inventoryItem && inventoryItemStock.length) {
+          if (remainQty > 0 && inventoryItem && inventoryItemStock.length) {
             inventoryItemStock.forEach((itemStock, index) => {
               const { id, batchNo, expiryDate, stock, isDefault } = itemStock
-              if (remainQty >= 0) {
+              if (remainQty > 0) {
                 let dispenseQuantity = 0
                 if (isDefault || remainQty <= stock) {
                   dispenseQuantity = remainQty
@@ -1507,9 +1533,22 @@ export default compose(
                   uomDisplayValue: inventoryItem?.uom?.name,
                   isDefault,
                   countNumber: index === 0 ? 1 : 0,
-                  rowspan: index === 0 ? inventoryItemStock.length : 0,
+                  rowspan: 0,
                 })
               }
+              const firstItem = orderItems.find(
+                i =>
+                  i.invoiceItemTypeFK === item.invoiceItemTypeFK &&
+                  i.isDrugMixture === item.isDrugMixture &&
+                  i.id === item.id &&
+                  i.countNumber === 1,
+              )
+              firstItem.rowspan = orderItems.filter(
+                i =>
+                  i.invoiceItemTypeFK === item.invoiceItemTypeFK &&
+                  i.isDrugMixture === item.isDrugMixture &&
+                  i.id === item.id,
+              ).length
             })
           } else {
             orderItems.push(defaultItem(item, 'NormalDispense'))
@@ -1569,6 +1608,7 @@ export default compose(
       const defaultExpandedGroups = _.uniqBy(orderItems, 'dispenseGroupId').map(
         o => o.dispenseGroupId,
       )
+      console.log('orderItems', orderItems)
       return {
         orderItems,
         defaultExpandedGroups,
