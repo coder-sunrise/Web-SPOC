@@ -409,7 +409,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       dataIndex: 'searchExamination',
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
         const service = (codetable.ctservice || []).filter(
-          x => x.serviceCenterCategoryFK === 4,
+          x => x.serviceCenterCategoryFK === 3,
         )
         const serviceOptions = Object.values(
           _.groupBy(service, 'serviceId'),
