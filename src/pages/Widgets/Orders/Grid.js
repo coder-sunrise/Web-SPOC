@@ -120,7 +120,7 @@ export default ({
     if (!row.isPreOrder) {
       if (
         (row.type === '10' &&
-          radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCCELED) ||
+          radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED) ||
         nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
       ) {
         return
@@ -466,7 +466,7 @@ export default ({
           />
         </Tooltip>
       )
-    if (radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.CANCCELED)
+    if (radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED)
       return (
         <Tooltip title='Cancelled'>
           <div
@@ -935,7 +935,7 @@ export default ({
                 }
                 if (
                   radiologyWorkitem.statusFK ===
-                  RADIOLOGY_WORKITEM_STATUS.CANCCELED
+                  RADIOLOGY_WORKITEM_STATUS.CANCELLED
                 ) {
                   editEnable = false
                 }
