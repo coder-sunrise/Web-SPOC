@@ -23,6 +23,7 @@ import {
 import { LoadingWrapper } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
 import PrintLabLabelButton from './PatientLabelBtn'
+import PatientStickyNotesBtn from './PatientStickyNotesBtn'
 // assets
 import styles from './styles.js'
 
@@ -376,6 +377,7 @@ class PatientInfoSideBanner extends PureComponent {
             text
             value={entity.genderFK}
           />)
+          <PatientStickyNotesBtn/>
         </p>
         <div style={{ display: 'inline-flex' }}>
           <PrintLabLabelButton
