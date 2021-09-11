@@ -359,10 +359,14 @@ const defaultColumns = (codetable, setDetailsId) => {
       title: '',
       dataIndex: 'searchVisitType',
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-        const visitTypeOptions = Object.values(VISIT_TYPE_NAME)
-          .filter(x => x.visitPurposeFK !== VISIT_TYPE.RETAIL)
-          .map(o => {
-            return { value: o.visitPurposeFK, name: o.displayName }
+        const visitTypeOptions = (codetable.ctvisitpurpose || [])
+          .filter(x => x.id !== VISIT_TYPE.RETAIL)
+          .map(x => {
+            return {
+              value: x.id,
+              name: x.name,
+              customTooltipField: `Code: ${x.code}\nName: ${x.name}`,
+            }
           })
         return (
           <Select
@@ -573,6 +577,14 @@ const RadiologyWorklistHistoryIndex = ({
         },
       },
     })
+    dispatch({
+      force: true,
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctvisitpurpose',
+      },
+    })    
+    
   })
 
   const columns = defaultColumns(codetable, setDetailsId)
