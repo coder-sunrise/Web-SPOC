@@ -144,7 +144,7 @@ const _routes = [
           },
           {
             path: '/radiology/history',
-            name: 'History',
+            name: 'history',
             component: './Radiology/History',
             mini: 'RW',
             exact: true,
