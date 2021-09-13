@@ -209,6 +209,14 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
             columnName: 'queueNo',
             width: 70,
             sortingEnabled: false,
+            render: row => {
+              const { isQueueNoDecimal } = clinicSettings
+              const queueNo =
+                !row.queueNo || !row.queueNo.trim().length
+                  ? '-'
+                  : numeral(row.queueNo).format(isQueueNoDecimal ? '0.0' : '0')
+              return <div>{queueNo}</div>
+            },
           },
           {
             columnName: 'name',
