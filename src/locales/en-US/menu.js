@@ -204,6 +204,7 @@ export default {
 
   'menu.radiology': 'Radiology Center',
   'menu.radiology.worklist': 'Worklist',
+  'menu.radiology.history': 'History',
 
   'menu.pharmacy': 'Pharmacy',
   'menu.pharmacy.worklist': 'Worklist',
