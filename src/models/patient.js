@@ -418,6 +418,26 @@ export default createFormViewModel({
         }
         return null
       },
+      *getStickyNotes({ payload }, { call,put }) {
+        const r = yield call(service.queryStickyNotes, payload)
+        const { status, data = [] } = r
+        yield put({
+          type: 'updateState',
+          payload: {
+            patientStickyNotes: data,
+          },
+        })
+        return data
+      },
+      *saveStickyNotes({ payload }, { call,put }){
+        let r = {}
+        if(payload.id){
+          r = yield call(service.upsertStickyNotes, payload)
+        }else{
+          r = yield call(service.createStickyNotes, payload)
+        }
+        return r
+      },
     },
     reducers: {
       updateDefaultEntity(state, { payload }) {

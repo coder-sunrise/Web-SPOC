@@ -301,7 +301,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       title: '',
       dataIndex: 'searchAccessionNo',
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-        return <TextField style={{ width: 250 }} label='Accession No' />
+        return <TextField style={{ width: 250 }} label='Accession No.' />
       },
     },
     {
@@ -348,7 +348,7 @@ const defaultColumns = (codetable, setDetailsId) => {
         return (
           <TextField
             style={{ width: 250 }}
-            label={'Patient Name/Acc. No./Ref. No.'}
+            label={'Patient Name, Acc. No., Patient Ref. No.'}
           />
         )
       },
@@ -358,11 +358,16 @@ const defaultColumns = (codetable, setDetailsId) => {
       hideInTable: true,
       title: '',
       dataIndex: 'searchVisitType',
+      initialValue:[-99],
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-        const visitTypeOptions = Object.values(VISIT_TYPE_NAME)
-          .filter(x => x.visitPurposeFK !== VISIT_TYPE.RETAIL)
-          .map(o => {
-            return { value: o.visitPurposeFK, name: o.displayName }
+        const visitTypeOptions = (codetable.ctvisitpurpose || [])
+          .filter(x => x.id !== VISIT_TYPE.RETAIL)
+          .map(x => {
+            return {
+              value: x.id,
+              name: x.name,
+              customTooltipField: `Code: ${x.code}\nName: ${x.name}`,
+            }
           })
         return (
           <Select
@@ -382,6 +387,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       hideInTable: true,
       title: '',
       dataIndex: 'searchModality',
+      initialValue:[-99],
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
         const modalityOptions = codetable.ctmodality || []
         return (
@@ -403,9 +409,10 @@ const defaultColumns = (codetable, setDetailsId) => {
       hideInTable: true,
       title: '',
       dataIndex: 'searchExamination',
+      initialValue:[-99],
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
         const service = (codetable.ctservice || []).filter(
-          x => x.serviceCenterCategoryFK === 4,
+          x => x.serviceCenterCategoryFK === 3,
         )
         const serviceOptions = Object.values(
           _.groupBy(service, 'serviceId'),
@@ -430,7 +437,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       hideInTable: true,
       title: '',
       dataIndex: 'searchVisitDoctor',
-      valueType: 'select',
+      initialValue:[-99],
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
         const visitDoctorOptions = (codetable.doctorprofile || []).map(x => {
           return {
@@ -484,6 +491,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       hideInTable: true,
       title: '',
       dataIndex: 'searchRadiographer',
+      initialValue:[-99],
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
         const radiographer = (codetable.clinicianprofile || []).filter(
           x => x.userProfile.role.id === 4 /*replace to radiographer role id*/,
@@ -573,6 +581,14 @@ const RadiologyWorklistHistoryIndex = ({
         },
       },
     })
+    dispatch({
+      force: true,
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctvisitpurpose',
+      },
+    })    
+    
   })
 
   const columns = defaultColumns(codetable, setDetailsId)
