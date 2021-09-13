@@ -23,7 +23,6 @@ import ErrorIcon from '@material-ui/icons/Error'
 import Authorized from '@/utils/Authorized'
 import { withStyles } from '@material-ui/core'
 import { Link } from 'umi'
-import { trim } from '@umijs/core/node_modules/@umijs/deps/compiled/lodash'
 
 const NOTESCOLOR = [
   '#EF5AA1',
