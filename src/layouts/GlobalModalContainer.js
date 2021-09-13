@@ -154,11 +154,12 @@ class GlobalModalContainer extends PureComponent {
           <ChangePassword userID={loggedInUserID} />
         </CommonModal>
 
-        <Drawer
-          zIndex={1390}
-          height='100%'
+        <CommonModal
+          // zIndex={1390}
+          fullScreen
+          // height='100%'
           title='Patient Profile'
-          placement='top'
+          // placement='top'
           headerStyle={{
             textAlign: 'center',
           }}
@@ -171,11 +172,11 @@ class GlobalModalContainer extends PureComponent {
             })
           }}
           open={global.showPatientInfoPanel}
-          visible={global.showPatientInfoPanel}
+          // visible={global.showPatientInfoPanel}
           observe='PatientProfile'
         >
           {global.showPatientInfoPanel && <PatientDetail {...this.props} />}
-        </Drawer>
+        </CommonModal>
 
         <CommonModal
           title={global.accountModalTitle}
