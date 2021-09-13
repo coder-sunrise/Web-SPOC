@@ -337,6 +337,16 @@ const DispenseDetails = ({
   const [showActualization, setShowActualization] = useState(false)
   const [actualizationStatus, setActualizationStatus] = useState(-1)
 
+  const handleReloadClick = () => {
+    setSelectedPrescriptionRows([])
+    setSelectedVaccinationRows([])
+    setSelectedOtherOrderRows([])
+    setSelectedActualizeRows([])
+    setShowActualization(false)
+    setActualizationStatus(-1)
+    onReloadClick()
+  }
+  
   const isShowActualizeSelection = (records = []) => {
     let actualizeOrderItemsRight = Authorized.check(
       'dispense.actualizeorderitems',
@@ -431,7 +441,7 @@ const DispenseDetails = ({
             <Button
               color='info'
               size='sm'
-              onClick={onReloadClick}
+              onClick={handleReloadClick}
               disabled={disableRefreshOrder}
             >
               <Refresh />

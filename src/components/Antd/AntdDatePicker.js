@@ -60,6 +60,9 @@ const STYLES = theme => ({
       borderRadius: 0,
       paddingLeft: 0,
       height: '1.5em !important',
+      '&[disabled]':{
+        color:'gray !important',
+      },
     },
     '& .ant-calendar-picker-input.ant-input': {
       lineHeight: 'inherit !important',
