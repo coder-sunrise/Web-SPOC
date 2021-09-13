@@ -170,7 +170,9 @@ class GlobalModalContainer extends PureComponent {
               },
             })
           }}
+          open={global.showPatientInfoPanel}
           visible={global.showPatientInfoPanel}
+          observe='PatientProfile'
         >
           {global.showPatientInfoPanel && <PatientDetail {...this.props} />}
         </Drawer>
