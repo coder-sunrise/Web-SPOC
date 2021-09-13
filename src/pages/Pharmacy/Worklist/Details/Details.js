@@ -115,6 +115,7 @@ const Details = props => {
     primaryPrintoutLanguage = 'EN',
     secondaryPrintoutLanguage = '',
     labelPrinterSize,
+    isQueueNoDecimal,
   } = clinicSettings
   const [showEditOrderModal, setShowEditOrderModal] = useState(false)
   const [showRedispenseFormModal, setShowRedispenseFormModal] = useState(false)
@@ -508,6 +509,11 @@ const Details = props => {
   const pharmacyOrderItemCount = (
     pharmacyDetails.entity?.pharmacyOrderItem || []
   ).length
+
+  const queueNo =
+    !workitem.queueNo || !workitem.queueNo.trim().length
+      ? '-'
+      : numeral(workitem.queueNo).format(isQueueNoDecimal ? '0.0' : '0')
   return (
     <div style={{ marginTop: -20 }}>
       <div className={classes.contentPanel}>
@@ -523,9 +529,7 @@ const Details = props => {
             <GridItem md={12}>
               <Typography.Title level={5}>Order Details</Typography.Title>
             </GridItem>
-            <ContentGridItem title='Queue No.:'>
-              {workitem.queueNo}
-            </ContentGridItem>
+            <ContentGridItem title='Queue No.:'>{queueNo}</ContentGridItem>
             <ContentGridItem title='Diagnosis:'>
               {corDiagnosis.length
                 ? workitem.corDiagnosis
@@ -1333,10 +1337,10 @@ export default compose(
                 })
                 const firstItem = orderItems.find(
                   i =>
-                    (i.drugMixtureFK === drugMixture.id && i.countNumber === 1),
+                    i.drugMixtureFK === drugMixture.id && i.countNumber === 1,
                 )
                 firstItem.rowspan = orderItems.filter(
-                  i => (i.drugMixtureFK === drugMixture.id),
+                  i => i.drugMixtureFK === drugMixture.id,
                 ).length
               } else {
                 orderItems.push({
