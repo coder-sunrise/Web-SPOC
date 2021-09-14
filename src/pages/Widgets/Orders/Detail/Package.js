@@ -165,7 +165,7 @@ import { CollectionsOutlined } from '@material-ui/icons'
         const medicationdispensingUOM = medication.dispensingUOM
         const medicationusage = medication.medicationUsage
         const medicationfrequency = matchInstruction?.medicationFrequency
-        const medicationdosage = matchInstruction?.medicationFrequency
+        const medicationdosage = matchInstruction?.prescribingDosage
         const medicationprescribingUOM = medication.prescribingUOM
         const medicationPrecautions =
           medication.inventoryMedication_MedicationPrecaution

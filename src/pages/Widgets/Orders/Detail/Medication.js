@@ -800,7 +800,7 @@ class Medication extends PureComponent {
         isMatchInstructionRule(i, age, weightKG),
       )
       const medicationfrequency = matchInstruction?.medicationFrequency
-      const medicationdosage = matchInstruction?.medicationFrequency
+      const medicationdosage = matchInstruction?.prescribingDosage
 
       defaultInstruction = {
         ...defaultInstruction,
