@@ -7,6 +7,7 @@ import { Field } from 'formik'
 // umi
 import { formatMessage } from 'umi'
 // custom components
+import _ from 'lodash'
 import { Alert } from 'antd'
 import {
   TextField,
@@ -473,7 +474,7 @@ const VisitInfoCard = ({
                 labelField='displayValue'
                 value={values.visitGroup}
                 disabled={isVisitReadonlyAfterSigned}
-                options={visitGroups}
+                options={_.orderBy(visitGroups, ['isFamilyMember','order'], ['desc','desc'])}
                 handleFilter={(input, option) => {
                   return (
                     option.data.visitGroup
@@ -507,8 +508,8 @@ const VisitInfoCard = ({
                         {option.patientName}
                       </GridItem>
                       {option.isFamilyMember ? (
-                        <GridItem sm={1} md={1}>
-                          <Icon type='family' />
+                        <GridItem style={{ padding: 0 }} sm={1} md={1}>
+                          <Icon style={{ fontSize: 20 }} type='family' />
                         </GridItem>
                       ) : (
                         ''
