@@ -581,6 +581,10 @@ const General = ({
                 handleUpdateAttachments={updateAttachments}
                 attachments={attachments}
                 simple
+                thumbnailSize={{
+                  height: 128,
+                  width: 128,
+                }}
               />
             )}
           />

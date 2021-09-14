@@ -2,7 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 import withStyles from '@material-ui/core/styles/withStyles'
 import CustomInput from 'mui-pro-components/CustomInput'
-import { Checkbox, FormControlLabel, Tooltip } from '@material-ui/core'
+import { Checkbox, FormControlLabel, Tooltip, Popover } from '@material-ui/core'
 import regularFormsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/regularFormsStyle'
 import { control } from '@/components/Decorator'
 import Authorized from '@/utils/Authorized'
@@ -124,8 +124,8 @@ class CheckboxGroup extends React.Component {
           const v = `${o[valueField]}`
           
           return (
-            <Tooltip 
-              title={o.tooltip || ''}
+            <Tooltip
+              title={o.tooltip ? <span style={{ fontSize: '1.5em' }}>{o.tooltip}</span> : ''}
               disableFocusListener
             >
               <div

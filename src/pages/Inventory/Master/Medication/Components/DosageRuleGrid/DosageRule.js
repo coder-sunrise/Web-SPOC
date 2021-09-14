@@ -21,7 +21,7 @@ import Save from '@material-ui/icons/Save'
 import Cancel from '@material-ui/icons/Cancel'
 import Delete from '@material-ui/icons/Delete'
 
-const maxNumOfRule = 5
+const maxNumOfRule = 100
 
 const formItemStyle = {
   margin: 0,
