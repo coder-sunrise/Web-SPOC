@@ -130,8 +130,8 @@ const applyFilter = (filter, data, isDayView) => {
 
           return (
             patientProfile.name.toLowerCase().indexOf(_searchStr) >= 0 ||
-            patientProfile.patientAccountNo.toLowerCase().indexOf(_searchStr) >=
-              0 ||
+            patientProfile.patientAccountNo.toLowerCase().indexOf(_searchStr) >= 0 ||
+            patientProfile.patientRefrenceNo.toLowerCase().indexOf(_searchStr) >= 0 ||
             mobile.number.toLowerCase().indexOf(_searchStr) >= 0
           )
         }
