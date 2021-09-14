@@ -171,7 +171,7 @@ const PharmacyWorklist = () => {
             textAlign: 'right',
           }}
         >
-          <p style={{ fontWeight: 500 }}>Now Serving:</p>
+          <p style={{ fontWeight: 600 }}>Now Serving:</p>
           <Tooltip title='1.0(genery)'>
             <p
               style={{
@@ -205,7 +205,7 @@ const PharmacyWorklist = () => {
         </Tooltip>
 
         <div style={{ position: 'absolute', top: 25, right: 50 }}>
-          <p style={{ fontWeight: 500 }}>Last Refresh:</p>
+          <p style={{ fontWeight: 600 }}>Last Refresh:</p>
           <p style={{ color: '#1890f8', marginTop: 4 }}>
             {' '}
             {refreshDate.format('HH:mm')}
