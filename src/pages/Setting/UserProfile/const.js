@@ -6,7 +6,7 @@ export const UserProfileTableConfig = {
     { name: 'name', title: 'Name' },
     {
       name: 'role',
-      title: 'Role',
+      title: 'User Group',
     },
     { name: 'isActive', title: 'Status' },
     { name: 'action', title: 'Action' },

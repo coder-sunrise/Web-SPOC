@@ -216,13 +216,13 @@ export const menuData = [
   {
     authority: 'settings.systemuser.systemuser',
     title: 'System User',
-    text: 'System User',
+    text: 'User Profile',
     url: '/setting/userprofile',
   },
   {
     authority: 'settings.role',
     title: 'System User',
-    text: 'Role & Access Right',
+    text: 'User Group & Access Right',
     url: '/setting/userrole',
   },
   {

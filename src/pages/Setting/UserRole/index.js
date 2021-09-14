@@ -36,6 +36,7 @@ import {
 import Authorized from '@/utils/Authorized'
 import UserRoleForm from './UserRoleForm'
 import { dummyData, UserRoleTableConfig } from './const'
+import { CLINICAL_ROLE } from '@/utils/constants'
 
 const styles = theme => ({
   verticalSpacing: {
@@ -43,9 +44,10 @@ const styles = theme => ({
     marginBottom: theme.spacing(2),
   },
 })
-@connect(({ settingUserRole, global }) => ({
+@connect(({ settingUserRole, global, clinicSettings }) => ({
   settingUserRole,
   mainDivHeight: global.mainDivHeight,
+  clinicSettings,
 }))
 @withSettingBase({ modelName: 'settingUserRole' })
 @withFormik({
@@ -68,7 +70,7 @@ class UserRole extends React.Component {
           render: row => {
             return (
               <Authorized authority='settings.role.editrole'>
-                <Tooltip title='Edit Role & Access Right' placement='bottom'>
+                <Tooltip title='Edit User Group & Access Right' placement='bottom'>
                   <Button
                     justIcon
                     color='primary'
@@ -167,10 +169,23 @@ class UserRole extends React.Component {
   }
 
   render() {
-    const { classes, mainDivHeight = 700 } = this.props
+    const { classes, mainDivHeight = 700, clinicSettings } = this.props
     const { showUserProfileForm, openPopper } = this.state
     let height = mainDivHeight - 100 - ($('.filterBar').height() || 0)
     if (height < 300) height = 300
+
+    const {
+      isEnableRadiologyModule,
+      isEnablePharmacyModule,
+      isEnableLabModule,
+      isEnableNurseWorkItem,
+    } = clinicSettings.settings
+    let filterArray = [CLINICAL_ROLE.DOCTOR, CLINICAL_ROLE.OTHERS]
+    if (isEnableRadiologyModule) filterArray.push(CLINICAL_ROLE.RADIOGRAPHER)
+    if (isEnablePharmacyModule) filterArray.push(CLINICAL_ROLE.PHARMACIST)
+    if (isEnableLabModule) filterArray.push(CLINICAL_ROLE.LABTECH)
+    if (isEnableNurseWorkItem) filterArray.push(CLINICAL_ROLE.NURSE)
+
     return (
       <CardContainer hideHeader>
         <div className='filterBar'>
@@ -191,6 +206,9 @@ class UserRole extends React.Component {
                     {...args}
                     label='Clinical Role'
                     code='ltclinicalrole'
+                    localFilter={item => {
+                      return filterArray.includes(item.id)
+                    }}
                   />
                 )}
               />
