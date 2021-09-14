@@ -37,6 +37,7 @@ const styles = theme => ({})
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
         drugallergyStatusFK: 1,
+        drugAllergySourceFK:2,
       },
     }).then(r => {
       if (r) {
@@ -96,20 +97,6 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem xs={6}>
-            <FastField
-              name='drugAllergySourceFK'
-              render={args => {
-                return (
-                  <CodeSelect
-                    label='Source'
-                    code='ltdrugallergysource'
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
             <GridItem md={6}>
               <FastField
                 name='sortOrder'
