@@ -15,6 +15,7 @@ import Yup from '@/utils/yup'
 const preOrderSchema = Yup.object().shape({
   preOrderItemType: Yup.string().required(),
   itemName: Yup.string().required(),
+  quantity: Yup.number().required().min(1),
 })
 
 const PendingPreOrder: React.FC = (props: any) => {

@@ -82,7 +82,7 @@ const WorkitemTitle = ({ item, classes }) => {
             className={classes.commonText}
             style={{
               color: blueColor,
-              fontWeight: 500,
+              fontWeight: 600,
               fontSize: '1rem',
             }}
           >
@@ -350,7 +350,7 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
           </Popover>
         )}
         {showGroup && (
-          <span style={{ fontWeight: 500, color: 'black' }}>
+          <span style={{ fontWeight: 600, color: 'black' }}>
             {item.visitGroup}
           </span>
         )}

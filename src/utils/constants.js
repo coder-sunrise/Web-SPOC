@@ -618,13 +618,13 @@ export const DIAGNOSIS_TYPE = {
 }
 
 export const SERVICE_CENTER_CATEGORY = {
-         INTERNALSERVICECENTRE: 1,
-         EXTERNALSERVICECENTRE: 2,
-         INTERNALLABSERVICECENTER: 3,
-         INTERNALRADIOLOGYSERVICECENTER: 4,
-         EXTERNALLABSERVICECENTRE: 5,
-         EXTERNALRADIOLOGYSERVICECENTRE: 6,
-       }
+                INTERNALSERVICECENTRE: 1,
+                EXTERNALSERVICECENTRE: 2,
+                INTERNALRADIOLOGYSERVICECENTER: 3,
+                INTERNALLABSERVICECENTER: 4,
+                EXTERNALRADIOLOGYSERVICECENTRE: 5,
+                EXTERNALLABSERVICECENTRE: 6,
+              }
 
 export const RADIOLOGY_CATEGORY = [
          SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
@@ -706,16 +706,16 @@ export const INVALID_APPOINTMENT_STATUS = [
 ]
 
 export const PHARMACY_STATUS = {
-    NEW: 1,
-    PREPARED: 2,
-    VERIFIED: 3,
-    DISPENSED: 4,
-}
+         NEW: 1,
+         PREPARED: 2,
+         VERIFIED: 3,
+         DISPENSED: 4,
+       }
 
 export const PHARMACY_ACTION = {
-    REDISPENSE: 'Redispense',
-    PREPARE: 'Prepare',
-    VERIFY: 'Verify',
-    COMPLETE: 'Complete',
-    CANCEL: 'Cancel',
-}
+         REDISPENSE: 'Redispense',
+         PREPARE: 'Prepare',
+         VERIFY: 'Verify',
+         COMPLETE: 'Complete',
+         CANCEL: 'Cancel',
+       }
