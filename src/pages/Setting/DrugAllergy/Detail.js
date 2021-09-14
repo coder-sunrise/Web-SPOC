@@ -10,6 +10,7 @@ import {
   TextField,
   NumberInput,
   DateRangePicker,
+  CodeSelect,
 } from '@/components'
 
 const styles = theme => ({})
@@ -95,6 +96,20 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
+            <GridItem xs={6}>
+            <FastField
+              name='drugAllergySourceFK'
+              render={args => {
+                return (
+                  <CodeSelect
+                    label='Source'
+                    code='ltdrugallergysource'
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
             <GridItem md={6}>
               <FastField
                 name='sortOrder'
