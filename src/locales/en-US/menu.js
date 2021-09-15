@@ -125,7 +125,7 @@ export default {
   'menu.setting.userprofile': 'User Profile',
   'menu.setting.newuserprofile': 'Add User Profile',
   'menu.setting.edituserprofile': 'Edit User Profile',
-  'menu.setting.userrole': 'Role & Access Right',
+  'menu.setting.userrole': 'User Group',
   'menu.setting.newuserrole': 'Add Role',
   'menu.setting.edituserrole': 'Edit Role',
   'menu.setting.revenuecategory': 'Revenue Category',
