@@ -248,7 +248,7 @@ const CalendarView = ({
   filter,
   loading,
   appointmentTypes,
-  apptTimeSlotDuration = 15 ,
+  apptTimeIntervel = 15 ,
   apptTimeRulerExtent = 1400 ,
   printDailyAppointmentReport,
   classes,
@@ -538,7 +538,7 @@ const CalendarView = ({
         selectable='ignoreEvents'
         resizable={false}
         showMultiDayTimes={false}
-        step={apptTimeSlotDuration}
+        step={apptTimeIntervel}
         className={classes.calendarHeightSettingStyle}
         timeslots={1}
         longPressThreshold={500}
@@ -576,7 +576,7 @@ const _CalendarView = connect(({ calendar, codetable, loading, doctorBlock, clin
   doctorBlocks: doctorBlock.list || [],
   appointmentTypes: codetable.ctappointmenttype || [],
   loading: loading.models.calendar,
-  apptTimeSlotDuration: clinicSettings.settings.apptTimeSlotDuration,
+  apptTimeIntervel: clinicSettings.settings.apptTimeIntervel,
   apptTimeRulerExtent: clinicSettings.settings.apptTimeRulerExtent,
 }))(CalendarView)
 

@@ -92,14 +92,14 @@ const calculateDurationTime = (durationMinutes) => {
   return { hour, minute }
 }
 
-const constructDefaultNewRow = (selectedSlot, apptTimeIntervel) => {
+const constructDefaultNewRow = (selectedSlot, apptTimeSlotDuration) => {
 
   let defaultNewRow = { isPrimaryClinician: true, id: getUniqueNumericId() }
   selectedSlot = selectedSlot || {}
   const startTime = moment(selectedSlot.start)
   const selectedEndTime = moment(selectedSlot.end)
 
-  const { hour = 0, minute = 15 } = calculateDurationTime(apptTimeIntervel)
+  const { hour = 0, minute = 15 } = calculateDurationTime(apptTimeSlotDuration)
   const endTime = moment(selectedSlot.start)
     .add(hour, 'hour')
     .add(minute, 'minute')
@@ -123,7 +123,7 @@ export const mapPropsToValues = ({
   patientProfile: patientEntity,
   user,
   clinicianProfiles,
-  apptTimeIntervel,
+  apptTimeSlotDuration,
 }) => {
   let _patientProfileFK
   let _patientContactNo
@@ -153,7 +153,7 @@ export const mapPropsToValues = ({
     currentAppointment: {
       appointmentDate: moment((selectedSlot || {}).start).formatUTC(),
       appointments_Resources: [
-        constructDefaultNewRow(selectedSlot, apptTimeIntervel),
+        constructDefaultNewRow(selectedSlot, apptTimeSlotDuration),
       ],
     },
     appointmentStatusFk: APPOINTMENT_STATUS.DRAFT,
