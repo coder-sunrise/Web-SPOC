@@ -70,7 +70,7 @@ class UserRole extends React.Component {
           render: row => {
             return (
               <Authorized authority='settings.role.editrole'>
-                <Tooltip title='Edit User Group & Access Right' placement='bottom'>
+                <Tooltip title='Edit User Group' placement='bottom'>
                   <Button
                     justIcon
                     color='primary'

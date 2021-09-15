@@ -222,7 +222,7 @@ export const menuData = [
   {
     authority: 'settings.role',
     title: 'System User',
-    text: 'User Group & Access Right',
+    text: 'User Group',
     url: '/setting/userrole',
   },
   {

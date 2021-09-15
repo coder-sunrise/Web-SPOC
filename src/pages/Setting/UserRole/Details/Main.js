@@ -829,7 +829,7 @@ class Main extends React.Component {
                 type: 'global/updateAppState',
                 payload: {
                   openConfirm: true,
-                  openConfirmContent: `Save User Group & Access Right?`,
+                  openConfirmContent: `Save User Group ?`,
                   onConfirmSave: this.props.handleSubmit,
                 },
               })
