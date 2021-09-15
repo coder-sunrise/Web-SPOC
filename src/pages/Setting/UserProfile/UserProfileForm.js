@@ -512,11 +512,6 @@ class UserProfileForm extends React.PureComponent {
                       Current user can switch to any user group under doctor clinical role
                     </div>
                   )}
-                  {_oldRole && currentClinicalRole?.clinicalRoleName !== 'Doctor' && (
-                    <div style={{ marginTop :20 }}>
-                      Current user can switch to any user group 
-                    </div>
-                  )}
                 </GridItem>
               </GridContainer>
 
