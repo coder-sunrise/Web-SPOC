@@ -148,7 +148,7 @@ const Details = props => {
         setShowEditOrderModal(true)
       })
     }
-    if (visitPurposeFK === VISIT_TYPE.RETAIL) {
+    if (visitPurposeFK === VISIT_TYPE.OTC) {
       navigateDirtyCheck({
         onProceed: _editOrder,
       })(e)
@@ -1210,7 +1210,7 @@ const Details = props => {
                 disabled={isOrderUpdate || !pharmacyOrderItemCount}
                 onClick={editOrder}
               >
-                {workitem.visitPurposeFK == VISIT_TYPE.RETAIL
+                {workitem.visitPurposeFK == VISIT_TYPE.OTC
                   ? 'Add Order'
                   : 'Edit Order'}
               </Button>

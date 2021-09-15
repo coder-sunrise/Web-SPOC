@@ -728,7 +728,7 @@ const ApplyClaims = ({
   }
 
   const shouldDisableAddApplicableClaim = () => {
-    if (values.visitPurposeFK === VISIT_TYPE.RETAIL) return true
+    if (values.visitPurposeFK === VISIT_TYPE.OTC) return true
     const isEditing = hasEditing()
     const hasUnappliedScheme =
       tempInvoicePayer.filter(
@@ -789,7 +789,7 @@ const ApplyClaims = ({
         <Button
           color='danger'
           size='sm'
-          disabled={values.visitPurposeFK === VISIT_TYPE.RETAIL}
+          disabled={values.visitPurposeFK === VISIT_TYPE.OTC}
           onClick={handleResetClick}
         >
           <Reset />

@@ -361,7 +361,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       initialValue:[-99],
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
         const visitTypeOptions = (codetable.ctvisitpurpose || [])
-          .filter(x => x.id !== VISIT_TYPE.RETAIL)
+          .filter(x => x.id !== VISIT_TYPE.OTC)
           .map(x => {
             return {
               value: x.id,

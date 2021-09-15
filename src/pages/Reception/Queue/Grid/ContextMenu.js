@@ -79,8 +79,8 @@ const ContextMenu = ({
     row.visitStatus,
   )
   // const isStatusDispense = row.visitStatus === VISIT_STATUS.DISPENSE
-  const isRetailVisit = row.visitPurposeFK === VISIT_TYPE.RETAIL
-  const isBillFirstVisit = row.visitPurposeFK === VISIT_TYPE.BILL_FIRST
+  const isRetailVisit = row.visitPurposeFK === VISIT_TYPE.OTC
+  const isBillFirstVisit = row.visitPurposeFK === VISIT_TYPE.BF
 
   const isStatusCompleted = [
     VISIT_STATUS.BILLING,
