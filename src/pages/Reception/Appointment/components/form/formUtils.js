@@ -173,7 +173,7 @@ export const mapPropsToValues = ({
       const appointment = viewingAppointment.appointments.find(
         (item) => item.id === selectedAppointmentID,
       )
-      const { recurrenceDto } = viewingAppointment
+      const { recurrenceDto, isCopyedAppt } = viewingAppointment
       let {
         patientContactNo,
         patientName,
@@ -244,7 +244,7 @@ export const mapPropsToValues = ({
           appointmentDate: moment(appointment.appointmentDate).formatUTC(),
           // appointmentDate,
         },
-        appointmentStatusFk: appointment.appointmentStatusFk,
+        appointmentStatusFk: isCopyedAppt ? APPOINTMENT_STATUS.DRAFT : appointment.appointmentStatusFk,
         appointments: viewingAppointment.appointments.map((item) => ({
           ...item,
         })),
