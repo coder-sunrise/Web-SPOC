@@ -116,6 +116,8 @@ export const isActualizable = row => {
 const actualizationButton = (row, buttonClickCallback) => {
   let actualizationBtn = null
   const { isNurseActualizeRequired, statusFK } = checkActualizable(row)
+  const cancelActualizeRight = Authorized.check('dispense.cancelactualizeorderitems')
+  const isHiddenCancelActualize =  cancelActualizeRight && cancelActualizeRight.rights === 'hidden'
 
   if (isNurseActualizeRequired) {
     if (
@@ -139,7 +141,7 @@ const actualizationButton = (row, buttonClickCallback) => {
         </Authorized>
       )
     } else if (statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED) {
-      actualizationBtn = (
+      actualizationBtn = !isHiddenCancelActualize && (
         <Tooltip title='Actualized'>
           <Button
             color='success'

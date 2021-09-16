@@ -20,6 +20,7 @@ class Grid extends PureComponent {
         width: 100,
         type: 'codeSelect',
         code: 'ltdrugallergysource',
+        sortBy: 'drugAllergySourceFKNavigation.DisplayValue',
       },
       { columnName: 'code', width: 200 },
       {

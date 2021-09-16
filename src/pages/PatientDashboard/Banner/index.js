@@ -13,6 +13,7 @@ import { getAppendUrl } from '@/utils/utils'
 import classnames from 'classnames'
 import { withStyles } from '@material-ui/core/styles'
 import PatientNurseNotes from '@/pages/PatientDatabase/Detail/PatientNurseNotes'
+import PatientStickyNotesBtn from '@/components/_medisys/PatientInfoSideBanner/PatientStickyNotesBtn'
 import SelectPreOrder from '@/pages/Reception/Appointment/components/form/SelectPreOrder'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import { MoreButton, LoadingWrapper } from '@/components/_medisys'
@@ -955,15 +956,7 @@ class Banner extends PureComponent {
                   {`) ${info.contact?.mobileContactNumber?.number}`}
                 </span>
                 <span className={classes.part}>
-                  <Link className={classes.header}>
-                    <span
-                      onClick={e => {
-                        this.openNotes()
-                      }}
-                    >
-                      <SwitcherTwoTone />
-                    </span>
-                  </Link>
+                  <PatientStickyNotesBtn />
                 </span>
               </GridItem>
               <GridItem xs={6} md={2} className={classes.cell}>

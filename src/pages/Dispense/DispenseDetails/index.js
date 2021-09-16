@@ -212,7 +212,7 @@ const DispenseDetails = ({
         openConfirm: true,
         openConfirmContent: `Discard dispense?`,
         onConfirmSave:
-          visitPurposeFK === VISIT_TYPE.RETAIL
+          visitPurposeFK === VISIT_TYPE.OTC
             ? discardAddOrderDetails
             : discardBillOrder,
       },
@@ -268,8 +268,8 @@ const DispenseDetails = ({
     clinicalObjectRecordFK: undefined,
   }
 
-  const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
-  const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BILL_FIRST
+  const isRetailVisit = visitPurposeFK === VISIT_TYPE.OTC
+  const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BF
   const disableRefreshOrder = isBillFirstVisit && !clinicalObjectRecordFK
   const disableDiscard = totalPayment > 0 || !!clinicalObjectRecordFK
   const [showRemovePayment, setShowRemovePayment] = useState(false)
@@ -690,7 +690,7 @@ const DispenseDetails = ({
               data={otherOrder}
             />
 
-            {settings.isEnablePackage && visitPurposeFK !== VISIT_TYPE.RETAIL && (
+            {settings.isEnablePackage && visitPurposeFK !== VISIT_TYPE.OTC && (
               <TableData
                 title='Package'
                 idPrefix='package'
