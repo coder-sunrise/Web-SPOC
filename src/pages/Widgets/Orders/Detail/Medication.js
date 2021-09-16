@@ -1600,7 +1600,7 @@ class Medication extends PureComponent {
     const { classes, values, setDisable } = this.props
     return (
       <GridItem xs={8} className={classes.editor}>
-        {values.visitPurposeFK !== VISIT_TYPE.RETAIL &&
+        {values.visitPurposeFK !== VISIT_TYPE.OTC &&
         !values.isDrugMixture &&
         !values.isPackage ? (
           <div style={{ position: 'absolute', bottom: 2 }}>
@@ -2656,7 +2656,7 @@ class Medication extends PureComponent {
             cancelText='Cancel'
           >
             <AddFromPast
-              isRetail={values.visitPurposeFK === VISIT_TYPE.RETAIL}
+              isRetail={values.visitPurposeFK === VISIT_TYPE.OTC}
               {...this.props}
             />
           </CommonModal>
@@ -2672,7 +2672,7 @@ class Medication extends PureComponent {
             cancelText='Cancel'
           >
             <PrescriptionSet
-              isRetail={values.visitPurposeFK === VISIT_TYPE.RETAIL}
+              isRetail={values.visitPurposeFK === VISIT_TYPE.OTC}
               {...this.props}
             />
           </CommonModal>

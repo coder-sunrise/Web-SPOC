@@ -382,28 +382,28 @@ export const PharmacyWorkitemStatus = {
 }
 
 export const VISIT_TYPE = {
-  CONS: 1,
-  RETAIL: 2,
-  BILL_FIRST: 3,
+  CON: 1,
+  OTC: 2,
+  BF: 3,
   MC: 4,
 }
 
 export const VISIT_TYPE_NAME = [
   {
-    visitPurposeFK: VISIT_TYPE.CONS,
-    displayName: 'Consultation',
+    visitPurposeFK: VISIT_TYPE.CON,
+    displayCode: 'CON',
   },
   {
-    visitPurposeFK: VISIT_TYPE.RETAIL,
-    displayName: 'Retail',
+    visitPurposeFK: VISIT_TYPE.OTC,
+    displayCode: 'OTC',
   },
   {
-    visitPurposeFK: VISIT_TYPE.BILL_FIRST,
-    displayName: 'Bill-First',
+    visitPurposeFK: VISIT_TYPE.BF,
+    displayCode: 'BF',
   },
   {
     visitPurposeFK: VISIT_TYPE.MC,
-    displayName: 'MC',
+    displayCode: 'MC',
   },
 ]
 

@@ -282,7 +282,7 @@ const AddOrder = ({
     const { entity } = dispense
     const { invoice } = entity
 
-    if (visitType === VISIT_TYPE.RETAIL)
+    if (visitType === VISIT_TYPE.OTC)
       displayExistingOrders(invoice.id, ctservice)
   }, [])
   return (
@@ -290,7 +290,7 @@ const AddOrder = ({
       <SizeContainer size='sm'>
         <div style={{ maxHeight: height - 128, overflow: 'auto' }}>
           <Order
-            fromDispense={visitType === VISIT_TYPE.RETAIL}
+            fromDispense={visitType === VISIT_TYPE.OTC}
             from='AddOrder'
           />
         </div>
@@ -348,7 +348,7 @@ export default compose(
       const { rows, summary, finalAdjustments } = orders
       const { addOrderDetails } = dispense
       const { isEnablePharmacyModule } = clinicSettings
-      if (visitType === VISIT_TYPE.RETAIL) {
+      if (visitType === VISIT_TYPE.OTC) {
         const removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions = existingIDArray => instructionOrPrecaution => {
           if (existingIDArray.includes(instructionOrPrecaution.id)) {
             return {
@@ -714,7 +714,7 @@ export default compose(
           }
         })
       }
-      if (visitType === VISIT_TYPE.BILL_FIRST) {
+      if (visitType === VISIT_TYPE.BF) {
         const billFirstPayload = convertToConsultation(consultation.entity, {
           consultationDocument: { rows: [] },
           orders,

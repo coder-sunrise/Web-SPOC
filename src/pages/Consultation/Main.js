@@ -857,7 +857,7 @@ class Main extends React.Component {
     const { entity: vistEntity = {} } = visitRegistration
     const { visit = {} } = vistEntity
     const {
-      visitPurposeFK = VISIT_TYPE.CONS,
+      visitPurposeFK = VISIT_TYPE.CON,
       visitStatus = VISIT_STATUS.DISPENSE,
     } = visit
 
@@ -873,7 +873,7 @@ class Main extends React.Component {
     }
 
     if (
-      visitPurposeFK === VISIT_TYPE.BILL_FIRST &&
+      visitPurposeFK === VISIT_TYPE.BF &&
       visitStatus === VISIT_STATUS.BILLING &&
       isModifiedOrder
     ) {
