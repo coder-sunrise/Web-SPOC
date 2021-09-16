@@ -25,16 +25,17 @@ import { withStyles } from '@material-ui/core'
 import { Link } from 'umi'
 import { trim } from '@umijs/core/node_modules/@umijs/deps/compiled/lodash'
 
-const NOTESCOLOR = [
-  '#EF5AA1',
-  '#99CC66',
-  '#66CCFF',
-  '#FFCC99',
-  '#CCCCCC',
-  '#FFFF99',
-  '#CCFFFF',
-  '#9966FF',
-]
+const NOTESCOLOR = {
+  Green: '#CCFF90',
+  Cyan: '#A7FFEB',
+  Blue: '#80D8FF',
+  LightPurple: '#CC99FF',
+  White: '#FFFFFF',
+  Red: '#FF8A80',
+  YellowOrange: '#FFD180',
+  Yellow: '#FFFF8D',
+}
+
 
 const styles = theme => ({
   notesTextStyle: {
@@ -339,7 +340,7 @@ class PatientStickyNotesBtn extends Component {
                       <div
                         style={{ paddingTop: 6, paddingLeft: 6, width: 126 }}
                       >
-                        {NOTESCOLOR.map(x => (
+                        {Object.values(NOTESCOLOR).map(x => (
                           <span
                             style={{
                               display: 'inline-block',
@@ -348,6 +349,8 @@ class PatientStickyNotesBtn extends Component {
                               height: 24,
                               width: 24,
                               backgroundColor: x,
+                              border: '1px solid gray',
+                              boxShadow: '0px 3px 10px rgba(0, 0, 0, 0.1)',
                             }}
                             onClick={() => this.onColorClick(x)}
                           />
@@ -360,7 +363,7 @@ class PatientStickyNotesBtn extends Component {
                       justIcon
                       color='transparent'
                       style={{
-                        color: NOTESCOLOR[0],
+                        color: NOTESCOLOR.Red,
                         margin: 0,
                       }}
                     >
