@@ -308,7 +308,26 @@ class PatientStickyNotesBtn extends Component {
                   }}
                   disabled={!stickyNotesEditable}
                 >
-                  <FlagIcon />
+                  {note.archivedDate ? (
+                    <Tooltip
+                      placement='right-start'
+                      title={
+                        note.archivedDate && (
+                          <div style={{ fontSize: 12, width: 310 }}>
+                            {`Archived by ${note.archivedByUser} (${
+                              note.archivedByUserRole
+                            }) ${moment(note.archivedDate).format(
+                              'DD MMM YYYY HH:mm',
+                            )}`}
+                          </div>
+                        )
+                      }
+                    >
+                      <FlagIcon />
+                    </Tooltip>
+                  ) : (
+                    <FlagIcon />
+                  )}
                 </Button>
               </div>
               {isEditMode && (
