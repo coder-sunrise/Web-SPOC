@@ -243,7 +243,7 @@ class PatientStickyNotesBtn extends Component {
 
     const { id: currentUserID } = this.props.currentUser
     const isBelongtoCurrentUser = !note.createByUserFK || note.createByUserFK === currentUserID
-console.log('isBelongtoCurrentUser',isBelongtoCurrentUser,currentUserID,note.createByUserFK)
+
     return (
       <div
         className={this.props.classes.noteItemStyle}
