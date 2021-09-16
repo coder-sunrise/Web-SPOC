@@ -9,9 +9,6 @@ import { VISIT_TYPE, VISIT_TYPE_NAME } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 
 const styles = () => ({
-  'TableCell-cell-*:first-child': {
-    padding: '0',
-  },
   container: {
     width: '100%',
     color: 'white',
