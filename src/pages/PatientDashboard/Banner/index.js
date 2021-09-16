@@ -43,7 +43,6 @@ const headerStyles = {
   color: 'darkblue',
   fontWeight: 500,
   position: 'relative',
-  // style={{ color: 'darkblue' }}
 }
 
 const styles = theme => ({
@@ -59,18 +58,14 @@ const styles = theme => ({
     display: 'inline-block',
   },
   contents: {
-    // whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    // width: '100%',
     display: '-webkit-box',
     WebkitBoxOrient: 'vertical',
     WebkitLineClamp: 2,
     '&:hover': {
       position: 'static',
       display: 'block',
-      //zIndex: 150,
-      //backgroundColor: 'yellow',
       width: '100%',
       whiteSpace: 'normal',
       overflow: 'visible',
@@ -844,8 +839,6 @@ class Banner extends PureComponent {
       )
     const { ctsalutation = [] } = codetable
     const info = entity
-    // const salt = ctsalutation.find(o => o.id === info.salutationFK) || {}
-    //const name = `${salt.name || ''} ${info.name}`
     const name = `${info.name}`
     /* const allergiesStyle = () => {
       return {
@@ -919,7 +912,6 @@ class Banner extends PureComponent {
                       <Tooltip title={name} placement='bottom-start'>
                         <span
                           style={{
-                            // whiteSpace: 'nowrap',
                             textOverflow: 'ellipsis',
                             textDecoration: 'underline',
                             display: 'inline-block',
