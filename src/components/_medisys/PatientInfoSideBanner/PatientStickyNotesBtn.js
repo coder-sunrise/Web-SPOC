@@ -314,7 +314,7 @@ class PatientStickyNotesBtn extends Component {
                       placement='right-start'
                       title={
                         note.archivedDate && (
-                          <div style={{ fontSize: 12, width: 310 }}>
+                          <div style={{ fontSize: 12 }}>
                             {`Archived by ${note.archivedByUser} (${
                               note.archivedByUserRole
                             }) ${moment(note.archivedDate).format(
@@ -443,21 +443,33 @@ class PatientStickyNotesBtn extends Component {
                         <Delete />
                       </Button>
                     </Popper>
-                    <span
-                      style={{
-                        float: 'right',
-                        fontSize: 12,
-                        color: 'gray',
-                        position: 'relative',
-                        bottom: -8,
-                      }}
+                    <Tooltip
+                      title={
+                        <div style={{ fontSize: 12}}>
+                          {`Created by ${note.createByUser} (${
+                            note.createByUserRole
+                          }) ${moment(note.createDate).format(
+                            'DD MMM YYYY HH:mm',
+                          )}`}
+                        </div>
+                      }
                     >
-                      {`Updated by ${note.updateByUser} (${
-                        note.updateByUserRole
-                      }) ${moment(note.updateDate).format(
-                        'DD MMM YYYY HH:mm',
-                      )}`}
-                    </span>
+                      <span
+                        style={{
+                          float: 'right',
+                          fontSize: 12,
+                          color: 'gray',
+                          position: 'relative',
+                          bottom: -8,
+                        }}
+                      >
+                        {`Updated by ${note.updateByUser} (${
+                          note.updateByUserRole
+                        }) ${moment(note.updateDate).format(
+                          'DD MMM YYYY HH:mm',
+                        )}`}
+                      </span>
+                    </Tooltip>
                   </div>
                 )
               )}
