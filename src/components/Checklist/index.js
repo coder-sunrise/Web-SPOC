@@ -116,20 +116,16 @@ class Checklist extends React.Component {
 
   updateEditor = input => {
     input = JSON.parse(JSON.stringify(input))
-    // console.log('updateEditor', input)
     // processing here
     let output = ''
     Object.keys(input).forEach(sub => {
-      // console.log('sub', sub)
       const obss = input[sub]
       if (obss) {
         output += `<strong>${sub}</strong><br /><br />`
         Object.keys(obss).forEach(obs => {
-          // console.log('obs', obs)
           if (obs !== 'Remarks') {
             const nats = obss[obs]
             if (nats) {
-              // console.log('nat', nats)
               output += `${obs}<br />`
               if (typeof nats === 'string') {
                 output += ` - ${nats}<br />`
@@ -140,7 +136,6 @@ class Checklist extends React.Component {
               }
             }
             const rem = obss['Remarks'][obs] // see checklistmodal
-            // console.log('rem', rem)
             if (rem) output += `<br />${rem}<br />`
 
             output += `<br />`

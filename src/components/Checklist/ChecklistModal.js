@@ -26,29 +26,6 @@ class ChecklistModal extends React.Component {
     checklistState: [],
   }
 
-  onFieldsChange = values => {
-    const { editorRef } = this.props
-    const { editorState } = editorRef.props
-    //send back to variable
-    let output = ''
-    if (
-      values.length > 0 &&
-      values[0].name.length > 0 &&
-      typeof values[0].value === 'object'
-    ) {
-      const id = values[0].name[0]
-      const subject = values[0].name[1]
-      const observation = values[0].name[2]
-      const natures = values[0].value.map(v => ' - ' + v)
-      output = `${subject}\n${observation}\n${natures.join('\n')}`
-    } else {
-      const subject = values[0].name[1]
-      const observation = values[0].name[2]
-      output = `${subject}\n${observation}\n${values[0].value}`
-    }
-    console.log(output)
-  }
-
   onCloseModal = () => this.props.onClose()
 
   onFinish = values => {
@@ -65,13 +42,11 @@ class ChecklistModal extends React.Component {
       onClose,
       open,
     } = this.props
-    // console.log('selectedChecklist', selectedChecklist)
     return (
       <CommonModal open={open} title='Checklist' onClose={this.onCloseModal}>
         <Form
           name='selectedChecklist'
           ref={this.formRef}
-          // onFieldsChange={this.onFieldsChange}
           onFinish={this.onFinish}
         >
           <Tabs defaultActiveKey='100'>

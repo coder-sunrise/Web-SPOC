@@ -46,18 +46,6 @@ class Findings extends Component {
     } = this.props
     return (
       <div>
-        {/*<RichEditor
-          editorRef={(ref) => {
-            this.richEditor = ref
-          }}
-          // autoFocus={index === 0}
-          // disabled={loading.global}
-          style={{ marginBottom: 0 }}
-          strongLabel
-          height={250}
-          // {...args}
-        />*/}
-
         <GridContainer>
           <GridItem sm={9} md={9}>
             <Typography>Examination Findings</Typography>
@@ -74,7 +62,6 @@ class Findings extends Component {
                 arrayName='radiologyScribbleArray'
                 categoryIndex={9}
                 scribbleNoteArray={this.state.scribbleNoteArray}
-                // gridItemWidth={width}
               />
               <Checklist 
                 checklistCategory={CHECKLIST_CATEGORY.RADIOLOGY}
