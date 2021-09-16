@@ -710,3 +710,8 @@ export const PHARMACY_ACTION = {
     COMPLETE: 'Complete',
     CANCEL: 'Cancel',
 }
+
+export const CHECKLIST_CATEGORY = {
+  RADIOLOGY: 1,
+  DOCTORCONSULTATION: 2,
+}
