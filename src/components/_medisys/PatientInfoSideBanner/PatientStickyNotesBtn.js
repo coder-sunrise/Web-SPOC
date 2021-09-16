@@ -69,6 +69,7 @@ class PatientStickyNotesBtn extends Component {
   state = {
     openPopper: false,
     stickyNotes: [],
+    isFlaggedOnlyShow: true,
   }
 
   componentDidMount = () => {
@@ -517,6 +518,7 @@ class PatientStickyNotesBtn extends Component {
             style={{ float: 'right', display: 'inline-block' }}
             disabled={isEditPending}
             simple
+            checked={isFlaggedOnlyShow}
             label='Show Flagged Only'
             onChange={this.filterFlaggedNotes}
           />
