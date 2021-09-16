@@ -82,7 +82,7 @@ const WorkitemTitle = ({ item, classes }) => {
             className={classes.commonText}
             style={{
               color: blueColor,
-              fontWeight: 500,
+              fontWeight: 600,
               fontSize: '1rem',
             }}
           >
@@ -209,6 +209,14 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
             columnName: 'queueNo',
             width: 70,
             sortingEnabled: false,
+            render: row => {
+              const { isQueueNoDecimal } = clinicSettings
+              const queueNo =
+                !row.queueNo || !row.queueNo.trim().length
+                  ? '-'
+                  : numeral(row.queueNo).format(isQueueNoDecimal ? '0.0' : '0')
+              return <div>{queueNo}</div>
+            },
           },
           {
             columnName: 'name',
@@ -342,7 +350,7 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
           </Popover>
         )}
         {showGroup && (
-          <span style={{ fontWeight: 500, color: 'black' }}>
+          <span style={{ fontWeight: 600, color: 'black' }}>
             {item.visitGroup}
           </span>
         )}

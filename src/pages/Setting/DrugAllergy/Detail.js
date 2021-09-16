@@ -10,6 +10,7 @@ import {
   TextField,
   NumberInput,
   DateRangePicker,
+  CodeSelect,
 } from '@/components'
 
 const styles = theme => ({})
@@ -36,6 +37,7 @@ const styles = theme => ({})
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
         drugallergyStatusFK: 1,
+        drugAllergySourceFK:2,
       },
     }).then(r => {
       if (r) {

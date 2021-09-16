@@ -800,7 +800,7 @@ class Medication extends PureComponent {
         isMatchInstructionRule(i, age, weightKG),
       )
       const medicationfrequency = matchInstruction?.medicationFrequency
-      const medicationdosage = matchInstruction?.medicationFrequency
+      const medicationdosage = matchInstruction?.prescribingDosage
 
       defaultInstruction = {
         ...defaultInstruction,
@@ -1499,7 +1499,7 @@ class Medication extends PureComponent {
                 padding: '1px 3px',
                 fontWeight: 500,
               }}
-              title='Exclusive Drug'
+              title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'
             >
               Excl.
             </div>
@@ -1600,7 +1600,7 @@ class Medication extends PureComponent {
     const { classes, values, setDisable } = this.props
     return (
       <GridItem xs={8} className={classes.editor}>
-        {values.visitPurposeFK !== VISIT_TYPE.RETAIL &&
+        {values.visitPurposeFK !== VISIT_TYPE.OTC &&
         !values.isDrugMixture &&
         !values.isPackage ? (
           <div style={{ position: 'absolute', bottom: 2 }}>
@@ -1651,7 +1651,7 @@ class Medication extends PureComponent {
                         {...args}
                         onChange={e => {
                           if (!e.target.value) {
-                            setFieldValue('isChargeToday', false)
+                            this.props.setFieldValue('isChargeToday', false)
                           }
                         }}
                       />
@@ -2656,7 +2656,7 @@ class Medication extends PureComponent {
             cancelText='Cancel'
           >
             <AddFromPast
-              isRetail={values.visitPurposeFK === VISIT_TYPE.RETAIL}
+              isRetail={values.visitPurposeFK === VISIT_TYPE.OTC}
               {...this.props}
             />
           </CommonModal>
@@ -2672,7 +2672,7 @@ class Medication extends PureComponent {
             cancelText='Cancel'
           >
             <PrescriptionSet
-              isRetail={values.visitPurposeFK === VISIT_TYPE.RETAIL}
+              isRetail={values.visitPurposeFK === VISIT_TYPE.OTC}
               {...this.props}
             />
           </CommonModal>

@@ -251,13 +251,12 @@ const FilterBar = props => {
           >
             Refresh
           </ProgressButton>
-          <ProgressButton
-            icon={<Search />}
+          <Button
             color='primary'
             onClick={toggleSearchAppointmentModal}
           >
-            Search Appointment
-          </ProgressButton>
+            {<Search />}Search Appointment
+          </Button>
         </GridItem>
         <GridItem xs md={8}>
           <Authorized authority='appointment.newappointment'>

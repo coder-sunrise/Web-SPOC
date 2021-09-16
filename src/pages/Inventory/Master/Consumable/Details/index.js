@@ -45,6 +45,7 @@ const Detail = ({
   setValues,
   values,
   errors,
+  clinicSettings,
 }) => {
   const [hasActiveSession, setHasActiveSession] = useState(true)
 
@@ -56,6 +57,7 @@ const Detail = ({
     values,
     errors,
     hasActiveSession,
+    clinicSettings,
   }
   const stockProps = {
     consumableDetail,
@@ -64,6 +66,7 @@ const Detail = ({
     dispatch,
     errors,
     hasActiveSession,
+    clinicSettings,
     authority: 'inventorymaster.consumable',
   }
 
@@ -77,6 +80,9 @@ const Detail = ({
   }
 
   useEffect(() => {
+    dispatch({
+      type: 'clinicSettings/query',
+    })
     if (consumableDetail.currentId) {
       checkHasActiveSession()
       dispatch({
@@ -147,9 +153,10 @@ const Detail = ({
 // const errMsg = (field) => `${field} must between 0 to 999,999.99`
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ consumable, consumableDetail }) => ({
+  connect(({ consumable, consumableDetail, clinicSettings }) => ({
     consumable,
     consumableDetail,
+    clinicSettings,
   })),
   withFormikExtend({
     enableReinitialize: true,
@@ -159,12 +166,15 @@ export default compose(
         : consumableDetail.default
 
       let chas = []
-      const { isChasAcuteClaimable, isChasChronicClaimable, isDispensedByPharmacy, isNurseActualizable } = returnValue
+      const { isChasAcuteClaimable, isChasChronicClaimable, isOnlyClinicInternalUsage, isDispensedByPharmacy, isNurseActualizable } = returnValue
       if (isChasAcuteClaimable) {
         chas.push('isChasAcuteClaimable')
       }
       if (isChasChronicClaimable) {
         chas.push('isChasChronicClaimable')
+      }
+      if (isOnlyClinicInternalUsage) {
+        chas.push('isOnlyClinicInternalUsage')
       }
       if (isDispensedByPharmacy) {
         chas.push('isDispensedByPharmacy')

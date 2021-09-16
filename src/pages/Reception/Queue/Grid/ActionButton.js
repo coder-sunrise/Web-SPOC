@@ -66,8 +66,8 @@ const ActionButton = ({ row, onClick }) => {
     VISIT_STATUS.PAUSED,
   ].includes(row.visitStatus)
 
-  const isRetailVisit = row.visitPurposeFK === VISIT_TYPE.RETAIL
-  const isBillFirstVisit = row.visitPurposeFK === VISIT_TYPE.BILL_FIRST
+  const isRetailVisit = row.visitPurposeFK === VISIT_TYPE.OTC
+  const isBillFirstVisit = row.visitPurposeFK === VISIT_TYPE.BF
 
   const enableDispense = () => {
     const consDispense = [

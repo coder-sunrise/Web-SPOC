@@ -238,8 +238,7 @@ const convertToConsultation = (
               }),
             }
           })
-      }
-      else {
+      } else {
         values[p.prop] = orderRows.filter(o => o.type === p.value)
       }
     }
@@ -327,6 +326,7 @@ const isPharmacyOrderUpdated = orders => {
   }
 
   const generateMedication = item => {
+    if (!item) return {}
     return {
       adjAmount: item.adjAmount,
       adjType: item.adjType,
@@ -337,7 +337,6 @@ const isPharmacyOrderUpdated = orders => {
       dispenseUOMFK: item.dispenseUOMFK,
       drugCode: item.drugCode,
       drugName: item.drugName,
-      gstAmount: item.gstAmount,
       instruction: item.instruction,
       inventoryMedicationFK: item.inventoryMedicationFK,
       isChargeToday: item.isChargeToday,
@@ -353,7 +352,6 @@ const isPharmacyOrderUpdated = orders => {
       remarks: item.remarks,
       secondInstruction: item.secondInstruction,
       seconDispenseUOMDisplayValue: item.seconDispenseUOMDisplayValue,
-      totalAfterGST: item.totalAfterGST,
       totalAfterItemAdjustment: item.totalAfterItemAdjustment,
       totalAfterOverallAdjustment: item.totalAfterOverallAdjustment,
       totalPrice: item.totalPrice,
@@ -362,6 +360,7 @@ const isPharmacyOrderUpdated = orders => {
   }
 
   const generateConsumable = item => {
+    if (!item) return {}
     return {
       adjAmount: item.adjAmount,
       adjType: item.adjType,
@@ -369,7 +368,6 @@ const isPharmacyOrderUpdated = orders => {
       batchNo: item.batchNo,
       consumableCode: item.consumableCode,
       consumableName: item.consumableName,
-      gstAmount: item.gstAmount,
       inventoryConsumableFK: item.inventoryConsumableFK,
       isChargeToday: item.isChargeToday,
       isDeleted: item.isDeleted,
@@ -379,7 +377,6 @@ const isPharmacyOrderUpdated = orders => {
       performingUserFK: item.performingUserFK,
       quantity: item.quantity,
       remark: item.remark,
-      totalAfterGST: item.totalAfterGST,
       totalAfterItemAdjustment: item.totalAfterItemAdjustment,
       totalAfterOverallAdjustment: item.totalAfterOverallAdjustment,
       totalPrice: item.totalPrice,

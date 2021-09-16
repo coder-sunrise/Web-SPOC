@@ -29,7 +29,7 @@ import {
   CodeSelect,
   TextField,
 } from '@/components'
-import { navigateDirtyCheck } from '@/utils/utils'
+import { navigateDirtyCheck, getMappedVisitType } from '@/utils/utils'
 import { hourOptions, minuteOptions} from '@/pages/Reception/Appointment/components/form/ApptDuration'
 
 const styles = (theme) => ({
@@ -43,8 +43,9 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ clinicSettings }) => ({
+@connect(({ clinicSettings,codetable }) => ({
   clinicSettings,
+  codetable : codetable,
 }))
 @withFormikExtend({
   enableReinitialize: true,
@@ -249,8 +250,26 @@ class GeneralSetting extends PureComponent {
       theme,
       handleSubmit,
       values,
+      codetable,
       ...restProps
     } = this.props
+
+    const {visitTypeSetting} = clinicSettings.settings
+    const { ctvisitpurpose = []} = codetable
+
+    let visitTypeSettingsObj = undefined
+    let visitPurpose = undefined
+    if (visitTypeSetting) {
+      try {
+        visitTypeSettingsObj = JSON.parse(visitTypeSetting)
+      } catch {}
+    }
+    if ((ctvisitpurpose || []).length > 0) {
+      visitPurpose = getMappedVisitType(ctvisitpurpose, visitTypeSettingsObj).filter(
+        vstType => vstType['isEnabled'] === 'true',
+      )
+    }
+
     const { hasActiveSession, autoPrintOnSignOff, autoPrintOnCompletePayment } = this.state
     const durationMinutes = values?.apptTimeSlotDuration?.settingValue || 15
     const { apptDurationHour , apptDurationMinute } = this.calcApptDuration(durationMinutes)
@@ -357,7 +376,8 @@ class GeneralSetting extends PureComponent {
                   <CodeSelect
                     label='Default Visit Type'
                     {...args}
-                    code='ctvisitpurpose'
+                    code ='ctVisitpurpose'
+                    options={visitPurpose || []}
                     disabled={!!hasActiveSession}
                     allowClear={false}
                   />

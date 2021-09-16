@@ -107,21 +107,23 @@ export const isActualizable = row => {
   const { isNurseActualizeRequired, statusFK } = checkActualizable(row)
   return (
     isNurseActualizeRequired &&
-    [NURSE_WORKITEM_STATUS.NEW, NURSE_WORKITEM_STATUS.CANCELLED].indexOf(
+    [NURSE_WORKITEM_STATUS.NEW, NURSE_WORKITEM_STATUS.CANCELLED].includes(
       statusFK,
-    ) > -1
+    )
   )
 }
 
 const actualizationButton = (row, buttonClickCallback) => {
   let actualizationBtn = null
   const { isNurseActualizeRequired, statusFK } = checkActualizable(row)
+  const cancelActualizeRight = Authorized.check('dispense.cancelactualizeorderitems')
+  const isHiddenCancelActualize =  cancelActualizeRight && cancelActualizeRight.rights === 'hidden'
 
   if (isNurseActualizeRequired) {
     if (
-      [NURSE_WORKITEM_STATUS.NEW, NURSE_WORKITEM_STATUS.CANCELLED].indexOf(
+      [NURSE_WORKITEM_STATUS.NEW, NURSE_WORKITEM_STATUS.CANCELLED].includes(
         statusFK,
-      ) > -1
+      )
     ) {
       actualizationBtn = (
         <Authorized authority='dispense.actualizeorderitems'>
@@ -139,7 +141,7 @@ const actualizationButton = (row, buttonClickCallback) => {
         </Authorized>
       )
     } else if (statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED) {
-      actualizationBtn = (
+      actualizationBtn = !isHiddenCancelActualize && (
         <Tooltip title='Actualized'>
           <Button
             color='success'
@@ -269,7 +271,7 @@ export const PrescriptionColumnExtensions = (
               </Tooltip>
             )}
             {row.isExclusive && (
-              <Tooltip title='Exclusive Drug'>
+              <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                 <div
                   style={{
                     position: 'absolute',
@@ -1122,7 +1124,7 @@ export const PackageColumnExtensions = (onPrint, showDrugLabelRemark) => [
           {row.type}
           <div style={{ position: 'relative', top: 2 }}>
             {row.isExclusive && (
-              <Tooltip title='Exclusive Drug'>
+              <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                 <div
                   style={{
                     position: 'absolute',

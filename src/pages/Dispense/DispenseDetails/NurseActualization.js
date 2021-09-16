@@ -29,7 +29,7 @@ const detailsColumns = [
   { name: 'qty', title: 'Qty.' },
   { name: 'orderBy', title: 'Order By' },
   { name: 'orderDate', title: 'Order Date' },
-  { name: 'instruction', title: 'Instructions' },
+  { name: 'instructions', title: 'Instructions' },
   { name: 'accessionNo', title: 'Accession No.' },
   { name: 'orderRemarks', title: 'Order Remarks' },
 ]
@@ -46,7 +46,7 @@ const colDetailsExtensions = [
   { columnName: 'qty', width: 80, align: 'right', render: r=> `${r.qty}${(r.uom && r.uom.trim() !== '' ? ` ${r.uom}` : '')}` },
   { columnName: 'orderBy', width: 130 },
   { columnName: 'orderDate', width: 140, render: r => localDateTime(r.orderDate) },
-  { columnName: 'instruction' },
+  { columnName: 'instructions' },
   { columnName: 'accessionNo', width:100  },
   { columnName: 'orderRemarks' },
   { columnName: 'actulizeByUser', width: 130 },

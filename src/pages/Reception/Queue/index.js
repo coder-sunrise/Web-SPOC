@@ -533,7 +533,7 @@ class Queue extends React.Component {
       case '1': {
         // dispense
         const isInitialLoading =
-          row.visitPurposeFK === VISIT_TYPE.RETAIL &&
+          row.visitPurposeFK === VISIT_TYPE.OTC &&
           row.visitStatus === VISIT_STATUS.WAITING
         const version = Date.now()
         dispatch({

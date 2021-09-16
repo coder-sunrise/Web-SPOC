@@ -21,6 +21,8 @@ import {
   Tooltip,
   FastField,
   notification,
+  TextField,
+  DatePicker,
 } from '@/components'
 import { FileCopySharp } from '@material-ui/icons'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
@@ -45,7 +47,7 @@ const styles = theme => ({
   rightIcon: {
     position: 'absolute',
     bottom: 2,
-    fontWeight: 500,
+    fontWeight: 600,
     color: 'white',
     fontSize: '0.7rem',
     padding: '2px 3px',
@@ -58,7 +60,7 @@ const styles = theme => ({
     },
   },
   contentPanel: {
-    maxHeight: 800,
+    maxHeight: 850,
     overflowY: 'scroll',
     marginBottom: 10,
   },
@@ -90,7 +92,7 @@ const ContentGridItem = ({ children, title }) => {
             textAlign: 'right',
             position: 'absolute',
             left: '-135px',
-            fontWeight: 500,
+            fontWeight: 600,
           }}
         >
           {title}
@@ -115,6 +117,8 @@ const Details = props => {
     primaryPrintoutLanguage = 'EN',
     secondaryPrintoutLanguage = '',
     labelPrinterSize,
+    isQueueNoDecimal,
+    visitTypeSetting,
   } = clinicSettings
   const [showEditOrderModal, setShowEditOrderModal] = useState(false)
   const [showRedispenseFormModal, setShowRedispenseFormModal] = useState(false)
@@ -144,12 +148,11 @@ const Details = props => {
         setShowEditOrderModal(true)
       })
     }
-    if (visitPurposeFK === VISIT_TYPE.RETAIL) {
-      _editOrder()
-    } else {
+    if (visitPurposeFK === VISIT_TYPE.OTC) {
       navigateDirtyCheck({
         onProceed: _editOrder,
       })(e)
+    } else {
     }
   }
 
@@ -270,7 +273,6 @@ const Details = props => {
 
   const reloadPharmacy = () => {
     dispatch({ type: 'pharmacyDetails/query', payload: { id: workitem.id } })
-    setShowEditOrderModal(false)
   }
 
   const getInstruction = row => {
@@ -422,7 +424,7 @@ const Details = props => {
   const onPrepare = () => {
     const { orderItems = [] } = props.values || {}
 
-    const isOverStock = () => {
+    const checkOverStock = () => {
       let isOverStock = false
       for (let index = 0; index < orderItems.length; index++) {
         if (orderItems[index].stockFK && !orderItems[index].isDefault) {
@@ -441,29 +443,79 @@ const Details = props => {
       return isOverStock
     }
 
-    const isPartialPrepare = () => {
-      let isPartialPrepare = false
+    const checkOverDispense = () => {
+      let isOverDispense = false
       for (let index = 0; index < orderItems.length; index++) {
-        var items = orderItems.filter(
-          oi =>
-            oi.invoiceItemTypeFK === orderItems[index].invoiceItemTypeFK &&
-            oi.id === orderItems[index].id &&
-            oi.inventoryFK === orderItems[index].inventoryFK,
-        )
-        if (orderItems[index].quantity > _.sumBy(items, 'dispenseQuantity')) {
-          isPartialPrepare = true
-          break
+        if (orderItems[index].stockFK) {
+          let items = []
+          if (orderItems[index].isDrugMixture) {
+            items = orderItems.filter(
+              oi =>
+                oi.isDrugMixture &&
+                oi.drugMixtureFK === orderItems[index].drugMixtureFK &&
+                oi.inventoryFK === orderItems[index].inventoryFK,
+            )
+          } else {
+            items = orderItems.filter(
+              oi =>
+                !oi.isDrugMixture &&
+                oi.invoiceItemTypeFK === orderItems[index].invoiceItemTypeFK &&
+                oi.id === orderItems[index].id &&
+                oi.inventoryFK === orderItems[index].inventoryFK,
+            )
+          }
+          if (orderItems[index].quantity < _.sumBy(items, 'dispenseQuantity')) {
+            isOverDispense = true
+            break
+          }
         }
       }
+      return isOverDispense
     }
 
-    if (isOverStock()) {
+    const checkPartialPrepare = () => {
+      let isPartialPrepare = false
+      for (let index = 0; index < orderItems.length; index++) {
+        if (orderItems[index].stockFK) {
+          let items = []
+          if (orderItems[index].isDrugMixture) {
+            items = orderItems.filter(
+              oi =>
+                oi.isDrugMixture &&
+                oi.drugMixtureFK === orderItems[index].drugMixtureFK &&
+                oi.inventoryFK === orderItems[index].inventoryFK,
+            )
+          } else {
+                   items = orderItems.filter(
+                     oi =>
+                       !oi.isDrugMixture &&
+                       oi.invoiceItemTypeFK ===
+                         orderItems[index].invoiceItemTypeFK &&
+                       oi.id === orderItems[index].id &&
+                       oi.inventoryFK === orderItems[index].inventoryFK,
+                   )
+                 }
+          if (orderItems[index].quantity > _.sumBy(items, 'dispenseQuantity')) {
+            isPartialPrepare = true
+            break
+          }
+        }
+      }
+      return isPartialPrepare
+    }
+    if (checkOverDispense()) {
       notification.error({
-        message: 'inventory dispense more than total stock.',
+        message: 'Dispense quantity more than ordered quantity',
       })
       return
     }
-    if (isPartialPrepare()) {
+    if (checkOverStock()) {
+      notification.error({
+        message: 'Dispense quantity more than total stock.',
+      })
+      return
+    }
+    if (checkPartialPrepare()) {
       dispatch({
         type: 'global/updateAppState',
         payload: {
@@ -489,24 +541,6 @@ const Details = props => {
     dispatch({
       type: 'pharmacyDetails/query',
       payload: { id: workitem.id },
-    }).then(r => {
-      if (!r) {
-        dispatch({
-          type: 'global/updateAppState',
-          payload: {
-            openConfirm: true,
-            isInformType: true,
-            openConfirmText: 'OK',
-            openConfirmContent: `Pharmacy workitem has been remove by others, click Ok to close.`,
-            onConfirmClose: () => {
-              const { onClose } = props
-              if (onClose) {
-                onClose()
-              }
-            },
-          },
-        })
-      }
     })
   }
 
@@ -524,6 +558,25 @@ const Details = props => {
     workitem.isPharmacyOrderUpdate || workitem.isPharmacyOrderDiscard
       ? workitem.updateMessage
       : updateMessage
+
+  const pharmacyOrderItemCount = (
+    pharmacyDetails.entity?.pharmacyOrderItem || []
+  ).length
+
+  const queueNo =
+    !workitem.queueNo || !workitem.queueNo.trim().length
+      ? '-'
+      : numeral(workitem.queueNo).format(isQueueNoDecimal ? '0.0' : '0')
+
+  let visitTypeSettingsObj = []
+  if (visitTypeSetting) {
+    try {
+      visitTypeSettingsObj = JSON.parse(visitTypeSetting)
+    } catch {}
+  }
+  const visitType = (visitTypeSettingsObj || []).find(
+    type => type.id === workitem.visitPurposeFK,
+  )
   return (
     <div style={{ marginTop: -20 }}>
       <div className={classes.contentPanel}>
@@ -541,9 +594,7 @@ const Details = props => {
             <GridItem md={12}>
               <Typography.Title level={5}>Order Details</Typography.Title>
             </GridItem>
-            <ContentGridItem title='Queue No.:'>
-              {workitem.queueNo}
-            </ContentGridItem>
+            <ContentGridItem title='Queue No.:'>{queueNo}</ContentGridItem>
             <ContentGridItem title='Diagnosis:'>
               {corDiagnosis.length
                 ? workitem.corDiagnosis
@@ -552,7 +603,7 @@ const Details = props => {
                 : '-'}
             </ContentGridItem>
             <ContentGridItem title='Visit Type:'>
-              {workitem.visitType}
+              {visitType?.displayValue || '-'}
             </ContentGridItem>
             <ContentGridItem title='Order By:'>{`${
               workitem.generateByUserTitle &&
@@ -592,14 +643,17 @@ const Details = props => {
                     className={classes.alertStyle}
                     icon={<Warning style={{ color: 'red' }} />}
                   />
-                  <Button
-                    color='primary'
-                    justIcon
-                    className={classes.refreshButton}
-                    onClick={refreshClick}
-                  >
-                    <Refresh />
-                  </Button>
+                  {workitem.isPharmacyOrderUpdate &&
+                    workitem.statusFK === PHARMACY_STATUS.NEW && (
+                      <Button
+                        color='primary'
+                        justIcon
+                        className={classes.refreshButton}
+                        onClick={refreshClick}
+                      >
+                        <Refresh />
+                      </Button>
+                    )}
                 </div>
               )}
             </GridItem>
@@ -676,19 +730,19 @@ const Details = props => {
                         )
                         if (row.value === 'NormalDispense')
                           return (
-                            <span style={{ fontWeight: 500 }}>
+                            <span style={{ fontWeight: 600 }}>
                               Normal Dispense Items
                             </span>
                           )
                         if (row.value === 'NoNeedToDispense')
                           return (
-                            <span style={{ fontWeight: 500 }}>
+                            <span style={{ fontWeight: 600 }}>
                               No Need To Dispense Items
                             </span>
                           )
                         return (
                           <span>
-                            <span style={{ fontWeight: 500 }}>
+                            <span style={{ fontWeight: 600 }}>
                               {'Drug Mixture: '}
                             </span>
                             {groupRow.drugMixtureName}
@@ -726,21 +780,11 @@ const Details = props => {
                   },
                   {
                     name: 'stock',
-                    title: (
-                      <div>
-                        <p style={{ height: 16 }}>Stock</p>
-                        <p style={{ height: 16 }}>Qty.</p>
-                      </div>
-                    ),
+                    title: 'Stock Qty.',
                   },
                   {
                     name: 'stockBalance',
-                    title: (
-                      <div>
-                        <p style={{ height: 16 }}>Balance</p>
-                        <p style={{ height: 16 }}>Qty.</p>
-                      </div>
-                    ),
+                    title: 'Balance Qty.',
                   },
                   { name: 'batchNo', title: 'Batch No.' },
                   { name: 'expiryDate', title: 'Expiry Date' },
@@ -769,7 +813,7 @@ const Details = props => {
                     }`,
                   },
                   { name: 'remarks', title: 'Remarks' },
-                  { name: 'action', title: 'Action' },
+                  //{ name: 'action', title: 'Action' },
                 ]}
                 columnExtensions={[
                   {
@@ -808,7 +852,7 @@ const Details = props => {
                             {row.itemName}
                             <div style={{ position: 'relative', top: 2 }}>
                               {row.isExclusive && (
-                                <Tooltip title='Exclusive Drug'>
+                                <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                                   <div
                                     className={classes.rightIcon}
                                     style={{
@@ -852,6 +896,7 @@ const Details = props => {
                         </Tooltip>
                       )
                     },
+                    align: 'right',
                   },
                   {
                     columnName: 'dispenseQuantity',
@@ -860,15 +905,11 @@ const Details = props => {
                     render: row => {
                       if (
                         row.statusFK !== PHARMACY_STATUS.NEW ||
-                        row.isExternalPrescription ||
-                        (!row.isDrugMixture && !row.inventoryFK)
+                        !row.stockFK
                       ) {
-                        const dispenseQty =
-                          row.isExternalPrescription ||
-                          (!row.isDrugMixture && !row.inventoryFK) ||
-                          !row.isDispensedByPharmacy
-                            ? '-'
-                            : `${numeral(row.dispenseQuantity).format('0.0')}`
+                        const dispenseQty = !row.stockFK
+                          ? '-'
+                          : `${numeral(row.dispenseQuantity).format('0.0')}`
                         return (
                           <Tooltip title={dispenseQty}>
                             <span>{dispenseQty}</span>
@@ -895,6 +936,7 @@ const Details = props => {
                         />
                       )
                     },
+                    align: 'right',
                   },
                   {
                     columnName: 'stock',
@@ -912,6 +954,7 @@ const Details = props => {
                         </Tooltip>
                       )
                     },
+                    align: 'right',
                   },
                   {
                     columnName: 'stockBalance',
@@ -931,24 +974,69 @@ const Details = props => {
                         </Tooltip>
                       )
                     },
+                    align: 'right',
                   },
                   {
                     columnName: 'batchNo',
                     width: 100,
                     sortingEnabled: false,
+                    render: row => {
+                      if (
+                        row.statusFK !== PHARMACY_STATUS.NEW ||
+                        !row.isDefault
+                      ) {
+                        return (
+                          <Tooltip title={row.batchNo}>
+                            <span>{row.batchNo}</span>
+                          </Tooltip>
+                        )
+                      }
+                      return (
+                        <FastField
+                          name={`orderItems[${row.rowIndex}]batchNo`}
+                          render={args => {
+                            return (
+                              <TextField maxLength={100} label='' {...args} />
+                            )
+                          }}
+                        />
+                      )
+                    },
                   },
                   {
                     columnName: 'expiryDate',
-                    width: 100,
+                    width: 110,
                     sortingEnabled: false,
                     render: row => {
-                      const expiryDate = row.expiryDate
-                        ? moment(row.expiryDate).format('DD MMM YYYY')
-                        : '-'
+                      if (
+                        row.statusFK !== PHARMACY_STATUS.NEW ||
+                        !row.isDefault
+                      ) {
+                        const expiryDate = row.expiryDate
+                          ? moment(row.expiryDate).format('DD MMM YYYY')
+                          : '-'
+                        return (
+                          <Tooltip title={expiryDate}>
+                            <span>{expiryDate}</span>
+                          </Tooltip>
+                        )
+                      }
                       return (
-                        <Tooltip title={expiryDate}>
-                          <span>{expiryDate}</span>
-                        </Tooltip>
+                        <FastField
+                          name={`orderItems[${row.rowIndex}]expiryDate`}
+                          render={args => {
+                            return (
+                              <DatePicker
+                                label=''
+                                simple
+                                disabledDate={d =>
+                                  !d || d.isBefore(moment().add('days', -1))
+                                }
+                                {...args}
+                              />
+                            )
+                          }}
+                        />
                       )
                     },
                   },
@@ -1018,7 +1106,7 @@ const Details = props => {
                                   <Tooltip
                                     title={
                                       <div>
-                                        <div style={{ fontWeight: 500 }}>
+                                        <div style={{ fontWeight: 600 }}>
                                           Drug Label Remarks
                                         </div>
                                         <div>{row.drugLabelRemarks}</div>
@@ -1050,7 +1138,9 @@ const Details = props => {
                     },
                   },
                 ]}
-                TableProps={{ rowComponent: orderItemRow }}
+                TableProps={{
+                  rowComponent: orderItemRow,
+                }}
               />
             </GridItem>
           </GridContainer>
@@ -1059,13 +1149,13 @@ const Details = props => {
       <GridContainer>
         <GridItem md={8}>
           <div style={{ position: 'relative' }}>
-            <Button color='primary' size='sm'>
+            <Button color='primary' size='sm' disabled={isOrderUpdate}>
               Print Prescription
             </Button>
-            <Button color='primary' size='sm'>
+            <Button color='primary' size='sm' disabled={isOrderUpdate}>
               Print leaflet/Drug Summary Label
             </Button>
-            <Button color='primary' size='sm'>
+            <Button color='primary' size='sm' disabled={isOrderUpdate}>
               Print Drug Label
             </Button>
             {secondaryPrintoutLanguage !== '' && (
@@ -1100,7 +1190,7 @@ const Details = props => {
             onClick={() => {
               if (
                 workitem.statusFK !== PHARMACY_STATUS.NEW &&
-                !props.values.orderItems.length
+                !pharmacyOrderItemCount
               ) {
                 updatePharmacy(PHARMACY_ACTION.CANCEL)
               } else {
@@ -1110,7 +1200,7 @@ const Details = props => {
             }}
           >
             {workitem.statusFK !== PHARMACY_STATUS.NEW &&
-            !props.values.orderItems.length
+            !pharmacyOrderItemCount
               ? 'Cancel'
               : 'Close'}
           </Button>
@@ -1119,10 +1209,10 @@ const Details = props => {
               <Button
                 color='success'
                 size='sm'
-                disabled={isOrderUpdate || !props.values.orderItems.length}
+                disabled={isOrderUpdate || !pharmacyOrderItemCount}
                 onClick={editOrder}
               >
-                {workitem.visitPurposeFK == VISIT_TYPE.RETAIL
+                {workitem.visitPurposeFK == VISIT_TYPE.OTC
                   ? 'Add Order'
                   : 'Edit Order'}
               </Button>
@@ -1136,7 +1226,9 @@ const Details = props => {
                 onClick={() => {
                   setShowRedispenseFormModal(true)
                 }}
-                disabled={!props.values.orderItems.length}
+                disabled={
+                  !pharmacyOrderItemCount || workitem.isPharmacyOrderDiscard
+                }
               >
                 Re-dispense
               </Button>
@@ -1148,7 +1240,7 @@ const Details = props => {
                 color='primary'
                 size='sm'
                 onClick={onPrepare}
-                disabled={isOrderUpdate || !props.values.orderItems.length}
+                disabled={isOrderUpdate || !pharmacyOrderItemCount}
               >
                 Prepare
               </Button>
@@ -1160,7 +1252,7 @@ const Details = props => {
                 color='primary'
                 size='sm'
                 onClick={() => updatePharmacy(PHARMACY_ACTION.VERIFY)}
-                disabled={isOrderUpdate || !props.values.orderItems.length}
+                disabled={isOrderUpdate || !pharmacyOrderItemCount}
               >
                 Verify
               </Button>
@@ -1172,7 +1264,7 @@ const Details = props => {
                 color='primary'
                 size='sm'
                 onClick={() => updatePharmacy(PHARMACY_ACTION.COMPLETE)}
-                disabled={isOrderUpdate || !props.values.orderItems.length}
+                disabled={isOrderUpdate || !pharmacyOrderItemCount}
               >
                 Complete
               </Button>
@@ -1185,6 +1277,15 @@ const Details = props => {
         title='Edit Order'
         showFooter={true}
         onClose={() => {
+          dispatch({
+            type: 'orders/reset',
+          })
+          setShowEditOrderModal(false)
+        }}
+        onConfirm={() => {
+          dispatch({
+            type: 'orders/reset',
+          })
           setShowEditOrderModal(false)
         }}
         maxWidth='md'
@@ -1222,7 +1323,7 @@ export default compose(
     codetable,
   })),
   withFormikExtend({
-    enableReinitialize: false,
+    enableReinitialize: true,
     mapPropsToValues: ({ pharmacyDetails, clinicSettings, codetable }) => {
       if (!pharmacyDetails.entity) return { orderItems: [] }
       const {
@@ -1304,7 +1405,7 @@ export default compose(
                 ['asc'],
               )
               let remainQty = drugMixture.quantity
-              if (inventoryItem && inventoryItemStock.length) {
+              if (remainQty > 0 && inventoryItem && inventoryItemStock.length) {
                 inventoryItemStock.forEach((itemStock, index) => {
                   const {
                     id,
@@ -1313,7 +1414,7 @@ export default compose(
                     stock,
                     isDefault,
                   } = itemStock
-                  if (remainQty >= 0) {
+                  if (remainQty > 0) {
                     let dispenseQuantity = 0
                     if (isDefault || remainQty <= stock) {
                       dispenseQuantity = remainQty
@@ -1333,10 +1434,17 @@ export default compose(
                       secondUOMDisplayValue: secondUOMDisplayValue,
                       isDefault,
                       countNumber: index === 0 ? 1 : 0,
-                      rowspan: index === 0 ? inventoryItemStock.length : 0,
+                      rowspan: 0,
                     })
                   }
                 })
+                const firstItem = orderItems.find(
+                  i =>
+                    i.drugMixtureFK === drugMixture.id && i.countNumber === 1,
+                )
+                firstItem.rowspan = orderItems.filter(
+                  i => i.drugMixtureFK === drugMixture.id,
+                ).length
               } else {
                 orderItems.push({
                   ...detaultDrugMixture,
@@ -1449,10 +1557,10 @@ export default compose(
             ['asc'],
           )
           let remainQty = item.quantity
-          if (inventoryItem && inventoryItemStock.length) {
+          if (remainQty > 0 && inventoryItem && inventoryItemStock.length) {
             inventoryItemStock.forEach((itemStock, index) => {
               const { id, batchNo, expiryDate, stock, isDefault } = itemStock
-              if (remainQty >= 0) {
+              if (remainQty > 0) {
                 let dispenseQuantity = 0
                 if (isDefault || remainQty <= stock) {
                   dispenseQuantity = remainQty
@@ -1472,10 +1580,23 @@ export default compose(
                   secondUOMDisplayValue: secondUOMDisplayValue,
                   isDefault,
                   countNumber: index === 0 ? 1 : 0,
-                  rowspan: index === 0 ? inventoryItemStock.length : 0,
+                  rowspan: 0,
                 })
               }
             })
+            const firstItem = orderItems.find(
+              i =>
+                i.invoiceItemTypeFK === item.invoiceItemTypeFK &&
+                i.isDrugMixture === item.isDrugMixture &&
+                i.id === item.id &&
+                i.countNumber === 1,
+            )
+            firstItem.rowspan = orderItems.filter(
+              i =>
+                i.invoiceItemTypeFK === item.invoiceItemTypeFK &&
+                i.isDrugMixture === item.isDrugMixture &&
+                i.id === item.id,
+            ).length
           } else {
             orderItems.push(defaultItem(item, groupName))
           }
@@ -1497,10 +1618,10 @@ export default compose(
             ['asc'],
           )
           let remainQty = item.quantity
-          if (inventoryItem && inventoryItemStock.length) {
+          if (remainQty > 0 && inventoryItem && inventoryItemStock.length) {
             inventoryItemStock.forEach((itemStock, index) => {
               const { id, batchNo, expiryDate, stock, isDefault } = itemStock
-              if (remainQty >= 0) {
+              if (remainQty > 0) {
                 let dispenseQuantity = 0
                 if (isDefault || remainQty <= stock) {
                   dispenseQuantity = remainQty
@@ -1519,9 +1640,22 @@ export default compose(
                   uomDisplayValue: inventoryItem?.uom?.name,
                   isDefault,
                   countNumber: index === 0 ? 1 : 0,
-                  rowspan: index === 0 ? inventoryItemStock.length : 0,
+                  rowspan: 0,
                 })
               }
+              const firstItem = orderItems.find(
+                i =>
+                  i.invoiceItemTypeFK === item.invoiceItemTypeFK &&
+                  i.isDrugMixture === item.isDrugMixture &&
+                  i.id === item.id &&
+                  i.countNumber === 1,
+              )
+              firstItem.rowspan = orderItems.filter(
+                i =>
+                  i.invoiceItemTypeFK === item.invoiceItemTypeFK &&
+                  i.isDrugMixture === item.isDrugMixture &&
+                  i.id === item.id,
+              ).length
             })
           } else {
             orderItems.push(defaultItem(item, 'NormalDispense'))

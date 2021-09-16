@@ -214,13 +214,17 @@ const Detail = ({
                             },
                           })
                         }
-                        arr.push({
-                          id: 'isNurseActualizable',
-                          name: 'Nurse Actualizable',
-                          layoutConfig: {
-                            style: {},
-                          },
-                        })
+                        if(clinicSettings.isEnableNurseWorkItem){
+                          arr.push({
+                            id: 'isNurseActualizable',
+                            name: 'Actualize by Nurse',
+                            tooltip: 'Item will generate task for nurse to actualize',
+                            disabled: hasActiveSession && vaccinationDetail.entity?.id,
+                            layoutConfig: {
+                              style: {},
+                            },
+                          })
+                        }
                         return arr
                       })()
                       }

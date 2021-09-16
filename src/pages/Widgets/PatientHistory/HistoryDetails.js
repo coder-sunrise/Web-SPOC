@@ -32,7 +32,7 @@ class HistoryDetails extends PureComponent {
 
   componentWillMount () {
     const { selectHistory } = this.props
-    const isRetailVisit = selectHistory.visitPurposeFK === VISIT_TYPE.RETAIL
+    const isRetailVisit = selectHistory.visitPurposeFK === VISIT_TYPE.OTC
     if (isRetailVisit) {
       this.handleRetailVisitHistory(selectHistory)
     } else
@@ -77,7 +77,7 @@ class HistoryDetails extends PureComponent {
     const { patientHistory, clinicSettings, selectHistory } = this.props
     const { settings = [] } = clinicSettings
     const { selectedSubRow } = patientHistory
-    const isRetailVisit = selectHistory.visitPurposeFK === VISIT_TYPE.RETAIL
+    const isRetailVisit = selectHistory.visitPurposeFK === VISIT_TYPE.OTC
     let newArray = []
 
     if (isRetailVisit) {
@@ -106,7 +106,7 @@ class HistoryDetails extends PureComponent {
             ? `${o.userTitle || ''} ${o.userName || ''}`
             : undefined
           const lastUpdateDate = moment(
-            selectHistory.visitPurposeFK === VISIT_TYPE.RETAIL
+            selectHistory.visitPurposeFK === VISIT_TYPE.OTC
               ? o.visitDate
               : o.signOffDate,
           ).format('DD MMM YYYY HH:mm')
@@ -224,7 +224,7 @@ class HistoryDetails extends PureComponent {
       >
         {this.widgets
           .filter((_widget) => {
-            if (visitPurposeFK === VISIT_TYPE.RETAIL) {
+            if (visitPurposeFK === VISIT_TYPE.OTC) {
               return (
                 _widget.id === WidgetConfig.WIDGETS_ID.INVOICE &&
                 WidgetConfig.showWidget(current, _widget.id)

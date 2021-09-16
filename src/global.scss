@@ -428,7 +428,9 @@ html {
 .ant-select-clear {
   right: 3px;
 }
-.ant-select-single:not(.ant-select-customize-input) .ant-select-selector .ant-select-selection-search-input {
+.ant-select-single:not(.ant-select-customize-input)
+  .ant-select-selector
+  .ant-select-selection-search-input {
   height: 18px;
 }
 // --- IMPORTANT: do not remove this css class ---
@@ -700,9 +702,9 @@ tr[class*='TableSelectRow-selected-'] {
 
 button[class^='MuiButton-root-'],
 button[class*='MuiButton-root-'] {
- text-transform: none !important;
- span{
-    span{
+  text-transform: none !important;
+  span {
+    span {
       margin-left: 0px !important;
     }
   }
@@ -768,15 +770,16 @@ button[class*='MuiButton-root-'] {
   top: 2px;
 }
 
-.ant-select-disabled.ant-select:not(.ant-select-customize-input) .ant-select-selector{
-  color:rgba(0, 0, 0, 0.54);
+.ant-select-disabled.ant-select:not(.ant-select-customize-input)
+  .ant-select-selector {
+  color: rgba(0, 0, 0, 0.54);
 }
 
-.ant-select-dropdown-bottom-bordered .rc-virtual-list-holder{
+.ant-select-dropdown-bottom-bordered .rc-virtual-list-holder {
   height: 300px;
-} 
+}
 
-.ant-select-dropdown-bottom-bordered .ant-select-item{
+.ant-select-dropdown-bottom-bordered .ant-select-item {
   border-bottom-color: #bdc1c9;
   border-bottom-width: thin;
   border-bottom-style: solid;
@@ -786,5 +789,9 @@ button[class*='MuiButton-root-'] {
 .ant-tabs-bottom > .ant-tabs-nav,
 .ant-tabs-top > div > .ant-tabs-nav,
 .ant-tabs-bottom > div > .ant-tabs-nav {
-    margin: 0 0 3px 0;
+  margin: 0 0 3px 0;
+} 
+
+td[class*='MuiTableCell-root-'],th[class*='MuiTableCell-root-'] {
+  padding-left: 8px!important; 
 }

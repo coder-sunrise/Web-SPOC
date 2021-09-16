@@ -165,7 +165,7 @@ import { CollectionsOutlined } from '@material-ui/icons'
         const medicationdispensingUOM = medication.dispensingUOM
         const medicationusage = medication.medicationUsage
         const medicationfrequency = matchInstruction?.medicationFrequency
-        const medicationdosage = matchInstruction?.medicationFrequency
+        const medicationdosage = matchInstruction?.prescribingDosage
         const medicationprescribingUOM = medication.prescribingUOM
         const medicationPrecautions =
           medication.inventoryMedication_MedicationPrecaution
@@ -659,7 +659,7 @@ class Package extends PureComponent {
                 </Tooltip>
                 <div style={{ position: 'relative', top: 2 }}>
                   {row.isExclusive && (
-                    <Tooltip title='Exclusive Drug'>
+                    <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                       <div
                         className={classes.rightIcon}
                         style={{
