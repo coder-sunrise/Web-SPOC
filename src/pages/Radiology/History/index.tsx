@@ -72,7 +72,7 @@ const saveColumnsSetting = (dispatch, columnsSetting) => {
   })
 }
 
-const defaultColumns = (codetable, setDetailsId) => {
+const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
   return [
     {
       key: 'accessionNo',
@@ -360,20 +360,11 @@ const defaultColumns = (codetable, setDetailsId) => {
       dataIndex: 'searchVisitType',
       initialValue:[-99],
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-        const visitTypeOptions = (codetable.ctvisitpurpose || [])
-          .filter(x => x.id !== VISIT_TYPE.OTC)
-          .map(x => {
-            return {
-              value: x.id,
-              name: x.name,
-              customTooltipField: `Code: ${x.code}\nName: ${x.name}`,
-            }
-          })
         return (
           <Select
             label='Visit Type'
             mode='multiple'
-            options={visitTypeOptions}
+            options={visitPurpose}
             placeholder=''
             style={{ width: 250 }}
             maxTagCount={0}
@@ -540,6 +531,7 @@ const defaultColumns = (codetable, setDetailsId) => {
 const RadiologyWorklistHistoryIndex = ({
   radiologyHisotry: { radiologyHistoryColumnSetting = [] },
   codetable,
+  clinicSettings,
   classes,
 }) => {
   const dispatch = useDispatch()
@@ -591,7 +583,46 @@ const RadiologyWorklistHistoryIndex = ({
     
   })
 
-  const columns = defaultColumns(codetable, setDetailsId)
+  let visitTypeSettingsObj = undefined
+  let visitPurpose = undefined
+
+  if (clinicSettings.visitTypeSetting) {
+    try {
+      visitTypeSettingsObj = JSON.parse(clinicSettings.visitTypeSetting)
+    } catch {}
+  }
+
+  const mapVisitType = (visitpurpose, visitTypeSettingsObj) => {
+    return visitpurpose
+      .map((item, index) => {
+        const { name, code, sortOrder, ...rest } = item
+        const vstType = visitTypeSettingsObj
+          ? visitTypeSettingsObj[index]
+          : undefined
+        return {
+          ...rest,
+          name: vstType?.displayValue || name,
+          code: vstType?.code || code,
+          isEnabled: vstType?.isEnabled || 'true',
+          sortOrder: vstType?.sortOrder || 0,
+          customTooltipField: `Code: ${vstType?.code ||
+            code}\nName: ${vstType?.displayValue || name}`,
+        }
+      })
+      .sort((a, b) => (a.sortOrder >= b.sortOrder ? 1 : -1))
+  }
+
+  if ((codetable?.ctvisitpurpose || []).length > 0) {
+    const filteredVisitpurpose = codetable.ctvisitpurpose.filter(
+      x => x.id != VISIT_TYPE.OTC,
+    )
+    visitPurpose = mapVisitType(
+      filteredVisitpurpose,
+      visitTypeSettingsObj,
+    ).filter(vstType => vstType['isEnabled'] === 'true')
+  }
+
+  const columns = defaultColumns(codetable, setDetailsId, visitPurpose)
 
   return (
     <Fragment>
@@ -712,9 +743,10 @@ const HistoryIndex = props => (
 )
 
 const historyIndex = compose(
-  connect(({ radiologyHisotry, codetable }) => ({
+  connect(({ radiologyHisotry, codetable, clinicSettings }) => ({
     radiologyHisotry,
     codetable,
+    clinicSettings:clinicSettings.settings || clinicSettings.default,
   })),
 )(HistoryIndex)
 
