@@ -7,6 +7,7 @@ import { Field } from 'formik'
 // umi
 import { formatMessage } from 'umi'
 // custom components
+import _ from 'lodash'
 import { Alert } from 'antd'
 import {
   TextField,
@@ -32,7 +33,7 @@ import {
 import { VISIT_TYPE } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
-import { roundTo } from '@/utils/utils'
+import { roundTo, getMappedVisitType } from '@/utils/utils'
 import numeral from 'numeral'
 import FormField from './formField'
 import Authorized from '@/utils/Authorized'
@@ -119,7 +120,7 @@ const VisitInfoCard = ({
     let activeItemTotal = 0
     visitOrderTemplateItemTypes.forEach(type => {
       // type.id === 3 means vaccination
-      if (vType === VISIT_TYPE.RETAIL && type.id === 3) return
+      if (vType === VISIT_TYPE.OTC && type.id === 3) return
       const currentTypeItems = template.visitOrderTemplateItemDtos.filter(
         itemType => itemType.inventoryItemTypeFK === type.id,
       )
@@ -222,29 +223,8 @@ const VisitInfoCard = ({
       visitTypeSettingsObj = JSON.parse(visitTypeSetting)
     } catch {}
   }
-
-  const mapVisitType = (visitpurpose, visitTypeSettingsObj) => {
-    return visitpurpose
-      .map((item, index) => {
-        const { name, code, sortOrder, ...rest } = item
-        const vstType = visitTypeSettingsObj
-          ? visitTypeSettingsObj[index]
-          : undefined
-        return {
-          ...rest,
-          name: vstType?.displayValue || name,
-          code: vstType?.code || code,
-          isEnabled: vstType?.isEnabled || 'true',
-          sortOrder: vstType?.sortOrder || 0,
-          customTooltipField: `${vstType?.code ||
-            code} - ${vstType?.displayValue || name}`,
-        }
-      })
-      .sort((a, b) => (a.sortOrder >= b.sortOrder ? 1 : -1))
-  }
-
   if ((ctvisitpurpose || []).length > 0) {
-    visitPurpose = mapVisitType(ctvisitpurpose, visitTypeSettingsObj).filter(
+    visitPurpose = getMappedVisitType(ctvisitpurpose, visitTypeSettingsObj).filter(
       vstType => vstType['isEnabled'] === 'true',
     )
   }
@@ -316,7 +296,7 @@ const VisitInfoCard = ({
                 // disabled={isReadOnly}
                 onChange={(v, op = {}) => handleDoctorChange(v, op)}
                 label={
-                  visitType === VISIT_TYPE.RETAIL
+                  visitType === VISIT_TYPE.OTC
                     ? formatMessage({
                         id: 'reception.queue.visitRegistration.attendantDoctor',
                       })
@@ -473,7 +453,7 @@ const VisitInfoCard = ({
                 labelField='displayValue'
                 value={values.visitGroup}
                 disabled={isVisitReadonlyAfterSigned}
-                options={visitGroups}
+                options={_.orderBy(visitGroups, ['isFamilyMember','order'], ['desc','desc'])}
                 handleFilter={(input, option) => {
                   return (
                     option.data.visitGroup
@@ -507,8 +487,8 @@ const VisitInfoCard = ({
                         {option.patientName}
                       </GridItem>
                       {option.isFamilyMember ? (
-                        <GridItem sm={1} md={1}>
-                          <Icon type='family' />
+                        <GridItem style={{ padding: 0 }} sm={1} md={1}>
+                          <Icon style={{ fontSize: 20 }} type='family' />
                         </GridItem>
                       ) : (
                         ''

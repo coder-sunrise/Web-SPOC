@@ -614,7 +614,7 @@ const RadiologyWorklistHistoryIndex = ({
 
   if ((codetable?.ctvisitpurpose || []).length > 0) {
     const filteredVisitpurpose = codetable.ctvisitpurpose.filter(
-      x => x.id != VISIT_TYPE.RETAIL,
+      x => x.id != VISIT_TYPE.OTC,
     )
     visitPurpose = mapVisitType(
       filteredVisitpurpose,

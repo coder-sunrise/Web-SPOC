@@ -27,15 +27,15 @@ import {
 // utils
 import { getBizSession } from '@/services/queue'
 import { navigateDirtyCheck, getModuleSequence } from '@/utils/utils'
-
+import { CLINICAL_ROLE } from '@/utils/constants'
 const isMatchRole = (clinicRoleFK, clinicRoleBitValue) => {
   return !clinicRoleFK || clinicRoleBitValue >= 2 ** (clinicRoleFK - 1)
 }
 
-const styles = (theme) => ({
+const styles = theme => ({
   container: {
     marginBottom: theme.spacing(2),
-    height: 'auto !important' ,
+    height: 'auto !important',
   },
   verticalSpacing: {
     marginTop: theme.spacing(2),
@@ -87,14 +87,15 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ settingUserRole, global }) => ({
+@connect(({ settingUserRole, global, clinicSettings }) => ({
   settingUserRole,
   userRole: settingUserRole.currentSelectedUserRole,
   mainDivHeight: global.mainDivHeight,
+  clinicSettings: clinicSettings,
 }))
 @withFormikExtend({
   enableReinitialize: true,
-  mapPropsToValues: (props) => {
+  mapPropsToValues: props => {
     const { userRole } = props
     return {
       ...userRole,
@@ -112,11 +113,11 @@ const styles = (theme) => ({
     const { dispatch, onConfirm, history } = props
     const { roleClientAccessRight, ...restValues } = values
     let result = _.cloneDeep(restValues)
-    result.roleClientAccessRight = roleClientAccessRight.filter((m) =>
+    result.roleClientAccessRight = roleClientAccessRight.filter(m =>
       isMatchRole(values.clinicRoleFK, m.clinicRoleBitValue),
     )
     if (!values.id) {
-      result.roleClientAccessRight = roleClientAccessRight.map((d) => {
+      result.roleClientAccessRight = roleClientAccessRight.map(d => {
         const { id, ...data } = d
         return data
       })
@@ -128,7 +129,7 @@ const styles = (theme) => ({
     dispatch({
       type: 'settingUserRole/upsert',
       payload: result,
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         resetForm()
         if (onConfirm) onConfirm()
@@ -148,7 +149,7 @@ class Main extends React.Component {
   }
 
   debouncedAction = _.debounce(
-    (e) => {
+    e => {
       this.setFilterAccessRight(e)
     },
     100,
@@ -182,8 +183,8 @@ class Main extends React.Component {
         .dispatch({
           type: 'settingUserRole/fetchActiveUsers',
         })
-        .then((response) => {
-          const result = response.data.filter((m) => {
+        .then(response => {
+          const result = response.data.filter(m => {
             return m.userProfile.role.id === userRole.id
           })
           this.setState({ hasUser: result.length > 0 })
@@ -209,12 +210,11 @@ class Main extends React.Component {
     }
   }
 
-  handleSearch = async (e) => {
+  handleSearch = async e => {
     const { values } = this.props
     const { roleClientAccessRight, ...restValues } = values
     let result = _.cloneDeep(restValues)
     result.roleClientAccessRight = roleClientAccessRight
-
     if (typeof e === 'number') {
       result.clinicRoleFK = e
     }
@@ -232,10 +232,8 @@ class Main extends React.Component {
     const { roleClientAccessRight } = userRole
     let filteredList = roleClientAccessRight || []
 
-    let result = Array.from(
-      new Set(filteredList.map((f) => f.module)),
-    ).map((m) => {
-      const item = filteredList.find((f) => f.module === m)
+    let result = Array.from(new Set(filteredList.map(f => f.module))).map(m => {
+      const item = filteredList.find(f => f.module === m)
       return {
         name: item.module,
         value: item.module,
@@ -243,10 +241,10 @@ class Main extends React.Component {
       }
     })
 
-    const receptionModule = result.find((r) => r.value === 'Reception')
-    const consultationModule = result.find((r) => r.value === 'Consultation')
+    const receptionModule = result.find(r => r.value === 'Reception')
+    const consultationModule = result.find(r => r.value === 'Consultation')
     const patientDashboardModule = result.find(
-      (r) => r.value === 'Patient Dashboard',
+      r => r.value === 'Patient Dashboard',
     )
 
     if (receptionModule && consultationModule) {
@@ -256,16 +254,7 @@ class Main extends React.Component {
     if (receptionModule && patientDashboardModule) {
       patientDashboardModule.sequence = receptionModule.sequence + 0.2
     }
-
-    return _.orderBy(
-      result,
-      [
-        'sequence',
-      ],
-      [
-        'asc',
-      ],
-    )
+    return _.orderBy(result, ['sequence'], ['asc'])
   }
 
   goBackToPreviousPage = () => {
@@ -280,38 +269,29 @@ class Main extends React.Component {
 
     roleClientAccessRight = _.orderBy(
       roleClientAccessRight,
-      [
-        'sortOrder',
-      ],
-      [
-        'asc',
-      ],
+      ['sortOrder'],
+      ['asc'],
     )
 
     const updateRoleClientAccessRight = roleClientAccessRight.filter(
-      (m) =>
+      m =>
         isMatchRole(clinicRoleFK, m.clinicRoleBitValue) &&
         m.module === moduleName &&
         m.type === type,
     )
 
-    const updateChildrenAccessRight = (clientAccessRightFK) => {
-      let currenAccessRight = roleClientAccessRight.filter((accessRight) => {
+    const updateChildrenAccessRight = clientAccessRightFK => {
+      let currenAccessRight = roleClientAccessRight.filter(accessRight => {
         return (
           isMatchRole(clinicRoleFK, accessRight.clinicRoleBitValue) &&
           accessRight.parentClientAccessRightFK === clientAccessRightFK
         )
       })
-      currenAccessRight.forEach((r) => {
+      currenAccessRight.forEach(r => {
         if (newValue === 'Hidden' && r.permission !== 'Hidden') {
           r.permission = newValue
           updateChildrenAccessRight(r.clientAccessRightFK)
-        } else if (
-          [
-            'Enable',
-            'ReadWrite',
-          ].indexOf(r.permission) >= 0
-        ) {
+        } else if (['Enable', 'ReadWrite'].indexOf(r.permission) >= 0) {
           if (r.type === 'Module') {
             r.permission = 'ReadOnly'
           }
@@ -322,7 +302,7 @@ class Main extends React.Component {
       })
     }
 
-    updateRoleClientAccessRight.forEach((r) => {
+    updateRoleClientAccessRight.forEach(r => {
       if (r.permission !== newValue) {
         if (
           !this.isOverParentAccessRight(
@@ -338,9 +318,7 @@ class Main extends React.Component {
       }
     })
 
-    setFieldValue('roleClientAccessRight', [
-      ...roleClientAccessRight,
-    ])
+    setFieldValue('roleClientAccessRight', [...roleClientAccessRight])
   }
 
   isParentSelect = (clientAccessRightFK, moduleName) => {
@@ -352,11 +330,10 @@ class Main extends React.Component {
       return true
     const { values } = this.props
     const { roleClientAccessRight = [] } = values
-    const currentRoleClientAccessRight = roleClientAccessRight.filter((m) =>
+    const currentRoleClientAccessRight = roleClientAccessRight.filter(m =>
       isMatchRole(values.clinicRoleFK, m.clinicRoleBitValue),
     )
-
-    const checkParentSelect = (currentClientAccessRightId) => {
+    const checkParentSelect = currentClientAccessRightId => {
       if (
         currentClientAccessRightId ===
         this.state.selectAccessRight.clientAccessRightFK
@@ -364,7 +341,7 @@ class Main extends React.Component {
         return true
 
       const currenClientAccessRight = currentRoleClientAccessRight.find(
-        (r) => r.clientAccessRightFK === currentClientAccessRightId,
+        r => r.clientAccessRightFK === currentClientAccessRightId,
       )
 
       if (
@@ -385,7 +362,7 @@ class Main extends React.Component {
     const { values } = this.props
     const { roleClientAccessRight = [] } = values
     const currentRoleClientAccessRight = roleClientAccessRight.filter(
-      (m) =>
+      m =>
         isMatchRole(values.clinicRoleFK, m.clinicRoleBitValue) &&
         m.module === mudule &&
         m.type === type &&
@@ -394,18 +371,10 @@ class Main extends React.Component {
           .indexOf((this.state.filterAccessRight || '').toUpperCase()) >= 0,
     )
 
-    return _.orderBy(
-      currentRoleClientAccessRight,
-      [
-        'sortOrder',
-      ],
-      [
-        'asc',
-      ],
-    )
+    return _.orderBy(currentRoleClientAccessRight, ['sortOrder'], ['asc'])
   }
 
-  setFilterAccessRight = (e) => {
+  setFilterAccessRight = e => {
     this.setState({ filterAccessRight: e.target.value })
   }
 
@@ -414,23 +383,18 @@ class Main extends React.Component {
     const { values, setFieldValue } = this.props
     let { roleClientAccessRight = [], clinicRoleFK } = values
 
-    const updateChildrenAccessRight = (clientAccessRightFK) => {
-      let currenAccessRight = roleClientAccessRight.filter((accessRight) => {
+    const updateChildrenAccessRight = clientAccessRightFK => {
+      let currenAccessRight = roleClientAccessRight.filter(accessRight => {
         return (
           isMatchRole(clinicRoleFK, accessRight.clinicRoleBitValue) &&
           accessRight.parentClientAccessRightFK === clientAccessRightFK
         )
       })
-      currenAccessRight.forEach((r) => {
+      currenAccessRight.forEach(r => {
         if (newValue === 'Hidden' && r.permission !== 'Hidden') {
           r.permission = newValue
           updateChildrenAccessRight(r.clientAccessRightFK)
-        } else if (
-          [
-            'Enable',
-            'ReadWrite',
-          ].indexOf(r.permission) >= 0
-        ) {
+        } else if (['Enable', 'ReadWrite'].indexOf(r.permission) >= 0) {
           if (r.type === 'Module') {
             r.permission = 'ReadOnly'
           }
@@ -441,7 +405,7 @@ class Main extends React.Component {
       })
     }
 
-    let selectAccessRight = roleClientAccessRight.find((accessRight) => {
+    let selectAccessRight = roleClientAccessRight.find(accessRight => {
       return (
         isMatchRole(clinicRoleFK, accessRight.clinicRoleBitValue) &&
         accessRight.clientAccessRightFK === item.clientAccessRightFK
@@ -449,18 +413,11 @@ class Main extends React.Component {
     })
     selectAccessRight.permission = newValue
 
-    if (
-      [
-        'Enable',
-        'ReadWrite',
-      ].indexOf(newValue) < 0
-    ) {
+    if (['Enable', 'ReadWrite'].indexOf(newValue) < 0) {
       updateChildrenAccessRight(item.clientAccessRightFK)
     }
 
-    setFieldValue('roleClientAccessRight', [
-      ...roleClientAccessRight,
-    ])
+    setFieldValue('roleClientAccessRight', [...roleClientAccessRight])
   }
 
   isOverParentAccessRight = (
@@ -472,22 +429,16 @@ class Main extends React.Component {
     if (!accessRight.parentClientAccessRightFK) return false
 
     const parentRoleClientAccessRight = roleClientAccessRight.find(
-      (m) =>
+      m =>
         isMatchRole(clinicRoleFK, m.clinicRoleBitValue) &&
         m.clientAccessRightFK === accessRight.parentClientAccessRightFK,
     )
     if (parentRoleClientAccessRight) {
-      if (
-        [
-          'Enable',
-          'ReadWrite',
-        ].indexOf(accessValue) >= 0
-      ) {
+      if (['Enable', 'ReadWrite'].indexOf(accessValue) >= 0) {
         return (
-          [
-            'Enable',
-            'ReadWrite',
-          ].indexOf(parentRoleClientAccessRight.permission) < 0
+          ['Enable', 'ReadWrite'].indexOf(
+            parentRoleClientAccessRight.permission,
+          ) < 0
         )
       }
       return parentRoleClientAccessRight.permission === 'Hidden'
@@ -545,7 +496,7 @@ class Main extends React.Component {
                 style={{ width: 210 }}
                 size='small'
                 value=''
-                onChange={(e) => {
+                onChange={e => {
                   this.onClickAll(type, e.target.value, moduleName)
                 }}
               >
@@ -583,7 +534,7 @@ class Main extends React.Component {
               disablePadding
               onClick={() => {}}
             >
-              {items.map((item) => {
+              {items.map(item => {
                 return (
                   <ListItem
                     alignItems='flex-start'
@@ -638,7 +589,7 @@ class Main extends React.Component {
                         }}
                         size='small'
                         value={item.permission}
-                        onChange={(e) => {
+                        onChange={e => {
                           this.accessRightChange(item, e.target.value)
                         }}
                       >
@@ -681,8 +632,8 @@ class Main extends React.Component {
     )
   }
 
-  render () {
-    const { classes, values } = this.props
+  render() {
+    const { classes, values, clinicSettings } = this.props
     const { hasUser, hasActiveSession, isActive } = this.state
     const {
       id,
@@ -690,6 +641,18 @@ class Main extends React.Component {
       effectiveStartDate,
       effectiveEndDate,
     } = values
+
+    const {
+      isEnableRadiologyModule,
+      isEnablePharmacyModule,
+      isEnableLabModule,
+      isEnableNurseWorkItem,
+    } = clinicSettings.settings
+    let filterArray = [CLINICAL_ROLE.DOCTOR, CLINICAL_ROLE.OTHERS]
+    if (isEnableRadiologyModule) filterArray.push(CLINICAL_ROLE.RADIOGRAPHER)
+    if (isEnablePharmacyModule) filterArray.push(CLINICAL_ROLE.PHARMACIST)
+    if (isEnableLabModule) filterArray.push(CLINICAL_ROLE.LABTECH)
+    if (isEnableNurseWorkItem) filterArray.push(CLINICAL_ROLE.NURSE)
 
     const isEdit = !!id
     return (
@@ -700,13 +663,13 @@ class Main extends React.Component {
           className={classes.container}
         >
           <GridItem md={12} className={classes.verticalSpacing}>
-            <h4>User Role</h4>
+            <h4>User Group</h4>
           </GridItem>
           <GridContainer className={classes.indent} alignItems='center'>
             <GridItem md={3}>
               <Field
                 name='code'
-                render={(args) => {
+                render={args => {
                   return <TextField label='Code' disabled={isEdit} {...args} />
                 }}
               />
@@ -714,7 +677,7 @@ class Main extends React.Component {
             <GridItem md={3}>
               <Field
                 name='name'
-                render={(args) => (
+                render={args => (
                   <TextField
                     label='Name'
                     {...args}
@@ -726,7 +689,7 @@ class Main extends React.Component {
             <GridItem md={3}>
               <Field
                 name='description'
-                render={(args) => (
+                render={args => (
                   <TextField
                     label='Description'
                     {...args}
@@ -739,7 +702,7 @@ class Main extends React.Component {
             <GridItem md={3}>
               <Field
                 name='effectiveStartDate'
-                render={(args) => (
+                render={args => (
                   <DatePicker
                     {...args}
                     label='Effective Start Date'
@@ -759,7 +722,7 @@ class Main extends React.Component {
             <GridItem md={3}>
               <Field
                 name='effectiveEndDate'
-                render={(args) => (
+                render={args => (
                   <DatePicker
                     {...args}
                     label='Effective End Date'
@@ -780,12 +743,15 @@ class Main extends React.Component {
             <GridItem md={3}>
               <Field
                 name='clinicRoleFK'
-                render={(args) => (
+                render={args => (
                   <CodeSelect
                     {...args}
                     label='Clinical Role'
                     code='ltclinicalrole'
                     disabled={isEdit}
+                    localFilter={item => {
+                      return filterArray.includes(item.id)
+                    }}
                     onChange={this.handleSearch}
                   />
                 )}
@@ -803,7 +769,7 @@ class Main extends React.Component {
           <GridItem md={3} className={classes.verticalSpacing}>
             <TextField
               label='Filter Access Right'
-              onChange={(e) => {
+              onChange={e => {
                 this.debouncedAction(e)
               }}
             />
@@ -863,7 +829,7 @@ class Main extends React.Component {
                 type: 'global/updateAppState',
                 payload: {
                   openConfirm: true,
-                  openConfirmContent: `Save Role & Access Right?`,
+                  openConfirmContent: `Save User Group ?`,
                   onConfirmSave: this.props.handleSubmit,
                 },
               })

@@ -418,7 +418,7 @@ class NewVisit extends PureComponent {
       ? 'Loading visit info...'
       : undefined
     const loadingText = isEdit ? 'Saving visit...' : 'Registering visit...'
-    const isRetail = values.visitPurposeFK === VISIT_TYPE.RETAIL
+    const isRetail = values.visitPurposeFK === VISIT_TYPE.OTC
     const params = locationQueryParameters()
     const vis = parseInt(params.vis, 10)
     const autoRefreshChas = !(params.md === 'visreg' && vis > 0)

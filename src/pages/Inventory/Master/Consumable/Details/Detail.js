@@ -112,7 +112,7 @@ const Detail = ({
                       textField='name'
                       options={(() => {
                         var arr = []
-                        if (settings.isEnableCHAS) {
+                        if (clinicSettings.isEnableCHAS) {
                           arr.push(
                             ...[
                               {
@@ -151,7 +151,7 @@ const Detail = ({
                           ],
                         )
 
-                        if (settings.isEnablePharmacyModule)
+                        if (clinicSettings.isEnablePharmacyModule)
                           arr.push(
                             ...[
                               {
@@ -169,7 +169,7 @@ const Detail = ({
                             ],
                           )
 
-                        if (settings.isEnableNurseWorkItem)
+                        if (clinicSettings.isEnableNurseWorkItem)
                           arr.push(
                             ...[
                               {

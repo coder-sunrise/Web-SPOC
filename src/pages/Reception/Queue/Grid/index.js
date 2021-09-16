@@ -67,13 +67,12 @@ class Grid extends React.Component {
   }
 
   onRowDoubleClick = (row) => {
-    const { visitStatus, visitPurposeFK = VISIT_TYPE.CONS } = row
+    const { visitStatus, visitPurposeFK = VISIT_TYPE.CON } = row
     const isWaiting = visitStatus === VISIT_STATUS.WAITING
     const { clinicianProfile: { doctorProfile } } = this.props.user.data
     const retailVisits = [
-      VISIT_TYPE.RETAIL,
-      VISIT_TYPE.BILL_FIRST,
-      VISIT_TYPE.TELE_CONS,
+      VISIT_TYPE.OTC,
+      VISIT_TYPE.BF,
     ]
     if (!doctorProfile || retailVisits.includes(visitPurposeFK)) return false
 
@@ -163,8 +162,8 @@ class Grid extends React.Component {
     switch (visitStatus) {
       case VISIT_STATUS.WAITING:
         if (
-          visitPurposeFK === VISIT_TYPE.RETAIL ||
-          visitPurposeFK === VISIT_TYPE.BILL_FIRST
+          visitPurposeFK === VISIT_TYPE.OTC ||
+          visitPurposeFK === VISIT_TYPE.BF
         )
           id = '1'
         else id = '5'
@@ -288,13 +287,8 @@ class Grid extends React.Component {
                   width: 60,
                   align: 'left',
                   render: (row) => {
-                    return row.visitPurposeFK === VISIT_TYPE.TELE_CONS ? (
-                      <Tooltip title='TEL-CONS'>
-                        <CallIcon style={{ color: 'green' }} />
-                      </Tooltip>
-                    ) : (
+                    return 
                       ''
-                    )
                   },
                 },
               ]}

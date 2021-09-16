@@ -108,8 +108,8 @@ const styles = theme => ({
     fontSize: '0.7rem',
     padding: '2px 3px',
     height: 20,
-    cursor: 'pointer'
-  }
+    cursor: 'pointer',
+  },
 })
 @connect(
   ({
@@ -137,7 +137,7 @@ const styles = theme => ({
   }),
 })
 class PatientHistory extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.widgets = WidgetConfig.widgets(
       props,
@@ -173,7 +173,7 @@ class PatientHistory extends Component {
     }
   }
 
-  componentWillMount () {
+  componentWillMount() {
     const { dispatch } = this.props
 
     dispatch({
@@ -217,7 +217,7 @@ class PatientHistory extends Component {
     })
   }
 
-  componentDidMount () {
+  componentDidMount() {
     window.addEventListener('resize', () => {
       this.setState({ currentHeight: window.innerHeight })
     })
@@ -236,14 +236,21 @@ class PatientHistory extends Component {
     }
 
     const { settings = {} } = clinicSettings
-    const { isEnableClinicNoteHistory = false,
+    const {
+      isEnableClinicNoteHistory = false,
       isEnableClinicNoteChiefComplaints = false,
       isEnableClinicNotes = false,
-      isEnableClinicNotePlan = false } = settings
-    categories = categories.filter(c => (c !== WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY || isEnableClinicNoteHistory)
-      && (c !== WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS || isEnableClinicNoteChiefComplaints)
-      && (c !== WidgetConfig.WIDGETS_ID.CLINICAL_NOTE || isEnableClinicNotes)
-      && (c !== WidgetConfig.WIDGETS_ID.PLAN || isEnableClinicNotePlan))
+      isEnableClinicNotePlan = false,
+    } = settings
+    categories = categories.filter(
+      c =>
+        (c !== WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY ||
+          isEnableClinicNoteHistory) &&
+        (c !== WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS ||
+          isEnableClinicNoteChiefComplaints) &&
+        (c !== WidgetConfig.WIDGETS_ID.CLINICAL_NOTE || isEnableClinicNotes) &&
+        (c !== WidgetConfig.WIDGETS_ID.PLAN || isEnableClinicNotePlan),
+    )
 
     return WidgetConfig.categoryTypes
       .filter(o => {
@@ -293,13 +300,13 @@ class PatientHistory extends Component {
       payload: {
         visitFromDate: visitFromDate
           ? moment(visitFromDate)
-            .startOf('day')
-            .formatUTC()
+              .startOf('day')
+              .formatUTC()
           : undefined,
         visitToDate: visitToDate
           ? moment(visitToDate)
-            .endOf('day')
-            .formatUTC(false)
+              .endOf('day')
+              .formatUTC(false)
           : undefined,
         isAllDate,
         pageIndex: pageIndex + 1,
@@ -391,7 +398,7 @@ class PatientHistory extends Component {
     } = row
     const { settings = [] } = clinicSettings
     const { patientID } = patientHistory
-    const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
+    const isRetailVisit = visitPurposeFK === VISIT_TYPE.OTC
     const patientIsActive = patient.isActive
     const docotrName = userName
       ? `${userTitle || ''} ${userName || ''}`
@@ -408,6 +415,13 @@ class PatientHistory extends Component {
     }
     const isSelect = !!this.state.selectItems.find(o => o === row.currentId)
 
+    let visitTypeSettingsObj = []
+    try {
+      visitTypeSettingsObj = JSON.parse(settings.visitTypeSetting)
+    } catch {}
+
+    const mappedVisitPurposeName = visitTypeSettingsObj.find(x => x.id === visitPurposeFK)
+    
     return (
       <div
         style={{ display: 'flex', padding: '3px 0px 8px 0px', height: 36 }}
@@ -469,9 +483,9 @@ class PatientHistory extends Component {
         </div>
         {isNurseNote && (
           <div style={{ fontSize: '0.9em', fontWeight: 500, marginTop: 12 }}>
-            {`${moment(visitDate).format(
-              'DD MMM YYYY HH:MM',
-            )} - Notes${docotrName ? ` - ${docotrName}` : ''}`}
+            {`${moment(visitDate).format('DD MMM YYYY HH:MM')} - Notes${
+              docotrName ? ` - ${docotrName}` : ''
+            }`}
           </div>
         )}
         {!isNurseNote && (
@@ -479,16 +493,21 @@ class PatientHistory extends Component {
             <div style={{ fontWeight: 500, marginTop: 4 }}>
               {`${moment(visitDate).format('DD MMM YYYY')} (Time In: ${moment(
                 timeIn,
-              ).format('HH:mm')} Time Out: ${timeOut ? moment(timeOut).format('HH:mm') : '-'
-                })${docotrName ? ` - ${docotrName}` : ''}`}
+              ).format('HH:mm')} Time Out: ${
+                timeOut ? moment(timeOut).format('HH:mm') : '-'
+              })${docotrName ? ` - ${docotrName}` : ''}`}
             </div>
             <div style={{ marginTop: 18 }}>
               <span>
-                {`${visitPurposeName}, Last Update By: ${LastUpdateBy ||
+                {`${mappedVisitPurposeName?.displayValue || visitPurposeName}, Last Update By: ${LastUpdateBy ||
                   ''} on ${moment(signOffDate).format('DD MMM YYYY HH:mm')}`}
               </span>
               <span style={{ marginLeft: 5 }}>
-                {row.servingByList?.length > 0 ? `Served by ${row.servingByList.map(x => x.servingBy).join(', ')}.` : null}
+                {row.servingByList?.length > 0
+                  ? `Served by ${row.servingByList
+                      .map(x => x.servingBy)
+                      .join(', ')}.`
+                  : null}
               </span>
             </div>
           </div>
@@ -572,34 +591,32 @@ class PatientHistory extends Component {
               )}
           </div>
         )}
-        {!isNurseNote &&
-          settings.showConsultationVersioning &&
-          !isRetailVisit && (
-            <div
-              style={{
-                marginLeft: 'auto',
-                display: 'flex',
-                alignItems: 'center',
-                marginRight: 10,
-              }}
-            >
-              <Tooltip title='View History'>
-                <span
-                  className='material-icons'
-                  style={{ color: 'gray' }}
-                  onClick={event => {
-                    event.stopPropagation()
-                    this.setState({
-                      showHistoryDetails: true,
-                      selectHistory: { ...row },
-                    })
-                  }}
-                >
-                  history
-                </span>
-              </Tooltip>
-            </div>
-          )}
+        {!isNurseNote && settings.showConsultationVersioning && !isRetailVisit && (
+          <div
+            style={{
+              marginLeft: 'auto',
+              display: 'flex',
+              alignItems: 'center',
+              marginRight: 10,
+            }}
+          >
+            <Tooltip title='View History'>
+              <span
+                className='material-icons'
+                style={{ color: 'gray' }}
+                onClick={event => {
+                  event.stopPropagation()
+                  this.setState({
+                    showHistoryDetails: true,
+                    selectHistory: { ...row },
+                  })
+                }}
+              >
+                history
+              </span>
+            </Tooltip>
+          </div>
+        )}
       </div>
     )
   }
@@ -830,8 +847,8 @@ class PatientHistory extends Component {
         patientAllergy: allergies.length
           ? allergies.map(o => o.allergyName).join(', ')
           : patientNoAllergies
-            ? 'NKDA'
-            : '',
+          ? 'NKDA'
+          : '',
         patientSocialHistory: socialHistory,
         patientFamilyHistory: familyHistory,
         patientMajorInvestigation: medicalHistory,
@@ -841,7 +858,7 @@ class PatientHistory extends Component {
 
   checkShowData = (widgetId, current, visitPurposeFK, isNurseNote) => {
     if (isNurseNote) return false
-    if (visitPurposeFK === VISIT_TYPE.RETAIL) {
+    if (visitPurposeFK === VISIT_TYPE.OTC) {
       return (
         (widgetId === WidgetConfig.WIDGETS_ID.ORDERS ||
           widgetId === WidgetConfig.WIDGETS_ID.INVOICE ||
@@ -1242,20 +1259,27 @@ class PatientHistory extends Component {
               current.patientNoteVitalSigns.map(o => {
                 return {
                   visitFK: current.currentId,
-                  temperatureC: `${o.temperatureC ? numeral(o.temperatureC).format('0.0') : 0.0
-                    } \u00b0C`,
-                  bpSysMMHG: `${o.bpSysMMHG ? numeral(o.bpSysMMHG).format('0.0') : 0.0
-                    } mmHg`,
-                  bpDiaMMHG: `${o.bpDiaMMHG ? numeral(o.bpDiaMMHG).format('0.0') : 0.0
-                    } mmHg`,
-                  pulseRateBPM: `${o.pulseRateBPM ? numeral(o.pulseRateBPM).format('0.0') : 0.0
-                    } bpm`,
-                  weightKG: `${o.weightKG ? numeral(o.weightKG).format('0.0') : 0.0
-                    } KG`,
-                  heightCM: `${o.heightCM ? numeral(o.heightCM).format('0.0') : 0.0
-                    } CM`,
-                  bmi: `${o.bmi ? numeral(o.bmi).format('0.0') : 0.0
-                    } kg/m\u00b2`,
+                  temperatureC: `${
+                    o.temperatureC ? numeral(o.temperatureC).format('0.0') : 0.0
+                  } \u00b0C`,
+                  bpSysMMHG: `${
+                    o.bpSysMMHG ? numeral(o.bpSysMMHG).format('0.0') : 0.0
+                  } mmHg`,
+                  bpDiaMMHG: `${
+                    o.bpDiaMMHG ? numeral(o.bpDiaMMHG).format('0.0') : 0.0
+                  } mmHg`,
+                  pulseRateBPM: `${
+                    o.pulseRateBPM ? numeral(o.pulseRateBPM).format('0.0') : 0.0
+                  } bpm`,
+                  weightKG: `${
+                    o.weightKG ? numeral(o.weightKG).format('0.0') : 0.0
+                  } KG`,
+                  heightCM: `${
+                    o.heightCM ? numeral(o.heightCM).format('0.0') : 0.0
+                  } CM`,
+                  bmi: `${
+                    o.bmi ? numeral(o.bmi).format('0.0') : 0.0
+                  } kg/m\u00b2`,
                 }
               }),
             )
@@ -1366,7 +1390,11 @@ class PatientHistory extends Component {
                   valueField='value'
                   label='Categories'
                   mode='multiple'
-                  style={{ width: 240, display: 'inline-Block', marginBottom: -16 }}
+                  style={{
+                    width: 240,
+                    display: 'inline-Block',
+                    marginBottom: -16,
+                  }}
                   options={this.getCategoriesOptions()}
                   {...args}
                 />
@@ -1376,7 +1404,12 @@ class PatientHistory extends Component {
               name='selectDoctors'
               render={args => (
                 <DoctorProfileSelect
-                  style={{ width: 240, display: 'inline-Block', marginLeft: 10, marginBottom: -16 }}
+                  style={{
+                    width: 240,
+                    display: 'inline-Block',
+                    marginLeft: 10,
+                    marginBottom: -16,
+                  }}
                   label='Doctors'
                   mode='multiple'
                   {...args}
@@ -1545,7 +1578,11 @@ class PatientHistory extends Component {
                   valueField='value'
                   label='Categories'
                   mode='multiple'
-                  style={{ width: !isFullScreen ? 150 : 240, display: 'inline-Block', marginBottom: -16 }}
+                  style={{
+                    width: !isFullScreen ? 150 : 240,
+                    display: 'inline-Block',
+                    marginBottom: -16,
+                  }}
                   options={this.getCategoriesOptions()}
                   {...args}
                 />
@@ -1555,7 +1592,12 @@ class PatientHistory extends Component {
               name='selectDoctors'
               render={args => (
                 <DoctorProfileSelect
-                  style={{ width: !isFullScreen ? 150 : 240, display: 'inline-Block', marginLeft: 10, marginBottom: -16 }}
+                  style={{
+                    width: !isFullScreen ? 150 : 240,
+                    display: 'inline-Block',
+                    marginLeft: 10,
+                    marginBottom: -16,
+                  }}
                   label='Doctors'
                   mode='multiple'
                   {...args}
@@ -1779,7 +1821,7 @@ class PatientHistory extends Component {
     this.queryVisitHistory()
   }
 
-  render () {
+  render() {
     const { clinicSettings, scriblenotes, fromModule } = this.props
     const cfg = {}
     const {
@@ -1894,7 +1936,10 @@ class PatientHistory extends Component {
           onClose={this.closeActualizationHistory}
         >
           <NurseActualization
-            nurseWorkitemIds={this.state.currentOrders.map(x => x.nurseWorkitemFK).filter(x=>x).join(',')}
+            nurseWorkitemIds={this.state.currentOrders
+              .map(x => x.nurseWorkitemFK)
+              .filter(x => x)
+              .join(',')}
             dispatch={this.props.dispatch}
             onClose={this.closeActualizationHistory}
           />

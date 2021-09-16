@@ -683,7 +683,7 @@ class Consumable extends PureComponent {
                   )}
                 />
               ) : (
-                values.visitPurposeFK !== VISIT_TYPE.RETAIL && (
+                values.visitPurposeFK !== VISIT_TYPE.OTC && (
                   <div>
                     <div style={{ display: 'inline-block' }}>
                       <FastField

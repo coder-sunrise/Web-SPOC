@@ -86,7 +86,7 @@ export default class BaseCRUDViewModel {
           )
             return list || entity
           if (typeof payload === 'object') {
-            const { sorting = [], pagesize = 10 } = pagination || {}
+            const { sorting = [], pagesize = 100 } = pagination || {}
             const current = !payload.current ? 1 : payload.current
 
             filter = {

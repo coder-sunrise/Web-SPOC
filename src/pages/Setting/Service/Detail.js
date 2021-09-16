@@ -933,7 +933,7 @@ class Detail extends PureComponent {
                 onCommitChanges: this.commitChanges,
                 onAddedRowsChange: this.onAddedRowsChange,
                 isDeletable: row => {
-                  return !this.state.hasActiveSession && !row.isUsedByOthers
+                  return !this.state.hasActiveSession || !row.isUsedByOthers
                 },
               }}
               schema={itemSchema}

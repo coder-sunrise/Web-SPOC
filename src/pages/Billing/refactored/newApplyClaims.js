@@ -170,7 +170,7 @@ const ApplyClaims = ({
         invoicePayer.payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT,
     ).length < invoice.claimableSchemes ||
     hasOtherEditing ||
-    visitPurposeFK === VISIT_TYPE.RETAIL
+    visitPurposeFK === VISIT_TYPE.OTC
 
   const incrementCommitCount = () => {
     dispatch({
@@ -1204,7 +1204,7 @@ const ApplyClaims = ({
         {!noExtraOptions && (
           <ResetButton
             disabled={
-              visitPurposeFK === VISIT_TYPE.RETAIL ||
+              visitPurposeFK === VISIT_TYPE.OTC ||
               tempInvoicePayer.find(
                 (payer) =>
                   !payer.isCancelled &&
