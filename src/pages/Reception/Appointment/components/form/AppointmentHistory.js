@@ -208,6 +208,12 @@ class AppointmentHistory extends PureComponent {
               rows={futureAppt}
               onRowDoubleClick={handleRowDoubleClick}
               {...futureApptTableParams(appointmentTypes)}
+              FuncProps={{
+                pager: true,
+                pagerDefaultState: {
+                  pagesize: 100,
+                },
+              }}
             />
 
             <h4
@@ -220,7 +226,16 @@ class AppointmentHistory extends PureComponent {
             <CommonTableGrid
               size='sm'
               rows={previousAppt}
-              {...previousApptTableParams(appointmentTypes,handleCopyAppointmentClick)}
+              {...previousApptTableParams(
+                appointmentTypes,
+                handleCopyAppointmentClick,
+              )}
+              FuncProps={{
+                pager: true,
+                pagerDefaultState: {
+                  pagesize: 100,
+                },
+              }}
             />
           </CardContainer>
         </div>

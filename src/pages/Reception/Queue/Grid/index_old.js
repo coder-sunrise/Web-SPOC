@@ -210,7 +210,7 @@ const Grid = ({
         case '1': {
           // dispense
           const isInitialLoading =
-            row.visitPurposeFK === VISIT_TYPE.RETAIL &&
+            row.visitPurposeFK === VISIT_TYPE.OTC &&
             row.visitStatus === 'WAITING'
           const version = Date.now()
           dispatch({
@@ -387,12 +387,12 @@ const Grid = ({
 
   const onRowDoubleClick = useCallback(
     row => {
-      const { visitStatus, visitPurposeFK = VISIT_TYPE.CONS } = row
+      const { visitStatus, visitPurposeFK = VISIT_TYPE.CON } = row
       const isWaiting = visitStatus === VISIT_STATUS.WAITING
       const {
         clinicianProfile: { doctorProfile },
       } = user.data
-      const retailVisits = [VISIT_TYPE.RETAIL, VISIT_TYPE.BILL_FIRST]
+      const retailVisits = [VISIT_TYPE.OTC, VISIT_TYPE.BF]
       if (!doctorProfile || retailVisits.includes(visitPurposeFK)) return false
 
       if (isWaiting) onClick(row, '5') // start consultation context menu id = 5
@@ -435,8 +435,8 @@ const Grid = ({
     switch (visitStatus) {
       case VISIT_STATUS.WAITING:
         if (
-          visitPurposeFK === VISIT_TYPE.RETAIL ||
-          visitPurposeFK === VISIT_TYPE.BILL_FIRST
+          visitPurposeFK === VISIT_TYPE.OTC ||
+          visitPurposeFK === VISIT_TYPE.BF
         )
           id = '1'
         else id = '5'

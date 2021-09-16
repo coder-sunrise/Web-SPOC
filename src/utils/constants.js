@@ -103,6 +103,15 @@ export const INVOICE_PAYER_TYPE = {
   COMPANY: 4,
 }
 
+export const CLINICAL_ROLE = {
+  DOCTOR : 1,
+  OTHERS : 2,
+  RADIOGRAPHER : 3,
+  PHARMACIST : 4,
+  LABTECH : 5,
+  NURSE : 6,
+}
+
 export const UNFIT_TYPE = {
   1: 'Unfit for Work',
   2: 'Unfit for School',
@@ -373,28 +382,28 @@ export const PharmacyWorkitemStatus = {
 }
 
 export const VISIT_TYPE = {
-  CONS: 1,
-  RETAIL: 2,
-  BILL_FIRST: 3,
+  CON: 1,
+  OTC: 2,
+  BF: 3,
   MC: 4,
 }
 
 export const VISIT_TYPE_NAME = [
   {
-    visitPurposeFK: VISIT_TYPE.CONS,
-    displayName: 'Consultation',
+    visitPurposeFK: VISIT_TYPE.CON,
+    displayCode: 'CON',
   },
   {
-    visitPurposeFK: VISIT_TYPE.RETAIL,
-    displayName: 'Retail',
+    visitPurposeFK: VISIT_TYPE.OTC,
+    displayCode: 'OTC',
   },
   {
-    visitPurposeFK: VISIT_TYPE.BILL_FIRST,
-    displayName: 'Bill-First',
+    visitPurposeFK: VISIT_TYPE.BF,
+    displayCode: 'BF',
   },
   {
     visitPurposeFK: VISIT_TYPE.MC,
-    displayName: 'MC',
+    displayCode: 'MC',
   },
 ]
 
@@ -609,13 +618,13 @@ export const DIAGNOSIS_TYPE = {
 }
 
 export const SERVICE_CENTER_CATEGORY = {
-         INTERNALSERVICECENTRE: 1,
-         EXTERNALSERVICECENTRE: 2,
-         INTERNALLABSERVICECENTER: 3,
-         INTERNALRADIOLOGYSERVICECENTER: 4,
-         EXTERNALLABSERVICECENTRE: 5,
-         EXTERNALRADIOLOGYSERVICECENTRE: 6,
-       }
+                INTERNALSERVICECENTRE: 1,
+                EXTERNALSERVICECENTRE: 2,
+                INTERNALRADIOLOGYSERVICECENTER: 3,
+                INTERNALLABSERVICECENTER: 4,
+                EXTERNALRADIOLOGYSERVICECENTRE: 5,
+                EXTERNALLABSERVICECENTRE: 6,
+              }
 
 export const RADIOLOGY_CATEGORY = [
          SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
@@ -697,11 +706,11 @@ export const INVALID_APPOINTMENT_STATUS = [
 ]
 
 export const PHARMACY_STATUS = {
-    NEW: 1,
-    PREPARED: 2,
-    VERIFIED: 3,
-    DISPENSED: 4,
-}
+         NEW: 1,
+         PREPARED: 2,
+         VERIFIED: 3,
+         DISPENSED: 4,
+       }
 
 export const PHARMACY_ACTION = {
     REDISPENSE: 'Redispense',
