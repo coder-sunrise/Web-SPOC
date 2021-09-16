@@ -11,13 +11,15 @@ import Authorized from '@/utils/Authorized'
 const styles = () => ({
   container: {
     width: '100%',
-    padding: 6,
     color: 'white',
-    borderRadius: '5px',
+    borderRadius: '3px',
     lineHeight: 1,
     display: 'inline-block',
     // textTransform: 'uppercase',
     fontSize: '.75rem',
+    height: '25px',
+    position: 'relative',
+    top: '3px',
     fontWeight: 700,
     verticalAlign: 'baseline',
     '&:hover': {
@@ -145,38 +147,43 @@ const VisitStatusTag = props => {
       }
       onDoubleClick={handleDoubleClick}
     >
-          <div
-            style={{
-              fontSize: '0.87rem',
-              fontWeight: 400,
-              letterSpacing: 'inherit',
-              display : 'inline-block',
-              textAlign : 'center',
-              width : 40,
-            }}
-          >
-            {mappedVisitType.code || visitType.displayCode}
-          </div>
-          <span
-            style={{
-              height: '100%',
-              borderLeft: '2px solid white',
-            }}
-          ></span>
-          <div
-            style={{
-              fontSize: '0.87rem',
-              fontWeight: 400,
-              position: 'absolute',
-              top: '35%',
-              left: '50%',
-              right: '50%',
-              letterSpacing: 'inherit',
-            }}
-          >
-            {value}
-          </div>
-        </div>
+      <div
+        style={{
+          fontSize: '0.9rem',
+          fontWeight: 400,
+          letterSpacing: 'inherit',
+          display: 'inline-block',
+          textAlign: 'center',
+          width: 42,
+          position: 'relative',
+          top: '-7px',
+        }}
+      >
+        {mappedVisitType.code || visitType.displayCode}
+      </div>
+      <span
+        style={{
+          height: '100%',
+          borderLeft: '1px solid #bbbbbb',
+          position: 'relative',
+          display: 'inline-block',
+          top: 0,
+        }}
+      ></span>
+      <div
+        style={{
+          fontSize: '0.9rem',
+          fontWeight: 400,
+          position: 'relative',
+          display: 'inline-block',
+          top: '-8px',
+          marginLeft: '6px',
+          letterSpacing: 'inherit',
+        }}
+      >
+        {value}
+      </div>
+    </div>
   )
 }
 
