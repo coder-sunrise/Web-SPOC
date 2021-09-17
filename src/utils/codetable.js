@@ -74,6 +74,7 @@ const tenantCodesMap = new Map([
     'inventorymedication',
     {
       ...defaultParams,
+      isOnlyClinicInternalUsage: true,
       sorting: [{ columnName: 'displayValue', direction: 'asc' }],
     },
   ],
@@ -81,6 +82,7 @@ const tenantCodesMap = new Map([
     'inventoryconsumable',
     {
       ...defaultParams,
+      isOnlyClinicInternalUsage: true,
       sorting: [{ columnName: 'displayValue', direction: 'asc' }],
     },
   ],
@@ -302,9 +304,9 @@ const fetchCodeTable = async (code, params, isReturnStatusCode = false) => {
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)
     : convertToQuery(
-        { ...criteriaForTenantCodes, ...params },
-        convertExcludeFields,
-      )
+      { ...criteriaForTenantCodes, ...params },
+      convertExcludeFields,
+    )
 
   const response = await request(`${url}${code}`, {
     method: 'GET',
@@ -555,7 +557,7 @@ const getServices = data => {
 
   let serviceTags = []
   data.forEach(service => {
-    ;(service.serviceTag || []).forEach(tag => {
+    (service.serviceTag || []).forEach(tag => {
       serviceTags = serviceTags.concat({
         value: tag.tagFK,
         name: tag.tagDisplayValue,
