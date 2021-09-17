@@ -182,6 +182,9 @@ const PatientIndex = ({
   dispatch,
   patient: { favPatDBColumnSetting = {} },
 }) => {
+  const createPatProfileAccessRight = Authorized.check(
+    'patientdatabase.newpatient',
+  )
   return (
     <PageContainer pageHeaderRender={false}>
       <ProTable
@@ -209,27 +212,30 @@ const PatientIndex = ({
         onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
         options={{ density: false, reload: false }}
         toolBarRender={() => {
-          return [
-            <Button
-              type='primary'
-              icon={<Icon type='adduser' />}
-              color='primary'
-              onClick={() => {
-                dispatch({
-                  type: 'patient/updateState',
-                  payload: {
-                    entity: undefined,
-                    version: undefined,
-                  },
-                })
-                dispatch({
-                  type: 'patient/openPatientModal',
-                })
-              }}
-            >
-              Register New Patient
-            </Button>,
-          ]
+          if(createPatProfileAccessRight && createPatProfileAccessRight.rights !== 'hidden')
+            return [
+              <Button
+                type='primary'
+                icon={<Icon type='adduser' />}
+                color='primary'
+                disabled={createPatProfileAccessRight.rights == 'disable'}
+                onClick={() => {
+                  dispatch({
+                    type: 'patient/updateState',
+                    payload: {
+                      entity: undefined,
+                      version: undefined,
+                    },
+                  })
+                  dispatch({
+                    type: 'patient/openPatientModal',
+                  })
+                }}
+              >
+                Register New Patient
+              </Button>,
+            ]
+          return []
         }}
         onRowDblClick={showPatient}
         defaultColumns={['options']}

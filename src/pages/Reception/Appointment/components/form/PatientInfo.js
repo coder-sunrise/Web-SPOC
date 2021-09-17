@@ -76,7 +76,7 @@ const PatientInfoInput = ({
         <div className={classnames(classes.buttonGroup)}>
           {!isRegisteredPatient ? (
             <React.Fragment>
-              <ProgressButton
+              <Button
                 size='sm'
                 color='primary'
                 variant='contained'
@@ -84,10 +84,9 @@ const PatientInfoInput = ({
                 disabled={disabled || isEdit}
                 onClick={onSearchPatientClick}
                 // tabIndex={-1}
-                icon={<Search />}
               >
-                Search
-              </ProgressButton>
+                {<Search />}Search
+              </Button>
               {!isEdit && (
                 <Authorized authority='patientdatabase.newpatient'>
                   <Button

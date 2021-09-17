@@ -24,16 +24,17 @@ import Authorized from '@/utils/Authorized'
 import { withStyles } from '@material-ui/core'
 import { Link } from 'umi'
 
-const NOTESCOLOR = [
-  '#EF5AA1',
-  '#99CC66',
-  '#66CCFF',
-  '#FFCC99',
-  '#CCCCCC',
-  '#FFFF99',
-  '#CCFFFF',
-  '#9966FF',
-]
+const NOTESCOLOR = {
+  Green: '#CCFF90',
+  Cyan: '#A7FFEB',
+  Blue: '#80D8FF',
+  LightPurple: '#CC99FF',
+  White: '#FFFFFF',
+  Red: '#FF8A80',
+  YellowOrange: '#FFD180',
+  Yellow: '#FFFF8D',
+}
+
 
 const styles = theme => ({
   notesTextStyle: {
@@ -68,6 +69,7 @@ class PatientStickyNotesBtn extends Component {
   state = {
     openPopper: false,
     stickyNotes: [],
+    isFlaggedOnlyShow: true,
   }
 
   componentDidMount = () => {
@@ -307,7 +309,26 @@ class PatientStickyNotesBtn extends Component {
                   }}
                   disabled={!stickyNotesEditable}
                 >
-                  <FlagIcon />
+                  {note.archivedDate ? (
+                    <Tooltip
+                      placement='right-start'
+                      title={
+                        note.archivedDate && (
+                          <div style={{ fontSize: 12 }}>
+                            {`Archived by ${note.archivedByUser} (${
+                              note.archivedByUserRole
+                            }) ${moment(note.archivedDate).format(
+                              'DD MMM YYYY HH:mm',
+                            )}`}
+                          </div>
+                        )
+                      }
+                    >
+                      <FlagIcon />
+                    </Tooltip>
+                  ) : (
+                    <FlagIcon />
+                  )}
                 </Button>
               </div>
               {isEditMode && (
@@ -318,7 +339,7 @@ class PatientStickyNotesBtn extends Component {
                       <div
                         style={{ paddingTop: 6, paddingLeft: 6, width: 126 }}
                       >
-                        {NOTESCOLOR.map(x => (
+                        {Object.values(NOTESCOLOR).map(x => (
                           <span
                             style={{
                               display: 'inline-block',
@@ -327,6 +348,8 @@ class PatientStickyNotesBtn extends Component {
                               height: 24,
                               width: 24,
                               backgroundColor: x,
+                              border: '1px solid gray',
+                              boxShadow: '0px 3px 10px rgba(0, 0, 0, 0.1)',
                             }}
                             onClick={() => this.onColorClick(x)}
                           />
@@ -339,7 +362,7 @@ class PatientStickyNotesBtn extends Component {
                       justIcon
                       color='transparent'
                       style={{
-                        color: NOTESCOLOR[0],
+                        color: NOTESCOLOR.Red,
                         margin: 0,
                       }}
                     >
@@ -422,21 +445,33 @@ class PatientStickyNotesBtn extends Component {
                         <Delete />
                       </Button>
                     </Popper>
-                    <span
-                      style={{
-                        float: 'right',
-                        fontSize: 12,
-                        color: 'gray',
-                        position: 'relative',
-                        bottom: -8,
-                      }}
+                    <Tooltip
+                      title={
+                        <div style={{ fontSize: 12}}>
+                          {`Created by ${note.createByUser} (${
+                            note.createByUserRole
+                          }) ${moment(note.createDate).format(
+                            'DD MMM YYYY HH:mm',
+                          )}`}
+                        </div>
+                      }
                     >
-                      {`Updated by ${note.updateByUser} (${
-                        note.updateByUserRole
-                      }) ${moment(note.updateDate).format(
-                        'DD MMM YYYY HH:mm',
-                      )}`}
-                    </span>
+                      <span
+                        style={{
+                          float: 'right',
+                          fontSize: 12,
+                          color: 'gray',
+                          position: 'relative',
+                          bottom: -8,
+                        }}
+                      >
+                        {`Updated by ${note.updateByUser} (${
+                          note.updateByUserRole
+                        }) ${moment(note.updateDate).format(
+                          'DD MMM YYYY HH:mm',
+                        )}`}
+                      </span>
+                    </Tooltip>
                   </div>
                 )
               )}
@@ -497,6 +532,7 @@ class PatientStickyNotesBtn extends Component {
             style={{ float: 'right', display: 'inline-block' }}
             disabled={isEditPending}
             simple
+            checked={isFlaggedOnlyShow}
             label='Show Flagged Only'
             onChange={this.filterFlaggedNotes}
           />

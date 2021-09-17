@@ -193,7 +193,7 @@ class Main extends Component {
 
     const accessRights = Authorized.check('queue.dispense.editorder')
 
-    if (visitPurposeFK === VISIT_TYPE.RETAIL && isEmptyDispense) {
+    if (visitPurposeFK === VISIT_TYPE.OTC && isEmptyDispense) {
       this.setState(
         prevState => {
           return {
@@ -211,7 +211,7 @@ class Main extends Component {
     if (
       accessRights &&
       accessRights.rights !== 'hidden' &&
-      visitPurposeFK === VISIT_TYPE.BILL_FIRST &&
+      visitPurposeFK === VISIT_TYPE.BF &&
       isEmptyDispense &&
       noClinicalObjectRecord &&
       dispense.loadCount === 0
@@ -268,13 +268,13 @@ class Main extends Component {
     const { location } = history
     const { query } = location
     const { visitPurposeFK } = values
-    const addOrderList = [VISIT_TYPE.RETAIL]
+    const addOrderList = [VISIT_TYPE.OTC]
     const shouldShowAddOrderModal = addOrderList.includes(visitPurposeFK)
 
     if (shouldShowAddOrderModal) {
       this.handleOrderModal()
     }
-    if (visitPurposeFK !== VISIT_TYPE.RETAIL) {
+    if (visitPurposeFK !== VISIT_TYPE.OTC) {
       dispatch({
         type: `consultation/editOrder`,
         payload: {
@@ -305,7 +305,7 @@ class Main extends Component {
     const { values } = this.props
     const { visitPurposeFK } = values
 
-    if (visitPurposeFK === VISIT_TYPE.RETAIL) {
+    if (visitPurposeFK === VISIT_TYPE.OTC) {
       this._editOrder()
     } else {
       navigateDirtyCheck({
@@ -391,7 +391,7 @@ class Main extends Component {
     const newOrderRows = rows.filter(row => !row.id && !row.isDeleted)
     if (formik.OrderPage && !formik.OrderPage.dirty && newOrderRows.length > 0)
       this.showConfirmationBox()
-    else if (visitPurposeFK === VISIT_TYPE.BILL_FIRST) {
+    else if (visitPurposeFK === VISIT_TYPE.BF) {
       dispatch({
         type: 'consultation/discard',
         payload: {

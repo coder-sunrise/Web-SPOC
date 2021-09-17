@@ -121,16 +121,16 @@ const getType = (typeId) => {
       if (dob) {
         age = Math.floor(moment.duration(moment().diff(dob)).asYears())
       }
-      var matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weightKG))
-      const medicationfrequency = matchInstruction?.medicationFrequency
-      const medicationdosage = matchInstruction?.medicationFrequency
+      var matchInstruction = medicationInstructionRule.find(i =>
+        isMatchInstructionRule(i, age, weightKG),
+      )
       const uom = ctmedicationunitofmeasurement.find(uom => uom.id === medication.dispensingUOM.id)
       let item
       if (medication.isActive === true) {
         const medicationdispensingUOM = medication.dispensingUOM
         const medicationusage = medication.medicationUsage
         const medicationfrequency = matchInstruction?.medicationFrequency
-        const medicationdosage = matchInstruction?.medicationFrequency
+        const medicationdosage = matchInstruction?.prescribingDosage
         const medicationprescribingUOM = medication.prescribingUOM
         const medicationPrecautions =
           medication.inventoryMedication_MedicationPrecaution
