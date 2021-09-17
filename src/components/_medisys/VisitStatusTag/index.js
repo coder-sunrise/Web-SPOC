@@ -159,7 +159,7 @@ const VisitStatusTag = props => {
           top: '-7px',
         }}
       >
-        {mappedVisitType.code || visitType.displayCode}
+        {mappedVisitType?.code || visitType?.displayCode || 'APT'}
       </div>
       <span
         style={{
