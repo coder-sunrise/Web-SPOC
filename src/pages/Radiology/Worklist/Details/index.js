@@ -10,6 +10,7 @@ import {
 import Banner from '@/pages/PatientDashboard/Banner'
 import { ExaminationSteps } from '../../Components'
 import WorklistContext from '../WorklistContext'
+import Findings from '../../Components/Findings'
 
 const RightAlignGridItem = ({ children, md = 6 }) => {
   return (
@@ -19,7 +20,7 @@ const RightAlignGridItem = ({ children, md = 6 }) => {
   )
 }
 
-const RadiologyDetails = () => {
+const RadiologyDetails = (props) => {
   const dispatch = useDispatch()
   const { detailsId, setDetailsId } = useContext(WorklistContext)
   const [showModal, setShowModal] = useState(false)
@@ -131,6 +132,14 @@ const RadiologyDetails = () => {
                 <Input.TextArea autoSize={{ minRows: 3, maxRows: 5 }} />
               </GridItem>
             </GridContainer>
+          </div>
+        </GridItem>
+        <GridItem md={12}>
+          <div>
+            <Findings 
+              workItem={workitem}
+              {...props} 
+            />
           </div>
         </GridItem>
       </GridContainer>
