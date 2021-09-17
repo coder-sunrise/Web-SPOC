@@ -63,12 +63,13 @@ const RadiologyDetails = () => {
     >
       <GridContainer style={{ height: 700, overflowY: 'scroll' }}>
         <GridItem md={12}>
-          <Banner
-            from='Radiology'
-            // activePreOrderItem={patientBannerEntity?.entity?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
-            patientInfo={patientBannerEntity}
-            style={{ position: 'relative' }}
-          />
+          <div style={{ padding: 8 }}>
+            <Banner
+              from='Radiology'
+              // activePreOrderItem={patientBannerEntity?.entity?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
+              patientInfo={patientBannerEntity}
+            />
+          </div>
         </GridItem>
         <GridItem md={12}>
           <ExaminationSteps />
