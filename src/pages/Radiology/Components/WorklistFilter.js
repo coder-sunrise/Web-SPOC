@@ -1,19 +1,58 @@
-import React, { useState } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { Form, Button } from 'antd'
 import Search from '@material-ui/icons/Search'
 import { useDispatch } from 'dva'
+import { VISIT_TYPE } from '@/utils/constants'
 import {
   TextField,
   DatePicker,
   Checkbox,
   Select,
   ProgressButton,
+  CodeSelect,
 } from '@/components'
 import { formatMessage } from 'umi'
+import WorlistContext from '../Worklist/WorklistContext'
 
 export const WorklistFilter = () => {
   const [form] = Form.useForm()
   const dispatch = useDispatch()
+  const { showDetails } = useContext(WorlistContext)
+
+  useEffect(() => {
+    handleSearch()
+  }, [showDetails])
+
+  const handleSearch = () => {
+    const {
+      searchValue,
+      visitType,
+      modality,
+      dateFrom,
+      dateTo,
+      isUrgent,
+      isMyPatientOnly,
+    } = form.getFieldsValue(true)
+
+    dispatch({
+      type: 'radiologyWorklist/query',
+      payload: {
+        apiCriteria: {
+          searchValue: searchValue,
+          visitType: visitType
+            ? visitType.filter(t => t !== -99).join(',')
+            : undefined,
+          modality: modality
+            ? modality.filter(t => t !== -99).join(',')
+            : undefined,
+          filterFrom: dateFrom,
+          filterTo: dateTo,
+          isUrgent: isUrgent,
+          isMyPatientOnly: isMyPatientOnly,
+        },
+      },
+    })
+  }
 
   return (
     <Form form={form} layout='inline' initialValues={{}}>
@@ -24,10 +63,22 @@ export const WorklistFilter = () => {
         />
       </Form.Item>
       <Form.Item name='visitType'>
-        <Select label='Visit Type' options={[]} style={{ width: 150 }} />
+        <CodeSelect
+          label='Visit Type'
+          code='ctvisitpurpose'
+          style={{ width: 180 }}
+          mode='multiple'
+          localFilter={item => item.id !== VISIT_TYPE.RETAIL}
+        />
       </Form.Item>
       <Form.Item name='modality'>
-        <Select label='Modality' options={[]} style={{ width: 150 }} />
+        <CodeSelect
+          mode='multiple'
+          style={{ width: 150 }}
+          label='Modality'
+          code='ctmodality'
+          onChange={() => console.log('modality')}
+        />
       </Form.Item>
       <Form.Item name='dateFrom'>
         <DatePicker
@@ -42,16 +93,16 @@ export const WorklistFilter = () => {
           style={{ width: 100 }}
         />
       </Form.Item>
-      <Form.Item name='isOnlyToday' style={{ alignSelf: 'flex-end' }}>
+      <Form.Item name='isUrgent' style={{ alignSelf: 'flex-end' }}>
         <Checkbox
           style={{ width: 70 }}
-          label={formatMessage({ id: 'radiology.search.todayOnly' })}
+          label={formatMessage({ id: 'radiology.search.urgentOnly' })}
         />
       </Form.Item>
-      <Form.Item name='isUrgentOnly' style={{ alignSelf: 'flex-end' }}>
+      <Form.Item name='isMyPatientOnly' style={{ alignSelf: 'flex-end' }}>
         <Checkbox
-          style={{ width: 100 }}
-          label={formatMessage({ id: 'radiology.search.urgentOnly' })}
+          style={{ width: 125 }}
+          label={formatMessage({ id: 'radiology.search.myPatientOnly' })}
         />
       </Form.Item>
       <Form.Item style={{ alignSelf: 'flex-end' }}>
@@ -60,13 +111,7 @@ export const WorklistFilter = () => {
           color='primary'
           icon={<Search />}
           onClick={() => {
-            const { searchValue } = form.getFieldsValue(true)
-            dispatch({
-              type: 'radiologyWorklist/query',
-              payload: {
-                apiCriteria: searchValue ? { searchValue } : undefined,
-              },
-            })
+            handleSearch()
           }}
         >
           {formatMessage({ id: 'form.search' })}

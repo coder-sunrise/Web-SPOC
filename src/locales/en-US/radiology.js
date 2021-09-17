@@ -3,6 +3,6 @@ export default {
     'Patient Name. Acc No, Patient Ref. No, Accession No.',
   'radiology.search.dateFrom': 'From',
   'radiology.search.dateTo': 'To',
-  'radiology.search.todayOnly': 'Today',
-  'radiology.search.urgentOnly': 'Urgent Only',
+  'radiology.search.myPatientOnly': 'My Patient Only',
+  'radiology.search.urgentOnly': 'Urgent',
 }

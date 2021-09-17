@@ -1,14 +1,20 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { useSelector, useDispatch } from 'dva'
 import { Typography, Input } from 'antd'
+import moment from 'moment'
 import {
   GridContainer,
   ProgressButton,
   GridItem,
   CommonModal,
+  dateFormatLongWithTimeNoSec12h,
 } from '@/components'
 import Banner from '@/pages/PatientDashboard/Banner'
 import { ExaminationSteps } from '../../Components'
+import {
+  RADIOLOGY_WORKITEM_STATUS,
+  RADIOLOGY_WORKITEM_BUTTON,
+} from '@/utils/constants'
 import WorklistContext from '../WorklistContext'
 
 const RightAlignGridItem = ({ children, md = 6 }) => {
@@ -21,41 +27,94 @@ const RightAlignGridItem = ({ children, md = 6 }) => {
 
 const RadiologyDetails = () => {
   const dispatch = useDispatch()
-  const { detailsId, setDetailsId } = useContext(WorklistContext)
-  const [showModal, setShowModal] = useState(false)
+  const { detailsId, setDetailsId, showDetails, setShowDetails } = useContext(
+    WorklistContext,
+  )
+
   const details = useSelector(state => state.radiologyDetails)
   const patientBannerEntity = useSelector(state => state.patient)
   const [workitem, setWorkItem] = useState({})
 
   useEffect(() => {
     if (detailsId) {
-      dispatch({ type: 'radiologyDetails/query', payload: { id: detailsId } })
-      setShowModal(true)
+      dispatch({
+        type: 'radiologyDetails/query',
+        payload: { id: detailsId },
+      })
+      setShowDetails(true)
+    } else {
+      setShowDetails(false)
     }
   }, [detailsId])
 
   useEffect(() => {
-    if (details && details.entity) setWorkItem(details.entity)
+    if (details && details.entity) {
+      setWorkItem(details.entity)
+    }
   }, [details])
+
+  const renderStatusButtons = () => {
+    if (!details || !details.entity) return
+
+    const buttonInfo = RADIOLOGY_WORKITEM_BUTTON.find(
+      s => s.currentStatusFK === details.entity.statusFK,
+    )
+
+    if (!buttonInfo) return
+
+    return (
+      <>
+        {buttonInfo.enableCancel && (
+          <ProgressButton
+            color='#797979'
+            onClick={() => {
+              dispatch({
+                type: 'radiologyDetails/updateRadiologyWorkitem',
+                payload: {
+                  ...details.entity,
+                  id: details.entity.radiologyWorkitemId,
+                  statusFK: RADIOLOGY_WORKITEM_STATUS.CANCELLED,
+                },
+              })
+
+              setShowDetails(false)
+            }}
+          >
+            Cancel Examination
+          </ProgressButton>
+        )}
+        <ProgressButton
+          color='success'
+          onClick={() => {
+            dispatch({
+              type: 'radiologyDetails/updateRadiologyWorkitem',
+              payload: {
+                ...details.entity,
+                id: details.entity.radiologyWorkitemId,
+                statusFK: buttonInfo.nextStatusFK,
+              },
+            })
+
+            setShowDetails(false)
+          }}
+        >
+          {buttonInfo.name}
+        </ProgressButton>
+      </>
+    )
+  }
 
   return (
     <CommonModal
-      open={showModal}
+      open={showDetails}
       title='Radiology Examination Details'
       showFooter={true}
       onClose={() => {
         setDetailsId(null)
-        setShowModal(false)
+        setShowDetails(false)
       }}
       footProps={{
-        extraButtons: (
-          <ProgressButton
-            color='success'
-            onClick={() => console.log('nothing')}
-          >
-            Start Examination
-          </ProgressButton>
-        ),
+        extraButtons: renderStatusButtons(),
       }}
       maxWidth='lg'
       overrideLoading
@@ -71,7 +130,7 @@ const RadiologyDetails = () => {
           />
         </GridItem>
         <GridItem md={12}>
-          <ExaminationSteps />
+          <ExaminationSteps item={details.entity} />
         </GridItem>
         <GridItem md={12}>
           <div>
@@ -85,20 +144,27 @@ const RadiologyDetails = () => {
                   <RightAlignGridItem>Examination :</RightAlignGridItem>
                   <GridItem md={6}>{workitem.itemDescription}</GridItem>
 
-                  <RightAlignGridItem>Order Combined :</RightAlignGridItem>
-                  <GridItem md={6}>Yes</GridItem>
+                  <RightAlignGridItem>Priority :</RightAlignGridItem>
+                  <GridItem md={6}>Urgent</GridItem>
 
-                  <RightAlignGridItem>Doctor Instruction :</RightAlignGridItem>
-                  <GridItem md={6}>Both left and right</GridItem>
-                  <RightAlignGridItem>Clinical History :</RightAlignGridItem>
-                  <GridItem md={6}>Patient sprain in the morning</GridItem>
+                  <RightAlignGridItem>Doctor Instructions :</RightAlignGridItem>
+                  <GridItem md={6}>{workitem.instruction}</GridItem>
+                  <RightAlignGridItem>Remarks :</RightAlignGridItem>
+                  <GridItem md={6}>{workitem.remark}</GridItem>
                 </GridContainer>
               </GridItem>
               <GridItem md={2} />
               <GridItem md={4}>
                 <GridContainer>
-                  <RightAlignGridItem>Order Time :</RightAlignGridItem>
-                  <GridItem md={6}>14 May 2021 03:15 PM</GridItem>
+                  <RightAlignGridItem>Order Created Time :</RightAlignGridItem>
+                  <GridItem md={6}>
+                    {moment(workitem.generateDate).format(
+                      dateFormatLongWithTimeNoSec12h,
+                    )}
+                  </GridItem>
+
+                  <RightAlignGridItem>Modality :</RightAlignGridItem>
+                  <GridItem md={6}> Outpatient </GridItem>
 
                   <RightAlignGridItem>Visit Type :</RightAlignGridItem>
                   <GridItem md={6}> Outpatient </GridItem>

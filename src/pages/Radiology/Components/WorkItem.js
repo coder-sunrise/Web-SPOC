@@ -2,12 +2,28 @@ import React, { Fragment, useState, useEffect, useContext } from 'react'
 import { Typography, Card } from 'antd'
 import ProCard from '@ant-design/pro-card'
 import moment from 'moment'
-import { Icon, dateFormatLongWithTimeNoSec12h } from '@/components'
+import { Icon, dateFormatLongWithTimeNoSec12h, Tooltip } from '@/components'
 import { VISIT_TYPE, VISIT_TYPE_NAME } from '@/utils/constants'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import WorlistContext from '../Worklist/WorklistContext'
 
 const blueColor = '#1890f8'
+
+const WorkitemLeftLabel = ({ children, tooltip, width = 150, ...props }) => (
+  <Tooltip title={tooltip}>
+    <div
+      style={{
+        textOverflow: 'ellipsis',
+        width: width,
+        overflow: 'hidden',
+        whiteSpace: 'nowrap',
+      }}
+      {...props}
+    >
+      {children}
+    </div>
+  </Tooltip>
+)
 
 const WorkitemTitle = ({ item }) => {
   const age = calculateAgeFromDOB(item.patientInfo.dob)
@@ -22,18 +38,27 @@ const WorkitemTitle = ({ item }) => {
         padding: 8,
       }}
     >
-      <div style={{ marginRight: 'auto' }}>
-        <div style={{ color: blueColor, fontWeight: 500 }}>
+      <div
+        style={{
+          marginRight: 'auto',
+        }}
+      >
+        <WorkitemLeftLabel style={{ color: blueColor, fontWeight: 500 }}>
           {item.patientInfo.name}
-        </div>
-        <div>{item.patientInfo.patientReferenceNo}</div>
+        </WorkitemLeftLabel>
+        <WorkitemLeftLabel tooltip={item.patientInfo.patientReferenceNo}>
+          {item.patientInfo.patientReferenceNo}
+          {item.patientInfo.patientReferenceNo}
+          {item.patientInfo.patientReferenceNo}
+          {item.patientInfo.patientReferenceNo}
+        </WorkitemLeftLabel>
       </div>
       <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
         <div>
           <Icon type='male' style={{ color: blueColor, fontSize: 15 }} />
           {age} {age === 1 ? 'Yr' : 'Yrs'}
         </div>
-        <div>{item.patientInfo.patientAccountNo}</div>
+        <div width={80}>{item.patientInfo.patientAccountNo}</div>
       </div>
     </div>
   )
@@ -62,10 +87,12 @@ const WorkitemBody = ({ item }) => {
         }}
       >
         <div style={{ marginRight: 'auto', flexGrow: 1 }}>
-          <div style={{ fontWeight: 500 }}>{item.itemDescription}</div>
-          <div>{item.accessionNo}</div>
-          <div>{item.visitInfo.doctorName}</div>
-          <div>{orderDate}</div>
+          <WorkitemLeftLabel style={{ fontWeight: 500 }}>
+            {item.itemDescription}
+          </WorkitemLeftLabel>
+          <WorkitemLeftLabel>{item.accessionNo}</WorkitemLeftLabel>
+          <WorkitemLeftLabel>{item.visitInfo.doctorName}</WorkitemLeftLabel>
+          <WorkitemLeftLabel>{orderDate}</WorkitemLeftLabel>
         </div>
         <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
           <div>Q.No.: {item.visitInfo.queueNo}</div>
@@ -87,7 +114,7 @@ const WorkitemBody = ({ item }) => {
             textAlign: 'left',
           }}
           onClick={() => {
-            setDetailsId(item.id)
+            setDetailsId(item.radiologyWorkitemId)
           }}
         >
           Details
@@ -124,7 +151,7 @@ const WorkitemBody = ({ item }) => {
 
 export const Workitem = item => (
   <div
-    key={item.id}
+    key={item.radiologyWorkitemId}
     style={{
       height: 220,
       margin: '10px 5px',

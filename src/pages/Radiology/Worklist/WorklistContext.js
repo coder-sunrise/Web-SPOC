@@ -5,6 +5,7 @@ const WorklistContext = createContext(null)
 
 export const WorklistContextProvider = props => {
   const [detailsId, setDetailsId] = useState(null)
+  const [showDetails, setShowDetails] = useState(false)
 
   return (
     // this is the provider providing state
@@ -12,6 +13,8 @@ export const WorklistContextProvider = props => {
       value={{
         detailsId,
         setDetailsId,
+        showDetails,
+        setShowDetails,
       }}
     >
       {props.children}

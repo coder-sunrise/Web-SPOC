@@ -609,18 +609,18 @@ export const DIAGNOSIS_TYPE = {
 }
 
 export const SERVICE_CENTER_CATEGORY = {
-         INTERNALSERVICECENTRE: 1,
-         EXTERNALSERVICECENTRE: 2,
-         INTERNALLABSERVICECENTER: 3,
-         INTERNALRADIOLOGYSERVICECENTER: 4,
-         EXTERNALLABSERVICECENTRE: 5,
-         EXTERNALRADIOLOGYSERVICECENTRE: 6,
-       }
+  INTERNALSERVICECENTRE: 1,
+  EXTERNALSERVICECENTRE: 2,
+  INTERNALLABSERVICECENTER: 3,
+  INTERNALRADIOLOGYSERVICECENTER: 4,
+  EXTERNALLABSERVICECENTRE: 5,
+  EXTERNALRADIOLOGYSERVICECENTRE: 6,
+}
 
 export const RADIOLOGY_CATEGORY = [
-         SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
-         SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE,
-       ]
+  SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
+  SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE,
+]
 
 export const DOSAGE_RULE_OPERATOR = {
   to: 'to',
@@ -642,6 +642,27 @@ export const RADIOLOGY_WORKITEM_STATUS = {
   CANCELLED: 5,
 }
 
+export const RADIOLOGY_WORKITEM_BUTTON = [
+  {
+    name: 'Start Examination',
+    currentStatusFK: 1,
+    nextStatusFK: 2,
+    enableCancel: true,
+  },
+  {
+    name: 'Complete Modality',
+    currentStatusFK: 2,
+    nextStatusFK: 3,
+    enableCancel: true,
+  },
+  {
+    name: 'Complete Reporting',
+    currentStatusFK: 3,
+    nextStatusFK: 4,
+    enableCancel: false,
+  },
+]
+
 export const NURSE_WORKITEM_STATUS = {
   NEW: 1,
   ACTUALIZED: 2,
@@ -654,10 +675,10 @@ export const ALLERGY_TYPE = {
 }
 
 export const PATIENT_ALLERGY_TYPE = {
-         ALLERGY: 'Allergy',
-         INGREDIENT: 'Ingredient',
-         NONALLERGY: 'NonAllergy',
-       }
+  ALLERGY: 'Allergy',
+  INGREDIENT: 'Ingredient',
+  NONALLERGY: 'NonAllergy',
+}
 
 export const ENABLE_PRESCRIPTION_SET_CLINIC_ROLE = [1]
 
@@ -697,16 +718,16 @@ export const INVALID_APPOINTMENT_STATUS = [
 ]
 
 export const PHARMACY_STATUS = {
-    NEW: 1,
-    PREPARED: 2,
-    VERIFIED: 3,
-    DISPENSED: 4,
+  NEW: 1,
+  PREPARED: 2,
+  VERIFIED: 3,
+  DISPENSED: 4,
 }
 
 export const PHARMACY_ACTION = {
-    REDISPENSE: 'Redispense',
-    PREPARE: 'Prepare',
-    VERIFY: 'Verify',
-    COMPLETE: 'Complete',
-    CANCEL: 'Cancel',
+  REDISPENSE: 'Redispense',
+  PREPARE: 'Prepare',
+  VERIFY: 'Verify',
+  COMPLETE: 'Complete',
+  CANCEL: 'Cancel',
 }
