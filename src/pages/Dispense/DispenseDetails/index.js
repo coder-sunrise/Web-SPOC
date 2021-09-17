@@ -34,16 +34,14 @@ import {
 import { sendNotification } from '@/utils/realtime'
 // sub components
 import TableData from './TableData'
-import VaccinationGrid from './VaccinationGrid'
 import DrugLabelSelection from './DrugLabelSelection'
 import NurseActualization from './NurseActualization'
 
 // variables
 import {
-  PrescriptionColumns,
-  PrescriptionColumnExtensions,
-  VaccinationColumn,
-  VaccinationColumnExtensions,
+  DispenseItemsColumns,
+  DispenseItemsColumnExtensions,
+  ServiceColumns,
   OtherOrdersColumns,
   OtherOrdersColumnExtensions,
   PackageColumns,
@@ -115,8 +113,8 @@ const DispenseDetails = ({
   user,
 }) => {
   const {
-    prescription,
-    vaccination,
+    dispenseItems,
+    service,
     otherOrder,
     packageItem,
     invoice,
@@ -134,36 +132,21 @@ const DispenseDetails = ({
 
   const { inventorymedication, inventoryvaccination } = codetable
   const { settings = {} } = clinicSettings
-  const currentDoc = doctorprofile.filter(x => x.id === visit.doctorProfileFK)
+  const currentDoc = doctorprofile.filter(
+    x => x.id === visit.doctorProfileFK,
+  )
   const docInfo =
-    currentDoc && currentDoc.length > 0 ? currentDoc[0].clinicianProfile : {}
-
-  const handleSelectedBatch = (e, op = {}, row) => {
-    if (op && op.length > 0) {
-      const { expiryDate } = op[0]
-      setFieldValue(`prescription[${row.rowIndex}]expiryDate`, expiryDate)
-    } else {
-      setFieldValue(`prescription[${row.rowIndex}]expiryDate`, undefined)
-    }
-  }
-
-  const handleSelectVaccinationBatch = (e, op = {}, row) => {
-    if (op && op.length > 0) {
-      const { expiryDate } = op[0]
-      setFieldValue(`vaccination[${row.rowIndex}]expiryDate`, expiryDate)
-    } else {
-      setFieldValue(`vaccination[${row.rowIndex}]expiryDate`, undefined)
-    }
-  }
+    currentDoc && currentDoc.length > 0
+      ? currentDoc[0].clinicianProfile
+      : {}
 
   const discardCallback = r => {
     if (r) {
       const userProfile = user.data.clinicianProfile
-      const userName = `${
-        userProfile.title && userProfile.title.trim().length
-          ? `${userProfile.title}. ${userProfile.name || ''}`
-          : `${userProfile.name || ''}`
-      }`
+      const userName = `${userProfile.title && userProfile.title.trim().length
+        ? `${userProfile.title}. ${userProfile.name || ''}`
+        : `${userProfile.name || ''}`
+        }`
       const message = `${userName} discard prescription at ${moment().format(
         'HH:mm',
       )}`
@@ -186,15 +169,15 @@ const DispenseDetails = ({
         id,
       },
     }).then(r => {
-                   sendNotification('EditedConsultation', {
-                     type: NOTIFICATION_TYPE.CONSULTAION,
-                     status: NOTIFICATION_STATUS.OK,
-                     message: 'Completed Consultation',
-                     visitID: values.id,
-                   })
+      sendNotification('EditedConsultation', {
+        type: NOTIFICATION_TYPE.CONSULTAION,
+        status: NOTIFICATION_STATUS.OK,
+        message: 'Completed Consultation',
+        visitID: values.id,
+      })
 
-                   discardCallback(r)
-                 })
+      discardCallback(r)
+    })
   }
 
   const discardBillOrder = () => {
@@ -225,7 +208,8 @@ const DispenseDetails = ({
       invoiceTotal: v.summary.total,
       invoiceTotalAftAdj: v.summary.totalAfterAdj,
       invoiceTotalAftGST: v.summary.totalWithGST,
-      outstandingBalance: v.summary.totalWithGST - values.invoice.totalPayment,
+      outstandingBalance:
+        v.summary.totalWithGST - values.invoice.totalPayment,
       invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
       invoiceGSTAdjustment: v.summary.gstAdj,
       invoiceAdjustment: v.adjustments,
@@ -315,7 +299,9 @@ const DispenseDetails = ({
     let label = 'Package'
     let totalPrice = 0
     if (!packageItem) return ''
-    const data = packageItem.filter(item => item.packageGlobalId === row.value)
+    const data = packageItem.filter(
+      item => item.packageGlobalId === row.value,
+    )
     if (data.length > 0) {
       totalPrice = _.sumBy(data, 'totalAfterItemAdjustment') || 0
       label = `${data[0].packageCode} - ${data[0].packageName} (Total: `
@@ -330,68 +316,62 @@ const DispenseDetails = ({
     )
   }
 
-  const [selectedPrescriptionRows, setSelectedPrescriptionRows] = useState([])
-  const [selectedVaccinationRows, setSelectedVaccinationRows] = useState([])
-  const [selectedOtherOrderRows, setSelectedOtherOrderRows] = useState([])
+  const [
+    selectedDispenseItemsRows,
+    setSelectedDispenseItemsRows,
+  ] = useState([])
+  const [selectedServiceRows, setSelectedServiceRows] = useState([])
   const [selectedActualizeRows, setSelectedActualizeRows] = useState([])
   const [showActualization, setShowActualization] = useState(false)
   const [actualizationStatus, setActualizationStatus] = useState(-1)
 
   const handleReloadClick = () => {
-    setSelectedPrescriptionRows([])
-    setSelectedVaccinationRows([])
-    setSelectedOtherOrderRows([])
+    setSelectedDispenseItemsRows([])
+    setSelectedServiceRows([])
     setSelectedActualizeRows([])
     setShowActualization(false)
     setActualizationStatus(-1)
     onReloadClick()
   }
-  
+
   const isShowActualizeSelection = (records = []) => {
     let actualizeOrderItemsRight = Authorized.check(
       'dispense.actualizeorderitems',
     )
     let viewable =
-      actualizeOrderItemsRight && actualizeOrderItemsRight.rights !== 'hidden'
-
+      actualizeOrderItemsRight &&
+      actualizeOrderItemsRight.rights !== 'hidden'
     return viewable && records.filter(x => isActualizable(x)).length > 0
   }
 
   const handleSelectionChange = (type, value) => {
     switch (type) {
-      case 'Prescription':
-        setSelectedPrescriptionRows(value)
+      case 'DispenseItems':
+        setSelectedDispenseItemsRows(value)
         break
-      case 'Vaccination':
-        setSelectedVaccinationRows(value)
-        break
-      case 'OtherOrders':
-        setSelectedOtherOrderRows(value)
+      case 'Service':
+        setSelectedServiceRows(value)
         break
     }
   }
 
   const onActualizeBtnClick = (row, status) => {
-                                                 setSelectedActualizeRows([row])
-                                                 setActualizationStatus(status)
-                                                 setShowActualization(true)
-                                               }
+    setSelectedActualizeRows([row])
+    setActualizationStatus(status)
+    setShowActualization(true)
+  }
 
   const handleMultiActualizationClick = type => {
     let selectedRows = []
     let records = []
     switch (type) {
-      case 'Prescription':
-        selectedRows = selectedPrescriptionRows
-        records = prescription
+      case 'DispenseItems':
+        selectedRows = selectedDispenseItemsRows
+        records = dispenseItems
         break
-      case 'Vaccination':
-        selectedRows = selectedVaccinationRows
-        records = vaccination
-        break
-      case 'OtherOrders':
-        selectedRows = selectedOtherOrderRows
-        records = otherOrder
+      case 'Service':
+        selectedRows = selectedServiceRows
+        records = service
         break
     }
     if (selectedRows.length > 0) {
@@ -436,7 +416,11 @@ const DispenseDetails = ({
   return (
     <React.Fragment>
       <GridContainer>
-        <GridItem justify='flex-start' md={7} className={classes.actionButtons}>
+        <GridItem
+          justify='flex-start'
+          md={7}
+          className={classes.actionButtons}
+        >
           {!viewOnly && !isRetailVisit && (
             <Button
               color='info'
@@ -472,7 +456,8 @@ const DispenseDetails = ({
             <span style={{ color: '#999999' }}>
               Order created by{' '}
               <span style={{ fontWeight: 500 }}>
-                {`${docInfo.title ? `${docInfo.title}.` : null}${docInfo.name}`}{' '}
+                {`${docInfo.title ? `${docInfo.title}.` : null}${docInfo.name
+                  }`}{' '}
                 at {visit.orderCreateTime.format('DD MMM yyyy HH:mm')}
               </span>{' '}
             </span>
@@ -488,20 +473,6 @@ const DispenseDetails = ({
         </GridItem>
         {!viewOnly && (
           <GridItem className={classes.rightActionButtons} md={5}>
-            {/* isBillFirstVisit && (
-              <div
-                style={{
-                  marginRight: 8,
-                  marginTop: 8,
-                  display: 'inline-block',
-                  color: dangerColor,
-                }}
-              >
-                <SizeContainer size='lg'>
-                  <AddAlert />
-                </SizeContainer>
-              </div>
-            ) */}
             {(isRetailVisit || isBillFirstVisit) && (
               <ProgressButton
                 color='danger'
@@ -515,7 +486,11 @@ const DispenseDetails = ({
             )}
             {!isBillFirstVisit && (
               <Authorized authority='queue.dispense.savedispense'>
-                <ProgressButton color='success' size='sm' onClick={onSaveClick}>
+                <ProgressButton
+                  color='success'
+                  size='sm'
+                  onClick={onSaveClick}
+                >
                   Save Dispense
                 </ProgressButton>
               </Authorized>
@@ -623,63 +598,53 @@ const DispenseDetails = ({
         <GridItem md={12}>
           <Paper className={classes.paper}>
             <TableData
-              title='Prescription'
+              title='Dispense Details'
               titleExtend={actualizeSelectedItemButton(
-                'Prescription',
-                prescription,
+                'DispenseItems',
+                dispenseItems,
               )}
-              selection={selectedPrescriptionRows}
+              selection={selectedDispenseItemsRows}
               onSelectionChange={value => {
-                handleSelectionChange('Prescription', value)
+                handleSelectionChange('DispenseItems', value)
               }}
-              {...actualizeTableConfig(isShowActualizeSelection(prescription))}
-              idPrefix='Prescription'
+              {...actualizeTableConfig(
+                isShowActualizeSelection(dispenseItems),
+              )}
+              idPrefix='DispenseItems'
               forceRender
-              columns={PrescriptionColumns}
-              colExtensions={PrescriptionColumnExtensions(
+              columns={DispenseItemsColumns}
+              colExtensions={DispenseItemsColumnExtensions(
                 viewOnly,
                 onPrint,
-                inventorymedication,
-                handleSelectedBatch,
                 onActualizeBtnClick,
                 showDrugLabelRemark,
               )}
-              data={prescription}
+              data={dispenseItems}
             />
-            <VaccinationGrid
-              title='Vaccination'
+
+            <TableData
+              title='Service'
               titleExtend={actualizeSelectedItemButton(
-                'Vaccination',
-                vaccination,
+                'Service',
+                service,
               )}
-              selection={selectedVaccinationRows}
+              selection={selectedServiceRows}
               onSelectionChange={value => {
-                handleSelectionChange('Vaccination', value)
+                handleSelectionChange('Service', value)
               }}
-              {...actualizeTableConfig(isShowActualizeSelection(vaccination))}
-              idPrefix='Vaccination'
-              columns={VaccinationColumn}
-              colExtensions={VaccinationColumnExtensions(
+              {...actualizeTableConfig(isShowActualizeSelection(service))}
+              idPrefix='Service'
+              columns={ServiceColumns}
+              colExtensions={OtherOrdersColumnExtensions(
                 viewOnly,
-                inventoryvaccination,
-                handleSelectVaccinationBatch,
+                onPrint,
                 onActualizeBtnClick,
               )}
-              data={vaccination}
-              visitPurposeFK={visitPurposeFK}
+              data={service}
             />
 
             <TableData
               title='Other Orders'
-              titleExtend={actualizeSelectedItemButton(
-                'OtherOrders',
-                otherOrder,
-              )}
-              selection={selectedOtherOrderRows}
-              onSelectionChange={value => {
-                handleSelectionChange('OtherOrders', value)
-              }}
-              {...actualizeTableConfig(isShowActualizeSelection(otherOrder))}
               idPrefix='OtherOrders'
               columns={OtherOrdersColumns}
               colExtensions={OtherOrdersColumnExtensions(
@@ -690,32 +655,33 @@ const DispenseDetails = ({
               data={otherOrder}
             />
 
-            {settings.isEnablePackage && visitPurposeFK !== VISIT_TYPE.RETAIL && (
-              <TableData
-                title='Package'
-                idPrefix='package'
-                columns={PackageColumns}
-                colExtensions={PackageColumnExtensions(
-                  onPrint,
-                  showDrugLabelRemark,
-                )}
-                data={packageItem}
-                FuncProps={{
-                  pager: false,
-                  grouping: true,
-                  groupingConfig: {
-                    state: {
-                      grouping: [{ columnName: 'packageGlobalId' }],
-                      expandedGroups: [...expandedGroups],
-                      onExpandedGroupsChange: handleExpandedGroupsChange,
+            {settings.isEnablePackage &&
+              visitPurposeFK !== VISIT_TYPE.RETAIL && (
+                <TableData
+                  title='Package'
+                  idPrefix='package'
+                  columns={PackageColumns}
+                  colExtensions={PackageColumnExtensions(
+                    onPrint,
+                    showDrugLabelRemark,
+                  )}
+                  data={packageItem}
+                  FuncProps={{
+                    pager: false,
+                    grouping: true,
+                    groupingConfig: {
+                      state: {
+                        grouping: [{ columnName: 'packageGlobalId' }],
+                        expandedGroups: [...expandedGroups],
+                        onExpandedGroupsChange: handleExpandedGroupsChange,
+                      },
+                      row: {
+                        contentComponent: packageGroupCellContent,
+                      },
                     },
-                    row: {
-                      contentComponent: packageGroupCellContent,
-                    },
-                  },
-                }}
-              />
-            )}
+                  }}
+                />
+              )}
           </Paper>
         </GridItem>
         <GridItem xs={7} md={7} style={{ marginTop: -14 }}>
@@ -829,8 +795,8 @@ const DispenseDetails = ({
 
             <div>
               Note: There are existing payments with some co-payers, click
-              "Void" to cancel all payments, or click "Skip" to remove co-payers
-              & payments manually.
+              "Void" to cancel all payments, or click "Skip" to remove
+              co-payers & payments manually.
             </div>
           </GridContainer>
           <GridContainer

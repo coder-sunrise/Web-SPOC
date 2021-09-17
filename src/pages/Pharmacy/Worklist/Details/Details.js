@@ -486,15 +486,15 @@ const Details = props => {
                 oi.inventoryFK === orderItems[index].inventoryFK,
             )
           } else {
-                   items = orderItems.filter(
-                     oi =>
-                       !oi.isDrugMixture &&
-                       oi.invoiceItemTypeFK ===
-                         orderItems[index].invoiceItemTypeFK &&
-                       oi.id === orderItems[index].id &&
-                       oi.inventoryFK === orderItems[index].inventoryFK,
-                   )
-                 }
+            items = orderItems.filter(
+              oi =>
+                !oi.isDrugMixture &&
+                oi.invoiceItemTypeFK ===
+                orderItems[index].invoiceItemTypeFK &&
+                oi.id === orderItems[index].id &&
+                oi.inventoryFK === orderItems[index].inventoryFK,
+            )
+          }
           if (orderItems[index].quantity > _.sumBy(items, 'dispenseQuantity')) {
             isPartialPrepare = true
             break
@@ -548,11 +548,10 @@ const Details = props => {
     workitem.isPharmacyOrderUpdate ||
     workitem.isPharmacyOrderDiscard ||
     workitem.isOrderUpdate
-  const updateMessage = `${
-    workitem.updateByUserTitle && workitem.updateByUserTitle.trim().length
+  const updateMessage = `${workitem.updateByUserTitle && workitem.updateByUserTitle.trim().length
       ? `${workitem.updateByUserTitle}. ${workitem.updateByUser || ''}`
       : `${workitem.updateByUser || ''}`
-  } amended prescription at ${moment(workitem.updateDate).format('HH:mm')}`
+    } amended prescription at ${moment(workitem.updateDate).format('HH:mm')}`
 
   const currentMessage =
     workitem.isPharmacyOrderUpdate || workitem.isPharmacyOrderDiscard
@@ -572,7 +571,7 @@ const Details = props => {
   if (visitTypeSetting) {
     try {
       visitTypeSettingsObj = JSON.parse(visitTypeSetting)
-    } catch {}
+    } catch { }
   }
   const visitType = (visitTypeSettingsObj || []).find(
     type => type.id === workitem.visitPurposeFK,
@@ -596,19 +595,18 @@ const Details = props => {
             <ContentGridItem title='Diagnosis:'>
               {corDiagnosis.length
                 ? workitem.corDiagnosis
-                    .map(d => d.diagnosisDescription)
-                    .join(', ')
+                  .map(d => d.diagnosisDescription)
+                  .join(', ')
                 : '-'}
             </ContentGridItem>
             <ContentGridItem title='Visit Type:'>
               {visitType?.displayValue || '-'}
             </ContentGridItem>
-            <ContentGridItem title='Order By:'>{`${
-              workitem.generateByUserTitle &&
+            <ContentGridItem title='Order By:'>{`${workitem.generateByUserTitle &&
               workitem.generateByUserTitle.trim().length
                 ? `${workitem.generateByUserTitle}. `
                 : ''
-            }${workitem.generateByUser || ''}`}</ContentGridItem>
+              }${workitem.generateByUser || ''}`}</ContentGridItem>
             <ContentGridItem title='Order Created Time:'>
               {moment(workitem.generateDate).format('HH:mm, DD MMM YYYY')}
             </ContentGridItem>
@@ -670,7 +668,7 @@ const Details = props => {
                   position: 'relative',
                   top: '6px',
                 }}
-                onClick={() => {}}
+                onClick={() => { }}
               >
                 Journal History
               </Typography.Text>
@@ -788,27 +786,24 @@ const Details = props => {
                   { name: 'expiryDate', title: 'Expiry Date' },
                   {
                     name: 'instruction',
-                    title: `Instruction${
-                      secondaryPrintoutLanguage !== ''
+                    title: `Instruction${secondaryPrintoutLanguage !== ''
                         ? `(${showLanguage})`
                         : ''
-                    }`,
+                      }`,
                   },
                   {
                     name: 'drugInteraction',
-                    title: `Drug Interaction${
-                      secondaryPrintoutLanguage !== ''
+                    title: `Drug Interaction${secondaryPrintoutLanguage !== ''
                         ? `(${showLanguage})`
                         : ''
-                    }`,
+                      }`,
                   },
                   {
                     name: 'drugContraindication',
-                    title: `Contraindication${
-                      secondaryPrintoutLanguage !== ''
+                    title: `Contraindication${secondaryPrintoutLanguage !== ''
                         ? `(${showLanguage})`
                         : ''
-                    }`,
+                      }`,
                   },
                   { name: 'remarks', title: 'Remarks' },
                   //{ name: 'action', title: 'Action' },
@@ -943,8 +938,8 @@ const Details = props => {
                     render: row => {
                       const stock = row.stock
                         ? `${numeral(row.stock).format('0.0')} ${getDispenseUOM(
-                            row,
-                          )}`
+                          row,
+                        )}`
                         : '-'
                       return (
                         <Tooltip title={stock}>
@@ -963,8 +958,8 @@ const Details = props => {
                       const stock =
                         balStock || balStock === 0
                           ? `${numeral(balStock).format(
-                              '0.0',
-                            )} ${getDispenseUOM(row)}`
+                            '0.0',
+                          )} ${getDispenseUOM(row)}`
                           : '-'
                       return (
                         <Tooltip title={stock}>
@@ -1198,7 +1193,7 @@ const Details = props => {
             }}
           >
             {workitem.statusFK !== PHARMACY_STATUS.NEW &&
-            !pharmacyOrderItemCount
+              !pharmacyOrderItemCount
               ? 'Cancel'
               : 'Close'}
           </Button>
@@ -1390,10 +1385,10 @@ export default compose(
               const secondUOMDisplayValue =
                 secondaryPrintoutLanguage !== ''
                   ? getTranslationValue(
-                      uom.translationData,
-                      secondaryPrintoutLanguage,
-                      'displayValue',
-                    )
+                    uom.translationData,
+                    secondaryPrintoutLanguage,
+                    'displayValue',
+                  )
                   : ''
               const inventoryItemStock = _.orderBy(
                 (inventoryItem?.medicationStock || []).filter(
@@ -1541,10 +1536,10 @@ export default compose(
           const secondUOMDisplayValue =
             secondaryPrintoutLanguage !== ''
               ? getTranslationValue(
-                  uom.translationData,
-                  secondaryPrintoutLanguage,
-                  'displayValue',
-                )
+                uom.translationData,
+                secondaryPrintoutLanguage,
+                'displayValue',
+              )
               : ''
 
           const inventoryItemStock = _.orderBy(
@@ -1719,7 +1714,7 @@ export default compose(
       }
     },
     //validationSchema: Yup.object().shape({}),
-    handleSubmit: () => {},
+    handleSubmit: () => { },
     displayName: 'PharmarcyWorklistDetail',
   }),
 )(Details)

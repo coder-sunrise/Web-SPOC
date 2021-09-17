@@ -100,7 +100,15 @@ const constructPayload = values => {
   notDirtyDuration: 3,
   mapPropsToValues: pops => {
     const { dispense = {} } = pops
-    const obj = dispense.entity || dispense.default
+    let obj = dispense.entity || dispense.default
+
+    const dispenseItems = [
+      ...(obj.prescription || []),
+      ...(obj.vaccination || []),
+      ...(obj.consumable || []),
+      ...(obj.externalPrescription || []),
+    ]
+    obj = { ...obj, dispenseItems }
     const result = calculateInvoiceAmounts(obj)
     return result
   },
