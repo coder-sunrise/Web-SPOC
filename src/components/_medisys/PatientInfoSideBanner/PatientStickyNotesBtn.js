@@ -77,6 +77,11 @@ class PatientStickyNotesBtn extends Component {
   }
 
   getLatest = () => {
+    const stickyNotesViewable =
+      this.patientStickyNotesAccessRight &&
+      this.patientStickyNotesAccessRight.rights !== 'hidden'
+    if (!stickyNotesViewable) return
+
     const { patient, dispatch } = this.props
     dispatch({
       type: 'patient/getStickyNotes',
@@ -199,8 +204,7 @@ class PatientStickyNotesBtn extends Component {
     e.preventDefault()
     const { editedNote } = this.state.editedItem
     const notes = editedNote.notes
-    if(notes.trim().length == 0)
-      return
+    if (notes.trim().length == 0) return
     this.saveStickyNotes(editedNote, () => {
       this.editMode()
     })
@@ -447,7 +451,7 @@ class PatientStickyNotesBtn extends Component {
                     </Popper>
                     <Tooltip
                       title={
-                        <div style={{ fontSize: 12}}>
+                        <div style={{ fontSize: 12 }}>
                           {`Created by ${note.createByUser} (${
                             note.createByUserRole
                           }) ${moment(note.createDate).format(
@@ -585,42 +589,47 @@ class PatientStickyNotesBtn extends Component {
 
     const { openPopper, stickyNotes = [], currentDeletingNote } = this.state
     const flaggedNoteCount = stickyNotes.filter(x => x.id && x.isFlagged).length
+    const defaultPopperStyle = {
+      zIndex: 1500,
+    }
+    const { popperStyle = defaultPopperStyle } = this.props
     return (
       <Popper
         open={openPopper}
         overlay={openPopper && this.renderStickyNotes()}
         placement='right-end'
-        style={{
-          zIndex: 1500,
-          marginTop: 100,
-        }}
+        style={popperStyle}
       >
         <span>
-          <Button justIcon color='transparent'>
-            <MailOutlineIcon
-              style={{ color: '#4255BD' }}
-              onClick={this.stickyNotesBtnClick}
-            />
+          <Button
+            justIcon
+            color='transparent'
+            onClick={this.stickyNotesBtnClick}
+          >
+            <div style={{ height: 22,width:28}}>
+              <MailOutlineIcon style={{ color: '#4255BD',position:'absolute',top:7,left:3 }} />
+              {flaggedNoteCount > 0 && (
+                <span
+                  style={{
+                    display: 'inline-block',
+                    lineHeight: '1.4em',
+                    minWidth: 14,
+                    backgroundColor: 'red',
+                    color: 'white',
+                    position: 'absolute',
+                    fontSize: '11px !important',
+                    borderRadius: 7,
+                    height: 14,
+                    right: 5,
+                    top: 3,
+                    padding:'0 2px',
+                  }}
+                >
+                  {flaggedNoteCount}
+                </span>
+              )}
+            </div>
           </Button>
-          {flaggedNoteCount > 0 && (
-            <span
-              style={{
-                display: 'inline-block',
-                lineHeight: '1.4em',
-                minWidth: 16,
-                backgroundColor: 'red',
-                color: 'white',
-                position: 'relative',
-                fontSize: '0.8em !important',
-                borderRadius: 8,
-                height: 16,
-                left: -18,
-                top: -5,
-              }}
-            >
-              {flaggedNoteCount}
-            </span>
-          )}
         </span>
       </Popper>
     )
