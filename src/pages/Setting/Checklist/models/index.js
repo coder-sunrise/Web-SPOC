@@ -23,6 +23,21 @@ export default createListViewModel({
     },
     effects: {},
     reducers: {
+      queryOneDone(st, { payload }) {
+        const {
+          effectiveStartDate,
+          effectiveEndDate,
+          visitOrderTemplateItemDtos,
+          ...restValues
+        } = payload.data
+        return {
+          ...st,
+          entity: {
+            ...restValues,
+            effectiveDates: [effectiveStartDate, effectiveEndDate],
+          },
+        }
+      },
       queryDone(st, { payload }) {
         const { data } = payload
 
