@@ -47,6 +47,7 @@ class ChecklistNature extends PureComponent {
         observationIndex,
         values,
         setFieldValue,
+        manuallyTriggerDirty,
       } = this.props
       const checklistSubject = values.checklistSubject || []
       const checklistObservation =
@@ -97,6 +98,7 @@ class ChecklistNature extends PureComponent {
       }
 
       if (added || deleted || changed) {
+        manuallyTriggerDirty()
         checklistObservation.checklistNature = newRows
         setFieldValue('checklistSubject', checklistSubject)
         this.setState({ checklistNature: newRows })

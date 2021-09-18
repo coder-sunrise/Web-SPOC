@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import _ from 'lodash'
-import { formatMessage, FormattedMessage } from 'umi'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -13,23 +12,26 @@ import {
   DateRangePicker,
 } from '@/components'
 import ChecklistSubject from './ChecklistSubject'
-import schema from '@/pages/PatientDatabase/Detail/schema'
 import { LTChecklistCategory } from '../variables'
 
 @withFormikExtend({
   mapPropsToValues: ({ settingChecklist }) => {
     const entity = settingChecklist.entity || settingChecklist.default
-
     const checklistSubject = entity.checklistSubject || []
     const checklistSubjectWithTabKey = checklistSubject.map(itemSubject => ({
       ...itemSubject,
-      checklistObservation: _.sortBy(itemSubject.checklistObservation, ['sortOrder'], ['asc']),
+      checklistObservation: _.sortBy(
+        itemSubject.checklistObservation,
+        ['sortOrder'],
+        ['asc'],
+      ),
       key: itemSubject.id ? itemSubject.id.toString() : itemSubject.key,
     }))
 
     return {
       ...entity,
       checklistSubject: checklistSubjectWithTabKey,
+      dirty: false,
     }
   },
   validationSchema: Yup.object().shape({
@@ -79,10 +81,15 @@ import { LTChecklistCategory } from '../variables'
 class Detail extends PureComponent {
   state = {}
 
+  manuallyTriggerDirty = () => {
+    const { setFieldValue } = this.props
+    setFieldValue('dirty', true)
+  }
+
   render() {
     const { props } = this
-    const { classes, theme, footer, values, settingChecklist } = props
-    // console.log('detail', props)
+    const { theme, footer, settingChecklist } = props
+
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -153,17 +160,16 @@ class Detail extends PureComponent {
                 name='sortOrder'
                 render={args => {
                   return (
-                    <NumberInput
-                      label='Sort Order'
-                      precision={0}
-                      {...args}
-                    />
+                    <NumberInput label='Sort Order' precision={0} {...args} />
                   )
                 }}
               />
             </GridItem>
             <GridItem md={12}>
-              <ChecklistSubject {...props} />
+              <ChecklistSubject
+                {...props}
+                manuallyTriggerDirty={this.manuallyTriggerDirty}
+              />
             </GridItem>
           </GridContainer>
         </div>
