@@ -580,7 +580,9 @@ const Details = props => {
   return (
     <div style={{ marginTop: -20 }}>
       <div className={classes.contentPanel}>
-        <Banner patientInfo={patient} style={{ position: 'relative' }} />
+        <div style={{ padding: 8}}>
+          <Banner from='Pharmacy' patientInfo={patient} />
+        </div>
         <div style={{ marginTop: 16 }}>
           <GridContainer>
             <GridItem>

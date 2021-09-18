@@ -713,9 +713,14 @@ export const PHARMACY_STATUS = {
        }
 
 export const PHARMACY_ACTION = {
-         REDISPENSE: 'Redispense',
-         PREPARE: 'Prepare',
-         VERIFY: 'Verify',
-         COMPLETE: 'Complete',
-         CANCEL: 'Cancel',
-       }
+    REDISPENSE: 'Redispense',
+    PREPARE: 'Prepare',
+    VERIFY: 'Verify',
+    COMPLETE: 'Complete',
+    CANCEL: 'Cancel',
+}
+
+export const CHECKLIST_CATEGORY = {
+  RADIOLOGY: 1,
+  DOCTORCONSULTATION: 2,
+}
