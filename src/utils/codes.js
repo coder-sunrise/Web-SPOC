@@ -1116,6 +1116,7 @@ export const inventoryItemListing = (list, itemFKName = undefined, stateName = u
       stateName,
       itemFK: x.id,
       isActive: x.isActive,
+      isOnlyClinicInternalUsage: x.isOnlyClinicInternalUsage,
       displayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(2)} / ${uom})`,
     }
   })

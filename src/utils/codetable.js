@@ -74,7 +74,6 @@ const tenantCodesMap = new Map([
     'inventorymedication',
     {
       ...defaultParams,
-      isOnlyClinicInternalUsage: true,
       sorting: [{ columnName: 'displayValue', direction: 'asc' }],
     },
   ],
@@ -82,7 +81,6 @@ const tenantCodesMap = new Map([
     'inventoryconsumable',
     {
       ...defaultParams,
-      isOnlyClinicInternalUsage: true,
       sorting: [{ columnName: 'displayValue', direction: 'asc' }],
     },
   ],
