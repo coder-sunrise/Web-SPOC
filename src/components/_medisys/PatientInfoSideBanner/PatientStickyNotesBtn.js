@@ -245,6 +245,9 @@ class PatientStickyNotesBtn extends Component {
     const isOpenDeleteItemConfirm =
       openDeleteItemConfirm && currentDeletingNote?.id === note.id
 
+    const { id: currentUserID } = this.props.currentUser
+    const isBelongtoCurrentUser = !note.createByUserFK || note.createByUserFK === currentUserID
+
     return (
       <div
         className={this.props.classes.noteItemStyle}
@@ -258,7 +261,7 @@ class PatientStickyNotesBtn extends Component {
           marginBottom: 10,
         }}
         onDoubleClick={() => {
-          if (!stickyNotesEditable) return
+          if (!stickyNotesEditable || !isBelongtoCurrentUser) return
           this.editMode(note, idx)
         }}
       >
@@ -306,7 +309,9 @@ class PatientStickyNotesBtn extends Component {
                 <Button
                   justIcon
                   color='transparent'
-                  onClick={() => this.onFlagClick(note)}
+                  onClick={() => {
+                    if (isBelongtoCurrentUser) this.onFlagClick(note)
+                  }}
                   style={{
                     margin: 0,
                     color: note.isFlagged ? 'red' : 'gray',
@@ -437,17 +442,19 @@ class PatientStickyNotesBtn extends Component {
                         )
                       }
                     >
-                      <Button
-                        className={
-                          isOpenDeleteItemConfirm ? null : 'delNoteBtnClass'
-                        }
-                        justIcon
-                        color='transparent'
-                        style={{ color: 'gray', margin: '0 0 0 -9px' }}
-                        onClick={() => this.onDeleteNoteClick(note)}
-                      >
-                        <Delete />
-                      </Button>
+                      {isBelongtoCurrentUser && (
+                        <Button
+                          className={
+                            isOpenDeleteItemConfirm ? null : 'delNoteBtnClass'
+                          }
+                          justIcon
+                          color='transparent'
+                          style={{ color: 'gray', margin: '0 0 0 -9px' }}
+                          onClick={() => this.onDeleteNoteClick(note)}
+                        >
+                          <Delete />
+                        </Button>
+                      )}
                     </Popper>
                     <Tooltip
                       title={
@@ -636,8 +643,9 @@ class PatientStickyNotesBtn extends Component {
   }
 }
 
-const ConnectedPatientStickyNotesBtn = connect(({ patient }) => ({
+const ConnectedPatientStickyNotesBtn = connect(({ patient, user }) => ({
   patient: patient.entity || {},
+  currentUser: user.data
 }))(PatientStickyNotesBtn)
 
 export default withStyles(styles, {
