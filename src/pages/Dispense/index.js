@@ -23,6 +23,7 @@ import style from './style'
     clinicSettings,
     loading,
     forms,
+    codetable
   }) => ({
     loading,
     dispense,
@@ -33,14 +34,15 @@ import style from './style'
     patient: patient.entity || {},
     clinicSettings,
     forms,
+    codetable
   }),
 )
 class Dispense extends PureComponent {
-  componentDidMount() {
+  componentDidMount () {
     this.getCodeTables()
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     const { dispatch } = this.props
     dispatch({
       type: 'orders/reset',
@@ -130,7 +132,7 @@ class Dispense extends PureComponent {
     })
   }
 
-  render() {
+  render () {
     const { classes, dispense, loading, patient } = this.props
     const { editingOrder } = dispense
     return (

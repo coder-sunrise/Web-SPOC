@@ -12,6 +12,7 @@ import Delete from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import { formatMessage } from 'umi' // common component
 import Warining from '@material-ui/icons/Error'
+import { Table } from '@devexpress/dx-react-grid-material-ui'
 import {
   Button,
   ProgressButton,
@@ -81,6 +82,14 @@ const styles = theme => ({
       marginRight: '0px !important',
     },
   },
+  subRow: {
+    '& > td:first-child': {
+      paddingLeft: theme.spacing(1),
+    },
+  },
+  groupStyle: {
+    margin: '3px 0px',
+  }
 })
 
 const DispenseDetails = ({
@@ -120,6 +129,7 @@ const DispenseDetails = ({
     invoice,
     visitPurposeFK,
     visitRemarks,
+    defaultExpandedGroups,
   } = values || {
     invoice: { invoiceItem: [] },
   }
@@ -375,9 +385,17 @@ const DispenseDetails = ({
         break
     }
     if (selectedRows.length > 0) {
-      let selectedRecords = records.filter(
-        x => selectedRows.indexOf(getRowId(x, type)) > -1,
-      )
+      let selectedRecords = []
+      if (type === 'DispenseItems') {
+        selectedRecords = records.filter(
+          x => selectedRows.indexOf(x.uid) > -1,
+        )
+      }
+      else {
+        selectedRecords = records.filter(
+          x => selectedRows.indexOf(getRowId(x, type)) > -1,
+        )
+      }
       setSelectedActualizeRows(selectedRecords)
       setActualizationStatus(NURSE_WORKITEM_STATUS.NEW)
       setShowActualization(true)
@@ -413,6 +431,58 @@ const DispenseDetails = ({
 
   const { labelPrinterSize } = settings
   const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
+
+  const orderItemRow = p => {
+    const { row, children, tableRow } = p
+    let newchildren = []
+
+    const batchColumns = children.slice(6, 11)
+
+    if (row.countNumber === 1) {
+      newchildren.push(
+        children
+          .filter((value, index) => index < 6)
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.rowspan,
+            },
+          })),
+      )
+
+      newchildren.push(batchColumns)
+
+      newchildren.push(
+        children
+          .filter((value, index) => index > 10)
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.rowspan,
+            },
+          })),
+      )
+    } else {
+      newchildren.push(batchColumns)
+    }
+
+    const selectedData = {
+      ...tableRow.row,
+      doctor: null,
+    }
+
+    if (row.countNumber === 1) {
+      return <Table.Row {...p}>{newchildren}</Table.Row>
+    }
+    return (
+      <Table.Row {...p} className={classes.subRow}>
+        {newchildren}
+      </Table.Row>
+    )
+  }
+
   return (
     <React.Fragment>
       <GridContainer>
@@ -605,10 +675,51 @@ const DispenseDetails = ({
               )}
               selection={selectedDispenseItemsRows}
               onSelectionChange={value => {
+                console.log('value', value)
                 handleSelectionChange('DispenseItems', value)
               }}
               {...actualizeTableConfig(
                 isShowActualizeSelection(dispenseItems),
+                {
+                  grouping: true,
+                  groupingConfig: {
+                    state: {
+                      grouping: [{ columnName: 'dispenseGroupId', groupingEnabled: false }],
+                      expandedGroups: defaultExpandedGroups,
+                    },
+                    row: {
+                      indentColumnWidth: 0,
+                      iconComponent: icon => <span></span>,
+                      contentComponent: group => {
+                        const { row } = group
+                        const groupRow = dispenseItems.find(
+                          data => data.dispenseGroupId === row.value,
+                        )
+                        if (row.value === 'NormalDispense')
+                          return (
+                            <div className={classes.groupStyle}>
+                              <span style={{ fontWeight: 600 }}>Normal Dispense Items</span>
+                            </div>
+                          )
+                        if (row.value === 'NoNeedToDispense')
+                          return (
+                            <div className={classes.groupStyle}><span style={{ fontWeight: 600 }}>
+                              No Need To Dispense Items
+                            </span>
+                            </div>
+                          )
+                        return (
+                          <div className={classes.groupStyle}>
+                            <span style={{ fontWeight: 600 }}>
+                              {'Drug Mixture: '}
+                            </span>
+                            {groupRow.drugMixtureName}
+                          </div>
+                        )
+                      },
+                    },
+                  },
+                }
               )}
               idPrefix='DispenseItems'
               forceRender
@@ -620,6 +731,10 @@ const DispenseDetails = ({
                 showDrugLabelRemark,
               )}
               data={dispenseItems}
+              TableProps={{
+                rowComponent: orderItemRow,
+              }}
+              getRowId={r => r.uid}
             />
 
             <TableData

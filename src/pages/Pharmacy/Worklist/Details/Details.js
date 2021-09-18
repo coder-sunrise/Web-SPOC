@@ -719,6 +719,7 @@ const Details = props => {
                       defaultExpandedGroups: props.values.defaultExpandedGroups,
                     },
                     row: {
+                      indentColumnWidth: 0,
                       contentComponent: group => {
                         const { row } = group
                         const groupRow = props.values.orderItems.find(

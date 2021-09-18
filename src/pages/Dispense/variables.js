@@ -26,7 +26,7 @@ export const tableConfig = {
   FuncProps: { pager: false },
 }
 
-export const actualizeTableConfig = selectable => {
+export const actualizeTableConfig = (selectable, groupConfig = {}) => {
   return {
     FuncProps: {
       pager: false,
@@ -49,6 +49,7 @@ export const actualizeTableConfig = selectable => {
           )
         },
       },
+      ...groupConfig,
     },
   }
 }
@@ -162,6 +163,7 @@ const actualizationButton = (row, buttonClickCallback) => {
 }
 
 export const DispenseItemsColumns = [
+  { name: 'dispenseGroupId', title: '' },
   {
     name: 'type',
     title: 'Type',
@@ -170,13 +172,22 @@ export const DispenseItemsColumns = [
     name: 'name',
     title: 'Name',
   },
+  { name: 'dispenseUOM', title: 'UOM' },
   {
-    name: 'instruction',
-    title: 'Instructions',
+    name: 'quantity',
+    title: 'Ordered Qty.',
   },
   {
-    name: 'remarks',
-    title: 'Remarks',
+    name: 'dispenseQuantity',
+    title: 'Dispensed Qty.',
+  },
+  {
+    name: 'stock',
+    title: 'Stock Qty.',
+  },
+  {
+    name: 'stockBalance',
+    title: 'Balance Qty.',
   },
   {
     name: 'batchNo',
@@ -187,12 +198,12 @@ export const DispenseItemsColumns = [
     title: 'Expiry Date',
   },
   {
-    name: 'quantity',
-    title: 'Qty. Ordered',
+    name: 'instruction',
+    title: 'Instructions',
   },
   {
-    name: 'dispensedQuanity',
-    title: 'Qty. Dispensed',
+    name: 'remarks',
+    title: 'Remarks',
   },
   {
     name: 'unitPrice',
@@ -218,70 +229,72 @@ export const DispenseItemsColumnExtensions = (
   onActualizeBtnClick,
   showDrugLabelRemark,
 ) => [
+    { columnName: 'dispenseGroupId' },
     {
-    columnName: 'type',
-    compare: compareString,
-    width: 160,
-    render: row => {
-      let paddingRight = 0
-      if (row.isPreOrder && row.isExclusive) {
-        paddingRight = 52
-      } else if (row.isPreOrder || row.isExclusive) {
-        paddingRight = 24
-      }
-      return (
-        <div
-          style={{
-            wordWrap: 'break-word',
-            whiteSpace: 'pre-wrap',
-            paddingRight: paddingRight,
-          }}
-        >
-          <Tooltip title={row.type}>
-            <span>{row.type}</span>
-          </Tooltip>
-          <div style={{ position: 'relative', top: 2 }}>
-            {row.isPreOrder && (
-              <Tooltip title='Pre-Order'>
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: 2,
-                    right: -27,
-                    borderRadius: 10,
-                    backgroundColor: '#4255bd',
-                    fontWeight: 500,
-                    color: 'white',
-                    fontSize: '0.7rem',
-                    padding: '2px 3px',
-                    height: 20,
-                  }}
-                >
-                  {' '}
-                  Pre
-                </div>
-              </Tooltip>
-            )}
-            {row.isExclusive && (
-              <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: 2,
-                    right: row.isPreOrder ? -60 : -30,
-                    borderRadius: 4,
-                    backgroundColor: 'green',
-                    fontWeight: 500,
-                    color: 'white',
-                    fontSize: '0.7rem',
-                    padding: '2px 3px',
-                    height: 20,
-                  }}
-                >
-                  Excl.
-                </div>
-              </Tooltip>
-            )}
+      columnName: 'type',
+      compare: compareString,
+      width: 160,
+      sortingEnabled: false,
+      render: row => {
+        let paddingRight = 0
+        if (row.isPreOrder && row.isExclusive) {
+          paddingRight = 52
+        } else if (row.isPreOrder || row.isExclusive) {
+          paddingRight = 24
+        }
+        return (
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+              paddingRight: paddingRight,
+            }}
+          >
+            <Tooltip title={row.type}>
+              <span>{row.type}</span>
+            </Tooltip>
+            <div style={{ position: 'relative', top: 2 }}>
+              {row.isPreOrder && (
+                <Tooltip title='Pre-Order'>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 2,
+                      right: -27,
+                      borderRadius: 10,
+                      backgroundColor: '#4255bd',
+                      fontWeight: 500,
+                      color: 'white',
+                      fontSize: '0.7rem',
+                      padding: '2px 3px',
+                      height: 20,
+                    }}
+                  >
+                    {' '}
+                    Pre
+                  </div>
+                </Tooltip>
+              )}
+              {row.isExclusive && (
+                <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 2,
+                      right: row.isPreOrder ? -60 : -30,
+                      borderRadius: 4,
+                      backgroundColor: 'green',
+                      fontWeight: 500,
+                      color: 'white',
+                      fontSize: '0.7rem',
+                      padding: '2px 3px',
+                      height: 20,
+                    }}
+                  >
+                    Excl.
+                  </div>
+                </Tooltip>
+              )}
             </div>
           </div>
         )
@@ -296,6 +309,7 @@ export const DispenseItemsColumnExtensions = (
     {
       columnName: 'name',
       width: '30%',
+      sortingEnabled: false,
       render: row => {
         const isShowStockIndicator =
           row.type === 'Medication' || row.type === 'Vaccination'
@@ -324,7 +338,7 @@ export const DispenseItemsColumnExtensions = (
             </Tooltip>
             <div style={{ position: 'relative', top: 2 }}>
               {lowStockIndicator(
-                row,
+                { ...row, isDrugMixture: false },
                 row.type === 'Medication'
                   ? 'inventoryMedicationFK'
                   : 'inventoryVaccinationFK',
@@ -338,6 +352,7 @@ export const DispenseItemsColumnExtensions = (
     {
       columnName: 'instruction',
       width: '40%',
+      sortingEnabled: false,
       render: row => {
         return (
           <Tooltip title={<div>{row.instruction}</div>}>
@@ -356,6 +371,7 @@ export const DispenseItemsColumnExtensions = (
     {
       columnName: 'remarks',
       width: '30%',
+      sortingEnabled: false,
       render: row => {
         const existsDrugLabelRemarks =
           showDrugLabelRemark &&
@@ -405,6 +421,7 @@ export const DispenseItemsColumnExtensions = (
       width: 110,
       align: 'right',
       type: 'currency',
+      sortingEnabled: false,
       render: row => (
         <NumberInput
           value={
@@ -422,27 +439,54 @@ export const DispenseItemsColumnExtensions = (
       width: 110,
       align: 'right',
       type: 'currency',
+      sortingEnabled: false,
     },
     {
-      columnName: 'dispensedQuanity',
-      type: 'number',
-      width: 130,
+      columnName: 'dispenseUOM',
+      width: 80,
+      sortingEnabled: false,
+    },
+    {
+      columnName: 'dispenseQuantity',
+      width: 120,
+      sortingEnabled: false,
       render: row => {
-        let qty = `${numeral(row.dispensedQuanity || 0).format(
-          '0,0.0',
-        )} ${row.dispenseUOM || ''}`
+        if (
+          !row.stockFK
+        ) {
+          return (
+            <Tooltip title='-'>
+              <span>-</span>
+            </Tooltip>
+          )
+        }
         return (
-          <Tooltip title={qty}>
-            <span>{qty}</span>
-          </Tooltip>
+          <FastField
+            name={`orderItems[${row.rowIndex}]dispenseQuantity`}
+            render={args => {
+              return (
+                <NumberInput
+                  label=''
+                  step={1}
+                  format='0.0'
+                  max={row.isDefault ? undefined : row.stock}
+                  min={0}
+                  disabled={row.isDispensedByPharmacy}
+                  precision={1}
+                  {...args}
+                />
+              )
+            }}
+          />
         )
       },
+      align: 'right',
     },
     {
       columnName: 'quantity',
       type: 'number',
       align: 'right',
-      width: 130,
+      width: 120,
       render: row => {
         let qty = `${numeral(row.quantity || 0).format(
           '0,0.0',
@@ -455,8 +499,45 @@ export const DispenseItemsColumnExtensions = (
       },
     },
     {
+      columnName: 'stock',
+      width: 120,
+      sortingEnabled: false,
+      render: row => {
+        const stock = row.stock
+          ? `${numeral(row.stock).format('0.0')} ${row.uomDisplayValue}`
+          : '-'
+        return (
+          <Tooltip title={stock}>
+            <span>{stock}</span>
+          </Tooltip>
+        )
+      },
+      align: 'right',
+    },
+    {
+      columnName: 'stockBalance',
+      width: 120,
+      sortingEnabled: false,
+      render: row => {
+        const balStock = row.stock - row.dispenseQuantity
+        const stock =
+          balStock || balStock === 0
+            ? `${numeral(balStock).format(
+              '0.0',
+            )} ${row.uomDisplayValue}`
+            : '-'
+        return (
+          <Tooltip title={stock}>
+            <span>{stock}</span>
+          </Tooltip>
+        )
+      },
+      align: 'right',
+    },
+    {
       columnName: 'batchNo',
       width: 150,
+      sortingEnabled: false,
       render: row => {
         return (
           <FastField
@@ -473,6 +554,7 @@ export const DispenseItemsColumnExtensions = (
     {
       columnName: 'expiryDate',
       width: 110,
+      sortingEnabled: false,
       render: row => {
         return (
           <FastField
@@ -496,7 +578,6 @@ export const DispenseItemsColumnExtensions = (
     },
     {
       columnName: 'action',
-      align: 'center',
       width: 70,
       render: row => {
         return (
