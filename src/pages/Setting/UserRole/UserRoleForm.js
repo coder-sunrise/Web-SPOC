@@ -56,7 +56,7 @@ class UserRoleForm extends React.PureComponent {
                   render={(args) => (
                     <CodeSelect
                       {...args}
-                      label='Existing Role'
+                      label='Existing User Group'
                       code='role'
                       onChange={this.onSelect}
                     />
