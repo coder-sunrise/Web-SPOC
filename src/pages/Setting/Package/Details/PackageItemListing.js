@@ -150,10 +150,10 @@ const PackageItemListing = ({
         const { inventoryItemList } = inventoryItemListing(list)
         switch (x.stateName) {
           case 'ConsumableItemList': {
-            return setConsumableList(inventoryItemList)
+            return setConsumableList(inventoryItemList.filter(item => item.isOnlyClinicInternalUsage))
           }
           case 'MedicationItemList': {
-            return setMedicationList(inventoryItemList)
+            return setMedicationList(inventoryItemList.filter(item => item.isOnlyClinicInternalUsage))
           }
           case 'VaccinationItemList': {
             return setVaccinationList(inventoryItemList)

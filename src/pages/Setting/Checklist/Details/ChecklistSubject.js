@@ -13,7 +13,6 @@ class ChecklistSubject extends PureComponent {
   constructor(props) {
     super(props)
 
-    const { setFieldValue } = this.props
     const checklistSubject = this.getChecklistSubject()
 
     let activeKey
@@ -78,6 +77,7 @@ class ChecklistSubject extends PureComponent {
     })
 
     this.setChecklistSubject(newChecklistSubject)
+    this.props.manuallyTriggerDirty()
   }
 
   removeObservation = observationItem => {
@@ -105,6 +105,7 @@ class ChecklistSubject extends PureComponent {
     }
 
     this.setChecklistSubject(checklistSubject)
+    this.props.manuallyTriggerDirty()
   }
 
   onChange = activeKey => {
@@ -112,6 +113,7 @@ class ChecklistSubject extends PureComponent {
   }
 
   onEdit = (targetKey, action) => {
+    this.props.manuallyTriggerDirty()
     this[action](targetKey)
   }
 

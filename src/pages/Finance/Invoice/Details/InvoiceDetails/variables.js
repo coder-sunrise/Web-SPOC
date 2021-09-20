@@ -59,7 +59,7 @@ export const DataGridColExtensions = [
                       position: 'absolute',
                     bottom: 2,
                     right: -30,
-                    borderRadius: 10,
+                    borderRadius: 4,
                     backgroundColor: '#4255bd',
                     fontWeight: 500,
                     color: 'white',
