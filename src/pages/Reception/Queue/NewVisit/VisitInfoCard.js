@@ -250,9 +250,9 @@ const VisitInfoCard = ({
     )
   }
 
-  const familyMembers = patientInfo?.patientFamilyGroup?.patientFamilyMember.map(
+  const familyMembers = [...patientInfo?.patientFamilyGroup?.patientFamilyMember.map(
     mem => mem.name,
-  )
+  ), patientInfo?.patientFamilyGroup.name]
   const visitGroups = [
     ...queueLog.list
       .filter((q, i, a) => {
