@@ -779,7 +779,7 @@ export default ({
                           className={classes.rightIcon}
                           style={{
                             right: -27,
-                            borderRadius: 10,
+                            borderRadius: 4,
                             backgroundColor: '#4255bd',
                           }}
                         >

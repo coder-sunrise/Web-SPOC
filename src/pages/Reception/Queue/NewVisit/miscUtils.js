@@ -111,7 +111,7 @@ const convertEyeForms = (values) => {
 const getVisitOrderTemplateTotal = (vType, template) => {
   let activeItemTotal = 0
   visitOrderTemplateItemTypes.forEach(type => {
-    if (vType === VISIT_TYPE.RETAIL && type.id === 3) return
+    if (vType === VISIT_TYPE.OTC && type.id === 3) return
     const currentTypeItems = template.visitOrderTemplateItemDtos.filter(
       itemType => itemType.inventoryItemTypeFK === type.id,
     )

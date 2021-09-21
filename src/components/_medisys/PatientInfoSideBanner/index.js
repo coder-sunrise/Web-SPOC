@@ -377,7 +377,12 @@ class PatientInfoSideBanner extends PureComponent {
             text
             value={entity.genderFK}
           />)
-          <PatientStickyNotesBtn/>
+            <PatientStickyNotesBtn
+              popperStyle={{
+                zIndex: 1500,
+                marginTop: 100,
+              }}
+            />
         </p>
         <div style={{ display: 'inline-flex' }}>
           <PrintLabLabelButton

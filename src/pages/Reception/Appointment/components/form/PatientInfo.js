@@ -58,6 +58,11 @@ const PatientInfoInput = ({
                   label={formatMessage({
                     id: 'reception.queue.patientSearchPlaceholder',
                   })}
+                  onKeyUp={e => {
+                    if ([13].includes(e.which)) {
+                      onSearchPatientClick()
+                    }
+                  }}
                 />
               )
             }}
@@ -68,7 +73,25 @@ const PatientInfoInput = ({
         <div className={classnames(classes.buttonGroup)}>
           <FastField
             name='dob'
-            render={args => <DatePicker {...args} label='DOB' />}
+            render={args => (
+              <DatePicker
+                {...args}
+                label='DOB'
+                onChange={async e => {
+                  if (!e) return
+                  try {
+                    const { form, field } = args
+
+                    if (form && field) {
+                      await form.setFieldValue(field.name, e)
+                      onSearchPatientClick()
+                    }
+                  } catch (error) {
+                    console.error({ error })
+                  }
+                }}
+              />
+            )}
           />
         </div>
       </GridItem>
@@ -76,7 +99,7 @@ const PatientInfoInput = ({
         <div className={classnames(classes.buttonGroup)}>
           {!isRegisteredPatient ? (
             <React.Fragment>
-              <ProgressButton
+              <Button
                 size='sm'
                 color='primary'
                 variant='contained'
@@ -84,10 +107,9 @@ const PatientInfoInput = ({
                 disabled={disabled || isEdit}
                 onClick={onSearchPatientClick}
                 // tabIndex={-1}
-                icon={<Search />}
               >
-                Search
-              </ProgressButton>
+                {<Search />}Search
+              </Button>
               {!isEdit && (
                 <Authorized authority='patientdatabase.newpatient'>
                   <Button

@@ -205,7 +205,7 @@ const DispenseDetails = ({
         openConfirm: true,
         openConfirmContent: `Discard dispense?`,
         onConfirmSave:
-          visitPurposeFK === VISIT_TYPE.RETAIL
+          visitPurposeFK === VISIT_TYPE.OTC
             ? discardAddOrderDetails
             : discardBillOrder,
       },
@@ -262,8 +262,8 @@ const DispenseDetails = ({
     clinicalObjectRecordFK: undefined,
   }
 
-  const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
-  const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BILL_FIRST
+  const isRetailVisit = visitPurposeFK === VISIT_TYPE.OTC
+  const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BF
   const disableRefreshOrder = isBillFirstVisit && !clinicalObjectRecordFK
   const disableDiscard = totalPayment > 0 || !!clinicalObjectRecordFK
   const [showRemovePayment, setShowRemovePayment] = useState(false)
@@ -763,33 +763,32 @@ const DispenseDetails = ({
               data={otherOrder}
             />
 
-            {settings.isEnablePackage &&
-              visitPurposeFK !== VISIT_TYPE.RETAIL && (
-                <TableData
-                  title='Package'
-                  idPrefix='package'
-                  columns={PackageColumns}
-                  colExtensions={PackageColumnExtensions(
-                    onPrint,
-                    showDrugLabelRemark,
-                  )}
-                  data={packageItem}
-                  FuncProps={{
-                    pager: false,
-                    grouping: true,
-                    groupingConfig: {
-                      state: {
-                        grouping: [{ columnName: 'packageGlobalId' }],
-                        expandedGroups: [...expandedGroups],
-                        onExpandedGroupsChange: handleExpandedGroupsChange,
-                      },
-                      row: {
-                        contentComponent: packageGroupCellContent,
-                      },
+            {settings.isEnablePackage && visitPurposeFK !== VISIT_TYPE.OTC && (
+              <TableData
+                title='Package'
+                idPrefix='package'
+                columns={PackageColumns}
+                colExtensions={PackageColumnExtensions(
+                  onPrint,
+                  showDrugLabelRemark,
+                )}
+                data={packageItem}
+                FuncProps={{
+                  pager: false,
+                  grouping: true,
+                  groupingConfig: {
+                    state: {
+                      grouping: [{ columnName: 'packageGlobalId' }],
+                      expandedGroups: [...expandedGroups],
+                      onExpandedGroupsChange: handleExpandedGroupsChange,
                     },
-                  }}
-                />
-              )}
+                    row: {
+                      contentComponent: packageGroupCellContent,
+                    },
+                  },
+                }}
+              />
+            )}
           </Paper>
         </GridItem>
         <GridItem xs={7} md={7} style={{ marginTop: -14 }}>

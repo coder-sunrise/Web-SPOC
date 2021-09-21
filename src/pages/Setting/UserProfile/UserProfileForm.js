@@ -28,7 +28,7 @@ import {
   MobileNumberInput,
 } from '@/components/_medisys'
 // utils
-import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
+import { NOTIFICATION_TYPE, NOTIFICATION_STATUS, CLINICAL_ROLE } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
 import * as queueServices from '@/services/queue'
 import clinicServices from '@/services/clinicInfo'
@@ -364,6 +364,7 @@ class UserProfileForm extends React.PureComponent {
       settingUserProfile,
       hasActiveSession,
       height,
+      ctRole,
     } = this.props
     const {
       currentPrimaryRegisteredDoctorFK,
@@ -377,6 +378,11 @@ class UserProfileForm extends React.PureComponent {
     const isMyAccount = isEdit
       ? _.isEmpty(settingUserProfile.currentSelectedUser)
       : false
+    const {
+      userProfile: { role = [] },
+      _oldRole,
+    } = values
+    const currentClinicalRole = ctRole?.find(item => item.id === role.id)
 
     return (
       <LoadingWrapper loading={isValidating}>
@@ -474,7 +480,7 @@ class UserProfileForm extends React.PureComponent {
               </GridContainer>
 
               <GridItem md={12} className={classes.verticalSpacing}>
-                <h4>User Role</h4>
+                <h4>User Group</h4>
               </GridItem>
               <GridContainer className={classes.indent}>
                 <GridItem md={6}>
@@ -483,13 +489,29 @@ class UserProfileForm extends React.PureComponent {
                     render={args => (
                       <CodeSelect
                         {...args}
-                        label='Role'
+                        label='User Group'
                         code='role'
+                        localFilter={item => {
+                          if (_oldRole && currentClinicalRole?.clinicalRoleName === 'Doctor') {
+                            return (
+                              item.clinicalRoleName ===
+                              currentClinicalRole?.clinicalRoleName
+                            )
+                          }
+                          return item
+                        }}
                         disabled={isMyAccount}
                         onChange={this.onRoleChange}
                       />
                     )}
                   />
+                </GridItem>
+                <GridItem md={6}>
+                  {_oldRole && currentClinicalRole?.clinicalRoleName === 'Doctor' && (
+                    <div style={{ marginTop :20 }}>
+                      Current user can switch to any user group under doctor clinical role
+                    </div>
+                  )}
                 </GridItem>
               </GridContainer>
 

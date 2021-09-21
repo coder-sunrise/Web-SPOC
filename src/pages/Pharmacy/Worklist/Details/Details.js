@@ -148,7 +148,7 @@ const Details = props => {
         setShowEditOrderModal(true)
       })
     }
-    if (visitPurposeFK === VISIT_TYPE.RETAIL) {
+    if (visitPurposeFK === VISIT_TYPE.OTC) {
       navigateDirtyCheck({
         onProceed: _editOrder,
       })(e)
@@ -579,7 +579,9 @@ const Details = props => {
   return (
     <div style={{ marginTop: -20 }}>
       <div className={classes.contentPanel}>
-        <Banner patientInfo={patient} style={{ position: 'relative' }} />
+        <div style={{ padding: 8}}>
+          <Banner from='Pharmacy' patientInfo={patient} />
+        </div>
         <div style={{ marginTop: 16 }}>
           <GridContainer>
             <GridItem>
@@ -1206,7 +1208,7 @@ const Details = props => {
                 disabled={isOrderUpdate || !pharmacyOrderItemCount}
                 onClick={editOrder}
               >
-                {workitem.visitPurposeFK == VISIT_TYPE.RETAIL
+                {workitem.visitPurposeFK == VISIT_TYPE.OTC
                   ? 'Add Order'
                   : 'Edit Order'}
               </Button>

@@ -24,16 +24,17 @@ import Authorized from '@/utils/Authorized'
 import { withStyles } from '@material-ui/core'
 import { Link } from 'umi'
 
-const NOTESCOLOR = [
-  '#EF5AA1',
-  '#99CC66',
-  '#66CCFF',
-  '#FFCC99',
-  '#CCCCCC',
-  '#FFFF99',
-  '#CCFFFF',
-  '#9966FF',
-]
+const NOTESCOLOR = {
+  Green: '#CCFF90',
+  Cyan: '#A7FFEB',
+  Blue: '#80D8FF',
+  LightPurple: '#CC99FF',
+  White: '#FFFFFF',
+  Red: '#FF8A80',
+  YellowOrange: '#FFD180',
+  Yellow: '#FFFF8D',
+}
+
 
 const styles = theme => ({
   notesTextStyle: {
@@ -68,6 +69,7 @@ class PatientStickyNotesBtn extends Component {
   state = {
     openPopper: false,
     stickyNotes: [],
+    isFlaggedOnlyShow: true,
   }
 
   componentDidMount = () => {
@@ -75,6 +77,11 @@ class PatientStickyNotesBtn extends Component {
   }
 
   getLatest = () => {
+    const stickyNotesViewable =
+      this.patientStickyNotesAccessRight &&
+      this.patientStickyNotesAccessRight.rights !== 'hidden'
+    if (!stickyNotesViewable) return
+
     const { patient, dispatch } = this.props
     dispatch({
       type: 'patient/getStickyNotes',
@@ -197,8 +204,7 @@ class PatientStickyNotesBtn extends Component {
     e.preventDefault()
     const { editedNote } = this.state.editedItem
     const notes = editedNote.notes
-    if(notes.trim().length == 0)
-      return
+    if (notes.trim().length == 0) return
     this.saveStickyNotes(editedNote, () => {
       this.editMode()
     })
@@ -239,6 +245,9 @@ class PatientStickyNotesBtn extends Component {
     const isOpenDeleteItemConfirm =
       openDeleteItemConfirm && currentDeletingNote?.id === note.id
 
+    const { id: currentUserID } = this.props.currentUser
+    const isBelongtoCurrentUser = !note.createByUserFK || note.createByUserFK === currentUserID
+
     return (
       <div
         className={this.props.classes.noteItemStyle}
@@ -252,7 +261,7 @@ class PatientStickyNotesBtn extends Component {
           marginBottom: 10,
         }}
         onDoubleClick={() => {
-          if (!stickyNotesEditable) return
+          if (!stickyNotesEditable || !isBelongtoCurrentUser) return
           this.editMode(note, idx)
         }}
       >
@@ -300,14 +309,35 @@ class PatientStickyNotesBtn extends Component {
                 <Button
                   justIcon
                   color='transparent'
-                  onClick={() => this.onFlagClick(note)}
+                  onClick={() => {
+                    if (isBelongtoCurrentUser) this.onFlagClick(note)
+                  }}
                   style={{
                     margin: 0,
                     color: note.isFlagged ? 'red' : 'gray',
                   }}
                   disabled={!stickyNotesEditable}
                 >
-                  <FlagIcon />
+                  {note.archivedDate ? (
+                    <Tooltip
+                      placement='right-start'
+                      title={
+                        note.archivedDate && (
+                          <div style={{ fontSize: 12 }}>
+                            {`Archived by ${note.archivedByUser} (${
+                              note.archivedByUserRole
+                            }) ${moment(note.archivedDate).format(
+                              'DD MMM YYYY HH:mm',
+                            )}`}
+                          </div>
+                        )
+                      }
+                    >
+                      <FlagIcon />
+                    </Tooltip>
+                  ) : (
+                    <FlagIcon />
+                  )}
                 </Button>
               </div>
               {isEditMode && (
@@ -318,7 +348,7 @@ class PatientStickyNotesBtn extends Component {
                       <div
                         style={{ paddingTop: 6, paddingLeft: 6, width: 126 }}
                       >
-                        {NOTESCOLOR.map(x => (
+                        {Object.values(NOTESCOLOR).map(x => (
                           <span
                             style={{
                               display: 'inline-block',
@@ -327,6 +357,8 @@ class PatientStickyNotesBtn extends Component {
                               height: 24,
                               width: 24,
                               backgroundColor: x,
+                              border: '1px solid gray',
+                              boxShadow: '0px 3px 10px rgba(0, 0, 0, 0.1)',
                             }}
                             onClick={() => this.onColorClick(x)}
                           />
@@ -339,7 +371,7 @@ class PatientStickyNotesBtn extends Component {
                       justIcon
                       color='transparent'
                       style={{
-                        color: NOTESCOLOR[0],
+                        color: NOTESCOLOR.Red,
                         margin: 0,
                       }}
                     >
@@ -410,33 +442,47 @@ class PatientStickyNotesBtn extends Component {
                         )
                       }
                     >
-                      <Button
-                        className={
-                          isOpenDeleteItemConfirm ? null : 'delNoteBtnClass'
-                        }
-                        justIcon
-                        color='transparent'
-                        style={{ color: 'gray', margin: '0 0 0 -9px' }}
-                        onClick={() => this.onDeleteNoteClick(note)}
-                      >
-                        <Delete />
-                      </Button>
+                      {isBelongtoCurrentUser && (
+                        <Button
+                          className={
+                            isOpenDeleteItemConfirm ? null : 'delNoteBtnClass'
+                          }
+                          justIcon
+                          color='transparent'
+                          style={{ color: 'gray', margin: '0 0 0 -9px' }}
+                          onClick={() => this.onDeleteNoteClick(note)}
+                        >
+                          <Delete />
+                        </Button>
+                      )}
                     </Popper>
-                    <span
-                      style={{
-                        float: 'right',
-                        fontSize: 12,
-                        color: 'gray',
-                        position: 'relative',
-                        bottom: -8,
-                      }}
+                    <Tooltip
+                      title={
+                        <div style={{ fontSize: 12 }}>
+                          {`Created by ${note.createByUser} (${
+                            note.createByUserRole
+                          }) ${moment(note.createDate).format(
+                            'DD MMM YYYY HH:mm',
+                          )}`}
+                        </div>
+                      }
                     >
-                      {`Updated by ${note.updateByUser} (${
-                        note.updateByUserRole
-                      }) ${moment(note.updateDate).format(
-                        'DD MMM YYYY HH:mm',
-                      )}`}
-                    </span>
+                      <span
+                        style={{
+                          float: 'right',
+                          fontSize: 12,
+                          color: 'gray',
+                          position: 'relative',
+                          bottom: -8,
+                        }}
+                      >
+                        {`Updated by ${note.updateByUser} (${
+                          note.updateByUserRole
+                        }) ${moment(note.updateDate).format(
+                          'DD MMM YYYY HH:mm',
+                        )}`}
+                      </span>
+                    </Tooltip>
                   </div>
                 )
               )}
@@ -497,6 +543,7 @@ class PatientStickyNotesBtn extends Component {
             style={{ float: 'right', display: 'inline-block' }}
             disabled={isEditPending}
             simple
+            checked={isFlaggedOnlyShow}
             label='Show Flagged Only'
             onChange={this.filterFlaggedNotes}
           />
@@ -549,50 +596,56 @@ class PatientStickyNotesBtn extends Component {
 
     const { openPopper, stickyNotes = [], currentDeletingNote } = this.state
     const flaggedNoteCount = stickyNotes.filter(x => x.id && x.isFlagged).length
+    const defaultPopperStyle = {
+      zIndex: 1500,
+    }
+    const { popperStyle = defaultPopperStyle } = this.props
     return (
       <Popper
         open={openPopper}
         overlay={openPopper && this.renderStickyNotes()}
         placement='right-end'
-        style={{
-          zIndex: 1500,
-          marginTop: 100,
-        }}
+        style={popperStyle}
       >
         <span>
-          <Button justIcon color='transparent'>
-            <MailOutlineIcon
-              style={{ color: '#4255BD' }}
-              onClick={this.stickyNotesBtnClick}
-            />
+          <Button
+            justIcon
+            color='transparent'
+            onClick={this.stickyNotesBtnClick}
+          >
+            <div style={{ height: 22,width:28}}>
+              <MailOutlineIcon style={{ color: '#4255BD',position:'absolute',top:7,left:3 }} />
+              {flaggedNoteCount > 0 && (
+                <span
+                  style={{
+                    display: 'inline-block',
+                    lineHeight: '1.4em',
+                    minWidth: 14,
+                    backgroundColor: 'red',
+                    color: 'white',
+                    position: 'absolute',
+                    fontSize: '11px !important',
+                    borderRadius: 7,
+                    height: 14,
+                    right: 5,
+                    top: 3,
+                    padding:'0 2px',
+                  }}
+                >
+                  {flaggedNoteCount}
+                </span>
+              )}
+            </div>
           </Button>
-          {flaggedNoteCount > 0 && (
-            <span
-              style={{
-                display: 'inline-block',
-                lineHeight: '1.4em',
-                minWidth: 16,
-                backgroundColor: 'red',
-                color: 'white',
-                position: 'relative',
-                fontSize: '0.8em !important',
-                borderRadius: 8,
-                height: 16,
-                left: -18,
-                top: -5,
-              }}
-            >
-              {flaggedNoteCount}
-            </span>
-          )}
         </span>
       </Popper>
     )
   }
 }
 
-const ConnectedPatientStickyNotesBtn = connect(({ patient }) => ({
+const ConnectedPatientStickyNotesBtn = connect(({ patient, user }) => ({
   patient: patient.entity || {},
+  currentUser: user.data
 }))(PatientStickyNotesBtn)
 
 export default withStyles(styles, {
