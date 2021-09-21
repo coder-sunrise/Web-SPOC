@@ -121,7 +121,7 @@ const actualizationButton = (row, buttonClickCallback) => {
   let actualizationBtn = null
   const { isNurseActualizeRequired, statusFK } = checkActualizable(row)
   const cancelActualizeRight = Authorized.check('dispense.cancelactualizeorderitems')
-  const isHiddenCancelActualize =  cancelActualizeRight && cancelActualizeRight.rights === 'hidden'
+  const isHiddenCancelActualize = cancelActualizeRight && cancelActualizeRight.rights === 'hidden'
 
   if (isNurseActualizeRequired) {
     if (
@@ -310,7 +310,7 @@ export const DispenseItemsColumnExtensions = (
                       position: 'absolute',
                       bottom: 2,
                       right: -27,
-                      borderRadius: 10,
+                      borderRadius: 4,
                       backgroundColor: '#4255bd',
                       fontWeight: 500,
                       color: 'white',
@@ -504,12 +504,11 @@ export const DispenseItemsColumnExtensions = (
       width: 80,
       sortingEnabled: false,
       render: row => {
-        if (
-          !row.stockFK
-        ) {
+        if (viewOnly || !row.stockFK) {
+          const qty = !row.stockFK ? '-' : numeral(row.dispenseQuantity).format('0.0')
           return (
-            <Tooltip title='-'>
-              <span>-</span>
+            <Tooltip title={qty}>
+              <span>{qty}</span>
             </Tooltip>
           )
         }
@@ -555,8 +554,8 @@ export const DispenseItemsColumnExtensions = (
       width: 100,
       sortingEnabled: false,
       render: row => {
-        const stock = row.stock
-          ? `${numeral(row.stock).format('0.0')} ${row.uomDisplayValue}`
+        const stock = row.stockFK
+          ? `${numeral(row.stock || 0).format('0.0')} ${row.uomDisplayValue}`
           : '-'
         return (
           <Tooltip title={stock}>
@@ -591,7 +590,7 @@ export const DispenseItemsColumnExtensions = (
       width: 100,
       sortingEnabled: false,
       render: row => {
-        if (!row.isDefault) {
+        if (viewOnly || !row.isDefault) {
           return (
             <Tooltip title={row.batchNo}>
               <span>{row.batchNo}</span>
@@ -615,7 +614,7 @@ export const DispenseItemsColumnExtensions = (
       width: 110,
       sortingEnabled: false,
       render: row => {
-        if (!row.isDefault) {
+        if (viewOnly || !row.isDefault) {
           const expiryDate = row.expiryDate
             ? moment(row.expiryDate).format('DD MMM YYYY')
             : '-'
