@@ -119,7 +119,7 @@ const WorkitemBody = ({ item }) => {
         >
           Details
         </Typography.Text>
-        {item.isUrgent && (
+        {item.priority === 'Urgent' && (
           <div
             style={{
               color: 'red',

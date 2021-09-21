@@ -10,10 +10,15 @@ import {
   dateFormatLongWithTimeNoSec12h,
 } from '@/components'
 import Banner from '@/pages/PatientDashboard/Banner'
-import { ExaminationSteps } from '../../Components'
+import {
+  ExaminationSteps,
+  CannedTextButton,
+  RadiographerTag,
+} from '../../Components'
 import {
   RADIOLOGY_WORKITEM_STATUS,
   RADIOLOGY_WORKITEM_BUTTON,
+  CANNED_TEXT_TYPE,
 } from '@/utils/constants'
 import WorklistContext from '../WorklistContext'
 import Findings from '../../Components/Findings'
@@ -26,13 +31,19 @@ const RightAlignGridItem = ({ children, md = 6 }) => {
   )
 }
 
-const RadiologyDetails = (props) => {
+const RadiologyDetails = props => {
   const dispatch = useDispatch()
-  const { detailsId, setDetailsId, showDetails, setShowDetails } = useContext(
-    WorklistContext,
-  )
+  const {
+    detailsId,
+    setDetailsId,
+    showDetails,
+    setShowDetails,
+    visitPurpose,
+  } = useContext(WorklistContext)
 
   const details = useSelector(state => state.radiologyDetails)
+  const [examinationFinding, setExaminationFinding] = useState('')
+  const [comment, setComment] = useState('')
   const patientBannerEntity = useSelector(state => state.patient)
   const [workitem, setWorkItem] = useState({})
 
@@ -51,6 +62,8 @@ const RadiologyDetails = (props) => {
   useEffect(() => {
     if (details && details.entity) {
       setWorkItem(details.entity)
+      setComment(details.entity.comment)
+      setExaminationFinding(details.entity.examinationFinding)
     }
   }, [details])
 
@@ -87,16 +100,7 @@ const RadiologyDetails = (props) => {
         <ProgressButton
           color='success'
           onClick={() => {
-            dispatch({
-              type: 'radiologyDetails/updateRadiologyWorkitem',
-              payload: {
-                ...details.entity,
-                id: details.entity.radiologyWorkitemId,
-                statusFK: buttonInfo.nextStatusFK,
-              },
-            })
-
-            setShowDetails(false)
+            handleSave(buttonInfo.nextStatusFK)
           }}
         >
           {buttonInfo.name}
@@ -105,11 +109,28 @@ const RadiologyDetails = (props) => {
     )
   }
 
+  const handleSave = statusFK => {
+    dispatch({
+      type: 'radiologyDetails/updateRadiologyWorkitem',
+      payload: {
+        ...details.entity,
+        id: details.entity.radiologyWorkitemId,
+        statusFK: statusFK ? statusFK : details.entity.statusFK,
+        comment: comment,
+        examinationFinding: examinationFinding,
+      },
+    })
+
+    setShowDetails(false)
+    setDetailsId(null)
+  }
+
   return (
     <CommonModal
       open={showDetails}
       title='Radiology Examination Details'
       showFooter={true}
+      onConfirm={() => handleSave()}
       onClose={() => {
         setDetailsId(null)
         setShowDetails(false)
@@ -147,7 +168,7 @@ const RadiologyDetails = (props) => {
                   <GridItem md={6}>{workitem.itemDescription}</GridItem>
 
                   <RightAlignGridItem>Priority :</RightAlignGridItem>
-                  <GridItem md={6}>Urgent</GridItem>
+                  <GridItem md={6}>{workitem.priority}</GridItem>
 
                   <RightAlignGridItem>Doctor Instructions :</RightAlignGridItem>
                   <GridItem md={6}>{workitem.instruction}</GridItem>
@@ -166,16 +187,19 @@ const RadiologyDetails = (props) => {
                   </GridItem>
 
                   <RightAlignGridItem>Modality :</RightAlignGridItem>
-                  <GridItem md={6}> Outpatient </GridItem>
+                  <GridItem md={6}> {workitem.modalityDescription} </GridItem>
 
                   <RightAlignGridItem>Visit Type :</RightAlignGridItem>
-                  <GridItem md={6}> Outpatient </GridItem>
+                  <GridItem md={6}>
+                    {visitPurpose &&
+                      workitem?.visitInfo &&
+                      visitPurpose.find(
+                        p => p.id === workitem.visitInfo.visitPurposeFK,
+                      ).name}
+                  </GridItem>
 
-                  <RightAlignGridItem>Priority :</RightAlignGridItem>
-                  <GridItem md={6}>Urgent</GridItem>
-
-                  <RightAlignGridItem>Groups :</RightAlignGridItem>
-                  <GridItem md={6}>Group 003</GridItem>
+                  <RightAlignGridItem>Visit Group No :</RightAlignGridItem>
+                  <GridItem md={6}>{workitem?.visitInfo?.visitGroup}</GridItem>
                 </GridContainer>
               </GridItem>
             </GridContainer>
@@ -184,30 +208,106 @@ const RadiologyDetails = (props) => {
         <GridItem md={12}>
           <div>
             <Typography.Title level={5}>Examination Details</Typography.Title>
-            <GridContainer>
-              <GridItem md={2}>
-                <RightAlignGridItem md={12}>Radiographer :</RightAlignGridItem>
-              </GridItem>
-              <GridItem md={10}>Tany Wu, Jack Lin</GridItem>
-              <GridItem md={2}>
-                <RightAlignGridItem md={12}>
-                  Radiographer Comment:
-                </RightAlignGridItem>
-              </GridItem>
-              <GridItem md={10}>
-                <Input.TextArea autoSize={{ minRows: 3, maxRows: 5 }} />
-              </GridItem>
-            </GridContainer>
+            {details.entity &&
+            details.entity.statusFK <=
+              RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT ? (
+              <GridContainer>
+                <GridItem md={2}>
+                  <RightAlignGridItem md={12}>
+                    Radiographer :
+                  </RightAlignGridItem>
+                </GridItem>
+                <GridItem md={10}>{/*  <RadiographerTag /> */}</GridItem>
+                <GridItem md={2}>
+                  <RightAlignGridItem md={12}>
+                    Radiographer Comment:
+                  </RightAlignGridItem>
+                </GridItem>
+                <GridItem md={10} style={{ textAlign: 'right' }}>
+                  <CannedTextButton
+                    buttonType='text'
+                    cannedTextTypeFK={CANNED_TEXT_TYPE.RADIOLOGYINSTRUCTION}
+                    style={{
+                      marginRight: 0,
+                      marginBottom: 8,
+                    }}
+                    handleSelectCannedText={cannedText => {
+                      setComment(comment + '\n' + cannedText.text)
+                    }}
+                  />
+                </GridItem>
+                <GridItem md={12}>
+                  <Input.TextArea
+                    value={comment}
+                    onChange={e => setComment(e.target.value)}
+                    autoSize={{ minRows: 3, maxRows: 5 }}
+                  />
+                </GridItem>
+              </GridContainer>
+            ) : (
+              <GridContainer>
+                <GridItem md={2}>
+                  <RightAlignGridItem md={12}>
+                    Radiographer :
+                  </RightAlignGridItem>
+                </GridItem>
+                <GridItem md={10}>Tamy Wu, Wammy Tu</GridItem>
+
+                <GridItem md={2}>
+                  <RightAlignGridItem md={12}>
+                    Radiographer Comment:
+                  </RightAlignGridItem>
+                </GridItem>
+                <GridItem md={10}>{workitem.comment}</GridItem>
+
+                {details.entity &&
+                details.entity.statusFK ===
+                  RADIOLOGY_WORKITEM_STATUS.COMPLETED ? (
+                  <>
+                    <GridItem md={2}>
+                      <RightAlignGridItem md={12}>
+                        Examination Findings:
+                      </RightAlignGridItem>
+                    </GridItem>
+
+                    <GridItem md={10}>
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: workitem.examinationFinding,
+                        }}
+                      />
+                    </GridItem>
+                  </>
+                ) : (
+                  <>
+                    <GridItem md={2}>
+                      <RightAlignGridItem md={12}>
+                        Cancel Reason:
+                      </RightAlignGridItem>
+                    </GridItem>
+
+                    <GridItem md={10}>{workitem.comment}</GridItem>
+                  </>
+                )}
+              </GridContainer>
+            )}
           </div>
         </GridItem>
-        <GridItem md={12}>
-          <div>
-            <Findings 
-              workItem={workitem}
-              {...props} 
-            />
-          </div>
-        </GridItem>
+
+        {details.entity &&
+          details.entity.statusFK ===
+            RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT && (
+            <GridItem md={12} style={{ marginTop: 5 }}>
+              <div>
+                <Findings
+                  defaultValue={details?.entity?.examinationFinding}
+                  onChange={value => setExaminationFinding(value)}
+                  workItem={workitem}
+                  {...props}
+                />
+              </div>
+            </GridItem>
+          )}
       </GridContainer>
     </CommonModal>
   )

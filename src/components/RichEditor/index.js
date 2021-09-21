@@ -22,7 +22,7 @@ import { control } from '@/components/Decorator'
 import { CustomInput, Button } from '@/components'
 import { htmlEncodeByRegExp, htmlDecodeByRegExp } from '@/utils/utils'
 
-const STYLES = (theme) => {
+const STYLES = theme => {
   return {
     wrapper: {
       // height: '90%',
@@ -48,7 +48,7 @@ class RichEditor extends React.PureComponent {
     delimiter: '\r\n',
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { form, field } = props
     const v = htmlDecodeByRegExp(
@@ -95,12 +95,12 @@ class RichEditor extends React.PureComponent {
         link: { inDropdown: true },
       },
     }
-    this.setDomEditorRef = (ref) => (this.domEditor = ref)
+    this.setDomEditorRef = ref => (this.domEditor = ref)
 
     // this.debouncedOnChange = _.debounce(this._onChange.bind(this), 300)
   }
 
-  componentDidMount () {
+  componentDidMount() {
     window.addEventListener('resize', this.resize.bind(this))
     if (this.props.autoFocus) {
       if (this.editorReferece) this.editorReferece.focus()
@@ -109,7 +109,7 @@ class RichEditor extends React.PureComponent {
 
   // eslint-disable-next-line camelcase
   // eslint-disable-next-line react/sort-comp
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { field, value, height } = nextProps
     const { isEditorFocused } = this.state
     let v = value || ''
@@ -158,7 +158,7 @@ class RichEditor extends React.PureComponent {
     }
   }
 
-  resize () {
+  resize() {
     this.setState({
       sheet: this.calculateEditorHeight(),
     })
@@ -210,7 +210,7 @@ class RichEditor extends React.PureComponent {
     return editorState
   }
 
-  onChange = (editorState) => {
+  onChange = editorState => {
     // console.log(editorState)
 
     // console.log(editorState)
@@ -247,7 +247,7 @@ class RichEditor extends React.PureComponent {
   // }
 
   _onFocus = () => {
-    this.setState((prevState) => ({
+    this.setState(prevState => ({
       isEditorFocused: true,
       // value: EditorState.moveFocusToEnd(prevState.value),
     }))
@@ -290,7 +290,7 @@ class RichEditor extends React.PureComponent {
     }
   }
 
-  tagButtonOnClick = (selectedValue) => {
+  tagButtonOnClick = selectedValue => {
     const newEditorState = this.insertSelectedTagToEditor(selectedValue)
 
     this.setState({
@@ -301,7 +301,7 @@ class RichEditor extends React.PureComponent {
   }
 
   // For the TagButton
-  tagButtonHandleClick = (event) => {
+  tagButtonHandleClick = event => {
     this.setState({ anchorEl: event.currentTarget })
   }
 
@@ -312,7 +312,7 @@ class RichEditor extends React.PureComponent {
     }, 1)
   }
 
-  insertSelectedTagToEditor = (selectedValue) => {
+  insertSelectedTagToEditor = selectedValue => {
     const { value } = this.state
     const currentEditorSelection = value.getSelection()
     const currentContentState = value.getCurrentContent()
@@ -345,7 +345,7 @@ class RichEditor extends React.PureComponent {
     return EditorState.push(value, newContentState, 'insert-fragment')
   }
 
-  setEditorReference = (ref) => {
+  setEditorReference = ref => {
     this.editorReferece = ref
     // ref.focus()
   }
@@ -405,7 +405,7 @@ class RichEditor extends React.PureComponent {
 
     return (
       <div>
-        {tagList.map((tag) => (
+        {tagList.map(tag => (
           <Button
             key={tag.id}
             color='info'
@@ -425,7 +425,7 @@ class RichEditor extends React.PureComponent {
     )
   }
 
-  render () {
+  render() {
     const { props } = this
     const { classes, mode, onChange, tagList, onBlur, ...restProps } = props
 
@@ -477,35 +477,23 @@ RichEditor.insertBlock = (editorState, blocks, isBefore) => {
 
   const blockMap = contentState.getBlockMap()
   // Split the blocks
-  const blocksBefore = blockMap.toSeq().takeUntil((v) => {
+  const blocksBefore = blockMap.toSeq().takeUntil(v => {
     return v === currentBlock
   })
   const blocksAfter = blockMap
     .toSeq()
-    .skipUntil((v) => {
+    .skipUntil(v => {
       return v === currentBlock
     })
     .rest()
   let newBlocks = isBefore
     ? [
-        ...blocks.map((o) => [
-          o.getKey(),
-          o,
-        ]),
-        [
-          currentBlock.getKey(),
-          currentBlock,
-        ],
+        ...blocks.map(o => [o.getKey(), o]),
+        [currentBlock.getKey(), currentBlock],
       ]
     : [
-        [
-          currentBlock.getKey(),
-          currentBlock,
-        ],
-        ...blocks.map((o) => [
-          o.getKey(),
-          o,
-        ]),
+        [currentBlock.getKey(), currentBlock],
+        ...blocks.map(o => [o.getKey(), o]),
       ]
   const newBlockMap = blocksBefore.concat(newBlocks, blocksAfter).toOrderedMap()
 

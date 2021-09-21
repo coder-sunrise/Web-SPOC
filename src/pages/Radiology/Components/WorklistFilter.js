@@ -17,7 +17,7 @@ import WorlistContext from '../Worklist/WorklistContext'
 export const WorklistFilter = () => {
   const [form] = Form.useForm()
   const dispatch = useDispatch()
-  const { showDetails } = useContext(WorlistContext)
+  const { showDetails, visitPurpose } = useContext(WorlistContext)
 
   useEffect(() => {
     handleSearch()
@@ -66,6 +66,7 @@ export const WorklistFilter = () => {
         <CodeSelect
           label='Visit Type'
           code='ctvisitpurpose'
+          options={visitPurpose || []}
           style={{ width: 180 }}
           mode='multiple'
           localFilter={item => item.id !== VISIT_TYPE.RETAIL}

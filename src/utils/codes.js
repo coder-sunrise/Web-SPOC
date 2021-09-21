@@ -1989,13 +1989,14 @@ const examinationSteps = [
     statusFK: 3,
     name: 'Modality Completed',
   },
-  {
-    statusFK: 4,
-    name: 'Reporting Completed',
-  },
+
   {
     statusFK: 4,
     name: 'Completed',
+  },
+  {
+    statusFK: 5,
+    name: 'Cancelled',
   },
 ]
 

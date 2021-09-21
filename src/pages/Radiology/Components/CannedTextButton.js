@@ -62,7 +62,7 @@ const ListItem = ({ classes, title, onClick }) => {
   )
 }
 
-const CannedTextButton = ({
+const component = ({
   dispatch,
   classes,
   cannedText,
@@ -226,6 +226,8 @@ const Connected = connect(({ cannedText, loading, user }) => ({
   cannedText,
   loading: loading.effects['cannedText/query'],
   user: user.data,
-}))(CannedTextButton)
+}))(component)
 
-export default withStyles(styles, { name: 'CannedTextButton' })(Connected)
+export const CannedTextButton = withStyles(styles, {
+  name: 'CannedTextButton',
+})(Connected)

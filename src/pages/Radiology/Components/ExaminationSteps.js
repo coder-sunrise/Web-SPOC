@@ -1,6 +1,9 @@
 import { Steps } from 'antd'
-import { CheckCircleFilled } from '@ant-design/icons'
-import { RADIOLOGY_WORKITEM_STATUS } from '@/utils/constants'
+import { CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons'
+import {
+  RadiologyWorkitemStatus,
+  RADIOLOGY_WORKITEM_STATUS,
+} from '@/utils/constants'
 import { examinationSteps } from '@/utils/codes'
 import { dateFormatLongWithTimeNoSec12h } from '@/components'
 import styles from './ExaminationStep.less'
@@ -9,11 +12,20 @@ const { Step } = Steps
 
 const showIcon = (statusFK, currentStatusFK) => {
   if (
+    currentStatusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED &&
+    statusFK === currentStatusFK
+  ) {
+    return <CloseCircleFilled style={{ color: '#999999' }} />
+  }
+
+  if (
     currentStatusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
     statusFK <= currentStatusFK
   ) {
     return <CheckCircleFilled style={{ color: '#33CC33' }} />
   }
+
+  //Next Status
   if (statusFK === currentStatusFK + 1) {
     return (
       <div
@@ -42,8 +54,7 @@ const getStatusStep = (status, statusHistory, currentStatusFK) => {
   // const lastStatus = _.orderBy(statusHistory, ['actionDate'], ['desc']).find(
   //   history => history.statusFK === status.statusFK,
   // )
-  console.log('item', statusHistory)
-  console.log('currentStatusFK', currentStatusFK)
+
   return (
     <Step
       title={<span style={{ fontWeight: 500 }}>{status.name}</span>}
@@ -73,17 +84,30 @@ const getStatusStep = (status, statusHistory, currentStatusFK) => {
   )
 }
 
-export const ExaminationSteps = ({ item }) => (
-  <div className='order-steps'>
-    <Steps
-      className={styles.orderStatus}
-      size='small'
-      labelPlacement='vertical'
-    >
-      {item &&
-        examinationSteps.map(status => {
-          return getStatusStep(status, item, item.statusFK)
-        })}
-    </Steps>
-  </div>
-)
+export const ExaminationSteps = ({ item }) => {
+  const validExaminationSteps =
+    item && item.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED
+      ? examinationSteps.filter(
+          s =>
+            s.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW ||
+            s.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED,
+        )
+      : examinationSteps.filter(
+          s => s.statusFK !== RADIOLOGY_WORKITEM_STATUS.CANCELLED,
+        )
+  return (
+    <div className='order-steps'>
+      <Steps
+        className={styles.orderStatus}
+        size='small'
+        labelPlacement='vertical'
+      >
+        {validExaminationSteps &&
+          item &&
+          validExaminationSteps.map(status => {
+            return getStatusStep(status, null, item.statusFK)
+          })}
+      </Steps>
+    </div>
+  )
+}

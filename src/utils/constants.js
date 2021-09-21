@@ -368,7 +368,7 @@ export const ADD_ON_FEATURE = {
 export const RadiologyWorkitemStatus = {
   1: 'New',
   2: 'In Progress',
-  3: 'Pending Report',
+  3: 'Modality Completed',
   4: 'Completed',
   5: 'Cancelled',
 }
