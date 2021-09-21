@@ -376,7 +376,7 @@ export default ({
             className={classes.rightIcon}
             style={{
               right: right,
-              borderRadius: 10,
+              borderRadius: 4,
               backgroundColor: 'red',
             }}
           >
@@ -804,12 +804,11 @@ export default ({
                         <div
                           className={classes.rightIcon}
                           style={{
-                            right: -27,
+                            right: -30,
                             borderRadius: 4,
                             backgroundColor: '#4255bd',
                           }}
                         >
-                          {' '}
                           Pre
                         </div>
                       </Tooltip>

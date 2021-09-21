@@ -675,8 +675,16 @@ export const DispenseItemsColumnExtensions = (
 
 export const ServiceColumns = [
   {
+    name: 'type',
+    title: 'Type',
+  },
+  {
     name: 'description',
     title: 'Name',
+  },
+  {
+    name: 'instruction',
+    title: 'Instructions',
   },
   {
     name: 'remarks',
@@ -732,11 +740,11 @@ const urgentIndicator = (row, right) => {
         <div
           style={{
             right: right,
-            borderRadius: 10,
+            borderRadius: 4,
             backgroundColor: 'red',
             position: 'absolute',
             bottom: 2,
-            fontWeight: 600,
+            fontWeight: 500,
             color: 'white',
             fontSize: '0.7rem',
             padding: '2px 3px',
@@ -764,7 +772,7 @@ export const OtherOrdersColumnExtensions = (
       let paddingRight = row.isPreOrder ? 24 : 0
       let urgentRight = 0
 
-      if((row.type === '3' || row.type === '10') && row.priority === 'Urgent')
+      if(row.priority === 'Urgent')
       {
         paddingRight += 34
         urgentRight = -paddingRight - 4
@@ -788,7 +796,7 @@ export const OtherOrdersColumnExtensions = (
                         position: 'absolute',
                         bottom: 2,
                         right: -30,
-                        borderRadius: 10,
+                        borderRadius: 4,
                         backgroundColor: '#4255bd',
                         fontWeight: 500,
                         color: 'white',
@@ -840,6 +848,10 @@ export const OtherOrdersColumnExtensions = (
           </Tooltip>
         )
       },
+    },
+    {
+      columnName: 'instruction',
+      width: 200,
     },
     {
       columnName: 'remarks',
