@@ -761,6 +761,32 @@ export const OtherOrdersColumns = [
 
 const compareString = (a, b) => a.localeCompare(b)
 
+const urgentIndicator = (row, right) => {
+  return (
+    row.priority === 'Urgent' && (
+      <Tooltip title='Urgent'>
+        <div
+          style={{
+            right: right,
+            borderRadius: 10,
+            backgroundColor: 'red',
+            position: 'absolute',
+            bottom: 2,
+            fontWeight: 600,
+            color: 'white',
+            fontSize: '0.7rem',
+            padding: '2px 3px',
+            height: 20,
+            cursor: 'pointer',
+          }}
+        >
+          Urg.
+        </div>
+      </Tooltip>
+    )
+  )
+}
+
 export const OtherOrdersColumnExtensions = (
   viewOnly = false,
   onPrint,
@@ -771,13 +797,22 @@ export const OtherOrdersColumnExtensions = (
     compare: compareString,
     width: 160,
     render: row => {
+      let paddingRight = row.isPreOrder ? 24 : 0
+      let urgentRight = 0
+
+      if((row.type === '3' || row.type === '10') && row.priority === 'Urgent')
+      {
+        paddingRight += 34
+        urgentRight = -paddingRight - 4
+      }
+
       return (
         <div style={{ position: 'relative' }}>
           <div
             style={{
               wordWrap: 'break-word',
               whiteSpace: 'pre-wrap',
-              paddingRight: row.isPreOrder ? 24 : 0,
+              paddingRight: paddingRight,
             }}
           >
             {row.type}
@@ -798,11 +833,11 @@ export const OtherOrdersColumnExtensions = (
                       height: 20,
                     }}
                   >
-                    {' '}
                     Pre
                   </div>
                 </Tooltip>
               )}
+              {urgentIndicator(row,urgentRight)}
             </div>
           </div>
         </div>

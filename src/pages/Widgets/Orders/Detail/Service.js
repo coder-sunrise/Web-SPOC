@@ -13,15 +13,17 @@ import {
   withFormikExtend,
   Switch,
   Checkbox,
+  RadioGroup,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 import Yup from '@/utils/yup'
 import { getServices } from '@/utils/codetable'
-import { VISIT_TYPE } from '@/utils/constants'
+import { VISIT_TYPE, CANNED_TEXT_TYPE } from '@/utils/constants'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
 import { DoctorProfileSelect } from '@/components/_medisys'
+import CannedTextButton from './CannedTextButton'
 
 const getVisitDoctorUserId = props => {
   const { doctorprofile } = props.codetable
@@ -337,12 +339,37 @@ class Service extends PureComponent {
       footer,
       from,
       setFieldValue,
+      getFieldValue,
     } = this.props
     const { services, serviceCenters } = this.state
-    const { serviceFK, serviceCenterFK } = values
+    const { serviceFK, serviceCenterFK, isPreOrder, workitem = {}, priority } = values
+
     const totalPriceReadonly =
       Authorized.check('queue.consultation.modifyorderitemtotalprice')
         .rights !== 'enable'
+
+    const totalAfterAdjElement = (
+      <GridItem xs={3} className={classes.editor}>
+        <Field
+          name='totalAfterItemAdjustment'
+          render={args => {
+            return (
+              <NumberInput
+                label='Total After Adj'
+                style={{
+                  marginLeft: theme.spacing(7),
+                  paddingRight: theme.spacing(6),
+                }}
+                currency
+                disabled
+                {...args}
+              />
+            )
+          }}
+        />
+      </GridItem>
+    )
+    
 
     return (
       <Authorized
@@ -353,7 +380,7 @@ class Service extends PureComponent {
       >
         <div>
           <GridContainer>
-            <GridItem xs={8}>
+            <GridItem xs={4}>
               <Field
                 name='serviceFK'
                 render={args => {
@@ -383,6 +410,30 @@ class Service extends PureComponent {
                         {...args}
                       />
                     </div>
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={4}>
+              <Field
+                name='serviceCenterFK'
+                render={args => {
+                  return (
+                    <Select
+                      label='Service Center Name'
+                      options={serviceCenters.filter(
+                        o =>
+                          !serviceFK ||
+                          o.services.find(m => m.value === serviceFK),
+                      )}
+                      onChange={() =>
+                        setTimeout(() => {
+                          this.getServiceCenterService()
+                        }, 1)
+                      }
+                      disabled={values.isPackage}
+                      {...args}
+                    />
                   )
                 }}
               />
@@ -462,29 +513,34 @@ class Service extends PureComponent {
             )}
           </GridContainer>
           <GridContainer>
-            <GridItem xs={8}>
-              <Field
-                name='serviceCenterFK'
-                render={args => {
-                  return (
-                    <Select
-                      label='Service Center Name'
-                      options={serviceCenters.filter(
-                        o =>
-                          !serviceFK ||
-                          o.services.find(m => m.value === serviceFK),
-                      )}
-                      onChange={() =>
-                        setTimeout(() => {
-                          this.getServiceCenterService()
-                        }, 1)
-                      }
-                      disabled={values.isPackage}
-                      {...args}
-                    />
-                  )
-                }}
-              />
+            <GridItem
+              xs={8}
+              className={classes.editor}
+              style={{ paddingRight: 35 }}
+            >
+              <div style={{ position: 'relative' }}>
+                <FastField
+                  name='instruction'
+                  render={args => {
+                    return <TextField label='Instructions' {...args} />
+                  }}
+                />
+                <CannedTextButton
+                  cannedTextTypeFK={CANNED_TEXT_TYPE.SERVICEINSTRUCTION}
+                  style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    right: -35,
+                  }}
+                  handleSelectCannedText={cannedText => {
+                    const oldInstruction = getFieldValue('instruction')
+                    const instruction = `${
+                      oldInstruction ? oldInstruction + ' ' : ''
+                    }${cannedText.text || ''}`.substring(0, 2000)
+                    setFieldValue('instruction', instruction)
+                  }}
+                />
+              </div>
             </GridItem>
             <GridItem xs={3}>
               <Field
@@ -630,6 +686,7 @@ class Service extends PureComponent {
                 />
               )}
             </GridItem>
+            {values.isDisplayValueChangable && totalAfterAdjElement}
           </GridContainer>
           <GridContainer>
             <GridItem xs={8} className={classes.editor}>
@@ -645,66 +702,83 @@ class Service extends PureComponent {
                   )}
                 />
               ) : (
-                values.visitPurposeFK !== VISIT_TYPE.OTC && (
-                  <div>
-                    <FastField
-                      name='isPreOrder'
-                      render={args => {
-                        return (
-                          <Checkbox
-                            label='Pre-Order'
-                            style={{ position: 'absolute', bottom: 2 }}
-                            {...args}
-                            onChange={e => {
-                              if (!e.target.value) {
-                                setFieldValue('isChargeToday', false)
-                              }
-                            }}
-                          />
-                        )
+                <div>
+                  <div
+                    style={{ position: 'relative', display: 'inline-block' }}
+                  >
+                    <span
+                      style={{
+                        fontSize: '0.85rem',
+                        position: 'absolute',
+                        bottom: '4px',
+                        fontWeight: 500,
                       }}
-                    />
-                    {values.isPreOrder && (
+                    >
+                      Priority:{' '}
+                    </span>
+                    <div style={{ marginLeft: 60, marginTop: 14 }}>
+                      <RadioGroup
+                        value={priority || 'Normal'}
+                        label=''
+                        onChange={e => {
+                          setFieldValue('priority', e.target.value)
+                        }}
+                        options={[
+                          {
+                            value: 'Normal',
+                            label: 'Normal',
+                          },
+                          {
+                            value: 'Urgent',
+                            label: 'Urgent',
+                          },
+                        ]}
+                      />
+                    </div>
+                  </div>
+                  {values.visitPurposeFK !== VISIT_TYPE.OTC && (
+                    <div style={{ display: 'inline-block', marginLeft: 20 }}>
                       <FastField
-                        name='isChargeToday'
+                        name='isPreOrder'
                         render={args => {
                           return (
                             <Checkbox
-                              style={{
-                                position: 'absolute',
-                                bottom: 2,
-                                left: '100px',
-                              }}
-                              label='Charge Today'
+                              label='Pre-Order'
+                              style={{ position: 'absolute', bottom: 2 }}
                               {...args}
+                              onChange={e => {
+                                if (!e.target.value) {
+                                  setFieldValue('isChargeToday', false)
+                                }
+                              }}
                             />
                           )
                         }}
                       />
-                    )}
-                  </div>
-                )
+                      {isPreOrder && (
+                        <FastField
+                          name='isChargeToday'
+                          render={args => {
+                            return (
+                              <Checkbox
+                                style={{
+                                  position: 'absolute',
+                                  bottom: 2,
+                                  left: '330px',
+                                }}
+                                label='Charge Today'
+                                {...args}
+                              />
+                            )
+                          }}
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
               )}
             </GridItem>
-            <GridItem xs={3} className={classes.editor}>
-              <Field
-                name='totalAfterItemAdjustment'
-                render={args => {
-                  return (
-                    <NumberInput
-                      label='Total After Adj'
-                      style={{
-                        marginLeft: theme.spacing(7),
-                        paddingRight: theme.spacing(6),
-                      }}
-                      currency
-                      disabled
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
+            {!values.isDisplayValueChangable && totalAfterAdjElement}
           </GridContainer>
           {footer({
             onSave: this.validateAndSubmitIfOk,

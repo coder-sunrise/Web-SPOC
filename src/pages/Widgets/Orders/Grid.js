@@ -367,6 +367,26 @@ export default ({
     )
   }
 
+  const urgentIndicator = (row, right) => {
+    if (row.type !== '10' && row.type !== '3') return null
+    return (
+      row.priority === 'Urgent' && (
+        <Tooltip title='Urgent'>
+          <div
+            className={classes.rightIcon}
+            style={{
+              right: right,
+              borderRadius: 10,
+              backgroundColor: 'red',
+            }}
+          >
+            Urg.
+          </div>
+        </Tooltip>
+      )
+    )
+  }
+
   const packageDrawdownIndicator = row => {
     if (!row.isPackage) return null
 
@@ -758,6 +778,12 @@ export default ({
             if (row.isDrugMixture || radiologyWorkitemStatusFK) {
               paddingRight = 10
             }
+            let urgentRight = -33
+            if((row.type === '3' || row.type === '10') && row.priority === 'Urgent')
+            {
+              paddingRight += 34
+              urgentRight = -paddingRight - 4
+            }
 
             return (
               <div style={{ position: 'relative' }}>
@@ -804,6 +830,7 @@ export default ({
                     )}
                     {radiologyWorkitemStatusFK &&
                       radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
+                    {urgentIndicator(row,urgentRight)}
                   </div>
                 </div>
               </div>
