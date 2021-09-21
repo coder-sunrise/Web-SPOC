@@ -33,7 +33,8 @@ const columnsTemplate = [
   },
 ]
 
-const RadiologyWorklist = () => {
+
+const RadiologyWorklist = (props) => {
   const dispatch = useDispatch()
   const [columns, setColumns] = useState([])
   const entity = useSelector(s => s.radiologyWorklist)
@@ -69,7 +70,7 @@ const RadiologyWorklist = () => {
       title={<WorklistFilter />}
     >
       <Worklist columns={columns} />
-      <RadiologyDetails />
+      <RadiologyDetails {...props} />
     </ProCard>
   )
 }

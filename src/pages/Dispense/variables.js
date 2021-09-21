@@ -116,6 +116,8 @@ export const isActualizable = row => {
 const actualizationButton = (row, buttonClickCallback) => {
   let actualizationBtn = null
   const { isNurseActualizeRequired, statusFK } = checkActualizable(row)
+  const cancelActualizeRight = Authorized.check('dispense.cancelactualizeorderitems')
+  const isHiddenCancelActualize =  cancelActualizeRight && cancelActualizeRight.rights === 'hidden'
 
   if (isNurseActualizeRequired) {
     if (
@@ -139,7 +141,7 @@ const actualizationButton = (row, buttonClickCallback) => {
         </Authorized>
       )
     } else if (statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED) {
-      actualizationBtn = (
+      actualizationBtn = !isHiddenCancelActualize && (
         <Tooltip title='Actualized'>
           <Button
             color='success'
@@ -254,7 +256,7 @@ export const PrescriptionColumnExtensions = (
                     position: 'absolute',
                     bottom: 2,
                     right: -27,
-                    borderRadius: 10,
+                    borderRadius: 4,
                     backgroundColor: '#4255bd',
                     fontWeight: 500,
                     color: 'white',
@@ -584,7 +586,7 @@ export const VaccinationColumnExtensions = (
                     position: 'absolute',
                     bottom: 2,
                     right: -30,
-                    borderRadius: 10,
+                    borderRadius: 4,
                     backgroundColor: '#4255bd',
                     fontWeight: 500,
                     color: 'white',
@@ -787,7 +789,7 @@ export const OtherOrdersColumnExtensions = (
                       position: 'absolute',
                       bottom: 2,
                       right: -30,
-                      borderRadius: 10,
+                      borderRadius: 4,
                       backgroundColor: '#4255bd',
                       fontWeight: 500,
                       color: 'white',

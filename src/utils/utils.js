@@ -1496,6 +1496,26 @@ const getTranslationValue = (translationDatas = [], language, key) => {
   return displayValue
 }
 
+const getMappedVisitType = (visitpurpose, visitTypeSettingsObj) => {
+  return visitpurpose
+    .map((item, index) => {
+      const { name, code, sortOrder, ...rest } = item
+      const vstType = visitTypeSettingsObj
+        ? visitTypeSettingsObj[index]
+        : undefined
+      return {
+        ...rest,
+        name: vstType?.displayValue || name,
+        code: vstType?.code || code,
+        isEnabled: vstType?.isEnabled || 'true',
+        sortOrder: vstType?.sortOrder || 0,
+        customTooltipField: `${vstType?.code ||
+          code} - ${vstType?.displayValue || name}`,
+      }
+    })
+    .sort((a, b) => (a.sortOrder >= b.sortOrder ? 1 : -1))
+}
+
 export {
   sleep,
   sumReducer,
@@ -1526,6 +1546,7 @@ export {
   checkAuthoritys,
   getModuleSequence,
   getTranslationValue,
+  getMappedVisitType,
   // toUTC,
   // toLocal,
 }

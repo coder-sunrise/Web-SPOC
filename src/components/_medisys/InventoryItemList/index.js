@@ -364,6 +364,7 @@ class InventoryItemList extends React.Component {
 
                     return <span>{optDisplay}</span>
                   }}
+                  localFilter={(item) => (type !== 'inventoryconsumable' && type !== 'inventorymedication') || item.isOnlyClinicInternalUsage}
                   disabled={isDisabled}
                   {...args}
                 />

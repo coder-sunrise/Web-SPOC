@@ -645,7 +645,7 @@ class Service extends PureComponent {
                   )}
                 />
               ) : (
-                values.visitPurposeFK !== VISIT_TYPE.RETAIL && (
+                values.visitPurposeFK !== VISIT_TYPE.OTC && (
                   <div>
                     <FastField
                       name='isPreOrder'

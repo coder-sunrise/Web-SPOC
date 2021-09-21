@@ -31,33 +31,6 @@ const checklistBorderStyle = {
 }
 
 class ChecklistObservation extends PureComponent {
-  componentDidMount() {}
-
-  removeObservation = item => {
-    const { values, subjectKey, classes } = this.props
-    const checklistSubject = values.checklistSubject || []
-
-    const currentSubject = _.find(checklistSubject, ['key', subjectKey])
-
-    const currentSubjectIndex = _.indexOf(checklistSubject, currentSubject)
-    if (currentSubjectIndex >= 0) {
-      if (item.id) {
-        item.isDeleted = true
-      } else {
-        const index = _.indexOf(
-          checklistSubject[currentSubjectIndex].checklistObservation,
-          item,
-        )
-
-        if (index >= 0) {
-          checklistSubject[currentSubjectIndex].checklistObservation.splice(
-            index,
-            1,
-          )
-        }
-      }
-    }
-  }
 
   render() {
     const {
@@ -65,7 +38,6 @@ class ChecklistObservation extends PureComponent {
       subjectKey,
       addObservation,
       removeObservation,
-      theme,
       classes,
     } = this.props
     const checklistSubject = values.checklistSubject || []
