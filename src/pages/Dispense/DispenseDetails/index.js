@@ -12,6 +12,7 @@ import Delete from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import { formatMessage } from 'umi' // common component
 import Warining from '@material-ui/icons/Error'
+import { Table } from '@devexpress/dx-react-grid-material-ui'
 import {
   Button,
   ProgressButton,
@@ -34,16 +35,14 @@ import {
 import { sendNotification } from '@/utils/realtime'
 // sub components
 import TableData from './TableData'
-import VaccinationGrid from './VaccinationGrid'
 import DrugLabelSelection from './DrugLabelSelection'
 import NurseActualization from './NurseActualization'
 
 // variables
 import {
-  PrescriptionColumns,
-  PrescriptionColumnExtensions,
-  VaccinationColumn,
-  VaccinationColumnExtensions,
+  DispenseItemsColumns,
+  DispenseItemsColumnExtensions,
+  ServiceColumns,
   OtherOrdersColumns,
   OtherOrdersColumnExtensions,
   PackageColumns,
@@ -83,6 +82,14 @@ const styles = theme => ({
       marginRight: '0px !important',
     },
   },
+  subRow: {
+    '& > td:first-child': {
+      paddingLeft: theme.spacing(1),
+    },
+  },
+  groupStyle: {
+    margin: '3px 0px',
+  }
 })
 
 const DispenseDetails = ({
@@ -115,13 +122,14 @@ const DispenseDetails = ({
   user,
 }) => {
   const {
-    prescription,
-    vaccination,
+    dispenseItems,
+    service,
     otherOrder,
     packageItem,
     invoice,
     visitPurposeFK,
     visitRemarks,
+    defaultExpandedGroups,
   } = values || {
     invoice: { invoiceItem: [] },
   }
@@ -134,36 +142,21 @@ const DispenseDetails = ({
 
   const { inventorymedication, inventoryvaccination } = codetable
   const { settings = {} } = clinicSettings
-  const currentDoc = doctorprofile.filter(x => x.id === visit.doctorProfileFK)
+  const currentDoc = doctorprofile.filter(
+    x => x.id === visit.doctorProfileFK,
+  )
   const docInfo =
-    currentDoc && currentDoc.length > 0 ? currentDoc[0].clinicianProfile : {}
-
-  const handleSelectedBatch = (e, op = {}, row) => {
-    if (op && op.length > 0) {
-      const { expiryDate } = op[0]
-      setFieldValue(`prescription[${row.rowIndex}]expiryDate`, expiryDate)
-    } else {
-      setFieldValue(`prescription[${row.rowIndex}]expiryDate`, undefined)
-    }
-  }
-
-  const handleSelectVaccinationBatch = (e, op = {}, row) => {
-    if (op && op.length > 0) {
-      const { expiryDate } = op[0]
-      setFieldValue(`vaccination[${row.rowIndex}]expiryDate`, expiryDate)
-    } else {
-      setFieldValue(`vaccination[${row.rowIndex}]expiryDate`, undefined)
-    }
-  }
+    currentDoc && currentDoc.length > 0
+      ? currentDoc[0].clinicianProfile
+      : {}
 
   const discardCallback = r => {
     if (r) {
       const userProfile = user.data.clinicianProfile
-      const userName = `${
-        userProfile.title && userProfile.title.trim().length
-          ? `${userProfile.title}. ${userProfile.name || ''}`
-          : `${userProfile.name || ''}`
-      }`
+      const userName = `${userProfile.title && userProfile.title.trim().length
+        ? `${userProfile.title}. ${userProfile.name || ''}`
+        : `${userProfile.name || ''}`
+        }`
       const message = `${userName} discard prescription at ${moment().format(
         'HH:mm',
       )}`
@@ -186,15 +179,15 @@ const DispenseDetails = ({
         id,
       },
     }).then(r => {
-                   sendNotification('EditedConsultation', {
-                     type: NOTIFICATION_TYPE.CONSULTAION,
-                     status: NOTIFICATION_STATUS.OK,
-                     message: 'Completed Consultation',
-                     visitID: values.id,
-                   })
+      sendNotification('EditedConsultation', {
+        type: NOTIFICATION_TYPE.CONSULTAION,
+        status: NOTIFICATION_STATUS.OK,
+        message: 'Completed Consultation',
+        visitID: values.id,
+      })
 
-                   discardCallback(r)
-                 })
+      discardCallback(r)
+    })
   }
 
   const discardBillOrder = () => {
@@ -225,7 +218,8 @@ const DispenseDetails = ({
       invoiceTotal: v.summary.total,
       invoiceTotalAftAdj: v.summary.totalAfterAdj,
       invoiceTotalAftGST: v.summary.totalWithGST,
-      outstandingBalance: v.summary.totalWithGST - values.invoice.totalPayment,
+      outstandingBalance:
+        v.summary.totalWithGST - values.invoice.totalPayment,
       invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
       invoiceGSTAdjustment: v.summary.gstAdj,
       invoiceAdjustment: v.adjustments,
@@ -315,7 +309,9 @@ const DispenseDetails = ({
     let label = 'Package'
     let totalPrice = 0
     if (!packageItem) return ''
-    const data = packageItem.filter(item => item.packageGlobalId === row.value)
+    const data = packageItem.filter(
+      item => item.packageGlobalId === row.value,
+    )
     if (data.length > 0) {
       totalPrice = _.sumBy(data, 'totalAfterItemAdjustment') || 0
       label = `${data[0].packageCode} - ${data[0].packageName} (Total: `
@@ -330,74 +326,74 @@ const DispenseDetails = ({
     )
   }
 
-  const [selectedPrescriptionRows, setSelectedPrescriptionRows] = useState([])
-  const [selectedVaccinationRows, setSelectedVaccinationRows] = useState([])
-  const [selectedOtherOrderRows, setSelectedOtherOrderRows] = useState([])
+  const [
+    selectedDispenseItemsRows,
+    setSelectedDispenseItemsRows,
+  ] = useState([])
+  const [selectedServiceRows, setSelectedServiceRows] = useState([])
   const [selectedActualizeRows, setSelectedActualizeRows] = useState([])
   const [showActualization, setShowActualization] = useState(false)
   const [actualizationStatus, setActualizationStatus] = useState(-1)
 
   const handleReloadClick = () => {
-    setSelectedPrescriptionRows([])
-    setSelectedVaccinationRows([])
-    setSelectedOtherOrderRows([])
+    setSelectedDispenseItemsRows([])
+    setSelectedServiceRows([])
     setSelectedActualizeRows([])
     setShowActualization(false)
     setActualizationStatus(-1)
     onReloadClick()
   }
-  
+
   const isShowActualizeSelection = (records = []) => {
     let actualizeOrderItemsRight = Authorized.check(
       'dispense.actualizeorderitems',
     )
     let viewable =
-      actualizeOrderItemsRight && actualizeOrderItemsRight.rights !== 'hidden'
-
+      actualizeOrderItemsRight &&
+      actualizeOrderItemsRight.rights !== 'hidden'
     return viewable && records.filter(x => isActualizable(x)).length > 0
   }
 
   const handleSelectionChange = (type, value) => {
     switch (type) {
-      case 'Prescription':
-        setSelectedPrescriptionRows(value)
+      case 'DispenseItems':
+        setSelectedDispenseItemsRows(value)
         break
-      case 'Vaccination':
-        setSelectedVaccinationRows(value)
-        break
-      case 'OtherOrders':
-        setSelectedOtherOrderRows(value)
+      case 'Service':
+        setSelectedServiceRows(value)
         break
     }
   }
 
   const onActualizeBtnClick = (row, status) => {
-                                                 setSelectedActualizeRows([row])
-                                                 setActualizationStatus(status)
-                                                 setShowActualization(true)
-                                               }
+    setSelectedActualizeRows([row])
+    setActualizationStatus(status)
+    setShowActualization(true)
+  }
 
   const handleMultiActualizationClick = type => {
     let selectedRows = []
     let records = []
     switch (type) {
-      case 'Prescription':
-        selectedRows = selectedPrescriptionRows
-        records = prescription
+      case 'DispenseItems':
+        selectedRows = dispenseItems.filter(x => x.isCheckActualize)
+        records = dispenseItems
         break
-      case 'Vaccination':
-        selectedRows = selectedVaccinationRows
-        records = vaccination
-        break
-      case 'OtherOrders':
-        selectedRows = selectedOtherOrderRows
-        records = otherOrder
+      case 'Service':
+        selectedRows = selectedServiceRows
+        records = service
         break
     }
     if (selectedRows.length > 0) {
-      let selectedRecords = records.filter(
-        x => selectedRows.indexOf(getRowId(x, type)) > -1,
-      )
+      let selectedRecords = []
+      if (type === 'DispenseItems') {
+        selectedRecords = records.filter(x => x.isCheckActualize)
+      }
+      else {
+        selectedRecords = records.filter(
+          x => selectedRows.indexOf(getRowId(x, type)) > -1,
+        )
+      }
       setSelectedActualizeRows(selectedRecords)
       setActualizationStatus(NURSE_WORKITEM_STATUS.NEW)
       setShowActualization(true)
@@ -433,10 +429,69 @@ const DispenseDetails = ({
 
   const { labelPrinterSize } = settings
   const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
+
+  const isShowDispenseActualie = isShowActualizeSelection(dispenseItems)
+  const orderItemRow = p => {
+    const { row, children, tableRow } = p
+    let newchildren = []
+
+    const firstPoint = isShowDispenseActualie ? 7 : 6
+    const secondPoint = isShowDispenseActualie ? 12 : 11
+    const batchColumns = children.slice(firstPoint, secondPoint)
+
+    if (row.countNumber === 1) {
+      newchildren.push(
+        children
+          .filter((value, index) => index < firstPoint)
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.rowspan,
+            },
+          })),
+      )
+
+      newchildren.push(batchColumns)
+
+      newchildren.push(
+        children
+          .filter((value, index) => index > secondPoint - 1)
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.rowspan,
+            },
+          })),
+      )
+    } else {
+      newchildren.push(batchColumns)
+    }
+
+    const selectedData = {
+      ...tableRow.row,
+      doctor: null,
+    }
+
+    if (row.countNumber === 1) {
+      return <Table.Row {...p}>{newchildren}</Table.Row>
+    }
+    return (
+      <Table.Row {...p} className={classes.subRow}>
+        {newchildren}
+      </Table.Row>
+    )
+  }
+
   return (
     <React.Fragment>
       <GridContainer>
-        <GridItem justify='flex-start' md={7} className={classes.actionButtons}>
+        <GridItem
+          justify='flex-start'
+          md={7}
+          className={classes.actionButtons}
+        >
           {!viewOnly && !isRetailVisit && (
             <Button
               color='info'
@@ -472,7 +527,8 @@ const DispenseDetails = ({
             <span style={{ color: '#999999' }}>
               Order created by{' '}
               <span style={{ fontWeight: 500 }}>
-                {`${docInfo.title ? `${docInfo.title}.` : null}${docInfo.name}`}{' '}
+                {`${docInfo.title ? `${docInfo.title}.` : null}${docInfo.name
+                  }`}{' '}
                 at {visit.orderCreateTime.format('DD MMM yyyy HH:mm')}
               </span>{' '}
             </span>
@@ -488,20 +544,6 @@ const DispenseDetails = ({
         </GridItem>
         {!viewOnly && (
           <GridItem className={classes.rightActionButtons} md={5}>
-            {/* isBillFirstVisit && (
-              <div
-                style={{
-                  marginRight: 8,
-                  marginTop: 8,
-                  display: 'inline-block',
-                  color: dangerColor,
-                }}
-              >
-                <SizeContainer size='lg'>
-                  <AddAlert />
-                </SizeContainer>
-              </div>
-            ) */}
             {(isRetailVisit || isBillFirstVisit) && (
               <ProgressButton
                 color='danger'
@@ -515,7 +557,11 @@ const DispenseDetails = ({
             )}
             {!isBillFirstVisit && (
               <Authorized authority='queue.dispense.savedispense'>
-                <ProgressButton color='success' size='sm' onClick={onSaveClick}>
+                <ProgressButton
+                  color='success'
+                  size='sm'
+                  onClick={onSaveClick}
+                >
                   Save Dispense
                 </ProgressButton>
               </Authorized>
@@ -623,63 +669,90 @@ const DispenseDetails = ({
         <GridItem md={12}>
           <Paper className={classes.paper}>
             <TableData
-              title='Prescription'
+              title='Dispense Details'
               titleExtend={actualizeSelectedItemButton(
-                'Prescription',
-                prescription,
+                'DispenseItems',
+                dispenseItems,
               )}
-              selection={selectedPrescriptionRows}
-              onSelectionChange={value => {
-                handleSelectionChange('Prescription', value)
+              FuncProps={{
+                pager: false,
+                grouping: true,
+                groupingConfig: {
+                  state: {
+                    grouping: [{ columnName: 'dispenseGroupId' }],
+                    expandedGroups: defaultExpandedGroups,
+                  },
+                  row: {
+                    indentColumnWidth: 0,
+                    iconComponent: icon => <span></span>,
+                    contentComponent: group => {
+                      const { row } = group
+                      const groupRow = dispenseItems.find(
+                        data => data.dispenseGroupId === row.value,
+                      )
+                      if (row.value === 'NormalDispense')
+                        return (
+                          <div className={classes.groupStyle}>
+                            <span style={{ fontWeight: 600 }}>Normal Dispense Items</span>
+                          </div>
+                        )
+                      if (row.value === 'NoNeedToDispense')
+                        return (
+                          <div className={classes.groupStyle}><span style={{ fontWeight: 600 }}>
+                            No Need To Dispense Items
+                          </span>
+                          </div>
+                        )
+                      return (
+                        <div className={classes.groupStyle}>
+                          <span style={{ fontWeight: 600 }}>
+                            {'Drug Mixture: '}
+                          </span>
+                          {groupRow.drugMixtureName}
+                        </div>
+                      )
+                    },
+                  },
+                },
               }}
-              {...actualizeTableConfig(isShowActualizeSelection(prescription))}
-              idPrefix='Prescription'
               forceRender
-              columns={PrescriptionColumns}
-              colExtensions={PrescriptionColumnExtensions(
+              columns={isShowDispenseActualie ? DispenseItemsColumns : DispenseItemsColumns.filter(c => c.name !== 'isCheckActualize')}
+              colExtensions={DispenseItemsColumnExtensions(
                 viewOnly,
                 onPrint,
-                inventorymedication,
-                handleSelectedBatch,
                 onActualizeBtnClick,
                 showDrugLabelRemark,
               )}
-              data={prescription}
-            />
-            <VaccinationGrid
-              title='Vaccination'
-              titleExtend={actualizeSelectedItemButton(
-                'Vaccination',
-                vaccination,
-              )}
-              selection={selectedVaccinationRows}
-              onSelectionChange={value => {
-                handleSelectionChange('Vaccination', value)
+              data={dispenseItems}
+              TableProps={{
+                rowComponent: orderItemRow,
               }}
-              {...actualizeTableConfig(isShowActualizeSelection(vaccination))}
-              idPrefix='Vaccination'
-              columns={VaccinationColumn}
-              colExtensions={VaccinationColumnExtensions(
+              getRowId={r => r.uid}
+            />
+
+            <TableData
+              title='Service'
+              titleExtend={actualizeSelectedItemButton(
+                'Service',
+                service,
+              )}
+              selection={selectedServiceRows}
+              onSelectionChange={value => {
+                handleSelectionChange('Service', value)
+              }}
+              {...actualizeTableConfig(isShowActualizeSelection(service))}
+              idPrefix='Service'
+              columns={ServiceColumns}
+              colExtensions={OtherOrdersColumnExtensions(
                 viewOnly,
-                inventoryvaccination,
-                handleSelectVaccinationBatch,
+                onPrint,
                 onActualizeBtnClick,
               )}
-              data={vaccination}
-              visitPurposeFK={visitPurposeFK}
+              data={service}
             />
 
             <TableData
               title='Other Orders'
-              titleExtend={actualizeSelectedItemButton(
-                'OtherOrders',
-                otherOrder,
-              )}
-              selection={selectedOtherOrderRows}
-              onSelectionChange={value => {
-                handleSelectionChange('OtherOrders', value)
-              }}
-              {...actualizeTableConfig(isShowActualizeSelection(otherOrder))}
               idPrefix='OtherOrders'
               columns={OtherOrdersColumns}
               colExtensions={OtherOrdersColumnExtensions(
@@ -829,8 +902,8 @@ const DispenseDetails = ({
 
             <div>
               Note: There are existing payments with some co-payers, click
-              "Void" to cancel all payments, or click "Skip" to remove co-payers
-              & payments manually.
+              "Void" to cancel all payments, or click "Skip" to remove
+              co-payers & payments manually.
             </div>
           </GridContainer>
           <GridContainer
