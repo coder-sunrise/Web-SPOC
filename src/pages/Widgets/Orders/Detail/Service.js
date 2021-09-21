@@ -339,7 +339,6 @@ class Service extends PureComponent {
       footer,
       from,
       setFieldValue,
-      getFieldValue,
     } = this.props
     const { services, serviceCenters } = this.state
     const { serviceFK, serviceCenterFK, isPreOrder, workitem = {}, priority } = values
@@ -533,9 +532,8 @@ class Service extends PureComponent {
                     right: -35,
                   }}
                   handleSelectCannedText={cannedText => {
-                    const oldInstruction = getFieldValue('instruction')
                     const instruction = `${
-                      oldInstruction ? oldInstruction + ' ' : ''
+                      values.instruction ? values.instruction + ' ' : ''
                     }${cannedText.text || ''}`.substring(0, 2000)
                     setFieldValue('instruction', instruction)
                   }}
