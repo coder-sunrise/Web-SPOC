@@ -26,7 +26,7 @@ export const tableConfig = {
   FuncProps: { pager: false },
 }
 
-export const actualizeTableConfig = (selectable, groupConfig = {}) => {
+export const actualizeTableConfig = (selectable) => {
   return {
     FuncProps: {
       pager: false,
@@ -49,7 +49,6 @@ export const actualizeTableConfig = (selectable, groupConfig = {}) => {
           )
         },
       },
-      ...groupConfig,
     },
   }
 }
@@ -165,9 +164,13 @@ const actualizationButton = (row, buttonClickCallback) => {
 export const DispenseItemsColumns = [
   { name: 'dispenseGroupId', title: '' },
   {
+    name: 'isCheckActualize', title: ' ',
+  },
+  {
     name: 'type',
     title: 'Type',
   },
+  { name: 'code', title: 'Code' },
   {
     name: 'name',
     title: 'Name',
@@ -175,11 +178,21 @@ export const DispenseItemsColumns = [
   { name: 'dispenseUOM', title: 'UOM' },
   {
     name: 'quantity',
-    title: 'Ordered Qty.',
+    title: (
+      <div>
+        <p style={{ height: 16 }}>Ordered</p>
+        <p style={{ height: 16 }}>Qty.</p>
+      </div>
+    ),
   },
   {
     name: 'dispenseQuantity',
-    title: 'Dispensed Qty.',
+    title: (
+      <div>
+        <p style={{ height: 16 }}>Dispensed</p>
+        <p style={{ height: 16 }}>Qty.</p>
+      </div>
+    ),
   },
   {
     name: 'stock',
@@ -229,11 +242,45 @@ export const DispenseItemsColumnExtensions = (
   onActualizeBtnClick,
   showDrugLabelRemark,
 ) => [
-    { columnName: 'dispenseGroupId' },
+    {
+      columnName: 'dispenseGroupId',
+      width: 0,
+      sortingEnabled: false,
+    },
+    {
+      columnName: 'isCheckActualize',
+      width: 50,
+      sortingEnabled: false,
+      align: 'center',
+      render: row => {
+        const {
+          isNurseActualizeRequired = false,
+          workitem: { nurseWorkitem: { statusFK } = {} } = {},
+          isPreOrder,
+          isExternalPrescription,
+        } = row
+
+        if (
+          !isPreOrder &&
+          !isExternalPrescription &&
+          isNurseActualizeRequired &&
+          statusFK !== NURSE_WORKITEM_STATUS.ACTUALIZED
+        ) {
+          return (
+            <FastField
+              name={`dispenseItems[${row.rowIndex}]isCheckActualize`}
+              render={args => {
+                return <Checkbox label='' style={{ marginLeft: 10 }} {...args} />
+              }} />
+          )
+        }
+        return ''
+      }
+    },
     {
       columnName: 'type',
       compare: compareString,
-      width: 160,
+      width: 120,
       sortingEnabled: false,
       render: row => {
         let paddingRight = 0
@@ -270,7 +317,6 @@ export const DispenseItemsColumnExtensions = (
                       height: 20,
                     }}
                   >
-                    {' '}
                     Pre
                   </div>
                 </Tooltip>
@@ -301,18 +347,23 @@ export const DispenseItemsColumnExtensions = (
       },
     },
     {
+      columnName: 'code',
+      width: 100,
+      sortingEnabled: false,
+    },
+    {
       columnName: 'unitPrice',
-      width: 120,
+      width: 100,
       align: 'right',
       type: 'currency',
+      sortingEnabled: false,
     },
     {
       columnName: 'name',
       width: '30%',
       sortingEnabled: false,
       render: row => {
-        const isShowStockIndicator =
-          row.type === 'Medication' || row.type === 'Vaccination'
+        const isShowStockIndicator = ['Medication', 'Medication (Ext.)', 'Vaccination'].indexOf(row.type) > -1
         let paddingRight = 0
         if (isShowStockIndicator) {
           paddingRight = 10
@@ -338,8 +389,8 @@ export const DispenseItemsColumnExtensions = (
             </Tooltip>
             <div style={{ position: 'relative', top: 2 }}>
               {lowStockIndicator(
-                { ...row, isDrugMixture: false },
-                row.type === 'Medication'
+                { ...row, isDrugMixture: false, type: row.type === 'Medication (Ext.)' ? 'Medication' : row.type },
+                ['Medication', 'Medication (Ext.)'].indexOf(row.type) > -1
                   ? 'inventoryMedicationFK'
                   : 'inventoryVaccinationFK',
                 -20,
@@ -418,7 +469,7 @@ export const DispenseItemsColumnExtensions = (
     },
     {
       columnName: 'totalAfterItemAdjustment',
-      width: 110,
+      width: 100,
       align: 'right',
       type: 'currency',
       sortingEnabled: false,
@@ -436,7 +487,7 @@ export const DispenseItemsColumnExtensions = (
     },
     {
       columnName: 'adjAmt',
-      width: 110,
+      width: 100,
       align: 'right',
       type: 'currency',
       sortingEnabled: false,
@@ -448,7 +499,7 @@ export const DispenseItemsColumnExtensions = (
     },
     {
       columnName: 'dispenseQuantity',
-      width: 120,
+      width: 80,
       sortingEnabled: false,
       render: row => {
         if (
@@ -462,14 +513,14 @@ export const DispenseItemsColumnExtensions = (
         }
         return (
           <FastField
-            name={`orderItems[${row.rowIndex}]dispenseQuantity`}
+            name={`dispenseItems[${row.rowIndex}]dispenseQuantity`}
             render={args => {
               return (
                 <NumberInput
                   label=''
                   step={1}
                   format='0.0'
-                  max={row.isDefault ? undefined : row.stock}
+                  max={(row.isDefault || row.isDispensedByPharmacy) ? undefined : row.stock}
                   min={0}
                   disabled={row.isDispensedByPharmacy}
                   precision={1}
@@ -485,12 +536,11 @@ export const DispenseItemsColumnExtensions = (
     {
       columnName: 'quantity',
       type: 'number',
+      sortingEnabled: false,
       align: 'right',
-      width: 120,
+      width: 80,
       render: row => {
-        let qty = `${numeral(row.quantity || 0).format(
-          '0,0.0',
-        )} ${row.dispenseUOM || ''}`
+        const qty = numeral(row.quantity).format('0.0')
         return (
           <Tooltip title={qty}>
             <span>{qty}</span>
@@ -500,7 +550,7 @@ export const DispenseItemsColumnExtensions = (
     },
     {
       columnName: 'stock',
-      width: 120,
+      width: 100,
       sortingEnabled: false,
       render: row => {
         const stock = row.stock
@@ -516,7 +566,7 @@ export const DispenseItemsColumnExtensions = (
     },
     {
       columnName: 'stockBalance',
-      width: 120,
+      width: 100,
       sortingEnabled: false,
       render: row => {
         const balStock = row.stock - row.dispenseQuantity
@@ -536,15 +586,22 @@ export const DispenseItemsColumnExtensions = (
     },
     {
       columnName: 'batchNo',
-      width: 150,
+      width: 100,
       sortingEnabled: false,
       render: row => {
+        if (!row.isDefault) {
+          return (
+            <Tooltip title={row.batchNo}>
+              <span>{row.batchNo}</span>
+            </Tooltip>
+          )
+        }
         return (
           <FastField
             name={`dispenseItems[${row.rowIndex}]batchNo`}
             render={args => {
               return (
-                <TextField maxLength={100} label='' {...args} />
+                <TextField maxLength={100} text={viewOnly} label='' {...args} />
               )
             }}
           />
@@ -556,6 +613,16 @@ export const DispenseItemsColumnExtensions = (
       width: 110,
       sortingEnabled: false,
       render: row => {
+        if (!row.isDefault) {
+          const expiryDate = row.expiryDate
+            ? moment(row.expiryDate).format('DD MMM YYYY')
+            : '-'
+          return (
+            <Tooltip title={expiryDate}>
+              <span>{expiryDate}</span>
+            </Tooltip>
+          )
+        }
         return (
           <FastField
             name={`dispenseItems[${row.rowIndex}]expiryDate`}
@@ -761,7 +828,7 @@ export const OtherOrdersColumnExtensions = (
       columnName: 'unitPrice',
       // type: 'currency',
       align: 'right',
-      width: 120,
+      width: 100,
       render: row => {
         const { type } = row
         if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
@@ -773,7 +840,7 @@ export const OtherOrdersColumnExtensions = (
       columnName: 'adjAmt',
       // type: 'currency',
       align: 'right',
-      width: 110,
+      width: 100,
       render: row => {
         const { type } = row
         if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
@@ -785,7 +852,7 @@ export const OtherOrdersColumnExtensions = (
       columnName: 'totalAfterItemAdjustment',
       // type: 'currency',
       align: 'right',
-      width: 110,
+      width: 100,
       render: row => {
         const { type } = row
         if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')

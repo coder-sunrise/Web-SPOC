@@ -71,6 +71,136 @@ const styles = theme => ({
 
 const base64Prefix = 'data:image/jpeg;base64,'
 
+const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
+  const {
+    inventorymedication = [],
+    inventoryconsumable = [],
+    inventoryvaccination = [],
+    ctmedicationunitofmeasurement = [],
+  } = codetable
+
+  const {
+    primaryPrintoutLanguage = 'EN',
+    secondaryPrintoutLanguage = '',
+  } = clinicSettings
+
+  let orderItems = []
+  const defaultItem = (item, groupName) => {
+    return {
+      ...item,
+      dispenseGroupId: groupName,
+      countNumber: 1,
+      rowspan: 1,
+      uid: getUniqueId(),
+    }
+  }
+
+  const transactionDetails = (item) => {
+    const { inventoryStockFK, batchNo, expiryDate, oldQty, transactionQty, uomDisplayValue, secondUOMDisplayValue } = item
+    return {
+      dispenseQuantity: transactionQty,
+      batchNo,
+      expiryDate,
+      stock: oldQty,
+      stockFK: inventoryStockFK,
+      uomDisplayValue,
+      secondUOMDisplayValue,
+    }
+  }
+
+  const generateFromDrugmixture = item => {
+    const drugMixtures = _.orderBy(
+      item.prescriptionDrugMixture,
+      ['sequence'],
+      ['asc'],
+    )
+    drugMixtures.forEach(drugMixture => {
+      const detaultDrugMixture = {
+        ...defaultItem(item, `DrugMixture-${item.id}`),
+        drugMixtureFK: drugMixture.id,
+        inventoryMedicationFK: drugMixture.inventoryMedicationFK,
+        code: drugMixture.drugCode,
+        name: drugMixture.drugName,
+        quantity: drugMixture.quantity,
+        dispenseUOM: drugMixture.uomDisplayValue,
+        isDispensedByPharmacy: drugMixture.isDispensedByPharmacy,
+        drugMixtureName: item.name,
+        uid: getUniqueId(),
+      }
+      if (drugMixture.dispenseItem.length) {
+        drugMixture.dispenseItem.forEach((di, index) => {
+          orderItems.push({
+            ...detaultDrugMixture,
+            ...transactionDetails(di),
+            countNumber: index === 0 ? 1 : 0,
+            rowspan: index === 0 ? drugMixture.dispenseItem.length : 0,
+            uid: getUniqueId(),
+          })
+        })
+      } else {
+        orderItems.push({
+          ...detaultDrugMixture,
+        })
+      }
+    })
+  }
+
+  const generateFromTransaction = item => {
+    const groupName = 'NormalDispense'
+    if (item.isPreOrder) {
+      orderItems.push(defaultItem(item, groupName))
+      return
+    }
+
+    if (item.dispenseItem.length) {
+      item.dispenseItem.forEach((di, index) => {
+        orderItems.push({
+          ...defaultItem(item, groupName),
+          ...transactionDetails(di),
+          countNumber: index === 0 ? 1 : 0,
+          rowspan: index === 0 ? item.dispenseItem.length : 0,
+          uid: getUniqueId(),
+        })
+      })
+    } else {
+      orderItems.push(defaultItem(item, groupName))
+    }
+  }
+
+  const sortOrderItems = [
+    ...(entity.prescription || []).filter(
+      item => item.type === 'Medication' && !item.isDrugMixture
+    ),
+    ...(entity.vaccination || []),
+    ...(entity.consumable || []),
+    ...(entity.prescription || []).filter(
+      item => item.type === 'Medication' && item.isDrugMixture,
+    ),
+    ...(entity.prescription || []).filter(
+      item => item.type === 'Open Prescription',
+    ),
+    ...(entity.externalPrescription || [])
+  ]
+
+  sortOrderItems.forEach(item => {
+    if (item.type === 'Medication') {
+      if (item.isDrugMixture) {
+        generateFromDrugmixture(item)
+      } else {
+        generateFromTransaction(item)
+      }
+    }
+    else if (item.type === 'Open Prescription' || item.type === 'Medication (Ext.)') {
+      orderItems.push(defaultItem(item, 'NoNeedToDispense'))
+    }
+    else {
+      generateFromTransaction(item)
+    }
+  })
+
+  return orderItems
+}
+
 @connect(
   ({
     global,
@@ -122,9 +252,15 @@ const base64Prefix = 'data:image/jpeg;base64,'
         const finalPayable = roundTo(
           billing.entity.invoice.totalAftGst - finalClaim,
         )
+
+        let obj = dispense.entity || dispense.default
+        const orderItems = getDispenseItems(codetable, settings, obj)
+        const defaultExpandedGroups = _.uniqBy(orderItems, 'dispenseGroupId').map(
+          o => o.dispenseGroupId,
+        )
+
         const values = {
-          ...billing.default,
-          ...billing.entity,
+          ...obj,
           invoice: {
             ...billing.entity.invoice,
           },
@@ -135,6 +271,8 @@ const base64Prefix = 'data:image/jpeg;base64,'
           autoPrintReportsOnCompletePayment: autoPrintReportsOnCompletePayment.split(
             ',',
           ),
+          dispenseItems: orderItems,
+          defaultExpandedGroups,
         }
 
         return values
@@ -153,7 +291,7 @@ const base64Prefix = 'data:image/jpeg;base64,'
 })
 @Authorized.Secured('queue.dispense.makepayment')
 class Billing extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.fetchCodeTables()
   }
@@ -178,7 +316,7 @@ class Billing extends Component {
     isConsumedPackage: false,
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     this.props.dispatch({
       type: 'billing/updateState',
       payload: {
@@ -495,7 +633,7 @@ class Billing extends Component {
 
     if (
       isCheckPackageSignature.toLowerCase() ===
-        PACKAGE_SIGNATURE_CHECK_OPTION.IGNORE.toLowerCase() ||
+      PACKAGE_SIGNATURE_CHECK_OPTION.IGNORE.toLowerCase() ||
       isExistingPackageSignature
     )
       return this.checkInvoiceOutstanding()
@@ -698,11 +836,11 @@ class Billing extends Component {
       _newInvoicePayment = invoicePayment.map(payment =>
         payment.id === id
           ? {
-              ...payment,
-              isCancelled: true,
-              cancelDate: new Date(),
-              cancelByUserFK: user.id,
-            }
+            ...payment,
+            isCancelled: true,
+            cancelDate: new Date(),
+            cancelByUserFK: user.id,
+          }
           : { ...payment },
       )
     }
@@ -841,7 +979,7 @@ class Billing extends Component {
     })
   }
 
-  render() {
+  render () {
     const {
       showReport,
       reportPayload,
@@ -907,7 +1045,7 @@ class Billing extends Component {
       <LoadingWrapper loading={loading} text='Getting billing info...'>
         <PatientBanner
           from='Billing'
-          // activePreOrderItem={patient?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
+        // activePreOrderItem={patient?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
         />
         <div className={classes.accordionContainer}>
           <LoadingWrapper linear loading={dispenseLoading}>

@@ -1364,6 +1364,7 @@ export default compose(
             secondDispenseUOM: drugMixture.secondUOMDisplayValue,
             isDispensedByPharmacy: drugMixture.isDispensedByPharmacy,
             drugMixtureName: item.itemName,
+            uid: getUniqueId(),
           }
           if (!drugMixture.isDispensedByPharmacy) {
             orderItems.push({
@@ -1429,6 +1430,7 @@ export default compose(
                       isDefault,
                       countNumber: index === 0 ? 1 : 0,
                       rowspan: 0,
+                      uid: getUniqueId(),
                     })
                   }
                 })
@@ -1472,6 +1474,7 @@ export default compose(
                         index === 0
                           ? drugMixture.pharmacyOrderItemTransaction.length
                           : 0,
+                      uid: getUniqueId(),
                     })
                   },
                 )
@@ -1510,6 +1513,7 @@ export default compose(
                 countNumber: index === 0 ? 1 : 0,
                 rowspan:
                   index === 0 ? item.pharmacyOrderItemTransaction.length : 0,
+                uid: getUniqueId(),
               })
             },
           )
@@ -1575,6 +1579,7 @@ export default compose(
                   isDefault,
                   countNumber: index === 0 ? 1 : 0,
                   rowspan: 0,
+                  uid: getUniqueId(),
                 })
               }
             })
@@ -1635,6 +1640,7 @@ export default compose(
                   isDefault,
                   countNumber: index === 0 ? 1 : 0,
                   rowspan: 0,
+                  uid: getUniqueId(),
                 })
               }
               const firstItem = orderItems.find(

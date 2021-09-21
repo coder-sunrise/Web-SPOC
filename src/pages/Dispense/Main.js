@@ -8,7 +8,7 @@ import {
   CommonModal,
   Button,
 } from '@/components'
-import { calculateAmount, navigateDirtyCheck, getUniqueId } from '@/utils/utils'
+import { calculateAmount, navigateDirtyCheck, getUniqueId, getTranslationValue } from '@/utils/utils'
 import Yup from '@/utils/yup'
 import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
@@ -16,6 +16,7 @@ import { openCautionAlertOnStartConsultation } from '@/pages/Widgets/Orders/util
 import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 import AddOrder from './DispenseDetails/AddOrder'
 import DispenseDetails from './DispenseDetails/WebSocketWrapper'
+import { DispenseItemsColumnExtensions } from './variables'
 
 const calculateInvoiceAmounts = entity => {
   const obj = { ...entity }
@@ -55,95 +56,197 @@ const calculateInvoiceAmounts = entity => {
 }
 
 const reloadDispense = (props, effect = 'query') => {
-  const { dispatch, dispense, resetForm } = props
+  const { dispatch, dispense, resetForm, codetable } = props
 
   dispatch({
     type: `dispense/${effect}`,
     payload: dispense.visitID,
   }).then(response => {
     if (response) {
-      const result = calculateInvoiceAmounts(response)
+      let obj = { ...response }
+      const orderItems = getDispenseItems(codetable, obj)
+      const defaultExpandedGroups = _.uniqBy(orderItems, 'dispenseGroupId').map(
+        o => o.dispenseGroupId,
+      )
+
+      obj = { ...obj, dispenseItems: orderItems, defaultExpandedGroups }
+      const result = calculateInvoiceAmounts(obj)
       resetForm(result)
     }
   })
 }
 
-const ConvertBatchNoArrayToText = array => {
-  if (array) {
-    return array.map(o => {
-      const item = { ...o }
-      if (item.batchNo instanceof Array) {
-        if (item.batchNo && item.batchNo.length > 0) {
-          const [firstIndex] = item.batchNo
-          item.batchNo = firstIndex
+const constructPayload = values => {
+  const getTransaction = item => {
+    const {
+      stockFK,
+      batchNo,
+      expiryDate,
+      dispenseQuantity,
+      uomDisplayValue,
+      secondUOMDisplayValue,
+    } = item
+    return {
+      inventoryStockFK: stockFK,
+      batchNo,
+      expiryDate,
+      transactionQty: dispenseQuantity,
+      uomDisplayValue,
+      secondUOMDisplayValue,
+    }
+  }
+
+  const updateTempDispenseItem = (items, inventoryFiledName) => {
+    return items.map(m => {
+      let tempDispenseItem = []
+      if (!m.isPreOrder) {
+        const items = values.dispenseItems.filter(d => d.type === m.type && d.id === m.id && d.dispenseQuantity > 0 && !d.isDispensedByPharmacy)
+        if (items.length) {
+          items.forEach(item => {
+            tempDispenseItem.push({ ...getTransaction(item), inventoryFK: item[inventoryFiledName] })
+          })
         }
       }
-      return item
+      return {
+        ...m,
+        dispenseDetails: tempDispenseItem
+      }
     })
   }
 
-  return array
-}
-
-const constructPayload = values => {
   const _values = {
     ...values,
-    prescription: ConvertBatchNoArrayToText(values.prescription),
-    vaccination: ConvertBatchNoArrayToText(values.vaccination),
+    prescription: updateTempDispenseItem(values.prescription, 'inventoryMedicationFK'),
+    vaccination: updateTempDispenseItem(values.vaccination, 'inventoryVaccinationFK'),
+    consumable: updateTempDispenseItem(values.consumable, 'inventoryConsumableFK'),
+    dispenseItems: undefined,
+    defaultExpandedGroups: undefined,
   }
   return _values
 }
 
-@withFormikExtend({
-  authority: 'queue.dispense',
-  enableReinitialize: true,
-  notDirtyDuration: 3,
-  mapPropsToValues: pops => {
-    const { dispense = {}, codetable } = pops
-    let obj = dispense.entity || dispense.default
-    const {
-      inventorymedication = [],
-      inventoryconsumable = [],
-      inventoryvaccination = [],
-    } = codetable
+const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
+  const {
+    inventorymedication = [],
+    inventoryconsumable = [],
+    inventoryvaccination = [],
+    ctmedicationunitofmeasurement = [],
+  } = codetable
 
-    let orderItems = []
-    const defaultItem = (item, groupName) => {
-      return {
-        ...item,
-        dispenseGroupId: groupName,
-        countNumber: 1,
-        rowspan: 1, uid: getUniqueId(),
-      }
+  const {
+    primaryPrintoutLanguage = 'EN',
+    secondaryPrintoutLanguage = '',
+  } = clinicSettings
+
+  let orderItems = []
+  const defaultItem = (item, groupName) => {
+    return {
+      ...item,
+      dispenseGroupId: groupName,
+      countNumber: 1,
+      rowspan: 1,
+      uid: getUniqueId(),
     }
+  }
 
-    const generateFromDrugmixture = item => {
-      const drugMixtures = _.orderBy(
-        item.prescriptionDrugMixture,
-        ['sequence'],
-        ['asc'],
-      )
-      drugMixtures.forEach(drugMixture => {
-        const detaultDrugMixture = {
-          ...defaultItem(item, `DrugMixture-${item.id}`),
-          drugMixtureFK: drugMixture.id,
-          inventoryMedicationFK: drugMixture.inventoryMedicationFK,
-          code: drugMixture.drugCode,
-          name: drugMixture.drugName,
-          quantity: drugMixture.quantity,
-          dispenseUOM: drugMixture.uomDisplayValue,
-          isDispensedByPharmacy: drugMixture.isDispensedByPharmacy,
-          drugMixtureName: item.name,
-        }
-        if (drugMixture.isDispensedByPharmacy) {
+  const transactionDetails = (item) => {
+    const { inventoryStockFK, batchNo, expiryDate, oldQty, transactionQty, uomDisplayValue, secondUOMDisplayValue } = item
+    return {
+      dispenseQuantity: transactionQty,
+      batchNo,
+      expiryDate,
+      stock: oldQty,
+      stockFK: inventoryStockFK,
+      uomDisplayValue,
+      secondUOMDisplayValue,
+    }
+  }
+
+  const generateFromTempDispenseInfo = (item, stock = 0, primaryUOM, secondUOM) => {
+    const { inventoryStockFK, batchNo, expiryDate, transactionQty, } = item
+    orderItems.push({
+      ...defaultItem(item, groupName),
+      dispenseQuantity: transactionQty,
+      batchNo,
+      expiryDate,
+      stock,
+      stockFK: inventoryStockFK,
+      uomDisplayValue: primaryUOM,
+      secondUOMDisplayValue: secondUOM,
+    })
+  }
+
+  const generateFromDrugmixture = item => {
+    const drugMixtures = _.orderBy(
+      item.prescriptionDrugMixture,
+      ['sequence'],
+      ['asc'],
+    )
+    drugMixtures.forEach(drugMixture => {
+      const detaultDrugMixture = {
+        ...defaultItem(item, `DrugMixture-${item.id}`),
+        drugMixtureFK: drugMixture.id,
+        inventoryMedicationFK: drugMixture.inventoryMedicationFK,
+        code: drugMixture.drugCode,
+        name: drugMixture.drugName,
+        quantity: drugMixture.quantity,
+        dispenseUOM: drugMixture.uomDisplayValue,
+        isDispensedByPharmacy: drugMixture.isDispensedByPharmacy,
+        drugMixtureName: item.name,
+        uid: getUniqueId(),
+      }
+      if (drugMixture.isDispensedByPharmacy) {
+        if (drugMixture.dispenseItem.length) {
+          drugMixture.dispenseItem.forEach((di, index) => {
+            orderItems.push({
+              ...detaultDrugMixture,
+              ...transactionDetails(di),
+              countNumber: index === 0 ? 1 : 0,
+              rowspan: index === 0 ? drugMixture.dispenseItem.length : 0,
+              uid: getUniqueId(),
+            })
+          })
+        } else {
           orderItems.push({
             ...detaultDrugMixture,
           })
-        } else {
-          const inventoryItem = inventorymedication.find(
-            drug => drug.id === drugMixture.inventoryMedicationFK,
-          )
-          const uomName = inventoryItem?.dispensingUOM?.name
+        }
+      } else {
+        const inventoryItem = inventorymedication.find(
+          drug => drug.id === drugMixture.inventoryMedicationFK,
+        )
+        const uom =
+          ctmedicationunitofmeasurement.find(
+            m => m.id === inventoryItem?.dispensingUOM?.id,
+          ) || {}
+        const primaryUOMDisplayValue = getTranslationValue(
+          uom.translationData,
+          primaryPrintoutLanguage,
+          'displayValue',
+        )
+        const secondUOMDisplayValue =
+          secondaryPrintoutLanguage !== ''
+            ? getTranslationValue(
+              uom.translationData,
+              secondaryPrintoutLanguage,
+              'displayValue',
+            )
+            : ''
+
+        const tempDispenseItem = (item.tempDispenseItem || []).filter(t => t.inventoryFK === drugMixture.inventoryMedicationFK)
+        if (tempDispenseItem.length) {
+          tempDispenseItem.forEach((di, index) => {
+            const currentStock = (inventoryItem?.medicationStock || []).find(s => s.id === di.inventoryStockFK)
+            orderItems.push({
+              ...detaultDrugMixture,
+              ...generateFromTempDispenseInfo(di, currentStock?.stock, primaryUOMDisplayValue, secondUOMDisplayValue),
+              countNumber: index === 0 ? 1 : 0,
+              rowspan: index === 0 ? tempDispenseItem.length : 0,
+              uid: getUniqueId(),
+            })
+          })
+        }
+        else {
           const inventoryItemStock = _.orderBy(
             (inventoryItem?.medicationStock || []).filter(
               s => s.isDefault || s.stock > 0,
@@ -177,10 +280,12 @@ const constructPayload = values => {
                   expiryDate,
                   stock,
                   stockFK: id,
-                  uomDisplayValue: uomName,
+                  uomDisplayValue: primaryUOMDisplayValue,
+                  secondUOMDisplayValue: secondUOMDisplayValue,
                   isDefault,
                   countNumber: index === 0 ? 1 : 0,
                   rowspan: 0,
+                  uid: getUniqueId(),
                 })
               }
             })
@@ -197,20 +302,65 @@ const constructPayload = values => {
             })
           }
         }
-      })
+      }
+    })
+  }
+
+  const generateFromNormalMedication = item => {
+    const groupName = 'NormalDispense'
+    if (item.isPreOrder) {
+      orderItems.push(defaultItem(item, groupName))
+      return
     }
 
-    const generateFromNormalMedication = item => {
-      const groupName = 'NormalDispense'
-
-      if (item.isDispensedByPharmacy) {
+    if (item.isDispensedByPharmacy) {
+      if (item.dispenseItem.length) {
+        item.dispenseItem.forEach((di, index) => {
+          orderItems.push({
+            ...defaultItem(item, groupName),
+            ...transactionDetails(di),
+            countNumber: index === 0 ? 1 : 0,
+            rowspan: index === 0 ? item.dispenseItem.length : 0,
+            uid: getUniqueId(),
+          })
+        })
+      } else {
         orderItems.push(defaultItem(item, groupName))
       }
-      else {
-        const inventoryItem = inventorymedication.find(
-          drug => drug.id === item.inventoryMedicationFK,
-        )
-        const uomName = inventoryItem?.dispensingUOM?.name
+    }
+    else {
+      const inventoryItem = inventorymedication.find(
+        drug => drug.id === item.inventoryMedicationFK,
+      )
+      const uom =
+        ctmedicationunitofmeasurement.find(
+          m => m.id === inventoryItem?.dispensingUOM?.id,
+        ) || {}
+      const primaryUOMDisplayValue = getTranslationValue(
+        uom.translationData,
+        primaryPrintoutLanguage,
+        'displayValue',
+      )
+      const secondUOMDisplayValue =
+        secondaryPrintoutLanguage !== ''
+          ? getTranslationValue(
+            uom.translationData,
+            secondaryPrintoutLanguage,
+            'displayValue',
+          )
+          : ''
+      if (item.tempDispenseItem.length) {
+        item.tempDispenseItem.forEach((di, index) => {
+          const currentStock = (inventoryItem?.medicationStock || []).find(s => s.id === di.inventoryStockFK)
+          orderItems.push({
+            ...defaultItem(item, groupName),
+            ...generateFromTempDispenseInfo(di, currentStock?.stock, primaryUOMDisplayValue, secondUOMDisplayValue),
+            countNumber: index === 0 ? 1 : 0,
+            rowspan: index === 0 ? item.tempDispenseItem.length : 0,
+            uid: getUniqueId(),
+          })
+        })
+      } else {
         const inventoryItemStock = _.orderBy(
           (inventoryItem?.medicationStock || []).filter(
             s => s.isDefault || s.stock > 0,
@@ -238,23 +388,25 @@ const constructPayload = values => {
                 expiryDate,
                 stock,
                 stockFK: id,
-                uomDisplayValue: uomName,
+                uomDisplayValue: primaryUOMDisplayValue,
+                secondUOMDisplayValue: secondUOMDisplayValue,
                 isDefault,
                 countNumber: index === 0 ? 1 : 0,
                 rowspan: 0,
+                uid: getUniqueId(),
               })
             }
           })
           const firstItem = orderItems.find(
             i =>
-              i.invoiceItemTypeFK === item.invoiceItemTypeFK &&
+              i.type === item.type &&
               i.isDrugMixture === item.isDrugMixture &&
               i.id === item.id &&
               i.countNumber === 1,
           )
           firstItem.rowspan = orderItems.filter(
             i =>
-              i.invoiceItemTypeFK === item.invoiceItemTypeFK &&
+              i.type === item.type &&
               i.isDrugMixture === item.isDrugMixture &&
               i.id === item.id,
           ).length
@@ -263,16 +415,47 @@ const constructPayload = values => {
         }
       }
     }
+  }
 
-    const generateFromNormalConsumable = item => {
-      const groupName = 'NormalDispense'
-      if (item.isDispensedByPharmacy) {
+  const generateFromNormalConsumable = item => {
+    const groupName = 'NormalDispense'
+    if (item.isPreOrder) {
+      orderItems.push(defaultItem(item, groupName))
+      return
+    }
+    if (item.isDispensedByPharmacy) {
+      if (item.dispenseItem.length) {
+        item.dispenseItem.forEach((di, index) => {
+          orderItems.push({
+            ...defaultItem(item, groupName),
+            ...transactionDetails(di),
+            countNumber: index === 0 ? 1 : 0,
+            rowspan: index === 0 ? item.dispenseItem.length : 0,
+            uid: getUniqueId(),
+          })
+        })
+      } else {
         orderItems.push(defaultItem(item, groupName))
       }
+    }
+    else {
+      const inventoryItem = inventoryconsumable.find(
+        consumable => consumable.id === item.inventoryConsumableFK,
+      )
+
+      if (item.tempDispenseItem.length) {
+        item.tempDispenseItem.forEach((di, index) => {
+          const currentStock = (inventoryItem?.consumableStock || []).find(s => s.id === di.inventoryStockFK)
+          orderItems.push({
+            ...defaultItem(item, groupName),
+            ...generateFromTempDispenseInfo(di, currentStock?.stock, inventoryItem?.uom?.name),
+            countNumber: index === 0 ? 1 : 0,
+            rowspan: index === 0 ? item.tempDispenseItem.length : 0,
+            uid: getUniqueId(),
+          })
+        })
+      }
       else {
-        const inventoryItem = inventoryconsumable.find(
-          consumable => consumable.id === item.inventoryConsumableFK,
-        )
         const inventoryItemStock = _.orderBy(
           (inventoryItem?.consumableStock || []).filter(
             s => s.isDefault || s.stock > 0,
@@ -304,18 +487,19 @@ const constructPayload = values => {
                 isDefault,
                 countNumber: index === 0 ? 1 : 0,
                 rowspan: 0,
+                uid: getUniqueId(),
               })
             }
             const firstItem = orderItems.find(
               i =>
-                i.invoiceItemTypeFK === item.invoiceItemTypeFK &&
+                i.type === item.type &&
                 i.isDrugMixture === item.isDrugMixture &&
                 i.id === item.id &&
                 i.countNumber === 1,
             )
             firstItem.rowspan = orderItems.filter(
               i =>
-                i.invoiceItemTypeFK === item.invoiceItemTypeFK &&
+                i.type === item.type &&
                 i.isDrugMixture === item.isDrugMixture &&
                 i.id === item.id,
             ).length
@@ -325,14 +509,31 @@ const constructPayload = values => {
         }
       }
     }
+  }
 
-    const generateFromNormalVaccination = item => {
-      const groupName = 'NormalDispense'
-      const inventoryItem = inventoryvaccination.find(
-        vaccination => vaccination.id === item.inventoryVaccinationFK,
-      )
+  const generateFromNormalVaccination = item => {
+    const groupName = 'NormalDispense'
+    if (item.isPreOrder) {
+      orderItems.push(defaultItem(item, groupName))
+      return
+    }
+    const inventoryItem = inventoryvaccination.find(
+      vaccination => vaccination.id === item.inventoryVaccinationFK,
+    )
+    if (item.tempDispenseItem.length) {
+      item.tempDispenseItem.forEach((di, index) => {
+        const currentStock = (inventoryItem?.vaccinationStock || []).find(s => s.id === di.inventoryStockFK)
+        orderItems.push({
+          ...defaultItem(item, groupName),
+          ...generateFromTempDispenseInfo(di, currentStock?.stock, inventoryItem?.prescribingUOM?.name),
+          countNumber: index === 0 ? 1 : 0,
+          rowspan: index === 0 ? item.tempDispenseItem.length : 0,
+          uid: getUniqueId(),
+        })
+      })
+    } else {
       const inventoryItemStock = _.orderBy(
-        (inventoryItem?.consumableStock || []).filter(
+        (inventoryItem?.vaccinationStock || []).filter(
           s => s.isDefault || s.stock >= item.quantity,
         ),
         ['isDefault', 'expiryDate'],
@@ -340,7 +541,6 @@ const constructPayload = values => {
       )
       let remainQty = item.quantity
       if (remainQty > 0 && inventoryItem && inventoryItemStock.length) {
-
         const { id, batchNo, expiryDate, stock, isDefault } = inventoryItemStock[0]
         orderItems.push({
           ...defaultItem(item, groupName),
@@ -349,49 +549,62 @@ const constructPayload = values => {
           expiryDate,
           stock,
           stockFK: id,
-          uomDisplayValue: inventoryItem?.uom?.name,
+          uomDisplayValue: inventoryItem?.prescribingUOM?.name,
           isDefault,
-          countNumber: index === 0 ? 1 : 0,
-          rowspan: 0,
         })
       } else {
-        orderItems.push(defaultItem(item, groupName))
+        const { batchNo, expiryDate, ...restItem } = item
+        orderItems.push(defaultItem(restItem, groupName))
       }
     }
+  }
 
-    const sortOrderItems = [
-      ...(obj.prescription || []).filter(
-        item => item.type === 'Medication' && !item.isDrugMixture
-      ),
-      ...(obj.vaccination || []),
-      ...(obj.consumable || []),
-      ...(obj.prescription || []).filter(
-        item => item.type === 'Medication' && item.isDrugMixture,
-      ),
-      ...(obj.prescription || []).filter(
-        item => item.type === 'Open Prescription',
-      ),
-      ...(obj.externalPrescription || [])
-    ]
+  const sortOrderItems = [
+    ...(entity.prescription || []).filter(
+      item => item.type === 'Medication' && !item.isDrugMixture
+    ),
+    ...(entity.vaccination || []),
+    ...(entity.consumable || []),
+    ...(entity.prescription || []).filter(
+      item => item.type === 'Medication' && item.isDrugMixture,
+    ),
+    ...(entity.prescription || []).filter(
+      item => item.type === 'Open Prescription',
+    ),
+    ...(entity.externalPrescription || [])
+  ]
 
-    sortOrderItems.forEach(item => {
-      if (item.type === 'Medication') {
-        if (item.isDrugMixture) {
-          generateFromDrugmixture(item)
-        } else {
-          generateFromNormalMedication(item)
-        }
+  sortOrderItems.forEach(item => {
+    if (item.type === 'Medication') {
+      if (item.isDrugMixture) {
+        generateFromDrugmixture(item)
+      } else {
+        generateFromNormalMedication(item)
       }
-      else if (item.type === 'Open Prescription' || item.type === 'Medication (Ext.)') {
-        orderItems.push(defaultItem(item, 'NoNeedToDispense'))
-      }
-      else if (item.type === 'Vaccination') {
-        generateFromNormalVaccination(item)
-      }
-      else {
-        generateFromNormalConsumable(item)
-      }
-    })
+    }
+    else if (item.type === 'Open Prescription' || item.type === 'Medication (Ext.)') {
+      orderItems.push(defaultItem(item, 'NoNeedToDispense'))
+    }
+    else if (item.type === 'Vaccination') {
+      generateFromNormalVaccination(item)
+    }
+    else {
+      generateFromNormalConsumable(item)
+    }
+  })
+
+  return orderItems
+}
+
+@withFormikExtend({
+  authority: 'queue.dispense',
+  enableReinitialize: true,
+  notDirtyDuration: 3,
+  mapPropsToValues: pops => {
+    const { dispense = {}, codetable, clinicSettings: { settings = {} } } = pops
+    let obj = dispense.entity || dispense.default
+
+    const orderItems = getDispenseItems(codetable, settings, obj)
     const defaultExpandedGroups = _.uniqBy(orderItems, 'dispenseGroupId').map(
       o => o.dispenseGroupId,
     )

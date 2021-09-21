@@ -123,6 +123,13 @@ class Dispense extends PureComponent {
         temp: true,
       },
     })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctmedicationunitofmeasurement',
+        force: true,
+      },
+    })
 
     dispatch({
       type: 'dispense/updateState',

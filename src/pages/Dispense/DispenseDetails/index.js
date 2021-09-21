@@ -376,7 +376,7 @@ const DispenseDetails = ({
     let records = []
     switch (type) {
       case 'DispenseItems':
-        selectedRows = selectedDispenseItemsRows
+        selectedRows = dispenseItems.filter(x => x.isCheckActualize)
         records = dispenseItems
         break
       case 'Service':
@@ -387,9 +387,7 @@ const DispenseDetails = ({
     if (selectedRows.length > 0) {
       let selectedRecords = []
       if (type === 'DispenseItems') {
-        selectedRecords = records.filter(
-          x => selectedRows.indexOf(x.uid) > -1,
-        )
+        selectedRecords = records.filter(x => x.isCheckActualize)
       }
       else {
         selectedRecords = records.filter(
@@ -432,16 +430,19 @@ const DispenseDetails = ({
   const { labelPrinterSize } = settings
   const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
 
+  const isShowDispenseActualie = isShowActualizeSelection(dispenseItems)
   const orderItemRow = p => {
     const { row, children, tableRow } = p
     let newchildren = []
 
-    const batchColumns = children.slice(6, 11)
+    const firstPoint = isShowDispenseActualie ? 7 : 6
+    const secondPoint = isShowDispenseActualie ? 12 : 11
+    const batchColumns = children.slice(firstPoint, secondPoint)
 
     if (row.countNumber === 1) {
       newchildren.push(
         children
-          .filter((value, index) => index < 6)
+          .filter((value, index) => index < firstPoint)
           .map(item => ({
             ...item,
             props: {
@@ -455,7 +456,7 @@ const DispenseDetails = ({
 
       newchildren.push(
         children
-          .filter((value, index) => index > 10)
+          .filter((value, index) => index > secondPoint - 1)
           .map(item => ({
             ...item,
             props: {
@@ -673,57 +674,49 @@ const DispenseDetails = ({
                 'DispenseItems',
                 dispenseItems,
               )}
-              selection={selectedDispenseItemsRows}
-              onSelectionChange={value => {
-                console.log('value', value)
-                handleSelectionChange('DispenseItems', value)
-              }}
-              {...actualizeTableConfig(
-                isShowActualizeSelection(dispenseItems),
-                {
-                  grouping: true,
-                  groupingConfig: {
-                    state: {
-                      grouping: [{ columnName: 'dispenseGroupId', groupingEnabled: false }],
-                      expandedGroups: defaultExpandedGroups,
-                    },
-                    row: {
-                      indentColumnWidth: 0,
-                      iconComponent: icon => <span></span>,
-                      contentComponent: group => {
-                        const { row } = group
-                        const groupRow = dispenseItems.find(
-                          data => data.dispenseGroupId === row.value,
-                        )
-                        if (row.value === 'NormalDispense')
-                          return (
-                            <div className={classes.groupStyle}>
-                              <span style={{ fontWeight: 600 }}>Normal Dispense Items</span>
-                            </div>
-                          )
-                        if (row.value === 'NoNeedToDispense')
-                          return (
-                            <div className={classes.groupStyle}><span style={{ fontWeight: 600 }}>
-                              No Need To Dispense Items
-                            </span>
-                            </div>
-                          )
+              FuncProps={{
+                pager: false,
+                grouping: true,
+                groupingConfig: {
+                  state: {
+                    grouping: [{ columnName: 'dispenseGroupId' }],
+                    expandedGroups: defaultExpandedGroups,
+                  },
+                  row: {
+                    indentColumnWidth: 0,
+                    iconComponent: icon => <span></span>,
+                    contentComponent: group => {
+                      const { row } = group
+                      const groupRow = dispenseItems.find(
+                        data => data.dispenseGroupId === row.value,
+                      )
+                      if (row.value === 'NormalDispense')
                         return (
                           <div className={classes.groupStyle}>
-                            <span style={{ fontWeight: 600 }}>
-                              {'Drug Mixture: '}
-                            </span>
-                            {groupRow.drugMixtureName}
+                            <span style={{ fontWeight: 600 }}>Normal Dispense Items</span>
                           </div>
                         )
-                      },
+                      if (row.value === 'NoNeedToDispense')
+                        return (
+                          <div className={classes.groupStyle}><span style={{ fontWeight: 600 }}>
+                            No Need To Dispense Items
+                          </span>
+                          </div>
+                        )
+                      return (
+                        <div className={classes.groupStyle}>
+                          <span style={{ fontWeight: 600 }}>
+                            {'Drug Mixture: '}
+                          </span>
+                          {groupRow.drugMixtureName}
+                        </div>
+                      )
                     },
                   },
-                }
-              )}
-              idPrefix='DispenseItems'
+                },
+              }}
               forceRender
-              columns={DispenseItemsColumns}
+              columns={isShowDispenseActualie ? DispenseItemsColumns : DispenseItemsColumns.filter(c => c.name !== 'isCheckActualize')}
               colExtensions={DispenseItemsColumnExtensions(
                 viewOnly,
                 onPrint,
