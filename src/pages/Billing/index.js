@@ -22,7 +22,7 @@ import {
 } from '@/components'
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 // common utils
-import { roundTo } from '@/utils/utils'
+import { roundTo, getUniqueId } from '@/utils/utils'
 import {
   INVOICE_PAYER_TYPE,
   PACKAGE_SIGNATURE_CHECK_OPTION,
@@ -71,7 +71,7 @@ const styles = theme => ({
 
 const base64Prefix = 'data:image/jpeg;base64,'
 
-const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
+const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
   const {
     inventorymedication = [],
     inventoryconsumable = [],
@@ -197,8 +197,14 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
       generateFromTransaction(item)
     }
   })
-
-  return orderItems
+  const defaultExpandedGroups = _.uniqBy(orderItems, 'dispenseGroupId').map(
+    o => o.dispenseGroupId,
+  )
+  return {
+    ...entity,
+    dispenseItems: orderItems,
+    defaultExpandedGroups,
+  }
 }
 
 @connect(
@@ -228,6 +234,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
     ctservice: codetable.ctservice || [],
     commitCount: global.commitCount,
     clinicSettings: clinicSettings.settings,
+    codetable,
   }),
 )
 @withFormikExtend({
@@ -252,15 +259,9 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
         const finalPayable = roundTo(
           billing.entity.invoice.totalAftGst - finalClaim,
         )
-
-        let obj = dispense.entity || dispense.default
-        const orderItems = getDispenseItems(codetable, settings, obj)
-        const defaultExpandedGroups = _.uniqBy(orderItems, 'dispenseGroupId').map(
-          o => o.dispenseGroupId,
-        )
-
         const values = {
-          ...obj,
+          ...billing.default,
+          ...billing.entity,
           invoice: {
             ...billing.entity.invoice,
           },
@@ -271,8 +272,6 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
           autoPrintReportsOnCompletePayment: autoPrintReportsOnCompletePayment.split(
             ',',
           ),
-          dispenseItems: orderItems,
-          defaultExpandedGroups,
         }
 
         return values
@@ -1008,6 +1007,7 @@ class Billing extends Component {
       inventoryvaccination,
       inventorymedication,
       clinicSettings,
+      codetable,
     } = this.props
     const formikBag = {
       values,
@@ -1060,7 +1060,7 @@ class Billing extends Component {
                     <div className={classes.dispenseContainer}>
                       <DispenseDetails
                         viewOnly
-                        values={dispense.entity}
+                        values={dispense.entity ? getDispenseEntity(codetable, clinicSettings, dispense.entity) : dispense.entity}
                         dispatch={this.props.dispatch}
                         onDrugLabelClick={this.handleDrugLabelClick}
                         showDrugLabelSelection={
