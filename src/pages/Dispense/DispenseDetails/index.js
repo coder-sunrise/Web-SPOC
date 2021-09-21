@@ -122,7 +122,7 @@ const DispenseDetails = ({
   user,
 }) => {
   const {
-    dispenseItems,
+    dispenseItems = [],
     service,
     otherOrder,
     packageItem,
