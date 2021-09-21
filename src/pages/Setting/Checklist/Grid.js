@@ -5,15 +5,21 @@ import Edit from '@material-ui/icons/Edit'
 
 class Grid extends PureComponent {
   editRow = (row, e) => {
-    const { dispatch, settingChecklist } = this.props
-
-    const { list } = settingChecklist
+    const { dispatch } = this.props
     dispatch({
-      type: 'settingChecklist/updateState',
+      type: 'settingChecklist/queryOne',
       payload: {
-        showModal: true,
-        entity: list.find(o => o.id === row.id),
+        id: row.id,
       },
+    }).then((v) => {
+      if (v) {
+        dispatch({
+          type: 'settingChecklist/updateState',
+          payload: {
+            showModal: true,
+          },
+        })
+      }
     })
   }
 
@@ -31,7 +37,10 @@ class Grid extends PureComponent {
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
           { name: 'description', title: 'Description' },
-          { name: 'checklistCategoryDisplayValue', title: 'Checklist Category' },
+          {
+            name: 'checklistCategoryDisplayValue',
+            title: 'Checklist Category',
+          },
           { name: 'sortOrder', title: 'Sort Order' },
           { name: 'isActive', title: 'Status' },
           {
@@ -49,6 +58,10 @@ class Grid extends PureComponent {
             options: status,
           },
           { columnName: 'sortOrder', width: 110 },
+          {
+            columnName: 'checklistCategoryDisplayValue',
+            sortingEnabled: false,
+          },
           {
             columnName: 'action',
             align: 'center',

@@ -59,7 +59,7 @@ export default ({ classes, current, fieldName = '' }) => {
                       className={classes.rightIcon}
                       style={{
                         right: -30,
-                        borderRadius: 10,
+                        borderRadius: 4,
                         backgroundColor: '#4255bd',
                       }}
                     >
