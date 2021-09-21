@@ -4,7 +4,7 @@ import { connect } from 'dva'
 import _ from 'lodash'
 import moment from 'moment'
 import { Drawer } from 'antd'
-import { Hidden, Paper } from '@material-ui/core'
+import { Paper } from '@material-ui/core'
 import { headerHeight } from 'mui-pro-jss'
 import Warning from '@material-ui/icons/Error'
 import Edit from '@material-ui/icons/Edit'
@@ -125,7 +125,7 @@ class Banner extends PureComponent {
     return (
       entity &&
       entity.isActive && (
-        <span style={{ marginTop: 5 }}>{allergyData || '-'}</span>
+        <span style={{ marginTop: 5 }}>{allergyData || ''}</span>
       )
     )
   }
@@ -980,7 +980,7 @@ class Banner extends PureComponent {
                       className={classes.contents}
                       style={{ WebkitLineClamp: 1 }}
                     >
-                      {info.patientRequest || '-'}
+                      {info.patientRequest || ''}
                     </span>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
@@ -988,7 +988,7 @@ class Banner extends PureComponent {
                     <span className={classes.contents} style={{WebkitLineClamp: 1}}>
                       {info.patientTag.length > 0
                         ? info.patientTag.map(t => t.tagName).join(', ')
-                        : '-'}
+                        : ''}
                     </span>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
@@ -1037,14 +1037,14 @@ class Banner extends PureComponent {
                   <GridItem xs={6} md={4} className={classes.cell}>
                     <span className={classes.header}>Non-Claimable Info: </span>
                     <span className={classes.contents}>
-                      {info.nonClaimableInfo || '-'}
+                      {info.nonClaimableInfo || ''}
                     </span>
                   </GridItem>
 
                   <GridItem xs={6} md={4} className={classes.cell}>
                     <span className={classes.header}>Payment Info: </span>
                     <span className={classes.contents}>
-                      {info.paymentInfo || '-'}
+                      {info.paymentInfo || ''}
                     </span>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
@@ -1056,7 +1056,7 @@ class Banner extends PureComponent {
                         ? info.patientHistoryDiagnosis
                             .map(d => d.diagnosisDescription)
                             .join(', ')
-                        : '-'}
+                        : ''}
                     </span>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
@@ -1064,7 +1064,7 @@ class Banner extends PureComponent {
                       Long Term Medication:{' '}
                     </span>
                     <span className={classes.contents}>
-                      {info.patientMedicalHistory?.longTermMedication || '-'}
+                      {info.patientMedicalHistory?.longTermMedication || ''}
                     </span>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
