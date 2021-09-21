@@ -6,7 +6,7 @@ import { RadiologyWorkitemStatus } from '@/utils/constants'
 import _ from 'lodash'
 import { CommonModal } from '@/components'
 import RadiologyDetails from './Details'
-import { Worklist, WorklistFilter } from '../Components'
+import { Worklist, WorklistFilter, StatusPanel } from '../Components'
 import WorklistContext, { WorklistContextProvider } from './WorklistContext'
 
 const columnsTemplate = [
@@ -22,7 +22,7 @@ const columnsTemplate = [
   },
   {
     backgroundColor: '#099',
-    title: 'Pending Report',
+    title: 'Modality Completed',
     workitems: [],
   },
   { backgroundColor: '#366', title: 'Completed', workitems: [] },
@@ -33,8 +33,7 @@ const columnsTemplate = [
   },
 ]
 
-
-const RadiologyWorklist = (props) => {
+const RadiologyWorklist = props => {
   const dispatch = useDispatch()
   const [columns, setColumns] = useState([])
   const entity = useSelector(s => s.radiologyWorklist)
@@ -67,7 +66,12 @@ const RadiologyWorklist = (props) => {
         height: '100%',
       }}
       gutter={[16, 16]}
-      title={<WorklistFilter />}
+      title={
+        <div style={{ display: 'flex', alignItems: 'end' }}>
+          <WorklistFilter />
+          <StatusPanel />
+        </div>
+      }
     >
       <Worklist columns={columns} />
       <RadiologyDetails {...props} />

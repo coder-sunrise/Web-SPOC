@@ -144,18 +144,17 @@ class Checklist extends React.Component {
       }
       output += `<br />`
     })
-    // console.log('output', output)
-    this.insertIntoEditor(output)
-  }
 
-  insertIntoEditor = formatted => {
-    const { editorRef } = this.props
-    const { editorState } = editorRef.props
-    editorRef.update(RichEditor.insertHtml(editorState, formatted))
+    this.props.onChecklistConfirm(output)
   }
 
   render() {
-    const { classes, settingChecklist, editorRef } = this.props
+    const {
+      classes,
+      settingChecklist,
+      onChecklistConfirm,
+      buttonStyle,
+    } = this.props
     return (
       <React.Fragment>
         <Popover
@@ -186,7 +185,9 @@ class Checklist extends React.Component {
             </div>
           }
         >
-          <Button color='info'>Checklist</Button>
+          <Button style={buttonStyle} size='sm' color='info'>
+            Checklist
+          </Button>
         </Popover>
         <ChecklistModal
           open={this.state.openModal}
