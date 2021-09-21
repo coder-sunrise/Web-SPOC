@@ -165,27 +165,33 @@ export default compose(
         ? consumableDetail.entity
         : consumableDetail.default
 
-      let chas = []
-      const { isChasAcuteClaimable, isChasChronicClaimable, isOnlyClinicInternalUsage, isDispensedByPharmacy, isNurseActualizable } = returnValue
+      let optionGrp = []
+      const {
+        isChasAcuteClaimable,
+        isChasChronicClaimable,
+        isOnlyClinicInternalUsage,
+        isDispensedByPharmacy,
+        isNurseActualizable,
+      } = returnValue
       if (isChasAcuteClaimable) {
-        chas.push('isChasAcuteClaimable')
+        optionGrp.push('isChasAcuteClaimable')
       }
       if (isChasChronicClaimable) {
-        chas.push('isChasChronicClaimable')
+        optionGrp.push('isChasChronicClaimable')
       }
       if (isOnlyClinicInternalUsage) {
-        chas.push('isOnlyClinicInternalUsage')
+        optionGrp.push('isOnlyClinicInternalUsage')
       }
       if (isDispensedByPharmacy) {
-        chas.push('isDispensedByPharmacy')
+        optionGrp.push('isDispensedByPharmacy')
       }
       if (isNurseActualizable) {
-        chas.push('isNurseActualizable')
+        optionGrp.push('isNurseActualizable')
       }
 
       return {
         ...returnValue,
-        chas,
+        chas: optionGrp,
       }
     },
     validationSchema: Yup.object().shape({
@@ -246,30 +252,31 @@ export default compose(
           },
         ]
       }
-      let chas = {
+      let optionGrp = {
         isChasAcuteClaimable: false,
         isChasChronicClaimable: false,
         isDispensedByPharmacy: false,
         isNurseActualizable: false,
+        isOnlyClinicInternalUsage: false,
       }
       values.chas.forEach(o => {
         if (o === 'isChasAcuteClaimable') {
-          chas[o] = true
+          optionGrp[o] = true
         } else if (o === 'isChasChronicClaimable') {
-          chas[o] = true
-        }
-        else if (o === 'isDispensedByPharmacy') {
-          chas[o] = true
-        }
-        else if (o === 'isNurseActualizable') {
-          chas[o] = true
+          optionGrp[o] = true
+        } else if (o === 'isDispensedByPharmacy') {
+          optionGrp[o] = true
+        } else if (o === 'isNurseActualizable') {
+          optionGrp[o] = true
+        } else if (o === 'isOnlyClinicInternalUsage') {
+          optionGrp[o] = true
         }
       })
       dispatch({
         type: 'consumableDetail/upsert',
         payload: {
           ...restValues,
-          ...chas,
+          ...optionGrp,
           id,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],
