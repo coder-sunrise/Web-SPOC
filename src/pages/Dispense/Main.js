@@ -56,7 +56,7 @@ const calculateInvoiceAmounts = entity => {
 }
 
 const reloadDispense = (props, effect = 'query') => {
-  const { dispatch, dispense, resetForm, codetable } = props
+  const { dispatch, dispense, resetForm, codetable, clinicSettings } = props
 
   dispatch({
     type: `dispense/${effect}`,
@@ -64,7 +64,7 @@ const reloadDispense = (props, effect = 'query') => {
   }).then(response => {
     if (response) {
       let obj = { ...response }
-      const orderItems = getDispenseItems(codetable, obj)
+      const orderItems = getDispenseItems(codetable, clinicSettings, obj)
       const defaultExpandedGroups = _.uniqBy(orderItems, 'dispenseGroupId').map(
         o => o.dispenseGroupId,
       )
