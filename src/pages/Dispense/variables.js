@@ -926,7 +926,7 @@ export const OtherOrdersColumnExtensions = (
       render: r => {
         const { type } = r
 
-        if (type === 'Service' || type === 'Consumable' || type === 'Treatment')
+        if (['Service','Consumable','Treatment','Radiology','Lab'].includes(type))
           return actualizationButton(r, onActualizeBtnClick)
         return (
           <Tooltip title='Print'>
