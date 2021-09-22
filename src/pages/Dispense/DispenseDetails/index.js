@@ -435,14 +435,14 @@ const DispenseDetails = ({
     const { row, children, tableRow } = p
     let newchildren = []
 
-    const firstPoint = isShowDispenseActualie ? 7 : 6
-    const secondPoint = isShowDispenseActualie ? 12 : 11
-    const batchColumns = children.slice(firstPoint, secondPoint)
+    const startColIndex = isShowDispenseActualie ? 7 : 6
+    const endColIndex = isShowDispenseActualie ? 12 : 11
+    const batchColumns = children.slice(startColIndex, endColIndex)
 
     if (row.countNumber === 1) {
       newchildren.push(
         children
-          .filter((value, index) => index < firstPoint)
+          .filter((value, index) => index < startColIndex)
           .map(item => ({
             ...item,
             props: {
@@ -456,7 +456,7 @@ const DispenseDetails = ({
 
       newchildren.push(
         children
-          .filter((value, index) => index > secondPoint - 1)
+          .filter((value, index) => index > endColIndex - 1)
           .map(item => ({
             ...item,
             props: {
