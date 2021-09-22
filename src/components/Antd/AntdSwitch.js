@@ -26,7 +26,6 @@ const STYLES = () => {
         '&::before': {
           borderRadius: 3,
           right: 2,
-          height: 16,
         },
       },
     },
