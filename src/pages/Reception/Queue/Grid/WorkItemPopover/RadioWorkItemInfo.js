@@ -124,7 +124,7 @@ const RadioWorkItemInfo = ({ values = {} }) => {
             </td>
           </tr>
           <td>
-            <div style={{ height: '250px', overflow: 'auto' }}>
+            <div style={{ maxHeight: '250px', overflow: 'auto' }}>
               <table>{radioWorkItemDetails(sortedWorkItem.sort((a,b) => b.prior - a.prior))}</table>
             </div>
           </td>
