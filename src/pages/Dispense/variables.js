@@ -13,7 +13,6 @@ import {
   Tooltip,
   Checkbox,
   Select,
-  Icon,
 } from '@/components'
 import LowStockInfo from '@/pages/Widgets/Orders/Detail/LowStockInfo'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
@@ -140,7 +139,7 @@ const actualizationButton = (row, buttonClickCallback) => {
                 buttonClickCallback(row, NURSE_WORKITEM_STATUS.NEW)
               }
             >
-              <span style={{fontSize:10,lineHeight:'14px'}}>TD</span>
+              <span style={{fontSize:12,lineHeight:'17px'}}>TD</span>
             </Button>
           </Tooltip>
         </Authorized>
