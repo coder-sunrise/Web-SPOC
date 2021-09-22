@@ -118,7 +118,7 @@ const PharmacyWorklist = () => {
         })
       const mapped = columnsTemplate.map(item => {
         let filterItems = worklist.filter(w => w.status === item.title)
-        if (item.title === 'Completed') {
+        if (item.title !== 'New') {
           filterItems = _.orderBy(filterItems,
             ['paymentDate', 'updateDate'],
             ['asc', 'desc'])
