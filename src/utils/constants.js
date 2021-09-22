@@ -377,8 +377,7 @@ export const PharmacyWorkitemStatus = {
   1: 'New',
   2: 'Prepared',
   3: 'Verified',
-  4: 'Dispensed',
-  5: 'Completed',
+  4: 'Completed',
 }
 
 export const VISIT_TYPE = {
@@ -732,7 +731,7 @@ export const PHARMACY_STATUS = {
   NEW: 1,
   PREPARED: 2,
   VERIFIED: 3,
-  DISPENSED: 4,
+  COMPLETED: 4,
 }
 
 export const PHARMACY_ACTION = {

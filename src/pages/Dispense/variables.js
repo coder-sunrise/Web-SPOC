@@ -516,12 +516,19 @@ export const DispenseItemsColumnExtensions = (
           <FastField
             name={`dispenseItems[${row.rowIndex}]dispenseQuantity`}
             render={args => {
+              let maxQuantity
+              if (row.isDefault || row.isDispensedByPharmacy) {
+                maxQuantity = row.quantity
+              }
+              else {
+                maxQuantity = row.quantity > row.stock ? row.stock : row.quantity
+              }
               return (
                 <NumberInput
                   label=''
                   step={1}
                   format='0.0'
-                  max={(row.isDefault || row.isDispensedByPharmacy) ? undefined : row.stock}
+                  max={maxQuantity}
                   min={0}
                   disabled={row.isDispensedByPharmacy}
                   precision={1}

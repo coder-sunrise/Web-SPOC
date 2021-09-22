@@ -469,11 +469,6 @@ const DispenseDetails = ({
       newchildren.push(batchColumns)
     }
 
-    const selectedData = {
-      ...tableRow.row,
-      doctor: null,
-    }
-
     if (row.countNumber === 1) {
       return <Table.Row {...p}>{newchildren}</Table.Row>
     }

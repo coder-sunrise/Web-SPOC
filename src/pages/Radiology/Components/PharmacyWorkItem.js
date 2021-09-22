@@ -146,12 +146,12 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
     const visitGroupRow = p => {
       const { row, children, tableRow } = p
       let newchildren = []
-      const middleColumns = children.slice(2, 4)
+      const middleColumns = children.slice(0, 1)
 
       if (row.countNumber === 1) {
         newchildren.push(
           children
-            .filter((value, index) => index < 2)
+            .filter((value, index) => index < 0)
             .map(item => ({
               ...item,
               props: {
@@ -165,7 +165,7 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
 
         newchildren.push(
           children
-            .filter((value, index) => index > 4)
+            .filter((value, index) => index > 0)
             .map(item => ({
               ...item,
               props: {
@@ -176,11 +176,6 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
         )
       } else {
         newchildren.push(middleColumns)
-      }
-
-      const selectedData = {
-        ...tableRow.row,
-        doctor: null,
       }
 
       if (row.countNumber === 1) {
@@ -233,7 +228,7 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
             sortingEnabled: false,
           },
         ]}
-        TableProps={{ rowComponent: visitGroupRow }}
+        //TableProps={{ rowComponent: visitGroupRow }}
       />
     )
   }

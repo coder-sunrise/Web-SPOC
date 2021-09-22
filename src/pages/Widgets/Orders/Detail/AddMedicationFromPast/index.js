@@ -268,8 +268,8 @@ class PastMedication extends PureComponent {
                 precautionIndex += 1
                 return {
                   medicationPrecautionFK: o.medicationPrecautionFK,
-                  precaution: o.medicationPrecaution.name,
-                  precautionCode: o.medicationPrecaution.code,
+                  precaution: o.medicationPrecautionName,
+                  precautionCode: o.medicationPrecautionCode,
                   sequence: currentPrecautionSequence,
                   isDeleted: false,
                 }
