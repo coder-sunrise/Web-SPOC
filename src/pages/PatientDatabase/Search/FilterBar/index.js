@@ -108,7 +108,7 @@ class FilterBar extends PureComponent {
                           searchValue: search,
                           dob: dob,
                           includeinactive: window.location.pathname.includes(
-                            'patientdb',
+                            'patient',
                           ),
                         },
                       },

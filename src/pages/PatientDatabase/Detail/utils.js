@@ -46,7 +46,7 @@ const upsertPatient = async ({
   }
 
   const shouldCloseForm = location.pathname
-    ? !location.pathname.includes('patientdb')
+    ? !location.pathname.includes('patient')
     : false
 
   const response = await dispatch({
@@ -74,7 +74,7 @@ const upsertPatient = async ({
   dispatch({
     type: 'patient/updateState',
     payload: {
-      shouldQueryOnClose: location.pathname.includes('patientdb'),
+      shouldQueryOnClose: location.pathname.includes('patient'),
     },
   })
 

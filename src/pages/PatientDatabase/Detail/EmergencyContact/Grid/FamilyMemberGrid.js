@@ -40,7 +40,7 @@ class FamilyMemberGrid extends PureComponent {
             md: 'pt',
             cmt: 1,
             pid: row.familyMemberFK,
-          },'/patientdb')
+          },'/patient')
           let closeThenReload=()=>{
             setTimeout(() => {
               this.props.dispatch({

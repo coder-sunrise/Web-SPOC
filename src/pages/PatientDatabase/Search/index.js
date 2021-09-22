@@ -74,7 +74,7 @@ class PatientSearch extends PureComponent {
         type: 'patientSearch/query',
         payload: {
           apiCriteria: {
-            includeinactive: window.location.pathname.includes('patientdb'),
+            includeinactive: window.location.pathname.includes('patient'),
           },
           sorting: [
             { columnName: 'name', direction: 'asc' },
