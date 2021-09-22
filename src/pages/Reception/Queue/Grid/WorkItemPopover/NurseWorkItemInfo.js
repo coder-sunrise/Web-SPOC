@@ -132,7 +132,7 @@ const NurseWorkItemInfo = ({ values = {} }) => {
         >
           <FileDoneOutlined />
         </IconButton>
-        {completedWorkItemCount > 1 && <span style={dotStyle}>{completedWorkItemCount}</span>}
+        {completedWorkItemCount >= 1 && <span style={dotStyle}>{completedWorkItemCount}</span>}
         {completedWorkItemCount < 1 && (
           <div
             style={{

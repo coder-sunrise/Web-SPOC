@@ -145,7 +145,7 @@ const RadioWorkItemInfo = ({ values = {} }) => {
         >
           <IconFont type='icon-radiology' />
         </IconButton>
-        {completedWorkItemCount > 1 && (
+        {completedWorkItemCount >= 1 && (
           <span style={dotStyle}>{completedWorkItemCount}</span>
         )}
         {completedWorkItemCount < 1 && (
