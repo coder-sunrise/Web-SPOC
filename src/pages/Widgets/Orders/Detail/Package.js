@@ -176,8 +176,8 @@ import { CollectionsOutlined } from '@material-ui/icons'
         currentMedicationPrecautions = currentMedicationPrecautions.concat(
           medicationPrecautions.map((o) => {
             return {
-              precautionCode: o.medicationPrecaution.code,
-              Precaution: o.medicationPrecaution.name,
+              precautionCode: o.medicationPrecautionCode,
+              Precaution: o.medicationPrecautionName,
               sequence: o.sequence,
               medicationPrecautionFK: o.medicationPrecautionFK,
             }

@@ -557,7 +557,7 @@ class Detail extends PureComponent {
       hiddenFields.push('isRequiredSpecifyPanelItem')
     }
 
-    if (!isEnableNurseWorkItem) hiddenFields.push('actualizedByNurse')
+    if (!isEnableNurseWorkItem) hiddenFields.push('isNurseActualizable')
 
     return hiddenFields
   }
@@ -787,10 +787,10 @@ class Detail extends PureComponent {
                         }}
                       />
                     </GridItem>
-                    {!hiddenFields.includes('actualizedByNurse') && (
+                    {!hiddenFields.includes('isNurseActualizable') && (
                       <GridItem xs={4}>
                         <Field
-                          name='actualizedByNurse'
+                          name='isNurseActualizable'
                           render={args => {
                             return (
                               <Switch label='Actualized by Nurse' {...args} />

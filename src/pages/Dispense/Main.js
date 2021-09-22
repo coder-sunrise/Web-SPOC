@@ -623,7 +623,7 @@ const validDispense = (dispenseItems = []) => {
       const matchInventoryItems = dispenseItems.filter(d => d.type === dispensedItems[index].type && d.stockFK === dispensedItems[index].stockFK)
       if (dispensedItems[index].stock < _.sumBy(matchInventoryItems, 'dispenseQuantity')) {
         notification.error({
-          message: 'Dispense quantity more than total stock.',
+          message: 'Dispense quantity cannot be more than total stock.',
         })
         isValid = false
         break

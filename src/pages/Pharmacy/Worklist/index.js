@@ -32,7 +32,7 @@ const columnsTemplate = [
   },
   {
     backgroundColor: '#366',
-    title: 'Dispensed',
+    title: 'Completed',
     workitems: [],
   },
 ]
@@ -70,7 +70,7 @@ const PharmacyWorklist = () => {
               .filter(
                 l =>
                   l.visitGroup === w.visitGroup &&
-                  l.patientProfileFK !== w.patientProfileFK,
+                  l.id !== w.id,
               )
               .map(l => {
                 const age = l.dob ? calculateAgeFromDOB(l.dob) : 0
@@ -110,17 +110,29 @@ const PharmacyWorklist = () => {
               gv.rowSpan = 0
             }
           })
-
           return {
             ...w,
             status: PharmacyWorkitemStatus[w.statusFK],
             groupVisit,
           }
         })
-      const mapped = columnsTemplate.map(item => ({
-        ...item,
-        workitems: worklist.filter(w => w.status === item.title),
-      }))
+      const mapped = columnsTemplate.map(item => {
+        let filterItems = worklist.filter(w => w.status === item.title)
+        if (item.title === 'Completed') {
+          filterItems = _.orderBy(filterItems,
+            ['paymentDate', 'updateDate'],
+            ['asc', 'desc'])
+        }
+        else {
+          filterItems = _.orderBy(filterItems,
+            ['paymentDate', 'generateDate'],
+            ['asc'])
+        }
+        return {
+          ...item,
+          workitems: filterItems,
+        }
+      })
 
       setColumns(mapped)
     }
@@ -198,7 +210,7 @@ const PharmacyWorklist = () => {
               width: 26,
               height: 26,
             }}
-            onClick={event => {}}
+            onClick={event => { }}
           >
             history
           </span>

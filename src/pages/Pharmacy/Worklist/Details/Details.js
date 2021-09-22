@@ -364,13 +364,14 @@ const Details = props => {
     const { classes } = props
     const { row, children, tableRow } = p
     let newchildren = []
-
-    const batchColumns = children.slice(6, 11)
+    const firstPoint = workitem.statusFK !== PHARMACY_STATUS.NEW ? 5 : 6
+    const secondPoint = workitem.statusFK !== PHARMACY_STATUS.NEW ? 10 : 11
+    const batchColumns = children.slice(firstPoint, secondPoint)
 
     if (row.countNumber === 1) {
       newchildren.push(
         children
-          .filter((value, index) => index < 6)
+          .filter((value, index) => index < firstPoint)
           .map(item => ({
             ...item,
             props: {
@@ -384,7 +385,7 @@ const Details = props => {
 
       newchildren.push(
         children
-          .filter((value, index) => index > 10)
+          .filter((value, index) => index > secondPoint - 1)
           .map(item => ({
             ...item,
             props: {
@@ -395,11 +396,6 @@ const Details = props => {
       )
     } else {
       newchildren.push(batchColumns)
-    }
-
-    const selectedData = {
-      ...tableRow.row,
-      doctor: null,
     }
 
     if (row.countNumber === 1) {
@@ -505,13 +501,13 @@ const Details = props => {
     }
     if (checkOverDispense()) {
       notification.error({
-        message: 'Dispense quantity more than ordered quantity',
+        message: 'Dispense quantity cannot be more than Ordered quantity',
       })
       return
     }
     if (checkOverStock()) {
       notification.error({
-        message: 'Dispense quantity more than total stock.',
+        message: 'Dispense quantity cannot be more than total stock.',
       })
       return
     }
@@ -549,8 +545,8 @@ const Details = props => {
     workitem.isPharmacyOrderDiscard ||
     workitem.isOrderUpdate
   const updateMessage = `${workitem.updateByUserTitle && workitem.updateByUserTitle.trim().length
-      ? `${workitem.updateByUserTitle}. ${workitem.updateByUser || ''}`
-      : `${workitem.updateByUser || ''}`
+    ? `${workitem.updateByUserTitle}. ${workitem.updateByUser || ''}`
+    : `${workitem.updateByUser || ''}`
     } amended prescription at ${moment(workitem.updateDate).format('HH:mm')}`
 
   const currentMessage =
@@ -576,10 +572,77 @@ const Details = props => {
   const visitType = (visitTypeSettingsObj || []).find(
     type => type.id === workitem.visitPurposeFK,
   )
+  const showButton = (authority) => {
+    const accessRight = Authorized.check(authority) || { rights: 'hidden' }
+    return accessRight.rights === 'enable'
+  }
+
+  let columns = [
+    { name: 'dispenseGroupId', title: '' },
+    { name: 'invoiceItemTypeFK', title: 'Type' },
+    { name: 'itemCode', title: 'Code' },
+    { name: 'itemName', title: 'Name' },
+    { name: 'dispenseUOM', title: 'UOM' },
+    {
+      name: 'quantity',
+      title: (
+        <div>
+          <p style={{ height: 16 }}>Ordered</p>
+          <p style={{ height: 16 }}>Qty.</p>
+        </div>
+      ),
+    },
+    {
+      name: 'dispenseQuantity',
+      title: (
+        <div>
+          <p style={{ height: 16 }}>Dispensed</p>
+          <p style={{ height: 16 }}>Qty.</p>
+        </div>
+      ),
+    },
+    {
+      name: 'stock',
+      title: 'Stock Qty.',
+    },
+    {
+      name: 'stockBalance',
+      title: 'Balance Qty.',
+    },
+    { name: 'batchNo', title: 'Batch No.' },
+    { name: 'expiryDate', title: 'Expiry Date' },
+    {
+      name: 'instruction',
+      title: `Instruction${secondaryPrintoutLanguage !== ''
+        ? `(${showLanguage})`
+        : ''
+        }`,
+    },
+    {
+      name: 'drugInteraction',
+      title: `Drug Interaction${secondaryPrintoutLanguage !== ''
+        ? `(${showLanguage})`
+        : ''
+        }`,
+    },
+    {
+      name: 'drugContraindication',
+      title: `Contraindication${secondaryPrintoutLanguage !== ''
+        ? `(${showLanguage})`
+        : ''
+        }`,
+    },
+    { name: 'remarks', title: 'Remarks' },
+    //{ name: 'action', title: 'Action' },
+  ]
+
+  if (workitem.statusFK !== PHARMACY_STATUS.NEW) {
+    columns = columns.filter(c => c.name !== 'stock')
+  }
   return (
     <div style={{ marginTop: -20 }}>
       <div className={classes.contentPanel}>
-        <div style={{ padding: 8}}>
+        <div style={{ padding: 8 }}>
           <Banner from='Pharmacy' patientInfo={patient} />
         </div>
         <div style={{ marginTop: 16 }}>
@@ -597,7 +660,7 @@ const Details = props => {
             <ContentGridItem title='Diagnosis:'>
               {corDiagnosis.length
                 ? workitem.corDiagnosis
-                  .map(d => d.diagnosisDescription)
+                  .map(d => d.icD10DiagnosisDescription)
                   .join(', ')
                 : '-'}
             </ContentGridItem>
@@ -606,8 +669,8 @@ const Details = props => {
             </ContentGridItem>
             <ContentGridItem title='Order By:'>{`${workitem.generateByUserTitle &&
               workitem.generateByUserTitle.trim().length
-                ? `${workitem.generateByUserTitle}. `
-                : ''
+              ? `${workitem.generateByUserTitle}. `
+              : ''
               }${workitem.generateByUser || ''}`}</ContentGridItem>
             <ContentGridItem title='Order Created Time:'>
               {moment(workitem.generateDate).format('HH:mm, DD MMM YYYY')}
@@ -753,64 +816,7 @@ const Details = props => {
                 }}
                 rows={props.values.orderItems || []}
                 getRowId={r => r.uid}
-                columns={[
-                  { name: 'dispenseGroupId', title: '' },
-                  { name: 'invoiceItemTypeFK', title: 'Type' },
-                  { name: 'itemCode', title: 'Code' },
-                  { name: 'itemName', title: 'Name' },
-                  { name: 'dispenseUOM', title: 'UOM' },
-                  {
-                    name: 'quantity',
-                    title: (
-                      <div>
-                        <p style={{ height: 16 }}>Ordered</p>
-                        <p style={{ height: 16 }}>Qty.</p>
-                      </div>
-                    ),
-                  },
-                  {
-                    name: 'dispenseQuantity',
-                    title: (
-                      <div>
-                        <p style={{ height: 16 }}>Dispensed</p>
-                        <p style={{ height: 16 }}>Qty.</p>
-                      </div>
-                    ),
-                  },
-                  {
-                    name: 'stock',
-                    title: 'Stock Qty.',
-                  },
-                  {
-                    name: 'stockBalance',
-                    title: 'Balance Qty.',
-                  },
-                  { name: 'batchNo', title: 'Batch No.' },
-                  { name: 'expiryDate', title: 'Expiry Date' },
-                  {
-                    name: 'instruction',
-                    title: `Instruction${secondaryPrintoutLanguage !== ''
-                        ? `(${showLanguage})`
-                        : ''
-                      }`,
-                  },
-                  {
-                    name: 'drugInteraction',
-                    title: `Drug Interaction${secondaryPrintoutLanguage !== ''
-                        ? `(${showLanguage})`
-                        : ''
-                      }`,
-                  },
-                  {
-                    name: 'drugContraindication',
-                    title: `Contraindication${secondaryPrintoutLanguage !== ''
-                        ? `(${showLanguage})`
-                        : ''
-                      }`,
-                  },
-                  { name: 'remarks', title: 'Remarks' },
-                  //{ name: 'action', title: 'Action' },
-                ]}
+                columns={columns}
                 columnExtensions={[
                   {
                     columnName: 'invoiceItemTypeFK',
@@ -916,12 +922,19 @@ const Details = props => {
                         <FastField
                           name={`orderItems[${row.rowIndex}]dispenseQuantity`}
                           render={args => {
+                            let maxQuantity
+                            if (row.isDefault) {
+                              maxQuantity = row.quantity
+                            }
+                            else {
+                              maxQuantity = row.quantity > row.stock ? row.stock : row.quantity
+                            }
                             return (
                               <NumberInput
                                 label=''
                                 step={1}
                                 format='0.0'
-                                max={row.isDefault ? undefined : row.stock}
+                                max={maxQuantity}
                                 min={0}
                                 disabled={!row.isDispensedByPharmacy}
                                 precision={1}
@@ -1200,8 +1213,8 @@ const Details = props => {
               ? 'Cancel'
               : 'Close'}
           </Button>
-          {workitem.statusFK === PHARMACY_STATUS.NEW && (
-            <Authorized authority={'pharmacyworklist.editorder'}>
+          {workitem.statusFK === PHARMACY_STATUS.NEW &&
+            showButton('pharmacyworklist.editorder') && (
               <Button
                 color='success'
                 size='sm'
@@ -1211,11 +1224,10 @@ const Details = props => {
                 {workitem.visitPurposeFK == VISIT_TYPE.OTC
                   ? 'Add Order'
                   : 'Edit Order'}
-              </Button>
-            </Authorized>
-          )}
-          {workitem.statusFK !== PHARMACY_STATUS.NEW && (
-            <Authorized authority={'pharmacyworklist.redispenseorder'}>
+            </Button>
+            )}
+          {workitem.statusFK !== PHARMACY_STATUS.NEW &&
+            showButton('pharmacyworklist.redispenseorder') && (
               <Button
                 color='primary'
                 size='sm'
@@ -1227,11 +1239,10 @@ const Details = props => {
                 }
               >
                 Re-dispense
-              </Button>
-            </Authorized>
-          )}
-          {workitem.statusFK === PHARMACY_STATUS.NEW && (
-            <Authorized authority={'pharmacyworklist.prepareorder'}>
+            </Button>
+            )}
+          {workitem.statusFK === PHARMACY_STATUS.NEW &&
+            showButton('pharmacyworklist.prepareorder') && (
               <Button
                 color='primary'
                 size='sm'
@@ -1239,11 +1250,10 @@ const Details = props => {
                 disabled={isOrderUpdate || !pharmacyOrderItemCount}
               >
                 Prepare
-              </Button>
-            </Authorized>
+            </Button>
           )}
-          {workitem.statusFK === PHARMACY_STATUS.PREPARED && (
-            <Authorized authority={'pharmacyworklist.verifyorder'}>
+          {workitem.statusFK === PHARMACY_STATUS.PREPARED &&
+            showButton('pharmacyworklist.verifyorder') && (
               <Button
                 color='primary'
                 size='sm'
@@ -1251,11 +1261,10 @@ const Details = props => {
                 disabled={isOrderUpdate || !pharmacyOrderItemCount}
               >
                 Verify
-              </Button>
-            </Authorized>
+            </Button>
           )}
-          {workitem.statusFK === PHARMACY_STATUS.VERIFIED && (
-            <Authorized authority={'pharmacyworklist.dispenseorder'}>
+          {workitem.statusFK === PHARMACY_STATUS.VERIFIED &&
+            showButton('pharmacyworklist.dispenseorder') && (
               <Button
                 color='primary'
                 size='sm'
@@ -1263,8 +1272,7 @@ const Details = props => {
                 disabled={isOrderUpdate || !pharmacyOrderItemCount}
               >
                 Complete
-              </Button>
-            </Authorized>
+            </Button>
           )}
         </GridItem>
       </GridContainer>

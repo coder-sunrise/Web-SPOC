@@ -219,8 +219,6 @@ class PrescriptionSetList extends PureComponent {
                   )
                 : ''
 
-            let itemExpiryDate
-            let itemBatchNo
             let itemCostPrice
             let itemUnitPrice
             let itemDispenseUOMCode
@@ -242,9 +240,6 @@ class PrescriptionSetList extends PureComponent {
               let drug = inventorymedication.find(
                 medication => medication.id === item.inventoryMedicationFK,
               )
-              let defaultBatch = drug.medicationStock.find(
-                o => o.isDefault === true,
-              )
 
               let precautionIndex = 0
               if (
@@ -257,8 +252,8 @@ class PrescriptionSetList extends PureComponent {
                     precautionIndex += 1
                     return {
                       medicationPrecautionFK: o.medicationPrecautionFK,
-                      precaution: o.medicationPrecaution.name,
-                      precautionCode: o.medicationPrecaution.code,
+                      precaution: o.medicationPrecautionName,
+                      precautionCode: o.medicationPrecautionCode,
                       sequence: currentPrecautionSequence,
                       isDeleted: false,
                     }
@@ -278,15 +273,6 @@ class PrescriptionSetList extends PureComponent {
               itemTotalPrice = item.isExternalPrescription
                 ? 0
                 : newTotalQuantity * drug.sellingPrice
-
-              itemExpiryDate =
-                !item.isExternalPrescription && defaultBatch
-                  ? defaultBatch.expiryDate
-                  : undefined
-              itemBatchNo =
-                !item.isExternalPrescription && defaultBatch
-                  ? defaultBatch.batchNo
-                  : undefined
 
               itemCostPrice = drug.averageCostPrice
               itemUnitPrice = drug.sellingPrice
@@ -322,8 +308,6 @@ class PrescriptionSetList extends PureComponent {
               isExclusive = drug.isExclusive
             } else if (item.isDrugMixture) {
               // Drug Mixture
-              itemExpiryDate = item.expiryDate
-              itemBatchNo = item.batchNo
               itemCostPrice = item.costPrice || 0
               itemUnitPrice = item.unitPrice || 0
               itemDispenseUOMCode = item.dispenseUOMCode
@@ -451,8 +435,6 @@ class PrescriptionSetList extends PureComponent {
               adjAmount: 0,
               adjType: 'ExactAmount',
               adjValue: 0,
-              expiryDate: itemExpiryDate,
-              batchNo: itemBatchNo,
               corPrescriptionItemInstruction: itemInstructions,
               corPrescriptionItemPrecaution: ItemPrecautions,
               corPrescriptionItemDrugMixture: itemCorPrescriptionItemDrugMixture,
