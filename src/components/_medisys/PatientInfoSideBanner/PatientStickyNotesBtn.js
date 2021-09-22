@@ -63,6 +63,10 @@ const styles = theme => ({
       fontSize:'14px',
     }
   },
+  iconFontStyle:{
+    fontSize: '0.7rem !important',
+    fontWeight: 500,
+  },
 })
 
 class PatientStickyNotesBtn extends Component {
@@ -624,13 +628,15 @@ class PatientStickyNotesBtn extends Component {
                     backgroundColor: 'red',
                     color: 'white',
                     position: 'absolute',
-                    fontSize: '11px !important',
+                    fontSize: '0.7rem !important',
                     borderRadius: 7,
                     height: 14,
                     right: 5,
                     top: 3,
                     padding:'0 2px',
+                    fontwidth:500,
                   }}
+                  className={this.props.classes.iconFontStyle}
                 >
                   {flaggedNoteCount}
                 </span>
