@@ -326,17 +326,12 @@ const DispenseDetails = ({
     )
   }
 
-  const [
-    selectedDispenseItemsRows,
-    setSelectedDispenseItemsRows,
-  ] = useState([])
   const [selectedServiceRows, setSelectedServiceRows] = useState([])
   const [selectedActualizeRows, setSelectedActualizeRows] = useState([])
   const [showActualization, setShowActualization] = useState(false)
   const [actualizationStatus, setActualizationStatus] = useState(-1)
 
   const handleReloadClick = () => {
-    setSelectedDispenseItemsRows([])
     setSelectedServiceRows([])
     setSelectedActualizeRows([])
     setShowActualization(false)
@@ -356,9 +351,6 @@ const DispenseDetails = ({
 
   const handleSelectionChange = (type, value) => {
     switch (type) {
-      case 'DispenseItems':
-        setSelectedDispenseItemsRows(value)
-        break
       case 'Service':
         setSelectedServiceRows(value)
         break
