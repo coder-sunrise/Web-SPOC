@@ -45,6 +45,7 @@ const styles = theme => ({
         top: 'unset !important',
         position: 'unset !important',
         marginBottom: 'unset !important',
+        minHeight:48,
       },
     },
   },
@@ -275,7 +276,7 @@ class PatientStickyNotesBtn extends Component {
               {isEditMode ? (
                 <OutlinedTextField
                   autoFocus
-                  rows='3'
+                  minRows={3}
                   multiline
                   defaultValue={note.notes}
                   onChange={e => {
