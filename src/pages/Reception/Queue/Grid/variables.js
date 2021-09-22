@@ -158,9 +158,16 @@ export const ApptColumnExtensions = [
   },
   {
     columnName: 'appointmentTime',
-    width: 180,
+    width: 150,
     type: 'date',
     showTime: true,
+    render: row => {
+      if (row.appointmentTime) {
+        return moment(row.appointmentTime).format('DD MMM YYYY HH:mm')
+      }
+      return '-'
+    },
+
   },
   {
     columnName: 'patientContactNo',
@@ -286,7 +293,7 @@ export const QueueColumnExtensions = [
   },
   {
     columnName: 'orderCreateTime',
-    width: 180,
+    width: 150,
     type: 'date',
     showTime: true,
     render: row => {
@@ -315,15 +322,27 @@ export const QueueColumnExtensions = [
   },
   {
     columnName: 'timeIn',
-    width: 180,
+    width: 150,
     type: 'date',
     showTime: true,
+    render: row => {
+      if (row.timeIn) {
+        return moment(row.timeIn).format('DD MMM YYYY HH:mm')
+      }
+      return '-'
+    },
   },
   {
     columnName: 'timeOut',
-    width: 180,
+    width: 150,
     type: 'date',
     showTime: true,
+    render: row => {
+      if (row.timeOut) {
+        return moment(row.timeOut).format('DD MMM YYYY HH:mm')
+      }
+      return '-'
+    },
   },
   {
     columnName: 'gender/age',
@@ -342,20 +361,14 @@ export const QueueColumnExtensions = [
   },
   {
     columnName: 'appointmentTime',
-    width: 180,
+    width: 150,
     type: 'date',
     showTime: true,
     // compare: compareTime,
     render: row => {
       if (row.appointmentTime) {
-        // const appointmentDate = moment(row.appointmentTime).format('MM DD YYYY')
-        const appointmentDate = moment(row.appointmentTime).format(
-          dateFormatLong,
-        )
-        return DateFormatter({
-          value: `${appointmentDate} ${row.appointmentResourceStartTime}`,
-          format: dateFormatLongWithTimeNoSec12h,
-        })
+        const appointmentDate = moment(row.appointmentTime).format('DD MMM YYYY')
+        return moment(`${appointmentDate} ${row.appointmentResourceStartTime}`).format('DD MMM YYYY HH:mm')
       }
       return '-'
     },
