@@ -420,7 +420,7 @@ class Radiology extends PureComponent {
 
     const { workitem = {}, isPreOrder } = editService
     const { radiologyWorkitem = {} } = workitem
-    const isStartedRadiology = !isPreOrder && [RADIOLOGY_WORKITEM_STATUS.INPROGRESS, RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT, RADIOLOGY_WORKITEM_STATUS.COMPLETED].indexOf(radiologyWorkitem.statusFK) >= 0
+    const isStartedRadiology = !isPreOrder && [RADIOLOGY_WORKITEM_STATUS.INPROGRESS, RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED, RADIOLOGY_WORKITEM_STATUS.COMPLETED].indexOf(radiologyWorkitem.statusFK) >= 0
 
     return (
       <Authorized

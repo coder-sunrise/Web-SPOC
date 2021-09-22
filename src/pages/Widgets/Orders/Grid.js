@@ -456,7 +456,7 @@ export default ({
       )
 
     if (
-      radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT ||
+      radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ||
       radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
       radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
     )
@@ -951,7 +951,7 @@ export default ({
                 if (
                   [
                     RADIOLOGY_WORKITEM_STATUS.INPROGRESS,
-                    RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT,
+                    RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED,
                     RADIOLOGY_WORKITEM_STATUS.COMPLETED,
                   ].indexOf(radiologyWorkitem.statusFK) >= 0
                 ) {
