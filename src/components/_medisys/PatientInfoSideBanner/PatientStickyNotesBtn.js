@@ -293,17 +293,17 @@ class PatientStickyNotesBtn extends Component {
                   }}
                 />
               ) : (
-                <span
+                <pre
                   style={{
-                    width: '100%',
-                    height: '100%',
                     fontSize: 14,
                     wordBreak: 'break-all',
+                    whiteSpace: 'pre-wrap',
                     color: textContentColor,
+                    margin:0,
                   }}
                 >
                   {note.notes}
-                </span>
+                </pre>
               )}
             </div>
           </GridItem>
@@ -400,7 +400,7 @@ class PatientStickyNotesBtn extends Component {
                 </div>
               ) : (
                 stickyNotesEditable && (
-                  <div>
+                  <div style={{height:25}}>
                     <Popper
                       open={isOpenDeleteItemConfirm}
                       placement='right-end'
