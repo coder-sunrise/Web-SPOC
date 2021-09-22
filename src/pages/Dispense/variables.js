@@ -139,7 +139,7 @@ const actualizationButton = (row, buttonClickCallback) => {
                 buttonClickCallback(row, NURSE_WORKITEM_STATUS.NEW)
               }
             >
-              <UnorderedListOutlined />
+              <span style={{fontSize:12,lineHeight:'17px'}}>TD</span>
             </Button>
           </Tooltip>
         </Authorized>
