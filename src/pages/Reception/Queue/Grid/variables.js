@@ -393,9 +393,6 @@ export const QueueColumnExtensions = [
 
       return (
         <div style={{ justifyContent: 'space-between' }}>
-          {labWorkItems && labWorkItems.length > 0 && (
-            <LabWorkItemInfo values={labWorkItems} />
-          )}
           {radioWorkItems && radioWorkItems.length > 0 && (
             <RadioWorkItemInfo values={radioWorkItems} />
           )}
