@@ -364,14 +364,14 @@ const Details = props => {
     const { classes } = props
     const { row, children, tableRow } = p
     let newchildren = []
-    const firstPoint = workitem.statusFK !== PHARMACY_STATUS.NEW ? 5 : 6
-    const secondPoint = workitem.statusFK !== PHARMACY_STATUS.NEW ? 10 : 11
-    const batchColumns = children.slice(firstPoint, secondPoint)
+    const startColIndex = workitem.statusFK !== PHARMACY_STATUS.NEW ? 5 : 6
+    const endColIndex = workitem.statusFK !== PHARMACY_STATUS.NEW ? 10 : 11
+    const batchColumns = children.slice(startColIndex, endColIndex)
 
     if (row.countNumber === 1) {
       newchildren.push(
         children
-          .filter((value, index) => index < firstPoint)
+          .filter((value, index) => index < startColIndex)
           .map(item => ({
             ...item,
             props: {
@@ -385,7 +385,7 @@ const Details = props => {
 
       newchildren.push(
         children
-          .filter((value, index) => index > secondPoint - 1)
+          .filter((value, index) => index > endColIndex - 1)
           .map(item => ({
             ...item,
             props: {

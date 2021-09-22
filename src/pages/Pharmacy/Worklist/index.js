@@ -64,56 +64,30 @@ const PharmacyWorklist = () => {
             w.name.toUpperCase().indexOf(filterValue.toUpperCase()) >= 0,
         )
         .map(w => {
-          let groupVisit = []
-          if (w.visitGroup && w.visitGroup.trim().length) {
-            groupVisit = entity.list
-              .filter(
-                l =>
-                  l.visitGroup === w.visitGroup &&
-                  l.id !== w.id,
-              )
-              .map(l => {
-                const age = l.dob ? calculateAgeFromDOB(l.dob) : 0
-                let gender = '-'
-                if (l.genderFK === 1) {
-                  gender = 'F'
-                } else if (l.genderFK === 2) {
-                  gender = 'M'
-                }
-                return {
-                  id: l.id,
-                  queueNo: l.queueNo,
-                  name: l.name,
-                  gender,
-                  patientProfileFK: l.patientProfileFK,
-                  age: `${age} ${age > 1 ? 'Yrs' : 'Yr'}`,
-                }
-              })
-          }
-
-          groupVisit = _.orderBy(
-            groupVisit,
-            ['patientProfileFK', 'queueNo'],
+          const visitGroupListing = _.orderBy(
+            w.visitGroupListing.map(l => {
+              const age = l.dob ? calculateAgeFromDOB(l.dob) : 0
+              let gender = '-'
+              if (l.genderFK === 1) {
+                gender = 'F'
+              } else if (l.genderFK === 2) {
+                gender = 'M'
+              }
+              return {
+                queueNo: l.queueNo,
+                name: l.patientName,
+                gender,
+                age: `${age} ${age > 1 ? 'Yrs' : 'Yr'}`,
+                orderQueueNo: parseFloat(l.queueNo)
+              }
+            }),
+            ['orderQueueNo'],
             ['asc'],
           )
-
-          let prePatientProfileFK
-          groupVisit.forEach(gv => {
-            if (gv.patientProfileFK !== prePatientProfileFK) {
-              gv.countNumber = 1
-              gv.rowSpan = groupVisit.filter(
-                g => g.patientProfileFK === gv.patientProfileFK,
-              ).length
-              prePatientProfileFK = gv.patientProfileFK
-            } else {
-              gv.countNumber = 0
-              gv.rowSpan = 0
-            }
-          })
           return {
             ...w,
             status: PharmacyWorkitemStatus[w.statusFK],
-            groupVisit,
+            visitGroupListing,
           }
         })
       const mapped = columnsTemplate.map(item => {
