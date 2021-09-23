@@ -31,6 +31,32 @@ const drugMixtureIndicator = (row, right) => {
   return <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
 }
 
+const urgentIndicator = (row, right) => {
+  return (
+    row.priority === 'Urgent' && (
+      <Tooltip title='Urgent'>
+        <div
+          style={{
+            right: right,
+            borderRadius: 4,
+            backgroundColor: 'red',
+            position: 'absolute',
+            bottom: 2,
+            fontWeight: 500,
+            color: 'white',
+            fontSize: '0.7rem',
+            padding: '2px 3px',
+            height: 20,
+            cursor: 'pointer',
+          }}
+        >
+          Urg.
+        </div>
+      </Tooltip>
+    )
+  )
+}
+
 const showCurrency = (value = 0) => {
   if (value >= 0)
     return (
@@ -60,6 +86,12 @@ const baseColumns = classes => {
         }
         if (row.isDrugMixture) {
           paddingRight = 10
+        }
+        let urgentRight = 0
+
+        if (row.priority === 'Urgent') {
+          paddingRight += 34
+          urgentRight = -paddingRight - 4
         }
         return (
           <div style={{ position: 'relative' }}>
@@ -102,6 +134,7 @@ const baseColumns = classes => {
                     </div>
                   </Tooltip>
                 )}
+                {urgentIndicator(row, urgentRight)}
               </div>
             </div>
           </div>
