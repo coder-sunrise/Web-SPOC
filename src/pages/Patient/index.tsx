@@ -8,8 +8,8 @@ import Authorized from '@/utils/Authorized'
 
 import { TextField, DatePicker } from '@/components'
 import { useState, useRef } from 'react'
+import { ActionType } from '@ant-design/pro-table'
 const { queryList, upsert, query, remove } = patientService
-import type { ProFormInstance } from "@ant-design/pro-form";
 const api = {
   remove,
   create: upsert,
@@ -186,10 +186,10 @@ const PatientIndex = ({
   const createPatProfileAccessRight = Authorized.check(
     'patientdatabase.newpatient',
   )
-  const ref = useRef<ProFormInstance>();
+  const actionRef = useRef<ActionType>();
 
   if(onRefresh){
-    ref.current?.reload()
+    actionRef?.current?.reload()
     dispatch({
       type: 'patient/updateState',
       payload: {
@@ -204,7 +204,7 @@ const PatientIndex = ({
         rowSelection={false}
         columns={defaultColumns}
         api={api}
-        formRef={ref}
+        actionRef={actionRef} 
         search={{
           optionRender: (searchConfig, formProps, dom) => {
             return (
