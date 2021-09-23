@@ -17,6 +17,7 @@ import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 import AddOrder from './DispenseDetails/AddOrder'
 import DispenseDetails from './DispenseDetails/WebSocketWrapper'
 import { DispenseItemsColumnExtensions } from './variables'
+import _ from 'lodash'
 
 const calculateInvoiceAmounts = entity => {
   const obj = { ...entity }
@@ -202,6 +203,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
             orderItems.push({
               ...detaultDrugMixture,
               ...transactionDetails(di),
+              stockBalance: drugMixture.quantity - _.sumBy(drugMixture.dispenseItem, 'transactionQty'),
               countNumber: index === 0 ? 1 : 0,
               rowspan: index === 0 ? drugMixture.dispenseItem.length : 0,
               uid: getUniqueId(),
@@ -241,6 +243,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
             orderItems.push({
               ...detaultDrugMixture,
               ...generateFromTempDispenseInfo(di, currentStock?.stock, currentStock?.isDefault, primaryUOMDisplayValue, secondUOMDisplayValue),
+              stockBalance: drugMixture.quantity - _.sumBy(tempDispenseItem, 'transactionQty'),
               countNumber: index === 0 ? 1 : 0,
               rowspan: index === 0 ? tempDispenseItem.length : 0,
               uid: getUniqueId(),
@@ -320,6 +323,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
           orderItems.push({
             ...defaultItem(item, groupName),
             ...transactionDetails(di),
+            stockBalance: item.quantity - _.sumBy(item.dispenseItem, 'transactionQty'),
             countNumber: index === 0 ? 1 : 0,
             rowspan: index === 0 ? item.dispenseItem.length : 0,
             uid: getUniqueId(),
@@ -356,6 +360,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
           orderItems.push({
             ...defaultItem(item, groupName),
             ...generateFromTempDispenseInfo(di, currentStock?.stock, currentStock?.isDefault, primaryUOMDisplayValue, secondUOMDisplayValue),
+            stockBalance: item.quantity - _.sumBy(item.tempDispenseItem, 'transactionQty'),
             countNumber: index === 0 ? 1 : 0,
             rowspan: index === 0 ? item.tempDispenseItem.length : 0,
             uid: getUniqueId(),
@@ -430,6 +435,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
           orderItems.push({
             ...defaultItem(item, groupName),
             ...transactionDetails(di),
+            stockBalance: item.quantity - _.sumBy(item.dispenseItem, 'transactionQty'),
             countNumber: index === 0 ? 1 : 0,
             rowspan: index === 0 ? item.dispenseItem.length : 0,
             uid: getUniqueId(),
@@ -450,6 +456,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
           orderItems.push({
             ...defaultItem(item, groupName),
             ...generateFromTempDispenseInfo(di, currentStock?.stock, currentStock?.isDefault, inventoryItem?.uom?.name),
+            stockBalance: item.quantity - _.sumBy(item.tempDispenseItem, 'transactionQty'),
             countNumber: index === 0 ? 1 : 0,
             rowspan: index === 0 ? item.tempDispenseItem.length : 0,
             uid: getUniqueId(),
@@ -527,6 +534,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
         orderItems.push({
           ...defaultItem(item, groupName),
           ...generateFromTempDispenseInfo(di, currentStock?.stock, currentStock?.isDefault, inventoryItem?.prescribingUOM?.name),
+          stockBalance: item.quantity - _.sumBy(item.tempDispenseItem, 'transactionQty'),
           countNumber: index === 0 ? 1 : 0,
           rowspan: index === 0 ? item.tempDispenseItem.length : 0,
           uid: getUniqueId(),
@@ -601,6 +609,22 @@ const validDispense = (dispenseItems = []) => {
   let isValid = true
   const dispensedItems = dispenseItems.filter(d => !d.isPreOrder && d.stockFK && !d.isDispensedByPharmacy)
   for (let index = 0; index < dispensedItems.length; index++) {
+    if (dispensedItems[index].dispenseQuantity > dispensedItems[index].quantity) {
+      notification.error({
+        message: 'Dispense quantity cannot be more than orderd quantity.',
+      })
+      isValid = false
+      break
+    }
+
+    if (!dispensedItems[index].isDefault && dispensedItems[index].dispenseQuantity > dispensedItems[index].stock) {
+      notification.error({
+        message: 'Dispense quantity cannot be more than stock quantity.',
+      })
+      isValid = false
+      break
+    }
+
     let matchItems = []
     if (dispensedItems[index].isDrugMixture) {
       matchItems = dispenseItems.filter(d => d.type === dispensedItems[index].type

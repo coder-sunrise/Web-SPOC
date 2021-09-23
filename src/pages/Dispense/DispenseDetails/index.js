@@ -340,6 +340,9 @@ const DispenseDetails = ({
   }
 
   const isShowActualizeSelection = (records = []) => {
+    if (viewOnly) {
+      return false
+    }
     let actualizeOrderItemsRight = Authorized.check(
       'dispense.actualizeorderitems',
     )
@@ -379,7 +382,8 @@ const DispenseDetails = ({
     if (selectedRows.length > 0) {
       let selectedRecords = []
       if (type === 'DispenseItems') {
-        selectedRecords = records.filter(x => x.isCheckActualize)
+        selectedRecords = [...records.filter(x => x.isCheckActualize && !x.isDrugMixture),
+        ..._.uniqBy(records.filter(x => x.isCheckActualize && x.isDrugMixture), 'id')]
       }
       else {
         selectedRecords = records.filter(
@@ -428,7 +432,10 @@ const DispenseDetails = ({
     let newchildren = []
 
     const startColIndex = isShowDispenseActualie ? 7 : 6
-    const endColIndex = isShowDispenseActualie ? 12 : 11
+    let endColIndex = isShowDispenseActualie ? 11 : 10
+    if (viewOnly) {
+      endColIndex = endColIndex - 1
+    }
     const batchColumns = children.slice(startColIndex, endColIndex)
 
     if (row.countNumber === 1) {
@@ -471,6 +478,38 @@ const DispenseDetails = ({
     )
   }
 
+  const actualizeChange = (e, row) => {
+    if (row.isDrugMixture) {
+      setFieldValue('dispenseItems', [...dispenseItems.map(di => {
+        if (row.id === di.id) {
+          return {
+            ...di,
+            isCheckActualize: e.target.value
+          }
+        }
+        return di
+      })])
+    }
+  }
+
+  let columns = DispenseItemsColumns
+  if (!isShowDispenseActualie) {
+    columns = columns.filter(c => c.name !== 'isCheckActualize')
+  }
+  if (viewOnly) {
+    columns = columns.filter(c => c.name !== 'stock')
+  }
+
+  const getBalanceQuantity = (row) => {
+    let matchItems = []
+    if (row.isDrugMixture) {
+      matchItems = dispenseItems.filter(oi => oi.drugMixtureFK === row.drugMixtureFK)
+    }
+    else {
+      matchItems = dispenseItems.filter(oi => oi.type === row.type && oi.id === row.id)
+    }
+    return (row.quantity - _.sumBy(matchItems, 'dispenseQuantity'))
+  }
   return (
     <React.Fragment>
       <GridContainer>
@@ -703,12 +742,13 @@ const DispenseDetails = ({
                 },
               }}
               forceRender
-              columns={isShowDispenseActualie ? DispenseItemsColumns : DispenseItemsColumns.filter(c => c.name !== 'isCheckActualize')}
+              columns={columns}
               colExtensions={DispenseItemsColumnExtensions(
                 viewOnly,
                 onPrint,
                 onActualizeBtnClick,
                 showDrugLabelRemark,
+                actualizeChange,
               )}
               data={dispenseItems}
               TableProps={{
