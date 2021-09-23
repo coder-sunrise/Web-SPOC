@@ -351,6 +351,9 @@ class NewVisit extends PureComponent {
     if (item) {
       if (item.id) {
         item.isDeleted = true
+      }else if (!item.id && item.actualizedPreOrderItemFK)
+      {
+        item.isDeleted = true
       }
       else {
         visitPreOrderItem = [...visitPreOrderItem.filter(poi => poi.actualizedPreOrderItemFK !== actualizedPreOrderItemFK)]
@@ -438,10 +441,9 @@ class NewVisit extends PureComponent {
     }
 
     const draftPreOrderItem = patientInfo?.pendingPreOrderItem
-      ?.filter(item => !item.isDeleted)
-      .map(po => {
+      ?.map(po => { 
         const selectPreOrder = visitPreOrderItem.find(
-          apo => !apo.isDeleted && apo.actualizedPreOrderItemFK === po.id,
+          apo => apo.actualizedPreOrderItemFK === po.id,
         )
         if (selectPreOrder) {
           return {
