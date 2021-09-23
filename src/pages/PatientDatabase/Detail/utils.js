@@ -74,7 +74,7 @@ const upsertPatient = async ({
   dispatch({
     type: 'patient/updateState',
     payload: {
-      shouldQueryOnClose: location.pathname.includes('patientdb'),
+      shouldQueryOnClose: location.pathname.includes('patient'),
     },
   })
 
