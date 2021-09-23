@@ -330,11 +330,11 @@ const Details = props => {
 
   const getDispenseUOM = row => {
     if (row.invoiceItemTypeFK === 1) {
-      return row.language.value === primaryPrintoutLanguage
+      return (row.language.value === primaryPrintoutLanguage
         ? row.uomDisplayValue
-        : row.secondUOMDisplayValue
+        : row.secondUOMDisplayValue) || ''
     } else {
-      return row.uomDisplayValue
+      return row.uomDisplayValue || ''
     }
   }
 
@@ -364,8 +364,8 @@ const Details = props => {
     const { classes } = props
     const { row, children, tableRow } = p
     let newchildren = []
-    const startColIndex = workitem.statusFK !== PHARMACY_STATUS.NEW ? 5 : 6
-    const endColIndex = workitem.statusFK !== PHARMACY_STATUS.NEW ? 10 : 11
+    const startColIndex = 6
+    const endColIndex = workitem.statusFK !== PHARMACY_STATUS.NEW ? 9 : 10
     const batchColumns = children.slice(startColIndex, endColIndex)
 
     if (row.countNumber === 1) {
@@ -420,9 +420,25 @@ const Details = props => {
   const onPrepare = () => {
     const { orderItems = [] } = props.values || {}
 
-    const checkOverStock = () => {
-      let isOverStock = false
+    const validPharmacy = () => {
+      let isValid = true
       for (let index = 0; index < orderItems.length; index++) {
+        if (orderItems[index].dispenseQuantity > orderItems[index].quantity) {
+          notification.error({
+            message: 'Dispense quantity cannot be more than orderd quantity.',
+          })
+          isValid = false
+          break
+        }
+
+        if (!orderItems[index].isDefault && orderItems[index].dispenseQuantity > orderItems[index].stock) {
+          notification.error({
+            message: 'Dispense quantity cannot be more than stock quantity.',
+          })
+          isValid = false
+          break
+        }
+
         if (orderItems[index].stockFK && !orderItems[index].isDefault) {
           var items = orderItems.filter(
             oi =>
@@ -431,12 +447,15 @@ const Details = props => {
               oi.inventoryFK === orderItems[index].inventoryFK,
           )
           if (orderItems[index].stock < _.sumBy(items, 'dispenseQuantity')) {
-            isOverStock = true
+            notification.error({
+              message: 'Dispense quantity cannot be more than stock quantity',
+            })
+            isValid = false
             break
           }
         }
       }
-      return isOverStock
+      return isValid
     }
 
     const checkOverDispense = () => {
@@ -499,15 +518,13 @@ const Details = props => {
       }
       return isPartialPrepare
     }
+    if (!validPharmacy()) {
+      return
+    }
+
     if (checkOverDispense()) {
       notification.error({
         message: 'Dispense quantity cannot be more than Ordered quantity',
-      })
-      return
-    }
-    if (checkOverStock()) {
-      notification.error({
-        message: 'Dispense quantity cannot be more than total stock.',
       })
       return
     }
@@ -605,12 +622,13 @@ const Details = props => {
       name: 'stock',
       title: 'Stock Qty.',
     },
+
+    { name: 'batchNo', title: 'Batch No.' },
+    { name: 'expiryDate', title: 'Expiry Date' },
     {
       name: 'stockBalance',
       title: 'Balance Qty.',
     },
-    { name: 'batchNo', title: 'Batch No.' },
-    { name: 'expiryDate', title: 'Expiry Date' },
     {
       name: 'instruction',
       title: `Instruction${secondaryPrintoutLanguage !== ''
@@ -638,6 +656,17 @@ const Details = props => {
 
   if (workitem.statusFK !== PHARMACY_STATUS.NEW) {
     columns = columns.filter(c => c.name !== 'stock')
+  }
+
+  const getBalanceQuantity = (row) => {
+    let matchItems = []
+    if (row.isDrugMixture) {
+      matchItems = props.values.orderItems.filter(oi => oi.drugMixtureFK === row.drugMixtureFK)
+    }
+    else {
+      matchItems = props.values.orderItems.filter(oi => oi.type === row.type && oi.id === row.id)
+    }
+    return (row.quantity - _.sumBy(matchItems, 'dispenseQuantity'))
   }
   return (
     <div style={{ marginTop: -20 }}>
@@ -930,16 +959,23 @@ const Details = props => {
                               maxQuantity = row.quantity > row.stock ? row.stock : row.quantity
                             }
                             return (
-                              <NumberInput
-                                label=''
-                                step={1}
-                                format='0.0'
-                                max={maxQuantity}
-                                min={0}
-                                disabled={!row.isDispensedByPharmacy}
-                                precision={1}
-                                {...args}
-                              />
+                              <div style={{ position: 'relative' }}>
+                                <NumberInput
+                                  label=''
+                                  step={1}
+                                  format='0.0'
+                                  max={maxQuantity}
+                                  min={0}
+                                  disabled={!row.isDispensedByPharmacy}
+                                  precision={1}
+                                  {...args}
+                                />
+                                {row.dispenseQuantity > maxQuantity && (
+                                  <Tooltip title={`Dispense quantity cannot be more than ${numeral(maxQuantity).format('0.0')}`}>
+                                    <div style={{ position: 'absolute', right: -5, top: 5, color: 'red' }}>*</div>
+                                  </Tooltip>
+                                )}
+                              </div>
                             )
                           }}
                         />
@@ -969,8 +1005,8 @@ const Details = props => {
                     columnName: 'stockBalance',
                     width: 100,
                     sortingEnabled: false,
-                    render: row => {
-                      const balStock = row.stock - row.dispenseQuantity
+                    render: (row) => {
+                      const balStock = row.stockBalance
                       const stock =
                         balStock || balStock === 0
                           ? `${numeral(balStock).format(
@@ -1250,8 +1286,8 @@ const Details = props => {
                 disabled={isOrderUpdate || !pharmacyOrderItemCount}
               >
                 Prepare
-            </Button>
-          )}
+              </Button>
+            )}
           {workitem.statusFK === PHARMACY_STATUS.PREPARED &&
             showButton('pharmacyworklist.verifyorder') && (
               <Button
@@ -1261,8 +1297,8 @@ const Details = props => {
                 disabled={isOrderUpdate || !pharmacyOrderItemCount}
               >
                 Verify
-            </Button>
-          )}
+              </Button>
+            )}
           {workitem.statusFK === PHARMACY_STATUS.VERIFIED &&
             showButton('pharmacyworklist.dispenseorder') && (
               <Button
@@ -1272,8 +1308,8 @@ const Details = props => {
                 disabled={isOrderUpdate || !pharmacyOrderItemCount}
               >
                 Complete
-            </Button>
-          )}
+              </Button>
+            )}
         </GridItem>
       </GridContainer>
       <CommonModal
@@ -1479,6 +1515,7 @@ export default compose(
                       uomDisplayValue,
                       secondUOMDisplayValue,
                       drugMixtureName: item.itemName,
+                      stockBalance: drugMixture.quantity - _.sumBy(drugMixture.pharmacyOrderItemTransaction, 'transactionQty'),
                       countNumber: index === 0 ? 1 : 0,
                       rowspan:
                         index === 0
@@ -1521,6 +1558,7 @@ export default compose(
                 uomDisplayValue,
                 secondUOMDisplayValue,
                 countNumber: index === 0 ? 1 : 0,
+                stockBalance: item.quantity - _.sumBy(item.pharmacyOrderItemTransaction, 'transactionQty'),
                 rowspan:
                   index === 0 ? item.pharmacyOrderItemTransaction.length : 0,
                 uid: getUniqueId(),

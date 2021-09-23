@@ -139,7 +139,7 @@ const actualizationButton = (row, buttonClickCallback) => {
                 buttonClickCallback(row, NURSE_WORKITEM_STATUS.NEW)
               }
             >
-              <span style={{fontSize:12,lineHeight:'17px'}}>TD</span>
+              <span style={{ fontSize: 12, lineHeight: '17px' }}>TD</span>
             </Button>
           </Tooltip>
         </Authorized>
@@ -201,16 +201,16 @@ export const DispenseItemsColumns = [
     title: 'Stock Qty.',
   },
   {
-    name: 'stockBalance',
-    title: 'Balance Qty.',
-  },
-  {
     name: 'batchNo',
     title: 'Batch #',
   },
   {
     name: 'expiryDate',
     title: 'Expiry Date',
+  },
+  {
+    name: 'stockBalance',
+    title: 'Balance Qty.',
   },
   {
     name: 'instruction',
@@ -243,6 +243,7 @@ export const DispenseItemsColumnExtensions = (
   onPrint,
   onActualizeBtnClick,
   showDrugLabelRemark,
+  actualizeChange,
 ) => [
     {
       columnName: 'dispenseGroupId',
@@ -272,7 +273,7 @@ export const DispenseItemsColumnExtensions = (
             <FastField
               name={`dispenseItems[${row.rowIndex}]isCheckActualize`}
               render={args => {
-                return <Checkbox label='' style={{ marginLeft: 10 }} {...args} />
+                return <Checkbox label='' style={{ marginLeft: 10 }} {...args} onChange={e => actualizeChange(e, row)} />
               }} />
           )
         }
@@ -524,16 +525,23 @@ export const DispenseItemsColumnExtensions = (
                 maxQuantity = row.quantity > row.stock ? row.stock : row.quantity
               }
               return (
-                <NumberInput
-                  label=''
-                  step={1}
-                  format='0.0'
-                  max={maxQuantity}
-                  min={0}
-                  disabled={row.isDispensedByPharmacy}
-                  precision={1}
-                  {...args}
-                />
+                <div style={{ position: 'relative' }}>
+                  <NumberInput
+                    label=''
+                    step={1}
+                    format='0.0'
+                    max={maxQuantity}
+                    min={0}
+                    disabled={row.isDispensedByPharmacy}
+                    precision={1}
+                    {...args}
+                  />
+                  {row.dispenseQuantity > maxQuantity && (
+                    <Tooltip title={`Dispense quantity cannot be more than ${numeral(maxQuantity).format('0.0')}`}>
+                      <div style={{ position: 'absolute', right: -5, top: 5, color: 'red' }}>*</div>
+                    </Tooltip>
+                  )}
+                </div>
               )
             }}
           />
@@ -577,12 +585,12 @@ export const DispenseItemsColumnExtensions = (
       width: 100,
       sortingEnabled: false,
       render: row => {
-        const balStock = row.stock - row.dispenseQuantity
+        const balStock = row.stockBalance
         const stock =
           balStock || balStock === 0
             ? `${numeral(balStock).format(
               '0.0',
-            )} ${row.uomDisplayValue}`
+            )} ${row.uomDisplayValue || ''}`
             : '-'
         return (
           <Tooltip title={stock}>
@@ -657,7 +665,7 @@ export const DispenseItemsColumnExtensions = (
       render: row => {
         return (
           <div>
-            {actualizationButton(row, onActualizeBtnClick)}
+            {!viewOnly && actualizationButton(row, onActualizeBtnClick)}
             <Tooltip
               title={
                 <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
@@ -775,22 +783,21 @@ export const OtherOrdersColumnExtensions = (
       compare: compareString,
       width: 160,
       render: row => {
-      let paddingRight = row.isPreOrder ? 24 : 0
-      let urgentRight = 0
+        let paddingRight = row.isPreOrder ? 24 : 0
+        let urgentRight = 0
 
-      if(row.priority === 'Urgent')
-      {
-        paddingRight += 34
-        urgentRight = -paddingRight - 4
-      }
+        if (row.priority === 'Urgent') {
+          paddingRight += 34
+          urgentRight = -paddingRight - 4
+        }
 
-      return (
+        return (
           <div style={{ position: 'relative' }}>
             <div
               style={{
                 wordWrap: 'break-word',
                 whiteSpace: 'pre-wrap',
-              paddingRight: paddingRight,
+                paddingRight: paddingRight,
               }}
             >
               {row.type}
@@ -815,8 +822,8 @@ export const OtherOrdersColumnExtensions = (
                     </div>
                   </Tooltip>
                 )}
-              {urgentIndicator(row,urgentRight)}
-            </div>
+                {urgentIndicator(row, urgentRight)}
+              </div>
             </div>
           </div>
         )
@@ -933,8 +940,8 @@ export const OtherOrdersColumnExtensions = (
       render: r => {
         const { type } = r
 
-        if (['Service','Consumable','Treatment','Radiology','Lab'].includes(type))
-          return actualizationButton(r, onActualizeBtnClick)
+        if (['Service', 'Consumable', 'Treatment', 'Radiology', 'Lab'].includes(type))
+          return !viewOnly && actualizationButton(r, onActualizeBtnClick)
         return (
           <Tooltip title='Print'>
             <Button

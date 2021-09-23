@@ -132,6 +132,7 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
           orderItems.push({
             ...detaultDrugMixture,
             ...transactionDetails(di),
+            stockBalance: drugMixture.quantity - _.sumBy(drugMixture.dispenseItem, 'transactionQty'),
             countNumber: index === 0 ? 1 : 0,
             rowspan: index === 0 ? drugMixture.dispenseItem.length : 0,
             uid: getUniqueId(),
@@ -157,6 +158,7 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
         orderItems.push({
           ...defaultItem(item, groupName),
           ...transactionDetails(di),
+          stockBalance: item.quantity - _.sumBy(item.dispenseItem, 'transactionQty'),
           countNumber: index === 0 ? 1 : 0,
           rowspan: index === 0 ? item.dispenseItem.length : 0,
           uid: getUniqueId(),
