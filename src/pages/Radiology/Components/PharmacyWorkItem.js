@@ -61,7 +61,7 @@ const styles = theme => ({
   },
 })
 
-const printPrescription = visitID => {}
+const printPrescription = visitID => { }
 
 const WorkitemTitle = ({ item, classes }) => {
   const age = item.dob ? calculateAgeFromDOB(item.dob) : 0
@@ -189,11 +189,10 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
   }
 
   const showGroup = item.visitGroup && item.visitGroup.trim().length
-  const doctorName = `${
-    item.doctorTitle && item.doctorTitle.trim().length
-      ? `${item.doctorTitle}. `
-      : ''
-  }${item.doctorName || ''}`
+  const doctorName = `${item.doctorTitle && item.doctorTitle.trim().length
+    ? `${item.doctorTitle}. `
+    : ''
+    }${item.doctorName || ''}`
 
   const { isQueueNoDecimal } = clinicSettings
   const queueNo =
@@ -247,15 +246,12 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
           </div>
         )}
       </div>
-      <div
-        style={{
-          color: blueColor,
-        }}
-      >
+      <div>
         <Typography.Text
           underline
           style={{
             cursor: 'pointer',
+            color: blueColor,
           }}
           onClick={() => {
             setDetailsId(item.id)
@@ -268,6 +264,7 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
           style={{
             cursor: 'pointer',
             marginLeft: 10,
+            color: blueColor,
           }}
           onClick={() => {
             printPrescription(item.visitFK)
@@ -300,7 +297,7 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
           </Popover>
         )}
         {showGroup && (
-          <span style={{ fontWeight: 600, color: 'black' }}>
+          <span>
             {item.visitGroup}
           </span>
         )}
