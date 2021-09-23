@@ -422,7 +422,7 @@ const DispenseDetails = ({
   const { labelPrinterSize } = settings
   const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
 
-  const isShowDispenseActualie = isShowActualizeSelection(dispenseItems)
+  const isShowDispenseActualie = !viewOnly && isShowActualizeSelection(dispenseItems)
   const orderItemRow = p => {
     const { row, children, tableRow } = p
     let newchildren = []
@@ -474,11 +474,7 @@ const DispenseDetails = ({
   return (
     <React.Fragment>
       <GridContainer>
-        <GridItem
-          justify='flex-start'
-          md={7}
-          className={classes.actionButtons}
-        >
+        <GridItem justify='flex-start' md={7} className={classes.actionButtons}>
           {!viewOnly && !isRetailVisit && (
             <Button
               color='info'
@@ -514,8 +510,7 @@ const DispenseDetails = ({
             <span style={{ color: '#999999' }}>
               Order created by{' '}
               <span style={{ fontWeight: 500 }}>
-                {`${docInfo.title ? `${docInfo.title}.` : null}${docInfo.name
-                  }`}{' '}
+                {`${docInfo.title ? `${docInfo.title}.` : null}${docInfo.name}`}{' '}
                 at {visit.orderCreateTime.format('DD MMM yyyy HH:mm')}
               </span>{' '}
             </span>
@@ -544,11 +539,7 @@ const DispenseDetails = ({
             )}
             {!isBillFirstVisit && (
               <Authorized authority='queue.dispense.savedispense'>
-                <ProgressButton
-                  color='success'
-                  size='sm'
-                  onClick={onSaveClick}
-                >
+                <ProgressButton color='success' size='sm' onClick={onSaveClick}>
                   Save Dispense
                 </ProgressButton>
               </Authorized>
@@ -657,10 +648,11 @@ const DispenseDetails = ({
           <Paper className={classes.paper}>
             <TableData
               title='Dispense Details'
-              titleExtend={actualizeSelectedItemButton(
-                'DispenseItems',
-                dispenseItems,
-              )}
+              titleExtend={
+                viewOnly
+                  ? null
+                  : actualizeSelectedItemButton('DispenseItems', dispenseItems)
+              }
               FuncProps={{
                 pager: false,
                 grouping: true,
@@ -680,14 +672,17 @@ const DispenseDetails = ({
                       if (row.value === 'NormalDispense')
                         return (
                           <div className={classes.groupStyle}>
-                            <span style={{ fontWeight: 600 }}>Normal Dispense Items</span>
+                            <span style={{ fontWeight: 600 }}>
+                              Normal Dispense Items
+                            </span>
                           </div>
                         )
                       if (row.value === 'NoNeedToDispense')
                         return (
-                          <div className={classes.groupStyle}><span style={{ fontWeight: 600 }}>
-                            No Need To Dispense Items
-                          </span>
+                          <div className={classes.groupStyle}>
+                            <span style={{ fontWeight: 600 }}>
+                              No Need To Dispense Items
+                            </span>
                           </div>
                         )
                       return (
@@ -703,7 +698,13 @@ const DispenseDetails = ({
                 },
               }}
               forceRender
-              columns={isShowDispenseActualie ? DispenseItemsColumns : DispenseItemsColumns.filter(c => c.name !== 'isCheckActualize')}
+              columns={
+                isShowDispenseActualie
+                  ? DispenseItemsColumns
+                  : DispenseItemsColumns.filter(
+                      c => c.name !== 'isCheckActualize',
+                    )
+              }
               colExtensions={DispenseItemsColumnExtensions(
                 viewOnly,
                 onPrint,
@@ -719,15 +720,16 @@ const DispenseDetails = ({
 
             <TableData
               title='Service'
-              titleExtend={actualizeSelectedItemButton(
-                'Service',
-                service,
-              )}
+              titleExtend={
+                viewOnly
+                  ? null
+                  : actualizeSelectedItemButton('Service', service)
+              }
               selection={selectedServiceRows}
               onSelectionChange={value => {
                 handleSelectionChange('Service', value)
               }}
-              {...actualizeTableConfig(isShowActualizeSelection(service))}
+              {...actualizeTableConfig(!viewOnly && isShowActualizeSelection(service))}
               idPrefix='Service'
               columns={ServiceColumns}
               colExtensions={OtherOrdersColumnExtensions(
@@ -889,8 +891,8 @@ const DispenseDetails = ({
 
             <div>
               Note: There are existing payments with some co-payers, click
-              "Void" to cancel all payments, or click "Skip" to remove
-              co-payers & payments manually.
+              "Void" to cancel all payments, or click "Skip" to remove co-payers
+              & payments manually.
             </div>
           </GridContainer>
           <GridContainer
