@@ -360,11 +360,16 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       dataIndex: 'searchVisitType',
       initialValue:[-99],
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
+        const visitPurposeOptions = (visitPurpose||[]).map(x => ({
+          value: x.id,
+          name: x.name,
+          customTooltipField: x.customTooltipField,
+        }))
         return (
           <Select
             label='Visit Type'
             mode='multiple'
-            options={visitPurpose}
+            options={visitPurposeOptions}
             placeholder=''
             style={{ width: 250 }}
             maxTagCount={0}

@@ -326,17 +326,12 @@ const DispenseDetails = ({
     )
   }
 
-  const [
-    selectedDispenseItemsRows,
-    setSelectedDispenseItemsRows,
-  ] = useState([])
   const [selectedServiceRows, setSelectedServiceRows] = useState([])
   const [selectedActualizeRows, setSelectedActualizeRows] = useState([])
   const [showActualization, setShowActualization] = useState(false)
   const [actualizationStatus, setActualizationStatus] = useState(-1)
 
   const handleReloadClick = () => {
-    setSelectedDispenseItemsRows([])
     setSelectedServiceRows([])
     setSelectedActualizeRows([])
     setShowActualization(false)
@@ -356,9 +351,6 @@ const DispenseDetails = ({
 
   const handleSelectionChange = (type, value) => {
     switch (type) {
-      case 'DispenseItems':
-        setSelectedDispenseItemsRows(value)
-        break
       case 'Service':
         setSelectedServiceRows(value)
         break
@@ -435,14 +427,14 @@ const DispenseDetails = ({
     const { row, children, tableRow } = p
     let newchildren = []
 
-    const firstPoint = isShowDispenseActualie ? 7 : 6
-    const secondPoint = isShowDispenseActualie ? 12 : 11
-    const batchColumns = children.slice(firstPoint, secondPoint)
+    const startColIndex = isShowDispenseActualie ? 7 : 6
+    const endColIndex = isShowDispenseActualie ? 12 : 11
+    const batchColumns = children.slice(startColIndex, endColIndex)
 
     if (row.countNumber === 1) {
       newchildren.push(
         children
-          .filter((value, index) => index < firstPoint)
+          .filter((value, index) => index < startColIndex)
           .map(item => ({
             ...item,
             props: {
@@ -456,7 +448,7 @@ const DispenseDetails = ({
 
       newchildren.push(
         children
-          .filter((value, index) => index > secondPoint - 1)
+          .filter((value, index) => index > endColIndex - 1)
           .map(item => ({
             ...item,
             props: {

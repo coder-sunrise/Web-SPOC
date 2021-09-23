@@ -139,7 +139,7 @@ const actualizationButton = (row, buttonClickCallback) => {
                 buttonClickCallback(row, NURSE_WORKITEM_STATUS.NEW)
               }
             >
-              <UnorderedListOutlined />
+              <span style={{fontSize:12,lineHeight:'17px'}}>TD</span>
             </Button>
           </Tooltip>
         </Authorized>
@@ -933,7 +933,7 @@ export const OtherOrdersColumnExtensions = (
       render: r => {
         const { type } = r
 
-        if (type === 'Service' || type === 'Consumable' || type === 'Treatment')
+        if (['Service','Consumable','Treatment','Radiology','Lab'].includes(type))
           return actualizationButton(r, onActualizeBtnClick)
         return (
           <Tooltip title='Print'>

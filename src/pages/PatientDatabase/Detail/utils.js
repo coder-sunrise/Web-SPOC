@@ -46,7 +46,7 @@ const upsertPatient = async ({
   }
 
   const shouldCloseForm = location.pathname
-    ? !location.pathname.includes('patientdb')
+    ? !location.pathname.includes('patient')
     : false
 
   const response = await dispatch({
