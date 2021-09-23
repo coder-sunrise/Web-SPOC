@@ -9,6 +9,7 @@ import Authorized from '@/utils/Authorized'
 import { TextField, DatePicker } from '@/components'
 import { useState, useRef } from 'react'
 const { queryList, upsert, query, remove } = patientService
+import type { ProFormInstance } from "@ant-design/pro-form";
 const api = {
   remove,
   create: upsert,
@@ -180,18 +181,30 @@ const saveColumnsSetting = (dispatch, columnsSetting) => {
 
 const PatientIndex = ({
   dispatch,
-  patient: { favPatDBColumnSetting = {} },
+  patient: { favPatDBColumnSetting = {} , onRefresh = false},
 }) => {
   const createPatProfileAccessRight = Authorized.check(
     'patientdatabase.newpatient',
   )
+  const ref = useRef<ProFormInstance>();
+
+  if(onRefresh){
+    ref.current?.reload()
+    dispatch({
+      type: 'patient/updateState',
+      payload: {
+        onRefresh: false,
+      },
+    })
+  }
   return (
     <PageContainer pageHeaderRender={false}>
-      <ProTable
+      <ProTable 
         search={{span:8}}
         rowSelection={false}
         columns={defaultColumns}
         api={api}
+        formRef={ref}
         search={{
           optionRender: (searchConfig, formProps, dom) => {
             return (
@@ -256,6 +269,12 @@ const PatientIndex = ({
           },
         ]}
         beforeSearchSubmit={({ search, dob, ...values }) => {
+          dispatch({
+            type: 'patient/updateState',
+            payload: {
+              shouldQueryOnClose: location.pathname.includes('patient'),
+            },
+          })
           return {
             ...values,
             apiCriteria: {
