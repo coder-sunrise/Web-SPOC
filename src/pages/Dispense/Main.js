@@ -352,12 +352,22 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
         }
       }
     })
+
+    const groupItems = orderItems.filter(
+      oi => oi.type === item.type && oi.id === item.id,
+    )
+    groupItems[0].groupNumber = 1
+    groupItems[0].groupRowSpan = groupItems.length
   }
 
   const generateFromNormalMedication = item => {
     const groupName = 'NormalDispense'
     if (item.isPreOrder) {
-      orderItems.push(defaultItem(item, groupName))
+      orderItems.push({
+        ...defaultItem(item, groupName),
+        groupNumber: 1,
+        groupRowSpan: 1,
+      })
       return
     }
 
@@ -475,12 +485,22 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
         }
       }
     }
+
+    const groupItems = orderItems.filter(
+      oi => oi.type === item.type && oi.id === item.id,
+    )
+    groupItems[0].groupNumber = 1
+    groupItems[0].groupRowSpan = groupItems.length
   }
 
   const generateFromNormalConsumable = item => {
     const groupName = 'NormalDispense'
     if (item.isPreOrder) {
-      orderItems.push(defaultItem(item, groupName))
+      orderItems.push({
+        ...defaultItem(item, groupName),
+        groupNumber: 1,
+        groupRowSpan: 1,
+      })
       return
     }
     if (item.isDispensedByPharmacy) {
@@ -579,12 +599,21 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
         }
       }
     }
+    const groupItems = orderItems.filter(
+      oi => oi.type === item.type && oi.id === item.id,
+    )
+    groupItems[0].groupNumber = 1
+    groupItems[0].groupRowSpan = groupItems.length
   }
 
   const generateFromNormalVaccination = item => {
     const groupName = 'NormalDispense'
     if (item.isPreOrder) {
-      orderItems.push(defaultItem(item, groupName))
+      orderItems.push({
+        ...defaultItem(item, groupName),
+        groupNumber: 1,
+        groupRowSpan: 1,
+      })
       return
     }
     const inventoryItem = inventoryvaccination.find(
@@ -643,6 +672,11 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
         orderItems.push(defaultItem(restItem, groupName))
       }
     }
+    const groupItems = orderItems.filter(
+      oi => oi.type === item.type && oi.id === item.id,
+    )
+    groupItems[0].groupNumber = 1
+    groupItems[0].groupRowSpan = groupItems.length
   }
 
   const sortOrderItems = [
@@ -671,7 +705,11 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
       item.type === 'Open Prescription' ||
       item.type === 'Medication (Ext.)'
     ) {
-      orderItems.push(defaultItem(item, 'NoNeedToDispense'))
+      orderItems.push({
+        ...defaultItem(item, 'NoNeedToDispense'),
+        groupNumber: 1,
+        groupRowSpan: 1,
+      })
     } else if (item.type === 'Vaccination') {
       generateFromNormalVaccination(item)
     } else {

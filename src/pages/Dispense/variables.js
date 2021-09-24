@@ -700,6 +700,7 @@ export const DispenseItemsColumnExtensions = (
     {
       columnName: 'action',
       width: 70,
+      disabled: true,
       render: row => {
         return (
           <div>

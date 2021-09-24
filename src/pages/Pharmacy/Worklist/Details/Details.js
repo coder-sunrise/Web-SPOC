@@ -375,10 +375,23 @@ const Details = props => {
     const endColIndex = workitem.statusFK !== PHARMACY_STATUS.NEW ? 9 : 10
     const batchColumns = children.slice(startColIndex, endColIndex)
 
+    if (row.groupNumber === 1) {
+      newchildren.push(
+        children
+          .filter((value, index) => index < 2)
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.groupRowSpan,
+            },
+          })),
+      )
+    }
     if (row.countNumber === 1) {
       newchildren.push(
         children
-          .filter((value, index) => index < startColIndex)
+          .filter((value, index) => index < startColIndex && index > 1)
           .map(item => ({
             ...item,
             props: {
@@ -392,7 +405,7 @@ const Details = props => {
 
       newchildren.push(
         children
-          .filter((value, index) => index > endColIndex - 1)
+          .filter((value, index) => index === endColIndex)
           .map(item => ({
             ...item,
             props: {
@@ -403,6 +416,19 @@ const Details = props => {
       )
     } else {
       newchildren.push(batchColumns)
+    }
+    if (row.groupNumber === 1) {
+      newchildren.push(
+        children
+          .filter((value, index) => index > endColIndex)
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.groupRowSpan,
+            },
+          })),
+      )
     }
 
     if (row.countNumber === 1) {
@@ -820,6 +846,7 @@ const Details = props => {
             </GridItem>
             <GridItem style={{ marginTop: 8 }}>
               <EditableTableGrid
+                oddEven={false}
                 forceRender
                 size='sm'
                 EditingProps={{
@@ -1579,6 +1606,14 @@ export default compose(
             }
           }
         })
+
+        const groupItems = orderItems.filter(
+          oi =>
+            oi.invoiceItemTypeFK === item.invoiceItemTypeFK &&
+            oi.id === item.id,
+        )
+        groupItems[0].groupNumber = 1
+        groupItems[0].groupRowSpan = groupItems.length
       }
 
       const generateFromItemTransaction = (item, groupName) => {
@@ -1603,10 +1638,10 @@ export default compose(
                 stockFK: stockFK,
                 uomDisplayValue,
                 secondUOMDisplayValue,
-                countNumber: index === 0 ? 1 : 0,
                 stockBalance:
                   item.quantity -
                   _.sumBy(item.pharmacyOrderItemTransaction, 'transactionQty'),
+                countNumber: index === 0 ? 1 : 0,
                 rowspan:
                   index === 0 ? item.pharmacyOrderItemTransaction.length : 0,
                 uid: getUniqueId(),
@@ -1699,6 +1734,13 @@ export default compose(
         } else {
           generateFromItemTransaction(item, groupName)
         }
+        const groupItems = orderItems.filter(
+          oi =>
+            oi.invoiceItemTypeFK === item.invoiceItemTypeFK &&
+            oi.id === item.id,
+        )
+        groupItems[0].groupNumber = 1
+        groupItems[0].groupRowSpan = groupItems.length
       }
 
       const generateFromNormalConsumable = item => {
@@ -1761,6 +1803,14 @@ export default compose(
         } else {
           generateFromItemTransaction(item, 'NormalDispense')
         }
+
+        const groupItems = orderItems.filter(
+          oi =>
+            oi.invoiceItemTypeFK === item.invoiceItemTypeFK &&
+            oi.id === item.id,
+        )
+        groupItems[0].groupNumber = 1
+        groupItems[0].groupRowSpan = groupItems.length
       }
 
       const pharmacyOrderItem = pharmacyDetails.entity?.pharmacyOrderItem || []
@@ -1788,7 +1838,11 @@ export default compose(
             if (item.isDrugMixture) {
               generateFromDrugmixture(item)
             } else if (!item.inventoryFK || item.isExternalPrescription) {
-              orderItems.push(defaultItem(item, 'NoNeedToDispense'))
+              orderItems.push({
+                ...defaultItem(item, 'NoNeedToDispense'),
+                groupNumber: 1,
+                groupRowSpan: 1,
+              })
             } else {
               generateFromNormalMedication(item)
             }
@@ -1800,7 +1854,11 @@ export default compose(
             if (item.isDrugMixture) {
               generateFromDrugmixture(item)
             } else if (!item.inventoryFK || item.isExternalPrescription) {
-              orderItems.push(defaultItem(item, 'NoNeedToDispense'))
+              orderItems.push({
+                ...defaultItem(item, 'NoNeedToDispense'),
+                groupNumber: 1,
+                groupRowSpan: 1,
+              })
             } else {
               generateFromNormalMedication(item)
             }

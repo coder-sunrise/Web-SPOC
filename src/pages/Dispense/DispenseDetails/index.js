@@ -437,10 +437,27 @@ const DispenseDetails = ({
     }
     const batchColumns = children.slice(startColIndex, endColIndex)
 
+    if (row.groupNumber === 1) {
+      newchildren.push(
+        children
+          .filter((value, index) => index < (isShowDispenseActualie ? 3 : 2))
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.groupRowSpan,
+            },
+          })),
+      )
+    }
+
     if (row.countNumber === 1) {
       newchildren.push(
         children
-          .filter((value, index) => index < startColIndex)
+          .filter(
+            (value, index) =>
+              index < startColIndex && index > (isShowDispenseActualie ? 2 : 1),
+          )
           .map(item => ({
             ...item,
             props: {
@@ -454,7 +471,7 @@ const DispenseDetails = ({
 
       newchildren.push(
         children
-          .filter((value, index) => index > endColIndex - 1)
+          .filter((value, index) => index === endColIndex)
           .map(item => ({
             ...item,
             props: {
@@ -465,6 +482,20 @@ const DispenseDetails = ({
       )
     } else {
       newchildren.push(batchColumns)
+    }
+
+    if (row.groupNumber === 1) {
+      newchildren.push(
+        children
+          .filter((value, index) => index > endColIndex)
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.groupRowSpan,
+            },
+          })),
+      )
     }
 
     if (row.countNumber === 1) {
@@ -508,12 +539,6 @@ const DispenseDetails = ({
       let matchItems = []
       if (editRow.isDrugMixture) {
         matchItems = rows.filter(r => r.drugMixtureFK === editRow.drugMixtureFK)
-        let drugMixture = rows.filter(
-          r => r.isDrugMixture && r.id === editRow.id && r.uid !== key,
-        )
-        drugMixture.forEach(
-          item => (item.isCheckActualize = editRow.isCheckActualize),
-        )
       } else {
         matchItems = rows.filter(
           r => r.type === editRow.type && r.id === editRow.id,
@@ -701,6 +726,7 @@ const DispenseDetails = ({
         <GridItem md={12}>
           <Paper className={classes.paper}>
             <TableData
+              oddEven={false}
               title='Dispense Details'
               titleExtend={
                 viewOnly
