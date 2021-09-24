@@ -14,9 +14,9 @@ const Medication = ({ dispatch, history, medication, values }) => {
     columns: [
       { name: 'code', title: 'Code' },
       { name: 'displayValue', title: 'Name' },
-      { name: 'favouriteSupplier', title: 'Supplier' },
-      { name: 'genericMedication', title: 'Generic Drug' },
-      { name: 'medicationGroup', title: 'Drug Group' },
+      { name: 'favouriteSupplierName', title: 'Supplier' },
+      { name: 'genericMedicationName', title: 'Generic Drug' },
+      { name: 'medicationGroupName', title: 'Drug Group' },
       { name: 'dispensingUOM', title: 'Disp. UOM' },
       { name: 'stock', title: 'Stock' },
       { name: 'averageCostPrice', title: 'Avg Cost Price' },
@@ -32,11 +32,8 @@ const Medication = ({ dispatch, history, medication, values }) => {
     { columnName: 'displayValue', width: 300 },
     { columnName: 'action', width: 80, align: 'center' },
     {
-      columnName: 'favouriteSupplier',
-      type: 'codeSelect',
-      code: 'ctSupplier',
-      sortBy: 'FavouriteSupplierFkNavigation.displayValue',
-      labelField: 'displayValue',
+      columnName: 'favouriteSupplierName',
+       sortBy: 'FavouriteSupplierFkNavigation.displayValue',
       width: 250,
     },
     {
@@ -47,18 +44,13 @@ const Medication = ({ dispatch, history, medication, values }) => {
       sortBy: 'DispensingUOMFkNavigation.DisplayValue',
     },
     {
-      columnName: 'medicationGroup',
-      type: 'codeSelect',
-      code: 'ctmedicationgroup',
+      columnName: 'medicationGroupName',
       sortBy: 'MedicationGroupFkNavigation.displayValue',
       width: 150,
     },
     {
-      columnName: 'genericMedication',
-      type: 'codeSelect',
-      code: 'ctgenericmedication',
+      columnName: 'genericMedicationName',
       sortBy: 'GenericMedicationFkNavigation.displayValue',
-      labelField: 'displayValue',
       width: 150,
     },
     {
