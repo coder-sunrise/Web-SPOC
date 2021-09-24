@@ -124,7 +124,7 @@ class CheckboxTypeProvider extends React.Component {
     super(props)
     this.CheckboxEditor = (columns, text) => (editorProps) => {
       return (
-        <CheckboxEditor editMode columnExtensions={columns} {...editorProps} />
+        <CheckboxEditor editMode={!text} columnExtensions={columns} {...editorProps} />
       )
     }
   }

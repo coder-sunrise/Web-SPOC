@@ -89,7 +89,7 @@ const styles = theme => ({
   },
   groupStyle: {
     margin: '3px 0px',
-  }
+  },
 })
 
 const DispenseDetails = ({
@@ -142,21 +142,18 @@ const DispenseDetails = ({
 
   const { inventorymedication, inventoryvaccination } = codetable
   const { settings = {} } = clinicSettings
-  const currentDoc = doctorprofile.filter(
-    x => x.id === visit.doctorProfileFK,
-  )
+  const currentDoc = doctorprofile.filter(x => x.id === visit.doctorProfileFK)
   const docInfo =
-    currentDoc && currentDoc.length > 0
-      ? currentDoc[0].clinicianProfile
-      : {}
+    currentDoc && currentDoc.length > 0 ? currentDoc[0].clinicianProfile : {}
 
   const discardCallback = r => {
     if (r) {
       const userProfile = user.data.clinicianProfile
-      const userName = `${userProfile.title && userProfile.title.trim().length
-        ? `${userProfile.title}. ${userProfile.name || ''}`
-        : `${userProfile.name || ''}`
-        }`
+      const userName = `${
+        userProfile.title && userProfile.title.trim().length
+          ? `${userProfile.title}. ${userProfile.name || ''}`
+          : `${userProfile.name || ''}`
+      }`
       const message = `${userName} discard prescription at ${moment().format(
         'HH:mm',
       )}`
@@ -218,8 +215,7 @@ const DispenseDetails = ({
       invoiceTotal: v.summary.total,
       invoiceTotalAftAdj: v.summary.totalAfterAdj,
       invoiceTotalAftGST: v.summary.totalWithGST,
-      outstandingBalance:
-        v.summary.totalWithGST - values.invoice.totalPayment,
+      outstandingBalance: v.summary.totalWithGST - values.invoice.totalPayment,
       invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
       invoiceGSTAdjustment: v.summary.gstAdj,
       invoiceAdjustment: v.adjustments,
@@ -309,9 +305,7 @@ const DispenseDetails = ({
     let label = 'Package'
     let totalPrice = 0
     if (!packageItem) return ''
-    const data = packageItem.filter(
-      item => item.packageGlobalId === row.value,
-    )
+    const data = packageItem.filter(item => item.packageGlobalId === row.value)
     if (data.length > 0) {
       totalPrice = _.sumBy(data, 'totalAfterItemAdjustment') || 0
       label = `${data[0].packageCode} - ${data[0].packageName} (Total: `
@@ -347,8 +341,7 @@ const DispenseDetails = ({
       'dispense.actualizeorderitems',
     )
     let viewable =
-      actualizeOrderItemsRight &&
-      actualizeOrderItemsRight.rights !== 'hidden'
+      actualizeOrderItemsRight && actualizeOrderItemsRight.rights !== 'hidden'
     return viewable && records.filter(x => isActualizable(x)).length > 0
   }
 
@@ -382,10 +375,14 @@ const DispenseDetails = ({
     if (selectedRows.length > 0) {
       let selectedRecords = []
       if (type === 'DispenseItems') {
-        selectedRecords = [...records.filter(x => x.isCheckActualize && !x.isDrugMixture),
-        ..._.uniqBy(records.filter(x => x.isCheckActualize && x.isDrugMixture), 'id')]
-      }
-      else {
+        selectedRecords = [
+          ...records.filter(x => x.isCheckActualize && !x.isDrugMixture),
+          ..._.uniqBy(
+            records.filter(x => x.isCheckActualize && x.isDrugMixture),
+            'id',
+          ),
+        ]
+      } else {
         selectedRecords = records.filter(
           x => selectedRows.indexOf(getRowId(x, type)) > -1,
         )
@@ -426,7 +423,8 @@ const DispenseDetails = ({
   const { labelPrinterSize } = settings
   const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
 
-  const isShowDispenseActualie = !viewOnly && isShowActualizeSelection(dispenseItems)
+  const isShowDispenseActualie =
+    !viewOnly && isShowActualizeSelection(dispenseItems)
   const orderItemRow = p => {
     const { row, children, tableRow } = p
     let newchildren = []
@@ -480,15 +478,17 @@ const DispenseDetails = ({
 
   const actualizeChange = (e, row) => {
     if (row.isDrugMixture) {
-      setFieldValue('dispenseItems', [...dispenseItems.map(di => {
-        if (row.id === di.id) {
-          return {
-            ...di,
-            isCheckActualize: e.target.value
+      setFieldValue('dispenseItems', [
+        ...dispenseItems.map(di => {
+          if (row.id === di.id) {
+            return {
+              ...di,
+              isCheckActualize: e.target.value,
+            }
           }
-        }
-        return di
-      })])
+          return di
+        }),
+      ])
     }
   }
 
@@ -500,15 +500,29 @@ const DispenseDetails = ({
     columns = columns.filter(c => c.name !== 'stock')
   }
 
-  const getBalanceQuantity = (row) => {
-    let matchItems = []
-    if (row.isDrugMixture) {
-      matchItems = dispenseItems.filter(oi => oi.drugMixtureFK === row.drugMixtureFK)
+  const commitChanges = ({ rows, changed }) => {
+    if (changed) {
+      const key = Object.keys(changed)[0]
+      const editRow = rows.find(r => r.uid === key)
+      let matchItems = []
+      if (editRow.isDrugMixture) {
+        matchItems = rows.filter(r => r.drugMixtureFK === editRow.drugMixtureFK)
+        let drugMixture = rows.filter(
+          r => r.isDrugMixture && r.id === editRow.id && r.uid !== key,
+        )
+        drugMixture.forEach(
+          item => (item.isCheckActualize = editRow.isCheckActualize),
+        )
+      } else {
+        matchItems = rows.filter(
+          r => r.type === editRow.type && r.id === editRow.id,
+        )
+      }
+      const balanceQty =
+        editRow.quantity - _.sumBy(matchItems, 'dispenseQuantity')
+      matchItems.forEach(item => (item.stockBalance = balanceQty))
+      setFieldValue('dispenseItems', rows)
     }
-    else {
-      matchItems = dispenseItems.filter(oi => oi.type === row.type && oi.id === row.id)
-    }
-    return (row.quantity - _.sumBy(matchItems, 'dispenseQuantity'))
   }
   return (
     <React.Fragment>
@@ -692,6 +706,10 @@ const DispenseDetails = ({
                   ? null
                   : actualizeSelectedItemButton('DispenseItems', dispenseItems)
               }
+              EditingProps={{
+                showCommandColumn: false,
+                onCommitChanges: commitChanges,
+              }}
               FuncProps={{
                 pager: false,
                 grouping: true,
@@ -763,7 +781,9 @@ const DispenseDetails = ({
               onSelectionChange={value => {
                 handleSelectionChange('Service', value)
               }}
-              {...actualizeTableConfig(!viewOnly && isShowActualizeSelection(service))}
+              {...actualizeTableConfig(
+                !viewOnly && isShowActualizeSelection(service),
+              )}
               idPrefix='Service'
               columns={ServiceColumns}
               colExtensions={OtherOrdersColumnExtensions(

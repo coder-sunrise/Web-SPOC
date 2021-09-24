@@ -1162,7 +1162,6 @@ const calculateAmount = (
     gstValue,
     isGSTInclusive,
   })
-
   const r = {
     rows,
     adjustments: adjustments

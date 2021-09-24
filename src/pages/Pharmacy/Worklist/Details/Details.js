@@ -9,12 +9,13 @@ import { history } from 'umi'
 import { withStyles } from '@material-ui/core'
 import Warning from '@material-ui/icons/Error'
 import Refresh from '@material-ui/icons/Refresh'
+import Yup from '@/utils/yup'
 import {
   GridContainer,
   GridItem,
   Button,
   CheckboxGroup,
-  CommonTableGrid,
+  EditableTableGrid,
   CommonModal,
   withFormikExtend,
   NumberInput,
@@ -330,9 +331,11 @@ const Details = props => {
 
   const getDispenseUOM = row => {
     if (row.invoiceItemTypeFK === 1) {
-      return (row.language.value === primaryPrintoutLanguage
-        ? row.uomDisplayValue
-        : row.secondUOMDisplayValue) || ''
+      return (
+        (row.language.value === primaryPrintoutLanguage
+          ? row.uomDisplayValue
+          : row.secondUOMDisplayValue) || ''
+      )
     } else {
       return row.uomDisplayValue || ''
     }
@@ -431,7 +434,10 @@ const Details = props => {
           break
         }
 
-        if (!orderItems[index].isDefault && orderItems[index].dispenseQuantity > orderItems[index].stock) {
+        if (
+          !orderItems[index].isDefault &&
+          orderItems[index].dispenseQuantity > orderItems[index].stock
+        ) {
           notification.error({
             message: 'Dispense quantity cannot be more than stock quantity.',
           })
@@ -504,8 +510,7 @@ const Details = props => {
             items = orderItems.filter(
               oi =>
                 !oi.isDrugMixture &&
-                oi.invoiceItemTypeFK ===
-                orderItems[index].invoiceItemTypeFK &&
+                oi.invoiceItemTypeFK === orderItems[index].invoiceItemTypeFK &&
                 oi.id === orderItems[index].id &&
                 oi.inventoryFK === orderItems[index].inventoryFK,
             )
@@ -561,10 +566,11 @@ const Details = props => {
     workitem.isPharmacyOrderUpdate ||
     workitem.isPharmacyOrderDiscard ||
     workitem.isOrderUpdate
-  const updateMessage = `${workitem.updateByUserTitle && workitem.updateByUserTitle.trim().length
-    ? `${workitem.updateByUserTitle}. ${workitem.updateByUser || ''}`
-    : `${workitem.updateByUser || ''}`
-    } amended prescription at ${moment(workitem.updateDate).format('HH:mm')}`
+  const updateMessage = `${
+    workitem.updateByUserTitle && workitem.updateByUserTitle.trim().length
+      ? `${workitem.updateByUserTitle}. ${workitem.updateByUser || ''}`
+      : `${workitem.updateByUser || ''}`
+  } amended prescription at ${moment(workitem.updateDate).format('HH:mm')}`
 
   const currentMessage =
     workitem.isPharmacyOrderUpdate || workitem.isPharmacyOrderDiscard
@@ -584,12 +590,12 @@ const Details = props => {
   if (visitTypeSetting) {
     try {
       visitTypeSettingsObj = JSON.parse(visitTypeSetting)
-    } catch { }
+    } catch {}
   }
   const visitType = (visitTypeSettingsObj || []).find(
     type => type.id === workitem.visitPurposeFK,
   )
-  const showButton = (authority) => {
+  const showButton = authority => {
     const accessRight = Authorized.check(authority) || { rights: 'hidden' }
     return accessRight.rights === 'enable'
   }
@@ -631,24 +637,21 @@ const Details = props => {
     },
     {
       name: 'instruction',
-      title: `Instruction${secondaryPrintoutLanguage !== ''
-        ? `(${showLanguage})`
-        : ''
-        }`,
+      title: `Instruction${
+        secondaryPrintoutLanguage !== '' ? `(${showLanguage})` : ''
+      }`,
     },
     {
       name: 'drugInteraction',
-      title: `Drug Interaction${secondaryPrintoutLanguage !== ''
-        ? `(${showLanguage})`
-        : ''
-        }`,
+      title: `Drug Interaction${
+        secondaryPrintoutLanguage !== '' ? `(${showLanguage})` : ''
+      }`,
     },
     {
       name: 'drugContraindication',
-      title: `Contraindication${secondaryPrintoutLanguage !== ''
-        ? `(${showLanguage})`
-        : ''
-        }`,
+      title: `Contraindication${
+        secondaryPrintoutLanguage !== '' ? `(${showLanguage})` : ''
+      }`,
     },
     { name: 'remarks', title: 'Remarks' },
     //{ name: 'action', title: 'Action' },
@@ -658,16 +661,26 @@ const Details = props => {
     columns = columns.filter(c => c.name !== 'stock')
   }
 
-  const getBalanceQuantity = (row) => {
-    let matchItems = []
-    if (row.isDrugMixture) {
-      matchItems = props.values.orderItems.filter(oi => oi.drugMixtureFK === row.drugMixtureFK)
+  const commitChanges = ({ rows, changed }) => {
+    if (changed) {
+      const { setFieldValue } = props
+      const key = Object.keys(changed)[0]
+      const editRow = rows.find(r => r.uid === key)
+      let matchItems = []
+      if (editRow.isDrugMixture) {
+        matchItems = rows.filter(r => r.drugMixtureFK === editRow.drugMixtureFK)
+      } else {
+        matchItems = rows.filter(
+          r => r.type === editRow.type && r.id === editRow.id,
+        )
+      }
+      const balanceQty =
+        editRow.quantity - _.sumBy(matchItems, 'dispenseQuantity')
+      matchItems.forEach(item => (item.stockBalance = balanceQty))
+      setFieldValue('orderItems', rows)
     }
-    else {
-      matchItems = props.values.orderItems.filter(oi => oi.type === row.type && oi.id === row.id)
-    }
-    return (row.quantity - _.sumBy(matchItems, 'dispenseQuantity'))
   }
+
   return (
     <div style={{ marginTop: -20 }}>
       <div className={classes.contentPanel}>
@@ -689,18 +702,19 @@ const Details = props => {
             <ContentGridItem title='Diagnosis:'>
               {corDiagnosis.length
                 ? workitem.corDiagnosis
-                  .map(d => d.icD10DiagnosisDescription)
-                  .join(', ')
+                    .map(d => d.icD10DiagnosisDescription)
+                    .join(', ')
                 : '-'}
             </ContentGridItem>
             <ContentGridItem title='Visit Type:'>
               {visitType?.displayValue || '-'}
             </ContentGridItem>
-            <ContentGridItem title='Order By:'>{`${workitem.generateByUserTitle &&
+            <ContentGridItem title='Order By:'>{`${
+              workitem.generateByUserTitle &&
               workitem.generateByUserTitle.trim().length
-              ? `${workitem.generateByUserTitle}. `
-              : ''
-              }${workitem.generateByUser || ''}`}</ContentGridItem>
+                ? `${workitem.generateByUserTitle}. `
+                : ''
+            }${workitem.generateByUser || ''}`}</ContentGridItem>
             <ContentGridItem title='Order Created Time:'>
               {moment(workitem.generateDate).format('HH:mm, DD MMM YYYY')}
             </ContentGridItem>
@@ -762,7 +776,7 @@ const Details = props => {
                   position: 'relative',
                   top: '6px',
                 }}
-                onClick={() => { }}
+                onClick={() => {}}
               >
                 Journal History
               </Typography.Text>
@@ -801,9 +815,13 @@ const Details = props => {
               )}
             </GridItem>
             <GridItem style={{ marginTop: 8 }}>
-              <CommonTableGrid
+              <EditableTableGrid
                 forceRender
                 size='sm'
+                EditingProps={{
+                  showCommandColumn: false,
+                  onCommitChanges: commitChanges,
+                }}
                 FuncProps={{
                   pager: false,
                   grouping: true,
@@ -851,6 +869,7 @@ const Details = props => {
                     columnName: 'invoiceItemTypeFK',
                     width: 110,
                     sortingEnabled: false,
+                    disabled: true,
                     render: row => {
                       const type = getType(row)
                       return (
@@ -864,11 +883,13 @@ const Details = props => {
                     columnName: 'itemCode',
                     width: 100,
                     sortingEnabled: false,
+                    disabled: true,
                   },
                   {
                     columnName: 'itemName',
                     width: 200,
                     sortingEnabled: false,
+                    disabled: true,
                     render: row => {
                       let paddingRight = 0
                       if (row.isExclusive) {
@@ -906,6 +927,7 @@ const Details = props => {
                     columnName: 'dispenseUOM',
                     width: 80,
                     sortingEnabled: false,
+                    disabled: true,
                     render: row => {
                       const uom = getUOM(row)
                       return (
@@ -919,6 +941,7 @@ const Details = props => {
                     columnName: 'quantity',
                     width: 80,
                     sortingEnabled: false,
+                    disabled: true,
                     render: row => {
                       const qty = numeral(row.quantity).format('0.0')
                       return (
@@ -933,6 +956,13 @@ const Details = props => {
                     columnName: 'dispenseQuantity',
                     width: 80,
                     sortingEnabled: false,
+                    format: '0.0',
+                    type: 'number',
+                    isDisabled: row => {
+                      return (
+                        row.statusFK !== PHARMACY_STATUS.NEW || !row.stockFK
+                      )
+                    },
                     render: row => {
                       if (
                         row.statusFK !== PHARMACY_STATUS.NEW ||
@@ -947,38 +977,44 @@ const Details = props => {
                           </Tooltip>
                         )
                       }
+                      let maxQuantity
+                      if (row.isDefault) {
+                        maxQuantity = row.quantity
+                      } else {
+                        maxQuantity =
+                          row.quantity > row.stock ? row.stock : row.quantity
+                      }
                       return (
-                        <FastField
-                          name={`orderItems[${row.rowIndex}]dispenseQuantity`}
-                          render={args => {
-                            let maxQuantity
-                            if (row.isDefault) {
-                              maxQuantity = row.quantity
-                            }
-                            else {
-                              maxQuantity = row.quantity > row.stock ? row.stock : row.quantity
-                            }
-                            return (
-                              <div style={{ position: 'relative' }}>
-                                <NumberInput
-                                  label=''
-                                  step={1}
-                                  format='0.0'
-                                  max={maxQuantity}
-                                  min={0}
-                                  disabled={!row.isDispensedByPharmacy}
-                                  precision={1}
-                                  {...args}
-                                />
-                                {row.dispenseQuantity > maxQuantity && (
-                                  <Tooltip title={`Dispense quantity cannot be more than ${numeral(maxQuantity).format('0.0')}`}>
-                                    <div style={{ position: 'absolute', right: -5, top: 5, color: 'red' }}>*</div>
-                                  </Tooltip>
-                                )}
+                        <div style={{ position: 'relative' }}>
+                          <NumberInput
+                            label=''
+                            step={1}
+                            format='0.0'
+                            max={maxQuantity}
+                            min={0}
+                            disabled={!row.isDispensedByPharmacy}
+                            precision={1}
+                            value={row.dispenseQuantity}
+                          />
+                          {row.dispenseQuantity > maxQuantity && (
+                            <Tooltip
+                              title={`Dispense quantity cannot be more than ${numeral(
+                                maxQuantity,
+                              ).format('0.0')}`}
+                            >
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  right: -5,
+                                  top: 5,
+                                  color: 'red',
+                                }}
+                              >
+                                *
                               </div>
-                            )
-                          }}
-                        />
+                            </Tooltip>
+                          )}
+                        </div>
                       )
                     },
                     align: 'right',
@@ -987,11 +1023,12 @@ const Details = props => {
                     columnName: 'stock',
                     width: 100,
                     sortingEnabled: false,
+                    disabled: true,
                     render: row => {
                       const stock = row.stock
                         ? `${numeral(row.stock).format('0.0')} ${getDispenseUOM(
-                          row,
-                        )}`
+                            row,
+                          )}`
                         : '-'
                       return (
                         <Tooltip title={stock}>
@@ -1005,13 +1042,14 @@ const Details = props => {
                     columnName: 'stockBalance',
                     width: 100,
                     sortingEnabled: false,
-                    render: (row) => {
+                    disabled: true,
+                    render: row => {
                       const balStock = row.stockBalance
                       const stock =
                         balStock || balStock === 0
                           ? `${numeral(balStock).format(
-                            '0.0',
-                          )} ${getDispenseUOM(row)}`
+                              '0.0',
+                            )} ${getDispenseUOM(row)}`
                           : '-'
                       return (
                         <Tooltip title={stock}>
@@ -1025,6 +1063,8 @@ const Details = props => {
                     columnName: 'batchNo',
                     width: 100,
                     sortingEnabled: false,
+                    isDisabled: row =>
+                      row.statusFK !== PHARMACY_STATUS.NEW || !row.isDefault,
                     render: row => {
                       if (
                         row.statusFK !== PHARMACY_STATUS.NEW ||
@@ -1037,13 +1077,10 @@ const Details = props => {
                         )
                       }
                       return (
-                        <FastField
-                          name={`orderItems[${row.rowIndex}]batchNo`}
-                          render={args => {
-                            return (
-                              <TextField maxLength={100} label='' {...args} />
-                            )
-                          }}
+                        <TextField
+                          maxLength={100}
+                          label=''
+                          value={row.batchNo}
                         />
                       )
                     },
@@ -1052,6 +1089,9 @@ const Details = props => {
                     columnName: 'expiryDate',
                     width: 110,
                     sortingEnabled: false,
+                    type: 'date',
+                    isDisabled: row =>
+                      row.statusFK !== PHARMACY_STATUS.NEW || !row.isDefault,
                     render: row => {
                       if (
                         row.statusFK !== PHARMACY_STATUS.NEW ||
@@ -1067,27 +1107,14 @@ const Details = props => {
                         )
                       }
                       return (
-                        <FastField
-                          name={`orderItems[${row.rowIndex}]expiryDate`}
-                          render={args => {
-                            return (
-                              <DatePicker
-                                label=''
-                                simple
-                                disabledDate={d =>
-                                  !d || d.isBefore(moment().add('days', -1))
-                                }
-                                {...args}
-                              />
-                            )
-                          }}
-                        />
+                        <DatePicker label='' simple value={row.expiryDate} />
                       )
                     },
                   },
                   {
                     columnName: 'instruction',
                     sortingEnabled: false,
+                    disabled: true,
                     render: row => {
                       const instruction = getInstruction(row)
                       return (
@@ -1100,6 +1127,7 @@ const Details = props => {
                   {
                     columnName: 'drugInteraction',
                     sortingEnabled: false,
+                    disabled: true,
                     render: row => {
                       const interaction = getDrugInteraction(row)
                       return (
@@ -1112,6 +1140,7 @@ const Details = props => {
                   {
                     columnName: 'drugContraindication',
                     sortingEnabled: false,
+                    disabled: true,
                     render: row => {
                       const contraIndication = getDrugContraIndication(row)
                       return (
@@ -1124,6 +1153,7 @@ const Details = props => {
                   {
                     columnName: 'remarks',
                     sortingEnabled: false,
+                    disabled: true,
                     render: row => {
                       const existsDrugLabelRemarks =
                         showDrugLabelRemark &&
@@ -1245,7 +1275,7 @@ const Details = props => {
             }}
           >
             {workitem.statusFK !== PHARMACY_STATUS.NEW &&
-              !pharmacyOrderItemCount
+            !pharmacyOrderItemCount
               ? 'Cancel'
               : 'Close'}
           </Button>
@@ -1260,7 +1290,7 @@ const Details = props => {
                 {workitem.visitPurposeFK == VISIT_TYPE.OTC
                   ? 'Add Order'
                   : 'Edit Order'}
-            </Button>
+              </Button>
             )}
           {workitem.statusFK !== PHARMACY_STATUS.NEW &&
             showButton('pharmacyworklist.redispenseorder') && (
@@ -1275,7 +1305,7 @@ const Details = props => {
                 }
               >
                 Re-dispense
-            </Button>
+              </Button>
             )}
           {workitem.statusFK === PHARMACY_STATUS.NEW &&
             showButton('pharmacyworklist.prepareorder') && (
@@ -1433,10 +1463,10 @@ export default compose(
               const secondUOMDisplayValue =
                 secondaryPrintoutLanguage !== ''
                   ? getTranslationValue(
-                    uom.translationData,
-                    secondaryPrintoutLanguage,
-                    'displayValue',
-                  )
+                      uom.translationData,
+                      secondaryPrintoutLanguage,
+                      'displayValue',
+                    )
                   : ''
               const inventoryItemStock = _.orderBy(
                 (inventoryItem?.medicationStock || []).filter(
@@ -1474,6 +1504,7 @@ export default compose(
                       uomDisplayValue: primaryUOMDisplayValue,
                       secondUOMDisplayValue: secondUOMDisplayValue,
                       isDefault,
+                      stockBalance: 0,
                       countNumber: index === 0 ? 1 : 0,
                       rowspan: 0,
                       uid: getUniqueId(),
@@ -1515,7 +1546,12 @@ export default compose(
                       uomDisplayValue,
                       secondUOMDisplayValue,
                       drugMixtureName: item.itemName,
-                      stockBalance: drugMixture.quantity - _.sumBy(drugMixture.pharmacyOrderItemTransaction, 'transactionQty'),
+                      stockBalance:
+                        drugMixture.quantity -
+                        _.sumBy(
+                          drugMixture.pharmacyOrderItemTransaction,
+                          'transactionQty',
+                        ),
                       countNumber: index === 0 ? 1 : 0,
                       rowspan:
                         index === 0
@@ -1558,7 +1594,9 @@ export default compose(
                 uomDisplayValue,
                 secondUOMDisplayValue,
                 countNumber: index === 0 ? 1 : 0,
-                stockBalance: item.quantity - _.sumBy(item.pharmacyOrderItemTransaction, 'transactionQty'),
+                stockBalance:
+                  item.quantity -
+                  _.sumBy(item.pharmacyOrderItemTransaction, 'transactionQty'),
                 rowspan:
                   index === 0 ? item.pharmacyOrderItemTransaction.length : 0,
                 uid: getUniqueId(),
@@ -1589,10 +1627,10 @@ export default compose(
           const secondUOMDisplayValue =
             secondaryPrintoutLanguage !== ''
               ? getTranslationValue(
-                uom.translationData,
-                secondaryPrintoutLanguage,
-                'displayValue',
-              )
+                  uom.translationData,
+                  secondaryPrintoutLanguage,
+                  'displayValue',
+                )
               : ''
 
           const inventoryItemStock = _.orderBy(
@@ -1625,6 +1663,7 @@ export default compose(
                   uomDisplayValue: primaryUOMDisplayValue,
                   secondUOMDisplayValue: secondUOMDisplayValue,
                   isDefault,
+                  stockBalance: 0,
                   countNumber: index === 0 ? 1 : 0,
                   rowspan: 0,
                   uid: getUniqueId(),
@@ -1686,6 +1725,7 @@ export default compose(
                   stockFK: id,
                   uomDisplayValue: inventoryItem?.uom?.name,
                   isDefault,
+                  stockBalance: 0,
                   countNumber: index === 0 ? 1 : 0,
                   rowspan: 0,
                   uid: getUniqueId(),
@@ -1769,7 +1809,7 @@ export default compose(
       }
     },
     //validationSchema: Yup.object().shape({}),
-    handleSubmit: () => { },
+    handleSubmit: () => {},
     displayName: 'PharmarcyWorklistDetail',
   }),
 )(Details)
