@@ -81,7 +81,6 @@ const nurseWorkItemsAccessRight = Authorized.check(
   'queue.workitem.nurseworkitem',
 )
 
-console.log(radiologyWorkItemsAccessRight,nurseWorkItemsAccessRight)
 
 export const FuncConfig = {
   pager: false,
