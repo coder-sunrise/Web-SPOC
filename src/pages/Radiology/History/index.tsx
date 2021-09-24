@@ -373,7 +373,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
             placeholder=''
             style={{ width: 250 }}
             maxTagCount={0}
-            maxTagPlaceholder='Modalities'
+            maxTagPlaceholder='Visit Types'
           />
         )
       },
