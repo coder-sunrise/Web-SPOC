@@ -287,6 +287,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
                   uomDisplayValue: primaryUOMDisplayValue,
                   secondUOMDisplayValue: secondUOMDisplayValue,
                   isDefault,
+                  stockBalance: 0,
                   countNumber: index === 0 ? 1 : 0,
                   rowspan: 0,
                   uid: getUniqueId(),
@@ -397,6 +398,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
                 uomDisplayValue: primaryUOMDisplayValue,
                 secondUOMDisplayValue: secondUOMDisplayValue,
                 isDefault,
+                stockBalance: 0,
                 countNumber: index === 0 ? 1 : 0,
                 rowspan: 0,
                 uid: getUniqueId(),
@@ -493,6 +495,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
                 stockFK: id,
                 uomDisplayValue: inventoryItem?.uom?.name,
                 isDefault,
+                stockBalance: 0,
                 countNumber: index === 0 ? 1 : 0,
                 rowspan: 0,
                 uid: getUniqueId(),
@@ -560,6 +563,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
           stockFK: id,
           uomDisplayValue: inventoryItem?.prescribingUOM?.name,
           isDefault,
+          stockBalance: 0,
         })
       } else {
         const { batchNo, expiryDate, ...restItem } = item

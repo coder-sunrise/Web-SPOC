@@ -500,15 +500,23 @@ const DispenseDetails = ({
     columns = columns.filter(c => c.name !== 'stock')
   }
 
-  const getBalanceQuantity = (row) => {
-    let matchItems = []
-    if (row.isDrugMixture) {
-      matchItems = dispenseItems.filter(oi => oi.drugMixtureFK === row.drugMixtureFK)
+  const commitChanges = ({ rows, changed }) => {
+    if (changed) {
+      const key = Object.keys(changed)[0]
+      const editRow = rows.find(r => r.uid === key)
+      let matchItems = []
+      if (editRow.isDrugMixture) {
+        matchItems = rows.filter(r => r.drugMixtureFK === editRow.drugMixtureFK)
+        let drugMixture = rows.filter(r => r.isDrugMixture && r.id === editRow.id && r.uid !== key)
+        drugMixture.forEach(item => item.isCheckActualize = editRow.isCheckActualize)
+      }
+      else {
+        matchItems = rows.filter(r => r.type === editRow.type && r.id === editRow.id)
+      }
+      const balanceQty = editRow.quantity - _.sumBy(matchItems, 'dispenseQuantity')
+      matchItems.forEach(item => item.stockBalance = balanceQty)
+      setFieldValue('dispenseItems', rows)
     }
-    else {
-      matchItems = dispenseItems.filter(oi => oi.type === row.type && oi.id === row.id)
-    }
-    return (row.quantity - _.sumBy(matchItems, 'dispenseQuantity'))
   }
   return (
     <React.Fragment>
@@ -700,6 +708,10 @@ const DispenseDetails = ({
                 'DispenseItems',
                 dispenseItems,
               )}
+              EditingProps={{
+                showCommandColumn: false,
+                onCommitChanges: commitChanges,
+              }}
               FuncProps={{
                 pager: false,
                 grouping: true,

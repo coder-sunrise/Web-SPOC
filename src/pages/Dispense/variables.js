@@ -243,8 +243,23 @@ export const DispenseItemsColumnExtensions = (
   onPrint,
   onActualizeBtnClick,
   showDrugLabelRemark,
-  actualizeChange,
-) => [
+) => {
+  const checkActualizable = (row) => {
+    const {
+      isNurseActualizeRequired = false,
+      workitem: { nurseWorkitem: { statusFK } = {} } = {},
+      isPreOrder,
+      isExternalPrescription,
+    } = row
+    if (!isPreOrder &&
+      !isExternalPrescription &&
+      isNurseActualizeRequired &&
+      statusFK !== NURSE_WORKITEM_STATUS.ACTUALIZED) {
+      return true
+    }
+    return false
+  }
+  return [
     {
       columnName: 'dispenseGroupId',
       width: 0,
@@ -254,28 +269,17 @@ export const DispenseItemsColumnExtensions = (
       columnName: 'isCheckActualize',
       width: 50,
       sortingEnabled: false,
-      align: 'center',
+      type: 'checkbox',
+      isDisabled: (row) => !checkActualizable(row),
       render: row => {
-        const {
-          isNurseActualizeRequired = false,
-          workitem: { nurseWorkitem: { statusFK } = {} } = {},
-          isPreOrder,
-          isExternalPrescription,
-        } = row
-
         if (
-          !isPreOrder &&
-          !isExternalPrescription &&
-          isNurseActualizeRequired &&
-          statusFK !== NURSE_WORKITEM_STATUS.ACTUALIZED
+          checkActualizable(row)
         ) {
-          return (
-            <FastField
-              name={`dispenseItems[${row.rowIndex}]isCheckActualize`}
-              render={args => {
-                return <Checkbox label='' style={{ marginLeft: 10 }} {...args} onChange={e => actualizeChange(e, row)} />
-              }} />
-          )
+          return <Checkbox label='' style={{ marginLeft: 10 }}
+            value={row.isCheckActualize}
+            onChange={e => {
+              row.isCheckActualize = e.target.value
+            }} />
         }
         return ''
       }
@@ -285,6 +289,7 @@ export const DispenseItemsColumnExtensions = (
       compare: compareString,
       width: 120,
       sortingEnabled: false,
+      disabled: true,
       render: row => {
         let paddingRight = 0
         if (row.isPreOrder && row.isExclusive) {
@@ -352,11 +357,13 @@ export const DispenseItemsColumnExtensions = (
     {
       columnName: 'code',
       width: 100,
+      disabled: true,
       sortingEnabled: false,
     },
     {
       columnName: 'unitPrice',
       width: 100,
+      disabled: true,
       align: 'right',
       type: 'currency',
       sortingEnabled: false,
@@ -364,6 +371,7 @@ export const DispenseItemsColumnExtensions = (
     {
       columnName: 'name',
       width: '30%',
+      disabled: true,
       sortingEnabled: false,
       render: row => {
         const isShowStockIndicator = ['Medication', 'Medication (Ext.)', 'Vaccination'].indexOf(row.type) > -1
@@ -406,6 +414,7 @@ export const DispenseItemsColumnExtensions = (
     {
       columnName: 'instruction',
       width: '40%',
+      disabled: true,
       sortingEnabled: false,
       render: row => {
         return (
@@ -425,6 +434,7 @@ export const DispenseItemsColumnExtensions = (
     {
       columnName: 'remarks',
       width: '30%',
+      disabled: true,
       sortingEnabled: false,
       render: row => {
         const existsDrugLabelRemarks =
@@ -473,6 +483,7 @@ export const DispenseItemsColumnExtensions = (
     {
       columnName: 'totalAfterItemAdjustment',
       width: 100,
+      disabled: true,
       align: 'right',
       type: 'currency',
       sortingEnabled: false,
@@ -491,6 +502,7 @@ export const DispenseItemsColumnExtensions = (
     {
       columnName: 'adjAmt',
       width: 100,
+      disabled: true,
       align: 'right',
       type: 'currency',
       sortingEnabled: false,
@@ -498,12 +510,17 @@ export const DispenseItemsColumnExtensions = (
     {
       columnName: 'dispenseUOM',
       width: 80,
+      disabled: true,
       sortingEnabled: false,
     },
     {
       columnName: 'dispenseQuantity',
       width: 80,
       sortingEnabled: false,
+      type: 'number',
+      isDisabled: (row) => {
+        return (viewOnly || !row.stockFK || row.isDispensedByPharmacy)
+      },
       render: row => {
         if (viewOnly || !row.stockFK) {
           const qty = !row.stockFK ? '-' : numeral(row.dispenseQuantity).format('0.0')
@@ -513,38 +530,31 @@ export const DispenseItemsColumnExtensions = (
             </Tooltip>
           )
         }
+        let maxQuantity
+        if (row.isDefault || row.isDispensedByPharmacy) {
+          maxQuantity = row.quantity
+        }
+        else {
+          maxQuantity = row.quantity > row.stock ? row.stock : row.quantity
+        }
         return (
-          <FastField
-            name={`dispenseItems[${row.rowIndex}]dispenseQuantity`}
-            render={args => {
-              let maxQuantity
-              if (row.isDefault || row.isDispensedByPharmacy) {
-                maxQuantity = row.quantity
-              }
-              else {
-                maxQuantity = row.quantity > row.stock ? row.stock : row.quantity
-              }
-              return (
-                <div style={{ position: 'relative' }}>
-                  <NumberInput
-                    label=''
-                    step={1}
-                    format='0.0'
-                    max={maxQuantity}
-                    min={0}
-                    disabled={row.isDispensedByPharmacy}
-                    precision={1}
-                    {...args}
-                  />
-                  {row.dispenseQuantity > maxQuantity && (
-                    <Tooltip title={`Dispense quantity cannot be more than ${numeral(maxQuantity).format('0.0')}`}>
-                      <div style={{ position: 'absolute', right: -5, top: 5, color: 'red' }}>*</div>
-                    </Tooltip>
-                  )}
-                </div>
-              )
-            }}
-          />
+          <div style={{ position: 'relative' }}>
+            <NumberInput
+              label=''
+              step={1}
+              format='0.0'
+              max={maxQuantity}
+              min={0}
+              disabled={row.isDispensedByPharmacy}
+              precision={1}
+              value={row.dispenseQuantity}
+            />
+            {row.dispenseQuantity > maxQuantity && (
+              <Tooltip title={`Dispense quantity cannot be more than ${numeral(maxQuantity).format('0.0')}`}>
+                <div style={{ position: 'absolute', right: -5, top: 5, color: 'red' }}>*</div>
+              </Tooltip>
+            )}
+          </div>
         )
       },
       align: 'right',
@@ -552,6 +562,7 @@ export const DispenseItemsColumnExtensions = (
     {
       columnName: 'quantity',
       type: 'number',
+      disabled: true,
       sortingEnabled: false,
       align: 'right',
       width: 80,
@@ -567,6 +578,7 @@ export const DispenseItemsColumnExtensions = (
     {
       columnName: 'stock',
       width: 100,
+      disabled: true,
       sortingEnabled: false,
       render: row => {
         const stock = row.stockFK
@@ -583,6 +595,7 @@ export const DispenseItemsColumnExtensions = (
     {
       columnName: 'stockBalance',
       width: 100,
+      disabled: true,
       sortingEnabled: false,
       render: row => {
         const balStock = row.stockBalance
@@ -604,6 +617,9 @@ export const DispenseItemsColumnExtensions = (
       columnName: 'batchNo',
       width: 100,
       sortingEnabled: false,
+      isDisabled: (row) => {
+        return (viewOnly || !row.isDefault)
+      },
       render: row => {
         if (viewOnly || !row.isDefault) {
           return (
@@ -613,14 +629,7 @@ export const DispenseItemsColumnExtensions = (
           )
         }
         return (
-          <FastField
-            name={`dispenseItems[${row.rowIndex}]batchNo`}
-            render={args => {
-              return (
-                <TextField maxLength={100} text={viewOnly} label='' {...args} />
-              )
-            }}
-          />
+          <TextField maxLength={100} text={viewOnly} label='' value={row.batchNo} />
         )
       },
     },
@@ -628,6 +637,10 @@ export const DispenseItemsColumnExtensions = (
       columnName: 'expiryDate',
       width: 110,
       sortingEnabled: false,
+      type: 'date',
+      isDisabled: (row) => {
+        return (viewOnly || !row.isDefault)
+      },
       render: row => {
         if (viewOnly || !row.isDefault) {
           const expiryDate = row.expiryDate
@@ -640,21 +653,11 @@ export const DispenseItemsColumnExtensions = (
           )
         }
         return (
-          <FastField
-            name={`dispenseItems[${row.rowIndex}]expiryDate`}
-            render={args => {
-              const restProps = viewOnly ? { value: row.expiryDate } : { ...args }
-
-              return (
-                <DatePicker
-                  text={viewOnly}
-                  disabled={viewOnly}
-                  disabledDate={d => !d || d.isBefore(moment().add('days', -1))}
-                  simple
-                  {...restProps}
-                />
-              )
-            }}
+          <DatePicker
+            text={viewOnly}
+            disabled={viewOnly}
+            simple
+            value={row.expiryDate}
           />
         )
       },
@@ -686,6 +689,7 @@ export const DispenseItemsColumnExtensions = (
       },
     },
   ]
+}
 
 export const ServiceColumns = [
   {

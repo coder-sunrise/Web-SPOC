@@ -9,6 +9,7 @@ import { history } from 'umi'
 import { withStyles } from '@material-ui/core'
 import Warning from '@material-ui/icons/Error'
 import Refresh from '@material-ui/icons/Refresh'
+import Yup from '@/utils/yup'
 import {
   GridContainer,
   GridItem,
@@ -23,6 +24,7 @@ import {
   notification,
   TextField,
   DatePicker,
+  EditableTableGrid
 } from '@/components'
 import { FileCopySharp } from '@material-ui/icons'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
@@ -658,16 +660,24 @@ const Details = props => {
     columns = columns.filter(c => c.name !== 'stock')
   }
 
-  const getBalanceQuantity = (row) => {
-    let matchItems = []
-    if (row.isDrugMixture) {
-      matchItems = props.values.orderItems.filter(oi => oi.drugMixtureFK === row.drugMixtureFK)
+  const commitChanges = ({ rows, changed }) => {
+    if (changed) {
+      const { setFieldValue } = props
+      const key = Object.keys(changed)[0]
+      const editRow = rows.find(r => r.uid === key)
+      let matchItems = []
+      if (editRow.isDrugMixture) {
+        matchItems = rows.filter(r => r.drugMixtureFK === editRow.drugMixtureFK)
+      }
+      else {
+        matchItems = rows.filter(r => r.type === editRow.type && r.id === editRow.id)
+      }
+      const balanceQty = editRow.quantity - _.sumBy(matchItems, 'dispenseQuantity')
+      matchItems.forEach(item => item.stockBalance = balanceQty)
+      setFieldValue('orderItems', rows)
     }
-    else {
-      matchItems = props.values.orderItems.filter(oi => oi.type === row.type && oi.id === row.id)
-    }
-    return (row.quantity - _.sumBy(matchItems, 'dispenseQuantity'))
   }
+
   return (
     <div style={{ marginTop: -20 }}>
       <div className={classes.contentPanel}>
@@ -801,9 +811,13 @@ const Details = props => {
               )}
             </GridItem>
             <GridItem style={{ marginTop: 8 }}>
-              <CommonTableGrid
+              <EditableTableGrid
                 forceRender
                 size='sm'
+                EditingProps={{
+                  showCommandColumn: false,
+                  onCommitChanges: commitChanges,
+                }}
                 FuncProps={{
                   pager: false,
                   grouping: true,
@@ -851,6 +865,7 @@ const Details = props => {
                     columnName: 'invoiceItemTypeFK',
                     width: 110,
                     sortingEnabled: false,
+                    disabled: true,
                     render: row => {
                       const type = getType(row)
                       return (
@@ -864,11 +879,13 @@ const Details = props => {
                     columnName: 'itemCode',
                     width: 100,
                     sortingEnabled: false,
+                    disabled: true,
                   },
                   {
                     columnName: 'itemName',
                     width: 200,
                     sortingEnabled: false,
+                    disabled: true,
                     render: row => {
                       let paddingRight = 0
                       if (row.isExclusive) {
@@ -906,6 +923,7 @@ const Details = props => {
                     columnName: 'dispenseUOM',
                     width: 80,
                     sortingEnabled: false,
+                    disabled: true,
                     render: row => {
                       const uom = getUOM(row)
                       return (
@@ -919,6 +937,7 @@ const Details = props => {
                     columnName: 'quantity',
                     width: 80,
                     sortingEnabled: false,
+                    disabled: true,
                     render: row => {
                       const qty = numeral(row.quantity).format('0.0')
                       return (
@@ -933,6 +952,11 @@ const Details = props => {
                     columnName: 'dispenseQuantity',
                     width: 80,
                     sortingEnabled: false,
+                    format: '0.0',
+                    type: 'number',
+                    isDisabled: (row) => {
+                      return (row.statusFK !== PHARMACY_STATUS.NEW || !row.stockFK)
+                    },
                     render: row => {
                       if (
                         row.statusFK !== PHARMACY_STATUS.NEW ||
@@ -947,38 +971,31 @@ const Details = props => {
                           </Tooltip>
                         )
                       }
+                      let maxQuantity
+                      if (row.isDefault) {
+                        maxQuantity = row.quantity
+                      }
+                      else {
+                        maxQuantity = row.quantity > row.stock ? row.stock : row.quantity
+                      }
                       return (
-                        <FastField
-                          name={`orderItems[${row.rowIndex}]dispenseQuantity`}
-                          render={args => {
-                            let maxQuantity
-                            if (row.isDefault) {
-                              maxQuantity = row.quantity
-                            }
-                            else {
-                              maxQuantity = row.quantity > row.stock ? row.stock : row.quantity
-                            }
-                            return (
-                              <div style={{ position: 'relative' }}>
-                                <NumberInput
-                                  label=''
-                                  step={1}
-                                  format='0.0'
-                                  max={maxQuantity}
-                                  min={0}
-                                  disabled={!row.isDispensedByPharmacy}
-                                  precision={1}
-                                  {...args}
-                                />
-                                {row.dispenseQuantity > maxQuantity && (
-                                  <Tooltip title={`Dispense quantity cannot be more than ${numeral(maxQuantity).format('0.0')}`}>
-                                    <div style={{ position: 'absolute', right: -5, top: 5, color: 'red' }}>*</div>
-                                  </Tooltip>
-                                )}
-                              </div>
-                            )
-                          }}
-                        />
+                        <div style={{ position: 'relative' }}>
+                          <NumberInput
+                            label=''
+                            step={1}
+                            format='0.0'
+                            max={maxQuantity}
+                            min={0}
+                            disabled={!row.isDispensedByPharmacy}
+                            precision={1}
+                            value={row.dispenseQuantity}
+                          />
+                          {row.dispenseQuantity > maxQuantity && (
+                            <Tooltip title={`Dispense quantity cannot be more than ${numeral(maxQuantity).format('0.0')}`}>
+                              <div style={{ position: 'absolute', right: -5, top: 5, color: 'red' }}>*</div>
+                            </Tooltip>
+                          )}
+                        </div>
                       )
                     },
                     align: 'right',
@@ -987,6 +1004,7 @@ const Details = props => {
                     columnName: 'stock',
                     width: 100,
                     sortingEnabled: false,
+                    disabled: true,
                     render: row => {
                       const stock = row.stock
                         ? `${numeral(row.stock).format('0.0')} ${getDispenseUOM(
@@ -1005,6 +1023,7 @@ const Details = props => {
                     columnName: 'stockBalance',
                     width: 100,
                     sortingEnabled: false,
+                    disabled: true,
                     render: (row) => {
                       const balStock = row.stockBalance
                       const stock =
@@ -1025,6 +1044,8 @@ const Details = props => {
                     columnName: 'batchNo',
                     width: 100,
                     sortingEnabled: false,
+                    isDisabled: (row) => row.statusFK !== PHARMACY_STATUS.NEW ||
+                      !row.isDefault,
                     render: row => {
                       if (
                         row.statusFK !== PHARMACY_STATUS.NEW ||
@@ -1036,22 +1057,16 @@ const Details = props => {
                           </Tooltip>
                         )
                       }
-                      return (
-                        <FastField
-                          name={`orderItems[${row.rowIndex}]batchNo`}
-                          render={args => {
-                            return (
-                              <TextField maxLength={100} label='' {...args} />
-                            )
-                          }}
-                        />
-                      )
-                    },
+                      return <TextField maxLength={100} label='' value={row.batchNo} />
+                    }
                   },
                   {
                     columnName: 'expiryDate',
                     width: 110,
                     sortingEnabled: false,
+                    type: 'date',
+                    isDisabled: (row) => row.statusFK !== PHARMACY_STATUS.NEW ||
+                      !row.isDefault,
                     render: row => {
                       if (
                         row.statusFK !== PHARMACY_STATUS.NEW ||
@@ -1066,28 +1081,17 @@ const Details = props => {
                           </Tooltip>
                         )
                       }
-                      return (
-                        <FastField
-                          name={`orderItems[${row.rowIndex}]expiryDate`}
-                          render={args => {
-                            return (
-                              <DatePicker
-                                label=''
-                                simple
-                                disabledDate={d =>
-                                  !d || d.isBefore(moment().add('days', -1))
-                                }
-                                {...args}
-                              />
-                            )
-                          }}
-                        />
-                      )
-                    },
+                      return <DatePicker
+                        label=''
+                        simple
+                        value={row.expiryDate}
+                      />
+                    }
                   },
                   {
                     columnName: 'instruction',
                     sortingEnabled: false,
+                    disabled: true,
                     render: row => {
                       const instruction = getInstruction(row)
                       return (
@@ -1100,6 +1104,7 @@ const Details = props => {
                   {
                     columnName: 'drugInteraction',
                     sortingEnabled: false,
+                    disabled: true,
                     render: row => {
                       const interaction = getDrugInteraction(row)
                       return (
@@ -1112,6 +1117,7 @@ const Details = props => {
                   {
                     columnName: 'drugContraindication',
                     sortingEnabled: false,
+                    disabled: true,
                     render: row => {
                       const contraIndication = getDrugContraIndication(row)
                       return (
@@ -1124,6 +1130,7 @@ const Details = props => {
                   {
                     columnName: 'remarks',
                     sortingEnabled: false,
+                    disabled: true,
                     render: row => {
                       const existsDrugLabelRemarks =
                         showDrugLabelRemark &&
@@ -1474,6 +1481,7 @@ export default compose(
                       uomDisplayValue: primaryUOMDisplayValue,
                       secondUOMDisplayValue: secondUOMDisplayValue,
                       isDefault,
+                      stockBalance: 0,
                       countNumber: index === 0 ? 1 : 0,
                       rowspan: 0,
                       uid: getUniqueId(),
@@ -1625,6 +1633,7 @@ export default compose(
                   uomDisplayValue: primaryUOMDisplayValue,
                   secondUOMDisplayValue: secondUOMDisplayValue,
                   isDefault,
+                  stockBalance: 0,
                   countNumber: index === 0 ? 1 : 0,
                   rowspan: 0,
                   uid: getUniqueId(),
@@ -1686,6 +1695,7 @@ export default compose(
                   stockFK: id,
                   uomDisplayValue: inventoryItem?.uom?.name,
                   isDefault,
+                  stockBalance: 0,
                   countNumber: index === 0 ? 1 : 0,
                   rowspan: 0,
                   uid: getUniqueId(),
