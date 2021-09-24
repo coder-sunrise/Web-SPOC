@@ -812,6 +812,7 @@ class Banner extends PureComponent {
       refreshingBalance,
       disablePreOrder,
       dispatch,
+      isReadOnly,
     } = props
 
     const preOrderAccessRight = Authorized.check(
@@ -1282,8 +1283,8 @@ class Banner extends PureComponent {
         >
           <SelectPreOrder
             disabled={
-              !(from === 'Appointment' || from === 'VisitReg') ||
-              actualizePreOrderAccessRight.rights !== 'enable'
+              !(from === 'Appointment' || from === 'VisitReg' && !isReadOnly) ||
+              actualizePreOrderAccessRight.rights !== 'enable' 
             }
             onSelectPreOrder={select => {
               if (onSelectPreOrder) onSelectPreOrder(select)

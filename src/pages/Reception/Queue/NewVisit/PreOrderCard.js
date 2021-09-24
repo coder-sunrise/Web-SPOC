@@ -32,7 +32,7 @@ const styles = theme => ({
 }))
 class PreOrderCard extends PureComponent {
   render() {
-    const { values, deletePreOrderItem } = this.props
+    const { values, deletePreOrderItem, isReadOnly } = this.props
     const { visitPreOrderItem = [] } = values
 
     const actualizePreOrderAccessRight = Authorized.check(
@@ -140,7 +140,7 @@ class PreOrderCard extends PureComponent {
               width: 60,
               render: row => {
                 return (
-                  actualizePreOrderAccessRight.rights === 'enable' && (
+                  actualizePreOrderAccessRight.rights === 'enable' && !isReadOnly && (
                     <Button
                       size='sm'
                       justIcon

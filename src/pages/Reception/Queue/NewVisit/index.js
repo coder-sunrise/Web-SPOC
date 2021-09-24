@@ -468,6 +468,7 @@ class NewVisit extends PureComponent {
               <div style={{ padding: 8, marginTop: -20 }}>
                 <PatientBanner
                   from='VisitReg'
+                  isReadOnly ={isReadOnly}
                   // activePreOrderItem={patientInfo?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
                   onSelectPreOrder={this.onSelectPreOrder}
                   activePreOrderItems={draftPreOrderItem}
@@ -580,6 +581,7 @@ class NewVisit extends PureComponent {
                           <GridItem xs={12} className={classes.row}>
                             <CommonCard title='Pre-Order Actualization'>
                               <PreOrderCard
+                                isReadOnly={isReadOnly}
                                 {...this.props}
                                 deletePreOrderItem={this.deletePreOrderItem}
                                 dispatch={dispatch}
