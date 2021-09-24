@@ -73,6 +73,15 @@ const filterLabWorkItem = workItem => {
   return workItem.filter(x => x.type === 'Lab')
 }
 
+const labWorkItemsAccessRight = Authorized.check('queue.workitem.labworkitem')
+const radiologyWorkItemsAccessRight = Authorized.check(
+  'queue.workitem.radiologyworkitem',
+)
+const nurseWorkItemsAccessRight = Authorized.check(
+  'queue.workitem.nurseworkitem',
+)
+
+
 export const FuncConfig = {
   pager: false,
   sort: true,
@@ -167,7 +176,6 @@ export const ApptColumnExtensions = [
       }
       return '-'
     },
-
   },
   {
     columnName: 'patientContactNo',
@@ -367,8 +375,12 @@ export const QueueColumnExtensions = [
     // compare: compareTime,
     render: row => {
       if (row.appointmentTime) {
-        const appointmentDate = moment(row.appointmentTime).format('DD MMM YYYY')
-        return moment(`${appointmentDate} ${row.appointmentResourceStartTime}`).format('DD MMM YYYY HH:mm')
+        const appointmentDate = moment(row.appointmentTime).format(
+          'DD MMM YYYY',
+        )
+        return moment(
+          `${appointmentDate} ${row.appointmentResourceStartTime}`,
+        ).format('DD MMM YYYY HH:mm')
       }
       return '-'
     },
@@ -393,12 +405,16 @@ export const QueueColumnExtensions = [
 
       return (
         <div style={{ justifyContent: 'space-between' }}>
-          {radioWorkItems && radioWorkItems.length > 0 && (
-            <RadioWorkItemInfo values={radioWorkItems} />
-          )}
-          {nurseWorkItems && nurseWorkItems.length > 0 && (
-            <NurseWorkItemInfo values={nurseWorkItems} />
-          )}
+          {radiologyWorkItemsAccessRight.rights === 'enable' &&
+            radioWorkItems &&
+            radioWorkItems.length > 0 && (
+              <RadioWorkItemInfo values={radioWorkItems} />
+            )}
+          {nurseWorkItemsAccessRight.rights === 'enable' &&
+            nurseWorkItems &&
+            nurseWorkItems.length > 0 && (
+              <NurseWorkItemInfo values={nurseWorkItems} />
+            )}
         </div>
       )
     },
