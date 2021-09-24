@@ -1241,7 +1241,7 @@ export const inventoryItemListing = (
       uom,
       sellingPrice: x.sellingPrice,
       lastCostPriceBefBonus: x.lastCostPriceBefBonus,
-      [itemFKName]: x.id,
+      id: x.id,
       stateName,
       itemFK: x.id,
       isActive: x.isActive,

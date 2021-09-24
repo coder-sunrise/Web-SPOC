@@ -114,6 +114,7 @@ const Detail = ({
                           id: 'inventory.master.vaccination.code',
                         })}
                         {...args}
+                        disabled={values.isActive}
                       />
                     )
                   }}
@@ -128,7 +129,6 @@ const Detail = ({
                         label={formatMessage({
                           id: 'inventory.master.vaccination.name',
                         })}
-                        disabled={vaccinationDetail.entity}
                         {...args}
                       />
                     )
