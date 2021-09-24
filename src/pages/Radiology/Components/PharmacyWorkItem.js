@@ -61,7 +61,7 @@ const styles = theme => ({
   },
 })
 
-const printPrescription = visitID => { }
+const printPrescription = visitID => {}
 
 const WorkitemTitle = ({ item, classes }) => {
   const age = item.dob ? calculateAgeFromDOB(item.dob) : 0
@@ -189,10 +189,11 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
   }
 
   const showGroup = item.visitGroup && item.visitGroup.trim().length
-  const doctorName = `${item.doctorTitle && item.doctorTitle.trim().length
-    ? `${item.doctorTitle}. `
-    : ''
-    }${item.doctorName || ''}`
+  const doctorName = `${
+    item.doctorTitle && item.doctorTitle.trim().length
+      ? `${item.doctorTitle}. `
+      : ''
+  }${item.doctorName || ''}`
 
   const { isQueueNoDecimal } = clinicSettings
   const queueNo =
@@ -296,11 +297,7 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
             />
           </Popover>
         )}
-        {showGroup && (
-          <span>
-            {item.visitGroup}
-          </span>
-        )}
+        {showGroup && <span>{item.visitGroup}</span>}
       </div>
     </div>
   )
