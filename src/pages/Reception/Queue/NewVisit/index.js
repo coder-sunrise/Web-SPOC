@@ -581,7 +581,7 @@ class NewVisit extends PureComponent {
                           <GridItem xs={12} className={classes.row}>
                             <CommonCard title='Pre-Order Actualization'>
                               <PreOrderCard
-                                isReadOnly={isReadOnly}
+                                isReadOnly={values.visitStatus === VISIT_STATUS.WAITING ? false : isReadOnly }
                                 {...this.props}
                                 deletePreOrderItem={this.deletePreOrderItem}
                                 dispatch={dispatch}
