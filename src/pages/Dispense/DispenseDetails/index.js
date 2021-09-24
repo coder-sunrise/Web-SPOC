@@ -800,6 +800,7 @@ const DispenseDetails = ({
 
             <TableData
               title='Service'
+              oddEven={false}
               titleExtend={
                 viewOnly
                   ? null
@@ -823,6 +824,7 @@ const DispenseDetails = ({
             />
 
             <TableData
+              oddEven={false}
               title='Other Orders'
               idPrefix='OtherOrders'
               columns={OtherOrdersColumns}
@@ -836,6 +838,7 @@ const DispenseDetails = ({
 
             {settings.isEnablePackage && visitPurposeFK !== VISIT_TYPE.OTC && (
               <TableData
+                oddEven={false}
                 title='Package'
                 idPrefix='package'
                 columns={PackageColumns}
