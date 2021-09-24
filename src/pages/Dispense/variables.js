@@ -700,6 +700,8 @@ export const DispenseItemsColumnExtensions = (
     {
       columnName: 'action',
       width: 70,
+      disabled: true,
+      align: 'left',
       render: row => {
         return (
           <div>
@@ -820,7 +822,7 @@ export const OtherOrdersColumnExtensions = (
   {
     columnName: 'type',
     compare: compareString,
-    width: 160,
+    width: 120,
     render: row => {
       let paddingRight = row.isPreOrder ? 24 : 0
       let urgentRight = 0
@@ -972,6 +974,7 @@ export const OtherOrdersColumnExtensions = (
   {
     columnName: 'action',
     align: 'center',
+    align: 'left',
     width: 70,
     render: r => {
       const { type } = r
@@ -1170,7 +1173,7 @@ export const PackageColumnExtensions = (onPrint, showDrugLabelRemark) => [
   {
     columnName: 'type',
     compare: compareString,
-    width: 160,
+    width: 120,
     sortingEnabled: false,
     render: row => {
       return (
@@ -1394,7 +1397,8 @@ export const PackageColumnExtensions = (onPrint, showDrugLabelRemark) => [
   {
     columnName: 'action',
     align: 'center',
-    width: 60,
+    align: 'left',
+    width: 70,
     sortingEnabled: false,
     render: r => {
       const { type } = r
