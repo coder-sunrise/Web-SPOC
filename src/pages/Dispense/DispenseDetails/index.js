@@ -88,7 +88,8 @@ const styles = theme => ({
     },
   },
   groupStyle: {
-    margin: '3px 0px',
+    padding: '3px 0px',
+    backgroundColor: '#CCCCCC',
   },
 })
 
@@ -752,6 +753,7 @@ const DispenseDetails = ({
                       )
                     },
                   },
+                  backgroundColor: '#CCCCCC',
                 },
               }}
               forceRender

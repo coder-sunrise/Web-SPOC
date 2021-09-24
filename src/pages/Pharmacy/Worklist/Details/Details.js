@@ -81,6 +81,10 @@ const styles = theme => ({
     width: 26,
     height: 26,
   },
+  groupStyle: {
+    padding: '3px 0px',
+    backgroundColor: '#CCCCCC',
+  },
 })
 
 const ContentGridItem = ({ children, title }) => {
@@ -828,10 +832,11 @@ const Details = props => {
                   groupingConfig: {
                     state: {
                       grouping: [{ columnName: 'dispenseGroupId' }],
-                      defaultExpandedGroups: props.values.defaultExpandedGroups,
+                      expandedGroups: props.values.defaultExpandedGroups,
                     },
                     row: {
                       indentColumnWidth: 0,
+                      iconComponent: icon => <span></span>,
                       contentComponent: group => {
                         const { row } = group
                         const groupRow = props.values.orderItems.find(
@@ -839,26 +844,31 @@ const Details = props => {
                         )
                         if (row.value === 'NormalDispense')
                           return (
-                            <span style={{ fontWeight: 600 }}>
-                              Normal Dispense Items
-                            </span>
+                            <div className={classes.groupStyle}>
+                              <span style={{ fontWeight: 600 }}>
+                                Normal Dispense Items
+                              </span>
+                            </div>
                           )
                         if (row.value === 'NoNeedToDispense')
                           return (
-                            <span style={{ fontWeight: 600 }}>
-                              No Need To Dispense Items
-                            </span>
+                            <div className={classes.groupStyle}>
+                              <span style={{ fontWeight: 600 }}>
+                                No Need To Dispense Items
+                              </span>
+                            </div>
                           )
                         return (
-                          <span>
+                          <div className={classes.groupStyle}>
                             <span style={{ fontWeight: 600 }}>
                               {'Drug Mixture: '}
                             </span>
                             {groupRow.drugMixtureName}
-                          </span>
+                          </div>
                         )
                       },
                     },
+                    backgroundColor: '#CCCCCC',
                   },
                 }}
                 rows={props.values.orderItems || []}
