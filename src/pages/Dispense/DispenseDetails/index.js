@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import _ from 'lodash'
@@ -54,6 +54,10 @@ import {
 
 import CONSTANTS from './constants'
 import { ServePatientButton } from '@/components/_medisys'
+import RadiologyDetails from '@/pages/Radiology/Worklist/Details'
+import WorklistContext, {
+  WorklistContextProvider,
+} from '@/pages/Radiology/Worklist/WorklistContext'
 
 const styles = theme => ({
   paper: {
@@ -358,6 +362,11 @@ const DispenseDetails = ({
     setSelectedActualizeRows([row])
     setActualizationStatus(status)
     setShowActualization(true)
+  }
+
+  const { detailsId, setDetailsId } = useContext(WorklistContext)
+  const onRadiologyBtnClick = radiologyWorkitemID => {
+    setDetailsId(radiologyWorkitemID)
   }
 
   const handleMultiActualizationClick = type => {
@@ -714,7 +723,12 @@ const DispenseDetails = ({
                   } else if (coPayerPayments.length > 0) {
                     setShowRemovePayment(true)
                   } else {
-                    onFinalizeClick()
+                    if(dispenseItems.filter(x => isActualizable(x)).length > 0 || service.filter(x => isActualizable(x)).length > 0)
+                      notification.error({
+                        message: 'Actualize all nursing work items before finalize.',
+                      })
+                    else
+                      onFinalizeClick()
                   }
                 }}
               >
@@ -819,6 +833,7 @@ const DispenseDetails = ({
                 viewOnly,
                 onPrint,
                 onActualizeBtnClick,
+                onRadiologyBtnClick,
               )}
               data={service}
             />
@@ -1045,9 +1060,16 @@ const DispenseDetails = ({
           }}
         />
       </CommonModal>
+      <RadiologyDetails />
     </React.Fragment>
   )
 }
+
+const _DispenseDetails = props => (
+  <WorklistContextProvider>
+    <DispenseDetails {...props}></DispenseDetails>
+  </WorklistContextProvider>
+)
 
 export default compose(
   withStyles(styles, { name: 'DispenseDetailsGrid' }),
@@ -1069,4 +1091,4 @@ export default compose(
       user,
     }),
   ),
-)(DispenseDetails)
+)(_DispenseDetails)

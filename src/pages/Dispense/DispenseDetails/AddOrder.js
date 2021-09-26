@@ -280,7 +280,7 @@ const AddOrder = ({
 
   useEffect(() => {
     const { entity } = dispense
-    const { invoice } = entity
+    const { invoice } = entity || {}
 
     if (visitType === VISIT_TYPE.OTC)
       displayExistingOrders(invoice.id, ctservice)
