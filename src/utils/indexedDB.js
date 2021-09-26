@@ -1,6 +1,6 @@
 import Dexie from 'dexie'
 
-const db = new Dexie('SEMRGen2')
+const db = new Dexie('jgh-init')
 
 // const CodeTableSchema = {
 //   codetable: 'code, data, createDate, updateDate',
