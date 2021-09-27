@@ -23,6 +23,7 @@ const Detail = ({
   hasActiveSession,
   theme,
   clinicSettings,
+  values
 }) => {
   const { settings = [] } = clinicSettings
   return (
@@ -48,6 +49,7 @@ const Detail = ({
                           id: 'inventory.master.consumable.code',
                         })}
                         {...args}
+                        disabled={values.isActive}
                       />
                     )
                   }}
@@ -62,7 +64,6 @@ const Detail = ({
                         label={formatMessage({
                           id: 'inventory.master.consumable.name',
                         })}
-                        disabled={consumableDetail.entity}
                         {...args}
                       />
                     )

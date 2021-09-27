@@ -225,7 +225,7 @@ const General = ({
                     id: 'inventory.master.medication.code',
                   })}
                   {...args}
-                  disabled={!values.isActive}
+                  disabled={values.isActive}
                 />
               )
             }}
@@ -240,7 +240,6 @@ const General = ({
                   label={formatMessage({
                     id: 'inventory.master.medication.name',
                   })}
-                  disabled={medicationDetail.entity}
                   {...args}
                 />
               )

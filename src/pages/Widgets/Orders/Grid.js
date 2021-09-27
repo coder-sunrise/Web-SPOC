@@ -479,8 +479,8 @@ export default ({
               backgroundColor:
                 radiologyWorkitemStatusFK ===
                 RADIOLOGY_WORKITEM_STATUS.INPROGRESS
-                  ? '#4876FF'
-                  : '#008B00',
+                  ? '#1890FF'
+                  : '#009900',
               cursor: 'pointer',
             }}
           />
@@ -498,8 +498,8 @@ export default ({
             }}
           >
             <Cross
-              style={{ color: 'red', height: 20, width: 20 }}
-              color='red'
+              style={{ color: 'black', height: 20, width: 20 }}
+              color='black'
             />
           </div>
         </Tooltip>

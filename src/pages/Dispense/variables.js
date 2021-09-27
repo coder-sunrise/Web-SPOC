@@ -19,8 +19,11 @@ import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import PackageDrawdownInfo from '@/pages/Widgets/Orders/Detail/PackageDrawdownInfo'
 import { InventoryTypes } from '@/utils/codes'
 import CONSTANTS from './DispenseDetails/constants'
-import { UnorderedListOutlined, CheckOutlined } from '@ant-design/icons'
-import { NURSE_WORKITEM_STATUS } from '@/utils/constants'
+import { UnorderedListOutlined, CheckOutlined, FileTextOutlined } from '@ant-design/icons'
+import {
+  NURSE_WORKITEM_STATUS,
+  RADIOLOGY_WORKITEM_STATUS,
+} from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 export const tableConfig = {
   FuncProps: { pager: false },
@@ -164,6 +167,31 @@ const actualizationButton = (row, buttonClickCallback) => {
         </Tooltip>
       )
     }
+  }
+  return actualizationBtn
+}
+
+const radiologyDetailsButton = (row, buttonClickCallback) => {
+  let actualizationBtn = null
+  const {
+    type,
+    workitem: { radiologyWorkitem: { id: radiologyWorkitemID } = {} } = {},
+  } = row
+
+  if (type === 'Radiology' && radiologyWorkitemID) {
+      actualizationBtn = (
+        <Tooltip title='Radiology Detail'>
+            <Button
+              color='primary'
+              justIcon
+              onClick={() =>
+                buttonClickCallback(radiologyWorkitemID)
+              }
+            >
+              <FileTextOutlined />
+            </Button>
+          </Tooltip>
+      )
   }
   return actualizationBtn
 }
@@ -791,22 +819,106 @@ const urgentIndicator = (row, right) => {
   )
 }
 
+const radiologyWorkitemStatus = radiologyWorkitemStatusFK => {
+  if (radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.NEW)
+    return (
+      <Tooltip title='New'>
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 2,
+            right: -15,
+            borderRadius: 8,
+            height: 16,
+            width: 16,
+            border: '2px solid #4876FF',
+            cursor: 'pointer',
+          }}
+        />
+      </Tooltip>
+    )
+
+  if (
+    radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ||
+    radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
+    radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
+  )
+    return (
+      <Tooltip
+        title={
+          radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
+            ? 'In Progress'
+            : 'Completed'
+        }
+      >
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 2,
+            right: -20,
+            borderRadius: 8,
+            height: 16,
+            width: 16,
+            backgroundColor:
+              radiologyWorkitemStatusFK ===
+              RADIOLOGY_WORKITEM_STATUS.INPROGRESS
+                ? '#1890FF'
+                : '#009900',
+            cursor: 'pointer',
+          }}
+        />
+      </Tooltip>
+    )
+  if (radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED)
+    return (
+      <Tooltip title='Cancelled'>
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 2,
+            right: -20,
+            cursor: 'pointer',
+          }}
+        >
+          <Cross
+            style={{ color: 'black', height: 20, width: 20 }}
+            color='black'
+          />
+        </div>
+      </Tooltip>
+    )
+  return ''
+}
+
 export const OtherOrdersColumnExtensions = (
   viewOnly = false,
   onPrint,
   onActualizeBtnClick,
+  onRadiologyBtnClick,
 ) => [
   {
     columnName: 'type',
     compare: compareString,
     width: 120,
     render: row => {
+
+      let radiologyWorkitemStatusFK
+      if (row.type === 'Radiology' && !row.isPreOrder) {
+        const { workitem: { radiologyWorkitem: { statusFK } = {} } = {} } = row
+        // const { radiologyWorkitem = {} } = workitem
+        radiologyWorkitemStatusFK = statusFK
+      }
+
       let paddingRight = row.isPreOrder ? 24 : 0
       let urgentRight = 0
 
       if (row.priority === 'Urgent') {
         paddingRight += 34
         urgentRight = -paddingRight - 4
+      }
+      
+      if (radiologyWorkitemStatusFK) {
+        paddingRight += 24
       }
 
       return (
@@ -840,6 +952,7 @@ export const OtherOrdersColumnExtensions = (
                   </div>
                 </Tooltip>
               )}
+              {radiologyWorkitemStatusFK && radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
               {urgentIndicator(row, urgentRight)}
             </div>
           </div>
@@ -955,8 +1068,12 @@ export const OtherOrdersColumnExtensions = (
     render: r => {
       const { type } = r
 
-      if (!viewOnly && ServiceTypes.includes(type))
-        return actualizationButton(r, onActualizeBtnClick)
+      if (!viewOnly && ServiceTypes.includes(type)) {
+        return <div>
+          {actualizationButton(r, onActualizeBtnClick)}
+          {radiologyDetailsButton(r, onRadiologyBtnClick)}
+        </div>
+      }
       return (
         <Tooltip title='Print'>
           <Button
