@@ -278,22 +278,7 @@ export const DispenseItemsColumnExtensions = (
       width: 50,
       sortingEnabled: false,
       type: 'checkbox',
-      isDisabled: row => !checkActualizable(row),
-      render: row => {
-        if (checkActualizable(row)) {
-          return (
-            <Checkbox
-              label=''
-              style={{ marginLeft: 10 }}
-              value={row.isCheckActualize}
-              onChange={e => {
-                row.isCheckActualize = e.target.value
-              }}
-            />
-          )
-        }
-        return ''
-      },
+      isVisible: row => checkActualizable(row),
     },
     {
       columnName: 'type',
@@ -400,15 +385,7 @@ export const DispenseItemsColumnExtensions = (
               paddingRight,
             }}
           >
-            <Tooltip
-              title={
-                <div>
-                  {`Code: ${row.code}`}
-                  <br />
-                  {`Name: ${row.name}`}
-                </div>
-              }
-            >
+            <Tooltip title={row.name}>
               <span>{row.name}</span>
             </Tooltip>
             <div style={{ position: 'relative', top: 2 }}>
@@ -973,7 +950,6 @@ export const OtherOrdersColumnExtensions = (
   },
   {
     columnName: 'action',
-    align: 'center',
     align: 'left',
     width: 70,
     render: r => {
@@ -1396,7 +1372,6 @@ export const PackageColumnExtensions = (onPrint, showDrugLabelRemark) => [
   },
   {
     columnName: 'action',
-    align: 'center',
     align: 'left',
     width: 70,
     sortingEnabled: false,
