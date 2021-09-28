@@ -790,14 +790,19 @@ button[class*='MuiButton-root-'] {
 .ant-tabs-top > div > .ant-tabs-nav,
 .ant-tabs-bottom > div > .ant-tabs-nav {
   margin: 0 0 3px 0;
-} 
+}
 
-td[class*='MuiTableCell-root-'],th[class*='MuiTableCell-root-'] {
-  padding-left: 8px!important; 
+td[class*='MuiTableCell-root-'],
+th[class*='MuiTableCell-root-'] {
+  padding-left: 8px !important;
 }
 
 [class*='MuiCheckbox-colorSecondary-'] {
-  &.Mui-checked {
-    color:#3f51b5 !important; 
-  }
+    &.Mui-checked {
+        color: #3f51b5 !important;
+    }
+}
+
+td[class*='TableGroupCell-cell-'] {
+  cursor: default !important;
 }
