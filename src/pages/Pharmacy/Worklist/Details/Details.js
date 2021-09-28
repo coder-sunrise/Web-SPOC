@@ -1180,6 +1180,46 @@ const Details = props => {
     }
   }
 
+  const checkPartialDispense = () => {
+    let isPartialDispense = false
+    if (workitem.statusFK !== PHARMACY_STATUS.NEW) {
+      const pharmacyOrderItem = pharmacyDetails.entity?.pharmacyOrderItem || []
+      for (let index = 0; index < pharmacyOrderItem.length; index++) {
+        if (
+          pharmacyOrderItem[index].invoiceItemTypeFK !== 1 ||
+          (pharmacyOrderItem[index].inventoryFK &&
+            !pharmacyOrderItem[index].isExternalPrescription)
+        ) {
+          if (
+            pharmacyOrderItem[index].quantity >
+            _.sumBy(
+              pharmacyOrderItem[index].pharmacyOrderItemTransaction || [],
+              'transactionQty',
+            )
+          ) {
+            isPartialDispense = true
+            break
+          }
+        } else if (
+          pharmacyOrderItem[index].isDrugMixture &&
+          pharmacyOrderItem[index].prescriptionDrugMixture.find(
+            dm =>
+              dm.isDispensedByPharmacy &&
+              dm.quantity >
+                _.sumBy(
+                  dm.pharmacyOrderItemTransaction || [],
+                  'transactionQty',
+                ),
+          )
+        ) {
+          isPartialDispense = true
+          break
+        }
+      }
+    }
+    return isPartialDispense
+  }
+
   return (
     <div style={{ marginTop: -20 }}>
       <div className={classes.contentPanel}>
@@ -1192,6 +1232,7 @@ const Details = props => {
               <PharmacySteps
                 statusHistory={statusHistory}
                 currentStatusFK={workitem.statusFK}
+                isPartialDispense={checkPartialDispense()}
               />
             </GridItem>
             <GridItem md={12}>
