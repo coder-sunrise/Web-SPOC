@@ -517,22 +517,6 @@ const DispenseDetails = ({
     )
   }
 
-  const actualizeChange = (e, row) => {
-    if (row.isDrugMixture) {
-      setFieldValue('dispenseItems', [
-        ...dispenseItems.map(di => {
-          if (row.id === di.id) {
-            return {
-              ...di,
-              isCheckActualize: e.target.value,
-            }
-          }
-          return di
-        }),
-      ])
-    }
-  }
-
   let columns = DispenseItemsColumns
   if (!isShowDispenseActualie || viewOnly) {
     columns = columns.filter(c => c.name !== 'isCheckActualize')
@@ -803,7 +787,6 @@ const DispenseDetails = ({
                 onPrint,
                 onActualizeBtnClick,
                 showDrugLabelRemark,
-                actualizeChange,
               )}
               data={dispenseItems}
               TableProps={{
