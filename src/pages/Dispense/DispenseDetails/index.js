@@ -797,6 +797,7 @@ const DispenseDetails = ({
 
             <TableData
               title='Service'
+              forceRender
               oddEven={false}
               titleExtend={
                 viewOnly
