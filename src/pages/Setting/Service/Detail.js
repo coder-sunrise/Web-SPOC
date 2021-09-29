@@ -732,30 +732,29 @@ class Detail extends PureComponent {
                   </GridItem>
                 )}
 
-                {labAndRadiologySetting
-                  ? !hiddenFields.includes('ctService_Tag') && (
-                      <GridItem xs={12}>
-                        <Field
-                          name='ctService_Tag'
-                          render={args => (
-                            <TagPanel
-                              label='Tags:'
-                              tagCategory='Service'
-                              defaultTagNames={this.state.serviceTags}
-                              {...args}
-                              onChange={(value, tags) =>
-                                this.handleTagPanelChange(
-                                  value,
-                                  tags,
-                                  args.form.setFieldValue,
-                                )
-                              }
-                            ></TagPanel>
-                          )}
-                        />
-                      </GridItem>
-                    )
-                  : ''}
+                {labAndRadiologySetting &&
+                  !hiddenFields.includes('ctService_Tag') && (
+                    <GridItem xs={12}>
+                      <Field
+                        name='ctService_Tag'
+                        render={args => (
+                          <TagPanel
+                            label='Tags:'
+                            tagCategory='Service'
+                            defaultTagNames={this.state.serviceTags}
+                            {...args}
+                            onChange={(value, tags) =>
+                              this.handleTagPanelChange(
+                                value,
+                                tags,
+                                args.form.setFieldValue,
+                              )
+                            }
+                          ></TagPanel>
+                        )}
+                      />
+                    </GridItem>
+                  )}
                 <GridItem xs={12}>
                   <GridContainer>
                     <GridItem xs={4}>
