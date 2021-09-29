@@ -73,13 +73,6 @@ const filterLabWorkItem = workItem => {
   return workItem.filter(x => x.type === 'Lab')
 }
 
-const labWorkItemsAccessRight = Authorized.check('queue.workitem.labworkitem')
-const radiologyWorkItemsAccessRight = Authorized.check(
-  'queue.workitem.radiologyworkitem',
-)
-const nurseWorkItemsAccessRight = Authorized.check(
-  'queue.workitem.nurseworkitem',
-)
 
 
 export const FuncConfig = {
@@ -402,7 +395,13 @@ export const QueueColumnExtensions = [
       const labWorkItems = filterLabWorkItem(row.workItem)
       const radioWorkItems = filterRadioWorkItem(row.workItem)
       const nurseWorkItems = filterNurseWorkItem(row.workItem)
-
+      const labWorkItemsAccessRight = Authorized.check('queue.workitem.labworkitem')
+      const radiologyWorkItemsAccessRight = Authorized.check(
+        'queue.workitem.radiologyworkitem',
+      )
+      const nurseWorkItemsAccessRight = Authorized.check(
+        'queue.workitem.nurseworkitem',
+      )
       return (
         <div style={{ justifyContent: 'space-between' }}>
           {radiologyWorkItemsAccessRight.rights === 'enable' &&
