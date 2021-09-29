@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import withStyles from '@material-ui/core/styles/withStyles'
+import { connect } from 'dva'
 import {
   EditorState,
   ContentState,
@@ -13,23 +14,29 @@ import {
   GridContainer,
   GridItem,
   Checklist,
+  CommonModal,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 import { Typography, Input } from 'antd'
-import { CHECKLIST_CATEGORY } from '@/utils/constants'
+import { CHECKLIST_CATEGORY, SCRIBBLE_NOTE_TYPE } from '@/utils/constants'
+import { navigateDirtyCheck } from '@/utils/utils'
+import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 
 const Findings = ({
-  item,
+  // item,
   scriblenotes,
   defaultValue,
   onChange,
   args,
   index,
-  scribbleNoteUpdateState,
+  // scribbleNoteUpdateState,
   loading,
   ...restProps
 }) => {
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
+  const [width, setWidth] = useState(0)
+  const [showScribbleModal, setScribbleModal] = useState(scriblenotes?.showScribbleModal || false)
+  const [selectedData, setSelectedScribble] = useState('')
 
   useEffect(() => {
     if (defaultValue && defaultValue !== '') {
@@ -60,6 +67,46 @@ const Findings = ({
     setEditorState(editorState)
   }
 
+  const scribbleNoteUpdateState = () => {
+
+  }
+  
+  useEffect(() => {
+    resize()
+  },[])
+  const resize = () => {
+    if (window.innerWidth <= 1785) {
+      setWidth(window.innerWidth / 11)
+    } else {
+      setWidth(window.innerWidth / 5.8)
+    }
+  }
+
+  const toggleScribbleModal = () => {
+    setScribbleModal(!showScribbleModal)
+  }
+
+  const scribbleNoteDrawing = () => {
+  }
+
+  const insertIntoClinicalNote = () => {
+  }
+
+  const deleteScribbleNote = () => {
+  }
+
+  const item = {
+    authority: 'queue.consultation.clinicalnotes.history',
+    category: 'RadiologyFindings',
+    fieldName: 'RadiologyFindings',
+    fieldTitle: 'RadiologyFindings',
+    scribbleField: 'radiologyFindingsScribbleArray',
+    scribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.RADIOLOGY,
+    index: 0,
+    height: 390,
+    enableSetting: 'isEnableClinicNoteHistory'
+  }
+
   return (
     <div>
       <GridContainer>
@@ -73,6 +120,15 @@ const Findings = ({
               textAlign: 'right',
             }}
           >
+            <ScribbleNoteItem
+              scribbleNoteUpdateState={scribbleNoteUpdateState}
+              category={item.category}
+              arrayName={item.scribbleField}
+              categoryIndex={item.scribbleNoteTypeFK}
+              scribbleNoteArray={[]}//scriblenotes[item.category][item.scribbleField]}
+              gridItemWidth={width}
+            />
+
             <Checklist
               checklistCategory={CHECKLIST_CATEGORY.RADIOLOGY}
               buttonStyle={{ marginRight: '0px' }}
@@ -103,6 +159,28 @@ const Findings = ({
           />
         </GridItem>
       </GridContainer>
+
+      <CommonModal
+        open={showScribbleModal}
+        title='Scribble'
+        fullScreen
+        bodyNoPadding
+        observe='ScribbleNotePage'
+        onClose={() =>
+          navigateDirtyCheck({
+            onProceed: toggleScribbleModal(),
+          })
+        }
+      >
+        <ScribbleNote
+          // {...this.props}
+          addScribble={scribbleNoteDrawing}
+          exportToClinicalNote={insertIntoClinicalNote}
+          toggleScribbleModal={toggleScribbleModal}
+          scribbleData={selectedData}
+          deleteScribbleNote={deleteScribbleNote}
+        />
+      </CommonModal>
     </div>
   )
 }

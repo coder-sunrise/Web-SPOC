@@ -296,7 +296,7 @@ const RadiologyDetails = props => {
 
         {details.entity &&
           details.entity.statusFK ===
-            RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT && (
+            RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED && (
             <GridItem md={12} style={{ marginTop: 5 }}>
               <div>
                 <Findings

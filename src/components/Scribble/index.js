@@ -484,6 +484,7 @@ class Scribble extends React.Component {
 
   onSaveClick = async () => {
     temp = this._sketch.getAllLayerData()
+    console.log('temp',temp)
     const thumbnail = await this._generateThumbnail()
     await this.props.setFieldValue('thumbnail', thumbnail.split(',')[1])
     this.props.handleSubmit()
@@ -498,6 +499,7 @@ class Scribble extends React.Component {
     //     selectedScribbleDataUrl: imageDataUrl,
     //   },
     // })
+    console.log('imageDataUrl',imageDataUrl)
     if (exportToClinicalNote) {
       exportToClinicalNote(imageDataUrl)
     }
