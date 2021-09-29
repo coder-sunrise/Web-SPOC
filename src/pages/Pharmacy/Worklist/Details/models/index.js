@@ -25,6 +25,12 @@ export default createFormViewModel({
             payload: { id: pharmacyDetails.entity.patientProfileFK },
           })
           yield take('patient/query/@@end')
+
+          yield put({
+            type: 'visitRegistration/query',
+            payload: { id: pharmacyDetails.entity.visitFK },
+          })
+          yield take('visitRegistration/query/@@end')
         }
       },
       *initState({ payload }, { call, select, put, take }) {},
