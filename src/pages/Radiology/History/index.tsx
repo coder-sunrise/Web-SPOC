@@ -34,6 +34,7 @@ import _ from 'lodash'
 import LinkIcon from '@material-ui/icons/Link'
 import IconButton from '@/components/Button/IconButton'
 import { withStyles } from '@material-ui/core'
+import { CommonSeriesSettingsHoverStyle } from 'devextreme-react/chart'
 
 const { queryList, query } = service
 const api = {
@@ -78,6 +79,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       key: 'accessionNo',
       title: 'Accession No.',
       dataIndex: 'accessionNo',
+      defaultSortOrder: 'descend',
       sorter: true,
       search: false,
       width: 120,
@@ -143,7 +145,8 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       dataIndex: 'orderDate',
       valueType: 'dateTime',
       render: (_dom: any, entity: any) =>
-        entity.orderTime?.format('yyyy-MM-DD HH:mm:ss') || '-',
+        entity.orderTime?.format('DD MMM YYYY HH:mm') || '-',
+      sortBy: 'createDate',
       sorter: true,
       search: false,
       width: 145,
@@ -217,6 +220,10 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       sorter: false,
       search: false,
       width: 85,
+      render: (_dom: any, entity: any) => {
+        const vt = (visitPurpose||[]).find(x => x.id === entity.visitType)
+        return vt?.code
+      },
     },
     {
       key: 'visitDoctor',
@@ -248,7 +255,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       dataIndex: 'completedDate',
       valueType: 'dateTime',
       render: (_dom: any, entity: any) =>
-        entity.completedDate?.format('yyyy-MM-DD HH:mm:ss') || '-',
+        entity.completedDate?.format('DD MMM YYYY HH:mm') || '-',
       sorter: false,
       search: false,
       width: 145,
@@ -259,7 +266,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       dataIndex: 'cancelledDate',
       valueType: 'dateTime',
       render: (_dom: any, entity: any) =>
-        entity.cancelledDate?.format('yyyy-MM-DD HH:mm:ss') || '-',
+        entity.cancelledDate?.format('DD MMM YYYY HH:mm') || '-',
       sorter: false,
       search: false,
       width: 145,
@@ -358,9 +365,9 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       hideInTable: true,
       title: '',
       dataIndex: 'searchVisitType',
-      initialValue:[-99],
+      initialValue: [-99],
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-        const visitPurposeOptions = (visitPurpose||[]).map(x => ({
+        const visitPurposeOptions = (visitPurpose || []).map(x => ({
           value: x.id,
           name: x.name,
           customTooltipField: x.customTooltipField,
@@ -383,7 +390,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       hideInTable: true,
       title: '',
       dataIndex: 'searchModality',
-      initialValue:[-99],
+      initialValue: [-99],
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
         const modalityOptions = codetable.ctmodality || []
         return (
@@ -405,7 +412,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       hideInTable: true,
       title: '',
       dataIndex: 'searchExamination',
-      initialValue:[-99],
+      initialValue: [-99],
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
         const service = (codetable.ctservice || []).filter(
           x => x.serviceCenterCategoryFK === 3,
@@ -433,7 +440,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       hideInTable: true,
       title: '',
       dataIndex: 'searchVisitDoctor',
-      initialValue:[-99],
+      initialValue: [-99],
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
         const visitDoctorOptions = (codetable.doctorprofile || []).map(x => {
           return {
@@ -487,7 +494,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       hideInTable: true,
       title: '',
       dataIndex: 'searchRadiographer',
-      initialValue:[-99],
+      initialValue: [-99],
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
         const radiographer = (codetable.clinicianprofile || []).filter(
           x => x.userProfile.role.id === 4 /*replace to radiographer role id*/,
@@ -618,13 +625,10 @@ const RadiologyWorklistHistoryIndex = ({
   }
 
   if ((codetable?.ctvisitpurpose || []).length > 0) {
-    const filteredVisitpurpose = codetable.ctvisitpurpose.filter(
-      x => x.id != VISIT_TYPE.OTC,
-    )
     visitPurpose = mapVisitType(
-      filteredVisitpurpose,
+      codetable.ctvisitpurpose,
       visitTypeSettingsObj,
-    ).filter(vstType => vstType['isEnabled'] === 'true')
+    ).filter(vstType => vstType.id != VISIT_TYPE.OTC && vstType['isEnabled'] === 'true')
   }
 
   const columns = defaultColumns(codetable, setDetailsId, visitPurpose)
@@ -667,7 +671,7 @@ const RadiologyWorklistHistoryIndex = ({
             ]
           }}
           defaultColumns={[]}
-          pagination={{ pageSize: 50 }}
+          pagination={{ pageSize: 100 }}
           features={[
             {
               code: 'details',
