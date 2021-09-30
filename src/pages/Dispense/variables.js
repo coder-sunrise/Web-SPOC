@@ -19,7 +19,11 @@ import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import PackageDrawdownInfo from '@/pages/Widgets/Orders/Detail/PackageDrawdownInfo'
 import { InventoryTypes } from '@/utils/codes'
 import CONSTANTS from './DispenseDetails/constants'
-import { UnorderedListOutlined, CheckOutlined, FileTextOutlined } from '@ant-design/icons'
+import {
+  UnorderedListOutlined,
+  CheckOutlined,
+  FileTextOutlined,
+} from '@ant-design/icons'
 import {
   NURSE_WORKITEM_STATUS,
   RADIOLOGY_WORKITEM_STATUS,
@@ -179,19 +183,17 @@ const radiologyDetailsButton = (row, buttonClickCallback) => {
   } = row
 
   if (type === 'Radiology' && radiologyWorkitemID) {
-      actualizationBtn = (
-        <Tooltip title='Radiology Detail'>
-            <Button
-              color='primary'
-              justIcon
-              onClick={() =>
-                buttonClickCallback(radiologyWorkitemID)
-              }
-            >
-              <FileTextOutlined />
-            </Button>
-          </Tooltip>
-      )
+    actualizationBtn = (
+      <Tooltip title='Radiology Detail'>
+        <Button
+          color='primary'
+          justIcon
+          onClick={() => buttonClickCallback(radiologyWorkitemID)}
+        >
+          <FileTextOutlined />
+        </Button>
+      </Tooltip>
+    )
   }
   return actualizationBtn
 }
@@ -468,19 +470,22 @@ export const DispenseItemsColumnExtensions = (
           <div style={{ position: 'relative' }}>
             <div
               style={{
-                wordWrap: 'break-word',
-                whiteSpace: 'pre-wrap',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
                 paddingRight: existsDrugLabelRemarks ? 10 : 0,
               }}
             >
-              {row.remarks || ' '}
+              <Tooltip title={row.remarks || ''}>
+                <span>{row.remarks || ' '}</span>
+              </Tooltip>
               <div style={{ position: 'relative', top: 2 }}>
                 {existsDrugLabelRemarks && (
                   <div
                     style={{
                       position: 'absolute',
                       bottom: 2,
-                      right: -15,
+                      right: -13,
                     }}
                   >
                     <Tooltip
@@ -860,8 +865,7 @@ const radiologyWorkitemStatus = radiologyWorkitemStatusFK => {
             height: 16,
             width: 16,
             backgroundColor:
-              radiologyWorkitemStatusFK ===
-              RADIOLOGY_WORKITEM_STATUS.INPROGRESS
+              radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
                 ? '#1890FF'
                 : '#009900',
             cursor: 'pointer',
@@ -901,7 +905,6 @@ export const OtherOrdersColumnExtensions = (
     compare: compareString,
     width: 120,
     render: row => {
-
       let radiologyWorkitemStatusFK
       if (row.type === 'Radiology' && !row.isPreOrder) {
         const { workitem: { radiologyWorkitem: { statusFK } = {} } = {} } = row
@@ -916,7 +919,7 @@ export const OtherOrdersColumnExtensions = (
         paddingRight += 34
         urgentRight = -paddingRight - 4
       }
-      
+
       if (radiologyWorkitemStatusFK) {
         paddingRight += 24
       }
@@ -952,7 +955,8 @@ export const OtherOrdersColumnExtensions = (
                   </div>
                 </Tooltip>
               )}
-              {radiologyWorkitemStatusFK && radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
+              {radiologyWorkitemStatusFK &&
+                radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
               {urgentIndicator(row, urgentRight)}
             </div>
           </div>
@@ -1069,10 +1073,12 @@ export const OtherOrdersColumnExtensions = (
       const { type } = r
 
       if (!viewOnly && ServiceTypes.includes(type)) {
-        return <div>
-          {actualizationButton(r, onActualizeBtnClick)}
-          {radiologyDetailsButton(r, onRadiologyBtnClick)}
-        </div>
+        return (
+          <div>
+            {actualizationButton(r, onActualizeBtnClick)}
+            {radiologyDetailsButton(r, onRadiologyBtnClick)}
+          </div>
+        )
       }
       return (
         <Tooltip title='Print'>
