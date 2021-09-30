@@ -34,6 +34,7 @@ import _ from 'lodash'
 import LinkIcon from '@material-ui/icons/Link'
 import IconButton from '@/components/Button/IconButton'
 import { withStyles } from '@material-ui/core'
+import { CommonSeriesSettingsHoverStyle } from 'devextreme-react/chart'
 
 const { queryList, query } = service
 const api = {
@@ -217,6 +218,10 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       sorter: false,
       search: false,
       width: 85,
+      render: (_dom: any, entity: any) => {
+        const vt = visitPurpose.filter(x=>x.id == entity.visitType)[0]
+        return vt.name
+      },
     },
     {
       key: 'visitDoctor',
@@ -618,13 +623,10 @@ const RadiologyWorklistHistoryIndex = ({
   }
 
   if ((codetable?.ctvisitpurpose || []).length > 0) {
-    const filteredVisitpurpose = codetable.ctvisitpurpose.filter(
-      x => x.id != VISIT_TYPE.OTC,
-    )
     visitPurpose = mapVisitType(
-      filteredVisitpurpose,
+      codetable.ctvisitpurpose,
       visitTypeSettingsObj,
-    ).filter(vstType => vstType['isEnabled'] === 'true')
+    ).filter(vstType => vstType.id != VISIT_TYPE.OTC && vstType['isEnabled'] === 'true')
   }
 
   const columns = defaultColumns(codetable, setDetailsId, visitPurpose)
