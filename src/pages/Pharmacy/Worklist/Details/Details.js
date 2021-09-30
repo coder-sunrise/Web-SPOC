@@ -8,6 +8,7 @@ import Banner from '@/pages/PatientDashboard/Banner'
 import Main from './Main'
 import EditOrder from '@/pages/Dispense/EditOrder'
 import style from '@/pages/Dispense/style'
+import { LoadingWrapper } from '@/components/_medisys'
 
 const styles = theme => ({
   ...style,
@@ -18,7 +19,7 @@ const styles = theme => ({
 })
 
 const Details = props => {
-  const { patient, classes, pharmacyDetails, dispatch } = props
+  const { patient, classes, pharmacyDetails, dispatch, loading } = props
   const [editingOrder, setEditingOrder] = useState(false)
   const closeEditOrder = () => {
     dispatch({
@@ -31,24 +32,28 @@ const Details = props => {
   const contentHeight = (props.height || 0) - (banner?.offsetHeight || 0)
   return (
     <div>
-      <div style={{ padding: 8, marginTop: -20 }}>
-        <Banner from='Pharmacy' patientInfo={patient} />
-      </div>
-      <div className={classes.contentPanel} style={{ height: contentHeight }}>
-        <SizeContainer size='sm'>
-          <React.Fragment>
-            {!editingOrder ? (
-              <Main {...props} setEditingOrder={setEditingOrder} />
-            ) : (
-              <EditOrder
-                from='Pharmacy'
-                {...props}
-                closeEditOrder={closeEditOrder}
-              />
-            )}
-          </React.Fragment>
-        </SizeContainer>
-      </div>
+      <LoadingWrapper
+        loading={loading.models.dispense || loading.models.pharmacyDetails}
+      >
+        <div style={{ padding: 8, marginTop: -20 }}>
+          <Banner from='Pharmacy' patientInfo={patient} />
+        </div>
+        <div className={classes.contentPanel} style={{ height: contentHeight }}>
+          <SizeContainer size='sm'>
+            <React.Fragment>
+              {!editingOrder ? (
+                <Main {...props} setEditingOrder={setEditingOrder} />
+              ) : (
+                <EditOrder
+                  from='Pharmacy'
+                  {...props}
+                  closeEditOrder={closeEditOrder}
+                />
+              )}
+            </React.Fragment>
+          </SizeContainer>
+        </div>
+      </LoadingWrapper>
     </div>
   )
 }
@@ -66,6 +71,7 @@ export default compose(
       pharmacyDetails,
       orders,
       visitRegistration,
+      loading,
     }) => ({
       patient: patient.entity || {},
       forms,
@@ -76,6 +82,7 @@ export default compose(
       pharmacyDetails,
       orders,
       visitRegistration,
+      loading,
     }),
   ),
 )(Details)
