@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import _ from 'lodash'
@@ -54,6 +54,10 @@ import {
 
 import CONSTANTS from './constants'
 import { ServePatientButton } from '@/components/_medisys'
+import RadiologyDetails from '@/pages/Radiology/Worklist/Details'
+import WorklistContext, {
+  WorklistContextProvider,
+} from '@/pages/Radiology/Worklist/WorklistContext'
 
 const styles = theme => ({
   paper: {
@@ -88,8 +92,9 @@ const styles = theme => ({
     },
   },
   groupStyle: {
-    margin: '3px 0px',
-  }
+    padding: '3px 0px',
+    backgroundColor: '#CCCCCC',
+  },
 })
 
 const DispenseDetails = ({
@@ -142,21 +147,18 @@ const DispenseDetails = ({
 
   const { inventorymedication, inventoryvaccination } = codetable
   const { settings = {} } = clinicSettings
-  const currentDoc = doctorprofile.filter(
-    x => x.id === visit.doctorProfileFK,
-  )
+  const currentDoc = doctorprofile.filter(x => x.id === visit.doctorProfileFK)
   const docInfo =
-    currentDoc && currentDoc.length > 0
-      ? currentDoc[0].clinicianProfile
-      : {}
+    currentDoc && currentDoc.length > 0 ? currentDoc[0].clinicianProfile : {}
 
   const discardCallback = r => {
     if (r) {
       const userProfile = user.data.clinicianProfile
-      const userName = `${userProfile.title && userProfile.title.trim().length
-        ? `${userProfile.title}. ${userProfile.name || ''}`
-        : `${userProfile.name || ''}`
-        }`
+      const userName = `${
+        userProfile.title && userProfile.title.trim().length
+          ? `${userProfile.title}. ${userProfile.name || ''}`
+          : `${userProfile.name || ''}`
+      }`
       const message = `${userName} discard prescription at ${moment().format(
         'HH:mm',
       )}`
@@ -218,8 +220,7 @@ const DispenseDetails = ({
       invoiceTotal: v.summary.total,
       invoiceTotalAftAdj: v.summary.totalAfterAdj,
       invoiceTotalAftGST: v.summary.totalWithGST,
-      outstandingBalance:
-        v.summary.totalWithGST - values.invoice.totalPayment,
+      outstandingBalance: v.summary.totalWithGST - values.invoice.totalPayment,
       invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
       invoiceGSTAdjustment: v.summary.gstAdj,
       invoiceAdjustment: v.adjustments,
@@ -309,9 +310,7 @@ const DispenseDetails = ({
     let label = 'Package'
     let totalPrice = 0
     if (!packageItem) return ''
-    const data = packageItem.filter(
-      item => item.packageGlobalId === row.value,
-    )
+    const data = packageItem.filter(item => item.packageGlobalId === row.value)
     if (data.length > 0) {
       totalPrice = _.sumBy(data, 'totalAfterItemAdjustment') || 0
       label = `${data[0].packageCode} - ${data[0].packageName} (Total: `
@@ -340,12 +339,14 @@ const DispenseDetails = ({
   }
 
   const isShowActualizeSelection = (records = []) => {
+    if (viewOnly) {
+      return false
+    }
     let actualizeOrderItemsRight = Authorized.check(
       'dispense.actualizeorderitems',
     )
     let viewable =
-      actualizeOrderItemsRight &&
-      actualizeOrderItemsRight.rights !== 'hidden'
+      actualizeOrderItemsRight && actualizeOrderItemsRight.rights !== 'hidden'
     return viewable && records.filter(x => isActualizable(x)).length > 0
   }
 
@@ -361,6 +362,11 @@ const DispenseDetails = ({
     setSelectedActualizeRows([row])
     setActualizationStatus(status)
     setShowActualization(true)
+  }
+
+  const { detailsId, setDetailsId } = useContext(WorklistContext)
+  const onRadiologyBtnClick = radiologyWorkitemID => {
+    setDetailsId(radiologyWorkitemID)
   }
 
   const handleMultiActualizationClick = type => {
@@ -379,9 +385,14 @@ const DispenseDetails = ({
     if (selectedRows.length > 0) {
       let selectedRecords = []
       if (type === 'DispenseItems') {
-        selectedRecords = records.filter(x => x.isCheckActualize)
-      }
-      else {
+        selectedRecords = [
+          ...records.filter(x => x.isCheckActualize && !x.isDrugMixture),
+          ..._.uniqBy(
+            records.filter(x => x.isCheckActualize && x.isDrugMixture),
+            'id',
+          ),
+        ]
+      } else {
         selectedRecords = records.filter(
           x => selectedRows.indexOf(getRowId(x, type)) > -1,
         )
@@ -422,19 +433,40 @@ const DispenseDetails = ({
   const { labelPrinterSize } = settings
   const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
 
-  const isShowDispenseActualie = isShowActualizeSelection(dispenseItems)
+  const isShowDispenseActualie =
+    !viewOnly && isShowActualizeSelection(dispenseItems)
   const orderItemRow = p => {
     const { row, children, tableRow } = p
     let newchildren = []
 
     const startColIndex = isShowDispenseActualie ? 7 : 6
-    const endColIndex = isShowDispenseActualie ? 12 : 11
+    let endColIndex = isShowDispenseActualie ? 11 : 10
+    if (viewOnly) {
+      endColIndex = endColIndex - 1
+    }
     const batchColumns = children.slice(startColIndex, endColIndex)
+
+    if (row.groupNumber === 1) {
+      newchildren.push(
+        children
+          .filter((value, index) => index < (isShowDispenseActualie ? 3 : 2))
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.groupRowSpan,
+            },
+          })),
+      )
+    }
 
     if (row.countNumber === 1) {
       newchildren.push(
         children
-          .filter((value, index) => index < startColIndex)
+          .filter(
+            (value, index) =>
+              index < startColIndex && index > (isShowDispenseActualie ? 2 : 1),
+          )
           .map(item => ({
             ...item,
             props: {
@@ -448,7 +480,7 @@ const DispenseDetails = ({
 
       newchildren.push(
         children
-          .filter((value, index) => index > endColIndex - 1)
+          .filter((value, index) => index === endColIndex)
           .map(item => ({
             ...item,
             props: {
@@ -461,6 +493,20 @@ const DispenseDetails = ({
       newchildren.push(batchColumns)
     }
 
+    if (row.groupNumber === 1) {
+      newchildren.push(
+        children
+          .filter((value, index) => index > endColIndex)
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.groupRowSpan,
+            },
+          })),
+      )
+    }
+
     if (row.countNumber === 1) {
       return <Table.Row {...p}>{newchildren}</Table.Row>
     }
@@ -471,14 +517,36 @@ const DispenseDetails = ({
     )
   }
 
+  let columns = DispenseItemsColumns
+  if (!isShowDispenseActualie || viewOnly) {
+    columns = columns.filter(c => c.name !== 'isCheckActualize')
+  }
+  if (viewOnly) {
+    columns = columns.filter(c => c.name !== 'stock')
+  }
+
+  const commitChanges = ({ rows, changed }) => {
+    if (changed) {
+      const key = Object.keys(changed)[0]
+      const editRow = rows.find(r => r.uid === key)
+      let matchItems = []
+      if (editRow.isDrugMixture) {
+        matchItems = rows.filter(r => r.drugMixtureFK === editRow.drugMixtureFK)
+      } else {
+        matchItems = rows.filter(
+          r => r.type === editRow.type && r.id === editRow.id,
+        )
+      }
+      const balanceQty =
+        editRow.quantity - _.sumBy(matchItems, 'dispenseQuantity')
+      matchItems.forEach(item => (item.stockBalance = balanceQty))
+      setFieldValue('dispenseItems', rows)
+    }
+  }
   return (
     <React.Fragment>
       <GridContainer>
-        <GridItem
-          justify='flex-start'
-          md={7}
-          className={classes.actionButtons}
-        >
+        <GridItem justify='flex-start' md={7} className={classes.actionButtons}>
           {!viewOnly && !isRetailVisit && (
             <Button
               color='info'
@@ -514,8 +582,7 @@ const DispenseDetails = ({
             <span style={{ color: '#999999' }}>
               Order created by{' '}
               <span style={{ fontWeight: 500 }}>
-                {`${docInfo.title ? `${docInfo.title}.` : null}${docInfo.name
-                  }`}{' '}
+                {`${docInfo.title ? `${docInfo.title}.` : null}${docInfo.name}`}{' '}
                 at {visit.orderCreateTime.format('DD MMM yyyy HH:mm')}
               </span>{' '}
             </span>
@@ -544,11 +611,7 @@ const DispenseDetails = ({
             )}
             {!isBillFirstVisit && (
               <Authorized authority='queue.dispense.savedispense'>
-                <ProgressButton
-                  color='success'
-                  size='sm'
-                  onClick={onSaveClick}
-                >
+                <ProgressButton color='success' size='sm' onClick={onSaveClick}>
                   Save Dispense
                 </ProgressButton>
               </Authorized>
@@ -644,7 +707,12 @@ const DispenseDetails = ({
                   } else if (coPayerPayments.length > 0) {
                     setShowRemovePayment(true)
                   } else {
-                    onFinalizeClick()
+                    if(dispenseItems.filter(x => isActualizable(x)).length > 0 || service.filter(x => isActualizable(x)).length > 0)
+                      notification.error({
+                        message: 'Actualize all nursing work items before finalize.',
+                      })
+                    else
+                      onFinalizeClick()
                   }
                 }}
               >
@@ -656,11 +724,17 @@ const DispenseDetails = ({
         <GridItem md={12}>
           <Paper className={classes.paper}>
             <TableData
+              oddEven={false}
               title='Dispense Details'
-              titleExtend={actualizeSelectedItemButton(
-                'DispenseItems',
-                dispenseItems,
-              )}
+              titleExtend={
+                viewOnly
+                  ? null
+                  : actualizeSelectedItemButton('DispenseItems', dispenseItems)
+              }
+              EditingProps={{
+                showCommandColumn: false,
+                onCommitChanges: commitChanges,
+              }}
               FuncProps={{
                 pager: false,
                 grouping: true,
@@ -680,14 +754,17 @@ const DispenseDetails = ({
                       if (row.value === 'NormalDispense')
                         return (
                           <div className={classes.groupStyle}>
-                            <span style={{ fontWeight: 600 }}>Normal Dispense Items</span>
+                            <span style={{ fontWeight: 600 }}>
+                              Normal Dispense Items
+                            </span>
                           </div>
                         )
                       if (row.value === 'NoNeedToDispense')
                         return (
-                          <div className={classes.groupStyle}><span style={{ fontWeight: 600 }}>
-                            No Need To Dispense Items
-                          </span>
+                          <div className={classes.groupStyle}>
+                            <span style={{ fontWeight: 600 }}>
+                              No Need To Dispense Items
+                            </span>
                           </div>
                         )
                       return (
@@ -700,10 +777,11 @@ const DispenseDetails = ({
                       )
                     },
                   },
+                  backgroundColor: '#CCCCCC',
                 },
               }}
               forceRender
-              columns={isShowDispenseActualie ? DispenseItemsColumns : DispenseItemsColumns.filter(c => c.name !== 'isCheckActualize')}
+              columns={columns}
               colExtensions={DispenseItemsColumnExtensions(
                 viewOnly,
                 onPrint,
@@ -719,26 +797,33 @@ const DispenseDetails = ({
 
             <TableData
               title='Service'
-              titleExtend={actualizeSelectedItemButton(
-                'Service',
-                service,
-              )}
+              forceRender
+              oddEven={false}
+              titleExtend={
+                viewOnly
+                  ? null
+                  : actualizeSelectedItemButton('Service', service)
+              }
               selection={selectedServiceRows}
               onSelectionChange={value => {
                 handleSelectionChange('Service', value)
               }}
-              {...actualizeTableConfig(isShowActualizeSelection(service))}
+              {...actualizeTableConfig(
+                !viewOnly && isShowActualizeSelection(service),
+              )}
               idPrefix='Service'
               columns={ServiceColumns}
               colExtensions={OtherOrdersColumnExtensions(
                 viewOnly,
                 onPrint,
                 onActualizeBtnClick,
+                onRadiologyBtnClick,
               )}
               data={service}
             />
 
             <TableData
+              oddEven={false}
               title='Other Orders'
               idPrefix='OtherOrders'
               columns={OtherOrdersColumns}
@@ -752,6 +837,7 @@ const DispenseDetails = ({
 
             {settings.isEnablePackage && visitPurposeFK !== VISIT_TYPE.OTC && (
               <TableData
+                oddEven={false}
                 title='Package'
                 idPrefix='package'
                 columns={PackageColumns}
@@ -889,8 +975,8 @@ const DispenseDetails = ({
 
             <div>
               Note: There are existing payments with some co-payers, click
-              "Void" to cancel all payments, or click "Skip" to remove
-              co-payers & payments manually.
+              "Void" to cancel all payments, or click "Skip" to remove co-payers
+              & payments manually.
             </div>
           </GridContainer>
           <GridContainer
@@ -958,9 +1044,16 @@ const DispenseDetails = ({
           }}
         />
       </CommonModal>
+      <RadiologyDetails />
     </React.Fragment>
   )
 }
+
+const _DispenseDetails = props => (
+  <WorklistContextProvider>
+    <DispenseDetails {...props}></DispenseDetails>
+  </WorklistContextProvider>
+)
 
 export default compose(
   withStyles(styles, { name: 'DispenseDetailsGrid' }),
@@ -982,4 +1075,4 @@ export default compose(
       user,
     }),
   ),
-)(DispenseDetails)
+)(_DispenseDetails)

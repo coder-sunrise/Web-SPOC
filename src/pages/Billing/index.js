@@ -95,8 +95,16 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
     }
   }
 
-  const transactionDetails = (item) => {
-    const { inventoryStockFK, batchNo, expiryDate, oldQty, transactionQty, uomDisplayValue, secondUOMDisplayValue } = item
+  const transactionDetails = item => {
+    const {
+      inventoryStockFK,
+      batchNo,
+      expiryDate,
+      oldQty,
+      transactionQty,
+      uomDisplayValue,
+      secondUOMDisplayValue,
+    } = item
     return {
       dispenseQuantity: transactionQty,
       batchNo,
@@ -132,6 +140,9 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
           orderItems.push({
             ...detaultDrugMixture,
             ...transactionDetails(di),
+            stockBalance:
+              drugMixture.quantity -
+              _.sumBy(drugMixture.dispenseItem, 'transactionQty'),
             countNumber: index === 0 ? 1 : 0,
             rowspan: index === 0 ? drugMixture.dispenseItem.length : 0,
             uid: getUniqueId(),
@@ -143,12 +154,22 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
         })
       }
     })
+
+    const groupItems = orderItems.filter(
+      oi => oi.type === item.type && oi.id === item.id,
+    )
+    groupItems[0].groupNumber = 1
+    groupItems[0].groupRowSpan = groupItems.length
   }
 
   const generateFromTransaction = item => {
     const groupName = 'NormalDispense'
     if (item.isPreOrder) {
-      orderItems.push(defaultItem(item, groupName))
+      orderItems.push({
+        ...defaultItem(item, groupName),
+        groupNumber: 1,
+        groupRowSpan: 1,
+      })
       return
     }
 
@@ -157,6 +178,8 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
         orderItems.push({
           ...defaultItem(item, groupName),
           ...transactionDetails(di),
+          stockBalance:
+            item.quantity - _.sumBy(item.dispenseItem, 'transactionQty'),
           countNumber: index === 0 ? 1 : 0,
           rowspan: index === 0 ? item.dispenseItem.length : 0,
           uid: getUniqueId(),
@@ -165,11 +188,16 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
     } else {
       orderItems.push(defaultItem(item, groupName))
     }
+    const groupItems = orderItems.filter(
+      oi => oi.type === item.type && oi.id === item.id,
+    )
+    groupItems[0].groupNumber = 1
+    groupItems[0].groupRowSpan = groupItems.length
   }
 
   const sortOrderItems = [
     ...(entity.prescription || []).filter(
-      item => item.type === 'Medication' && !item.isDrugMixture
+      item => item.type === 'Medication' && !item.isDrugMixture,
     ),
     ...(entity.vaccination || []),
     ...(entity.consumable || []),
@@ -179,7 +207,7 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
     ...(entity.prescription || []).filter(
       item => item.type === 'Open Prescription',
     ),
-    ...(entity.externalPrescription || [])
+    ...(entity.externalPrescription || []),
   ]
 
   sortOrderItems.forEach(item => {
@@ -189,11 +217,16 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
       } else {
         generateFromTransaction(item)
       }
-    }
-    else if (item.type === 'Open Prescription' || item.type === 'Medication (Ext.)') {
-      orderItems.push(defaultItem(item, 'NoNeedToDispense'))
-    }
-    else {
+    } else if (
+      item.type === 'Open Prescription' ||
+      item.type === 'Medication (Ext.)'
+    ) {
+      orderItems.push({
+        ...defaultItem(item, 'NoNeedToDispense'),
+        groupNumber: 1,
+        groupRowSpan: 1,
+      })
+    } else {
       generateFromTransaction(item)
     }
   })
@@ -290,7 +323,7 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
 })
 @Authorized.Secured('queue.dispense.makepayment')
 class Billing extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.fetchCodeTables()
   }
@@ -315,7 +348,7 @@ class Billing extends Component {
     isConsumedPackage: false,
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.dispatch({
       type: 'billing/updateState',
       payload: {
@@ -632,7 +665,7 @@ class Billing extends Component {
 
     if (
       isCheckPackageSignature.toLowerCase() ===
-      PACKAGE_SIGNATURE_CHECK_OPTION.IGNORE.toLowerCase() ||
+        PACKAGE_SIGNATURE_CHECK_OPTION.IGNORE.toLowerCase() ||
       isExistingPackageSignature
     )
       return this.checkInvoiceOutstanding()
@@ -835,11 +868,11 @@ class Billing extends Component {
       _newInvoicePayment = invoicePayment.map(payment =>
         payment.id === id
           ? {
-            ...payment,
-            isCancelled: true,
-            cancelDate: new Date(),
-            cancelByUserFK: user.id,
-          }
+              ...payment,
+              isCancelled: true,
+              cancelDate: new Date(),
+              cancelByUserFK: user.id,
+            }
           : { ...payment },
       )
     }
@@ -978,7 +1011,7 @@ class Billing extends Component {
     })
   }
 
-  render () {
+  render() {
     const {
       showReport,
       reportPayload,
@@ -1045,7 +1078,7 @@ class Billing extends Component {
       <LoadingWrapper loading={loading} text='Getting billing info...'>
         <PatientBanner
           from='Billing'
-        // activePreOrderItem={patient?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
+          // activePreOrderItem={patient?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
         />
         <div className={classes.accordionContainer}>
           <LoadingWrapper linear loading={dispenseLoading}>
@@ -1060,7 +1093,15 @@ class Billing extends Component {
                     <div className={classes.dispenseContainer}>
                       <DispenseDetails
                         viewOnly
-                        values={dispense.entity ? getDispenseEntity(codetable, clinicSettings, dispense.entity) : dispense.entity}
+                        values={
+                          dispense.entity
+                            ? getDispenseEntity(
+                                codetable,
+                                clinicSettings,
+                                dispense.entity,
+                              )
+                            : dispense.entity
+                        }
                         dispatch={this.props.dispatch}
                         onDrugLabelClick={this.handleDrugLabelClick}
                         showDrugLabelSelection={

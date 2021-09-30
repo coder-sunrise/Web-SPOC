@@ -8,7 +8,12 @@ import {
   CommonModal,
   Button,
 } from '@/components'
-import { calculateAmount, navigateDirtyCheck, getUniqueId, getTranslationValue } from '@/utils/utils'
+import {
+  calculateAmount,
+  navigateDirtyCheck,
+  getUniqueId,
+  getTranslationValue,
+} from '@/utils/utils'
 import Yup from '@/utils/yup'
 import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
@@ -17,6 +22,7 @@ import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 import AddOrder from './DispenseDetails/AddOrder'
 import DispenseDetails from './DispenseDetails/WebSocketWrapper'
 import { DispenseItemsColumnExtensions } from './variables'
+import _ from 'lodash'
 
 const calculateInvoiceAmounts = entity => {
   const obj = { ...entity }
@@ -100,26 +106,44 @@ const constructPayload = values => {
     return items.map(m => {
       let tempDispenseItem = []
       if (!m.isPreOrder) {
-        const matchItem = values.dispenseItems.filter(d => d.type === m.type && d.id === m.id && d.dispenseQuantity > 0 && !d.isDispensedByPharmacy)
+        const matchItem = values.dispenseItems.filter(
+          d =>
+            d.type === m.type &&
+            d.id === m.id &&
+            d.dispenseQuantity > 0 &&
+            !d.isDispensedByPharmacy,
+        )
 
         if (matchItem.length) {
           matchItem.forEach(item => {
-            tempDispenseItem.push({ ...getTransaction(item), inventoryFK: item[inventoryFiledName] })
+            tempDispenseItem.push({
+              ...getTransaction(item),
+              inventoryFK: item[inventoryFiledName],
+            })
           })
         }
       }
       return {
         ...m,
-        tempDispenseItem
+        tempDispenseItem,
       }
     })
   }
 
   const _values = {
     ...values,
-    prescription: updateTempDispenseItem(values.prescription, 'inventoryMedicationFK'),
-    vaccination: updateTempDispenseItem(values.vaccination, 'inventoryVaccinationFK'),
-    consumable: updateTempDispenseItem(values.consumable, 'inventoryConsumableFK'),
+    prescription: updateTempDispenseItem(
+      values.prescription,
+      'inventoryMedicationFK',
+    ),
+    vaccination: updateTempDispenseItem(
+      values.vaccination,
+      'inventoryVaccinationFK',
+    ),
+    consumable: updateTempDispenseItem(
+      values.consumable,
+      'inventoryConsumableFK',
+    ),
     dispenseItems: undefined,
     defaultExpandedGroups: undefined,
   }
@@ -150,8 +174,16 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
     }
   }
 
-  const transactionDetails = (item) => {
-    const { inventoryStockFK, batchNo, expiryDate, oldQty, transactionQty, uomDisplayValue, secondUOMDisplayValue } = item
+  const transactionDetails = item => {
+    const {
+      inventoryStockFK,
+      batchNo,
+      expiryDate,
+      oldQty,
+      transactionQty,
+      uomDisplayValue,
+      secondUOMDisplayValue,
+    } = item
     return {
       dispenseQuantity: transactionQty,
       batchNo,
@@ -163,8 +195,14 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
     }
   }
 
-  const generateFromTempDispenseInfo = (item, stock = 0, isDefault, primaryUOM, secondUOM) => {
-    const { inventoryStockFK, batchNo, expiryDate, transactionQty, } = item
+  const generateFromTempDispenseInfo = (
+    item,
+    stock = 0,
+    isDefault,
+    primaryUOM,
+    secondUOM,
+  ) => {
+    const { inventoryStockFK, batchNo, expiryDate, transactionQty } = item
     return {
       dispenseQuantity: transactionQty,
       batchNo,
@@ -173,7 +211,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
       stockFK: inventoryStockFK,
       uomDisplayValue: primaryUOM,
       secondUOMDisplayValue: secondUOM,
-      isDefault
+      isDefault,
     }
   }
 
@@ -202,6 +240,9 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
             orderItems.push({
               ...detaultDrugMixture,
               ...transactionDetails(di),
+              stockBalance:
+                drugMixture.quantity -
+                _.sumBy(drugMixture.dispenseItem, 'transactionQty'),
               countNumber: index === 0 ? 1 : 0,
               rowspan: index === 0 ? drugMixture.dispenseItem.length : 0,
               uid: getUniqueId(),
@@ -228,26 +269,38 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
         const secondUOMDisplayValue =
           secondaryPrintoutLanguage !== ''
             ? getTranslationValue(
-              uom.translationData,
-              secondaryPrintoutLanguage,
-              'displayValue',
-            )
+                uom.translationData,
+                secondaryPrintoutLanguage,
+                'displayValue',
+              )
             : ''
 
-        const tempDispenseItem = (item.tempDispenseItem || []).filter(t => t.inventoryFK === drugMixture.inventoryMedicationFK)
+        const tempDispenseItem = (item.tempDispenseItem || []).filter(
+          t => t.inventoryFK === drugMixture.inventoryMedicationFK,
+        )
         if (tempDispenseItem.length) {
           tempDispenseItem.forEach((di, index) => {
-            const currentStock = (inventoryItem?.medicationStock || []).find(s => s.id === di.inventoryStockFK)
+            const currentStock = (inventoryItem?.medicationStock || []).find(
+              s => s.id === di.inventoryStockFK,
+            )
             orderItems.push({
               ...detaultDrugMixture,
-              ...generateFromTempDispenseInfo(di, currentStock?.stock, currentStock?.isDefault, primaryUOMDisplayValue, secondUOMDisplayValue),
+              ...generateFromTempDispenseInfo(
+                di,
+                currentStock?.stock,
+                currentStock?.isDefault,
+                primaryUOMDisplayValue,
+                secondUOMDisplayValue,
+              ),
+              stockBalance:
+                drugMixture.quantity -
+                _.sumBy(tempDispenseItem, 'transactionQty'),
               countNumber: index === 0 ? 1 : 0,
               rowspan: index === 0 ? tempDispenseItem.length : 0,
               uid: getUniqueId(),
             })
           })
-        }
-        else {
+        } else {
           const inventoryItemStock = _.orderBy(
             (inventoryItem?.medicationStock || []).filter(
               s => s.isDefault || s.stock > 0,
@@ -258,13 +311,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
           let remainQty = drugMixture.quantity
           if (remainQty > 0 && inventoryItem && inventoryItemStock.length) {
             inventoryItemStock.forEach((itemStock, index) => {
-              const {
-                id,
-                batchNo,
-                expiryDate,
-                stock,
-                isDefault,
-              } = itemStock
+              const { id, batchNo, expiryDate, stock, isDefault } = itemStock
               if (remainQty > 0) {
                 let dispenseQuantity = 0
                 if (isDefault || remainQty <= stock) {
@@ -284,6 +331,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
                   uomDisplayValue: primaryUOMDisplayValue,
                   secondUOMDisplayValue: secondUOMDisplayValue,
                   isDefault,
+                  stockBalance: 0,
                   countNumber: index === 0 ? 1 : 0,
                   rowspan: 0,
                   uid: getUniqueId(),
@@ -291,8 +339,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
               }
             })
             const firstItem = orderItems.find(
-              i =>
-                i.drugMixtureFK === drugMixture.id && i.countNumber === 1,
+              i => i.drugMixtureFK === drugMixture.id && i.countNumber === 1,
             )
             firstItem.rowspan = orderItems.filter(
               i => i.drugMixtureFK === drugMixture.id,
@@ -305,12 +352,22 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
         }
       }
     })
+
+    const groupItems = orderItems.filter(
+      oi => oi.type === item.type && oi.id === item.id,
+    )
+    groupItems[0].groupNumber = 1
+    groupItems[0].groupRowSpan = groupItems.length
   }
 
   const generateFromNormalMedication = item => {
     const groupName = 'NormalDispense'
     if (item.isPreOrder) {
-      orderItems.push(defaultItem(item, groupName))
+      orderItems.push({
+        ...defaultItem(item, groupName),
+        groupNumber: 1,
+        groupRowSpan: 1,
+      })
       return
     }
 
@@ -320,6 +377,8 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
           orderItems.push({
             ...defaultItem(item, groupName),
             ...transactionDetails(di),
+            stockBalance:
+              item.quantity - _.sumBy(item.dispenseItem, 'transactionQty'),
             countNumber: index === 0 ? 1 : 0,
             rowspan: index === 0 ? item.dispenseItem.length : 0,
             uid: getUniqueId(),
@@ -328,8 +387,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
       } else {
         orderItems.push(defaultItem(item, groupName))
       }
-    }
-    else {
+    } else {
       const inventoryItem = inventorymedication.find(
         drug => drug.id === item.inventoryMedicationFK,
       )
@@ -345,17 +403,27 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
       const secondUOMDisplayValue =
         secondaryPrintoutLanguage !== ''
           ? getTranslationValue(
-            uom.translationData,
-            secondaryPrintoutLanguage,
-            'displayValue',
-          )
+              uom.translationData,
+              secondaryPrintoutLanguage,
+              'displayValue',
+            )
           : ''
       if (item.tempDispenseItem.length) {
         item.tempDispenseItem.forEach((di, index) => {
-          const currentStock = (inventoryItem?.medicationStock || []).find(s => s.id === di.inventoryStockFK)
+          const currentStock = (inventoryItem?.medicationStock || []).find(
+            s => s.id === di.inventoryStockFK,
+          )
           orderItems.push({
             ...defaultItem(item, groupName),
-            ...generateFromTempDispenseInfo(di, currentStock?.stock, currentStock?.isDefault, primaryUOMDisplayValue, secondUOMDisplayValue),
+            ...generateFromTempDispenseInfo(
+              di,
+              currentStock?.stock,
+              currentStock?.isDefault,
+              primaryUOMDisplayValue,
+              secondUOMDisplayValue,
+            ),
+            stockBalance:
+              item.quantity - _.sumBy(item.tempDispenseItem, 'transactionQty'),
             countNumber: index === 0 ? 1 : 0,
             rowspan: index === 0 ? item.tempDispenseItem.length : 0,
             uid: getUniqueId(),
@@ -392,6 +460,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
                 uomDisplayValue: primaryUOMDisplayValue,
                 secondUOMDisplayValue: secondUOMDisplayValue,
                 isDefault,
+                stockBalance: 0,
                 countNumber: index === 0 ? 1 : 0,
                 rowspan: 0,
                 uid: getUniqueId(),
@@ -416,12 +485,22 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
         }
       }
     }
+
+    const groupItems = orderItems.filter(
+      oi => oi.type === item.type && oi.id === item.id,
+    )
+    groupItems[0].groupNumber = 1
+    groupItems[0].groupRowSpan = groupItems.length
   }
 
   const generateFromNormalConsumable = item => {
     const groupName = 'NormalDispense'
     if (item.isPreOrder) {
-      orderItems.push(defaultItem(item, groupName))
+      orderItems.push({
+        ...defaultItem(item, groupName),
+        groupNumber: 1,
+        groupRowSpan: 1,
+      })
       return
     }
     if (item.isDispensedByPharmacy) {
@@ -430,6 +509,8 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
           orderItems.push({
             ...defaultItem(item, groupName),
             ...transactionDetails(di),
+            stockBalance:
+              item.quantity - _.sumBy(item.dispenseItem, 'transactionQty'),
             countNumber: index === 0 ? 1 : 0,
             rowspan: index === 0 ? item.dispenseItem.length : 0,
             uid: getUniqueId(),
@@ -438,25 +519,32 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
       } else {
         orderItems.push(defaultItem(item, groupName))
       }
-    }
-    else {
+    } else {
       const inventoryItem = inventoryconsumable.find(
         consumable => consumable.id === item.inventoryConsumableFK,
       )
 
       if (item.tempDispenseItem.length) {
         item.tempDispenseItem.forEach((di, index) => {
-          const currentStock = (inventoryItem?.consumableStock || []).find(s => s.id === di.inventoryStockFK)
+          const currentStock = (inventoryItem?.consumableStock || []).find(
+            s => s.id === di.inventoryStockFK,
+          )
           orderItems.push({
             ...defaultItem(item, groupName),
-            ...generateFromTempDispenseInfo(di, currentStock?.stock, currentStock?.isDefault, inventoryItem?.uom?.name),
+            ...generateFromTempDispenseInfo(
+              di,
+              currentStock?.stock,
+              currentStock?.isDefault,
+              inventoryItem?.uom?.name,
+            ),
+            stockBalance:
+              item.quantity - _.sumBy(item.tempDispenseItem, 'transactionQty'),
             countNumber: index === 0 ? 1 : 0,
             rowspan: index === 0 ? item.tempDispenseItem.length : 0,
             uid: getUniqueId(),
           })
         })
-      }
-      else {
+      } else {
         const inventoryItemStock = _.orderBy(
           (inventoryItem?.consumableStock || []).filter(
             s => s.isDefault || s.stock > 0,
@@ -486,6 +574,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
                 stockFK: id,
                 uomDisplayValue: inventoryItem?.uom?.name,
                 isDefault,
+                stockBalance: 0,
                 countNumber: index === 0 ? 1 : 0,
                 rowspan: 0,
                 uid: getUniqueId(),
@@ -510,12 +599,21 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
         }
       }
     }
+    const groupItems = orderItems.filter(
+      oi => oi.type === item.type && oi.id === item.id,
+    )
+    groupItems[0].groupNumber = 1
+    groupItems[0].groupRowSpan = groupItems.length
   }
 
   const generateFromNormalVaccination = item => {
     const groupName = 'NormalDispense'
     if (item.isPreOrder) {
-      orderItems.push(defaultItem(item, groupName))
+      orderItems.push({
+        ...defaultItem(item, groupName),
+        groupNumber: 1,
+        groupRowSpan: 1,
+      })
       return
     }
     const inventoryItem = inventoryvaccination.find(
@@ -523,10 +621,19 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
     )
     if (item.tempDispenseItem.length) {
       item.tempDispenseItem.forEach((di, index) => {
-        const currentStock = (inventoryItem?.vaccinationStock || []).find(s => s.id === di.inventoryStockFK)
+        const currentStock = (inventoryItem?.vaccinationStock || []).find(
+          s => s.id === di.inventoryStockFK,
+        )
         orderItems.push({
           ...defaultItem(item, groupName),
-          ...generateFromTempDispenseInfo(di, currentStock?.stock, currentStock?.isDefault, inventoryItem?.prescribingUOM?.name),
+          ...generateFromTempDispenseInfo(
+            di,
+            currentStock?.stock,
+            currentStock?.isDefault,
+            inventoryItem?.prescribingUOM?.name,
+          ),
+          stockBalance:
+            item.quantity - _.sumBy(item.tempDispenseItem, 'transactionQty'),
           countNumber: index === 0 ? 1 : 0,
           rowspan: index === 0 ? item.tempDispenseItem.length : 0,
           uid: getUniqueId(),
@@ -542,7 +649,13 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
       )
       let remainQty = item.quantity
       if (remainQty > 0 && inventoryItem && inventoryItemStock.length) {
-        const { id, batchNo, expiryDate, stock, isDefault } = inventoryItemStock[0]
+        const {
+          id,
+          batchNo,
+          expiryDate,
+          stock,
+          isDefault,
+        } = inventoryItemStock[0]
         orderItems.push({
           ...defaultItem(item, groupName),
           dispenseQuantity: item.quantity,
@@ -552,17 +665,23 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
           stockFK: id,
           uomDisplayValue: inventoryItem?.prescribingUOM?.name,
           isDefault,
+          stockBalance: 0,
         })
       } else {
         const { batchNo, expiryDate, ...restItem } = item
         orderItems.push(defaultItem(restItem, groupName))
       }
     }
+    const groupItems = orderItems.filter(
+      oi => oi.type === item.type && oi.id === item.id,
+    )
+    groupItems[0].groupNumber = 1
+    groupItems[0].groupRowSpan = groupItems.length
   }
 
   const sortOrderItems = [
     ...(entity.prescription || []).filter(
-      item => item.type === 'Medication' && !item.isDrugMixture
+      item => item.type === 'Medication' && !item.isDrugMixture,
     ),
     ...(entity.vaccination || []),
     ...(entity.consumable || []),
@@ -572,7 +691,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
     ...(entity.prescription || []).filter(
       item => item.type === 'Open Prescription',
     ),
-    ...(entity.externalPrescription || [])
+    ...(entity.externalPrescription || []),
   ]
 
   sortOrderItems.forEach(item => {
@@ -582,14 +701,18 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
       } else {
         generateFromNormalMedication(item)
       }
-    }
-    else if (item.type === 'Open Prescription' || item.type === 'Medication (Ext.)') {
-      orderItems.push(defaultItem(item, 'NoNeedToDispense'))
-    }
-    else if (item.type === 'Vaccination') {
+    } else if (
+      item.type === 'Open Prescription' ||
+      item.type === 'Medication (Ext.)'
+    ) {
+      orderItems.push({
+        ...defaultItem(item, 'NoNeedToDispense'),
+        groupNumber: 1,
+        groupRowSpan: 1,
+      })
+    } else if (item.type === 'Vaccination') {
       generateFromNormalVaccination(item)
-    }
-    else {
+    } else {
       generateFromNormalConsumable(item)
     }
   })
@@ -599,19 +722,50 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
 
 const validDispense = (dispenseItems = []) => {
   let isValid = true
-  const dispensedItems = dispenseItems.filter(d => !d.isPreOrder && d.stockFK && !d.isDispensedByPharmacy)
+  const dispensedItems = dispenseItems.filter(
+    d => !d.isPreOrder && d.stockFK && !d.isDispensedByPharmacy,
+  )
   for (let index = 0; index < dispensedItems.length; index++) {
-    let matchItems = []
-    if (dispensedItems[index].isDrugMixture) {
-      matchItems = dispenseItems.filter(d => d.type === dispensedItems[index].type
-        && dispensedItems[index].isDrugMixture
-        && d.drugMixtureFK === dispensedItems[index].drugMixtureFK)
-    }
-    else {
-      matchItems = dispenseItems.filter(d => d.type === dispensedItems[index].type && d.id === dispensedItems[index].id)
+    if (
+      dispensedItems[index].dispenseQuantity > dispensedItems[index].quantity
+    ) {
+      notification.error({
+        message: 'Dispense quantity cannot be more than orderd quantity.',
+      })
+      isValid = false
+      break
     }
 
-    if (dispensedItems[index].quantity !== _.sumBy(matchItems, 'dispenseQuantity')) {
+    if (
+      !dispensedItems[index].isDefault &&
+      dispensedItems[index].dispenseQuantity > dispensedItems[index].stock
+    ) {
+      notification.error({
+        message: 'Dispense quantity cannot be more than stock quantity.',
+      })
+      isValid = false
+      break
+    }
+
+    let matchItems = []
+    if (dispensedItems[index].isDrugMixture) {
+      matchItems = dispenseItems.filter(
+        d =>
+          d.type === dispensedItems[index].type &&
+          dispensedItems[index].isDrugMixture &&
+          d.drugMixtureFK === dispensedItems[index].drugMixtureFK,
+      )
+    } else {
+      matchItems = dispenseItems.filter(
+        d =>
+          d.type === dispensedItems[index].type &&
+          d.id === dispensedItems[index].id,
+      )
+    }
+
+    if (
+      dispensedItems[index].quantity !== _.sumBy(matchItems, 'dispenseQuantity')
+    ) {
       notification.error({
         message: 'Dispense quantity not equal order quantity.',
       })
@@ -620,8 +774,15 @@ const validDispense = (dispenseItems = []) => {
     }
 
     if (!dispensedItems[index].isDefault) {
-      const matchInventoryItems = dispenseItems.filter(d => d.type === dispensedItems[index].type && d.stockFK === dispensedItems[index].stockFK)
-      if (dispensedItems[index].stock < _.sumBy(matchInventoryItems, 'dispenseQuantity')) {
+      const matchInventoryItems = dispenseItems.filter(
+        d =>
+          d.type === dispensedItems[index].type &&
+          d.stockFK === dispensedItems[index].stockFK,
+      )
+      if (
+        dispensedItems[index].stock <
+        _.sumBy(matchInventoryItems, 'dispenseQuantity')
+      ) {
         notification.error({
           message: 'Dispense quantity cannot be more than total stock.',
         })
@@ -638,7 +799,11 @@ const validDispense = (dispenseItems = []) => {
   enableReinitialize: true,
   notDirtyDuration: 3,
   mapPropsToValues: pops => {
-    const { dispense = {}, codetable, clinicSettings: { settings = {} } } = pops
+    const {
+      dispense = {},
+      codetable,
+      clinicSettings: { settings = {} },
+    } = pops
     let obj = dispense.entity || dispense.default
 
     const orderItems = getDispenseItems(codetable, settings, obj)
@@ -684,7 +849,6 @@ const validDispense = (dispenseItems = []) => {
   },
   displayName: 'DispensePage',
 })
-
 @connect(({ orders, formik, dispense }) => ({
   orders,
   formik,
@@ -699,7 +863,7 @@ class Main extends Component {
     isShowOrderUpdated: false,
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { prescription = [], packageItem = [] } = nextProps.values
 
     let drugList = []
@@ -1034,7 +1198,7 @@ class Main extends Component {
     }
   }
 
-  render () {
+  render() {
     const { classes, handleSubmit, values, dispense, codetable } = this.props
     return (
       <div className={classes.root}>

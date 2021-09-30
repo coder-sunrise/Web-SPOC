@@ -247,15 +247,12 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
           </div>
         )}
       </div>
-      <div
-        style={{
-          color: blueColor,
-        }}
-      >
+      <div>
         <Typography.Text
           underline
           style={{
             cursor: 'pointer',
+            color: blueColor,
           }}
           onClick={() => {
             setDetailsId(item.id)
@@ -268,6 +265,7 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
           style={{
             cursor: 'pointer',
             marginLeft: 10,
+            color: blueColor,
           }}
           onClick={() => {
             printPrescription(item.visitFK)
@@ -299,11 +297,7 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
             />
           </Popover>
         )}
-        {showGroup && (
-          <span style={{ fontWeight: 600, color: 'black' }}>
-            {item.visitGroup}
-          </span>
-        )}
+        {showGroup && <span>{item.visitGroup}</span>}
       </div>
     </div>
   )
