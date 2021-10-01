@@ -1,7 +1,7 @@
 import React from 'react'
 // formik
 import { FastField, Field } from 'formik'
-import { status, costPriceTypes } from '@/utils/codes'
+import { status } from '@/utils/codes'
 // common components
 import {
   Button,
