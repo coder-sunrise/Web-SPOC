@@ -84,21 +84,6 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
             />
           </GridItem>
           <GridItem md={3}>
-            <FastField
-              name='costPriceType'
-              render={(args) => {
-                return (
-                  <Select
-                    label='Cost Price Type'
-                    {...args}
-                    options={costPriceTypes}
-                    allowClear={false}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem md={3}>
             <Button
               color='primary'
               onClick={handleSubmit}
