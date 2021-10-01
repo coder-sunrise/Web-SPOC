@@ -206,7 +206,7 @@ let i = 0
       return instruction
     }
 
-    const instruction = getInstruction(primaryPrintoutLanguage)
+    const instruction = getInstruction()
 
     values.instruction = instruction
 
