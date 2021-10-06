@@ -74,7 +74,7 @@ let i = 0
         const { doctorProfileFK } = visitRegistration.entity.visit
         if (doctorprofile && doctorProfileFK) {
           newOrders.performingUserFK = doctorprofile.find(
-            (d) => d.id === doctorProfileFK,
+            d => d.id === doctorProfileFK,
           ).clinicianProfile.userProfileFK
         }
       }
@@ -116,12 +116,14 @@ let i = 0
       codetable,
       patient,
       visitRegistration,
+      clinicSettings,
       consultationDocument: { rows = [] },
     } = props
-    const { inventoryvaccination = [],
+    const {
+      inventoryvaccination = [],
       ctvaccinationusage = [],
       ctmedicationdosage = [],
-      ctvaccinationunitofmeasurement = []
+      ctvaccinationunitofmeasurement = [],
     } = codetable
     let { batchNo } = values
     if (batchNo instanceof Array) {
@@ -136,14 +138,14 @@ let i = 0
     let newCORVaccinationCert = corVaccinationCert
     if (isGenerateCertificate) {
       const { documenttemplate = [] } = codetable
-      if (corVaccinationCert.find((vc) => !vc.isDeleted)) {
+      if (corVaccinationCert.find(vc => !vc.isDeleted)) {
         notification.warning({
           message:
             'Any changes will not be reflected in the vaccination certificate.',
         })
       } else {
         const defaultTemplate = documenttemplate.find(
-          (dt) =>
+          dt =>
             dt.isDefaultTemplate === true && dt.documentTemplateTypeFK === 3,
         )
         if (!defaultTemplate) {
@@ -157,8 +159,8 @@ let i = 0
           const { entity } = patient
           const { name, patientAccountNo, genderFK, dob } = entity
           const { ctgender = [] } = codetable
-          const gender = ctgender.find((o) => o.id === genderFK) || {}
-          const allDocs = rows.filter((s) => !s.isDeleted)
+          const gender = ctgender.find(o => o.id === genderFK) || {}
+          const allDocs = rows.filter(s => !s.isDeleted)
           let nextSequence = 1
           if (allDocs && allDocs.length > 0) {
             const { sequence } = _.maxBy(allDocs, 'sequence')
@@ -185,7 +187,9 @@ let i = 0
       }
     }
 
-    const vaccination = inventoryvaccination.find(c => c.id === values.inventoryVaccinationFK)
+    const vaccination = inventoryvaccination.find(
+      c => c.id === values.inventoryVaccinationFK,
+    )
     values.vaccinationName = vaccination.displayValue
 
     const usage = ctvaccinationusage.find(c => c.id === values.usageMethodFK)
@@ -195,6 +199,16 @@ let i = 0
     values.usageMethodDisplayValue = usage?.name
     values.dosageDisplayValue = dosage?.displayValue
     values.uomDisplayValue = uom?.name
+
+    const getInstruction = () => {
+      let instruction = ''
+      instruction += `${usage?.name} ${dosage?.displayValue} ${uom?.name}`
+      return instruction
+    }
+
+    const instruction = getInstruction()
+
+    values.instruction = instruction
 
     const data = {
       isOrderedByDoctor:
@@ -226,7 +240,7 @@ let i = 0
   displayName: 'OrderPage',
 })
 class Vaccination extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     const { codetable, values } = this.props
@@ -237,7 +251,7 @@ class Vaccination extends PureComponent {
       vaccinationStock: [],
     }
     const vaccination = inventoryVaccinationFK
-      ? inventoryvaccination.find((item) => item.id === inventoryVaccinationFK)
+      ? inventoryvaccination.find(item => item.id === inventoryVaccinationFK)
       : undefined
 
     if (vaccination) selectedVaccination = vaccination
@@ -251,7 +265,9 @@ class Vaccination extends PureComponent {
   }
 
   getVaccinationOptions = () => {
-    const { codetable: { inventoryvaccination = [] } } = this.props
+    const {
+      codetable: { inventoryvaccination = [] },
+    } = this.props
 
     return inventoryvaccination.reduce((p, c) => {
       const { code, displayValue, sellingPrice = 0, dispensingUOM = {} } = c
@@ -262,19 +278,17 @@ class Vaccination extends PureComponent {
           2,
         )} / ${uomName})`,
       }
-      return [
-        ...p,
-        opt,
-      ]
+      return [...p, opt]
     }, [])
   }
 
   changeVaccination = (v, op = {}) => {
     const { setFieldValue, values, disableEdit, codetable } = this.props
+    const { instruction = [] } = values
     setFieldValue('isNurseActualizeRequired', op.isNurseActualizable)
     let defaultBatch
     if (op.vaccinationStock) {
-      defaultBatch = op.vaccinationStock.find((o) => o.isDefault === true)
+      defaultBatch = op.vaccinationStock.find(o => o.isDefault === true)
       if (defaultBatch)
         this.setState({
           batchNo: defaultBatch.batchNo,
@@ -285,6 +299,7 @@ class Vaccination extends PureComponent {
       selectedVaccination: op,
     })
 
+    setFieldValue('instruction', instruction)
     setFieldValue('isActive', op.isActive)
     setFieldValue(
       'dosageFK',
@@ -346,7 +361,7 @@ class Vaccination extends PureComponent {
     this.onExpiryDateChange()
   }
 
-  calculateQuantity = (vaccination) => {
+  calculateQuantity = vaccination => {
     const { codetable, setFieldValue, values } = this.props
     if (values.isPackage) return
     const { minQuantity = 0 } = values
@@ -364,7 +379,7 @@ class Vaccination extends PureComponent {
       const { ctmedicationdosage } = codetable
 
       const dosage = ctmedicationdosage.find(
-        (o) =>
+        o =>
           o.id ===
           (values.dosageFK ||
             (currentVaccination && currentVaccination.prescribingDosage
@@ -392,7 +407,7 @@ class Vaccination extends PureComponent {
     this.updateTotalPrice(unitprice * newTotalQuantity)
   }
 
-  updateTotalPrice = (v) => {
+  updateTotalPrice = v => {
     if (v || v === 0) {
       const { isExactAmount, isMinus, adjValue, isPackage } = this.props.values
       if (isPackage) return
@@ -429,7 +444,7 @@ class Vaccination extends PureComponent {
     })
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.orders.type === this.props.type)
       if (
         (!this.props.global.openAdjustment &&
@@ -457,7 +472,7 @@ class Vaccination extends PureComponent {
       const { inventoryvaccination = [] } = codetable
       const { inventoryVaccinationFK } = nextValues
       const vaccination = inventoryvaccination.find(
-        (item) => item.id === inventoryVaccinationFK,
+        item => item.id === inventoryVaccinationFK,
       )
 
       if (vaccination)
@@ -505,7 +520,7 @@ class Vaccination extends PureComponent {
     })
   }
 
-  onAdjustmentConditionChange = (v) => {
+  onAdjustmentConditionChange = v => {
     const { values } = this.props
     const { isMinus, adjValue, isExactAmount } = values
     if (!isNumber(adjValue)) return
@@ -541,12 +556,15 @@ class Vaccination extends PureComponent {
   }
 
   getCaution = () => {
-    const { values, codetable: { inventoryvaccination = [] } } = this.props
+    const {
+      values,
+      codetable: { inventoryvaccination = [] },
+    } = this.props
     let cautions
 
     const { inventoryVaccinationFK } = values
     const selectVaccination = inventoryvaccination.find(
-      (vaccination) => vaccination.id === inventoryVaccinationFK,
+      vaccination => vaccination.id === inventoryVaccinationFK,
     )
     if (
       selectVaccination &&
@@ -569,7 +587,7 @@ class Vaccination extends PureComponent {
     }, 300)
   }
 
-  render () {
+  render() {
     const {
       theme,
       values,
@@ -601,7 +619,7 @@ class Vaccination extends PureComponent {
             <GridItem xs={8}>
               <Field
                 name='inventoryVaccinationFK'
-                render={(args) => {
+                render={args => {
                   return (
                     <div
                       id={`autofocus_${values.type}`}
@@ -697,7 +715,7 @@ class Vaccination extends PureComponent {
             <GridItem xs={2}>
               <Field
                 name='usageMethodFK'
-                render={(args) => {
+                render={args => {
                   return (
                     <CodeSelect
                       label='Usage'
@@ -722,7 +740,7 @@ class Vaccination extends PureComponent {
             <GridItem xs={2}>
               <FastField
                 name='dosageFK'
-                render={(args) => {
+                render={args => {
                   return (
                     <CodeSelect
                       label='Dosage'
@@ -747,7 +765,7 @@ class Vaccination extends PureComponent {
             <GridItem xs={2}>
               <FastField
                 name='uomfk'
-                render={(args) => {
+                render={args => {
                   return (
                     <CodeSelect
                       label='UOM'
@@ -769,7 +787,7 @@ class Vaccination extends PureComponent {
             <GridItem xs={2}>
               <FastField
                 name='vaccinationGivenDate'
-                render={(args) => {
+                render={args => {
                   return <DatePicker label='Date Given' {...args} />
                 }}
               />
@@ -779,7 +797,7 @@ class Vaccination extends PureComponent {
                 <GridItem xs={3}>
                   <Field
                     name='packageConsumeQuantity'
-                    render={(args) => {
+                    render={args => {
                       return (
                         <NumberInput
                           label='Consumed Quantity'
@@ -803,13 +821,13 @@ class Vaccination extends PureComponent {
                 <GridItem xs={1}>
                   <Field
                     name='remainingQuantity'
-                    render={(args) => {
+                    render={args => {
                       return (
                         <NumberInput
                           style={{
                             marginTop: theme.spacing(3),
                           }}
-                          formatter={(v) => `/ ${parseFloat(v).toFixed(1)}`}
+                          formatter={v => `/ ${parseFloat(v).toFixed(1)}`}
                           text
                           {...args}
                         />
@@ -823,7 +841,7 @@ class Vaccination extends PureComponent {
               <GridItem xs={3}>
                 <Field
                   name='quantity'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <NumberInput
                         label='Quantity'
@@ -833,7 +851,7 @@ class Vaccination extends PureComponent {
                         }}
                         step={1}
                         min={values.minQuantity}
-                        onChange={(e) => {
+                        onChange={e => {
                           if (values.unitPrice) {
                             const total = e.target.value * values.unitPrice
                             setFieldValue('totalPrice', total)
@@ -852,7 +870,7 @@ class Vaccination extends PureComponent {
             <GridItem xs={4} className={classes.editor}>
               <Field
                 name='batchNo'
-                render={(args) => {
+                render={args => {
                   return (
                     <CodeSelect
                       mode='tags'
@@ -881,7 +899,7 @@ class Vaccination extends PureComponent {
             <GridItem xs={4} className={classes.editor}>
               <FastField
                 name='expiryDate'
-                render={(args) => {
+                render={args => {
                   return (
                     <DatePicker
                       label='Expiry Date'
@@ -898,7 +916,7 @@ class Vaccination extends PureComponent {
             <GridItem xs={3} className={classes.editor}>
               <Field
                 name='totalPrice'
-                render={(args) => {
+                render={args => {
                   return (
                     <NumberInput
                       label='Total'
@@ -907,7 +925,7 @@ class Vaccination extends PureComponent {
                         paddingRight: theme.spacing(6),
                       }}
                       currency
-                      onChange={(e) => {
+                      onChange={e => {
                         this.updateTotalPrice(e.target.value)
                       }}
                       min={0}
@@ -923,7 +941,7 @@ class Vaccination extends PureComponent {
             <GridItem xs={8} className={classes.editor}>
               <FastField
                 name='remarks'
-                render={(args) => {
+                render={args => {
                   return <TextField rowsMax='5' label='Remarks' {...args} />
                 }}
               />
@@ -935,7 +953,7 @@ class Vaccination extends PureComponent {
                 >
                   <Field
                     name='isMinus'
-                    render={(args) => {
+                    render={args => {
                       return (
                         <Switch
                           checkedChildren='-'
@@ -955,7 +973,7 @@ class Vaccination extends PureComponent {
                 </div>
                 <Field
                   name='adjValue'
-                  render={(args) => {
+                  render={args => {
                     args.min = 0
                     if (values.isExactAmount) {
                       return (
@@ -1002,7 +1020,7 @@ class Vaccination extends PureComponent {
               <div style={{ marginTop: theme.spacing(2) }}>
                 <Field
                   name='isExactAmount'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <Switch
                         checkedChildren='$'
@@ -1026,7 +1044,7 @@ class Vaccination extends PureComponent {
             <GridItem xs={3} className={classes.editor}>
               <FastField
                 name='isGenerateCertificate'
-                render={(args) => {
+                render={args => {
                   return (
                     <Checkbox
                       style={{ position: 'absolute', bottom: 2 }}
@@ -1041,7 +1059,7 @@ class Vaccination extends PureComponent {
               {values.isPackage ? (
                 <Field
                   name='performingUserFK'
-                  render={(args) => (
+                  render={args => (
                     <DoctorProfileSelect
                       label='Performed By'
                       {...args}
@@ -1068,27 +1086,31 @@ class Vaccination extends PureComponent {
                       )
                     }}
                   />
-                  {values.isPreOrder &&
+                  {values.isPreOrder && (
                     <FastField
                       name='isChargeToday'
                       render={args => {
                         return (
                           <Checkbox
-                            style={{ position: 'absolute', bottom: 2, left: '100px' }}
+                            style={{
+                              position: 'absolute',
+                              bottom: 2,
+                              left: '100px',
+                            }}
                             label='Charge Today'
                             {...args}
                           />
                         )
                       }}
                     />
-                  }
+                  )}
                 </div>
               )}
             </GridItem>
             <GridItem xs={3} className={classes.editor}>
               <FastField
                 name='totalAfterItemAdjustment'
-                render={(args) => {
+                render={args => {
                   return (
                     <NumberInput
                       label='Total After Adj'

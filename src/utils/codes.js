@@ -1241,7 +1241,7 @@ export const inventoryItemListing = (
       uom,
       sellingPrice: x.sellingPrice,
       lastCostPriceBefBonus: x.lastCostPriceBefBonus,
-      [itemFKName]: x.id,
+      id: x.id,
       stateName,
       itemFK: x.id,
       isActive: x.isActive,
@@ -1956,7 +1956,7 @@ const isPanelItemRequired = [
 const pharmacyStatus = [
   {
     statusFK: 1,
-    name: 'Order',
+    name: 'Ordered',
   },
   {
     statusFK: 2,
@@ -1968,12 +1968,8 @@ const pharmacyStatus = [
   },
   {
     statusFK: 4,
-    name: 'Dispensed',
-  },
-  {
-    statusFK: 5,
     name: 'Completed',
-  },
+  }
 ]
 
 const examinationSteps = [

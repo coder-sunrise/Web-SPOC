@@ -74,7 +74,7 @@ class FilterBar extends PureComponent {
               />
             </GridItem>
           </Authorized>
-          <GridItem md={12} lg={7}>
+          <GridItem md={12} lg={5}>
             <div className={classes.filterBtn}>
               <Authorized authority='patientdatabase/searchpatient'>
                 <ProgressButton
@@ -108,7 +108,7 @@ class FilterBar extends PureComponent {
                           searchValue: search,
                           dob: dob,
                           includeinactive: window.location.pathname.includes(
-                            'patientdb',
+                            'patient',
                           ),
                         },
                       },

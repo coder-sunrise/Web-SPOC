@@ -208,17 +208,10 @@ export default createFormViewModel({
 
         if (patientState.shouldQueryOnClose) {
           yield put({
-            type: 'patientSearch/query',
-            payload: {
-              apiCriteria: {
-                includeinactive: window.location.pathname.includes('patientdb'),
-              },
-            },
-          })
-          yield put({
             type: 'updateState',
             payload: {
               shouldQueryOnClose: false,
+              onRefresh : true,
             },
           })
         }
@@ -334,7 +327,6 @@ export default createFormViewModel({
       },
       *queryDone({ payload }, { put }) {
         const { data } = payload
-        // console.log(payload)
         data.patientScheme.forEach(ps => {
           if (ps.validFrom && ps.validTo)
             ps.validRange = [ps.validFrom, ps.validTo]

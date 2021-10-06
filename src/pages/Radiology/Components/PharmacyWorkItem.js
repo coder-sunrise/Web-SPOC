@@ -143,61 +143,12 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
   const orderDate = moment(item.generateDate).format('DD MMM YYYY HH:mm')
 
   const visitGroup = item => {
-    const visitGroupRow = p => {
-      const { row, children, tableRow } = p
-      let newchildren = []
-      const middleColumns = children.slice(2, 4)
-
-      if (row.countNumber === 1) {
-        newchildren.push(
-          children
-            .filter((value, index) => index < 2)
-            .map(item => ({
-              ...item,
-              props: {
-                ...item.props,
-                rowSpan: row.rowspan,
-              },
-            })),
-        )
-
-        newchildren.push(middleColumns)
-
-        newchildren.push(
-          children
-            .filter((value, index) => index > 4)
-            .map(item => ({
-              ...item,
-              props: {
-                ...item.props,
-                rowSpan: row.rowspan,
-              },
-            })),
-        )
-      } else {
-        newchildren.push(middleColumns)
-      }
-
-      const selectedData = {
-        ...tableRow.row,
-        doctor: null,
-      }
-
-      if (row.countNumber === 1) {
-        return <Table.Row {...p}>{newchildren}</Table.Row>
-      }
-      return (
-        <Table.Row {...p} className={classes.subRow}>
-          {newchildren}
-        </Table.Row>
-      )
-    }
     return (
       <CommonTableGrid
         forceRender
         size='sm'
         FuncProps={{ pager: false }}
-        rows={item.groupVisit || []}
+        rows={item.visitGroupListing || []}
         columns={[
           { name: 'queueNo', title: 'Q. No.' },
           { name: 'name', title: 'Name' },
@@ -233,7 +184,6 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
             sortingEnabled: false,
           },
         ]}
-        TableProps={{ rowComponent: visitGroupRow }}
       />
     )
   }
@@ -297,15 +247,12 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
           </div>
         )}
       </div>
-      <div
-        style={{
-          color: blueColor,
-        }}
-      >
+      <div>
         <Typography.Text
           underline
           style={{
             cursor: 'pointer',
+            color: blueColor,
           }}
           onClick={() => {
             setDetailsId(item.id)
@@ -318,6 +265,7 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
           style={{
             cursor: 'pointer',
             marginLeft: 10,
+            color: blueColor,
           }}
           onClick={() => {
             printPrescription(item.visitFK)
@@ -349,11 +297,7 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
             />
           </Popover>
         )}
-        {showGroup && (
-          <span style={{ fontWeight: 600, color: 'black' }}>
-            {item.visitGroup}
-          </span>
-        )}
+        {showGroup && <span>{item.visitGroup}</span>}
       </div>
     </div>
   )

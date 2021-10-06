@@ -208,6 +208,7 @@ export default {
 
   'menu.pharmacy': 'Pharmacy',
   'menu.pharmacy.worklist': 'Worklist',
+  'menu.pharmacy.history': 'History',
 
   'menu.not-found': 'Not Found',
   'menu.forbidden': 'Forbidden',

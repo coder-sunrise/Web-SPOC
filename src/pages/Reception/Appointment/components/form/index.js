@@ -1178,7 +1178,7 @@ class Form extends React.PureComponent {
     const { pendingPreOrderItem = [] } = patientProfile || {}
 
     const draftPreOrderItem = pendingPreOrderItem.map(po => {
-      const selectPreOrder = appointmentPreOrderItem.find(apo => !apo.isDeleted && apo.actualizedPreOrderItemFK === po.id)
+      const selectPreOrder = appointmentPreOrderItem.find(apo => apo.actualizedPreOrderItemFK === po.id)
       if (selectPreOrder) {
         return {
           ...po,

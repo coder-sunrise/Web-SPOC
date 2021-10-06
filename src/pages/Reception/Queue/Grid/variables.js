@@ -1,7 +1,11 @@
 import React, { Fragment } from 'react'
 import moment from 'moment'
 // components
-import { DoctorLabel, CallingQueueButton,ServePatientButton } from '@/components/_medisys'
+import {
+  DoctorLabel,
+  CallingQueueButton,
+  ServePatientButton,
+} from '@/components/_medisys'
 import {
   CodeSelect,
   DateFormatter,
@@ -14,6 +18,9 @@ import { calculateAgeFromDOB } from '@/utils/dateUtils'
 // variables
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import Authorized from '@/utils/Authorized'
+import NurseWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/NurseWorkItemInfo'
+import RadioWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/RadioWorkItemInfo'
+import LabWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/LabWorkItemInfo'
 
 const compareString = (a, b) => a.localeCompare(b)
 const compareDoctor = (a, b) => {
@@ -47,11 +54,26 @@ const compareQueueNo = (a, b) => {
   return floatA < floatB ? -1 : 1
 }
 
-const mapServingPersonsString = (servingByList) => servingByList && servingByList.map(o=> o.servingBy).join(', ')
+const mapServingPersonsString = servingByList =>
+  servingByList && servingByList.map(o => o.servingBy).join(', ')
 
 const compareServingPerson = (a, b) => {
   return compareString(mapServingPersonsString(a), mapServingPersonsString(b))
 }
+
+const filterRadioWorkItem = workItem => {
+  return workItem.filter(x => x.type === 'Radiology')
+}
+
+const filterNurseWorkItem = workItem => {
+  return workItem.filter(x => x.type === 'NurseActualize')
+}
+
+const filterLabWorkItem = workItem => {
+  return workItem.filter(x => x.type === 'Lab')
+}
+
+
 
 export const FuncConfig = {
   pager: false,
@@ -59,9 +81,7 @@ export const FuncConfig = {
   columnReorderable: true,
   columnSelectable: true,
   sortConfig: {
-    defaultSorting: [
-      { columnName: 'queueNo', direction: 'asc' },
-    ],
+    defaultSorting: [{ columnName: 'queueNo', direction: 'asc' }],
   },
   resizable: true,
   selectRowHighlightable: true,
@@ -98,14 +118,14 @@ export const ApptColumnExtensions = [
   {
     columnName: 'doctorName',
     width: 250,
-    render: (row) => {
+    render: row => {
       const _title = row.title ? `${row.title} ` : ''
       return `${_title}${row.doctorName}`
     },
   },
   {
     columnName: 'gender/age',
-    render: (row) => {
+    render: row => {
       const { genderFK, dob, patientProfileFk } = row
       if (!patientProfileFk) return null
       const gender = (
@@ -130,19 +150,25 @@ export const ApptColumnExtensions = [
   },
   {
     columnName: 'roomNo',
-    render: (row) => row.roomNo || '-',
+    render: row => row.roomNo || '-',
     width: 120,
   },
   {
     columnName: 'remarks',
     width: 180,
-    render: (row) => row.remarks || '-',
+    render: row => row.remarks || '-',
   },
   {
     columnName: 'appointmentTime',
-    width: 180,
+    width: 150,
     type: 'date',
     showTime: true,
+    render: row => {
+      if (row.appointmentTime) {
+        return moment(row.appointmentTime).format('DD MMM YYYY HH:mm')
+      }
+      return '-'
+    },
   },
   {
     columnName: 'patientContactNo',
@@ -155,7 +181,12 @@ export const QueueTableConfig = {
     { name: 'visitStatus', title: 'Status' },
     { name: 'queueNo', title: 'Q. No.' },
     { name: 'visitGroup', title: 'Group No.' },
-    { name: 'consReady', title: 'Cons. Ready', fullTitle: 'Ready for Consultation' },
+    {
+      name: 'consReady',
+      title: 'Cons. Ready',
+      fullTitle: 'Ready for Consultation',
+    },
+    { name: 'workItem', title: 'Work Item' },
     { name: 'servingByList', title: 'Serving By' },
     { name: 'patientReferenceNo', title: 'Ref. No.' },
     { name: 'patientName', title: 'Patient Name' },
@@ -180,11 +211,7 @@ export const QueueTableConfig = {
     { name: 'visitOrderTemplate', title: 'Visit Purpose' },
     { name: 'action', title: 'Action' },
   ],
-  leftColumns: [
-    'visitStatus',
-    'queueNo',
-    'patientName',
-  ],
+  leftColumns: ['visitStatus', 'queueNo', 'patientName'],
   identifier: 'reception',
 }
 
@@ -198,7 +225,7 @@ export const QueueColumnExtensions = [
     columnName: 'queueNo',
     width: 80,
     compare: compareQueueNo,
-    render: (row) => {
+    render: row => {
       return (
         <Fragment>
           <div
@@ -211,15 +238,15 @@ export const QueueColumnExtensions = [
             <span>{row.queueNo}</span>
             <div>
               {row.patientIsActive &&
-              row.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
-                <Authorized authority='openqueuedisplay'>
-                  <CallingQueueButton
-                    qId={row.queueNo}
-                    roomNo={row.roomNo}
-                    doctor={row.doctor}
-                  />
-                </Authorized>
-              )}
+                row.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
+                  <Authorized authority='openqueuedisplay'>
+                    <CallingQueueButton
+                      qId={row.queueNo}
+                      roomNo={row.roomNo}
+                      doctor={row.doctor}
+                    />
+                  </Authorized>
+                )}
             </div>
           </div>
         </Fragment>
@@ -231,7 +258,7 @@ export const QueueColumnExtensions = [
     columnName: 'visitGroup',
     align: 'center',
   },
-  { 
+  {
     columnName: 'invoiceNo',
     width: 120,
   },
@@ -267,9 +294,15 @@ export const QueueColumnExtensions = [
   },
   {
     columnName: 'orderCreateTime',
-    width: 180,
+    width: 150,
     type: 'date',
     showTime: true,
+    render: row => {
+      if (row.orderCreateTime) {
+        return moment(row.orderCreateTime).format('DD MMM YYYY HH:mm')
+      }
+      return '-'
+    },
   },
   { columnName: 'referralCompany', width: 150 },
   { columnName: 'referralPerson', width: 150 },
@@ -290,19 +323,31 @@ export const QueueColumnExtensions = [
   },
   {
     columnName: 'timeIn',
-    width: 180,
+    width: 150,
     type: 'date',
     showTime: true,
+    render: row => {
+      if (row.timeIn) {
+        return moment(row.timeIn).format('DD MMM YYYY HH:mm')
+      }
+      return '-'
+    },
   },
   {
     columnName: 'timeOut',
-    width: 180,
+    width: 150,
     type: 'date',
     showTime: true,
+    render: row => {
+      if (row.timeOut) {
+        return moment(row.timeOut).format('DD MMM YYYY HH:mm')
+      }
+      return '-'
+    },
   },
   {
     columnName: 'gender/age',
-    render: (row) => {
+    render: row => {
       const { dob, gender = 'U' } = row
 
       const ageLabel = calculateAgeFromDOB(dob)
@@ -317,20 +362,18 @@ export const QueueColumnExtensions = [
   },
   {
     columnName: 'appointmentTime',
-    width: 180,
+    width: 150,
     type: 'date',
     showTime: true,
     // compare: compareTime,
-    render: (row) => {
+    render: row => {
       if (row.appointmentTime) {
-        // const appointmentDate = moment(row.appointmentTime).format('MM DD YYYY')
         const appointmentDate = moment(row.appointmentTime).format(
-          dateFormatLong,
+          'DD MMM YYYY',
         )
-        return DateFormatter({
-          value: `${appointmentDate} ${row.appointmentResourceStartTime}`,
-          format: dateFormatLongWithTimeNoSec12h,
-        })
+        return moment(
+          `${appointmentDate} ${row.appointmentResourceStartTime}`,
+        ).format('DD MMM YYYY HH:mm')
       }
       return '-'
     },
@@ -338,7 +381,7 @@ export const QueueColumnExtensions = [
   {
     columnName: 'doctor',
     compare: compareDoctor,
-    render: (row) => <DoctorLabel doctor={row.doctor} hideMCR />,
+    render: row => <DoctorLabel doctor={row.doctor} hideMCR />,
     width: 150,
   },
   {
@@ -346,10 +389,40 @@ export const QueueColumnExtensions = [
     width: 180,
   },
   {
+    columnName: 'workItem',
+    width: 180,
+    render: row => {
+      const labWorkItems = filterLabWorkItem(row.workItem)
+      const radioWorkItems = filterRadioWorkItem(row.workItem)
+      const nurseWorkItems = filterNurseWorkItem(row.workItem)
+      const labWorkItemsAccessRight = Authorized.check('queue.workitem.labworkitem')
+      const radiologyWorkItemsAccessRight = Authorized.check(
+        'queue.workitem.radiologyworkitem',
+      )
+      const nurseWorkItemsAccessRight = Authorized.check(
+        'queue.workitem.nurseworkitem',
+      )
+      return (
+        <div style={{ justifyContent: 'space-between' }}>
+          {radiologyWorkItemsAccessRight.rights === 'enable' &&
+            radioWorkItems &&
+            radioWorkItems.length > 0 && (
+              <RadioWorkItemInfo values={radioWorkItems} />
+            )}
+          {nurseWorkItemsAccessRight.rights === 'enable' &&
+            nurseWorkItems &&
+            nurseWorkItems.length > 0 && (
+              <NurseWorkItemInfo values={nurseWorkItems} />
+            )}
+        </div>
+      )
+    },
+  },
+  {
     columnName: 'servingByList',
     compare: compareServingPerson,
     width: 130,
-    render: (row) => {
+    render: row => {
       const servingPersons = mapServingPersonsString(row.servingByList)
       return (
         <Fragment>
@@ -361,14 +434,20 @@ export const QueueColumnExtensions = [
             }}
           >
             <Tooltip title={servingPersons}>
-              <span style={{overflow:'hidden',textOverflow:'ellipsis'}}>{servingPersons}</span>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {servingPersons}
+              </span>
             </Tooltip>
             <div>
               {row.visitFK && (
                 <Authorized authority='queue.servepatient'>
-                  <ServePatientButton visitFK={row.visitFK} servingPersons={row.servingByList} patientName={row.patientName}/>
+                  <ServePatientButton
+                    visitFK={row.visitFK}
+                    servingPersons={row.servingByList}
+                    patientName={row.patientName}
+                  />
                 </Authorized>
-                )}
+              )}
             </div>
           </div>
         </Fragment>

@@ -319,7 +319,7 @@ const isPharmacyOrderUpdated = orders => {
   let isUpdatedPharmacy = false
   const isPushToPharmacy = item => {
     let isPushToPharmacy = false
-    if (item.type === '1' || item.type === '4') {
+    if (item.type === '1' || item.type === '4' || item.type === '5') {
       isPushToPharmacy = item.isDispensedByPharmacy
     }
     return isPushToPharmacy

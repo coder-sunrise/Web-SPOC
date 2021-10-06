@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import _ from 'lodash'
@@ -12,6 +12,7 @@ import Delete from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import { formatMessage } from 'umi' // common component
 import Warining from '@material-ui/icons/Error'
+import { Table } from '@devexpress/dx-react-grid-material-ui'
 import {
   Button,
   ProgressButton,
@@ -34,16 +35,14 @@ import {
 import { sendNotification } from '@/utils/realtime'
 // sub components
 import TableData from './TableData'
-import VaccinationGrid from './VaccinationGrid'
 import DrugLabelSelection from './DrugLabelSelection'
 import NurseActualization from './NurseActualization'
 
 // variables
 import {
-  PrescriptionColumns,
-  PrescriptionColumnExtensions,
-  VaccinationColumn,
-  VaccinationColumnExtensions,
+  DispenseItemsColumns,
+  DispenseItemsColumnExtensions,
+  ServiceColumns,
   OtherOrdersColumns,
   OtherOrdersColumnExtensions,
   PackageColumns,
@@ -55,6 +54,10 @@ import {
 
 import CONSTANTS from './constants'
 import { ServePatientButton } from '@/components/_medisys'
+import RadiologyDetails from '@/pages/Radiology/Worklist/Details'
+import WorklistContext, {
+  WorklistContextProvider,
+} from '@/pages/Radiology/Worklist/WorklistContext'
 
 const styles = theme => ({
   paper: {
@@ -82,6 +85,15 @@ const styles = theme => ({
     '& > button:last-child': {
       marginRight: '0px !important',
     },
+  },
+  subRow: {
+    '& > td:first-child': {
+      paddingLeft: theme.spacing(1),
+    },
+  },
+  groupStyle: {
+    padding: '3px 0px',
+    backgroundColor: '#CCCCCC',
   },
 })
 
@@ -115,13 +127,14 @@ const DispenseDetails = ({
   user,
 }) => {
   const {
-    prescription,
-    vaccination,
+    dispenseItems = [],
+    service,
     otherOrder,
     packageItem,
     invoice,
     visitPurposeFK,
     visitRemarks,
+    defaultExpandedGroups,
   } = values || {
     invoice: { invoiceItem: [] },
   }
@@ -137,24 +150,6 @@ const DispenseDetails = ({
   const currentDoc = doctorprofile.filter(x => x.id === visit.doctorProfileFK)
   const docInfo =
     currentDoc && currentDoc.length > 0 ? currentDoc[0].clinicianProfile : {}
-
-  const handleSelectedBatch = (e, op = {}, row) => {
-    if (op && op.length > 0) {
-      const { expiryDate } = op[0]
-      setFieldValue(`prescription[${row.rowIndex}]expiryDate`, expiryDate)
-    } else {
-      setFieldValue(`prescription[${row.rowIndex}]expiryDate`, undefined)
-    }
-  }
-
-  const handleSelectVaccinationBatch = (e, op = {}, row) => {
-    if (op && op.length > 0) {
-      const { expiryDate } = op[0]
-      setFieldValue(`vaccination[${row.rowIndex}]expiryDate`, expiryDate)
-    } else {
-      setFieldValue(`vaccination[${row.rowIndex}]expiryDate`, undefined)
-    }
-  }
 
   const discardCallback = r => {
     if (r) {
@@ -186,15 +181,15 @@ const DispenseDetails = ({
         id,
       },
     }).then(r => {
-                   sendNotification('EditedConsultation', {
-                     type: NOTIFICATION_TYPE.CONSULTAION,
-                     status: NOTIFICATION_STATUS.OK,
-                     message: 'Completed Consultation',
-                     visitID: values.id,
-                   })
+      sendNotification('EditedConsultation', {
+        type: NOTIFICATION_TYPE.CONSULTAION,
+        status: NOTIFICATION_STATUS.OK,
+        message: 'Completed Consultation',
+        visitID: values.id,
+      })
 
-                   discardCallback(r)
-                 })
+      discardCallback(r)
+    })
   }
 
   const discardBillOrder = () => {
@@ -330,74 +325,78 @@ const DispenseDetails = ({
     )
   }
 
-  const [selectedPrescriptionRows, setSelectedPrescriptionRows] = useState([])
-  const [selectedVaccinationRows, setSelectedVaccinationRows] = useState([])
-  const [selectedOtherOrderRows, setSelectedOtherOrderRows] = useState([])
+  const [selectedServiceRows, setSelectedServiceRows] = useState([])
   const [selectedActualizeRows, setSelectedActualizeRows] = useState([])
   const [showActualization, setShowActualization] = useState(false)
   const [actualizationStatus, setActualizationStatus] = useState(-1)
 
   const handleReloadClick = () => {
-    setSelectedPrescriptionRows([])
-    setSelectedVaccinationRows([])
-    setSelectedOtherOrderRows([])
+    setSelectedServiceRows([])
     setSelectedActualizeRows([])
     setShowActualization(false)
     setActualizationStatus(-1)
     onReloadClick()
   }
-  
+
   const isShowActualizeSelection = (records = []) => {
+    if (viewOnly) {
+      return false
+    }
     let actualizeOrderItemsRight = Authorized.check(
       'dispense.actualizeorderitems',
     )
     let viewable =
       actualizeOrderItemsRight && actualizeOrderItemsRight.rights !== 'hidden'
-
     return viewable && records.filter(x => isActualizable(x)).length > 0
   }
 
   const handleSelectionChange = (type, value) => {
     switch (type) {
-      case 'Prescription':
-        setSelectedPrescriptionRows(value)
-        break
-      case 'Vaccination':
-        setSelectedVaccinationRows(value)
-        break
-      case 'OtherOrders':
-        setSelectedOtherOrderRows(value)
+      case 'Service':
+        setSelectedServiceRows(value)
         break
     }
   }
 
   const onActualizeBtnClick = (row, status) => {
-                                                 setSelectedActualizeRows([row])
-                                                 setActualizationStatus(status)
-                                                 setShowActualization(true)
-                                               }
+    setSelectedActualizeRows([row])
+    setActualizationStatus(status)
+    setShowActualization(true)
+  }
+
+  const { detailsId, setDetailsId } = useContext(WorklistContext)
+  const onRadiologyBtnClick = radiologyWorkitemID => {
+    setDetailsId(radiologyWorkitemID)
+  }
 
   const handleMultiActualizationClick = type => {
     let selectedRows = []
     let records = []
     switch (type) {
-      case 'Prescription':
-        selectedRows = selectedPrescriptionRows
-        records = prescription
+      case 'DispenseItems':
+        selectedRows = dispenseItems.filter(x => x.isCheckActualize)
+        records = dispenseItems
         break
-      case 'Vaccination':
-        selectedRows = selectedVaccinationRows
-        records = vaccination
-        break
-      case 'OtherOrders':
-        selectedRows = selectedOtherOrderRows
-        records = otherOrder
+      case 'Service':
+        selectedRows = selectedServiceRows
+        records = service
         break
     }
     if (selectedRows.length > 0) {
-      let selectedRecords = records.filter(
-        x => selectedRows.indexOf(getRowId(x, type)) > -1,
-      )
+      let selectedRecords = []
+      if (type === 'DispenseItems') {
+        selectedRecords = [
+          ...records.filter(x => x.isCheckActualize && !x.isDrugMixture),
+          ..._.uniqBy(
+            records.filter(x => x.isCheckActualize && x.isDrugMixture),
+            'id',
+          ),
+        ]
+      } else {
+        selectedRecords = records.filter(
+          x => selectedRows.indexOf(getRowId(x, type)) > -1,
+        )
+      }
       setSelectedActualizeRows(selectedRecords)
       setActualizationStatus(NURSE_WORKITEM_STATUS.NEW)
       setShowActualization(true)
@@ -433,6 +432,117 @@ const DispenseDetails = ({
 
   const { labelPrinterSize } = settings
   const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
+
+  const isShowDispenseActualie =
+    !viewOnly && isShowActualizeSelection(dispenseItems)
+  const orderItemRow = p => {
+    const { row, children, tableRow } = p
+    let newchildren = []
+
+    const startColIndex = isShowDispenseActualie ? 7 : 6
+    let endColIndex = isShowDispenseActualie ? 11 : 10
+    if (viewOnly) {
+      endColIndex = endColIndex - 1
+    }
+    const batchColumns = children.slice(startColIndex, endColIndex)
+
+    if (row.groupNumber === 1) {
+      newchildren.push(
+        children
+          .filter((value, index) => index < (isShowDispenseActualie ? 3 : 2))
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.groupRowSpan,
+            },
+          })),
+      )
+    }
+
+    if (row.countNumber === 1) {
+      newchildren.push(
+        children
+          .filter(
+            (value, index) =>
+              index < startColIndex && index > (isShowDispenseActualie ? 2 : 1),
+          )
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.rowspan,
+            },
+          })),
+      )
+
+      newchildren.push(batchColumns)
+
+      newchildren.push(
+        children
+          .filter((value, index) => index === endColIndex)
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.rowspan,
+            },
+          })),
+      )
+    } else {
+      newchildren.push(batchColumns)
+    }
+
+    if (row.groupNumber === 1) {
+      newchildren.push(
+        children
+          .filter((value, index) => index > endColIndex)
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.groupRowSpan,
+            },
+          })),
+      )
+    }
+
+    if (row.countNumber === 1) {
+      return <Table.Row {...p}>{newchildren}</Table.Row>
+    }
+    return (
+      <Table.Row {...p} className={classes.subRow}>
+        {newchildren}
+      </Table.Row>
+    )
+  }
+
+  let columns = DispenseItemsColumns
+  if (!isShowDispenseActualie || viewOnly) {
+    columns = columns.filter(c => c.name !== 'isCheckActualize')
+  }
+  if (viewOnly) {
+    columns = columns.filter(c => c.name !== 'stock')
+  }
+
+  const commitChanges = ({ rows, changed }) => {
+    if (changed) {
+      const key = Object.keys(changed)[0]
+      const editRow = rows.find(r => r.uid === key)
+      let matchItems = []
+      if (editRow.isDrugMixture) {
+        matchItems = rows.filter(r => r.drugMixtureFK === editRow.drugMixtureFK)
+      } else {
+        matchItems = rows.filter(
+          r => r.type === editRow.type && r.id === editRow.id,
+        )
+      }
+      const balanceQty =
+        editRow.quantity - _.sumBy(matchItems, 'dispenseQuantity')
+      matchItems.forEach(item => (item.stockBalance = balanceQty))
+      setFieldValue('dispenseItems', rows)
+    }
+  }
   return (
     <React.Fragment>
       <GridContainer>
@@ -488,20 +598,6 @@ const DispenseDetails = ({
         </GridItem>
         {!viewOnly && (
           <GridItem className={classes.rightActionButtons} md={5}>
-            {/* isBillFirstVisit && (
-              <div
-                style={{
-                  marginRight: 8,
-                  marginTop: 8,
-                  display: 'inline-block',
-                  color: dangerColor,
-                }}
-              >
-                <SizeContainer size='lg'>
-                  <AddAlert />
-                </SizeContainer>
-              </div>
-            ) */}
             {(isRetailVisit || isBillFirstVisit) && (
               <ProgressButton
                 color='danger'
@@ -611,7 +707,12 @@ const DispenseDetails = ({
                   } else if (coPayerPayments.length > 0) {
                     setShowRemovePayment(true)
                   } else {
-                    onFinalizeClick()
+                    if(dispenseItems.filter(x => isActualizable(x)).length > 0 || service.filter(x => isActualizable(x)).length > 0)
+                      notification.error({
+                        message: 'Actualize all nursing work items before finalize.',
+                      })
+                    else
+                      onFinalizeClick()
                   }
                 }}
               >
@@ -623,63 +724,107 @@ const DispenseDetails = ({
         <GridItem md={12}>
           <Paper className={classes.paper}>
             <TableData
-              title='Prescription'
-              titleExtend={actualizeSelectedItemButton(
-                'Prescription',
-                prescription,
-              )}
-              selection={selectedPrescriptionRows}
-              onSelectionChange={value => {
-                handleSelectionChange('Prescription', value)
+              oddEven={false}
+              title='Dispense Details'
+              titleExtend={
+                viewOnly
+                  ? null
+                  : actualizeSelectedItemButton('DispenseItems', dispenseItems)
+              }
+              EditingProps={{
+                showCommandColumn: false,
+                onCommitChanges: commitChanges,
               }}
-              {...actualizeTableConfig(isShowActualizeSelection(prescription))}
-              idPrefix='Prescription'
+              FuncProps={{
+                pager: false,
+                grouping: true,
+                groupingConfig: {
+                  state: {
+                    grouping: [{ columnName: 'dispenseGroupId' }],
+                    expandedGroups: defaultExpandedGroups,
+                  },
+                  row: {
+                    indentColumnWidth: 0,
+                    iconComponent: icon => <span></span>,
+                    contentComponent: group => {
+                      const { row } = group
+                      const groupRow = dispenseItems.find(
+                        data => data.dispenseGroupId === row.value,
+                      )
+                      if (row.value === 'NormalDispense')
+                        return (
+                          <div className={classes.groupStyle}>
+                            <span style={{ fontWeight: 600 }}>
+                              Normal Dispense Items
+                            </span>
+                          </div>
+                        )
+                      if (row.value === 'NoNeedToDispense')
+                        return (
+                          <div className={classes.groupStyle}>
+                            <span style={{ fontWeight: 600 }}>
+                              No Need To Dispense Items
+                            </span>
+                          </div>
+                        )
+                      return (
+                        <div className={classes.groupStyle}>
+                          <span style={{ fontWeight: 600 }}>
+                            {'Drug Mixture: '}
+                          </span>
+                          {groupRow.drugMixtureName}
+                        </div>
+                      )
+                    },
+                  },
+                  backgroundColor: '#CCCCCC',
+                },
+              }}
               forceRender
-              columns={PrescriptionColumns}
-              colExtensions={PrescriptionColumnExtensions(
+              columns={columns}
+              colExtensions={DispenseItemsColumnExtensions(
                 viewOnly,
                 onPrint,
-                inventorymedication,
-                handleSelectedBatch,
                 onActualizeBtnClick,
                 showDrugLabelRemark,
               )}
-              data={prescription}
-            />
-            <VaccinationGrid
-              title='Vaccination'
-              titleExtend={actualizeSelectedItemButton(
-                'Vaccination',
-                vaccination,
-              )}
-              selection={selectedVaccinationRows}
-              onSelectionChange={value => {
-                handleSelectionChange('Vaccination', value)
+              data={dispenseItems}
+              TableProps={{
+                rowComponent: orderItemRow,
               }}
-              {...actualizeTableConfig(isShowActualizeSelection(vaccination))}
-              idPrefix='Vaccination'
-              columns={VaccinationColumn}
-              colExtensions={VaccinationColumnExtensions(
-                viewOnly,
-                inventoryvaccination,
-                handleSelectVaccinationBatch,
-                onActualizeBtnClick,
-              )}
-              data={vaccination}
-              visitPurposeFK={visitPurposeFK}
+              getRowId={r => r.uid}
             />
 
             <TableData
-              title='Other Orders'
-              titleExtend={actualizeSelectedItemButton(
-                'OtherOrders',
-                otherOrder,
-              )}
-              selection={selectedOtherOrderRows}
+              title='Service'
+              forceRender
+              oddEven={false}
+              titleExtend={
+                viewOnly
+                  ? null
+                  : actualizeSelectedItemButton('Service', service)
+              }
+              selection={selectedServiceRows}
               onSelectionChange={value => {
-                handleSelectionChange('OtherOrders', value)
+                handleSelectionChange('Service', value)
               }}
-              {...actualizeTableConfig(isShowActualizeSelection(otherOrder))}
+              {...actualizeTableConfig(
+                !viewOnly && isShowActualizeSelection(service),
+              )}
+              idPrefix='Service'
+              columns={ServiceColumns}
+              colExtensions={OtherOrdersColumnExtensions(
+                viewOnly,
+                onPrint,
+                onActualizeBtnClick,
+                onRadiologyBtnClick,
+              )}
+              data={service}
+            />
+
+            <TableData
+              oddEven={false}
+              title='Other Orders'
               idPrefix='OtherOrders'
               columns={OtherOrdersColumns}
               colExtensions={OtherOrdersColumnExtensions(
@@ -692,6 +837,7 @@ const DispenseDetails = ({
 
             {settings.isEnablePackage && visitPurposeFK !== VISIT_TYPE.OTC && (
               <TableData
+                oddEven={false}
                 title='Package'
                 idPrefix='package'
                 columns={PackageColumns}
@@ -898,9 +1044,16 @@ const DispenseDetails = ({
           }}
         />
       </CommonModal>
+      <RadiologyDetails />
     </React.Fragment>
   )
 }
+
+const _DispenseDetails = props => (
+  <WorklistContextProvider>
+    <DispenseDetails {...props}></DispenseDetails>
+  </WorklistContextProvider>
+)
 
 export default compose(
   withStyles(styles, { name: 'DispenseDetailsGrid' }),
@@ -922,4 +1075,4 @@ export default compose(
       user,
     }),
   ),
-)(DispenseDetails)
+)(_DispenseDetails)

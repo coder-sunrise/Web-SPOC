@@ -377,8 +377,7 @@ export const PharmacyWorkitemStatus = {
   1: 'New',
   2: 'Prepared',
   3: 'Verified',
-  4: 'Dispensed',
-  5: 'Completed',
+  4: 'Completed',
 }
 
 export const VISIT_TYPE = {
@@ -482,6 +481,7 @@ export const CANNED_TEXT_TYPE = {
   RADIOLOGYINSTRUCTION: 8,
   MEDICATIONREMARKS: 9,
   APPOINTMENTREMARKS: 10,
+  SERVICEINSTRUCTION: 11,
 }
 
 export const CANNED_TEXT_TYPE_BASE_TEXT = [
@@ -489,6 +489,7 @@ export const CANNED_TEXT_TYPE_BASE_TEXT = [
   CANNED_TEXT_TYPE.RADIOLOGYINSTRUCTION,
   CANNED_TEXT_TYPE.MEDICATIONREMARKS,
   CANNED_TEXT_TYPE.APPOINTMENTREMARKS,
+  CANNED_TEXT_TYPE.SERVICEINSTRUCTION,
 ]
 
 export const DENTAL_CANNED_TEXT_TYPE_FIELD = {
@@ -646,7 +647,7 @@ export const DOSAGE_RULE = {
 export const RADIOLOGY_WORKITEM_STATUS = {
   NEW: 1,
   INPROGRESS: 2,
-  PENDINGREPORT: 3,
+  MODALITYCOMPLETED: 3,
   COMPLETED: 4,
   CANCELLED: 5,
 }
@@ -730,7 +731,7 @@ export const PHARMACY_STATUS = {
   NEW: 1,
   PREPARED: 2,
   VERIFIED: 3,
-  DISPENSED: 4,
+  COMPLETED: 4,
 }
 
 export const PHARMACY_ACTION = {

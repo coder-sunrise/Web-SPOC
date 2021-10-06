@@ -35,7 +35,6 @@ const NOTESCOLOR = {
   Yellow: '#FFFF8D',
 }
 
-
 const styles = theme => ({
   notesTextStyle: {
     '& > Div > Div': {
@@ -45,6 +44,7 @@ const styles = theme => ({
         top: 'unset !important',
         position: 'unset !important',
         marginBottom: 'unset !important',
+        minHeight: 48,
       },
     },
   },
@@ -58,10 +58,14 @@ const styles = theme => ({
       },
     },
   },
-  checkBoxStyle:{
-    '& > div > div > label > span:last-child':{
-      fontSize:'14px',
-    }
+  checkBoxStyle: {
+    '& > div > div > label > span:last-child': {
+      fontSize: '14px',
+    },
+  },
+  iconFontStyle: {
+    fontSize: '0.7rem !important',
+    fontWeight: 500,
   },
 })
 
@@ -70,9 +74,11 @@ class PatientStickyNotesBtn extends Component {
     openPopper: false,
     stickyNotes: [],
     isFlaggedOnlyShow: true,
+    patientProfileFK: undefined,
+    flaggedNoteCount: 0,
   }
 
-  componentDidMount = () => {
+  componentWillMount = () => {
     this.getLatest()
   }
 
@@ -82,14 +88,19 @@ class PatientStickyNotesBtn extends Component {
       this.patientStickyNotesAccessRight.rights !== 'hidden'
     if (!stickyNotesViewable) return
 
-    const { patient, dispatch } = this.props
+    const { patient, dispatch, patientProfileFK } = this.props
     dispatch({
       type: 'patient/getStickyNotes',
       payload: {
-        patientProfileFK: patient.id,
+        patientProfileFK: patientProfileFK || patient.id,
       },
     }).then(result => {
-      this.setState({ stickyNotes: result || [] })
+      this.setState({
+        patientProfileFK: patientProfileFK,
+        stickyNotes: result || [],
+        flaggedNoteCount: (result || []).filter(x => x.id && x.isFlagged)
+          .length,
+      })
     })
   }
 
@@ -246,7 +257,8 @@ class PatientStickyNotesBtn extends Component {
       openDeleteItemConfirm && currentDeletingNote?.id === note.id
 
     const { id: currentUserID } = this.props.currentUser
-    const isBelongtoCurrentUser = !note.createByUserFK || note.createByUserFK === currentUserID
+    const isBelongtoCurrentUser =
+      !note.createByUserFK || note.createByUserFK === currentUserID
 
     return (
       <div
@@ -271,7 +283,7 @@ class PatientStickyNotesBtn extends Component {
               {isEditMode ? (
                 <OutlinedTextField
                   autoFocus
-                  rows='3'
+                  minRows={3}
                   multiline
                   defaultValue={note.notes}
                   onChange={e => {
@@ -289,17 +301,17 @@ class PatientStickyNotesBtn extends Component {
                   }}
                 />
               ) : (
-                <span
+                <pre
                   style={{
-                    width: '100%',
-                    height: '100%',
                     fontSize: 14,
                     wordBreak: 'break-all',
+                    whiteSpace: 'pre-wrap',
                     color: textContentColor,
+                    margin: 0,
                   }}
                 >
                   {note.notes}
-                </span>
+                </pre>
               )}
             </div>
           </GridItem>
@@ -396,7 +408,7 @@ class PatientStickyNotesBtn extends Component {
                 </div>
               ) : (
                 stickyNotesEditable && (
-                  <div>
+                  <div style={{ height: 25 }}>
                     <Popper
                       open={isOpenDeleteItemConfirm}
                       placement='right-end'
@@ -593,13 +605,26 @@ class PatientStickyNotesBtn extends Component {
       this.patientStickyNotesAccessRight &&
       this.patientStickyNotesAccessRight.rights !== 'hidden'
     if (!stickyNotesViewable) return null
+    const {
+      openPopper,
+      stickyNotes = [],
+      currentDeletingNote,
+      flaggedNoteCount,
+      patientProfileFK,
+    } = this.state
 
-    const { openPopper, stickyNotes = [], currentDeletingNote } = this.state
-    const flaggedNoteCount = stickyNotes.filter(x => x.id && x.isFlagged).length
     const defaultPopperStyle = {
       zIndex: 1500,
     }
-    const { popperStyle = defaultPopperStyle } = this.props
+
+    const {
+      popperStyle = defaultPopperStyle,
+      patientProfileFK: newPatientProfileFK,
+    } = this.props
+
+    if (patientProfileFK && patientProfileFK != newPatientProfileFK)
+      this.getLatest()
+
     return (
       <Popper
         open={openPopper}
@@ -613,8 +638,15 @@ class PatientStickyNotesBtn extends Component {
             color='transparent'
             onClick={this.stickyNotesBtnClick}
           >
-            <div style={{ height: 22,width:28}}>
-              <MailOutlineIcon style={{ color: '#4255BD',position:'absolute',top:7,left:3 }} />
+            <div style={{ height: 22, width: 28 }}>
+              <MailOutlineIcon
+                style={{
+                  color: '#4255BD',
+                  position: 'absolute',
+                  top: 7,
+                  left: 3,
+                }}
+              />
               {flaggedNoteCount > 0 && (
                 <span
                   style={{
@@ -624,13 +656,15 @@ class PatientStickyNotesBtn extends Component {
                     backgroundColor: 'red',
                     color: 'white',
                     position: 'absolute',
-                    fontSize: '11px !important',
+                    fontSize: '0.7rem !important',
                     borderRadius: 7,
                     height: 14,
                     right: 5,
                     top: 3,
-                    padding:'0 2px',
+                    padding: '0 2px',
+                    fontwidth: 500,
                   }}
+                  className={this.props.classes.iconFontStyle}
                 >
                   {flaggedNoteCount}
                 </span>
@@ -645,7 +679,7 @@ class PatientStickyNotesBtn extends Component {
 
 const ConnectedPatientStickyNotesBtn = connect(({ patient, user }) => ({
   patient: patient.entity || {},
-  currentUser: user.data
+  currentUser: user.data,
 }))(PatientStickyNotesBtn)
 
 export default withStyles(styles, {

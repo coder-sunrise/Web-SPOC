@@ -367,6 +367,26 @@ export default ({
     )
   }
 
+  const urgentIndicator = (row, right) => {
+    if (row.type !== '10' && row.type !== '3') return null
+    return (
+      row.priority === 'Urgent' && (
+        <Tooltip title='Urgent'>
+          <div
+            className={classes.rightIcon}
+            style={{
+              right: right,
+              borderRadius: 4,
+              backgroundColor: 'red',
+            }}
+          >
+            Urg.
+          </div>
+        </Tooltip>
+      )
+    )
+  }
+
   const packageDrawdownIndicator = row => {
     if (!row.isPackage) return null
 
@@ -436,7 +456,7 @@ export default ({
       )
 
     if (
-      radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT ||
+      radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ||
       radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
       radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
     )
@@ -459,8 +479,8 @@ export default ({
               backgroundColor:
                 radiologyWorkitemStatusFK ===
                 RADIOLOGY_WORKITEM_STATUS.INPROGRESS
-                  ? '#4876FF'
-                  : '#008B00',
+                  ? '#1890FF'
+                  : '#009900',
               cursor: 'pointer',
             }}
           />
@@ -478,8 +498,8 @@ export default ({
             }}
           >
             <Cross
-              style={{ color: 'red', height: 20, width: 20 }}
-              color='red'
+              style={{ color: 'black', height: 20, width: 20 }}
+              color='black'
             />
           </div>
         </Tooltip>
@@ -758,6 +778,12 @@ export default ({
             if (row.isDrugMixture || radiologyWorkitemStatusFK) {
               paddingRight = 10
             }
+            let urgentRight = -33
+            if((row.type === '3' || row.type === '10') && row.priority === 'Urgent')
+            {
+              paddingRight += 34
+              urgentRight = -paddingRight - 4
+            }
 
             return (
               <div style={{ position: 'relative' }}>
@@ -778,12 +804,11 @@ export default ({
                         <div
                           className={classes.rightIcon}
                           style={{
-                            right: -27,
+                            right: -30,
                             borderRadius: 4,
                             backgroundColor: '#4255bd',
                           }}
                         >
-                          {' '}
                           Pre
                         </div>
                       </Tooltip>
@@ -804,6 +829,7 @@ export default ({
                     )}
                     {radiologyWorkitemStatusFK &&
                       radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
+                    {urgentIndicator(row,urgentRight)}
                   </div>
                 </div>
               </div>
@@ -925,7 +951,7 @@ export default ({
                 if (
                   [
                     RADIOLOGY_WORKITEM_STATUS.INPROGRESS,
-                    RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT,
+                    RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED,
                     RADIOLOGY_WORKITEM_STATUS.COMPLETED,
                   ].indexOf(radiologyWorkitem.statusFK) >= 0
                 ) {

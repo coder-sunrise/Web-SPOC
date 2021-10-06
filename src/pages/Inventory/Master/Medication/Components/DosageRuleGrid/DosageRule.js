@@ -21,8 +21,6 @@ import Save from '@material-ui/icons/Save'
 import Cancel from '@material-ui/icons/Cancel'
 import Delete from '@material-ui/icons/Delete'
 
-const maxNumOfRule = 100
-
 const formItemStyle = {
   margin: 0,
   justifyContent: 'center',
@@ -715,7 +713,7 @@ const DosageRuleTable = ({
         rowClassName={(record, index) => isEditing(record) ? styles.editingRow : styles.editableRow}
         pagination={false}
       />
-      {((rule !== DOSAGE_RULE.default && data.length < maxNumOfRule) ||
+      {((rule !== DOSAGE_RULE.default) ||
         data.length === 0) && (
         <Button
           disabled={editingKey !== ''}
