@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { useSelector, useDispatch } from 'dva'
+import { connect, useSelector, useDispatch } from 'dva'
 import { Typography, Input } from 'antd'
 import moment from 'moment'
 import {
@@ -19,6 +19,7 @@ import {
   RADIOLOGY_WORKITEM_STATUS,
   RADIOLOGY_WORKITEM_BUTTON,
   CANNED_TEXT_TYPE,
+  SCRIBBLE_NOTE_TYPE,
 } from '@/utils/constants'
 import WorklistContext from '../WorklistContext'
 import Findings from '../../Components/Findings'
@@ -31,6 +32,10 @@ const RightAlignGridItem = ({ children, md = 6 }) => {
   )
 }
 
+// const mapStateToProps = (state) => ({
+//   scriblenotes: state.scriblenotes,
+// })
+
 const RadiologyDetails = props => {
   const dispatch = useDispatch()
   const {
@@ -42,10 +47,21 @@ const RadiologyDetails = props => {
   } = useContext(WorklistContext)
 
   const details = useSelector(state => state.radiologyDetails)
-  const [examinationFinding, setExaminationFinding] = useState('')
+  const [findings, setFindings] = useState({})
   const [comment, setComment] = useState('')
   const patientBannerEntity = useSelector(state => state.patient)
   const [workitem, setWorkItem] = useState({})
+  const item = {
+    authority: 'queue.consultation.clinicalnotes.history',
+    category: 'RadiologyFindings',
+    fieldName: 'RadiologyFindings',
+    fieldTitle: 'RadiologyFindings',
+    scribbleField: 'radiologyFindingsScribbleArray',
+    scribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.RADIOLOGY,
+    index: 0,
+    height: 390,
+    enableSetting: 'isEnableClinicNoteHistory'
+  }
 
   useEffect(() => {
     if (detailsId) {
@@ -57,13 +73,17 @@ const RadiologyDetails = props => {
     } else {
       setShowDetails(false)
     }
+
   }, [detailsId])
 
   useEffect(() => {
     if (details && details.entity) {
       setWorkItem(details.entity)
       setComment(details.entity.comment)
-      setExaminationFinding(details.entity.examinationFinding)
+      setFindings({
+        examinationFinding: details.entity.examinationFinding,
+        radiologyScribbleNote: details.entity.radiologyScribbleNote,
+      })
     }
   }, [details])
 
@@ -117,7 +137,8 @@ const RadiologyDetails = props => {
         id: details.entity.radiologyWorkitemId,
         statusFK: statusFK ? statusFK : details.entity.statusFK,
         comment: comment,
-        examinationFinding: examinationFinding,
+        examinationFinding: findings.examinationFinding,
+        radiologyScribbleNote: findings.radiologyScribbleNote,
       },
     })
 
@@ -134,6 +155,7 @@ const RadiologyDetails = props => {
       onClose={() => {
         setDetailsId(null)
         setShowDetails(false)
+        //TODO: if has changed scribble notes, warn to pending changes
       }}
       footProps={{
         extraButtons: renderStatusButtons(),
@@ -142,7 +164,12 @@ const RadiologyDetails = props => {
       overrideLoading
       observe=''
     >
-      <GridContainer style={{ height: 700, overflowY: 'scroll' }}>
+      <GridContainer 
+        style={{ 
+          // height: 700, 
+          overflowY: 'scroll' 
+        }}
+      >
         <GridItem md={12}>
           <div style={{ padding: 8 }}>
             <Banner
@@ -301,8 +328,10 @@ const RadiologyDetails = props => {
               <div>
                 <Findings
                   defaultValue={details?.entity?.examinationFinding}
-                  onChange={value => setExaminationFinding(value)}
+                  radiologyScribbleNote={details?.entity?.radiologyScribbleNote}
+                  onChange={value => setFindings(value)}
                   workItem={workitem}
+                  item={item}
                   {...props}
                 />
               </div>

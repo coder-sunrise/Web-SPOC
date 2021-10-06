@@ -620,7 +620,7 @@ class ClinicalNotes extends Component {
           <ScribbleNote
             {...this.props}
             addScribble={this.scribbleNoteDrawing}
-            exportToClinicalNote={this.insertIntoClinicalNote}
+            // exportToClinicalNote={this.insertIntoClinicalNote}
             toggleScribbleModal={this.toggleScribbleModal}
             scribbleData={this.state.selectedData}
             deleteScribbleNote={this.deleteScribbleNote}
