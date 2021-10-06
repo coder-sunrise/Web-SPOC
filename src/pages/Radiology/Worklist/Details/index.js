@@ -80,8 +80,6 @@ const RadiologyDetails = props => {
   const [cancellationReason, setCancellationReason] = useState('')
   const [assignedRadiographers, setAssignedRadiographers] = useState([])
 
-  console.log('currentUser', currentUser)
-
   useEffect(() => {
     if (detailsId) {
       dispatch({
@@ -99,6 +97,10 @@ const RadiologyDetails = props => {
         payload: { entity: {} },
       })
       setWorkItem({})
+      setIsCombinedOrder(false)
+      setAssignedRadiographers([])
+      setCancellationReason('')
+      setVisitWorkItems([])
     }
   }, [detailsId])
 
@@ -291,15 +293,18 @@ const RadiologyDetails = props => {
                     <RightAlignGridItem>Order Combined :</RightAlignGridItem>
 
                     <GridItem md={6}>
-                      {workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW && (
-                        <Radio.Group
-                          onChange={e => setIsCombinedOrder(e.target.value)}
-                          value={isCombinedOrder}
-                        >
-                          <Radio value={false}>No</Radio>
-                          <Radio value={true}>Yes</Radio>
-                        </Radio.Group>
-                      )}
+                      {workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW &&
+                        (workitem.visitWorkitems.length > 1 ? (
+                          <Radio.Group
+                            onChange={e => setIsCombinedOrder(e.target.value)}
+                            value={isCombinedOrder}
+                          >
+                            <Radio value={false}>No</Radio>
+                            <Radio value={true}>Yes</Radio>
+                          </Radio.Group>
+                        ) : (
+                          '-'
+                        ))}
                       {workitem.statusFK !== RADIOLOGY_WORKITEM_STATUS.NEW &&
                         (isCombinedOrder ? 'Yes' : 'No')}
                     </GridItem>
@@ -308,30 +313,30 @@ const RadiologyDetails = props => {
               </GridContainer>
             </div>
           </GridItem>
-          {isCombinedOrder &&
-            workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW && (
-              <React.Fragment>
-                <GridItem md={12}>
-                  <SectionTitle title='Order Combined Details' />
-                </GridItem>
-                <GridItem md={12}>
-                  <CombineOrderGrid
-                    visitWorkitems={workitem.visitWorkitems}
-                    currentWorkitemid={workitem.radiologyWorkitemId}
-                    onChange={value => {
-                      setVisitWorkItems(value)
-                    }}
-                  />
-                </GridItem>
-              </React.Fragment>
-            )}
+          {isCombinedOrder && (
+            <React.Fragment>
+              <GridItem md={12}>
+                <SectionTitle title='Order Combined Details' />
+              </GridItem>
+              <GridItem md={12}>
+                <CombineOrderGrid
+                  visitWorkitems={workitem.visitWorkitems}
+                  currentWorkitemid={workitem.radiologyWorkitemId}
+                  onChange={value => {
+                    setVisitWorkItems(value)
+                  }}
+                  readonly={workitem.statusFK !== RADIOLOGY_WORKITEM_STATUS.NEW}
+                />
+              </GridItem>
+            </React.Fragment>
+          )}
           <GridItem md={12}>
             <div>
               <SectionTitle title='Examination Details' />
 
               {details.entity &&
               details.entity.statusFK <=
-                RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT ? (
+                RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ? (
                 <GridContainer style={{ rowGap: 10 }}>
                   <GridItem md={2}>
                     <RightAlignGridItem md={12}>
@@ -435,7 +440,7 @@ const RadiologyDetails = props => {
 
           {details.entity &&
             details.entity.statusFK ===
-              RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT && (
+              RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED && (
               <GridItem md={12} style={{ marginTop: 5 }}>
                 <div>
                   <Findings

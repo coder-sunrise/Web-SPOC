@@ -7,6 +7,7 @@ export const CombineOrderGrid = ({
   visitWorkitems = [],
   currentWorkitemid,
   onChange,
+  readonly,
 }) => {
   const columns = [
     {
@@ -94,8 +95,10 @@ export const CombineOrderGrid = ({
               if (e.target.checked) setPrimaryId(record.radiologyWorkitemId)
             }}
             disabled={
-              !combinedItems.includes(record.radiologyWorkitemId) &&
-              record.radiologyWorkitemId !== currentWorkitemid
+              readonly
+                ? true
+                : !combinedItems.includes(record.radiologyWorkitemId) &&
+                  record.radiologyWorkitemId !== currentWorkitemid
             }
           />
         )
