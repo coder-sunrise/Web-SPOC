@@ -40,6 +40,17 @@ export default createFormViewModel({
         }
         return false
       },
+
+      *cancelRadiologyWorkitem({ payload }, { put, select, call }) {
+        const radiologyDetails = yield select(state => state.radiologyDetails)
+
+        const response = yield call(service.cancel, payload)
+        if (response === 204) {
+          notification.success({ message: 'Saved successfully.' })
+          return true
+        }
+        return false
+      },
     },
     reducers: {},
   },

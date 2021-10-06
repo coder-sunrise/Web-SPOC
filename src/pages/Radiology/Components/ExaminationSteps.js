@@ -1,4 +1,5 @@
 import { Steps } from 'antd'
+import moment from 'moment'
 import { CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons'
 import {
   RadiologyWorkitemStatus,
@@ -51,35 +52,31 @@ const showIcon = (statusFK, currentStatusFK) => {
 }
 
 const getStatusStep = (status, statusHistory, currentStatusFK) => {
-  // const lastStatus = _.orderBy(statusHistory, ['actionDate'], ['desc']).find(
-  //   history => history.statusFK === status.statusFK,
-  // )
+  const lastStatus = _.orderBy(statusHistory, ['actionDate'], ['asc']).find(
+    history => history.statusFK === status.statusFK,
+  )
 
   return (
     <Step
       title={<span style={{ fontWeight: 500 }}>{status.name}</span>}
       icon={showIcon(status.statusFK, currentStatusFK)}
-      // subTitle={
-
-      // lastStatus
-      //   ? `${
-      //       lastStatus.actionByUserTitle &&
-      //       lastStatus.actionByUserTitle.trim().length
-      //         ? `${lastStatus.actionByUserTitle}. `
-      //         : ''
-      //     }${lastStatus.actionByUser || ''}`
-      //   : ''
-
-      // }
-      // description={
-
-      // lastStatus
-      //   ? `${moment(item.generateDate).format(
-      //       dateFormatLongWithTimeNoSec12h,
-      //     )}`
-      //   : ''
-
-      // }
+      subTitle={
+        lastStatus
+          ? `${
+              lastStatus.actionByUserTitle &&
+              lastStatus.actionByUserTitle.trim().length
+                ? `${lastStatus.actionByUserTitle}. `
+                : ''
+            }${lastStatus.actionByUser || ''}`
+          : ''
+      }
+      description={
+        lastStatus
+          ? `${moment(lastStatus.actionDate).format(
+              dateFormatLongWithTimeNoSec12h,
+            )}`
+          : ''
+      }
     />
   )
 }
@@ -105,7 +102,11 @@ export const ExaminationSteps = ({ item }) => {
         {validExaminationSteps &&
           item &&
           validExaminationSteps.map(status => {
-            return getStatusStep(status, null, item.statusFK)
+            return getStatusStep(
+              status,
+              item.radiologyWorkitemHistory,
+              item.statusFK,
+            )
           })}
       </Steps>
     </div>

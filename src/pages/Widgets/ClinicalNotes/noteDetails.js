@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import withStyles from '@material-ui/core/styles/withStyles'
-import { RichEditor, ScribbleNoteItem } from '@/components'
+import { RichEditor, ScribbleNoteItem, Checklist } from '@/components'
 import Authorized from '@/utils/Authorized'
 import CannedTextButton from './CannedText/CannedTextButton'
+import { CHECKLIST_CATEGORY } from '@/utils/constants'
 
 class NoteDetails extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.richEditor = React.createRef()
   }
@@ -21,8 +22,7 @@ class NoteDetails extends Component {
     }
   }
 
-  handleSelectCannedText = async (cannedText) => {
-    const result = await this.getCannedText(cannedText)
+  updateEditor = async result => {
     if (this.richEditor && this.richEditor.props) {
       const { editorState } = this.richEditor.props
       this.richEditor.update(RichEditor.insertHtml(editorState, result))
@@ -32,8 +32,16 @@ class NoteDetails extends Component {
     }
   }
 
+  handleSelectCannedText = async cannedText => {
+    const result = await this.getCannedText(cannedText)
+    this.updateEditor(result)
+  }
+
   getPrevDoctorNotes = async () => {
-    const { visitRegistration, item: { cannedTextTypeFK } } = this.props
+    const {
+      visitRegistration,
+      item: { cannedTextTypeFK },
+    } = this.props
     const visitId = ((visitRegistration.entity || {}).visit || {}).id
     let previousDoctorNote = await this.props.dispatch({
       type: 'cannedText/queryPrevDoctorNotes',
@@ -55,7 +63,7 @@ class NoteDetails extends Component {
     return text
   }
 
-  getCannedText = (cannedText) => {
+  getCannedText = cannedText => {
     const { cannedTextRow = {} } = this.props
     const { authority } = cannedTextRow
     const accessRight = Authorized.check(authority)
@@ -65,7 +73,7 @@ class NoteDetails extends Component {
     return text
   }
 
-  render () {
+  render() {
     const {
       item,
       scriblenotes,
@@ -107,10 +115,16 @@ class NoteDetails extends Component {
               handleSelectCannedText={this.handleSelectCannedText}
             />
           </Authorized>
+
+          <Checklist
+            checklistCategory={CHECKLIST_CATEGORY.DOCTORCONSULTATION}
+            buttonStyle={{ marginRight: '0px' }}
+            onChecklistConfirm={this.updateEditor}
+          />
         </div>
 
         <RichEditor
-          editorRef={(ref) => {
+          editorRef={ref => {
             this.richEditor = ref
           }}
           autoFocus={index === 0}

@@ -169,6 +169,14 @@ const _routes = [
             exact: true,
             authority: ['pharmacy/pharmacyworklist'],
           },
+          {
+            path: '/pharmacy/history',
+            name: 'history',
+            component: './Pharmacy/History',
+            mini: 'PW',
+            exact: true,
+            authority: ['pharmacy/worklisthistory'],
+          },
         ],
       },
       //

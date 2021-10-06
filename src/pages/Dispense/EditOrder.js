@@ -33,7 +33,12 @@ import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 import ConsumePackage from '@/pages/Widgets/Orders/Detail/ConsumePackage'
 
-const discardConsultation = async ({ dispatch, dispense }) => {
+const discardConsultation = async ({
+  dispatch,
+  dispense,
+  from = 'Dispense',
+  closeEditOrder,
+}) => {
   try {
     const consultationResult = await dispatch({
       type: 'consultation/discard',
@@ -42,19 +47,23 @@ const discardConsultation = async ({ dispatch, dispense }) => {
       },
     })
     if (consultationResult) {
-      await dispatch({
-        type: 'dispense/query',
-        payload: {
-          id: dispense.visitID,
-          version: Date.now(),
-        },
-      })
-      dispatch({
-        type: `dispense/updateState`,
-        payload: {
-          editingOrder: false,
-        },
-      })
+      if (from === 'Dispense') {
+        await dispatch({
+          type: 'dispense/query',
+          payload: {
+            id: dispense.visitID,
+            version: Date.now(),
+          },
+        })
+        dispatch({
+          type: `dispense/updateState`,
+          payload: {
+            editingOrder: false,
+          },
+        })
+      } else if (closeEditOrder) {
+        closeEditOrder()
+      }
     }
   } catch (error) {
     console.error({ error })
@@ -191,6 +200,8 @@ class EditOrder extends Component {
       forms,
       clinicSettings,
       user,
+      from = 'Dispense',
+      closeEditOrder,
     } = this.props
     if (forms.rows.filter(o => o.statusFK === 1 && !o.isDeleted).length > 0) {
       notification.warning({
@@ -295,17 +306,21 @@ class EditOrder extends Component {
           message: 'Order signed',
         })
 
-        await dispatch({
-          type: `dispense/refresh`,
-          payload: dispense.visitID,
-        })
-        dispatch({
-          type: `dispense/updateState`,
-          payload: {
-            editingOrder: false,
-            shouldRefreshOrder: false,
-          },
-        })
+        if (from === 'Dispense') {
+          await dispatch({
+            type: `dispense/refresh`,
+            payload: dispense.visitID,
+          })
+          dispatch({
+            type: `dispense/updateState`,
+            payload: {
+              editingOrder: false,
+              shouldRefreshOrder: false,
+            },
+          })
+        } else if (closeEditOrder) {
+          closeEditOrder()
+        }
       }
     }
   }
