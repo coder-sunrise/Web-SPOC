@@ -1,7 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { Form, Button } from 'antd'
+import moment from 'moment'
 import Search from '@material-ui/icons/Search'
-import { useDispatch } from 'dva'
+import { useDispatch, useSelector } from 'dva'
 import { VISIT_TYPE } from '@/utils/constants'
 import {
   TextField,
@@ -10,6 +11,7 @@ import {
   Select,
   ProgressButton,
   CodeSelect,
+  dateFormatLong,
 } from '@/components'
 import { formatMessage } from 'umi'
 import WorlistContext from '../Worklist/WorklistContext'
@@ -18,6 +20,7 @@ export const WorklistFilter = () => {
   const [form] = Form.useForm()
   const dispatch = useDispatch()
   const { showDetails, visitPurpose } = useContext(WorlistContext)
+  const { settings } = useSelector(s => s.clinicSettings)
 
   useEffect(() => {
     handleSearch()
