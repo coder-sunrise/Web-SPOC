@@ -328,6 +328,7 @@ const RadiologyDetails = props => {
           <GridItem md={12}>
             <div>
               <SectionTitle title='Examination Details' />
+
               {details.entity &&
               details.entity.statusFK <=
                 RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT ? (
@@ -343,7 +344,6 @@ const RadiologyDetails = props => {
                       <RadiographerTag
                         value={assignedRadiographers}
                         onChange={newVal => {
-                          console.log('assignedRaiioGraphers-newVal', newVal)
                           setAssignedRadiographers(newVal)
                         }}
                       />
@@ -388,7 +388,9 @@ const RadiologyDetails = props => {
                       Radiographer :
                     </RightAlignGridItem>
                   </GridItem>
-                  <GridItem md={10}>Tamy Wu, Wammy Tu</GridItem>
+                  <GridItem md={10}>
+                    {assignedRadiographers.map(r => r.name).toString()}
+                  </GridItem>
 
                   <GridItem md={2}>
                     <RightAlignGridItem md={12}>
