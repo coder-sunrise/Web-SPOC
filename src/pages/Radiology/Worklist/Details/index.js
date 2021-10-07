@@ -171,7 +171,6 @@ const RadiologyDetails = props => {
   }
 
   const handleSave = payload => {
-    console.log('handleSave-assignedRadiographers', assignedRadiographers)
     dispatch({
       type: 'radiologyDetails/updateRadiologyWorkitem',
       payload: {
