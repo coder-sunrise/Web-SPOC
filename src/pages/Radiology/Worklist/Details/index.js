@@ -464,6 +464,7 @@ const RadiologyDetails = props => {
                 <div>
                   <Findings
                     defaultValue={details?.entity?.examinationFinding}
+                    radiologyScribbleNote={details?.entity?.radiologyScribbleNote}
                     onChange={value => {
                       setFindings(value)
                       setIsDirty(true)
