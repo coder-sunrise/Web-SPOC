@@ -73,7 +73,6 @@ const RadiologyDetails = props => {
   const [isDirty, setIsDirty] = useState(false)
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
   const [isCombinedOrder, setIsCombinedOrder] = useState(false)
-  // const [examinationFinding, setExaminationFinding] = useState('')
   const [comment, setComment] = useState('')
   const patientBannerEntity = useSelector(state => state.patient)
   const [workitem, setWorkItem] = useState({})
@@ -125,7 +124,6 @@ const RadiologyDetails = props => {
         examinationFinding: details.entity.examinationFinding,
         radiologyScribbleNote: details.entity.radiologyScribbleNote,
       })
-      // setExaminationFinding(details.entity.examinationFinding)
       setVisitWorkItems(details.entity.visitWorkitems)
 
       if (
@@ -228,7 +226,7 @@ const RadiologyDetails = props => {
           handleSave({
             ...details.entity,
           })
-          //TODO: if has changed scribble notes, warn to pending changes
+          //TODO: if changed scribble notes, warn to pending changes
         }}
         confirmText='Save'
         onClose={() => {
