@@ -1,6 +1,6 @@
 import * as service from '@/services/common'
 
-const url = '/api/Consultation/ScribbleNote'
+const url = '/api/ScribbleNote'
 
 const templateUrl = '/api/CTScribbleNoteTemplate'
 

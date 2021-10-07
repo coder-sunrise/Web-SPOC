@@ -22,6 +22,7 @@ import {
   RADIOLOGY_WORKITEM_STATUS,
   RADIOLOGY_WORKITEM_BUTTON,
   CANNED_TEXT_TYPE,
+  SCRIBBLE_NOTE_TYPE,
   CLINICAL_ROLE,
 } from '@/utils/constants'
 import WorklistContext from '../WorklistContext'
@@ -72,13 +73,24 @@ const RadiologyDetails = props => {
   const [isDirty, setIsDirty] = useState(false)
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
   const [isCombinedOrder, setIsCombinedOrder] = useState(false)
-  const [examinationFinding, setExaminationFinding] = useState('')
   const [comment, setComment] = useState('')
   const patientBannerEntity = useSelector(state => state.patient)
   const [workitem, setWorkItem] = useState({})
   const [visitWorkitems, setVisitWorkItems] = useState([])
   const [cancellationReason, setCancellationReason] = useState('')
   const [assignedRadiographers, setAssignedRadiographers] = useState([])
+  const [findings, setFindings] = useState({})
+  const item = {
+    authority: 'queue.consultation.clinicalnotes.history',
+    category: 'RadiologyFindings',
+    fieldName: 'RadiologyFindings',
+    fieldTitle: 'RadiologyFindings',
+    scribbleField: 'radiologyFindingsScribbleArray',
+    scribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.RADIOLOGY,
+    index: 0,
+    height: 390,
+    enableSetting: 'isEnableClinicNoteHistory'
+  }
 
   useEffect(() => {
     if (detailsId) {
@@ -108,7 +120,10 @@ const RadiologyDetails = props => {
     if (details && details.entity) {
       setWorkItem(details.entity)
       setComment(details.entity.comment)
-      setExaminationFinding(details.entity.examinationFinding)
+      setFindings({
+        examinationFinding: details.entity.examinationFinding,
+        radiologyScribbleNote: details.entity.radiologyScribbleNote,
+      })
       setVisitWorkItems(details.entity.visitWorkitems)
 
       if (
@@ -178,7 +193,8 @@ const RadiologyDetails = props => {
         ...payload,
         id: details.entity.radiologyWorkitemId,
         comment: comment,
-        examinationFinding: examinationFinding,
+        examinationFinding: findings.examinationFinding,
+        radiologyScribbleNote: findings.radiologyScribbleNote,
         visitWorkitems: visitWorkitems,
         assignedRadiographers: assignedRadiographers,
       },
@@ -210,6 +226,7 @@ const RadiologyDetails = props => {
           handleSave({
             ...details.entity,
           })
+          //TODO: if changed scribble notes, warn to pending changes
         }}
         confirmText='Save'
         onClose={() => {
@@ -445,11 +462,13 @@ const RadiologyDetails = props => {
                 <div>
                   <Findings
                     defaultValue={details?.entity?.examinationFinding}
+                    radiologyScribbleNote={details?.entity?.radiologyScribbleNote}
                     onChange={value => {
-                      setExaminationFinding(value)
+                      setFindings(value)
                       setIsDirty(true)
                     }}
                     workItem={workitem}
+                    item={item}
                     {...props}
                   />
                 </div>
