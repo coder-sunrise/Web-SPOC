@@ -29,6 +29,7 @@ class ChecklistModal extends React.Component {
   onCloseModal = () => this.props.onClose()
 
   onFinish = values => {
+    console.log('onFinish',values)
     this.updateEditor(values)
   }
 
@@ -74,7 +75,11 @@ class ChecklistModal extends React.Component {
                       return (
                         <Collapse.Panel header={displayValue} key={i}>
                           <Form.Item
-                            name={[subject.displayValue, displayValue]}
+                            name={[
+                              subject.displayValue,
+                              displayValue,
+                              'Nature',
+                            ]}
                           >
                             {isHasMultiNature ? (
                               <Checkbox.Group>
@@ -107,8 +112,8 @@ class ChecklistModal extends React.Component {
                           <Form.Item
                             name={[
                               subject.displayValue,
-                              'Remarks',
                               displayValue,
+                              'Remarks',
                             ]}
                           >
                             {isHasRemark && <TextField label='Remarks' />}
