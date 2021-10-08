@@ -123,20 +123,21 @@ class Checklist extends React.Component {
       if (obss) {
         output += `<strong>${sub}</strong><br /><br />`
         Object.keys(obss).forEach(obs => {
-          if (obs !== 'Remarks') {
-            const nats = obss[obs]
-            if (nats) {
+          const obsObj = obss[obs]
+            if (obsObj) {
               output += `${obs}<br />`
-              if (typeof nats === 'string') {
-                output += ` - ${nats}<br />`
+              const nats = obss[obs]['Nature']
+              if(nats){
+                if (typeof nats === 'string') {
+                  output += ` - ${nats}<br />`
+                }
+                if (typeof nats === 'object') {
+                  const panels = nats.map(n => ' - ' + n).join('<br />')
+                  output += `${panels}<br />`
+                }
               }
-              if (typeof nats === 'object') {
-                const panels = nats.map(n => ' - ' + n).join('<br />')
-                output += `${panels}<br />`
-              }
-            }
-            const rem = obss['Remarks'][obs] // see checklistmodal
-            if (rem) output += `<br />${rem}<br />`
+            const rem = obss[obs]['Remarks'] // see checklistmodal
+            if (rem) output += `${rem}<br />`
 
             output += `<br />`
           }
@@ -144,7 +145,7 @@ class Checklist extends React.Component {
       }
       output += `<br />`
     })
-
+console.log('output',output)
     this.props.onChecklistConfirm(output)
   }
 
