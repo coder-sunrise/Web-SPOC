@@ -57,14 +57,15 @@ class ChecklistModal extends React.Component {
               ['asc'],
             ).map((subject, index) => {
               let a = (index + 1) * 100
+              const orderedObservation = _.orderBy(subject.checklistObservation,['sortOrder'],['asc'])
               return (
                 <Tabs.TabPane tab={subject.displayValue} key={a}>
                   <Collapse
                     defaultActiveKey={[
-                      ...Array(subject.checklistObservation.length).keys(),
+                      ...Array(orderedObservation.length).keys(),
                     ].map(ind => (ind + 1) * 10 + a)}
                   >
-                    {subject.checklistObservation.map((observation, index) => {
+                    {orderedObservation.map((observation, index) => {
                       const i = (index + 1) * 10 + a
                       const {
                         checklistNature,
@@ -72,6 +73,7 @@ class ChecklistModal extends React.Component {
                         isHasMultiNature,
                         isHasRemark,
                       } = observation
+                      const orderedNature = _.orderBy(checklistNature,['sortOrder'],['asc'])
                       return (
                         <Collapse.Panel header={displayValue} key={i}>
                           <Form.Item
@@ -83,7 +85,7 @@ class ChecklistModal extends React.Component {
                           >
                             {isHasMultiNature ? (
                               <Checkbox.Group>
-                                {checklistNature.map((nature, index) => {
+                                {orderedNature.map((nature, index) => {
                                   return (
                                     <Checkbox
                                       value={nature.displayValue}
@@ -96,7 +98,7 @@ class ChecklistModal extends React.Component {
                               </Checkbox.Group>
                             ) : (
                               <Radio.Group>
-                                {checklistNature.map((nature, index) => {
+                                {orderedNature.map((nature, index) => {
                                   return (
                                     <Radio
                                       value={nature.displayValue}
