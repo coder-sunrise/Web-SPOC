@@ -20,11 +20,11 @@ import Authorized from '@/utils/Authorized'
 import { Typography, Input } from 'antd'
 import { CHECKLIST_CATEGORY, SCRIBBLE_NOTE_TYPE } from '@/utils/constants'
 import { navigateDirtyCheck } from '@/utils/utils'
-import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
+import ScribbleNote from '@/pages/Shared/ScribbleNote/ScribbleNote'
 
-const Findings = ({
+export const Findings = ({
   item,
-  radiologyScribbleNote = [],
+  radiologyScribbleNote,
   defaultValue,
   onChange,
   args,
@@ -37,10 +37,10 @@ const Findings = ({
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
   const [width, setWidth] = useState(0)
   const [scribbleNoteState, setScribbleNoteState] = useState({
-      category: '',
-      arrayName: '',
-      categoryIndex: '',
-      selectedData: '',    
+    category: '',
+    arrayName: '',
+    categoryIndex: '',
+    selectedData: '',
   })
   const [scribbleNotes, setScribbleNotes] = useState([])
 
@@ -62,7 +62,7 @@ const Findings = ({
       type: 'scriblenotes/updateState',
       payload,
     })
-  },[radiologyScribbleNote])
+  }, [radiologyScribbleNote])
 
   useEffect(() => {
     if (defaultValue && defaultValue !== '') {
@@ -109,10 +109,10 @@ const Findings = ({
       selectedData: selectedDataValue,
     })
   }
-  
+
   useEffect(() => {
     resize()
-  },[])
+  }, [])
   const resize = () => {
     if (window.innerWidth <= 1785) {
       setWidth(window.innerWidth / 11)
@@ -164,11 +164,13 @@ const Findings = ({
         type: 'scriblenotes/upsert',
         payload: {
           id: newArrayItems[scriblenotes.selectedIndex].scribbleNoteFK,
-          scribbleNoteTypeFK: newArrayItems[scriblenotes.selectedIndex].scribbleNoteTypeFK,
+          scribbleNoteTypeFK:
+            newArrayItems[scriblenotes.selectedIndex].scribbleNoteTypeFK,
           scribbleNoteLayers: temp.map(t => {
             return {
               ...t,
-              scribbleNoteFK: newArrayItems[scriblenotes.selectedIndex].scribbleNoteFK,
+              scribbleNoteFK:
+                newArrayItems[scriblenotes.selectedIndex].scribbleNoteFK,
             }
           }),
           subject,
@@ -191,18 +193,12 @@ const Findings = ({
       dispatch({
         type: 'scriblenotes/upsert',
         payload: newData,
-      }).then((o) => {
-        if(o) {
+      }).then(o => {
+        if (o) {
           newData.scribbleNoteFK = o.id
         }
       })
 
-      console.log('newData',{
-        ...scriblenotes,
-        [category]: {
-          [arrayName]: [...scriblenotes[category][arrayName], newData],
-        },
-      })
       dispatch({
         type: 'scriblenotes/updateState',
         payload: {
@@ -216,7 +212,7 @@ const Findings = ({
     }
 
     setScribbleNotes(previousData)
-    
+
     onChange({
       examinationFinding: getHtmlFromEditorState(editorState),
       radiologyScribbleNote: previousData,
@@ -260,7 +256,7 @@ const Findings = ({
       },
     })
 
-    console.log('updatedCategoryScribbleArray',updatedCategoryScribbleArray)
+    console.log('updatedCategoryScribbleArray', updatedCategoryScribbleArray)
     for (let i = 0; i < previousData.length; i++) {
       if (JSON.stringify(previousData[i]) === JSON.stringify(deleteItem)) {
         if (previousData[i].isDeleted !== undefined) {
@@ -272,7 +268,7 @@ const Findings = ({
     }
 
     setScribbleNotes(previousData)
-    
+
     onChange({
       examinationFinding: getHtmlFromEditorState(editorState),
       radiologyScribbleNote: previousData,
@@ -280,7 +276,7 @@ const Findings = ({
 
     toggleScribbleModal()
   }
-
+  console.log('Findings is loaded')
   return (
     <div>
       <GridContainer>
@@ -299,7 +295,9 @@ const Findings = ({
               category={item.category}
               arrayName={item.scribbleField}
               categoryIndex={item.scribbleNoteTypeFK}
-              scribbleNoteArray={scriblenotes[item.category][item.scribbleField]}
+              scribbleNoteArray={
+                scriblenotes[item.category][item.scribbleField]
+              }
               gridItemWidth={width}
             />
 
@@ -357,5 +355,3 @@ const Findings = ({
     </div>
   )
 }
-
-export default Findings
