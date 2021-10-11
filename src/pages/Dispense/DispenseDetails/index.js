@@ -439,8 +439,8 @@ const DispenseDetails = ({
     const { row, children, tableRow } = p
     let newchildren = []
 
-    const startColIndex = isShowDispenseActualie ? 7 : 6
-    let endColIndex = isShowDispenseActualie ? 11 : 10
+    const startColIndex = isShowDispenseActualie ? 9 : 8
+    let endColIndex = isShowDispenseActualie ? 12 : 11
     if (viewOnly) {
       endColIndex = endColIndex - 1
     }
@@ -465,7 +465,8 @@ const DispenseDetails = ({
         children
           .filter(
             (value, index) =>
-              index < startColIndex && index > (isShowDispenseActualie ? 2 : 1),
+              index < startColIndex - 2 &&
+              index > (isShowDispenseActualie ? 2 : 1),
           )
           .map(item => ({
             ...item,
@@ -475,12 +476,10 @@ const DispenseDetails = ({
             },
           })),
       )
-
-      newchildren.push(batchColumns)
-
+      newchildren.push(children.slice(startColIndex - 2, startColIndex - 1))
       newchildren.push(
         children
-          .filter((value, index) => index === endColIndex)
+          .filter((value, index) => index === startColIndex - 1)
           .map(item => ({
             ...item,
             props: {
@@ -489,14 +488,16 @@ const DispenseDetails = ({
             },
           })),
       )
+      newchildren.push(batchColumns)
     } else {
+      newchildren.push(children.slice(startColIndex - 2, startColIndex - 1))
       newchildren.push(batchColumns)
     }
 
     if (row.groupNumber === 1) {
       newchildren.push(
         children
-          .filter((value, index) => index > endColIndex)
+          .filter((value, index) => index >= endColIndex)
           .map(item => ({
             ...item,
             props: {
@@ -707,12 +708,15 @@ const DispenseDetails = ({
                   } else if (coPayerPayments.length > 0) {
                     setShowRemovePayment(true)
                   } else {
-                    if(dispenseItems.filter(x => isActualizable(x)).length > 0 || service.filter(x => isActualizable(x)).length > 0)
+                    if (
+                      dispenseItems.filter(x => isActualizable(x)).length > 0 ||
+                      service.filter(x => isActualizable(x)).length > 0
+                    )
                       notification.error({
-                        message: 'Actualize all nursing work items before finalize.',
+                        message:
+                          'Actualize all nursing work items before finalize.',
                       })
-                    else
-                      onFinalizeClick()
+                    else onFinalizeClick()
                   }
                 }}
               >

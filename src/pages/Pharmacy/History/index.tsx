@@ -360,7 +360,7 @@ const PharmacyWorklistHistoryIndex = ({
           columns={columns}
           api={api}
           search={{
-            span:8,
+            span: 8,
             collapsed: false,
             collapseRender: false,
             searchText: 'SEARCH',
@@ -415,15 +415,19 @@ const PharmacyWorklistHistoryIndex = ({
                 searchValue: searchPatient,
                 orderDateForm: searchOrderDateForm,
                 orderDateTo: searchOrderDateTo,
-                visitDoctor: searchOrderBy?.indexOf(-99) > -1 ? null : searchOrderBy?.join(),
-                status: searchStatus?.indexOf(-99) > -1 ? null : searchStatus?.join(),
+                visitDoctor:
+                  searchOrderBy?.indexOf(-99) > -1
+                    ? null
+                    : searchOrderBy?.join(),
+                status:
+                  searchStatus?.indexOf(-99) > -1 ? null : searchStatus?.join(),
               },
             }
           }}
           scroll={{ x: 1100 }}
         />
       </PageContainer>
-      <PharmacyDetails refreshClick={refreshClick} />
+      <PharmacyDetails refreshClick={refreshClick} fromModule='History' />
     </Fragment>
   )
 }
@@ -440,7 +444,7 @@ const historyIndex = compose(
   connect(({ pharmacyHisotry, codetable, clinicSettings }) => ({
     pharmacyHisotry,
     codetable,
-    clinicSettings:clinicSettings.settings || clinicSettings.default,
+    clinicSettings: clinicSettings.settings || clinicSettings.default,
   })),
 )(HistoryIndex)
 

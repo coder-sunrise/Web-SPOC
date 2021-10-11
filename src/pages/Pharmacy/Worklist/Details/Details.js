@@ -19,7 +19,14 @@ const styles = theme => ({
 })
 
 const Details = props => {
-  const { patient, classes, pharmacyDetails, dispatch, loading } = props
+  const {
+    patient,
+    classes,
+    pharmacyDetails,
+    dispatch,
+    loading,
+    fromModule,
+  } = props
   const [editingOrder, setEditingOrder] = useState(false)
   const closeEditOrder = () => {
     dispatch({
