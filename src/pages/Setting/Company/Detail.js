@@ -36,7 +36,10 @@ import Contact from './Contact'
     settingCompany.entity || settingCompany.default,
   validationSchema: ({ settingCompany }) =>
     Yup.object().shape({
-      code: Yup.string().required(),
+      code: Yup.string().when('settingCompany', {
+        is: () => settingCompany.companyType.id === 2,
+        then: Yup.string().required()
+      }),
       displayValue: Yup.string().required(),
       contactPerson: Yup.string().max(
         100,
@@ -182,7 +185,7 @@ class Detail extends PureComponent {
                       label={isCopayer ? 'Co-Payer Code' : 'Company Code'}
                       autoFocus
                       {...args}
-                      disabled={!!settingCompany.entity}
+                      disabled={isCopayer? true : !!settingCompany.entity}
                     />
                   )}
                 />
