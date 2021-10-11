@@ -853,7 +853,7 @@ const radiologyWorkitemStatus = radiologyWorkitemStatusFK => {
         title={
           radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
             ? 'In Progress'
-            : 'Completed'
+            : radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ? 'Modality Completed' :'Completed'
         }
       >
         <div
