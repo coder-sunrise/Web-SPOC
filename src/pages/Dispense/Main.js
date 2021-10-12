@@ -167,6 +167,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
   const defaultItem = (item, groupName) => {
     return {
       ...item,
+      stockBalance: item.quantity,
       dispenseGroupId: groupName,
       countNumber: 1,
       rowspan: 1,
@@ -232,6 +233,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
         dispenseUOM: drugMixture.uomDisplayValue,
         isDispensedByPharmacy: drugMixture.isDispensedByPharmacy,
         drugMixtureName: item.name,
+        stockBalance: drugMixture.quantity,
         uid: getUniqueId(),
       }
       if (drugMixture.isDispensedByPharmacy) {

@@ -9,7 +9,10 @@ import styles from './PharmacyStep.less'
 
 const { Step } = Steps
 
-const showIcon = (statusFK, currentStatusFK) => {
+const showIcon = (statusFK, currentStatusFK, isPartialDispense) => {
+  if (isPartialDispense && statusFK === PHARMACY_STATUS.COMPLETED)
+    return <CheckCircleFilled style={{ color: 'orange' }} />
+
   if (
     currentStatusFK === PHARMACY_STATUS.COMPLETED ||
     statusFK <= currentStatusFK
@@ -67,11 +70,11 @@ const getStatusStep = (
       title={
         <span style={{ fontWeight: 500 }}>
           {isPartialDispense && status.statusFK === PHARMACY_STATUS.COMPLETED
-            ? `${status.name} (Partial)`
+            ? `${status.name} (Partial Dispense)`
             : status.name}
         </span>
       }
-      icon={showIcon(status.statusFK, currentStatusFK)}
+      icon={showIcon(status.statusFK, currentStatusFK, isPartialDispense)}
       subTitle={
         lastStatus
           ? `${
@@ -116,6 +119,21 @@ export const PharmacySteps = ({
             isPartialDispense,
           )
         })}
+        {isPartialDispense && (
+          <Step
+            title={<span style={{ fontWeight: 500 }}>Completed</span>}
+            icon={
+              <div
+                style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: 12,
+                  backgroundColor: 'gray',
+                }}
+              ></div>
+            }
+          />
+        )}
       </Steps>
     </div>
   )
