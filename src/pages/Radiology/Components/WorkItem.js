@@ -90,7 +90,15 @@ const WorkitemBody = ({ item }) => {
           <WorkitemLeftLabel style={{ fontWeight: 500 }}>
             {item.itemDescription}
           </WorkitemLeftLabel>
-          <WorkitemLeftLabel>{item.accessionNo}</WorkitemLeftLabel>
+          <WorkitemLeftLabel>
+            {item.accessionNo}
+            {item.primaryWorkitemFK && (
+              <Icon
+                type='link'
+                style={{ fontSize: 18, color: blueColor, alignSelf: 'center' }}
+              />
+            )}
+          </WorkitemLeftLabel>
           <WorkitemLeftLabel>{item.visitInfo.doctorName}</WorkitemLeftLabel>
           <WorkitemLeftLabel>{orderDate}</WorkitemLeftLabel>
         </div>

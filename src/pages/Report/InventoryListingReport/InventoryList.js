@@ -27,7 +27,7 @@ class InventoryList extends PureComponent {
             ...countCol,
             props: {
               ...countCol.props,
-              colSpan: 9,
+              colSpan: 12,
               tableColumn: {
                 ...countCol.props.tableColumn,
                 align: 'right',
@@ -67,11 +67,11 @@ class InventoryList extends PureComponent {
       { name: 'status', title: 'Status' },
       { name: 'stock', title: 'Stock' },
       { name: 'uom', title: 'UOM' },
-      {
-        name: 'acp',
-        title: <span>{reportDatas.InventoryListInfo[0].costPriceType}</span>,
-      },
-      { name: 'amount', title: 'Total Cost' },
+      { name: 'sellingPrice', title: 'Selling Price' },
+      { name: 'lcpBef', title: 'LCP (Before Bonus)' },
+      { name: 'lcpAft', title: 'LCP (After Bonus)' },
+      { name: 'acp', title: 'ACP' },
+      { name: 'amount', title: 'Total Cost (ACP)' },
     ]
     const InventoryListExtensions = [
       { columnName: 'inventoryType', sortingEnabled: false, width: 120 },
@@ -87,6 +87,30 @@ class InventoryList extends PureComponent {
         width: 100,
       },
       { columnName: 'uom', sortingEnabled: false, width: 130 },
+      {
+        columnName: 'sellingPrice',
+        sortingEnabled: false,
+        type: 'currency',
+        currency: true,
+        precision: 2,
+        width: 130,
+      },
+      {
+        columnName: 'lcpBef',
+        sortingEnabled: false,
+        type: 'currency',
+        currency: true,
+        precision: 4,
+        width: 140,
+      },
+      {
+        columnName: 'lcpAft',
+        sortingEnabled: false,
+        type: 'currency',
+        currency: true,
+        precision: 4,
+        width: 140,
+      },
       {
         columnName: 'acp',
         sortingEnabled: false,

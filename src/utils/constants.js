@@ -441,6 +441,7 @@ export const SCRIBBLE_NOTE_TYPE = {
   CHIEFCOMPLAINTS: 2,
   PLAN: 6,
   HISTORY: 3,
+  RADIOLOGY: 9,
 }
 
 export const SMS_STATUS = {

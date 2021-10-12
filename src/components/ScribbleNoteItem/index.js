@@ -154,7 +154,7 @@ class ScribbleNoteItem extends React.Component {
                           .dispatch({
                             type: 'scriblenotes/query',
                             payload: {
-                              id: item.id,
+                              id: item.scribbleNoteFK,
                             },
                           })
                           .then((v) => {
@@ -201,7 +201,7 @@ class ScribbleNoteItem extends React.Component {
           </div>
         }
       >
-        <Button color='info'>Scribble Note</Button>
+        <Button size='sm' color='info'>Scribble Note</Button>
       </Popover>
     )
   }

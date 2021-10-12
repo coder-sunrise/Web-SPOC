@@ -3,68 +3,65 @@ import { useDispatch } from 'dva'
 import moment from 'moment'
 import { Tag, Input, Tooltip, Select, Divider, Typography } from 'antd'
 import { SaveFilled, PlusOutlined } from '@ant-design/icons'
-
+import { CLINICAL_ROLE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 
 export const RadiographerTag = ({
-  tagCategory,
   onChange,
-  defaultTagNames = [],
   label,
-  disabled,
+  value = [],
+  readonly = false,
 }) => {
   const [inputVisible, setInputVisible] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const inputRef = useRef < Input > null
-  const [currentTagNames, setCurrentTagNames] = useState([])
-  const [currentCategoryTags, setTagsUnderCategory] = useState([])
-  const [validTagNames, setValidTagNames] = useState([])
+  const inputRef = useRef(null)
+  const [assignedRadiographers, setAssignedRadiographers] = useState([])
   const [newTagInput, setNewTagInput] = useState([])
+  const [radiographers, setRadiographers] = useState([])
+  const [assignableRadiographers, setAssignableRadiographers] = useState([])
   const dispatch = useDispatch()
 
-  function fetchTags() {
+  useEffect(() => {
     dispatch({
       type: 'codetable/fetchCodes',
-
-      payload: { code: 'cttag', force: true },
-    }).then(result => {
-      if (result) {
-        setTagsUnderCategory(result.filter(t => t.category === tagCategory))
+      payload: {
+        code: 'clinicianprofile',
+        force: true,
+      },
+    }).then(o => {
+      if (o) {
+        const result = o.filter(
+          c => c.userProfile.role.clinicRoleFK === CLINICAL_ROLE.RADIOGRAPHER,
+        )
+        setRadiographers(result)
       }
     })
-  }
+  }, [])
 
   useEffect(() => {
-    fetchTags()
-  }, [tagCategory])
+    setAssignedRadiographers(value)
+  }, [value])
 
   useEffect(() => {
-    setCurrentTagNames(defaultTagNames)
-  }, [defaultTagNames])
-
-  useEffect(() => {
-    setValidTagNames(
-      currentCategoryTags
-        .filter(
-          t => currentTagNames.findIndex(v => v === t.displayValue) === -1,
-        )
-        .map(t => {
-          return { value: t.displayValue }
-        }),
-    )
-  }, [currentTagNames, currentCategoryTags])
+    const tmpAssignableRadiographers = radiographers
+      .filter(
+        r => assignedRadiographers.findIndex(ar => ar.id === r.id) === -1, //filter out assigned radiographers in selection
+      )
+      .map(r => ({ label: r.name, value: r.id }))
+    setAssignableRadiographers(tmpAssignableRadiographers)
+  }, [radiographers, assignedRadiographers])
 
   useEffect(() => {
     inputRef.current?.focus()
   }, [inputVisible])
 
-  const handleRemoveTag = remoeTagName => {
-    const newTags = currentTagNames.filter(tag => tag !== remoeTagName)
-    setCurrentTagNames(newTags)
-    onChange(
-      newTags,
-      currentCategoryTags.filter(t => newTags.includes(t.displayValue)),
-    )
+  const handleRemoveTag = val => {
+    const tmpAssignedRadiographers =
+      assignedRadiographers.filter(r => r.id !== val.id) ?? []
+
+    setAssignedRadiographers(tmpAssignedRadiographers)
+
+    onChange(tmpAssignedRadiographers)
   }
 
   const showInput = () => {
@@ -72,17 +69,18 @@ export const RadiographerTag = ({
   }
 
   const handleInputConfirm = val => {
-    let newTags = []
-    if (val && currentTagNames.indexOf(val) === -1) {
-      newTags = [...currentTagNames, val]
+    let tmpAssignedRadiographers = []
+    if (val && assignedRadiographers.findIndex(r => r.id === val) === -1) {
+      tmpAssignedRadiographers = [
+        ...assignedRadiographers,
+        radiographers.find(r => r.id === val),
+      ]
     }
-    setCurrentTagNames(newTags)
+
+    setAssignedRadiographers(tmpAssignedRadiographers)
     setInputVisible(false)
 
-    onChange(
-      newTags,
-      currentCategoryTags.filter(t => newTags.includes(t.displayValue)),
-    )
+    onChange(tmpAssignedRadiographers)
   }
 
   const handleInputCancel = () => {
@@ -91,43 +89,34 @@ export const RadiographerTag = ({
     }
   }
 
-  const saveAsNewTag = async () => {
-    await service.default.upsert({
-      description: newTagInput,
-      displayValue: newTagInput,
-      category: tagCategory,
-      isUserMaintainable: true,
-      effectiveStartDate: moment().formatUTC(),
-      effectiveEndDate: moment('2099-12-31T23:59:59').formatUTC(false),
-    })
-    fetchTags()
-  }
-
   return (
     <div>
-      <Typography.Text disabled={disabled}>{label} </Typography.Text>
+      <Typography.Text readonly={readonly}>{label} </Typography.Text>
 
-      {currentTagNames.map((tag, index) => {
+      {assignedRadiographers.map((assignedRadiographer, index) => {
         {
           const tagElem = (
             <Tag
-              key={tag}
+              key={assignedRadiographer.id}
               style={
-                disabled
+                readonly
                   ? { cursor: 'no-drop', margin: '3px' }
                   : { margin: '3px' }
               }
-              closable={!disabled}
-              onClose={() => handleRemoveTag(tag)}
+              closable={!readonly}
+              onClose={() => handleRemoveTag(assignedRadiographer)}
             >
-              <span>{tag}</span>
+              <span>{assignedRadiographer.name}</span>
             </Tag>
           )
-          return disabled ? (
+          return !readonly ? (
             tagElem
           ) : (
-            <Tooltip title={tag} key={tag}>
-              {tagElem}
+            <Tooltip
+              title={assignedRadiographer.name}
+              key={assignedRadiographer.id}
+            >
+              {assignedRadiographer.name}
             </Tooltip>
           )
         }
@@ -145,46 +134,10 @@ export const RadiographerTag = ({
           onDropdownVisibleChange={open => {
             setDropdownOpen(open)
           }}
-          dropdownRender={menu => (
-            <div>
-              {menu}
-              {currentCategoryTags.findIndex(t =>
-                t.displayValue.includes(newTagInput),
-              ) === -1 && (
-                <>
-                  <Authorized authority='settings.clinicsetting.tag'>
-                    <Divider style={{ margin: '4px 0' }} />
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexWrap: 'nowrap',
-                        padding: 4,
-                      }}
-                    >
-                      <a
-                        style={{
-                          flex: 'none',
-                          padding: '4px',
-                          display: 'block',
-                          cursor: 'pointer',
-                        }}
-                        onClick={saveAsNewTag}
-                      >
-                        Save As New Tag <SaveFilled />
-                      </a>
-                    </div>
-                  </Authorized>
-                </>
-              )}
-            </div>
-          )}
-        >
-          {validTagNames.map(item => (
-            <Option key={item.value}>{item.value}</Option>
-          ))}
-        </Select>
+          options={assignableRadiographers}
+        />
       )}
-      {!disabled && !inputVisible && (
+      {!readonly && !inputVisible && (
         <Tag className='site-tag-plus' onClick={showInput}>
           <PlusOutlined /> New Radaographer
         </Tag>
