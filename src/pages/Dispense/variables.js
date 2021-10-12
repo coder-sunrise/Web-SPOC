@@ -233,6 +233,10 @@ export const DispenseItemsColumns = [
     ),
   },
   {
+    name: 'stockBalance',
+    title: 'Balance Qty.',
+  },
+  {
     name: 'stock',
     title: 'Stock Qty.',
   },
@@ -243,10 +247,6 @@ export const DispenseItemsColumns = [
   {
     name: 'expiryDate',
     title: 'Expiry Date',
-  },
-  {
-    name: 'stockBalance',
-    title: 'Balance Qty.',
   },
   {
     name: 'instruction',
@@ -641,10 +641,9 @@ export const DispenseItemsColumnExtensions = (
       sortingEnabled: false,
       render: row => {
         const balStock = row.stockBalance
-        const stock =
-          balStock || balStock === 0
-            ? `${numeral(balStock).format('0.0')} ${row.uomDisplayValue || ''}`
-            : '-'
+        const stock = balStock
+          ? `${numeral(balStock).format('0.0')} ${row.uomDisplayValue || ''}`
+          : '-'
         return (
           <Tooltip title={stock}>
             <span>{stock}</span>
@@ -832,7 +831,7 @@ const radiologyWorkitemStatus = radiologyWorkitemStatusFK => {
           style={{
             position: 'absolute',
             bottom: 2,
-            right: -15,
+            right: -20,
             borderRadius: 8,
             height: 16,
             width: 16,
@@ -853,7 +852,7 @@ const radiologyWorkitemStatus = radiologyWorkitemStatusFK => {
         title={
           radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
             ? 'In Progress'
-            : 'Completed'
+            : radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ? 'Modality Completed' :'Completed'
         }
       >
         <div
@@ -915,13 +914,13 @@ export const OtherOrdersColumnExtensions = (
       let paddingRight = row.isPreOrder ? 24 : 0
       let urgentRight = 0
 
-      if (row.priority === 'Urgent') {
-        paddingRight += 34
-        urgentRight = -paddingRight - 4
-      }
-
       if (radiologyWorkitemStatusFK) {
         paddingRight += 24
+      }
+
+      if (row.priority === 'Urgent') {
+        paddingRight += 34
+        urgentRight = -paddingRight
       }
 
       return (
@@ -941,7 +940,7 @@ export const OtherOrdersColumnExtensions = (
                     style={{
                       position: 'absolute',
                       bottom: 2,
-                      right: -30,
+                      right: -24,
                       borderRadius: 4,
                       backgroundColor: '#4255bd',
                       fontWeight: 500,

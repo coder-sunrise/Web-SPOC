@@ -328,6 +328,13 @@ class PatientDetail extends PureComponent {
       }
     }
 
+    const emergencyContactAccessRight = Authorized.check('patientdatabase.patientprofiledetails.emergencycontact')
+    if (emergencyContactAccessRight) {
+      const hiddenEmergencyContactByAccessRight = emergencyContactAccessRight.rights === 'hidden'
+      if (hiddenEmergencyContactByAccessRight) {
+        this.widgets = this.widgets.filter(t => t.id !== '2')
+      }
+    }
     const { clinicSettings } = this.props
     if (!clinicSettings.isEnablePackage) {
       this.widgets = this.widgets.filter(w => w.id !== '10')

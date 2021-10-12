@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import _ from 'lodash'
 import Loadable from 'react-loadable'
 import Add from '@material-ui/icons/Add'
+import Authorized from '@/utils/Authorized'
 import {
   FastEditableTableGrid,
   Button,
@@ -28,16 +29,18 @@ class EmergencyContact extends PureComponent {
 
   render() {
     const { classes, dispatch, values, schema, ...restProps } = this.props
-    // const { SearchPatient = f => f } = this
+    const accessRight = Authorized.check('patientdatabase.patientprofiledetails.emergencycontact')
+    let disabledByAccessRight = true
+    if (accessRight) disabledByAccessRight = accessRight.rights === 'disable'
 
     return (
       <GridContainer>
         <GridItem>
-          <EmergencyContactGrid {...this.props} />
+          <EmergencyContactGrid {...this.props} disabled={disabledByAccessRight}/>
         </GridItem>
         <GridItem style={{ marginTop: 50 }}>
           <h4 style={{ fontWeight: 500 }}>Family Members</h4>
-          <FamilyMemberGrid {...this.props} />
+          <FamilyMemberGrid {...this.props} disabled={disabledByAccessRight}/>
         </GridItem>
       </GridContainer>
     )

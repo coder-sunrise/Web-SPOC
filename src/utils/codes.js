@@ -1887,21 +1887,6 @@ const queueItemStatus = [
   },
 ]
 
-export const costPriceTypes = [
-  {
-    value: 1,
-    name: 'Average Cost Price',
-  },
-  {
-    value: 2,
-    name: 'Last Cost Price (Before Bonus)',
-  },
-  {
-    value: 3,
-    name: 'Last Cost Price (After Bonus)',
-  },
-]
-
 const preOrderItemCategory = [
   {
     value: 'Medication',
