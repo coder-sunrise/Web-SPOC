@@ -19,6 +19,7 @@ import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import PackageDrawdownInfo from '@/pages/Widgets/Orders/Detail/PackageDrawdownInfo'
 import { InventoryTypes } from '@/utils/codes'
 import CONSTANTS from './DispenseDetails/constants'
+import Cross from '@material-ui/icons/HighlightOff'
 import {
   UnorderedListOutlined,
   CheckOutlined,
@@ -879,7 +880,7 @@ const radiologyWorkitemStatus = radiologyWorkitemStatusFK => {
         <div
           style={{
             position: 'absolute',
-            bottom: 2,
+            bottom: -4,
             right: -20,
             cursor: 'pointer',
           }}
