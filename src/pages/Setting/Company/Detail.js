@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { connect } from "dva"
+import { connect } from 'dva'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -19,39 +19,42 @@ import {
 import AuthorizedContext from '@/components/Context/Authorized'
 import Contact from './Contact'
 
-@connect(
-  ({
-    clinicSettings,
-  }) => ({
-    clinicSettings: clinicSettings.settings,
-  }),
-)
-
+@connect(({ clinicSettings }) => ({
+  clinicSettings: clinicSettings.settings,
+}))
 @withFormikExtend({
-  authority: [
-    'copayer.copayerdetails',
-    'copayer.newcopayer',
-  ],
+  authority: ['copayer.copayerdetails', 'copayer.newcopayer'],
   mapPropsToValues: ({ settingCompany }) =>
     settingCompany.entity || settingCompany.default,
   validationSchema: ({ settingCompany }) =>
     Yup.object().shape({
-      code: Yup.string().required(),
+      code: Yup.string().when('settingCompany', {
+        is: () => settingCompany.companyType.id === 2,
+        then: Yup.string().required(),
+      }),
       displayValue: Yup.string().required(),
       contactPerson: Yup.string().max(
         100,
         'Contact Person must be at most 100 characters',
       ),
-      defaultStatementAdjustmentRemarks: Yup.string().when(['isAutoGenerateStatementEnabled', 'statementAdjustment'],
+      defaultStatementAdjustmentRemarks: Yup.string().when(
+        ['isAutoGenerateStatementEnabled', 'statementAdjustment'],
         {
-          is: (isAutoGenerateStatementEnabled, statementAdjustment) => statementAdjustment > 0 && isAutoGenerateStatementEnabled,
-          then: Yup.string().required().max(
-            50,
-            'Default statement ajdustment remarks must be at most 50 characters',
-          ),
+          is: (isAutoGenerateStatementEnabled, statementAdjustment) =>
+            statementAdjustment > 0 && isAutoGenerateStatementEnabled,
+          then: Yup.string()
+            .required()
+            .max(
+              50,
+              'Default statement ajdustment remarks must be at most 50 characters',
+            ),
           otherwise: Yup.string(),
-        }),
-      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+        },
+      ),
+      effectiveDates: Yup.array()
+        .of(Yup.date())
+        .min(2)
+        .required(),
       coPayerTypeFK: Yup.number().when('settingCompany', {
         is: () => settingCompany.companyType.id === 1,
         then: Yup.number().required(),
@@ -85,7 +88,9 @@ import Contact from './Contact'
         is: () => settingCompany.companyType.id === 1,
         then: Yup.object().shape({
           contactEmailAddress: Yup.object().shape({
-            emailAddress: Yup.string().email().nullable(),
+            emailAddress: Yup.string()
+              .email()
+              .nullable(),
           }),
 
           contactAddress: Yup.array().of(
@@ -109,8 +114,10 @@ import Contact from './Contact'
         }),
       }),
       gstValue: Yup.number().when('isGSTEnabled', {
-        is: (v) => v,
-        then: Yup.number().required().moreThan(0),
+        is: v => v,
+        then: Yup.number()
+          .required()
+          .moreThan(0),
       }),
     }),
   handleSubmit: (values, { props, resetForm }) => {
@@ -127,7 +134,7 @@ import Contact from './Contact'
         companyTypeFK: id,
         companyTypeName: name,
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         resetForm()
         if (onConfirm) onConfirm()
@@ -146,20 +153,40 @@ class Detail extends PureComponent {
   state = {}
 
   updateDefaultRemarks = () => {
-    const { isAutoGenerateStatementEnabled, statementAdjustment } = this.props.values
-    if (!isAutoGenerateStatementEnabled || !statementAdjustment || statementAdjustment === 0) {
+    const {
+      isAutoGenerateStatementEnabled,
+      statementAdjustment,
+    } = this.props.values
+    if (
+      !isAutoGenerateStatementEnabled ||
+      !statementAdjustment ||
+      statementAdjustment === 0
+    ) {
       this.props.setFieldValue('defaultStatementAdjustmentRemarks', undefined)
     }
   }
 
-  render () {
+  render() {
     const { props } = this
 
-    const { theme, footer, values, settingCompany, route, rights, clinicSettings } = props
+    const {
+      theme,
+      footer,
+      values,
+      settingCompany,
+      route,
+      rights,
+      clinicSettings,
+    } = props
     const { name } = route
     const isCopayer = name === 'copayer'
 
-    const { isUserMaintainable, isGSTEnabled, isAutoGenerateStatementEnabled, statementAdjustment } = values
+    const {
+      isUserMaintainable,
+      isGSTEnabled,
+      isAutoGenerateStatementEnabled,
+      statementAdjustment,
+    } = values
 
     let finalRights = isUserMaintainable ? 'enable' : 'disable'
     if (rights === 'disable') finalRights = 'disable'
@@ -177,12 +204,12 @@ class Detail extends PureComponent {
               <GridItem md={6}>
                 <FastField
                   name='code'
-                  render={(args) => (
+                  render={args => (
                     <TextField
                       label={isCopayer ? 'Co-Payer Code' : 'Company Code'}
                       autoFocus
                       {...args}
-                      disabled={!!settingCompany.entity}
+                      disabled={isCopayer ? true : !!settingCompany.entity}
                     />
                   )}
                 />
@@ -190,7 +217,7 @@ class Detail extends PureComponent {
               <GridItem md={6}>
                 <FastField
                   name='displayValue'
-                  render={(args) => (
+                  render={args => (
                     <TextField
                       label={isCopayer ? 'Co-Payer Name' : 'Company Name'}
                       {...args}
@@ -202,7 +229,7 @@ class Detail extends PureComponent {
               <GridItem md={12}>
                 <FastField
                   name='effectiveDates'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <DateRangePicker
                         format={dateFormatLong}
@@ -219,7 +246,7 @@ class Detail extends PureComponent {
                   <GridItem md={6}>
                     <FastField
                       name='coPayerTypeFK'
-                      render={(args) => (
+                      render={args => (
                         <CodeSelect
                           label='Co-Payer Type'
                           code='ctCopayerType'
@@ -235,7 +262,7 @@ class Detail extends PureComponent {
                 <GridItem md={4}>
                   <Field
                     name='adminCharge'
-                    render={(args) => {
+                    render={args => {
                       if (values.adminChargeType === 'ExactAmount') {
                         return (
                           <NumberInput
@@ -264,7 +291,7 @@ class Detail extends PureComponent {
                 <GridItem md={2}>
                   <Field
                     name='adminChargeType'
-                    render={(args) => (
+                    render={args => (
                       <Switch
                         checkedChildren='$'
                         checkedValue='ExactAmount'
@@ -283,7 +310,7 @@ class Detail extends PureComponent {
                   <GridItem md={4}>
                     <Field
                       name='statementAdjustment'
-                      render={(args) => {
+                      render={args => {
                         if (values.statementAdjustmentType === 'ExactAmount') {
                           return (
                             <NumberInput
@@ -314,7 +341,7 @@ class Detail extends PureComponent {
                   <GridItem md={2}>
                     <Field
                       name='statementAdjustmentType'
-                      render={(args) => (
+                      render={args => (
                         <Switch
                           checkedChildren='$'
                           checkedValue='ExactAmount'
@@ -333,7 +360,7 @@ class Detail extends PureComponent {
                   <GridItem md={4}>
                     <Field
                       name='autoInvoiceAdjustment'
-                      render={(args) => {
+                      render={args => {
                         if (
                           values.autoInvoiceAdjustmentType === 'ExactAmount'
                         ) {
@@ -362,7 +389,7 @@ class Detail extends PureComponent {
                   <GridItem md={2}>
                     <Field
                       name='autoInvoiceAdjustmentType'
-                      render={(args) => (
+                      render={args => (
                         <Switch
                           checkedChildren='$'
                           checkedValue='ExactAmount'
@@ -389,7 +416,7 @@ class Detail extends PureComponent {
                       >
                         <FastField
                           name='isGSTEnabled'
-                          render={(args) => (
+                          render={args => (
                             <Checkbox
                               label='Enable GST'
                               onChange={this.handleOnChange}
@@ -400,14 +427,14 @@ class Detail extends PureComponent {
                       </div>
                     </div>
                   ) : (
-                      []
-                    )}
+                    []
+                  )}
                 </GridItem>
                 <GridItem md={4}>
                   {!isCopayer ? (
                     <Field
                       name='gstValue'
-                      render={(args) => (
+                      render={args => (
                         <NumberInput
                           label='GST Value'
                           {...args}
@@ -420,8 +447,8 @@ class Detail extends PureComponent {
                       )}
                     />
                   ) : (
-                      []
-                    )}
+                    []
+                  )}
                 </GridItem>
               </React.Fragment>
             </GridContainer>
@@ -431,25 +458,34 @@ class Detail extends PureComponent {
                 <GridItem md={6}>
                   <FastField
                     name='isAutoGenerateStatementEnabled'
-                    render={(args) => {
-                      return <Checkbox
-                        style={{ marginTop: '22px' }}
-                        label='Auto Generate Statement'
-                        {...args}
-                        onChange={this.updateDefaultRemarks}
-                      />
+                    render={args => {
+                      return (
+                        <Checkbox
+                          style={{ marginTop: '22px' }}
+                          label='Auto Generate Statement'
+                          {...args}
+                          onChange={this.updateDefaultRemarks}
+                        />
+                      )
                     }}
                   />
                 </GridItem>
-                {isAutoGenerateStatementEnabled && (statementAdjustment && statementAdjustment > 0) &&
-                  <GridItem md={6}>
-                    <Field
-                      name='defaultStatementAdjustmentRemarks'
-                      render={(args) =>
-                        <TextField label='Default Statement Adjustment Remarks' maxLength={50} {...args} />}
-                    />
-                  </GridItem>
-                }
+                {isAutoGenerateStatementEnabled &&
+                  statementAdjustment &&
+                  statementAdjustment > 0 && (
+                    <GridItem md={6}>
+                      <Field
+                        name='defaultStatementAdjustmentRemarks'
+                        render={args => (
+                          <TextField
+                            label='Default Statement Adjustment Remarks'
+                            maxLength={50}
+                            {...args}
+                          />
+                        )}
+                      />
+                    </GridItem>
+                  )}
               </GridContainer>
             )}
             {isCopayer && (
@@ -457,7 +493,7 @@ class Detail extends PureComponent {
                 <GridItem md={12}>
                   <Field
                     name='remark'
-                    render={(args) => <TextField label='Remarks' {...args} />}
+                    render={args => <TextField label='Remarks' {...args} />}
                   />
                 </GridItem>
               </GridContainer>

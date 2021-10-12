@@ -13,6 +13,7 @@ import {
   TextField,
   withFormikExtend,
   Tooltip,
+  Switch,
 } from '@/components'
 
 import { TagTwoTone } from '@ant-design/icons'
@@ -84,6 +85,22 @@ const Form = ({ classes, footer, setFieldValue, handleSubmit, values }) => {
               render={(args) => <TextField {...args} label='Description' />}
             />
           </GridItem>
+
+          <GridItem md={6}>
+            <FastField
+              name='sortOrder'
+              render={(args) => <TextField {...args} label='Sort Order' />}
+            />
+          </GridItem>
+
+          <GridItem md={6}>
+            <FastField
+              name='isDefault'
+              render={args => {
+                return <Switch label='Set Appointment Type as default' {...args}/>
+              }}
+            />
+          </GridItem>
         </GridItem>
         <GridItem container md={6} justify='center'>
           <GridItem md={12}>
@@ -131,32 +148,44 @@ export default withFormikExtend({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date().required()).min(2).required(),
+    sortOrder: Yup.number().required(),
   }),
   mapPropsToValues: ({ settingAppointmentType }) =>
-    settingAppointmentType.entity || settingAppointmentType.default,
+    ({...settingAppointmentType.entity || settingAppointmentType.default, list: settingAppointmentType.list}),
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
-
-    dispatch({
-      type: 'settingAppointmentType/upsert',
-      payload: {
-        ...restValues,
-        effectiveStartDate: effectiveDates[0],
-        effectiveEndDate: effectiveDates[1],
-      },
-    }).then((response) => {
-      if (response) {
-        resetForm()
-        if (onConfirm) onConfirm()
-        dispatch({
-          type: 'settingAppointmentType/query',
-        })
-        // dispatch({
-        //   type: 'settingAppointmentType/updateState',
-        //   payload: { entity: null },
-        // })
-      }
-    })
+    const saveData = () => {
+      dispatch({
+        type: 'settingAppointmentType/upsert',
+        payload: {
+          ...{ ...restValues, list: null },
+          effectiveStartDate: effectiveDates[0],
+          effectiveEndDate: effectiveDates[1],
+        },
+      }).then(response => {
+        if (response) {
+          resetForm()
+          if (onConfirm) onConfirm()
+          dispatch({
+            type: 'settingAppointmentType/query',
+          })
+        }
+      })
+    }
+    const anyDefaultIsNotThis =　restValues.isDefault && restValues.list.some(x => x.isDefault && x.id !== restValues.id)
+    if (anyDefaultIsNotThis) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmContent:
+            'There is already an Appointment Type set as default.\nConfirm to overwrite?',
+          onConfirmSave: saveData,
+        },
+      })
+    } else {
+      saveData()
+    }
   },
 })(Form)

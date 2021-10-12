@@ -225,7 +225,7 @@ const General = ({
                     id: 'inventory.master.medication.code',
                   })}
                   {...args}
-                  disabled={values.isActive}
+                  disabled={values.isActive && values.id}
                 />
               )
             }}

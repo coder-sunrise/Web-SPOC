@@ -240,7 +240,7 @@ class EmergencyContactGrid extends PureComponent {
           // onRowDoubleClick={this.onRowDoubleClick}
           FuncProps={{
             pagerConfig: {
-              containerExtraComponent: (
+              containerExtraComponent: !this.props.disabled && (
                 <Button
                   onClick={this.toggleModal}
                   // hideIfNoEditRights
@@ -260,7 +260,8 @@ class EmergencyContactGrid extends PureComponent {
             //     name: '123',
             //   },
             // ],
-            showAddCommand: true,
+            showAddCommand: !this.props.disabled,
+            isDeletable: row => !this.props.disabled,
             // editingRowIds: this.state.editingRowIds,
             // onEditingRowIdsChange: this.onEditingRowIdsChange,
             onCommitChanges: this.commitChanges,

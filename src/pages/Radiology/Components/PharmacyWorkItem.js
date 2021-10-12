@@ -69,7 +69,7 @@ const WorkitemTitle = ({ item, classes }) => {
   let genderColor
   if (item.genderFK === 1) {
     gender = 'female'
-    genderColor = 'pink'
+    genderColor = '#F5559F'
   } else if (item.genderFK === 2) {
     gender = 'male'
     genderColor = blueColor
