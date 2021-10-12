@@ -49,7 +49,7 @@ const Detail = ({
                           id: 'inventory.master.consumable.code',
                         })}
                         {...args}
-                        disabled={values.isActive}
+                        disabled={values.isActive && values.id}
                       />
                     )
                   }}

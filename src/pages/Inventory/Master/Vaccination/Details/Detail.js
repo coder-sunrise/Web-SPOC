@@ -114,7 +114,7 @@ const Detail = ({
                           id: 'inventory.master.vaccination.code',
                         })}
                         {...args}
-                        disabled={values.isActive}
+                        disabled={values.isActive && values.id}
                       />
                     )
                   }}
