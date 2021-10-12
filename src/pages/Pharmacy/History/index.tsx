@@ -363,8 +363,8 @@ const PharmacyWorklistHistoryIndex = ({
             span:8,
             collapsed: false,
             collapseRender: false,
-            searchText: 'SEARCH',
-            resetText: 'RESET',
+            searchText: 'Search',
+            resetText: 'Reset',
             optionRender: (searchConfig, formProps, dom) => {
               return (
                 <div

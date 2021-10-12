@@ -643,8 +643,8 @@ const RadiologyWorklistHistoryIndex = ({
           search={{
             collapsed: false,
             collapseRender: false,
-            searchText: 'SEARCH',
-            resetText: 'RESET',
+            searchText: 'Search',
+            resetText: 'Reset',
             optionRender: (searchConfig, formProps, dom) => {
               return (
                 <div
