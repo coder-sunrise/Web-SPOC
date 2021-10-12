@@ -56,6 +56,7 @@ const gridValidationSchema = Yup.object().shape({
   apptDurationHour: Yup.number().required(),
   apptDurationMinute: Yup.number().required(),
   clinicianFK: Yup.string().required(),
+  appointmentTypeFK: Yup.string().required(),
 })
 
 @connect(

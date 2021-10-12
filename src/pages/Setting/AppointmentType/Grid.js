@@ -11,6 +11,8 @@ const columns = [
   { name: 'displayValue', title: 'Display Value' },
   { name: 'tagColorHex', title: 'Appt. Type Color' },
   { name: 'isActive', title: 'Status' },
+  { name: 'sortOrder', title: 'SortOrder' },
+  { name: 'isDefault', title: 'Default' },
   {
     name: 'action',
     title: 'Action',
@@ -20,6 +22,38 @@ const columns = [
 class Grid extends React.PureComponent {
   state = {
     columnExtensions: [
+      {
+        columnName:'sortOrder',
+        sortingEnabled: true,
+        width:'100px',
+      },
+      {
+        columnName:'isDefault',
+        sortingEnabled: false,
+        type: 'radio',
+        align: 'center',
+        width:'100px',
+        checkedValue: true,
+        uncheckedValue: false,
+        onChange: ({ row, checked }) => {
+          // if (checked) {
+          //   const { values, setFieldValue, setFieldTouched } = this.props
+          //   const serviceSettingItem = _.cloneDeep(
+          //     values.ctServiceCenter_ServiceNavigation,
+          //   )
+          //   serviceSettingItem.forEach(pec => {
+          //     pec.isDefault = false
+          //   })
+          //   const r = serviceSettingItem.find(o => o.id === row.id)
+          //   if (r) {
+          //     r.isDefault = true
+          //   }
+          //   this.setState({ serviceSettings: serviceSettingItem })
+          //   setFieldValue('ctServiceCenter_ServiceNavigation',serviceSettingItem)
+          //   setFieldTouched('ctServiceCenter_ServiceNavigation', true)
+          // }
+        },
+      },
       {
         columnName: 'isActive',
         sortingEnabled: false,
