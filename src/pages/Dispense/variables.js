@@ -831,7 +831,7 @@ const radiologyWorkitemStatus = radiologyWorkitemStatusFK => {
           style={{
             position: 'absolute',
             bottom: 2,
-            right: -15,
+            right: -20,
             borderRadius: 8,
             height: 16,
             width: 16,
@@ -852,7 +852,7 @@ const radiologyWorkitemStatus = radiologyWorkitemStatusFK => {
         title={
           radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
             ? 'In Progress'
-            : 'Completed'
+            : radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ? 'Modality Completed' :'Completed'
         }
       >
         <div
@@ -914,13 +914,13 @@ export const OtherOrdersColumnExtensions = (
       let paddingRight = row.isPreOrder ? 24 : 0
       let urgentRight = 0
 
-      if (row.priority === 'Urgent') {
-        paddingRight += 34
-        urgentRight = -paddingRight - 4
-      }
-
       if (radiologyWorkitemStatusFK) {
         paddingRight += 24
+      }
+
+      if (row.priority === 'Urgent') {
+        paddingRight += 34
+        urgentRight = -paddingRight
       }
 
       return (
@@ -940,7 +940,7 @@ export const OtherOrdersColumnExtensions = (
                     style={{
                       position: 'absolute',
                       bottom: 2,
-                      right: -30,
+                      right: -24,
                       borderRadius: 4,
                       backgroundColor: '#4255bd',
                       fontWeight: 500,
