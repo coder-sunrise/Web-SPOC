@@ -84,7 +84,6 @@ export default compose(
   withStyles(styles, { withTheme: true}),
   connect(({ copayerDetail, clinicSettings, global }) => ({
     copayerDetail, clinicSettings,
-    // mainDivHeight: global.mainDivHeight,
   })),
   withFormikExtend({
     // authority: [
@@ -97,11 +96,19 @@ export default compose(
       return copayerDetail.entity ? copayerDetail.entity : copayerDetail.default;
     },
     validationSchema: Yup.object().shape({
-      code: Yup.string().required(),
-      displayValue: Yup.string().required(),
+      code: Yup.string().required().max(30, 'Copayer Code should not exceed 30 characters'),
+      displayValue: Yup.string().required().max(200, 'Copayer Name should not exceed 200 characters'),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+      creditInformation: Yup.string().max(200, 'Credit Information should not exceed 200 characters'),
+      remark: Yup.string().max(200, 'Remarks should not exceed 200 characters'),
+      website: Yup.string().max(100, 'Website should not exceed 100 characters'),
       address: Yup.object().shape({
         countryFK: Yup.number().required(),
+        postcode: Yup.string().max(10, 'Postcode should not exceed 10 characters'),
+        blockNo: Yup.string().max(500, 'Block No should not exceed 500 characters'),
+        unitNo: Yup.string().max(500, 'Unit No should not exceed 500 characters'),
+        street: Yup.string().max(500, 'Street should not exceed 500 characters'),
+        buildingName: Yup.string().max(500, 'Building Name should not exceed 500 characters'),
       }),
     }),
     handleSubmit: (values, { props }) => {
