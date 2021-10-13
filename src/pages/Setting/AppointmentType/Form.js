@@ -180,7 +180,7 @@ export default withFormikExtend({
         payload: {
           openConfirm: true,
           openConfirmContent:
-            'There is already an Appointment Type set as default.\nConfirm to overwrite?',
+            'Appointment (Follow Up) is currently set as the default appointment type.\nConfirm to overwrite?',
           onConfirmSave: saveData,
         },
       })
