@@ -24,7 +24,7 @@ class Grid extends PureComponent {
   }
 
   editRow = (row, e) => {
-    const { dispatch, settingCompany, route } = this.props
+    const { dispatch, settingCompany, route, history } = this.props
     const { name } = route
     const accessRight =
       name === 'copayer'
@@ -40,13 +40,18 @@ class Grid extends PureComponent {
 
     const { list } = settingCompany
 
-    dispatch({
-      type: 'settingCompany/updateState',
-      payload: {
-        showModal: true,
-        entity: list.find((o) => o.id === row.id),
-      },
-    })
+    if (name === 'copayer'){
+      history.push(`/finance/copayer/editcopayer?id=${row.id}`);
+    }
+    else {
+      dispatch({
+        type: 'settingCompany/updateState',
+        payload: {
+          showModal: true,
+          entity: list.find((o) => o.id === row.id),
+        },
+      })
+    }
   }
 
   handleClick = async (copayerId) => {
@@ -89,6 +94,7 @@ class Grid extends PureComponent {
   render () {
     const { route, height } = this.props
     const { name } = route
+
     return (
       <Fragment>
         <CommonTableGrid
@@ -153,7 +159,7 @@ class Grid extends PureComponent {
             {
               columnName: 'url',
               sortingEnabled: false,
-              width: 400,
+              width: 300,
               render: (row) => {
                 return (
                   <a
@@ -183,7 +189,7 @@ class Grid extends PureComponent {
             {
               columnName: 'coPayerTypeName',
               sortBy: 'coPayerTypeFK',
-              width: 200,
+              width: 140,
             },
             {
               columnName: 'officeNum',
@@ -224,23 +230,24 @@ class Grid extends PureComponent {
               ),
             },
             {
-              columnName: 'displayValue',
-              width: 500,
+              columnName: 'code',
+              width: 180,
             },
-
             {
               columnName: 'contactNo',
               sortingEnabled: false,
               width: 120,
               render: (row) => (
                 <span>
-                  {row.contact &&
-                  row.contact.mobileContactNumber &&
-                  row.contact.mobileContactNumber.number !== '' ? (
-                    row.contact.mobileContactNumber.number
-                  ) : (
-                    '-'
-                  )}
+                  {
+                    row.defaultContactPerson 
+                      && row.defaultContactPerson.mobileNumber 
+                      && row.defaultContactPerson.mobileNumber !== ''? (
+                        row.defaultContactPerson.mobileNumber
+                      ) : (
+                        '-'
+                      )
+                  }
                 </span>
               ),
             },
@@ -250,7 +257,7 @@ class Grid extends PureComponent {
               type: 'select',
               options: status,
               align: 'center',
-              width: 120,
+              width: 100,
             },
             {
               columnName: 'isGSTEnabled',
