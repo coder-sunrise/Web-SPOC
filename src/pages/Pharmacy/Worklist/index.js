@@ -7,7 +7,6 @@ import { PharmacyWorkitemStatus } from '@/utils/constants'
 import Refresh from '@material-ui/icons/Refresh'
 import moment from 'moment'
 import _ from 'lodash'
-import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import { HistoryOutlined } from '@ant-design/icons'
 import { CommonModal, Button, Tooltip } from '@/components'
 import { Worklist } from '@/pages/Radiology/Components'
@@ -41,13 +40,17 @@ const PharmacyWorklist = () => {
   const dispatch = useDispatch()
   const [columns, setColumns] = useState([])
   const entity = useSelector(s => s.pharmacyWorklist)
+  const clinicSettings = useSelector(s => s.clinicSettings)
   const [refreshDate, setRefreshDate] = useState(moment())
   const [filterValue, setFilterValue] = useState('')
-
+  const { autoRefreshPharmacyInterval = 60 } = clinicSettings.settings || {}
+  const [refreshTimer, setRefreshTimer] = useState(null)
   useEffect(() => {
     dispatch({
       type: 'pharmacyWorklist/query',
     })
+    startRefreshTimer()
+    return () => stopRefreshTimer()
   }, [])
 
   useEffect(() => {
@@ -64,47 +67,27 @@ const PharmacyWorklist = () => {
             w.name.toUpperCase().indexOf(filterValue.toUpperCase()) >= 0,
         )
         .map(w => {
-          const visitGroupListing = _.orderBy(
-            w.visitGroupListing.map(l => {
-              const age = l.dob ? calculateAgeFromDOB(l.dob) : 0
-              let gender = '-'
-              if (l.genderFK === 1) {
-                gender = 'F'
-              } else if (l.genderFK === 2) {
-                gender = 'M'
-              }
-              return {
-                queueNo: l.queueNo,
-                name: l.patientName,
-                gender,
-                age: `${age} ${age > 1 ? 'Yrs' : 'Yr'}`,
-                orderQueueNo: parseFloat(l.queueNo)
-              }
-            }),
-            ['orderQueueNo'],
-            ['asc'],
-          )
           return {
             ...w,
             status: PharmacyWorkitemStatus[w.statusFK],
-            visitGroupListing,
           }
         })
       const mapped = columnsTemplate.map(item => {
         let filterItems = worklist.filter(w => w.status === item.title)
         if (item.title === 'Completed') {
-          filterItems = _.orderBy(filterItems,
-            ['updateDate'],
-            ['desc'])
+          filterItems = _.orderBy(filterItems, ['updateDate'], ['desc'])
         } else if (item.title === 'New') {
-          filterItems = _.orderBy(filterItems,
+          filterItems = _.orderBy(
+            filterItems,
             ['paymentDate', 'generateDate'],
-            ['asc'])
-        }
-        else {
-          filterItems = _.orderBy(filterItems,
+            ['asc'],
+          )
+        } else {
+          filterItems = _.orderBy(
+            filterItems,
             ['paymentDate', 'updateDate'],
-            ['asc'])
+            ['asc'],
+          )
         }
         return {
           ...item,
@@ -115,6 +98,20 @@ const PharmacyWorklist = () => {
       setColumns(mapped)
     }
   }, [entity, filterValue])
+  const startRefreshTimer = () => {
+    setRefreshTimer(
+      setInterval(() => {
+        refreshClick()
+      }, autoRefreshPharmacyInterval * 1000),
+    )
+  }
+
+  const stopRefreshTimer = () => {
+    if (refreshTimer) {
+      clearInterval(refreshTimer)
+      setRefreshTimer(null)
+    }
+  }
 
   const refreshClick = () => {
     dispatch({
@@ -148,7 +145,11 @@ const PharmacyWorklist = () => {
         }
       >
         <Worklist columns={columns} worklistType='Pharmacy' />
-        <PharmacyDetails refreshClick={refreshClick} />
+        <PharmacyDetails
+          refreshClick={refreshClick}
+          startRefreshTimer={startRefreshTimer}
+          stopRefreshTimer={stopRefreshTimer}
+        />
       </ProCard>
 
       <div>
@@ -188,7 +189,7 @@ const PharmacyWorklist = () => {
               width: 26,
               height: 26,
             }}
-            onClick={event => { }}
+            onClick={event => {}}
           >
             history
           </span>
@@ -197,7 +198,6 @@ const PharmacyWorklist = () => {
         <div style={{ position: 'absolute', top: 25, right: 50 }}>
           <p style={{ fontWeight: 600 }}>Last Refresh:</p>
           <p style={{ color: '#1890f8', marginTop: 4 }}>
-            {' '}
             {refreshDate.format('HH:mm')}
           </p>
         </div>

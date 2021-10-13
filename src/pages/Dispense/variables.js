@@ -233,10 +233,6 @@ export const DispenseItemsColumns = [
     ),
   },
   {
-    name: 'stockBalance',
-    title: 'Balance Qty.',
-  },
-  {
     name: 'stock',
     title: 'Stock Qty.',
   },
@@ -247,6 +243,10 @@ export const DispenseItemsColumns = [
   {
     name: 'expiryDate',
     title: 'Expiry Date',
+  },
+  {
+    name: 'stockBalance',
+    title: 'Balance Qty.',
   },
   {
     name: 'instruction',
@@ -636,14 +636,12 @@ export const DispenseItemsColumnExtensions = (
     },
     {
       columnName: 'stockBalance',
-      width: 100,
+      width: 95,
       disabled: true,
       sortingEnabled: false,
       render: row => {
         const balStock = row.stockBalance
-        const stock = balStock
-          ? `${numeral(balStock).format('0.0')} ${row.uomDisplayValue || ''}`
-          : '-'
+        const stock = balStock ? `${numeral(balStock).format('0.0')}` : '-'
         return (
           <Tooltip title={stock}>
             <span>{stock}</span>
