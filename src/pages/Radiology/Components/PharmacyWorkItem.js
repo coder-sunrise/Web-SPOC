@@ -291,7 +291,7 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
               type='family'
               style={{
                 color: 'red',
-                fontSize: '1.5rem',
+                fontSize: '1.2rem',
                 marginLeft: 10,
               }}
             />

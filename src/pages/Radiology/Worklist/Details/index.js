@@ -105,6 +105,7 @@ const RadiologyDetails = props => {
           onClick={() => {
             if (
               workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW &&
+              workitem.primaryWorkitemFK &&
               visitWorkitems.filter(
                 v => v.primaryWorkitemFK === workitem.primaryWorkitemFK,
               ).length > 1

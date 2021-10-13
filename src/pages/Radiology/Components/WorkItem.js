@@ -115,7 +115,7 @@ const WorkitemBody = ({ item }) => {
                 type='family'
                 style={{
                   color: 'red',
-                  fontSize: '1.5rem',
+                  fontSize: '1.2rem',
                   marginRight: 10,
                 }}
               />
