@@ -389,61 +389,11 @@ class Banner extends PureComponent {
             placement='bottom'
           >
             <Link>
-              {currentDate > new Date(s.validTo) ? (
-                <span
-                  style={{
-                    color: 'red',
-                    textDecoration: 'underline',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {s.copaymentSchemeName || s.schemeTypeName}
-                  {` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`}
-                  {i < arr.length - 1 ? ',' : ''}
-                </span>
-              ) : (
-                <span
-                  style={{
-                    color: 'black',
-                    textDecoration: 'underline',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {s.copaymentSchemeName || s.schemeTypeName}
-                  {s.validTo
-                    ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`
-                    : ' (Exp: -)'}
-                  {i < arr.length - 1 ? ',' : ''}
-                </span>
-              )}
-            </Link>
-          </Popover>
-        ) : (
-          <Link>
-            {currentDate > new Date(s.validTo) ? (
               <span
                 style={{
-                  color: 'red',
+                  color: currentDate > new Date(s.validTo) ? 'red' : 'black',
                   textDecoration: 'underline',
                   whiteSpace: 'nowrap',
-                }}
-                onClick={e => {
-                  this.openScheme()
-                }}
-              >
-                {s.copaymentSchemeName || s.schemeTypeName}
-                {` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`}
-                {i < arr.length - 1 ? ',' : ''}
-              </span>
-            ) : (
-              <span
-                style={{
-                  color: 'black',
-                  textDecoration: 'underline',
-                  whiteSpace: 'nowrap',
-                }}
-                onClick={e => {
-                  this.openScheme()
                 }}
               >
                 {s.copaymentSchemeName || s.schemeTypeName}
@@ -452,7 +402,26 @@ class Banner extends PureComponent {
                   : ' (Exp: -)'}
                 {i < arr.length - 1 ? ',' : ''}
               </span>
-            )}
+            </Link>
+          </Popover>
+        ) : (
+          <Link>
+            <span
+              style={{
+                color: currentDate > new Date(s.validTo) ? 'red' : 'black',
+                textDecoration: 'underline',
+                whiteSpace: 'nowrap',
+              }}
+              onClick={e => {
+                this.openScheme()
+              }}
+            >
+              {s.copaymentSchemeName || s.schemeTypeName}
+              {s.validTo
+                ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`
+                : ' (Exp: -)'}
+              {i < arr.length - 1 ? ',' : ''}
+            </span>
           </Link>
         )}
       </span>
