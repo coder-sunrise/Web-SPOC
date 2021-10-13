@@ -1280,7 +1280,7 @@ const Main = props => {
   return (
     <div>
       <GridContainer>
-        <GridItem>
+        <GridItem md={12}>
           <PharmacySteps
             statusHistory={statusHistory}
             currentStatusFK={workitem.statusFK}
