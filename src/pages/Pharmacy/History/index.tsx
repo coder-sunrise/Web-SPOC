@@ -247,7 +247,7 @@ const defaultColumns = (codetable, setDetailsId) => {
         return (
           <DatePicker
             style={{ width: 250 }}
-            label='Order Date Form'
+            label='Order Date From'
             placeholder=''
           />
         )
