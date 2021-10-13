@@ -65,7 +65,16 @@ const WorkitemTitle = ({ item }) => {
           <Icon type='male' style={{ color: blueColor, fontSize: 15 }} />
           {age} {age === 1 ? 'Yr' : 'Yrs'}
         </div>
-        <div width={80}>{item.patientInfo.patientAccountNo}</div>
+        <div
+          style={{
+            textOverflow: 'ellipsis',
+            width: 80,
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {item.patientInfo.patientAccountNo}
+        </div>
       </div>
     </div>
   )

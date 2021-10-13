@@ -72,7 +72,9 @@ export const StartExaminationConfirmation = ({
           columns={startExaminationConfirmationTable}
           dataSource={combinedWorkitems}
         />
-        <div>Radiographer(s): {getRadiographers(combinedWorkitems)}</div>
+        <div style={{ margin: 10 }}>
+          Radiographer(s): {getRadiographers(combinedWorkitems)}
+        </div>
       </div>
     </CommonModal>
   )
