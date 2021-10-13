@@ -6,7 +6,7 @@ import {
   RADIOLOGY_WORKITEM_STATUS,
 } from '@/utils/constants'
 import { examinationSteps } from '@/utils/codes'
-import { dateFormatLongWithTimeNoSec12h } from '@/components'
+import { dateFormatLongWithTimeNoSec } from '@/components'
 import styles from './ExaminationStep.less'
 
 const { Step } = Steps
@@ -73,7 +73,7 @@ const getStatusStep = (status, statusHistory, currentStatusFK) => {
       description={
         lastStatus
           ? `${moment(lastStatus.actionDate).format(
-              dateFormatLongWithTimeNoSec12h,
+              dateFormatLongWithTimeNoSec,
             )}`
           : ''
       }

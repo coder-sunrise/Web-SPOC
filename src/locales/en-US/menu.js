@@ -52,6 +52,9 @@ export default {
   'menu.finance.statement/statementpayment': 'Statement Payment',
   'menu.finance.scheme': 'Scheme',
   'menu.finance.scheme/detail': 'Scheme Detail',
+  'menu.finance.copayer': 'Co-Payer',
+  'menu.finance.copayer/newcopayer': 'Add Co-Payer',
+  'menu.finance.copayer/editcopayer': 'Edit Co-Payer',
 
   'menu.reception': 'Reception',
   'menu.reception.queue': 'Queue',
@@ -150,7 +153,6 @@ export default {
   'menu.setting.gstsetup': 'GST Setup',
   'menu.setting.generalsetting': 'General Setting',
   'menu.setting.queuedisplaysetup': 'Queue Display Setup',
-  'menu.finance.copayer': 'Co-Payer',
   'menu.setting.supplier': 'Supplier',
   'menu.setting.paymentmode': 'Payment Mode',
   'menu.setting.appointmenttype': 'Appointment Type',

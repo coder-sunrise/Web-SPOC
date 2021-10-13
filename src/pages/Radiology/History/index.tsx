@@ -444,7 +444,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
         const visitDoctorOptions = (codetable.doctorprofile || []).map(x => {
           return {
-            value: x.clinicianProfile.userProfileFK,
+            value: x.id,
             name: x.clinicianProfile.name,
             doctorMCRNo: x.doctorMCRNo,
             clinicianProfile: x.clinicianProfile,
@@ -643,8 +643,8 @@ const RadiologyWorklistHistoryIndex = ({
           search={{
             collapsed: false,
             collapseRender: false,
-            searchText: 'SEARCH',
-            resetText: 'RESET',
+            searchText: 'Search',
+            resetText: 'Reset',
             optionRender: (searchConfig, formProps, dom) => {
               return (
                 <div

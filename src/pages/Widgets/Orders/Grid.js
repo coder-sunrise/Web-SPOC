@@ -443,7 +443,7 @@ export default ({
           <div
             style={{
               position: 'absolute',
-              bottom: 2,
+              bottom: 3,
               right: -15,
               borderRadius: 8,
               height: 16,
@@ -465,14 +465,14 @@ export default ({
           title={
             radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
               ? 'In Progress'
-              : 'Completed'
-          }
+              : radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ? 'Modality Completed' :'Completed'
+            }
         >
           <div
             style={{
               position: 'absolute',
-              bottom: 2,
-              right: -20,
+              bottom: 3,
+              right: -15,
               borderRadius: 8,
               height: 16,
               width: 16,
@@ -492,8 +492,8 @@ export default ({
           <div
             style={{
               position: 'absolute',
-              bottom: 2,
-              right: -20,
+              bottom: -4,
+              right: -16,
               cursor: 'pointer',
             }}
           >

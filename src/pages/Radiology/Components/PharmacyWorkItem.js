@@ -140,7 +140,7 @@ const WorkitemTitle = ({ item, classes }) => {
 }
 
 const WorkitemBody = ({ item, classes, clinicSettings }) => {
-  const { setDetailsId } = useContext(WorlistContext)
+  const { setDetailsId } = useContext(WorklistContext)
   const orderDate = moment(item.generateDate).format('DD MMM YYYY HH:mm')
 
   const showGroup = item.visitGroup && item.visitGroup.trim().length
