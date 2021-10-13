@@ -10,9 +10,9 @@ const columns = [
   { name: 'code', title: 'Code' },
   { name: 'displayValue', title: 'Display Value' },
   { name: 'tagColorHex', title: 'Appt. Type Color' },
-  { name: 'isActive', title: 'Status' },
   { name: 'sortOrder', title: 'Sort Order' },
   { name: 'isDefault', title: 'Default' },
+  { name: 'isActive', title: 'Status' },
   {
     name: 'action',
     title: 'Action',
@@ -30,38 +30,20 @@ class Grid extends React.PureComponent {
       {
         columnName:'isDefault',
         sortingEnabled: false,
-        type: 'radio',
         align: 'center',
         width:'100px',
-        checkedValue: true,
-        uncheckedValue: false,
-        onChange: ({ row, checked }) => {
-          // if (checked) {
-          //   const { values, setFieldValue, setFieldTouched } = this.props
-          //   const serviceSettingItem = _.cloneDeep(
-          //     values.ctServiceCenter_ServiceNavigation,
-          //   )
-          //   serviceSettingItem.forEach(pec => {
-          //     pec.isDefault = false
-          //   })
-          //   const r = serviceSettingItem.find(o => o.id === row.id)
-          //   if (r) {
-          //     r.isDefault = true
-          //   }
-          //   this.setState({ serviceSettings: serviceSettingItem })
-          //   setFieldValue('ctServiceCenter_ServiceNavigation',serviceSettingItem)
-          //   setFieldTouched('ctServiceCenter_ServiceNavigation', true)
-          // }
-        },
+        render: row => (row.isDefault ? 'Yes' : 'No'),
       },
       {
         columnName: 'isActive',
         sortingEnabled: false,
         type: 'select',
         options: status,
+        width:'100px',
       },
       {
         columnName: 'tagColorHex',
+        width: '200px',
         render: (row) => (
           <div
             style={{
