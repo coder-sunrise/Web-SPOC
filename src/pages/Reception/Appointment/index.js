@@ -68,6 +68,7 @@ export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>
   doctorprofile: codetable.doctorprofile || [],
   user,
   apptTimeSlotDuration: clinicSettings.settings.apptTimeSlotDuration,
+  appointmentTypes: codetable.ctappointmenttype || [],
 }))
 class Appointment extends React.PureComponent {
   state = {
@@ -690,6 +691,7 @@ class Appointment extends React.PureComponent {
       user,
       doctorprofile,
       apptTimeSlotDuration,
+      appointmentTypes,
     } = this.props
     const {
       showAppointmentForm,
@@ -771,6 +773,7 @@ class Appointment extends React.PureComponent {
               onHistoryRowSelected={this.onDoubleClickEvent}
               apptTimeSlotDuration={apptTimeSlotDuration}
               handleCopyAppointmentClick={this.handleCopyAppointmentClick}
+              appointmentTypes={appointmentTypes}
             />
           )}
         </CommonModal>

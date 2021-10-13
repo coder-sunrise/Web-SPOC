@@ -4,7 +4,7 @@ import { CommonModal } from '@/components'
 import WorklistContext from '@/pages/Radiology/Worklist/WorklistContext'
 import Details from './Details'
 
-const PharmacyDetails = ({ refreshClick }) => {
+const PharmacyDetails = ({ refreshClick, fromModule = 'Main' }) => {
   const dispatch = useDispatch()
   const { detailsId, setDetailsId } = useContext(WorklistContext)
   const [showModal, setShowModal] = useState(false)
@@ -12,38 +12,45 @@ const PharmacyDetails = ({ refreshClick }) => {
   useEffect(() => {
     if (detailsId) {
       dispatch({
-        type: 'codetable/fetchCodes',
-        payload: { code: 'inventorymedication', force: true },
+        type: 'pharmacyDetails/updateState',
+        payload: { fromModule },
       })
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: { code: 'inventoryconsumable', force: true },
-      })
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: { code: 'ctmedicationunitofmeasurement' },
-      })
-      dispatch({
-        type: 'pharmacyDetails/query',
-        payload: { id: detailsId },
-      }).then(r => {
-        if (r) {
-          setShowModal(true)
-        } else {
-          setDetailsId(undefined)
-          dispatch({
-            type: 'global/updateAppState',
-            payload: {
-              openConfirm: true,
-              isInformType: true,
-              openConfirmText: 'OK',
-              openConfirmContent: `Pharmacy workitem has been remove by others, click Ok to refresh worklist.`,
-              onConfirmClose: () => {
-                refreshClick()
+      Promise.all([
+        dispatch({
+          type: 'codetable/fetchCodes',
+          payload: { code: 'inventorymedication', force: true },
+        }),
+        dispatch({
+          type: 'codetable/fetchCodes',
+          payload: { code: 'inventoryconsumable', force: true },
+        }),
+        dispatch({
+          type: 'codetable/fetchCodes',
+          payload: { code: 'ctmedicationunitofmeasurement', force: true },
+        }),
+      ]).then(r => {
+        dispatch({
+          type: 'pharmacyDetails/query',
+          payload: { id: detailsId },
+        }).then(r => {
+          if (r) {
+            setShowModal(true)
+          } else {
+            setDetailsId(undefined)
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                openConfirm: true,
+                isInformType: true,
+                openConfirmText: 'OK',
+                openConfirmContent: `Pharmacy workitem has been remove by others, click Ok to refresh worklist.`,
+                onConfirmClose: () => {
+                  refreshClick()
+                },
               },
-            },
-          })
-        }
+            })
+          }
+        })
       })
     }
   }, [detailsId])
@@ -53,7 +60,7 @@ const PharmacyDetails = ({ refreshClick }) => {
     setShowModal(false)
     dispatch({
       type: 'pharmacyDetails/updateState',
-      payload: { entity: undefined },
+      payload: { entity: undefined, fromModule: undefined },
     })
     refreshClick()
   }

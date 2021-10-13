@@ -20,6 +20,7 @@ export default createListViewModel({
           moment().formatUTC(),
           moment('2099-12-31T23:59:59').formatUTC(false),
         ],
+        sortOrder:1,
       },
     },
     subscriptions: {},

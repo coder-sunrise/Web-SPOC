@@ -741,6 +741,7 @@ export const PHARMACY_ACTION = {
   VERIFY: 'Verify',
   COMPLETE: 'Complete',
   CANCEL: 'Cancel',
+  COMPLETEPARTIAL: 'CompletePartial',
 }
 
 export const CHECKLIST_CATEGORY = {
