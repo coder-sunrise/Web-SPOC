@@ -103,11 +103,16 @@ const RadiologyDetails = props => {
         <ProgressButton
           color='success'
           onClick={() => {
+            const currentPrimaryWorkitemFK = visitWorkitems.find(
+              v => v.radiologyWorkitemId === workitem.radiologyWorkitemId,
+            ).primaryWorkitemFK
             if (
               workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW &&
-              workitem.primaryWorkitemFK &&
+              currentPrimaryWorkitemFK &&
               visitWorkitems.filter(
-                v => v.primaryWorkitemFK === workitem.primaryWorkitemFK,
+                v =>
+                  v.primaryWorkitemFK &&
+                  v.primaryWorkitemFK === currentPrimaryWorkitemFK,
               ).length > 1
             ) {
               setShowStartConfirm(true)
