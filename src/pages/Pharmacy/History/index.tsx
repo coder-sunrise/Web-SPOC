@@ -123,6 +123,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       key: 'orderDate',
       title: 'Order Time',
       dataIndex: 'orderDate',
+      defaultSortOrder: 'descend',
       valueType: 'dateTime',
       render: (_dom: any, entity: any) =>
         entity.orderTime?.format('DD MMM YYYY HH:mm') || '-',
