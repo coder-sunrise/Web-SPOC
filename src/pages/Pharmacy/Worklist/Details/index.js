@@ -4,7 +4,12 @@ import { CommonModal } from '@/components'
 import WorklistContext from '@/pages/Radiology/Worklist/WorklistContext'
 import Details from './Details'
 
-const PharmacyDetails = ({ refreshClick, fromModule = 'Main' }) => {
+const PharmacyDetails = ({
+  refreshClick,
+  fromModule = 'Main',
+  startRefreshTimer,
+  stopRefreshTimer,
+}) => {
   const dispatch = useDispatch()
   const { detailsId, setDetailsId } = useContext(WorklistContext)
   const [showModal, setShowModal] = useState(false)
@@ -34,6 +39,7 @@ const PharmacyDetails = ({ refreshClick, fromModule = 'Main' }) => {
           payload: { id: detailsId },
         }).then(r => {
           if (r) {
+            stopRefreshTimer()
             setShowModal(true)
           } else {
             setDetailsId(undefined)
@@ -63,6 +69,7 @@ const PharmacyDetails = ({ refreshClick, fromModule = 'Main' }) => {
       payload: { entity: undefined, fromModule: undefined },
     })
     refreshClick()
+    startRefreshTimer()
   }
 
   return (

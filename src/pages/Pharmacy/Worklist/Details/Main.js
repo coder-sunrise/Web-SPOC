@@ -172,6 +172,12 @@ const Main = props => {
   const { corDiagnosis = [], visitPurposeFK } = workitem
 
   const editOrder = e => {
+    if (workitem.isClinicSessionClosed) {
+      notification.error({
+        message: 'Can not edit order, session is end.',
+      })
+      return
+    }
     const _addOrder = () => {
       dispatch({
         type: 'dispense/query',
@@ -436,12 +442,12 @@ const Main = props => {
     const { classes } = props
     const { row, children, tableRow } = p
     let newchildren = []
-    const startColIndex = 8
+    const startColIndex = 6
     let endColIndex
     if (pharmacyDetails.fromModule === 'History') {
-      endColIndex = type === 'PendingItems' ? 11 : 10
+      endColIndex = type === 'PendingItems' ? 10 : 9
     } else {
-      endColIndex = workitem.statusFK !== PHARMACY_STATUS.NEW ? 10 : 11
+      endColIndex = workitem.statusFK !== PHARMACY_STATUS.NEW ? 9 : 10
     }
     const batchColumns = children.slice(startColIndex, endColIndex)
 
@@ -461,20 +467,7 @@ const Main = props => {
     if (row.countNumber === 1) {
       newchildren.push(
         children
-          .filter((value, index) => index < startColIndex - 2 && index > 1)
-          .map(item => ({
-            ...item,
-            props: {
-              ...item.props,
-              rowSpan: row.rowspan,
-            },
-          })),
-      )
-
-      newchildren.push(children.slice(startColIndex - 2, startColIndex - 1))
-      newchildren.push(
-        children
-          .filter((value, index) => index === startColIndex - 1)
+          .filter((value, index) => index < startColIndex && index > 1)
           .map(item => ({
             ...item,
             props: {
@@ -484,14 +477,24 @@ const Main = props => {
           })),
       )
       newchildren.push(batchColumns)
+      newchildren.push(
+        children
+          .filter((value, index) => index === endColIndex)
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.rowspan,
+            },
+          })),
+      )
     } else {
-      newchildren.push(children.slice(startColIndex - 2, startColIndex - 1))
       newchildren.push(batchColumns)
     }
     if (row.groupNumber === 1) {
       newchildren.push(
         children
-          .filter((value, index) => index === endColIndex)
+          .filter((value, index) => index === endColIndex + 1)
           .map(item => ({
             ...item,
             props: {
@@ -506,7 +509,8 @@ const Main = props => {
       newchildren.push(
         children
           .filter(
-            (value, index) => index < endColIndex + 3 && index > endColIndex,
+            (value, index) =>
+              index < endColIndex + 4 && index > endColIndex + 1,
           )
           .map(item => ({
             ...item,
@@ -521,7 +525,7 @@ const Main = props => {
     if (row.groupNumber === 1) {
       newchildren.push(
         children
-          .filter((value, index) => index > endColIndex + 2)
+          .filter((value, index) => index > endColIndex + 3)
           .map(item => ({
             ...item,
             props: {
@@ -921,14 +925,12 @@ const Main = props => {
       },
       {
         columnName: 'stockBalance',
-        width: 100,
+        width: 95,
         sortingEnabled: false,
         disabled: true,
         render: row => {
           const balStock = row.stockBalance
-          const stock = balStock
-            ? `${numeral(balStock).format('0.0')} ${getDispenseUOM(row)}`
-            : '-'
+          const stock = balStock ? `${numeral(balStock).format('0.0')}` : '-'
           return (
             <Tooltip title={stock}>
               <span>{stock}</span>
@@ -1122,15 +1124,15 @@ const Main = props => {
         ),
       },
       {
-        name: 'stockBalance',
-        title: 'Balance Qty.',
-      },
-      {
         name: 'stock',
         title: 'Stock Qty.',
       },
       { name: 'batchNo', title: 'Batch No.' },
       { name: 'expiryDate', title: 'Expiry Date' },
+      {
+        name: 'stockBalance',
+        title: 'Balance Qty.',
+      },
       {
         name: 'instruction',
         title: `Instruction${

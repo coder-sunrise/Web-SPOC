@@ -13,12 +13,12 @@ import {
   CommonTableGrid,
   Popover,
 } from '@/components'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { VISIT_TYPE, VISIT_TYPE_NAME } from '@/utils/constants'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import { FileDoneOutlined } from '@ant-design/icons'
 import Warning from '@material-ui/icons/Error'
 import WorklistContext from '../Worklist/WorklistContext'
+import VisitGroupIcon from './VisitGroupIcon'
 
 const blueColor = '#1890f8'
 
@@ -142,52 +142,6 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
   const { setDetailsId } = useContext(WorklistContext)
   const orderDate = moment(item.generateDate).format('DD MMM YYYY HH:mm')
 
-  const visitGroup = item => {
-    return (
-      <CommonTableGrid
-        forceRender
-        size='sm'
-        FuncProps={{ pager: false }}
-        rows={item.visitGroupListing || []}
-        columns={[
-          { name: 'queueNo', title: 'Q. No.' },
-          { name: 'name', title: 'Name' },
-          { name: 'gender', title: 'Gender' },
-          { name: 'age', title: 'Age' },
-        ]}
-        columnExtensions={[
-          {
-            columnName: 'queueNo',
-            width: 70,
-            sortingEnabled: false,
-            render: row => {
-              const { isQueueNoDecimal } = clinicSettings
-              const queueNo =
-                !row.queueNo || !row.queueNo.trim().length
-                  ? '-'
-                  : numeral(row.queueNo).format(isQueueNoDecimal ? '0.0' : '0')
-              return <div>{queueNo}</div>
-            },
-          },
-          {
-            columnName: 'name',
-            sortingEnabled: false,
-          },
-          {
-            columnName: 'gender',
-            width: 60,
-            sortingEnabled: false,
-          },
-          {
-            columnName: 'age',
-            width: 60,
-            sortingEnabled: false,
-          },
-        ]}
-      />
-    )
-  }
-
   const showGroup = item.visitGroup && item.visitGroup.trim().length
   const doctorName = `${
     item.doctorTitle && item.doctorTitle.trim().length
@@ -279,25 +233,12 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
           </Tooltip>
         )}
         {showGroup && (
-          <Popover
-            icon={null}
-            trigger='hover'
-            placement='right'
-            content={
-              <div style={{ padding: 3, width: 400 }}>{visitGroup(item)}</div>
-            }
-          >
-            <Icon
-              type='family'
-              style={{
-                color: 'red',
-                fontSize: '1.2rem',
-                marginLeft: 10,
-              }}
-            />
-          </Popover>
+          <VisitGroupIcon
+            visitGroup={item.visitGroup}
+            visitFK={item.visitFK}
+            isQueueNoDecimal={isQueueNoDecimal}
+          />
         )}
-        {showGroup && <span>{item.visitGroup}</span>}
       </div>
     </div>
   )
