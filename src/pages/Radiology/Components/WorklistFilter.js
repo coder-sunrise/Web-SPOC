@@ -14,16 +14,35 @@ import {
   dateFormatLong,
 } from '@/components'
 import { formatMessage } from 'umi'
-import WorlistContext from '../Worklist/WorklistContext'
+import WorklistContext from '../Worklist/WorklistContext'
 
 export const WorklistFilter = () => {
   const [form] = Form.useForm()
   const dispatch = useDispatch()
-  const { showDetails, visitPurpose } = useContext(WorlistContext)
+  const { showDetails, visitPurpose } = useContext(WorklistContext)
   const { settings } = useSelector(s => s.clinicSettings)
 
+  const timer = React.useRef(null)
+
+  const startTimer = () => {
+    timer.current = setInterval(() => {
+      handleSearch()
+    }, 30000)
+  }
+
+  const stopTimer = () => {
+    clearInterval(timer.current)
+  }
+
   useEffect(() => {
-    handleSearch()
+    if (showDetails) {
+      stopTimer()
+    } else {
+      handleSearch()
+      startTimer()
+    }
+
+    return () => clearInterval(timer.current)
   }, [showDetails])
 
   const handleSearch = () => {
