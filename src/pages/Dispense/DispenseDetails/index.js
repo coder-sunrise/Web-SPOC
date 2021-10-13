@@ -121,8 +121,6 @@ const DispenseDetails = ({
   selectedDrugs,
   clinicSettings,
   servingPersons = [],
-  visit,
-  doctorprofile = [],
   patient,
   user,
 }) => {
@@ -135,6 +133,8 @@ const DispenseDetails = ({
     visitPurposeFK,
     visitRemarks,
     defaultExpandedGroups,
+    orderCreateTime,
+    orderCreateBy,
   } = values || {
     invoice: { invoiceItem: [] },
   }
@@ -147,10 +147,6 @@ const DispenseDetails = ({
 
   const { inventorymedication, inventoryvaccination } = codetable
   const { settings = {} } = clinicSettings
-  const currentDoc = doctorprofile.filter(x => x.id === visit.doctorProfileFK)
-  const docInfo =
-    currentDoc && currentDoc.length > 0 ? currentDoc[0].clinicianProfile : {}
-
   const discardCallback = r => {
     if (r) {
       const userProfile = user.data.clinicianProfile
@@ -579,12 +575,12 @@ const DispenseDetails = ({
             {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
             Patient Label
           </Button>
-          {visit.orderCreateTime && (
+          {orderCreateTime && (
             <span style={{ color: '#999999' }}>
-              Order created by{' '}
+              Order created by
               <span style={{ fontWeight: 500 }}>
-                {`${docInfo.title ? `${docInfo.title}.` : null}${docInfo.name}`}{' '}
-                at {visit.orderCreateTime.format('DD MMM yyyy HH:mm')}
+                {` ${orderCreateBy} `}
+                at {orderCreateTime.format('DD MMM yyyy HH:mm')}
               </span>{' '}
             </span>
           )}
@@ -637,7 +633,7 @@ const DispenseDetails = ({
                   onConfirm={() => {
                     dispatch({
                       type: 'dispense/setServingPerson',
-                      payload: { visitFK: visit.id },
+                      payload: { visitFK: values?.id },
                     })
                   }}
                 />
@@ -1066,15 +1062,12 @@ export default compose(
       codetable,
       clinicSettings,
       dispense,
-      visitRegistration,
       patient,
       user,
     }) => ({
       codetable,
       clinicSettings,
       servingPersons: dispense.servingPersons,
-      visit: visitRegistration?.entity?.visit || {},
-      doctorprofile: codetable.doctorprofile || [],
       patient: patient.entity || {},
       user,
     }),
