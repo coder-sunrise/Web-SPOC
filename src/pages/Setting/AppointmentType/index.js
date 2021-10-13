@@ -32,6 +32,11 @@ const AppointmentType = ({
   useEffect(() => {
     dispatch({
       type: 'settingAppointmentType/query',
+      payload: {
+        sorting: [
+          { columnName: 'displayValue', direction: 'asc' },
+        ],
+      },
     })
   }, [])
 
