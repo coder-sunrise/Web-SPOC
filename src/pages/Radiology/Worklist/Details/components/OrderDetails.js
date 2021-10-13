@@ -4,7 +4,7 @@ import moment from 'moment'
 import {
   GridContainer,
   GridItem,
-  dateFormatLongWithTimeNoSec12h,
+  dateFormatLongWithTimeNoSec,
 } from '@/components'
 import { RightAlignGridItem, SectionTitle } from '../../../Components'
 import { CombineOrderGrid } from './index'
@@ -51,7 +51,7 @@ export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
             <RightAlignGridItem>Order Created Time :</RightAlignGridItem>
             <GridItem md={6}>
               {moment(workitem.generateDate).format(
-                dateFormatLongWithTimeNoSec12h,
+                dateFormatLongWithTimeNoSec,
               )}
             </GridItem>
 

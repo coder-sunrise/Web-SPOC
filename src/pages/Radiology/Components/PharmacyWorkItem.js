@@ -18,7 +18,7 @@ import { VISIT_TYPE, VISIT_TYPE_NAME } from '@/utils/constants'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import { FileDoneOutlined } from '@ant-design/icons'
 import Warning from '@material-ui/icons/Error'
-import WorlistContext from '../Worklist/WorklistContext'
+import WorklistContext from '../Worklist/WorklistContext'
 
 const blueColor = '#1890f8'
 
@@ -139,7 +139,7 @@ const WorkitemTitle = ({ item, classes }) => {
 }
 
 const WorkitemBody = ({ item, classes, clinicSettings }) => {
-  const { setDetailsId } = useContext(WorlistContext)
+  const { setDetailsId } = useContext(WorklistContext)
   const orderDate = moment(item.generateDate).format('DD MMM YYYY HH:mm')
 
   const visitGroup = item => {
@@ -288,10 +288,10 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
             }
           >
             <Icon
-              type='team'
+              type='family'
               style={{
                 color: 'red',
-                fontSize: '1rem',
+                fontSize: '1.5rem',
                 marginLeft: 10,
               }}
             />

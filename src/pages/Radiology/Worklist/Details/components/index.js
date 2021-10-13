@@ -1,4 +1,5 @@
 export { CancelConfirmation } from './CancelConfirmation'
+export { StartExaminationConfirmation } from './StartExaminationConfirmation'
 export { ExaminationSteps } from './ExaminationSteps'
 export { OrderDetails } from './OrderDetails'
 export { ExaminationDetails } from './ExaminationDetails'

@@ -17,11 +17,13 @@ import {
   OrderDetails,
   ExaminationDetails,
   CancelConfirmation,
+  StartExaminationConfirmation,
 } from './components'
 import { SectionTitle, RightAlignGridItem } from '../../Components'
 import {
   RADIOLOGY_WORKITEM_STATUS,
   RADIOLOGY_WORKITEM_BUTTON,
+  RadiologyWorkitemStatus,
 } from '@/utils/constants'
 import WorklistContext from '../WorklistContext'
 import { examinationSteps } from '@/utils/codes'
@@ -33,12 +35,13 @@ const RadiologyDetails = props => {
   )
 
   const details = useSelector(state => state.radiologyDetails)
-  const patientBannerEntity = useSelector(state => state.patient)
   const [isDirty, setIsDirty] = useState(false)
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
+  const [showStartConfirm, setShowStartConfirm] = useState(false)
   const [workitem, setWorkItem] = useState({})
   const [visitWorkitems, setVisitWorkItems] = useState([])
   const [examinationDetails, setExaminationDetails] = useState({})
+  const [currentPatient, setCurrentPatient] = useState({})
 
   useEffect(() => {
     if (detailsId) {
@@ -56,9 +59,16 @@ const RadiologyDetails = props => {
         type: 'radiologyDetails/updateState',
         payload: { entity: {} },
       })
+
+      dispatch({
+        type: 'patient/updateState',
+        payload: { entity: null },
+      })
+
       setWorkItem({})
       setVisitWorkItems([])
       setExaminationDetails({})
+      setShowDetails(false)
     }
   }, [detailsId])
 
@@ -93,8 +103,16 @@ const RadiologyDetails = props => {
         <ProgressButton
           color='success'
           onClick={() => {
+            if (
+              workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW &&
+              visitWorkitems.filter(
+                v => v.primaryWorkitemFK === workitem.primaryWorkitemFK,
+              ).length > 1
+            ) {
+              setShowStartConfirm(true)
+              return
+            }
             handleSave({
-              ...details.entity,
               statusFK: buttonInfo.nextStatusFK,
             })
           }}
@@ -105,14 +123,15 @@ const RadiologyDetails = props => {
     )
   }
 
-  const handleSave = payload => {
+  const handleSave = (payload = {}) => {
     dispatch({
       type: 'radiologyDetails/updateRadiologyWorkitem',
       payload: {
-        ...payload,
+        ...workitem,
         id: details.entity.radiologyWorkitemId,
         visitWorkitems: visitWorkitems,
         ...examinationDetails,
+        ...payload,
       },
     })
 
@@ -138,21 +157,40 @@ const RadiologyDetails = props => {
     setShowCancelConfirm(false)
   }
 
+  const getCombinedWorkitems = () =>
+    visitWorkitems
+      ? visitWorkitems
+          .filter(w => w.primaryWorkitemFK === workitem.primaryWorkitemFK)
+          .map(w => {
+            if (w.radiologyWorkitemId !== workitem.radiologyWorkitemId) return w
+
+            //Current changes need to be considered as well.
+            return {
+              ...w,
+              assignedRadiographers: examinationDetails.assignedRadiographers,
+            }
+          })
+      : []
+
   return (
     <CommonModal
       open={showDetails}
       title='Radiology Examination Details'
       showFooter={true}
       onConfirm={() => {
-        handleSave({
-          ...details.entity,
-        })
+        handleSave()
+
         //TODO: if changed scribble notes, warn to pending changes
       }}
       confirmText='Save'
       onClose={() => {
         setDetailsId(null)
         setShowDetails(false)
+
+        dispatch({
+          type: 'patient/updateState',
+          payload: {},
+        })
       }}
       footProps={{
         extraButtons: renderStatusButtons(),
@@ -163,7 +201,7 @@ const RadiologyDetails = props => {
       <GridContainer style={{ height: 700, overflowY: 'scroll' }}>
         <GridItem md={12}>
           <div style={{ padding: 8 }}>
-            <Banner from='Radiology' patientInfo={patientBannerEntity} />
+            <Banner from='Radiology' />
           </div>
         </GridItem>
         <GridItem md={12}>
@@ -191,6 +229,24 @@ const RadiologyDetails = props => {
         onCancelConfirm={cancellationReason => {
           handleCancel(cancellationReason)
         }}
+        onCancelClose={() => setShowCancelConfirm(false)}
+      />
+
+      <StartExaminationConfirmation
+        open={showStartConfirm}
+        workitem={workitem}
+        combinedWorkitems={getCombinedWorkitems()}
+        onStartConfirm={() => {
+          handleSave({
+            statusFK: RADIOLOGY_WORKITEM_STATUS.INPROGRESS,
+            assignedRadiographers: _.uniqBy(
+              getCombinedWorkitems().flatMap(w => w.assignedRadiographers),
+              c => c.userProfileFK,
+            ),
+          })
+          setShowStartConfirm(false)
+        }}
+        onStartClose={() => setShowStartConfirm(false)}
       />
     </CommonModal>
   )

@@ -39,11 +39,7 @@ export const ExaminationDetails = ({
   useEffect(() => {
     onChange({ assignedRadiographers, comment, findings })
   }, [assignedRadiographers, comment, findings])
-  console.log('workitem.statusFK', workitem.statusFK)
-  console.log(
-    'same??',
-    workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED,
-  )
+
   useEffect(() => {
     if (workitem) {
       setComment(workitem.comment)
@@ -98,7 +94,7 @@ export const ExaminationDetails = ({
                 }}
               />
             ) : (
-              assignedRadiographers.map(r => r.name).toString()
+              assignedRadiographers.map(r => r.name).join(', ')
             )}
           </GridItem>
 

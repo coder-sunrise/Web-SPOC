@@ -2,14 +2,20 @@ import React, { Fragment, useState, useEffect, useContext } from 'react'
 import { Typography, Card } from 'antd'
 import ProCard from '@ant-design/pro-card'
 import moment from 'moment'
-import { Icon, dateFormatLongWithTimeNoSec12h, Tooltip } from '@/components'
+import { Icon, dateFormatLongWithTimeNoSec, Tooltip } from '@/components'
 import { VISIT_TYPE, VISIT_TYPE_NAME } from '@/utils/constants'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
-import WorlistContext from '../Worklist/WorklistContext'
+import WorklistContext from '../Worklist/WorklistContext'
 
 const blueColor = '#1890f8'
 
-const WorkitemLeftLabel = ({ children, tooltip, width = 150, ...props }) => (
+const WorkitemLeftLabel = ({
+  children,
+  tooltip,
+  width = 150,
+  style,
+  ...props
+}) => (
   <Tooltip title={tooltip}>
     <div
       style={{
@@ -17,6 +23,7 @@ const WorkitemLeftLabel = ({ children, tooltip, width = 150, ...props }) => (
         width: width,
         overflow: 'hidden',
         whiteSpace: 'nowrap',
+        ...style,
       }}
       {...props}
     >
@@ -48,9 +55,6 @@ const WorkitemTitle = ({ item }) => {
         </WorkitemLeftLabel>
         <WorkitemLeftLabel tooltip={item.patientInfo.patientReferenceNo}>
           {item.patientInfo.patientReferenceNo}
-          {item.patientInfo.patientReferenceNo}
-          {item.patientInfo.patientReferenceNo}
-          {item.patientInfo.patientReferenceNo}
         </WorkitemLeftLabel>
       </div>
       <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
@@ -65,9 +69,10 @@ const WorkitemTitle = ({ item }) => {
 }
 
 const WorkitemBody = ({ item }) => {
-  const { setDetailsId } = useContext(WorlistContext)
+  const { setDetailsId } = useContext(WorklistContext)
   const orderDate = moment(item.generateDate).format(
-    dateFormatLongWithTimeNoSec12h,
+    dateFormatLongWithTimeNoSec,
+    false,
   )
   return (
     <div
@@ -90,7 +95,7 @@ const WorkitemBody = ({ item }) => {
           <WorkitemLeftLabel style={{ fontWeight: 500 }}>
             {item.itemDescription}
           </WorkitemLeftLabel>
-          <WorkitemLeftLabel>
+          <WorkitemLeftLabel tooltip={item.accessionNo}>
             {item.accessionNo}
             {item.primaryWorkitemFK && (
               <Icon
@@ -104,6 +109,19 @@ const WorkitemBody = ({ item }) => {
         </div>
         <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
           <div>Q.No.: {item.visitInfo.queueNo}</div>
+          {item.visitInfo.visitGroup && (
+            <div>
+              <Icon
+                type='family'
+                style={{
+                  color: 'red',
+                  fontSize: '1.5rem',
+                  marginRight: 10,
+                }}
+              />
+              {item.visitInfo.visitGroup}
+            </div>
+          )}
         </div>
       </div>
       <div
@@ -143,6 +161,7 @@ const WorkitemBody = ({ item }) => {
             URGENT
           </div>
         )}
+
         <span
           style={{
             gridColumnStart: 3,
@@ -164,7 +183,10 @@ export const Workitem = item => (
       height: 220,
       margin: '10px 5px',
       borderRadius: 10,
-      backgroundColor: item.isNurseActualized ? '#d3fed1' : 'white',
+      backgroundColor:
+        item.isNurseActualized || !item.isNurseActualizeRequired
+          ? '#d3fed1'
+          : 'white',
       border: '#cdcdcd solid 2px',
     }}
   >
