@@ -43,7 +43,8 @@ const PharmacyWorklist = () => {
   const clinicSettings = useSelector(s => s.clinicSettings)
   const [refreshDate, setRefreshDate] = useState(moment())
   const [filterValue, setFilterValue] = useState('')
-  const { autoRefreshPharmacyInterval = 60 } = clinicSettings.settings || {}
+  const { autoRefreshPharmacyWorklistInterval = 60 } =
+    clinicSettings.settings || {}
   const [refreshTimer, setRefreshTimer] = useState(null)
   useEffect(() => {
     dispatch({
@@ -102,7 +103,7 @@ const PharmacyWorklist = () => {
     setRefreshTimer(
       setInterval(() => {
         refreshClick()
-      }, autoRefreshPharmacyInterval * 1000),
+      }, autoRefreshPharmacyWorklistInterval * 1000),
     )
   }
 
