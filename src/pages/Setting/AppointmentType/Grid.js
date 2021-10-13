@@ -11,7 +11,7 @@ const columns = [
   { name: 'displayValue', title: 'Display Value' },
   { name: 'tagColorHex', title: 'Appt. Type Color' },
   { name: 'isActive', title: 'Status' },
-  { name: 'sortOrder', title: 'SortOrder' },
+  { name: 'sortOrder', title: 'Sort Order' },
   { name: 'isDefault', title: 'Default' },
   {
     name: 'action',
