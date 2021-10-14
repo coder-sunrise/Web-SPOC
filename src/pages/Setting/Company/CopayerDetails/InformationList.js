@@ -19,10 +19,10 @@ const EditableCell = ({ col, editing, editingKey, record, index, children, onErr
     </React.Fragment>
   );
 
-  //=============== Non-editing / non-editable cell (e.g. Action Column) ===============//
+  //=============== Non-editing / non-editable cell (e.g. Action Column) ===============
   if (!col) { return (<td {...restProps}>{cell}</td>); }
   if (!editing) {
-    if (col.inputType && col.inputType === 'text') {
+    if (col.inputType && (col.inputType === 'text' || col.inputType === 'number')) {
       cell = (
         <Tooltip title={record[col.dataIndex]} placement='bottom'>
           <span className={styles.cellNonWrapableText} style={{width: col.width - 20}}>{record[col.dataIndex]}</span>
@@ -33,18 +33,13 @@ const EditableCell = ({ col, editing, editingKey, record, index, children, onErr
     return (<td {...restProps}>{cell}</td>);
   }
 
-  //=============== Editable cell - No validation (isDefault) ===============//
-  if (col.key === 'isDefault') {
-    cell = <React.Fragment>{children}</React.Fragment>;
-    return (<td {...restProps}>{cell}</td>);
-  }
-
   //=============== Editable cell ===============//
   //===== State =====//
   const [validationError, setValidationError] = useState({hasError:false, errorMsg: ''});
   const [initialized, setInitialized] = useState(false);
   const inputRef = useRef(null);
 
+  //===== Hooks =====//
   useEffect(() => {
     if (col.key === 'name') {
       inputRef.current.focus();
@@ -79,15 +74,6 @@ const EditableCell = ({ col, editing, editingKey, record, index, children, onErr
         error = {hasError:true, errorMsg: editableRule.message};
         break;
       }
-
-      if (editableRule.type && editableRule.type === 'email' && fieldValue !== '') {
-        var pattern = new RegExp(/^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i);
-
-        if (!pattern.test(fieldValue)) {
-          error = {hasError:true, errorMsg: editableRule.message};
-          break;
-        }
-      }
     }
     
     if (error.hasError != validationError.hasError && error.errorMsg != validationError.errorMsg) {
@@ -99,6 +85,7 @@ const EditableCell = ({ col, editing, editingKey, record, index, children, onErr
     }
   }
 
+  //===== Styles =====//
   let errorIconWidth = 18;
   let cellPadding = 10 * 2;
   let inputBoxWidth = col.width - cellPadding;
@@ -114,6 +101,7 @@ const EditableCell = ({ col, editing, editingKey, record, index, children, onErr
     width: inputBoxWidth,
   }
 
+  //===== Component (Error Icon) =====//
   let errorIcon = undefined;
   if (validationError && validationError.hasError) {
     let errorIconStyle = {
@@ -144,6 +132,7 @@ const EditableCell = ({ col, editing, editingKey, record, index, children, onErr
     }
   }
 
+  //===== Component (Main) =====//
   cell = (
     <React.Fragment>
       <Form.Item name={col.dataIndex} style={inputContainerStyle}>
@@ -153,10 +142,6 @@ const EditableCell = ({ col, editing, editingKey, record, index, children, onErr
           onChange={onFieldChanged} 
           autoComplete='off'
           ref={inputRef}
-          //=== Cannot use Ant Design Component default suffix feature, 
-          //=== redrawing with suffix will cause control lost focus.
-          //=== Manual refocus does not help as the cursor will refresh to the last character
-          // suffix={errorIcon}
         />
         
       </Form.Item>
@@ -164,35 +149,81 @@ const EditableCell = ({ col, editing, editingKey, record, index, children, onErr
     </React.Fragment>
   );
 
-  return <td {...restProps}>{cell}</td>
-};
+  return (<td {...restProps}>{cell}</td>);
+}
 
-export const ContactPersonList = (props) => {
+export const InformationList = (props) => {
   const { dispatch, values } = props;
-  const { contactPersons } = values;
+  const { informations } = values;
 
   const [form] = Form.useForm();
+  const [data, setData]  = useState([]);
   const [editingKey, setEditingKey] = useState('');
   const [editingHasError, setEditingHasError] = useState(false);
   const [editingErrorFields, setEditingErrorFields] = useState([]);
-  
-  //--- Initialize contact person list state ---//
-  const [data, setData]  = useState([]);
+
+  const isEditing = (record) => record.key === editingKey;
+
+  console.log('info', props);
   useEffect(() => {
-    setData(contactPersons);
-  }, [contactPersons]);
+    setData(informations);
+  }, [informations]);
 
   let filteredData = [];
   if (data && data.length > 0) {
     filteredData = data.filter(function(x) { return x.isDeleted !== true; });
+    filteredData = _.sortBy(filteredData, 'sortOrder');
   }
 
-  const isEditing = (record) => record.key === editingKey;
+  //========== Events ==========//
+  const addNew = () => {
+    let nextKey = 0;
+    if (data && data.length > 0){
+      nextKey = data[data.length - 1].key + 1;
+    }
+    
+    let newInfo = {
+      key: nextKey,
+      type: '', summary: '', description: '', 
+      sortOrder: 99,
+      isDeleted: false,
+      isNewRecord: true, recordStatus: 'Adding',
+    };
+
+    edit(newInfo);
+
+    let newInfoList = [...data, newInfo];
+    props.setFieldValue('informations', newInfoList);
+  };
 
   const edit = (record) => {
     form.setFieldsValue({...record});
     setEditingHasError(false);
     setEditingKey(record.key);
+  };
+
+  const save = async (recordKey) => {
+    try {
+      const row = await form.validateFields();
+      const newData = [...data];
+      const index = newData.findIndex((item) => recordKey === item.key);
+      
+      if (index > -1) {
+        const info = newData[index];
+
+        if (info.isNewRecord === true) {
+          info.recordStatus = "New";
+        }
+
+        newData.splice(index, 1, {...info, ...row});
+        setData(newData);
+        setEditingKey('');
+        
+        props.setFieldValue('informations', newData);
+      }
+    } catch (errInfo) {
+      console.log('Validation Failed:', errInfo);
+    }
   };
 
   const cancel = async (record) => {
@@ -209,99 +240,28 @@ export const ContactPersonList = (props) => {
     }
   };
 
-  const save = async (recordKey) => {
-    try {
-      const row = await form.validateFields();
-      const newData = [...data];
-      const index = newData.findIndex((item) => recordKey === item.key);
-      
-      if (index > -1) {
-        const contactPerson = newData[index];
-
-        if (contactPerson.isNewRecord === true) {
-          contactPerson.recordStatus = "New";
-        }
-
-        newData.splice(index, 1, {...contactPerson, ...row});
-        setData(newData);
-        setEditingKey('');
-        
-        props.setFieldValue('contactPersons', newData);
-      }
-    } catch (errInfo) {
-      console.log('Validation Failed:', errInfo);
-    }
-  };
-
-  const addNew = () => {
-    let isDefault = true;
-    let nextKey = 0;
-    if (data && data.length > 0){
-      nextKey = data[data.length - 1].key + 1;
-      isDefault = false;
-    }
-    
-    let newContact = {
-      key: nextKey,
-      name: '',
-      mobileNumber: '', workNumber: '', faxNumber: '',
-      emailAddress: '', remarks: '',
-      isDefault: isDefault, isDeleted: false,
-      isNewRecord: true, recordStatus: 'Adding',
-    };
-
-    edit(newContact);
-
-    let newContacts = [...data, newContact];
-    props.setFieldValue('contactPersons', newContacts);
-  };
-
   const deleteExisting = (record) => {
     if (record.isNewRecord === true) {
       const newData = data.filter(function(x) { return x.key !== record.key; });
       setData(newData);
         
-      props.setFieldValue('contactPersons', newData);
-    } else {
+      props.setFieldValue('informations', newData);
+    } 
+    else {
       const newData = [...data];
       const index = newData.findIndex((item) => record.key === item.key);
       
       if (index > -1) {
-        const contactPerson = newData[index];
+        const info = newData[index];
         record.isDeleted = true;
 
-        newData.splice(index, 1, {...contactPerson, ...record});
+        newData.splice(index, 1, {...info, ...record});
         setData(newData);
         
-        props.setFieldValue('contactPersons', newData);
+        props.setFieldValue('informations', newData);
       }
     }
   }; 
-
-  const setDefault = (e, record) => {
-    try {
-      const newData = [...data];
-      const index = newData.findIndex((item) => record.key === item.key);
-      const currentDefaultIndex = newData.findIndex((item) => item.isDefault === true);
-
-      if (index !== currentDefaultIndex) {
-        const newDefaultRecord = newData[index];
-        const existingDefaultRecord = newData[currentDefaultIndex];
-
-        newDefaultRecord.isDefault = true;
-        newData.splice(index, 1, {...newDefaultRecord});
-
-        if (existingDefaultRecord) {
-          existingDefaultRecord.isDefault = false;
-          newData.splice(currentDefaultIndex, 1, {...existingDefaultRecord})
-        }
-
-        props.setFieldValue('contactPersons', newData);
-      }
-    } catch (errInfo) {
-      console.log('Set default failed', errInfo);
-    }
-  }
 
   const onEditingErrorStatusChanged = (fieldName, errorInfo) => {
     let newErrorList = [];
@@ -322,90 +282,45 @@ export const ContactPersonList = (props) => {
     }
   };
 
-  useEffect(() => {
-    if (data && data.length > 0 && editingKey === '') {
-      const records = data.filter(function(x) { return x.isDeleted === false; });
+  //========== Table Setup ==========//
+  const components = {
+    body: {
+      cell: EditableCell,
+    },
+  };
 
-      if (records && records.length > 0) {
-        const defaultRecord = records.filter(function(x) { return x.isDefault; });
-
-        if (defaultRecord === undefined || defaultRecord === null || defaultRecord.length <= 0) {
-          setDefault(undefined, records[0]);
-        }
-      }
-    }
-  });
-
-  const contactPersonColumns = [
+  const informationColumns = [
     {
-      title: 'Contact Person Name', width: 250,
-      dataIndex: 'name', key: 'name',
+      title: 'Type', width: 150,
+      dataIndex: 'type', key: 'type',
+      editable: true, inputType: 'text',
+      editableRules: [
+        { max:30, message: 'Type should not exceed 30 characters' }
+      ],
+    },
+    {
+      title: 'Summary', width: 350,
+      dataIndex: 'summary', key: 'summary',
       editable: true, inputType: 'text',
       editableRules: [
         { required: true, message: 'This is a required field' },
-        { max:200, message: 'Contact Person Name should not exceed 200 characters' }
+        { max:250, message: 'Summary should not exceed 250 characters' }
       ],
     },
     {
-      title: 'Contact No.', width: 125,
-      dataIndex: 'mobileNumber', key: 'mobileNumber',
-      align: 'center',
+      title: 'Description', 
+      dataIndex: 'description', key: 'description',
       editable: true, inputType: 'text',
       editableRules: [
-        { max:50, message: 'Contact No. should not exceed 50 characters' }
+        { max:2500, message: 'Description should not exceed 2500 characters' }
       ],
     },
     {
-      title: 'Office No.', width: 125,
-      dataIndex: 'workNumber', key: 'workNumber',
+      title: 'Sort Order', width: 90,
+      dataIndex: 'sortOrder', key: 'sortOrder',
       align: 'center',
-      editable: true, inputType: 'text',
-      editableRules: [
-        { max:50, message: 'Office No. should not exceed 50 characters' }
-      ]
-    },
-    {
-      title: 'Fax No.', width: 125,
-      dataIndex: 'faxNumber', key: 'faxNumber',
-      align: 'center',
-      editable: true, inputType: 'text',
-      editableRules: [
-        { max:50, message: 'Fax No. should not exceed 50 characters' }
-      ]
-    },
-    {
-      title: 'Email', width: 200,
-      dataIndex: 'emailAddress', key: 'emailAddress',
-      editable: true, inputType: 'text',
-      editableRules: [
-        { type: 'email', message: 'Please enter valid Email address'}
-      ]
-    },
-    {
-      title: 'Contact Remarks',
-      dataIndex: 'remarks', key: 'remarks',
-      editable: true, inputType: 'text',
-    },
-    {
-      title: 'Default', width: 80,
-      dataIndex: 'isDefault', key: 'isDefault',
-      align: 'center',
-      editable: true, inputType: 'radio',
-      render: (_, record) => {
-        let disableButton = false;
-        const rowEditable = isEditing(record);
-        if (editingKey !== '' && !rowEditable) {
-          disableButton = true;
-        }
-
-        return (
-          <Radio 
-            disabled={disableButton}
-            checked={record.isDefault}
-            onChange={(e) => {setDefault(e, record)}}
-          />
-        )
-      },
+      editable: true, inputType: 'number',
+      editableRules: [],
     },
     {
       title: 'Action', width: 100,
@@ -487,16 +402,10 @@ export const ContactPersonList = (props) => {
           </React.Fragment>
         );
       }
-    }
+    },
   ];
 
-  const components = {
-    body: {
-      cell: EditableCell,
-    },
-  };
-
-  const columns = contactPersonColumns.map((col) => {
+  const columns = informationColumns.map((col) => {
     if (!col.editable) { return col; }
 
     return {
@@ -511,19 +420,20 @@ export const ContactPersonList = (props) => {
     };
   });
 
+  //========== Component ==========//
   return (
     <React.Fragment>
-      {/* Contact Person List */}
-      {/* <GridItem style={{marginTop:50}}>
-        <h4 style={{fontWeight:500}}>Contact Person</h4>
-      </GridItem> */}
-      
+      {/* //===== Information List =====// */}
+      <GridItem style={{marginTop:30}}>
+        <h4 style={{fontWeight:500}}>Information</h4>
+      </GridItem>
+
       <Form form={form} component={false}>
-        <Table 
+        <Table
           className={styles.editableTable}
           rowClassName={(record) => isEditing(record) ? styles.editingRow : styles.editableRow}
           components={components}
-          columns={columns} 
+          columns={columns}
           dataSource={filteredData}
           pagination={{position: ['none', 'none']}}
         />
@@ -540,5 +450,5 @@ export const ContactPersonList = (props) => {
         </Typography.Link>
       </div>
     </React.Fragment>
-  );
+  )
 }

@@ -10,23 +10,17 @@
   }
 }
 
-.editableCell {
-  .editable-cell {
-    position: relative;
-  }
+.editableRow {
+  background-color: transparent;
 }
 
-.editableCellValueWrap {
-  .editable-cell-value-wrap {
-    padding: 5px 12px;
-    cursor: pointer;
-  }
+.editingRow {
+  background-color: #d6e4ff;
 }
 
-.editableRow{
-  .editable-row:hover .editable-cell-value-wrap {
-    padding: 4px 11px;
-    border: 1px solid #d9d9d9;
-    border-radius: 2px;
-  }
+.cellNonWrapableText{
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
 }

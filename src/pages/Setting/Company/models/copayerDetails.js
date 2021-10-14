@@ -36,6 +36,7 @@ export default createFormViewModel({
         isAutoGenerateStatementEnabled: false,
         defaultStatementAdjustmentRemarks: '',
         contactPersons: [],
+        informations: [],
         website: '',
         address: {
           blockNo: '',

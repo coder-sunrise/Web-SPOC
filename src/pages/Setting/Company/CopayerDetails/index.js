@@ -11,6 +11,7 @@ import {
 } from '@/components';
 import { General } from './General';
 import { ContactPersonList } from './ContactPersonList';
+import { InformationList } from './InformationList';
 import { Space } from 'antd';
 import Yup from '@/utils/yup';
 
@@ -34,6 +35,7 @@ const getTabContent = (tabName, props) => {
         <Space direction="vertical">
           <General {...props}/>
           <ContactPersonList {...props}/>
+          <InformationList {...props}/>
         </Space>
       </CardContainer>
     )
@@ -43,7 +45,7 @@ const getTabContent = (tabName, props) => {
 const copayerDetailTabs = (props) => [
   {
     id: 0,
-    name: <span>General</span>,
+    name: <span>Details</span>,
     content: getTabContent('General', props)
   }
 ]
@@ -59,7 +61,7 @@ const Detail = (props) =>
   };
 
   const spacingSize = theme.spacing(1);
-
+  console.log('index', props);
   return (
     <React.Fragment>
       <Tabs style={{ marginTop: theme.spacing(1) }} defaultActiveKey='0' options={copayerDetailTabs(compProps)}/>
@@ -96,14 +98,14 @@ export default compose(
       return copayerDetail.entity ? copayerDetail.entity : copayerDetail.default;
     },
     validationSchema: Yup.object().shape({
-      code: Yup.string().required().max(30, 'Copayer Code should not exceed 30 characters'),
+      code: Yup.string().max(20, 'Copayer Code should not exceed 20 characters'),
       displayValue: Yup.string().required().max(200, 'Copayer Name should not exceed 200 characters'),
+      coPayerTypeFK: Yup.number().required(),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
-      creditInformation: Yup.string().max(200, 'Credit Information should not exceed 200 characters'),
+      creditInformation: Yup.string().max(300, 'Credit Information should not exceed 300 characters'),
       remark: Yup.string().max(200, 'Remarks should not exceed 200 characters'),
       website: Yup.string().max(100, 'Website should not exceed 100 characters'),
       address: Yup.object().shape({
-        countryFK: Yup.number().required(),
         postcode: Yup.string().max(10, 'Postcode should not exceed 10 characters'),
         blockNo: Yup.string().max(500, 'Block No should not exceed 500 characters'),
         unitNo: Yup.string().max(500, 'Unit No should not exceed 500 characters'),
