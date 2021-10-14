@@ -180,6 +180,13 @@ const Main = props => {
     }
     const _addOrder = () => {
       dispatch({
+        type: 'orders/updateState',
+        payload: {
+          type: '1',
+          visitPurposeFK: visitPurposeFK,
+        },
+      })
+      dispatch({
         type: 'dispense/query',
         payload: {
           id: workitem.visitFK,
