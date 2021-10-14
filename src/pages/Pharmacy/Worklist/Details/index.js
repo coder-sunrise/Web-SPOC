@@ -39,7 +39,9 @@ const PharmacyDetails = ({
           payload: { id: detailsId },
         }).then(r => {
           if (r) {
-            stopRefreshTimer()
+            if (stopRefreshTimer) {
+              stopRefreshTimer()
+            }
             setShowModal(true)
           } else {
             setDetailsId(undefined)
