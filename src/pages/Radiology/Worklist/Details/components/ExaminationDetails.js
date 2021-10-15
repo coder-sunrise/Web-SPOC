@@ -37,7 +37,7 @@ export const ExaminationDetails = ({
   if (!workitem) return <div></div>
 
   useEffect(() => {
-    onChange({ assignedRadiographers, comment, findings })
+    onChange({ assignedRadiographers, comment, ...findings })
   }, [assignedRadiographers, comment, findings])
 
   useEffect(() => {

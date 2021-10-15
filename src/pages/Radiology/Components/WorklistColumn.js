@@ -109,7 +109,15 @@ const sortItems = data => {
       sortValue: calculateSortValue(item),
     })),
     item => item.sortValue,
-  ).reverse()
+  )
+
+  const currentColumnStatus = data.workitems[0].statusFK
+  //New and In Progress show oldest at the top.
+  if (
+    currentColumnStatus === RADIOLOGY_WORKITEM_STATUS.NEW ||
+    currentColumnStatus === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
+  )
+    return sortedData.reverse()
 
   return sortedData
 }

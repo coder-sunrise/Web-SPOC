@@ -10,7 +10,7 @@ export const startSession = async () => {
   return response
 }
 
-export const endSession = async (sessionID) => {
+export const endSession = async sessionID => {
   const response = await request(`/api/bizsession/${sessionID}`, {
     method: 'PUT',
   })
@@ -24,25 +24,23 @@ export const reopenLastSession = async () => {
   return response
 }
 
-export const getBizSession = (params) =>
+export const getBizSession = params =>
   commonServices.queryList(bizSessionAPIURL, params)
 
-export const query = (params) => commonServices.query(bizSessionAPIURL, params)
+export const query = params => commonServices.query(bizSessionAPIURL, params)
 
-export const queryList = (params) =>
-  commonServices.queryList(queueAPIUrl, params)
+export const queryList = params => commonServices.queryList(queueAPIUrl, params)
 
-export const deleteQueue = (params) =>
-  commonServices.remove(queueAPIUrl, params)
+export const deleteQueue = params => commonServices.remove(queueAPIUrl, params)
 
-export const queryAppointmentListing = (params) =>
+export const queryAppointmentListing = params =>
   commonServices.queryList(`${appointmentAPIURL}`, {
     ...params,
     isCancelled: false,
     pagesize: 999,
   })
 
-export const updateQueueListing = async (params) => {
+export const updateQueueListing = async params => {
   const response = await request(`${queueAPIUrl}/QueueListing`, {
     method: 'PUT',
     body: params,
@@ -50,9 +48,12 @@ export const updateQueueListing = async (params) => {
   return response
 }
 
-export const setServingPerson = async (visitFK) => {
+export const setServingPerson = async visitFK => {
   const response = await request(`${queueAPIUrl}/SetServingPerson/${visitFK}`, {
     method: 'POST',
   })
   return response
 }
+
+export const queryVisitGroup = params =>
+  commonServices.query(`${queueAPIUrl}/GetVisitGroup`, params.visitID)

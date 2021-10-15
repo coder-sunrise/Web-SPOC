@@ -82,6 +82,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       search: false,
       fixed: 'left',
       width: 200,
+      sortBy: 'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.Name',
     },
     {
       key: 'patientReferenceNo',
@@ -90,6 +91,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 100,
+      sortBy: 'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.PatientReferenceNo',
     },
     {
       key: 'patientAccountNo',
@@ -98,6 +100,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 100,
+      sortBy: 'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo',
     },
     {
       key: 'genderAge',
@@ -123,6 +126,8 @@ const defaultColumns = (codetable, setDetailsId) => {
       key: 'orderDate',
       title: 'Order Time',
       dataIndex: 'orderDate',
+      defaultSortOrder: 'descend',
+      sortBy: 'WorkitemFKNavigation.GenerateDate',
       valueType: 'dateTime',
       render: (_dom: any, entity: any) =>
         entity.orderTime?.format('DD MMM YYYY HH:mm') || '-',
@@ -246,7 +251,7 @@ const defaultColumns = (codetable, setDetailsId) => {
         return (
           <DatePicker
             style={{ width: 250 }}
-            label='Order Date Form'
+            label='Order Date From'
             placeholder=''
           />
         )

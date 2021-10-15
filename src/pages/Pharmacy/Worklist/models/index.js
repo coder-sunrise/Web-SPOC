@@ -8,7 +8,7 @@ export default createListViewModel({
     service,
     state: {},
     setting: {},
-    subscriptions: ({ dispatch }) => { },
+    subscriptions: ({ dispatch }) => {},
     effects: {},
     reducers: {},
   },

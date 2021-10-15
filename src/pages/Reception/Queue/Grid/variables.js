@@ -66,7 +66,7 @@ const filterRadioWorkItem = workItem => {
 }
 
 const filterNurseWorkItem = workItem => {
-  return workItem.filter(x => x.type === 'NurseActualize')
+  return workItem.filter(x => x.nurseWorkitem)
 }
 
 const filterLabWorkItem = workItem => {

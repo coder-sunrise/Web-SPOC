@@ -76,7 +76,30 @@ export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
               {workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW &&
                 (workitem.visitWorkitems.length > 1 ? (
                   <Radio.Group
-                    onChange={e => setIsCombinedOrder(e.target.value)}
+                    onChange={e => {
+                      setIsCombinedOrder(e.target.value)
+
+                      if (e.target.value === false) {
+                        {
+                          const primaryWorkitemFK = workitem.visitWorkitems.find(
+                            w =>
+                              w.radiologyWorkitemId ===
+                              workitem.radiologyWorkitemId,
+                          ).primaryWorkitemFK
+                          const removeCombinedOrder = workitem.visitWorkitems.map(
+                            v => ({
+                              ...v,
+                              primaryWorkitemFK:
+                                primaryWorkitemFK === v.primaryWorkitemFK
+                                  ? null
+                                  : v.primaryWorkitemFK,
+                            }),
+                          )
+
+                          onCombinedOrderChange(removeCombinedOrder)
+                        }
+                      }
+                    }}
                     value={isCombinedOrder}
                   >
                     <Radio value={false}>No</Radio>
