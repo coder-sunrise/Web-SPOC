@@ -120,9 +120,6 @@ export default compose(
       return schemeDetail.entity ? schemeDetail.entity : schemeDetail.default
     },
     validationSchema: Yup.object().shape({
-      code: Yup.string()
-        .max(30),
-        // .required(),
       name: Yup.string()
         .required()
         .max(100),
@@ -142,7 +139,6 @@ export default compose(
 
       const { effectiveDates, ...restValues } = values
       const { dispatch, history, onConfirm } = props
-      console.log({ restValues })
       dispatch({
         type: 'schemeDetail/upsert',
         payload: {

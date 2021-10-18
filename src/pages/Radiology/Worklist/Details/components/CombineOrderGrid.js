@@ -13,19 +13,22 @@ export const CombineOrderGrid = ({
     {
       title: 'Accession No.',
       dataIndex: 'accessionNo',
-      key: 'name',
+      key: 'accessionNo',
       width: 100,
+      columnId: 'accessionNo',
     },
     {
       title: 'Examination',
       dataIndex: 'itemDescription',
       key: 'itemDescription',
+      columnId: 'itemDescription',
       width: 200,
     },
     {
       title: 'Priority',
       dataIndex: 'priority',
       key: 'priority',
+      columnId: 'priority',
       width: 80,
       align: 'center',
     },
@@ -33,6 +36,7 @@ export const CombineOrderGrid = ({
       title: 'Instruction',
       dataIndex: 'instruction',
       key: 'instruction',
+      columnId: 'instruction',
       width: 200,
       align: 'center',
     },
@@ -40,13 +44,14 @@ export const CombineOrderGrid = ({
       title: 'Remarks',
       dataIndex: 'remark',
       key: 'remark',
+      columnId: 'remark',
       width: 200,
       align: 'center',
     },
     {
       title: 'Combine',
-      dataIndex: 'itemDescription',
-      key: 'itemDescription',
+      key: 'combine',
+      columnId: 'isCombine',
       align: 'center',
       width: 40,
       render: (text, record, index) => {
@@ -83,9 +88,8 @@ export const CombineOrderGrid = ({
     },
     {
       title: 'Primary',
-      dataIndex: 'itemDescription',
-      key: 'itemDescription',
       align: 'center',
+      columnId: 'isPrimary',
       width: 40,
       render: (text, record, index) => {
         return (
@@ -146,39 +150,62 @@ export const CombineOrderGrid = ({
 
   useEffect(() => {
     if (visitWorkitems) {
-      const tmpConmbinableWorkitems = visitWorkitems.filter(
-        w =>
-          w.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW &&
-          (!w.primaryWorkitemFK ||
-            w.primaryWorkitemFK ===
-              visitWorkitems.find(
-                w => w.radiologyWorkitemId === currentWorkitemid,
-              ).primaryWorkitemFK),
+      const currentWorkitem = visitWorkitems.find(
+        w => w.radiologyWorkitemId === currentWorkitemid,
       )
-      setCombinableWorkitems(tmpConmbinableWorkitems)
 
-      //Prepare combined list, always include the current workitem.
-      //If only current workitem is in the combinedItems, it will consider as - not combined
-      const combined = [
-        ...visitWorkitems.filter(
-          w => w.radiologyWorkitemId === currentWorkitemid,
-        ),
-        ...tmpConmbinableWorkitems.filter(
+      if (currentWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW) {
+        const tmpConmbinableWorkitems = visitWorkitems.filter(
           w =>
-            w.primaryWorkitemFK && w.radiologyWorkitemId !== currentWorkitemid,
-        ),
-      ]
-
-      setCombinedItems(combined.map(w => w.radiologyWorkitemId))
-
-      if (combined && combined.length > 1)
-        setPrimaryId(
-          combined.filter(
-            c =>
-              c.primaryWorkitemFK !== null && c.primaryWorkitemFK !== undefined,
-          )[0].primaryWorkitemFK,
+            w.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW &&
+            (!w.primaryWorkitemFK ||
+              w.primaryWorkitemFK ===
+                visitWorkitems.find(
+                  w => w.radiologyWorkitemId === currentWorkitemid,
+                ).primaryWorkitemFK),
         )
-      else setPrimaryId(currentWorkitemid)
+        setCombinableWorkitems(tmpConmbinableWorkitems)
+
+        //Prepare combined list, always include the current workitem.
+        //If only current workitem is in the combinedItems, it will consider as - not combined
+        const combined = [
+          currentWorkitem,
+          ...tmpConmbinableWorkitems.filter(
+            w =>
+              w.primaryWorkitemFK &&
+              w.radiologyWorkitemId !== currentWorkitemid,
+          ),
+        ]
+
+        setCombinedItems(combined.map(w => w.radiologyWorkitemId))
+
+        if (combined && combined.length > 1)
+          setPrimaryId(
+            combined.filter(
+              c =>
+                c.primaryWorkitemFK !== null &&
+                c.primaryWorkitemFK !== undefined,
+            )[0].primaryWorkitemFK,
+          )
+        else setPrimaryId(currentWorkitemid)
+      } else {
+        const combined = visitWorkitems.filter(
+          w => w.primaryWorkitemFK === currentWorkitem.primaryWorkitemFK,
+        )
+
+        setCombinedItems(combined)
+        setCombinableWorkitems(combined)
+
+        if (combined && combined.length > 1)
+          setPrimaryId(
+            combined.filter(
+              c =>
+                c.primaryWorkitemFK !== null &&
+                c.primaryWorkitemFK !== undefined,
+            )[0].primaryWorkitemFK,
+          )
+        else setPrimaryId(currentWorkitemid)
+      }
     }
   }, [visitWorkitems])
 
@@ -188,8 +215,15 @@ export const CombineOrderGrid = ({
       bordered
       size='small'
       pagination={false}
-      columns={columns}
-      dataSource={combinableWorkitems.sort((a, b) => a.remark > b.remark)}
+      columns={(() => {
+        const currentWorkitem = visitWorkitems.find(
+          v => v.radiologyWorkitemId === currentWorkitemid,
+        )
+        if (currentWorkitem.statusFK !== RADIOLOGY_WORKITEM_STATUS.NEW)
+          return columns.filter(c => c.columnId !== 'isCombine')
+        return columns
+      })()}
+      dataSource={combinableWorkitems}
     />
   )
 }

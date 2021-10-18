@@ -26,8 +26,6 @@ export default createFormViewModel({
         })
 
         yield take('patient/query/@@end')
-
-        const patientInfo = yield select(st => st.patient)
       },
       *initState({ payload }, { call, select, put, take }) {},
       *updateRadiologyWorkitem({ payload }, { put, select, call }) {

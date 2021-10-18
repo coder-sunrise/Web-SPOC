@@ -48,6 +48,7 @@ const Detail = ({ height, ...props }) => {
                     label={formatMessage({
                       id: 'finance.scheme.detail.code',
                     })}
+                    disabled
                     {...args}
                   />
                 )

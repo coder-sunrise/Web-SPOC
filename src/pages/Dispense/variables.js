@@ -19,6 +19,7 @@ import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import PackageDrawdownInfo from '@/pages/Widgets/Orders/Detail/PackageDrawdownInfo'
 import { InventoryTypes } from '@/utils/codes'
 import CONSTANTS from './DispenseDetails/constants'
+import Cross from '@material-ui/icons/HighlightOff'
 import {
   UnorderedListOutlined,
   CheckOutlined,
@@ -233,10 +234,6 @@ export const DispenseItemsColumns = [
     ),
   },
   {
-    name: 'stockBalance',
-    title: 'Balance Qty.',
-  },
-  {
     name: 'stock',
     title: 'Stock Qty.',
   },
@@ -247,6 +244,10 @@ export const DispenseItemsColumns = [
   {
     name: 'expiryDate',
     title: 'Expiry Date',
+  },
+  {
+    name: 'stockBalance',
+    title: 'Balance Qty.',
   },
   {
     name: 'instruction',
@@ -636,14 +637,12 @@ export const DispenseItemsColumnExtensions = (
     },
     {
       columnName: 'stockBalance',
-      width: 100,
+      width: 95,
       disabled: true,
       sortingEnabled: false,
       render: row => {
         const balStock = row.stockBalance
-        const stock = balStock
-          ? `${numeral(balStock).format('0.0')} ${row.uomDisplayValue || ''}`
-          : '-'
+        const stock = balStock ? `${numeral(balStock).format('0.0')}` : '-'
         return (
           <Tooltip title={stock}>
             <span>{stock}</span>
@@ -878,7 +877,7 @@ const radiologyWorkitemStatus = radiologyWorkitemStatusFK => {
         <div
           style={{
             position: 'absolute',
-            bottom: 2,
+            bottom: -4,
             right: -20,
             cursor: 'pointer',
           }}
