@@ -8,7 +8,6 @@ import {
   ExclamationCircleOutlined, PlusOutlined,
   CloseCircleFilled, SaveFilled, DeleteFilled, EditFilled
 } from '@ant-design/icons';
-import Add from '@material-ui/icons/Add';
 import Print from '@material-ui/icons/Print';
 import styles from './ContactPersonList.less';
 
@@ -99,30 +98,26 @@ const EditableCell = ({ col, editing, editingKey, record, index, children, onErr
     }
   }
 
-  let errorIconWidth = 18;
-  let cellPadding = 10 * 2;
-  let inputBoxWidth = col.width - cellPadding;
+  //===== Styles =====//
+  let inputContainerStyle = {
+    display: 'flex',
+    width: '100%'
+  }
   let inputBoxStyle = {
     borderStyle: 'none none solid none',
     borderRadius: 0,
     outline: 'none',
     boxShadow: 'none',
   }
-  let inputContainerStyle = {
-    margin: 0,
-    display: 'inline-block',
-    width: inputBoxWidth,
-  }
 
+  //===== Component (Error Icon) =====//
   let errorIcon = undefined;
   if (validationError && validationError.hasError) {
     let errorIconStyle = {
-      width: errorIconWidth,
       color: 'red',
-      display: 'inline-block',
-      verticalAlign: 'middle',
+      minWidth: 18,
       marginTop: 10,
-      marginLeft: 2,
+      marginLeft: 4,
     }
 
     errorIcon = (
@@ -131,36 +126,32 @@ const EditableCell = ({ col, editing, editingKey, record, index, children, onErr
       </Tooltip>
     )
     
-    inputBoxWidth -= errorIconWidth;
-
     inputBoxStyle = {
       ...inputBoxStyle,
       borderColor: 'red',
     }
-
-    inputContainerStyle = {
-      ...inputContainerStyle,
-      width: inputBoxWidth,
-    }
   }
 
+  //===== Component (Main) =====//
   cell = (
     <React.Fragment>
-      <Form.Item name={col.dataIndex} style={inputContainerStyle}>
-        <Input 
-          key={col.dataIndex}
-          style={inputBoxStyle}
-          onChange={onFieldChanged} 
-          autoComplete='off'
-          ref={inputRef}
-          //=== Cannot use Ant Design Component default suffix feature, 
-          //=== redrawing with suffix will cause control lost focus.
-          //=== Manual refocus does not help as the cursor will refresh to the last character
-          // suffix={errorIcon}
-        />
-        
-      </Form.Item>
-      {errorIcon}
+      <div style={inputContainerStyle}>
+        <Form.Item name={col.dataIndex} style={{margin: 0, width: '100%'}}>
+          <Input 
+            key={col.dataIndex}
+            style={inputBoxStyle}
+            onChange={onFieldChanged} 
+            autoComplete='off'
+            ref={inputRef}
+            
+            //=== Cannot use Ant Design Component default suffix feature, 
+            //=== redrawing with suffix will cause control lost focus.
+            //=== Manual refocus does not help as the cursor will refresh to the last character
+            // suffix={errorIcon}
+          />
+        </Form.Item>
+        {errorIcon}
+      </div>
     </React.Fragment>
   );
 
@@ -169,6 +160,7 @@ const EditableCell = ({ col, editing, editingKey, record, index, children, onErr
 
 export const ContactPersonList = (props) => {
   const { dispatch, values } = props;
+  const { onEditingListControl } = props;
   const { contactPersons } = values;
 
   const [form] = Form.useForm();
@@ -193,6 +185,10 @@ export const ContactPersonList = (props) => {
     form.setFieldsValue({...record});
     setEditingHasError(false);
     setEditingKey(record.key);
+
+    if (onEditingListControl) {
+      onEditingListControl('Contact Person', true);
+    }
   };
 
   const cancel = async (record) => {
@@ -203,6 +199,10 @@ export const ContactPersonList = (props) => {
         deleteExisting(record);
       } else {
         setEditingKey('');
+      }
+
+      if (onEditingListControl) {
+        onEditingListControl('Contact Person', false);
       }
     } catch (errInfo) {
       console.log('Validation Failed:', errInfo);
@@ -227,6 +227,10 @@ export const ContactPersonList = (props) => {
         setEditingKey('');
         
         props.setFieldValue('contactPersons', newData);
+
+        if (onEditingListControl) {
+          onEditingListControl('Contact Person', false);
+        }
       }
     } catch (errInfo) {
       console.log('Validation Failed:', errInfo);
@@ -415,6 +419,7 @@ export const ContactPersonList = (props) => {
           fontSize: 16,
           marginLeft: 4,
           marginRight: 4,
+          marginTop: 4,
         }
 
         const alertActionIconStyle = {

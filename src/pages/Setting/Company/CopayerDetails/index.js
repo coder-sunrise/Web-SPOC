@@ -12,7 +12,7 @@ import {
 import { General } from './General';
 import { ContactPersonList } from './ContactPersonList';
 import { InformationList } from './InformationList';
-import { Space } from 'antd';
+import { Space, Tooltip } from 'antd';
 import Yup from '@/utils/yup';
 
 const styles = () => ({
@@ -55,17 +55,57 @@ const Detail = (props) =>
   const { classes, theme } = props;
   const { copayerDetail, clinicSettings } = props;
   const { handleSubmit } = props;
+  
+  const spacingSize = theme.spacing(1);
+
+  const [editingLists, setEditingLists] = useState([]);
+
+  const onEditingList = (listName, isEditing) => {
+    let newEditingList = [];
+    
+    console.log('on edit before', {listName, isEditing}, editingLists);
+    if (isEditing) {
+      newEditingList = editingLists.concat(listName);
+    } 
+    else {
+      if (editingLists && editingLists.length > 0) {
+        newEditingList = editingLists.filter(function(x) { return x !== listName; });
+      }
+    }
+
+    console.log('on edit after', {listName, isEditing}, newEditingList);
+    setEditingLists(newEditingList);
+  };
+
   const compProps = {
     height: `calc(100vh - ${183 + theme.spacing(1)}px)`,
+    onEditingListControl: onEditingList,
     ...props
   };
 
-  const spacingSize = theme.spacing(1);
-  console.log('index', props);
-  return (
-    <React.Fragment>
-      <Tabs style={{ marginTop: theme.spacing(1) }} defaultActiveKey='0' options={copayerDetailTabs(compProps)}/>
-      <div style={{textAlign: 'center'}}>
+  const ActionButtons = (props) => {
+    const disabledSaveButton = editingLists && editingLists.length > 0;
+    let saveButton = (
+      <ProgressButton
+        disabled={disabledSaveButton}
+        submitKey='schemeDetail/submit'
+        onClick={handleSubmit}
+      />
+    )
+
+    if (disabledSaveButton) {
+      let editingMsg = 'Complete edit ' + editingLists[0] + ' to save';
+      saveButton = (
+        <Tooltip title={editingMsg} placement='top'>
+          <span>
+            {saveButton}
+          </span>
+        </Tooltip>
+      )
+    }
+    
+    return (
+      <React.Fragment>
         <Button
           authority='none'
           color='danger'
@@ -73,10 +113,16 @@ const Detail = (props) =>
         >
           Close
         </Button>
-        <ProgressButton
-          submitKey='schemeDetail/submit'
-          onClick={handleSubmit}
-        />
+        {saveButton}
+      </React.Fragment>
+    )
+  };
+
+  return (
+    <React.Fragment>
+      <Tabs style={{ marginTop: theme.spacing(1) }} defaultActiveKey='0' options={copayerDetailTabs(compProps)}/>
+      <div style={{textAlign: 'center'}}>
+        <ActionButtons {...props}/>
       </div>
     </React.Fragment>
   );

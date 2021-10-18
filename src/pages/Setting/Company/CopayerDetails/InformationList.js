@@ -3,16 +3,19 @@ import {
   GridContainer, GridItem, Button,
   Checkbox, TextField, FastField, Field, Tooltip
 } from '@/components';
-import { Table, Radio, Input, Form, Popconfirm, Typography, Space } from 'antd';
+import { Table, Radio, Input, InputNumber, Form, Popconfirm, Typography, Space } from 'antd';
 import { 
   ExclamationCircleOutlined, PlusOutlined,
   CloseCircleFilled, SaveFilled, DeleteFilled, EditFilled
 } from '@ant-design/icons';
-import Add from '@material-ui/icons/Add';
 import Print from '@material-ui/icons/Print';
 import styles from './ContactPersonList.less';
 
+const { TextArea } = Input;
 const EditableCell = ({ col, editing, editingKey, record, index, children, onErrorStatusChanged, ...restProps}) => {
+  let cellContainerStyle = {
+    verticalAlign: 'top',
+  }
   let cell = (
     <React.Fragment>
       {children}
@@ -22,15 +25,21 @@ const EditableCell = ({ col, editing, editingKey, record, index, children, onErr
   //=============== Non-editing / non-editable cell (e.g. Action Column) ===============
   if (!col) { return (<td {...restProps}>{cell}</td>); }
   if (!editing) {
-    if (col.inputType && (col.inputType === 'text' || col.inputType === 'number')) {
-      cell = (
-        <Tooltip title={record[col.dataIndex]} placement='bottom'>
-          <span className={styles.cellNonWrapableText} style={{width: col.width - 20}}>{record[col.dataIndex]}</span>
-        </Tooltip>
-      )
+    if (col.inputType && col.inputType === 'number') {
+      cellContainerStyle = {
+        ...cellContainerStyle,
+        textAlign: 'center',
+      }
     }
-
-    return (<td {...restProps}>{cell}</td>);
+    else
+    {
+      cellContainerStyle = {
+        ...cellContainerStyle,
+        whiteSpace: 'pre-line',
+      }
+    }
+    
+    return (<td {...restProps} style={cellContainerStyle}><p>{cell}</p></td>);
   }
 
   //=============== Editable cell ===============//
@@ -41,7 +50,7 @@ const EditableCell = ({ col, editing, editingKey, record, index, children, onErr
 
   //===== Hooks =====//
   useEffect(() => {
-    if (col.key === 'name') {
+    if (col.key === 'type') {
       inputRef.current.focus();
     }
   }, [initialized])
@@ -86,31 +95,25 @@ const EditableCell = ({ col, editing, editingKey, record, index, children, onErr
   }
 
   //===== Styles =====//
-  let errorIconWidth = 18;
-  let cellPadding = 10 * 2;
-  let inputBoxWidth = col.width - cellPadding;
+  let inputContainerStyle = {
+    display: 'flex',
+    width: '100%'
+  }
   let inputBoxStyle = {
     borderStyle: 'none none solid none',
     borderRadius: 0,
     outline: 'none',
     boxShadow: 'none',
   }
-  let inputContainerStyle = {
-    margin: 0,
-    display: 'inline-block',
-    width: inputBoxWidth,
-  }
 
   //===== Component (Error Icon) =====//
   let errorIcon = undefined;
   if (validationError && validationError.hasError) {
     let errorIconStyle = {
-      width: errorIconWidth,
       color: 'red',
-      display: 'inline-block',
-      verticalAlign: 'middle',
+      minWidth: 18,
       marginTop: 10,
-      marginLeft: 2,
+      marginLeft: 4,
     }
 
     errorIcon = (
@@ -119,41 +122,59 @@ const EditableCell = ({ col, editing, editingKey, record, index, children, onErr
       </Tooltip>
     )
     
-    inputBoxWidth -= errorIconWidth;
-
     inputBoxStyle = {
       ...inputBoxStyle,
       borderColor: 'red',
-    }
-
-    inputContainerStyle = {
-      ...inputContainerStyle,
-      width: inputBoxWidth,
     }
   }
 
   //===== Component (Main) =====//
   cell = (
     <React.Fragment>
-      <Form.Item name={col.dataIndex} style={inputContainerStyle}>
-        <Input 
-          key={col.dataIndex}
-          style={inputBoxStyle}
-          onChange={onFieldChanged} 
-          autoComplete='off'
-          ref={inputRef}
-        />
-        
-      </Form.Item>
-      {errorIcon}
+      <div style={inputContainerStyle}>
+        <Form.Item name={col.dataIndex} style={{margin: 0, width: '100%'}}>
+          {/* <Input 
+            key={col.dataIndex}
+            style={inputBoxStyle}
+            onChange={onFieldChanged} 
+            autoComplete='off'
+            ref={inputRef}/> */}
+          {
+            col.inputType === 'number'? (
+              <InputNumber
+                key={col.dataIndex}
+                style={inputBoxStyle}
+                autoComplete='off'
+                ref={inputRef}
+                min={0} max={2147483647}
+              />
+            ) : (
+              <TextArea 
+                key={col.dataIndex}
+                style={inputBoxStyle}
+                onChange={onFieldChanged} 
+                autoComplete='off'
+                ref={inputRef}
+                autoSize={{minRows: 1}}
+              />
+            )
+          }
+        </Form.Item>
+        {errorIcon}
+      </div>
     </React.Fragment>
   );
 
-  return (<td {...restProps}>{cell}</td>);
+  return (
+    <td {...restProps} style={cellContainerStyle}>
+      {cell}
+    </td>
+  );
 }
 
 export const InformationList = (props) => {
   const { dispatch, values } = props;
+  const { onEditingListControl } = props;
   const { informations } = values;
 
   const [form] = Form.useForm();
@@ -164,7 +185,6 @@ export const InformationList = (props) => {
 
   const isEditing = (record) => record.key === editingKey;
 
-  console.log('info', props);
   useEffect(() => {
     setData(informations);
   }, [informations]);
@@ -189,7 +209,7 @@ export const InformationList = (props) => {
       isDeleted: false,
       isNewRecord: true, recordStatus: 'Adding',
     };
-
+    
     edit(newInfo);
 
     let newInfoList = [...data, newInfo];
@@ -200,6 +220,10 @@ export const InformationList = (props) => {
     form.setFieldsValue({...record});
     setEditingHasError(false);
     setEditingKey(record.key);
+
+    if (onEditingListControl) {
+      onEditingListControl('Information', true);
+    }
   };
 
   const save = async (recordKey) => {
@@ -220,6 +244,10 @@ export const InformationList = (props) => {
         setEditingKey('');
         
         props.setFieldValue('informations', newData);
+
+        if (onEditingListControl) {
+          onEditingListControl('Information', false);
+        }
       }
     } catch (errInfo) {
       console.log('Validation Failed:', errInfo);
@@ -234,6 +262,10 @@ export const InformationList = (props) => {
         deleteExisting(record);
       } else {
         setEditingKey('');
+      }
+
+      if (onEditingListControl) {
+        onEditingListControl('Information', false);
       }
     } catch (errInfo) {
       console.log('Validation Failed:', errInfo);
@@ -299,7 +331,7 @@ export const InformationList = (props) => {
       ],
     },
     {
-      title: 'Summary', width: 350,
+      title: 'Summary', width: 400,
       dataIndex: 'summary', key: 'summary',
       editable: true, inputType: 'text',
       editableRules: [
@@ -330,6 +362,7 @@ export const InformationList = (props) => {
           fontSize: 16,
           marginLeft: 4,
           marginRight: 4,
+          marginTop: 4,
         }
 
         const alertActionIconStyle = {
@@ -446,7 +479,7 @@ export const InformationList = (props) => {
           onClick={addNew}
         >
           <PlusOutlined style={{marginRight: 6}}/>
-          New Contact Person
+          New Information
         </Typography.Link>
       </div>
     </React.Fragment>

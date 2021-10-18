@@ -121,8 +121,8 @@ export default compose(
     },
     validationSchema: Yup.object().shape({
       code: Yup.string()
-        .required()
         .max(30),
+        // .required(),
       name: Yup.string()
         .required()
         .max(100),

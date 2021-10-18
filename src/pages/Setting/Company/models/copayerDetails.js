@@ -81,6 +81,14 @@ export default createFormViewModel({
           }
         }
 
+        if (data.informations && data.informations.length > 0) {
+          for (let i = 0; i < data.informations.length; i++) {
+            data.informations[i].key = i;
+            data.informations[i].recordStatus = 'Existing';
+            data.informations[i].isNewRecord = false;
+          }
+        }
+
         return {
           ...state,
           entity: {
