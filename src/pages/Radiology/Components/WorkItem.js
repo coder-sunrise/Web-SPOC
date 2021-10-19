@@ -2,6 +2,8 @@ import React, { Fragment, useState, useEffect, useContext } from 'react'
 import { Typography, Card } from 'antd'
 import ProCard from '@ant-design/pro-card'
 import moment from 'moment'
+import { useSelector } from 'dva'
+import numeral from 'numeral'
 import { Icon, dateFormatLongWithTimeNoSec, Tooltip } from '@/components'
 import {
   VISIT_TYPE,
@@ -12,6 +14,7 @@ import {
 } from '@/utils/constants'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import WorklistContext from '../Worklist/WorklistContext'
+import VisitGroupIcon from './VisitGroupIcon'
 
 const blueColor = '#1890f8'
 
@@ -114,6 +117,12 @@ const WorkitemBody = ({ item }) => {
     false,
   )
 
+  const clinicSettings = useSelector(s => s.clinicSettings)
+  const { isQueueNoDecimal } = clinicSettings.settings || {}
+  const queueNo =
+    !item.visitInfo.queueNo || !item.visitInfo.queueNo.trim().length
+      ? '-'
+      : numeral(item.visitInfo.queueNo).format(isQueueNoDecimal ? '0.0' : '0')
   return (
     <div
       style={{
@@ -155,18 +164,15 @@ const WorkitemBody = ({ item }) => {
           </WorkitemLeftLabel>
         </div>
         <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-          <div>Q.No.: {item.visitInfo.queueNo}</div>
+          <div>Q.No.: {queueNo}</div>
+
           {item.visitInfo.visitGroup ? (
             <div>
-              <Icon
-                type='family'
-                style={{
-                  color: 'red',
-                  fontSize: '1.2rem',
-                  marginRight: 10,
-                }}
+              <VisitGroupIcon
+                visitGroup={item.visitInfo.visitGroup}
+                visitFK={item.visitFK}
+                isQueueNoDecimal={isQueueNoDecimal}
               />
-              {item.visitInfo.visitGroup}
             </div>
           ) : (
             <EmptyDiv />

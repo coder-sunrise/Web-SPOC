@@ -530,6 +530,20 @@ const _routes = [
             component: './Setting/Company',
             authority: ['finance/copayer'],
           },
+          {
+            path: '/finance/copayer/newcopayer',
+            name: 'copayer/newcopayer',
+            hideInMenu: true,
+            component: './Setting/Company/CopayerDetails',
+            authority: ['finance/copayer'],
+          },
+          {
+            path: '/finance/copayer/editcopayer',
+            name: 'copayer/editcopayer',
+            hideInMenu: true,
+            component: './Setting/Company/CopayerDetails',
+            authority: ['finance/copayer'],
+          },
         ],
       },
       //
