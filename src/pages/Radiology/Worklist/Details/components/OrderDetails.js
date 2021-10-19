@@ -78,27 +78,6 @@ export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
                   <Radio.Group
                     onChange={e => {
                       setIsCombinedOrder(e.target.value)
-
-                      if (e.target.value === false) {
-                        {
-                          const primaryWorkitemFK = workitem.visitWorkitems.find(
-                            w =>
-                              w.radiologyWorkitemId ===
-                              workitem.radiologyWorkitemId,
-                          ).primaryWorkitemFK
-                          const removeCombinedOrder = workitem.visitWorkitems.map(
-                            v => ({
-                              ...v,
-                              primaryWorkitemFK:
-                                primaryWorkitemFK === v.primaryWorkitemFK
-                                  ? null
-                                  : v.primaryWorkitemFK,
-                            }),
-                          )
-
-                          onCombinedOrderChange(removeCombinedOrder)
-                        }
-                      }
                     }}
                     value={isCombinedOrder}
                   >

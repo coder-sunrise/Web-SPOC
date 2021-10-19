@@ -16,7 +16,7 @@ import { formatMessage } from 'umi'
 import { getAppendUrl } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import {
-  RadiologyWorkitemStatus,
+  RADIOLOGY_WORKITEM_STATUS_TITLE,
   VISIT_TYPE_NAME,
   VISIT_TYPE,
 } from '@/utils/constants'
@@ -221,7 +221,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       search: false,
       width: 85,
       render: (_dom: any, entity: any) => {
-        const vt = (visitPurpose||[]).find(x => x.id === entity.visitType)
+        const vt = (visitPurpose || []).find(x => x.id === entity.visitType)
         return vt?.code
       },
     },
@@ -278,7 +278,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       sorter: false,
       search: false,
       renderText: (item, { type, defaultRender, ...rest }, form) =>
-        Object.values(RadiologyWorkitemStatus)[item - 1],
+        Object.values(RADIOLOGY_WORKITEM_STATUS_TITLE)[item - 1],
       width: 100,
       fixed: 'right',
     },
@@ -591,8 +591,7 @@ const RadiologyWorklistHistoryIndex = ({
       payload: {
         code: 'ctvisitpurpose',
       },
-    })    
-    
+    })
   })
 
   let visitTypeSettingsObj = undefined
@@ -628,7 +627,10 @@ const RadiologyWorklistHistoryIndex = ({
     visitPurpose = mapVisitType(
       codetable.ctvisitpurpose,
       visitTypeSettingsObj,
-    ).filter(vstType => vstType.id != VISIT_TYPE.OTC && vstType['isEnabled'] === 'true')
+    ).filter(
+      vstType =>
+        vstType.id != VISIT_TYPE.OTC && vstType['isEnabled'] === 'true',
+    )
   }
 
   const columns = defaultColumns(codetable, setDetailsId, visitPurpose)
@@ -755,7 +757,7 @@ const historyIndex = compose(
   connect(({ radiologyHisotry, codetable, clinicSettings }) => ({
     radiologyHisotry,
     codetable,
-    clinicSettings:clinicSettings.settings || clinicSettings.default,
+    clinicSettings: clinicSettings.settings || clinicSettings.default,
   })),
 )(HistoryIndex)
 

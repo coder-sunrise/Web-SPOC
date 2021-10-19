@@ -23,7 +23,6 @@ import { SectionTitle, RightAlignGridItem } from '../../Components'
 import {
   RADIOLOGY_WORKITEM_STATUS,
   RADIOLOGY_WORKITEM_BUTTON,
-  RadiologyWorkitemStatus,
 } from '@/utils/constants'
 import WorklistContext from '../WorklistContext'
 import { examinationSteps } from '@/utils/codes'

@@ -3,11 +3,19 @@ import { Typography, Card } from 'antd'
 import ProCard from '@ant-design/pro-card'
 import moment from 'moment'
 import { Icon, dateFormatLongWithTimeNoSec, Tooltip } from '@/components'
-import { VISIT_TYPE, VISIT_TYPE_NAME } from '@/utils/constants'
+import {
+  VISIT_TYPE,
+  VISIT_TYPE_NAME,
+  RADIOLOGY_WORKITEM_STATUS,
+  RADIOLOGY_WORKLIST_STATUS_COLOR,
+  GENDER,
+} from '@/utils/constants'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import WorklistContext from '../Worklist/WorklistContext'
 
 const blueColor = '#1890f8'
+
+const EmptyDiv = () => <div>&nbsp;</div>
 
 const WorkitemLeftLabel = ({
   children,
@@ -34,6 +42,7 @@ const WorkitemLeftLabel = ({
 
 const WorkitemTitle = ({ item }) => {
   const age = calculateAgeFromDOB(item.patientInfo.dob)
+  const gender = item.patientInfo.genderFK === GENDER.MALE ? 'male' : 'female'
 
   return (
     <div
@@ -50,7 +59,10 @@ const WorkitemTitle = ({ item }) => {
           marginRight: 'auto',
         }}
       >
-        <WorkitemLeftLabel style={{ color: blueColor, fontWeight: 500 }}>
+        <WorkitemLeftLabel
+          tooltip={item.patientInfo.name}
+          style={{ color: blueColor, fontWeight: 500 }}
+        >
           {item.patientInfo.name}
         </WorkitemLeftLabel>
         <WorkitemLeftLabel tooltip={item.patientInfo.patientReferenceNo}>
@@ -59,9 +71,23 @@ const WorkitemTitle = ({ item }) => {
       </div>
       <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
         <div>
-          <Icon type='male' style={{ color: blueColor, fontSize: 15 }} />
+          <Tooltip title={gender}>
+            <span>
+              <Icon
+                type={gender}
+                style={{
+                  color:
+                    item.patientInfo.genderFK === GENDER.MALE
+                      ? blueColor
+                      : 'red',
+                  fontSize: 15,
+                }}
+              />
+            </span>
+          </Tooltip>
           {age} {age === 1 ? 'Yr' : 'Yrs'}
         </div>
+
         <div
           style={{
             textOverflow: 'ellipsis',
@@ -78,11 +104,16 @@ const WorkitemTitle = ({ item }) => {
 }
 
 const WorkitemBody = ({ item }) => {
-  const { setDetailsId } = useContext(WorklistContext)
+  const { setDetailsId, visitPurpose } = useContext(WorklistContext)
   const orderDate = moment(item.generateDate).format(
     dateFormatLongWithTimeNoSec,
     false,
   )
+  const statusUpdateDate = moment(item.statusUpdateDate).format(
+    dateFormatLongWithTimeNoSec,
+    false,
+  )
+
   return (
     <div
       style={{
@@ -101,7 +132,10 @@ const WorkitemBody = ({ item }) => {
         }}
       >
         <div style={{ marginRight: 'auto', flexGrow: 1 }}>
-          <WorkitemLeftLabel style={{ fontWeight: 500 }}>
+          <WorkitemLeftLabel
+            style={{ fontWeight: 500 }}
+            tooltip={item.itemDescription}
+          >
             {item.itemDescription}
           </WorkitemLeftLabel>
           <WorkitemLeftLabel tooltip={item.accessionNo}>
@@ -113,12 +147,16 @@ const WorkitemBody = ({ item }) => {
               />
             )}
           </WorkitemLeftLabel>
-          <WorkitemLeftLabel>{item.visitInfo.doctorName}</WorkitemLeftLabel>
-          <WorkitemLeftLabel>{orderDate}</WorkitemLeftLabel>
+          <WorkitemLeftLabel tooltip={item.visitInfo.doctorName}>
+            {item.visitInfo.doctorName}
+          </WorkitemLeftLabel>
+          <WorkitemLeftLabel tooltip='Order Created Time'>
+            {orderDate}
+          </WorkitemLeftLabel>
         </div>
         <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
           <div>Q.No.: {item.visitInfo.queueNo}</div>
-          {item.visitInfo.visitGroup && (
+          {item.visitInfo.visitGroup ? (
             <div>
               <Icon
                 type='family'
@@ -130,7 +168,17 @@ const WorkitemBody = ({ item }) => {
               />
               {item.visitInfo.visitGroup}
             </div>
+          ) : (
+            <EmptyDiv />
           )}
+          <EmptyDiv />
+          <div
+            style={{
+              color: RADIOLOGY_WORKLIST_STATUS_COLOR[`${item.statusFK}`],
+            }}
+          >
+            {statusUpdateDate}
+          </div>
         </div>
       </div>
       <div
@@ -178,7 +226,9 @@ const WorkitemBody = ({ item }) => {
             justifySelf: 'center',
           }}
         >
-          {item.visitPurposeFK !== VISIT_TYPE.MC ? 'O/P' : 'MC'}
+          {visitPurpose &&
+            item?.visitInfo &&
+            visitPurpose.find(p => p.id === item.visitInfo.visitPurposeFK).code}
         </span>
       </div>
     </div>
@@ -193,7 +243,9 @@ export const Workitem = item => (
       margin: '10px 5px',
       borderRadius: 10,
       backgroundColor:
-        item.isNurseActualized || !item.isNurseActualizeRequired
+        ((item.isNurseActualized || !item.isNurseActualizeRequired) &&
+          item.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW) ||
+        item.statusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
           ? '#d3fed1'
           : 'white',
       border: '#cdcdcd solid 2px',

@@ -2,7 +2,11 @@ import React, { Fragment, useState, useEffect, useContext } from 'react'
 import ProCard from '@ant-design/pro-card'
 import { compose } from 'redux'
 import { useSelector, useDispatch, connect } from 'dva'
-import { RadiologyWorkitemStatus } from '@/utils/constants'
+import {
+  RADIOLOGY_WORKITEM_STATUS_TITLE,
+  RADIOLOGY_WORKITEM_STATUS,
+  RADIOLOGY_WORKLIST_STATUS_COLOR,
+} from '@/utils/constants'
 import _ from 'lodash'
 import { CommonModal } from '@/components'
 import RadiologyDetails from './Details'
@@ -11,23 +15,34 @@ import WorklistContext, { WorklistContextProvider } from './WorklistContext'
 
 const columnsTemplate = [
   {
-    backgroundColor: '#009933',
+    backgroundColor:
+      RADIOLOGY_WORKLIST_STATUS_COLOR[RADIOLOGY_WORKITEM_STATUS.NEW],
     title: 'New',
     workitems: [],
   },
   {
-    backgroundColor: '#960',
+    backgroundColor:
+      RADIOLOGY_WORKLIST_STATUS_COLOR[RADIOLOGY_WORKITEM_STATUS.INPROGRESS],
     title: 'In Progress',
     workitems: [],
   },
   {
-    backgroundColor: '#099',
+    backgroundColor:
+      RADIOLOGY_WORKLIST_STATUS_COLOR[
+        RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED
+      ],
     title: 'Modality Completed',
     workitems: [],
   },
-  { backgroundColor: '#366', title: 'Completed', workitems: [] },
   {
-    backgroundColor: '#797979',
+    backgroundColor:
+      RADIOLOGY_WORKLIST_STATUS_COLOR[RADIOLOGY_WORKITEM_STATUS.COMPLETED],
+    title: 'Completed',
+    workitems: [],
+  },
+  {
+    backgroundColor:
+      RADIOLOGY_WORKLIST_STATUS_COLOR[RADIOLOGY_WORKITEM_STATUS.CANCELLED],
     title: 'Cancelled',
     workitems: [],
   },
@@ -48,7 +63,7 @@ const RadiologyWorklist = props => {
     if (entity && entity.list) {
       const worklist = entity.list.map(w => ({
         ...w,
-        status: RadiologyWorkitemStatus[w.statusFK],
+        status: RADIOLOGY_WORKITEM_STATUS_TITLE[w.statusFK],
       }))
 
       const mapped = columnsTemplate.map(item => ({

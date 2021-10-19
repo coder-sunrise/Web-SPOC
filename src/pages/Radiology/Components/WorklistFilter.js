@@ -19,7 +19,7 @@ import WorklistContext from '../Worklist/WorklistContext'
 export const WorklistFilter = () => {
   const [form] = Form.useForm()
   const dispatch = useDispatch()
-  const { showDetails, visitPurpose } = useContext(WorklistContext)
+  const { showDetails, visitPurpose = [] } = useContext(WorklistContext)
   const { settings } = useSelector(s => s.clinicSettings)
 
   const timer = React.useRef(null)
@@ -44,6 +44,18 @@ export const WorklistFilter = () => {
 
     return () => clearInterval(timer.current)
   }, [showDetails])
+
+  const getVisitTypes = () => {
+    if (!visitPurpose) return []
+    console.log('visitPurpose', visitPurpose)
+    return visitPurpose
+      .filter(p => p.id !== VISIT_TYPE.OTC)
+      .map(c => ({
+        name: c.name,
+        value: c.id,
+        customTooltipField: `Code: ${c.code}\nName: ${c.name}`,
+      }))
+  }
 
   const handleSearch = () => {
     const {
@@ -85,13 +97,11 @@ export const WorklistFilter = () => {
         />
       </Form.Item>
       <Form.Item name='visitType'>
-        <CodeSelect
+        <Select
           label='Visit Type'
-          code='ctvisitpurpose'
-          options={visitPurpose || []}
+          options={getVisitTypes()}
           style={{ width: 180 }}
           mode='multiple'
-          localFilter={item => item.id !== VISIT_TYPE.RETAIL}
         />
       </Form.Item>
       <Form.Item name='modality'>
