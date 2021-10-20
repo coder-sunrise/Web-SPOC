@@ -1,10 +1,7 @@
 import { Steps } from 'antd'
 import moment from 'moment'
 import { CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons'
-import {
-  RadiologyWorkitemStatus,
-  RADIOLOGY_WORKITEM_STATUS,
-} from '@/utils/constants'
+import { RADIOLOGY_WORKITEM_STATUS } from '@/utils/constants'
 import { examinationSteps } from '@/utils/codes'
 import { dateFormatLongWithTimeNoSec } from '@/components'
 import styles from './ExaminationStep.less'

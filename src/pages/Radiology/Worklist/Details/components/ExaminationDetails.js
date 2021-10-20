@@ -86,7 +86,8 @@ export const ExaminationDetails = ({
           </GridItem>
 
           <GridItem md={10}>
-            {workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW ? (
+            {workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW ||
+            workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS ? (
               <RadiographerTag
                 value={assignedRadiographers}
                 onChange={newVal => {

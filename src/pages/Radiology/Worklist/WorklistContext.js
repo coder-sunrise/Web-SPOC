@@ -1,15 +1,27 @@
 import React, { useContext, useEffect, useState, createContext } from 'react'
-import { useSelector } from 'dva'
+import { useSelector, useDispatch } from 'dva'
 import { getMappedVisitType } from '@/utils/utils'
 
 const WorklistContext = createContext(null)
 
 export const WorklistContextProvider = props => {
+  const dispatch = useDispatch()
   const [detailsId, setDetailsId] = useState(null)
   const [showDetails, setShowDetails] = useState(false)
   const codetable = useSelector(st => st.codetable)
   const { visitTypeSetting } = useSelector(st => st.clinicSettings.settings)
-  const { ctvisitpurpose = [] } = codetable
+  const [ctvisitpurpose, setCtVisitPurpose] = useState([])
+
+  useEffect(() => {
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctvisitpurpose',
+      },
+    }).then(v => {
+      setCtVisitPurpose(v)
+    })
+  }, [])
 
   let visitTypeSettingsObj = undefined
   let visitPurpose = undefined
@@ -18,6 +30,7 @@ export const WorklistContextProvider = props => {
       visitTypeSettingsObj = JSON.parse(visitTypeSetting)
     } catch {}
   }
+
   if ((ctvisitpurpose || []).length > 0) {
     visitPurpose = getMappedVisitType(
       ctvisitpurpose,
