@@ -1,34 +1,38 @@
 import React, { useState, useRef } from 'react';
 import { compose } from 'redux';
 import {
-  CardContainer, GridContainer, GridItem, Space,
+  CardContainer, GridContainer, GridItem, Tooltip,
   Checkbox, TextField, FastField, Field, CodeSelect, NumberInput, Switch,
   DateRangePicker, dateFormatLong
 } from '@/components';
-import { Table, Button, Input } from 'antd';
+import { Table, Button, Input  } from 'antd';
 
 export const General = (props) => {
   const { dispatch } = props;
-  const { copayerDetail, clinicSettings } = props;
+  const { copayerDetail, clinicSettings, values } = props;
   const { isUserMaintainable, isGSTEnabled, isAutoGenerateStatementEnabled, statementAdjustment } = copayerDetail
   const { isEnableAutoGenerateStatement = true } = clinicSettings;
   const { height } = props;
 
+  const isNew = values.id? false: true;
+  
   return (
     <React.Fragment>
       <GridContainer>
         <GridItem md={12}>
           <GridContainer>
-            <GridItem md={2}>
-              <FastField 
-                name='code'
-                render={(args) => (
-                  <TextField label='Co-Payer Code' {...args}/>
-                )}
-              />
+            <GridItem md={3}>
+              <Tooltip title='Co-Payer Code will be generated automatically if no code is entered' placement='bottom'><span>
+                <FastField 
+                  name='code'
+                  render={(args) => (
+                    <TextField disabled={!isNew} label='Co-Payer Code' {...args}/>
+                  )}
+                />
+              </span></Tooltip>
             </GridItem>
 
-            <GridItem md={5}>
+            <GridItem md={3}>
               <FastField
                 name='displayValue'
                 render={(args) => (
@@ -37,14 +41,13 @@ export const General = (props) => {
               />
             </GridItem>
 
-            <GridItem md={2}>
+            <GridItem md={3}>
               <FastField
                 name='coPayerTypeFK'
                 render={(args) => (
                   <CodeSelect
                     label='Co-Payer Type'
                     code='ctCopayerType'
-                    disabled
                     {...args}
                   />
                 )}
@@ -228,7 +231,7 @@ export const General = (props) => {
         <GridItem md={3}>
           <Field
             name='creditInformation'
-            render={(args) => <TextField label='Credit Information' {...args} />}
+            render={(args) => <TextField label='Credit Code' {...args} />}
           />
         </GridItem>
 
@@ -261,7 +264,7 @@ export const General = (props) => {
       </GridContainer>
       
       {/* Company Address */}
-      <GridItem style={{marginTop:50}}>
+      <GridItem style={{marginTop:30}}>
         <h4 style={{fontWeight:500}}>Contact</h4>
       </GridItem>
 
@@ -270,7 +273,7 @@ export const General = (props) => {
           <GridItem xs={12} md={3}>
               <FastField 
                 name='address.postcode'
-                render={(args) => <TextField label='Postcode' {...args}/>}
+                render={(args) => <TextField label='Postal Code' {...args}/>}
               />
           </GridItem>
           <GridItem xs={12} md={3}>
