@@ -288,6 +288,9 @@ class Banner extends PureComponent {
     const chasOrMedisave = (schemeDataList || []).filter(
       o => o.schemeTypeFK <= 6 || this.isMedisave(o.schemeTypeFK),
     )
+    const { patient } = this.props
+    const { entity } = patient
+    const { patientScheme } = entity
     return schemeDataList.map((s, i, arr) => (
       <span style={{ paddingRight: 5, display: 'inline-block' }}>
         {chasOrMedisave &&
@@ -390,7 +393,7 @@ class Banner extends PureComponent {
             <Link>
               <span
                 style={{
-                  color: 'black',
+                  color: patientScheme[i].isExpired ? 'red' : 'black',
                   textDecoration: 'underline',
                   whiteSpace: 'nowrap',
                 }}
@@ -407,7 +410,7 @@ class Banner extends PureComponent {
           <Link>
             <span
               style={{
-                color: 'black',
+                color: patientScheme[i].isExpired ? 'red' : 'black',
                 textDecoration: 'underline',
                 whiteSpace: 'nowrap',
               }}
@@ -970,7 +973,7 @@ class Banner extends PureComponent {
                     </span>
 
                     <span className={classes.part}>
-                      <PatientStickyNotesBtn patientProfileFK={info.id}/>
+                      <PatientStickyNotesBtn patientProfileFK={info.id} />
                     </span>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
@@ -985,7 +988,10 @@ class Banner extends PureComponent {
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
                     <span className={classes.header}>Tag: </span>
-                    <span className={classes.contents} style={{WebkitLineClamp: 1}}>
+                    <span
+                      className={classes.contents}
+                      style={{ WebkitLineClamp: 1 }}
+                    >
                       {info.patientTag.length > 0
                         ? info.patientTag.map(t => t.tagName).join(', ')
                         : ''}

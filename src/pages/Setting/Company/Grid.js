@@ -109,45 +109,24 @@ class Grid extends PureComponent {
           columns={
             name === 'copayer' ? (
               [
-                {
-                  name: 'code',
-                  title: 'Co-payer Code',
-                },
-
-                {
-                  name: 'displayValue',
-                  title: 'Co-payer Name',
-                },
-
-                { name: 'coPayerTypeName', title: 'Co-payer Type' },
-
-                {
-                  name: 'contactNo',
-                  title: 'Contact No.',
-                },
-
-                { name: 'url', title: 'URL' },
-
+                { name: 'code', title: 'Co-Payer Code' },
+                { name: 'displayValue', title: 'Co-Payer Name' },
+                { name: 'coPayerTypeName', title: 'Co-Payer Type' },
+                { name: 'copayerContactPerson', title: 'Contact Person' },
+                { name: 'contactNo', title: 'Contact No.' },
+                { name: 'copayerContactPersonEmail', title: 'Email' },
+                { name: 'url', title: 'Website' },
+                { name: 'copayerCreditInformation', title: 'Credit Code' },
                 { name: 'isActive', title: 'Status' },
                 { name: 'action', title: 'Action' },
               ]
             ) : (
               [
-                {
-                  name: 'code',
-                  title: 'Company Code',
-                },
-
-                {
-                  name: 'displayValue',
-                  title: 'Company Name',
-                },
-
+                { name: 'code', title: 'Company Code' },
+                { name: 'displayValue', title: 'Company Name' },
                 { name: 'contactPerson', title: 'Contact Person' },
                 { name: 'contactNo', title: 'Contact No.' },
-
                 { name: 'officeNum', title: 'Office Number' },
-
                 { name: 'faxNo', title: 'Fax Number' },
                 { name: 'isGSTEnabled', title: 'GST Enable' },
                 { name: 'isActive', title: 'Status' },
@@ -210,8 +189,54 @@ class Grid extends PureComponent {
             {
               columnName: 'contactPerson',
               render: (row) => (
+
                 <span>{row.contactPerson ? row.contactPerson : '-'}</span>
               ),
+            },
+            {
+              columnName: 'copayerContactPerson',
+              render: (row) => {
+                let cell = <span>-</span>
+                if (row.defaultContactPerson && row.defaultContactPerson.name && row.defaultContactPerson.name !== '') {
+                  cell = (
+                    <Tooltip title={row.defaultContactPerson.name} placement='top'>
+                      <span>{row.defaultContactPerson.name}</span>
+                    </Tooltip>
+                  )
+                }
+
+                return cell;
+              },
+            },
+            {
+              columnName: 'copayerContactPersonEmail',
+              render: (row) => {
+                let cell = <span>-</span>
+                if (row.defaultContactPerson && row.defaultContactPerson.emailAddress && row.defaultContactPerson.emailAddress !== '') {
+                  cell = (
+                    <Tooltip title={row.defaultContactPerson.emailAddress} placement='top'>
+                      <span>{row.defaultContactPerson.emailAddress}</span>
+                    </Tooltip>
+                  )
+                }
+
+                return cell;
+              },
+            },
+            {
+              columnName: 'copayerCreditInformation',
+              render: (row) => {
+                let cell = <span>-</span>
+                if (row.creditInformation && row.creditInformation !== '') {
+                  cell = (
+                    <Tooltip title={row.creditInformation} placement='top'>
+                      <span>{row.creditInformation}</span>
+                    </Tooltip>
+                  )
+                }
+
+                return cell;
+              },
             },
             {
               columnName: 'faxNo',

@@ -71,7 +71,9 @@ const PharmacyDetails = ({
       payload: { entity: undefined, fromModule: undefined },
     })
     refreshClick()
-    startRefreshTimer()
+    if (startRefreshTimer) {
+      startRefreshTimer()
+    }
   }
 
   return (
