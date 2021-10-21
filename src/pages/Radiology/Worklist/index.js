@@ -84,9 +84,9 @@ const RadiologyWorklist = props => {
       title={
         <div style={{ display: 'flex', alignItems: 'end' }}>
           <WorklistFilter />
-          <StatusPanel />
         </div>
       }
+      extra={<StatusPanel />}
     >
       <Worklist columns={columns} />
       <RadiologyDetails {...props} />

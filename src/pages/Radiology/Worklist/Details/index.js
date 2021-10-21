@@ -40,6 +40,7 @@ const RadiologyDetails = props => {
   const [showRequiredField, setShowRequiredField] = useState(false)
   const [workitem, setWorkItem] = useState({})
   const [visitWorkitems, setVisitWorkItems] = useState([])
+  const [combinedWorkitems, setCombinedWorkitems] = useState([])
   const [examinationDetails, setExaminationDetails] = useState({})
   const [currentPatient, setCurrentPatient] = useState({})
 
@@ -67,6 +68,7 @@ const RadiologyDetails = props => {
 
       setWorkItem({})
       setVisitWorkItems([])
+      setCombinedWorkitems([])
       setExaminationDetails({})
       setShowDetails(false)
       setShowRequiredField(false)
@@ -79,6 +81,10 @@ const RadiologyDetails = props => {
       setVisitWorkItems(details.entity.visitWorkitems)
     }
   }, [details])
+
+  useEffect(() => {
+    setCombinedWorkitems(getCombinedWorkitems(visitWorkitems))
+  }, [visitWorkitems, examinationDetails])
 
   const renderStatusButtons = () => {
     if (!details || !details.entity) return
@@ -169,20 +175,26 @@ const RadiologyDetails = props => {
     setShowCancelConfirm(false)
   }
 
-  const getCombinedWorkitems = () =>
-    visitWorkitems
-      ? visitWorkitems
-          .filter(w => w.primaryWorkitemFK === workitem.primaryWorkitemFK)
-          .map(w => {
-            if (w.radiologyWorkitemId !== workitem.radiologyWorkitemId) return w
+  const getCombinedWorkitems = (allVisitWorkItems = []) => {
+    const primaryWorkitemFK = allVisitWorkItems.find(
+      c => c.radiologyWorkitemId === workitem.radiologyWorkitemId,
+    )?.primaryWorkitemFK
+    if (!primaryWorkitemFK) {
+      return []
+    }
 
-            //Current changes need to be considered as well.
-            return {
-              ...w,
-              assignedRadiographers: examinationDetails.assignedRadiographers,
-            }
-          })
-      : []
+    return allVisitWorkItems
+      .filter(w => w.primaryWorkitemFK === primaryWorkitemFK)
+      .map(w => {
+        if (w.radiologyWorkitemId !== workitem.radiologyWorkitemId) return w
+
+        //To ensure to append current assigned radiographers for current opening workitem.
+        return {
+          ...w,
+          assignedRadiographers: examinationDetails.assignedRadiographers,
+        }
+      })
+  }
 
   return (
     <CommonModal
@@ -248,12 +260,12 @@ const RadiologyDetails = props => {
       <StartExaminationConfirmation
         open={showStartConfirm}
         workitem={workitem}
-        combinedWorkitems={getCombinedWorkitems()}
+        combinedWorkitems={combinedWorkitems}
         onStartConfirm={() => {
           handleSave({
             statusFK: RADIOLOGY_WORKITEM_STATUS.INPROGRESS,
             assignedRadiographers: _.uniqBy(
-              getCombinedWorkitems().flatMap(w => w.assignedRadiographers),
+              combinedWorkitems.flatMap(w => w.assignedRadiographers),
               c => c.userProfileFK,
             ),
           })
