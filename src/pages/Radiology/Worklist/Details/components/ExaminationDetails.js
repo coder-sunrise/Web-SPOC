@@ -130,7 +130,6 @@ export const ExaminationDetails = ({
               value={comment}
               onChange={e => {
                 setComment(e.target.value)
-                setIsDirty(true)
               }}
               autoSize={{ minRows: 3, maxRows: 5 }}
             />
