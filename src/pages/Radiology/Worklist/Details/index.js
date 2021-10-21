@@ -37,6 +37,7 @@ const RadiologyDetails = props => {
   const [isDirty, setIsDirty] = useState(false)
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
   const [showStartConfirm, setShowStartConfirm] = useState(false)
+  const [showRequiredField, setShowRequiredField] = useState(false)
   const [workitem, setWorkItem] = useState({})
   const [visitWorkitems, setVisitWorkItems] = useState([])
   const [examinationDetails, setExaminationDetails] = useState({})
@@ -68,6 +69,7 @@ const RadiologyDetails = props => {
       setVisitWorkItems([])
       setExaminationDetails({})
       setShowDetails(false)
+      setShowRequiredField(false)
     }
   }, [detailsId])
 
@@ -102,6 +104,11 @@ const RadiologyDetails = props => {
         <ProgressButton
           color='success'
           onClick={() => {
+            if (examinationDetails.assignedRadiographers.length === 0) {
+              setShowRequiredField(true)
+              return
+            }
+
             const currentPrimaryWorkitemFK = visitWorkitems.find(
               v => v.radiologyWorkitemId === workitem.radiologyWorkitemId,
             ).primaryWorkitemFK
@@ -223,6 +230,7 @@ const RadiologyDetails = props => {
         <GridItem md={12}>
           <ExaminationDetails
             onChange={val => setExaminationDetails(val)}
+            showRequiredField={showRequiredField}
             workitem={workitem}
           />
         </GridItem>
