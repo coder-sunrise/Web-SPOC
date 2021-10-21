@@ -309,6 +309,17 @@ class PatientDetail extends PureComponent {
       }
     }
 
+    const AllergiesAccessRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.allergies',
+    )
+    if (AllergiesAccessRight) {
+      const hiddenAllergiesByAccessRight =
+        AllergiesAccessRight.rights === 'hidden'
+      if (hiddenAllergiesByAccessRight) {
+        this.widgets = this.widgets.filter(t => t.id !== '3')
+      }
+    }
+
     const SchemeAccessRight = Authorized.check('scheme.schemedetails')
     if (SchemeAccessRight) {
       const hiddenSchemeByAccessRight = SchemeAccessRight.rights === 'hidden'
@@ -328,9 +339,12 @@ class PatientDetail extends PureComponent {
       }
     }
 
-    const emergencyContactAccessRight = Authorized.check('patientdatabase.patientprofiledetails.emergencycontact')
+    const emergencyContactAccessRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.emergencycontact',
+    )
     if (emergencyContactAccessRight) {
-      const hiddenEmergencyContactByAccessRight = emergencyContactAccessRight.rights === 'hidden'
+      const hiddenEmergencyContactByAccessRight =
+        emergencyContactAccessRight.rights === 'hidden'
       if (hiddenEmergencyContactByAccessRight) {
         this.widgets = this.widgets.filter(t => t.id !== '2')
       }
