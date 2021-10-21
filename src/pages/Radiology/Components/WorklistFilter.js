@@ -80,7 +80,9 @@ export const WorklistFilter = () => {
             ? modality.filter(t => t !== -99).join(',')
             : undefined,
           filterFrom: dateFrom,
-          filterTo: dateTo,
+          filterTo: moment(dateTo)
+            .endOf('day')
+            .formatUTC(false),
           isUrgent: isUrgent,
           isMyPatientOnly: isMyPatientOnly,
         },
@@ -96,30 +98,38 @@ export const WorklistFilter = () => {
           style={{ width: 350 }}
         />
       </Form.Item>
-      <Form.Item name='visitType'>
+      <Form.Item name='visitType' initialValue={[-99]}>
         <Select
           label='Visit Type'
           options={getVisitTypes()}
-          style={{ width: 180 }}
+          style={{ width: 170 }}
           mode='multiple'
+          maxTagCount={0}
+          maxTagPlaceholder='Visit Types'
         />
       </Form.Item>
-      <Form.Item name='modality'>
+      <Form.Item name='modality' initialValue={[-99]}>
         <CodeSelect
           mode='multiple'
-          style={{ width: 150 }}
+          style={{ width: 160 }}
           label='Modality'
           code='ctmodality'
+          maxTagPlaceholder='Modalities'
           onChange={() => console.log('modality')}
         />
       </Form.Item>
-      <Form.Item name='dateFrom'>
+      <Form.Item name='dateFrom' initialValue={moment().toDate()}>
         <DatePicker
           style={{ width: 100 }}
           label={formatMessage({ id: 'radiology.search.dateFrom' })}
         />
       </Form.Item>
-      <Form.Item name='dateTo'>
+      <Form.Item
+        name='dateTo'
+        initialValue={moment()
+          .endOf('day')
+          .formatUTC(false)}
+      >
         <DatePicker
           bordered={true}
           label={formatMessage({ id: 'radiology.search.dateTo' })}

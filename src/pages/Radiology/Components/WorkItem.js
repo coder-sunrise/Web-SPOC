@@ -178,13 +178,15 @@ const WorkitemBody = ({ item }) => {
             <EmptyDiv />
           )}
           <EmptyDiv />
-          <div
-            style={{
-              color: RADIOLOGY_WORKLIST_STATUS_COLOR[`${item.statusFK}`],
-            }}
-          >
-            {statusUpdateDate}
-          </div>
+          {item.statusFK !== RADIOLOGY_WORKITEM_STATUS.NEW && (
+            <div
+              style={{
+                color: RADIOLOGY_WORKLIST_STATUS_COLOR[`${item.statusFK}`],
+              }}
+            >
+              {statusUpdateDate}
+            </div>
+          )}
         </div>
       </div>
       <div
