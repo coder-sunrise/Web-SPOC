@@ -322,9 +322,7 @@ class PatientStickyNotesBtn extends Component {
                 <Button
                   justIcon
                   color='transparent'
-                  onClick={() => {
-                    if (isBelongtoCurrentUser) this.onFlagClick(note)
-                  }}
+                  onClick={() => {this.onFlagClick(note)}}
                   style={{
                     margin: 0,
                     color: note.isFlagged ? 'red' : 'gray',
