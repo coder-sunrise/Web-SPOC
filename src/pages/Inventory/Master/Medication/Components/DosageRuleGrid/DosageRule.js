@@ -206,7 +206,7 @@ const DosageRuleTable = ({
         }
 
         if (leftOperand > rightOperand) {
-          rangeValidationErrorMessage = `${rule} from must be larger than ${rule} to.`
+          rangeValidationErrorMessage = `${rule} to must be larger than ${rule} from.`
           validationSuccess = false
         }
       } else {
@@ -652,7 +652,7 @@ const DosageRuleTable = ({
                   okText='Yes'
                   onConfirm={() => cancel(record.key)}
                 >
-                  <Cancel style={{color: '#f5222d' }} />
+                  <Cancel style={{ color: '#f5222d' }} />
                 </Popconfirm>
               </Typography.Link>
             </div>
@@ -675,7 +675,7 @@ const DosageRuleTable = ({
                 okText='Yes'
                 onConfirm={() => deleteData(record.key)}
               >
-                <Delete style={{color: '#f5222d' }} />
+                <Delete style={{ color: '#f5222d' }} />
               </Popconfirm>
             </Typography.Link>
           </div>
@@ -710,11 +710,12 @@ const DosageRuleTable = ({
         bordered
         dataSource={data}
         columns={mergedColumns}
-        rowClassName={(record, index) => isEditing(record) ? styles.editingRow : styles.editableRow}
+        rowClassName={(record, index) =>
+          isEditing(record) ? styles.editingRow : styles.editableRow
+        }
         pagination={false}
       />
-      {((rule !== DOSAGE_RULE.default) ||
-        data.length === 0) && (
+      {(rule !== DOSAGE_RULE.default || data.length === 0) && (
         <Button
           disabled={editingKey !== ''}
           onClick={() => {

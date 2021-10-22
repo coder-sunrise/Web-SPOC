@@ -138,6 +138,8 @@ const General = ({
       {
         id: 'isExclusive',
         name: 'Exclusive',
+        tooltip:
+          'The item has no local stock, we will purchase on behalf and charge to patient in invoice',
         layoutConfig: {
           style: {},
         },

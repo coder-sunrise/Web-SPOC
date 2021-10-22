@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { Form, Button } from 'antd'
+import { CLINICAL_ROLE } from '@/utils/constants'
 import moment from 'moment'
 import Search from '@material-ui/icons/Search'
 import { useDispatch, useSelector } from 'dva'
@@ -21,6 +22,9 @@ export const WorklistFilter = () => {
   const dispatch = useDispatch()
   const { showDetails, visitPurpose = [] } = useContext(WorklistContext)
   const { settings } = useSelector(s => s.clinicSettings)
+  const clinicianProfile = useSelector(
+    state => state.user.data.clinicianProfile,
+  )
 
   const timer = React.useRef(null)
 
@@ -84,7 +88,7 @@ export const WorklistFilter = () => {
             .endOf('day')
             .formatUTC(false),
           isUrgent: isUrgent,
-          isMyPatientOnly: isMyPatientOnly,
+          clinicianProfileId: isMyPatientOnly ? clinicianProfile.id : undefined,
         },
       },
     })
@@ -142,12 +146,16 @@ export const WorklistFilter = () => {
           label={formatMessage({ id: 'radiology.search.urgentOnly' })}
         />
       </Form.Item>
-      <Form.Item name='isMyPatientOnly' style={{ alignSelf: 'flex-end' }}>
-        <Checkbox
-          style={{ width: 125 }}
-          label={formatMessage({ id: 'radiology.search.myPatientOnly' })}
-        />
-      </Form.Item>
+      {clinicianProfile.userProfile?.role?.clinicRoleFK ===
+        CLINICAL_ROLE.RADIOGRAPHER && (
+        <Form.Item name='isMyPatientOnly' style={{ alignSelf: 'flex-end' }}>
+          <Checkbox
+            style={{ width: 125 }}
+            label={formatMessage({ id: 'radiology.search.myPatientOnly' })}
+          />
+        </Form.Item>
+      )}
+
       <Form.Item style={{ alignSelf: 'flex-end' }}>
         <ProgressButton
           variant='contained'

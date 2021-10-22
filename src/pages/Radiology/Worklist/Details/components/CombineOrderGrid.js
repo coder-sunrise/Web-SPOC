@@ -38,7 +38,7 @@ export const CombineOrderGrid = ({
       key: 'instruction',
       columnId: 'instruction',
       width: 200,
-      align: 'center',
+      align: 'left',
     },
     {
       title: 'Remarks',
@@ -46,7 +46,7 @@ export const CombineOrderGrid = ({
       key: 'remark',
       columnId: 'remark',
       width: 200,
-      align: 'center',
+      align: 'left',
     },
     {
       title: 'Combine',
@@ -90,7 +90,7 @@ export const CombineOrderGrid = ({
       title: 'Primary',
       align: 'center',
       columnId: 'isPrimary',
-      width: 40,
+      width: 50,
       render: (text, record, index) => {
         return (
           <Radio
@@ -111,7 +111,7 @@ export const CombineOrderGrid = ({
   ]
 
   const [combinedItems, setCombinedItems] = useState([])
-  const [primaryId, setPrimaryId] = useState()
+  const [primaryId, setPrimaryId] = useState(null)
   const [combinableWorkitems, setCombinableWorkitems] = useState([])
 
   useEffect(() => {
@@ -137,7 +137,6 @@ export const CombineOrderGrid = ({
             }
 
             if (combinedItems.includes(w.radiologyWorkitemId)) {
-              console.log(w.radiologyWorkitemId)
               return { ...w, primaryWorkitemFK: primaryId }
             }
             return { ...w, primaryWorkitemFK: null }
@@ -193,7 +192,7 @@ export const CombineOrderGrid = ({
           w => w.primaryWorkitemFK === currentWorkitem.primaryWorkitemFK,
         )
 
-        setCombinedItems(combined)
+        setCombinedItems(combined.map(w => w.radiologyWorkitemId))
         setCombinableWorkitems(combined)
 
         if (combined && combined.length > 1)

@@ -1,19 +1,45 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { Radio } from 'antd'
+import { Radio, Typography } from 'antd'
 import moment from 'moment'
 import {
   GridContainer,
   GridItem,
   dateFormatLongWithTimeNoSec,
+  Icon,
 } from '@/components'
 import { RightAlignGridItem, SectionTitle } from '../../../Components'
 import { CombineOrderGrid } from './index'
 import { RADIOLOGY_WORKITEM_STATUS } from '@/utils/constants'
 import WorklistContext from '@/pages/Radiology/Worklist/WorklistContext'
 
+const blueColor = '#1890f8'
+
+const PrimaryAccessionNoHeader = ({ accessionNo }) => (
+  <div
+    style={{
+      display: 'flex',
+      marginTop: 18,
+      marginBottom: 10,
+      marginLeft: 15,
+    }}
+  >
+    {'Combined Accession No.: '}
+    <Typography.Text strong>{accessionNo}</Typography.Text>
+    <Icon
+      type='link'
+      style={{
+        fontSize: 18,
+        color: blueColor,
+        alignSelf: 'start',
+      }}
+    />{' '}
+  </div>
+)
+
 export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
   const { visitPurpose } = useContext(WorklistContext)
   const [isCombinedOrder, setIsCombinedOrder] = useState(false)
+  const [primaryAccessionNo, setPrimaryAccessionNo] = useState('')
 
   useEffect(() => {
     setIsCombinedOrder(workitem.primaryWorkitemFK ? true : false)
@@ -95,13 +121,31 @@ export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
         {isCombinedOrder && (
           <React.Fragment>
             <GridItem md={12}>
-              <SectionTitle title='Order Combined Details' />
+              <div style={{ display: 'flex' }}>
+                <SectionTitle title='Order Combined Details' />
+                {primaryAccessionNo !== '' && (
+                  <PrimaryAccessionNoHeader accessionNo={primaryAccessionNo} />
+                )}
+              </div>
             </GridItem>
             <GridItem md={12}>
               <CombineOrderGrid
                 visitWorkitems={workitem.visitWorkitems}
                 currentWorkitemid={workitem.radiologyWorkitemId}
                 onChange={value => {
+                  if (value && value.length > 0) {
+                    const primaryWorkitemFK = value.find(
+                      c =>
+                        c.radiologyWorkitemId === workitem.radiologyWorkitemId,
+                    ).primaryWorkitemFK
+                    if (primaryWorkitemFK) {
+                      const primaryWorkitem = value.find(
+                        c => c.radiologyWorkitemId === primaryWorkitemFK,
+                      )
+                      setPrimaryAccessionNo(primaryWorkitem.accessionNo)
+                    }
+                  }
+
                   onCombinedOrderChange(value)
                 }}
                 readonly={workitem.statusFK !== RADIOLOGY_WORKITEM_STATUS.NEW}

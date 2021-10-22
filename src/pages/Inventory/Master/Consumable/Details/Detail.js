@@ -23,7 +23,7 @@ const Detail = ({
   hasActiveSession,
   theme,
   clinicSettings,
-  values
+  values,
 }) => {
   const { settings = [] } = clinicSettings
   return (
@@ -157,7 +157,7 @@ const Detail = ({
                             ...[
                               {
                                 id: 'isDispensedByPharmacy',
-                                name: 'Dispense by Pharmacy',
+                                name: 'Dispensed by Pharmacy',
                                 tooltip:
                                   "Item’s stock is deducted and dispense by pharmacy. If unchecked the setting, stock deduction will take place during finalization of patient's order",
                                 disabled:
