@@ -29,7 +29,7 @@ const WorlklistColumnTitle = ({ title, workItemCount }) => {
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: '1fr 3fr 1fr',
+        gridTemplateColumns: '1fr 4fr 1fr',
         justifyItems: 'center',
         margin: 5,
       }}
@@ -146,6 +146,7 @@ export const WorklistColumn = ({
       ...defaultColumnStyle,
       backgroundColor: data.backgroundColor,
       width: `${columnPercentage}%`,
+      minWidth: 300,
     }}
   >
     <WorlklistColumnTitle
