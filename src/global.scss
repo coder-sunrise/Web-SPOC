@@ -798,11 +798,13 @@ th[class*='MuiTableCell-root-'] {
 }
 
 [class*='MuiCheckbox-colorSecondary-'] {
-    &.Mui-checked {
-        color: #3f51b5 !important;
-    }
+  &.Mui-checked {
+    color: #3f51b5 !important;
+  }
 }
 
-td[class*='TableGroupCell-cell-'] {
-  cursor: default !important;
+tr[class*='disableexpandedgroup'] {
+  td {
+    cursor: default !important;
+  }
 }

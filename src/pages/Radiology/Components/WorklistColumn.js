@@ -122,8 +122,11 @@ const sortItems = data => {
   return sortedData
 }
 
-const WorklistColumnBody = ({ data, renderWorkitem }) => {
-  const sortedData = sortItems(data)
+const WorklistColumnBody = ({ data, renderWorkitem, worklistType }) => {
+  let sortedData = data.workitems || []
+  if (worklistType === 'Radiology') {
+    const sortedData = sortItems(data)
+  }
 
   return (
     <div style={columnBodyStyle}>
@@ -132,7 +135,12 @@ const WorklistColumnBody = ({ data, renderWorkitem }) => {
   )
 }
 
-export const WorklistColumn = ({ data, renderWorkitem, columnPercentage }) => (
+export const WorklistColumn = ({
+  data,
+  renderWorkitem,
+  columnPercentage,
+  worklistType,
+}) => (
   <div
     style={{
       ...defaultColumnStyle,
@@ -144,6 +152,10 @@ export const WorklistColumn = ({ data, renderWorkitem, columnPercentage }) => (
       title={data.title}
       workItemCount={data.workitems.length}
     />
-    <WorklistColumnBody data={data} renderWorkitem={renderWorkitem} />
+    <WorklistColumnBody
+      data={data}
+      renderWorkitem={renderWorkitem}
+      worklistType={worklistType}
+    />
   </div>
 )
