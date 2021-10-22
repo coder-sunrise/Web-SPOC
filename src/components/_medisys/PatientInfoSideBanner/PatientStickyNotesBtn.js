@@ -165,6 +165,7 @@ class PatientStickyNotesBtn extends Component {
       }).then(notes => {
         this.setState({
           stickyNotes: notes,
+          flaggedNoteCount: (notes || []).filter(x => x.id && x.isFlagged).length,
         })
         callback?.call(this)
       })
