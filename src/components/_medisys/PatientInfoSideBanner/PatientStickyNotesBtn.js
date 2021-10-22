@@ -302,17 +302,18 @@ class PatientStickyNotesBtn extends Component {
                   }}
                 />
               ) : (
-                <pre
+                <div
                   style={{
                     fontSize: 14,
                     wordBreak: 'break-all',
                     whiteSpace: 'pre-wrap',
                     color: textContentColor,
                     margin: 0,
+                    whiteSpace: 'pre',
                   }}
                 >
                   {note.notes}
-                </pre>
+                </div>
               )}
             </div>
           </GridItem>
