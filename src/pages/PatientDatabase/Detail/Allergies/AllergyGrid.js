@@ -14,7 +14,7 @@ class AllergyGrid extends PureComponent {
 
   constructor(props) {
     super(props)
-    const { type, codetable } = this.props
+    const { isEditable, type, codetable } = this.props
 
     // const compareDate = (a, b) =>
     //   a.toLocaleString().localeCompare(b.toLocaleString())
@@ -37,6 +37,9 @@ class AllergyGrid extends PureComponent {
         {
           columnName: 'onsetDate',
           type: 'date',
+          isDisabled: () => {
+            return !isEditable
+          },
         },
         {
           columnName: 'ingredientFK',
@@ -44,20 +47,23 @@ class AllergyGrid extends PureComponent {
           code: 'ctmedicationingredient',
           label: 'Allergy Name',
           autoComplete: true,
+          isDisabled: () => {
+            return !isEditable
+          },
           onChange: ({ val, option, row }) => {
             if (option) {
               let { rows } = this.props
               if (
                 rows.filter(
-                  o => !o.isDeleted && o.ingredientFK === val && o.id !== row.id,
+                  o =>
+                    !o.isDeleted && o.ingredientFK === val && o.id !== row.id,
                 ).length > 0
               ) {
                 row.ingredientFK = null
                 notification.error({
                   message: 'The Allergy record already exists.',
                 })
-              }
-              else {
+              } else {
                 // row.allergyCode = option.code || option.name
                 row.allergyName = option.name
               }
@@ -71,6 +77,9 @@ class AllergyGrid extends PureComponent {
           label: 'Allergy Name',
           valueField: 'id',
           code: 'ctdrugallergy',
+          isDisabled: () => {
+            return !isEditable
+          },
           autoComplete: true,
           onChange: ({ val, option, row }) => {
             if (option) {
@@ -93,6 +102,9 @@ class AllergyGrid extends PureComponent {
         {
           columnName: 'allergyName',
           maxLength: 100,
+          isDisabled: () => {
+            return !isEditable
+          },
           onChange: ({ val, row }) => {
             // row.allergyCode = val
             // row.allergyFK = 1
@@ -103,12 +115,18 @@ class AllergyGrid extends PureComponent {
           type: 'codeSelect',
           label: 'Allergic Reaction',
           code: 'CTAllergyReaction',
+          isDisabled: () => {
+            return !isEditable
+          },
         },
         {
           columnName: 'patientAllergyStatusFK',
           type: 'codeSelect',
           code: 'ctPatientAllergyStatus',
           label: 'Status',
+          isDisabled: () => {
+            return !isEditable
+          },
         },
       ],
     }

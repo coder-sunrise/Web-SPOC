@@ -167,6 +167,7 @@ class PatientStickyNotesBtn extends Component {
       }).then(notes => {
         this.setState({
           stickyNotes: notes,
+          flaggedNoteCount: (notes || []).filter(x => x.id && x.isFlagged).length,
         })
         callback?.call(this)
       })
@@ -303,17 +304,18 @@ class PatientStickyNotesBtn extends Component {
                   }}
                 />
               ) : (
-                <pre
+                <div
                   style={{
                     fontSize: 14,
                     wordBreak: 'break-all',
                     whiteSpace: 'pre-wrap',
                     color: textContentColor,
                     margin: 0,
+                    whiteSpace: 'pre',
                   }}
                 >
                   {note.notes}
-                </pre>
+                </div>
               )}
             </div>
           </GridItem>
@@ -323,9 +325,7 @@ class PatientStickyNotesBtn extends Component {
                 <Button
                   justIcon
                   color='transparent'
-                  onClick={() => {
-                    if (isBelongtoCurrentUser) this.onFlagClick(note)
-                  }}
+                  onClick={() => {this.onFlagClick(note)}}
                   style={{
                     margin: 0,
                     color: note.isFlagged ? 'red' : 'gray',

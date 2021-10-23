@@ -288,6 +288,9 @@ class Banner extends PureComponent {
     const chasOrMedisave = (schemeDataList || []).filter(
       o => o.schemeTypeFK <= 6 || this.isMedisave(o.schemeTypeFK),
     )
+    const { patient } = this.props
+    const { entity } = patient
+    const { patientScheme } = entity
     return schemeDataList.map((s, i, arr) => (
       <span style={{ paddingRight: 5, display: 'inline-block' }}>
         {chasOrMedisave &&
@@ -390,7 +393,7 @@ class Banner extends PureComponent {
             <Link>
               <span
                 style={{
-                  color: 'black',
+                  color: patientScheme[i].isExpired ? 'red' : 'black',
                   textDecoration: 'underline',
                   whiteSpace: 'nowrap',
                 }}
@@ -407,7 +410,7 @@ class Banner extends PureComponent {
           <Link>
             <span
               style={{
-                color: 'black',
+                color: patientScheme[i].isExpired ? 'red' : 'black',
                 textDecoration: 'underline',
                 whiteSpace: 'nowrap',
               }}

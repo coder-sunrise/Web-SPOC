@@ -27,6 +27,7 @@ const findingSettings = {
 export const ExaminationDetails = ({
   workitem = {},
   onChange,
+  showRequiredField = false,
   ...restProps
 }) => {
   const currentUser = useSelector(state => state.user.data)
@@ -86,13 +87,21 @@ export const ExaminationDetails = ({
           </GridItem>
 
           <GridItem md={10}>
-            {workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW ? (
-              <RadiographerTag
-                value={assignedRadiographers}
-                onChange={newVal => {
-                  setAssignedRadiographers(newVal)
-                }}
-              />
+            {workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW ||
+            workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS ? (
+              <div style={{ display: 'flex' }}>
+                <RadiographerTag
+                  value={assignedRadiographers}
+                  onChange={newVal => {
+                    setAssignedRadiographers(newVal)
+                  }}
+                />
+                {showRequiredField && assignedRadiographers.length === 0 && (
+                  <span style={{ color: 'red' }}>
+                    * This is a required field
+                  </span>
+                )}
+              </div>
             ) : (
               assignedRadiographers.map(r => r.name).join(', ')
             )}
@@ -121,7 +130,6 @@ export const ExaminationDetails = ({
               value={comment}
               onChange={e => {
                 setComment(e.target.value)
-                setIsDirty(true)
               }}
               autoSize={{ minRows: 3, maxRows: 5 }}
             />

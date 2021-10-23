@@ -27,8 +27,6 @@ export const StartExaminationConfirmation = ({
   onStartConfirm,
   onStartClose,
 }) => {
-  const [cancellationReason, setCancellationReason] = useState('')
-
   const getRadiographers = () => {
     const uniqueRadiogrpahers = _.uniq(
       combinedWorkitems
@@ -43,12 +41,6 @@ export const StartExaminationConfirmation = ({
     return uniqueRadiogrpahers.reduce((a, b) => a + ', ' + b)
   }
 
-  useEffect(() => {
-    return () => setCancellationReason('')
-  }, [])
-
-  console.log('combinedWorkitems', combinedWorkitems)
-
   return (
     <CommonModal
       open={open}
@@ -57,13 +49,13 @@ export const StartExaminationConfirmation = ({
       maxWidth='sm'
       confirmProps={{ disabled: true }}
       onConfirm={() => {
-        onStartConfirm(cancellationReason)
+        onStartConfirm()
       }}
       onClose={() => {
         if (onStartClose) onStartClose()
       }}
     >
-      <div>Confirm to cancel examination below? </div>
+      <div>Confirm to start examination below? </div>
       <div style={{ margin: 10 }}>
         <Table
           bordered

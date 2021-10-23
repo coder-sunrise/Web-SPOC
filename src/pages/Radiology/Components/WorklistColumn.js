@@ -29,7 +29,7 @@ const WorlklistColumnTitle = ({ title, workItemCount }) => {
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: '1fr 3fr 1fr',
+        gridTemplateColumns: '1fr 4fr 1fr',
         justifyItems: 'center',
         margin: 5,
       }}
@@ -122,8 +122,11 @@ const sortItems = data => {
   return sortedData
 }
 
-const WorklistColumnBody = ({ data, renderWorkitem }) => {
-  const sortedData = sortItems(data)
+const WorklistColumnBody = ({ data, renderWorkitem, worklistType }) => {
+  let sortedData = data.workitems || []
+  if (worklistType === 'Radiology') {
+    const sortedData = sortItems(data)
+  }
 
   return (
     <div style={columnBodyStyle}>
@@ -132,18 +135,28 @@ const WorklistColumnBody = ({ data, renderWorkitem }) => {
   )
 }
 
-export const WorklistColumn = ({ data, renderWorkitem, columnPercentage }) => (
+export const WorklistColumn = ({
+  data,
+  renderWorkitem,
+  columnPercentage,
+  worklistType,
+}) => (
   <div
     style={{
       ...defaultColumnStyle,
       backgroundColor: data.backgroundColor,
       width: `${columnPercentage}%`,
+      minWidth: 300,
     }}
   >
     <WorlklistColumnTitle
       title={data.title}
       workItemCount={data.workitems.length}
     />
-    <WorklistColumnBody data={data} renderWorkitem={renderWorkitem} />
+    <WorklistColumnBody
+      data={data}
+      renderWorkitem={renderWorkitem}
+      worklistType={worklistType}
+    />
   </div>
 )

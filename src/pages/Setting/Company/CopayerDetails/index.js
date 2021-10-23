@@ -11,7 +11,8 @@ import {
 } from '@/components';
 import { General } from './General';
 import { ContactPersonList } from './ContactPersonList';
-import { Space } from 'antd';
+import { InformationList } from './InformationList';
+import { Space, Tooltip } from 'antd';
 import Yup from '@/utils/yup';
 
 const styles = () => ({
@@ -34,6 +35,7 @@ const getTabContent = (tabName, props) => {
         <Space direction="vertical">
           <General {...props}/>
           <ContactPersonList {...props}/>
+          <InformationList {...props}/>
         </Space>
       </CardContainer>
     )
@@ -43,7 +45,7 @@ const getTabContent = (tabName, props) => {
 const copayerDetailTabs = (props) => [
   {
     id: 0,
-    name: <span>General</span>,
+    name: <span>Details</span>,
     content: getTabContent('General', props)
   }
 ]
@@ -53,17 +55,57 @@ const Detail = (props) =>
   const { classes, theme } = props;
   const { copayerDetail, clinicSettings } = props;
   const { handleSubmit } = props;
+  
+  const spacingSize = theme.spacing(1);
+
+  const [editingLists, setEditingLists] = useState([]);
+
+  const onEditingList = (listName, isEditing) => {
+    let newEditingList = [];
+    
+    console.log('on edit before', {listName, isEditing}, editingLists);
+    if (isEditing) {
+      newEditingList = editingLists.concat(listName);
+    } 
+    else {
+      if (editingLists && editingLists.length > 0) {
+        newEditingList = editingLists.filter(function(x) { return x !== listName; });
+      }
+    }
+
+    console.log('on edit after', {listName, isEditing}, newEditingList);
+    setEditingLists(newEditingList);
+  };
+
   const compProps = {
     height: `calc(100vh - ${183 + theme.spacing(1)}px)`,
+    onEditingListControl: onEditingList,
     ...props
   };
 
-  const spacingSize = theme.spacing(1);
+  const ActionButtons = (props) => {
+    const disabledSaveButton = editingLists && editingLists.length > 0;
+    let saveButton = (
+      <ProgressButton
+        disabled={disabledSaveButton}
+        submitKey='schemeDetail/submit'
+        onClick={handleSubmit}
+      />
+    )
 
-  return (
-    <React.Fragment>
-      <Tabs style={{ marginTop: theme.spacing(1) }} defaultActiveKey='0' options={copayerDetailTabs(compProps)}/>
-      <div style={{textAlign: 'center'}}>
+    if (disabledSaveButton) {
+      let editingMsg = 'Complete edit ' + editingLists[0] + ' to save';
+      saveButton = (
+        <Tooltip title={editingMsg} placement='top'>
+          <span>
+            {saveButton}
+          </span>
+        </Tooltip>
+      )
+    }
+    
+    return (
+      <React.Fragment>
         <Button
           authority='none'
           color='danger'
@@ -71,10 +113,16 @@ const Detail = (props) =>
         >
           Close
         </Button>
-        <ProgressButton
-          submitKey='schemeDetail/submit'
-          onClick={handleSubmit}
-        />
+        {saveButton}
+      </React.Fragment>
+    )
+  };
+
+  return (
+    <React.Fragment>
+      <Tabs style={{ marginTop: theme.spacing(1) }} defaultActiveKey='0' options={copayerDetailTabs(compProps)}/>
+      <div style={{textAlign: 'center'}}>
+        <ActionButtons {...props}/>
       </div>
     </React.Fragment>
   );
@@ -96,14 +144,14 @@ export default compose(
       return copayerDetail.entity ? copayerDetail.entity : copayerDetail.default;
     },
     validationSchema: Yup.object().shape({
-      code: Yup.string().required().max(30, 'Copayer Code should not exceed 30 characters'),
+      code: Yup.string().max(20, 'Copayer Code should not exceed 20 characters'),
       displayValue: Yup.string().required().max(200, 'Copayer Name should not exceed 200 characters'),
+      coPayerTypeFK: Yup.number().required(),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
-      creditInformation: Yup.string().max(200, 'Credit Information should not exceed 200 characters'),
+      creditInformation: Yup.string().max(300, 'Credit Information should not exceed 300 characters'),
       remark: Yup.string().max(200, 'Remarks should not exceed 200 characters'),
       website: Yup.string().max(100, 'Website should not exceed 100 characters'),
       address: Yup.object().shape({
-        countryFK: Yup.number().required(),
         postcode: Yup.string().max(10, 'Postcode should not exceed 10 characters'),
         blockNo: Yup.string().max(500, 'Block No should not exceed 500 characters'),
         unitNo: Yup.string().max(500, 'Unit No should not exceed 500 characters'),

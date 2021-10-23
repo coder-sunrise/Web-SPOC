@@ -39,7 +39,9 @@ const PharmacyDetails = ({
           payload: { id: detailsId },
         }).then(r => {
           if (r) {
-            stopRefreshTimer()
+            if (stopRefreshTimer) {
+              stopRefreshTimer()
+            }
             setShowModal(true)
           } else {
             setDetailsId(undefined)
@@ -69,7 +71,9 @@ const PharmacyDetails = ({
       payload: { entity: undefined, fromModule: undefined },
     })
     refreshClick()
-    startRefreshTimer()
+    if (startRefreshTimer) {
+      startRefreshTimer()
+    }
   }
 
   return (

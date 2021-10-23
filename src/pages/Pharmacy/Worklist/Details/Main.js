@@ -6,7 +6,7 @@ import _ from 'lodash'
 import numeral from 'numeral'
 import moment from 'moment'
 import { history } from 'umi'
-import { withStyles } from '@material-ui/core'
+import { withStyles, Drawer } from '@material-ui/core'
 import Warning from '@material-ui/icons/Error'
 import Refresh from '@material-ui/icons/Refresh'
 import Yup from '@/utils/yup'
@@ -38,7 +38,7 @@ import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE, PHARMACY_STATUS, PHARMACY_ACTION } from '@/utils/constants'
 import AddOrder from '@/pages/Dispense/DispenseDetails/AddOrder'
 import { MenuOutlined } from '@ant-design/icons'
-import { PharmacySteps } from '../../Components'
+import { PharmacySteps, JournalHistory } from '../../Components'
 import RedispenseForm from '../../Components/RedispenseForm'
 
 const styles = theme => ({
@@ -84,7 +84,7 @@ const styles = theme => ({
   },
   groupStyle: {
     padding: '3px 0px',
-    backgroundColor: '#CCCCCC',
+    backgroundColor: 'rgb(240, 248, 255)',
   },
 })
 
@@ -122,6 +122,7 @@ const Main = props => {
   } = props
 
   const [orderUpdateMessage, setOrderUpdateMessage] = useState({})
+  const [showJournalHistory, setShowJournalHistory] = useState(false)
   useEffect(() => {
     subscribeNotification('PharmacyOrderUpdate', {
       callback: response => {
@@ -179,6 +180,13 @@ const Main = props => {
       return
     }
     const _addOrder = () => {
+      dispatch({
+        type: 'orders/updateState',
+        payload: {
+          type: '1',
+          visitPurposeFK: visitPurposeFK,
+        },
+      })
       dispatch({
         type: 'dispense/query',
         payload: {
@@ -1049,35 +1057,36 @@ const Main = props => {
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   paddingRight: existsDrugLabelRemarks ? 10 : 0,
+                  minHeight: 20,
                 }}
               >
                 <Tooltip title={row.remarks || ''}>
                   <span>{row.remarks || ' '}</span>
                 </Tooltip>
-                <div style={{ position: 'relative', top: 2 }}>
-                  {existsDrugLabelRemarks && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        bottom: 2,
-                        right: -13,
-                      }}
-                    >
-                      <Tooltip
-                        title={
-                          <div>
-                            <div style={{ fontWeight: 600 }}>
-                              Drug Label Remarks
-                            </div>
-                            <div>{row.drugLabelRemarks}</div>
+              </div>
+              <div style={{ position: 'relative', top: 6 }}>
+                {existsDrugLabelRemarks && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 2,
+                      right: -8,
+                    }}
+                  >
+                    <Tooltip
+                      title={
+                        <div>
+                          <div style={{ fontWeight: 600 }}>
+                            Drug Label Remarks
                           </div>
-                        }
-                      >
-                        <FileCopySharp style={{ color: '#4255bd' }} />
-                      </Tooltip>
-                    </div>
-                  )}
-                </div>
+                          <div>{row.drugLabelRemarks}</div>
+                        </div>
+                      }
+                    >
+                      <FileCopySharp style={{ color: '#4255bd' }} />
+                    </Tooltip>
+                  </div>
+                )}
               </div>
             </div>
           )
@@ -1240,6 +1249,7 @@ const Main = props => {
       pager: false,
       grouping: true,
       groupingConfig: {
+        isDisableExpandedGroups: true,
         state: {
           grouping: [{ columnName: 'dispenseGroupId' }],
           expandedGroups: defaultExpandedGroups,
@@ -1273,14 +1283,14 @@ const Main = props => {
             )
           },
         },
-        backgroundColor: '#CCCCCC',
+        backgroundColor: 'rgb(240, 248, 255)',
       },
     }
   }
   return (
     <div>
       <GridContainer>
-        <GridItem md={12}>
+        <GridItem md={12} style={{ marginTop: 8 }}>
           <PharmacySteps
             statusHistory={statusHistory}
             currentStatusFK={workitem.statusFK}
@@ -1368,7 +1378,7 @@ const Main = props => {
               position: 'relative',
               top: '6px',
             }}
-            onClick={() => {}}
+            onClick={() => setShowJournalHistory(true)}
           >
             Journal History
           </Typography.Text>
@@ -1645,6 +1655,13 @@ const Main = props => {
       >
         <RedispenseForm onConfirmRedispense={onConfirmRedispense} />
       </CommonModal>
+      <Drawer
+        anchor='right'
+        open={showJournalHistory}
+        onClose={() => setShowJournalHistory(false)}
+      >
+        <JournalHistory statusHistory={statusHistory} />
+      </Drawer>
     </div>
   )
 }

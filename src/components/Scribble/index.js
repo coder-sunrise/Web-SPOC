@@ -21,17 +21,21 @@ import UndoIcon from '@material-ui/icons/Undo'
 import RedoIcon from '@material-ui/icons/Redo'
 import DeleteIcon from '@material-ui/icons/Delete'
 import Save from '@material-ui/icons/SaveAlt'
+import SaveIcon from '@material-ui/icons/Save';
 import Erase from '@material-ui/icons/HowToVote'
 import Remove from '@material-ui/icons/Remove'
 import Backspace from '@material-ui/icons/CompareArrowsTwoTone'
 import Rectangle from '@material-ui/icons/CropSquare'
 import Circle from '@material-ui/icons/PanoramaFishEye'
 import Move from '@material-ui/icons/OpenWith'
-import Select from '@material-ui/icons/PanTool'
+import SelectIcon from '@material-ui/icons/PanTool'
 import Visibility from '@material-ui/icons/Visibility'
 import InVisibility from '@material-ui/icons/VisibilityOff'
+import EditIcon from '@material-ui/icons/Edit'
+import AddIcon from '@material-ui/icons/Add'
 import MaterialTextField from '@material-ui/core/TextField'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener'
+import ReplayIcon from '@material-ui/icons/Replay';
 import keydown, { Keys } from 'react-keydown'
 import { Radio } from 'antd'
 import { connect } from 'dva'
@@ -50,12 +54,16 @@ import {
   Button,
   withFormikExtend,
   FastField,
+  Select,
 } from '@/components'
-
+import _ from 'lodash'
 import {
   errMsgForOutOfRange as errMsg,
   navigateDirtyCheck,
 } from '@/utils/utils'
+import { Add } from '@material-ui/icons'
+import moment from 'moment'
+
 
 const styles = () => ({
   container: {
@@ -64,12 +72,12 @@ const styles = () => ({
   },
   dropArea: {
     width: '100%',
-    height: '90px',
+    // height: '30px',
     border: '2px dashed rgb(102, 102, 102)',
     borderStyle: 'dashed',
     borderRadius: '5px',
     textAlign: 'center',
-    paddingTop: '30px',
+    // paddingTop: '30px',
     paddingLeft: '10px',
     paddingRight: '10px',
   },
@@ -96,15 +104,15 @@ const styles = () => ({
     paddingTop: 5,
   },
   templateImage: {
-    maxHeight: 130,
+    maxHeight: 'calc(100vh - 270px)',
     overflow: 'auto',
     alignItems: 'center',
   },
   imageOption: {
-    width: 402.27,
     alignItems: 'center',
     textAlign: 'center',
     display: 'block',
+    margin:5,
   },
   rightButton: {
     display: 'flex',
@@ -113,8 +121,166 @@ const styles = () => ({
   },
   sketchArea: {
     paddingTop: 30,
+    paddingRight:0,
+  },
+  imageTemplateArea:{
+    paddingTop: 10,
+  },
+  templateItemActions:{
+    // height: 30,
+    position: 'relative',
+    '& > #templateItemActions':{
+      display: 'none',
+      position: 'absolute',
+      right: 0,
+      bottom: 0,
+    },
+    '&:hover > #templateItemActions':{
+      display: 'inline-block',
+    },
+    '& > div > div > input:not([disabled])':{
+      width: 'calc(100% - 44px)',
+    },
+    '&:hover > span#readOnlyDescription':{
+      paddingRight: 66,
+    },
+    '& > span#readOnlyDescription':{
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      display: 'block',
+      textAlign: 'left',
+      borderBottom: '1px solid gray',
+      padding:'1.5px 0'
+    },
+  },
+  templateItemEditActions:{
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
   },
 })
+
+class ScribbleTemplateItem extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      isEdit: false,
+      item: props.item,
+      description: props.item.description,
+    }
+  }
+  buttonProps = {
+    justIcon: true,
+    color: 'transparent',
+    style: { marginRight: -4 },
+  }
+  render() {
+    const { isEdit, item, description } = this.state
+    const { setTemplate, upsertTemplate, classes } = this.props
+    return (
+      <div style={{paddingBottom:5}}>
+        <div>
+          <img
+            style={{ height: 140, border: '1px solid gray' }}
+            src={item.layerContent}
+          />
+        </div>
+        <div className={classes.templateItemActions}>
+          {isEdit ? 
+            <TextField
+              ref={this.inputRef}
+              disabled={!isEdit}
+              label=''
+              maxLength={500}
+              style={{ margin: 0 }}
+              inputProps={{
+                id: 'templateItemName',
+                maxLength: 500,
+                style: { fontSize: 14, padding: 0 },
+              }}
+              value={description}
+              onChange={e => {
+                this.setState({ description: e.target.value })
+              }}
+            /> :
+            <Tooltip title={item.description}>
+              <span id='readOnlyDescription'>{item.description}</span>
+            </Tooltip>
+          }
+          {isEdit ? (
+            <span className={classes.templateItemEditActions}>
+              <Tooltip title='Restore'>
+                <Button
+                  {...this.buttonProps}
+                  onClick={() => {
+                    this.setState({
+                      isEdit: false,
+                      description: item.description,
+                    })
+                  }}
+                >
+                  <ReplayIcon />
+                </Button>
+              </Tooltip>
+              <Tooltip title='Save'>
+                <Button
+                  {...this.buttonProps}
+                  onClick={() => {
+                    const savedItem = { ...item, description }
+                    this.setState({
+                      isEdit: false,
+                      item: savedItem,
+                      description,
+                    })
+                    upsertTemplate.call(this, savedItem)
+                  }}
+                >
+                  <SaveIcon />
+                </Button>
+              </Tooltip>
+            </span>
+          ) : (
+            <span id='templateItemActions'>
+             <Tooltip title='Edit'>
+              <Button
+                  {...this.buttonProps}
+                  onClick={() => {
+                    this.setState({ isEdit: true })
+                  }}
+                >
+                  <EditIcon />
+                </Button>
+             </Tooltip>
+              <Tooltip title='Apply'>
+                <Button
+                  {...this.buttonProps}
+                  onClick={() => {
+                    setTemplate(item.layerContent, item.id, item.description)
+                  }}
+                >
+                  <RedoIcon />
+                </Button>
+              </Tooltip>
+              <Tooltip title='Delete'>
+                <Button
+                  {...this.buttonProps}
+                  onClick={() => {
+                    const deledItem = { ...item, isDeleted: true }
+                    this.setState({ item: deledItem })
+                    upsertTemplate(deledItem)
+                  }}
+                >
+                  <DeleteIcon />
+                </Button>
+              </Tooltip>
+            </span>
+          )}
+        </div>
+      </div>
+    )
+  }
+}
 
 let temp = null
 @withFormikExtend({
@@ -144,7 +310,7 @@ let temp = null
   scriblenotes,
 }))
 class Scribble extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       tool: props.scriblenotes.isReadonly ? Tools.None : Tools.Pencil,
@@ -177,10 +343,12 @@ class Scribble extends React.Component {
       selectColor: false,
       eraserColor: false,
       templateList: [],
+      filterItem: '',
     }
+    this.inputEl = React.createRef()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { scriblenotes, dispatch } = this.props
 
     if (scriblenotes.editEnable) {
@@ -193,14 +361,7 @@ class Scribble extends React.Component {
       })
     }
 
-    dispatch({
-      type: 'scriblenotes/queryTemplateList',
-    }).then((templateList) => {
-      if (templateList && templateList.data)
-        this.setState({
-          templateList: templateList.data.data,
-        })
-    })
+    this.queryTemplateList()
 
     if (this.props.scribbleData !== '') {
       if (this.props.scribbleData.scribbleNoteLayers.length > 0) {
@@ -213,35 +374,35 @@ class Scribble extends React.Component {
     }
   }
 
-  handleToolsDrawVisibleChange = (toolsDrawVisible) => {
+  handleToolsDrawVisibleChange = toolsDrawVisible => {
     this.setState({ toolsDrawVisible })
     if (!toolsDrawVisible) {
       this.setState({ toolsDrawingColor: false })
     }
   }
 
-  handleToolsShapeVisibleChange = (toolsShapeVisible) => {
+  handleToolsShapeVisibleChange = toolsShapeVisible => {
     this.setState({ toolsShapeVisible })
     if (!toolsShapeVisible) {
       this.setState({ toolsShapeColor: false })
     }
   }
 
-  handleColorVisibleChange = (colorVisible) => {
+  handleColorVisibleChange = colorVisible => {
     this.setState({ colorVisible })
     if (!colorVisible) {
       this.setState({ selectColorColor: false })
     }
   }
 
-  handleInsertImageVisibleChange = (imageVisible) => {
+  handleInsertImageVisibleChange = imageVisible => {
     this.setState({ imageVisible })
     if (!imageVisible) {
       this.setState({ imageColor: false })
     }
   }
 
-  handleTextVisibleChange = (textVisible) => {
+  handleTextVisibleChange = textVisible => {
     this.setState({ textVisible })
     if (!textVisible) {
       this.setState({ textColor: false })
@@ -335,7 +496,7 @@ class Scribble extends React.Component {
     }
   }
 
-  _onSketchChange = (action) => {
+  _onSketchChange = action => {
     const { scriblenotes } = this.props
     if (scriblenotes.isReadonly) return
     const prev = this.state.canUndo
@@ -363,7 +524,7 @@ class Scribble extends React.Component {
     this.props.setFieldValue('drawing', 'dirty')
   }
 
-  _selectTool = (event) => {
+  _selectTool = event => {
     this.setState({
       tool: event.target.value,
       // enableRemoveSelected: event.target.value === Tools.Select,
@@ -392,9 +553,8 @@ class Scribble extends React.Component {
     this._addText()
   }
 
-  _onBackgroundImageDrop = (accepted) => {
+  _onBackgroundImageDrop = accepted => {
     const { indexCount } = this.state
-
     if (accepted && accepted.length > 0) {
       const sketch = this._sketch
       const reader = new FileReader()
@@ -412,9 +572,75 @@ class Scribble extends React.Component {
       reader.readAsDataURL(accepted[0])
     }
   }
+  
+  uploadTemplate = file => {
+    let reader = new FileReader()
+    reader.onloadend = () => {
+      const newItem = this.generateScribbleTemplateDto(file.name, reader.result)
+      this.upsertTemplate(newItem)
+    }
+    reader.readAsDataURL(file)
+  }
 
-  _setTemplate = (layerContent, id) => {
-    this._sketch.setTemplate(layerContent, id)
+  generateScribbleTemplateDto = (name, base64) => {
+    const dto = {
+      code: name,
+      displayValue: name,
+      description: name,
+      layerContent: base64,
+      isUserMaintainable: true,
+      isDeleted: false,
+      sortOrder: this.state.templateList.reduce((maxSortOrder,t) => Math.max(maxSortOrder,t.sortOrder||0),0) + 1,
+      effectiveStartDate: moment().formatUTC(false),
+      effectiveEndDate: moment('2099-12-31').formatUTC(false),
+      scribbleNoteType: this.props.scribbleNoteType,
+    }
+    return dto
+  }
+
+  queryTemplateList = ()=>{
+    const { dispatch } = this.props
+    dispatch({
+      type: 'scriblenotes/queryTemplateList',
+      payload: {
+        scribbleNoteType: this.props.scribbleNoteType,
+      },
+    }).then(templateList => {
+      if (templateList && templateList.data)
+        this.setState({
+          templateList: templateList.data.data,
+        })
+    })
+  }
+
+  upsertTemplate = item => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'scriblenotes/upsertTemplate',
+      payload: item,
+    }).then(r => {
+      if (r) 
+        this.queryTemplateList()
+    })
+  }
+
+  onUploadTemplateClick = () => {
+    this.inputEl.current.click()
+  }
+
+  clearValue = e => {
+    e.target.value = null
+  }
+
+  onFileChange = async event => {
+    const { files } = event.target
+    console.log('onfilechange', files)
+    if (files.length > 0) this.uploadTemplate(files[0])
+  }
+
+  _setTemplate = (layerContent, id, description) => {
+    this._sketch.setTemplate(layerContent, id, description)
+    this.props.setFieldValue('subject', description.substr(0,20))
   }
 
   toolDrawingHandleClickAway = () => {
@@ -448,7 +674,7 @@ class Scribble extends React.Component {
   }
 
   @keydown('ctrl+z')
-  shortcutKeyUndo () {
+  shortcutKeyUndo() {
     if (this.props.scriblenotes.isReadonly) return
     if (this.state.canUndo) {
       this._undo()
@@ -456,7 +682,7 @@ class Scribble extends React.Component {
   }
 
   @keydown('ctrl+y')
-  shortcutKeyRedo () {
+  shortcutKeyRedo() {
     if (this.props.scriblenotes.isReadonly) return
     if (this.state.canRedo) {
       this._redo()
@@ -464,7 +690,7 @@ class Scribble extends React.Component {
   }
 
   @keydown('delete')
-  shortcutKeyDelete () {
+  shortcutKeyDelete() {
     if (this.props.scriblenotes.isReadonly) return
     const result = this._sketch._deleteSelectedObject()
     if (!result) {
@@ -489,7 +715,7 @@ class Scribble extends React.Component {
     this.props.handleSubmit()
   }
 
-  onInsertClick = (event) => {
+  onInsertClick = event => {
     const imageDataUrl = this._sketch.exportToImageDataUrl()
     const { dispatch, exportToClinicalNote } = this.props
     // this.props.dispatch({
@@ -507,7 +733,7 @@ class Scribble extends React.Component {
     })(event)
   }
 
-  render () {
+  render() {
     const {
       classes,
       toggleScribbleModal,
@@ -517,6 +743,18 @@ class Scribble extends React.Component {
       dispatch,
       scriblenotes,
     } = this.props
+    const { templateList, filterItem } = this.state
+    const filteredTemplateList =
+      filterItem && filterItem.trim() !== ''
+        ? templateList.filter(x =>
+            x.description.toLowerCase().includes(filterItem.toLowerCase()),
+          )
+        : templateList
+    const sortedTemplateList = _.orderBy(
+      filteredTemplateList,
+      ['sortOrder'],
+      ['asc'],
+    )
     return (
       <div className={classes.layout}>
         <GridContainer>
@@ -524,7 +762,7 @@ class Scribble extends React.Component {
             <div className={classes.scribbleSubject}>
               <FastField
                 name='subject'
-                render={(args) => (
+                render={args => (
                   <TextField
                     {...args}
                     label='Scribble Subject'
@@ -546,7 +784,7 @@ class Scribble extends React.Component {
                 // size='small'
                 // value={alignment}
                 exclusive
-                onChange={(e) => {
+                onChange={e => {
                   if (e.target.value === 'select') {
                     this.setState({
                       tool: e.target.value,
@@ -578,7 +816,7 @@ class Scribble extends React.Component {
                       })
                     }}
                   >
-                    <Select
+                    <SelectIcon
                       color={this.state.selectColor ? 'primary' : ''}
                       style={{
                         color: this.state.selectColor ? '' : '#191919',
@@ -600,7 +838,7 @@ class Scribble extends React.Component {
                               // defaultValue={Tools.Pencil}
                               value={this.state.tool}
                               buttonStyle='solid'
-                              onChange={(e) => {
+                              onChange={e => {
                                 this.setState({
                                   tool: e.target.value,
                                   eraserColor: false,
@@ -645,7 +883,8 @@ class Scribble extends React.Component {
                               aria-labelledby='slider'
                               value={this.state.lineWidth}
                               onChange={(e, v) =>
-                                this.setState({ lineWidth: v })}
+                                this.setState({ lineWidth: v })
+                              }
                             />
                           </GridItem>
                         </GridContainer>
@@ -694,7 +933,7 @@ class Scribble extends React.Component {
                               // defaultValue={Tools.Pencil}
                               value={this.state.tool}
                               buttonStyle='solid'
-                              onChange={(e) => {
+                              onChange={e => {
                                 this.setState({
                                   tool: e.target.value,
                                   eraserColor: false,
@@ -724,9 +963,10 @@ class Scribble extends React.Component {
                             <Switch
                               value={this.state.fillWithColor}
                               onChange={() =>
-                                this.setState((preState) => ({
+                                this.setState(preState => ({
                                   fillWithColor: !preState.fillWithColor,
-                                }))}
+                                }))
+                              }
                             />
                           </GridItem>
                         </GridContainer>
@@ -742,7 +982,8 @@ class Scribble extends React.Component {
                               aria-labelledby='slider'
                               value={this.state.lineWidth}
                               onChange={(e, v) =>
-                                this.setState({ lineWidth: v })}
+                                this.setState({ lineWidth: v })
+                              }
                             />
                           </GridItem>
                         </GridContainer>
@@ -789,8 +1030,9 @@ class Scribble extends React.Component {
                             <CompactPicker
                               id='lineColor'
                               color={this.state.lineColor}
-                              onChange={(color) =>
-                                this.setState({ lineColor: color.hex })}
+                              onChange={color =>
+                                this.setState({ lineColor: color.hex })
+                              }
                             />
                           </GridItem>
                         </GridContainer>
@@ -800,8 +1042,9 @@ class Scribble extends React.Component {
                             <Typography>Fill Color</Typography>
                             <CompactPicker
                               color={this.state.fillColor}
-                              onChange={(color) =>
-                                this.setState({ fillColor: color.hex })}
+                              onChange={color =>
+                                this.setState({ fillColor: color.hex })
+                              }
                             />
 
                             {/* <Typography>Fill Enable</Typography>
@@ -844,100 +1087,6 @@ class Scribble extends React.Component {
                     </ToggleButton>
                   </Tooltip>
                 </Popover>
-
-                <Popover
-                  icon={null}
-                  content={
-                    <ClickAwayListener onClickAway={this.imageHandleClickAway}>
-                      <div>
-                        <GridContainer>
-                          <GridItem xs={12} md={12}>
-                            <div style={{ paddingBottom: 10 }}>
-                              <Typography>Select Image</Typography>
-                              <Divider />
-                            </div>
-                            <Paper className={classes.templateImage}>
-                              <List>
-                                <div className={classes.imageOption}>
-                                  {this.state.templateList.map((item) => {
-                                    return (
-                                      <Button
-                                        color='primary'
-                                        onClick={() => {
-                                          this._setTemplate(
-                                            item.layerContent,
-                                            item.id,
-                                          )
-                                        }}
-                                        style={{
-                                          margin: 10,
-                                        }}
-                                      >
-                                        {item.description}
-                                      </Button>
-                                    )
-                                  })}
-                                </div>
-                              </List>
-                            </Paper>
-                          </GridItem>
-                        </GridContainer>
-                        <GridContainer style={{ paddingTop: 10 }}>
-                          <GridItem xs={12} md={12}>
-                            <Dropzone
-                              onDrop={this._onBackgroundImageDrop}
-                              accept='image/*'
-                              multiple={false}
-                            >
-                              {({ getRootProps, getInputProps }) => (
-                                <section>
-                                  <div
-                                    {...getRootProps()}
-                                    style={styles.dropArea}
-                                  >
-                                    <input {...getInputProps()} />
-                                    <p className={classes.dropArea}>
-                                      Drag and drop some files here, or click to
-                                      select files
-                                    </p>
-                                  </div>
-                                </section>
-                              )}
-                            </Dropzone>
-                          </GridItem>
-                        </GridContainer>
-                      </div>
-                    </ClickAwayListener>
-                  }
-                  // title='Select Image'
-                  trigger='click'
-                  placement='bottomLeft'
-                  visible={this.state.imageVisible}
-                  onVisibleChange={this.handleInsertImageVisibleChange}
-                  onClick={() => {
-                    const { imageColor } = this.state
-                    this.setState(() => ({
-                      toolsDrawingColor: false,
-                      toolsShapeColor: false,
-                      selectColorColor: false,
-                      imageColor: true,
-                      textColor: false,
-                      eraserColor: false,
-                    }))
-                  }}
-                >
-                  <Tooltip title='Insert Image'>
-                    <ToggleButton key={5}>
-                      <InsertPhoto
-                        color={this.state.imageColor ? 'primary' : ''}
-                        style={{
-                          color: this.state.imageColor ? '' : '#191919',
-                        }}
-                      />
-                    </ToggleButton>
-                  </Tooltip>
-                </Popover>
-
                 <Popover
                   icon={null}
                   content={
@@ -947,8 +1096,9 @@ class Scribble extends React.Component {
                           <GridItem xs={12} md={12}>
                             <TextField
                               label='Text'
-                              onChange={(e) =>
-                                this.setState({ text: e.target.value })}
+                              onChange={e =>
+                                this.setState({ text: e.target.value })
+                              }
                               // value={this.state.text}
                             />
                           </GridItem>
@@ -1178,12 +1328,12 @@ class Scribble extends React.Component {
               )}
             </div>
           </GridItem>
-          <GridItem xs={12} md={12}>
+          <GridItem xs={10} md={10}>
             <div className={classes.sketchArea}>
-              <FastField name='drawing' render={(args) => ''} />
+              <FastField name='drawing' render={args => ''} />
               <SketchField
                 name='sketch'
-                ref={(c) => {
+                ref={c => {
                   this._sketch = c
                 }}
                 lineWidth={this.state.lineWidth}
@@ -1191,24 +1341,98 @@ class Scribble extends React.Component {
                 className={classes.container}
                 tool={this.state.tool}
                 fillColor={
-                  this.state.fillWithColor ? (
-                    this.state.fillColor
-                  ) : (
-                    'transparent'
-                  )
+                  this.state.fillWithColor
+                    ? this.state.fillColor
+                    : 'transparent'
                 }
                 backgroundColor={
-                  this.state.fillWithBackgroundColor ? (
-                    this.state.backgroundColor
-                  ) : (
-                    'transparent'
-                  )
+                  this.state.fillWithBackgroundColor
+                    ? this.state.backgroundColor
+                    : 'transparent'
                 }
                 onChange={this._onSketchChange}
                 forceValue
                 height={this.state.sketchHeight}
                 width={this.state.sketchWidth}
               />
+            </div>
+          </GridItem>
+          <GridItem xs={2} md={2}>
+            <div className={classes.imageTemplateArea}>
+              <GridContainer>
+                <GridItem xs={12} md={12}>
+                  <div style={{ position: 'relative' }}>
+                    <TextField
+                      label='Image Templates'
+                      maxLength={500}
+                      inputProps={{ maxLength: 500 }}
+                      style={{ paddingRight: 35 }}
+                      value={filterItem}
+                      onChange={e => {
+                        this.setState({ filterItem: e.target.value })
+                      }}
+                    />
+                    <Tooltip title='Upload Image'>
+                      <Button
+                        color='success'
+                        justIcon
+                        onClick={this.onUploadTemplateClick}
+                        style={{ position: 'absolute', right: -10, bottom: 10 }}
+                      >
+                        <Add />
+                      </Button>
+                    </Tooltip>
+                  </div>
+                  <div className={classes.templateImage}>
+                    <List>
+                      <div className={classes.imageOption}>
+                        {sortedTemplateList.map(item => (
+                          <ScribbleTemplateItem
+                            key={item.id}
+                            item={item}
+                            setTemplate={this._setTemplate}
+                            upsertTemplate={this.upsertTemplate}
+                            classes={classes}
+                          />
+                        ))}
+                      </div>
+                    </List>
+                  </div>
+                </GridItem>
+              </GridContainer>
+              <GridContainer style={{ paddingTop: 10 }}>
+                <GridItem xs={12} md={12}>
+                  <Dropzone
+                    onDrop={this._onBackgroundImageDrop}
+                    accept='image/*'
+                    multiple={false}
+                  >
+                    {({ getRootProps, getInputProps }) => (
+                      <section>
+                        <div {...getRootProps()} style={styles.dropArea}>
+                          <input {...getInputProps()} />
+                          <p className={classes.dropArea}>
+                            Drag and drop some files here, <br/>or click to select
+                            files
+                          </p>
+                        </div>
+                      </section>
+                    )}
+                  </Dropzone>
+                </GridItem>
+                <GridItem xs={12} md={12}>
+                  <input
+                    style={{ display: 'none' }}
+                    type='file'
+                    accept='image/*'
+                    id='uploadTemplate'
+                    ref={this.inputEl}
+                    multiple={false}
+                    onChange={this.onFileChange}
+                    onClick={this.clearValue}
+                  />
+                </GridItem>
+              </GridContainer>
             </div>
           </GridItem>
         </GridContainer>

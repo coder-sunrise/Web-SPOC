@@ -365,14 +365,6 @@ export const ADD_ON_FEATURE = {
   MIMS: 2,
 }
 
-export const RadiologyWorkitemStatus = {
-  1: 'New',
-  2: 'In Progress',
-  3: 'Modality Completed',
-  4: 'Completed',
-  5: 'Cancelled',
-}
-
 export const PharmacyWorkitemStatus = {
   1: 'New',
   2: 'Prepared',
@@ -645,12 +637,28 @@ export const DOSAGE_RULE = {
   default: 'default',
 }
 
+export const RADIOLOGY_WORKITEM_STATUS_TITLE = {
+  1: 'New',
+  2: 'In Progress',
+  3: 'Modality Completed',
+  4: 'Completed',
+  5: 'Cancelled',
+}
+
 export const RADIOLOGY_WORKITEM_STATUS = {
   NEW: 1,
   INPROGRESS: 2,
   MODALITYCOMPLETED: 3,
   COMPLETED: 4,
   CANCELLED: 5,
+}
+
+export const RADIOLOGY_WORKLIST_STATUS_COLOR = {
+  1: '#009933',
+  2: '#960',
+  3: '#099',
+  4: '#366',
+  5: '#797979',
 }
 
 export const RADIOLOGY_WORKITEM_BUTTON = [
@@ -748,3 +756,5 @@ export const CHECKLIST_CATEGORY = {
   RADIOLOGY: 1,
   DOCTORCONSULTATION: 2,
 }
+
+export const GENDER = { FEMALE: 1, MALE: 2 }
