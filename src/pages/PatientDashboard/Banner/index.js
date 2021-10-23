@@ -969,8 +969,11 @@ class Banner extends PureComponent {
                       />
                     </span>
 
-                    <span className={classes.part}>
-                      <PatientStickyNotesBtn patientProfileFK={info.id}/>
+                    <span
+                      className={classes.part}
+                      style={{ top: 3, position: 'relative' }}
+                    >
+                      <PatientStickyNotesBtn patientProfileFK={info.id} />
                     </span>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
@@ -985,7 +988,10 @@ class Banner extends PureComponent {
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
                     <span className={classes.header}>Tag: </span>
-                    <span className={classes.contents} style={{WebkitLineClamp: 1}}>
+                    <span
+                      className={classes.contents}
+                      style={{ WebkitLineClamp: 1 }}
+                    >
                       {info.patientTag.length > 0
                         ? info.patientTag.map(t => t.tagName).join(', ')
                         : ''}
