@@ -173,14 +173,14 @@ export default withFormikExtend({
         }
       })
     }
-    const anyDefaultIsNotThis =　restValues.isDefault && restValues.list.some(x => x.isDefault && x.id !== restValues.id)
-    if (anyDefaultIsNotThis) {
+    const defaultAppt =　restValues.isDefault && restValues.list.find(x => x.isDefault && x.id !== restValues.id)
+    if (defaultAppt) {
       dispatch({
         type: 'global/updateAppState',
         payload: {
           openConfirm: true,
           openConfirmContent:
-            'There is an default appointment type.\nConfirm to overwrite?',
+            `Appointment (${defaultAppt.displayValue.length > 20 ? `${defaultAppt.displayValue.substr(0,20)}...` : defaultAppt.displayValue}) is currently set as the default appointment type. Confirm to overwrite?`,
           onConfirmSave: saveData,
         },
       })
