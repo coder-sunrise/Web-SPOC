@@ -53,7 +53,7 @@ const _routes = [
       { path: '/reception', redirect: '/reception/queue' },
       {
         path: '/reception',
-        icon: 'icon-medicinebox-fill',
+        icon: 'icon-solution',
         name: 'reception',
         moduleName: 'Reception',
         authority: ['reception'],
@@ -154,7 +154,7 @@ const _routes = [
       },
       {
         path: '/pharmacy',
-        icon: 'icon-plus-square',
+        icon: 'icon-medicinebox-fill',
         name: 'pharmacy',
         moduleName: 'Pharmacy',
         authority: ['pharmacy'],

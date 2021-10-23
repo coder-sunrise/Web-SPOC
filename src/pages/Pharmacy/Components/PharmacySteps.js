@@ -68,7 +68,7 @@ const getStatusStep = (
   return (
     <Step
       title={
-        <span style={{ fontWeight: 500 }}>
+        <span style={{ fontWeight: 600 }}>
           {isPartialDispense && status.statusFK === PHARMACY_STATUS.COMPLETED
             ? `${status.name} (Partial Dispense)`
             : status.name}

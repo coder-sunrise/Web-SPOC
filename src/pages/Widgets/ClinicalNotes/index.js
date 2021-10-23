@@ -624,6 +624,7 @@ class ClinicalNotes extends Component {
             toggleScribbleModal={this.toggleScribbleModal}
             scribbleData={this.state.selectedData}
             deleteScribbleNote={this.deleteScribbleNote}
+            scribbleNoteType={this.state.category}
           />
         </CommonModal>
       </div>
