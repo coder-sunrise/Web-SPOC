@@ -46,6 +46,11 @@ const api = {
 
 const style = theme => ({})
 
+const PharmacyWorkitemHistoryStatus = {
+  '-4': 'Partially',
+  '4': 'Completed',
+}
+
 const orderDateForm = moment()
   .add(-1, 'week')
   .toDate()
@@ -198,8 +203,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       dataIndex: 'status',
       sorter: false,
       search: false,
-      renderText: (item, { type, defaultRender, ...rest }, form) =>
-        Object.values(PharmacyWorkitemStatus)[item - 1],
+      render: (_dom: any, entity: any) => PharmacyWorkitemHistoryStatus[entity.status] || '-',
       width: 100,
       fixed: 'right',
     },
@@ -313,8 +317,8 @@ const defaultColumns = (codetable, setDetailsId) => {
             label='Status'
             mode='multiple'
             options={[
-              { value: 6, name: 'Partially' },
-              { value: 4, name: 'Completed' },
+              { value: -4, name: PharmacyWorkitemHistoryStatus[-4] },
+              { value: 4, name: PharmacyWorkitemHistoryStatus[4] },
             ]}
             placeholder=''
             style={{ width: 250 }}
