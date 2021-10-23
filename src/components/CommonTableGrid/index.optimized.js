@@ -1202,7 +1202,11 @@ class CommonTableGrid extends PureComponent {
                   rowComponent={p => {
                     return (
                       <TableGroupRow.Row
-                        className='group'
+                        className={
+                          groupingConfig.isDisableExpandedGroups
+                            ? 'disableexpandedgroup'
+                            : 'group'
+                        }
                         {...p}
                         style={{
                           backgroundColor: groupingConfig.backgroundColor,
