@@ -201,7 +201,7 @@ class ScribbleNoteItem extends React.Component {
           </div>
         }
       >
-        <Button size='sm' color='info'>Scribble Note</Button>
+        <Button size='sm' color='info'>Scribble Note{scribbleNoteArray && scribbleNoteArray.length > 0 ? ` (${scribbleNoteArray.length})` : null}</Button>
       </Popover>
     )
   }
