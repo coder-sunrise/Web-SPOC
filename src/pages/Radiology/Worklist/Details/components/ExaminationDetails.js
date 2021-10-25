@@ -4,6 +4,7 @@ import { Radio, Input } from 'antd'
 import moment from 'moment'
 import { GridContainer, GridItem } from '@/components'
 import { RightAlignGridItem, SectionTitle } from '../../../Components'
+import WorklistContext from '@/pages/Radiology/Worklist/WorklistContext'
 import {
   RADIOLOGY_WORKITEM_STATUS,
   CLINICAL_ROLE,
@@ -34,12 +35,17 @@ export const ExaminationDetails = ({
   const [assignedRadiographers, setAssignedRadiographers] = useState([])
   const [comment, setComment] = useState('')
   const [findings, setFindings] = useState({})
+  const [hasChanged, setHasChanged] = useState(false)
+  const { isReadOnly } = useContext(WorklistContext)
 
   if (!workitem) return <div></div>
 
   useEffect(() => {
-    onChange({ assignedRadiographers, comment, ...findings })
-  }, [assignedRadiographers, comment, findings])
+    if (hasChanged) {
+      onChange({ assignedRadiographers, comment, ...findings })
+      setHasChanged(false)
+    }
+  }, [assignedRadiographers, comment, findings, hasChanged])
 
   useEffect(() => {
     if (workitem) {
@@ -48,14 +54,9 @@ export const ExaminationDetails = ({
         examinationFinding: workitem.examinationFinding,
         radiologyScribbleNote: workitem.radiologyScribbleNote,
       })
+      setAssignedRadiographers(workitem.assignedRadiographers ?? [])
 
-      if (
-        workitem.assignedRadiographers &&
-        workitem.assignedRadiographers.length > 0
-      ) {
-        setAssignedRadiographers(workitem.assignedRadiographers)
-      }
-
+      // If no user assigned to the current workitem, default to current radiographer
       if (
         !workitem.assignedRadiographers ||
         workitem.assignedRadiographers.length === 0
@@ -63,16 +64,20 @@ export const ExaminationDetails = ({
         const currentClinician = currentUser.clinicianProfile
         if (
           currentClinician.userProfile.role.clinicRoleFK ===
-          CLINICAL_ROLE.RADIOGRAPHER
-        )
+            CLINICAL_ROLE.RADIOGRAPHER &&
+          workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW
+        ) {
           setAssignedRadiographers([currentClinician])
+          setHasChanged(true)
+        }
       }
+    }
 
-      return () => {
-        setAssignedRadiographers([])
-        setComment('')
-        setFindings({})
-      }
+    return () => {
+      setAssignedRadiographers([])
+      setComment('')
+      setFindings({})
+      setHasChanged(false)
     }
   }, [workitem])
 
@@ -80,7 +85,8 @@ export const ExaminationDetails = ({
     <div>
       <SectionTitle title='Examination Details' />
 
-      {workitem.statusFK <= RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ? (
+      {!isReadOnly &&
+      workitem.statusFK <= RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ? (
         <GridContainer style={{ rowGap: 10 }}>
           <GridItem md={2}>
             <RightAlignGridItem md={12}>Radiographer :</RightAlignGridItem>
@@ -94,6 +100,7 @@ export const ExaminationDetails = ({
                   value={assignedRadiographers}
                   onChange={newVal => {
                     setAssignedRadiographers(newVal)
+                    setHasChanged(true)
                   }}
                 />
                 {showRequiredField && assignedRadiographers.length === 0 && (
@@ -122,6 +129,7 @@ export const ExaminationDetails = ({
               }}
               handleSelectCannedText={cannedText => {
                 setComment(comment + '\n' + cannedText.text)
+                setHasChanged(true)
               }}
             />
           </GridItem>
@@ -130,6 +138,7 @@ export const ExaminationDetails = ({
               value={comment}
               onChange={e => {
                 setComment(e.target.value)
+                setHasChanged(true)
               }}
               autoSize={{ minRows: 3, maxRows: 5 }}
             />
@@ -142,6 +151,7 @@ export const ExaminationDetails = ({
                 radiologyScribbleNote={workitem.radiologyScribbleNote}
                 onChange={value => {
                   setFindings(value)
+                  setHasChanged(true)
                 }}
                 workItem={workitem}
                 item={findingSettings}

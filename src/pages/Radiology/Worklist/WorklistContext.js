@@ -1,16 +1,19 @@
 import React, { useContext, useEffect, useState, createContext } from 'react'
 import { useSelector, useDispatch } from 'dva'
+import moment from 'moment'
 import { getMappedVisitType } from '@/utils/utils'
 
 const WorklistContext = createContext(null)
 
 export const WorklistContextProvider = props => {
   const dispatch = useDispatch()
-  const [detailsId, setDetailsId] = useState(null)
-  const [showDetails, setShowDetails] = useState(false)
+  const [detailsId, setDetailsIdInternal] = useState(null)
+  const [isReadOnly, setIsReadOnly] = useState(false)
   const codetable = useSelector(st => st.codetable)
   const { visitTypeSetting } = useSelector(st => st.clinicSettings.settings)
   const [ctvisitpurpose, setCtVisitPurpose] = useState([])
+  const [filter, setFilter] = useState({})
+  const [refreshDate, setRefreshDate] = useState(moment())
 
   useEffect(() => {
     dispatch({
@@ -22,6 +25,92 @@ export const WorklistContextProvider = props => {
       setCtVisitPurpose(v)
     })
   }, [])
+
+  const getPrimaryWorkitem = workitem => {
+    const { visitWorkitems } = workitem
+    if (visitWorkitems && visitWorkitems.length > 0) {
+      const primaryWorkitemFK = visitWorkitems.find(
+        c => c.radiologyWorkitemId === workitem.radiologyWorkitemId,
+      ).primaryWorkitemFK
+      if (primaryWorkitemFK) {
+        const primaryWorkitem = visitWorkitems.find(
+          c => c.radiologyWorkitemId === primaryWorkitemFK,
+        )
+        return primaryWorkitem
+      }
+    }
+  }
+
+  const getCombinedOrders = workitem => {
+    if (
+      workitem.primaryWorkitemFK === null ||
+      workitem.primaryWorkitemFK === undefined
+    )
+      return []
+
+    const { visitWorkitems } = workitem
+    if (visitWorkitems && visitWorkitems.length > 0) {
+      const primaryWorkitemFK = visitWorkitems.find(
+        c => c.radiologyWorkitemId === workitem.radiologyWorkitemId,
+      ).primaryWorkitemFK
+
+      return [
+        visitWorkitems.find(
+          v => v.radiologyWorkitemId === workitem.radiologyWorkitemId,
+        ),
+        ...visitWorkitems.filter(
+          v =>
+            v.primaryWorkitemFK === primaryWorkitemFK &&
+            v.radiologyWorkitemId !== workitem.radiologyWorkitemId,
+        ),
+      ]
+    }
+  }
+
+  const filterWorklist = param => {
+    const {
+      searchValue,
+      visitType,
+      modality,
+      dateFrom,
+      dateTo,
+      isUrgent,
+      isMyPatientOnly,
+    } = param ?? filter
+
+    dispatch({
+      type: 'radiologyWorklist/query',
+      payload: {
+        apiCriteria: {
+          searchValue: searchValue,
+          visitType: visitType
+            ? visitType.filter(t => t !== -99).join(',')
+            : undefined,
+          modality: modality
+            ? modality.filter(t => t !== -99).join(',')
+            : undefined,
+          filterFrom: dateFrom,
+          filterTo: moment(dateTo)
+            .endOf('day')
+            .formatUTC(false),
+          isUrgent: isUrgent,
+          clinicianProfileId: isMyPatientOnly ? clinicianProfile.id : undefined,
+        },
+      },
+    }).then(val => {
+      if (val) {
+        setRefreshDate(moment())
+      }
+    })
+  }
+
+  const setDetailsId = (id, readonly = false) => {
+    setIsReadOnly(readonly)
+    setDetailsIdInternal(id)
+
+    //set back the default value.
+    if (!id) setIsReadOnly(false)
+  }
 
   let visitTypeSettingsObj = undefined
   let visitPurpose = undefined
@@ -43,10 +132,15 @@ export const WorklistContextProvider = props => {
     <WorklistContext.Provider
       value={{
         detailsId,
+        isReadOnly,
         setDetailsId,
-        showDetails,
-        setShowDetails,
         visitPurpose,
+        refreshDate,
+        setRefreshDate,
+        filter,
+        filterWorklist,
+        getPrimaryWorkitem,
+        getCombinedOrders,
       }}
     >
       {props.children}

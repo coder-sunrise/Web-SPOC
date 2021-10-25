@@ -14,16 +14,24 @@ import {
 } from '@/utils/constants'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import WorklistContext from '../Worklist/WorklistContext'
+import CombinedOrderIcon from './CombinedOrderIcon'
 import VisitGroupIcon from './VisitGroupIcon'
 
 const blueColor = '#1890f8'
+const statusUpdateDateTooltip = {
+  1: '', //No tooltip is needed as new status only have order create date.
+  2: 'Examination Started Time',
+  3: 'Modality Completed Time',
+  4: 'Reporting Completed Time',
+  5: 'Cancelled Time',
+}
 
 const EmptyDiv = () => <div>&nbsp;</div>
 
 const WorkitemLeftLabel = ({
   children,
   tooltip,
-  width = 150,
+  width = 120,
   style,
   ...props
 }) => (
@@ -63,12 +71,16 @@ const WorkitemTitle = ({ item }) => {
         }}
       >
         <WorkitemLeftLabel
+          width={180}
           tooltip={item.patientInfo.name}
           style={{ color: blueColor, fontWeight: 500 }}
         >
           {item.patientInfo.name}
         </WorkitemLeftLabel>
-        <WorkitemLeftLabel tooltip={item.patientInfo.patientReferenceNo}>
+        <WorkitemLeftLabel
+          width={180}
+          tooltip={item.patientInfo.patientReferenceNo}
+        >
           {item.patientInfo.patientReferenceNo}
         </WorkitemLeftLabel>
       </div>
@@ -147,13 +159,12 @@ const WorkitemBody = ({ item }) => {
           >
             {item.itemDescription}
           </WorkitemLeftLabel>
-          <WorkitemLeftLabel tooltip={item.accessionNo}>
-            {item.accessionNo}
+          <WorkitemLeftLabel>
+            <Tooltip title={item.accessionNo}>
+              <span>{item.accessionNo}</span>
+            </Tooltip>
             {item.primaryWorkitemFK && (
-              <Icon
-                type='link'
-                style={{ fontSize: 18, color: blueColor, alignSelf: 'center' }}
-              />
+              <CombinedOrderIcon workitemId={item.radiologyWorkitemId} />
             )}
           </WorkitemLeftLabel>
           <WorkitemLeftLabel tooltip={item.visitInfo.doctorName}>
@@ -179,13 +190,15 @@ const WorkitemBody = ({ item }) => {
           )}
           <EmptyDiv />
           {item.statusFK !== RADIOLOGY_WORKITEM_STATUS.NEW && (
-            <div
-              style={{
-                color: RADIOLOGY_WORKLIST_STATUS_COLOR[`${item.statusFK}`],
-              }}
-            >
-              {statusUpdateDate}
-            </div>
+            <Tooltip title={statusUpdateDateTooltip[`${item.statusFK}`]}>
+              <div
+                style={{
+                  color: RADIOLOGY_WORKLIST_STATUS_COLOR[`${item.statusFK}`],
+                }}
+              >
+                {statusUpdateDate}
+              </div>
+            </Tooltip>
           )}
         </div>
       </div>

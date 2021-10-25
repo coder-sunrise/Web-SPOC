@@ -362,7 +362,7 @@ const DispenseDetails = ({
 
   const { detailsId, setDetailsId } = useContext(WorklistContext)
   const onRadiologyBtnClick = radiologyWorkitemID => {
-    setDetailsId(radiologyWorkitemID)
+    setDetailsId(radiologyWorkitemID, true)
   }
 
   const handleMultiActualizationClick = type => {
@@ -1054,19 +1054,11 @@ const _DispenseDetails = props => (
 
 export default compose(
   withStyles(styles, { name: 'DispenseDetailsGrid' }),
-  connect(
-    ({
-      codetable,
-      clinicSettings,
-      dispense,
-      patient,
-      user,
-    }) => ({
-      codetable,
-      clinicSettings,
-      servingPersons: dispense.servingPersons,
-      patient: patient.entity || {},
-      user,
-    }),
-  ),
+  connect(({ codetable, clinicSettings, dispense, patient, user }) => ({
+    codetable,
+    clinicSettings,
+    servingPersons: dispense.servingPersons,
+    patient: patient.entity || {},
+    user,
+  })),
 )(_DispenseDetails)

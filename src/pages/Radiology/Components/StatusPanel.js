@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useContext } from 'react'
 import Refresh from '@material-ui/icons/Refresh'
-import moment from 'moment'
 import { Button, Tooltip } from '@/components'
+import WorklistContext from '../Worklist/WorklistContext'
 
 export const StatusPanel = () => {
-  const [refreshDate, setRefreshDate] = useState(moment())
+  const { refreshDate, filterWorklist } = useContext(WorklistContext)
 
   return (
     <div style={{ display: 'flex', alignItems: 'end' }}>
@@ -55,7 +55,7 @@ export const StatusPanel = () => {
           style={{
             height: 26,
           }}
-          onClick={console.log('yello')}
+          onClick={() => filterWorklist()}
         >
           <Refresh />
         </Button>

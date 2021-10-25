@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { useSelector, useDispatch } from 'dva'
-import { Table, Radio } from 'antd'
+import { Table, Radio, Form } from 'antd'
 import moment from 'moment'
 import {
   GridContainer,
   ProgressButton,
+  Button,
   GridItem,
   CommonModal,
   dateFormatLongWithTimeNoSec12h,
@@ -26,31 +27,33 @@ import {
 } from '@/utils/constants'
 import WorklistContext from '../WorklistContext'
 import { examinationSteps } from '@/utils/codes'
+import { formatMessage } from '@/.umi/plugin-locale/localeExports'
 
-const RadiologyDetails = props => {
+const RadiologyDetails = () => {
   const dispatch = useDispatch()
-  const { detailsId, setDetailsId, showDetails, setShowDetails } = useContext(
-    WorklistContext,
-  )
+  const { detailsId, setDetailsId, isReadOnly } = useContext(WorklistContext)
+
+  const [form] = Form.useForm()
 
   const details = useSelector(state => state.radiologyDetails)
+  const [showDetails, setShowDetails] = useState(false)
   const [isDirty, setIsDirty] = useState(false)
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
   const [showStartConfirm, setShowStartConfirm] = useState(false)
   const [showRequiredField, setShowRequiredField] = useState(false)
   const [workitem, setWorkItem] = useState({})
-  const [visitWorkitems, setVisitWorkItems] = useState([])
+
   const [combinedWorkitems, setCombinedWorkitems] = useState([])
   const [examinationDetails, setExaminationDetails] = useState({})
-  const [currentPatient, setCurrentPatient] = useState({})
 
   useEffect(() => {
     if (detailsId) {
       dispatch({
         type: 'radiologyDetails/query',
         payload: { id: detailsId },
+      }).then(val => {
+        if (val) setShowDetails(true)
       })
-      setShowDetails(true)
     } else {
       setShowDetails(false)
     }
@@ -67,24 +70,32 @@ const RadiologyDetails = props => {
       })
 
       setWorkItem({})
-      setVisitWorkItems([])
       setCombinedWorkitems([])
       setExaminationDetails({})
+
       setShowDetails(false)
       setShowRequiredField(false)
+      setIsDirty(false)
     }
   }, [detailsId])
 
   useEffect(() => {
     if (details && details.entity) {
-      setWorkItem(details.entity)
-      setVisitWorkItems(details.entity.visitWorkitems)
+      const { entity } = details
+      setWorkItem(entity)
+      setExaminationDetails({
+        comment: entity.comment,
+        examinationFinding: entity.examinationFinding,
+        radiologyScribbleNote: entity.radiologyScribbleNote,
+        assignedRadiographers: entity.assignedRadiographers,
+      })
     }
   }, [details])
 
   useEffect(() => {
-    setCombinedWorkitems(getCombinedWorkitems(visitWorkitems))
-  }, [visitWorkitems, examinationDetails])
+    console.log('workitem - new', workitem)
+    setCombinedWorkitems(getCombinedWorkitems(workitem.visitWorkitems))
+  }, [workitem, examinationDetails])
 
   const renderStatusButtons = () => {
     if (!details || !details.entity) return
@@ -114,6 +125,8 @@ const RadiologyDetails = props => {
               setShowRequiredField(true)
               return
             }
+
+            const { visitWorkitems } = workitem
 
             const currentPrimaryWorkitemFK = visitWorkitems.find(
               v => v.radiologyWorkitemId === workitem.radiologyWorkitemId,
@@ -147,7 +160,6 @@ const RadiologyDetails = props => {
       payload: {
         ...workitem,
         id: details.entity.radiologyWorkitemId,
-        visitWorkitems: visitWorkitems,
         ...examinationDetails,
         ...payload,
       },
@@ -157,13 +169,17 @@ const RadiologyDetails = props => {
     setDetailsId(null)
   }
 
+  const handleClose = () => {
+    setDetailsId(null)
+    setShowDetails(false)
+  }
+
   const handleCancel = cancellationReason => {
     dispatch({
       type: 'radiologyDetails/cancelRadiologyWorkitem',
       payload: {
         ...workitem,
         id: workitem.radiologyWorkitemId,
-        visitWorkitems: visitWorkitems,
         ...examinationDetails,
         statusFK: RADIOLOGY_WORKITEM_STATUS.CANCELLED,
         cancellationReason: cancellationReason,
@@ -196,38 +212,60 @@ const RadiologyDetails = props => {
       })
   }
 
+  useEffect(() => {
+    console.log('isDirty', isDirty)
+  }, [isDirty])
+
+  const showOnlyCloseButton =
+    isReadOnly ||
+    workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
+    workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED
+
   return (
     <CommonModal
       open={showDetails}
       title='Radiology Examination Details'
       showFooter={true}
-      onConfirm={() => {
-        handleSave()
-
-        //TODO: if changed scribble notes, warn to pending changes
-      }}
       confirmText='Save'
       onClose={() => {
-        setDetailsId(null)
-        setShowDetails(false)
-
-        dispatch({
-          type: 'patient/updateState',
-          payload: {},
-        })
+        if (isDirty) {
+          dispatch({
+            type: 'global/updateAppState',
+            payload: {
+              openConfirm: true,
+              openConfirmContent: formatMessage({
+                id: 'app.general.leave-without-save',
+              }),
+              onConfirmSave: handleClose,
+            },
+          })
+        } else {
+          setDetailsId(null)
+          setShowDetails(false)
+        }
       }}
       footProps={{
-        extraButtons: renderStatusButtons(),
+        extraButtons: !showOnlyCloseButton ? renderStatusButtons() : undefined,
+        onConfirm: !showOnlyCloseButton
+          ? () => {
+              handleSave()
+            }
+          : undefined,
       }}
+      confirmProps={{ disable: true }}
       maxWidth='lg'
       overrideLoading
     >
-      <GridContainer style={{ height: 700, overflowY: 'scroll' }}>
-        <GridItem md={12}>
-          <div style={{ padding: 8 }}>
-            <Banner from='Radiology' />
-          </div>
-        </GridItem>
+      <GridContainer
+        style={{ height: !isReadOnly ? 700 : undefined, overflowY: 'scroll' }}
+      >
+        {!isReadOnly && (
+          <GridItem md={12}>
+            <div style={{ padding: 8 }}>
+              <Banner from='Radiology' />
+            </div>
+          </GridItem>
+        )}
         <GridItem md={12}>
           <ExaminationSteps item={workitem} />
         </GridItem>
@@ -235,13 +273,24 @@ const RadiologyDetails = props => {
           <OrderDetails
             workitem={workitem}
             onCombinedOrderChange={value => {
-              setVisitWorkItems(value)
+              console.log('onCombinedOrderChange', value)
+              setWorkItem({
+                ...workitem,
+                primaryWorkitemFK: value.find(
+                  v => v.radiologyWorkitemId == workitem.radiologyWorkitemId,
+                ).primaryWorkitemFK,
+                visitWorkitems: value,
+              })
+              setIsDirty(true)
             }}
           />
         </GridItem>
         <GridItem md={12}>
           <ExaminationDetails
-            onChange={val => setExaminationDetails(val)}
+            onChange={val => {
+              setExaminationDetails(val)
+              setIsDirty(true)
+            }}
             showRequiredField={showRequiredField}
             workitem={workitem}
           />
@@ -250,7 +299,6 @@ const RadiologyDetails = props => {
       <CancelConfirmation
         open={showCancelConfirm}
         workitem={workitem}
-        visitWorkitems={visitWorkitems}
         onCancelConfirm={cancellationReason => {
           handleCancel(cancellationReason)
         }}

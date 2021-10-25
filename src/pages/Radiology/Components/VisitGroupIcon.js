@@ -4,7 +4,6 @@ import numeral from 'numeral'
 import { Typography, Card, Table } from 'antd'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import { Icon, Popover } from '@/components'
-import tablestyles from '@/pages/Widgets/PatientHistory/PatientHistoryStyle.less'
 import { queryVisitGroup } from '@/services/queue'
 
 const VisitGroupIcon = props => {
@@ -49,10 +48,6 @@ const VisitGroupIcon = props => {
             sortingEnabled: false,
           },
         ]}
-        rowClassName={(record, index) => {
-          return index % 2 === 0 ? tablestyles.once : tablestyles.two
-        }}
-        className={tablestyles.table}
       />
     )
   }
