@@ -475,35 +475,36 @@ export const DispenseItemsColumnExtensions = (
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 paddingRight: existsDrugLabelRemarks ? 10 : 0,
+                minHeight: 20,
               }}
             >
               <Tooltip title={row.remarks || ''}>
                 <span>{row.remarks || ' '}</span>
               </Tooltip>
-              <div style={{ position: 'relative', top: 2 }}>
-                {existsDrugLabelRemarks && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: 2,
-                      right: -13,
-                    }}
-                  >
-                    <Tooltip
-                      title={
-                        <div>
-                          <div style={{ fontWeight: 500 }}>
-                            Drug Label Remarks
-                          </div>
-                          <div>{row.drugLabelRemarks}</div>
+            </div>
+            <div style={{ position: 'relative', top: 6 }}>
+              {existsDrugLabelRemarks && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: 2,
+                    right: -8,
+                  }}
+                >
+                  <Tooltip
+                    title={
+                      <div>
+                        <div style={{ fontWeight: 500 }}>
+                          Drug Label Remarks
                         </div>
-                      }
-                    >
-                      <FileCopySharp style={{ color: '#4255bd' }} />
-                    </Tooltip>
-                  </div>
-                )}
-              </div>
+                        <div>{row.drugLabelRemarks}</div>
+                      </div>
+                    }
+                  >
+                    <FileCopySharp style={{ color: '#4255bd' }} />
+                  </Tooltip>
+                </div>
+              )}
             </div>
           </div>
         )
@@ -851,7 +852,10 @@ const radiologyWorkitemStatus = radiologyWorkitemStatusFK => {
         title={
           radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
             ? 'In Progress'
-            : radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ? 'Modality Completed' :'Completed'
+            : radiologyWorkitemStatusFK ===
+              RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED
+            ? 'Modality Completed'
+            : 'Completed'
         }
       >
         <div
@@ -1360,36 +1364,38 @@ export const PackageColumnExtensions = (onPrint, showDrugLabelRemark) => [
         <div style={{ position: 'relative' }}>
           <div
             style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
               paddingRight: existsDrugLabelRemarks ? 10 : 0,
+              minHeight: 20,
             }}
           >
-            {row.remarks || ' '}
-            <div style={{ position: 'relative', top: 2 }}>
-              {existsDrugLabelRemarks && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: 2,
-                    right: -15,
-                  }}
+            <Tooltip title={row.remarks || ''}>
+              <span> {row.remarks || ' '}</span>
+            </Tooltip>
+          </div>
+          <div style={{ position: 'relative', top: 6 }}>
+            {existsDrugLabelRemarks && (
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: 2,
+                  right: -8,
+                }}
+              >
+                <Tooltip
+                  title={
+                    <div>
+                      <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
+                      <div>{row.drugLabelRemarks}</div>
+                    </div>
+                  }
                 >
-                  <Tooltip
-                    title={
-                      <div>
-                        <div style={{ fontWeight: 500 }}>
-                          Drug Label Remarks
-                        </div>
-                        <div>{row.drugLabelRemarks}</div>
-                      </div>
-                    }
-                  >
-                    <FileCopySharp style={{ color: '#4255bd' }} />
-                  </Tooltip>
-                </div>
-              )}
-            </div>
+                  <FileCopySharp style={{ color: '#4255bd' }} />
+                </Tooltip>
+              </div>
+            )}
           </div>
         </div>
       )

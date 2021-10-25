@@ -972,7 +972,10 @@ class Banner extends PureComponent {
                       />
                     </span>
 
-                    <span className={classes.part}>
+                    <span
+                      className={classes.part}
+                      style={{ top: 3, position: 'relative' }}
+                    >
                       <PatientStickyNotesBtn patientProfileFK={info.id} />
                     </span>
                   </GridItem>

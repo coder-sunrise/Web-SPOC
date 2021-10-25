@@ -45,13 +45,16 @@ const PharmacyWorklist = () => {
   const [filterValue, setFilterValue] = useState('')
   const { autoRefreshPharmacyWorklistInterval = 60 } =
     clinicSettings.settings || {}
-  const [refreshTimer, setRefreshTimer] = useState(null)
+  const timer = React.useRef(null)
   useEffect(() => {
     dispatch({
       type: 'pharmacyWorklist/query',
     })
+    stopRefreshTimer()
     startRefreshTimer()
-    return () => stopRefreshTimer()
+    return () => {
+      stopRefreshTimer()
+    }
   }, [])
 
   useEffect(() => {
@@ -100,18 +103,13 @@ const PharmacyWorklist = () => {
     }
   }, [entity, filterValue])
   const startRefreshTimer = () => {
-    setRefreshTimer(
-      setInterval(() => {
-        refreshClick()
-      }, autoRefreshPharmacyWorklistInterval * 1000),
-    )
+    timer.current = setInterval(() => {
+      refreshClick()
+    }, autoRefreshPharmacyWorklistInterval * 1000)
   }
 
   const stopRefreshTimer = () => {
-    if (refreshTimer) {
-      clearInterval(refreshTimer)
-      setRefreshTimer(null)
-    }
+    clearInterval(timer.current)
   }
 
   const refreshClick = () => {

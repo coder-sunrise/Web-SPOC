@@ -35,6 +35,10 @@ export default createFormViewModel({
         const response = yield call(service.queryTemplateList, payload)
         return response
       },
+      *upsertTemplate({ payload }, { call, put }) {
+        const response = yield call(service.upsertTemplate, payload)
+        return response
+      },
       *removeScribble({ payload }, { call, put }) {
         const response = yield call(service.remove, payload)
         return response

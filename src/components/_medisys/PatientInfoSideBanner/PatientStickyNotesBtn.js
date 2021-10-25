@@ -13,6 +13,7 @@ import {
   Tooltip,
   OutlinedTextField,
 } from '@/components'
+import { Badge, Avatar } from 'antd'
 import { grayColors } from '@/assets/jss'
 import MailOutlineIcon from '@material-ui/icons/MailOutline'
 import FlagIcon from '@material-ui/icons/Flag'
@@ -23,6 +24,7 @@ import ErrorIcon from '@material-ui/icons/Error'
 import Authorized from '@/utils/Authorized'
 import { withStyles } from '@material-ui/core'
 import { Link } from 'umi'
+import { MailOutlined } from '@ant-design/icons'
 
 const NOTESCOLOR = {
   Green: '#CCFF90',
@@ -165,6 +167,7 @@ class PatientStickyNotesBtn extends Component {
       }).then(notes => {
         this.setState({
           stickyNotes: notes,
+          flaggedNoteCount: (notes || []).filter(x => x.id && x.isFlagged).length,
         })
         callback?.call(this)
       })
@@ -301,17 +304,18 @@ class PatientStickyNotesBtn extends Component {
                   }}
                 />
               ) : (
-                <pre
+                <div
                   style={{
                     fontSize: 14,
                     wordBreak: 'break-all',
                     whiteSpace: 'pre-wrap',
                     color: textContentColor,
                     margin: 0,
+                    whiteSpace: 'pre',
                   }}
                 >
                   {note.notes}
-                </pre>
+                </div>
               )}
             </div>
           </GridItem>
@@ -321,9 +325,7 @@ class PatientStickyNotesBtn extends Component {
                 <Button
                   justIcon
                   color='transparent'
-                  onClick={() => {
-                    if (isBelongtoCurrentUser) this.onFlagClick(note)
-                  }}
+                  onClick={() => {this.onFlagClick(note)}}
                   style={{
                     margin: 0,
                     color: note.isFlagged ? 'red' : 'gray',
@@ -632,45 +634,18 @@ class PatientStickyNotesBtn extends Component {
         placement='right-end'
         style={popperStyle}
       >
-        <span>
-          <Button
-            justIcon
-            color='transparent'
+        <span style={{ cursor: 'pointer', marginLeft: 8 }}>
+          <Badge
+            style={{
+              paddingLeft: '4px',
+              paddingRight: '4px',
+            }}
+            size='small'
             onClick={this.stickyNotesBtnClick}
+            count={flaggedNoteCount}
           >
-            <div style={{ height: 22, width: 28 }}>
-              <MailOutlineIcon
-                style={{
-                  color: '#4255BD',
-                  position: 'absolute',
-                  top: 7,
-                  left: 3,
-                }}
-              />
-              {flaggedNoteCount > 0 && (
-                <span
-                  style={{
-                    display: 'inline-block',
-                    lineHeight: '1.4em',
-                    minWidth: 14,
-                    backgroundColor: 'red',
-                    color: 'white',
-                    position: 'absolute',
-                    fontSize: '0.7rem !important',
-                    borderRadius: 7,
-                    height: 14,
-                    right: 5,
-                    top: 3,
-                    padding: '0 2px',
-                    fontwidth: 500,
-                  }}
-                  className={this.props.classes.iconFontStyle}
-                >
-                  {flaggedNoteCount}
-                </span>
-              )}
-            </div>
-          </Button>
+            <MailOutlined style={{ color: '#4255bd', fontSize: 20 }} />
+          </Badge>
         </span>
       </Popper>
     )

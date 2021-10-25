@@ -31,6 +31,7 @@ export const Worklist = ({ columns, worklistType = 'Radiology' }) => {
           columnPercentage={
             worklistType === 'Radiology' ? 100 : columnPercentage
           }
+          worklistType={worklistType}
           data={column}
           renderWorkitem={
             worklistType === 'Radiology'

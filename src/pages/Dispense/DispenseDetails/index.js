@@ -93,7 +93,7 @@ const styles = theme => ({
   },
   groupStyle: {
     padding: '3px 0px',
-    backgroundColor: '#CCCCCC',
+    backgroundColor: 'rgb(240, 248, 255)',
   },
 })
 
@@ -736,6 +736,7 @@ const DispenseDetails = ({
                 pager: false,
                 grouping: true,
                 groupingConfig: {
+                  isDisableExpandedGroups: true,
                   state: {
                     grouping: [{ columnName: 'dispenseGroupId' }],
                     expandedGroups: defaultExpandedGroups,
@@ -774,7 +775,7 @@ const DispenseDetails = ({
                       )
                     },
                   },
-                  backgroundColor: '#CCCCCC',
+                  backgroundColor: 'rgb(240, 248, 255)',
                 },
               }}
               forceRender
