@@ -264,9 +264,9 @@ export const Workitem = item => (
       margin: '10px 5px',
       borderRadius: 10,
       backgroundColor:
-        ((item.isNurseActualized || !item.isNurseActualizeRequired) &&
-          item.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW) ||
-        item.statusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
+        (item.isNurseActualized || !item.isNurseActualizeRequired) &&
+        (item.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW ||
+          item.statusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS)
           ? '#d3fed1'
           : 'white',
       border: '#cdcdcd solid 2px',
