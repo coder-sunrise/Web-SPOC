@@ -46,6 +46,11 @@ const api = {
 
 const style = theme => ({})
 
+const IsFullyDispensedStatus = {
+  false: 'Partially',
+  true: 'Completed',
+}
+
 const orderDateForm = moment()
   .add(-1, 'week')
   .toDate()
@@ -198,8 +203,6 @@ const defaultColumns = (codetable, setDetailsId) => {
       dataIndex: 'status',
       sorter: false,
       search: false,
-      renderText: (item, { type, defaultRender, ...rest }, form) =>
-        Object.values(PharmacyWorkitemStatus)[item - 1],
       width: 100,
       fixed: 'right',
     },
@@ -312,10 +315,7 @@ const defaultColumns = (codetable, setDetailsId) => {
           <Select
             label='Status'
             mode='multiple'
-            options={[
-              { value: 6, name: 'Partially' },
-              { value: 4, name: 'Completed' },
-            ]}
+            options={Object.entries(IsFullyDispensedStatus).map(x=>({value:x[0],name:x[1]}))}
             placeholder=''
             style={{ width: 250 }}
             maxTagCount={0}
@@ -420,12 +420,12 @@ const PharmacyWorklistHistoryIndex = ({
                 searchValue: searchPatient,
                 orderDateForm: searchOrderDateForm,
                 orderDateTo: searchOrderDateTo,
-                visitDoctor:
-                  searchOrderBy?.indexOf(-99) > -1
-                    ? null
-                    : searchOrderBy?.join(),
-                status:
-                  searchStatus?.indexOf(-99) > -1 ? null : searchStatus?.join(),
+                visitDoctor: searchOrderBy?.includes(-99)
+                  ? null
+                  : searchOrderBy?.join(),
+                status: searchStatus?.includes(-99)
+                  ? null
+                  : searchStatus?.join(),
               },
             }
           }}

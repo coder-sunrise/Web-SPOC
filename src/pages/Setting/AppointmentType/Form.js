@@ -180,7 +180,7 @@ export default withFormikExtend({
         payload: {
           openConfirm: true,
           openConfirmContent:
-            `Appointment (${defaultAppt.displayValue.length > 20 ? `${defaultAppt.displayValue.substr(0,20)}...` : defaultAppt.displayValue}) is currently set as the default appointment type. Confirm to overwrite?`,
+            `${defaultAppt.displayValue.length > 20 ? `${defaultAppt.displayValue.substr(0,20)}...` : defaultAppt.displayValue} is currently set as the default appointment type. Confirm to overwrite?`,
           onConfirmSave: saveData,
         },
       })
