@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { useSelector, useDispatch } from 'dva'
 import { Table, Radio, Form } from 'antd'
+import { formatMessage } from 'umi'
 import moment from 'moment'
 import {
   GridContainer,
@@ -27,7 +28,6 @@ import {
 } from '@/utils/constants'
 import WorklistContext from '../WorklistContext'
 import { examinationSteps } from '@/utils/codes'
-import { formatMessage } from '@/.umi/plugin-locale/localeExports'
 
 const RadiologyDetails = () => {
   const dispatch = useDispatch()
