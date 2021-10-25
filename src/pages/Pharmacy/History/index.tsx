@@ -46,9 +46,9 @@ const api = {
 
 const style = theme => ({})
 
-const PharmacyWorkitemHistoryStatus = {
-  '-4': 'Partially',
-  '4': 'Completed',
+const IsFullyDispensedStatus = {
+  false: 'Partially',
+  true: 'Completed',
 }
 
 const orderDateForm = moment()
@@ -203,7 +203,6 @@ const defaultColumns = (codetable, setDetailsId) => {
       dataIndex: 'status',
       sorter: false,
       search: false,
-      render: (_dom: any, entity: any) => PharmacyWorkitemHistoryStatus[entity.status] || '-',
       width: 100,
       fixed: 'right',
     },
@@ -316,10 +315,7 @@ const defaultColumns = (codetable, setDetailsId) => {
           <Select
             label='Status'
             mode='multiple'
-            options={[
-              { value: -4, name: PharmacyWorkitemHistoryStatus[-4] },
-              { value: 4, name: PharmacyWorkitemHistoryStatus[4] },
-            ]}
+            options={Object.entries(IsFullyDispensedStatus).map(x=>({value:x[0],name:x[1]}))}
             placeholder=''
             style={{ width: 250 }}
             maxTagCount={0}
@@ -424,12 +420,12 @@ const PharmacyWorklistHistoryIndex = ({
                 searchValue: searchPatient,
                 orderDateForm: searchOrderDateForm,
                 orderDateTo: searchOrderDateTo,
-                visitDoctor:
-                  searchOrderBy?.indexOf(-99) > -1
-                    ? null
-                    : searchOrderBy?.join(),
-                status:
-                  searchStatus?.indexOf(-99) > -1 ? null : searchStatus?.join(),
+                visitDoctor: searchOrderBy?.includes(-99)
+                  ? null
+                  : searchOrderBy?.join(),
+                status: searchStatus?.includes(-99)
+                  ? null
+                  : searchStatus?.join(),
               },
             }
           }}
