@@ -12,6 +12,7 @@ import { CombineOrderGrid } from './index'
 import { RADIOLOGY_WORKITEM_STATUS } from '@/utils/constants'
 import WorklistContext from '@/pages/Radiology/Worklist/WorklistContext'
 import { get } from 'immutable'
+import { Popconfirm } from '@medisys/component'
 
 const blueColor = '#1890f8'
 
@@ -116,8 +117,9 @@ export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
                 (workitem.visitWorkitems.length > 1 ? (
                   <Radio.Group
                     onChange={e => {
+                      const isCombinedYes = e.target.value
                       //if combined order has change from No to Yes, current workitem will be primary by default.
-                      if (e.target.value) {
+                      if (isCombinedYes) {
                         onCombinedOrderChange(
                           workitem.visitWorkitems.map(v => {
                             if (
@@ -136,7 +138,34 @@ export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
                     }}
                     value={isCombinedOrder}
                   >
-                    <Radio value={false}>No</Radio>
+                    <Popconfirm
+                      okText='Confirm'
+                      cancelText='Cancel'
+                      title='Confirm to remove combined order?'
+                      onConfirm={() => {
+                        const currentCombinedOrders = workitem.visitWorkitems.filter(
+                          v =>
+                            v.primaryWorkitemFK === workitem.primaryWorkitemFK,
+                        )
+                        if (currentCombinedOrders.length > 1) {
+                          onCombinedOrderChange(
+                            workitem.visitWorkitems.map(v => {
+                              if (
+                                v.primaryWorkitemFK ===
+                                workitem.primaryWorkitemFK
+                              )
+                                return {
+                                  ...v,
+                                  primaryWorkitemFK: null,
+                                }
+                              return v
+                            }),
+                          )
+                        }
+                      }}
+                    >
+                      <Radio value={false}>No</Radio>
+                    </Popconfirm>
                     <Radio value={true}>Yes</Radio>
                   </Radio.Group>
                 ) : (
