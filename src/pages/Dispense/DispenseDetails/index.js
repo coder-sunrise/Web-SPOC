@@ -540,18 +540,7 @@ const DispenseDetails = ({
   return (
     <React.Fragment>
       <GridContainer>
-        <GridItem justify='flex-start' md={7} className={classes.actionButtons}>
-          {!viewOnly && !isRetailVisit && (
-            <Button
-              color='info'
-              size='sm'
-              onClick={handleReloadClick}
-              disabled={disableRefreshOrder}
-            >
-              <Refresh />
-              Refresh Order
-            </Button>
-          )}
+        <GridItem justify='flex-start' md={7} className={classes.actionButtons}>       
           <Button
             color='primary'
             size='sm'

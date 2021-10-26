@@ -87,7 +87,7 @@ export const ContextMenuOptions = [
   },
   {
     id: 1,
-    label: 'Dispense',
+    label: 'Order Details',
     Icon: Money,
     disabled: false,
     authority: 'queue.dispense',

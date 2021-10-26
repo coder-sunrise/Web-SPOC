@@ -73,6 +73,7 @@ const ActionButton = ({ row, onClick }) => {
     const consDispense = [
       VISIT_STATUS.DISPENSE,
       VISIT_STATUS.ORDER_UPDATED,
+      VISIT_STATUS.PAUSED,
     ].includes(row.visitStatus)
 
     const retailDispense = [

@@ -169,8 +169,19 @@ class Grid extends React.Component {
         else id = '5'
         break
       case VISIT_STATUS.IN_CONS:
-      case VISIT_STATUS.PAUSED:
         id = '6'
+        break
+      case VISIT_STATUS.PAUSED:
+        const{user} = this.props
+        const clinicRoleFK = user.clinicianProfile.userProfile.role?.clinicRoleFK
+        if(clinicRoleFK === 1)
+        {
+          id = '6'
+        }
+        else
+        {
+          id = '1'
+        }
         break
       case VISIT_STATUS.DISPENSE:
       case VISIT_STATUS.ORDER_UPDATED:
