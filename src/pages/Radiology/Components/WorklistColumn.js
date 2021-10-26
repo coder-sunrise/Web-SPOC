@@ -79,22 +79,20 @@ const sortItems = data => {
 
     //If not new item, the sorting is based on status update date.
     if (sortValueItem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW) {
-      sortValue += getEpochTime(
-        new Date() - Date.parse(sortValueItem.generateDate),
-      )
+      sortValue +=
+        getEpochTime(new Date()) /
+        getEpochTime(Date.parse(sortValueItem.generateDate))
 
       if (
         !sortValueItem.isNurseActualizeRequired ||
         (sortValueItem.isNurseActualizeRequired &&
-          sortValueItem.isNurseActualized)
+          sortValueItem.isNurseActualized === true)
       )
-        sortValue = sortValue * 10
+        sortValue = sortValue * 1000
 
-      if (sortValueItem.priority === 'Urgent') sortValue = sortValue * 100
+      if (sortValueItem.priority === 'Urgent') sortValue = sortValue * 10000
     } else {
-      sortValue = getEpochTime(
-        new Date() - Date.parse(sortValueItem.statusUpdateDate),
-      )
+      sortValue = getEpochTime(Date.parse(sortValueItem.statusUpdateDate))
     }
 
     if (item.primaryWorkitemFK === item.radiologyWorkitemId)
@@ -112,20 +110,14 @@ const sortItems = data => {
   )
 
   const currentColumnStatus = data.workitems[0].statusFK
-  //New and In Progress show oldest at the top.
-  if (
-    currentColumnStatus === RADIOLOGY_WORKITEM_STATUS.NEW ||
-    currentColumnStatus === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
-  )
-    return sortedData.reverse()
 
-  return sortedData
+  return sortedData.reverse()
 }
 
 const WorklistColumnBody = ({ data, renderWorkitem, worklistType }) => {
   let sortedData = data.workitems || []
   if (worklistType === 'Radiology') {
-    const sortedData = sortItems(data)
+    sortedData = sortItems(data)
   }
 
   return (

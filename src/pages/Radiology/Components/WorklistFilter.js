@@ -20,7 +20,9 @@ import WorklistContext from '../Worklist/WorklistContext'
 export const WorklistFilter = () => {
   const [form] = Form.useForm()
   const dispatch = useDispatch()
-  const { showDetails, visitPurpose = [] } = useContext(WorklistContext)
+  const { detailsId, visitPurpose = [], filterWorklist } = useContext(
+    WorklistContext,
+  )
   const { settings } = useSelector(s => s.clinicSettings)
   const clinicianProfile = useSelector(
     state => state.user.data.clinicianProfile,
@@ -39,7 +41,7 @@ export const WorklistFilter = () => {
   }
 
   useEffect(() => {
-    if (showDetails) {
+    if (detailsId) {
       stopTimer()
     } else {
       handleSearch()
@@ -47,11 +49,10 @@ export const WorklistFilter = () => {
     }
 
     return () => clearInterval(timer.current)
-  }, [showDetails])
+  }, [detailsId])
 
   const getVisitTypes = () => {
     if (!visitPurpose) return []
-    console.log('visitPurpose', visitPurpose)
     return visitPurpose
       .filter(p => p.id !== VISIT_TYPE.OTC)
       .map(c => ({
@@ -62,36 +63,8 @@ export const WorklistFilter = () => {
   }
 
   const handleSearch = () => {
-    const {
-      searchValue,
-      visitType,
-      modality,
-      dateFrom,
-      dateTo,
-      isUrgent,
-      isMyPatientOnly,
-    } = form.getFieldsValue(true)
-
-    dispatch({
-      type: 'radiologyWorklist/query',
-      payload: {
-        apiCriteria: {
-          searchValue: searchValue,
-          visitType: visitType
-            ? visitType.filter(t => t !== -99).join(',')
-            : undefined,
-          modality: modality
-            ? modality.filter(t => t !== -99).join(',')
-            : undefined,
-          filterFrom: dateFrom,
-          filterTo: moment(dateTo)
-            .endOf('day')
-            .formatUTC(false),
-          isUrgent: isUrgent,
-          clinicianProfileId: isMyPatientOnly ? clinicianProfile.id : undefined,
-        },
-      },
-    })
+    const filter = form.getFieldsValue(true)
+    filterWorklist(filter)
   }
 
   return (
@@ -115,14 +88,17 @@ export const WorklistFilter = () => {
       <Form.Item name='modality' initialValue={[-99]}>
         <CodeSelect
           mode='multiple'
-          style={{ width: 160 }}
+          style={{ width: 165 }}
           label='Modality'
           code='ctmodality'
           maxTagPlaceholder='Modalities'
           onChange={() => console.log('modality')}
         />
       </Form.Item>
-      <Form.Item name='dateFrom' initialValue={moment().toDate()}>
+      <Form.Item
+        name='dateFrom'
+        initialValue={moment(moment().toDate()).formatUTC()}
+      >
         <DatePicker
           style={{ width: 100 }}
           label={formatMessage({ id: 'radiology.search.dateFrom' })}

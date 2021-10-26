@@ -65,6 +65,7 @@ export const CombineOrderGrid = ({
           <Checkbox
             checked={combinedItems.includes(record.radiologyWorkitemId)}
             onChange={e => {
+              console.log('checkbox-changed')
               const radiologyWorkitemId = record.radiologyWorkitemId
               if (
                 e.target.checked &&
@@ -81,6 +82,7 @@ export const CombineOrderGrid = ({
                   combinedItems.filter(i => i !== radiologyWorkitemId),
                 )
               }
+              setHasChanged(true)
             }}
           />
         )
@@ -97,6 +99,7 @@ export const CombineOrderGrid = ({
             checked={record.radiologyWorkitemId === primaryId}
             onChange={e => {
               if (e.target.checked) setPrimaryId(record.radiologyWorkitemId)
+              setHasChanged(true)
             }}
             disabled={
               readonly
@@ -113,39 +116,42 @@ export const CombineOrderGrid = ({
   const [combinedItems, setCombinedItems] = useState([])
   const [primaryId, setPrimaryId] = useState(null)
   const [combinableWorkitems, setCombinableWorkitems] = useState([])
+  const [hasChanged, setHasChanged] = useState(false)
 
   useEffect(() => {
-    const newWorkItems =
-      combinedItems.length === 1
-        ? visitWorkitems.map(w => {
-            if (
-              combinableWorkitems.findIndex(
-                item => item.radiologyWorkitemId === w.radiologyWorkitemId,
-              ) === -1
-            ) {
-              return w
-            }
-            return { ...w, primaryWorkitemFK: null }
-          })
-        : visitWorkitems.map(w => {
-            if (
-              combinableWorkitems.findIndex(
-                item => item.radiologyWorkitemId === w.radiologyWorkitemId,
-              ) === -1
-            ) {
-              return w
-            }
+    if (hasChanged) {
+      const newWorkItems =
+        combinedItems.length === 1
+          ? visitWorkitems.map(w => {
+              if (
+                combinableWorkitems.findIndex(
+                  item => item.radiologyWorkitemId === w.radiologyWorkitemId,
+                ) === -1
+              ) {
+                return w
+              }
+              return { ...w, primaryWorkitemFK: null }
+            })
+          : visitWorkitems.map(w => {
+              if (
+                combinableWorkitems.findIndex(
+                  item => item.radiologyWorkitemId === w.radiologyWorkitemId,
+                ) === -1
+              ) {
+                return w
+              }
 
-            if (combinedItems.includes(w.radiologyWorkitemId)) {
-              return { ...w, primaryWorkitemFK: primaryId }
-            }
-            return { ...w, primaryWorkitemFK: null }
-          })
-
-    onChange(newWorkItems)
+              if (combinedItems.includes(w.radiologyWorkitemId)) {
+                return { ...w, primaryWorkitemFK: primaryId }
+              }
+              return { ...w, primaryWorkitemFK: null }
+            })
+      setHasChanged(false)
+      onChange(newWorkItems)
+    }
 
     //Check if only current work item is in the combinedItems
-  }, [combinedItems, primaryId])
+  }, [hasChanged])
 
   useEffect(() => {
     if (visitWorkitems) {

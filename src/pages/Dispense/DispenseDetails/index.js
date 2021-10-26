@@ -362,7 +362,7 @@ const DispenseDetails = ({
 
   const { detailsId, setDetailsId } = useContext(WorklistContext)
   const onRadiologyBtnClick = radiologyWorkitemID => {
-    setDetailsId(radiologyWorkitemID)
+    setDetailsId(radiologyWorkitemID, true)
   }
 
   const handleMultiActualizationClick = type => {
