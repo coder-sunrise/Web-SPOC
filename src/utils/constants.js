@@ -667,18 +667,21 @@ export const RADIOLOGY_WORKITEM_BUTTON = [
     currentStatusFK: 1,
     nextStatusFK: 2,
     enableCancel: true,
+    authority: 'radiologyworklist.startexamination',
   },
   {
     name: 'Complete Modality',
     currentStatusFK: 2,
     nextStatusFK: 3,
     enableCancel: true,
+    authority: 'radiologyworklist.completemodality',
   },
   {
     name: 'Complete Reporting',
     currentStatusFK: 3,
     nextStatusFK: 4,
     enableCancel: false,
+    authority: 'radiologyworklist.completereporting',
   },
 ]
 

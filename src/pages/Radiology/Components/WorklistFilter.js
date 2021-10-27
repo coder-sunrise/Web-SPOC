@@ -28,12 +28,14 @@ export const WorklistFilter = () => {
     state => state.user.data.clinicianProfile,
   )
 
+  const { autoRefreshRadiologyWorklistInterval = 30 } = settings
+
   const timer = React.useRef(null)
 
   const startTimer = () => {
     timer.current = setInterval(() => {
       handleSearch()
-    }, 30000)
+    }, autoRefreshRadiologyWorklistInterval * 1000)
   }
 
   const stopTimer = () => {

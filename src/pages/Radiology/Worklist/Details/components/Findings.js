@@ -8,6 +8,7 @@ import {
   convertFromHTML,
 } from 'draft-js'
 import draftToHtml from 'draftjs-to-html'
+import Authorized from '@/utils/Authorized'
 import {
   RichEditor,
   ScribbleNoteItem,
@@ -16,7 +17,6 @@ import {
   Checklist,
   CommonModal,
 } from '@/components'
-import Authorized from '@/utils/Authorized'
 import { Typography, Input } from 'antd'
 import { CHECKLIST_CATEGORY, SCRIBBLE_NOTE_TYPE } from '@/utils/constants'
 import { navigateDirtyCheck } from '@/utils/utils'
@@ -256,7 +256,6 @@ export const Findings = ({
       },
     })
 
-    console.log('updatedCategoryScribbleArray', updatedCategoryScribbleArray)
     for (let i = 0; i < previousData.length; i++) {
       if (JSON.stringify(previousData[i]) === JSON.stringify(deleteItem)) {
         if (previousData[i].isDeleted !== undefined) {
@@ -276,7 +275,11 @@ export const Findings = ({
 
     toggleScribbleModal()
   }
-  console.log('Findings is loaded')
+
+  const isReadOnly =
+    Authorized.check('radiologyworklist.examinationfinding').rights ===
+    'disable'
+
   return (
     <div>
       <GridContainer>
@@ -291,6 +294,7 @@ export const Findings = ({
             }}
           >
             <ScribbleNoteItem
+              buttonProps={{ disabled: isReadOnly }}
               scribbleNoteUpdateState={scribbleNoteUpdateState}
               category={item.category}
               arrayName={item.scribbleField}
@@ -302,6 +306,7 @@ export const Findings = ({
             />
 
             <Checklist
+              buttonProps={{ disabled: isReadOnly }}
               checklistCategory={CHECKLIST_CATEGORY.RADIOLOGY}
               buttonStyle={{ marginRight: '0px' }}
               onChecklistConfirm={checklist => {
@@ -323,6 +328,7 @@ export const Findings = ({
         </GridItem>
         <GridItem sm={12} md={12}>
           <RichEditor
+            disabled={isReadOnly}
             editorState={editorState}
             onEditorStateChange={onEditorStateChange}
             stripPastedStyles={false}
