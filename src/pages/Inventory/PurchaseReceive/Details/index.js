@@ -28,20 +28,13 @@ class Index extends Component {
     const { purchaseOrder } = purchaseOrderDetails
     const poStatus = purchaseOrder ? purchaseOrder.purchaseOrderStatusFK : 1
 
-    return (
-      // <AuthorizedContext.Provider
-      //   value={{
-      //     rights: poStatus !== 6 ? 'enable' : 'disable',
-      //     // rights: 'disable',
-      //   }}
-      // >
+    return ( 
       <CardContainer hideHeader>
         <Tabs
           defaultActiveKey='0'
           options={PurchaseReceiveDetailOption(poStatus, this.props)}
         />
-      </CardContainer>
-      // </AuthorizedContext.Provider>
+      </CardContainer> 
     )
   }
 }
