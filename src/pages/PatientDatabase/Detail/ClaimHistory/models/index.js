@@ -13,25 +13,6 @@ export default createListViewModel({
     subscriptions: {},
     effects: {},
     reducers: {
-      queryDone(st, { payload }) {
-        const { data } = payload
-        return {
-          ...st,
-          list: data.data.map(o => {
-            return {
-              ...o,
-              balanceDays: o.dueDate
-                ? Math.floor(
-                    (moment(o.dueDate).startOf('day') -
-                      moment().startOf('day')) /
-                      (24 * 3600 * 1000),
-                  )
-                : undefined,
-            }
-          }),
-        }
-      },
-
       queryOneDone(st, { payload }) {
         const { data } = payload
         return {

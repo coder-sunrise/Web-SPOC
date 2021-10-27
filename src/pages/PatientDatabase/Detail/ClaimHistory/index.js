@@ -3,10 +3,12 @@ import { connect } from 'dva'
 import moment from 'moment'
 import { Edit, Info } from '@material-ui/icons'
 import Authorized from '@/utils/Authorized'
-import { Tooltip, CommonTableGrid, Button, CommonModal } from '@/components'
+import { Tooltip, Button, CommonModal } from '@/components'
+import { ProTable } from '@medisys/component'
+import service from './services'
 import Details from './Details'
 
-const ClaimHistory = ({ values, dispatch, claimHistory, clinicSettings }) => {
+const ClaimHistory = ({ values, dispatch, height, clinicSettings }) => {
   const [showEditClaimDetails, setShowEditClaimDetails] = useState(false)
   const {
     diagnosisDataSource = 'Snomed',
@@ -19,32 +21,238 @@ const ClaimHistory = ({ values, dispatch, claimHistory, clinicSettings }) => {
     ) || { rights: 'hidden' }
 
     let columns = [
-      { name: 'visitDate', title: 'Visit Date' },
-      { name: 'doctor', title: 'Doctor' },
-      { name: 'diagnosis', title: 'Diagnosis' },
-      { name: 'diagnosisJP', title: 'Diagnosis (JP)' },
-      { name: 'internationalCode', title: 'Int. Code' },
-      { name: 'diagnosisType', title: 'Type' },
-      { name: 'isClaimable', title: 'Claimable' },
-      { name: 'onsetDate', title: 'Onset Date' },
-      { name: 'firstVisitDate', title: 'First Visit Date' },
       {
-        name: 'validityDays',
+        key: 'visitDate',
+        title: 'Visit Date',
+        dataIndex: 'visitDate',
+        sorter: false,
+        search: false,
+        render: (_dom, row) => {
+          const visitDate = moment(row.visitDate).format('DD MMM YYYY')
+          return (
+            <Tooltip title={visitDate}>
+              <div>{visitDate}</div>
+            </Tooltip>
+          )
+        },
+        width: 100,
+      },
+      {
+        key: 'doctor',
+        title: 'Doctor',
+        dataIndex: 'doctor',
+        width: 120,
+        sorter: false,
+        search: false,
+        render: (_dom, row) => {
+          const doctor = `${
+            row.doctorTitle && row.doctorTitle.trim().length
+              ? `${row.doctorTitle}. `
+              : ''
+          }${row.doctorName || ''}`
+          return (
+            <Tooltip title={doctor}>
+              <div
+                style={{
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  width: 104,
+                }}
+              >
+                {doctor}
+              </div>
+            </Tooltip>
+          )
+        },
+      },
+      {
+        key: 'diagnosis',
+        title: 'Diagnosis',
+        dataIndex: 'diagnosis',
+        width: 150,
+        sorter: false,
+        search: false,
+        render: (_dom, row) => {
+          const diagnosis =
+            diagnosisDataSource === 'Snomed'
+              ? row.diagnosisFK
+                ? row.diagnosisDescription
+                : '-'
+              : row.icD10DiagnosisFK
+              ? row.icD10DiagnosisDescription
+              : '-'
+          return (
+            <Tooltip title={diagnosis}>
+              <div
+                style={{
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  width: 134,
+                }}
+              >
+                {diagnosis}
+              </div>
+            </Tooltip>
+          )
+        },
+      },
+      {
+        key: 'diagnosisJP',
+        title: 'Diagnosis (JP)',
+        dataIndex: 'diagnosisJP',
+        width: 150,
+        sorter: false,
+        search: false,
+        render: (_dom, row) => {
+          return (
+            <Tooltip title={row.icD10JpnDiagnosisDescription}>
+              <div
+                style={{
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  width: 134,
+                }}
+              >
+                {row.icD10JpnDiagnosisFK
+                  ? row.icD10JpnDiagnosisDescription
+                  : '-'}
+              </div>
+            </Tooltip>
+          )
+        },
+      },
+      {
+        key: 'internationalCode',
+        title: 'Int. Code',
+        dataIndex: 'internationalCode',
+        width: 80,
+        align: 'center',
+        sorter: false,
+        search: false,
+        render: (_dom, row) => {
+          return (
+            <Tooltip title={row.internationalCode}>
+              <div
+                style={{
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  width: 64,
+                }}
+              >
+                {row.internationalCode || '-'}
+              </div>
+            </Tooltip>
+          )
+        },
+      },
+      {
+        key: 'diagnosisType',
+        title: 'Type',
+        dataIndex: 'diagnosisType',
+        width: 80,
+        sorter: false,
+        search: false,
+        render: (_dom, row) => {
+          return (
+            <Tooltip title={row.diagnosisType}>
+              <div>{row.diagnosisType || '-'}</div>
+            </Tooltip>
+          )
+        },
+      },
+      {
+        key: 'isClaimable',
+        title: 'Claimable',
+        dataIndex: 'isClaimable',
+        width: 80,
+        align: 'center',
+        sorter: false,
+        search: false,
+        render: (_dom, row) => {
+          const claimable = row.isClaimable ? 'Yes' : 'No'
+          return (
+            <Tooltip title={claimable}>
+              <div>{claimable}</div>
+            </Tooltip>
+          )
+        },
+      },
+      {
+        key: 'onsetDate',
+        title: 'Onset Date',
+        dataIndex: 'onsetDate',
+        width: 100,
+        sorter: false,
+        search: false,
+        render: (_dom, row) => {
+          const onsetDate = row.onsetDate
+            ? moment(row.onsetDate).format('DD MMM YYYY')
+            : '-'
+          return (
+            <Tooltip title={onsetDate}>
+              <div>{onsetDate}</div>
+            </Tooltip>
+          )
+        },
+      },
+      {
+        key: 'firstVisitDate',
+        title: 'First Visit Date',
+        dataIndex: 'firstVisitDate',
+        width: 110,
+        sorter: false,
+        search: false,
+        render: (_dom, row) => {
+          const firstVisitDate = row.firstVisitDate
+            ? moment(row.firstVisitDate).format('DD MMM YYYY')
+            : '-'
+          return (
+            <Tooltip title={firstVisitDate}>
+              <div>{firstVisitDate}</div>
+            </Tooltip>
+          )
+        },
+      },
+      {
+        key: 'validityDays',
         title: (
           <div>
             <p style={{ height: 16 }}>Validity</p>
             <p style={{ height: 16 }}>(Days)</p>
           </div>
         ),
+        dataIndex: 'validityDays',
+        width: 80,
+        align: 'center',
+        sorter: false,
+        search: false,
+        render: (_dom, row) => {
+          return (
+            <Tooltip tirle={row.validityDays}>
+              <div>{row.validityDays || '-'}</div>
+            </Tooltip>
+          )
+        },
       },
       {
-        name: 'balanceDays',
+        key: 'balanceDays',
         title: (
           <div>
             <p style={{ height: 16 }}>Balance</p>
             <p style={{ height: 16 }}>
               (Days)
-              <Tooltip title='Order has been amended, please retrieve latest order from Details link'>
+              <Tooltip
+                title={
+                  <div>
+                    <p>i.e.,</p>
+                    <p>Due Date (-) Today's Date = Balance (days)</p>
+                  </div>
+                }
+              >
                 <Info
                   style={{
                     color: 'red',
@@ -58,13 +266,49 @@ const ClaimHistory = ({ values, dispatch, claimHistory, clinicSettings }) => {
             </p>
           </div>
         ),
+        dataIndex: 'balanceDays',
+        width: 80,
+        align: 'center',
+        sorter: false,
+        search: false,
+        render: (_dom, row) => {
+          const balanceDays = row.dueDate
+            ? Math.floor(
+                (moment(row.dueDate).startOf('day') - moment().startOf('day')) /
+                  (24 * 3600 * 1000),
+              )
+            : undefined
+          return (
+            <Tooltip
+              title={balanceDays || balanceDays === 0 ? row.balanceDays : '-'}
+            >
+              <div>{balanceDays || balanceDays === 0 ? balanceDays : '-'}</div>
+            </Tooltip>
+          )
+        },
       },
       {
-        name: 'dueDate',
+        key: 'dueDate',
         title: (
           <div>
             Due Date
-            <Tooltip title='Order has been amended, please retrieve latest order from Details link'>
+            <Tooltip
+              title={
+                <div>
+                  <p>i.e.,</p>
+                  <p>
+                    <span style={{ textDecoration: 'underline' }}>
+                      Sickness:
+                    </span>{' '}
+                    First Visit Date (+) Validity = Due Date
+                  </p>
+                  <p>
+                    <span style={{ textDecoration: 'underline' }}>Injury:</span>{' '}
+                    Onset Visit Date (+) Validity = Due Date
+                  </p>
+                </div>
+              }
+            >
               <Info
                 style={{
                   color: 'red',
@@ -77,200 +321,11 @@ const ClaimHistory = ({ values, dispatch, claimHistory, clinicSettings }) => {
             </Tooltip>
           </div>
         ),
-      },
-      { name: 'diagnosisRemarks', title: 'Diagnosis Remarks' },
-      { name: 'updateUser', title: 'Updated By' },
-      { name: 'updateDate', title: 'Updated Date' },
-      { name: 'remarks', title: 'Remarks' },
-      { name: 'action', title: 'Action' },
-    ]
-
-    if (diagnosisDataSource === 'Snomed' || !isEnableJapaneseICD10Diagnosis) {
-      columns = columns.filter(c => c.name !== 'diagnosisJP')
-    }
-
-    if (editClaimHistoryRight.rights !== 'enable') {
-      columns = columns.filter(c => c.name !== 'action')
-    }
-    return columns
-  }
-
-  const columnExtensions = diagnosisType => {
-    return [
-      {
-        columnName: 'visitDate',
+        dataIndex: 'dueDate',
         width: 100,
-        sortingEnabled: false,
-        render: row => {
-          const visitDate = moment(row.visitDate).format('DD MMM YYYY')
-          return (
-            <Tooltip title={visitDate}>
-              <div>{visitDate}</div>
-            </Tooltip>
-          )
-        },
-      },
-      {
-        columnName: 'doctor',
-        width: 120,
-        sortingEnabled: false,
-        render: row => {
-          const doctor = `${
-            row.doctorTitle && row.doctorTitle.trim().length
-              ? `${row.doctorTitle}. `
-              : ''
-          }${row.doctorName || ''}`
-          return (
-            <Tooltip title={doctor}>
-              <div>{doctor}</div>
-            </Tooltip>
-          )
-        },
-      },
-      {
-        columnName: 'diagnosis',
-        width: 150,
-        sortingEnabled: false,
-        render: row => {
-          const diagnosis =
-            diagnosisType === 'Snomed'
-              ? row.diagnosisFK
-                ? row.diagnosisDescription
-                : '-'
-              : row.icd10JpnDiagnosisFK
-              ? row.icd10DiagnosisDescription
-              : '-'
-          return (
-            <Tooltip title={diagnosis}>
-              <div>{diagnosis}</div>
-            </Tooltip>
-          )
-        },
-      },
-      {
-        columnName: 'diagnosisJP',
-        width: 150,
-        sortingEnabled: false,
-        render: row => {
-          return (
-            <Tooltip title={row.icd10JpnDiagnosisDescription}>
-              <div>
-                {row.icd10JpnDiagnosisFK
-                  ? row.icd10JpnDiagnosisDescription
-                  : '-'}
-              </div>
-            </Tooltip>
-          )
-        },
-      },
-      {
-        columnName: 'internationalCode',
-        width: 80,
-        align: 'center',
-        sortingEnabled: false,
-        render: row => {
-          return (
-            <Tooltip title={row.internationalCode}>
-              <div>{row.internationalCode || '-'}</div>
-            </Tooltip>
-          )
-        },
-      },
-      {
-        columnName: 'diagnosisType',
-        width: 80,
-        sortingEnabled: false,
-        render: row => {
-          return (
-            <Tooltip title={row.diagnosisType}>
-              <div>{row.diagnosisType || '-'}</div>
-            </Tooltip>
-          )
-        },
-      },
-      {
-        columnName: 'isClaimable',
-        width: 80,
-        align: 'center',
-        sortingEnabled: false,
-        render: row => {
-          const claimable = row.isClaimable ? 'Yes' : 'No'
-          return (
-            <Tooltip title={claimable}>
-              <div>{claimable}</div>
-            </Tooltip>
-          )
-        },
-      },
-      {
-        columnName: 'onsetDate',
-        width: 100,
-        sortingEnabled: false,
-        render: row => {
-          const onsetDate = row.onsetDate
-            ? moment(row.onsetDate).format('DD MMM YYYY')
-            : '-'
-          return (
-            <Tooltip title={onsetDate}>
-              <div>{onsetDate}</div>
-            </Tooltip>
-          )
-        },
-      },
-      {
-        columnName: 'firstVisitDate',
-        width: 110,
-        sortingEnabled: false,
-        render: row => {
-          const firstVisitDate = row.firstVisitDate
-            ? moment(row.firstVisitDate).format('DD MMM YYYY')
-            : '-'
-          return (
-            <Tooltip title={firstVisitDate}>
-              <div>{firstVisitDate}</div>
-            </Tooltip>
-          )
-        },
-      },
-      {
-        columnName: 'validityDays',
-        width: 70,
-        align: 'center',
-        sortingEnabled: false,
-        render: row => {
-          return (
-            <Tooltip tirle={row.validityDays}>
-              <div>{row.validityDays || '-'}</div>
-            </Tooltip>
-          )
-        },
-      },
-      {
-        columnName: 'balanceDays',
-        width: 70,
-        align: 'center',
-        sortingEnabled: false,
-        render: row => {
-          return (
-            <Tooltip
-              title={
-                row.balanceDays || row.balanceDays === 0 ? row.balanceDays : '-'
-              }
-            >
-              <div>
-                {row.balanceDays || row.balanceDays === 0
-                  ? row.balanceDays
-                  : '-'}
-              </div>
-            </Tooltip>
-          )
-        },
-      },
-      {
-        columnName: 'dueDate',
-        width: 100,
-        sortingEnabled: false,
-        render: row => {
+        sorter: false,
+        search: false,
+        render: (_dom, row) => {
           const dueDate = row.dueDate
             ? moment(row.dueDate).format('DD MMM YYYY')
             : '-'
@@ -282,10 +337,13 @@ const ClaimHistory = ({ values, dispatch, claimHistory, clinicSettings }) => {
         },
       },
       {
-        columnName: 'diagnosisRemarks',
-        sortingEnabled: false,
+        key: 'diagnosisRemarks',
+        title: 'Diagnosis Remarks',
+        dataIndex: 'diagnosisRemarks',
+        sorter: false,
+        search: false,
         width: 200,
-        render: row => {
+        render: (_dom, row) => {
           return (
             <Tooltip title={row.diagnosisRemarks}>
               <div
@@ -293,6 +351,7 @@ const ClaimHistory = ({ values, dispatch, claimHistory, clinicSettings }) => {
                   textOverflow: 'ellipsis',
                   overflow: 'hidden',
                   whiteSpace: 'nowrap',
+                  width: 184,
                 }}
               >
                 {row.diagnosisRemarks || '-'}
@@ -302,10 +361,13 @@ const ClaimHistory = ({ values, dispatch, claimHistory, clinicSettings }) => {
         },
       },
       {
-        columnName: 'updateUser',
+        key: 'updateUser',
+        title: 'Updated By',
+        dataIndex: 'updateUser',
         width: 110,
-        sortingEnabled: false,
-        render: row => {
+        sorter: false,
+        search: false,
+        render: (_dom, row) => {
           const updateUser = `${
             row.updateUserTitle && row.updateUserTitle.trim().length
               ? `${row.updateUserTitle}. `
@@ -313,16 +375,28 @@ const ClaimHistory = ({ values, dispatch, claimHistory, clinicSettings }) => {
           }${row.updateUserName || ''}`
           return (
             <Tooltip title={updateUser}>
-              <div>{updateUser}</div>
+              <div
+                style={{
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  width: 94,
+                }}
+              >
+                {updateUser}
+              </div>
             </Tooltip>
           )
         },
       },
       {
-        columnName: 'updateDate',
+        key: 'updateDate',
+        title: 'Updated Date',
+        dataIndex: 'updateDate',
         width: 100,
-        sortingEnabled: false,
-        render: row => {
+        sorter: false,
+        search: false,
+        render: (_dom, row) => {
           const updateDate = moment(row.updateDate).format('DD MMM YYYY')
           return (
             <Tooltip title={updateDate}>
@@ -332,10 +406,13 @@ const ClaimHistory = ({ values, dispatch, claimHistory, clinicSettings }) => {
         },
       },
       {
-        columnName: 'remarks',
-        sortingEnabled: false,
+        key: 'remarks',
+        title: 'Remarks',
+        dataIndex: 'remarks',
+        sorter: false,
+        search: false,
         width: 200,
-        render: row => {
+        render: (_dom, row) => {
           return (
             <Tooltip title={row.remarks}>
               <div
@@ -343,6 +420,7 @@ const ClaimHistory = ({ values, dispatch, claimHistory, clinicSettings }) => {
                   textOverflow: 'ellipsis',
                   overflow: 'hidden',
                   whiteSpace: 'nowrap',
+                  width: 184,
                 }}
               >
                 {row.remarks || '-'}
@@ -352,11 +430,15 @@ const ClaimHistory = ({ values, dispatch, claimHistory, clinicSettings }) => {
         },
       },
       {
-        columnName: 'action',
+        key: 'action',
+        title: 'Action',
+        dataIndex: 'action',
         width: 60,
-        sortingEnabled: false,
+        sorter: false,
+        search: false,
         align: 'center',
-        render: row => {
+        fixed: 'right',
+        render: (_dom, row) => {
           return (
             <Button
               size='sm'
@@ -373,7 +455,17 @@ const ClaimHistory = ({ values, dispatch, claimHistory, clinicSettings }) => {
         },
       },
     ]
+
+    if (diagnosisDataSource === 'Snomed' || !isEnableJapaneseICD10Diagnosis) {
+      columns = columns.filter(c => c.dataIndex !== 'diagnosisJP')
+    }
+
+    if (editClaimHistoryRight.rights !== 'enable') {
+      columns = columns.filter(c => c.dataIndex !== 'action')
+    }
+    return columns
   }
+
   useEffect(() => {
     if (values.id) {
       dispatch({
@@ -415,16 +507,26 @@ const ClaimHistory = ({ values, dispatch, claimHistory, clinicSettings }) => {
       }
     })
   }
+
+  const { queryList, query } = service
+  const api = {
+    remove: null,
+    create: null,
+    update: null,
+    queryList,
+    query: null,
+  }
   return (
     <div>
-      <CommonTableGrid
-        getRowId={row => row.id}
-        size='sm'
-        forceRender
-        type='claimHistory'
-        //rows={claimHistory.list || []}
+      <ProTable
+        rowSelection={false}
+        options={false}
         columns={getColumns()}
-        columnExtensions={columnExtensions(diagnosisDataSource)}
+        api={api}
+        defaultColumns={[]}
+        search={false}
+        scroll={{ x: 2000, y: height - 260 }}
+        pagination={{ pageSize: 100 }}
       />
 
       <CommonModal
@@ -447,7 +549,6 @@ const ClaimHistory = ({ values, dispatch, claimHistory, clinicSettings }) => {
   )
 }
 
-export default connect(({ claimHistory, clinicSettings }) => ({
-  claimHistory: claimHistory || {},
+export default connect(({ clinicSettings }) => ({
   clinicSettings: clinicSettings.settings,
 }))(ClaimHistory)

@@ -55,11 +55,11 @@ const Details = ({
   if (diagnosisDataSource === 'Snomed') {
     diagnosis = values.diagnosisFK ? values.diagnosisDescription : '-'
   } else {
-    diagnosis = values.icd10DiagnosisFK
+    diagnosis = values.icD10DiagnosisFK
       ? isEnableJapaneseICD10Diagnosis
-        ? `${values.icd10DiagnosisDescription ||
-            ''} ${values.icd10JpnDiagnosisDescription || ''}`
-        : values.icd10DiagnosisDescription
+        ? `${values.icD10DiagnosisDescription ||
+            ''} ${values.icD10JpnDiagnosisDescription || ''}`
+        : values.icD10DiagnosisDescription
       : '-'
   }
   const doctor = `${

@@ -710,7 +710,7 @@ class PatientDetail extends PureComponent {
                     rights: currentItemDisabled ? 'disable' : 'enable', //
                   }}
                 >
-                  <CurrentComponent {...resetProps} />
+                  <CurrentComponent {...resetProps} height={height} />
                 </Authorized.Context.Provider>
               </div>
             </CardContainer>
