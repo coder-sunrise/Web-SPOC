@@ -124,18 +124,18 @@ class Checklist extends React.Component {
         output += `<strong>${sub}</strong><br /><br />`
         Object.keys(obss).forEach(obs => {
           const obsObj = obss[obs]
-            if (obsObj) {
-              output += `${obs}<br />`
-              const nats = obss[obs]['Nature']
-              if(nats){
-                if (typeof nats === 'string') {
-                  output += ` - ${nats}<br />`
-                }
-                if (typeof nats === 'object') {
-                  const panels = nats.map(n => ' - ' + n).join('<br />')
-                  output += `${panels}<br />`
-                }
+          if (obsObj) {
+            output += `${obs}<br />`
+            const nats = obss[obs]['Nature']
+            if (nats) {
+              if (typeof nats === 'string') {
+                output += ` - ${nats}<br />`
               }
+              if (typeof nats === 'object') {
+                const panels = nats.map(n => ' - ' + n).join('<br />')
+                output += `${panels}<br />`
+              }
+            }
             const rem = obss[obs]['Remarks'] // see checklistmodal
             if (rem) output += `${rem}<br />`
 
@@ -145,7 +145,7 @@ class Checklist extends React.Component {
       }
       output += `<br />`
     })
-console.log('output',output)
+    console.log('output', output)
     this.props.onChecklistConfirm(output)
   }
 
@@ -155,6 +155,7 @@ console.log('output',output)
       settingChecklist,
       onChecklistConfirm,
       buttonStyle,
+      buttonProps,
     } = this.props
     return (
       <React.Fragment>
@@ -186,7 +187,7 @@ console.log('output',output)
             </div>
           }
         >
-          <Button style={buttonStyle} size='sm' color='info'>
+          <Button style={buttonStyle} size='sm' color='info' {...buttonProps}>
             Checklist
           </Button>
         </Popover>

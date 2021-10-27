@@ -13,6 +13,7 @@ import {
   Popconfirm,
   TextField,
 } from '@/components'
+import Authorized from '@/utils/Authorized'
 import Banner from '@/pages/PatientDashboard/Banner'
 import {
   ExaminationSteps,
@@ -104,20 +105,26 @@ const RadiologyDetails = () => {
       s => s.currentStatusFK === details.entity.statusFK,
     )
 
-    if (!buttonInfo) return
+    if (
+      !buttonInfo ||
+      Authorized.check(buttonInfo.authority).rights !== 'enable'
+    )
+      return
 
     return (
       <React.Fragment>
-        {buttonInfo.enableCancel && (
-          <ProgressButton
-            color='#797979'
-            onClick={() => {
-              setShowCancelConfirm(true)
-            }}
-          >
-            Cancel Examination
-          </ProgressButton>
-        )}
+        {buttonInfo.enableCancel &&
+          Authorized.check('radiologyworklist.cancelexamination').rights ===
+            'enable' && (
+            <ProgressButton
+              color='#797979'
+              onClick={() => {
+                setShowCancelConfirm(true)
+              }}
+            >
+              Cancel Examination
+            </ProgressButton>
+          )}
         <ProgressButton
           color='success'
           onClick={() => {
@@ -219,7 +226,8 @@ const RadiologyDetails = () => {
   const showOnlyCloseButton =
     isReadOnly ||
     workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
-    workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED
+    workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED ||
+    Authorized.check('radiologyworklist.saveexamination').rights !== 'enable'
 
   return (
     <CommonModal

@@ -177,14 +177,18 @@ const actualizationButton = (row, buttonClickCallback) => {
 }
 
 const radiologyDetailsButton = (row, buttonClickCallback) => {
-  let actualizationBtn = null
+  let radiologyDetailsBtn = null
   const {
     type,
     workitem: { radiologyWorkitem: { id: radiologyWorkitemID } = {} } = {},
   } = row
 
-  if (type === 'Radiology' && radiologyWorkitemID) {
-    actualizationBtn = (
+  if (
+    type === 'Radiology' &&
+    radiologyWorkitemID &&
+    Authorized.check('queue.radiologyexaminationdetails').rights !== 'hidden'
+  ) {
+    radiologyDetailsBtn = (
       <Tooltip title='Radiology Detail'>
         <Button
           color='primary'
@@ -196,7 +200,7 @@ const radiologyDetailsButton = (row, buttonClickCallback) => {
       </Tooltip>
     )
   }
-  return actualizationBtn
+  return radiologyDetailsBtn
 }
 
 export const DispenseItemsColumns = [

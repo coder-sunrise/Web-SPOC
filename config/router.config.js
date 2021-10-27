@@ -140,7 +140,7 @@ const _routes = [
             component: './Radiology/Worklist',
             mini: 'RW',
             exact: true,
-            //authority: ['reception/queue'], TODO:: to replace with actual permission
+            authority: ['radiology/worklist'],
           },
           {
             path: '/radiology/history',
