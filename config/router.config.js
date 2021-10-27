@@ -132,6 +132,7 @@ const _routes = [
         name: 'radiology',
         moduleName: 'Radiology',
         authority: ['radiology'],
+        clinicSetting: ['IsEnableRadiologyModule'],
         specialist: ['GP', 'Dental'],
         routes: [
           {

@@ -145,7 +145,6 @@ class Checklist extends React.Component {
       }
       output += `<br />`
     })
-    console.log('output', output)
     this.props.onChecklistConfirm(output)
   }
 
