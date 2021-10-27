@@ -44,7 +44,9 @@ export const StatusPanel = () => {
 
       <div style={{ display: 'flex', alignItems: 'end', marginLeft: 10 }}>
         <div>
-          <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>Last Refresh:</p>
+          <p style={{ fontWeight: 400, fontSize: '0.8rem', minWidth: 80 }}>
+            Last Refresh:
+          </p>
           <p style={{ color: '#1890f8', fontSize: '0.9rem' }}>
             {refreshDate.format('HH:mm')}
           </p>
