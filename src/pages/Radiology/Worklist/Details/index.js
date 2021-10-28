@@ -94,7 +94,6 @@ const RadiologyDetails = () => {
   }, [details])
 
   useEffect(() => {
-    console.log('workitem - new', workitem)
     setCombinedWorkitems(getCombinedWorkitems(workitem.visitWorkitems))
   }, [workitem, examinationDetails])
 

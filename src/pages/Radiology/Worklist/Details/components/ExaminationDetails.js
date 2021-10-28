@@ -4,7 +4,11 @@ import { Radio, Input } from 'antd'
 import moment from 'moment'
 import Authorized from '@/utils/Authorized'
 import { GridContainer, GridItem } from '@/components'
-import { RightAlignGridItem, SectionTitle } from '../../../Components'
+import {
+  RightAlignGridItem,
+  SectionTitle,
+  TextGridItem,
+} from '../../../Components'
 import WorklistContext from '@/pages/Radiology/Worklist/WorklistContext'
 import {
   RADIOLOGY_WORKITEM_STATUS,
@@ -169,15 +173,15 @@ export const ExaminationDetails = ({
           <GridItem md={2}>
             <RightAlignGridItem md={12}>Radiographer :</RightAlignGridItem>
           </GridItem>
-          <GridItem md={10}>
+          <TextGridItem md={10}>
             {assignedRadiographers.map(r => r.name).toString()}
-          </GridItem>
+          </TextGridItem>
           <GridItem md={2}>
             <RightAlignGridItem md={12}>
               Radiographer Comments :
             </RightAlignGridItem>
           </GridItem>
-          <GridItem md={10}>{workitem.comment}</GridItem>
+          <TextGridItem md={10}>{workitem.comment}</TextGridItem>
 
           {workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ? (
             !isHiddenExaminationFinding && (
@@ -189,11 +193,15 @@ export const ExaminationDetails = ({
                 </GridItem>
 
                 <GridItem md={10}>
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: workitem.examinationFinding,
-                    }}
-                  />
+                  {workitem.examinationFinding == '' ? (
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: workitem.examinationFinding,
+                      }}
+                    />
+                  ) : (
+                    '-'
+                  )}
                 </GridItem>
               </React.Fragment>
             )
@@ -203,7 +211,7 @@ export const ExaminationDetails = ({
                 <RightAlignGridItem md={12}>Cancel Reason:</RightAlignGridItem>
               </GridItem>
 
-              <GridItem md={10}>{workitem.cancellationReason}</GridItem>
+              <TextGridItem md={10}>{workitem.cancellationReason}</TextGridItem>
             </React.Fragment>
           )}
         </GridContainer>
