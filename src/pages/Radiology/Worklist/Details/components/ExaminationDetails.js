@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react'
 import { useSelector } from 'dva'
 import { Radio, Input } from 'antd'
 import moment from 'moment'
+import Authorized from '@/utils/Authorized'
 import { GridContainer, GridItem } from '@/components'
 import { RightAlignGridItem, SectionTitle } from '../../../Components'
 import WorklistContext from '@/pages/Radiology/Worklist/WorklistContext'
@@ -81,6 +82,9 @@ export const ExaminationDetails = ({
     }
   }, [workitem])
 
+  const isHiddenExaminationFinding =
+    Authorized.check('radiologyworklist.examinationfinding').rights === 'hidden'
+
   return (
     <div>
       <SectionTitle title='Examination Details' />
@@ -143,22 +147,22 @@ export const ExaminationDetails = ({
               autoSize={{ minRows: 3, maxRows: 5 }}
             />
           </GridItem>
-          <GridItem md={12}>
-            {workitem.statusFK ===
-              RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED && (
-              <Findings
-                defaultValue={workitem.examinationFinding}
-                radiologyScribbleNote={workitem.radiologyScribbleNote}
-                onChange={value => {
-                  setFindings(value)
-                  setHasChanged(true)
-                }}
-                workItem={workitem}
-                item={findingSettings}
-                {...restProps}
-              />
+          {workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED &&
+            !isHiddenExaminationFinding && (
+              <GridItem md={12}>
+                <Findings
+                  defaultValue={workitem.examinationFinding}
+                  radiologyScribbleNote={workitem.radiologyScribbleNote}
+                  onChange={value => {
+                    setFindings(value)
+                    setHasChanged(true)
+                  }}
+                  workItem={workitem}
+                  item={findingSettings}
+                  {...restProps}
+                />
+              </GridItem>
             )}
-          </GridItem>
         </GridContainer>
       ) : (
         <GridContainer style={{ rowGap: 10 }}>
@@ -176,21 +180,23 @@ export const ExaminationDetails = ({
           <GridItem md={10}>{workitem.comment}</GridItem>
 
           {workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ? (
-            <React.Fragment>
-              <GridItem md={2}>
-                <RightAlignGridItem md={12}>
-                  Examination Findings:
-                </RightAlignGridItem>
-              </GridItem>
+            !isHiddenExaminationFinding && (
+              <React.Fragment>
+                <GridItem md={2}>
+                  <RightAlignGridItem md={12}>
+                    Examination Findings:
+                  </RightAlignGridItem>
+                </GridItem>
 
-              <GridItem md={10}>
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: workitem.examinationFinding,
-                  }}
-                />
-              </GridItem>
-            </React.Fragment>
+                <GridItem md={10}>
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: workitem.examinationFinding,
+                    }}
+                  />
+                </GridItem>
+              </React.Fragment>
+            )
           ) : (
             <React.Fragment>
               <GridItem md={2}>

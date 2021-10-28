@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { Form, Button } from 'antd'
+import InfoCircleOutlined from '@ant-design/icons/InfoCircleOutlined'
 import { CLINICAL_ROLE } from '@/utils/constants'
 import moment from 'moment'
 import Search from '@material-ui/icons/Search'
@@ -13,13 +14,44 @@ import {
   ProgressButton,
   CodeSelect,
   dateFormatLong,
+  IconButton,
+  Popover,
 } from '@/components'
 import { formatMessage } from 'umi'
 import WorklistContext from '../Worklist/WorklistContext'
 
+const DateFilterInfo = () => {
+  const [showDateFilterInfo, setShowDateFilterInfo] = useState(false)
+  return (
+    <Popover
+      icon={null}
+      visible={showDateFilterInfo}
+      placement='topLeft'
+      content={
+        <div style={{ width: 280 }}>
+          <p>
+            All states filter using "Order Created date" except Completed state
+            filter using "Reporting Completed date"
+          </p>
+        </div>
+      }
+    >
+      <IconButton
+        size='small'
+        style={{ alignSelf: 'flex-end', marginRight: 16, marginBottom: 8 }}
+        onMouseOver={() => setShowDateFilterInfo(true)}
+        onMouseOut={() => setShowDateFilterInfo(false)}
+      >
+        <InfoCircleOutlined />
+      </IconButton>
+    </Popover>
+  )
+}
+
 export const WorklistFilter = () => {
   const [form] = Form.useForm()
   const dispatch = useDispatch()
+
   const { detailsId, visitPurpose = [], filterWorklist } = useContext(
     WorklistContext,
   )
@@ -28,12 +60,14 @@ export const WorklistFilter = () => {
     state => state.user.data.clinicianProfile,
   )
 
+  const { autoRefreshRadiologyWorklistInterval = 30 } = settings
+
   const timer = React.useRef(null)
 
   const startTimer = () => {
     timer.current = setInterval(() => {
       handleSearch()
-    }, 30000)
+    }, autoRefreshRadiologyWorklistInterval * 1000)
   }
 
   const stopTimer = () => {
@@ -92,7 +126,6 @@ export const WorklistFilter = () => {
           label='Modality'
           code='ctmodality'
           maxTagPlaceholder='Modalities'
-          onChange={() => console.log('modality')}
         />
       </Form.Item>
       <Form.Item
@@ -105,6 +138,7 @@ export const WorklistFilter = () => {
         />
       </Form.Item>
       <Form.Item
+        noStyle
         name='dateTo'
         initialValue={moment()
           .endOf('day')
@@ -116,9 +150,10 @@ export const WorklistFilter = () => {
           style={{ width: 100 }}
         />
       </Form.Item>
+      <DateFilterInfo />
       <Form.Item name='isUrgent' style={{ alignSelf: 'flex-end' }}>
         <Checkbox
-          style={{ width: 70 }}
+          style={{ width: 65 }}
           label={formatMessage({ id: 'radiology.search.urgentOnly' })}
         />
       </Form.Item>
@@ -126,12 +161,11 @@ export const WorklistFilter = () => {
         CLINICAL_ROLE.RADIOGRAPHER && (
         <Form.Item name='isMyPatientOnly' style={{ alignSelf: 'flex-end' }}>
           <Checkbox
-            style={{ width: 125 }}
+            style={{ width: 95 }}
             label={formatMessage({ id: 'radiology.search.myPatientOnly' })}
           />
         </Form.Item>
       )}
-
       <Form.Item style={{ alignSelf: 'flex-end' }}>
         <ProgressButton
           variant='contained'

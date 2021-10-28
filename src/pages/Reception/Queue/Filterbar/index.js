@@ -114,16 +114,18 @@ const Filterbar = props => {
             </Button>
           </Authorized>
 
-          {((clinicRoleFK === 1 && !hideSelfOnlyFilter)
-            || (clinicRoleFK === 2 && servePatientRight && servePatientRight.rights !== 'hidden')) && (
-              <div className={classes.switch}>
-                <Checkbox
-                  label='My Patient Only'
-                  onChange={onSwitchClick}
-                  checked={selfOnly}
-                />
-              </div>
-            )}
+          {((clinicRoleFK === 1 && !hideSelfOnlyFilter) ||
+            (clinicRoleFK === 2 &&
+              servePatientRight &&
+              servePatientRight.rights !== 'hidden')) && (
+            <div className={classes.switch}>
+              <Checkbox
+                label='My Patient'
+                onChange={onSwitchClick}
+                checked={selfOnly}
+              />
+            </div>
+          )}
         </GridItem>
 
         <GridItem

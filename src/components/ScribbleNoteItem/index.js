@@ -24,7 +24,7 @@ import {
   Tooltip,
 } from '@/components'
 
-const styles = (theme) => ({
+const styles = theme => ({
   item: {
     marginBottom: theme.spacing(1),
     padding: theme.spacing(1),
@@ -34,7 +34,9 @@ const styles = (theme) => ({
     cursor: 'pointer',
 
     '&:hover': {
-      background: color(primaryColor).lighten(0.9).hex(),
+      background: color(primaryColor)
+        .lighten(0.9)
+        .hex(),
     },
     '& > svg': {
       marginRight: theme.spacing(1),
@@ -77,13 +79,13 @@ class ScribbleNoteItem extends React.Component {
   }
 
   toggleVisibleChange = () =>
-    this.setState((ps) => {
+    this.setState(ps => {
       return {
         open: !ps.open,
       }
     })
 
-  render () {
+  render() {
     const {
       classes,
       scriblenotes,
@@ -92,6 +94,7 @@ class ScribbleNoteItem extends React.Component {
       categoryIndex,
       scribbleNoteUpdateState,
       scribbleNoteArray = [],
+      buttonProps,
     } = this.props
 
     return (
@@ -157,7 +160,7 @@ class ScribbleNoteItem extends React.Component {
                               id: item.scribbleNoteFK,
                             },
                           })
-                          .then((v) => {
+                          .then(v => {
                             scribbleNoteUpdateState(
                               category,
                               arrayName,
@@ -201,7 +204,12 @@ class ScribbleNoteItem extends React.Component {
           </div>
         }
       >
-        <Button size='sm' color='info'>Scribble Note{scribbleNoteArray && scribbleNoteArray.length > 0 ? ` (${scribbleNoteArray.length})` : null}</Button>
+        <Button size='sm' color='info' {...buttonProps}>
+          Scribble Note
+          {scribbleNoteArray && scribbleNoteArray.length > 0
+            ? ` (${scribbleNoteArray.length})`
+            : null}
+        </Button>
       </Popover>
     )
   }
