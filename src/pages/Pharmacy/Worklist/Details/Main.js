@@ -163,6 +163,7 @@ const Main = props => {
     labelPrinterSize,
     isQueueNoDecimal,
     visitTypeSetting,
+    diagnosisDataSource = 'Snomed',
   } = clinicSettings
   const [showEditOrderModal, setShowEditOrderModal] = useState(false)
   const [showRedispenseFormModal, setShowRedispenseFormModal] = useState(false)
@@ -1304,7 +1305,11 @@ const Main = props => {
         <ContentGridItem title='Diagnosis:'>
           {(corDiagnosis || []).length
             ? workitem.corDiagnosis
-                .map(d => d.icD10DiagnosisDescription)
+                .map(d =>
+                  diagnosisDataSource === 'Snomed'
+                    ? d.diagnosisDescription
+                    : d.icD10DiagnosisDescription,
+                )
                 .join(', ')
             : '-'}
         </ContentGridItem>

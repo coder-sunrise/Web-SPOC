@@ -166,7 +166,7 @@ class Grid extends PureComponent {
             width: 110,
             render: row => {
               return (
-                <React.Fragment>
+                <div>
                   <Tooltip title='Download'>
                     <Button
                       size='sm'
@@ -228,7 +228,7 @@ class Grid extends PureComponent {
                       </Button>
                     </Tooltip>
                   </Popconfirm>
-                </React.Fragment>
+                </div>
               )
             },
           },

@@ -341,7 +341,13 @@ class Service extends PureComponent {
       setFieldValue,
     } = this.props
     const { services, serviceCenters } = this.state
-    const { serviceFK, serviceCenterFK, isPreOrder, workitem = {}, priority } = values
+    const {
+      serviceFK,
+      serviceCenterFK,
+      isPreOrder,
+      workitem = {},
+      priority,
+    } = values
 
     const totalPriceReadonly =
       Authorized.check('queue.consultation.modifyorderitemtotalprice')
@@ -368,7 +374,6 @@ class Service extends PureComponent {
         />
       </GridItem>
     )
-    
 
     return (
       <Authorized
@@ -395,11 +400,16 @@ class Service extends PureComponent {
                               m => m.value === serviceCenterFK,
                             ),
                         )}
-                        onChange={(v, op = {}) => {
-                          setFieldValue(
-                            'isNurseActualizeRequired',
-                            op.isNurseActualizable,
-                          )
+                        onChange={(v, op) => {
+                          if (!op) {
+                            setFieldValue('isNurseActualizeRequired', undefined)
+                            setFieldValue('serviceCenterFK', undefined)
+                          } else {
+                            setFieldValue(
+                              'isNurseActualizeRequired',
+                              op.isNurseActualizable,
+                            )
+                          }
 
                           setTimeout(() => {
                             this.getServiceCenterService()
