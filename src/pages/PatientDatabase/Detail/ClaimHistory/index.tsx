@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
 import { Edit, Info } from '@material-ui/icons'
 import Authorized from '@/utils/Authorized'
 import { Tooltip, Button, CommonModal, dateFormatLong } from '@/components'
 import { ProTable } from '@medisys/component'
+import { ActionType } from '@ant-design/pro-table'
 import service from './services'
 import Details from './Details'
 
 const ClaimHistory = ({ values, dispatch, height, clinicSettings }) => {
   const [showEditClaimDetails, setShowEditClaimDetails] = useState(false)
+  const myRef = useRef<ActionType>()
   const {
     diagnosisDataSource = 'Snomed',
     isEnableJapaneseICD10Diagnosis = false,
@@ -466,25 +468,6 @@ const ClaimHistory = ({ values, dispatch, height, clinicSettings }) => {
     return columns
   }
 
-  useEffect(() => {
-    if (values.id) {
-      dispatch({
-        type: 'claimHistory/query',
-        payload: {
-          pagesize: 100,
-          sorting: [
-            {
-              columnName: 'visitDate',
-              sortBy: 'visitFKNavigation.visitDate',
-              direction: 'desc',
-            },
-          ],
-          patientProfileFK: values.id,
-        },
-      })
-    }
-  }, [])
-
   const closeForm = () => {
     dispatch({
       type: 'claimHistory/updateState',
@@ -508,17 +491,29 @@ const ClaimHistory = ({ values, dispatch, height, clinicSettings }) => {
     })
   }
 
-  const { queryList, query } = service
+  const { queryList } = service
   const api = {
     remove: null,
     create: null,
     update: null,
-    queryList,
+    queryList: payload => {
+      return queryList({
+        ...payload,
+        sort: [
+          {
+            sortby: 'visitFKNavigation.visitDate',
+            order: 'desc',
+          },
+        ],
+        patientProfileFK: values.id,
+      })
+    },
     query: null,
   }
   return (
     <div>
       <ProTable
+        actionRef={myRef}
         rowSelection={false}
         options={false}
         columns={getColumns()}
@@ -541,6 +536,7 @@ const ClaimHistory = ({ values, dispatch, height, clinicSettings }) => {
         showFooter={false}
         onConfirm={() => {
           closeForm()
+          myRef?.current?.reload()
         }}
       >
         <Details />
