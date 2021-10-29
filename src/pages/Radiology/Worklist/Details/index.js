@@ -65,11 +65,6 @@ const RadiologyDetails = () => {
         payload: { entity: {} },
       })
 
-      dispatch({
-        type: 'patient/updateState',
-        payload: { entity: null },
-      })
-
       setWorkItem({})
       setCombinedWorkitems([])
       setExaminationDetails({})
