@@ -67,11 +67,6 @@ const RadiologyDetails = () => {
         payload: { entity: {} },
       })
 
-      dispatch({
-        type: 'patient/updateState',
-        payload: { entity: null },
-      })
-
       setWorkItem({})
       setCombinedWorkitems([])
       setExaminationDetails({})
@@ -96,7 +91,6 @@ const RadiologyDetails = () => {
   }, [details])
 
   useEffect(() => {
-    console.log('workitem - new', workitem)
     setCombinedWorkitems(getCombinedWorkitems(workitem.visitWorkitems))
   }, [workitem, examinationDetails])
 
@@ -188,10 +182,10 @@ const RadiologyDetails = () => {
         ...examinationDetails,
         ...payload,
       },
+    }).then(value => {
+      setDetailsId(null)
+      setShowDetails(false)
     })
-
-    setShowDetails(false)
-    setDetailsId(null)
   }
 
   const handleClose = () => {
@@ -209,11 +203,11 @@ const RadiologyDetails = () => {
         statusFK: RADIOLOGY_WORKITEM_STATUS.CANCELLED,
         cancellationReason: cancellationReason,
       },
+    }).then(() => {
+      setShowDetails(false)
+      setDetailsId(null)
+      setShowCancelConfirm(false)
     })
-
-    setShowDetails(false)
-    setDetailsId(null)
-    setShowCancelConfirm(false)
   }
 
   const getCombinedWorkitems = (allVisitWorkItems = []) => {

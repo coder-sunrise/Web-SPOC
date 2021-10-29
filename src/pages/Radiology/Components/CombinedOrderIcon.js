@@ -22,14 +22,25 @@ const CombinedOrderIcon = ({ workitemId, ...restProps }) => {
       payload: { id: workitemId },
     }).then(workitem => {
       if (workitem) {
-        console.log('getCombinedOrders', getCombinedOrders(workitem))
-        setCombinedOrders(getCombinedOrders(workitem))
+        const allCombinedOrders = getCombinedOrders(workitem)
+        const sortedCombinedOrders = [
+          allCombinedOrders.find(
+            c => c.radiologyWorkitemId === c.primaryWorkitemFK,
+          ),
+          ..._.sortBy(
+            allCombinedOrders.filter(
+              c => c.radiologyWorkitemId !== c.primaryWorkitemFK,
+            ),
+            r => r.accessionNo,
+          ),
+        ]
+        setCombinedOrders(sortedCombinedOrders)
       }
     })
   }
 
   const CombinedOrderTable = () => {
-    return combinedOrders.length > 0 ? (
+    return (
       <Table
         size='small'
         bordered
@@ -62,13 +73,13 @@ const CombinedOrderIcon = ({ workitemId, ...restProps }) => {
             sortingEnabled: false,
             align: 'center',
             render: (text, row, index) => {
-              return index === 0 ? 'Yes' : 'No'
+              return row.primaryWorkitemFK === row.radiologyWorkitemId
+                ? 'Yes'
+                : 'No'
             },
           },
         ]}
       />
-    ) : (
-      <React.Fragment />
     )
   }
 
