@@ -19,6 +19,7 @@ import { FileDoneOutlined } from '@ant-design/icons'
 import Warning from '@material-ui/icons/Error'
 import WorklistContext from '../Worklist/WorklistContext'
 import VisitGroupIcon from './VisitGroupIcon'
+import PrintPrescription from './PrintPrescription'
 
 const blueColor = '#1890f8'
 
@@ -214,19 +215,7 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
         >
           Details
         </Typography.Text>
-        <Typography.Text
-          underline
-          style={{
-            cursor: 'pointer',
-            marginLeft: 10,
-            color: blueColor,
-          }}
-          onClick={() => {
-            printPrescription(item.visitFK)
-          }}
-        >
-          Print Prescription
-        </Typography.Text>
+        <PrintPrescription/>
         {item.isOrderUpdate && (
           <Tooltip title='Order has been amended, please retrieve latest order from Details link'>
             <Warning className={classes.warningIcon} />
