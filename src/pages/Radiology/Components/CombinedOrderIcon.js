@@ -40,7 +40,7 @@ const CombinedOrderIcon = ({ workitemId, ...restProps }) => {
   }
 
   const CombinedOrderTable = () => {
-    return combinedOrders.length > 0 ? (
+    return (
       <Table
         size='small'
         bordered
@@ -80,8 +80,6 @@ const CombinedOrderIcon = ({ workitemId, ...restProps }) => {
           },
         ]}
       />
-    ) : (
-      <React.Fragment />
     )
   }
 
