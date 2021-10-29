@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import moment from 'moment'
 import { Edit, Info } from '@material-ui/icons'
 import Authorized from '@/utils/Authorized'
-import { Tooltip, Button, CommonModal } from '@/components'
+import { Tooltip, Button, CommonModal, dateFormatLong } from '@/components'
 import { ProTable } from '@medisys/component'
 import service from './services'
 import Details from './Details'
@@ -28,7 +28,7 @@ const ClaimHistory = ({ values, dispatch, height, clinicSettings }) => {
         sorter: false,
         search: false,
         render: (_dom, row) => {
-          const visitDate = moment(row.visitDate).format('DD MMM YYYY')
+          const visitDate = moment(row.visitDate).format(dateFormatLong)
           return (
             <Tooltip title={visitDate}>
               <div>{visitDate}</div>
@@ -190,7 +190,7 @@ const ClaimHistory = ({ values, dispatch, height, clinicSettings }) => {
         search: false,
         render: (_dom, row) => {
           const onsetDate = row.onsetDate
-            ? moment(row.onsetDate).format('DD MMM YYYY')
+            ? moment(row.onsetDate).format(dateFormatLong)
             : '-'
           return (
             <Tooltip title={onsetDate}>
@@ -208,7 +208,7 @@ const ClaimHistory = ({ values, dispatch, height, clinicSettings }) => {
         search: false,
         render: (_dom, row) => {
           const firstVisitDate = row.firstVisitDate
-            ? moment(row.firstVisitDate).format('DD MMM YYYY')
+            ? moment(row.firstVisitDate).format(dateFormatLong)
             : '-'
           return (
             <Tooltip title={firstVisitDate}>
@@ -327,7 +327,7 @@ const ClaimHistory = ({ values, dispatch, height, clinicSettings }) => {
         search: false,
         render: (_dom, row) => {
           const dueDate = row.dueDate
-            ? moment(row.dueDate).format('DD MMM YYYY')
+            ? moment(row.dueDate).format(dateFormatLong)
             : '-'
           return (
             <Tooltip title={dueDate}>
@@ -397,7 +397,7 @@ const ClaimHistory = ({ values, dispatch, height, clinicSettings }) => {
         sorter: false,
         search: false,
         render: (_dom, row) => {
-          const updateDate = moment(row.updateDate).format('DD MMM YYYY')
+          const updateDate = moment(row.updateDate).format(dateFormatLong)
           return (
             <Tooltip title={updateDate}>
               <div>{updateDate}</div>

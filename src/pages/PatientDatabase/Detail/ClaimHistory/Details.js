@@ -14,6 +14,8 @@ import {
   CodeSelect,
   Button,
   Tooltip,
+  dateFormatLong,
+  dateFormatLongWithTimeNoSec,
 } from '@/components'
 
 const styles = theme => ({})
@@ -76,7 +78,7 @@ const Details = ({
     }${values.updateUserName || ''}`
 
     return `Last Updated by ${updateUser} on ${moment(values.updateDate).format(
-      'DD MMM YYYY HH:mm',
+      dateFormatLongWithTimeNoSec,
     )}`
   }
 
@@ -175,7 +177,7 @@ const Details = ({
               fontWeight: 400,
             }}
           >
-            {moment(values.visitDate).format('DD MMM YYYY')}
+            {moment(values.visitDate).format(dateFormatLong)}
           </div>
         </ContentGridItem>
         <ContentGridItem title='Visit Doctor:'>
