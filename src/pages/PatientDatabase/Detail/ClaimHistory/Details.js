@@ -396,9 +396,6 @@ export default compose(
         if (r) {
           resetForm()
           if (onConfirm) onConfirm()
-          dispatch({
-            type: 'claimHistory/query',
-          })
         }
       })
     },
