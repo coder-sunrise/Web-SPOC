@@ -169,10 +169,10 @@ const RadiologyDetails = () => {
         ...examinationDetails,
         ...payload,
       },
+    }).then(value => {
+      setDetailsId(null)
+      setShowDetails(false)
     })
-
-    setShowDetails(false)
-    setDetailsId(null)
   }
 
   const handleClose = () => {
@@ -190,11 +190,11 @@ const RadiologyDetails = () => {
         statusFK: RADIOLOGY_WORKITEM_STATUS.CANCELLED,
         cancellationReason: cancellationReason,
       },
+    }).then(() => {
+      setShowDetails(false)
+      setDetailsId(null)
+      setShowCancelConfirm(false)
     })
-
-    setShowDetails(false)
-    setDetailsId(null)
-    setShowCancelConfirm(false)
   }
 
   const getCombinedWorkitems = (allVisitWorkItems = []) => {
