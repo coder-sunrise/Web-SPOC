@@ -1,4 +1,5 @@
 import React, { memo, useMemo } from 'react'
+import { useSelector } from 'dva'
 // custom components
 import { withStyles } from '@material-ui/core'
 // components
@@ -24,7 +25,7 @@ const ActionButton = ({ row, onClick }) => {
           <GridButton
             row={row}
             onClick={onClick}
-            contextMenuOptions={AppointmentContextMenu.map((opt) => {
+            contextMenuOptions={AppointmentContextMenu.map(opt => {
               switch (opt.id) {
                 case 8: // register visit
                   return {
@@ -61,10 +62,12 @@ const ActionButton = ({ row, onClick }) => {
     VISIT_STATUS.ORDER_UPDATED,
   ].includes(row.visitStatus)
 
-  const hideResumeButton = ![
-    VISIT_STATUS.IN_CONS,
-    VISIT_STATUS.PAUSED,
-  ].includes(row.visitStatus)
+  const user = useSelector(st => st.user)
+  const clinicRoleFK = user.data.clinicianProfile.userProfile.role?.clinicRoleFK
+  const hideResumeButton =
+    clinicRoleFK === 1
+      ? ![VISIT_STATUS.IN_CONS, VISIT_STATUS.PAUSED].includes(row.visitStatus)
+      : true
 
   const isRetailVisit = row.visitPurposeFK === VISIT_TYPE.OTC
   const isBillFirstVisit = row.visitPurposeFK === VISIT_TYPE.BF
@@ -96,10 +99,9 @@ const ActionButton = ({ row, onClick }) => {
     return consDispense
   }
 
-  const enableBilling = [
-    VISIT_STATUS.BILLING,
-    VISIT_STATUS.COMPLETED,
-  ].includes(row.visitStatus)
+  const enableBilling = [VISIT_STATUS.BILLING, VISIT_STATUS.COMPLETED].includes(
+    row.visitStatus,
+  )
 
   const hideEditConsultation =
     !isStatusCompleted ||
@@ -108,7 +110,7 @@ const ActionButton = ({ row, onClick }) => {
 
   const newContextMenuOptions = useMemo(
     () =>
-      ContextMenuOptions.map((opt) => {
+      ContextMenuOptions.map(opt => {
         switch (opt.id) {
           case 0: // view visit
             return { ...opt, hidden: !isStatusWaiting }
@@ -150,12 +152,7 @@ const ActionButton = ({ row, onClick }) => {
             return { ...opt }
         }
       }),
-    [
-      row.rowIndex,
-      row.visitStatus,
-      row.visitPurposeFK,
-      row.hasSignedCOR,
-    ],
+    [row.rowIndex, row.visitStatus, row.visitPurposeFK, row.hasSignedCOR],
   )
   return (
     <Tooltip title='More Options'>
