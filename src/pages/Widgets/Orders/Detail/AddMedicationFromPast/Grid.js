@@ -93,6 +93,7 @@ class Grid extends PureComponent {
         drugMixtures.find(
           drugMixture =>
             !drugMixture.isActive ||
+            !drugMixture.isOnlyClinicInternalUsage ||
             drugMixture.inventoryDispenseUOMFK !== drugMixture.uomfk ||
             drugMixture.inventoryPrescribingUOMFK !==
               drugMixture.prescribeUOMFK,
@@ -104,6 +105,7 @@ class Grid extends PureComponent {
     }
     return (
       item.isActive &&
+      item.isOnlyClinicInternalUsage &&
       item.inventoryDispenseUOMFK === item.dispenseUOMFK &&
       firstInstruction?.prescribeUOMFK === item.inventoryPrescribingUOMFK
     )
@@ -220,6 +222,12 @@ class Grid extends PureComponent {
                   warningLabel = '#1'
                 } else if (
                   drugMixtures.find(
+                    drugMixture => !drugMixture.isOnlyClinicInternalUsage,
+                  )
+                ) {
+                  warningLabel = '#2'
+                } else if (
+                  drugMixtures.find(
                     drugMixture =>
                       drugMixture.inventoryDispenseUOMFK !==
                         drugMixture.uomfk ||
@@ -227,19 +235,21 @@ class Grid extends PureComponent {
                         drugMixture.prescribeUOMFK,
                   )
                 ) {
-                  warningLabel = '#2'
+                  warningLabel = '#3'
                 }
               } else {
                 if (!item.isActive) {
                   warningLabel = '#1'
+                } else if (!item.isOnlyClinicInternalUsage) {
+                  warningLabel = '#2'
                 } else if (
                   item.inventoryDispenseUOMFK !== item.dispenseUOMFK ||
                   firstInstruction?.prescribeUOMFK !==
                     item.inventoryPrescribingUOMFK
                 ) {
-                  warningLabel = '#2'
-                } else if (item.isExternalPrescription) {
                   warningLabel = '#3'
+                } else if (item.isExternalPrescription) {
+                  warningLabel = '#4'
                 }
               }
 
@@ -461,11 +471,15 @@ class Grid extends PureComponent {
                   <span style={{ color: 'red', fontStyle: 'italic' }}>
                     <sup>#2&nbsp;</sup>
                   </span>
+                  non-orderable medication&nbsp;&nbsp;
+                  <span style={{ color: 'red', fontStyle: 'italic' }}>
+                    <sup>#3&nbsp;</sup>
+                  </span>
                   dispense/prescribe UOM changed&nbsp;&nbsp;
                   {!isRetail && (
                     <span>
                       <span style={{ color: 'red', fontStyle: 'italic' }}>
-                        <sup>#3&nbsp;</sup>
+                        <sup>4&nbsp;</sup>
                       </span>
                       external prescription
                     </span>
