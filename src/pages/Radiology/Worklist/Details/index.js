@@ -48,7 +48,7 @@ const RadiologyDetails = () => {
   const [combinedWorkitems, setCombinedWorkitems] = useState([])
   const [examinationDetails, setExaminationDetails] = useState({})
   const [showReport, setShowReport] = useState(false)
-
+  const patientProfileFK = details?.entity?.patientProfileFK
   useEffect(() => {
     if (detailsId) {
       dispatch({
@@ -361,7 +361,7 @@ const RadiologyDetails = () => {
         <ReportViewer
           showTopDivider={false}
           reportID={82}
-          reportParameters={{ radiologyWorkitemId: detailsId }}
+          reportParameters={{ radiologyWorkitemId: detailsId, patientProfileFK }}
           defaultScale={1.5}
         />
       </CommonModal>
