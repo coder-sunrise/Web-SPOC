@@ -29,6 +29,7 @@ import {
 } from '@/utils/constants'
 import WorklistContext from '../WorklistContext'
 import { examinationSteps } from '@/utils/codes'
+import { ReportViewer } from '@/components/_medisys'
 
 const RadiologyDetails = () => {
   const dispatch = useDispatch()
@@ -266,10 +267,9 @@ const RadiologyDetails = () => {
           }
         }}
         footProps={{
-          extraButtons: [
-            !showOnlyCloseButton ? renderStatusButtons() : undefined,
-            renderPrintButton(),
-          ],
+          extraButtons: !showOnlyCloseButton
+            ? renderStatusButtons()
+            : undefined,
           onConfirm: !showOnlyCloseButton
             ? () => {
                 handleSave()
