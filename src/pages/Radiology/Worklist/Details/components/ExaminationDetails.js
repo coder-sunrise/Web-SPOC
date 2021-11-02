@@ -193,7 +193,7 @@ export const ExaminationDetails = ({
                 </GridItem>
 
                 <GridItem md={10}>
-                  {workitem.examinationFinding == '' ? (
+                  {workitem.examinationFinding ? (
                     <div
                       dangerouslySetInnerHTML={{
                         __html: workitem.examinationFinding,
