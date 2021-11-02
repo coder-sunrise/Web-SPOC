@@ -112,7 +112,7 @@ const WorkitemTitle = ({ item }) => {
         <LeftLabel tooltip={item.patientInfo.patientReferenceNo}>
           {item.patientInfo.patientReferenceNo}
         </LeftLabel>
-        <RightLabel width={100}>{item.patientInfo.patientAccountNo}</RightLabel>
+        <RightLabel width={150}>{item.patientInfo.patientAccountNo}</RightLabel>
       </WorkitemRow>
     </div>
   )
