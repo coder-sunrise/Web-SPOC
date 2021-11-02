@@ -303,6 +303,7 @@ const RadiologyDetails = () => {
                     v => v.radiologyWorkitemId == workitem.radiologyWorkitemId,
                   ).primaryWorkitemFK,
                   visitWorkitems: value,
+                  ...examinationDetails,
                 })
                 setIsDirty(true)
               }}
@@ -312,10 +313,6 @@ const RadiologyDetails = () => {
             <ExaminationDetails
               onChange={val => {
                 setExaminationDetails(val)
-                setWorkItem({
-                  ...workitem,
-                  ...val,
-                })
                 setIsDirty(true)
               }}
               showRequiredField={showRequiredField}

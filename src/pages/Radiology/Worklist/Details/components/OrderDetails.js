@@ -128,6 +128,8 @@ export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
                     onChange={e => {
                       if (e.target.value) {
                         setIsCombinedRadioYes(true)
+                      } else {
+                        if (!isCombinedOrder) setIsCombinedRadioYes(false)
                       }
                     }}
                     value={isCombinedOrder || isCombinedRadioYes}
@@ -142,7 +144,7 @@ export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
                           v =>
                             v.primaryWorkitemFK === workitem.primaryWorkitemFK,
                         )
-
+                        setIsCombinedRadioYes(false)
                         onCombinedOrderChange(
                           workitem.visitWorkitems.map(v => {
                             if (
