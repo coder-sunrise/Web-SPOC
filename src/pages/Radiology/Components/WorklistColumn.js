@@ -58,11 +58,7 @@ const WorlklistColumnTitle = ({ title, workItemCount }) => {
 const sortItems = data => {
   if (!data || !data.workitems || data.workitems.length === 0) return []
 
-  const getEpochTime = date => Math.round(date / 1000)
-
-  const currentColumnStatus = data.workitems[0].statusFK
-
-  //If the order is combined, the sort value is based on primary workitem.
+  //If the order is combined, the sorting is based on primary workitem first.
   const getSortValueItem = (collection, item) => {
     return !item.primaryWorkitemFK ||
       item.primaryWorkitemFK === item.radiologyWorkitemId ||
@@ -136,17 +132,18 @@ const sortItems = data => {
     })
   }
 
-  const sortNonNewWorkitems = items =>
-    currentColumnStatus === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
-      ? _.sortBy(items, 'statusUpdateDate') // In progress items are sorted from oldest to newest.
-      : _.sortBy(items, 'statusUpdateDate').reverse()
+  const currentColumnStatus = data.workitems[0].statusFK
 
-  const sortedData =
-    currentColumnStatus === RADIOLOGY_WORKITEM_STATUS.NEW
-      ? sortNewWorkitems(data.workitems)
-      : sortNonNewWorkitems(data.workitems)
+  switch (currentColumnStatus) {
+    case RADIOLOGY_WORKITEM_STATUS.NEW:
+      return sortNewWorkitems(data.workitems)
 
-  return sortedData
+    case RADIOLOGY_WORKITEM_STATUS.INPROGRESS:
+      return _.sortBy(data.workitems, 'statusUpdateDate')
+
+    default:
+      return _.sortBy(data.workitems, 'statusUpdateDate').reverse()
+  }
 }
 
 const WorklistColumnBody = ({ data, renderWorkitem, worklistType }) => {
