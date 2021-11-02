@@ -162,16 +162,12 @@ const WorkitemBody = ({ item }) => {
             <CombinedOrderIcon workitemId={item.radiologyWorkitemId} />
           )}
         </LeftLabel>
-        <RightLabel width={120}>
-          Q.No.: {queueNo}
-          Bring Back Honesty
-        </RightLabel>
+        <RightLabel width={120}>Q.No.: {queueNo}</RightLabel>
       </WorkitemRow>
 
       <WorkitemRow>
         <LeftLabel tooltip={item.visitInfo.doctorName}>
           {item.visitInfo.doctorName}
-          Neon Tide Bring Back Honesty
         </LeftLabel>
 
         {item.visitInfo.visitGroup && (
