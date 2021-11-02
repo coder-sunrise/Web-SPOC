@@ -155,8 +155,6 @@ class Index extends Component {
   onSubmitButtonClicked = async action => {
     const { dispatch, validateForm, history, values } = this.props
     const { purchaseOrderNo } = values.purchaseOrder
-
-    console.log('purchaseOrderNo', purchaseOrderNo)
     let dispatchType = 'purchaseOrderDetails/savePO'
     let processedPayload = {}
     const isFormValid = await validateForm()
@@ -245,10 +243,6 @@ class Index extends Component {
         confirmText,
         cancelText,
       ) => {
-        console.log('statusCode', statusCode)
-        console.log('content', content)
-        console.log('confirmText', confirmText)
-
         dispatch({
           type: 'global/updateAppState',
           payload: {
@@ -596,8 +590,6 @@ class Index extends Component {
       classes,
     } = this.props
     const { purchaseOrder: po, type } = purchaseOrderDetails
-    console.log('this.props', this.props)
-    console.log('po', po)
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment, rows } = values
     const {
