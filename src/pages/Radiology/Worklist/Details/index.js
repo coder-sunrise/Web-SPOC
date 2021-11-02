@@ -275,7 +275,6 @@ const RadiologyDetails = () => {
           <OrderDetails
             workitem={workitem}
             onCombinedOrderChange={value => {
-              console.log('onCombinedOrderChange', value)
               setWorkItem({
                 ...workitem,
                 primaryWorkitemFK: value.find(
@@ -291,6 +290,10 @@ const RadiologyDetails = () => {
           <ExaminationDetails
             onChange={val => {
               setExaminationDetails(val)
+              setWorkItem({
+                ...workitem,
+                ...val,
+              })
               setIsDirty(true)
             }}
             showRequiredField={showRequiredField}
