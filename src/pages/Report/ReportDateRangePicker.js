@@ -14,19 +14,21 @@ const ReportDateRangePicker = ({
   limit = { number: 1, type: 'year' },
   onChange,
   disabled = false,
+  fromDateWidth = 2,
+  toDateWidth = 2,
 }) => {
-  const onDateChange = (value) => {
+  const onDateChange = value => {
     if (onChange) onChange(value)
   }
 
   return (
     <React.Fragment>
-      <GridItem md={2}>
+      <GridItem md={fromDateWidth}>
         <Field
           name={fromDateFieldName}
-          render={(args) => {
+          render={args => {
             const { form } = args
-            const _onChange = (value) => {
+            const _onChange = value => {
               const endDate = form.values[toDateFieldName]
               const maxDate = moment(value).add(limit.number, limit.type)
 
@@ -47,7 +49,7 @@ const ReportDateRangePicker = ({
           }}
         />
       </GridItem>
-      <GridItem md={2}>
+      <GridItem md={toDateWidth}>
         <DatePickerWithLimit
           label={toDateLabel}
           fieldName={toDateFieldName}
