@@ -105,7 +105,7 @@ class index extends Component {
     this.setState({ showDeliveryOrderDetails: false, mode: '' })
 
   render() {
-    const { purchaseOrderDetails, rights, mainDivHeight = 700 } = this.props
+    const { purchaseOrderDetails, mainDivHeight = 700 } = this.props
     const { purchaseOrder } = purchaseOrderDetails
     const poStatus = purchaseOrder ? purchaseOrder.purchaseOrderStatusFK : 1
     const isWriteOff = purchaseOrder
@@ -119,10 +119,11 @@ class index extends Component {
     }
     let height = mainDivHeight - 160
     if (height < 300) height = 300
+    var rights = getAccessRight() ? 'enable' : 'disable'
     return (
       <AuthorizedContext.Provider
         value={{
-          rights: isEditable() === false ? 'disable' : rights,
+          rights: isEditable() ? rights : 'disable',
         }}
       >
         <GridContainer>

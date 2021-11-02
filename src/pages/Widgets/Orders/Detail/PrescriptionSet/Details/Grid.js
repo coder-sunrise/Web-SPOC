@@ -25,7 +25,8 @@ const rightIcon = {
 
 const Grid = ({ prescriptionSet, dispatch }) => {
   const editRow = row => {
-    if (!row.isActive && !row.isDrugMixture) return
+    if ((!row.isActive || !row.isOnlyClinicInternalUsage) && !row.isDrugMixture)
+      return
     else {
       dispatch({
         type: 'prescriptionSet/updateState',
@@ -93,23 +94,31 @@ const Grid = ({ prescriptionSet, dispatch }) => {
                 warningLabel = '#1'
               } else if (
                 drugMixtures.find(
+                  drugMixture => !drugMixture.isOnlyClinicInternalUsage,
+                )
+              ) {
+                warningLabel = '#2'
+              } else if (
+                drugMixtures.find(
                   drugMixture =>
                     drugMixture.inventoryDispenseUOMFK !== drugMixture.uomfk ||
                     drugMixture.inventoryPrescribingUOMFK !==
                       drugMixture.prescribeUOMFK,
                 )
               ) {
-                warningLabel = '#2'
+                warningLabel = '#3'
               }
             } else {
               if (!row.isActive) {
                 warningLabel = '#1'
+              } else if (!row.isOnlyClinicInternalUsage) {
+                warningLabel = '#2'
               } else if (
                 row.inventoryDispenseUOMFK !== row.dispenseUOMFK ||
                 firstInstruction?.prescribeUOMFK !==
                   row.inventoryPrescribingUOMFK
               ) {
-                warningLabel = '#2'
+                warningLabel = '#3'
               }
             }
 
@@ -221,7 +230,10 @@ const Grid = ({ prescriptionSet, dispatch }) => {
                     justIcon
                     color='primary'
                     style={{ marginRight: 5 }}
-                    disabled={!row.isActive && !row.isDrugMixture}
+                    disabled={
+                      (!row.isActive || !row.isOnlyClinicInternalUsage) &&
+                      !row.isDrugMixture
+                    }
                   >
                     <Edit />
                   </Button>

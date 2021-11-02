@@ -187,6 +187,22 @@ class PatientDetail extends PureComponent {
         }),
       },
       {
+        id: '12',
+        name: 'Claim History',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
+        component: Loadable({
+          loader: () => import('./ClaimHistory'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...p} />
+          },
+          loading: Loading,
+        }),
+      },
+      {
         id: '5',
         name: 'Patient Results',
         access: [
@@ -352,6 +368,13 @@ class PatientDetail extends PureComponent {
     const { clinicSettings } = this.props
     if (!clinicSettings.isEnablePackage) {
       this.widgets = this.widgets.filter(w => w.id !== '10')
+    }
+
+    const viewClaimHistoryRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.viewclaimhistory',
+    ) || { rights: 'hidden' }
+    if (viewClaimHistoryRight.rights === 'hidden') {
+      this.widgets = this.widgets.filter(t => t.id !== '12')
     }
   }
 
@@ -687,7 +710,7 @@ class PatientDetail extends PureComponent {
                     rights: currentItemDisabled ? 'disable' : 'enable', //
                   }}
                 >
-                  <CurrentComponent {...resetProps} />
+                  <CurrentComponent {...resetProps} height={height} />
                 </Authorized.Context.Provider>
               </div>
             </CardContainer>

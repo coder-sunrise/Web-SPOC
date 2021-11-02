@@ -7,7 +7,7 @@ import {
   List,
   Divider,
 } from '@material-ui/core'
-
+import { CloudUploadOutlined } from '@ant-design/icons';
 import { CompactPicker } from 'react-color'
 import ToggleButton from '@material-ui/lab/ToggleButton'
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup'
@@ -1372,14 +1372,14 @@ class Scribble extends React.Component {
                         this.setState({ filterItem: e.target.value })
                       }}
                     />
-                    <Tooltip title='Upload Image'>
+                    <Tooltip title='Upload image to save as image template'>
                       <Button
                         color='success'
                         justIcon
                         onClick={this.onUploadTemplateClick}
                         style={{ position: 'absolute', right: -10, bottom: 10 }}
                       >
-                        <Add />
+                        <CloudUploadOutlined />
                       </Button>
                     </Tooltip>
                   </div>
