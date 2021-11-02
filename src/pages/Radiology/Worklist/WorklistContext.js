@@ -11,6 +11,7 @@ export const WorklistContextProvider = props => {
   const [isReadOnly, setIsReadOnly] = useState(false)
   const codetable = useSelector(st => st.codetable)
   const { visitTypeSetting } = useSelector(st => st.clinicSettings.settings)
+  const clinicianProfile = useSelector(st => st.user.data.clinicianProfile)
   const [ctvisitpurpose, setCtVisitPurpose] = useState([])
   const [lastFilter, setLastFilter] = useState({})
   const [refreshDate, setRefreshDate] = useState(moment())
