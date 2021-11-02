@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect, useContext } from 'react'
+import React, { Fragment, useState, useEffect, useContext, useRef } from 'react'
 import { Typography, Card } from 'antd'
 import ProCard from '@ant-design/pro-card'
 import moment from 'moment'
@@ -28,27 +28,44 @@ const statusUpdateDateTooltip = {
 
 const EmptyDiv = () => <div>&nbsp;</div>
 
-const WorkitemLeftLabel = ({
-  children,
-  tooltip,
-  width = 120,
-  style,
-  ...props
-}) => (
+const LeftLabel = ({ children, tooltip, style, ...restProps }) => (
   <Tooltip title={tooltip}>
     <div
       style={{
         textOverflow: 'ellipsis',
-        width: width,
         overflow: 'hidden',
         whiteSpace: 'nowrap',
+        width: '100%',
         ...style,
       }}
-      {...props}
+      {...restProps}
     >
       {children}
     </div>
   </Tooltip>
+)
+
+const WorkitemRow = ({ children, rowStyle, ...restProps }) => (
+  <div style={{ display: 'flex', ...rowStyle }} {...restProps}>
+    {children}
+  </div>
+)
+
+const RightLabel = ({ children, width, style, ...restProps }) => (
+  <div
+    style={{
+      marginLeft: 'auto',
+      textAlign: 'right',
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      width,
+      ...style,
+    }}
+    {...restProps}
+  >
+    {children}
+  </div>
 )
 
 const WorkitemTitle = ({ item }) => {
@@ -63,29 +80,17 @@ const WorkitemTitle = ({ item }) => {
         fontSize: '0.9rem',
         borderBottom: '#cdcdcd solid 1px',
         padding: 8,
+        flexDirection: 'column',
       }}
     >
-      <div
-        style={{
-          marginRight: 'auto',
-        }}
-      >
-        <WorkitemLeftLabel
-          width={180}
+      <WorkitemRow>
+        <LeftLabel
           tooltip={item.patientInfo.name}
           style={{ color: blueColor, fontWeight: 500 }}
         >
           {item.patientInfo.name}
-        </WorkitemLeftLabel>
-        <WorkitemLeftLabel
-          width={180}
-          tooltip={item.patientInfo.patientReferenceNo}
-        >
-          {item.patientInfo.patientReferenceNo}
-        </WorkitemLeftLabel>
-      </div>
-      <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-        <div>
+        </LeftLabel>
+        <RightLabel width={100}>
           <Tooltip title={gender}>
             <span>
               <Icon
@@ -101,19 +106,14 @@ const WorkitemTitle = ({ item }) => {
             </span>
           </Tooltip>
           {age} {age === 1 ? 'Yr' : 'Yrs'}
-        </div>
-
-        <div
-          style={{
-            textOverflow: 'ellipsis',
-            width: 80,
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {item.patientInfo.patientAccountNo}
-        </div>
-      </div>
+        </RightLabel>
+      </WorkitemRow>
+      <WorkitemRow>
+        <LeftLabel tooltip={item.patientInfo.patientReferenceNo}>
+          {item.patientInfo.patientReferenceNo}
+        </LeftLabel>
+        <RightLabel width={100}>{item.patientInfo.patientAccountNo}</RightLabel>
+      </WorkitemRow>
     </div>
   )
 }
@@ -135,6 +135,7 @@ const WorkitemBody = ({ item }) => {
     !item.visitInfo.queueNo || !item.visitInfo.queueNo.trim().length
       ? '-'
       : numeral(item.visitInfo.queueNo).format(isQueueNoDecimal ? '0.0' : '0')
+
   return (
     <div
       style={{
@@ -146,49 +147,45 @@ const WorkitemBody = ({ item }) => {
         flexDirection: 'column',
       }}
     >
-      <div
-        style={{
-          display: 'flex',
-          width: '100%',
-        }}
-      >
-        <div style={{ marginRight: 'auto', flexGrow: 1 }}>
-          <WorkitemLeftLabel
-            style={{ fontWeight: 500 }}
-            tooltip={item.itemDescription}
-          >
-            {item.itemDescription}
-          </WorkitemLeftLabel>
-          <WorkitemLeftLabel>
-            <Tooltip title={item.accessionNo}>
-              <span>{item.accessionNo}</span>
-            </Tooltip>
-            {item.primaryWorkitemFK && (
-              <CombinedOrderIcon workitemId={item.radiologyWorkitemId} />
-            )}
-          </WorkitemLeftLabel>
-          <WorkitemLeftLabel tooltip={item.visitInfo.doctorName}>
-            {item.visitInfo.doctorName}
-          </WorkitemLeftLabel>
-          <WorkitemLeftLabel tooltip='Order Created Time'>
-            {orderDate}
-          </WorkitemLeftLabel>
-        </div>
-        <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-          <div>Q.No.: {queueNo}</div>
+      <WorkitemRow>
+        <LeftLabel style={{ fontWeight: 500 }} tooltip={item.itemDescription}>
+          {item.itemDescription}
+        </LeftLabel>
+      </WorkitemRow>
 
-          {item.visitInfo.visitGroup ? (
-            <div>
-              <VisitGroupIcon
-                visitGroup={item.visitInfo.visitGroup}
-                visitFK={item.visitFK}
-                isQueueNoDecimal={isQueueNoDecimal}
-              />
-            </div>
-          ) : (
-            <EmptyDiv />
+      <WorkitemRow>
+        <LeftLabel>
+          <Tooltip title={item.accessionNo}>
+            <span>{item.accessionNo}</span>
+          </Tooltip>
+          {item.primaryWorkitemFK && (
+            <CombinedOrderIcon workitemId={item.radiologyWorkitemId} />
           )}
-          <EmptyDiv />
+        </LeftLabel>
+        <RightLabel width={120}>Q.No.: {queueNo}</RightLabel>
+      </WorkitemRow>
+
+      <WorkitemRow>
+        <LeftLabel tooltip={item.visitInfo.doctorName}>
+          {item.visitInfo.doctorName}
+        </LeftLabel>
+
+        {item.visitInfo.visitGroup && (
+          <RightLabel width={100}>
+            <VisitGroupIcon
+              visitGroup={item.visitInfo.visitGroup}
+              visitFK={item.visitFK}
+              isQueueNoDecimal={isQueueNoDecimal}
+            />
+          </RightLabel>
+        )}
+      </WorkitemRow>
+
+      <WorkitemRow>
+        <LeftLabel tooltip='Order Created Time' style={{ width: 140 }}>
+          {orderDate}
+        </LeftLabel>
+        <RightLabel width={140}>
           {item.statusFK !== RADIOLOGY_WORKITEM_STATUS.NEW && (
             <Tooltip title={statusUpdateDateTooltip[`${item.statusFK}`]}>
               <div
@@ -200,8 +197,9 @@ const WorkitemBody = ({ item }) => {
               </div>
             </Tooltip>
           )}
-        </div>
-      </div>
+        </RightLabel>
+      </WorkitemRow>
+
       <div
         style={{
           color: blueColor,
