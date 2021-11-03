@@ -127,7 +127,7 @@ class ScribbleNoteItem extends React.Component {
             </div>
             <Divider className={classes.divider} />
             <div className={classes.listContainer}>
-              {scribbleNoteArray.map((item, i) => {
+              {_.orderBy(scribbleNoteArray,(x)=>x?.subject.toLowerCase(),['asc']).map((item, i) => {
                 return (
                   <ListItem
                     key={`scribble-${item.id}`}
