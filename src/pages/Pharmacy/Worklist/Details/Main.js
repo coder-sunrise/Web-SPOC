@@ -1483,13 +1483,13 @@ const Main = props => {
         <GridItem md={8}>
           <div style={{ position: 'relative' }}>
             <Button color='primary' size='sm' disabled={isOrderUpdate}>
-              Print Prescription
+              Print Drug Label
             </Button>
             <Button color='primary' size='sm' disabled={isOrderUpdate}>
               Print leaflet/Drug Summary Label
             </Button>
             <Button color='primary' size='sm' disabled={isOrderUpdate}>
-              Print Drug Label
+              Print Prescription
             </Button>
             {secondaryPrintoutLanguage !== '' && (
               <CheckboxGroup

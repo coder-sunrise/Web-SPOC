@@ -1,10 +1,15 @@
-import React, { Component } from 'react'
+import React, { Component, useState } from 'react'
 import Print from '@material-ui/icons/Print'
-import { Button, Tooltip } from '@/components'
+import { Button, Tooltip, CommonModal } from '@/components'
+import { ReportViewer } from '@/components/_medisys'
 import MenuItem from '@material-ui/core/MenuItem'
 import Menu from '@material-ui/core/Menu'
 
-export default function PrintPrescription() {
+export default function PrintPrescription({
+  visitFK,
+  id: pharmacyWorkitemId,
+  patientProfileFK,
+}) {
   const [anchorEl, setAnchorEl] = React.useState(null)
   const open = Boolean(anchorEl)
   const handleClick = event => {
@@ -12,6 +17,14 @@ export default function PrintPrescription() {
   }
   const handleClose = () => {
     setAnchorEl(null)
+  }
+  const [showReportViwer, setshowReportViwer] = useState(false)
+  const toggleReportViwer = () => {
+    setshowReportViwer(!showReportViwer)
+  }
+  const prescription = () => {
+    handleClose()
+    toggleReportViwer()
   }
   const blueColor = '#1890f8'
   return (
@@ -51,8 +64,22 @@ export default function PrintPrescription() {
         <MenuItem onClick={handleClose}>Drug Summary Label</MenuItem>
         <MenuItem onClick={handleClose}>Patient Label</MenuItem>
         <MenuItem onClick={handleClose}>Patient Info Leaflet</MenuItem>
-        <MenuItem onClick={handleClose}>Prescription</MenuItem>
+        <MenuItem onClick={prescription}>Prescription</MenuItem>
       </Menu>
+
+      <CommonModal
+        open={showReportViwer}
+        onClose={toggleReportViwer}
+        title='Prescription'
+        maxWidth='lg'
+      >
+        <ReportViewer
+          showTopDivider={false}
+          reportID={83}
+          reportParameters={{ visitFK, pharmacyWorkitemId, patientProfileFK }}
+          defaultScale={1.5}
+        />
+      </CommonModal>
     </span>
   )
 }

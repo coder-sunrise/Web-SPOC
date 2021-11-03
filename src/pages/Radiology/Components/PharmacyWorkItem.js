@@ -215,7 +215,7 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
         >
           Details
         </Typography.Text>
-        <PrintPrescription/>
+        <PrintPrescription {...item} />
         {item.isOrderUpdate && (
           <Tooltip title='Order has been amended, please retrieve latest order from Details link'>
             <Warning className={classes.warningIcon} />
