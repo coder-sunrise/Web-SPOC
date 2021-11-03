@@ -143,6 +143,7 @@ export const ExaminationDetails = ({
           </GridItem>
           <GridItem md={12}>
             <Input.TextArea
+              maxLength={2000}
               value={comment}
               onChange={e => {
                 setComment(e.target.value)
