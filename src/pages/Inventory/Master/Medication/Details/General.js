@@ -165,7 +165,7 @@ const General = ({
     if (clinicSettings.isEnablePharmacyModule) {
       generalOptions.splice(2, 0, {
         id: 'isDispensedByPharmacy',
-        name: 'Dispensed by Pharmacy',
+        name: 'Dispense by Pharmacy',
         tooltip:
           "Item’s stock is deducted and dispense by pharmacy. If unchecked the setting, stock deduction will take place during finalization of patient's order",
         disabled: hasActiveSession && values.id,
@@ -178,7 +178,7 @@ const General = ({
     if (clinicSettings.isEnableNurseWorkItem) {
       generalOptions.splice(3, 0, {
         id: 'isNurseActualizable',
-        name: 'Nurse Actualizable',
+        name: 'Actualize by Nurse',
         tooltip: 'Item will generate task for nurse to actualize',
         disabled: hasActiveSession && values.id,
         layoutConfig: {
