@@ -14,8 +14,8 @@ const ReportDateRangePicker = ({
   limit = { number: 1, type: 'year' },
   onChange,
   disabled = false,
-  fromDateWidth = 2,
-  toDateWidth = 2,
+  fromDateCols = 2,
+  toDateCols = 2,
 }) => {
   const onDateChange = value => {
     if (onChange) onChange(value)
@@ -23,7 +23,7 @@ const ReportDateRangePicker = ({
 
   return (
     <React.Fragment>
-      <GridItem md={fromDateWidth}>
+      <GridItem md={fromDateCols}>
         <Field
           name={fromDateFieldName}
           render={args => {
@@ -41,6 +41,8 @@ const ReportDateRangePicker = ({
             return (
               <DatePicker
                 {...args}
+                // fix alignment issue
+                style={{ position: 'relative', top: '-3px' }}
                 label={fromDateLabel}
                 disabled={disabled}
                 onChange={_onChange}
@@ -49,7 +51,7 @@ const ReportDateRangePicker = ({
           }}
         />
       </GridItem>
-      <GridItem md={toDateWidth}>
+      <GridItem md={toDateCols}>
         <DatePickerWithLimit
           label={toDateLabel}
           fieldName={toDateFieldName}

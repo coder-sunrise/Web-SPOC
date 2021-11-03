@@ -11,6 +11,7 @@ import {
   CodeSelect,
   SizeContainer,
   Select,
+  ClinicianSelect,
 } from '@/components'
 import { DoctorProfileSelect } from '@/components/_medisys'
 import ReportDateRangePicker from '../ReportDateRangePicker'
@@ -33,25 +34,21 @@ const FilterBar = ({
           <ReportDateRangePicker
             fromDateLabel='Order Date From'
             toDateLabel='Order Date To'
-            fromDateWidth='1'
-            toDateWidth='1'
+            fromDateCols='1'
+            toDateCols='1'
           />
           <GridItem md={2}>
             <FastField
-              name='doctorIDs'
+              name='radiographerIDs'
               render={args => (
-                <DoctorProfileSelect
-                  mode='multiple'
-                  {...args}
+                <ClinicianSelect
                   label='Radiology Technologist'
-                  allValue={-99}
-                  allValueOption={{
-                    id: -99,
-                    clinicianProfile: {
-                      name: 'All',
-                    },
-                  }}
-                  labelField='clinicianProfile.name'
+                  noDefaultValue
+                  mode='multiple'
+                  temp={false}
+                  maxTagPlaceholder='Radiology Technologists'
+                  {...args}
+                  localFilter={item => item.userProfile.role.clinicRoleFK === 3}
                 />
               )}
             />
@@ -81,7 +78,7 @@ const FilterBar = ({
                   label='Examination'
                   mode='multiple'
                   options={serviceOptions}
-                  maxTagPlaceholder='Examination'
+                  maxTagPlaceholder='Examinations'
                   {...args}
                 />
               )}
@@ -96,6 +93,7 @@ const FilterBar = ({
                   {...args}
                   mode='multiple'
                   code='ctVisitpurpose'
+                  maxTagPlaceholder='Visit Types'
                   allowClear={true}
                 />
               )}
@@ -109,13 +107,13 @@ const FilterBar = ({
                   label='Patient Tag'
                   mode='multiple'
                   options={cttag}
-                  maxTagPlaceholder='Patient Tag'
+                  maxTagPlaceholder='Patient Tags'
                   {...args}
                 />
               )}
             />
           </GridItem>
-          <GridItem md={2}>
+          <GridItem md={12} style={{ textAlign: 'right' }}>
             <Button
               color='primary'
               onClick={handleSubmit}

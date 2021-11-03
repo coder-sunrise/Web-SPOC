@@ -103,6 +103,11 @@ export const menuData = [
          },
          {
            title: 'Finance',
+           text: 'Radiology Statistic Report',
+           url: '/report/radiologystatisticreport',
+         },
+         {
+           title: 'Finance',
            text: 'Xero Invoices Report',
            url: '/report/xeroinvoicesreport',
            authority: 'report.finance.xeroinvoicesreport',
@@ -178,10 +183,5 @@ export const menuData = [
            text: 'Package Expiry Report',
            url: '/report/packageexpiry',
            authority: 'report.finance.packageexpiryreport',
-         },
-         {
-           title: 'Finance',
-           text: 'Radiology Statistic Report',
-           url: '/report/radiologystatisticreport',
          },
        ]
