@@ -17,6 +17,7 @@ class LowStockList extends PureComponent {
       { name: 'inventoryType', title: 'Inventory Type' },
       { name: 'code', title: 'Code' },
       { name: 'name', title: 'Name' },
+      { name: 'thresholdType', title: 'Threshold Type' },
       { name: 'stock', title: 'Current Stock' },
       { name: 'threshold', title: 'Threshold' },
       { name: 'uom', title: 'UOM' },
@@ -24,14 +25,25 @@ class LowStockList extends PureComponent {
       { name: 'supplier', title: 'Supplier' },
     ]
     const LowStockDetailsExtensions = [
-      { columnName: 'inventoryType', sortingEnabled: false },
-      { columnName: 'stock', type: 'number', sortingEnabled: false },
-      { columnName: 'code', sortingEnabled: false },
+      { columnName: 'inventoryType', width: '120', sortingEnabled: false },
+      {
+        columnName: 'stock',
+        width: '120',
+        type: 'number',
+        sortingEnabled: false,
+      },
+      { columnName: 'code', width: '150', sortingEnabled: false },
       { columnName: 'name', sortingEnabled: false },
-      { columnName: 'threshold', type: 'number', sortingEnabled: false },
-      { columnName: 'uom', sortingEnabled: false },
-      { columnName: 'status', sortingEnabled: false },
-      { columnName: 'supplier', sortingEnabled: false },
+      { columnName: 'thresholdType', width: 120, sortingEnabled: false },
+      {
+        columnName: 'threshold',
+        width: '120',
+        type: 'number',
+        sortingEnabled: false,
+      },
+      { columnName: 'uom', width: '110', sortingEnabled: false },
+      { columnName: 'status', width: '80', sortingEnabled: false },
+      { columnName: 'supplier', width: '200', sortingEnabled: false },
     ]
 
     return <ReportDataGrid data={listData} columns={LowStockDetailsCols} columnExtensions={LowStockDetailsExtensions} />
