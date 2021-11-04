@@ -11,6 +11,7 @@ import {
   CodeSelect,
   SizeContainer,
   Select,
+  Tooltip,
   ClinicianSelect,
 } from '@/components'
 import { DoctorProfileSelect } from '@/components/_medisys'
@@ -41,15 +42,22 @@ const FilterBar = ({
             <FastField
               name='radiographerIDs'
               render={args => (
-                <ClinicianSelect
-                  label='Radiology Technologist'
-                  noDefaultValue
-                  mode='multiple'
-                  temp={false}
-                  maxTagPlaceholder='Radiology Technologists'
-                  {...args}
-                  localFilter={item => item.userProfile.role.clinicRoleFK === 3}
-                />
+                <Tooltip
+                  placement='right'
+                  title='Select "All" will retrieve active and inactive radiographers'
+                >
+                  <ClinicianSelect
+                    label='Radiology Technologist'
+                    noDefaultValue
+                    mode='multiple'
+                    temp={false}
+                    maxTagPlaceholder='Radiology Technologists'
+                    {...args}
+                    localFilter={item =>
+                      item.userProfile.role.clinicRoleFK === 3
+                    }
+                  />
+                </Tooltip>
               )}
             />
           </GridItem>
@@ -57,16 +65,21 @@ const FilterBar = ({
             <FastField
               name='modalityIDs'
               render={args => (
-                <CodeSelect
-                  mode='multiple'
-                  label='Modality'
-                  code='ctmodality'
-                  maxTagPlaceholder='Modalities'
-                  remoteFilter={{
-                    isActive: true,
-                  }}
-                  {...args}
-                />
+                <Tooltip
+                  placement='right'
+                  title='Select "All" will retrieve active and inactive modality'
+                >
+                  <CodeSelect
+                    mode='multiple'
+                    label='Modality'
+                    code='ctmodality'
+                    maxTagPlaceholder='Modalities'
+                    remoteFilter={{
+                      isActive: true,
+                    }}
+                    {...args}
+                  />
+                </Tooltip>
               )}
             ></FastField>
           </GridItem>
@@ -74,13 +87,18 @@ const FilterBar = ({
             <Field
               name='serviceIDs'
               render={args => (
-                <CodeSelect
-                  label='Examination'
-                  mode='multiple'
-                  options={serviceOptions}
-                  maxTagPlaceholder='Examinations'
-                  {...args}
-                />
+                <Tooltip
+                  placement='right'
+                  title='Select "All" will retrieve active and inactive examinations'
+                >
+                  <CodeSelect
+                    label='Examination'
+                    mode='multiple'
+                    options={serviceOptions}
+                    maxTagPlaceholder='Examinations'
+                    {...args}
+                  />
+                </Tooltip>
               )}
             />
           </GridItem>
@@ -88,14 +106,19 @@ const FilterBar = ({
             <FastField
               name='visitTypeIDs'
               render={args => (
-                <CodeSelect
-                  label='Visit Type'
-                  {...args}
-                  mode='multiple'
-                  code='ctVisitpurpose'
-                  maxTagPlaceholder='Visit Types'
-                  allowClear={true}
-                />
+                <Tooltip
+                  placement='right'
+                  title='Select "All" will retrieve active and inactive visit type'
+                >
+                  <CodeSelect
+                    label='Visit Type'
+                    {...args}
+                    mode='multiple'
+                    code='ctVisitpurpose'
+                    maxTagPlaceholder='Visit Types'
+                    allowClear={true}
+                  />
+                </Tooltip>
               )}
             />
           </GridItem>

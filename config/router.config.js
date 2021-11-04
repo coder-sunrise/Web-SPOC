@@ -763,6 +763,7 @@ const _routes = [
             path: '/report/radiologystatisticreport',
             name: 'radiologystatisticreport',
             component: './Report/RadiologyStatisticReport',
+            authority: ['report.finance.radiologystatisticreport'],
           },
         ],
       },

@@ -105,6 +105,7 @@ export const menuData = [
            title: 'Finance',
            text: 'Radiology Statistic Report',
            url: '/report/radiologystatisticreport',
+           authority: 'report.finance.radiologystatisticreport',
          },
          {
            title: 'Finance',
