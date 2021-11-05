@@ -7,25 +7,25 @@ import { Button, GridContainer, GridItem, SizeContainer, CodeSelect, Select } fr
 
 const FilterBar = ({ handleSubmit, isSubmitting }) => {
   return (
-    <SizeContainer size="sm">
+    <SizeContainer size='sm'>
       <React.Fragment>
-        <GridContainer alignItems="flex-end">
+        <GridContainer alignItems='flex-end'>
           <GridItem md={3}>
             <Field
-              name="inventoryType"
-              render={(args) => {
+              name='inventoryType'
+              render={args => {
                 const { form: fm } = args
                 return (
                   <Select
                     {...args}
-                    label="Inventory Type"
+                    label='Inventory Type'
                     options={[
                       { name: 'Medication', value: 'MEDICATION' },
                       { name: 'Consumable', value: 'CONSUMABLE' },
                       { name: 'Vaccination', value: 'VACCINATION' },
                     ]}
                     allowClear={false}
-                    onChange={(e) => {
+                    onChange={e => {
                       if (e) {
                         fm.setFieldValue('items', undefined)
                       }
@@ -37,25 +37,50 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           </GridItem>
           <GridItem md={3}>
             <FastField
-              name="Suppliers"
-              render={(args) => (
-                <CodeSelect label="Supplier" code="ctSupplier" mode="multiple" labelField="displayValue" {...args} />
+              name='Suppliers'
+              render={args => (
+                <CodeSelect
+                  label='Supplier'
+                  code='ctSupplier'
+                  mode='multiple'
+                  labelField='displayValue'
+                  {...args}
+                />
               )}
             />
           </GridItem>
-          <GridItem md={6} />
+          <GridItem md={3}>
+            <FastField
+              name='ThresholdType'
+              render={args => (
+                <Select
+                  label='Threshold Type'
+                  allowClear={false}
+                  labelField='name'
+                  valueField='value'
+                  {...args}
+                  options={[
+                    { name: 'All', value: 'All' },
+                    { name: 'Re-Order', value: 'Re-Order' },
+                    { name: 'Excess', value: 'Excess' },
+                  ]}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={3} />
           <GridItem md={3}>
             <Field
-              name="items"
-              render={(args) => {
+              name='items'
+              render={args => {
                 const { form } = args
                 return (
                   <CodeSelect
                     {...args}
-                    label="Item List"
-                    mode="multiple"
+                    label='Item List'
+                    mode='multiple'
                     code={`Inventory${form.values.inventoryType}`}
-                    labelField="displayValue"
+                    labelField='displayValue'
                     temp
                   />
                 )
@@ -64,11 +89,11 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           </GridItem>
           <GridItem md={3}>
             <FastField
-              name="Status"
-              render={(args) => (
+              name='Status'
+              render={args => (
                 <Select
                   {...args}
-                  label="Status"
+                  label='Status'
                   options={[
                     {
                       name: 'All',
@@ -84,14 +109,19 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                     },
                   ]}
                   allowClear={false}
-                  labelField="name"
-                  valueField="value"
+                  labelField='name'
+                  valueField='value'
                 />
               )}
             />
           </GridItem>
           <GridItem md={3}>
-            <Button color="primary" onClick={handleSubmit} disabled={isSubmitting}>
+            <Button
+              color='primary'
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              style={{ position: 'relative', top: '-5px' }}
+            >
               Generate Report
             </Button>
           </GridItem>
