@@ -192,6 +192,7 @@ export default {
   'menu.report.packageexpiry': 'Package Expiry Report',
   'menu.report.viewreport': 'View Report',
   'menu.report.expiringstockreport': 'Expiring Stock Report',
+  'menu.report.radiologystatisticreport': 'Radiology Statistic Report',
 
   'menu.report.visitListingReport': 'Visit Listing Report',
 

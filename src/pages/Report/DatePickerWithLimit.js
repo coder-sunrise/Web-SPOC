@@ -24,7 +24,9 @@ const DatePickerWithLimit = ({
           <DatePicker
             {...args}
             label={label}
-            disabledDate={(date) => date.isAfter(maximumDateLimit)}
+            // fix alignment issue
+            style={{ position: 'relative', top: '-3px' }}
+            disabledDate={date => date.isAfter(maximumDateLimit)}
             disabled={disabled}
           />
         )

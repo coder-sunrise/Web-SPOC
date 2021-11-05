@@ -85,29 +85,33 @@ class Report extends React.Component {
           <GridContainer style={{ marginTop: theme.spacing(1) }} key={o}>
             {filtered.map((item) => {
               const accessRight = Authorized.check(item.authority)
-              const isDisabled = accessRight && accessRight.rights === 'disable'
+              const isHidden =
+                accessRight &&
+                (accessRight.rights === 'disable' ||
+                  accessRight.rights === 'hidden')
               return (
-                <GridItem
-                  key={item.name}
-                  xs={4}
-                  md={2}
-                  style={{ marginBottom: theme.spacing(2) }}
-                >
-                  <Button
-                    fullWidth
-                    color='primary'
-                    className={classnames({
-                      [classes.bigviewBtn]: true,
-                      // [classes.longTextBtn]: item.longText,
-                    })}
-                    variant='outlined'
-                    id={item.url}
-                    onClick={this.onButtonClick}
-                    disabled={isDisabled}
+                !isHidden && (
+                  <GridItem
+                    key={item.name}
+                    xs={4}
+                    md={2}
+                    style={{ marginBottom: theme.spacing(2) }}
                   >
-                    {item.text}
-                  </Button>
-                </GridItem>
+                    <Button
+                      fullWidth
+                      color='primary'
+                      className={classnames({
+                        [classes.bigviewBtn]: true,
+                        // [classes.longTextBtn]: item.longText,
+                      })}
+                      variant='outlined'
+                      id={item.url}
+                      onClick={this.onButtonClick}
+                    >
+                      {item.text}
+                    </Button>
+                  </GridItem>
+                )
               )
             })}
           </GridContainer>
