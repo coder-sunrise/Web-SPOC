@@ -7,7 +7,11 @@ import {
   dateFormatLongWithTimeNoSec,
   Icon,
 } from '@/components'
-import { RightAlignGridItem, SectionTitle } from '../../../Components'
+import {
+  RightAlignGridItem,
+  SectionTitle,
+  TextGridItem,
+} from '../../../Components'
 import { CombineOrderGrid } from './index'
 import { RADIOLOGY_WORKITEM_STATUS } from '@/utils/constants'
 import WorklistContext from '@/pages/Radiology/Worklist/WorklistContext'
@@ -70,44 +74,46 @@ export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
         <GridItem md={4}>
           <GridContainer style={{ rowGap: 10 }}>
             <RightAlignGridItem>Accession No. :</RightAlignGridItem>
-            <GridItem md={6}>{workitem.accessionNo}</GridItem>
+            <TextGridItem md={6}>{workitem.accessionNo}</TextGridItem>
 
             <RightAlignGridItem>Examination :</RightAlignGridItem>
-            <GridItem md={6}>{workitem.itemDescription}</GridItem>
+            <TextGridItem md={6}>{workitem.itemDescription}</TextGridItem>
 
             <RightAlignGridItem>Priority :</RightAlignGridItem>
-            <GridItem md={6}>{workitem.priority}</GridItem>
+            <TextGridItem md={6}>{workitem.priority}</TextGridItem>
 
             <RightAlignGridItem>Doctor Instructions :</RightAlignGridItem>
-            <GridItem md={6}>{workitem.instruction}</GridItem>
+            <TextGridItem md={6}>{workitem.instruction}</TextGridItem>
             <RightAlignGridItem>Remarks :</RightAlignGridItem>
-            <GridItem md={6}>{workitem.remark}</GridItem>
+            <TextGridItem md={6}>{workitem.remark}</TextGridItem>
           </GridContainer>
         </GridItem>
         <GridItem md={2} />
         <GridItem md={4}>
           <GridContainer>
             <RightAlignGridItem>Order Created Time :</RightAlignGridItem>
-            <GridItem md={6}>
+            <TextGridItem md={6}>
               {moment(workitem.generateDate).format(
                 dateFormatLongWithTimeNoSec,
               )}
-            </GridItem>
+            </TextGridItem>
 
             <RightAlignGridItem>Modality :</RightAlignGridItem>
-            <GridItem md={6}> {workitem.modalityDescription} </GridItem>
+            <TextGridItem md={6}> {workitem.modalityDescription} </TextGridItem>
 
             <RightAlignGridItem>Visit Type :</RightAlignGridItem>
-            <GridItem md={6}>
+            <TextGridItem md={6}>
               {visitPurpose &&
                 workitem?.visitInfo &&
                 visitPurpose.find(
                   p => p.id === workitem.visitInfo.visitPurposeFK,
                 ).name}
-            </GridItem>
+            </TextGridItem>
 
             <RightAlignGridItem>Visit Group No. :</RightAlignGridItem>
-            <GridItem md={6}>{workitem?.visitInfo?.visitGroup}</GridItem>
+            <TextGridItem md={6}>
+              {workitem?.visitInfo?.visitGroup}
+            </TextGridItem>
 
             <RightAlignGridItem>Order Combined :</RightAlignGridItem>
 

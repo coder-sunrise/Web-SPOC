@@ -11,8 +11,9 @@ export const WorklistContextProvider = props => {
   const [isReadOnly, setIsReadOnly] = useState(false)
   const codetable = useSelector(st => st.codetable)
   const { visitTypeSetting } = useSelector(st => st.clinicSettings.settings)
+  const clinicianProfile = useSelector(st => st.user.data.clinicianProfile)
   const [ctvisitpurpose, setCtVisitPurpose] = useState([])
-  const [filter, setFilter] = useState({})
+  const [lastFilter, setLastFilter] = useState({})
   const [refreshDate, setRefreshDate] = useState(moment())
 
   useEffect(() => {
@@ -68,6 +69,8 @@ export const WorklistContextProvider = props => {
   }
 
   const filterWorklist = param => {
+    const currentFilter = param ?? lastFilter
+
     const {
       searchValue,
       visitType,
@@ -76,7 +79,7 @@ export const WorklistContextProvider = props => {
       dateTo,
       isUrgent,
       isMyPatientOnly,
-    } = param ?? filter
+    } = currentFilter
 
     dispatch({
       type: 'radiologyWorklist/query',
@@ -102,6 +105,7 @@ export const WorklistContextProvider = props => {
         setRefreshDate(moment())
       }
     })
+    setLastFilter({ ...currentFilter })
   }
 
   const setDetailsId = (id, readonly = false) => {
@@ -137,7 +141,6 @@ export const WorklistContextProvider = props => {
         visitPurpose,
         refreshDate,
         setRefreshDate,
-        filter,
         filterWorklist,
         getPrimaryWorkitem,
         getCombinedOrders,

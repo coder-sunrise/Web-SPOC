@@ -742,15 +742,17 @@ class Medication extends PureComponent {
     const {
       codetable: { inventorymedication = [] },
     } = this.props
-    return inventorymedication.filter(m => m.isOnlyClinicInternalUsage).reduce((p, c) => {
-      const { code, displayValue, sellingPrice = 0, dispensingUOM = {} } = c
-      const { name: uomName = '' } = dispensingUOM
-      let opt = {
-        ...c,
-        combinDisplayValue: `${displayValue} - ${code}`,
-      }
-      return [...p, opt]
-    }, [])
+    return inventorymedication
+      .filter(m => m.isOnlyClinicInternalUsage)
+      .reduce((p, c) => {
+        const { code, displayValue, sellingPrice = 0, dispensingUOM = {} } = c
+        const { name: uomName = '' } = dispensingUOM
+        let opt = {
+          ...c,
+          combinDisplayValue: `${displayValue} - ${code}`,
+        }
+        return [...p, opt]
+      }, [])
   }
 
   changeMedication = (
@@ -848,6 +850,7 @@ class Medication extends PureComponent {
 
     setFieldValue('corPrescriptionItemInstruction', newPrescriptionInstruction)
     setFieldValue('isActive', op.isActive)
+    setFieldValue('isOnlyClinicInternalUsage', op.isOnlyClinicInternalUsage)
     setFieldValue('selectedMedication', op)
 
     if (
@@ -1184,6 +1187,7 @@ class Medication extends PureComponent {
     row.inventoryDispenseUOMFK = option.dispensingUOM.id
     row.inventoryPrescribingUOMFK = option.prescribingUOM.id
     row.isActive = option.isActive
+    row.isOnlyClinicInternalUsage = option.isOnlyClinicInternalUsage
   }
 
   handleDrugMixtureItemQuantityOnChange = e => {
@@ -1792,10 +1796,7 @@ class Medication extends PureComponent {
                   render={args => {
                     return (
                       <div id={`autofocus_${values.type}`}>
-                        <TextField
-                          label='Open Prescription Name'
-                          {...args}
-                        />
+                        <TextField label='Open Prescription Name' {...args} />
                       </div>
                     )
                   }}

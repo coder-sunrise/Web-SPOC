@@ -29,6 +29,7 @@ import {
 } from '@/utils/constants'
 import WorklistContext from '../WorklistContext'
 import { examinationSteps } from '@/utils/codes'
+import { ReportViewer } from '@/components/_medisys'
 
 const RadiologyDetails = () => {
   const dispatch = useDispatch()
@@ -46,7 +47,8 @@ const RadiologyDetails = () => {
 
   const [combinedWorkitems, setCombinedWorkitems] = useState([])
   const [examinationDetails, setExaminationDetails] = useState({})
-
+  const [showReport, setShowReport] = useState(false)
+  const patientProfileFK = details?.entity?.patientProfileFK
   useEffect(() => {
     if (detailsId) {
       dispatch({
@@ -63,11 +65,6 @@ const RadiologyDetails = () => {
       dispatch({
         type: 'radiologyDetails/updateState',
         payload: { entity: {} },
-      })
-
-      dispatch({
-        type: 'patient/updateState',
-        payload: { entity: null },
       })
 
       setWorkItem({})
@@ -94,7 +91,6 @@ const RadiologyDetails = () => {
   }, [details])
 
   useEffect(() => {
-    console.log('workitem - new', workitem)
     setCombinedWorkitems(getCombinedWorkitems(workitem.visitWorkitems))
   }, [workitem, examinationDetails])
 
@@ -161,6 +157,22 @@ const RadiologyDetails = () => {
     )
   }
 
+  const toggleReport = () => {
+    setShowReport(!showReport)
+  }
+  const renderPrintButton = () => {
+    if (!details || !details.entity) return
+    const { statusFK:currentStatusFK } = details.entity
+    return [
+      RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED,
+      RADIOLOGY_WORKITEM_STATUS.COMPLETED,
+    ].includes(currentStatusFK) && (
+      <Button color='primary' onClick={toggleReport}>
+        Print
+      </Button>
+    )
+  }
+
   const handleSave = (payload = {}) => {
     dispatch({
       type: 'radiologyDetails/updateRadiologyWorkitem',
@@ -170,10 +182,10 @@ const RadiologyDetails = () => {
         ...examinationDetails,
         ...payload,
       },
+    }).then(value => {
+      setDetailsId(null)
+      setShowDetails(false)
     })
-
-    setShowDetails(false)
-    setDetailsId(null)
   }
 
   const handleClose = () => {
@@ -191,11 +203,11 @@ const RadiologyDetails = () => {
         statusFK: RADIOLOGY_WORKITEM_STATUS.CANCELLED,
         cancellationReason: cancellationReason,
       },
+    }).then(() => {
+      setShowDetails(false)
+      setDetailsId(null)
+      setShowCancelConfirm(false)
     })
-
-    setShowDetails(false)
-    setDetailsId(null)
-    setShowCancelConfirm(false)
   }
 
   const getCombinedWorkitems = (allVisitWorkItems = []) => {
@@ -230,106 +242,124 @@ const RadiologyDetails = () => {
     Authorized.check('radiologyworklist.saveexamination').rights !== 'enable'
 
   return (
-    <CommonModal
-      open={showDetails}
-      title='Radiology Examination Details'
-      showFooter={true}
-      confirmText='Save'
-      onClose={() => {
-        if (isDirty) {
-          dispatch({
-            type: 'global/updateAppState',
-            payload: {
-              openConfirm: true,
-              openConfirmContent: formatMessage({
-                id: 'app.general.leave-without-save',
-              }),
-              onConfirmSave: handleClose,
-            },
-          })
-        } else {
-          setDetailsId(null)
-          setShowDetails(false)
-        }
-      }}
-      footProps={{
-        extraButtons: !showOnlyCloseButton ? renderStatusButtons() : undefined,
-        onConfirm: !showOnlyCloseButton
-          ? () => {
-              handleSave()
-            }
-          : undefined,
-      }}
-      confirmProps={{ disable: true }}
-      maxWidth='lg'
-      overrideLoading
-    >
-      <GridContainer
-        style={{ height: !isReadOnly ? 700 : undefined, overflowY: 'scroll' }}
+    <React.Fragment>
+      <CommonModal
+        open={showDetails}
+        title='Radiology Examination Details'
+        showFooter={true}
+        confirmText='Save'
+        onClose={() => {
+          if (isDirty) {
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                openConfirm: true,
+                openConfirmContent: formatMessage({
+                  id: 'app.general.leave-without-save',
+                }),
+                onConfirmSave: handleClose,
+              },
+            })
+          } else {
+            setDetailsId(null)
+            setShowDetails(false)
+          }
+        }}
+        footProps={{
+          extraButtons: [
+            !showOnlyCloseButton ? renderStatusButtons() : undefined,
+            renderPrintButton(),
+          ],
+          onConfirm: !showOnlyCloseButton
+            ? () => {
+                handleSave()
+              }
+            : undefined,
+        }}
+        confirmProps={{ disable: true }}
+        maxWidth='lg'
+        overrideLoading
       >
-        {!isReadOnly && (
+        <GridContainer
+          style={{ height: !isReadOnly ? 700 : undefined, overflowY: 'scroll' }}
+        >
+          {!isReadOnly && (
+            <GridItem md={12}>
+              <div style={{ padding: 8 }}>
+                <Banner from='Radiology' />
+              </div>
+            </GridItem>
+          )}
           <GridItem md={12}>
-            <div style={{ padding: 8 }}>
-              <Banner from='Radiology' />
-            </div>
+            <ExaminationSteps item={workitem} />
           </GridItem>
-        )}
-        <GridItem md={12}>
-          <ExaminationSteps item={workitem} />
-        </GridItem>
-        <GridItem md={12}>
-          <OrderDetails
-            workitem={workitem}
-            onCombinedOrderChange={value => {
-              console.log('onCombinedOrderChange', value)
-              setWorkItem({
-                ...workitem,
-                primaryWorkitemFK: value.find(
-                  v => v.radiologyWorkitemId == workitem.radiologyWorkitemId,
-                ).primaryWorkitemFK,
-                visitWorkitems: value,
-              })
-              setIsDirty(true)
-            }}
-          />
-        </GridItem>
-        <GridItem md={12}>
-          <ExaminationDetails
-            onChange={val => {
-              setExaminationDetails(val)
-              setIsDirty(true)
-            }}
-            showRequiredField={showRequiredField}
-            workitem={workitem}
-          />
-        </GridItem>
-      </GridContainer>
-      <CancelConfirmation
-        open={showCancelConfirm}
-        workitem={workitem}
-        onCancelConfirm={cancellationReason => {
-          handleCancel(cancellationReason)
-        }}
-        onCancelClose={() => setShowCancelConfirm(false)}
-      />
+          <GridItem md={12}>
+            <OrderDetails
+              workitem={workitem}
+              onCombinedOrderChange={value => {
+                console.log('onCombinedOrderChange', value)
+                setWorkItem({
+                  ...workitem,
+                  primaryWorkitemFK: value.find(
+                    v => v.radiologyWorkitemId == workitem.radiologyWorkitemId,
+                  ).primaryWorkitemFK,
+                  visitWorkitems: value,
+                })
+                setIsDirty(true)
+              }}
+            />
+          </GridItem>
+          <GridItem md={12}>
+            <ExaminationDetails
+              onChange={val => {
+                setExaminationDetails(val)
+                setIsDirty(true)
+              }}
+              showRequiredField={showRequiredField}
+              workitem={workitem}
+            />
+          </GridItem>
+        </GridContainer>
+        <CancelConfirmation
+          open={showCancelConfirm}
+          workitem={workitem}
+          onCancelConfirm={cancellationReason => {
+            handleCancel(cancellationReason)
+          }}
+          onCancelClose={() => setShowCancelConfirm(false)}
+        />
 
-      <StartExaminationConfirmation
-        open={showStartConfirm}
-        workitem={workitem}
-        combinedWorkitems={combinedWorkitems}
-        onStartConfirm={() => {
-          handleSave({
-            statusFK: RADIOLOGY_WORKITEM_STATUS.INPROGRESS,
-            assignedRadiographers: _.uniqBy(
-              combinedWorkitems.flatMap(w => w.assignedRadiographers),
-              c => c.userProfileFK,
-            ),
-          })
-          setShowStartConfirm(false)
-        }}
-        onStartClose={() => setShowStartConfirm(false)}
-      />
-    </CommonModal>
+        <StartExaminationConfirmation
+          open={showStartConfirm}
+          workitem={workitem}
+          combinedWorkitems={combinedWorkitems}
+          onStartConfirm={() => {
+            handleSave({
+              statusFK: RADIOLOGY_WORKITEM_STATUS.INPROGRESS,
+              assignedRadiographers: _.uniqBy(
+                combinedWorkitems.flatMap(w => w.assignedRadiographers),
+                c => c.userProfileFK,
+              ),
+            })
+            setShowStartConfirm(false)
+          }}
+          onStartClose={() => setShowStartConfirm(false)}
+        />
+      </CommonModal>
+      <CommonModal
+        open={showReport}
+        onClose={toggleReport}
+        title='Radiology Examination Finding Report'
+        maxWidth='lg'
+      >
+        <ReportViewer
+          showTopDivider={false}
+          reportID={82}
+          reportParameters={{ radiologyWorkitemId: detailsId, patientProfileFK }}
+          defaultScale={1.5}
+        />
+      </CommonModal>
+    </React.Fragment>
   )
 }
 

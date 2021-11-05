@@ -665,13 +665,6 @@ const RadiologyWorklistHistoryIndex = ({
           options={{ density: false, reload: false }}
           columnsStateMap={radiologyHistoryColumnSetting}
           onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
-          toolBarRender={() => {
-            return [
-              <Button type='primary' icon={<PrinterOutlined />} color='primary'>
-                PRINT
-              </Button>,
-            ]
-          }}
           defaultColumns={[]}
           pagination={{ pageSize: 100 }}
           features={[

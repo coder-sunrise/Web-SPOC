@@ -33,6 +33,7 @@ import {
   NURSE_WORKITEM_STATUS,
 } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 // sub components
 import TableData from './TableData'
 import DrugLabelSelection from './DrugLabelSelection'
@@ -135,6 +136,7 @@ const DispenseDetails = ({
     defaultExpandedGroups,
     orderCreateTime,
     orderCreateBy,
+    visitStatus,
   } = values || {
     invoice: { invoiceItem: [] },
   }
@@ -541,17 +543,6 @@ const DispenseDetails = ({
     <React.Fragment>
       <GridContainer>
         <GridItem justify='flex-start' md={7} className={classes.actionButtons}>
-          {!viewOnly && !isRetailVisit && (
-            <Button
-              color='info'
-              size='sm'
-              onClick={handleReloadClick}
-              disabled={disableRefreshOrder}
-            >
-              <Refresh />
-              Refresh Order
-            </Button>
-          )}
           <Button
             color='primary'
             size='sm'
@@ -636,7 +627,7 @@ const DispenseDetails = ({
                 />
               </Authorized>
             )}
-            {!isRetailVisit && (
+            {!isRetailVisit && visitStatus !== VISIT_STATUS.PAUSED && (
               <Authorized authority='queue.dispense.editorder'>
                 <ProgressButton
                   color='primary'
@@ -648,74 +639,77 @@ const DispenseDetails = ({
                 </ProgressButton>
               </Authorized>
             )}
-            <Authorized authority='queue.dispense.makepayment'>
-              <ProgressButton
-                color='primary'
-                size='sm'
-                icon={<AttachMoney />}
-                onClick={() => {
-                  if (dispense && dispense.totalWithGST < 0) {
-                    window.g_app._store.dispatch({
-                      type: 'global/updateAppState',
-                      payload: {
-                        openConfirm: true,
-                        isInformType: true,
-                        customWidth: 'md',
-                        openConfirmContent: () => {
-                          return (
-                            <div>
-                              <Warining
-                                style={{
-                                  width: '1.3rem',
-                                  height: '1.3rem',
-                                  marginLeft: '10px',
-                                  color: 'red',
-                                }}
-                              />
-                              <h3
-                                style={{
-                                  marginLeft: '10px',
-                                  display: 'inline-block',
-                                }}
-                              >
-                                Unable to finalize, total amount cannot be{' '}
-                                <span style={{ fontWeight: 400 }}>
-                                  negative
-                                </span>
-                                .
-                              </h3>
-                            </div>
-                          )
+            {visitStatus !== VISIT_STATUS.PAUSED && (
+              <Authorized authority='queue.dispense.makepayment'>
+                <ProgressButton
+                  color='primary'
+                  size='sm'
+                  icon={<AttachMoney />}
+                  onClick={() => {
+                    if (dispense && dispense.totalWithGST < 0) {
+                      window.g_app._store.dispatch({
+                        type: 'global/updateAppState',
+                        payload: {
+                          openConfirm: true,
+                          isInformType: true,
+                          customWidth: 'md',
+                          openConfirmContent: () => {
+                            return (
+                              <div>
+                                <Warining
+                                  style={{
+                                    width: '1.3rem',
+                                    height: '1.3rem',
+                                    marginLeft: '10px',
+                                    color: 'red',
+                                  }}
+                                />
+                                <h3
+                                  style={{
+                                    marginLeft: '10px',
+                                    display: 'inline-block',
+                                  }}
+                                >
+                                  Unable to finalize, total amount cannot be{' '}
+                                  <span style={{ fontWeight: 400 }}>
+                                    negative
+                                  </span>
+                                  .
+                                </h3>
+                              </div>
+                            )
+                          },
+                          openConfirmText: 'OK',
+                          onConfirmClose: () => {
+                            window.g_app._store.dispatch({
+                              type: 'global/updateAppState',
+                              payload: {
+                                customWidth: undefined,
+                              },
+                            })
+                          },
                         },
-                        openConfirmText: 'OK',
-                        onConfirmClose: () => {
-                          window.g_app._store.dispatch({
-                            type: 'global/updateAppState',
-                            payload: {
-                              customWidth: undefined,
-                            },
-                          })
-                        },
-                      },
-                    })
-                  } else if (coPayerPayments.length > 0) {
-                    setShowRemovePayment(true)
-                  } else {
-                    if (
-                      dispenseItems.filter(x => isActualizable(x)).length > 0 ||
-                      service.filter(x => isActualizable(x)).length > 0
-                    )
-                      notification.error({
-                        message:
-                          'Actualize all nursing work items before finalize.',
                       })
-                    else onFinalizeClick()
-                  }
-                }}
-              >
-                Finalize
-              </ProgressButton>
-            </Authorized>
+                    } else if (coPayerPayments.length > 0) {
+                      setShowRemovePayment(true)
+                    } else {
+                      if (
+                        dispenseItems.filter(x => isActualizable(x)).length >
+                          0 ||
+                        service.filter(x => isActualizable(x)).length > 0
+                      )
+                        notification.error({
+                          message:
+                            'Actualize all nursing work items before finalize.',
+                        })
+                      else onFinalizeClick()
+                    }
+                  }}
+                >
+                  Finalize
+                </ProgressButton>
+              </Authorized>
+            )}
           </GridItem>
         )}
         <GridItem md={12}>
@@ -876,6 +870,7 @@ const DispenseDetails = ({
           <GridItem xs={5} md={5}>
             <div style={{ paddingRight: 90 }}>
               <AmountSummary
+                isViewOnly={true}
                 rows={invoiceItem}
                 adjustments={invoiceAdjustment}
                 config={{
