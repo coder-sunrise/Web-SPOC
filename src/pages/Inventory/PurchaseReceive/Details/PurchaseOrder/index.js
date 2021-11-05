@@ -153,7 +153,8 @@ class Index extends Component {
   }
 
   onSubmitButtonClicked = async action => {
-    const { dispatch, validateForm, history } = this.props
+    const { dispatch, validateForm, history, values } = this.props
+    const { purchaseOrderNo } = values.purchaseOrder
     let dispatchType = 'purchaseOrderDetails/savePO'
     let processedPayload = {}
     const isFormValid = await validateForm()
@@ -236,7 +237,12 @@ class Index extends Component {
         return validation
       }
 
-      const openConfirmationModal = (statusCode, content, confirmText) => {
+      const openConfirmationModal = (
+        statusCode,
+        content,
+        confirmText,
+        cancelText,
+      ) => {
         dispatch({
           type: 'global/updateAppState',
           payload: {
@@ -250,6 +256,7 @@ class Index extends Component {
               }
             },
             openConfirmText: confirmText,
+            cancelText: cancelText,
           },
         })
       }
@@ -262,8 +269,9 @@ class Index extends Component {
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
           openConfirmationModal(
             PURCHASE_ORDER_STATUS.CANCELLED,
-            'Cancel PO?',
-            'Cancel PO',
+            'Cancel Purchase Order ' + purchaseOrderNo + '?',
+            'Yes',
+            'No',
           )
           return true
         case poSubmitAction.FINALIZE:
@@ -573,7 +581,7 @@ class Index extends Component {
     return 'enable'
   }
 
-  render () {
+  render() {
     const {
       purchaseOrderDetails,
       values,
