@@ -10,7 +10,7 @@ import VoidCNList from './VoidCNList'
 import ReportBase from '../ReportBase'
 
 const reportId = 14
-const fileName = 'Void Credit Note & Payment Report'
+const fileName = 'Void Credit Note & Payment & Write-Off Report'
 
 class VoidCreditNoteReport extends ReportBase {
   constructor(props) {
