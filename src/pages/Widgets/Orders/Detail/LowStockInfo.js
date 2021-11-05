@@ -15,8 +15,7 @@ const LowStockInfo = ({ sourceType, values = {}, codetable, visitRegistration = 
     inventoryvaccination = [],
   } = codetable
   let source = {}
-
-  console.log(inventorymedication)
+ 
   if (
     sourceType === 'medication' ||
     (sourceType === 'prescriptionSet' && values.inventoryMedicationFK)
@@ -200,7 +199,7 @@ const LowStockInfo = ({ sourceType, values = {}, codetable, visitRegistration = 
         <p>
           Current Stock: {numeral(stock).format(qtyFormat)}
           {isLowStock || isReOrder || isExcessStock ? (
-            <font color={isLowStock || isExcessStock ? 'red' : 'black'}>
+            <font color={isLowStock ? 'red' : 'black'}>
               {' '}
               {isExcessStock ? '(Excess Stock)' : '(Low Stock)'}
             </font>
