@@ -93,7 +93,7 @@ export default {
   'menu.report.voidCreditNoteReport': 'Void Credit Note & Payment Report',
   'menu.report.salesListingReport': 'Sales Listing Report',
   'menu.report.invoiceListingReport': 'Invoice Listing Report',
-  'menu.report.lowStockReport': 'Low Stock Report',
+  'menu.report.lowStockReport': 'Inventory Threshold Report',
   'menu.report.depositTransactionReport': 'Deposit Transaction Report',
   'menu.report.creditNoteListingReport': 'Credit Note Listing Report',
   'menu.report.inventorytrendingreport': 'Inventory Trending Report',
