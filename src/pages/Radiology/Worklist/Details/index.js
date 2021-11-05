@@ -162,17 +162,18 @@ const RadiologyDetails = () => {
   }
   const renderPrintButton = () => {
     if (!details || !details.entity) return
-    const { statusFK:currentStatusFK } = details.entity
-    return [
-      RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED,
-      RADIOLOGY_WORKITEM_STATUS.COMPLETED,
-    ].includes(currentStatusFK) && (
-      <Button color='primary' onClick={toggleReport}>
-        Print
-      </Button>
+    const { statusFK: currentStatusFK } = details.entity
+    return (
+      [
+        RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED,
+        RADIOLOGY_WORKITEM_STATUS.COMPLETED,
+      ].includes(currentStatusFK) && (
+        <Button color='primary' onClick={toggleReport}>
+          Print
+        </Button>
+      )
     )
   }
-
   const handleSave = (payload = {}) => {
     dispatch({
       type: 'radiologyDetails/updateRadiologyWorkitem',
@@ -266,10 +267,9 @@ const RadiologyDetails = () => {
           }
         }}
         footProps={{
-          extraButtons: [
-            !showOnlyCloseButton ? renderStatusButtons() : undefined,
-            renderPrintButton(),
-          ],
+          extraButtons: !showOnlyCloseButton
+            ? renderStatusButtons()
+            : undefined,
           onConfirm: !showOnlyCloseButton
             ? () => {
                 handleSave()
@@ -297,13 +297,13 @@ const RadiologyDetails = () => {
             <OrderDetails
               workitem={workitem}
               onCombinedOrderChange={value => {
-                console.log('onCombinedOrderChange', value)
                 setWorkItem({
                   ...workitem,
                   primaryWorkitemFK: value.find(
                     v => v.radiologyWorkitemId == workitem.radiologyWorkitemId,
                   ).primaryWorkitemFK,
                   visitWorkitems: value,
+                  ...examinationDetails,
                 })
                 setIsDirty(true)
               }}
@@ -355,7 +355,10 @@ const RadiologyDetails = () => {
         <ReportViewer
           showTopDivider={false}
           reportID={82}
-          reportParameters={{ radiologyWorkitemId: detailsId, patientProfileFK }}
+          reportParameters={{
+            radiologyWorkitemId: detailsId,
+            patientProfileFK,
+          }}
           defaultScale={1.5}
         />
       </CommonModal>

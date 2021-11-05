@@ -235,7 +235,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
     },
     {
       key: 'radiographer',
-      title: 'Radiographer',
+      title: 'Radiology Technologist',
       dataIndex: 'radiographer',
       sorter: false,
       search: false,
@@ -504,13 +504,13 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
         })
         return (
           <Select
-            label='Radiographer'
+            label='Radiology Technologist'
             mode='multiple'
             options={radiographerOptions}
             placeholder=''
             style={{ width: 250 }}
             maxTagCount={0}
-            maxTagPlaceholder='Radiographers'
+            maxTagPlaceholder='Radiology Technologist'
           />
         )
       },

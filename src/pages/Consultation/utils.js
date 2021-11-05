@@ -356,6 +356,7 @@ const isPharmacyOrderUpdated = orders => {
       totalAfterOverallAdjustment: item.totalAfterOverallAdjustment,
       totalPrice: item.totalPrice,
       unitPrice: item.unitPrice,
+      drugLabelRemarks: item.drugLabelRemarks,
     }
   }
 

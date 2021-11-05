@@ -1037,10 +1037,10 @@ class Banner extends PureComponent {
                               <Refresh />
                             </IconButton>
                           )}
+                        {this.getSchemeList(
+                          _.orderBy(schemeDataList, ['schemeTypeFK'], ['asc']),
+                        )}
                       </span>
-                      {this.getSchemeList(
-                        _.orderBy(schemeDataList, ['schemeTypeFK'], ['asc']),
-                      )}
                     </LoadingWrapper>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>

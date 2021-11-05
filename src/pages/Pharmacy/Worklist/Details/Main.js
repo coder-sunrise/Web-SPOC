@@ -1288,6 +1288,16 @@ const Main = props => {
       },
     }
   }
+
+  const onCloseJournalHistory = () => {
+    dispatch({
+      type: 'pharmacyDetails/updateState',
+      payload: {
+        journalHistoryList: [],
+      },
+    })
+    setShowJournalHistory(false)
+  }
   return (
     <div>
       <GridContainer>
@@ -1383,7 +1393,19 @@ const Main = props => {
               position: 'relative',
               top: '6px',
             }}
-            onClick={() => setShowJournalHistory(true)}
+            onClick={() => {
+              dispatch({
+                type: 'pharmacyDetails/queryJournalHistory',
+                payload: {
+                  pharmacyWorkitemFK: workitem.id,
+                  pagesize: 9999,
+                },
+              }).then(r => {
+                if (r) {
+                  setShowJournalHistory(true)
+                }
+              })
+            }}
           >
             Journal History
           </Typography.Text>
@@ -1488,13 +1510,13 @@ const Main = props => {
         <GridItem md={8}>
           <div style={{ position: 'relative' }}>
             <Button color='primary' size='sm' disabled={isOrderUpdate}>
-              Print Prescription
+              Print Drug Label
             </Button>
             <Button color='primary' size='sm' disabled={isOrderUpdate}>
               Print leaflet/Drug Summary Label
             </Button>
             <Button color='primary' size='sm' disabled={isOrderUpdate}>
-              Print Drug Label
+              Print Prescription
             </Button>
             {secondaryPrintoutLanguage !== '' && (
               <CheckboxGroup
@@ -1663,9 +1685,12 @@ const Main = props => {
       <Drawer
         anchor='right'
         open={showJournalHistory}
-        onClose={() => setShowJournalHistory(false)}
+        onClose={onCloseJournalHistory}
       >
-        <JournalHistory statusHistory={statusHistory} />
+        <JournalHistory
+          journalHistoryList={pharmacyDetails.journalHistoryList}
+          onClose={onCloseJournalHistory}
+        />
       </Drawer>
     </div>
   )

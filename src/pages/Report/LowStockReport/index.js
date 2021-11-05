@@ -32,6 +32,7 @@ const LowStockReportWithFormik = withFormik({
   mapPropsToValues: () => ({
     inventoryType: 'MEDICATION',
     Status: 'active',
+    ThresholdType: 'All',
   }),
 })(LowStockReport)
 
