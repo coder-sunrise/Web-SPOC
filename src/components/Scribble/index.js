@@ -7,7 +7,7 @@ import {
   List,
   Divider,
 } from '@material-ui/core'
-import { CloudUploadOutlined } from '@ant-design/icons';
+import { CloudUploadOutlined, CopyOutlined } from '@ant-design/icons';
 import { CompactPicker } from 'react-color'
 import ToggleButton from '@material-ui/lab/ToggleButton'
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup'
@@ -259,7 +259,7 @@ class ScribbleTemplateItem extends React.Component {
                     setTemplate(item.layerContent, item.id, item.description)
                   }}
                 >
-                  <RedoIcon />
+                  <CopyOutlined />
                 </Button>
               </Tooltip>
               <Tooltip title='Delete'>
