@@ -16,7 +16,7 @@ import DetailsList from './DetailsList'
 import Summary from './Summary'
 import ReportBase from '../ReportBase'
 
-const reportId = 82
+const reportId = 83
 const fileName = 'Radiology Statisitic Report'
 
 @connect(({ codetable }) => ({
