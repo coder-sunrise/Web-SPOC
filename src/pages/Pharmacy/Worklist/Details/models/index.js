@@ -855,7 +855,19 @@ export default createFormViewModel({
           yield take('visitRegistration/query/@@end')
         }
       },
-      *initState({ payload }, { call, select, put, take }) {},
+      *queryJournalHistory({ payload }, { call, select, put, take }) {
+        const result = yield call(service.queryJournalHistoryList, payload)
+        if (result.status === '200') {
+          yield put({
+            type: 'updateState',
+            payload: {
+              journalHistoryList: result.data.data,
+            },
+          })
+          return true
+        }
+        return false
+      },
     },
     reducers: {},
   },
