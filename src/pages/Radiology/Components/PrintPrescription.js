@@ -75,7 +75,7 @@ export default function PrintPrescription({
       >
         <ReportViewer
           showTopDivider={false}
-          reportID={83}
+          reportID={84}
           reportParameters={{ visitFK, pharmacyWorkitemId, patientProfileFK }}
           defaultScale={1.5}
         />
