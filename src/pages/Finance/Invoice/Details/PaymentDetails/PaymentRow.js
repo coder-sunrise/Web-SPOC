@@ -50,12 +50,10 @@ const PaymentRow = ({
 
   let tooltipMsg = ''
   let showVoidButton = true
-  if (type === 'Credit Note' || type === 'Write Off') {
-    showVoidButton = ableToViewByAuthority(
-      type === 'Credit Note'
-        ? 'finance.addcreditnote'
-        : 'finance.createwriteoff',
-    )
+  if (type === 'Credit Note') {
+    showVoidButton = ableToViewByAuthority('finance.addcreditnote')
+  } else if (type === 'Write Off') {
+    showVoidButton = false
   }
 
   if (type === 'Payment') tooltipMsg = 'Print Receipt'

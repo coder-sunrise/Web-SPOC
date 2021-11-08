@@ -28,7 +28,6 @@ const PaymentActions = ({
     size: 'sm',
   }
   let showAddCN = ableToViewByAuthority('finance.addcreditnote')
-  let showAddWriteOff = ableToViewByAuthority('finance.createwriteoff')
   return (
     <div>
       <Button
@@ -59,7 +58,7 @@ const PaymentActions = ({
           Transfer Deposit
         </Button>
       )}
-      {showAddWriteOff && type === PayerType.PATIENT && (
+      {false && type === PayerType.PATIENT && (
         <Button
           onClick={() => handleWriteOff(invoicePayerFK)}
           disabled={!handleWriteOff || readOnly}
