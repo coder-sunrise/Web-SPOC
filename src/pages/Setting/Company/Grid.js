@@ -26,44 +26,48 @@ class Grid extends PureComponent {
   editRow = (row, e) => {
     const { dispatch, settingCompany, route, history } = this.props
     const { name } = route
-    const accessRight =
-      name === 'copayer'
-        ? Authorized.check('copayer.copayerdetails')
-        : Authorized.check('settings.supplier.supplierdetails')
-
-    if (accessRight && accessRight.rights !== 'enable') {
-      notification.error({
-        message: 'Current user is not authorized to access',
-      })
-      return
+    if (name === 'copayer') {
+      const accessRight = Authorized.check('copayer.copayerdetails') || {
+        rights: 'hidden',
+      }
+      if (accessRight && accessRight.rights === 'hidden') {
+        return
+      }
+    } else {
+      const accessRight = Authorized.check('settings.supplier.supplierdetails')
+      if (accessRight && accessRight.rights !== 'enable') {
+        notification.error({
+          message: 'Current user is not authorized to access',
+        })
+        return
+      }
     }
 
     const { list } = settingCompany
 
-    if (name === 'copayer'){
-      history.push(`/finance/copayer/editcopayer?id=${row.id}`);
-    }
-    else {
+    if (name === 'copayer') {
+      history.push(`/finance/copayer/editcopayer?id=${row.id}`)
+    } else {
       dispatch({
         type: 'settingCompany/updateState',
         payload: {
           showModal: true,
-          entity: list.find((o) => o.id === row.id),
+          entity: list.find(o => o.id === row.id),
         },
       })
     }
   }
 
-  handleClick = async (copayerId) => {
+  handleClick = async copayerId => {
     if (!Number.isInteger(copayerId)) return
 
     const { handlePrint, clinicSettings } = this.props
     const { labelPrinterSize } = clinicSettings.settings
 
-    const sizeConverter = (sizeCM) => {
+    const sizeConverter = sizeCM => {
       return sizeCM
         .split('x')
-        .map((o) =>
+        .map(o =>
           (10 * parseFloat(o.replace('cm', ''))).toString().concat('MM'),
         )
         .join('_')
@@ -73,7 +77,8 @@ class Grid extends PureComponent {
       REPORT_ID[
         (route.name === 'copayer'
           ? 'COPAYER_ADDRESS_LABEL_'
-          : 'SUPPLIER_ADDRESS_LABEL_').concat(sizeConverter(labelPrinterSize))
+          : 'SUPPLIER_ADDRESS_LABEL_'
+        ).concat(sizeConverter(labelPrinterSize))
       ]
 
     const data = await getRawData(
@@ -91,7 +96,7 @@ class Grid extends PureComponent {
     handlePrint(JSON.stringify(payload))
   }
 
-  render () {
+  render() {
     const { route, height } = this.props
     const { name } = route
 
@@ -107,39 +112,37 @@ class Grid extends PureComponent {
           FuncProps={this.FuncConfig}
           forceRender
           columns={
-            name === 'copayer' ? (
-              [
-                { name: 'code', title: 'Co-Payer Code' },
-                { name: 'displayValue', title: 'Co-Payer Name' },
-                { name: 'coPayerTypeName', title: 'Co-Payer Type' },
-                { name: 'copayerContactPerson', title: 'Contact Person' },
-                { name: 'contactNo', title: 'Contact No.' },
-                { name: 'copayerContactPersonEmail', title: 'Email' },
-                { name: 'url', title: 'Website' },
-                { name: 'copayerCreditInformation', title: 'Credit Code' },
-                { name: 'isActive', title: 'Status' },
-                { name: 'action', title: 'Action' },
-              ]
-            ) : (
-              [
-                { name: 'code', title: 'Company Code' },
-                { name: 'displayValue', title: 'Company Name' },
-                { name: 'contactPerson', title: 'Contact Person' },
-                { name: 'contactNo', title: 'Contact No.' },
-                { name: 'officeNum', title: 'Office Number' },
-                { name: 'faxNo', title: 'Fax Number' },
-                { name: 'isGSTEnabled', title: 'GST Enable' },
-                { name: 'isActive', title: 'Status' },
-                { name: 'action', title: 'Action' },
-              ]
-            )
+            name === 'copayer'
+              ? [
+                  { name: 'code', title: 'Co-Payer Code' },
+                  { name: 'displayValue', title: 'Co-Payer Name' },
+                  { name: 'coPayerTypeName', title: 'Co-Payer Type' },
+                  { name: 'copayerContactPerson', title: 'Contact Person' },
+                  { name: 'contactNo', title: 'Contact No.' },
+                  { name: 'copayerContactPersonEmail', title: 'Email' },
+                  { name: 'url', title: 'Website' },
+                  { name: 'copayerCreditInformation', title: 'Credit Code' },
+                  { name: 'isActive', title: 'Status' },
+                  { name: 'action', title: 'Action' },
+                ]
+              : [
+                  { name: 'code', title: 'Company Code' },
+                  { name: 'displayValue', title: 'Company Name' },
+                  { name: 'contactPerson', title: 'Contact Person' },
+                  { name: 'contactNo', title: 'Contact No.' },
+                  { name: 'officeNum', title: 'Office Number' },
+                  { name: 'faxNo', title: 'Fax Number' },
+                  { name: 'isGSTEnabled', title: 'GST Enable' },
+                  { name: 'isActive', title: 'Status' },
+                  { name: 'action', title: 'Action' },
+                ]
           }
           columnExtensions={[
             {
               columnName: 'url',
               sortingEnabled: false,
               width: 300,
-              render: (row) => {
+              render: row => {
                 return (
                   <a
                     rel='noopener noreferrer'
@@ -147,20 +150,16 @@ class Grid extends PureComponent {
                     href={
                       row.contact &&
                       row.contact.contactWebsite &&
-                      row.contact.contactWebsite.website !== '' ? (
-                        row.contact.contactWebsite.website
-                      ) : (
-                        '-'
-                      )
+                      row.contact.contactWebsite.website !== ''
+                        ? row.contact.contactWebsite.website
+                        : '-'
                     }
                   >
                     {row.contact &&
                     row.contact.contactWebsite &&
-                    row.contact.contactWebsite.website !== '' ? (
-                      row.contact.contactWebsite.website
-                    ) : (
-                      '-'
-                    )}
+                    row.contact.contactWebsite.website !== ''
+                      ? row.contact.contactWebsite.website
+                      : '-'}
                   </a>
                 )
               },
@@ -174,58 +173,69 @@ class Grid extends PureComponent {
               columnName: 'officeNum',
               sortingEnabled: false,
               width: 120,
-              render: (row) => (
+              render: row => (
                 <span>
                   {row.contact &&
                   row.contact.officeContactNumber &&
-                  row.contact.officeContactNumber.number !== '' ? (
-                    row.contact.officeContactNumber.number
-                  ) : (
-                    '-'
-                  )}
+                  row.contact.officeContactNumber.number !== ''
+                    ? row.contact.officeContactNumber.number
+                    : '-'}
                 </span>
               ),
             },
             {
               columnName: 'contactPerson',
-              render: (row) => (
-
+              render: row => (
                 <span>{row.contactPerson ? row.contactPerson : '-'}</span>
               ),
             },
             {
               columnName: 'copayerContactPerson',
-              render: (row) => {
+              render: row => {
                 let cell = <span>-</span>
-                if (row.defaultContactPerson && row.defaultContactPerson.name && row.defaultContactPerson.name !== '') {
+                if (
+                  row.defaultContactPerson &&
+                  row.defaultContactPerson.name &&
+                  row.defaultContactPerson.name !== ''
+                ) {
                   cell = (
-                    <Tooltip title={row.defaultContactPerson.name} placement='top'>
+                    <Tooltip
+                      title={row.defaultContactPerson.name}
+                      placement='top'
+                    >
                       <span>{row.defaultContactPerson.name}</span>
                     </Tooltip>
                   )
                 }
 
-                return cell;
+                return cell
               },
             },
             {
               columnName: 'copayerContactPersonEmail',
-              render: (row) => {
+              render: row => {
                 let cell = <span>-</span>
-                if (row.defaultContactPerson && row.defaultContactPerson.emailAddress && row.defaultContactPerson.emailAddress !== '') {
+                if (
+                  row.defaultContactPerson &&
+                  row.defaultContactPerson.emailAddress &&
+                  row.defaultContactPerson.emailAddress !== ''
+                ) {
                   cell = (
-                    <Tooltip title={row.defaultContactPerson.emailAddress} placement='top'>
+                    <Tooltip
+                      title={row.defaultContactPerson.emailAddress}
+                      placement='top'
+                    >
                       <span>{row.defaultContactPerson.emailAddress}</span>
                     </Tooltip>
                   )
                 }
 
-                return cell;
+                return cell
               },
             },
             {
               columnName: 'copayerCreditInformation',
-              render: (row) => {
+              render: row => {
                 let cell = <span>-</span>
                 if (row.creditInformation && row.creditInformation !== '') {
                   cell = (
@@ -235,22 +245,20 @@ class Grid extends PureComponent {
                   )
                 }
 
-                return cell;
+                return cell
               },
             },
             {
               columnName: 'faxNo',
               sortingEnabled: false,
               width: 120,
-              render: (row) => (
+              render: row => (
                 <span>
                   {row.contact &&
                   row.contact.faxContactNumber &&
-                  row.contact.faxContactNumber.number !== '' ? (
-                    row.contact.faxContactNumber.number
-                  ) : (
-                    '-'
-                  )}
+                  row.contact.faxContactNumber.number !== ''
+                    ? row.contact.faxContactNumber.number
+                    : '-'}
                 </span>
               ),
             },
@@ -262,17 +270,13 @@ class Grid extends PureComponent {
               columnName: 'contactNo',
               sortingEnabled: false,
               width: 120,
-              render: (row) => (
+              render: row => (
                 <span>
-                  {
-                    row.defaultContactPerson 
-                      && row.defaultContactPerson.mobileNumber 
-                      && row.defaultContactPerson.mobileNumber !== ''? (
-                        row.defaultContactPerson.mobileNumber
-                      ) : (
-                        '-'
-                      )
-                  }
+                  {row.defaultContactPerson &&
+                  row.defaultContactPerson.mobileNumber &&
+                  row.defaultContactPerson.mobileNumber !== ''
+                    ? row.defaultContactPerson.mobileNumber
+                    : '-'}
                 </span>
               ),
             },
@@ -295,22 +299,29 @@ class Grid extends PureComponent {
               columnName: 'action',
               align: 'center',
               width: 100,
-              render: (row) => {
-                return name === 'copayer' ? (
-                  <Authorized authority='copayer.copayerdetails'>
-                    <Fragment>
-                      <Tooltip title='Edit Co-Payer' placement='bottom'>
-                        <Button
-                          size='sm'
-                          onClick={() => {
-                            this.editRow(row)
-                          }}
-                          justIcon
-                          color='primary'
-                        >
-                          <Edit />
-                        </Button>
-                      </Tooltip>
+              render: row => {
+                if (name === 'copayer') {
+                  const editDetailAccessRight = Authorized.check(
+                    'copayer.copayerdetails',
+                  ) || {
+                    rights: 'hidden',
+                  }
+                  return (
+                    <div>
+                      {editDetailAccessRight.rights !== 'hidden' && (
+                        <Tooltip title='Edit Co-Payer' placement='bottom'>
+                          <Button
+                            size='sm'
+                            onClick={() => {
+                              this.editRow(row)
+                            }}
+                            justIcon
+                            color='primary'
+                          >
+                            <Edit />
+                          </Button>
+                        </Tooltip>
+                      )}
                       <Tooltip title='Print Copayer Label' placement='bottom'>
                         <Button
                           size='sm'
@@ -321,9 +332,10 @@ class Grid extends PureComponent {
                           <Print />
                         </Button>
                       </Tooltip>
-                    </Fragment>
-                  </Authorized>
-                ) : (
+                    </div>
+                  )
+                }
+                return (
                   <Authorized authority='settings.supplier.supplierdetails'>
                     <Fragment>
                       <Tooltip title='Edit Supplier' placement='bottom'>
