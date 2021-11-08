@@ -7,6 +7,7 @@ import RepeatIcon from '@material-ui/icons/Repeat'
 import { Button } from '@/components'
 // constants variables
 import { PayerType } from './variables'
+import { ableToViewByAuthority } from '@/utils/utils'
 
 const PaymentActions = ({
   handleAddPayment,
@@ -36,16 +37,17 @@ const PaymentActions = ({
         <Add />
         Add Payment
       </Button>
-      {type !== PayerType.GOVT_COPAYER && (
-        <Button
-          onClick={() => handleAddCrNote(invoicePayerFK, type)}
-          disabled={!handleAddCrNote || readOnly}
-          {...ButtonProps}
-        >
-          <Add />
-          Add Cr. Note
-        </Button>
-      )}
+      {ableToViewByAuthority('finance.addcreditnote') &&
+        type !== PayerType.GOVT_COPAYER && (
+          <Button
+            onClick={() => handleAddCrNote(invoicePayerFK, type)}
+            disabled={!handleAddCrNote || readOnly}
+            {...ButtonProps}
+          >
+            <Add />
+            Add Cr. Note
+          </Button>
+        )}
       {type === PayerType.PATIENT && (
         <Button
           onClick={() => handleTransferToDeposit(invoicePayerFK)}
@@ -56,7 +58,7 @@ const PaymentActions = ({
           Transfer Deposit
         </Button>
       )}
-      {type === PayerType.PATIENT && (
+      {false && type === PayerType.PATIENT && (
         <Button
           onClick={() => handleWriteOff(invoicePayerFK)}
           disabled={!handleWriteOff || readOnly}
@@ -78,12 +80,8 @@ const PaymentActions = ({
       )}
       <Button
         onClick={() =>
-          handlePrinterClick(
-            'TaxInvoice',
-            undefined,
-            companyFK,
-            invoicePayerFK,
-          )}
+          handlePrinterClick('TaxInvoice', undefined, companyFK, invoicePayerFK)
+        }
         disabled={!handlePrinterClick}
         {...ButtonProps}
       >

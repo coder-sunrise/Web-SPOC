@@ -55,7 +55,7 @@ export const menuData = [
          },
          {
            title: 'Finance',
-           text: 'Void Credit Note & Payment Report',
+           text: 'Void Credit Note & Payment & Write Off Report',
            url: '/report/voidcreditnotereport',
            authority: 'report.finance.voidcreditnoteandpayment',
          },
@@ -102,13 +102,13 @@ export const menuData = [
            authority: 'report.finance.patientageingreport',
          },
          {
-           title: 'Finance', 
+           title: 'Finance',
            text: 'Radiology Statistic Report',
            url: '/report/radiologystatisticreport',
            authority: 'report.finance.radiologystatisticreport',
          },
          {
-           title: 'Finance', 
+           title: 'Finance',
            text: 'Xero Invoices Report',
            url: '/report/xeroinvoicesreport',
            authority: 'report.finance.xeroinvoicesreport',
@@ -120,8 +120,8 @@ export const menuData = [
            authority: 'report.inventory.inventorymovement',
          },
          {
-           title: 'Inventory', 
-           text: 'Inventory Threshold Report', 
+           title: 'Inventory',
+           text: 'Inventory Threshold Report',
            url: '/report/lowstockreport',
            authority: 'report.inventory.lowstock',
          },

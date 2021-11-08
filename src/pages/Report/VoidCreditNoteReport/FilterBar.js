@@ -22,10 +22,10 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
             toDateLabel='Void Date To'
           />
 
-          <GridItem md={2}>
+          <GridItem md={3}>
             <FastField
               name='filterType'
-              render={(args) => (
+              render={args => (
                 <RadioGroup
                   {...args}
                   label='Type'
@@ -37,6 +37,10 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                     {
                       value: 'Payment',
                       label: 'Payment',
+                    },
+                    {
+                      value: 'Write Off',
+                      label: 'Write Off',
                     },
                   ]}
                 />
