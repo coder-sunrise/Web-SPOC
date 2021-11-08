@@ -215,7 +215,7 @@ const PaymentRow = ({
           </GridItem>
           <GridItem md={6} container justify='flex-end' alignItems='center'>
             <GridItem>
-              <span className={classes.currency} style={{ paddingRight: 48 }}>
+              <span className={classes.currency}>
                 {patientDepositTransaction.amount ? (
                   <NumberInput
                     text
@@ -227,6 +227,7 @@ const PaymentRow = ({
                 )}
               </span>
             </GridItem>
+            <GridItem style={{ width: '30px' }}></GridItem>
           </GridItem>
         </GridContainer>
       )}
