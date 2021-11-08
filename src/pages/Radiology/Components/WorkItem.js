@@ -11,11 +11,13 @@ import {
   RADIOLOGY_WORKITEM_STATUS,
   RADIOLOGY_WORKLIST_STATUS_COLOR,
   GENDER,
+  MODALITY_STATUS,
 } from '@/utils/constants'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import WorklistContext from '../Worklist/WorklistContext'
 import CombinedOrderIcon from './CombinedOrderIcon'
 import VisitGroupIcon from './VisitGroupIcon'
+import ModalityStatusIcon from './ModalityStatusIcon'
 
 const blueColor = '#1890f8'
 const statusUpdateDateTooltip = {
@@ -112,6 +114,11 @@ const WorkitemTitle = ({ item }) => {
         <LeftLabel tooltip={item.patientInfo.patientReferenceNo}>
           {item.patientInfo.patientReferenceNo}
         </LeftLabel>
+        {item.statusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS &&
+          (item.modalityStatusFK === MODALITY_STATUS.PENDING ||
+            item.modalityStatusFK === MODALITY_STATUS.FAILED) && (
+            <ModalityStatusIcon itemModalityStatusFK={item.modalityStatusFK} />
+          )}
         <RightLabel width={150}>{item.patientInfo.patientAccountNo}</RightLabel>
       </WorkitemRow>
     </div>

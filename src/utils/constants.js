@@ -761,3 +761,10 @@ export const CHECKLIST_CATEGORY = {
 }
 
 export const GENDER = { FEMALE: 1, MALE: 2 }
+
+export const MODALITY_STATUS = {
+  PENDING: 1,
+  PROCESSING: 2,
+  SUCCESSFUL: 3,
+  FAILED: 4,
+}
