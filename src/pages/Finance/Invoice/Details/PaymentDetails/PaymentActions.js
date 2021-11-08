@@ -27,7 +27,6 @@ const PaymentActions = ({
     color: 'primary',
     size: 'sm',
   }
-  let showAddCN = ableToViewByAuthority('finance.addcreditnote')
   return (
     <div>
       <Button
@@ -38,16 +37,17 @@ const PaymentActions = ({
         <Add />
         Add Payment
       </Button>
-      {showAddCN && type !== PayerType.GOVT_COPAYER && (
-        <Button
-          onClick={() => handleAddCrNote(invoicePayerFK, type)}
-          disabled={!handleAddCrNote || readOnly}
-          {...ButtonProps}
-        >
-          <Add />
-          Add Cr. Note
-        </Button>
-      )}
+      {ableToViewByAuthority('finance.addcreditnote') &&
+        type !== PayerType.GOVT_COPAYER && (
+          <Button
+            onClick={() => handleAddCrNote(invoicePayerFK, type)}
+            disabled={!handleAddCrNote || readOnly}
+            {...ButtonProps}
+          >
+            <Add />
+            Add Cr. Note
+          </Button>
+        )}
       {type === PayerType.PATIENT && (
         <Button
           onClick={() => handleTransferToDeposit(invoicePayerFK)}
