@@ -322,7 +322,7 @@ class Grid extends PureComponent {
                           </Button>
                         </Tooltip>
                       )}
-                      <Tooltip title='Print Copayer Label' placement='bottom'>
+                      <Tooltip title='Print Co-Payer Label' placement='bottom'>
                         <Button
                           size='sm'
                           justIcon

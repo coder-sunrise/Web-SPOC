@@ -38,6 +38,7 @@ import { control } from '@/components/Decorator'
 import Block from './Block'
 import HistoryDiagnosis from './HistoryDiagnosis'
 import { SwitcherTwoTone } from '@ant-design/icons'
+import { SCHEME_TYPE } from '@/utils/constants'
 
 const headerStyles = {
   color: 'darkblue',
@@ -74,10 +75,11 @@ const styles = theme => ({
 })
 
 @control()
-@connect(({ patient, codetable, loading }) => ({
+@connect(({ patient, codetable, loading, clinicSettings }) => ({
   patient,
   codetable,
   ctschemetype: codetable.ctschemetype || [],
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
   refreshingBalance:
     loading.effects['patient/refreshChasBalance'] ||
     loading.effects['patient/refreshMedisaveBalance'],
@@ -288,114 +290,144 @@ class Banner extends PureComponent {
     const chasOrMedisave = (schemeDataList || []).filter(
       o => o.schemeTypeFK <= 6 || this.isMedisave(o.schemeTypeFK),
     )
-    const { patient } = this.props
+    const { patient, clinicSettings } = this.props
     const { entity } = patient
     const { patientScheme } = entity
-    return schemeDataList.map((s, i, arr) => (
-      <span style={{ paddingRight: 5, display: 'inline-block' }}>
-        {chasOrMedisave &&
-        chasOrMedisave.find(list => s.schemeTypeFK === list.schemeTypeFK) ? (
-          <Popover
-            icon={null}
-            content={
-              <div>
+    const { schemeInsuranceDisplayColorCode = '' } = clinicSettings
+    return schemeDataList.map((s, i, arr) => {
+      var scheme =
+        patientScheme.find(
+          ps => ps.coPaymentSchemeFK === s.coPaymentSchemeFK,
+        ) || {}
+      return (
+        <span style={{ paddingRight: 5, display: 'inline-block' }}>
+          {chasOrMedisave &&
+          chasOrMedisave.find(list => s.schemeTypeFK === list.schemeTypeFK) ? (
+            <Popover
+              icon={null}
+              content={
                 <div>
-                  {s.coPaymentSchemeFK ||
-                  schemeDataList.filter(p =>
-                    this.isMedisave(p.schemeTypeFK),
-                  )[0] === s
-                    ? s.copaymentSchemeName
-                    : s.schemeTypeName}
-                  <span style={{ bottom: -2 }}>
-                    {s.schemeTypeFK <= 6 && (
-                      <IconButton onClick={this.refreshChasBalance}>
-                        <Refresh />
-                      </IconButton>
-                    )}
-                    {this.isMedisave(s.schemeTypeFK) &&
-                      schemeDataList.filter(p =>
-                        this.isMedisave(p.schemeTypeFK),
-                      )[0] === s && (
-                        <IconButton onClick={this.refreshMedisaveBalance}>
+                  <div>
+                    {s.coPaymentSchemeFK ||
+                    schemeDataList.filter(p =>
+                      this.isMedisave(p.schemeTypeFK),
+                    )[0] === s
+                      ? s.copaymentSchemeName
+                      : s.schemeTypeName}
+                    <span style={{ bottom: -2 }}>
+                      {s.schemeTypeFK <= 6 && (
+                        <IconButton onClick={this.refreshChasBalance}>
                           <Refresh />
                         </IconButton>
                       )}
-                  </span>
+                      {this.isMedisave(s.schemeTypeFK) &&
+                        schemeDataList.filter(p =>
+                          this.isMedisave(p.schemeTypeFK),
+                        )[0] === s && (
+                          <IconButton onClick={this.refreshMedisaveBalance}>
+                            <Refresh />
+                          </IconButton>
+                        )}
+                    </span>
+                  </div>
+                  {s.schemeType && (
+                    <div style={{ marginTop: 15 }}>{s.schemeType}</div>
+                  )}
+                  {this.isMedisave(s.schemeTypeFK) && (
+                    <div>
+                      Payer: {s.payerName} ({s.payerAccountNo})
+                    </div>
+                  )}
+                  {s.validFrom && (
+                    <div>
+                      Validity:{' '}
+                      {s.validFrom ? (
+                        <DatePicker
+                          text
+                          format={dateFormatLong}
+                          value={s.validFrom}
+                        />
+                      ) : (
+                        ''
+                      )}
+                      &nbsp;-&nbsp;
+                      {s.validTo ? (
+                        <DatePicker
+                          text
+                          format={dateFormatLong}
+                          value={s.validTo}
+                        />
+                      ) : (
+                        ''
+                      )}
+                    </div>
+                  )}
+                  {s.schemeTypeFK !== 15 ? (
+                    <div>
+                      Balance: <NumberInput text currency value={s.balance} />
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                  {s.schemeTypeFK <= 6 ? (
+                    <div>
+                      Patient Acute Visit Balance:{' '}
+                      <NumberInput
+                        text
+                        currency
+                        value={s.acuteVisitPatientBalance}
+                      />
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                  {s.schemeTypeFK <= 6 ? (
+                    <div>
+                      Patient Acute Clinic Balance:{' '}
+                      <NumberInput
+                        text
+                        currency
+                        value={s.acuteVisitClinicBalance}
+                      />
+                    </div>
+                  ) : (
+                    ''
+                  )}
                 </div>
-                {s.schemeType && (
-                  <div style={{ marginTop: 15 }}>{s.schemeType}</div>
-                )}
-                {this.isMedisave(s.schemeTypeFK) && (
-                  <div>
-                    Payer: {s.payerName} ({s.payerAccountNo})
-                  </div>
-                )}
-                {s.validFrom && (
-                  <div>
-                    Validity:{' '}
-                    {s.validFrom ? (
-                      <DatePicker
-                        text
-                        format={dateFormatLong}
-                        value={s.validFrom}
-                      />
-                    ) : (
-                      ''
-                    )}
-                    &nbsp;-&nbsp;
-                    {s.validTo ? (
-                      <DatePicker
-                        text
-                        format={dateFormatLong}
-                        value={s.validTo}
-                      />
-                    ) : (
-                      ''
-                    )}
-                  </div>
-                )}
-                {s.schemeTypeFK !== 15 ? (
-                  <div>
-                    Balance: <NumberInput text currency value={s.balance} />
-                  </div>
-                ) : (
-                  ''
-                )}
-                {s.schemeTypeFK <= 6 ? (
-                  <div>
-                    Patient Acute Visit Balance:{' '}
-                    <NumberInput
-                      text
-                      currency
-                      value={s.acuteVisitPatientBalance}
-                    />
-                  </div>
-                ) : (
-                  ''
-                )}
-                {s.schemeTypeFK <= 6 ? (
-                  <div>
-                    Patient Acute Clinic Balance:{' '}
-                    <NumberInput
-                      text
-                      currency
-                      value={s.acuteVisitClinicBalance}
-                    />
-                  </div>
-                ) : (
-                  ''
-                )}
-              </div>
-            }
-            trigger='click'
-            placement='bottom'
-          >
+              }
+              trigger='click'
+              placement='bottom'
+            >
+              <Link>
+                <span
+                  style={{
+                    color: scheme.isExpired ? 'red' : 'black',
+                    textDecoration: 'underline',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {s.copaymentSchemeName || s.schemeTypeName}
+                  {s.validTo
+                    ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`
+                    : ' (Exp: -)'}
+                  {i < arr.length - 1 ? ',' : ''}
+                </span>
+              </Link>
+            </Popover>
+          ) : (
             <Link>
               <span
                 style={{
-                  color: patientScheme[i].isExpired ? 'red' : 'black',
+                  color: scheme.isExpired
+                    ? 'red'
+                    : scheme.schemeTypeFK === SCHEME_TYPE.INSURANCE
+                    ? `#${schemeInsuranceDisplayColorCode}`
+                    : 'black',
                   textDecoration: 'underline',
                   whiteSpace: 'nowrap',
+                }}
+                onClick={e => {
+                  this.openScheme()
                 }}
               >
                 {s.copaymentSchemeName || s.schemeTypeName}
@@ -405,29 +437,10 @@ class Banner extends PureComponent {
                 {i < arr.length - 1 ? ',' : ''}
               </span>
             </Link>
-          </Popover>
-        ) : (
-          <Link>
-            <span
-              style={{
-                color: patientScheme[i].isExpired ? 'red' : 'black',
-                textDecoration: 'underline',
-                whiteSpace: 'nowrap',
-              }}
-              onClick={e => {
-                this.openScheme()
-              }}
-            >
-              {s.copaymentSchemeName || s.schemeTypeName}
-              {s.validTo
-                ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`
-                : ' (Exp: -)'}
-              {i < arr.length - 1 ? ',' : ''}
-            </span>
-          </Link>
-        )}
-      </span>
-    ))
+          )}
+        </span>
+      )
+    })
   }
 
   refreshGovtBalance = () => {

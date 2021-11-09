@@ -11,7 +11,7 @@ const styles = () => ({
   },
 })
 class PaymentCollectionSummaryDetails extends PureComponent {
-  render () {
+  render() {
     const { reportDatas, classes } = this.props
     if (!reportDatas) return null
     let PaymentCollectionSummaryDetailsCols = [
@@ -22,9 +22,7 @@ class PaymentCollectionSummaryDetails extends PureComponent {
     ]
     let grouping = []
     const {
-      PaymentCollectionInfo: [
-        sumDetail = {},
-      ],
+      PaymentCollectionInfo: [sumDetail = {}],
     } = reportDatas
     const { groupByDoctor, groupByCompany } = sumDetail
 
@@ -39,15 +37,12 @@ class PaymentCollectionSummaryDetails extends PureComponent {
         ...PaymentCollectionSummaryDetailsExtensions,
       ]
 
-      grouping = [
-        { columnName: 'doctorName' },
-        ...grouping,
-      ]
+      grouping = [{ columnName: 'doctorName' }, ...grouping]
     }
 
     if (groupByCompany) {
       PaymentCollectionSummaryDetailsCols = [
-        { name: 'payerName', title: 'Company Name' },
+        { name: 'payerName', title: 'Co-Payer Name' },
         ...PaymentCollectionSummaryDetailsCols,
       ]
 
@@ -56,10 +51,7 @@ class PaymentCollectionSummaryDetails extends PureComponent {
         ...PaymentCollectionSummaryDetailsExtensions,
       ]
 
-      grouping = [
-        { columnName: 'payerName' },
-        ...grouping,
-      ]
+      grouping = [{ columnName: 'payerName' }, ...grouping]
     }
 
     let listData = []
@@ -79,14 +71,16 @@ class PaymentCollectionSummaryDetails extends PureComponent {
           groupItems.push({ columnName: cur.paymentMode, type: 'sum' })
           colInfo.push({
             name: cur.paymentMode,
-            title: <div className={classes.paymentModeHeader}>{cur.paymentMode}</div>,
+            title: (
+              <div className={classes.paymentModeHeader}>{cur.paymentMode}</div>
+            ),
             sortOrder: cur.sortOrder,
           })
         }
         if (cur.paymentDate) {
           const curId = `PaymentCollectionSummaryDetails-${cur.payerName ||
             ''}-${cur.doctorName || ''}-${cur.paymentDate}`
-          let record = listData.find((value) => value.id === curId)
+          let record = listData.find(value => value.id === curId)
           if (record) {
             record[cur.paymentMode] =
               record[cur.paymentMode] === undefined
@@ -115,16 +109,14 @@ class PaymentCollectionSummaryDetails extends PureComponent {
       ...colInfo,
     ]
 
-    listData = listData.map((value) => ({ ...categories, ...value }))
+    listData = listData.map(value => ({ ...categories, ...value }))
 
     const FuncProps = {
       pager: false,
       grouping: true,
       groupingConfig: {
         state: {
-          grouping: [
-            ...grouping,
-          ],
+          grouping: [...grouping],
         },
       },
       summary: true,
@@ -156,4 +148,6 @@ class PaymentCollectionSummaryDetails extends PureComponent {
     )
   }
 }
-export default withStyles(styles, { withTheme: true })(PaymentCollectionSummaryDetails)
+export default withStyles(styles, { withTheme: true })(
+  PaymentCollectionSummaryDetails,
+)

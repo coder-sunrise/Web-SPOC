@@ -6,15 +6,15 @@ import PaymentCollections from './PaymentCollections'
 import PaymentSummary from './PaymentSummary'
 import SessionDetails from './SessionDetails'
 import VisitListing from './VisitListing'
-import InvoicePayer from "./InvoicePayer"
-import PatientDeposit from "./PatientDeposit"
+import InvoicePayer from './InvoicePayer'
+import PatientDeposit from './PatientDeposit'
 import ReportBase from '../../ReportBase'
 
 const reportId = 5
 const fileName = 'Session Summary Report'
 
 class SessionSummary extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       ...this.state,
@@ -23,8 +23,8 @@ class SessionSummary extends ReportBase {
     }
   }
 
-  componentDidMount () {
-    this.setState((state) => ({
+  componentDidMount() {
+    this.setState(state => ({
       ...state.default,
     }))
     this.onSubmitClick()
@@ -42,9 +42,10 @@ class SessionSummary extends ReportBase {
     return null
   }
 
-  renderContent = (reportDatas) => {
+  renderContent = reportDatas => {
     if (!reportDatas) return null
-    let cashPayment = reportDatas.PaymentDetails.find(p => p.paymentMode === 'Cash') || []
+    let cashPayment =
+      reportDatas.PaymentDetails.find(p => p.paymentMode === 'Cash') || []
     return (
       <GridContainer>
         <SessionDetails
@@ -52,42 +53,116 @@ class SessionSummary extends ReportBase {
           companyDetails={reportDatas.CompanyDetails[0]}
         />
         <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
-          <Collapse style={{ fontSize: 'inherit' }} expandIconPosition='right' defaultActiveKey={['0']}>
-            <Collapse.Panel header={<div style={{ fontWeight: 500 }}>Summary</div>} key={0}>
+          <Collapse
+            style={{ fontSize: 'inherit' }}
+            expandIconPosition='right'
+            defaultActiveKey={['0']}
+          >
+            <Collapse.Panel
+              header={<div style={{ fontWeight: 500 }}>Summary</div>}
+              key={0}
+            >
               <GridItem md={12}>
-                <PaymentSummary PaymentSummaryDetails={reportDatas.PaymentDetails} />
+                <PaymentSummary
+                  PaymentSummaryDetails={reportDatas.PaymentDetails}
+                />
               </GridItem>
               <GridItem md={12} style={{ marginTop: '10px' }}>
-                <span style={{ display: 'inline-block', textAlign: 'left', fontWeight: '500', width: '160px' }}>Total Cash Collected:</span>
-                <NumberInput currency text value={(cashPayment.currentCollected + cashPayment.pastCollected + cashPayment.currentCashRounding + cashPayment.pastCashRounding) || 0} style={{ padding: '0px 8px', width: '100px', textAlign: 'right' }} />
+                <span
+                  style={{
+                    display: 'inline-block',
+                    textAlign: 'left',
+                    fontWeight: '500',
+                    width: '160px',
+                  }}
+                >
+                  Total Cash Collected:
+                </span>
+                <NumberInput
+                  currency
+                  text
+                  value={
+                    cashPayment.currentCollected +
+                      cashPayment.pastCollected +
+                      cashPayment.currentCashRounding +
+                      cashPayment.pastCashRounding || 0
+                  }
+                  style={{
+                    padding: '0px 8px',
+                    width: '100px',
+                    textAlign: 'right',
+                  }}
+                />
               </GridItem>
               <GridItem md={12}>
-                <span style={{ display: 'inline-block', textAlign: 'left', fontWeight: '500', width: '160px' }}>Total Cash Rounding:</span>
-                <NumberInput currency text value={(cashPayment.currentCashRounding + cashPayment.pastCashRounding) || 0} style={{ padding: '0px 8px', width: '100px', textAlign: 'right' }} />
+                <span
+                  style={{
+                    display: 'inline-block',
+                    textAlign: 'left',
+                    fontWeight: '500',
+                    width: '160px',
+                  }}
+                >
+                  Total Cash Rounding:
+                </span>
+                <NumberInput
+                  currency
+                  text
+                  value={
+                    cashPayment.currentCashRounding +
+                      cashPayment.pastCashRounding || 0
+                  }
+                  style={{
+                    padding: '0px 8px',
+                    width: '100px',
+                    textAlign: 'right',
+                  }}
+                />
               </GridItem>
               <GridItem md={12}>
-                <span style={{ display: 'inline-block', textAlign: 'left', fontWeight: '500', width: '160px' }}>Company Payable Amt.:</span>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    textAlign: 'left',
+                    fontWeight: '500',
+                    width: '160px',
+                  }}
+                >
+                  Co-Payer Payable Amt.:
+                </span>
                 <NumberInput
                   currency
                   text
                   value={reportDatas.CompanyDetails.reduce((pre, cur) => {
                     return pre + cur.totalCompanyAmount
                   }, 0)}
-                  style={{ padding: '0px 8px', width: '100px', textAlign: 'right' }} />
+                  style={{
+                    padding: '0px 8px',
+                    width: '100px',
+                    textAlign: 'right',
+                  }}
+                />
               </GridItem>
-              <GridItem md={6} style={{marginTop: '10px'}}>
+              <GridItem md={6} style={{ marginTop: '10px' }}>
                 <InvoicePayer reportDatas={reportDatas} />
               </GridItem>
             </Collapse.Panel>
           </Collapse>
         </GridItem>
         <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
-          <Collapse style={{ fontSize: 'inherit', padding: 5 }} expandIconPosition='right' defaultActiveKey={['0']}>
-            <Collapse.Panel header={<div style={{ fontWeight: 500 }}>Details</div>} key={0}>
+          <Collapse
+            style={{ fontSize: 'inherit', padding: 5 }}
+            expandIconPosition='right'
+            defaultActiveKey={['0']}
+          >
+            <Collapse.Panel
+              header={<div style={{ fontWeight: 500 }}>Details</div>}
+              key={0}
+            >
               <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
                 <h5>Session Listing</h5>
               </GridItem>
-              <GridItem md={12} >
+              <GridItem md={12}>
                 <VisitListing reportDatas={reportDatas} />
               </GridItem>
               <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
@@ -101,11 +176,13 @@ class SessionSummary extends ReportBase {
                 />
               </GridItem>
               <GridItem md={12} style={{ marginBottom: 8, marginTop: 18 }}>
-                <h5>Payment Collections for Past Invoices (Company)</h5>
+                <h5>Payment Collections for Past Invoices (Co-Payer)</h5>
               </GridItem>
               <GridItem md={12}>
                 <PaymentCollections
-                  PaymentCollectionsDetails={reportDatas.CompanyPastPaymentCollections}
+                  PaymentCollectionsDetails={
+                    reportDatas.CompanyPastPaymentCollections
+                  }
                   TotalDetails={reportDatas.CompanyPastPaymentTotal}
                   isCompanyPaymentCollectionsForPast
                 />
@@ -115,7 +192,9 @@ class SessionSummary extends ReportBase {
               </GridItem>
               <GridItem md={12}>
                 <PaymentCollections
-                  PaymentCollectionsDetails={reportDatas.PrivatePastPaymentCollections}
+                  PaymentCollectionsDetails={
+                    reportDatas.PrivatePastPaymentCollections
+                  }
                   TotalDetails={reportDatas.PrivatePastPaymentTotal}
                 />
               </GridItem>

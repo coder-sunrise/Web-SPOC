@@ -1,23 +1,18 @@
 import React, { PureComponent } from 'react'
-import {
-  IntegratedSummary,
-} from '@devexpress/dx-react-grid'
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { ReportDataGrid } from '@/components/_medisys'
 
 class InvoiceList extends PureComponent {
-  render () {
+  render() {
     let listData = []
     const { reportDatas } = this.props
-    if (!reportDatas)
-      return null
+    if (!reportDatas) return null
     const { groupBy } = reportDatas.ListingDetails[0]
     if (reportDatas && reportDatas.InvoiceListing) {
-      listData = reportDatas.InvoiceListing.map(
-        (item, index) => ({
-          ...item,
-          id: `InvoiceListing-${index}-${item.invoiceno}`,
-        }),
-      )
+      listData = reportDatas.InvoiceListing.map((item, index) => ({
+        ...item,
+        id: `InvoiceListing-${index}-${item.invoiceno}`,
+      }))
     }
 
     const InvoiceListingCols = [
@@ -29,20 +24,67 @@ class InvoiceList extends PureComponent {
       { name: 'gstAmt', title: 'GST' },
       { name: 'adj', title: 'ADJ' },
       { name: 'patientPayable', title: 'Patient Payable' },
-      { name: 'copayer', title: 'Copayer' },
-      { name: 'copayerPayable', title: 'Copayer Payable' },
+      { name: 'copayer', title: 'Co-Payer' },
+      { name: 'copayerPayable', title: 'Co-Payer Payable' },
     ]
     const InvoiceListingExtensions = [
-      { columnName: 'invoiceDate', type: 'date', sortingEnabled: false, width: 120 },
+      {
+        columnName: 'invoiceDate',
+        type: 'date',
+        sortingEnabled: false,
+        width: 120,
+      },
       { columnName: 'invoiceNo', sortingEnabled: false, width: 100 },
-      { columnName: 'doctorName', sortingEnabled: false, wordWrapEnabled: true },
-      { columnName: 'patientName', sortingEnabled: false, wordWrapEnabled: true },
-      { columnName: 'invoiceAmt', type: 'currency', currency: true, sortingEnabled: false, width: 140 },
-      { columnName: 'gstAmt', type: 'currency', currency: true, sortingEnabled: false, width: 140, wordWrapEnabled: true },
-      { columnName: 'adj', type: 'currency', currency: true, sortingEnabled: false, width: 140, wordWrapEnabled: true },
-      { columnName: 'patientPayable', type: 'currency', currency: true, sortingEnabled: false, width: 140, wordWrapEnabled: true },
+      {
+        columnName: 'doctorName',
+        sortingEnabled: false,
+        wordWrapEnabled: true,
+      },
+      {
+        columnName: 'patientName',
+        sortingEnabled: false,
+        wordWrapEnabled: true,
+      },
+      {
+        columnName: 'invoiceAmt',
+        type: 'currency',
+        currency: true,
+        sortingEnabled: false,
+        width: 140,
+      },
+      {
+        columnName: 'gstAmt',
+        type: 'currency',
+        currency: true,
+        sortingEnabled: false,
+        width: 140,
+        wordWrapEnabled: true,
+      },
+      {
+        columnName: 'adj',
+        type: 'currency',
+        currency: true,
+        sortingEnabled: false,
+        width: 140,
+        wordWrapEnabled: true,
+      },
+      {
+        columnName: 'patientPayable',
+        type: 'currency',
+        currency: true,
+        sortingEnabled: false,
+        width: 140,
+        wordWrapEnabled: true,
+      },
       { columnName: 'copayer', sortingEnabled: false, wordWrapEnabled: true },
-      { columnName: 'copayerPayable', type: 'currency', currency: true, sortingEnabled: false, width: 140, wordWrapEnabled: true },
+      {
+        columnName: 'copayerPayable',
+        type: 'currency',
+        currency: true,
+        sortingEnabled: false,
+        width: 140,
+        wordWrapEnabled: true,
+      },
     ]
     const sumItems = [
       { columnName: 'invoiceAmt', type: 'sum' },
@@ -76,16 +118,14 @@ class InvoiceList extends PureComponent {
         grouping: true,
         groupingConfig: {
           state: {
-            grouping: [
-              { columnName: 'doctorName' },
-            ],
+            grouping: [{ columnName: 'doctorName' }],
           },
         },
       }
     } else if (groupBy === 'Company') {
       InvoiceListCols = [
         ...InvoiceListingCols,
-        { name: 'company', title: 'Company' },
+        { name: 'company', title: 'Co-Payer' },
       ]
       InvoiceListColsExtension = [
         ...InvoiceListingExtensions,
@@ -110,17 +150,13 @@ class InvoiceList extends PureComponent {
         grouping: true,
         groupingConfig: {
           state: {
-            grouping: [
-              { columnName: 'company' },
-            ],
+            grouping: [{ columnName: 'company' }],
           },
           row: {
             contentComponent: ({ column, row }) => (
               <span>
-                <strong>
-                  {row.value ? column.title : ''}
-                </strong>
-                {row.value ? (`: ${row.value}`) : 'Private Patient Invoices'}
+                <strong>{row.value ? column.title : ''}</strong>
+                {row.value ? `: ${row.value}` : 'Private Patient Invoices'}
               </span>
             ),
           },

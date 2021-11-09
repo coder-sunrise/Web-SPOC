@@ -17,7 +17,7 @@ import Summary from './Summary'
 import { AccordionTitle } from '@/components/_medisys'
 
 class QueueListing extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       ...this.state,
@@ -30,17 +30,13 @@ class QueueListing extends ReportBase {
     return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
   }
 
-  renderContent = (reportDatas) => {
+  renderContent = reportDatas => {
     if (!reportDatas) return null
     return (
       <Accordion
         // active={this.state.activePanel}
         // onChange={this.handleActivePanelChange}
-        defaultActive={[
-          0,
-          1,
-          2,
-        ]}
+        defaultActive={[0, 1, 2]}
         mode='multiple'
         leftIcon
         expandIcon={<SolidExpandMore fontSize='large' />}
@@ -50,11 +46,17 @@ class QueueListing extends ReportBase {
             content: <VisitListing reportDatas={reportDatas} />,
           },
           {
-            title: <AccordionTitle title='Payment Collections for Past Invoices (Company)' />,
-            content: <PastPaymentsCollection reportDatas={reportDatas} isCompany />,
+            title: (
+              <AccordionTitle title='Payment Collections for Past Invoices (Co-Payer)' />
+            ),
+            content: (
+              <PastPaymentsCollection reportDatas={reportDatas} isCompany />
+            ),
           },
           {
-            title: <AccordionTitle title='Payment Collections for Past Invoices (Private)' />,
+            title: (
+              <AccordionTitle title='Payment Collections for Past Invoices (Private)' />
+            ),
             content: <PastPaymentsCollection reportDatas={reportDatas} />,
           },
           {
@@ -84,8 +86,12 @@ const QueueListingWithFormik = withFormik({
     listingFrom: Yup.date().required(),
   }),
   mapPropsToValues: () => ({
-    listingFrom: moment(new Date()).startOf('month').toDate(),
-    listingTo: moment(new Date()).endOf('month').toDate(),
+    listingFrom: moment(new Date())
+      .startOf('month')
+      .toDate(),
+    listingTo: moment(new Date())
+      .endOf('month')
+      .toDate(),
   }),
 })(QueueListing)
 

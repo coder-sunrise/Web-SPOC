@@ -37,7 +37,7 @@ export const Cell = CellBase
 class CorporateBillingGrid extends PureComponent {
   state = {
     columns: [
-      { name: 'displayValue', title: 'Company' },
+      { name: 'displayValue', title: 'Co-Payer' },
       { name: 'outstandingBalance', title: 'O/S Balance' },
       { name: 'lastPaymentDate', title: 'Last Payment' },
       { name: 'contactPerson', title: 'Contact Person' },
@@ -143,7 +143,6 @@ class CorporateBillingGrid extends PureComponent {
     this.props.dispatch({
       type: 'corporateBilling/fetchCompany',
     })
-
   }
 
   componentDidMount() {

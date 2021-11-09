@@ -237,11 +237,11 @@ export default compose(
     validationSchema: Yup.object().shape({
       code: Yup.string().max(
         20,
-        'Copayer Code should not exceed 20 characters',
+        'Co-Payer Code should not exceed 20 characters',
       ),
       displayValue: Yup.string()
         .required()
-        .max(200, 'Copayer Name should not exceed 200 characters'),
+        .max(200, 'Co-Payer Name should not exceed 200 characters'),
       coPayerTypeFK: Yup.number().required(),
       defaultStatementAdjustmentRemarks: Yup.string().when(
         ['isAutoGenerateStatementEnabled', 'statementAdjustment'],

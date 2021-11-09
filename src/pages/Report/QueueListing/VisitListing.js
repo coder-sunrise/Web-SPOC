@@ -4,7 +4,7 @@ import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { ReportDataGrid } from '@/components/_medisys'
 
-const styles = (theme) => ({
+const styles = theme => ({
   subRow: {
     '& > td:first-child': {
       paddingLeft: theme.spacing(1),
@@ -52,7 +52,7 @@ const VisitListing = ({ reportDatas, classes }) => {
     { name: 'patientPaid', title: 'Patient Paid Amt.' },
     { name: 'paymentMode', title: 'Mode' },
     { name: 'patientOS', title: 'Patient O/S Amt.' },
-    { name: 'coPayerPayable', title: 'Company Payable' },
+    { name: 'coPayerPayable', title: 'Co-Payer Payable' },
     { name: 'coPayerName', title: 'Co-Payer' },
     { name: 'visitDate', title: 'Visit Date' },
   ]
@@ -108,9 +108,7 @@ const VisitListing = ({ reportDatas, classes }) => {
     grouping: true,
     groupingConfig: {
       state: {
-        grouping: [
-          { columnName: 'visitDate' },
-        ],
+        grouping: [{ columnName: 'visitDate' }],
       },
     },
     summary: true,
@@ -143,29 +141,25 @@ const VisitListing = ({ reportDatas, classes }) => {
       },
     },
   }
-  const visitListingRow = (p) => {
+  const visitListingRow = p => {
     const { row, children } = p
     if (row.countNumber === 1) {
-      const newchildren = children.map(
-        (item, index) =>
-          index < children.length - 5 || index > children.length - 4
-            ? {
-                ...children[index],
-                props: {
-                  ...children[index].props,
-                  rowSpan: row.rowspan,
-                },
-              }
-            : item,
+      const newchildren = children.map((item, index) =>
+        index < children.length - 5 || index > children.length - 4
+          ? {
+              ...children[index],
+              props: {
+                ...children[index].props,
+                rowSpan: row.rowspan,
+              },
+            }
+          : item,
       )
       return <Table.Row {...p}>{newchildren}</Table.Row>
     }
     return (
       <Table.Row className={classes.subRow}>
-        {[
-          children[children.length - 5],
-          children[children.length - 4],
-        ]}{' '}
+        {[children[children.length - 5], children[children.length - 4]]}{' '}
       </Table.Row>
     )
   }
