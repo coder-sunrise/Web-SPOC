@@ -24,7 +24,7 @@ import {
   Tooltip,
 } from '@/components'
 
-const styles = (theme) => ({
+const styles = theme => ({
   item: {
     marginBottom: theme.spacing(1),
     padding: theme.spacing(1),
@@ -34,7 +34,9 @@ const styles = (theme) => ({
     cursor: 'pointer',
 
     '&:hover': {
-      background: color(primaryColor).lighten(0.9).hex(),
+      background: color(primaryColor)
+        .lighten(0.9)
+        .hex(),
     },
     '& > svg': {
       marginRight: theme.spacing(1),
@@ -77,13 +79,13 @@ class ScribbleNoteItem extends React.Component {
   }
 
   toggleVisibleChange = () =>
-    this.setState((ps) => {
+    this.setState(ps => {
       return {
         open: !ps.open,
       }
     })
 
-  render () {
+  render() {
     const {
       classes,
       scriblenotes,
@@ -92,6 +94,7 @@ class ScribbleNoteItem extends React.Component {
       categoryIndex,
       scribbleNoteUpdateState,
       scribbleNoteArray = [],
+      buttonProps,
     } = this.props
 
     return (
@@ -124,7 +127,7 @@ class ScribbleNoteItem extends React.Component {
             </div>
             <Divider className={classes.divider} />
             <div className={classes.listContainer}>
-              {scribbleNoteArray.map((item, i) => {
+              {_.orderBy(scribbleNoteArray,(x)=>x?.subject.toLowerCase(),['asc']).map((item, i) => {
                 return (
                   <ListItem
                     key={`scribble-${item.id}`}
@@ -154,10 +157,10 @@ class ScribbleNoteItem extends React.Component {
                           .dispatch({
                             type: 'scriblenotes/query',
                             payload: {
-                              id: item.id,
+                              id: item.scribbleNoteFK,
                             },
                           })
-                          .then((v) => {
+                          .then(v => {
                             scribbleNoteUpdateState(
                               category,
                               arrayName,
@@ -201,7 +204,12 @@ class ScribbleNoteItem extends React.Component {
           </div>
         }
       >
-        <Button color='info'>Scribble Note</Button>
+        <Button size='sm' color='info' {...buttonProps}>
+          Scribble Note
+          {scribbleNoteArray && scribbleNoteArray.length > 0
+            ? ` (${scribbleNoteArray.length})`
+            : null}
+        </Button>
       </Popover>
     )
   }

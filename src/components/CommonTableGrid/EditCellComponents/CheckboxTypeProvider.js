@@ -13,29 +13,28 @@ import {
 
 import { Checkbox } from '@/components'
 
-const styles = (theme) => ({
-  main: {},
+const styles = theme => ({
+  main: { paddingLeft: '10px' },
 })
 
 class CheckboxEditorBase extends PureComponent {
   state = {}
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.myRef = React.createRef()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     // const { gridId, row, columnName } = onComponentDidMount.call(this)
     // if (!_checkboxSelectedMap) _checkboxSelectedMap = {}
     // if (row[columnName]) {
     //   // _checkboxSelectedMap[columnName] = row.id
     // }
     // this.forceUpdate()
-    // console.log('CheckboxEditorBase', row, _checkboxSelectedMap)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     // _checkboxSelectedMap = {}
   }
 
@@ -72,7 +71,15 @@ class CheckboxEditorBase extends PureComponent {
     }
   }
 
-  renderComponent = ({ type, code, options, row, editMode, ...commonCfg }) => {
+  renderComponent = ({
+    type,
+    code,
+    options,
+    row,
+    editMode,
+    isVisible = () => true,
+    ...commonCfg
+  }) => {
     const {
       columnExtensions,
       column: { name: columnName },
@@ -92,19 +99,21 @@ class CheckboxEditorBase extends PureComponent {
     // if (_checkboxSelectedMap[columnName]) {
     //   commonCfg.checked = _checkboxSelectedMap[columnName] === row.id
     // }
-    return (
-      <Checkbox
-        checked={value}
+
+    return isVisible(row) ? (
+      <div
         className={classnames({
           [classes.main]: true,
         })}
-        {...commonCfg}
-        fullWidth={false}
-      />
+      >
+        <Checkbox checked={value} {...commonCfg} fullWidth={false} />
+      </div>
+    ) : (
+      <div></div>
     )
   }
 
-  render () {
+  render() {
     return getCommonRender.bind(this)(this.renderComponent)
   }
 }
@@ -120,11 +129,15 @@ class CheckboxTypeProvider extends React.Component {
     columnExtensions: PropTypes.array,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
-    this.CheckboxEditor = (columns, text) => (editorProps) => {
+    this.CheckboxEditor = (columns, text) => editorProps => {
       return (
-        <CheckboxEditor editMode={!text} columnExtensions={columns} {...editorProps} />
+        <CheckboxEditor
+          editMode={text}
+          columnExtensions={columns}
+          {...editorProps}
+        />
       )
     }
   }
@@ -133,18 +146,11 @@ class CheckboxTypeProvider extends React.Component {
     this.props.editingRowIds !== nextProps.editingRowIds ||
     this.props.commitCount !== nextProps.commitCount
 
-  render () {
+  render() {
     const { columnExtensions } = this.props
-    // console.log(this.props)
     const columns = columnExtensions
-      .filter(
-        (o) =>
-          [
-            'checkbox',
-          ].indexOf(o.type) >= 0,
-      )
-      .map((o) => o.columnName)
-    // console.log(columns)
+      .filter(o => ['checkbox'].indexOf(o.type) >= 0)
+      .map(o => o.columnName)
     return (
       <DataTypeProvider
         for={columns}

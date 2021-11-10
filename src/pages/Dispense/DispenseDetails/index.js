@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import _ from 'lodash'
@@ -33,6 +33,7 @@ import {
   NURSE_WORKITEM_STATUS,
 } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 // sub components
 import TableData from './TableData'
 import DrugLabelSelection from './DrugLabelSelection'
@@ -54,6 +55,10 @@ import {
 
 import CONSTANTS from './constants'
 import { ServePatientButton } from '@/components/_medisys'
+import RadiologyDetails from '@/pages/Radiology/Worklist/Details'
+import WorklistContext, {
+  WorklistContextProvider,
+} from '@/pages/Radiology/Worklist/WorklistContext'
 
 const styles = theme => ({
   paper: {
@@ -88,7 +93,8 @@ const styles = theme => ({
     },
   },
   groupStyle: {
-    margin: '3px 0px',
+    padding: '3px 0px',
+    backgroundColor: 'rgb(240, 248, 255)',
   },
 })
 
@@ -116,8 +122,6 @@ const DispenseDetails = ({
   selectedDrugs,
   clinicSettings,
   servingPersons = [],
-  visit,
-  doctorprofile = [],
   patient,
   user,
 }) => {
@@ -130,6 +134,9 @@ const DispenseDetails = ({
     visitPurposeFK,
     visitRemarks,
     defaultExpandedGroups,
+    orderCreateTime,
+    orderCreateBy,
+    visitStatus,
   } = values || {
     invoice: { invoiceItem: [] },
   }
@@ -142,10 +149,6 @@ const DispenseDetails = ({
 
   const { inventorymedication, inventoryvaccination } = codetable
   const { settings = {} } = clinicSettings
-  const currentDoc = doctorprofile.filter(x => x.id === visit.doctorProfileFK)
-  const docInfo =
-    currentDoc && currentDoc.length > 0 ? currentDoc[0].clinicianProfile : {}
-
   const discardCallback = r => {
     if (r) {
       const userProfile = user.data.clinicianProfile
@@ -359,6 +362,11 @@ const DispenseDetails = ({
     setShowActualization(true)
   }
 
+  const { detailsId, setDetailsId } = useContext(WorklistContext)
+  const onRadiologyBtnClick = radiologyWorkitemID => {
+    setDetailsId(radiologyWorkitemID, true)
+  }
+
   const handleMultiActualizationClick = type => {
     let selectedRows = []
     let records = []
@@ -436,10 +444,27 @@ const DispenseDetails = ({
     }
     const batchColumns = children.slice(startColIndex, endColIndex)
 
+    if (row.groupNumber === 1) {
+      newchildren.push(
+        children
+          .filter((value, index) => index < (isShowDispenseActualie ? 3 : 2))
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.groupRowSpan,
+            },
+          })),
+      )
+    }
+
     if (row.countNumber === 1) {
       newchildren.push(
         children
-          .filter((value, index) => index < startColIndex)
+          .filter(
+            (value, index) =>
+              index < startColIndex && index > (isShowDispenseActualie ? 2 : 1),
+          )
           .map(item => ({
             ...item,
             props: {
@@ -448,12 +473,10 @@ const DispenseDetails = ({
             },
           })),
       )
-
       newchildren.push(batchColumns)
-
       newchildren.push(
         children
-          .filter((value, index) => index > endColIndex - 1)
+          .filter((value, index) => index === endColIndex)
           .map(item => ({
             ...item,
             props: {
@@ -466,6 +489,20 @@ const DispenseDetails = ({
       newchildren.push(batchColumns)
     }
 
+    if (row.groupNumber === 1) {
+      newchildren.push(
+        children
+          .filter((value, index) => index > endColIndex)
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.groupRowSpan,
+            },
+          })),
+      )
+    }
+
     if (row.countNumber === 1) {
       return <Table.Row {...p}>{newchildren}</Table.Row>
     }
@@ -474,22 +511,6 @@ const DispenseDetails = ({
         {newchildren}
       </Table.Row>
     )
-  }
-
-  const actualizeChange = (e, row) => {
-    if (row.isDrugMixture) {
-      setFieldValue('dispenseItems', [
-        ...dispenseItems.map(di => {
-          if (row.id === di.id) {
-            return {
-              ...di,
-              isCheckActualize: e.target.value,
-            }
-          }
-          return di
-        }),
-      ])
-    }
   }
 
   let columns = DispenseItemsColumns
@@ -507,12 +528,6 @@ const DispenseDetails = ({
       let matchItems = []
       if (editRow.isDrugMixture) {
         matchItems = rows.filter(r => r.drugMixtureFK === editRow.drugMixtureFK)
-        let drugMixture = rows.filter(
-          r => r.isDrugMixture && r.id === editRow.id && r.uid !== key,
-        )
-        drugMixture.forEach(
-          item => (item.isCheckActualize = editRow.isCheckActualize),
-        )
       } else {
         matchItems = rows.filter(
           r => r.type === editRow.type && r.id === editRow.id,
@@ -528,17 +543,6 @@ const DispenseDetails = ({
     <React.Fragment>
       <GridContainer>
         <GridItem justify='flex-start' md={7} className={classes.actionButtons}>
-          {!viewOnly && !isRetailVisit && (
-            <Button
-              color='info'
-              size='sm'
-              onClick={handleReloadClick}
-              disabled={disableRefreshOrder}
-            >
-              <Refresh />
-              Refresh Order
-            </Button>
-          )}
           <Button
             color='primary'
             size='sm'
@@ -559,12 +563,12 @@ const DispenseDetails = ({
             {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
             Patient Label
           </Button>
-          {visit.orderCreateTime && (
+          {orderCreateTime && (
             <span style={{ color: '#999999' }}>
-              Order created by{' '}
+              Order created by
               <span style={{ fontWeight: 500 }}>
-                {`${docInfo.title ? `${docInfo.title}.` : null}${docInfo.name}`}{' '}
-                at {visit.orderCreateTime.format('DD MMM yyyy HH:mm')}
+                {` ${orderCreateBy} `}
+                at {orderCreateTime.format('DD MMM yyyy HH:mm')}
               </span>{' '}
             </span>
           )}
@@ -617,13 +621,13 @@ const DispenseDetails = ({
                   onConfirm={() => {
                     dispatch({
                       type: 'dispense/setServingPerson',
-                      payload: { visitFK: visit.id },
+                      payload: { visitFK: values?.id },
                     })
                   }}
                 />
               </Authorized>
             )}
-            {!isRetailVisit && (
+            {!isRetailVisit && visitStatus !== VISIT_STATUS.PAUSED && (
               <Authorized authority='queue.dispense.editorder'>
                 <ProgressButton
                   color='primary'
@@ -635,71 +639,83 @@ const DispenseDetails = ({
                 </ProgressButton>
               </Authorized>
             )}
-            <Authorized authority='queue.dispense.makepayment'>
-              <ProgressButton
-                color='primary'
-                size='sm'
-                icon={<AttachMoney />}
-                onClick={() => {
-                  if (dispense && dispense.totalWithGST < 0) {
-                    window.g_app._store.dispatch({
-                      type: 'global/updateAppState',
-                      payload: {
-                        openConfirm: true,
-                        isInformType: true,
-                        customWidth: 'md',
-                        openConfirmContent: () => {
-                          return (
-                            <div>
-                              <Warining
-                                style={{
-                                  width: '1.3rem',
-                                  height: '1.3rem',
-                                  marginLeft: '10px',
-                                  color: 'red',
-                                }}
-                              />
-                              <h3
-                                style={{
-                                  marginLeft: '10px',
-                                  display: 'inline-block',
-                                }}
-                              >
-                                Unable to finalize, total amount cannot be{' '}
-                                <span style={{ fontWeight: 400 }}>
-                                  negative
-                                </span>
-                                .
-                              </h3>
-                            </div>
-                          )
+            {visitStatus !== VISIT_STATUS.PAUSED && (
+              <Authorized authority='queue.dispense.makepayment'>
+                <ProgressButton
+                  color='primary'
+                  size='sm'
+                  icon={<AttachMoney />}
+                  onClick={() => {
+                    if (dispense && dispense.totalWithGST < 0) {
+                      window.g_app._store.dispatch({
+                        type: 'global/updateAppState',
+                        payload: {
+                          openConfirm: true,
+                          isInformType: true,
+                          customWidth: 'md',
+                          openConfirmContent: () => {
+                            return (
+                              <div>
+                                <Warining
+                                  style={{
+                                    width: '1.3rem',
+                                    height: '1.3rem',
+                                    marginLeft: '10px',
+                                    color: 'red',
+                                  }}
+                                />
+                                <h3
+                                  style={{
+                                    marginLeft: '10px',
+                                    display: 'inline-block',
+                                  }}
+                                >
+                                  Unable to finalize, total amount cannot be{' '}
+                                  <span style={{ fontWeight: 400 }}>
+                                    negative
+                                  </span>
+                                  .
+                                </h3>
+                              </div>
+                            )
+                          },
+                          openConfirmText: 'OK',
+                          onConfirmClose: () => {
+                            window.g_app._store.dispatch({
+                              type: 'global/updateAppState',
+                              payload: {
+                                customWidth: undefined,
+                              },
+                            })
+                          },
                         },
-                        openConfirmText: 'OK',
-                        onConfirmClose: () => {
-                          window.g_app._store.dispatch({
-                            type: 'global/updateAppState',
-                            payload: {
-                              customWidth: undefined,
-                            },
-                          })
-                        },
-                      },
-                    })
-                  } else if (coPayerPayments.length > 0) {
-                    setShowRemovePayment(true)
-                  } else {
-                    onFinalizeClick()
-                  }
-                }}
-              >
-                Finalize
-              </ProgressButton>
-            </Authorized>
+                      })
+                    } else if (coPayerPayments.length > 0) {
+                      setShowRemovePayment(true)
+                    } else {
+                      if (
+                        dispenseItems.filter(x => isActualizable(x)).length >
+                          0 ||
+                        service.filter(x => isActualizable(x)).length > 0
+                      )
+                        notification.error({
+                          message:
+                            'Actualize all nursing work items before finalize.',
+                        })
+                      else onFinalizeClick()
+                    }
+                  }}
+                >
+                  Finalize
+                </ProgressButton>
+              </Authorized>
+            )}
           </GridItem>
         )}
         <GridItem md={12}>
           <Paper className={classes.paper}>
             <TableData
+              oddEven={false}
               title='Dispense Details'
               titleExtend={
                 viewOnly
@@ -714,6 +730,7 @@ const DispenseDetails = ({
                 pager: false,
                 grouping: true,
                 groupingConfig: {
+                  isDisableExpandedGroups: true,
                   state: {
                     grouping: [{ columnName: 'dispenseGroupId' }],
                     expandedGroups: defaultExpandedGroups,
@@ -752,6 +769,7 @@ const DispenseDetails = ({
                       )
                     },
                   },
+                  backgroundColor: 'rgb(240, 248, 255)',
                 },
               }}
               forceRender
@@ -761,7 +779,6 @@ const DispenseDetails = ({
                 onPrint,
                 onActualizeBtnClick,
                 showDrugLabelRemark,
-                actualizeChange,
               )}
               data={dispenseItems}
               TableProps={{
@@ -772,6 +789,8 @@ const DispenseDetails = ({
 
             <TableData
               title='Service'
+              forceRender
+              oddEven={false}
               titleExtend={
                 viewOnly
                   ? null
@@ -790,11 +809,13 @@ const DispenseDetails = ({
                 viewOnly,
                 onPrint,
                 onActualizeBtnClick,
+                onRadiologyBtnClick,
               )}
               data={service}
             />
 
             <TableData
+              oddEven={false}
               title='Other Orders'
               idPrefix='OtherOrders'
               columns={OtherOrdersColumns}
@@ -808,6 +829,7 @@ const DispenseDetails = ({
 
             {settings.isEnablePackage && visitPurposeFK !== VISIT_TYPE.OTC && (
               <TableData
+                oddEven={false}
                 title='Package'
                 idPrefix='package'
                 columns={PackageColumns}
@@ -848,6 +870,7 @@ const DispenseDetails = ({
           <GridItem xs={5} md={5}>
             <div style={{ paddingRight: 90 }}>
               <AmountSummary
+                isViewOnly={true}
                 rows={invoiceItem}
                 adjustments={invoiceAdjustment}
                 config={{
@@ -1014,28 +1037,24 @@ const DispenseDetails = ({
           }}
         />
       </CommonModal>
+      <RadiologyDetails />
     </React.Fragment>
   )
 }
 
+const _DispenseDetails = props => (
+  <WorklistContextProvider>
+    <DispenseDetails {...props}></DispenseDetails>
+  </WorklistContextProvider>
+)
+
 export default compose(
   withStyles(styles, { name: 'DispenseDetailsGrid' }),
-  connect(
-    ({
-      codetable,
-      clinicSettings,
-      dispense,
-      visitRegistration,
-      patient,
-      user,
-    }) => ({
-      codetable,
-      clinicSettings,
-      servingPersons: dispense.servingPersons,
-      visit: visitRegistration?.entity?.visit || {},
-      doctorprofile: codetable.doctorprofile || [],
-      patient: patient.entity || {},
-      user,
-    }),
-  ),
-)(DispenseDetails)
+  connect(({ codetable, clinicSettings, dispense, patient, user }) => ({
+    codetable,
+    clinicSettings,
+    servingPersons: dispense.servingPersons,
+    patient: patient.entity || {},
+    user,
+  })),
+)(_DispenseDetails)

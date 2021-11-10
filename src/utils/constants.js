@@ -208,39 +208,39 @@ export const INVENTORY_ADJUSTMENT_STATUS = {
 }
 
 export const REPORT_TYPE = {
-  1: 'Queue Listing',
-  2: 'Patient Listing',
-  3: 'Sales Summary',
-  4: 'Payment Collection',
-  5: 'Session Summary',
-  6: 'Diagnosis Trending',
-  7: 'Medical Certificate',
-  8: 'Certificate of Attendance',
-  9: 'Referral Letter',
-  10: 'Vaccination Certificate',
-  11: 'Memo',
-  12: 'Other Documents',
-  13: 'Credit Note Listing',
-  14: 'Void Credit Note & Payment',
-  15: 'Invoice',
-  16: 'Oustanding Payment',
-  17: 'Sales Listing',
-  18: 'Credit Note',
-  20: 'Low Stock',
-  21: 'Consumable Movement Report',
-  22: 'Medication Movement',
-  23: 'Deposit Transaction',
-  24: 'Drug Label',
-  25: 'Statement',
-  26: 'Purchase Order',
-  27: 'Patient Label',
-  29: 'Payment Receipt',
-  37: 'Inventory Trending Report',
-  55: 'Letter of Certification',
-  61: 'Refraction Form Report',
-  68: 'Patient History Report',
-  80: 'Visitation Invoice',
-}
+         1: 'Queue Listing',
+         2: 'Patient Listing',
+         3: 'Sales Summary',
+         4: 'Payment Collection',
+         5: 'Session Summary',
+         6: 'Diagnosis Trending',
+         7: 'Medical Certificate',
+         8: 'Certificate of Attendance',
+         9: 'Referral Letter',
+         10: 'Vaccination Certificate',
+         11: 'Memo',
+         12: 'Other Documents',
+         13: 'Credit Note Listing',
+         14: 'Void Credit Note & Payment',
+         15: 'Invoice',
+         16: 'Oustanding Payment',
+         17: 'Sales Listing',
+         18: 'Credit Note',
+         20: 'Low Stock',
+         21: 'Consumable Movement Report',
+         22: 'Medication Movement',
+         23: 'Deposit Transaction',
+         24: 'Drug Label',
+         25: 'Statement',
+         26: 'Purchase Order',
+         27: 'Patient Label',
+         29: 'Payment Receipt',
+         37: 'Inventory Trending Report',
+         55: 'Letter of Certification',
+         61: 'Refraction Form Report',
+         68: 'Patient History Report',
+         80: 'Visitation Invoice',
+       }
 
 export const REPORT_ID = {
   DRUG_LABEL_80MM_45MM: 24,
@@ -365,14 +365,6 @@ export const ADD_ON_FEATURE = {
   MIMS: 2,
 }
 
-export const RadiologyWorkitemStatus = {
-  1: 'New',
-  2: 'In Progress',
-  3: 'Modality Completed',
-  4: 'Completed',
-  5: 'Cancelled',
-}
-
 export const PharmacyWorkitemStatus = {
   1: 'New',
   2: 'Prepared',
@@ -441,6 +433,7 @@ export const SCRIBBLE_NOTE_TYPE = {
   CHIEFCOMPLAINTS: 2,
   PLAN: 6,
   HISTORY: 3,
+  RADIOLOGY: 9,
 }
 
 export const SMS_STATUS = {
@@ -644,6 +637,14 @@ export const DOSAGE_RULE = {
   default: 'default',
 }
 
+export const RADIOLOGY_WORKITEM_STATUS_TITLE = {
+  1: 'New',
+  2: 'In Progress',
+  3: 'Modality Completed',
+  4: 'Completed',
+  5: 'Cancelled',
+}
+
 export const RADIOLOGY_WORKITEM_STATUS = {
   NEW: 1,
   INPROGRESS: 2,
@@ -652,24 +653,35 @@ export const RADIOLOGY_WORKITEM_STATUS = {
   CANCELLED: 5,
 }
 
+export const RADIOLOGY_WORKLIST_STATUS_COLOR = {
+  1: '#009933',
+  2: '#960',
+  3: '#099',
+  4: '#366',
+  5: '#797979',
+}
+
 export const RADIOLOGY_WORKITEM_BUTTON = [
   {
     name: 'Start Examination',
     currentStatusFK: 1,
     nextStatusFK: 2,
     enableCancel: true,
+    authority: 'radiologyworklist.startexamination',
   },
   {
     name: 'Complete Modality',
     currentStatusFK: 2,
     nextStatusFK: 3,
     enableCancel: true,
+    authority: 'radiologyworklist.completemodality',
   },
   {
     name: 'Complete Reporting',
     currentStatusFK: 3,
     nextStatusFK: 4,
     enableCancel: false,
+    authority: 'radiologyworklist.completereporting',
   },
 ]
 
@@ -740,9 +752,12 @@ export const PHARMACY_ACTION = {
   VERIFY: 'Verify',
   COMPLETE: 'Complete',
   CANCEL: 'Cancel',
+  COMPLETEPARTIAL: 'CompletePartial',
 }
 
 export const CHECKLIST_CATEGORY = {
   RADIOLOGY: 1,
   DOCTORCONSULTATION: 2,
 }
+
+export const GENDER = { FEMALE: 1, MALE: 2 }

@@ -53,7 +53,7 @@ const _routes = [
       { path: '/reception', redirect: '/reception/queue' },
       {
         path: '/reception',
-        icon: 'icon-medicinebox-fill',
+        icon: 'icon-solution',
         name: 'reception',
         moduleName: 'Reception',
         authority: ['reception'],
@@ -132,6 +132,7 @@ const _routes = [
         name: 'radiology',
         moduleName: 'Radiology',
         authority: ['radiology'],
+        clinicSetting: ['isEnableRadiologyModule'],
         specialist: ['GP', 'Dental'],
         routes: [
           {
@@ -140,7 +141,7 @@ const _routes = [
             component: './Radiology/Worklist',
             mini: 'RW',
             exact: true,
-            //authority: ['reception/queue'], TODO:: to replace with actual permission
+            authority: ['radiology/worklist'],
           },
           {
             path: '/radiology/history',
@@ -154,7 +155,7 @@ const _routes = [
       },
       {
         path: '/pharmacy',
-        icon: 'icon-plus-square',
+        icon: 'icon-medicinebox-fill',
         name: 'pharmacy',
         moduleName: 'Pharmacy',
         authority: ['pharmacy'],
@@ -168,6 +169,14 @@ const _routes = [
             mini: 'PW',
             exact: true,
             authority: ['pharmacy/pharmacyworklist'],
+          },
+          {
+            path: '/pharmacy/history',
+            name: 'history',
+            component: './Pharmacy/History',
+            mini: 'PW',
+            exact: true,
+            authority: ['pharmacy/worklisthistory'],
           },
         ],
       },
@@ -522,6 +531,20 @@ const _routes = [
             component: './Setting/Company',
             authority: ['finance/copayer'],
           },
+          {
+            path: '/finance/copayer/newcopayer',
+            name: 'copayer/newcopayer',
+            hideInMenu: true,
+            component: './Setting/Company/CopayerDetails',
+            authority: ['finance/copayer'],
+          },
+          {
+            path: '/finance/copayer/editcopayer',
+            name: 'copayer/editcopayer',
+            hideInMenu: true,
+            component: './Setting/Company/CopayerDetails',
+            authority: ['finance/copayer'],
+          },
         ],
       },
       //
@@ -735,6 +758,12 @@ const _routes = [
             name: 'expiringstockreport',
             component: './Report/expiringstockreport',
             authority: ['report.inventory.expiringstockreport'],
+          },
+          {
+            path: '/report/radiologystatisticreport',
+            name: 'radiologystatisticreport',
+            component: './Report/RadiologyStatisticReport',
+            authority: ['report.finance.radiologystatisticreport'],
           },
         ],
       },

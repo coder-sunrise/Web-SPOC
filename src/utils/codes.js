@@ -1241,7 +1241,7 @@ export const inventoryItemListing = (
       uom,
       sellingPrice: x.sellingPrice,
       lastCostPriceBefBonus: x.lastCostPriceBefBonus,
-      [itemFKName]: x.id,
+      id: x.id,
       stateName,
       itemFK: x.id,
       isActive: x.isActive,
@@ -1384,6 +1384,7 @@ export const ReportsOnSignOffOption = {
   Memo: 'Memo',
   VaccinationCertificate: 'Vaccination Certificate',
   OtherDocuments: 'Other Documents',
+  PrescriptionSheet: 'Prescription Sheet',
 }
 export const ReportsOnSignOff = [
   { code: ReportsOnSignOffOption.DrugLabel, description: 'Drug Label' },
@@ -1407,6 +1408,10 @@ export const ReportsOnSignOff = [
   {
     code: ReportsOnSignOffOption.OtherDocuments,
     description: 'Other Documents',
+  },
+  {
+    code: ReportsOnSignOffOption.PrescriptionSheet,
+    description: 'Prescription Sheet',
   },
 ]
 export const ReportsOnCompletePaymentOption = {
@@ -1884,21 +1889,6 @@ const queueItemStatus = [
   {
     value: 4,
     name: 'Failed',
-  },
-]
-
-export const costPriceTypes = [
-  {
-    value: 1,
-    name: 'Average Cost Price',
-  },
-  {
-    value: 2,
-    name: 'Last Cost Price (Before Bonus)',
-  },
-  {
-    value: 3,
-    name: 'Last Cost Price (After Bonus)',
   },
 ]
 

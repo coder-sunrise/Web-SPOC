@@ -23,7 +23,7 @@ const Adjustment = ({
   amountProps,
   type,
   theme,
-  hiddenDelete = false,
+  isViewOnly = false,
 }) => {
   // console.log('Adjustment', amountProps)
   const isExactAmount = type === 'ExactAmount'
@@ -51,7 +51,7 @@ const Adjustment = ({
         </div>
       </GridItem>
       <GridItem xs={2}>
-        {(
+        {!isViewOnly && (
           <Tooltip title='Edit Adjustment'>
             <Button
               color='primary'
@@ -69,7 +69,7 @@ const Adjustment = ({
             </Button>
           </Tooltip>
         )}
-        {!hiddenDelete && (
+        {!isViewOnly && (
           <Tooltip title='Delete Adjustment'>
             <Button
               color='danger'

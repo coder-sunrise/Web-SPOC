@@ -24,7 +24,7 @@ class Grid extends PureComponent {
   }
 
   editRow = (row, e) => {
-    const { dispatch, settingCompany, route } = this.props
+    const { dispatch, settingCompany, route, history } = this.props
     const { name } = route
     const accessRight =
       name === 'copayer'
@@ -40,13 +40,18 @@ class Grid extends PureComponent {
 
     const { list } = settingCompany
 
-    dispatch({
-      type: 'settingCompany/updateState',
-      payload: {
-        showModal: true,
-        entity: list.find((o) => o.id === row.id),
-      },
-    })
+    if (name === 'copayer'){
+      history.push(`/finance/copayer/editcopayer?id=${row.id}`);
+    }
+    else {
+      dispatch({
+        type: 'settingCompany/updateState',
+        payload: {
+          showModal: true,
+          entity: list.find((o) => o.id === row.id),
+        },
+      })
+    }
   }
 
   handleClick = async (copayerId) => {
@@ -89,6 +94,7 @@ class Grid extends PureComponent {
   render () {
     const { route, height } = this.props
     const { name } = route
+
     return (
       <Fragment>
         <CommonTableGrid
@@ -103,45 +109,24 @@ class Grid extends PureComponent {
           columns={
             name === 'copayer' ? (
               [
-                {
-                  name: 'code',
-                  title: 'Co-payer Code',
-                },
-
-                {
-                  name: 'displayValue',
-                  title: 'Co-payer Name',
-                },
-
-                { name: 'coPayerTypeName', title: 'Co-payer Type' },
-
-                {
-                  name: 'contactNo',
-                  title: 'Contact No.',
-                },
-
-                { name: 'url', title: 'URL' },
-
+                { name: 'code', title: 'Co-Payer Code' },
+                { name: 'displayValue', title: 'Co-Payer Name' },
+                { name: 'coPayerTypeName', title: 'Co-Payer Type' },
+                { name: 'copayerContactPerson', title: 'Contact Person' },
+                { name: 'contactNo', title: 'Contact No.' },
+                { name: 'copayerContactPersonEmail', title: 'Email' },
+                { name: 'url', title: 'Website' },
+                { name: 'copayerCreditInformation', title: 'Credit Code' },
                 { name: 'isActive', title: 'Status' },
                 { name: 'action', title: 'Action' },
               ]
             ) : (
               [
-                {
-                  name: 'code',
-                  title: 'Company Code',
-                },
-
-                {
-                  name: 'displayValue',
-                  title: 'Company Name',
-                },
-
+                { name: 'code', title: 'Company Code' },
+                { name: 'displayValue', title: 'Company Name' },
                 { name: 'contactPerson', title: 'Contact Person' },
                 { name: 'contactNo', title: 'Contact No.' },
-
                 { name: 'officeNum', title: 'Office Number' },
-
                 { name: 'faxNo', title: 'Fax Number' },
                 { name: 'isGSTEnabled', title: 'GST Enable' },
                 { name: 'isActive', title: 'Status' },
@@ -153,7 +138,7 @@ class Grid extends PureComponent {
             {
               columnName: 'url',
               sortingEnabled: false,
-              width: 400,
+              width: 300,
               render: (row) => {
                 return (
                   <a
@@ -183,7 +168,7 @@ class Grid extends PureComponent {
             {
               columnName: 'coPayerTypeName',
               sortBy: 'coPayerTypeFK',
-              width: 200,
+              width: 140,
             },
             {
               columnName: 'officeNum',
@@ -204,8 +189,54 @@ class Grid extends PureComponent {
             {
               columnName: 'contactPerson',
               render: (row) => (
+
                 <span>{row.contactPerson ? row.contactPerson : '-'}</span>
               ),
+            },
+            {
+              columnName: 'copayerContactPerson',
+              render: (row) => {
+                let cell = <span>-</span>
+                if (row.defaultContactPerson && row.defaultContactPerson.name && row.defaultContactPerson.name !== '') {
+                  cell = (
+                    <Tooltip title={row.defaultContactPerson.name} placement='top'>
+                      <span>{row.defaultContactPerson.name}</span>
+                    </Tooltip>
+                  )
+                }
+
+                return cell;
+              },
+            },
+            {
+              columnName: 'copayerContactPersonEmail',
+              render: (row) => {
+                let cell = <span>-</span>
+                if (row.defaultContactPerson && row.defaultContactPerson.emailAddress && row.defaultContactPerson.emailAddress !== '') {
+                  cell = (
+                    <Tooltip title={row.defaultContactPerson.emailAddress} placement='top'>
+                      <span>{row.defaultContactPerson.emailAddress}</span>
+                    </Tooltip>
+                  )
+                }
+
+                return cell;
+              },
+            },
+            {
+              columnName: 'copayerCreditInformation',
+              render: (row) => {
+                let cell = <span>-</span>
+                if (row.creditInformation && row.creditInformation !== '') {
+                  cell = (
+                    <Tooltip title={row.creditInformation} placement='top'>
+                      <span>{row.creditInformation}</span>
+                    </Tooltip>
+                  )
+                }
+
+                return cell;
+              },
             },
             {
               columnName: 'faxNo',
@@ -224,23 +255,24 @@ class Grid extends PureComponent {
               ),
             },
             {
-              columnName: 'displayValue',
-              width: 500,
+              columnName: 'code',
+              width: 180,
             },
-
             {
               columnName: 'contactNo',
               sortingEnabled: false,
               width: 120,
               render: (row) => (
                 <span>
-                  {row.contact &&
-                  row.contact.mobileContactNumber &&
-                  row.contact.mobileContactNumber.number !== '' ? (
-                    row.contact.mobileContactNumber.number
-                  ) : (
-                    '-'
-                  )}
+                  {
+                    row.defaultContactPerson 
+                      && row.defaultContactPerson.mobileNumber 
+                      && row.defaultContactPerson.mobileNumber !== ''? (
+                        row.defaultContactPerson.mobileNumber
+                      ) : (
+                        '-'
+                      )
+                  }
                 </span>
               ),
             },
@@ -250,7 +282,7 @@ class Grid extends PureComponent {
               type: 'select',
               options: status,
               align: 'center',
-              width: 120,
+              width: 100,
             },
             {
               columnName: 'isGSTEnabled',

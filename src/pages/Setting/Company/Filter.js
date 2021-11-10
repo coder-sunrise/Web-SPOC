@@ -34,7 +34,7 @@ class Filter extends PureComponent {
   }
 
   render() {
-    const { classes, route, settingCompany } = this.props
+    const { classes, history, route, settingCompany } = this.props
     const { name } = route
     const { companyType } = settingCompany
     this.checkIsCopayer(name)
@@ -120,12 +120,12 @@ class Filter extends PureComponent {
                       color='primary'
                       onClick={() => {
                         this.props.dispatch({
-                          type: 'settingCompany/updateState',
+                          type: 'copayerDetail/updateState',
                           payload: {
                             entity: undefined,
                           },
-                        })
-                        this.props.toggleModal()
+                        });
+                        history.push('/finance/copayer/newcopayer');
                       }}
                     >
                       <Add />

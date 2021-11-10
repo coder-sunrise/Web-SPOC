@@ -427,7 +427,7 @@ export default compose(
       if (isDispensedByPharmacy || !medicationDetails.id) {
         checkboxGroup.push('isDispensedByPharmacy')
       }
-      if (isNurseActualizable || !medicationDetails.id) {
+      if (isNurseActualizable) {
         checkboxGroup.push('isNurseActualizable')
       }
 
@@ -489,12 +489,12 @@ export default compose(
       revenueCategoryFK: Yup.number().required(),
       indication: Yup.string().test(
         'oneOfRequired',
-        'Please enter indication in both languages',
+        'Please enter indication in all languages',
         validateIndication,
       ),
       indicationSecondary: Yup.string().test(
         'oneOfRequired',
-        'Please enter indication in both languages',
+        'Please enter indication in all languages',
         validateIndication,
       ),
       isMultiLanguage: Yup.boolean(),
@@ -515,7 +515,10 @@ export default compose(
 
       suggestSellingPrice: Yup.number()
         .min(0, 'Suggested Selling Price must between 0 and 999,999.99')
-        .max(999999.99, 'Suggested Selling Price must between 0 and 999,999.99'),
+        .max(
+          999999.99,
+          'Suggested Selling Price must between 0 and 999,999.99',
+        ),
 
       sellingPrice: Yup.number()
         .required()
@@ -574,6 +577,8 @@ export default compose(
         isExclusive: false,
         isDisplayInLeaflet: false,
         isOnlyClinicInternalUsage: false,
+        isDispensedByPharmacy: false,
+        isNurseActualizable: false,
       }
       values.checkboxGroup.forEach(o => {
         checkboxGroup[o] = true

@@ -88,6 +88,7 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
   const defaultItem = (item, groupName) => {
     return {
       ...item,
+      stockBalance: item.quantity,
       dispenseGroupId: groupName,
       countNumber: 1,
       rowspan: 1,
@@ -133,6 +134,7 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
         dispenseUOM: drugMixture.uomDisplayValue,
         isDispensedByPharmacy: drugMixture.isDispensedByPharmacy,
         drugMixtureName: item.name,
+        stockBalance: drugMixture.quantity,
         uid: getUniqueId(),
       }
       if (drugMixture.dispenseItem.length) {
@@ -154,12 +156,22 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
         })
       }
     })
+
+    const groupItems = orderItems.filter(
+      oi => oi.type === item.type && oi.id === item.id,
+    )
+    groupItems[0].groupNumber = 1
+    groupItems[0].groupRowSpan = groupItems.length
   }
 
   const generateFromTransaction = item => {
     const groupName = 'NormalDispense'
     if (item.isPreOrder) {
-      orderItems.push(defaultItem(item, groupName))
+      orderItems.push({
+        ...defaultItem(item, groupName),
+        groupNumber: 1,
+        groupRowSpan: 1,
+      })
       return
     }
 
@@ -178,6 +190,11 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
     } else {
       orderItems.push(defaultItem(item, groupName))
     }
+    const groupItems = orderItems.filter(
+      oi => oi.type === item.type && oi.id === item.id,
+    )
+    groupItems[0].groupNumber = 1
+    groupItems[0].groupRowSpan = groupItems.length
   }
 
   const sortOrderItems = [
@@ -206,7 +223,11 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
       item.type === 'Open Prescription' ||
       item.type === 'Medication (Ext.)'
     ) {
-      orderItems.push(defaultItem(item, 'NoNeedToDispense'))
+      orderItems.push({
+        ...defaultItem(item, 'NoNeedToDispense'),
+        groupNumber: 1,
+        groupRowSpan: 1,
+      })
     } else {
       generateFromTransaction(item)
     }

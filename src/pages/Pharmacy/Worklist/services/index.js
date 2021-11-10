@@ -6,5 +6,7 @@ const fns = {
   query: params => service.query(url, params),
   queryList: params => service.queryList(url, params),
   upsert: params => service.upsert(url, params),
+  queryJournalHistoryList: params =>
+    service.queryList(`${url}/GetJournalHistory`, params),
 }
 export default fns

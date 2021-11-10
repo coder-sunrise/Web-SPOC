@@ -54,8 +54,8 @@ import {
 } from '@devexpress/dx-react-grid-material-ui'
 import MenuItem from '@material-ui/core/MenuItem'
 import MenuList from '@material-ui/core/MenuList'
-import ArrowDownward from '@material-ui/icons/ArrowDownward';
-import ArrowUpward from '@material-ui/icons/ArrowUpward';
+import ArrowDownward from '@material-ui/icons/ArrowDownward'
+import ArrowUpward from '@material-ui/icons/ArrowUpward'
 import SettingsApplicationsIcon from '@material-ui/icons/SettingsApplications'
 import * as userService from '@/services/user'
 import { control } from '@/components/Decorator'
@@ -94,7 +94,7 @@ const cellStyle = {
   },
 }
 
-const Root = (props) => <DevGrid.Root {...props} style={{ height: '100%' }} />
+const Root = props => <DevGrid.Root {...props} style={{ height: '100%' }} />
 
 const getIndexedRows = (rows = [], pagerConfig = {}) => {
   const startIndex = pagerConfig.current
@@ -109,11 +109,12 @@ const getIndexedRows = (rows = [], pagerConfig = {}) => {
     }
   })
 }
-const SortingIcon = ({ direction }) => (
-  direction === 'asc'
-    ? <ArrowUpward style={{ fontSize: '18px' }} />
-    : <ArrowDownward style={{ fontSize: '18px' }} />
-)
+const SortingIcon = ({ direction }) =>
+  direction === 'asc' ? (
+    <ArrowUpward style={{ fontSize: '18px' }} />
+  ) : (
+    <ArrowDownward style={{ fontSize: '18px' }} />
+  )
 
 let uniqueGid = 0
 @connect(({ loading, global }, { type }) => {
@@ -126,10 +127,10 @@ let uniqueGid = 0
 class CommonTableGrid extends PureComponent {
   static defaultProps = {
     columnExtensions: [],
-    getRowId: (row) => (row.Id ? row.Id : row.id),
+    getRowId: row => (row.Id ? row.Id : row.id),
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     const {
       classes,
@@ -149,11 +150,13 @@ class CommonTableGrid extends PureComponent {
     this.gridId = `view-${uniqueGid++}`
     this.isScrollable = !!pHeight
     this.hashCode =
-      identifier || generateHashCode(JSON.stringify(columns.map((o) => o.name)))
-    const { user: { gridSetting = [] } } = window.g_app._store.getState()
-    const gs = gridSetting.find((o) => o.Identifier === this.hashCode) || {}
+      identifier || generateHashCode(JSON.stringify(columns.map(o => o.name)))
+    const {
+      user: { gridSetting = [] },
+    } = window.g_app._store.getState()
+    const gs = gridSetting.find(o => o.Identifier === this.hashCode) || {}
     if (gs.ColumnsOrder && gs.ColumnsOrder.length !== columns.length) {
-      gs.ColumnsOrder = columns.map((o) => o.name)
+      gs.ColumnsOrder = columns.map(o => o.name)
     }
     // this.myRef = React.createRef()
     const { pagerDefaultState = {} } = FuncProps
@@ -200,11 +203,13 @@ class CommonTableGrid extends PureComponent {
     this.TableBody = Table.TableBody
     this.TableRow = this.Row // tableRowRender
     if (!editableGrid && rowDragable) {
-      this.TableRow = (rowProps) => {
+      this.TableRow = rowProps => {
         const { tableRow } = rowProps
         const { row } = tableRow
         // console.log(rowProps)
-        const index = this.getData().map((i) => i.id).indexOf(getRowId(row))
+        const index = this.getData()
+          .map(i => i.id)
+          .indexOf(getRowId(row))
         const DragableRow = SortableElement(this.Row)
         return <DragableRow {...rowProps} index={index} />
       }
@@ -252,13 +257,12 @@ class CommonTableGrid extends PureComponent {
                 return ''
               }}
             >
-            <Tooltip title={children} placement='top'>
-            <div>{children}</div>
-          </Tooltip>
+              <Tooltip title={children} placement='top'>
+                <div>{children}</div>
+              </Tooltip>
             </TableHeaderRow.SortLabel>
           )
-        }
-      }
+        }}
       />
     )
 
@@ -269,12 +273,12 @@ class CommonTableGrid extends PureComponent {
       selectRowHighlightable: false,
       pager: true,
       pagerStateConfig: {
-        onCurrentPageChange: (current) => {
+        onCurrentPageChange: current => {
           this.search({
             current: current + 1,
           })
         },
-        onPageSizeChange: (pagesize) => {
+        onPageSizeChange: pagesize => {
           this.search({
             pagesize,
             current: 1,
@@ -483,7 +487,7 @@ class CommonTableGrid extends PureComponent {
     // console.log(props.query, ' c grid')
   }
 
-  static getDerivedStateFromProps (nextProps, preState) {
+  static getDerivedStateFromProps(nextProps, preState) {
     // console.log(JSON.stringify(nextProps))
     const { entity, type, columnExtensions } = nextProps
     // console.log(nextProps)
@@ -501,8 +505,8 @@ class CommonTableGrid extends PureComponent {
     ) {
       // console.log(_entity.filter)
       if (_entity.filter && _entity.filter.sorting) {
-        _entity.filter.sorting.forEach((o) => {
-          const c = columnExtensions.find((m) => m.sortBy === o.columnName)
+        _entity.filter.sorting.forEach(o => {
+          const c = columnExtensions.find(m => m.sortBy === o.columnName)
           if (c) {
             o.columnName = c.sortBy || c.columnName
           }
@@ -550,7 +554,7 @@ class CommonTableGrid extends PureComponent {
     return null
   }
 
-  componentDidMount () {
+  componentDidMount() {
     // console.log('componentDidMount')
     const { forceRenderDuration = 1000, forceRender } = this.props
     if (!forceRender) enableTableForceRender(forceRenderDuration)
@@ -581,12 +585,12 @@ class CommonTableGrid extends PureComponent {
   //   return true
   // }
 
-  search = (payload) => {
+  search = payload => {
     const { query, dispatch, type, queryMethod = 'query' } = this.props
     // window.$tempGridRow[this.gridId] = {}
     if (query) {
       query({
-        callback: (data) => {
+        callback: data => {
           // console.log(data)
           if (data) {
             const { current, data: list, pagesize, totalRecords } = data
@@ -613,7 +617,7 @@ class CommonTableGrid extends PureComponent {
         type: `${type}/${queryMethod}`,
         payload: p,
       }).then(() => {
-        this.setState((ps) => {
+        this.setState(ps => {
           return {
             pagination: {
               ...ps.pagination,
@@ -669,7 +673,7 @@ class CommonTableGrid extends PureComponent {
   //   )
   // }
 
-  Row = (p) => {
+  Row = p => {
     const { classes, FuncProps = {}, ...restProps } = this.props
     const { selectRowHighlightable = false } = FuncProps
     return (
@@ -685,9 +689,7 @@ class CommonTableGrid extends PureComponent {
               })
             } else {
               this.setState({
-                selectedItem: [
-                  rowId,
-                ],
+                selectedItem: [rowId],
               })
             }
           }
@@ -696,12 +698,12 @@ class CommonTableGrid extends PureComponent {
     )
   }
 
-  Cell = (p) => {
+  Cell = p => {
     const { rows = [], FuncProps = {}, ...restProps } = this.props
     // console.log(restProps, p)
     const { selectRowHighlightable = false } = FuncProps
     const row = rows.find(
-      (o) => this.props.getRowId(o) === this.props.getRowId(p.row),
+      o => this.props.getRowId(o) === this.props.getRowId(p.row),
     )
     const rowId = this.props.getRowId(row || p.row)
     const highlitSytle =
@@ -728,9 +730,9 @@ class CommonTableGrid extends PureComponent {
     // const childRows = rows.filter((r) => r.parentId === (row ? row.id : 0))
     // console.log(row, rows, childRows)
     // return childRows.length ? childRows : null
-    const { getRowId = (r) => (r.Id ? r.Id : r.id) } = this.props
+    const { getRowId = r => (r.Id ? r.Id : r.id) } = this.props
     const childRows = rootRows.filter(
-      (r) => r.parentId === (row ? getRowId(row) : null),
+      r => r.parentId === (row ? getRowId(row) : null),
     )
     // console.log(childRows)
     return childRows.length ? childRows : null
@@ -742,7 +744,7 @@ class CommonTableGrid extends PureComponent {
     return getIndexedRows(
       this.state.entity
         ? this.state.entity.list
-        : rows.filter((o) => !o.isDeleted || showIsDeleted),
+        : rows.filter(o => !o.isDeleted || showIsDeleted),
       this.state.pagination,
     )
   }
@@ -813,16 +815,11 @@ class CommonTableGrid extends PureComponent {
     )
   }
 
-  render () {
+  render() {
     const { state, props } = this
     const {
       classes,
-      pageSizes = [
-        5,
-        10,
-        50,
-        100,
-      ],
+      pageSizes = [5, 10, 50, 100],
       columns = [],
       type,
       defaultSorting = [],
@@ -837,13 +834,13 @@ class CommonTableGrid extends PureComponent {
       errors = [],
       query,
       getRowId,
-      onSelectionChange = (f) => f,
+      onSelectionChange = f => f,
       FuncProps = {},
       TableProps = {},
       ActionProps = {},
       FilteringProps: {
         defaultFilters = [],
-        onFiltersChange = (f) => f,
+        onFiltersChange = f => f,
         filterColumnExtensions = [],
       } = {},
       LoadingProps: { isLoading = false, loadingMessage = 'Retrieve data' } = {
@@ -872,7 +869,7 @@ class CommonTableGrid extends PureComponent {
       selectRowHighlightable,
       selectConfig = {
         showSelectAll: false,
-        rowSelectionEnabled: (row) => true,
+        rowSelectionEnabled: row => true,
       },
       pager,
       pagerConfig = {},
@@ -912,10 +909,10 @@ class CommonTableGrid extends PureComponent {
           width: 80,
           align: 'left',
           disabled: true,
-          render: (row) => {
+          render: row => {
             return isNumber(row.rowIndex) ? row.rowIndex + 1 : ''
           },
-          editRender: (row) => {
+          editRender: row => {
             return isNumber(row.rowIndex) ? row.rowIndex + 1 : ''
           },
         },
@@ -933,8 +930,8 @@ class CommonTableGrid extends PureComponent {
         },
       ],
       ...columns
-        .filter((o) => !columnExtensions.find((m) => m.columnName === o.name))
-        .map((o) => {
+        .filter(o => !columnExtensions.find(m => m.columnName === o.name))
+        .map(o => {
           let extraCfg = {}
           if (o.name === 'action') {
             extraCfg = {
@@ -948,11 +945,9 @@ class CommonTableGrid extends PureComponent {
           }
         }),
     ])
-    let actionCol = columnExtensions.find((o) => o.columnName === 'action')
+    let actionCol = columnExtensions.find(o => o.columnName === 'action')
     if (actionCol) {
-      columnExtensions = columnExtensions.filter(
-        (o) => o.columnName !== 'action',
-      )
+      columnExtensions = columnExtensions.filter(o => o.columnName !== 'action')
       columnExtensions.push({
         ...actionColDefaultCfg,
         ...actionCol,
@@ -970,7 +965,7 @@ class CommonTableGrid extends PureComponent {
 
       ...TableProps,
     }
-    columnExtensions.forEach((c) => {
+    columnExtensions.forEach(c => {
       c.validationSchema = schema
       c.gridId = gridId || this.gridId
       c.getRowId = getRowId
@@ -1016,23 +1011,17 @@ class CommonTableGrid extends PureComponent {
     if (
       !editableGrid &&
       rowDragable &&
-      !newColumns.find((o) => o.name === 'rowDrag')
+      !newColumns.find(o => o.name === 'rowDrag')
     ) {
-      newLeftCols = [
-        'rowDrag',
-      ].concat(newLeftCols)
+      newLeftCols = ['rowDrag'].concat(newLeftCols)
       newColumns.unshift({ name: 'rowDrag', title: ' ' })
     }
-    if (rowMoveable && !newColumns.find((o) => o.name === 'rowMove')) {
-      newLeftCols = [
-        'rowMove',
-      ].concat(newLeftCols)
+    if (rowMoveable && !newColumns.find(o => o.name === 'rowMove')) {
+      newLeftCols = ['rowMove'].concat(newLeftCols)
       newColumns.unshift({ name: 'rowMove', title: ' ' })
     }
-    if (showRowNumber && !newColumns.find((o) => o.name === 'rowIndex')) {
-      newLeftCols = [
-        'rowIndex',
-      ].concat(newLeftCols)
+    if (showRowNumber && !newColumns.find(o => o.name === 'rowIndex')) {
+      newLeftCols = ['rowIndex'].concat(newLeftCols)
       newColumns.unshift({ name: 'rowIndex', title: 'No.' })
     }
     // console.log(window.$tempGridRow)
@@ -1080,11 +1069,11 @@ class CommonTableGrid extends PureComponent {
                 <SortingState
                   sorting={this.state.pagination.sorting}
                   defaultSorting={defaultSorting}
-                  onSortingChange={(_cmptSortings) => {
+                  onSortingChange={_cmptSortings => {
                     // console.log(_cmptSortings, this.state.entity.pagination)
                     _cmptSortings.forEach((o, i) => {
                       const c = columnExtensions.find(
-                        (m) => m.columnName === o.columnName,
+                        m => m.columnName === o.columnName,
                       )
                       if (this.state.entity) {
                         const { sorting = [] } = this.state.entity.pagination
@@ -1121,21 +1110,19 @@ class CommonTableGrid extends PureComponent {
                 />
               )}
               {tree && <TreeDataState />}
-              {extraState.map((o) => o)}
+              {extraState.map(o => o)}
               {grouping && (
                 <IntegratedGrouping
                   columnExtensions={groupingConfig.columnExtensions || []}
                 />
               )}
               {/* <IntegratedFiltering /> */}
-              {sort &&
-              !type && (
+              {sort && !type && (
                 <IntegratedSorting columnExtensions={columnExtensions} />
               )}
               {summary && <IntegratedSummary {...summaryConfig.integrated} />}
               {pager && !this.state.entity && <IntegratedPaging />}
-              {pager &&
-              this.state.entity && (
+              {pager && this.state.entity && (
                 <CustomPaging totalCount={this.state.pagination.totalRecords} />
               )}
               {selectable && (
@@ -1186,9 +1173,9 @@ class CommonTableGrid extends PureComponent {
                 <TableColumnReordering
                   defaultOrder={
                     state.gridSetting.ColumnsOrder ||
-                    newColumns.map((o) => o.name)
+                    newColumns.map(o => o.name)
                   }
-                  onOrderChange={(ary) => {
+                  onOrderChange={ary => {
                     const gridSetting = {
                       ...state.gridSetting,
                       ColumnsOrder: ary,
@@ -1197,10 +1184,9 @@ class CommonTableGrid extends PureComponent {
                   }}
                 />
               )}
-              {header &&
-              resizable && (
+              {header && resizable && (
                 <TableColumnResizing
-                  defaultColumnWidths={columnExtensions.map((o) => {
+                  defaultColumnWidths={columnExtensions.map(o => {
                     return {
                       columnName: o.columnName,
                       width: o.width || 100,
@@ -1209,24 +1195,35 @@ class CommonTableGrid extends PureComponent {
                 />
               )}
               {header && <HeaderRow showSortingControls />}
-              {extraRow.map((o) => o)}
+              {extraRow.map(o => o)}
               {pager && <PagingPanel pageSizes={pageSizes} {...pagerConfig} />}
               {grouping && (
                 <TableGroupRow
-                  rowComponent={(p) => {
-                    return <TableGroupRow.Row className='group' {...p} />
+                  rowComponent={p => {
+                    return (
+                      <TableGroupRow.Row
+                        className={
+                          groupingConfig.isDisableExpandedGroups
+                            ? 'disableexpandedgroup'
+                            : 'group'
+                        }
+                        {...p}
+                        style={{
+                          backgroundColor: groupingConfig.backgroundColor,
+                        }}
+                      />
+                    )
                   }}
                   {...groupingConfig.row}
                 />
               )}
               {showToolbar && <Toolbar />}
-              {grouping &&
-              groupingConfig.showToolbar && (
+              {grouping && groupingConfig.showToolbar && (
                 <GroupingPanel showSortingControls />
               )}
               {summary && (
                 <TableSummaryRow
-                  itemComponent={(p) => {
+                  itemComponent={p => {
                     return (
                       <TableSummaryRow.Item
                         className={classes.cleanFormat}
@@ -1241,7 +1238,7 @@ class CommonTableGrid extends PureComponent {
                 <TableColumnVisibility
                   defaultHiddenColumnNames={state.gridSetting.HiddenColumns}
                   // hiddenColumnNames={this.state.hiddenCols}
-                  onHiddenColumnNamesChange={(ary) => {
+                  onHiddenColumnNamesChange={ary => {
                     const gridSetting = {
                       ...state.gridSetting,
                       HiddenColumns: ary,
@@ -1261,22 +1258,16 @@ class CommonTableGrid extends PureComponent {
                 />
               )}
               {tree && <TableTreeColumn {...treeColumnConfig} />}
-              {extraColumn.map((o) => o)}
+              {extraColumn.map(o => o)}
               <TableFixedColumns
                 rightColumns={
-                  rightColumns.length > 0 ? (
-                    rightColumns
-                  ) : (
-                    [
-                      'action',
-                      'Action',
-                      'editCommand',
-                    ]
-                  )
+                  rightColumns.length > 0
+                    ? rightColumns
+                    : ['action', 'Action', 'editCommand']
                 }
                 leftColumns={newLeftCols}
               />
-              {extraGetter.map((o) => o)}
+              {extraGetter.map(o => o)}
               {/* <Getter
                 key='Getter-totalSummaryItems'
                 name='totalSummaryItems'
@@ -1325,17 +1316,11 @@ CommonTableGrid.propTypes = {
     filterColumnExtensions: PropTypes.array,
   }),
   ActionProps: PropTypes.shape({
-    TableCellComponent: PropTypes.oneOfType([
-      PropTypes.object,
-      PropTypes.func,
-    ]),
+    TableCellComponent: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
   }),
   LoadingProps: PropTypes.shape({
     isLoading: PropTypes.bool.isRequired,
-    loadingMessage: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.object,
-    ]),
+    loadingMessage: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   }),
 }
 

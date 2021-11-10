@@ -280,7 +280,7 @@ const AddOrder = ({
 
   useEffect(() => {
     const { entity } = dispense
-    const { invoice } = entity
+    const { invoice } = entity || {}
 
     if (visitType === VISIT_TYPE.OTC)
       displayExistingOrders(invoice.id, ctservice)
@@ -585,7 +585,7 @@ export default compose(
                 adjType: o.adjType,
                 adjValue: o.adjValue,
                 itemCode: o.serviceCode,
-                itemName: o.serviceName,
+                itemName: o.newServiceName && o.newServiceName.trim() !== '' ? o.newServiceName : o.serviceName,
                 subTotal: roundTo(o.total),
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.SERVICE,
                 unitPrice: roundTo(o.total) || 0,

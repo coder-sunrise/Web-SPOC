@@ -257,7 +257,7 @@ class FamilyMemberGrid extends PureComponent {
           schema={schema.patientFamilyMember._subType}
           FuncProps={{
             pagerConfig: {
-              containerExtraComponent: (
+              containerExtraComponent: !this.props.disabled && (
                 <Button
                   onClick={this.toggleModal}
                   // hideIfNoEditRights
@@ -273,6 +273,7 @@ class FamilyMemberGrid extends PureComponent {
           }}
           EditingProps={{
             showAddCommand: false,
+            isDeletable: row => !this.props.disabled,
             onCommitChanges: this.commitChanges,
             onAddedRowsChange: rows => {
               return rows.map(o => {

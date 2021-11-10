@@ -187,6 +187,22 @@ class PatientDetail extends PureComponent {
         }),
       },
       {
+        id: '12',
+        name: 'Claim History',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
+        component: Loadable({
+          loader: () => import('./ClaimHistory'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...p} />
+          },
+          loading: Loading,
+        }),
+      },
+      {
         id: '5',
         name: 'Patient Results',
         access: [
@@ -309,6 +325,17 @@ class PatientDetail extends PureComponent {
       }
     }
 
+    const AllergiesAccessRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.allergies',
+    )
+    if (AllergiesAccessRight) {
+      const hiddenAllergiesByAccessRight =
+        AllergiesAccessRight.rights === 'hidden'
+      if (hiddenAllergiesByAccessRight) {
+        this.widgets = this.widgets.filter(t => t.id !== '3')
+      }
+    }
+
     const SchemeAccessRight = Authorized.check('scheme.schemedetails')
     if (SchemeAccessRight) {
       const hiddenSchemeByAccessRight = SchemeAccessRight.rights === 'hidden'
@@ -328,9 +355,26 @@ class PatientDetail extends PureComponent {
       }
     }
 
+    const emergencyContactAccessRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.emergencycontact',
+    )
+    if (emergencyContactAccessRight) {
+      const hiddenEmergencyContactByAccessRight =
+        emergencyContactAccessRight.rights === 'hidden'
+      if (hiddenEmergencyContactByAccessRight) {
+        this.widgets = this.widgets.filter(t => t.id !== '2')
+      }
+    }
     const { clinicSettings } = this.props
     if (!clinicSettings.isEnablePackage) {
       this.widgets = this.widgets.filter(w => w.id !== '10')
+    }
+
+    const viewClaimHistoryRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.viewclaimhistory',
+    ) || { rights: 'hidden' }
+    if (viewClaimHistoryRight.rights === 'hidden') {
+      this.widgets = this.widgets.filter(t => t.id !== '12')
     }
   }
 
@@ -666,7 +710,7 @@ class PatientDetail extends PureComponent {
                     rights: currentItemDisabled ? 'disable' : 'enable', //
                   }}
                 >
-                  <CurrentComponent {...resetProps} />
+                  <CurrentComponent {...resetProps} height={height} />
                 </Authorized.Context.Provider>
               </div>
             </CardContainer>

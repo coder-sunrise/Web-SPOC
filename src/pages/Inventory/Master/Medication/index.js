@@ -17,7 +17,7 @@ const Medication = ({ dispatch, history, medication, values }) => {
       { name: 'favouriteSupplierName', title: 'Supplier' },
       { name: 'genericMedicationName', title: 'Generic Drug' },
       { name: 'medicationGroupName', title: 'Drug Group' },
-      { name: 'dispensingUOM', title: 'Disp. UOM' },
+      { name: 'dispensingUOMName', title: 'Disp. UOM' },
       { name: 'stock', title: 'Stock' },
       { name: 'averageCostPrice', title: 'Avg Cost Price' },
       { name: 'sellingPrice', title: 'Selling Price' },
@@ -37,10 +37,7 @@ const Medication = ({ dispatch, history, medication, values }) => {
       width: 250,
     },
     {
-      columnName: 'dispensingUOM',
-      type: 'codeSelect',
-      code: 'ctmedicationunitofmeasurement',
-      labelField: 'displayValue',
+      columnName: 'dispensingUOMName',
       sortBy: 'DispensingUOMFkNavigation.DisplayValue',
     },
     {

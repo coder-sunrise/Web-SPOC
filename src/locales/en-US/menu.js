@@ -52,6 +52,9 @@ export default {
   'menu.finance.statement/statementpayment': 'Statement Payment',
   'menu.finance.scheme': 'Scheme',
   'menu.finance.scheme/detail': 'Scheme Detail',
+  'menu.finance.copayer': 'Co-Payer',
+  'menu.finance.copayer/newcopayer': 'Add Co-Payer',
+  'menu.finance.copayer/editcopayer': 'Edit Co-Payer',
 
   'menu.reception': 'Reception',
   'menu.reception.queue': 'Queue',
@@ -87,10 +90,11 @@ export default {
   'menu.report.gstReport': 'GST Report',
   'menu.report.inventoryMovementReport': 'Inventory Movement Report',
   'menu.report.chasClaimReport': 'CHAS Claim Report',
-  'menu.report.voidCreditNoteReport': 'Void Credit Note & Payment Report',
+  'menu.report.voidCreditNoteReport':
+    'Void Credit Note & Payment & Write Off Report',
   'menu.report.salesListingReport': 'Sales Listing Report',
   'menu.report.invoiceListingReport': 'Invoice Listing Report',
-  'menu.report.lowStockReport': 'Low Stock Report',
+  'menu.report.lowStockReport': 'Inventory Threshold Report',
   'menu.report.depositTransactionReport': 'Deposit Transaction Report',
   'menu.report.creditNoteListingReport': 'Credit Note Listing Report',
   'menu.report.inventorytrendingreport': 'Inventory Trending Report',
@@ -150,7 +154,6 @@ export default {
   'menu.setting.gstsetup': 'GST Setup',
   'menu.setting.generalsetting': 'General Setting',
   'menu.setting.queuedisplaysetup': 'Queue Display Setup',
-  'menu.finance.copayer': 'Co-Payer',
   'menu.setting.supplier': 'Supplier',
   'menu.setting.paymentmode': 'Payment Mode',
   'menu.setting.appointmenttype': 'Appointment Type',
@@ -190,6 +193,7 @@ export default {
   'menu.report.packageexpiry': 'Package Expiry Report',
   'menu.report.viewreport': 'View Report',
   'menu.report.expiringstockreport': 'Expiring Stock Report',
+  'menu.report.radiologystatisticreport': 'Radiology Statistic Report',
 
   'menu.report.visitListingReport': 'Visit Listing Report',
 
@@ -208,6 +212,7 @@ export default {
 
   'menu.pharmacy': 'Pharmacy',
   'menu.pharmacy.worklist': 'Worklist',
+  'menu.pharmacy.history': 'History',
 
   'menu.not-found': 'Not Found',
   'menu.forbidden': 'Forbidden',

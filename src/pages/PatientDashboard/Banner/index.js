@@ -125,7 +125,7 @@ class Banner extends PureComponent {
     return (
       entity &&
       entity.isActive && (
-        <span style={{ marginTop: 5 }}>{allergyData || ''}</span>
+        <span style={{ marginTop: 5 }}>{allergyData || '-'}</span>
       )
     )
   }
@@ -288,6 +288,10 @@ class Banner extends PureComponent {
     const chasOrMedisave = (schemeDataList || []).filter(
       o => o.schemeTypeFK <= 6 || this.isMedisave(o.schemeTypeFK),
     )
+    const { patient } = this.props
+    const { entity } = patient
+    const { patientScheme } = entity
+    if (schemeDataList.length === 0) return '-'
     return schemeDataList.map((s, i, arr) => (
       <span style={{ paddingRight: 5, display: 'inline-block' }}>
         {chasOrMedisave &&
@@ -390,7 +394,7 @@ class Banner extends PureComponent {
             <Link>
               <span
                 style={{
-                  color: 'black',
+                  color: patientScheme[i].isExpired ? 'red' : 'black',
                   textDecoration: 'underline',
                   whiteSpace: 'nowrap',
                 }}
@@ -407,7 +411,7 @@ class Banner extends PureComponent {
           <Link>
             <span
               style={{
-                color: 'black',
+                color: patientScheme[i].isExpired ? 'red' : 'black',
                 textDecoration: 'underline',
                 whiteSpace: 'nowrap',
               }}
@@ -426,7 +430,23 @@ class Banner extends PureComponent {
       </span>
     ))
   }
-
+  getTagData = () => {
+    const { patient } = this.props
+    const { entity } = patient
+    let tagData = ''
+    if (entity.patientTag.length > 0) {
+      tagData = entity.patientTag.map(t => t.tagName).join(', ')
+    }
+    if (entity.patientTagRemarks) {
+      if (tagData === '') {
+        tagData = entity.patientTagRemarks
+      } else {
+        tagData += ' -' + entity.patientTagRemarks
+      }
+    }
+    if (!!tagData) return tagData
+    return '-'
+  }
   refreshGovtBalance = () => {
     this.refreshChasBalance()
     this.refreshMedisaveBalance()
@@ -970,8 +990,11 @@ class Banner extends PureComponent {
                       />
                     </span>
 
-                    <span className={classes.part}>
-                      <PatientStickyNotesBtn patientProfileFK={info.id}/>
+                    <span
+                      className={classes.part}
+                      style={{ top: 3, position: 'relative' }}
+                    >
+                      <PatientStickyNotesBtn patientProfileFK={info.id} />
                     </span>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
@@ -981,15 +1004,16 @@ class Banner extends PureComponent {
                       className={classes.contents}
                       style={{ WebkitLineClamp: 1 }}
                     >
-                      {info.patientRequest || ''}
+                      {info.patientRequest || '-'}
                     </span>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
                     <span className={classes.header}>Tag: </span>
-                    <span className={classes.contents} style={{WebkitLineClamp: 1}}>
-                      {info.patientTag.length > 0
-                        ? info.patientTag.map(t => t.tagName).join(', ')
-                        : ''}
+                    <span
+                      className={classes.contents}
+                      style={{ WebkitLineClamp: 1 }}
+                    >
+                      {this.getTagData()}
                     </span>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
@@ -1008,7 +1032,7 @@ class Banner extends PureComponent {
                         className={classes.contents}
                         style={{ WebkitLineClamp: 1 }}
                       >
-                        {info.patientMedicalHistory?.highRiskCondition}
+                        {info.patientMedicalHistory?.highRiskCondition || '-'}
                       </span>
                     </div>
                   </GridItem>
@@ -1029,23 +1053,23 @@ class Banner extends PureComponent {
                               <Refresh />
                             </IconButton>
                           )}
+                        {this.getSchemeList(
+                          _.orderBy(schemeDataList, ['schemeTypeFK'], ['asc']),
+                        )}
                       </span>
-                      {this.getSchemeList(
-                        _.orderBy(schemeDataList, ['schemeTypeFK'], ['asc']),
-                      )}
                     </LoadingWrapper>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
                     <span className={classes.header}>Non-Claimable Info: </span>
                     <span className={classes.contents}>
-                      {info.nonClaimableInfo || ''}
+                      {info.nonClaimableInfo || '-'}
                     </span>
                   </GridItem>
 
                   <GridItem xs={6} md={4} className={classes.cell}>
                     <span className={classes.header}>Payment Info: </span>
                     <span className={classes.contents}>
-                      {info.paymentInfo || ''}
+                      {info.paymentInfo || '-'}
                     </span>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
@@ -1057,7 +1081,7 @@ class Banner extends PureComponent {
                         ? info.patientHistoryDiagnosis
                             .map(d => d.diagnosisDescription)
                             .join(', ')
-                        : ''}
+                        : '-'}
                     </span>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
@@ -1065,7 +1089,7 @@ class Banner extends PureComponent {
                       Long Term Medication:{' '}
                     </span>
                     <span className={classes.contents}>
-                      {info.patientMedicalHistory?.longTermMedication || ''}
+                      {info.patientMedicalHistory?.longTermMedication || '-'}
                     </span>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>

@@ -23,6 +23,7 @@ const Detail = ({
   hasActiveSession,
   theme,
   clinicSettings,
+  values,
 }) => {
   const { settings = [] } = clinicSettings
   return (
@@ -48,6 +49,7 @@ const Detail = ({
                           id: 'inventory.master.consumable.code',
                         })}
                         {...args}
+                        disabled={values.isActive && values.id}
                       />
                     )
                   }}
@@ -62,7 +64,6 @@ const Detail = ({
                         label={formatMessage({
                           id: 'inventory.master.consumable.name',
                         })}
-                        disabled={consumableDetail.entity}
                         {...args}
                       />
                     )
@@ -156,7 +157,7 @@ const Detail = ({
                             ...[
                               {
                                 id: 'isDispensedByPharmacy',
-                                name: 'Dispense by Pharmacy',
+                                name: 'Dispensed by Pharmacy',
                                 tooltip:
                                   "Item’s stock is deducted and dispense by pharmacy. If unchecked the setting, stock deduction will take place during finalization of patient's order",
                                 disabled:

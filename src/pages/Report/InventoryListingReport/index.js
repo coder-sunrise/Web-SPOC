@@ -33,7 +33,6 @@ const InventoryListingReportWithFormik = withFormik({
   validationSchema: Yup.object().shape({}),
   mapPropsToValues: () => ({
     inventoryType: 'MEDICATION',
-    costPriceType: 1,
   }),
 })(InventoryListingReport)
 

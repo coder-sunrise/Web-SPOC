@@ -13,12 +13,13 @@ import {
   CommonTableGrid,
   Popover,
 } from '@/components'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { VISIT_TYPE, VISIT_TYPE_NAME } from '@/utils/constants'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import { FileDoneOutlined } from '@ant-design/icons'
 import Warning from '@material-ui/icons/Error'
-import WorlistContext from '../Worklist/WorklistContext'
+import WorklistContext from '../Worklist/WorklistContext'
+import VisitGroupIcon from './VisitGroupIcon'
+import PrintPrescription from './PrintPrescription'
 
 const blueColor = '#1890f8'
 
@@ -69,7 +70,7 @@ const WorkitemTitle = ({ item, classes }) => {
   let genderColor
   if (item.genderFK === 1) {
     gender = 'female'
-    genderColor = 'pink'
+    genderColor = '#F5559F'
   } else if (item.genderFK === 2) {
     gender = 'male'
     genderColor = blueColor
@@ -139,54 +140,8 @@ const WorkitemTitle = ({ item, classes }) => {
 }
 
 const WorkitemBody = ({ item, classes, clinicSettings }) => {
-  const { setDetailsId } = useContext(WorlistContext)
+  const { setDetailsId } = useContext(WorklistContext)
   const orderDate = moment(item.generateDate).format('DD MMM YYYY HH:mm')
-
-  const visitGroup = item => {
-    return (
-      <CommonTableGrid
-        forceRender
-        size='sm'
-        FuncProps={{ pager: false }}
-        rows={item.visitGroupListing || []}
-        columns={[
-          { name: 'queueNo', title: 'Q. No.' },
-          { name: 'name', title: 'Name' },
-          { name: 'gender', title: 'Gender' },
-          { name: 'age', title: 'Age' },
-        ]}
-        columnExtensions={[
-          {
-            columnName: 'queueNo',
-            width: 70,
-            sortingEnabled: false,
-            render: row => {
-              const { isQueueNoDecimal } = clinicSettings
-              const queueNo =
-                !row.queueNo || !row.queueNo.trim().length
-                  ? '-'
-                  : numeral(row.queueNo).format(isQueueNoDecimal ? '0.0' : '0')
-              return <div>{queueNo}</div>
-            },
-          },
-          {
-            columnName: 'name',
-            sortingEnabled: false,
-          },
-          {
-            columnName: 'gender',
-            width: 60,
-            sortingEnabled: false,
-          },
-          {
-            columnName: 'age',
-            width: 60,
-            sortingEnabled: false,
-          },
-        ]}
-      />
-    )
-  }
 
   const showGroup = item.visitGroup && item.visitGroup.trim().length
   const doctorName = `${
@@ -260,44 +215,19 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
         >
           Details
         </Typography.Text>
-        <Typography.Text
-          underline
-          style={{
-            cursor: 'pointer',
-            marginLeft: 10,
-            color: blueColor,
-          }}
-          onClick={() => {
-            printPrescription(item.visitFK)
-          }}
-        >
-          Print Prescription
-        </Typography.Text>
+        <PrintPrescription {...item} />
         {item.isOrderUpdate && (
           <Tooltip title='Order has been amended, please retrieve latest order from Details link'>
             <Warning className={classes.warningIcon} />
           </Tooltip>
         )}
         {showGroup && (
-          <Popover
-            icon={null}
-            trigger='hover'
-            placement='right'
-            content={
-              <div style={{ padding: 3, width: 400 }}>{visitGroup(item)}</div>
-            }
-          >
-            <Icon
-              type='team'
-              style={{
-                color: 'red',
-                fontSize: '1rem',
-                marginLeft: 10,
-              }}
-            />
-          </Popover>
+          <VisitGroupIcon
+            visitGroup={item.visitGroup}
+            visitFK={item.visitFK}
+            isQueueNoDecimal={isQueueNoDecimal}
+          />
         )}
-        {showGroup && <span>{item.visitGroup}</span>}
       </div>
     </div>
   )
