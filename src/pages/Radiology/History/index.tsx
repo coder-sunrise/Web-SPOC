@@ -497,7 +497,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       initialValue: [-99],
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
         const radiographer = (codetable.clinicianprofile || []).filter(
-          x => x.userProfile.role.id === 4 /*replace to radiographer role id*/,
+          x => x.userProfile.role.normalizedName === 'RADIOGRAPHER',
         )
         const radiographerOptions = radiographer.map(x => {
           return { value: x.userProfile.id, name: x.name }
