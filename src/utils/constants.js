@@ -221,7 +221,7 @@ export const REPORT_TYPE = {
          11: 'Memo',
          12: 'Other Documents',
          13: 'Credit Note Listing',
-         14: 'Void Credit Note & Payment & Write Off',
+         14: 'Void Credit Note & Payment',
          15: 'Invoice',
          16: 'Oustanding Payment',
          17: 'Sales Listing',
