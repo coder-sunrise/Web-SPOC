@@ -38,7 +38,7 @@ const LowStockInfo = ({ sourceType, values = {}, codetable, visitRegistration = 
   const {
     criticalThreshold = 0.0,
     reOrderThreshold = 0.0,
-    excessThreshold = 0.0,
+    excessThreshold,
     stock = 0.0,
     isChasAcuteClaimable,
     isChasChronicClaimable,
@@ -57,7 +57,7 @@ const LowStockInfo = ({ sourceType, values = {}, codetable, visitRegistration = 
   if (sourceType !== 'prescriptionSet') {
     isLowStock = stock <= criticalThreshold
     isReOrder = stock <= reOrderThreshold
-    isExcessStock = stock >= excessThreshold
+    isExcessStock = excessThreshold && stock >= excessThreshold
     if (isLowStock) stockIconTooltip = 'Low Stock'
     if (isExcessStock) stockIconTooltip = 'Excess Stock'
   }
@@ -162,6 +162,16 @@ const LowStockInfo = ({ sourceType, values = {}, codetable, visitRegistration = 
               <span style={{ color: stock < 0 ? 'red' : 'black' }}>{`${numeral(
                 stock,
               ).format(qtyFormat)} ${dispensingUOM.name || ''}`}</span>
+              <span>
+                {isLowStock || isReOrder || isExcessStock ? (
+                  <font color={isLowStock ? 'red' : 'black'}>
+                    {' '}
+                    {isExcessStock ? '(Excess Stock)' : '(Low Stock)'}
+                  </font>
+                ) : (
+                  ''
+                )}
+              </span>
             </div>
           )}
           <div>
@@ -233,7 +243,7 @@ const LowStockInfo = ({ sourceType, values = {}, codetable, visitRegistration = 
           }}
           size='medium'
         >
-          <Info color={isLowStock || isExcessStock ? 'error' : 'primary'} />
+          <Info color={isLowStock ? 'error' : 'primary'} />
         </IconButton>
       </Tooltip>
     </Popover>
