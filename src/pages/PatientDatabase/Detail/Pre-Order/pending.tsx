@@ -356,6 +356,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         type: 'select',
         labelField: 'name',
         valueField: 'value',
+        sortingEnabled: false,
         width: 180,
         options: () => preOrderItemCategory,
         onChange: handleCategoryChanged,
@@ -373,6 +374,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         type: 'select',
         labelField: 'combinDisplayValue',
         valueField: 'id',
+        sortingEnabled: false,
         options: generateItemDataSource,
         onChange: handleItemChanged,
         render: row => {
@@ -397,6 +399,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         type: 'number',
         precision: 1,
         width: 100,
+        sortingEnabled: false,
         onChange: handelQuantityChanged,
         render: row => {
           return (
@@ -421,6 +424,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         columnName: 'orderByUserFK',
         width: 150,
         type: 'text',
+        sortingEnabled: false,
         render: row => {
           return (
             <Tooltip title={row.orderByUser}>
@@ -459,12 +463,14 @@ const PendingPreOrder: React.FC = (props: any) => {
         columnName: 'amount',
         width: 100,
         type: 'currency',
+        sortingEnabled: false,
         isDisabled: row => !isEditable(row),
       },
       {
         columnName: 'hasPaid',
         width: 100,
         isDisabled: () => true,
+        sortingEnabled: false,
         render: row => {
           return row.hasPaid ? 'Yes' : 'No'
         },
@@ -472,6 +478,7 @@ const PendingPreOrder: React.FC = (props: any) => {
       {
         columnName: 'preOrderItemStatus',
         width: 100,
+        sortingEnabled: false,
         isDisabled: () => true,
       },
     ],
