@@ -184,7 +184,7 @@ import { CollectionsOutlined } from '@material-ui/icons'
       let item
       if (
         medication.isActive === true &&
-        medication.isOnlyClinicInternalUsage
+        !medication.isOnlyClinicInternalUsage
       ) {
         const medicationdispensingUOM = medication.dispensingUOM
         const medicationusage = medication.medicationUsage
@@ -460,7 +460,7 @@ import { CollectionsOutlined } from '@material-ui/icons'
       let item
       if (
         consumable.isActive === true &&
-        consumable.isOnlyClinicInternalUsage
+        !consumable.isOnlyClinicInternalUsage
       ) {
         let isDefaultBatchNo
         let unitOfMeasurement
