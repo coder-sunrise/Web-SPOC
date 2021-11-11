@@ -65,7 +65,6 @@ export const CombineOrderGrid = ({
           <Checkbox
             checked={combinedItems.includes(record.radiologyWorkitemId)}
             onChange={e => {
-              console.log('checkbox-changed')
               const radiologyWorkitemId = record.radiologyWorkitemId
               if (
                 e.target.checked &&
@@ -149,8 +148,6 @@ export const CombineOrderGrid = ({
       setHasChanged(false)
       onChange(newWorkItems)
     }
-
-    //Check if only current work item is in the combinedItems
   }, [hasChanged])
 
   useEffect(() => {

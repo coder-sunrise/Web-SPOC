@@ -21,6 +21,7 @@ import { Typography, Input } from 'antd'
 import { CHECKLIST_CATEGORY, SCRIBBLE_NOTE_TYPE } from '@/utils/constants'
 import { navigateDirtyCheck } from '@/utils/utils'
 import ScribbleNote from '@/pages/Shared/ScribbleNote/ScribbleNote'
+import { scribbleTypes } from '@/utils/codes'
 
 export const Findings = ({
   item,
@@ -77,13 +78,6 @@ export const Findings = ({
     }
   }, [defaultValue])
 
-  useEffect(() => {
-    onChange({
-      examinationFinding: getHtmlFromEditorState(editorState),
-      radiologyScribbleNote,
-    })
-  }, [editorState])
-
   const getHtmlFromEditorState = editorState => {
     const currentContent = editorState.getCurrentContent()
     if (currentContent.plainText === '') return
@@ -91,9 +85,12 @@ export const Findings = ({
     return draftToHtml(convertToRaw(currentContent))
   }
 
-  const onEditorStateChange = editorState => {
-    Window.__editorState = editorState
-    setEditorState(editorState)
+  const handleEditorStateChange = newEditorState => {
+    setEditorState(newEditorState)
+    onChange({
+      examinationFinding: getHtmlFromEditorState(newEditorState),
+      radiologyScribbleNote,
+    })
   }
 
   const scribbleNoteUpdateState = (
@@ -319,8 +316,7 @@ export const Findings = ({
                   blocksFromHTML.contentBlocks,
                   blocksFromHTML.entityMap,
                 )
-
-                setEditorState(EditorState.createWithContent(newState))
+                handleEditorStateChange(EditorState.createWithContent(newState))
               }}
               {...restProps}
             />
@@ -330,9 +326,8 @@ export const Findings = ({
           <RichEditor
             disabled={isReadOnly}
             editorState={editorState}
-            onEditorStateChange={onEditorStateChange}
+            onEditorStateChange={handleEditorStateChange}
             stripPastedStyles={false}
-            strongLabel
             height={250}
           />
         </GridItem>
@@ -356,6 +351,7 @@ export const Findings = ({
           toggleScribbleModal={toggleScribbleModal}
           scribbleData={scribbleNoteState.selectedData}
           deleteScribbleNote={deleteScribbleNote}
+          scribbleNoteType={scribbleTypes.find(x=>x.typeFK === SCRIBBLE_NOTE_TYPE.RADIOLOGY)?.type}
         />
       </CommonModal>
     </div>

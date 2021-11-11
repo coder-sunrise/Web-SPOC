@@ -47,6 +47,7 @@ export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
     WorklistContext,
   )
   const [isCombinedOrder, setIsCombinedOrder] = useState(false)
+  const [isCombinedRadioYes, setIsCombinedRadioYes] = useState(false)
   const [primaryAccessionNo, setPrimaryAccessionNo] = useState('')
 
   useEffect(() => {
@@ -54,6 +55,8 @@ export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
       setIsCombinedOrder(true)
       setPrimaryAccessionNo(getPrimaryAccessionNo(workitem))
     }
+
+    console.log('workitem changed')
 
     return () => {
       setIsCombinedOrder(false)
@@ -123,51 +126,37 @@ export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
                 (workitem.visitWorkitems.length > 1 ? (
                   <Radio.Group
                     onChange={e => {
-                      const isCombinedYes = e.target.value
-                      //if combined order has change from No to Yes, current workitem will be primary by default.
-                      if (isCombinedYes) {
-                        onCombinedOrderChange(
-                          workitem.visitWorkitems.map(v => {
-                            if (
-                              v.radiologyWorkitemId ===
-                              workitem.radiologyWorkitemId
-                            )
-                              return {
-                                ...v,
-                                primaryWorkitemFK: workitem.radiologyWorkitemId,
-                              }
-
-                            return v
-                          }),
-                        )
+                      if (e.target.value) {
+                        setIsCombinedRadioYes(true)
+                      } else {
+                        if (!isCombinedOrder) setIsCombinedRadioYes(false)
                       }
                     }}
-                    value={isCombinedOrder}
+                    value={isCombinedOrder || isCombinedRadioYes}
                   >
                     <Popconfirm
                       okText='Confirm'
                       cancelText='Cancel'
                       title='Confirm to remove combined order?'
+                      disabled={!isCombinedOrder}
                       onConfirm={() => {
                         const currentCombinedOrders = workitem.visitWorkitems.filter(
                           v =>
                             v.primaryWorkitemFK === workitem.primaryWorkitemFK,
                         )
-                        if (currentCombinedOrders.length > 1) {
-                          onCombinedOrderChange(
-                            workitem.visitWorkitems.map(v => {
-                              if (
-                                v.primaryWorkitemFK ===
-                                workitem.primaryWorkitemFK
-                              )
-                                return {
-                                  ...v,
-                                  primaryWorkitemFK: null,
-                                }
-                              return v
-                            }),
-                          )
-                        }
+                        setIsCombinedRadioYes(false)
+                        onCombinedOrderChange(
+                          workitem.visitWorkitems.map(v => {
+                            if (
+                              v.primaryWorkitemFK === workitem.primaryWorkitemFK
+                            )
+                              return {
+                                ...v,
+                                primaryWorkitemFK: null,
+                              }
+                            return v
+                          }),
+                        )
                       }}
                     >
                       <Radio value={false}>No</Radio>
@@ -183,7 +172,7 @@ export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
             </GridItem>
           </GridContainer>
         </GridItem>
-        {isCombinedOrder && (
+        {(isCombinedOrder || isCombinedRadioYes) && (
           <React.Fragment>
             <GridItem md={12}>
               <div style={{ display: 'flex' }}>

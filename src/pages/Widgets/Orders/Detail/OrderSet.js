@@ -172,7 +172,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       let item
       if (
         inventoryMedication.isActive === true &&
-        inventoryMedication.isOnlyClinicInternalUsage
+        !inventoryMedication.isOnlyClinicInternalUsage
       ) {
         const medicationdispensingUOM = ctmedicationunitofmeasurement.find(
           uom => uom.id === inventoryMedication.dispensingUOMFK,
@@ -445,7 +445,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       let item
       if (
         inventoryConsumable.isActive === true &&
-        inventoryConsumable.isOnlyClinicInternalUsage
+        !inventoryConsumable.isOnlyClinicInternalUsage
       ) {
         item = {
           inventoryConsumableFK: inventoryConsumable.id,

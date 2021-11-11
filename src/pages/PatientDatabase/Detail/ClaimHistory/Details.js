@@ -91,10 +91,12 @@ const Details = ({
     if (dueDate) {
       setFieldValue(
         'balanceDays',
-        Math.floor(
-          (moment(dueDate).startOf('day') - moment().startOf('day')) /
-            (24 * 3600 * 1000),
-        ),
+        moment(dueDate).startOf('day') > moment().startOf('day')
+          ? Math.floor(
+              (moment(dueDate).startOf('day') - moment().startOf('day')) /
+                (24 * 3600 * 1000),
+            )
+          : 0,
       )
     } else {
       setFieldValue('balanceDays', undefined)

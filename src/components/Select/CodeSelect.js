@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import Select from '../Antd/AntdSelect'
+import _ from 'lodash'
 
 @connect(({ codetable }) => ({ codetable }))
 class CodeSelect extends React.PureComponent {
@@ -66,10 +67,11 @@ class CodeSelect extends React.PureComponent {
   }
 
   render() {
-    const { codetable, code, localFilter, formatCodes } = this.props
+    const { codetable, code, localFilter, formatCodes, orderBy } = this.props
     const options =
       code !== undefined ? codetable[code.toLowerCase()] || [] : []
-    const filteredOptions = localFilter ? options.filter(localFilter) : options
+    let filteredOptions = localFilter ? options.filter(localFilter) : options
+    filteredOptions = orderBy ? _.orderBy(filteredOptions,(x)=> x[orderBy[0]].toLowerCase(),orderBy[1]) : filteredOptions
     const formattedFilteredOptions = formatCodes
       ? formatCodes(filteredOptions)
       : filteredOptions

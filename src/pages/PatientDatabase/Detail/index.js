@@ -380,7 +380,7 @@ class PatientDetail extends PureComponent {
     const viewClaimHistoryRight = Authorized.check(
       'patientdatabase.patientprofiledetails.viewclaimhistory',
     ) || { rights: 'hidden' }
-    if (viewClaimHistoryRight.rights === 'hidden') {
+    if (viewClaimHistoryRight.rights !== 'enable') {
       this.widgets = this.widgets.filter(t => t.id !== '12')
     }
   }

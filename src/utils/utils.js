@@ -1394,6 +1394,13 @@ const checkAuthoritys = (pathname, history) => {
   }
 }
 
+const ableToViewByAuthority = authority => {
+  const accessRight = Authorized.check(authority) || {
+    rights: 'hidden',
+  }
+  return accessRight.rights === 'enable'
+}
+
 const getModuleSequence = moduleName => {
   const sequence = RouterConfig[2].routes
     .filter(r => r.moduleName)
@@ -1487,7 +1494,9 @@ const getTranslationValue = (translationDatas = [], language, key) => {
   let displayValue = ''
   const translationData = translationDatas.find(t => t.language === language)
   if (translationData) {
-    const displayValueItem = (translationData.list || []).find(l => l.key === key)
+    const displayValueItem = (translationData.list || []).find(
+      l => l.key === key,
+    )
     if (displayValueItem) {
       displayValue = displayValueItem.value
     }
@@ -1546,6 +1555,7 @@ export {
   getModuleSequence,
   getTranslationValue,
   getMappedVisitType,
+  ableToViewByAuthority,
   // toUTC,
   // toLocal,
 }

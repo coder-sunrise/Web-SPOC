@@ -20,11 +20,13 @@ export default createListViewModel({
           entity: {
             ...data,
             balanceDays: data.dueDate
-              ? Math.floor(
-                  (moment(data.dueDate).startOf('day') -
-                    moment().startOf('day')) /
-                    (24 * 3600 * 1000),
-                )
+              ? moment(data.dueDate).startOf('day') > moment().startOf('day')
+                ? Math.floor(
+                    (moment(data.dueDate).startOf('day') -
+                      moment().startOf('day')) /
+                      (24 * 3600 * 1000),
+                  )
+                : 0
               : undefined,
           },
         }
