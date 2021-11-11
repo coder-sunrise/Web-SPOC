@@ -51,23 +51,37 @@ const Detail = props => {
     prescriptionSet,
   } = props
   const typeEnable = generalAccessRight.rights === 'enable'
-  const containsMedication =
-    (prescriptionSet.prescriptionSetItems || []).filter(ps => !ps.isDeleted)
-      .length > 0
-  const containsInactiveMedication =
-    (prescriptionSet.prescriptionSetItems || []).filter(
-      ps => !ps.isDeleted && !ps.isActive,
-    ).length > 0
-  const containsNonOrderableMedication =
-    (prescriptionSet.prescriptionSetItems || []).filter(
-      ps => !ps.isDeleted && !ps.isOnlyClinicInternalUsage,
-    ).length > 0
+  const items = (prescriptionSet.prescriptionSetItems || []).filter(
+    ps => !ps.isDeleted,
+  )
+  const containsMedication = items.length > 0
+  let containsInactiveMedication
+  let containsNonOrderableMedication
+
+  items.forEach(item => {
+    if (item.isDrugMixture) {
+      const drugMixtures = item.prescriptionSetItemDrugMixture || []
+      if (drugMixtures.find(drugMixture => !drugMixture.isActive)) {
+        containsInactiveMedication = true
+      } else if (
+        drugMixtures.find(drugMixture => drugMixture.isOnlyClinicInternalUsage)
+      ) {
+        containsNonOrderableMedication = true
+      }
+    } else {
+      if (!item.isActive) {
+        containsInactiveMedication = true
+      } else if (item.isOnlyClinicInternalUsage) {
+        containsNonOrderableMedication = true
+      }
+    }
+  })
   const containsUOMChangedMedication =
-    (prescriptionSet.prescriptionSetItems || []).filter(ps => {
+    items.filter(ps => {
       const firstInstruction = (ps.prescriptionSetItemInstruction || []).find(
         item => !item.isDeleted,
       )
-      return !ps.isDeleted && UOMChanged(ps)
+      return UOMChanged(ps)
     }).length > 0
   return (
     <React.Fragment>

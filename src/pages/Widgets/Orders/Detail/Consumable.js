@@ -164,17 +164,19 @@ class Consumable extends PureComponent {
     const {
       codetable: { inventoryconsumable = [] },
     } = this.props
-    return inventoryconsumable.filter(m => m.isOnlyClinicInternalUsage).reduce((p, c) => {
-      const { code, displayValue, sellingPrice = 0, uom = {} } = c
-      const { name: uomName = '' } = uom
-      let opt = {
-        ...c,
-        combinDisplayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
-          2,
-        )} / ${uomName})`,
-      }
-      return [...p, opt]
-    }, [])
+    return inventoryconsumable
+      .filter(m => !m.isOnlyClinicInternalUsage)
+      .reduce((p, c) => {
+        const { code, displayValue, sellingPrice = 0, uom = {} } = c
+        const { name: uomName = '' } = uom
+        let opt = {
+          ...c,
+          combinDisplayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
+            2,
+          )} / ${uomName})`,
+        }
+        return [...p, opt]
+      }, [])
   }
 
   changeConsumable = (v, op = {}) => {

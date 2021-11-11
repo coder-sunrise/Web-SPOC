@@ -152,7 +152,7 @@ const getType = typeId => {
       let item
       if (
         medication.isActive === true &&
-        medication.isOnlyClinicInternalUsage
+        !medication.isOnlyClinicInternalUsage
       ) {
         const medicationdispensingUOM = medication.dispensingUOM
         const medicationusage = medication.medicationUsage
@@ -385,7 +385,7 @@ const getType = typeId => {
       let item
       if (
         consumable.isActive === true &&
-        consumable.isOnlyClinicInternalUsage
+        !consumable.isOnlyClinicInternalUsage
       ) {
         let isDefaultBatchNo
         if (consumable) {
