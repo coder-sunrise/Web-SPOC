@@ -1441,6 +1441,7 @@ const scribbleTypes = [
   { type: 'chiefComplaints', typeFK: SCRIBBLE_NOTE_TYPE.CHIEFCOMPLAINTS },
   { type: 'note', typeFK: SCRIBBLE_NOTE_TYPE.CLINICALNOTES },
   { type: 'plan', typeFK: SCRIBBLE_NOTE_TYPE.PLAN },
+  { type: 'radiology', typeFK: SCRIBBLE_NOTE_TYPE.RADIOLOGY },
 ]
 
 const formTypes = [
