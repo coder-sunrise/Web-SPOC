@@ -126,13 +126,18 @@ const FilterBar = ({
             <Field
               name='tags'
               render={args => (
-                <CodeSelect
-                  label='Patient Tag'
-                  mode='multiple'
-                  options={cttag}
-                  maxTagPlaceholder='Patient Tags'
-                  {...args}
-                />
+                <Tooltip
+                  placement='right'
+                  title='Select “All” will retrieve active and inactive patient tag'
+                >
+                  <CodeSelect
+                    label='Patient Tag'
+                    mode='multiple'
+                    options={cttag}
+                    maxTagPlaceholder='Patient Tags'
+                    {...args}
+                  />
+                </Tooltip>
               )}
             />
           </GridItem>
