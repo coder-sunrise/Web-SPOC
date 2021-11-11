@@ -13,6 +13,7 @@ import {
   Select,
   Tooltip,
   ClinicianSelect,
+  VisitTypeSelect,
 } from '@/components'
 import { DoctorProfileSelect } from '@/components/_medisys'
 import ReportDateRangePicker from '../ReportDateRangePicker'
@@ -110,11 +111,10 @@ const FilterBar = ({
                   placement='right'
                   title='Select "All" will retrieve active and inactive visit type'
                 >
-                  <CodeSelect
+                  <VisitTypeSelect
                     label='Visit Type'
                     {...args}
                     mode='multiple'
-                    code='ctVisitpurpose'
                     maxTagPlaceholder='Visit Types'
                     allowClear={true}
                   />
