@@ -13,8 +13,9 @@ import { primaryColor } from 'mui-pro-jss'
 import { Button, Popover, Tooltip, TextField } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
 import { CANNED_TEXT_TYPE_FIELD_NAME } from './utils'
+import Authorized from '@/utils/Authorized'
 
-const styles = (theme) => ({
+const styles = theme => ({
   item: {
     marginBottom: theme.spacing(1),
     padding: theme.spacing(1),
@@ -24,7 +25,9 @@ const styles = (theme) => ({
     cursor: 'pointer',
 
     '&:hover': {
-      background: color(primaryColor).lighten(0.9).hex(),
+      background: color(primaryColor)
+        .lighten(0.9)
+        .hex(),
     },
     '& > svg': {
       marginRight: theme.spacing(1),
@@ -74,42 +77,24 @@ const CannedTextButton = ({
   loading,
   user,
 }) => {
-  const [
-    show,
-    setShow,
-  ] = useState(false)
-  const [
-    showCannedText,
-    setShowCannedText,
-  ] = useState(false)
+  const [show, setShow] = useState(false)
+  const [showCannedText, setShowCannedText] = useState(false)
 
-  const [
-    filterCannedText,
-    setFilterCannedText,
-  ] = useState('')
+  const [filterCannedText, setFilterCannedText] = useState('')
 
-  const fieldName = CANNED_TEXT_TYPE_FIELD_NAME[ cannedTextTypeFK ]
+  const fieldName = CANNED_TEXT_TYPE_FIELD_NAME[cannedTextTypeFK]
 
-  let list = cannedText[ fieldName ] || []
+  let list = cannedText[fieldName] || []
   list = [
     ..._.orderBy(
-      list.filter((o) => o.ownedByUserFK === user.id),
-      [
-        'sortOrder',
-        'title',
-      ],
-      [
-        'asc',
-      ],
+      list.filter(o => o.ownedByUserFK === user.id),
+      ['sortOrder', 'title'],
+      ['asc'],
     ),
     ..._.orderBy(
-      list.filter((o) => o.ownedByUserFK !== user.id),
-      [
-        'title',
-      ],
-      [
-        'asc',
-      ],
+      list.filter(o => o.ownedByUserFK !== user.id),
+      ['title'],
+      ['asc'],
     ),
   ]
 
@@ -135,7 +120,7 @@ const CannedTextButton = ({
     onCannedTextClick()
   }
 
-  const onListItemClick = (selectedCannedText) => {
+  const onListItemClick = selectedCannedText => {
     handleSelectCannedText(selectedCannedText)
   }
 
@@ -153,7 +138,7 @@ const CannedTextButton = ({
   }
 
   const debouncedAction = _.debounce(
-    (e) => {
+    e => {
       setFilterCannedText(e.target.value)
     },
     100,
@@ -162,6 +147,11 @@ const CannedTextButton = ({
       trailing: false,
     },
   )
+
+  const accessRight = Authorized.check('settings.cannedtext') || {
+    rights: 'hidden',
+  }
+  const showSettingButton = accessRight.rights === 'enable'
 
   return (
     <Popover
@@ -189,28 +179,43 @@ const CannedTextButton = ({
                 <div className={classes.popoverContainer}>
                   <TextField
                     label='Filter Canned Text'
-                    onChange={(e) => {
+                    onChange={e => {
                       debouncedAction(e)
                     }}
                   />
                   <div className={classes.listContainer}>
-                    {list.filter(item => item.title.toUpperCase().indexOf(filterCannedText.toUpperCase()) >= 0).map((item) => {
-                      const handleClick = () => onListItemClick(item)
-                      return (
-                        <ListItem
-                          key={`cannedText-${item.id}`}
-                          classes={classes}
-                          onClick={handleClick}
-                          {...item}
-                        />
+                    {list
+                      .filter(
+                        item =>
+                          item.title
+                            .toUpperCase()
+                            .indexOf(filterCannedText.toUpperCase()) >= 0,
                       )
-                    })}
+                      .map(item => {
+                        const handleClick = () => onListItemClick(item)
+                        return (
+                          <ListItem
+                            key={`cannedText-${item.id}`}
+                            classes={classes}
+                            onClick={handleClick}
+                            {...item}
+                          />
+                        )
+                      })}
                   </div>
-                  <Divider className={classes.divider} />
-                  <div className={classes.item} onClick={handleSettingClick}>
-                    <Settings />
-                    <span>Settings</span>
-                  </div>
+                  {showSettingButton && (
+                    <div>
+                      {' '}
+                      <Divider className={classes.divider} />
+                      <div
+                        className={classes.item}
+                        onClick={handleSettingClick}
+                      >
+                        <Settings />
+                        <span>Settings</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               }
             >
@@ -224,13 +229,13 @@ const CannedTextButton = ({
               </div>
             </Popover>
           </div>
-        </LoadingWrapper >
+        </LoadingWrapper>
       }
     >
       <Button color='info' onClick={handleMainButtonClick}>
         Load From
       </Button>
-    </Popover >
+    </Popover>
   )
 }
 
