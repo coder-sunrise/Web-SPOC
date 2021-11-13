@@ -52,10 +52,10 @@ const PaymentRow = ({
   let tooltipMsg = ''
   let showVoidButton = true
   if (type === 'Credit Note') {
-    showVoidButton = ableToViewByAuthority('finance.addcreditnote')
+    showVoidButton = ableToViewByAuthority('finance.deletecreditnote')
   } else if (type === 'Write Off') {
     if (isEnableWriteOffinInvoice) {
-      showVoidButton = ableToViewByAuthority('finance.createwriteoff')
+      showVoidButton = ableToViewByAuthority('finance.deletewriteoff')
     } else {
       showVoidButton = false
     }
