@@ -189,11 +189,12 @@ class PatientStickyNotesBtn extends Component {
     }
   }
 
-  onColorClick = color => {
+  onColorClick = (note,color) => {
     const { patient, dispatch } = this.props
     const { index, editedNote } = this.state.editedItem
+    note.color = color
     this.setState({
-      editedItem: { index, editedNote: { ...editedNote, color } },
+      editedItem: { index, editedNote: note },
     })
   }
 
@@ -374,7 +375,7 @@ class PatientStickyNotesBtn extends Component {
                               border: '1px solid gray',
                               boxShadow: '0px 3px 10px rgba(0, 0, 0, 0.1)',
                             }}
-                            onClick={() => this.onColorClick(x)}
+                            onClick={() => this.onColorClick(note,x)}
                           />
                         ))}
                       </div>
