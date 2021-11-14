@@ -1310,6 +1310,7 @@ class Scribble extends React.Component {
                     onClick={navigateDirtyCheck({
                       displayName: 'ScribbleNotePage',
                       onProceed: toggleScribbleModal,
+                      openConfirmContent: 'Discard the changes?'
                     })}
                   >
                     Cancel
