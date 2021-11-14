@@ -228,6 +228,8 @@ class ScribbleTemplateItem extends React.Component {
                 <Button
                   {...this.buttonProps}
                   onClick={() => {
+                    if(!description || !description.trim())
+                      return
                     const savedItem = { ...item, description }
                     this.setState({
                       isEdit: false,
