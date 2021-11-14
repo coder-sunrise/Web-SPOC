@@ -60,6 +60,7 @@ import _ from 'lodash'
 import {
   errMsgForOutOfRange as errMsg,
   navigateDirtyCheck,
+  getUniqueGUID,
 } from '@/utils/utils'
 import { Add } from '@material-ui/icons'
 import moment from 'moment'
@@ -584,7 +585,7 @@ class Scribble extends React.Component {
 
   generateScribbleTemplateDto = (name, base64) => {
     const dto = {
-      code: name,
+      code: getUniqueGUID(),
       displayValue: name,
       description: name,
       layerContent: base64,
@@ -634,7 +635,6 @@ class Scribble extends React.Component {
 
   onFileChange = async event => {
     const { files } = event.target
-    console.log('onfilechange', files)
     if (files.length > 0) this.uploadTemplate(files[0])
   }
 
