@@ -418,13 +418,9 @@ class PatientDetail extends PureComponent {
   handleCloseReplacementModal = () =>
     this.setState({ showReplacementModal: false })
 
-  checkAddressAndSchemeChange = (initialValues, values) => {
-    const oldAddressVal = initialValues.contact.contactAddress.filter(
-      x => x.isPrimary,
-    )
-    const newAddressVal = values.contact.contactAddress.filter(
-      x => x.isPrimary && !x.isDeleted,
-    )
+  checkFamilyMemberInfoChange = (initialValues, values) => {
+    const oldAddressVal = initialValues.contact.contactAddress
+    const newAddressVal = values.contact.contactAddress
     let isAddressChange = !_.isEqual(oldAddressVal, newAddressVal)
     const oldSchemeVal = initialValues.patientScheme.filter(
       x => x.schemeTypeFK === SCHEME_TYPE.CORPORATE,
@@ -432,31 +428,52 @@ class PatientDetail extends PureComponent {
     const newSchemeVal = values.patientScheme.filter(
       x => x.schemeTypeFK === SCHEME_TYPE.CORPORATE && !x.isDeleted,
     )
-    let isSchemeChange = !_.isEqual(oldSchemeVal, newSchemeVal) && newSchemeVal.length > 0
-    const updatedTypes = { address: isAddressChange, scheme: isSchemeChange }
-    const fimilyMembersInfoTitle = `Confirm Update Family Members' ${[
-      isAddressChange ? 'Address' : '',
-      isSchemeChange ? 'Corporate Scheme' : '',
-    ]
-      .filter(x => x)
-      .join(', ')}`
-    this.setState({ updatedTypes, fimilyMembersInfoTitle })
-    return updatedTypes
+    let isSchemeChange =
+      !_.isEqual(oldSchemeVal, newSchemeVal) && newSchemeVal.length > 0
+    //if added new member, would update address & scheme for that member
+    console.log('check family member change', values)
+    const newFamilyMembers = values.patientFamilyGroup.patientFamilyMember
+      .filter(x => x.isNew && !x.isDeleted)
+      .map(x => x.familyMemberFK)
+    return [isAddressChange, isSchemeChange, newFamilyMembers]
   }
 
   beforeHandleSubmit = () => {
     const { handleSubmit, dispatch, values, dirty, initialValues } = this.props
     if (dirty) {
-      const { address, scheme } = this.checkAddressAndSchemeChange(
-        initialValues,
-        values,
-      )
-      if (address || scheme) {
-        this.setState({ showFamilyMembersInfoUpdate: true })
+      const [
+        address,
+        scheme,
+        newFamilyMembers,
+      ] = this.checkFamilyMemberInfoChange(initialValues, values)
+      const anyNewFamilyMember = newFamilyMembers.length > 0
+      if (anyNewFamilyMember || address || scheme) {
+        const fimilyMembersInfoTitle = `Confirm Update Family Members' ${[
+          anyNewFamilyMember || address ? 'Address' : '',
+          anyNewFamilyMember || scheme ? 'Corporate Scheme' : '',
+        ]
+          .filter(x => x)
+          .join(', ')}`
+        this.setState({
+          showFamilyMembersInfoUpdate: true,
+          fimilyMembersInfoTitle,
+          updatedTypes: { address, scheme },
+          newFamilyMembers,
+        })
         return undefined
       }
     }
     return handleSubmit()
+  }
+
+  closeFamilyMembersInfoUpdate = () => {
+    this.setState({
+      showFamilyMembersInfoUpdate: false,
+      fimilyMembersInfoTitle: '',
+      updatedTypes: { address: false, scheme: false },
+      newFamilyMembers: [],
+    })
+    this.props.handleSubmit()
   }
 
   validatePatient = async () => {
@@ -799,18 +816,13 @@ class PatientDetail extends PureComponent {
             confirmText='Yes'
             cancelText='No'
             showFooter
-            onConfirm={() => {
-              this.setState({ showFamilyMembersInfoUpdate: false })
-              this.props.handleSubmit()
-            }}
-            onClose={() => {
-              this.setState({ showFamilyMembersInfoUpdate: false })
-              this.props.handleSubmit()
-            }}
+            onConfirm={() => this.closeFamilyMembersInfoUpdate()}
+            onClose={() => this.closeFamilyMembersInfoUpdate()}
           >
             {this.state.showFamilyMembersInfoUpdate && (
               <FamilyMembersInfoUpdate
                 patientProfileFK={entity.id}
+                newFamilyMembers={this.state.newFamilyMembers}
                 {...this.state.updatedTypes}
                 dispatch={dispatch}
                 onSelectionChange={e => (values.familyMembersInfoUpdate = e)}

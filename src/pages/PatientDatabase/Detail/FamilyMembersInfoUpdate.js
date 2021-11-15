@@ -13,8 +13,8 @@ const schemeColumns = [
   { name: 'schemeInfo', title: 'Current Corporate Scheme' },
 ]
 const columnExtensions = [
-  { columnName: 'name', type: 'Text', width:'25%'},
-  { columnName: 'relationship', type: 'Text', width:'30%' },
+  { columnName: 'name', type: 'Text', width: '25%' },
+  { columnName: 'relationship', type: 'Text', width: '30%' },
   { columnName: 'addressInfo', type: 'Text' },
   { columnName: 'schemeInfo', type: 'Text' },
 ]
@@ -27,13 +27,25 @@ export default class FamilyMembersInfoUpdate extends Component {
     }
   }
   componentWillMount = () => {
-    const { patientProfileFK, address, scheme, dispatch } = this.props
+    const {
+      patientProfileFK,
+      address,
+      scheme,
+      dispatch,
+      newFamilyMembers = [],
+    } = this.props
     dispatch({
       type: 'patient/getFamilyMembersInfo',
-      payload: { patientProfileFK, getAddress: address, getScheme: scheme },
+      payload: {
+        patientProfileFK,
+        getAddress: address,
+        getScheme: scheme,
+        newFamilyMembers: newFamilyMembers.join(','),
+      },
     }).then(r => {
       if (r) {
         this.setState({ familyMembersInfo: r })
+        console.log('getFamilyMemberinfo',r)
       }
     })
   }
@@ -59,12 +71,12 @@ export default class FamilyMembersInfoUpdate extends Component {
               columnExtensions={columnExtensions}
               selection={selectedAddressRows}
               onSelectionChange={rows => {
-                familyMembersInfo.forEach(x=> {
+                familyMembersInfo.forEach(x => {
                   x.isUpdateAddress = false
-                  if(rows.some(i=>i === x.familyMemberFK))
+                  if (rows.some(i => i === x.familyMemberFK))
                     x.isUpdateAddress = true
                 })
-                this.setState({ familyMembersInfo, selectedAddressRows: rows})
+                this.setState({ familyMembersInfo, selectedAddressRows: rows })
                 onSelectionChange(familyMembersInfo)
               }}
               FuncProps={{
@@ -90,12 +102,12 @@ export default class FamilyMembersInfoUpdate extends Component {
               columnExtensions={columnExtensions}
               selection={selectedSchemeRows}
               onSelectionChange={rows => {
-                familyMembersInfo.forEach(x=> {
+                familyMembersInfo.forEach(x => {
                   x.isUpdateScheme = false
-                  if(rows.some(i=>i === x.familyMemberFK))
+                  if (rows.some(i => i === x.familyMemberFK))
                     x.isUpdateScheme = true
                 })
-                this.setState({ familyMembersInfo, selectedSchemeRows: rows})
+                this.setState({ familyMembersInfo, selectedSchemeRows: rows })
                 onSelectionChange(familyMembersInfo)
               }}
               FuncProps={{
