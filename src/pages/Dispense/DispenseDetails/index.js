@@ -163,7 +163,8 @@ const DispenseDetails = ({
       const visitTypeName = JSON.parse(settings.visitTypeSetting).find(
         t => t.id === entity.visit.visitPurposeFK,
       ).displayValue
-      notification.success({ message: `${visitTypeName} visit discarded.` })
+      // Currently call signalR notification will also prompt current user, so skip local promption
+      // notification.success({ message: `${visitTypeName} visit discarded.` })
       sendQueueNotification({
         message: `${visitTypeName} visit discarded.`,
         queueNo: entity.queueNo,
@@ -195,7 +196,10 @@ const DispenseDetails = ({
         const visitTypeName = JSON.parse(settings.visitTypeSetting).find(
           t => t.id === entity.visit.visitPurposeFK,
         ).displayValue
-        notification.success({ message: `${visitTypeName} visit discarded.` })
+        // Currently call signalR notification will also prompt current user, so skip local promption
+        // notification.success({
+        //   message: `${visitTypeName} visit discarded.`,
+        // })
         sendQueueNotification({
           message: `${visitTypeName} visit discarded.`,
           queueNo: entity.queueNo,
