@@ -8,6 +8,7 @@ import OrderSet from '@/pages/Widgets/Orders/Detail/OrderSet'
 import Treatment from '@/pages/Widgets/Orders/Detail/Treatment'
 import Package from '@/pages/Widgets/Orders/Detail/Package'
 import Radiology from '@/pages/Widgets/Orders/Detail/Radiology'
+import Lab from '@/pages/Widgets/Orders/Detail/Lab'
 import { SERVICE_CENTER_CATEGORY, RADIOLOGY_CATEGORY } from '@/utils/constants'
 
 const orderTypes = [
@@ -39,6 +40,15 @@ const orderTypes = [
     getSubject: r => r.serviceName,
     filter: r => RADIOLOGY_CATEGORY.indexOf(r.serviceCenterCategoryFK) >= 0,
     component: props => <Radiology {...props} />,
+  },
+  {
+    name: 'Lab',
+    value: '11',
+    prop: 'corService',
+    accessRight: 'queue.consultation.order.radiology',
+    getSubject: r => r.serviceName,
+    filter: r => RADIOLOGY_CATEGORY.indexOf(r.serviceCenterCategoryFK) >= 0,
+    component: props => <Lab {...props} />,
   },
   {
     name: 'Vaccination',

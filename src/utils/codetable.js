@@ -302,9 +302,9 @@ const fetchCodeTable = async (code, params, isReturnStatusCode = false) => {
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)
     : convertToQuery(
-      { ...criteriaForTenantCodes, ...params },
-      convertExcludeFields,
-    )
+        { ...criteriaForTenantCodes, ...params },
+        convertExcludeFields,
+      )
 
   const response = await request(`${url}${code}`, {
     method: 'GET',
@@ -518,6 +518,12 @@ const getServices = data => {
             name: m.tagDisplayValue,
           }
         }),
+        serviceTestCategories: (o[0].serviceTestPanel || []).map(m => {
+          return {
+            value: m.testCategoryFK,
+            name: m.testCategory,
+          }
+        }),
         isDisplayValueChangable: o[0].isDisplayValueChangable,
       }
     }),
@@ -555,7 +561,7 @@ const getServices = data => {
 
   let serviceTags = []
   data.forEach(service => {
-    (service.serviceTag || []).forEach(tag => {
+    ;(service.serviceTag || []).forEach(tag => {
       serviceTags = serviceTags.concat({
         value: tag.tagFK,
         name: tag.tagDisplayValue,
@@ -573,12 +579,33 @@ const getServices = data => {
     ['asc'],
   )
 
+  let serviceTestCategories = []
+  data.forEach(service => {
+    ;(service.serviceTestPanel || []).forEach(testPanel => {
+      serviceTestCategories = serviceTestCategories.concat({
+        value: testPanel.testCategoryFK,
+        name: testPanel.testCategory,
+      })
+    })
+  })
+  serviceTestCategories = _.orderBy(
+    Object.values(_.groupBy(serviceTestCategories, 'value')).map(o => {
+      return {
+        value: o[0].value,
+        name: o[0].name,
+      }
+    }),
+    ['name'],
+    ['asc'],
+  )
+
   return {
     serviceCenterServices: data,
     services,
     serviceCenters,
     serviceCatetorys,
     serviceTags,
+    serviceTestCategories,
   }
 }
 export {

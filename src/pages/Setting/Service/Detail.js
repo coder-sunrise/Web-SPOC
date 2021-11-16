@@ -41,6 +41,31 @@ const styles = theme => ({
   },
 })
 
+const RadioAndLabCategories = {
+  internalRadiology: 3,
+  internalLab: 4,
+  externalRadiology: 5,
+  externalLab: 6,
+}
+
+const checkAnyInternalLabServiceCenter = (
+  currentServiceCenters = [],
+  allServiceCenters = [],
+) => {
+  const internalLabServiceCenterIds = allServiceCenters
+    .filter(
+      sc => RadioAndLabCategories.internalLab === sc.serviceCenterCategoryFK,
+    )
+    .map(sc => sc.id)
+
+  const hasInternalLabServiceCenter =
+    currentServiceCenters.findIndex(sc =>
+      internalLabServiceCenterIds.includes(sc.serviceCenterFK),
+    ) !== -1
+
+  return hasInternalLabServiceCenter
+}
+
 const itemSchema = Yup.object().shape({
   serviceCenterFK: Yup.string().required(),
   costPrice: Yup.number()
@@ -54,12 +79,21 @@ const modalityItemSchema = Yup.object().shape({
   modalityFK: Yup.string().required(),
 })
 
+const testPanelSchema = Yup.object().shape({
+  testPanelFK: Yup.string().required(),
+})
+
 @connect(({ clinicSettings }) => ({
   clinicSettings,
 }))
 @withFormikExtend({
   mapPropsToValues: ({ settingClinicService }) => {
-    // console.log('settingClinicService', settingClinicService)
+    const {
+      serviceCenterList: allServiceCenters,
+      entity,
+    } = settingClinicService
+    const { ctServiceCenter_ServiceNavigation: currentServiceCenters } = entity
+
     const returnValue =
       settingClinicService.entity || settingClinicService.default
     const { isAutoOrder, ctServiceCenter_ServiceNavigation } = returnValue
@@ -72,7 +106,13 @@ const modalityItemSchema = Yup.object().shape({
       }
     }
 
-    return returnValue
+    return {
+      ...returnValue,
+      hasInternalLabServiceCenter: checkAnyInternalLabServiceCenter(
+        currentServiceCenters,
+        allServiceCenters,
+      ),
+    }
   },
 
   validationSchema: Yup.object().shape({
@@ -93,12 +133,22 @@ const modalityItemSchema = Yup.object().shape({
     modalitySettingItem: Yup.array()
       .compact(v => v.isDeleted)
       .of(modalityItemSchema),
+    ctService_TestPanel: Yup.array().when('hasInternalLabServiceCenter', {
+      is: true,
+      then: Yup.array()
+        .compact(v => v.isDeleted)
+        .required('At least one test panel is required.'),
+    }),
   }),
   handleSubmit: (values, { props, resetForm }) => {
-    const { effectiveDates, ...restValues } = values
+    const {
+      effectiveDates,
+      hasInternalLabServiceCenter,
+      ...restValues
+    } = values
     const { dispatch, onConfirm } = props
     const selectedOptions = {}
-
+    console.log('handleSubmit')
     dispatch({
       type: 'settingClinicService/upsert',
       payload: {
@@ -165,6 +215,7 @@ class Detail extends PureComponent {
     ddlOutpatientScan: this.props.initialValues.isOutpatientScan,
     serviceSettings: this.props.values.ctServiceCenter_ServiceNavigation,
     modalitySettings: this.props.values.ctService_Modality,
+    testPanels: this.props.values.ctService_TestPanel,
   }
 
   tableParas = {
@@ -235,6 +286,28 @@ class Detail extends PureComponent {
           const { modalitySettings } = this.state
           const rs = modalitySettings.filter(
             o => !o.isDeleted && o.modalityFK === val && o.id !== row.id,
+          )
+          if (rs.length > 0) {
+            notification.error({
+              message: 'The modality already exist in the list',
+            })
+          }
+        },
+      },
+    ],
+  }
+
+  testPanelTableParas = {
+    columns: [{ name: 'testPanelFK', title: 'TestPanel' }],
+    columnExtensions: [
+      {
+        columnName: 'testPanelFK',
+        type: 'codeSelect',
+        code: 'ctTestPanel',
+        onChange: ({ val, row }) => {
+          const { testPanels } = this.state
+          const rs = testPanels.filter(
+            o => !o.isDeleted && o.testPanelFK === val && o.id !== row.id,
           )
           if (rs.length > 0) {
             notification.error({
@@ -359,8 +432,9 @@ class Detail extends PureComponent {
   commitChanges = temp => {
     const { rows, changed } = temp
     const _rows = this.checkIsServiceCenterUnique({ rows, changed })
-
     const { setFieldValue, values } = this.props
+    const { ctService_TestPanel = [] } = values
+
     _rows.forEach((val, i) => {
       val.serviceFK = values.id
       val.serviceCenterFKNavigation = null
@@ -381,12 +455,30 @@ class Detail extends PureComponent {
       }
     }
 
-    const hiddenFields = this.getHiddenFields(_rows)
+    const hiddenFields = this.computeHiddenFields(_rows)
 
     //Reset the field if the fields are being hidden
     if (hiddenFields.includes('ctService_Tag'))
       setFieldValue('ctService_Tag', [])
-    if (hiddenFields.includes('panelItems')) setFieldValue('panelItems', [])
+
+    if (hiddenFields.includes('ctService_TestPanel')) {
+      //To use in the validation of test panel is required or not. Test Panel is required only if any lab service center for the service.
+      setFieldValue('hasInternalLabServiceCenter', false)
+      const testPanels = ctService_TestPanel.map(i => ({
+        ...i,
+        isDeleted: true,
+      }))
+
+      setFieldValue('ctService_TestPanel', testPanels)
+      this.setState(() => {
+        return {
+          testPanels: testPanels,
+        }
+      })
+    } else {
+      setFieldValue('hasInternalLabServiceCenter', true)
+    }
+
     if (hiddenFields.includes('isRequiredSpecifyPanelItem'))
       setFieldValue('isRequiredSpecifyPanelItem', false)
 
@@ -489,6 +581,43 @@ class Detail extends PureComponent {
     return _rows
   }
 
+  checkIsTestPanelUnique = ({ rows, changed }) => {
+    if (!changed) return rows
+    const key = Object.keys(changed)[0]
+    const obj = changed[key]
+    if (obj.testPanelFK !== undefined) {
+      const hasDuplicate = rows.filter(
+        i => !i.isDeleted && i.testPanelFK === obj.testPanelFK,
+      )
+      if (hasDuplicate.length >= 2) {
+        return rows.map(row =>
+          row.id === parseInt(key, 10)
+            ? { ...row, testPanelFK: undefined }
+            : row,
+        )
+      }
+    }
+    return rows
+  }
+
+  commitTestPanelChanges = ({ rows, changed }) => {
+    const _rows = this.checkIsTestPanelUnique({ rows, changed })
+    const { setFieldValue, values } = this.props
+
+    _rows.forEach((val, i) => {
+      val.serviceFK = values.id
+      val.testPanelFKNavigation = null
+    })
+
+    setFieldValue('ctService_TestPanel', _rows)
+    this.setState(() => {
+      return {
+        testPanels: _rows,
+      }
+    })
+    return _rows
+  }
+
   handleTagPanelChange = (value, tags, setFieldValue) => {
     const {
       ctService_Tag: originalTags = [],
@@ -512,13 +641,8 @@ class Detail extends PureComponent {
     setFieldValue('ctService_Tag', [...currentTags, ...deletedTags])
   }
 
-  getHiddenFields = serviceSettings => {
-    const radioAndLabCategories = {
-      internalRadiology: 3,
-      internalLab: 4,
-      externalRadiology: 5,
-      externalLab: 6,
-    }
+  computeHiddenFields = rows => {
+    const serviceSettings = rows.filter(r => !r.isDeleted)
 
     const hiddenFields = []
     const { settingClinicService, clinicSettings, setFieldValue } = this.props
@@ -528,15 +652,9 @@ class Detail extends PureComponent {
 
     const radioAndLabServiceCenterIds = serviceCenterList
       .filter(sc =>
-        Object.values(radioAndLabCategories).includes(
+        Object.values(RadioAndLabCategories).includes(
           sc.serviceCenterCategoryFK,
         ),
-      )
-      .map(sc => sc.id)
-
-    const internalLabServiceCenterIds = serviceCenterList
-      .filter(
-        sc => radioAndLabCategories.internalLab === sc.serviceCenterCategoryFK,
       )
       .map(sc => sc.id)
 
@@ -548,12 +666,12 @@ class Detail extends PureComponent {
       hiddenFields.push('ctService_Tag')
     }
 
-    const hasInternalLabServiceCenter =
-      serviceSettings.findIndex(sc =>
-        internalLabServiceCenterIds.includes(sc.serviceCenterFK),
-      ) !== -1
+    const hasInternalLabServiceCenter = checkAnyInternalLabServiceCenter(
+      serviceSettings,
+      serviceCenterList,
+    )
     if (!hasInternalLabServiceCenter) {
-      hiddenFields.push('panelItems')
+      hiddenFields.push('ctService_TestPanel')
       hiddenFields.push('isRequiredSpecifyPanelItem')
     }
 
@@ -583,13 +701,14 @@ class Detail extends PureComponent {
       isPanelItemRequired,
     } = this.state
     const serviceSettingsErrMsg = errors.ctServiceCenter_ServiceNavigation
+    const testPanelErrMsg = errors.ctService_TestPanel
+    console.log('errors lalalal', errors)
     const shoudDisableSaveButton =
       serviceSettings.filter(row => !row.isDeleted).length === 0
     const { settings = [] } = clinicSettings
     const labAndRadiologySetting =
       settings.isEnableLabModule || settings.isEnableRadiologyModule
-
-    const hiddenFields = this.getHiddenFields(this.state.serviceSettings)
+    const hiddenFields = this.computeHiddenFields(this.state.serviceSettings)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(2) }}>
@@ -683,34 +802,7 @@ class Detail extends PureComponent {
                     }}
                   />
                 </GridItem>
-                {!hiddenFields.includes('panelItems') && (
-                  <GridItem xs={12}>
-                    <FastField
-                      name='panelItems'
-                      render={args => {
-                        return (
-                          <CodeSelect
-                            mode='multiple'
-                            maxTagCount='responsive'
-                            maxTagPlaceholder={<span>...</span>}
-                            onChange={val => {
-                              //If all panel items are removed, set false to Specify Panel Item toggle
-                              if (!val || val.length === 0)
-                                args.form.setFieldValue(
-                                  'isRequiredSpecifyPanelItem',
-                                  false,
-                                )
-                            }}
-                            disableAll
-                            label='Panel Items'
-                            code='CTRevenueCategory'
-                            {...args}
-                          />
-                        )
-                      }}
-                    />
-                  </GridItem>
-                )}
+
                 {settings.isEnableMedisave && (
                   <GridItem xs={12}>
                     <FastField
@@ -811,8 +903,9 @@ class Detail extends PureComponent {
                             return (
                               <Switch
                                 disabled={
-                                  !this.props.values.panelItems ||
-                                  this.props.values.panelItems.length === 0
+                                  !this.props.values.ctService_TestPanel ||
+                                  this.props.values.ctService_TestPanel
+                                    .length === 0
                                 }
                                 label='Specify Panel Item'
                                 {...args}
@@ -966,6 +1059,38 @@ class Detail extends PureComponent {
                   }}
                   schema={modalityItemSchema}
                   {...this.modalityTableParas}
+                />
+              </React.Fragment>
+            )}
+
+            {!hiddenFields.includes('ctService_TestPanel') && (
+              <React.Fragment>
+                <h4 style={{ fontWeight: 400 }}>
+                  <b>Test Panels</b>
+                </h4>{' '}
+                {testPanelErrMsg && (
+                  <p className={classes.serviceSettingStyle}>
+                    {testPanelErrMsg}
+                  </p>
+                )}
+                <EditableTableGrid
+                  forceRender
+                  style={{
+                    marginTop: theme.spacing(1),
+                    margin: theme.spacing(2),
+                  }}
+                  rows={this.state.testPanels}
+                  FuncProps={{
+                    pagerConfig: {
+                      containerExtraComponent: this.PagerContent,
+                    },
+                  }}
+                  EditingProps={{
+                    showAddCommand: true,
+                    onCommitChanges: this.commitTestPanelChanges,
+                  }}
+                  schema={testPanelSchema}
+                  {...this.testPanelTableParas}
                 />
               </React.Fragment>
             )}
