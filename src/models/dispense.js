@@ -90,22 +90,22 @@ export default createFormViewModel({
         })
       },
 
-      *addActualize({payload},{call,put}){
+      *addActualize({ payload }, { call, put }) {
         const response = yield call(service.addActualize, payload)
         return response
       },
 
-      *getActualize({payload},{call,put}){
+      *getActualize({ payload }, { call, put }) {
         const response = yield call(service.getActualize, payload)
         return response
       },
 
-      *cancelActualize({payload},{call,put}){
+      *cancelActualize({ payload }, { call, put }) {
         const response = yield call(service.cancelActualize, payload)
         return response
       },
 
-      *getServingPersons({payload},{call,put}){
+      *getServingPersons({ payload }, { call, put }) {
         const response = yield call(service.getServingPersons, payload)
         if (response)
           yield put({
@@ -116,7 +116,7 @@ export default createFormViewModel({
           })
       },
 
-      *setServingPerson({payload},{call,put}){
+      *setServingPerson({ payload }, { call, put }) {
         const response = yield call(service.setServingPerson, payload)
         if (response)
           yield put({
@@ -249,30 +249,14 @@ export default createFormViewModel({
         const { entity } = visitRegistration
 
         const response = yield call(service.removeAddOrderDetails, payload)
-        if (response === 204) {
-          notification.success({ message: 'Retail visit discarded' })
-          sendQueueNotification({
-            message: 'Retail visit discarded.',
-            queueNo: entity.queueNo,
-          })
-          return true
-        }
-        return false
+        return response === 204
       },
       *discardBillOrder({ payload }, { call, select }) {
         const visitRegistration = yield select(state => state.visitRegistration)
         const { entity } = visitRegistration
 
         const response = yield call(service.removeBillFirstVisit, payload)
-        if (response === 204) {
-          notification.success({ message: 'Bill-First visit discarded' })
-          sendQueueNotification({
-            message: 'Bill-First visit discarded.',
-            queueNo: entity.queueNo,
-          })
-          return true
-        }
-        return false
+        return response === 204
       },
 
       *updateShouldRefreshOrder({ payload }, { put, select }) {

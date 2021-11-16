@@ -175,7 +175,7 @@ const Detail = ({
                             ...[
                               {
                                 id: 'isNurseActualizable',
-                                name: 'Actualize by Nurse',
+                                name: 'Actualized by Nurse',
                                 tooltip:
                                   'Item will generate task for nurse to actualize',
                                 disabled:

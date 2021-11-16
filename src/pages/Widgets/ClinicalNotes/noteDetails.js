@@ -106,15 +106,13 @@ class NoteDetails extends Component {
             gridItemWidth={width}
           />
 
-          <Authorized authority='settings.cannedtext'>
-            <CannedTextButton
-              onSettingClick={onSettingClick}
-              onPrevDoctorNoteClick={this.onPrevDoctorNoteClick}
-              onCannedTextClick={onCannedTextClick}
-              cannedTextTypeFK={item.cannedTextTypeFK}
-              handleSelectCannedText={this.handleSelectCannedText}
-            />
-          </Authorized>
+          <CannedTextButton
+            onSettingClick={onSettingClick}
+            onPrevDoctorNoteClick={this.onPrevDoctorNoteClick}
+            onCannedTextClick={onCannedTextClick}
+            cannedTextTypeFK={item.cannedTextTypeFK}
+            handleSelectCannedText={this.handleSelectCannedText}
+          />
 
           <Checklist
             checklistCategory={CHECKLIST_CATEGORY.DOCTORCONSULTATION}
