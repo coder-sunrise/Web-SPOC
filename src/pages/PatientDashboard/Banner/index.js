@@ -39,6 +39,7 @@ import Block from './Block'
 import HistoryDiagnosis from './HistoryDiagnosis'
 import { SwitcherTwoTone } from '@ant-design/icons'
 import { SCHEME_TYPE } from '@/utils/constants'
+import CopayerDetails from '@/pages/Setting/Company/CopayerDetails'
 
 const headerStyles = {
   color: 'darkblue',
@@ -266,8 +267,46 @@ class Banner extends PureComponent {
   closeNotes = () => this.setState({ showNotesModal: false })
   openPreOrders = () => this.setState({ showPreOrderModal: true })
   closePreOrders = () => this.setState({ showPreOrderModal: false })
-  openScheme = () => this.setState({ showSchemeModal: true })
-  closeScheme = () => this.setState({ showSchemeModal: false })
+  openScheme = coPayerFK => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'copayerDetail/queryCopayerDetails',
+      payload: {
+        id: coPayerFK,
+      },
+    })
+
+    this.setState({ showSchemeModal: true })
+  }
+  closeScheme = () => {
+    const { dispatch } = this.props
+
+    dispatch({
+      type: 'copayerDetail/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
+    this.setState({ showSchemeModal: false })
+  }
+  confirmCopayer = () => {
+    const { dispatch, patient } = this.props
+    const { entity } = patient
+    dispatch({
+      type: 'patient/query',
+      payload: {
+        id: entity.id,
+      },
+    })
+
+    dispatch({
+      type: 'copayerDetail/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
+    this.setState({ showSchemeModal: false })
+  }
   openPatientProfile = () => {
     if (this.props.from !== 'Appointment') return
     const { dispatch, patient } = this.props
@@ -428,7 +467,15 @@ class Banner extends PureComponent {
                   whiteSpace: 'nowrap',
                 }}
                 onClick={e => {
-                  this.openScheme()
+                  const editDetailAccessRight = Authorized.check(
+                    'copayer.copayerdetails',
+                  ) || {
+                    rights: 'hidden',
+                  }
+                  if (editDetailAccessRight.rights === 'hidden') return
+                  if (scheme.copayerFK) {
+                    this.openScheme(scheme.copayerFK)
+                  }
                 }}
               >
                 {s.copaymentSchemeName || s.schemeTypeName}
@@ -1334,9 +1381,10 @@ class Banner extends PureComponent {
           open={this.state.showSchemeModal}
           title='Co-Payer Details'
           onClose={this.closeScheme}
-          maxWidth='lg'
+          onConfirm={this.confirmCopayer}
+          fullScreen
         >
-          <Paper />
+          <CopayerDetails fromCommonModal />
         </CommonModal>
       </Paper>
     )

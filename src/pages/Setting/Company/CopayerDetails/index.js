@@ -43,7 +43,7 @@ const getTabContent = (tabName, props) => {
       <CardContainer
         hideHeader
         style={{
-          height,
+          height: height,
           overflowX: 'hidden',
         }}
       >
@@ -87,7 +87,7 @@ const copayerDetailTabs = props => {
 }
 
 const Detail = props => {
-  const { classes, theme } = props
+  const { classes, theme, height, fromCommonModal = false, onClose } = props
   const { copayerDetail, clinicSettings } = props
   const { handleSubmit } = props
 
@@ -114,9 +114,11 @@ const Detail = props => {
   }
 
   const compProps = {
-    height: `calc(100vh - ${183 + theme.spacing(1)}px)`,
     onEditingListControl: onEditingList,
     ...props,
+    height: fromCommonModal
+      ? height - 130
+      : `calc(100vh - ${183 + theme.spacing(1)}px)`,
   }
 
   const ActionButtons = () => {
@@ -152,7 +154,11 @@ const Detail = props => {
         <Button
           authority='none'
           color='danger'
-          onClick={navigateDirtyCheck({ redirectUrl: '/finance/copayer' })}
+          onClick={
+            fromCommonModal
+              ? onClose
+              : navigateDirtyCheck({ redirectUrl: '/finance/copayer' })
+          }
         >
           Close
         </Button>
@@ -197,7 +203,7 @@ const Detail = props => {
         keepMounted={false}
       >
         <div>
-          <div style={{ marginLeft: 8, marginBottom: 4, marginTop: '-4px' }}>
+          <div style={{ marginLeft: 8, marginTop: '-10px' }}>
             Co-Payer:&nbsp;
             <span style={{ fontWeight: 600 }}>{props.values.code}</span>
             &nbsp;-&nbsp;
@@ -287,7 +293,7 @@ export default compose(
       }),
     }),
     handleSubmit: (values, { props }) => {
-      const { dispatch, history } = props
+      const { dispatch, history, fromCommonModal = false, onConfirm } = props
       const { effectiveDates, ...restValues } = values
 
       const actionPayload = {
@@ -303,7 +309,13 @@ export default compose(
         payload: { ...actionPayload },
       }).then(result => {
         if (result !== false) {
-          history.push('/finance/copayer')
+          if (fromCommonModal) {
+            if (onConfirm) {
+              onConfirm()
+            }
+          } else {
+            history.push('/finance/copayer')
+          }
         }
       })
     },
