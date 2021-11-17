@@ -17,7 +17,7 @@ import { ErrorWrapper, LoadingWrapper } from '@/components/_medisys'
 // Sub-components
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 import { deleteFileByFileID } from '@/services/file'
-import { VISIT_TYPE } from '@/utils/constants'
+import { VISIT_TYPE, SCHEME_TYPE } from '@/utils/constants'
 import { locationQueryParameters } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import PatientInfoCard from './PatientInfoCard'
@@ -96,7 +96,7 @@ const getHeight = propsHeight => {
     patientInfo: patient.entity || {},
     doctorProfiles: codetable.doctorprofile,
     ctinvoiceadjustment: codetable.ctinvoiceadjustment,
-    ctvisitpurpose : codetable.ctvisitpurpose,
+    ctvisitpurpose: codetable.ctvisitpurpose,
   }),
 )
 @withFormikExtend({
@@ -337,29 +337,36 @@ class NewVisit extends PureComponent {
         currentPreOrder.isDeleted = false
       } else {
         const { id, ...restPreOrderItem } = po
-        visitPreOrderItem = [...visitPreOrderItem, { ...restPreOrderItem, actualizedPreOrderItemFK: id }]
+        visitPreOrderItem = [
+          ...visitPreOrderItem,
+          { ...restPreOrderItem, actualizedPreOrderItemFK: id },
+        ]
       }
     })
     setFieldValue('visitPreOrderItem', [...visitPreOrderItem])
   }
 
-  deletePreOrderItem = (actualizedPreOrderItemFK) => {
+  deletePreOrderItem = actualizedPreOrderItemFK => {
     const { values, setFieldValue } = this.props
     let { visitPreOrderItem = [] } = values
 
-    var item = visitPreOrderItem.find(poi => poi.actualizedPreOrderItemFK === actualizedPreOrderItemFK)
+    var item = visitPreOrderItem.find(
+      poi => poi.actualizedPreOrderItemFK === actualizedPreOrderItemFK,
+    )
     if (item) {
       if (item.id) {
         item.isDeleted = true
-      }else if (!item.id && item.actualizedPreOrderItemFK)
-      {
+      } else if (!item.id && item.actualizedPreOrderItemFK) {
         item.isDeleted = true
-      }
-      else {
-        visitPreOrderItem = [...visitPreOrderItem.filter(poi => poi.actualizedPreOrderItemFK !== actualizedPreOrderItemFK)]
+      } else {
+        visitPreOrderItem = [
+          ...visitPreOrderItem.filter(
+            poi => poi.actualizedPreOrderItemFK !== actualizedPreOrderItemFK,
+          ),
+        ]
       }
     }
-    setFieldValue("visitPreOrderItem", [...visitPreOrderItem])
+    setFieldValue('visitPreOrderItem', [...visitPreOrderItem])
   }
 
   render() {
@@ -440,21 +447,18 @@ class NewVisit extends PureComponent {
       this.props.setFieldValue('referredBy', referralType)
     }
 
-    const draftPreOrderItem = patientInfo?.pendingPreOrderItem
-      ?.map(po => { 
-        const selectPreOrder = visitPreOrderItem.find(
-          apo => apo.actualizedPreOrderItemFK === po.id,
-        )
-        if (selectPreOrder) {
-          return {
-            ...po,
-            preOrderItemStatus: selectPreOrder.isDeleted
-              ? 'New'
-              : 'Actualizing',
-          }
+    const draftPreOrderItem = patientInfo?.pendingPreOrderItem?.map(po => {
+      const selectPreOrder = visitPreOrderItem.find(
+        apo => apo.actualizedPreOrderItemFK === po.id,
+      )
+      if (selectPreOrder) {
+        return {
+          ...po,
+          preOrderItemStatus: selectPreOrder.isDeleted ? 'New' : 'Actualizing',
         }
-        return { ...po }
-      })
+      }
+      return { ...po }
+    })
 
     return (
       <React.Fragment>
@@ -519,7 +523,13 @@ class NewVisit extends PureComponent {
                           existingQNo={existingQNo}
                           copaymentScheme={(
                             patientInfo?.patientScheme || []
-                          ).filter(t => t.schemeTypeFK === 15)}
+                          ).filter(
+                            t =>
+                              [
+                                SCHEME_TYPE.CORPORATE,
+                                SCHEME_TYPE.INSURANCE,
+                              ].indexOf(t.schemeTypeFK) >= 0,
+                          )}
                           handleUpdateAttachments={this.updateAttachments}
                           attachments={values.visitAttachment}
                           visitType={values.visitPurposeFK}
@@ -577,16 +587,16 @@ class NewVisit extends PureComponent {
                         </GridItem>
                         {values.visitPreOrderItem &&
                           values.visitPreOrderItem?.length !== 0 && (
-                          <GridItem xs={12} className={classes.row}>
-                            <CommonCard title='Pre-Order Actualization'>
-                              <PreOrderCard
-                                {...this.props}
-                                deletePreOrderItem={this.deletePreOrderItem}
-                                dispatch={dispatch}
-                              />
-                            </CommonCard>
-                          </GridItem>
-                        )}
+                            <GridItem xs={12} className={classes.row}>
+                              <CommonCard title='Pre-Order Actualization'>
+                                <PreOrderCard
+                                  {...this.props}
+                                  deletePreOrderItem={this.deletePreOrderItem}
+                                  dispatch={dispatch}
+                                />
+                              </CommonCard>
+                            </GridItem>
+                          )}
                         <GridItem xs={12} className={classes.row}>
                           <div ref={this.myRef}>
                             <Accordion

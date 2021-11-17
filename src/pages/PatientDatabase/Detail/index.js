@@ -315,6 +315,13 @@ class PatientDetail extends PureComponent {
       },
     })
 
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'coPaymentScheme',
+      },
+    })
+
     const accessRight = Authorized.check(
       'patientdatabase.patientprofiledetails.medicalhistory',
     )

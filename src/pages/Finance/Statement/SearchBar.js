@@ -17,6 +17,7 @@ import {
 } from '@/components'
 import { FilterBarDate } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
+import { COPAYER_TYPE } from '@/utils/constants'
 
 const styles = () => ({
   container: {
@@ -37,7 +38,7 @@ const styles = () => ({
 }))
 @withFormik({
   mapPropsToValues: () => ({
-    copayerFK: 'All Company',
+    copayerFK: 'All Co-Payer',
     statementStartDate: moment()
       .subtract(1, 'months')
       .startOf('month'),
@@ -96,7 +97,7 @@ class SearchBar extends PureComponent {
     showReportSelection: false,
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.unmount()
   }
 
@@ -124,11 +125,7 @@ class SearchBar extends PureComponent {
   }
 
   batchPrintClick = () => {
-    const {
-      batchPrintStatements,
-      dispatch,
-      values
-    } = this.props
+    const { batchPrintStatements, dispatch, values } = this.props
 
     const {
       statementNo,
@@ -167,7 +164,7 @@ class SearchBar extends PureComponent {
           DueDateFrom: statementDueDateFrom,
           DueDateTo: statementDueDateTo,
         },
-        pagesize: 99999
+        pagesize: 99999,
       },
     }).then(r => {
       if (r) {
@@ -178,7 +175,7 @@ class SearchBar extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const {
       classes,
       history,
@@ -262,10 +259,15 @@ class SearchBar extends PureComponent {
                   return (
                     <CodeSelect
                       {...args}
-                      label='Company'
+                      label='Co-Payer'
                       code='ctCopayer'
                       labelField='displayValue'
-                      localFilter={item => item.coPayerTypeFK === 1}
+                      localFilter={item =>
+                        [
+                          COPAYER_TYPE.CORPORATE,
+                          COPAYER_TYPE.INSURANCE,
+                        ].indexOf(item.coPayerTypeFK) >= 0
+                      }
                     />
                   )
                 }}

@@ -19,16 +19,16 @@ import ListItemIcon from '@material-ui/core/ListItemIcon'
 import { CreateNewFolder, AddCircle } from '@material-ui/icons'
 
 class SetFolderWithPopover extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = { newFolder: '', folderFKs: [] }
   }
 
-  setNewFolder = (name) => {
+  setNewFolder = name => {
     this.setState({ newFolder: name })
   }
 
-  setFolderFKs = (folderFKs) => {
+  setFolderFKs = folderFKs => {
     this.setState({ folderFKs })
   }
 
@@ -38,7 +38,7 @@ class SetFolderWithPopover extends Component {
   }
 
   // eslint-disable-next-line camelcase
-  UNSAFE_componentWillReceiveProps = (nextProps) => {
+  UNSAFE_componentWillReceiveProps = nextProps => {
     const folderFKs = _.sortedUniq(this.props.selectedFolderFKs)
     const nextFolderFKs = _.sortedUniq(nextProps.selectedFolderFKs)
     if (
@@ -49,7 +49,7 @@ class SetFolderWithPopover extends Component {
     }
   }
 
-  render () {
+  render() {
     const { folderList = [], onClose, onAddNewFolders, justIcon } = this.props
     const { folderFKs, newFolder } = this.state
 
@@ -65,38 +65,35 @@ class SetFolderWithPopover extends Component {
                 overflow: 'scroll',
               }}
             >
-              {folderList.filter((f) => f.id > 0).map((item) => {
-                return (
-                  <ListItem key={item.id} button style={{ paddingLeft: 0 }}>
-                    <Checkbox
-                      simple
-                      label={item.displayValue}
-                      checked={folderFKs.includes(item.id)}
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          this.setFolderFKs(
-                            _.uniq([
-                              ...folderFKs,
-                              item.id,
-                            ]),
-                          )
-                        } else {
-                          this.setFolderFKs(
-                            _.uniq(folderFKs.filter((f) => f !== item.id)),
-                          )
-                        }
-                      }}
-                    />
-                  </ListItem>
-                )
-              })}
+              {folderList
+                .filter(f => f.id > 0)
+                .map(item => {
+                  return (
+                    <ListItem key={item.id} button style={{ paddingLeft: 0 }}>
+                      <Checkbox
+                        simple
+                        label={item.displayValue}
+                        checked={folderFKs.includes(item.id)}
+                        onChange={e => {
+                          if (e.target.value) {
+                            this.setFolderFKs(_.uniq([...folderFKs, item.id]))
+                          } else {
+                            this.setFolderFKs(
+                              _.uniq(folderFKs.filter(f => f !== item.id)),
+                            )
+                          }
+                        }}
+                      />
+                    </ListItem>
+                  )
+                })}
             </div>
 
             <div style={{ display: 'flex' }}>
               <TextField
                 label='New Folder'
                 maxLength={50}
-                onChange={(e) => {
+                onChange={e => {
                   this.setNewFolder(e.target.value)
                 }}
               />
@@ -105,7 +102,7 @@ class SetFolderWithPopover extends Component {
                   size='sm'
                   onClick={() => {
                     const maxSort = _.maxBy(
-                      folderList.filter((f) => f.id > 0),
+                      folderList.filter(f => f.id > 0),
                       'sortOrder',
                     )
                     const entity = {
@@ -115,6 +112,7 @@ class SetFolderWithPopover extends Component {
                       sortOrder: maxSort ? maxSort.sortOrder + 1 : 1,
                       effectiveStartDate: moment().formatUTC(true),
                       effectiveEndDate: moment('2099-12-31').formatUTC(true),
+                      type: this.props.type,
                     }
                     onAddNewFolders(entity)
                   }}
@@ -132,7 +130,7 @@ class SetFolderWithPopover extends Component {
         title='Folder as:'
         trigger='click'
         placement='right'
-        onVisibleChange={(e) => {
+        onVisibleChange={e => {
           if (e === false) {
             onClose(folderFKs)
           }
