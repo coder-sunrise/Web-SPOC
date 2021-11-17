@@ -195,7 +195,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           medicationPrecautions.map(o => {
             return {
               precautionCode: o.medicationPrecautionCode,
-              Precaution: medicationPrecautionName,
+              Precaution: o.medicationPrecautionName,
               sequence: o.sequence,
               medicationPrecautionFK: o.medicationPrecautionFK,
             }
@@ -314,6 +314,9 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
         const vaccinationUOM = ctvaccinationunitofmeasurement.find(
           uom => uom.id === inventoryVaccination.prescribingUOMFK,
         )
+        const vaccinationDispenseUOM = ctvaccinationunitofmeasurement.find(
+          uom => uom.id === inventoryVaccination.dispensingUOMFK,
+        )
         const vaccinationusage = ctvaccinationusage.find(
           usage => usage.id === inventoryVaccination.vaccinationUsageFK,
         )
@@ -331,18 +334,17 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           vaccinationCode: inventoryVaccination.code,
           vaccinationName: inventoryVaccination.displayValue,
           usageMethodFK: inventoryVaccination.vaccinationUsageFK,
-          usageMethodCode: vaccinationusage ? vaccinationusage.code : undefined,
-          usageMethodDisplayValue: vaccinationusage
-            ? vaccinationusage.name
-            : undefined,
+          usageMethodCode: vaccinationusage?.code,
+          usageMethodDisplayValue: vaccinationusage?.name,
           dosageFK: inventoryVaccination.prescribingDosageFK,
-          dosageCode: vaccinationdosage ? vaccinationdosage.code : undefined,
-          dosageDisplayValue: vaccinationdosage
-            ? vaccinationdosage.displayValue
-            : undefined,
+          dosageCode: vaccinationdosage?.code,
+          dosageDisplayValue: vaccinationdosage?.displayValue,
           uomfk: inventoryVaccination.prescribingUOMFK,
-          uomCode: vaccinationUOM ? vaccinationUOM.code : undefined,
-          uomDisplayValue: vaccinationUOM ? vaccinationUOM.name : undefined,
+          uomCode: vaccinationUOM?.code,
+          uomDisplayValue: vaccinationUOM?.name,
+          dispenseUOMFK: inventoryVaccination.dispensingUOMFK,
+          dispenseUOMCode: vaccinationDispenseUOM?.code,
+          dispenseUOMDisplayValue: vaccinationDispenseUOM?.name,
           quantity: inventoryVaccination.dispensingQuantity,
           unitPrice: orderSetItem.unitPrice,
           totalPrice: orderSetItem.unitPrice * orderSetItem.quantity,
@@ -364,6 +366,9 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           subject: inventoryVaccination.displayValue,
           isGenerateCertificate: inventoryVaccination.isAutoGenerateCertificate,
           isNurseActualizeRequired: inventoryVaccination.isNurseActualizable,
+          instruction: `${vaccinationusage?.name ||
+            ''} ${vaccinationdosage?.displayValue ||
+            ''} ${vaccinationUOM?.name || ''}`,
         }
       }
       let newCORVaccinationCert = []

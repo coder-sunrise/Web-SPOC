@@ -456,7 +456,8 @@ export default ({
       )
 
     if (
-      radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ||
+      radiologyWorkitemStatusFK ===
+        RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ||
       radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
       radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
     )
@@ -465,8 +466,11 @@ export default ({
           title={
             radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
               ? 'In Progress'
-              : radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ? 'Modality Completed' :'Completed'
-            }
+              : radiologyWorkitemStatusFK ===
+                RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED
+              ? 'Modality Completed'
+              : 'Completed'
+          }
         >
           <div
             style={{
@@ -779,8 +783,10 @@ export default ({
               paddingRight = 10
             }
             let urgentRight = -33
-            if((row.type === '3' || row.type === '10') && row.priority === 'Urgent')
-            {
+            if (
+              (row.type === '3' || row.type === '10') &&
+              row.priority === 'Urgent'
+            ) {
               paddingRight += 34
               urgentRight = -paddingRight - 4
             }
@@ -829,7 +835,7 @@ export default ({
                     )}
                     {radiologyWorkitemStatusFK &&
                       radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
-                    {urgentIndicator(row,urgentRight)}
+                    {urgentIndicator(row, urgentRight)}
                   </div>
                 </div>
               </div>
@@ -904,14 +910,10 @@ export default ({
           width: 100,
           render: row => {
             let qty = '0.0'
-            if (row.type === '1' || row.type === '5') {
-              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${
-                row.dispenseUOMDisplayValue
-              }`
-            } else if (row.type === '2') {
-              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${
-                row.uomDisplayValue
-              }`
+            if (row.type === '1' || row.type === '5' || row.type === '2') {
+              qty = `${numeral(row.quantity || 0).format(
+                '0,0.0',
+              )} ${row.dispenseUOMDisplayValue || ''}`
             } else if (
               row.type === '3' ||
               row.type === '7' ||
