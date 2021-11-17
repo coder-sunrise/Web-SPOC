@@ -4,12 +4,12 @@ import { useDispatch } from 'dva'
 
 const addressColumns = [
   { name: 'name', title: 'Name' },
-  { name: 'relationship', title: 'Relationship' },
+  // { name: 'relationship', title: 'Relationship' },
   { name: 'addressInfo', title: 'Current Address' },
 ]
 const schemeColumns = [
   { name: 'name', title: 'Name' },
-  { name: 'relationship', title: 'Relationship' },
+  // { name: 'relationship', title: 'Relationship' },
   { name: 'schemeInfo', title: 'Current Corporate Scheme' },
 ]
 const columnExtensions = [
@@ -43,9 +43,10 @@ export default class FamilyMembersInfoUpdate extends Component {
       selectedAddressRows = [],
       selectedSchemeRows = [],
     } = this.state
+    const { onSelectionChange } = this.props
     const addressList = familyMembersInfo.filter(x => x.addressInfo)
     const schemeList = familyMembersInfo.filter(x => x.schemeInfo)
-    // console.log('detail render', addressList, schemeList, familyMembersInfo)
+
     return (
       <div>
         {addressList.length > 0 && (
@@ -53,19 +54,24 @@ export default class FamilyMembersInfoUpdate extends Component {
             <h5>Do you want to update your Family Members' Address too?</h5>
             <CommonTableGrid
               rows={addressList}
-              getRowId={r => r.id}
+              getRowId={r => r.familyMemberFK}
               columns={addressColumns}
               columnExtensions={columnExtensions}
               selection={selectedAddressRows}
-              onSelectionChange={rows =>
-                this.setState({ selectedAddressRows: rows })
-              }
+              onSelectionChange={rows => {
+                familyMembersInfo.forEach(x=> {
+                  x.isUpdateAddress = false
+                  if(rows.some(i=>i === x.familyMemberFK))
+                    x.isUpdateAddress = true
+                })
+                this.setState({ familyMembersInfo, selectedAddressRows: rows})
+                onSelectionChange(familyMembersInfo)
+              }}
               FuncProps={{
                 pager: false,
                 selectable: true,
                 selectConfig: {
                   showSelectAll: true,
-                  // selectByRowClick: false,
                   rowSelectionEnabled: () => true,
                 },
               }}
@@ -79,19 +85,24 @@ export default class FamilyMembersInfoUpdate extends Component {
             </h5>
             <CommonTableGrid
               rows={schemeList}
-              getRowId={r => r.id}
+              getRowId={r => r.familyMemberFK}
               columns={schemeColumns}
               columnExtensions={columnExtensions}
               selection={selectedSchemeRows}
-              onSelectionChange={rows =>
-                this.setState({ selectedSchemeRows: rows })
-              }
+              onSelectionChange={rows => {
+                familyMembersInfo.forEach(x=> {
+                  x.isUpdateScheme = false
+                  if(rows.some(i=>i === x.familyMemberFK))
+                    x.isUpdateScheme = true
+                })
+                this.setState({ familyMembersInfo, selectedSchemeRows: rows})
+                onSelectionChange(familyMembersInfo)
+              }}
               FuncProps={{
                 pager: false,
                 selectable: true,
                 selectConfig: {
                   showSelectAll: true,
-                  // selectByRowClick: false,
                   rowSelectionEnabled: () => true,
                 },
               }}

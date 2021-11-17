@@ -432,7 +432,7 @@ class PatientDetail extends PureComponent {
     const newSchemeVal = values.patientScheme.filter(
       x => x.schemeTypeFK === SCHEME_TYPE.CORPORATE && !x.isDeleted,
     )
-    let isSchemeChange = !_.isEqual(oldSchemeVal, newSchemeVal)
+    let isSchemeChange = !_.isEqual(oldSchemeVal, newSchemeVal) && newSchemeVal.length > 0
     const updatedTypes = { address: isAddressChange, scheme: isSchemeChange }
     const fimilyMembersInfoTitle = `Confirm Update Family Members' ${[
       isAddressChange ? 'Address' : '',
@@ -793,13 +793,14 @@ class PatientDetail extends PureComponent {
           <CommonModal
             open={this.state.showFamilyMembersInfoUpdate}
             title={this.state.fimilyMembersInfoTitle}
-            observe='FaimilyMembersInfoUpdate'
+            // observe='FaimilyMembersInfoUpdate'
             overrideLoading
             displayCloseIcon={false}
             confirmText='Yes'
             cancelText='No'
             showFooter
             onConfirm={() => {
+              this.setState({ showFamilyMembersInfoUpdate: false })
               this.props.handleSubmit()
             }}
             onClose={() => {
@@ -807,11 +808,14 @@ class PatientDetail extends PureComponent {
               this.props.handleSubmit()
             }}
           >
-            <FamilyMembersInfoUpdate
-              patientProfileFK={entity.id}
-              {...this.state.updatedTypes}
-              dispatch={dispatch}
-            />
+            {this.state.showFamilyMembersInfoUpdate && (
+              <FamilyMembersInfoUpdate
+                patientProfileFK={entity.id}
+                {...this.state.updatedTypes}
+                dispatch={dispatch}
+                onSelectionChange={e => (values.familyMembersInfoUpdate = e)}
+              />
+            )}
           </CommonModal>
         </GridContainer>
       </Authorized>
