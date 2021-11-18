@@ -19,7 +19,7 @@ const styles = (theme) => ({
   mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({ modelName: 'settingDocumentTemplate' })
-class ServiceCenter extends PureComponent {
+class DocumentTemplate extends PureComponent {
   state = {}
 
   componentDidMount () {
@@ -57,7 +57,7 @@ class ServiceCenter extends PureComponent {
           title={`${settingDocumentTemplate.entity
             ? 'Edit '
             : 'Add '}Document Template`}
-          maxWidth='md'
+          maxWidth='lg'
           bodyNoPadding
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
@@ -69,4 +69,4 @@ class ServiceCenter extends PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(ServiceCenter)
+export default withStyles(styles, { withTheme: true })(DocumentTemplate)
