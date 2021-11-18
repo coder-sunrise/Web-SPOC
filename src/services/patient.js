@@ -5,7 +5,7 @@ const url = '/api/patient'
 const chasBalanceUrl = '/api/PatientCoPaymentScheme/ChasBalance'
 const medisaveBalanceUrl = '/api/PatientCoPaymentScheme/MedisaveBalance'
 const stickyNotesUrl = '/api/PatientStickyNotes'
-
+import { stringify } from 'qs'
 // const { api } = config
 // const { url, subjects, getListWithoutCheckRights } = api
 
@@ -31,5 +31,10 @@ const fns = {
   queryStickyNotes: params => service.query(stickyNotesUrl, params.patientProfileFK),
   createStickyNotes: params => service.upsert(stickyNotesUrl, params),
   upsertStickyNotes: params => service.upsert(stickyNotesUrl, params),
+  getFamilyMembersInfo: async params => {
+    return await request(`${url}/GetFamilyMembersInfo?${stringify(params)}`)
+  },
+
+
 }
 export default fns

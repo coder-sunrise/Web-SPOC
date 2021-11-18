@@ -430,6 +430,13 @@ export default createFormViewModel({
         }
         return r
       },
+      *getFamilyMembersInfo({ payload }, { call, put }) {
+        const r = yield call(service.getFamilyMembersInfo, payload)
+        const { status, data = [] } = r
+        if(status === '200')
+          return data
+        return null
+      },
     },
     reducers: {
       updateDefaultEntity(state, { payload }) {
