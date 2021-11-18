@@ -665,7 +665,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
           expiryDate,
           stock,
           stockFK: id,
-          uomDisplayValue: inventoryItem?.prescribingUOM?.name,
+          uomDisplayValue: inventoryItem?.dispensingUOM?.name,
           isDefault,
           stockBalance: 0,
         })
