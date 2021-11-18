@@ -71,8 +71,8 @@ class DocumentEditor extends SampleBase {
       'Separator',
       'Find',
       'Separator',
-      'LocalClipboard',
-      'RestrictEditing',
+      // 'LocalClipboard',
+      // 'RestrictEditing',
       'FormFields',
     ]
     return (
