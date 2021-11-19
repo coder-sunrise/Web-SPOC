@@ -18,7 +18,7 @@ import { ErrorWrapper, LoadingWrapper } from '@/components/_medisys'
 // Sub-components
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 import { deleteFileByFileID } from '@/services/file'
-import { VISIT_TYPE } from '@/utils/constants'
+import { VISIT_TYPE, SCHEME_TYPE } from '@/utils/constants'
 import { locationQueryParameters } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import PatientInfoCard from './PatientInfoCard'
@@ -584,7 +584,13 @@ class NewVisit extends PureComponent {
                           existingQNo={existingQNo}
                           copaymentScheme={(
                             patientInfo?.patientScheme || []
-                          ).filter(t => t.schemeTypeFK === 15)}
+                          ).filter(
+                            t =>
+                              [
+                                SCHEME_TYPE.CORPORATE,
+                                SCHEME_TYPE.INSURANCE,
+                              ].indexOf(t.schemeTypeFK) >= 0,
+                          )}
                           handleUpdateAttachments={this.updateAttachments}
                           attachments={values.visitAttachment}
                           visitType={values.visitPurposeFK}

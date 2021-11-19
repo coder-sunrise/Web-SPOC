@@ -21,6 +21,7 @@ import {
 } from '@/utils/utils'
 import UploadAttachment from './UploadAttachment'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
+import { scribbleTypes } from '@/utils/codes'
 // import model from './models'
 
 const styles = theme => ({
@@ -613,6 +614,7 @@ class DentalNotes extends Component {
             toggleScribbleModal={this.toggleScribbleModal}
             scribbleData={this.state.selectedData}
             deleteScribbleNote={this.deleteScribbleNote}
+            scribbleNoteType={scribbleTypes.find(x=>x.typeFK === this.state.categoryIndex)?.type}
           />
         </CommonModal>
       </div>

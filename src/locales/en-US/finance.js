@@ -48,7 +48,7 @@ export default {
   'finance.doctor-expense.patient': 'Patient',
   'finance.doctor-expense.description': 'Description',
 
-  'finance.corporate-billing.title': 'Corporate Billing',
+  'finance.corporate-billing.title': 'Co-Payer Billing',
   'finance.corporate-billing.status': 'Status',
   'finance.corporate-billing.outstandingBalance': 'Outstanding Balance',
   'finance.corporate-billing.invoiceNo': 'Invoice No.',
@@ -74,7 +74,7 @@ export default {
 
   'finance.statement.paymentDueDate': 'Payment Due Date',
   'finance.statement.paymentTerms': 'Payment Terms',
-  'finance.statement.company': 'Company',
+  'finance.statement.company': 'Co-Payer',
   'finance.statement.allCompanies': 'All companies',
   'finance.statement.totalAmount': 'Total Amount',
   'finance.statement.outstandingBalance': 'O/S Balance Amount',

@@ -258,6 +258,7 @@ class MasterPrintoutSetting extends PureComponent {
                     allowClear={false}
                     {...args}
                     onChange={(e) => this.checkFormIsDirty(e)}
+                    orderBy={[['name'],['asc']]}
                   />
                 )}
               />

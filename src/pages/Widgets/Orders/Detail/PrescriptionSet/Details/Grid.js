@@ -25,7 +25,7 @@ const rightIcon = {
 
 const Grid = ({ prescriptionSet, dispatch }) => {
   const editRow = row => {
-    if ((!row.isActive || !row.isOnlyClinicInternalUsage) && !row.isDrugMixture)
+    if ((!row.isActive || row.isOnlyClinicInternalUsage) && !row.isDrugMixture)
       return
     else {
       dispatch({
@@ -94,7 +94,7 @@ const Grid = ({ prescriptionSet, dispatch }) => {
                 warningLabel = '#1'
               } else if (
                 drugMixtures.find(
-                  drugMixture => !drugMixture.isOnlyClinicInternalUsage,
+                  drugMixture => drugMixture.isOnlyClinicInternalUsage,
                 )
               ) {
                 warningLabel = '#2'
@@ -111,7 +111,7 @@ const Grid = ({ prescriptionSet, dispatch }) => {
             } else {
               if (!row.isActive) {
                 warningLabel = '#1'
-              } else if (!row.isOnlyClinicInternalUsage) {
+              } else if (row.isOnlyClinicInternalUsage) {
                 warningLabel = '#2'
               } else if (
                 row.inventoryDispenseUOMFK !== row.dispenseUOMFK ||
@@ -231,7 +231,7 @@ const Grid = ({ prescriptionSet, dispatch }) => {
                     color='primary'
                     style={{ marginRight: 5 }}
                     disabled={
-                      (!row.isActive || !row.isOnlyClinicInternalUsage) &&
+                      (!row.isActive || row.isOnlyClinicInternalUsage) &&
                       !row.isDrugMixture
                     }
                   >

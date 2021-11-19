@@ -422,7 +422,7 @@ const isPharmacyOrderUpdated = orders => {
   const isItemUpdate = item => {
     const currentRow = rows.find(r => r.id === item.id && r.type === item.type)
     const isEqual =
-      item.type === '1'
+      item.type === '1' || item.type === '5'
         ? _.isEqual(generateMedication(item), generateMedication(currentRow))
         : _.isEqual(generateConsumable(item), generateConsumable(currentRow))
     return !isEqual
@@ -439,7 +439,10 @@ const isPharmacyOrderUpdated = orders => {
 
   const pharmacyOrder = _originalRows.filter(r => isPushToPharmacy(r))
   for (let index = 0; index < pharmacyOrder.length; index++) {
-    if (pharmacyOrder[index].type === '1') {
+    if (
+      pharmacyOrder[index].type === '1' ||
+      pharmacyOrder[index].type === '5'
+    ) {
       if (isItemUpdate(pharmacyOrder[index])) {
         isUpdatedPharmacy = true
         break

@@ -28,25 +28,10 @@ import { InView } from 'react-intersection-observer'
 import SetFolderWithPopover from './SetFolderWithPopover'
 
 const base64Prefix = 'data:image/png;base64,'
-const wordExt = [
-  'DOC',
-  'DOCX',
-]
-const pptExt = [
-  'PPT',
-  'PPTX',
-]
-const excelExt = [
-  'XLS',
-  'XLSX',
-]
-const imageExt = [
-  'JPG',
-  'JPEG',
-  'PNG',
-  'BMP',
-  'GIF',
-]
+const wordExt = ['DOC', 'DOCX']
+const pptExt = ['PPT', 'PPTX']
+const excelExt = ['XLS', 'XLSX']
+const imageExt = ['JPG', 'JPEG', 'PNG', 'BMP', 'GIF']
 const styles = () => ({
   // Toolbar: {
   //   display: 'none',
@@ -61,7 +46,7 @@ const styles = () => ({
 })
 
 class CardItem extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       loading: false,
@@ -72,7 +57,7 @@ class CardItem extends Component {
   }
 
   // eslint-disable-next-line react/sort-comp
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { width, height } = this.props
     const { width: nextWidth, height: nextHeight } = nextProps
 
@@ -82,7 +67,9 @@ class CardItem extends Component {
   }
 
   refreshImage = () => {
-    const { file: { fileExtension, fileIndexFK, imageData } } = this.props
+    const {
+      file: { fileExtension, fileIndexFK, imageData },
+    } = this.props
 
     if (imageExt.includes(fileExtension.toUpperCase())) {
       if (!imageData) this.fetchImage(fileIndexFK)
@@ -100,10 +87,10 @@ class CardItem extends Component {
     }
   }
 
-  fetchImage = (selectedFileId) => {
+  fetchImage = selectedFileId => {
     this.setState({ loading: true })
 
-    getFileByFileID(selectedFileId).then((response) => {
+    getFileByFileID(selectedFileId).then(response => {
       if (response) {
         const contentInBase64 =
           base64Prefix + arrayBufferToBase64(response.data)
@@ -122,7 +109,7 @@ class CardItem extends Component {
     }
   }
 
-  handleImageLoaded = (e) => {
+  handleImageLoaded = e => {
     const { width, height } = this.props
     this.setState({
       originalImageSize: { width: e.target.width, height: e.target.height },
@@ -145,7 +132,7 @@ class CardItem extends Component {
     }
   }
 
-  render () {
+  render() {
     const {
       classes,
       file,
@@ -158,9 +145,11 @@ class CardItem extends Component {
       readOnly,
       width,
       height,
+      modelName,
+      isEnableDeleteDocument = true,
+      isEnableEditDocument = true,
     } = this.props
     const { loading, imageData } = this.state
-
     return (
       <InView as='div' onChange={this.handleInViewChanged}>
         <div className={classes.CardContainer}>
@@ -173,62 +162,70 @@ class CardItem extends Component {
               </GridItem>
               <GridItem md={6} align='Right' style={{ padding: 0, height: 20 }}>
                 <div className={classes.Toolbar}>
-                  <Button
-                    color='primary'
-                    justIcon
-                    disabled={readOnly}
-                    onClick={() => {
-                      onEditFileName(file)
-                    }}
-                  >
-                    <Edit />
-                  </Button>
-                  <SetFolderWithPopover
-                    key={file.id}
-                    folderList={folderList}
-                    selectedFolderFKs={file.folderFKs || []}
-                    onClose={(selectedFolder) => {
-                      const originalFolders = _.sortedUniq(file.folderFKs || [])
-                      const newFolders = _.sortedUniq(selectedFolder)
+                  {isEnableEditDocument && (
+                    <Button
+                      color='primary'
+                      justIcon
+                      disabled={readOnly}
+                      onClick={() => {
+                        onEditFileName(file)
+                      }}
+                    >
+                      <Edit />
+                    </Button>
+                  )}
+                  {isEnableEditDocument && (
+                    <SetFolderWithPopover
+                      key={file.id}
+                      folderList={folderList}
+                      selectedFolderFKs={file.folderFKs || []}
+                      onClose={selectedFolder => {
+                        const originalFolders = _.sortedUniq(
+                          file.folderFKs || [],
+                        )
+                        const newFolders = _.sortedUniq(selectedFolder)
 
-                      if (
-                        originalFolders.length !== newFolders.length ||
-                        originalFolders.join(',') !== newFolders.join(',')
-                      ) {
-                        onFileUpdated({
-                          ...file,
-                          folderFKs: newFolders,
-                        })
-                      }
-                    }}
-                    onAddNewFolders={onAddNewFolders}
-                  />
-                  <Popconfirm
-                    title='Permanently delete this file in all folders?'
-                    onConfirm={() => {
-                      dispatch({
-                        type: 'patientAttachment/removeRow',
-                        payload: {
-                          id: file.id,
-                        },
-                      }).then(() => {
+                        if (
+                          originalFolders.length !== newFolders.length ||
+                          originalFolders.join(',') !== newFolders.join(',')
+                        ) {
+                          onFileUpdated({
+                            ...file,
+                            folderFKs: newFolders,
+                          })
+                        }
+                      }}
+                      onAddNewFolders={onAddNewFolders}
+                    />
+                  )}
+                  {isEnableDeleteDocument && (
+                    <Popconfirm
+                      title='Permanently delete this file in all folders?'
+                      onConfirm={() => {
                         dispatch({
-                          type: 'patientAttachment/query',
+                          type: `${modelName}/removeRow`,
+                          payload: {
+                            id: file.id,
+                          },
+                        }).then(() => {
+                          dispatch({
+                            type: `${modelName}/query`,
+                          })
                         })
-                      })
-                    }}
-                  >
-                    <Tooltip title='Delete'>
-                      <Button
-                        size='sm'
-                        color='danger'
-                        justIcon
-                        disabled={readOnly}
-                      >
-                        <Delete />
-                      </Button>
-                    </Tooltip>
-                  </Popconfirm>
+                      }}
+                    >
+                      <Tooltip title='Delete'>
+                        <Button
+                          size='sm'
+                          color='danger'
+                          justIcon
+                          disabled={readOnly}
+                        >
+                          <Delete />
+                        </Button>
+                      </Tooltip>
+                    </Popconfirm>
+                  )}
                 </div>
               </GridItem>
               <GridItem md={12}>
@@ -286,8 +283,8 @@ class CardItem extends Component {
               </GridItem>
               <GridItem md={12} style={{ overflow: 'auto', height: 29 }}>
                 {folderList
-                  .filter((f) => file.folderFKs.includes(f.id))
-                  .map((item) => (
+                  .filter(f => file.folderFKs.includes(f.id))
+                  .map(item => (
                     <Chip
                       style={{ marginBottom: 5, marginRight: 5 }}
                       key={item.id}

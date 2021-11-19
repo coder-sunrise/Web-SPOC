@@ -57,80 +57,51 @@ const InventoryTypeListing = ({
 
   const medicationSchema = Yup.object().shape({
     inventoryMedicationFK: Yup.number().required(),
-    quantity: Yup.number().required().min(1),
+    quantity: Yup.number()
+      .required()
+      .min(1),
   })
   const consumableSchema = Yup.object().shape({
     inventoryConsumableFK: Yup.number().required(),
-    quantity: Yup.number().required().min(1),
+    quantity: Yup.number()
+      .required()
+      .min(1),
   })
   const vaccinationSchema = Yup.object().shape({
     inventoryVaccinationFK: Yup.number().required(),
-    quantity: Yup.number().required().min(1),
+    quantity: Yup.number()
+      .required()
+      .min(1),
   })
   const serviceSchema = Yup.object().shape({
     serviceFK: Yup.number().required(),
     serviceCenterServiceFK: Yup.number().required(),
     serviceName: Yup.number().required(),
-    quantity: Yup.number().required().min(1),
+    quantity: Yup.number()
+      .required()
+      .min(1),
   })
 
-  const [
-    medicationRows,
-    setMedicationRows,
-  ] = useState(medicationOrderSetItem)
-  const [
-    consumableRows,
-    setConsumableRows,
-  ] = useState(consumableOrderSetItem)
-  const [
-    vaccinationRows,
-    setVaccinationRows,
-  ] = useState(vaccinationOrderSetItem)
-  const [
-    serviceRows,
-    setServiceRows,
-  ] = useState(serviceOrderSetItem)
+  const [medicationRows, setMedicationRows] = useState(medicationOrderSetItem)
+  const [consumableRows, setConsumableRows] = useState(consumableOrderSetItem)
+  const [vaccinationRows, setVaccinationRows] = useState(
+    vaccinationOrderSetItem,
+  )
+  const [serviceRows, setServiceRows] = useState(serviceOrderSetItem)
 
-  const [
-    medicationList,
-    setMedicationList,
-  ] = useState([])
+  const [medicationList, setMedicationList] = useState([])
 
-  const [
-    consumableList,
-    setConsumableList,
-  ] = useState([])
+  const [consumableList, setConsumableList] = useState([])
 
-  const [
-    vaccinationList,
-    setVaccinationList,
-  ] = useState([])
+  const [vaccinationList, setVaccinationList] = useState([])
 
-  const [
-    selectedItem,
-    setSelectedItem,
-  ] = useState(() => {})
+  const [selectedItem, setSelectedItem] = useState(() => {})
 
-  const [
-    servicess,
-    setServicess,
-  ] = useState(() => [])
-  const [
-    serviceCenterss,
-    setServiceCenterss,
-  ] = useState(() => [])
-  const [
-    serviceCenterServicess,
-    setServiceCenterServicess,
-  ] = useState(() => [])
-  const [
-    serviceFK,
-    setServiceFK,
-  ] = useState(() => {})
-  const [
-    serviceCenterFK,
-    setServiceCenterFK,
-  ] = useState(() => {})
+  const [servicess, setServicess] = useState(() => [])
+  const [serviceCenterss, setServiceCenterss] = useState(() => [])
+  const [serviceCenterServicess, setServiceCenterServicess] = useState(() => [])
+  const [serviceFK, setServiceFK] = useState(() => {})
+  const [serviceCenterFK, setServiceCenterFK] = useState(() => {})
 
   const fetchCodes = async () => {
     await dispatch({
@@ -138,7 +109,7 @@ const InventoryTypeListing = ({
       payload: {
         code: 'ctservice',
       },
-    }).then((list) => {
+    }).then(list => {
       const { services, serviceCenters, serviceCenterServices } = getServices(
         list,
       )
@@ -147,21 +118,25 @@ const InventoryTypeListing = ({
       setServiceCenterServicess(serviceCenterServices)
     })
 
-    podoOrderType.forEach((x) => {
+    podoOrderType.forEach(x => {
       dispatch({
         type: 'codetable/fetchCodes',
         payload: {
           code: x.ctName,
         },
-      }).then((list) => {
+      }).then(list => {
         const { inventoryItemList } = inventoryItemListing(list)
 
         switch (x.stateName) {
           case 'ConsumableItemList': {
-            return setConsumableList(inventoryItemList.filter(item => item.isOnlyClinicInternalUsage))
+            return setConsumableList(
+              inventoryItemList.filter(item => !item.isOnlyClinicInternalUsage),
+            )
           }
           case 'MedicationItemList': {
-            return setMedicationList(inventoryItemList.filter(item => item.isOnlyClinicInternalUsage))
+            return setMedicationList(
+              inventoryItemList.filter(item => !item.isOnlyClinicInternalUsage),
+            )
           }
           case 'VaccinationItemList': {
             return setVaccinationList(inventoryItemList)
@@ -174,110 +149,88 @@ const InventoryTypeListing = ({
     })
   }
 
-  useEffect(
-    () => {
-      dispatch({
-        // force current edit row components to update
-        type: 'global/updateState',
-        payload: {
-          commitCount: (commitCount += 1),
-        },
-      })
-    },
-    [
-      medicationList,
-      consumableList,
-      vaccinationList,
-    ],
-  )
+  useEffect(() => {
+    dispatch({
+      // force current edit row components to update
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
+    })
+  }, [medicationList, consumableList, vaccinationList])
 
-  useEffect(
-    () => {
-      setMedicationRows(medicationOrderSetItem)
-      setConsumableRows(consumableOrderSetItem)
-      setVaccinationRows(vaccinationOrderSetItem)
-      setServiceRows(serviceOrderSetItem)
-      // dispatch({
-      //   // force current edit row components to update
-      //   type: 'global/updateState',
-      //   payload: {
-      //     commitCount: (commitCount += 1),
-      //   },
-      // })
-    },
-    [
-      orderSetDetail,
-    ],
-  )
+  useEffect(() => {
+    setMedicationRows(medicationOrderSetItem)
+    setConsumableRows(consumableOrderSetItem)
+    setVaccinationRows(vaccinationOrderSetItem)
+    setServiceRows(serviceOrderSetItem)
+    // dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
+  }, [orderSetDetail])
 
   useEffect(() => {
     fetchCodes()
   }, [])
 
-  useEffect(
-    () => {
-      let total = 0
-      const calTotal = (row) => {
-        const { isDeleted, subTotal } = row
-        if (!isDeleted && subTotal) {
-          total += subTotal
-        }
-        return total
+  useEffect(() => {
+    let total = 0
+    const calTotal = row => {
+      const { isDeleted, subTotal } = row
+      if (!isDeleted && subTotal) {
+        total += subTotal
       }
-      medicationRows.forEach((row) => {
-        calTotal(row)
-      })
+      return total
+    }
+    medicationRows.forEach(row => {
+      calTotal(row)
+    })
 
-      serviceRows.forEach((row) => {
-        calTotal(row)
-      })
+    serviceRows.forEach(row => {
+      calTotal(row)
+    })
 
-      consumableRows.forEach((row) => {
-        calTotal(row)
-      })
+    consumableRows.forEach(row => {
+      calTotal(row)
+    })
 
-      vaccinationRows.forEach((row) => {
-        calTotal(row)
-      })
+    vaccinationRows.forEach(row => {
+      calTotal(row)
+    })
 
-      setFieldValue('medicationOrderSetItem', medicationRows)
-      setFieldValue('consumableOrderSetItem', consumableRows)
-      setFieldValue('vaccinationOrderSetItem', vaccinationRows)
-      setFieldValue('serviceOrderSetItem', serviceRows)
+    setFieldValue('medicationOrderSetItem', medicationRows)
+    setFieldValue('consumableOrderSetItem', consumableRows)
+    setFieldValue('vaccinationOrderSetItem', vaccinationRows)
+    setFieldValue('serviceOrderSetItem', serviceRows)
 
-      setTotalPrice(total)
+    setTotalPrice(total)
 
-      setValues({
-        ...values,
-        medicationOrderSetItem: medicationRows,
-        consumableOrderSetItem: consumableRows,
-        vaccinationOrderSetItem: vaccinationRows,
-        serviceOrderSetItem: serviceRows,
-        totalPrice: total,
-      })
+    setValues({
+      ...values,
+      medicationOrderSetItem: medicationRows,
+      consumableOrderSetItem: consumableRows,
+      vaccinationOrderSetItem: vaccinationRows,
+      serviceOrderSetItem: serviceRows,
+      totalPrice: total,
+    })
 
-      // dispatch({
-      //   // force current edit row components to update
-      //   type: 'global/updateState',
-      //   payload: {
-      //     commitCount: (commitCount += 1),
-      //   },
-      // })
-    },
-    [
-      medicationRows,
-      consumableRows,
-      vaccinationRows,
-      serviceRows,
-    ],
-  )
+    // dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
+  }, [medicationRows, consumableRows, vaccinationRows, serviceRows])
 
-  const onCommitChanges = (type) => ({ rows, deleted, added, changed }) => {
+  const onCommitChanges = type => ({ rows, deleted, added, changed }) => {
     if (deleted) {
-      const tempArray = [
-        ...values[type],
-      ]
-      const newArray = tempArray.map((o) => {
+      const tempArray = [...values[type]]
+      const newArray = tempArray.map(o => {
         if (o.id === deleted[0]) {
           return {
             ...o,
@@ -310,36 +263,27 @@ const InventoryTypeListing = ({
     } else if (added) {
       switch (type) {
         case 'medicationOrderSetItem': {
-          setMedicationRows([
-            ...medicationRows,
-            rows[0],
-          ])
+          setMedicationRows([...medicationRows, rows[0]])
           return setFieldValue(`${type}`, medicationRows)
         }
         case 'consumableOrderSetItem': {
-          setConsumableRows([
-            ...consumableRows,
-            rows[0],
-          ])
+          setConsumableRows([...consumableRows, rows[0]])
           return setFieldValue(`${type}`, consumableRows)
         }
         case 'vaccinationOrderSetItem': {
-          setVaccinationRows([
-            ...vaccinationRows,
-            rows[0],
-          ])
+          setVaccinationRows([...vaccinationRows, rows[0]])
           return setFieldValue(`${type}`, vaccinationRows)
         }
         case 'serviceOrderSetItem': {
           const { serviceCenterServiceFK, serviceName } = rows[0]
           const serviceCenterService =
             serviceCenterServicess.find(
-              (o) =>
+              o =>
                 o.serviceId === serviceCenterServiceFK &&
                 o.serviceCenterId === serviceName,
             ) || {}
           if (serviceCenterService) {
-            const item = servicess.find((o) => o.value === serviceFK)
+            const item = servicess.find(o => o.value === serviceFK)
             rows[0] = {
               ...rows[0],
               isDeleted: false,
@@ -349,10 +293,7 @@ const InventoryTypeListing = ({
             }
           }
 
-          setServiceRows([
-            ...serviceRows,
-            rows[0],
-          ])
+          setServiceRows([...serviceRows, rows[0]])
           setServiceCenterFK()
           setServiceFK()
           return setFieldValue(`${type}`, serviceRows)
@@ -361,30 +302,30 @@ const InventoryTypeListing = ({
           return rows
       }
     } else if (changed) {
-      const getType = (t) => {
+      const getType = t => {
         switch (t) {
           case 'medicationOrderSetItem': {
             return {
               stateRows: medicationRows,
-              setStateRow: (v) => setMedicationRows(v),
+              setStateRow: v => setMedicationRows(v),
             }
           }
           case 'consumableOrderSetItem': {
             return {
               stateRows: consumableRows,
-              setStateRow: (v) => setConsumableRows(v),
+              setStateRow: v => setConsumableRows(v),
             }
           }
           case 'vaccinationOrderSetItem': {
             return {
               stateRows: vaccinationRows,
-              setStateRow: (v) => setVaccinationRows(v),
+              setStateRow: v => setVaccinationRows(v),
             }
           }
           case 'serviceOrderSetItem': {
             return {
               stateRows: serviceRows,
-              setStateRow: (v) => setServiceRows(v),
+              setStateRow: v => setServiceRows(v),
             }
           }
           default: {
@@ -395,13 +336,13 @@ const InventoryTypeListing = ({
 
       const edittedType = getType(type)
 
-      const newRows = rows.map((item) => {
+      const newRows = rows.map(item => {
         let tempServiceCenterServiceFK
         const tempServiceId = serviceFK || item.serviceCenterServiceFK
         const tempServiceCenterId = serviceCenterFK || item.serviceName
         const serviceCenterService =
           serviceCenterServicess.find(
-            (o) =>
+            o =>
               o.serviceId === tempServiceId &&
               o.serviceCenterId === tempServiceCenterId,
           ) || {}
@@ -424,7 +365,7 @@ const InventoryTypeListing = ({
     }
   }
 
-  const getServiceCenterService = (row) => {
+  const getServiceCenterService = row => {
     const { servicefk = serviceFK, serviceName } = row
     if (!servicefk || !serviceName) {
       setSelectedItem({})
@@ -432,19 +373,19 @@ const InventoryTypeListing = ({
     }
     const serviceCenterService =
       serviceCenterServicess.find(
-        (o) => o.serviceId === servicefk && o.serviceCenterId === serviceName,
+        o => o.serviceId === servicefk && o.serviceCenterId === serviceName,
       ) || {}
     if (serviceCenterService) {
       row.unitPrice = serviceCenterService.unitPrice
     }
   }
-  const calSubtotal = (e) => {
+  const calSubtotal = e => {
     const { row } = e
     const { unitPrice, quantity } = row
     if (unitPrice && quantity) row.subTotal = unitPrice * quantity
   }
 
-  const onAddedRowsChange = (type) => (addedRows) => {
+  const onAddedRowsChange = type => addedRows => {
     if (addedRows.length > 0) {
       const newRow = addedRows[0]
 
@@ -452,31 +393,31 @@ const InventoryTypeListing = ({
 
       if (type === 'service') {
         if (servicefk && serviceName) {
-          const returnRow = addedRows.map((row) => ({
+          const returnRow = addedRows.map(row => ({
             ...row,
           }))
           return returnRow
         }
 
-        return addedRows.map((row) => ({
+        return addedRows.map(row => ({
           ...row,
         }))
       }
 
       if (selectedItem) {
-        return addedRows.map((row) => ({
+        return addedRows.map(row => ({
           ...row,
         }))
       }
     }
-    return addedRows.map((row) => {
+    return addedRows.map(row => {
       return {
         ...row,
       }
     })
   }
 
-  const handleItemOnChange = (e) => {
+  const handleItemOnChange = e => {
     const { option, row } = e
     const { sellingPrice } = option
     setSelectedItem(option)
@@ -619,31 +560,29 @@ const InventoryTypeListing = ({
         columnName: 'serviceFK',
         type: 'select',
         labelField: 'displayValue',
-        options: (row) => {
+        options: row => {
           let options = []
-          const tempArray = [
-            ...servicess,
-          ]
+          const tempArray = [...servicess]
           if (!row.serviceName) {
             options = tempArray
           } else {
-            options = tempArray.filter((o) =>
-              o.serviceCenters.find((m) => m.value === row.serviceName),
+            options = tempArray.filter(o =>
+              o.serviceCenters.find(m => m.value === row.serviceName),
             )
           }
-          return options.map((m) => {
+          return options.map(m => {
             const defaultServiceCenter =
-              m.serviceCenters.find((o) => o.isDefault) || {}
+              m.serviceCenters.find(o => o.isDefault) || {}
             const { unitPrice = 0 } = defaultServiceCenter
             return {
               ...m,
-              displayValue: `${m.name} - ${m.code} (${currencySymbol}${unitPrice.toFixed(
-                2,
-              )})`,
+              displayValue: `${m.name} - ${
+                m.code
+              } (${currencySymbol}${unitPrice.toFixed(2)})`,
             }
           })
         },
-        onChange: (e) => {
+        onChange: e => {
           setServiceFK(e.val)
           handleItemOnChange
           getServiceCenterService(e.row)
@@ -651,7 +590,7 @@ const InventoryTypeListing = ({
             e.row.quantity = 1
           }
           const serviceCenterService = serviceCenterServicess.find(
-            (o) => o.serviceId === e.val && o.isDefault,
+            o => o.serviceId === e.val && o.isDefault,
           )
           if (serviceCenterService) {
             e.row.unitPrice = serviceCenterService.unitPrice
@@ -666,29 +605,27 @@ const InventoryTypeListing = ({
       {
         columnName: 'serviceName',
         type: 'select',
-        options: (row) => {
+        options: row => {
           let options = []
-          const tempArray = [
-            ...serviceCenterss,
-          ]
+          const tempArray = [...serviceCenterss]
           if (!row.serviceFK) {
             options = tempArray
           }
-          options = tempArray.filter((o) =>
-            o.services.find((m) => m.value === row.serviceFK),
+          options = tempArray.filter(o =>
+            o.services.find(m => m.value === row.serviceFK),
           )
           return options
         },
-        onChange: (e) => {
+        onChange: e => {
           setServiceCenterFK(e.val)
           handleItemOnChange
           getServiceCenterService(e.row)
           e.row.serviceName = e.val
           let originServiceCenterService = serviceCenterServicess.find(
-            (o) => o.serviceCenter_ServiceId === e.row.serviceCenterServiceFK,
+            o => o.serviceCenter_ServiceId === e.row.serviceCenterServiceFK,
           )
           const serviceCenterService = serviceCenterServicess.find(
-            (o) =>
+            o =>
               o.serviceId === originServiceCenterService.serviceId &&
               o.serviceCenterId === e.val,
           )

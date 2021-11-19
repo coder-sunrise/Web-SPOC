@@ -24,6 +24,7 @@ import {
   withFormikExtend,
   ProgressButton,
 } from '@/components'
+import { COPAYER_TYPE } from '@/utils/constants'
 
 const styles = () => ({
   root: { padding: '10px' },
@@ -376,7 +377,12 @@ class AddNewStatement extends PureComponent {
                         label='Co-Payer'
                         code='ctcopayer'
                         labelField='displayValue'
-                        localFilter={item => item.coPayerTypeFK === 1}
+                        localFilter={item =>
+                          [
+                            COPAYER_TYPE.CORPORATE,
+                            COPAYER_TYPE.INSURANCE,
+                          ].indexOf(item.coPayerTypeFK) >= 0
+                        }
                         disabled={statement.entity}
                         onChange={this.clearInvoiceList}
                         {...args}

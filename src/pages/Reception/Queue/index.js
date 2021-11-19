@@ -120,7 +120,7 @@ const styles = theme => ({
   }),
 )
 class Queue extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       _sessionInfoID: undefined,
@@ -159,7 +159,7 @@ class Queue extends React.Component {
     }, 900000)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     clearInterval(this._timer)
     this.props.dispatch({
       type: 'calendar/updateState',
@@ -329,17 +329,23 @@ class Queue extends React.Component {
     const { dispatch, queueLog } = this.props
     const { sessionInfo } = queueLog
     const { sessionNo } = sessionInfo
-    const hasWaitingVisitGroup = queueLog.list.find(q => q.visitGroup && q.visitStatus === VISIT_STATUS.WAITING)
-    
+    const hasWaitingVisitGroup = queueLog.list.find(
+      q => q.visitGroup && q.visitStatus === VISIT_STATUS.WAITING,
+    )
+
     dispatch({
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
         openConfirmTitle: '',
         customWidth: hasWaitingVisitGroup ? 'md' : '',
-        openConfirmContent: hasWaitingVisitGroup 
-        ? [`Confirm to remove waiting patients' visit group and`,<br/>,`end current session (${sessionNo})?`] 
-        : `End current session (${sessionNo})?`,
+        openConfirmContent: hasWaitingVisitGroup
+          ? [
+              `Confirm to remove waiting patients' visit group and`,
+              <br />,
+              `end current session (${sessionNo})?`,
+            ]
+          : `End current session (${sessionNo})?`,
         onConfirmSave: this.onConfirmEndSession,
       },
     })
@@ -473,7 +479,7 @@ class Queue extends React.Component {
       return false
     }
 
-    if (visitStatus === VISIT_STATUS.IN_CONS) {
+    if ([VISIT_STATUS.IN_CONS, VISIT_STATUS.PAUSED].indexOf(visitStatus) >= 0) {
       if (id !== doctorProfile.id) {
         notification.error({
           message: `You cannot resume other doctor's consultation.`,
@@ -639,7 +645,6 @@ class Queue extends React.Component {
             version,
           },
         }).then(o => {
-          console.log('111111', o)
           if (o)
             if (o.updateByUserFK !== this.props.user.id) {
               const { clinicianprofile = [] } = this.props.codetable
@@ -708,7 +713,7 @@ class Queue extends React.Component {
     }, 3000)
   }
 
-  onQueueListing = (row) => {
+  onQueueListing = row => {
     const { dispatch } = this.props
     const visitId = row.id
     dispatch({
@@ -716,7 +721,7 @@ class Queue extends React.Component {
       payload: row,
     })
   }
-  
+
   showSearchResult = (hasSearchQuery = false) => {
     const { patientSearchResult = [] } = this.props
     const totalRecords = patientSearchResult.length
@@ -799,7 +804,7 @@ class Queue extends React.Component {
     this.toggleForms()
   }
 
-  render () {
+  render() {
     const {
       classes,
       queueLog,

@@ -928,14 +928,10 @@ export default ({
           width: 100,
           render: row => {
             let qty = '0.0'
-            if (row.type === '1' || row.type === '5') {
-              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${
-                row.dispenseUOMDisplayValue
-              }`
-            } else if (row.type === '2') {
-              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${
-                row.uomDisplayValue
-              }`
+            if (row.type === '1' || row.type === '5' || row.type === '2') {
+              qty = `${numeral(row.quantity || 0).format(
+                '0,0.0',
+              )} ${row.dispenseUOMDisplayValue || ''}`
             } else if (
               row.type === '3' ||
               row.type === '7' ||

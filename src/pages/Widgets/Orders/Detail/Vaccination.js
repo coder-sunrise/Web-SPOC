@@ -98,6 +98,8 @@ let i = 0
     totalPrice: Yup.number().required(),
     vaccinationGivenDate: Yup.date().required(),
     quantity: Yup.number().required(),
+    uomfk: Yup.number().required(),
+    dispenseUOMFK: Yup.number().required(),
     totalAfterItemAdjustment: Yup.number().min(
       0.0,
       'The amount should be more than 0.00',
@@ -195,14 +197,19 @@ let i = 0
     const usage = ctvaccinationusage.find(c => c.id === values.usageMethodFK)
     const dosage = ctmedicationdosage.find(c => c.id === values.dosageFK)
     const uom = ctvaccinationunitofmeasurement.find(c => c.id === values.uomfk)
+    const dispensingUOM = ctvaccinationunitofmeasurement.find(
+      c => c.id === values.dispenseUOMFK,
+    )
 
     values.usageMethodDisplayValue = usage?.name
     values.dosageDisplayValue = dosage?.displayValue
     values.uomDisplayValue = uom?.name
+    values.dispenseUOMDisplayValue = dispensingUOM?.name
 
     const getInstruction = () => {
       let instruction = ''
-      instruction += `${usage?.name} ${dosage?.displayValue} ${uom?.name}`
+      instruction += `${usage?.name || ''} ${dosage?.displayValue ||
+        ''} ${uom?.name || ''}`
       return instruction
     }
 
@@ -325,6 +332,18 @@ class Vaccination extends PureComponent {
     setFieldValue(
       'uomDisplayValue',
       op.prescribingUOM ? op.prescribingUOM.name : undefined,
+    )
+    setFieldValue(
+      'dispenseUOMFK',
+      op.dispensingUOM ? op.dispensingUOM.id : undefined,
+    )
+    setFieldValue(
+      'dispenseUOMCode',
+      op.dispensingUOM ? op.dispensingUOM.code : undefined,
+    )
+    setFieldValue(
+      'dispenseUOMDisplayValue',
+      op.dispensingUOM ? op.dispensingUOM.name : undefined,
     )
     setFieldValue(
       'usageMethodFK',
@@ -820,6 +839,7 @@ class Vaccination extends PureComponent {
                 render={args => {
                   return (
                     <CodeSelect
+                      disabled
                       label='UOM'
                       allowClear={false}
                       code='ctvaccinationunitofmeasurement'
@@ -891,7 +911,7 @@ class Vaccination extends PureComponent {
               </React.Fragment>
             )}
             {!values.isPackage && (
-              <GridItem xs={3}>
+              <GridItem xs={2}>
                 <Field
                   name='quantity'
                   render={args => {
@@ -919,6 +939,32 @@ class Vaccination extends PureComponent {
                 />
               </GridItem>
             )}
+            <GridItem xs={2}>
+              <FastField
+                name='dispenseUOMFK'
+                render={args => {
+                  return (
+                    <CodeSelect
+                      disabled
+                      label='Dispense UOM'
+                      allowClear={false}
+                      code='ctvaccinationunitofmeasurement'
+                      onChange={(v, op = {}) => {
+                        setFieldValue(
+                          'dispenseUOMCode',
+                          op ? op.code : undefined,
+                        )
+                        setFieldValue(
+                          'dispenseUOMDisplayValue',
+                          op ? op.name : undefined,
+                        )
+                      }}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
           </GridContainer>
           <GridContainer>
             <GridItem xs={4} className={classes.editor}>
@@ -967,7 +1013,7 @@ class Vaccination extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem xs={3} className={classes.editor}>
+            <GridItem xs={4} className={classes.editor}>
               <Field
                 name='totalPrice'
                 render={args => {
@@ -1204,7 +1250,7 @@ class Vaccination extends PureComponent {
                 </div>
               )}
             </GridItem>
-            <GridItem xs={3} className={classes.editor}>
+            <GridItem xs={4} className={classes.editor}>
               <FastField
                 name='totalAfterItemAdjustment'
                 render={args => {

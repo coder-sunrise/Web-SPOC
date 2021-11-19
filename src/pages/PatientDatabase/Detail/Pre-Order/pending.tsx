@@ -310,6 +310,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         type: 'select',
         labelField: 'name',
         valueField: 'value',
+        sortingEnabled: false,
         width: 180,
         sortingEnabled: false,
         options: () => preOrderItemCategory,
@@ -459,6 +460,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         width: 100,
         sortingEnabled: false,
         isDisabled: () => true,
+        sortingEnabled: false,
         render: row => {
           return row.hasPaid ? 'Yes' : 'No'
         },

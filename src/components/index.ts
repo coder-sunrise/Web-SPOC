@@ -113,3 +113,4 @@ export Number from './Number'
 
 export TagPanel from './TagPanel'
 export Checklist from './Checklist'
+export VisitTypeSelect from './Select/VisitTypeSelect'

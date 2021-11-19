@@ -25,7 +25,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={2}>
             <FastField
               name='doctorIDs'
-              render={(args) => (
+              render={args => (
                 <DoctorProfileSelect
                   mode='multiple'
                   {...args}
@@ -44,14 +44,14 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={2}>
             <FastField
               name='companyIDS'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   {...args}
                   // code='ctcopayer,ctsupplier'
                   code='ctcopayer'
                   labelField='displayValue'
                   mode='multiple'
-                  label='Company'
+                  label='Co-Payer'
                 />
               )}
             />
@@ -60,7 +60,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={2}>
             <FastField
               name='payerType'
-              render={(args) => (
+              render={args => (
                 <RadioGroup
                   {...args}
                   label='Payer Type'
@@ -71,7 +71,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                     },
                     {
                       value: 'Company',
-                      label: 'Company',
+                      label: 'Co-Payer',
                     },
                     {
                       value: 'Patient',
@@ -85,13 +85,13 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={2}>
             <FastField
               name='groupByDoctor'
-              render={(args) => <Checkbox {...args} label='Group By Doctor' />}
+              render={args => <Checkbox {...args} label='Group By Doctor' />}
             />
           </GridItem>
           <GridItem md={1}>
             <FastField
               name='asAt'
-              render={(args) => <Checkbox {...args} label='As At' />}
+              render={args => <Checkbox {...args} label='As At' />}
             />
           </GridItem>
           <GridItem md={2}>
