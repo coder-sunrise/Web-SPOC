@@ -48,7 +48,7 @@ class Demographic extends PureComponent {
     patientTags: [],
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.fetchCodeTables()
   }
@@ -66,8 +66,9 @@ class Demographic extends PureComponent {
           patientTags: result
             .filter(
               t =>
-                t.category === 'Patient' 
-                && values.patientTag && values.patientTag.findIndex(st => st.tagFK === t.id) !== -1,
+                t.category === 'Patient' &&
+                values.patientTag &&
+                values.patientTag.findIndex(st => st.tagFK === t.id) !== -1,
             )
             .map(t => t.displayValue),
         })
@@ -400,7 +401,9 @@ class Demographic extends PureComponent {
                 <GridItem xs={3}>
                   <FastField
                     name='contact.homeContactNumber.number'
-                    render={args => <MobileNumberInput label='Home' {...args} />}
+                    render={args => (
+                      <MobileNumberInput label='Home' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem xs={3}>
@@ -513,32 +516,47 @@ class Demographic extends PureComponent {
                     />
                   )}
                 />
-              </GridItem>            
-              <GridItem xs={12} style={{ paddingTop: 3 }}>
+              </GridItem>
+              <GridItem xs={6} style={{ paddingTop: 3 }}>
                 <Field
-                    name='patientTag'
-                    render={args => (
-                      <TagPanel
-                        label='Patient Tags:'
-                        tagCategory='Patient'
-                        defaultTagNames={this.state.patientTags}
-                        disabled={values.isActive === false}
-                        onChange={(value, tags) =>
-                          this.handleTagPanelChange(
-                            value,
-                            tags,
-                            args.form.setFieldValue,
-                          )
-                        }
-                        {...args}
-                      ></TagPanel>
-                    )}
-                  />
+                  name='patientTag'
+                  render={args => (
+                    <TagPanel
+                      label='Patient Tags:'
+                      tagCategory='Patient'
+                      defaultTagNames={this.state.patientTags}
+                      disabled={values.isActive === false}
+                      onChange={(value, tags) =>
+                        this.handleTagPanelChange(
+                          value,
+                          tags,
+                          args.form.setFieldValue,
+                        )
+                      }
+                      {...args}
+                    ></TagPanel>
+                  )}
+                />
+              </GridItem>
+              <GridItem xs={6}>
+                <FastField
+                  name='patientTagRemarks'
+                  render={args => (
+                    <TextField
+                      style={{ top: -28 }}
+                      label='Patient Tag Remarks'
+                      maxLength={40}
+                      {...args}
+                    />
+                  )}
+                />
               </GridItem>
               <GridItem xs={12}>
                 <FastField
                   name='patientRequest'
-                  render={args => <TextField label='Patient Request' {...args} />}
+                  render={args => (
+                    <TextField label='Patient Request' {...args} />
+                  )}
                 />
               </GridItem>
               <GridItem xs={12}>

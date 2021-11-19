@@ -4,7 +4,7 @@ import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { ReportDataGrid } from '@/components/_medisys'
 
-const styles = (theme) => ({
+const styles = theme => ({
   subRow: {
     '& > td:first-child': {
       paddingLeft: theme.spacing(1),
@@ -12,7 +12,7 @@ const styles = (theme) => ({
   },
 })
 class StatementList extends PureComponent {
-  render () {
+  render() {
     let listData = []
     const { reportDatas } = this.props
     if (!reportDatas) return null
@@ -36,7 +36,7 @@ class StatementList extends PureComponent {
       { name: 'invoiceDate', title: 'Date' },
       { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'refNo', title: 'Ref. No.' },
-      { name: 'companyName', title: 'Company Name' },
+      { name: 'companyName', title: 'Co-Payer Name' },
       { name: 'dueDate', title: 'Due Date' },
       { name: 'invoiceAmt', title: 'Invoice Amt.' },
       { name: 'adjustments', title: 'Adjustments' },
@@ -133,14 +133,12 @@ class StatementList extends PureComponent {
         grouping: true,
         groupingConfig: {
           state: {
-            grouping: [
-              { columnName: 'companyName' },
-            ],
+            grouping: [{ columnName: 'companyName' }],
           },
         },
       }
     }
-    const listingRow = (p) => {
+    const listingRow = p => {
       const { children } = p
       return <Table.Row {...p}>{children}</Table.Row>
     }

@@ -577,6 +577,8 @@ export default compose(
         isExclusive: false,
         isDisplayInLeaflet: false,
         isOnlyClinicInternalUsage: false,
+        isDispensedByPharmacy: false,
+        isNurseActualizable: false,
       }
       values.checkboxGroup.forEach(o => {
         checkboxGroup[o] = true

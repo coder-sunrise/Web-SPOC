@@ -235,7 +235,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
     },
     {
       key: 'radiographer',
-      title: 'Radiographer',
+      title: 'Radiology Technologist',
       dataIndex: 'radiographer',
       sorter: false,
       search: false,
@@ -497,20 +497,20 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       initialValue: [-99],
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
         const radiographer = (codetable.clinicianprofile || []).filter(
-          x => x.userProfile.role.id === 4 /*replace to radiographer role id*/,
+          x => x.userProfile.role.normalizedName === 'RADIOGRAPHER',
         )
         const radiographerOptions = radiographer.map(x => {
           return { value: x.userProfile.id, name: x.name }
         })
         return (
           <Select
-            label='Radiographer'
+            label='Radiology Technologist'
             mode='multiple'
             options={radiographerOptions}
             placeholder=''
             style={{ width: 250 }}
             maxTagCount={0}
-            maxTagPlaceholder='Radiographers'
+            maxTagPlaceholder='Radiology Technologist'
           />
         )
       },

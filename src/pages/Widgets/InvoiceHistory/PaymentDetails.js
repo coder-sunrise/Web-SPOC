@@ -19,8 +19,9 @@ import TransferToDepositModal from '@/pages/Finance/Deposit/Modal'
 import styles from '@/pages/Finance/Invoice/Details/PaymentDetails/styles'
 import AddCrNote from './AddCrNote'
 
-@connect(({ patient }) => ({
+@connect(({ patient, clinicSettings }) => ({
   patient,
+  clinicSettings,
 }))
 class PaymentDetails extends Component {
   state = {
@@ -66,10 +67,10 @@ class PaymentDetails extends Component {
     }
   }
 
-  onAddPaymentClick = (invoicePayerFK) => {
+  onAddPaymentClick = invoicePayerFK => {
     const { dispatch, invoicePayer = [], invoiceDetail } = this.props
     const currentPayer = invoicePayer.find(
-      (item) => parseInt(item.id, 10) === parseInt(invoicePayerFK, 10),
+      item => parseInt(item.id, 10) === parseInt(invoicePayerFK, 10),
     )
 
     const queryPatientProfileThenShowAddPayment = () => {
@@ -109,9 +110,9 @@ class PaymentDetails extends Component {
     )
   }
 
-  onWriteOffClick = (invoicePayerFK) => {
+  onWriteOffClick = invoicePayerFK => {
     const { invoicePayer } = this.props
-    const currentPayer = invoicePayer.find((item) => item.id === invoicePayerFK)
+    const currentPayer = invoicePayer.find(item => item.id === invoicePayerFK)
     const showWriteOffModal = () => {
       this.setState({
         showWriteOff: true,
@@ -142,7 +143,7 @@ class PaymentDetails extends Component {
       invoicePayerPayment: undefined,
     })
 
-  onVoidClick = (entity) => {
+  onVoidClick = entity => {
     this.setState({
       showDeleteConfirmation: true,
       onVoid: { ...entity },
@@ -214,7 +215,7 @@ class PaymentDetails extends Component {
   }
 
   // submitAddPayment
-  onSubmitAddPayment = (invoicePaymentList) => {
+  onSubmitAddPayment = invoicePaymentList => {
     const { selectedInvoicePayerFK } = this.state
     this.props
       .dispatch({
@@ -224,7 +225,7 @@ class PaymentDetails extends Component {
           invoicePaymentList,
         },
       })
-      .then((r) => {
+      .then(r => {
         if (r) {
           this.refresh()
           this.closeAddPaymentModal()
@@ -232,11 +233,11 @@ class PaymentDetails extends Component {
       })
   }
 
-  onSubmitWriteOff = (writeOffData) => {
+  onSubmitWriteOff = writeOffData => {
     const { selectedInvoicePayerFK } = this.state
     const { invoicePayer = [] } = this.props
     const payer = invoicePayer.find(
-      (item) => parseInt(item.id, 10) === parseInt(selectedInvoicePayerFK, 10),
+      item => parseInt(item.id, 10) === parseInt(selectedInvoicePayerFK, 10),
     )
     this.props
       .dispatch({
@@ -247,7 +248,7 @@ class PaymentDetails extends Component {
           writeOffAmount: payer.outStanding,
         },
       })
-      .then((r) => {
+      .then(r => {
         if (r) {
           this.refresh()
           this.closeWriteOffModal()
@@ -255,7 +256,7 @@ class PaymentDetails extends Component {
       })
   }
 
-  onSubmitVoid = (cancelReason) => {
+  onSubmitVoid = cancelReason => {
     const { onVoid } = this.state
     const { type } = onVoid
     let dispatchType
@@ -285,7 +286,7 @@ class PaymentDetails extends Component {
             cancelReason,
           },
         })
-        .then((r) => {
+        .then(r => {
           if (r) {
             this.refresh()
             this.closeDeleteConfirmationModal()
@@ -294,22 +295,21 @@ class PaymentDetails extends Component {
     }
   }
 
-  onTransferClick = (invoicePayerFK) => {
+  onTransferClick = invoicePayerFK => {
     const { dispatch, invoiceDetail } = this.props
     dispatch({
       type: 'invoicePayment/query',
       payload: {
         id: invoiceDetail.currentId,
       },
-    }).then((response) => {
+    }).then(response => {
       if (response.length > 0) {
         const company = response.find(
-          (o) => o.payerTypeFK === INVOICE_PAYER_TYPE.COMPANY,
+          o => o.payerTypeFK === INVOICE_PAYER_TYPE.COMPANY,
         )
         if (company && company.statementInvoice.length > 0) {
           notification.warning({
-            message: `Please remove the invoice from statement ${company
-              .statementInvoice[0].statementNo} before transfer. `,
+            message: `Please remove the invoice from statement ${company.statementInvoice[0].statementNo} before transfer. `,
           })
           return
         }
@@ -325,7 +325,7 @@ class PaymentDetails extends Component {
     })
   }
 
-  onTransferToDepositClick = async (invoicePayerFK) => {
+  onTransferToDepositClick = async invoicePayerFK => {
     const { invoicePayer, dispatch, patient = {} } = this.props
     const { entity = {} } = patient
     const { patientDeposit } = entity
@@ -347,9 +347,7 @@ class PaymentDetails extends Component {
         },
       })
     }
-    const selectedPayer = invoicePayer.find(
-      (item) => item.id === invoicePayerFK,
-    )
+    const selectedPayer = invoicePayer.find(item => item.id === invoicePayerFK)
     const showInvoicePayerDepositModal = () => {
       this.setState({
         showTransferToDeposit: true,
@@ -368,7 +366,7 @@ class PaymentDetails extends Component {
     })
   }
 
-  render () {
+  render() {
     const {
       classes,
       invoicePayer = [],
@@ -376,6 +374,7 @@ class PaymentDetails extends Component {
       hasActiveSession,
       invoiceDetail,
       patientIsActive,
+      clinicSettings,
     } = this.props
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
@@ -403,38 +402,39 @@ class PaymentDetails extends Component {
       outStanding,
     } = this.state
 
+    const isEnableWriteOffinInvoice =
+      clinicSettings.settings.enableWriteOffinInvoice
     const transferProps = {
       ...this.props,
     }
 
     return (
       <div className={classes.container}>
-        {invoicePayer.length > 0 ? (
-          invoicePayer
-            .sort((a, b) => a.payerTypeFK - b.payerTypeFK)
-            .map((payment) => {
-              return (
-                <PaymentCard
-                  coPaymentSchemeFK={payment.coPaymentSchemeFK}
-                  companyFK={payment.companyFK}
-                  companyName={payment.companyName}
-                  patientName={payment.patientName}
-                  payerType={payment.payerType}
-                  payerTypeFK={payment.payerTypeFK}
-                  payments={payment.paymentTxnList}
-                  payerDistributedAmt={payment.payerDistributedAmt}
-                  outstanding={payment.outStanding}
-                  invoicePayerFK={payment.id}
-                  actions={paymentActionsProps}
-                  readOnly={readOnly}
-                  hasActiveSession={hasActiveSession}
-                  patientIsActive={patientIsActive}
-                />
-              )
-            })
-        ) : (
-          ''
-        )}
+        {invoicePayer.length > 0
+          ? invoicePayer
+              .sort((a, b) => a.payerTypeFK - b.payerTypeFK)
+              .map(payment => {
+                return (
+                  <PaymentCard
+                    coPaymentSchemeFK={payment.coPaymentSchemeFK}
+                    companyFK={payment.companyFK}
+                    companyName={payment.companyName}
+                    patientName={payment.patientName}
+                    payerType={payment.payerType}
+                    payerTypeFK={payment.payerTypeFK}
+                    payments={payment.paymentTxnList}
+                    isEnableWriteOffinInvoice={isEnableWriteOffinInvoice}
+                    payerDistributedAmt={payment.payerDistributedAmt}
+                    outstanding={payment.outStanding}
+                    invoicePayerFK={payment.id}
+                    actions={paymentActionsProps}
+                    readOnly={readOnly}
+                    hasActiveSession={hasActiveSession}
+                    patientIsActive={patientIsActive}
+                  />
+                )
+              })
+          : ''}
         <CommonModal
           open={showAddPayment}
           title='Add Payment'

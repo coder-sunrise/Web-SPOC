@@ -25,7 +25,7 @@ class Grid extends PureComponent {
     tableParas: {
       columns: [
         { name: 'refNo', title: 'Status' },
-        { name: 'patientName', title: 'Company' },
+        { name: 'patientName', title: 'Co-Payer' },
         { name: 'supplier', title: 'O/S Balance' },
         { name: 'dispUOM', title: 'Last Payment' },
         { name: 'gender', title: 'Contact Person' },
@@ -42,7 +42,6 @@ class Grid extends PureComponent {
   }
 
   Cell = ({ column, row, dispatch, classes, ...props }) => {
-    // console.log(this)
     if (column.name === 'Action') {
       return (
         <Table.Cell {...props}>
@@ -78,7 +77,6 @@ class Grid extends PureComponent {
 
   render() {
     const { tableParas } = this.state
-    // console.log(this.props)
     const {
       schemeCompany: { list = [] },
       dispatch,

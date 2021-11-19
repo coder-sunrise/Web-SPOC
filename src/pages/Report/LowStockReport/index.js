@@ -6,7 +6,7 @@ import LowStockList from './LowStockList'
 import ReportBase from '../ReportBase'
 
 const reportId = 20
-const fileName = 'Low Stock Report'
+const fileName = 'Inventory Threshold Report'
 
 class LowStockReport extends ReportBase {
   constructor (props) {
@@ -32,6 +32,7 @@ const LowStockReportWithFormik = withFormik({
   mapPropsToValues: () => ({
     inventoryType: 'MEDICATION',
     Status: 'active',
+    ThresholdType: 'All',
   }),
 })(LowStockReport)
 

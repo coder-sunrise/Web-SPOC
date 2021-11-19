@@ -18,6 +18,8 @@ class VoidCNList extends PureComponent {
     }
 
     let filterType = 'Credit Note'
+    let generatedDateTitle = 'Cn Date'
+    let itemNoTitle = 'Cn No.'
     if (
       reportDatas &&
       reportDatas.ListingDetails &&
@@ -26,16 +28,21 @@ class VoidCNList extends PureComponent {
       filterType = reportDatas.ListingDetails[0].filterType
     }
 
+    if (filterType === 'Payment') {
+      generatedDateTitle = 'Payment Date'
+      itemNoTitle = 'Payment No.'
+    } 
+    
     const listCols = [
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'invoiceNo', title: 'Invoice No.' },
       {
         name: 'generatedDate',
-        title: filterType === 'Credit Note' ? 'Cn Date' : 'Payment Date',
+        title: generatedDateTitle,
       },
       {
         name: 'itemNo',
-        title: filterType === 'Credit Note' ? 'Cn No.' : 'Payment No.',
+        title: itemNoTitle,
       },
       { name: 'totalAmt', title: 'Amount' },
       { name: 'voidedBy', title: 'Voided By' },

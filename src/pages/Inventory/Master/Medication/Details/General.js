@@ -178,7 +178,7 @@ const General = ({
     if (clinicSettings.isEnableNurseWorkItem) {
       generalOptions.splice(3, 0, {
         id: 'isNurseActualizable',
-        name: 'Nurse Actualizable',
+        name: 'Actualized by Nurse',
         tooltip: 'Item will generate task for nurse to actualize',
         disabled: hasActiveSession && values.id,
         layoutConfig: {

@@ -42,9 +42,9 @@ export default {
   'menu.finance.deposit': 'Deposit',
   'menu.finance.doctor-expense': 'Doctor Expense',
   'menu.finance.credit/debitnote': 'Credit / Debit Note',
-  'menu.finance.corporate-billing': 'Corporate Billing',
+  'menu.finance.corporate-billing': 'Co-Payer Billing',
   'menu.finance.corporate-billing.detail': 'Invoices',
-  'menu.finance.corporate-billing/detail': 'Corporate Billing Details',
+  'menu.finance.corporate-billing/detail': 'Co-Payer Billing Details',
   'menu.finance.statement': 'Statement',
   'menu.finance.statement/newstatement': 'New Statement',
   'menu.finance.statement/editstatement': 'Edit Statement',
@@ -90,10 +90,11 @@ export default {
   'menu.report.gstReport': 'GST Report',
   'menu.report.inventoryMovementReport': 'Inventory Movement Report',
   'menu.report.chasClaimReport': 'CHAS Claim Report',
-  'menu.report.voidCreditNoteReport': 'Void Credit Note & Payment Report',
+  'menu.report.voidCreditNoteReport':
+    'Void Credit Note & Payment & Write Off Report',
   'menu.report.salesListingReport': 'Sales Listing Report',
   'menu.report.invoiceListingReport': 'Invoice Listing Report',
-  'menu.report.lowStockReport': 'Low Stock Report',
+  'menu.report.lowStockReport': 'Inventory Threshold Report',
   'menu.report.depositTransactionReport': 'Deposit Transaction Report',
   'menu.report.creditNoteListingReport': 'Credit Note Listing Report',
   'menu.report.inventorytrendingreport': 'Inventory Trending Report',
@@ -192,6 +193,7 @@ export default {
   'menu.report.packageexpiry': 'Package Expiry Report',
   'menu.report.viewreport': 'View Report',
   'menu.report.expiringstockreport': 'Expiring Stock Report',
+  'menu.report.radiologystatisticreport': 'Radiology Statistic Report',
 
   'menu.report.visitListingReport': 'Visit Listing Report',
 

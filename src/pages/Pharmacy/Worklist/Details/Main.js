@@ -11,6 +11,7 @@ import Warning from '@material-ui/icons/Error'
 import Refresh from '@material-ui/icons/Refresh'
 import Yup from '@/utils/yup'
 import { subscribeNotification } from '@/utils/realtime'
+import { ReportViewer } from '@/components/_medisys'
 import {
   GridContainer,
   GridItem,
@@ -123,6 +124,12 @@ const Main = props => {
 
   const [orderUpdateMessage, setOrderUpdateMessage] = useState({})
   const [showJournalHistory, setShowJournalHistory] = useState(false)
+  const [showReportViwer, setShowReportViwer] = useState(false)
+  const [reportTitle, setReportTitle] = useState('')
+  const [reportID, setReportID] = useState(-1)
+  const [reportParameters, setReportParameters] = useState({})
+
+
   useEffect(() => {
     subscribeNotification('PharmacyOrderUpdate', {
       callback: response => {
@@ -1288,6 +1295,38 @@ const Main = props => {
       },
     }
   }
+
+  const onCloseJournalHistory = () => {
+    dispatch({
+      type: 'pharmacyDetails/updateState',
+      payload: {
+        journalHistoryList: [],
+      },
+    })
+    setShowJournalHistory(false)
+  }
+
+  const printReview = (reportid) => {
+    let reprottitle = ''
+    let reportparameters = {}
+    if(reportid == 84){
+      reprottitle = 'Prescription'
+      const { visitFK, id, patientProfileFK } = pharmacyDetails?.entity || {}
+      reportparameters = { visitFK, pharmacyWorkitemId:id, patientProfileFK }
+    }
+    setReportID(reportid)
+    setReportTitle(reprottitle)
+    setReportParameters(reportparameters)
+    setShowReportViwer(true)
+  }
+
+  const closeReportViewer = () => {
+    setReportID(-1)
+    setReportTitle('')
+    setReportParameters({})
+    setShowReportViwer(false)
+  }
+
   return (
     <div>
       <GridContainer>
@@ -1383,7 +1422,19 @@ const Main = props => {
               position: 'relative',
               top: '6px',
             }}
-            onClick={() => setShowJournalHistory(true)}
+            onClick={() => {
+              dispatch({
+                type: 'pharmacyDetails/queryJournalHistory',
+                payload: {
+                  pharmacyWorkitemFK: workitem.id,
+                  pagesize: 9999,
+                },
+              }).then(r => {
+                if (r) {
+                  setShowJournalHistory(true)
+                }
+              })
+            }}
           >
             Journal History
           </Typography.Text>
@@ -1488,13 +1539,13 @@ const Main = props => {
         <GridItem md={8}>
           <div style={{ position: 'relative' }}>
             <Button color='primary' size='sm' disabled={isOrderUpdate}>
-              Print Prescription
+              Print Drug Label
             </Button>
             <Button color='primary' size='sm' disabled={isOrderUpdate}>
               Print leaflet/Drug Summary Label
             </Button>
-            <Button color='primary' size='sm' disabled={isOrderUpdate}>
-              Print Drug Label
+            <Button color='primary' size='sm' disabled={isOrderUpdate} onClick={()=>printReview(84)}>
+              Print Prescription
             </Button>
             {secondaryPrintoutLanguage !== '' && (
               <CheckboxGroup
@@ -1663,10 +1714,26 @@ const Main = props => {
       <Drawer
         anchor='right'
         open={showJournalHistory}
-        onClose={() => setShowJournalHistory(false)}
+        onClose={onCloseJournalHistory}
       >
-        <JournalHistory statusHistory={statusHistory} />
+        <JournalHistory
+          journalHistoryList={pharmacyDetails.journalHistoryList}
+          onClose={onCloseJournalHistory}
+        />
       </Drawer>
+      <CommonModal
+        open={showReportViwer}
+        onClose={closeReportViewer}
+        title={reportTitle}
+        maxWidth='lg'
+      >
+        <ReportViewer
+          showTopDivider={false}
+          reportID={reportID}
+          reportParameters={reportParameters}
+          defaultScale={1.5}
+        />
+      </CommonModal>
     </div>
   )
 }

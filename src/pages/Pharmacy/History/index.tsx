@@ -28,7 +28,7 @@ import WorklistContext, {
 import { Fragment, useContext } from 'react'
 import PharmacyDetails from '../Worklist/Details'
 import { compose } from 'redux'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'dva'
 import _ from 'lodash'
 import LinkIcon from '@material-ui/icons/Link'
@@ -335,6 +335,7 @@ const PharmacyWorklistHistoryIndex = ({
 }) => {
   const dispatch = useDispatch()
   const { detailsId, setDetailsId } = useContext(WorklistContext)
+  const actionRef = useRef();
 
   useEffect(() => {
     dispatch({
@@ -350,9 +351,7 @@ const PharmacyWorklistHistoryIndex = ({
   })
 
   const refreshClick = () => {
-    // dispatch({
-    //   type: 'pharmacyHisotry/query',
-    // })
+    actionRef.current.reload()
   }
 
   const columns = defaultColumns(codetable, setDetailsId)
@@ -361,6 +360,7 @@ const PharmacyWorklistHistoryIndex = ({
     <Fragment>
       <PageContainer pageHeaderRender={false}>
         <ProTable
+          actionRef={actionRef}
           rowSelection={false}
           columns={columns}
           api={api}

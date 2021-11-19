@@ -120,7 +120,7 @@ export default createFormViewModel({
           filteredCreditNote.length > 0
             ? sum(filteredCreditNote.map(x => Number(x.totalAftGST)))
             : 0
-
+            
         return {
           ...InitialCreditNote,
           gstValue,
@@ -131,7 +131,7 @@ export default createFormViewModel({
           creditNoteItem: remainingItems
             ? remainingItems.filter(x => x.originRemainingQty > 0)
             : [],
-          creditNoteBalance: creditNoteBalance - totalCreditNote,
+          creditNoteBalance: creditNoteBalance,
         }
       },
     },

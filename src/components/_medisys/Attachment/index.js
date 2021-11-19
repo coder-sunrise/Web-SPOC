@@ -20,7 +20,7 @@ import withWebSocket from '@/components/Decorator/withWebSocket'
 import { convertToBase64 } from '@/utils/utils'
 import AttachmentChipWithPopover from './AttachmentChipWithPopover'
 
-const styles = (theme) => ({
+const styles = theme => ({
   noPadding: {
     paddingLeft: '0px !important',
     paddingRight: '0px !important',
@@ -56,12 +56,12 @@ const styles = (theme) => ({
 
 const allowedFiles = '.png, .jpg, .jpeg, .xls, .xlsx, .doc, .docx, .pdf'
 
-const getFileExtension = (filename) => {
+const getFileExtension = filename => {
   return filename.split('.').pop()
 }
 
 class Attachment extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       errorText: undefined,
@@ -72,21 +72,21 @@ class Attachment extends Component {
     this.popperRef = React.createRef()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.onRef(this)
   }
 
-  setUploading = (val) => {
+  setUploading = val => {
     this.setState({ uploading: val })
   }
 
-  setErrorText = (val) => {
+  setErrorText = val => {
     this.setState({
       errorText: val,
     })
   }
 
-  onUploadFromScan = async (datas) => {
+  onUploadFromScan = async datas => {
     const { attachmentType = '', dispatch } = this.props
     try {
       this.setUploading(true)
@@ -108,7 +108,7 @@ class Attachment extends Component {
       }
 
       const selectedFilesDto = await Promise.all(
-        datas.map((m) =>
+        datas.map(m =>
           this.generateFileDto(m.name, m.size, attachmentType, m.imgData),
         ),
       )
@@ -130,11 +130,11 @@ class Attachment extends Component {
     }
   }
 
-  beginUpload = async (uploadObjects) => {
+  beginUpload = async uploadObjects => {
     const { attachmentType = '' } = this.props
     const uploaded = await uploadFile(uploadObjects)
 
-    return uploaded.map((m) => {
+    return uploaded.map(m => {
       return {
         0: m,
         attachmentType,
@@ -148,6 +148,9 @@ class Attachment extends Component {
     if (attachmentType === 'patientAttachment') {
       fileStatusFK = FILE_STATUS.CONFIRMED
       fileCategoryFK = FILE_CATEGORY.PATIENT
+    } else if (attachmentType === 'coPayerAttachment') {
+      fileStatusFK = FILE_STATUS.CONFIRMED
+      fileCategoryFK = FILE_CATEGORY.COPAYER
     } else {
       fileStatusFK = FILE_STATUS.UPLOADED
       if (attachmentType === 'VisitReferral' || attachmentType === 'Visit') {
@@ -167,9 +170,7 @@ class Attachment extends Component {
       fileStatusFK,
       attachmentType,
     }
-    const uploaded = await uploadFile([
-      uploadObject,
-    ])
+    const uploaded = await uploadFile([uploadObject])
 
     return { ...uploaded, attachmentType }
 
@@ -177,7 +178,7 @@ class Attachment extends Component {
     // return uploadObject
   }
 
-  mapFileToUploadObject = async (file) => {
+  mapFileToUploadObject = async file => {
     const { attachmentType = '' } = this.props
     const { name, size } = file
     // file type and file size validation
@@ -191,18 +192,11 @@ class Attachment extends Component {
     this.inputEl.current.click()
   }
 
-  validateFileSize = (files) => {
+  validateFileSize = files => {
     const maxMB = 31457280
     const skippedFiles = Object.keys(files).reduce(
       (skipped, key) =>
-        files[key].size > maxMB
-          ? [
-              ...skipped,
-              files[key].name,
-            ]
-          : [
-              ...skipped,
-            ],
+        files[key].size > maxMB ? [...skipped, files[key].name] : [...skipped],
       [],
     )
     if (skippedFiles.length === 0) return []
@@ -215,17 +209,17 @@ class Attachment extends Component {
     return skippedFiles
   }
 
-  validateFilesTotalSize = (filesArray) => {
+  validateFilesTotalSize = filesArray => {
     const { attachments = [] } = this.props
 
     let totalFilesSize = 0
     const maxUploadSize = 31457280
 
     filesArray &&
-      filesArray.forEach((o) => {
+      filesArray.forEach(o => {
         totalFilesSize += o.size
       })
-    attachments.forEach((o) => {
+    attachments.forEach(o => {
       if (!o.isDeleted) {
         totalFilesSize += o.fileSize
       }
@@ -238,7 +232,7 @@ class Attachment extends Component {
     return true
   }
 
-  onFileChange = async (event) => {
+  onFileChange = async event => {
     const { dispatch } = this.props
     try {
       this.setUploading(true)
@@ -250,9 +244,7 @@ class Attachment extends Component {
       })
 
       const { files } = event.target
-      const filesArray = [
-        ...files,
-      ]
+      const filesArray = [...files]
 
       if (!this.validateFilesTotalSize(filesArray)) {
         this.setUploading(false)
@@ -269,8 +261,8 @@ class Attachment extends Component {
 
       const selectedFiles = await Promise.all(
         Object.keys(files)
-          .filter((key) => !skipped.includes(files[key].name))
-          .map((key) => this.mapFileToUploadObject(files[key])),
+          .filter(key => !skipped.includes(files[key].name))
+          .map(key => this.mapFileToUploadObject(files[key])),
       )
 
       // let addedItems = await this.beginUpload(selectedFiles)
@@ -300,15 +292,15 @@ class Attachment extends Component {
     })
   }
 
-  clearValue = (e) => {
+  clearValue = e => {
     e.target.value = null
   }
 
-  onClick = (attachment) => {
+  onClick = attachment => {
     downloadAttachment(attachment)
   }
 
-  render () {
+  render() {
     const {
       global,
       classes,
@@ -322,7 +314,7 @@ class Attachment extends Component {
     } = this.props
 
     const fileAttachments = attachments.filter(
-      (attachment) =>
+      attachment =>
         (!attachmentType ||
           attachment.attachmentType === attachmentType ||
           filterTypes.indexOf(attachment.attachmentType) >= 0) &&
@@ -351,7 +343,7 @@ class Attachment extends Component {
         )} */}
           <GridItem md={10} className={classes.verticalSpacing}>
             <div>
-              {fileAttachments.map((attachment) => (
+              {fileAttachments.map(attachment => (
                 <AttachmentChipWithPopover
                   title='Delete Attachment'
                   contentText='Confirm to delete this attachment?'

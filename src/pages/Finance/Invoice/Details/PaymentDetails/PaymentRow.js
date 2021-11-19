@@ -18,12 +18,14 @@ import {
 } from '@/components'
 import styles from './styles'
 import PaymentDetails from './PaymentDetails'
+import { ableToViewByAuthority } from '@/utils/utils'
 
 const PaymentRow = ({
   classes,
   handleVoidClick,
   handlePrinterClick,
   readOnly,
+  isEnableWriteOffinInvoice,
   printDisabled = false,
   ...payment
 }) => {
@@ -41,16 +43,23 @@ const PaymentRow = ({
     statementPaymentReceiptNo,
   } = payment
 
-  const sortedInvoicePaymentModes = [
-    ...invoicePaymentMode,
-  ].sort((a, b) => (a.id > b.id ? 1 : -1))
+  const sortedInvoicePaymentModes = [...invoicePaymentMode].sort((a, b) =>
+    a.id > b.id ? 1 : -1,
+  )
 
-  const [
-    hoveredRowId,
-    setHoveredRowId,
-  ] = useState(null)
+  const [hoveredRowId, setHoveredRowId] = useState(null)
 
   let tooltipMsg = ''
+  let showVoidButton = true
+  if (type === 'Credit Note') {
+    showVoidButton = ableToViewByAuthority('finance.deletecreditnote')
+  } else if (type === 'Write Off') {
+    if (isEnableWriteOffinInvoice) {
+      showVoidButton = ableToViewByAuthority('finance.deletewriteoff')
+    } else {
+      showVoidButton = false
+    }
+  }
   if (type === 'Payment') tooltipMsg = 'Print Receipt'
   else if (type === 'Credit Note') tooltipMsg = 'Print Credit Note'
 
@@ -104,11 +113,7 @@ const PaymentRow = ({
         <GridItem md={2}>
           {getIconByType()}
           {type === 'Payment' ||
-          ([
-            'Credit Note',
-            'Write Off',
-            'Deposit',
-          ].includes(type) &&
+          (['Credit Note', 'Write Off', 'Deposit'].includes(type) &&
             isCancelled) ? (
             <Popper
               className={classNames({
@@ -161,27 +166,29 @@ const PaymentRow = ({
               {amount ? <NumberInput text currency value={amount} /> : 'N/A'}
             </span>
           </GridItem>
-          <GridItem>
-            <Tooltip
-              title='Delete Selected item'
-              style={{
-                visibility: isCancelled === undefined ? 'hidden' : 'visible',
-              }}
-            >
-              <Button
-                justIcon
-                simple
-                size='sm'
-                color='danger'
-                id={itemID}
-                onClick={() => handleVoidClick(payment)}
-                disabled={
-                  isCancelled || readOnly || !!statementPaymentReceiptNo
-                }
+          <GridItem style={{ width: '30px' }}>
+            {showVoidButton && (
+              <Tooltip
+                title='Delete Selected item'
+                style={{
+                  visibility: isCancelled === undefined ? 'hidden' : 'visible',
+                }}
               >
-                <Cross />
-              </Button>
-            </Tooltip>
+                <Button
+                  justIcon
+                  simple
+                  size='sm'
+                  color='danger'
+                  id={itemID}
+                  onClick={() => handleVoidClick(payment)}
+                  disabled={
+                    isCancelled || readOnly || !!statementPaymentReceiptNo
+                  }
+                >
+                  <Cross />
+                </Button>
+              </Tooltip>
+            )}
           </GridItem>
         </GridItem>
       </GridContainer>
@@ -212,7 +219,7 @@ const PaymentRow = ({
           </GridItem>
           <GridItem md={6} container justify='flex-end' alignItems='center'>
             <GridItem>
-              <span className={classes.currency} style={{ paddingRight: 48 }}>
+              <span className={classes.currency}>
                 {patientDepositTransaction.amount ? (
                   <NumberInput
                     text
@@ -224,6 +231,7 @@ const PaymentRow = ({
                 )}
               </span>
             </GridItem>
+            <GridItem style={{ width: '30px' }}></GridItem>
           </GridItem>
         </GridContainer>
       )}

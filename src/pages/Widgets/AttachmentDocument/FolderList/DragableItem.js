@@ -10,24 +10,24 @@ const Types = {
   Folder: 'Folder',
 }
 const ItemSource = {
-  canDrag (props, monitor, component) {
+  canDrag(props, monitor, component) {
     const { item } = props
     return item.id > 0
   },
-  beginDrag (props, monitor, component) {
+  beginDrag(props, monitor, component) {
     return {
       index: props.index,
     }
   },
-  endDrag (props, monitor, component) {
+  endDrag(props, monitor, component) {
     props.onEndDrag && props.onEndDrag(props)
   },
 }
 const ItemTarget = {
-  canDrop (props, monitor) {
+  canDrop(props, monitor) {
     return props.index > 0
   },
-  hover (props, monitor, component) {
+  hover(props, monitor, component) {
     if (!component) {
       return null
     }
@@ -53,7 +53,7 @@ const ItemTarget = {
     monitor.getItem().index = hoverIndex
   },
 }
-function dropCollect (connect, monitor) {
+function dropCollect(connect, monitor) {
   return {
     connectDropTarget: connect.dropTarget(),
     isOver: monitor.isOver(),
@@ -62,7 +62,7 @@ function dropCollect (connect, monitor) {
     itemType: monitor.getItemType(),
   }
 }
-function dragCollect (connect, monitor) {
+function dragCollect(connect, monitor) {
   return {
     connectDragSource: connect.dragSource(),
     connectDragPreview: connect.dragPreview(),
@@ -71,7 +71,7 @@ function dragCollect (connect, monitor) {
 }
 
 class DragableItem extends Component {
-  render () {
+  render() {
     const {
       isDragging,
       connectDragSource,
@@ -83,6 +83,7 @@ class DragableItem extends Component {
       onItemChanged,
       isEditMode,
       readOnly,
+      isEnableEditDocument = true,
     } = this.props
 
     let opacity = isDragging ? 0.4 : 1
@@ -112,7 +113,7 @@ class DragableItem extends Component {
                     <TextField
                       maxLength={50}
                       value={item.displayValue}
-                      onChange={(e) => {
+                      onChange={e => {
                         onItemChanged({ ...item, displayValue: e.target.value })
                       }}
                     />
@@ -121,11 +122,10 @@ class DragableItem extends Component {
                   <Button
                     color='danger'
                     justIcon
-                    disabled={!item.isEmpty}
                     style={{
                       float: 'right',
                     }}
-                    onClick={(e) => {
+                    onClick={e => {
                       onItemChanged({ ...item, isDeleted: true })
                     }}
                   >
@@ -137,17 +137,18 @@ class DragableItem extends Component {
               <MenuItem
                 key={item.id}
                 selected={isSelected}
-                onClick={(e) => {
+                onClick={e => {
                   onItemClick(item)
                 }}
               >
                 {!readOnly &&
                   !isItemAll &&
+                  isEnableEditDocument &&
                   connectDragSource(
                     <div style={{ cursor: 'move' }}>
                       <ListItemIcon style={{ minWidth: 25, marginTop: 5 }}>
                         <DragIndicator
-                          onMouseDown={(e) => {
+                          onMouseDown={e => {
                             e.stopPropagation()
                           }}
                         />
@@ -172,7 +173,8 @@ class DragableItem extends Component {
                     }
                     style={{
                       marginRight: 15,
-                      paddingLeft: isItemAll && !readOnly ? 25 : 0,
+                      paddingLeft:
+                        isItemAll && !readOnly && isEnableEditDocument ? 25 : 0,
                       overflow: 'hidden',
                     }}
                   />

@@ -45,7 +45,8 @@ const FilterBar = ({
               return (
                 <CodeSelect
                   options={ctCoPayer}
-                  label='Company'
+                  label='Co-Payer'
+                  labelField='displayValue'
                   labelField='name'
                   {...args}
                 />
@@ -96,7 +97,7 @@ export default compose(
   withStyles(styles, { withTheme: true }),
   withFormik({
     mapPropsToValues: () => ({
-      copayerFK: 'All Company',
+      copayerFK: 'All Co-Payer',
     }),
     handleSubmit: (values, { props }) => {
       const { copayerFK, isActive, outstandingBalanceStatus } = values

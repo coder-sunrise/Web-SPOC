@@ -152,7 +152,7 @@ const getType = typeId => {
       let item
       if (
         medication.isActive === true &&
-        medication.isOnlyClinicInternalUsage
+        !medication.isOnlyClinicInternalUsage
       ) {
         const medicationdispensingUOM = medication.dispensingUOM
         const medicationusage = medication.medicationUsage
@@ -289,6 +289,7 @@ const getType = typeId => {
       let item
       if (vaccination.isActive === true) {
         const vaccinationUOM = vaccination.prescribingUOM
+        const vaccinationDispenseUOM = vaccination.despensingUOM
         const vaccinationusage = vaccination.vaccinationUsage
         const vaccinationdosage = vaccination.prescribingDosage
         const isDefaultBatchNo = vaccination.vaccinationStock.find(
@@ -302,18 +303,17 @@ const getType = typeId => {
           vaccinationCode: vaccination.code,
           vaccinationName: vaccination.displayValue,
           usageMethodFK: vaccination.vaccinationUsage.id,
-          usageMethodCode: vaccinationusage ? vaccinationusage.code : undefined,
-          usageMethodDisplayValue: vaccinationusage
-            ? vaccinationusage.name
-            : undefined,
+          usageMethodCode: vaccinationusage?.code,
+          usageMethodDisplayValue: vaccinationusage?.name,
           dosageFK: vaccination.prescribingDosage.id,
-          dosageCode: vaccinationdosage ? vaccinationdosage.code : undefined,
-          dosageDisplayValue: vaccinationdosage
-            ? vaccinationdosage.name
-            : undefined,
-          uomfk: vaccination.prescribingUOM.id,
-          uomCode: vaccinationUOM ? vaccinationUOM.code : undefined,
-          uomDisplayValue: vaccinationUOM ? vaccinationUOM.name : undefined,
+          dosageCode: vaccinationdosage?.code,
+          dosageDisplayValue: vaccinationdosage?.name,
+          uomfk: vaccinationUOM?.id,
+          uomCode: vaccinationUOM?.code,
+          uomDisplayValue: vaccinationUOM?.name,
+          dispenseUOMFK: vaccinationDispenseUOM?.id,
+          dispenseUOMCode: vaccinationDispenseUOM?.code,
+          dispenseUOMDisplayValue: vaccinationDispenseUOM?.name,
           quantity: 0,
           unitPrice: packageItem.unitPrice,
           totalPrice: 0,
@@ -336,6 +336,9 @@ const getType = typeId => {
           packageGlobalId: packageItem.packageGlobalId,
           corVaccinationCert: [],
           isNurseActualizeRequired: vaccination.isNurseActualizable,
+          instruction: `${vaccinationusage?.name ||
+            ''} ${vaccinationdosage?.displayValue ||
+            ''} ${vaccinationUOM?.name || ''}`,
         }
       }
       return item
@@ -385,7 +388,7 @@ const getType = typeId => {
       let item
       if (
         consumable.isActive === true &&
-        consumable.isOnlyClinicInternalUsage
+        !consumable.isOnlyClinicInternalUsage
       ) {
         let isDefaultBatchNo
         if (consumable) {

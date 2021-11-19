@@ -23,7 +23,7 @@ import Authorized from '@/utils/Authorized'
 import { currencySymbol } from '@/utils/config'
 import _ from 'lodash'
 
-const CPSwitch = (label) => (args) => {
+const CPSwitch = label => args => {
   if (!args.field.value) {
     args.field.value = 'ExactAmount'
   }
@@ -39,7 +39,7 @@ const CPSwitch = (label) => (args) => {
     />
   )
 }
-const CPNumber = (label, type) => (args) => {
+const CPNumber = (label, type) => args => {
   return (
     <NumberInput
       label={label}
@@ -57,19 +57,13 @@ class InventoryItemList extends React.Component {
     currentTab: 1,
   }
 
-  addItemToRows = (newRow) => {
+  addItemToRows = newRow => {
     const { setFieldValue, values, dispatch } = this.props
     let newRows = []
     if (Array.isArray(newRow)) {
-      newRows = [
-        ...values.rows,
-        ...newRow,
-      ]
+      newRows = [...values.rows, ...newRow]
     } else {
-      newRows = [
-        ...values.rows,
-        newRow,
-      ]
+      newRows = [...values.rows, newRow]
     }
 
     setFieldValue('rows', newRows)
@@ -86,7 +80,7 @@ class InventoryItemList extends React.Component {
     if (array.length > 0) {
       return (
         <Fragment>
-          {array.map((item) => (
+          {array.map(item => (
             <li>
               <b>{item[fieldName]}</b>
             </li>
@@ -102,16 +96,16 @@ class InventoryItemList extends React.Component {
     const { dispatch } = this.props
 
     const medicationArray = existingItemArray.filter(
-      (item) => item.inventoryMedicationFK,
+      item => item.inventoryMedicationFK,
     )
     const consumableArray = existingItemArray.filter(
-      (item) => item.inventoryConsumableFK,
+      item => item.inventoryConsumableFK,
     )
     const vaccinationArray = existingItemArray.filter(
-      (item) => item.inventoryVaccinationFK,
+      item => item.inventoryVaccinationFK,
     )
     const serviceArray = existingItemArray.filter(
-      (item) => item.serviceCenterServiceFK,
+      item => item.serviceCenterServiceFK,
     )
 
     dispatch({
@@ -137,11 +131,9 @@ class InventoryItemList extends React.Component {
     })
   }
 
-  addOrderSetItemToRows = (newItemArray) => {
-    const newItems = newItemArray.map((item) => {
-      const itemFieldName = InventoryTypes.filter(
-        (x) => x.value === item.type,
-      )[0]
+  addOrderSetItemToRows = newItemArray => {
+    const newItems = newItemArray.map(item => {
+      const itemFieldName = InventoryTypes.filter(x => x.value === item.type)[0]
       const typeFieldName = item[itemFieldName.field]
       const newItemRow = {
         uid: getUniqueId(),
@@ -170,14 +162,13 @@ class InventoryItemList extends React.Component {
 
   checkOrderSetItemIsExisted = (orderSetItemArray, existingRows, type) => {
     let existingItem = []
-    // console.log({ orderSetItemArray })
     const filteredRows = existingRows
-      .filter((row) => !row.isDeleted && row.type === type)
-      .map((row) => row.itemFK)
+      .filter(row => !row.isDeleted && row.type === type)
+      .map(row => row.itemFK)
 
-    const updatedItemArray = orderSetItemArray.map((row) => {
+    const updatedItemArray = orderSetItemArray.map(row => {
       const currentType = visitOrderTemplateItemTypes.find(
-        (itemType) => itemType.id === type,
+        itemType => itemType.id === type,
       )
       if (
         filteredRows.includes(row[currentType.itemFKName]) ||
@@ -191,20 +182,15 @@ class InventoryItemList extends React.Component {
         type,
       }
     })
-    // console.log({ updatedItemArray })
 
-    return [
-      existingItem,
-      updatedItemArray,
-    ]
+    return [existingItem, updatedItemArray]
   }
 
-  onClickAdd = (type) => {
+  onClickAdd = type => {
     const { currentTab } = this.state
     const { values } = this.props
     const { tempSelectedItem, rows, tempSelectedItemFK } = values
     if (tempSelectedItemFK === undefined) return
-    // console.log(tempSelectedItem, rows, currentTab)
 
     let itemFieldName
     let existingItem = []
@@ -227,7 +213,7 @@ class InventoryItemList extends React.Component {
       )
 
       existingItem.push(...existingMedicationItem)
-      newItem.push(...newMedicationItem.filter((item) => item !== null))
+      newItem.push(...newMedicationItem.filter(item => item !== null))
 
       const [
         existingConsumableItem,
@@ -239,7 +225,7 @@ class InventoryItemList extends React.Component {
       )
 
       existingItem.push(...existingConsumableItem)
-      newItem.push(...newConsumableItem.filter((item) => item !== null))
+      newItem.push(...newConsumableItem.filter(item => item !== null))
 
       const [
         existingVaccinationItem,
@@ -251,7 +237,7 @@ class InventoryItemList extends React.Component {
       )
 
       existingItem.push(...existingVaccinationItem)
-      newItem.push(...newVaccinationItem.filter((item) => item !== null))
+      newItem.push(...newVaccinationItem.filter(item => item !== null))
 
       const [
         existingServiceItem,
@@ -263,9 +249,7 @@ class InventoryItemList extends React.Component {
       )
 
       existingItem.push(...existingServiceItem)
-      newItem.push(...newServiceItem.filter((item) => item !== null))
-
-      // console.log({ existingItem, newItem })
+      newItem.push(...newServiceItem.filter(item => item !== null))
 
       if (existingItem.length > 0) {
         this.showConfirmationBox(existingItem, newItem)
@@ -274,8 +258,8 @@ class InventoryItemList extends React.Component {
       }
     } else {
       const isExisted = rows
-        .filter((row) => !row.isDeleted && row.type === currentTab)
-        .map((row) => row.itemFK)
+        .filter(row => !row.isDeleted && row.type === currentTab)
+        .map(row => row.itemFK)
         .includes(tempSelectedItemFK)
 
       if (isExisted) {
@@ -283,7 +267,7 @@ class InventoryItemList extends React.Component {
         return
       }
 
-      itemFieldName = InventoryTypes.filter((x) => x.ctName === type)[0]
+      itemFieldName = InventoryTypes.filter(x => x.ctName === type)[0]
       let newItemRow = {
         uid: getUniqueId(),
         type: itemFieldName.value,
@@ -305,7 +289,6 @@ class InventoryItemList extends React.Component {
 
   onItemSelect = (e, option, type) => {
     const { setFieldValue } = this.props
-    // console.log(e, option, type)
     if (option) {
       setFieldValue('tempSelectedItem', option)
     }
@@ -318,7 +301,7 @@ class InventoryItemList extends React.Component {
         <GridItem xs={8}>
           <FastField
             name='tempSelectedItemFK'
-            render={(args) => {
+            render={args => {
               return (
                 <CodeSelect
                   labelField='displayValue'
@@ -327,7 +310,7 @@ class InventoryItemList extends React.Component {
                   }
                   onChange={(e, option) => this.onItemSelect(e, option, type)}
                   code={type}
-                  renderDropdown={(option) => {
+                  renderDropdown={option => {
                     let {
                       code,
                       displayValue,
@@ -364,7 +347,11 @@ class InventoryItemList extends React.Component {
 
                     return <span>{optDisplay}</span>
                   }}
-                  localFilter={(item) => (type !== 'inventoryconsumable' && type !== 'inventorymedication') || item.isOnlyClinicInternalUsage}
+                  localFilter={item =>
+                    (type !== 'inventoryconsumable' &&
+                      type !== 'inventorymedication') ||
+                    !item.isOnlyClinicInternalUsage
+                  }
                   disabled={isDisabled}
                   {...args}
                 />
@@ -386,9 +373,9 @@ class InventoryItemList extends React.Component {
     )
   }
 
-  onDeleteClick = (row) => {
+  onDeleteClick = row => {
     const { values, setFieldValue, dispatch } = this.props
-    const newRows = values.rows.map((item) => {
+    const newRows = values.rows.map(item => {
       if (item.itemFK === row.itemFK && item.type === row.type) {
         return {
           ...item,
@@ -403,7 +390,7 @@ class InventoryItemList extends React.Component {
     })
   }
 
-  onTabChange = (tabId) => {
+  onTabChange = tabId => {
     const { setFieldValue } = this.props
     setFieldValue('tempSelectedItemFK', undefined)
     this.setState({
@@ -411,9 +398,9 @@ class InventoryItemList extends React.Component {
     })
   }
 
-  filterTabOnAccessRight = (tabs) => {
+  filterTabOnAccessRight = tabs => {
     if (this.props.includeOrderSet) {
-      return tabs.filter((o) => {
+      return tabs.filter(o => {
         if (!o.accessRight || o.accessRight === 'hidden') return false
         return true
       })
@@ -421,7 +408,7 @@ class InventoryItemList extends React.Component {
     return tabs
   }
 
-  getAccessRight = (accessRightName) => {
+  getAccessRight = accessRightName => {
     const accessRight = Authorized.check(accessRightName)
     if (!accessRight) return false
     return accessRight.rights
@@ -485,7 +472,7 @@ class InventoryItemList extends React.Component {
       ]
     }
 
-    const removedAccessRightOptions = commonOptions.map((option) => {
+    const removedAccessRightOptions = commonOptions.map(option => {
       const { accessRight, ...restFields } = option
       return {
         ...restFields,
@@ -522,33 +509,31 @@ class InventoryItemList extends React.Component {
     return commonColumns
   }
 
-  getColumnsExtensions = (values) => {
+  getColumnsExtensions = values => {
     const commonExtensions = [
       {
         columnName: 'type',
         type: 'select',
         options: InventoryTypes,
-        render: (row) => {
-          const itemType = `${InventoryTypes.find(
-            (type) => type.value === row.type,
-          ).name}`
+        render: row => {
+          const itemType = `${
+            InventoryTypes.find(type => type.value === row.type).name
+          }`
 
           return (
             <span>
               {itemType} <br />
-              {`${row.isActive || row.isActive === undefined
-                ? ''
-                : '(Inactive)'}`}
+              {`${
+                row.isActive || row.isActive === undefined ? '' : '(Inactive)'
+              }`}
             </span>
           )
         },
       },
       {
         columnName: 'itemFK',
-        render: (row) => {
-          const inventory = InventoryTypes.filter(
-            (x) => x.value === row.type,
-          )[0]
+        render: row => {
+          const inventory = InventoryTypes.filter(x => x.value === row.type)[0]
           const { ctName, itemFKName } = inventory
           return row.name ? row.name : ''
         },
@@ -556,7 +541,7 @@ class InventoryItemList extends React.Component {
       {
         columnName: 'action',
         align: 'center',
-        render: (row) => {
+        render: row => {
           const onConfirm = () => this.onDeleteClick(row)
           const btnAccessRight = this.getCurrentTypeAccessRight(row.type)
           if (btnAccessRight === 'hidden') return null
@@ -586,13 +571,13 @@ class InventoryItemList extends React.Component {
           columnName: 'quantity',
           type: 'number',
           align: 'left',
-          render: (row) => {
+          render: row => {
             const { rows = [] } = values
-            const index = rows.map((i) => i.uid).indexOf(row.uid)
+            const index = rows.map(i => i.uid).indexOf(row.uid)
             return (
               <Field
                 name={`rows[${index}].quantity`}
-                render={(args) => (
+                render={args => (
                   <NumberInput
                     {...args}
                     min={1}
@@ -609,13 +594,13 @@ class InventoryItemList extends React.Component {
           columnName: 'unitPrice',
           type: 'currency',
           align: 'left',
-          render: (row) => {
+          render: row => {
             const { rows = [] } = values
-            const index = rows.map((i) => i.uid).indexOf(row.uid)
+            const index = rows.map(i => i.uid).indexOf(row.uid)
             return (
               <Field
                 name={`rows[${index}].unitPrice`}
-                render={(args) => (
+                render={args => (
                   <NumberInput
                     {...args}
                     currency
@@ -630,12 +615,9 @@ class InventoryItemList extends React.Component {
         },
         {
           columnName: 'amount',
-          observeFields: [
-            'quantity',
-            'unitPrice',
-          ],
+          observeFields: ['quantity', 'unitPrice'],
           type: 'currency',
-          render: (row) => {
+          render: row => {
             return (
               <p
                 style={{
@@ -643,7 +625,11 @@ class InventoryItemList extends React.Component {
                   fontWeight: 500,
                 }}
               >
-                <NumberInput text currency value={_.round(row.unitPrice * row.quantity, 2)} />
+                <NumberInput
+                  text
+                  currency
+                  value={_.round(row.unitPrice * row.quantity, 2)}
+                />
               </p>
             )
           },
@@ -663,9 +649,9 @@ class InventoryItemList extends React.Component {
         },
         {
           columnName: 'cpAmount',
-          render: (row) => {
+          render: row => {
             const { rows = [] } = values
-            const index = rows.map((i) => i.uid).indexOf(row.uid)
+            const index = rows.map(i => i.uid).indexOf(row.uid)
             return (
               <GridContainer>
                 <GridItem xs={8}>
@@ -695,9 +681,9 @@ class InventoryItemList extends React.Component {
     return commonExtensions
   }
 
-  getCurrentTypeAccessRight = (rowType) => {
+  getCurrentTypeAccessRight = rowType => {
     const currentTabAccessRight = this.getOptions().find(
-      (tab) => tab.id === rowType,
+      tab => tab.id === rowType,
     )
 
     if (currentTabAccessRight && currentTabAccessRight.accessRight === 'hidden')
@@ -712,7 +698,7 @@ class InventoryItemList extends React.Component {
     return false
   }
 
-  render () {
+  render() {
     const { theme, values } = this.props
     return (
       <SizeContainer size='sm'>
@@ -726,7 +712,7 @@ class InventoryItemList extends React.Component {
             rows={values.rows}
             // {...tableConfigs}
             forceRender
-            getRowId={(r) => r.uid}
+            getRowId={r => r.uid}
             columns={this.getColumns()}
             columnExtensions={this.getColumnsExtensions(values)}
             FuncProps={{

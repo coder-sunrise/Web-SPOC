@@ -759,6 +759,12 @@ const _routes = [
             component: './Report/expiringstockreport',
             authority: ['report.inventory.expiringstockreport'],
           },
+          {
+            path: '/report/radiologystatisticreport',
+            name: 'radiologystatisticreport',
+            component: './Report/RadiologyStatisticReport',
+            authority: ['report.finance.radiologystatisticreport'],
+          },
         ],
       },
       // Report
