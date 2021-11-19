@@ -60,6 +60,7 @@ import _ from 'lodash'
 import {
   errMsgForOutOfRange as errMsg,
   navigateDirtyCheck,
+  getUniqueGUID,
 } from '@/utils/utils'
 import { Add } from '@material-ui/icons'
 import moment from 'moment'
@@ -192,11 +193,11 @@ class ScribbleTemplateItem extends React.Component {
               ref={this.inputRef}
               disabled={!isEdit}
               label=''
-              maxLength={500}
+              maxLength={50}
               style={{ margin: 0 }}
               inputProps={{
                 id: 'templateItemName',
-                maxLength: 500,
+                maxLength: 50,
                 style: { fontSize: 14, padding: 0 },
               }}
               value={description}
@@ -228,6 +229,8 @@ class ScribbleTemplateItem extends React.Component {
                 <Button
                   {...this.buttonProps}
                   onClick={() => {
+                    if(!description || !description.trim())
+                      return
                     const savedItem = { ...item, description }
                     this.setState({
                       isEdit: false,
@@ -297,7 +300,7 @@ let temp = null
   validationSchema: Yup.object().shape({
     subject: Yup.string()
       .required()
-      .max(20, 'Subject should not exceed 20 characters'),
+      .max(50, 'Subject should not exceed 50 characters'),
   }),
 
   handleSubmit: (values, { props }) => {
@@ -582,7 +585,7 @@ class Scribble extends React.Component {
   uploadTemplate = file => {
     let reader = new FileReader()
     reader.onloadend = () => {
-      const newItem = this.generateScribbleTemplateDto(file.name, reader.result)
+      const newItem = this.generateScribbleTemplateDto(file.name.substring(0,50), reader.result)
       this.upsertTemplate(newItem)
     }
     reader.readAsDataURL(file)
@@ -590,7 +593,7 @@ class Scribble extends React.Component {
 
   generateScribbleTemplateDto = (name, base64) => {
     const dto = {
-      code: name,
+      code: getUniqueGUID(),
       displayValue: name,
       description: name,
       layerContent: base64,
@@ -644,13 +647,12 @@ class Scribble extends React.Component {
 
   onFileChange = async event => {
     const { files } = event.target
-    console.log('onfilechange', files)
     if (files.length > 0) this.uploadTemplate(files[0])
   }
 
   _setTemplate = (layerContent, id, description) => {
     this._sketch.setTemplate(layerContent, id, description)
-    this.props.setFieldValue('subject', description.substr(0,20))
+    this.props.setFieldValue('subject', description.substr(0,50))
   }
 
   toolDrawingHandleClickAway = () => {
@@ -776,9 +778,9 @@ class Scribble extends React.Component {
                   <TextField
                     {...args}
                     label='Scribble Subject'
-                    inputProps={{ maxLength: 20 }}
+                    inputProps={{ maxLength: 50 }}
                     disabled={scriblenotes.isReadonly}
-                    maxLength={20}
+                    maxLength={50}
                     // onChange={(e) => {
                     //   const subject = e.target.value
                     //   if (subject.length > 20) {
@@ -1320,6 +1322,7 @@ class Scribble extends React.Component {
                     onClick={navigateDirtyCheck({
                       displayName: 'ScribbleNotePage',
                       onProceed: toggleScribbleModal,
+                      openConfirmContent: 'Discard the changes?'
                     })}
                   >
                     Cancel

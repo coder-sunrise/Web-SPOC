@@ -270,7 +270,7 @@ class EditOrder extends Component {
         type: `consultation/signOrder`,
         payload: {
           ...payload,
-          isPharmacyOrderUpdate,
+          isPharmacyOrderUpdated: isPharmacyOrderUpdate,
         },
       })
       if (signResult) {

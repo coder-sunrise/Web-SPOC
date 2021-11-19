@@ -1,5 +1,4 @@
 import React, { PureComponent, Component } from 'react'
-
 import moment from 'moment'
 import _ from 'lodash'
 import {
@@ -12,7 +11,6 @@ import {
   Tooltip,
 } from '@/components'
 import { Attachment } from '@/components/_medisys'
-
 import { CreateNewFolder, Edit, Save, Cancel } from '@material-ui/icons'
 import TextEditor from '../TextEditor'
 import DragableList from './DragableList'
@@ -24,15 +22,15 @@ class FolderList extends Component {
   }
 
   // eslint-disable-next-line react/sort-comp
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { folderList: nextFolderList = [] } = nextProps
 
     const nextList = _.orderBy(
-      nextFolderList.filter((f) => !f.isDeleted),
+      nextFolderList.filter(f => !f.isDeleted),
       'sortOrder',
     ).map(this.entityGenerator)
     const currentList = _.orderBy(
-      this.state.folderList.filter((f) => !f.isDeleted),
+      this.state.folderList.filter(f => !f.isDeleted),
       'sortOrder',
     ).map(this.entityGenerator)
 
@@ -48,7 +46,7 @@ class FolderList extends Component {
   mapPropsToStates = () => {
     const { folderList = [] } = this.props
     const nextList = _.orderBy(
-      folderList.filter((f) => !f.isDeleted),
+      folderList.filter(f => !f.isDeleted),
       'sortOrder',
     ).map(this.entityGenerator)
     this.setState({
@@ -56,7 +54,7 @@ class FolderList extends Component {
     })
   }
 
-  entityGenerator = (n) => {
+  entityGenerator = n => {
     return {
       id: n.id,
       displayValue: n.displayValue,
@@ -72,9 +70,7 @@ class FolderList extends Component {
       type: 'folder/query',
       payload: {
         pagesize: 999,
-        sorting: [
-          { columnName: 'sortOrder', direction: 'asc' },
-        ],
+        sorting: [{ columnName: 'sortOrder', direction: 'asc' }],
       },
     })
   }
@@ -83,9 +79,12 @@ class FolderList extends Component {
     this.setState({ showNewFolder: false })
   }
 
-  onSaveNewFolder = (name) => {
+  onSaveNewFolder = name => {
     const { folderList, dispatch } = this.props
-    const maxSort = _.maxBy(folderList.filter((f) => f.id > 0), 'sortOrder')
+    const maxSort = _.maxBy(
+      folderList.filter(f => f.id > 0),
+      'sortOrder',
+    )
 
     dispatch({
       type: 'folder/upsert',
@@ -96,13 +95,14 @@ class FolderList extends Component {
         effectiveStartDate: moment().formatUTC(true),
         effectiveEndDate: moment('2099-12-31').formatUTC(true),
         sortOrder: maxSort ? maxSort.sortOrder + 1 : 1,
+        type: this.props.type,
       },
     }).then(this.refreshFolders)
 
     this.closeNewFolderModal()
   }
 
-  onItemClick = (item) => {
+  onItemClick = item => {
     this.props.onSelectionChange(item)
   }
 
@@ -125,15 +125,17 @@ class FolderList extends Component {
     })
   }
 
-  handleOnEndDrag = (p) => {
+  handleOnEndDrag = p => {
     const { folderList: origFolder = [] } = this.props
     const { folderList } = this.state
     const updated = []
-    origFolder.filter((fo) => fo.id > 0).map((f) => {
-      const newFolder = folderList.find((o) => o.id === f.id)
-      if (newFolder && newFolder.sortOrder !== f.sortOrder)
-        updated.push({ ...f, sortOrder: newFolder.sortOrder })
-    })
+    origFolder
+      .filter(fo => fo.id > 0)
+      .map(f => {
+        const newFolder = folderList.find(o => o.id === f.id)
+        if (newFolder && newFolder.sortOrder !== f.sortOrder)
+          updated.push({ ...f, sortOrder: newFolder.sortOrder })
+      })
     if (updated.length > 0) {
       this.props
         .dispatch({
@@ -144,9 +146,9 @@ class FolderList extends Component {
     }
   }
 
-  onItemChanged = (item) => {
+  onItemChanged = item => {
     const { folderList = [] } = this.state
-    let stateItem = folderList.find((i) => i.id === item.id)
+    let stateItem = folderList.find(i => i.id === item.id)
     stateItem.displayValue = item.displayValue
     stateItem.isDeleted = item.isDeleted
 
@@ -157,8 +159,8 @@ class FolderList extends Component {
     const { folderList: origFolder = [] } = this.props
     const { folderList } = this.state
     const updated = []
-    origFolder.map((f) => {
-      const newFolder = folderList.find((o) => o.id === f.id)
+    origFolder.map(f => {
+      const newFolder = folderList.find(o => o.id === f.id)
       if (
         newFolder &&
         (newFolder.displayValue !== f.displayValue ||
@@ -180,13 +182,19 @@ class FolderList extends Component {
     }
   }
 
-  render () {
-    const { readOnly, updateAttachments, selectedFolderFK = -99 } = this.props
+  render() {
+    const {
+      readOnly,
+      updateAttachments,
+      selectedFolderFK = -99,
+      modelName,
+      isEnableEditDocument = true,
+    } = this.props
     const { showNewFolder, folderList, isEditMode } = this.state
 
     return (
       <GridContainer style={{ height: 'auto' }}>
-        {!readOnly && (
+        {!readOnly && isEnableEditDocument && (
           <GridItem md={12}>
             <div>
               <div style={{ display: 'flex', float: 'left' }}>
@@ -203,25 +211,23 @@ class FolderList extends Component {
                   />
                 </IconButton>
                 <FastField
-                  name='patientAttachment'
-                  render={(args) => {
+                  name={`${modelName}`}
+                  render={args => {
                     this.form = args.form
                     return (
                       <Attachment
-                        attachmentType='patientAttachment'
-                        handleUpdateAttachments={(att) => {
+                        attachmentType={`${modelName}`}
+                        handleUpdateAttachments={att => {
                           let { added = [] } = att
                           const { selectedFolderFK: folderFK } = this.props
                           if (folderFK > 0 && added.length > 0) {
-                            added = added.map((ad) => {
+                            added = added.map(ad => {
                               const { 0: fileDetails } = ad
                               const retVal = {
                                 ...ad,
                                 0: {
                                   ...fileDetails,
-                                  patientAttachment_Folder: [
-                                    { folderFK },
-                                  ],
+                                  [`${modelName}_Folder`]: [{ folderFK }],
                                 },
                               }
                               return retVal
@@ -236,14 +242,12 @@ class FolderList extends Component {
                   }}
                 />
               </div>
-
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   float: 'right',
-                  height: 50,
-                  marginTop: 5,
+                  marginTop: 15,
                 }}
               >
                 {isEditMode ? (
@@ -295,12 +299,13 @@ class FolderList extends Component {
           <DragableList
             readOnly={readOnly}
             isEditMode={isEditMode}
-            folderList={folderList.filter((f) => !f.isDeleted)}
+            folderList={folderList.filter(f => !f.isDeleted)}
             selectedFolderFK={selectedFolderFK}
             onMoving={this.handleOnMoving}
             onItemClick={this.onItemClick}
             onEndDrag={this.handleOnEndDrag}
             onItemChanged={this.onItemChanged}
+            isEnableEditDocument={isEnableEditDocument}
           />
         </GridItem>
 

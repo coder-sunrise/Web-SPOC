@@ -3,6 +3,7 @@ import { connect } from 'dva'
 import { Field } from 'formik'
 import { withStyles } from '@material-ui/core'
 import Yup from '@/utils/yup'
+import { COPAYER_TYPE } from '@/utils/constants'
 
 import {
   withFormikExtend,
@@ -77,10 +78,18 @@ class ExtractAsSingle extends PureComponent {
       { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'invoiceAmt', title: 'Invoice Amount' },
-      { name: 'copayerFK', title: (<div>Co-Payer<sup>1</sup></div>) },
+      {
+        name: 'copayerFK',
+        title: (
+          <div>
+            Co-Payer<sup>1</sup>
+          </div>
+        ),
+      },
       { name: 'isTransferToExistingStatement', title: ' ' },
       {
-        name: 'transferToStatementFK', title: 'Statement No.',
+        name: 'transferToStatementFK',
+        title: 'Statement No.',
       },
     ],
     columnExtensions: [
@@ -117,7 +126,10 @@ class ExtractAsSingle extends PureComponent {
         code: 'ctcopayer',
         valueField: 'id',
         labelField: 'displayValue',
-        localFilter: (item) => item.coPayerTypeFK === 1,
+        localFilter: item =>
+          [COPAYER_TYPE.CORPORATE, COPAYER_TYPE.INSURANCE].indexOf(
+            item.coPayerTypeFK,
+          ) >= 0,
         onChange: ({ option, row }) => {
           const { statement, setFieldValue, values } = this.props
           const { statementNoList } = statement
@@ -134,7 +146,10 @@ class ExtractAsSingle extends PureComponent {
               ...o,
               _errors: undefined,
               // transferToStatementFK: o.id === row.id ? undefined : o.transferToStatementFK,
-              recentStatementNoList: o.id === row.id ? recentStatementNoList : o.recentStatementNoList,
+              recentStatementNoList:
+                o.id === row.id
+                  ? recentStatementNoList
+                  : o.recentStatementNoList,
             })),
           )
         },
@@ -168,7 +183,7 @@ class ExtractAsSingle extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { props } = this
     const {
       columns,
@@ -185,16 +200,29 @@ class ExtractAsSingle extends PureComponent {
       values,
     } = props
     const { rows } = values
-    let statementNoExtCol = columnExtensions.find(t => t.columnName === 'transferToStatementFK')
+    let statementNoExtCol = columnExtensions.find(
+      t => t.columnName === 'transferToStatementFK',
+    )
     statementNoExtCol.disabled = !transferToExistingStatement
 
     let statementNoCol = columns.find(t => t.name === 'transferToStatementFK')
-    statementNoCol.title = transferToExistingStatement ? (<div>Statement No.<sup>2</sup></div>) : (<div>Statement No.</div>)
+    statementNoCol.title = transferToExistingStatement ? (
+      <div>
+        Statement No.<sup>2</sup>
+      </div>
+    ) : (
+      <div>Statement No.</div>
+    )
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(2), marginTop: 0 }}>
           <p
-            style={{ margin: theme.spacing(1), marginTop: 0, marginLeft: 0, marginRight: 0 }}
+            style={{
+              margin: theme.spacing(1),
+              marginTop: 0,
+              marginLeft: 0,
+              marginRight: 0,
+            }}
           >
             <Checkbox
               name='isTransferToExistingStatement'
@@ -209,18 +237,21 @@ class ExtractAsSingle extends PureComponent {
                     ...o,
                     _errors: undefined,
                     transferToStatementFK: e.target.value ? null : undefined,
-                    recentStatementNoList: e.target.value ? (statement.statementNoList.filter(
-                      s => s.copayerFK === o.copayerFK,
-                    )) : [],
+                    recentStatementNoList: e.target.value
+                      ? statement.statementNoList.filter(
+                          s => s.copayerFK === o.copayerFK,
+                        )
+                      : [],
                     isTransferToExistingStatement: e.target.value,
                   })),
                 )
                 let disableSaveButton = false
                 if (e.target.value) {
-                  disableSaveButton = rows.filter(s => !s.copayerFK,).length > 0 || rows.filter(s => !s.transferToStatementFK).length > 0
-                }
-                else {
-                  disableSaveButton = rows.filter(s => !s.copayerFK,).length > 0
+                  disableSaveButton =
+                    rows.filter(s => !s.copayerFK).length > 0 ||
+                    rows.filter(s => !s.transferToStatementFK).length > 0
+                } else {
+                  disableSaveButton = rows.filter(s => !s.copayerFK).length > 0
                 }
                 dispatch({
                   type: 'global/updateState',
@@ -241,17 +272,30 @@ class ExtractAsSingle extends PureComponent {
           />
           <div style={{ height: 42 }}>
             <p
-              style={{ margin: theme.spacing(1), marginLeft: 0, marginRight: 0 }}
+              style={{
+                margin: theme.spacing(1),
+                marginLeft: 0,
+                marginRight: 0,
+              }}
             >
               <i>
-                <sup>1</sup>&nbsp;Changing the co-payer will update co-payer in patient invoice.
+                <sup>1</sup>&nbsp;Changing the co-payer will update co-payer in
+                patient invoice.
               </i>
             </p>
             <p
-              style={{ margin: theme.spacing(1), display: this.state.transferToExistingStatement ? 'block' : 'none', marginLeft: 0, marginRight: 0 }}
+              style={{
+                margin: theme.spacing(1),
+                display: this.state.transferToExistingStatement
+                  ? 'block'
+                  : 'none',
+                marginLeft: 0,
+                marginRight: 0,
+              }}
             >
               <i>
-                <sup>2</sup>&nbsp;Statement No. will display latest 5 unpaid statement only.
+                <sup>2</sup>&nbsp;Statement No. will display latest 5 unpaid
+                statement only.
               </i>
             </p>
           </div>

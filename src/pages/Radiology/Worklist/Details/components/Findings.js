@@ -21,6 +21,7 @@ import { Typography, Input } from 'antd'
 import { CHECKLIST_CATEGORY, SCRIBBLE_NOTE_TYPE } from '@/utils/constants'
 import { navigateDirtyCheck } from '@/utils/utils'
 import ScribbleNote from '@/pages/Shared/ScribbleNote/ScribbleNote'
+import { scribbleTypes } from '@/utils/codes'
 
 export const Findings = ({
   item,
@@ -350,6 +351,7 @@ export const Findings = ({
           toggleScribbleModal={toggleScribbleModal}
           scribbleData={scribbleNoteState.selectedData}
           deleteScribbleNote={deleteScribbleNote}
+          scribbleNoteType={scribbleTypes.find(x=>x.typeFK === SCRIBBLE_NOTE_TYPE.RADIOLOGY)?.type}
         />
       </CommonModal>
     </div>

@@ -178,7 +178,7 @@ class NurseActualization extends React.PureComponent {
     const isDisabledActualize = actualizeRight && actualizeRight.rights === 'disable'
     const isDisabledCancelActualize = cancelActualizeRight && cancelActualizeRight.rights === 'disable' 
     const radiologyCancellableActualizeStatus = [RADIOLOGY_WORKITEM_STATUS.NEW, RADIOLOGY_WORKITEM_STATUS.CANCELLED]
-    const isDisabledCancelActualizeByRadiology = !actualize.some(x=> x.radiologyWorkitemStatusFK && radiologyCancellableActualizeStatus.includes(x.radiologyWorkitemStatusFK))
+    const isEnableCancelActualizeByRadiology = actualize.some(x=> !x.radiologyWorkitemStatusFK || radiologyCancellableActualizeStatus.includes(x.radiologyWorkitemStatusFK))
 
       return (
       <div>
@@ -259,7 +259,7 @@ class NurseActualization extends React.PureComponent {
               {actualizeViewable && cancelBtnViewable && (
                 <Authorized authorized='dispense.cancelactualizeorderitems'>
                   {
-                    isDisabledCancelActualizeByRadiology ?
+                    !isEnableCancelActualizeByRadiology ?
                         <Tooltip title='Workitem has been started, cancel actualization is not supported.'>
                           <span>
                             <Button color='warning' onClick={this.cancel} disabled={true}>

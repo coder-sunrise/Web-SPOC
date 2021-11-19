@@ -10,7 +10,7 @@ import { ITEM_TYPE } from '@/utils/constants'
 import { roundTo, maxReducer } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
 
-const styles = (theme) => ({
+const styles = theme => ({
   displayDiv: {
     float: 'right',
     padding: '20px',
@@ -46,84 +46,72 @@ const PackageItemListing = ({
 
   const medicationSchema = Yup.object().shape({
     inventoryMedicationFK: Yup.number().required(),
-    quantity: Yup.number().required().min(1),
-    defaultConsumeQuantity: Yup.number().required().min(0),
-    subTotal: Yup.number().required().min(0),
+    quantity: Yup.number()
+      .required()
+      .min(1),
+    defaultConsumeQuantity: Yup.number()
+      .required()
+      .min(0),
+    subTotal: Yup.number()
+      .required()
+      .min(0),
   })
   const consumableSchema = Yup.object().shape({
     inventoryConsumableFK: Yup.number().required(),
-    quantity: Yup.number().required().min(1),
-    defaultConsumeQuantity: Yup.number().required().min(0),
-    subTotal: Yup.number().required().min(0),
+    quantity: Yup.number()
+      .required()
+      .min(1),
+    defaultConsumeQuantity: Yup.number()
+      .required()
+      .min(0),
+    subTotal: Yup.number()
+      .required()
+      .min(0),
   })
   const vaccinationSchema = Yup.object().shape({
     inventoryVaccinationFK: Yup.number().required(),
-    quantity: Yup.number().required().min(1),
-    defaultConsumeQuantity: Yup.number().required().min(0),
-    subTotal: Yup.number().required().min(0),
+    quantity: Yup.number()
+      .required()
+      .min(1),
+    defaultConsumeQuantity: Yup.number()
+      .required()
+      .min(0),
+    subTotal: Yup.number()
+      .required()
+      .min(0),
   })
   const serviceSchema = Yup.object().shape({
     serviceFK: Yup.number().required(),
     serviceCenterFK: Yup.number().required(),
-    quantity: Yup.number().required().min(1),
-    defaultConsumeQuantity: Yup.number().required().min(0),
-    subTotal: Yup.number().required().min(0),
+    quantity: Yup.number()
+      .required()
+      .min(1),
+    defaultConsumeQuantity: Yup.number()
+      .required()
+      .min(0),
+    subTotal: Yup.number()
+      .required()
+      .min(0),
   })
 
-  const [
-    totalPrice,
-    setTotalPrice,
-  ] = useState(0)
+  const [totalPrice, setTotalPrice] = useState(0)
 
-  const [
-    medicationRows,
-    setMedicationRows,
-  ] = useState(medicationPackageItem)
-  const [
-    consumableRows,
-    setConsumableRows,
-  ] = useState(consumablePackageItem)
-  const [
-    vaccinationRows,
-    setVaccinationRows,
-  ] = useState(vaccinationPackageItem)
-  const [
-    serviceRows,
-    setServiceRows,
-  ] = useState(servicePackageItem)
+  const [medicationRows, setMedicationRows] = useState(medicationPackageItem)
+  const [consumableRows, setConsumableRows] = useState(consumablePackageItem)
+  const [vaccinationRows, setVaccinationRows] = useState(vaccinationPackageItem)
+  const [serviceRows, setServiceRows] = useState(servicePackageItem)
 
-  const [
-    medicationList,
-    setMedicationList,
-  ] = useState([])
+  const [medicationList, setMedicationList] = useState([])
 
-  const [
-    consumableList,
-    setConsumableList,
-  ] = useState([])
+  const [consumableList, setConsumableList] = useState([])
 
-  const [
-    vaccinationList,
-    setVaccinationList,
-  ] = useState([])
+  const [vaccinationList, setVaccinationList] = useState([])
 
-  const [
-    selectedItem,
-    setSelectedItem,
-  ] = useState(() => {})
+  const [selectedItem, setSelectedItem] = useState(() => {})
 
-  const [
-    servicess,
-    setServicess,
-  ] = useState(() => [])
-  const [
-    serviceCenterss,
-    setServiceCenterss,
-  ] = useState(() => [])
-  const [
-    serviceCenterServicess,
-    setServiceCenterServicess,
-  ] = useState(() => [])
+  const [servicess, setServicess] = useState(() => [])
+  const [serviceCenterss, setServiceCenterss] = useState(() => [])
+  const [serviceCenterServicess, setServiceCenterServicess] = useState(() => [])
 
   const fetchCodes = async () => {
     await dispatch({
@@ -131,7 +119,7 @@ const PackageItemListing = ({
       payload: {
         code: 'ctservice',
       },
-    }).then((list) => {
+    }).then(list => {
       const { services, serviceCenters, serviceCenterServices } = getServices(
         list,
       )
@@ -140,20 +128,24 @@ const PackageItemListing = ({
       setServiceCenterServicess(serviceCenterServices)
     })
 
-    podoOrderType.forEach((x) => {
+    podoOrderType.forEach(x => {
       dispatch({
         type: 'codetable/fetchCodes',
         payload: {
           code: x.ctName,
         },
-      }).then((list) => {
+      }).then(list => {
         const { inventoryItemList } = inventoryItemListing(list)
         switch (x.stateName) {
           case 'ConsumableItemList': {
-            return setConsumableList(inventoryItemList.filter(item => item.isOnlyClinicInternalUsage))
+            return setConsumableList(
+              inventoryItemList.filter(item => !item.isOnlyClinicInternalUsage),
+            )
           }
           case 'MedicationItemList': {
-            return setMedicationList(inventoryItemList.filter(item => item.isOnlyClinicInternalUsage))
+            return setMedicationList(
+              inventoryItemList.filter(item => !item.isOnlyClinicInternalUsage),
+            )
           }
           case 'VaccinationItemList': {
             return setVaccinationList(inventoryItemList)
@@ -166,90 +158,70 @@ const PackageItemListing = ({
     })
   }
 
-  useEffect(
-    () => {
-      dispatch({
-        // force current edit row components to update
-        type: 'global/updateState',
-        payload: {
-          commitCount: (commitCount += 1),
-        },
-      })
-    },
-    [
-      medicationList,
-      consumableList,
-      vaccinationList,
-    ],
-  )
+  useEffect(() => {
+    dispatch({
+      // force current edit row components to update
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
+    })
+  }, [medicationList, consumableList, vaccinationList])
 
-  useEffect(
-    () => {
-      setMedicationRows(medicationPackageItem)
-      setConsumableRows(consumablePackageItem)
-      setVaccinationRows(vaccinationPackageItem)
-      setServiceRows(servicePackageItem)
-    },
-    [
-      settingPackage,
-    ],
-  )
+  useEffect(() => {
+    setMedicationRows(medicationPackageItem)
+    setConsumableRows(consumablePackageItem)
+    setVaccinationRows(vaccinationPackageItem)
+    setServiceRows(servicePackageItem)
+  }, [settingPackage])
 
   useEffect(() => {
     fetchCodes()
   }, [])
 
-  useEffect(
-    () => {
-      let total = 0
-      const calTotal = (row) => {
-        const { isDeleted, subTotal } = row
-        if (!isDeleted && subTotal) {
-          total += subTotal
-        }
-        return total
+  useEffect(() => {
+    let total = 0
+    const calTotal = row => {
+      const { isDeleted, subTotal } = row
+      if (!isDeleted && subTotal) {
+        total += subTotal
       }
-      medicationRows.forEach((row) => {
-        calTotal(row)
-      })
+      return total
+    }
+    medicationRows.forEach(row => {
+      calTotal(row)
+    })
 
-      serviceRows.forEach((row) => {
-        calTotal(row)
-      })
+    serviceRows.forEach(row => {
+      calTotal(row)
+    })
 
-      consumableRows.forEach((row) => {
-        calTotal(row)
-      })
+    consumableRows.forEach(row => {
+      calTotal(row)
+    })
 
-      vaccinationRows.forEach((row) => {
-        calTotal(row)
-      })
+    vaccinationRows.forEach(row => {
+      calTotal(row)
+    })
 
-      setFieldValue('medicationPackageItem', medicationRows)
-      setFieldValue('consumablePackageItem', consumableRows)
-      setFieldValue('vaccinationPackageItem', vaccinationRows)
-      setFieldValue('servicePackageItem', serviceRows)
+    setFieldValue('medicationPackageItem', medicationRows)
+    setFieldValue('consumablePackageItem', consumableRows)
+    setFieldValue('vaccinationPackageItem', vaccinationRows)
+    setFieldValue('servicePackageItem', serviceRows)
 
-      setTotalPrice(total)
+    setTotalPrice(total)
 
-      setValues({
-        ...values,
-        medicationPackageItem: medicationRows,
-        consumablePackageItem: consumableRows,
-        vaccinationPackageItem: vaccinationRows,
-        servicePackageItem: serviceRows,
-        totalPrice: total,
-      })
-    },
-    [
-      medicationRows,
-      consumableRows,
-      vaccinationRows,
-      serviceRows,
-    ],
-  )
+    setValues({
+      ...values,
+      medicationPackageItem: medicationRows,
+      consumablePackageItem: consumableRows,
+      vaccinationPackageItem: vaccinationRows,
+      servicePackageItem: serviceRows,
+      totalPrice: total,
+    })
+  }, [medicationRows, consumableRows, vaccinationRows, serviceRows])
 
-  const handleItemOnChange = (e) => {
+  const handleItemOnChange = e => {
     const { option, row } = e
     const { sellingPrice } = option
     setSelectedItem(option)
@@ -260,23 +232,23 @@ const PackageItemListing = ({
     row.isActive = option.isActive
   }
 
-  const getNextSequence = (type) => {
+  const getNextSequence = type => {
     let list
     switch (type) {
       case 'medicationPackageItem': {
-        list = medicationRows.filter((m) => !m.isDeleted)
+        list = medicationRows.filter(m => !m.isDeleted)
         break
       }
       case 'consumablePackageItem': {
-        list = consumableRows.filter((c) => !c.isDeleted)
+        list = consumableRows.filter(c => !c.isDeleted)
         break
       }
       case 'vaccinationPackageItem': {
-        list = vaccinationRows.filter((v) => !v.isDeleted)
+        list = vaccinationRows.filter(v => !v.isDeleted)
         break
       }
       case 'servicePackageItem': {
-        list = serviceRows.filter((s) => !s.isDeleted)
+        list = serviceRows.filter(s => !s.isDeleted)
         break
       }
       default: {
@@ -286,18 +258,16 @@ const PackageItemListing = ({
 
     let nextSequence = 1
     if (list && list.length > 0) {
-      nextSequence = list.map((o) => o.sequence).reduce(maxReducer, 0) + 1
+      nextSequence = list.map(o => o.sequence).reduce(maxReducer, 0) + 1
     }
 
     return nextSequence
   }
 
-  const onCommitChanges = (type) => ({ rows, deleted, added, changed }) => {
+  const onCommitChanges = type => ({ rows, deleted, added, changed }) => {
     if (deleted) {
-      const tempArray = [
-        ...values[type],
-      ]
-      const newArray = tempArray.map((o) => {
+      const tempArray = [...values[type]]
+      const newArray = tempArray.map(o => {
         if (o.id === deleted[0]) {
           return {
             ...o,
@@ -330,26 +300,17 @@ const PackageItemListing = ({
       switch (type) {
         case 'medicationPackageItem': {
           rows[0].inventoryItemTypeFK = ITEM_TYPE.MEDICATION
-          setMedicationRows([
-            ...medicationRows,
-            rows[0],
-          ])
+          setMedicationRows([...medicationRows, rows[0]])
           return setFieldValue(`${type}`, medicationRows)
         }
         case 'consumablePackageItem': {
           rows[0].inventoryItemTypeFK = ITEM_TYPE.CONSUMABLE
-          setConsumableRows([
-            ...consumableRows,
-            rows[0],
-          ])
+          setConsumableRows([...consumableRows, rows[0]])
           return setFieldValue(`${type}`, consumableRows)
         }
         case 'vaccinationPackageItem': {
           rows[0].inventoryItemTypeFK = ITEM_TYPE.VACCINATION
-          setVaccinationRows([
-            ...vaccinationRows,
-            rows[0],
-          ])
+          setVaccinationRows([...vaccinationRows, rows[0]])
           return setFieldValue(`${type}`, vaccinationRows)
         }
         case 'servicePackageItem': {
@@ -357,7 +318,7 @@ const PackageItemListing = ({
           const { serviceFK, serviceCenterFK } = rows[0]
           const serviceCenterService =
             serviceCenterServicess.find(
-              (o) =>
+              o =>
                 o.serviceId === serviceFK &&
                 o.serviceCenterId === serviceCenterFK,
             ) || {}
@@ -367,40 +328,37 @@ const PackageItemListing = ({
               isDeleted: false,
             }
           }
-          setServiceRows([
-            ...serviceRows,
-            rows[0],
-          ])
+          setServiceRows([...serviceRows, rows[0]])
           return setFieldValue(`${type}`, serviceRows)
         }
         default:
           return rows
       }
     } else if (changed) {
-      const getType = (t) => {
+      const getType = t => {
         switch (t) {
           case 'medicationPackageItem': {
             return {
               stateRows: medicationRows,
-              setStateRow: (v) => setMedicationRows(v),
+              setStateRow: v => setMedicationRows(v),
             }
           }
           case 'consumablePackageItem': {
             return {
               stateRows: consumableRows,
-              setStateRow: (v) => setConsumableRows(v),
+              setStateRow: v => setConsumableRows(v),
             }
           }
           case 'vaccinationPackageItem': {
             return {
               stateRows: vaccinationRows,
-              setStateRow: (v) => setVaccinationRows(v),
+              setStateRow: v => setVaccinationRows(v),
             }
           }
           case 'servicePackageItem': {
             return {
               stateRows: serviceRows,
-              setStateRow: (v) => setServiceRows(v),
+              setStateRow: v => setServiceRows(v),
             }
           }
           default: {
@@ -414,18 +372,18 @@ const PackageItemListing = ({
     }
   }
 
-  const onAddedRowsChange = (type) => (addedRows) => {
+  const onAddedRowsChange = type => addedRows => {
     if (addedRows.length > 0) {
       const newRow = addedRows[0]
       const { serviceFK, serviceCenterFK } = newRow
       if (type === 'service') {
         if (serviceFK && serviceCenterFK) {
-          const returnRow = addedRows.map((row) => ({
+          const returnRow = addedRows.map(row => ({
             ...row,
           }))
           return returnRow
         }
-        return addedRows.map((row) => ({
+        return addedRows.map(row => ({
           ...row,
           quantity: undefined,
           unitPrice: undefined,
@@ -433,12 +391,12 @@ const PackageItemListing = ({
         }))
       }
       if (selectedItem) {
-        return addedRows.map((row) => ({
+        return addedRows.map(row => ({
           ...row,
         }))
       }
     }
-    return addedRows.map((row) => {
+    return addedRows.map(row => {
       return {
         ...row,
         subTotal: 0,
@@ -447,7 +405,7 @@ const PackageItemListing = ({
     })
   }
 
-  const calUnitPrice = (e) => {
+  const calUnitPrice = e => {
     const { row } = e
     const { subTotal, quantity } = row
     row.unitPrice = 0
@@ -623,7 +581,7 @@ const PackageItemListing = ({
     onAddedRowsChange: onAddedRowsChange('vaccination'),
   }
 
-  const getServiceCenterService = (row) => {
+  const getServiceCenterService = row => {
     const { serviceFK, serviceCenterFK } = row
     if (!serviceFK || !serviceCenterFK) {
       setSelectedItem({})
@@ -631,8 +589,7 @@ const PackageItemListing = ({
     }
     const serviceCenterService =
       serviceCenterServicess.find(
-        (o) =>
-          o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
+        o => o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
       ) || {}
     if (serviceCenterService) {
       row.serviceCenterServiceFK = serviceCenterService.serviceCenter_ServiceId
@@ -663,36 +620,34 @@ const PackageItemListing = ({
         columnName: 'serviceFK',
         type: 'select',
         labelField: 'displayValue',
-        options: (row) => {
+        options: row => {
           let options = []
-          const tempArray = [
-            ...servicess,
-          ]
+          const tempArray = [...servicess]
           if (!row.serviceCenterFK) {
             options = tempArray
           } else {
-            options = tempArray.filter((o) =>
-              o.serviceCenters.find((m) => m.value === row.serviceCenterFK),
+            options = tempArray.filter(o =>
+              o.serviceCenters.find(m => m.value === row.serviceCenterFK),
             )
           }
 
-          return options.map((m) => {
+          return options.map(m => {
             const defaultServiceCenter =
-              m.serviceCenters.find((o) => o.isDefault) || {}
+              m.serviceCenters.find(o => o.isDefault) || {}
             const { unitPrice = 0 } = defaultServiceCenter
             return {
               ...m,
-              displayValue: `${m.name} - ${m.code} (${currencySymbol}${unitPrice.toFixed(
-                2,
-              )})`,
+              displayValue: `${m.name} - ${
+                m.code
+              } (${currencySymbol}${unitPrice.toFixed(2)})`,
             }
           })
         },
-        onChange: (e) => {
+        onChange: e => {
           handleItemOnChange
           if (!e.row.serviceCenterFK) {
             const serviceCenterService = serviceCenterServicess.find(
-              (o) => o.serviceId === e.val && o.isDefault,
+              o => o.serviceId === e.val && o.isDefault,
             )
             if (serviceCenterService) {
               e.row.serviceCenterFK = serviceCenterService.serviceCenterId
@@ -707,20 +662,18 @@ const PackageItemListing = ({
         columnName: 'serviceCenterFK',
         type: 'select',
         width: 150,
-        options: (row) => {
-          const tempArray = [
-            ...serviceCenterss,
-          ]
+        options: row => {
+          const tempArray = [...serviceCenterss]
           if (!row.serviceFK) {
             return tempArray
           }
-          const options = tempArray.filter((o) =>
-            o.services.find((m) => m.value === row.serviceFK),
+          const options = tempArray.filter(o =>
+            o.services.find(m => m.value === row.serviceFK),
           )
           return options
         },
 
-        onChange: (e) => {
+        onChange: e => {
           handleItemOnChange
           getServiceCenterService(e.row)
           e.row.serviceCenterFK = e.val
@@ -772,7 +725,7 @@ const PackageItemListing = ({
           <div className={classes.displayDiv}>
             <h4>
               <b>
-              Package Total Price:{' '}
+                Package Total Price:{' '}
                 <NumberInput text currency value={totalPrice} />
               </b>
             </h4>

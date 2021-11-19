@@ -35,6 +35,7 @@ import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import HistoryDetails from './HistoryDetails'
 import customtyles from './PatientHistoryStyle.less'
 import NurseActualization from '@/pages/Dispense/DispenseDetails/NurseActualization'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 
 const defaultValue = {
   visitDate: [
@@ -395,6 +396,7 @@ class PatientHistory extends Component {
       visitPurposeName,
       coHistory = [],
       isNurseNote,
+      visitStatus,
     } = row
     const { settings = [] } = clinicSettings
     const { patientID } = patientHistory
@@ -420,8 +422,10 @@ class PatientHistory extends Component {
       visitTypeSettingsObj = JSON.parse(settings.visitTypeSetting)
     } catch {}
 
-    const mappedVisitPurposeName = visitTypeSettingsObj.find(x => x.id === visitPurposeFK)
-    
+    const mappedVisitPurposeName = visitTypeSettingsObj.find(
+      x => x.id === visitPurposeFK,
+    )
+
     return (
       <div
         style={{ display: 'flex', padding: '3px 0px 8px 0px', height: 36 }}
@@ -499,7 +503,8 @@ class PatientHistory extends Component {
             </div>
             <div style={{ marginTop: 18 }}>
               <span>
-                {`${mappedVisitPurposeName?.displayValue || visitPurposeName}, Last Update By: ${LastUpdateBy ||
+                {`${mappedVisitPurposeName?.displayValue ||
+                  visitPurposeName}, Last Update By: ${LastUpdateBy ||
                   ''} on ${moment(signOffDate).format('DD MMM YYYY HH:mm')}`}
               </span>
               <span style={{ marginLeft: 5 }}>
@@ -521,6 +526,7 @@ class PatientHistory extends Component {
           >
             {patientIsActive &&
               !isRetailVisit &&
+              visitStatus != VISIT_STATUS.PAUSED &&
               fromModule !== 'Consultation' &&
               fromModule !== 'History' && (
                 <Authorized authority='patientdashboard.editconsultation'>

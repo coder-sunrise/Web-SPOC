@@ -11,20 +11,21 @@ import {
   GridItem,
   DateRangePicker,
   Select,
+  Field,
 } from '@/components'
+import { SCHEME_TYPE, COPAYER_TYPE, SCHEME_CATEGORY } from '@/utils/constants'
 import Setting from './Setting'
 
 const styles = () => ({})
 
 const Detail = ({ height, ...props }) => {
-  const { values, codetable } = props
+  const { values, codetable, setFieldValue } = props
   const { copayerTypeFK } = values
 
   const getCopayerOptions = () => {
     const { ctcopayer = [] } = codetable
-    if (copayerTypeFK === 2) return ctcopayer
     const options = ctcopayer.filter(
-      copayerList => copayerList.coPayerTypeFK === 1,
+      copayerList => copayerList.coPayerTypeFK === copayerTypeFK,
     )
     return options
   }
@@ -114,7 +115,36 @@ const Detail = ({ height, ...props }) => {
                       id: 'finance.scheme.detail.type',
                     })}
                     code='ctSchemeType'
-                    disabled
+                    localFilter={item => {
+                      return (
+                        values.id ||
+                        ['CORPORATE', 'INSURANCE'].indexOf(
+                          item.code.toUpperCase(),
+                        ) >= 0
+                      )
+                    }}
+                    disabled={values.id}
+                    onChange={value => {
+                      if (value) {
+                        if (value === SCHEME_TYPE.CORPORATE) {
+                          setFieldValue('copayerTypeFK', COPAYER_TYPE.CORPORATE)
+                          setFieldValue(
+                            'schemeCategoryFK',
+                            SCHEME_CATEGORY.CORPORATE,
+                          )
+                        } else {
+                          setFieldValue('copayerTypeFK', COPAYER_TYPE.INSURANCE)
+                          setFieldValue(
+                            'schemeCategoryFK',
+                            SCHEME_CATEGORY.INSURANCE,
+                          )
+                        }
+                      } else {
+                        setFieldValue('copayerTypeFK', undefined)
+                        setFieldValue('schemeCategoryFK', undefined)
+                      }
+                      setFieldValue('copayerFK', undefined)
+                    }}
                     {...args}
                   />
                 )
@@ -140,15 +170,15 @@ const Detail = ({ height, ...props }) => {
             />
           </GridItem>
           <GridItem xs={9}>
-            <FastField
+            <Field
               name='copayerFK'
               render={args => (
-                <Select
+                <CodeSelect
+                  code='ctcopayer'
                   label={formatMessage({
                     id: 'finance.scheme.detail.coPayer',
                   })}
-                  options={getCopayerOptions()}
-                  valueField='id'
+                  localFilter={item => item.coPayerTypeFK === copayerTypeFK}
                   labelField='displayValue'
                   max={50}
                   {...args}

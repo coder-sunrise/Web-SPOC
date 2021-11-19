@@ -1,9 +1,9 @@
 import { createListViewModel } from 'medisys-model'
 import { notification } from '@/components'
-import * as service from '../AttachmentDocument/services/patientAttachment'
+import * as service from '../AttachmentDocument/services/coPayerAttachment'
 
 export default createListViewModel({
-  namespace: 'patientAttachment',
+  namespace: 'coPayerAttachment',
   config: {},
   param: {
     service,

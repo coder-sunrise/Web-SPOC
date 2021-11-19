@@ -752,7 +752,9 @@ class PrescriptionSetList extends PureComponent {
                           .map(i => {
                             return { ...i, id: undefined }
                           }),
-                        prescriptionSetItemDrugMixture: drug.corPrescriptionItemDrugMixture
+                        prescriptionSetItemDrugMixture: (
+                          drug.corPrescriptionItemDrugMixture || []
+                        )
                           .filter(dm => !dm.isDeleted)
                           .map(dm => {
                             return { ...dm, id: undefined }

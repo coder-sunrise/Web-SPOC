@@ -201,9 +201,10 @@ const schemaSchemes = {
         // accountNumber: Yup.string().required(),
         coPaymentSchemeFK: Yup.number().when('schemeTypeFK', {
           is: val => {
-            return (
-              val ===
-              schemeTypes.find(o => o.code.toUpperCase() === 'CORPORATE').id
+            return schemeTypes.find(
+              o =>
+                ['CORPORATE', 'INSURANCE'].indexOf(o.code.toUpperCase()) >= 0 &&
+                o.id === val,
             )
           },
 
@@ -218,7 +219,9 @@ const schemaSchemes = {
               ['MEDIVISIT', 'FLEXIMEDI', 'OPSCAN'].indexOf(st.code) < 0 &&
               !st.code.startsWith('PHPC')
 
-            const isCorporate = st.id === 15
+            const isCorporate =
+              ['CORPORATE', 'INSURANCE'].indexOf(st.code.toUpperCase()) >= 0
+
             return notMedisaveOrPhpc && !isCorporate
           },
           then: Yup.array()

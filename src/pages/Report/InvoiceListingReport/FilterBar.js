@@ -12,6 +12,7 @@ import {
   Checkbox,
 } from '@/components'
 import { DoctorProfileSelect } from '@/components/_medisys'
+import { COPAYER_TYPE } from '@/utils/constants'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
 const FilterBar = ({ handleSubmit, isSubmitting }) => {
@@ -26,14 +27,14 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={2}>
             <FastField
               name='groupBy'
-              render={(args) => (
+              render={args => (
                 <RadioGroup
                   {...args}
                   label='Group By'
                   options={[
                     {
                       value: 'Company',
-                      label: 'Company',
+                      label: 'Co-Payer',
                     },
                     {
                       value: 'Doctor',
@@ -51,7 +52,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={1}>
             <FastField
               name='asAt'
-              render={(args) => <Checkbox {...args} label='As At' />}
+              render={args => <Checkbox {...args} label='As At' />}
             />
           </GridItem>
           <GridItem md={2}>
@@ -62,11 +63,11 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
             >
               Generate Report
             </Button>
-          </GridItem> 
+          </GridItem>
           <GridItem md={4}>
             <FastField
               name='doctorIDs'
-              render={(args) => (
+              render={args => (
                 <DoctorProfileSelect
                   mode='multiple'
                   {...args}
@@ -85,14 +86,13 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={4}>
             <FastField
               name='companyIDS'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   {...args}
-                  // code='ctcopayer,ctsupplier'
                   code='ctcopayer'
                   labelField='displayValue'
                   mode='multiple'
-                  label='Company'
+                  label='Co-Payer'
                 />
               )}
             />

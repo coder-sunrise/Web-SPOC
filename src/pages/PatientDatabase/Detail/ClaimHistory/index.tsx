@@ -3,7 +3,13 @@ import { connect } from 'dva'
 import moment from 'moment'
 import { Edit, Info } from '@material-ui/icons'
 import Authorized from '@/utils/Authorized'
-import { Tooltip, Button, CommonModal, dateFormatLong } from '@/components'
+import {
+  Tooltip,
+  Button,
+  CommonModal,
+  dateFormatLong,
+  dateFormatLongWithTimeNoSec,
+} from '@/components'
 import { ProTable } from '@medisys/component'
 import { ActionType } from '@ant-design/pro-table'
 import service from './services'
@@ -118,9 +124,7 @@ const ClaimHistory = ({ values, dispatch, height, clinicSettings }) => {
                   width: 134,
                 }}
               >
-                {row.icD10JpnDiagnosisFK
-                  ? row.icD10JpnDiagnosisDescription
-                  : '-'}
+                {row.icD10DiagnosisFK ? row.icD10JpnDiagnosisDescription : '-'}
               </div>
             </Tooltip>
           )
@@ -275,10 +279,13 @@ const ClaimHistory = ({ values, dispatch, height, clinicSettings }) => {
         search: false,
         render: (_dom, row) => {
           const balanceDays = row.dueDate
-            ? Math.floor(
-                (moment(row.dueDate).startOf('day') - moment().startOf('day')) /
-                  (24 * 3600 * 1000),
-              )
+            ? moment(row.dueDate).startOf('day') > moment().startOf('day')
+              ? Math.floor(
+                  (moment(row.dueDate).startOf('day') -
+                    moment().startOf('day')) /
+                    (24 * 3600 * 1000),
+                )
+              : 0
             : undefined
           return (
             <Tooltip
@@ -306,7 +313,7 @@ const ClaimHistory = ({ values, dispatch, height, clinicSettings }) => {
                   </p>
                   <p>
                     <span style={{ textDecoration: 'underline' }}>Injury:</span>{' '}
-                    Onset Visit Date (+) Validity = Due Date
+                    Onset Date (+) Validity = Due Date
                   </p>
                 </div>
               }
@@ -395,11 +402,13 @@ const ClaimHistory = ({ values, dispatch, height, clinicSettings }) => {
         key: 'updateDate',
         title: 'Updated Date',
         dataIndex: 'updateDate',
-        width: 100,
+        width: 140,
         sorter: false,
         search: false,
         render: (_dom, row) => {
-          const updateDate = moment(row.updateDate).format(dateFormatLong)
+          const updateDate = moment(row.updateDate).format(
+            dateFormatLongWithTimeNoSec,
+          )
           return (
             <Tooltip title={updateDate}>
               <div>{updateDate}</div>

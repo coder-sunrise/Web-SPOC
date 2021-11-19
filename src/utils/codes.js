@@ -1384,6 +1384,7 @@ export const ReportsOnSignOffOption = {
   Memo: 'Memo',
   VaccinationCertificate: 'Vaccination Certificate',
   OtherDocuments: 'Other Documents',
+  PrescriptionSheet: 'Prescription Sheet',
 }
 export const ReportsOnSignOff = [
   { code: ReportsOnSignOffOption.DrugLabel, description: 'Drug Label' },
@@ -1407,6 +1408,10 @@ export const ReportsOnSignOff = [
   {
     code: ReportsOnSignOffOption.OtherDocuments,
     description: 'Other Documents',
+  },
+  {
+    code: ReportsOnSignOffOption.PrescriptionSheet,
+    description: 'Prescription Sheet',
   },
 ]
 export const ReportsOnCompletePaymentOption = {
@@ -1436,6 +1441,7 @@ const scribbleTypes = [
   { type: 'chiefComplaints', typeFK: SCRIBBLE_NOTE_TYPE.CHIEFCOMPLAINTS },
   { type: 'note', typeFK: SCRIBBLE_NOTE_TYPE.CLINICALNOTES },
   { type: 'plan', typeFK: SCRIBBLE_NOTE_TYPE.PLAN },
+  { type: 'radiology', typeFK: SCRIBBLE_NOTE_TYPE.RADIOLOGY },
 ]
 
 const formTypes = [
