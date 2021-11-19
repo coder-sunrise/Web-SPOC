@@ -18,7 +18,7 @@ class DetailsList extends PureComponent {
     }
 
     const examinationDetailsCols = [
-      { name: 'orderDate', title: 'OrderDate' },
+      { name: 'orderDate', title: 'Order Date' },
       { name: 'accessionNo', title: 'Accession No.' },
       { name: 'patientName', title: 'Patient Name' },
       { name: 'accountNo', title: 'Account No.' },

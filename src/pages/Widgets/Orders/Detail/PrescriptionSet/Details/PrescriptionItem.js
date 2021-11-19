@@ -644,7 +644,7 @@ class Detail extends PureComponent {
       codetable: { inventorymedication = [] },
     } = this.props
     return inventorymedication
-      .filter(m => m.isOnlyClinicInternalUsage)
+      .filter(m => !m.isOnlyClinicInternalUsage)
       .reduce((p, c) => {
         const { code, displayValue, sellingPrice = 0, dispensingUOM = {} } = c
         const { name: uomName = '' } = dispensingUOM
