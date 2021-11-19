@@ -106,7 +106,7 @@ const baseColumns = classes => {
               <div style={{ position: 'relative', top: 2 }}>
                 {drugMixtureIndicator(row, -20)}
                 {row.isPreOrder && (
-                  <Tooltip title='Pre-Order'>
+                  <Tooltip title='New Pre-Order'>
                     <div
                       className={classes.rightIcon}
                       style={{
@@ -188,8 +188,7 @@ const baseColumns = classes => {
       title: 'UOM',
       width: 80,
       render: (text, row) => (
-        <Tooltip
-          title = {row.dispenseUOMDisplayValue}>
+        <Tooltip title={row.dispenseUOMDisplayValue}>
           <div style={wrapCellTextStyle}>{text}</div>
         </Tooltip>
       ),

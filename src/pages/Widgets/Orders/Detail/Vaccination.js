@@ -261,6 +261,7 @@ class Vaccination extends PureComponent {
       batchNo: '',
       expiryDate: '',
       showAddFromPastModal: false,
+      isPreOrderItemExists: false,
     }
   }
 
@@ -295,6 +296,9 @@ class Vaccination extends PureComponent {
           expiryDate: defaultBatch.expiryDate,
         })
     }
+
+    const { isPreOrderItemExists } = this.state
+
     this.setState({
       selectedVaccination: op,
     })
@@ -359,6 +363,9 @@ class Vaccination extends PureComponent {
       this.calculateQuantity(op)
     }, 1)
     this.onExpiryDateChange()
+
+    if (values.isPreOrder) this.props.setFieldValue('isPreOrder', false)
+    if (isPreOrderItemExists) this.setState({ isPreOrderItemExists: false })
   }
 
   calculateQuantity = vaccination => {
@@ -587,6 +594,36 @@ class Vaccination extends PureComponent {
     }, 300)
   }
 
+  checkIsPreOrderItemExistsInListing = isPreOrderChecked => {
+    const {
+      setFieldValue,
+      values,
+      codetable,
+      visitRegistration,
+      patient,
+      orders = {},
+    } = this.props
+    if (isPreOrderChecked) {
+      const vacinnationPreOrderItem = patient?.entity?.pendingPreOrderItem.filter(
+        x => x.preOrderItemType === 'Vaccination',
+      )
+      if (vacinnationPreOrderItem) {
+        vacinnationPreOrderItem.filter(item => {
+          const { preOrderVaccinationItem = {} } = item
+          const CheckIfPreOrderItemExists =
+            preOrderVaccinationItem.inventoryVaccinationFK ===
+            values.inventoryVaccinationFK
+          if (CheckIfPreOrderItemExists) {
+            this.setState({ isPreOrderItemExists: true })
+            return
+          }
+        })
+      }
+    } else {
+      this.setState({ isPreOrderItemExists: false })
+    }
+  }
+
   render() {
     const {
       theme,
@@ -598,14 +635,27 @@ class Vaccination extends PureComponent {
       disableEdit,
       getNextSequence,
       from,
+      orders,
       ...reset
     } = this.props
     const { isEditVaccination } = values
-    const { showAddFromPastModal } = this.state
+    const { showAddFromPastModal, isPreOrderItemExists } = this.state
     const caution = this.getCaution()
     const totalPriceReadonly =
       Authorized.check('queue.consultation.modifyorderitemtotalprice')
         .rights !== 'enable'
+
+    const isDisabledHasPaidPreOrder =
+      orders.entity?.actualizedPreOrderItemFK && orders.entity?.hasPaid == true
+        ? true
+        : false
+
+    const isDisabledNoPaidPreOrder = orders.entity?.actualizedPreOrderItemFK
+      ? true
+      : false
+
+    if (orders.isPreOrderItemExists === false && !values.isPreOrder)
+      this.setState({ isPreOrderItemExists: false })
 
     return (
       <Authorized
@@ -634,7 +684,7 @@ class Vaccination extends PureComponent {
                         options={this.getVaccinationOptions()}
                         {...args}
                         style={{ paddingRight: 20 }}
-                        disabled={values.isPackage}
+                        disabled={values.isPackage || isDisabledNoPaidPreOrder}
                       />
                       <LowStockInfo sourceType='vaccination' {...this.props} />
                     </div>
@@ -732,6 +782,7 @@ class Vaccination extends PureComponent {
                         )
                       }}
                       {...args}
+                      disabled={isDisabledHasPaidPreOrder}
                     />
                   )
                 }}
@@ -757,6 +808,7 @@ class Vaccination extends PureComponent {
                       }}
                       valueFiled='id'
                       {...args}
+                      disabled={isDisabledHasPaidPreOrder}
                     />
                   )
                 }}
@@ -779,6 +831,7 @@ class Vaccination extends PureComponent {
                         )
                       }}
                       {...args}
+                      disabled={isDisabledHasPaidPreOrder}
                     />
                   )
                 }}
@@ -859,6 +912,7 @@ class Vaccination extends PureComponent {
                           }
                         }}
                         {...args}
+                        disabled={isDisabledHasPaidPreOrder}
                       />
                     )
                   }}
@@ -929,7 +983,11 @@ class Vaccination extends PureComponent {
                         this.updateTotalPrice(e.target.value)
                       }}
                       min={0}
-                      disabled={totalPriceReadonly || values.isPackage}
+                      disabled={
+                        totalPriceReadonly ||
+                        values.isPackage ||
+                        isDisabledHasPaidPreOrder
+                      }
                       {...args}
                     />
                   )
@@ -964,7 +1022,11 @@ class Vaccination extends PureComponent {
                               this.onAdjustmentConditionChange()
                             }, 1)
                           }}
-                          disabled={totalPriceReadonly || values.isPackage}
+                          disabled={
+                            totalPriceReadonly ||
+                            values.isPackage ||
+                            isDisabledHasPaidPreOrder
+                          }
                           {...args}
                         />
                       )
@@ -989,7 +1051,11 @@ class Vaccination extends PureComponent {
                               this.onAdjustmentConditionChange()
                             }, 1)
                           }}
-                          disabled={totalPriceReadonly || values.isPackage}
+                          disabled={
+                            totalPriceReadonly ||
+                            values.isPackage ||
+                            isDisabledHasPaidPreOrder
+                          }
                           {...args}
                         />
                       )
@@ -1008,7 +1074,11 @@ class Vaccination extends PureComponent {
                             this.onAdjustmentConditionChange()
                           }, 1)
                         }}
-                        disabled={totalPriceReadonly || values.isPackage}
+                        disabled={
+                          totalPriceReadonly ||
+                          values.isPackage ||
+                          isDisabledHasPaidPreOrder
+                        }
                         {...args}
                       />
                     )
@@ -1031,7 +1101,11 @@ class Vaccination extends PureComponent {
                             this.onAdjustmentConditionChange()
                           }, 1)
                         }}
-                        disabled={totalPriceReadonly || values.isPackage}
+                        disabled={
+                          totalPriceReadonly ||
+                          values.isPackage ||
+                          isDisabledHasPaidPreOrder
+                        }
                         {...args}
                       />
                     )
@@ -1069,18 +1143,22 @@ class Vaccination extends PureComponent {
                 />
               ) : (
                 <div>
-                  <FastField
+                  <Field
                     name='isPreOrder'
                     render={args => {
                       return (
                         <Checkbox
                           label='Pre-Order'
+                          disabled={isDisabledNoPaidPreOrder}
                           style={{ position: 'absolute', bottom: 2 }}
                           {...args}
                           onChange={e => {
                             if (!e.target.value) {
                               setFieldValue('isChargeToday', false)
                             }
+                            this.checkIsPreOrderItemExistsInListing(
+                              e.target.value,
+                            )
                           }}
                         />
                       )
@@ -1101,6 +1179,25 @@ class Vaccination extends PureComponent {
                             {...args}
                           />
                         )
+                      }}
+                    />
+                  )}
+                  {isPreOrderItemExists && (
+                    <Alert
+                      message={
+                        "Item exists in Pre-Order. Plesae check patient's Pre-Order."
+                      }
+                      type='warning'
+                      style={{
+                        position: 'absolute',
+                        top: 45,
+                        left: 10,
+                        whiteSpace: 'nowrap',
+                        textOverflow: 'ellipsis',
+                        display: 'inline-block',
+                        overflow: 'hidden',
+                        lineHeight: '25px',
+                        fontSize: '0.85rem',
                       }}
                     />
                   )}
