@@ -341,7 +341,7 @@ export const DispenseItemsColumnExtensions = (
             </Tooltip>
             <div style={{ position: 'relative', top: 2 }}>
               {row.isPreOrder && (
-                <Tooltip title='Pre-Order'>
+                <Tooltip title='New Pre-Order'>
                   <div
                     style={{
                       position: 'absolute',
@@ -942,7 +942,7 @@ export const OtherOrdersColumnExtensions = (
             {row.type}
             <div style={{ position: 'relative', top: 2 }}>
               {row.isPreOrder && (
-                <Tooltip title='Pre-Order'>
+                <Tooltip title='New Pre-Order'>
                   <div
                     style={{
                       position: 'absolute',

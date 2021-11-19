@@ -12,9 +12,7 @@ const wrapCellTextStyle = {
 const drugMixtureIndicator = (row, right) => {
   if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
 
-  return (
-    <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
-  )
+  return <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
 }
 
 const packageDrawdownIndicator = row => {
@@ -44,31 +42,37 @@ export const DataGridColExtensions = [
       }
       return (
         <div style={{ position: 'relative' }}>
-          <div style={{
-            wordWrap: 'break-word',
-            whiteSpace: 'pre-wrap',
-            paddingRight: paddingRight
-          }}>
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+              paddingRight: paddingRight,
+            }}
+          >
             {row.itemType}
             <div style={{ position: 'relative', top: 2 }}>
               {drugMixtureIndicator(row, -20)}
-              {row.isPreOrder &&
-                <Tooltip title='Pre-Order'>
+              {row.isPreOrder && (
+                <Tooltip title='New Pre-Order'>
                   <div
                     style={{
                       position: 'absolute',
-                    bottom: 2,
-                    right: -30,
-                    borderRadius: 4,
-                    backgroundColor: '#4255bd',
-                    fontWeight: 500,
-                    color: 'white',
-                    fontSize: '0.7rem',
+                      bottom: 2,
+                      right: -30,
+                      borderRadius: 4,
+                      backgroundColor: '#4255bd',
+                      fontWeight: 500,
+                      color: 'white',
+                      fontSize: '0.7rem',
                       padding: '2px 3px',
                       height: 20,
                     }}
-                  > Pre</div>
-                </Tooltip>}
+                  >
+                    {' '}
+                    Pre
+                  </div>
+                </Tooltip>
+              )}
             </div>
           </div>
         </div>
@@ -109,6 +113,16 @@ export const DataGridColExtensions = [
     type: 'currency',
     currency: true,
     width: 200,
-    render: (row) => <NumberInput value={(row.isPreOrder && !row.isChargeToday) ? 0 : row.totalAfterItemAdjustment} text currency />
+    render: row => (
+      <NumberInput
+        value={
+          row.isPreOrder && !row.isChargeToday
+            ? 0
+            : row.totalAfterItemAdjustment
+        }
+        text
+        currency
+      />
+    ),
   },
 ]

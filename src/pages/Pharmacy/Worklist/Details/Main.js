@@ -129,7 +129,6 @@ const Main = props => {
   const [reportID, setReportID] = useState(-1)
   const [reportParameters, setReportParameters] = useState({})
 
-
   useEffect(() => {
     subscribeNotification('PharmacyOrderUpdate', {
       callback: response => {
@@ -207,7 +206,6 @@ const Main = props => {
         }
       })
     }
-
     const _editOrder = () => {
       if (pharmacyDetails.entity?.visitFK) {
         dispatch({
@@ -1306,13 +1304,13 @@ const Main = props => {
     setShowJournalHistory(false)
   }
 
-  const printReview = (reportid) => {
+  const printReview = reportid => {
     let reprottitle = ''
     let reportparameters = {}
-    if(reportid == 84){
+    if (reportid == 84) {
       reprottitle = 'Prescription'
       const { visitFK, id, patientProfileFK } = pharmacyDetails?.entity || {}
-      reportparameters = { visitFK, pharmacyWorkitemId:id, patientProfileFK }
+      reportparameters = { visitFK, pharmacyWorkitemId: id, patientProfileFK }
     }
     setReportID(reportid)
     setReportTitle(reprottitle)
@@ -1325,6 +1323,37 @@ const Main = props => {
     setReportTitle('')
     setReportParameters({})
     setShowReportViwer(false)
+  }
+
+  const actualizeEditOrder = () => {
+    dispatch({
+      type: 'orders/updateState',
+      payload: {
+        type: '1',
+        visitPurposeFK: visitPurposeFK,
+      },
+    })
+    dispatch({
+      type: 'dispense/updateState',
+      payload: { ordersData: pharmacyDetails.ordersData },
+    })
+    dispatch({
+      type: 'dispense/query',
+      payload: {
+        id: workitem.visitFK,
+        version: Date.now(),
+      },
+    }).then(r => {
+      if (r) {
+        setShowEditOrderModal(true)
+      }
+    })
+  }
+
+  if (pharmacyDetails.openOrderPopUpAfterActualize) {
+    actualizeEditOrder()
+    console.log('dispense.ordersData', pharmacyDetails.ordersData)
+    pharmacyDetails.openOrderPopUpAfterActualize = false
   }
 
   return (
@@ -1544,7 +1573,12 @@ const Main = props => {
             <Button color='primary' size='sm' disabled={isOrderUpdate}>
               Print leaflet/Drug Summary Label
             </Button>
-            <Button color='primary' size='sm' disabled={isOrderUpdate} onClick={()=>printReview(84)}>
+            <Button
+              color='primary'
+              size='sm'
+              disabled={isOrderUpdate}
+              onClick={() => printReview(84)}
+            >
               Print Prescription
             </Button>
             {secondaryPrintoutLanguage !== '' && (

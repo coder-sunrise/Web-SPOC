@@ -1029,6 +1029,21 @@ class Main extends Component {
     }
   }
 
+  actualizeEditOrder = () => {
+    const { dispatch, values, dispense, orders } = this.props
+    this.setState(
+      prevState => {
+        return {
+          showOrderModal: !prevState.showOrderModal,
+          isFirstAddOrder: false,
+        }
+      },
+      () => {
+        this.openFirstTabAddOrder()
+      },
+    )
+  }
+
   openFirstTabAddOrder = () => {
     const { dispatch, values } = this.props
     if (this.state.showOrderModal) {
@@ -1104,7 +1119,11 @@ class Main extends Component {
     } = this.props
     const { visitPurposeFK } = values
     const newOrderRows = rows.filter(row => !row.id && !row.isDeleted)
-    if (formik.OrderPage && !formik.OrderPage.dirty && newOrderRows.length > 0)
+
+    if (
+      (formik.OrderPage && !formik.OrderPage.dirty) ||
+      newOrderRows.length > 0
+    )
       this.showConfirmationBox()
     else if (visitPurposeFK === VISIT_TYPE.BF) {
       dispatch({
@@ -1201,7 +1220,20 @@ class Main extends Component {
   }
 
   render() {
-    const { classes, handleSubmit, values, dispense, codetable } = this.props
+    const {
+      classes,
+      handleSubmit,
+      values,
+      dispense,
+      codetable,
+      isActualizeInRetail,
+      testProps,
+    } = this.props
+
+    if (dispense.openOrderPopUpAfterActualize) {
+      this.actualizeEditOrder()
+      dispense.openOrderPopUpAfterActualize = false
+    }
     return (
       <div className={classes.root}>
         <DispenseDetails

@@ -53,8 +53,7 @@ class PreOrderCard extends PureComponent {
             { name: 'quantity', title: 'Order Qty.' },
             { name: 'orderByUser', title: 'Order By' },
             { name: 'orderDate', title: 'Order Date' },
-            { name: 'remarks', title: 'Remarks' },
-            { name: 'amount', title: 'Amount' },
+            { name: 'amount', title: 'Total' },
             { name: 'hasPaid', title: 'Paid' },
             { name: 'action', title: 'Action' },
           ]}
@@ -85,19 +84,16 @@ class PreOrderCard extends PureComponent {
             },
             {
               columnName: 'quantity',
-              sortingEnabled: false,
+              type: 'number',
+              precision: 1,
               width: 120,
+              sortingEnabled: false,
               render: row => {
-                const { quantity, dispenseUOM = '' } = row
                 return (
                   <Tooltip
-                    title={`${numeral(quantity).format(
-                      qtyFormat,
-                    )} ${dispenseUOM}`}
+                    title={<span>{`${row.quantity} ${row.dispenseUOM}`}</span>}
                   >
-                    <div>
-                      {numeral(quantity).format(qtyFormat)} {dispenseUOM}
-                    </div>
+                    <span>{`${row.quantity} ${row.dispenseUOM}`}</span>
                   </Tooltip>
                 )
               },
@@ -125,9 +121,13 @@ class PreOrderCard extends PureComponent {
             },
             {
               columnName: 'amount',
-              sortingEnabled: false,
+              width: 100,
               type: 'currency',
-              width: 90,
+              sortingEnabled: false,
+              isDisabled: () => true,
+              render: row => {
+                return row.hasPaid ? row.amount : '-'
+              },
             },
             {
               columnName: 'hasPaid',
@@ -140,7 +140,8 @@ class PreOrderCard extends PureComponent {
               width: 60,
               render: row => {
                 return (
-                  actualizePreOrderAccessRight.rights === 'enable' && !isReadOnly && (
+                  actualizePreOrderAccessRight.rights === 'enable' &&
+                  !isReadOnly && (
                     <Button
                       size='sm'
                       justIcon

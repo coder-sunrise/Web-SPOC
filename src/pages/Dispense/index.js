@@ -11,6 +11,8 @@ import { LoadingWrapper } from '@/components/_medisys'
 import Main from './Main'
 import EditOrder from './EditOrder'
 import style from './style'
+import { VISIT_TYPE } from '@/utils/constants'
+import { getOrdersData } from '@/pages/Consultation/utils'
 
 @connect(
   ({
@@ -23,7 +25,8 @@ import style from './style'
     clinicSettings,
     loading,
     forms,
-    codetable
+    codetable,
+    user,
   }) => ({
     loading,
     dispense,
@@ -34,15 +37,16 @@ import style from './style'
     patient: patient.entity || {},
     clinicSettings,
     forms,
-    codetable
+    codetable,
+    user,
   }),
 )
 class Dispense extends PureComponent {
-  componentDidMount () {
+  componentDidMount() {
     this.getCodeTables()
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     const { dispatch } = this.props
     dispatch({
       type: 'orders/reset',
@@ -139,16 +143,92 @@ class Dispense extends PureComponent {
     })
   }
 
-  render () {
-    const { classes, dispense, loading, patient } = this.props
+  onSelectPreOrder = (selectPreOrder = []) => {
+    const {
+      orders,
+      dispatch,
+      codetable,
+      visitRegistration,
+      patient,
+      user,
+      clinicSettings,
+      dispense,
+    } = this.props
+    const { entity } = visitRegistration
+    const { visit = {} } = entity
     const { editingOrder } = dispense
+
+    if (!editingOrder && visit.visitPurposeFK === VISIT_TYPE.OTC) {
+      dispatch({
+        type: 'dispense/updateState',
+        payload: {
+          openOrderPopUpAfterActualize: true,
+          ordersData: getOrdersData({
+            selectPreOrder,
+            orders,
+            codetable,
+            visitRegistration,
+            patient,
+            user,
+            clinicSettings,
+          }),
+        },
+      })
+    } else {
+      dispatch({
+        type: 'orders/upsertRows',
+        payload: getOrdersData({
+          selectPreOrder,
+          orders,
+          codetable,
+          visitRegistration,
+          patient,
+          user,
+          clinicSettings,
+        }),
+      })
+    }
+  }
+
+  render() {
+    const {
+      classes,
+      dispense,
+      loading,
+      patient,
+      orders,
+      visitRegistration,
+    } = this.props
+    const { editingOrder } = dispense
+    const { rows } = orders
+    const { entity } = visitRegistration
+    const { visit = {} } = entity
+
+    const draftPreOrderItem = patient?.pendingPreOrderItem?.map(po => {
+      const selectPreOrder = rows.find(
+        apo => apo.actualizedPreOrderItemFK === po.id,
+      )
+      if (selectPreOrder) {
+        return {
+          ...po,
+          preOrderItemStatus: selectPreOrder.isDeleted ? 'New' : 'Actualizing',
+        }
+      }
+      return { ...po }
+    })
+
     return (
       <div className={classes.root}>
         <LoadingWrapper loading={loading.models.dispense}>
           <Banner
             from='Dispense'
-            // activePreOrderItem={patient?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
+            editingOrder={
+              editingOrder || visit.visitPurposeFK === VISIT_TYPE.OTC
+            }
+            onSelectPreOrder={this.onSelectPreOrder}
+            activePreOrderItems={draftPreOrderItem}
             extraCmt={this.getExtraComponent()}
+            isRetail={visit.visitPurposeFK === VISIT_TYPE.OTC}
           />
           <SizeContainer size='sm'>
             <React.Fragment>

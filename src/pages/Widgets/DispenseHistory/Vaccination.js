@@ -54,7 +54,7 @@ export default ({ classes, current, fieldName = '' }) => {
               </Tooltip>
               <div style={{ position: 'relative', top: 2 }}>
                 {row.isPreOrder && (
-                  <Tooltip title='Pre-Order'>
+                  <Tooltip title='New Pre-Order'>
                     <div
                       className={classes.rightIcon}
                       style={{
