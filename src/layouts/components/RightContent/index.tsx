@@ -99,6 +99,8 @@ class HeaderLinks extends React.Component {
 
     const clinicShortCode = clinicInfo ? clinicInfo.clinicShortCode : ''
 
+    const roomDisplayValue = localStorage.getItem('roomDisplayValue')
+
     return (
       <div>
         <div>
@@ -152,6 +154,17 @@ class HeaderLinks extends React.Component {
                   </span>
                 </Button>
               </Popper>
+              {roomDisplayValue && (
+                <span>
+                  <Divider
+                    type='vertical'
+                    style={{ background: '#999', height: '1.2rem' }}
+                  />
+                  <div className={styles.roomDisplayValue}>
+                    <span>{roomDisplayValue}</span>
+                  </div>
+                </span>
+              )}
               <Divider
                 type='vertical'
                 style={{ background: '#999', height: '1.2rem' }}

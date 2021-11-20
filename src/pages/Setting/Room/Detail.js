@@ -9,6 +9,8 @@ import {
   GridItem,
   TextField,
   DateRangePicker,
+  Button,
+  notification,
 } from '@/components'
 
 const styles = theme => ({})
@@ -93,6 +95,22 @@ class Detail extends PureComponent {
                   )
                 }}
               />
+            </GridItem>
+            <GridItem md={6} style={{ paddingTop: 10 }}>
+              <Button
+                color='primary'
+                className={classes.button}
+                onClick={() => {
+                  localStorage.setItem('roomDisplayValue', values.displayValue)
+                  notification.success({
+                    message: 'Local Identity Saved',
+                  })
+                  window.location.reload()
+                }}
+                disabled={false}
+              >
+                Save As Local Identity
+              </Button>
             </GridItem>
             <GridItem md={12}>
               <FastField
