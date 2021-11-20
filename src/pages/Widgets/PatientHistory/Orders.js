@@ -262,7 +262,7 @@ export default ({ current, classes, showDrugLabelRemark }) => {
                 }}
               >
                 {`${currencySymbol}${numeral(
-                  row.isPreOrder && !row.isChargeToday
+                  (row.isPreOrder && !row.isChargeToday) || row.hasPaid
                     ? 0
                     : row.totalAfterItemAdjustment || 0,
                 ).format('0,0.00')}`}

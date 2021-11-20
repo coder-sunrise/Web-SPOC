@@ -540,7 +540,8 @@ const getOrdersData = val => {
         } else {
           weightKG = visitRegistration.entity.visit.weightKG
         }
-        const { dob } = patient.entity
+
+        const { dob } = patient
         let age
         if (dob) {
           age = Math.floor(moment.duration(moment().diff(dob)).asYears())
@@ -595,6 +596,33 @@ const getOrdersData = val => {
             )
           : ''
 
+      let ItemPrecautions = []
+      let precautionIndex = 0
+      if (
+        inventoryMedication_MedicationPrecaution &&
+        inventoryMedication_MedicationPrecaution.length > 0
+      ) {
+        ItemPrecautions = ItemPrecautions.concat(
+          inventoryMedication_MedicationPrecaution.map(o => {
+            let currentPrecautionSequence = precautionIndex
+            precautionIndex += 1
+            return {
+              medicationPrecautionFK: o.medicationPrecautionFK,
+              precaution: o.medicationPrecautionName,
+              precautionCode: o.medicationPrecautionCode,
+              sequence: currentPrecautionSequence,
+              isDeleted: false,
+            }
+          }),
+        )
+      } else {
+        ItemPrecautions = [
+          {
+            precaution: '',
+            sequence: 0,
+          },
+        ]
+      }
       data.push({
         actualizedPreOrderItemFK: po.id,
         adjAmount: preOrderMedicationItem?.adjAmount || 0,
@@ -603,7 +631,7 @@ const getOrdersData = val => {
         corPrescriptionItemInstruction: preOrderMedicationItem.length
           ? preOrderMedicationItem?.corPrescriptionItemInstruction
           : [defaultInstruction],
-        corPrescriptionItemPrecaution: inventoryMedication_MedicationPrecaution,
+        corPrescriptionItemPrecaution: ItemPrecautions,
         costPrice: medicationStock[0].averageCostPrice || 0,
         dispenseUOMCode: dispensingUOM?.code,
         dispenseUOMDisplayValue: dispensingUOM?.name,

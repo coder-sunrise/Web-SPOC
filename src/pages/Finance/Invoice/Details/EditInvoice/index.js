@@ -350,7 +350,8 @@ class EditInvoice extends Component {
                 onChange: e => {
                   this.updateUnitPrice(e.row)
                 },
-                isDisabled: row => row.isPreOrder && !row.isChargeToday,
+                isDisabled: row =>
+                  (row.isPreOrder && !row.isChargeToday) || row.hasPaid,
               },
               {
                 columnName: 'quantity',
@@ -398,7 +399,10 @@ class EditInvoice extends Component {
                                 }
                               },
                             }}
-                            disabled={row.isPreOrder && !row.isChargeToday}
+                            disabled={
+                              (row.isPreOrder && !row.isChargeToday) ||
+                              row.hasPaid
+                            }
                           />
                         )}
                       />
@@ -435,7 +439,10 @@ class EditInvoice extends Component {
                                     }
                                   },
                                 }}
-                                disabled={row.isPreOrder && !row.isChargeToday}
+                                disabled={
+                                  (row.isPreOrder && !row.isChargeToday) ||
+                                  row.hasPaid
+                                }
                               />
                             )}
                           />
@@ -467,7 +474,10 @@ class EditInvoice extends Component {
                                     }
                                   },
                                 }}
-                                disabled={row.isPreOrder && !row.isChargeToday}
+                                disabled={
+                                  (row.isPreOrder && !row.isChargeToday) ||
+                                  row.hasPaid
+                                }
                               />
                             )}
                           />
@@ -499,7 +509,10 @@ class EditInvoice extends Component {
                                 }
                               },
                             }}
-                            disabled={row.isPreOrder && !row.isChargeToday}
+                            disabled={
+                              (row.isPreOrder && !row.isChargeToday) ||
+                              row.hasPaid
+                            }
                           />
                         )}
                       />
@@ -516,11 +529,12 @@ class EditInvoice extends Component {
                 onChange: e => {
                   this.updateTotal(e.row)
                 },
-                isDisabled: row => row.isPreOrder && !row.isChargeToday,
+                isDisabled: row =>
+                  (row.isPreOrder && !row.isChargeToday) || row.hasPaid,
                 render: row => (
                   <NumberInput
                     value={
-                      row.isPreOrder && !row.isChargeToday
+                      (row.isPreOrder && !row.isChargeToday) || row.hasPaid
                         ? 0
                         : row.totalAfterItemAdjustment
                     }

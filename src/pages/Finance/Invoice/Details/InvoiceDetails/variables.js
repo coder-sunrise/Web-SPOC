@@ -116,7 +116,7 @@ export const DataGridColExtensions = [
     render: row => (
       <NumberInput
         value={
-          row.isPreOrder && !row.isChargeToday
+          (row.isPreOrder && !row.isChargeToday) || row.hasPaid
             ? 0
             : row.totalAfterItemAdjustment
         }

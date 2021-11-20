@@ -124,7 +124,7 @@ export default ({ classes, current, fieldName = '' }) => {
       width: 90,
       render: (text, row) =>
         showCurrency(
-          row.isPreOrder && !row.isChargeToday
+          (row.isPreOrder && !row.isChargeToday) || row.hasPaid
             ? 0
             : row.totalAfterItemAdjustment,
         ),
