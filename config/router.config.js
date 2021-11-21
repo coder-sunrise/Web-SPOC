@@ -154,6 +154,33 @@ const _routes = [
         ],
       },
       {
+        path: '/lab',
+        icon: 'icon-radiology',
+        name: 'lab',
+        moduleName: 'Lab',
+        authority: ['lab'],
+        clinicSetting: ['isEnableLabModule'],
+        specialist: ['GP'],
+        routes: [
+          {
+            path: '/lab/worklist',
+            name: 'worklist',
+            component: './lab/Worklist',
+            mini: 'LW',
+            exact: true,
+            //authority: ['lab/worklist'],
+          },
+          {
+            path: '/lab/history',
+            name: 'history',
+            component: './lab/History',
+            mini: 'LH',
+            exact: true,
+            //authority: ['lab/worklisthistory'],
+          },
+        ],
+      },
+      {
         path: '/pharmacy',
         icon: 'icon-medicinebox-fill',
         name: 'pharmacy',

@@ -311,7 +311,7 @@ class Detail extends PureComponent {
           )
           if (rs.length > 0) {
             notification.error({
-              message: 'The modality already exist in the list',
+              message: 'The test panel already exist in the list',
             })
           }
         },

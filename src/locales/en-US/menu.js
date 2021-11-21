@@ -214,6 +214,10 @@ export default {
   'menu.pharmacy.worklist': 'Worklist',
   'menu.pharmacy.history': 'History',
 
+  'menu.lab': 'Lab Center',
+  'menu.lab.worklist': 'Worklist',
+  'menu.lab.history': 'History',
+
   'menu.not-found': 'Not Found',
   'menu.forbidden': 'Forbidden',
 }
