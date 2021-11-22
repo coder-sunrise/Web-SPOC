@@ -115,6 +115,7 @@ const getPharmacyItems = (codetable, clinicSettings, entity = {}) => {
                   countNumber: index === 0 ? 1 : 0,
                   rowspan: 0,
                   uid: getUniqueId(),
+                  allowToDispense: true,
                 })
               }
             })
@@ -168,6 +169,7 @@ const getPharmacyItems = (codetable, clinicSettings, entity = {}) => {
                     ? drugMixture.pharmacyOrderItemTransaction.length
                     : 0,
                 uid: getUniqueId(),
+                allowToDispense: true,
               })
             })
           } else {
@@ -219,6 +221,7 @@ const getPharmacyItems = (codetable, clinicSettings, entity = {}) => {
           countNumber: index === 0 ? 1 : 0,
           rowspan: index === 0 ? item.pharmacyOrderItemTransaction.length : 0,
           uid: getUniqueId(),
+          allowToDispense: true,
         })
       })
     } else {
@@ -285,6 +288,7 @@ const getPharmacyItems = (codetable, clinicSettings, entity = {}) => {
               countNumber: index === 0 ? 1 : 0,
               rowspan: 0,
               uid: getUniqueId(),
+              allowToDispense: true,
             })
           }
         })
@@ -353,6 +357,7 @@ const getPharmacyItems = (codetable, clinicSettings, entity = {}) => {
               countNumber: index === 0 ? 1 : 0,
               rowspan: 0,
               uid: getUniqueId(),
+              allowToDispense: true,
             })
           }
           const firstItem = orderItems.find(
@@ -552,6 +557,7 @@ const getPartialPharmacyItems = (codetable, clinicSettings, entity = {}) => {
                 countNumber: index === 0 ? 1 : 0,
                 rowspan: 0,
                 uid: getUniqueId(),
+                allowToDispense: true,
               })
             }
           })
@@ -642,6 +648,7 @@ const getPartialPharmacyItems = (codetable, clinicSettings, entity = {}) => {
             countNumber: index === 0 ? 1 : 0,
             rowspan: 0,
             uid: getUniqueId(),
+            allowToDispense: true,
           })
         }
       })
@@ -714,6 +721,7 @@ const getPartialPharmacyItems = (codetable, clinicSettings, entity = {}) => {
             countNumber: index === 0 ? 1 : 0,
             rowspan: 0,
             uid: getUniqueId(),
+            allowToDispense: true,
           })
         }
         const firstItem = orderItems.find(
