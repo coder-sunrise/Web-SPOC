@@ -198,18 +198,24 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
   }
 
   const sortOrderItems = [
-    ...(entity.prescription || []).filter(
-      item => item.type === 'Medication' && !item.isDrugMixture,
-    ),
+    ...(entity.prescription || [])
+      .filter(item => item.type === 'Medication' && !item.isDrugMixture)
+      .map(item => {
+        return { ...item, quantity: item.dispensedQuanity }
+      }),
     ...(entity.vaccination || []),
     ...(entity.consumable || []),
     ...(entity.prescription || []).filter(
       item => item.type === 'Medication' && item.isDrugMixture,
     ),
-    ...(entity.prescription || []).filter(
-      item => item.type === 'Open Prescription',
-    ),
-    ...(entity.externalPrescription || []),
+    ...(entity.prescription || [])
+      .filter(item => item.type === 'Open Prescription')
+      .map(item => {
+        return { ...item, quantity: item.dispensedQuanity }
+      }),
+    ...(entity.externalPrescription || []).map(item => {
+      return { ...item, quantity: item.dispensedQuanity }
+    }),
   ]
 
   sortOrderItems.forEach(item => {
