@@ -13,18 +13,6 @@ export const StatusPanel = () => {
           <span style={{ fontWeight: 400, fontSize: '0.8rem' }}>
             Now Serving:
           </span>
-
-          <Tooltip title=''>
-            <span
-              className='material-icons'
-              style={{
-                color: 'gray',
-              }}
-              onClick={event => {}}
-            >
-              history
-            </span>
-          </Tooltip>
         </div>
         <Tooltip title='1.0(genery)'>
           <p

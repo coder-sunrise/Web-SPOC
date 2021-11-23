@@ -161,7 +161,7 @@ const PharmacyWorklist = () => {
             textAlign: 'right',
           }}
         >
-          <p style={{ fontWeight: 600 }}>Now Serving:</p>
+          <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>Now Serving:</p>
           <Tooltip title='1.0(genery)'>
             <p
               style={{
@@ -176,45 +176,28 @@ const PharmacyWorklist = () => {
             </p>
           </Tooltip>
         </div>
-
-        <Tooltip title=''>
-          <span
-            className='material-icons'
-            style={{
-              color: 'gray',
-              position: 'absolute',
-              top: 22,
-              right: 143,
-              width: 26,
-              height: 26,
-            }}
-            onClick={event => {}}
-          >
-            history
-          </span>
-        </Tooltip>
-
         <div style={{ position: 'absolute', top: 25, right: 50 }}>
-          <p style={{ fontWeight: 600 }}>Last Refresh:</p>
-          <p style={{ color: '#1890f8', marginTop: 4 }}>
-            {refreshDate.format('HH:mm')}
-          </p>
+          <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>Last Refresh:</p>
+          <span>
+            <p style={{ color: '#1890f8', marginTop: 4, fontSize: '0.9rem' }}>
+              {refreshDate.format('HH:mm')}
+            </p>
+            <Button
+              color='primary'
+              justIcon
+              style={{
+                position: 'absolute',
+                top: 20,
+                left: 80,
+                width: 26,
+                height: 26,
+              }}
+              onClick={refreshClick}
+            >
+              <Refresh />
+            </Button>
+          </span>
         </div>
-
-        <Button
-          color='primary'
-          justIcon
-          style={{
-            position: 'absolute',
-            top: 22,
-            right: 10,
-            width: 26,
-            height: 26,
-          }}
-          onClick={refreshClick}
-        >
-          <Refresh />
-        </Button>
       </div>
     </div>
   )
