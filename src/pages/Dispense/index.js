@@ -42,7 +42,8 @@ import { getOrdersData } from '@/pages/Consultation/utils'
   }),
 )
 class Dispense extends PureComponent {
-  componentDidMount() {
+  constructor(props) {
+    super(props)
     this.getCodeTables()
   }
 
