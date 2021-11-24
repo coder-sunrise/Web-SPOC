@@ -3,6 +3,7 @@ import Print from '@material-ui/icons/Print'
 import { FileCopySharp } from '@material-ui/icons'
 import { FormattedMessage } from 'umi'
 import numeral from 'numeral'
+import _ from 'lodash'
 import { currencySymbol, currencyFormat } from '@/utils/config'
 import {
   NumberInput,
@@ -242,7 +243,7 @@ export const DispenseItemsColumns = [
     title: 'Stock Qty.',
   },
   {
-    name: 'batchNo',
+    name: 'stockFK',
     title: 'Batch #',
   },
   {
@@ -284,6 +285,7 @@ export const DispenseItemsColumnExtensions = (
   onPrint,
   onActualizeBtnClick,
   showDrugLabelRemark,
+  codetable,
 ) => {
   const checkActualizable = row => {
     const {
@@ -553,10 +555,10 @@ export const DispenseItemsColumnExtensions = (
       sortingEnabled: false,
       type: 'number',
       isDisabled: row => {
-        return viewOnly || !row.stockFK || row.isDispensedByPharmacy
+        return viewOnly || !row.allowToDispense || row.isDispensedByPharmacy
       },
       render: row => {
-        if (viewOnly || !row.stockFK) {
+        if (viewOnly || !row.allowToDispense) {
           const qty = !row.stockFK
             ? '-'
             : numeral(row.dispenseQuantity).format('0.0')
@@ -657,27 +659,136 @@ export const DispenseItemsColumnExtensions = (
       align: 'right',
     },
     {
-      columnName: 'batchNo',
+      columnName: 'stockFK',
       width: 100,
       sortingEnabled: false,
+      type: 'codeSelect',
+      labelField: 'batchNo',
+      valueField: 'id',
+      options: row => {
+        const {
+          inventorymedication = [],
+          inventoryconsumable = [],
+          inventoryvaccination = [],
+        } = codetable
+        let stockList = []
+        if (row.type === 'Medication') {
+          const medication = inventorymedication.find(
+            m => m.id === row.inventoryMedicationFK,
+          )
+          if (medication) {
+            stockList = (medication.medicationStock || []).filter(
+              s => s.isDefault || s.stock > 0,
+            )
+          }
+        } else if (row.type === 'Consumable') {
+          const consumable = inventoryconsumable.find(
+            m => m.id === row.inventoryConsumableFK,
+          )
+          if (consumable) {
+            stockList = (consumable.consumableStock || []).filter(
+              s => s.isDefault || s.stock > 0,
+            )
+          }
+        } else if (row.type === 'Vaccination') {
+          const vaccination = inventoryvaccination.find(
+            m => m.id === row.inventoryVaccinationFK,
+          )
+          if (vaccination) {
+            stockList = (vaccination.vaccinationStock || []).filter(
+              s => s.isDefault || s.stock >= row.quantity,
+            )
+          }
+        }
+
+        stockList = _.orderBy(stockList, ['expiryDate'], ['asc'])
+
+        if (row.stockFK) {
+          const selectStock = stockList.find(sl => sl.id === row.stockFK)
+          if (!selectStock) {
+            return [
+              {
+                id: row.stockFK,
+                batchNo: row.batchNo,
+                expiryDate: row.expiryDate,
+                isDefault: row.isDefault,
+              },
+              ...stockList,
+            ]
+          } else {
+            return [
+              { ...selectStock },
+              ...stockList.filter(sl => sl.id !== row.stockFK),
+            ]
+          }
+        }
+        return stockList
+      },
+      dropdownMatchSelectWidth: false,
+      dropdownStyle: {
+        width: '200px!important',
+      },
+      renderDropdown: option => {
+        const batchtext = option.expiryDate
+          ? `${option.batchNo}, Exp.: ${moment(option.expiryDate).format(
+              'DD MMM YYYY',
+            )}`
+          : option.batchNo
+        return (
+          <Tooltip title={batchtext}>
+            <div
+              style={{
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                width: 230,
+              }}
+            >
+              {batchtext}
+            </div>
+          </Tooltip>
+        )
+      },
       isDisabled: row => {
-        return viewOnly || !row.isDefault
+        return viewOnly || !row.allowToDispense
+      },
+      onChange: ({ option, row }) => {
+        if (option) {
+          row.stockFK = option.id
+          row.batchNo = option.batchNo
+          row.expiryDate = option.expiryDate
+          row.isDefault = option.isDefault
+          row.stock = option.stock
+        } else {
+          row.stockFK = undefined
+          row.batchNo = undefined
+          row.expiryDate = undefined
+          row.isDefault = false
+          row.stock = 0
+          row.dispenseQuantity = 0
+        }
       },
       render: row => {
-        if (viewOnly || !row.isDefault) {
-          return (
-            <Tooltip title={row.batchNo}>
-              <span>{row.batchNo}</span>
-            </Tooltip>
-          )
-        }
+        const isExpire =
+          !viewOnly &&
+          row.expiryDate &&
+          moment(row.expiryDate).startOf('day') < moment().startOf('day')
         return (
-          <TextField
-            maxLength={100}
-            text={viewOnly}
-            label=''
-            value={row.batchNo}
-          />
+          <div>
+            <Tooltip title={row.batchNo}>
+              <div
+                style={{
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {row.batchNo || '-'}
+              </div>
+            </Tooltip>
+            {isExpire && <p style={{ color: 'red' }}>EXPIRED!</p>}
+          </div>
         )
       },
     },
@@ -690,23 +801,19 @@ export const DispenseItemsColumnExtensions = (
         return viewOnly || !row.isDefault
       },
       render: row => {
-        if (viewOnly || !row.isDefault) {
-          const expiryDate = row.expiryDate
-            ? moment(row.expiryDate).format('DD MMM YYYY')
-            : '-'
-          return (
-            <Tooltip title={expiryDate}>
-              <span>{expiryDate}</span>
-            </Tooltip>
-          )
-        }
+        const expiryDate = row.expiryDate
+          ? moment(row.expiryDate).format('DD MMM YYYY')
+          : '-'
+        const isExpire =
+          !viewOnly &&
+          row.expiryDate &&
+          moment(row.expiryDate).startOf('day') < moment().startOf('day')
         return (
-          <DatePicker
-            text={viewOnly}
-            disabled={viewOnly}
-            simple
-            value={row.expiryDate}
-          />
+          <Tooltip title={expiryDate}>
+            <span style={{ color: isExpire ? 'red' : 'black' }}>
+              {expiryDate}
+            </span>
+          </Tooltip>
         )
       },
     },
@@ -719,21 +826,24 @@ export const DispenseItemsColumnExtensions = (
         return (
           <div>
             {!viewOnly && actualizationButton(row, onActualizeBtnClick)}
-            <Tooltip
-              title={
-                <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
-              }
-            >
-              <Button
-                color='primary'
-                onClick={() => {
-                  onPrint({ type: CONSTANTS.DRUG_LABEL, row })
-                }}
-                justIcon
+            {(row.type === 'Medication' ||
+              row.type === 'Open Prescription') && (
+              <Tooltip
+                title={
+                  <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
+                }
               >
-                <Print />
-              </Button>
-            </Tooltip>
+                <Button
+                  color='primary'
+                  onClick={() => {
+                    onPrint({ type: CONSTANTS.DRUG_LABEL, row })
+                  }}
+                  justIcon
+                >
+                  <Print />
+                </Button>
+              </Tooltip>
+            )}
           </div>
         )
       },

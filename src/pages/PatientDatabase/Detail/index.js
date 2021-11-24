@@ -439,9 +439,11 @@ class PatientDetail extends PureComponent {
       !_.isEqual(oldSchemeVal, newSchemeVal) && newSchemeVal.length > 0
     //if added new member, would update address & scheme for that member
     console.log('check family member change', values)
-    const newFamilyMembers = values.patientFamilyGroup.patientFamilyMember
-      .filter(x => x.isNew && !x.isDeleted)
-      .map(x => x.familyMemberFK)
+    const newFamilyMembers =
+      values.patientFamilyGroup &&
+      values.patientFamilyGroup.patientFamilyMember
+        .filter(x => x.isNew && !x.isDeleted)
+        .map(x => x.familyMemberFK)
     return [isAddressChange, isSchemeChange, newFamilyMembers]
   }
 
@@ -453,7 +455,7 @@ class PatientDetail extends PureComponent {
         scheme,
         newFamilyMembers,
       ] = this.checkFamilyMemberInfoChange(initialValues, values)
-      const anyNewFamilyMember = newFamilyMembers.length > 0
+      const anyNewFamilyMember = newFamilyMembers && newFamilyMembers.length > 0
       if (anyNewFamilyMember || address || scheme) {
         const fimilyMembersInfoTitle = `Confirm Update Family Members' ${[
           anyNewFamilyMember || address ? 'Address' : '',
