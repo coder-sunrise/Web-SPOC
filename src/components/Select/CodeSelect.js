@@ -88,6 +88,8 @@ class CodeSelect extends React.PureComponent {
         options={formattedFilteredOptions || []}
         valueField='id'
         {...selectProps}
+        // prevent to show default '请输入' placeholder
+        placeholder=''
         onChange={(values, opts) => {
           if (
             this.props.maxTagCount === undefined &&
