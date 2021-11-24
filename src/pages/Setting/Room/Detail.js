@@ -101,7 +101,7 @@ class Detail extends PureComponent {
                 color='primary'
                 className={classes.button}
                 onClick={() => {
-                  localStorage.setItem('roomDisplayValue', values.displayValue)
+                  localStorage.setItem('roomCode', values.code)
                   notification.success({
                     message: 'Local Identity Saved',
                   })

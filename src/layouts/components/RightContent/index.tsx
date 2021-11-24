@@ -18,10 +18,11 @@ import { updateAPIType } from '@/utils/request'
 import { navigateDirtyCheck } from '@/utils/utils'
 import styles from './index.less'
 
-@connect(({ user, clinicInfo, header }) => ({
+@connect(({ user, clinicInfo, header, codetable }) => ({
   user,
   clinicInfo,
   header,
+  codetable,
 }))
 class HeaderLinks extends React.Component {
   state = {
@@ -84,9 +85,10 @@ class HeaderLinks extends React.Component {
   }
 
   render() {
-    const { rtlActive, user, clinicInfo, header } = this.props
+    const { rtlActive, user, clinicInfo, header, codetable } = this.props
     const { openAccount } = this.state
     const { signalRConnected, notifications } = header
+    const { ctroom = [] } = codetable
 
     const name =
       user.data && user.data.clinicianProfile
@@ -99,7 +101,13 @@ class HeaderLinks extends React.Component {
 
     const clinicShortCode = clinicInfo ? clinicInfo.clinicShortCode : ''
 
-    const roomDisplayValue = localStorage.getItem('roomDisplayValue')
+    const roomCode = localStorage.getItem('roomCode')
+    let roomDisplayValue = null
+
+    if (roomCode && ctroom.length !== 0) {
+      const room = ctroom?.find(room => room.code === roomCode)
+      roomDisplayValue = room.name
+    }
 
     return (
       <div>
