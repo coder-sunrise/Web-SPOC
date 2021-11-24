@@ -808,3 +808,9 @@ tr[class*='disableexpandedgroup'] {
     cursor: default !important;
   }
 }
+
+td[class='ant-table-cell ant-table-cell-ellipsis'] {
+  span {
+    width: 100% !important;
+  }
+}

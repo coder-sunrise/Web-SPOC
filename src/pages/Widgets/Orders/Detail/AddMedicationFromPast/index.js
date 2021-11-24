@@ -14,7 +14,7 @@ import {
   ReplaceCertificateTeplate,
   getDrugAllergy,
 } from '@/pages/Widgets/Orders/utils'
-import { getTranslationValue } from '@/utils/utils'
+import { getTranslationValue, getUniqueId } from '@/utils/utils'
 import FitlerBar from './FilterBar'
 import Grid from './Grid'
 import { getClinicianProfile } from '../../../ConsultationDocument/utils'
@@ -216,6 +216,7 @@ class PastMedication extends PureComponent {
             sequence: instruction.sequence,
             stepdose: instruction.stepdose,
             isDeleted: false,
+            uid: getUniqueId(),
           }
         })
 
@@ -272,6 +273,7 @@ class PastMedication extends PureComponent {
                   precautionCode: o.medicationPrecautionCode,
                   sequence: currentPrecautionSequence,
                   isDeleted: false,
+                  uid: getUniqueId(),
                 }
               }),
             )
@@ -280,6 +282,7 @@ class PastMedication extends PureComponent {
               {
                 precaution: '',
                 sequence: 0,
+                uid: getUniqueId(),
               },
             ]
           }
@@ -378,6 +381,7 @@ class PastMedication extends PureComponent {
                   precautionCode: o.precautionCode,
                   sequence: currentPrecautionSequence,
                   isDeleted: false,
+                  uid: getUniqueId(),
                 }
               }),
             )
@@ -386,6 +390,7 @@ class PastMedication extends PureComponent {
               {
                 precaution: '',
                 sequence: 0,
+                uid: getUniqueId(),
               },
             ]
           }
