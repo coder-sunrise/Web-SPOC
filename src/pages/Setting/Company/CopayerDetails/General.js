@@ -256,7 +256,9 @@ export const General = props => {
         <GridItem md={3}>
           <Field
             name='creditInformation'
-            render={args => <TextField label='Credit Code' {...args} />}
+            render={args => (
+              <TextField label='Credit Code' maxLength={300} {...args} />
+            )}
           />
         </GridItem>
 

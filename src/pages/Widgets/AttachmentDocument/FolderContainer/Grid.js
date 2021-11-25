@@ -127,6 +127,7 @@ class Grid extends PureComponent {
           {
             columnName: 'folderFKs',
             disabled: true,
+            sortingEnabled: false,
             render: row => {
               return (
                 <div style={{ whiteSpace: 'pre-wrap' }}>

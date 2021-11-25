@@ -12,6 +12,7 @@ import {
   DateRangePicker,
   Select,
   Field,
+  Tooltip,
 } from '@/components'
 import { SCHEME_TYPE, COPAYER_TYPE, SCHEME_CATEGORY } from '@/utils/constants'
 import Setting from './Setting'
@@ -45,13 +46,20 @@ const Detail = ({ height, ...props }) => {
               name='code'
               render={args => {
                 return (
-                  <TextField
-                    label={formatMessage({
-                      id: 'finance.scheme.detail.code',
-                    })}
-                    disabled
-                    {...args}
-                  />
+                  <Tooltip
+                    title='Code will be generated automatically if no code is entered'
+                    placement='bottom'
+                  >
+                    <span>
+                      <TextField
+                        label={formatMessage({
+                          id: 'finance.scheme.detail.code',
+                        })}
+                        disabled={values.id}
+                        {...args}
+                      />
+                    </span>
+                  </Tooltip>
                 )
               }}
             />

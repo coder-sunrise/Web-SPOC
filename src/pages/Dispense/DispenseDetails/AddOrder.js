@@ -97,12 +97,18 @@ const AddOrder = ({
                   return {
                     ...instruction,
                     stepdose: instruction.stepdose || 'AND',
+                    uid: getUniqueId(),
                   }
                 },
               ),
-              corPrescriptionItemPrecaution:
-                o.retailVisitInvoiceDrug.retailPrescriptionItem
-                  .retailPrescriptionItemPrecaution,
+              corPrescriptionItemPrecaution: retailPrescriptionItemPrecaution.map(
+                pp => {
+                  return {
+                    ...pp,
+                    uid: getUniqueId(),
+                  }
+                },
+              ),
               corPrescriptionItemDrugMixture:
                 o.retailVisitInvoiceDrug.retailPrescriptionItem
                   .retailPrescriptionItemDrugMixture,
@@ -289,10 +295,7 @@ const AddOrder = ({
     <React.Fragment>
       <SizeContainer size='sm'>
         <div style={{ maxHeight: height - 128, overflow: 'auto' }}>
-          <Order
-            fromDispense={visitType === VISIT_TYPE.OTC}
-            from='AddOrder'
-          />
+          <Order fromDispense={visitType === VISIT_TYPE.OTC} from='AddOrder' />
         </div>
       </SizeContainer>
       {footer &&
@@ -585,7 +588,10 @@ export default compose(
                 adjType: o.adjType,
                 adjValue: o.adjValue,
                 itemCode: o.serviceCode,
-                itemName: o.newServiceName && o.newServiceName.trim() !== '' ? o.newServiceName : o.serviceName,
+                itemName:
+                  o.newServiceName && o.newServiceName.trim() !== ''
+                    ? o.newServiceName
+                    : o.serviceName,
                 subTotal: roundTo(o.total),
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.SERVICE,
                 unitPrice: roundTo(o.total) || 0,
