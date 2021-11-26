@@ -444,7 +444,7 @@ export const ContactPersonList = props => {
       key: 'remarks',
       editable: true,
       inputType: 'text',
-      ellipsis: true,
+      ellipsis: { showTitle: false },
       editableRules: [
         {
           max: 200,
