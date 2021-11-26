@@ -236,40 +236,36 @@ class PrescriptionSetList extends PureComponent {
             let isDispensedByPharmacy
             let isNurseActualizeRequired
             let isExclusive
+
+            const precautions = item.prescriptionSetItemPrecaution
+            if (precautions && precautions.length > 0) {
+              ItemPrecautions = ItemPrecautions.concat(
+                precautions.map((o, index) => {
+                  return {
+                    medicationPrecautionFK: o.medicationPrecautionFK,
+                    precaution: o.precaution,
+                    precautionCode: o.precautionCode,
+                    sequence: index,
+                    isDeleted: false,
+                    uid: getUniqueId(),
+                  }
+                }),
+              )
+            } else {
+              ItemPrecautions = [
+                {
+                  precaution: '',
+                  sequence: 0,
+                  uid: getUniqueId(),
+                },
+              ]
+            }
+
             if (item.inventoryMedicationFK) {
               // Normal Drug
               let drug = inventorymedication.find(
                 medication => medication.id === item.inventoryMedicationFK,
               )
-
-              let precautionIndex = 0
-              if (
-                drug.inventoryMedication_MedicationPrecaution &&
-                drug.inventoryMedication_MedicationPrecaution.length > 0
-              ) {
-                ItemPrecautions = ItemPrecautions.concat(
-                  drug.inventoryMedication_MedicationPrecaution.map(o => {
-                    let currentPrecautionSequence = precautionIndex
-                    precautionIndex += 1
-                    return {
-                      medicationPrecautionFK: o.medicationPrecautionFK,
-                      precaution: o.medicationPrecautionName,
-                      precautionCode: o.medicationPrecautionCode,
-                      sequence: currentPrecautionSequence,
-                      isDeleted: false,
-                      uid: getUniqueId(),
-                    }
-                  }),
-                )
-              } else {
-                ItemPrecautions = [
-                  {
-                    precaution: '',
-                    sequence: 0,
-                    uid: getUniqueId(),
-                  },
-                ]
-              }
 
               newTotalQuantity = item.quantity
 
@@ -335,33 +331,6 @@ class PrescriptionSetList extends PureComponent {
               itemDrugName = item.drugName
               itemTotalPrice = 0
               newTotalQuantity = item.quantity
-
-              let precautionIndex = 0
-              const precautions = item.prescriptionSetItemPrecaution
-              if (precautions && precautions.length > 0) {
-                ItemPrecautions = ItemPrecautions.concat(
-                  precautions.map(o => {
-                    let currentPrecautionSequence = precautionIndex
-                    precautionIndex += 1
-                    return {
-                      medicationPrecautionFK: o.medicationPrecautionFK,
-                      precaution: o.precaution,
-                      precautionCode: o.precautionCode,
-                      sequence: currentPrecautionSequence,
-                      isDeleted: false,
-                      uid: getUniqueId(),
-                    }
-                  }),
-                )
-              } else {
-                ItemPrecautions = [
-                  {
-                    precaution: '',
-                    sequence: 0,
-                    uid: getUniqueId(),
-                  },
-                ]
-              }
 
               let drugMixtureIndex = 0
               const drugMixtures = item.prescriptionSetItemDrugMixture
