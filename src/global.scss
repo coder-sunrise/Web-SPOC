@@ -806,6 +806,9 @@ th[class*='MuiTableCell-root-'] {
 tr[class*='disableexpandedgroup'] {
   td {
     cursor: default !important;
+    div {
+      z-index: 0 !important;
+    }
   }
 }
 
