@@ -15,7 +15,7 @@ export const InvoiceGridColumns = [
   { name: 'totalCreditNoteAmt', title: 'Credit Notes' },
   { name: 'patientOutstanding', title: 'Patient O/S' },
   { name: 'governmentOutstanding', title: 'Govt. O/S' },
-  { name: 'corporateOutstanding', title: 'Corp. O/S' },
+  { name: 'corporateOutstanding', title: 'Co-Payer O/S' },
   { name: 'totalOutstanding', title: 'Total O/S Bal.' },
 ]
 

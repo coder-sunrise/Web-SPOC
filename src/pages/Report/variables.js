@@ -55,7 +55,7 @@ export const menuData = [
   },
   {
     title: 'Finance',
-    text: 'Void Credit Note & Payment & Write Off Report',
+    text: 'Void Credit Note & Payment Report',
     url: '/report/voidcreditnotereport',
     authority: 'report.finance.voidcreditnoteandpayment',
   },
@@ -155,6 +155,7 @@ export const menuData = [
     url: '/report/expiringstockreport',
     authority: 'report.inventory.expiringstockreport',
   },
+
   {
     title: 'Inventory',
     text: 'Partial Dispense Report',

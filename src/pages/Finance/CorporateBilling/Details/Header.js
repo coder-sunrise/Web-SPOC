@@ -58,7 +58,7 @@ class Header extends PureComponent {
             <Field
               name='company.displayValue'
               render={args => (
-                <TextField prefix='Company Name:' {...cfg} {...args} />
+                <TextField prefix='Co-Payer Name:' {...cfg} {...args} />
               )}
             />
           </GridItem>

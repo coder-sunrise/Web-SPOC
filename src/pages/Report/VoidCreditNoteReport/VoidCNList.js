@@ -31,10 +31,8 @@ class VoidCNList extends PureComponent {
     if (filterType === 'Payment') {
       generatedDateTitle = 'Payment Date'
       itemNoTitle = 'Payment No.'
-    } else if (filterType === 'Write Off') {
-      generatedDateTitle = 'Wo Date'
-      itemNoTitle = 'Wo No.'
-    }
+    } 
+    
     const listCols = [
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'invoiceNo', title: 'Invoice No.' },

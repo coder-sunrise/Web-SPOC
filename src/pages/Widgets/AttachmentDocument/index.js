@@ -1,9 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
-
 // material ui
 import { withStyles, Slider } from '@material-ui/core'
-
 // styles
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 // common components
@@ -22,23 +20,20 @@ import {
   Apps as AppsIcon,
   ZoomIn as ZoomInIcon,
 } from '@material-ui/icons'
-
-// models
-// import model from './models'
 import FolderList from './FolderList/index'
 import FolderContainer from './FolderContainer/index'
-
-// window.g_app.replaceModel(model)
+import { FOLDER_TYPE } from '@/utils/constants'
 
 const styles = theme => ({
   ...basicStyle(theme),
 })
 
-@connect(({ patientAttachment, folder }) => ({
+@connect(({ patientAttachment, folder, coPayerAttachment }) => ({
   patientAttachment,
   folder,
+  coPayerAttachment,
 }))
-class PatientDocument extends Component {
+class AttachmentDocument extends Component {
   state = {
     selectedFolderFK: -99, // all
     viewMode: 'card',
@@ -46,30 +41,41 @@ class PatientDocument extends Component {
   }
 
   componentDidMount() {
-    const { dispatch, values } = this.props
+    const { dispatch, values, type } = this.props
     dispatch({
       type: 'folder/query',
       payload: {
-        pagesize: 999,
+        pagesize: 9999,
         sorting: [{ columnName: 'sortOrder', direction: 'asc' }],
+        type,
       },
     }).then(this.refreshDocuments)
   }
 
   refreshDocuments = () => {
-    const { dispatch, values } = this.props
-    dispatch({
-      type: 'patientAttachment/query',
-      payload: {
-        pagesize: 999,
-        'PatientProfileFKNavigation.Id': values.id,
-      },
-    })
+    const { dispatch, values, type, modelName } = this.props
+    if (type === FOLDER_TYPE.PATIENT) {
+      dispatch({
+        type: `${modelName}/query`,
+        payload: {
+          pagesize: 999,
+          'PatientProfileFKNavigation.Id': values.id,
+        },
+      })
+    } else if (type === FOLDER_TYPE.COPAYER) {
+      dispatch({
+        type: `${modelName}/query`,
+        payload: {
+          pagesize: 999,
+          'CoPayerFKNavigation.Id': values.id,
+        },
+      })
+    }
   }
 
   updateAttachments = args => ({ added, deleted }) => {
-    const { dispatch, patientAttachment = [] } = this.props
-    const { list = [] } = patientAttachment
+    const { dispatch, modelName, type } = this.props
+    const { list = [] } = this.props[modelName]
     const { field } = args
 
     const getLargestSortOrder = (largestIndex, attachment) =>
@@ -86,7 +92,6 @@ class PatientDocument extends Component {
         }
       })
       updated = [...updated, ...addedFiles]
-      // this.setState({ showTagModal: true, tagList: addedFiles })
     }
 
     if (deleted)
@@ -107,35 +112,40 @@ class PatientDocument extends Component {
     const startOrder = list.reduce(getLargestSortOrder, 0) + 1
 
     Promise.all(
-      sorted.map((attachment, index) =>
+      sorted.map((attachment, index) => {
+        let payload = {
+          cfg: { message: 'Uploaded Attachment' },
+          sortOrder: startOrder + index,
+          fileIndexFK: attachment.fileIndexFK,
+          displayValue: attachment.fileName,
+          [`${modelName}_Folder`]: attachment[`${modelName}_Folder`],
+        }
+        if (type === FOLDER_TYPE.PATIENT) {
+          payload = { ...payload, patientProfileFK: findGetParameter('pid') }
+        } else {
+          payload = { ...payload, coPayerFK: findGetParameter('id') }
+        }
         dispatch({
-          type: 'patientAttachment/upsert',
-          payload: {
-            cfg: { message: 'Uploaded Attachment' },
-            patientProfileFK: findGetParameter('pid'),
-            sortOrder: startOrder + index,
-            fileIndexFK: attachment.fileIndexFK,
-            displayValue: attachment.fileName,
-            patientAttachment_Folder: attachment.patientAttachment_Folder,
-          },
-        }),
-      ),
+          type: `${modelName}/upsert`,
+          payload,
+        })
+      }),
     )
       .then(this.refreshDocuments)
-      .catch(error => {
-        console.error({ error })
-      })
+      .catch(error => {})
   }
 
   render() {
     const {
-      patient: { entity },
       patientAttachment,
       folder,
+      readOnly = false,
+      coPayerAttachment,
+      type,
+      modelName,
     } = this.props
     const { viewMode, selectedFolderFK, zoom } = this.state
-    const patientIsActive = entity && entity.isActive
-    const { list = [] } = patientAttachment
+    const { list = [] } = this.props[modelName]
 
     let folderList = (folder.list || []).map(l => {
       return {
@@ -155,7 +165,7 @@ class PatientDocument extends Component {
             style={{ height: window.innerHeight - 100, overflow: 'scroll' }}
           >
             <FolderList
-              readOnly={!patientIsActive}
+              readOnly={readOnly}
               folderList={folderList}
               selectedFolderFK={selectedFolderFK}
               updateAttachments={this.updateAttachments}
@@ -234,7 +244,7 @@ class PatientDocument extends Component {
                 <FolderContainer
                   {...this.props}
                   zoom={zoom}
-                  readOnly={!patientIsActive}
+                  readOnly={readOnly}
                   folderList={folderList}
                   viewMode={viewMode}
                   attachmentList={list}
@@ -249,4 +259,4 @@ class PatientDocument extends Component {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(PatientDocument)
+export default withStyles(styles, { withTheme: true })(AttachmentDocument)

@@ -13,6 +13,7 @@ import AttachMoney from '@material-ui/icons/AttachMoney'
 import { formatMessage } from 'umi' // common component
 import Warining from '@material-ui/icons/Error'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
+import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import {
   Button,
   ProgressButton,
@@ -124,6 +125,8 @@ const DispenseDetails = ({
   servingPersons = [],
   patient,
   user,
+  visitRegistration,
+  isIncludeExpiredItem = false,
 }) => {
   const {
     dispenseItems = [],
@@ -157,6 +160,15 @@ const DispenseDetails = ({
           ? `${userProfile.title}. ${userProfile.name || ''}`
           : `${userProfile.name || ''}`
       }`
+      const { entity } = visitRegistration
+      const visitTypeName = JSON.parse(settings.visitTypeSetting).find(
+        t => t.id === entity.visit.visitPurposeFK,
+      ).displayValue
+      notification.success({ message: `${visitTypeName} visit discarded.` })
+      sendQueueNotification({
+        message: `${visitTypeName} visit discarded.`,
+        queueNo: entity.queueNo,
+      })
       const message = `${userName} discard prescription at ${moment().format(
         'HH:mm',
       )}`
@@ -179,6 +191,12 @@ const DispenseDetails = ({
         id,
       },
     }).then(r => {
+      if (r) {
+        const { entity } = visitRegistration
+        const visitTypeName = JSON.parse(settings.visitTypeSetting).find(
+          t => t.id === entity.visit.visitPurposeFK,
+        ).displayValue
+      }
       sendNotification('EditedConsultation', {
         type: NOTIFICATION_TYPE.CONSULTAION,
         status: NOTIFICATION_STATUS.OK,
@@ -596,7 +614,12 @@ const DispenseDetails = ({
             )}
             {!isBillFirstVisit && (
               <Authorized authority='queue.dispense.savedispense'>
-                <ProgressButton color='success' size='sm' onClick={onSaveClick}>
+                <ProgressButton
+                  color='success'
+                  size='sm'
+                  onClick={onSaveClick}
+                  disabled={isIncludeExpiredItem}
+                >
                   Save Dispense
                 </ProgressButton>
               </Authorized>
@@ -645,6 +668,7 @@ const DispenseDetails = ({
                   color='primary'
                   size='sm'
                   icon={<AttachMoney />}
+                  disabled={isIncludeExpiredItem}
                   onClick={() => {
                     if (dispense && dispense.totalWithGST < 0) {
                       window.g_app._store.dispatch({
@@ -779,6 +803,7 @@ const DispenseDetails = ({
                 onPrint,
                 onActualizeBtnClick,
                 showDrugLabelRemark,
+                codetable,
               )}
               data={dispenseItems}
               TableProps={{
@@ -1050,11 +1075,21 @@ const _DispenseDetails = props => (
 
 export default compose(
   withStyles(styles, { name: 'DispenseDetailsGrid' }),
-  connect(({ codetable, clinicSettings, dispense, patient, user }) => ({
-    codetable,
-    clinicSettings,
-    servingPersons: dispense.servingPersons,
-    patient: patient.entity || {},
-    user,
-  })),
+  connect(
+    ({
+      codetable,
+      visitRegistration,
+      clinicSettings,
+      dispense,
+      patient,
+      user,
+    }) => ({
+      codetable,
+      clinicSettings,
+      visitRegistration,
+      servingPersons: dispense.servingPersons,
+      patient: patient.entity || {},
+      user,
+    }),
+  ),
 )(_DispenseDetails)

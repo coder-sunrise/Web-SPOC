@@ -25,6 +25,7 @@ const PaymentRow = ({
   handleVoidClick,
   handlePrinterClick,
   readOnly,
+  isEnableWriteOffinInvoice,
   printDisabled = false,
   ...payment
 }) => {
@@ -51,11 +52,14 @@ const PaymentRow = ({
   let tooltipMsg = ''
   let showVoidButton = true
   if (type === 'Credit Note') {
-    showVoidButton = ableToViewByAuthority('finance.addcreditnote')
+    showVoidButton = ableToViewByAuthority('finance.deletecreditnote')
   } else if (type === 'Write Off') {
-    showVoidButton = false
+    if (isEnableWriteOffinInvoice) {
+      showVoidButton = ableToViewByAuthority('finance.deletewriteoff')
+    } else {
+      showVoidButton = false
+    }
   }
-
   if (type === 'Payment') tooltipMsg = 'Print Receipt'
   else if (type === 'Credit Note') tooltipMsg = 'Print Credit Note'
 

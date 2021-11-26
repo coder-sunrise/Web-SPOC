@@ -184,7 +184,7 @@ import { CollectionsOutlined } from '@material-ui/icons'
       let item
       if (
         medication.isActive === true &&
-        medication.isOnlyClinicInternalUsage
+        !medication.isOnlyClinicInternalUsage
       ) {
         const medicationdispensingUOM = medication.dispensingUOM
         const medicationusage = medication.medicationUsage
@@ -326,6 +326,7 @@ import { CollectionsOutlined } from '@material-ui/icons'
       let item
       if (vaccination.isActive === true) {
         const vaccinationUOM = vaccination.prescribingUOM
+        const vaccinationDispenseUOM = vaccination.despensingUOM
         const vaccinationusage = vaccination.vaccinationUsage
         const vaccinationdosage = vaccination.prescribingDosage
         const isDefaultBatchNo = vaccination.vaccinationStock.find(
@@ -338,19 +339,18 @@ import { CollectionsOutlined } from '@material-ui/icons'
           vaccinationGivenDate: moment().format(serverDateTimeFormatFull),
           vaccinationCode: vaccination.code,
           vaccinationName: vaccination.displayValue,
-          usageMethodFK: vaccinationusage ? vaccinationusage.id : undefined,
-          usageMethodCode: vaccinationusage ? vaccinationusage.code : undefined,
-          usageMethodDisplayValue: vaccinationusage
-            ? vaccinationusage.name
-            : undefined,
-          dosageFK: vaccinationdosage ? vaccinationdosage.id : undefined,
-          dosageCode: vaccinationdosage ? vaccinationdosage.code : undefined,
-          dosageDisplayValue: vaccinationdosage
-            ? vaccinationdosage.name
-            : undefined,
-          uomfk: vaccinationUOM ? vaccinationUOM.id : undefined,
-          uomCode: vaccinationUOM ? vaccinationUOM.code : undefined,
-          uomDisplayValue: vaccinationUOM ? vaccinationUOM.name : undefined,
+          usageMethodFK: vaccinationusage?.id,
+          usageMethodCode: vaccinationusage?.code,
+          usageMethodDisplayValue: vaccinationusage?.name,
+          dosageFK: vaccinationdosage?.id,
+          dosageCode: vaccinationdosage?.code,
+          dosageDisplayValue: vaccinationdosage?.name,
+          uomfk: vaccinationUOM?.id,
+          uomCode: vaccinationUOM?.code,
+          uomDisplayValue: vaccinationUOM?.name,
+          dispenseUOMFK: vaccinationDispenseUOM?.id,
+          dispenseUOMCode: vaccinationDispenseUOM?.code,
+          dispenseUOMDisplayValue: vaccinationDispenseUOM?.name,
           quantity: packageItem.quantity,
           unitPrice: packageItem.unitPrice,
           totalPrice: packageItem.subTotal,
@@ -375,6 +375,9 @@ import { CollectionsOutlined } from '@material-ui/icons'
           subject: vaccination.displayValue,
           isGenerateCertificate: vaccination.isAutoGenerateCertificate,
           isNurseActualizeRequired: vaccination.isNurseActualizable,
+          instruction: `${vaccinationusage?.name ||
+            ''} ${vaccinationdosage?.displayValue ||
+            ''} ${vaccinationUOM?.name || ''}`,
         }
       }
 
@@ -460,7 +463,7 @@ import { CollectionsOutlined } from '@material-ui/icons'
       let item
       if (
         consumable.isActive === true &&
-        consumable.isOnlyClinicInternalUsage
+        !consumable.isOnlyClinicInternalUsage
       ) {
         let isDefaultBatchNo
         let unitOfMeasurement

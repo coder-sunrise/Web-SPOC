@@ -18,6 +18,7 @@ import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 // import cannedTextModel from './models/cannedText'
 import { getDefaultActivePanel, getConfig, getContent } from './utils'
 import NoteDetails from './noteDetails'
+import { scribbleTypes } from '@/utils/codes'
 
 const styles = theme => ({
   editor: {
@@ -624,7 +625,7 @@ class ClinicalNotes extends Component {
             toggleScribbleModal={this.toggleScribbleModal}
             scribbleData={this.state.selectedData}
             deleteScribbleNote={this.deleteScribbleNote}
-            scribbleNoteType={this.state.category}
+            scribbleNoteType={scribbleTypes.find(x=>x.typeFK === this.state.categoryIndex)?.type}
           />
         </CommonModal>
       </div>

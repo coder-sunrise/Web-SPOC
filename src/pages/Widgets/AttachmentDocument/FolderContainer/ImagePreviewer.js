@@ -62,7 +62,7 @@ const styles = theme => ({
   folder,
 }))
 class ImagePreviewer extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.carouselRef = React.createRef()
     this.state = {
@@ -70,20 +70,19 @@ class ImagePreviewer extends Component {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { defaultFileFK, files } = this.props
 
-    // console.log('componentDidMount', { defaultFileFK, files })
     this.cacheImageList(files, defaultFileFK)
     window.addEventListener('resize', this.resize.bind(this))
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('resize', this.resize)
   }
 
   // eslint-disable-next-line react/sort-comp
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { files: nextFiles = [] } = nextProps
     const { imageList } = this.state
 
@@ -183,7 +182,9 @@ class ImagePreviewer extends Component {
 
             this.setState({ imageList, loading: false })
             setTimeout(() => {
-              this.carouselRef.goTo(selectedImg.slideNumber, true)
+              if (this.carouselRef) {
+                this.carouselRef.goTo(selectedImg.slideNumber, true)
+              }
             }, 100)
           }
         })
@@ -256,21 +257,21 @@ class ImagePreviewer extends Component {
   }
 
   deleteImage = file => {
-    this.props
-      .dispatch({
-        type: 'patientAttachment/removeRow',
-        payload: {
-          id: file.id,
-        },
-      })
-      .then(() => {
-        if (this.state.imageList.filter(f => f.id !== file.id).length === 0)
-          this.props.onClose()
+    const { dispatch, modelName, onClose } = this.props
 
-        this.props.dispatch({
-          type: 'patientAttachment/query',
-        })
+    dispatch({
+      type: `${modelName}/removeRow`,
+      payload: {
+        id: file.id,
+      },
+    }).then(() => {
+      if (this.state.imageList.filter(f => f.id !== file.id).length === 0)
+        onClose()
+
+      dispatch({
+        type: `${modelName}/query`,
       })
+    })
   }
 
   checkFileChanged = (file, onConfirm) => {
@@ -306,7 +307,7 @@ class ImagePreviewer extends Component {
     }
   }
 
-  render () {
+  render() {
     const {
       imageList = [],
       loading = false,
@@ -319,6 +320,8 @@ class ImagePreviewer extends Component {
       folder: { list: folderList },
       onFileUpdated,
       onAddNewFolders,
+      isEnableDeleteDocument = true,
+      isEnableEditDocument = true,
     } = this.props
     const selectedImage = this.state.imageList.find(s => s.isSelected) || {}
 
@@ -390,8 +393,8 @@ class ImagePreviewer extends Component {
             style={{ transform: 'rotate(180deg)', color: 'white' }}
           />
         </div>
-       
-        <GridContainer style={{display:'table-cell', verticalAlign:'top'}}>
+
+        <GridContainer style={{ display: 'table-cell', verticalAlign: 'top' }}>
           <GridItem xs={12} md={12}>
             <TextField
               label='Created By'
@@ -413,117 +416,121 @@ class ImagePreviewer extends Component {
               value={selectedImage.fileName}
               maxLength={50}
               onChange={e => {
-                  selectedImage.fileName = e.target.value
-                  this.setState({ imageList })
-                }}
-              text={readOnly}
+                selectedImage.fileName = e.target.value
+                this.setState({ imageList })
+              }}
+              text={readOnly || !isEnableEditDocument}
               style={{ width: '100%' }}
             />
           </GridItem>
           <GridItem md={12} style={{ marginTop: 10 }}>
             <div>
               <span style={{ marginRight: 10 }}>Folder as:</span>
-              {!readOnly && (
-              <SetFolderWithPopover
-                key={selectedImage.id}
-                folderList={folderList}
-                selectedFolderFKs={selectedImage.folderFKs || []}
-                onClose={selectedFolder => {
-                      const originalFolders = _.sortedUniq(
-                        selectedImage.folderFKs || [],
-                      )
-                      const newFolders = _.sortedUniq(selectedFolder)
+              {!readOnly && isEnableEditDocument && (
+                <SetFolderWithPopover
+                  key={selectedImage.id}
+                  folderList={folderList}
+                  selectedFolderFKs={selectedImage.folderFKs || []}
+                  onClose={selectedFolder => {
+                    const originalFolders = _.sortedUniq(
+                      selectedImage.folderFKs || [],
+                    )
+                    const newFolders = _.sortedUniq(selectedFolder)
 
-                      if (
-                        originalFolders.length !== newFolders.length ||
-                        originalFolders.join(',') !== newFolders.join(',')
-                      ) {
-                        selectedImage.folderFKs = newFolders
-                        this.setState({ imageList })
-                      }
-                    }}
-                onAddNewFolders={onAddNewFolders}
-              />
-                )}
+                    if (
+                      originalFolders.length !== newFolders.length ||
+                      originalFolders.join(',') !== newFolders.join(',')
+                    ) {
+                      selectedImage.folderFKs = newFolders
+                      this.setState({ imageList })
+                    }
+                  }}
+                  onAddNewFolders={onAddNewFolders}
+                />
+              )}
             </div>
           </GridItem>
           {selectedImage.folderFKs && Array.isArray(selectedImage.folderFKs) && (
-          <GridItem
-            md={12}
-            style={{
-                  padding: 0,
-                  minHeight: 50,
-                  maxHeight: 200,
-                  overflow: 'scroll',
-                }}
-          >
-            {_.uniq(selectedImage.folderFKs).map(item => {
-                  const folderEntity = folderList.find(f => f.id === item)
-                  return (
-                    <Chip
-                      style={{ margin: 8 }}
-                      key={item}
-                      size='small'
-                      variant='outlined'
-                      label={folderEntity.displayValue}
-                      color='primary'
-                      onDelete={() => {
-                        selectedImage.folderFKs = selectedImage.folderFKs.filter(
-                          i => i !== item,
-                        )
-                        this.setState({ imageList })
-                      }}
-                    />
-                  )
-                })}
-          </GridItem>
-            )}
+            <GridItem
+              md={12}
+              style={{
+                padding: 0,
+                minHeight: 50,
+                maxHeight: 200,
+                overflow: 'scroll',
+              }}
+            >
+              {_.uniq(selectedImage.folderFKs).map(item => {
+                const folderEntity = folderList.find(f => f.id === item)
+                return (
+                  <Chip
+                    style={{ margin: 8 }}
+                    key={item}
+                    size='small'
+                    variant='outlined'
+                    label={folderEntity.displayValue}
+                    color='primary'
+                    disabled={!isEnableEditDocument}
+                    onDelete={() => {
+                      selectedImage.folderFKs = selectedImage.folderFKs.filter(
+                        i => i !== item,
+                      )
+                      this.setState({ imageList })
+                    }}
+                  />
+                )
+              })}
+            </GridItem>
+          )}
           <GridItem md={12}>
             <div>
               <Button
                 color='primary'
                 onClick={() => {
-                    printJS({
-                      printable: selectedImage.image.src,
-                      type: 'image',
-                      base64: true,
-                      header: '',
-                    })
-                  }}
+                  printJS({
+                    printable: selectedImage.image.src,
+                    type: 'image',
+                    base64: true,
+                    header: '',
+                  })
+                }}
               >
                 <Print /> Print
               </Button>
               {!readOnly && (
-              <React.Fragment>
-                <Button
-                  color='primary'
-                  disabled={
+                <React.Fragment>
+                  {isEnableEditDocument && (
+                    <Button
+                      color='primary'
+                      disabled={
                         selectedImage.fileName === undefined ||
                         selectedImage.fileName.trim() === ''
                       }
-                  onClick={() => {
+                      onClick={() => {
                         onFileUpdated(selectedImage)
                       }}
-                >
-                  <Save /> Save
-                </Button>
+                    >
+                      <Save /> Save
+                    </Button>
+                  )}
 
-                <Popconfirm
-                  title='Permanently delete this file in all folders?'
-                  onConfirm={() => {
+                  {isEnableDeleteDocument && (
+                    <Popconfirm
+                      title='Permanently delete this file in all folders?'
+                      onConfirm={() => {
                         this.deleteImage(selectedImage)
                       }}
-                >
-                  <Button color='danger'>
-                    <Delete /> Delete
-                  </Button>
-                </Popconfirm>
-              </React.Fragment>
-                )}
+                    >
+                      <Button color='danger'>
+                        <Delete /> Delete
+                      </Button>
+                    </Popconfirm>
+                  )}
+                </React.Fragment>
+              )}
             </div>
           </GridItem>
         </GridContainer>
-     
       </div>
     )
   }

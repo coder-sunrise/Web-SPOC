@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 // common component
 import { connect } from 'dva'
 import { formatMessage } from 'umi'
+import moment from 'moment'
 import {
   withFormikExtend,
   notification,
@@ -213,6 +214,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
       uomDisplayValue: primaryUOM,
       secondUOMDisplayValue: secondUOM,
       isDefault,
+      allowToDispense: true,
     }
   }
 
@@ -337,6 +339,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
                   countNumber: index === 0 ? 1 : 0,
                   rowspan: 0,
                   uid: getUniqueId(),
+                  allowToDispense: true,
                 })
               }
             })
@@ -466,6 +469,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
                 countNumber: index === 0 ? 1 : 0,
                 rowspan: 0,
                 uid: getUniqueId(),
+                allowToDispense: true,
               })
             }
           })
@@ -580,6 +584,7 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
                 countNumber: index === 0 ? 1 : 0,
                 rowspan: 0,
                 uid: getUniqueId(),
+                allowToDispense: true,
               })
             }
             const firstItem = orderItems.find(
@@ -665,9 +670,10 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
           expiryDate,
           stock,
           stockFK: id,
-          uomDisplayValue: inventoryItem?.prescribingUOM?.name,
+          uomDisplayValue: inventoryItem?.dispensingUOM?.name,
           isDefault,
           stockBalance: 0,
+          allowToDispense: true,
         })
       } else {
         const { batchNo, expiryDate, ...restItem } = item
@@ -682,18 +688,24 @@ const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
   }
 
   const sortOrderItems = [
-    ...(entity.prescription || []).filter(
-      item => item.type === 'Medication' && !item.isDrugMixture,
-    ),
+    ...(entity.prescription || [])
+      .filter(item => item.type === 'Medication' && !item.isDrugMixture)
+      .map(item => {
+        return { ...item, quantity: item.dispensedQuanity }
+      }),
     ...(entity.vaccination || []),
     ...(entity.consumable || []),
     ...(entity.prescription || []).filter(
       item => item.type === 'Medication' && item.isDrugMixture,
     ),
-    ...(entity.prescription || []).filter(
-      item => item.type === 'Open Prescription',
-    ),
-    ...(entity.externalPrescription || []),
+    ...(entity.prescription || [])
+      .filter(item => item.type === 'Open Prescription')
+      .map(item => {
+        return { ...item, quantity: item.dispensedQuanity }
+      }),
+    ...(entity.externalPrescription || []).map(item => {
+      return { ...item, quantity: item.dispensedQuanity }
+    }),
   ]
 
   sortOrderItems.forEach(item => {
@@ -1200,8 +1212,22 @@ class Main extends Component {
     }
   }
 
+  checkExpiredItems = () => {
+    if (
+      (this.props.values.dispenseItems || []).find(
+        item =>
+          item.expiryDate &&
+          moment(item.expiryDate).startOf('day') < moment().startOf('day'),
+      )
+    ) {
+      return true
+    }
+    return false
+  }
+
   render() {
     const { classes, handleSubmit, values, dispense, codetable } = this.props
+
     return (
       <div className={classes.root}>
         <DispenseDetails
@@ -1216,6 +1242,7 @@ class Main extends Component {
           onDrugLabelSelected={this.handleDrugLabelSelected}
           onDrugLabelNoChanged={this.handleDrugLabelNoChanged}
           selectedDrugs={this.state.selectedDrugs}
+          isIncludeExpiredItem={this.checkExpiredItems()}
         />
         <CommonModal
           title='Orders'

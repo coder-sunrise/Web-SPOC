@@ -39,6 +39,9 @@ class Filter extends PureComponent {
     const { companyType } = settingCompany
     this.checkIsCopayer(name)
     const { isCopayer } = this.state
+    const newCopayerAccessRight = Authorized.check('copayer.newcopayer') || {
+      rights: 'hidden',
+    }
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -115,7 +118,7 @@ class Filter extends PureComponent {
                   <FormattedMessage id='form.search' />
                 </ProgressButton>
                 {isCopayer ? (
-                  <Authorized authority='copayer.newcopayer'>
+                  newCopayerAccessRight.rights === 'enable' && (
                     <Button
                       color='primary'
                       onClick={() => {
@@ -124,14 +127,14 @@ class Filter extends PureComponent {
                           payload: {
                             entity: undefined,
                           },
-                        });
-                        history.push('/finance/copayer/newcopayer');
+                        })
+                        history.push('/finance/copayer/newcopayer')
                       }}
                     >
                       <Add />
                       Add New
                     </Button>
-                  </Authorized>
+                  )
                 ) : (
                   <Authorized authority='settings.supplier.newsupplier'>
                     <Button

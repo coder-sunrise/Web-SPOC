@@ -15,7 +15,7 @@ import {
   Switch,
 } from '@/components'
 
-const CPSwitch = (label) => (args) => {
+const CPSwitch = label => args => {
   if (!args.field.value) {
     args.field.value = 'ExactAmount'
   }
@@ -31,7 +31,7 @@ const CPSwitch = (label) => (args) => {
     />
   )
 }
-const CPNumber = (label, type) => (args) => {
+const CPNumber = (label, type) => args => {
   return (
     <NumberInput
       label={label}
@@ -44,27 +44,29 @@ const CPNumber = (label, type) => (args) => {
     />
   )
 }
-const Setting = (props) => {
+const Setting = props => {
   const { schemeDetail, height, classes, values, setFieldValue, theme } = props
 
   return (
     <div style={{ marginTop: theme.spacing(1) }}>
       <SizeContainer size='sm'>
         <GridContainer>
-          <GridItem xs={8} md={5}>
-            <Field
-              name='patientMinCoPaymentAmount'
-              render={CPNumber(
-                'Minimum Patient Payable Amount',
-                values.patientMinCoPaymentAmountType,
-              )}
-            />
-          </GridItem>
-          <GridItem xs={4} md={1}>
-            <Field
-              name='patientMinCoPaymentAmountType'
-              render={CPSwitch(' ')}
-            />
+          <GridItem xs={12} md={6}>
+            <div style={{ position: 'relative', paddingRight: 50 }}>
+              <Field
+                name='patientMinCoPaymentAmount'
+                render={CPNumber(
+                  'Minimum Patient Payable Amount',
+                  values.patientMinCoPaymentAmountType,
+                )}
+              />
+              <div style={{ position: 'absolute', right: 0, top: 0 }}>
+                <Field
+                  name='patientMinCoPaymentAmountType'
+                  render={CPSwitch(' ')}
+                />
+              </div>
+            </div>
           </GridItem>
         </GridContainer>
         <GridContainer>

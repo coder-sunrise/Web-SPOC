@@ -204,6 +204,7 @@ class PrescriptionSetList extends PureComponent {
                 sequence: instruction.sequence,
                 stepdose: instruction.stepdose,
                 isDeleted: false,
+                uid: getUniqueId(),
               }
             })
 
@@ -256,6 +257,7 @@ class PrescriptionSetList extends PureComponent {
                       precautionCode: o.medicationPrecautionCode,
                       sequence: currentPrecautionSequence,
                       isDeleted: false,
+                      uid: getUniqueId(),
                     }
                   }),
                 )
@@ -264,6 +266,7 @@ class PrescriptionSetList extends PureComponent {
                   {
                     precaution: '',
                     sequence: 0,
+                    uid: getUniqueId(),
                   },
                 ]
               }
@@ -346,6 +349,7 @@ class PrescriptionSetList extends PureComponent {
                       precautionCode: o.precautionCode,
                       sequence: currentPrecautionSequence,
                       isDeleted: false,
+                      uid: getUniqueId(),
                     }
                   }),
                 )
@@ -354,6 +358,7 @@ class PrescriptionSetList extends PureComponent {
                   {
                     precaution: '',
                     sequence: 0,
+                    uid: getUniqueId(),
                   },
                 ]
               }
@@ -752,7 +757,9 @@ class PrescriptionSetList extends PureComponent {
                           .map(i => {
                             return { ...i, id: undefined }
                           }),
-                        prescriptionSetItemDrugMixture: drug.corPrescriptionItemDrugMixture
+                        prescriptionSetItemDrugMixture: (
+                          drug.corPrescriptionItemDrugMixture || []
+                        )
                           .filter(dm => !dm.isDeleted)
                           .map(dm => {
                             return { ...dm, id: undefined }

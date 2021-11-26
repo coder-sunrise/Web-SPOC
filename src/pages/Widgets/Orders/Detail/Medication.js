@@ -743,7 +743,7 @@ class Medication extends PureComponent {
       codetable: { inventorymedication = [] },
     } = this.props
     return inventorymedication
-      .filter(m => m.isOnlyClinicInternalUsage)
+      .filter(m => !m.isOnlyClinicInternalUsage)
       .reduce((p, c) => {
         const { code, displayValue, sellingPrice = 0, dispensingUOM = {} } = c
         const { name: uomName = '' } = dispensingUOM
@@ -2240,7 +2240,10 @@ class Medication extends PureComponent {
                     let newMaxSeq = maxSeq
                       ? maxSeq.sequence + 1
                       : values.corPrescriptionItemPrecaution.length + 1
-
+                    console.log(
+                      'values.corPrescriptionItemPrecaution',
+                      values.corPrescriptionItemPrecaution,
+                    )
                     return activeRows.map((val, activeIndex) => {
                       if (val && val.isDeleted) return null
                       const i = values.corPrescriptionItemPrecaution.findIndex(

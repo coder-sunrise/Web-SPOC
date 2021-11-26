@@ -19,7 +19,11 @@ import { LTReceivingGoodsStatus } from '../../variables'
 
 const prefix = 'receivingGoods'
 
-const RGForm = ({ setFieldValue, isReadOnly = false }) => {
+const RGForm = ({
+  setFieldValue,
+  isReadOnly = false,
+  isDisableSupplier = false,
+}) => {
   const setSupplierDetails = opts => {
     let conPerson
     let faxNo
@@ -204,7 +208,7 @@ const RGForm = ({ setFieldValue, isReadOnly = false }) => {
           <GridItem xs={12} md={5}>
             <GridContainer>
               <GridItem xs={12}>
-                <FastField
+                <Field
                   name={`${prefix}.supplierFK`}
                   render={args => {
                     return (
@@ -217,6 +221,7 @@ const RGForm = ({ setFieldValue, isReadOnly = false }) => {
                         onChange={(v, opts) => {
                           setSupplierDetails(opts)
                         }}
+                        disabled={isDisableSupplier}
                         {...args}
                       />
                     )

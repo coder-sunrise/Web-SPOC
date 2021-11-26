@@ -94,6 +94,7 @@ export const LAB_TRACKING_STATUS = {
 export const COPAYER_TYPE = {
   CORPORATE: 1,
   GOVERNMENT: 2,
+  INSURANCE: 3,
 }
 
 export const INVOICE_PAYER_TYPE = {
@@ -221,7 +222,7 @@ export const REPORT_TYPE = {
          11: 'Memo',
          12: 'Other Documents',
          13: 'Credit Note Listing',
-         14: 'Void Credit Note & Payment & Write Off',
+         14: 'Void Credit Note & Payment',
          15: 'Invoice',
          16: 'Oustanding Payment',
          17: 'Sales Listing',
@@ -504,6 +505,8 @@ export const FILE_CATEGORY = {
   VISITREG: 1,
   CONSULTATION: 2,
   PATIENT: 3,
+  QUEUEDISPLAY: 4,
+  COPAYER: 5,
 }
 
 export const PURCHASE_ORDER_STATUS = {
@@ -549,6 +552,12 @@ export const VALUE_KEYS = {
 
 export const SCHEME_TYPE = {
   CORPORATE: 15,
+  INSURANCE: 16,
+}
+
+export const SCHEME_CATEGORY = {
+  CORPORATE: 5,
+  INSURANCE: 11,
 }
 
 export const INVOICE_VIEW_MODE = {
@@ -761,3 +770,8 @@ export const CHECKLIST_CATEGORY = {
 }
 
 export const GENDER = { FEMALE: 1, MALE: 2 }
+
+export const FOLDER_TYPE = {
+  PATIENT: 'Patient',
+  COPAYER: 'CoPayer',
+}

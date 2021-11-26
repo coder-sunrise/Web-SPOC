@@ -37,7 +37,7 @@ export const Cell = CellBase
 class CorporateBillingGrid extends PureComponent {
   state = {
     columns: [
-      { name: 'displayValue', title: 'Company' },
+      { name: 'displayValue', title: 'Co-Payer' },
       { name: 'outstandingBalance', title: 'O/S Balance' },
       { name: 'lastPaymentDate', title: 'Last Payment' },
       { name: 'contactPerson', title: 'Contact Person' },
@@ -54,7 +54,20 @@ class CorporateBillingGrid extends PureComponent {
         align: 'center',
         sortingEnabled: false,
       },
-      { columnName: 'contactPerson', width: 130 },
+      {
+        columnName: 'contactPerson',
+        width: 130,
+        render: row => {
+          const contactPerson = (row.contactPersons || []).find(
+            x => x.isDefault,
+          )
+          return (
+            <Tooltip title={contactPerson?.name}>
+              <span>{contactPerson?.name || '-'}</span>
+            </Tooltip>
+          )
+        },
+      },
       { columnName: 'displayValue' },
       {
         columnName: 'lastPaymentDate',
@@ -68,14 +81,13 @@ class CorporateBillingGrid extends PureComponent {
         sortingEnabled: false,
         width: 130,
         render: row => {
+          const contactPerson = (row.contactPersons || []).find(
+            x => x.isDefault,
+          )
           return (
-            <span>
-              {row.contact &&
-              row.contact.officeContactNumber &&
-              row.contact.officeContactNumber.number !== ''
-                ? row.contact.officeContactNumber.number
-                : '-'}
-            </span>
+            <Tooltip title={contactPerson?.workNumber}>
+              <span>{contactPerson?.workNumber || '-'}</span>
+            </Tooltip>
           )
         },
       },
@@ -84,14 +96,13 @@ class CorporateBillingGrid extends PureComponent {
         sortingEnabled: false,
         width: 130,
         render: row => {
+          const contactPerson = (row.contactPersons || []).find(
+            x => x.isDefault,
+          )
           return (
-            <span>
-              {row.contact &&
-              row.contact.faxContactNumber &&
-              row.contact.faxContactNumber.number !== ''
-                ? row.contact.faxContactNumber.number
-                : '-'}
-            </span>
+            <Tooltip title={contactPerson?.faxNumber}>
+              <span>{contactPerson?.faxNumber || '-'}</span>
+            </Tooltip>
           )
         },
       },
@@ -100,14 +111,13 @@ class CorporateBillingGrid extends PureComponent {
         sortingEnabled: false,
         width: 130,
         render: row => {
+          const contactPerson = (row.contactPersons || []).find(
+            x => x.isDefault,
+          )
           return (
-            <span>
-              {row.contact &&
-              row.contact.contactEmailAddress &&
-              row.contact.contactEmailAddress.emailAddress !== ''
-                ? row.contact.contactEmailAddress.emailAddress
-                : '-'}
-            </span>
+            <Tooltip title={contactPerson?.emailAddress}>
+              <span>{contactPerson?.emailAddress || '-'}</span>
+            </Tooltip>
           )
         },
       },
@@ -143,7 +153,6 @@ class CorporateBillingGrid extends PureComponent {
     this.props.dispatch({
       type: 'corporateBilling/fetchCompany',
     })
-
   }
 
   componentDidMount() {

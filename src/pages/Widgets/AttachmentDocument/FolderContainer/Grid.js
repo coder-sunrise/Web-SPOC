@@ -42,7 +42,6 @@ class Grid extends PureComponent {
     const {
       dispatch,
       onPreview,
-      patient: { entity },
       attachmentList = [],
       selectedFolderFK,
       folderList = [],
@@ -50,9 +49,11 @@ class Grid extends PureComponent {
       onAddNewFolders,
       onFileUpdated,
       readOnly,
+      modelName,
+      isEnableEditDocument = true,
+      isEnableDeleteDocument = true,
     } = this.props
 
-    const patientIsActive = entity && entity.isActive
     return (
       <CommonTableGrid
         style={{ margin: '0px 1px 0px 0px' }}
@@ -101,7 +102,7 @@ class Grid extends PureComponent {
                       </NavLink>
                     </div>
                   </Tooltip>
-                  {!readOnly && (
+                  {!readOnly && isEnableEditDocument && (
                     <div
                       style={{
                         float: 'right',
@@ -126,6 +127,7 @@ class Grid extends PureComponent {
           {
             columnName: 'folderFKs',
             disabled: true,
+            sortingEnabled: false,
             render: row => {
               return (
                 <div style={{ whiteSpace: 'pre-wrap' }}>
@@ -180,7 +182,7 @@ class Grid extends PureComponent {
                       <Download />
                     </Button>
                   </Tooltip>
-                  {!readOnly && (
+                  {!readOnly && isEnableEditDocument && (
                     <SetFolderWithPopover
                       key={row.id}
                       folderList={row.folderList}
@@ -202,32 +204,34 @@ class Grid extends PureComponent {
                       onAddNewFolders={onAddNewFolders}
                     />
                   )}
-                  <Popconfirm
-                    title='Permanently delete this file in all folders?'
-                    onConfirm={() => {
-                      dispatch({
-                        type: 'patientAttachment/removeRow',
-                        payload: {
-                          id: row.id,
-                        },
-                      }).then(() => {
+                  {isEnableDeleteDocument && (
+                    <Popconfirm
+                      title='Permanently delete this file in all folders?'
+                      onConfirm={() => {
                         dispatch({
-                          type: 'patientAttachment/query',
+                          type: `${modelName}/removeRow`,
+                          payload: {
+                            id: row.id,
+                          },
+                        }).then(() => {
+                          dispatch({
+                            type: `${modelName}/query`,
+                          })
                         })
-                      })
-                    }}
-                  >
-                    <Tooltip title='Delete'>
-                      <Button
-                        size='sm'
-                        disabled={readOnly}
-                        color='danger'
-                        justIcon
-                      >
-                        <Delete />
-                      </Button>
-                    </Tooltip>
-                  </Popconfirm>
+                      }}
+                    >
+                      <Tooltip title='Delete'>
+                        <Button
+                          size='sm'
+                          disabled={readOnly}
+                          color='danger'
+                          justIcon
+                        >
+                          <Delete />
+                        </Button>
+                      </Tooltip>
+                    </Popconfirm>
+                  )}
                 </div>
               )
             },

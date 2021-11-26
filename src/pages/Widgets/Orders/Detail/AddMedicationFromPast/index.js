@@ -14,7 +14,7 @@ import {
   ReplaceCertificateTeplate,
   getDrugAllergy,
 } from '@/pages/Widgets/Orders/utils'
-import { getTranslationValue } from '@/utils/utils'
+import { getTranslationValue, getUniqueId } from '@/utils/utils'
 import FitlerBar from './FilterBar'
 import Grid from './Grid'
 import { getClinicianProfile } from '../../../ConsultationDocument/utils'
@@ -216,6 +216,7 @@ class PastMedication extends PureComponent {
             sequence: instruction.sequence,
             stepdose: instruction.stepdose,
             isDeleted: false,
+            uid: getUniqueId(),
           }
         })
 
@@ -272,6 +273,7 @@ class PastMedication extends PureComponent {
                   precautionCode: o.medicationPrecautionCode,
                   sequence: currentPrecautionSequence,
                   isDeleted: false,
+                  uid: getUniqueId(),
                 }
               }),
             )
@@ -280,6 +282,7 @@ class PastMedication extends PureComponent {
               {
                 precaution: '',
                 sequence: 0,
+                uid: getUniqueId(),
               },
             ]
           }
@@ -378,6 +381,7 @@ class PastMedication extends PureComponent {
                   precautionCode: o.precautionCode,
                   sequence: currentPrecautionSequence,
                   isDeleted: false,
+                  uid: getUniqueId(),
                 }
               }),
             )
@@ -386,6 +390,7 @@ class PastMedication extends PureComponent {
               {
                 precaution: '',
                 sequence: 0,
+                uid: getUniqueId(),
               },
             ]
           }
@@ -565,6 +570,9 @@ class PastMedication extends PureComponent {
         let uom = ctvaccinationunitofmeasurement.find(
           vaccuom => vaccuom.id === item.uomfk,
         )
+        let dispenseUOM = ctvaccinationunitofmeasurement.find(
+          vaccuom => vaccuom.id === item.dispenseUOMFK,
+        )
         let newTotalQuantity = item.quantity
 
         const totalPrice = newTotalQuantity * vaccination.sellingPrice
@@ -575,15 +583,18 @@ class PastMedication extends PureComponent {
           vaccinationGivenDate: item.vaccinationGivenDate,
           vaccinationCode: vaccination.code,
           vaccinationName: vaccination.displayValue,
-          usageMethodFK: usage ? usage.id : undefined,
-          usageMethodCode: usage ? usage.code : undefined,
-          usageMethodDisplayValue: usage ? usage.name : undefined,
-          dosageFK: dosage ? dosage.id : undefined,
-          dosageCode: dosage ? dosage.code : undefined,
-          dosageDisplayValue: dosage ? dosage.displayValue : undefined,
-          uomfk: uom ? uom.id : undefined,
-          uomCode: uom ? uom.code : undefined,
-          uomDisplayValue: uom ? uom.name : undefined,
+          usageMethodFK: usage?.id,
+          usageMethodCode: usage?.code,
+          usageMethodDisplayValue: usage?.name,
+          dosageFK: dosage?.id,
+          dosageCode: dosage?.code,
+          dosageDisplayValue: dosage?.displayValue,
+          uomfk: uom?.id,
+          uomCode: uom?.code,
+          uomDisplayValue: uom?.name,
+          dispenseUOMFK: dispenseUOM?.id,
+          dispenseUOMCode: dispenseUOM?.code,
+          dispenseUOMDisplayValue: dispenseUOM?.name,
           quantity: newTotalQuantity,
           unitPrice: vaccination.sellingPrice,
           totalPrice,
@@ -603,6 +614,8 @@ class PastMedication extends PureComponent {
           performingUserFK: this.getVisitDoctorUserId(this.props),
           packageGlobalId: '',
           isNurseActualizeRequired: vaccination.isNurseActualizable,
+          instruction: `${usage?.name || ''} ${dosage?.displayValue ||
+            ''} ${uom?.name || ''}`,
         }
         let newCORVaccinationCert = []
         if (newVaccination.isGenerateCertificate) {

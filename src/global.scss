@@ -806,5 +806,14 @@ th[class*='MuiTableCell-root-'] {
 tr[class*='disableexpandedgroup'] {
   td {
     cursor: default !important;
+    div {
+      z-index: 0 !important;
+    }
+  }
+}
+
+td[class='ant-table-cell ant-table-cell-ellipsis'] {
+  span {
+    width: 100% !important;
   }
 }

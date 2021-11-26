@@ -40,7 +40,7 @@ class Statement extends PureComponent {
     columns: [
       { name: 'statementNo', title: 'Statement No.' },
       { name: 'statementDate', title: 'Statement Date' },
-      { name: 'company', title: 'Company' },
+      { name: 'company', title: 'Co-Payer' },
       { name: 'payableAmount', title: 'Payable Amount' },
       { name: 'totalPaid', title: 'Paid' },
       { name: 'outstandingAmount', title: 'Outstanding' },
@@ -50,9 +50,15 @@ class Statement extends PureComponent {
     ],
   }
 
-  componentDidMount () {
-    const fromDate = moment().subtract(1, 'months').startOf('month').formatUTC()
-    const toDate = moment().endOf('month').endOf('day').formatUTC(false)
+  componentDidMount() {
+    const fromDate = moment()
+      .subtract(1, 'months')
+      .startOf('month')
+      .formatUTC()
+    const toDate = moment()
+      .endOf('month')
+      .endOf('day')
+      .formatUTC(false)
     const dueToDate = moment()
       .add(3, 'months')
       .endOf('month')
@@ -72,13 +78,13 @@ class Statement extends PureComponent {
     })
   }
 
-  handleSelectionChange = (selection) => {
+  handleSelectionChange = selection => {
     if (selection.length < 2) {
       this.setState({ selectedRows: selection })
     }
   }
 
-  cancelStatement = (row) => {
+  cancelStatement = row => {
     const { dispatch } = this.props
     const { statementNo, id } = row
     dispatch({
@@ -123,18 +129,18 @@ class Statement extends PureComponent {
   }
 
   toggleGenerateStatement = () => {
-    this.setState((preState) => ({
+    this.setState(preState => ({
       showGenerateStatement: !preState.showGenerateStatement,
     }))
   }
 
   toggleBatchPrintStatements = () => {
-    this.setState((preState) => ({
+    this.setState(preState => ({
       showBatchPrintStatements: !preState.showBatchPrintStatements,
     }))
   }
 
-  render () {
+  render() {
     const {
       history,
       dispatch,
@@ -219,7 +225,7 @@ class Statement extends PureComponent {
               columnName: 'action',
               align: 'center',
               width: 130,
-              render: (row) => {
+              render: row => {
                 return (
                   <Authorized authority='statement.statementdetails'>
                     <Fragment>
