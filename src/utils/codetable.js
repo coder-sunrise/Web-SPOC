@@ -177,6 +177,7 @@ const tenantCodesMap = new Map([
     'ctcopayer',
     {
       ...defaultParams,
+      sorting: [{ columnName: 'displayValue', direction: 'asc' }],
     },
   ],
   [
