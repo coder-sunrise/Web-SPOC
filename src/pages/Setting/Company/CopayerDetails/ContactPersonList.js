@@ -239,9 +239,7 @@ export const ContactPersonList = props => {
       if (onEditingListControl) {
         onEditingListControl('Contact Person', false)
       }
-    } catch (errInfo) {
-      console.log('Validation Failed:', errInfo)
-    }
+    } catch (errInfo) {}
   }
 
   const save = async recordKey => {
@@ -267,17 +265,13 @@ export const ContactPersonList = props => {
           onEditingListControl('Contact Person', false)
         }
       }
-    } catch (errInfo) {
-      console.log('Validation Failed:', errInfo)
-    }
+    } catch (errInfo) {}
   }
 
   const addNew = () => {
-    let isDefault = true
     let nextKey = 0
     if (data && data.length > 0) {
       nextKey = data[data.length - 1].key + 1
-      isDefault = false
     }
 
     let newContact = {
@@ -288,7 +282,7 @@ export const ContactPersonList = props => {
       faxNumber: '',
       emailAddress: '',
       remarks: '',
-      isDefault: isDefault,
+      isDefault: false,
       isDeleted: false,
       isNewRecord: true,
       recordStatus: 'Adding',
@@ -305,6 +299,12 @@ export const ContactPersonList = props => {
       const newData = data.filter(function(x) {
         return x.key !== record.key
       })
+      if (record.isDefault) {
+        var activeData = newData.filter(x => !x.isDeleted)
+        if (activeData.length) {
+          activeData[0].isDefault = true
+        }
+      }
       setData(newData)
 
       props.setFieldValue('contactPersons', newData)
@@ -318,7 +318,12 @@ export const ContactPersonList = props => {
 
         newData.splice(index, 1, { ...contactPerson, ...record })
         setData(newData)
-
+        if (record.isDefault) {
+          var activeData = newData.filter(x => !x.isDeleted)
+          if (activeData.length) {
+            activeData[0].isDefault = true
+          }
+        }
         props.setFieldValue('contactPersons', newData)
       }
     }
@@ -346,9 +351,7 @@ export const ContactPersonList = props => {
 
         props.setFieldValue('contactPersons', newData)
       }
-    } catch (errInfo) {
-      console.log('Set default failed', errInfo)
-    }
+    } catch (errInfo) {}
   }
 
   const onEditingErrorStatusChanged = (fieldName, errorInfo) => {
@@ -371,28 +374,6 @@ export const ContactPersonList = props => {
       setEditingHasError(false)
     }
   }
-
-  useEffect(() => {
-    if (data && data.length > 0 && editingKey === '') {
-      const records = data.filter(function(x) {
-        return x.isDeleted === false
-      })
-
-      if (records && records.length > 0) {
-        const defaultRecord = records.filter(function(x) {
-          return x.isDefault
-        })
-
-        if (
-          defaultRecord === undefined ||
-          defaultRecord === null ||
-          defaultRecord.length <= 0
-        ) {
-          setDefault(undefined, records[0])
-        }
-      }
-    }
-  })
 
   const contactPersonColumns = [
     {
@@ -463,6 +444,13 @@ export const ContactPersonList = props => {
       key: 'remarks',
       editable: true,
       inputType: 'text',
+      ellipsis: true,
+      editableRules: [
+        {
+          max: 200,
+          message: 'Contact Remarks should not exceed 200 characters',
+        },
+      ],
     },
     {
       title: 'Default',

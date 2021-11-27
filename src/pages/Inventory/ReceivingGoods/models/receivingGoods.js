@@ -28,6 +28,7 @@ export default createFormViewModel({
         receivingGoodsMedicationItem: [],
         receivingGoodsVaccinationItem: [],
         receivingGoodsConsumableItem: [],
+        receivingGoodsAdjustment: [],
       },
       receivingGoods: {
         receivingGoodsDate: moment(),
@@ -154,11 +155,16 @@ export default createFormViewModel({
           receivingGoodsMedicationItem: [],
           receivingGoodsVaccinationItem: [],
           receivingGoodsConsumableItem: [],
+          receivingGoodsAdjustment: [],
         }
       },
 
       setReceivingGoods(state, { payload }) {
-        const { receivingGoodsItem, receivingGoodsPayment } = payload
+        const {
+          receivingGoodsItem,
+          receivingGoodsPayment,
+          receivingGoodsAdjustment = [],
+        } = payload
         const itemRows = receivingGoodsItem.map(x => {
           const itemType = rgType.find(y => y.value === x.inventoryItemTypeFK)
 
@@ -172,6 +178,7 @@ export default createFormViewModel({
             itemFK: x[itemType.prop][itemType.itemFKName],
             codeString: x[itemType.prop][itemType.itemCode],
             nameString: x[itemType.prop][itemType.itemName],
+            isClosed: payload.isClosed || false,
           }
         })
 
@@ -186,6 +193,9 @@ export default createFormViewModel({
               payload.receivingGoodsStatus,
             ).id,
           },
+          receivingGoodsAdjustment: _.sortBy(receivingGoodsAdjustment, s => {
+            return s.sequence || 0
+          }),
           rows: itemRows || [],
           receivingGoodsPayment,
         }

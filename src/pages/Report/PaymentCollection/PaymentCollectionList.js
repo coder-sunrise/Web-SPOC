@@ -38,6 +38,7 @@ class PaymentCollectionList extends PureComponent {
       { columnName: 'payerName', sortingEnabled: false },
       { columnName: 'remark', sortingEnabled: false },
       { columnName: 'doctorName', sortingEnabled: false },
+      { columnName: 'visitType', sortingEnabled: false, width: 150 },
       { columnName: 'invoiceNo', sortingEnabled: false, width: 100 },
       { columnName: 'invoiceDate', sortingEnabled: false, width: 100 },
       { columnName: 'paymentMode', sortingEnabled: false },
@@ -54,14 +55,13 @@ class PaymentCollectionList extends PureComponent {
       let otherData = []
       if (paymentCollectionData.length > 0) {
         cashData = paymentCollectionData.filter(
-          (item) => item.paymentMode === 'CASH',
+          item => item.paymentMode === 'CASH',
         )
         giroData = paymentCollectionData.filter(
-          (item) => item.paymentMode === 'GIRO',
+          item => item.paymentMode === 'GIRO',
         )
         otherData = paymentCollectionData.filter(
-          (item) =>
-            !(item.paymentMode === 'GIRO' || item.paymentMode === 'CASH'),
+          item => !(item.paymentMode === 'GIRO' || item.paymentMode === 'CASH'),
         )
       }
       const OtherPaymentModeDetailsCols = [
@@ -71,6 +71,7 @@ class PaymentCollectionList extends PureComponent {
         { name: 'payerName', title: 'Payer Name' },
         { name: 'remark', title: 'Remarks' },
         { name: 'doctorName', title: 'DR.' },
+        { name: 'visitType', title: 'Visit Type' },
         { name: 'invoiceNo', title: 'Invoice No.' },
         { name: 'invoiceDate', title: 'Inv. Date' },
         { name: 'amount', title: 'Amount' },
@@ -84,6 +85,7 @@ class PaymentCollectionList extends PureComponent {
         { name: 'patientName', title: 'Patient Name' },
         { name: 'remark', title: 'Remarks' },
         { name: 'doctorName', title: 'Doctor' },
+        { name: 'visitType', title: 'Visit Type' },
         { name: 'invoiceNo', title: 'Invoice No.' },
         { name: 'invoiceDate', title: 'Inv. Date' },
         { name: 'amount', title: 'Amount' },
@@ -94,17 +96,13 @@ class PaymentCollectionList extends PureComponent {
         grouping: true,
         groupingConfig: {
           state: {
-            grouping: [
-              { columnName: 'paymentMode' },
-            ],
+            grouping: [{ columnName: 'paymentMode' }],
           },
         },
         summaryConfig: {
           state: {
             totalItems: [],
-            groupItems: [
-              { columnName: 'amount', type: 'sum' },
-            ],
+            groupItems: [{ columnName: 'amount', type: 'sum' }],
           },
           integrated: {
             calculator: IntegratedSummary.defaultCalculator,
@@ -159,11 +157,9 @@ class PaymentCollectionList extends PureComponent {
           width: 180,
         },
       ]
-      console.log({ CashDetailsCols, CashColsExtension, CashFuncProps })
       return (
         <GridItem md={12}>
-          {cashData &&
-          cashData.length > 0 && (
+          {cashData && cashData.length > 0 && (
             <ReportDataGrid
               data={cashData}
               columns={CashDetailsCols}
@@ -171,8 +167,7 @@ class PaymentCollectionList extends PureComponent {
               FuncProps={CashFuncProps}
             />
           )}
-          {giroData &&
-          giroData.length > 0 && (
+          {giroData && giroData.length > 0 && (
             <ReportDataGrid
               data={giroData}
               columns={GIRODetailsCols}
@@ -180,8 +175,7 @@ class PaymentCollectionList extends PureComponent {
               FuncProps={FuncProps}
             />
           )}
-          {otherData &&
-          otherData.length > 0 && (
+          {otherData && otherData.length > 0 && (
             <ReportDataGrid
               data={otherData}
               columns={OtherPaymentModeDetailsCols}
@@ -198,9 +192,7 @@ class PaymentCollectionList extends PureComponent {
         summaryConfig: {
           state: {
             totalItems: [],
-            groupItems: [
-              { columnName: 'amount', type: 'sum' },
-            ],
+            groupItems: [{ columnName: 'amount', type: 'sum' }],
           },
           integrated: {
             calculator: IntegratedSummary.defaultCalculator,
@@ -214,9 +206,7 @@ class PaymentCollectionList extends PureComponent {
         grouping: true,
         groupingConfig: {
           state: {
-            grouping: [
-              { columnName: 'doctorName' },
-            ],
+            grouping: [{ columnName: 'doctorName' }],
           },
         },
       }
@@ -225,9 +215,7 @@ class PaymentCollectionList extends PureComponent {
         ...FuncProps,
         summaryConfig: {
           state: {
-            totalItems: [
-              { columnName: 'amount', type: 'sum' },
-            ],
+            totalItems: [{ columnName: 'amount', type: 'sum' }],
           },
           integrated: {
             calculator: IntegratedSummary.defaultCalculator,
@@ -246,6 +234,7 @@ class PaymentCollectionList extends PureComponent {
       { name: 'referenceNo', title: 'Ref. No.' },
       { name: 'payerName', title: 'Payer Name' },
       { name: 'doctorName', title: 'DR.' },
+      { name: 'visitType', title: 'Visit Type' },
       { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'invoiceDate', title: 'Inv. Date' },
       { name: 'amount', title: 'Amount' },
