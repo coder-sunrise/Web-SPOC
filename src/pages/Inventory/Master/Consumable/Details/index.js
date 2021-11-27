@@ -218,7 +218,10 @@ export default compose(
 
       suggestSellingPrice: Yup.number()
         .min(0, 'Suggested Selling Price must between 0 and 999,999.99')
-        .max(999999.99, 'Suggested Selling Price must between 0 and 999,999.99'),
+        .max(
+          999999.99,
+          'Suggested Selling Price must between 0 and 999,999.99',
+        ),
 
       sellingPrice: Yup.number()
         .required()
@@ -236,6 +239,10 @@ export default compose(
       criticalThreshold: Yup.number()
         .min(0, 'Critical Threshold must between 0 and 999,999.9')
         .max(999999.9, 'Critical Threshold must between 0 and 999,999.9'),
+
+      excessThreshold: Yup.number()
+        .min(0, 'Excess Threshold must between 0 and 999,999.9')
+        .max(999999.9, 'Excess Threshold must between 0 and 999,999.9'),
     }),
 
     handleSubmit: (values, { props, resetForm }) => {
