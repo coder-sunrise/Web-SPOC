@@ -3,6 +3,8 @@ import request from '@/utils/request'
 
 const url = '/api/Forms'
 const lcformurl = '/api/LCForm'
+const consentformurl = '/api/ConsentForm'
+
 const queryList = params => service.queryList(url, params)
 const getCORForms = async params => {
   const r = await request(`${url}/CORForm/${params.id}`, {
@@ -18,30 +20,34 @@ const getVisitForms = async params => {
   })
   return r
 }
-const saveVisitForm = async (visitId, params) => {
-  const r = await request(`${lcformurl}/VisitForm/${visitId}`, {
+
+const saveVisitForm = async (type, visitId, params) => {
+  const r = await request(
+    `${type === '1' ? lcformurl : consentformurl}/VisitForm/${visitId}`,
+    {
+      method: 'PUT',
+      body: params,
+    },
+  )
+  return r
+}
+const saveCORForm = async (type, visitId, params) => {
+  const r = await request(`${type === '1' ? lcformurl : consentformurl}/CORForm/${visitId}`, {
     method: 'PUT',
     body: params,
   })
   return r
 }
-const saveCORForm = async (visitId, params) => {
-  const r = await request(`${lcformurl}/CORForm/${visitId}`, {
-    method: 'PUT',
-    body: params,
-  })
-  return r
-}
-const queryCORForm = async params => {
-  const r = await request(`${lcformurl}/CORForm/${params.id}`, {
+const queryCORForm = async (type, params) => {
+  const r = await request(`${type === '1' ? lcformurl : consentformurl}/CORForm/${params.id}`, {
     method: 'GET',
     // body: params,
   })
   return r
 }
 
-const queryVisitForm = async params => {
-  const r = await request(`${lcformurl}/VisitForm/${params.id}`, {
+const queryVisitForm = async (type, params) => {
+  const r = await request(`${type === '1' ? lcformurl : consentformurl}/VisitForm/${params.id}`, {
     method: 'GET',
     // body: params,
   })

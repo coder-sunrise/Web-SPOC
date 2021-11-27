@@ -26,6 +26,7 @@ import {
   Checkbox,
 } from '@/components'
 import AddForm from './AddForm'
+import { FORM_CATEGORY } from '@/utils/constants'
 
 const styles = (theme) => ({
   item: {
@@ -145,12 +146,13 @@ export const viewReport = (row, props) => {
   return true
 }
 
-@connect(({ forms, codetable, patient, consultation, user }) => ({
+@connect(({ forms, codetable, patient, consultation, user, formListing }) => ({
   forms,
   codetable,
   patient,
   consultation,
   user,
+  formListing,
 }))
 @withFormikExtend({
   authority: [
@@ -169,6 +171,15 @@ export const viewReport = (row, props) => {
   displayName: 'Forms',
 })
 class Forms extends PureComponent {
+
+  componentWillMount() {
+    const { dispatch} = this.props
+    dispatch({
+      type: 'formListing/initState',
+      payload: { formCategory: FORM_CATEGORY.CORFORM },
+    })
+  }
+
   constructor (props) {
     super(props)
     const { dispatch } = props
@@ -223,6 +234,21 @@ class Forms extends PureComponent {
       }
     })
 
+    setFilterFormTemplate = (val) => {
+      this.setState({ filterFormTemplate: val })
+    }
+  
+    debouncedFilterFormTemplateAction = _.debounce(
+      e => {
+        this.setFilterFormTemplate(e.target.value)
+      },
+      100,
+      {
+        leading: true,
+        trailing: false,
+      },
+    )
+    
   ListItem = ({ classes, title, onClick }) => {
     return (
       <Tooltip title={title} style={{ pidding: 0 }}>
@@ -285,7 +311,15 @@ class Forms extends PureComponent {
   }
 
   render () {
-    const { forms, dispatch, theme, classes, setFieldValue, user } = this.props
+    const {
+      forms,
+      dispatch,
+      theme,
+      classes,
+      setFieldValue,
+      user,
+      formListing: { formTemplates = [] },
+    } = this.props
     const { showModal } = forms
     const { rows = [] } = forms
     return (
@@ -316,15 +350,16 @@ class Forms extends PureComponent {
           }
           onRowDoubleClick={this.editRow}
           columns={[
-            { name: 'typeName', title: 'Type' },
-            { name: 'updateByUser', title: 'Last Update By' },
+            { name: 'formName', title: 'Form' },
+            { name: 'updateByUser', title: 'Last Updated By' },
+            { name: 'updateDate', title: 'Last Updated Date' },
             { name: 'statusFK', title: 'Status' },
             { name: 'action', title: 'Action' },
           ]}
           FuncProps={{ pager: false }}
           columnExtensions={[
             {
-              columnName: 'typeName',
+              columnName: 'formName',
               type: 'link',
               linkField: 'href',
               onClick: (row) => {
@@ -335,9 +370,25 @@ class Forms extends PureComponent {
               columnName: 'updateByUser',
             },
             {
+              columnName: 'updateDate',
+              render: r => {
+                const updateDate = moment(r.updateDate)
+                  .utc()
+                  .format('DD MMM YYYY HH:mm')
+                return (
+                  <Tooltip title={updateDate}>
+                    <span>{updateDate}</span>
+                  </Tooltip>
+                )
+              },
+            },
+            {
               columnName: 'statusFK',
-              type: 'select',
-              options: formStatus,
+              render: r => {
+                const status = formStatus.find(x => x.value === r.statusFK).name
+                const title = r.statusFK === 4 ? r.voidReason : status
+                return <Tooltip title={title}><span>{status}</span></Tooltip>
+              },
             },
             {
               align: 'left',
@@ -408,7 +459,16 @@ class Forms extends PureComponent {
         <AuthorizedContext>
           {(r) => {
             if (r && r.rights !== 'enable') return null
-
+            let unionFormTypes = formTypes.concat(formTemplates)
+            unionFormTypes = this.state.filterFormTemplate
+              ? unionFormTypes.filter(
+                  x =>
+                    x.name
+                      .toUpperCase()
+                      .indexOf(this.state.filterFormTemplate.toUpperCase()) >=
+                    0,
+                )
+              : unionFormTypes
             return (
               <Popover
                 icon={null}
@@ -418,8 +478,14 @@ class Forms extends PureComponent {
                 onVisibleChange={this.toggleVisibleChange}
                 content={
                   <div className={classes.popoverContainer}>
+                    <TextField
+                      label='Filter Template'
+                      onChange={e => {
+                        this.debouncedFilterFormTemplateAction(e)
+                      }}
+                    />
                     <div className={classes.listContainer}>
-                      {formTypes.map((item) => {
+                      {unionFormTypes.slice(0,6).map((item) => {
                         return (
                           <this.ListItem
                             key={item.value}
@@ -432,6 +498,9 @@ class Forms extends PureComponent {
                                   showModal: true,
                                   type: item.value,
                                   entity: undefined,
+                                  formCategory: FORM_CATEGORY.CORFORM,
+                                  formName: item.name,
+                                  templateContent: item.templateContent,
                                 },
                               })
                               this.toggleVisibleChange()

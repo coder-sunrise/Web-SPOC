@@ -235,6 +235,7 @@ class LCForm extends PureComponent {
         dispatch({
           type: 'formListing/saveCORForm',
           payload: {
+            type: formListing.type,
             ...saveData,
             visitID,
             ClinicalObjectRecordFK:

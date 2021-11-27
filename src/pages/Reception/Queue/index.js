@@ -1,6 +1,6 @@
 import React from 'react'
 import { PageContainer } from '@/components'
-
+import moment from 'moment'
 // umi locale
 import { history, FormattedMessage, formatMessage, connect } from 'umi'
 // class names
@@ -25,6 +25,7 @@ import {
 // current page sub components
 import EndSessionSummary from '@/pages/Report/SessionSummary/Details/index'
 // utils
+import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import { getAppendUrl, getRemovedUrl } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import { QueueDashboardButton } from '@/components/_medisys'
@@ -783,7 +784,7 @@ class Queue extends React.Component {
   }
 
   showVisitForms = async row => {
-    const { id, visitStatus, doctor, patientAccountNo, patientName } = row
+    const { id, visitStatus, doctor, patientAccountNo, patientName, gender, patientReferenceNo, dob} = row
     await this.props.dispatch({
       type: 'formListing/updateState',
       payload: {
@@ -793,6 +794,11 @@ class Queue extends React.Component {
           doctorProfileFK: doctor ? doctor.id : 0,
           patientName,
           patientAccountNo,
+          patientGender: gender,
+          patientDOB: dob,
+          patientAge: dob ? calculateAgeFromDOB(dob) : 0,
+          patientRefNo: patientReferenceNo,
+          todayDate: moment().toDate(),
         },
       },
     })

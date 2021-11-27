@@ -4,7 +4,7 @@ import { connect } from 'dva'
 import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import { CardContainer, CommonModal, notification } from '@/components'
-import { FORM_CATEGORY, FORM_FROM } from '@/utils/constants'
+import { DOCUMENT_CATEGORY, FORM_CATEGORY, FORM_FROM } from '@/utils/constants'
 import { commonDataReaderTransform } from '@/utils/utils'
 import { formTypes } from '@/utils/codes'
 import { download } from '@/utils/request'
@@ -89,6 +89,14 @@ const styles = () => ({})
   mainDivHeight: global.mainDivHeight,
 }))
 class FormListingDetails extends PureComponent {
+  componentWillMount() {
+    const { dispatch, formCategory } = this.props
+    dispatch({
+      type: 'formListing/initState',
+      payload: { formCategory },
+    })
+  }
+
   componentDidMount() {
     this.queryFormListing()
   }
@@ -151,8 +159,8 @@ class FormListingDetails extends PureComponent {
 
   render() {
     const { formFrom, formListing, user, mainDivHeight = 700 } = this.props
+    const { showModal, formTemplates } = formListing
 
-    const { showModal } = formListing
     let height =
       mainDivHeight - 110 - $('.filterBar').height() ||
       0 - $('.footerBar').height() ||
