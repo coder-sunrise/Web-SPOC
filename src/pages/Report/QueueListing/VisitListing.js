@@ -46,6 +46,7 @@ const VisitListing = ({ reportDatas, classes }) => {
     { name: 'doctorName', title: 'Doctor' },
     { name: 'timeIn', title: 'Time In' },
     { name: 'timeOut', title: 'Time Out' },
+    { name: 'visitType', title: 'Visit Type' },
     { name: 'invoiceNo', title: 'Invoice No' },
     { name: 'invoiceAmt', title: 'Invoice Amt.' },
     { name: 'gstAmt', title: 'GST' },
@@ -64,6 +65,7 @@ const VisitListing = ({ reportDatas, classes }) => {
     { columnName: 'doctorName', width: 180, sortingEnabled: false },
     { columnName: 'timeIn', width: 80, sortingEnabled: false },
     { columnName: 'timeOut', width: 80, sortingEnabled: false },
+    { columnName: 'visitType', width: 100, sortingEnabled: false },
     { columnName: 'invoiceNo', width: 100, sortingEnabled: false },
     {
       columnName: 'invoiceAmt',
