@@ -395,13 +395,13 @@ export const QueueColumnExtensions = [
       const nurseWorkItems = filterNurseWorkItem(row.workItem)
       const labWorkItemsAccessRight = Authorized.check(
         'queue.workitem.labworkitem',
-      )
+      ) || { rights: 'hidden' }
       const radiologyWorkItemsAccessRight = Authorized.check(
         'queue.workitem.radiologyworkitem',
-      )
+      ) || { rights: 'hidden' }
       const nurseWorkItemsAccessRight = Authorized.check(
         'queue.workitem.nurseworkitem',
-      )
+      ) || { rights: 'hidden' }
       return (
         <div style={{ justifyContent: 'space-between' }}>
           {radiologyWorkItemsAccessRight.rights === 'enable' &&

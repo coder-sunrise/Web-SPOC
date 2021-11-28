@@ -191,6 +191,7 @@ class Grid extends PureComponent {
             },
             {
               columnName: 'copayerContactPerson',
+              sortingEnabled: false,
               render: row => {
                 let cell = <span>-</span>
                 if (
@@ -213,6 +214,7 @@ class Grid extends PureComponent {
             },
             {
               columnName: 'copayerContactPersonEmail',
+              sortingEnabled: false,
               render: row => {
                 let cell = <span>-</span>
                 if (
@@ -235,6 +237,7 @@ class Grid extends PureComponent {
             },
             {
               columnName: 'copayerCreditInformation',
+              sortingEnabled: false,
               render: row => {
                 let cell = <span>-</span>
                 if (row.creditInformation && row.creditInformation !== '') {
