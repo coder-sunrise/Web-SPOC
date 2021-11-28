@@ -97,12 +97,18 @@ const AddOrder = ({
                   return {
                     ...instruction,
                     stepdose: instruction.stepdose || 'AND',
+                    uid: getUniqueId(),
                   }
                 },
               ),
-              corPrescriptionItemPrecaution:
-                o.retailVisitInvoiceDrug.retailPrescriptionItem
-                  .retailPrescriptionItemPrecaution,
+              corPrescriptionItemPrecaution: retailPrescriptionItemPrecaution.map(
+                pp => {
+                  return {
+                    ...pp,
+                    uid: getUniqueId(),
+                  }
+                },
+              ),
               corPrescriptionItemDrugMixture:
                 o.retailVisitInvoiceDrug.retailPrescriptionItem
                   .retailPrescriptionItemDrugMixture,

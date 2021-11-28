@@ -182,7 +182,9 @@ class ImagePreviewer extends Component {
 
             this.setState({ imageList, loading: false })
             setTimeout(() => {
-              this.carouselRef.goTo(selectedImg.slideNumber, true)
+              if (this.carouselRef) {
+                this.carouselRef.goTo(selectedImg.slideNumber, true)
+              }
             }, 100)
           }
         })

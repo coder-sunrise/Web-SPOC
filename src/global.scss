@@ -811,3 +811,9 @@ tr[class*='disableexpandedgroup'] {
     }
   }
 }
+
+td[class='ant-table-cell ant-table-cell-ellipsis'] {
+  span {
+    width: 100% !important;
+  }
+}
