@@ -10,7 +10,9 @@ import _ from 'lodash'
 import { HistoryOutlined } from '@ant-design/icons'
 import { CommonModal, Button, Tooltip } from '@/components'
 import { Worklist } from '@/pages/Radiology/Components'
-import { WorklistContextProvider } from '@/pages/Radiology/Worklist/WorklistContext'
+import WorklistContext, {
+  WorklistContextProvider,
+} from '@/pages/Radiology/Worklist/WorklistContext'
 import PharmacyDetails from './Details'
 import { WorklistFilter } from '../Components'
 const columnsTemplate = [
@@ -46,6 +48,7 @@ const PharmacyWorklist = () => {
   const { autoRefreshPharmacyWorklistInterval = 60 } =
     clinicSettings.settings || {}
   const timer = React.useRef(null)
+  const { pharmacyQueueCallList = [] } = useContext(WorklistContext)
   useEffect(() => {
     dispatch({
       type: 'pharmacyWorklist/query',
@@ -129,6 +132,12 @@ const PharmacyWorklist = () => {
       trailing: false,
     },
   )
+
+  let nowServing = undefined
+  if (pharmacyQueueCallList.length > 0) {
+    nowServing = `${pharmacyQueueCallList?.[0]?.qNo}.0 (${pharmacyQueueCallList?.[0]?.patientName})`
+  }
+
   return (
     <div style={{ position: 'relative', height: '100%' }}>
       <ProCard
@@ -156,13 +165,12 @@ const PharmacyWorklist = () => {
           style={{
             position: 'absolute',
             top: 25,
-            right: 175,
-            width: 300,
-            textAlign: 'right',
+            right: 150,
+            width: 200,
           }}
         >
           <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>Now Serving:</p>
-          <Tooltip title='1.0(genery)'>
+          <Tooltip title={nowServing || '-'}>
             <p
               style={{
                 color: '#1890f8',
@@ -172,7 +180,7 @@ const PharmacyWorklist = () => {
                 marginTop: 4,
               }}
             >
-              1.0(genery)
+              {nowServing || '-'}
             </p>
           </Tooltip>
         </div>

@@ -73,8 +73,6 @@ const filterLabWorkItem = workItem => {
   return workItem.filter(x => x.type === 'Lab')
 }
 
-
-
 export const FuncConfig = {
   pager: false,
   sort: true,
@@ -242,8 +240,8 @@ export const QueueColumnExtensions = [
                   <Authorized authority='openqueuedisplay'>
                     <CallingQueueButton
                       qId={row.queueNo}
-                      roomNo={row.roomNo}
-                      doctor={row.doctor}
+                      patientName={row.patientName}
+                      from='Queue'
                     />
                   </Authorized>
                 )}
@@ -395,7 +393,9 @@ export const QueueColumnExtensions = [
       const labWorkItems = filterLabWorkItem(row.workItem)
       const radioWorkItems = filterRadioWorkItem(row.workItem)
       const nurseWorkItems = filterNurseWorkItem(row.workItem)
-      const labWorkItemsAccessRight = Authorized.check('queue.workitem.labworkitem')
+      const labWorkItemsAccessRight = Authorized.check(
+        'queue.workitem.labworkitem',
+      )
       const radiologyWorkItemsAccessRight = Authorized.check(
         'queue.workitem.radiologyworkitem',
       )
