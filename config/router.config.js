@@ -765,6 +765,12 @@ const _routes = [
             component: './Report/RadiologyStatisticReport',
             authority: ['report.finance.radiologystatisticreport'],
           },
+          {
+            path: '/report/partialdispensereport',
+            name: 'partialdispensereport',
+            component: './Report/PartialDispenseReport',
+            authority: ['report.inventory.partialdispensereport'],
+          },
         ],
       },
       // Report

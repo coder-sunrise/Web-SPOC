@@ -177,7 +177,7 @@ class Grid extends PureComponent {
                 <span>
                   {row.contact &&
                   row.contact.officeContactNumber &&
-                  row.contact.officeContactNumber.number !== ''
+                  row.contact.officeContactNumber.number
                     ? row.contact.officeContactNumber.number
                     : '-'}
                 </span>
@@ -259,7 +259,7 @@ class Grid extends PureComponent {
                 <span>
                   {row.contact &&
                   row.contact.faxContactNumber &&
-                  row.contact.faxContactNumber.number !== ''
+                  row.contact.faxContactNumber.number
                     ? row.contact.faxContactNumber.number
                     : '-'}
                 </span>
@@ -273,15 +273,31 @@ class Grid extends PureComponent {
               columnName: 'contactNo',
               sortingEnabled: false,
               width: 120,
-              render: row => (
-                <span>
-                  {row.defaultContactPerson &&
-                  row.defaultContactPerson.mobileNumber &&
-                  row.defaultContactPerson.mobileNumber !== ''
-                    ? row.defaultContactPerson.mobileNumber
-                    : '-'}
-                </span>
-              ),
+              render: function(row) {
+                //copayer
+                if (row.defaultContactPerson) {
+                  return (
+                    <span>
+                      {row.defaultContactPerson.mobileNumber &&
+                      row.defaultContactPerson.mobileNumber !== ''
+                        ? row.defaultContactPerson.mobileNumber
+                        : '-'}
+                    </span>
+                  )
+                }
+                // supplier
+                else {
+                  return (
+                    <span>
+                      {row.contact &&
+                      row.contact.mobileContactNumber &&
+                      row.contact.mobileContactNumber.number
+                        ? row.contact.mobileContactNumber.number
+                        : '-'}
+                    </span>
+                  )
+                }
+              },
             },
             {
               columnName: 'isActive',
