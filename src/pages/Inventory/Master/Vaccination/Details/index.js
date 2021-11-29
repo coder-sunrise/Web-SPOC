@@ -168,7 +168,7 @@ export default compose(
         isChasChronicClaimable,
         isMedisaveClaimable,
         isAutoGenerateCertificate,
-        isNurseActualizable
+        isNurseActualizable,
       } = returnValue
       if (isChasAcuteClaimable) {
         schemes.push('isChasAcuteClaimable')
@@ -195,12 +195,17 @@ export default compose(
 
     validationSchema: Yup.object().shape({
       code: Yup.string().when('id', {
-        is: (id) => !!id,
-        then: Yup.string().trim().required(),
+        is: id => !!id,
+        then: Yup.string()
+          .trim()
+          .required(),
       }),
       displayValue: Yup.string().required(),
       revenueCategoryFK: Yup.number().required(),
-      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+      effectiveDates: Yup.array()
+        .of(Yup.date())
+        .min(2)
+        .required(),
       prescribingUOMFK: Yup.number().required(),
       prescriptionToDispenseConversion: Yup.number().required(),
       dispensingUOMFK: Yup.number().required(),
@@ -214,9 +219,13 @@ export default compose(
 
       suggestSellingPrice: Yup.number()
         .min(0, 'Suggested Selling Price must between 0 and 999,999.99')
-        .max(999999.99, 'Suggested Selling Price must between 0 and 999,999.99'),
+        .max(
+          999999.99,
+          'Suggested Selling Price must between 0 and 999,999.99',
+        ),
 
-      sellingPrice: Yup.number().required()
+      sellingPrice: Yup.number()
+        .required()
         .min(0, errMsg('Selling Price'))
         .max(999999.99, errMsg('Selling Price')),
 
@@ -232,6 +241,9 @@ export default compose(
         .min(0, 'Critical Threshold must between 0 and 999,999.9')
         .max(999999.9, 'Critical Threshold must between 0 and 999,999.9'),
 
+      excessThreshold: Yup.number()
+        .min(0, 'Excess Threshold must between 0 and 999,999.9')
+        .max(999999.9, 'Excess Threshold must between 0 and 999,999.9'),
     }),
     handleSubmit: (values, { props, resetForm }) => {
       const { dispatch, history } = props
@@ -252,9 +264,9 @@ export default compose(
         isChasChronicClaimable: false,
         isMedisaveClaimable: false,
         isAutoGenerateCertificate: false,
-        isNurseActualizable: false
+        isNurseActualizable: false,
       }
-      values.schemes.forEach((o) => {
+      values.schemes.forEach(o => {
         if (o === 'isChasAcuteClaimable') {
           schemes[o] = true
         } else if (o === 'isChasChronicClaimable') {
@@ -279,7 +291,7 @@ export default compose(
           vaccinationStock: defaultVaccinationStock,
           suggestSellingPrice: roundTo(restValues.suggestSellingPrice),
         },
-      }).then((r) => {
+      }).then(r => {
         if (r) {
           resetForm()
           history.push('/inventory/master?t=2')
