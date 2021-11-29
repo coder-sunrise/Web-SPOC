@@ -285,7 +285,6 @@ export const DispenseItemsColumnExtensions = (
   onPrint,
   onActualizeBtnClick,
   showDrugLabelRemark,
-  codetable,
 ) => {
   const checkActualizable = row => {
     const {
@@ -666,39 +665,34 @@ export const DispenseItemsColumnExtensions = (
       labelField: 'batchNo',
       valueField: 'id',
       options: row => {
-        const {
-          inventorymedication = [],
-          inventoryconsumable = [],
-          inventoryvaccination = [],
-        } = codetable
         let stockList = []
         if (row.type === 'Medication') {
-          const medication = inventorymedication.find(
-            m => m.id === row.inventoryMedicationFK,
+          stockList = (row.medicationStock || []).filter(
+            s =>
+              s.isDefault ||
+              (s.stock > 0 &&
+                (!s.expiryDate ||
+                  moment(s.expiryDate).startOf('day') >=
+                    moment().startOf('day'))),
           )
-          if (medication) {
-            stockList = (medication.medicationStock || []).filter(
-              s => s.isDefault || s.stock > 0,
-            )
-          }
         } else if (row.type === 'Consumable') {
-          const consumable = inventoryconsumable.find(
-            m => m.id === row.inventoryConsumableFK,
+          stockList = (row.consumableStock || []).filter(
+            s =>
+              s.isDefault ||
+              (s.stock > 0 &&
+                (!s.expiryDate ||
+                  moment(s.expiryDate).startOf('day') >=
+                    moment().startOf('day'))),
           )
-          if (consumable) {
-            stockList = (consumable.consumableStock || []).filter(
-              s => s.isDefault || s.stock > 0,
-            )
-          }
         } else if (row.type === 'Vaccination') {
-          const vaccination = inventoryvaccination.find(
-            m => m.id === row.inventoryVaccinationFK,
+          stockList = (row.vaccinationStock || []).filter(
+            s =>
+              s.isDefault ||
+              (s.stock >= row.quantity &&
+                (!s.expiryDate ||
+                  moment(s.expiryDate).startOf('day') >=
+                    moment().startOf('day'))),
           )
-          if (vaccination) {
-            stockList = (vaccination.vaccinationStock || []).filter(
-              s => s.isDefault || s.stock >= row.quantity,
-            )
-          }
         }
 
         stockList = _.orderBy(stockList, ['expiryDate'], ['asc'])

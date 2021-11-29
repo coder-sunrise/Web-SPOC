@@ -803,7 +803,6 @@ const DispenseDetails = ({
                 onPrint,
                 onActualizeBtnClick,
                 showDrugLabelRemark,
-                codetable,
               )}
               data={dispenseItems}
               TableProps={{

@@ -1006,7 +1006,12 @@ const Main = props => {
             )
             if (medication) {
               stockList = (medication.medicationStock || []).filter(
-                s => s.isDefault || s.stock > 0,
+                s =>
+                  s.isDefault ||
+                  (s.stock > 0 &&
+                    (!s.expiryDate ||
+                      moment(s.expiryDate).startOf('day') >=
+                        moment().startOf('day'))),
               )
             }
           } else {
@@ -1015,7 +1020,12 @@ const Main = props => {
             )
             if (consumable) {
               stockList = (consumable.consumableStock || []).filter(
-                s => s.isDefault || s.stock > 0,
+                s =>
+                  s.isDefault ||
+                  (s.stock > 0 &&
+                    (!s.expiryDate ||
+                      moment(s.expiryDate).startOf('day') >=
+                        moment().startOf('day'))),
               )
             }
           }
