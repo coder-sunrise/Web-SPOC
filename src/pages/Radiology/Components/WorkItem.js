@@ -16,6 +16,7 @@ import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import WorklistContext from '../Worklist/WorklistContext'
 import CombinedOrderIcon from './CombinedOrderIcon'
 import VisitGroupIcon from './VisitGroupIcon'
+import { CallingQueueButton } from '@/components/_medisys'
 
 const blueColor = '#1890f8'
 const statusUpdateDateTooltip = {
@@ -249,6 +250,22 @@ const WorkitemBody = ({ item }) => {
             item?.visitInfo &&
             visitPurpose.find(p => p.id === item.visitInfo.visitPurposeFK).code}
         </span>
+
+        {item.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW && (
+          <span
+            style={{
+              display: 'flex',
+              float: 'right',
+              marginLeft: 50,
+            }}
+          >
+            <CallingQueueButton
+              qId={queueNo}
+              patientName={item.patientInfo.name}
+              from='Radiology'
+            />
+          </span>
+        )}
       </div>
     </div>
   )

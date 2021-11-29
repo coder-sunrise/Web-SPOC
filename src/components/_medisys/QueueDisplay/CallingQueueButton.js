@@ -17,99 +17,59 @@ import { notification, ProgressButton } from '@/components'
 const CallingQueueButton = ({
   classes,
   qId = '0',
-  roomNo,
   dispatch,
   doctor,
   roomAssignmentList,
   ctroom,
   user,
+  patientName,
+  from,
   queueCalling: { oriQCallList = [], lastUpdateDate, tracker, ...restValues },
 }) => {
   // console.log({ qId })
-
   const qNo = qId.includes('.0') ? qId.replace('.0', '') : qId
+  const roomCode = localStorage.getItem('roomCode')
+  const [disable, setDisable] = useState(false)
 
-  const [
-    disable,
-    setDisable,
-  ] = useState(false)
-
-  useEffect(
-    () => {
-      if (tracker && qNo === tracker.qNo) {
-        const isExistCalledQ = oriQCallList.find((q) => q.qNo === tracker.qNo)
-        if (!isExistCalledQ) {
-          dispatch({
-            type: 'queueCalling/updateState',
-            payload: {
-              oriQCallList: [
-                tracker,
-                ...oriQCallList,
-              ],
-            },
-          })
-        }
-        setDisable(() => !disable)
-        setTimeout(() => {
-          setDisable(() => false)
-        }, 3000)
+  useEffect(() => {
+    if (tracker && qNo === tracker.qNo) {
+      const isExistCalledQ = oriQCallList.find(q => q.qNo === tracker.qNo)
+      if (!isExistCalledQ) {
+        dispatch({
+          type: 'queueCalling/updateState',
+          payload: {
+            oriQCallList: [tracker, ...oriQCallList],
+          },
+        })
       }
-    },
-    [
-      tracker,
-    ],
-  )
+      setDisable(() => !disable)
+      setTimeout(() => {
+        setDisable(() => false)
+      }, 3000)
+    }
+  }, [tracker])
 
   const getRoomAssigned = () => {
-    if (roomNo) {
-      if (isNumber(roomNo)) {
-        const roomAssigned = ctroom.find((room) => room.id === roomNo)
-        return roomAssigned ? roomAssigned.name || '' : ''
-      }
-      return roomNo
+    if (roomCode) {
+      const roomAssigned = ctroom.find(room => room.code === roomCode)
+      return roomAssigned?.name || ''
     }
-
-    let roomAssign = ''
-
-    if (doctor) {
-      let clinicianProfileFK = isNumber(doctor)
-        ? doctor
-        : doctor.clinicianProfile.id
-
-      if (user.clinicianProfile.doctorProfile) {
-        clinicianProfileFK = user.clinicianProfile.doctorProfile.id
-      }
-
-      // console.log({ clinicianProfileFK })
-
-      const roomAssignment = (roomAssignmentList || [])
-        .find((room) => room.clinicianProfileFK === clinicianProfileFK)
-      // console.log({ roomAssignment })
-      if (roomAssignment) {
-        const roomAssigned = ctroom.find(
-          (room) => room.id === roomAssignment.roomFK,
-        )
-        if (roomAssigned) roomAssign = roomAssigned.name
-      }
-      // console.log({ roomAssign })
-    }
-
-    return roomAssign
   }
 
-  const callingQueue = { qNo, roomNo: getRoomAssigned() }
+  const callingQueue = {
+    qNo,
+    roomNo: getRoomAssigned(),
+    patientName,
+    from,
+    roomCode: roomCode,
+  }
 
-  const newQList = [
-    ...oriQCallList,
-  ]
+  const newQList = [...oriQCallList]
 
-  const isCalled = newQList.find((q) => q.qNo === qNo)
+  const isCalled = newQList.find(q => q.qNo === qNo && q.from === from)
 
   const updateData = (existingQArray, newRestValues = {}) => {
-    const valueArray = [
-      callingQueue,
-      ...existingQArray,
-    ]
+    const valueArray = [callingQueue, ...existingQArray]
 
     const stringifyValue = JSON.stringify(valueArray)
 
@@ -125,7 +85,7 @@ const CallingQueueButton = ({
     dispatch({
       type: 'queueCalling/upsertQueueCallList',
       payload,
-    }).then((response) => {
+    }).then(response => {
       if (response) {
         notification.success({ message: 'Called' })
         const { lastUpdateDate: lastUpdateTime, concurrencyToken } = response
@@ -140,8 +100,11 @@ const CallingQueueButton = ({
         sendNotification('QueueCalled', {
           type: NOTIFICATION_TYPE.QUEUE,
           status: NOTIFICATION_STATUS.OK,
-          message: 'Queue Called',
-          ...callingQueue,
+          message: callingQueue?.roomNo
+            ? `Queue called from ${callingQueue.roomNo}.`
+            : 'Queue called.',
+          oriQCallList: valueArray,
+          callingQueue: callingQueue,
           queueNo: callingQueue.qNo,
         })
       } else {
@@ -150,7 +113,7 @@ const CallingQueueButton = ({
           payload: {
             keys: VALUE_KEYS.QUEUECALLING,
           },
-        }).then((res) => {
+        }).then(res => {
           const { value, ...restRespValues } = res
 
           const existingQCall = JSON.parse(value)
@@ -180,7 +143,7 @@ const CallingQueueButton = ({
         payload: {
           keys: VALUE_KEYS.QUEUECALLING,
         },
-      }).then((response) => {
+      }).then(response => {
         const { value, ...newRestValues } = response
 
         const existingQCall = JSON.parse(value)

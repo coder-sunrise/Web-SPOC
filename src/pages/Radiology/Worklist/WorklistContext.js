@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState, createContext } from 'react'
 import { useSelector, useDispatch } from 'dva'
 import moment from 'moment'
 import { getMappedVisitType } from '@/utils/utils'
-
+import { VALUE_KEYS } from '@/utils/constants'
 const WorklistContext = createContext(null)
 
 export const WorklistContextProvider = props => {
@@ -12,9 +12,12 @@ export const WorklistContextProvider = props => {
   const codetable = useSelector(st => st.codetable)
   const { visitTypeSetting } = useSelector(st => st.clinicSettings.settings)
   const clinicianProfile = useSelector(st => st.user.data.clinicianProfile)
+  const oriQCallList = useSelector(st => st.queueCalling.oriQCallList)
   const [ctvisitpurpose, setCtVisitPurpose] = useState([])
   const [lastFilter, setLastFilter] = useState({})
   const [refreshDate, setRefreshDate] = useState(moment())
+  const [radiologyQueueCallList, setRadiologyQueueCallList] = useState([])
+  const [pharmacyQueueCallList, setPharmacyQueueCallList] = useState([])
 
   useEffect(() => {
     dispatch({
@@ -26,6 +29,23 @@ export const WorklistContextProvider = props => {
       setCtVisitPurpose(v)
     })
   }, [])
+
+  useEffect(() => {
+    if (oriQCallList) {
+      setRadiologyQueueCallList(
+        oriQCallList.filter(
+          x => x.from === 'Radiology' && x.roomCode === roomCode,
+        ),
+      )
+      setPharmacyQueueCallList(
+        oriQCallList.filter(
+          x => x.from === 'Pharmacy' && x.roomCode === roomCode,
+        ),
+      )
+    }
+  }, [oriQCallList])
+
+  const roomCode = localStorage.getItem('roomCode')
 
   const getPrimaryWorkitem = workitem => {
     const { visitWorkitems } = workitem
@@ -144,6 +164,8 @@ export const WorklistContextProvider = props => {
         filterWorklist,
         getPrimaryWorkitem,
         getCombinedOrders,
+        radiologyQueueCallList,
+        pharmacyQueueCallList,
       }}
     >
       {props.children}

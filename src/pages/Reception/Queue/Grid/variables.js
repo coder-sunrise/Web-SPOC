@@ -73,8 +73,6 @@ const filterLabWorkItem = workItem => {
   return workItem.filter(x => x.type === 'Lab')
 }
 
-
-
 export const FuncConfig = {
   pager: false,
   sort: true,
@@ -242,8 +240,8 @@ export const QueueColumnExtensions = [
                   <Authorized authority='openqueuedisplay'>
                     <CallingQueueButton
                       qId={row.queueNo}
-                      roomNo={row.roomNo}
-                      doctor={row.doctor}
+                      patientName={row.patientName}
+                      from='Queue'
                     />
                   </Authorized>
                 )}

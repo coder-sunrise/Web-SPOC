@@ -921,11 +921,13 @@ class Main extends React.Component {
       orders = {},
       visitRegistration,
       clinicSettings,
+      patient,
     } = this.props
     const { entity: vistEntity = {} } = visitRegistration
     // if (!vistEntity) return null
     const { visit = {}, queueNo } = vistEntity
     const { summary } = orders
+    const patientName = patient.entity.name
     // const { adjustments, total, gst, totalWithGst } = summary
 
     return (
@@ -1062,8 +1064,8 @@ class Main extends React.Component {
                 <div style={{ marginRight: 10 }}>
                   <CallingQueueButton
                     qId={queueNo}
-                    roomNo={visit.roomFK}
-                    doctor={visit.doctorProfileFK}
+                    patientName={patientName}
+                    from='Queue'
                   />
                 </div>
               </Authorized>

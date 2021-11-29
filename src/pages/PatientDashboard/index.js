@@ -171,8 +171,8 @@ class PatientDashboard extends PureComponent {
                     <Authorized authority='openqueuedisplay'>
                       <CallingQueueButton
                         qId={queueNo}
-                        roomNo={roomFK}
-                        doctor={doctorProfileFK}
+                        patientName={patientProfile?.name}
+                        from='Queue'
                       />
                     </Authorized>
                   )}

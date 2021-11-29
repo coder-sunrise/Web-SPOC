@@ -4,8 +4,13 @@ import { Button, Tooltip } from '@/components'
 import WorklistContext from '../Worklist/WorklistContext'
 
 export const StatusPanel = () => {
-  const { refreshDate, filterWorklist } = useContext(WorklistContext)
-
+  const { refreshDate, filterWorklist, radiologyQueueCallList } = useContext(
+    WorklistContext,
+  )
+  let nowServing = undefined
+  if (radiologyQueueCallList.length > 0) {
+    nowServing = `${radiologyQueueCallList?.[0]?.qNo}.0 (${radiologyQueueCallList?.[0]?.patientName})`
+  }
   return (
     <div style={{ display: 'flex', alignItems: 'end' }}>
       <div>
@@ -13,20 +18,8 @@ export const StatusPanel = () => {
           <span style={{ fontWeight: 400, fontSize: '0.8rem' }}>
             Now Serving:
           </span>
-
-          <Tooltip title=''>
-            <span
-              className='material-icons'
-              style={{
-                color: 'gray',
-              }}
-              onClick={event => {}}
-            >
-              history
-            </span>
-          </Tooltip>
         </div>
-        <Tooltip title='1.0(genery)'>
+        <Tooltip title={nowServing || '-'}>
           <p
             style={{
               color: '#1890f8',
@@ -37,7 +30,7 @@ export const StatusPanel = () => {
               fontSize: '0.9rem',
             }}
           >
-            1.0(Takashimaya Kotohamasuri)
+            {nowServing || '-'}
           </p>
         </Tooltip>
       </div>
