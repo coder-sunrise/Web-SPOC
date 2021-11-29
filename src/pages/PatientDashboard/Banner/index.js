@@ -65,13 +65,6 @@ const styles = theme => ({
     display: '-webkit-box',
     WebkitBoxOrient: 'vertical',
     WebkitLineClamp: 2,
-    '&:hover': {
-      position: 'static',
-      display: 'block',
-      width: '100%',
-      whiteSpace: 'normal',
-      overflow: 'visible',
-    },
   },
 })
 
@@ -1059,21 +1052,29 @@ class Banner extends PureComponent {
                   <GridItem xs={6} md={4} className={classes.cell}>
                     <span className={classes.header}>Patient Request: </span>
 
-                    <span
-                      className={classes.contents}
-                      style={{ WebkitLineClamp: 1 }}
-                    >
-                      {info.patientRequest || '-'}
-                    </span>
+                    <Tooltip title={info.patientRequest} interactive='true'>
+                      <span
+                        className={classes.contents}
+                        style={{ WebkitLineClamp: 1 }}
+                      >
+                        {info.patientRequest || '-'}
+                      </span>
+                    </Tooltip>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
                     <span className={classes.header}>Tag: </span>
-                    <span
-                      className={classes.contents}
-                      style={{ WebkitLineClamp: 1 }}
+                    <Tooltip
+                      title={this.getTagData()}
+                      placement='bottom-start'
+                      interactive='true'
                     >
-                      {this.getTagData()}
-                    </span>
+                      <span
+                        className={classes.contents}
+                        style={{ WebkitLineClamp: 1 }}
+                      >
+                        {this.getTagData()}
+                      </span>
+                    </Tooltip>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
                     <div>
@@ -1087,12 +1088,17 @@ class Banner extends PureComponent {
                       >
                         HRP:{' '}
                       </span>
-                      <span
-                        className={classes.contents}
-                        style={{ WebkitLineClamp: 1 }}
+                      <Tooltip
+                        title={info.patientMedicalHistory?.highRiskCondition}
+                        interactive='true'
                       >
-                        {info.patientMedicalHistory?.highRiskCondition || '-'}
-                      </span>
+                        <span
+                          className={classes.contents}
+                          style={{ WebkitLineClamp: 1 }}
+                        >
+                          {info.patientMedicalHistory?.highRiskCondition || '-'}
+                        </span>
+                      </Tooltip>
                     </div>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
@@ -1101,55 +1107,82 @@ class Banner extends PureComponent {
                       text='Retrieving balance...'
                     >
                       <span className={classes.header}>Scheme: </span>
-                      <span className={classes.contents}>
-                        {entity.isActive &&
-                          (entity.patientScheme || []).filter(
-                            o =>
-                              o.schemeTypeFK <= 6 ||
-                              this.isMedisave(o.schemeTypeFK),
-                          ).length > 0 && (
-                            <IconButton onClick={this.refreshGovtBalance}>
-                              <Refresh />
-                            </IconButton>
-                          )}
-                        {this.getSchemeList(
+                      <Tooltip
+                        title={this.getSchemeList(
                           _.orderBy(schemeDataList, ['schemeTypeFK'], ['asc']),
                         )}
-                      </span>
+                        interactive='true'
+                      >
+                        <span className={classes.contents}>
+                          {entity.isActive &&
+                            (entity.patientScheme || []).filter(
+                              o =>
+                                o.schemeTypeFK <= 6 ||
+                                this.isMedisave(o.schemeTypeFK),
+                            ).length > 0 && (
+                              <IconButton onClick={this.refreshGovtBalance}>
+                                <Refresh />
+                              </IconButton>
+                            )}
+                          {this.getSchemeList(
+                            _.orderBy(
+                              schemeDataList,
+                              ['schemeTypeFK'],
+                              ['asc'],
+                            ),
+                          )}
+                        </span>
+                      </Tooltip>
                     </LoadingWrapper>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
                     <span className={classes.header}>Non-Claimable Info: </span>
-                    <span className={classes.contents}>
-                      {info.nonClaimableInfo || '-'}
-                    </span>
+                    <Tooltip title={info.nonClaimableInfo} interactive='true'>
+                      <span className={classes.contents}>
+                        {info.nonClaimableInfo || '-'}
+                      </span>
+                    </Tooltip>
                   </GridItem>
 
                   <GridItem xs={6} md={4} className={classes.cell}>
                     <span className={classes.header}>Payment Info: </span>
-                    <span className={classes.contents}>
-                      {info.paymentInfo || '-'}
-                    </span>
+                    <Tooltip title={info.paymentInfo} interactive='true'>
+                      <span className={classes.contents}>
+                        {info.paymentInfo || '-'}
+                      </span>
+                    </Tooltip>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
                     <span className={classes.header}>
                       Persistent Diagnosis:{' '}
                     </span>
-                    <span className={classes.contents}>
-                      {info.patientHistoryDiagnosis.length > 0
-                        ? info.patientHistoryDiagnosis
-                            .map(d => d.diagnosisDescription)
-                            .join(', ')
-                        : '-'}
-                    </span>
+                    <Tooltip
+                      title={info.patientHistoryDiagnosis
+                        .map(d => d.diagnosisDescription)
+                        .join(', ')}
+                      interactive='true'
+                    >
+                      <span className={classes.contents}>
+                        {info.patientHistoryDiagnosis.length > 0
+                          ? info.patientHistoryDiagnosis
+                              .map(d => d.diagnosisDescription)
+                              .join(', ')
+                          : '-'}
+                      </span>
+                    </Tooltip>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
                     <span className={classes.header}>
                       Long Term Medication:{' '}
                     </span>
-                    <span className={classes.contents}>
-                      {info.patientMedicalHistory?.longTermMedication || '-'}
-                    </span>
+                    <Tooltip
+                      title={info.patientMedicalHistory?.longTermMedication}
+                      interactive='true'
+                    >
+                      <span className={classes.contents}>
+                        {info.patientMedicalHistory?.longTermMedication || '-'}
+                      </span>
+                    </Tooltip>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
                     <span
@@ -1175,9 +1208,11 @@ class Banner extends PureComponent {
                       </span>
                     </span>
                     <span>{this.getAllergyLink('link')}</span>
-                    <span className={classes.contents}>
-                      {this.getAllergyData()}
-                    </span>
+                    <Tooltip title={this.getAllergyData()} interactive='true'>
+                      <span className={classes.contents}>
+                        {this.getAllergyData()}
+                      </span>
+                    </Tooltip>
                   </GridItem>
                 </GridContainer>
               </GridItem>
