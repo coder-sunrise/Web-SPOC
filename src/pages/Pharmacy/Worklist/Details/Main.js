@@ -206,7 +206,6 @@ const Main = props => {
         }
       })
     }
-
     const _editOrder = () => {
       if (pharmacyDetails.entity?.visitFK) {
         dispatch({
@@ -1469,6 +1468,36 @@ const Main = props => {
     setReportTitle('')
     setReportParameters({})
     setShowReportViwer(false)
+  }
+
+  const actualizeEditOrder = () => {
+    dispatch({
+      type: 'orders/updateState',
+      payload: {
+        type: '1',
+        visitPurposeFK: visitPurposeFK,
+      },
+    })
+    dispatch({
+      type: 'dispense/updateState',
+      payload: { ordersData: pharmacyDetails.ordersData },
+    })
+    dispatch({
+      type: 'dispense/query',
+      payload: {
+        id: workitem.visitFK,
+        version: Date.now(),
+      },
+    }).then(r => {
+      if (r) {
+        setShowEditOrderModal(true)
+      }
+    })
+  }
+
+  if (pharmacyDetails.openOrderPopUpAfterActualize) {
+    actualizeEditOrder()
+    pharmacyDetails.openOrderPopUpAfterActualize = false
   }
 
   const checkExpiredItems = () => {

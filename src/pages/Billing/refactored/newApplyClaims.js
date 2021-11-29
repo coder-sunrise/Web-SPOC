@@ -111,7 +111,7 @@ const ApplyClaims = ({
 
   const [updatedInvoiceItems, setUpdatedInvoiceItems] = useState([
     ...invoice.invoiceItems.filter(
-      item => !item.isPreOrder || item.isChargeToday,
+      item => (!item.isPreOrder || item.isChargeToday) && !item.hasPaid,
     ),
   ])
 
@@ -464,7 +464,7 @@ const ApplyClaims = ({
     const newOutstandingBalance = roundTo(finalPayable - totalPaid)
     const newInvoiceItemsCopy = updateOriginalInvoiceItemList(
       invoice.invoiceItems.filter(
-        item => !item.isPreOrder || item.isChargeToday,
+        item => (!item.isPreOrder || item.isChargeToday) && !item.hasPaid,
       ),
       temp,
     )
@@ -502,7 +502,7 @@ const ApplyClaims = ({
     const newOutstandingBalance = roundTo(finalPayable - totalPaid)
     const newInvoiceItemsCopy = updateOriginalInvoiceItemList(
       invoice.invoiceItems.filter(
-        item => !item.isPreOrder || item.isChargeToday,
+        item => (!item.isPreOrder || item.isChargeToday) && !item.hasPaid,
       ),
       temp,
     )

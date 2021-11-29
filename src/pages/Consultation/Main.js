@@ -33,6 +33,7 @@ import {
   convertToConsultation,
   convertConsultationDocument,
   isPharmacyOrderUpdated,
+  getOrdersData,
 } from '@/pages/Consultation/utils'
 // import model from '@/pages/Widgets/Orders/models'
 import {
@@ -442,6 +443,7 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
     user,
     patient,
     forms,
+    codetable,
   }) => ({
     clinicInfo,
     consultation,
@@ -455,6 +457,7 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
     user,
     patient,
     forms,
+    codetable,
   }),
 )
 @withFormikExtend({
@@ -623,6 +626,18 @@ class Main extends React.Component {
         saveDraftDoctorNote(this.props)
       }, autoSaveClinicNoteInterval * 1000)
     }
+
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctservice',
+      },
+    })
+
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'inventoryconsumable' },
+    })
   }
 
   componentWillUnmount() {
@@ -1265,6 +1280,31 @@ class Main extends React.Component {
     })
   }
 
+  onSelectPreOrder = (selectPreOrder = []) => {
+    const {
+      orders,
+      dispatch,
+      codetable,
+      visitRegistration,
+      patient,
+      user,
+      clinicSettings,
+    } = this.props
+
+    dispatch({
+      type: 'orders/upsertRows',
+      payload: getOrdersData({
+        selectPreOrder,
+        orders,
+        codetable,
+        visitRegistration,
+        patient,
+        user,
+        clinicSettings,
+      }),
+    })
+  }
+
   render() {
     const { props, state } = this
     const {
@@ -1300,11 +1340,26 @@ class Main extends React.Component {
           ? 'disable'
           : rights,
     }
+    const { rows } = orders
+    const draftPreOrderItem = patient?.entity?.pendingPreOrderItem?.map(po => {
+      const selectPreOrder = rows.find(
+        apo => apo.actualizedPreOrderItemFK === po.id,
+      )
+      if (selectPreOrder) {
+        return {
+          ...po,
+          preOrderItemStatus: selectPreOrder.isDeleted ? 'New' : 'Actualizing',
+        }
+      }
+      return { ...po }
+    })
+
     return (
       <div className={classes.root}>
         <PatientBanner
           from='Consultation'
-          // activePreOrderItem={patient?.entity?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
+          onSelectPreOrder={this.onSelectPreOrder}
+          activePreOrderItems={draftPreOrderItem} // {patient?.entity?.pendingPreOrderItem} //
           extraCmt={this.getExtraComponent()}
           {...this.props}
         />

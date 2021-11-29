@@ -11,6 +11,7 @@ import {
   SizeContainer,
   withFormikExtend,
   Accordion,
+  notification,
 } from '@/components'
 // medisys-components
 import { ErrorWrapper, LoadingWrapper } from '@/components/_medisys'
@@ -36,6 +37,7 @@ import FormFieldName from './formField'
 import { formikMapPropsToValues, formikHandleSubmit } from './miscUtils'
 import { VISIT_STATUS } from '../variables'
 import PreOrderCard from './PreOrderCard'
+import { preOrderItemCategory } from '@/utils/codes'
 
 const styles = theme => ({
   gridContainer: {
@@ -246,6 +248,64 @@ class NewVisit extends PureComponent {
       errors,
       values,
     } = this.props
+
+    const { visitPreOrderItem = [] } = values
+    const isUnableActualizePreOrderItemFound = visitPreOrderItem
+      .filter(x => x.isDeleted !== true)
+      .find(c =>
+        patientInfo?.pendingPreOrderItem
+          .filter(
+            m =>
+              m.isPreOrderItemActive === false ||
+              m.isPreOrderItemOrderable === false ||
+              m.isUOMChanged === true,
+          )
+          .find(x => x.id === c.actualizedPreOrderItemFK),
+      )
+
+    if (isUnableActualizePreOrderItemFound) {
+      notification.error({
+        message: 'Please remove the invalid Pre-Order item.',
+      })
+      return
+    }
+    const msg = []
+    let errorMessage =
+      'cannot be added in Over-The-Counter visit type. Please remove the Pre-Order item.'
+    if (values.visitPurposeFK === VISIT_TYPE.OTC) {
+      const isVaccinationFound =
+        visitPreOrderItem?.filter(
+          x =>
+            x.isDeleted !== true &&
+            x.preOrderItemType === preOrderItemCategory[2].value,
+        ).length > 0
+
+      const isLabFound =
+        visitPreOrderItem?.filter(
+          x =>
+            x.isDeleted !== true &&
+            x.preOrderItemType === preOrderItemCategory[4].value,
+        ).length > 0
+
+      const isRadiologyFound =
+        visitPreOrderItem?.filter(
+          x =>
+            x.isDeleted !== true &&
+            x.preOrderItemType === preOrderItemCategory[5].value,
+        ).length > 0
+
+      if (isVaccinationFound) msg.push('Vaccination ')
+      if (isLabFound) msg.push('Lab test ')
+      if (isRadiologyFound) msg.push('Radiology examination ')
+
+      if (msg.length > 0) {
+        errorMessage = `${msg.join(',')} ${errorMessage}`
+      }
+    }
+    if (msg.length > 0) {
+      notification.error({ message: errorMessage })
+      return
+    }
 
     if (Object.keys(errors).length > 0) return handleSubmit()
 
@@ -472,9 +532,10 @@ class NewVisit extends PureComponent {
               <div style={{ padding: 8, marginTop: -20 }}>
                 <PatientBanner
                   from='VisitReg'
-                  // activePreOrderItem={patientInfo?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
+                  isReadOnly={isReadOnly}
                   onSelectPreOrder={this.onSelectPreOrder}
                   activePreOrderItems={draftPreOrderItem}
+                  isRetail={isRetail}
                   extraCmt={
                     <div
                       style={{
@@ -590,6 +651,11 @@ class NewVisit extends PureComponent {
                             <GridItem xs={12} className={classes.row}>
                               <CommonCard title='Pre-Order Actualization'>
                                 <PreOrderCard
+                                  isReadOnly={
+                                    values.visitStatus === VISIT_STATUS.WAITING
+                                      ? false
+                                      : isReadOnly
+                                  }
                                   {...this.props}
                                   deletePreOrderItem={this.deletePreOrderItem}
                                   dispatch={dispatch}

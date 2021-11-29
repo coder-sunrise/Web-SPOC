@@ -282,8 +282,17 @@ const AddOrder = ({
         },
       })
     }
+    if (dispense.ordersData) {
+      dispatch({
+        type: 'orders/upsertRows',
+        payload: dispense.ordersData,
+      })
+      dispatch({
+        type: 'dispense/updateState',
+        payload: { ordersData: undefined },
+      })
+    }
   }
-
   useEffect(() => {
     const { entity } = dispense
     const { invoice } = entity || {}

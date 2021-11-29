@@ -126,7 +126,6 @@ export default ({
         return
       }
     }
-
     if (row.isPreOrderActualize) return
     if (!row.isActive && row.type !== '5' && !row.isDrugMixture) return
 
@@ -160,6 +159,7 @@ export default ({
         type: 'orders/updateState',
         payload: {
           entity: row,
+          isPreOrderItemExists: false,
           type: row.type,
         },
       })
@@ -510,7 +510,6 @@ export default ({
       )
     return ''
   }
-
   return (
     <CommonTableGrid
       size='sm'
@@ -520,7 +519,9 @@ export default ({
         return {
           ...r,
           currentTotal:
-            !r.isPreOrder || r.isChargeToday ? r.totalAfterItemAdjustment : 0,
+            (!r.isPreOrder && !r.hasPaid) || r.isChargeToday
+              ? r.totalAfterItemAdjustment
+              : 0,
         }
       })}
       onRowDoubleClick={editRow}
@@ -806,7 +807,7 @@ export default ({
                   <div style={{ position: 'relative', top: 2 }}>
                     {drugMixtureIndicator(row, -20)}
                     {row.isPreOrder && (
-                      <Tooltip title='Pre-Order'>
+                      <Tooltip title='New Pre-Order'>
                         <div
                           className={classes.rightIcon}
                           style={{
@@ -819,12 +820,29 @@ export default ({
                         </div>
                       </Tooltip>
                     )}
+                    {row.actualizedPreOrderItemFK && (
+                      <Tooltip title='Actualized Pre-Order'>
+                        <div
+                          className={classes.rightIcon}
+                          style={{
+                            right: -5,
+                            borderRadius: 4,
+                            backgroundColor: 'green',
+                          }}
+                        >
+                          Pre
+                        </div>
+                      </Tooltip>
+                    )}
                     {row.isExclusive && (
                       <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                         <div
                           className={classes.rightIcon}
                           style={{
-                            right: row.isPreOrder ? -60 : -30,
+                            right:
+                              row.isPreOrder || row.actualizedPreOrderItemFK
+                                ? -60
+                                : -30,
                             borderRadius: 4,
                             backgroundColor: 'green',
                           }}

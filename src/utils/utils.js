@@ -1040,13 +1040,16 @@ const calculateAmount = (
   } = {},
 ) => {
   let gst = 0
-  rows.filter(o => !o.isDeleted && o.isPreOrder && o.isChargeToday).forEach(r => {
-    r[adjustedField] = r[totalField]
-    r[gstField] = r[adjustedField]
-    r[gstAmtField] = 0
-  }
+  rows
+    .filter(o => !o.isDeleted && o.isPreOrder && o.isChargeToday && !o.hasPaid)
+    .forEach(r => {
+      r[adjustedField] = r[totalField]
+      r[gstField] = r[adjustedField]
+      r[gstAmtField] = 0
+    })
+  const activeRows = rows.filter(
+    o => !o.isDeleted && (!o.isPreOrder || o.isChargeToday) && !o.hasPaid,
   )
-  const activeRows = rows.filter(o => !o.isDeleted && (!o.isPreOrder || o.isChargeToday))
   const activeAdjustments = adjustments.filter(o => !o.isDeleted)
 
   const total = roundTo(
@@ -1109,7 +1112,6 @@ const calculateAmount = (
   const totalAfterAdj = roundTo(
     activeRows.map(o => o[adjustedField]).reduce(sumReducer, 0),
   )
-
 
   if (gstValue) {
     if (isGSTInclusive) {

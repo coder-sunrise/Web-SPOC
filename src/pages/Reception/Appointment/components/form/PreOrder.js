@@ -54,7 +54,7 @@ const PreOrder = ({ values, deletePreOrderItem, disabled }) => {
           { name: 'orderByUser', title: 'Order By' },
           { name: 'orderDateDisplay', title: 'Order Date' },
           { name: 'remarks', title: 'Remarks' },
-          { name: 'amount', title: 'Amount' },
+          { name: 'amount', title: 'Total' },
           { name: 'hasPaid', title: 'Paid' },
           { name: 'action', title: 'Action' },
         ]}
@@ -79,15 +79,42 @@ const PreOrder = ({ values, deletePreOrderItem, disabled }) => {
               )
             },
           },
-          { columnName: 'displayQty', sortingEnabled: false, width: 120 },
+          {
+            columnName: 'displayQty',
+            type: 'number',
+            precision: 1,
+            sortingEnabled: false,
+            width: 120,
+            render: row => {
+              return (
+                <Tooltip
+                  title={
+                    <span>
+                      {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}{' '}
+                      {row.dispenseUOM}
+                    </span>
+                  }
+                >
+                  <span>
+                    {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}{' '}
+                    {row.dispenseUOM}
+                  </span>
+                </Tooltip>
+              )
+            },
+          },
           { columnName: 'orderByUser', sortingEnabled: false },
           { columnName: 'orderDateDisplay', sortingEnabled: false, width: 140 },
           { columnName: 'remarks', sortingEnabled: false },
           {
             columnName: 'amount',
-            sortingEnabled: false,
+            width: 100,
             type: 'currency',
-            width: 90,
+            sortingEnabled: false,
+            isDisabled: () => true,
+            render: row => {
+              return row.hasPaid === 'Yes' ? row.amount : '-'
+            },
           },
           { columnName: 'hasPaid', sortingEnabled: false, width: 50 },
           {
@@ -95,20 +122,20 @@ const PreOrder = ({ values, deletePreOrderItem, disabled }) => {
             width: 60,
             render: row => {
               return (
-                 actualizePreOrderAccessRight.rights ==='enable' && (
+                actualizePreOrderAccessRight.rights === 'enable' && (
                   <Button
-                  size='sm'
-                  justIcon
-                  color='danger'
-                  disabled={row.disabled}
-                  onClick={() => {
-                    if (deletePreOrderItem) {
-                      deletePreOrderItem(row.actualizedPreOrderItemFK)
-                    }
-                  }}
-                >
-                  <Delete />
-                </Button>
+                    size='sm'
+                    justIcon
+                    color='danger'
+                    disabled={row.disabled}
+                    onClick={() => {
+                      if (deletePreOrderItem) {
+                        deletePreOrderItem(row.actualizedPreOrderItemFK)
+                      }
+                    }}
+                  >
+                    <Delete />
+                  </Button>
                 )
               )
             },

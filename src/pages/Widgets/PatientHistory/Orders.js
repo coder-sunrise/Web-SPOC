@@ -84,7 +84,7 @@ export default ({ current, classes, showDrugLabelRemark }) => {
                     <div style={{ position: 'relative', top: 2 }}>
                       {drugMixtureIndicator(row, -20)}
                       {row.isPreOrder && (
-                        <Tooltip title='Pre-Order'>
+                        <Tooltip title='New Pre-Order'>
                           <div
                             className={classes.rightIcon}
                             style={{
@@ -262,7 +262,7 @@ export default ({ current, classes, showDrugLabelRemark }) => {
                 }}
               >
                 {`${currencySymbol}${numeral(
-                  row.isPreOrder && !row.isChargeToday
+                  (row.isPreOrder && !row.isChargeToday) || row.hasPaid
                     ? 0
                     : row.totalAfterItemAdjustment || 0,
                 ).format('0,0.00')}`}
