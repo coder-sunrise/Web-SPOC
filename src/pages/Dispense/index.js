@@ -40,7 +40,7 @@ import style from './style'
 class Dispense extends PureComponent {
   constructor(props) {
     super(props)
-    this.getCodeTables()
+    //this.getCodeTables()
   }
 
   componentWillUnmount() {

@@ -2240,10 +2240,6 @@ class Medication extends PureComponent {
                     let newMaxSeq = maxSeq
                       ? maxSeq.sequence + 1
                       : values.corPrescriptionItemPrecaution.length + 1
-                    console.log(
-                      'values.corPrescriptionItemPrecaution',
-                      values.corPrescriptionItemPrecaution,
-                    )
                     return activeRows.map((val, activeIndex) => {
                       if (val && val.isDeleted) return null
                       const i = values.corPrescriptionItemPrecaution.findIndex(

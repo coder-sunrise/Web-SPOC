@@ -468,7 +468,7 @@ class ImagePreviewer extends Component {
                     key={item}
                     size='small'
                     variant='outlined'
-                    label={folderEntity.displayValue}
+                    label={folderEntity?.displayValue}
                     color='primary'
                     disabled={!isEnableEditDocument}
                     onDelete={() => {

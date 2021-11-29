@@ -603,17 +603,9 @@ class Billing extends Component {
   }
 
   backToDispense = () => {
-    const refreshOrder = this.showRefreshOrder()
     const { dispatch, billing } = this.props
     dispatch({
       type: 'billing/backToDispense',
-    }).then(() => {
-      if (refreshOrder) {
-        dispatch({
-          type: 'dispense/refresh',
-          payload: billing.visitID,
-        })
-      }
     })
   }
 
