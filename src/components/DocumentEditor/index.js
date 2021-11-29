@@ -17,34 +17,44 @@ class DocumentEditor extends SampleBase {
   constructor() {
     super(...arguments)
     this.onLoadDefault = () => {
-      const { documentName, document } = this.props
-      this.container.documentEditor.documentName = documentName
+      const { documentName, document, enableTitleBar } = this.props
       this.container.documentEditor.open(document)
+      this.container.documentEditor.documentName = documentName
+      if (enableTitleBar) {
+        this.titleBar.updateDocumentTitle()
+      }
     }
   }
+
   rendereComplete() {
+    const { enableTitleBar } = this.props
     this.container.serviceUrl = this.hostUrl + 'api/documenteditor/'
     this.container.documentEditor.pageOutline = '#E0E0E0'
     this.container.documentEditor.acceptTab = true
     this.container.documentEditor.resize()
-    this.titleBar = new TitleBar(
-      document.getElementById('documenteditor_titlebar'),
-      this.container.documentEditor,
-      true,
-    )
+    if (enableTitleBar) {
+      this.titleBar = new TitleBar(
+        document.getElementById('documenteditor_titlebar'),
+        this.container.documentEditor,
+        true,
+      )
+    }
     this.onLoadDefault()
   }
-  
+
   render() {
+    const { enableTitleBar } = this.props
     return (
       <GridContainer>
         <GridItem md={12}>
           <div className='control-pane'>
             <div className='control-section'>
-              <div
-                id='documenteditor_titlebar'
-                className='e-de-ctn-title'
-              ></div>
+              {enableTitleBar && (
+                <div
+                  id='documenteditor_titlebar'
+                  className='e-de-ctn-title'
+                ></div>
+              )}
               <div id='documenteditor_container_body'>
                 <DocumentEditorContainerComponent
                   id='container'
@@ -53,7 +63,6 @@ class DocumentEditor extends SampleBase {
                   }}
                   locale='en-US'
                   {...this.props}
-
                 />
               </div>
             </div>

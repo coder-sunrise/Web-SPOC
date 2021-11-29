@@ -5,28 +5,72 @@ import { DocumentEditor, CommonModal, Button } from '@/components'
 import AddPhotoAlternateIcon from '@material-ui/icons/AddPhotoAlternate'
 import HideImageIcon from '@material-ui/icons/Image'
 import DownloadIcon from '@material-ui/icons/CloudDownload'
+import Print from '@material-ui/icons/Print'
 import Signature from '../Signature'
 
 const base64Prefix = 'data:image/jpeg;base64,'
-// @connect(({ user }) => ({
-//   currentUser: user?.data?.clinicianProfile?.name,
-// }))
+
 class CommonConsentForm extends PureComponent {
+  switchMode = () => {
+    let isSigningMode = !this.state.isSigningMode
+    this.DEContainer.documentEditor.editor.enforceProtection(
+      '',
+      isSigningMode ? 'ReadOnly' : 'FormFieldsOnly',
+    )
+    this.setState({ isSigningMode })
+  }
 
   addSignature = () => {
     this.setState({ showSignature: true })
   }
-  deleteSignature = () => {}
+
+  selectionChange = e => {
+    const selection = e.source.documentEditor.selection
+    this.setState({
+      isImageSelected: selection.isImageSelected,
+      isSelectionInEditRegion: selection.isSelectionInEditRegion(),
+    })
+  }
+
+  deleteSignature = () => {
+    if (this.state.isImageSelected) {
+      this.DEContainer.documentEditor.selection.isImageSelected = false
+      this.DEContainer.documentEditor.editor.deleteEditElement(
+        this.DEContainer.documentEditor.selection,
+      )
+    }
+    this.setState({ isImageSelected: false })
+  }
 
   updateSignature = ({ thumbnail }) => {
     const imageString =
       thumbnail && thumbnail.trim() != ''
         ? `${base64Prefix}${thumbnail}`
         : thumbnail
-    this.DEContainer.documentEditor.editor.insertImage(imageString, 200, 100)
-    // this.setState({
-    //   showSignature: false,
-    // })
+    this.DEContainer.documentEditor.editor.insertImage(imageString, 200, 50)
+  }
+
+  closeSignature = () => {
+    this.setState({ showSignature: false })
+  }
+
+  showHideHighligth(isShow) {
+    const selection = this.DEContainer.documentEditor.editor.selection
+    const formFieldSettings = this.DEContainer.documentEditorSettings.formFieldSettings
+    formFieldSettings.applyShading = isShow
+    selection.isHighlightEditRegion = isShow
+  }
+
+  download = () => {
+    this.showHideHighligth(false)
+    this.DEContainer.documentEditor.save(this.props.values.formName, 'Docx')
+    this.showHideHighligth(true)
+  }
+
+  print = () => {
+    this.showHideHighligth(false)
+    this.DEContainer.documentEditor.print()
+    this.showHideHighligth(true)
   }
 
   contentChange = () => {
@@ -37,10 +81,8 @@ class CommonConsentForm extends PureComponent {
   }
 
   fillFormFields = () => {
-    const {
-      values: { fillData },
-    } = this.props
-    if (fillData && this.DEContainer) {
+    const fillData = this.props.values.fillData
+    if (fillData) {
       const formFieldData = this.DEContainer.documentEditor.exportFormData()
       Object.entries(fillData).forEach(p => {
         formFieldData.forEach(f => {
@@ -59,75 +101,60 @@ class CommonConsentForm extends PureComponent {
   }
 
   documentChange = () => {
-    this.fillFormFields()
     if (!this.DEContainer) return
-    this.DEContainer.restrictEditing = false
-    this.DEContainer.documentEditor.editor.enforceProtection(
-      '',
-      'FormFieldsOnly',
-    )
+    this.fillFormFields()
+    this.DEContainer.documentEditor.editor.enforceProtection('','FormFieldsOnly')
     this.DEContainer.documentEditor.showRestrictEditingPane(false)
-    // this.DEContainer.documentEditor.enableCursorOnReadOnly = true
-    this.DEContainer.showPropertiesPane = false
     this.DEContainer.showHidePropertiesPane(false)
-    // this.DEContainer.enableToolbar = false
-    // this.container.documentEditor.isReadOnly = true
   }
 
   state = {}
 
   render() {
-    const { showSignature, isSignatureMode } = this.state
     const {
-      values: { formName, formData },
+      showSignature,
+      isSigningMode,
+      isImageSelected,
+      isSelectionInEditRegion,
+    } = this.state
+    const {
+      values: { statusFK, formName, formData },
       height,
     } = this.props
-
+    const disableEdit = statusFK === 4 //Finalize
     return (
       <div>
-        <div style={{float:'right'}}>
+        <div style={{ float: 'right', margin: '-15px 0 5px 0' }}>
           <Button
+            disabled={disableEdit}
             color='primary'
-            onClick={() => {
-              this.DEContainer.documentEditor.editor.enforceProtection(
-                '',
-                !isSignatureMode ? 'ReadOnly' : 'FormFieldsOnly',
-              )
-              this.setState({ isSignatureMode: !isSignatureMode })
-            }}
+            onClick={this.switchMode}
           >
-            {isSignatureMode ? 'Signature' : 'FillingField'}
+            {isSigningMode ? 'Switch to Edit Mode' : 'Switch to Signing Mode'}
+          </Button>
+          <Button
+            disabled={disableEdit || !isSigningMode || !isSelectionInEditRegion}
+            size='sm'
+            color='primary'
+            icon
+            onClick={this.addSignature}
+          >
+            <AddPhotoAlternateIcon /> Add Signature
           </Button>
           <Button
             size='sm'
             color='primary'
+            disabled={disableEdit || !isSigningMode || !isImageSelected}
             icon
-            onClick={() => {
-              this.DEContainer.documentEditor.export()
-            }}
+            onClick={this.deleteSignature}
           >
+            <HideImageIcon /> Delete Signature
+          </Button>
+          <Button size='sm' color='primary' icon onClick={this.download}>
             <DownloadIcon /> Download
           </Button>
-          <Button
-            color='primary'
-            onClick={() => {
-              const selection = this.DEContainer.documentEditor.editor.selection
-              const formFieldSettings = this.DEContainer.documentEditorSettings
-                .formFieldSettings
-              formFieldSettings.applyShading = false
-              selection.isHighlightEditRegion = false
-              this.DEContainer.documentEditor.print()
-              formFieldSettings.applyShading = true
-              selection.isHighlightEditRegion = true
-            }}
-          >
-            Print
-          </Button>
-          <Button size='sm' color='primary' icon onClick={this.addSignature}>
-            <AddPhotoAlternateIcon /> Signature
-          </Button>
-          <Button size='sm' color='primary' icon onClick={this.deleteSignature}>
-            <HideImageIcon /> Delete Signature
+          <Button size='sm' color='primary' icon onClick={this.print}>
+            <Print /> Print
           </Button>
         </div>
         <DocumentEditor
@@ -139,8 +166,9 @@ class CommonConsentForm extends PureComponent {
           enableToolbar={false}
           restrictEditing={false}
           // userColor={'#FFFF00'}
-          contentChange={() => this.contentChange()}
-          documentChange={() => this.documentChange()}
+          contentChange={this.contentChange}
+          documentChange={this.documentChange}
+          selectionChange={this.selectionChange}
           // documentEditorSettings={{
           //   searchHighlightColor: '#FFE97F',
           //   formFieldSettings: {
@@ -156,9 +184,7 @@ class CommonConsentForm extends PureComponent {
           open={showSignature}
           title='Signature'
           observe='Signature'
-          onClose={() => {
-            this.setState({ showSignature: false })
-          }}
+          onClose={this.closeSignature}
         >
           {showSignature && (
             <Signature updateSignature={this.updateSignature} />
