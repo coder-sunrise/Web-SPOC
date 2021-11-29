@@ -1,11 +1,12 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { Form, Button, Card } from 'antd'
+import { StatusButtons } from './StatusButtons'
+import { formatMessage } from 'umi'
 import InfoCircleOutlined from '@ant-design/icons/InfoCircleOutlined'
 import { CLINICAL_ROLE } from '@/utils/constants'
 import moment from 'moment'
 import Search from '@material-ui/icons/Search'
 import { useDispatch, useSelector } from 'dva'
-import { VISIT_TYPE } from '@/utils/constants'
 import {
   TextField,
   DatePicker,
@@ -18,11 +19,10 @@ import {
   Popover,
 } from '@/components'
 import WorklistContext from '../WorklistContext'
-import { formatMessage } from 'umi'
 
 export const WorklistFilter = () => {
   const [form] = Form.useForm()
-  const { isAnyModelOpened, visitPurpose = [] } = useContext(WorklistContext)
+  const { isAnyModelOpened, getVisitTypes } = useContext(WorklistContext)
   const [refreshDate, setRefreshDate] = useState(moment())
   const dispatch = useDispatch()
 
@@ -56,17 +56,6 @@ export const WorklistFilter = () => {
     return () => clearInterval(timer.current)
   }, [isAnyModelOpened])
 
-  const getVisitTypes = () => {
-    if (!visitPurpose) return []
-    return visitPurpose
-      .filter(p => p.id !== VISIT_TYPE.OTC)
-      .map(c => ({
-        name: c.name,
-        value: c.id,
-        customTooltipField: `Code: ${c.code}\nName: ${c.name}`,
-      }))
-  }
-
   const handleSearch = () => {
     const {
       searchValue,
@@ -74,7 +63,6 @@ export const WorklistFilter = () => {
       modality,
       dateFrom,
       dateTo,
-      isUrgent,
       isMyPatientOnly,
     } = form.getFieldsValue(true)
 
@@ -93,7 +81,7 @@ export const WorklistFilter = () => {
           filterTo: moment(dateTo)
             .endOf('day')
             .formatUTC(false),
-          isUrgent: isUrgent,
+
           clinicianProfileId: isMyPatientOnly ? clinicianProfile.id : undefined,
         },
       },
@@ -107,81 +95,90 @@ export const WorklistFilter = () => {
   return (
     <Card>
       <Form form={form} layout='inline' initialValues={{}}>
-        <Form.Item name='searchValue'>
-          <TextField
-            label={formatMessage({ id: 'radiology.search.general' })}
-            style={{ width: 350 }}
-          />
-        </Form.Item>
-        <Form.Item name='visitType' initialValue={[-99]}>
-          <Select
-            label='Visit Type'
-            options={getVisitTypes()}
-            style={{ width: 170 }}
-            mode='multiple'
-            maxTagCount={0}
-            maxTagPlaceholder='Visit Types'
-          />
-        </Form.Item>
-        <Form.Item name='modality' initialValue={[-99]}>
-          <CodeSelect
-            mode='multiple'
-            style={{ width: 165 }}
-            label='Modality'
-            code='ctmodality'
-            maxTagPlaceholder='Modalities'
-          />
-        </Form.Item>
-        <Form.Item
-          name='dateFrom'
-          initialValue={moment(moment().toDate()).formatUTC()}
-        >
-          <DatePicker
-            style={{ width: 100 }}
-            label={formatMessage({ id: 'radiology.search.dateFrom' })}
-          />
-        </Form.Item>
-        <Form.Item
-          noStyle
-          name='dateTo'
-          initialValue={moment()
-            .endOf('day')
-            .formatUTC(false)}
-        >
-          <DatePicker
-            bordered={true}
-            label={formatMessage({ id: 'radiology.search.dateTo' })}
-            style={{ width: 100 }}
-          />
-        </Form.Item>
-
-        <Form.Item name='isUrgent' style={{ alignSelf: 'flex-end' }}>
-          <Checkbox
-            style={{ width: 65 }}
-            label={formatMessage({ id: 'radiology.search.urgentOnly' })}
-          />
-        </Form.Item>
-        {clinicianProfile.userProfile?.role?.clinicRoleFK ===
-          CLINICAL_ROLE.RADIOGRAPHER && (
-          <Form.Item name='isMyPatientOnly' style={{ alignSelf: 'flex-end' }}>
-            <Checkbox
-              style={{ width: 95 }}
-              label={formatMessage({ id: 'radiology.search.myPatientOnly' })}
+        <div style={{ display: 'flex', width: '100%' }}>
+          <Form.Item name='searchValue'>
+            <TextField
+              label={formatMessage({ id: 'radiology.search.general' })}
+              style={{ width: 350 }}
             />
           </Form.Item>
-        )}
-        <Form.Item style={{ alignSelf: 'flex-end' }}>
-          <ProgressButton
-            variant='contained'
-            color='primary'
-            icon={<Search />}
-            onClick={() => {
-              handleSearch()
-            }}
+          <Form.Item name='visitDoctor' initialValue={[-99]}>
+            <Select
+              label='Visit Doctor'
+              options={getVisitTypes().map(item => ({
+                value: item.id,
+                ...item,
+              }))}
+              style={{ width: 170 }}
+              mode='multiple'
+              maxTagCount={0}
+              maxTagPlaceholder='Visit Doctor'
+            />
+          </Form.Item>
+          <Form.Item name='priority' initialValue={[-99]}>
+            <Select
+              label='Priority'
+              options={getVisitTypes().map(item => ({
+                value: item.id,
+                ...item,
+              }))}
+              style={{ width: 170 }}
+              mode='multiple'
+              maxTagCount={0}
+              maxTagPlaceholder='Priority'
+            />
+          </Form.Item>
+          <Form.Item name='visitType' initialValue={[-99]}>
+            <Select
+              label='Visit Type'
+              options={getVisitTypes().map(item => ({
+                value: item.id,
+                ...item,
+              }))}
+              style={{ width: 170 }}
+              mode='multiple'
+              maxTagCount={0}
+              maxTagPlaceholder='Visit Types'
+            />
+          </Form.Item>
+
+          <Form.Item
+            name='dateFrom'
+            initialValue={moment(moment().toDate()).formatUTC()}
           >
-            {formatMessage({ id: 'form.search' })}
-          </ProgressButton>
-        </Form.Item>
+            <DatePicker
+              style={{ width: 100 }}
+              label={formatMessage({ id: 'radiology.search.dateFrom' })}
+            />
+          </Form.Item>
+          <Form.Item
+            name='dateTo'
+            initialValue={moment()
+              .endOf('day')
+              .formatUTC(false)}
+          >
+            <DatePicker
+              bordered={true}
+              label={formatMessage({ id: 'radiology.search.dateTo' })}
+              style={{ width: 100 }}
+            />
+          </Form.Item>
+
+          <Form.Item style={{ alignSelf: 'center' }}>
+            <ProgressButton
+              variant='contained'
+              color='primary'
+              icon={<Search />}
+              size='small'
+              onClick={() => {
+                handleSearch()
+              }}
+            >
+              {formatMessage({ id: 'form.search' })}
+            </ProgressButton>
+          </Form.Item>
+        </div>
+        {/* <Form.Item> <StatusButtons /> </Form.Item>*/}
       </Form>
     </Card>
   )

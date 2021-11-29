@@ -90,7 +90,7 @@ const testPanelSchema = Yup.object().shape({
   mapPropsToValues: ({ settingClinicService }) => {
     const {
       serviceCenterList: allServiceCenters,
-      entity,
+      entity = {},
     } = settingClinicService
     const { ctServiceCenter_ServiceNavigation: currentServiceCenters } = entity
 
