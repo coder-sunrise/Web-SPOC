@@ -9,6 +9,7 @@ import Authorized from '@/utils/Authorized'
 import { TextField, DatePicker, CodeSelect } from '@/components'
 import { useState, useRef } from 'react'
 import { ActionType } from '@ant-design/pro-table'
+import { Tooltip } from '@material-ui/core'
 const { queryList, upsert, query, remove } = patientService
 const api = {
   remove,
@@ -148,15 +149,17 @@ const defaultColumns = [
     dataIndex: 'copayer',
     renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
       return (
-        <CodeSelect
-          style={{ width: 150 }}
-          label={formatMessage({
-            id: 'finance.scheme.search.cpname',
-          })}
-          mode='multiple'
-          code='ctCopayer'
-          labelField='displayValue'
-        />
+        <Tooltip title='Select “All” will retrieve active and inactive co-payers'>
+          <CodeSelect
+            style={{ width: 150 }}
+            label={formatMessage({
+              id: 'finance.scheme.search.cpname',
+            })}
+            mode='multiple'
+            code='ctCopayer'
+            labelField='displayValue'
+          />
+        </Tooltip>
       )
     },
   },
