@@ -26,7 +26,7 @@ import { calculateAgeFromDOB } from '@/utils/dateUtils'
         ...forms.entity,
       }
     } else {
-      const { formName, templateContent, defaultConsentForm } = forms
+      const { formName, templateContent, defaultConsentForm, formTemplateFK } = forms
       const fillData = {
         patientName: patient.name,
         patientGender: patient.genderFK === 1 ? 'Female' : patient.genderFK === 2 ? 'Male' : 'Unknown' ,
@@ -40,6 +40,7 @@ import { calculateAgeFromDOB } from '@/utils/dateUtils'
         formName: formName,
         formData: templateContent,
         fillData,
+        formTemplateFK: formTemplateFK,
       }
     }
     return values
@@ -131,7 +132,7 @@ class ConsentForm extends PureComponent {
           }}
         >
           <Button color='danger' icon={null} onClick={this.cancelConsentForm}>
-            cancel
+            Cancel
           </Button>
           {statusFK === 1 && (
             <ProgressButton
@@ -141,24 +142,24 @@ class ConsentForm extends PureComponent {
                 this.onSubmitButtonClicked('save')
               }}
             >
-              save
+              Save
             </ProgressButton>
           )}
           {statusFK === 1 && (
             <Authorized authority='forms.finalize'>
               <ProgressButton
-                color='primary'
+                color='success'
                 icon={null}
                 onClick={() => {
                   this.onSubmitButtonClicked('finalize')
                 }}
               >
-                finalize
+                Finalize
               </ProgressButton>
             </Authorized>
           )}
 
-          {(statusFK === 1 || statusFK === 2) && (
+          {/* {(statusFK === 1 || statusFK === 2) && (
             <Authorized authority='forms.submit'>
               <ProgressButton
                 color='success'
@@ -170,7 +171,7 @@ class ConsentForm extends PureComponent {
                 submit
               </ProgressButton>
             </Authorized>
-          )}
+          )} */}
         </GridContainer>
       </div>
     )

@@ -47,7 +47,7 @@ class CommonConsentForm extends PureComponent {
       thumbnail && thumbnail.trim() != ''
         ? `${base64Prefix}${thumbnail}`
         : thumbnail
-    this.DEContainer.documentEditor.editor.insertImage(imageString, 200, 50)
+    this.DEContainer.documentEditor.editor.insertImage(imageString, 120, 60)
   }
 
   closeSignature = () => {
@@ -103,7 +103,7 @@ class CommonConsentForm extends PureComponent {
   documentChange = () => {
     if (!this.DEContainer) return
     this.fillFormFields()
-    this.DEContainer.documentEditor.editor.enforceProtection('','FormFieldsOnly')
+    this.DEContainer.documentEditor.editor.enforceProtection('', this.props.values.statusFK === 2 ? 'ReadOnly' : 'FormFieldsOnly')
     this.DEContainer.documentEditor.showRestrictEditingPane(false)
     this.DEContainer.showHidePropertiesPane(false)
   }
@@ -121,7 +121,7 @@ class CommonConsentForm extends PureComponent {
       values: { statusFK, formName, formData },
       height,
     } = this.props
-    const disableEdit = statusFK === 4 //Finalize
+    const disableEdit = statusFK === 2 //Finalize
     return (
       <div>
         <div style={{ float: 'right', margin: '-15px 0 5px 0' }}>
@@ -164,7 +164,7 @@ class CommonConsentForm extends PureComponent {
           height={'60vh'}
           showPropertiesPane={false}
           enableToolbar={false}
-          restrictEditing={false}
+          restrictEditing={disableEdit}
           // userColor={'#FFFF00'}
           contentChange={this.contentChange}
           documentChange={this.documentChange}

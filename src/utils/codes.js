@@ -1610,6 +1610,17 @@ const formTypes = [
       },
     },
   },
+  {
+    value: '2',
+    name: 'Consent Form',
+    prop: 'corConsentForm',
+    downloadConfig: {
+      id: 0,
+      key: 'ConsentFormId',
+      subject: 'Consent Form',
+      draft: row => {},
+    },
+  },
 ]
 
 const formStatus = [

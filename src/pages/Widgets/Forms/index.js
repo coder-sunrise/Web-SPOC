@@ -4,7 +4,6 @@ import moment from 'moment'
 import { primaryColor } from 'mui-pro-jss'
 import color from 'color'
 import withStyles from '@material-ui/core/styles/withStyles'
-import { Tooltip } from '@material-ui/core'
 import { Delete, Edit, Print, Add } from '@material-ui/icons'
 import { formTypes, formStatus } from '@/utils/codes'
 import { download } from '@/utils/request'
@@ -24,6 +23,7 @@ import {
   Danger,
   Popover,
   Checkbox,
+  Tooltip,
 } from '@/components'
 import AddForm from './AddForm'
 import { FORM_CATEGORY } from '@/utils/constants'
@@ -60,6 +60,7 @@ const styles = (theme) => ({
   popoverContainer: {
     width: 200,
     textAlign: 'left',
+    marginTop: -10,
   },
   listContainer: {
     maxHeight: 300,
@@ -251,7 +252,7 @@ class Forms extends PureComponent {
     
   ListItem = ({ classes, title, onClick }) => {
     return (
-      <Tooltip title={title} style={{ pidding: 0 }}>
+      <Tooltip title={title}>
         <div className={classes.item} onClick={onClick}>
           <span>{title}</span>
         </div>
@@ -459,7 +460,7 @@ class Forms extends PureComponent {
         <AuthorizedContext>
           {(r) => {
             if (r && r.rights !== 'enable') return null
-            let unionFormTypes = formTypes.concat(formTemplates)
+            let unionFormTypes = formTemplates//formTypes.concat(formTemplates)
             unionFormTypes = this.state.filterFormTemplate
               ? unionFormTypes.filter(
                   x =>
@@ -488,7 +489,7 @@ class Forms extends PureComponent {
                       {unionFormTypes.slice(0,6).map((item) => {
                         return (
                           <this.ListItem
-                            key={item.value}
+                            key={item.formTemplateFK}
                             title={item.name}
                             classes={classes}
                             onClick={() => {
@@ -501,6 +502,7 @@ class Forms extends PureComponent {
                                   formCategory: FORM_CATEGORY.CORFORM,
                                   formName: item.name,
                                   templateContent: item.templateContent,
+                                  formTemplateFK: item.formTemplateFK,
                                 },
                               })
                               this.toggleVisibleChange()

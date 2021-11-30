@@ -3,7 +3,6 @@ import { primaryColor } from 'mui-pro-jss'
 import moment from 'moment'
 import color from 'color'
 import withStyles from '@material-ui/core/styles/withStyles'
-import { Tooltip } from '@material-ui/core'
 import { Delete, Edit, Print, Add } from '@material-ui/icons'
 import { FORM_CATEGORY } from '@/utils/constants'
 import { formTypes, formStatus } from '@/utils/codes'
@@ -16,6 +15,7 @@ import {
   Danger,
   Popover,
   Checkbox,
+  Tooltip,
 } from '@/components'
 import VoidWithPopover from './FormDetail/VoidWithPopover'
 
@@ -50,6 +50,7 @@ const styles = (theme) => ({
   popoverContainer: {
     width: 200,
     textAlign: 'left',
+    marginTop: -10,
   },
   listContainer: {
     maxHeight: 300,
@@ -98,7 +99,7 @@ class VisitFormGrid extends PureComponent {
 
   ListItem = ({ classes, title, onClick }) => {
     return (
-      <Tooltip title={title} style={{ pidding: 0 }}>
+      <Tooltip title={title}>
         <div className={classes.item} onClick={onClick}>
           <span>{title}</span>
         </div>
@@ -380,7 +381,7 @@ class VisitFormGrid extends PureComponent {
         <AuthorizedContext>
           {r => {
             if ((r && r.rights !== 'enable') || !isCanEditForms) return null
-            let unionFormTypes = formTypes.concat(formTemplates)
+            let unionFormTypes = formTemplates//formTypes.concat(formTemplates)
             unionFormTypes = this.state.filterFormTemplate
               ? unionFormTypes.filter(
                   x =>
@@ -409,7 +410,7 @@ class VisitFormGrid extends PureComponent {
                       {unionFormTypes.slice(0, 6).map(item => {
                         return (
                           <this.ListItem
-                            key={item.value}
+                            key={item.formTemplateFK}
                             title={item.name}
                             classes={classes}
                             onClick={() => {
@@ -422,6 +423,7 @@ class VisitFormGrid extends PureComponent {
                                   formCategory: this.props.formCategory,
                                   formName: item.name,
                                   templateContent: item.templateContent,
+                                  formTemplateFK: item.formTemplateFK,
                                 },
                               })
                               this.toggleVisibleChange()

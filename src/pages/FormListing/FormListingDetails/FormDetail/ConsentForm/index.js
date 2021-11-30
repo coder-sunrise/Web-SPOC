@@ -47,6 +47,7 @@ import Authorized from '@/utils/Authorized'
         formName: formListing.formName,
         formData: formListing.templateContent,
         fillData,
+        formTemplateFK: formListing.formTemplateFK,
       }
     }
     return values
@@ -210,7 +211,7 @@ class ConsentForm extends PureComponent {
           {formCategory === FORM_CATEGORY.CORFORM && statusFK === 1 && (
             <Authorized authority='forms.finalize'>
               <ProgressButton
-                color='primary'
+                color='success'
                 icon={null}
                 onClick={() => {
                   this.onSubmitButtonClicked('finalize')
