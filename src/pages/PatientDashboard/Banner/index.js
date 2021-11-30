@@ -1366,7 +1366,7 @@ class Banner extends PureComponent {
           </GridItem>
 
           <GridItem xs={3} md={12 - this.getBannerMd()}>
-            {extraCmt}
+            {extraCmt()}
           </GridItem>
         </GridContainer>
 
