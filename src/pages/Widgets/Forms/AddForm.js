@@ -5,7 +5,7 @@ import _ from 'lodash'
 
 import { SizeContainer } from '@/components'
 import LCForm from './LCForm'
-import ConsentForm from './ConsentForm'
+import Form from './Form'
 
 const styles = (theme) => ({
   editor: {
@@ -56,7 +56,7 @@ class AddForm extends PureComponent {
         }}
       >
         {type === '1' && <LCForm {...cfg} />}
-        {type === '2' && <ConsentForm {...cfg} />}
+        {type === '2' && <Form {...cfg} />}
       </div>
     )
   }

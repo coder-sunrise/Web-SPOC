@@ -11,7 +11,7 @@ import {
   ProgressButton,
   notification,
 } from '@/components'
-import CommonConsentForm from '@/components/_medisys/Forms/CommonConsentForm/index'
+import CommonForm from '@/components/_medisys/Forms/CommonForm/index'
 import Authorized from '@/utils/Authorized'
 
 @connect(({ formListing }) => ({
@@ -43,7 +43,7 @@ import Authorized from '@/utils/Authorized'
         todayDate: moment(todayDate).format('DD MMM YYYY'),
       }
       values = {
-        ...formListing.defaultConsentForm,
+        ...formListing.defaultForm,
         formName: formListing.formName,
         formData: formListing.templateContent,
         fillData,
@@ -57,9 +57,9 @@ import Authorized from '@/utils/Authorized'
   //     formData: Yup.object().shape({}),
   //   })
   // },
-  displayName: 'ConsentForm',
+  displayName: 'Form',
 })
-class ConsentForm extends PureComponent {
+class Form extends PureComponent {
   onSubmitButtonClicked = async action => {
     const {
       dispatch,
@@ -174,7 +174,7 @@ class ConsentForm extends PureComponent {
     }
   }
 
-  cancelConsentForm = () => {
+  cancelForm = () => {
     if (this.props.onClose) {
       this.props.onClose()
     }
@@ -185,7 +185,7 @@ class ConsentForm extends PureComponent {
     const { statusFK } = values
     return (
       <div>
-        <CommonConsentForm {...this.props} />
+        <CommonForm {...this.props} />
         <GridContainer
           style={{
             marginTop: 20,
@@ -194,7 +194,7 @@ class ConsentForm extends PureComponent {
             justifyContent: 'flex-end',
           }}
         >
-          <Button color='danger' icon={null} onClick={this.cancelConsentForm}>
+          <Button color='danger' icon={null} onClick={this.cancelForm}>
             Cancel
           </Button>
           {formCategory === FORM_CATEGORY.VISITFORM && (
@@ -241,4 +241,4 @@ class ConsentForm extends PureComponent {
     )
   }
 }
-export default ConsentForm
+export default Form

@@ -1612,12 +1612,12 @@ const formTypes = [
   },
   {
     value: '2',
-    name: 'Consent Form',
-    prop: 'corConsentForm',
+    name: 'From',
+    prop: 'corForm',
     downloadConfig: {
       id: 0,
-      key: 'ConsentFormId',
-      subject: 'Consent Form',
+      key: 'FormId',
+      subject: 'From',
       draft: row => {},
     },
   },

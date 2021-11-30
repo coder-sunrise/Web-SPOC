@@ -32,11 +32,11 @@ export default createFormViewModel({
           otherDiagnosis: [],
         },
       },
-      defaultConsentForm: {
+      defaultForm: {
         type: '2',
-        typeName: 'Consent Form',
+        typeName: 'From',
         statusFK: 1,
-        formName: 'Consent Form',
+        formName: 'From',
         formData: { content: null, signature: [] },
       },
       default: {},

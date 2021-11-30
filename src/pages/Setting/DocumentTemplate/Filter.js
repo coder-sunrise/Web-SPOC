@@ -136,7 +136,7 @@ class Filter extends PureComponent {
                           displayValue: codeDisplayValue,
                           documentTemplateTypeFK,
                           documentCategoryFK,
-                          combineCondition: 'or',
+                          combineCondition: 'and',
                         },
                       ],
                     },

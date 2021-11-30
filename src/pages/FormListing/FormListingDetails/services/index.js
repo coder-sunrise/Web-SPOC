@@ -3,7 +3,7 @@ import request from '@/utils/request'
 
 const url = '/api/Forms'
 const lcformurl = '/api/LCForm'
-const consentformurl = '/api/ConsentForm'
+const formurl = '/api/Form'
 
 const queryList = params => service.queryList(url, params)
 const getCORForms = async params => {
@@ -23,7 +23,7 @@ const getVisitForms = async params => {
 
 const saveVisitForm = async (type, visitId, params) => {
   const r = await request(
-    `${type === '1' ? lcformurl : consentformurl}/VisitForm/${visitId}`,
+    `${type === '1' ? lcformurl : formurl}/VisitForm/${visitId}`,
     {
       method: 'PUT',
       body: params,
@@ -32,14 +32,14 @@ const saveVisitForm = async (type, visitId, params) => {
   return r
 }
 const saveCORForm = async (type, visitId, params) => {
-  const r = await request(`${type === '1' ? lcformurl : consentformurl}/CORForm/${visitId}`, {
+  const r = await request(`${type === '1' ? lcformurl : formurl}/CORForm/${visitId}`, {
     method: 'PUT',
     body: params,
   })
   return r
 }
 const queryCORForm = async (type, params) => {
-  const r = await request(`${type === '1' ? lcformurl : consentformurl}/CORForm/${params.id}`, {
+  const r = await request(`${type === '1' ? lcformurl : formurl}/CORForm/${params.id}`, {
     method: 'GET',
     // body: params,
   })
@@ -47,7 +47,7 @@ const queryCORForm = async (type, params) => {
 }
 
 const queryVisitForm = async (type, params) => {
-  const r = await request(`${type === '1' ? lcformurl : consentformurl}/VisitForm/${params.id}`, {
+  const r = await request(`${type === '1' ? lcformurl : formurl}/VisitForm/${params.id}`, {
     method: 'GET',
     // body: params,
   })

@@ -10,7 +10,7 @@ import Signature from '../Signature'
 
 const base64Prefix = 'data:image/jpeg;base64,'
 
-class CommonConsentForm extends PureComponent {
+class CommonForm extends PureComponent {
   switchMode = () => {
     let isSigningMode = !this.state.isSigningMode
     this.DEContainer.documentEditor.editor.enforceProtection(
@@ -194,4 +194,4 @@ class CommonConsentForm extends PureComponent {
     )
   }
 }
-export default CommonConsentForm
+export default CommonForm

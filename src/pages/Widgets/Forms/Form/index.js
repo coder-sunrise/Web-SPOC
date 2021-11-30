@@ -10,7 +10,7 @@ import {
   ProgressButton,
   notification,
 } from '@/components'
-import CommonConsentForm from '@/components/_medisys/Forms/CommonConsentForm/index'
+import CommonForm from '@/components/_medisys/Forms/CommonForm/index'
 import Authorized from '@/utils/Authorized'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 
@@ -26,7 +26,7 @@ import { calculateAgeFromDOB } from '@/utils/dateUtils'
         ...forms.entity,
       }
     } else {
-      const { formName, templateContent, defaultConsentForm, formTemplateFK } = forms
+      const { formName, templateContent, defaultForm, formTemplateFK } = forms
       const fillData = {
         patientName: patient.name,
         patientGender: patient.genderFK === 1 ? 'Female' : patient.genderFK === 2 ? 'Male' : 'Unknown' ,
@@ -36,7 +36,7 @@ import { calculateAgeFromDOB } from '@/utils/dateUtils'
         todayDate: moment().format('DD MMM YYYY'),
       }
       values = {
-        ...defaultConsentForm,
+        ...defaultForm,
         formName: formName,
         formData: templateContent,
         fillData,
@@ -48,9 +48,9 @@ import { calculateAgeFromDOB } from '@/utils/dateUtils'
   // validationSchema: Yup.object().shape({
   //   formData: Yup.object().shape({}),
   // }),
-  displayName: 'ConsentForm',
+  displayName: 'Form',
 })
-class ConsentForm extends PureComponent {
+class Form extends PureComponent {
   onSubmitButtonClicked = async action => {
     const {
       dispatch,
@@ -109,7 +109,7 @@ class ConsentForm extends PureComponent {
     }
   }
 
-  cancelConsentForm = () => {
+  cancelForm = () => {
     if (this.props.onClose) {
       this.props.onClose()
     }
@@ -120,7 +120,7 @@ class ConsentForm extends PureComponent {
     const { statusFK } = values
     return (
       <div>
-        <CommonConsentForm
+        <CommonForm
           {...this.props}
         />
         <GridContainer
@@ -131,7 +131,7 @@ class ConsentForm extends PureComponent {
             justifyContent: 'flex-end',
           }}
         >
-          <Button color='danger' icon={null} onClick={this.cancelConsentForm}>
+          <Button color='danger' icon={null} onClick={this.cancelForm}>
             Cancel
           </Button>
           {statusFK === 1 && (
@@ -177,4 +177,4 @@ class ConsentForm extends PureComponent {
     )
   }
 }
-export default ConsentForm
+export default Form

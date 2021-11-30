@@ -12,8 +12,8 @@ const formTypes = [
   },
   {
     value: '2',
-    name: 'Consent Form',
-    prop: 'corConsentForm',
+    name: 'From',
+    prop: 'corForm',
   },
 ]
 
@@ -25,8 +25,8 @@ const visitFormTypes = [
   },
   {
     value: '2',
-    name: 'Consent Form',
-    prop: 'visitConsentForm',
+    name: 'From',
+    prop: 'visitForm',
   },
 ]
 
@@ -60,11 +60,11 @@ export default createListViewModel({
           otherDiagnosis: [],
         },
       },
-      defaultConsentForm: {
+      defaultForm: {
         type: '2',
-        typeName: 'Consent Form',
+        typeName: 'From',
         statusFK: 1,
-        formName: 'Consent Form',
+        formName: 'From',
         formData: { content: null, signature: [] },
       },
       default: {},
@@ -97,8 +97,8 @@ export default createListViewModel({
           name: x.displayValue,
           prop:
             formCategory === FORM_CATEGORY.CORFORM
-              ? 'corConsentForm'
-              : 'visitConsentForm',
+              ? 'corForm'
+              : 'visitForm',
           formTemplateFK: x.id,
           templateContent: x.templateContent,
         }))
