@@ -63,6 +63,7 @@ const styles = () => ({
 class SystemSetting extends PureComponent {
   constructor (props) {
     super(props)
+    console.log(menuData)
     this.group = _.groupBy(menuData, 'title')
   }
 
