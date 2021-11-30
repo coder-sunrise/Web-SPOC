@@ -228,7 +228,7 @@ class Dispense extends PureComponent {
             }
             onSelectPreOrder={this.onSelectPreOrder}
             activePreOrderItems={draftPreOrderItem}
-            extraCmt={this.getExtraComponent()}
+            extraCmt={this.getExtraComponent}
             isRetail={visit.visitPurposeFK === VISIT_TYPE.OTC}
           />
           <SizeContainer size='sm'>
