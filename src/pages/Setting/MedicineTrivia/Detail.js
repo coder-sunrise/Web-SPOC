@@ -1,4 +1,4 @@
-import React, { useState, PureComponent } from 'react'
+import React, { useState, useEffect, PureComponent } from 'react'
 import Yup from '@/utils/yup'
 import useTranslation from '@/utils/hooks/useTranslation'
 import { compose } from 'redux'
@@ -41,6 +41,21 @@ const Detail = ({
 
   const [attachments, setAttachments] = useState([])
 
+  useEffect(() => {
+    const { fileIndexFK } = values
+    if (fileIndexFK) {
+      const attach = [
+        {
+          thumbnailIndexFK: fileIndexFK,
+          fileIndexFK: fileIndexFK,
+          id: fileIndexFK,
+        },
+      ]
+      setAttachments(attach)
+      setFieldValue(attach)
+      return
+    }
+  }, [])
   const onSaveClick = async () => {
     await setFieldValue('translationData', [...translationData])
     handleSubmit()
@@ -82,11 +97,15 @@ const Detail = ({
             />
           </GridItem>
           <GridItem md={8}>
-            <FastField
+            <Field
               name='isDefault'
               render={args => {
                 return (
-                  <Checkbox label='Set As Current Medicine Trivia' {...args} />
+                  <Checkbox
+                    style={{ position: 'relative', top: '15px' }}
+                    label='Set As Current Medicine Trivia'
+                    {...args}
+                  />
                 )
               }}
             />
@@ -201,19 +220,28 @@ export default compose(
     validationSchema: Yup.object().shape({
       code: Yup.string().required(),
       displayValue: Yup.string().required(),
-      // shortcutKey: Yup.string().required(),
       secondDisplayValue: Yup.string().when('secondLanguage', {
         is: v => v !== undefined,
         then: Yup.string().required(),
       }),
     }),
     handleSubmit: (values, { props, resetForm }) => {
-      const { ...restValues } = values
+      const { attachment, effectiveDates, ...restValues } = values
       const { dispatch, onConfirm, clinicSettings } = props
       const {
         primaryPrintoutLanguage = 'EN',
         secondaryPrintoutLanguage = '',
       } = clinicSettings
+
+      const fileInfo = {}
+      if (attachment) {
+        const newAttach = attachment.filter(
+          a => !a.isDeleted && a.fileIndexFK === undefined,
+        )[0]
+
+        fileInfo.fileIndexFK = newAttach?.id
+        fileInfo.fileName = newAttach?.fileName
+      }
 
       let translationData = [
         {
@@ -245,6 +273,9 @@ export default compose(
         type: 'settingMedicineTrivia/upsert',
         payload: {
           ...restValues,
+          ...fileInfo,
+          EffectiveStartDate: effectiveDates[0],
+          EffectiveEndDate: effectiveDates[1],
           translationData,
         },
       }).then(r => {

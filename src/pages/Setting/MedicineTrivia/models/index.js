@@ -14,14 +14,7 @@ export default createListViewModel({
   param: {
     service,
     state: {
-      default: {
-        isUserMaintainable: true,
-        effectiveDates: [
-          moment().formatUTC(),
-          moment('2099-12-31T23:59:59').formatUTC(false),
-        ],
-        description: '',
-      },
+      default: {},
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -58,7 +51,6 @@ export default createListViewModel({
           list: data.data.map(o => {
             return {
               ...o,
-              effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
               translatedDisplayValue: getTranslationValue(
                 o.translationData,
                 secondaryPrintoutLanguage,
