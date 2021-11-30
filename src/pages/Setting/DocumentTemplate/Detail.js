@@ -21,6 +21,24 @@ import {
   DOCUMENT_CATEGORY,
   DOCUMENTCATEGORY_DOCUMENTTYPE,
 } from '@/utils/constants'
+import AddCircleOutlineTwoTone from '@material-ui/icons/AddCircleOutlineTwoTone'
+
+const formFieldTips_Subject = 'Guidelines to use Forms Fields'
+const formFieldTips_Content =
+  "In order to add autofill feature, you must input the exact same instance into the name column. For example: To auto-populate patient's name, you need to key in" +
+  'PatientName into the name column in Forms Fields. Click on the light bulb icon for more autofill instances.'
+const formFieldTips_Tooltip =
+  "i. Patient's Name:PatientName\n" +
+  "ii.Patient's Gender:PatientGender\n" +
+  "iii Patient's DOB：PatientDOB\n" +
+  "iv.Patient's Age: PatientAge\n" +
+  "vi. Patient's Reference Number:PatientRefNo\n" +
+  "vii.Today's Date:TodayDate\n" +
+  '\n\nif you would like to enter twice the same instance, please' +
+  'key in "<InstanceName>_<Number>".The number must be' +
+  'unique throughout a form.' +
+  'eg: for patient name,please enter "PatientName_2"'
+
 
 @withFormikExtend({
   mapPropsToValues: ({ settingDocumentTemplate }) =>
@@ -79,6 +97,37 @@ import {
 class Detail extends PureComponent {
   state = { isShowSaveDefaultTemplate: false }
 
+  FormFieldTips = () => {
+    const formFieldTips_Subject = 'Guidelines to use Forms Fields'
+    const formFieldTips_Content =
+      "In order to add autofill feature, you must input the exact same instance into the name column. For example: To auto-populate patient's name, you need to key in " +
+      'PatientName into the name column in Forms Fields. Click on the light bulb icon for more autofill instances.'
+    const formFieldTips_Tooltip =
+      "i. Patient's Name:PatientName\n" +
+      "ii.Patient's Gender:PatientGender\n" +
+      "iii Patient's DOB：PatientDOB\n" +
+      "iv.Patient's Age: PatientAge\n" +
+      "vi. Patient's Reference Number:PatientRefNo\n" +
+      "vii.Today's Date:TodayDate\n" +
+      '\nif you would like to enter twice the same instance, please\n' +
+      'key in "<InstanceName>_<Number>".The number must be unique\n' +
+      'throughout a form.\n' +
+      'eg: for patient name,please enter "PatientName_2"'
+    return (
+      <div style={{marginLeft:10}}>
+        <p>
+         <span style={{fontWeight:'bold',textDecoration:'underline'}}>{formFieldTips_Subject}</span>
+          <Tooltip useTooltip2 title={<pre>{formFieldTips_Tooltip}</pre>}>
+            <span>
+              <AddCircleOutlineTwoTone color='primary' style={{verticalAlign:'text-top'}}/>
+            </span>
+          </Tooltip>
+        </p>
+        <p>{formFieldTips_Content}</p>
+      </div>
+    )
+  }
+
   handelSaveDefaultTemplate = () => {
     this.setState(preState => {
       return { isShowSaveDefaultTemplate: !preState.isShowSaveDefaultTemplate }
@@ -95,9 +144,18 @@ class Detail extends PureComponent {
     }
   }
 
-  setFormTemplateContent = () => {
-    const { setFieldValue } = this.props
-    setFieldValue('templateContent', this.editorRef.serializeConent())
+  contentChange = () => {
+    this.props.setFieldValue(
+      'templateContent',
+      this.edContainer.documentEditor.serialize(),
+    )
+  }
+
+  componentCreated = e => {
+    if (!this.edContainer?.document) {
+      this.edContainer.documentEditor.openBlank()
+      this.contentChange()
+    }
   }
 
   render() {
@@ -247,11 +305,36 @@ class Detail extends PureComponent {
                         Template Message
                       </div>
                       <DocumentEditor
-                        label='Consent Form'
-                        value={values.templateContent}
-                        ref={r => (this.editorRef = r)}
-                        onContentChange={() => this.setFormTemplateContent()}
+                        documentName={values.displayValue}
+                        document={values.templateContent}
+                        ref={r => (this.edContainer = r?.container)}
+                        contentChange={this.contentChange.bind(this)}
+                        // documentChange={this.documentChange.bind(this)}
+                        created={this.componentCreated.bind(this)}
+                        height={500}
+                        toolbarItems={[
+                          'Open',
+                          'Separator',
+                          'Undo',
+                          'Redo',
+                          'Separator',
+                          'Image',
+                          'Table',
+                          'Hyperlink',
+                          'Separator',
+                          'Header',
+                          'Footer',
+                          'PageSetup',
+                          'PageNumber',
+                          'Break',
+                          'Separator',
+                          'Find',
+                          'Separator',
+                          'RestrictEditing',
+                          'FormFields',
+                        ]}
                       />
+                     <this.FormFieldTips/>
                     </div>
                   ) : (
                     <RichEditor

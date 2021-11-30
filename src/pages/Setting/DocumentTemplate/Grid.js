@@ -37,7 +37,7 @@ class Grid extends PureComponent {
           { name: 'documentTemplateTypeFK', title: 'Document Type' },
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
-          { name: 'templateContent', title: 'Template Message' },
+          // { name: 'templateContent', title: 'Template Message' },
           { name: 'isActive', title: 'Status' },
           {
             name: 'action',
@@ -96,21 +96,21 @@ class Grid extends PureComponent {
             options: status,
             width: 100,
           },
-          {
-            columnName: 'templateContent',
-            render: row => {
-              let e = document.createElement('div')
-              e.innerHTML = row.templateContent
-              let htmlData =
-                e.childNodes.length === 0 ? '' : e.childNodes[0].nodeValue
+          // {
+          //   columnName: 'templateContent',
+          //   render: row => {
+          //     let e = document.createElement('div')
+          //     e.innerHTML = row.templateContent
+          //     let htmlData =
+          //       e.childNodes.length === 0 ? '' : e.childNodes[0].nodeValue
 
-              const templateMessageProps = {
-                templateContent: htmlToText.fromString(htmlData),
-              }
+          //     const templateMessageProps = {
+          //       templateContent: htmlToText.fromString(htmlData),
+          //     }
 
-              return <MouseOverPopover {...templateMessageProps} />
-            },
-          },
+          //     return <MouseOverPopover {...templateMessageProps} />
+          //   },
+          // },
           {
             columnName: 'effectiveStartDate',
             type: 'date',
