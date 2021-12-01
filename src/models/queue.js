@@ -416,13 +416,11 @@ export default createListViewModel({
             const filterBar = JSON.parse(data)
             let queueFilterBar
             if (payload.type === '9') {
-              queueFilterBar = filterBar.find(
-                o => o.Identifier === 'QueueFilterBar',
-              )
+              queueFilterBar = filterBar.find(o => o.Identifier === 'Queue')
             }
             yield put({
               type: 'updateState',
-              payload: { queueFilterBar: queueFilterBar.value },
+              payload: { queueFilterBar: queueFilterBar?.value || {} },
             })
           }
         }

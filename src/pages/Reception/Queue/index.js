@@ -109,7 +109,6 @@ const styles = theme => ({
     patient,
     queueCalling,
     codetable,
-    clinicSettings,
   }) => ({
     patientSearchResult: patientSearch.list,
     queueLog,
@@ -119,7 +118,6 @@ const styles = theme => ({
     DefaultPatientProfile: patient.default,
     queueCalling,
     codetable,
-    clinicSettings: clinicSettings.settings,
   }),
 )
 class Queue extends React.Component {
@@ -154,16 +152,6 @@ class Queue extends React.Component {
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctroom',
-      },
-    })
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctvisitpurpose',
-        force: true,
-        filter: {
-          isActive: true,
-        },
       },
     })
 

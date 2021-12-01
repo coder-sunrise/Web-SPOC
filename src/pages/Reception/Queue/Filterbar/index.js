@@ -16,7 +16,8 @@ import {
   GridItem,
   TextField,
   ProgressButton,
-  CodeSelect,
+  VisitTypeSelect,
+  Tooltip,
 } from '@/components'
 // sub component
 import Authorized from '@/utils/Authorized'
@@ -40,8 +41,6 @@ const Filterbar = props => {
     user,
     setSearch,
     loading,
-    clinicSettings,
-    codetable,
     values,
     queueLog,
   } = props
@@ -49,27 +48,6 @@ const Filterbar = props => {
   const onSwitchClick = () => dispatch({ type: 'queueLog/toggleSelfOnly' })
   const clinicRoleFK = user.clinicianProfile.userProfile.role?.clinicRoleFK
   const servePatientRight = Authorized.check('queue.servepatient')
-
-  const visitTypes = () => {
-    const { ctvisitpurpose = [] } = codetable
-    const { visitTypeSetting } = clinicSettings
-
-    let visitTypeSettingsObj = undefined
-    let visitPurpose = []
-    if (visitTypeSetting) {
-      try {
-        visitTypeSettingsObj = JSON.parse(visitTypeSetting)
-      } catch {}
-    }
-    if ((ctvisitpurpose || []).length > 0) {
-      visitPurpose = getMappedVisitType(
-        ctvisitpurpose,
-        visitTypeSettingsObj,
-      ).filter(vstType => vstType['isEnabled'] === 'true')
-    }
-    return visitPurpose
-  }
-
   const { visitType = [] } = values
   const visittypeCount = visitType.length <= 1 ? 1 : 0
   return (
@@ -83,42 +61,44 @@ const Filterbar = props => {
           <Field
             name='visitType'
             render={args => (
-              <CodeSelect
-                label='Visit Type'
-                onChange={(v, op = {}) => {
-                  dispatch({
-                    type: 'queueLog/saveUserPreference',
-                    payload: {
-                      userPreferenceDetails: {
-                        value: {
+              <Tooltip
+                placement='right'
+                title='Select "All" will retrieve active and inactive visit type'
+              >
+                <VisitTypeSelect
+                  label='Visit Type'
+                  {...args}
+                  mode='multiple'
+                  maxTagPlaceholder='Visit Types'
+                  allowClear={true}
+                  onChange={(v, op = {}) => {
+                    dispatch({
+                      type: 'queueLog/saveUserPreference',
+                      payload: {
+                        userPreferenceDetails: {
+                          value: {
+                            ...queueLog.queueFilterBar,
+                            visitType: v,
+                          },
+                          Identifier: 'Queue',
+                        },
+                        itemIdentifier: 'Queue',
+                        type: '9',
+                      },
+                    })
+
+                    dispatch({
+                      type: 'queueLog/updateState',
+                      payload: {
+                        queueFilterBar: {
                           ...queueLog.queueFilterBar,
                           visitType: v,
                         },
-                        Identifier: 'QueueFilterBar',
                       },
-                      itemIdentifier: 'QueueFilterBar',
-                      type: '9',
-                    },
-                  })
-
-                  dispatch({
-                    type: 'queueLog/updateState',
-                    payload: {
-                      queueFilterBar: {
-                        ...queueLog.queueFilterBar,
-                        visitType: v,
-                      },
-                    },
-                  })
-                }}
-                options={visitTypes()}
-                allowClear={false}
-                mode='multiple'
-                all={-99}
-                maxTagCount={visittypeCount}
-                maxTagPlaceholder='visit types'
-                {...args}
-              />
+                    })
+                  }}
+                />
+              </Tooltip>
             )}
           />
         </GridItem>
