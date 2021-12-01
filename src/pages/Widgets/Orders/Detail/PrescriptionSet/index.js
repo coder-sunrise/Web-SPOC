@@ -236,6 +236,8 @@ class PrescriptionSetList extends PureComponent {
             let isDispensedByPharmacy
             let isNurseActualizeRequired
             let isExclusive
+            let inventoryDispenseUOMFK
+            let inventoryPrescribingUOMFK
 
             const precautions = item.prescriptionSetItemPrecaution
             if (precautions && precautions.length > 0) {
@@ -305,6 +307,8 @@ class PrescriptionSetList extends PureComponent {
               isDispensedByPharmacy = drug.isDispensedByPharmacy
               isNurseActualizeRequired = drug.isNurseActualizable
               isExclusive = drug.isExclusive
+              inventoryDispenseUOMFK = drug.dispensingUOM.id
+              inventoryPrescribingUOMFK = drug.prescribingUOM.id
             } else if (item.isDrugMixture) {
               // Drug Mixture
               itemCostPrice = item.costPrice || 0
@@ -441,6 +445,8 @@ class PrescriptionSetList extends PureComponent {
               isDispensedByPharmacy,
               isNurseActualizeRequired,
               isExclusive,
+              inventoryDispenseUOMFK,
+              inventoryPrescribingUOMFK,
             }
           }),
       )
