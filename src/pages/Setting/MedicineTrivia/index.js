@@ -26,6 +26,12 @@ class MedicineTrivia extends PureComponent {
   componentDidMount() {
     this.props.dispatch({
       type: 'settingMedicineTrivia/query',
+      payload: {
+        sorting: [
+          { columnName: 'isDefault', direction: 'desc' },
+          { columnName: 'updateDate', direction: 'desc' },
+        ],
+      },
     })
   }
 

@@ -16,6 +16,7 @@ import {
   dateFormatLong,
 } from '@/components'
 import { AttachmentWithThumbnail } from '@/components/_medisys'
+import { Tooltip } from 'antd'
 
 const Detail = ({
   theme,
@@ -24,6 +25,7 @@ const Detail = ({
   clinicSettings,
   handleSubmit,
   values,
+  dispatch,
   setFieldValue,
 }) => {
   const {
@@ -103,7 +105,14 @@ const Detail = ({
                 return (
                   <Checkbox
                     style={{ position: 'relative', top: '15px' }}
-                    label='Set As Current Medicine Trivia'
+                    label={
+                      <Tooltip
+                        title='To display in Patient Info Leaflet'
+                        placement='bottomLeft'
+                      >
+                        <span>Set As Current Medicine Trivia</span>
+                      </Tooltip>
+                    }
                     {...args}
                   />
                 )
@@ -190,7 +199,20 @@ const Detail = ({
       </div>
       {footer &&
         footer({
-          onConfirm: onSaveClick,
+          onConfirm: () => {
+            if (values.isDefault) {
+              dispatch({
+                type: 'global/updateAppState',
+                payload: {
+                  openConfirm: true,
+                  openConfirmContent: `Set ${values.code} as current Medicine Trivia?`,
+                  onConfirmSave: onSaveClick,
+                },
+              })
+            } else {
+              onSaveClick()
+            }
+          },
           confirmBtnText: 'Save',
           confirmProps: {
             disabled: false,
@@ -226,7 +248,7 @@ export default compose(
       }),
     }),
     handleSubmit: (values, { props, resetForm }) => {
-      const { attachment, effectiveDates, ...restValues } = values
+      const { attachment, ...restValues } = values
       const { dispatch, onConfirm, clinicSettings } = props
       const {
         primaryPrintoutLanguage = 'EN',
@@ -274,8 +296,8 @@ export default compose(
         payload: {
           ...restValues,
           ...fileInfo,
-          EffectiveStartDate: effectiveDates[0],
-          EffectiveEndDate: effectiveDates[1],
+          EffectiveStartDate: '1900-01-01',
+          EffectiveEndDate: '2099-12-31',
           translationData,
         },
       }).then(r => {
@@ -284,6 +306,12 @@ export default compose(
           if (onConfirm) onConfirm()
           dispatch({
             type: 'settingMedicineTrivia/query',
+            payload: {
+              sorting: [
+                { columnName: 'isDefault', direction: 'desc' },
+                { columnName: 'updateDate', direction: 'desc' },
+              ],
+            },
           })
         }
       })

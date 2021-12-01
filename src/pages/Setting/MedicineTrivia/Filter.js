@@ -34,35 +34,27 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={2}>
-            <FastField
-              name='isActive'
-              render={args => {
-                return <Select label='Status' options={status} {...args} />
-              }}
-            />
-          </GridItem>
-        </GridContainer>
-
-        <GridContainer>
           <GridItem>
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
                 icon={<Search />}
                 onClick={() => {
-                  const { codeDisplayValue, isActive } = this.props.values
+                  const { codeDisplayValue } = this.props.values
                   const { clinicSettings } = this.props
                   const { secondaryPrintoutLanguage = '' } = clinicSettings
                   this.props.dispatch({
                     type: 'settingMedicineTrivia/query',
                     payload: {
-                      isActive,
                       apiCriteria: {
                         Language: secondaryPrintoutLanguage,
                         Key: 'displayValue',
                         SearchValue: codeDisplayValue,
                       },
+                      sorting: [
+                        { columnName: 'isDefault', direction: 'desc' },
+                        { columnName: 'updateDate', direction: 'desc' },
+                      ],
                     },
                   })
                 }}

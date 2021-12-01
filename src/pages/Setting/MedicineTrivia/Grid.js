@@ -1,5 +1,5 @@
 import React, { Fragment, PureComponent } from 'react'
-import { CommonTableGrid, Button, Tooltip } from '@/components'
+import { CommonTableGrid, Button, Tooltip, Popconfirm } from '@/components'
 import { status } from '@/utils/codes'
 import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
@@ -26,29 +26,36 @@ class Grid extends PureComponent {
     }).then(() => {
       dispatch({
         type: 'settingMedicineTrivia/query',
+        payload: {
+          sorting: [
+            { columnName: 'isDefault', direction: 'desc' },
+            { columnName: 'updateDate', direction: 'desc' },
+          ],
+        },
       })
     })
   }
 
   deleteTrivia = (row, e) => {
-    const { dispatch, settingMedicineTrivia } = this.props
-    const { list } = settingMedicineTrivia
-    dispatch({
-      type: 'global/updateAppState',
-      payload: {
-        openConfirm: true,
-        openConfirmContent: 'Delete this medicine trivia?',
-        onConfirmSave: () => this.confirmDelete(row.id),
-      },
-    })
+    this.confirmDelete(row.id)
   }
 
+  FuncConfig = {
+    sort: true,
+    sortConfig: {
+      defaultSorting: [
+        { columnName: 'isDefault', direction: 'desc' },
+        { columnName: 'updateDate', direction: 'desc' },
+      ],
+    },
+  }
   render() {
     const { height, clinicSettings } = this.props
     const {
       primaryPrintoutLanguage = 'EN',
       secondaryPrintoutLanguage = '',
     } = clinicSettings
+
     const isUseSecondLanguage = secondaryPrintoutLanguage !== ''
     let columns = [
       { name: 'code', title: 'Code' },
@@ -74,11 +81,13 @@ class Grid extends PureComponent {
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
+        forceRender
         type='settingMedicineTrivia'
         onRowDoubleClick={this.editRow}
         TableProps={{
           height,
         }}
+        FuncProps={this.FuncConfig}
         columns={columns}
         columnExtensions={[
           {
@@ -87,31 +96,33 @@ class Grid extends PureComponent {
           },
           {
             columnName: 'code',
-            width: 200,
+            width: 300,
             sortingEnabled: true,
             render: row => {
-              let width = row.isDefault ? 128 : 190
+              let width = row.isDefault ? 228 : 290
               return (
-                <div style={{ position: 'relative', top: '5px' }}>
-                  <div
-                    style={{
-                      display: 'inline-block',
-                      width: width,
-                      textOverflow: 'ellipsis',
-                      overflow: 'hidden',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {row.code}
+                <Tooltip title={row.code} placement='bottom'>
+                  <div style={{ position: 'relative', top: '3px' }}>
+                    <div
+                      style={{
+                        display: 'inline-block',
+                        width: width,
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {row.code}
+                    </div>
+                    {row.isDefault ? (
+                      <span style={{ position: 'relative', top: '-5px' }}>
+                        <Tag color='#87d068'>Current</Tag>
+                      </span>
+                    ) : (
+                      <span></span>
+                    )}
                   </div>
-                  {row.isDefault ? (
-                    <span style={{ position: 'relative', top: '-5px' }}>
-                      <Tag color='#87d068'>Current</Tag>
-                    </span>
-                  ) : (
-                    <span></span>
-                  )}
-                </div>
+                </Tooltip>
               )
             },
           },
@@ -134,21 +145,28 @@ class Grid extends PureComponent {
                       <Edit />
                     </Button>
                   </Tooltip>
-                  <Tooltip title='Delete Medicine Trivia'>
-                    <Button
-                      className='noPadding'
-                      color='danger'
-                      size='sm'
-                      id={row.id}
-                      justIcon
-                      rounded
-                      onClick={() => {
+
+                  <Popconfirm
+                    title='Are you sure?'
+                    onConfirm={() => {
+                      setTimeout(() => {
                         this.deleteTrivia(row)
-                      }}
-                    >
-                      <Delete />
-                    </Button>
-                  </Tooltip>
+                      }, 1)
+                    }}
+                  >
+                    <Tooltip title='Delete Medicine Trivia'>
+                      <Button
+                        className='noPadding'
+                        color='danger'
+                        size='sm'
+                        id={row.id}
+                        justIcon
+                        rounded
+                      >
+                        <Delete />
+                      </Button>
+                    </Tooltip>
+                  </Popconfirm>
                 </Fragment>
               )
             },
