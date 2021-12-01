@@ -306,7 +306,7 @@ class LCForm extends PureComponent {
           )}
           {formCategory === FORM_CATEGORY.CORFORM &&
           statusFK === 1 && (
-            <Authorized authority='forms.finalize'>
+            <Authorized authority='queue.consultation.form.finalize'>
               <ProgressButton
                 color='primary'
                 icon={null}

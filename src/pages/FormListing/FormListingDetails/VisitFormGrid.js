@@ -18,6 +18,7 @@ import {
   Tooltip,
 } from '@/components'
 import VoidWithPopover from './FormDetail/VoidWithPopover'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   item: {
@@ -177,6 +178,7 @@ class VisitFormGrid extends PureComponent {
             type: 'formListing/saveCORForm',
             payload: {
               ...voidData,
+              action: 'void',
             },
           }).then(() => {
             this.props.queryFormListing()
@@ -218,6 +220,13 @@ class VisitFormGrid extends PureComponent {
     let { formListing, dispatch, theme, classes, user } = this.props
     let { list, visitDetail = {}, formTemplates = [] } = formListing
     let { isCanEditForms = true } = visitDetail
+
+    const modifyAR = Authorized.check('queue.consultation.form.modify')
+    const voidAR = Authorized.check('queue.consultation.form.void')
+
+    const isHiddenModify = modifyAR && modifyAR.rights !== 'enable'
+    const isHiddenVoid = voidAR && voidAR.rights !== 'enable'
+
     return (
       <div>
         <Checkbox
@@ -257,7 +266,8 @@ class VisitFormGrid extends PureComponent {
               type: 'link',
               linkField: 'href',
               onClick: row => {
-                this.props.viewReport(row, this.props)
+                // this.props.viewReport(row, this.props)
+                this.editRow(row)
               },
             },
             {
@@ -295,8 +305,8 @@ class VisitFormGrid extends PureComponent {
                       <Button
                         size='sm'
                         onClick={() => {
-                          const { formCategory, printRow } = this.props
-                          printRow(row, formCategory)
+                          // const { formCategory, printRow } = this.props
+                          // printRow(row, formCategory)
                         }}
                         justIcon
                         color='primary'
@@ -305,7 +315,7 @@ class VisitFormGrid extends PureComponent {
                         <Print />
                       </Button>
                     </Tooltip>
-                    {(row.statusFK === 1 || row.statusFK === 2) && (
+                    {row.statusFK === 1 && !isHiddenModify && (
                       <Tooltip title='Edit'>
                         <Button
                           disabled={!row.isCanEditForms}
@@ -321,7 +331,7 @@ class VisitFormGrid extends PureComponent {
                         </Button>
                       </Tooltip>
                     )}
-                    {(row.statusFK === 1 || row.statusFK === 2) && (
+                    {row.statusFK === 1 && (
                       <Popconfirm
                         onConfirm={() => {
                           const { formCategory } = this.props
@@ -352,19 +362,21 @@ class VisitFormGrid extends PureComponent {
                           }
                         }}
                       >
-                        <Tooltip title='Delete'>
-                          <Button
-                            disabled={!row.isCanEditForms}
-                            size='sm'
-                            color='danger'
-                            justIcon
-                          >
-                            <Delete />
-                          </Button>
-                        </Tooltip>
+                        {!isHiddenModify && (
+                          <Tooltip title='Delete'>
+                            <Button
+                              disabled={!row.isCanEditForms}
+                              size='sm'
+                              color='danger'
+                              justIcon
+                            >
+                              <Delete />
+                            </Button>
+                          </Tooltip>
+                        )}
                       </Popconfirm>
                     )}
-                    {row.statusFK === 3 && (
+                    {row.statusFK === 2 && !isHiddenVoid && (
                       <this.VoidForm
                         classes={classes}
                         dispatch={dispatch}

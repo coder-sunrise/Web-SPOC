@@ -32,7 +32,13 @@ const saveVisitForm = async (type, visitId, params) => {
   return r
 }
 const saveCORForm = async (type, visitId, params) => {
-  const r = await request(`${type === '1' ? lcformurl : formurl}/CORForm/${visitId}`, {
+  const { action } = params
+  let url = `${type === '1' ? lcformurl : formurl}/CORForm/${visitId}`
+  if(type !== '1' && action === 'finalize')
+    url = `${formurl}/CORForm/Finalize/${visitId}`
+  else if(type !== '1' && action === 'void')
+    url = `${formurl}/CORForm/Void/${visitId}`
+  const r = await request(url, {
     method: 'PUT',
     body: params,
   })

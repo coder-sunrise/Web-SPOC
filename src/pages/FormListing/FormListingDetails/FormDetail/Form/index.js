@@ -151,6 +151,7 @@ class Form extends PureComponent {
               saveData.id && saveData.id > 0
                 ? saveData.ClinicalObjectRecordFK
                 : currentCORId,
+            action,
           },
         }).then(r => {
           if (r) {
@@ -183,6 +184,12 @@ class Form extends PureComponent {
   render() {
     const { values, formCategory } = this.props
     const { statusFK } = values
+    const modifyAR = Authorized.check('queue.consultation.form.modify')
+    const finalizeAR = Authorized.check('queue.consultation.form.finalize')
+
+    const isHiddenModify = modifyAR && modifyAR.rights !== 'enable'
+    const isHiddenFinalize = finalizeAR && finalizeAR.rights !== 'enable'
+    
     return (
       <div>
         <CommonForm {...this.props} />
@@ -197,19 +204,21 @@ class Form extends PureComponent {
           <Button color='danger' icon={null} onClick={this.cancelForm}>
             Cancel
           </Button>
-          {formCategory === FORM_CATEGORY.VISITFORM && (
-            <ProgressButton
-              color='primary'
-              icon={null}
-              onClick={() => {
-                this.onSubmitButtonClicked('save')
-              }}
-            >
-              Save
-            </ProgressButton>
+          {formCategory === FORM_CATEGORY.VISITFORM && !isHiddenModify && (
+            // <Authorized authority='queue.consultation.form.modify'>
+              <ProgressButton
+                color='primary'
+                icon={null}
+                onClick={() => {
+                  this.onSubmitButtonClicked('save')
+                }}
+              >
+                Save
+              </ProgressButton>
+            // </Authorized>
           )}
-          {formCategory === FORM_CATEGORY.CORFORM && statusFK === 1 && (
-            <Authorized authority='forms.finalize'>
+          {formCategory === FORM_CATEGORY.CORFORM && !isHiddenFinalize && statusFK === 1 && (
+            // <Authorized authority='queue.consultation.form.finalize'>
               <ProgressButton
                 color='success'
                 icon={null}
@@ -219,7 +228,7 @@ class Form extends PureComponent {
               >
                 Finalize
               </ProgressButton>
-            </Authorized>
+            // </Authorized>
           )}
 
           {/* {formCategory === FORM_CATEGORY.CORFORM &&

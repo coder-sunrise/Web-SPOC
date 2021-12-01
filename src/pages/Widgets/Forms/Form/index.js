@@ -118,6 +118,13 @@ class Form extends PureComponent {
   render() {
     const { values } = this.props
     const { statusFK } = values
+
+    const modifyAR = Authorized.check('queue.consultation.form.modify')
+    const finalizeAR = Authorized.check('queue.consultation.form.finalize')
+
+    const isHiddenModify = modifyAR && modifyAR.rights !== 'enable'
+    const isHiddenFinalize = finalizeAR && finalizeAR.rights !== 'enable'
+
     return (
       <div>
         <CommonForm
@@ -134,7 +141,7 @@ class Form extends PureComponent {
           <Button color='danger' icon={null} onClick={this.cancelForm}>
             Cancel
           </Button>
-          {statusFK === 1 && (
+          {statusFK === 1 && !isHiddenModify && (
             <ProgressButton
               color='primary'
               icon={null}
@@ -145,8 +152,8 @@ class Form extends PureComponent {
               Save
             </ProgressButton>
           )}
-          {statusFK === 1 && (
-            <Authorized authority='forms.finalize'>
+          {statusFK === 1 && !isHiddenFinalize && (
+            // <Authorized authority='queue.consultation.form.finalize'>
               <ProgressButton
                 color='success'
                 icon={null}
@@ -156,7 +163,7 @@ class Form extends PureComponent {
               >
                 Finalize
               </ProgressButton>
-            </Authorized>
+            // </Authorized>
           )}
 
           {/* {(statusFK === 1 || statusFK === 2) && (

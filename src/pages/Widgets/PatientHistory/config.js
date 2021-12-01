@@ -166,7 +166,7 @@ export const categoryTypes = [
   {
     value: WIDGETS_ID.FORMS,
     name: 'Forms',
-    authority: 'patientdashboard.forms',
+    authority: 'queue.consultation.form',
   },
   {
     value: WIDGETS_ID.ATTACHMENT,
@@ -461,7 +461,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => { }) => [
   {
     id: WIDGETS_ID.FORMS,
     name: 'Forms',
-    authority: 'queue.consultation.widgets.forms',
+    authority: 'queue.consultation.form',
     component: Loadable({
       loader: () => import('./Forms'),
       render: (loaded, p) => {
