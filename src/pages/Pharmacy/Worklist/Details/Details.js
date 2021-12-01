@@ -32,7 +32,7 @@ const Details = props => {
     fromModule,
     visitRegistration,
   } = props
-  const { entity } = visitRegistration
+  const { entity = {} } = visitRegistration
   const { visit = {} } = entity
   const { rows } = orders
 
@@ -70,7 +70,7 @@ const Details = props => {
       user,
       clinicSettings,
     } = props
-    const { entity } = visitRegistration
+    const { entity = {} } = visitRegistration
     const { visit = {} } = entity
     await props.dispatch({
       type: 'codetable/fetchCodes',

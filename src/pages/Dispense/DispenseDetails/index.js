@@ -1049,14 +1049,6 @@ const DispenseDetails = ({
                 id: values.id,
                 version: version,
               },
-            }).then(r => {
-              dispatch({
-                type: 'dispense/updateState',
-                payload: {
-                  entity: r,
-                  version: version,
-                },
-              })
             })
           }}
         />
