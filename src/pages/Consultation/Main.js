@@ -942,7 +942,7 @@ class Main extends React.Component {
     // if (!vistEntity) return null
     const { visit = {}, queueNo } = vistEntity
     const { summary } = orders
-    const patientName = patient.entity.name
+    const patientName = patient?.entity?.name
     // const { adjustments, total, gst, totalWithGst } = summary
 
     return (
@@ -1359,8 +1359,8 @@ class Main extends React.Component {
         <PatientBanner
           from='Consultation'
           onSelectPreOrder={this.onSelectPreOrder}
-          activePreOrderItems={draftPreOrderItem} // {patient?.entity?.pendingPreOrderItem} //
-          extraCmt={this.getExtraComponent()}
+          activePreOrderItems={draftPreOrderItem}
+          extraCmt={this.getExtraComponent}
           {...this.props}
         />
         <Authorized.Context.Provider value={matches}>
