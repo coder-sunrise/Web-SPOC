@@ -1136,6 +1136,12 @@ const _routes = [
             authority: ['settings.templates.visitordertemplate'],
           },
           {
+            path: '/setting/medicinetrivia',
+            name: 'medicinetrivia',
+            component: './Setting/medicineTrivia',
+            authority: ['settings.clinicsetting.medicinetrivia'],
+          },
+          {
             path: '/setting/refractiontesttype',
             name: 'refractiontesttype',
             component: './Setting/RefractionTestType',
