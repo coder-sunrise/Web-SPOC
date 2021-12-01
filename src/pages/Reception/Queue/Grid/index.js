@@ -57,6 +57,7 @@ class Grid extends React.Component {
     if (this.props.filter !== nextProps.filter) return true
     if (this.props.mainDivHeight !== nextProps.mainDivHeight) return true
     if (this.props.searchQuery !== nextProps.searchQuery) return true
+    if (this.props.visitType !== nextProps.visitType) return true
 
     if (
       nextProps.filter === 'appointment' &&
@@ -89,6 +90,7 @@ class Grid extends React.Component {
       searchQuery,
       selfOnly = false,
       queueList = [],
+      visitType = [],
     } = this.props
 
     const { clinicianProfile } = user.data
@@ -128,7 +130,7 @@ class Grid extends React.Component {
       })
     }
 
-    return filterData(filter, data, searchQuery)
+    return filterData(filter, data, searchQuery, visitType)
   }
 
   getActionButton = row => (

@@ -109,6 +109,7 @@ const styles = theme => ({
     patient,
     queueCalling,
     codetable,
+    clinicSettings,
   }) => ({
     patientSearchResult: patientSearch.list,
     queueLog,
@@ -118,6 +119,7 @@ const styles = theme => ({
     DefaultPatientProfile: patient.default,
     queueCalling,
     codetable,
+    clinicSettings: clinicSettings.settings,
   }),
 )
 class Queue extends React.Component {
@@ -152,6 +154,16 @@ class Queue extends React.Component {
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctroom',
+      },
+    })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctvisitpurpose',
+        force: true,
+        filter: {
+          isActive: true,
+        },
       },
     })
 
@@ -828,7 +840,8 @@ class Queue extends React.Component {
       queueInfo,
       refreshInfo,
     } = this.state
-    const { sessionInfo, error } = queueLog
+    const { sessionInfo, error, queueFilterBar = {} } = queueLog
+    const { visitType = [] } = queueFilterBar
     const { sessionNo, isClinicSessionClosed } = sessionInfo
     const { oriQCallList } = queueCalling
     const openQueueDisplayAccessRight = Authorized.check('openqueuedisplay')
@@ -965,6 +978,7 @@ class Queue extends React.Component {
                   onRegisterVisitEnterPressed={this.onEnterPressed}
                   toggleNewPatient={this.toggleRegisterNewPatient}
                   setSearch={this.setSearch}
+                  {...this.props}
                 />
               </div>
               <DetailsGrid
@@ -979,6 +993,7 @@ class Queue extends React.Component {
                 // handleFormsClick={this.showVisitForms}
                 history={history}
                 searchQuery={search}
+                visitType={visitType}
               />
               <RightClickContextMenu
                 onMenuItemClick={this.onMenuItemClick}

@@ -3,7 +3,7 @@ import { connect } from 'umi'
 // umi locale
 import { FormattedMessage, formatMessage } from 'umi'
 // formik
-import { FastField, withFormik } from 'formik'
+import { FastField, withFormik, Field } from 'formik'
 // material ui
 import { Hidden, withStyles } from '@material-ui/core'
 import PersonAdd from '@material-ui/icons/PersonAdd'
@@ -16,14 +16,16 @@ import {
   GridItem,
   TextField,
   ProgressButton,
+  CodeSelect,
 } from '@/components'
 // sub component
 import Authorized from '@/utils/Authorized'
+import { getMappedVisitType } from '@/utils/utils'
 import StatusFilterButton from './StatusFilterButton'
 
 const styles = () => ({
   actionBar: { marginBottom: '10px' },
-  switch: { display: 'inline-block', minWidth: '200px' },
+  switch: { display: 'inline-block', width: '100px' },
 })
 
 const Filterbar = props => {
@@ -38,12 +40,38 @@ const Filterbar = props => {
     user,
     setSearch,
     loading,
+    clinicSettings,
+    codetable,
+    values,
+    queueLog,
   } = props
 
   const onSwitchClick = () => dispatch({ type: 'queueLog/toggleSelfOnly' })
   const clinicRoleFK = user.clinicianProfile.userProfile.role?.clinicRoleFK
   const servePatientRight = Authorized.check('queue.servepatient')
 
+  const visitTypes = () => {
+    const { ctvisitpurpose = [] } = codetable
+    const { visitTypeSetting } = clinicSettings
+
+    let visitTypeSettingsObj = undefined
+    let visitPurpose = []
+    if (visitTypeSetting) {
+      try {
+        visitTypeSettingsObj = JSON.parse(visitTypeSetting)
+      } catch {}
+    }
+    if ((ctvisitpurpose || []).length > 0) {
+      visitPurpose = getMappedVisitType(
+        ctvisitpurpose,
+        visitTypeSettingsObj,
+      ).filter(vstType => vstType['isEnabled'] === 'true')
+    }
+    return visitPurpose
+  }
+
+  const { visitType = [] } = values
+  const visittypeCount = visitType.length <= 1 ? 1 : 0
   return (
     <div className='div-reception-header'>
       <GridContainer
@@ -51,6 +79,49 @@ const Filterbar = props => {
         justify='flex-start'
         alignItems='center'
       >
+        <GridItem xs={2} sm={2} md={2} lg={2}>
+          <Field
+            name='visitType'
+            render={args => (
+              <CodeSelect
+                label='Visit Type'
+                onChange={(v, op = {}) => {
+                  dispatch({
+                    type: 'queueLog/saveUserPreference',
+                    payload: {
+                      userPreferenceDetails: {
+                        value: {
+                          ...queueLog.queueFilterBar,
+                          visitType: v,
+                        },
+                        Identifier: 'QueueFilterBar',
+                      },
+                      itemIdentifier: 'QueueFilterBar',
+                      type: '9',
+                    },
+                  })
+
+                  dispatch({
+                    type: 'queueLog/updateState',
+                    payload: {
+                      queueFilterBar: {
+                        ...queueLog.queueFilterBar,
+                        visitType: v,
+                      },
+                    },
+                  })
+                }}
+                options={visitTypes()}
+                allowClear={false}
+                mode='multiple'
+                all={-99}
+                maxTagCount={visittypeCount}
+                maxTagPlaceholder='visit types'
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
         <GridItem xs={3} sm={3} md={3} lg={3}>
           <FastField
             name='search'
@@ -72,7 +143,7 @@ const Filterbar = props => {
             )}
           />
         </GridItem>
-        <GridItem xs={7} sm={7} md={7} lg={4}>
+        <GridItem xs={7} sm={7} md={7} lg={3}>
           <Authorized authority='queue.registervisit'>
             <ProgressButton
               variant='contained'
@@ -132,7 +203,7 @@ const Filterbar = props => {
           xs={12}
           sm={12}
           md={12}
-          lg={5}
+          lg={4}
           container
           justify='flex-end'
           alignItems='center'
@@ -153,9 +224,13 @@ const connectedFilterbar = connect(({ queueLog, user, loading }) => ({
 }))(Filterbar)
 
 const FilterbarWithFormik = withFormik({
-  mapPropsToValues: () => ({
-    search: '',
-  }),
+  mapPropsToValues: ({ queueLog }) => {
+    const { visitType } = queueLog.queueFilterBar || {}
+    return {
+      search: '',
+      visitType: visitType || [-99],
+    }
+  },
   handleSubmit: ({ search }, { props }) => {
     const { onRegisterVisitEnterPressed } = props
     onRegisterVisitEnterPressed(search)
