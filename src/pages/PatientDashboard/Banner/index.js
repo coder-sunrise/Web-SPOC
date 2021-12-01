@@ -1230,7 +1230,7 @@ class Banner extends PureComponent {
                       style={{ position: 'relative', top: 5 }}
                       className={classes.cell}
                     >
-                      <span>Last Visit : </span>
+                      <span>Last Visit: </span>
                       <Tooltip
                         title={moment(entity.lastVisitDate).format(
                           'DD MMM YYYY',
