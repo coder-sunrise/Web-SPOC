@@ -1229,6 +1229,32 @@ class Banner extends PureComponent {
               <GridItem xs={2} md={2} className={classes.cell}>
                 {/* right half */}
                 <GridContainer>
+                  {entity?.lastVisitDate ? (
+                    <GridItem
+                      xs={12}
+                      md={12}
+                      style={{ position: 'relative', top: 5 }}
+                      className={classes.cell}
+                    >
+                      <span>Last Visit: </span>
+                      <Tooltip
+                        title={moment(entity.lastVisitDate).format(
+                          'DD MMM YYYY',
+                        )}
+                      >
+                        <span>
+                          {moment(entity.lastVisitDate).format('DD MMM YYYY')}
+                        </span>
+                      </Tooltip>
+                    </GridItem>
+                  ) : (
+                    <GridItem
+                      xs={12}
+                      md={12}
+                      style={{ height: 22 }}
+                      className={classes.cell}
+                    ></GridItem>
+                  )}
                   <GridItem xs={12} md={12} className={classes.cell}>
                     <span
                       style={{
@@ -1270,12 +1296,17 @@ class Banner extends PureComponent {
                   </GridItem>
 
                   <GridItem xs={12} md={12} className={classes.cell}>
-                    <div>
+                    <div style={{ position: 'relative', top: 10 }}>
                       <span className={classes.header}>G6PD: </span>
                       <span>{g6PD ? g6PD.name : '-'}</span>
                     </div>
                   </GridItem>
-                  <GridItem xs={12} md={12} className={classes.cell}>
+                  <GridItem
+                    xs={12}
+                    md={12}
+                    className={classes.cell}
+                    style={{ position: 'relative', top: 10 }}
+                  >
                     {notesHistoryAccessRight.rights !== 'hidden' && (
                       <Link className={classes.header}>
                         <span
@@ -1364,8 +1395,6 @@ class Banner extends PureComponent {
                       Lab Results
                     </Link>
                   </GridItem>
-
-                  <GridItem xs={6} md={12} className={classes.cell}></GridItem>
                 </GridContainer>
               </GridItem>
             </GridContainer>
