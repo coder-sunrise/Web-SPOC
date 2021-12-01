@@ -828,7 +828,8 @@ class Queue extends React.Component {
       queueInfo,
       refreshInfo,
     } = this.state
-    const { sessionInfo, error } = queueLog
+    const { sessionInfo, error, queueFilterBar = {} } = queueLog
+    const { visitType = [] } = queueFilterBar
     const { sessionNo, isClinicSessionClosed } = sessionInfo
     const { oriQCallList } = queueCalling
     const openQueueDisplayAccessRight = Authorized.check('openqueuedisplay')
@@ -965,6 +966,7 @@ class Queue extends React.Component {
                   onRegisterVisitEnterPressed={this.onEnterPressed}
                   toggleNewPatient={this.toggleRegisterNewPatient}
                   setSearch={this.setSearch}
+                  {...this.props}
                 />
               </div>
               <DetailsGrid
@@ -979,6 +981,7 @@ class Queue extends React.Component {
                 // handleFormsClick={this.showVisitForms}
                 history={history}
                 searchQuery={search}
+                visitType={visitType}
               />
               <RightClickContextMenu
                 onMenuItemClick={this.onMenuItemClick}
