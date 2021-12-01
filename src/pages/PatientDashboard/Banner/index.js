@@ -1161,14 +1161,20 @@ class Banner extends PureComponent {
                     </span>
                     <Tooltip
                       title={info.patientHistoryDiagnosis
-                        .map(d => d.diagnosisDescription)
+                        .map(
+                          d =>
+                            `${d.diagnosisDescription} ${d.jpnDiagnosisDescription}`,
+                        )
                         .join(', ')}
                       interactive='true'
                     >
                       <span className={classes.contents}>
                         {info.patientHistoryDiagnosis.length > 0
                           ? info.patientHistoryDiagnosis
-                              .map(d => d.diagnosisDescription)
+                              .map(
+                                d =>
+                                  `${d.diagnosisDescription} ${d.jpnDiagnosisDescription}`,
+                              )
                               .join(', ')
                           : '-'}
                       </span>
