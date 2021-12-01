@@ -21,7 +21,6 @@ import {
 } from '@/components'
 // sub component
 import Authorized from '@/utils/Authorized'
-import { getMappedVisitType } from '@/utils/utils'
 import StatusFilterButton from './StatusFilterButton'
 
 const styles = () => ({
@@ -41,15 +40,12 @@ const Filterbar = props => {
     user,
     setSearch,
     loading,
-    values,
     queueLog,
   } = props
 
   const onSwitchClick = () => dispatch({ type: 'queueLog/toggleSelfOnly' })
   const clinicRoleFK = user.clinicianProfile.userProfile.role?.clinicRoleFK
   const servePatientRight = Authorized.check('queue.servepatient')
-  const { visitType = [] } = values
-  const visittypeCount = visitType.length <= 1 ? 1 : 0
   return (
     <div className='div-reception-header'>
       <GridContainer
