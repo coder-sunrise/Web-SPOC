@@ -9,6 +9,7 @@ import { CardContainer, CommonModal } from '@/components'
 import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
+import moment from 'moment'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -34,8 +35,10 @@ class InventoryAdjustment extends PureComponent {
       type: 'inventoryAdjustment/query',
       payload: {
         sorting: [
-          { columnName: 'adjustmentTransactionNo', direction: 'asc' },
+          { columnName: 'adjustmentTransactionDate', direction: 'desc' },
         ],
+        lgteql_adjustmentTransactionDate: moment().add(-30,'day').formatUTC(),
+        lsteql_adjustmentTransactionDate: moment().endOf('day').formatUTC(false),
       },
     })
   }
