@@ -888,7 +888,7 @@ class Main extends React.Component {
     }
 
     if (
-      visitPurposeFK === VISIT_TYPE.BF &&
+      (visitPurposeFK === VISIT_TYPE.BF || visitPurposeFK === VISIT_TYPE.MC) &&
       visitStatus === VISIT_STATUS.BILLING &&
       isModifiedOrder
     ) {

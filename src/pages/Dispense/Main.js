@@ -366,7 +366,7 @@ class Main extends Component {
     if (
       accessRights &&
       accessRights.rights !== 'hidden' &&
-      visitPurposeFK === VISIT_TYPE.BF &&
+      (visitPurposeFK === VISIT_TYPE.BF || visitPurposeFK === VISIT_TYPE.MC) &&
       isEmptyDispense &&
       noClinicalObjectRecord &&
       dispense.loadCount === 0
@@ -566,7 +566,10 @@ class Main extends Component {
       newOrderRows.length > 0
     )
       this.showConfirmationBox()
-    else if (visitPurposeFK === VISIT_TYPE.BF) {
+    else if (
+      visitPurposeFK === VISIT_TYPE.BF ||
+      visitPurposeFK === VISIT_TYPE.MC
+    ) {
       dispatch({
         type: 'consultation/discard',
         payload: {

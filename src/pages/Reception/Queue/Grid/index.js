@@ -73,7 +73,7 @@ class Grid extends React.Component {
     const {
       clinicianProfile: { doctorProfile },
     } = this.props.user.data
-    const retailVisits = [VISIT_TYPE.OTC, VISIT_TYPE.BF]
+    const retailVisits = [VISIT_TYPE.OTC, VISIT_TYPE.BF, VISIT_TYPE.MC]
     if (!doctorProfile || retailVisits.includes(visitPurposeFK)) return false
 
     if (isWaiting) this.props.onMenuItemClick(row, '5') // start consultation context menu id = 5
@@ -168,7 +168,8 @@ class Grid extends React.Component {
       case VISIT_STATUS.WAITING:
         if (
           visitPurposeFK === VISIT_TYPE.OTC ||
-          visitPurposeFK === VISIT_TYPE.BF
+          visitPurposeFK === VISIT_TYPE.BF ||
+          visitPurposeFK === VISIT_TYPE.MC
         )
           id = '1'
         else id = '5'

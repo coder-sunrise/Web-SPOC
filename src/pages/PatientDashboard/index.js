@@ -171,7 +171,8 @@ class PatientDashboard extends PureComponent {
                     onClick={this.startConsultation}
                     disabled={
                       visitPurposeFK === VISIT_TYPE.OTC ||
-                      visitPurposeFK === VISIT_TYPE.BF
+                      visitPurposeFK === VISIT_TYPE.BF ||
+                      visitPurposeFK === VISIT_TYPE.MC
                     }
                   >
                     Start Consultation

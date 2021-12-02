@@ -280,7 +280,8 @@ const DispenseDetails = ({
   }
 
   const isRetailVisit = visitPurposeFK === VISIT_TYPE.OTC
-  const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BF
+  const isBillFirstVisit =
+    visitPurposeFK === VISIT_TYPE.BF || visitPurposeFK === VISIT_TYPE.MC
   const disableRefreshOrder = isBillFirstVisit && !clinicalObjectRecordFK
   const disableDiscard = totalPayment > 0 || !!clinicalObjectRecordFK
   const [showRemovePayment, setShowRemovePayment] = useState(false)
