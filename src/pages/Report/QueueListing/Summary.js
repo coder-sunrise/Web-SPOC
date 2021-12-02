@@ -77,7 +77,16 @@ const Summary = ({ reportDatas }) => {
         />
       </GridItem>
       <GridItem md={12} style={{ marginTop: '10px' }}>
-        <span style={{ display: 'inline-block', textAlign: 'left', fontWeight: '500', width: '160px' }}>Total Cash Collected:</span>
+        <span
+          style={{
+            display: 'inline-block',
+            textAlign: 'left',
+            fontWeight: '500',
+            width: '160px',
+          }}
+        >
+          Total Cash Collected:
+        </span>
         <NumberInput
           prefix=''
           currency
@@ -89,7 +98,16 @@ const Summary = ({ reportDatas }) => {
         />
       </GridItem>
       <GridItem md={12}>
-        <span style={{ display: 'inline-block', textAlign: 'left', fontWeight: '500', width: '160px' }}>Total Cash Rounding:</span>
+        <span
+          style={{
+            display: 'inline-block',
+            textAlign: 'left',
+            fontWeight: '500',
+            width: '160px',
+          }}
+        >
+          Total Cash Rounding:
+        </span>
         <NumberInput
           currency
           text
@@ -100,11 +118,20 @@ const Summary = ({ reportDatas }) => {
         />
       </GridItem>
       <GridItem md={12}>
-        <span style={{ display: 'inline-block', textAlign: 'left', fontWeight: '500', width: '160px' }}>Company Payable Amt.:</span>
+        <span
+          style={{
+            display: 'inline-block',
+            textAlign: 'left',
+            fontWeight: '500',
+            width: '160px',
+          }}
+        >
+          Co-Payer Payable Amt.:
+        </span>
         <NumberInput
           currency
           text
-          style={{ padding: '0px 8px', width: '100px', textAlign: 'right' }} 
+          style={{ padding: '0px 8px', width: '100px', textAlign: 'right' }}
           value={InvoicePayerDetail.reduce((pre, cur) => {
             return pre + cur.coPayerPayable
           }, 0)}

@@ -765,6 +765,12 @@ const _routes = [
             component: './Report/RadiologyStatisticReport',
             authority: ['report.finance.radiologystatisticreport'],
           },
+          {
+            path: '/report/partialdispensereport',
+            name: 'partialdispensereport',
+            component: './Report/PartialDispenseReport',
+            authority: ['report.inventory.partialdispensereport'],
+          },
         ],
       },
       // Report
@@ -1128,6 +1134,12 @@ const _routes = [
             name: 'visitordertemplate',
             component: './Setting/VisitOrderTemplate',
             authority: ['settings.templates.visitordertemplate'],
+          },
+          {
+            path: '/setting/medicinetrivia',
+            name: 'medicinetrivia',
+            component: './Setting/medicineTrivia',
+            authority: ['settings.clinicsetting.medicinetrivia'],
           },
           {
             path: '/setting/refractiontesttype',

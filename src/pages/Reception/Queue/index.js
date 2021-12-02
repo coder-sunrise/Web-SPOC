@@ -21,6 +21,7 @@ import {
   PageHeaderWrapper,
   ProgressButton,
   notification,
+  Tooltip,
 } from '@/components'
 // current page sub components
 import EndSessionSummary from '@/pages/Report/SessionSummary/Details/index'
@@ -130,6 +131,8 @@ class Queue extends React.Component {
       search: '',
       showForms: false,
       formCategory: undefined,
+      queueInfo: undefined,
+      refreshInfo: undefined,
     }
     this._timer = null
   }
@@ -153,10 +156,12 @@ class Queue extends React.Component {
       },
     })
 
+    this.setState({ refreshInfo: moment().format('HH:mm') })
     initRoomAssignment()
 
     this._timer = setInterval(() => {
       dispatch({ type: `${modelKey}refresh` })
+      this.setState({ refreshInfo: moment().format('HH:mm') })
     }, 900000)
   }
 
@@ -739,6 +744,7 @@ class Queue extends React.Component {
 
   onRefreshClick = () => {
     const { dispatch } = this.props
+    this.setState({ refreshInfo: moment().format('HH:mm') })
     dispatch({
       type: `${modelKey}refresh`,
     })
@@ -825,11 +831,22 @@ class Queue extends React.Component {
       _sessionInfoID,
       search,
       showForms,
+      queueInfo,
+      refreshInfo,
     } = this.state
-    const { sessionInfo, error } = queueLog
+    const { sessionInfo, error, queueFilterBar = {} } = queueLog
+    const { visitType = [] } = queueFilterBar
     const { sessionNo, isClinicSessionClosed } = sessionInfo
-    const { tracker } = queueCalling
+    const { oriQCallList } = queueCalling
     const openQueueDisplayAccessRight = Authorized.check('openqueuedisplay')
+    const roomCode = localStorage.getItem('roomCode')
+    let queueCallList = undefined
+
+    if (oriQCallList) {
+      queueCallList = oriQCallList.filter(
+        x => x.from === 'Queue' && x.roomCode === roomCode,
+      )
+    }
     return (
       <PageContainer
         header={{
@@ -837,32 +854,76 @@ class Queue extends React.Component {
           title: `Session No.: ${sessionNo}`,
           extra: [
             <div className='queueHeader'>
-              {openQueueDisplayAccessRight &&
-              openQueueDisplayAccessRight.rights !== 'hidden' &&
-              tracker &&
-              tracker.qNo ? (
-                <h4
-                  className={classNames(classes.sessionNo)}
-                  style={{
-                    fontSize: 16,
-                    marginTop: 10,
-                    marginLeft: 10,
-                    fontWeight: 'Bold',
-                  }}
-                >
-                  <font color='red'>
-                    NOW SERVING:{' '}
-                    {tracker.qNo.includes('.')
-                      ? tracker.qNo
-                      : `${tracker.qNo}.0`}
-                  </font>
-                </h4>
-              ) : (
-                ''
-              )}
-
               {!isClinicSessionClosed && (
                 <div>
+                  <div
+                    style={{
+                      display: 'inline-block',
+                      position: 'absolute',
+                      right: 700,
+                      width: 200,
+                    }}
+                  >
+                    <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>
+                      Now Serving:
+                    </p>
+                    <Tooltip
+                      title={
+                        queueCallList?.[0]
+                          ? `${queueCallList?.[0]?.qNo}.0 (${queueCallList?.[0]?.patientName})`
+                          : '-'
+                      }
+                    >
+                      <p
+                        style={{
+                          color: '#1890f8',
+                          textOverflow: 'ellipsis',
+                          overflow: 'hidden',
+                          whiteSpace: 'nowrap',
+                          marginTop: -5,
+                          fontSize: '0.9rem',
+                          width: 200,
+                        }}
+                      >
+                        {queueCallList?.[0]
+                          ? `${queueCallList?.[0]?.qNo}.0 (${queueCallList?.[0]?.patientName})`
+                          : '-'}
+                      </p>
+                    </Tooltip>
+                  </div>
+                  <div
+                    style={{
+                      display: 'inline-block',
+                      position: 'absolute',
+                      right: 620,
+                    }}
+                  >
+                    <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>
+                      Last Refresh:
+                    </p>
+                    <span>
+                      <p
+                        style={{
+                          color: '#1890f8',
+                          marginTop: -5,
+                          fontSize: '0.9rem',
+                        }}
+                      >
+                        {refreshInfo ? refreshInfo : '-'}
+                      </p>
+                    </span>
+                  </div>
+                  <ProgressButton
+                    color='info'
+                    size='sm'
+                    onClick={this.onRefreshClick}
+                    submitKey={`${modelKey}refresh`}
+                    icon={<Refresh />}
+                  >
+                    Refresh
+                  </ProgressButton>
+                  <QueueDashboardButton size='sm' />
+
                   <Authorized authority='queue.endsession'>
                     <ProgressButton
                       icon={<EventNote />}
@@ -873,16 +934,6 @@ class Queue extends React.Component {
                       <FormattedMessage id='reception.queue.sessionSummary' />
                     </ProgressButton>
                   </Authorized>
-                  <QueueDashboardButton size='sm' />
-                  <ProgressButton
-                    color='info'
-                    size='sm'
-                    onClick={this.onRefreshClick}
-                    submitKey={`${modelKey}refresh`}
-                    icon={<Refresh />}
-                  >
-                    Refresh
-                  </ProgressButton>
 
                   <Authorized authority='queue.endsession'>
                     <ProgressButton
@@ -921,6 +972,7 @@ class Queue extends React.Component {
                   onRegisterVisitEnterPressed={this.onEnterPressed}
                   toggleNewPatient={this.toggleRegisterNewPatient}
                   setSearch={this.setSearch}
+                  {...this.props}
                 />
               </div>
               <DetailsGrid
@@ -935,6 +987,7 @@ class Queue extends React.Component {
                 // handleFormsClick={this.showVisitForms}
                 history={history}
                 searchQuery={search}
+                visitType={visitType}
               />
               <RightClickContextMenu
                 onMenuItemClick={this.onMenuItemClick}

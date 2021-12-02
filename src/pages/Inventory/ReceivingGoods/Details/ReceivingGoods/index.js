@@ -5,6 +5,7 @@ import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
 
 import Yup from '@/utils/yup'
+import Warining from '@material-ui/icons/Error'
 import {
   withFormikExtend,
   GridContainer,
@@ -51,12 +52,6 @@ const styles = theme => ({
   mapPropsToValues: ({ receivingGoodsDetails }) => {
     return {
       ...receivingGoodsDetails,
-      rows: (receivingGoodsDetails.rows || []).map(o => {
-        return {
-          ...o,
-          isClosed: receivingGoodsDetails.receivingGoods.isClosed,
-        }
-      }),
     }
   },
   validationSchema: Yup.object().shape({
@@ -191,13 +186,54 @@ class Index extends Component {
         confirmText,
         cancelText,
       ) => {
+        processedPayload = this.processSubmitPayload(statusCode)
+        if (
+          action === rgSubmitAction.COMPLETE &&
+          processedPayload.totalAfterAdj < 0
+        ) {
+          window.g_app._store.dispatch({
+            type: 'global/updateAppState',
+            payload: {
+              openConfirm: true,
+              isInformType: true,
+              customWidth: 'md',
+              openConfirmContent: () => {
+                return (
+                  <div>
+                    <Warining
+                      style={{
+                        width: '1.3rem',
+                        height: '1.3rem',
+                        marginLeft: '10px',
+                        color: 'red',
+                      }}
+                    />
+                    <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>
+                      Unable to complete, total amount cannot be{' '}
+                      <span style={{ fontWeight: 400 }}>negative</span>.
+                    </h3>
+                  </div>
+                )
+              },
+              openConfirmText: 'OK',
+              onConfirmClose: () => {
+                window.g_app._store.dispatch({
+                  type: 'global/updateAppState',
+                  payload: {
+                    customWidth: undefined,
+                  },
+                })
+              },
+            },
+          })
+          return
+        }
         dispatch({
           type: 'global/updateAppState',
           payload: {
             openConfirm: true,
             openConfirmContent: content,
             onConfirmSave: async () => {
-              processedPayload = this.processSubmitPayload(statusCode)
               await submit()
               if (statusCode === RECEIVING_GOODS_STATUS.CANCELLED) {
                 history.push('/inventory/rg')
@@ -251,9 +287,14 @@ class Index extends Component {
   processSubmitPayload = receivingGoodsStatusFK => {
     const { receivingGoodsDetails, values } = this.props
     const { type } = receivingGoodsDetails
-    const { receivingGoods, rows } = values
+    const {
+      receivingGoods,
+      rows,
+      receivingGoodsAdjustment: rgAdjustment,
+    } = values
     let receivingGoodsItem = []
     let newReceivingGoodsStatusFK = receivingGoodsStatusFK
+    let newRgAdjustment
 
     if (type === 'new') {
       if (receivingGoodsStatusFK === RECEIVING_GOODS_STATUS.COMPLETED) {
@@ -273,7 +314,8 @@ class Index extends Component {
             quantityReceived: x.quantityReceived,
             totalReceived: x.totalReceived,
             totalPrice: x.totalPrice,
-            totalAfterGST: roundTo(x.totalAfterGST),
+            totalAfterGST: roundTo(x.totalAfterGst),
+            totalAfterAdjustments: roundTo(x.totalAfterAdjustments),
             unitPrice: x.unitPrice,
             sortOrder: x.sortOrder,
             IsACPUpdated: false,
@@ -296,6 +338,12 @@ class Index extends Component {
       delete receivingGoods.id
       delete receivingGoods.concurrencyToken
 
+      newRgAdjustment = rgAdjustment.map(adj => {
+        delete adj.id
+        delete adj.concurrencyToken
+        delete adj.receivingGoodsFK
+        return adj
+      })
       receivingGoodsItem = rows
         .filter(item => !item.isDeleted)
         .map(x => {
@@ -308,7 +356,8 @@ class Index extends Component {
             totalReceived: x.totalReceived,
             totalPrice: x.totalPrice,
             unitPrice: x.unitPrice,
-            totalAfterGST: roundTo(x.totalAfterGST),
+            totalAfterGST: roundTo(x.totalAfterGst),
+            totalAfterAdjustments: roundTo(x.totalAfterAdjustments),
             sortOrder: x.sortOrder,
             IsACPUpdated: false,
             unitOfMeasurement: x.unitOfMeasurement,
@@ -339,7 +388,8 @@ class Index extends Component {
               totalReceived: x.totalReceived,
               totalPrice: x.totalPrice,
               unitPrice: x.unitPrice,
-              totalAfterGST: roundTo(x.totalAfterGST),
+              totalAfterGST: roundTo(x.totalAfterGst),
+              totalAfterAdjustments: roundTo(x.totalAfterAdjustments),
               sortOrder: x.sortOrder,
               IsACPUpdated: false,
               unitOfMeasurement: x.unitOfMeasurement,
@@ -354,6 +404,8 @@ class Index extends Component {
           } else if (!x.isDeleted) {
             result = {
               ...x,
+              totalAfterGST: roundTo(x.totalAfterGst),
+              totalAfterAdjustments: roundTo(x.totalAfterAdjustments),
               [itemType.prop]: {
                 ...x[itemType.prop],
                 [itemType.itemFKName]: x[itemType.itemFKName],
@@ -364,6 +416,8 @@ class Index extends Component {
           } else {
             result = {
               ...x,
+              totalAfterGST: roundTo(x.totalAfterGst),
+              totalAfterAdjustments: roundTo(x.totalAfterAdjustments),
             }
           }
           return result
@@ -376,6 +430,14 @@ class Index extends Component {
         newReceivingGoodsStatusFK,
       ).code,
       receivingGoodsItem,
+      receivingGoodsAdjustment: newRgAdjustment || [
+        ...rgAdjustment.map(adj => {
+          if (adj.isNew) {
+            delete adj.id
+          }
+          return adj
+        }),
+      ],
     }
   }
 
@@ -413,7 +475,12 @@ class Index extends Component {
     const { values, setFieldValue, errors, classes, setValues } = this.props
     const { receivingGoods: rg, type } = values
     const rgStatus = rg ? rg.receivingGoodsStatusFK : 0
-    const { receivingGoods, rows, receivingGoodsPayment = [] } = values
+    const {
+      receivingGoods,
+      rows = [],
+      receivingGoodsPayment = [],
+      receivingGoodsAdjustment = [],
+    } = values
     const {
       isGSTEnabled,
       isGSTInclusive,
@@ -446,6 +513,11 @@ class Index extends Component {
             isReadOnly={
               this.getRights(type, rgStatus, isClosed, isWriteOff) === 'disable'
             }
+            isDisableSupplier={
+              rgStatus === RECEIVING_GOODS_STATUS.CANCELLED ||
+              isClosed ||
+              isWriteOff
+            }
             setFieldValue={setFieldValue}
             isCompletedOrCancelled={isCompletedOrCancelled}
             {...this.props}
@@ -463,34 +535,60 @@ class Index extends Component {
             {...this.props}
           />
           <GridContainer>
-            <GridItem xs={2} md={8} />
-            <GridItem xs={10} md={4}>
-              <div style={{ paddingRight: 22 }}>
-                <AmountSummary
-                  showAdjustment={false}
-                  adjustments={[]}
-                  rows={rows}
-                  config={{
-                    isGSTInclusive,
-                    itemFkField: 'receivingGoodsItemFK',
-                    totalField: 'totalPrice',
-                    gstField: 'totalAfterGST',
-                    gstValue: currentGSTValue,
+            <GridItem xs={2} md={6} />
+            <GridItem xs={10} md={6}>
+              <div style={{ paddingRight: 100 }}>
+                <AuthorizedContext.Provider
+                  value={{
+                    rights:
+                      rgStatus === RECEIVING_GOODS_STATUS.CANCELLED ||
+                      isClosed ||
+                      isWriteOff
+                        ? 'disable'
+                        : 'enable',
                   }}
-                  onValueChanged={v => {
-                    const newReceivingGoods = {
-                      ...values.receivingGoods,
-                      totalAmount: v.summary.total,
-                      totalAftGST: v.summary.totalWithGST,
-                      gstAmount: Math.round(v.summary.gst * 100) / 100,
-                      isGSTInclusive: !!v.summary.isGSTInclusive,
-                    }
-                    setValues({
-                      ...values,
-                      receivingGoods: newReceivingGoods,
-                    })
-                  }}
-                />
+                >
+                  <AmountSummary
+                    adjustments={receivingGoodsAdjustment}
+                    rows={rows}
+                    config={{
+                      isGSTInclusive,
+                      itemFkField: 'receivingGoodsItemFK',
+                      itemAdjustmentFkField: 'receivingGoodsAdjustmentFK',
+                      invoiceItemAdjustmentField:
+                        'receivingGoodsItemAdjustment',
+                      adjustedField: 'totalAfterAdjustments',
+                      totalField: 'totalPrice',
+                      gstField: 'totalAfterGst',
+                      gstAmtField: 'itemLevelGST',
+                      gstValue: currentGSTValue,
+                    }}
+                    onValueChanged={v => {
+                      const newReceivingGoods = {
+                        ...values.receivingGoods,
+                        totalAmount: v.summary.total,
+                        totalAftGST: v.summary.totalWithGST,
+                        gstAmount: Math.round(v.summary.gst * 100) / 100,
+                        isGSTInclusive: !!v.summary.isGSTInclusive,
+                        totalAfterAdj: v.summary.totalAfterAdj,
+                        adjustmentAmount: _.sumBy(
+                          (v.adjustments || []).filter(p => !p.isDeleted),
+                          'adjAmount',
+                        ),
+                      }
+                      setValues({
+                        ...values,
+                        receivingGoods: newReceivingGoods,
+                        receivingGoodsAdjustment: v.adjustments.map(a => {
+                          return {
+                            sequence: a.index + 1,
+                            ...a,
+                          }
+                        }),
+                      })
+                    }}
+                  />
+                </AuthorizedContext.Provider>
               </div>
             </GridItem>
           </GridContainer>

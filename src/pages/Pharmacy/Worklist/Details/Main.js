@@ -129,7 +129,6 @@ const Main = props => {
   const [reportID, setReportID] = useState(-1)
   const [reportParameters, setReportParameters] = useState({})
 
-
   useEffect(() => {
     subscribeNotification('PharmacyOrderUpdate', {
       callback: response => {
@@ -207,7 +206,6 @@ const Main = props => {
         }
       })
     }
-
     const _editOrder = () => {
       if (pharmacyDetails.entity?.visitFK) {
         dispatch({
@@ -615,10 +613,37 @@ const Main = props => {
       return isValid
     }
 
+    const checkPartialDrugMixture = () => {
+      let isPartialDrugMixture = false
+      for (let index = 0; index < orderItems.length; index++) {
+        if (
+          orderItems[index].allowToDispense &&
+          orderItems[index].isDrugMixture
+        ) {
+          const items = orderItems.filter(
+            oi =>
+              oi.isDrugMixture &&
+              oi.drugMixtureFK === orderItems[index].drugMixtureFK &&
+              oi.inventoryFK === orderItems[index].inventoryFK,
+          )
+          if (
+            orderItems[index].remainQty > _.sumBy(items, 'dispenseQuantity')
+          ) {
+            isPartialDrugMixture = true
+            notification.error({
+              message: 'Partial dispense is not allowed for drug mixture.',
+            })
+            break
+          }
+        }
+      }
+      return isPartialDrugMixture
+    }
+
     const checkOverDispense = () => {
       let isOverDispense = false
       for (let index = 0; index < orderItems.length; index++) {
-        if (orderItems[index].stockFK) {
+        if (orderItems[index].allowToDispense) {
           let items = []
           if (orderItems[index].isDrugMixture) {
             items = orderItems.filter(
@@ -650,7 +675,7 @@ const Main = props => {
     const checkPartialPrepare = () => {
       let isPartialPrepare = false
       for (let index = 0; index < orderItems.length; index++) {
-        if (orderItems[index].stockFK) {
+        if (orderItems[index].allowToDispense) {
           let items = []
           if (orderItems[index].isDrugMixture) {
             items = orderItems.filter(
@@ -678,6 +703,11 @@ const Main = props => {
       }
       return isPartialPrepare
     }
+
+    if (checkPartialDrugMixture()) {
+      return
+    }
+
     if (!validPharmacy()) {
       return
     }
@@ -861,7 +891,7 @@ const Main = props => {
           return (
             (pharmacyDetails.fromModule === 'Main' &&
               row.statusFK !== PHARMACY_STATUS.NEW) ||
-            !row.stockFK ||
+            !row.allowToDispense ||
             type === 'CompletedItems'
           )
         },
@@ -869,7 +899,7 @@ const Main = props => {
           if (
             (pharmacyDetails.fromModule === 'Main' &&
               row.statusFK !== PHARMACY_STATUS.NEW) ||
-            !row.stockFK ||
+            !row.allowToDispense ||
             type === 'CompletedItems'
           ) {
             const dispenseQty = !row.stockFK
@@ -956,28 +986,141 @@ const Main = props => {
         align: 'right',
       },
       {
-        columnName: 'batchNo',
+        columnName: 'stockFK',
         width: 100,
         sortingEnabled: false,
+        type: 'codeSelect',
+        labelField: 'batchNo',
+        valueField: 'id',
+        options: row => {
+          const { codetable } = props
+          const {
+            inventorymedication = [],
+            inventoryconsumable = [],
+          } = codetable
+          let stockList = []
+          if (row.invoiceItemTypeFK === 1) {
+            const medication = inventorymedication.find(
+              m => m.id === row.inventoryFK,
+            )
+            if (medication) {
+              stockList = (medication.medicationStock || []).filter(
+                s =>
+                  s.isDefault ||
+                  (s.stock > 0 &&
+                    (!s.expiryDate ||
+                      moment(s.expiryDate).startOf('day') >=
+                        moment().startOf('day'))),
+              )
+            }
+          } else {
+            const consumable = inventoryconsumable.find(
+              m => m.id === row.inventoryFK,
+            )
+            if (consumable) {
+              stockList = (consumable.consumableStock || []).filter(
+                s =>
+                  s.isDefault ||
+                  (s.stock > 0 &&
+                    (!s.expiryDate ||
+                      moment(s.expiryDate).startOf('day') >=
+                        moment().startOf('day'))),
+              )
+            }
+          }
+          stockList = _.orderBy(stockList, ['expiryDate'], ['asc'])
+          if (row.stockFK) {
+            const selectStock = stockList.find(sl => sl.id === row.stockFK)
+            if (!selectStock) {
+              return [
+                {
+                  id: row.stockFK,
+                  batchNo: row.batchNo,
+                  expiryDate: row.expiryDate,
+                  isDefault: row.isDefault,
+                },
+                ...stockList,
+              ]
+            } else {
+              return [
+                { ...selectStock },
+                ...stockList.filter(sl => sl.id !== row.stockFK),
+              ]
+            }
+          }
+          return stockList
+        },
+        dropdownMatchSelectWidth: false,
+        dropdownStyle: {
+          width: '200px!important',
+        },
+        renderDropdown: option => {
+          const batchtext = option.expiryDate
+            ? `${option.batchNo}, Exp.: ${moment(option.expiryDate).format(
+                'DD MMM YYYY',
+              )}`
+            : option.batchNo
+          return (
+            <Tooltip title={batchtext}>
+              <div
+                style={{
+                  display: 'inline-block',
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  width: 230,
+                }}
+              >
+                {batchtext}
+              </div>
+            </Tooltip>
+          )
+        },
         isDisabled: row =>
           (pharmacyDetails.fromModule === 'Main' &&
             row.statusFK !== PHARMACY_STATUS.NEW) ||
-          !row.isDefault ||
+          !row.allowToDispense ||
           type === 'CompletedItems',
-        render: row => {
-          if (
-            (pharmacyDetails.fromModule === 'Main' &&
-              row.statusFK !== PHARMACY_STATUS.NEW) ||
-            !row.isDefault ||
-            type === 'CompletedItems'
-          ) {
-            return (
-              <Tooltip title={row.batchNo}>
-                <span>{row.batchNo}</span>
-              </Tooltip>
-            )
+        onChange: ({ option, row }) => {
+          if (option) {
+            row.stockFK = option.id
+            row.batchNo = option.batchNo
+            row.expiryDate = option.expiryDate
+            row.isDefault = option.isDefault
+            row.stock = option.stock
+          } else {
+            row.stockFK = undefined
+            row.batchNo = undefined
+            row.expiryDate = undefined
+            row.isDefault = false
+            row.stock = 0
+            row.dispenseQuantity = 0
           }
-          return <TextField maxLength={100} label='' value={row.batchNo} />
+        },
+        render: row => {
+          const isExpire =
+            ((pharmacyDetails.fromModule === 'Main' &&
+              row.statusFK === PHARMACY_STATUS.NEW) ||
+              type === 'PendingItems') &&
+            row.expiryDate &&
+            moment(row.expiryDate).startOf('day') < moment().startOf('day')
+
+          return (
+            <div>
+              <Tooltip title={row.batchNo}>
+                <div
+                  style={{
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {row.batchNo || '-'}
+                </div>
+              </Tooltip>
+              {isExpire && <p style={{ color: 'red' }}>EXPIRED!</p>}
+            </div>
+          )
         },
       },
       {
@@ -991,22 +1134,22 @@ const Main = props => {
           !row.isDefault ||
           type === 'CompletedItems',
         render: row => {
-          if (
-            (pharmacyDetails.fromModule === 'Main' &&
-              row.statusFK !== PHARMACY_STATUS.NEW) ||
-            !row.isDefault ||
-            type === 'CompletedItems'
-          ) {
-            const expiryDate = row.expiryDate
-              ? moment(row.expiryDate).format('DD MMM YYYY')
-              : '-'
-            return (
-              <Tooltip title={expiryDate}>
-                <span>{expiryDate}</span>
-              </Tooltip>
-            )
-          }
-          return <DatePicker label='' simple value={row.expiryDate} />
+          const expiryDate = row.expiryDate
+            ? moment(row.expiryDate).format('DD MMM YYYY')
+            : '-'
+          const isExpire =
+            ((pharmacyDetails.fromModule === 'Main' &&
+              row.statusFK === PHARMACY_STATUS.NEW) ||
+              type === 'PendingItems') &&
+            row.expiryDate &&
+            moment(row.expiryDate).startOf('day') < moment().startOf('day')
+          return (
+            <Tooltip title={expiryDate}>
+              <span style={{ color: isExpire ? 'red' : 'black' }}>
+                {expiryDate}
+              </span>
+            </Tooltip>
+          )
         },
       },
       {
@@ -1144,7 +1287,7 @@ const Main = props => {
         name: 'stock',
         title: 'Stock Qty.',
       },
-      { name: 'batchNo', title: 'Batch No.' },
+      { name: 'stockFK', title: 'Batch No.' },
       { name: 'expiryDate', title: 'Expiry Date' },
       {
         name: 'stockBalance',
@@ -1306,13 +1449,13 @@ const Main = props => {
     setShowJournalHistory(false)
   }
 
-  const printReview = (reportid) => {
+  const printReview = reportid => {
     let reprottitle = ''
     let reportparameters = {}
-    if(reportid == 84){
+    if (reportid == 84) {
       reprottitle = 'Prescription'
       const { visitFK, id, patientProfileFK } = pharmacyDetails?.entity || {}
-      reportparameters = { visitFK, pharmacyWorkitemId:id, patientProfileFK }
+      reportparameters = { visitFK, pharmacyWorkitemId: id, patientProfileFK }
     }
     setReportID(reportid)
     setReportTitle(reprottitle)
@@ -1325,6 +1468,49 @@ const Main = props => {
     setReportTitle('')
     setReportParameters({})
     setShowReportViwer(false)
+  }
+
+  const actualizeEditOrder = () => {
+    dispatch({
+      type: 'orders/updateState',
+      payload: {
+        type: '1',
+        visitPurposeFK: visitPurposeFK,
+      },
+    })
+    dispatch({
+      type: 'dispense/updateState',
+      payload: { ordersData: pharmacyDetails.ordersData },
+    })
+    dispatch({
+      type: 'dispense/query',
+      payload: {
+        id: workitem.visitFK,
+        version: Date.now(),
+      },
+    }).then(r => {
+      if (r) {
+        setShowEditOrderModal(true)
+      }
+    })
+  }
+
+  if (pharmacyDetails.openOrderPopUpAfterActualize) {
+    actualizeEditOrder()
+    pharmacyDetails.openOrderPopUpAfterActualize = false
+  }
+
+  const checkExpiredItems = () => {
+    if (
+      (props.values.orderItems || []).find(
+        item =>
+          item.expiryDate &&
+          moment(item.expiryDate).startOf('day') < moment().startOf('day'),
+      )
+    ) {
+      return true
+    }
+    return false
   }
 
   return (
@@ -1544,7 +1730,12 @@ const Main = props => {
             <Button color='primary' size='sm' disabled={isOrderUpdate}>
               Print leaflet/Drug Summary Label
             </Button>
-            <Button color='primary' size='sm' disabled={isOrderUpdate} onClick={()=>printReview(84)}>
+            <Button
+              color='primary'
+              size='sm'
+              disabled={isOrderUpdate}
+              onClick={() => printReview(84)}
+            >
               Print Prescription
             </Button>
             {secondaryPrintoutLanguage !== '' && (
@@ -1629,7 +1820,11 @@ const Main = props => {
                 color='primary'
                 size='sm'
                 onClick={() => onPrepare(PHARMACY_ACTION.PREPARE)}
-                disabled={isOrderUpdate || !pharmacyOrderItemCount}
+                disabled={
+                  isOrderUpdate ||
+                  !pharmacyOrderItemCount ||
+                  checkExpiredItems()
+                }
               >
                 Prepare
               </Button>
@@ -1666,7 +1861,7 @@ const Main = props => {
                 color='primary'
                 size='sm'
                 onClick={() => onPrepare(PHARMACY_ACTION.COMPLETEPARTIAL)}
-                disabled={isOrderUpdate}
+                disabled={isOrderUpdate || checkExpiredItems()}
               >
                 Complete
               </Button>

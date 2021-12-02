@@ -11,6 +11,7 @@ import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import Authorized from '@/utils/Authorized'
 import { VALUE_KEYS } from '@/utils/constants'
 import * as service from '../services/queue'
+import { getUserPreference, saveUserPreference } from '@/services/user'
 
 const InitialSessionInfo = {
   isClinicSessionClosed: undefined,
@@ -50,7 +51,7 @@ export default createListViewModel({
       },
     },
     subscriptions: ({ history, dispatch, ...restProps }) => {
-      history.listen(async (location) => {
+      history.listen(async location => {
         const { pathname } = location
         if (pathname === '/reception/queue') {
           dispatch({
@@ -58,7 +59,7 @@ export default createListViewModel({
             payload: {
               keys: VALUE_KEYS.QUEUECALLING,
             },
-          }).then((response) => {
+          }).then(response => {
             const { value } = response
             const {
               lastUpdateDate: lastUpdateTime,
@@ -76,11 +77,18 @@ export default createListViewModel({
               })
             }
           })
+
+          dispatch({
+            type: 'getUserPreference',
+            payload: {
+              type: '9',
+            },
+          })
         }
       })
 
       subscribeNotification('QueueListing', {
-        callback: (response) => {
+        callback: response => {
           const { location } = history
           const { user } = window.g_app._store.getState()
           const { senderId } = response
@@ -93,12 +101,16 @@ export default createListViewModel({
       })
     },
     effects: {
-      *initState (_, { select, put }) {
-        let user = yield select((state) => state.user.data)
-        const queueLogState = yield select((state) => state.queueLog)
-        let { clinicianProfile: { userProfile: { role: userRole } } } = user
+      *initState(_, { select, put }) {
+        let user = yield select(state => state.user.data)
+        const queueLogState = yield select(state => state.queueLog)
+        let {
+          clinicianProfile: {
+            userProfile: { role: userRole },
+          },
+        } = user
         if (userRole === undefined) {
-          user = yield select((state) => state.user.data)
+          user = yield select(state => state.user.data)
           userRole = user.clinicianProfile.userProfile.role
 
           yield put({
@@ -126,13 +138,16 @@ export default createListViewModel({
             hideSelfOnlyFilter: startConsultPermissionIsHidden,
             selfOnly: !queueLogState._modifiedSelftOnly
               ? userRole &&
-                ((userRole.clinicRoleFK === 1 && !startConsultPermissionIsHidden) 
-                  || (userRole.clinicRoleFK === 2 && servePatientRight && servePatientRight.rights !== 'hidden'))
+                ((userRole.clinicRoleFK === 1 &&
+                  !startConsultPermissionIsHidden) ||
+                  (userRole.clinicRoleFK === 2 &&
+                    servePatientRight &&
+                    servePatientRight.rights !== 'hidden'))
               : queueLogState.selfOnly,
           },
         })
       },
-      *startSession (_, { call, put }) {
+      *startSession(_, { call, put }) {
         const response = yield call(service.startSession)
 
         if (response) {
@@ -156,7 +171,7 @@ export default createListViewModel({
           },
         })
       },
-      *endSession ({ sessionID }, { call, put }) {
+      *endSession({ sessionID }, { call, put }) {
         const response = yield call(service.endSession, sessionID)
 
         if (response) {
@@ -177,7 +192,7 @@ export default createListViewModel({
         }
         return response
       },
-      *reopenLastSession (_, { call, put }) {
+      *reopenLastSession(_, { call, put }) {
         const response = yield call(service.reopenLastSession)
 
         if (response) {
@@ -201,7 +216,7 @@ export default createListViewModel({
           },
         })
       },
-      *getCurrentActiveSessionInfo (_, { call, put }) {
+      *getCurrentActiveSessionInfo(_, { call, put }) {
         const bizSessionPayload = {
           IsClinicSessionClosed: false,
         }
@@ -215,12 +230,16 @@ export default createListViewModel({
           })
         }
       },
-      *getSessionInfo (
+      *getSessionInfo(
         { payload = { shouldGetTodayAppointments: true } },
         { call, put, all, select, take },
       ) {
-        let user = yield select((state) => state.user.data)
-        let { clinicianProfile: { userProfile: { role: userRole } } } = user
+        let user = yield select(state => state.user.data)
+        let {
+          clinicianProfile: {
+            userProfile: { role: userRole },
+          },
+        } = user
 
         const { shouldGetTodayAppointments = true } = payload
         const bizSessionPayload = {
@@ -263,7 +282,7 @@ export default createListViewModel({
         })
         return false
       },
-      *getTodayAppointments ({ payload }, { call, put, select }) {
+      *getTodayAppointments({ payload }, { call, put, select }) {
         const { shouldGetTodayAppointments = true } = payload
         // TODO: integrate with new appointment listing api
 
@@ -271,7 +290,7 @@ export default createListViewModel({
         const viewOtherApptAccessRight = Authorized.check(
           'appointment.viewotherappointment',
         )
-        const user = yield select((state) => state.user)
+        const user = yield select(state => state.user)
         let doctor
         if (
           !viewOtherApptAccessRight ||
@@ -292,11 +311,13 @@ export default createListViewModel({
             queryPayload,
           )
           if (response) {
-            const { data: { data = [] } } = response
+            const {
+              data: { data = [] },
+            } = response
             yield put({
               type: 'updateState',
               payload: {
-                appointmentList: data.map((item) => ({
+                appointmentList: data.map(item => ({
                   ...item,
                   visitStatus: VISIT_STATUS.UPCOMING_APPT,
                   appointmentTime: combineDateTime(
@@ -309,7 +330,7 @@ export default createListViewModel({
           }
         }
       },
-      *deleteQueueByQueueID ({ payload }, { call, put }) {
+      *deleteQueueByQueueID({ payload }, { call, put }) {
         const result = yield call(service.deleteQueue, payload)
         if (result) {
           notification.success({
@@ -325,14 +346,14 @@ export default createListViewModel({
         }
         return result
       },
-      *refresh ({ payload }, { put }) {
+      *refresh({ payload }, { put }) {
         yield put({
           type: 'getSessionInfo',
           payload,
         })
         return true
       },
-      *searchPatient ({ payload }, { take, put }) {
+      *searchPatient({ payload }, { take, put }) {
         const prefix = 'like_'
         const { searchQuery } = payload
         yield put({
@@ -353,15 +374,15 @@ export default createListViewModel({
 
         return true
       },
-      *updateQueueListing ({ payload }, { call, put }) {
+      *updateQueueListing({ payload }, { call, put }) {
         const response = yield call(service.updateQueueListing, payload)
-        if(response) {
+        if (response) {
           yield put({
             type: 'updateState',
             payload: {
               list: [],
             },
-          }) 
+          })
           yield put({
             type: 'getSessionInfo',
             payload,
@@ -369,29 +390,79 @@ export default createListViewModel({
         }
         return true
       },
-      *setServingPerson ({ payload}, {call,put}){
+      *setServingPerson({ payload }, { call, put }) {
         const response = yield call(service.setServingPerson, payload.visitFK)
-        if(response){
+        if (response) {
           yield put({
             type: 'getSessionInfo',
           })
         }
       },
+      *saveUserPreference({ payload }, { call, put, select }) {
+        const r = yield call(saveUserPreference, {
+          userPreferenceDetails: JSON.stringify(payload.userPreferenceDetails),
+          itemIdentifier: payload.itemIdentifier,
+          type: payload.type,
+        })
+        if (r === 204) return true
+
+        return false
+      },
+      *getUserPreference({ payload }, { call, put, select }) {
+        const r = yield call(getUserPreference, payload.type)
+        const { status, data } = r
+        if (status === '200') {
+          if (data) {
+            const clinicSettings = yield select(st => st.clinicSettings)
+            const filterBar = JSON.parse(data)
+            let queueFilterBar
+            if (payload.type === '9') {
+              queueFilterBar = filterBar.find(o => o.Identifier === 'Queue')
+            }
+
+            const queue = queueFilterBar?.value || {}
+            const { visitType } = queue
+            const visitTypeSetting = JSON.parse(
+              clinicSettings?.settings?.visitTypeSetting,
+            )
+            const activeVisitType = (visitTypeSetting || [])
+              .filter(vt => vt.isEnabled === 'true')
+              .map(vt => vt.id)
+
+            let newVisitType = [-99, ...activeVisitType]
+            if (visitType) {
+              newVisitType = visitType.filter(
+                vt => activeVisitType.indexOf(vt) >= 0,
+              )
+              if (newVisitType.length === activeVisitType.length) {
+                newVisitType = [-99, ...newVisitType]
+              }
+            }
+            yield put({
+              type: 'updateState',
+              payload: {
+                queueFilterBar: { ...queue, visitType: newVisitType },
+              },
+            })
+          }
+        }
+        return null
+      },
     },
     reducers: {
-      toggleSelfOnly (state) {
+      toggleSelfOnly(state) {
         return { ...state, selfOnly: !state.selfOnly, _modifiedSelftOnly: true }
       },
-      toggleError (state, { error = {} }) {
+      toggleError(state, { error = {} }) {
         return { ...state, error: { ...error } }
       },
-      updateSessionInfo (state, { payload }) {
+      updateSessionInfo(state, { payload }) {
         return { ...state, sessionInfo: { ...payload } }
       },
-      showError (state, { payload }) {
+      showError(state, { payload }) {
         return { ...state, errorMessage: payload }
       },
-      updateFilter (state, { status }) {
+      updateFilter(state, { status }) {
         return { ...state, currentFilter: status }
       },
     },

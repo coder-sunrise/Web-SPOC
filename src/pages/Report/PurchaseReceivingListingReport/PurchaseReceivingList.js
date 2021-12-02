@@ -7,7 +7,7 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { withStyles } from '@material-ui/core'
 import _ from 'lodash'
 
-const styles = (theme) => ({
+const styles = theme => ({
   subRow: {
     '& > td:first-child': {
       paddingLeft: theme.spacing(1),
@@ -15,13 +15,13 @@ const styles = (theme) => ({
   },
 })
 class PurchaseReceivingList extends PureComponent {
-  handleExpandedGroupsChange = (expandedGroups) => {
-    this.setState((prevState) => {
+  handleExpandedGroupsChange = expandedGroups => {
+    this.setState(prevState => {
       return { ...prevState, tableGroupRows: expandedGroups }
     })
   }
 
-  render () {
+  render() {
     let incomeData = []
     const { reportDatas } = this.props
     if (!reportDatas) return null
@@ -50,7 +50,7 @@ class PurchaseReceivingList extends PureComponent {
             countNumber: firstRow ? 1 : 0,
             rowspan: firstRow
               ? reportDatas.PurchaseReceivingListingDetails.filter(
-                  (pr) =>
+                  pr =>
                     pr.poItemID === currentPoItemId &&
                     pr.transactionType === currentTransactionType,
                 ).length
@@ -185,24 +185,22 @@ class PurchaseReceivingList extends PureComponent {
     let grouping = []
     let defaultExpandedGroups = []
     if (reportDatas.PurchaseReceivingListingInfo[0].isGroupBySupplier) {
-      grouping = [
-        { columnName: 'supplierName' },
-      ]
+      grouping = [{ columnName: 'supplierName' }]
 
       defaultExpandedGroups = defaultExpandedGroups.concat(
-        _.uniqBy(incomeData, 'supplierName').map((o) => o.supplierName),
+        _.uniqBy(incomeData, 'supplierName').map(o => o.supplierName),
       )
     }
 
     if (grouping.length > 0) {
       defaultExpandedGroups = defaultExpandedGroups.concat(
         _.uniqBy(incomeData, 'groupID').map(
-          (o) => `${o.supplierName}|${o.groupID}`,
+          o => `${o.supplierName}|${o.groupID}`,
         ),
       )
     } else {
       defaultExpandedGroups = defaultExpandedGroups.concat(
-        _.uniqBy(incomeData, 'groupID').map((o) => o.groupID),
+        _.uniqBy(incomeData, 'groupID').map(o => o.groupID),
       )
     }
     grouping = [
@@ -220,7 +218,7 @@ class PurchaseReceivingList extends PureComponent {
           defaultExpandedGroups,
         },
         row: {
-          contentComponent: (group) => {
+          contentComponent: group => {
             const { row } = group
             if (row.groupedBy === 'supplierName')
               return (
@@ -231,26 +229,22 @@ class PurchaseReceivingList extends PureComponent {
               )
             if (row.groupedBy === 'groupID') {
               const groupRow = incomeData.find(
-                (data) => data.groupID === row.value,
+                data => data.groupID === row.value,
               )
               return (
                 <span>
                   <span style={{ fontWeight: 500 }}>
-                    {groupRow.transactionType === 'PurchaseOrder' ? (
-                      'PO. No.:'
-                    ) : (
-                      'RG. No.:'
-                    )}
+                    {groupRow.transactionType === 'PurchaseOrder'
+                      ? 'PO. No.:'
+                      : 'RG. No.:'}
                   </span>
                   &nbsp;
                   <span>{`${groupRow.poNo || ''}`}</span>
                   &nbsp;&nbsp;&nbsp;&nbsp;
                   <span style={{ fontWeight: 500 }}>
-                    {groupRow.transactionType === 'PurchaseOrder' ? (
-                      'PO. Date.:'
-                    ) : (
-                      'RG. Date.:'
-                    )}
+                    {groupRow.transactionType === 'PurchaseOrder'
+                      ? 'PO. Date.:'
+                      : 'RG. Date.:'}
                   </span>
                   &nbsp;
                   {moment(groupRow.poDate).format('DD MMM YYYY')}
@@ -269,12 +263,30 @@ class PurchaseReceivingList extends PureComponent {
                   <span style={{ marginLeft: 40 }}>
                     <span style={{ fontWeight: 500 }}>Invoice No.:</span>
                     &nbsp;
-                    {groupRow.inovoiceNo || ''}
+                    {groupRow.invoiceNo || ''}
                     &nbsp;&nbsp;&nbsp;&nbsp;
-                    <span style={{ fontWeight: 500 }}>Invoice Amt:</span>
+                    <span style={{ fontWeight: 500 }}>
+                      Invoice Amt(Before Adj & GST):
+                    </span>
                     &nbsp;
                     {currencySymbol}
                     {numeral(groupRow.invoiceAmount || 0).format('0.00')}
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <span style={{ fontWeight: 500 }}>Adjustment:</span>
+                    &nbsp;
+                    <span
+                      style={{
+                        color: groupRow.adjustmentAmount < 0 ? 'red' : 'black',
+                      }}
+                    >
+                      {groupRow.adjustmentAmount < 0
+                        ? `(${currencySymbol}${numeral(
+                            -1 * (groupRow.adjustmentAmount || 0),
+                          ).format('0.00')})`
+                        : `${currencySymbol}${numeral(
+                            groupRow.adjustmentAmount || 0,
+                          ).format('0.00')}`}
+                    </span>
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <span style={{ fontWeight: 500 }}>GST:</span>
                     &nbsp;
@@ -295,7 +307,7 @@ class PurchaseReceivingList extends PureComponent {
       },
     }
 
-    const listRow = (p) => {
+    const listRow = p => {
       const { classes } = this.props
       const { row, children } = p
       let newchildren = []
@@ -316,7 +328,7 @@ class PurchaseReceivingList extends PureComponent {
                   ? 7
                   : 6),
             )
-            .map((item) => ({
+            .map(item => ({
               ...item,
               props: {
                 ...item.props,

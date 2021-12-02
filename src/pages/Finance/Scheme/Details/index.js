@@ -120,6 +120,7 @@ export default compose(
       return schemeDetail.entity ? schemeDetail.entity : schemeDetail.default
     },
     validationSchema: Yup.object().shape({
+      code: Yup.string().max(100),
       name: Yup.string()
         .required()
         .max(100),

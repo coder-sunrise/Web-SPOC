@@ -20,7 +20,7 @@ import {
   NumberInput,
   Switch,
   ProgressButton,
-  Tooltip
+  Tooltip,
 } from '@/components'
 // utils
 import { INVOICE_VIEW_MODE } from '@/utils/constants'
@@ -56,8 +56,8 @@ const styles = theme => ({
     fontSize: '0.7rem',
     padding: '2px 3px',
     height: 20,
-    cursor: 'pointer'
-  }
+    cursor: 'pointer',
+  },
 })
 
 const itemSchema = Yup.object().shape({
@@ -243,7 +243,7 @@ class EditInvoice extends Component {
     )
   }
 
-  render () {
+  render() {
     const { classes, values } = this.props
     const {
       invoiceItem = [],
@@ -309,22 +309,28 @@ class EditInvoice extends Component {
                   }
                   return (
                     <div style={{ position: 'relative' }}>
-                      <div className={classes.wrapCellTextStyle}
-                        style={{ paddingRight: paddingRight }}>
+                      <div
+                        className={classes.wrapCellTextStyle}
+                        style={{ paddingRight: paddingRight }}
+                      >
                         {row.itemType}
                         <div style={{ position: 'relative', top: 2 }}>
                           {this.drugMixtureIndicator(row, -20)}
-                          {row.isPreOrder &&
-                            <Tooltip title='Pre-Order'>
+                          {row.isPreOrder && (
+                            <Tooltip title='New Pre-Order'>
                               <div
-                              className={classes.rightIcon}
-                              style={{
+                                className={classes.rightIcon}
+                                style={{
                                   right: -30,
-                                borderRadius: 4,
+                                  borderRadius: 4,
                                   backgroundColor: '#4255bd',
                                 }}
-                              > Pre</div>
-                            </Tooltip>}
+                              >
+                                {' '}
+                                Pre
+                              </div>
+                            </Tooltip>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -344,7 +350,8 @@ class EditInvoice extends Component {
                 onChange: e => {
                   this.updateUnitPrice(e.row)
                 },
-                isDisabled: (row) => row.isPreOrder && !row.isChargeToday,
+                isDisabled: row =>
+                  (row.isPreOrder && !row.isChargeToday) || row.hasPaid,
               },
               {
                 columnName: 'quantity',
@@ -392,7 +399,10 @@ class EditInvoice extends Component {
                                 }
                               },
                             }}
-                            disabled={row.isPreOrder && !row.isChargeToday}
+                            disabled={
+                              (row.isPreOrder && !row.isChargeToday) ||
+                              row.hasPaid
+                            }
                           />
                         )}
                       />
@@ -429,7 +439,10 @@ class EditInvoice extends Component {
                                     }
                                   },
                                 }}
-                                disabled={row.isPreOrder && !row.isChargeToday}
+                                disabled={
+                                  (row.isPreOrder && !row.isChargeToday) ||
+                                  row.hasPaid
+                                }
                               />
                             )}
                           />
@@ -461,7 +474,10 @@ class EditInvoice extends Component {
                                     }
                                   },
                                 }}
-                                disabled={row.isPreOrder && !row.isChargeToday}
+                                disabled={
+                                  (row.isPreOrder && !row.isChargeToday) ||
+                                  row.hasPaid
+                                }
                               />
                             )}
                           />
@@ -493,7 +509,10 @@ class EditInvoice extends Component {
                                 }
                               },
                             }}
-                            disabled={row.isPreOrder && !row.isChargeToday}
+                            disabled={
+                              (row.isPreOrder && !row.isChargeToday) ||
+                              row.hasPaid
+                            }
                           />
                         )}
                       />
@@ -510,8 +529,19 @@ class EditInvoice extends Component {
                 onChange: e => {
                   this.updateTotal(e.row)
                 },
-                isDisabled: (row) => row.isPreOrder && !row.isChargeToday,
-                render: (row) => <NumberInput value={(row.isPreOrder && !row.isChargeToday) ? 0 : row.totalAfterItemAdjustment} text currency />
+                isDisabled: row =>
+                  (row.isPreOrder && !row.isChargeToday) || row.hasPaid,
+                render: row => (
+                  <NumberInput
+                    value={
+                      (row.isPreOrder && !row.isChargeToday) || row.hasPaid
+                        ? 0
+                        : row.totalAfterItemAdjustment
+                    }
+                    text
+                    currency
+                  />
+                ),
               },
             ]}
             schema={itemSchema}

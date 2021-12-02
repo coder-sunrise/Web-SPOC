@@ -137,6 +137,7 @@ export default {
   'menu.setting.servicecentercategory': 'Service Center Category',
   'menu.setting.servicecategory': 'Service Category',
   'menu.setting.medicationfrequency': 'Medication Frequency',
+  'menu.setting.medicinetrivia': 'Medicine Trivia',
   'menu.setting.medicationprecautions': 'Medication Precaution',
   'menu.setting.medicationconsumptionmethod': 'Medication Consumption Method',
   'menu.setting.smstemplate': 'SMS Template',
@@ -194,6 +195,7 @@ export default {
   'menu.report.viewreport': 'View Report',
   'menu.report.expiringstockreport': 'Expiring Stock Report',
   'menu.report.radiologystatisticreport': 'Radiology Statistic Report',
+  'menu.report.partialdispensereport': ' Partial Dispense Report',
 
   'menu.report.visitListingReport': 'Visit Listing Report',
 

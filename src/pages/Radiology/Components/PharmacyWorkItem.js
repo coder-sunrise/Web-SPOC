@@ -13,13 +13,14 @@ import {
   CommonTableGrid,
   Popover,
 } from '@/components'
-import { VISIT_TYPE, VISIT_TYPE_NAME } from '@/utils/constants'
+import { VISIT_TYPE, VISIT_TYPE_NAME, PHARMACY_STATUS } from '@/utils/constants'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import { FileDoneOutlined } from '@ant-design/icons'
 import Warning from '@material-ui/icons/Error'
 import WorklistContext from '../Worklist/WorklistContext'
 import VisitGroupIcon from './VisitGroupIcon'
 import PrintPrescription from './PrintPrescription'
+import { CallingQueueButton } from '@/components/_medisys'
 
 const blueColor = '#1890f8'
 
@@ -227,6 +228,20 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
             visitFK={item.visitFK}
             isQueueNoDecimal={isQueueNoDecimal}
           />
+        )}
+        {item.statusFK === PHARMACY_STATUS.VERIFIED && (
+          <span
+            style={{
+              display: 'flex',
+              float: 'right',
+            }}
+          >
+            <CallingQueueButton
+              qId={queueNo}
+              patientName={item.name}
+              from='Pharmacy'
+            />
+          </span>
         )}
       </div>
     </div>
