@@ -1290,17 +1290,12 @@ class Banner extends PureComponent {
                   </GridItem>
 
                   <GridItem xs={12} md={12} className={classes.cell}>
-                    <div style={{ position: 'relative', top: 10 }}>
+                    <div>
                       <span className={classes.header}>G6PD: </span>
                       <span>{g6PD ? g6PD.name : '-'}</span>
                     </div>
                   </GridItem>
-                  <GridItem
-                    xs={12}
-                    md={12}
-                    className={classes.cell}
-                    style={{ position: 'relative', top: 10 }}
-                  >
+                  <GridItem xs={12} md={12} className={classes.cell}>
                     {notesHistoryAccessRight.rights !== 'hidden' && (
                       <Link className={classes.header}>
                         <span
