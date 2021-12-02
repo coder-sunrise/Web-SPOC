@@ -888,7 +888,10 @@ class Banner extends PureComponent {
       isReadOnly,
       isRetail,
       editingOrder,
+      clinicSettings,
     } = props
+
+    const { isEnableJapaneseICD10Diagnosis } = clinicSettings
 
     const preOrderAccessRight = Authorized.check(
       'patientdatabase.modifypreorder',
@@ -954,6 +957,22 @@ class Banner extends PureComponent {
 
     const pendingPreOrderItems =
       entity.pendingPreOrderItem?.filter(item => !item.isDeleted) || []
+
+    const persistentDiagnosis =
+      isEnableJapaneseICD10Diagnosis === true &&
+      info.patientHistoryDiagnosis.length > 0
+        ? info.patientHistoryDiagnosis
+            .map(
+              d =>
+                `${d.diagnosisDescription} ${d.jpnDiagnosisDescription || ''}`,
+            )
+            .join(', ')
+        : isEnableJapaneseICD10Diagnosis === false &&
+          info.patientHistoryDiagnosis.length > 0
+        ? info.patientHistoryDiagnosis
+            .map(d => d.diagnosisDescription)
+            .join(', ')
+        : '-'
 
     return (
       <Paper id='patientBanner' style={style}>
@@ -1159,18 +1178,9 @@ class Banner extends PureComponent {
                     <span className={classes.header}>
                       Persistent Diagnosis:{' '}
                     </span>
-                    <Tooltip
-                      title={info.patientHistoryDiagnosis
-                        .map(d => d.diagnosisDescription)
-                        .join(', ')}
-                      interactive='true'
-                    >
+                    <Tooltip title={persistentDiagnosis} interactive='true'>
                       <span className={classes.contents}>
-                        {info.patientHistoryDiagnosis.length > 0
-                          ? info.patientHistoryDiagnosis
-                              .map(d => d.diagnosisDescription)
-                              .join(', ')
-                          : '-'}
+                        {persistentDiagnosis}
                       </span>
                     </Tooltip>
                   </GridItem>
