@@ -392,7 +392,7 @@ class VisitFormGrid extends PureComponent {
         />
         <AuthorizedContext>
           {r => {
-            if ((r && r.rights !== 'enable') || !isCanEditForms) return null
+            if ((r && r.rights !== 'enable') || isHiddenModify || !isCanEditForms) return null
             let unionFormTypes = formTemplates//formTypes.concat(formTemplates)
             unionFormTypes = this.state.filterFormTemplate
               ? unionFormTypes.filter(

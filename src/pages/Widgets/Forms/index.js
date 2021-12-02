@@ -10,6 +10,7 @@ import { download } from '@/utils/request'
 import { commonDataReaderTransform } from '@/utils/utils'
 import Yup from '@/utils/yup'
 import VoidWithPopover from './VoidWithPopover'
+import Authorized from '@/utils/Authorized'
 
 import {
   CommonTableGrid,
@@ -323,6 +324,13 @@ class Forms extends PureComponent {
     } = this.props
     const { showModal } = forms
     const { rows = [] } = forms
+    
+    const modifyAR = Authorized.check('queue.consultation.form.modify')
+    const voidAR = Authorized.check('queue.consultation.form.void')
+
+    const isHiddenModify = modifyAR && modifyAR.rights !== 'enable'
+    const isHiddenVoid = voidAR && voidAR.rights !== 'enable'
+
     return (
       <div>
         <Checkbox
@@ -364,7 +372,8 @@ class Forms extends PureComponent {
               type: 'link',
               linkField: 'href',
               onClick: (row) => {
-                this.handleViewReport(row.uid)
+                // this.handleViewReport(row.uid)
+                this.editRow(row)
               },
             },
             {
@@ -402,7 +411,7 @@ class Forms extends PureComponent {
                       <Button
                         size='sm'
                         onClick={() => {
-                          printRow(row, this.props)
+                          // printRow(row, this.props)
                         }}
                         justIcon
                         color='primary'
@@ -411,7 +420,7 @@ class Forms extends PureComponent {
                         <Print />
                       </Button>
                     </Tooltip>
-                    {(row.statusFK === 1 || row.statusFK === 2) && (
+                    {(row.statusFK === 1 || row.statusFK === 2) && !isHiddenModify && (
                       <Tooltip title='Edit'>
                         <Button
                           size='sm'
@@ -426,7 +435,7 @@ class Forms extends PureComponent {
                         </Button>
                       </Tooltip>
                     )}
-                    {(row.statusFK === 1 || row.statusFK === 2) && (
+                    {(row.statusFK === 1 || row.statusFK === 2) && !isHiddenModify && (
                       <Popconfirm
                         onConfirm={() =>
                           dispatch({
@@ -443,7 +452,7 @@ class Forms extends PureComponent {
                         </Tooltip>
                       </Popconfirm>
                     )}
-                    {row.statusFK === 3 && (
+                    {row.statusFK === 2 && !isHiddenVoid && (
                       <this.VoidForm
                         classes={setFieldValue}
                         dispatch={dispatch}
@@ -459,7 +468,7 @@ class Forms extends PureComponent {
         />
         <AuthorizedContext>
           {(r) => {
-            if (r && r.rights !== 'enable') return null
+            if (r && r.rights !== 'enable' || isHiddenModify) return null
             let unionFormTypes = formTemplates//formTypes.concat(formTemplates)
             unionFormTypes = this.state.filterFormTemplate
               ? unionFormTypes.filter(
