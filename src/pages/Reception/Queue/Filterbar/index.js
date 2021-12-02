@@ -54,7 +54,7 @@ const Filterbar = props => {
         alignItems='center'
       >
         <GridItem xs={2} sm={2} md={2} lg={2}>
-          <Field
+          <FastField
             name='visitType'
             render={args => (
               <Tooltip
@@ -200,11 +200,12 @@ const connectedFilterbar = connect(({ queueLog, user, loading }) => ({
 }))(Filterbar)
 
 const FilterbarWithFormik = withFormik({
+  enableReinitialize: true,
   mapPropsToValues: ({ queueLog }) => {
     const { visitType } = queueLog.queueFilterBar || {}
     return {
       search: '',
-      visitType: visitType || [-99],
+      visitType: visitType || [],
     }
   },
   handleSubmit: ({ search }, { props }) => {
