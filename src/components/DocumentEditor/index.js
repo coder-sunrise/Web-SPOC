@@ -71,6 +71,32 @@ class DocumentEditor extends SampleBase {
       </GridContainer>
     )
   }
+
+  static instance = undefined
+  static print = ({ ...printProps }) => {
+    const { documentName, document: content } = printProps
+    if (!DocumentEditor.instance) {
+      const container = new DocumentEditorContainerComponent({
+        userColor: '#FFFFFF',
+        documentEditorSettings: {
+          // searchHighlightColor: '#FFFFFF',
+          formFieldSettings: {
+            shadingColor: '#FFFFFF',
+            // applyShading: false,
+            // selectionColor: '#FFFFFF',
+          },
+        },
+      })
+      container.element = document.createElement('div')
+      container.preRender()
+      container.render()
+      DocumentEditor.instance = container
+    }
+    const documentEditor = DocumentEditor.instance.documentEditor
+    documentEditor.open(typeof content === 'object' ? JSON.stringify(content) : content)
+    documentEditor.documentName = documentName
+    setTimeout(() => documentEditor.print(), 1)
+  }
 }
 
 export default DocumentEditor

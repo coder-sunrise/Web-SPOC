@@ -16,6 +16,7 @@ import {
   Popover,
   Checkbox,
   Tooltip,
+  DocumentEditor,
 } from '@/components'
 import VoidWithPopover from './FormDetail/VoidWithPopover'
 import Authorized from '@/utils/Authorized'
@@ -146,6 +147,10 @@ class VisitFormGrid extends PureComponent {
         },
       })
     }
+  }
+
+  printRow = row => {
+    DocumentEditor.print({ documentName: row.formName, document: row.formData })
   }
 
   VoidForm = ({ classes, dispatch, row, user }) => {
@@ -307,6 +312,7 @@ class VisitFormGrid extends PureComponent {
                         onClick={() => {
                           // const { formCategory, printRow } = this.props
                           // printRow(row, formCategory)
+                          this.printRow(row)
                         }}
                         justIcon
                         color='primary'

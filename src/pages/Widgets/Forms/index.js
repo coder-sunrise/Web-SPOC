@@ -25,6 +25,7 @@ import {
   Popover,
   Checkbox,
   Tooltip,
+  DocumentEditor,
 } from '@/components'
 import AddForm from './AddForm'
 import { FORM_CATEGORY } from '@/utils/constants'
@@ -312,6 +313,10 @@ class Forms extends PureComponent {
     )
   }
 
+  printRow = row => {
+    DocumentEditor.print({ documentName: row.formName, document: row.formData })
+  }
+
   render () {
     const {
       forms,
@@ -405,6 +410,7 @@ class Forms extends PureComponent {
               columnName: 'action',
               width: 110,
               render: (row) => {
+                console.log(row)
                 return (
                   <React.Fragment>
                     <Tooltip title='Print'>
@@ -412,6 +418,7 @@ class Forms extends PureComponent {
                         size='sm'
                         onClick={() => {
                           // printRow(row, this.props)
+                          this.printRow(row)
                         }}
                         justIcon
                         color='primary'
@@ -420,7 +427,7 @@ class Forms extends PureComponent {
                         <Print />
                       </Button>
                     </Tooltip>
-                    {(row.statusFK === 1 || row.statusFK === 2) && !isHiddenModify && (
+                    {(row.statusFK === 1) && !isHiddenModify && (
                       <Tooltip title='Edit'>
                         <Button
                           size='sm'
@@ -435,7 +442,7 @@ class Forms extends PureComponent {
                         </Button>
                       </Tooltip>
                     )}
-                    {(row.statusFK === 1 || row.statusFK === 2) && !isHiddenModify && (
+                    {(row.statusFK === 1) && !isHiddenModify && (
                       <Popconfirm
                         onConfirm={() =>
                           dispatch({
