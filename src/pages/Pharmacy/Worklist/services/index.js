@@ -8,5 +8,7 @@ const fns = {
   upsert: params => service.upsert(url, params),
   queryJournalHistoryList: params =>
     service.queryList(`${url}/GetJournalHistory`, params),
+  queryLeafletDrugList: params =>
+    service.query(`${url}/GetLeaftletDrugs`, params),
 }
 export default fns

@@ -876,6 +876,13 @@ export default createFormViewModel({
         }
         return false
       },
+      *queryLeafletDrugList({ payload }, { call, select, put, take }) {
+        const result = yield call(service.queryLeafletDrugList, payload)
+        if (result.status === '200') {
+          return result.data
+        }
+        return []
+      },
     },
     reducers: {},
   },
