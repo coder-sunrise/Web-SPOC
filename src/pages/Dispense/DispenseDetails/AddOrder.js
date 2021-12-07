@@ -729,7 +729,7 @@ export default compose(
           }
         })
       }
-      if (visitType === VISIT_TYPE.BF) {
+      if (visitType === VISIT_TYPE.BF || visitType === VISIT_TYPE.MC) {
         const billFirstPayload = convertToConsultation(consultation.entity, {
           consultationDocument: { rows: [] },
           orders,
