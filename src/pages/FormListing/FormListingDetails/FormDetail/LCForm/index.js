@@ -235,6 +235,7 @@ class LCForm extends PureComponent {
         dispatch({
           type: 'formListing/saveCORForm',
           payload: {
+            type: formListing.type,
             ...saveData,
             visitID,
             ClinicalObjectRecordFK:
@@ -305,7 +306,7 @@ class LCForm extends PureComponent {
           )}
           {formCategory === FORM_CATEGORY.CORFORM &&
           statusFK === 1 && (
-            <Authorized authority='forms.finalize'>
+            <Authorized authority='queue.consultation.form.finalize'>
               <ProgressButton
                 color='primary'
                 icon={null}

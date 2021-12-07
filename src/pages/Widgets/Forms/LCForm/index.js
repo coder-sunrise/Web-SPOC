@@ -236,7 +236,7 @@ class LCForm extends PureComponent {
             </ProgressButton>
           )}
           {statusFK === 1 && (
-            <Authorized authority='forms.finalize'>
+            <Authorized authority='queue.consultation.form.finalize'>
               <ProgressButton
                 color='primary'
                 icon={null}

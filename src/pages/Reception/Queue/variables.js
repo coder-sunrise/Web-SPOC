@@ -145,6 +145,6 @@ export const ContextMenuOptions = [
     Icon: Description,
     disabled: false,
     hidden: false,
-    authority: 'patientdashboard.forms',
+    authority: 'queue.consultation.form',
   },
 ]

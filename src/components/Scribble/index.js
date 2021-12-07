@@ -178,7 +178,7 @@ class ScribbleTemplateItem extends React.Component {
   }
   render() {
     const { isEdit, item, description } = this.state
-    const { setTemplate, upsertTemplate, classes } = this.props
+    const { setTemplate, upsertTemplate, classes, onEditingTemplate, isTemplateEditing } = this.props
     return (
       <div style={{paddingBottom:5}}>
         <div>
@@ -219,6 +219,7 @@ class ScribbleTemplateItem extends React.Component {
                       isEdit: false,
                       description: item.description,
                     })
+                    onEditingTemplate(false)
                   }}
                 >
                   <ReplayIcon />
@@ -237,6 +238,7 @@ class ScribbleTemplateItem extends React.Component {
                       description,
                     })
                     upsertTemplate.call(this, savedItem)
+                    onEditingTemplate(false)
                   }}
                 >
                   <SaveIcon />
@@ -248,7 +250,9 @@ class ScribbleTemplateItem extends React.Component {
              <Tooltip title='Edit'>
               <Button
                   {...this.buttonProps}
+                  disabled={isTemplateEditing}
                   onClick={() => {
+                    onEditingTemplate(true)
                     this.setState({ isEdit: true })
                   }}
                 >
@@ -257,6 +261,7 @@ class ScribbleTemplateItem extends React.Component {
              </Tooltip>
               <Tooltip title='Apply'>
                 <Button
+                  disabled={isTemplateEditing}
                   {...this.buttonProps}
                   onClick={() => {
                     setTemplate(item.layerContent, item.id, item.description)
@@ -267,6 +272,7 @@ class ScribbleTemplateItem extends React.Component {
               </Tooltip>
               <Tooltip title='Delete'>
                 <Button
+                  disabled={isTemplateEditing}
                   {...this.buttonProps}
                   onClick={() => {
                     const deledItem = { ...item, isDeleted: true }
@@ -625,6 +631,10 @@ class Scribble extends React.Component {
       if (r) 
         this.queryTemplateList()
     })
+  }
+
+  handleEditingTemplate = (mode) => {
+    this.setState({ isTemplateEditing: mode })
   }
 
   onUploadTemplateClick = () => {
@@ -1395,6 +1405,8 @@ class Scribble extends React.Component {
                             item={item}
                             setTemplate={this._setTemplate}
                             upsertTemplate={this.upsertTemplate}
+                            onEditingTemplate={this.handleEditingTemplate}
+                            isTemplateEditing={this.state.isTemplateEditing}
                             classes={classes}
                           />
                         ))}

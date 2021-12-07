@@ -841,14 +841,14 @@ const _routes = [
       // Claim Submission
       //
       // Forms
-      {
-        path: '/forms',
-        icon: 'icon-pic-right',
-        name: 'forms',
-        moduleName: 'Forms',
-        component: './FormListing',
-        authority: ['forms'],
-      },
+      // {
+      //   path: '/forms',
+      //   icon: 'icon-pic-right',
+      //   name: 'forms',
+      //   moduleName: 'Forms',
+      //   component: './FormListing',
+      //   authority: ['forms'],
+      // },
       // Forms
       //
       // Settings

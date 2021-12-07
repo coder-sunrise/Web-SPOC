@@ -2,12 +2,18 @@ import { createListViewModel } from 'medisys-model'
 import _ from 'lodash'
 import { getUniqueId } from '@/utils/utils'
 import * as service from '../services'
+import { DOCUMENT_CATEGORY, FORM_CATEGORY } from '@/utils/constants'
 
 const formTypes = [
   {
     value: '1',
     name: 'Letter of Certification',
     prop: 'corLetterOfCertification',
+  },
+  {
+    value: '2',
+    name: 'From',
+    prop: 'corForm',
   },
 ]
 
@@ -16,6 +22,11 @@ const visitFormTypes = [
     value: '1',
     name: 'Letter of Certification',
     prop: 'visitLetterOfCertification',
+  },
+  {
+    value: '2',
+    name: 'From',
+    prop: 'visitForm',
   },
 ]
 
@@ -49,6 +60,13 @@ export default createListViewModel({
           otherDiagnosis: [],
         },
       },
+      defaultForm: {
+        type: '2',
+        typeName: 'From',
+        statusFK: 1,
+        formName: 'From',
+        formData: { content: null, signature: [] },
+      },
       default: {},
       showModal: false,
       list: [],
@@ -60,7 +78,38 @@ export default createListViewModel({
       })
     },
     effects: {
-      *getCORForms ({ payload }, { call, put, select }) {
+      *initState({ payload }, { select, put, take }) {
+        const { formCategory } = payload
+        yield put({
+          type: 'settingDocumentTemplate/query',
+          payload: {
+            isActive: true,
+            documentCategoryFK: DOCUMENT_CATEGORY.FORM,
+          },
+        })
+        yield take('settingDocumentTemplate/query/@@end')
+        const settingDocumentTemplate = yield select(
+          st => st.settingDocumentTemplate,
+        )
+        const formTemplateList = settingDocumentTemplate?.list || []
+        const formTemplates = formTemplateList.map(x => ({
+          value: '2',
+          name: x.displayValue,
+          prop:
+            formCategory === FORM_CATEGORY.CORFORM
+              ? 'corForm'
+              : 'visitForm',
+          formTemplateFK: x.id,
+          templateContent: x.templateContent,
+        }))
+        yield put({
+          type: 'updateState',
+          payload: {
+            formTemplates,
+          },
+        })
+      },
+      *getCORForms({ payload }, { call, put, select }) {
         const response = yield call(service.getCORForms, payload)
         const { data, status } = response
         if (status === '200') {
@@ -73,7 +122,7 @@ export default createListViewModel({
         return false
       },
 
-      *getVisitForms ({ payload }, { call, put, select }) {
+      *getVisitForms({ payload }, { call, put, select }) {
         const response = yield call(service.getVisitForms, payload)
         const { data, status } = response
         if (status === '200') {
@@ -86,20 +135,26 @@ export default createListViewModel({
         return false
       },
 
-      *saveVisitForm ({ payload }, { call, put, select }) {
-        const { visitID } = payload
-        const response = yield call(service.saveVisitForm, visitID, payload)
+      *saveVisitForm({ payload }, { call, put, select }) {
+        const { type, visitID } = payload
+        const response = yield call(
+          service.saveVisitForm,
+          type,
+          visitID,
+          payload,
+        )
         return response
       },
 
-      *saveCORForm ({ payload }, { call, put, select }) {
-        const { visitID } = payload
-        const response = yield call(service.saveCORForm, visitID, payload)
+      *saveCORForm({ payload }, { call, put, select }) {
+        const { type, visitID } = payload
+        const response = yield call(service.saveCORForm, type, visitID, payload)
         return response
       },
 
-      *getCORForm ({ payload }, { call, put, select }) {
-        const response = yield call(service.queryCORForm, payload)
+      *getCORForm({ payload }, { call, put, select }) {
+        const { type } = payload
+        const response = yield call(service.queryCORForm, type, payload)
         const { data, status } = response
         if (status === '200') {
           return data
@@ -107,8 +162,9 @@ export default createListViewModel({
         return false
       },
 
-      *getVisitForm ({ payload }, { call, put, select }) {
-        const response = yield call(service.queryVisitForm, payload)
+      *getVisitForm({ payload }, { call, put, select }) {
+        const { type } = payload
+        const response = yield call(service.queryVisitForm, type, payload)
         const { data, status } = response
         if (status === '200') {
           return data
@@ -117,27 +173,27 @@ export default createListViewModel({
       },
     },
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
 
         return {
           ...st,
-          list: data.data.map((o) => {
+          list: data.data.map(o => {
             return {
               ...o,
-              typeName: formTypes.find((t) => t.value === o.type).name,
+              typeName: formTypes.find(t => t.value === o.type).name,
             }
           }),
         }
       },
 
-      queryCORFormsDone (st, { payload }) {
+      queryCORFormsDone(st, { payload }) {
         const { data } = payload
         const { id, currentCORId, visitDate, isCanEditForms } = data
         let formRows = []
-        formTypes.forEach((p) => {
+        formTypes.forEach(p => {
           formRows = formRows.concat(
-            (data[p.prop] || []).map((o) => {
+            (data[p.prop] || []).map(o => {
               const d = {
                 uid: getUniqueId(),
                 type: p.value,
@@ -164,13 +220,13 @@ export default createListViewModel({
         }
       },
 
-      queryVisitFormsDone (st, { payload }) {
+      queryVisitFormsDone(st, { payload }) {
         const { data } = payload
         const { id, currentCORId, visitDate, isCanEditForms } = data
         let formRows = []
-        visitFormTypes.forEach((p) => {
+        visitFormTypes.forEach(p => {
           formRows = formRows.concat(
-            (data[p.prop] || []).map((o) => {
+            (data[p.prop] || []).map(o => {
               const d = {
                 uid: getUniqueId(),
                 type: p.value,

@@ -65,9 +65,11 @@ class Signature extends React.Component {
     return (
       <div>
         <GridContainer>
+          {signatureName && (
           <GridItem xs={12} md={12}>
             <TextField label={signatureNameLabel} disabled value={signatureName} />
           </GridItem>
+          )}
           <GridItem xs={12} md={12}>
             <SketchField
               name='sketch'
@@ -95,23 +97,23 @@ class Signature extends React.Component {
             justifyContent: 'center',
           }}
         >
+          <Button color='danger' icon={null} onClick={this.props.onClose}>
+            {isEditable ? 'Cancel' : 'Close'}
+          </Button>
           {isEditable && (
             <React.Fragment>
+              <Button color='danger' icon={null} onClick={this.clearSignature}>
+                Clear
+              </Button>
               <Button
                 color='primary'
                 icon={null}
                 onClick={this.onSubmitButtonClicked}
               >
-                OK
-              </Button>
-              <Button color='danger' icon={null} onClick={this.clearSignature}>
-                clear
+                Confirm
               </Button>
             </React.Fragment>
           )}
-          <Button color='danger' icon={null} onClick={this.props.onClose}>
-            {isEditable ? 'Cancel' : 'Close'}
-          </Button>
         </GridContainer>
       </div>
     )
