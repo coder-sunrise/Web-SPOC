@@ -1231,7 +1231,7 @@ export const inventoryItemListing = (
 ) => {
   let inventoryItemList = list.map(x => {
     const { code, displayValue, sellingPrice = 0 } = x
-    const uom = x.dispensingUOM ? x.dispensingUOM.name : x.uom.name
+    const uom = x.dispensingUOM ? x.dispensingUOM.name : x.uom?.name
 
     return {
       value: x.id,
