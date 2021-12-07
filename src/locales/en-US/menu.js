@@ -196,7 +196,7 @@ export default {
   'menu.report.expiringstockreport': 'Expiring Stock Report',
   'menu.report.radiologystatisticreport': 'Radiology Statistic Report',
   'menu.report.partialdispensereport': ' Partial Dispense Report',
-
+  'menu.report.preorderlistingreport': ' Pre-Order Listing Report',
   'menu.report.visitListingReport': 'Visit Listing Report',
 
   'menu.support': 'Support',
