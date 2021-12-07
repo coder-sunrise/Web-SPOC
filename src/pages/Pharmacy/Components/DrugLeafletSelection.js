@@ -8,6 +8,7 @@ import {
   NumberInput,
   Checkbox,
   EditableTableGrid,
+  CommonTableGrid,
 } from '@/components'
 import { Alert } from 'antd'
 
@@ -22,40 +23,12 @@ class DrugLeafletSelection extends React.PureComponent {
       title: 'Item',
     },
   ]
-
   colExtensions = [
     {
-      columnName: 'print',
-      align: 'center',
-      width: 80,
+      columnName: 'displayName',
       render: row => {
-        return (
-          <Checkbox
-            onChange={obj => {
-              handleDrugLabelSelected(row.id, obj.target.value)
-            }}
-            checked={row.selected}
-            simple
-          />
-        )
-      },
-    },
-    {
-      columnName: 'item',
-      disabled: true,
-      render: row => {
-        return (
-          <div style={{ position: 'relative' }}>
-            <div
-              style={{
-                wordWrap: 'break-word',
-                whiteSpace: 'pre-wrap',
-              }}
-            >
-              {row.item}
-            </div>
-          </div>
-        )
+        console.log(row)
+        return <div>{row.displayName}</div>
       },
     },
   ]
@@ -73,20 +46,6 @@ class DrugLeafletSelection extends React.PureComponent {
   }
   componentWillMount = () => {
     let { visitid, dispatch } = this.props
-    dispatch({
-      type: 'pharmacyDetails/queryLeafletDrugList',
-      payload: {
-        id: visitid,
-      },
-    }).then(r => {
-      if (r) {
-        this.setState({
-          data: r.map(x => {
-            return { ...x, isDeleted: false }
-          }),
-        })
-      }
-    })
   }
   constructor(props) {
     super(props)
@@ -108,6 +67,7 @@ class DrugLeafletSelection extends React.PureComponent {
     const {
       onConfirmPrintLeaflet,
       footer,
+      rows,
       classes,
       showInvoiceAmountNegativeWarning,
     } = this.props
@@ -117,21 +77,14 @@ class DrugLeafletSelection extends React.PureComponent {
           <GridItem md={12}>
             {this.state.data && (
               <div className={classes.tableContainer}>
-                <EditableTableGrid
+                <CommonTableGrid
                   size='sm'
-                  forceRender
                   columns={this.columns}
                   columnExtensions={this.colExtensions}
-                  rows={this.state.data}
+                  rows={rows}
                   {...this.tableConfig}
                   selection={this.state.selectedRows}
                   onSelectionChange={this.handleSelectionChange}
-                  EditingProps={{
-                    showAddCommand: false,
-                    showDeleteCommand: false,
-                    onCommitChanges: this.handleCommitChanges,
-                    showCommandColumn: false,
-                  }}
                 />
               </div>
             )}
@@ -139,16 +92,11 @@ class DrugLeafletSelection extends React.PureComponent {
         </GridContainer>
         {footer({
           onConfirm: () => {
-            const { selectedRows, data } = this.state
-            const selectedData = data.filter(item =>
+            const { selectedRows } = this.state
+            const selectedData = rows.filter(item =>
               selectedRows.includes(item.id),
             )
-
-            let printData = selectedData.reduce((pre, cur) => {
-              let itemData = this.props.data.filter(x => x.item === cur.item)
-              return [...pre, ...itemData.map(i => ({ ...i }))]
-            }, [])
-            onConfirmPrintLeaflet(printData)
+            onConfirmPrintLeaflet(selectedData)
           },
           confirmBtnText: 'Confirm',
         })}

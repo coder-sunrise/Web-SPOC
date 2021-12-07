@@ -12,6 +12,8 @@ import Refresh from '@material-ui/icons/Refresh'
 import Yup from '@/utils/yup'
 import { subscribeNotification } from '@/utils/realtime'
 import { ReportViewer } from '@/components/_medisys'
+import { getRawData } from '@/services/report'
+import { REPORT_ID } from '@/utils/constants'
 import {
   GridContainer,
   GridItem,
@@ -132,6 +134,7 @@ const Main = props => {
   const [reportTitle, setReportTitle] = useState('')
   const [reportID, setReportID] = useState(-1)
   const [reportParameters, setReportParameters] = useState({})
+  const [drugLeafletData, setDrugLeafletData] = useState({})
 
   useEffect(() => {
     subscribeNotification('PharmacyOrderUpdate', {
@@ -369,19 +372,47 @@ const Main = props => {
     dispatch({ type: 'pharmacyDetails/query', payload: { id: workitem.id } })
   }
 
-  const printLeaflet = (printData = {}) => {
-    const { selectedDrugs } = printData
-    dispatch({
-      type: 'pharmacyDetails/printleaflet',
-      payload: {
-        selectedDrugs,
-      },
-    }).then(r => {
-      if (r) {
-        const { onConfirm } = props
-        // onConfirm()
-      }
+  const printLeaflet = async (printData = {}) => {
+    console.log(printData)
+    const visitinvoicedrugids = _.join(
+      printData.map(x => {
+        return x.id
+      }),
+    )
+    console.log(visitinvoicedrugids)
+    const instructionIds = _.join(
+      printData.map(x => {
+        return _.join(x.instructionId, ',')
+      }),
+    )
+    console.log(instructionIds)
+    const data = await getRawData(REPORT_ID.PATIENT_INFO_LEAFLET, {
+      visitinvoicedrugids,
+      instructionIds,
+      language: 'JP',
+      visitId: pharmacyDetails.entity?.visitFK,
     })
+    const payload = [
+      {
+        ReportId: REPORT_ID.PATIENT_INFO_LEAFLET,
+        ReportData: JSON.stringify({
+          ...data,
+        }),
+      },
+    ]
+    handlePrint(JSON.stringify(payload))
+
+    // dispatch({
+    //   type: 'pharmacyDetails/printleaflet',
+    //   payload: {
+    //     selectedDrugs,
+    //   },
+    // }).then(r => {
+    //   if (r) {
+    //     const { onConfirm } = props
+    //     // onConfirm()
+    //   }
+    // })
   }
   const getInstruction = row => {
     if (row.invoiceItemTypeFK !== 1) return ''
@@ -1472,7 +1503,17 @@ const Main = props => {
     setShowJournalHistory(false)
   }
   const showDrugLeafletSelection = () => {
-    setShowLeafletSelectionPopup(true)
+    dispatch({
+      type: 'pharmacyDetails/queryLeafletDrugList',
+      payload: {
+        id: pharmacyDetails.entity?.visitFK,
+      },
+    }).then(data => {
+      if (data) {
+        setDrugLeafletData(data)
+        setShowLeafletSelectionPopup(true)
+      }
+    })
   }
 
   const printReview = reportid => {
@@ -1977,6 +2018,7 @@ const Main = props => {
       >
         <DrugLeafletSelection
           {...props}
+          rows={drugLeafletData}
           visitid={pharmacyDetails.entity?.visitFK}
           onConfirmPrintLeaflet={onConfirmPrintLeaflet}
         />
