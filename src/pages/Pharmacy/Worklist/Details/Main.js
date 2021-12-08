@@ -609,8 +609,7 @@ const Main = props => {
     )
   }
 
-  const onConfirmPrintLeaflet = printData => {
-    printLeaflet(printData)
+  const onConfirmPrintLeaflet = () => {
     setShowLeafletSelectionPopup(false)
   }
 

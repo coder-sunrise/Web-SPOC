@@ -1,5 +1,10 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
+import withWebSocket from '@/components/Decorator/withWebSocket'
 import * as Yup from 'yup'
+import _ from 'lodash'
+import { getRawData } from '@/services/report'
+import { connect } from 'dva'
+import { REPORT_ID } from '@/utils/constants'
 // common components
 import { withStyles } from '@material-ui/core'
 import {
@@ -8,15 +13,21 @@ import {
   NumberInput,
   Checkbox,
   EditableTableGrid,
+  CheckboxGroup,
   CommonTableGrid,
 } from '@/components'
 import { Alert } from 'antd'
 
-class DrugLeafletSelection extends React.PureComponent {
+@connect(({ clinicSettings }) => ({
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
+}))
+class DrugLeafletSelection extends PureComponent {
   state = {
     data: [],
     selectedRows: [],
+    printlanguage: ['EN'],
   }
+
   columns = [
     {
       name: 'displayName',
@@ -46,6 +57,7 @@ class DrugLeafletSelection extends React.PureComponent {
   }
   componentWillMount = () => {
     let { visitid, dispatch } = this.props
+    this.setState({ printlanguage: ['EN'] })
   }
   constructor(props) {
     super(props)
@@ -62,6 +74,43 @@ class DrugLeafletSelection extends React.PureComponent {
       data: [...rows],
     })
   }
+  printLeaflet = async (printData = {}) => {
+    console.log(printData)
+    const { visitid } = this.props
+    const visitinvoicedrugids = _.join(
+      printData.map(x => {
+        return x.id
+      }),
+    )
+    console.log(visitinvoicedrugids)
+    const instructionIds = _.join(
+      printData
+        // skip drug mixture
+        .filter(xx => xx.instructionId && xx.instructionId.length > 0)
+        .map(x => {
+          return _.join(x.instructionId, ',')
+        }),
+    )
+    console.log(instructionIds)
+    this.state.printlanguage.forEach(async lan => {
+      const data = await getRawData(REPORT_ID.PATIENT_INFO_LEAFLET, {
+        visitinvoicedrugids,
+        instructionIds,
+        language: lan,
+        visitId: visitid,
+      })
+      const payload = [
+        {
+          ReportId: REPORT_ID.PATIENT_INFO_LEAFLET,
+          ReportData: JSON.stringify({
+            ...data,
+          }),
+        },
+      ]
+      this.props.handlePrint(JSON.stringify(payload))
+      this.props.onConfirmPrintLeaflet()
+    })
+  }
 
   render() {
     const {
@@ -69,8 +118,14 @@ class DrugLeafletSelection extends React.PureComponent {
       footer,
       rows,
       classes,
+      handlePrint,
+      clinicSettings,
       showInvoiceAmountNegativeWarning,
     } = this.props
+    const {
+      primaryPrintoutLanguage = 'EN',
+      secondaryPrintoutLanguage = '',
+    } = clinicSettings
     return (
       <div>
         <GridContainer>
@@ -89,6 +144,22 @@ class DrugLeafletSelection extends React.PureComponent {
               </div>
             )}
           </GridItem>
+          <GridItem>
+            {secondaryPrintoutLanguage !== '' && (
+              <CheckboxGroup
+                value={this.state.printlanguage}
+                options={[
+                  { value: 'EN', label: 'EN' },
+                  { value: 'JP', label: 'JP' },
+                ]}
+                onChange={v => {
+                  this.setState({
+                    printlanguage: v.target.value,
+                  })
+                }}
+              />
+            )}
+          </GridItem>
         </GridContainer>
         {footer({
           onConfirm: () => {
@@ -96,7 +167,7 @@ class DrugLeafletSelection extends React.PureComponent {
             const selectedData = rows.filter(item =>
               selectedRows.includes(item.id),
             )
-            onConfirmPrintLeaflet(selectedData)
+            this.printLeaflet(selectedData)
           },
           confirmBtnText: 'Confirm',
         })}
@@ -105,4 +176,4 @@ class DrugLeafletSelection extends React.PureComponent {
   }
 }
 
-export default DrugLeafletSelection
+export default withWebSocket()(DrugLeafletSelection)
