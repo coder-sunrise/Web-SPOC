@@ -25,7 +25,7 @@ class DrugLeafletSelection extends PureComponent {
   state = {
     data: [],
     selectedRows: [],
-    printlanguage: ['EN'],
+    printlanguage: [],
   }
 
   columns = [
@@ -56,8 +56,9 @@ class DrugLeafletSelection extends PureComponent {
     },
   }
   componentWillMount = () => {
-    let { visitid, dispatch } = this.props
+    let { visitid, dispatch, rows } = this.props
     this.setState({ printlanguage: ['EN'] })
+    this.setState({ selectedRows: rows.filter(t => t.displayInLeaflet) })
   }
   constructor(props) {
     super(props)
@@ -79,7 +80,7 @@ class DrugLeafletSelection extends PureComponent {
     const { visitid } = this.props
     const visitinvoicedrugids = _.join(
       printData.map(x => {
-        return x.id
+        return x.visitInvoiceDrugId
       }),
     )
     console.log(visitinvoicedrugids)
