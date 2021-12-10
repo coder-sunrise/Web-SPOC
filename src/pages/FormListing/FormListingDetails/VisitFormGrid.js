@@ -55,7 +55,7 @@ const styles = (theme) => ({
     marginTop: -10,
   },
   listContainer: {
-    maxHeight: 300,
+    maxHeight: 132,
     overflowY: 'auto',
   },
 })
@@ -425,7 +425,7 @@ class VisitFormGrid extends PureComponent {
                       }}
                     />
                     <div className={classes.listContainer}>
-                      {unionFormTypes.slice(0, 6).map(item => {
+                      {unionFormTypes.map(item => {
                         return (
                           <this.ListItem
                             key={item.formTemplateFK}
