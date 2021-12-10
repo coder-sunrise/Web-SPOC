@@ -9,6 +9,7 @@ import { CardContainer, CommonModal, withSettingBase } from '@/components'
 import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
+import { DOCUMENT_CATEGORY } from '@/utils/constants'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -38,12 +39,13 @@ class DocumentTemplate extends PureComponent {
   }
 
   render () {
-    const { settingDocumentTemplate, mainDivHeight = 700 } = this.props
+    const { settingDocumentTemplate, mainDivHeight = 700, settingDocumentTemplate:{documentCategoryFK} } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
     let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
     if (height < 300) height = 300
+    const isFullScreen = (settingDocumentTemplate.entity?.documentCategoryFK || documentCategoryFK) === DOCUMENT_CATEGORY.FORM
     return (
       <CardContainer hideHeader>
         <div className='filterBar'>
@@ -58,6 +60,7 @@ class DocumentTemplate extends PureComponent {
             ? 'Edit '
             : 'Add '}Document Template`}
           maxWidth='lg'
+          fullScreen={isFullScreen}
           bodyNoPadding
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}

@@ -1,6 +1,6 @@
 // import { connect } from 'dva'
 import React, { PureComponent } from 'react'
-import { DocumentEditor, CommonModal, Button } from '@/components'
+import { DocumentEditor, CommonModal, Button, notification } from '@/components'
 // import moment from 'moment'
 import AddPhotoAlternateIcon from '@material-ui/icons/AddPhotoAlternate'
 import HideImageIcon from '@material-ui/icons/Image'
@@ -11,12 +11,10 @@ import Signature from '../Signature'
 const base64Prefix = 'data:image/jpeg;base64,'
 
 class CommonForm extends PureComponent {
+
   switchMode = () => {
     let isSigningMode = !this.state.isSigningMode
-    this.DEContainer.documentEditor.editor.enforceProtection(
-      '',
-      isSigningMode ? 'ReadOnly' : 'FormFieldsOnly',
-    )
+    this.DEContainer.documentEditor.editor.enforceProtection('', isSigningMode ? 'ReadOnly' : 'FormFieldsOnly')
     this.setState({ isSigningMode })
   }
 
@@ -24,12 +22,15 @@ class CommonForm extends PureComponent {
     this.setState({ showSignature: true })
   }
 
+  notificationWarning = _.debounce(message => notification.warning(message),100)
+
   selectionChange = e => {
-    const selection = e.source.documentEditor.selection
-    this.setState({
-      isImageSelected: selection.isImageSelected,
-      isSelectionInEditRegion: selection.isSelectionInEditRegion(),
-    })
+    const isImageSelected = e.source.documentEditor.selection.isImageSelected
+    const isSelectionInEditRegion = e.source.documentEditor.selection.isSelectionInEditRegion()
+    if (this.mouseClicked && this.props.values.statusFK !== 2 && !isImageSelected && !isSelectionInEditRegion && this.state.signatureCounter > 0)
+      this.notificationWarning({ message: 'Please remove signatures to update form content.'})
+    this.setState({ isImageSelected, isSelectionInEditRegion })
+    this.mouseClicked = false
   }
 
   deleteSignature = () => {
@@ -40,6 +41,7 @@ class CommonForm extends PureComponent {
       )
     }
     this.setState({ isImageSelected: false })
+    this.updateSignatureCounter(-1)
   }
 
   updateSignature = ({ thumbnail }) => {
@@ -48,6 +50,14 @@ class CommonForm extends PureComponent {
         ? `${base64Prefix}${thumbnail}`
         : thumbnail
     this.DEContainer.documentEditor.editor.insertImage(imageString, 120, 60)
+    this.updateSignatureCounter(+1)
+  }
+
+  updateSignatureCounter = val => {
+    if (!val) return
+    const newSignatureCounter = (this.state.signatureCounter || 0) + val
+    this.props.setFieldValue('formData.signatureCounter', newSignatureCounter)
+    this.setState({ signatureCounter: newSignatureCounter })
   }
 
   closeSignature = () => {
@@ -74,10 +84,7 @@ class CommonForm extends PureComponent {
   }
 
   contentChange = () => {
-    this.props.setFieldValue(
-      'formData',
-      this.DEContainer.documentEditor.serialize(),
-    )
+    this.props.setFieldValue('formData.content',this.DEContainer.documentEditor.serialize())
   }
 
   fillFormFields = () => {
@@ -100,12 +107,20 @@ class CommonForm extends PureComponent {
     }
   }
 
+  documentClick = e => {
+    this.mouseClicked = true
+  }
+
   documentChange = () => {
     if (!this.DEContainer) return
     this.fillFormFields()
-    this.DEContainer.documentEditor.editor.enforceProtection('', this.props.values.statusFK === 2 ? 'ReadOnly' : 'FormFieldsOnly')
+    const { statusFK, formData:{ signatureCounter = 0 } } = this.props.values
+    this.setState({signatureCounter})
+    this.DEContainer.documentEditor.editor.enforceProtection('',statusFK === 2 || signatureCounter > 0 ? 'ReadOnly' : 'FormFieldsOnly')
     this.DEContainer.documentEditor.showRestrictEditingPane(false)
     this.DEContainer.showHidePropertiesPane(false)
+    const deElement = this.DEContainer.documentEditor.getDocumentEditorElement()
+    deElement.addEventListener('click',this.documentClick.bind(this))
   }
 
   state = {}
@@ -116,9 +131,10 @@ class CommonForm extends PureComponent {
       isSigningMode,
       isImageSelected,
       isSelectionInEditRegion,
+      signatureCounter,
     } = this.state
     const {
-      values: { statusFK, formName, formData },
+      values: { statusFK, formName, formData:{ content } },
       height,
     } = this.props
     const disableEdit = statusFK === 2 //Finalize
@@ -126,7 +142,7 @@ class CommonForm extends PureComponent {
       <div>
         <div style={{ float: 'right', margin: '-15px 0 5px 0' }}>
           <Button
-            disabled={disableEdit}
+            disabled={disableEdit || signatureCounter > 0}
             color='primary'
             onClick={this.switchMode}
           >
@@ -159,7 +175,7 @@ class CommonForm extends PureComponent {
         </div>
         <DocumentEditor
           documentName={formName}
-          document={formData}
+          document={content}
           ref={r => (this.DEContainer = r?.container)}
           height={'60vh'}
           showPropertiesPane={false}

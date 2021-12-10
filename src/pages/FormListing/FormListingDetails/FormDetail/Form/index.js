@@ -45,7 +45,7 @@ import Authorized from '@/utils/Authorized'
       values = {
         ...formListing.defaultForm,
         formName: formListing.formName,
-        formData: formListing.templateContent,
+        formData: { content: formListing.templateContent, signatureCounter: 0 },
         fillData,
         formTemplateFK: formListing.formTemplateFK,
       }
@@ -60,7 +60,7 @@ import Authorized from '@/utils/Authorized'
   displayName: 'Form',
 })
 class Form extends PureComponent {
-  onSubmitButtonClicked = async action => {
+  onSubmitButtonClicked = async (action,skipConfirm) => {
     const {
       dispatch,
       onConfirm,
@@ -78,15 +78,25 @@ class Form extends PureComponent {
     if (!_.isEmpty(isFormValid)) {
       this.props.handleSubmit()
     } else {
-      // if (
-      //   (action === 'submit' || action === 'finalize') &&
-      //   !values.formData.signature.some(x => x.value)
-      // ) {
-      //   notification.warning({
-      //     message: `Signature is required.`,
-      //   })
-      //   return
-      // }
+      if (action === 'finalize') {
+        if (!(values.formData.signatureCounter > 0)){
+          notification.warning({ message: `At least one signature is required.` })
+          return
+        }
+        if(!skipConfirm) {
+          this.props.dispatch({
+            type: 'global/updateAppState',
+            payload: {
+              openConfirm: true,
+              openConfirmContent: 'Signed form is not editable after Finalized. Confirm to proceed ?',
+              openConfirmText: 'Confirm',
+              onConfirmSave: () => this.onSubmitButtonClicked('finalize', true),
+            },
+          })
+          return
+        }
+      }
+
       let nextSequence
       if (formFrom === FORM_FROM.QUEUELOG) {
         nextSequence = getNextSequence()
@@ -94,10 +104,8 @@ class Form extends PureComponent {
       let saveData = {
         sequence: nextSequence,
         ...values,
-        // formData: JSON.stringify({
-        //   ...values.formData
-        // }),
-        formData: values.formData,
+        formData: JSON.stringify(values.formData),
+        // formData: values.formData,
         updateByUser: user.data.clinicianProfile.name,
       }
       if (action === 'submit') {
@@ -217,7 +225,7 @@ class Form extends PureComponent {
               </ProgressButton>
             // </Authorized>
           )}
-          {formCategory === FORM_CATEGORY.CORFORM && !isHiddenFinalize && statusFK === 1 && (
+          {/*formCategory === FORM_CATEGORY.CORFORM && */!isHiddenFinalize && statusFK === 1 && (
             // <Authorized authority='queue.consultation.form.finalize'>
               <ProgressButton
                 color='success'

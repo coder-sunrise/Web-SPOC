@@ -38,7 +38,7 @@ import { calculateAgeFromDOB } from '@/utils/dateUtils'
       values = {
         ...defaultForm,
         formName: formName,
-        formData: templateContent,
+        formData: { content: templateContent, signatureCounter: 0 },
         fillData,
         formTemplateFK: formTemplateFK,
       }
