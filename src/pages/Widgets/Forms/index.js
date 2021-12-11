@@ -401,7 +401,7 @@ class Forms extends PureComponent {
               columnName: 'statusFK',
               render: r => {
                 const status = formStatus.find(x => x.value === r.statusFK).name
-                const title = r.statusFK === 4 ? r.voidReason : status
+                const title = r.statusFK === 4 ? `${status}, Reason: ${r.voidReason}.` : status
                 return <Tooltip title={title}><span>{status}</span></Tooltip>
               },
             },
