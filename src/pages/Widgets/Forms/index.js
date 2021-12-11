@@ -545,7 +545,7 @@ class Forms extends PureComponent {
           title='Add Form'
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
-          observe='AddForm'
+          observe='Form'
           maxWidth='lg'
           bodyNoPadding
         >
