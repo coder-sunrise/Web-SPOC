@@ -22,6 +22,9 @@ import {
   DOCUMENTCATEGORY_DOCUMENTTYPE,
 } from '@/utils/constants'
 import { InfoTwoTone } from '@material-ui/icons'
+import { withStyles } from '@material-ui/core'
+
+const styles = theme => ({})
 
 const formFieldTips_Subject = 'Guidelines to use Forms Fields'
 const formFieldTips_Content =
@@ -360,7 +363,7 @@ class Detail extends PureComponent {
                           {
                             id:'signaturePanel',
                             text:'Signature Panel',
-                            prefixIcon:'e-de-ctnr-image'
+                            prefixIcon:'e-signature',
                           }
                         ]}
                       />
@@ -429,4 +432,4 @@ class Detail extends PureComponent {
   }
 }
 
-export default Detail
+export default withStyles(styles, { name: 'DocumentTemplateDetail' })(Detail)
