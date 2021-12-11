@@ -10,6 +10,7 @@ import {
   Tools,
   Button,
   notification,
+  withFormikExtend,
 } from '@/components'
 
 const styles = () => ({
@@ -19,14 +20,31 @@ const styles = () => ({
   },
 })
 
+@withFormikExtend({
+  mapPropsToValues: () => ({}),
+  displayName: 'Signature',
+})
 class Signature extends React.Component {
   componentDidMount () {
     const { image } = this.props
     if (image) this._sketch.setBackgroundFromData(image)
   }
 
+  contentModifyed = () => {
+    window.g_app._store.dispatch({
+      type: 'formik/updateState',
+      payload: {
+        Signature: {
+          displayName: 'Signature',
+          dirty: true,
+        },
+      },
+    })
+  }
+
   clearSignature = () => {
     this._sketch.clear()
+    this.contentModifyed()
   }
 
   _generateThumbnail = async () => {
@@ -57,7 +75,7 @@ class Signature extends React.Component {
     }
     const thumbnail = await this._generateThumbnail()
     if (updateSignature) updateSignature({ thumbnail: thumbnail.split(',')[1] })
-    if (onClose) onClose()
+    if (onClose) onClose(true)
   }
 
   render () {
@@ -70,7 +88,7 @@ class Signature extends React.Component {
             <TextField label={signatureNameLabel} disabled value={signatureName} />
           </GridItem>
           )}
-          <GridItem xs={12} md={12}>
+          <GridItem xs={12} md={12} onClick={this.contentModifyed}>
             <SketchField
               name='sketch'
               ref={(c) => {
