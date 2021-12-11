@@ -388,7 +388,6 @@ class Forms extends PureComponent {
               columnName: 'updateDate',
               render: r => {
                 const updateDate = moment(r.updateDate)
-                  .utc()
                   .format('DD MMM YYYY HH:mm')
                 return (
                   <Tooltip title={updateDate}>
