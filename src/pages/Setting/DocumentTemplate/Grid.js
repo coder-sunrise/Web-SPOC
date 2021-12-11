@@ -47,7 +47,7 @@ class Grid extends PureComponent {
         columnExtensions={[
           {
             columnName: 'documentCategoryFK',
-            sortingEnabled: false,
+            sortingEnabled: true,
             width: 200,
             render: row => {
               const category =
