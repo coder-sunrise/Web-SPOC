@@ -1957,6 +1957,10 @@ export const documentTemplateTypes = [
     value: 5,
     name: 'Consent Form',
   },
+  {
+    value: 6,
+    name: 'Questionnaire',
+  },
 ]
 
 const isPanelItemRequired = [
