@@ -52,14 +52,16 @@ const withWebSocket = () => (Component) => {
     prepareJobForWebSocket = async (content, autoupdate) => {
       // reset port number state to retry all attempt and set job content
       // then initialize web socket connection
-      const pendingJob = [
-        content,
-      ]
+      const pendingJob = [content]
+      console.log(content)
       let sendSuccess = false
       this.setState({ pendingJob })
 
       const { isWsConnected } = this.state
-      if (isWsConnected === true || (!autoupdate && (await this.tryConnectSocket()))) {
+      if (
+        isWsConnected === true ||
+        (!autoupdate && (await this.tryConnectSocket()))
+      ) {
         this.wsConnection.send(content)
         sendSuccess = true
       } else if (!autoupdate) {
@@ -75,12 +77,11 @@ const withWebSocket = () => (Component) => {
       let connected = false
       const settings = JSON.parse(localStorage.getItem('clinicSettings'))
       // prevent to connect websocket before login.
-      if (!settings) { return false }
+      if (!settings) {
+        return false
+      }
       const { printToolSocketURL = '' } = settings
-      const [
-        prefix = '',
-        ip = '',
-      ] = printToolSocketURL.split(':')
+      const [prefix = '', ip = ''] = printToolSocketURL.split(':')
 
       for (let index = 0; index < defaultSocketPortsState.length; index++) {
         const port = defaultSocketPortsState[index]
@@ -104,8 +105,9 @@ const withWebSocket = () => (Component) => {
       return connected
     }
 
-    handlePrint = async (content) => {
+    handlePrint = async content => {
       if (content) {
+        console.log(content)
         const result = await this.prepareJobForWebSocket(
           AESEncryptor.encrypt(
             JSON.stringify({
