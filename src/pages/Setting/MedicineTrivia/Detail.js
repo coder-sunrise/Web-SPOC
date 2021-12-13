@@ -44,12 +44,14 @@ const Detail = ({
   const [attachments, setAttachments] = useState([])
 
   useEffect(() => {
-    const { fileIndexFK } = values
+    const { fileIndexFK, fileExtension, fileName } = values
     if (fileIndexFK) {
       const attach = [
         {
           thumbnailIndexFK: fileIndexFK,
           fileIndexFK: fileIndexFK,
+          fileName: fileName,
+          fileExtension: fileExtension,
           id: fileIndexFK,
         },
       ]
