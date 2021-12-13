@@ -323,7 +323,7 @@ const consultationDocumentTypes = [
     name: 'Certificate of Attendance',
     prop: 'corCertificateOfAttendance',
     getSubject: r => {
-      return `Certificate of Attendance ${r.accompaniedBy}`
+      return `Certificate of Attendance ${r.accompaniedBy || ''}`
     },
     convert: r => {
       return {

@@ -130,7 +130,7 @@ const Detail = ({
                     isUseSecondLanguage ? ` (${primaryPrintoutLanguage})` : ''
                   }`}
                   {...args}
-                  maxLength={2000}
+                  maxLength={300}
                   onChange={e => {
                     if (
                       getValue(primaryPrintoutLanguage).displayValue !==
@@ -156,7 +156,7 @@ const Detail = ({
                     <TextField
                       label={`Display Value (${secondaryPrintoutLanguage})`}
                       {...args}
-                      maxLength={2000}
+                      maxLength={500}
                       onChange={e => {
                         if (
                           getValue(secondaryPrintoutLanguage).displayValue !==
