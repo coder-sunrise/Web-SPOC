@@ -52,9 +52,10 @@ class FamilyMemberGrid extends PureComponent {
               this.props.history.push(targetUrl)
             }, 1000)
           }
+          const { values: { id: currentPatientId } } = this.props
           return(
             <div>
-              {this.props.patient.entity.id === row.familyMemberFK
+              {currentPatientId === row.familyMemberFK
               ?row.name
               :<Link
                 to={targetUrl}

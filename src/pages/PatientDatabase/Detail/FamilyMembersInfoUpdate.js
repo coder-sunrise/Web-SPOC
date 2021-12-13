@@ -45,7 +45,6 @@ export default class FamilyMembersInfoUpdate extends Component {
     }).then(r => {
       if (r) {
         this.setState({ familyMembersInfo: r })
-        console.log('getFamilyMemberinfo',r)
       }
     })
   }

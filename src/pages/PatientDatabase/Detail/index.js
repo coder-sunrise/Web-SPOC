@@ -425,51 +425,89 @@ class PatientDetail extends PureComponent {
   handleCloseReplacementModal = () =>
     this.setState({ showReplacementModal: false })
 
+  getAddressCompareVal = contactAddress => {
+    return contactAddress.map(x => {
+      const {
+        postcode = '',
+        blockNo = '',
+        unitNo = '',
+        buildingName = '',
+        street = '',
+        countryFK = '',
+      } = x
+      return `${postcode}${blockNo}${unitNo}${buildingName}${street}${countryFK}`.replaceAll(
+        ' ',
+        '',
+      )
+    })
+  }
+
+  getSchemeCompareVal = patientScheme => {
+    return patientScheme.map(x => {
+      const { coPaymentSchemeFK, accountNumber, validFrom, validTo } = x
+      return { coPaymentSchemeFK, accountNumber, validFrom, validTo } 
+    })
+  }
+
   checkFamilyMemberInfoChange = (initialValues, values) => {
-    const oldAddressVal = initialValues.contact.contactAddress
-    const newAddressVal = values.contact.contactAddress
-    let isAddressChange = !_.isEqual(oldAddressVal, newAddressVal)
-    const oldSchemeVal = initialValues.patientScheme.filter(
-      x => x.schemeTypeFK === SCHEME_TYPE.CORPORATE,
+    const familyMembers =
+      (values.patientFamilyGroup &&
+        values.patientFamilyGroup.patientFamilyMember
+          .filter(x => !x.isDeleted)
+          .map(x => ({ familyMemberFK: x.familyMemberFK, isNew: x.isNew }))) ||
+      []
+    if (familyMembers.length === 0) return [false, false, []]
+
+    const oldAddressVal = this.getAddressCompareVal(
+      initialValues.contact.contactAddress,
     )
-    const newSchemeVal = values.patientScheme.filter(
-      x => x.schemeTypeFK === SCHEME_TYPE.CORPORATE && !x.isDeleted,
+    const newAddressVal = this.getAddressCompareVal(
+      values.contact.contactAddress.filter(x => !x.isDeleted),
     )
-    let isSchemeChange =
+    const isAddressChange = !_.isEqual(oldAddressVal, newAddressVal)
+    const oldSchemeVal = this.getSchemeCompareVal(
+      initialValues.patientScheme.filter(
+        x => x.schemeTypeFK === SCHEME_TYPE.CORPORATE,
+      ),
+    )
+    const newSchemeVal = this.getSchemeCompareVal(
+      values.patientScheme.filter(
+        x => x.schemeTypeFK === SCHEME_TYPE.CORPORATE && !x.isDeleted,
+      ),
+    )
+    const isSchemeChange =
       !_.isEqual(oldSchemeVal, newSchemeVal) && newSchemeVal.length > 0
-    //if added new member, would update address & scheme for that member
-    console.log('check family member change', values)
-    const newFamilyMembers =
-      values.patientFamilyGroup &&
-      values.patientFamilyGroup.patientFamilyMember
-        .filter(x => x.isNew && !x.isDeleted)
-        .map(x => x.familyMemberFK)
-    return [isAddressChange, isSchemeChange, newFamilyMembers]
+
+    return [isAddressChange, isSchemeChange, familyMembers]
   }
 
   beforeHandleSubmit = () => {
     const { handleSubmit, dispatch, values, dirty, initialValues } = this.props
     if (dirty) {
-      const [
-        address,
-        scheme,
-        newFamilyMembers,
-      ] = this.checkFamilyMemberInfoChange(initialValues, values)
-      const anyNewFamilyMember = newFamilyMembers && newFamilyMembers.length > 0
-      if (anyNewFamilyMember || address || scheme) {
-        const fimilyMembersInfoTitle = `Confirm Update Family Members' ${[
-          anyNewFamilyMember || address ? 'Address' : '',
-          anyNewFamilyMember || scheme ? 'Corporate Scheme' : '',
-        ]
-          .filter(x => x)
-          .join(', ')}`
-        this.setState({
-          showFamilyMembersInfoUpdate: true,
-          fimilyMembersInfoTitle,
-          updatedTypes: { address, scheme },
-          newFamilyMembers,
-        })
-        return undefined
+      const [address, scheme, familyMembers] = this.checkFamilyMemberInfoChange(
+        initialValues,
+        values,
+      )
+      if (familyMembers.length > 0) {
+        const newFamilyMembers = familyMembers
+          .filter(x => x.isNew)
+          .map(x => x.familyMemberFK)
+        const anyNewFamilyMember = newFamilyMembers.length > 0
+        if ((anyNewFamilyMember && (address || scheme)) || address || scheme) {
+          const fimilyMembersInfoTitle = `Confirm Update Family Members' ${[
+            anyNewFamilyMember || address ? 'Address' : '',
+            anyNewFamilyMember || scheme ? 'Corporate Scheme' : '',
+          ]
+            .filter(x => x)
+            .join(', ')}`
+          this.setState({
+            showFamilyMembersInfoUpdate: true,
+            fimilyMembersInfoTitle,
+            updatedTypes: { address, scheme },
+            newFamilyMembers,
+          })
+          return undefined
+        }
       }
     }
     return handleSubmit()
@@ -657,7 +695,7 @@ class PatientDetail extends PureComponent {
     if (!patient) return null
     const { currentComponent, currentId, menuErrors, entity } = patient
     const patientIsActiveOrCreating = !entity || entity.isActive
-
+    const { id: currentPatientId } = values
     const isCreatingPatient = entity
       ? Object.prototype.hasOwnProperty.call(entity, 'id') && entity.isActive
       : false
@@ -830,7 +868,7 @@ class PatientDetail extends PureComponent {
           >
             {this.state.showFamilyMembersInfoUpdate && (
               <FamilyMembersInfoUpdate
-                patientProfileFK={entity.id}
+                patientProfileFK={currentPatientId}
                 newFamilyMembers={this.state.newFamilyMembers}
                 {...this.state.updatedTypes}
                 dispatch={dispatch}
