@@ -21,7 +21,10 @@ import {
   DOCUMENT_CATEGORY,
   DOCUMENTCATEGORY_DOCUMENTTYPE,
 } from '@/utils/constants'
-import AddCircleOutlineTwoTone from '@material-ui/icons/AddCircleOutlineTwoTone'
+import { InfoTwoTone } from '@material-ui/icons'
+import { withStyles } from '@material-ui/core'
+
+const styles = theme => ({})
 
 const formFieldTips_Subject = 'Guidelines to use Forms Fields'
 const formFieldTips_Content =
@@ -99,9 +102,18 @@ class Detail extends PureComponent {
 
   FormFieldTips = () => {
     const formFieldTips_Subject = 'Guidelines to use Forms Fields'
-    const formFieldTips_Content =
-      "In order to add autofill feature, you must input the exact same instance into the name column. For example: To auto-populate patient's name, you need to key in " +
-      'PatientName into the name column in Forms Fields. Click on the light bulb icon for more autofill instances.'
+    const formFieldTips_Content = (
+      <span>
+        In order to add autofill feature, you must input the exact same instance
+        into the Name column. For example: To auto-populate patient's name, you
+        need to key in PatientName into the Name column in Forms Fields -&gt; Text
+        Form -&gt; Field Settings Mouse over the 
+        <span>
+          <InfoTwoTone color='primary' style={{verticalAlign:'text-top'}}/>
+        </span> 
+        icon for more autofill instances.
+      </span>
+    )
     const formFieldTips_Tooltip =
       "i. Patient's Name:PatientName\n" +
       "ii.Patient's Gender:PatientGender\n" +
@@ -119,7 +131,7 @@ class Detail extends PureComponent {
          <span style={{fontWeight:'bold',textDecoration:'underline'}}>{formFieldTips_Subject}</span>
           <Tooltip useTooltip2 title={<pre>{formFieldTips_Tooltip}</pre>}>
             <span>
-              <AddCircleOutlineTwoTone color='primary' style={{verticalAlign:'text-top'}}/>
+              <InfoTwoTone color='primary' style={{verticalAlign:'text-top'}}/>
             </span>
           </Tooltip>
         </p>
@@ -309,9 +321,25 @@ class Detail extends PureComponent {
                         document={values.templateContent}
                         ref={r => (this.edContainer = r?.container)}
                         contentChange={this.contentChange.bind(this)}
-                        // documentChange={this.documentChange.bind(this)}
+                        documentChange={() => {
+                          if (this.edContainer?.documentEditor)
+                            this.edContainer.documentEditor.selection.isHighlightEditRegion = true
+                        }}
                         created={this.componentCreated.bind(this)}
-                        height={500}
+                        height={'calc( 100vh - 340px)'}
+                        toolbarClick={(e)=>{
+                          const { item:{properties:{ id }}} = e
+                          if(id === 'signaturePanel'){
+                            const currentUser = 'Everyone'
+                            const signaturePlaceholder = ' '
+                            const startOffset = this.edContainer.documentEditor.selection.endOffset
+                            this.edContainer.documentEditor.editor.insertText(signaturePlaceholder)
+                            const endOffset = this.edContainer.documentEditor.selection.endOffset
+                            // console.log(startOffset,endOffset)
+                            this.edContainer.documentEditor.selection.select(startOffset,endOffset)
+                            this.edContainer.documentEditor.editor.insertEditingRegion(currentUser)
+                          }
+                        }}
                         toolbarItems={[
                           'Open',
                           'Separator',
@@ -330,8 +358,13 @@ class Detail extends PureComponent {
                           'Separator',
                           'Find',
                           'Separator',
-                          'RestrictEditing',
+                          //'RestrictEditing',
                           'FormFields',
+                          {
+                            id:'signaturePanel',
+                            text:'Signature Panel',
+                            prefixIcon:'e-signature',
+                          }
                         ]}
                       />
                      <this.FormFieldTips/>
@@ -399,4 +432,4 @@ class Detail extends PureComponent {
   }
 }
 
-export default Detail
+export default withStyles(styles, { name: 'DocumentTemplateDetail' })(Detail)

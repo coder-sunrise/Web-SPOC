@@ -65,7 +65,7 @@ const styles = (theme) => ({
     marginTop: -10,
   },
   listContainer: {
-    maxHeight: 300,
+    maxHeight: 132,
     overflowY: 'auto',
   },
 })
@@ -388,7 +388,6 @@ class Forms extends PureComponent {
               columnName: 'updateDate',
               render: r => {
                 const updateDate = moment(r.updateDate)
-                  .utc()
                   .format('DD MMM YYYY HH:mm')
                 return (
                   <Tooltip title={updateDate}>
@@ -401,7 +400,7 @@ class Forms extends PureComponent {
               columnName: 'statusFK',
               render: r => {
                 const status = formStatus.find(x => x.value === r.statusFK).name
-                const title = r.statusFK === 4 ? r.voidReason : status
+                const title = r.statusFK === 4 ? `${status}, Reason: ${r.voidReason}.` : status
                 return <Tooltip title={title}><span>{status}</span></Tooltip>
               },
             },
@@ -502,7 +501,7 @@ class Forms extends PureComponent {
                       }}
                     />
                     <div className={classes.listContainer}>
-                      {unionFormTypes.slice(0,6).map((item) => {
+                      {unionFormTypes.map((item) => {
                         return (
                           <this.ListItem
                             key={item.formTemplateFK}
@@ -546,7 +545,7 @@ class Forms extends PureComponent {
           title='Add Form'
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
-          observe='AddForm'
+          observe='Form'
           maxWidth='lg'
           bodyNoPadding
         >

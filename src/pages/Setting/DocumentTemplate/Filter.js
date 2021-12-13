@@ -97,6 +97,7 @@ class Filter extends PureComponent {
                     localFilter={x => filterTemplateTypes.some(y => x.id == y)}
                     code='LTDocumentTemplateType'
                     label='Document Type'
+                    orderBy={[['name'],['asc']]}
                     {...args}
                   />
                 )
