@@ -149,7 +149,10 @@ const defaultColumns = [
     dataIndex: 'copayer',
     renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
       return (
-        <Tooltip title='Select “All” will retrieve active and inactive co-payers'>
+        <Tooltip
+          placement='left'
+          title='Select “All” will retrieve active and inactive co-payers'
+        >
           <CodeSelect
             style={{ width: 150 }}
             label={formatMessage({
