@@ -1,4 +1,3 @@
-
 @import url('https://cdn.syncfusion.com/ej2/material.css');
 /* @import url('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'); */
 
@@ -31,12 +30,6 @@
     height: 100%;
 }
 
-body {
-    margin: 0;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-}
 
 /** Document editor sample level styles*/
 
