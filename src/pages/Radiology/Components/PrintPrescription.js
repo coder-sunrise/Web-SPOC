@@ -4,16 +4,44 @@ import { Button, Tooltip, CommonModal } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
 import MenuItem from '@material-ui/core/MenuItem'
 import Menu from '@material-ui/core/Menu'
+import DrugLeafletSelection from '../../Pharmacy/Components/DrugLeafletSelection'
 
-export default function PrintPrescription({
-  visitFK,
-  id: pharmacyWorkitemId,
-  patientProfileFK,
-}) {
+const PrintPrescription = props => {
+  const { item, dispatch } = props
+  const {
+    visitFK,
+    translationLinkFK,
+    id: pharmacyWorkitemId,
+    patientProfileFK,
+  } = item
+  const [showLeafletSelectionPopup, setShowLeafletSelectionPopup] = useState(
+    false,
+  )
+  const [drugLeafletData, setDrugLeafletData] = useState({})
   const [anchorEl, setAnchorEl] = React.useState(null)
+  const closeLeafletSelectionPopup = () => {
+    setShowLeafletSelectionPopup(false)
+  }
+  const onConfirmPrintLeaflet = () => {
+    setShowLeafletSelectionPopup(false)
+  }
   const open = Boolean(anchorEl)
   const handleClick = event => {
     setAnchorEl(event.currentTarget)
+  }
+  const printPIL = () => {
+    dispatch({
+      type: 'pharmacyDetails/queryLeafletDrugList',
+      payload: {
+        id: visitFK,
+      },
+    }).then(data => {
+      if (data) {
+        handleClose()
+        setDrugLeafletData(data)
+        setShowLeafletSelectionPopup(true)
+      }
+    })
   }
   const handleClose = () => {
     setAnchorEl(null)
@@ -63,7 +91,7 @@ export default function PrintPrescription({
         <MenuItem onClick={handleClose}>Drug Label</MenuItem>
         <MenuItem onClick={handleClose}>Drug Summary Label</MenuItem>
         <MenuItem onClick={handleClose}>Patient Label</MenuItem>
-        <MenuItem onClick={handleClose}>Patient Info Leaflet</MenuItem>
+        <MenuItem onClick={printPIL}>Patient Info Leaflet</MenuItem>
         <MenuItem onClick={prescription}>Prescription</MenuItem>
       </Menu>
 
@@ -76,10 +104,32 @@ export default function PrintPrescription({
         <ReportViewer
           showTopDivider={false}
           reportID={84}
-          reportParameters={{ visitFK, pharmacyWorkitemId, patientProfileFK }}
+          reportParameters={{
+            visitFK,
+            pharmacyWorkitemId,
+            patientProfileFK,
+          }}
           defaultScale={1.5}
+        />
+      </CommonModal>
+      <CommonModal
+        open={showLeafletSelectionPopup}
+        title='Print Patient Info Leaflet'
+        onClose={closeLeafletSelectionPopup}
+        maxWidth='sm'
+        cancelText='Cancel'
+        observe='Confirm'
+      >
+        <DrugLeafletSelection
+          {...props}
+          rows={drugLeafletData}
+          tranlationFK={translationLinkFK}
+          visitid={visitFK}
+          onConfirmPrintLeaflet={onConfirmPrintLeaflet}
         />
       </CommonModal>
     </span>
   )
 }
+
+export default PrintPrescription
