@@ -26,6 +26,7 @@ import {
 // current page sub components
 import EndSessionSummary from '@/pages/Report/SessionSummary/Details/index'
 // utils
+import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import { getAppendUrl, getRemovedUrl } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import { QueueDashboardButton } from '@/components/_medisys'
@@ -789,7 +790,7 @@ class Queue extends React.Component {
   }
 
   showVisitForms = async row => {
-    const { id, visitStatus, doctor, patientAccountNo, patientName } = row
+    const { id, visitStatus, doctor, patientAccountNo, patientName, gender, patientReferenceNo, dob} = row
     await this.props.dispatch({
       type: 'formListing/updateState',
       payload: {
@@ -799,6 +800,11 @@ class Queue extends React.Component {
           doctorProfileFK: doctor ? doctor.id : 0,
           patientName,
           patientAccountNo,
+          patientGender: gender,
+          patientDOB: dob,
+          patientAge: dob ? calculateAgeFromDOB(dob) : 0,
+          patientRefNo: patientReferenceNo,
+          todayDate: moment().toDate(),
         },
       },
     })
@@ -828,7 +834,8 @@ class Queue extends React.Component {
       queueInfo,
       refreshInfo,
     } = this.state
-    const { sessionInfo, error } = queueLog
+    const { sessionInfo, error, queueFilterBar = {} } = queueLog
+    const { visitType = [] } = queueFilterBar
     const { sessionNo, isClinicSessionClosed } = sessionInfo
     const { oriQCallList } = queueCalling
     const openQueueDisplayAccessRight = Authorized.check('openqueuedisplay')
@@ -965,6 +972,7 @@ class Queue extends React.Component {
                   onRegisterVisitEnterPressed={this.onEnterPressed}
                   toggleNewPatient={this.toggleRegisterNewPatient}
                   setSearch={this.setSearch}
+                  {...this.props}
                 />
               </div>
               <DetailsGrid
@@ -979,6 +987,7 @@ class Queue extends React.Component {
                 // handleFormsClick={this.showVisitForms}
                 history={history}
                 searchQuery={search}
+                visitType={visitType}
               />
               <RightClickContextMenu
                 onMenuItemClick={this.onMenuItemClick}

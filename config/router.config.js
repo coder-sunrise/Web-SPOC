@@ -771,6 +771,12 @@ const _routes = [
             component: './Report/PartialDispenseReport',
             authority: ['report.inventory.partialdispensereport'],
           },
+          {
+            path: '/report/preorderlistingreport',
+            name: 'preorderlistingreport',
+            component: './Report/PreOrderListingReport',
+            authority: ['report.finance.preorderlistingreport'],
+          },
         ],
       },
       // Report
@@ -835,14 +841,14 @@ const _routes = [
       // Claim Submission
       //
       // Forms
-      {
-        path: '/forms',
-        icon: 'icon-pic-right',
-        name: 'forms',
-        moduleName: 'Forms',
-        component: './FormListing',
-        authority: ['forms'],
-      },
+      // {
+      //   path: '/forms',
+      //   icon: 'icon-pic-right',
+      //   name: 'forms',
+      //   moduleName: 'Forms',
+      //   component: './FormListing',
+      //   authority: ['forms'],
+      // },
       // Forms
       //
       // Settings
@@ -1134,6 +1140,12 @@ const _routes = [
             name: 'visitordertemplate',
             component: './Setting/VisitOrderTemplate',
             authority: ['settings.templates.visitordertemplate'],
+          },
+          {
+            path: '/setting/medicinetrivia',
+            name: 'medicinetrivia',
+            component: './Setting/medicineTrivia',
+            authority: ['settings.clinicsetting.medicinetrivia'],
           },
           {
             path: '/setting/refractiontesttype',

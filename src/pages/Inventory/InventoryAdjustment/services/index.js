@@ -6,7 +6,27 @@ const runningNoUrl = '/api/InventoryAdjustment/GenerateRunningNo'
 const stockUrl = '/api/InventoryAdjustment/StockDetails'
 
 const fns = {
-  queryList: params => service.queryList(url, params),
+  queryList: params => {
+    const { sorting = [] } = params
+    const sortOrderByTransactionDate = sorting.find(
+      s => s.columnName === 'transactionDate',
+    )
+    let newParams = params
+    if (sortOrderByTransactionDate) {
+      newParams = {
+        ...params,
+        sorting: [
+          ...params.sorting,
+          {
+            columnName: 'transactionDate',
+            sortBy: 'createDate',
+            direction: sortOrderByTransactionDate.direction,
+          },
+        ],
+      }
+    }
+    return service.queryList(url, newParams)
+  },
   query: params => service.query(url, params),
   queryStockDetails: params => service.query(stockUrl, params),
   upsert: params => service.upsert(url, params),

@@ -888,7 +888,10 @@ class Banner extends PureComponent {
       isReadOnly,
       isRetail,
       editingOrder,
+      clinicSettings,
     } = props
+
+    const { isEnableJapaneseICD10Diagnosis } = clinicSettings
 
     const preOrderAccessRight = Authorized.check(
       'patientdatabase.modifypreorder',
@@ -954,6 +957,22 @@ class Banner extends PureComponent {
 
     const pendingPreOrderItems =
       entity.pendingPreOrderItem?.filter(item => !item.isDeleted) || []
+
+    const persistentDiagnosis =
+      isEnableJapaneseICD10Diagnosis === true &&
+      info.patientHistoryDiagnosis.length > 0
+        ? info.patientHistoryDiagnosis
+            .map(
+              d =>
+                `${d.diagnosisDescription} ${d.jpnDiagnosisDescription || ''}`,
+            )
+            .join(', ')
+        : isEnableJapaneseICD10Diagnosis === false &&
+          info.patientHistoryDiagnosis.length > 0
+        ? info.patientHistoryDiagnosis
+            .map(d => d.diagnosisDescription)
+            .join(', ')
+        : '-'
 
     return (
       <Paper id='patientBanner' style={style}>
@@ -1159,18 +1178,9 @@ class Banner extends PureComponent {
                     <span className={classes.header}>
                       Persistent Diagnosis:{' '}
                     </span>
-                    <Tooltip
-                      title={info.patientHistoryDiagnosis
-                        .map(d => d.diagnosisDescription)
-                        .join(', ')}
-                      interactive='true'
-                    >
+                    <Tooltip title={persistentDiagnosis} interactive='true'>
                       <span className={classes.contents}>
-                        {info.patientHistoryDiagnosis.length > 0
-                          ? info.patientHistoryDiagnosis
-                              .map(d => d.diagnosisDescription)
-                              .join(', ')
-                          : '-'}
+                        {persistentDiagnosis}
                       </span>
                     </Tooltip>
                   </GridItem>
@@ -1223,6 +1233,32 @@ class Banner extends PureComponent {
               <GridItem xs={2} md={2} className={classes.cell}>
                 {/* right half */}
                 <GridContainer>
+                  {entity?.lastVisitDate ? (
+                    <GridItem
+                      xs={12}
+                      md={12}
+                      style={{ position: 'relative', top: 5 }}
+                      className={classes.cell}
+                    >
+                      <span>Last Visit: </span>
+                      <Tooltip
+                        title={moment(entity.lastVisitDate).format(
+                          'DD MMM YYYY',
+                        )}
+                      >
+                        <span>
+                          {moment(entity.lastVisitDate).format('DD MMM YYYY')}
+                        </span>
+                      </Tooltip>
+                    </GridItem>
+                  ) : (
+                    <GridItem
+                      xs={12}
+                      md={12}
+                      style={{ height: 22 }}
+                      className={classes.cell}
+                    ></GridItem>
+                  )}
                   <GridItem xs={12} md={12} className={classes.cell}>
                     <span
                       style={{
@@ -1358,16 +1394,16 @@ class Banner extends PureComponent {
                       Lab Results
                     </Link>
                   </GridItem>
-
-                  <GridItem xs={6} md={12} className={classes.cell}></GridItem>
                 </GridContainer>
               </GridItem>
             </GridContainer>
           </GridItem>
 
-          <GridItem xs={3} md={12 - this.getBannerMd()}>
-            {extraCmt}
-          </GridItem>
+          {extraCmt && (
+            <GridItem xs={3} md={12 - this.getBannerMd()}>
+              {extraCmt()}
+            </GridItem>
+          )}
         </GridContainer>
 
         <CommonModal

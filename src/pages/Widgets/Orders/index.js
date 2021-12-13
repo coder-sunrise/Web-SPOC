@@ -36,7 +36,7 @@ import Grid from './Grid'
 import Detail from './Detail/index'
 import Details from './Detail/PrescriptionSet/Details'
 
-const styles = (theme) => ({
+const styles = theme => ({
   rightAlign: {
     textAlign: 'right',
   },
@@ -52,8 +52,20 @@ const styles = (theme) => ({
     fontSize: '0.7rem',
     padding: '2px 3px',
     height: 20,
-    cursor: 'pointer'
-  }
+    cursor: 'pointer',
+  },
+  switchContainer: {
+    color: 'currentColor',
+    borderRadius: 0,
+    '& .ant-switch-handle': {
+      width: 20,
+      height: 16,
+      '&::before': {
+        borderRadius: 3,
+        right: 2,
+      },
+    },
+  },
 })
 // @skeleton()
 @connect(({ orders, codetable, clinicInfo }) => ({
@@ -70,7 +82,7 @@ class Orders extends PureComponent {
     showPrescriptionSetDetailModal: false,
   }
 
-  componentWillMount () {
+  componentWillMount() {
     const { dispatch, status } = this.props
 
     const codeTableNameArray = [
@@ -99,17 +111,14 @@ class Orders extends PureComponent {
     if (!serviceCenterFK || !serviceFK) return
     const serviceCenterService =
       this.state.serviceCenterServices.find(
-        (o) =>
-          o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
+        o => o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
       ) || {}
     if (serviceCenterService) {
       setValues({
         ...values,
         serviceCenterServiceFK: serviceCenterService.serviceCenter_ServiceId,
-        serviceCode: this.state.services.find((o) => o.value === serviceFK)
-          .code,
-        serviceName: this.state.services.find((o) => o.value === serviceFK)
-          .name,
+        serviceCode: this.state.services.find(o => o.value === serviceFK).code,
+        serviceName: this.state.services.find(o => o.value === serviceFK).name,
         unitPrice: serviceCenterService.unitPrice,
         total: serviceCenterService.unitPrice,
         quantity: 1,
@@ -125,14 +134,14 @@ class Orders extends PureComponent {
       payload: {
         entity: undefined,
         prescriptionSetItems: [],
-        editPrescriptionSetItem: undefined
-      }
+        editPrescriptionSetItem: undefined,
+      },
     })
 
     this.setState({ showPrescriptionSetDetailModal: false })
   }
 
-  render () {
+  render() {
     const { props } = this
     const { className, footer, ...restProps } = props
     return (

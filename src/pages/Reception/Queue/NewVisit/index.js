@@ -429,6 +429,29 @@ class NewVisit extends PureComponent {
     setFieldValue('visitPreOrderItem', [...visitPreOrderItem])
   }
 
+  getExtraComponent = () => {
+    const { clinicSettings, patientInfo } = this.props
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-evenly',
+          height: '100%',
+          width: '90%',
+        }}
+      >
+        {patientInfo && (
+          <PrintLabLabelButton
+            patientId={patientInfo.id}
+            clinicSettings={clinicSettings?.settings}
+            isEnableScanner
+          />
+        )}
+      </div>
+    )
+  }
+
   render() {
     const {
       classes,
@@ -536,25 +559,7 @@ class NewVisit extends PureComponent {
                   onSelectPreOrder={this.onSelectPreOrder}
                   activePreOrderItems={draftPreOrderItem}
                   isRetail={isRetail}
-                  extraCmt={
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-evenly',
-                        height: '100%',
-                        width: '90%',
-                      }}
-                    >
-                      {patientInfo && (
-                        <PrintLabLabelButton
-                          patientId={patientInfo.id}
-                          clinicSettings={clinicSettings?.settings}
-                          isEnableScanner
-                        />
-                      )}
-                    </div>
-                  }
+                  extraCmt={this.getExtraComponent}
                   {...this.props}
                 />
               </div>

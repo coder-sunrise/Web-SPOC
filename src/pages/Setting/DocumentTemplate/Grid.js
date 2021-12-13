@@ -2,12 +2,12 @@ import React, { PureComponent } from 'react'
 import { Badge } from 'antd'
 import htmlToText from 'html-to-text'
 import { CommonTableGrid, Button, Tooltip } from '@/components'
-import { status, documentTemplateTypes } from '@/utils/codes'
+import { status, documentTemplateTypes, documentCategorys } from '@/utils/codes'
 import { Edit } from '@material-ui/icons'
 import MouseOverPopover from './MouseOverPopover'
 
 class Grid extends PureComponent {
-  editRow = (row) => {
+  editRow = row => {
     const { dispatch, settingDocumentTemplate } = this.props
 
     const { list } = settingDocumentTemplate
@@ -16,12 +16,12 @@ class Grid extends PureComponent {
       type: 'settingDocumentTemplate/updateState',
       payload: {
         showModal: true,
-        entity: list.find((o) => o.id === row.id),
+        entity: list.find(o => o.id === row.id),
       },
     })
   }
 
-  render () {
+  render() {
     const { height } = this.props
     return (
       <CommonTableGrid
@@ -33,10 +33,11 @@ class Grid extends PureComponent {
           height,
         }}
         columns={[
+          { name: 'documentCategoryFK', title: 'Document Category' },
           { name: 'documentTemplateTypeFK', title: 'Document Type' },
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
-          { name: 'templateContent', title: 'Template Message' },
+          // { name: 'templateContent', title: 'Template Message' },
           { name: 'isActive', title: 'Status' },
           {
             name: 'action',
@@ -45,13 +46,25 @@ class Grid extends PureComponent {
         ]}
         columnExtensions={[
           {
+            columnName: 'documentCategoryFK',
+            sortingEnabled: false,
+            width: 200,
+            render: row => {
+              const category =
+                documentCategorys.find(
+                  t => t.value === row.documentCategoryFK,
+                ) || {}
+              return category.name
+            },
+          },
+          {
             columnName: 'documentTemplateTypeFK',
             sortingEnabled: false,
             width: 240,
-            render: (row) => {
+            render: row => {
               const documentTemplateType =
                 documentTemplateTypes.find(
-                  (type) => type.value === row.documentTemplateTypeFK,
+                  type => type.value === row.documentTemplateTypeFK,
                 ) || {}
               return (
                 <div style={{ marginTop: 1 }}>
@@ -73,27 +86,31 @@ class Grid extends PureComponent {
             },
           },
           {
+            columnName: 'displayValue',
+            sortingEnabled: true,
+          },
+          {
             columnName: 'isActive',
             sortingEnabled: false,
             type: 'select',
             options: status,
             width: 100,
           },
-          {
-            columnName: 'templateContent',
-            render: (row) => {
-              let e = document.createElement('div')
-              e.innerHTML = row.templateContent
-              let htmlData =
-                e.childNodes.length === 0 ? '' : e.childNodes[0].nodeValue
+          // {
+          //   columnName: 'templateContent',
+          //   render: row => {
+          //     let e = document.createElement('div')
+          //     e.innerHTML = row.templateContent
+          //     let htmlData =
+          //       e.childNodes.length === 0 ? '' : e.childNodes[0].nodeValue
 
-              const templateMessageProps = {
-                templateContent: htmlToText.fromString(htmlData),
-              }
+          //     const templateMessageProps = {
+          //       templateContent: htmlToText.fromString(htmlData),
+          //     }
 
-              return <MouseOverPopover {...templateMessageProps} />
-            },
-          },
+          //     return <MouseOverPopover {...templateMessageProps} />
+          //   },
+          // },
           {
             columnName: 'effectiveStartDate',
             type: 'date',
@@ -107,7 +124,7 @@ class Grid extends PureComponent {
           {
             columnName: 'action',
             sortingEnabled: false,
-            render: (row) => {
+            render: row => {
               return (
                 <Tooltip title='Edit Document Template' placement='top-end'>
                   <Button

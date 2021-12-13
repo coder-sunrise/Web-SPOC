@@ -134,6 +134,7 @@ const getVisitDoctorUserId = props => {
       ...orders.defaultConsumable,
       type: orders.type,
       performingUserFK: getVisitDoctorUserId(props),
+      visitPurposeFK: orders.visitPurposeFK,
     })
   },
   displayName: 'OrderPage',
@@ -262,6 +263,7 @@ class Consumable extends PureComponent {
       ...orders.defaultConsumable,
       type: orders.type,
       performingUserFK: getVisitDoctorUserId(this.props),
+      visitPurposeFK: orders.visitPurposeFK,
     })
   }
 

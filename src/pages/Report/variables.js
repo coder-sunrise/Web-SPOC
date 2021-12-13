@@ -192,4 +192,10 @@ export const menuData = [
     url: '/report/packageexpiry',
     authority: 'report.finance.packageexpiryreport',
   },
+  {
+    title: 'Finance',
+    text: 'Pre-Order Listing Report',
+    url: '/report/preorderlistingreport',
+    authority: 'report.finance.preorderlistingreport',
+  },
 ]

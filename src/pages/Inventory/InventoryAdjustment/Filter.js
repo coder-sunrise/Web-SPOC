@@ -2,6 +2,7 @@ import React, { PureComponent, Fragment } from 'react'
 import { FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
+import moment from 'moment'
 import {
   MenuList,
   Popper,
@@ -27,8 +28,11 @@ import { inventoryAdjustmentStatus } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
 
 @withFormikExtend({
-  mapPropsToValues: ({ inventoryAdjustment }) =>
-    inventoryAdjustment.filter || {},
+  mapPropsToValues: ({ inventoryAdjustment }) =>{
+    const defaultDateFrom = moment().add(-30,'day').formatUTC()
+    const defaultDateTo = moment().endOf('day').formatUTC(false)
+    return ({...(inventoryAdjustment.filter),transDates:[defaultDateFrom,defaultDateTo]}) || {}
+  },
   handleSubmit: () => {},
   displayName: 'InventoryAdjustmentFilter',
 })
@@ -88,8 +92,8 @@ class Filter extends PureComponent {
               render={args => {
                 return (
                   <DateRangePicker
-                    label='Transaction From Date'
-                    label2='To Date'
+                    label='Transaction Date From'
+                    label2='Transaction Date To'
                     disabled={values.allDate}
                     {...args}
                   />
@@ -177,7 +181,7 @@ class Filter extends PureComponent {
                     <Add />
                     Add New
                   </Button>
-                  <Button
+                  {/* <Button
                     color='primary'
                     icon={null}
                     onClick={this.handleToggle}
@@ -186,7 +190,7 @@ class Filter extends PureComponent {
                     }}
                   >
                     Mass Adjustment
-                  </Button>
+                  </Button> */}
                 </Fragment>
               </Authorized>
 

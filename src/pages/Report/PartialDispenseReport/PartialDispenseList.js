@@ -19,8 +19,8 @@ class PartialDispenseList extends PureComponent {
     let PartialDispenseExtensions = []
     let PartialDispenseColumns = [
       { name: 'orderDate', title: 'Order Date' },
-      { name: 'patientReferenceNo', title: 'Ref. No' },
-      { name: 'patientAccountNo', title: 'Acc. No' },
+      { name: 'patientReferenceNo', title: 'Ref. No.' },
+      { name: 'patientAccountNo', title: 'Acc. No.' },
       { name: 'patientName', title: 'Patient Name' },
       { name: 'patientContactNo', title: 'Contact No.' },
     ]
