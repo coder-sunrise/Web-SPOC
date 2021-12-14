@@ -290,7 +290,7 @@ class GeneralSetting extends PureComponent {
             <GridItem md={3}>
               <Field
                 name='locale.settingValue'
-                render={(args) => (
+                render={args => (
                   <Select
                     label='System Currency'
                     {...args}
@@ -305,7 +305,7 @@ class GeneralSetting extends PureComponent {
             <GridItem md={3}>
               <Field
                 name='currencyRounding.settingValue'
-                render={(args) => (
+                render={args => (
                   <Select
                     label='Currency Rounding'
                     options={currencyRoundingList}
@@ -319,7 +319,7 @@ class GeneralSetting extends PureComponent {
             <GridItem md={3}>
               <Field
                 name='currencyRoundingToTheClosest.settingValue'
-                render={(args) => (
+                render={args => (
                   <Select
                     label='To The Closest'
                     options={currencyRoundingToTheClosestList}
@@ -334,7 +334,7 @@ class GeneralSetting extends PureComponent {
             <GridItem md={3} sm={6} xs={12}>
               <Field
                 name='showConsultationVersioning.settingValue'
-                render={(args) => (
+                render={args => (
                   <Switch
                     label='Show Consultation Versioning'
                     {...args}
@@ -346,7 +346,7 @@ class GeneralSetting extends PureComponent {
             <GridItem md={3} sm={6} xs={12}>
               <Field
                 name='autoRefresh.settingValue'
-                render={(args) => (
+                render={args => (
                   <Switch
                     label='Queue Listing Auto Refresh'
                     {...args}
@@ -358,7 +358,7 @@ class GeneralSetting extends PureComponent {
             <GridItem md={3} sm={6} xs={12}>
               <Field
                 name='isVisitReferralSourceMandatory.settingValue'
-                render={(args) => (
+                render={args => (
                   <Switch
                     label='Referral Source Mandatory'
                     {...args}
@@ -367,16 +367,16 @@ class GeneralSetting extends PureComponent {
                 )}
               />
             </GridItem>
-          </GridContainer> 
+          </GridContainer>
           <GridContainer>
             <GridItem md={2} style={{ margin: 0 }}>
               <Field
                 name='defaultVisitType.settingValue'
-                render={(args) => (
+                render={args => (
                   <CodeSelect
                     label='Default Visit Type'
                     {...args}
-                    code ='ctVisitpurpose'
+                    code='ctVisitpurpose'
                     options={visitPurpose || []}
                     disabled={!!hasActiveSession}
                     allowClear={false}
@@ -387,7 +387,7 @@ class GeneralSetting extends PureComponent {
             <GridItem md={2} style={{ margin: 0 }}>
               <Field
                 name='labelPrinterSize.settingValue'
-                render={(args) => (
+                render={args => (
                   <Select
                     label='Label Printer Size'
                     options={labelPrinterList}
@@ -401,7 +401,7 @@ class GeneralSetting extends PureComponent {
             <GridItem md={2} style={{ margin: 0 }}>
               <Field
                 name='showTotalInvoiceAmtInConsultation.settingValue'
-                render={(args) => (
+                render={args => (
                   <Switch
                     label='Show Total Invoice Amount In Consultation'
                     {...args}
@@ -416,16 +416,16 @@ class GeneralSetting extends PureComponent {
               <h5 className={classes.boldText}>Auto Print</h5>
             </GridItem>
           </GridContainer>
-          <GridContainer>
+          <GridContainer style={{ display: 'none' }}>
             <GridItem md={3}>
               <h5> Finalize Order </h5>
             </GridItem>
           </GridContainer>
-          <GridContainer>
+          <GridContainer style={{ display: 'none' }}>
             <GridItem md={3}>
               <Field
                 name='autoPrintDrugLabelOnFinalize.settingValue'
-                render={(args) => {
+                render={args => {
                   return (
                     <Checkbox
                       label='Drug Label'
@@ -446,7 +446,7 @@ class GeneralSetting extends PureComponent {
             <GridItem md={3}>
               <Field
                 name='autoPrintOnSignOff.settingValue'
-                render={(args) => (
+                render={args => (
                   <Switch
                     {...args}
                     style={{ marginTop: 0 }}
@@ -461,7 +461,7 @@ class GeneralSetting extends PureComponent {
             <GridItem md={12}>
               <Field
                 name='autoPrintReportsOnSignOff.settingValue'
-                render={(args) => {
+                render={args => {
                   return (
                     <CheckboxGroup
                       valueField='code'
@@ -483,7 +483,7 @@ class GeneralSetting extends PureComponent {
             <GridItem md={3}>
               <Field
                 name='autoPrintOnCompletePayment.settingValue'
-                render={(args) => (
+                render={args => (
                   <Switch
                     {...args}
                     style={{ marginTop: 0 }}
@@ -498,10 +498,12 @@ class GeneralSetting extends PureComponent {
             <GridItem md={12}>
               <Field
                 name='autoPrintReportsOnCompletePayment.settingValue'
-                render={(args) => {
+                render={args => {
                   return (
                     <CheckboxGroup
-                      disabled={!!hasActiveSession || autoPrintOnCompletePayment}
+                      disabled={
+                        !!hasActiveSession || autoPrintOnCompletePayment
+                      }
                       valueField='code'
                       textField='description'
                       options={ReportsOnCompletePayment}
@@ -518,7 +520,7 @@ class GeneralSetting extends PureComponent {
               <h5>Appointment Timeslot setup</h5>
               <Field
                 name='apptDefaultSettingsCheckbox'
-                render={(args) => {
+                render={args => {
                   return (
                     <Checkbox
                       label='Use System Default Setting'
@@ -535,27 +537,27 @@ class GeneralSetting extends PureComponent {
           <GridContainer>
             <GridItem md={2}>
               <Field
-                  name='apptTimeRulerExtent.settingValue'
-                  render={(args) => (
-                    <TextField
-                      label='Appointment Time Grid Height (PIXELS)'
-                      {...args}
-                      disabled={!!hasActiveSession}
-                    />
-                  )}
-                />
+                name='apptTimeRulerExtent.settingValue'
+                render={args => (
+                  <TextField
+                    label='Appointment Time Grid Height (PIXELS)'
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
             </GridItem>
             <GridItem md={2}>
               <Field
-                  name='apptTimeIntervel.settingValue'
-                  render={(args) => (
-                    <TextField
-                      label='Appointment Time Grid Interval (MINS)'
-                      {...args}
-                      disabled={!!hasActiveSession}
-                    />
-                  )}
-                />
+                name='apptTimeIntervel.settingValue'
+                render={args => (
+                  <TextField
+                    label='Appointment Time Grid Interval (MINS)'
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
             </GridItem>
             <GridContainer>
               <GridItem md={2}>
@@ -571,7 +573,13 @@ class GeneralSetting extends PureComponent {
                         label='Hours'
                         options={hourOptions}
                         value={apptDurationHour}
-                        onChange={(value)=>this.setApptDurationH(this.props.setFieldValue,durationMinutes,value)}
+                        onChange={value =>
+                          this.setApptDurationH(
+                            this.props.setFieldValue,
+                            durationMinutes,
+                            value,
+                          )
+                        }
                         disabled={!!hasActiveSession}
                       />
                     )}
@@ -586,7 +594,13 @@ class GeneralSetting extends PureComponent {
                         label='Minutes'
                         options={minuteOptions}
                         value={apptDurationMinute}
-                        onChange={(value)=>this.setApptDurationM(this.props.setFieldValue,durationMinutes,value)}
+                        onChange={value =>
+                          this.setApptDurationM(
+                            this.props.setFieldValue,
+                            durationMinutes,
+                            value,
+                          )
+                        }
                         disabled={!!hasActiveSession}
                       />
                     )}

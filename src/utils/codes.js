@@ -1387,7 +1387,7 @@ export const ReportsOnSignOffOption = {
   PrescriptionSheet: 'Prescription Sheet',
 }
 export const ReportsOnSignOff = [
-  { code: ReportsOnSignOffOption.DrugLabel, description: 'Drug Label' },
+  // { code: ReportsOnSignOffOption.DrugLabel, description: 'Drug Label' },
   {
     code: ReportsOnSignOffOption.MedicalCertificate,
     description: 'Medical Certificate',
@@ -1420,7 +1420,7 @@ export const ReportsOnCompletePaymentOption = {
   Receipt: 'Receipt',
 }
 export const ReportsOnCompletePayment = [
-  { code: ReportsOnCompletePaymentOption.DrugLabel, description: 'Drug Label' },
+  // { code: ReportsOnCompletePaymentOption.DrugLabel, description: 'Drug Label' },
   { code: ReportsOnCompletePaymentOption.Invoice, description: 'Invoice' },
   { code: ReportsOnCompletePaymentOption.Receipt, description: 'Receipt' },
 ]

@@ -1209,28 +1209,29 @@ export const OtherOrdersColumnExtensions = (
 
 export const DrugLabelSelectionColumns = [
   {
-    name: 'code',
-    title: 'Code',
+    name: 'print',
+    title: 'Print',
   },
+  // {
+  //   name: 'code',
+  //   title: 'Code',
+  // },
   {
     name: 'name',
     title: 'Description',
   },
-  {
-    name: 'instruction',
-    title: 'Instructions',
-  },
-  {
-    name: 'dispensedQuanity',
-    title: 'Qty. Dispensed',
-  },
+  // {
+  //   name: 'instruction',
+  //   title: 'Instructions',
+  // },
+  // {
+  //   name: 'dispensedQuanity',
+  //   //  title: 'Qty. Dispensed',
+  //   title: ' ',
+  // },
   {
     name: 'no',
-    title: 'No. Of Label',
-  },
-  {
-    name: 'print',
-    title: 'Print',
+    title: 'Copies',
   },
 ]
 
@@ -1239,26 +1240,42 @@ export const DrugLabelSelectionColumnExtensions = (
   handleDrugLabelNoChanged,
 ) => [
   {
-    columnName: 'code',
-    width: 150,
+    columnName: 'print',
+    align: 'center',
+    width: 80,
     render: row => {
       return (
-        <div style={{ position: 'relative' }}>
-          <div
-            style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-            }}
-          >
-            {row.code}
-          </div>
-        </div>
+        <Checkbox
+          onChange={obj => {
+            handleDrugLabelSelected(row.id, obj.target.value)
+          }}
+          checked={row.selected}
+          simple
+        />
       )
     },
   },
+  // {
+  //   columnName: 'code',
+  //   width: 150,
+  //   render: row => {
+  //     return (
+  //       <div style={{ position: 'relative' }}>
+  //         <div
+  //           style={{
+  //             wordWrap: 'break-word',
+  //             whiteSpace: 'pre-wrap',
+  //           }}
+  //         >
+  //           {row.code}
+  //         </div>
+  //       </div>
+  //     )
+  //   },
+  // },
   {
     columnName: 'name',
-    width: 210,
+    // width: 210,
     render: row => {
       return (
         <div style={{ position: 'relative' }}>
@@ -1274,40 +1291,40 @@ export const DrugLabelSelectionColumnExtensions = (
       )
     },
   },
-  {
-    columnName: 'instruction',
-    width: 260,
-    render: row => {
-      return (
-        <Tooltip title={<div>{row.instruction}</div>}>
-          <div
-            style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-            }}
-          >
-            {row.instruction}
-          </div>
-        </Tooltip>
-      )
-    },
-  },
-  {
-    columnName: 'dispensedQuanity',
-    type: 'number',
-    width: 100,
-    render: row => {
-      return (
-        <span>
-          {row.dispensedQuanity} {row.dispenseUOM}
-        </span>
-      )
-    },
-  },
+  // {
+  //   columnName: 'instruction',
+  //   width: 260,
+  //   render: row => {
+  //     return (
+  //       <Tooltip title={<div>{row.instruction}</div>}>
+  //         <div
+  //           style={{
+  //             wordWrap: 'break-word',
+  //             whiteSpace: 'pre-wrap',
+  //           }}
+  //         >
+  //           {row.instruction}
+  //         </div>
+  //       </Tooltip>
+  //     )
+  //   },
+  // },
+  // {
+  //   columnName: 'dispensedQuanity',
+  //   type: 'number',
+  //   width: 1,
+  //   render: row => {
+  //     return (
+  //       <span>
+  //         {row.dispensedQuanity} {row.dispenseUOM}
+  //       </span>
+  //     )
+  //   },
+  // },
   {
     columnName: 'no',
     type: 'number',
-    width: 100,
+    width: 80,
     render: row => {
       return (
         <p>
@@ -1322,22 +1339,6 @@ export const DrugLabelSelectionColumnExtensions = (
             }}
           />
         </p>
-      )
-    },
-  },
-  {
-    columnName: 'print',
-    align: 'center',
-    width: 80,
-    render: row => {
-      return (
-        <Checkbox
-          onChange={obj => {
-            handleDrugLabelSelected(row.id, obj.target.value)
-          }}
-          checked={row.selected}
-          simple
-        />
       )
     },
   },

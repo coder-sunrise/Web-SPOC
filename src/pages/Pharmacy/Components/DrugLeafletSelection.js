@@ -122,7 +122,12 @@ class DrugLeafletSelection extends PureComponent {
         },
       ]
       this.props.handlePrint(JSON.stringify(payload))
-      this.props.onConfirmPrintLeaflet()
+      if (
+        this.state.printlanguage.indexOf(lan) ==
+        this.state.printlanguage.length - 1
+      ) {
+        this.props.onConfirmPrintLeaflet()
+      }
     })
   }
 

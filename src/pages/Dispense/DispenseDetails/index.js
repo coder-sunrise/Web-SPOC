@@ -913,6 +913,7 @@ const DispenseDetails = ({
         )}
       </GridContainer>
       <CommonModal
+        maxWidth='sm'
         title='Print Drug Labels'
         open={showDrugLabelSelection}
         observe='DispenseDetails'

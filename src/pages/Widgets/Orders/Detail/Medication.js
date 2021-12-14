@@ -1890,7 +1890,7 @@ class Medication extends PureComponent {
               </GridItem>
             )}
             {values.isDrugMixture && (
-              <GridItem xs={6} style={{ paddingRight: 115 }}>
+              <GridItem xs={6} style={{ paddingRight: 85 }}>
                 <div style={{ position: 'relative' }}>
                   <FastField
                     name='drugName'
@@ -1909,7 +1909,7 @@ class Medication extends PureComponent {
                   <div
                     style={{
                       position: 'absolute',
-                      right: -115,
+                      right: -110,
                       top: 24,
                       marginLeft: 'auto',
                     }}
@@ -1928,9 +1928,12 @@ class Medication extends PureComponent {
                 </div>
               </GridItem>
             )}
-            <GridItem xs={6} style={{ marginTop: theme.spacing(2) }}>
-              <div style={{ position: 'relative' }}>
-                <div>
+            <GridItem
+              xs={6}
+              style={{ marginTop: theme.spacing(2), textAlign: 'right' }}
+            >
+              <div style={{ display: 'inline-block' }}>
+                <div style={{ display: 'inline-block' }}>
                   {!openPrescription && (
                     <Field
                       name='isDrugMixture'
@@ -1986,7 +1989,7 @@ class Medication extends PureComponent {
                   )}
                 </div>
                 {!openPrescription && !isEditMedication && (
-                  <div style={{ position: 'absolute', left: 110, top: 0 }}>
+                  <div style={{ display: 'inline-block', top: 0 }}>
                     <Tooltip title={`Add Medication From patient's History`}>
                       <ProgressButton
                         color='primary'
@@ -2001,6 +2004,7 @@ class Medication extends PureComponent {
                         <ProgressButton
                           color='primary'
                           icon={<Add />}
+                          style={{ marginRight: '0' }}
                           onClick={this.onSearchPrescriptionSet}
                         >
                           Prescription Set
@@ -2018,7 +2022,7 @@ class Medication extends PureComponent {
                 <EditableTableGrid
                   forceRender
                   style={{
-                    margin: theme.spacing(1),
+                    marginTop: theme.spacing(1),
                   }}
                   getRowId={r => r.id}
                   rows={values.corPrescriptionItemDrugMixture}
