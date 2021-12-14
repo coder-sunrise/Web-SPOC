@@ -214,6 +214,8 @@ class FamilyMemberGrid extends PureComponent {
       accountNoTypeFK:o.patientAccountNoTypeFK,
       accountNo:o.patientAccountNo,
       contactNo:o.contact.mobileContactNumber.number,
+      contactAddress:o.contact.contactAddress,
+      patientScheme:o.patientScheme,
     })
     setFieldValue('patientFamilyGroup.patientFamilyMember', patientFamilyMember)
     this.toggleModal()
