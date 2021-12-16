@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 // common components
-import { GridContainer, GridItem } from '@/components'
+import { GridContainer, GridItem, CheckboxGroup } from '@/components'
 import { connect } from 'dva'
 
 import {
@@ -9,8 +9,9 @@ import {
 } from '../variables'
 import TableData from './TableData'
 
-@connect(({ clinicSettings }) => ({
+@connect(({ clinicSettings, dispense }) => ({
   clinicSettings,
+  dispense,
 }))
 class DrugLabelSelection extends React.PureComponent {
   state = {
@@ -19,26 +20,40 @@ class DrugLabelSelection extends React.PureComponent {
     confirmEnabled: false,
     languageSelected: false,
   }
+  componentDidMount = () => {
+    // this.props
+    //   .dispatch({
+    //     type: 'dispense/queryDrugLabelList',
+    //     payload: {
+    //       id: pharmacyDetails.entity?.visitFK,
+    //     },
+    //   })
+    //   .then(data => {
+    //     if (data) {
+    //       setDrugLeafletData(data)
+    //       setShowLeafletSelectionPopup(true)
+    //     }
+    //   })
+  }
   render() {
     const {
       footer,
       handleSubmit,
       prescription,
       clinicSettings,
+      selectedLanguage,
       handleDrugLabelSelected,
       handleDrugLabelNoChanged,
+      handlePrintOutLanguageChanged,
     } = this.props
-
     const {
       primaryPrintoutLanguage = 'EN',
       secondaryPrintoutLanguage = '',
     } = clinicSettings
-    const showDrugWarning =
-      this.props.prescription.filter(item =>
-        this.state.selectedRows.includes(item.id),
-      ).length == 0
-    const showLanguageWarning = this.state.printlanguage.length == 0
-    const printLabelDisabled = !prescription.some(x => x.selected === true)
+    const showDrugWarning = !prescription.some(x => x.selected === true)
+    const showLanguageWarning = selectedLanguage.length == 0
+    const printLabelDisabled =
+      !prescription.some(x => x.selected === true) || showLanguageWarning
     return (
       <div>
         <GridContainer>
@@ -55,21 +70,19 @@ class DrugLabelSelection extends React.PureComponent {
             />
           </GridItem>
           <GridItem>
-            {secondaryPrintoutLanguage !== '' && (
+            {true && (
               <Fragment>
                 <span>Print In: </span>
                 <div style={{ width: 150, display: 'inline-block' }}>
                   <CheckboxGroup
                     displayInlineBlock={true}
-                    value={this.state.printlanguage}
+                    value={selectedLanguage}
                     options={[
                       { value: 'EN', label: 'EN' },
                       { value: 'JP', label: 'JP' },
                     ]}
                     onChange={v => {
-                      this.setState({
-                        printlanguage: v.target.value,
-                      })
+                      handlePrintOutLanguageChanged(v.target.value)
                     }}
                   />
                 </div>

@@ -16,6 +16,7 @@ const { queryDrugLabelDetails, queryDrugLabelsDetails } = service
 const WebSocketWrapper = ({
   handlePrint,
   selectedDrugs,
+  selectedLanguage,
   sendingJob,
   onPrintRef,
   ...restProps
@@ -115,28 +116,61 @@ const WebSocketWrapper = ({
       } else if (settings && settings.labelPrinterSize === '7.6cmx3.8cm') {
         drugLabelReportID = REPORT_ID.DRUG_LABEL_76MM_38MM
         patientLabelReportID = REPORT_ID.PATIENT_LABEL_76MM_38MM
+      } else if (settings && settings.labelPrinterSize === '8.0cmx4.5cm_V2') {
+        drugLabelReportID = REPORT_ID.DRUG_LABEL_80MM_45MM_V2
       }
 
       if (type === CONSTANTS.ALL_DRUG_LABEL) {
         const { dispense, values } = restProps
         const { prescription, packageItem } = values
-        const reportContext = await getReportContext(drugLabelReportID)
-        const drugLabelList = await generateDrugLablesPrintSource(
-          dispense ? dispense.visitID : values.id,
-          prescription,
-          packageItem,
-          printAllDrugLabel,
+        console.log(dispense, '111')
+        const visitinvoicedrugids = _.join(
+          selectedDrugs
+            .filter(t => t.selected)
+            .map(x => {
+              return x.visitInvoiceDrugId
+            }),
         )
-        if (drugLabelList) {
-          const payload = drugLabelList.map(drugLabel => ({
+        const instructionIds = _.join(
+          selectedDrugs
+            .filter(t => t.selected)
+            .map(x => {
+              return _.join(x.instructionId, '|')
+            }),
+          ',',
+        )
+
+        const data = await getRawData(drugLabelReportID, {
+          selectedDrugs: JSON.stringify(
+            selectedDrugs
+              .filter(t => t.selected)
+              .map(t => {
+                return {
+                  id: t.id,
+                  vidId: t.visitInvoiceDrugId,
+                  pinfo: t.PageInfo,
+                  insId: _.join(t.instructionId, ','),
+                }
+              }),
+          ),
+          // visitinvoicedrugids,
+          // instructionIds,
+          language: _.join(selectedLanguage, ','),
+          visitId: dispense.visitID,
+        })
+        data.DrugLabelDetails.forEach(t => {
+          t.ExpiryDate = '20 Jun 2021'
+          t.BatchNo = '23332032'
+        })
+        const payload = [
+          {
             ReportId: drugLabelReportID,
             ReportData: JSON.stringify({
-              DrugLabelDetails: [{ ...drugLabel }],
-              ReportContext: reportContext,
+              ...data,
             }),
-          }))
-          return payload
-        }
+          },
+        ]
+        handlePrint(JSON.stringify(payload))
       }
 
       if (type === CONSTANTS.DRUG_LABEL) {
@@ -176,7 +210,7 @@ const WebSocketWrapper = ({
     }
     return null
   }
-
+  // Click print in drug lable selector will trigger this
   const handleOnPrint = async ({ type, row, printAllDrugLabel, printData }) => {
     if (withoutPrintPreview.includes(type)) {
       let printResult = await getPrintResult(type, row, printAllDrugLabel)
@@ -236,6 +270,7 @@ const WebSocketWrapper = ({
       onPrint={handleOnPrint}
       sendingJob={sendingJob}
       selectedDrugs={selectedDrugs}
+      selectedLanguage={selectedLanguage}
     />
   )
 }

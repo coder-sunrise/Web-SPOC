@@ -120,7 +120,9 @@ const DispenseDetails = ({
   onDrugLabelSelectionClose,
   onDrugLabelSelected,
   onDrugLabelNoChanged,
+  onPrintOutLanguageChanged,
   selectedDrugs,
+  selectedLanguage = [],
   clinicSettings,
   servingPersons = [],
   patient,
@@ -923,12 +925,16 @@ const DispenseDetails = ({
       >
         <DrugLabelSelection
           prescription={selectedDrugs}
+          selectedLanguage={selectedLanguage}
           codetable={codetable}
           handleDrugLabelSelected={onDrugLabelSelected}
           handleDrugLabelNoChanged={onDrugLabelNoChanged}
+          handlePrintOutLanguageChanged={onPrintOutLanguageChanged}
+          dispatch={dispatch}
+          patient={patient}
           handleSubmit={() => {
-            onDrugLabelSelectionClose()
             onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
+            onDrugLabelSelectionClose()
           }}
         />
       </CommonModal>

@@ -107,25 +107,35 @@ const fns = {
     })
     return r
   },
-  addActualize : async params => {
+  addActualize: async params => {
     const r = await request(`${url}/addActualize`, {
       method: 'POST',
-      body: params
+      body: params,
     })
     return r
   },
-  getActualize : async params => {
-    const r = await request(`${url}/getActualize/${params.status}?nurseWorkitemIds=${params.nurseWorkitemIds}`, {
-      method: 'GET',
-    })
+  getActualize: async params => {
+    const r = await request(
+      `${url}/getActualize/${params.status}?nurseWorkitemIds=${params.nurseWorkitemIds}`,
+      {
+        method: 'GET',
+      },
+    )
     return r
   },
-  cancelActualize : async params => {
+  cancelActualize: async params => {
     const r = await request(`${url}/cancelActualize`, {
       method: 'PUT',
-      body: params
+      body: params,
     })
     return r
   },
+  queryDrugLabelList: async params =>
+    await request(`/api/pharmacyWorklist/GetLeaftletDrugs/${params.id}`, {
+      method: 'GET',
+      data: {
+        ...params,
+      },
+    }),
 }
 export default fns

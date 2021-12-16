@@ -1208,32 +1208,32 @@ export const OtherOrdersColumnExtensions = (
 ]
 
 export const DrugLabelSelectionColumns = [
-  {
-    name: 'print',
-    title: 'Print',
-  },
-  // {
-  //   name: 'code',
-  //   title: 'Code',
-  // },
-  {
-    name: 'name',
-    title: 'Description',
-  },
-  // {
-  //   name: 'instruction',
-  //   title: 'Instructions',
-  // },
-  // {
-  //   name: 'dispensedQuanity',
-  //   //  title: 'Qty. Dispensed',
-  //   title: ' ',
-  // },
-  {
-    name: 'no',
-    title: 'Copies',
-  },
-]
+         {
+           name: 'print',
+           title: 'Print',
+         },
+         // {
+         //   name: 'code',
+         //   title: 'Code',
+         // },
+         {
+           name: 'displayName',
+           title: 'Item',
+         },
+         // {
+         //   name: 'instruction',
+         //   title: 'Instructions',
+         // },
+         // {
+         //   name: 'dispensedQuanity',
+         //   //  title: 'Qty. Dispensed',
+         //   title: ' ',
+         // },
+         {
+           name: 'no',
+           title: 'Copies',
+         },
+       ]
 
 export const DrugLabelSelectionColumnExtensions = (
   handleDrugLabelSelected,

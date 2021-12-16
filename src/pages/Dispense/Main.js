@@ -302,6 +302,7 @@ class Main extends Component {
     showOrderModal: false,
     showDrugLabelSelection: false,
     selectedDrugs: [],
+    selectedLanguage: [],
     showCautionAlert: false,
     isShowOrderUpdated: false,
   }
@@ -589,31 +590,41 @@ class Main extends Component {
       this.handleOrderModal()
     }
   }
-
+  // click Drug Label
   handleDrugLabelClick = () => {
-    const { values } = this.props
+    const { values, dispatch, dispense } = this.props
     const { prescription = [], packageItem = [] } = values
     let drugList = []
 
-    prescription.forEach(item => {
-      drugList.push(item)
-    })
-    packageItem.forEach(item => {
-      if (item.type === 'Medication') {
-        drugList.push({
-          ...item,
-          name: item.description,
-          dispensedQuanity: item.packageConsumeQuantity,
+    dispatch({
+      type: 'dispense/queryDrugLabelList',
+      payload: {
+        id: dispense.visitID,
+        includeOpenPrescription: true,
+      },
+    }).then(data => {
+      if (data) {
+        data.forEach(item => {
+          drugList.push({ dispensedQuanity: 1, ...item })
         })
-      }
-    })
+        packageItem.forEach(item => {
+          if (item.type === 'Medication') {
+            drugList.push({
+              ...item,
+              displayName: item.description,
+              dispensedQuanity: item.packageConsumeQuantity,
+            })
+          }
+        })
 
-    this.setState(prevState => {
-      return {
-        showDrugLabelSelection: !prevState.showDrugLabelSelection,
-        selectedDrugs: drugList.map(x => {
-          return { ...x, no: 1, selected: true }
-        }),
+        this.setState(prevState => {
+          return {
+            showDrugLabelSelection: !prevState.showDrugLabelSelection,
+            selectedDrugs: drugList.map(x => {
+              return { ...x, no: 1, selected: true }
+            }),
+          }
+        })
       }
     })
   }
@@ -633,6 +644,10 @@ class Main extends Component {
       ),
     }))
     this.props.dispatch({ type: 'global/incrementCommitCount' })
+  }
+
+  handlePrintOutLanguageChanged = lang => {
+    this.setState({ selectedLanguage: lang })
   }
 
   handleDrugLabelNoChanged = (itemId, no) => {
@@ -703,8 +718,10 @@ class Main extends Component {
           showDrugLabelSelection={this.state.showDrugLabelSelection}
           onDrugLabelSelectionClose={this.handleDrugLabelSelectionClose}
           onDrugLabelSelected={this.handleDrugLabelSelected}
+          onPrintOutLanguageChanged={this.handlePrintOutLanguageChanged}
           onDrugLabelNoChanged={this.handleDrugLabelNoChanged}
           selectedDrugs={this.state.selectedDrugs}
+          selectedLanguage={this.state.selectedLanguage}
           isIncludeExpiredItem={this.checkExpiredItems()}
         />
         <CommonModal
