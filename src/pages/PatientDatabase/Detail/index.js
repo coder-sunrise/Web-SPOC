@@ -425,49 +425,72 @@ class PatientDetail extends PureComponent {
   handleCloseReplacementModal = () =>
     this.setState({ showReplacementModal: false })
 
-  checkFamilyMemberInfoChange = (initialValues, values) => {
-    const oldAddressVal = initialValues.contact.contactAddress
-    const newAddressVal = values.contact.contactAddress
-    let isAddressChange = !_.isEqual(oldAddressVal, newAddressVal)
-    const oldSchemeVal = initialValues.patientScheme.filter(
-      x => x.schemeTypeFK === SCHEME_TYPE.CORPORATE,
-    )
-    const newSchemeVal = values.patientScheme.filter(
-      x => x.schemeTypeFK === SCHEME_TYPE.CORPORATE && !x.isDeleted,
-    )
-    let isSchemeChange =
-      !_.isEqual(oldSchemeVal, newSchemeVal) && newSchemeVal.length > 0
-    //if added new member, would update address & scheme for that member
-    console.log('check family member change', values)
-    const newFamilyMembers =
-      values.patientFamilyGroup &&
-      values.patientFamilyGroup.patientFamilyMember
-        .filter(x => x.isNew && !x.isDeleted)
-        .map(x => x.familyMemberFK)
-    return [isAddressChange, isSchemeChange, newFamilyMembers]
+  getAddressCompareVal = contactAddress => {
+    return contactAddress
+      .filter(x => x.isPrimary && !x.isDeleted)
+      .map(x => {
+        const {
+          isMailing,
+          postcode = '',
+          blockNo = '',
+          unitNo = '',
+          buildingName = '',
+          street = '',
+          countryFK = '',
+        } = x
+        return {
+          isMailing,
+          address: `${postcode}${blockNo}${unitNo}${buildingName}${street}${countryFK}`.replaceAll(
+            ' ',
+            '',
+          ),
+        }
+      })
+      .filter(x => x.address !== '')
+  }
+
+  getSchemeCompareVal = patientScheme => {
+    return patientScheme
+      .filter(x => x.schemeTypeFK === SCHEME_TYPE.CORPORATE && !x.isDeleted)
+      .map(x => {
+        const { coPaymentSchemeFK, accountNumber, validFrom, validTo } = x
+        return { coPaymentSchemeFK, accountNumber, validFrom, validTo }
+      })
+  }
+
+  checkFamilyMembersInfoDiff = (initialValues, values) => {
+    let familyMembers = values.patientFamilyGroup?.patientFamilyMember.filter(x => !x.isDeleted)  || []
+    let anyAddressDiff = false, anySchemeDiff = false
+    if (familyMembers.length > 0) {
+      const newAddressVal = this.getAddressCompareVal(values.contact.contactAddress)
+      const newSchemeVal = this.getSchemeCompareVal(values.patientScheme)
+      familyMembers = familyMembers.map(x => {
+        const otherMemberAddress = this.getAddressCompareVal(x.contactAddress)
+        const otherMemberAddressDiff = _.differenceWith(newAddressVal, otherMemberAddress, _.isEqual)
+        if(!anyAddressDiff) anyAddressDiff = otherMemberAddressDiff.length > 0
+
+        const otherMemberScheme = this.getSchemeCompareVal(x.patientScheme)
+        const otherMemberSchemeDiff = _.differenceWith(newSchemeVal, otherMemberScheme, _.isEqual)
+        if(!anySchemeDiff) anySchemeDiff = otherMemberSchemeDiff.length > 0
+        return { isNew: x.isNew, familyMemberFK: x.familyMemberFK, isAddressDiff: otherMemberAddressDiff.length > 0, isSchemeDiff: otherMemberSchemeDiff.length > 0 }
+      })
+    }
+    return [familyMembers.filter(x=> x.isAddressDiff||x.isSchemeDiff), anyAddressDiff, anySchemeDiff]
   }
 
   beforeHandleSubmit = () => {
     const { handleSubmit, dispatch, values, dirty, initialValues } = this.props
     if (dirty) {
-      const [
-        address,
-        scheme,
-        newFamilyMembers,
-      ] = this.checkFamilyMemberInfoChange(initialValues, values)
-      const anyNewFamilyMember = newFamilyMembers && newFamilyMembers.length > 0
-      if (anyNewFamilyMember || address || scheme) {
-        const fimilyMembersInfoTitle = `Confirm Update Family Members' ${[
-          anyNewFamilyMember || address ? 'Address' : '',
-          anyNewFamilyMember || scheme ? 'Corporate Scheme' : '',
-        ]
-          .filter(x => x)
-          .join(', ')}`
+      const [familyMembers, address, scheme] = this.checkFamilyMembersInfoDiff(initialValues,values)
+      if (address || scheme) {
+        const familyMembersInfoUpdateTitle = `Confirm Update Family Members' ${[
+          address ? 'Address' : '',
+          scheme ? 'Corporate Scheme' : '',
+        ].filter(x => x).join(', ')}`
         this.setState({
-          showFamilyMembersInfoUpdate: true,
-          fimilyMembersInfoTitle,
-          updatedTypes: { address, scheme },
-          newFamilyMembers,
+          isUpdateFamilyMembersInfo: true,
+          familyMembersInfoUpdateTitle,
+          familyMembers,
         })
         return undefined
       }
@@ -477,10 +500,9 @@ class PatientDetail extends PureComponent {
 
   closeFamilyMembersInfoUpdate = () => {
     this.setState({
-      showFamilyMembersInfoUpdate: false,
-      fimilyMembersInfoTitle: '',
-      updatedTypes: { address: false, scheme: false },
-      newFamilyMembers: [],
+      isUpdateFamilyMembersInfo: false,
+      familyMembersInfoUpdateTitle: '',
+      familyMembers: [],
     })
     this.props.handleSubmit()
   }
@@ -657,7 +679,7 @@ class PatientDetail extends PureComponent {
     if (!patient) return null
     const { currentComponent, currentId, menuErrors, entity } = patient
     const patientIsActiveOrCreating = !entity || entity.isActive
-
+    const { id: currentPatientId } = values
     const isCreatingPatient = entity
       ? Object.prototype.hasOwnProperty.call(entity, 'id') && entity.isActive
       : false
@@ -817,9 +839,8 @@ class PatientDetail extends PureComponent {
             </div>
           </GridItem>
           <CommonModal
-            open={this.state.showFamilyMembersInfoUpdate}
-            title={this.state.fimilyMembersInfoTitle}
-            // observe='FaimilyMembersInfoUpdate'
+            open={this.state.isUpdateFamilyMembersInfo}
+            title={this.state.familyMembersInfoUpdateTitle}
             overrideLoading
             displayCloseIcon={false}
             confirmText='Yes'
@@ -828,12 +849,11 @@ class PatientDetail extends PureComponent {
             onConfirm={() => this.closeFamilyMembersInfoUpdate()}
             onClose={() => this.closeFamilyMembersInfoUpdate()}
           >
-            {this.state.showFamilyMembersInfoUpdate && (
+            {this.state.isUpdateFamilyMembersInfo && (
               <FamilyMembersInfoUpdate
-                patientProfileFK={entity.id}
-                newFamilyMembers={this.state.newFamilyMembers}
-                {...this.state.updatedTypes}
                 dispatch={dispatch}
+                patientProfileFK={currentPatientId}
+                familyMembers={this.state.familyMembers}
                 onSelectionChange={e => (values.familyMembersInfoUpdate = e)}
               />
             )}
