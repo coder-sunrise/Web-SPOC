@@ -116,7 +116,7 @@ class Grid extends PureComponent {
                     </div>
                     {row.isDefault ? (
                       <span style={{ position: 'relative', top: '-5px' }}>
-                        <Tag color='#87d068'>Current</Tag>
+                        <Tag color='#008000'>Current</Tag>
                       </span>
                     ) : (
                       <span></span>
