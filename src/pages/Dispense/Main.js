@@ -19,6 +19,7 @@ import AddOrder from './DispenseDetails/AddOrder'
 import DispenseDetails from './DispenseDetails/WebSocketWrapper'
 import { DispenseItemsColumnExtensions } from './variables'
 import _ from 'lodash'
+import patient from '@/models/patient'
 
 const calculateInvoiceAmounts = entity => {
   const obj = { ...entity }
@@ -292,10 +293,12 @@ const validDispense = (dispenseItems = []) => {
   },
   displayName: 'DispensePage',
 })
-@connect(({ orders, formik, dispense }) => ({
+@connect(({ orders, formik, dispense, patient, clinicSettings }) => ({
   orders,
   formik,
   dispense,
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
+  patient,
 }))
 class Main extends Component {
   state = {
@@ -334,7 +337,7 @@ class Main extends Component {
   }
 
   componentDidMount = async () => {
-    const { dispatch, values, dispense } = this.props
+    const { dispatch, values, dispense, clinicSettings } = this.props
     const {
       otherOrder = [],
       prescription = [],
@@ -389,6 +392,13 @@ class Main extends Component {
         })
       }
     })
+
+    // set default language based on patient tranlsation and clinic setting.
+    const preferLanguage =
+      (patient && patient.translationLinkFK) === 5
+        ? 'JP'
+        : clinicSettings.primaryPrintoutLanguage
+    this.setState({ selectedLanguage: [preferLanguage] })
 
     this.setState(() => {
       return {
@@ -590,7 +600,7 @@ class Main extends Component {
       this.handleOrderModal()
     }
   }
-  // click Drug Label
+  // click Drug Label button to show drug label selection
   handleDrugLabelClick = () => {
     const { values, dispatch, dispense } = this.props
     const { prescription = [], packageItem = [] } = values

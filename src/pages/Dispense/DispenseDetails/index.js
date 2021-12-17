@@ -934,7 +934,6 @@ const DispenseDetails = ({
           patient={patient}
           handleSubmit={() => {
             onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
-            onDrugLabelSelectionClose()
           }}
         />
       </CommonModal>

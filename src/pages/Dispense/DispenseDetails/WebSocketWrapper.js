@@ -11,6 +11,7 @@ import { REPORT_ID } from '@/utils/constants'
 import { getAppendUrl } from '@/utils/utils'
 import CONSTANTS from './constants'
 import DispenseDetails from './index'
+import _ from 'lodash'
 
 const { queryDrugLabelDetails, queryDrugLabelsDetails } = service
 const WebSocketWrapper = ({
@@ -105,7 +106,7 @@ const WebSocketWrapper = ({
     return null
   }
 
-  const getPrintResult = async (type, row, printAllDrugLabel) => {
+  const getPrintResult = async (type, row, printAllDrugLabel, lan) => {
     let drugLabelReportID = REPORT_ID.DRUG_LABEL_80MM_45MM
     let patientLabelReportID = REPORT_ID.PATIENT_LABEL_80MM_45MM
     try {
@@ -122,7 +123,7 @@ const WebSocketWrapper = ({
 
       if (type === CONSTANTS.ALL_DRUG_LABEL) {
         const { dispense, values } = restProps
-        const { prescription, packageItem } = values
+        const { prescription, packageItem, dispenseItems } = values
         console.log(dispense, '111')
         const visitinvoicedrugids = _.join(
           selectedDrugs
@@ -148,20 +149,60 @@ const WebSocketWrapper = ({
                 return {
                   id: t.id,
                   vidId: t.visitInvoiceDrugId,
-                  pinfo: t.PageInfo,
+                  pinfo: t.pageInfo,
                   insId: _.join(t.instructionId, ','),
                 }
               }),
           ),
           // visitinvoicedrugids,
           // instructionIds,
-          language: _.join(selectedLanguage, ','),
+          language: lan,
           visitId: dispense.visitID,
         })
+        let finalDrugLabelDetails = []
         data.DrugLabelDetails.forEach(t => {
-          t.ExpiryDate = '20 Jun 2021'
-          t.BatchNo = '23332032'
+          var dispenseItemss = dispenseItems.filter(
+            x => x.invoiceItemFK === t.invoiceItemId,
+          )
+          var indicationArray = t.indication.split('\n')
+          t.firstLine = indicationArray.length > 0 ? indicationArray[0] : ' '
+          t.secondLine = indicationArray.length > 1 ? indicationArray[1] : ' '
+          t.thirdLine =
+            indicationArray.length > 2
+              ? indicationArray[2] +
+                ' ' +
+                // currently will append all the precaution into last line if it's AND
+                (t.isDrugMixture
+                  ? _.takeRight(indicationArray, 2).join(' ')
+                  : '')
+              : ' '
+          // If it's drugmixture, then just duplicate by copies.
+          if (t.isDrugMixture) {
+            for (
+              let j = 0;
+              j < selectedDrugs.find(x => x.id === t.index && x.selected).no;
+              j++
+            ) {
+              finalDrugLabelDetails.push(t)
+            }
+          }
+          // If it's normal items, then need to based on Batch and Copies to duplicate.
+          else {
+            for (let i = 0; i < dispenseItemss.length; i++) {
+              let xx = { ...t }
+              xx.ExpiryDate = dispenseItemss[i].expiryDate
+              xx.BatchNo = dispenseItemss[i].batchNo
+              for (
+                let j = 0;
+                j < selectedDrugs.find(x => x.id === t.index && x.selected).no;
+                j++
+              ) {
+                finalDrugLabelDetails.push(xx)
+              }
+            }
+          }
         })
+        data.DrugLabelDetails = finalDrugLabelDetails
         const payload = [
           {
             ReportId: drugLabelReportID,
@@ -170,7 +211,7 @@ const WebSocketWrapper = ({
             }),
           },
         ]
-        handlePrint(JSON.stringify(payload))
+        return payload
       }
 
       if (type === CONSTANTS.DRUG_LABEL) {
@@ -213,12 +254,28 @@ const WebSocketWrapper = ({
   // Click print in drug lable selector will trigger this
   const handleOnPrint = async ({ type, row, printAllDrugLabel, printData }) => {
     if (withoutPrintPreview.includes(type)) {
-      let printResult = await getPrintResult(type, row, printAllDrugLabel)
-      if (printData && printData.length > 0)
-        printResult = (printResult || []).concat(printData)
+      if (type === CONSTANTS.DRUG_LABEL || type === CONSTANTS.ALL_DRUG_LABEL) {
+        selectedLanguage.forEach(async lan => {
+          let printResult = await getPrintResult(
+            type,
+            row,
+            printAllDrugLabel,
+            lan,
+          )
+          if (printData && printData.length > 0)
+            printResult = (printResult || []).concat(printData)
 
-      if (!printResult || printResult.length <= 0) return
-      await handlePrint(JSON.stringify(printResult))
+          if (!printResult || printResult.length <= 0) return
+          await handlePrint(JSON.stringify(printResult))
+        })
+      } else {
+        let printResult = await getPrintResult(type, row, printAllDrugLabel)
+        if (printData && printData.length > 0)
+          printResult = (printResult || []).concat(printData)
+
+        if (!printResult || printResult.length <= 0) return
+        await handlePrint(JSON.stringify(printResult))
+      }
     } else {
       const documentType = consultationDocumentTypes.find(
         o =>
