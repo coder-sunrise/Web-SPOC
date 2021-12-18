@@ -614,6 +614,7 @@ class Main extends Component {
       },
     }).then(data => {
       if (data) {
+        data = _.orderBy(data, ['displayName'], ['asc'])
         data.forEach(item => {
           drugList.push({ dispensedQuanity: 1, ...item })
         })
