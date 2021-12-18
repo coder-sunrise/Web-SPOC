@@ -4,7 +4,7 @@ import moment from 'moment'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common component
-import { CardContainer, CommonModal } from '@/components'
+import { CardContainer, CommonModal, timeFormat24Hour } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
 // sub component
 import {
@@ -784,7 +784,7 @@ class Appointment extends React.PureComponent {
         ...event,
         startTime: event.isDoctorBlock
           ? moment(event.startTime).formatUTC(false)
-          : moment(event.startTime).format('HH:mm'),
+          : moment(event.startTime).format(timeFormat24Hour),
         endTime: moment(event.endTime).formatUTC(false),
       },
     }).then(r => {

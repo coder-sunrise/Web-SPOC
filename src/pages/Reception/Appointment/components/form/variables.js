@@ -1,6 +1,6 @@
 import moment from 'moment'
 import {
-  timeFormat,
+  timeFormat24Hour,
   CodeSelect,
   Tooltip,
   Button,
@@ -74,23 +74,17 @@ export const AppointmentDataColExtensions = apptTimeIntervel => [
         <div style={{ position: 'relative', paddingRight: 15 }}>
           <SyncfusionTimePicker
             step={apptTimeIntervel}
-            value={moment(
-              new Date(`${moment().format('YYYY MM DD')} ${row.startTime}`),
-            ).toDate()}
-            onTimeChange={e => {
+            value={row.startTime}
+            onChange={e => {
               const { commitChanges } = control
-              row.startTime = e.value
-
-              if (e.value) {
-                const _startTime = moment(e.value).format('HH:mm')
-                const _endTime = moment(e.value)
+              row.startTime = e
+              if (row.startTime) {
+                const _endTime = moment(row.startTime, timeFormat24Hour)
                   .add(apptDurationHour, 'hour')
                   .add(apptDurationMinute, 'minute')
-                  .format('HH:mm')
+                  .format(timeFormat24Hour)
 
-                row.startTime = _startTime
                 row.endTime = _endTime
-
                 commitChanges({
                   changed: {
                     [row.id]: {

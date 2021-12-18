@@ -20,6 +20,7 @@ import {
   withFormikExtend,
   CommonModal,
   SyncfusionTimePicker,
+  timeFormat24Hour,
 } from '@/components'
 import {
   Recurrence,
@@ -64,8 +65,6 @@ const styles = theme => ({
     marginRight: '0px !important',
   },
 })
-
-const _timeFormat = 'hh:mm a'
 
 const durationHours = [
   { value: '0', name: '0' },
@@ -174,14 +173,14 @@ const initDailyRecurrence = {
 
         const endDate = moment(
           `${doctorBlockDate} ${eventTime}`,
-          `${dateFormatLong} ${_timeFormat}`,
+          `${dateFormatLong} ${timeFormat24Hour}`,
         )
         endDate.add(parseInt(durationHour, 10), 'hours')
         endDate.add(parseInt(durationMinute, 10), 'minutes')
 
         const startDate = moment(
           `${doctorBlockDate} ${eventTime}`,
-          `${dateFormatLong} ${_timeFormat}`,
+          `${dateFormatLong} ${timeFormat24Hour}`,
         )
         if (
           doctorBlockMode === 'series' &&
@@ -234,7 +233,9 @@ const initDailyRecurrence = {
       let start = moment(doctorBlock.startDateTime)
       let end = moment(doctorBlock.endDateTime)
       let doctorBlockUserFk = restValues.doctorBlockUserFk
+      let isFromDragOrResize
       if (updateEvent) {
+        isFromDragOrResize = true
         const { newStartTime, newEndTime, newResourceId } = updateEvent
         start = moment(newStartTime)
         end = moment(newEndTime)
@@ -243,14 +244,13 @@ const initDailyRecurrence = {
         }
       }
       const hour = end.diff(start, 'hour')
-      // const minute = end.format(timeFormat24Hour).split(':')[1]
       const minute = (end.diff(start, 'minute') / 60 - hour) * 60
 
       return {
         ...restValues,
         doctorBlockFK: doctorBlock.id,
         eventDate: start.formatUTC(),
-        eventTime: start.format(_timeFormat),
+        eventTime: start.format(timeFormat24Hour),
         durationHour: hour,
         durationMinute: minute,
         restDoctorBlock: { ...doctorBlock },
@@ -266,6 +266,7 @@ const initDailyRecurrence = {
                 ),
               }
             : { ...initDailyRecurrence },
+        isFromDragOrResize,
       }
     }
     return {
@@ -286,6 +287,14 @@ const initDailyRecurrence = {
 class DoctorEventForm extends React.PureComponent {
   state = {
     showSeriesUpdateConfirmation: false,
+  }
+  componentDidMount = async () => {
+    setTimeout(() => {
+      const { values, setFieldValue } = this.props
+      if (values.isFromDragOrResize) {
+        setFieldValue('isFromDragOrResize', false)
+      }
+    }, 500)
   }
 
   onClickDelete = () => {
@@ -412,64 +421,26 @@ class DoctorEventForm extends React.PureComponent {
             <GridItem xs md={4}>
               <FastField
                 name='eventTime'
-                render={args => (
-                  <TimePicker
-                    {...args}
-                    label='Time'
-                    format={_timeFormat}
-                    use12Hours
-                  />
-                )}
+                render={args => {
+                  return (
+                    <SyncfusionTimePicker
+                      label='Time'
+                      step={apptTimeIntervel}
+                      onTimeChange={e => {
+                        const { setFieldValue } = this.props
+                        setFieldValue(
+                          'eventTime',
+                          e.value
+                            ? moment(e.value).format(timeFormat24Hour)
+                            : undefined,
+                        )
+                      }}
+                      {...args}
+                    />
+                  )
+                }}
               />
             </GridItem>
-
-            {false && (
-              <GridItem xs md={4}>
-                <FastField
-                  name='eventTime'
-                  render={args => {
-                    return (
-                      <div
-                        style={{ margin: 4, height: 44.97, lineHeight: 1.43 }}
-                      >
-                        <div
-                          style={{
-                            color: 'rgba(0, 0, 0, 0.54)',
-                            lineHeight: '19px',
-                            height: '18.19px',
-                          }}
-                        >
-                          Time
-                        </div>
-                        <SyncfusionTimePicker
-                          step={apptTimeIntervel}
-                          value={
-                            values.eventTime
-                              ? moment(
-                                  new Date(
-                                    `${moment().format('YYYY MM DD')} ${
-                                      values.eventTime
-                                    }`,
-                                  ),
-                                ).toDate()
-                              : undefined
-                          }
-                          onTimeChange={e => {
-                            const { setFieldValue } = this.props
-                            setFieldValue(
-                              'eventTime',
-                              e.value
-                                ? moment(e.value).format(_timeFormat)
-                                : undefined,
-                            )
-                          }}
-                        />
-                      </div>
-                    )
-                  }}
-                />
-              </GridItem>
-            )}
           </GridContainer>
           <GridContainer item xs md={12}>
             <GridItem xs md={4}>

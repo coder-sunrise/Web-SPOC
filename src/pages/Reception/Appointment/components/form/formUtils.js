@@ -114,12 +114,12 @@ const constructDefaultNewRow = (
   const endTime = moment(selectedSlot.start)
     .add(hour, 'hour')
     .add(minute, 'minute')
-    .format('HH:mm')
+    .format(timeFormat24Hour)
   const resource = ctcalendarresource.find(
     source => source.id === selectedSlot.resourceId,
   )
   defaultNewRow = {
-    startTime: startTime.format('HH:mm'),
+    startTime: startTime.format(timeFormat24Hour),
     calendarResourceFK: selectedSlot.resourceId,
     calendarResource: resource ? { ...resource } : undefined,
     endTime,
@@ -202,15 +202,15 @@ export const mapPropsToValues = ({
       let apptResources = appointment.appointments_Resources.map(item => {
         const { calendarResourceFK } = item
         const cp = ctcalendarresource.find(_cp => _cp.id === calendarResourceFK)
-        const startTime = moment(item.startTime, 'HH:mm:ss')
-        const endTime = moment(item.endTime, 'HH:mm:ss')
+        const startTime = moment(item.startTime, timeFormat24Hour)
+        const endTime = moment(item.endTime, timeFormat24Hour)
         const { hour, minute } = calculateDuration(startTime, endTime)
         return {
           ...item,
           calendarResourceFK:
             cp && cp.isActive ? calendarResourceFK : undefined,
-          startTime: startTime.format('HH:mm'),
-          endTime: endTime.format('HH:mm'),
+          startTime: startTime.format(timeFormat24Hour),
+          endTime: endTime.format(timeFormat24Hour),
           apptDurationHour: hour,
           apptDurationMinute: minute,
         }
@@ -237,11 +237,11 @@ export const mapPropsToValues = ({
         )
 
         if (view !== CALENDAR_VIEWS.MONTH) {
-          const startTime = moment(newStartTime, 'HH:mm:ss')
-          const endTime = moment(newEndTime, 'HH:mm:ss')
+          const startTime = moment(newStartTime, timeFormat24Hour)
+          const endTime = moment(newEndTime, timeFormat24Hour)
           const { hour, minute } = calculateDuration(startTime, endTime)
-          updateResource.startTime = startTime.format('HH:mm')
-          updateResource.endTime = endTime.format('HH:mm')
+          updateResource.startTime = startTime.format(timeFormat24Hour)
+          updateResource.endTime = endTime.format(timeFormat24Hour)
           updateResource.apptDurationHour = hour
           updateResource.apptDurationMinute = minute
         }

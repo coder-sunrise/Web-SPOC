@@ -11,6 +11,7 @@ import {
   Button,
   Popover,
   notification,
+  timeFormat24Hour,
 } from '@/components'
 // medisys components
 import { LoadingWrapper } from '@/components/_medisys'
@@ -426,19 +427,19 @@ const CalendarView = ({
         stage: appointment.stage,
         start: moment(
           `${appointmentDate} ${item.startTime}`,
-          `${serverDateFormat} HH:mm`,
+          `${serverDateFormat} ${timeFormat24Hour}`,
         ).toDate(),
         end: moment(
           `${appointmentDate} ${item.endTime}`,
-          `${serverDateFormat} HH:mm`,
+          `${serverDateFormat} ${timeFormat24Hour}`,
         ).toDate(),
         StartTime: moment(
           `${appointmentDate} ${item.startTime}`,
-          `${serverDateFormat} HH:mm`,
+          `${serverDateFormat} ${timeFormat24Hour}`,
         ).toDate(),
         EndTime: moment(
           `${appointmentDate} ${item.endTime}`,
-          `${serverDateFormat} HH:mm`,
+          `${serverDateFormat} ${timeFormat24Hour}`,
         ).toDate(),
         updateByUser,
         updateDate,
@@ -597,14 +598,14 @@ const CalendarView = ({
               new Date(
                 `${moment(startTime).format('YYYY MM DD')} ${moment(
                   e.data.startDateTime,
-                ).format('HH:mm')}`,
+                ).format(timeFormat24Hour)}`,
               ),
             ).toDate()
             endTime = moment(
               new Date(
                 `${moment(endTime).format('YYYY MM DD')} ${moment(
                   e.data.endDateTime,
-                ).format('HH:mm')}`,
+                ).format(timeFormat24Hour)}`,
               ),
             ).toDate()
           }
@@ -656,7 +657,7 @@ const CalendarView = ({
                 new Date(
                   `${moment(data.startTime).format('YYYY MM DD')} ${moment(
                     eventAction.event.startDateTime,
-                  ).format('HH:mm')}`,
+                  ).format(timeFormat24Hour)}`,
                 ),
               ).toDate()
             }

@@ -14,11 +14,12 @@ import {
   TextField,
   DateRangePicker,
   NumberInput,
-  FastEditableTableGrid,
+  EditableTableGrid,
   SyncfusionTimePicker,
   Tooltip,
   CommonModal,
   notification,
+  timeFormat24Hour,
 } from '@/components'
 import { ShoppingCartTwoTone } from '@material-ui/icons'
 import DailyResourceManagement from './DailyResourceManagement'
@@ -26,15 +27,14 @@ import DailyResourceManagement from './DailyResourceManagement'
 const styles = theme => ({})
 
 const resourceCapacitySchema = Yup.object().shape({
-  isAllInput: Yup.string().required('Must input start time and end time.'),
+  isAllInput: Yup.number().required('Must input start time and end time.'),
   maxCapacity: Yup.number().required(),
 })
 
 @withFormikExtend({
   enableReinitialize: true,
-  mapPropsToValues: ({ settingResource }) => ({
-    ...(settingResource.entity || settingResource.default),
-  }),
+  mapPropsToValues: ({ settingResource }) =>
+    settingResource.entity || settingResource.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
@@ -61,8 +61,6 @@ const resourceCapacitySchema = Yup.object().shape({
             csc => {
               return {
                 ...csc,
-                startTime: moment(csc.startTime, 'hh:mm A').format('HH:mm'),
-                endTime: moment(csc.endTime, 'hh:mm A').format('HH:mm'),
               }
             },
           ),
@@ -72,7 +70,6 @@ const resourceCapacitySchema = Yup.object().shape({
       },
     }).then(r => {
       if (r) {
-        resetForm()
         let queryId = values.id
         if (!values.id) {
           queryId = r.id
@@ -242,7 +239,7 @@ class Detail extends PureComponent {
             <b>Resource Management</b>
           </h4>
           <div style={{ position: 'relative' }}>
-            <FastEditableTableGrid
+            <EditableTableGrid
               forceRender
               style={{
                 marginTop: theme.spacing(1),
@@ -272,11 +269,11 @@ class Detail extends PureComponent {
                             <SyncfusionTimePicker
                               step={apptTimeIntervel}
                               value={row.startTime}
-                              onTimeChange={e => {
+                              onChange={e => {
                                 const { commitChanges } = control
-                                row.startTime = e.value
+                                row.startTime = e
                                 row.isAllInput =
-                                  (row.startTime && row.endTime) || undefined
+                                  row.startTime && row.endTime ? 1 : undefined
                                 if (
                                   row.isAllInput &&
                                   row.startTime > row.endTime
@@ -301,7 +298,7 @@ class Detail extends PureComponent {
                                 style={{
                                   position: 'absolute',
                                   left: '-25px',
-                                  bottom: 4,
+                                  bottom: 7,
                                 }}
                               >
                                 To
@@ -310,11 +307,11 @@ class Detail extends PureComponent {
                                 step={apptTimeIntervel}
                                 value={row.endTime}
                                 min={row.startTime}
-                                onTimeChange={e => {
+                                onChange={e => {
                                   const { commitChanges } = control
-                                  row.endTime = e.value
+                                  row.endTime = e
                                   row.isAllInput =
-                                    (row.startTime && row.endTime) || undefined
+                                    row.startTime && row.endTime ? 1 : undefined
                                   commitChanges({
                                     changed: {
                                       [row.id]: {
@@ -323,7 +320,6 @@ class Detail extends PureComponent {
                                       },
                                     },
                                   })
-                                  document.activeElement.blur()
                                 }}
                               />
                             </div>

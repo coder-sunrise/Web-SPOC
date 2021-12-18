@@ -62,13 +62,7 @@ export default createListViewModel({
           data.calendarResource.ctCalendarResourceCapacity.map(csc => {
             return {
               ...csc,
-              startTime: moment(
-                new Date(`${moment().format('YYYY MM DD')} ${csc.startTime}`),
-              ).toDate(),
-              endTime: moment(
-                new Date(`${moment().format('YYYY MM DD')} ${csc.endTime}`),
-              ).toDate(),
-              isAllInput: true,
+              isAllInput: 1,
             }
           }),
           ['startTime'],
