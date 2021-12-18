@@ -164,7 +164,7 @@ const WebSocketWrapper = ({
           var dispenseItemss = dispenseItems.filter(
             x => x.invoiceItemFK === t.invoiceItemId,
           )
-          var indicationArray = t.indication.split('\n')
+          var indicationArray = (t.indication || '').split('\n')
           t.firstLine = indicationArray.length > 0 ? indicationArray[0] : ' '
           t.secondLine = indicationArray.length > 1 ? indicationArray[1] : ' '
           t.thirdLine =

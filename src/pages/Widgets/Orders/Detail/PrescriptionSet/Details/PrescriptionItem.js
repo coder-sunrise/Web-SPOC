@@ -1258,7 +1258,7 @@ class Detail extends PureComponent {
                       fontWeight: 500,
                     }}
                   >
-                    {`Characters left: ${60 - (values.drugName || '').length}`}
+                    {`Characters left: ${90 - (values.drugName || '').length}`}
                   </span>
                 </div>
               </div>

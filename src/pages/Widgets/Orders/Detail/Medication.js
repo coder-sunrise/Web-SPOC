@@ -1824,7 +1824,7 @@ class Medication extends PureComponent {
       ? true
       : false
     const { labelPrinterSize } = clinicSettings
-    const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
+    const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
     const showPrescriptionSet =
       ENABLE_PRESCRIPTION_SET_CLINIC_ROLE.indexOf(
         user.data.clinicianProfile.userProfile.role.clinicRoleFK,
@@ -1900,7 +1900,7 @@ class Medication extends PureComponent {
                           <TextField
                             label='Drug Mixture'
                             {...args}
-                            maxLength={60}
+                            maxLength={90}
                           />
                         </div>
                       )
@@ -1921,7 +1921,7 @@ class Medication extends PureComponent {
                         fontWeight: 500,
                       }}
                     >
-                      {`Characters left: ${60 -
+                      {`Characters left: ${90 -
                         (drugName ? drugName.length : 0)}`}
                     </span>
                   </div>
@@ -2549,7 +2549,7 @@ class Medication extends PureComponent {
                     render={args => {
                       return (
                         <TextField
-                          maxLength={60}
+                          maxLength={30}
                           label='Drug Label Remarks'
                           {...args}
                         />
@@ -2571,7 +2571,7 @@ class Medication extends PureComponent {
                         fontWeight: 500,
                       }}
                     >
-                      {`Characters left: ${60 -
+                      {`Characters left: ${30 -
                         (drugLabelRemarks ? drugLabelRemarks.length : 0)}`}
                     </span>
                   </div>

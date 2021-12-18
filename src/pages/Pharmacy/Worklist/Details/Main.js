@@ -499,7 +499,7 @@ const Main = props => {
     return type
   }
 
-  const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
+  const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
 
   const orderItemRow = (p, type) => {
     const { classes } = props
