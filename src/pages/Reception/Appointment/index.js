@@ -7,8 +7,11 @@ import { withStyles } from '@material-ui/core'
 import { CardContainer, CommonModal } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
 // sub component
-import BigCalendar from 'react-big-calendar'
-import { APPOINTMENT_STATUS } from '@/utils/constants'
+import {
+  APPOINTMENT_STATUS,
+  CALENDAR_VIEWS,
+  CALENDAR_RESOURCE,
+} from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { getRemovedUrl } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
@@ -24,6 +27,7 @@ import {
   DoctorFormValidation,
   InitialPopoverEvent,
 } from './utils'
+import { ApplyClaimsColumnExtension } from '@/pages/Billing/variables'
 // utils
 
 const styles = theme => ({
@@ -60,22 +64,33 @@ export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>
         },
       ]
 
-@connect(({ calendar, codetable, clinicInfo, loading, user, clinicSettings }) => ({
-  calendar,
-  calendarLoading: loading.models.calendar,
-  // doctorProfiles: codetable.doctorprofile || [],
-  clinicInfo,
-  doctorprofile: codetable.doctorprofile || [],
-  user,
-  apptTimeSlotDuration: clinicSettings.settings.apptTimeSlotDuration,
-  appointmentTypes: codetable.ctappointmenttype || [],
-}))
+@connect(
+  ({
+    calendar,
+    codetable,
+    clinicInfo,
+    loading,
+    user,
+    clinicSettings,
+    calendarResource,
+  }) => ({
+    calendar,
+    calendarLoading: loading.models.calendar,
+    clinicInfo,
+    doctorprofile: codetable.doctorprofile || [],
+    user,
+    apptTimeSlotDuration: clinicSettings.settings.apptTimeSlotDuration,
+    appointmentTypes: codetable.ctappointmenttype || [],
+    ctcalendarresource: codetable.ctcalendarresource || [],
+    calendarResource,
+  }),
+)
 class Appointment extends React.PureComponent {
   state = {
     showAppointmentForm: false,
     showDoctorEventModal: false,
     showSearchAppointmentModal: false,
-    resources: null,
+    resources: [],
     selectedSlot: {},
     filter: {
       search: '',
@@ -86,15 +101,15 @@ class Appointment extends React.PureComponent {
     isDragging: false,
     selectedAppointmentFK: -1,
     selectedDoctorEventFK: -1,
+    updateEvent: undefined,
   }
 
   async componentWillMount() {
     const { dispatch, clinicInfo } = this.props
     const startOfMonth = moment()
-      .startOf('month')
+      .startOf('day')
       .formatUTC()
     const endOfMonth = moment()
-      .endOf('month')
       .endOf('day')
       .formatUTC(false)
 
@@ -127,11 +142,7 @@ class Appointment extends React.PureComponent {
     if (filterTemplate) {
       const { currentFilterTemplate } = filterTemplate
       if (currentFilterTemplate) {
-        const {
-          filterByDoctor,
-          filterByApptType,
-          dob,
-        } = currentFilterTemplate
+        const { filterByDoctor, filterByApptType, dob } = currentFilterTemplate
         filter = {
           filterByDoctor,
           filterByApptType,
@@ -145,19 +156,25 @@ class Appointment extends React.PureComponent {
     }
 
     const response = await dispatch({
-      type: 'codetable/fetchCodes',
+      type: 'calendarResource/query',
       payload: {
-        code: 'doctorprofile',
-        force: true,
-        filter: {},
+        apiCriteria: {
+          IncludeDailyCapacity: true,
+          DateFrom: moment()
+            .startOf('Day')
+            .formatUTC(),
+          DateTo: moment()
+            .startOf('Day')
+            .formatUTC(),
+        },
+        sorting: [{ columnName: 'resourceType', direction: 'asc' }],
       },
     })
-
     if (response) {
       let filterByDoctor = []
       let filterBySingleDoctor
       let resources = []
-      let primaryClinicianFK
+      let primaryCalendarResourceFK
 
       const viewOtherApptAccessRight = Authorized.check(
         'appointment.viewotherappointment',
@@ -177,43 +194,51 @@ class Appointment extends React.PureComponent {
           filterDoctors = lastSelected
         }
 
-        resources = response
-          .filter(clinician => clinician.clinicianProfile.isActive)
-          .filter((_, index) =>
+        resources = response.data
+          .filter(calendarResource => calendarResource.isActive)
+          .filter((calendarResource, index) =>
             filterDoctors.length > 0
-              ? filterDoctors.includes(_.clinicianProfile.id)
+              ? filterDoctors.includes(calendarResource.id)
               : index < 5,
           )
-          .map(clinician => ({
-            clinicianFK: clinician.clinicianProfile.id,
-            doctorName: clinician.clinicianProfile.name,
+          .map(calendarResource => ({
+            ...calendarResource,
+            calendarResourceFK: calendarResource.id,
+            calendarResourceName: calendarResource.name,
+            resourceFK:
+              calendarResource.resourceType === CALENDAR_RESOURCE.DOCTOR
+                ? `Doctor-${calendarResource.clinicianProfileDto.id}`
+                : `Resource-${calendarResource.resourceDto.id}`,
           }))
       } else {
-        resources = response
-          .filter(clinician => clinician.clinicianProfile.isActive)
-          .filter(activeclinician => {
+        resources = response.data
+          .filter(calendarResource => {
             const { user } = this.props
             return (
-              activeclinician.clinicianProfile.id ===
-              user.data.clinicianProfile.id
+              calendarResource.isActive &&
+              calendarResource.clinicianProfileDto?.id ===
+                user.data.clinicianProfile.id
             )
           })
-          .map(clinician => ({
-            clinicianFK: clinician.clinicianProfile.id,
-            doctorName: clinician.clinicianProfile.name,
+          .map(calendarResource => ({
+            ...calendarResource,
+            calendarResourceFK: calendarResource.id,
+            calendarResourceName: calendarResource.name,
+            resourceFK: `Doctor-${calendarResource.clinicianProfileDto.id}`,
           }))
       }
-      filterByDoctor = resources.map(res => res.clinicianFK)
+      filterByDoctor = resources.map(res => res.calendarResourceFK)
       filterBySingleDoctor =
-        resources && resources.length ? resources[0].clinicianFK : undefined
-
+        resources && resources.length
+          ? resources[0].calendarResourceFK
+          : undefined
       this.setState(() => ({
         filter: {
           ...filter,
           filterByDoctor,
           filterBySingleDoctor,
         },
-        primaryClinicianFK,
+        primaryCalendarResourceFK,
         resources,
       }))
     } else {
@@ -262,7 +287,11 @@ class Appointment extends React.PureComponent {
   }
 
   closeAppointmentForm = () => {
-    this.setState({ selectedAppointmentFK: -1, showAppointmentForm: false })
+    this.setState({
+      selectedAppointmentFK: -1,
+      showAppointmentForm: false,
+      updateEvent: undefined,
+    })
     const { dispatch, history } = this.props
     dispatch({
       type: 'calendar/updateState',
@@ -294,32 +323,32 @@ class Appointment extends React.PureComponent {
     })
   }
 
-  printDailyAppointmentReport = (date,clinicianFK) => {
-    this.reportDailyAppt(date,date,clinicianFK)
+  printDailyAppointmentReport = (date, calendarResourceFK) => {
+    this.reportDailyAppt(date, date, calendarResourceFK)
   }
 
-  reportDailyAppt = (start, end, resourceId) => {
+  reportDailyAppt = (start, end, calendarResourceFK) => {
     this.setState({
-      selectedSlot: { start, end, resourceId },
+      selectedSlot: { start, end, calendarResourceFK },
       showDailyAppointmentListingReport: true,
     })
   }
 
-  createDailyApptListingPayload = ({ start, end, resourceId }) => {
+  createDailyApptListingPayload = ({ start, end, calendarResourceFK }) => {
     var payload = {
       apptDateFrom: moment(start)
-        .set({ hour: 0, minute: 0, second: 0, millisecond:0 })
+        .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
         .toDate(),
       apptDateto: moment(end)
         .set({ hour: 23, minute: 59, second: 59 })
         .toDate(),
-      doctor: resourceId,
+      doctor: calendarResourceFK,
     }
     return payload
   }
 
   onSelectSlot = props => {
-    const { start, end, resourceId, action } = props || {}
+    const { start, end, action, resourceId } = props || {}
     const createApptAccessRight = Authorized.check('appointment.newappointment')
 
     if (createApptAccessRight && createApptAccessRight.rights !== 'enable')
@@ -429,6 +458,7 @@ class Appointment extends React.PureComponent {
           selectedAppointmentFK: undefined,
           showAppointmentForm: false,
           isDragging: false,
+          updateEvent: undefined,
         })
       }
 
@@ -464,19 +494,6 @@ class Appointment extends React.PureComponent {
     }
   }
 
-  onEventMouseOver = (event, syntheticEvent) => {
-    const { isDragging } = this.state
-    !isDragging &&
-      this.setState({
-        showPopup: event !== null,
-        popoverEvent: event !== null ? event : { ...InitialPopoverEvent },
-        popupAnchor:
-          syntheticEvent !== null
-            ? syntheticEvent.currentTarget
-            : syntheticEvent,
-      })
-  }
-
   handleClosePopover = () => {
     this.setState({
       showPopup: false,
@@ -501,7 +518,37 @@ class Appointment extends React.PureComponent {
     })
   }
 
-  onFilterUpdate = filter => {
+  getCalendarResource = async (view, date) => {
+    const { dispatch } = this.props
+    let calendarView = 'month'
+    if (view === CALENDAR_VIEWS.DAY) {
+      calendarView = 'day'
+    } else if (view === CALENDAR_VIEWS.WEEK) {
+      calendarView = 'week'
+    }
+    const dateFrom = moment(date)
+      .startOf(calendarView)
+      .formatUTC()
+    const dateTo = moment(date)
+      .endOf(calendarView)
+      .startOf('day')
+      .formatUTC()
+    const response = await dispatch({
+      type: 'calendarResource/query',
+      payload: {
+        apiCriteria: {
+          IncludeDailyCapacity: true,
+          DateFrom: dateFrom,
+          DateTo: dateTo,
+        },
+        sorting: [{ columnName: 'resourceType', direction: 'asc' }],
+      },
+    })
+
+    return response
+  }
+
+  onFilterUpdate = async filter => {
     const {
       filterByDoctor = [],
       dob,
@@ -509,22 +556,30 @@ class Appointment extends React.PureComponent {
       filterByApptType,
       filterBySingleDoctor,
     } = filter
-    const { doctorprofile } = this.props
-
-    const newResources = doctorprofile.reduce(
-      (resources, doctor) =>
-        filterByDoctor.includes(doctor.clinicianProfile.id)
-          ? [
-              ...resources,
-              {
-                clinicianFK: doctor.clinicianProfile.id,
-                doctorName: doctor.clinicianProfile.name,
-              },
-            ]
-          : [...resources],
-      [],
+    const { calendar } = this.props
+    const response = await this.getCalendarResource(
+      calendar.calendarView,
+      calendar.currentViewDate,
     )
-
+    let newResources = []
+    if (response) {
+      newResources = (response.data || [])
+        .filter(calendarResource =>
+          calendar.calendarView === CALENDAR_VIEWS.DAY
+            ? !filterByDoctor.length ||
+              filterByDoctor.includes(calendarResource.id)
+            : filterBySingleDoctor === calendarResource.id,
+        )
+        .map(calendarResource => ({
+          ...calendarResource,
+          calendarResourceFK: calendarResource.id,
+          calendarResourceName: calendarResource.name,
+          resourceFK:
+            calendarResource.resourceType === CALENDAR_RESOURCE.DOCTOR
+              ? `Doctor-${calendarResource.clinicianProfileDto.id}`
+              : `Resource-${calendarResource.resourceDto.id}`,
+        }))
+    }
     const updFilter = {
       dob: dob || undefined,
       search: search || undefined,
@@ -535,7 +590,7 @@ class Appointment extends React.PureComponent {
 
     this.setState(() => ({
       filter: { ...updFilter },
-      resources: newResources.length > 0 ? newResources : null,
+      resources: newResources.length > 0 ? newResources : [],
     }))
 
     this.props.dispatch({
@@ -543,7 +598,10 @@ class Appointment extends React.PureComponent {
       payload: {
         search: updFilter.search,
         dob: updFilter.dob,
-        doctor: updFilter.filterByDoctor,
+        doctor:
+          calendar.calendarView === CALENDAR_VIEWS.DAY
+            ? updFilter.filterByDoctor
+            : [updFilter.filterBySingleDoctor],
         appType: updFilter.filterByApptType,
       },
     })
@@ -553,35 +611,41 @@ class Appointment extends React.PureComponent {
     this.onSelectSlot({ start: new Date(), end: new Date() })
   }
 
-  handleCopyAppointmentClick = (selectedAppointmentID) => {
+  handleCopyAppointmentClick = selectedAppointmentID => {
     let shouldShowApptForm = true
     if (this.state.showAppointmentForm) {
       this.setState({
         selectedAppointmentFK: undefined,
         showAppointmentForm: false,
         isDragging: false,
+        updateEvent: undefined,
       })
     }
-    this.props.dispatch({
-      type: 'calendar/copyAppointment',
-      payload: {
-        id: selectedAppointmentID,
-        mode: 'single',
-        bookedByUserFk: this.props.user.data.id,
-      },
-    }).then(response => {
-      if (response)
-        this.setState({
-          selectedAppointmentFK: selectedAppointmentID,
-          showAppointmentForm: shouldShowApptForm,
-          isDragging: false,
-        })
-    })
+    this.props
+      .dispatch({
+        type: 'calendar/copyAppointment',
+        payload: {
+          id: selectedAppointmentID,
+          mode: 'single',
+          bookedByUserFk: this.props.user.data.id,
+        },
+      })
+      .then(response => {
+        if (response)
+          this.setState({
+            selectedAppointmentFK: selectedAppointmentID,
+            showAppointmentForm: shouldShowApptForm,
+            isDragging: false,
+          })
+      })
   }
 
   handleDoctorEventClick = () => {
     const { showDoctorEventModal } = this.state
-    this.setState({ showDoctorEventModal: !showDoctorEventModal })
+    this.setState({
+      showDoctorEventModal: !showDoctorEventModal,
+      updateEvent: undefined,
+    })
     this.props.dispatch({
       type: 'doctorBlock/updateState',
       payload: {
@@ -591,7 +655,7 @@ class Appointment extends React.PureComponent {
   }
 
   closeDoctorBlockModal = () => {
-    this.setState({ showDoctorEventModal: false })
+    this.setState({ showDoctorEventModal: false, updateEvent: undefined })
     this.props.dispatch({
       type: 'doctorBlock/updateState',
       payload: {
@@ -683,13 +747,175 @@ class Appointment extends React.PureComponent {
     })
   }
 
+  onResourceDateChange = async (view, targetDate) => {
+    const response = await this.getCalendarResource(view, targetDate)
+
+    if (response) {
+      const { filterByDoctor = [], filterBySingleDoctor } = this.state.filter
+      const newResources = (response.data || [])
+        .filter(calendarResource =>
+          view === CALENDAR_VIEWS.DAY
+            ? !filterByDoctor.length ||
+              filterByDoctor.includes(calendarResource.id)
+            : filterBySingleDoctor === calendarResource.id,
+        )
+        .map(calendarResource => ({
+          ...calendarResource,
+          calendarResourceFK: calendarResource.id,
+          calendarResourceName: calendarResource.name,
+          resourceFK:
+            calendarResource.resourceType === CALENDAR_RESOURCE.DOCTOR
+              ? `Doctor-${calendarResource.clinicianProfileDto.id}`
+              : `Resource-${calendarResource.resourceDto.id}`,
+        }))
+
+      this.setState(preFilter => ({
+        ...preFilter,
+        resources: newResources.length > 0 ? newResources : [],
+      }))
+    }
+  }
+
+  onPasteEvent = event => {
+    const { dispatch } = this.props
+    dispatch({
+      type: `${event.isDoctorBlock ? 'doctorBlock' : 'calendar'}/paste`,
+      payload: {
+        ...event,
+        startTime: event.isDoctorBlock
+          ? moment(event.startTime).formatUTC(false)
+          : moment(event.startTime).format('HH:mm'),
+        endTime: moment(event.endTime).formatUTC(false),
+      },
+    }).then(r => {
+      if (event.isDoctorBlock) {
+        dispatch({
+          type: 'calendar/refresh',
+        })
+      } else {
+        const { calendar } = this.props
+        this.onResourceDateChange(
+          calendar.calendarView,
+          calendar.currentViewDate,
+        )
+        dispatch({
+          type: 'calendar/filterCalendar',
+          payload: { ...this.state.filter },
+        })
+      }
+    })
+  }
+
+  onDragOrResizeEvent = event => {
+    const {
+      id,
+      appointmentFK,
+      appointmentStatusFk,
+      isDoctorBlock,
+      resourceId,
+      startTime,
+      endTime,
+      view,
+    } = event
+
+    const viewApptAccessRight = Authorized.check(
+      'appointment.appointmentdetails',
+    )
+    const viewDoctorBlockAccessRight = Authorized.check(
+      'settings.clinicsetting.doctorblock',
+    )
+
+    if (
+      (viewApptAccessRight &&
+        viewApptAccessRight.rights !== 'enable' &&
+        !isDoctorBlock) ||
+      (isDoctorBlock &&
+        viewDoctorBlockAccessRight &&
+        viewDoctorBlockAccessRight.rights !== 'enable')
+    )
+      return
+
+    if (isDoctorBlock) {
+      if (this.state.showDoctorEventModal) {
+        this.setState({
+          selectedDoctorEventFK: undefined,
+          showDoctorEventModal: false,
+          isDragging: false,
+          updateEvent: undefined,
+        })
+      }
+
+      this.props
+        .dispatch({
+          type: 'doctorBlock/getDoctorBlockDetails',
+          payload: {
+            id,
+            mode: 'single',
+          },
+        })
+        .then(response => {
+          if (response) {
+            this.setState({
+              selectedDoctorEventFK: id,
+              showDoctorEventModal: true,
+              eventType: 'DoctorBlock',
+              updateEvent: {
+                newResourceId: resourceId,
+                newStartTime: startTime,
+                newEndTime: endTime,
+                view,
+              },
+              isDragging: false,
+            })
+          }
+        })
+    } else {
+      const selectedAppointmentID =
+        appointmentFK === undefined ? id : appointmentFK
+
+      if (this.state.showAppointmentForm) {
+        this.setState({
+          selectedAppointmentFK: undefined,
+          showAppointmentForm: false,
+          isDragging: false,
+          updateEvent: undefined,
+        })
+      }
+
+      this.props
+        .dispatch({
+          type: 'calendar/getAppointmentDetails',
+          payload: {
+            id: selectedAppointmentID,
+            mode: 'single',
+          },
+        })
+        .then(response => {
+          if (response)
+            this.setState({
+              selectedAppointmentFK: selectedAppointmentID,
+              showAppointmentForm: true,
+              eventType: 'Appointment',
+              updateEvent: {
+                updateApptResourceId: id,
+                newResourceId: resourceId,
+                newStartTime: startTime,
+                newEndTime: endTime,
+                view: view,
+              },
+              isDragging: false,
+            })
+        })
+    }
+  }
+
   render() {
     const {
       calendar: CalendarModel,
       calendarLoading,
       dispatch,
       user,
-      doctorprofile,
+      ctcalendarresource,
       apptTimeSlotDuration,
       appointmentTypes,
     } = this.props
@@ -704,6 +930,7 @@ class Appointment extends React.PureComponent {
       showSearchAppointmentModal,
       eventType,
       showDailyAppointmentListingReport,
+      updateEvent,
     } = this.state
 
     const { currentViewAppointment, mode, calendarView } = CalendarModel
@@ -744,6 +971,10 @@ class Appointment extends React.PureComponent {
               handleEventMouseOver={this.onEventMouseOver}
               handleOnDragStart={this.handleOnDragStart}
               printDailyAppointmentReport={this.printDailyAppointmentReport}
+              onResourceDateChange={this.onResourceDateChange}
+              onPasteEvent={this.onPasteEvent}
+              onDragOrResizeEvent={this.onDragOrResizeEvent}
+              {...this.props}
             />
           </div>
         </Authorized>
@@ -766,10 +997,11 @@ class Appointment extends React.PureComponent {
               selectedSlot={{
                 ...selectedSlot,
                 resourceId:
-                  calendarView === BigCalendar.Views.DAY
+                  calendarView === CALENDAR_VIEWS.DAY
                     ? selectedSlot.resourceId
                     : filter.filterBySingleDoctor,
               }}
+              updateEvent={updateEvent}
               onHistoryRowSelected={this.onDoubleClickEvent}
               apptTimeSlotDuration={apptTimeSlotDuration}
               handleCopyAppointmentClick={this.handleCopyAppointmentClick}
@@ -785,7 +1017,7 @@ class Appointment extends React.PureComponent {
           observe='DoctorBlockForm'
         >
           <DoctorBlockForm
-            initialProps={selectedSlot}
+            updateEvent={updateEvent}
             validationSchema={DoctorFormValidation}
             handleAfterSubmit={this.handleAfterSubmitDoctorBlock}
           />
@@ -813,7 +1045,7 @@ class Appointment extends React.PureComponent {
             handleAddAppointmentClick={this.handleAddAppointmentClick}
             handleCopyAppointmentClick={this.handleCopyAppointmentClick}
             currentUser={user.data.clinicianProfile.id}
-            doctorprofile={doctorprofile}
+            ctcalendarresource={ctcalendarresource}
           />
         </CommonModal>
 

@@ -1,0 +1,21 @@
+@import url('https://cdn.syncfusion.com/ej2/bootstrap5.css');
+
+.timepicker-control-section {
+  max-width: 300px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.e-bigger .control-pane.default .control-section {
+  margin-top: 60px;
+}
+
+input.e-input,
+.e-input-group input.e-input,
+.e-input-group.e-control-wrapper input.e-input,
+textarea.e-input,
+.e-input-group textarea.e-input,
+.e-input-group.e-control-wrapper textarea.e-input {
+  padding-top: 4px !important;
+  padding-bottom: 1px !important;
+}

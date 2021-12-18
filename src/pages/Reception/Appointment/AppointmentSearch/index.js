@@ -12,16 +12,15 @@ const AppointmentSearch = ({
   handleCopyAppointmentClick,
   appointment,
   currentUser,
-  doctorprofile = [],
+  ctcalendarresource = [],
   mainDivHeight = 700,
 }) => {
   const viewOtherApptAccessRight = Authorized.check(
     'appointment.viewotherappointment',
   )
-  const isActiveDoctor = doctorprofile.find(
-    (doctor) =>
-      doctor.clinicianProfile.isActive &&
-      doctor.clinicianProfile.id === currentUser,
+  const isActiveCalendarResource = ctcalendarresource.find(
+    resource =>
+      resource.isActive && resource.clinicianProfileDto?.id === currentUser,
   )
 
   useEffect(() => {
@@ -30,14 +29,10 @@ const AppointmentSearch = ({
       !viewOtherApptAccessRight ||
       viewOtherApptAccessRight.rights !== 'enable'
     ) {
-      if (isActiveDoctor) {
-        defaultDoctor = [
-          currentUser,
-        ]
+      if (isActiveCalendarResource) {
+        defaultDoctor = [isActiveCalendarResource.id]
       } else {
-        defaultDoctor = [
-          -1,
-        ]
+        defaultDoctor = [-1]
       }
     }
     dispatch({
@@ -49,7 +44,7 @@ const AppointmentSearch = ({
           isIncludeRescheduledByClinic: true,
           isIncludeHistory: true,
         },
-        pagesize:100,
+        pagesize: 100,
       },
     })
     return () => {
@@ -80,22 +75,18 @@ const AppointmentSearch = ({
           filterByDoctor={
             (!viewOtherApptAccessRight ||
               viewOtherApptAccessRight.rights !== 'enable') &&
-            isActiveDoctor ? (
-              [
-                currentUser,
-              ]
-            ) : (
-              []
-            )
+            isActiveCalendarResource
+              ? [isActiveCalendarResource.id]
+              : []
           }
           viewOtherApptAccessRight={viewOtherApptAccessRight}
-          isActiveDoctor={isActiveDoctor}
+          isActiveCalendarResource={isActiveCalendarResource}
         />
       </div>
       <Grid
-      handleCopyAppointmentClick={handleCopyAppointmentClick}
-      handleDoubleClick={(data) => {
-        handleDoubleClick({ ...data, isHistory: true })
+        handleCopyAppointmentClick={handleCopyAppointmentClick}
+        handleDoubleClick={data => {
+          handleDoubleClick({ ...data, isHistory: true })
         }}
         height={height}
       />

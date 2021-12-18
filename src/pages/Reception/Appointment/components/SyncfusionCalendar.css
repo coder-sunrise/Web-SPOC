@@ -1,0 +1,50 @@
+@import url('https://cdn.syncfusion.com/ej2/material.css');
+
+#EventLog b {
+  color: #388e3c;
+}
+
+hr {
+  margin: 1px 10px 1px 0px;
+  border-top: 1px solid #eee;
+}
+/* custom code end*/
+
+.e-schedule .e-schedule-toolbar .e-icon-schedule-print::before {
+  content: '\e973';
+}
+
+.e-schedule .e-schedule-toolbar .e-icon-schedule-pdf::before {
+  content: '\e7c8';
+}
+
+.custom-field-row {
+  margin-bottom: 20px;
+}
+
+.multi-prop div {
+  padding-left: 0;
+  padding-top: 0;
+}
+
+.e-schedule .e-vertical-view .e-resource-cells {
+  padding: 5px !important;
+}
+
+.e-schedule .e-month-view .e-appointment {
+  height: 40px !important;
+}
+
+.e-schedule .e-month-view .e-appointment .e-appointment-details {
+  display: revert !important;
+}
+
+.e-more-popup-wrapper .e-appointment {
+  height: 40px !important;
+  display: revert !important;
+}
+
+.e-contextmenu-wrapper ul,
+.e-contextmenu-container ul {
+  padding: 0px !important;
+}

@@ -267,10 +267,17 @@ const tenantCodesMap = new Map([
       ...defaultParams,
     },
   ],
+  [
+    'ctcalendarresource',
+    {
+      pagesize: 99999,
+      sorting: [{ columnName: 'resourceType', direction: 'asc' }],
+    },
+  ],
 ])
 
 // always get latest codetable
-const skipCache = ['doctorprofile', 'clinicianprofile']
+const skipCache = ['doctorprofile', 'clinicianprofile', 'ctcalendarresource']
 
 const noSortOrderProp = ['doctorprofile', 'clinicianprofile', 'role', 'cttag']
 
@@ -303,9 +310,9 @@ const fetchCodeTable = async (code, params, isReturnStatusCode = false) => {
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)
     : convertToQuery(
-      { ...criteriaForTenantCodes, ...params },
-      convertExcludeFields,
-    )
+        { ...criteriaForTenantCodes, ...params },
+        convertExcludeFields,
+      )
 
   const response = await request(`${url}${code}`, {
     method: 'GET',
@@ -556,7 +563,7 @@ const getServices = data => {
 
   let serviceTags = []
   data.forEach(service => {
-    (service.serviceTag || []).forEach(tag => {
+    ;(service.serviceTag || []).forEach(tag => {
       serviceTags = serviceTags.concat({
         value: tag.tagFK,
         name: tag.tagDisplayValue,

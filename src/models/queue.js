@@ -286,7 +286,8 @@ export default createListViewModel({
         const { shouldGetTodayAppointments = true } = payload
         // TODO: integrate with new appointment listing api
 
-        const doctorProperty = 'Appointment_Resources.ClinicianFK'
+        const doctorProperty =
+          'Appointment_Resources.CalendarResourceFKNavigation.ClinicianProfile.Id'
         const viewOtherApptAccessRight = Authorized.check(
           'appointment.viewotherappointment',
         )

@@ -6,18 +6,16 @@ import moment from 'moment'
 import { withStyles } from '@material-ui/core'
 import ErrorOutline from '@material-ui/icons/ErrorOutline'
 import Cached from '@material-ui/icons/Cached'
-// big calendar
-import BigCalendar from 'react-big-calendar'
 // common components
-import { Popper,Tooltip } from '@/components'
+import { Popper, Tooltip } from '@/components'
 // assets
-import LocalOfferIcon from '@material-ui/icons/LocalOffer';
-
+import LocalOfferIcon from '@material-ui/icons/LocalOffer'
+import { CALENDAR_VIEWS } from '@/utils/constants'
 import customDropdownStyle from '@/assets/jss/material-dashboard-pro-react/components/customDropdownStyle'
 import ApptPopover from './ApptPopover'
 import DoctorBlockPopover from './DoctorBlockPopover'
 
-const style = (theme) => ({
+const style = theme => ({
   ...customDropdownStyle(theme),
   blockDiv: {
     display: 'block',
@@ -63,7 +61,7 @@ const style = (theme) => ({
 
 @connect(({ calendar }) => ({ calendarView: calendar.calendarView }))
 class Event extends React.PureComponent {
-  _handleMouseEnter = (syntheticEvent) => {
+  _handleMouseEnter = syntheticEvent => {
     const { event, handleMouseOver } = this.props
     handleMouseOver(event, syntheticEvent)
   }
@@ -73,10 +71,10 @@ class Event extends React.PureComponent {
     handleMouseOver(null, null)
   }
 
-  constructAccountNo = (patientAccountNo) =>
+  constructAccountNo = patientAccountNo =>
     !patientAccountNo ? '' : `(${patientAccountNo})`
 
-  render () {
+  render() {
     const { event, classes, calendarView } = this.props
     const {
       doctor,
@@ -90,7 +88,7 @@ class Event extends React.PureComponent {
     if (patientProfile) {
       const { name, patientAccountNo: accNo, contactNumbers } = patientProfile
       const _mobileContact = contactNumbers.find(
-        (item) => item.numberTypeFK === 1,
+        item => item.numberTypeFK === 1,
       )
       if (_mobileContact) patientContactNo = _mobileContact.number
 
@@ -126,9 +124,14 @@ class Event extends React.PureComponent {
     if (event.isDoctorBlock)
       OverlayComponent = <DoctorBlockPopover popoverEvent={event} />
 
-    const {stage,stageColorHex} = event
-    const showStage = stage && stage.trim()!==''
-    const stageDivStyle = {float:'left',...(showStage?{width:'100%',marginLeft:'-20px',paddingLeft:'20px'}:{})}
+    const { stage, stageColorHex } = event
+    const showStage = stage && stage.trim() !== ''
+    const stageDivStyle = {
+      float: 'left',
+      ...(showStage
+        ? { width: '100%', marginLeft: '-20px', paddingLeft: '20px' }
+        : {}),
+    }
     return (
       <Popper
         stopOnClickPropagation
@@ -139,45 +142,66 @@ class Event extends React.PureComponent {
         useTimer
         overlay={OverlayComponent}
       >
-        {calendarView === BigCalendar.Views.MONTH ? (
-          <div style={{ padding: '0px 4px' }}>
-            <div className={monthViewClass}>
-              <span className={classes.title}>
-                {`${moment(start).format('h:mm A')} - ${moment(end).format(
-                  'h:mm A',
-                )}`}
-              </span>
+        {calendarView === CALENDAR_VIEWS.MONTH ? (
+          <div
+            style={{
+              position: 'relative',
+              paddingRight: showStage ? 20 : 0,
+              paddingLeft: 4,
+            }}
+          >
+            <div>
+              <div className={monthViewClass}>
+                <span className={classes.title}>
+                  {`${moment(start).format('h:mm A')} - ${moment(end).format(
+                    'h:mm A',
+                  )}`}
+                </span>
+              </div>
+              <div className={monthViewClass}>
+                <span className={classes.title}>
+                  {`${title || ''} ${subtitle ? `(${subtitle})` : ''}`}
+                </span>
+                {hasConflict && <ErrorOutline className={classes.icon} />}
+                {isEnableRecurrence && <Cached />}
+              </div>
             </div>
-            <div className={monthViewClass}>
-              <span className={classes.title}>
-                {`${title || ''} ${subtitle ? `(${subtitle})` : ''}`}
-              </span>
-              {hasConflict && <ErrorOutline className={classes.icon} />}
-              {isEnableRecurrence && <Cached />}
-              {showStage &&
-              <Tooltip title={stage} style={{float:'right'}}>
-                <LocalOfferIcon
-                  style={{ color: stageColorHex, float: 'right'}}
-                />
-              </Tooltip>}
-            </div>
+            {showStage && (
+              <div style={{ position: 'absolute', right: 0, top: 2 }}>
+                <Tooltip title={stage}>
+                  <LocalOfferIcon style={{ color: stageColorHex }} />
+                </Tooltip>
+              </div>
+            )}
           </div>
         ) : (
-          <div>
-            <div className={otherViewClass} style={stageDivStyle}>
-              <div className={classes.title}>
-                <span>{title ? title.toUpperCase() : ''}</span>
+          <div
+            style={{ position: 'relative', paddingRight: showStage ? 20 : 0 }}
+          >
+            <div>
+              <div className={otherViewClass}>
+                <span className={classes.title}>
+                  {`${moment(start).format('h:mm A')} - ${moment(end).format(
+                    'h:mm A',
+                  )}`}
+                </span>
               </div>
-              <span className={classes.blockDiv}>
-                {subtitle ? subtitle.toUpperCase() : ''}
-              </span>
+              <div className={otherViewClass}>
+                <div className={classes.title}>
+                  <span>{title ? title.toUpperCase() : ''}</span>
+                </div>
+                <span className={classes.blockDiv}>
+                  {subtitle ? subtitle.toUpperCase() : ''}
+                </span>
+              </div>
             </div>
-            {showStage &&
-              <Tooltip title={stage} style={{float:'right'}}>
-                <LocalOfferIcon
-                  style={{ color: stageColorHex, float: 'right'}}
-                />
-              </Tooltip>}
+            {showStage && (
+              <div style={{ position: 'absolute', right: '-3px', top: 2 }}>
+                <Tooltip title={stage}>
+                  <LocalOfferIcon style={{ color: stageColorHex }} />
+                </Tooltip>
+              </div>
+            )}
           </div>
         )}
       </Popper>
