@@ -228,7 +228,7 @@ class History {
         removeObject: true,
       })
     }
-
+    if ((this.originalList?.length || 0) === 0) return
     let [
       originalObj,
     ] = this.originalList[this.originalList.length - 1]

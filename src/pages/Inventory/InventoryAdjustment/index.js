@@ -9,8 +9,9 @@ import { CardContainer, CommonModal } from '@/components'
 import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
+import moment from 'moment'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -23,7 +24,7 @@ class InventoryAdjustment extends PureComponent {
     open: false,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'global/updateState',
       payload: {
@@ -34,15 +35,30 @@ class InventoryAdjustment extends PureComponent {
       type: 'inventoryAdjustment/query',
       payload: {
         sorting: [
-          { columnName: 'adjustmentTransactionNo', direction: 'asc' },
+          {
+            columnName: 'transactionDate',
+            direction: 'desc',
+            sortBy: 'adjustmentTransactionDate',
+          },
+          {
+            columnName: 'transactionDate',
+            sortBy: 'createDate',
+            direction: 'desc',
+          },
         ],
+        lgteql_adjustmentTransactionDate: moment()
+          .add(-30, 'day')
+          .formatUTC(),
+        lsteql_adjustmentTransactionDate: moment()
+          .endOf('day')
+          .formatUTC(false),
       },
     })
   }
 
   toggleModal = async () => {
     const { dispatch } = this.props
-    this.setState((prevState) => {
+    this.setState(prevState => {
       return {
         open: !prevState.open,
       }
@@ -58,7 +74,7 @@ class InventoryAdjustment extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const { inventoryAdjustment, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
@@ -78,11 +94,9 @@ class InventoryAdjustment extends PureComponent {
           open={this.state.open}
           observe='InventoryAdjustment'
           title={
-            inventoryAdjustment.entity ? (
-              'Edit Inventory Adjustment'
-            ) : (
-              'Add Inventory Adjustment'
-            )
+            inventoryAdjustment.entity
+              ? 'Edit Inventory Adjustment'
+              : 'Add Inventory Adjustment'
           }
           maxWidth='xl'
           bodyNoPadding

@@ -116,6 +116,7 @@ const getVisitDoctorUserId = props => {
       ...orders.defaultService,
       type: orders.type,
       performingUserFK: getVisitDoctorUserId(props),
+      visitPurposeFK: orders.visitPurposeFK,
     })
   },
   displayName: 'OrderPage',
@@ -285,6 +286,7 @@ class Service extends PureComponent {
       ...orders.defaultService,
       type: orders.type,
       performingUserFK: getVisitDoctorUserId(this.props),
+      visitPurposeFK: orders.visitPurposeFK,
     })
   }
 

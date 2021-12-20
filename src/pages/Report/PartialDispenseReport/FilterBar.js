@@ -42,7 +42,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
               )}
             />
           </GridItem>
-          <GridItem md={2}>
+          <GridItem md={1}>
             <Field
               name='inventoryType'
               render={args => {
@@ -94,6 +94,27 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
             <FastField
               name='GroupByItem'
               render={args => <Checkbox {...args} label='Group By Item' />}
+            />
+          </GridItem>
+          <GridItem md={1}>
+            <Field
+              name='isFullyDispensed'
+              render={args => {
+                const { form: fm } = args
+                return (
+                  <Select
+                    {...args}
+                    label='Status'
+                    mode='multiple'
+                    options={[
+                      { name: 'Partially', value: 0 },
+                      { name: 'Completed', value: 1 },
+                    ]}
+                    maxTagCount={0}
+                    maxTagPlaceholder='Statuses'
+                  />
+                )
+              }}
             />
           </GridItem>
           <GridItem md={2}>

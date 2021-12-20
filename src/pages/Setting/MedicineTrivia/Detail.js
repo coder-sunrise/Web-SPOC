@@ -44,12 +44,14 @@ const Detail = ({
   const [attachments, setAttachments] = useState([])
 
   useEffect(() => {
-    const { fileIndexFK } = values
+    const { fileIndexFK, fileExtension, fileName } = values
     if (fileIndexFK) {
       const attach = [
         {
           thumbnailIndexFK: fileIndexFK,
           fileIndexFK: fileIndexFK,
+          fileName: fileName,
+          fileExtension: fileExtension,
           id: fileIndexFK,
         },
       ]
@@ -128,7 +130,7 @@ const Detail = ({
                     isUseSecondLanguage ? ` (${primaryPrintoutLanguage})` : ''
                   }`}
                   {...args}
-                  maxLength={2000}
+                  maxLength={300}
                   onChange={e => {
                     if (
                       getValue(primaryPrintoutLanguage).displayValue !==
@@ -154,7 +156,7 @@ const Detail = ({
                     <TextField
                       label={`Display Value (${secondaryPrintoutLanguage})`}
                       {...args}
-                      maxLength={2000}
+                      maxLength={500}
                       onChange={e => {
                         if (
                           getValue(secondaryPrintoutLanguage).displayValue !==

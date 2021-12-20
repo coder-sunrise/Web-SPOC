@@ -766,10 +766,16 @@ const _routes = [
             authority: ['report.finance.radiologystatisticreport'],
           },
           {
-            path: '/report/partialdispensereport',
+            path: '/report/dispensaryreport',
             name: 'partialdispensereport',
             component: './Report/PartialDispenseReport',
             authority: ['report.inventory.partialdispensereport'],
+          },
+          {
+            path: '/report/preorderlistingreport',
+            name: 'preorderlistingreport',
+            component: './Report/PreOrderListingReport',
+            authority: ['report.finance.preorderlistingreport'],
           },
         ],
       },
@@ -835,14 +841,14 @@ const _routes = [
       // Claim Submission
       //
       // Forms
-      {
-        path: '/forms',
-        icon: 'icon-pic-right',
-        name: 'forms',
-        moduleName: 'Forms',
-        component: './FormListing',
-        authority: ['forms'],
-      },
+      // {
+      //   path: '/forms',
+      //   icon: 'icon-pic-right',
+      //   name: 'forms',
+      //   moduleName: 'Forms',
+      //   component: './FormListing',
+      //   authority: ['forms'],
+      // },
       // Forms
       //
       // Settings

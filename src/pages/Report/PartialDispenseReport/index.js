@@ -10,7 +10,7 @@ import PartialDispenseList from './PartialDispenseList'
 import ReportBase from '../ReportBase'
 
 const reportId = 85
-const fileName = 'Partial Dispense Report'
+const fileName = 'Dispensary Report'
 
 class PartialDispenseReport extends ReportBase {
   constructor(props) {

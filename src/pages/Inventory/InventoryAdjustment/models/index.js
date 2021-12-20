@@ -67,7 +67,7 @@ export default createListViewModel({
             inventoryAdjustmentItems: data.inventoryAdjustmentItems.map(o => {
               return {
                 ...o,
-                preInventoryTypeFK: o.inventoryTypeFK,
+                // preInventoryTypeFK: o.inventoryTypeFK,
               }
             }),
           },

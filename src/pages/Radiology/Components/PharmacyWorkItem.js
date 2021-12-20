@@ -140,7 +140,8 @@ const WorkitemTitle = ({ item, classes }) => {
   )
 }
 
-const WorkitemBody = ({ item, classes, clinicSettings }) => {
+const WorkitemBody = props => {
+  const { item, classes, clinicSettings, dispatch } = props
   const { setDetailsId } = useContext(WorklistContext)
   const orderDate = moment(item.generateDate).format('DD MMM YYYY HH:mm')
 
@@ -216,7 +217,7 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
         >
           Details
         </Typography.Text>
-        <PrintPrescription {...item} />
+        <PrintPrescription {...props} />
         {item.isOrderUpdate && (
           <Tooltip title='Order has been amended, please retrieve latest order from Details link'>
             <Warning className={classes.warningIcon} />
@@ -266,7 +267,9 @@ const PharmacyWorkItem = props => {
 
 export default compose(
   withStyles(styles),
-  connect(({ clinicSettings }) => ({
+  connect(({ clinicSettings, patient, pharmacyDetails }) => ({
     clinicSettings: clinicSettings.settings || clinicSettings.default,
+    patient,
+    pharmacyDetails,
   })),
 )(PharmacyWorkItem)

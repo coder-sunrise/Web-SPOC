@@ -29,15 +29,11 @@ class PartialDispenseList extends PureComponent {
       reportDatas.PartialDispenseDetails.length > 0
     ) {
       PartialDispenseColumns = [
-        {
-          name: 'groupingItems',
-          title: (
-            <text>{reportDatas.PartialDispenseDetails[0].inventoryType}</text>
-          ),
-        },
+        { name: 'inventoryType', title: 'Type' },
+        { name: 'groupingItems', title: 'Item Name'},
         ...PartialDispenseColumns,
       ]
-      groupByItems = [{ columnName: 'groupingItems' }, ...groupByItems]
+      groupByItems = [{ columnName: 'inventoryType' }, { columnName: 'groupingItems' }, ...groupByItems]
     } else {
       PartialDispenseColumns = [
         ...PartialDispenseColumns,
@@ -86,16 +82,17 @@ class PartialDispenseList extends PureComponent {
         ),
       },
       { name: 'uom', title: 'UOM' },
+      { name: 'instruction', title: 'Instruction' },
       { name: 'visitDoctor', title: 'Visit Doctor' },
     ]
     PartialDispenseExtensions = [
       {
         columnName: 'orderDate',
         type: 'date',
-        width: 120,
+        width: 100,
       },
-      { columnName: 'patientReferenceNo', width: 130 },
-      { columnName: 'patientAccountNo', width: 150 },
+      { columnName: 'patientReferenceNo', width: 100 },
+      { columnName: 'patientAccountNo', width: 100 },
 
       { columnName: 'patientContactNo', width: 150 },
       {
@@ -117,6 +114,7 @@ class PartialDispenseList extends PureComponent {
         width: 100,
       },
       { columnName: 'uom', width: 120 },
+      { columnName: 'instruction', width: 120  },
       { columnExtensions: 'visitDoctor', width: 120 },
       ...PartialDispenseExtensions,
     ]
@@ -129,6 +127,12 @@ class PartialDispenseList extends PureComponent {
         state: {
           grouping: groupByItems,
         },
+      },
+      sort: true,
+      sortConfig: {
+        defaultSorting: [
+          { columnName: 'orderDate', direction: 'asc' },
+        ],
       },
     }
     return (

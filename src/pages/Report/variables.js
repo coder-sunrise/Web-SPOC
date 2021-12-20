@@ -158,8 +158,8 @@ export const menuData = [
 
   {
     title: 'Inventory',
-    text: 'Partial Dispense Report',
-    url: '/report/partialdispensereport',
+    text: 'Dispensary Report',
+    url: '/report/dispensaryreport',
     authority: 'report.inventory.partialdispensereport',
   },
   {
@@ -191,5 +191,11 @@ export const menuData = [
     text: 'Package Expiry Report',
     url: '/report/packageexpiry',
     authority: 'report.finance.packageexpiryreport',
+  },
+  {
+    title: 'Finance',
+    text: 'Pre-Order Listing Report',
+    url: '/report/preorderlistingreport',
+    authority: 'report.finance.preorderlistingreport',
   },
 ]

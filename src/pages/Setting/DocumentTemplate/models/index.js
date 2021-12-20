@@ -1,6 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import service from '../services'
+import { DOCUMENT_CATEGORY } from '@/utils/constants'
 
 const pathname = window.location.pathname.trim().toLowerCase()
 export default createListViewModel({
@@ -14,6 +15,7 @@ export default createListViewModel({
   param: {
     service,
     state: {
+      documentCategoryFK: DOCUMENT_CATEGORY.CONSULTATIONDOCUMENT,
       default: {
         isUserMaintainable: true,
         effectiveDates: [
