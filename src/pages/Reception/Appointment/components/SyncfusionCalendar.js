@@ -182,6 +182,8 @@ class SyncfusionCalendar extends React.PureComponent {
                     this.setState({ previousDate: props.currentDate }, () => {
                       if (jumpToDate) jumpToDate(props.currentDate)
                     })
+                  } else {
+                    props.cancel = true
                   }
                 }
               }}

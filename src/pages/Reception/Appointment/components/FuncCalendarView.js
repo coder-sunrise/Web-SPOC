@@ -502,9 +502,6 @@ const CalendarView = ({
           ['asc'],
         )
         if (dailyCapacity.length) {
-          const totalSlot = _.sumBy(dailyCapacity, 'maxCapacity')
-          const totalUsedSlot = _.sumBy(dailyCapacity, 'usedSlot')
-          const balanceSlot = totalSlot - totalUsedSlot
           const tooltip = dailyCapacity
             .map(c => {
               const startTime = moment(
@@ -515,14 +512,20 @@ const CalendarView = ({
               ).format('hh:mm A')
               return `${startTime} - ${endTime} Maximum slot: ${
                 c.maxCapacity
-              } Balance slot: ${c.maxCapacity - c.usedSlot}`
+              } Balance slot: ${c.maxCapacity -
+                c.usedSlot}\r\nRemarks: ${c.remarks || '-'}`
             })
             .join('\r\n')
-          event.element.innerHTML = `<div style="position:relative;">${
-            event.element.innerHTML
-          }<div title="${tooltip}" style="position:absolute;right:6px;top:1px;color:black;"><span style="color:${
-            balanceSlot >= 0 ? 'black' : 'red'
-          }">${balanceSlot}</span>/${totalSlot}</div></div>`
+          const maxSlot = dailyCapacity.map(c => c.maxCapacity).join(', ')
+          const balanceSlot = dailyCapacity
+            .map(c => {
+              const balance = c.maxCapacity - c.usedSlot
+              return `<span style="color:${
+                balance >= 0 ? 'black' : 'red'
+              }">${balance}</span>`
+            })
+            .join(', ')
+          event.element.innerHTML = `<div style="position:relative;">${event.element.innerHTML}<div title="${tooltip}" style="position:absolute;right:6px;top:1px;color:black;">Max: ${maxSlot} Bal: ${balanceSlot}</div></div>`
         }
       }
     }

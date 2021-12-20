@@ -59,12 +59,7 @@ export default createListViewModel({
       queryOneDone(st, { payload }) {
         const { data } = payload
         const ctCalendarResourceCapacity = _.orderBy(
-          data.calendarResource.ctCalendarResourceCapacity.map(csc => {
-            return {
-              ...csc,
-              isAllInput: 1,
-            }
-          }),
+          data.calendarResource.ctCalendarResourceCapacity,
           ['startTime'],
           ['asc'],
         )

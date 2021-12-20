@@ -75,9 +75,9 @@ export const AppointmentDataColExtensions = apptTimeIntervel => [
           <SyncfusionTimePicker
             step={apptTimeIntervel}
             value={row.startTime}
-            onChange={e => {
+            onChange={time => {
               const { commitChanges } = control
-              row.startTime = e
+              row.startTime = time
               if (row.startTime) {
                 const _endTime = moment(row.startTime, timeFormat24Hour)
                   .add(apptDurationHour, 'hour')
@@ -85,24 +85,17 @@ export const AppointmentDataColExtensions = apptTimeIntervel => [
                   .format(timeFormat24Hour)
 
                 row.endTime = _endTime
-                commitChanges({
-                  changed: {
-                    [row.id]: {
-                      startTime: row.startTime,
-                      endTime: row.endTime,
-                    },
-                  },
-                })
               } else {
-                commitChanges({
-                  changed: {
-                    [row.id]: {
-                      startTime: undefined,
-                      endTime: undefined,
-                    },
-                  },
-                })
+                row.endTime = undefined
               }
+              commitChanges({
+                changed: {
+                  [row.id]: {
+                    startTime: row.startTime,
+                    endTime: row.endTime,
+                  },
+                },
+              })
             }}
           />
           <div
@@ -132,7 +125,7 @@ export const AppointmentDataColExtensions = apptTimeIntervel => [
     columnName: 'isPrimaryClinician',
     width: 110,
     type: 'radio',
-    isDisabled: row => {
+    isHiddend: row => {
       return (
         !row.calendarResource ||
         row.calendarResource.resourceType === CALENDAR_RESOURCE.RESOURCE

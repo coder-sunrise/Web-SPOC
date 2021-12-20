@@ -27,7 +27,15 @@ import DailyResourceManagement from './DailyResourceManagement'
 const styles = theme => ({})
 
 const resourceCapacitySchema = Yup.object().shape({
-  isAllInput: Yup.number().required('Must input start time and end time.'),
+  capacityTime: Yup.string().when(
+    ['startTime', 'endTime'],
+    (startTime, endTime) => {
+      if (startTime && endTime && startTime > endTime)
+        return Yup.string().required('Time to should be more than time from.')
+    },
+  ),
+  startTime: Yup.string().required(),
+  endTime: Yup.string().required(),
   maxCapacity: Yup.number().required(),
 })
 
@@ -43,7 +51,7 @@ const resourceCapacitySchema = Yup.object().shape({
       .min(2)
       .required(),
     calendarResource: Yup.object().shape({
-      ctcalendarResourceCapacity: Yup.array()
+      ctCalendarResourceCapacity: Yup.array()
         .compact(v => v.isDeleted)
         .of(resourceCapacitySchema),
     }),
@@ -92,8 +100,20 @@ class Detail extends PureComponent {
     const { setFieldValue } = this.props
     setFieldValue('_fakeField', 'fakeValue')
     rows = _.orderBy(rows, ['startTime'], ['asc'])
-    setFieldValue('calendarResource.ctCalendarResourceCapacity', rows)
-    return rows
+    const endResult = rows.reduce((result, data) => {
+      try {
+        if (!data.isDeleted) {
+          resourceCapacitySchema.validateSync(data, {
+            abortEarly: false,
+          })
+        }
+        return [...result, { ...data, _errors: [] }]
+      } catch (error) {
+        return [...result, { ...data, _errors: error.inner }]
+      }
+    }, [])
+    setFieldValue('calendarResource.ctCalendarResourceCapacity', endResult)
+    return endResult
   }
 
   isEnableDailyManagement = () => {
@@ -158,6 +178,7 @@ class Detail extends PureComponent {
       handleSubmit()
     }
   }
+
   render() {
     const {
       theme,
@@ -252,30 +273,40 @@ class Detail extends PureComponent {
               }}
               schema={resourceCapacitySchema}
               columns={[
-                { name: 'isAllInput', title: 'Time From & Time To' },
+                { name: 'capacityTime', title: 'Time From & Time To' },
                 { name: 'maxCapacity', title: 'Default Maximum Capacity' },
               ]}
               columnExtensions={[
                 {
-                  columnName: 'isAllInput',
+                  columnName: 'capacityTime',
                   isReactComponent: true,
                   render: e => {
                     const { row, columnConfig, cellProps } = e
                     const { control, error, validSchema } = columnConfig
+                    const startError = (row._errors || []).find(
+                      se => se.path === 'startTime',
+                    )
+                    const endError = (row._errors || []).find(
+                      se => se.path === 'endTime',
+                    )
+                    const moreThanError = (row._errors || []).find(
+                      se => se.path === 'capacityTime',
+                    )
                     return (
-                      <div style={{ position: 'relative', paddingRight: 10 }}>
-                        <GridContainer>
-                          <GridItem xs md={6} style={{ paddingRight: 20 }}>
+                      <GridContainer>
+                        <GridItem xs md={6} style={{ paddingRight: 10 }}>
+                          <div
+                            style={{ position: 'relative', paddingRight: 10 }}
+                          >
                             <SyncfusionTimePicker
                               step={apptTimeIntervel}
                               value={row.startTime}
                               onChange={e => {
                                 const { commitChanges } = control
                                 row.startTime = e
-                                row.isAllInput =
-                                  row.startTime && row.endTime ? 1 : undefined
                                 if (
-                                  row.isAllInput &&
+                                  row.startTime &&
+                                  row.endTime &&
                                   row.startTime > row.endTime
                                 ) {
                                   row.endTime = row.startTime
@@ -285,60 +316,73 @@ class Detail extends PureComponent {
                                     [row.id]: {
                                       startTime: row.startTime,
                                       endTime: row.endTime,
-                                      isAllInput: row.isAllInput,
                                     },
                                   },
                                 })
                               }}
                             />
-                          </GridItem>
-                          <GridItem xs md={6} style={{ paddingLeft: 20 }}>
-                            <div style={{ position: 'relative' }}>
-                              <div
-                                style={{
-                                  position: 'absolute',
-                                  left: '-25px',
-                                  bottom: 7,
-                                }}
-                              >
-                                To
-                              </div>
-                              <SyncfusionTimePicker
-                                step={apptTimeIntervel}
-                                value={row.endTime}
-                                min={row.startTime}
-                                onChange={e => {
-                                  const { commitChanges } = control
-                                  row.endTime = e
-                                  row.isAllInput =
-                                    row.startTime && row.endTime ? 1 : undefined
-                                  commitChanges({
-                                    changed: {
-                                      [row.id]: {
-                                        endTime: row.endTime,
-                                        isAllInput: row.isAllInput,
-                                      },
-                                    },
-                                  })
-                                }}
-                              />
+                            <div
+                              style={{
+                                position: 'absolute',
+                                right: '-8px',
+                                top: 10,
+                              }}
+                            >
+                              {startError && (
+                                <Tooltip title={startError.message}>
+                                  <Warning style={{ color: 'red' }} />
+                                </Tooltip>
+                              )}
                             </div>
-                          </GridItem>
-                          <div
-                            style={{
-                              position: 'absolute',
-                              right: '-4px',
-                              top: 8,
-                            }}
-                          >
-                            {error && (
-                              <Tooltip title={error}>
-                                <Warning style={{ color: 'red' }} />
-                              </Tooltip>
-                            )}
                           </div>
-                        </GridContainer>
-                      </div>
+                        </GridItem>
+                        <GridItem xs md={6} style={{ paddingLeft: 20 }}>
+                          <div
+                            style={{ position: 'relative', paddingRight: 10 }}
+                          >
+                            <div
+                              style={{
+                                position: 'absolute',
+                                left: '-25px',
+                                bottom: 7,
+                              }}
+                            >
+                              To
+                            </div>
+                            <SyncfusionTimePicker
+                              step={apptTimeIntervel}
+                              value={row.endTime}
+                              //min={row.startTime}
+                              onChange={e => {
+                                const { commitChanges } = control
+                                row.endTime = e
+                                commitChanges({
+                                  changed: {
+                                    [row.id]: {
+                                      endTime: row.endTime,
+                                    },
+                                  },
+                                })
+                              }}
+                            />
+                            <div
+                              style={{
+                                position: 'absolute',
+                                right: '-8px',
+                                top: 10,
+                              }}
+                            >
+                              {(endError || moreThanError) && (
+                                <Tooltip
+                                  title={(endError || moreThanError).message}
+                                >
+                                  <Warning style={{ color: 'red' }} />
+                                </Tooltip>
+                              )}
+                            </div>
+                          </div>
+                        </GridItem>
+                      </GridContainer>
                     )
                   },
                   sortingEnabled: false,
@@ -348,6 +392,7 @@ class Detail extends PureComponent {
                   type: 'number',
                   max: 9999,
                   precision: 0,
+                  min: 0,
                   sortingEnabled: false,
                   width: 200,
                 },

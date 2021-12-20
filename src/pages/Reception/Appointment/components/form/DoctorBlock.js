@@ -426,15 +426,6 @@ class DoctorEventForm extends React.PureComponent {
                     <SyncfusionTimePicker
                       label='Time'
                       step={apptTimeIntervel}
-                      onTimeChange={e => {
-                        const { setFieldValue } = this.props
-                        setFieldValue(
-                          'eventTime',
-                          e.value
-                            ? moment(e.value).format(timeFormat24Hour)
-                            : undefined,
-                        )
-                      }}
                       {...args}
                     />
                   )
