@@ -202,7 +202,7 @@ class Dispense extends PureComponent {
     } = this.props
     const { editingOrder } = dispense
     const { rows } = orders
-    const { entity } = visitRegistration
+    const { entity = {} } = visitRegistration
     const { visit = {} } = entity
 
     const draftPreOrderItem = patient?.pendingPreOrderItem?.map(po => {
