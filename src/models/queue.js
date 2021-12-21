@@ -412,24 +412,24 @@ export default createListViewModel({
         const r = yield call(getUserPreference, payload.type)
         const { status, data } = r
         if (status === '200') {
+          const clinicSettings = yield select(st => st.clinicSettings)
+          const visitTypeSetting = JSON.parse(
+            clinicSettings?.settings?.visitTypeSetting,
+          )
+          const activeVisitType = (visitTypeSetting || [])
+            .filter(vt => vt.isEnabled === 'true')
+            .map(vt => vt.id)
+
+          let newVisitType = [-99, ...activeVisitType]
           if (data) {
-            const clinicSettings = yield select(st => st.clinicSettings)
             const filterBar = JSON.parse(data)
             let queueFilterBar
             if (payload.type === '9') {
               queueFilterBar = filterBar.find(o => o.Identifier === 'Queue')
             }
-
             const queue = queueFilterBar?.value || {}
             const { visitType } = queue
-            const visitTypeSetting = JSON.parse(
-              clinicSettings?.settings?.visitTypeSetting,
-            )
-            const activeVisitType = (visitTypeSetting || [])
-              .filter(vt => vt.isEnabled === 'true')
-              .map(vt => vt.id)
 
-            let newVisitType = [-99, ...activeVisitType]
             if (visitType) {
               newVisitType = visitType.filter(
                 vt => activeVisitType.indexOf(vt) >= 0,
@@ -442,6 +442,13 @@ export default createListViewModel({
               type: 'updateState',
               payload: {
                 queueFilterBar: { ...queue, visitType: newVisitType },
+              },
+            })
+          } else {
+            yield put({
+              type: 'updateState',
+              payload: {
+                queueFilterBar: { visitType: newVisitType },
               },
             })
           }

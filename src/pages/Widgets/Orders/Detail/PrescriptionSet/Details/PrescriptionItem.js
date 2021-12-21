@@ -570,11 +570,11 @@ class Detail extends PureComponent {
         )
         setFieldValue(
           `prescriptionSetItemPrecaution[${i}].precaution`,
-          im.medicationPrecaution?.name,
+          im.medicationPrecautionName,
         )
         setFieldValue(
           `prescriptionSetItemPrecaution[${i}].precautionCode`,
-          im.medicationPrecaution?.code,
+          im.medicationPrecautionCode,
         )
         setFieldValue(`prescriptionSetItemPrecaution[${i}].sequence`, i)
       })
