@@ -85,11 +85,11 @@ class DrugLabelSelection extends React.PureComponent {
 
   constructor(props) {
     super(props)
-    const { dispatch, currentDrugToPrint } = props
+    const { dispatch, batchInformation, currentDrugToPrint, visitid } = props
     dispatch({
       type: 'dispense/queryDrugLabelList',
       payload: {
-        id: this.props.dispense.visitID,
+        id: this.props.dispense.visitID || visitid,
         includeOpenPrescription: true,
       },
     }).then(data => {
@@ -162,8 +162,14 @@ class DrugLabelSelection extends React.PureComponent {
         drugLabelReportID = REPORT_ID.DRUG_LABEL_80MM_45MM_V2
       }
 
-      const { dispense, values, currentDrugToPrint } = this.props
-      const { packageItem, dispenseItems, orderItems } = values
+      const {
+        dispense,
+        values = {},
+        currentDrugToPrint,
+        visitid,
+        batchInformation,
+      } = this.props
+      const { packageItem, dispenseItems } = values
       const data = await getRawData(drugLabelReportID, {
         selectedDrugs: JSON.stringify(
           this.state.prescription
@@ -180,13 +186,21 @@ class DrugLabelSelection extends React.PureComponent {
             }),
         ),
         language: lan,
-        visitId: dispense.visitID,
+        visitId: dispense.visitID || visitid,
       })
       let finalDrugLabelDetails = []
       data.DrugLabelDetails.forEach(t => {
-        var dispenseItemss = (dispenseItems || orderItems).filter(
-          x => x.invoiceItemFK === t.invoiceItemId,
-        )
+        let dispenseItemss = []
+        if (dispenseItems) {
+          dispenseItemss = dispenseItems.filter(
+            x => x.invoiceItemFK === t.invoiceItemId,
+          )
+        }
+        if (batchInformation) {
+          dispenseItemss = batchInformation.filter(
+            xxx => xxx.id === t.invoiceItemId,
+          )
+        }
         var indicationArray = (t.indication || '').split('\n')
         t.firstLine = indicationArray.length > 0 ? indicationArray[0] : ' '
         t.secondLine = indicationArray.length > 1 ? indicationArray[1] : ' '
@@ -214,21 +228,25 @@ class DrugLabelSelection extends React.PureComponent {
         }
         // If it's normal items, then need to based on Batch and Copies to duplicate.
         else {
-          for (let i = 0; i < dispenseItemss.length; i++) {
-            let xx = { ...t }
-            xx.ExpiryDate = dispenseItemss[i].expiryDate
-            xx.BatchNo = dispenseItemss[i].batchNo
-            for (
-              let j = 0;
-              j <
-              this.state.prescription.find(
-                x =>
-                  x.id === t.index &&
-                  this.state.selectedRows.filter(tt => tt == x.id).length > 0,
-              ).no;
-              j++
-            ) {
-              finalDrugLabelDetails.push(xx)
+          for (
+            let j = 0;
+            j <
+            this.state.prescription.find(
+              x =>
+                x.id === t.index &&
+                this.state.selectedRows.filter(tt => tt == x.id).length > 0,
+            ).no;
+            j++
+          ) {
+            if (dispenseItemss && dispenseItemss.length > 0) {
+              for (let i = 0; i < dispenseItemss.length; i++) {
+                let xx = { ...t }
+                xx.ExpiryDate = dispenseItemss[i].expiryDate
+                xx.BatchNo = dispenseItemss[i].batchNo
+                finalDrugLabelDetails.push(xx)
+              }
+            } else {
+              finalDrugLabelDetails.push({ ...t })
             }
           }
         }
@@ -267,6 +285,7 @@ class DrugLabelSelection extends React.PureComponent {
       dispenseItems = [],
       packageItem,
       clinicSettings,
+      visitid,
       ...restProps
     } = this.props
     const {

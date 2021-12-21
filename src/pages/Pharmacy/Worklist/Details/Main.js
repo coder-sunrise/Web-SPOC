@@ -121,6 +121,7 @@ const Main = props => {
     dispatch,
     classes,
     clinicSettings,
+    patient,
     codetable,
     values,
     user,
@@ -142,6 +143,7 @@ const Main = props => {
   const [reportParameters, setReportParameters] = useState({})
   const [drugLeafletData, setDrugLeafletData] = useState({})
   const [currentDrugToPrint, setCurrentDrugToPrint] = useState({})
+  const [batchInformation, setBatchInformation] = useState({})
 
   useEffect(() => {
     subscribeNotification('PharmacyOrderUpdate', {
@@ -1510,6 +1512,14 @@ const Main = props => {
       }
     })
   }
+  const showDrugLabelSelection = () => {
+    let batchs = props.values.orderItems.map(x => {
+      return { id: x.id, batchNo: x.batchNo, expiryDate: x.expiryDate }
+    })
+    setBatchInformation(batchs)
+    console.log(batchs)
+    setShowDrugLabelSelectionPopup(true)
+  }
 
   const printReview = reportid => {
     let reprottitle = ''
@@ -1794,7 +1804,12 @@ const Main = props => {
       <GridContainer style={{ marginTop: 10 }}>
         <GridItem md={8}>
           <div style={{ position: 'relative' }}>
-            <Button color='primary' size='sm' disabled={isOrderUpdate}>
+            <Button
+              color='primary'
+              onClick={() => showDrugLabelSelection()}
+              size='sm'
+              disabled={isOrderUpdate}
+            >
               <Print />
               Drug Label
             </Button>
@@ -2035,19 +2050,11 @@ const Main = props => {
         observe='Confirm'
       >
         <DrugLabelSelection
-          {...props}
-          rows={drugLeafletData}
-          visitid={pharmacyDetails.entity?.visitFK}
-          onConfirmPrintLeaflet={onConfirmPrintDrugLabel}
-        />
-        <DrugLabelSelection
-          values={this.props.values}
+          values={props.values}
           currentDrugToPrint={currentDrugToPrint}
-          handleDrugLabelSelected={onDrugLabelSelected}
-          handleDrugLabelNoChanged={onDrugLabelNoChanged}
-          handlePrintOutLanguageChanged={onPrintOutLanguageChanged}
           dispatch={dispatch}
-          patient={patient}
+          visitid={pharmacyDetails.entity?.visitFK}
+          batchInformation={batchInformation}
           handleSubmit={() => {
             onConfirmPrintDrugLabel()
           }}

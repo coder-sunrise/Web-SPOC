@@ -5,6 +5,7 @@ import { ReportViewer } from '@/components/_medisys'
 import MenuItem from '@material-ui/core/MenuItem'
 import Menu from '@material-ui/core/Menu'
 import DrugLeafletSelection from '../../Pharmacy/Components/DrugLeafletSelection'
+import DrugLabelSelection from '../../Dispense/DispenseDetails/DrugLabelSelection'
 
 const PrintPrescription = props => {
   const { item, dispatch } = props
@@ -17,13 +18,24 @@ const PrintPrescription = props => {
   const [showLeafletSelectionPopup, setShowLeafletSelectionPopup] = useState(
     false,
   )
+  const [
+    showDrugLabelSelectionPopup,
+    setShowDrugLabelSelectionPopup,
+  ] = useState(false)
   const [drugLeafletData, setDrugLeafletData] = useState({})
+  const [batchInformation, setBatchInformation] = useState({})
   const [anchorEl, setAnchorEl] = React.useState(null)
   const closeLeafletSelectionPopup = () => {
     setShowLeafletSelectionPopup(false)
   }
   const onConfirmPrintLeaflet = () => {
     setShowLeafletSelectionPopup(false)
+  }
+  const closeDrugLabelSelectionPopup = () => {
+    setShowDrugLabelSelectionPopup(false)
+  }
+  const onConfirmPrintDrugLabel = () => {
+    setShowDrugLabelSelectionPopup(false)
   }
   const open = Boolean(anchorEl)
   const handleClick = event => {
@@ -40,6 +52,26 @@ const PrintPrescription = props => {
         handleClose()
         setDrugLeafletData(data)
         setShowLeafletSelectionPopup(true)
+      }
+    })
+  }
+  const printDrugLabel = () => {
+    dispatch({
+      type: 'pharmacyDetails/query',
+      payload: { id: props.item.id },
+    }).then(r => {
+      if (r) {
+        const { pharmacyOrderItem } = r
+        let batchs = []
+        pharmacyOrderItem.forEach(x => {
+          x.pharmacyOrderItemTransaction.forEach(y => {
+            const { batchNo = '', expiryDate = '' } = y
+            batchs.push({ batchNo, expiryDate, id: x.id })
+          })
+        })
+        setBatchInformation(batchs)
+        setShowDrugLabelSelectionPopup(true)
+        handleClose()
       }
     })
   }
@@ -88,7 +120,7 @@ const PrintPrescription = props => {
           horizontal: -30,
         }}
       >
-        <MenuItem onClick={handleClose}>Drug Label</MenuItem>
+        <MenuItem onClick={printDrugLabel}>Drug Label</MenuItem>
         <MenuItem onClick={handleClose}>Drug Summary Label</MenuItem>
         <MenuItem onClick={handleClose}>Patient Label</MenuItem>
         <MenuItem onClick={printPIL}>Patient Info Leaflet</MenuItem>
@@ -126,6 +158,22 @@ const PrintPrescription = props => {
           tranlationFK={translationLinkFK}
           visitid={visitFK}
           onConfirmPrintLeaflet={onConfirmPrintLeaflet}
+        />
+      </CommonModal>
+      <CommonModal
+        open={showDrugLabelSelectionPopup}
+        title='Print Drug Label'
+        onClose={closeDrugLabelSelectionPopup}
+        maxWidth='sm'
+        cancelText='Cancel'
+        observe='Confirm'
+      >
+        <DrugLabelSelection
+          {...props}
+          batchInformation={batchInformation}
+          tranlationFK={translationLinkFK}
+          handleSubmit={onConfirmPrintDrugLabel}
+          visitid={visitFK}
         />
       </CommonModal>
     </span>
