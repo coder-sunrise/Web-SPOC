@@ -14,6 +14,7 @@ import { subscribeNotification } from '@/utils/realtime'
 import { ReportViewer } from '@/components/_medisys'
 import { getRawData } from '@/services/report'
 import { REPORT_ID } from '@/utils/constants'
+import Print from '@material-ui/icons/Print'
 import {
   GridContainer,
   GridItem,
@@ -44,6 +45,7 @@ import { MenuOutlined } from '@ant-design/icons'
 import { PharmacySteps, JournalHistory } from '../../Components'
 import RedispenseForm from '../../Components/RedispenseForm'
 import DrugLeafletSelection from '../../Components/DrugLeafletSelection'
+import DrugLabelSelection from '@/pages/Dispense/DispenseDetails/DrugLabelSelection'
 
 const styles = theme => ({
   wrapCellTextStyle: {
@@ -130,11 +132,16 @@ const Main = props => {
   const [showLeafletSelectionPopup, setShowLeafletSelectionPopup] = useState(
     false,
   )
+  const [
+    showDrugLabelSelectionPopup,
+    setShowDrugLabelSelectionPopup,
+  ] = useState(false)
   const [showReportViwer, setShowReportViwer] = useState(false)
   const [reportTitle, setReportTitle] = useState('')
   const [reportID, setReportID] = useState(-1)
   const [reportParameters, setReportParameters] = useState({})
   const [drugLeafletData, setDrugLeafletData] = useState({})
+  const [currentDrugToPrint, setCurrentDrugToPrint] = useState({})
 
   useEffect(() => {
     subscribeNotification('PharmacyOrderUpdate', {
@@ -373,19 +380,16 @@ const Main = props => {
   }
 
   const printLeaflet = async (printData = {}) => {
-    console.log(printData)
     const visitinvoicedrugids = _.join(
       printData.map(x => {
         return x.id
       }),
     )
-    console.log(visitinvoicedrugids)
     const instructionIds = _.join(
       printData.map(x => {
         return _.join(x.instructionId, ',')
       }),
     )
-    console.log(instructionIds)
     const data = await getRawData(REPORT_ID.PATIENT_INFO_LEAFLET, {
       visitinvoicedrugids,
       instructionIds,
@@ -401,18 +405,6 @@ const Main = props => {
       },
     ]
     handlePrint(JSON.stringify(payload))
-
-    // dispatch({
-    //   type: 'pharmacyDetails/printleaflet',
-    //   payload: {
-    //     selectedDrugs,
-    //   },
-    // }).then(r => {
-    //   if (r) {
-    //     const { onConfirm } = props
-    //     // onConfirm()
-    //   }
-    // })
   }
   const getInstruction = row => {
     if (row.invoiceItemTypeFK !== 1) return ''
@@ -611,6 +603,10 @@ const Main = props => {
 
   const onConfirmPrintLeaflet = () => {
     setShowLeafletSelectionPopup(false)
+  }
+
+  const onConfirmPrintDrugLabel = () => {
+    setShowDrugLabelSelectionPopup(false)
   }
 
   const onConfirmRedispense = redispenseValues => {
@@ -1540,6 +1536,10 @@ const Main = props => {
     setShowLeafletSelectionPopup(false)
   }
 
+  const closeDrugLabelSelectionPopup = () => {
+    setShowDrugLabelSelectionPopup(false)
+  }
+
   const actualizeEditOrder = () => {
     dispatch({
       type: 'orders/updateState',
@@ -1795,9 +1795,11 @@ const Main = props => {
         <GridItem md={8}>
           <div style={{ position: 'relative' }}>
             <Button color='primary' size='sm' disabled={isOrderUpdate}>
+              <Print />
               Drug Label
             </Button>
             <Button color='primary' size='sm' disabled={isOrderUpdate}>
+              <Print />
               Drug Summary Label
             </Button>
             <Button
@@ -1806,6 +1808,7 @@ const Main = props => {
               size='sm'
               disabled={isOrderUpdate}
             >
+              <Print />
               Patient Info Leaflet
             </Button>
             <Button
@@ -1814,6 +1817,7 @@ const Main = props => {
               disabled={isOrderUpdate}
               onClick={() => printReview(84)}
             >
+              <Print />
               Prescription
             </Button>
             {secondaryPrintoutLanguage !== '' && (
@@ -2020,6 +2024,33 @@ const Main = props => {
           rows={drugLeafletData}
           visitid={pharmacyDetails.entity?.visitFK}
           onConfirmPrintLeaflet={onConfirmPrintLeaflet}
+        />
+      </CommonModal>
+      <CommonModal
+        open={showDrugLabelSelectionPopup}
+        title='Print Drug Label'
+        onClose={closeDrugLabelSelectionPopup}
+        maxWidth='sm'
+        cancelText='Cancel'
+        observe='Confirm'
+      >
+        <DrugLabelSelection
+          {...props}
+          rows={drugLeafletData}
+          visitid={pharmacyDetails.entity?.visitFK}
+          onConfirmPrintLeaflet={onConfirmPrintDrugLabel}
+        />
+        <DrugLabelSelection
+          values={this.props.values}
+          currentDrugToPrint={currentDrugToPrint}
+          handleDrugLabelSelected={onDrugLabelSelected}
+          handleDrugLabelNoChanged={onDrugLabelNoChanged}
+          handlePrintOutLanguageChanged={onPrintOutLanguageChanged}
+          dispatch={dispatch}
+          patient={patient}
+          handleSubmit={() => {
+            onConfirmPrintDrugLabel()
+          }}
         />
       </CommonModal>
     </div>

@@ -18,8 +18,10 @@ const WebSocketWrapper = ({
   handlePrint,
   selectedDrugs,
   selectedLanguage,
+  currentDrugToPrint,
   sendingJob,
   onPrintRef,
+  onDrugLabelSelectionClose,
   ...restProps
 }) => {
   const withoutPrintPreview = [
@@ -107,135 +109,19 @@ const WebSocketWrapper = ({
   }
 
   const getPrintResult = async (type, row, printAllDrugLabel, lan) => {
-    let drugLabelReportID = REPORT_ID.DRUG_LABEL_80MM_45MM
     let patientLabelReportID = REPORT_ID.PATIENT_LABEL_80MM_45MM
     try {
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
       if (settings && settings.labelPrinterSize === '8.9cmx3.6cm') {
-        drugLabelReportID = REPORT_ID.DRUG_LABEL_89MM_36MM
         patientLabelReportID = REPORT_ID.PATIENT_LABEL_89MM_36MM
       } else if (settings && settings.labelPrinterSize === '7.6cmx3.8cm') {
-        drugLabelReportID = REPORT_ID.DRUG_LABEL_76MM_38MM
         patientLabelReportID = REPORT_ID.PATIENT_LABEL_76MM_38MM
-      } else if (settings && settings.labelPrinterSize === '8.0cmx4.5cm_V2') {
-        drugLabelReportID = REPORT_ID.DRUG_LABEL_80MM_45MM_V2
-      }
-
-      if (type === CONSTANTS.ALL_DRUG_LABEL) {
-        const { dispense, values } = restProps
-        const { prescription, packageItem, dispenseItems } = values
-        console.log(dispense, '111')
-        const visitinvoicedrugids = _.join(
-          selectedDrugs
-            .filter(t => t.selected)
-            .map(x => {
-              return x.visitInvoiceDrugId
-            }),
-        )
-        const instructionIds = _.join(
-          selectedDrugs
-            .filter(t => t.selected)
-            .map(x => {
-              return _.join(x.instructionId, '|')
-            }),
-          ',',
-        )
-
-        const data = await getRawData(drugLabelReportID, {
-          selectedDrugs: JSON.stringify(
-            selectedDrugs
-              .filter(t => t.selected)
-              .map(t => {
-                return {
-                  id: t.id,
-                  vidId: t.visitInvoiceDrugId,
-                  pinfo: t.pageInfo,
-                  insId: _.join(t.instructionId, ','),
-                }
-              }),
-          ),
-          // visitinvoicedrugids,
-          // instructionIds,
-          language: lan,
-          visitId: dispense.visitID,
-        })
-        let finalDrugLabelDetails = []
-        data.DrugLabelDetails.forEach(t => {
-          var dispenseItemss = dispenseItems.filter(
-            x => x.invoiceItemFK === t.invoiceItemId,
-          )
-          var indicationArray = (t.indication || '').split('\n')
-          t.firstLine = indicationArray.length > 0 ? indicationArray[0] : ' '
-          t.secondLine = indicationArray.length > 1 ? indicationArray[1] : ' '
-          t.thirdLine =
-            indicationArray.length > 2
-              ? indicationArray[2] +
-                ' ' +
-                // currently will append all the precaution into last line if it's AND
-                (t.isDrugMixture
-                  ? _.takeRight(indicationArray, 2).join(' ')
-                  : '')
-              : ' '
-          // If it's drugmixture, then just duplicate by copies.
-          if (t.isDrugMixture) {
-            for (
-              let j = 0;
-              j < selectedDrugs.find(x => x.id === t.index && x.selected).no;
-              j++
-            ) {
-              finalDrugLabelDetails.push(t)
-            }
-          }
-          // If it's normal items, then need to based on Batch and Copies to duplicate.
-          else {
-            for (let i = 0; i < dispenseItemss.length; i++) {
-              let xx = { ...t }
-              xx.ExpiryDate = dispenseItemss[i].expiryDate
-              xx.BatchNo = dispenseItemss[i].batchNo
-              for (
-                let j = 0;
-                j < selectedDrugs.find(x => x.id === t.index && x.selected).no;
-                j++
-              ) {
-                finalDrugLabelDetails.push(xx)
-              }
-            }
-          }
-        })
-        data.DrugLabelDetails = finalDrugLabelDetails
-        const payload = [
-          {
-            ReportId: drugLabelReportID,
-            ReportData: JSON.stringify({
-              ...data,
-            }),
-          },
-        ]
-        return payload
-      }
-
-      if (type === CONSTANTS.DRUG_LABEL) {
-        const reportContext = await getReportContext(drugLabelReportID)
-        const drugLabel = await generateDrugLablePrintSource(row)
-        if (drugLabel) {
-          const payload = drugLabel.map(details => {
-            return {
-              ReportId: drugLabelReportID,
-              ReportData: JSON.stringify({
-                DrugLabelDetails: [{ ...details }],
-                ReportContext: reportContext,
-              }),
-            }
-          })
-          return payload
-        }
       }
 
       if (type === CONSTANTS.PATIENT_LABEL) {
         const { patient, values } = restProps
-
         const data = await getRawData(patientLabelReportID, {
-          patientId: patient ? patient.id : values.patientProfileFK,
+          patientId: patient ? patient.entity.id : values.patientProfileFK,
         })
         return [
           {
@@ -251,24 +137,10 @@ const WebSocketWrapper = ({
     }
     return null
   }
-  // Click print in drug lable selector will trigger this
+  // Click Confirm in drug lable selector will trigger this
   const handleOnPrint = async ({ type, row, printAllDrugLabel, printData }) => {
     if (withoutPrintPreview.includes(type)) {
-      if (type === CONSTANTS.DRUG_LABEL || type === CONSTANTS.ALL_DRUG_LABEL) {
-        selectedLanguage.forEach(async lan => {
-          let printResult = await getPrintResult(
-            type,
-            row,
-            printAllDrugLabel,
-            lan,
-          )
-          if (printData && printData.length > 0)
-            printResult = (printResult || []).concat(printData)
-
-          if (!printResult || printResult.length <= 0) return
-          await handlePrint(JSON.stringify(printResult))
-        })
-      } else {
+      if (type === CONSTANTS.PATIENT_LABEL) {
         let printResult = await getPrintResult(type, row, printAllDrugLabel)
         if (printData && printData.length > 0)
           printResult = (printResult || []).concat(printData)
@@ -324,10 +196,12 @@ const WebSocketWrapper = ({
     <DispenseDetails
       {...restProps}
       onFinalizeClick={handleFinalize}
+      onDrugLabelSelectionClose={onDrugLabelSelectionClose}
       onPrint={handleOnPrint}
       sendingJob={sendingJob}
       selectedDrugs={selectedDrugs}
       selectedLanguage={selectedLanguage}
+      currentDrugToPrint={currentDrugToPrint}
     />
   )
 }

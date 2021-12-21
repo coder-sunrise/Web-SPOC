@@ -128,11 +128,8 @@ const DispenseDetails = ({
   onDrugLabelClick,
   showDrugLabelSelection,
   onDrugLabelSelectionClose,
-  onDrugLabelSelected,
-  onDrugLabelNoChanged,
-  onPrintOutLanguageChanged,
   selectedDrugs,
-  selectedLanguage = [],
+  currentDrugToPrint,
   clinicSettings,
   servingPersons = [],
   patient,
@@ -585,7 +582,7 @@ const DispenseDetails = ({
           <div style={{ display: 'inline-block' }}>
             <Popper
               open={popperOpen}
-              style={{marginTop:10}}
+              style={{ marginTop: 10 }}
               placement='bottom-start'
               transition
               overlay={
@@ -617,9 +614,7 @@ const DispenseDetails = ({
                         color='primary'
                         size='sm'
                         style={{ width: 120 }}
-                        onClick={() => {
-                          onPrint({ type: CONSTANTS.PATIENT_LABEL })
-                        }}
+                        onClick={() => {}}
                         disabled={sendingJob}
                       >
                         Lab Label
@@ -897,7 +892,7 @@ const DispenseDetails = ({
               columns={columns}
               colExtensions={DispenseItemsColumnExtensions(
                 viewOnly,
-                onPrint,
+                onDrugLabelClick,
                 onActualizeBtnClick,
                 showDrugLabelRemark,
               )}
@@ -1018,16 +1013,12 @@ const DispenseDetails = ({
         }}
       >
         <DrugLabelSelection
-          prescription={selectedDrugs}
-          selectedLanguage={selectedLanguage}
-          codetable={codetable}
-          handleDrugLabelSelected={onDrugLabelSelected}
-          handleDrugLabelNoChanged={onDrugLabelNoChanged}
-          handlePrintOutLanguageChanged={onPrintOutLanguageChanged}
+          values={values}
+          currentDrugToPrint={currentDrugToPrint}
           dispatch={dispatch}
           patient={patient}
           handleSubmit={() => {
-            onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
+            onDrugLabelSelectionClose()
           }}
         />
       </CommonModal>
