@@ -28,9 +28,14 @@ import {
   ReportViewer,
 } from '@/components/_medisys'
 import { appointmentStatusReception } from '@/utils/codes'
+import { CALENDAR_RESOURCE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 
-const createPayload = (values, viewOtherApptAccessRight, isActiveDoctor) => {
+const createPayload = (
+  values,
+  viewOtherApptAccessRight,
+  isActiveCalendarResource,
+) => {
   const {
     filterByDoctor = [],
     filterByRoomBlockGroup = [],
@@ -61,7 +66,7 @@ const createPayload = (values, viewOtherApptAccessRight, isActiveDoctor) => {
   if (
     (!viewOtherApptAccessRight ||
       viewOtherApptAccessRight.rights !== 'enable') &&
-    !isActiveDoctor
+    !isActiveCalendarResource
   ) {
     selectedDoctor = [-1]
   }
@@ -72,7 +77,10 @@ const createPayload = (values, viewOtherApptAccessRight, isActiveDoctor) => {
       doctor: selectedDoctor.length > 0 ? selectedDoctor : undefined,
       room: filterByRoomBlockGroup > 0 ? filterByRoomBlockGroup : undefined,
       SearchText: searchValue || '',
-      ApptType: filterByApptType.length == 0 || filterByApptType.indexOf(-99) > -1 ? undefined : filterByApptType,
+      ApptType:
+        filterByApptType.length == 0 || filterByApptType.indexOf(-99) > -1
+          ? undefined
+          : filterByApptType,
       ApptStatus:
         filterByAppointmentStatus.length > 0
           ? filterByAppointmentStatus
@@ -92,7 +100,7 @@ const createPayload = (values, viewOtherApptAccessRight, isActiveDoctor) => {
     appStatus: filterByAppointmentStatus.join() || undefined,
     isIncludeRescheduledByClinic: true,
     isIncludeHistory: true,
-    dob: dob ,
+    dob: dob,
   }
 }
 
@@ -110,7 +118,7 @@ const FilterBar = ({
     filterByAppointmentStatus = [],
   } = values
 
-  const { viewOtherApptAccessRight, isActiveDoctor } = restValues
+  const { viewOtherApptAccessRight, isActiveCalendarResource } = restValues
 
   const [showReport, setShowReport] = useState(false)
 
@@ -119,7 +127,15 @@ const FilterBar = ({
   const maxRoomBlockGroupTagCount = filterByRoomBlockGroup.length <= 1 ? 1 : 0
   const maxAppointmentStatusTagCount =
     filterByAppointmentStatus.length <= 1 ? 1 : 0
-  const renderDropdown = option => <DoctorLabel doctor={option} />
+  const renderDropdown = option => {
+    if (option.resourceType === CALENDAR_RESOURCE.DOCTOR)
+      return (
+        <DoctorLabel
+          doctor={{ clinicianProfile: option.clinicianProfileDto }}
+        />
+      )
+    return option.name
+  }
 
   const toggleReport = () => {
     // if (!values.searchValue) return
@@ -143,7 +159,7 @@ const FilterBar = ({
             )}
           />
         </GridItem>
-        <GridItem  md={1}>
+        <GridItem md={1}>
           <FastField
             name='dob'
             render={args => <DatePicker {...args} label='DOB' />}
@@ -158,27 +174,15 @@ const FilterBar = ({
                   {...args}
                   // allLabel='All Doctors'
                   // disableAll
-                  // allValue={-99}
-                  allValueOption={{
-                    clinicianProfile: {
-                      name: 'All',
-                      id: -99,
-                    },
-                  }}
+                  allValue={-99}
                   allowClear={false}
-                  label='Filter by Doctor'
+                  label='Filter by Resource'
                   mode='multiple'
-                  // code='clinicianprofile'
-                  // labelField='name'
-                  // valueField='id'
-                  remoteFilter={{
-                    'clinicianProfile.isActive': true,
-                  }}
-                  code='doctorprofile'
-                  labelField='clinicianProfile.name'
-                  valueField='clinicianProfile.id'
+                  localFilter={option => option.isActive}
+                  code='ctcalendarresource'
+                  valueField='id'
                   maxTagCount={maxDoctorTagCount}
-                  maxTagPlaceholder='doctors'
+                  maxTagPlaceholder='resources'
                   renderDropdown={renderDropdown}
                 />
               </Authorized>
@@ -329,7 +333,11 @@ const FilterBar = ({
           showTopDivider={false}
           reportID={38}
           reportParameters={{
-            ...createPayload(values, viewOtherApptAccessRight, isActiveDoctor),
+            ...createPayload(
+              values,
+              viewOtherApptAccessRight,
+              isActiveCalendarResource,
+            ),
           }}
           defaultScale={1.5}
         />
@@ -347,13 +355,21 @@ export default memo(
     //   }),
     // }),
     handleSubmit: (values, { props }) => {
-      const { dispatch, viewOtherApptAccessRight, isActiveDoctor } = props
+      const {
+        dispatch,
+        viewOtherApptAccessRight,
+        isActiveCalendarResource,
+      } = props
 
       dispatch({
         type: `appointment/query`,
         payload: {
           apiCriteria: {
-            ...createPayload(values, viewOtherApptAccessRight, isActiveDoctor),
+            ...createPayload(
+              values,
+              viewOtherApptAccessRight,
+              isActiveCalendarResource,
+            ),
           },
         },
       })

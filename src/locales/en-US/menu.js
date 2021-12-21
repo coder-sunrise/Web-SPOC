@@ -175,6 +175,7 @@ export default {
   'menu.setting.drugallergy': 'Drug Allergy',
   'menu.setting.administrationroute': 'Route of Administration',
   'menu.setting.checklist': 'Checklist',
+  'menu.setting.resource': 'Resource',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',

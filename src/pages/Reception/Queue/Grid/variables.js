@@ -117,8 +117,8 @@ export const ApptColumnExtensions = [
     columnName: 'doctorName',
     width: 250,
     render: row => {
-      const _title = row.title ? `${row.title} ` : ''
-      return `${_title}${row.doctorName}`
+      const _title = row.title ? `${row.title || ''} ` : ''
+      return `${_title}${row.doctorName || ''}`
     },
   },
   {

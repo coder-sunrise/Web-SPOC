@@ -1219,6 +1219,12 @@ const _routes = [
             component: './Setting/AdministrationRoute',
             authority: ['settings.clinicsetting.administrationroute'],
           },
+          {
+            path: '/setting/resource',
+            name: 'resource',
+            component: './Setting/Resource',
+            authority: ['settings.clinicsetting.resource'],
+          },
         ],
       },
       // Settings

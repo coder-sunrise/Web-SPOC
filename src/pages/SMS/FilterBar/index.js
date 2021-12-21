@@ -155,9 +155,11 @@ export default compose(
         dispatchType = 'smsAppointment'
 
         let stringDoctors = Number(doctor)
-        let doctorProperty = 'Appointment_Resources.ClinicianFK'
+        let doctorProperty =
+          'Appointment_Resources.CalendarResourceFKNavigation.ClinicianProfile.Id'
         if (doctor.length > 1) {
-          doctorProperty = 'in_Appointment_Resources.ClinicianFK'
+          doctorProperty =
+            'in_Appointment_Resources.CalendarResourceFKNavigation.ClinicianProfile.Id'
           stringDoctors = doctor.join('|')
         } else if (doctor.length <= 0) {
           const viewOtherApptAccessRight = Authorized.check(
@@ -175,7 +177,8 @@ export default compose(
               viewOtherApptAccessRight.rights !== 'enable') &&
             !isActiveDoctor
           ) {
-            doctorProperty = 'Appointment_Resources.ClinicianFK'
+            doctorProperty =
+              'Appointment_Resources.CalendarResourceFKNavigation.ClinicianProfile.Id'
             stringDoctors = -1
           }
         }
