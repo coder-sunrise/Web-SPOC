@@ -44,7 +44,6 @@ const FormFooter = ({
   }
 
   const confirmBtnText = isNew || isDraft ? ButtonText.ADD : ButtonText.EDIT
-
   return (
     <SizeContainer size='md'>
       <div className={classnames(classes.footer)}>
@@ -59,7 +58,7 @@ const FormFooter = ({
           </Button>
         </Authorized>
         <Button
-          disabled={disabledCheckAvailability || isTurnedUp ||　isCancelled}
+          disabled={disabledCheckAvailability || isTurnedUp || isCancelled}
           color='success'
           onClick={handleValidateClick}
         >
