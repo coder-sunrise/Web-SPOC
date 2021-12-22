@@ -162,7 +162,7 @@ const PrintPrescription = props => {
       </CommonModal>
       <CommonModal
         open={showDrugLabelSelectionPopup}
-        title='Print Drug Label'
+        title='Print Drug Labels'
         onClose={closeDrugLabelSelectionPopup}
         maxWidth='sm'
         cancelText='Cancel'
@@ -173,6 +173,7 @@ const PrintPrescription = props => {
           batchInformation={batchInformation}
           tranlationFK={translationLinkFK}
           handleSubmit={onConfirmPrintDrugLabel}
+          source='pharmacy'
           visitid={visitFK}
         />
       </CommonModal>

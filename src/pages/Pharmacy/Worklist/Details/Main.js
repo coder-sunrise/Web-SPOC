@@ -2043,7 +2043,7 @@ const Main = props => {
       </CommonModal>
       <CommonModal
         open={showDrugLabelSelectionPopup}
-        title='Print Drug Label'
+        title='Print Drug Labels'
         onClose={closeDrugLabelSelectionPopup}
         maxWidth='sm'
         cancelText='Cancel'
@@ -2055,6 +2055,7 @@ const Main = props => {
           dispatch={dispatch}
           visitid={pharmacyDetails.entity?.visitFK}
           batchInformation={batchInformation}
+          source='pharmacy'
           handleSubmit={() => {
             onConfirmPrintDrugLabel()
           }}

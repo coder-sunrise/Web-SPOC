@@ -131,11 +131,14 @@ const fns = {
     return r
   },
   queryDrugLabelList: async params =>
-    await request(`/api/pharmacyWorklist/GetLeaftletDrugs/${params.id}`, {
-      method: 'GET',
-      data: {
-        ...params,
+    await request(
+      `/api/pharmacyWorklist/GetSeparatedDrugInstructions/${params.id}`,
+      {
+        method: 'GET',
+        data: {
+          ...params,
+        },
       },
-    }),
+    ),
 }
 export default fns

@@ -85,7 +85,13 @@ class DrugLabelSelection extends React.PureComponent {
 
   constructor(props) {
     super(props)
-    const { dispatch, batchInformation, currentDrugToPrint, visitid } = props
+    const {
+      dispatch,
+      batchInformation,
+      currentDrugToPrint,
+      visitid,
+      source = 'dispense',
+    } = props
     dispatch({
       type: 'dispense/queryDrugLabelList',
       payload: {
@@ -100,7 +106,15 @@ class DrugLabelSelection extends React.PureComponent {
             t => t.visitInvoiceDrugId === currentDrugToPrint.id,
           )
         }
-        data = _.orderBy(data, ['displayName'], ['asc'])
+        if (source === 'pharmacy') {
+          data = _.orderBy(
+            data,
+            ['dispenseByPharmacy', 'displayName'],
+            ['desc', 'asc'],
+          )
+        } else {
+          data = _.orderBy(data, ['displayName'], ['asc'])
+        }
         // set default language based on patient tranlsation and clinic setting.
         const preferLanguage =
           (this.props.patient && this.props.patient.translationLinkFK) === 5
@@ -110,7 +124,10 @@ class DrugLabelSelection extends React.PureComponent {
           prescription: data.map(x => {
             return { ...x, no: 1 }
           }),
-          selectedRows: data.map(item => item.id),
+          selectedRows:
+            source === 'pharmacy'
+              ? data.filter(t => t.dispenseByPharmacy).map(item => item.id)
+              : data.map(item => item.id),
           selectedLanguage: [preferLanguage],
         })
       }
@@ -319,34 +336,36 @@ class DrugLabelSelection extends React.PureComponent {
             )}
           </GridItem>
           <GridItem>
-            {secondaryPrintoutLanguage && (
-              <Fragment>
-                <span>Print In: </span>
-                <div style={{ width: 150, display: 'inline-block' }}>
-                  <CheckboxGroup
-                    displayInlineBlock={true}
-                    value={this.state.selectedLanguage}
-                    options={[
-                      { value: 'EN', label: 'EN' },
-                      { value: 'JP', label: 'JP' },
-                    ]}
-                    onChange={v => {
-                      this.handlePrintOutLanguageChanged(v.target.value)
-                    }}
-                  />
+            <Fragment>
+              {secondaryPrintoutLanguage && (
+                <div style={{ display: 'inline-block' }}>
+                  <span>Print In: </span>
+                  <div style={{ width: 150, display: 'inline-block' }}>
+                    <CheckboxGroup
+                      displayInlineBlock={true}
+                      value={this.state.selectedLanguage}
+                      options={[
+                        { value: 'EN', label: 'EN' },
+                        { value: 'JP', label: 'JP' },
+                      ]}
+                      onChange={v => {
+                        this.handlePrintOutLanguageChanged(v.target.value)
+                      }}
+                    />
+                  </div>
                 </div>
-                {showDrugWarning && (
-                  <div style={{ color: 'red' }}>
-                    * Please select at least one drug to print.
-                  </div>
-                )}
-                {showLanguageWarning && (
-                  <div style={{ color: 'red' }}>
-                    * Please select at least one language to print.
-                  </div>
-                )}
-              </Fragment>
-            )}
+              )}
+              {showDrugWarning && (
+                <div style={{ color: 'red' }}>
+                  * Please select at least one drug to print.
+                </div>
+              )}
+              {showLanguageWarning && (
+                <div style={{ color: 'red' }}>
+                  * Please select at least one language to print.
+                </div>
+              )}
+            </Fragment>
           </GridItem>
         </GridContainer>
         {footer &&
