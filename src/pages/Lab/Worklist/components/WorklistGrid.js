@@ -16,7 +16,12 @@ import {
 import Delete from '@material-ui/icons/Delete'
 import { CommonModal, DatePicker, Select, Button } from '@/components'
 import WorklistContext from '../WorklistContext'
-import { StatusButtons, SpecimenCollection, SpecimenDiscarding } from './index'
+import {
+  StatusButtons,
+  SpecimenCollection,
+  SpecimenDiscarding,
+  ExapandCollapseAllButton,
+} from './index'
 import { SpecimenDetails } from '../SpecimenDetails'
 import styles from './WorklistGrid.less'
 
@@ -35,6 +40,7 @@ export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
     modal: MODALS.NONE,
     para: undefined,
   })
+  const [expandingKeys, setExpandingKeys] = useState([])
 
   useEffect(() => {
     dispatch({
@@ -47,6 +53,17 @@ export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
       payload: { code: 'cttestpanel' },
     })
   }, [])
+
+  useEffect(() => {
+    if (labWorklist && labWorklist.list) {
+      expandAllRows()
+    }
+  }, [labWorklist])
+
+  const expandAllRows = () =>
+    setExpandingKeys(
+      _.uniq(labWorklist.list.map(item => item.patientReferenceNo)),
+    )
 
   const patients = _.uniqBy(
     list.map(item => ({
@@ -236,7 +253,7 @@ export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
       />
     )
   }
-
+  console.log('expandingKeys', expandingKeys)
   const columns = [
     {
       title: 'Name',
@@ -249,8 +266,11 @@ export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
               Patient: {record.patientName}
             </Typography.Text>
             <Button
-              type='primary'
-              icon={<CoffeeOutlined />}
+              size='sm'
+              underline
+              color='info'
+              noUnderline={false}
+              link
               onClick={() => {
                 if (currentModal.modal === MODALS.NONE)
                   setCurrentModal({
@@ -270,15 +290,35 @@ export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
 
   return (
     <Card>
-      <StatusButtons style={{ justifyContent: 'end', marginBottom: 10 }} />
+      <div style={{ display: 'flex', alignItems: 'start' }}>
+        <ExapandCollapseAllButton
+          onExpandAllClick={() => expandAllRows()}
+          onCollapseAllClick={() => setExpandingKeys([])}
+        />
+        <StatusButtons
+          style={{
+            flexGrow: 1,
+            justifyContent: 'end',
+            marginBottom: 10,
+          }}
+        />
+      </div>
       <Table
         className={styles.table}
         size='small'
         columns={columns}
         rowClassName={styles.expandableRow}
-        expandable={{ expandedRowRender }}
-        defaultExpandAllRows={true}
-        //expandedRowKeys={[0, 1]}
+        expandable={{
+          expandedRowRender,
+          onExpand: (expanded, record) => {
+            expanded
+              ? setExpandingKeys([...expandingKeys, record.key])
+              : setExpandingKeys(
+                  expandingKeys.filter(item => item !== record.key),
+                )
+          },
+        }}
+        expandedRowKeys={expandingKeys}
         showHeader={false}
         dataSource={patients}
         pagination={false}

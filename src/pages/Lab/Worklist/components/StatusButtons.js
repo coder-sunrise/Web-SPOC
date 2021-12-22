@@ -1,206 +1,59 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { Form, Button, Card, Tag, Avatar, Badge } from 'antd'
+import { CheckSquareFilled } from '@ant-design/icons'
+
+const StatusTag = ({ tagColor, text, count, checked = false, onClick }) => {
+  return (
+    <Badge
+      offset={[-10, 0]}
+      count={
+        checked ? (
+          <CheckSquareFilled
+            style={{ color: '#4255bd', backgroundColor: 'white' }}
+          />
+        ) : (
+          0
+        )
+      }
+    >
+      <Tag color={tagColor} style={{ minWidth: 80 }} onClick={onClick}>
+        <div
+          style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+        >
+          <span style={{ flexGrow: 1, marginRight: 5 }}>{text}</span>
+          <span
+            style={{
+              textAlign: 'center',
+              justifyContent: 'end',
+              alignItems: 'flex-end',
+              background: 'white',
+              borderRadius: '10px',
+              margin: '3px 0px',
+              color: tagColor,
+              width: '20px',
+              height: '20px',
+              fontSize: '0.8em',
+            }}
+          >
+            {count}
+          </span>
+        </div>
+      </Tag>
+    </Badge>
+  )
+}
 
 export const StatusButtons = ({ style }) => {
   return (
     <div style={{ display: 'flex', ...style }}>
-      <Tag color='#5a9cde' style={{ minWidth: 80 }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span style={{ flexGrow: 1, marginRight: 5 }}>All</span>
-          <span
-            style={{
-              textAlign: 'center',
-              justifyContent: 'end',
-              alignItems: 'flex-end',
-              background: 'white',
-              borderRadius: '10px',
-              margin: '3px 0px',
-              color: '#5a9cde',
-              width: '20px',
-              height: '20px',
-              fontSize: '0.8em',
-            }}
-          >
-            90
-          </span>
-        </div>
-      </Tag>
-
-      <Tag color='#999900' style={{ minWidth: 80 }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span style={{ flexGrow: 1, marginRight: 5 }}>New</span>
-          <span
-            style={{
-              textAlign: 'center',
-              justifyContent: 'end',
-              alignItems: 'flex-end',
-              background: 'white',
-              borderRadius: '10px',
-              margin: '3px 0px',
-              color: '#999900',
-              width: '20px',
-              height: '20px',
-              fontSize: '0.8em',
-            }}
-          >
-            8
-          </span>
-        </div>
-      </Tag>
-
-      <Tag color='#009999' style={{ minWidth: 80 }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span style={{ flexGrow: 1, marginRight: 5 }}>In Progress</span>
-          <span
-            style={{
-              textAlign: 'center',
-              justifyContent: 'end',
-              alignItems: 'flex-end',
-              background: 'white',
-              borderRadius: '10px',
-              margin: '3px 0px',
-              color: '#009999',
-              width: '20px',
-              height: '20px',
-              fontSize: '0.8em',
-            }}
-          >
-            8
-          </span>
-        </div>
-      </Tag>
-
-      <Tag color='#993333' style={{ minWidth: 80 }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span style={{ flexGrow: 1, marginRight: 5 }}> P. 1st Verify</span>
-          <span
-            style={{
-              textAlign: 'center',
-              justifyContent: 'end',
-              alignItems: 'flex-end',
-              background: 'white',
-              borderRadius: '10px',
-              margin: '3px 0px',
-              color: '#993333',
-              width: '20px',
-              height: '20px',
-              fontSize: '0.8em',
-            }}
-          >
-            0
-          </span>
-        </div>
-      </Tag>
-
-      <Tag color='#0000ff' style={{ minWidth: 80 }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span style={{ flexGrow: 1, marginRight: 5 }}>P. 2nd Verify</span>
-          <span
-            style={{
-              textAlign: 'center',
-              justifyContent: 'end',
-              alignItems: 'flex-end',
-              background: 'white',
-              borderRadius: '10px',
-              margin: '3px 0px',
-              color: '#0000ff',
-              width: '20px',
-              height: '20px',
-              fontSize: '0.8em',
-            }}
-          >
-            3
-          </span>
-        </div>
-      </Tag>
-
-      <Tag color='#0000ff' style={{ minWidth: 80 }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span style={{ flexGrow: 1, marginRight: 5 }}>P. 2nd Verify</span>
-          <span
-            style={{
-              textAlign: 'center',
-              justifyContent: 'end',
-              alignItems: 'flex-end',
-              background: 'white',
-              borderRadius: '10px',
-              margin: '3px 0px',
-              color: '#0000ff',
-              width: '20px',
-              height: '20px',
-              fontSize: '0.8em',
-            }}
-          >
-            3
-          </span>
-        </div>
-      </Tag>
-
-      <Tag color='#009933' style={{ minWidth: 80 }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span style={{ flexGrow: 1, marginRight: 5 }}>Completed</span>
-          <span
-            style={{
-              textAlign: 'center',
-              justifyContent: 'end',
-              alignItems: 'flex-end',
-              background: 'white',
-              borderRadius: '10px',
-              margin: '3px 0px',
-              color: '#009933',
-              width: '20px',
-              height: '20px',
-              fontSize: '0.8em',
-            }}
-          >
-            23
-          </span>
-        </div>
-      </Tag>
-
-      <Tag color='#cc6633' style={{ minWidth: 80 }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span style={{ flexGrow: 1, marginRight: 5 }}>Cancelled</span>
-          <span
-            style={{
-              textAlign: 'center',
-              justifyContent: 'end',
-              alignItems: 'flex-end',
-              background: 'white',
-              borderRadius: '10px',
-              margin: '3px 0px',
-              color: '#cc6633',
-              width: '20px',
-              height: '20px',
-              fontSize: '0.8em',
-            }}
-          >
-            23
-          </span>
-        </div>
-      </Tag>
-
-      <Tag color='#33cc99' style={{ minWidth: 80 }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span style={{ flexGrow: 1, marginRight: 5 }}>Discarded</span>
-          <span
-            style={{
-              textAlign: 'center',
-              justifyContent: 'end',
-              alignItems: 'flex-end',
-              background: 'white',
-              borderRadius: '10px',
-              margin: '3px 0px',
-              color: '#33cc99',
-              width: '20px',
-              height: '20px',
-              fontSize: '0.8em',
-            }}
-          >
-            2
-          </span>
-        </div>
-      </Tag>
+      <StatusTag tagColor='#5a9cde' text='All' count='90' checked />
+      <StatusTag tagColor='#999900' text='New' count='8' checked />
+      <StatusTag tagColor='#009999' text='In Progress' count='8' />
+      <StatusTag tagColor='#993333' text='P. 1st Verify' count='0' checked />
+      <StatusTag tagColor='#0000ff' text='P. 2nd Verify' count='0' />
+      <StatusTag tagColor='#009933' text='Completed' count='0' />
+      <StatusTag tagColor='#cc6633' text='Cancelled' count='3' />
+      <StatusTag tagColor='#33cc99' text='Cancelled' count='5' />
     </div>
   )
 }

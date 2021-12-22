@@ -12,7 +12,7 @@ export default createFormViewModel({
     effects: {
       *queryDone({ payload }, { call, select, put, take }) {
         // const radiologyDetails = yield select(st => st.radiologyDetails)
-
+        console.log('query done')
         yield put({
           type: 'patient/query',
           payload: { id: 12 }, //TODO::Replace with actual patient id

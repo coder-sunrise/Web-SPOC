@@ -1,12 +1,12 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { Form, Button, Card } from 'antd'
-import { StatusButtons } from './StatusButtons'
+import { Form, Card } from 'antd'
 import { formatMessage } from 'umi'
+import { useDispatch, useSelector } from 'dva'
 import InfoCircleOutlined from '@ant-design/icons/InfoCircleOutlined'
-import { CLINICAL_ROLE } from '@/utils/constants'
 import moment from 'moment'
 import Search from '@material-ui/icons/Search'
-import { useDispatch, useSelector } from 'dva'
+import Refresh from '@material-ui/icons/Refresh'
+import { CLINICAL_ROLE, PRIORITIES } from '@/utils/constants'
 import {
   TextField,
   DatePicker,
@@ -17,8 +17,10 @@ import {
   dateFormatLong,
   IconButton,
   Popover,
+  Button,
 } from '@/components'
 import WorklistContext from '../WorklistContext'
+import { StatusButtons } from './StatusButtons'
 
 export const WorklistFilter = () => {
   const [form] = Form.useForm()
@@ -27,6 +29,7 @@ export const WorklistFilter = () => {
   const dispatch = useDispatch()
 
   const { settings } = useSelector(s => s.clinicSettings)
+  const { doctorprofile = [] } = useSelector(s => s.codetable)
   const clinicianProfile = useSelector(
     state => state.user.data.clinicianProfile,
   )
@@ -46,6 +49,19 @@ export const WorklistFilter = () => {
   }
 
   useEffect(() => {
+    dispatch({
+      force: true,
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'doctorprofile',
+        filter: {
+          'clinicianProfile.isActive': true,
+        },
+      },
+    })
+  }, [])
+
+  useEffect(() => {
     if (isAnyModelOpened) {
       stopTimer()
     } else {
@@ -60,10 +76,10 @@ export const WorklistFilter = () => {
     const {
       searchValue,
       visitType,
-      modality,
+      priority,
+      visitDoctor,
       dateFrom,
       dateTo,
-      isMyPatientOnly,
     } = form.getFieldsValue(true)
 
     dispatch({
@@ -74,15 +90,16 @@ export const WorklistFilter = () => {
           visitType: visitType
             ? visitType.filter(t => t !== -99).join(',')
             : undefined,
-          modality: modality
-            ? modality.filter(t => t !== -99).join(',')
+          priority: priority
+            ? priority.filter(t => t !== -99).join(',')
+            : undefined,
+          visitDoctor: visitDoctor
+            ? visitDoctor.filter(t => t !== -99).join(',')
             : undefined,
           filterFrom: dateFrom,
           filterTo: moment(dateTo)
             .endOf('day')
             .formatUTC(false),
-
-          clinicianProfileId: isMyPatientOnly ? clinicianProfile.id : undefined,
         },
       },
     }).then(val => {
@@ -105,9 +122,9 @@ export const WorklistFilter = () => {
           <Form.Item name='visitDoctor' initialValue={[-99]}>
             <Select
               label='Visit Doctor'
-              options={getVisitTypes().map(item => ({
+              options={doctorprofile.map(item => ({
                 value: item.id,
-                ...item,
+                name: item.clinicianProfile.name,
               }))}
               style={{ width: 170 }}
               mode='multiple'
@@ -118,10 +135,7 @@ export const WorklistFilter = () => {
           <Form.Item name='priority' initialValue={[-99]}>
             <Select
               label='Priority'
-              options={getVisitTypes().map(item => ({
-                value: item.id,
-                ...item,
-              }))}
+              options={PRIORITIES}
               style={{ width: 170 }}
               mode='multiple'
               maxTagCount={0}
@@ -177,8 +191,40 @@ export const WorklistFilter = () => {
               {formatMessage({ id: 'form.search' })}
             </ProgressButton>
           </Form.Item>
+          <div
+            style={{
+              display: 'inline-flex',
+              flexGrow: 1,
+              justifyContent: 'end',
+              alignItems: 'center',
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  fontWeight: 400,
+                  fontSize: '0.8rem',
+                  minWidth: 80,
+                }}
+              >
+                Last Refresh:
+              </p>
+              <p style={{ color: '#1890f8', fontSize: '0.9rem' }}>
+                {refreshDate.format('HH:mm')}
+              </p>
+            </div>
+            <Button
+              color='primary'
+              justIcon
+              style={{
+                height: 26,
+              }}
+              onClick={() => handleSearch()}
+            >
+              <Refresh />
+            </Button>
+          </div>
         </div>
-        {/* <Form.Item> <StatusButtons /> </Form.Item>*/}
       </Form>
     </Card>
   )
