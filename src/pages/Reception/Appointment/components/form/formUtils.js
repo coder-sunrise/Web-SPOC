@@ -2,7 +2,11 @@ import moment from 'moment'
 import * as Yup from 'yup'
 import { serverDateFormat, timeFormat, timeFormat24Hour } from '@/components'
 import { computeRRule } from '@/components/_medisys'
-import { APPOINTMENT_STATUS } from '@/utils/constants'
+import {
+  APPOINTMENT_STATUS,
+  CALENDAR_RESOURCE,
+  CALENDAR_VIEWS,
+} from '@/utils/constants'
 import { getTimeObject, compare } from '@/utils/yup'
 import { getUniqueNumericId, roundTo } from '@/utils/utils'
 
@@ -14,7 +18,9 @@ const initDailyRecurrence = {
   recurrenceDaysOfTheWeek: undefined,
   recurrenceDayOfTheMonth: undefined,
 }
-const endOfMonth = moment().endOf('month').date()
+const endOfMonth = moment()
+  .endOf('month')
+  .date()
 
 export const parseDateToServerDateFormatString = (date, format) => {
   if (moment.isMoment(date)) return date.format(serverDateFormat)
@@ -39,10 +45,7 @@ export const ValidationSchema = Yup.object().shape({
   }),
   isEnableRecurrence: Yup.boolean(),
   recurrenceDto: Yup.object().when(
-    [
-      'isEnableRecurrence',
-      'currentAppointment',
-    ],
+    ['isEnableRecurrence', 'currentAppointment'],
     (isEnableRecurrence, currentAppointment, recurrenceDto) => {
       return recurrenceDto.shape({
         recurrenceFrequency: Yup.number()
@@ -54,20 +57,20 @@ export const ValidationSchema = Yup.object().shape({
           .max(99, 'Number of Ocurrence must be less than or equal to 99')
           .required(),
         recurrenceDayOfTheMonth: Yup.number()
-          .transform((value) => {
+          .transform(value => {
             if (Number.isNaN(value)) return -1
             return value
           })
           .when('recurrencePatternFK', {
-            is: (recurrencePatternFK) => recurrencePatternFK === 3,
+            is: recurrencePatternFK => recurrencePatternFK === 3,
             then: Yup.number()
               .min(1, 'Day of month cannot be less than 1')
               .max(endOfMonth, `Day of month cannot exceed ${endOfMonth}`),
           }),
         recurrenceDaysOfTheWeek: Yup.array()
-          .transform((value) => (value === null ? [] : value))
+          .transform(value => (value === null ? [] : value))
           .when('recurrencePatternFK', {
-            is: (recurrencePatternFK) => recurrencePatternFK === 2,
+            is: recurrencePatternFK => recurrencePatternFK === 2,
             then: Yup.array()
               .min(1, 'Day(s) of week is required')
               .required('Day(s) of week is required'),
@@ -78,7 +81,7 @@ export const ValidationSchema = Yup.object().shape({
 })
 
 const convertReccurenceDaysOfTheWeek = (week = '') =>
-  week.split(', ').map((eachDay) => parseInt(eachDay, 10))
+  week.split(', ').map(eachDay => parseInt(eachDay, 10))
 
 const calculateDuration = (startTime, endTime) => {
   const hour = endTime.diff(startTime, 'hour')
@@ -86,34 +89,46 @@ const calculateDuration = (startTime, endTime) => {
   return { hour, minute }
 }
 
-const calculateDurationTime = (durationMinutes) => {
-  const hour = Math.floor(durationMinutes/60)
-  const minute = durationMinutes%60
+const calculateDurationTime = durationMinutes => {
+  const hour = Math.floor(durationMinutes / 60)
+  const minute = durationMinutes % 60
   return { hour, minute }
 }
 
-const constructDefaultNewRow = (selectedSlot, apptTimeSlotDuration, appointmentTypes) => {
-
-  let defaultNewRow = { isPrimaryClinician: true, id: getUniqueNumericId() }
+const constructDefaultNewRow = (
+  selectedSlot,
+  apptTimeSlotDuration,
+  appointmentTypes,
+  ctcalendarresource,
+) => {
+  let defaultNewRow = { id: getUniqueNumericId() }
   selectedSlot = selectedSlot || {}
   const startTime = moment(selectedSlot.start)
   const selectedEndTime = moment(selectedSlot.end)
 
   const { hour = 0, minute = 15 } = calculateDurationTime(apptTimeSlotDuration)
-  const defaultApptType = _.orderBy(appointmentTypes,['sortOrder'],['asc']).find(x=>x.isDefault) || {}
+  const defaultApptType =
+    _.orderBy(appointmentTypes, ['sortOrder'], ['asc']).find(
+      x => x.isDefault,
+    ) || {}
   const endTime = moment(selectedSlot.start)
     .add(hour, 'hour')
     .add(minute, 'minute')
-    .format('HH:mm')
+    .format(timeFormat24Hour)
+  const resource = ctcalendarresource.find(
+    source => source.id === selectedSlot.resourceId,
+  )
   defaultNewRow = {
-    startTime: startTime.format('HH:mm'),
-    clinicianFK: selectedSlot.resourceId,
+    startTime: startTime.format(timeFormat24Hour),
+    calendarResourceFK: selectedSlot.resourceId,
+    calendarResource: resource ? { ...resource } : undefined,
     endTime,
     apptDurationHour: hour,
     apptDurationMinute: minute,
     sortOrder: 0,
     appointmentTypeFK: defaultApptType.id,
     ...defaultNewRow,
+    isPrimaryClinician: resource?.resourceType === CALENDAR_RESOURCE.DOCTOR,
   }
   return defaultNewRow
 }
@@ -127,6 +142,8 @@ export const mapPropsToValues = ({
   clinicianProfiles,
   apptTimeSlotDuration,
   appointmentTypes,
+  ctcalendarresource,
+  updateEvent,
 }) => {
   let _patientProfileFK
   let _patientContactNo
@@ -156,7 +173,12 @@ export const mapPropsToValues = ({
     currentAppointment: {
       appointmentDate: moment((selectedSlot || {}).start).formatUTC(),
       appointments_Resources: [
-        constructDefaultNewRow(selectedSlot, apptTimeSlotDuration, appointmentTypes),
+        constructDefaultNewRow(
+          selectedSlot,
+          apptTimeSlotDuration,
+          appointmentTypes,
+          ctcalendarresource,
+        ),
       ],
     },
     appointmentStatusFk: APPOINTMENT_STATUS.DRAFT,
@@ -171,11 +193,75 @@ export const mapPropsToValues = ({
       const clinicianProfile =
         clinicianProfiles &&
         clinicianProfiles.find(
-          (item) => viewingAppointment.bookedByUserFk === item.userProfileFK,
+          item => viewingAppointment.bookedByUserFk === item.userProfileFK,
         )
       const appointment = viewingAppointment.appointments.find(
-        (item) => item.id === selectedAppointmentID,
+        item => item.id === selectedAppointmentID,
       )
+      let appointmentDate = appointment.appointmentDate
+      let apptResources = appointment.appointments_Resources.map(item => {
+        const { calendarResourceFK } = item
+        const cp = ctcalendarresource.find(_cp => _cp.id === calendarResourceFK)
+        const startTime = moment(item.startTime, timeFormat24Hour)
+        const endTime = moment(item.endTime, timeFormat24Hour)
+        const { hour, minute } = calculateDuration(startTime, endTime)
+        return {
+          ...item,
+          calendarResourceFK:
+            cp && cp.isActive ? calendarResourceFK : undefined,
+          startTime: startTime.format(timeFormat24Hour),
+          endTime: endTime.format(timeFormat24Hour),
+          apptDurationHour: hour,
+          apptDurationMinute: minute,
+        }
+      })
+      let isFromDragOrResize
+      if (updateEvent) {
+        const {
+          updateApptResourceId,
+          newStartTime,
+          newEndTime,
+          newResourceId,
+          view,
+        } = updateEvent
+        isFromDragOrResize = true
+        if (
+          (view === CALENDAR_VIEWS.MONTH || view === CALENDAR_VIEWS.WEEK) &&
+          moment(newStartTime).startOf('day') !==
+            moment(appointment.appointmentDate)
+        ) {
+          appointmentDate = moment(newStartTime).startOf('day')
+        }
+        let updateResource = apptResources.find(
+          r => r.id === updateApptResourceId,
+        )
+
+        if (view !== CALENDAR_VIEWS.MONTH) {
+          const startTime = moment(newStartTime, timeFormat24Hour)
+          const endTime = moment(newEndTime, timeFormat24Hour)
+          const { hour, minute } = calculateDuration(startTime, endTime)
+          updateResource.startTime = startTime.format(timeFormat24Hour)
+          updateResource.endTime = endTime.format(timeFormat24Hour)
+          updateResource.apptDurationHour = hour
+          updateResource.apptDurationMinute = minute
+        }
+        if (newResourceId) {
+          const source = ctcalendarresource.find(
+            source => source.id === newResourceId,
+          )
+          if (source.resourceType === CALENDAR_RESOURCE.RESOURCE) {
+            updateResource.isPrimaryClinician = false
+          } else if (
+            !apptResources.find(
+              r => r.id !== updateApptResourceId && r.isPrimaryClinician,
+            )
+          ) {
+            updateResource.isPrimaryClinician = true
+          }
+          updateResource.calendarResourceFK = newResourceId
+          updateResource.calendarResource = { ...source }
+        }
+      }
       const { recurrenceDto, isCopyedAppt } = viewingAppointment
       let {
         patientContactNo,
@@ -189,7 +275,7 @@ export const mapPropsToValues = ({
       if (patientProfile) {
         const { name, patientAccountNo: accNo, contactNumbers } = patientProfile
         const _mobileContact = contactNumbers.find(
-          (item) => item.numberTypeFK === 1,
+          item => item.numberTypeFK === 1,
         )
         if (_mobileContact) {
           patientContactNo = parseInt(_mobileContact.number, 10)
@@ -227,41 +313,26 @@ export const mapPropsToValues = ({
 
         currentAppointment: {
           ...appointment,
-          appointments_Resources: appointment.appointments_Resources.map(
-            (item) => {
-              const { clinicianFK } = item
-              const cp = clinicianProfiles.find((_cp) => _cp.id === clinicianFK)
-              const startTime = moment(item.startTime, 'HH:mm:ss')
-              const endTime = moment(item.endTime, 'HH:mm:ss')
-              const { hour, minute } = calculateDuration(startTime, endTime)
-              return {
-                ...item,
-                clinicianFK: cp && cp.isActive ? clinicianFK : undefined,
-                startTime: startTime.format('HH:mm'),
-                endTime: endTime.format('HH:mm'),
-                apptDurationHour: hour,
-                apptDurationMinute: minute,
-              }
-            },
-          ),
-          appointmentDate: moment(appointment.appointmentDate).formatUTC(),
+          appointments_Resources: apptResources,
+          appointmentDate: moment(appointmentDate),
           // appointmentDate,
         },
-        appointmentStatusFk: isCopyedAppt ? APPOINTMENT_STATUS.DRAFT : appointment.appointmentStatusFk,
-        appointments: viewingAppointment.appointments.map((item) => ({
+        appointmentStatusFk: isCopyedAppt
+          ? APPOINTMENT_STATUS.DRAFT
+          : appointment.appointmentStatusFk,
+        appointments: viewingAppointment.appointments.map(item => ({
           ...item,
         })),
         _appointmentDateIn: true,
+        isFromDragOrResize,
       }
     }
-  } catch (error) {
-    console.log({ error })
-  }
+  } catch (error) {}
 
   return values
 }
 
-export const mapDatagridToAppointmentResources = (shouldDumpID) => (event) => {
+export const mapDatagridToAppointmentResources = shouldDumpID => event => {
   const { id, startTime: timeFrom, endTime: timeTo, ...restEvent } = event
   const startTime =
     timeFrom && (timeFrom.includes('AM') || timeFrom.includes('PM'))
@@ -290,7 +361,7 @@ export const compareDto = (value, original) => {
   )
     return false
   let isChanged = false
-  Object.keys(original).forEach((key) => {
+  Object.keys(original).forEach(key => {
     if (value[key] === undefined) isChanged = true
     else if (original[key] !== value[key]) isChanged = true
   })
@@ -303,37 +374,30 @@ export const generateRecurringAppointments = (
   shouldGenerate,
   shouldDumpID,
 ) => {
-  if (!shouldGenerate)
-    return [
-      appointment,
-    ]
+  if (!shouldGenerate) return [appointment]
 
   const rrule = computeRRule({
     recurrenceDto,
     date: appointment.appointmentDate,
   })
   if (rrule) {
-    const allDates =
-      [
-        ...rrule.all(),
-      ] || []
+    const allDates = [...rrule.all()] || []
 
     const { id, ...restAppointmentValues } = appointment
-    return allDates.map(
-      (date) =>
-        shouldDumpID || id === undefined
-          ? {
-              ...restAppointmentValues,
-              appointments_Resources: restAppointmentValues.appointments_Resources.map(
-                ({ appointmentFK, ...restItem }) => ({ ...restItem }),
-              ),
-              appointmentDate: moment(date).formatUTC(),
-            }
-          : {
-              ...restAppointmentValues,
-              id,
-              appointmentDate: moment(date).formatUTC(),
-            },
+    return allDates.map(date =>
+      shouldDumpID || id === undefined
+        ? {
+            ...restAppointmentValues,
+            appointments_Resources: restAppointmentValues.appointments_Resources.map(
+              ({ appointmentFK, ...restItem }) => ({ ...restItem }),
+            ),
+            appointmentDate: moment(date).formatUTC(),
+          }
+        : {
+            ...restAppointmentValues,
+            id,
+            appointmentDate: moment(date).formatUTC(),
+          },
     )
   }
   return null
@@ -344,17 +408,17 @@ export const getRecurrenceLastDate = (recurrences = []) =>
     ? moment(recurrences[recurrences.length - 1]).formatUTC()
     : undefined
 
-export const getFirstAppointmentType = (appointment) => {
+export const getFirstAppointmentType = appointment => {
   const { appointment_Resources: resources = [] } = appointment
 
   if (resources.length > 0) {
-    const first = resources.find((item) => item.sortOrder === 0)
+    const first = resources.find(item => item.sortOrder === 0)
     return first && first.appointmentTypeFK
   }
   return null
 }
 
-export const filterRecurrenceDto = (recurrenceDto) => {
+export const filterRecurrenceDto = recurrenceDto => {
   const { recurrencePatternFK } = recurrenceDto
   // daily
   if (recurrencePatternFK === 1) {
@@ -391,7 +455,7 @@ export const sortDataGrid = (a, b) => {
   return 0
 }
 
-export const getEndTime = (row) => {
+export const getEndTime = row => {
   const { endTime, apptDurationHour, apptDurationMinute, startTime } = row
 
   if (!startTime) return endTime

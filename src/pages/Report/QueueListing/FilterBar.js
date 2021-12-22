@@ -9,6 +9,8 @@ import {
   GridContainer,
   GridItem,
   SizeContainer,
+  VisitTypeSelect,
+  Tooltip,
 } from '@/components'
 // medisys components
 import { DoctorProfileSelect } from '@/components/_medisys'
@@ -28,32 +30,53 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={2}>
             <FastField
               name='isSeperatePaymentMode'
-              render={(args) => (
+              render={args => (
                 <Checkbox {...args} label='Separate Payment Mode' />
               )}
+            />
+          </GridItem>
+          <GridItem md={3}></GridItem>
+          <GridItem md={2} />
+          <GridItem md={2}>
+            <FastField
+              name='doctorID'
+              render={args => <DoctorProfileSelect {...args} />}
+            />
+          </GridItem>
+          <GridItem md={2}>
+            <FastField
+              name='visitTypeIDs'
+              render={args => (
+                <Tooltip
+                  placement='right'
+                  title='Select "All" will retrieve active and inactive visit type'
+                >
+                  <VisitTypeSelect
+                    label='Visit Type'
+                    {...args}
+                    mode='multiple'
+                    maxTagPlaceholder='Visit Types'
+                    allowClear={true}
+                  />
+                </Tooltip>
+              )}
+            />
+          </GridItem>
+          <GridItem md={2}>
+            <FastField
+              name='asAt'
+              render={args => <Checkbox {...args} label='As At' />}
             />
           </GridItem>
           <GridItem md={3}>
             <Button
               color='primary'
               onClick={handleSubmit}
+              style={{ position: 'relative', top: -5 }}
               disabled={isSubmitting}
             >
               Generate Report
             </Button>
-          </GridItem>
-          <GridItem md={3} />
-          <GridItem md={4}>
-            <FastField
-              name='doctorID'
-              render={(args) => <DoctorProfileSelect {...args} />}
-            />
-          </GridItem>
-          <GridItem md={2}>
-            <FastField
-              name='asAt'
-              render={(args) => <Checkbox {...args} label='As At' />}
-            />
           </GridItem>
         </GridContainer>
       </React.Fragment>

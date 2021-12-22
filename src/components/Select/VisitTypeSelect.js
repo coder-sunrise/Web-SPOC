@@ -16,17 +16,18 @@ class VisitTypeSelect extends React.Component {
         const { name, code, sortOrder, ...rest } = item
         const visitType = visitTypeSettingsObj
           ? visitTypeSettingsObj[index]
-          : undefined
+          : undefined 
         return {
           ...rest,
           name: visitType?.displayValue || name,
           code: visitType?.code || code,
-          isEnabled: visitType?.isEnabled || 'true',
+          isEnabled: visitType?.isEnabled === 'true' || !visitType?.isEnabled,
           sortOrder: visitType?.sortOrder || 0,
           customTooltipField: `Code: ${visitType?.code ||
             code}\nName: ${visitType?.displayValue || name}`,
         }
       })
+      .filter(t => t.isEnabled)
       .sort((a, b) => (a.sortOrder >= b.sortOrder ? 1 : -1))
   }
 
@@ -34,7 +35,10 @@ class VisitTypeSelect extends React.Component {
     const { dispatch, clinicSettings } = this.props
     dispatch({
       type: 'codetable/fetchCodes',
-      payload: { code: 'ctVisitpurpose', force: true },
+      payload: {
+        code: 'ctVisitpurpose',
+        force: true,
+      },
     }).then(result => {
       if (result) {
         const visitTypeSetting = JSON.parse(

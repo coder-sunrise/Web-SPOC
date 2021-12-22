@@ -126,6 +126,7 @@ const DispenseDetails = ({
   patient,
   user,
   visitRegistration,
+  isIncludeExpiredItem = false,
 }) => {
   const {
     dispenseItems = [],
@@ -279,7 +280,8 @@ const DispenseDetails = ({
   }
 
   const isRetailVisit = visitPurposeFK === VISIT_TYPE.OTC
-  const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BF
+  const isBillFirstVisit =
+    visitPurposeFK === VISIT_TYPE.BF || visitPurposeFK === VISIT_TYPE.MC
   const disableRefreshOrder = isBillFirstVisit && !clinicalObjectRecordFK
   const disableDiscard = totalPayment > 0 || !!clinicalObjectRecordFK
   const [showRemovePayment, setShowRemovePayment] = useState(false)
@@ -613,7 +615,12 @@ const DispenseDetails = ({
             )}
             {!isBillFirstVisit && (
               <Authorized authority='queue.dispense.savedispense'>
-                <ProgressButton color='success' size='sm' onClick={onSaveClick}>
+                <ProgressButton
+                  color='success'
+                  size='sm'
+                  onClick={onSaveClick}
+                  disabled={isIncludeExpiredItem}
+                >
                   Save Dispense
                 </ProgressButton>
               </Authorized>
@@ -662,6 +669,7 @@ const DispenseDetails = ({
                   color='primary'
                   size='sm'
                   icon={<AttachMoney />}
+                  disabled={isIncludeExpiredItem}
                   onClick={() => {
                     if (dispense && dispense.totalWithGST < 0) {
                       window.g_app._store.dispatch({
@@ -1042,14 +1050,6 @@ const DispenseDetails = ({
                 id: values.id,
                 version: version,
               },
-            }).then(r => {
-              dispatch({
-                type: 'dispense/updateState',
-                payload: {
-                  entity: r,
-                  version: version,
-                },
-              })
             })
           }}
         />

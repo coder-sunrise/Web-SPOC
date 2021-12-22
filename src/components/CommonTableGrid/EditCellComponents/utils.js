@@ -153,6 +153,7 @@ function getCommonConfig() {
   const {
     validationSchema,
     isDisabled = () => false,
+    isHiddend = () => false,
     onChange,
     gridId,
     getRowId,
@@ -168,6 +169,7 @@ function getCommonConfig() {
       o.path === cfg.columnName || o.path.indexOf(`${cfg.columnName}[`) === 0,
   )
   const disabled = isDisabled(latestRow)
+  const hiddend = isHiddend(latestRow)
   const error = errorObj ? errorObj.message : ''
   // console.log(columnName, latestRow[columnName], this.props.value)
   const commonCfg = {
@@ -178,6 +180,7 @@ function getCommonConfig() {
     value: latestRow[columnName] || this.props.value,
     defaultValue: getInitialValue ? getInitialValue(row) : undefined,
     disabled,
+    hiddend,
     row: latestRow,
     text: text || !editMode,
     validSchema: _row => {
@@ -202,7 +205,7 @@ function getCommonConfig() {
 function getCommonRender(cb) {
   const { value, editMode } = this.props
   const cfg = getCommonConfig.call(this)
-  const { render, error, row, isReactComponent } = cfg
+  const { render, error, row, isReactComponent, hiddend } = cfg
   // console.log(row, this.props.row)
   // console.log('getCommonRender', row, this.props.row)
   if (render) {
@@ -217,7 +220,7 @@ function getCommonRender(cb) {
   if (typeof value === 'object' && React.isValidElement(value)) {
     return <span>{value}</span>
   }
-  return cb(cfg)
+  return hiddend ? '' : cb(cfg)
 }
 
 export {

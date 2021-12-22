@@ -15,7 +15,7 @@ import {
 import * as Helper from './helper'
 import { primaryColor } from '@/assets/jss'
 
-const styles = (theme) => ({
+const styles = theme => ({
   root: {
     width: '530px',
     textAlign: 'left',
@@ -45,10 +45,10 @@ const styles = (theme) => ({
     display: 'flex',
     alignItems: 'center',
   },
-  updateOnStyle:{
-    '& > div > div > div > div > input':{
-      color:'black !important',
-    }
+  updateOnStyle: {
+    '& > div > div > div > div > input': {
+      color: 'black !important',
+    },
   },
 })
 
@@ -64,12 +64,11 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
     patientName,
     patientProfile,
     patientContactNo,
-    clinicianFK,
     startTime,
     endTime,
-    clinicianName,
     updateByUser,
     updateDate,
+    resourceName,
   } = popoverEvent
 
   const date = moment(appointmentDate)
@@ -90,13 +89,13 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
   const TimeLabel = (
     <Fragment>
       <span className={classes.datetimeLabel}>
-        {Helper.getTimeRange(appointmentResources, { startTime, endTime })}
+        {Helper.getTimeRange([], { startTime, endTime })}
       </span>
     </Fragment>
   )
 
   const appointmentType = ctappointmenttype.find(
-    (item) => item.id === appointmentTypeFK,
+    item => item.id === appointmentTypeFK,
   )
   const appointmentColor = appointmentType
     ? appointmentType.tagColorHex
@@ -115,7 +114,7 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
           <h4 className={classes.titleLabel}>{title}</h4>
         </GridItem>
         <GridItem md={12}>
-          <span>Doctor: {clinicianName}</span>
+          <span>Resource: {resourceName}</span>
         </GridItem>
         <GridItem className={classes.iconRow}>{AppointmentDateLabel}</GridItem>
         <GridItem>
@@ -161,7 +160,11 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
           <TextField disabled label='Update By' value={updateByUser} />
         </GridItem>
         <GridItem md={6}>
-          <TextField disabled label='Update On' value={moment(updateDate).format('DD MMM YYYY HH:mm')} />
+          <TextField
+            disabled
+            label='Update On'
+            value={moment(updateDate).format('DD MMM YYYY HH:mm')}
+          />
         </GridItem>
         <GridItem md={12}>
           <TextField

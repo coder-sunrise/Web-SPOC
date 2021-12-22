@@ -33,6 +33,7 @@ const styles = theme => ({
   user,
   mainDivHeight: global.mainDivHeight,
   appointmentTypes: codetable.ctappointmenttype,
+  ctcalendarresource: codetable.ctcalendarresource,
 }))
 class AppointmentHistory extends PureComponent {
   state = {
@@ -62,7 +63,14 @@ class AppointmentHistory extends PureComponent {
       !viewOtherApptAccessRight ||
       viewOtherApptAccessRight.rights !== 'enable'
     ) {
-      doctor = user.data.clinicianProfile.id
+      const calendarresource = ctcalendarresource.find(
+        resource =>
+          resource.isActive &&
+          resource.clinicianProfileDto?.id === user.data.clinicianProfile.id,
+      )
+      if (calendarresource) {
+        doctor = calendarresource.id
+      }
     }
 
     await dispatch({
@@ -113,14 +121,14 @@ class AppointmentHistory extends PureComponent {
         item => item.sortOrder === 0,
       )
       let startTime = ''
-      let doctor = 0
+      let calendarResourceFK = 0
       let { appointmentDate } = o
 
       if (firstAppointment) {
         startTime = moment(firstAppointment.startTime, 'HH:mm:ss').format(
           'hh:mm A',
         )
-        doctor = firstAppointment.clinicianFK
+        calendarResourceFK = firstAppointment.calendarResourceFK
         appointmentDate = `${moment(o.appointmentDate).format(
           'YYYY-MM-DD',
         )} ${moment(firstAppointment.startTime, 'HH:mm:ss').format('HH:mm:ss')}`
@@ -134,7 +142,7 @@ class AppointmentHistory extends PureComponent {
         ...o,
         appointmentDate,
         startTime,
-        doctor,
+        calendarResourceFK,
         appointmentStatus: apptStatus ? apptStatus.name || '' : '',
         appointmentStatusFk: apptStatusId,
         appointmentRemarks: o.appointmentRemarks || '',

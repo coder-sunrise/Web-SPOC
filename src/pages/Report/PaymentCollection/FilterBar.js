@@ -10,6 +10,8 @@ import {
   GridItem,
   RadioGroup,
   SizeContainer,
+  VisitTypeSelect,
+  Tooltip,
 } from '@/components'
 // medisys components
 import { DoctorProfileSelect } from '@/components/_medisys'
@@ -22,7 +24,25 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
         <GridContainer alignItems='center'>
           {/* 1st row  */}
           <ReportDateRangePicker />
-
+          <GridItem md={2}>
+            <FastField
+              name='visitTypeIDs'
+              render={args => (
+                <Tooltip
+                  placement='right'
+                  title='Select "All" will retrieve active and inactive visit type'
+                >
+                  <VisitTypeSelect
+                    label='Visit Type'
+                    {...args}
+                    mode='multiple'
+                    maxTagPlaceholder='Visit Types'
+                    allowClear={true}
+                  />
+                </Tooltip>
+              )}
+            />
+          </GridItem>
           <GridItem md={2}>
             <FastField
               name='doctorID'
@@ -59,7 +79,6 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
               )}
             />
           </GridItem>
-          <GridItem md={2} />
 
           <GridItem md={2}>
             <FastField

@@ -177,6 +177,7 @@ const tenantCodesMap = new Map([
     'ctcopayer',
     {
       ...defaultParams,
+      sorting: [{ columnName: 'displayValue', direction: 'asc' }],
     },
   ],
   [
@@ -266,10 +267,17 @@ const tenantCodesMap = new Map([
       ...defaultParams,
     },
   ],
+  [
+    'ctcalendarresource',
+    {
+      pagesize: 99999,
+      sorting: [{ columnName: 'resourceType', direction: 'asc' }],
+    },
+  ],
 ])
 
 // always get latest codetable
-const skipCache = ['doctorprofile', 'clinicianprofile']
+const skipCache = ['doctorprofile', 'clinicianprofile', 'ctcalendarresource']
 
 const noSortOrderProp = ['doctorprofile', 'clinicianprofile', 'role', 'cttag']
 

@@ -33,6 +33,7 @@ const PatientInfoInput = ({
   values,
   hasActiveSession,
   patientIsActive,
+  containsPrimaryClinician,
 }) => {
   const isRegisteredPatient =
     patientProfileFK !== undefined && patientProfileFK !== null
@@ -86,9 +87,7 @@ const PatientInfoInput = ({
                       await form.setFieldValue(field.name, e)
                       onSearchPatientClick()
                     }
-                  } catch (error) {
-                    console.error({ error })
-                  }
+                  } catch (error) {}
                 }}
               />
             )}
@@ -138,7 +137,7 @@ const PatientInfoInput = ({
                   </Button>
                 </Authorized>
               )}
-              {hasActiveSession && (
+              {hasActiveSession && containsPrimaryClinician && (
                 <Authorized authority='queue.registervisit'>
                   <Button
                     size='sm'

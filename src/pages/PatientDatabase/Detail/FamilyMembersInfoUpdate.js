@@ -28,24 +28,19 @@ export default class FamilyMembersInfoUpdate extends Component {
   }
   componentWillMount = () => {
     const {
-      patientProfileFK,
-      address,
-      scheme,
       dispatch,
-      newFamilyMembers = [],
+      patientProfileFK,
+      familyMembers = [],
     } = this.props
     dispatch({
       type: 'patient/getFamilyMembersInfo',
       payload: {
         patientProfileFK,
-        getAddress: address,
-        getScheme: scheme,
-        newFamilyMembers: newFamilyMembers.join(','),
+        familyMembers: JSON.stringify(familyMembers),
       },
     }).then(r => {
       if (r) {
         this.setState({ familyMembersInfo: r })
-        console.log('getFamilyMemberinfo',r)
       }
     })
   }

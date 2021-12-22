@@ -75,7 +75,7 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
               <div style={{ position: 'relative', top: 2 }}>
                 {drugMixtureIndicator(row, -20)}
                 {row.isPreOrder && (
-                  <Tooltip title='Pre-Order'>
+                  <Tooltip title='New Pre-Order'>
                     <div
                       className={classes.rightIcon}
                       style={{
@@ -169,7 +169,7 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
       width: 90,
       render: (text, row) =>
         showCurrency(
-          row.isPreOrder && !row.isChargeToday
+          (row.isPreOrder && !row.isChargeToday) || row.hasPaid
             ? 0
             : row.totalAfterItemAdjustment,
         ),

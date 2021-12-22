@@ -17,14 +17,19 @@ import {
   SizeContainer,
   OutlinedTextField,
   withFormikExtend,
-  Button
+  Button,
 } from '@/components'
 // medisys components
 import { LoadingWrapper, Recurrence } from '@/components/_medisys'
 // custom components
 import PatientProfile from '@/pages/PatientDatabase/Detail'
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
-import { APPOINTMENT_STATUS, APPOINTMENT_CANCELLEDBY, CANNED_TEXT_TYPE } from '@/utils/constants'
+import {
+  APPOINTMENT_STATUS,
+  APPOINTMENT_CANCELLEDBY,
+  CANNED_TEXT_TYPE,
+  CALENDAR_RESOURCE,
+} from '@/utils/constants'
 import { getBizSession } from '@/services/queue'
 import Authorized from '@/utils/Authorized'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
@@ -55,7 +60,7 @@ const gridValidationSchema = Yup.object().shape({
   endTime: Yup.string().required(),
   apptDurationHour: Yup.number().required(),
   apptDurationMinute: Yup.number().required(),
-  clinicianFK: Yup.string().required(),
+  calendarResourceFK: Yup.number().required(),
   appointmentTypeFK: Yup.string().required(),
 })
 
@@ -69,7 +74,7 @@ const gridValidationSchema = Yup.object().shape({
     patient,
     patientSearch,
     global,
-    visitRegistration
+    visitRegistration,
   }) => ({
     loginSEMR,
     loading,
@@ -86,7 +91,8 @@ const gridValidationSchema = Yup.object().shape({
     appointmentStatuses: codetable.ltappointmentstatus,
     clinicianProfiles: codetable.clinicianprofile,
     patientSearchResult: patientSearch.list,
-    visitRegistration
+    visitRegistration,
+    ctcalendarresource: codetable.ctcalendarresource,
   }),
 )
 @withFormikExtend({
@@ -116,7 +122,7 @@ class Form extends React.PureComponent {
   }
 
   componentDidMount = async () => {
-    const { values, dispatch } = this.props
+    const { values, dispatch, setFieldValue } = this.props
     const response = await dispatch({
       type: 'visitRegistration/getVisitOrderTemplateList',
       payload: {
@@ -126,8 +132,8 @@ class Form extends React.PureComponent {
     if (response) {
       const { data } = response
       const templateOptions = data
-        .filter((template) => template.isActive)
-        .map((template) => {
+        .filter(template => template.isActive)
+        .map(template => {
           return {
             ...template,
             value: template.id,
@@ -161,6 +167,13 @@ class Form extends React.PureComponent {
     }
 
     this.validateDataGrid()
+
+    setTimeout(() => {
+      const { values, setFieldValue } = this.props
+      if (values.isFromDragOrResize) {
+        setFieldValue('isFromDragOrResize', false)
+      }
+    }, 500)
   }
 
   checkHasActiveSession = async () => {
@@ -176,11 +189,10 @@ class Form extends React.PureComponent {
           hasActiveSession: data.length > 0,
         }
       })
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
-  refreshPatient = (id) => {
+  refreshPatient = id => {
     this.props
       .dispatch({
         type: 'patient/query',
@@ -188,7 +200,7 @@ class Form extends React.PureComponent {
           id,
         },
       })
-      .then((pat) => {
+      .then(pat => {
         this.props.dispatch({
           type: 'patient/updateState',
           payload: { entity: pat },
@@ -196,7 +208,7 @@ class Form extends React.PureComponent {
       })
   }
 
-  onRecurrencePatternChange = async (recurrencePatternFK) => {
+  onRecurrencePatternChange = async recurrencePatternFK => {
     const { setFieldValue, setFieldTouched } = this.props
     // reset other field first
     await setFieldValue('recurrenceDto.recurrenceDaysOfTheWeek', [])
@@ -282,8 +294,7 @@ class Form extends React.PureComponent {
     // )
   }
 
-  checkShouldPopulate = (patientSearchResult) =>
-    patientSearchResult.length === 1
+  checkShouldPopulate = patientSearchResult => patientSearchResult.length === 1
 
   onSearchPatient = async () => {
     const { dispatch, values } = this.props
@@ -362,7 +373,7 @@ class Form extends React.PureComponent {
     })
   }
 
-  deleteDraft = (id) => {
+  deleteDraft = id => {
     const { onClose, dispatch } = this.props
     dispatch({
       type: 'calendar/deleteDraft',
@@ -419,7 +430,7 @@ class Form extends React.PureComponent {
     dispatch({
       type: 'calendar/cancelAppointment',
       payload,
-    }).then((response) => {
+    }).then(response => {
       if (response) {
         this.setState({
           showDeleteConfirmationModal: false,
@@ -438,15 +449,9 @@ class Form extends React.PureComponent {
           })
         }
 
-        return [
-          ...result,
-          { ...data, _errors: [] },
-        ]
+        return [...result, { ...data, _errors: [] }]
       } catch (error) {
-        return [
-          ...result,
-          { ...data, _errors: error.inner },
-        ]
+        return [...result, { ...data, _errors: error.inner }]
       }
     }, [])
     return endResult
@@ -460,23 +465,25 @@ class Form extends React.PureComponent {
       // const newDatagrid = datagrid.filter(
       //   (event) => !deleted.includes(event.id),
       // )
-      const afterDelete = datagrid.map((item) => ({
+      const afterDelete = datagrid.map(item => ({
         ...item,
         isDeleted: item.isDeleted || deleted.includes(item.id),
       }))
       const primayDoctor = afterDelete.find(
-        (item) => !item.isDeleted && item.isPrimaryClinician,
+        item => !item.isDeleted && item.isPrimaryClinician,
       )
-      const firstUnDelete = afterDelete.filter((item) => !item.isDeleted)[0]
-      let newDataGrid = [
-        ...afterDelete,
-      ]
+      const firstUnDelete = afterDelete.find(
+        item =>
+          !item.isDeleted &&
+          item.calendarResource.resourceType === CALENDAR_RESOURCE.DOCTOR,
+      )
+      let newDataGrid = [...afterDelete]
       if (primayDoctor) {
         newDataGrid = afterDelete
       } else {
-        newDataGrid = afterDelete.map((item) => ({
+        newDataGrid = afterDelete.map(item => ({
           ...item,
-          isPrimaryClinician: firstUnDelete.id === item.id,
+          isPrimaryClinician: firstUnDelete?.id === item.id,
         }))
       }
 
@@ -523,7 +530,7 @@ class Form extends React.PureComponent {
 
     if (
       this.validateWithSchema(datagrid).filter(
-        (item) => item._errors && item._errors.length > 0,
+        item => item._errors && item._errors.length > 0,
       ).length > 0
     )
       isDataGridValid = false
@@ -531,14 +538,8 @@ class Form extends React.PureComponent {
     // has at least 1 row of appointment_resources
     if (datagrid.length === 0) isDataGridValid = false
 
-    const filterDeleted = datagrid.filter((item) => !item.isDeleted)
-    const hasPrimary = filterDeleted.reduce(
-      (hasPrimaryClinician, item) =>
-        item.isPrimaryClinician || hasPrimaryClinician,
-      false,
-    )
+    const filterDeleted = datagrid.filter(item => !item.isDeleted)
 
-    if (!hasPrimary) isDataGridValid = false
     this.setState({
       isDataGridValid,
       // datagrid: newDataGrid,
@@ -583,14 +584,12 @@ class Form extends React.PureComponent {
       dispatch({
         type: 'calendar/submit',
         payload: submitPayload,
-      }).then((response) => {
+      }).then(response => {
         if (validate && response) {
-          const conflicts = [
-            ...response,
-          ]
+          const conflicts = [...response]
 
           this.setState(
-            (preState) => ({
+            preState => ({
               submitCount: preState.submitCount + 1,
               datagrid: preState.datagrid.reduce(
                 (data, d) => [
@@ -620,15 +619,14 @@ class Form extends React.PureComponent {
           onConfirm()
         }
       })
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
-  onDeleteClick = () => { }
+  onDeleteClick = () => {}
 
   onValidateClick = () => {
     const appointmentStatus = this.props.appointmentStatuses.find(
-      (item) => item.code === 'SCHEDULED',
+      item => item.code === 'SCHEDULED',
     )
     const { tempNewAppointmentStatusFK } = this.state
     this.setState(
@@ -696,15 +694,15 @@ class Form extends React.PureComponent {
       let newAppointmentStatusFK = APPOINTMENT_STATUS.CONFIRMED
       const rescheduleFK = APPOINTMENT_STATUS.RESCHEDULED
       let originalAppointment = viewingAppointment.appointments.find(
-        (t) => t.id === values.currentAppointment.id,
+        t => t.id === values.currentAppointment.id,
       )
 
-      let newResource = Array.from(datagrid, (resource) => {
+      let newResource = Array.from(datagrid, resource => {
         let startTime = `${resource.startTime}:00`
         let endTime = `${resource.endTime}:00`
         const {
           appointmentFK,
-          clinicianFK,
+          calendarResourceFK,
           clinicianName,
           clinicianTitle,
           sortOrder,
@@ -714,13 +712,13 @@ class Form extends React.PureComponent {
           concurrencyToken,
           apptDurationHour,
           apptDurationMinute,
-          preClinicianFK,
+          preCalendarResourceFK,
           roomFk,
           appointmentTypeFK,
         } = resource
         return {
           appointmentFK,
-          clinicianFK,
+          calendarResourceFK,
           clinicianName,
           clinicianTitle,
           startTime,
@@ -732,7 +730,7 @@ class Form extends React.PureComponent {
           concurrencyToken,
           apptDurationHour,
           apptDurationMinute,
-          preClinicianFK,
+          preCalendarResourceFK,
           roomFk,
           appointmentTypeFK,
         }
@@ -741,10 +739,10 @@ class Form extends React.PureComponent {
       if (originalAppointment) {
         originalResource = Array.from(
           originalAppointment.appointments_Resources,
-          (resource) => {
+          resource => {
             const {
               appointmentFK,
-              clinicianFK,
+              calendarResourceFK,
               clinicianName,
               clinicianTitle,
               startTime,
@@ -756,13 +754,13 @@ class Form extends React.PureComponent {
               concurrencyToken,
               apptDurationHour,
               apptDurationMinute,
-              preClinicianFK,
+              preCalendarResourceFK,
               roomFk,
               appointmentTypeFK,
             } = resource
             return {
               appointmentFK,
-              clinicianFK,
+              calendarResourceFK,
               clinicianName,
               clinicianTitle,
               startTime,
@@ -774,7 +772,7 @@ class Form extends React.PureComponent {
               concurrencyToken,
               apptDurationHour,
               apptDurationMinute,
-              preClinicianFK,
+              preCalendarResourceFK,
               roomFk,
               appointmentTypeFK,
             }
@@ -833,8 +831,7 @@ class Form extends React.PureComponent {
           return true
         },
       )
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   openRescheduleForm = () => {
@@ -847,7 +844,7 @@ class Form extends React.PureComponent {
     })
   }
 
-  closeSeriesUpdateConfirmation = (callback = (f) => f) => {
+  closeSeriesUpdateConfirmation = (callback = f => f) => {
     this.setState({ showSeriesUpdateConfirmation: false }, callback)
   }
 
@@ -855,7 +852,7 @@ class Form extends React.PureComponent {
     this.setState({ showRescheduleForm: false })
   }
 
-  onConfirmSeriesUpdate = async (type) => {
+  onConfirmSeriesUpdate = async type => {
     await this.props.setFieldValue('overwriteEntireSeries', type === '2', false)
     const { tempNewAppointmentStatusFK } = this.state
 
@@ -865,7 +862,7 @@ class Form extends React.PureComponent {
     } else this.closeSeriesUpdateConfirmation(this._submit)
   }
 
-  onConfirmReschedule = async (rescheduleValues) => {
+  onConfirmReschedule = async rescheduleValues => {
     const { setValues, values } = this.props
     // const { rescheduledByFK } = rescheduleValues
     // let { appointmentStatusFk } = values
@@ -881,12 +878,10 @@ class Form extends React.PureComponent {
     this._submit()
   }
 
-  onEditingRowsChange = (rows) => {
+  onEditingRowsChange = rows => {
     this.setState(
       {
-        editingRows: [
-          ...rows,
-        ],
+        editingRows: [...rows],
       },
       () => this.validateDataGrid(),
     )
@@ -905,16 +900,13 @@ class Form extends React.PureComponent {
   getVisregUrl = () => {
     const { datagrid } = this.state
     const { values, history } = this.props
-    const primaryDoctorResource = datagrid.find(
-      (item) => item.isPrimaryClinician,
-    )
-    const firstResource = datagrid.find((i) => i.sortOrder === 0)
-
+    const primaryDoctorResource = datagrid.find(item => item.isPrimaryClinician)
+    const firstResource = datagrid.find(i => i.sortOrder === 0)
     const parameters = {
       md: 'visreg',
       pid: values.patientProfileFK,
       apptid: values.currentAppointment.id,
-      pdid: primaryDoctorResource.clinicianFK, // primary clinician id
+      pdid: primaryDoctorResource?.calendarResource?.clinicianProfileDto?.id, // primary clinician id
     }
 
     if (firstResource.roomFk) {
@@ -923,6 +915,14 @@ class Form extends React.PureComponent {
     }
 
     return getAppendUrl(parameters)
+  }
+
+  containsPrimaryClinician = () => {
+    const { datagrid } = this.state
+    if (datagrid.find(item => item.isPrimaryClinician)) {
+      return true
+    }
+    return false
   }
 
   onViewPatientProfile = () => {
@@ -1011,7 +1011,7 @@ class Form extends React.PureComponent {
   }
 
   updatePreOrderSequence = (appointmentPreOrderItem = []) => {
-    let sequence = 0;
+    let sequence = 0
     appointmentPreOrderItem.forEach(po => {
       if (!po.isDeleted) {
         po.sequence = sequence
@@ -1025,17 +1025,23 @@ class Form extends React.PureComponent {
     const { currentAppointment = {} } = values
     let { appointmentPreOrderItem = [] } = currentAppointment
     selectPreOrder.forEach(po => {
-      let currentPreOrder = appointmentPreOrderItem.find(apo => apo.actualizedPreOrderItemFK === po.id)
+      let currentPreOrder = appointmentPreOrderItem.find(
+        apo => apo.actualizedPreOrderItemFK === po.id,
+      )
       if (currentPreOrder) {
         currentPreOrder.isDeleted = false
-      }
-      else {
+      } else {
         const { id, ...resetPreOrderItem } = po
-        appointmentPreOrderItem = [...appointmentPreOrderItem, { ...resetPreOrderItem, actualizedPreOrderItemFK: id }]
+        appointmentPreOrderItem = [
+          ...appointmentPreOrderItem,
+          { ...resetPreOrderItem, actualizedPreOrderItemFK: id },
+        ]
       }
     })
     this.updatePreOrderSequence(appointmentPreOrderItem)
-    setFieldValue("currentAppointment.appointmentPreOrderItem", [...appointmentPreOrderItem])
+    setFieldValue('currentAppointment.appointmentPreOrderItem', [
+      ...appointmentPreOrderItem,
+    ])
     setFieldValue('currentAppointment.dirty', true)
     this.setState({ showSelectPreOrder: false })
   }
@@ -1055,11 +1061,11 @@ class Form extends React.PureComponent {
           openConfirmText: 'OK',
           openConfirmContent: `Check Recurrence will remove all Pre-Order.`,
           onConfirmSave: () => {
-            setFieldValue("currentAppointment.appointmentPreOrderItem", [])
+            setFieldValue('currentAppointment.appointmentPreOrderItem', [])
           },
           onConfirmClose: () => {
             setFieldValue('isEnableRecurrence', false)
-          }
+          },
         },
       })
     }
@@ -1067,8 +1073,8 @@ class Form extends React.PureComponent {
 
   showPreOrder = () => {
     const { values, mode } = this.props
-    const { isEnableRecurrence, patientProfileFK,currentAppointment } = values
-    const {appointmentPreOrderItem = {}} = currentAppointment
+    const { isEnableRecurrence, patientProfileFK, currentAppointment } = values
+    const { appointmentPreOrderItem = {} } = currentAppointment
     if (!appointmentPreOrderItem.length) return false
     if (values.id) {
       return mode !== 'series'
@@ -1076,22 +1082,29 @@ class Form extends React.PureComponent {
     return patientProfileFK && !isEnableRecurrence
   }
 
-  deletePreOrderItem = (actualizedPreOrderItemFK) => {
+  deletePreOrderItem = actualizedPreOrderItemFK => {
     const { values, setFieldValue } = this.props
     const { currentAppointment = {} } = values
     let { appointmentPreOrderItem = [] } = currentAppointment
 
-    var item = appointmentPreOrderItem.find(poi => poi.actualizedPreOrderItemFK === actualizedPreOrderItemFK)
+    var item = appointmentPreOrderItem.find(
+      poi => poi.actualizedPreOrderItemFK === actualizedPreOrderItemFK,
+    )
     if (item) {
       if (item.id) {
         item.isDeleted = true
-      }
-      else {
-        appointmentPreOrderItem = [...appointmentPreOrderItem.filter(poi => poi.actualizedPreOrderItemFK !== actualizedPreOrderItemFK)]
+      } else {
+        appointmentPreOrderItem = [
+          ...appointmentPreOrderItem.filter(
+            poi => poi.actualizedPreOrderItemFK !== actualizedPreOrderItemFK,
+          ),
+        ]
       }
     }
     this.updatePreOrderSequence(appointmentPreOrderItem)
-    setFieldValue("currentAppointment.appointmentPreOrderItem", [...appointmentPreOrderItem])
+    setFieldValue('currentAppointment.appointmentPreOrderItem', [
+      ...appointmentPreOrderItem,
+    ])
     setFieldValue('currentAppointment.dirty', true)
   }
 
@@ -1101,11 +1114,10 @@ class Form extends React.PureComponent {
     this.setState({
       bannerHeight: bannerHeight,
     })
-    if(bannerHeight === 0)
-        setTimeout(this.setBannerHeight, 1000)
+    if (bannerHeight === 0) setTimeout(this.setBannerHeight, 1000)
   }
 
-  render () {
+  render() {
     const {
       classes,
       theme,
@@ -1164,12 +1176,10 @@ class Form extends React.PureComponent {
     const _datagrid =
       conflicts.length > 0
         ? datagrid
-          .filter((item) => !item.isDeleted)
-          .sort(sortDataGrid)
-          .map((item, index) => ({ ...item, sortOrder: index }))
-        : [
-          ...datagrid,
-        ]
+            .filter(item => !item.isDeleted)
+            .sort(sortDataGrid)
+            .map((item, index) => ({ ...item, sortOrder: index }))
+        : [...datagrid]
 
     const show =
       loading.effects['patientSearch/query'] || loading.models.calendar
@@ -1179,45 +1189,43 @@ class Form extends React.PureComponent {
     const { pendingPreOrderItem = [] } = patientProfile || {}
 
     const draftPreOrderItem = pendingPreOrderItem.map(po => {
-      const selectPreOrder = appointmentPreOrderItem.find(apo => apo.actualizedPreOrderItemFK === po.id)
+      const selectPreOrder = appointmentPreOrderItem.find(
+        apo => apo.actualizedPreOrderItemFK === po.id,
+      )
       if (selectPreOrder) {
         return {
           ...po,
-          preOrderItemStatus: selectPreOrder.isDeleted ? 'New' : 'Actualizing'
+          preOrderItemStatus: selectPreOrder.isDeleted ? 'New' : 'Actualizing',
         }
       }
       return { ...po }
     })
 
-
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer size='sm'>
           <React.Fragment>
-            {values.patientProfileFK && <div style={{ marginTop: -20 }}>
-              <PatientBanner
-                from='Appointment'
-                onSelectPreOrder={this.onSelectPreOrder}
-                disablePreOrder={disablePreOrderConditions}
-                activePreOrderItems={draftPreOrderItem}
-                {...this.props}
+            {values.patientProfileFK && (
+              <div style={{ marginTop: -20 }}>
+                <PatientBanner
+                  from='Appointment'
+                  onSelectPreOrder={this.onSelectPreOrder}
+                  disablePreOrder={disablePreOrderConditions}
+                  activePreOrderItems={draftPreOrderItem}
+                  {...this.props}
                 />
-            </div>}
+              </div>
+            )}
             <GridContainer
               className={classnames(classes.formContent)}
               alignItems='flex-start'
               style={{
-                height: this.props.height - (this.state.bannerHeight || 0),// - 100,
+                height: this.props.height - (this.state.bannerHeight || 0), // - 100,
                 overflow: 'auto',
               }}
             >
               <GridItem container xs={12} md={6}>
-                <GridItem
-                  container
-                  xs
-                  md={12}
-                  justify='flex-start'
-                >
+                <GridItem container xs md={12} justify='flex-start'>
                   <PatientInfoInput
                     disabled={disablePatientInfo}
                     isEdit={values.id}
@@ -1235,8 +1243,13 @@ class Form extends React.PureComponent {
                     appointmentStatusFK={currentAppointment.appointmentStatusFk}
                     values={values}
                     hasActiveSession={this.state.hasActiveSession}
+                    containsPrimaryClinician={this.containsPrimaryClinician()}
                   />
-                  <AppointmentDateInput disabled={_disableAppointmentDate} visitOrderTemplateOptions={visitOrderTemplateOptions} patientProfileFK={values.patientProfileFK}/>
+                  <AppointmentDateInput
+                    disabled={_disableAppointmentDate}
+                    visitOrderTemplateOptions={visitOrderTemplateOptions}
+                    patientProfileFK={values.patientProfileFK}
+                  />
                   <GridItem xs md={12} className={classes.verticalSpacing}>
                     <AppointmentDataGrid
                       validationSchema={gridValidationSchema}
@@ -1250,33 +1263,40 @@ class Form extends React.PureComponent {
                     />
                   </GridItem>
                   <GridItem xs md={12}>
-                  <div style={{ position: 'relative' }}>
-                    <span>Appointment Remarks</span>
-                    <Field
-                      name='currentAppointment.appointmentRemarks'
-                      render={(args) => (
-                        <OutlinedTextField
-                          {...args}
-                          disabled={disableDataGrid}
-                          rows='5'
-                          multiline
-                          maxLength={2000}
-                          label=''
-                          className={classes.apptRemarksMultiline}
-                        />
-                      )}
-                    />
+                    <div style={{ position: 'relative' }}>
+                      <span>Appointment Remarks</span>
+                      <Field
+                        name='currentAppointment.appointmentRemarks'
+                        render={args => (
+                          <OutlinedTextField
+                            {...args}
+                            disabled={disableDataGrid}
+                            rows='5'
+                            multiline
+                            maxLength={2000}
+                            label=''
+                            className={classes.apptRemarksMultiline}
+                          />
+                        )}
+                      />
                       <CannedTextButton
                         buttonType='text'
                         disabled={disableDataGrid}
                         cannedTextTypeFK={CANNED_TEXT_TYPE.APPOINTMENTREMARKS}
                         style={{
-                          position: 'absolute', top: -5, right: -7,
+                          position: 'absolute',
+                          top: -5,
+                          right: -7,
                         }}
-                        handleSelectCannedText={(cannedText) => {
+                        handleSelectCannedText={cannedText => {
                           const remarks = currentAppointment.appointmentRemarks
-                          const newRemaks = `${remarks ? (remarks + ' ') : ''}${cannedText.text || ''}`.substring(0, 2000)
-                          setFieldValue('currentAppointment.appointmentRemarks', newRemaks)
+                          const newRemaks = `${
+                            remarks ? remarks + ' ' : ''
+                          }${cannedText.text || ''}`.substring(0, 2000)
+                          setFieldValue(
+                            'currentAppointment.appointmentRemarks',
+                            newRemaks,
+                          )
                         }}
                       />
                     </div>
@@ -1294,7 +1314,13 @@ class Form extends React.PureComponent {
                     />
                   </GridItem>
                   <GridItem xs md={12}>
-                    {this.showPreOrder() && <PreOrder {...this.props} deletePreOrderItem={this.deletePreOrderItem} disabled={disableDataGrid}></PreOrder>}
+                    {this.showPreOrder() && (
+                      <PreOrder
+                        {...this.props}
+                        deletePreOrderItem={this.deletePreOrderItem}
+                        disabled={disableDataGrid}
+                      ></PreOrder>
+                    )}
                   </GridItem>
                 </GridItem>
 
@@ -1322,7 +1348,7 @@ class Form extends React.PureComponent {
                 >
                   <h4 style={{ fontWeight: 500 }}>Appointment History</h4>
                   <AppointmentHistory
-                    handleRowDoubleClick={(data) => {
+                    handleRowDoubleClick={data => {
                       onHistoryRowSelected({ ...data, isHistory: true })
                     }}
                     handleCopyAppointmentClick={handleCopyAppointmentClick}

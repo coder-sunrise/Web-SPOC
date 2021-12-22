@@ -51,20 +51,11 @@ const SMS = ({
   doctorprofile,
   user,
 }) => {
-  const [
-    selectedRows,
-    setSelectedRows,
-  ] = useState([])
+  const [selectedRows, setSelectedRows] = useState([])
 
-  const [
-    currentTab,
-    setCurrentTab,
-  ] = useState('0')
+  const [currentTab, setCurrentTab] = useState('0')
 
-  const [
-    showWarning,
-    setShowWarning,
-  ] = useState(false)
+  const [showWarning, setShowWarning] = useState(false)
 
   const newMessageProps = {
     selectedRows,
@@ -89,18 +80,19 @@ const SMS = ({
     [classes.blur]: showWarning,
   })
 
-  const defaultSearchQuery = (type) => {
+  const defaultSearchQuery = type => {
     if (type === 'Appointment') {
       const viewOtherApptAccessRight = Authorized.check(
         'appointment.viewotherappointment',
       )
 
       const isActiveDoctor = doctorprofile.find(
-        (clinician) =>
+        clinician =>
           clinician.clinicianProfile.isActive &&
           clinician.clinicianProfile.id === user.data.clinicianProfile.id,
       )
-      let doctorProperty = 'Appointment_Resources.ClinicianFK'
+      let doctorProperty =
+        'Appointment_Resources.CalendarResourceFKNavigation.ClinicianProfile.Id'
       let doctor
       if (
         !viewOtherApptAccessRight ||
@@ -114,8 +106,8 @@ const SMS = ({
           .add(1, 'months')
           .endOf('day')
           .formatUTC(false),
-          in_AppointmentStatusFk: `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.PFA_RESCHEDULED}|${APPOINTMENT_STATUS.CONFIRMED}`,
-      [doctorProperty]: doctor,
+        in_AppointmentStatusFk: `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.PFA_RESCHEDULED}|${APPOINTMENT_STATUS.CONFIRMED}`,
+        [doctorProperty]: doctor,
       }
     }
 
@@ -128,7 +120,7 @@ const SMS = ({
     }
   }
 
-  const checkSmsConfiguration = async (smsService) => {
+  const checkSmsConfiguration = async smsService => {
     if (!smsService) {
       setShowWarning(true)
       return false
@@ -151,7 +143,7 @@ const SMS = ({
         setShowWarning(true)
         return false
       }
-      const smsFeature = ctAddonFeature.find((o) => o.id === ctAddOnFeatureFK)
+      const smsFeature = ctAddonFeature.find(o => o.id === ctAddOnFeatureFK)
       if (!smsFeature) {
         setShowWarning(true)
         return false
@@ -181,7 +173,7 @@ const SMS = ({
   useEffect(() => {
     const { addOnSubscriptions } = clinicInfo
     const smsService = addOnSubscriptions.find(
-      (o) => o.ctAddOnFeatureFK === ADD_ON_FEATURE.SMS,
+      o => o.ctAddOnFeatureFK === ADD_ON_FEATURE.SMS,
     )
 
     checkSmsConfiguration(smsService)
@@ -208,7 +200,7 @@ const SMS = ({
           <Tabs
             defaultActiveKey='0'
             options={SmsOption(gridProps)}
-            onChange={(e) => setCurrentTab(e)}
+            onChange={e => setCurrentTab(e)}
           />
           <div className={classes.sendBar}>
             <New {...newMessageProps} />

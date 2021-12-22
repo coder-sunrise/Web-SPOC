@@ -1,6 +1,10 @@
 import React from 'react'
 import { dateFormatLong } from '@/utils/format'
-import { APPOINTMENT_STATUS, CANCELLATION_REASON_TYPE, mapApptStatus } from '@/utils/constants'
+import {
+  APPOINTMENT_STATUS,
+  CANCELLATION_REASON_TYPE,
+  mapApptStatus,
+} from '@/utils/constants'
 import { CodeSelect, Tooltip } from '@/components'
 import moment from 'moment'
 import { AppointmentTypeLabel } from '@/components/_medisys'
@@ -44,9 +48,9 @@ export const commonExt = appointmentTypes => {
       sortingEnabled: false,
     },
     {
-      columnName: 'doctor',
+      columnName: 'calendarResourceFK',
       type: 'codeSelect',
-      code: 'clinicianprofile',
+      code: 'ctcalendarresource',
       valueField: 'id',
       labelField: 'name',
     },
@@ -118,7 +122,7 @@ export const previousApptTableParams = appointmentTypes => {
     columns: [
       { name: 'appointmentDate', title: 'Date' },
       { name: 'startTime', title: 'Time' },
-      { name: 'doctor', title: 'Doctor' },
+      { name: 'calendarResourceFK', title: 'Resource' },
       { name: 'appointmentTypeFK', title: 'Appt Type' },
       { name: 'appointmentStatus', title: 'Status' },
       { name: 'cancellationReason', title: 'Reason' },
@@ -135,7 +139,7 @@ export const futureApptTableParams = appointmentTypes => {
     columns: [
       { name: 'appointmentDate', title: 'Date' },
       { name: 'startTime', title: 'Time' },
-      { name: 'doctor', title: 'Doctor' },
+      { name: 'calendarResourceFK', title: 'Resource' },
       { name: 'appointmentRemarks', title: 'Remarks' },
       { name: 'appointmentStatus', title: 'Status' },
     ],

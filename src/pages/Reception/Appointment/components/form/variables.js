@@ -1,8 +1,20 @@
 import moment from 'moment'
-import { timeFormat, CodeSelect, Tooltip, Button } from '@/components'
+import {
+  timeFormat24Hour,
+  CodeSelect,
+  Tooltip,
+  Button,
+  SyncfusionTimePicker,
+} from '@/components'
+import Warning from '@material-ui/icons/Error'
 import { DoctorLabel, AppointmentTypeLabel } from '@/components/_medisys'
 import { dateFormatLong } from '@/utils/format'
-import { APPOINTMENT_STATUS, mapApptStatus, INVALID_APPOINTMENT_STATUS } from '@/utils/constants'
+import {
+  APPOINTMENT_STATUS,
+  mapApptStatus,
+  INVALID_APPOINTMENT_STATUS,
+  CALENDAR_RESOURCE,
+} from '@/utils/constants'
 import { FileAddTwoTone } from '@ant-design/icons'
 import Authorized from '@/utils/Authorized'
 import ErrorPopover from './ErrorPopover'
@@ -10,7 +22,7 @@ import ApptDuration from './ApptDuration'
 
 export const AppointmentDataColumn = [
   { name: 'conflicts', title: ' ' },
-  { name: 'clinicianFK', title: 'Doctor' },
+  { name: 'calendarResourceFK', title: 'Resource' },
   { name: 'appointmentTypeFK', title: 'Appointment Type' },
   { name: 'startTime', title: 'Time From' },
   { name: 'endTime', title: 'Appt Duration' },
@@ -18,16 +30,23 @@ export const AppointmentDataColumn = [
   { name: 'isPrimaryClinician', title: 'Primary Doctor' },
 ]
 
-export const AppointmentDataColExtensions = [
+export const AppointmentDataColExtensions = apptTimeIntervel => [
   {
-    columnName: 'clinicianFK',
+    columnName: 'calendarResourceFK',
     width: 150,
     type: 'codeSelect',
-    code: 'doctorprofile',
-    labelField: 'clinicianProfile.name',
-    valueField: 'clinicianProfile.id',
-    localFilter: o => o.clinicianProfile.isActive,
-    renderDropdown: option => <DoctorLabel doctor={option} />,
+    code: 'ctcalendarresource',
+    valueField: 'id',
+    localFilter: o => o.isActive,
+    renderDropdown: option => {
+      if (option.resourceType === CALENDAR_RESOURCE.DOCTOR)
+        return (
+          <DoctorLabel
+            doctor={{ clinicianProfile: option.clinicianProfileDto }}
+          />
+        )
+      return option.name
+    },
   },
   {
     columnName: 'appointmentTypeFK',
@@ -45,24 +64,55 @@ export const AppointmentDataColExtensions = [
   },
   {
     columnName: 'startTime',
-    type: 'time',
-    width: 110,
-    format: timeFormat,
-    allowClear: false,
-    onChange: props => {
-      const { row } = props
+    isReactComponent: true,
+    width: 130,
+    render: e => {
+      const { row, columnConfig, cellProps } = e
+      const { control, error, validSchema } = columnConfig
       const { apptDurationHour = 0, apptDurationMinute = 0 } = row
-      let { startTime } = row
-      let _endTime = row.endTime
+      return (
+        <div style={{ position: 'relative', paddingRight: 15 }}>
+          <SyncfusionTimePicker
+            step={apptTimeIntervel}
+            value={row.startTime}
+            onChange={time => {
+              const { commitChanges } = control
+              row.startTime = time
+              if (row.startTime) {
+                const _endTime = moment(row.startTime, timeFormat24Hour)
+                  .add(apptDurationHour, 'hour')
+                  .add(apptDurationMinute, 'minute')
+                  .format(timeFormat24Hour)
 
-      if (startTime) {
-        const startMoment = moment(startTime, 'HH:mm A')
-        _endTime = startMoment
-          .add(apptDurationHour, 'hour')
-          .add(apptDurationMinute, 'minute')
-          .format('HH:mm')
-        row.endTime = _endTime
-      }
+                row.endTime = _endTime
+              } else {
+                row.endTime = undefined
+              }
+              commitChanges({
+                changed: {
+                  [row.id]: {
+                    startTime: row.startTime,
+                    endTime: row.endTime,
+                  },
+                },
+              })
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: 8,
+            }}
+          >
+            {error && (
+              <Tooltip title={error}>
+                <Warning style={{ color: 'red' }} />
+              </Tooltip>
+            )}
+          </div>
+        </div>
+      )
     },
   },
   {
@@ -75,6 +125,12 @@ export const AppointmentDataColExtensions = [
     columnName: 'isPrimaryClinician',
     width: 110,
     type: 'radio',
+    isHiddend: row => {
+      return (
+        !row.calendarResource ||
+        row.calendarResource.resourceType === CALENDAR_RESOURCE.RESOURCE
+      )
+    },
   },
 ]
 
@@ -84,7 +140,7 @@ export const initialAptInfo = {
   isEnableRecurrence: false,
 }
 
-export const commonExt = (appointmentTypes,handleCopyAppointmentClick) => {
+export const commonExt = (appointmentTypes, handleCopyAppointmentClick) => {
   return [
     {
       columnName: 'appointmentStatus',
@@ -124,9 +180,9 @@ export const commonExt = (appointmentTypes,handleCopyAppointmentClick) => {
       sortingEnabled: false,
     },
     {
-      columnName: 'doctor',
+      columnName: 'calendarResourceFK',
       type: 'codeSelect',
-      code: 'clinicianprofile',
+      code: 'ctcalendarresource',
       valueField: 'id',
       labelField: 'name',
     },
@@ -166,7 +222,9 @@ export const commonExt = (appointmentTypes,handleCopyAppointmentClick) => {
       columnName: 'updateByUser',
       sortingEnabled: false,
       render: row => {
-        const content = `${mapApptStatus(row.appointmentStatusFk)} by ${row.updateByUser}`
+        const content = `${mapApptStatus(row.appointmentStatusFk)} by ${
+          row.updateByUser
+        }`
         return (
           <Tooltip title={content}>
             <span>{content}</span>
@@ -192,30 +250,48 @@ export const commonExt = (appointmentTypes,handleCopyAppointmentClick) => {
       columnName: 'action',
       width: 60,
       sortingEnabled: false,
-      align:'center',
-      render:(row)=> {
+      align: 'center',
+      render: row => {
         const accessRight = Authorized.check('appointment.appointmentdetails')
-        const createApptAccessRight = Authorized.check('appointment.newappointment')
-        if (!accessRight ||  accessRight.rights !== 'enable' || !createApptAccessRight || createApptAccessRight.rights !== 'enable')
-          return
-        return INVALID_APPOINTMENT_STATUS.indexOf(row.appointmentStatusFk) === -1 && (
-          <Tooltip title='Copy'>
-            <Button color='transparent' style={{float:'right'}} justIcon onClick={()=>handleCopyAppointmentClick(row.id)}>
-              <FileAddTwoTone />
-            </Button>
-          </Tooltip>
+        const createApptAccessRight = Authorized.check(
+          'appointment.newappointment',
         )
-      }
+        if (
+          !accessRight ||
+          accessRight.rights !== 'enable' ||
+          !createApptAccessRight ||
+          createApptAccessRight.rights !== 'enable'
+        )
+          return
+        return (
+          INVALID_APPOINTMENT_STATUS.indexOf(row.appointmentStatusFk) ===
+            -1 && (
+            <Tooltip title='Copy'>
+              <Button
+                color='transparent'
+                style={{ float: 'right' }}
+                justIcon
+                onClick={() => handleCopyAppointmentClick(row.id)}
+              >
+                <FileAddTwoTone />
+              </Button>
+            </Tooltip>
+          )
+        )
+      },
     },
   ]
 }
 
-export const previousApptTableParams = (appointmentTypes,handleCopyAppointmentClick) => {
+export const previousApptTableParams = (
+  appointmentTypes,
+  handleCopyAppointmentClick,
+) => {
   return {
     columns: [
       { name: 'appointmentDate', title: 'Date' },
       { name: 'startTime', title: 'Time' },
-      { name: 'doctor', title: 'Doctor' },
+      { name: 'calendarResourceFK', title: 'Resource' },
       { name: 'appointmentTypeFK', title: 'Appt Type' },
       { name: 'appointmentStatus', title: 'Status' },
       {
@@ -227,7 +303,9 @@ export const previousApptTableParams = (appointmentTypes,handleCopyAppointmentCl
       { name: 'updateDate', title: 'Update On' },
       { name: 'action', title: 'Action' },
     ],
-    columnExtensions: [...commonExt(appointmentTypes,handleCopyAppointmentClick)],
+    columnExtensions: [
+      ...commonExt(appointmentTypes, handleCopyAppointmentClick),
+    ],
   }
 }
 
@@ -236,7 +314,7 @@ export const futureApptTableParams = appointmentTypes => {
     columns: [
       { name: 'appointmentDate', title: 'Date' },
       { name: 'startTime', title: 'Time' },
-      { name: 'doctor', title: 'Doctor' },
+      { name: 'calendarResourceFK', title: 'Resource' },
       { name: 'appointmentTypeFK', title: 'Appt Type' },
       { name: 'appointmentStatus', title: 'Status' },
       { name: 'appointmentRemarks', title: 'Remarks' },

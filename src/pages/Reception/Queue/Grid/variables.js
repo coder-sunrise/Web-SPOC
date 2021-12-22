@@ -73,8 +73,6 @@ const filterLabWorkItem = workItem => {
   return workItem.filter(x => x.type === 'Lab')
 }
 
-
-
 export const FuncConfig = {
   pager: false,
   sort: true,
@@ -119,8 +117,8 @@ export const ApptColumnExtensions = [
     columnName: 'doctorName',
     width: 250,
     render: row => {
-      const _title = row.title ? `${row.title} ` : ''
-      return `${_title}${row.doctorName}`
+      const _title = row.title ? `${row.title || ''} ` : ''
+      return `${_title}${row.doctorName || ''}`
     },
   },
   {
@@ -242,8 +240,8 @@ export const QueueColumnExtensions = [
                   <Authorized authority='openqueuedisplay'>
                     <CallingQueueButton
                       qId={row.queueNo}
-                      roomNo={row.roomNo}
-                      doctor={row.doctor}
+                      patientName={row.patientName}
+                      from='Queue'
                     />
                   </Authorized>
                 )}
@@ -395,13 +393,15 @@ export const QueueColumnExtensions = [
       const labWorkItems = filterLabWorkItem(row.workItem)
       const radioWorkItems = filterRadioWorkItem(row.workItem)
       const nurseWorkItems = filterNurseWorkItem(row.workItem)
-      const labWorkItemsAccessRight = Authorized.check('queue.workitem.labworkitem')
+      const labWorkItemsAccessRight = Authorized.check(
+        'queue.workitem.labworkitem',
+      ) || { rights: 'hidden' }
       const radiologyWorkItemsAccessRight = Authorized.check(
         'queue.workitem.radiologyworkitem',
-      )
+      ) || { rights: 'hidden' }
       const nurseWorkItemsAccessRight = Authorized.check(
         'queue.workitem.nurseworkitem',
-      )
+      ) || { rights: 'hidden' }
       return (
         <div style={{ justifyContent: 'space-between' }}>
           {radiologyWorkItemsAccessRight.rights === 'enable' &&

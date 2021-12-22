@@ -32,11 +32,18 @@ export default createFormViewModel({
           otherDiagnosis: [],
         },
       },
+      defaultForm: {
+        type: '2',
+        typeName: 'From',
+        statusFK: 1,
+        formName: 'From',
+        formData: { content: null, signature: [] },
+      },
       default: {},
       rows: [],
     },
     effects: {
-      *upsertRow ({ payload }, { put }) {
+      *upsertRow({ payload }, { put }) {
         yield put({
           type: 'upsertRowState',
           payload,
@@ -44,10 +51,10 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      upsertRowState (state, { payload }) {
+      upsertRowState(state, { payload }) {
         let { rows } = state
         if (payload.uid) {
-          rows = rows.map((row) => {
+          rows = rows.map(row => {
             const n =
               row.uid === payload.uid
                 ? {
@@ -70,23 +77,23 @@ export default createFormViewModel({
         }
       },
 
-      deleteRow (state, { payload }) {
+      deleteRow(state, { payload }) {
         const { rows } = state
 
         return {
           ...state,
-          rows: rows.map((o) => {
+          rows: rows.map(o => {
             if (!payload || o.uid === payload.id) o.isDeleted = true
             return o
           }),
         }
       },
 
-      voidRow (state, { payload }) {
+      voidRow(state, { payload }) {
         const { rows } = state
         return {
           ...state,
-          rows: rows.map((o) => {
+          rows: rows.map(o => {
             if (payload && o.uid === payload.id) {
               o.voidReason = payload.voidReason
               o.statusFK = payload.statusFK

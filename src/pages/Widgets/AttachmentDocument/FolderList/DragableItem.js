@@ -4,7 +4,11 @@ import { DragSource, DropTarget, useDrag, useDrop } from 'react-dnd'
 import { MenuItem, ListItemText, ListItemIcon } from '@material-ui/core'
 import _ from 'lodash'
 import { IconButton, Button, Badge, TextField, Tooltip } from '@/components'
-import { DragIndicator, Delete } from '@material-ui/icons'
+import {
+  DragIndicator,
+  Delete,
+  ImportContactsOutlined,
+} from '@material-ui/icons'
 
 const Types = {
   Folder: 'Folder',
@@ -122,6 +126,7 @@ class DragableItem extends Component {
                   <Button
                     color='danger'
                     justIcon
+                    disabled={!item.isEmpty}
                     style={{
                       float: 'right',
                     }}

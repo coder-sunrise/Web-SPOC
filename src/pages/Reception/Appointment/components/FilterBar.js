@@ -1,6 +1,5 @@
 import React, { memo, useState } from 'react'
 import classnames from 'classnames'
-import BigCalendar from 'react-big-calendar'
 // formik
 import { withFormik, Field, FastField } from 'formik'
 // umi
@@ -28,6 +27,7 @@ import {
 // sub components
 import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
+import { CALENDAR_VIEWS, CALENDAR_RESOURCE } from '@/utils/constants'
 import FilterTemplateTooltip from './FilterTemplateTooltip'
 
 const styles = () => ({
@@ -63,9 +63,17 @@ const FilterBar = props => {
     values,
     calendarView,
   } = props
-  const onFilterClick = () => handleUpdateFilter(values)
+  const onFilterClick = async () => await handleUpdateFilter(values)
 
-  const renderDropdown = option => <DoctorLabel doctor={option} />
+  const renderDropdown = option => {
+    if (option.resourceType === CALENDAR_RESOURCE.DOCTOR)
+      return (
+        <DoctorLabel
+          doctor={{ clinicianProfile: option.clinicianProfileDto }}
+        />
+      )
+    return option.name
+  }
 
   const { filterByDoctor = [], dob } = values
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
@@ -90,7 +98,7 @@ const FilterBar = props => {
     })
   }
 
-  const isDayView = calendarView === BigCalendar.Views.DAY
+  const isDayView = calendarView === CALENDAR_VIEWS.DAY
   return (
     <React.Fragment>
       <GridContainer alignItems='center'>
@@ -123,17 +131,13 @@ const FilterBar = props => {
                     {...args}
                     disableAll
                     allowClear={false}
-                    label='Filter by Doctor'
+                    label='Filter by Resource'
                     mode='multiple'
-                    remoteFilter={{
-                      'clinicianProfile.isActive': true,
-                    }}
-                    localFilter={option => option.clinicianProfile.isActive}
-                    code='doctorprofile'
-                    labelField='clinicianProfile.name'
-                    valueField='clinicianProfile.id'
+                    localFilter={option => option.isActive}
+                    code='ctcalendarresource'
+                    valueField='id'
                     maxTagCount={maxDoctorTagCount}
-                    maxTagPlaceholder='doctors'
+                    maxTagPlaceholder='resources'
                     renderDropdown={renderDropdown}
                     onChange={v => {
                       sessionStorage.setItem(
@@ -156,14 +160,10 @@ const FilterBar = props => {
                   <CodeSelect
                     {...args}
                     allowClear={false}
-                    label='Filter by Doctor'
-                    remoteFilter={{
-                      'clinicianProfile.isActive': true,
-                    }}
-                    localFilter={option => option.clinicianProfile.isActive}
-                    code='doctorprofile'
-                    labelField='clinicianProfile.name'
-                    valueField='clinicianProfile.id'
+                    label='Filter by Resource'
+                    localFilter={option => option.isActive}
+                    code='ctcalendarresource'
+                    valueField='id'
                     renderDropdown={renderDropdown}
                   />
                 </Authorized>
@@ -251,10 +251,7 @@ const FilterBar = props => {
           >
             Refresh
           </ProgressButton>
-          <Button
-            color='primary'
-            onClick={toggleSearchAppointmentModal}
-          >
+          <Button color='primary' onClick={toggleSearchAppointmentModal}>
             {<Search />}Search Appointment
           </Button>
         </GridItem>

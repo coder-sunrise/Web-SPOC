@@ -255,6 +255,12 @@ export const menuData = [
     text: 'Visit Purpose',
     url: '/setting/visitordertemplate',
   },
+  {
+    authority: 'settings.clinicsetting.medicinetrivia',
+    title: 'Templates',
+    text: 'Medicine Trivia',
+    url: '/setting/medicinetrivia',
+  },
   // {
   //   title: 'Contact',
   //   text: 'Co-Payer',
@@ -337,5 +343,11 @@ export const menuData = [
     title: 'Clinic Setting',
     text: 'Checklist',
     url: '/setting/checklist',
+  },
+  {
+    authority: 'settings.clinicsetting.resource',
+    title: 'Clinic Setting',
+    text: 'Resource',
+    url: '/setting/resource',
   },
 ]

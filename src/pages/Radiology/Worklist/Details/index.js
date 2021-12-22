@@ -240,7 +240,11 @@ const RadiologyDetails = () => {
     isReadOnly ||
     workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
     workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED ||
-    Authorized.check('radiologyworklist.saveexamination').rights !== 'enable'
+    (
+      Authorized.check('radiologyworklist.saveexamination') || {
+        rights: 'hidden',
+      }
+    ).rights !== 'enable'
 
   return (
     <React.Fragment>

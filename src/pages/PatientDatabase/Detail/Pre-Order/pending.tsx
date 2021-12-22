@@ -15,7 +15,9 @@ import Yup from '@/utils/yup'
 const preOrderSchema = Yup.object().shape({
   preOrderItemType: Yup.string().required(),
   itemName: Yup.string().required(),
-  quantity: Yup.number().required().min(1),
+  quantity: Yup.number()
+    .required()
+    .min(1),
 })
 
 const PendingPreOrder: React.FC = (props: any) => {
@@ -24,6 +26,7 @@ const PendingPreOrder: React.FC = (props: any) => {
     user: {
       data: { clinicianProfile },
     },
+    height,
   } = props
   const [medications, setMedications] = useState()
   const [consumables, setConsumables] = useState()
@@ -45,7 +48,7 @@ const PendingPreOrder: React.FC = (props: any) => {
 
   const commitChanges = ({ rows }) => {
     const { setFieldValue, values } = props
-    setFieldValue('listingPreOrderItem', rows)
+    setFieldValue('pendingPreOrderItem', rows)
   }
 
   const fetchCodeTable = async (
@@ -240,16 +243,26 @@ const PendingPreOrder: React.FC = (props: any) => {
   }
   const handleItemChanged = (e: any) => {
     const { row, option } = e
+    const { dispensingUOM = {}, prescribingUOM = {}, uom = {} } = option
     row.itemName = option?.combinDisplayValue
-    if (row.preOrderItemType === preOrderItemCategory[0].value)
-      row.preOrderMedicationItem = { InventoryMedicationFK: option?.id }
-    else if (row.preOrderItemType === preOrderItemCategory[1].value)
-      row.preOrderConsumableItem = { InventoryConsumableFK: option?.id }
-    else if (row.preOrderItemType === preOrderItemCategory[2].value)
+    if (row.preOrderItemType === preOrderItemCategory[0].value) {
+      row.preOrderMedicationItem = {
+        InventoryMedicationFK: option?.id,
+        PrescribingUOMFK: prescribingUOM?.id,
+        DispensingUOMFK: dispensingUOM?.id,
+      }
+    } else if (row.preOrderItemType === preOrderItemCategory[1].value) {
+      row.preOrderConsumableItem = {
+        InventoryConsumableFK: option?.id,
+        DispensingUOMFK: uom?.id,
+      }
+    } else if (row.preOrderItemType === preOrderItemCategory[2].value) {
       row.preOrderVaccinationItem = {
         InventoryVaccinationFK: option?.id,
+        PrescribingUOMFK: prescribingUOM?.id,
+        DispensingUOMFK: dispensingUOM?.id,
       }
-    else if (
+    } else if (
       row.preOrderItemType === preOrderItemCategory[3].value ||
       row.preOrderItemType == preOrderItemCategory[4].value ||
       row.preOrderItemType == preOrderItemCategory[5].value
@@ -272,66 +285,6 @@ const PendingPreOrder: React.FC = (props: any) => {
     if (!preOrderItemType) {
       return
     }
-
-    if (medications && preOrderItemType === preOrderItemCategory[0].value) {
-      const item = medications.find(
-        m => m.id === preOrderMedicationItem.InventoryMedicationFK,
-      )
-      if (item) {
-        const { sellingPrice } = item
-        row.amount = sellingPrice * value
-      }
-    }
-
-    if (consumables && preOrderItemType === preOrderItemCategory[1].value) {
-      const item = consumables.find(
-        m => m.id === preOrderConsumableItem.InventoryConsumableFK,
-      )
-      if (item) {
-        const { sellingPrice } = item
-        row.amount = sellingPrice * value
-      }
-    }
-
-    if (vaccinations && preOrderItemType === preOrderItemCategory[2].value) {
-      const item = vaccinations.find(
-        m => m.id === preOrderVaccinationItem.InventoryVaccinationFK,
-      )
-      if (item) {
-        const { sellingPrice } = item
-        row.amount = sellingPrice * value
-      }
-    }
-
-    if (services && preOrderItemType === preOrderItemCategory[3].value) {
-      const item = services.find(
-        m => m.id === preOrderServiceItem.ServiceCenterServiceFK,
-      )
-      if (item) {
-        const { unitPrice } = item
-        row.amount = unitPrice * value
-      }
-    }
-
-    if (labs && preOrderItemType === preOrderItemCategory[4].value) {
-      const item = labs.find(
-        m => m.id === preOrderServiceItem.ServiceCenterServiceFK,
-      )
-      if (item) {
-        const { unitPrice } = item
-        row.amount = unitPrice * value
-      }
-    }
-
-    if (radiology && preOrderItemType === preOrderItemCategory[5].value) {
-      const item = radiology.find(
-        m => m.id === preOrderServiceItem.ServiceCenterServiceFK,
-      )
-      if (item) {
-        const { unitPrice } = item
-        row.amount = unitPrice * value
-      }
-    }
   }
 
   useEffect(() => {
@@ -346,7 +299,8 @@ const PendingPreOrder: React.FC = (props: any) => {
       { name: 'orderByUserFK', title: 'Order By' },
       { name: 'orderDate', title: 'Order Date' },
       { name: 'remarks', title: 'Remarks' },
-      { name: 'amount', title: 'Amount' },
+      { name: 'apptDate', title: 'Appt. Date' },
+      { name: 'amount', title: 'Total' },
       { name: 'hasPaid', title: 'Paid' },
       { name: 'preOrderItemStatus', title: 'Status' },
     ],
@@ -358,13 +312,29 @@ const PendingPreOrder: React.FC = (props: any) => {
         valueField: 'value',
         sortingEnabled: false,
         width: 180,
+        sortingEnabled: false,
         options: () => preOrderItemCategory,
         onChange: handleCategoryChanged,
         isDisabled: row => !isEditable(row),
         render: row => {
           return (
             <Tooltip title={row.preOrderItemType}>
-              <div>{row.preOrderItemType}</div>
+              <div>
+                <span style={{ color: 'red', fontStyle: 'italic' }}>
+                  <sup>
+                    {row.isPreOrderItemActive === false
+                      ? '#1'
+                      : row.isPreOrderItemOrderable === false
+                      ? '#2'
+                      : row.isUOMChanged === true
+                      ? '#3'
+                      : ''}
+                    &nbsp;
+                  </sup>
+                </span>
+
+                <span>{row.preOrderItemType}</span>
+              </div>
             </Tooltip>
           )
         },
@@ -388,7 +358,7 @@ const PendingPreOrder: React.FC = (props: any) => {
                 </div>
               }
             >
-            <div>{row.itemName}</div>
+              <div>{row.itemName}</div>
             </Tooltip>
           )
         },
@@ -400,7 +370,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         precision: 1,
         width: 100,
         sortingEnabled: false,
-        onChange: handelQuantityChanged,
+        // onChange: handelQuantityChanged,
         render: row => {
           return (
             <Tooltip
@@ -438,6 +408,8 @@ const PendingPreOrder: React.FC = (props: any) => {
         columnName: 'orderDate',
         type: 'date',
         width: 150,
+        direction: 'desc',
+        sortBy: 'orderDate',
         isDisabled: () => true,
         render: row => {
           return (
@@ -449,8 +421,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         columnName: 'remarks',
         maxLength: 100,
         sortingEnabled: false,
-        isDisabled: row =>
-          addPreOrderAccessRight.rights === 'enable' ? false : true,
+        isDisabled: row => !isEditable(row),
         render: row => {
           return (
             <Tooltip title={row.remarks}>
@@ -460,15 +431,34 @@ const PendingPreOrder: React.FC = (props: any) => {
         },
       },
       {
+        columnName: 'apptDate',
+        width: 150,
+        type: 'date',
+        sortingEnabled: false,
+        render: row => {
+          return row.apptDate
+            ? `${moment(row.apptDate).format('DD MMM YYYY')} ${moment(
+                row.apptStartTime,
+                'HH:mm',
+              ).format('HH:mm')}`
+            : '-'
+        },
+        isDisabled: () => true,
+      },
+      {
         columnName: 'amount',
         width: 100,
         type: 'currency',
         sortingEnabled: false,
-        isDisabled: row => !isEditable(row),
+        isDisabled: () => true,
+        render: row => {
+          return row.hasPaid ? row.amount : '-'
+        },
       },
       {
         columnName: 'hasPaid',
         width: 100,
+        sortingEnabled: false,
         isDisabled: () => true,
         sortingEnabled: false,
         render: row => {
@@ -497,45 +487,69 @@ const PendingPreOrder: React.FC = (props: any) => {
 
   return (
     <>
-      <FastEditableTableGrid
-        rows={getFilteredRows(values.listingPreOrderItem)}
-        schema={preOrderSchema}
-        FuncProps={{
-          pager: false,
-        }}
-        EditingProps={{
-          showAddCommand:
-            addPreOrderAccessRight.rights === 'enable' ? true : false,
-          isDeletable: row => {
-            return deletePreOrderAccessRight.rights === 'enable' &&
-              row.hasPaid === false &&
-              row.preOrderItemStatus === 'New'
-              ? true
-              : false
-          },
-          showCommandColumn:
-            deletePreOrderAccessRight.rights === 'enable' ? true : false,
-          onCommitChanges: commitChanges,
-          onAddedRowsChange: (rows: any) => {
-            return rows.map(o => {
-              return {
-                orderDate: moment(),
-                orderByUserFK: clinicianProfile?.userProfileFK,
-                orderByUser: clinicianProfile?.userProfile.userName,
-                preOrderItemStatus: 'New',
-                hasPaid: false,
-                amount: 0,
-                preOrderVaccinationItem: undefined,
-                preOrderServiceItem: undefined,
-                preOrderMedicationItem: undefined,
-                preOrderConsumableItem: undefined,
-                ...o,
-              }
-            })
-          },
-        }}
-        {...tableParas}
-      />
+      <div style={{ maxHeight: height - 250, overflowY: 'auto' }}>
+        <FastEditableTableGrid
+          rows={getFilteredRows(values.pendingPreOrderItem)}
+          schema={preOrderSchema}
+          FuncProps={{
+            pager: false,
+            sortConfig: {
+              defaultSorting: [{ columnName: 'orderDate', direction: 'desc' }],
+            },
+          }}
+          EditingProps={{
+            showAddCommand:
+              addPreOrderAccessRight.rights === 'enable' ? true : false,
+            isDeletable: row => {
+              return deletePreOrderAccessRight.rights === 'enable' &&
+                row.hasPaid === false &&
+                row.preOrderItemStatus === 'New'
+                ? true
+                : false
+            },
+            showCommandColumn:
+              deletePreOrderAccessRight.rights === 'enable' ? true : false,
+            onCommitChanges: commitChanges,
+            onAddedRowsChange: (rows: any) => {
+              return rows.map(o => {
+                return {
+                  orderDate: moment(),
+                  orderByUserFK: clinicianProfile?.userProfileFK,
+                  orderByUser: clinicianProfile?.userProfile.userName,
+                  preOrderItemStatus: 'New',
+                  hasPaid: false,
+                  amount: 0,
+                  preOrderVaccinationItem: undefined,
+                  preOrderServiceItem: undefined,
+                  preOrderMedicationItem: undefined,
+                  preOrderConsumableItem: undefined,
+                  prescribingUOMFK: undefined,
+                  ...o,
+                }
+              })
+            },
+          }}
+          {...tableParas}
+        />
+      </div>
+
+      <div style={{ position: 'fixed', bottom: 100, width: '100%' }}>
+        <span>
+          Note:&nbsp;
+          <span style={{ color: 'red', fontStyle: 'italic' }}>
+            <sup>#1&nbsp;</sup>
+          </span>
+          Inactive item &nbsp;&nbsp;
+          <span style={{ color: 'red', fontStyle: 'italic' }}>
+            <sup>#2&nbsp;</sup>
+          </span>
+          Non-orderable item&nbsp;&nbsp;
+          <span style={{ color: 'red', fontStyle: 'italic' }}>
+            <sup>#3&nbsp;</sup>
+          </span>
+          Dispense/prescribe UOM changed&nbsp;&nbsp;
+        </span>
+      </div>
     </>
   )
 }

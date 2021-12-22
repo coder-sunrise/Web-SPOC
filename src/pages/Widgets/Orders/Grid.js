@@ -22,6 +22,7 @@ import {
   Tooltip,
   NumberInput,
   Checkbox,
+  Switch,
 } from '@/components'
 import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
@@ -126,7 +127,6 @@ export default ({
         return
       }
     }
-
     if (row.isPreOrderActualize) return
     if (!row.isActive && row.type !== '5' && !row.isDrugMixture) return
 
@@ -160,6 +160,7 @@ export default ({
         type: 'orders/updateState',
         payload: {
           entity: row,
+          isPreOrderItemExists: false,
           type: row.type,
         },
       })
@@ -367,26 +368,6 @@ export default ({
     )
   }
 
-  const urgentIndicator = (row, right) => {
-    if (row.type !== '10' && row.type !== '3') return null
-    return (
-      row.priority === 'Urgent' && (
-        <Tooltip title='Urgent'>
-          <div
-            className={classes.rightIcon}
-            style={{
-              right: right,
-              borderRadius: 4,
-              backgroundColor: 'red',
-            }}
-          >
-            Urg.
-          </div>
-        </Tooltip>
-      )
-    )
-  }
-
   const packageDrawdownIndicator = row => {
     if (!row.isPackage) return null
 
@@ -510,7 +491,6 @@ export default ({
       )
     return ''
   }
-
   return (
     <CommonTableGrid
       size='sm'
@@ -520,7 +500,10 @@ export default ({
         return {
           ...r,
           currentTotal:
-            !r.isPreOrder || r.isChargeToday ? r.totalAfterItemAdjustment : 0,
+            (!r.isPreOrder && !r.hasPaid) || r.isChargeToday
+              ? r.totalAfterItemAdjustment
+              : 0,
+          isEditingEntity: isEditingEntity,
         }
       })}
       onRowDoubleClick={editRow}
@@ -528,6 +511,7 @@ export default ({
       columns={[
         { name: 'type', title: 'Type' },
         { name: 'subject', title: 'Name' },
+        { name: 'priority', title: 'Urgent' },
         { name: 'description', title: 'Instructions' },
         { name: 'quantity', title: 'Qty.' },
         { name: 'adjAmount', title: 'Adj.' },
@@ -603,11 +587,11 @@ export default ({
               if (isExistPackage) {
                 newChildren = [
                   <Table.Cell
-                    colSpan={3}
+                    colSpan={4}
                     key={1}
                     style={{ position: 'relative' }}
                   />,
-                  React.cloneElement(children[6], {
+                  React.cloneElement(children[7], {
                     colSpan: 3,
                     ...restProps,
                   }),
@@ -615,11 +599,11 @@ export default ({
               } else {
                 newChildren = [
                   <Table.Cell
-                    colSpan={2}
+                    colSpan={3}
                     key={1}
                     style={{ position: 'relative' }}
                   />,
-                  React.cloneElement(children[5], {
+                  React.cloneElement(children[6], {
                     colSpan: 2,
                     ...restProps,
                   }),
@@ -782,14 +766,6 @@ export default ({
             if (row.isDrugMixture || radiologyWorkitemStatusFK) {
               paddingRight = 10
             }
-            let urgentRight = -33
-            if (
-              (row.type === '3' || row.type === '10') &&
-              row.priority === 'Urgent'
-            ) {
-              paddingRight += 34
-              urgentRight = -paddingRight - 4
-            }
 
             return (
               <div style={{ position: 'relative' }}>
@@ -806,7 +782,7 @@ export default ({
                   <div style={{ position: 'relative', top: 2 }}>
                     {drugMixtureIndicator(row, -20)}
                     {row.isPreOrder && (
-                      <Tooltip title='Pre-Order'>
+                      <Tooltip title='New Pre-Order'>
                         <div
                           className={classes.rightIcon}
                           style={{
@@ -819,12 +795,29 @@ export default ({
                         </div>
                       </Tooltip>
                     )}
+                    {row.actualizedPreOrderItemFK && (
+                      <Tooltip title='Actualized Pre-Order'>
+                        <div
+                          className={classes.rightIcon}
+                          style={{
+                            right: -5,
+                            borderRadius: 4,
+                            backgroundColor: 'green',
+                          }}
+                        >
+                          Pre
+                        </div>
+                      </Tooltip>
+                    )}
                     {row.isExclusive && (
                       <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                         <div
                           className={classes.rightIcon}
                           style={{
-                            right: row.isPreOrder ? -60 : -30,
+                            right:
+                              row.isPreOrder || row.actualizedPreOrderItemFK
+                                ? -60
+                                : -30,
                             borderRadius: 4,
                             backgroundColor: 'green',
                           }}
@@ -835,7 +828,6 @@ export default ({
                     )}
                     {radiologyWorkitemStatusFK &&
                       radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
-                    {urgentIndicator(row, urgentRight)}
                   </div>
                 </div>
               </div>
@@ -995,7 +987,7 @@ export default ({
                       color='primary'
                       style={{ marginRight: 5 }}
                       disabled={
-                        isEditingEntity ||
+                        row.isEditingEntity ||
                         (!row.isActive &&
                           row.type !== '5' &&
                           !row.isDrugMixture) ||
@@ -1012,7 +1004,7 @@ export default ({
                       color='danger'
                       justIcon
                       disabled={
-                        isEditingEntity ||
+                        row.isEditingEntity ||
                         row.isPreOrderActualize ||
                         !deleteEnable
                       }
@@ -1054,6 +1046,60 @@ export default ({
                     </Button>
                   </Tooltip>
                 </div>
+              </Authorized>
+            )
+          },
+        },
+        {
+          columnName: 'priority',
+          width: 70,
+          align: 'center',
+          sortingEnabled: false,
+          render: row => {
+            if (row.type !== '10' && row.type !== '3') return ''
+            const editAccessRight = OrderItemAccessRight(row)
+            const { workitem = {} } = row
+            const { nurseWorkitem = {}, radiologyWorkitem = {} } = workitem
+            let editEnable = true
+            if (!row.isPreOrder) {
+              if (row.type === '10') {
+                if (
+                  radiologyWorkitem.statusFK ===
+                  RADIOLOGY_WORKITEM_STATUS.CANCELLED
+                ) {
+                  editEnable = false
+                }
+              } else {
+                if (
+                  nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
+                ) {
+                  editEnable = false
+                }
+              }
+            }
+            return (
+              <Authorized authority={editAccessRight}>
+                <Switch
+                  checkedValue='Urgent'
+                  unCheckedValue='Normal'
+                  value={row.priority}
+                  className={classes.switchContainer}
+                  preventToggle
+                  disabled={
+                    row.isEditingEntity ||
+                    row.isPreOrderActualize ||
+                    !editEnable
+                  }
+                  onClick={checked => {
+                    dispatch({
+                      type: 'orders/updatePriority',
+                      payload: {
+                        uid: row.uid,
+                        priority: checked ? 'Urgent' : 'Normal',
+                      },
+                    })
+                  }}
+                />
               </Authorized>
             )
           },

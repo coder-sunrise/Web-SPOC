@@ -33,6 +33,7 @@ import {
   convertToConsultation,
   convertConsultationDocument,
   isPharmacyOrderUpdated,
+  getOrdersData,
 } from '@/pages/Consultation/utils'
 // import model from '@/pages/Widgets/Orders/models'
 import {
@@ -442,6 +443,7 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
     user,
     patient,
     forms,
+    codetable,
   }) => ({
     clinicInfo,
     consultation,
@@ -455,6 +457,7 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
     user,
     patient,
     forms,
+    codetable,
   }),
 )
 @withFormikExtend({
@@ -623,6 +626,18 @@ class Main extends React.Component {
         saveDraftDoctorNote(this.props)
       }, autoSaveClinicNoteInterval * 1000)
     }
+
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctservice',
+      },
+    })
+
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'inventoryconsumable' },
+    })
   }
 
   componentWillUnmount() {
@@ -873,7 +888,7 @@ class Main extends React.Component {
     }
 
     if (
-      visitPurposeFK === VISIT_TYPE.BF &&
+      (visitPurposeFK === VISIT_TYPE.BF || visitPurposeFK === VISIT_TYPE.MC) &&
       visitStatus === VISIT_STATUS.BILLING &&
       isModifiedOrder
     ) {
@@ -921,11 +936,13 @@ class Main extends React.Component {
       orders = {},
       visitRegistration,
       clinicSettings,
+      patient,
     } = this.props
     const { entity: vistEntity = {} } = visitRegistration
     // if (!vistEntity) return null
     const { visit = {}, queueNo } = vistEntity
     const { summary } = orders
+    const patientName = patient?.entity?.name
     // const { adjustments, total, gst, totalWithGst } = summary
 
     return (
@@ -1062,8 +1079,8 @@ class Main extends React.Component {
                 <div style={{ marginRight: 10 }}>
                   <CallingQueueButton
                     qId={queueNo}
-                    roomNo={visit.roomFK}
-                    doctor={visit.doctorProfileFK}
+                    patientName={patientName}
+                    from='Queue'
                   />
                 </div>
               </Authorized>
@@ -1263,6 +1280,31 @@ class Main extends React.Component {
     })
   }
 
+  onSelectPreOrder = (selectPreOrder = []) => {
+    const {
+      orders,
+      dispatch,
+      codetable,
+      visitRegistration,
+      patient,
+      user,
+      clinicSettings,
+    } = this.props
+
+    dispatch({
+      type: 'orders/upsertRows',
+      payload: getOrdersData({
+        selectPreOrder,
+        orders,
+        codetable,
+        visitRegistration,
+        patient,
+        user,
+        clinicSettings,
+      }),
+    })
+  }
+
   render() {
     const { props, state } = this
     const {
@@ -1298,12 +1340,27 @@ class Main extends React.Component {
           ? 'disable'
           : rights,
     }
+    const { rows } = orders
+    const draftPreOrderItem = patient?.entity?.pendingPreOrderItem?.map(po => {
+      const selectPreOrder = rows.find(
+        apo => apo.actualizedPreOrderItemFK === po.id,
+      )
+      if (selectPreOrder) {
+        return {
+          ...po,
+          preOrderItemStatus: selectPreOrder.isDeleted ? 'New' : 'Actualizing',
+        }
+      }
+      return { ...po }
+    })
+
     return (
       <div className={classes.root}>
         <PatientBanner
           from='Consultation'
-          // activePreOrderItem={patient?.entity?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
-          extraCmt={this.getExtraComponent()}
+          onSelectPreOrder={this.onSelectPreOrder}
+          activePreOrderItems={draftPreOrderItem}
+          extraCmt={this.getExtraComponent}
           {...this.props}
         />
         <Authorized.Context.Provider value={matches}>

@@ -306,7 +306,7 @@ class Grid extends PureComponent {
                         {item.isDrugMixture &&
                           this.drugMixtureIndicator(item, -20)}
                         {item.isPreOrder && (
-                          <Tooltip title='Pre-Order'>
+                          <Tooltip title='New Pre-Order'>
                             <div
                               className={classes.rightIcon}
                               style={{

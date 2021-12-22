@@ -323,7 +323,7 @@ const consultationDocumentTypes = [
     name: 'Certificate of Attendance',
     prop: 'corCertificateOfAttendance',
     getSubject: r => {
-      return `Certificate of Attendance ${r.accompaniedBy}`
+      return `Certificate of Attendance ${r.accompaniedBy || ''}`
     },
     convert: r => {
       return {
@@ -1231,7 +1231,7 @@ export const inventoryItemListing = (
 ) => {
   let inventoryItemList = list.map(x => {
     const { code, displayValue, sellingPrice = 0 } = x
-    const uom = x.dispensingUOM ? x.dispensingUOM.name : x.uom.name
+    const uom = x.dispensingUOM ? x.dispensingUOM.name : x.uom?.name
 
     return {
       value: x.id,
@@ -1610,6 +1610,17 @@ const formTypes = [
       },
     },
   },
+  {
+    value: '2',
+    name: 'From',
+    prop: 'corForm',
+    downloadConfig: {
+      id: 0,
+      key: 'FormId',
+      subject: 'From',
+      draft: row => {},
+    },
+  },
 ]
 
 const formStatus = [
@@ -1920,6 +1931,11 @@ const preOrderItemCategory = [
   },
 ]
 
+export const documentCategorys = [
+  { value: 1, name: 'Consultation Document' },
+  { value: 2, name: 'Form' },
+]
+
 export const documentTemplateTypes = [
   {
     value: 1,
@@ -1936,6 +1952,14 @@ export const documentTemplateTypes = [
   {
     value: 4,
     name: 'Others',
+  },
+  {
+    value: 5,
+    name: 'Consent Form',
+  },
+  {
+    value: 6,
+    name: 'Questionnaire',
   },
 ]
 

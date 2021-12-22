@@ -30,13 +30,14 @@ import {
   Attachment,
   AttachmentWithThumbnail,
 } from '@/components/_medisys'
-import { VISIT_TYPE } from '@/utils/constants'
+import { VISIT_TYPE, CANNED_TEXT_TYPE } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
 import { roundTo, getMappedVisitType } from '@/utils/utils'
 import numeral from 'numeral'
 import FormField from './formField'
 import Authorized from '@/utils/Authorized'
+import CannedTextButton from '@/pages/Widgets/Orders/Detail/CannedTextButton'
 
 const styles = theme => ({
   verticalSpacing: {
@@ -224,16 +225,16 @@ const VisitInfoCard = ({
     } catch {}
   }
   if ((ctvisitpurpose || []).length > 0) {
-    visitPurpose = getMappedVisitType(ctvisitpurpose, visitTypeSettingsObj).filter(
-      vstType => vstType['isEnabled'] === 'true',
-    )
+    visitPurpose = getMappedVisitType(
+      ctvisitpurpose,
+      visitTypeSettingsObj,
+    ).filter(vstType => vstType['isEnabled'] === 'true')
   }
 
   const family = patientInfo?.patientFamilyGroup?.patientFamilyMember
-  const familyMembers = family ? [
-    ...family.map(mem => mem.name), 
-    patientInfo?.patientFamilyGroup.name
-  ] : []
+  const familyMembers = family
+    ? [...family.map(mem => mem.name), patientInfo?.patientFamilyGroup.name]
+    : []
   const visitGroups = [
     ...queueLog.list
       .filter((q, i, a) => {
@@ -430,22 +431,40 @@ const VisitInfoCard = ({
           </Authorized>
         </GridItem>
         <GridItem xs md={6}>
-          <Field
-            name={FormField['visit.visitRemarks']}
-            render={args => (
-              <TextField
-                {...args}
-                // disabled={isReadOnly}
-                multiline
-                rowsMax={3}
-                authority='none'
-                disabled={isVisitReadonlyAfterSigned}
-                label={formatMessage({
-                  id: 'reception.queue.visitRegistration.visitRemarks',
-                })}
-              />
-            )}
-          />
+          <div style={{ position: 'relative' }}>
+            <Field
+              name={FormField['visit.visitRemarks']}
+              render={args => (
+                <TextField
+                  {...args}
+                  // disabled={isReadOnly}
+                  multiline
+                  rowsMax={3}
+                  authority='none'
+                  disabled={isVisitReadonlyAfterSigned}
+                  label={formatMessage({
+                    id: 'reception.queue.visitRegistration.visitRemarks',
+                  })}
+                />
+              )}
+            />
+            <CannedTextButton
+              disabled={isVisitReadonlyAfterSigned}
+              cannedTextTypeFK={CANNED_TEXT_TYPE.APPOINTMENTREMARKS}
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                right: -5,
+              }}
+              handleSelectCannedText={cannedText => {
+                const remarks = values.visitRemarks
+                const newRemaks = `${
+                  remarks ? remarks + ' ' : ''
+                }${cannedText.text || ''}`.substring(0, 2000)
+                setFieldValue(FormField['visit.visitRemarks'], newRemaks)
+              }}
+            />
+          </div>
         </GridItem>
         <GridItem xs md={3}>
           <Authorized authority='queue.visitgroup'>
@@ -455,7 +474,11 @@ const VisitInfoCard = ({
                 labelField='displayValue'
                 value={values.visitGroup}
                 disabled={isVisitReadonlyAfterSigned}
-                options={_.orderBy(visitGroups, ['isFamilyMember','order'], ['desc','desc'])}
+                options={_.orderBy(
+                  visitGroups,
+                  ['isFamilyMember', 'order'],
+                  ['desc', 'desc'],
+                )}
                 handleFilter={(input, option) => {
                   return (
                     option.data.visitGroup

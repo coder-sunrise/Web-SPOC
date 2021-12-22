@@ -223,14 +223,6 @@ const WebSocketWrapper = ({
           type: CONSTANTS.ALL_DRUG_LABEL,
           printAllDrugLabel: true,
         })
-
-      await restProps.dispatch({
-        type: 'dispense/query',
-        payload: {
-          id: restProps.dispense.visitID,
-          version: Date.now(),
-        },
-      })
       history.push(getAppendUrl({}, '/reception/queue/billing'))
     }
   }
