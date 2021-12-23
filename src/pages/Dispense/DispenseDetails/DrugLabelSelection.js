@@ -95,7 +95,7 @@ class DrugLabelSelection extends React.PureComponent {
     dispatch({
       type: 'dispense/queryDrugLabelList',
       payload: {
-        id: this.props.dispense.visitID || visitid,
+        id: visitid,
         includeOpenPrescription: true,
       },
     }).then(data => {
