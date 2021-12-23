@@ -1507,6 +1507,11 @@ const Main = props => {
       },
     }).then(data => {
       if (data) {
+        data = _.orderBy(
+          data,
+          ['dispenseByPharmacy', 'displayName'],
+          ['desc', 'asc'],
+        )
         setDrugLeafletData(data)
         setShowLeafletSelectionPopup(true)
       }
