@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import _ from 'lodash'
 import { isNumber } from 'util'
 import { Link } from 'umi'
-import { Tag } from 'antd'
+import { Tag, Alert } from 'antd'
 import { withStyles } from '@material-ui/core'
 import {
   GridContainer,
@@ -120,16 +120,17 @@ const getVisitDoctorUserId = props => {
   return visitDoctorUserId
 }
 
-@connect(({ codetable, global, user, visitRegistration }) => ({
+@connect(({ codetable, global, user, visitRegistration, patient }) => ({
   codetable,
   global,
   user,
   visitRegistration,
+  patient,
 }))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
-      ...(orders.entity || orders.defaultRadiology),
+      ...(orders.entity || orders.defaultLab),
     }
     return {
       ...v,
@@ -160,7 +161,7 @@ const getVisitDoctorUserId = props => {
   handleSubmit: (values, { props, onConfirm, setValues }) => {
     const { dispatch, orders, getNextSequence, user } = props
     let nextSequence = getNextSequence()
-    const data = values.radiologyItems.map(item => {
+    const data = values.labItems.map(item => {
       return {
         isOrderedByDoctor:
           user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
@@ -188,7 +189,7 @@ const getVisitDoctorUserId = props => {
     }
     if (onConfirm) onConfirm()
     setValues({
-      ...orders.defaultRadiology,
+      ...orders.defaultLab,
       type: orders.type,
       filterService: undefined,
     })
@@ -207,6 +208,7 @@ class Lab extends PureComponent {
       serviceTags: [],
       serviceCategories: [],
       serviceTestCategories: [],
+      isPreOrderItemExists: false,
     }
 
     dispatch({
@@ -334,7 +336,7 @@ class Lab extends PureComponent {
   handleReset = () => {
     const { setValues, orders } = this.props
     setValues({
-      ...orders.defaultRadiology,
+      ...orders.defaultLab,
       type: orders.type,
       isEdit: false,
     })
@@ -374,16 +376,16 @@ class Lab extends PureComponent {
 
   validateAndSubmitIfOk = async () => {
     const { handleSubmit, values } = this.props
-    const { radiologyItems = [] } = values
-    if (!radiologyItems.length) return
+    const { labItems = [] } = values
+    if (!labItems.length) return
     if (
-      radiologyItems.filter(
+      labItems.filter(
         r =>
           r.serviceCenterFK &&
           r.quantity >= 0 &&
           r.total >= 0 &&
           r.totalAfterItemAdjustment >= 0,
-      ).length !== radiologyItems.length
+      ).length !== labItems.length
     )
       return
     handleSubmit()
@@ -391,34 +393,66 @@ class Lab extends PureComponent {
 
   isValidate = service => {
     const { values } = this.props
-    const { radiologyItems = [] } = values
-    let checkedRadiology = radiologyItems.find(
-      r => r.serviceFK === service.value,
-    )
-    if (!checkedRadiology) {
+    const { labItems = [] } = values
+    let checkedLab = labItems.find(r => r.serviceFK === service.value)
+    if (!checkedLab) {
       return true
     }
     if (
-      checkedRadiology.serviceCenterFK &&
-      checkedRadiology.quantity >= 0 &&
-      checkedRadiology.total >= 0 &&
-      checkedRadiology.totalAfterItemAdjustment >= 0
+      checkedLab.serviceCenterFK &&
+      checkedLab.quantity >= 0 &&
+      checkedLab.total >= 0 &&
+      checkedLab.totalAfterItemAdjustment >= 0
     ) {
       return true
     }
     return false
   }
 
-  setSelectRadilogy = selectRadiology => {
+  setSelectLab = selectLab => {
     const { setFieldValue } = this.props
-    setFieldValue('editServiceId', selectRadiology.serviceFK)
-    setFieldValue('serviceCenterFK', selectRadiology.serviceCenterFK)
-    setFieldValue('quantity', selectRadiology.quantity)
-    setFieldValue('total', selectRadiology.total)
+    setFieldValue('editServiceId', selectLab.serviceFK)
+    setFieldValue('serviceCenterFK', selectLab.serviceCenterFK)
+    setFieldValue('quantity', selectLab.quantity)
+    setFieldValue('total', selectLab.total)
     setFieldValue(
       'totalAfterItemAdjustment',
-      selectRadiology.totalAfterItemAdjustment,
+      selectLab.totalAfterItemAdjustment,
     )
+
+    if (selectLab.isPreOrder === true)
+      this.checkIsPreOrderItemExistsInListing(selectLab.serviceFK, true)
+    else this.setState({ isPreOrderItemExists: false })
+  }
+
+  checkIsPreOrderItemExistsInListing = (editServiceId, val) => {
+    const {
+      setFieldValue,
+      values,
+      codetable,
+      visitRegistration,
+      patient,
+      orders = {},
+    } = this.props
+
+    if (val) {
+      const labPreOrderItem = patient?.entity?.pendingPreOrderItem.filter(
+        x => x.preOrderItemType === 'Lab',
+      )
+      if (labPreOrderItem) {
+        labPreOrderItem.filter(item => {
+          const { preOrderServiceItem = {} } = item
+          const CheckIfPreOrderItemExists =
+            preOrderServiceItem.serviceFK === editServiceId
+          if (CheckIfPreOrderItemExists) {
+            this.setState({ isPreOrderItemExists: true })
+            return
+          }
+        })
+      }
+    } else {
+      this.setState({ isPreOrderItemExists: false })
+    }
   }
 
   render() {
@@ -429,6 +463,7 @@ class Lab extends PureComponent {
       footer,
       from,
       setFieldValue,
+      orders,
     } = this.props
     const {
       services = [],
@@ -436,9 +471,10 @@ class Lab extends PureComponent {
       serviceCategories = [],
       serviceTestCategories = [],
       serviceTags = [],
+      isPreOrderItemExists,
     } = this.state
     const {
-      radiologyItems = [],
+      labItems = [],
       isEdit,
       editServiceId,
       filterService = '',
@@ -450,9 +486,8 @@ class Lab extends PureComponent {
       Authorized.check('queue.consultation.modifyorderitemtotalprice')
         .rights !== 'enable'
 
-    const selectService = radiologyItems.map(r => r.serviceName).join(', ')
-    const editService =
-      radiologyItems.find(r => r.serviceFK === editServiceId) || {}
+    const selectService = labItems.map(r => r.serviceName).join(', ')
+    const editService = labItems.find(r => r.serviceFK === editServiceId) || {}
     let filterServices = []
 
     if (isEdit) {
@@ -460,7 +495,7 @@ class Lab extends PureComponent {
     } else {
       filterServices = services.filter(
         s =>
-          radiologyItems.find(r => r.serviceFK === s.value) ||
+          labItems.find(r => r.serviceFK === s.value) ||
           ((selectTag === 'All' ||
             s.serviceTags.find(st => st.value === selectTag)) &&
             (selectCategory === 'All' ||
@@ -470,21 +505,34 @@ class Lab extends PureComponent {
       )
     }
 
+    const isDisabledHasPaidPreOrder =
+      editService?.actualizedPreOrderItemFK && editService?.hasPaid == true
+        ? true
+        : false
+
+    const isDisabledNoPaidPreOrder = editService?.actualizedPreOrderItemFK
+      ? true
+      : false
+
+    if (orders.isPreOrderItemExists === false && !values.isPreOrder)
+      this.setState({ isPreOrderItemExists: false })
+
     const { workitem = {}, isPreOrder } = editService
-    const { radiologyWorkitem = {} } = workitem
-    const isStartedRadiology =
+    //TODO::TO change according to final design of Lab.
+    const { radiologyWorkitem: labWorkitem = {} } = workitem
+    const isStartedLab =
       !isPreOrder &&
       [
         RADIOLOGY_WORKITEM_STATUS.INPROGRESS,
         RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED,
         RADIOLOGY_WORKITEM_STATUS.COMPLETED,
-      ].indexOf(radiologyWorkitem.statusFK) >= 0
+      ].indexOf(labWorkitem.statusFK) >= 0
 
     return (
       <Authorized
         authority={GetOrderItemAccessRight(
           from,
-          'queue.consultation.order.radiology',
+          'queue.consultation.order.lab',
         )}
       >
         <div>
@@ -606,11 +654,11 @@ class Lab extends PureComponent {
                         }}
                         className={classes.checkServiceItem}
                         onClick={() => {
-                          const selectRadiology = radiologyItems.find(
+                          const selectLab = labItems.find(
                             item => item.serviceFK === r.value,
                           )
-                          if (selectRadiology) {
-                            this.setSelectRadilogy(selectRadiology)
+                          if (selectLab) {
+                            this.setSelectLab(selectLab)
                           }
                         }}
                       >
@@ -643,9 +691,7 @@ class Lab extends PureComponent {
                             inputLabel=''
                             checked={
                               !_.isEmpty(
-                                radiologyItems.find(
-                                  ri => ri.serviceFK === r.value,
-                                ),
+                                labItems.find(ri => ri.serviceFK === r.value),
                               )
                             }
                             onChange={e => {
@@ -665,9 +711,12 @@ class Lab extends PureComponent {
                                   isNurseActualizeRequired:
                                     r.isNurseActualizable,
                                 }
+                                if (isPreOrderItemExists)
+                                  this.setState({ isPreOrderItemExists: false })
+
                                 this.getServiceCenterService(newService)
-                                setFieldValue('radiologyItems', [
-                                  ...radiologyItems,
+                                setFieldValue('labItems', [
+                                  ...labItems,
                                   newService,
                                 ])
                                 setFieldValue(
@@ -685,8 +734,8 @@ class Lab extends PureComponent {
                                   newService.totalAfterItemAdjustment,
                                 )
                               } else {
-                                setFieldValue('radiologyItems', [
-                                  ...radiologyItems.filter(
+                                setFieldValue('labItems', [
+                                  ...labItems.filter(
                                     item => item.serviceFK !== r.value,
                                   ),
                                 ])
@@ -698,6 +747,8 @@ class Lab extends PureComponent {
                                   'totalAfterItemAdjustment',
                                   undefined,
                                 )
+                                if (isPreOrderItemExists)
+                                  this.setState({ isPreOrderItemExists: false })
                               }
                             }}
                           />
@@ -720,13 +771,13 @@ class Lab extends PureComponent {
                 >
                   Selected:
                 </div>
-                {radiologyItems.map(ri => {
+                {labItems.map(ri => {
                   return (
                     <div style={{ display: 'inline-block', marginLeft: 10 }}>
                       <Link
                         onClick={e => {
                           e.preventDefault()
-                          this.setSelectRadilogy(ri)
+                          this.setSelectLab(ri)
                         }}
                       >
                         <span style={{ textDecoration: 'underline' }}>
@@ -753,7 +804,7 @@ class Lab extends PureComponent {
                 render={args => {
                   return (
                     <Select
-                      disabled={!editServiceId || isStartedRadiology}
+                      disabled={!editServiceId || isStartedLab}
                       allowClear={false}
                       label='Service Center Name'
                       options={serviceCenters.filter(o =>
@@ -770,7 +821,7 @@ class Lab extends PureComponent {
                             editService.totalAfterItemAdjustment,
                           )
                         }
-                        setFieldValue('radiologyItems', [...radiologyItems])
+                        setFieldValue('labItems', [...labItems])
                       }}
                       {...args}
                     />
@@ -784,7 +835,11 @@ class Lab extends PureComponent {
                 render={args => {
                   return (
                     <NumberInput
-                      disabled={!editServiceId || isStartedRadiology}
+                      disabled={
+                        !editServiceId ||
+                        isStartedLab ||
+                        isDisabledHasPaidPreOrder
+                      }
                       label='Quantity'
                       style={{
                         marginLeft: theme.spacing(7),
@@ -804,7 +859,7 @@ class Lab extends PureComponent {
                             editService.totalAfterItemAdjustment,
                           )
                         }
-                        setFieldValue('radiologyItems', [...radiologyItems])
+                        setFieldValue('labItems', [...labItems])
                       }}
                       {...args}
                     />
@@ -822,16 +877,16 @@ class Lab extends PureComponent {
               <div style={{ position: 'relative' }}>
                 <TextField
                   value={editService.instruction}
-                  disabled={!editServiceId || isStartedRadiology}
+                  disabled={!editServiceId || isStartedLab}
                   label='Instructions'
                   onChange={e => {
                     editService.instruction = e.target.value
-                    setFieldValue('radiologyItems', [...radiologyItems])
+                    setFieldValue('labItems', [...labItems])
                   }}
                 />
                 <CannedTextButton
-                  disabled={!editServiceId || isStartedRadiology}
-                  cannedTextTypeFK={CANNED_TEXT_TYPE.RADIOLOGYINSTRUCTION}
+                  disabled={!editServiceId || isStartedLab}
+                  cannedTextTypeFK={CANNED_TEXT_TYPE.LABINSTRUCTION}
                   style={{
                     position: 'absolute',
                     bottom: 0,
@@ -843,7 +898,7 @@ class Lab extends PureComponent {
                         ? editService.instruction + ' '
                         : ''
                     }${cannedText.text || ''}`.substring(0, 2000)
-                    setFieldValue('radiologyItems', [...radiologyItems])
+                    setFieldValue('labItems', [...labItems])
                   }}
                 />
               </div>
@@ -864,13 +919,17 @@ class Lab extends PureComponent {
                       onChange={e => {
                         editService.total = e.target.value
                         this.updateTotalPrice(e.target.value, editService)
-                        setFieldValue('radiologyItems', [...radiologyItems])
+                        setFieldValue('labItems', [...labItems])
                         setFieldValue(
                           'totalAfterItemAdjustment',
                           editService.totalAfterItemAdjustment,
                         )
                       }}
-                      disabled={totalPriceReadonly || !editServiceId}
+                      disabled={
+                        totalPriceReadonly ||
+                        !editServiceId ||
+                        isDisabledHasPaidPreOrder
+                      }
                       {...args}
                     />
                   )
@@ -882,11 +941,11 @@ class Lab extends PureComponent {
             <GridItem xs={8} className={classes.editor}>
               <TextField
                 value={editService.remark}
-                disabled={!editServiceId || isStartedRadiology}
+                disabled={!editServiceId || isStartedLab}
                 label='Remarks'
                 onChange={e => {
                   editService.remark = e.target.value
-                  setFieldValue('radiologyItems', [...radiologyItems])
+                  setFieldValue('labItems', [...labItems])
                 }}
               />
             </GridItem>
@@ -903,13 +962,17 @@ class Lab extends PureComponent {
                     onChange={value => {
                       editService.isMinus = value
                       this.onAdjustmentConditionChange(editService)
-                      setFieldValue('radiologyItems', [...radiologyItems])
+                      setFieldValue('labItems', [...labItems])
                       setFieldValue(
                         'totalAfterItemAdjustment',
                         editService.totalAfterItemAdjustment,
                       )
                     }}
-                    disabled={totalPriceReadonly || !editServiceId}
+                    disabled={
+                      totalPriceReadonly ||
+                      !editServiceId ||
+                      isDisabledHasPaidPreOrder
+                    }
                   />
                 </div>
 
@@ -926,13 +989,17 @@ class Lab extends PureComponent {
                     onChange={e => {
                       editService.adjValue = e.target.value
                       this.onAdjustmentConditionChange(editService)
-                      setFieldValue('radiologyItems', [...radiologyItems])
+                      setFieldValue('labItems', [...labItems])
                       setFieldValue(
                         'totalAfterItemAdjustment',
                         editService.totalAfterItemAdjustment,
                       )
                     }}
-                    disabled={totalPriceReadonly || !editServiceId}
+                    disabled={
+                      totalPriceReadonly ||
+                      !editServiceId ||
+                      isDisabledHasPaidPreOrder
+                    }
                   />
                 ) : (
                   <NumberInput
@@ -948,13 +1015,17 @@ class Lab extends PureComponent {
                     onChange={e => {
                       editService.adjValue = e.target.value
                       this.onAdjustmentConditionChange(editService)
-                      setFieldValue('radiologyItems', [...radiologyItems])
+                      setFieldValue('labItems', [...labItems])
                       setFieldValue(
                         'totalAfterItemAdjustment',
                         editService.totalAfterItemAdjustment,
                       )
                     }}
-                    disabled={totalPriceReadonly || !editServiceId}
+                    disabled={
+                      totalPriceReadonly ||
+                      !editServiceId ||
+                      isDisabledHasPaidPreOrder
+                    }
                   />
                 )}
               </div>
@@ -969,13 +1040,17 @@ class Lab extends PureComponent {
                   onChange={value => {
                     editService.isExactAmount = value
                     this.onAdjustmentConditionChange(editService)
-                    setFieldValue('radiologyItems', [...radiologyItems])
+                    setFieldValue('labItems', [...labItems])
                     setFieldValue(
                       'totalAfterItemAdjustment',
                       editService.totalAfterItemAdjustment,
                     )
                   }}
-                  disabled={totalPriceReadonly || !editServiceId}
+                  disabled={
+                    totalPriceReadonly ||
+                    !editServiceId ||
+                    isDisabledHasPaidPreOrder
+                  }
                 />
               </div>
             </GridItem>
@@ -985,12 +1060,12 @@ class Lab extends PureComponent {
               <GridItem xs={8} className={classes.editor}>
                 <TextField
                   value={editService.newServiceName}
-                  disabled={!editServiceId || isStartedRadiology}
+                  disabled={!editServiceId || isStartedLab}
                   label='New Service Display Name'
                   maxLength={255}
                   onChange={e => {
                     editService.newServiceName = e.target.value
-                    setFieldValue('radiologyItems', [...radiologyItems])
+                    setFieldValue('labItems', [...labItems])
                   }}
                 />
               </GridItem>
@@ -1012,12 +1087,12 @@ class Lab extends PureComponent {
                     </span>
                     <div style={{ marginLeft: 60, marginTop: 14 }}>
                       <RadioGroup
-                        disabled={!editServiceId || isStartedRadiology}
+                        disabled={!editServiceId || isStartedLab}
                         value={editService.priority || 'Normal'}
                         label=''
                         onChange={e => {
                           editService.priority = e.target.value
-                          setFieldValue('radiologyItems', [...radiologyItems])
+                          setFieldValue('labItems', [...labItems])
                         }}
                         options={[
                           {
@@ -1035,7 +1110,11 @@ class Lab extends PureComponent {
                   <div style={{ display: 'inline-block', marginLeft: 20 }}>
                     <Checkbox
                       checked={editService.isPreOrder || false}
-                      disabled={!editServiceId || isStartedRadiology}
+                      disabled={
+                        !editServiceId ||
+                        isStartedLab ||
+                        isDisabledNoPaidPreOrder
+                      }
                       style={{ position: 'absolute', bottom: 2 }}
                       label='Pre-Order'
                       onChange={e => {
@@ -1043,13 +1122,17 @@ class Lab extends PureComponent {
                         if (!e.target.value) {
                           editService.isChargeToday = false
                         }
-                        setFieldValue('radiologyItems', [...radiologyItems])
+                        this.checkIsPreOrderItemExistsInListing(
+                          editServiceId,
+                          e.target.value,
+                        )
+                        setFieldValue('labItems', [...labItems])
                       }}
                     />
                     {editService.isPreOrder && (
                       <Checkbox
                         checked={editService.isChargeToday || false}
-                        disabled={!editServiceId || isStartedRadiology}
+                        disabled={!editServiceId || isStartedLab}
                         style={{
                           position: 'absolute',
                           bottom: 2,
@@ -1058,7 +1141,26 @@ class Lab extends PureComponent {
                         label='Charge Today'
                         onChange={e => {
                           editService.isChargeToday = e.target.value
-                          setFieldValue('radiologyItems', [...radiologyItems])
+                          setFieldValue('labItems', [...labItems])
+                        }}
+                      />
+                    )}
+                    {isPreOrderItemExists && (
+                      <Alert
+                        message={
+                          "Item exists in Pre-Order. Plesae check patient's Pre-Order."
+                        }
+                        type='warning'
+                        style={{
+                          position: 'absolute',
+                          top: 45,
+                          left: 200,
+                          whiteSpace: 'nowrap',
+                          textOverflow: 'ellipsis',
+                          display: 'inline-block',
+                          overflow: 'hidden',
+                          lineHeight: '25px',
+                          fontSize: '0.85rem',
                         }}
                       />
                     )}
@@ -1105,12 +1207,16 @@ class Lab extends PureComponent {
                     </span>
                     <div style={{ marginLeft: 60, marginTop: 14 }}>
                       <RadioGroup
-                        disabled={!editServiceId || isStartedRadiology}
+                        disabled={
+                          !editServiceId ||
+                          isStartedLab ||
+                          isDisabledNoPaidPreOrder
+                        }
                         value={editService.priority || 'Normal'}
                         label=''
                         onChange={e => {
                           editService.priority = e.target.value
-                          setFieldValue('radiologyItems', [...radiologyItems])
+                          setFieldValue('labItems', [...labItems])
                         }}
                         options={[
                           {
@@ -1128,7 +1234,7 @@ class Lab extends PureComponent {
                   <div style={{ display: 'inline-block', marginLeft: 20 }}>
                     <Checkbox
                       checked={editService.isPreOrder || false}
-                      disabled={!editServiceId || isStartedRadiology}
+                      disabled={!editServiceId || isStartedLab}
                       style={{ position: 'absolute', bottom: 0 }}
                       label='Pre-Order'
                       onChange={e => {
@@ -1136,13 +1242,13 @@ class Lab extends PureComponent {
                         if (!e.target.value) {
                           editService.isChargeToday = false
                         }
-                        setFieldValue('radiologyItems', [...radiologyItems])
+                        setFieldValue('labItems', [...labItems])
                       }}
                     />
                     {editService.isPreOrder && (
                       <Checkbox
                         checked={editService.isChargeToday || false}
-                        disabled={!editServiceId || isStartedRadiology}
+                        disabled={!editServiceId || isStartedLab}
                         style={{
                           position: 'absolute',
                           bottom: 0,
@@ -1151,7 +1257,7 @@ class Lab extends PureComponent {
                         label='Charge Today'
                         onChange={e => {
                           editService.isChargeToday = e.target.value
-                          setFieldValue('radiologyItems', [...radiologyItems])
+                          setFieldValue('labItems', [...labItems])
                         }}
                       />
                     )}

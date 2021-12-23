@@ -5,7 +5,7 @@ import $ from 'jquery'
 
 import { Divider, withStyles } from '@material-ui/core'
 import _ from 'lodash'
-import { ORDER_WIDGET_VALUES } from '@/utils/constants'
+import { ORDER_TYPES } from '@/utils/constants'
 import {
   Button,
   ProgressButton,
@@ -191,33 +191,27 @@ class Details extends PureComponent {
     if (fromDispense) {
       orderTypeArray = orderTypes.filter(
         o =>
-          o.value !== ORDER_WIDGET_VALUES.VACCINATION &&
-          o.value !== ORDER_WIDGET_VALUES.ORDER_SET &&
-          o.value !== ORDER_WIDGET_VALUES.PACKAGE &&
-          o.value !== ORDER_WIDGET_VALUES.RADIOLOGY &&
-          o.value !== ORDER_WIDGET_VALUES.LAB,
+          o.value !== ORDER_TYPES.VACCINATION &&
+          o.value !== ORDER_TYPES.ORDER_SET &&
+          o.value !== ORDER_TYPES.PACKAGE &&
+          o.value !== ORDER_TYPES.RADIOLOGY &&
+          o.value !== ORDER_TYPES.LAB,
       )
     } else {
       const { settings = [] } = clinicSettings
 
       orderTypeArray = orderTypes.filter(o => {
-        if (
-          !settings.isEnablePackage &&
-          o.value === ORDER_WIDGET_VALUES.PACKAGE
-        )
+        if (!settings.isEnablePackage && o.value === ORDER_TYPES.PACKAGE)
           return false
 
         if (
           !settings.isEnableRadiologyModule &&
-          o.value === ORDER_WIDGET_VALUES.RADIOLOGY
+          o.value === ORDER_TYPES.RADIOLOGY
         ) {
           return false
         }
 
-        if (
-          !settings.isEnableLabModule &&
-          o.value === ORDER_WIDGET_VALUES.LAB
-        ) {
+        if (!settings.isEnableLabModule && o.value === ORDER_TYPES.LAB) {
           return false
         }
 

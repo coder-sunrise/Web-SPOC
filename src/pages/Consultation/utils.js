@@ -9,7 +9,11 @@ import Treatment from '@/pages/Widgets/Orders/Detail/Treatment'
 import Package from '@/pages/Widgets/Orders/Detail/Package'
 import Radiology from '@/pages/Widgets/Orders/Detail/Radiology'
 import Lab from '@/pages/Widgets/Orders/Detail/Lab'
-import { SERVICE_CENTER_CATEGORY, RADIOLOGY_CATEGORY } from '@/utils/constants'
+import {
+  SERVICE_CENTER_CATEGORY,
+  RADIOLOGY_CATEGORY,
+  LAB_CATEGORY,
+} from '@/utils/constants'
 
 import moment from 'moment'
 import { getUniqueId, getTranslationValue } from '@/utils/utils'
@@ -18,14 +22,14 @@ import {
   DOSAGE_RULE_OPERATOR,
   ALLERGY_TYPE,
   PATIENT_ALLERGY_TYPE,
-  ORDER_WIDGET_VALUES,
+  ORDER_TYPES,
 } from '@/utils/constants'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 
 const orderTypes = [
   {
     name: 'Medication',
-    value: ORDER_WIDGET_VALUES.MEDICATION,
+    value: ORDER_TYPES.MEDICATION,
     prop: 'corPrescriptionItem',
     accessRight: 'queue.consultation.order.medication',
     filter: r => r.inventoryMedicationFK || r.isDrugMixture,
@@ -36,16 +40,18 @@ const orderTypes = [
   },
   {
     name: 'Service',
-    value: ORDER_WIDGET_VALUES.SERVICE,
+    value: ORDER_TYPES.SERVICE,
     prop: 'corService',
     accessRight: 'queue.consultation.order.service',
-    filter: r => RADIOLOGY_CATEGORY.indexOf(r.serviceCenterCategoryFK) < 0,
+    filter: r =>
+      RADIOLOGY_CATEGORY.indexOf(r.serviceCenterCategoryFK) < 0 &&
+      LAB_CATEGORY.indexOf(r.serviceCenterCategoryFK) < 0,
     getSubject: r => r.serviceName,
     component: props => <Service {...props} />,
   },
   {
     name: 'Radiology',
-    value: ORDER_WIDGET_VALUES.RADIOLOGY,
+    value: ORDER_TYPES.RADIOLOGY,
     prop: 'corService',
     accessRight: 'queue.consultation.order.radiology',
     getSubject: r => r.serviceName,
@@ -54,16 +60,16 @@ const orderTypes = [
   },
   {
     name: 'Lab',
-    value: ORDER_WIDGET_VALUES.LAB,
+    value: ORDER_TYPES.LAB,
     prop: 'corService',
-    accessRight: 'queue.consultation.order.radiology',
+    accessRight: 'queue.consultation.order.lab',
     getSubject: r => r.serviceName,
-    filter: r => RADIOLOGY_CATEGORY.indexOf(r.serviceCenterCategoryFK) >= 0,
+    filter: r => LAB_CATEGORY.indexOf(r.serviceCenterCategoryFK) >= 0,
     component: props => <Lab {...props} />,
   },
   {
     name: 'Vaccination',
-    value: ORDER_WIDGET_VALUES.VACCINATION,
+    value: ORDER_TYPES.VACCINATION,
     prop: 'corVaccinationItem',
     accessRight: 'queue.consultation.order.vaccination',
     getSubject: r => r.vaccinationName,
@@ -71,7 +77,7 @@ const orderTypes = [
   },
   {
     name: 'Consumable',
-    value: ORDER_WIDGET_VALUES.CONSUMABLE,
+    value: ORDER_TYPES.CONSUMABLE,
     prop: 'corConsumable',
     accessRight: 'queue.consultation.order.consumable',
     getSubject: r => r.consumableName,
@@ -79,7 +85,7 @@ const orderTypes = [
   },
   {
     name: 'Open Prescription',
-    value: ORDER_WIDGET_VALUES.OPEN_PRESCRIPTION,
+    value: ORDER_TYPES.OPEN_PRESCRIPTION,
     prop: 'corPrescriptionItem',
     accessRight: 'queue.consultation.order.openprescription',
     filter: r => !r.inventoryMedicationFK && !r.isDrugMixture,
@@ -88,13 +94,13 @@ const orderTypes = [
   },
   {
     name: 'Order Set',
-    value: ORDER_WIDGET_VALUES.ORDER_SET,
+    value: ORDER_TYPES.ORDER_SET,
     accessRight: 'queue.consultation.order.orderset',
     component: props => <OrderSet {...props} />,
   },
   {
     name: 'Treatment',
-    value: ORDER_WIDGET_VALUES.TREATMENT,
+    value: ORDER_TYPES.TREATMENT,
     prop: 'corDentalTreatments',
     accessRight: 'queue.consultation.order.treatment',
     getSubject: r => r.itemName,
@@ -102,7 +108,7 @@ const orderTypes = [
   },
   {
     name: 'Package',
-    value: ORDER_WIDGET_VALUES.PACKAGE,
+    value: ORDER_TYPES.PACKAGE,
     accessRight: 'queue.consultation.order.package',
     component: props => <Package {...props} />,
   },
@@ -523,6 +529,7 @@ const getOrdersData = val => {
     inventoryvaccination,
     ctservice,
   } = codetable
+
   selectPreOrder.forEach(po => {
     if (po.preOrderItemType === 'Medication') {
       const { preOrderMedicationItem = {} } = po
@@ -839,7 +846,13 @@ const getOrdersData = val => {
         totalAfterOverallAdjustment:
           preOrderServiceItem?.totalAfterOverallAdjustment ||
           service[0].unitPrice * po.quantity,
-        type: po.preOrderItemType === 'Radiology' ? '10' : '3',
+        type: (() => {
+          if (po.preOrderItemType === 'Radiology') return ORDER_TYPES.RADIOLOGY
+
+          if (po.preOrderItemType === 'Lab') return ORDER_TYPES.LAB
+
+          return ORDER_TYPES.SERVICE
+        })(),
         unitPrice: service[0].unitPrice || 0,
         hasPaid: po?.hasPaid,
       })
