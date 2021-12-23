@@ -4,10 +4,19 @@ import { compose } from 'redux'
 import _ from 'lodash'
 import moment from 'moment'
 // material ui
-import { Paper, withStyles, Link } from '@material-ui/core'
 import Print from '@material-ui/icons/Print'
 import Refresh from '@material-ui/icons/Refresh'
 import Edit from '@material-ui/icons/Edit'
+import { InputNumber } from 'antd'
+import {
+  MenuList,
+  ClickAwayListener,
+  MenuItem,
+  makeStyles,
+  Paper,
+  withStyles,
+  Link,
+} from '@material-ui/core'
 import Delete from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import { formatMessage } from 'umi' // common component
@@ -23,6 +32,7 @@ import {
   TextField,
   CommonModal,
   NumberInput,
+  Popper,
   notification,
 } from '@/components'
 import AmountSummary from '@/pages/Shared/AmountSummary'
@@ -118,9 +128,8 @@ const DispenseDetails = ({
   onDrugLabelClick,
   showDrugLabelSelection,
   onDrugLabelSelectionClose,
-  onDrugLabelSelected,
-  onDrugLabelNoChanged,
   selectedDrugs,
+  currentDrugToPrint,
   clinicSettings,
   servingPersons = [],
   patient,
@@ -149,6 +158,10 @@ const DispenseDetails = ({
     totalPayment,
     coPayer = [],
   } = invoice
+
+  const [popperOpen, setPopperOpen] = useState(false)
+  const openPopper = () => setPopperOpen(true)
+  const closePopper = () => setPopperOpen(false)
 
   const { inventorymedication, inventoryvaccination } = codetable
   const { settings = {} } = clinicSettings
@@ -448,7 +461,7 @@ const DispenseDetails = ({
   }
 
   const { labelPrinterSize } = settings
-  const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
+  const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
 
   const isShowDispenseActualie =
     !viewOnly && isShowActualizeSelection(dispenseItems)
@@ -558,11 +571,89 @@ const DispenseDetails = ({
       setFieldValue('dispenseItems', rows)
     }
   }
+  const printDrugLabel = () => {
+    setPopperOpen(false)
+    onDrugLabelClick()
+  }
   return (
     <React.Fragment>
       <GridContainer>
         <GridItem justify='flex-start' md={7} className={classes.actionButtons}>
-          <Button
+          <div style={{ display: 'inline-block' }}>
+            <Popper
+              open={popperOpen}
+              style={{ marginTop: 10 }}
+              placement='bottom-start'
+              transition
+              overlay={
+                <ClickAwayListener onClickAway={closePopper}>
+                  <MenuList role='menu'>
+                    <MenuItem>
+                      <Button
+                        color='primary'
+                        size='sm'
+                        style={{ width: 120 }}
+                        onClick={() => {
+                          onPrint({ type: CONSTANTS.PATIENT_LABEL })
+                        }}
+                        disabled={sendingJob}
+                      >
+                        Patient Label
+                      </Button>
+                      <InputNumber
+                        size='small'
+                        min={1}
+                        max={10}
+                        value={1}
+                        className={classes.inputStyle}
+                      />
+                      <span className={classes.qtyFont}>&nbsp;Copies</span>
+                    </MenuItem>
+                    <MenuItem>
+                      <Button
+                        color='primary'
+                        size='sm'
+                        style={{ width: 120 }}
+                        onClick={() => {}}
+                        disabled={sendingJob}
+                      >
+                        Lab Label
+                      </Button>
+                      <InputNumber
+                        size='small'
+                        min={1}
+                        max={10}
+                        value={1}
+                        className={classes.inputStyle}
+                      />
+                      <span className={classes.qtyFont}>&nbsp;Copies</span>
+                    </MenuItem>
+                    <MenuItem>
+                      <Button
+                        color='primary'
+                        size='sm'
+                        onClick={printDrugLabel}
+                        disabled={sendingJob}
+                        style={{ width: 120 }}
+                      >
+                        Drug Label
+                      </Button>
+                    </MenuItem>
+                  </MenuList>
+                </ClickAwayListener>
+              }
+            >
+              <Button
+                color='primary'
+                onClick={openPopper}
+                size='sm'
+                style={{ height: 25, marginTop: 2 }}
+              >
+                <Print /> Label
+              </Button>
+            </Popper>
+          </div>
+          {/* <Button
             color='primary'
             size='sm'
             onClick={onDrugLabelClick}
@@ -581,7 +672,7 @@ const DispenseDetails = ({
           >
             {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
             Patient Label
-          </Button>
+          </Button> */}
           {orderCreateTime && (
             <span style={{ color: '#999999' }}>
               Order created by
@@ -801,7 +892,7 @@ const DispenseDetails = ({
               columns={columns}
               colExtensions={DispenseItemsColumnExtensions(
                 viewOnly,
-                onPrint,
+                onDrugLabelClick,
                 onActualizeBtnClick,
                 showDrugLabelRemark,
               )}
@@ -913,6 +1004,7 @@ const DispenseDetails = ({
         )}
       </GridContainer>
       <CommonModal
+        maxWidth='sm'
         title='Print Drug Labels'
         open={showDrugLabelSelection}
         observe='DispenseDetails'
@@ -921,13 +1013,14 @@ const DispenseDetails = ({
         }}
       >
         <DrugLabelSelection
-          prescription={selectedDrugs}
-          codetable={codetable}
-          handleDrugLabelSelected={onDrugLabelSelected}
-          handleDrugLabelNoChanged={onDrugLabelNoChanged}
+          values={values}
+          currentDrugToPrint={currentDrugToPrint}
+          dispatch={dispatch}
+          patient={patient}
+          source='dispense'
+          visitid={values.id}
           handleSubmit={() => {
             onDrugLabelSelectionClose()
-            onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
           }}
         />
       </CommonModal>

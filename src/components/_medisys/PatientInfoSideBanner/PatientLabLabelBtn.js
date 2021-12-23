@@ -113,7 +113,7 @@ const PatientLabLabelButton = ({
             onChange={handleCopyNoChange}
             style={{ width: '50px', textAlign: 'right' }}
           />
-          <span style={{ fontSize: '0.75rem' }}>&nbsp;Qty</span>
+          <span style={{ fontSize: '0.75rem' }}>&nbsp;Copies</span>
         </div>
       </div>
       <div
@@ -147,7 +147,7 @@ const PatientLabLabelButton = ({
             onChange={handlePtnLabelCopyNoChanges}
             style={{ width: '50px', textAlign: 'right' }}
           />
-          <span style={{ fontSize: '0.75rem' }}>&nbsp;Qty</span>
+          <span style={{ fontSize: '0.75rem' }}>&nbsp;Copies</span>
         </div>
       </div>
     </SizeContainer>

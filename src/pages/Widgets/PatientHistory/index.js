@@ -705,7 +705,7 @@ class PatientHistory extends Component {
 
     const { settings = {} } = clinicSettings
     const { labelPrinterSize } = settings
-    const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
+    const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
 
     return (
       <div

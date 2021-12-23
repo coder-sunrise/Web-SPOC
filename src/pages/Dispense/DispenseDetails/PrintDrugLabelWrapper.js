@@ -18,12 +18,10 @@ const defaultSocketPortsState = [
   { portNumber: 7184, attempted: false },
 ]
 class PrintDrugLabelWrapper extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      socketPorts: [
-        ...defaultSocketPortsState,
-      ],
+      socketPorts: [...defaultSocketPortsState],
       pendingJob: [],
     }
     this.isWsConnected = false
@@ -31,7 +29,7 @@ class PrintDrugLabelWrapper extends React.Component {
     this.initializeWebSocket(true)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     if (this.wsConnection) this.wsConnection.close()
   }
 
@@ -43,12 +41,12 @@ class PrintDrugLabelWrapper extends React.Component {
     if (settings.labelPrinterSize === '8.9cmx3.6cm') {
       drugLabelReportID = 31
       patientLabelReportID = 32
-    }
-    else if (settings.labelPrinterSize === '7.6cmx3.8cm') {
+    } else if (settings.labelPrinterSize === '7.6cmx3.8cm') {
       drugLabelReportID = 48
       patientLabelReportID = 45
-    }
-    else {
+    } else if (settings.labelPrinterSize === '8.0cmx4.5cm_V2') {
+      drugLabelReportID = 88
+    } else {
       drugLabelReportID = 24
       patientLabelReportID = 27
     }
@@ -77,17 +75,13 @@ class PrintDrugLabelWrapper extends React.Component {
     return printResult
   }
 
-  prepareJobForWebSocket = (content) => {
+  prepareJobForWebSocket = content => {
     // reset port number state to retry all attempt and set job content
     // then initialize web socket connection
     this.setState(
       {
-        socketPorts: [
-          ...defaultSocketPortsState,
-        ],
-        pendingJob: [
-          content,
-        ],
+        socketPorts: [...defaultSocketPortsState],
+        pendingJob: [content],
       },
       () => {
         this.initializeWebSocket(false)
@@ -116,7 +110,9 @@ class PrintDrugLabelWrapper extends React.Component {
       CONSTANTS.DRUG_LABEL,
       CONSTANTS.PATIENT_LABEL,
     ]
+    console.log('CONFIRM PRINT1')
     if (withoutPrintPreview.includes(type)) {
+      console.log('CONFIRM PRINT')
       let printResult = await this.getPrintResult(type, row)
       if (printResult) {
         const base64Result = arrayBufferToBase64(printResult)
@@ -124,7 +120,7 @@ class PrintDrugLabelWrapper extends React.Component {
       }
     } else {
       const documentType = consultationDocumentTypes.find(
-        (o) =>
+        o =>
           o.name.toLowerCase() === row.type.toLowerCase() ||
           (o.name === 'Others' && row.type === 'Other Documents'),
       )
@@ -150,13 +146,13 @@ class PrintDrugLabelWrapper extends React.Component {
     }
   }
 
-  generateDrugLablePrintSource = async (row) => {
+  generateDrugLablePrintSource = async row => {
     const drugLabelDetails1 = await queryDrugLabelDetails(row.id)
     const { data } = drugLabelDetails1
     if (data && data.length > 0) {
       let drugLabelDetail = []
       drugLabelDetail = drugLabelDetail.concat(
-        data.map((o) => {
+        data.map(o => {
           return this.getDrugLabelDetails(o, row)
         }),
       )
@@ -174,8 +170,8 @@ class PrintDrugLabelWrapper extends React.Component {
     if (data && data.length > 0) {
       let drugLabelDetail = []
       drugLabelDetail = drugLabelDetail.concat(
-        data.map((o) => {
-          const prescriptionItem = prescriptions.find((p) => p.id === o.id)
+        data.map(o => {
+          const prescriptionItem = prescriptions.find(p => p.id === o.id)
           return this.getDrugLabelDetails(o, prescriptionItem)
         }),
       )
@@ -212,13 +208,12 @@ class PrintDrugLabelWrapper extends React.Component {
     }
   }
 
-  setSocketPortsState = (socket) => {
-    this.setState((preState) => ({
-      socketPorts: preState.socketPorts.map(
-        (port) =>
-          port.portNumber === socket.portNumber
-            ? { ...port, attempted: true }
-            : { ...port },
+  setSocketPortsState = socket => {
+    this.setState(preState => ({
+      socketPorts: preState.socketPorts.map(port =>
+        port.portNumber === socket.portNumber
+          ? { ...port, attempted: true }
+          : { ...port },
       ),
     }))
   }
@@ -231,14 +226,11 @@ class PrintDrugLabelWrapper extends React.Component {
     if (this.isWsConnected === false) {
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
       const { printToolSocketURL = '' } = settings
-      const [
-        prefix = '',
-        ip = '',
-      ] = printToolSocketURL.split(':')
+      const [prefix = '', ip = ''] = printToolSocketURL.split(':')
 
       // attempt to connect to different port number
       // abort early and clear job if no available port number left
-      const socket = socketPorts.find((port) => !port.attempted)
+      const socket = socketPorts.find(port => !port.attempted)
       if (!socket) {
         this.setState({
           pendingJob: [],
