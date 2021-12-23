@@ -832,3 +832,16 @@ export const CALENDAR_RESOURCE = {
   DOCTOR: 'Doctor',
   RESOURCE: 'Resource',
 }
+
+export const ORDER_WIDGET_VALUES = {
+  MEDICATION: '1',
+  VACCINATION: '2',
+  SERVICE: '3',
+  CONSUMABLE: '4',
+  OPEN_PRESCRIPTION: '5',
+  ORDER_SET: '6',
+  TREATMENT: '7',
+  PACKAGE: '8',
+  RADIOLOGY: '10',
+  LAB: '11',
+}

@@ -18,13 +18,14 @@ import {
   DOSAGE_RULE_OPERATOR,
   ALLERGY_TYPE,
   PATIENT_ALLERGY_TYPE,
+  ORDER_WIDGET_VALUES,
 } from '@/utils/constants'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 
 const orderTypes = [
   {
     name: 'Medication',
-    value: '1',
+    value: ORDER_WIDGET_VALUES.MEDICATION,
     prop: 'corPrescriptionItem',
     accessRight: 'queue.consultation.order.medication',
     filter: r => r.inventoryMedicationFK || r.isDrugMixture,
@@ -35,7 +36,7 @@ const orderTypes = [
   },
   {
     name: 'Service',
-    value: '3',
+    value: ORDER_WIDGET_VALUES.SERVICE,
     prop: 'corService',
     accessRight: 'queue.consultation.order.service',
     filter: r => RADIOLOGY_CATEGORY.indexOf(r.serviceCenterCategoryFK) < 0,
@@ -44,7 +45,7 @@ const orderTypes = [
   },
   {
     name: 'Radiology',
-    value: '10',
+    value: ORDER_WIDGET_VALUES.RADIOLOGY,
     prop: 'corService',
     accessRight: 'queue.consultation.order.radiology',
     getSubject: r => r.serviceName,
@@ -53,7 +54,7 @@ const orderTypes = [
   },
   {
     name: 'Lab',
-    value: '11',
+    value: ORDER_WIDGET_VALUES.LAB,
     prop: 'corService',
     accessRight: 'queue.consultation.order.radiology',
     getSubject: r => r.serviceName,
@@ -62,7 +63,7 @@ const orderTypes = [
   },
   {
     name: 'Vaccination',
-    value: '2',
+    value: ORDER_WIDGET_VALUES.VACCINATION,
     prop: 'corVaccinationItem',
     accessRight: 'queue.consultation.order.vaccination',
     getSubject: r => r.vaccinationName,
@@ -70,7 +71,7 @@ const orderTypes = [
   },
   {
     name: 'Consumable',
-    value: '4',
+    value: ORDER_WIDGET_VALUES.CONSUMABLE,
     prop: 'corConsumable',
     accessRight: 'queue.consultation.order.consumable',
     getSubject: r => r.consumableName,
@@ -78,7 +79,7 @@ const orderTypes = [
   },
   {
     name: 'Open Prescription',
-    value: '5',
+    value: ORDER_WIDGET_VALUES.OPEN_PRESCRIPTION,
     prop: 'corPrescriptionItem',
     accessRight: 'queue.consultation.order.openprescription',
     filter: r => !r.inventoryMedicationFK && !r.isDrugMixture,
@@ -87,13 +88,13 @@ const orderTypes = [
   },
   {
     name: 'Order Set',
-    value: '6',
+    value: ORDER_WIDGET_VALUES.ORDER_SET,
     accessRight: 'queue.consultation.order.orderset',
     component: props => <OrderSet {...props} />,
   },
   {
     name: 'Treatment',
-    value: '7',
+    value: ORDER_WIDGET_VALUES.TREATMENT,
     prop: 'corDentalTreatments',
     accessRight: 'queue.consultation.order.treatment',
     getSubject: r => r.itemName,
@@ -101,7 +102,7 @@ const orderTypes = [
   },
   {
     name: 'Package',
-    value: '8',
+    value: ORDER_WIDGET_VALUES.PACKAGE,
     accessRight: 'queue.consultation.order.package',
     component: props => <Package {...props} />,
   },

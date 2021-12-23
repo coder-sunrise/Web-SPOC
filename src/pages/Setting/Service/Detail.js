@@ -137,7 +137,7 @@ const testPanelSchema = Yup.object().shape({
       is: true,
       then: Yup.array()
         .compact(v => v.isDeleted)
-        .required('At least one test panel is required.'),
+        .required('At least one lab test panel is required.'),
     }),
   }),
   handleSubmit: (values, { props, resetForm }) => {
@@ -311,7 +311,7 @@ class Detail extends PureComponent {
           )
           if (rs.length > 0) {
             notification.error({
-              message: 'The test panel already exist in the list',
+              message: 'The lab test panel already exist in the list',
             })
           }
         },
@@ -478,9 +478,6 @@ class Detail extends PureComponent {
     } else {
       setFieldValue('hasInternalLabServiceCenter', true)
     }
-
-    if (hiddenFields.includes('isRequiredSpecifyPanelItem'))
-      setFieldValue('isRequiredSpecifyPanelItem', false)
 
     setFieldValue('ctServiceCenter_ServiceNavigation', _rows)
     this.setState(() => {
@@ -672,7 +669,6 @@ class Detail extends PureComponent {
     )
     if (!hasInternalLabServiceCenter) {
       hiddenFields.push('ctService_TestPanel')
-      hiddenFields.push('isRequiredSpecifyPanelItem')
     }
 
     if (!isEnableNurseWorkItem) hiddenFields.push('isNurseActualizable')
@@ -692,6 +688,8 @@ class Detail extends PureComponent {
       ctService_Tag,
       errors,
     } = props
+
+    const { ctService_TestPanel: originalTestPanels } = props.initialValues
 
     const {
       serviceSettings,
@@ -894,27 +892,6 @@ class Detail extends PureComponent {
                         />
                       </GridItem>
                     )}
-
-                    {!hiddenFields.includes('isRequiredSpecifyPanelItem') && (
-                      <GridItem xs={4}>
-                        <Field
-                          name='isRequiredSpecifyPanelItem'
-                          render={args => {
-                            return (
-                              <Switch
-                                disabled={
-                                  !this.props.values.ctService_TestPanel ||
-                                  this.props.values.ctService_TestPanel
-                                    .length === 0
-                                }
-                                label='Specify Panel Item'
-                                {...args}
-                              />
-                            )
-                          }}
-                        />
-                      </GridItem>
-                    )}
                   </GridContainer>
                 </GridItem>
               </GridContainer>
@@ -1029,7 +1006,7 @@ class Detail extends PureComponent {
                 onCommitChanges: this.commitChanges,
                 onAddedRowsChange: this.onAddedRowsChange,
                 isDeletable: row => {
-                  return !this.state.hasActiveSession || !row.isUsedByOthers
+                  return !row.isUsedByOthers
                 },
               }}
               schema={itemSchema}
@@ -1066,7 +1043,7 @@ class Detail extends PureComponent {
             {!hiddenFields.includes('ctService_TestPanel') && (
               <React.Fragment>
                 <h4 style={{ fontWeight: 400 }}>
-                  <b>Test Panels</b>
+                  <b>Lab Test Panel Settings</b>
                 </h4>{' '}
                 {testPanelErrMsg && (
                   <p className={classes.serviceSettingStyle}>
@@ -1088,6 +1065,16 @@ class Detail extends PureComponent {
                   EditingProps={{
                     showAddCommand: true,
                     onCommitChanges: this.commitTestPanelChanges,
+                    isDeletable: row => {
+                      if (row.id && row.id <= 0) return true //Newly added row can be deletable before saving.
+
+                      const isUsedByOthers =
+                        (serviceSettings ?? []).findIndex(
+                          s => s.isUsedByOthers,
+                        ) !== -1
+
+                      return !isUsedByOthers
+                    },
                   }}
                   schema={testPanelSchema}
                   {...this.testPanelTableParas}

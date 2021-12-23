@@ -5,6 +5,7 @@ import $ from 'jquery'
 
 import { Divider, withStyles } from '@material-ui/core'
 import _ from 'lodash'
+import { ORDER_WIDGET_VALUES } from '@/utils/constants'
 import {
   Button,
   ProgressButton,
@@ -16,8 +17,9 @@ import {
 // utils
 import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
+import { computeTotalForAllSavedClaim } from '@/pages/Billing/refactored/applyClaimUtils'
 
-const styles = (theme) => ({
+const styles = theme => ({
   editor: {
     marginTop: theme.spacing(1),
     position: 'relative',
@@ -50,7 +52,7 @@ class Details extends PureComponent {
     prevKey: null,
   }
 
-  autoFocuseItem = (type) => {
+  autoFocuseItem = type => {
     setTimeout(() => {
       if (type === '5') {
         $(`#autofocus_${type} input`).focus()
@@ -91,7 +93,7 @@ class Details extends PureComponent {
           <ProgressButton
             color='primary'
             onClick={async () => {
-              const isSaveOk = await onSave((success) => { })
+              const isSaveOk = await onSave(success => {})
             }}
             icon={null}
           >
@@ -143,16 +145,18 @@ class Details extends PureComponent {
     }, 1)
   }
 
-  setDisable = (value) => {
+  setDisable = value => {
     this.setState({
       disableEdit: value,
     })
   }
 
   getNextSequence = () => {
-    const { orders: { rows } } = this.props
+    const {
+      orders: { rows },
+    } = this.props
 
-    const allDocs = rows.filter((s) => !s.isDeleted)
+    const allDocs = rows.filter(s => !s.isDeleted)
     let nextSequence = 1
     if (allDocs && allDocs.length > 0) {
       const { sequence } = _.maxBy(allDocs, 'sequence')
@@ -161,50 +165,76 @@ class Details extends PureComponent {
     return nextSequence
   }
 
-  render () {
+  render() {
     const { props } = this
-    const { classes, orders, dispatch, fromDispense, singleMode, from, clinicSettings } = props
+    const {
+      classes,
+      orders,
+      dispatch,
+      fromDispense,
+      singleMode,
+      from,
+      clinicSettings,
+    } = props
     const { type } = orders
     const cfg = {
       disableEdit: this.state.disableEdit,
       setDisable: this.setDisable,
       footer: this.footerBtns,
-      currentType: orderTypes.find((o) => o.value === type),
+      currentType: orderTypes.find(o => o.value === type),
       orderTypes,
       getNextSequence: this.getNextSequence,
       ...props,
     }
+
     let orderTypeArray = orderTypes
     if (fromDispense) {
       orderTypeArray = orderTypes.filter(
-        (o) => o.value !== '2' && o.value !== '6' && o.value !== '8' && o.value !== '10',
+        o =>
+          o.value !== ORDER_WIDGET_VALUES.VACCINATION &&
+          o.value !== ORDER_WIDGET_VALUES.ORDER_SET &&
+          o.value !== ORDER_WIDGET_VALUES.PACKAGE &&
+          o.value !== ORDER_WIDGET_VALUES.RADIOLOGY &&
+          o.value !== ORDER_WIDGET_VALUES.LAB,
       )
-    }
-    else {
+    } else {
       const { settings = [] } = clinicSettings
-      if (!settings.isEnablePackage) {
-        orderTypeArray = orderTypes.filter(
-          (o) => o.value !== '8',
-        )
-      }
 
-      if (!settings.isEnableRadiologyModule) {
-        orderTypeArray = orderTypes.filter(
-          (o) => o.value !== '10',
+      orderTypeArray = orderTypes.filter(o => {
+        if (
+          !settings.isEnablePackage &&
+          o.value === ORDER_WIDGET_VALUES.PACKAGE
         )
-      }
+          return false
+
+        if (
+          !settings.isEnableRadiologyModule &&
+          o.value === ORDER_WIDGET_VALUES.RADIOLOGY
+        ) {
+          return false
+        }
+
+        if (
+          !settings.isEnableLabModule &&
+          o.value === ORDER_WIDGET_VALUES.LAB
+        ) {
+          return false
+        }
+
+        return true
+      })
     }
 
     if (singleMode)
-      return orderTypeArray.find((o) => o.value === '7').component({
-        ...cfg,
-        type: '7',
-      })
+      return orderTypeArray
+        .find(o => o.value === '7')
+        .component({
+          ...cfg,
+          type: '7',
+        })
     const tabOptions = orderTypeArray
-      .filter(
-        (o) => o.value !== '7' || (o.value === '7' && from === 'EditOrder'),
-      )
-      .filter((o) => {
+      .filter(o => o.value !== '7' || (o.value === '7' && from === 'EditOrder'))
+      .filter(o => {
         const accessRight = Authorized.check(o.accessRight)
 
         if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
@@ -219,7 +249,7 @@ class Details extends PureComponent {
             <GridItem xs={12}>
               <Tabs
                 activeKey={type}
-                options={tabOptions.map((o) => {
+                options={tabOptions.map(o => {
                   return {
                     id: o.value,
                     name: o.name,
@@ -230,7 +260,7 @@ class Details extends PureComponent {
                   }
                 })}
                 tabStyle={{}}
-                onChange={(key) => {
+                onChange={key => {
                   dispatch({
                     type: 'orders/updateState',
                     payload: {
