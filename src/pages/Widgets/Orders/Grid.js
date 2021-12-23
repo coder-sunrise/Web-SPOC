@@ -1090,17 +1090,14 @@ export default ({
             if (!row.isPreOrder) {
               if (row.type === '10') {
                 if (
-                  radiologyWorkitem.statusFK ===
-                  RADIOLOGY_WORKITEM_STATUS.CANCELLED
+                  radiologyWorkitem.statusFK !== RADIOLOGY_WORKITEM_STATUS.NEW
                 ) {
                   editEnable = false
                 }
-              } else {
-                if (
-                  nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
-                ) {
-                  editEnable = false
-                }
+              } else if (
+                nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
+              ) {
+                editEnable = false
               }
             }
             return (

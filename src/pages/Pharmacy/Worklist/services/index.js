@@ -9,7 +9,7 @@ const fns = {
   queryJournalHistoryList: params =>
     service.queryList(`${url}/GetJournalHistory`, params),
   queryLeafletDrugList: params =>
-    service.query(`${url}/GetLeaftletDrugs`, params),
+    service.query(`${url}/GetSeparatedDrugInstructions`, params),
   printleaflet: params => service.query(`${url}/printleaflet`, params),
 }
 export default fns

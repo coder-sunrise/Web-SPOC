@@ -93,7 +93,6 @@ const EditableCell = ({
     let error = { hasError: false, errorMsg: '' }
     for (let i = 0; i < col.editableRules.length; i++) {
       let editableRule = col.editableRules[i]
-
       if (editableRule.required && fieldValue === '') {
         error = { hasError: true, errorMsg: editableRule.message }
         break
@@ -121,7 +120,7 @@ const EditableCell = ({
     }
 
     if (
-      error.hasError != validationError.hasError &&
+      error.hasError != validationError.hasError ||
       error.errorMsg != validationError.errorMsg
     ) {
       if (onErrorStatusChanged) {

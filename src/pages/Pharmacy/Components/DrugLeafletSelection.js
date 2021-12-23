@@ -122,7 +122,12 @@ class DrugLeafletSelection extends PureComponent {
         },
       ]
       this.props.handlePrint(JSON.stringify(payload))
-      this.props.onConfirmPrintLeaflet()
+      if (
+        this.state.printlanguage.indexOf(lan) ==
+        this.state.printlanguage.length - 1
+      ) {
+        this.props.onConfirmPrintLeaflet()
+      }
     })
   }
 
@@ -163,36 +168,38 @@ class DrugLeafletSelection extends PureComponent {
             )}
           </GridItem>
           <GridItem>
-            {secondaryPrintoutLanguage !== '' && (
-              <Fragment>
-                <span>Print In: </span>
-                <div style={{ width: 150, display: 'inline-block' }}>
-                  <CheckboxGroup
-                    displayInlineBlock={true}
-                    value={this.state.printlanguage}
-                    options={[
-                      { value: 'EN', label: 'EN' },
-                      { value: 'JP', label: 'JP' },
-                    ]}
-                    onChange={v => {
-                      this.setState({
-                        printlanguage: v.target.value,
-                      })
-                    }}
-                  />
+            <Fragment>
+              {secondaryPrintoutLanguage !== '' && (
+                <div style={{ display: 'inline-block' }}>
+                  <span>Print In: </span>
+                  <div style={{ width: 150, display: 'inline-block' }}>
+                    <CheckboxGroup
+                      displayInlineBlock={true}
+                      value={this.state.printlanguage}
+                      options={[
+                        { value: 'EN', label: 'EN' },
+                        { value: 'JP', label: 'JP' },
+                      ]}
+                      onChange={v => {
+                        this.setState({
+                          printlanguage: v.target.value,
+                        })
+                      }}
+                    />
+                  </div>
                 </div>
-                {showDrugWarning && (
-                  <div style={{ color: 'red' }}>
-                    * Please select at least one drug to print.
-                  </div>
-                )}
-                {showLanguageWarning && (
-                  <div style={{ color: 'red' }}>
-                    * Please select at least one language to print.
-                  </div>
-                )}
-              </Fragment>
-            )}
+              )}
+              {showDrugWarning && (
+                <div style={{ color: 'red' }}>
+                  * Please select at least one drug to print.
+                </div>
+              )}
+              {showLanguageWarning && (
+                <div style={{ color: 'red' }}>
+                  * Please select at least one language to print.
+                </div>
+              )}
+            </Fragment>
           </GridItem>
         </GridContainer>
         {footer({

@@ -1824,7 +1824,7 @@ class Medication extends PureComponent {
       ? true
       : false
     const { labelPrinterSize } = clinicSettings
-    const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
+    const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
     const showPrescriptionSet =
       ENABLE_PRESCRIPTION_SET_CLINIC_ROLE.indexOf(
         user.data.clinicianProfile.userProfile.role.clinicRoleFK,
@@ -1890,7 +1890,7 @@ class Medication extends PureComponent {
               </GridItem>
             )}
             {values.isDrugMixture && (
-              <GridItem xs={6} style={{ paddingRight: 115 }}>
+              <GridItem xs={6} style={{ paddingRight: 85 }}>
                 <div style={{ position: 'relative' }}>
                   <FastField
                     name='drugName'
@@ -1900,7 +1900,7 @@ class Medication extends PureComponent {
                           <TextField
                             label='Drug Mixture'
                             {...args}
-                            maxLength={60}
+                            maxLength={90}
                           />
                         </div>
                       )
@@ -1909,7 +1909,7 @@ class Medication extends PureComponent {
                   <div
                     style={{
                       position: 'absolute',
-                      right: -115,
+                      right: -110,
                       top: 24,
                       marginLeft: 'auto',
                     }}
@@ -1921,16 +1921,19 @@ class Medication extends PureComponent {
                         fontWeight: 500,
                       }}
                     >
-                      {`Characters left: ${60 -
+                      {`Characters left: ${90 -
                         (drugName ? drugName.length : 0)}`}
                     </span>
                   </div>
                 </div>
               </GridItem>
             )}
-            <GridItem xs={6} style={{ marginTop: theme.spacing(2) }}>
-              <div style={{ position: 'relative' }}>
-                <div>
+            <GridItem
+              xs={6}
+              style={{ marginTop: theme.spacing(2), textAlign: 'right' }}
+            >
+              <div style={{ display: 'inline-block' }}>
+                <div style={{ display: 'inline-block' }}>
                   {!openPrescription && (
                     <Field
                       name='isDrugMixture'
@@ -1986,7 +1989,7 @@ class Medication extends PureComponent {
                   )}
                 </div>
                 {!openPrescription && !isEditMedication && (
-                  <div style={{ position: 'absolute', left: 110, top: 0 }}>
+                  <div style={{ display: 'inline-block', top: 0 }}>
                     <Tooltip title={`Add Medication From patient's History`}>
                       <ProgressButton
                         color='primary'
@@ -2001,6 +2004,7 @@ class Medication extends PureComponent {
                         <ProgressButton
                           color='primary'
                           icon={<Add />}
+                          style={{ marginRight: '0' }}
                           onClick={this.onSearchPrescriptionSet}
                         >
                           Prescription Set
@@ -2018,7 +2022,7 @@ class Medication extends PureComponent {
                 <EditableTableGrid
                   forceRender
                   style={{
-                    margin: theme.spacing(1),
+                    marginTop: theme.spacing(1),
                   }}
                   getRowId={r => r.id}
                   rows={values.corPrescriptionItemDrugMixture}
@@ -2545,7 +2549,7 @@ class Medication extends PureComponent {
                     render={args => {
                       return (
                         <TextField
-                          maxLength={60}
+                          maxLength={30}
                           label='Drug Label Remarks'
                           {...args}
                         />
@@ -2567,7 +2571,7 @@ class Medication extends PureComponent {
                         fontWeight: 500,
                       }}
                     >
-                      {`Characters left: ${60 -
+                      {`Characters left: ${30 -
                         (drugLabelRemarks ? drugLabelRemarks.length : 0)}`}
                     </span>
                   </div>

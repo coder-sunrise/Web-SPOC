@@ -2,33 +2,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import CodeSelect from './CodeSelect'
+import { getMappedVisitType } from '@/utils/utils'
 
 @connect(({ codetable, clinicSettings }) => ({ codetable, clinicSettings }))
 class VisitTypeSelect extends React.Component {
   state = {}
   constructor(props) {
     super(props)
-  }
-
-  mapVisitType = (visitpurpose, visitTypeSettingsObj) => {
-    return visitpurpose
-      .map((item, index) => {
-        const { name, code, sortOrder, ...rest } = item
-        const visitType = visitTypeSettingsObj
-          ? visitTypeSettingsObj[index]
-          : undefined 
-        return {
-          ...rest,
-          name: visitType?.displayValue || name,
-          code: visitType?.code || code,
-          isEnabled: visitType?.isEnabled === 'true' || !visitType?.isEnabled,
-          sortOrder: visitType?.sortOrder || 0,
-          customTooltipField: `Code: ${visitType?.code ||
-            code}\nName: ${visitType?.displayValue || name}`,
-        }
-      })
-      .filter(t => t.isEnabled)
-      .sort((a, b) => (a.sortOrder >= b.sortOrder ? 1 : -1))
   }
 
   componentDidMount() {
@@ -44,7 +24,7 @@ class VisitTypeSelect extends React.Component {
         const visitTypeSetting = JSON.parse(
           clinicSettings.settings.visitTypeSetting,
         )
-        var newVisitType = this.mapVisitType(result, visitTypeSetting)
+        var newVisitType = getMappedVisitType(result, visitTypeSetting)
         this.setState({
           ctVisitpurpose: newVisitType,
         })
