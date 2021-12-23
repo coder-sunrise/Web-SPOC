@@ -526,6 +526,12 @@ const getServices = data => {
             name: m.tagDisplayValue,
           }
         }),
+        serviceTestCategories: (o[0].serviceTestPanel || []).map(m => {
+          return {
+            value: m.testCategoryFK,
+            name: m.testCategory,
+          }
+        }),
         isDisplayValueChangable: o[0].isDisplayValueChangable,
       }
     }),
@@ -581,12 +587,33 @@ const getServices = data => {
     ['asc'],
   )
 
+  let serviceTestCategories = []
+  data.forEach(service => {
+    ;(service.serviceTestPanel || []).forEach(testPanel => {
+      serviceTestCategories = serviceTestCategories.concat({
+        value: testPanel.testCategoryFK,
+        name: testPanel.testCategory,
+      })
+    })
+  })
+  serviceTestCategories = _.orderBy(
+    Object.values(_.groupBy(serviceTestCategories, 'value')).map(o => {
+      return {
+        value: o[0].value,
+        name: o[0].name,
+      }
+    }),
+    ['name'],
+    ['asc'],
+  )
+
   return {
     serviceCenterServices: data,
     services,
     serviceCenters,
     serviceCatetorys,
     serviceTags,
+    serviceTestCategories,
   }
 }
 export {

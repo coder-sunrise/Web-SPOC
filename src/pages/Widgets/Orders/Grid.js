@@ -15,6 +15,7 @@ import numeral from 'numeral'
 import {
   RADIOLOGY_WORKITEM_STATUS,
   NURSE_WORKITEM_STATUS,
+  ORDER_TYPES,
 } from '@/utils/constants'
 import {
   CommonTableGrid,
@@ -120,29 +121,53 @@ export default ({
     const { nuseActualize = [] } = nurseWorkitem
     if (!row.isPreOrder) {
       if (
-        (row.type === '10' &&
+        (row.type === ORDER_TYPES.RADIOLOGY &&
           radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED) ||
         nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
       ) {
         return
       }
     }
+    //TODO::Check for changes to make for Lab
     if (row.isPreOrderActualize) return
-    if (!row.isActive && row.type !== '5' && !row.isDrugMixture) return
+    if (
+      !row.isActive &&
+      row.type !== ORDER_TYPES.OPEN_PRESCRIPTION &&
+      !row.isDrugMixture
+    )
+      return
 
-    if (row.type === '7' && from !== 'EditOrder') return
+    if (row.type === ORDER_TYPES.TREATMENT && from !== 'EditOrder') return
 
     const editAccessRight = OrderItemAccessRight(row)
 
     const accessRight = Authorized.check(editAccessRight)
     if (!accessRight || accessRight.rights !== 'enable') return
 
-    if (row.type === '10') {
+    if (row.type === ORDER_TYPES.RADIOLOGY) {
       dispatch({
         type: 'orders/updateState',
         payload: {
           entity: {
             radiologyItems: [{ ...row }],
+            editServiceId: row.serviceFK,
+            selectCategory: 'All',
+            selectTag: 'All',
+            filterService: '',
+            serviceCenterFK: row.serviceCenterFK,
+            quantity: row.quantity,
+            total: row.total,
+            totalAfterItemAdjustment: row.totalAfterItemAdjustment,
+          },
+          type: row.type,
+        },
+      })
+    } else if (row.type === ORDER_TYPES.LAB) {
+      dispatch({
+        type: 'orders/updateState',
+        payload: {
+          entity: {
+            labItems: [{ ...row }],
             editServiceId: row.serviceFK,
             selectCategory: 'All',
             selectTag: 'All',
@@ -491,6 +516,7 @@ export default ({
       )
     return ''
   }
+
   return (
     <CommonTableGrid
       size='sm'
