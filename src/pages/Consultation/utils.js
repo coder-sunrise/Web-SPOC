@@ -245,10 +245,17 @@ const convertToConsultation = (
     isGSTInclusive,
     corPackage = [],
   } = orders
+
   values.corOrderAdjustment = finalAdjustments
   orderTypes.forEach((p, i) => {
     if (p.prop) {
-      if (p.value === '5' || p.value === '10') {
+      if (
+        p.value === ORDER_TYPES.OPEN_PRESCRIPTION ||
+        p.value === ORDER_TYPES.RADIOLOGY ||
+        p.value === ORDER_TYPES.LAB
+      ) {
+        // Open Prescription is sharing the property with Medication so that it will need to cancatenate new orders into same property.
+        // Same logic applies to Service , Lab and Radiology.
         values[p.prop] = (values[p.prop] || []).concat(
           orderRows.filter(o => o.type === p.value),
         )
@@ -311,7 +318,6 @@ const convertToConsultation = (
   })
 
   values.corPackage = corPackage
-
   return {
     ...values,
     isGSTInclusive,
