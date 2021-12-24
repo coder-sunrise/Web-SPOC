@@ -19,6 +19,7 @@ import AddOrder from './DispenseDetails/AddOrder'
 import DispenseDetails from './DispenseDetails/WebSocketWrapper'
 import { DispenseItemsColumnExtensions } from './variables'
 import _ from 'lodash'
+import patient from '@/models/patient'
 
 const calculateInvoiceAmounts = entity => {
   const obj = { ...entity }
@@ -292,18 +293,24 @@ const validDispense = (dispenseItems = []) => {
   },
   displayName: 'DispensePage',
 })
-@connect(({ orders, formik, dispense }) => ({
+@connect(({ orders, formik, dispense, patient, clinicSettings }) => ({
   orders,
   formik,
   dispense,
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
+  patient,
 }))
 class Main extends Component {
   state = {
     showOrderModal: false,
     showDrugLabelSelection: false,
-    selectedDrugs: [],
     showCautionAlert: false,
     isShowOrderUpdated: false,
+    currentDrugToPrint: {},
+    packageItem: [],
+    dispenseItems: [],
+    packageItem: [],
+    dispenseItems: [],
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -333,7 +340,7 @@ class Main extends Component {
   }
 
   componentDidMount = async () => {
-    const { dispatch, values, dispense } = this.props
+    const { dispatch, values, dispense, clinicSettings } = this.props
     const {
       otherOrder = [],
       prescription = [],
@@ -388,6 +395,13 @@ class Main extends Component {
         })
       }
     })
+
+    // set default language based on patient tranlsation and clinic setting.
+    const preferLanguage =
+      (patient && patient.translationLinkFK) === 5
+        ? 'JP'
+        : clinicSettings.primaryPrintoutLanguage
+    this.setState({ selectedLanguage: [preferLanguage] })
 
     this.setState(() => {
       return {
@@ -589,31 +603,12 @@ class Main extends Component {
       this.handleOrderModal()
     }
   }
-
-  handleDrugLabelClick = () => {
-    const { values } = this.props
-    const { prescription = [], packageItem = [] } = values
-    let drugList = []
-
-    prescription.forEach(item => {
-      drugList.push(item)
-    })
-    packageItem.forEach(item => {
-      if (item.type === 'Medication') {
-        drugList.push({
-          ...item,
-          name: item.description,
-          dispensedQuanity: item.packageConsumeQuantity,
-        })
-      }
-    })
-
+  // click Drug Label button to show drug label selection
+  handleDrugLabelClick = row => {
+    this.setState({ currentDrugToPrint: row })
     this.setState(prevState => {
       return {
         showDrugLabelSelection: !prevState.showDrugLabelSelection,
-        selectedDrugs: drugList.map(x => {
-          return { ...x, no: 1, selected: true }
-        }),
       }
     })
   }
@@ -624,24 +619,6 @@ class Main extends Component {
         showDrugLabelSelection: !prevState.showDrugLabelSelection,
       }
     })
-  }
-
-  handleDrugLabelSelected = (itemId, selected) => {
-    this.setState(prevState => ({
-      selectedDrugs: prevState.selectedDrugs.map(drug =>
-        drug.id === itemId ? { ...drug, selected } : { ...drug },
-      ),
-    }))
-    this.props.dispatch({ type: 'global/incrementCommitCount' })
-  }
-
-  handleDrugLabelNoChanged = (itemId, no) => {
-    this.setState(prevState => ({
-      selectedDrugs: prevState.selectedDrugs.map(drug =>
-        drug.id === itemId ? { ...drug, no } : { ...drug },
-      ),
-    }))
-    this.props.dispatch({ type: 'global/incrementCommitCount' })
   }
 
   showRefreshOrder = () => {
@@ -702,9 +679,7 @@ class Main extends Component {
           onDrugLabelClick={this.handleDrugLabelClick}
           showDrugLabelSelection={this.state.showDrugLabelSelection}
           onDrugLabelSelectionClose={this.handleDrugLabelSelectionClose}
-          onDrugLabelSelected={this.handleDrugLabelSelected}
-          onDrugLabelNoChanged={this.handleDrugLabelNoChanged}
-          selectedDrugs={this.state.selectedDrugs}
+          currentDrugToPrint={this.state.currentDrugToPrint}
           isIncludeExpiredItem={this.checkExpiredItems()}
         />
         <CommonModal

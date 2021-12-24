@@ -816,6 +816,13 @@ td[class='ant-table-cell ant-table-cell-ellipsis'] {
   span {
     width: 100% !important;
   }
+  div {
+    span[class='anticon anticon-exclamation-circle'] {
+      width: 18px !important;
+    }
+  }
 }
 
-.MuiTooltip-tooltip{ font-size: 0.8rem!important;}
+.MuiTooltip-tooltip {
+  font-size: 0.8rem !important;
+}

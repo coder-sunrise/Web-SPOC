@@ -1510,17 +1510,17 @@ const getMappedVisitType = (visitpurpose, visitTypeSettingsObj) => {
   return visitpurpose
     .map((item, index) => {
       const { name, code, sortOrder, ...rest } = item
-      const vstType = visitTypeSettingsObj
+      const visitType = visitTypeSettingsObj
         ? visitTypeSettingsObj[index]
         : undefined
       return {
         ...rest,
-        name: vstType?.displayValue || name,
-        code: vstType?.code || code,
-        isEnabled: vstType?.isEnabled || 'true',
-        sortOrder: vstType?.sortOrder || 0,
-        customTooltipField: `${vstType?.code ||
-          code} - ${vstType?.displayValue || name}`,
+        name: visitType?.displayValue || name,
+        code: visitType?.code || code,
+        isEnabled: visitType?.isEnabled || 'true',
+        sortOrder: visitType?.sortOrder || 0,
+        customTooltipField: `Code: ${visitType?.code ||
+          code}\nName: ${visitType?.displayValue || name}`,
       }
     })
     .sort((a, b) => (a.sortOrder >= b.sortOrder ? 1 : -1))

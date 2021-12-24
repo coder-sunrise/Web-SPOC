@@ -228,7 +228,7 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
   ]
 
   const { labelPrinterSize } = clinicSettings.settings
-  const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
+  const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
 
   return (
     <CardContainer hideHeader size='sm' style={{ margin: 0 }}>

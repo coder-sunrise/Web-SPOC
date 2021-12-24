@@ -8,7 +8,12 @@ import OrderSet from '@/pages/Widgets/Orders/Detail/OrderSet'
 import Treatment from '@/pages/Widgets/Orders/Detail/Treatment'
 import Package from '@/pages/Widgets/Orders/Detail/Package'
 import Radiology from '@/pages/Widgets/Orders/Detail/Radiology'
-import { SERVICE_CENTER_CATEGORY, RADIOLOGY_CATEGORY } from '@/utils/constants'
+import Lab from '@/pages/Widgets/Orders/Detail/Lab'
+import {
+  SERVICE_CENTER_CATEGORY,
+  RADIOLOGY_CATEGORY,
+  LAB_CATEGORY,
+} from '@/utils/constants'
 
 import moment from 'moment'
 import { getUniqueId, getTranslationValue } from '@/utils/utils'
@@ -17,13 +22,14 @@ import {
   DOSAGE_RULE_OPERATOR,
   ALLERGY_TYPE,
   PATIENT_ALLERGY_TYPE,
+  ORDER_TYPES,
 } from '@/utils/constants'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 
 const orderTypes = [
   {
     name: 'Medication',
-    value: '1',
+    value: ORDER_TYPES.MEDICATION,
     prop: 'corPrescriptionItem',
     accessRight: 'queue.consultation.order.medication',
     filter: r => r.inventoryMedicationFK || r.isDrugMixture,
@@ -34,16 +40,18 @@ const orderTypes = [
   },
   {
     name: 'Service',
-    value: '3',
+    value: ORDER_TYPES.SERVICE,
     prop: 'corService',
     accessRight: 'queue.consultation.order.service',
-    filter: r => RADIOLOGY_CATEGORY.indexOf(r.serviceCenterCategoryFK) < 0,
+    filter: r =>
+      RADIOLOGY_CATEGORY.indexOf(r.serviceCenterCategoryFK) < 0 &&
+      LAB_CATEGORY.indexOf(r.serviceCenterCategoryFK) < 0,
     getSubject: r => r.serviceName,
     component: props => <Service {...props} />,
   },
   {
     name: 'Radiology',
-    value: '10',
+    value: ORDER_TYPES.RADIOLOGY,
     prop: 'corService',
     accessRight: 'queue.consultation.order.radiology',
     getSubject: r => r.serviceName,
@@ -51,8 +59,17 @@ const orderTypes = [
     component: props => <Radiology {...props} />,
   },
   {
+    name: 'Lab',
+    value: ORDER_TYPES.LAB,
+    prop: 'corService',
+    accessRight: 'queue.consultation.order.lab',
+    getSubject: r => r.serviceName,
+    filter: r => LAB_CATEGORY.indexOf(r.serviceCenterCategoryFK) >= 0,
+    component: props => <Lab {...props} />,
+  },
+  {
     name: 'Vaccination',
-    value: '2',
+    value: ORDER_TYPES.VACCINATION,
     prop: 'corVaccinationItem',
     accessRight: 'queue.consultation.order.vaccination',
     getSubject: r => r.vaccinationName,
@@ -60,7 +77,7 @@ const orderTypes = [
   },
   {
     name: 'Consumable',
-    value: '4',
+    value: ORDER_TYPES.CONSUMABLE,
     prop: 'corConsumable',
     accessRight: 'queue.consultation.order.consumable',
     getSubject: r => r.consumableName,
@@ -68,7 +85,7 @@ const orderTypes = [
   },
   {
     name: 'Open Prescription',
-    value: '5',
+    value: ORDER_TYPES.OPEN_PRESCRIPTION,
     prop: 'corPrescriptionItem',
     accessRight: 'queue.consultation.order.openprescription',
     filter: r => !r.inventoryMedicationFK && !r.isDrugMixture,
@@ -77,13 +94,13 @@ const orderTypes = [
   },
   {
     name: 'Order Set',
-    value: '6',
+    value: ORDER_TYPES.ORDER_SET,
     accessRight: 'queue.consultation.order.orderset',
     component: props => <OrderSet {...props} />,
   },
   {
     name: 'Treatment',
-    value: '7',
+    value: ORDER_TYPES.TREATMENT,
     prop: 'corDentalTreatments',
     accessRight: 'queue.consultation.order.treatment',
     getSubject: r => r.itemName,
@@ -91,7 +108,7 @@ const orderTypes = [
   },
   {
     name: 'Package',
-    value: '8',
+    value: ORDER_TYPES.PACKAGE,
     accessRight: 'queue.consultation.order.package',
     component: props => <Package {...props} />,
   },
@@ -228,28 +245,26 @@ const convertToConsultation = (
     isGSTInclusive,
     corPackage = [],
   } = orders
+
   values.corOrderAdjustment = finalAdjustments
   orderTypes.forEach((p, i) => {
     if (p.prop) {
-      if (p.value === '5' || p.value === '10') {
-        values[p.prop] = (values[p.prop] || []).concat(
-          orderRows.filter(o => o.type === p.value),
-        )
-      } else if (p.value === '2') {
+      values[p.prop] = (values[p.prop] || []).concat(
+        orderRows.filter(o => o.type === p.value),
+      )
+
+      if (p.value === ORDER_TYPES.VACCINATION) {
         // merge auto generated certificate from document to orders
-        values[p.prop] = orderRows
-          .filter(o => o.type === p.value)
-          .map(o => {
-            return {
-              ...o,
-              corVaccinationCert: o.corVaccinationCert.map(vc => {
-                const certificate = rows.find(cvc => cvc.uid === vc.uid)
-                return { ...vc, ...certificate }
-              }),
-            }
-          })
-      } else {
-        values[p.prop] = orderRows.filter(o => o.type === p.value)
+
+        values[p.prop] = values[p.prop].map(o => {
+          return {
+            ...o,
+            corVaccinationCert: o.corVaccinationCert.map(vc => {
+              const certificate = rows.find(cvc => cvc.uid === vc.uid)
+              return { ...vc, ...certificate }
+            }),
+          }
+        })
       }
     }
   })
@@ -294,7 +309,6 @@ const convertToConsultation = (
   })
 
   values.corPackage = corPackage
-
   return {
     ...values,
     isGSTInclusive,
@@ -512,6 +526,7 @@ const getOrdersData = val => {
     inventoryvaccination,
     ctservice,
   } = codetable
+
   selectPreOrder.forEach(po => {
     if (po.preOrderItemType === 'Medication') {
       const { preOrderMedicationItem = {} } = po
@@ -828,7 +843,13 @@ const getOrdersData = val => {
         totalAfterOverallAdjustment:
           preOrderServiceItem?.totalAfterOverallAdjustment ||
           service[0].unitPrice * po.quantity,
-        type: po.preOrderItemType === 'Radiology' ? '10' : '3',
+        type: (() => {
+          if (po.preOrderItemType === 'Radiology') return ORDER_TYPES.RADIOLOGY
+
+          if (po.preOrderItemType === 'Lab') return ORDER_TYPES.LAB
+
+          return ORDER_TYPES.SERVICE
+        })(),
         unitPrice: service[0].unitPrice || 0,
         hasPaid: po?.hasPaid,
       })

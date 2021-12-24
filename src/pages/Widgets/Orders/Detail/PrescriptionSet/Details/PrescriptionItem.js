@@ -570,11 +570,11 @@ class Detail extends PureComponent {
         )
         setFieldValue(
           `prescriptionSetItemPrecaution[${i}].precaution`,
-          im.medicationPrecaution?.name,
+          im.medicationPrecautionName,
         )
         setFieldValue(
           `prescriptionSetItemPrecaution[${i}].precautionCode`,
-          im.medicationPrecaution?.code,
+          im.medicationPrecautionCode,
         )
         setFieldValue(`prescriptionSetItemPrecaution[${i}].sequence`, i)
       })
@@ -1258,7 +1258,7 @@ class Detail extends PureComponent {
                       fontWeight: 500,
                     }}
                   >
-                    {`Characters left: ${60 - (values.drugName || '').length}`}
+                    {`Characters left: ${90 - (values.drugName || '').length}`}
                   </span>
                 </div>
               </div>

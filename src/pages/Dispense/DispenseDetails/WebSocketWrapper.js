@@ -11,13 +11,17 @@ import { REPORT_ID } from '@/utils/constants'
 import { getAppendUrl } from '@/utils/utils'
 import CONSTANTS from './constants'
 import DispenseDetails from './index'
+import _ from 'lodash'
 
 const { queryDrugLabelDetails, queryDrugLabelsDetails } = service
 const WebSocketWrapper = ({
   handlePrint,
   selectedDrugs,
+  selectedLanguage,
+  currentDrugToPrint,
   sendingJob,
   onPrintRef,
+  onDrugLabelSelectionClose,
   ...restProps
 }) => {
   const withoutPrintPreview = [
@@ -104,63 +108,20 @@ const WebSocketWrapper = ({
     return null
   }
 
-  const getPrintResult = async (type, row, printAllDrugLabel) => {
-    let drugLabelReportID = REPORT_ID.DRUG_LABEL_80MM_45MM
+  const getPrintResult = async (type, row, printAllDrugLabel, lan) => {
     let patientLabelReportID = REPORT_ID.PATIENT_LABEL_80MM_45MM
     try {
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
       if (settings && settings.labelPrinterSize === '8.9cmx3.6cm') {
-        drugLabelReportID = REPORT_ID.DRUG_LABEL_89MM_36MM
         patientLabelReportID = REPORT_ID.PATIENT_LABEL_89MM_36MM
       } else if (settings && settings.labelPrinterSize === '7.6cmx3.8cm') {
-        drugLabelReportID = REPORT_ID.DRUG_LABEL_76MM_38MM
         patientLabelReportID = REPORT_ID.PATIENT_LABEL_76MM_38MM
-      }
-
-      if (type === CONSTANTS.ALL_DRUG_LABEL) {
-        const { dispense, values } = restProps
-        const { prescription, packageItem } = values
-        const reportContext = await getReportContext(drugLabelReportID)
-        const drugLabelList = await generateDrugLablesPrintSource(
-          dispense ? dispense.visitID : values.id,
-          prescription,
-          packageItem,
-          printAllDrugLabel,
-        )
-        if (drugLabelList) {
-          const payload = drugLabelList.map(drugLabel => ({
-            ReportId: drugLabelReportID,
-            ReportData: JSON.stringify({
-              DrugLabelDetails: [{ ...drugLabel }],
-              ReportContext: reportContext,
-            }),
-          }))
-          return payload
-        }
-      }
-
-      if (type === CONSTANTS.DRUG_LABEL) {
-        const reportContext = await getReportContext(drugLabelReportID)
-        const drugLabel = await generateDrugLablePrintSource(row)
-        if (drugLabel) {
-          const payload = drugLabel.map(details => {
-            return {
-              ReportId: drugLabelReportID,
-              ReportData: JSON.stringify({
-                DrugLabelDetails: [{ ...details }],
-                ReportContext: reportContext,
-              }),
-            }
-          })
-          return payload
-        }
       }
 
       if (type === CONSTANTS.PATIENT_LABEL) {
         const { patient, values } = restProps
-
         const data = await getRawData(patientLabelReportID, {
-          patientId: patient ? patient.id : values.patientProfileFK,
+          patientId: patient ? patient.entity.id : values.patientProfileFK,
         })
         return [
           {
@@ -176,15 +137,17 @@ const WebSocketWrapper = ({
     }
     return null
   }
-
+  // Click Confirm in drug lable selector will trigger this
   const handleOnPrint = async ({ type, row, printAllDrugLabel, printData }) => {
     if (withoutPrintPreview.includes(type)) {
-      let printResult = await getPrintResult(type, row, printAllDrugLabel)
-      if (printData && printData.length > 0)
-        printResult = (printResult || []).concat(printData)
+      if (type === CONSTANTS.PATIENT_LABEL) {
+        let printResult = await getPrintResult(type, row, printAllDrugLabel)
+        if (printData && printData.length > 0)
+          printResult = (printResult || []).concat(printData)
 
-      if (!printResult || printResult.length <= 0) return
-      await handlePrint(JSON.stringify(printResult))
+        if (!printResult || printResult.length <= 0) return
+        await handlePrint(JSON.stringify(printResult))
+      }
     } else {
       const documentType = consultationDocumentTypes.find(
         o =>
@@ -233,9 +196,12 @@ const WebSocketWrapper = ({
     <DispenseDetails
       {...restProps}
       onFinalizeClick={handleFinalize}
+      onDrugLabelSelectionClose={onDrugLabelSelectionClose}
       onPrint={handleOnPrint}
       sendingJob={sendingJob}
       selectedDrugs={selectedDrugs}
+      selectedLanguage={selectedLanguage}
+      currentDrugToPrint={currentDrugToPrint}
     />
   )
 }

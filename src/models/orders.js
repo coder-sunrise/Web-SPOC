@@ -80,6 +80,14 @@ const initialState = {
     selectTag: 'All',
     filterService: '',
   },
+  defaultlab: {
+    editServiceId: undefined,
+    isEdit: false,
+    labItems: [],
+    selectCategory: 'All',
+    selectTag: 'All',
+    filterService: '',
+  },
 }
 export default createListViewModel({
   namespace: 'orders',
