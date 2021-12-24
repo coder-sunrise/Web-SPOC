@@ -148,7 +148,8 @@ class DrugLeafletSelection extends PureComponent {
     const showDrugWarning =
       this.props.rows.filter(item => this.state.selectedRows.includes(item.id))
         .length == 0
-    const showLanguageWarning = this.state.printlanguage.length == 0
+    const showLanguageWarning =
+      secondaryPrintoutLanguage != '' && this.state.printlanguage.length == 0
     return (
       <div>
         <GridContainer>
