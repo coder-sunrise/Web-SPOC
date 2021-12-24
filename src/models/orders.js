@@ -80,7 +80,7 @@ const initialState = {
     selectTag: 'All',
     filterService: '',
   },
-  defaultlab: {
+  defaultLab: {
     editServiceId: undefined,
     isEdit: false,
     labItems: [],
