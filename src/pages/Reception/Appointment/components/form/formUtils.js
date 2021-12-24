@@ -189,15 +189,22 @@ export const mapPropsToValues = ({
   }
 
   try {
-    if (viewingAppointment.id) {
+    if (viewingAppointment.id || viewingAppointment.isFromCopy) {
       const clinicianProfile =
         clinicianProfiles &&
         clinicianProfiles.find(
           item => viewingAppointment.bookedByUserFk === item.userProfileFK,
         )
-      const appointment = viewingAppointment.appointments.find(
-        item => item.id === selectedAppointmentID,
-      )
+      let appointment
+      let isUpdated
+      if (viewingAppointment.isFromCopy) {
+        appointment = viewingAppointment.appointments[0]
+        isUpdated = true
+      } else {
+        appointment = viewingAppointment.appointments.find(
+          item => item.id === selectedAppointmentID,
+        )
+      }
       let appointmentDate = appointment.appointmentDate
       let apptResources = appointment.appointments_Resources.map(item => {
         const { calendarResourceFK } = item
@@ -215,7 +222,7 @@ export const mapPropsToValues = ({
           apptDurationMinute: minute,
         }
       })
-      let isFromDragOrResize
+
       if (updateEvent) {
         const {
           updateApptResourceId,
@@ -224,7 +231,7 @@ export const mapPropsToValues = ({
           newResourceId,
           view,
         } = updateEvent
-        isFromDragOrResize = true
+        isUpdated = true
         if (
           (view === CALENDAR_VIEWS.MONTH || view === CALENDAR_VIEWS.WEEK) &&
           moment(newStartTime).startOf('day') !==
@@ -262,7 +269,7 @@ export const mapPropsToValues = ({
           updateResource.calendarResource = { ...source }
         }
       }
-      const { recurrenceDto, isCopyedAppt } = viewingAppointment
+      const { recurrenceDto } = viewingAppointment
       let {
         patientContactNo,
         patientName,
@@ -317,14 +324,12 @@ export const mapPropsToValues = ({
           appointmentDate: moment(appointmentDate),
           // appointmentDate,
         },
-        appointmentStatusFk: isCopyedAppt
-          ? APPOINTMENT_STATUS.DRAFT
-          : appointment.appointmentStatusFk,
+        appointmentStatusFk: appointment.appointmentStatusFk,
         appointments: viewingAppointment.appointments.map(item => ({
           ...item,
         })),
         _appointmentDateIn: true,
-        isFromDragOrResize,
+        isUpdated,
       }
     }
   } catch (error) {}

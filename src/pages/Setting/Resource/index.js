@@ -38,6 +38,9 @@ class Resource extends PureComponent {
         showModal: !this.props.settingResource.showModal,
       },
     })
+    this.props.dispatch({
+      type: 'settingResource/query',
+    })
   }
 
   render() {

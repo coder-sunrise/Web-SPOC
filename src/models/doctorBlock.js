@@ -66,10 +66,52 @@ export default createListViewModel({
         }
         return false
       },
-      *paste({ payload }, { call }) {
-        const result = yield call(service.paste, payload)
-        if (result) {
-          notification.success({ message: 'Doctor Block pasted' })
+      *copyDoctorBlock({ payload }, { call, put }) {
+        const { updateReource, ...other } = payload
+        const result = yield call(service.query, other)
+        const { status, data } = result
+        if (parseInt(status, 10) === 200) {
+          const {
+            id,
+            recurrenceDto,
+            doctorBlockRecurrenceFK,
+            ...restData
+          } = data
+          const doctorBlock = data.doctorBlocks[0]
+          let doctorBlockUserFk = restData.doctorBlockUserFk
+          let start = moment(doctorBlock.startDateTime)
+          let end = moment(doctorBlock.endDateTime)
+          if (updateReource) {
+            const { newStartTime, newEndTime, newResourceId } = updateReource
+            start = moment(newStartTime)
+            end = moment(newEndTime)
+            if (newResourceId) {
+              doctorBlockUserFk = newResourceId
+            }
+          }
+          const copyBlock = {
+            ...restData,
+            doctorBlocks: data.doctorBlocks.map(item => {
+              const { id, doctorBlockGroupFK, ...restItem } = item
+              return {
+                ...restItem,
+                startDateTime: start,
+                endDateTime: end,
+                isEditedAsSingleDoctorBlock: true,
+              }
+            }),
+            doctorBlockUserFk,
+            isEnableRecurrence: false,
+            isFromCopy: true,
+          }
+          yield put({
+            type: 'setDoctorBlockView',
+            payload: copyBlock,
+          })
+          yield put({
+            type: 'setEditType',
+            payload: payload.mode,
+          })
           return true
         }
         return false

@@ -20,7 +20,10 @@ import {
   CommonModal,
   notification,
   timeFormat24Hour,
+  Popconfirm,
+  Button,
 } from '@/components'
+import Delete from '@material-ui/icons/Delete'
 import { ShoppingCartTwoTone } from '@material-ui/icons'
 import DailyResourceManagement from './DailyResourceManagement'
 
@@ -36,7 +39,10 @@ const resourceCapacitySchema = Yup.object().shape({
   ),
   startTime: Yup.string().required(),
   endTime: Yup.string().required(),
-  maxCapacity: Yup.number().required(),
+  maxCapacity: Yup.number()
+    .required()
+    .min(0)
+    .max(9999),
 })
 
 @withFormikExtend({
@@ -65,13 +71,13 @@ const resourceCapacitySchema = Yup.object().shape({
         ...restValues,
         calendarResource: {
           ...restValues.calendarResource,
-          ctCalendarResourceCapacity: restValues.calendarResource.ctCalendarResourceCapacity.map(
-            csc => {
+          ctCalendarResourceCapacity: restValues.calendarResource.ctCalendarResourceCapacity
+            .filter(csc => csc.id > 0 || !csc.isDeleted)
+            .map(csc => {
               return {
                 ...csc,
               }
-            },
-          ),
+            }),
         },
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
@@ -157,26 +163,33 @@ class Detail extends PureComponent {
   }
 
   onConfirm = () => {
-    const { values, handleSubmit } = this.props
+    const { handleSubmit } = this.props
+    if (this.checkConflictTime()) {
+      notification.error({
+        message: 'Time range conflicting with other times.',
+      })
+    } else {
+      setTimeout(() => {
+        handleSubmit()
+      }, 100)
+    }
+  }
+
+  checkConflictTime = () => {
+    const { values } = this.props
     const resourceCapacity =
       values.calendarResource?.ctCalendarResourceCapacity || []
-    let containsWrongCapacity = false
+    let containsConflictTime = false
     for (let index = 0; index < resourceCapacity.length; index++) {
       if (
         index > 0 &&
         resourceCapacity[index].startTime < resourceCapacity[index - 1].endTime
       ) {
-        containsWrongCapacity = true
+        containsConflictTime = true
         break
       }
     }
-    if (containsWrongCapacity) {
-      notification.error({
-        message: 'Time from can not be more than previous time to',
-      })
-    } else {
-      handleSubmit()
-    }
+    return containsConflictTime
   }
 
   render() {
@@ -268,6 +281,7 @@ class Detail extends PureComponent {
               }}
               rows={values.calendarResource?.ctCalendarResourceCapacity || []}
               EditingProps={{
+                showCommandColumn: false,
                 showAddCommand: true,
                 onCommitChanges: this.commitChanges,
               }}
@@ -275,6 +289,7 @@ class Detail extends PureComponent {
               columns={[
                 { name: 'capacityTime', title: 'Time From & Time To' },
                 { name: 'maxCapacity', title: 'Default Maximum Capacity' },
+                { name: 'action', title: ' ' },
               ]}
               columnExtensions={[
                 {
@@ -301,6 +316,8 @@ class Detail extends PureComponent {
                             <SyncfusionTimePicker
                               step={apptTimeIntervel}
                               value={row.startTime}
+                              min='07:00'
+                              max='22:00'
                               onChange={e => {
                                 const { commitChanges } = control
                                 row.startTime = e
@@ -324,13 +341,13 @@ class Detail extends PureComponent {
                             <div
                               style={{
                                 position: 'absolute',
-                                right: '-8px',
+                                right: '-6px',
                                 top: 10,
                               }}
                             >
                               {startError && (
                                 <Tooltip title={startError.message}>
-                                  <Warning style={{ color: 'red' }} />
+                                  <Warning color='error' />
                                 </Tooltip>
                               )}
                             </div>
@@ -352,7 +369,8 @@ class Detail extends PureComponent {
                             <SyncfusionTimePicker
                               step={apptTimeIntervel}
                               value={row.endTime}
-                              //min={row.startTime}
+                              min='07:00'
+                              max='22:00'
                               onChange={e => {
                                 const { commitChanges } = control
                                 row.endTime = e
@@ -368,7 +386,7 @@ class Detail extends PureComponent {
                             <div
                               style={{
                                 position: 'absolute',
-                                right: '-8px',
+                                right: '-6px',
                                 top: 10,
                               }}
                             >
@@ -376,7 +394,7 @@ class Detail extends PureComponent {
                                 <Tooltip
                                   title={(endError || moreThanError).message}
                                 >
-                                  <Warning style={{ color: 'red' }} />
+                                  <Warning color='error' />
                                 </Tooltip>
                               )}
                             </div>
@@ -395,6 +413,36 @@ class Detail extends PureComponent {
                   min: 0,
                   sortingEnabled: false,
                   width: 200,
+                },
+                {
+                  columnName: 'action',
+                  width: 60,
+                  isReactComponent: true,
+                  sortingEnabled: false,
+                  isDisabled: row => true,
+                  render: e => {
+                    const { row, columnConfig } = e
+                    const { control } = columnConfig
+                    const { commitChanges } = control
+                    return (
+                      <Popconfirm
+                        title='Confirm to delete?'
+                        onConfirm={() => {
+                          commitChanges({
+                            changed: {
+                              [row.id]: {
+                                isDeleted: true,
+                              },
+                            },
+                          })
+                        }}
+                      >
+                        <Button size='sm' justIcon color='danger'>
+                          <Delete />
+                        </Button>
+                      </Popconfirm>
+                    )
+                  },
                 },
               ]}
               FuncProps={{
@@ -425,6 +473,11 @@ class Detail extends PureComponent {
                 </Link>
               )}
             </div>
+            {this.checkConflictTime() && (
+              <div style={{ color: 'red', marginLeft: 16 }}>
+                Time range conflicting with other times.
+              </div>
+            )}
           </div>
         </div>
         {footer &&

@@ -93,6 +93,7 @@ const Filterbar = props => {
                       },
                     })
                   }}
+                  maxTagCount={0}
                 />
               </Tooltip>
             )}

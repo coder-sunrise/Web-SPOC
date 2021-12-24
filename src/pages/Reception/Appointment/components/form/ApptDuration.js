@@ -28,7 +28,7 @@ export const minuteOptions = [
   { name: '50 MINS', value: 50 },
   { name: '55 MINS', value: 55 },
 ]
-const setEndTime = (row) => {
+const setEndTime = row => {
   const { startTime, apptDurationHour = 0, apptDurationMinute = 0 } = row
   if (startTime) {
     const startMoment = moment(startTime, 'HH:mm')
@@ -42,36 +42,25 @@ const setEndTime = (row) => {
 const ApptDuration = ({ row, columnConfig, cellProps }) => {
   const { value, control, validSchema, ...restProps } = columnConfig
   const { onBlur, onFocus, autoFocus, ...props } = cellProps
-  const [
-    blur,
-    setBlur,
-  ] = useState(false)
+  const [blur, setBlur] = useState(false)
   const debounceBlur = _.debounce(setBlur, 100, {
     leading: false,
     trailing: true,
   })
-  useEffect(
-    () => {
-      if (blur) {
-        if (onBlur) onBlur()
-      }
-    },
-    [
-      blur,
-    ],
-  )
+  useEffect(() => {
+    if (blur) {
+      if (onBlur) onBlur()
+    }
+  }, [blur])
 
-  const [
-    focused,
-    setFocused,
-  ] = useState(false)
+  const [focused, setFocused] = useState(false)
 
   return (
     <GridContainer>
       <GridItem xs={5}>
         <Select
           inputProps={{
-            onMouseUp: (e) => {
+            onMouseUp: e => {
               if (!focused) {
                 setFocused(true)
                 if (typeof e.target.click === 'function') e.target.click()
@@ -84,7 +73,7 @@ const ApptDuration = ({ row, columnConfig, cellProps }) => {
           error={
             row.apptDurationHour !== undefined ? '' : 'This is a required field'
           }
-          onChange={(e) => {
+          onChange={e => {
             const { commitChanges } = control
             row.apptDurationHour = e
             setEndTime(row)
@@ -104,12 +93,16 @@ const ApptDuration = ({ row, columnConfig, cellProps }) => {
           onFocus={() => {
             debounceBlur(false)
           }}
+          dropdownMatchSelectWidth={false}
+          dropdownStyle={{
+            width: 60,
+          }}
         />
       </GridItem>
       <GridItem xs={6}>
         <Select
           inputProps={{
-            onMouseUp: (e) => {
+            onMouseUp: e => {
               if (!focused) {
                 setFocused(true)
                 if (typeof e.target.click === 'function') e.target.click()
@@ -120,13 +113,11 @@ const ApptDuration = ({ row, columnConfig, cellProps }) => {
           options={minuteOptions}
           {...restProps}
           error={
-            row.apptDurationMinute !== undefined ? (
-              ''
-            ) : (
-              'This is a required field'
-            )
+            row.apptDurationMinute !== undefined
+              ? ''
+              : 'This is a required field'
           }
-          onChange={(e) => {
+          onChange={e => {
             const { commitChanges } = control
             row.apptDurationMinute = e
             setEndTime(row)
@@ -144,6 +135,10 @@ const ApptDuration = ({ row, columnConfig, cellProps }) => {
           }}
           onFocus={() => {
             debounceBlur(false)
+          }}
+          dropdownMatchSelectWidth={false}
+          dropdownStyle={{
+            width: 90,
           }}
         />
       </GridItem>

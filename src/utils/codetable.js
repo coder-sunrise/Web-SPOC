@@ -271,7 +271,6 @@ const tenantCodesMap = new Map([
     'ctcalendarresource',
     {
       pagesize: 99999,
-      sorting: [{ columnName: 'resourceType', direction: 'asc' }],
     },
   ],
 ])
@@ -323,6 +322,10 @@ const fetchCodeTable = async (code, params, isReturnStatusCode = false) => {
   let newData = []
   if (parseInt(statusCode, 10) === 200) {
     newData = [...data.data]
+  }
+
+  if (code === 'ctcalendarresource') {
+    newData = _.orderBy(newData, ['resourceType', 'sortOrder', 'name'], ['asc'])
   }
 
   if (isReturnStatusCode === true) {
