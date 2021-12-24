@@ -245,28 +245,26 @@ const convertToConsultation = (
     isGSTInclusive,
     corPackage = [],
   } = orders
+
   values.corOrderAdjustment = finalAdjustments
   orderTypes.forEach((p, i) => {
     if (p.prop) {
-      if (p.value === '5' || p.value === '10') {
-        values[p.prop] = (values[p.prop] || []).concat(
-          orderRows.filter(o => o.type === p.value),
-        )
-      } else if (p.value === '2') {
+      values[p.prop] = (values[p.prop] || []).concat(
+        orderRows.filter(o => o.type === p.value),
+      )
+
+      if (p.value === ORDER_TYPES.VACCINATION) {
         // merge auto generated certificate from document to orders
-        values[p.prop] = orderRows
-          .filter(o => o.type === p.value)
-          .map(o => {
-            return {
-              ...o,
-              corVaccinationCert: o.corVaccinationCert.map(vc => {
-                const certificate = rows.find(cvc => cvc.uid === vc.uid)
-                return { ...vc, ...certificate }
-              }),
-            }
-          })
-      } else {
-        values[p.prop] = orderRows.filter(o => o.type === p.value)
+
+        values[p.prop] = values[p.prop].map(o => {
+          return {
+            ...o,
+            corVaccinationCert: o.corVaccinationCert.map(vc => {
+              const certificate = rows.find(cvc => cvc.uid === vc.uid)
+              return { ...vc, ...certificate }
+            }),
+          }
+        })
       }
     }
   })
@@ -311,7 +309,6 @@ const convertToConsultation = (
   })
 
   values.corPackage = corPackage
-
   return {
     ...values,
     isGSTInclusive,
