@@ -1,5 +1,4 @@
 import React, { PureComponent, Fragment } from 'react'
-import withWebSocket from '@/components/Decorator/withWebSocket'
 import * as Yup from 'yup'
 import _ from 'lodash'
 import { getRawData } from '@/services/report'
@@ -121,7 +120,7 @@ class DrugLeafletSelection extends PureComponent {
           }),
         },
       ]
-      this.props.handlePrint(JSON.stringify(payload))
+      await this.props.handlePrint(JSON.stringify(payload))
       if (
         this.state.printlanguage.indexOf(lan) ==
         this.state.printlanguage.length - 1
@@ -219,4 +218,4 @@ class DrugLeafletSelection extends PureComponent {
   }
 }
 
-export default withWebSocket()(DrugLeafletSelection)
+export default DrugLeafletSelection
