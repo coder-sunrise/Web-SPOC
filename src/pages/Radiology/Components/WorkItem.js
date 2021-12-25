@@ -121,6 +121,7 @@ const WorkitemTitle = ({ item }) => {
 
 const WorkitemBody = ({ item }) => {
   const { setDetailsId, visitPurpose } = useContext(WorklistContext)
+  const { visitInfo } = item
   const orderDate = moment(item.generateDate).format(
     dateFormatLongWithTimeNoSec,
     false,
@@ -136,6 +137,12 @@ const WorkitemBody = ({ item }) => {
     !item.visitInfo.queueNo || !item.visitInfo.queueNo.trim().length
       ? '-'
       : numeral(item.visitInfo.queueNo).format(isQueueNoDecimal ? '0.0' : '0')
+
+  const doctorName = `${
+    visitInfo.doctorTitle && visitInfo.doctorTitle.trim().length
+      ? `${visitInfo.doctorTitle}. `
+      : ''
+  }${visitInfo.doctorName || ''}`
 
   return (
     <div
@@ -167,9 +174,7 @@ const WorkitemBody = ({ item }) => {
       </WorkitemRow>
 
       <WorkitemRow>
-        <LeftLabel tooltip={item.visitInfo.doctorName}>
-          {item.visitInfo.doctorName}
-        </LeftLabel>
+        <LeftLabel tooltip={doctorName}>{doctorName}</LeftLabel>
 
         {item.visitInfo.visitGroup && (
           <RightLabel width={100}>
