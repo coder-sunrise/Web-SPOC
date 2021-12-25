@@ -212,7 +212,7 @@ class Adjustment extends PureComponent {
     } = openAdjustmentConfig
     const { showError } = this.state
 
-    console.log(openAdjustmentConfig)
+    //console.log(openAdjustmentConfig)
     return (
       <div>
         <div style={{ margin: theme.spacing(1) }}>

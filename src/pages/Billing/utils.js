@@ -14,6 +14,7 @@ export const constructPayload = values => {
     invoicePayer = [],
     invoicePayment = [],
     mode,
+    visitGroup,
   } = values
 
   const { invoiceItems, ...restInvoice } = invoice
@@ -103,6 +104,7 @@ export const constructPayload = values => {
       })),
     invoice: restInvoice,
     invoicePayer: _invoicePayer,
+    visitGroup,
   }
   return payload
 }

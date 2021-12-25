@@ -719,9 +719,9 @@ const DispenseDetails = ({
                       setShowRemovePayment(true)
                     } else {
                       if (
-                        dispenseItems.filter(x => isActualizable(x)).length >
+                        dispenseItems?.filter(x => isActualizable(x)).length >
                           0 ||
-                        service.filter(x => isActualizable(x)).length > 0
+                        service?.filter(x => isActualizable(x)).length > 0
                       )
                         notification.error({
                           message:
