@@ -278,8 +278,8 @@ const CalendarView = ({
   calendar,
   ctcalendarresource,
   onResourceDateChange,
-  onPasteEvent,
-  onDragOrResizeEvent,
+  onUpdateEvent,
+  apptTimeSlotDuration = 15,
 }) => {
   changeTimeRulerExtentPixel(apptTimeRulerExtent)
 
@@ -476,6 +476,40 @@ const CalendarView = ({
   )
 
   const cellDoubleClick = props => {
+    const resource = resources[props.groupIndex]
+    if (resource.resourceType === CALENDAR_RESOURCE.RESOURCE) {
+      const dailyCapacity = resource.calendarResourceDailyCapacity || []
+      const startTime = moment(props.startTime).format(timeFormat24Hour)
+      const hour = Math.floor(apptTimeSlotDuration / 60)
+      const minute = apptTimeSlotDuration % 60
+      const endTime = moment(props.startTime)
+        .add(hour, 'hour')
+        .add(minute, 'minute')
+        .format(timeFormat24Hour)
+      for (let index = 0; index < dailyCapacity.length; index++) {
+        if (
+          ((startTime < dailyCapacity[index].startTime &&
+            endTime < dailyCapacity[index].endTime) ||
+            (startTime >= dailyCapacity[index].startTime &&
+              startTime < dailyCapacity[index].endTime) ||
+            (endTime > dailyCapacity[index].startTime &&
+              endTime <= dailyCapacity[index].endTime)) &&
+          dailyCapacity[index].maxCapacity <= dailyCapacity[index].usedSlot
+        ) {
+          dispatch({
+            type: 'global/updateAppState',
+            payload: {
+              openConfirm: true,
+              isInformType: true,
+              openConfirmText: 'OK',
+              openConfirmContent: `${resource.name} reach maximum booking in this time slot. Please select another time.`,
+            },
+          })
+          props.cancel = true
+          return
+        }
+      }
+    }
     handleSelectSlot({
       start: props.startTime,
       end: props.endTime,
@@ -513,7 +547,7 @@ const CalendarView = ({
               return `${startTime} - ${endTime} Maximum slot: ${
                 c.maxCapacity
               } Balance slot: ${c.maxCapacity -
-                c.usedSlot}\r\nRemarks: ${c.remarks || '-'}`
+                c.usedSlot}\r\nRemarks:${c.remarks || '-'}`
             })
             .join('\r\n')
           const maxSlot = dailyCapacity.map(c => c.maxCapacity).join(', ')
@@ -521,7 +555,7 @@ const CalendarView = ({
             .map(c => {
               const balance = c.maxCapacity - c.usedSlot
               return `<span style="color:${
-                balance >= 0 ? 'black' : 'red'
+                balance > 0 ? 'black' : 'red'
               }">${balance}</span>`
             })
             .join(', ')
@@ -588,11 +622,6 @@ const CalendarView = ({
             })
             return
           }
-          const preEvent = filtered.filter(
-            item =>
-              item.isDoctorBlock === e.data.isDoctorBlock &&
-              item.id === e.data.id,
-          )
 
           let startTime = e.data.StartTime
           let endTime = e.data.EndTime
@@ -612,7 +641,7 @@ const CalendarView = ({
               ),
             ).toDate()
           }
-          onDragOrResizeEvent({
+          onUpdateEvent({
             ...e.data,
             resourceId:
               calendarView === CALENDAR_VIEWS.DAY
@@ -628,7 +657,7 @@ const CalendarView = ({
           setEventAction(undefined)
         }}
         resizeStop={e => {
-          onDragOrResizeEvent({
+          onUpdateEvent({
             ...e.data,
             view: calendarView,
             startTime: e.data.StartTime,
@@ -653,55 +682,47 @@ const CalendarView = ({
             })
             return
           }
+
+          let oldStartTime = eventAction.event.StartTime
+          let oldEndTime = eventAction.event.EndTime
           if (eventAction.event.isDoctorBlock) {
-            let starTime = data.startTime
-            if (calendarView === CALENDAR_VIEWS.MONTH) {
-              starTime = moment(
-                new Date(
-                  `${moment(data.startTime).format('YYYY MM DD')} ${moment(
-                    eventAction.event.startDateTime,
-                  ).format(timeFormat24Hour)}`,
-                ),
-              ).toDate()
-            }
-            const hour = moment(eventAction.event.endDateTime).diff(
-              moment(eventAction.event.startDateTime),
-              'hour',
-            )
-            const minute =
-              (moment(eventAction.event.endDateTime).diff(
-                moment(eventAction.event.startDateTime),
-                'minute',
-              ) /
-                60 -
-                hour) *
-              60
-            const endTime = moment(starTime)
-              .add(hour, 'hour')
-              .add(minute, 'minute')
-              .toDate()
-            onPasteEvent({
-              id: eventAction.event.id,
-              isDoctorBlock: eventAction.event.isDoctorBlock,
-              dataFrom: eventAction.type,
-              newResourceId: newResource.clinicianProfileDto.userProfileFK,
-              startTime: starTime,
-              endTime: endTime,
-            })
-          } else {
-            onPasteEvent({
-              id: eventAction.event.id,
-              isDoctorBlock: eventAction.event.isDoctorBlock,
-              dataFrom: eventAction.type,
-              newResourceId: newResource.id,
-              newDate: moment(data.startTime)
-                .startOf('day')
-                .formatUTC(),
-              startTime: data.startTime,
-              endTime: data.endTime,
-              pasteView: calendarView,
-            })
+            oldStartTime = eventAction.event.startDateTime
+            oldEndTime = eventAction.event.endDateTime
           }
+
+          let startTime = data.startTime
+          if (calendarView === CALENDAR_VIEWS.MONTH) {
+            startTime = moment(
+              new Date(
+                `${moment(data.startTime).format('YYYY MM DD')} ${moment(
+                  oldStartTime,
+                ).format(timeFormat24Hour)}`,
+              ),
+            ).toDate()
+          }
+          const hour = moment(oldEndTime).diff(moment(oldStartTime), 'hour')
+          const minute =
+            (moment(oldEndTime).diff(moment(oldStartTime), 'minute') / 60 -
+              hour) *
+            60
+          const endTime = moment(startTime)
+            .add(hour, 'hour')
+            .add(minute, 'minute')
+            .toDate()
+
+          onUpdateEvent({
+            ...eventAction.event,
+            resourceId:
+              calendarView === CALENDAR_VIEWS.DAY
+                ? eventAction.event.isDoctorBlock
+                  ? newResource.clinicianProfileDto.userProfileFK
+                  : newResource.id
+                : undefined,
+            view: calendarView,
+            startTime,
+            endTime,
+            isFromCopy: eventAction.type === 'Copy',
+          })
           setEventAction(undefined)
         }}
       />
@@ -720,6 +741,7 @@ const _CalendarView = connect(
     loading: loading.models.calendar,
     apptTimeIntervel: clinicSettings.settings.apptTimeIntervel,
     apptTimeRulerExtent: clinicSettings.settings.apptTimeRulerExtent,
+    apptTimeSlotDuration: clinicSettings.settings.apptTimeSlotDuration,
   }),
 )(CalendarView)
 

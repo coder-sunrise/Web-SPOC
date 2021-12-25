@@ -8,6 +8,7 @@ import { DataTypeProvider } from '@devexpress/dx-react-grid'
 // common components
 import { SizeContainer } from '@/components'
 import { tooltip } from '@/assets/jss/index'
+import _ from 'lodash'
 
 const RowErrorStyles = () => ({
   popover: {
@@ -31,20 +32,22 @@ const RowErrorStyles = () => ({
 const ListTypeError = ({ errors }) => {
   return (
     <ul>
-      {errors.map((error, index) => (
-        <li key={`rowError-${index}`}>{error.conflictContent}</li>
+      {_.orderBy(errors, ['isPrevent'], ['asc']).map((error, index) => (
+        <li
+          key={`rowError-${index}`}
+          style={{ fontWeight: error.isPrevent ? 600 : undefined }}
+        >
+          {error.conflictContent}
+        </li>
       ))}
     </ul>
   )
 }
 
 const ErrorPopover = ({ classes, errors = [], style = {}, className }) => {
-  const [
-    anchorEl,
-    setAnchorEl,
-  ] = useState(null)
+  const [anchorEl, setAnchorEl] = useState(null)
 
-  const handlePopoverOpen = (event) => {
+  const handlePopoverOpen = event => {
     setAnchorEl(event.currentTarget)
   }
 

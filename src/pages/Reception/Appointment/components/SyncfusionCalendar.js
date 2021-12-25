@@ -273,7 +273,7 @@ class SyncfusionCalendar extends React.PureComponent {
                     return
                   if (
                     !eventObj.isDoctorBlock &&
-                    eventObj.appointmentTypeFK === APPOINTMENT_STATUS.TURNEDUP
+                    eventObj.appointmentStatusFk === APPOINTMENT_STATUS.TURNEDUP
                   ) {
                     this.contextMenuObj.showItems(['Copy'], true)
                   } else {

@@ -51,7 +51,7 @@ export const AppointmentDataColExtensions = apptTimeIntervel => [
   {
     columnName: 'appointmentTypeFK',
     type: 'codeSelect',
-    width: 130,
+    width: 150,
     code: 'ctappointmenttype',
     labelField: 'displayValue',
     valueField: 'id',
@@ -107,7 +107,7 @@ export const AppointmentDataColExtensions = apptTimeIntervel => [
           >
             {error && (
               <Tooltip title={error}>
-                <Warning style={{ color: 'red' }} />
+                <Warning color='error' />
               </Tooltip>
             )}
           </div>

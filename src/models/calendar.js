@@ -4,8 +4,13 @@ import moment from 'moment'
 import { history } from 'umi'
 import { createListViewModel } from 'medisys-model'
 // common components
-import { notification } from '@/components'
-import { APPOINTMENT_STATUS, CALENDAR_VIEWS } from '@/utils/constants'
+import { notification, timeFormat24Hour } from '@/components'
+import {
+  APPOINTMENT_STATUS,
+  CALENDAR_VIEWS,
+  CALENDAR_RESOURCE,
+} from '@/utils/constants'
+import { roundTo } from '@/utils/utils'
 import * as service from '@/services/calendar'
 import phServices from '@/pages/Setting/PublicHoliday/services'
 import cbServices from '@/pages/Setting/ClinicBreakHour/services'
@@ -58,6 +63,12 @@ const updateApptResources = oldResources => (
       ...old,
     },
   ]
+}
+
+const calculateDuration = (startTime, endTime) => {
+  const hour = endTime.diff(startTime, 'hour')
+  const minute = roundTo((endTime.diff(startTime, 'minute') / 60 - hour) * 60)
+  return { hour, minute }
 }
 
 export default createListViewModel({
@@ -137,8 +148,7 @@ export default createListViewModel({
             ...restFormikValues
           } = formikValues
 
-          const isEdit =
-            formikValues.id !== undefined && !formikValues.isCopyedAppt
+          const isEdit = formikValues.id !== undefined
           let isRecurrenceChanged =
             formikValues.isEnableRecurrence &&
             compareDto(
@@ -285,20 +295,6 @@ export default createListViewModel({
             appointments,
             recurrenceDto: recurrence,
           }
-          if (restFormikValues.isCopyedAppt) {
-            savePayload = {
-              ...savePayload,
-              id: 0,
-              appointments: savePayload.appointments.map(appt => ({
-                ...appt,
-                id: 0,
-                appointmentGroupFK: 0,
-                appointments_Resources: appt.appointments_Resources.map(
-                  res => ({ ...res, id: 0, appointmentFK: 0 }),
-                ),
-              })),
-            }
-          }
           if (validate) {
             return yield put({
               type: 'validate',
@@ -364,22 +360,78 @@ export default createListViewModel({
         }
         return false
       },
-      *copyAppointment({ payload }, { call, put }) {
-        const result = yield call(service.query, payload)
+      *copyAppointment({ payload }, { call, put, select }) {
+        const { updateReource, ...other } = payload
+        const result = yield call(service.query, other)
         const { status, data } = result
         if (parseInt(status, 10) === 200) {
+          const { id, recurrenceDto, recurrenceFK, ...restData } = data
+          let appointmentDate = moment().startOf('day')
+          let apptResources = [...data.appointments[0].appointments_Resources]
+          if (updateReource) {
+            const codetable = yield select(st => st.codetable)
+            const { ctcalendarresource = [] } = codetable
+            const {
+              updateApptResourceId,
+              newStartTime,
+              newEndTime,
+              newResourceId,
+              view,
+            } = updateReource
+
+            appointmentDate = moment(newStartTime).startOf('day')
+            let updateResource = apptResources.find(
+              r => r.id === updateApptResourceId,
+            )
+
+            if (view !== CALENDAR_VIEWS.MONTH) {
+              const startTime = moment(newStartTime, timeFormat24Hour)
+              const endTime = moment(newEndTime, timeFormat24Hour)
+              const { hour, minute } = calculateDuration(startTime, endTime)
+              updateResource.startTime = startTime.format(timeFormat24Hour)
+              updateResource.endTime = endTime.format(timeFormat24Hour)
+              updateResource.apptDurationHour = hour
+              updateResource.apptDurationMinute = minute
+            }
+            if (newResourceId) {
+              const source = ctcalendarresource.find(
+                source => source.id === newResourceId,
+              )
+              if (source.resourceType === CALENDAR_RESOURCE.RESOURCE) {
+                updateResource.isPrimaryClinician = false
+              } else if (
+                !apptResources.find(
+                  r => r.id !== updateApptResourceId && r.isPrimaryClinician,
+                )
+              ) {
+                updateResource.isPrimaryClinician = true
+              }
+              updateResource.calendarResourceFK = newResourceId
+            }
+          }
           const copyAppt = {
-            ...data,
-            appointments: data.appointments.map(item => ({
-              ...item,
-              appointmentDate: moment().formatUTC(),
-              appointmentStatusFk: undefined, //undefined is new, will updated to Darft
-              isEditedAsSingleAppointment: false,
-              appointmentPreOrderItem: [],
-            })),
+            ...restData,
+            appointments: data.appointments.map(item => {
+              const { id, appointmentGroupFK, ...restApptData } = item
+              return {
+                ...restApptData,
+                appointmentDate: appointmentDate,
+                appointmentStatusFk: APPOINTMENT_STATUS.DRAFT, //undefined is new, will updated to Darft
+                isEditedAsSingleAppointment: false,
+                appointmentPreOrderItem: [],
+                appointments_Resources: [
+                  ...apptResources.map(res => {
+                    const { id, appointmentFK, ...restResourceData } = res
+                    return {
+                      ...restResourceData,
+                    }
+                  }),
+                ],
+              }
+            }),
             bookedByUserFk: payload.bookedByUserFk,
             isEnableRecurrence: false,
-            isCopyedAppt: true,
+            isFromCopy: true,
           }
           yield put({
             type: 'setViewAppointment',
@@ -616,15 +668,6 @@ export default createListViewModel({
             },
           }),
         ])
-      },
-
-      *paste({ payload }, { call }) {
-        const result = yield call(service.paste, payload)
-        if (result) {
-          notification.success({ message: 'Appointment pasted' })
-          return true
-        }
-        return false
       },
     },
     reducers: {
