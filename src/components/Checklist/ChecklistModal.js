@@ -32,10 +32,12 @@ const ChecklistModal = ({ selectedChecklist, onConfirm, onClose, open }) => {
     updateEditor(values)
   }
 
+  console.log('selectedChecklist', selectedChecklist)
+
   return (
     <CommonModal
       open={open}
-      title='Checklist'
+      title={selectedChecklist.displayValue}
       onClose={onCloseModal}
       showFooter={true}
       onConfirm={onFinish}
