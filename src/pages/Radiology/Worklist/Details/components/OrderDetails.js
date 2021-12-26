@@ -56,8 +56,6 @@ export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
       setPrimaryAccessionNo(getPrimaryAccessionNo(workitem))
     }
 
-    console.log('workitem changed')
-
     return () => {
       setIsCombinedOrder(false)
       setPrimaryAccessionNo('')
@@ -102,7 +100,7 @@ export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
             </TextGridItem>
 
             <RightAlignGridItem>Modality :</RightAlignGridItem>
-            <TextGridItem md={6}> {workitem.modalityDescription} </TextGridItem>
+            <TextGridItem md={6}>{workitem.modalityDescription}</TextGridItem>
 
             <RightAlignGridItem>Visit Type :</RightAlignGridItem>
             <TextGridItem md={6}>
