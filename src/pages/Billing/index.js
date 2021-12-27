@@ -365,7 +365,7 @@ class Billing extends Component {
           const {values, dispatch} = this.props
           if (values.visitId === visitID){
             const { isGroupPrint, showReport, reportPayload:{ reportID }={}, isGroupPayment, showAddPaymentModal } = this.state
-            if((isGroupPrint && (reportID === 88 && showReport)) || (isGroupPayment && showAddPaymentModal)){
+            if((isGroupPrint && (reportID === 89 && showReport)) || (isGroupPayment && showAddPaymentModal)){
               notification.error({ message: `The status for one of the invoices had been changed. Please check all invoices is in billing status and the billing is saved.`,})
               this.setState({ disabledPayment: true })
               dispatch({
@@ -776,7 +776,7 @@ class Billing extends Component {
   onPrintInvoice = (copayerID, invoicePayerid, index, isGroup) => {
     const { values, dispatch } = this.props
     const { invoicePayer, visitGroup } = values
-    const reportID = isGroup ? 88 : 15
+    const reportID = isGroup ? 89 : 15
     this.setState({ isGroupPrint: isGroup })
     const modifiedOrNewAddedPayer = invoicePayer.filter(payer => {
       if (payer.id === undefined && payer.isCancelled) return false
@@ -1396,7 +1396,7 @@ class Billing extends Component {
           open={showReport}
           onClose={this.onCloseReport}
           title={
-            [15, 88].indexOf(reportPayload.reportID) > 0
+            [15, 89].indexOf(reportPayload.reportID) > 0
               ? 'Invoice'
               : 'Visitation Invoice'
           }
