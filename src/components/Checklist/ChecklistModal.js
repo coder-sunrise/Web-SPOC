@@ -32,8 +32,6 @@ const ChecklistModal = ({ selectedChecklist, onConfirm, onClose, open }) => {
     updateEditor(values)
   }
 
-  console.log('selectedChecklist', selectedChecklist)
-
   return (
     <CommonModal
       open={open}
