@@ -843,7 +843,7 @@ class Billing extends Component {
 
   onPrintInvoiceClick = isGroup => {
     const { dispatch, values:{visitGroupStatusDetails=[]} } = this.props
-    if (isGroup && visitGroupStatusDetails.some(x => x.status !== 'Billing' || !x.isBillingSaved)) {
+    if (isGroup && visitGroupStatusDetails.some(x => !x.isBillingSaved)) {
       dispatch({
         type: 'global/updateAppState',
         payload: {
