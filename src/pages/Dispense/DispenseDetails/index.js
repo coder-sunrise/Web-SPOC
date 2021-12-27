@@ -18,6 +18,7 @@ import {
   Link,
 } from '@material-ui/core'
 import Delete from '@material-ui/icons/Delete'
+import withWebSocket from '@/components/Decorator/withWebSocket'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import { formatMessage } from 'umi' // common component
 import Warining from '@material-ui/icons/Error'
@@ -124,6 +125,7 @@ const DispenseDetails = ({
   onFinalizeClick,
   codetable,
   dispense,
+  handlePrint,
   history,
   onDrugLabelClick,
   showDrugLabelSelection,
@@ -1013,6 +1015,7 @@ const DispenseDetails = ({
         }}
       >
         <DrugLabelSelection
+          handlePrint={handlePrint}
           values={values}
           currentDrugToPrint={currentDrugToPrint}
           dispatch={dispatch}
@@ -1159,6 +1162,7 @@ const _DispenseDetails = props => (
 )
 
 export default compose(
+  withWebSocket(),
   withStyles(styles, { name: 'DispenseDetailsGrid' }),
   connect(
     ({

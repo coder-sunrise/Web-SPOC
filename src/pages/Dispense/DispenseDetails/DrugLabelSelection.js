@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react'
-import withWebSocket from '@/components/Decorator/withWebSocket'
 // common components
 import {
   GridContainer,
@@ -381,4 +380,4 @@ class DrugLabelSelection extends React.PureComponent {
     )
   }
 }
-export default withWebSocket()(DrugLabelSelection)
+export default DrugLabelSelection

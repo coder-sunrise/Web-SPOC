@@ -53,7 +53,6 @@ const withWebSocket = () => (Component) => {
       // reset port number state to retry all attempt and set job content
       // then initialize web socket connection
       const pendingJob = [content]
-      console.log(content)
       let sendSuccess = false
       this.setState({ pendingJob })
 
@@ -107,7 +106,6 @@ const withWebSocket = () => (Component) => {
 
     handlePrint = async content => {
       if (content) {
-        console.log(content)
         const result = await this.prepareJobForWebSocket(
           AESEncryptor.encrypt(
             JSON.stringify({
