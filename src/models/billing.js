@@ -69,6 +69,16 @@ export default createFormViewModel({
     effects: {
       *initState({ payload }, { select, put, take }) {
         const queueLogState = yield select(st => st.queueLog)
+
+        if (payload.visitID) {
+          yield put({
+            type: 'billing/query',
+            payload: {
+              id: payload.visitID,
+            },
+          })
+        }
+        
         if (payload.pid) {
           yield put({
             type: 'patient/query',
@@ -141,6 +151,7 @@ export default createFormViewModel({
             sendQueueNotification({
               message: 'Billing updated.',
               queueNo: entity.queueNo,
+              visitID: entity.id,
             })
           }
           return response
@@ -184,6 +195,7 @@ export default createFormViewModel({
           sendQueueNotification({
             message: 'Invoice unlocked. Ready for dispensing.',
             queueNo: entity.queueNo,
+            visitID: entity.id,
           })
           history.push(destinationUrl)
         }

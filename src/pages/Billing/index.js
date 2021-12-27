@@ -47,6 +47,7 @@ import {
   constructPayload,
   validateApplySchemesWithPatientSchemes,
 } from './utils'
+import { subscribeNotification } from '@/utils/realtime'
 
 const styles = theme => ({
   accordionContainer: {
@@ -282,7 +283,7 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
   notDirtyDuration: 3,
   displayName: 'BillingForm',
   enableReinitialize: true,
-  mapPropsToValues: ({ billing, clinicSettings }) => {
+  mapPropsToValues: ({ billing, clinicSettings, patient }) => {
     const { autoPrintReportsOnCompletePayment = '' } = clinicSettings
     try {
       if (billing.entity) {
@@ -313,8 +314,8 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
           autoPrintReportsOnCompletePayment: autoPrintReportsOnCompletePayment.split(
             ',',
           ),
+          patientID: patient.id,
         }
-
         return values
       }
     } catch (error) {
@@ -356,6 +357,28 @@ class Billing extends Component {
     isConsumedPackage: false,
   }
 
+  componentDidMount(){
+    subscribeNotification('QueueListing',{
+      callback: response => {
+        const { visitID, senderId } = response
+        if(visitID){
+          const {values, dispatch} = this.props
+          if (values.visitId === visitID){
+            const { isGroupPrint, showReport, reportPayload:{ reportID }={}, isGroupPayment, showAddPaymentModal } = this.state
+            if((isGroupPrint && (reportID === 88 && showReport)) || (isGroupPayment && showAddPaymentModal)){
+              notification.error({ message: `The status for one of the invoices had been changed. Please check all invoices is in billing status and the billing is saved.`,})
+              this.setState({ disabledPayment: true })
+              dispatch({
+                type: 'groupInvoice/fetchVisitGroupStatusDetails',
+                payload: { visitGroup: values.visitGroup },
+              })
+            }
+          }
+        }
+      }
+    })
+  }
+
   componentWillUnmount() {
     this.props.dispatch({
       type: 'billing/updateState',
@@ -374,7 +397,7 @@ class Billing extends Component {
   }
 
   fetchCodeTables = async () => {
-    const { history, dispatch } = this.props
+    const { history, dispatch, billing } = this.props
     const { query } = history.location
     await dispatch({
       type: 'codetable/fetchCodes',
@@ -413,26 +436,19 @@ class Billing extends Component {
       },
     })
     if (query.vid) {
-      await dispatch({
-        type: 'billing/query',
-        payload: {
-          id: query.vid,
-        },
-      }).then(response => {
-        const { invoice } = response
-        const { invoiceItems } = invoice
+      const { invoice } = billing.entity || billing.default
+      const { invoiceItems } = invoice
 
-        if (invoiceItems && invoiceItems.length > 0) {
-          const consumedItems = invoiceItems.filter(
-            i => i.isPackage && i.packageConsumeQuantity > 0,
-          )
-          if (consumedItems.length > 0) {
-            this.setState({
-              isConsumedPackage: true,
-            })
-          }
+      if (invoiceItems && invoiceItems.length > 0) {
+        const consumedItems = invoiceItems.filter(
+          i => i.isPackage && i.packageConsumeQuantity > 0,
+        )
+        if (consumedItems.length > 0) {
+          this.setState({
+            isConsumedPackage: true,
+          })
         }
-      })
+      }
     }
   }
 
@@ -609,9 +625,9 @@ class Billing extends Component {
     })
   }
 
-  toggleAddPaymentModal = () => {
+  toggleAddPaymentModal = async isGroupPayment => {
     const { showAddPaymentModal } = this.state
-    this.setState({ showAddPaymentModal: !showAddPaymentModal })
+    this.setState({ isGroupPayment, disabledPayment:undefined, showAddPaymentModal: !showAddPaymentModal })
   }
 
   calculateOutstandingBalance = async invoicePayment => {
@@ -757,9 +773,11 @@ class Billing extends Component {
     }
   }
 
-  onPrintInvoice = (copayerID, invoicePayerid, index) => {
+  onPrintInvoice = (copayerID, invoicePayerid, index, isGroup) => {
     const { values, dispatch } = this.props
-    const { invoicePayer } = values
+    const { invoicePayer, visitGroup } = values
+    const reportID = isGroup ? 88 : 15
+    this.setState({ isGroupPrint: isGroup })
     const modifiedOrNewAddedPayer = invoicePayer.filter(payer => {
       if (payer.id === undefined && payer.isCancelled) return false
       if (payer.id) return payer.isModified
@@ -812,19 +830,33 @@ class Billing extends Component {
                 }
               }
 
-              this.onShowReport(15, parametrPaload)
+              this.onShowReport(reportID, { visitGroup, ...parametrPaload })
             }
             this.upsertBilling(callback)
           },
         },
       })
     } else {
-      this.onShowReport(15, parametrPaload)
+      this.onShowReport(reportID, { visitGroup, ...parametrPaload })
     }
   }
 
-  onPrintInvoiceClick = () => {
-    this.onPrintInvoice(undefined)
+  onPrintInvoiceClick = isGroup => {
+    const { dispatch, values:{visitGroupStatusDetails=[]} } = this.props
+    if (isGroup && visitGroupStatusDetails.some(x => !x.isBillingSaved)) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmContent: `One or more invoice(s) are not in \'Billing\' status. Confirm to print?`,
+          onConfirmSave: () => {
+            this.onPrintInvoice(undefined, undefined, undefined, isGroup)
+          },
+        },
+      })
+    } else {
+      this.onPrintInvoice(undefined, undefined, undefined, isGroup)
+    }
   }
 
   onPrintVisitInvoiceClick = () => {
@@ -1019,6 +1051,8 @@ class Billing extends Component {
       showSchemeValidationPrompt,
       schemeValidations,
       submitCount,
+      isGroupPayment,
+      disabledPayment,
     } = this.state
     const {
       classes,
@@ -1028,7 +1062,7 @@ class Billing extends Component {
       loading,
       dispenseLoading,
       setFieldValue,
-      setValues,
+      setValues: setValuesHook,
       patient,
       sessionInfo,
       user,
@@ -1042,6 +1076,26 @@ class Billing extends Component {
       clinicSettings,
       codetable,
     } = this.props
+
+    const setValues = v => {
+      let newValues = v
+      if (v.visitGroupStatusDetails?.length > 0) {
+        newValues = {
+          ...v,
+          visitGroupStatusDetails: v.visitGroupStatusDetails.map(x => {
+            if (x.visitFK === v.id)
+              return {
+                ...x,
+                totalClaim: v.finalClaim,
+                outstandingBalance: v.invoice.outstandingBalance,
+              }
+            return x
+          }),
+        }
+      }
+      setValuesHook(newValues)
+    }
+
     const formikBag = {
       values,
       setFieldValue,
@@ -1312,32 +1366,39 @@ class Billing extends Component {
         </CommonModal>
         <CommonModal
           open={showAddPaymentModal}
-          title='Add Payment'
+          title={`Add ${isGroupPayment?'Group':''} Payment`}
           onClose={this.toggleAddPaymentModal}
           observe='AddPaymentForm'
           maxWidth='lg'
         >
-          <AddPayment
-            handleSubmit={this.handleAddPayment}
-            invoicePayerName={patient.name}
-            invoicePayment={values.invoicePayment}
-            invoice={{
-              ...values.invoice,
-              outstandingBalance: values.invoice.outstandingBalance,
-              payerTypeFK: INVOICE_PAYER_TYPE.PATIENT,
-              paymentReceivedByUserFK: user.id,
-              paymentCreatedBizSessionFK: sessionInfo.id,
-              paymentReceivedBizSessionFK: sessionInfo.id,
-              finalPayable: values.finalPayable,
-              totalClaim: values.finalClaim,
-            }}
-          />
+          {showAddPaymentModal && (
+            <AddPayment
+              handleSubmit={this.handleAddPayment}
+              invoicePayerName={patient.name}
+              invoicePayment={values.invoicePayment}
+              invoice={{
+                ...values.invoice,
+                outstandingBalance: values.invoice.outstandingBalance,
+                payerTypeFK: INVOICE_PAYER_TYPE.PATIENT,
+                paymentReceivedByUserFK: user.id,
+                paymentCreatedBizSessionFK: sessionInfo.id,
+                paymentReceivedBizSessionFK: sessionInfo.id,
+                finalPayable: values.finalPayable,
+                totalClaim: values.finalClaim,
+              }}
+              disabledPayment={disabledPayment}
+              isGroupPayment={isGroupPayment}
+              visitGroupStatusDetails={values.visitGroupStatusDetails.filter(x=>x.outstandingBalance > 0)}
+            />
+          )}
         </CommonModal>
         <CommonModal
           open={showReport}
           onClose={this.onCloseReport}
           title={
-            reportPayload.reportID === 15 ? 'Invoice' : 'Visitation Invoice'
+            [15, 88].indexOf(reportPayload.reportID) > 0
+              ? 'Invoice'
+              : 'Visitation Invoice'
           }
           maxWidth='lg'
         >

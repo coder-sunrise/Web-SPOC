@@ -182,6 +182,7 @@ export default createFormViewModel({
           sendQueueNotification({
             message: 'Consultation paused.',
             queueNo: entity.queueNo,
+            visitID: entity.id,
           })
 
           yield put({ type: 'closeModal' })
@@ -272,6 +273,7 @@ export default createFormViewModel({
           sendQueueNotification({
             message: 'Consultation signed-off.',
             queueNo: entity.queueNo,
+            visitID: entity.id,
           })
         }
         return response

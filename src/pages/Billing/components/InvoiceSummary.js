@@ -11,10 +11,14 @@ import {
   GridContainer,
   GridItem,
   NumberInput,
+  Popover,
 } from '@/components'
 // utils
 import { roundTo } from '@/utils/utils'
 import Payments from './Payments'
+import MenuItem from '@material-ui/core/MenuItem'
+import MenuList from '@material-ui/core/MenuList'
+import GroupInvoicesPopover from './GroupInvoicePopover'
 
 const styles = () => ({
   crossed: {
@@ -58,12 +62,11 @@ const InvoiceSummary = ({
 }) => {
   const errorMessage = 'Cancel reason is required'
 
-  const [
-    showError,
-    setShowError,
-  ] = useState(false)
+  const [showError, setShowError] = useState(false)
+  const [showAddPaymentMenu, setShowAddPaymentMenu] = useState(false)
+  const [showPrintInvoiceMenu, setShowPrintInvoiceMenu] = useState(false)
 
-  const { invoicePayment, invoice } = values
+  const { invoicePayment, invoice, visitGroup, visitGroupStatusDetails, patientID } = values
   const {
     gstValue,
     gstAmount,
@@ -104,8 +107,9 @@ const InvoiceSummary = ({
       setShowError(false)
   }
 
-  const shouldDisableAddPayment =
-    disabled || (outstandingBalance !== undefined && outstandingBalance <= 0)
+  const shouldDisableGroupPayment = !visitGroupStatusDetails || _.sumBy(visitGroupStatusDetails,'outstandingBalance') <= 0 || !visitGroupStatusDetails.some(x=> x.isBillingSaved)
+  const shouldDisableIndividualPayment = outstandingBalance !== undefined && outstandingBalance <= 0
+  const shouldDisableAddPayment = disabled || (shouldDisableIndividualPayment && shouldDisableGroupPayment)
 
   const handleCancelClick = useCallback(
     (id) => {
@@ -219,20 +223,54 @@ const InvoiceSummary = ({
                 }}
               />
             </GridItem>
+            {visitGroup && (
+              <GridItem md={1}>
+                <GroupInvoicesPopover
+                  visitGroup={visitGroup}
+                  patientID={patientID}
+                />
+              </GridItem>
+            )}
             <GridItem md={3}>
-              <Button
-                color='primary'
-                simple
-                size='sm'
-                className={classes.invoiceButton}
-                onClick={handlePrintInvoiceClick}
-                disabled={disabled}
-              >
-                Print Invoice
-              </Button>
+              <span>
+                <Popover
+                  icon={null}
+                  trigger='click'
+                  placement='right'
+                  visible={showPrintInvoiceMenu}
+                  onVisibleChange={() => {
+                    if (visitGroup) {
+                      setShowPrintInvoiceMenu(!showPrintInvoiceMenu)
+                    } else {
+                      handlePrintInvoiceClick()
+                    }
+                  }}
+                  content={
+                    <MenuList role='menu' onClick={()=>setShowPrintInvoiceMenu(false)}>
+                      <MenuItem onClick={() => handlePrintInvoiceClick(true)}>
+                        Group Invoice
+                      </MenuItem>
+                      <MenuItem onClick={() => handlePrintInvoiceClick()}>
+                        Individual Invoice
+                      </MenuItem>
+                    </MenuList>
+                  }
+                >
+                  <Button
+                    color='primary'
+                    simple
+                    size='sm'
+                    className={classes.invoiceButton}
+                    disabled={disabled}
+                  >
+                    Print Invoice
+                  </Button>
+                </Popover>
+              </span>
             </GridItem>
-            {isEnableVisitationInvoiceReport && (
-              <GridItem md={6}>
+            
+            <GridItem md={5}>
+              {isEnableVisitationInvoiceReport && (
                 <Button
                   color='primary'
                   simple
@@ -243,19 +281,49 @@ const InvoiceSummary = ({
                 >
                   Print Visit Invoice
                 </Button>
-              </GridItem>
-            )}
+              )}
+            </GridItem>
+        
             <GridItem md={3} className={classes.rightAlign}>
-              <Button
-                color='primary'
-                simple
-                size='sm'
-                className={classes.addPaymentButton}
-                onClick={handleAddPaymentClick}
-                disabled={shouldDisableAddPayment}
+              <Popover
+                icon={null}
+                trigger='click'
+                placement='right'
+                visible={showAddPaymentMenu}
+                onVisibleChange={() => {
+                  if (visitGroup) {
+                    setShowAddPaymentMenu(!showAddPaymentMenu)
+                  } else {
+                    handleAddPaymentClick()
+                  }
+                }}
+                content={
+                  <MenuList role='menu' onClick={()=>setShowAddPaymentMenu(false)}>
+                    <MenuItem
+                      disabled={shouldDisableGroupPayment}
+                      onClick={() => handleAddPaymentClick(true)}
+                    >
+                      Group Payment
+                    </MenuItem>
+                    <MenuItem
+                      disabled={shouldDisableIndividualPayment}
+                      onClick={() => handleAddPaymentClick()}
+                    >
+                      Individual Payment
+                    </MenuItem>
+                  </MenuList>
+                }
               >
-                Add Payment
-              </Button>
+                <Button
+                  color='primary'
+                  simple
+                  size='sm'
+                  className={classes.addPaymentButton}
+                  disabled={shouldDisableAddPayment}
+                >
+                  Add Payment
+                </Button>
+              </Popover>
             </GridItem>
           </GridContainer>
         </CardContainer>

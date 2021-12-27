@@ -847,6 +847,7 @@ export default createFormViewModel({
         sendQueueNotification({
           message: 'Dispense finalized. Waiting for payment.',
           queueNo: entity.queueNo,
+          visitID: entity.id,
         })
         return response
       },
