@@ -4,7 +4,11 @@ import moment from 'moment'
 import color from 'color'
 import withStyles from '@material-ui/core/styles/withStyles'
 import { Delete, Edit, Print, Add } from '@material-ui/icons'
-import { FORM_CATEGORY } from '@/utils/constants'
+import {
+  FORM_CATEGORY,
+  DOCUMENT_CATEGORY,
+  DOCUMENTCATEGORY_DOCUMENTTYPE,
+} from '@/utils/constants'
 import { formTypes, formStatus } from '@/utils/codes'
 import {
   CommonTableGrid,
@@ -408,6 +412,11 @@ class VisitFormGrid extends PureComponent {
                     0,
                 )
               : unionFormTypes
+            const formDocumentTypes =
+              DOCUMENTCATEGORY_DOCUMENTTYPE.find(
+                y => y.documentCategoryFK === DOCUMENT_CATEGORY.FORM,
+              )?.templateTypes || []
+            const orderedTemplates = _.orderBy(unionFormTypes,[a=>formDocumentTypes.findIndex(x=>x===a.documentTemplateTypeFK),b=>b.name])
             return (
               <Popover
                 icon={null}
@@ -424,7 +433,7 @@ class VisitFormGrid extends PureComponent {
                       }}
                     />
                     <div className={classes.listContainer}>
-                      {unionFormTypes.map(item => {
+                      {orderedTemplates.map(item => {
                         return (
                           <this.ListItem
                             key={item.formTemplateFK}
