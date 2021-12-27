@@ -156,7 +156,7 @@ const Detail = ({
                     <TextField
                       label={`Display Value (${secondaryPrintoutLanguage})`}
                       {...args}
-                      maxLength={500}
+                      maxLength={300}
                       onChange={e => {
                         if (
                           getValue(secondaryPrintoutLanguage).displayValue !==
