@@ -143,7 +143,6 @@ export default ({
 
     const accessRight = Authorized.check(editAccessRight)
     if (!accessRight || accessRight.rights !== 'enable') return
-
     if (row.type === ORDER_TYPES.RADIOLOGY) {
       dispatch({
         type: 'orders/updateState',
@@ -1082,13 +1081,19 @@ export default ({
           align: 'center',
           sortingEnabled: false,
           render: row => {
-            if (row.type !== '10' && row.type !== '3') return ''
+            if (
+              row.type !== ORDER_TYPES.RADIOLOGY &&
+              row.type !== ORDER_TYPES.SERVICE &&
+              row.type !== ORDER_TYPES.LAB
+            )
+              return ''
             const editAccessRight = OrderItemAccessRight(row)
             const { workitem = {} } = row
             const { nurseWorkitem = {}, radiologyWorkitem = {} } = workitem
             let editEnable = true
             if (!row.isPreOrder) {
-              if (row.type === '10') {
+              if (row.type === ORDER_TYPES.RADIOLOGY) {
+                //TODO::Win-Check the same logic for Lab once status are defined.
                 if (
                   radiologyWorkitem.statusFK !== RADIOLOGY_WORKITEM_STATUS.NEW
                 ) {

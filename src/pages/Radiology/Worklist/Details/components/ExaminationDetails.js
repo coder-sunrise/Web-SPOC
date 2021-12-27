@@ -210,13 +210,13 @@ export const ExaminationDetails = ({
             <GridItem md={10} style={{ textAlign: 'right' }}>
               <CannedTextButton
                 buttonType='text'
-                cannedTextTypeFK={CANNED_TEXT_TYPE.RADIOLOGYINSTRUCTION}
+                cannedTextTypeFK={CANNED_TEXT_TYPE.RADIOGRAPHERCOMMENT}
                 style={{
                   marginRight: 0,
                   marginBottom: 8,
                 }}
                 handleSelectCannedText={cannedText => {
-                  setComment(comment + '\n' + cannedText.text)
+                  setComment((comment ? comment + '\n' : '') + cannedText.text)
                   setHasChanged(true)
                 }}
               />
