@@ -1089,7 +1089,10 @@ export default ({
               return ''
             const editAccessRight = OrderItemAccessRight(row)
             const { workitem = {} } = row
-            const { nurseWorkitem = {}, radiologyWorkitem = {} } = workitem
+            const {
+              nurseWorkitem = {},
+              radiologyWorkitem = { statusFK: RADIOLOGY_WORKITEM_STATUS.NEW },
+            } = workitem
             let editEnable = true
             if (!row.isPreOrder) {
               if (row.type === ORDER_TYPES.RADIOLOGY) {
