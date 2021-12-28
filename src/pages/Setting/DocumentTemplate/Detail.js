@@ -217,6 +217,7 @@ class Detail extends PureComponent {
                       localFilter={x =>
                         filterTemplateTypes.some(y => x.id === y)
                       }
+                      orderBy={[[x=>filterTemplateTypes.findIndex(y=>y === x.id)],['asc']]}
                       code='LTDocumentTemplateType'
                       label='Document Type'
                       onChange={v => {

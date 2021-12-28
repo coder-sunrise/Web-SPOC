@@ -99,6 +99,7 @@ export default createListViewModel({
             formCategory === FORM_CATEGORY.CORFORM
               ? 'corForm'
               : 'visitForm',
+          documentTemplateTypeFK: x.documentTemplateTypeFK,    
           formTemplateFK: x.id,
           templateContent: x.templateContent,
         }))
