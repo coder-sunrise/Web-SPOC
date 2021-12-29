@@ -155,7 +155,7 @@ const _routes = [
       },
       {
         path: '/lab',
-        icon: 'icon-radiology',
+        icon: 'icon-lab',
         name: 'lab',
         moduleName: 'Lab',
         authority: ['lab'],

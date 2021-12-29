@@ -3,7 +3,7 @@ import { connect } from 'umi'
 import { Space, Card, Tabs } from 'antd'
 import { Worklist } from './components/Worklist'
 
-import { WorklistContextProvider } from './Specimen/WorklistContext'
+import { WorklistContextProvider } from './Worklist/WorklistContext'
 
 const LabWorklist = props => {
   const { TabPane } = Tabs
@@ -21,5 +21,19 @@ const LabWorklist = props => {
     </Tabs>
   )
 }
+
+const LabWorklistWithProvider = props => (
+  <WorklistContextProvider>
+    <LabWorklist {...props}></LabWorklist>
+  </WorklistContextProvider>
+)
+
+const ConnectedLabWorklistWithProvider = connect(
+  ({ labWorklist, codetable, clinicSettings }) => ({
+    labWorklist,
+    codetable,
+    clinicSettings: clinicSettings.settings || clinicSettings.default,
+  }),
+)(LabWorklistWithProvider)
 
 export default ConnectedLabWorklistWithProvider

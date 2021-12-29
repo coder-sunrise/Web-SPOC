@@ -52,7 +52,11 @@ export const WorklistContextProvider = props => {
   return (
     // this is the provider providing state
     <WorklistContext.Provider
-      value={{ isAnyModelOpened, setIsAnyModelOpened, getVisitTypes }}
+      value={{
+        isAnyModelOpened,
+        setIsAnyModelOpened,
+        getVisitTypes,
+      }}
     >
       {props.children}
     </WorklistContext.Provider>

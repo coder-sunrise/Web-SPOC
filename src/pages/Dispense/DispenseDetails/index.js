@@ -1018,7 +1018,7 @@ const DispenseDetails = ({
           dispatch={dispatch}
           patient={patient}
           source='dispense'
-          visitid={values.id}
+          visitid={values?.id}
           handleSubmit={() => {
             onDrugLabelSelectionClose()
           }}

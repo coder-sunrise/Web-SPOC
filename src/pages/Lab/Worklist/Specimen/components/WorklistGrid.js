@@ -14,6 +14,7 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons'
 import Delete from '@material-ui/icons/Delete'
+import { LAB_WORKITEM_STATUS } from '@/utils/constants'
 import { CommonModal, DatePicker, Select, Button } from '@/components'
 import WorklistContext from '../WorklistContext'
 import {
@@ -35,12 +36,15 @@ const MODALS = {
 export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
   const { list = [] } = labWorklist
   const { getVisitTypes } = useContext(WorklistContext)
+  const [visits, setVisits] = useState([])
+  const [collapsedKeys, setCollapsedKeys] = useState([])
+
   const dispatch = useDispatch()
+  const visitTypes = getVisitTypes()
   const [currentModal, setCurrentModal] = useState({
     modal: MODALS.NONE,
     para: undefined,
   })
-  const [expandingKeys, setExpandingKeys] = useState([])
 
   useEffect(() => {
     dispatch({
@@ -56,41 +60,51 @@ export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
 
   useEffect(() => {
     if (labWorklist && labWorklist.list) {
-      expandAllRows()
+      const uniqueVisits = _(
+        list.map(item => ({
+          key: item.visitId,
+          patientName: item.patientName,
+          patientReferenceNo: item.patientReferenceNo,
+          visitId: item.visitId,
+          workitems: list
+            .filter(inner => inner.visitId === item.visitId)
+            .map(inner => ({
+              testCategoryId: inner.testCategoryId,
+              workitemStatusId: inner.workitemStatusId,
+              workitemId: inner.workitemId,
+              visitId: inner.visitId,
+            })),
+        })),
+      )
+        .uniqBy('visitId')
+        .value()
+
+      setVisits(uniqueVisits)
     }
   }, [labWorklist])
 
-  const expandAllRows = () =>
-    setExpandingKeys(
-      _.uniq(labWorklist.list.map(item => item.patientReferenceNo)),
+  const getTestCategorySummary = visit => {
+    if (!visit || !codetable.cttestcategory) return ''
+    const testCategories = codetable.cttestcategory.map(item => ({
+      name: item.displayValue,
+      incompleteWorkitemCount: visit.workitems.filter(
+        w =>
+          w.testCategoryId === item.id &&
+          w.workitemStatusId !== LAB_WORKITEM_STATUS.COMPLETED,
+      ).length,
+    }))
+
+    console.log(
+      'WorklistGrid - codetable.cttestcategory',
+      codetable.cttestcategory,
     )
+    console.log('WorklistGrid - testCategories', testCategories)
 
-  const patients = _.uniqBy(
-    list.map(item => ({
-      patientName: item.patientName,
-      key: item.patientReferenceNo,
-      summary:
-        'Biochemistry: 2, Serology/Immunology: 0, Hematology: 1, Urinalysisi: 0, Swab: 1, Faeces: 0',
-    })),
-    'key',
-  )
-
-  const visitTypes = getVisitTypes()
+    return 'test'
+  }
 
   const expandedRowRender = (record, index, indent, expanded) => {
     const columns = [
-      {
-        title: 'Ref. No',
-        dataIndex: 'patientReferenceNo',
-        key: 'patientReferenceNo',
-        ellipsis: true,
-      },
-      {
-        title: 'Doctor',
-        dataIndex: 'doctor',
-        key: 'doctor',
-        ellipsis: true,
-      },
       {
         title: 'Visit Type',
         wdith: 100,
@@ -102,6 +116,12 @@ export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
           )
           return visitType ? visitType.name : ''
         },
+      },
+      {
+        title: 'Visit Doctor',
+        dataIndex: 'doctor',
+        key: 'doctor',
+        ellipsis: true,
       },
       {
         title: 'Category',
@@ -130,7 +150,7 @@ export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
                 currentTestPanel => currentTestPanel === item.id,
               ) !== -1,
           )
-          console.log('currentTestPanels', currentTestPanels)
+
           return currentTestPanels
             .map(item => item.name)
             .sort()
@@ -158,27 +178,27 @@ export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
       },
       {
         title: '1st Order Date',
-        dataIndex: 'firstOrderDate',
-        key: 'firstOrderDate',
+        dataIndex: 'generateDate',
+        key: 'generateDate',
         ellipsis: true,
       },
       {
         title: '1st Verifier',
-        dataIndex: 'firstOrderDate',
-        key: 'firstOrderDate',
+        dataIndex: 'generateDate',
+        key: 'generateDate',
         ellipsis: true,
       },
       {
         title: '2nd Verifier',
-        dataIndex: 'firstOrderDate',
-        key: 'firstOrderDate',
+        dataIndex: 'generateDate',
+        key: 'generateDate',
         ellipsis: true,
       },
       {
         title: 'Status',
         width: 100,
-        dataIndex: 'firstOrderDate',
-        key: 'firstOrderDate',
+        dataIndex: 'generateDate',
+        key: 'generateDate',
         ellipsis: true,
       },
       {
@@ -224,9 +244,9 @@ export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
 
     const groupedTestPanels = _.uniqBy(
       list
-        .filter(item => item.patientReferenceNo === record.key)
+        .filter(item => item.visitId === record.visitId)
         .map(item => ({
-          key: item.patientReferenceNo,
+          visitId: item.visitId,
           patientReferenceNo: item.patientReferenceNo,
           doctor:
             (item.doctorTitle ? `${item.doctorTitle} ` : '') + item.doctorName,
@@ -234,7 +254,7 @@ export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
             list
               .filter(
                 innerItem =>
-                  innerItem.patientReferenceNo === record.key &&
+                  innerItem.visitId === record.visitId &&
                   innerItem.testCategoryId === item.testCategoryId,
               )
               .map(innerItem => innerItem.testPanelId),
@@ -253,17 +273,17 @@ export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
       />
     )
   }
-  console.log('expandingKeys', expandingKeys)
   const columns = [
     {
       title: 'Name',
       dataIndex: 'patientName',
       key: 'patientName',
       render: (text, record) => {
+        console.log('WorklistGrid - Top Level Records : ', record)
         return (
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Typography.Text strong style={{ flexGrow: 1 }}>
-              Patient: {record.patientName}
+              {record.patientName} ({record.patientReferenceNo})
             </Typography.Text>
             <Button
               size='sm'
@@ -275,25 +295,33 @@ export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
                 if (currentModal.modal === MODALS.NONE)
                   setCurrentModal({
                     modal: MODALS.SPECIMEN_COLLECTION,
-                    para: record.patientReferenceNo,
+                    para: record.visitId,
                   })
               }}
             >
               Collect Specimen
             </Button>
-            <span>{record.summary}</span>
+            <span>{getTestCategorySummary(record)}</span>
           </div>
         )
       },
     },
   ]
+  console.log('WorklistGrid - collapsedKeys', collapsedKeys)
+  console.log('WorklistGrid - visits', visits)
+  console.log(
+    'WorklistGrid - expanded',
+    visits.filter(v => !collapsedKeys.includes(v.visitId)).map(v => v.visitId),
+  )
 
   return (
     <Card>
       <div style={{ display: 'flex', alignItems: 'start' }}>
         <ExapandCollapseAllButton
-          onExpandAllClick={() => expandAllRows()}
-          onCollapseAllClick={() => setExpandingKeys([])}
+          onExpandAllClick={() => setCollapsedKeys([])}
+          onCollapseAllClick={() =>
+            setCollapsedKeys(visits.map(v => v.visitId))
+          }
         />
         <StatusButtons
           style={{
@@ -312,15 +340,17 @@ export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
           expandedRowRender,
           onExpand: (expanded, record) => {
             expanded
-              ? setExpandingKeys([...expandingKeys, record.key])
-              : setExpandingKeys(
-                  expandingKeys.filter(item => item !== record.key),
+              ? setCollapsedKeys(
+                  collapsedKeys.filter(item => item !== record.visitId),
                 )
+              : setCollapsedKeys([...collapsedKeys, record.visitId])
           },
         }}
-        expandedRowKeys={expandingKeys}
+        expandedRowKeys={visits
+          .filter(v => !collapsedKeys.includes(v.visitId))
+          .map(v => v.visitId)}
         showHeader={false}
-        dataSource={patients}
+        dataSource={visits}
         pagination={false}
         expandIcon={({ expanded, onExpand, record }) =>
           expanded ? (
@@ -330,6 +360,11 @@ export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
           )
         }
       />
+      <section style={{ margin: 10, fontStyle: 'italic' }}>
+        Note: test panel in{' '}
+        <span style={{ color: 'red' }}>red color = urgent </span>; test panel in
+        black color = normal
+      </section>
 
       <SpecimenCollection
         open={currentModal.modal === MODALS.SPECIMEN_COLLECTION}

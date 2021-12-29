@@ -4,6 +4,7 @@ import ProCard from '@ant-design/pro-card'
 import moment from 'moment'
 import { useSelector } from 'dva'
 import numeral from 'numeral'
+import { getNameWithTitle } from '@/utils/utils'
 import { Icon, dateFormatLongWithTimeNoSec, Tooltip } from '@/components'
 import {
   VISIT_TYPE,
@@ -138,11 +139,10 @@ const WorkitemBody = ({ item }) => {
       ? '-'
       : numeral(item.visitInfo.queueNo).format(isQueueNoDecimal ? '0.0' : '0')
 
-  const doctorName = `${
-    visitInfo.doctorTitle && visitInfo.doctorTitle.trim().length
-      ? `${visitInfo.doctorTitle}. `
-      : ''
-  }${visitInfo.doctorName || ''}`
+  const doctorName = getNameWithTitle(
+    visitInfo.doctorTitle,
+    visitInfo.doctorName,
+  )
 
   return (
     <div

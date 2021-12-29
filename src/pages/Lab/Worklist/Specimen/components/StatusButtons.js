@@ -52,8 +52,7 @@ export const StatusButtons = ({ style }) => {
       <StatusTag tagColor='#993333' text='P. 1st Verify' count='0' checked />
       <StatusTag tagColor='#0000ff' text='P. 2nd Verify' count='0' />
       <StatusTag tagColor='#009933' text='Completed' count='0' />
-      <StatusTag tagColor='#cc6633' text='Cancelled' count='3' />
-      <StatusTag tagColor='#33cc99' text='Cancelled' count='5' />
+      <StatusTag tagColor='#33cc99' text='Discarded' count='5' />
     </div>
   )
 }

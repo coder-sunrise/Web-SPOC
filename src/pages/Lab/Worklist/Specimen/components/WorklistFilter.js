@@ -34,14 +34,14 @@ export const WorklistFilter = () => {
     state => state.user.data.clinicianProfile,
   )
 
-  const { autoRefreshRadiologyWorklistInterval = 30 } = settings
+  const { autoRefreshLabWorklistInterval = 30 } = settings
 
   const timer = React.useRef(null)
 
   const startTimer = () => {
     timer.current = setInterval(() => {
       handleSearch()
-    }, autoRefreshRadiologyWorklistInterval * 1000)
+    }, autoRefreshLabWorklistInterval * 1000)
   }
 
   const stopTimer = () => {
@@ -93,9 +93,10 @@ export const WorklistFilter = () => {
           priority: priority
             ? priority.filter(t => t !== -99).join(',')
             : undefined,
-          visitDoctor: visitDoctor
-            ? visitDoctor.filter(t => t !== -99).join(',')
-            : undefined,
+          visitDoctor:
+            visitDoctor && !visitDoctor.includes(-99)
+              ? visitDoctor.join(',')
+              : undefined,
           filterFrom: dateFrom,
           filterTo: moment(dateTo)
             .endOf('day')
@@ -110,23 +111,23 @@ export const WorklistFilter = () => {
   }
 
   return (
-    <Card>
+    <Card bordered={false}>
       <Form form={form} layout='inline' initialValues={{}}>
         <div style={{ display: 'flex', width: '100%' }}>
           <Form.Item name='searchValue'>
             <TextField
-              label={formatMessage({ id: 'radiology.search.general' })}
+              label={formatMessage({ id: 'lab.search.general' })}
               style={{ width: 350 }}
             />
           </Form.Item>
           <Form.Item name='visitDoctor' initialValue={[-99]}>
             <Select
-              label='Visit Doctor'
+              label={formatMessage({ id: 'lab.search.visitDoctor' })}
               options={doctorprofile.map(item => ({
                 value: item.id,
                 name: item.clinicianProfile.name,
               }))}
-              style={{ width: 170 }}
+              style={{ width: 180 }}
               mode='multiple'
               maxTagCount={0}
               maxTagPlaceholder='Visit Doctor'
@@ -134,7 +135,7 @@ export const WorklistFilter = () => {
           </Form.Item>
           <Form.Item name='priority' initialValue={[-99]}>
             <Select
-              label='Priority'
+              label={formatMessage({ id: 'lab.search.priority' })}
               options={PRIORITIES}
               style={{ width: 170 }}
               mode='multiple'
@@ -144,7 +145,7 @@ export const WorklistFilter = () => {
           </Form.Item>
           <Form.Item name='visitType' initialValue={[-99]}>
             <Select
-              label='Visit Type'
+              label={formatMessage({ id: 'lab.search.visittype' })}
               options={getVisitTypes().map(item => ({
                 value: item.id,
                 ...item,
