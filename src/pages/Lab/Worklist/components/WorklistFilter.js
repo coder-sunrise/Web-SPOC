@@ -6,7 +6,7 @@ import InfoCircleOutlined from '@ant-design/icons/InfoCircleOutlined'
 import moment from 'moment'
 import Search from '@material-ui/icons/Search'
 import Refresh from '@material-ui/icons/Refresh'
-import { CLINICAL_ROLE, PRIORITIES } from '@/utils/constants'
+import { CLINICAL_ROLE, PRIORITIES, VISIT_TYPE } from '@/utils/constants'
 import {
   TextField,
   DatePicker,
@@ -18,13 +18,14 @@ import {
   IconButton,
   Popover,
   Button,
+  VisitTypeSelect,
 } from '@/components'
 import WorklistContext from '../WorklistContext'
 import { StatusButtons } from './StatusButtons'
 
 export const WorklistFilter = () => {
   const [form] = Form.useForm()
-  const { isAnyModelOpened, getVisitTypes } = useContext(WorklistContext)
+  const { isAnyWorklistModelOpened } = useContext(WorklistContext)
   const [refreshDate, setRefreshDate] = useState(moment())
   const dispatch = useDispatch()
 
@@ -62,7 +63,7 @@ export const WorklistFilter = () => {
   }, [])
 
   useEffect(() => {
-    if (isAnyModelOpened) {
+    if (isAnyWorklistModelOpened) {
       stopTimer()
     } else {
       handleSearch()
@@ -70,7 +71,7 @@ export const WorklistFilter = () => {
     }
 
     return () => clearInterval(timer.current)
-  }, [isAnyModelOpened])
+  }, [isAnyWorklistModelOpened])
 
   const handleSearch = () => {
     const {
@@ -144,16 +145,16 @@ export const WorklistFilter = () => {
             />
           </Form.Item>
           <Form.Item name='visitType' initialValue={[-99]}>
-            <Select
+            <VisitTypeSelect
               label={formatMessage({ id: 'lab.search.visittype' })}
-              options={getVisitTypes().map(item => ({
-                value: item.id,
-                ...item,
-              }))}
-              style={{ width: 170 }}
               mode='multiple'
               maxTagCount={0}
               maxTagPlaceholder='Visit Types'
+              style={{ width: 170 }}
+              localFilter={item => {
+                return item.id !== VISIT_TYPE.OTC
+              }}
+              allowClear={true}
             />
           </Form.Item>
 

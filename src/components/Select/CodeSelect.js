@@ -68,10 +68,18 @@ class CodeSelect extends React.PureComponent {
 
   render() {
     const { codetable, code, localFilter, formatCodes, orderBy } = this.props
-    const options =
-      code !== undefined ? codetable[code.toLowerCase()] || [] : []
+
+    const options = this.props.options
+      ? //if options set explicitly, to use the options that have been set.
+        //This is only for legacy purpose and options should not be set for codeselect, and use Select component instead.
+        this.props.options
+      : code !== undefined
+      ? codetable[code.toLowerCase()] || []
+      : []
     let filteredOptions = localFilter ? options.filter(localFilter) : options
-    filteredOptions = orderBy ? _.orderBy(filteredOptions,(x)=> x[orderBy[0]].toLowerCase(),orderBy[1]) : filteredOptions
+    filteredOptions = orderBy
+      ? _.orderBy(filteredOptions, x => x[orderBy[0]].toLowerCase(), orderBy[1])
+      : filteredOptions
     const formattedFilteredOptions = formatCodes
       ? formatCodes(filteredOptions)
       : filteredOptions
@@ -85,9 +93,9 @@ class CodeSelect extends React.PureComponent {
     }
     return (
       <Select
-        options={formattedFilteredOptions || []}
         valueField='id'
         {...selectProps}
+        options={formattedFilteredOptions || []}
         // prevent to show default '请输入' placeholder
         placeholder=''
         onChange={(values, opts) => {

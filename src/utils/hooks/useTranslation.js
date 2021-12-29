@@ -1,61 +1,59 @@
-import { useState, useEffect } from "react";
-import _ from "lodash";
+import { useState, useEffect } from 'react'
+import _ from 'lodash'
 
-function useTranslation (valuesPara = [], defaultLang) {
-  const [value, setVal] = useState({});
-  const [values, setValues] = useState(valuesPara);
-  const [currentLanguage, setCurrentLanguage] = useState(defaultLang);
-  const getValue = (lang) => {
-    const displayLanguage = lang ?? currentLanguage;
-    const langValues = values.filter((v) => v.language === displayLanguage);
+export function useTranslation(valuesPara = [], defaultLang) {
+  const [value, setVal] = useState({})
+  const [values, setValues] = useState(valuesPara)
+  const [currentLanguage, setCurrentLanguage] = useState(defaultLang)
+  const getValue = lang => {
+    const displayLanguage = lang ?? currentLanguage
+    const langValues = values.filter(v => v.language === displayLanguage)
 
-    if (!langValues || langValues.length === 0) return "";
+    if (!langValues || langValues.length === 0) return ''
 
-    const obj = {};
+    const obj = {}
 
-    langValues[0].list.forEach((field) => (obj[field.key] = field.value));
+    langValues[0].list.forEach(field => (obj[field.key] = field.value))
 
-    return obj;
-  };
+    return obj
+  }
 
   useEffect(() => {
-    setValues(_.cloneDeep(valuesPara));
-    setCurrentLanguage(defaultLang);
-  }, []);
+    setValues(_.cloneDeep(valuesPara))
+    setCurrentLanguage(defaultLang)
+  }, [])
 
-  useEffect(() => setVal(getValue()), [values, currentLanguage]);
+  useEffect(() => setVal(getValue()), [values, currentLanguage])
 
   const setValue = (fieldName, value, lang = null) => {
-    const newValues = _.cloneDeep(values);
-    const currentLanguage = lang ?? defaultLang;
+    const newValues = _.cloneDeep(values)
+    const currentLanguage = lang ?? defaultLang
 
-    let langValues = newValues.filter((v) => v.language === currentLanguage);
+    let langValues = newValues.filter(v => v.language === currentLanguage)
 
     if (!langValues || langValues.length === 0) {
-      newValues.push({ language: currentLanguage, list: [] });
+      newValues.push({ language: currentLanguage, list: [] })
 
-      langValues = newValues.filter((v) => v.language === currentLanguage);
+      langValues = newValues.filter(v => v.language === currentLanguage)
     }
 
-    let item = langValues[0].list.filter((v) => v.key === fieldName);
+    let item = langValues[0].list.filter(v => v.key === fieldName)
 
     if (!item || item.length === 0) {
-      item = [];
-      item.push({ key: fieldName });
-      langValues[0].list.push(item[0]);
+      item = []
+      item.push({ key: fieldName })
+      langValues[0].list.push(item[0])
     }
 
-    item[0].value = value;
+    item[0].value = value
 
-    setValues(newValues);
-    return newValues;
-  };
+    setValues(newValues)
+    return newValues
+  }
 
-  const changeLang = (lang) => {
-    setCurrentLanguage(lang);
-  };
+  const changeLang = lang => {
+    setCurrentLanguage(lang)
+  }
 
-  return [value, getValue, setValue, changeLang, values];
+  return [value, getValue, setValue, changeLang, values]
 }
-
-export default useTranslation;

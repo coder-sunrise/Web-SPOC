@@ -15,6 +15,7 @@ import {
 } from '@ant-design/icons'
 import Delete from '@material-ui/icons/Delete'
 import { LAB_WORKITEM_STATUS } from '@/utils/constants'
+import { useVisitTypes } from '@/utils/hooks'
 import { CommonModal, DatePicker, Select, Button } from '@/components'
 import WorklistContext from '../WorklistContext'
 import {
@@ -35,12 +36,11 @@ const MODALS = {
 
 export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
   const { list = [] } = labWorklist
-  const { getVisitTypes } = useContext(WorklistContext)
   const [visits, setVisits] = useState([])
   const [collapsedKeys, setCollapsedKeys] = useState([])
 
   const dispatch = useDispatch()
-  const visitTypes = getVisitTypes()
+  const [visitTypes] = useVisitTypes()
   const [currentModal, setCurrentModal] = useState({
     modal: MODALS.NONE,
     para: undefined,

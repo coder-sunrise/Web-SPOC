@@ -20,7 +20,7 @@ import {
 import { AttachmentWithThumbnail } from '@/components/_medisys'
 import { MultiLangCodeSelect } from '../Components'
 import SharedContainer from '../../SharedContainer'
-import useTranslation from '@/utils/hooks/useTranslation'
+import { useTranslation } from '@/utils/hooks'
 import Sdd from '../../Sdd'
 import DetailsContext from './DetailsContext'
 import { getBizSession } from '@/services/queue'

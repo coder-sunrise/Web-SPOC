@@ -5,6 +5,7 @@ import moment from 'moment'
 import { useSelector } from 'dva'
 import numeral from 'numeral'
 import { getNameWithTitle } from '@/utils/utils'
+import { useVisitTypes } from '@/utils/hooks/'
 import { Icon, dateFormatLongWithTimeNoSec, Tooltip } from '@/components'
 import {
   VISIT_TYPE,
@@ -121,7 +122,8 @@ const WorkitemTitle = ({ item }) => {
 }
 
 const WorkitemBody = ({ item }) => {
-  const { setDetailsId, visitPurpose } = useContext(WorklistContext)
+  const { setDetailsId } = useContext(WorklistContext)
+  const [visitTypes] = useVisitTypes()
   const { visitInfo } = item
   const orderDate = moment(item.generateDate).format(
     dateFormatLongWithTimeNoSec,
@@ -251,9 +253,10 @@ const WorkitemBody = ({ item }) => {
             justifySelf: 'center',
           }}
         >
-          {visitPurpose &&
+          {visitTypes &&
+            visitTypes.length > 0 &&
             item?.visitInfo &&
-            visitPurpose.find(p => p.id === item.visitInfo.visitPurposeFK).code}
+            visitTypes.find(p => p.id === item.visitInfo.visitPurposeFK).code}
         </span>
 
         {item.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW && (
