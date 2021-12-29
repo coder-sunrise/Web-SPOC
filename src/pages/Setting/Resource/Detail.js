@@ -84,6 +84,7 @@ const resourceCapacitySchema = Yup.object().shape({
       },
     }).then(r => {
       if (r) {
+        resetForm()
         let queryId = values.id
         if (!values.id) {
           queryId = r.id

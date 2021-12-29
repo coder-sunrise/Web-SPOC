@@ -117,7 +117,7 @@ const EditableCell = ({
     }
 
     if (
-      error.hasError != validationError.hasError &&
+      error.hasError != validationError.hasError ||
       error.errorMsg != validationError.errorMsg
     ) {
       if (onErrorStatusChanged) {
