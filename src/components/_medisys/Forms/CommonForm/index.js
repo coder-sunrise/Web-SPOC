@@ -185,15 +185,16 @@ class CommonForm extends PureComponent {
           contentChange={this.contentChange}
           documentChange={this.documentChange}
           selectionChange={this.selectionChange}
-          // documentEditorSettings={{
-          //   searchHighlightColor: '#FFE97F',
-          //   formFieldSettings: {
-          //     shadingColor: '#cfcfcf',
-          //     applyShading: true,
-          //     selectionColor: '#cccccc',
-          //     formFillingMode: 'Popup',//'Inline',
-          //   },
-          // }}
+          documentEditorSettings={{
+            printDevicePixelRatio:3,
+            // searchHighlightColor: '#FFE97F',
+            // formFieldSettings: {
+            //   shadingColor: '#cfcfcf',
+            //   applyShading: true,
+            //   selectionColor: '#cccccc',
+            //   formFillingMode: 'Popup',//'Inline',
+            // },
+          }}
         />
 
         <CommonModal

@@ -86,6 +86,12 @@ const Detail = ({
     if (consumableDetail.currentId) {
       checkHasActiveSession()
       dispatch({
+        type: 'consumableDetail/updateState',
+        payload: {
+          entity: undefined,
+        },
+      })
+      dispatch({
         type: 'consumableDetail/query',
         payload: {
           id: consumableDetail.currentId,
@@ -292,7 +298,7 @@ export default compose(
         },
       }).then(r => {
         if (r) {
-          resetForm()
+          //resetForm()
           history.push('/inventory/master?t=1')
         }
       })

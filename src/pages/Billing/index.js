@@ -1388,7 +1388,7 @@ class Billing extends Component {
               }}
               disabledPayment={disabledPayment}
               isGroupPayment={isGroupPayment}
-              visitGroupStatusDetails={values.visitGroupStatusDetails.filter(x=>x.outstandingBalance > 0)}
+              visitGroupStatusDetails={values.visitGroupStatusDetails?.filter(x=>x.outstandingBalance > 0)}
             />
           )}
         </CommonModal>
