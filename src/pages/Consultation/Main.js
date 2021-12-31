@@ -40,6 +40,7 @@ import {
   VISIT_TYPE,
   NOTIFICATION_TYPE,
   NOTIFICATION_STATUS,
+  REPORT_ID,
 } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { CallingQueueButton } from '@/components/_medisys'
@@ -60,6 +61,7 @@ import Layout from './Layout'
 import schema from './schema'
 import styles from './style'
 import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
+import { getRawData } from '@/services/report'
 
 const discardMessage = 'Discard consultation?'
 const onPageLeaveMessage = 'Do you want to save consultation notes?'
@@ -171,6 +173,31 @@ const generatePrintData = async (
       printData = printData.concat(
         getPrintData('Vaccination Certificate', corVaccinationCert),
       )
+    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.PrescriptionSheet) > -1) {
+        const { rows = [] } = orders || {}
+        if (rows.length > 0) {
+        // drug & consumable (pharmacy item)
+        const anyPharmacyItem = rows.some(
+          f =>
+            !f.isDeleted &&
+            !f.isPreOrder &&
+            !f.isExternalPrescription &&
+            f.isDispensedByPharmacy &&
+            ['1', '2'].some(x => x === f.type),
+        )
+        if (anyPharmacyItem)
+          printData = printData.concat([
+            {
+              item: ReportsOnSignOffOption.PrescriptionSheet,
+              description: ReportsOnSignOffOption.PrescriptionSheet,
+              Copies: 1,
+              print: true,
+              ReportId: REPORT_ID.PRESCRIPTION,
+              ReportDate: null,
+            },
+          ])
+      }
+    }
     return printData
   }
   return []
@@ -556,18 +583,49 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
                   let printedData = result
                   if (printedData && printedData.length > 0) {
                     const token = localStorage.getItem('token')
-                    printedData = printedData.map(item => ({
-                      ReportId: item.ReportId,
-                      DocumentName: `${item.item}(${item.description})`,
-                      ReportData: item.ReportData,
-                      Copies: item.Copies,
-                      Token: token,
-                      BaseUrl: process.env.url,
-                    }))
-                    handlePrint(JSON.stringify(printedData))
+                    if(printedData.some(x=>x.ReportId === REPORT_ID.PRESCRIPTION)){
+                      const {
+                        visitRegistration: {
+                          entity: {
+                            visit: { id:visitFK, patientProfileFK },
+                          },
+                        },
+                      } = props
+                      getRawData(REPORT_ID.PRESCRIPTION, {
+                        visitFK,
+                        patientProfileFK,
+                      }).then(r => {
+                        printedData = printedData.map(item => ({
+                          ReportId: item.ReportId,
+                          DocumentName:
+                            item.ReportId === REPORT_ID.PRESCRIPTION
+                              ? item.description
+                              : `${item.item}(${item.description})`,
+                          ReportData:
+                            item.ReportId === REPORT_ID.PRESCRIPTION
+                              ? JSON.stringify((delete r.ReportSettingParameter, delete r.ReportContext,r))
+                              : item.ReportData,
+                          Copies: item.Copies,
+                          Token: token,
+                          BaseUrl: process.env.url,
+                        }))
+                        handlePrint(JSON.stringify(printedData))
+                        props.dispatch({ type: 'consultation/closeModal' })
+                      })
+                    }else{
+                      printedData = printedData.map(item => ({
+                        ReportId: item.ReportId,
+                        DocumentName: `${item.item}(${item.description})`,
+                        ReportData: item.ReportData,
+                        Copies: item.Copies,
+                        Token: token,
+                        BaseUrl: process.env.url,
+                      }))
+                      handlePrint(JSON.stringify(printedData))
+                      props.dispatch({ type: 'consultation/closeModal' })
+                    }
                   }
                 }
-                props.dispatch({ type: 'consultation/closeModal' })
               },
             })
           },
