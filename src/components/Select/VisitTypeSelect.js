@@ -17,7 +17,6 @@ class VisitTypeSelect extends React.Component {
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctVisitpurpose',
-        force: true,
       },
     }).then(result => {
       if (result) {

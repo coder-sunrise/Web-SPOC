@@ -34,5 +34,5 @@ export function useVisitTypes() {
     ).filter(vstType => vstType['isEnabled'] === 'true')
   }
 
-  return [visitTypes]
+  return visitTypes
 }

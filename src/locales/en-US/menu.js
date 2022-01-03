@@ -220,6 +220,7 @@ export default {
   'menu.lab': 'Lab Center',
   'menu.lab.worklist': 'Worklist',
   'menu.lab.history': 'History',
+  'menu.lab.specimenCollection': 'Specimen Collection',
 
   'menu.not-found': 'Not Found',
   'menu.forbidden': 'Forbidden',

@@ -123,7 +123,7 @@ const WorkitemTitle = ({ item }) => {
 
 const WorkitemBody = ({ item }) => {
   const { setDetailsId } = useContext(WorklistContext)
-  const [visitTypes] = useVisitTypes()
+  const visitTypes = useVisitTypes()
   const { visitInfo } = item
   const orderDate = moment(item.generateDate).format(
     dateFormatLongWithTimeNoSec,

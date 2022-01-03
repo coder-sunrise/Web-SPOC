@@ -20,7 +20,6 @@ import { CommonModal, DatePicker, Select, Button } from '@/components'
 import WorklistContext from '../WorklistContext'
 import {
   StatusButtons,
-  SpecimenCollection,
   SpecimenDiscarding,
   ExapandCollapseAllButton,
 } from './index'
@@ -40,7 +39,7 @@ export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
   const [collapsedKeys, setCollapsedKeys] = useState([])
 
   const dispatch = useDispatch()
-  const [visitTypes] = useVisitTypes()
+  const visitTypes = useVisitTypes()
   const [currentModal, setCurrentModal] = useState({
     modal: MODALS.NONE,
     para: undefined,
@@ -366,13 +365,6 @@ export const WorklistGrid = ({ labWorklist, codetable, clinicSettings }) => {
         black color = normal
       </section>
 
-      <SpecimenCollection
-        open={currentModal.modal === MODALS.SPECIMEN_COLLECTION}
-        onClose={() => {
-          console.log('closed me!!!')
-          setCurrentModal({ modal: MODALS.NONE })
-        }}
-      ></SpecimenCollection>
       <SpecimenDetails
         open={currentModal.modal === MODALS.SPECIMEN_DETAILS}
         onClose={() => {
