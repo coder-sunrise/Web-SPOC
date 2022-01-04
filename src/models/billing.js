@@ -146,6 +146,7 @@ export default createFormViewModel({
             sendQueueNotification({
               message: 'Visit completed.',
               queueNo: entity.queueNo,
+              visitID: entity.id,
             })
           } else {
             sendQueueNotification({
