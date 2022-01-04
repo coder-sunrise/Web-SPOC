@@ -234,17 +234,17 @@ class AddPayment extends Component {
   }
 
   getPopulateAmount = paymentMode => {
-    const { values, patient } = this.props
-    const amount = values.outstandingAfterPayment
+    const { values, patient, isGroupPayment, visitGroupStatusDetails } = this.props
+    let amount = values.outstandingAfterPayment
     const { id: type } = paymentMode
     if (parseInt(type, 10) !== PAYMENT_MODE.DEPOSIT) return amount
 
     const { patientDeposit } = patient
-
     if (patientDeposit) {
       const { balance = 0 } = patientDeposit
-      if (balance > values.outstandingAfterPayment) return amount
-      return balance
+      if (isGroupPayment)
+        amount -= _.sumBy(visitGroupStatusDetails.filter(x=>x.invoiceFK !== values.id),'outstandingBalance') || 0
+      return Math.min(balance,amount)
     }
   }
 
@@ -260,13 +260,13 @@ class AddPayment extends Component {
       paymentMode: displayValue,
       amt,
     }
-
-    if (isGroupPayment)
+    if (isGroupPayment){
+      const isDeposit = parseInt(type, 10) === PAYMENT_MODE.DEPOSIT 
       payment = {
-        ...payment,
-        remark: visitGroupStatusDetails.map(x => x.invoiceNo).join('/'),
-      }
-
+          ...payment,
+          remark: isDeposit ? values.invoiceNo : visitGroupStatusDetails.map(x => x.invoiceNo).join('/'),
+        }
+    }
     const newPaymentList = [...values.paymentList, payment]
     await setFieldValue('paymentList', newPaymentList)
     this.calculatePayment()
