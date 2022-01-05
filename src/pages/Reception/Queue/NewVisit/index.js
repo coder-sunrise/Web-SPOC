@@ -30,7 +30,10 @@ import RefractionFormCard from './RefractionFormCard'
 import PrintLabLabelButton from '@/components/_medisys/PatientInfoSideBanner/PatientLabelBtn'
 
 // import ParticipantCard from './ParticipantCard'
-import VisitValidationSchema from './validationScheme'
+import {
+  VisitValidationSchema,
+  reportingDoctorSchema,
+} from './validationScheme'
 import FormFieldName from './formField'
 // services
 // misc utils
@@ -601,6 +604,7 @@ class NewVisit extends PureComponent {
                           visitType={values.visitPurposeFK}
                           dispatch={dispatch}
                           visitOrderTemplateOptions={visitOrderTemplateOptions}
+                          reportingDoctorSchema={reportingDoctorSchema}
                           {...this.props}
                         />
                       </GridItem>

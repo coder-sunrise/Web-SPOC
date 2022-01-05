@@ -855,3 +855,10 @@ export const ORDER_TYPES = {
   RADIOLOGY: '10',
   LAB: '11',
 }
+
+export const VISITDOCTOR_CONSULTATIONSTATUS = {
+  WAITING: 'Waiting',
+  INPROGRESS: 'In Progress',
+  PAUSED: 'Paused',
+  COMPLETED: 'Completed',
+}

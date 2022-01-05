@@ -22,11 +22,13 @@ import {
   ProgressButton,
   CodeSelect,
   DateRangePicker,
+  dateFormatLong,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 // utils
 import { findGetParameter, commonDataReaderTransform } from '@/utils/utils'
 import { VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
+import { scribbleTypes } from '@/utils/codes'
 import { DoctorProfileSelect, ServePatientButton } from '@/components/_medisys'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import { getReportContext } from '@/services/report'
@@ -676,7 +678,6 @@ class PatientHistory extends Component {
         </div>
       )
     }
-
     let current = {
       ...history.patientHistoryDetail,
       visitAttachments: history.visitAttachments,
@@ -688,6 +689,7 @@ class PatientHistory extends Component {
       referralPerson: history.referralPerson,
       referralPatientName: history.referralPatientName,
       referralRemarks: history.referralRemarks,
+      visitPurposeFK: history.visitPurposeFK,
     }
     let visitDetails = {
       visitDate: history.visitDate,
@@ -981,6 +983,49 @@ class PatientHistory extends Component {
     }
   }
 
+  getNotes = (fieldName, visitPurposeFK, note, current) => {
+    const scribbleType = scribbleTypes.find(o => o.type === fieldName)
+    const doctorScrible = current.scribbleNotes.filter(
+      s =>
+        s.scribbleNoteTypeFK === scribbleType.typeFK &&
+        (visitPurposeFK !== VISIT_TYPE.MC ||
+          s.signedByUserFK === note.signedByUserFK),
+    )
+    if (
+      note[fieldName] === undefined ||
+      note[fieldName] === null ||
+      !note[fieldName].trim().length
+      //&& !doctorScrible.length
+    )
+      return null
+
+    const noteUserName = `${
+      note.signedByUserTitle && note.signedByUserTitle.trim().length
+        ? `${note.signedByUserTitle} ${note.signedByUserName || ''}`
+        : `${note.signedByUserName || ''}`
+    }`
+    const noteCreateBy = `${noteUserName}, ${moment(note.orderDate).format(
+      dateFormatLong,
+    )}`
+
+    return {
+      doctorNotes: {
+        id: note.id,
+        visitFK: current.currentId,
+        content: note[fieldName] || '',
+        createBy: noteCreateBy,
+      },
+      scribbleNotes: doctorScrible.map(scribble => {
+        return {
+          doctorNoteFK: note.id,
+          type: scribbleType.typeFK,
+          thumbnail: scribble.thumbnail,
+          subject: scribble.subject,
+        }
+      }),
+    }
+  }
+
   printHandel = async () => {
     let reportContext = []
     const result = await getReportContext(68)
@@ -1024,6 +1069,11 @@ class PatientHistory extends Component {
     let vitalSign = []
     let orders = []
     let consultationDocument = []
+    let noteHistory = []
+    let notePlan = []
+    let noteClinicNotes = []
+    let noteChiefComplaints = []
+    let scribbleNote = []
 
     loadVisits
       .filter(visit => selectItems.find(item => item === visit.currentId))
@@ -1045,6 +1095,7 @@ class PatientHistory extends Component {
           visitDate: visit.visitDate,
           userName: visit.userName,
           userTitle: visit.userTitle,
+          visitPurposeFK: visit.visitPurposeFK,
         }
         const { isNurseNote, nurseNotes = '', visitPurposeFK } = current
         const isShowHistory = this.checkShowData(
@@ -1183,12 +1234,6 @@ class PatientHistory extends Component {
             currentId: current.currentId,
             visitDate: moment(current.visitDate).format('DD MMM YYYY HH:mm'),
             doctor: `${current.userTitle || ''} ${current.userName || ''}`,
-            history: isShowHistory ? current.history : '',
-            chiefComplaints: isShowChiefComplaints
-              ? current.chiefComplaints
-              : '',
-            clinicNotes: isShowClinicNotes ? current.note : '',
-            plan: isShowPlan ? current.plan : '',
             isNurseNote: isNurseNote || false,
             nurseNotes,
             visitRemarks: isShowVisitRemarks ? current.visitRemarks : '',
@@ -1321,6 +1366,72 @@ class PatientHistory extends Component {
               }),
             )
           }
+
+          current.doctorNotes.forEach(note => {
+            // history
+            if (isShowHistory) {
+              const newNote = this.getNotes(
+                'history',
+                visit.visitPurposeFK,
+                note,
+                current,
+              )
+              if (newNote) {
+                noteHistory.push({ ...newNote.doctorNotes })
+                if (newNote.scribbleNotes.length) {
+                  scribbleNote = scribbleNote.concat(newNote.scribbleNotes)
+                }
+              }
+            }
+
+            // Chief Complaints
+            if (isShowChiefComplaints) {
+              const newNote = this.getNotes(
+                'chiefComplaints',
+                visit.visitPurposeFK,
+                note,
+                current,
+              )
+              if (newNote) {
+                noteChiefComplaints.push({ ...newNote.doctorNotes })
+                if (newNote.scribbleNotes.length) {
+                  scribbleNote = scribbleNote.concat(newNote.scribbleNotes)
+                }
+              }
+            }
+
+            // ClinicNotes
+            if (isShowClinicNotes) {
+              const newNote = this.getNotes(
+                'note',
+                visit.visitPurposeFK,
+                note,
+                current,
+              )
+              if (newNote) {
+                noteClinicNotes.push({ ...newNote.doctorNotes })
+                if (newNote.scribbleNotes.length) {
+                  scribbleNote = scribbleNote.concat(newNote.scribbleNotes)
+                }
+              }
+            }
+
+            //  Plan
+            if (isShowPlan) {
+              const newNote = this.getNotes(
+                'plan',
+                visit.visitPurposeFK,
+                note,
+                current,
+              )
+              if (newNote) {
+                notePlan.push({ ...newNote.doctorNotes })
+                if (newNote.scribbleNotes.length) {
+                  scribbleNote = scribbleNote.concat(newNote.scribbleNotes)
+                }
+              }
+            }
+          })
         }
       })
 
@@ -1340,6 +1451,11 @@ class PatientHistory extends Component {
       VitalSign: vitalSign,
       Orders: orders,
       ConsultationDocument: consultationDocument,
+      NoteHistory: noteHistory,
+      NoteChiefComplaints: noteChiefComplaints,
+      NoteClinicNotes: noteClinicNotes,
+      NotePlan: notePlan,
+      //ScribbleNote: scribbleNote,
       ReportContext: reportContext,
     }
     const payload1 = [

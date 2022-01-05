@@ -191,7 +191,7 @@ export const notesTypes = [
   { value: WIDGETS_ID.VISITREMARKS, fieldName: 'visitRemarks' },
 ]
 
-export const widgets = (props, scribbleNoteUpdateState = () => { }) => [
+export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
   {
     id: WIDGETS_ID.ASSOCIATED_HISTORY,
     name: 'History',
@@ -488,19 +488,21 @@ export const widgets = (props, scribbleNoteUpdateState = () => { }) => [
 
 export const showWidget = (current, widgetId) => {
   // check show notes
-  const notesType = notesTypes.find((type) => type.value === widgetId)
+  const notesType = notesTypes.find(type => type.value === widgetId)
 
   if (notesType) {
-    const { scribbleNotes = [] } = current
-    const scribbleType = scribbleTypes.find(
-      (o) => o.type === notesType.fieldName,
-    )
+    const { scribbleNotes = [], doctorNotes = [] } = current
+    const scribbleType = scribbleTypes.find(o => o.type === notesType.fieldName)
     if (
-      !current[notesType.fieldName] &&
+      !doctorNotes.find(
+        note =>
+          note[notesType.fieldName] !== undefined &&
+          note[notesType.fieldName] !== null &&
+          note[notesType.fieldName].trim().length,
+      ) &&
       (!scribbleType ||
-        scribbleNotes.filter(
-          (o) => o.scribbleNoteTypeFK === scribbleType.typeFK,
-        ).length === 0)
+        scribbleNotes.filter(o => o.scribbleNoteTypeFK === scribbleType.typeFK)
+          .length === 0)
     )
       return false
   }
@@ -612,7 +614,7 @@ export const showWidget = (current, widgetId) => {
   if (
     widgetId === WIDGETS_ID.TREATMENT &&
     (!current.orders ||
-      current.orders.filter((o) => o.type === 'Treatment').length === 0)
+      current.orders.filter(o => o.type === 'Treatment').length === 0)
   )
     return false
   // check show vital sign
@@ -624,12 +626,12 @@ export const showWidget = (current, widgetId) => {
     return false
   // check show visit referral
   if (widgetId === WIDGETS_ID.REFERRAL) {
-    const { referralSourceFK, referralPersonFK, referralPatientProfileFK } = current
-    if (
-      !referralSourceFK &&
-      !referralPersonFK &&
-      !referralPatientProfileFK
-    )
+    const {
+      referralSourceFK,
+      referralPersonFK,
+      referralPatientProfileFK,
+    } = current
+    if (!referralSourceFK && !referralPersonFK && !referralPatientProfileFK)
       return false
   }
 

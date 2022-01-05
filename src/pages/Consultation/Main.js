@@ -193,7 +193,12 @@ const saveConsultation = ({
     forms = {},
     user,
     clinicSettings,
+    visitRegistration,
   } = props
+  const { entity: vistEntity = {} } = visitRegistration
+  const { visit = {} } = vistEntity
+  const { visitPurposeFK = VISIT_TYPE.CON } = visit
+
   let settings = JSON.parse(localStorage.getItem('clinicSettings'))
   const { diagnosisDataSource } = settings
 
@@ -221,6 +226,18 @@ const saveConsultation = ({
         forms,
       },
     )
+    if (!newValues.corDoctorNote.length) {
+      newValues.corDoctorNote = [{}]
+    }
+    if (visitPurposeFK === VISIT_TYPE.MC) {
+      newValues.corDoctorNote.forEach(
+        note => (note.signedByUserFK = user.data.id),
+      )
+
+      newValues.corScribbleNotes.forEach(
+        note => (note.signedByUserFK = user.data.id),
+      )
+    }
     newValues.duration = Math.floor(
       Number(sessionStorage.getItem(`${values.id}_consultationTimer`)) || 0,
     )
@@ -347,6 +364,9 @@ const pauseConsultation = ({
     user,
     visitRegistration,
   } = rest
+  const { entity: vistEntity = {} } = visitRegistration
+  const { visit = {} } = vistEntity
+  const { visitPurposeFK = VISIT_TYPE.CON } = visit
   let settings = JSON.parse(localStorage.getItem('clinicSettings'))
   const { diagnosisDataSource, isEnablePharmacyModule } = settings
   if (isEnablePharmacyModule) {
@@ -370,6 +390,19 @@ const pauseConsultation = ({
       forms,
     },
   )
+
+  if (!newValues.corDoctorNote.length) {
+    newValues.corDoctorNote = [{}]
+  }
+  if (visitPurposeFK === VISIT_TYPE.MC) {
+    newValues.corDoctorNote.forEach(
+      note => (note.signedByUserFK = user.data.id),
+    )
+
+    newValues.corScribbleNotes.forEach(
+      note => (note.signedByUserFK = user.data.id),
+    )
+  }
   newValues.duration = Math.floor(
     Number(sessionStorage.getItem(`${values.id}_consultationTimer`)) || 0,
   )

@@ -34,7 +34,7 @@ import {
 import AddForm from './AddForm'
 import { FORM_CATEGORY } from '@/utils/constants'
 
-const styles = (theme) => ({
+const styles = theme => ({
   item: {
     display: 'flex',
     justifyContent: 'flex-start',
@@ -42,7 +42,9 @@ const styles = (theme) => ({
     cursor: 'pointer',
 
     '&:hover': {
-      background: color(primaryColor).lighten(0.9).hex(),
+      background: color(primaryColor)
+        .lighten(0.9)
+        .hex(),
     },
     '& > svg': {
       marginRight: theme.spacing(1),
@@ -75,7 +77,7 @@ const styles = (theme) => ({
 })
 export const printRow = async (row, props) => {
   const type = formTypes.find(
-    (o) => o.value === row.type || o.name === row.type || o.code === row.type,
+    o => o.value === row.type || o.name === row.type || o.code === row.type,
   )
   const { downloadConfig } = type
   if (!downloadConfig) {
@@ -111,7 +113,7 @@ export const printRow = async (row, props) => {
 
 export const viewReport = (row, props) => {
   const type = formTypes.find(
-    (o) => o.value === row.type || o.name === row.type || o.code === row.type,
+    o => o.value === row.type || o.name === row.type || o.code === row.type,
   )
   const { downloadConfig } = type
   if (!downloadConfig) {
@@ -124,7 +126,7 @@ export const viewReport = (row, props) => {
   const { entity } = patient
   const obj =
     clinicianprofile.find(
-      (o) =>
+      o =>
         o.userProfileFK ===
         (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
     ) || {}
@@ -162,9 +164,6 @@ export const viewReport = (row, props) => {
   formListing,
 }))
 @withFormikExtend({
-  authority: [
-    'queue.consultation.form',
-  ],
   mapPropsToValues: ({ consultation }) => {
     const _values = consultation.entity || consultation.default
     return _values
@@ -178,16 +177,15 @@ export const viewReport = (row, props) => {
   displayName: 'Forms',
 })
 class Forms extends PureComponent {
-
   componentWillMount() {
-    const { dispatch} = this.props
+    const { dispatch } = this.props
     dispatch({
       type: 'formListing/initState',
       payload: { formCategory: FORM_CATEGORY.CORFORM },
     })
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { dispatch } = props
 
@@ -215,7 +213,9 @@ class Forms extends PureComponent {
     })
   }
 
-  editRow = (row) => {
+  editRow = row => {
+    const { isEnableEditOrder = true } = this.props
+    if (!isEnableEditOrder) return
     if (row.statusFK === 3 || row.statusFK === 4) return
     this.props.dispatch({
       type: 'forms/updateState',
@@ -227,35 +227,38 @@ class Forms extends PureComponent {
     this.toggleModal()
   }
 
-  handleViewReport = (uid) => {
+  handleViewReport = uid => {
     const { forms } = this.props
     const { rows } = forms
-    viewReport(rows.find((item) => item.uid === uid), this.props)
+    viewReport(
+      rows.find(item => item.uid === uid),
+      this.props,
+    )
   }
 
   toggleVisibleChange = () =>
-    this.setState((ps) => {
+    this.setState(ps => {
       return {
         ...ps,
         openFormType: !ps.openFormType,
       }
     })
 
-    setFilterFormTemplate = (val) => {
-      this.setState({ filterFormTemplate: val })
-    }
-  
-    debouncedFilterFormTemplateAction = _.debounce(
-      e => {
-        this.setFilterFormTemplate(e.target.value)
-      },
-      100,
-      {
-        leading: true,
-        trailing: false,
-      },
-    )
-    
+  setFilterFormTemplate = val => {
+    this.setState({ filterFormTemplate: val })
+  }
+
+  debouncedFilterFormTemplateAction = _.debounce(
+    e => {
+      this.setFilterFormTemplate(e.target.value)
+    },
+    100,
+    {
+      leading: true,
+      trailing: false,
+    },
+  )
+
   ListItem = ({ classes, title, onClick }) => {
     return (
       <Tooltip title={title}>
@@ -267,10 +270,7 @@ class Forms extends PureComponent {
   }
 
   VoidForm = ({ classes, dispatch, row, user }) => {
-    const [
-      reason,
-      setReason,
-    ] = useState(undefined)
+    const [reason, setReason] = useState(undefined)
 
     const handleConfirmDelete = useCallback((i, voidVisibleChange) => {
       if (reason) {
@@ -298,7 +298,7 @@ class Forms extends PureComponent {
               label='Void Reason'
               autoFocus
               value={reason}
-              onChange={(e) => {
+              onChange={e => {
                 setReason(e.target.value)
               }}
             />
@@ -321,7 +321,18 @@ class Forms extends PureComponent {
     DocumentEditor.print({ documentName: row.formName, document: row.formData })
   }
 
-  render () {
+  getFormAccessRight = () => {
+    const { isEnableEditOrder = true } = this.props
+    let right = Authorized.check('queue.consultation.form') || {
+      rights: 'hidden',
+    }
+    if (right.rights === 'enable' && !isEnableEditOrder) {
+      right = { rights: 'disable' }
+    }
+    return right
+  }
+
+  render() {
     const {
       forms,
       dispatch,
@@ -333,13 +344,30 @@ class Forms extends PureComponent {
     } = this.props
     const { showModal } = forms
     const { rows = [] } = forms
-    
+
     const modifyAR = Authorized.check('queue.consultation.form.modify')
     const voidAR = Authorized.check('queue.consultation.form.void')
 
     const isHiddenModify = modifyAR && modifyAR.rights !== 'enable'
     const isHiddenVoid = voidAR && voidAR.rights !== 'enable'
 
+    let unionFormTypes = formTemplates //formTypes.concat(formTemplates)
+    unionFormTypes = this.state.filterFormTemplate
+      ? unionFormTypes.filter(
+          x =>
+            x.name
+              .toUpperCase()
+              .indexOf(this.state.filterFormTemplate.toUpperCase()) >= 0,
+        )
+      : unionFormTypes
+    const formDocumentTypes =
+      DOCUMENTCATEGORY_DOCUMENTTYPE.find(
+        y => y.documentCategoryFK === DOCUMENT_CATEGORY.FORM,
+      )?.templateTypes || []
+    const orderedTemplates = _.orderBy(unionFormTypes, [
+      a => formDocumentTypes.findIndex(x => x === a.documentTemplateTypeFK),
+      b => b.name,
+    ])
     return (
       <div>
         <Checkbox
@@ -347,7 +375,7 @@ class Forms extends PureComponent {
           label='Include voided forms'
           value={this.state.includeVoidForms}
           onChange={() => {
-            this.setState((ps) => {
+            this.setState(ps => {
               return {
                 ...ps,
                 includeVoidForms: !ps.includeVoidForms,
@@ -356,15 +384,13 @@ class Forms extends PureComponent {
           }}
         />
         <CommonTableGrid
-          getRowId={(r) => r.uid}
+          getRowId={r => r.uid}
           size='sm'
           style={{ margin: 0 }}
           rows={
-            this.state.includeVoidForms ? (
-              rows
-            ) : (
-              rows.filter((o) => o.statusFK !== 4)
-            )
+            this.state.includeVoidForms
+              ? rows
+              : rows.filter(o => o.statusFK !== 4)
           }
           onRowDoubleClick={this.editRow}
           columns={[
@@ -380,7 +406,7 @@ class Forms extends PureComponent {
               columnName: 'formName',
               type: 'link',
               linkField: 'href',
-              onClick: (row) => {
+              onClick: row => {
                 // this.handleViewReport(row.uid)
                 this.editRow(row)
               },
@@ -391,8 +417,9 @@ class Forms extends PureComponent {
             {
               columnName: 'updateDate',
               render: r => {
-                const updateDate = moment(r.updateDate)
-                  .format('DD MMM YYYY HH:mm')
+                const updateDate = moment(r.updateDate).format(
+                  'DD MMM YYYY HH:mm',
+                )
                 return (
                   <Tooltip title={updateDate}>
                     <span>{updateDate}</span>
@@ -404,16 +431,22 @@ class Forms extends PureComponent {
               columnName: 'statusFK',
               render: r => {
                 const status = formStatus.find(x => x.value === r.statusFK).name
-                const title = r.statusFK === 4 ? `${status}, Reason: ${r.voidReason}.` : status
-                return <Tooltip title={title}><span>{status}</span></Tooltip>
+                const title =
+                  r.statusFK === 4
+                    ? `${status}, Reason: ${r.voidReason}.`
+                    : status
+                return (
+                  <Tooltip title={title}>
+                    <span>{status}</span>
+                  </Tooltip>
+                )
               },
             },
             {
               align: 'left',
               columnName: 'action',
               width: 110,
-              render: (row) => {
-                console.log(row)
+              render: row => {
                 return (
                   <React.Fragment>
                     <Tooltip title='Print'>
@@ -430,45 +463,58 @@ class Forms extends PureComponent {
                         <Print />
                       </Button>
                     </Tooltip>
-                    {(row.statusFK === 1) && !isHiddenModify && (
-                      <Tooltip title='Edit'>
-                        <Button
-                          size='sm'
-                          onClick={() => {
-                            this.editRow(row)
-                          }}
-                          justIcon
-                          color='primary'
-                          style={{ marginRight: 5 }}
-                        >
-                          <Edit />
-                        </Button>
-                      </Tooltip>
-                    )}
-                    {(row.statusFK === 1) && !isHiddenModify && (
-                      <Popconfirm
-                        onConfirm={() =>
-                          dispatch({
-                            type: 'forms/deleteRow',
-                            payload: {
-                              id: row.uid,
-                            },
-                          })}
+                    {row.statusFK === 1 && !isHiddenModify && (
+                      <AuthorizedContext.Provider
+                        value={this.getFormAccessRight()}
                       >
-                        <Tooltip title='Delete'>
-                          <Button size='sm' color='danger' justIcon>
-                            <Delete />
+                        <Tooltip title='Edit'>
+                          <Button
+                            size='sm'
+                            onClick={() => {
+                              this.editRow(row)
+                            }}
+                            justIcon
+                            color='primary'
+                            style={{ marginRight: 5 }}
+                          >
+                            <Edit />
                           </Button>
                         </Tooltip>
-                      </Popconfirm>
+                      </AuthorizedContext.Provider>
+                    )}
+                    {row.statusFK === 1 && !isHiddenModify && (
+                      <AuthorizedContext.Provider
+                        value={this.getFormAccessRight()}
+                      >
+                        <Popconfirm
+                          onConfirm={() =>
+                            dispatch({
+                              type: 'forms/deleteRow',
+                              payload: {
+                                id: row.uid,
+                              },
+                            })
+                          }
+                        >
+                          <Tooltip title='Delete'>
+                            <Button size='sm' color='danger' justIcon>
+                              <Delete />
+                            </Button>
+                          </Tooltip>
+                        </Popconfirm>
+                      </AuthorizedContext.Provider>
                     )}
                     {row.statusFK === 2 && !isHiddenVoid && (
-                      <this.VoidForm
-                        classes={setFieldValue}
-                        dispatch={dispatch}
-                        row={row}
-                        user={user}
-                      />
+                      <AuthorizedContext.Provider
+                        value={this.getFormAccessRight()}
+                      >
+                        <this.VoidForm
+                          classes={setFieldValue}
+                          dispatch={dispatch}
+                          row={row}
+                          user={user}
+                        />
+                      </AuthorizedContext.Provider>
                     )}
                   </React.Fragment>
                 )
@@ -476,79 +522,66 @@ class Forms extends PureComponent {
             },
           ]}
         />
-        <AuthorizedContext>
-          {(r) => {
-            if (r && r.rights !== 'enable' || isHiddenModify) return null
-            let unionFormTypes = formTemplates//formTypes.concat(formTemplates)
-            unionFormTypes = this.state.filterFormTemplate
-              ? unionFormTypes.filter(
-                  x =>
-                    x.name
-                      .toUpperCase()
-                      .indexOf(this.state.filterFormTemplate.toUpperCase()) >=
-                    0,
-                )
-              : unionFormTypes
-            const formDocumentTypes =
-              DOCUMENTCATEGORY_DOCUMENTTYPE.find(
-                y => y.documentCategoryFK === DOCUMENT_CATEGORY.FORM,
-              )?.templateTypes || []
-            const orderedTemplates = _.orderBy(unionFormTypes,[a=>formDocumentTypes.findIndex(x=>x===a.documentTemplateTypeFK),b=>b.name])
-            return (
-              <Popover
-                icon={null}
-                trigger='click'
-                placement='bottom'
-                visible={this.state.openFormType}
-                onVisibleChange={this.toggleVisibleChange}
-                content={
-                  <div className={classes.popoverContainer}>
-                    <TextField
-                      label='Filter Template'
-                      onChange={e => {
-                        this.debouncedFilterFormTemplateAction(e)
-                      }}
-                    />
-                    <div className={classes.listContainer}>
-                      {orderedTemplates.map((item) => {
-                        return (
-                          <this.ListItem
-                            key={item.formTemplateFK}
-                            title={item.name}
-                            classes={classes}
-                            onClick={() => {
-                              window.g_app._store.dispatch({
-                                type: 'forms/updateState',
-                                payload: {
-                                  showModal: true,
-                                  type: item.value,
-                                  entity: undefined,
-                                  formCategory: FORM_CATEGORY.CORFORM,
-                                  formName: item.name,
-                                  templateContent: item.templateContent,
-                                  formTemplateFK: item.formTemplateFK,
-                                },
-                              })
-                              this.toggleVisibleChange()
-                            }}
-                            {...item}
-                          />
-                        )
-                      })}
-                    </div>
-                  </div>
-                }
-              >
-                <Tooltip title='Add Form'>
-                  <Button color='primary' style={{ margin: theme.spacing(1) }}>
-                    <Add />
-                    Add New
-                  </Button>
-                </Tooltip>
-              </Popover>
-            )
+        <AuthorizedContext.Provider
+          value={{
+            rights:
+              this.getFormAccessRight().rights !== 'enable'
+                ? 'hidden'
+                : 'enable',
           }}
-        </AuthorizedContext>
+        >
+          <Popover
+            icon={null}
+            trigger='click'
+            placement='bottom'
+            visible={this.state.openFormType}
+            onVisibleChange={this.toggleVisibleChange}
+            content={
+              <div className={classes.popoverContainer}>
+                <TextField
+                  label='Filter Template'
+                  onChange={e => {
+                    this.debouncedFilterFormTemplateAction(e)
+                  }}
+                />
+                <div className={classes.listContainer}>
+                  {orderedTemplates.map(item => {
+                    return (
+                      <this.ListItem
+                        key={item.formTemplateFK}
+                        title={item.name}
+                        classes={classes}
+                        onClick={() => {
+                          window.g_app._store.dispatch({
+                            type: 'forms/updateState',
+                            payload: {
+                              showModal: true,
+                              type: item.value,
+                              entity: undefined,
+                              formCategory: FORM_CATEGORY.CORFORM,
+                              formName: item.name,
+                              templateContent: item.templateContent,
+                              formTemplateFK: item.formTemplateFK,
+                            },
+                          })
+                          this.toggleVisibleChange()
+                        }}
+                        {...item}
+                      />
+                    )
+                  })}
+                </div>
+              </div>
+            }
+          >
+            <Tooltip title='Add Form'>
+              <Button color='primary' style={{ margin: theme.spacing(1) }}>
+                <Add />
+                Add New
+              </Button>
+            </Tooltip>
+          </Popover>
+        </AuthorizedContext.Provider>
         <CommonModal
           open={showModal}
           title='Add Form'

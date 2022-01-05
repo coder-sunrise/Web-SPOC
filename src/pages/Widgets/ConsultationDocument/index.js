@@ -9,7 +9,7 @@ import Add from '@material-ui/icons/Add'
 import { consultationDocumentTypes } from '@/utils/codes'
 import { download } from '@/utils/request'
 import { commonDataReaderTransform } from '@/utils/utils'
-
+import Authorized from '@/utils/Authorized'
 import {
   CommonTableGrid,
   Button,
@@ -28,7 +28,7 @@ import AddConsultationDocument from './AddConsultationDocument'
 const styles = () => ({})
 export const printRow = async (row, props) => {
   const type = consultationDocumentTypes.find(
-    (o) => o.value === row.type || o.name === row.type || o.code === row.type,
+    o => o.value === row.type || o.name === row.type || o.code === row.type,
   )
   const { downloadConfig } = type
   if (!downloadConfig) {
@@ -50,7 +50,7 @@ export const printRow = async (row, props) => {
     const { entity } = patient
     const obj =
       clinicianprofile.find(
-        (o) =>
+        o =>
           o.userProfileFK ===
           (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
       ) || {}
@@ -82,7 +82,7 @@ export const printRow = async (row, props) => {
 
 export const viewReport = (row, props, useID = false) => {
   const type = consultationDocumentTypes.find(
-    (o) => o.value === row.type || o.name === row.type || o.code === row.type,
+    o => o.value === row.type || o.name === row.type || o.code === row.type,
   )
   const { downloadConfig } = type
   if (!downloadConfig) {
@@ -106,7 +106,7 @@ export const viewReport = (row, props, useID = false) => {
     const { entity } = patient
     const obj =
       clinicianprofile.find(
-        (o) =>
+        o =>
           o.userProfileFK ===
           (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
       ) || {}
@@ -135,9 +135,6 @@ export const viewReport = (row, props, useID = false) => {
 
   return true
 }
-
-// @skeleton(['consultationDocument'])
-
 @connect(({ consultationDocument, codetable, patient, consultation }) => ({
   consultationDocument,
   codetable,
@@ -145,13 +142,10 @@ export const viewReport = (row, props, useID = false) => {
   consultation,
 }))
 @withFormikExtend({
-  authority: [
-    'queue.consultation.widgets.consultationdocument',
-  ],
   displayName: 'ConsultationDocumentList',
 })
 class ConsultationDocument extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { dispatch } = props
 
@@ -174,7 +168,9 @@ class ConsultationDocument extends PureComponent {
     })
   }
 
-  editRow = (row) => {
+  editRow = row => {
+    const { isEnableEditOrder = true } = this.props
+    if (!isEnableEditOrder) return
     this.props.dispatch({
       type: 'consultationDocument/updateState',
       payload: {
@@ -185,71 +181,88 @@ class ConsultationDocument extends PureComponent {
     this.toggleModal()
   }
 
-  handleViewReport = (uid) => {
+  handleViewReport = uid => {
     const { consultationDocument } = this.props
     const { rows } = consultationDocument
-    viewReport(rows.find((item) => item.uid === uid), this.props)
+    viewReport(
+      rows.find(item => item.uid === uid),
+      this.props,
+    )
   }
 
-  render () {
+  getDocumentAccessRight = () => {
+    const { isEnableEditOrder = true } = this.props
+    let right = Authorized.check(
+      'queue.consultation.widgets.consultationdocument',
+    ) || {
+      rights: 'hidden',
+    }
+    if (right.rights === 'enable' && !isEnableEditOrder) {
+      right = { rights: 'disable' }
+    }
+    return right
+  }
+
+  render() {
     const { consultationDocument, dispatch, theme } = this.props
     const { showModal } = consultationDocument
     const { rows } = consultationDocument
     return (
       <div>
-        <CommonTableGrid
-          getRowId={(r) => r.uid}
-          size='sm'
-          style={{ margin: 0 }}
-          rows={rows}
-          onRowDoubleClick={this.editRow}
-          columns={[
-            { name: 'type', title: 'Type' },
-            { name: 'subject', title: 'Subject' },
-            { name: 'issuedByUserFK', title: 'From' },
-            { name: 'action', title: 'Action' },
-          ]}
-          FuncProps={{ pager: false }}
-          columnExtensions={[
-            {
-              columnName: 'type',
-              type: 'select',
-              options: consultationDocumentTypes,
-            },
-            {
-              columnName: 'issuedByUserFK',
-              render: (r) => {
-                const { codetable } = this.props
-                const { clinicianprofile = [] } = codetable
-                const obj =
-                  clinicianprofile.find(
-                    (o) =>
-                      o.userProfileFK ===
-                      (r.issuedByUserFK
-                        ? r.issuedByUserFK
-                        : r.referredByUserFK),
-                  ) || {}
-                return `${obj.title || ''} ${obj.name || ''}`
+        <AuthorizedContext.Provider value={this.getDocumentAccessRight()}>
+          <CommonTableGrid
+            getRowId={r => r.uid}
+            size='sm'
+            style={{ margin: 0 }}
+            rows={rows}
+            onRowDoubleClick={this.editRow}
+            columns={[
+              { name: 'type', title: 'Type' },
+              { name: 'subject', title: 'Subject' },
+              { name: 'issuedByUserFK', title: 'From' },
+              { name: 'action', title: 'Action' },
+            ]}
+            FuncProps={{ pager: false }}
+            columnExtensions={[
+              {
+                columnName: 'type',
+                type: 'select',
+                options: consultationDocumentTypes,
               },
-            },
-            {
-              columnName: 'subject',
-              onClick: (row) => {
-                this.handleViewReport(row.uid)
+              {
+                columnName: 'issuedByUserFK',
+                render: r => {
+                  const { codetable } = this.props
+                  const { clinicianprofile = [] } = codetable
+                  const obj =
+                    clinicianprofile.find(
+                      o =>
+                        o.userProfileFK ===
+                        (r.issuedByUserFK
+                          ? r.issuedByUserFK
+                          : r.referredByUserFK),
+                    ) || {}
+                  return `${obj.title || ''} ${obj.name || ''}`
+                },
               },
-              type: 'link',
-              linkField: 'href',
-              getLinkText: (row) => {
-                return row.type === '4' ? row.title : row.subject
+              {
+                columnName: 'subject',
+                onClick: row => {
+                  this.handleViewReport(row.uid)
+                },
+                type: 'link',
+                linkField: 'href',
+                getLinkText: row => {
+                  return row.type === '4' ? row.title : row.subject
+                },
               },
-            },
-            {
-              columnName: 'action',
-              width: 110,
-              render: (row) => {
-                return (
-                  <React.Fragment>
-                    {/* <Tooltip title='Print'>
+              {
+                columnName: 'action',
+                width: 110,
+                render: row => {
+                  return (
+                    <React.Fragment>
+                      {/* <Tooltip title='Print'>
                       <Button
                         size='sm'
                         onClick={() => {
@@ -262,67 +275,70 @@ class ConsultationDocument extends PureComponent {
                         <Print />
                       </Button>
                     </Tooltip> */}
-                    <Tooltip title='Edit'>
-                      <Button
-                        size='sm'
-                        onClick={() => {
-                          this.editRow(row)
-                        }}
-                        justIcon
-                        color='primary'
-                        style={{ marginRight: 5 }}
-                      >
-                        <Edit />
-                      </Button>
-                    </Tooltip>
-                    <Popconfirm
-                      onConfirm={() =>
-                        dispatch({
-                          type: 'consultationDocument/deleteRow',
-                          payload: {
-                            id: row.uid,
-                          },
-                        })}
-                    >
-                      <Tooltip title='Delete'>
-                        <Button size='sm' color='danger' justIcon>
-                          <Delete />
+                      <Tooltip title='Edit'>
+                        <Button
+                          size='sm'
+                          onClick={() => {
+                            this.editRow(row)
+                          }}
+                          justIcon
+                          color='primary'
+                          style={{ marginRight: 5 }}
+                        >
+                          <Edit />
                         </Button>
                       </Tooltip>
-                    </Popconfirm>
-                  </React.Fragment>
-                )
+                      <Popconfirm
+                        onConfirm={() =>
+                          dispatch({
+                            type: 'consultationDocument/deleteRow',
+                            payload: {
+                              id: row.uid,
+                            },
+                          })
+                        }
+                      >
+                        <Tooltip title='Delete'>
+                          <Button size='sm' color='danger' justIcon>
+                            <Delete />
+                          </Button>
+                        </Tooltip>
+                      </Popconfirm>
+                    </React.Fragment>
+                  )
+                },
               },
-            },
-          ]}
-        />
-        <AuthorizedContext>
-          {(r) => {
-            if (r && r.rights !== 'enable') return null
-
-            return (
-              <Tooltip title='Add Consultation Document'>
-                <ProgressButton
-                  color='primary'
-                  icon={<Add />}
-                  style={{ margin: theme.spacing(1) }}
-                  onClick={() => {
-                    window.g_app._store.dispatch({
-                      type: 'consultationDocument/updateState',
-                      payload: {
-                        showModal: true,
-                        type: '5',
-                        entity: undefined,
-                      },
-                    })
-                  }}
-                >
-                  Add New
-                </ProgressButton>
-              </Tooltip>
-            )
+            ]}
+          />
+        </AuthorizedContext.Provider>
+        <AuthorizedContext.Provider
+          value={{
+            rights:
+              this.getDocumentAccessRight().rights !== 'enable'
+                ? 'hidden'
+                : 'enable',
           }}
-        </AuthorizedContext>
+        >
+          <Tooltip title='Add Consultation Document'>
+            <ProgressButton
+              color='primary'
+              icon={<Add />}
+              style={{ margin: theme.spacing(1) }}
+              onClick={() => {
+                window.g_app._store.dispatch({
+                  type: 'consultationDocument/updateState',
+                  payload: {
+                    showModal: true,
+                    type: '5',
+                    entity: undefined,
+                  },
+                })
+              }}
+            >
+              Add New
+            </ProgressButton>
+          </Tooltip>
+        </AuthorizedContext.Provider>
         <CommonModal
           open={showModal}
           title='Add Consultation Document'

@@ -18,19 +18,19 @@ import * as WidgetConfig from './config'
   patientHistory,
 }))
 class HistoryDetails extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.widgets = WidgetConfig.widgets(
       props,
       props.scribbleNoteUpdateState,
-    ).filter((o) => {
+    ).filter(o => {
       const accessRight = Authorized.check(o.authority)
       return accessRight && accessRight.rights !== 'hidden'
     })
   }
 
-  componentWillMount () {
+  componentWillMount() {
     const { selectHistory } = this.props
     const isRetailVisit = selectHistory.visitPurposeFK === VISIT_TYPE.OTC
     if (isRetailVisit) {
@@ -41,7 +41,7 @@ class HistoryDetails extends PureComponent {
           type: 'patientHistory/queryOne',
           payload: selectHistory.coHistory[0].id,
         })
-        .then((r) => {
+        .then(r => {
           if (r) {
             this.props.dispatch({
               type: 'patientHistory/updateState',
@@ -53,7 +53,7 @@ class HistoryDetails extends PureComponent {
         })
   }
 
-  handleRetailVisitHistory = (v) => {
+  handleRetailVisitHistory = v => {
     this.props
       .dispatch({
         type: 'patientHistory/queryRetailHistory',
@@ -61,7 +61,7 @@ class HistoryDetails extends PureComponent {
           id: v.invoiceFK,
         },
       })
-      .then((r) => {
+      .then(r => {
         if (r) {
           this.props.dispatch({
             type: 'patientHistory/updateState',
@@ -101,7 +101,7 @@ class HistoryDetails extends PureComponent {
         disablePadding
         onClick={() => {}}
       >
-        {newArray.map((o) => {
+        {newArray.map(o => {
           const updateByUser = o.userName
             ? `${o.userTitle || ''} ${o.userName || ''}`
             : undefined
@@ -144,7 +144,7 @@ class HistoryDetails extends PureComponent {
                         type: 'patientHistory/queryOne',
                         payload: o.id,
                       })
-                      .then((r) => {
+                      .then(r => {
                         if (r) {
                           this.props.dispatch({
                             type: 'patientHistory/updateState',
@@ -168,19 +168,22 @@ class HistoryDetails extends PureComponent {
                           'DD MMM YYYY',
                         )} (Time In: ${moment(timeIn).format(
                           'HH:mm',
-                        )} Time Out: ${timeOut
-                          ? moment(timeOut).format('HH:mm')
-                          : '-'})${docotrName ? ` - ${docotrName}` : ''}`}
+                        )} Time Out: ${
+                          timeOut ? moment(timeOut).format('HH:mm') : '-'
+                        })${docotrName ? ` - ${docotrName}` : ''}`}
                       </div>
                       <div>
-                        {settings.showConsultationVersioning &&
-                        !isRetailVisit ? (
-                          `${selectHistory.visitPurposeName} (V${o.versionNumber}), Last Update By: ${updateByUser ||
-                            ''}${lastUpdateDate ? ` on ${lastUpdateDate}` : ''}`
-                        ) : (
-                          `${selectHistory.visitPurposeName}, Last Update By: ${updateByUser ||
-                            ''}${lastUpdateDate ? ` on ${lastUpdateDate}` : ''}`
-                        )}
+                        {settings.showConsultationVersioning && !isRetailVisit
+                          ? `${selectHistory.visitPurposeName} (V${
+                              o.versionNumber
+                            }), Last Update By: ${updateByUser || ''}${
+                              lastUpdateDate ? ` on ${lastUpdateDate}` : ''
+                            }`
+                          : `${
+                              selectHistory.visitPurposeName
+                            }, Last Update By: ${updateByUser || ''}${
+                              lastUpdateDate ? ` on ${lastUpdateDate}` : ''
+                            }`}
                       </div>
                     </div>
                   }
@@ -200,19 +203,20 @@ class HistoryDetails extends PureComponent {
       patientName: selectHistory.patientName,
       patientAccountNo: selectHistory.patientAccountNo,
     }
+    const { visitPurposeFK } = selectHistory
     let current = {
       ...patientHistory.entity,
       visitAttachments: selectHistory.visitAttachments,
       visitRemarks: selectHistory.visitRemarks,
       referralSourceFK: selectHistory.referralSourceFK,
       referralPersonFK: selectHistory.referralPersonFK,
-      referralPatientProfileFK: selectHistory.referralPatientProfileFK, 
+      referralPatientProfileFK: selectHistory.referralPatientProfileFK,
       referralSource: selectHistory.referralSource,
       referralPerson: selectHistory.referralPerson,
       referralPatientName: selectHistory.referralPatientName,
-      referralRemarks: selectHistory.referralRemarks, 
+      referralRemarks: selectHistory.referralRemarks,
+      visitPurposeFK: visitPurposeFK,
     }
-    const { visitPurposeFK } = selectHistory
     return (
       <CardContainer
         hideHeader
@@ -223,7 +227,7 @@ class HistoryDetails extends PureComponent {
         })}
       >
         {this.widgets
-          .filter((_widget) => {
+          .filter(_widget => {
             if (visitPurposeFK === VISIT_TYPE.OTC) {
               return (
                 _widget.id === WidgetConfig.WIDGETS_ID.INVOICE &&
@@ -232,7 +236,7 @@ class HistoryDetails extends PureComponent {
             }
             return WidgetConfig.showWidget(current, _widget.id)
           })
-          .map((o) => {
+          .map(o => {
             const Widget = o.component
             return (
               <div>
@@ -258,7 +262,7 @@ class HistoryDetails extends PureComponent {
     )
   }
 
-  render () {
+  render() {
     const { classes } = this.props
     return (
       <div style={{ marginLeft: 8, marginRight: 8 }}>

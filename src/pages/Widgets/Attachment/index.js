@@ -28,11 +28,11 @@ class Attachment extends Component {
     activedKeys: undefined,
     selectedAttachmentType: 'ClinicalNotes',
     types: corAttchementTypes.filter(
-      (o) => o.id !== 5 && (!o.accessRight || Authorized.check(o.accessRight)),
+      o => o.id !== 5 && (!o.accessRight || Authorized.check(o.accessRight)),
     ),
   }
 
-  handleClickAttachment = (attachment) => {
+  handleClickAttachment = attachment => {
     downloadAttachment(attachment)
   }
 
@@ -41,14 +41,12 @@ class Attachment extends Component {
     const { entity } = consultation
     const { form, field } = this
     const { types, activedKeys, selectedAttachmentType } = this.state
-    let updated = [
-      ...(field.value || []),
-    ]
+    let updated = [...(field.value || [])]
 
     if (added) {
       updated = [
         ...updated,
-        ...added.map((o) => {
+        ...added.map(o => {
           const { id, ...resetProps } = o
           return {
             ...resetProps,
@@ -60,17 +58,15 @@ class Attachment extends Component {
       if (selectedAttachmentType) {
         // default open panel if it was closed
         const targetIndex = types.indexOf(
-          types.find((o) => o.type === selectedAttachmentType),
+          types.find(o => o.type === selectedAttachmentType),
         )
         if (
           targetIndex >= 0 &&
-          added.find((o) => o.attachmentType === selectedAttachmentType) &&
+          added.find(o => o.attachmentType === selectedAttachmentType) &&
           !(activedKeys || []).includes(targetIndex)
         ) {
-          this.setState((preState) => ({
-            activedKeys: (preState.activedKeys || []).concat([
-              targetIndex,
-            ]),
+          this.setState(preState => ({
+            activedKeys: (preState.activedKeys || []).concat([targetIndex]),
           }))
         }
       }
@@ -82,15 +78,9 @@ class Attachment extends Component {
           (item.fileIndexFK !== undefined && item.fileIndexFK === deleted) ||
           (item.fileIndexFK === undefined && item.id === deleted)
         )
-          return [
-            ...attachments,
-            { ...item, isDeleted: true },
-          ]
+          return [...attachments, { ...item, isDeleted: true }]
 
-        return [
-          ...attachments,
-          { ...item },
-        ]
+        return [...attachments, { ...item }]
       }, [])
 
     form.setFieldValue(
@@ -123,7 +113,7 @@ class Attachment extends Component {
     })
   }
 
-  handleScribbleThumbnailClick = (data) => {
+  handleScribbleThumbnailClick = data => {
     this.setState({
       selectedScribbleNoteData: data,
       showScribbleModal: true,
@@ -137,7 +127,7 @@ class Attachment extends Component {
   }
 
   toggleScribbleModal = () => {
-    this.setState((preState) => ({
+    this.setState(preState => ({
       showScribbleModal: !preState.showScribbleModal,
     }))
   }
@@ -151,18 +141,18 @@ class Attachment extends Component {
 
     return (
       <div style={{ width: '100%' }}>
-        {list.filter((attachment) => !attachment.isDeleted).length === 0 ? (
+        {list.filter(attachment => !attachment.isDeleted).length === 0 ? (
           <EmptyList />
         ) : (
           list
-            .filter((attachment) => !attachment.isDeleted)
+            .filter(attachment => !attachment.isDeleted)
             .map((attachment, index) => {
               let indexInAllAttachments = attachments.findIndex(
-                (item) => item.id === attachment.id,
+                item => item.id === attachment.id,
               )
               if (attachment.fileIndexFK)
                 indexInAllAttachments = attachments.findIndex(
-                  (item) => item.fileIndexFK === attachment.fileIndexFK,
+                  item => item.fileIndexFK === attachment.fileIndexFK,
                 )
               return (
                 <Thumbnail
@@ -180,13 +170,13 @@ class Attachment extends Component {
     )
   }
 
-  onAccordionChange = (keys) => {
+  onAccordionChange = keys => {
     this.setState({
       activedKeys: keys,
     })
   }
 
-  handleSelectedAttachmentType = (selectedType) => {
+  handleSelectedAttachmentType = selectedType => {
     this.setState(() => {
       return {
         selectedAttachmentType: selectedType,
@@ -195,6 +185,8 @@ class Attachment extends Component {
   }
 
   isAttachmentReadOnly = () => {
+    const { isEnableEditOrder = true } = this.props
+    if (!isEnableEditOrder) return true
     const widgetAccessRight = Authorized.check(
       'queue.consultation.widgets.attachment',
     )
@@ -203,7 +195,7 @@ class Attachment extends Component {
     return false
   }
 
-  render () {
+  render() {
     const { types, selectedAttachmentType } = this.state
     const { consultation } = this.props
     const { entity } = consultation
@@ -212,7 +204,7 @@ class Attachment extends Component {
       <div>
         <FastField
           name='corAttachment'
-          render={(args) => {
+          render={args => {
             // these lines are to bind the form and field value to {this}
             // and initialize corAttachment to keep a local state,
             // its value is the same as in the form.values
@@ -237,7 +229,7 @@ class Attachment extends Component {
             isReadOnly={this.isAttachmentReadOnly()}
             handleUpdateAttachments={this.handleUpdateAttachments}
             handleSelectedAttachmentType={this.handleSelectedAttachmentType}
-            renderBody={(attachments) => {
+            renderBody={attachments => {
               return (
                 <Accordion
                   leftIcon
@@ -247,23 +239,18 @@ class Attachment extends Component {
                   onExpend={this.onAccordionChange}
                   defaultActive={types.reduce((result, tp, index) => {
                     if (
-                      corAttachment.filter((m) => m.attachmentType === tp.type)
+                      corAttachment.filter(m => m.attachmentType === tp.type)
                         .length > 0
                     ) {
-                      return [
-                        ...result,
-                        index,
-                      ]
+                      return [...result, index]
                     }
                     return result
                   }, [])}
-                  collapses={types.map((o) => {
+                  collapses={types.map(o => {
                     return {
                       title: o.name,
                       content: this.getContent(
-                        corAttachment.filter(
-                          (m) => m.attachmentType === o.type,
-                        ),
+                        corAttachment.filter(m => m.attachmentType === o.type),
                         attachments,
                       ),
                     }
