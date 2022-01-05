@@ -32,13 +32,11 @@ class SummaryComment extends PureComponent {
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
-        code: 'ctexaminationitem',
-        force: true,
+        code: 'ctsummarycommentcategory',
       },
-    }).then(() => {
-      dispatch({
-        type: 'settingSummaryComment/query',
-      })
+    })
+    dispatch({
+      type: 'settingSummaryComment/query',
     })
   }
 

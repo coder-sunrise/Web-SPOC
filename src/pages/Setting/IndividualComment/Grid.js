@@ -134,7 +134,7 @@ class Grid extends PureComponent {
                       }, 1)
                     }}
                   >
-                    <Tooltip title='Delete Medicine Trivia'>
+                    <Tooltip title='Delete Individual Comment'>
                       <Button
                         className='noPadding'
                         color='danger'

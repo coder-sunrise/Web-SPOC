@@ -118,14 +118,14 @@ const Detail = ({
                 }}
               />
             </GridItem>
-          )} 
-          <GridItem md={8}>
+          )}
+          <GridItem md={12}>
             <FastField
-              name='examinationItemFK'
+              name='summaryCommentCategoryFK'
               render={args => (
                 <CodeSelect
-                  label='Examination'
-                  code='ctexaminationitem'
+                  label='Category'
+                  code='ctsummarycommentcategory'
                   {...args}
                 />
               )}
@@ -164,8 +164,7 @@ export default compose(
     validationSchema: Yup.object().shape({
       code: Yup.string().required(),
       displayValue: Yup.string().required(),
-      groupNo: Yup.number().required(),
-      examinationItemFK: Yup.string().required(),
+      summaryCommentCategoryFK: Yup.string().required(),
       sortOrder: Yup.number()
         .min(
           -2147483648,
@@ -219,7 +218,7 @@ export default compose(
         type: 'settingSummaryComment/upsert',
         payload: {
           ...restValues,
-          examinationItemFKNavigation: null,
+          summaryCommentCategoryFKNavigation: null,
           translationData,
           EffectiveStartDate: '1900-01-01',
           EffectiveEndDate: '2099-12-31',

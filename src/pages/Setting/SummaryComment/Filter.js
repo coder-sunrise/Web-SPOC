@@ -37,16 +37,16 @@ class Filter extends PureComponent {
           </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
-              name='examinationItemFK'
+              name='summaryCommentCategoryFK'
               render={args => (
                 <CodeSelect
-                  label='Examination'
-                  code='ctexaminationitem'
+                  label='Category'
+                  code='ctsummarycommentcategory'
                   {...args}
                 />
               )}
             />
-          </GridItem> 
+          </GridItem>
           <GridItem>
             <div className={classes.filterBtn}>
               <ProgressButton
@@ -55,16 +55,14 @@ class Filter extends PureComponent {
                 onClick={() => {
                   const {
                     codeDisplayValue,
-                    groupNo,
-                    examinationItemFK,
+                    summaryCommentCategoryFK,
                   } = this.props.values
                   const { clinicSettings } = this.props
                   const { secondaryPrintoutLanguage = '' } = clinicSettings
                   this.props.dispatch({
                     type: 'settingSummaryComment/query',
                     payload: {
-                      groupNo,
-                      examinationItemFK,
+                      summaryCommentCategoryFK,
                       apiCriteria: {
                         Language: secondaryPrintoutLanguage,
                         Key: 'displayValue',

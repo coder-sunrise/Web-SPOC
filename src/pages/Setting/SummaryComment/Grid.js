@@ -52,8 +52,7 @@ class Grid extends PureComponent {
         name: 'translatedDisplayValue',
         title: `Display Value (${secondaryPrintoutLanguage})`,
       },
-      { name: 'examinationItem', title: 'Examination' },
-      { name: 'groupNo', title: 'Comment Group' },
+      { name: 'summaryCommentCategory', title: 'Category' },
       { name: 'sortOrder', title: 'Sort Order' },
       {
         name: 'action',
@@ -83,13 +82,9 @@ class Grid extends PureComponent {
             sortingEnabled: false,
           },
           {
-            columnName: 'examinationItem',
+            columnName: 'summaryCommentCategory',
             sortingEnabled: false,
             width: 200,
-          },
-          {
-            columnName: 'groupNo',
-            width: 150,
           },
           {
             columnName: 'code',
