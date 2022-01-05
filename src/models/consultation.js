@@ -220,6 +220,7 @@ export default createFormViewModel({
             sendQueueNotification({
               message: 'Consultation resumed.',
               queueNo: entity.queueNo,
+              visitID: entity.id,
             })
           }
         }
@@ -288,6 +289,7 @@ export default createFormViewModel({
           sendQueueNotification({
             message: 'Consultation discarded.',
             queueNo: entity.queueNo,
+            visitID: entity.id,
           })
         }
         return response

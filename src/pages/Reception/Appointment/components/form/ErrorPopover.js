@@ -32,13 +32,8 @@ const RowErrorStyles = () => ({
 const ListTypeError = ({ errors }) => {
   return (
     <ul>
-      {_.orderBy(errors, ['isPrevent'], ['asc']).map((error, index) => (
-        <li
-          key={`rowError-${index}`}
-          style={{ fontWeight: error.isPrevent ? 600 : undefined }}
-        >
-          {error.conflictContent}
-        </li>
+      {_.orderBy(errors, ['isPrevent'], ['desc']).map((error, index) => (
+        <li key={`rowError-${index}`}>{error.conflictContent}</li>
       ))}
     </ul>
   )

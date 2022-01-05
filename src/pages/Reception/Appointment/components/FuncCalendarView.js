@@ -547,7 +547,7 @@ const CalendarView = ({
               return `${startTime} - ${endTime} Maximum slot: ${
                 c.maxCapacity
               } Balance slot: ${c.maxCapacity -
-                c.usedSlot}\r\nRemarks:${c.remarks || '-'}`
+                c.usedSlot}\r\nRemarks: ${c.remarks || '-'}`
             })
             .join('\r\n')
           const maxSlot = dailyCapacity.map(c => c.maxCapacity).join(', ')

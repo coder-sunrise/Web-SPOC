@@ -183,6 +183,7 @@ const DispenseDetails = ({
       sendQueueNotification({
         message: `${visitTypeName} visit discarded.`,
         queueNo: entity.queueNo,
+        visitID: entity.id,
       })
       const message = `${userName} discard prescription at ${moment().format(
         'HH:mm',
