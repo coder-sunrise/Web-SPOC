@@ -801,6 +801,20 @@ class Detail extends PureComponent {
                   />
                 </GridItem>
 
+                <GridItem xs={6}>
+                  <FastField
+                    name='examinationItemFK'
+                    render={args => {
+                      return (
+                        <CodeSelect
+                          label='Examination'
+                          code='ctexaminationitem'
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
                 {settings.isEnableMedisave && (
                   <GridItem xs={12}>
                     <FastField
