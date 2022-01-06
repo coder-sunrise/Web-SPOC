@@ -175,8 +175,8 @@ export default {
   'menu.setting.drugallergy': 'Drug Allergy',
   'menu.setting.administrationroute': 'Route of Administration',
   'menu.setting.checklist': 'Checklist',
-  'menu.setting.individualcomment': 'Medical Check Up Individual Comment',
-  'menu.setting.summarycomment': 'Medical Check Up Summary Comment',
+  'menu.setting.individualcomment': 'Individual Comment',
+  'menu.setting.summarycomment': 'Summary Comment',
   'menu.setting.resource': 'Resource',
 
   'menu.report': 'Report',

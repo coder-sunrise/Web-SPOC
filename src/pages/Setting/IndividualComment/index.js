@@ -69,8 +69,8 @@ class IndividualComment extends PureComponent {
           observe='IndividualCommentDetail'
           title={
             settingIndividualComment.entity
-              ? 'Edit Medical Check Up Individual Comment'
-              : 'Add Medical Check Up Individual Comment'
+              ? 'Edit Individual Comment'
+              : 'Add Individual Comment'
           }
           maxWidth='md'
           bodyNoPadding

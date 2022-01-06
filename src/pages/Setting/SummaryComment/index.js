@@ -67,8 +67,8 @@ class SummaryComment extends PureComponent {
           observe='SummaryCommentDetail'
           title={
             settingSummaryComment.entity
-              ? 'Edit Medical Check Up Summary Comment'
-              : 'Add Medical Check Up Summary Comment'
+              ? 'Edit Summary Comment'
+              : 'Add Summary Comment'
           }
           maxWidth='md'
           bodyNoPadding

@@ -807,7 +807,7 @@ class Detail extends PureComponent {
                     render={args => {
                       return (
                         <CodeSelect
-                          label='Medical Check Up Examination'
+                          label='Examination'
                           code='ctexaminationitem'
                           {...args}
                         />

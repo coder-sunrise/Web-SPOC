@@ -53,7 +53,7 @@ class Filter extends PureComponent {
               render={args => {
                 return (
                   <Select
-                    label='Examination Group'
+                    label='Comment Group'
                     options={individualCommentGroup}
                     {...args}
                   />

@@ -352,14 +352,14 @@ export const menuData = [
          },
          {
            //  authority: 'settings.clinicsetting.individualcomment',
-           title: 'Clinic Setting',
-           text: 'Medical Check Up Individual Comment',
+           title: 'Templates',
+           text: 'Individual Comment',
            url: '/setting/individualcomment',
          },
          {
            //  authority: 'settings.clinicsetting.summarycomment',
-           title: 'Clinic Setting',
-           text: 'Medical Check Up Summary Comment',
+           title: 'Templates',
+           text: 'Summary Comment',
            url: '/setting/summarycomment',
          },
        ]

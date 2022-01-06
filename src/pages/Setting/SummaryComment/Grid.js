@@ -105,10 +105,7 @@ class Grid extends PureComponent {
             render: row => {
               return (
                 <Fragment>
-                  <Tooltip
-                    title='Edit Medical Check Up Summary Comment'
-                    placement='bottom'
-                  >
+                  <Tooltip title='Edit Summary Comment' placement='bottom'>
                     <Button
                       size='sm'
                       onClick={() => {
