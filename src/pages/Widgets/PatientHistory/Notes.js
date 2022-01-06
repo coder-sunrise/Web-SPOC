@@ -158,20 +158,20 @@ export default ({
     })
     return (
       <div style={{ margin: '4px 0px 10px 0px' }}>
-        {doctorNote[fieldName] !== undefined ? (
-          <div>
-            <div style={{ marginLeft: 8, textDecoration: 'underline' }}>
-              {noteCreateBy}
-            </div>
+        <div>
+          <div style={{ marginLeft: 8, textDecoration: 'underline' }}>
+            {noteCreateBy}
+          </div>
+          {doctorNote[fieldName] !== undefined ? (
             <div
               style={{ fontSize: '0.85rem' }}
               className={classes.paragraph}
               dangerouslySetInnerHTML={{ __html: htmlData }}
             />
-          </div>
-        ) : (
-          ''
-        )}
+          ) : (
+            ''
+          )}
+        </div>
         {scribbleLink.length > 0 && <div>{scribbleLink}</div>}
       </div>
     )
