@@ -325,7 +325,11 @@ const fetchCodeTable = async (code, params, isReturnStatusCode = false) => {
   }
 
   if (code === 'ctcalendarresource') {
-    newData = _.orderBy(newData, ['resourceType', 'sortOrder', 'name'], ['asc'])
+    newData = _.orderBy(
+      newData,
+      ['resourceType', 'sortOrder', source => source.name.toUpperCase()],
+      ['asc'],
+    )
   }
 
   if (isReturnStatusCode === true) {

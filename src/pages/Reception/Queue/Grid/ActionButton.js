@@ -31,7 +31,7 @@ const ActionButton = ({ row, onClick }) => {
                   return {
                     ...opt,
                     disabled: !row.patientProfileFk,
-                    hidden: !row.patientProfileFk,
+                    hidden: !row.patientProfileFk || !row.doctorName,
                   }
                 case 9: // register patient
                   return {

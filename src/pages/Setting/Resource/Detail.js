@@ -193,6 +193,22 @@ class Detail extends PureComponent {
     return containsConflictTime
   }
 
+  isTimeChange = (from, to) => {
+    if (from && to) {
+      if (
+        moment(from, timeFormat24Hour).format(timeFormat24Hour) ===
+        moment(to, timeFormat24Hour).format(timeFormat24Hour)
+      ) {
+        return false
+      }
+      return true
+    }
+
+    if (!from && !to) {
+      return false
+    }
+    return true
+  }
   render() {
     const {
       theme,
@@ -320,6 +336,7 @@ class Detail extends PureComponent {
                               min='07:00'
                               max='22:00'
                               onChange={e => {
+                                if (!this.isTimeChange(row.startTime, e)) return
                                 const { commitChanges } = control
                                 row.startTime = e
                                 if (
@@ -373,6 +390,7 @@ class Detail extends PureComponent {
                               min='07:00'
                               max='22:00'
                               onChange={e => {
+                                if (!this.isTimeChange(row.endTime, e)) return
                                 const { commitChanges } = control
                                 row.endTime = e
                                 commitChanges({
