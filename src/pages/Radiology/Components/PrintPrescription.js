@@ -50,6 +50,11 @@ const PrintPrescription = props => {
     }).then(data => {
       if (data) {
         handleClose()
+        data = _.orderBy(
+          data,
+          ['displayInLeaflet', 'displayName'],
+          ['desc', 'asc'],
+        )
         setDrugLeafletData(data)
         setShowLeafletSelectionPopup(true)
       }

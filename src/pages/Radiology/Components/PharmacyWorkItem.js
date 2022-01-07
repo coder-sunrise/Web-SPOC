@@ -20,6 +20,7 @@ import Warning from '@material-ui/icons/Error'
 import WorklistContext from '../Worklist/WorklistContext'
 import VisitGroupIcon from './VisitGroupIcon'
 import PrintPrescription from './PrintPrescription'
+import withWebSocket from '@/components/Decorator/withWebSocket'
 import { CallingQueueButton } from '@/components/_medisys'
 
 const blueColor = '#1890f8'
@@ -266,6 +267,7 @@ const PharmacyWorkItem = props => {
 }
 
 export default compose(
+  withWebSocket(),
   withStyles(styles),
   connect(({ clinicSettings, patient, pharmacyDetails }) => ({
     clinicSettings: clinicSettings.settings || clinicSettings.default,

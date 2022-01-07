@@ -11,6 +11,10 @@ import { commonDataReaderTransform } from '@/utils/utils'
 import Yup from '@/utils/yup'
 import VoidWithPopover from './VoidWithPopover'
 import Authorized from '@/utils/Authorized'
+import {
+  DOCUMENT_CATEGORY,
+  DOCUMENTCATEGORY_DOCUMENTTYPE,
+} from '@/utils/constants'
 
 import {
   CommonTableGrid,
@@ -485,6 +489,11 @@ class Forms extends PureComponent {
                     0,
                 )
               : unionFormTypes
+            const formDocumentTypes =
+              DOCUMENTCATEGORY_DOCUMENTTYPE.find(
+                y => y.documentCategoryFK === DOCUMENT_CATEGORY.FORM,
+              )?.templateTypes || []
+            const orderedTemplates = _.orderBy(unionFormTypes,[a=>formDocumentTypes.findIndex(x=>x===a.documentTemplateTypeFK),b=>b.name])
             return (
               <Popover
                 icon={null}
@@ -501,7 +510,7 @@ class Forms extends PureComponent {
                       }}
                     />
                     <div className={classes.listContainer}>
-                      {unionFormTypes.map((item) => {
+                      {orderedTemplates.map((item) => {
                         return (
                           <this.ListItem
                             key={item.formTemplateFK}

@@ -287,7 +287,7 @@ const ApplyClaims = ({
     let newVisitType = null
     const copaymentSchemeCode = ctcopaymentscheme.find(
       cps => cps.id === midPayer.copaymentSchemeFK,
-    ).code
+    )?.code
     if (
       cdmpVaccinations &&
       (copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500VACC ||

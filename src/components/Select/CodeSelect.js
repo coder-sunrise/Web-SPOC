@@ -78,7 +78,7 @@ class CodeSelect extends React.PureComponent {
       : []
     let filteredOptions = localFilter ? options.filter(localFilter) : options
     filteredOptions = orderBy
-      ? _.orderBy(filteredOptions, x => x[orderBy[0]].toLowerCase(), orderBy[1])
+      ? _.orderBy(filteredOptions, orderBy[0], orderBy[1])
       : filteredOptions
     const formattedFilteredOptions = formatCodes
       ? formatCodes(filteredOptions)

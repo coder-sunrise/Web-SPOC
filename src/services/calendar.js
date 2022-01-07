@@ -58,6 +58,3 @@ export const validate = params =>
 
 export const updateLinking = params =>
   request(updateAppointmentLinkingURL, { method: 'PUT', body: params })
-
-export const paste = params =>
-  request(`${url}/Paste`, { method: 'PUT', body: params })

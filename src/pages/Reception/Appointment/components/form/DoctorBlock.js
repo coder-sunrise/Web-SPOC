@@ -227,15 +227,19 @@ const initDailyRecurrence = {
       const {
         doctorBlocks,
         recurrenceDto,
+        isFromCopy,
         ...restValues
       } = currentViewDoctorBlock
       const doctorBlock = doctorBlocks[0]
       let start = moment(doctorBlock.startDateTime)
       let end = moment(doctorBlock.endDateTime)
       let doctorBlockUserFk = restValues.doctorBlockUserFk
-      let isFromDragOrResize
+      let isUpdated
+      if (isFromCopy) {
+        isUpdated = true
+      }
       if (updateEvent) {
-        isFromDragOrResize = true
+        isUpdated = true
         const { newStartTime, newEndTime, newResourceId } = updateEvent
         start = moment(newStartTime)
         end = moment(newEndTime)
@@ -266,7 +270,7 @@ const initDailyRecurrence = {
                 ),
               }
             : { ...initDailyRecurrence },
-        isFromDragOrResize,
+        isUpdated,
       }
     }
     return {
@@ -291,8 +295,8 @@ class DoctorEventForm extends React.PureComponent {
   componentDidMount = async () => {
     setTimeout(() => {
       const { values, setFieldValue } = this.props
-      if (values.isFromDragOrResize) {
-        setFieldValue('isFromDragOrResize', false)
+      if (values.isUpdated) {
+        setFieldValue('isUpdated', false)
       }
     }, 500)
   }

@@ -28,26 +28,42 @@ import { rounding } from './utils'
 @withFormikExtend({
   notDirtyDuration: 0.5,
   displayName: 'AddPaymentForm',
-  mapPropsToValues: ({ invoice, showPaymentDate }) => {
-    const { outstandingBalance } = invoice
-
-    return {
+  mapPropsToValues: ({
+    invoice,
+    showPaymentDate,
+    isGroupPayment,
+    visitGroupStatusDetails = [],
+  }) => {
+    let newValues = {
       ...invoice,
       showPaymentDate,
       cashReturned: 0,
       cashReceived: 0,
       cashRounding: 0,
       totalAmtPaid: 0,
-      outstandingAfterPayment: outstandingBalance,
-      collectableAmount: outstandingBalance,
+      outstandingAfterPayment: invoice.outstandingBalance,
+      collectableAmount: invoice.outstandingBalance,
       paymentList: [],
-      // paymentReceivedDate: moment().formatUTC(false),
-      // finalPayable: _finalPayable,
     }
+    if (isGroupPayment && visitGroupStatusDetails.length > 0) {
+      const outstandingBalance = roundTo(_.sumBy(
+        visitGroupStatusDetails,
+        'outstandingBalance',
+      ))
+      return {
+        ...newValues,
+        outstandingAfterPayment: outstandingBalance,
+        collectableAmount: outstandingBalance,
+        finalPayable: outstandingBalance,
+        outstandingBalance: outstandingBalance,
+        isGroupPayment,
+      }
+    }
+    return newValues
   },
   validationSchema: ValidationSchema,
   handleSubmit: (values, { props }) => {
-    const { handleSubmit } = props
+    const { handleSubmit, isGroupPayment } = props
     const {
       paymentList,
       cashRounding,
@@ -76,6 +92,7 @@ import { rounding } from './utils'
       paymentReceivedDate,
       paymentReceivedBizSessionFK,
       paymentCreatedBizSessionFK,
+      isGroupPayment,
     }
 
     // console.log({ returnValue })
@@ -95,7 +112,7 @@ class AddPayment extends Component {
         type: 'codetable/fetchCodes',
         payload: { code: 'ctpaymentmode' },
       })
-      .then((response) => {
+      .then(response => {
         this.setState({
           paymentModes: response,
         })
@@ -109,12 +126,12 @@ class AddPayment extends Component {
     document.addEventListener('keydown', this.handleKeyDown)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     // unbind keyDown listener
     document.removeEventListener('keydown', this.handleKeyDown)
   }
 
-  handleKeyDown = (event) => {
+  handleKeyDown = event => {
     const { values } = this.props
     const min = 112
     const max = 123
@@ -124,14 +141,14 @@ class AddPayment extends Component {
     event.preventDefault()
     const { ctPaymentMode, patient } = this.props
 
-    const paymentModeObj = ctPaymentMode.find((o) => o.hotKey === key)
+    const paymentModeObj = ctPaymentMode.find(o => o.hotKey === key)
 
     if (paymentModeObj) {
       const isCash = paymentModeObj.id === PAYMENT_MODE.CASH
       const isDeposit = paymentModeObj.id === PAYMENT_MODE.DEPOSIT
       const hasCashPaymentAlready =
         values.paymentList.filter(
-          (item) => item.paymentModeFK === PAYMENT_MODE.CASH,
+          item => item.paymentModeFK === PAYMENT_MODE.CASH,
         ).length > 0
 
       const hasDeposit =
@@ -151,11 +168,9 @@ class AddPayment extends Component {
     const { setFieldValue } = this.props
     const payload = {
       pagesize: 1,
-      sorting: [
-        { columnName: 'sessionStartDate', direction: 'desc' },
-      ],
+      sorting: [{ columnName: 'sessionStartDate', direction: 'desc' }],
     }
-    getBizSession(payload).then((response) => {
+    getBizSession(payload).then(response => {
       const { status, data } = response
       if (parseInt(status, 10) === 200 && data.totalRecords > 0) {
         const { data: sessionData } = data
@@ -177,7 +192,7 @@ class AddPayment extends Component {
     })
   }
 
-  fetchBizSessionList = (date) => {
+  fetchBizSessionList = date => {
     if (!date) return
 
     const { setFieldValue } = this.props
@@ -199,13 +214,11 @@ class AddPayment extends Component {
           combineCondition: 'or',
         },
       ],
-      sorting: [
-        { columnName: 'sessionStartDate', direction: 'desc' },
-      ],
-    }).then((response) => {
+      sorting: [{ columnName: 'sessionStartDate', direction: 'desc' }],
+    }).then(response => {
       const { status, data } = response
       if (parseInt(status, 10) === 200) {
-        const bizSessionList = data.data.map((item) => ({
+        const bizSessionList = data.data.map(item => ({
           value: item.id,
           name: item.sessionNo,
         }))
@@ -220,46 +233,49 @@ class AddPayment extends Component {
     })
   }
 
-  getPopulateAmount = (paymentMode) => {
-    const { values, patient } = this.props
-    const amount = values.outstandingAfterPayment
+  getPopulateAmount = paymentMode => {
+    const { values, patient, isGroupPayment, visitGroupStatusDetails } = this.props
+    let amount = values.outstandingAfterPayment
     const { id: type } = paymentMode
     if (parseInt(type, 10) !== PAYMENT_MODE.DEPOSIT) return amount
 
     const { patientDeposit } = patient
-
     if (patientDeposit) {
       const { balance = 0 } = patientDeposit
-      if (balance > values.outstandingAfterPayment) return amount
-      return balance
+      if (isGroupPayment)
+        amount -= _.sumBy(visitGroupStatusDetails.filter(x=>x.invoiceFK !== values.id),'outstandingBalance') || 0
+      return Math.min(balance,amount)
     }
   }
 
-  onPaymentTypeClick = async (paymentMode) => {
-    const { values, setFieldValue } = this.props
+  onPaymentTypeClick = async paymentMode => {
+    const { values, setFieldValue, isGroupPayment, visitGroupStatusDetails } = this.props
     const { id: type, displayValue } = paymentMode
     const amt = this.getPopulateAmount(paymentMode)
 
-    const payment = {
+    let payment = {
       id: getLargestID(values.paymentList) + 1,
       displayValue,
       paymentModeFK: parseInt(type, 10),
       paymentMode: displayValue,
       amt,
     }
-
-    const newPaymentList = [
-      ...values.paymentList,
-      payment,
-    ]
+    if (isGroupPayment){
+      const isDeposit = parseInt(type, 10) === PAYMENT_MODE.DEPOSIT 
+      payment = {
+          ...payment,
+          remark: isDeposit ? values.invoiceNo : visitGroupStatusDetails.map(x => x.invoiceNo).join('/'),
+        }
+    }
+    const newPaymentList = [...values.paymentList, payment]
     await setFieldValue('paymentList', newPaymentList)
     this.calculatePayment()
   }
 
-  onDeleteClick = async (paymentID) => {
+  onDeleteClick = async paymentID => {
     const { values, setFieldValue } = this.props
     const newPaymentList = values.paymentList.filter(
-      (payment) => payment.id !== parseFloat(paymentID, 10),
+      payment => payment.id !== parseFloat(paymentID, 10),
     )
 
     await setFieldValue('paymentList', newPaymentList)
@@ -267,24 +283,45 @@ class AddPayment extends Component {
   }
 
   calculatePayment = () => {
-    const { values, setFieldValue, clinicSettings } = this.props
-    const { paymentList, outstandingBalance } = values
+    const { values, setFieldValue, clinicSettings, isGroupPayment, visitGroupStatusDetails = [] } = this.props
+    let { paymentList, outstandingBalance } = values
     const totalPaid = roundTo(
       paymentList.reduce((total, payment) => total + (payment.amt || 0), 0),
     )
 
     const cashPayment = paymentList.find(
-      (payment) => payment.paymentModeFK === PAYMENT_MODE.CASH,
+      payment => payment.paymentModeFK === PAYMENT_MODE.CASH,
     )
 
     let cashReturned = 0
     if (cashPayment) {
-      const cashAfterRounding = roundTo(
+      let cashAfterRounding = roundTo(
         rounding(clinicSettings, cashPayment.amt),
       )
-      const collectableAmountAfterRounding = roundTo(
+      let collectableAmountAfterRounding = roundTo(
         rounding(clinicSettings, totalPaid),
       )
+      if (isGroupPayment) {
+        const otherPayment = _.sumBy(paymentList, p =>
+          p.paymentModeFK !== PAYMENT_MODE.CASH ? p.amt || 0 : 0,
+        )
+        let tempOtherPayment = otherPayment
+        //rouding os for per invoice then sum
+        const newCashAfterRounding = roundTo(_.sumBy(visitGroupStatusDetails, x => {
+          const paidAmt = roundTo(Math.min(tempOtherPayment, x.outstandingBalance))
+          const remainOS = roundTo(x.outstandingBalance - paidAmt)
+          tempOtherPayment -= paidAmt
+          if(remainOS > 0){
+            const newInvoiceOS = roundTo(rounding(clinicSettings, remainOS))
+            // console.log('invoice O/S after cash rounding','newInvoiceOS', newInvoiceOS,'remainOS',remainOS)
+            return newInvoiceOS
+          }
+          return 0
+        }))
+        //console.log('newCashAfterRounding',newCashAfterRounding,'cashAfterRounding',cashAfterRounding)
+        cashAfterRounding = newCashAfterRounding
+        collectableAmountAfterRounding = otherPayment + newCashAfterRounding
+      }
       const roundingAmt = roundTo(cashAfterRounding - cashPayment.amt)
       this.setState(
         {
@@ -324,12 +361,12 @@ class AddPayment extends Component {
     setTimeout(() => this.calculatePayment(), 100)
   }
 
-  handleCashReceivedChange = (event) => {
+  handleCashReceivedChange = event => {
     const _cashReceived = event.target.value
     const { values, setFieldValue } = this.props
     const { cashRounding, paymentList, finalPayable } = values
     const cashPayment = paymentList.find(
-      (payment) => payment.paymentModeFK === PAYMENT_MODE.CASH,
+      payment => payment.paymentModeFK === PAYMENT_MODE.CASH,
     )
     const totalPaid = paymentList.reduce(
       (total, payment) => total + (payment.amt || 0),
@@ -349,11 +386,43 @@ class AddPayment extends Component {
     } else setFieldValue('cashReturned', 0)
   }
 
-  handlePaymentDateChange = (value) => {
+  handlePaymentDateChange = value => {
     this.fetchBizSessionList(value)
   }
 
-  render () {
+  getPayerHeaderProps = () => {
+    const {
+      patient,
+      values,
+      invoice = {},
+      invoicePayerName = '',
+      isGroupPayment,
+      visitGroupStatusDetails = []
+    } = this.props
+    return {
+      invoiceNo: isGroupPayment
+        ? visitGroupStatusDetails.map(x => x.invoiceNo).join('/')
+        : invoice.invoiceNo,
+      invoicePayerName: isGroupPayment
+        ? visitGroupStatusDetails.map(x => x.name).join('/')
+        : invoicePayerName,
+      patientReferenceNo: isGroupPayment
+        ? visitGroupStatusDetails.map(x => x.patientReferenceNo).join('/')
+        : patient.patientReferenceNo,
+      outstandingAfterPayment: values.outstandingAfterPayment,
+      totalClaim: isGroupPayment
+        ? _.sumBy(visitGroupStatusDetails, x => x.totalClaim)
+        : invoice.totalClaim,
+      totalAftGst: isGroupPayment
+        ? _.sumBy(visitGroupStatusDetails, x => x.totalAftGST)
+        : invoice.totalAftGst,
+      payerTypeFK: isGroupPayment
+        ? INVOICE_PAYER_TYPE.PATIENT
+        : invoice.payerTypeFK,
+    }
+  }
+
+  render() {
     const {
       classes,
       onClose,
@@ -363,18 +432,13 @@ class AddPayment extends Component {
       handleSubmit,
       patient,
       showPaymentDate,
-      invoicePayerName = '',
+      disabledPayment,
     } = this.props
-    const { paymentList } = values
     const { bizSessionList, paymentModes } = this.state
+    const payerHeaderProps = this.getPayerHeaderProps()
     return (
       <div>
-        <PayerHeader
-          invoicePayerName={invoicePayerName}
-          invoice={invoice}
-          patient={patient}
-          outstandingAfterPayment={values.outstandingAfterPayment}
-        />
+        <PayerHeader {...payerHeaderProps} />
         <React.Fragment>
           {showPaymentDate && (
             <PaymentDateAndBizSession
@@ -390,7 +454,7 @@ class AddPayment extends Component {
               <PaymentType
                 paymentModes={paymentModes}
                 currentPayments={values.paymentList.map(
-                  (payment) => payment.paymentModeFK,
+                  payment => payment.paymentModeFK,
                 )}
                 hideDeposit={values.payerTypeFK !== INVOICE_PAYER_TYPE.PATIENT}
                 patientInfo={patient}
@@ -399,7 +463,7 @@ class AddPayment extends Component {
             </GridItem>
             <GridItem md={9}>
               <PaymentCard
-                paymentList={paymentList}
+                paymentList={values.paymentList}
                 handleDeletePayment={this.onDeleteClick}
                 handleAmountChange={this.handleAmountChange}
                 setFieldValue={this.props.setFieldValue}
@@ -422,7 +486,7 @@ class AddPayment extends Component {
               <Button
                 color='primary'
                 onClick={handleSubmit}
-                disabled={paymentList.length === 0}
+                disabled={values.paymentList.length === 0 || disabledPayment}
               >
                 Confirm
               </Button>

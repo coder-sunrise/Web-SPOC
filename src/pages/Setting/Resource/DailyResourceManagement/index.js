@@ -177,9 +177,12 @@ class DailyResourceManagement extends PureComponent {
             columns={[
               { name: 'dailyDate', title: 'Date' },
               { name: 'timeSpace', title: 'Time From & Time To' },
-              { name: 'maxCapacity', title: 'Max. Slot' },
+              {
+                name: 'maxCapacity',
+                title: 'Maximum Slot',
+              },
               { name: 'usedSlot', title: 'Used Slot' },
-              { name: 'balanceSlot', title: 'Bal. Slot' },
+              { name: 'balanceSlot', title: 'Balance Slot' },
               { name: 'remarks', title: 'Remarks' },
             ]}
             columnExtensions={[
@@ -212,7 +215,7 @@ class DailyResourceManagement extends PureComponent {
               {
                 columnName: 'maxCapacity',
                 type: 'number',
-                width: 80,
+                width: 105,
                 precision: 0,
                 min: 0,
                 max: 9999,
@@ -222,7 +225,7 @@ class DailyResourceManagement extends PureComponent {
                 columnName: 'usedSlot',
                 type: 'number',
                 precision: 0,
-                width: 80,
+                width: 100,
                 disabled: true,
                 sortingEnabled: false,
               },
@@ -230,7 +233,7 @@ class DailyResourceManagement extends PureComponent {
                 columnName: 'balanceSlot',
                 type: 'number',
                 precision: 0,
-                width: 80,
+                width: 100,
                 disabled: true,
                 sortingEnabled: false,
                 render: row => {
@@ -245,7 +248,7 @@ class DailyResourceManagement extends PureComponent {
               {
                 columnName: 'remarks',
                 sortingEnabled: false,
-                width: 400,
+                width: 335,
                 maxLength: 2000,
               },
             ]}

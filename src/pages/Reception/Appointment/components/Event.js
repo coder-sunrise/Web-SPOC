@@ -59,7 +59,6 @@ const style = theme => ({
   },
 })
 
-@connect(({ calendar }) => ({ calendarView: calendar.calendarView }))
 class Event extends React.PureComponent {
   _handleMouseEnter = syntheticEvent => {
     const { event, handleMouseOver } = this.props

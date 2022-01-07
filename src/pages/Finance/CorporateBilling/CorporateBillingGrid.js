@@ -57,6 +57,7 @@ class CorporateBillingGrid extends PureComponent {
       {
         columnName: 'contactPerson',
         width: 130,
+        sortingEnabled: false,
         render: row => {
           const contactPerson = (row.contactPersons || []).find(
             x => x.isDefault,

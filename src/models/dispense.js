@@ -782,6 +782,7 @@ export default createFormViewModel({
           sendQueueNotification({
             message: 'Ready for dispensing.',
             queueNo: payload.queueNo,
+            visitID: id,
           })
         }
         return response
@@ -828,6 +829,7 @@ export default createFormViewModel({
           sendQueueNotification({
             message: 'Dispense discarded',
             queueNo: entity.queueNo,
+            visitID: entity.id,
           })
         }
         return response
@@ -847,6 +849,7 @@ export default createFormViewModel({
         sendQueueNotification({
           message: 'Dispense finalized. Waiting for payment.',
           queueNo: entity.queueNo,
+          visitID: entity.id,
         })
         return response
       },

@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react'
-import withWebSocket from '@/components/Decorator/withWebSocket'
 // common components
 import {
   GridContainer,
@@ -67,19 +66,9 @@ class DrugLabelSelection extends React.PureComponent {
       type: 'number',
       width: 80,
       sortingEnabled: false,
-      render: row => {
-        return (
-          <p>
-            <NumberInput
-              max={99}
-              precision={0}
-              min={1}
-              value={row.no}
-              defaultValue={1}
-            />
-          </p>
-        )
-      },
+      precision: 0,
+      min: 1,
+      max: 99,
     },
   ]
 
@@ -95,7 +84,7 @@ class DrugLabelSelection extends React.PureComponent {
     dispatch({
       type: 'dispense/queryDrugLabelList',
       payload: {
-        id: this.props.dispense.visitID || visitid,
+        id: visitid,
         includeOpenPrescription: true,
       },
     }).then(data => {
@@ -381,4 +370,4 @@ class DrugLabelSelection extends React.PureComponent {
     )
   }
 }
-export default withWebSocket()(DrugLabelSelection)
+export default DrugLabelSelection

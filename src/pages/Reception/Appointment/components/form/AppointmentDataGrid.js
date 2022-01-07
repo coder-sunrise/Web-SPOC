@@ -8,6 +8,7 @@ import {
   FastEditableTableGrid,
   CommonTableGrid,
   dateFormat,
+  notification,
 } from '@/components'
 import { AppointmentTypeLabel } from '@/components/_medisys'
 import AuthorizedContext from '@/components/Context/Authorized'
@@ -17,6 +18,7 @@ import {
 } from './variables'
 import ErrorPopover from './ErrorPopover'
 import { CALENDAR_RESOURCE } from '@/utils/constants'
+import { NavigateBeforeSharp } from '@material-ui/icons'
 
 const styles = () => ({
   container: {
@@ -63,6 +65,7 @@ class AppointmentDataGrid extends React.Component {
       data,
       selectedSlot,
       apptTimeIntervel = 30,
+      checkAddResource,
     } = this.props
     const columnExtensions = AppointmentDataColExtensions(apptTimeIntervel).map(
       column => {
@@ -135,6 +138,10 @@ class AppointmentDataGrid extends React.Component {
               )
               handleCommitChanges({ rows: newRows })
             },
+            localFilter: o =>
+              o.isActive &&
+              (checkAddResource() ||
+                o.resourceType === CALENDAR_RESOURCE.DOCTOR),
           }
         }
 
@@ -220,7 +227,8 @@ class AppointmentDataGrid extends React.Component {
         editingEnabled: false,
         sortingEnabled: false,
         disabled: true,
-        width: 60,
+        align: 'center',
+        width: 40,
         render: row => {
           if (row.conflicts && row.conflicts.length > 0) {
             return <ErrorPopover errors={row.conflicts} />
@@ -262,7 +270,20 @@ class AppointmentDataGrid extends React.Component {
               showDeleteCommand:
                 data.filter(item => !item.isDeleted).length > 1,
               onCommitChanges: handleCommitChanges,
-              onAddedRowsChange: rows => {
+              onAddedRowsChange: (rows, aa) => {
+                const primaryDoctor = data.find(
+                  d => !d.isDeleted && d.isPrimaryClinician,
+                )
+                if (primaryDoctor) {
+                  rows.forEach(r => {
+                    r.appointmentFK = primaryDoctor.appointmentFK
+                    r.appointmentTypeFK = primaryDoctor.appointmentTypeFK
+                    r.apptDurationHour = primaryDoctor.apptDurationHour
+                    r.apptDurationMinute = primaryDoctor.apptDurationMinute
+                    r.startTime = primaryDoctor.startTime
+                    r.endTime = primaryDoctor.endTime
+                  })
+                }
                 return rows
               },
             }}

@@ -1260,6 +1260,18 @@ const _routes = [
             component: './Setting/Resource',
             authority: ['settings.clinicsetting.resource'],
           },
+          {
+            path: '/setting/individualcomment',
+            name: 'individualcomment',
+            component: './Setting/IndividualComment',
+            // authority: ['settings.clinicsetting.individualcomment'],
+          },
+          {
+            path: '/setting/summarycomment',
+            name: 'summarycomment',
+            component: './Setting/SummaryComment',
+            // authority: ['settings.clinicsetting.individualcomment'],
+          },
         ],
       },
       // Settings

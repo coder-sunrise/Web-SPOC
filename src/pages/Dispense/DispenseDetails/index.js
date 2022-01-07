@@ -18,6 +18,7 @@ import {
   Link,
 } from '@material-ui/core'
 import Delete from '@material-ui/icons/Delete'
+import withWebSocket from '@/components/Decorator/withWebSocket'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import { formatMessage } from 'umi' // common component
 import Warining from '@material-ui/icons/Error'
@@ -124,6 +125,7 @@ const DispenseDetails = ({
   onFinalizeClick,
   codetable,
   dispense,
+  handlePrint,
   history,
   onDrugLabelClick,
   showDrugLabelSelection,
@@ -181,6 +183,7 @@ const DispenseDetails = ({
       sendQueueNotification({
         message: `${visitTypeName} visit discarded.`,
         queueNo: entity.queueNo,
+        visitID: entity.id,
       })
       const message = `${userName} discard prescription at ${moment().format(
         'HH:mm',
@@ -810,9 +813,9 @@ const DispenseDetails = ({
                       setShowRemovePayment(true)
                     } else {
                       if (
-                        dispenseItems.filter(x => isActualizable(x)).length >
+                        dispenseItems?.filter(x => isActualizable(x)).length >
                           0 ||
-                        service.filter(x => isActualizable(x)).length > 0
+                        service?.filter(x => isActualizable(x)).length > 0
                       )
                         notification.error({
                           message:
@@ -1013,12 +1016,13 @@ const DispenseDetails = ({
         }}
       >
         <DrugLabelSelection
+          handlePrint={handlePrint}
           values={values}
           currentDrugToPrint={currentDrugToPrint}
           dispatch={dispatch}
           patient={patient}
           source='dispense'
-          visitid={values.id}
+          visitid={values?.id}
           handleSubmit={() => {
             onDrugLabelSelectionClose()
           }}
@@ -1159,6 +1163,7 @@ const _DispenseDetails = props => (
 )
 
 export default compose(
+  withWebSocket(),
   withStyles(styles, { name: 'DispenseDetailsGrid' }),
   connect(
     ({

@@ -18,6 +18,7 @@ import {
   OutlinedTextField,
   withFormikExtend,
   Button,
+  notification,
 } from '@/components'
 // medisys components
 import { LoadingWrapper, Recurrence } from '@/components/_medisys'
@@ -170,8 +171,8 @@ class Form extends React.PureComponent {
 
     setTimeout(() => {
       const { values, setFieldValue } = this.props
-      if (values.isFromDragOrResize) {
-        setFieldValue('isFromDragOrResize', false)
+      if (values.isUpdated) {
+        setFieldValue('isUpdated', false)
       }
     }, 500)
   }
@@ -491,7 +492,10 @@ class Form extends React.PureComponent {
         {
           datagrid: newDataGrid,
         },
-        this.validateDataGrid,
+        () => {
+          this.validateDataGrid()
+          this.updateEnableRecurrence()
+        },
       )
       return newDataGrid
     }
@@ -512,12 +516,40 @@ class Form extends React.PureComponent {
         {
           datagrid: updatedRows,
         },
-        this.validateDataGrid,
+        () => {
+          this.validateDataGrid()
+          this.updateEnableRecurrence()
+        },
       )
       return updatedRows
     }
 
     return rows
+  }
+
+  updateEnableRecurrence = () => {
+    const { datagrid } = this.state
+    const { setFieldValue, values } = this.props
+    if (
+      !values.id &&
+      values.isEnableRecurrence &&
+      datagrid
+        .filter(item => !item.isDeleted)
+        .find(
+          item =>
+            item.calendarResource?.resourceType === CALENDAR_RESOURCE.RESOURCE,
+        )
+    ) {
+      setFieldValue('isEnableRecurrence', false)
+    }
+  }
+
+  checkAddResource = () => {
+    const { values, mode } = this.props
+    if (values.id && mode === 'series') {
+      return false
+    }
+    return true
   }
 
   validateDataGrid = () => {
@@ -581,45 +613,49 @@ class Form extends React.PureComponent {
       }
       setSubmitting(false)
 
-      dispatch({
+      const response = await dispatch({
         type: 'calendar/submit',
         payload: submitPayload,
-      }).then(response => {
-        if (validate && response) {
-          const conflicts = [...response]
-
-          this.setState(
-            preState => ({
-              submitCount: preState.submitCount + 1,
-              datagrid: preState.datagrid.reduce(
-                (data, d) => [
-                  ...data,
-                  {
-                    ...d,
-                    conflicts:
-                      conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
-                        ? conflicts[d.sortOrder].conflicts
-                        : undefined,
-                  },
-                ],
-                [],
-              ),
-            }),
-            () => {
-              this.props.dispatch({
-                type: 'global/updateState',
-                payload: {
-                  commitCount: this.state.submitCount + 1,
-                },
-              })
-            },
-          )
-        }
-        if (!validate && response) {
-          onConfirm()
-        }
       })
-    } catch (error) {}
+      if (validate && response) {
+        const conflicts = [...response]
+
+        this.setState(
+          preState => ({
+            submitCount: preState.submitCount + 1,
+            datagrid: preState.datagrid.reduce(
+              (data, d) => [
+                ...data,
+                {
+                  ...d,
+                  conflicts:
+                    conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
+                      ? conflicts[d.sortOrder].conflicts
+                      : undefined,
+                },
+              ],
+              [],
+            ),
+          }),
+          () => {
+            this.props.dispatch({
+              type: 'global/updateState',
+              payload: {
+                commitCount: this.state.submitCount + 1,
+              },
+            })
+          },
+        )
+        return conflicts
+      }
+      if (!validate && response) {
+        onConfirm()
+      }
+      return response
+    } catch (error) {
+      return false
+    }
+    return false
   }
 
   onDeleteClick = () => {}
@@ -635,7 +671,9 @@ class Form extends React.PureComponent {
           ? appointmentStatus.id
           : tempNewAppointmentStatusFK,
       },
-      () => this._submit(true),
+      async () => {
+        await this._submit(true)
+      },
     )
   }
 
@@ -661,7 +699,7 @@ class Form extends React.PureComponent {
     }
   }
 
-  onSaveDraftClick = () => {
+  saveAppointment = () => {
     const { values, mode, viewingAppointment } = this.props
     const appointmentStatusFK = APPOINTMENT_STATUS.DRAFT
 
@@ -687,7 +725,34 @@ class Form extends React.PureComponent {
     )
   }
 
-  onConfirmClick = () => {
+  onSaveDraftClick = () => {
+    const appointmentStatus = this.props.appointmentStatuses.find(
+      item => item.code === 'SCHEDULED',
+    )
+    const { tempNewAppointmentStatusFK } = this.state
+    this.setState(
+      {
+        tempNewAppointmentStatusFK: appointmentStatus
+          ? appointmentStatus.id
+          : tempNewAppointmentStatusFK,
+      },
+      async () => {
+        const result = await this._submit(true)
+        if (result) {
+          if (result.find(c => (c?.conflicts || []).find(r => r.isPrevent))) {
+            notification.error({
+              message:
+                'Resource reach maximum booking. please modify to proceed.',
+            })
+          } else {
+            this.saveAppointment()
+          }
+        }
+      },
+    )
+  }
+
+  confirmAppointment = () => {
     const { values, mode, viewingAppointment } = this.props
     try {
       const { datagrid } = this.state
@@ -832,6 +897,33 @@ class Form extends React.PureComponent {
         },
       )
     } catch (error) {}
+  }
+
+  onConfirmClick = () => {
+    const appointmentStatus = this.props.appointmentStatuses.find(
+      item => item.code === 'SCHEDULED',
+    )
+    const { tempNewAppointmentStatusFK } = this.state
+    this.setState(
+      {
+        tempNewAppointmentStatusFK: appointmentStatus
+          ? appointmentStatus.id
+          : tempNewAppointmentStatusFK,
+      },
+      async () => {
+        const result = await this._submit(true)
+        if (result) {
+          if (result.find(c => (c?.conflicts || []).find(r => r.isPrevent))) {
+            notification.error({
+              message:
+                'Resource reach maximum booking. please modify to proceed.',
+            })
+          } else {
+            this.confirmAppointment()
+          }
+        }
+      },
+    )
   }
 
   openRescheduleForm = () => {
@@ -1117,6 +1209,19 @@ class Form extends React.PureComponent {
     if (bannerHeight === 0) setTimeout(this.setBannerHeight, 1000)
   }
 
+  disableRecurrence = () => {
+    const { values } = this.props
+    const { datagrid = [] } = this.state
+    return (
+      values.id !== undefined ||
+      datagrid
+        .filter(item => !item.isDeleted)
+        .find(
+          item =>
+            item.calendarResource?.resourceType === CALENDAR_RESOURCE.RESOURCE,
+        )
+    )
+  }
   render() {
     const {
       classes,
@@ -1200,7 +1305,6 @@ class Form extends React.PureComponent {
       }
       return { ...po }
     })
-
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer size='sm'>
@@ -1260,6 +1364,7 @@ class Form extends React.PureComponent {
                       handleEditingRowsChange={this.onEditingRowsChange}
                       editingRows={editingRows}
                       selectedSlot={selectedSlot}
+                      checkAddResource={this.checkAddResource}
                     />
                   </GridItem>
                   <GridItem xs md={12}>
@@ -1304,7 +1409,7 @@ class Form extends React.PureComponent {
                   <GridItem xs md={12}>
                     <Recurrence
                       size='lg'
-                      disabled={values.id !== undefined}
+                      disabled={this.disableRecurrence()}
                       formValues={values}
                       recurrenceDto={values.recurrenceDto}
                       handleRecurrencePatternChange={

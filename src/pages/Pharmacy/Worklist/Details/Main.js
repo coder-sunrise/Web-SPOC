@@ -40,6 +40,7 @@ import {
 } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE, PHARMACY_STATUS, PHARMACY_ACTION } from '@/utils/constants'
+import withWebSocket from '@/components/Decorator/withWebSocket'
 import AddOrder from '@/pages/Dispense/DispenseDetails/AddOrder'
 import { MenuOutlined } from '@ant-design/icons'
 import { PharmacySteps, JournalHistory } from '../../Components'
@@ -1507,6 +1508,11 @@ const Main = props => {
       },
     }).then(data => {
       if (data) {
+        data = _.orderBy(
+          data,
+          ['displayInLeaflet', 'displayName'],
+          ['desc', 'asc'],
+        )
         setDrugLeafletData(data)
         setShowLeafletSelectionPopup(true)
       }
@@ -2050,6 +2056,7 @@ const Main = props => {
         observe='Confirm'
       >
         <DrugLabelSelection
+          {...props}
           values={props.values}
           currentDrugToPrint={currentDrugToPrint}
           dispatch={dispatch}
@@ -2066,6 +2073,7 @@ const Main = props => {
 }
 
 export default compose(
+  withWebSocket(),
   withStyles(styles),
   connect(({ pharmacyDetails, clinicSettings, codetable, user }) => ({
     pharmacyDetails,
