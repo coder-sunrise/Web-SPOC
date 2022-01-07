@@ -119,7 +119,7 @@ const submitKey = 'login/getToken'
       return {
         username: '',
         password: '',
-        clinicCode: 'c1',
+        clinicCode: '',
       }
     return { username: '', password: '', clinicCode: '' }
   },

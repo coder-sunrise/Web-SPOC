@@ -3,7 +3,7 @@ import service from '../services'
 
 export default createListViewModel({
   namespace: 'labWorklist',
-  config: {},
+  config: { queryOnLoad: false },
   param: {
     service,
     state: {},

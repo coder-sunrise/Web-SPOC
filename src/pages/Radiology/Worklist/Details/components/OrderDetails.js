@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { Radio, Typography } from 'antd'
 import moment from 'moment'
+import { useVisitTypes } from '@/utils/hooks/'
 import {
   GridContainer,
   GridItem,
@@ -43,9 +44,8 @@ const PrimaryAccessionNoHeader = ({ accessionNo }) => (
 )
 
 export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
-  const { visitPurpose, isReadOnly, getPrimaryWorkitem } = useContext(
-    WorklistContext,
-  )
+  const { isReadOnly, getPrimaryWorkitem } = useContext(WorklistContext)
+  const visitTypes = useVisitTypes()
   const [isCombinedOrder, setIsCombinedOrder] = useState(false)
   const [isCombinedRadioYes, setIsCombinedRadioYes] = useState(false)
   const [primaryAccessionNo, setPrimaryAccessionNo] = useState('')
@@ -104,11 +104,11 @@ export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
 
             <RightAlignGridItem>Visit Type :</RightAlignGridItem>
             <TextGridItem md={6}>
-              {visitPurpose &&
+              {visitTypes &&
+                visitTypes.length > 0 &&
                 workitem?.visitInfo &&
-                visitPurpose.find(
-                  p => p.id === workitem.visitInfo.visitPurposeFK,
-                ).name}
+                visitTypes.find(p => p.id === workitem.visitInfo.visitPurposeFK)
+                  .name}
             </TextGridItem>
 
             <RightAlignGridItem>Visit Group No. :</RightAlignGridItem>

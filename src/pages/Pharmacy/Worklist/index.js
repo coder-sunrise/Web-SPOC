@@ -52,6 +52,7 @@ const PharmacyWorklist = () => {
   useEffect(() => {
     dispatch({
       type: 'pharmacyWorklist/query',
+      payload: { pagesize: 9999 },
     })
     stopRefreshTimer()
     startRefreshTimer()
@@ -118,6 +119,7 @@ const PharmacyWorklist = () => {
   const refreshClick = () => {
     dispatch({
       type: 'pharmacyWorklist/query',
+      payload: { pagesize: 9999 },
     })
     setRefreshDate(moment())
   }

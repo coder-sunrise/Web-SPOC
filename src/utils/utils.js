@@ -1526,6 +1526,9 @@ const getMappedVisitType = (visitpurpose, visitTypeSettingsObj) => {
     .sort((a, b) => (a.sortOrder >= b.sortOrder ? 1 : -1))
 }
 
+const getNameWithTitle = (title, name) =>
+  `${title && name.trim().length ? `${title}. ` : ''}${name || ''}`
+
 export {
   sleep,
   sumReducer,
@@ -1558,6 +1561,7 @@ export {
   getTranslationValue,
   getMappedVisitType,
   ableToViewByAuthority,
+  getNameWithTitle,
   // toUTC,
   // toLocal,
 }

@@ -592,7 +592,7 @@ const RadiologyWorklistHistoryIndex = ({
         code: 'ctvisitpurpose',
       },
     })
-  })
+  }, [])
 
   let visitTypeSettingsObj = undefined
   let visitPurpose = undefined
