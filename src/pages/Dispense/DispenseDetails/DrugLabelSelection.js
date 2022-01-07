@@ -98,7 +98,10 @@ class DrugLabelSelection extends React.PureComponent {
         if (source === 'pharmacy') {
           data = _.orderBy(
             data,
-            ['dispenseByPharmacy', 'displayName'],
+            [
+              data => data.dispenseByPharmacy,
+              data => data.displayName.toLowerCase(),
+            ],
             ['desc', 'asc'],
           )
         } else {

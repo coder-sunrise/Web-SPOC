@@ -52,7 +52,10 @@ const PrintPrescription = props => {
         handleClose()
         data = _.orderBy(
           data,
-          ['displayInLeaflet', 'displayName'],
+          [
+            data => data.displayInLeaflet,
+            data => data.displayName.toLowerCase(),
+          ],
           ['desc', 'asc'],
         )
         setDrugLeafletData(data)
