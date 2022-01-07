@@ -28,7 +28,6 @@ import {
 } from '@/components'
 // medisys components
 import {
-  DoctorLabel,
   DoctorProfileSelect,
   Attachment,
   AttachmentWithThumbnail,
@@ -39,9 +38,9 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
 import { roundTo, getMappedVisitType } from '@/utils/utils'
 import numeral from 'numeral'
 import FormField from './formField'
+import { getMCReportLanguage } from './miscUtils'
 import Authorized from '@/utils/Authorized'
 import CannedTextButton from '@/pages/Widgets/Orders/Detail/CannedTextButton'
-import Delete from '@material-ui/icons/Delete'
 
 const styles = theme => ({
   verticalSpacing: {
@@ -107,8 +106,6 @@ const VisitInfoCard = ({
   clinicSettings,
   queueLog,
   ctvisitpurpose,
-  reportingDoctorSchema,
-  theme,
   ...restProps
 }) => {
   const [visitGroupMessage, setVisitGroupMessage] = useState()
@@ -180,11 +177,24 @@ const VisitInfoCard = ({
       i => i.id === values.visitOrderTemplateFK,
     )
     setFieldValue(FormField['visit.visitType'], v)
-    setFieldValue('visitDoctor', [
-      ...values.visitDoctor.map(d => {
-        return { ...d, isDeleted: true }
-      }),
-    ])
+
+    if (v != VISIT_TYPE.MC) {
+      setFieldValue('visitDoctor', [
+        ...values.visitDoctor.map(d => {
+          return { ...d, isDeleted: true }
+        }),
+      ])
+
+      setFieldValue('mcReportLanguage', undefined)
+      setFieldValue('mcReportPriority', undefined)
+      setFieldValue('mcUrgentReportRemarks', undefined)
+    } else {
+      setFieldValue('mcReportLanguage', [
+        getMCReportLanguage(patientInfo, clinicSettings.settings),
+      ])
+      setFieldValue('mcReportPriority', 'Normal')
+    }
+
     if (template) {
       handleVisitOrderTemplateChange(v, template)
     }
@@ -281,11 +291,6 @@ const VisitInfoCard = ({
     } else if (!noVisitGroup) return
     else setVisitGroupMessage(null)
   }, [values, familyMembers])
-
-  const commitChanges = ({ rows, changed }) => {
-    setFieldValue('visitDoctor', rows)
-    return rows
-  }
 
   return (
     <CommonCard title='Visit Information'>
@@ -740,71 +745,6 @@ const VisitInfoCard = ({
           </GridItem>
         ) : (
           undefined
-        )}
-        {visitType === VISIT_TYPE.MC && (
-          <GridItem xs md={12}>
-            <EditableTableGrid
-              forceRender
-              style={{
-                marginTop: theme.spacing(1),
-              }}
-              rows={restProps.values.visitDoctor}
-              EditingProps={{
-                showCommandColumn: false,
-                showAddCommand: true,
-                onCommitChanges: commitChanges,
-              }}
-              schema={reportingDoctorSchema}
-              columns={[
-                { name: 'doctorProfileFK', title: 'Reporting Doctor' },
-                { name: 'action', title: ' ' },
-              ]}
-              columnExtensions={[
-                {
-                  columnName: 'doctorProfileFK',
-                  sortingEnabled: false,
-                  type: 'codeSelect',
-                  code: 'doctorprofile',
-                  labelField: 'clinicianProfile.name',
-                  localFilter: o => o.clinicianProfile.isActive,
-                  renderDropdown: option => <DoctorLabel doctor={option} />,
-                },
-                {
-                  columnName: 'action',
-                  width: 60,
-                  isReactComponent: true,
-                  sortingEnabled: false,
-                  isDisabled: row => true,
-                  render: e => {
-                    const { row, columnConfig } = e
-                    const { control } = columnConfig
-                    const { commitChanges } = control
-                    return (
-                      <Popconfirm
-                        title='Confirm to delete?'
-                        onConfirm={() => {
-                          commitChanges({
-                            changed: {
-                              [row.id]: {
-                                isDeleted: true,
-                              },
-                            },
-                          })
-                        }}
-                      >
-                        <Button size='sm' justIcon color='danger'>
-                          <Delete />
-                        </Button>
-                      </Popconfirm>
-                    )
-                  },
-                },
-              ]}
-              FuncProps={{
-                pager: false,
-              }}
-            />
-          </GridItem>
         )}
         <GridItem xs md={12}>
           <AttachmentWithThumbnail

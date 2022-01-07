@@ -4,6 +4,7 @@ import _ from 'lodash'
 import { cleanFields } from '@/pages/Consultation/utils'
 import { VISIT_TYPE, VISITDOCTOR_CONSULTATIONSTATUS } from '@/utils/constants'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
+import { notification } from '@/components'
 import { VISIT_STATUS } from '../variables'
 
 const filterDeletedFiles = item => {
@@ -120,6 +121,24 @@ const getVisitOrderTemplateTotal = (vType, template) => {
   return activeItemTotal
 }
 
+export const getMCReportLanguage = (patient, clinicSettings) => {
+  const {
+    primaryPrintoutLanguage = 'EN',
+    secondaryPrintoutLanguage = '',
+  } = clinicSettings
+  const { printLanguageCode = '' } = patient
+  if (
+    printLanguageCode.trim().length &&
+    (printLanguageCode.toUpperCase() ===
+      primaryPrintoutLanguage.toUpperCase() ||
+      printLanguageCode.toUpperCase() ===
+        secondaryPrintoutLanguage.toUpperCase())
+  ) {
+    return printLanguageCode.toUpperCase()
+  }
+  return primaryPrintoutLanguage
+}
+
 export const formikMapPropsToValues = ({
   clinicInfo,
   queueLog,
@@ -139,6 +158,8 @@ export const formikMapPropsToValues = ({
     let currentVisitOrderTemplateFK
     let defaultVisitPreOrderItem = []
     let totalTempCharge
+    let mcReportLanguage
+    let mcReportPriority
     if (clinicInfo) {
       // doctorProfile = doctorProfiles.find(
       //   (item) => item.doctorMCRNo === clinicInfo.primaryMCRNO,
@@ -180,6 +201,12 @@ export const formikMapPropsToValues = ({
 
     if (clinicSettings) {
       visitPurposeFK = Number(clinicSettings.settings.defaultVisitType)
+      if (visitPurposeFK === VISIT_TYPE.MC) {
+        mcReportPriority = 'Normal'
+        mcReportLanguage = [
+          getMCReportLanguage(patientInfo, clinicSettings.settings),
+        ]
+      }
     }
 
     const { visitOrderTemplateFK, visitEyeRefractionForm } = visitEntries
@@ -266,6 +293,10 @@ export const formikMapPropsToValues = ({
       } else if (visitEntries.referralPatientProfileFK) {
         referralType = 'Patient'
       }
+
+      if (visitEntries.visitPurposeFK === VISIT_TYPE.MC) {
+        mcReportLanguage = visitEntries.mcReportLanguage.split(',')
+      }
     } else if (
       patientInfo &&
       (patientInfo.referredBy === 'Company' ||
@@ -281,12 +312,14 @@ export const formikMapPropsToValues = ({
     return {
       queueNo: qNo,
       visitPurposeFK,
+      mcReportPriority,
       consReady,
       roomFK: roomAssignmentFK || roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
       doctorProfileFK,
       ...visitEntries,
+      mcReportLanguage,
       visitOrderTemplateFK: isVisitOrderTemplateActive
         ? currentVisitOrderTemplateFK
         : undefined,
@@ -411,6 +444,11 @@ export const formikHandleSubmit = (
     })
   }
 
+  let mcReportLanguage
+  if (values.visitPurposeFK === VISIT_TYPE.MC) {
+    mcReportLanguage = values.mcReportLanguage.join(',')
+  }
+
   const payload = {
     cfg: {
       message: id ? 'Visit updated' : 'Visit created',
@@ -431,6 +469,7 @@ export const formikHandleSubmit = (
       visitDoctor: newVisitDoctor,
       referralBy: _referralBy,
       visitEyeRefractionForm,
+      mcReportLanguage,
     },
   }
 
