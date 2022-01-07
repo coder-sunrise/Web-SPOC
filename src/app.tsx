@@ -44,6 +44,19 @@ export const dva = {
     },
     onReducer(reducer) {
       return (state, action) => {
+        const actionType = action.type.toLowerCase()
+        if (
+          actionType.includes('consultation') ||
+          actionType.includes('order')
+        ) {
+          console.group('onReducer')
+          console.log('action changed', action.type)
+          console.log('state', state)
+          console.log('payload', action.payload)
+          console.trace()
+          console.groupEnd()
+        }
+
         const newState =
           action.type === 'RESET_APP_STATE'
             ? { ...initialState, routing: state.routing }
