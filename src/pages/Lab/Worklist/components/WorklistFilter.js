@@ -6,7 +6,7 @@ import InfoCircleOutlined from '@ant-design/icons/InfoCircleOutlined'
 import moment from 'moment'
 import Search from '@material-ui/icons/Search'
 import Refresh from '@material-ui/icons/Refresh'
-import { CLINICAL_ROLE, PRIORITIES, VISIT_TYPE } from '@/utils/constants'
+import { CLINICAL_ROLE, PRIORITY_OPTIONS, VISIT_TYPE } from '@/utils/constants'
 import {
   TextField,
   DatePicker,
@@ -21,7 +21,6 @@ import {
   VisitTypeSelect,
 } from '@/components'
 import WorklistContext from '../WorklistContext'
-import { StatusButtons } from './StatusButtons'
 
 export const WorklistFilter = () => {
   const [form] = Form.useForm()
@@ -60,6 +59,7 @@ export const WorklistFilter = () => {
         },
       },
     })
+    handleSearch()
   }, [])
 
   useEffect(() => {
@@ -137,7 +137,7 @@ export const WorklistFilter = () => {
           <Form.Item name='priority' initialValue={[-99]}>
             <Select
               label={formatMessage({ id: 'lab.search.priority' })}
-              options={PRIORITIES}
+              options={PRIORITY_OPTIONS}
               style={{ width: 170 }}
               mode='multiple'
               maxTagCount={0}

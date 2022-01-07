@@ -45,7 +45,7 @@ const PrimaryAccessionNoHeader = ({ accessionNo }) => (
 
 export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
   const { isReadOnly, getPrimaryWorkitem } = useContext(WorklistContext)
-  const [visitTypes] = useVisitTypes()
+  const visitTypes = useVisitTypes()
   const [isCombinedOrder, setIsCombinedOrder] = useState(false)
   const [isCombinedRadioYes, setIsCombinedRadioYes] = useState(false)
   const [primaryAccessionNo, setPrimaryAccessionNo] = useState('')

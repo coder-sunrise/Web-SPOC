@@ -787,7 +787,9 @@ export const FOLDER_TYPE = {
   COPAYER: 'CoPayer',
 }
 
-export const PRIORITIES = [
+export const PRIORITY_VALUES = { NORMAL: 'Normal', URGENT: 'Urgent' }
+
+export const PRIORITY_OPTIONS = [
   {
     value: 'Normal',
     name: 'Normal',
@@ -856,10 +858,44 @@ export const ORDER_TYPES = {
   LAB: '11',
 }
 
-export const LAB_WORKITEM_STATUS = {
+export const LAB_SPECIMEN_STATUS = {
   NEW: 1,
   INPROGRESS: 2,
-  PENDING_FIRST_VERIFIER: 3,
-  PENDING_SECOND_VERIFIER: 4,
-  COMPLETED: 5,
+  FORRETEST: 3,
+  PENDINGFIRSTVERIFIER: 4,
+  PENDINGSECONDVERIFIER: 5,
+  COMPLETED: 6,
+  DISCARDED: 7,
+}
+export const LAB_SPECIMEN_ALL_COLOR = '#5a9cde'
+export const LAB_SPECIMEN_STATUS_COLORS = {
+  1: '#999900',
+  2: '#009999',
+  3: '#DA6300',
+  4: '#993333',
+  5: '#0000ff',
+  6: '#009933',
+  7: '#33cc99',
+}
+
+export const LAB_SPECIMEN_ALL_LABEL = 'All'
+export const LAB_SPECIMEN_STATUS_LABELS = {
+  1: 'New',
+  2: 'In Progress',
+  3: 'P. Retest',
+  4: 'P. 1st Verify',
+  5: 'P. 2nd Verify',
+  6: 'Completed',
+  7: 'Discarded',
+}
+
+export const LAB_SPECIMEN_ALL_DESCRIPTION = 'All'
+export const LAB_SPECIMEN_STATUS_DESCRIPTION = {
+  1: 'New',
+  2: 'In Progress',
+  3: 'Pending for Retest',
+  4: 'Pending First Verification',
+  5: 'Pending Second Verification',
+  6: 'Completed',
+  7: 'Discarded',
 }

@@ -90,6 +90,7 @@ export const WorklistContextProvider = props => {
     dispatch({
       type: 'radiologyWorklist/query',
       payload: {
+        pagesize: 9999,
         apiCriteria: {
           searchValue: searchValue,
           visitType: visitType
