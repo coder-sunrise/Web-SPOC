@@ -271,9 +271,10 @@ const RadiologyDetails = () => {
           }
         }}
         footProps={{
-          extraButtons: !showOnlyCloseButton
-            ? renderStatusButtons()
-            : undefined,
+          extraButtons: [
+            !showOnlyCloseButton ? renderStatusButtons() : undefined,
+            renderPrintButton(),
+          ],
           onConfirm: !showOnlyCloseButton
             ? () => {
                 handleSave()
