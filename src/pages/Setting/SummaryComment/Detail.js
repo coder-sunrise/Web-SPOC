@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react'
 import Yup from '@/utils/yup'
 import _ from 'lodash'
-import useTranslation from '@/utils/hooks/useTranslation'
-import { compose } from 'redux' 
+import { useTranslation } from '@/utils/hooks'
+import { compose } from 'redux'
 import { getTranslationValue } from '@/utils/utils'
 import {
   withFormikExtend,
