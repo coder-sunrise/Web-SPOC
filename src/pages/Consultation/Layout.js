@@ -485,19 +485,20 @@ class Layout extends PureComponent {
   }
 
   onAnchorClick = (id) => {
-    const parentElement = document.getElementById('mainPanel-root')
+    const parentElement = document.getElementById('main-page')
     const element = document.getElementById(id)
     try {
       if (parentElement && element) {
         const screenPosition = element.getBoundingClientRect()
         const { scrollTop } = parentElement
-        const { top, left } = screenPosition
-
+        const { top, left } = screenPosition 
         parentElement.scrollTo({
           // scrolled top position + element top position - Nav header height and Patient Banner height
-          top: scrollTop + top - 208,
-          left,
-          behavior: 'smooth',
+          top:
+            scrollTop +
+            top -
+            (document.getElementById('patientBanner').offsetHeight + 108),
+          left, 
         })
       }
     } catch (error) {
@@ -616,34 +617,42 @@ class Layout extends PureComponent {
               // backgroundColor: '#f0f8ff',
             }}
           >
-            <GridContainer justify="space-between">
+            <GridContainer justify='space-between'>
               <GridItem md={9}>
-                {state.currentLayout.widgets.map((id) => {
-                  const w = widgets.find((o) => o.id === id)
+                {state.currentLayout.widgets.map(id => {
+                  const w = widgets.find(o => o.id === id)
                   if (!w) return null
 
                   const onClick = () => this.onAnchorClick(w.id)
                   return (
-                    <Button size="sm" color="primary" onClick={onClick}>
+                    <Button size='sm' color='primary' onClick={onClick}>
                       {w.name}
                     </Button>
                   )
                 })}
               </GridItem>
               <GridItem md={3} style={{ textAlign: 'right' }}>
-                <Button size="sm" color="info" onClick={this.toggleLabTrackingDrawer}>
+                <Button
+                  size='sm'
+                  color='info'
+                  onClick={this.toggleLabTrackingDrawer}
+                >
                   <Accessibility />
                   Results
                 </Button>
-                <Button size="sm" color="info" onClick={this.toggleDrawer}>
+                <Button size='sm' color='info' onClick={this.toggleDrawer}>
                   <Settings />
                   Widgets
                 </Button>
-                <Authorized authority="queue.consultation.widgets.patienthistory">
+                <Authorized authority='queue.consultation.widgets.patienthistory'>
                   {({ rights: patientHistoryAccessRight }) => {
                     if (patientHistoryAccessRight === 'hidden') return null
                     return (
-                      <Button size="sm" color="info" onClick={this.togglePatientHistoryDrawer}>
+                      <Button
+                        size='sm'
+                        color='info'
+                        onClick={this.togglePatientHistoryDrawer}
+                      >
                         <Accessibility />
                         History
                       </Button>
@@ -659,8 +668,6 @@ class Layout extends PureComponent {
             ref={this.layoutContainer}
             style={{
               height: height ? this.props.height - 116 : 'auto',
-              overflowY: 'auto',
-              overflowX: 'hidden',
               marginTop: 1,
               position: 'relative',
             }}
@@ -668,11 +675,11 @@ class Layout extends PureComponent {
             // onScroll={this.delayedMainDivScroll}
           >
             <ResponsiveGridLayout {...layoutCfg}>
-              {state.currentLayout.widgets.map((id) => {
-                const w = widgets.find((o) => o.id === id)
+              {state.currentLayout.widgets.map(id => {
+                const w = widgets.find(o => o.id === id)
                 if (!w) return <div />
                 const cfgs = state.currentLayout[state.breakpoint]
-                const cfg = cfgs.find((o) => o.i === id)
+                const cfg = cfgs.find(o => o.i === id)
 
                 if (!cfg) return <div key={id} />
                 const LoadableComponent = w.component
@@ -683,7 +690,9 @@ class Layout extends PureComponent {
                       [classes.block]: true,
                       [classes.fullscreen]: state.fullScreenWidget === id,
                       [classes.hide]: state.fullScreenWidget !== id,
-                      [classes.show]: !state.fullScreenWidget || state.fullScreenWidget === id,
+                      [classes.show]:
+                        !state.fullScreenWidget ||
+                        state.fullScreenWidget === id,
                     })}
                     key={id}
                     id={w.id}
@@ -698,17 +707,19 @@ class Layout extends PureComponent {
                     >
                       {this.state.mode === 'edit' && (
                         <div className={`${classes.blockHeader} dragable`}>
-                          <div style={{ height: 25, backgroundColor: '#e6e6e6' }}>
+                          <div
+                            style={{ height: 25, backgroundColor: '#e6e6e6' }}
+                          >
                             <span className={classes.blockName}>{w.name}</span>
 
                             <React.Fragment>
                               {w.toolbarAddon}
                               {!state.fullScreenWidget && (
                                 <React.Fragment>
-                                  <Tooltip title="Full-screen">
+                                  <Tooltip title='Full-screen'>
                                     <IconButton
-                                      aria-label="Full-screen"
-                                      size="small"
+                                      aria-label='Full-screen'
+                                      size='small'
                                       onClick={this.onFullScreenClick(id)}
                                     >
                                       <Fullscreen />
@@ -717,18 +728,21 @@ class Layout extends PureComponent {
 
                                   <Dropdown
                                     overlay={this.widgetMenu}
-                                    trigger={[ 'click' ]}
+                                    trigger={['click']}
                                     currentWidgetId={id}
                                     disabled={cfg.static}
-                                    onVisibleChange={(visible) => {
+                                    onVisibleChange={visible => {
                                       if (visible)
                                         this.setState({
                                           replaceWidget: id,
                                         })
                                     }}
                                   >
-                                    <Tooltip title="Switch widget">
-                                      <IconButton aria-label="Replace" size="small">
+                                    <Tooltip title='Switch widget'>
+                                      <IconButton
+                                        aria-label='Replace'
+                                        size='small'
+                                      >
                                         <CompareArrows />
                                       </IconButton>
                                     </Tooltip>
@@ -736,21 +750,25 @@ class Layout extends PureComponent {
 
                                   {!w.disableDeleteWarning ? (
                                     <Popconfirm
-                                      title="Removing widget will remove all underlying data. Remove this widget?"
+                                      title='Removing widget will remove all underlying data. Remove this widget?'
                                       onConfirm={() => this.removeWidget(id)}
                                     >
-                                      <Tooltip title="Delete">
-                                        <IconButton aria-label="Delete" size="small" disabled={w.persist}>
+                                      <Tooltip title='Delete'>
+                                        <IconButton
+                                          aria-label='Delete'
+                                          size='small'
+                                          disabled={w.persist}
+                                        >
                                           <Clear />
                                         </IconButton>
                                       </Tooltip>
                                     </Popconfirm>
                                   ) : (
-                                    <Tooltip title="Delete">
+                                    <Tooltip title='Delete'>
                                       <IconButton
                                         onClick={() => this.removeWidget(id)}
-                                        aria-label="Delete"
-                                        size="small"
+                                        aria-label='Delete'
+                                        size='small'
                                         disabled={w.persist}
                                       >
                                         <Clear />
@@ -760,10 +778,10 @@ class Layout extends PureComponent {
                                 </React.Fragment>
                               )}
                               {state.fullScreenWidget === id && (
-                                <Tooltip title="Exit full-screen">
+                                <Tooltip title='Exit full-screen'>
                                   <IconButton
-                                    aria-label="Exit full-screen"
-                                    size="small"
+                                    aria-label='Exit full-screen'
+                                    size='small'
                                     onClick={this.onExitFullScreenClick}
                                   >
                                     <FullscreenExit />
@@ -775,8 +793,11 @@ class Layout extends PureComponent {
                           <Divider light />
                         </div>
                       )}
-                      <div className="non-dragable" style={w.layoutConfig ? w.layoutConfig.style : {}}>
-                        <SizeContainer size="sm">
+                      <div
+                        className='non-dragable'
+                        style={w.layoutConfig ? w.layoutConfig.style : {}}
+                      >
+                        <SizeContainer size='sm'>
                           <LoadableComponent
                             {...widgetProps}
                             {...w.restProps}
@@ -833,8 +854,15 @@ class Layout extends PureComponent {
                 </Slide>
               )}
             </div> */}
-            <Drawer anchor="right" open={this.state.openPatientHistoryDrawer} onClose={this.togglePatientHistoryDrawer}>
-              <PatientHistoryDrawer {...widgetProps} onClose={this.togglePatientHistoryDrawer} />
+            <Drawer
+              anchor='right'
+              open={this.state.openPatientHistoryDrawer}
+              onClose={this.togglePatientHistoryDrawer}
+            >
+              <PatientHistoryDrawer
+                {...widgetProps}
+                onClose={this.togglePatientHistoryDrawer}
+              />
               {/* <div style={{ width: '67vw', padding: theme.spacing(2) }}>
                 <h4>Patient History</h4>
                 <Button />
@@ -843,7 +871,11 @@ class Layout extends PureComponent {
                 </SizeContainer>
               </div> */}
             </Drawer>
-            <Drawer anchor="right" open={this.state.openDraw} onClose={this.toggleDrawer}>
+            <Drawer
+              anchor='right'
+              open={this.state.openDraw}
+              onClose={this.toggleDrawer}
+            >
               <div style={{ width: 360, position: 'relative' }}>
                 <h5
                   style={{
@@ -856,19 +888,23 @@ class Layout extends PureComponent {
                 >
                   Manage Widgets
                 </h5>
-                <SizeContainer size="sm">
+                <SizeContainer size='sm'>
                   <CheckboxGroup
                     className={classes.fabDiv}
-                    label=""
+                    label=''
                     vertical
                     strongLabel
                     value={currentLayout.widgets}
-                    valueField="id"
-                    textField="name"
-                    options={widgets.filter((widget) => {
-                      const widgetAccessRight = Authorized.check(widget.accessRight)
+                    valueField='id'
+                    textField='name'
+                    options={widgets.filter(widget => {
+                      const widgetAccessRight = Authorized.check(
+                        widget.accessRight,
+                      )
                       if (!widgetAccessRight) return false
-                      const shouldShow = widgetAccessRight && widgetAccessRight.rights !== 'hidden'
+                      const shouldShow =
+                        widgetAccessRight &&
+                        widgetAccessRight.rights !== 'hidden'
 
                       return shouldShow
                     })}
@@ -886,54 +922,59 @@ class Layout extends PureComponent {
                       onClick={() => {
                         this.changeLayout(this.getDefaultLayout())
                       }}
-                      color="danger"
+                      color='danger'
                     >
                       Reset
                     </Button>
                   </div>
                   <Divider light />
                   <div className={classes.fabDiv}>
-                  <h5
-                    style={{
-                      fontWeight: 500,
-                      lineHeight: 1.3,
-                      position: 'absolute',
-                    }}
-                  >
-                    Manage Layout
-                  </h5>
-                  <CustomInputWrapper
-                    label=""
-                    style={{ paddingTop: 25 }}
-                    strongLabel
-                    labelProps={{
-                      shrink: true,
-                    }}
-                  >
-                    <ProgressButton
-                      style={{ margin: theme.spacing(1, 0) }}
-                      onClick={() => {
-                        onSaveLayout(this.state.currentLayout)
-                      }}
-                    >
-                      Save Layout as My Favourite
-                    </ProgressButton>
-                    <ul
+                    <h5
                       style={{
-                        listStyle: 'square',
-                        paddingLeft: 16,
-                        fontSize: 'smaller',
+                        fontWeight: 500,
+                        lineHeight: 1.3,
+                        position: 'absolute',
                       }}
                     >
-                      <li>
-                        <p>Save current consultation layout as my favourite.</p>
-                      </li>
-                      <li>
-                        <p>System will use favourite layout for new consultation.</p>
-                      </li>
-                    </ul>
-                  </CustomInputWrapper>
-                </div>
+                      Manage Layout
+                    </h5>
+                    <CustomInputWrapper
+                      label=''
+                      style={{ paddingTop: 25 }}
+                      strongLabel
+                      labelProps={{
+                        shrink: true,
+                      }}
+                    >
+                      <ProgressButton
+                        style={{ margin: theme.spacing(1, 0) }}
+                        onClick={() => {
+                          onSaveLayout(this.state.currentLayout)
+                        }}
+                      >
+                        Save Layout as My Favourite
+                      </ProgressButton>
+                      <ul
+                        style={{
+                          listStyle: 'square',
+                          paddingLeft: 16,
+                          fontSize: 'smaller',
+                        }}
+                      >
+                        <li>
+                          <p>
+                            Save current consultation layout as my favourite.
+                          </p>
+                        </li>
+                        <li>
+                          <p>
+                            System will use favourite layout for new
+                            consultation.
+                          </p>
+                        </li>
+                      </ul>
+                    </CustomInputWrapper>
+                  </div>
                   <Divider light />
                   <div className={classes.fabDiv}>
                     <Templates {...restProps} />
@@ -947,55 +988,66 @@ class Layout extends PureComponent {
                         marginBottom: theme.spacing(1),
                       }}
                     >
-                      {isEnableJapaneseICD10Diagnosis === true && diagnosisDataSource === DIAGNOSIS_TYPE['ICD10DIANOGSIS'] && (
-                        <GridContainer>
-                          <GridItem xs={12}>
-                            <h5 style={{ fontWeight: 500, lineHeight: 1.3 }}>Favourite Diagnosis Language </h5>
-                          </GridItem>
-                          <GridItem xs={8}>
-                          <Field
-                          render={() => (
-                            <CodeSelect
-                            label="Diagnosis Language"
-                            labelField='name'
-                            valueField='value'
-                            value={favouriteDiagnosisLanguage}
-                            options={languageCategory}
-                            dropdownMatchSelectWidth={false}
-                            onChange={(v) => {
-                              this.setLanguageVersion(v)
-                            }}
-                            {...restProps}
-                          />
-                          )}
-                          />
-                          </GridItem>
-                          <GridItem xs={3} style={{ marginTop: 15, marginLeft: 20 }}>
-                            <ProgressButton
-                              disabled={false}
-                              onClick={() => {
-                                onSaveFavouriteDiagnosisLanguage(favouriteDiagnosisLanguage)
-                              }}
+                      {isEnableJapaneseICD10Diagnosis === true &&
+                        diagnosisDataSource ===
+                          DIAGNOSIS_TYPE['ICD10DIANOGSIS'] && (
+                          <GridContainer>
+                            <GridItem xs={12}>
+                              <h5 style={{ fontWeight: 500, lineHeight: 1.3 }}>
+                                Favourite Diagnosis Language{' '}
+                              </h5>
+                            </GridItem>
+                            <GridItem xs={8}>
+                              <Field
+                                render={() => (
+                                  <CodeSelect
+                                    label='Diagnosis Language'
+                                    labelField='name'
+                                    valueField='value'
+                                    value={favouriteDiagnosisLanguage}
+                                    options={languageCategory}
+                                    dropdownMatchSelectWidth={false}
+                                    onChange={v => {
+                                      this.setLanguageVersion(v)
+                                    }}
+                                    {...restProps}
+                                  />
+                                )}
+                              />
+                            </GridItem>
+                            <GridItem
+                              xs={3}
+                              style={{ marginTop: 15, marginLeft: 20 }}
                             >
-                              Save{' '}
-                            </ProgressButton>
-                          </GridItem>
-                        </GridContainer>
-                      )}
+                              <ProgressButton
+                                disabled={false}
+                                onClick={() => {
+                                  onSaveFavouriteDiagnosisLanguage(
+                                    favouriteDiagnosisLanguage,
+                                  )
+                                }}
+                              >
+                                Save{' '}
+                              </ProgressButton>
+                            </GridItem>
+                          </GridContainer>
+                        )}
                     </GridContainer>
                   </div>
                 </SizeContainer>
               </div>
             </Drawer>
-            <Drawer anchor="right" open={this.state.openLabTrackingDrawer} onClose={this.toggleLabTrackingDrawer}>
+            <Drawer
+              anchor='right'
+              open={this.state.openLabTrackingDrawer}
+              onClose={this.toggleLabTrackingDrawer}
+            >
               <LabTrackingDrawer
                 {...widgetProps}
                 patientId={
-                  this.props.visitRegistration.entity ? (
-                    this.props.visitRegistration.entity.visit.patientProfileFK
-                  ) : (
-                    undefined
-                  )
+                  this.props.visitRegistration.entity
+                    ? this.props.visitRegistration.entity.visit.patientProfileFK
+                    : undefined
                 }
                 onClose={this.toggleLabTrackingDrawer}
               />
