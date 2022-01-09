@@ -25,9 +25,6 @@ import {
 import Delete from '@material-ui/icons/Delete'
 import {
   LAB_SPECIMEN_STATUS,
-  LAB_SPECIMEN_STATUS_COLORS,
-  LAB_SPECIMEN_STATUS_LABELS,
-  LAB_SPECIMEN_STATUS_DESCRIPTION,
   PRIORITY_OPTIONS,
   PRIORITY_VALUES,
 } from '@/utils/constants'
@@ -48,6 +45,7 @@ import {
   ExapandCollapseAllButton,
 } from './index'
 import { SpecimenDetails } from '../SpecimenDetails'
+import { SpecimenStatusTag } from './SpecimenStatusTag'
 import styles from './WorklistGrid.less'
 
 const MODALS = {
@@ -58,17 +56,6 @@ const MODALS = {
 }
 
 const allSpecimenStatuses = Object.values(LAB_SPECIMEN_STATUS)
-
-const SpecimenStatusTag = ({ statusId }) => (
-  <Tooltip title={LAB_SPECIMEN_STATUS_DESCRIPTION[`${statusId}`]}>
-    <Tag
-      color={LAB_SPECIMEN_STATUS_COLORS[`${statusId}`]}
-      style={{ width: 80, textAlign: 'center' }}
-    >
-      {LAB_SPECIMEN_STATUS_LABELS[`${statusId}`]}
-    </Tag>
-  </Tooltip>
-)
 
 export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
   const { list: originalWorklist = [] } = labWorklist
@@ -90,7 +77,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
     if (originalWorklist) {
       const currentFilteredWorklist = _(
         originalWorklist.filter(item =>
-          filteredStatuses.includes(item.specimenStatusId),
+          filteredStatuses.includes(item.specimenStatusFK),
         ),
       )
         .orderBy('firstOrderDate')
@@ -98,27 +85,27 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
 
       const uniqeVisits = _(
         currentFilteredWorklist.map(item => ({
-          key: item.visitId,
+          key: item.visitFK,
           patientName: item.patientName,
           patientReferenceNo: item.patientReferenceNo,
-          visitId: item.visitId,
-          visitPurposeId: item.visitPurposeId,
+          visitFK: item.visitFK,
+          visitPurposeFK: item.visitPurposeFK,
           doctor:
             (item.doctorTitle ? `${item.doctorTitle} ` : '') + item.doctorName,
           firstOrderDate: _(currentFilteredWorklist)
-            .filter(inner => inner.visitId === item.visitId)
+            .filter(inner => inner.visitFK === item.visitFK)
             .minBy(inner => inner.generateDate).generateDate,
           workitems: currentFilteredWorklist
-            .filter(inner => inner.visitId === item.visitId)
+            .filter(inner => inner.visitFK === item.visitFK)
             .map(inner => ({
-              testCategoryId: inner.testCategoryId,
+              testCategoryFK: inner.testCategoryFK,
               workitemStatusId: inner.workitemStatusId,
               workitemId: inner.workitemId,
-              visitId: inner.visitId,
+              visitFK: inner.visitFK,
             })),
         })),
       )
-        .uniqBy('visitId')
+        .uniqBy('visitFK')
         .orderBy('firstOrderDate')
         .reverse()
         .value()
@@ -128,22 +115,22 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
     }
   }, [originalWorklist, filteredStatuses])
 
-  const getSpecimenCountByCategory = visitId => {
-    if (!visitId || !cttestcategory) return ''
+  const getSpecimenCountByCategory = visitFK => {
+    if (!visitFK || !cttestcategory) return ''
     const specimenCountByCategory = cttestcategory.map(item => ({
       name: item.name,
       incompleteWorkitemCount: _(originalWorklist)
         .filter(
           w =>
-            w.visitId === visitId &&
-            w.testCategoryId === item.id &&
-            (w.specimenStatusId !== LAB_SPECIMEN_STATUS.COMPLETED ||
-              w.specimenStatusId !== LAB_SPECIMEN_STATUS.DISCARDED),
+            w.visitFK === visitFK &&
+            w.testCategoryFK === item.id &&
+            (w.specimenStatusFK !== LAB_SPECIMEN_STATUS.COMPLETED ||
+              w.specimenStatusFK !== LAB_SPECIMEN_STATUS.DISCARDED),
         )
-        .uniqBy(w => w.labSpecimenId)
+        .uniqBy(w => w.labSpecimenFK)
         .value().length,
     }))
-    console.log('lab-module logs: visitId', visitId)
+    console.log('lab-module logs: visitFK', visitFK)
     console.log(
       'lab-module logs: testCategories',
       originalWorklist,
@@ -165,42 +152,42 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
   const expandedRowRender = (record, index, indent, expanded) => {
     const groupedTestPanels = _.uniqBy(
       filteredWorklist
-        .filter(item => item.visitId === record.visitId)
+        .filter(item => item.visitFK === record.visitFK)
         .map(item => ({
-          visitId: item.visitId,
-          labSpecimenId: item.labSpecimenId,
+          visitFK: item.visitFK,
+          labSpecimenFK: item.labSpecimenFK,
           patientReferenceNo: item.patientReferenceNo,
           firstOrderDate: _(filteredWorklist)
-            .filter(innerItem => innerItem.labSpecimenId === item.labSpecimenId)
+            .filter(innerItem => innerItem.labSpecimenFK === item.labSpecimenFK)
             .minBy(innerItem => innerItem.generateDate).generateDate,
           testPanels: _.uniq(
             filteredWorklist
               .filter(
-                innerItem => innerItem.labSpecimenId === item.labSpecimenId,
+                innerItem => innerItem.labSpecimenFK === item.labSpecimenFK,
               )
               .map(innerItem => ({
-                testpanelId: innerItem.testPanelId,
+                testPanelFK: innerItem.testPanelFK,
                 testPanelName: cttestpanel.find(
-                  item => item.id === innerItem.testPanelId,
+                  item => item.id === innerItem.testPanelFK,
                 )?.name,
                 priority: innerItem.priority,
               })),
           ),
           ...item,
         })),
-      'labSpecimenId',
+      'labSpecimenFK',
     )
 
     const columns = [
       {
         title: 'Category',
-        dataIndex: 'testCategoryId',
-        key: 'testCategoryId',
+        dataIndex: 'testCategoryFK',
+        key: 'testCategoryFK',
         ellipsis: true,
         width: 160,
         render: (text, record, index) => {
           const testCategory = cttestcategory.find(
-            item => item.id === record.testCategoryId,
+            item => item.id === record.testCategoryFK,
           )
           return testCategory ? testCategory.name : ''
         },
@@ -249,12 +236,12 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
       {
         title: 'Specimen Type',
         width: 150,
-        dataIndex: 'specimenTypeId',
-        key: 'specimenTypeId',
+        dataIndex: 'specimenTypeFK',
+        key: 'specimenTypeFK',
         ellipsis: true,
         render: (text, record, index) => {
           const speicmenType = ctspecimentype.find(
-            item => record.specimenTypeId === item.id,
+            item => record.specimenTypeFK === item.id,
           )
 
           return speicmenType ? speicmenType.name : ''
@@ -296,8 +283,9 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
       {
         title: 'Status',
         width: 100,
-        dataIndex: 'specimenStatusId',
-        key: 'specimenStatusId',
+        dataIndex: 'specimenStatusFK',
+        key: 'specimenStatusFK',
+        align: 'center',
         render: (text, record, index) => <SpecimenStatusTag statusId={text} />,
       },
       {
@@ -309,14 +297,14 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
         render: (text, record, index) => (
           <Space size='small' align='center'>
             {record.dateReceived &&
-              record.specimenStatusId !== LAB_SPECIMEN_STATUS.DISCARDED && (
+              record.specimenStatusFK !== LAB_SPECIMEN_STATUS.DISCARDED && (
                 <Tooltip title='Open Specimen Details'>
                   <Button
                     onClick={() => {
                       if (currentModal.modal === MODALS.NONE)
                         setCurrentModal({
                           modal: MODALS.SPECIMEN_DETAILS,
-                          para: record.labSpecimenId,
+                          para: record.labSpecimenFK,
                         })
                     }}
                     justIcon
@@ -334,7 +322,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
                     if (currentModal.modal === MODALS.NONE)
                       setCurrentModal({
                         modal: MODALS.SPECIMEN_DETAILS,
-                        para: record.labSpecimenId,
+                        para: record.labSpecimenFK,
                       })
                   }}
                   justIcon
@@ -346,14 +334,14 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
               </Tooltip>
             )}
             {record.dateReceived &&
-              record.specimenStatusId === LAB_SPECIMEN_STATUS.NEW && (
+              record.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW && (
                 <Tooltip title='Discard Specimen'>
                   <Button
                     onClick={() => {
                       if (currentModal.modal === MODALS.NONE)
                         setCurrentModal({
                           modal: MODALS.SPECIMEN_DETAILS,
-                          para: record.labSpecimenId,
+                          para: record.labSpecimenFK,
                         })
                     }}
                     justIcon
@@ -394,9 +382,9 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
               <Typography.Text type='secondary'>
                 {record.doctor}
               </Typography.Text>
-              <VisitTypeTag type={record.visitPurposeId} />
+              <VisitTypeTag type={record.visitPurposeFK} />
             </Space>
-            <span>{getSpecimenCountByCategory(record.visitId)}</span>
+            <span>{getSpecimenCountByCategory(record.visitFK)}</span>
           </div>
         )
       },
@@ -409,17 +397,17 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
         <ExapandCollapseAllButton
           onExpandAllClick={() => setCollapsedKeys([])}
           onCollapseAllClick={() =>
-            setCollapsedKeys(visits.map(v => v.visitId))
+            setCollapsedKeys(visits.map(v => v.visitFK))
           }
         />
         <StatusFilter
           defaultSelection={allSpecimenStatuses}
           counts={_(originalWorklist)
-            .groupBy('specimenStatusId')
-            .map(function(items, specimenStatusId) {
+            .groupBy('specimenStatusFK')
+            .map(function(items, specimenStatusFK) {
               return {
-                status: parseInt(specimenStatusId),
-                count: _.uniqBy(items, 'labSpecimenId').length,
+                status: parseInt(specimenStatusFK),
+                count: _.uniqBy(items, 'labSpecimenFK').length,
               }
             })
             .value()}
@@ -441,14 +429,14 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
           onExpand: (expanded, record) => {
             expanded
               ? setCollapsedKeys(
-                  collapsedKeys.filter(item => item !== record.visitId),
+                  collapsedKeys.filter(item => item !== record.visitFK),
                 )
-              : setCollapsedKeys([...collapsedKeys, record.visitId])
+              : setCollapsedKeys([...collapsedKeys, record.visitFK])
           },
         }}
         expandedRowKeys={visits
-          .filter(v => !collapsedKeys.includes(v.visitId))
-          .map(v => v.visitId)}
+          .filter(v => !collapsedKeys.includes(v.visitFK))
+          .map(v => v.visitFK)}
         showHeader={false}
         dataSource={visits}
         pagination={false}
@@ -467,7 +455,11 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
       </section>
 
       <SpecimenDetails
-        open={currentModal.modal === MODALS.SPECIMEN_DETAILS}
+        id={
+          currentModal.modal === MODALS.SPECIMEN_DETAILS
+            ? currentModal.para
+            : undefined
+        }
         onClose={() => {
           console.log('closed me!!!')
           setCurrentModal({ modal: MODALS.NONE })

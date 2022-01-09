@@ -2,20 +2,22 @@ import { createFormViewModel } from 'medisys-model'
 import service from '../../services'
 
 export default createFormViewModel({
-  namespace: 'specimentDetails',
+  namespace: 'worklistSpecimenDetails',
   config: {},
   param: {
     service,
-    state: {},
+    state: { entity: {} },
     setting: {},
     subscriptions: ({ dispatch }) => {},
     effects: {
       *queryDone({ payload }, { call, select, put, take }) {
-        // const radiologyDetails = yield select(st => st.radiologyDetails)
-        console.log('query done')
+        const { entity: specimenDetails } = yield select(
+          st => st.worklistSpecimenDetails,
+        )
+        console.log('query done', specimenDetails)
         yield put({
           type: 'patient/query',
-          payload: { id: 12 }, //TODO::Replace with actual patient id
+          payload: { id: specimenDetails.patientProfileFK },
         })
 
         yield take('patient/query/@@end')
