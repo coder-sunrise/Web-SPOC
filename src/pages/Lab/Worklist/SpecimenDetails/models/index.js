@@ -6,7 +6,7 @@ export default createFormViewModel({
   config: {},
   param: {
     service,
-    state: { entity: {} },
+    state: { entity: { specimenOrders: [] } },
     setting: {},
     subscriptions: ({ dispatch }) => {},
     effects: {

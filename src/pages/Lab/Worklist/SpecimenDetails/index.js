@@ -13,17 +13,23 @@ import {
 } from '@/components'
 import { VisitTypeTag } from '@/components/_medisys'
 import { SpecimenStatusTag } from '../components/SpecimenStatusTag'
+import { TestPanelColumn } from '../components/TestPanelColumn'
 import { SpecimenDetailsStep } from './components'
 import { useCodeTable } from '@/utils/hooks'
 
 const { Panel } = Collapse
 
-export const SpecimenDetails = ({ id, onClose }) => {
+export const SpecimenDetails = ({ id, onClose, onConfirm }) => {
   const dispatch = useDispatch()
   const cttestcategory = useCodeTable('cttestcategory')
   const ctspecimentype = useCodeTable('ctspecimentype')
+  const cttestpanel = useCodeTable('cttestpanel')
   const { entity } = useSelector(s => s.worklistSpecimenDetails)
-
+  console.log(
+    'lab-module logs: entity.specimenOrders',
+    entity,
+    entity.specimenOrders,
+  )
   useEffect(() => {
     if (id) {
       dispatch({
@@ -113,6 +119,16 @@ export const SpecimenDetails = ({ id, onClose }) => {
       dataIndex: 'testPanel',
       key: 'testPanel',
       width: 200,
+      render: (text, record, index) => {
+        const testPanels = record.labWorkitems.map(item => ({
+          priority: item.priority,
+          testPanelName: cttestpanel.find(
+            testPanel => testPanel.id === item.testPanelFK,
+          )?.name,
+        }))
+
+        return <TestPanelColumn testPanels={testPanels} />
+      },
     },
     {
       title: 'Priority',
@@ -183,7 +199,9 @@ export const SpecimenDetails = ({ id, onClose }) => {
               <Table
                 bordered
                 columns={orderInfoColumns}
-                dataSource={entity.specimenOrders}
+                dataSource={[...(entity.specimenOrders ?? [])].sort(
+                  item => item.serviceName,
+                )}
                 pagination={false}
                 size='small'
               />

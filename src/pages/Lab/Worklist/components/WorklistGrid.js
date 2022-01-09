@@ -41,24 +41,29 @@ import { VisitTypeTag } from '@/components/_medisys'
 import WorklistContext from '../WorklistContext'
 import {
   StatusFilter,
-  SpecimenDiscarding,
+  DiscardSpecimen,
+  ReceiveSpecimen,
   ExapandCollapseAllButton,
 } from './index'
 import { SpecimenDetails } from '../SpecimenDetails'
 import { SpecimenStatusTag } from './SpecimenStatusTag'
+import { TestPanelColumn } from './TestPanelColumn'
 import styles from './WorklistGrid.less'
 
 const MODALS = {
   NONE: '',
   SPECIMEN_COLLECTION: 'SPECIMEN_COLLECTION',
   SPECIMEN_DETAILS: 'SPECIMEN_DETAILS',
-  SPECIMEN_DISCARDING: 'SPECIMEN_DISCARDING',
+  DISCARD_SPECIMEN: 'DISCARD_SPECIMEN',
+  RECEIVE_SPECIMEN: 'RECEIVE_SPECIMEN',
 }
 
 const allSpecimenStatuses = Object.values(LAB_SPECIMEN_STATUS)
 
 export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
   const { list: originalWorklist = [] } = labWorklist
+  const { setIsAnyWorklistModelOpened } = useContext(WorklistContext)
+
   const [visits, setVisits] = useState([])
   const [collapsedKeys, setCollapsedKeys] = useState([])
   const [filteredStatuses, setFilteredStatuses] = useState(allSpecimenStatuses)
@@ -130,13 +135,6 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
         .uniqBy(w => w.labSpecimenFK)
         .value().length,
     }))
-    console.log('lab-module logs: visitFK', visitFK)
-    console.log(
-      'lab-module logs: testCategories',
-      originalWorklist,
-      specimenCountByCategory,
-      cttestcategory,
-    )
 
     return specimenCountByCategory
       .filter(item => item.incompleteWorkitemCount > 0)
@@ -147,6 +145,11 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
           } `,
         '',
       )
+  }
+
+  const closeModal = () => {
+    setCurrentModal({ modal: MODALS.NONE })
+    setIsAnyWorklistModelOpened(false)
   }
 
   const expandedRowRender = (record, index, indent, expanded) => {
@@ -199,38 +202,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
         width: 350,
         render: (text, record, index) => {
           console.log('lab-module logs: testPanels - ', record.testPanels)
-          const testPanelHtml = record.testPanels
-            //Sort by Priority then by the alphabetical order
-            .sort((a, b) =>
-              a.priority === b.priority
-                ? a.testPanelName < b.testPanelName
-                  ? -1
-                  : 1
-                : a.priority === PRIORITY_VALUES.URGENT
-                ? -1
-                : 1,
-            )
-            .map(item =>
-              item.priority === PRIORITY_VALUES.URGENT
-                ? `<span style="color:red;"> ${item.testPanelName}</span>`
-                : `${item.testPanelName}`,
-            )
-            .join(', ')
-
-          return (
-            <p
-              style={{
-                width: 334, //Column width - 16 (left and righ 8 px padding)
-                display: '-webkit-box',
-                WebkitBoxOrient: 'vertical',
-                WebkitLineClamp: 2,
-                overflow: 'hidden',
-              }}
-              dangerouslySetInnerHTML={{
-                __html: testPanelHtml,
-              }}
-            ></p>
-          )
+          return <TestPanelColumn testPanels={record.testPanels} />
         },
       },
       {
@@ -301,11 +273,13 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
                 <Tooltip title='Open Specimen Details'>
                   <Button
                     onClick={() => {
-                      if (currentModal.modal === MODALS.NONE)
+                      if (currentModal.modal === MODALS.NONE) {
                         setCurrentModal({
                           modal: MODALS.SPECIMEN_DETAILS,
                           para: record.labSpecimenFK,
                         })
+                        setIsAnyWorklistModelOpened(true)
+                      }
                     }}
                     justIcon
                     color='primary'
@@ -315,34 +289,39 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
                   </Button>
                 </Tooltip>
               )}
-            {!record.dateReceived && (
-              <Tooltip title='Receive Specimen'>
-                <Button
-                  onClick={() => {
-                    if (currentModal.modal === MODALS.NONE)
-                      setCurrentModal({
-                        modal: MODALS.SPECIMEN_DETAILS,
-                        para: record.labSpecimenFK,
-                      })
-                  }}
-                  justIcon
-                  color='primary'
-                  size='sm'
-                >
-                  <Icon type='flask-empty' />
-                </Button>
-              </Tooltip>
-            )}
+            {!record.dateReceived &&
+              record.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW && (
+                <Tooltip title='Receive Specimen'>
+                  <Button
+                    onClick={() => {
+                      if (currentModal.modal === MODALS.NONE) {
+                        setCurrentModal({
+                          modal: MODALS.RECEIVE_SPECIMEN,
+                          para: record.labSpecimenFK,
+                        })
+                        setIsAnyWorklistModelOpened(true)
+                      }
+                    }}
+                    justIcon
+                    color='primary'
+                    size='sm'
+                  >
+                    <Icon type='flask-empty' />
+                  </Button>
+                </Tooltip>
+              )}
             {record.dateReceived &&
               record.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW && (
                 <Tooltip title='Discard Specimen'>
                   <Button
                     onClick={() => {
-                      if (currentModal.modal === MODALS.NONE)
+                      if (currentModal.modal === MODALS.NONE) {
                         setCurrentModal({
-                          modal: MODALS.SPECIMEN_DETAILS,
+                          modal: MODALS.DISCARD_SPECIMEN,
                           para: record.labSpecimenFK,
                         })
+                        setIsAnyWorklistModelOpened(true)
+                      }
                     }}
                     justIcon
                     color='danger'
@@ -461,15 +440,36 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
             : undefined
         }
         onClose={() => {
-          console.log('closed me!!!')
-          setCurrentModal({ modal: MODALS.NONE })
+          closeModal()
+        }}
+        onConfirm={() => {
+          closeModal()
         }}
       />
-      <SpecimenDiscarding
-        open={currentModal.modal === MODALS.SPECIMEN_DISCARDING}
+      <ReceiveSpecimen
+        id={
+          currentModal.modal === MODALS.RECEIVE_SPECIMEN
+            ? currentModal.para
+            : undefined
+        }
         onClose={() => {
-          console.log('closed me!!!')
-          setCurrentModal({ modal: MODALS.NONE })
+          closeModal()
+        }}
+        onConfirm={() => {
+          closeModal()
+        }}
+      />
+      <DiscardSpecimen
+        id={
+          currentModal.modal === MODALS.DISCARD_SPECIMEN
+            ? currentModal.para
+            : undefined
+        }
+        onClose={() => {
+          closeModal()
+        }}
+        onConfirm={() => {
+          closeModal()
         }}
       />
     </Card>

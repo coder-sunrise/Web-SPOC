@@ -190,7 +190,7 @@ const CollectSpecimen = ({ visitId, onConfirm, onClose }) => {
                 label='Date Received'
                 format={dateFormatLongWithTimeNoSec}
               />
-            </Form.Item>{' '}
+            </Form.Item>
             <Checkbox
               onChange={e => {
                 form.setFieldsValue({
