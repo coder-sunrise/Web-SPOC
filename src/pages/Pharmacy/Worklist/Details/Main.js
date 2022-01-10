@@ -143,8 +143,13 @@ const Main = props => {
   const [reportID, setReportID] = useState(-1)
   const [reportParameters, setReportParameters] = useState({})
   const [drugLeafletData, setDrugLeafletData] = useState({})
+  const [drugDrugSummaryLabelData, setDrugDrugSummaryLabelData] = useState({})
   const [currentDrugToPrint, setCurrentDrugToPrint] = useState({})
   const [batchInformation, setBatchInformation] = useState({})
+  const [
+    showDrugSummaryLabelSelectionPopup,
+    setShowDrugSummaryLabelSelectionPopup,
+  ] = useState({})
 
   useEffect(() => {
     subscribeNotification('PharmacyOrderUpdate', {
@@ -1523,8 +1528,27 @@ const Main = props => {
       return { id: x.id, batchNo: x.batchNo, expiryDate: x.expiryDate }
     })
     setBatchInformation(batchs)
-    console.log(batchs)
     setShowDrugLabelSelectionPopup(true)
+    setLabelType('drugLabel')
+  }
+  const showDrugSummaryLabelSelection = () => {
+    dispatch({
+      type: 'pharmacyDetails/queryLeafletDrugList',
+      payload: {
+        id: pharmacyDetails.entity?.visitFK,
+      },
+    }).then(data => {
+      if (data) {
+        data = _.orderBy(
+          data,
+          ['dispenseByPharmacy', 'displayName'],
+          ['desc', 'asc'],
+        )
+        setDrugDrugSummaryLabelData(data)
+        setShowDrugLabelSelectionPopup(true)
+      }
+    })
+    setLabelType('DrugSummaryLabel')
   }
 
   const printReview = reportid => {
@@ -1554,6 +1578,10 @@ const Main = props => {
 
   const closeDrugLabelSelectionPopup = () => {
     setShowDrugLabelSelectionPopup(false)
+  }
+
+  const closeDrugSummaryLabelSelectionPopup = () => {
+    setShowDrugSummaryLabelSelectionPopup(false)
   }
 
   const actualizeEditOrder = () => {
@@ -1819,7 +1847,12 @@ const Main = props => {
               <Print />
               Drug Label
             </Button>
-            <Button color='primary' size='sm' disabled={isOrderUpdate}>
+            <Button
+              color='primary'
+              onClick={() => showDrugSummaryLabelSelection()}
+              size='sm'
+              disabled={isOrderUpdate}
+            >
               <Print />
               Drug Summary Label
             </Button>
@@ -2043,6 +2076,23 @@ const Main = props => {
         <DrugLeafletSelection
           {...props}
           rows={drugLeafletData}
+          type='PIL'
+          visitid={pharmacyDetails.entity?.visitFK}
+          onConfirmPrintLeaflet={onConfirmPrintLeaflet}
+        />
+      </CommonModal>
+      <CommonModal
+        open={showDrugSummaryLabelSelectionPopup}
+        title='Print Drug Summary Labels'
+        onClose={closeDrugSummaryLabelSelectionPopup}
+        maxWidth='sm'
+        cancelText='Cancel'
+        observe='Confirm'
+      >
+        <DrugLeafletSelection
+          {...props}
+          rows={drugLeafletData}
+          type='drugsummarylabel'
           visitid={pharmacyDetails.entity?.visitFK}
           onConfirmPrintLeaflet={onConfirmPrintLeaflet}
         />

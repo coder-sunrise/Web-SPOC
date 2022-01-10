@@ -16,6 +16,7 @@ import {
   CommonTableGrid,
 } from '@/components'
 import { Alert } from 'antd'
+import { ThreeSixtySharp } from '@material-ui/icons'
 
 @connect(({ clinicSettings, patient }) => ({
   clinicSettings: clinicSettings.settings || clinicSettings.default,
@@ -61,19 +62,30 @@ class DrugLeafletSelection extends PureComponent {
       tranlationFK,
       patient,
       clinicSettings,
+      type,
     } = this.props
     const preferLanguage =
       (tranlationFK || (patient && patient.translationLinkFK)) === 5
         ? 'JP'
         : clinicSettings.primaryPrintoutLanguage
     this.setState({ printlanguage: [preferLanguage] })
-    this.setState({
-      selectedRows: rows
-        .filter(t => t.displayInLeaflet)
-        .map(x => {
-          return x.id
-        }),
-    })
+    if (type === 'PIL') {
+      this.setState({
+        selectedRows: rows
+          .filter(t => t.displayInLeaflet)
+          .map(x => {
+            return x.id
+          }),
+      })
+    } else {
+      this.setState({
+        selectedRows: rows
+          .filter(t => t.dispenseByPharmacy)
+          .map(x => {
+            return x.id
+          }),
+      })
+    }
   }
   constructor(props) {
     super(props)
@@ -130,6 +142,60 @@ class DrugLeafletSelection extends PureComponent {
     })
   }
 
+  printDrugSummaryLabel = async (printData = {}) => {
+    const { visitid } = this.props
+    const visitinvoicedrugids = _.join(
+      printData.map(x => {
+        return x.visitInvoiceDrugId
+      }),
+    )
+    const instructionIds = _.join(
+      printData
+        // skip drug mixture
+        .filter(xx => xx.instructionId && xx.instructionId.length > 0)
+        .map(x => {
+          return _.join(x.instructionId, ',')
+        }),
+    )
+    this.state.printlanguage.forEach(async lan => {
+      const data = await getRawData(REPORT_ID.DRUG_SUMMARY_LABEL_80MM_45MM, {
+        visitinvoicedrugids,
+        instructionIds,
+        language: lan,
+        visitId: visitid,
+      })
+      data.DrugDetailsList.forEach(t => {
+        if (t.isDrugMixture) {
+          const instructions = (t.instruction || '').split('\n')
+          t.FirstLine = ''
+          t.SecondLine = t.ingredient
+          t.ThirdLine = instructions.length > 0 ? instructions[0] : ''
+          t.FourthLine = instructions.length > 1 ? instructions[1] : ''
+        } else {
+          const instructions = (t.instruction || '').split('\n')
+          t.FirstLine = t.ingredient
+          t.SecondLine = t.indication
+          t.ThirdLine = instructions.length > 0 ? instructions[0] : ''
+          t.FourthLine = instructions.length > 1 ? instructions[1] : ''
+        }
+      })
+      const payload = [
+        {
+          ReportId: REPORT_ID.DRUG_SUMMARY_LABEL_80MM_45MM,
+          ReportData: JSON.stringify({
+            ...data,
+          }),
+        },
+      ]
+      await this.props.handlePrint(JSON.stringify(payload))
+      if (
+        this.state.printlanguage.indexOf(lan) ==
+        this.state.printlanguage.length - 1
+      ) {
+        this.props.onConfirmPrintLeaflet()
+      }
+    })
+  }
   render() {
     const {
       onConfirmPrintLeaflet,
@@ -208,7 +274,12 @@ class DrugLeafletSelection extends PureComponent {
             const selectedData = rows.filter(item =>
               selectedRows.includes(item.id),
             )
-            this.printLeaflet(selectedData)
+            console.log(this.props.type)
+            if (this.props.type === 'PIL') {
+              this.printLeaflet(selectedData)
+            } else if (this.props.type === 'drugsummarylabel') {
+              this.printDrugSummaryLabel(selectedData)
+            }
           },
           confirmBtnText: 'Confirm',
           confirmProps: { disabled: showDrugWarning || showLanguageWarning },

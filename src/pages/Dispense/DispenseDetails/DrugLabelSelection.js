@@ -92,7 +92,7 @@ class DrugLabelSelection extends React.PureComponent {
       source = 'dispense',
     } = props
     dispatch({
-      type: 'dispense/queryDrugLabelList',
+      type: 'dispense/getSeparatedDrugInstructions',
       payload: {
         id: visitid,
         includeOpenPrescription: true,
