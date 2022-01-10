@@ -210,37 +210,39 @@ class FolderList extends Component {
                     style={{ width: 40, height: 40 }}
                   />
                 </IconButton>
-                <FastField
-                  name={`${modelName}`}
-                  render={args => {
-                    this.form = args.form
-                    return (
-                      <Attachment
-                        attachmentType={`${modelName}`}
-                        handleUpdateAttachments={att => {
-                          let { added = [] } = att
-                          const { selectedFolderFK: folderFK } = this.props
-                          if (folderFK > 0 && added.length > 0) {
-                            added = added.map(ad => {
-                              const { 0: fileDetails } = ad
-                              const retVal = {
-                                ...ad,
-                                0: {
-                                  ...fileDetails,
-                                  [`${modelName}_Folder`]: [{ folderFK }],
-                                },
-                              }
-                              return retVal
-                            })
-                          }
-                          updateAttachments(args)({ ...att, added })
-                        }}
-                        attachments={args.field.value}
-                        label=''
-                      />
-                    )
-                  }}
-                />
+                <div style={{ marginTop: 15 }}>
+                  <FastField
+                    name={`${modelName}`}
+                    render={args => {
+                      this.form = args.form
+                      return (
+                        <Attachment
+                          attachmentType={`${modelName}`}
+                          handleUpdateAttachments={att => {
+                            let { added = [] } = att
+                            const { selectedFolderFK: folderFK } = this.props
+                            if (folderFK > 0 && added.length > 0) {
+                              added = added.map(ad => {
+                                const { 0: fileDetails } = ad
+                                const retVal = {
+                                  ...ad,
+                                  0: {
+                                    ...fileDetails,
+                                    [`${modelName}_Folder`]: [{ folderFK }],
+                                  },
+                                }
+                                return retVal
+                              })
+                            }
+                            updateAttachments(args)({ ...att, added })
+                          }}
+                          attachments={args.field.value}
+                          label=''
+                        />
+                      )
+                    }}
+                  />
+                </div>
               </div>
               <div
                 style={{
