@@ -93,42 +93,44 @@ export const ReceiveSpecimen = ({ id, onClose, onConfirm }) => {
                 ?.name
             }
           </Descriptions.Item>
-        </Descriptions>
-        <Form
-          form={form}
-          initialValues={{
-            dateReceived: moment(),
-          }}
-          onFinish={({ dateReceived }) => {
-            const payload = {
-              ...entity,
-              dateReceived,
-            }
+          <Descriptions.Item label='Receiving Date'>
+            <Form
+              form={form}
+              initialValues={{
+                dateReceived: moment(),
+              }}
+              onFinish={({ dateReceived }) => {
+                const payload = {
+                  ...entity,
+                  dateReceived,
+                }
 
-            dispatch({
-              type: 'labWorklist/receiveSpecimen',
-              payload,
-            }).then(result => {
-              if (result) {
-                setIsOpenModal(false)
-                onConfirm && onConfirm()
-              }
-            })
-          }}
-        >
-          <Form.Item
-            name='dateReceived'
-            style={{ margin: 8 }}
-            rules={[{ required: true, message: 'Receiving date is required.' }]}
-          >
-            <DatePicker
-              showTime
-              style={{ width: 150 }}
-              label='Receiving Date'
-              format={dateFormatLongWithTimeNoSec}
-            />
-          </Form.Item>
-        </Form>
+                dispatch({
+                  type: 'labWorklist/receiveSpecimen',
+                  payload,
+                }).then(result => {
+                  if (result) {
+                    setIsOpenModal(false)
+                    onConfirm && onConfirm()
+                  }
+                })
+              }}
+            >
+              <Form.Item
+                name='dateReceived'
+                rules={[
+                  { required: true, message: 'Receiving date is required.' },
+                ]}
+              >
+                <DatePicker
+                  showTime
+                  style={{ width: 150 }}
+                  format={dateFormatLongWithTimeNoSec}
+                />
+              </Form.Item>
+            </Form>
+          </Descriptions.Item>
+        </Descriptions>
       </div>
     </CommonModal>
   )

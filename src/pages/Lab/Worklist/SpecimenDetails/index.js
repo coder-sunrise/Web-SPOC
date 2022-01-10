@@ -1,8 +1,17 @@
-import React, { useState, useEffect } from 'react'
-import { Space, Collapse, Checkbox, InputNumber, Typography, Table } from 'antd'
+import React, { useState, useEffect, useRef } from 'react'
+import {
+  Space,
+  Collapse,
+  InputNumber,
+  Typography,
+  Table,
+  Checkbox,
+  Form,
+} from 'antd'
 import Banner from '@/pages/PatientDashboard/Banner'
 import { useSelector, useDispatch } from 'dva'
 import {
+  Icon,
   dateFormatLongWithTimeNoSec,
   DatePicker,
   Select,
@@ -16,6 +25,7 @@ import { SpecimenStatusTag } from '../components/SpecimenStatusTag'
 import { TestPanelColumn } from '../components/TestPanelColumn'
 import { SpecimenDetailsStep } from './components'
 import { useCodeTable } from '@/utils/hooks'
+import { EditableTable } from './components/LabResultTable'
 
 const { Panel } = Collapse
 
@@ -25,11 +35,15 @@ export const SpecimenDetails = ({ id, onClose, onConfirm }) => {
   const ctspecimentype = useCodeTable('ctspecimentype')
   const cttestpanel = useCodeTable('cttestpanel')
   const { entity } = useSelector(s => s.worklistSpecimenDetails)
-  console.log(
-    'lab-module logs: entity.specimenOrders',
-    entity,
-    entity.specimenOrders,
-  )
+  const [isResultFullScreen, setIsResultFullScreen] = useState(false)
+  const [form] = Form.useForm()
+
+  // const data = [
+  //   { testPanel: 'CRE', rawData: '100', unit: 'mmHg', referenceRange: 0 - 10 },
+  //   { testPanel: 'BUN', rawData: '100', unit: 'mmHg', referenceRange: 0 - 10 },
+  //   { testPanel: 'GOT', rawData: '100', unit: 'mmHg', referenceRange: 0 - 10 },
+  // ]
+
   useEffect(() => {
     if (id) {
       dispatch({
@@ -163,52 +177,86 @@ export const SpecimenDetails = ({ id, onClose, onConfirm }) => {
       open={id && id > 0}
       title='Lab Test Specimen Details'
       onClose={onClose}
+      onConfirm={() => form.submit()}
       showFooter={true}
       maxWidth='lg'
     >
-      <GridContainer>
-        <GridItem md={12}>
-          <div style={{ padding: 8 }}>
-            <Banner />
-          </div>
-        </GridItem>
-        <GridItem md={12}>
-          <SpecimenDetailsStep />
-        </GridItem>
-        <GridItem md={12}>
-          <GridContainer>
-            <GridItem md={8} style={{ paddingTop: 16 }}>
-              <Typography.Text strong>Specimen Details: </Typography.Text>
-            </GridItem>
-            <GridItem md={4} style={{ padding: 8, textAlign: 'right' }}>
-              <VisitTypeTag type={entity.visitPurposeFK} />
-            </GridItem>
-            <GridItem md={12} style={{ padding: 8 }}>
-              <Table
-                bordered
-                columns={specimenInfoColumns}
-                dataSource={[entity]}
-                pagination={false}
-                size='small'
-              />
-            </GridItem>
-            <GridItem md={12} style={{ paddingTop: 16 }}>
-              <Typography.Text strong>Order Details: </Typography.Text>
-            </GridItem>
-            <GridItem md={12} style={{ padding: 8 }}>
-              <Table
-                bordered
-                columns={orderInfoColumns}
-                dataSource={[...(entity.specimenOrders ?? [])].sort(
-                  item => item.serviceName,
-                )}
-                pagination={false}
-                size='small'
-              />
-            </GridItem>
-          </GridContainer>
-        </GridItem>
-      </GridContainer>
+      <div>
+        <GridContainer
+          style={{ height: 700, alignItems: 'start', overflowY: 'scroll' }}
+        >
+          {!isResultFullScreen && (
+            <React.Fragment>
+              {' '}
+              <GridItem md={12}>
+                <div style={{ padding: 8 }}>
+                  <Banner />
+                </div>
+              </GridItem>
+              <GridItem md={12}>
+                <SpecimenDetailsStep />
+              </GridItem>
+              <GridItem md={12}>
+                <GridContainer>
+                  <GridItem md={8} style={{ paddingTop: 16 }}>
+                    <Typography.Text strong>Specimen Details: </Typography.Text>
+                  </GridItem>
+                  <GridItem md={4} style={{ padding: 8, textAlign: 'right' }}>
+                    <VisitTypeTag type={entity.visitPurposeFK} />
+                  </GridItem>
+                  <GridItem md={12} style={{ padding: 8 }}>
+                    <Table
+                      bordered
+                      columns={specimenInfoColumns}
+                      dataSource={[entity]}
+                      pagination={false}
+                      size='small'
+                    />
+                  </GridItem>
+                  <GridItem md={12} style={{ paddingTop: 16 }}>
+                    <Typography.Text strong>Order Details: </Typography.Text>
+                  </GridItem>
+                  <GridItem md={12} style={{ padding: 8 }}>
+                    <Table
+                      bordered
+                      columns={orderInfoColumns}
+                      dataSource={[...(entity.specimenOrders ?? [])].sort(
+                        item => item.serviceName,
+                      )}
+                      pagination={false}
+                      size='small'
+                    />
+                  </GridItem>
+                </GridContainer>
+              </GridItem>
+            </React.Fragment>
+          )}
+          <GridItem md={12}>
+            <GridContainer>
+              <GridItem md={12} style={{ paddingTop: 16, display: 'flex' }}>
+                <Space>
+                  <Typography.Text strong style={{ flexGrow: 1 }}>
+                    Final Result:
+                  </Typography.Text>
+
+                  <Checkbox onChange={e => console.log} />
+                  <span>Display Raw Data</span>
+                </Space>
+                <div style={{ flexGrow: 1, textAlign: 'right' }}>
+                  <Icon
+                    type={isResultFullScreen ? 'fullscreen-exit' : 'fullscreen'}
+                    style={{ border: '1px solid', fontSize: '1rem' }}
+                    onClick={() => setIsResultFullScreen(!isResultFullScreen)}
+                  />
+                </div>
+              </GridItem>
+              <GridItem md={12} style={{ paddingTop: 8 }}>
+                <EditableTable />
+              </GridItem>
+            </GridContainer>
+          </GridItem>
+        </GridContainer>
+      </div>
     </CommonModal>
   )
 }
