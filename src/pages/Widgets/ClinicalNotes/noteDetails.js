@@ -83,7 +83,7 @@ class NoteDetails extends Component {
       scribbleNoteUpdateState,
       onSettingClick,
       onCannedTextClick,
-      loading,
+      consultation,
       onRichEditorBlur,
     } = this.props
     return (
@@ -126,7 +126,7 @@ class NoteDetails extends Component {
             this.richEditor = ref
           }}
           autoFocus={index === 0}
-          disabled={loading.global}
+          disabled={!consultation.entity?.loaded}
           style={{ marginBottom: 0 }}
           strongLabel
           onRichEditorBlur={onRichEditorBlur}

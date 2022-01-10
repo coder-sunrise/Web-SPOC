@@ -24,10 +24,28 @@ class HistoryDetails extends PureComponent {
     this.widgets = WidgetConfig.widgets(
       props,
       props.scribbleNoteUpdateState,
+      this.getSelectNoteTypes,
     ).filter(o => {
-      const accessRight = Authorized.check(o.authority)
-      return accessRight && accessRight.rights !== 'hidden'
+      if (o.id === WidgetConfig.WIDGETS_ID.DOCTORNOTE) {
+        return this.getSelectNoteTypes().length > 0
+      }
+      return props.getCategoriesOptions().find(c => c.value === o.id)
     })
+  }
+
+  getSelectNoteTypes = () => {
+    return [
+      WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
+      WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
+      WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
+      WidgetConfig.WIDGETS_ID.PLAN,
+    ].filter(
+      n =>
+        this.props
+          .getCategoriesOptions()
+          .map(c => c.value)
+          .indexOf(n) >= 0,
+    )
   }
 
   componentWillMount() {
@@ -197,7 +215,13 @@ class HistoryDetails extends PureComponent {
   }
 
   detailPanel = () => {
-    const { classes, override = {}, patientHistory, selectHistory } = this.props
+    const {
+      classes,
+      override = {},
+      patientHistory,
+      selectHistory,
+      getCategoriesOptions,
+    } = this.props
     let visitDetails = {
       visitDate: selectHistory.visitDate,
       patientName: selectHistory.patientName,
@@ -234,7 +258,11 @@ class HistoryDetails extends PureComponent {
                 WidgetConfig.showWidget(current, _widget.id)
               )
             }
-            return WidgetConfig.showWidget(current, _widget.id)
+            return WidgetConfig.showWidget(
+              current,
+              _widget.id,
+              getCategoriesOptions(),
+            )
           })
           .map(o => {
             const Widget = o.component

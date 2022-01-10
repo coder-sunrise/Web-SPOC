@@ -557,6 +557,7 @@ export default createFormViewModel({
         const { corEyeRefractionForm, corEyeExaminationForm } = newResponse
         data.corEyeRefractionForm = corEyeRefractionForm
         data.corEyeExaminationForm = corEyeExaminationForm
+        data.loaded = true
         return payload
       },
     },
