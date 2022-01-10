@@ -175,6 +175,8 @@ export default {
   'menu.setting.drugallergy': 'Drug Allergy',
   'menu.setting.administrationroute': 'Route of Administration',
   'menu.setting.checklist': 'Checklist',
+  'menu.setting.individualcomment': 'Individual Comment',
+  'menu.setting.summarycomment': 'Summary Comment',
   'menu.setting.resource': 'Resource',
 
   'menu.report': 'Report',
@@ -220,6 +222,7 @@ export default {
   'menu.lab': 'Lab Center',
   'menu.lab.worklist': 'Worklist',
   'menu.lab.history': 'History',
+  'menu.lab.specimenCollection': 'Specimen Collection',
 
   'menu.not-found': 'Not Found',
   'menu.forbidden': 'Forbidden',

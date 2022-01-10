@@ -79,7 +79,6 @@ const MultiLangCodeList = ({
       style={{ height: 200, overflow: 'auto' }}
       dataSource={codeList}
       renderItem={(item, i) => {
-        console.log('item', item)
         return (
           <div style={{ padding: 10, display: 'flex' }}>
             <span

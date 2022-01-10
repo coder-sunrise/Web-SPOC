@@ -6,7 +6,7 @@ import InfoCircleOutlined from '@ant-design/icons/InfoCircleOutlined'
 import moment from 'moment'
 import Search from '@material-ui/icons/Search'
 import Refresh from '@material-ui/icons/Refresh'
-import { CLINICAL_ROLE, PRIORITIES } from '@/utils/constants'
+import { CLINICAL_ROLE, PRIORITY_OPTIONS, VISIT_TYPE } from '@/utils/constants'
 import {
   TextField,
   DatePicker,
@@ -18,13 +18,13 @@ import {
   IconButton,
   Popover,
   Button,
+  VisitTypeSelect,
 } from '@/components'
 import WorklistContext from '../WorklistContext'
-import { StatusButtons } from './StatusButtons'
 
 export const WorklistFilter = () => {
   const [form] = Form.useForm()
-  const { isAnyModelOpened, getVisitTypes } = useContext(WorklistContext)
+  const { isAnyWorklistModelOpened } = useContext(WorklistContext)
   const [refreshDate, setRefreshDate] = useState(moment())
   const dispatch = useDispatch()
 
@@ -34,14 +34,14 @@ export const WorklistFilter = () => {
     state => state.user.data.clinicianProfile,
   )
 
-  const { autoRefreshRadiologyWorklistInterval = 30 } = settings
+  const { autoRefreshLabWorklistInterval = 30 } = settings
 
   const timer = React.useRef(null)
 
   const startTimer = () => {
     timer.current = setInterval(() => {
       handleSearch()
-    }, autoRefreshRadiologyWorklistInterval * 1000)
+    }, autoRefreshLabWorklistInterval * 1000)
   }
 
   const stopTimer = () => {
@@ -59,10 +59,11 @@ export const WorklistFilter = () => {
         },
       },
     })
+    handleSearch()
   }, [])
 
   useEffect(() => {
-    if (isAnyModelOpened) {
+    if (isAnyWorklistModelOpened) {
       stopTimer()
     } else {
       handleSearch()
@@ -70,7 +71,7 @@ export const WorklistFilter = () => {
     }
 
     return () => clearInterval(timer.current)
-  }, [isAnyModelOpened])
+  }, [isAnyWorklistModelOpened])
 
   const handleSearch = () => {
     const {
@@ -93,9 +94,10 @@ export const WorklistFilter = () => {
           priority: priority
             ? priority.filter(t => t !== -99).join(',')
             : undefined,
-          visitDoctor: visitDoctor
-            ? visitDoctor.filter(t => t !== -99).join(',')
-            : undefined,
+          visitDoctor:
+            visitDoctor && !visitDoctor.includes(-99)
+              ? visitDoctor.join(',')
+              : undefined,
           filterFrom: dateFrom,
           filterTo: moment(dateTo)
             .endOf('day')
@@ -110,23 +112,23 @@ export const WorklistFilter = () => {
   }
 
   return (
-    <Card>
+    <Card bordered={false}>
       <Form form={form} layout='inline' initialValues={{}}>
         <div style={{ display: 'flex', width: '100%' }}>
           <Form.Item name='searchValue'>
             <TextField
-              label={formatMessage({ id: 'radiology.search.general' })}
+              label={formatMessage({ id: 'lab.search.general' })}
               style={{ width: 350 }}
             />
           </Form.Item>
           <Form.Item name='visitDoctor' initialValue={[-99]}>
             <Select
-              label='Visit Doctor'
+              label={formatMessage({ id: 'lab.search.visitDoctor' })}
               options={doctorprofile.map(item => ({
                 value: item.id,
                 name: item.clinicianProfile.name,
               }))}
-              style={{ width: 170 }}
+              style={{ width: 180 }}
               mode='multiple'
               maxTagCount={0}
               maxTagPlaceholder='Visit Doctor'
@@ -134,8 +136,8 @@ export const WorklistFilter = () => {
           </Form.Item>
           <Form.Item name='priority' initialValue={[-99]}>
             <Select
-              label='Priority'
-              options={PRIORITIES}
+              label={formatMessage({ id: 'lab.search.priority' })}
+              options={PRIORITY_OPTIONS}
               style={{ width: 170 }}
               mode='multiple'
               maxTagCount={0}
@@ -143,16 +145,16 @@ export const WorklistFilter = () => {
             />
           </Form.Item>
           <Form.Item name='visitType' initialValue={[-99]}>
-            <Select
-              label='Visit Type'
-              options={getVisitTypes().map(item => ({
-                value: item.id,
-                ...item,
-              }))}
-              style={{ width: 170 }}
+            <VisitTypeSelect
+              label={formatMessage({ id: 'lab.search.visittype' })}
               mode='multiple'
               maxTagCount={0}
               maxTagPlaceholder='Visit Types'
+              style={{ width: 170 }}
+              localFilter={item => {
+                return item.id !== VISIT_TYPE.OTC
+              }}
+              allowClear={true}
             />
           </Form.Item>
 

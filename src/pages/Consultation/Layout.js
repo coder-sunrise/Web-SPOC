@@ -462,20 +462,21 @@ class Layout extends PureComponent {
     return ((this.props.height || window.innerHeight) - topHeight) / 6
   }
 
-  onAnchorClick = id => {
-    const parentElement = document.getElementById('mainPanel-root')
+  onAnchorClick = (id) => {
+    const parentElement = document.getElementById('main-page')
     const element = document.getElementById(id)
     try {
       if (parentElement && element) {
         const screenPosition = element.getBoundingClientRect()
         const { scrollTop } = parentElement
-        const { top, left } = screenPosition
-
+        const { top, left } = screenPosition 
         parentElement.scrollTo({
           // scrolled top position + element top position - Nav header height and Patient Banner height
-          top: scrollTop + top - 208,
-          left,
-          behavior: 'smooth',
+          top:
+            scrollTop +
+            top -
+            (document.getElementById('patientBanner').offsetHeight + 108),
+          left, 
         })
       }
     } catch (error) {
@@ -656,8 +657,6 @@ class Layout extends PureComponent {
             ref={this.layoutContainer}
             style={{
               height: height ? this.props.height - 116 : 'auto',
-              overflowY: 'auto',
-              overflowX: 'hidden',
               marginTop: 1,
               position: 'relative',
             }}

@@ -1,4 +1,5 @@
 import React, { setState } from 'react'
+import { compose } from 'redux'
 import classnames from 'classnames'
 import withStyles from '@material-ui/core/styles/withStyles'
 import CustomInput from 'mui-pro-components/CustomInput'
@@ -66,9 +67,6 @@ const ListItem = ({ classes, title, onClick }) => {
   )
 }
 
-@connect(({ settingChecklist }) => ({
-  settingChecklist,
-}))
 class Checklist extends React.Component {
   state = {
     checklistGroups: [],
@@ -213,4 +211,9 @@ class Checklist extends React.Component {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(Checklist)
+export default compose(
+  withStyles(styles, { withTheme: true }),
+  connect(({ settingChecklist }) => ({
+    settingChecklist,
+  })),
+)(Checklist)

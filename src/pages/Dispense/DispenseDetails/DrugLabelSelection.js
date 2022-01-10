@@ -66,19 +66,9 @@ class DrugLabelSelection extends React.PureComponent {
       type: 'number',
       width: 80,
       sortingEnabled: false,
-      render: row => {
-        return (
-          <p>
-            <NumberInput
-              max={99}
-              precision={0}
-              min={1}
-              value={row.no}
-              defaultValue={1}
-            />
-          </p>
-        )
-      },
+      precision: 0,
+      min: 1,
+      max: 99,
     },
   ]
 
@@ -108,7 +98,10 @@ class DrugLabelSelection extends React.PureComponent {
         if (source === 'pharmacy') {
           data = _.orderBy(
             data,
-            ['dispenseByPharmacy', 'displayName'],
+            [
+              data => data.dispenseByPharmacy,
+              data => data.displayName.toLowerCase(),
+            ],
             ['desc', 'asc'],
           )
         } else {

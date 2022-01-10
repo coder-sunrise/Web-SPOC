@@ -16,6 +16,7 @@ import {
   dateFormatLong,
   IconButton,
   Popover,
+  VisitTypeSelect,
 } from '@/components'
 import { formatMessage } from 'umi'
 import WorklistContext from '../Worklist/WorklistContext'
@@ -52,9 +53,7 @@ export const WorklistFilter = () => {
   const [form] = Form.useForm()
   const dispatch = useDispatch()
 
-  const { detailsId, visitPurpose = [], filterWorklist } = useContext(
-    WorklistContext,
-  )
+  const { detailsId, filterWorklist } = useContext(WorklistContext)
   const { settings } = useSelector(s => s.clinicSettings)
   const clinicianProfile = useSelector(
     state => state.user.data.clinicianProfile,
@@ -85,17 +84,6 @@ export const WorklistFilter = () => {
     return () => clearInterval(timer.current)
   }, [detailsId])
 
-  const getVisitTypes = () => {
-    if (!visitPurpose) return []
-    return visitPurpose
-      .filter(p => p.id !== VISIT_TYPE.OTC)
-      .map(c => ({
-        name: c.name,
-        value: c.id,
-        customTooltipField: `Code: ${c.code}\nName: ${c.name}`,
-      }))
-  }
-
   const handleSearch = () => {
     const filter = form.getFieldsValue(true)
     filterWorklist(filter)
@@ -110,13 +98,16 @@ export const WorklistFilter = () => {
         />
       </Form.Item>
       <Form.Item name='visitType' initialValue={[-99]}>
-        <Select
+        <VisitTypeSelect
           label='Visit Type'
-          options={getVisitTypes()}
-          style={{ width: 170 }}
           mode='multiple'
           maxTagCount={0}
           maxTagPlaceholder='Visit Types'
+          style={{ width: 170 }}
+          localFilter={item => {
+            return item.id !== VISIT_TYPE.OTC
+          }}
+          allowClear={true}
         />
       </Form.Item>
       <Form.Item name='modality' initialValue={[-99]}>

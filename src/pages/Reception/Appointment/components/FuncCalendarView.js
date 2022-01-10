@@ -289,24 +289,16 @@ const CalendarView = ({
     return true
   }
   const _eventColors = event => {
-    const { doctor } = event.data
+    const { isDoctorBlock } = event.data
 
-    if (doctor) {
+    if (isDoctorBlock) {
       event.element.style.backgroundColor = doctorEventColorOpts.value
       return
     }
 
-    let appointmentType
-    if (calendarView !== CALENDAR_VIEWS.MONTH) {
-      appointmentType = appointmentTypes.find(
-        item => item.id === event.data.appointmentTypeFK,
-      )
-    } else {
-      const appointmentTypeFK = getFirstAppointmentType(event.data)
-      appointmentType =
-        appointmentTypeFK !== null &&
-        appointmentTypes.find(item => item.id === appointmentTypeFK)
-    }
+    const appointmentType = appointmentTypes.find(
+      item => item.id === event.data.appointmentTypeFK,
+    )
 
     event.element.style.backgroundColor = !appointmentType
       ? primaryColor

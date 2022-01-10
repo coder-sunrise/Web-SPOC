@@ -196,7 +196,7 @@ class Appointment extends React.PureComponent {
 
         resources = _.orderBy(
           response.data || [],
-          ['resourceType', 'sortOrder', 'name'],
+          ['resourceType', 'sortOrder', source => source.name.toUpperCase()],
           ['asc'],
         )
           .filter(calendarResource => calendarResource.isActive)
@@ -261,8 +261,11 @@ class Appointment extends React.PureComponent {
     })
 
     dispatch({
-      type: 'calendar/setCurrentViewDate',
-      payload: moment().toDate(),
+      type: 'calendar/updateState',
+      payload: {
+        currentViewDate: moment().toDate(),
+        calendarView: CALENDAR_VIEWS.DAY,
+      },
     })
   }
 
@@ -302,7 +305,7 @@ class Appointment extends React.PureComponent {
     if (response) {
       newResources = _.orderBy(
         response.data || [],
-        ['resourceType', 'sortOrder', 'name'],
+        ['resourceType', 'sortOrder', source => source.name.toUpperCase()],
         ['asc'],
       )
         .filter(calendarResource =>
@@ -605,7 +608,7 @@ class Appointment extends React.PureComponent {
     if (response) {
       newResources = _.orderBy(
         response.data || [],
-        ['resourceType', 'sortOrder', 'name'],
+        ['resourceType', 'sortOrder', source => source.name.toUpperCase()],
         ['asc'],
       )
         .filter(calendarResource =>
@@ -798,7 +801,7 @@ class Appointment extends React.PureComponent {
       const { filterByDoctor = [], filterBySingleDoctor } = this.state.filter
       const newResources = _.orderBy(
         response.data || [],
-        ['resourceType', 'sortOrder', 'name'],
+        ['resourceType', 'sortOrder', source => source.name.toUpperCase()],
         ['asc'],
       )
         .filter(calendarResource =>
