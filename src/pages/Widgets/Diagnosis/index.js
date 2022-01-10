@@ -9,21 +9,19 @@ import { AuthorizedContext, Button } from '@/components'
 import Authorized from '@/utils/Authorized'
 import Item from './Item'
 
-const styles = (theme) => ({
+const styles = theme => ({
   diagnosisRow: {
     marginBottom: theme.spacing(1),
     padding: theme.spacing(0.5),
   },
 })
-const { Secured } = Authorized
-@Secured('queue.consultation.widgets.diagnosis')
 @connect(({ diagnosis, codetable, consultation }) => ({
   diagnosis,
   codetable,
   consultation,
 }))
 class Diagnosis extends PureComponent {
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props
     dispatch({
       type: 'codetable/fetchCodes',
@@ -43,7 +41,7 @@ class Diagnosis extends PureComponent {
       payload: {
         type: '8',
       },
-    }).then((response) => {
+    }).then(response => {
       if (response) {
         const { favouriteDiagnosisLanguage: favouriteLanguage } = response
         this.props.dispatch({
@@ -56,8 +54,11 @@ class Diagnosis extends PureComponent {
     })
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (!this.props.diagnosis.shouldAddNew && nextProps.diagnosis.shouldAddNew) {
+  componentWillReceiveProps(nextProps) {
+    if (
+      !this.props.diagnosis.shouldAddNew &&
+      nextProps.diagnosis.shouldAddNew
+    ) {
       let index = 0
       if (this.diagnosises.length === 0) {
         index = 1
@@ -74,11 +75,11 @@ class Diagnosis extends PureComponent {
     }
   }
 
-  addDiagnosis = (index) => {
+  addDiagnosis = index => {
     const { diagnosis } = this.props
     let currentSelectCategory = diagnosis.favouriteDiagnosisCategory || []
     if (currentSelectCategory.length === 4) {
-      currentSelectCategory = [ 'all', ...currentSelectCategory ]
+      currentSelectCategory = ['all', ...currentSelectCategory]
     }
     this.arrayHelpers.push({
       uid: getUniqueGUID(),
@@ -98,12 +99,12 @@ class Diagnosis extends PureComponent {
     this.addDiagnosis(index + 1)
   }
 
-  clearFavouriteDiagnosisMessage = (uid) => {
+  clearFavouriteDiagnosisMessage = uid => {
     const { form } = this.arrayHelpers
     const { values, setFieldValue } = form
     setFieldValue(
       'corDiagnosis',
-      (values.corDiagnosis || []).map((d) => {
+      (values.corDiagnosis || []).map(d => {
         if (d.uid === uid) {
           return {
             ...d,
@@ -111,16 +112,16 @@ class Diagnosis extends PureComponent {
           }
         }
         return d
-      })
+      }),
     )
   }
 
-  clearFavouriteDiagnosisCategoryMessage = (uid) => {
+  clearFavouriteDiagnosisCategoryMessage = uid => {
     const { form } = this.arrayHelpers
     const { values, setFieldValue } = form
     setFieldValue(
       'corDiagnosis',
-      (values.corDiagnosis || []).map((d) => {
+      (values.corDiagnosis || []).map(d => {
         if (d.uid === uid) {
           return {
             ...d,
@@ -128,7 +129,7 @@ class Diagnosis extends PureComponent {
           }
         }
         return d
-      })
+      }),
     )
   }
 
@@ -136,11 +137,16 @@ class Diagnosis extends PureComponent {
     const { dispatch, diagnosis } = this.props
     let newFavouriteDiagnosis
     let addNewFavorite
-    if ((diagnosis.favouriteDiagnosis || []).find((d) => d === dignosisCode)) {
-      newFavouriteDiagnosis = (diagnosis.favouriteDiagnosis || []).filter((d) => d !== dignosisCode)
+    if ((diagnosis.favouriteDiagnosis || []).find(d => d === dignosisCode)) {
+      newFavouriteDiagnosis = (diagnosis.favouriteDiagnosis || []).filter(
+        d => d !== dignosisCode,
+      )
     } else {
       addNewFavorite = true
-      newFavouriteDiagnosis = [ ...(diagnosis.favouriteDiagnosis || []), dignosisCode ]
+      newFavouriteDiagnosis = [
+        ...(diagnosis.favouriteDiagnosis || []),
+        dignosisCode,
+      ]
     }
     dispatch({
       type: 'diagnosis/saveUserPreference',
@@ -152,20 +158,20 @@ class Diagnosis extends PureComponent {
         itemIdentifier: 'FavouriteDiagnosis',
         type: '6',
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         dispatch({
           type: 'diagnosis/getUserPreference',
           payload: {
             type: '6',
           },
-        }).then((response) => {
+        }).then(response => {
           if (response) {
             const { form } = this.arrayHelpers
             const { values, setFieldValue } = form
             setFieldValue(
               'corDiagnosis',
-              (values.corDiagnosis || []).map((d) => {
+              (values.corDiagnosis || []).map(d => {
                 if (d.uid === uid) {
                   return {
                     ...d,
@@ -175,7 +181,7 @@ class Diagnosis extends PureComponent {
                   }
                 }
                 return d
-              })
+              }),
             )
 
             setTimeout(() => {
@@ -198,20 +204,20 @@ class Diagnosis extends PureComponent {
         },
         itemIdentifier: 'FavouriteDiagnosisCategory',
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         dispatch({
           type: 'diagnosis/getUserPreference',
           payload: {
             type: '6',
           },
-        }).then((response) => {
+        }).then(response => {
           if (response) {
             const { form } = this.arrayHelpers
             const { values, setFieldValue } = form
             setFieldValue(
               'corDiagnosis',
-              (values.corDiagnosis || []).map((d) => {
+              (values.corDiagnosis || []).map(d => {
                 if (d.uid === uid) {
                   return {
                     ...d,
@@ -219,7 +225,7 @@ class Diagnosis extends PureComponent {
                   }
                 }
                 return d
-              })
+              }),
             )
 
             setTimeout(() => {
@@ -231,14 +237,23 @@ class Diagnosis extends PureComponent {
     })
   }
 
-  render () {
-    const { rights, diagnosis } = this.props
-
+  getDiagnosisAccessRight = () => {
+    const { isEnableEditOrder = true } = this.props
+    let right = Authorized.check('queue.consultation.widgets.diagnosis') || {
+      rights: 'hidden',
+    }
+    if (right.rights === 'enable' && !isEnableEditOrder) {
+      right = { rights: 'disable' }
+    }
+    return right
+  }
+  render() {
+    const { rights, diagnosis, user, visitRegistration } = this.props
     return (
       <div>
         <FieldArray
-          name="corDiagnosis"
-          render={(arrayHelpers) => {
+          name='corDiagnosis'
+          render={arrayHelpers => {
             const { form } = arrayHelpers
             const { values } = form
             this.diagnosises = values.corDiagnosis || []
@@ -254,41 +269,56 @@ class Diagnosis extends PureComponent {
             return this.diagnosises.map((v, i) => {
               if (v.isDeleted === true) return null
               return (
-                <div key={v.uid}>
-                  <Item
-                    {...this.props}
-                    ctCompilation={this.props.codetable}
-                    index={i}
-                    arrayHelpers={arrayHelpers}
-                    diagnosises={this.diagnosises}
-                    saveCategoryAsFavourite={this.saveCategoryAsFavourite}
-                    saveDiagnosisAsFavourite={this.saveDiagnosisAsFavourite}
-                    uid={v.uid}
-                    diagnosisCode={v.diagnosisCode}
-                    favouriteDiagnosisMessage={v.favouriteDiagnosisMessage}
-                    favouriteDiagnosisCategoryMessage={v.favouriteDiagnosisCategoryMessage}
-                    favouriteDiagnosis={diagnosis.favouriteDiagnosis || []}
-                    favouriteDiagnosisCategory={diagnosis.favouriteDiagnosisCategory || []}
-                    currentSelectCategory={v.currentSelectCategory || []}
-                  />
-                </div>
+                <AuthorizedContext.Provider
+                  value={this.getDiagnosisAccessRight()}
+                >
+                  <div key={v.uid}>
+                    <Item
+                      {...this.props}
+                      ctCompilation={this.props.codetable}
+                      index={i}
+                      arrayHelpers={arrayHelpers}
+                      diagnosises={this.diagnosises}
+                      saveCategoryAsFavourite={this.saveCategoryAsFavourite}
+                      saveDiagnosisAsFavourite={this.saveDiagnosisAsFavourite}
+                      uid={v.uid}
+                      diagnosisCode={v.diagnosisCode}
+                      favouriteDiagnosisMessage={v.favouriteDiagnosisMessage}
+                      favouriteDiagnosisCategoryMessage={
+                        v.favouriteDiagnosisCategoryMessage
+                      }
+                      favouriteDiagnosis={diagnosis.favouriteDiagnosis || []}
+                      favouriteDiagnosisCategory={
+                        diagnosis.favouriteDiagnosisCategory || []
+                      }
+                      currentSelectCategory={v.currentSelectCategory || []}
+                    />
+                  </div>
+                </AuthorizedContext.Provider>
               )
             })
           }}
         />
 
-        <AuthorizedContext>
-          {(r) => {
-            if (r.rights !== 'enable') return null
-            return (
-              <div>
-                <Button size="sm" color="primary" onClick={this.handleAddDiagnosisClick}>
-                  <Add />Add Diagnosis
-                </Button>
-              </div>
-            )
+        <AuthorizedContext.Provider
+          value={{
+            rights:
+              this.getDiagnosisAccessRight().rights !== 'enable'
+                ? 'hidden'
+                : 'enable',
           }}
-        </AuthorizedContext>
+        >
+          <div>
+            <Button
+              size='sm'
+              color='primary'
+              onClick={this.handleAddDiagnosisClick}
+            >
+              <Add />
+              Add Diagnosis
+            </Button>
+          </div>
+        </AuthorizedContext.Provider>
       </div>
     )
   }

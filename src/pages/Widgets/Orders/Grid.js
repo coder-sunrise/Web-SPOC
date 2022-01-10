@@ -24,6 +24,7 @@ import {
   NumberInput,
   Checkbox,
   Switch,
+  AuthorizedContext,
 } from '@/components'
 import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
@@ -38,6 +39,7 @@ export default ({
   codetable,
   theme,
   isFullScreen = false,
+  isEnableEditOrder = true,
 }) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
   const { total, gst, totalWithGST, subTotal } = summary
@@ -48,6 +50,16 @@ export default ({
   const [isExistPackage, setIsExistPackage] = useState(false)
 
   const [expandedGroups, setExpandedGroups] = useState([])
+
+  const getOrderAccessRight = accessRight => {
+    let right = Authorized.check(accessRight) || {
+      rights: 'hidden',
+    }
+    if (right.rights === 'enable' && !isEnableEditOrder) {
+      right = { rights: 'disable' }
+    }
+    return right
+  }
 
   const handleExpandedGroupsChange = e => {
     setExpandedGroups(e)
@@ -116,6 +128,7 @@ export default ({
   }
 
   const editRow = row => {
+    if (!isEnableEditOrder) return
     const { workitem = {} } = row
     const { nurseWorkitem = {}, radiologyWorkitem = {} } = workitem
     const { nuseActualize = [] } = nurseWorkitem
@@ -272,7 +285,9 @@ export default ({
           marginLeft: theme.spacing(1),
         }}
       >
-        <Authorized authority={OrderAccessRight()}>
+        <AuthorizedContext.Provider
+          value={getOrderAccessRight(OrderAccessRight())}
+        >
           <Checkbox
             simple
             label={`Inclusive GST (${numeral(gstValue).format('0.00')}%)`}
@@ -294,7 +309,7 @@ export default ({
               })
             }}
           />
-        </Authorized>
+        </AuthorizedContext.Provider>
       </div>
     )
   }
@@ -324,7 +339,9 @@ export default ({
             <span>{adj.adjRemark}</span>
           </Tooltip>
         </div>
-        <Authorized authority={OrderAccessRight()}>
+        <AuthorizedContext.Provider
+          value={getOrderAccessRight(OrderAccessRight())}
+        >
           <div
             style={{
               marginLeft: isExistPackage
@@ -365,7 +382,7 @@ export default ({
               </Button>
             </Tooltip>
           </div>
-        </Authorized>
+        </AuthorizedContext.Provider>
       </div>
     )
   })
@@ -515,7 +532,6 @@ export default ({
       )
     return ''
   }
-
   return (
     <CommonTableGrid
       size='sm'
@@ -695,7 +711,9 @@ export default ({
                         <span>
                           Invoice Adjustment
                           <Tooltip title='Add Adjustment'>
-                            <Authorized authority={OrderAccessRight()}>
+                            <AuthorizedContext.Provider
+                              value={getOrderAccessRight(OrderAccessRight())}
+                            >
                               <Button
                                 justIcon
                                 color='primary'
@@ -707,7 +725,7 @@ export default ({
                               >
                                 <Add />
                               </Button>
-                            </Authorized>
+                            </AuthorizedContext.Provider>
                           </Tooltip>
                         </span>
                       </div>
@@ -1000,7 +1018,9 @@ export default ({
               }
             }
             return (
-              <Authorized authority={editAccessRight}>
+              <AuthorizedContext.Provider
+                value={getOrderAccessRight(editAccessRight)}
+              >
                 <div>
                   <Tooltip title={editMessage}>
                     <Button
@@ -1071,7 +1091,7 @@ export default ({
                     </Button>
                   </Tooltip>
                 </div>
-              </Authorized>
+              </AuthorizedContext.Provider>
             )
           },
         },
@@ -1091,7 +1111,9 @@ export default ({
             const { workitem = {} } = row
             const {
               nurseWorkitem = {},
-              radiologyWorkitem = { statusFK: RADIOLOGY_WORKITEM_STATUS.NEW },
+              radiologyWorkitem = {
+                statusFK: RADIOLOGY_WORKITEM_STATUS.NEW,
+              },
             } = workitem
             let editEnable = true
             if (!row.isPreOrder) {
@@ -1109,7 +1131,9 @@ export default ({
               }
             }
             return (
-              <Authorized authority={editAccessRight}>
+              <AuthorizedContext.Provider
+                value={getOrderAccessRight(editAccessRight)}
+              >
                 <Switch
                   checkedValue='Urgent'
                   unCheckedValue='Normal'
@@ -1131,7 +1155,7 @@ export default ({
                     })
                   }}
                 />
-              </Authorized>
+              </AuthorizedContext.Provider>
             )
           },
         },

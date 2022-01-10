@@ -24,6 +24,7 @@ export default ({
   handleCalculateBMI,
   weightOnChange,
   handelDelete,
+  isShowDelete = true,
   ...props
 }) => {
   const [show, setShow] = useState(false)
@@ -113,7 +114,7 @@ export default ({
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.weight.suffix',
                 })}
-                onChange={async (e) => {
+                onChange={async e => {
                   const { form } = arrayHelpers
                   await form.setFieldValue(
                     `corPatientNoteVitalSign[${index}].weightKG`,
@@ -214,26 +215,28 @@ export default ({
               <DeleteIcon />
             </Button>
           </Popover> */}
-          <Popconfirm
-            title='Confirm to remove this Vital Sign?'
-            onConfirm={async () => {
-              const { form } = arrayHelpers
-              await form.setFieldValue(
-                `corPatientNoteVitalSign[${index}].isDeleted`,
-                true,
-              )
-              handelDelete()
-            }}
-          >
-            <Button
-              style={{ position: 'absolute', bottom: theme.spacing(1) }}
-              justIcon
-              color='danger'
-              size='sm'
+          {isShowDelete && (
+            <Popconfirm
+              title='Confirm to remove this Vital Sign?'
+              onConfirm={async () => {
+                const { form } = arrayHelpers
+                await form.setFieldValue(
+                  `corPatientNoteVitalSign[${index}].isDeleted`,
+                  true,
+                )
+                handelDelete()
+              }}
             >
-              <DeleteIcon />
-            </Button>
-          </Popconfirm>
+              <Button
+                style={{ position: 'absolute', bottom: theme.spacing(1) }}
+                justIcon
+                color='danger'
+                size='sm'
+              >
+                <DeleteIcon />
+              </Button>
+            </Popconfirm>
+          )}
         </GridItem>
       </GridContainer>
       <Divider />

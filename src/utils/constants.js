@@ -900,3 +900,10 @@ export const LAB_SPECIMEN_STATUS_DESCRIPTION = {
   6: 'Completed',
   7: 'Discarded',
 }
+
+export const VISITDOCTOR_CONSULTATIONSTATUS = {
+  WAITING: 'Waiting',
+  INPROGRESS: 'In Progress',
+  PAUSED: 'Paused',
+  COMPLETED: 'Completed',
+}

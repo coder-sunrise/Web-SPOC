@@ -22,10 +22,12 @@ import {
   Popover,
   IconButton,
   Icon,
+  EditableTableGrid,
+  Popconfirm,
+  Button,
 } from '@/components'
 // medisys components
 import {
-  DoctorLabel,
   DoctorProfileSelect,
   Attachment,
   AttachmentWithThumbnail,
@@ -36,6 +38,7 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
 import { roundTo, getMappedVisitType } from '@/utils/utils'
 import numeral from 'numeral'
 import FormField from './formField'
+import { getMCReportLanguage } from './miscUtils'
 import Authorized from '@/utils/Authorized'
 import CannedTextButton from '@/pages/Widgets/Orders/Detail/CannedTextButton'
 
@@ -174,6 +177,24 @@ const VisitInfoCard = ({
       i => i.id === values.visitOrderTemplateFK,
     )
     setFieldValue(FormField['visit.visitType'], v)
+
+    if (v != VISIT_TYPE.MC) {
+      setFieldValue('visitDoctor', [
+        ...values.visitDoctor.map(d => {
+          return { ...d, isDeleted: true }
+        }),
+      ])
+
+      setFieldValue('mcReportLanguage', undefined)
+      setFieldValue('mcReportPriority', undefined)
+      setFieldValue('mcUrgentReportRemarks', undefined)
+    } else {
+      setFieldValue('mcReportLanguage', [
+        getMCReportLanguage(patientInfo, clinicSettings.settings),
+      ])
+      setFieldValue('mcReportPriority', 'Normal')
+    }
+
     if (template) {
       handleVisitOrderTemplateChange(v, template)
     }
