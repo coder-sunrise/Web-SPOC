@@ -81,33 +81,41 @@ class Grid extends PureComponent {
   }
 
   enableSelectItem = item => {
-    const firstInstruction = (item.corPrescriptionItemInstruction || []).find(
-      item => !item.isDeleted,
-    )
-    if (item.isDrugMixture) {
-      const drugMixtures =
-        item.corPrescriptionItemDrugMixture ||
-        item.retailPrescriptionItemDrugMixture ||
-        []
-      if (
-        drugMixtures.find(
-          drugMixture =>
-            !drugMixture.isActive ||
-            !drugMixture.isOnlyClinicInternalUsage ||
-            drugMixture.inventoryDispenseUOMFK !== drugMixture.uomfk ||
-            drugMixture.inventoryPrescribingUOMFK !==
-              drugMixture.prescribeUOMFK,
-        )
-      ) {
-        return false
+    const { type } = this.props
+    if (type === '1') {
+      const firstInstruction = (item.corPrescriptionItemInstruction || []).find(
+        item => !item.isDeleted,
+      )
+      if (item.isDrugMixture) {
+        const drugMixtures =
+          item.corPrescriptionItemDrugMixture ||
+          item.retailPrescriptionItemDrugMixture ||
+          []
+        if (
+          drugMixtures.find(
+            drugMixture =>
+              !drugMixture.isActive ||
+              drugMixture.isOnlyClinicInternalUsage ||
+              drugMixture.inventoryDispenseUOMFK !== drugMixture.uomfk ||
+              drugMixture.inventoryPrescribingUOMFK !==
+                drugMixture.prescribeUOMFK,
+          )
+        ) {
+          return false
+        }
+        return true
       }
-      return true
+      return (
+        item.isActive &&
+        !item.isOnlyClinicInternalUsage &&
+        item.inventoryDispenseUOMFK === item.dispenseUOMFK &&
+        firstInstruction?.prescribeUOMFK === item.inventoryPrescribingUOMFK
+      )
     }
     return (
       item.isActive &&
-      item.isOnlyClinicInternalUsage &&
       item.inventoryDispenseUOMFK === item.dispenseUOMFK &&
-      firstInstruction?.prescribeUOMFK === item.inventoryPrescribingUOMFK
+      item.inventoryPrescribingUOMFK === item.uomfk
     )
   }
 
@@ -213,43 +221,54 @@ class Grid extends PureComponent {
                 item.corPrescriptionItemInstruction || []
               ).find(item => !item.isDeleted)
               let warningLabel
-              if (item.isDrugMixture) {
-                const drugMixtures =
-                  item.corPrescriptionItemDrugMixture ||
-                  item.retailPrescriptionItemDrugMixture ||
-                  []
-                if (drugMixtures.find(drugMixture => !drugMixture.isActive)) {
-                  warningLabel = '#1'
-                } else if (
-                  drugMixtures.find(
-                    drugMixture => !drugMixture.isOnlyClinicInternalUsage,
-                  )
-                ) {
-                  warningLabel = '#2'
-                } else if (
-                  drugMixtures.find(
-                    drugMixture =>
-                      drugMixture.inventoryDispenseUOMFK !==
-                        drugMixture.uomfk ||
-                      drugMixture.inventoryPrescribingUOMFK !==
-                        drugMixture.prescribeUOMFK,
-                  )
-                ) {
-                  warningLabel = '#3'
+              if (type === '1') {
+                if (item.isDrugMixture) {
+                  const drugMixtures =
+                    item.corPrescriptionItemDrugMixture ||
+                    item.retailPrescriptionItemDrugMixture ||
+                    []
+                  if (drugMixtures.find(drugMixture => !drugMixture.isActive)) {
+                    warningLabel = '#1'
+                  } else if (
+                    drugMixtures.find(
+                      drugMixture => drugMixture.isOnlyClinicInternalUsage,
+                    )
+                  ) {
+                    warningLabel = '#2'
+                  } else if (
+                    drugMixtures.find(
+                      drugMixture =>
+                        drugMixture.inventoryDispenseUOMFK !==
+                          drugMixture.uomfk ||
+                        drugMixture.inventoryPrescribingUOMFK !==
+                          drugMixture.prescribeUOMFK,
+                    )
+                  ) {
+                    warningLabel = '#3'
+                  }
+                } else {
+                  if (!item.isActive) {
+                    warningLabel = '#1'
+                  } else if (item.isOnlyClinicInternalUsage) {
+                    warningLabel = '#2'
+                  } else if (
+                    item.inventoryDispenseUOMFK !== item.dispenseUOMFK ||
+                    firstInstruction?.prescribeUOMFK !==
+                      item.inventoryPrescribingUOMFK
+                  ) {
+                    warningLabel = '#3'
+                  } else if (item.isExternalPrescription) {
+                    warningLabel = '#4'
+                  }
                 }
               } else {
                 if (!item.isActive) {
                   warningLabel = '#1'
-                } else if (!item.isOnlyClinicInternalUsage) {
-                  warningLabel = '#2'
                 } else if (
                   item.inventoryDispenseUOMFK !== item.dispenseUOMFK ||
-                  firstInstruction?.prescribeUOMFK !==
-                    item.inventoryPrescribingUOMFK
+                  item.inventoryPrescribingUOMFK !== item.uomfk
                 ) {
-                  warningLabel = '#3'
-                } else if (item.isExternalPrescription) {
-                  warningLabel = '#4'
+                  warningLabel = '#2'
                 }
               }
 
@@ -287,7 +306,7 @@ class Grid extends PureComponent {
                         {item.isDrugMixture &&
                           this.drugMixtureIndicator(item, -20)}
                         {item.isPreOrder && (
-                          <Tooltip title='Pre-Order'>
+                          <Tooltip title='New Pre-Order'>
                             <div
                               className={classes.rightIcon}
                               style={{
@@ -336,14 +355,10 @@ class Grid extends PureComponent {
                     </div>
                     <div className={classes.quantityColumn}>
                       <Tooltip
-                        title={`${
-                          item.quantity
-                        } ${item.dispenseUOMDisplayValue ||
-                          item.uomDisplayValue}`}
+                        title={`${item.quantity} ${item.dispenseUOMDisplayValue}`}
                       >
                         <span>
-                          {`${item.quantity} ${item.dispenseUOMDisplayValue ||
-                            item.uomDisplayValue}`}
+                          {`${item.quantity} ${item.dispenseUOMDisplayValue}`}
                         </span>
                       </Tooltip>
                     </div>
@@ -492,7 +507,11 @@ class Grid extends PureComponent {
                   <span style={{ color: 'red', fontStyle: 'italic' }}>
                     <sup>#1&nbsp;</sup>
                   </span>
-                  inactive vaccination
+                  inactive vaccination&nbsp;&nbsp;
+                  <span style={{ color: 'red', fontStyle: 'italic' }}>
+                    <sup>#2&nbsp;</sup>
+                  </span>
+                  dispense/prescribe UOM changed&nbsp;&nbsp;
                 </span>
               )}
             </div>

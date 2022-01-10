@@ -94,6 +94,7 @@ export const LAB_TRACKING_STATUS = {
 export const COPAYER_TYPE = {
   CORPORATE: 1,
   GOVERNMENT: 2,
+  INSURANCE: 3,
 }
 
 export const INVOICE_PAYER_TYPE = {
@@ -208,39 +209,39 @@ export const INVENTORY_ADJUSTMENT_STATUS = {
 }
 
 export const REPORT_TYPE = {
-         1: 'Queue Listing',
-         2: 'Patient Listing',
-         3: 'Sales Summary',
-         4: 'Payment Collection',
-         5: 'Session Summary',
-         6: 'Diagnosis Trending',
-         7: 'Medical Certificate',
-         8: 'Certificate of Attendance',
-         9: 'Referral Letter',
-         10: 'Vaccination Certificate',
-         11: 'Memo',
-         12: 'Other Documents',
-         13: 'Credit Note Listing',
-         14: 'Void Credit Note & Payment & Write Off',
-         15: 'Invoice',
-         16: 'Oustanding Payment',
-         17: 'Sales Listing',
-         18: 'Credit Note',
-         20: 'Low Stock',
-         21: 'Consumable Movement Report',
-         22: 'Medication Movement',
-         23: 'Deposit Transaction',
-         24: 'Drug Label',
-         25: 'Statement',
-         26: 'Purchase Order',
-         27: 'Patient Label',
-         29: 'Payment Receipt',
-         37: 'Inventory Trending Report',
-         55: 'Letter of Certification',
-         61: 'Refraction Form Report',
-         68: 'Patient History Report',
-         80: 'Visitation Invoice',
-       }
+  1: 'Queue Listing',
+  2: 'Patient Listing',
+  3: 'Sales Summary',
+  4: 'Payment Collection',
+  5: 'Session Summary',
+  6: 'Diagnosis Trending',
+  7: 'Medical Certificate',
+  8: 'Certificate of Attendance',
+  9: 'Referral Letter',
+  10: 'Vaccination Certificate',
+  11: 'Memo',
+  12: 'Other Documents',
+  13: 'Credit Note Listing',
+  14: 'Void Credit Note & Payment',
+  15: 'Invoice',
+  16: 'Oustanding Payment',
+  17: 'Sales Listing',
+  18: 'Credit Note',
+  20: 'Low Stock',
+  21: 'Consumable Movement Report',
+  22: 'Medication Movement',
+  23: 'Deposit Transaction',
+  24: 'Drug Label',
+  25: 'Statement',
+  26: 'Purchase Order',
+  27: 'Patient Label',
+  29: 'Payment Receipt',
+  37: 'Inventory Trending Report',
+  55: 'Letter of Certification',
+  61: 'Refraction Form Report',
+  68: 'Patient History Report',
+  80: 'Visitation Invoice',
+}
 
 export const REPORT_ID = {
   DRUG_LABEL_80MM_45MM: 24,
@@ -269,6 +270,9 @@ export const REPORT_ID = {
   REFERRAL_SOURCE_LABEL_80MM_45MM: 73,
   REFERRAL_SOURCE_LABEL_89MM_36MM: 74,
   REFERRAL_SOURCE_LABEL_76MM_38MM: 75,
+  PRESCRIPTION: 84,
+  PATIENT_INFO_LEAFLET: 87,
+  DRUG_LABEL_80MM_45MM_V2: 88,
 }
 
 export const INVOICE_STATUS = {
@@ -475,6 +479,8 @@ export const CANNED_TEXT_TYPE = {
   MEDICATIONREMARKS: 9,
   APPOINTMENTREMARKS: 10,
   SERVICEINSTRUCTION: 11,
+  LABINSTRUCTION: 12,
+  RADIOGRAPHERCOMMENT: 13,
 }
 
 export const CANNED_TEXT_TYPE_BASE_TEXT = [
@@ -483,6 +489,8 @@ export const CANNED_TEXT_TYPE_BASE_TEXT = [
   CANNED_TEXT_TYPE.MEDICATIONREMARKS,
   CANNED_TEXT_TYPE.APPOINTMENTREMARKS,
   CANNED_TEXT_TYPE.SERVICEINSTRUCTION,
+  CANNED_TEXT_TYPE.LABINSTRUCTION,
+  CANNED_TEXT_TYPE.RADIOGRAPHERCOMMENT,
 ]
 
 export const DENTAL_CANNED_TEXT_TYPE_FIELD = {
@@ -504,6 +512,8 @@ export const FILE_CATEGORY = {
   VISITREG: 1,
   CONSULTATION: 2,
   PATIENT: 3,
+  QUEUEDISPLAY: 4,
+  COPAYER: 5,
 }
 
 export const PURCHASE_ORDER_STATUS = {
@@ -549,6 +559,12 @@ export const VALUE_KEYS = {
 
 export const SCHEME_TYPE = {
   CORPORATE: 15,
+  INSURANCE: 16,
+}
+
+export const SCHEME_CATEGORY = {
+  CORPORATE: 5,
+  INSURANCE: 11,
 }
 
 export const INVOICE_VIEW_MODE = {
@@ -623,6 +639,11 @@ export const SERVICE_CENTER_CATEGORY = {
 export const RADIOLOGY_CATEGORY = [
   SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
   SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE,
+]
+
+export const LAB_CATEGORY = [
+  SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER,
+  SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE,
 ]
 
 export const DOSAGE_RULE_OPERATOR = {
@@ -767,4 +788,129 @@ export const MODALITY_STATUS = {
   PROCESSING: 2,
   SUCCESSFUL: 3,
   FAILED: 4,
+}
+
+export const FOLDER_TYPE = {
+  PATIENT: 'Patient',
+  COPAYER: 'CoPayer',
+}
+
+export const PRIORITY_VALUES = { NORMAL: 'Normal', URGENT: 'Urgent' }
+
+export const PRIORITY_OPTIONS = [
+  {
+    value: 'Normal',
+    name: 'Normal',
+  },
+  {
+    value: 'Urgent',
+    name: 'Urgent',
+  },
+]
+
+export const DOCUMENT_CATEGORY = {
+  CONSULTATIONDOCUMENT: 1,
+  FORM: 2,
+}
+
+export const DOCUMENT_TEMPLATE_TYPE = {
+  REFERRALLETTER: 1,
+  MEMO: 2,
+  VACCCERT: 3,
+  OTHERS: 4,
+  CONSENTFORM: 5,
+  QUESTIONNAIRE: 6,
+}
+
+export const DOCUMENTCATEGORY_DOCUMENTTYPE = [
+  {
+    documentCategoryFK: DOCUMENT_CATEGORY.CONSULTATIONDOCUMENT,
+    templateTypes: [
+      DOCUMENT_TEMPLATE_TYPE.REFERRALLETTER,
+      DOCUMENT_TEMPLATE_TYPE.MEMO,
+      DOCUMENT_TEMPLATE_TYPE.VACCCERT,
+      DOCUMENT_TEMPLATE_TYPE.OTHERS,
+    ],
+  },
+  {
+    documentCategoryFK: DOCUMENT_CATEGORY.FORM,
+    templateTypes: [
+      DOCUMENT_TEMPLATE_TYPE.CONSENTFORM,
+      DOCUMENT_TEMPLATE_TYPE.QUESTIONNAIRE,
+      DOCUMENT_TEMPLATE_TYPE.OTHERS,
+    ],
+  },
+]
+
+export const CALENDAR_VIEWS = {
+  DAY: 'Day',
+  WEEK: 'Week',
+  MONTH: 'Month',
+}
+
+export const CALENDAR_RESOURCE = {
+  DOCTOR: 'Doctor',
+  RESOURCE: 'Resource',
+}
+
+export const ORDER_TYPES = {
+  MEDICATION: '1',
+  VACCINATION: '2',
+  SERVICE: '3',
+  CONSUMABLE: '4',
+  OPEN_PRESCRIPTION: '5',
+  ORDER_SET: '6',
+  TREATMENT: '7',
+  PACKAGE: '8',
+  RADIOLOGY: '10',
+  LAB: '11',
+}
+
+export const LAB_SPECIMEN_STATUS = {
+  NEW: 1,
+  INPROGRESS: 2,
+  FORRETEST: 3,
+  PENDINGFIRSTVERIFIER: 4,
+  PENDINGSECONDVERIFIER: 5,
+  COMPLETED: 6,
+  DISCARDED: 7,
+}
+export const LAB_SPECIMEN_ALL_COLOR = '#5a9cde'
+export const LAB_SPECIMEN_STATUS_COLORS = {
+  1: '#999900',
+  2: '#009999',
+  3: '#DA6300',
+  4: '#993333',
+  5: '#0000ff',
+  6: '#009933',
+  7: '#33cc99',
+}
+
+export const LAB_SPECIMEN_ALL_LABEL = 'All'
+export const LAB_SPECIMEN_STATUS_LABELS = {
+  1: 'New',
+  2: 'In Progress',
+  3: 'P. Retest',
+  4: 'P. 1st Verify',
+  5: 'P. 2nd Verify',
+  6: 'Completed',
+  7: 'Discarded',
+}
+
+export const LAB_SPECIMEN_ALL_DESCRIPTION = 'All'
+export const LAB_SPECIMEN_STATUS_DESCRIPTION = {
+  1: 'New',
+  2: 'In Progress',
+  3: 'Pending for Retest',
+  4: 'Pending First Verification',
+  5: 'Pending Second Verification',
+  6: 'Completed',
+  7: 'Discarded',
+}
+
+export const VISITDOCTOR_CONSULTATIONSTATUS = {
+  WAITING: 'Waiting',
+  INPROGRESS: 'In Progress',
+  PAUSED: 'Paused',
+  COMPLETED: 'Completed',
 }

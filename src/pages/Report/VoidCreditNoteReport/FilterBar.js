@@ -38,10 +38,6 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                       value: 'Payment',
                       label: 'Payment',
                     },
-                    {
-                      value: 'Write Off',
-                      label: 'Write Off',
-                    },
                   ]}
                 />
               )}

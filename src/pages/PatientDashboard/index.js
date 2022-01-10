@@ -130,6 +130,61 @@ class PatientDashboard extends PureComponent {
       })
   }
 
+  getExtraComponent = () => {
+    const {
+      visitRegistration,
+      patient: { entity: patientProfile },
+    } = this.props
+    const { entity } = visitRegistration
+    if (!entity) return null
+    const { visit = {}, queueNo } = entity
+    const { visitPurposeFK = VISIT_TYPE.CON, roomFK, doctorProfileFK } = visit
+
+    return (
+      visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-evenly',
+            height: '100%',
+          }}
+        >
+          {patientProfile &&
+            patientProfile.isActive &&
+            visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
+              <Authorized authority='openqueuedisplay'>
+                <CallingQueueButton
+                  qId={queueNo}
+                  patientName={patientProfile?.name}
+                  from='Queue'
+                />
+              </Authorized>
+            )}
+          {visit.visitStatus === VISIT_STATUS.WAITING &&
+            patientProfile &&
+            patientProfile.isActive && (
+              <Authorized authority='patientdashboard.startresumeconsultation'>
+                <div style={{ padding: '30px 0' }}>
+                  <ProgressButton
+                    color='primary'
+                    onClick={this.startConsultation}
+                    disabled={
+                      visitPurposeFK === VISIT_TYPE.OTC ||
+                      visitPurposeFK === VISIT_TYPE.BF ||
+                      visitPurposeFK === VISIT_TYPE.MC
+                    }
+                  >
+                    Start Consultation
+                  </ProgressButton>
+                </div>
+              </Authorized>
+            )}
+        </div>
+      )
+    )
+  }
+
   render() {
     const {
       theme,
@@ -147,56 +202,13 @@ class PatientDashboard extends PureComponent {
     } = resetProps
     const { entity } = visitRegistration
     if (!entity) return null
-    const { visit = {}, queueNo } = entity
-    const { visitPurposeFK = VISIT_TYPE.CON, roomFK, doctorProfileFK } = visit
 
     return (
       <div className={classes.root}>
         <Banner
           from='PatientDashboard'
           // activePreOrderItem={patientProfile?.listingPreOrderItem.filter(item => !item.isDeleted) || []}
-          extraCmt={
-            visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-evenly',
-                  height: '100%',
-                }}
-              >
-                {patientProfile &&
-                  patientProfile.isActive &&
-                  visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
-                    <Authorized authority='openqueuedisplay'>
-                      <CallingQueueButton
-                        qId={queueNo}
-                        roomNo={roomFK}
-                        doctor={doctorProfileFK}
-                      />
-                    </Authorized>
-                  )}
-                {visit.visitStatus === VISIT_STATUS.WAITING &&
-                  patientProfile &&
-                  patientProfile.isActive && (
-                    <Authorized authority='patientdashboard.startresumeconsultation'>
-                      <div style={{ padding: '30px 0' }}>
-                        <ProgressButton
-                          color='primary'
-                          onClick={this.startConsultation}
-                          disabled={
-                            visitPurposeFK === VISIT_TYPE.OTC ||
-                            visitPurposeFK === VISIT_TYPE.BF
-                          }
-                        >
-                          Start Consultation
-                        </ProgressButton>
-                      </div>
-                    </Authorized>
-                  )}
-              </div>
-            )
-          }
+          extraCmt={this.getExtraComponent}
           {...this.props}
         />
         <div style={{ marginTop: theme.spacing(1) }}>

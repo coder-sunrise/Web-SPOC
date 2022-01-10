@@ -3,6 +3,7 @@ import moment from 'moment'
 import { timeFormat } from '@/components'
 import { getUniqueId } from '@/utils/utils'
 import service from '../services'
+import { CALENDAR_RESOURCE } from '@/utils/constants'
 
 const calculateDuration = (startTime, endTime) => {
   const duration = moment.duration(
@@ -35,11 +36,9 @@ const splitApptResource = data => {
         startTime,
         endTime,
         appointmentFK,
-        clinicianName,
-        clinicianTitle,
+        calendarResource,
         appointmentTypeFK,
       } = appt
-
       const commonValues = {
         ...restValues,
         uid: getUniqueId(),
@@ -47,7 +46,12 @@ const splitApptResource = data => {
         roomFk,
         appointmentFK,
         apptTime: startTime,
-        doctor: `${clinicianTitle || ''} ${clinicianName}`,
+        resource:
+          calendarResource.resourceType === CALENDAR_RESOURCE.DOCTOR
+            ? `${calendarResource.clinicianProfileDto.title || ''} ${
+                calendarResource.clinicianProfileDto.name
+              }`
+            : calendarResource.resourceDto.displayValue,
         duration: calculateDuration(startTime, endTime),
         patientName: `${restValues.salutation || ''} ${restValues.patientName}`,
         appointmentTypeFK,
@@ -165,9 +169,11 @@ export default createListViewModel({
         const { filterTemplates } = st
 
         if (id) {
-          const { filterByDoctor, filterByApptType, dob } = filterTemplates.find(
-            template => template.id === id,
-          )
+          const {
+            filterByDoctor,
+            filterByApptType,
+            dob,
+          } = filterTemplates.find(template => template.id === id)
           return {
             ...st,
             currentFilterTemplate: {

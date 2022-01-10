@@ -15,6 +15,7 @@ import numeral from 'numeral'
 import {
   RADIOLOGY_WORKITEM_STATUS,
   NURSE_WORKITEM_STATUS,
+  ORDER_TYPES,
 } from '@/utils/constants'
 import {
   CommonTableGrid,
@@ -22,6 +23,8 @@ import {
   Tooltip,
   NumberInput,
   Checkbox,
+  Switch,
+  AuthorizedContext,
 } from '@/components'
 import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
@@ -36,6 +39,7 @@ export default ({
   codetable,
   theme,
   isFullScreen = false,
+  isEnableEditOrder = true,
 }) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
   const { total, gst, totalWithGST, subTotal } = summary
@@ -46,6 +50,16 @@ export default ({
   const [isExistPackage, setIsExistPackage] = useState(false)
 
   const [expandedGroups, setExpandedGroups] = useState([])
+
+  const getOrderAccessRight = accessRight => {
+    let right = Authorized.check(accessRight) || {
+      rights: 'hidden',
+    }
+    if (right.rights === 'enable' && !isEnableEditOrder) {
+      right = { rights: 'disable' }
+    }
+    return right
+  }
 
   const handleExpandedGroupsChange = e => {
     setExpandedGroups(e)
@@ -114,30 +128,35 @@ export default ({
   }
 
   const editRow = row => {
+    if (!isEnableEditOrder) return
     const { workitem = {} } = row
     const { nurseWorkitem = {}, radiologyWorkitem = {} } = workitem
     const { nuseActualize = [] } = nurseWorkitem
     if (!row.isPreOrder) {
       if (
-        (row.type === '10' &&
+        (row.type === ORDER_TYPES.RADIOLOGY &&
           radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED) ||
         nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
       ) {
         return
       }
     }
-
+    //TODO::Check for changes to make for Lab
     if (row.isPreOrderActualize) return
-    if (!row.isActive && row.type !== '5' && !row.isDrugMixture) return
+    if (
+      !row.isActive &&
+      row.type !== ORDER_TYPES.OPEN_PRESCRIPTION &&
+      !row.isDrugMixture
+    )
+      return
 
-    if (row.type === '7' && from !== 'EditOrder') return
+    if (row.type === ORDER_TYPES.TREATMENT && from !== 'EditOrder') return
 
     const editAccessRight = OrderItemAccessRight(row)
 
     const accessRight = Authorized.check(editAccessRight)
     if (!accessRight || accessRight.rights !== 'enable') return
-
-    if (row.type === '10') {
+    if (row.type === ORDER_TYPES.RADIOLOGY) {
       dispatch({
         type: 'orders/updateState',
         payload: {
@@ -155,11 +174,30 @@ export default ({
           type: row.type,
         },
       })
+    } else if (row.type === ORDER_TYPES.LAB) {
+      dispatch({
+        type: 'orders/updateState',
+        payload: {
+          entity: {
+            labItems: [{ ...row }],
+            editServiceId: row.serviceFK,
+            selectCategory: 'All',
+            selectTag: 'All',
+            filterService: '',
+            serviceCenterFK: row.serviceCenterFK,
+            quantity: row.quantity,
+            total: row.total,
+            totalAfterItemAdjustment: row.totalAfterItemAdjustment,
+          },
+          type: row.type,
+        },
+      })
     } else {
       dispatch({
         type: 'orders/updateState',
         payload: {
           entity: row,
+          isPreOrderItemExists: false,
           type: row.type,
         },
       })
@@ -247,7 +285,9 @@ export default ({
           marginLeft: theme.spacing(1),
         }}
       >
-        <Authorized authority={OrderAccessRight()}>
+        <AuthorizedContext.Provider
+          value={getOrderAccessRight(OrderAccessRight())}
+        >
           <Checkbox
             simple
             label={`Inclusive GST (${numeral(gstValue).format('0.00')}%)`}
@@ -269,7 +309,7 @@ export default ({
               })
             }}
           />
-        </Authorized>
+        </AuthorizedContext.Provider>
       </div>
     )
   }
@@ -299,7 +339,9 @@ export default ({
             <span>{adj.adjRemark}</span>
           </Tooltip>
         </div>
-        <Authorized authority={OrderAccessRight()}>
+        <AuthorizedContext.Provider
+          value={getOrderAccessRight(OrderAccessRight())}
+        >
           <div
             style={{
               marginLeft: isExistPackage
@@ -340,7 +382,7 @@ export default ({
               </Button>
             </Tooltip>
           </div>
-        </Authorized>
+        </AuthorizedContext.Provider>
       </div>
     )
   })
@@ -364,26 +406,6 @@ export default ({
         isShowTooltip={true}
         right={right}
       />
-    )
-  }
-
-  const urgentIndicator = (row, right) => {
-    if (row.type !== '10' && row.type !== '3') return null
-    return (
-      row.priority === 'Urgent' && (
-        <Tooltip title='Urgent'>
-          <div
-            className={classes.rightIcon}
-            style={{
-              right: right,
-              borderRadius: 4,
-              backgroundColor: 'red',
-            }}
-          >
-            Urg.
-          </div>
-        </Tooltip>
-      )
     )
   }
 
@@ -456,7 +478,8 @@ export default ({
       )
 
     if (
-      radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ||
+      radiologyWorkitemStatusFK ===
+        RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ||
       radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
       radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
     )
@@ -465,8 +488,11 @@ export default ({
           title={
             radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
               ? 'In Progress'
-              : radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ? 'Modality Completed' :'Completed'
-            }
+              : radiologyWorkitemStatusFK ===
+                RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED
+              ? 'Modality Completed'
+              : 'Completed'
+          }
         >
           <div
             style={{
@@ -506,7 +532,6 @@ export default ({
       )
     return ''
   }
-
   return (
     <CommonTableGrid
       size='sm'
@@ -516,7 +541,10 @@ export default ({
         return {
           ...r,
           currentTotal:
-            !r.isPreOrder || r.isChargeToday ? r.totalAfterItemAdjustment : 0,
+            (!r.isPreOrder && !r.hasPaid) || r.isChargeToday
+              ? r.totalAfterItemAdjustment
+              : 0,
+          isEditingEntity: isEditingEntity,
         }
       })}
       onRowDoubleClick={editRow}
@@ -524,6 +552,7 @@ export default ({
       columns={[
         { name: 'type', title: 'Type' },
         { name: 'subject', title: 'Name' },
+        { name: 'priority', title: 'Urgent' },
         { name: 'description', title: 'Instructions' },
         { name: 'quantity', title: 'Qty.' },
         { name: 'adjAmount', title: 'Adj.' },
@@ -599,11 +628,11 @@ export default ({
               if (isExistPackage) {
                 newChildren = [
                   <Table.Cell
-                    colSpan={3}
+                    colSpan={4}
                     key={1}
                     style={{ position: 'relative' }}
                   />,
-                  React.cloneElement(children[6], {
+                  React.cloneElement(children[7], {
                     colSpan: 3,
                     ...restProps,
                   }),
@@ -611,11 +640,11 @@ export default ({
               } else {
                 newChildren = [
                   <Table.Cell
-                    colSpan={2}
+                    colSpan={3}
                     key={1}
                     style={{ position: 'relative' }}
                   />,
-                  React.cloneElement(children[5], {
+                  React.cloneElement(children[6], {
                     colSpan: 2,
                     ...restProps,
                   }),
@@ -682,7 +711,9 @@ export default ({
                         <span>
                           Invoice Adjustment
                           <Tooltip title='Add Adjustment'>
-                            <Authorized authority={OrderAccessRight()}>
+                            <AuthorizedContext.Provider
+                              value={getOrderAccessRight(OrderAccessRight())}
+                            >
                               <Button
                                 justIcon
                                 color='primary'
@@ -694,7 +725,7 @@ export default ({
                               >
                                 <Add />
                               </Button>
-                            </Authorized>
+                            </AuthorizedContext.Provider>
                           </Tooltip>
                         </span>
                       </div>
@@ -778,12 +809,6 @@ export default ({
             if (row.isDrugMixture || radiologyWorkitemStatusFK) {
               paddingRight = 10
             }
-            let urgentRight = -33
-            if((row.type === '3' || row.type === '10') && row.priority === 'Urgent')
-            {
-              paddingRight += 34
-              urgentRight = -paddingRight - 4
-            }
 
             return (
               <div style={{ position: 'relative' }}>
@@ -800,7 +825,7 @@ export default ({
                   <div style={{ position: 'relative', top: 2 }}>
                     {drugMixtureIndicator(row, -20)}
                     {row.isPreOrder && (
-                      <Tooltip title='Pre-Order'>
+                      <Tooltip title='New Pre-Order'>
                         <div
                           className={classes.rightIcon}
                           style={{
@@ -813,12 +838,29 @@ export default ({
                         </div>
                       </Tooltip>
                     )}
+                    {row.actualizedPreOrderItemFK && (
+                      <Tooltip title='Actualized Pre-Order'>
+                        <div
+                          className={classes.rightIcon}
+                          style={{
+                            right: -5,
+                            borderRadius: 4,
+                            backgroundColor: 'green',
+                          }}
+                        >
+                          Pre
+                        </div>
+                      </Tooltip>
+                    )}
                     {row.isExclusive && (
                       <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                         <div
                           className={classes.rightIcon}
                           style={{
-                            right: row.isPreOrder ? -60 : -30,
+                            right:
+                              row.isPreOrder || row.actualizedPreOrderItemFK
+                                ? -60
+                                : -30,
                             borderRadius: 4,
                             backgroundColor: 'green',
                           }}
@@ -829,7 +871,6 @@ export default ({
                     )}
                     {radiologyWorkitemStatusFK &&
                       radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
-                    {urgentIndicator(row,urgentRight)}
                   </div>
                 </div>
               </div>
@@ -904,14 +945,10 @@ export default ({
           width: 100,
           render: row => {
             let qty = '0.0'
-            if (row.type === '1' || row.type === '5') {
-              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${
-                row.dispenseUOMDisplayValue
-              }`
-            } else if (row.type === '2') {
-              qty = `${numeral(row.quantity || 0).format('0,0.0')} ${
-                row.uomDisplayValue
-              }`
+            if (row.type === '1' || row.type === '5' || row.type === '2') {
+              qty = `${numeral(row.quantity || 0).format(
+                '0,0.0',
+              )} ${row.dispenseUOMDisplayValue || ''}`
             } else if (
               row.type === '3' ||
               row.type === '7' ||
@@ -981,7 +1018,9 @@ export default ({
               }
             }
             return (
-              <Authorized authority={editAccessRight}>
+              <AuthorizedContext.Provider
+                value={getOrderAccessRight(editAccessRight)}
+              >
                 <div>
                   <Tooltip title={editMessage}>
                     <Button
@@ -993,7 +1032,7 @@ export default ({
                       color='primary'
                       style={{ marginRight: 5 }}
                       disabled={
-                        isEditingEntity ||
+                        row.isEditingEntity ||
                         (!row.isActive &&
                           row.type !== '5' &&
                           !row.isDrugMixture) ||
@@ -1010,7 +1049,7 @@ export default ({
                       color='danger'
                       justIcon
                       disabled={
-                        isEditingEntity ||
+                        row.isEditingEntity ||
                         row.isPreOrderActualize ||
                         !deleteEnable
                       }
@@ -1052,7 +1091,71 @@ export default ({
                     </Button>
                   </Tooltip>
                 </div>
-              </Authorized>
+              </AuthorizedContext.Provider>
+            )
+          },
+        },
+        {
+          columnName: 'priority',
+          width: 70,
+          align: 'center',
+          sortingEnabled: false,
+          render: row => {
+            if (
+              row.type !== ORDER_TYPES.RADIOLOGY &&
+              row.type !== ORDER_TYPES.SERVICE &&
+              row.type !== ORDER_TYPES.LAB
+            )
+              return ''
+            const editAccessRight = OrderItemAccessRight(row)
+            const { workitem = {} } = row
+            const {
+              nurseWorkitem = {},
+              radiologyWorkitem = {
+                statusFK: RADIOLOGY_WORKITEM_STATUS.NEW,
+              },
+            } = workitem
+            let editEnable = true
+            if (!row.isPreOrder) {
+              if (row.type === ORDER_TYPES.RADIOLOGY) {
+                //TODO::Win-Check the same logic for Lab once status are defined.
+                if (
+                  radiologyWorkitem.statusFK !== RADIOLOGY_WORKITEM_STATUS.NEW
+                ) {
+                  editEnable = false
+                }
+              } else if (
+                nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
+              ) {
+                editEnable = false
+              }
+            }
+            return (
+              <AuthorizedContext.Provider
+                value={getOrderAccessRight(editAccessRight)}
+              >
+                <Switch
+                  checkedValue='Urgent'
+                  unCheckedValue='Normal'
+                  value={row.priority}
+                  className={classes.switchContainer}
+                  preventToggle
+                  disabled={
+                    row.isEditingEntity ||
+                    row.isPreOrderActualize ||
+                    !editEnable
+                  }
+                  onClick={checked => {
+                    dispatch({
+                      type: 'orders/updatePriority',
+                      payload: {
+                        uid: row.uid,
+                        priority: checked ? 'Urgent' : 'Normal',
+                      },
+                    })
+                  }}
+                />
+              </AuthorizedContext.Provider>
             )
           },
         },

@@ -10,7 +10,9 @@ import _ from 'lodash'
 import { HistoryOutlined } from '@ant-design/icons'
 import { CommonModal, Button, Tooltip } from '@/components'
 import { Worklist } from '@/pages/Radiology/Components'
-import { WorklistContextProvider } from '@/pages/Radiology/Worklist/WorklistContext'
+import WorklistContext, {
+  WorklistContextProvider,
+} from '@/pages/Radiology/Worklist/WorklistContext'
 import PharmacyDetails from './Details'
 import { WorklistFilter } from '../Components'
 const columnsTemplate = [
@@ -46,9 +48,11 @@ const PharmacyWorklist = () => {
   const { autoRefreshPharmacyWorklistInterval = 60 } =
     clinicSettings.settings || {}
   const timer = React.useRef(null)
+  const { pharmacyQueueCallList = [] } = useContext(WorklistContext)
   useEffect(() => {
     dispatch({
       type: 'pharmacyWorklist/query',
+      payload: { pagesize: 9999 },
     })
     stopRefreshTimer()
     startRefreshTimer()
@@ -115,6 +119,7 @@ const PharmacyWorklist = () => {
   const refreshClick = () => {
     dispatch({
       type: 'pharmacyWorklist/query',
+      payload: { pagesize: 9999 },
     })
     setRefreshDate(moment())
   }
@@ -129,6 +134,12 @@ const PharmacyWorklist = () => {
       trailing: false,
     },
   )
+
+  let nowServing = undefined
+  if (pharmacyQueueCallList.length > 0) {
+    nowServing = `${pharmacyQueueCallList?.[0]?.qNo}.0 (${pharmacyQueueCallList?.[0]?.patientName})`
+  }
+
   return (
     <div style={{ position: 'relative', height: '100%' }}>
       <ProCard
@@ -156,13 +167,12 @@ const PharmacyWorklist = () => {
           style={{
             position: 'absolute',
             top: 25,
-            right: 175,
-            width: 300,
-            textAlign: 'right',
+            right: 150,
+            width: 200,
           }}
         >
-          <p style={{ fontWeight: 600 }}>Now Serving:</p>
-          <Tooltip title='1.0(genery)'>
+          <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>Now Serving:</p>
+          <Tooltip title={nowServing || '-'}>
             <p
               style={{
                 color: '#1890f8',
@@ -172,49 +182,32 @@ const PharmacyWorklist = () => {
                 marginTop: 4,
               }}
             >
-              1.0(genery)
+              {nowServing || '-'}
             </p>
           </Tooltip>
         </div>
-
-        <Tooltip title=''>
-          <span
-            className='material-icons'
-            style={{
-              color: 'gray',
-              position: 'absolute',
-              top: 22,
-              right: 143,
-              width: 26,
-              height: 26,
-            }}
-            onClick={event => {}}
-          >
-            history
-          </span>
-        </Tooltip>
-
         <div style={{ position: 'absolute', top: 25, right: 50 }}>
-          <p style={{ fontWeight: 600 }}>Last Refresh:</p>
-          <p style={{ color: '#1890f8', marginTop: 4 }}>
-            {refreshDate.format('HH:mm')}
-          </p>
+          <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>Last Refresh:</p>
+          <span>
+            <p style={{ color: '#1890f8', marginTop: 4, fontSize: '0.9rem' }}>
+              {refreshDate.format('HH:mm')}
+            </p>
+            <Button
+              color='primary'
+              justIcon
+              style={{
+                position: 'absolute',
+                top: 20,
+                left: 80,
+                width: 26,
+                height: 26,
+              }}
+              onClick={refreshClick}
+            >
+              <Refresh />
+            </Button>
+          </span>
         </div>
-
-        <Button
-          color='primary'
-          justIcon
-          style={{
-            position: 'absolute',
-            top: 22,
-            right: 10,
-            width: 26,
-            height: 26,
-          }}
-          onClick={refreshClick}
-        >
-          <Refresh />
-        </Button>
       </div>
     </div>
   )

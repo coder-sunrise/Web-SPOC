@@ -42,9 +42,9 @@ export default {
   'menu.finance.deposit': 'Deposit',
   'menu.finance.doctor-expense': 'Doctor Expense',
   'menu.finance.credit/debitnote': 'Credit / Debit Note',
-  'menu.finance.corporate-billing': 'Corporate Billing',
+  'menu.finance.corporate-billing': 'Co-Payer Billing',
   'menu.finance.corporate-billing.detail': 'Invoices',
-  'menu.finance.corporate-billing/detail': 'Corporate Billing Details',
+  'menu.finance.corporate-billing/detail': 'Co-Payer Billing Details',
   'menu.finance.statement': 'Statement',
   'menu.finance.statement/newstatement': 'New Statement',
   'menu.finance.statement/editstatement': 'Edit Statement',
@@ -137,6 +137,7 @@ export default {
   'menu.setting.servicecentercategory': 'Service Center Category',
   'menu.setting.servicecategory': 'Service Category',
   'menu.setting.medicationfrequency': 'Medication Frequency',
+  'menu.setting.medicinetrivia': 'Medicine Trivia',
   'menu.setting.medicationprecautions': 'Medication Precaution',
   'menu.setting.medicationconsumptionmethod': 'Medication Consumption Method',
   'menu.setting.smstemplate': 'SMS Template',
@@ -174,6 +175,9 @@ export default {
   'menu.setting.drugallergy': 'Drug Allergy',
   'menu.setting.administrationroute': 'Route of Administration',
   'menu.setting.checklist': 'Checklist',
+  'menu.setting.individualcomment': 'Individual Comment',
+  'menu.setting.summarycomment': 'Summary Comment',
+  'menu.setting.resource': 'Resource',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',
@@ -194,7 +198,8 @@ export default {
   'menu.report.viewreport': 'View Report',
   'menu.report.expiringstockreport': 'Expiring Stock Report',
   'menu.report.radiologystatisticreport': 'Radiology Statistic Report',
-
+  'menu.report.partialdispensereport': 'Dispensary Report',
+  'menu.report.preorderlistingreport': ' Pre-Order Listing Report',
   'menu.report.visitListingReport': 'Visit Listing Report',
 
   'menu.support': 'Support',
@@ -213,6 +218,11 @@ export default {
   'menu.pharmacy': 'Pharmacy',
   'menu.pharmacy.worklist': 'Worklist',
   'menu.pharmacy.history': 'History',
+
+  'menu.lab': 'Lab Center',
+  'menu.lab.worklist': 'Worklist',
+  'menu.lab.history': 'History',
+  'menu.lab.specimenCollection': 'Specimen Collection',
 
   'menu.not-found': 'Not Found',
   'menu.forbidden': 'Forbidden',

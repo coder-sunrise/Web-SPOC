@@ -75,7 +75,7 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
               <div style={{ position: 'relative', top: 2 }}>
                 {drugMixtureIndicator(row, -20)}
                 {row.isPreOrder && (
-                  <Tooltip title='Pre-Order'>
+                  <Tooltip title='New Pre-Order'>
                     <div
                       className={classes.rightIcon}
                       style={{
@@ -169,7 +169,7 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
       width: 90,
       render: (text, row) =>
         showCurrency(
-          row.isPreOrder && !row.isChargeToday
+          (row.isPreOrder && !row.isChargeToday) || row.hasPaid
             ? 0
             : row.totalAfterItemAdjustment,
         ),
@@ -228,7 +228,7 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
   ]
 
   const { labelPrinterSize } = clinicSettings.settings
-  const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
+  const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
 
   return (
     <CardContainer hideHeader size='sm' style={{ margin: 0 }}>

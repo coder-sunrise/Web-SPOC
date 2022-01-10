@@ -8,6 +8,7 @@ import {
   FastEditableTableGrid,
   CommonTableGrid,
   dateFormat,
+  notification,
 } from '@/components'
 import { AppointmentTypeLabel } from '@/components/_medisys'
 import AuthorizedContext from '@/components/Context/Authorized'
@@ -16,6 +17,8 @@ import {
   AppointmentDataColumn,
 } from './variables'
 import ErrorPopover from './ErrorPopover'
+import { CALENDAR_RESOURCE } from '@/utils/constants'
+import { NavigateBeforeSharp } from '@material-ui/icons'
 
 const styles = () => ({
   container: {
@@ -48,127 +51,163 @@ const calculateDuration = (startTime, endTime) => {
   return { hour, minute }
 }
 
-@connect(({ codetable }) => ({
+@connect(({ codetable, clinicSettings }) => ({
   appointmentTypes: codetable.ctappointmenttype,
-  clinicianProfiles: codetable.clinicianprofile,
+  ctcalendarresource: codetable.ctcalendarresource,
   rooms: codetable.ctroom,
+  apptTimeIntervel: clinicSettings.settings.apptTimeIntervel,
 }))
 class AppointmentDataGrid extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
-    const { appointmentDate, data, selectedSlot } = this.props
-    const columnExtensions = AppointmentDataColExtensions.map((column) => {
-      if (column.columnName === 'isPrimaryClinician') {
-        return {
-          ...column,
-          checkedValue: true,
-          uncheckedValue: false,
-          onChange: this.onRadioChange,
+    const {
+      appointmentDate,
+      data,
+      selectedSlot,
+      apptTimeIntervel = 30,
+      checkAddResource,
+    } = this.props
+    const columnExtensions = AppointmentDataColExtensions(apptTimeIntervel).map(
+      column => {
+        if (column.columnName === 'isPrimaryClinician') {
+          return {
+            ...column,
+            checkedValue: true,
+            uncheckedValue: false,
+            onChange: this.onRadioChange,
+          }
         }
-      }
 
-      if (column.type === 'time') {
-        return {
-          ...column,
-          currentDate: appointmentDate
-            ? moment(appointmentDate, dateFormat)
-            : moment(),
+        if (column.type === 'time') {
+          return {
+            ...column,
+            currentDate: appointmentDate
+              ? moment(appointmentDate, dateFormat)
+              : moment(),
+          }
         }
-      }
 
-      if (column.columnName === 'roomFk') {
-        return {
-          ...column,
-          render: (row) => {
-            const { rooms = [] } = this.props
-            const room = rooms.find((item) => item.id === row.roomFk)
-            if (room) return room.name
-            return ''
-          },
+        if (column.columnName === 'roomFk') {
+          return {
+            ...column,
+            render: row => {
+              const { rooms = [] } = this.props
+              const room = rooms.find(item => item.id === row.roomFk)
+              if (room) return room.name
+              return ''
+            },
+          }
         }
-      }
 
-      if (column.columnName === 'clinicianFK') {
-        return {
-          ...column,
-          render: (row) => {
-            const { clinicianFK } = row
-            const { clinicianProfiles = [] } = this.props
-            const clinicianProfile = clinicianProfiles.find(
-              (item) => item.id === clinicianFK,
-            )
+        if (column.columnName === 'calendarResourceFK') {
+          return {
+            ...column,
+            render: row => {
+              const { calendarResourceFK } = row
+              const { ctcalendarresource = [] } = this.props
+              const calendarResource = ctcalendarresource.find(
+                item => item.id === calendarResourceFK,
+              )
 
-            if (!clinicianProfile) return null
-            const title = clinicianProfile.title || ''
-            return <p>{`${title} ${clinicianProfile.name}`}</p>
-          },
+              if (!calendarResource) return null
+              if (calendarResource.resourceType === CALENDAR_RESOURCE.DOCTOR) {
+                const title = calendarResource.clinicianProfileDto.title || ''
+                return (
+                  <p>{`${title} ${calendarResource.clinicianProfileDto.name}`}</p>
+                )
+              } else {
+                return calendarResource.name
+              }
+            },
+            onChange: ({ row, option }) => {
+              const { data, handleCommitChanges } = this.props
+              const newRows = data.map(eachRow =>
+                eachRow.id !== row.id
+                  ? {
+                      ...eachRow,
+                    }
+                  : {
+                      ...eachRow,
+                      calendarResource: option ? { ...option } : undefined,
+                      isPrimaryClinician:
+                        !option ||
+                        option.resourceType === CALENDAR_RESOURCE.RESOURCE
+                          ? false
+                          : eachRow.isPrimaryClinician,
+                    },
+              )
+              handleCommitChanges({ rows: newRows })
+            },
+            localFilter: o =>
+              o.isActive &&
+              (checkAddResource() ||
+                o.resourceType === CALENDAR_RESOURCE.DOCTOR),
+          }
         }
-      }
 
-      if (column.columnName === 'appointmentTypeFK') {
-        return {
-          ...column,
-          render: (row) => {
-            const { appointmentTypeFK } = row
-            const { appointmentTypes = [] } = this.props
-            const appointmentType = appointmentTypes.find(
-              (item) => item.id === appointmentTypeFK,
-            )
+        if (column.columnName === 'appointmentTypeFK') {
+          return {
+            ...column,
+            render: row => {
+              const { appointmentTypeFK } = row
+              const { appointmentTypes = [] } = this.props
+              const appointmentType = appointmentTypes.find(
+                item => item.id === appointmentTypeFK,
+              )
 
-            if (!appointmentType) return null
-            return (
-              <AppointmentTypeLabel
-                color={appointmentType.tagColorHex}
-                label={appointmentType.displayValue}
-              />
-            )
-          },
-          renderDropdown: (option) => {
-            let color
-            if (option.tagColorHex)
-              color = option.tagColorHex.includes('#')
-                ? option.tagColorHex
-                : `#${option.tagColorHex}`
-            return (
-              <AppointmentTypeLabel color={color} label={option.displayValue} />
-            )
-          },
+              if (!appointmentType) return null
+              return (
+                <AppointmentTypeLabel
+                  color={appointmentType.tagColorHex}
+                  label={appointmentType.displayValue}
+                />
+              )
+            },
+            renderDropdown: option => {
+              let color
+              if (option.tagColorHex)
+                color = option.tagColorHex.includes('#')
+                  ? option.tagColorHex
+                  : `#${option.tagColorHex}`
+              return (
+                <AppointmentTypeLabel
+                  color={color}
+                  label={option.displayValue}
+                />
+              )
+            },
+          }
         }
-      }
 
-      if (column.columnName === 'startTime') {
-        return {
-          ...column,
-          onChange: (row) => {
-            console.log({ row })
-          },
+        if (column.columnName === 'startTime') {
+          return {
+            ...column,
+            onChange: row => {},
+          }
         }
-      }
-      return { ...column }
-    })
+        return { ...column }
+      },
+    )
 
-    this.columnExtensions = [
-      ...columnExtensions,
-    ]
+    this.columnExtensions = [...columnExtensions]
   }
 
   onRadioChange = ({ row, checked }) => {
     if (checked) {
       const { data, handleCommitChanges } = this.props
-      const newRows = data.map(
-        (eachRow) =>
-          eachRow.id !== row.id
-            ? {
-                ...eachRow,
-                isPrimaryClinician: false,
-              }
-            : { ...eachRow, isPrimaryClinician: checked },
+      const newRows = data.map(eachRow =>
+        eachRow.id !== row.id
+          ? {
+              ...eachRow,
+              isPrimaryClinician: false,
+            }
+          : { ...eachRow, isPrimaryClinician: checked },
       )
       handleCommitChanges({ rows: newRows })
     }
   }
 
-  render () {
+  render() {
     const {
       classes,
       data,
@@ -188,8 +227,9 @@ class AppointmentDataGrid extends React.Component {
         editingEnabled: false,
         sortingEnabled: false,
         disabled: true,
-        width: 60,
-        render: (row) => {
+        align: 'center',
+        width: 40,
+        render: row => {
           if (row.conflicts && row.conflicts.length > 0) {
             return <ErrorPopover errors={row.conflicts} />
           }
@@ -203,9 +243,7 @@ class AppointmentDataGrid extends React.Component {
       pager: false,
       sort: true,
       sortConfig: {
-        defaultSorting: [
-          { columnName: 'startTime', direction: 'asc' },
-        ],
+        defaultSorting: [{ columnName: 'startTime', direction: 'asc' }],
       },
     }
     return (
@@ -230,9 +268,22 @@ class AppointmentDataGrid extends React.Component {
               },
               showAddCommand: !disabled,
               showDeleteCommand:
-                data.filter((item) => !item.isDeleted).length > 1,
+                data.filter(item => !item.isDeleted).length > 1,
               onCommitChanges: handleCommitChanges,
-              onAddedRowsChange: (rows) => {
+              onAddedRowsChange: (rows, aa) => {
+                const primaryDoctor = data.find(
+                  d => !d.isDeleted && d.isPrimaryClinician,
+                )
+                if (primaryDoctor) {
+                  rows.forEach(r => {
+                    r.appointmentFK = primaryDoctor.appointmentFK
+                    r.appointmentTypeFK = primaryDoctor.appointmentTypeFK
+                    r.apptDurationHour = primaryDoctor.apptDurationHour
+                    r.apptDurationMinute = primaryDoctor.apptDurationMinute
+                    r.startTime = primaryDoctor.startTime
+                    r.endTime = primaryDoctor.endTime
+                  })
+                }
                 return rows
               },
             }}

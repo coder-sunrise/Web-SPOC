@@ -19,13 +19,13 @@ export default createFormViewModel({
     subscriptions: ({ dispatch, history, searchField, ...restValues }) => {
       subscribeNotification('QueueCalled', {
         callback: response => {
-          const { qNo, roomNo } = response
-          const newCalledQueue = { qNo, roomNo }
+          const { oriQCallList, callingQueue } = response
 
           return dispatch({
             type: 'refreshQueueCallList',
             payload: {
-              callingQueue: newCalledQueue,
+              oriQCallList: oriQCallList,
+              callingQueue: callingQueue,
             },
           })
         },
@@ -147,7 +147,7 @@ export default createFormViewModel({
         }
       },
       refreshQueueCallList(st, { payload }) {
-        const { callingQueue } = payload
+        const { callingQueue, oriQCallList } = payload
         const { pendingQCall, isSync } = st
 
         if (isSync) {
@@ -165,6 +165,7 @@ export default createFormViewModel({
         return {
           ...st,
           tracker: callingQueue,
+          oriQCallList: oriQCallList,
         }
       },
       displayCallQueue(st, { payload }) {

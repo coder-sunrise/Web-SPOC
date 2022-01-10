@@ -15,7 +15,8 @@ const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
 const widgets = [
   {
     id: '1',
-    name: clinicTypeFK !== CLINIC_TYPE.DENTAL ? 'Clinical Notes' : 'Dental Notes',
+    name:
+      clinicTypeFK !== CLINIC_TYPE.DENTAL ? 'Clinical Notes' : 'Dental Notes',
     accessRight: 'queue.consultation.widgets.clinicalnotes',
     component: Loadable({
       loader: () => import('@/pages/Widgets/ClinicalNotes'),
@@ -36,7 +37,7 @@ const widgets = [
     },
     toolbarAddon: (
       <AuthorizedContext>
-        {(r) => {
+        {r => {
           if (r.rights !== 'enable') return null
           return (
             // <Dropdown
@@ -105,7 +106,7 @@ const widgets = [
       loading: Loading,
     }),
     model: 'diagnosis',
-    associatedProps: [ 'corDiagnosis' ],
+    associatedProps: ['corDiagnosis'],
     layoutConfig: {
       minW: 12,
       minH: 10,
@@ -165,10 +166,11 @@ const widgets = [
     name: 'Patient History',
     accessRight: 'queue.consultation.widgets.patienthistory',
     component: Loadable({
-      loader: () => import('@/pages/Widgets/PatientHistory/consultationDisplay'),
+      loader: () =>
+        import('@/pages/Widgets/PatientHistory/consultationDisplay'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...p} widget mode="integrated" />
+        return <Cmpnet {...p} widget mode='integrated' />
       },
       loading: Loading,
     }),
@@ -236,7 +238,7 @@ const widgets = [
       loading: Loading,
     }),
     model: 'patientVitalSign',
-    associatedProps: [ 'corPatientNoteVitalSign' ],
+    associatedProps: ['corPatientNoteVitalSign'],
     layoutConfig: {
       minW: 12,
       minH: 10,
@@ -244,26 +246,6 @@ const widgets = [
         padding: '0 5px',
       },
     },
-    toolbarAddon: (
-      <Authorized authority="queue.consultation.widgets.vitalsign">
-        <Tooltip title="Add Vital Sign">
-          <IconButton
-            style={{ float: 'left' }}
-            className="non-dragable"
-            onClick={() => {
-              window.g_app._store.dispatch({
-                type: 'patientVitalSign/updateState',
-                payload: {
-                  shouldAddNew: true,
-                },
-              })
-            }}
-          >
-            <Add />
-          </IconButton>
-        </Tooltip>
-      </Authorized>
-    ),
   },
 
   {
@@ -288,12 +270,12 @@ const widgets = [
       loader: () => import('@/pages/Widgets/Attachment'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...p} mainType="ClinicalNotes" />
+        return <Cmpnet {...p} mainType='ClinicalNotes' />
       },
       loading: Loading,
     }),
     model: 'attachment',
-    associatedProps: [ 'corAttachment' ],
+    associatedProps: ['corAttachment'],
     layoutConfig: {
       minW: 12,
       minH: 10,
@@ -312,13 +294,18 @@ const widgets = [
         let Cmpnet = loaded.default
         return (
           <Fragment>
-            <Authorized authority="queue.consultation.widgets.eyevisualacuity">
+            <Authorized authority='queue.consultation.widgets.eyevisualacuity'>
               <Cmpnet
                 {...p}
-                prefix="corEyeVisualAcuityTest.eyeVisualAcuityTestForms"
-                attachmentsFieldName="corAttachment"
+                prefix='corEyeVisualAcuityTest.eyeVisualAcuityTestForms'
+                attachmentsFieldName='corAttachment'
                 fromConsultation
-                handleUpdateAttachments={({ updated, form, dispatch, consultation }) => {
+                handleUpdateAttachments={({
+                  updated,
+                  form,
+                  dispatch,
+                  consultation,
+                }) => {
                   // console.log(updated, form, dispatch, consultation)
                   form.setFieldValue('corAttachment', updated)
                   const { entity } = consultation
@@ -337,7 +324,7 @@ const widgets = [
       },
       loading: Loading,
     }),
-    associatedProps: [ 'corEyeVisualAcuityTest' ],
+    associatedProps: ['corEyeVisualAcuityTest'],
     layoutConfig: {
       minW: 12,
       minH: 10,
@@ -354,11 +341,11 @@ const widgets = [
       loader: () => import('@/pages/Widgets/RefractionForm'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...p} prefix="corEyeRefractionForm.formData" />
+        return <Cmpnet {...p} prefix='corEyeRefractionForm.formData' />
       },
       loading: Loading,
     }),
-    associatedProps: [ 'corEyeRefractionForm' ],
+    associatedProps: ['corEyeRefractionForm'],
     // model: 'refractionForm',
     layoutConfig: {},
   },
@@ -370,18 +357,18 @@ const widgets = [
       loader: () => import('@/pages/Widgets/ExaminationForm'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...p} prefix="corEyeExaminationForm.formData" />
+        return <Cmpnet {...p} prefix='corEyeExaminationForm.formData' />
       },
       loading: Loading,
     }),
-    associatedProps: [ 'corEyeExaminationForm' ],
+    associatedProps: ['corEyeExaminationForm'],
     // model: 'refractionForm',
     layoutConfig: {},
   },
   {
     id: '12',
     name: 'Forms',
-    accessRight: 'queue.consultation.widgets.forms',
+    accessRight: 'queue.consultation.form',
     component: Loadable({
       loader: () => import('@/pages/Widgets/Forms'),
       loading: Loading,

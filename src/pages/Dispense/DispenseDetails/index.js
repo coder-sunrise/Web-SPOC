@@ -4,15 +4,26 @@ import { compose } from 'redux'
 import _ from 'lodash'
 import moment from 'moment'
 // material ui
-import { Paper, withStyles, Link } from '@material-ui/core'
 import Print from '@material-ui/icons/Print'
 import Refresh from '@material-ui/icons/Refresh'
 import Edit from '@material-ui/icons/Edit'
+import { InputNumber } from 'antd'
+import {
+  MenuList,
+  ClickAwayListener,
+  MenuItem,
+  makeStyles,
+  Paper,
+  withStyles,
+  Link,
+} from '@material-ui/core'
 import Delete from '@material-ui/icons/Delete'
+import withWebSocket from '@/components/Decorator/withWebSocket'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import { formatMessage } from 'umi' // common component
 import Warining from '@material-ui/icons/Error'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
+import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import {
   Button,
   ProgressButton,
@@ -22,6 +33,7 @@ import {
   TextField,
   CommonModal,
   NumberInput,
+  Popper,
   notification,
 } from '@/components'
 import AmountSummary from '@/pages/Shared/AmountSummary'
@@ -113,17 +125,19 @@ const DispenseDetails = ({
   onFinalizeClick,
   codetable,
   dispense,
+  handlePrint,
   history,
   onDrugLabelClick,
   showDrugLabelSelection,
   onDrugLabelSelectionClose,
-  onDrugLabelSelected,
-  onDrugLabelNoChanged,
   selectedDrugs,
+  currentDrugToPrint,
   clinicSettings,
   servingPersons = [],
   patient,
   user,
+  visitRegistration,
+  isIncludeExpiredItem = false,
 }) => {
   const {
     dispenseItems = [],
@@ -147,6 +161,10 @@ const DispenseDetails = ({
     coPayer = [],
   } = invoice
 
+  const [popperOpen, setPopperOpen] = useState(false)
+  const openPopper = () => setPopperOpen(true)
+  const closePopper = () => setPopperOpen(false)
+
   const { inventorymedication, inventoryvaccination } = codetable
   const { settings = {} } = clinicSettings
   const discardCallback = r => {
@@ -157,6 +175,16 @@ const DispenseDetails = ({
           ? `${userProfile.title}. ${userProfile.name || ''}`
           : `${userProfile.name || ''}`
       }`
+      const { entity } = visitRegistration
+      const visitTypeName = JSON.parse(settings.visitTypeSetting).find(
+        t => t.id === entity.visit.visitPurposeFK,
+      ).displayValue
+      notification.success({ message: `${visitTypeName} visit discarded.` })
+      sendQueueNotification({
+        message: `${visitTypeName} visit discarded.`,
+        queueNo: entity.queueNo,
+        visitID: entity.id,
+      })
       const message = `${userName} discard prescription at ${moment().format(
         'HH:mm',
       )}`
@@ -179,6 +207,12 @@ const DispenseDetails = ({
         id,
       },
     }).then(r => {
+      if (r) {
+        const { entity } = visitRegistration
+        const visitTypeName = JSON.parse(settings.visitTypeSetting).find(
+          t => t.id === entity.visit.visitPurposeFK,
+        ).displayValue
+      }
       sendNotification('EditedConsultation', {
         type: NOTIFICATION_TYPE.CONSULTAION,
         status: NOTIFICATION_STATUS.OK,
@@ -262,7 +296,8 @@ const DispenseDetails = ({
   }
 
   const isRetailVisit = visitPurposeFK === VISIT_TYPE.OTC
-  const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BF
+  const isBillFirstVisit =
+    visitPurposeFK === VISIT_TYPE.BF || visitPurposeFK === VISIT_TYPE.MC
   const disableRefreshOrder = isBillFirstVisit && !clinicalObjectRecordFK
   const disableDiscard = totalPayment > 0 || !!clinicalObjectRecordFK
   const [showRemovePayment, setShowRemovePayment] = useState(false)
@@ -429,7 +464,7 @@ const DispenseDetails = ({
   }
 
   const { labelPrinterSize } = settings
-  const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
+  const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
 
   const isShowDispenseActualie =
     !viewOnly && isShowActualizeSelection(dispenseItems)
@@ -539,11 +574,89 @@ const DispenseDetails = ({
       setFieldValue('dispenseItems', rows)
     }
   }
+  const printDrugLabel = () => {
+    setPopperOpen(false)
+    onDrugLabelClick()
+  }
   return (
     <React.Fragment>
       <GridContainer>
         <GridItem justify='flex-start' md={7} className={classes.actionButtons}>
-          <Button
+          <div style={{ display: 'inline-block' }}>
+            <Popper
+              open={popperOpen}
+              style={{ marginTop: 10 }}
+              placement='bottom-start'
+              transition
+              overlay={
+                <ClickAwayListener onClickAway={closePopper}>
+                  <MenuList role='menu'>
+                    <MenuItem>
+                      <Button
+                        color='primary'
+                        size='sm'
+                        style={{ width: 120 }}
+                        onClick={() => {
+                          onPrint({ type: CONSTANTS.PATIENT_LABEL })
+                        }}
+                        disabled={sendingJob}
+                      >
+                        Patient Label
+                      </Button>
+                      <InputNumber
+                        size='small'
+                        min={1}
+                        max={10}
+                        value={1}
+                        className={classes.inputStyle}
+                      />
+                      <span className={classes.qtyFont}>&nbsp;Copies</span>
+                    </MenuItem>
+                    <MenuItem>
+                      <Button
+                        color='primary'
+                        size='sm'
+                        style={{ width: 120 }}
+                        onClick={() => {}}
+                        disabled={sendingJob}
+                      >
+                        Lab Label
+                      </Button>
+                      <InputNumber
+                        size='small'
+                        min={1}
+                        max={10}
+                        value={1}
+                        className={classes.inputStyle}
+                      />
+                      <span className={classes.qtyFont}>&nbsp;Copies</span>
+                    </MenuItem>
+                    <MenuItem>
+                      <Button
+                        color='primary'
+                        size='sm'
+                        onClick={printDrugLabel}
+                        disabled={sendingJob}
+                        style={{ width: 120 }}
+                      >
+                        Drug Label
+                      </Button>
+                    </MenuItem>
+                  </MenuList>
+                </ClickAwayListener>
+              }
+            >
+              <Button
+                color='primary'
+                onClick={openPopper}
+                size='sm'
+                style={{ height: 25, marginTop: 2 }}
+              >
+                <Print /> Label
+              </Button>
+            </Popper>
+          </div>
+          {/* <Button
             color='primary'
             size='sm'
             onClick={onDrugLabelClick}
@@ -562,7 +675,7 @@ const DispenseDetails = ({
           >
             {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
             Patient Label
-          </Button>
+          </Button> */}
           {orderCreateTime && (
             <span style={{ color: '#999999' }}>
               Order created by
@@ -596,7 +709,12 @@ const DispenseDetails = ({
             )}
             {!isBillFirstVisit && (
               <Authorized authority='queue.dispense.savedispense'>
-                <ProgressButton color='success' size='sm' onClick={onSaveClick}>
+                <ProgressButton
+                  color='success'
+                  size='sm'
+                  onClick={onSaveClick}
+                  disabled={isIncludeExpiredItem}
+                >
                   Save Dispense
                 </ProgressButton>
               </Authorized>
@@ -645,6 +763,7 @@ const DispenseDetails = ({
                   color='primary'
                   size='sm'
                   icon={<AttachMoney />}
+                  disabled={isIncludeExpiredItem}
                   onClick={() => {
                     if (dispense && dispense.totalWithGST < 0) {
                       window.g_app._store.dispatch({
@@ -694,9 +813,9 @@ const DispenseDetails = ({
                       setShowRemovePayment(true)
                     } else {
                       if (
-                        dispenseItems.filter(x => isActualizable(x)).length >
+                        dispenseItems?.filter(x => isActualizable(x)).length >
                           0 ||
-                        service.filter(x => isActualizable(x)).length > 0
+                        service?.filter(x => isActualizable(x)).length > 0
                       )
                         notification.error({
                           message:
@@ -776,7 +895,7 @@ const DispenseDetails = ({
               columns={columns}
               colExtensions={DispenseItemsColumnExtensions(
                 viewOnly,
-                onPrint,
+                onDrugLabelClick,
                 onActualizeBtnClick,
                 showDrugLabelRemark,
               )}
@@ -888,6 +1007,7 @@ const DispenseDetails = ({
         )}
       </GridContainer>
       <CommonModal
+        maxWidth='sm'
         title='Print Drug Labels'
         open={showDrugLabelSelection}
         observe='DispenseDetails'
@@ -896,13 +1016,15 @@ const DispenseDetails = ({
         }}
       >
         <DrugLabelSelection
-          prescription={selectedDrugs}
-          codetable={codetable}
-          handleDrugLabelSelected={onDrugLabelSelected}
-          handleDrugLabelNoChanged={onDrugLabelNoChanged}
+          handlePrint={handlePrint}
+          values={values}
+          currentDrugToPrint={currentDrugToPrint}
+          dispatch={dispatch}
+          patient={patient}
+          source='dispense'
+          visitid={values?.id}
           handleSubmit={() => {
             onDrugLabelSelectionClose()
-            onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
           }}
         />
       </CommonModal>
@@ -1025,14 +1147,6 @@ const DispenseDetails = ({
                 id: values.id,
                 version: version,
               },
-            }).then(r => {
-              dispatch({
-                type: 'dispense/updateState',
-                payload: {
-                  entity: r,
-                  version: version,
-                },
-              })
             })
           }}
         />
@@ -1049,12 +1163,23 @@ const _DispenseDetails = props => (
 )
 
 export default compose(
+  withWebSocket(),
   withStyles(styles, { name: 'DispenseDetailsGrid' }),
-  connect(({ codetable, clinicSettings, dispense, patient, user }) => ({
-    codetable,
-    clinicSettings,
-    servingPersons: dispense.servingPersons,
-    patient: patient.entity || {},
-    user,
-  })),
+  connect(
+    ({
+      codetable,
+      visitRegistration,
+      clinicSettings,
+      dispense,
+      patient,
+      user,
+    }) => ({
+      codetable,
+      clinicSettings,
+      visitRegistration,
+      servingPersons: dispense.servingPersons,
+      patient: patient.entity || {},
+      user,
+    }),
+  ),
 )(_DispenseDetails)

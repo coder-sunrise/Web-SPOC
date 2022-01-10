@@ -70,6 +70,7 @@ class FormModuleGrid extends PureComponent {
             statusFK: 4,
             voidDate: moment(),
             voidByUserFK: user.data.clinicianProfile.id,
+            action: 'void',
           },
         }).then(() => {
           this.props.queryFormListing()
@@ -199,7 +200,7 @@ class FormModuleGrid extends PureComponent {
                       <Print />
                     </Button>
                   </Tooltip>
-                  {(row.statusFK === 1 || row.statusFK === 2) && (
+                  {(row.statusFK === 1/* || row.statusFK === 2*/) && (
                     <Tooltip title='Edit'>
                       <Button
                         disabled={!patientIsActive}
@@ -215,7 +216,7 @@ class FormModuleGrid extends PureComponent {
                       </Button>
                     </Tooltip>
                   )}
-                  {(row.statusFK === 1 || row.statusFK === 2) && (
+                  {(row.statusFK === 1/* || row.statusFK === 2*/) && (
                     <Popconfirm
                       onConfirm={() =>
                         this.props
@@ -242,7 +243,7 @@ class FormModuleGrid extends PureComponent {
                       </Tooltip>
                     </Popconfirm>
                   )}
-                  {row.statusFK === 3 && (
+                  {row.statusFK === 2 && (
                     <this.VoidForm
                       classes={classes}
                       dispatch={dispatch}

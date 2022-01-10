@@ -14,6 +14,7 @@ const SelectPreOrder = ({
   mainDivHeight,
   disabled,
   actualizePreOrderAccessRight,
+  isRetail,
 }) => {
   const [selectedPreOrders, setSelectedPreOrders] = useState([])
   let height = mainDivHeight - 200
@@ -61,7 +62,20 @@ const SelectPreOrder = ({
           selectable: !disabled,
           selectConfig: {
             showSelectAll: true,
-            rowSelectionEnabled: row => row.preOrderItemStatus === 'New',
+            rowSelectionEnabled: row =>
+              (isRetail === true &&
+                row.preOrderItemStatus === 'New' &&
+                row.isPreOrderItemActive === true &&
+                row.isPreOrderItemOrderable === true &&
+                row.isUOMChanged === false &&
+                (row.preOrderItemType === 'Medication' ||
+                  row.preOrderItemType === 'Consumable' ||
+                  row.preOrderItemType === 'Service')) ||
+              ((isRetail === false || !isRetail) &&
+                row.preOrderItemStatus === 'New' &&
+                row.isPreOrderItemActive === true &&
+                row.isPreOrderItemOrderable === true &&
+                row.isUOMChanged === false),
           },
         }}
         TableProps={{
@@ -77,12 +91,39 @@ const SelectPreOrder = ({
           { name: 'orderByUser', title: 'Order By' },
           { name: 'orderDateDisplay', title: 'Order Date' },
           { name: 'remarks', title: 'Remarks' },
-          { name: 'amount', title: 'Amount' },
+          { name: 'apptDate', title: 'Appt. Date' },
+          { name: 'amount', title: 'Total' },
           { name: 'hasPaid', title: 'Paid' },
           { name: 'preOrderItemStatus', title: 'Status' },
         ]}
         columnExtensions={[
-          { columnName: 'preOrderItemType', sortingEnabled: false, width: 120 },
+          {
+            columnName: 'preOrderItemType',
+            sortingEnabled: false,
+            width: 120,
+            render: row => {
+              return (
+                <Tooltip title={row.preOrderItemType}>
+                  <div>
+                    <span style={{ color: 'red', fontStyle: 'italic' }}>
+                      <sup>
+                        {row.isPreOrderItemActive === false
+                          ? '#1'
+                          : row.isPreOrderItemOrderable === false
+                          ? '#2'
+                          : row.isUOMChanged === true
+                          ? '#3'
+                          : ''}
+                        &nbsp;
+                      </sup>
+                    </span>
+
+                    <span>{row.preOrderItemType}</span>
+                  </div>
+                </Tooltip>
+              )
+            },
+          },
           {
             columnName: 'itemName',
             sortingEnabled: false,
@@ -102,15 +143,57 @@ const SelectPreOrder = ({
               )
             },
           },
-          { columnName: 'displayQty', sortingEnabled: false, width: 120 },
+          {
+            columnName: 'displayQty',
+            type: 'number',
+            precision: 1,
+            sortingEnabled: false,
+            width: 120,
+            render: row => {
+              return (
+                <Tooltip
+                  title={
+                    <span>
+                      {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}{' '}
+                      {row.dispenseUOM}
+                    </span>
+                  }
+                >
+                  <span>
+                    {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}{' '}
+                    {row.dispenseUOM}
+                  </span>
+                </Tooltip>
+              )
+            },
+          },
           { columnName: 'orderByUser', sortingEnabled: false },
           { columnName: 'orderDateDisplay', sortingEnabled: false, width: 140 },
           { columnName: 'remarks', sortingEnabled: false },
           {
-            columnName: 'amount',
+            columnName: 'apptDate',
+            width: 150,
+            type: 'date',
             sortingEnabled: false,
+            render: row => {
+              return row.apptDate
+                ? `${moment(row.apptDate).format('DD MMM YYYY')} ${moment(
+                    row.apptStartTime,
+                    'HH:mm',
+                  ).format('HH:mm')}`
+                : '-'
+            },
+            isDisabled: () => true,
+          },
+          {
+            columnName: 'amount',
+            width: 100,
             type: 'currency',
-            width: 90,
+            sortingEnabled: false,
+            isDisabled: () => true,
+            render: row => {
+              return row.hasPaid === 'Yes' ? row.amount : '-'
+            },
           },
           { columnName: 'hasPaid', sortingEnabled: false, width: 50 },
           {
@@ -120,6 +203,23 @@ const SelectPreOrder = ({
           },
         ]}
       />
+      <div style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+        <span>
+          Note:&nbsp;
+          <span style={{ color: 'red', fontStyle: 'italic' }}>
+            <sup>#1&nbsp;</sup>
+          </span>
+          Inactive item &nbsp;&nbsp;
+          <span style={{ color: 'red', fontStyle: 'italic' }}>
+            <sup>#2&nbsp;</sup>
+          </span>
+          Non-orderable item&nbsp;&nbsp;
+          <span style={{ color: 'red', fontStyle: 'italic' }}>
+            <sup>#3&nbsp;</sup>
+          </span>
+          Dispense/prescribe UOM changed&nbsp;&nbsp;
+        </span>
+      </div>
       {footer &&
         footer({
           onConfirm:

@@ -4,6 +4,8 @@ import ProCard from '@ant-design/pro-card'
 import moment from 'moment'
 import { useSelector } from 'dva'
 import numeral from 'numeral'
+import { getNameWithTitle } from '@/utils/utils'
+import { useVisitTypes } from '@/utils/hooks/'
 import { Icon, dateFormatLongWithTimeNoSec, Tooltip } from '@/components'
 import {
   VISIT_TYPE,
@@ -18,6 +20,7 @@ import WorklistContext from '../Worklist/WorklistContext'
 import CombinedOrderIcon from './CombinedOrderIcon'
 import VisitGroupIcon from './VisitGroupIcon'
 import ModalityStatusIcon from './ModalityStatusIcon'
+import { CallingQueueButton } from '@/components/_medisys'
 
 const blueColor = '#1890f8'
 const statusUpdateDateTooltip = {
@@ -126,7 +129,9 @@ const WorkitemTitle = ({ item }) => {
 }
 
 const WorkitemBody = ({ item }) => {
-  const { setDetailsId, visitPurpose } = useContext(WorklistContext)
+  const { setDetailsId } = useContext(WorklistContext)
+  const visitTypes = useVisitTypes()
+  const { visitInfo } = item
   const orderDate = moment(item.generateDate).format(
     dateFormatLongWithTimeNoSec,
     false,
@@ -142,6 +147,11 @@ const WorkitemBody = ({ item }) => {
     !item.visitInfo.queueNo || !item.visitInfo.queueNo.trim().length
       ? '-'
       : numeral(item.visitInfo.queueNo).format(isQueueNoDecimal ? '0.0' : '0')
+
+  const doctorName = getNameWithTitle(
+    visitInfo.doctorTitle,
+    visitInfo.doctorName,
+  )
 
   return (
     <div
@@ -173,9 +183,7 @@ const WorkitemBody = ({ item }) => {
       </WorkitemRow>
 
       <WorkitemRow>
-        <LeftLabel tooltip={item.visitInfo.doctorName}>
-          {item.visitInfo.doctorName}
-        </LeftLabel>
+        <LeftLabel tooltip={doctorName}>{doctorName}</LeftLabel>
 
         {item.visitInfo.visitGroup && (
           <RightLabel width={100}>
@@ -252,10 +260,27 @@ const WorkitemBody = ({ item }) => {
             justifySelf: 'center',
           }}
         >
-          {visitPurpose &&
+          {visitTypes &&
+            visitTypes.length > 0 &&
             item?.visitInfo &&
-            visitPurpose.find(p => p.id === item.visitInfo.visitPurposeFK).code}
+            visitTypes.find(p => p.id === item.visitInfo.visitPurposeFK).code}
         </span>
+
+        {item.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW && (
+          <span
+            style={{
+              display: 'flex',
+              float: 'right',
+              marginLeft: 50,
+            }}
+          >
+            <CallingQueueButton
+              qId={queueNo}
+              patientName={item.patientInfo.name}
+              from='Radiology'
+            />
+          </span>
+        )}
       </div>
     </div>
   )

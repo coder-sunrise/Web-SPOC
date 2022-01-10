@@ -66,7 +66,7 @@ class RightClickContextMenu extends React.Component {
       return false
     }
 
-    if (visitStatus === VISIT_STATUS.IN_CONS) {
+    if ([VISIT_STATUS.IN_CONS, VISIT_STATUS.PAUSED].indexOf(visitStatus) >= 0) {
       if (id !== doctorProfile.id) {
         notification.error({
           message: `You cannot resume other doctor's consultation.`,
@@ -87,7 +87,6 @@ class RightClickContextMenu extends React.Component {
     const findMatch = item => item.id === parseFloat(id, 10)
 
     let menuOpt = ContextMenuOptions.find(findMatch)
-    // console.log(menuOpt)
     if (apptsActionID.includes(id)) {
       menuOpt = AppointmentContextMenu.find(findMatch)
     }

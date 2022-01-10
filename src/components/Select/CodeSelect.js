@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import Select from '../Antd/AntdSelect'
+import _ from 'lodash'
 
 @connect(({ codetable }) => ({ codetable }))
 class CodeSelect extends React.PureComponent {
@@ -66,10 +67,19 @@ class CodeSelect extends React.PureComponent {
   }
 
   render() {
-    const { codetable, code, localFilter, formatCodes } = this.props
-    const options =
-      code !== undefined ? codetable[code.toLowerCase()] || [] : []
-    const filteredOptions = localFilter ? options.filter(localFilter) : options
+    const { codetable, code, localFilter, formatCodes, orderBy } = this.props
+
+    const options = this.props.options
+      ? //if options set explicitly, to use the options that have been set.
+        //This is only for legacy purpose and options should not be set for codeselect, and use Select component instead.
+        this.props.options
+      : code !== undefined
+      ? codetable[code.toLowerCase()] || []
+      : []
+    let filteredOptions = localFilter ? options.filter(localFilter) : options
+    filteredOptions = orderBy
+      ? _.orderBy(filteredOptions, orderBy[0], orderBy[1])
+      : filteredOptions
     const formattedFilteredOptions = formatCodes
       ? formatCodes(filteredOptions)
       : filteredOptions
@@ -83,9 +93,11 @@ class CodeSelect extends React.PureComponent {
     }
     return (
       <Select
-        options={formattedFilteredOptions || []}
         valueField='id'
         {...selectProps}
+        options={formattedFilteredOptions || []}
+        // prevent to show default '请输入' placeholder
+        placeholder=''
         onChange={(values, opts) => {
           if (
             this.props.maxTagCount === undefined &&

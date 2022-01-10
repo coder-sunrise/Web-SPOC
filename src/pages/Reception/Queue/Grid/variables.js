@@ -21,6 +21,8 @@ import Authorized from '@/utils/Authorized'
 import NurseWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/NurseWorkItemInfo'
 import RadioWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/RadioWorkItemInfo'
 import LabWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/LabWorkItemInfo'
+import { VISIT_TYPE } from '@/utils/constants'
+import DoctorConsultationStatus from './DoctorConsultationStatus'
 
 const compareString = (a, b) => a.localeCompare(b)
 const compareDoctor = (a, b) => {
@@ -73,8 +75,6 @@ const filterLabWorkItem = workItem => {
   return workItem.filter(x => x.type === 'Lab')
 }
 
-
-
 export const FuncConfig = {
   pager: false,
   sort: true,
@@ -119,8 +119,8 @@ export const ApptColumnExtensions = [
     columnName: 'doctorName',
     width: 250,
     render: row => {
-      const _title = row.title ? `${row.title} ` : ''
-      return `${_title}${row.doctorName}`
+      const _title = row.title ? `${row.title || ''} ` : ''
+      return `${_title}${row.doctorName || ''}`
     },
   },
   {
@@ -242,8 +242,8 @@ export const QueueColumnExtensions = [
                   <Authorized authority='openqueuedisplay'>
                     <CallingQueueButton
                       qId={row.queueNo}
-                      roomNo={row.roomNo}
-                      doctor={row.doctor}
+                      patientName={row.patientName}
+                      from='Queue'
                     />
                   </Authorized>
                 )}
@@ -380,9 +380,21 @@ export const QueueColumnExtensions = [
   },
   {
     columnName: 'doctor',
-    compare: compareDoctor,
-    render: row => <DoctorLabel doctor={row.doctor} hideMCR />,
-    width: 150,
+    render: row => {
+      if (row.visitPurposeFK !== VISIT_TYPE.MC) {
+        return <DoctorLabel doctor={row.doctor} hideMCR />
+      }
+
+      const showVisitDoctor = () => {
+        return row.visitDoctor.map(d => {
+          return <DoctorConsultationStatus doctor={d} />
+        })
+      }
+
+      return <DoctorConsultationStatus visitDoctor={row.visitDoctor} />
+    },
+    sortingEnabled: false,
+    width: 280,
   },
   {
     columnName: 'visitOrderTemplate',
@@ -395,13 +407,15 @@ export const QueueColumnExtensions = [
       const labWorkItems = filterLabWorkItem(row.workItem)
       const radioWorkItems = filterRadioWorkItem(row.workItem)
       const nurseWorkItems = filterNurseWorkItem(row.workItem)
-      const labWorkItemsAccessRight = Authorized.check('queue.workitem.labworkitem')
+      const labWorkItemsAccessRight = Authorized.check(
+        'queue.workitem.labworkitem',
+      ) || { rights: 'hidden' }
       const radiologyWorkItemsAccessRight = Authorized.check(
         'queue.workitem.radiologyworkitem',
-      )
+      ) || { rights: 'hidden' }
       const nurseWorkItemsAccessRight = Authorized.check(
         'queue.workitem.nurseworkitem',
-      )
+      ) || { rights: 'hidden' }
       return (
         <div style={{ justifyContent: 'space-between' }}>
           {radiologyWorkItemsAccessRight.rights === 'enable' &&

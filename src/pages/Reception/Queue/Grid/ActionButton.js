@@ -31,7 +31,7 @@ const ActionButton = ({ row, onClick }) => {
                   return {
                     ...opt,
                     disabled: !row.patientProfileFk,
-                    hidden: !row.patientProfileFk,
+                    hidden: !row.patientProfileFk || !row.doctorName,
                   }
                 case 9: // register patient
                   return {
@@ -70,7 +70,8 @@ const ActionButton = ({ row, onClick }) => {
       : true
 
   const isRetailVisit = row.visitPurposeFK === VISIT_TYPE.OTC
-  const isBillFirstVisit = row.visitPurposeFK === VISIT_TYPE.BF
+  const isBillFirstVisit =
+    row.visitPurposeFK === VISIT_TYPE.BF || row.visitPurposeFK === VISIT_TYPE.MC
 
   const enableDispense = () => {
     const consDispense = [

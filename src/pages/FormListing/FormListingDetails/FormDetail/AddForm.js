@@ -5,6 +5,7 @@ import _ from 'lodash'
 
 import { SizeContainer } from '@/components'
 import LCForm from './LCForm/index'
+import Form from './Form/index'
 
 const styles = (theme) => ({
   editor: {
@@ -47,7 +48,6 @@ class AddForm extends PureComponent {
       templateLoader: this.getLoader,
       getNextSequence: this.getNextSequence,
     }
-
     return (
       <div
         style={{
@@ -56,6 +56,7 @@ class AddForm extends PureComponent {
         }}
       >
         {type === '1' && <LCForm {...cfg} />}
+        {type === '2' && <Form {...cfg} />}
       </div>
     )
   }

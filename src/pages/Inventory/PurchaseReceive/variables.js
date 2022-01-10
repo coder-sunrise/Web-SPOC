@@ -157,10 +157,10 @@ export const PurchaseReceiveGridCol = [
 export const ContextMenuOptions = row => {
   const createAuthority = Authorized.check(
     'purchasingandreceiving.newpurchasingandreceiving',
-  )
+  ) || { rights: 'hidden' }
   const viewEditAuthority = Authorized.check(
     'purchasingandreceiving.purchasingandreceivingdetails',
-  )
+  ) || { rights: 'hidden' }
 
   let menuOptions = [
     {

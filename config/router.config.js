@@ -154,6 +154,41 @@ const _routes = [
         ],
       },
       {
+        path: '/lab',
+        icon: 'icon-lab',
+        name: 'lab',
+        moduleName: 'Lab',
+        authority: ['lab'],
+        clinicSetting: ['isEnableLabModule'],
+        specialist: ['GP'],
+        routes: [
+          {
+            path: '/lab/worklist',
+            name: 'worklist',
+            component: './Lab/Worklist',
+            mini: 'LW',
+            exact: true,
+            //authority: ['lab/worklist'],
+          },
+          {
+            path: '/lab/specimenCollection',
+            name: 'specimenCollection',
+            component: './Lab/SpecimenCollection',
+            mini: 'PS',
+            exact: true,
+            //authority: ['lab/worklist'],
+          },
+          {
+            path: '/lab/history',
+            name: 'history',
+            component: './Lab/History',
+            mini: 'LH',
+            exact: true,
+            //authority: ['lab/worklisthistory'],
+          },
+        ],
+      },
+      {
         path: '/pharmacy',
         icon: 'icon-medicinebox-fill',
         name: 'pharmacy',
@@ -765,6 +800,18 @@ const _routes = [
             component: './Report/RadiologyStatisticReport',
             authority: ['report.finance.radiologystatisticreport'],
           },
+          {
+            path: '/report/dispensaryreport',
+            name: 'partialdispensereport',
+            component: './Report/PartialDispenseReport',
+            authority: ['report.inventory.partialdispensereport'],
+          },
+          {
+            path: '/report/preorderlistingreport',
+            name: 'preorderlistingreport',
+            component: './Report/PreOrderListingReport',
+            authority: ['report.finance.preorderlistingreport'],
+          },
         ],
       },
       // Report
@@ -829,14 +876,14 @@ const _routes = [
       // Claim Submission
       //
       // Forms
-      {
-        path: '/forms',
-        icon: 'icon-pic-right',
-        name: 'forms',
-        moduleName: 'Forms',
-        component: './FormListing',
-        authority: ['forms'],
-      },
+      // {
+      //   path: '/forms',
+      //   icon: 'icon-pic-right',
+      //   name: 'forms',
+      //   moduleName: 'Forms',
+      //   component: './FormListing',
+      //   authority: ['forms'],
+      // },
       // Forms
       //
       // Settings
@@ -1130,6 +1177,12 @@ const _routes = [
             authority: ['settings.templates.visitordertemplate'],
           },
           {
+            path: '/setting/medicinetrivia',
+            name: 'medicinetrivia',
+            component: './Setting/medicineTrivia',
+            authority: ['settings.clinicsetting.medicinetrivia'],
+          },
+          {
             path: '/setting/refractiontesttype',
             name: 'refractiontesttype',
             component: './Setting/RefractionTestType',
@@ -1200,6 +1253,24 @@ const _routes = [
             name: 'administrationroute',
             component: './Setting/AdministrationRoute',
             authority: ['settings.clinicsetting.administrationroute'],
+          },
+          {
+            path: '/setting/resource',
+            name: 'resource',
+            component: './Setting/Resource',
+            authority: ['settings.clinicsetting.resource'],
+          },
+          {
+            path: '/setting/individualcomment',
+            name: 'individualcomment',
+            component: './Setting/IndividualComment',
+            // authority: ['settings.clinicsetting.individualcomment'],
+          },
+          {
+            path: '/setting/summarycomment',
+            name: 'summarycomment',
+            component: './Setting/SummaryComment',
+            // authority: ['settings.clinicsetting.individualcomment'],
           },
         ],
       },

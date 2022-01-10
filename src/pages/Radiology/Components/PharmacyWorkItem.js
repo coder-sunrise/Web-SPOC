@@ -13,13 +13,15 @@ import {
   CommonTableGrid,
   Popover,
 } from '@/components'
-import { VISIT_TYPE, VISIT_TYPE_NAME } from '@/utils/constants'
+import { VISIT_TYPE, VISIT_TYPE_NAME, PHARMACY_STATUS } from '@/utils/constants'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import { FileDoneOutlined } from '@ant-design/icons'
 import Warning from '@material-ui/icons/Error'
 import WorklistContext from '../Worklist/WorklistContext'
 import VisitGroupIcon from './VisitGroupIcon'
 import PrintPrescription from './PrintPrescription'
+import withWebSocket from '@/components/Decorator/withWebSocket'
+import { CallingQueueButton } from '@/components/_medisys'
 
 const blueColor = '#1890f8'
 
@@ -139,7 +141,8 @@ const WorkitemTitle = ({ item, classes }) => {
   )
 }
 
-const WorkitemBody = ({ item, classes, clinicSettings }) => {
+const WorkitemBody = props => {
+  const { item, classes, clinicSettings, dispatch } = props
   const { setDetailsId } = useContext(WorklistContext)
   const orderDate = moment(item.generateDate).format('DD MMM YYYY HH:mm')
 
@@ -215,7 +218,7 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
         >
           Details
         </Typography.Text>
-        <PrintPrescription {...item} />
+        <PrintPrescription {...props} />
         {item.isOrderUpdate && (
           <Tooltip title='Order has been amended, please retrieve latest order from Details link'>
             <Warning className={classes.warningIcon} />
@@ -227,6 +230,20 @@ const WorkitemBody = ({ item, classes, clinicSettings }) => {
             visitFK={item.visitFK}
             isQueueNoDecimal={isQueueNoDecimal}
           />
+        )}
+        {item.statusFK === PHARMACY_STATUS.VERIFIED && (
+          <span
+            style={{
+              display: 'flex',
+              float: 'right',
+            }}
+          >
+            <CallingQueueButton
+              qId={queueNo}
+              patientName={item.name}
+              from='Pharmacy'
+            />
+          </span>
         )}
       </div>
     </div>
@@ -250,8 +267,11 @@ const PharmacyWorkItem = props => {
 }
 
 export default compose(
+  withWebSocket(),
   withStyles(styles),
-  connect(({ clinicSettings }) => ({
+  connect(({ clinicSettings, patient, pharmacyDetails }) => ({
     clinicSettings: clinicSettings.settings || clinicSettings.default,
+    patient,
+    pharmacyDetails,
   })),
 )(PharmacyWorkItem)

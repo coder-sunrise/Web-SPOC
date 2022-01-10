@@ -2,18 +2,14 @@ import React, { Component } from 'react'
 // common component
 import { connect } from 'dva'
 import { formatMessage } from 'umi'
+import moment from 'moment'
 import {
   withFormikExtend,
   notification,
   CommonModal,
   Button,
 } from '@/components'
-import {
-  calculateAmount,
-  navigateDirtyCheck,
-  getUniqueId,
-  getTranslationValue,
-} from '@/utils/utils'
+import { calculateAmount, navigateDirtyCheck } from '@/utils/utils'
 import Yup from '@/utils/yup'
 import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
@@ -23,6 +19,7 @@ import AddOrder from './DispenseDetails/AddOrder'
 import DispenseDetails from './DispenseDetails/WebSocketWrapper'
 import { DispenseItemsColumnExtensions } from './variables'
 import _ from 'lodash'
+import patient from '@/models/patient'
 
 const calculateInvoiceAmounts = entity => {
   const obj = { ...entity }
@@ -63,22 +60,51 @@ const calculateInvoiceAmounts = entity => {
 
 const reloadDispense = (props, effect = 'query') => {
   const { dispatch, dispense, resetForm, codetable, clinicSettings } = props
-
-  dispatch({
-    type: `dispense/${effect}`,
-    payload: dispense.visitID,
-  }).then(response => {
-    if (response) {
-      let obj = { ...response }
-      const orderItems = getDispenseItems(codetable, clinicSettings, obj)
-      const defaultExpandedGroups = _.uniqBy(orderItems, 'dispenseGroupId').map(
-        o => o.dispenseGroupId,
-      )
-
-      obj = { ...obj, dispenseItems: orderItems, defaultExpandedGroups }
-      const result = calculateInvoiceAmounts(obj)
-      resetForm(result)
-    }
+  Promise.all([
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventorymedication',
+        force: true,
+        temp: true,
+      },
+    }),
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventoryvaccination',
+        force: true,
+        temp: true,
+      },
+    }),
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventoryconsumable',
+        force: true,
+        temp: true,
+      },
+    }),
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctservice',
+        force: true,
+        temp: true,
+      },
+    }),
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctmedicationunitofmeasurement',
+        force: true,
+      },
+    }),
+  ]).then(r => {
+    dispatch({
+      type: `dispense/${effect}`,
+      payload: dispense.visitID,
+    })
   })
 }
 
@@ -103,7 +129,7 @@ const constructPayload = values => {
   }
 
   const updateTempDispenseItem = (items, inventoryFiledName) => {
-    return items.map(m => {
+    return items?.map(m => {
       let tempDispenseItem = []
       if (!m.isPreOrder) {
         const matchItem = values.dispenseItems.filter(
@@ -113,7 +139,6 @@ const constructPayload = values => {
             d.dispenseQuantity > 0 &&
             !d.isDispensedByPharmacy,
         )
-
         if (matchItem.length) {
           matchItem.forEach(item => {
             tempDispenseItem.push({
@@ -148,578 +173,6 @@ const constructPayload = values => {
     defaultExpandedGroups: undefined,
   }
   return _values
-}
-
-const getDispenseItems = (codetable, clinicSettings, entity = {}) => {
-  const {
-    inventorymedication = [],
-    inventoryconsumable = [],
-    inventoryvaccination = [],
-    ctmedicationunitofmeasurement = [],
-  } = codetable
-
-  const {
-    primaryPrintoutLanguage = 'EN',
-    secondaryPrintoutLanguage = '',
-  } = clinicSettings
-
-  let orderItems = []
-  const defaultItem = (item, groupName) => {
-    return {
-      ...item,
-      stockBalance: item.quantity,
-      dispenseGroupId: groupName,
-      countNumber: 1,
-      rowspan: 1,
-      uid: getUniqueId(),
-    }
-  }
-
-  const transactionDetails = item => {
-    const {
-      inventoryStockFK,
-      batchNo,
-      expiryDate,
-      oldQty,
-      transactionQty,
-      uomDisplayValue,
-      secondUOMDisplayValue,
-    } = item
-    return {
-      dispenseQuantity: transactionQty,
-      batchNo,
-      expiryDate,
-      stock: oldQty,
-      stockFK: inventoryStockFK,
-      uomDisplayValue,
-      secondUOMDisplayValue,
-    }
-  }
-
-  const generateFromTempDispenseInfo = (
-    item,
-    stock = 0,
-    isDefault,
-    primaryUOM,
-    secondUOM,
-  ) => {
-    const { inventoryStockFK, batchNo, expiryDate, transactionQty } = item
-    return {
-      dispenseQuantity: transactionQty,
-      batchNo,
-      expiryDate,
-      stock,
-      stockFK: inventoryStockFK,
-      uomDisplayValue: primaryUOM,
-      secondUOMDisplayValue: secondUOM,
-      isDefault,
-    }
-  }
-
-  const generateFromDrugmixture = item => {
-    const drugMixtures = _.orderBy(
-      item.prescriptionDrugMixture,
-      ['sequence'],
-      ['asc'],
-    )
-    drugMixtures.forEach(drugMixture => {
-      const detaultDrugMixture = {
-        ...defaultItem(item, `DrugMixture-${item.id}`),
-        drugMixtureFK: drugMixture.id,
-        inventoryMedicationFK: drugMixture.inventoryMedicationFK,
-        code: drugMixture.drugCode,
-        name: drugMixture.drugName,
-        quantity: drugMixture.quantity,
-        dispenseUOM: drugMixture.uomDisplayValue,
-        isDispensedByPharmacy: drugMixture.isDispensedByPharmacy,
-        drugMixtureName: item.name,
-        stockBalance: drugMixture.quantity,
-        uid: getUniqueId(),
-      }
-      if (drugMixture.isDispensedByPharmacy) {
-        if (drugMixture.dispenseItem.length) {
-          drugMixture.dispenseItem.forEach((di, index) => {
-            orderItems.push({
-              ...detaultDrugMixture,
-              ...transactionDetails(di),
-              stockBalance:
-                drugMixture.quantity -
-                _.sumBy(drugMixture.dispenseItem, 'transactionQty'),
-              countNumber: index === 0 ? 1 : 0,
-              rowspan: index === 0 ? drugMixture.dispenseItem.length : 0,
-              uid: getUniqueId(),
-            })
-          })
-        } else {
-          orderItems.push({
-            ...detaultDrugMixture,
-          })
-        }
-      } else {
-        const inventoryItem = inventorymedication.find(
-          drug => drug.id === drugMixture.inventoryMedicationFK,
-        )
-        const uom =
-          ctmedicationunitofmeasurement.find(
-            m => m.id === inventoryItem?.dispensingUOM?.id,
-          ) || {}
-        const primaryUOMDisplayValue = getTranslationValue(
-          uom.translationData,
-          primaryPrintoutLanguage,
-          'displayValue',
-        )
-        const secondUOMDisplayValue =
-          secondaryPrintoutLanguage !== ''
-            ? getTranslationValue(
-                uom.translationData,
-                secondaryPrintoutLanguage,
-                'displayValue',
-              )
-            : ''
-
-        const tempDispenseItem = (item.tempDispenseItem || []).filter(
-          t => t.inventoryFK === drugMixture.inventoryMedicationFK,
-        )
-        if (tempDispenseItem.length) {
-          tempDispenseItem.forEach((di, index) => {
-            const currentStock = (inventoryItem?.medicationStock || []).find(
-              s => s.id === di.inventoryStockFK,
-            )
-            orderItems.push({
-              ...detaultDrugMixture,
-              ...generateFromTempDispenseInfo(
-                di,
-                currentStock?.stock,
-                currentStock?.isDefault,
-                primaryUOMDisplayValue,
-                secondUOMDisplayValue,
-              ),
-              stockBalance:
-                drugMixture.quantity -
-                _.sumBy(tempDispenseItem, 'transactionQty'),
-              countNumber: index === 0 ? 1 : 0,
-              rowspan: index === 0 ? tempDispenseItem.length : 0,
-              uid: getUniqueId(),
-            })
-          })
-        } else {
-          const inventoryItemStock = _.orderBy(
-            (inventoryItem?.medicationStock || []).filter(
-              s => s.isDefault || s.stock > 0,
-            ),
-            ['isDefault', 'expiryDate'],
-            ['asc'],
-          )
-          let remainQty = drugMixture.quantity
-          if (remainQty > 0 && inventoryItem && inventoryItemStock.length) {
-            inventoryItemStock.forEach((itemStock, index) => {
-              const { id, batchNo, expiryDate, stock, isDefault } = itemStock
-              if (remainQty > 0) {
-                let dispenseQuantity = 0
-                if (isDefault || remainQty <= stock) {
-                  dispenseQuantity = remainQty
-                  remainQty = -1
-                } else {
-                  dispenseQuantity = stock
-                  remainQty = remainQty - stock
-                }
-                orderItems.push({
-                  ...detaultDrugMixture,
-                  dispenseQuantity: dispenseQuantity,
-                  batchNo,
-                  expiryDate,
-                  stock,
-                  stockFK: id,
-                  uomDisplayValue: primaryUOMDisplayValue,
-                  secondUOMDisplayValue: secondUOMDisplayValue,
-                  isDefault,
-                  stockBalance: 0,
-                  countNumber: index === 0 ? 1 : 0,
-                  rowspan: 0,
-                  uid: getUniqueId(),
-                })
-              }
-            })
-            const firstItem = orderItems.find(
-              i => i.drugMixtureFK === drugMixture.id && i.countNumber === 1,
-            )
-            firstItem.rowspan = orderItems.filter(
-              i => i.drugMixtureFK === drugMixture.id,
-            ).length
-          } else {
-            orderItems.push({
-              ...detaultDrugMixture,
-            })
-          }
-        }
-      }
-    })
-
-    const groupItems = orderItems.filter(
-      oi => oi.type === item.type && oi.id === item.id,
-    )
-    groupItems[0].groupNumber = 1
-    groupItems[0].groupRowSpan = groupItems.length
-  }
-
-  const generateFromNormalMedication = item => {
-    const groupName = 'NormalDispense'
-    if (item.isPreOrder) {
-      orderItems.push({
-        ...defaultItem(item, groupName),
-        groupNumber: 1,
-        groupRowSpan: 1,
-      })
-      return
-    }
-
-    if (item.isDispensedByPharmacy) {
-      if (item.dispenseItem.length) {
-        item.dispenseItem.forEach((di, index) => {
-          orderItems.push({
-            ...defaultItem(item, groupName),
-            ...transactionDetails(di),
-            stockBalance:
-              item.quantity - _.sumBy(item.dispenseItem, 'transactionQty'),
-            countNumber: index === 0 ? 1 : 0,
-            rowspan: index === 0 ? item.dispenseItem.length : 0,
-            uid: getUniqueId(),
-          })
-        })
-      } else {
-        orderItems.push(defaultItem(item, groupName))
-      }
-    } else {
-      const inventoryItem = inventorymedication.find(
-        drug => drug.id === item.inventoryMedicationFK,
-      )
-      const uom =
-        ctmedicationunitofmeasurement.find(
-          m => m.id === inventoryItem?.dispensingUOM?.id,
-        ) || {}
-      const primaryUOMDisplayValue = getTranslationValue(
-        uom.translationData,
-        primaryPrintoutLanguage,
-        'displayValue',
-      )
-      const secondUOMDisplayValue =
-        secondaryPrintoutLanguage !== ''
-          ? getTranslationValue(
-              uom.translationData,
-              secondaryPrintoutLanguage,
-              'displayValue',
-            )
-          : ''
-      if (item.tempDispenseItem.length) {
-        item.tempDispenseItem.forEach((di, index) => {
-          const currentStock = (inventoryItem?.medicationStock || []).find(
-            s => s.id === di.inventoryStockFK,
-          )
-          orderItems.push({
-            ...defaultItem(item, groupName),
-            ...generateFromTempDispenseInfo(
-              di,
-              currentStock?.stock,
-              currentStock?.isDefault,
-              primaryUOMDisplayValue,
-              secondUOMDisplayValue,
-            ),
-            stockBalance:
-              item.quantity - _.sumBy(item.tempDispenseItem, 'transactionQty'),
-            countNumber: index === 0 ? 1 : 0,
-            rowspan: index === 0 ? item.tempDispenseItem.length : 0,
-            uid: getUniqueId(),
-          })
-        })
-      } else {
-        const inventoryItemStock = _.orderBy(
-          (inventoryItem?.medicationStock || []).filter(
-            s => s.isDefault || s.stock > 0,
-          ),
-          ['isDefault', 'expiryDate'],
-          ['asc'],
-        )
-        let remainQty = item.quantity
-        if (remainQty > 0 && inventoryItem && inventoryItemStock.length) {
-          inventoryItemStock.forEach((itemStock, index) => {
-            const { id, batchNo, expiryDate, stock, isDefault } = itemStock
-            if (remainQty > 0) {
-              let dispenseQuantity = 0
-              if (isDefault || remainQty <= stock) {
-                dispenseQuantity = remainQty
-                remainQty = -1
-              } else {
-                dispenseQuantity = stock
-                remainQty = remainQty - stock
-              }
-              orderItems.push({
-                ...defaultItem(item, groupName),
-                dispenseQuantity: dispenseQuantity,
-                batchNo,
-                expiryDate,
-                stock,
-                stockFK: id,
-                uomDisplayValue: primaryUOMDisplayValue,
-                secondUOMDisplayValue: secondUOMDisplayValue,
-                isDefault,
-                stockBalance: 0,
-                countNumber: index === 0 ? 1 : 0,
-                rowspan: 0,
-                uid: getUniqueId(),
-              })
-            }
-          })
-          const firstItem = orderItems.find(
-            i =>
-              i.type === item.type &&
-              i.isDrugMixture === item.isDrugMixture &&
-              i.id === item.id &&
-              i.countNumber === 1,
-          )
-          firstItem.rowspan = orderItems.filter(
-            i =>
-              i.type === item.type &&
-              i.isDrugMixture === item.isDrugMixture &&
-              i.id === item.id,
-          ).length
-        } else {
-          orderItems.push(defaultItem(item, groupName))
-        }
-      }
-    }
-
-    const groupItems = orderItems.filter(
-      oi => oi.type === item.type && oi.id === item.id,
-    )
-    groupItems[0].groupNumber = 1
-    groupItems[0].groupRowSpan = groupItems.length
-  }
-
-  const generateFromNormalConsumable = item => {
-    const groupName = 'NormalDispense'
-    if (item.isPreOrder) {
-      orderItems.push({
-        ...defaultItem(item, groupName),
-        groupNumber: 1,
-        groupRowSpan: 1,
-      })
-      return
-    }
-    if (item.isDispensedByPharmacy) {
-      if (item.dispenseItem.length) {
-        item.dispenseItem.forEach((di, index) => {
-          orderItems.push({
-            ...defaultItem(item, groupName),
-            ...transactionDetails(di),
-            stockBalance:
-              item.quantity - _.sumBy(item.dispenseItem, 'transactionQty'),
-            countNumber: index === 0 ? 1 : 0,
-            rowspan: index === 0 ? item.dispenseItem.length : 0,
-            uid: getUniqueId(),
-          })
-        })
-      } else {
-        orderItems.push(defaultItem(item, groupName))
-      }
-    } else {
-      const inventoryItem = inventoryconsumable.find(
-        consumable => consumable.id === item.inventoryConsumableFK,
-      )
-
-      if (item.tempDispenseItem.length) {
-        item.tempDispenseItem.forEach((di, index) => {
-          const currentStock = (inventoryItem?.consumableStock || []).find(
-            s => s.id === di.inventoryStockFK,
-          )
-          orderItems.push({
-            ...defaultItem(item, groupName),
-            ...generateFromTempDispenseInfo(
-              di,
-              currentStock?.stock,
-              currentStock?.isDefault,
-              inventoryItem?.uom?.name,
-            ),
-            stockBalance:
-              item.quantity - _.sumBy(item.tempDispenseItem, 'transactionQty'),
-            countNumber: index === 0 ? 1 : 0,
-            rowspan: index === 0 ? item.tempDispenseItem.length : 0,
-            uid: getUniqueId(),
-          })
-        })
-      } else {
-        const inventoryItemStock = _.orderBy(
-          (inventoryItem?.consumableStock || []).filter(
-            s => s.isDefault || s.stock > 0,
-          ),
-          ['isDefault', 'expiryDate'],
-          ['asc'],
-        )
-        let remainQty = item.quantity
-        if (remainQty > 0 && inventoryItem && inventoryItemStock.length) {
-          inventoryItemStock.forEach((itemStock, index) => {
-            const { id, batchNo, expiryDate, stock, isDefault } = itemStock
-            if (remainQty > 0) {
-              let dispenseQuantity = 0
-              if (isDefault || remainQty <= stock) {
-                dispenseQuantity = remainQty
-                remainQty = -1
-              } else {
-                dispenseQuantity = stock
-                remainQty = remainQty - stock
-              }
-              orderItems.push({
-                ...defaultItem(item, groupName),
-                dispenseQuantity: dispenseQuantity,
-                batchNo,
-                expiryDate,
-                stock,
-                stockFK: id,
-                uomDisplayValue: inventoryItem?.uom?.name,
-                isDefault,
-                stockBalance: 0,
-                countNumber: index === 0 ? 1 : 0,
-                rowspan: 0,
-                uid: getUniqueId(),
-              })
-            }
-            const firstItem = orderItems.find(
-              i =>
-                i.type === item.type &&
-                i.isDrugMixture === item.isDrugMixture &&
-                i.id === item.id &&
-                i.countNumber === 1,
-            )
-            firstItem.rowspan = orderItems.filter(
-              i =>
-                i.type === item.type &&
-                i.isDrugMixture === item.isDrugMixture &&
-                i.id === item.id,
-            ).length
-          })
-        } else {
-          orderItems.push(defaultItem(item, groupName))
-        }
-      }
-    }
-    const groupItems = orderItems.filter(
-      oi => oi.type === item.type && oi.id === item.id,
-    )
-    groupItems[0].groupNumber = 1
-    groupItems[0].groupRowSpan = groupItems.length
-  }
-
-  const generateFromNormalVaccination = item => {
-    const groupName = 'NormalDispense'
-    if (item.isPreOrder) {
-      orderItems.push({
-        ...defaultItem(item, groupName),
-        groupNumber: 1,
-        groupRowSpan: 1,
-      })
-      return
-    }
-    const inventoryItem = inventoryvaccination.find(
-      vaccination => vaccination.id === item.inventoryVaccinationFK,
-    )
-    if (item.tempDispenseItem.length) {
-      item.tempDispenseItem.forEach((di, index) => {
-        const currentStock = (inventoryItem?.vaccinationStock || []).find(
-          s => s.id === di.inventoryStockFK,
-        )
-        orderItems.push({
-          ...defaultItem(item, groupName),
-          ...generateFromTempDispenseInfo(
-            di,
-            currentStock?.stock,
-            currentStock?.isDefault,
-            inventoryItem?.prescribingUOM?.name,
-          ),
-          stockBalance:
-            item.quantity - _.sumBy(item.tempDispenseItem, 'transactionQty'),
-          countNumber: index === 0 ? 1 : 0,
-          rowspan: index === 0 ? item.tempDispenseItem.length : 0,
-          uid: getUniqueId(),
-        })
-      })
-    } else {
-      const inventoryItemStock = _.orderBy(
-        (inventoryItem?.vaccinationStock || []).filter(
-          s => s.isDefault || s.stock >= item.quantity,
-        ),
-        ['isDefault', 'expiryDate'],
-        ['asc'],
-      )
-      let remainQty = item.quantity
-      if (remainQty > 0 && inventoryItem && inventoryItemStock.length) {
-        const {
-          id,
-          batchNo,
-          expiryDate,
-          stock,
-          isDefault,
-        } = inventoryItemStock[0]
-        orderItems.push({
-          ...defaultItem(item, groupName),
-          dispenseQuantity: item.quantity,
-          batchNo,
-          expiryDate,
-          stock,
-          stockFK: id,
-          uomDisplayValue: inventoryItem?.prescribingUOM?.name,
-          isDefault,
-          stockBalance: 0,
-        })
-      } else {
-        const { batchNo, expiryDate, ...restItem } = item
-        orderItems.push(defaultItem(restItem, groupName))
-      }
-    }
-    const groupItems = orderItems.filter(
-      oi => oi.type === item.type && oi.id === item.id,
-    )
-    groupItems[0].groupNumber = 1
-    groupItems[0].groupRowSpan = groupItems.length
-  }
-
-  const sortOrderItems = [
-    ...(entity.prescription || []).filter(
-      item => item.type === 'Medication' && !item.isDrugMixture,
-    ),
-    ...(entity.vaccination || []),
-    ...(entity.consumable || []),
-    ...(entity.prescription || []).filter(
-      item => item.type === 'Medication' && item.isDrugMixture,
-    ),
-    ...(entity.prescription || []).filter(
-      item => item.type === 'Open Prescription',
-    ),
-    ...(entity.externalPrescription || []),
-  ]
-
-  sortOrderItems.forEach(item => {
-    if (item.type === 'Medication') {
-      if (item.isDrugMixture) {
-        generateFromDrugmixture(item)
-      } else {
-        generateFromNormalMedication(item)
-      }
-    } else if (
-      item.type === 'Open Prescription' ||
-      item.type === 'Medication (Ext.)'
-    ) {
-      orderItems.push({
-        ...defaultItem(item, 'NoNeedToDispense'),
-        groupNumber: 1,
-        groupRowSpan: 1,
-      })
-    } else if (item.type === 'Vaccination') {
-      generateFromNormalVaccination(item)
-    } else {
-      generateFromNormalConsumable(item)
-    }
-  })
-
-  return orderItems
 }
 
 const validDispense = (dispenseItems = []) => {
@@ -801,19 +254,8 @@ const validDispense = (dispenseItems = []) => {
   enableReinitialize: true,
   notDirtyDuration: 3,
   mapPropsToValues: pops => {
-    const {
-      dispense = {},
-      codetable,
-      clinicSettings: { settings = {} },
-    } = pops
+    const { dispense = {} } = pops
     let obj = dispense.entity || dispense.default
-
-    const orderItems = getDispenseItems(codetable, settings, obj)
-    const defaultExpandedGroups = _.uniqBy(orderItems, 'dispenseGroupId').map(
-      o => o.dispenseGroupId,
-    )
-
-    obj = { ...obj, dispenseItems: orderItems, defaultExpandedGroups }
     const result = calculateInvoiceAmounts(obj)
     return result
   },
@@ -851,18 +293,24 @@ const validDispense = (dispenseItems = []) => {
   },
   displayName: 'DispensePage',
 })
-@connect(({ orders, formik, dispense }) => ({
+@connect(({ orders, formik, dispense, patient, clinicSettings }) => ({
   orders,
   formik,
   dispense,
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
+  patient,
 }))
 class Main extends Component {
   state = {
     showOrderModal: false,
     showDrugLabelSelection: false,
-    selectedDrugs: [],
     showCautionAlert: false,
     isShowOrderUpdated: false,
+    currentDrugToPrint: {},
+    packageItem: [],
+    dispenseItems: [],
+    packageItem: [],
+    dispenseItems: [],
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -892,13 +340,17 @@ class Main extends Component {
   }
 
   componentDidMount = async () => {
-    const { dispatch, values, dispense } = this.props
     const {
-      otherOrder = [],
-      prescription = [],
-      packageItem = [],
-      visitPurposeFK,
-    } = values
+      dispatch,
+      values,
+      dispense,
+      clinicSettings,
+      visitRegistration,
+    } = this.props
+
+    const { entity = {} } = visitRegistration
+    const { visit = {} } = entity
+    const { otherOrder = [], prescription = [], packageItem = [] } = values
     dispatch({
       type: 'dispense/incrementLoadCount',
     })
@@ -906,8 +358,7 @@ class Main extends Component {
     const noClinicalObjectRecord = !values.clinicalObjectRecordFK
 
     const accessRights = Authorized.check('queue.dispense.editorder')
-
-    if (visitPurposeFK === VISIT_TYPE.OTC && isEmptyDispense) {
+    if (visit.visitPurposeFK === VISIT_TYPE.OTC && isEmptyDispense) {
       this.setState(
         prevState => {
           return {
@@ -925,7 +376,8 @@ class Main extends Component {
     if (
       accessRights &&
       accessRights.rights !== 'hidden' &&
-      visitPurposeFK === VISIT_TYPE.BF &&
+      (visit.visitPurposeFK === VISIT_TYPE.BF ||
+        visit.visitPurposeFK === VISIT_TYPE.MC) &&
       isEmptyDispense &&
       noClinicalObjectRecord &&
       dispense.loadCount === 0
@@ -947,6 +399,13 @@ class Main extends Component {
         })
       }
     })
+
+    // set default language based on patient tranlsation and clinic setting.
+    const preferLanguage =
+      (patient && patient.translationLinkFK) === 5
+        ? 'JP'
+        : clinicSettings.primaryPrintoutLanguage
+    this.setState({ selectedLanguage: [preferLanguage] })
 
     this.setState(() => {
       return {
@@ -1029,6 +488,21 @@ class Main extends Component {
     }
   }
 
+  actualizeEditOrder = () => {
+    const { dispatch, values, dispense, orders } = this.props
+    this.setState(
+      prevState => {
+        return {
+          showOrderModal: !prevState.showOrderModal,
+          isFirstAddOrder: false,
+        }
+      },
+      () => {
+        this.openFirstTabAddOrder()
+      },
+    )
+  }
+
   openFirstTabAddOrder = () => {
     const { dispatch, values } = this.props
     if (this.state.showOrderModal) {
@@ -1104,9 +578,16 @@ class Main extends Component {
     } = this.props
     const { visitPurposeFK } = values
     const newOrderRows = rows.filter(row => !row.id && !row.isDeleted)
-    if (formik.OrderPage && !formik.OrderPage.dirty && newOrderRows.length > 0)
+
+    if (
+      (formik.OrderPage && !formik.OrderPage.dirty) ||
+      newOrderRows.length > 0
+    )
       this.showConfirmationBox()
-    else if (visitPurposeFK === VISIT_TYPE.BF) {
+    else if (
+      visitPurposeFK === VISIT_TYPE.BF ||
+      visitPurposeFK === VISIT_TYPE.MC
+    ) {
       dispatch({
         type: 'consultation/discard',
         payload: {
@@ -1126,31 +607,12 @@ class Main extends Component {
       this.handleOrderModal()
     }
   }
-
-  handleDrugLabelClick = () => {
-    const { values } = this.props
-    const { prescription = [], packageItem = [] } = values
-    let drugList = []
-
-    prescription.forEach(item => {
-      drugList.push(item)
-    })
-    packageItem.forEach(item => {
-      if (item.type === 'Medication') {
-        drugList.push({
-          ...item,
-          name: item.description,
-          dispensedQuanity: item.packageConsumeQuantity,
-        })
-      }
-    })
-
+  // click Drug Label button to show drug label selection
+  handleDrugLabelClick = row => {
+    this.setState({ currentDrugToPrint: row })
     this.setState(prevState => {
       return {
         showDrugLabelSelection: !prevState.showDrugLabelSelection,
-        selectedDrugs: drugList.map(x => {
-          return { ...x, no: 1, selected: true }
-        }),
       }
     })
   }
@@ -1161,24 +623,6 @@ class Main extends Component {
         showDrugLabelSelection: !prevState.showDrugLabelSelection,
       }
     })
-  }
-
-  handleDrugLabelSelected = (itemId, selected) => {
-    this.setState(prevState => ({
-      selectedDrugs: prevState.selectedDrugs.map(drug =>
-        drug.id === itemId ? { ...drug, selected } : { ...drug },
-      ),
-    }))
-    this.props.dispatch({ type: 'global/incrementCommitCount' })
-  }
-
-  handleDrugLabelNoChanged = (itemId, no) => {
-    this.setState(prevState => ({
-      selectedDrugs: prevState.selectedDrugs.map(drug =>
-        drug.id === itemId ? { ...drug, no } : { ...drug },
-      ),
-    }))
-    this.props.dispatch({ type: 'global/incrementCommitCount' })
   }
 
   showRefreshOrder = () => {
@@ -1200,8 +644,34 @@ class Main extends Component {
     }
   }
 
+  checkExpiredItems = () => {
+    if (
+      (this.props.values.dispenseItems || []).find(
+        item =>
+          item.expiryDate &&
+          moment(item.expiryDate).startOf('day') < moment().startOf('day'),
+      )
+    ) {
+      return true
+    }
+    return false
+  }
+
   render() {
-    const { classes, handleSubmit, values, dispense, codetable } = this.props
+    const {
+      classes,
+      handleSubmit,
+      values,
+      dispense,
+      codetable,
+      isActualizeInRetail,
+      testProps,
+    } = this.props
+
+    if (dispense.openOrderPopUpAfterActualize) {
+      this.actualizeEditOrder()
+      dispense.openOrderPopUpAfterActualize = false
+    }
     return (
       <div className={classes.root}>
         <DispenseDetails
@@ -1213,9 +683,8 @@ class Main extends Component {
           onDrugLabelClick={this.handleDrugLabelClick}
           showDrugLabelSelection={this.state.showDrugLabelSelection}
           onDrugLabelSelectionClose={this.handleDrugLabelSelectionClose}
-          onDrugLabelSelected={this.handleDrugLabelSelected}
-          onDrugLabelNoChanged={this.handleDrugLabelNoChanged}
-          selectedDrugs={this.state.selectedDrugs}
+          currentDrugToPrint={this.state.currentDrugToPrint}
+          isIncludeExpiredItem={this.checkExpiredItems()}
         />
         <CommonModal
           title='Orders'

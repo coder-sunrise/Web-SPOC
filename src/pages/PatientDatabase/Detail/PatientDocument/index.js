@@ -1,9 +1,8 @@
 import React, { PureComponent } from 'react'
-
 import { withStyles } from '@material-ui/core'
-
 import { CommonModal } from '@/components'
-import PatientDocument from '@/pages/Widgets/PatientDocument'
+import AttachmentDocument from '@/pages/Widgets/AttachmentDocument'
+import { FOLDER_TYPE } from '@/utils/constants'
 
 const styles = () => ({
   container: {
@@ -15,16 +14,16 @@ const styles = () => ({
 })
 
 class Document extends PureComponent {
-  componentDidMount () {
+  componentDidMount() {
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('resize', this.resize.bind(this))
   }
 
-  resize () {
+  resize() {
     if (this.divElement) {
       const height = this.divElement.clientHeight
       if (height > 0) {
@@ -33,7 +32,13 @@ class Document extends PureComponent {
     }
   }
 
-  render () {
+  render() {
+    const {
+      patient: { entity },
+      folder,
+    } = this.props
+
+    const patientIsActive = entity && entity.isActive
     return (
       <CommonModal
         open
@@ -42,7 +47,12 @@ class Document extends PureComponent {
         title='Patient Document'
         keepMounted={false}
       >
-        <PatientDocument {...this.props} />
+        <AttachmentDocument
+          {...this.props}
+          type={FOLDER_TYPE.PATIENT}
+          readOnly={!patientIsActive}
+          modelName='patientAttachment'
+        />
       </CommonModal>
     )
   }

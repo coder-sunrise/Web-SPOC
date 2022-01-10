@@ -3,7 +3,7 @@ import { useSelector } from 'dva'
 import { Radio, Input } from 'antd'
 import moment from 'moment'
 import Authorized from '@/utils/Authorized'
-import { GridContainer, GridItem } from '@/components'
+import { GridContainer, GridItem, CommonModal } from '@/components'
 import {
   RightAlignGridItem,
   SectionTitle,
@@ -17,6 +17,8 @@ import {
   SCRIBBLE_NOTE_TYPE,
 } from '@/utils/constants'
 import { CannedTextButton, RadiographerTag, Findings } from './index'
+import { scribbleTypes } from '@/utils/codes'
+import ScribbleNote from '@/pages/Shared/ScribbleNote/ScribbleNote'
 
 const findingSettings = {
   authority: 'queue.consultation.clinicalnotes.history',
@@ -41,7 +43,10 @@ export const ExaminationDetails = ({
   const [comment, setComment] = useState('')
   const [findings, setFindings] = useState({})
   const [hasChanged, setHasChanged] = useState(false)
+  const [scribbleNoteSelectedData, setSribbleNoteSelectedData] = useState({})
+  const [isShowScribbleNote, setIsShowScribbleNote] = useState(false)
   const { isReadOnly } = useContext(WorklistContext)
+  const base64Prefix = 'data:image/jpeg;base64,'
 
   if (!workitem) return <div></div>
 
@@ -89,134 +94,234 @@ export const ExaminationDetails = ({
   const isHiddenExaminationFinding =
     Authorized.check('radiologyworklist.examinationfinding').rights === 'hidden'
 
+  let currentScribbleNotes = []
+  const scribbleType = scribbleTypes.find(o => o.type === 'radiology')
+  if (scribbleType && workitem?.radiologyScribbleNote) {
+    currentScribbleNotes = _.orderBy(
+      workitem.radiologyScribbleNote.filter(
+        o => o.scribbleNoteTypeFK === scribbleType.typeFK,
+      ),
+      ['subject'],
+      ['asc'],
+    )
+  }
+
+  const viewScribbleNote = scribbleNote => {
+    setSribbleNoteSelectedData(scribbleNote)
+    setIsShowScribbleNote(true)
+    window.g_app._store.dispatch({
+      type: 'scriblenotes/updateState',
+      payload: {
+        showViewScribbleModal: true,
+        isReadonly: true,
+        entity: scribbleNote,
+      },
+    })
+  }
+
+  const scribbleLink = currentScribbleNotes.map(o => {
+    let src
+    if (o.thumbnail && o.thumbnail !== '') {
+      src = `${base64Prefix}${o.thumbnail}`
+    }
+    return (
+      <div
+        style={{
+          marginRight: 10,
+          fontSize: '0.85rem',
+          fontWeight: 'bold',
+        }}
+      >
+        <span>{o.subject}</span>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '1px solid #CCCCCC',
+            width: 277,
+            height: 152,
+            cursor: 'pointer',
+          }}
+          onClick={() => {
+            viewScribbleNote(o)
+          }}
+        >
+          {src ? (
+            <img src={src} alt={o.subject} width={275} height={150} />
+          ) : (
+            <span>No Image</span>
+          )}
+        </div>
+      </div>
+    )
+  })
+
+  const toggleScribbleModal = () => {
+    setIsShowScribbleNote(false)
+    window.g_app._store.dispatch({
+      type: 'scriblenotes/updateState',
+      payload: {
+        showViewScribbleModal: isShowScribbleNote,
+        isReadonly: false,
+      },
+    })
+  }
+
   return (
     <div>
-      <SectionTitle title='Examination Details' />
+      <div>
+        <SectionTitle title='Examination Details' />
 
-      {!isReadOnly &&
-      workitem.statusFK <= RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ? (
-        <GridContainer style={{ rowGap: 10 }}>
-          <GridItem md={2}>
-            <RightAlignGridItem md={12}>Radiographer :</RightAlignGridItem>
-          </GridItem>
+        {!isReadOnly &&
+        workitem.statusFK <= RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ? (
+          <GridContainer style={{ rowGap: 10 }}>
+            <GridItem md={2}>
+              <RightAlignGridItem md={12}>Radiographer :</RightAlignGridItem>
+            </GridItem>
 
-          <GridItem md={10}>
-            {workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW ||
-            workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS ? (
-              <div style={{ display: 'flex' }}>
-                <RadiographerTag
-                  value={assignedRadiographers}
-                  onChange={newVal => {
-                    setAssignedRadiographers(newVal)
-                    setHasChanged(true)
-                  }}
-                />
-                {showRequiredField && assignedRadiographers.length === 0 && (
-                  <span style={{ color: 'red' }}>
-                    * This is a required field
-                  </span>
-                )}
-              </div>
+            <GridItem md={10}>
+              {workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW ||
+              workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS ? (
+                <div style={{ display: 'flex' }}>
+                  <RadiographerTag
+                    value={assignedRadiographers}
+                    onChange={newVal => {
+                      setAssignedRadiographers(newVal)
+                      setHasChanged(true)
+                    }}
+                  />
+                  {showRequiredField && assignedRadiographers.length === 0 && (
+                    <span style={{ color: 'red' }}>
+                      * This is a required field
+                    </span>
+                  )}
+                </div>
+              ) : (
+                assignedRadiographers.map(r => r.name).join(', ')
+              )}
+            </GridItem>
+
+            <GridItem md={2}>
+              <RightAlignGridItem md={12}>
+                Radiographer Comments :
+              </RightAlignGridItem>
+            </GridItem>
+            <GridItem md={10} style={{ textAlign: 'right' }}>
+              <CannedTextButton
+                buttonType='text'
+                cannedTextTypeFK={CANNED_TEXT_TYPE.RADIOGRAPHERCOMMENT}
+                style={{
+                  marginRight: 0,
+                  marginBottom: 8,
+                }}
+                handleSelectCannedText={cannedText => {
+                  setComment((comment ? comment + '\n' : '') + cannedText.text)
+                  setHasChanged(true)
+                }}
+              />
+            </GridItem>
+            <GridItem md={12}>
+              <Input.TextArea
+                maxLength={2000}
+                value={comment}
+                onChange={e => {
+                  setComment(e.target.value)
+                  setHasChanged(true)
+                }}
+                autoSize={{ minRows: 3, maxRows: 5 }}
+              />
+            </GridItem>
+            {workitem.statusFK ===
+              RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED &&
+              !isHiddenExaminationFinding && (
+                <GridItem md={12}>
+                  <Findings
+                    defaultValue={workitem.examinationFinding}
+                    radiologyScribbleNote={workitem.radiologyScribbleNote}
+                    onChange={value => {
+                      setFindings(value)
+                      setHasChanged(true)
+                    }}
+                    workItem={workitem}
+                    item={findingSettings}
+                    {...restProps}
+                  />
+                </GridItem>
+              )}
+          </GridContainer>
+        ) : (
+          <GridContainer style={{ rowGap: 10 }}>
+            <GridItem md={2}>
+              <RightAlignGridItem md={12}>Radiographer :</RightAlignGridItem>
+            </GridItem>
+            <TextGridItem md={10}>
+              {assignedRadiographers.map(r => r.name).toString()}
+            </TextGridItem>
+            <GridItem md={2}>
+              <RightAlignGridItem md={12}>
+                Radiographer Comments :
+              </RightAlignGridItem>
+            </GridItem>
+            <TextGridItem md={10}>{workitem.comment}</TextGridItem>
+
+            {workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ? (
+              !isHiddenExaminationFinding && (
+                <React.Fragment>
+                  <GridItem md={2}>
+                    <RightAlignGridItem md={12}>
+                      Examination Findings:
+                    </RightAlignGridItem>
+                  </GridItem>
+
+                  <GridItem md={10}>
+                    {workitem.examinationFinding ? (
+                      <div>
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: workitem.examinationFinding,
+                          }}
+                        />
+                        {scribbleLink.length > 0 && (
+                          <GridContainer>{scribbleLink}</GridContainer>
+                        )}
+                      </div>
+                    ) : (
+                      '-'
+                    )}
+                  </GridItem>
+                </React.Fragment>
+              )
             ) : (
-              assignedRadiographers.map(r => r.name).join(', ')
-            )}
-          </GridItem>
-
-          <GridItem md={2}>
-            <RightAlignGridItem md={12}>
-              Radiographer Comments :
-            </RightAlignGridItem>
-          </GridItem>
-          <GridItem md={10} style={{ textAlign: 'right' }}>
-            <CannedTextButton
-              buttonType='text'
-              cannedTextTypeFK={CANNED_TEXT_TYPE.RADIOLOGYINSTRUCTION}
-              style={{
-                marginRight: 0,
-                marginBottom: 8,
-              }}
-              handleSelectCannedText={cannedText => {
-                setComment(comment + '\n' + cannedText.text)
-                setHasChanged(true)
-              }}
-            />
-          </GridItem>
-          <GridItem md={12}>
-            <Input.TextArea
-              maxLength={2000}
-              value={comment}
-              onChange={e => {
-                setComment(e.target.value)
-                setHasChanged(true)
-              }}
-              autoSize={{ minRows: 3, maxRows: 5 }}
-            />
-          </GridItem>
-          {workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED &&
-            !isHiddenExaminationFinding && (
-              <GridItem md={12}>
-                <Findings
-                  defaultValue={workitem.examinationFinding}
-                  radiologyScribbleNote={workitem.radiologyScribbleNote}
-                  onChange={value => {
-                    setFindings(value)
-                    setHasChanged(true)
-                  }}
-                  workItem={workitem}
-                  item={findingSettings}
-                  {...restProps}
-                />
-              </GridItem>
-            )}
-        </GridContainer>
-      ) : (
-        <GridContainer style={{ rowGap: 10 }}>
-          <GridItem md={2}>
-            <RightAlignGridItem md={12}>Radiographer :</RightAlignGridItem>
-          </GridItem>
-          <TextGridItem md={10}>
-            {assignedRadiographers.map(r => r.name).toString()}
-          </TextGridItem>
-          <GridItem md={2}>
-            <RightAlignGridItem md={12}>
-              Radiographer Comments :
-            </RightAlignGridItem>
-          </GridItem>
-          <TextGridItem md={10}>{workitem.comment}</TextGridItem>
-
-          {workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ? (
-            !isHiddenExaminationFinding && (
               <React.Fragment>
                 <GridItem md={2}>
                   <RightAlignGridItem md={12}>
-                    Examination Findings:
+                    Cancel Reason:
                   </RightAlignGridItem>
                 </GridItem>
 
-                <GridItem md={10}>
-                  {workitem.examinationFinding ? (
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: workitem.examinationFinding,
-                      }}
-                    />
-                  ) : (
-                    '-'
-                  )}
-                </GridItem>
+                <TextGridItem md={10}>
+                  {workitem.cancellationReason}
+                </TextGridItem>
               </React.Fragment>
-            )
-          ) : (
-            <React.Fragment>
-              <GridItem md={2}>
-                <RightAlignGridItem md={12}>Cancel Reason:</RightAlignGridItem>
-              </GridItem>
-
-              <TextGridItem md={10}>{workitem.cancellationReason}</TextGridItem>
-            </React.Fragment>
-          )}
-        </GridContainer>
-      )}
+            )}
+          </GridContainer>
+        )}
+      </div>
+      <CommonModal
+        open={isShowScribbleNote}
+        title='Scribble'
+        fullScreen
+        bodyNoPadding
+        observe='ScribbleNotePage'
+        onClose={toggleScribbleModal}
+      >
+        <ScribbleNote
+          {...restProps}
+          toggleScribbleModal={toggleScribbleModal}
+          scribbleData={scribbleNoteSelectedData}
+        />
+      </CommonModal>
     </div>
   )
 }

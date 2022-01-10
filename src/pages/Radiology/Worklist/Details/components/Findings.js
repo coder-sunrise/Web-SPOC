@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import withStyles from '@material-ui/core/styles/withStyles'
+import { makeStyles } from '@material-ui/styles'
 import { connect, useSelector, useDispatch } from 'dva'
 import {
   EditorState,
@@ -21,6 +22,13 @@ import { Typography, Input } from 'antd'
 import { CHECKLIST_CATEGORY, SCRIBBLE_NOTE_TYPE } from '@/utils/constants'
 import { navigateDirtyCheck } from '@/utils/utils'
 import ScribbleNote from '@/pages/Shared/ScribbleNote/ScribbleNote'
+import { scribbleTypes } from '@/utils/codes'
+
+const useStyles = makeStyles(theme => ({
+  editor: {
+    fontSize: '0.9rem',
+  },
+}))
 
 export const Findings = ({
   item,
@@ -33,6 +41,7 @@ export const Findings = ({
   ...restProps
 }) => {
   const dispatch = useDispatch()
+  const classes = useStyles()
   const scriblenotes = useSelector(state => state.scriblenotes)
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
   const [width, setWidth] = useState(0)
@@ -43,7 +52,6 @@ export const Findings = ({
     selectedData: '',
   })
   const [scribbleNotes, setScribbleNotes] = useState([])
-
   useEffect(() => {
     const fields = [item]
     const payload = {
@@ -323,6 +331,7 @@ export const Findings = ({
         </GridItem>
         <GridItem sm={12} md={12}>
           <RichEditor
+            classes={classes}
             disabled={isReadOnly}
             editorState={editorState}
             onEditorStateChange={handleEditorStateChange}
@@ -350,6 +359,10 @@ export const Findings = ({
           toggleScribbleModal={toggleScribbleModal}
           scribbleData={scribbleNoteState.selectedData}
           deleteScribbleNote={deleteScribbleNote}
+          scribbleNoteType={
+            scribbleTypes.find(x => x.typeFK === SCRIBBLE_NOTE_TYPE.RADIOLOGY)
+              ?.type
+          }
         />
       </CommonModal>
     </div>

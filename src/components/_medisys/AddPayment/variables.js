@@ -24,8 +24,13 @@ export const ValidationSchema = Yup.object().shape({
     [
       'finalPayable',
       'totalAmtPaid',
+      'isGroupPayment'
     ],
-    (finalPayable, totalAmtPaid, schema) => {
+    (finalPayable, totalAmtPaid, isGroupPayment, schema) => {
+      const needPaidFull = isGroupPayment && totalAmtPaid < finalPayable
+      const min = needPaidFull ? finalPayable : 0.01
+      const minMsg = needPaidFull ? 'Outstanding must be paid full' : 'Amount must be greater than $0.00'
+      //console.log(totalAmtPaid,finalPayable)
       if (totalAmtPaid > finalPayable)
         return schema.of(
           Yup.object().shape({
@@ -49,7 +54,7 @@ export const ValidationSchema = Yup.object().shape({
           id: Yup.number(),
           paymentModeFK: Yup.number().required(),
           amt: Yup.number()
-            .min(0.01, 'Amount must be greater than $0.00')
+            .min(min, minMsg)
             .max(
               finalPayable,
               `Total amount paid cannot exceed $${finalPayable}`,

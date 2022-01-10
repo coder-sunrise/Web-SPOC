@@ -39,6 +39,12 @@ class Service extends PureComponent {
       type: 'settingClinicService/getServiceCenter',
       payload: {},
     })
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctexaminationitem',
+      },
+    })
   }
 
   toggleModal = () => {

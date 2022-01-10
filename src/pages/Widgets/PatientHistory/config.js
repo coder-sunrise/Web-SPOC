@@ -2,6 +2,7 @@ import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
 import { scribbleTypes } from '@/utils/codes'
 import { cleanFields } from '@/pages/Consultation/utils'
+import { VISIT_TYPE } from '@/utils/constants'
 import _ from 'lodash'
 
 export const WIDGETS_ID = {
@@ -26,6 +27,7 @@ export const WIDGETS_ID = {
   REFERRAL: '19',
   CONSULTATION_DOCUMENT: '20',
   NURSENOTES: '21',
+  DOCTORNOTE: '22',
 }
 
 export const GPCategory = [
@@ -166,7 +168,7 @@ export const categoryTypes = [
   {
     value: WIDGETS_ID.FORMS,
     name: 'Forms',
-    authority: 'patientdashboard.forms',
+    authority: 'queue.consultation.form',
   },
   {
     value: WIDGETS_ID.ATTACHMENT,
@@ -182,22 +184,33 @@ export const categoryTypes = [
 ]
 
 export const notesTypes = [
-  { value: WIDGETS_ID.ASSOCIATED_HISTORY, fieldName: 'history' },
-  { value: WIDGETS_ID.CHIEF_COMPLAINTS, fieldName: 'chiefComplaints' },
-  { value: WIDGETS_ID.CLINICAL_NOTE, fieldName: 'note' },
-  { value: WIDGETS_ID.PLAN, fieldName: 'plan' },
+  {
+    value: WIDGETS_ID.ASSOCIATED_HISTORY,
+    fieldName: 'history',
+    title: 'History',
+  },
+  {
+    value: WIDGETS_ID.CHIEF_COMPLAINTS,
+    fieldName: 'chiefComplaints',
+    title: 'Chief Complaints',
+  },
+  { value: WIDGETS_ID.CLINICAL_NOTE, fieldName: 'note', title: 'Note' },
+  { value: WIDGETS_ID.PLAN, fieldName: 'plan', title: 'Plan' },
   { value: WIDGETS_ID.INTRA_ORAL, fieldName: 'intraOral' },
   { value: WIDGETS_ID.EXTRA_ORAL, fieldName: 'extraOral' },
   { value: WIDGETS_ID.VISITREMARKS, fieldName: 'visitRemarks' },
 ]
 
-export const widgets = (props, scribbleNoteUpdateState = () => { }) => [
+export const widgets = (
+  props,
+  scribbleNoteUpdateState = () => {},
+  getSelectNoteTypes = () => {},
+) => [
   {
-    id: WIDGETS_ID.ASSOCIATED_HISTORY,
-    name: 'History',
-    authority: 'queue.consultation.clinicalnotes.history',
+    id: WIDGETS_ID.DOCTORNOTE,
+    name: 'Doctor Notes',
     component: Loadable({
-      loader: () => import('./Notes'),
+      loader: () => import('./DoctorNotes'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return (
@@ -205,68 +218,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => { }) => [
             {...props}
             {...p}
             scribbleNoteUpdateState={scribbleNoteUpdateState}
-            fieldName='history'
-          />
-        )
-      },
-      loading: Loading,
-    }),
-  },
-
-  {
-    id: WIDGETS_ID.CHIEF_COMPLAINTS,
-    name: 'Chief Complaints',
-    authority: 'queue.consultation.clinicalnotes.chiefcomplaints',
-    component: Loadable({
-      loader: () => import('./Notes'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return (
-          <Cmpnet
-            {...props}
-            {...p}
-            scribbleNoteUpdateState={scribbleNoteUpdateState}
-            fieldName='chiefComplaints'
-          />
-        )
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: WIDGETS_ID.CLINICAL_NOTE,
-    name: 'Clinical Notes',
-    authority: 'queue.consultation.clinicalnotes.clinicalnotes',
-    component: Loadable({
-      loader: () => import('./Notes'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return (
-          <Cmpnet
-            {...props}
-            {...p}
-            scribbleNoteUpdateState={scribbleNoteUpdateState}
-            fieldName='note'
-          />
-        )
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: WIDGETS_ID.PLAN,
-    name: 'Plan',
-    authority: 'queue.consultation.clinicalnotes.plan',
-    component: Loadable({
-      loader: () => import('./Notes'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return (
-          <Cmpnet
-            {...props}
-            scribbleNoteUpdateState={scribbleNoteUpdateState}
-            {...p}
-            fieldName='plan'
+            getSelectNoteTypes={getSelectNoteTypes}
           />
         )
       },
@@ -461,7 +413,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => { }) => [
   {
     id: WIDGETS_ID.FORMS,
     name: 'Forms',
-    authority: 'queue.consultation.widgets.forms',
+    authority: 'queue.consultation.form',
     component: Loadable({
       loader: () => import('./Forms'),
       render: (loaded, p) => {
@@ -486,23 +438,41 @@ export const widgets = (props, scribbleNoteUpdateState = () => { }) => [
   },
 ]
 
-export const showWidget = (current, widgetId) => {
-  // check show notes
-  const notesType = notesTypes.find((type) => type.value === widgetId)
-
+const checkNote = (widgetId, current) => {
+  const notesType = notesTypes.find(type => type.value === widgetId)
   if (notesType) {
-    const { scribbleNotes = [] } = current
-    const scribbleType = scribbleTypes.find(
-      (o) => o.type === notesType.fieldName,
-    )
+    const { scribbleNotes = [], doctorNotes = [] } = current
+    const scribbleType = scribbleTypes.find(o => o.type === notesType.fieldName)
     if (
-      !current[notesType.fieldName] &&
+      !doctorNotes.find(
+        note =>
+          note[notesType.fieldName] !== undefined &&
+          note[notesType.fieldName] !== null &&
+          note[notesType.fieldName].trim().length,
+      ) &&
       (!scribbleType ||
-        scribbleNotes.filter(
-          (o) => o.scribbleNoteTypeFK === scribbleType.typeFK,
-        ).length === 0)
-    )
+        scribbleNotes.filter(o => o.scribbleNoteTypeFK === scribbleType.typeFK)
+          .length === 0)
+    ) {
       return false
+    }
+    return true
+  }
+  return true
+}
+
+export const showWidget = (current, widgetId, selectNoteTypes = []) => {
+  // check show notes
+  if (!checkNote(widgetId, current)) {
+    return false
+  }
+
+  // check show Dcotor Notes
+  if (
+    widgetId === WIDGETS_ID.DOCTORNOTE &&
+    !selectNoteTypes.find(c => checkNote(c, current))
+  ) {
+    return false
   }
 
   // check show diagnosis
@@ -612,7 +582,7 @@ export const showWidget = (current, widgetId) => {
   if (
     widgetId === WIDGETS_ID.TREATMENT &&
     (!current.orders ||
-      current.orders.filter((o) => o.type === 'Treatment').length === 0)
+      current.orders.filter(o => o.type === 'Treatment').length === 0)
   )
     return false
   // check show vital sign
@@ -624,14 +594,37 @@ export const showWidget = (current, widgetId) => {
     return false
   // check show visit referral
   if (widgetId === WIDGETS_ID.REFERRAL) {
-    const { referralSourceFK, referralPersonFK, referralPatientProfileFK } = current
-    if (
-      !referralSourceFK &&
-      !referralPersonFK &&
-      !referralPatientProfileFK
-    )
+    const {
+      referralSourceFK,
+      referralPersonFK,
+      referralPatientProfileFK,
+    } = current
+    if (!referralSourceFK && !referralPersonFK && !referralPatientProfileFK)
       return false
   }
 
+  return true
+}
+
+export const showNote = (
+  note,
+  scribbleNotes = [],
+  noteType,
+  visitPurposeFK,
+) => {
+  const scribbleType = scribbleTypes.find(o => o.type === noteType.fieldName)
+  if (
+    (note[noteType.fieldName] === null ||
+      note[noteType.fieldName] === undefined ||
+      !note[noteType.fieldName].trim().length) &&
+    !scribbleNotes.find(
+      s =>
+        s.scribbleNoteTypeFK === scribbleType?.typeFK &&
+        (visitPurposeFK !== VISIT_TYPE.MC ||
+          s.signedByUserFK === note.signedByUserFK),
+    )
+  ) {
+    return false
+  }
   return true
 }

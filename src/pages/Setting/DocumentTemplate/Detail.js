@@ -14,18 +14,56 @@ import {
   Checkbox,
   Tooltip,
   CommonModal,
+  DocumentEditor,
 } from '@/components'
 import { tagList } from '@/utils/codes'
+import {
+  DOCUMENT_CATEGORY,
+  DOCUMENTCATEGORY_DOCUMENTTYPE,
+} from '@/utils/constants'
+import { InfoTwoTone } from '@material-ui/icons'
+import { withStyles } from '@material-ui/core'
+
+const styles = theme => ({})
+
+const formFieldTips_Subject = 'Guidelines to use Forms Fields'
+const formFieldTips_Content =
+  "In order to add autofill feature, you must input the exact same instance into the name column. For example: To auto-populate patient's name, you need to key in" +
+  'PatientName into the name column in Forms Fields. Click on the light bulb icon for more autofill instances.'
+const formFieldTips_Tooltip =
+  "i. Patient's Name:PatientName\n" +
+  "ii.Patient's Gender:PatientGender\n" +
+  "iii Patient's DOB：PatientDOB\n" +
+  "iv.Patient's Age: PatientAge\n" +
+  "vi. Patient's Reference Number:PatientRefNo\n" +
+  "vii.Today's Date:TodayDate\n" +
+  '\n\nif you would like to enter twice the same instance, please' +
+  'key in "<InstanceName>_<Number>".The number must be' +
+  'unique throughout a form.' +
+  'eg: for patient name,please enter "PatientName_2"'
+
 
 @withFormikExtend({
   mapPropsToValues: ({ settingDocumentTemplate }) =>
-    settingDocumentTemplate.entity || settingDocumentTemplate.default,
+    settingDocumentTemplate.entity || {
+      ...settingDocumentTemplate.default,
+      documentCategoryFK: settingDocumentTemplate.documentCategoryFK,
+      templateContent: '',
+    },
   validationSchema: Yup.object().shape({
+    documentCategoryFK: Yup.string().required(),
     documentTemplateTypeFK: Yup.string().required(),
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    templateContent: Yup.string().required(),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    templateContent: Yup.string().when('documentCategoryFK', {
+      is: val => val == DOCUMENT_CATEGORY.FORM,
+      then: Yup.string().nullable(),
+      otherwise: Yup.string().required(),
+    }),
+    effectiveDates: Yup.array()
+      .of(Yup.date())
+      .min(2)
+      .required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
@@ -47,7 +85,7 @@ import { tagList } from '@/utils/codes'
         effectiveEndDate: effectiveDates[1],
         cfg: { message },
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         resetForm()
         if (onConfirm) onConfirm()
@@ -62,8 +100,48 @@ import { tagList } from '@/utils/codes'
 class Detail extends PureComponent {
   state = { isShowSaveDefaultTemplate: false }
 
+  FormFieldTips = () => {
+    const formFieldTips_Subject = 'Guidelines to use Forms Fields'
+    const formFieldTips_Content = (
+      <span>
+        In order to add autofill feature, you must input the exact same instance
+        into the Name column. For example: To auto-populate patient's name, you
+        need to key in PatientName into the Name column in Forms Fields -&gt; Text
+        Form -&gt; Field Settings Mouse over the 
+        <span>
+          <InfoTwoTone color='primary' style={{verticalAlign:'text-top'}}/>
+        </span> 
+        icon for more autofill instances.
+      </span>
+    )
+    const formFieldTips_Tooltip =
+      "i. Patient's Name:PatientName\n" +
+      "ii.Patient's Gender:PatientGender\n" +
+      "iii Patient's DOB：PatientDOB\n" +
+      "iv.Patient's Age: PatientAge\n" +
+      "vi. Patient's Reference Number:PatientRefNo\n" +
+      "vii.Today's Date:TodayDate\n" +
+      '\nif you would like to enter twice the same instance, please\n' +
+      'key in "<InstanceName>_<Number>".The number must be unique\n' +
+      'throughout a form.\n' +
+      'eg: for patient name,please enter "PatientName_2"'
+    return (
+      <div style={{marginLeft:10}}>
+        <p>
+         <span style={{fontWeight:'bold',textDecoration:'underline'}}>{formFieldTips_Subject}</span>
+          <Tooltip useTooltip2 title={<pre>{formFieldTips_Tooltip}</pre>}>
+            <span>
+              <InfoTwoTone color='primary' style={{verticalAlign:'text-top'}}/>
+            </span>
+          </Tooltip>
+        </p>
+        <p>{formFieldTips_Content}</p>
+      </div>
+    )
+  }
+
   handelSaveDefaultTemplate = () => {
-    this.setState((preState) => {
+    this.setState(preState => {
       return { isShowSaveDefaultTemplate: !preState.isShowSaveDefaultTemplate }
     })
   }
@@ -78,7 +156,21 @@ class Detail extends PureComponent {
     }
   }
 
-  render () {
+  contentChange = () => {
+    this.props.setFieldValue(
+      'templateContent',
+      this.edContainer.documentEditor.serialize(),
+    )
+  }
+
+  componentCreated = e => {
+    if (!this.edContainer?.document) {
+      this.edContainer.documentEditor.openBlank()
+      this.contentChange()
+    }
+  }
+
+  render() {
     const { props } = this
     const {
       theme,
@@ -88,20 +180,47 @@ class Detail extends PureComponent {
       height,
       values,
     } = props
-    const { documentTemplateTypeFK, displayValue } = values
+    const { documentTemplateTypeFK, displayValue, documentCategoryFK } = values
     return (
       <SizeContainer size='sm'>
         <div style={{ margin: theme.spacing(1) }}>
           <GridContainer>
             <GridItem md={6}>
               <FastField
-                name='documentTemplateTypeFK'
-                render={(args) => {
+                name='documentCategoryFK'
+                render={args => {
                   return (
                     <CodeSelect
+                      disabled
+                      code='LTDocumentCategory'
+                      label='Document Category'
+                      onChange={() => {
+                        setFieldValue('documentTemplateTypeFK', undefined)
+                      }}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={6}>
+              <FastField
+                shouldUpdate={() => true}
+                name='documentTemplateTypeFK'
+                render={args => {
+                  const filterTemplateTypes =
+                    DOCUMENTCATEGORY_DOCUMENTTYPE.find(
+                      y => y.documentCategoryFK === values.documentCategoryFK,
+                    )?.templateTypes || []
+                  return (
+                    <CodeSelect
+                      localFilter={x =>
+                        filterTemplateTypes.some(y => x.id === y)
+                      }
+                      orderBy={[[x=>filterTemplateTypes.findIndex(y=>y === x.id)],['asc']]}
                       code='LTDocumentTemplateType'
                       label='Document Type'
-                      onChange={(v) => {
+                      onChange={v => {
                         if (v !== 3) {
                           setFieldValue('isDefaultTemplate', false)
                         }
@@ -117,7 +236,7 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='code'
-                render={(args) => (
+                render={args => (
                   <TextField
                     label='Code'
                     autoFocus
@@ -130,13 +249,13 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='displayValue'
-                render={(args) => <TextField label='Display Value' {...args} />}
+                render={args => <TextField label='Display Value' {...args} />}
               />
             </GridItem>
             <GridItem md={6}>
               <FastField
                 name='effectiveDates'
-                render={(args) => {
+                render={args => {
                   return (
                     <DateRangePicker
                       label='Effective Start Date'
@@ -156,7 +275,7 @@ class Detail extends PureComponent {
               {documentTemplateTypeFK === 3 && (
                 <FastField
                   name='isDefaultTemplate'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <Checkbox
                         label={
@@ -178,26 +297,91 @@ class Detail extends PureComponent {
             <GridItem md={12}>
               <Field
                 name='templateContent'
-                render={(args) => {
+                render={args => {
                   const cfg = {}
                   if (height && height > 538) {
                     cfg.height = height - 440
                   }
-                  return (
+                  return documentCategoryFK === DOCUMENT_CATEGORY.FORM ? (
+                    <div style={{ margin: '0 -8px' }}>
+                      <div
+                        style={{
+                          marginLeft: 8,
+                          height: '25px',
+                          lineHeight: '25px',
+                          fontWeight: 'inherit',
+                          color: 'rgb(0,0,0,0.54)',
+                          transform: 'translate(0,3px) scale(0.8)',
+                          transformOrigin: 'top left',
+                        }}
+                      >
+                        Template Message
+                      </div>
+                      <DocumentEditor
+                        documentName={values.displayValue}
+                        document={values.templateContent}
+                        ref={r => (this.edContainer = r?.container)}
+                        contentChange={this.contentChange.bind(this)}
+                        documentChange={() => {
+                          if (this.edContainer?.documentEditor)
+                            this.edContainer.documentEditor.selection.isHighlightEditRegion = true
+                        }}
+                        created={this.componentCreated.bind(this)}
+                        height={'calc( 100vh - 340px)'}
+                        toolbarClick={(e)=>{
+                          const { item:{properties:{ id }}} = e
+                          if(id === 'signaturePanel'){
+                            const currentUser = 'Everyone'
+                            const signaturePlaceholder = ' '
+                            const startOffset = this.edContainer.documentEditor.selection.endOffset
+                            this.edContainer.documentEditor.editor.insertText(signaturePlaceholder)
+                            const endOffset = this.edContainer.documentEditor.selection.endOffset
+                            // console.log(startOffset,endOffset)
+                            this.edContainer.documentEditor.selection.select(startOffset,endOffset)
+                            this.edContainer.documentEditor.editor.insertEditingRegion(currentUser)
+                          }
+                        }}
+                        toolbarItems={[
+                          'Open',
+                          'Separator',
+                          'Undo',
+                          'Redo',
+                          'Separator',
+                          'Image',
+                          'Table',
+                          'Hyperlink',
+                          'Separator',
+                          'Header',
+                          'Footer',
+                          'PageSetup',
+                          'PageNumber',
+                          'Break',
+                          'Separator',
+                          'Find',
+                          'Separator',
+                          //'RestrictEditing',
+                          'FormFields',
+                          {
+                            id:'signaturePanel',
+                            text:'Signature Panel',
+                            prefixIcon:'e-signature',
+                          }
+                        ]}
+                      />
+                     <this.FormFieldTips/>
+                    </div>
+                  ) : (
                     <RichEditor
                       label='Template Message'
                       tagList={
-                        documentTemplateTypeFK === 3 ? (
-                          tagList.filter(
-                            (t) =>
-                              [
-                                'Order',
-                                'ExternalPrescription',
-                              ].indexOf(t.value) < 0,
-                          )
-                        ) : (
-                          tagList
-                        )
+                        documentTemplateTypeFK === 3
+                          ? tagList.filter(
+                              t =>
+                                ['Order', 'ExternalPrescription'].indexOf(
+                                  t.value,
+                                ) < 0,
+                            )
+                          : tagList
                       }
                       {...cfg}
                       {...args}
@@ -249,4 +433,4 @@ class Detail extends PureComponent {
   }
 }
 
-export default Detail
+export default withStyles(styles, { name: 'DocumentTemplateDetail' })(Detail)

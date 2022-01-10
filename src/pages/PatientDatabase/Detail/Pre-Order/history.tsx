@@ -8,7 +8,7 @@ import { preOrderItemCategory } from '@/utils/codes'
 interface IHistoryPreOrderProps {}
 
 const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
-  const { schema, patientPreOrderItem } = props
+  const { schema, patientPreOrderItem, height } = props
   const { list } = patientPreOrderItem
 
   const getFilteredRows = (rows: any) => {
@@ -26,7 +26,7 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
       { name: 'orderByUser', title: 'Order By' },
       { name: 'orderDate', title: 'Order Date' },
       { name: 'remarks', title: 'Remarks' },
-      { name: 'amount', title: 'Amount' },
+      { name: 'apptDate', title: 'Appt. Date' },
       { name: 'actualizedQuantity', title: 'Actualized Qty.' },
       { name: 'actualizedByUser', title: 'Actualized By' },
       { name: 'actualizedDate', title: 'Actualized Date' },
@@ -43,7 +43,22 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
         render: row => {
           return (
             <Tooltip title={row.preOrderItemType}>
-              <div>{row.preOrderItemType}</div>
+              <div>
+                <span style={{ color: 'red', fontStyle: 'italic' }}>
+                  <sup>
+                    {row.isPreOrderItemActive === false
+                      ? '#1'
+                      : row.isPreOrderItemOrderable === false
+                      ? '#2'
+                      : row.isUOMChanged === true
+                      ? '#3'
+                      : ''}
+                    &nbsp;
+                  </sup>
+                </span>
+
+                <span>{row.preOrderItemType}</span>
+              </div>
             </Tooltip>
           )
         },
@@ -54,16 +69,16 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
         render: row => {
           return (
             <Tooltip
-            title={
-              <div>
-                {`Code: ${row.code}`}
-                <br />
-                {`Name: ${row.itemName}`}
-              </div>
-            }
-          >
-          <div>{row.itemName}</div>
-          </Tooltip>
+              title={
+                <div>
+                  {`Code: ${row.code}`}
+                  <br />
+                  {`Name: ${row.itemName}`}
+                </div>
+              }
+            >
+              <div>{row.itemName}</div>
+            </Tooltip>
           )
         },
       },
@@ -127,9 +142,18 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
         },
       },
       {
-        columnName: 'amount',
-        width: 100,
-        type: 'currency',
+        columnName: 'apptDate',
+        width: 150,
+        type: 'date',
+        sortingEnabled: false,
+        render: row => {
+          return row.apptDate
+            ? `${moment(row.apptDate).format('DD MMM YYYY')} ${moment(
+                row.apptStartTime,
+                'HH:mm',
+              ).format('HH:mm')}`
+            : '-'
+        },
         isDisabled: () => true,
       },
       {
@@ -183,19 +207,42 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
       pagerDefaultState: {
         pagesize: 100,
       },
+      sortConfig: {
+        defaultSorting: [{ columnName: 'actualizedDate', direction: 'desc' }],
+      },
     },
   }
 
   return (
     <>
-      <CommonTableGrid
-        rows={getFilteredRows(list)}
-        schema={schema}
-        EditingProps={{
-          showCommandColumn: false,
-        }}
-        {...tableParas}
-      />
+      <div style={{ maxHeight: height - 250, overflowY: 'auto' }}>
+        <CommonTableGrid
+          rows={getFilteredRows(list)}
+          schema={schema}
+          EditingProps={{
+            showCommandColumn: false,
+          }}
+          {...tableParas}
+        />
+      </div>
+
+      <div style={{ position: 'fixed', bottom: 100, width: '100%' }}>
+        <span>
+          Note:&nbsp;
+          <span style={{ color: 'red', fontStyle: 'italic' }}>
+            <sup>#1&nbsp;</sup>
+          </span>
+          Inactive item &nbsp;&nbsp;
+          <span style={{ color: 'red', fontStyle: 'italic' }}>
+            <sup>#2&nbsp;</sup>
+          </span>
+          Non-orderable item&nbsp;&nbsp;
+          <span style={{ color: 'red', fontStyle: 'italic' }}>
+            <sup>#3&nbsp;</sup>
+          </span>
+          Dispense/prescribe UOM changed&nbsp;&nbsp;
+        </span>
+      </div>
     </>
   )
 }

@@ -20,6 +20,7 @@ const PaymentActions = ({
   invoicePayerFK,
   companyFK,
   readOnly,
+  isEnableWriteOffinInvoice,
 }) => {
   const ButtonProps = {
     icon: true,
@@ -58,16 +59,18 @@ const PaymentActions = ({
           Transfer Deposit
         </Button>
       )}
-      {false && type === PayerType.PATIENT && (
-        <Button
-          onClick={() => handleWriteOff(invoicePayerFK)}
-          disabled={!handleWriteOff || readOnly}
-          {...ButtonProps}
-        >
-          <Add />
-          Write Off
-        </Button>
-      )}
+      {isEnableWriteOffinInvoice &&
+        ableToViewByAuthority('finance.createwriteoff') &&
+        type === PayerType.PATIENT && (
+          <Button
+            onClick={() => handleWriteOff(invoicePayerFK)}
+            disabled={!handleWriteOff || readOnly}
+            {...ButtonProps}
+          >
+            <Add />
+            Write Off
+          </Button>
+        )}
       {type === PayerType.COPAYER_REAL && (
         <Button
           onClick={() => handleTransferClick(invoicePayerFK, type)}

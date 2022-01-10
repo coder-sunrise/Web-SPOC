@@ -83,7 +83,7 @@ class NoteDetails extends Component {
       scribbleNoteUpdateState,
       onSettingClick,
       onCannedTextClick,
-      loading,
+      consultation,
       onRichEditorBlur,
     } = this.props
     return (
@@ -106,15 +106,13 @@ class NoteDetails extends Component {
             gridItemWidth={width}
           />
 
-          <Authorized authority='settings.cannedtext'>
-            <CannedTextButton
-              onSettingClick={onSettingClick}
-              onPrevDoctorNoteClick={this.onPrevDoctorNoteClick}
-              onCannedTextClick={onCannedTextClick}
-              cannedTextTypeFK={item.cannedTextTypeFK}
-              handleSelectCannedText={this.handleSelectCannedText}
-            />
-          </Authorized>
+          <CannedTextButton
+            onSettingClick={onSettingClick}
+            onPrevDoctorNoteClick={this.onPrevDoctorNoteClick}
+            onCannedTextClick={onCannedTextClick}
+            cannedTextTypeFK={item.cannedTextTypeFK}
+            handleSelectCannedText={this.handleSelectCannedText}
+          />
 
           <Checklist
             checklistCategory={CHECKLIST_CATEGORY.DOCTORCONSULTATION}
@@ -128,7 +126,7 @@ class NoteDetails extends Component {
             this.richEditor = ref
           }}
           autoFocus={index === 0}
-          disabled={loading.global}
+          disabled={!consultation.entity?.loaded}
           style={{ marginBottom: 0 }}
           strongLabel
           onRichEditorBlur={onRichEditorBlur}

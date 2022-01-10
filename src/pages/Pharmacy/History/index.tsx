@@ -28,7 +28,7 @@ import WorklistContext, {
 import { Fragment, useContext } from 'react'
 import PharmacyDetails from '../Worklist/Details'
 import { compose } from 'redux'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'dva'
 import _ from 'lodash'
 import LinkIcon from '@material-ui/icons/Link'
@@ -87,7 +87,8 @@ const defaultColumns = (codetable, setDetailsId) => {
       search: false,
       fixed: 'left',
       width: 200,
-      sortBy: 'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.Name',
+      sortBy:
+        'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.Name',
     },
     {
       key: 'patientReferenceNo',
@@ -96,7 +97,8 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 100,
-      sortBy: 'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.PatientReferenceNo',
+      sortBy:
+        'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.PatientReferenceNo',
     },
     {
       key: 'patientAccountNo',
@@ -105,7 +107,8 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 100,
-      sortBy: 'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo',
+      sortBy:
+        'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo',
     },
     {
       key: 'genderAge',
@@ -315,7 +318,10 @@ const defaultColumns = (codetable, setDetailsId) => {
           <Select
             label='Status'
             mode='multiple'
-            options={Object.entries(IsFullyDispensedStatus).map(x=>({value:x[0],name:x[1]}))}
+            options={Object.entries(IsFullyDispensedStatus).map(x => ({
+              value: x[0],
+              name: x[1],
+            }))}
             placeholder=''
             style={{ width: 250 }}
             maxTagCount={0}
@@ -335,6 +341,7 @@ const PharmacyWorklistHistoryIndex = ({
 }) => {
   const dispatch = useDispatch()
   const { detailsId, setDetailsId } = useContext(WorklistContext)
+  const actionRef = useRef()
 
   useEffect(() => {
     dispatch({
@@ -347,12 +354,10 @@ const PharmacyWorklistHistoryIndex = ({
         },
       },
     })
-  })
+  }, [])
 
   const refreshClick = () => {
-    // dispatch({
-    //   type: 'pharmacyHisotry/query',
-    // })
+    actionRef.current.reload()
   }
 
   const columns = defaultColumns(codetable, setDetailsId)
@@ -361,6 +366,7 @@ const PharmacyWorklistHistoryIndex = ({
     <Fragment>
       <PageContainer pageHeaderRender={false}>
         <ProTable
+          actionRef={actionRef}
           rowSelection={false}
           columns={columns}
           api={api}

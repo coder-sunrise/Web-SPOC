@@ -19,11 +19,11 @@ import {
   withFormikExtend,
 } from '@/components'
 // data table variable
-import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+import { INVOICE_PAYER_TYPE, COPAYER_TYPE } from '@/utils/constants'
 import { roundTo, getUniqueId } from '@/utils/utils'
 import { CoPayerColumns, CoPayerColExtensions } from '../variables'
 
-const styles = (theme) => ({
+const styles = theme => ({
   container: {
     padding: theme.spacing.unit,
   },
@@ -51,14 +51,10 @@ const validationSchema = Yup.object().shape({
   validationSchema: Yup.object().shape({
     coPayer: Yup.number().required(),
     patientCopayAmount: Yup.number().when(
-      [
-        'patientCopayAmountType',
-        'invoiceItems',
-        'selectedRows',
-      ],
+      ['patientCopayAmountType', 'invoiceItems', 'selectedRows'],
       (patientCopayAmountType, invoiceItems, selectedRows = [], schema) => {
         let maxAmount = invoiceItems
-          .filter((r) => selectedRows.includes(r.id))
+          .filter(r => selectedRows.includes(r.id))
           .reduce((p, c) => {
             return p + (c.payableBalance || 0)
           }, 0)
@@ -79,7 +75,7 @@ class CoPayer extends Component {
     invoiceItems: this.props.invoiceItems,
   }
 
-  UNSAFE_componentWillReceiveProps = (nextProps) => {
+  UNSAFE_componentWillReceiveProps = nextProps => {
     const { values: nextValues } = nextProps
     const { values } = this.props
 
@@ -92,12 +88,12 @@ class CoPayer extends Component {
     }
   }
 
-  populateClaimAmount = (selected) => {
+  populateClaimAmount = selected => {
     const { invoiceItems } = this.state
     const {
       values: { patientCopayAmountType = 'Percentage', patientCopayAmount },
     } = this.props
-    const selectedItems = invoiceItems.map((item) => {
+    const selectedItems = invoiceItems.map(item => {
       if (
         selected.includes(item.id) &&
         (item.claimAmount === 0 || item.claimAmount === undefined)
@@ -124,7 +120,7 @@ class CoPayer extends Component {
     patientCopayAmount,
     selectedRows,
   ) => {
-    const newitems = invoiceItems.map((i) => {
+    const newitems = invoiceItems.map(i => {
       const payableAmount = i.payableBalance
       let claimAmount = i.payableBalance || 0
 
@@ -134,7 +130,7 @@ class CoPayer extends Component {
 
       if (patientCopayAmount > 0 && payableAmount > 0) {
         if (patientCopayAmountType === 'Percentage') {
-          const amt = roundTo(payableAmount * patientCopayAmount / 100)
+          const amt = roundTo((payableAmount * patientCopayAmount) / 100)
           if (claimAmount > amt) {
             claimAmount -= amt
           } else claimAmount = 0
@@ -165,7 +161,7 @@ class CoPayer extends Component {
     })
   }
 
-  handleSelectionChange = (selection) => {
+  handleSelectionChange = selection => {
     this.populateClaimAmount(selection)
     this.setState({ selectedRows: selection })
     const { setFieldValue } = this.props
@@ -192,9 +188,9 @@ class CoPayer extends Component {
 
     const { selectedRows, invoiceItems } = this.state
     const invoicePayerItem = invoiceItems
-      .filter((item) => selectedRows.includes(item.id))
-      .map((item) => ({ ...item, id: getUniqueId(), invoiceItemFK: item.id }))
-    const copayerItem = codetable.ctcopayer.find((item) => item.id === coPayer)
+      .filter(item => selectedRows.includes(item.id))
+      .map(item => ({ ...item, id: getUniqueId(), invoiceItemFK: item.id }))
+    const copayerItem = codetable.ctcopayer.find(item => item.id === coPayer)
 
     const returnValue = {
       invoicePayerItem,
@@ -223,13 +219,11 @@ class CoPayer extends Component {
 
   handleCommitChanges = ({ rows }) => {
     this.setState({
-      invoiceItems: [
-        ...rows,
-      ],
+      invoiceItems: [...rows],
     })
   }
 
-  handleEditingRowIdsChange = (rows) => {
+  handleEditingRowIdsChange = rows => {
     this.setState({
       editingRowIds: rows,
     })
@@ -237,15 +231,17 @@ class CoPayer extends Component {
   }
 
   shouldDisableAddCopayer = () => {
-    const { values: { coPayer } } = this.props
+    const {
+      values: { coPayer },
+    } = this.props
     const { selectedRows, editingRowIds, invoiceItems } = this.state
     const subtotalAmount = invoiceItems.reduce(
       (subtotal, item) =>
         item.claimAmount === undefined ? subtotal : subtotal + item.claimAmount,
       0,
     )
-    const getErrorRows = (row) => row._errors && row._errors.length > 0
-    const getSelectedRows = (item) => selectedRows.includes(item.id)
+    const getErrorRows = row => row._errors && row._errors.length > 0
+    const getSelectedRows = item => selectedRows.includes(item.id)
     const hasError =
       invoiceItems.filter(getSelectedRows).filter(getErrorRows).length > 0
 
@@ -258,9 +254,9 @@ class CoPayer extends Component {
     )
   }
 
-  SummaryRow = (p) => {
+  SummaryRow = p => {
     const { children } = p
-    let countCol = children.find((c) => {
+    let countCol = children.find(c => {
       if (!c.props.tableColumn.column) return false
       return c.props.tableColumn.column.name === 'claimAmount'
     })
@@ -284,7 +280,7 @@ class CoPayer extends Component {
     return <Table.Row {...p}>{children}</Table.Row>
   }
 
-  render () {
+  render() {
     const { classes, onClose, copayers = [], values } = this.props
     const { selectedRows, invoiceItems } = this.state
 
@@ -294,14 +290,17 @@ class CoPayer extends Component {
           <GridItem md={4} className={classes.dropdown}>
             <FastField
               name='coPayer'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
-                    label='Corporate Copayer'
+                    label='Co-Payer'
                     code='ctcopayer'
                     labelField='displayValue'
-                    localFilter={(item) =>
-                      item.coPayerTypeFK === 1 && !copayers.includes(item.id)}
+                    localFilter={item =>
+                      [COPAYER_TYPE.CORPORATE, COPAYER_TYPE.INSURANCE].indexOf(
+                        item.coPayerTypeFK,
+                      ) >= 0 && !copayers.includes(item.id)
+                    }
                     {...args}
                   />
                 )
@@ -312,7 +311,7 @@ class CoPayer extends Component {
           <GridItem md={4}>
             <Field
               name='patientCopayAmount'
-              render={(args) => {
+              render={args => {
                 if (values.patientCopayAmountType === 'ExactAmount') {
                   return (
                     <NumberInput
@@ -342,7 +341,7 @@ class CoPayer extends Component {
           <GridItem md={1}>
             <Field
               name='patientCopayAmountType'
-              render={(args) => (
+              render={args => (
                 <Switch
                   checkedChildren='$'
                   checkedValue='ExactAmount'
@@ -357,7 +356,7 @@ class CoPayer extends Component {
           <GridItem md={12}>
             <EditableTableGrid
               size='sm'
-              rows={invoiceItems.map((item) => ({
+              rows={invoiceItems.map(item => ({
                 ...item,
                 disabled: !selectedRows.includes(item.id),
               }))}
@@ -372,19 +371,17 @@ class CoPayer extends Component {
                 summary: true,
                 selectConfig: {
                   showSelectAll: true,
-                  rowSelectionEnabled: (row) => row.isClaimable,
+                  rowSelectionEnabled: row => row.isClaimable,
                 },
 
                 summaryConfig: {
                   state: {
-                    totalItems: [
-                      { columnName: 'claimAmount', type: 'sum' },
-                    ],
+                    totalItems: [{ columnName: 'claimAmount', type: 'sum' }],
                   },
                   integrated: {
                     calculator: (type, rows, getValue) => {
                       return rows
-                        .filter((r) => selectedRows.includes(r.id))
+                        .filter(r => selectedRows.includes(r.id))
                         .reduce((pre, cur) => {
                           const v = getValue(cur)
                           return pre + (v || 0)
@@ -419,7 +416,7 @@ class CoPayer extends Component {
             onClick={this.onConfirmClick}
             disabled={this.shouldDisableAddCopayer()}
           >
-            Add Copayer
+            Add Co-Payer
           </Button>
         </div>
       </div>

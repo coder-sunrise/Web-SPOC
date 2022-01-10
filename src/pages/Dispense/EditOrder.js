@@ -270,7 +270,7 @@ class EditOrder extends Component {
         type: `consultation/signOrder`,
         payload: {
           ...payload,
-          isPharmacyOrderUpdate,
+          isPharmacyOrderUpdated: isPharmacyOrderUpdate,
         },
       })
       if (signResult) {
@@ -307,7 +307,48 @@ class EditOrder extends Component {
         })
 
         if (from === 'Dispense') {
-          await dispatch({
+          await Promise.all([
+            dispatch({
+              type: 'codetable/fetchCodes',
+              payload: {
+                code: 'inventorymedication',
+                force: true,
+                temp: true,
+              },
+            }),
+            dispatch({
+              type: 'codetable/fetchCodes',
+              payload: {
+                code: 'inventoryvaccination',
+                force: true,
+                temp: true,
+              },
+            }),
+            dispatch({
+              type: 'codetable/fetchCodes',
+              payload: {
+                code: 'inventoryconsumable',
+                force: true,
+                temp: true,
+              },
+            }),
+            dispatch({
+              type: 'codetable/fetchCodes',
+              payload: {
+                code: 'ctservice',
+                force: true,
+                temp: true,
+              },
+            }),
+            dispatch({
+              type: 'codetable/fetchCodes',
+              payload: {
+                code: 'ctmedicationunitofmeasurement',
+                force: true,
+              },
+            }),
+          ])
+          dispatch({
             type: `dispense/refresh`,
             payload: dispense.visitID,
           })
