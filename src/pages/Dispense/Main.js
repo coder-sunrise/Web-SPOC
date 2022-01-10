@@ -340,13 +340,17 @@ class Main extends Component {
   }
 
   componentDidMount = async () => {
-    const { dispatch, values, dispense, clinicSettings } = this.props
     const {
-      otherOrder = [],
-      prescription = [],
-      packageItem = [],
-      visitPurposeFK,
-    } = values
+      dispatch,
+      values,
+      dispense,
+      clinicSettings,
+      visitRegistration,
+    } = this.props
+
+    const { entity = {} } = visitRegistration
+    const { visit = {} } = entity
+    const { otherOrder = [], prescription = [], packageItem = [] } = values
     dispatch({
       type: 'dispense/incrementLoadCount',
     })
@@ -354,8 +358,7 @@ class Main extends Component {
     const noClinicalObjectRecord = !values.clinicalObjectRecordFK
 
     const accessRights = Authorized.check('queue.dispense.editorder')
-
-    if (visitPurposeFK === VISIT_TYPE.OTC && isEmptyDispense) {
+    if (visit.visitPurposeFK === VISIT_TYPE.OTC && isEmptyDispense) {
       this.setState(
         prevState => {
           return {
@@ -373,7 +376,8 @@ class Main extends Component {
     if (
       accessRights &&
       accessRights.rights !== 'hidden' &&
-      (visitPurposeFK === VISIT_TYPE.BF || visitPurposeFK === VISIT_TYPE.MC) &&
+      (visit.visitPurposeFK === VISIT_TYPE.BF ||
+        visit.visitPurposeFK === VISIT_TYPE.MC) &&
       isEmptyDispense &&
       noClinicalObjectRecord &&
       dispense.loadCount === 0
