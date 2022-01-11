@@ -40,6 +40,7 @@ import HistoryDiagnosis from './HistoryDiagnosis'
 import { SwitcherTwoTone } from '@ant-design/icons'
 import { SCHEME_TYPE } from '@/utils/constants'
 import CopayerDetails from '@/pages/Setting/Company/CopayerDetails'
+import ClaimHistory from '@/pages/PatientDatabase/Detail/ClaimHistory'
 
 const headerStyles = {
   color: 'darkblue',
@@ -87,6 +88,7 @@ class Banner extends PureComponent {
     currentSchemeType: 0,
     showNotesModal: false,
     showSchemeModal: false,
+    showNonClaimableHistoryModal: false,
     showPreOrderModal: false,
   }
 
@@ -855,6 +857,37 @@ class Banner extends PureComponent {
     return 12
   }
 
+  openNonClaimableHistory = () => {
+    const { dispatch, patient } = this.props
+    const { entity = {} } = patient
+    dispatch({
+      type: 'nonClaimableHistory/query',
+      payload: {
+        patientProfileFK: entity.id,
+      },
+    })
+
+    this.setState({ showNonClaimableHistoryModal: true })
+  }
+  closeNonClaimableHistory = () => {
+    const { dispatch, patient } = this.props
+    const { entity } = patient
+    dispatch({
+      type: 'patient/query',
+      payload: {
+        id: entity.id,
+      },
+    })
+
+    dispatch({
+      type: 'nonClaimableHistory/updateState',
+      payload: {
+        list: [],
+      },
+    })
+    this.setState({ showNonClaimableHistoryModal: false })
+  }
+
   render() {
     const { props } = this
     const {
@@ -903,6 +936,10 @@ class Banner extends PureComponent {
 
     const notesHistoryAccessRight = Authorized.check(
       'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
+    ) || { rights: 'hidden' }
+
+    const nonClaimableHistoryAccessRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.patienthistory.nonclaimablehistory',
     ) || { rights: 'hidden' }
 
     const viewPatientProfileAccess = Authorized.check(
@@ -974,6 +1011,9 @@ class Banner extends PureComponent {
             .join(', ')
         : '-'
 
+    const viewNonClaimableHistoryRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.claimhistory.viewnonclaimablehistory',
+    ) || { rights: 'hidden' }
     return (
       <Paper id='patientBanner' style={style}>
         {/* Please do not change the height below (By default is 100) */}
@@ -1072,56 +1112,74 @@ class Banner extends PureComponent {
                     </span>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
-                    <span className={classes.header}>Patient Request: </span>
-
-                    <Tooltip title={info.patientRequest} interactive='true'>
-                      <span
-                        className={classes.contents}
-                        style={{ WebkitLineClamp: 1 }}
+                    <div style={{ position: 'relative', paddingLeft: 35 }}>
+                      <div
+                        className={classes.header}
+                        style={{ position: 'absolute', left: 0 }}
                       >
-                        {info.patientRequest || '-'}
-                      </span>
-                    </Tooltip>
-                  </GridItem>
-                  <GridItem xs={6} md={4} className={classes.cell}>
-                    <span className={classes.header}>Tag: </span>
-                    <Tooltip
-                      title={this.getTagData()}
-                      placement='bottom-start'
-                      interactive='true'
-                    >
-                      <span
-                        className={classes.contents}
-                        style={{ WebkitLineClamp: 1 }}
+                        Tag:
+                      </div>
+                      <Tooltip
+                        title={this.getTagData()}
+                        placement='bottom-start'
+                        interactive='true'
                       >
-                        {this.getTagData()}
-                      </span>
-                    </Tooltip>
+                        <div
+                          style={{
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {this.getTagData()}
+                        </div>
+                      </Tooltip>
+                    </div>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
                     <div>
+                      <span className={classes.header}>G6PD: </span>
+                      <span>{g6PD ? g6PD.name : '-'}</span>
+                    </div>
+                  </GridItem>
+                  <GridItem xs={6} md={4} className={classes.cell}>
+                    <span
+                      style={{
+                        ...headerStyles,
+                        color: info.outstandingBalance
+                          ? 'red'
+                          : headerStyles.color,
+                      }}
+                    >
+                      O/S Bal.:&nbsp;
+                    </span>
+                    <Tooltip
+                      title={
+                        info.outstandingBalance
+                          ? `${currencySymbol}${_.round(
+                              info.outstandingBalance,
+                              2,
+                            )}`
+                          : ''
+                      }
+                    >
                       <span
                         style={{
-                          ...headerStyles,
-                          color: info.patientMedicalHistory?.highRiskCondition
-                            ? 'red'
-                            : headerStyles.color,
+                          fontWeight: 500,
+                          marginTop: 5,
                         }}
                       >
-                        HRP:{' '}
+                        {info.outstandingBalance ? (
+                          <NumberInput
+                            text
+                            currency
+                            value={_.round(info.outstandingBalance, 2)}
+                          />
+                        ) : (
+                          '-'
+                        )}
                       </span>
-                      <Tooltip
-                        title={info.patientMedicalHistory?.highRiskCondition}
-                        interactive='true'
-                      >
-                        <span
-                          className={classes.contents}
-                          style={{ WebkitLineClamp: 1 }}
-                        >
-                          {info.patientMedicalHistory?.highRiskCondition || '-'}
-                        </span>
-                      </Tooltip>
-                    </div>
+                    </Tooltip>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
                     <LoadingWrapper
@@ -1158,21 +1216,39 @@ class Banner extends PureComponent {
                     </LoadingWrapper>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
-                    <span className={classes.header}>Non-Claimable Info: </span>
-                    <Tooltip title={info.nonClaimableInfo} interactive='true'>
-                      <span className={classes.contents}>
-                        {info.nonClaimableInfo || '-'}
+                    <span className={classes.header}>Patient Request: </span>
+
+                    <Tooltip title={info.patientRequest} interactive='true'>
+                      <span
+                        className={classes.contents}
+                        style={{ WebkitLineClamp: 1 }}
+                      >
+                        {info.patientRequest || '-'}
                       </span>
                     </Tooltip>
                   </GridItem>
-
                   <GridItem xs={6} md={4} className={classes.cell}>
-                    <span className={classes.header}>Payment Info: </span>
-                    <Tooltip title={info.paymentInfo} interactive='true'>
-                      <span className={classes.contents}>
-                        {info.paymentInfo || '-'}
+                    <div>
+                      <span
+                        style={{
+                          ...headerStyles,
+                          color: 'red',
+                        }}
+                      >
+                        HRP:{' '}
                       </span>
-                    </Tooltip>
+                      <Tooltip
+                        title={info.patientMedicalHistory?.highRiskCondition}
+                        interactive='true'
+                      >
+                        <span
+                          className={classes.contents}
+                          style={{ WebkitLineClamp: 1 }}
+                        >
+                          {info.patientMedicalHistory?.highRiskCondition || '-'}
+                        </span>
+                      </Tooltip>
+                    </div>
                   </GridItem>
                   <GridItem xs={6} md={4} className={classes.cell}>
                     <span className={classes.header}>
@@ -1201,9 +1277,7 @@ class Banner extends PureComponent {
                     <span
                       style={{
                         ...headerStyles,
-                        color: this.state.showWarning
-                          ? 'red'
-                          : headerStyles.color,
+                        color: 'red',
                       }}
                     >
                       {this.state.showWarning && (
@@ -1260,64 +1334,37 @@ class Banner extends PureComponent {
                     ></GridItem>
                   )}
                   <GridItem xs={12} md={12} className={classes.cell}>
-                    <span
-                      style={{
-                        ...headerStyles,
-                        color: info.outstandingBalance
-                          ? 'red'
-                          : headerStyles.color,
-                      }}
-                    >
-                      O/S Bal.:{' '}
-                    </span>
-                    <Tooltip
-                      title={
-                        info.outstandingBalance
-                          ? `${currencySymbol}${_.round(
-                              info.outstandingBalance,
-                              2,
-                            )}`
-                          : ''
-                      }
-                    >
-                      <span
-                        style={{
-                          fontWeight: 500,
-                          marginTop: 5,
-                        }}
-                      >
-                        {info.outstandingBalance ? (
-                          <NumberInput
-                            text
-                            currency
-                            value={_.round(info.outstandingBalance, 2)}
-                          />
-                        ) : (
-                          '-'
-                        )}
-                      </span>
-                    </Tooltip>
-                  </GridItem>
-
-                  <GridItem xs={12} md={12} className={classes.cell}>
-                    <div>
-                      <span className={classes.header}>G6PD: </span>
-                      <span>{g6PD ? g6PD.name : '-'}</span>
-                    </div>
-                  </GridItem>
-                  <GridItem xs={12} md={12} className={classes.cell}>
                     {notesHistoryAccessRight.rights !== 'hidden' && (
                       <Link className={classes.header}>
                         <span
                           style={{
                             display: 'block',
                             textDecoration: 'underline',
+                            margin: '5px 0px',
                           }}
                           onClick={e => {
                             this.openNotes()
                           }}
                         >
                           Notes
+                        </span>
+                      </Link>
+                    )}
+
+                    {viewNonClaimableHistoryRight.rights === 'enable' && (
+                      <Link className={classes.header}>
+                        <span
+                          style={{
+                            display: 'block',
+                            textDecoration: 'underline',
+                            margin: '5px 0px',
+                          }}
+                          onClick={e => {
+                            this.openNonClaimableHistory()
+                          }}
+                        >
+                          {`Non Claimable History (${info.nonClaimableHistoryCount ||
+                            0})`}
                         </span>
                       </Link>
                     )}
@@ -1331,6 +1378,7 @@ class Banner extends PureComponent {
                           style={{
                             display: 'block',
                             textDecoration: 'underline',
+                            margin: '5px 0px',
                           }}
                           onClick={e => {
                             e.preventDefault()
@@ -1382,6 +1430,7 @@ class Banner extends PureComponent {
                         display: 'block',
                         paddingRight: 10,
                         textDecoration: 'underline',
+                        margin: '5px 0px',
                       }}
                       to={getAppendUrl({
                         md: 'pt',
@@ -1391,7 +1440,7 @@ class Banner extends PureComponent {
                       // disabled={}
                       tabIndex='-1'
                     >
-                      Lab Results
+                      Examination Results
                     </Link>
                   </GridItem>
                 </GridContainer>
@@ -1465,6 +1514,17 @@ class Banner extends PureComponent {
           fullScreen
         >
           <CopayerDetails fromCommonModal />
+        </CommonModal>
+        <CommonModal
+          open={this.state.showNonClaimableHistoryModal}
+          title='Claim History'
+          onClose={this.closeNonClaimableHistory}
+          maxWidth='lg'
+        >
+          <ClaimHistory
+            defaultTab='NonClaimableHistory'
+            patientProfileFK={entity.id}
+          />
         </CommonModal>
       </Paper>
     )
