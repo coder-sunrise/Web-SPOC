@@ -173,9 +173,11 @@ const generatePrintData = async (
       printData = printData.concat(
         getPrintData('Vaccination Certificate', corVaccinationCert),
       )
-    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.PrescriptionSheet) > -1) {
-        const { rows = [] } = orders || {}
-        if (rows.length > 0) {
+    if (
+      reportsOnSignOff.indexOf(ReportsOnSignOffOption.PrescriptionSheet) > -1
+    ) {
+      const { rows = [] } = orders || {}
+      if (rows.length > 0) {
         // drug & consumable (pharmacy item)
         const anyPharmacyItem = rows.some(
           f =>
@@ -220,7 +222,12 @@ const saveConsultation = ({
     forms = {},
     user,
     clinicSettings,
+    visitRegistration,
   } = props
+  const { entity: vistEntity = {} } = visitRegistration
+  const { visit = {} } = vistEntity
+  const { visitPurposeFK = VISIT_TYPE.CON } = visit
+
   let settings = JSON.parse(localStorage.getItem('clinicSettings'))
   const { diagnosisDataSource } = settings
 
@@ -248,6 +255,19 @@ const saveConsultation = ({
         forms,
       },
     )
+    if (!newValues.corDoctorNote.length) {
+      newValues.corDoctorNote = [{}]
+    }
+
+    newValues.corDoctorNote.forEach(note => {
+      note.signedByUserFK = user.data.id
+      note.signedDate = moment()
+    })
+
+    newValues.corScribbleNotes.forEach(
+      note => (note.signedByUserFK = user.data.id),
+    )
+
     newValues.duration = Math.floor(
       Number(sessionStorage.getItem(`${values.id}_consultationTimer`)) || 0,
     )
@@ -374,6 +394,9 @@ const pauseConsultation = ({
     user,
     visitRegistration,
   } = rest
+  const { entity: vistEntity = {} } = visitRegistration
+  const { visit = {} } = vistEntity
+  const { visitPurposeFK = VISIT_TYPE.CON } = visit
   let settings = JSON.parse(localStorage.getItem('clinicSettings'))
   const { diagnosisDataSource, isEnablePharmacyModule } = settings
   if (isEnablePharmacyModule) {
@@ -397,6 +420,20 @@ const pauseConsultation = ({
       forms,
     },
   )
+
+  if (!newValues.corDoctorNote.length) {
+    newValues.corDoctorNote = [{}]
+  }
+
+  newValues.corDoctorNote.forEach(note => {
+    note.signedByUserFK = user.data.id
+    note.signedDate = moment()
+  })
+
+  newValues.corScribbleNotes.forEach(
+    note => (note.signedByUserFK = user.data.id),
+  )
+
   newValues.duration = Math.floor(
     Number(sessionStorage.getItem(`${values.id}_consultationTimer`)) || 0,
   )
@@ -583,11 +620,15 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
                   let printedData = result
                   if (printedData && printedData.length > 0) {
                     const token = localStorage.getItem('token')
-                    if(printedData.some(x=>x.ReportId === REPORT_ID.PRESCRIPTION)){
+                    if (
+                      printedData.some(
+                        x => x.ReportId === REPORT_ID.PRESCRIPTION,
+                      )
+                    ) {
                       const {
                         visitRegistration: {
                           entity: {
-                            visit: { id:visitFK, patientProfileFK },
+                            visit: { id: visitFK, patientProfileFK },
                           },
                         },
                       } = props
@@ -603,7 +644,11 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
                               : `${item.item}(${item.description})`,
                           ReportData:
                             item.ReportId === REPORT_ID.PRESCRIPTION
-                              ? JSON.stringify((delete r.ReportSettingParameter, delete r.ReportContext,r))
+                              ? JSON.stringify(
+                                  (delete r.ReportSettingParameter,
+                                  delete r.ReportContext,
+                                  r),
+                                )
                               : item.ReportData,
                           Copies: item.Copies,
                           Token: token,
@@ -612,7 +657,7 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
                         handlePrint(JSON.stringify(printedData))
                         props.dispatch({ type: 'consultation/closeModal' })
                       })
-                    }else{
+                    } else {
                       printedData = printedData.map(item => ({
                         ReportId: item.ReportId,
                         DocumentName: `${item.item}(${item.description})`,

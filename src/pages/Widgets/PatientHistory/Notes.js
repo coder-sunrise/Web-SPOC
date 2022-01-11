@@ -23,20 +23,15 @@ export default ({
   }
   if (fieldName === 'visitReferral') {
     let referral = ''
-    if (current.referralPatientProfileFK)
-    {
+    if (current.referralPatientProfileFK) {
       referral = `Referred By Patient: ${current.referralPatientName}`
-    }
-    else if (current.referralSourceFK)
-    {
+    } else if (current.referralSourceFK) {
       referral = `Referred By: ${current.referralSource}`
-      if (current.referralPersonFK)
-      {
+      if (current.referralPersonFK) {
         referral = `Referred By: ${current.referralSource}        Referral Person: ${current.referralPerson}`
       }
     }
-    if (current.referralRemarks)
-    {
+    if (current.referralRemarks) {
       referral += `\r\n\r\nRemarks: ${current.referralRemarks}`
     }
     // const { referralBy = '', referralInstitution = '', referralDate } = current
@@ -62,20 +57,16 @@ export default ({
   const { scribbleNotes = [] } = current
 
   let currentScribbleNotes = []
-  const scribbleType = scribbleTypes.find((o) => o.type === fieldName)
+  const scribbleType = scribbleTypes.find(o => o.type === fieldName)
   if (scribbleType) {
     currentScribbleNotes = _.orderBy(
-      scribbleNotes.filter((o) => o.scribbleNoteTypeFK === scribbleType.typeFK),
-      [
-        'subject',
-      ],
-      [
-        'asc',
-      ],
+      scribbleNotes.filter(o => o.scribbleNoteTypeFK === scribbleType.typeFK),
+      ['subject'],
+      ['asc'],
     )
   }
 
-  const viewScribbleNote = (scribbleNote) => {
+  const viewScribbleNote = scribbleNote => {
     scribbleNoteUpdateState(scribbleNote)
     window.g_app._store.dispatch({
       type: 'scriblenotes/updateState',
@@ -87,7 +78,7 @@ export default ({
     })
   }
 
-  const scribbleLink = currentScribbleNotes.map((o) => {
+  const scribbleLink = currentScribbleNotes.map(o => {
     let src
     if (o.thumbnail && o.thumbnail !== '') {
       src = `${base64Prefix}${o.thumbnail}`
@@ -95,19 +86,18 @@ export default ({
     return (
       <div
         style={{
-          margin: 10,
+          margin: '5px 10px',
           fontSize: '0.85rem',
         }}
       >
-        <span>{o.subject}</span>
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             border: '1px solid #CCCCCC',
-            width: 277,
-            height: 152,
+            width: 253,
+            height: 140,
             cursor: 'pointer',
           }}
           onClick={() => {
@@ -115,11 +105,12 @@ export default ({
           }}
         >
           {src ? (
-            <img src={src} alt={o.subject} width={275} height={150} />
+            <img src={src} alt={o.subject} width={250} />
           ) : (
             <span>No Image</span>
           )}
         </div>
+        <span style={{ color: '#4255bd' }}>{o.subject}</span>
       </div>
     )
   })

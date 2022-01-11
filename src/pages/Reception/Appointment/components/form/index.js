@@ -739,7 +739,7 @@ class Form extends React.PureComponent {
       async () => {
         const result = await this._submit(true)
         if (result) {
-          if (result.find(c => (c.conflicts || []).find(r => r.isPrevent))) {
+          if (result.find(c => (c?.conflicts || []).find(r => r.isPrevent))) {
             notification.error({
               message:
                 'Resource reach maximum booking. please modify to proceed.',
@@ -913,7 +913,7 @@ class Form extends React.PureComponent {
       async () => {
         const result = await this._submit(true)
         if (result) {
-          if (result.find(c => (c.conflicts || []).find(r => r.isPrevent))) {
+          if (result.find(c => (c?.conflicts || []).find(r => r.isPrevent))) {
             notification.error({
               message:
                 'Resource reach maximum booking. please modify to proceed.',

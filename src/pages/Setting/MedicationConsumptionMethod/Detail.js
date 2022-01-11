@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import Yup from '@/utils/yup'
-import useTranslation from '@/utils/hooks/useTranslation'
+import { useTranslation } from '@/utils/hooks'
 import { compose } from 'redux'
 import { getTranslationValue } from '@/utils/utils'
 import {

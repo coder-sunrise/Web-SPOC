@@ -4,7 +4,11 @@ import numeral from 'numeral'
 import Authorized from '@/utils/Authorized'
 import { currencySymbol, qtyFormat } from '@/utils/config'
 import { dateFormatLong, dateFormatLongWithTime } from '@/components'
-import { UNFIT_TYPE, SCRIBBLE_NOTE_TYPE } from './constants'
+import {
+  UNFIT_TYPE,
+  SCRIBBLE_NOTE_TYPE,
+  VISITDOCTOR_CONSULTATIONSTATUS,
+} from './constants'
 import { calculateAgeFromDOB } from './dateUtils'
 
 const status = [
@@ -1984,7 +1988,7 @@ const pharmacyStatus = [
   {
     statusFK: 4,
     name: 'Completed',
-  }
+  },
 ]
 
 const examinationSteps = [
@@ -2038,6 +2042,13 @@ const individualCommentGroup = [
   },
 ]
 
+const visitDoctorConsultationStatusColor = [
+  { value: VISITDOCTOR_CONSULTATIONSTATUS.WAITING, color: '#4255BD' },
+  { value: VISITDOCTOR_CONSULTATIONSTATUS.INPROGRESS, color: '#CF1322' },
+  { value: VISITDOCTOR_CONSULTATIONSTATUS.PAUSED, color: '#CF1322' },
+  { value: VISITDOCTOR_CONSULTATIONSTATUS.COMPLETED, color: '#777' },
+]
+
 export {
   appointmentStatus,
   status,
@@ -2078,4 +2089,5 @@ export {
   pharmacyStatus,
   examinationSteps,
   individualCommentGroup,
+  visitDoctorConsultationStatusColor,
 }

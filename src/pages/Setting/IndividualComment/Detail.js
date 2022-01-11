@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import Yup from '@/utils/yup'
 import _ from 'lodash'
-import useTranslation from '@/utils/hooks/useTranslation'
+import { useTranslation } from '@/utils/hooks'
 import { compose } from 'redux'
 import { individualCommentGroup } from '@/utils/codes'
 import { getTranslationValue } from '@/utils/utils'

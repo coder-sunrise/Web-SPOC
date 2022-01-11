@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState, createContext } from 'react'
 import { useSelector, useDispatch } from 'dva'
 import moment from 'moment'
-import { getMappedVisitType } from '@/utils/utils'
 import { VALUE_KEYS } from '@/utils/constants'
 const WorklistContext = createContext(null)
 
@@ -10,25 +9,12 @@ export const WorklistContextProvider = props => {
   const [detailsId, setDetailsIdInternal] = useState(null)
   const [isReadOnly, setIsReadOnly] = useState(false)
   const codetable = useSelector(st => st.codetable)
-  const { visitTypeSetting } = useSelector(st => st.clinicSettings.settings)
   const clinicianProfile = useSelector(st => st.user.data.clinicianProfile)
   const oriQCallList = useSelector(st => st.queueCalling.oriQCallList)
-  const [ctvisitpurpose, setCtVisitPurpose] = useState([])
   const [lastFilter, setLastFilter] = useState({})
   const [refreshDate, setRefreshDate] = useState(moment())
   const [radiologyQueueCallList, setRadiologyQueueCallList] = useState([])
   const [pharmacyQueueCallList, setPharmacyQueueCallList] = useState([])
-
-  useEffect(() => {
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctvisitpurpose',
-      },
-    }).then(v => {
-      setCtVisitPurpose(v)
-    })
-  }, [])
 
   useEffect(() => {
     if (oriQCallList) {
@@ -104,6 +90,7 @@ export const WorklistContextProvider = props => {
     dispatch({
       type: 'radiologyWorklist/query',
       payload: {
+        pagesize: 9999,
         apiCriteria: {
           searchValue: searchValue,
           visitType: visitType
@@ -136,21 +123,6 @@ export const WorklistContextProvider = props => {
     if (!id) setIsReadOnly(false)
   }
 
-  let visitTypeSettingsObj = undefined
-  let visitPurpose = undefined
-  if (visitTypeSetting) {
-    try {
-      visitTypeSettingsObj = JSON.parse(visitTypeSetting)
-    } catch {}
-  }
-
-  if ((ctvisitpurpose || []).length > 0) {
-    visitPurpose = getMappedVisitType(
-      ctvisitpurpose,
-      visitTypeSettingsObj,
-    ).filter(vstType => vstType['isEnabled'] === 'true')
-  }
-
   return (
     // this is the provider providing state
     <WorklistContext.Provider
@@ -158,7 +130,6 @@ export const WorklistContextProvider = props => {
         detailsId,
         isReadOnly,
         setDetailsId,
-        visitPurpose,
         refreshDate,
         setRefreshDate,
         filterWorklist,
