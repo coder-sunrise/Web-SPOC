@@ -4,7 +4,7 @@ import { Button, Tooltip, CommonModal } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
 import MenuItem from '@material-ui/core/MenuItem'
 import Menu from '@material-ui/core/Menu'
-import DrugLeafletSelection from '../../Pharmacy/Components/DrugLeafletSelection'
+import DrugLeafletSelection from './DrugLeafletSelection'
 import DrugLabelSelection from '../../Dispense/DispenseDetails/DrugLabelSelection'
 
 const PrintPrescription = props => {
@@ -33,11 +33,17 @@ const PrintPrescription = props => {
   const closeLeafletSelectionPopup = () => {
     setShowLeafletSelectionPopup(false)
   }
+  const closeDrugSummaryLabelSelectionPopup = () => {
+    setShowDrugSummaryLabelSelectionPopup(false)
+  }
   const onConfirmPrintLeaflet = () => {
     setShowLeafletSelectionPopup(false)
   }
   const closeDrugLabelSelectionPopup = () => {
     setShowDrugLabelSelectionPopup(false)
+  }
+  const onConfirmPrintDrugSummaryLabel = () => {
+    setShowDrugSummaryLabelSelectionPopup(false)
   }
   const onConfirmPrintDrugLabel = () => {
     setShowDrugLabelSelectionPopup(false)
@@ -188,13 +194,14 @@ const PrintPrescription = props => {
           rows={drugLeafletData}
           tranlationFK={translationLinkFK}
           visitid={visitFK}
+          type='PIL'
           onConfirmPrintLeaflet={onConfirmPrintLeaflet}
         />
       </CommonModal>
       <CommonModal
         open={showDrugSummaryLabelSelectionPopup}
         title='Print Drug Summary Label'
-        onClose={closeLeafletSelectionPopup}
+        onClose={closeDrugSummaryLabelSelectionPopup}
         maxWidth='sm'
         cancelText='Cancel'
         observe='Confirm'
@@ -205,7 +212,7 @@ const PrintPrescription = props => {
           tranlationFK={translationLinkFK}
           visitid={visitFK}
           type='drugsummarylabel'
-          onConfirmPrintLeaflet={onConfirmPrintLeaflet}
+          onConfirmPrintLeaflet={onConfirmPrintDrugSummaryLabel}
         />
       </CommonModal>
       <CommonModal

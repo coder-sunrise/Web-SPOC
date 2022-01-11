@@ -164,21 +164,47 @@ class DrugLeafletSelection extends PureComponent {
         language: lan,
         visitId: visitid,
       })
+      if (!data || !data.DrugDetailsList) {
+        notification.error({
+          message: `Get drug summary label data failed.`,
+        })
+        return
+      }
       data.DrugDetailsList.forEach(t => {
         if (t.isDrugMixture) {
           const instructions = (t.instruction || '').split('\n')
+          // if it's drug mixture then first line will not show(occupied by drug mixture's drug name)
           t.FirstLine = ''
           t.SecondLine = t.ingredient
-          t.ThirdLine = instructions.length > 0 ? instructions[0] : ''
-          t.FourthLine = instructions.length > 1 ? instructions[1] : ''
+          // If language is EN, instruction need to auto breakline and show in 2 lines
+          // If JP, then need to separate to 2 lines. last line will include the last remaining 2 step dose.
+          if (lan === 'JP') {
+            t.ThirdLine = instructions.length > 0 ? instructions[0] : ''
+            t.FourthLine = instructions.length > 1 ? instructions[1] : ''
+            if (instructions.length > 2) {
+              t.FourthLine = `${t.FourthLine} ${instructions[2]}`
+            }
+          } else {
+            t.ThirdLine = t.instruction
+          }
         } else {
           const instructions = (t.instruction || '').split('\n')
           t.FirstLine = t.ingredient
           t.SecondLine = t.indication
-          t.ThirdLine = instructions.length > 0 ? instructions[0] : ''
-          t.FourthLine = instructions.length > 1 ? instructions[1] : ''
+          // If language is EN, instruction need to auto breakline and show in 2 lines
+          // If JP, then need to separate to 2 lines. last line will include the last remaining 2 step dose.
+          if (lan === 'JP') {
+            t.ThirdLine = instructions.length > 0 ? instructions[0] : ''
+            t.FourthLine = instructions.length > 1 ? instructions[1] : ''
+            if (instructions.length > 2) {
+              t.FourthLine = `${t.FourthLine} ${instructions[2]}`
+            }
+          } else {
+            t.ThirdLine = t.instruction
+          }
         }
       })
+      console.log(data)
       const payload = [
         {
           ReportId: REPORT_ID.DRUG_SUMMARY_LABEL_80MM_45MM,

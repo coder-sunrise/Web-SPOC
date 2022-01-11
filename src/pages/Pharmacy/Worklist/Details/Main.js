@@ -142,14 +142,14 @@ const Main = props => {
   const [reportTitle, setReportTitle] = useState('')
   const [reportID, setReportID] = useState(-1)
   const [reportParameters, setReportParameters] = useState({})
-  const [drugLeafletData, setDrugLeafletData] = useState({})
-  const [drugDrugSummaryLabelData, setDrugDrugSummaryLabelData] = useState({})
+  const [drugLeafletData, setDrugLeafletData] = useState([])
+  const [drugDrugSummaryLabelData, setDrugDrugSummaryLabelData] = useState([])
   const [currentDrugToPrint, setCurrentDrugToPrint] = useState({})
   const [batchInformation, setBatchInformation] = useState({})
   const [
     showDrugSummaryLabelSelectionPopup,
     setShowDrugSummaryLabelSelectionPopup,
-  ] = useState({})
+  ] = useState(false)
 
   useEffect(() => {
     subscribeNotification('PharmacyOrderUpdate', {
@@ -1529,7 +1529,6 @@ const Main = props => {
     })
     setBatchInformation(batchs)
     setShowDrugLabelSelectionPopup(true)
-    setLabelType('drugLabel')
   }
   const showDrugSummaryLabelSelection = () => {
     dispatch({
@@ -1545,10 +1544,9 @@ const Main = props => {
           ['desc', 'asc'],
         )
         setDrugDrugSummaryLabelData(data)
-        setShowDrugLabelSelectionPopup(true)
+        setShowDrugSummaryLabelSelectionPopup(true)
       }
     })
-    setLabelType('DrugSummaryLabel')
   }
 
   const printReview = reportid => {
@@ -2091,10 +2089,10 @@ const Main = props => {
       >
         <DrugLeafletSelection
           {...props}
-          rows={drugLeafletData}
+          rows={drugDrugSummaryLabelData}
           type='drugsummarylabel'
           visitid={pharmacyDetails.entity?.visitFK}
-          onConfirmPrintLeaflet={onConfirmPrintLeaflet}
+          onConfirmPrintLeaflet={closeDrugSummaryLabelSelectionPopup}
         />
       </CommonModal>
       <CommonModal
