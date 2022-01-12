@@ -12,6 +12,7 @@ import {
   NumberInput,
   Checkbox,
   EditableTableGrid,
+  notification,
   CheckboxGroup,
   CommonTableGrid,
 } from '@/components'
@@ -123,6 +124,27 @@ class DrugLeafletSelection extends PureComponent {
         instructionIds,
         language: lan,
         visitId: visitid,
+      })
+      if (!data || !data.DrugDetailsList) {
+        return
+      }
+      // ingredient in leaflet will max to 2 lines and end with ', etc...' if more than 2 lines;
+      data.DrugDetailsList.forEach(t => {
+        if (t.ingredient) {
+          if (t.ingredient.length > 28) {
+            t.ingredient1 = '(' + t.ingredient.substr(0, 28)
+            if (t.ingredient.length > 49) {
+              t.ingredient2 = t.ingredient.substr(28, 21) + ', etc...)'
+            } else {
+              t.ingredient2 = t.ingredient.substr(28, 21) + ')'
+            }
+          } else {
+            t.ingredient1 = '(' + t.ingredient + ')'
+          }
+        } else {
+          t.ingredient1 = ''
+          t.ingredient2 = ''
+        }
       })
       const payload = [
         {
