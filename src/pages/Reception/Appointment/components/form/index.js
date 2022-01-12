@@ -476,7 +476,7 @@ class Form extends React.PureComponent {
       const firstUnDelete = afterDelete.find(
         item =>
           !item.isDeleted &&
-          item.calendarResource.resourceType === CALENDAR_RESOURCE.DOCTOR,
+          item.calendarResource?.resourceType === CALENDAR_RESOURCE.DOCTOR,
       )
       let newDataGrid = [...afterDelete]
       if (primayDoctor) {
