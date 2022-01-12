@@ -147,7 +147,7 @@ const sortItems = data => {
 }
 
 const WorklistColumnBody = ({ data, renderWorkitem }) => {
-  const sortedData = sortItems(data)
+  let sortedData = data.workitems || []
 
   return (
     <div style={columnBodyStyle}>
