@@ -61,8 +61,10 @@ const withWebSocket = () => (Component) => {
         isWsConnected === true ||
         (!autoupdate && (await this.tryConnectSocket()))
       ) {
-        this.wsConnection.send(content)
-        sendSuccess = true
+        if (this.wsConnection.readyState === 1) {
+          this.wsConnection.send(content)
+          sendSuccess = true
+        } 
       } else if (!autoupdate) {
         notification.error({
           message: `Medicloud printing tool is not running, please start it.`,

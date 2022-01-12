@@ -273,6 +273,7 @@ export const REPORT_ID = {
   PRESCRIPTION: 84,
   PATIENT_INFO_LEAFLET: 87,
   DRUG_LABEL_80MM_45MM_V2: 88,
+  DRUG_SUMMARY_LABEL_80MM_45MM: 90,
 }
 
 export const INVOICE_STATUS = {
@@ -906,4 +907,9 @@ export const VISITDOCTOR_CONSULTATIONSTATUS = {
   INPROGRESS: 'In Progress',
   PAUSED: 'Paused',
   COMPLETED: 'Completed',
+}
+
+export const LANGUAGES = {
+  2: 'EN',
+  5: 'JP',
 }
