@@ -4,7 +4,7 @@ import { Button, Tooltip, CommonModal } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
 import MenuItem from '@material-ui/core/MenuItem'
 import Menu from '@material-ui/core/Menu'
-import DrugLeafletSelection from '../../Pharmacy/Components/DrugLeafletSelection'
+import DrugLeafletSelection from './DrugLeafletSelection'
 import DrugLabelSelection from '../../Dispense/DispenseDetails/DrugLabelSelection'
 
 const PrintPrescription = props => {
