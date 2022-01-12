@@ -20,6 +20,23 @@ import Authorized from '@/utils/Authorized'
 import ErrorPopover from './ErrorPopover'
 import ApptDuration from './ApptDuration'
 
+const isTimeChange = (from, to) => {
+  if (from && to) {
+    if (
+      moment(from, timeFormat24Hour).format(timeFormat24Hour) ===
+      moment(to, timeFormat24Hour).format(timeFormat24Hour)
+    ) {
+      return false
+    }
+    return true
+  }
+
+  if (!from && !to) {
+    return false
+  }
+  return true
+}
+
 export const AppointmentDataColumn = [
   { name: 'conflicts', title: ' ' },
   { name: 'calendarResourceFK', title: 'Resource' },
@@ -77,6 +94,7 @@ export const AppointmentDataColExtensions = (apptTimeIntervel, disabled) => [
             value={row.startTime}
             disabled={disabled}
             onChange={time => {
+              if (!isTimeChange(row.startTime, time)) return
               const { commitChanges } = control
               row.startTime = time
               if (row.startTime) {
