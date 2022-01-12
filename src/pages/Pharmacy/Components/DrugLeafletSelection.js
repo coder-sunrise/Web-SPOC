@@ -3,7 +3,7 @@ import * as Yup from 'yup'
 import _ from 'lodash'
 import { getRawData } from '@/services/report'
 import { connect } from 'dva'
-import { REPORT_ID } from '@/utils/constants'
+import { REPORT_ID, LANGUAGES } from '@/utils/constants'
 // common components
 import { withStyles } from '@material-ui/core'
 import {
@@ -66,9 +66,8 @@ class DrugLeafletSelection extends PureComponent {
       type,
     } = this.props
     const preferLanguage =
-      (tranlationFK || (patient && patient.translationLinkFK)) === 5
-        ? 'JP'
-        : clinicSettings.primaryPrintoutLanguage
+      LANGUAGES[tranlationFK || (patient && patient.translationLinkFK)] ??
+      clinicSettings.primaryPrintoutLanguage
     this.setState({ printlanguage: [preferLanguage] })
     if (type === 'PIL') {
       this.setState({

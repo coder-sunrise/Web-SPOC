@@ -11,7 +11,7 @@ import {
 import { connect } from 'dva'
 
 import { getReportContext, getRawData } from '@/services/report'
-import { REPORT_ID } from '@/utils/constants'
+import { REPORT_ID, LANGUAGES } from '@/utils/constants'
 import {
   DrugLabelSelectionColumns,
   DrugLabelSelectionColumnExtensions,
@@ -105,13 +105,20 @@ class DrugLabelSelection extends React.PureComponent {
             ['desc', 'asc'],
           )
         } else {
-          data = _.orderBy(data, ['displayName'], ['asc'])
+          data = _.orderBy(
+            data,
+            [data => data.displayName.toLowerCase()],
+            ['asc'],
+          )
         }
         // set default language based on patient tranlsation and clinic setting.
+        const translationFK =
+          this.props.patient &&
+          this.props.patient.entity &&
+          this.props.patient.entity.translationLinkFK
         const preferLanguage =
-          (this.props.patient && this.props.patient.translationLinkFK) === 5
-            ? 'JP'
-            : this.props.clinicSettings.primaryPrintoutLanguage
+          LANGUAGES[translationFK] ??
+          this.props.clinicSettings.primaryPrintoutLanguage
         this.setState({
           prescription: data.map(x => {
             return { ...x, no: 1 }
@@ -210,6 +217,7 @@ class DrugLabelSelection extends React.PureComponent {
             xxx => xxx.id === t.invoiceItemId,
           )
         }
+        t.instruction = t.instruction.replace('\n ', '\n').replace('\n ', '')
         var indicationArray = (t.indication || '').split('\n')
         t.firstLine = indicationArray.length > 0 ? indicationArray[0] : ' '
         t.secondLine = indicationArray.length > 1 ? indicationArray[1] : ' '

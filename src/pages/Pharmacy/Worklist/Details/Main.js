@@ -1515,7 +1515,7 @@ const Main = props => {
       if (data) {
         data = _.orderBy(
           data,
-          ['displayInLeaflet', 'displayName'],
+          [t => t.displayInLeaflet, t => t.displayName.toLowerCase()],
           ['desc', 'asc'],
         )
         setDrugLeafletData(data)
@@ -1540,7 +1540,7 @@ const Main = props => {
       if (data) {
         data = _.orderBy(
           data,
-          ['dispenseByPharmacy', 'displayName'],
+          [t => t.dispenseByPharmacy, t => t.displayName.toLowerCase()],
           ['desc', 'asc'],
         )
         setDrugDrugSummaryLabelData(data)
