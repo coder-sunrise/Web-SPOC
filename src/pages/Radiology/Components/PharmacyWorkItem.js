@@ -19,7 +19,7 @@ import { FileDoneOutlined } from '@ant-design/icons'
 import Warning from '@material-ui/icons/Error'
 import WorklistContext from '../Worklist/WorklistContext'
 import VisitGroupIcon from './VisitGroupIcon'
-import PrintPrescription from './PrintPrescription'
+import PrintPrescription from '../../Pharmacy/Components/PrintPrescription'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import { CallingQueueButton } from '@/components/_medisys'
 
