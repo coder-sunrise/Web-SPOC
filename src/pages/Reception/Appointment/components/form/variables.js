@@ -20,6 +20,23 @@ import Authorized from '@/utils/Authorized'
 import ErrorPopover from './ErrorPopover'
 import ApptDuration from './ApptDuration'
 
+const isTimeChange = (from, to) => {
+  if (from && to) {
+    if (
+      moment(from, timeFormat24Hour).format(timeFormat24Hour) ===
+      moment(to, timeFormat24Hour).format(timeFormat24Hour)
+    ) {
+      return false
+    }
+    return true
+  }
+
+  if (!from && !to) {
+    return false
+  }
+  return true
+}
+
 export const AppointmentDataColumn = [
   { name: 'conflicts', title: ' ' },
   { name: 'calendarResourceFK', title: 'Resource' },
@@ -30,7 +47,7 @@ export const AppointmentDataColumn = [
   { name: 'isPrimaryClinician', title: 'Primary Doctor' },
 ]
 
-export const AppointmentDataColExtensions = apptTimeIntervel => [
+export const AppointmentDataColExtensions = (apptTimeIntervel, disabled) => [
   {
     columnName: 'calendarResourceFK',
     width: 150,
@@ -75,7 +92,9 @@ export const AppointmentDataColExtensions = apptTimeIntervel => [
           <SyncfusionTimePicker
             step={apptTimeIntervel}
             value={row.startTime}
+            disabled={disabled}
             onChange={time => {
+              if (!isTimeChange(row.startTime, time)) return
               const { commitChanges } = control
               row.startTime = time
               if (row.startTime) {
@@ -125,11 +144,28 @@ export const AppointmentDataColExtensions = apptTimeIntervel => [
     columnName: 'isPrimaryClinician',
     width: 110,
     type: 'radio',
+    isDisabled: row => disabled,
     isHiddend: row => {
       return (
         !row.calendarResource ||
         row.calendarResource.resourceType === CALENDAR_RESOURCE.RESOURCE
       )
+    },
+  },
+  {
+    columnName: 'conflicts',
+    // type: 'error',
+    editingEnabled: false,
+    sortingEnabled: false,
+    disabled: true,
+    align: 'center',
+    width: 40,
+    render: row => {
+      if (row.conflicts && row.conflicts.length > 0) {
+        return <ErrorPopover errors={row.conflicts} />
+      }
+
+      return null
     },
   },
 ]

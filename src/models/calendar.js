@@ -366,7 +366,7 @@ export default createListViewModel({
         const { status, data } = result
         if (parseInt(status, 10) === 200) {
           const { id, recurrenceDto, recurrenceFK, ...restData } = data
-          let appointmentDate = moment().startOf('day')
+          let appointmentDate = moment().formatUTC()
           let apptResources = [...data.appointments[0].appointments_Resources]
           if (updateReource) {
             const codetable = yield select(st => st.codetable)
@@ -379,7 +379,7 @@ export default createListViewModel({
               view,
             } = updateReource
 
-            appointmentDate = moment(newStartTime).startOf('day')
+            appointmentDate = moment(newStartTime).formatUTC()
             let updateResource = apptResources.find(
               r => r.id === updateApptResourceId,
             )
@@ -407,6 +407,7 @@ export default createListViewModel({
                 updateResource.isPrimaryClinician = true
               }
               updateResource.calendarResourceFK = newResourceId
+              updateResource.calendarResource = { ...source }
             }
           }
           const copyAppt = {
@@ -420,9 +421,10 @@ export default createListViewModel({
                 isEditedAsSingleAppointment: false,
                 appointmentPreOrderItem: [],
                 appointments_Resources: [
-                  ...apptResources.map(res => {
+                  ...apptResources.map((res, index) => {
                     const { id, appointmentFK, ...restResourceData } = res
                     return {
+                      id: -1 * (index + 1),
                       ...restResourceData,
                     }
                   }),

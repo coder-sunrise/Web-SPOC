@@ -3,7 +3,7 @@ import { Typography, Card } from 'antd'
 import ProCard from '@ant-design/pro-card'
 import { Icon } from '@/components'
 import { WorklistColumn } from './WorklistColumn'
-import { Workitem } from './WorkItem'
+import PharmacyWorkItem from './PharmacyWorkItem'
 
 export const Worklist = ({ columns }) => {
   const [columnPercentage, setColumnPercentage] = useState(100)
@@ -14,22 +14,16 @@ export const Worklist = ({ columns }) => {
     }
   }, [columns])
   window.mapped = columns
-  const gridStyle = {
-    gridTemplateColumns: columns.reduce(r => r + '1fr ', ''), //fraction to set same fraction for all columns
-    display: 'grid',
-    height: '100%',
-    columnGap: 15,
-  }
-
-  const gridStyle2 = { height: '100%', display: 'flex' }
 
   return (
-    <div style={gridStyle}>
+    <div style={{ height: '100%', display: 'flex' }}>
       {columns.map((column, index) => (
         <WorklistColumn
-          columnPercentage={100}
+          columnPercentage={columnPercentage}
           data={column}
-          renderWorkitem={Workitem}
+          renderWorkitem={item => {
+            return <PharmacyWorkItem item={item} />
+          }}
         />
       ))}
     </div>

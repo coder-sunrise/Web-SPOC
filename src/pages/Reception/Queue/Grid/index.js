@@ -156,8 +156,12 @@ class Grid extends React.Component {
       visitPurposeFK,
       patientProfileFk,
       appointmentStatusFk,
+      doctorName,
     } = row
     if (visitStatus === VISIT_STATUS.UPCOMING_APPT) {
+      if (patientProfileFk && !doctorName) {
+        return
+      }
       id = patientProfileFk ? '8' : '9'
 
       this.props.onMenuItemClick(row, id)
