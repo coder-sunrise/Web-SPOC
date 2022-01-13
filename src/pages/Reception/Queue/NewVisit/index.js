@@ -186,6 +186,13 @@ class NewVisit extends PureComponent {
         },
       },
     })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctlanguage',
+        force: true,
+      },
+    })
   }
   componentWillUnmount() {
     // call file index API METHOD='DELETE'
