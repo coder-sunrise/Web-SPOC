@@ -1885,7 +1885,15 @@ const ltAdmittingSpecialty = [
 const queueProcessorType = [
   {
     value: 1,
-    name: 'Auto Generate Statement',
+    name: 'XRay Interface',
+  },
+  {
+    value: 2,
+    name: 'SAP Interface',
+  },
+  {
+    value: 3,
+    name: 'Lab Interface',
   },
 ]
 
