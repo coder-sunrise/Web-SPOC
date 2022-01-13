@@ -31,12 +31,13 @@ const ICD10DiagnosisItem = ({
   saveDiagnosisAsFavourite,
   uid,
   icD10DiagnosisCode,
+  defaultLanguage,
 }) => {
-  const [ show, setShow ] = useState(false)
+  const [show, setShow] = useState(false)
 
-  const [ showPersistMsg, setShowPersistMsg ] = useState(false)
+  const [showPersistMsg, setShowPersistMsg] = useState(false)
 
-  const [ persistMsg, setPersitMsg ] = useState('')
+  const [persistMsg, setPersitMsg] = useState('')
 
   const { form } = arrayHelpers
 
@@ -63,7 +64,10 @@ const ICD10DiagnosisItem = ({
     saveDiagnosisAsFavourite(icD10DiagnosisCode, uid)
   }
 
-  const diagnosisTypeOptions = [ { label: ' Sickness ', value: 'Sickness' }, { label: ' Injury ', value: 'Injury' } ]
+  const diagnosisTypeOptions = [
+    { label: ' Sickness ', value: 'Sickness' },
+    { label: ' Injury ', value: 'Injury' },
+  ]
 
   return (
     <Paper className={classes.diagnosisRow}>
@@ -71,15 +75,16 @@ const ICD10DiagnosisItem = ({
         <GridItem xs={5}>
           <Field
             name={`corDiagnosis[${index}].icD10DiagnosisFK`}
-            render={(args) => (
+            render={args => (
               <ICD10DiagnosisSelect
                 onChange={onDiagnosisChange}
                 filterStyle={{
                   position: 'absolute',
                   bottom: -3,
-                  right: -50,
+                  right: -140,
                 }}
-                from="Consultaion"
+                from='Consultaion'
+                defaultLanguage={defaultLanguage}
                 selectDiagnosisCode={icD10DiagnosisCode}
                 favouriteDiagnosis={favouriteDiagnosis}
                 handelSaveDiagnosisAsFavourite={handelSaveDiagnosisAsFavourite}
@@ -88,36 +93,36 @@ const ICD10DiagnosisItem = ({
             )}
           />
         </GridItem>
-        <GridItem xs={5} style={{ right: 50, bottom: 100 }} >
-        {favouriteDiagnosisMessage && (
-          <Alert
-            message={favouriteDiagnosisMessage}
-            type="warning"
-            style={{
-              whiteSpace: 'nowrap',
-              textOverflow: 'ellipsis',
-              display: 'inline-block',
-              overflow: 'hidden',
-              lineHeight: '25px',
-              fontSize: '0.85rem',
-            }}
-          />
-        )}
-        {showPersistMsg && (
-          <Alert
-            message={persistMsg}
-            type="warning"
-            style={{
-              position: 'relative',
-              whiteSpace: 'nowrap',
-              textOverflow: 'ellipsis',
-              display: 'inline-block',
-              overflow: 'hidden',
-              lineHeight: '20px',
-              fontSize: '0.85rem',
-            }}
-          />
-        )}
+        <GridItem xs={5} style={{ right: 50, bottom: 100 }}>
+          {favouriteDiagnosisMessage && (
+            <Alert
+              message={favouriteDiagnosisMessage}
+              type='warning'
+              style={{
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                display: 'inline-block',
+                overflow: 'hidden',
+                lineHeight: '25px',
+                fontSize: '0.85rem',
+              }}
+            />
+          )}
+          {showPersistMsg && (
+            <Alert
+              message={persistMsg}
+              type='warning'
+              style={{
+                position: 'relative',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                display: 'inline-block',
+                overflow: 'hidden',
+                lineHeight: '20px',
+                fontSize: '0.85rem',
+              }}
+            />
+          )}
         </GridItem>
         <GridItem xs={1} style={{ position: 'relative', right: -50 }}>
           <Popover
@@ -125,7 +130,8 @@ const ICD10DiagnosisItem = ({
               <div
                 style={{
                   width:
-                    form.values.corDiagnosis[index].isNew === true || !form.values.corDiagnosis[index].defaultIsPersist
+                    form.values.corDiagnosis[index].isNew === true ||
+                    !form.values.corDiagnosis[index].defaultIsPersist
                       ? '180px'
                       : '340px',
                 }}
@@ -138,34 +144,32 @@ const ICD10DiagnosisItem = ({
                   }}
                 >
                   {form.values.corDiagnosis[index].isNew === true ||
-                  !form.values.corDiagnosis[index].defaultIsPersist ? (
-                    'Remove diagnosis?'
-                  ) : (
-                    'Remove persist diagnosis?'
-                  )}
+                  !form.values.corDiagnosis[index].defaultIsPersist
+                    ? 'Remove diagnosis?'
+                    : 'Remove persist diagnosis?'}
                 </p>
                 {!form.values.corDiagnosis[index].isNew &&
-                form.values.corDiagnosis[index].defaultIsPersist &&
-                form.values.corDiagnosis[index].isPersist && (
-                  <div
-                    style={{
-                      fontSize: '0.8em',
-                      paddingBottom: theme.spacing(2),
-                    }}
-                  >
-                    Diagnosis will be removed from patient's medical problem
-                  </div>
-                )}
+                  form.values.corDiagnosis[index].defaultIsPersist &&
+                  form.values.corDiagnosis[index].isPersist && (
+                    <div
+                      style={{
+                        fontSize: '0.8em',
+                        paddingBottom: theme.spacing(2),
+                      }}
+                    >
+                      Diagnosis will be removed from patient's medical problem
+                    </div>
+                  )}
                 <Button
                   onClick={() => {
                     setShow(false)
                   }}
-                  variant="outlined"
+                  variant='outlined'
                 >
                   Cancel
                 </Button>
                 <Button
-                  color="primary"
+                  color='primary'
                   onClick={async () => {
                     const { values: vals } = form
                     const { entity } = consultation
@@ -180,34 +184,41 @@ const ICD10DiagnosisItem = ({
                   }}
                 >
                   {form.values.corDiagnosis[index].isNew === true ||
-                  !form.values.corDiagnosis[index].defaultIsPersist ? (
-                    'Confirm'
-                  ) : (
-                    'Current Visit'
-                  )}
+                  !form.values.corDiagnosis[index].defaultIsPersist
+                    ? 'Confirm'
+                    : 'Current Visit'}
                 </Button>
                 <Button
-                  color="primary"
+                  color='primary'
                   hidden={
-                    form.values.corDiagnosis[index].isNew === true || !form.values.corDiagnosis[index].defaultIsPersist
+                    form.values.corDiagnosis[index].isNew === true ||
+                    !form.values.corDiagnosis[index].defaultIsPersist
                   }
                   onClick={() => {
                     form.setFieldValue(`corDiagnosis[${index}].isDeleted`, true)
-                    form.setFieldValue(`corDiagnosis[${index}].isPermanentDelete`, true)
+                    form.setFieldValue(
+                      `corDiagnosis[${index}].isPermanentDelete`,
+                      true,
+                    )
                   }}
                 >
                   Permanently
                 </Button>
               </div>
             }
-            trigger="click"
+            trigger='click'
             visible={show}
             onVisibleChange={() => {
               setShow(!show)
             }}
           >
-            <Tooltip title="Delete">
-              <Button style={{ position: 'absolute', bottom: 0, right: 0 }} justIcon color="danger" size="sm">
+            <Tooltip title='Delete'>
+              <Button
+                style={{ position: 'absolute', bottom: 0, right: 0 }}
+                justIcon
+                color='danger'
+                size='sm'
+              >
                 <DeleteIcon />
               </Button>
             </Tooltip>
@@ -216,34 +227,33 @@ const ICD10DiagnosisItem = ({
         <GridItem xs={5}>
           <FastField
             name={`corDiagnosis[${index}].onsetDate`}
-            render={(args) => {
-              return (
-                <DatePicker
-                  label="Onset Date"
-                  {...args}
-                />
-              )
+            render={args => {
+              return <DatePicker label='Onset Date' {...args} />
             }}
           />
         </GridItem>
-        <GridItem xs={1} >
+        <GridItem xs={1}>
           <div>
             <FastField
               name={`corDiagnosis[${index}].isPersist`}
-              render={(args) => {
+              render={args => {
                 return (
                   <Checkbox
-                    inputLabel="Persist"
+                    inputLabel='Persist'
                     {...args}
                     onChange={({ target }) => {
                       if (target.value) {
                         setShowPersistMsg(true)
-                        setPersitMsg('Diagnosis added to patient’s persistent diagnosis')
+                        setPersitMsg(
+                          'Diagnosis added to patient’s persistent diagnosis',
+                        )
                         setTimeout(() => {
                           setShowPersistMsg(false)
                         }, 3000)
                       } else {
-                        setPersitMsg('Diagnosis removed from patient’s persistent diagnosis')
+                        setPersitMsg(
+                          'Diagnosis removed from patient’s persistent diagnosis',
+                        )
                         setShowPersistMsg(true)
                         setTimeout(() => {
                           setShowPersistMsg(false)
@@ -256,15 +266,18 @@ const ICD10DiagnosisItem = ({
             />
           </div>
         </GridItem>
-        <GridItem xs={5} >
+        <GridItem xs={5}>
           <Field
             name={`corDiagnosis[${index}].diagnosisType`}
-            render={(args) => (
+            render={args => (
               <RadioGroup
-                label= 'Type'
+                label='Type'
                 options={diagnosisTypeOptions}
                 onChange={({ target }) => {
-                  form.setFieldValue(`corDiagnosis[${index}].diagnosisType`, target.value)
+                  form.setFieldValue(
+                    `corDiagnosis[${index}].diagnosisType`,
+                    target.value,
+                  )
                 }}
                 {...args}
               />
@@ -274,37 +287,38 @@ const ICD10DiagnosisItem = ({
         <GridItem xs={5}>
           <FastField
             name={`corDiagnosis[${index}].firstVisitDate`}
-            render={(args) => {
+            render={args => {
+              return <DatePicker label='First Visit Date' {...args} />
+            }}
+          />
+        </GridItem>
+        <GridItem xs={1} />
+        <GridItem xs={5}>
+          <FastField
+            name={`corDiagnosis[${index}].validityDays`}
+            render={args => {
               return (
-                <DatePicker
-                  label="First Visit Date"
+                <TextField
+                  label='Validity (Days)'
+                  onChange={({ target }) => {
+                    form.setFieldValue(
+                      `corDiagnosis[${index}].validityDays`,
+                      target.value || null,
+                    )
+                  }}
                   {...args}
                 />
               )
             }}
           />
         </GridItem>
-        <GridItem xs={1}/>
-        <GridItem xs={5} >
-          <FastField
-            name={`corDiagnosis[${index}].validityDays`}
-            render={(args) => {
-              return (
-              <TextField
-              label="Validity (Days)" 
-              onChange={({target})=> {
-                  form.setFieldValue(`corDiagnosis[${index}].validityDays`,(target.value || null))
-                }}
-              {...args} 
-              />)
-            }}
-          />
-        </GridItem>
         <GridItem xs={12}>
           <FastField
             name={`corDiagnosis[${index}].remarks`}
-            render={(args) => {
-              return <TextField label="Remarks" multiline rowMax={6} {...args} />
+            render={args => {
+              return (
+                <TextField label='Remarks' multiline rowMax={6} {...args} />
+              )
             }}
           />
         </GridItem>

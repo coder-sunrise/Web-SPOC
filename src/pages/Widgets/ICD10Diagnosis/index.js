@@ -213,6 +213,7 @@ class ICD10Diagnosis extends PureComponent {
                         icD10DiagnosisCode={v.icD10DiagnosisCode}
                         favouriteDiagnosisMessage={v.favouriteDiagnosisMessage}
                         favouriteDiagnosis={diagnosis.favouriteDiagnosis || []}
+                        defaultLanguage={diagnosis.favouriteDiagnosisLanguage}
                       />
                     )}
                   </div>
