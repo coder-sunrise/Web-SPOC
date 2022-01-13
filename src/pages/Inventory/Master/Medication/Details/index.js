@@ -600,8 +600,12 @@ export default compose(
       if (medicationIngredients) {
         medicationIngredientList = medicationIngredients
           .filter(m => m !== allOptionId)
-          .map(m => {
-            return { medicationIngredientFK: m, inventoryMedicationFK: id }
+          .map((m, index) => {
+            return {
+              medicationIngredientFK: m,
+              inventoryMedicationFK: id,
+              sequence: index + 1,
+            }
           })
       }
 

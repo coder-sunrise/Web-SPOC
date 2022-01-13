@@ -15,7 +15,12 @@ import { ActionType } from '@ant-design/pro-table'
 import service from './services'
 import Details from './Details'
 
-const ClaimHistory = ({ values, dispatch, height, clinicSettings }) => {
+const ClaimTracking = ({
+  dispatch,
+  height,
+  clinicSettings,
+  patientProfileFK,
+}) => {
   const [showEditClaimDetails, setShowEditClaimDetails] = useState(false)
   const myRef = useRef<ActionType>()
   const {
@@ -25,7 +30,7 @@ const ClaimHistory = ({ values, dispatch, height, clinicSettings }) => {
 
   const getColumns = () => {
     const editClaimHistoryRight = Authorized.check(
-      'patientdatabase.patientprofiledetails.viewclaimhistory.editclaimdetails',
+      'patientdatabase.patientprofiledetails.claimhistory.viewclaimtracking.edit',
     ) || { rights: 'hidden' }
 
     let columns = [
@@ -514,7 +519,7 @@ const ClaimHistory = ({ values, dispatch, height, clinicSettings }) => {
             order: 'desc',
           },
         ],
-        patientProfileFK: values.id,
+        patientProfileFK,
       })
     },
     query: null,
@@ -556,4 +561,4 @@ const ClaimHistory = ({ values, dispatch, height, clinicSettings }) => {
 
 export default connect(({ clinicSettings }) => ({
   clinicSettings: clinicSettings.settings,
-}))(ClaimHistory)
+}))(ClaimTracking)

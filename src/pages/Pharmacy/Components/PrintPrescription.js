@@ -19,20 +19,31 @@ const PrintPrescription = props => {
     false,
   )
   const [
+    showDrugSummaryLabelSelectionPopup,
+    setShowDrugSummaryLabelSelectionPopup,
+  ] = useState(false)
+  const [
     showDrugLabelSelectionPopup,
     setShowDrugLabelSelectionPopup,
   ] = useState(false)
   const [drugLeafletData, setDrugLeafletData] = useState({})
+  const [drugSummaryLabelData, setDrugSummaryLabelData] = useState({})
   const [batchInformation, setBatchInformation] = useState({})
   const [anchorEl, setAnchorEl] = React.useState(null)
   const closeLeafletSelectionPopup = () => {
     setShowLeafletSelectionPopup(false)
+  }
+  const closeDrugSummaryLabelSelectionPopup = () => {
+    setShowDrugSummaryLabelSelectionPopup(false)
   }
   const onConfirmPrintLeaflet = () => {
     setShowLeafletSelectionPopup(false)
   }
   const closeDrugLabelSelectionPopup = () => {
     setShowDrugLabelSelectionPopup(false)
+  }
+  const onConfirmPrintDrugSummaryLabel = () => {
+    setShowDrugSummaryLabelSelectionPopup(false)
   }
   const onConfirmPrintDrugLabel = () => {
     setShowDrugLabelSelectionPopup(false)
@@ -83,6 +94,27 @@ const PrintPrescription = props => {
       }
     })
   }
+  const printDrugSummaryLabel = () => {
+    dispatch({
+      type: 'pharmacyDetails/queryLeafletDrugList',
+      payload: {
+        id: visitFK,
+      },
+    }).then(data => {
+      if (!data) {
+        return
+      }
+      handleClose()
+      data = _.orderBy(
+        data,
+        ['dispenseByPharmacy', 'displayName'],
+        ['desc', 'asc'],
+      )
+      setDrugSummaryLabelData(data)
+      setShowDrugSummaryLabelSelectionPopup(true)
+      console.log(data)
+    })
+  }
   const handleClose = () => {
     setAnchorEl(null)
   }
@@ -129,7 +161,7 @@ const PrintPrescription = props => {
         }}
       >
         <MenuItem onClick={printDrugLabel}>Drug Label</MenuItem>
-        <MenuItem onClick={handleClose}>Drug Summary Label</MenuItem>
+        <MenuItem onClick={printDrugSummaryLabel}>Drug Summary Label</MenuItem>
         <MenuItem onClick={handleClose}>Patient Label</MenuItem>
         <MenuItem onClick={printPIL}>Patient Info Leaflet</MenuItem>
         <MenuItem onClick={prescription}>Prescription</MenuItem>
@@ -165,7 +197,25 @@ const PrintPrescription = props => {
           rows={drugLeafletData}
           tranlationFK={translationLinkFK}
           visitid={visitFK}
+          type='PIL'
           onConfirmPrintLeaflet={onConfirmPrintLeaflet}
+        />
+      </CommonModal>
+      <CommonModal
+        open={showDrugSummaryLabelSelectionPopup}
+        title='Print Drug Summary Label'
+        onClose={closeDrugSummaryLabelSelectionPopup}
+        maxWidth='sm'
+        cancelText='Cancel'
+        observe='Confirm'
+      >
+        <DrugLeafletSelection
+          {...props}
+          rows={drugSummaryLabelData}
+          tranlationFK={translationLinkFK}
+          visitid={visitFK}
+          type='drugsummarylabel'
+          onConfirmPrintLeaflet={onConfirmPrintDrugSummaryLabel}
         />
       </CommonModal>
       <CommonModal
