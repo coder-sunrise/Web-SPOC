@@ -273,10 +273,22 @@ const drugMixtureItemSchema = Yup.object().shape({
             nextStepdose = ''
           }
 
-          const itemDuration = item.duration
-            ? ` For ${item.duration} day(s)`
-            : ''
-
+          let itemDuration = item.duration ? ` For ${item.duration} day(s)` : ''
+          let separator = nextStepdose
+          if (language === 'JP') {
+            separator = nextStepdose === '' ? '<br>' : ''
+            itemDuration = item.duration ? `${item.duration} 日分` : ''
+          }
+          let usagePrefix = ''
+          if (language === 'JP' && item.dosageFK) {
+            usagePrefix = '1回'
+          } else {
+            usagePrefix = getTranslationValue(
+              usage?.translationData,
+              language,
+              'displayValue',
+            )
+          }
           const dosage = ctmedicationdosage.find(d => d.id === item.dosageFK)
           const usage = ctmedicationusage.find(u => u.id === item.usageMethodFK)
           const frequency = ctmedicationfrequency.find(
@@ -286,11 +298,7 @@ const drugMixtureItemSchema = Yup.object().shape({
             m => m.id === item.prescribeUOMFK,
           )
 
-          instruction += `${getTranslationValue(
-            usage?.translationData,
-            language,
-            'displayValue',
-          )} ${getTranslationValue(
+          instruction += `${usagePrefix} ${getTranslationValue(
             dosage?.translationData,
             language,
             'displayValue',
@@ -302,7 +310,7 @@ const drugMixtureItemSchema = Yup.object().shape({
             frequency?.translationData,
             language,
             'displayValue',
-          )}${itemDuration}${nextStepdose}`
+          )}${itemDuration}${separator}`
         }
       }
       return instruction
