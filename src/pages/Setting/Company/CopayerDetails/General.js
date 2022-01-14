@@ -94,7 +94,12 @@ export const General = props => {
         </GridItem>
 
         <GridItem md={3}>
-          <div style={{ position: 'relative', paddingRight: 50 }}>
+          <div
+            style={{
+              position: 'relative',
+              paddingRight: 50,
+            }}
+          >
             <Field
               name='statementAdjustment'
               render={args => {
@@ -139,7 +144,13 @@ export const General = props => {
                 )
               }}
             />
-            <div style={{ position: 'absolute', right: 0, top: 0 }}>
+            <div
+              style={{
+                position: 'absolute',
+                right: 0,
+                top: 0,
+              }}
+            >
               <Field
                 name='statementAdjustmentType'
                 render={args => (
@@ -158,7 +169,12 @@ export const General = props => {
         </GridItem>
 
         <GridItem md={3}>
-          <div style={{ position: 'relative', paddingRight: 50 }}>
+          <div
+            style={{
+              position: 'relative',
+              paddingRight: 50,
+            }}
+          >
             <Field
               name='autoInvoiceAdjustment'
               render={args => {
@@ -187,7 +203,13 @@ export const General = props => {
                 )
               }}
             />
-            <div style={{ position: 'absolute', right: 0, top: 0 }}>
+            <div
+              style={{
+                position: 'absolute',
+                right: 0,
+                top: 0,
+              }}
+            >
               <Field
                 name='autoInvoiceAdjustmentType'
                 render={args => (
@@ -206,7 +228,12 @@ export const General = props => {
         </GridItem>
 
         <GridItem md={3}>
-          <div style={{ position: 'relative', paddingRight: 50 }}>
+          <div
+            style={{
+              position: 'relative',
+              paddingRight: 50,
+            }}
+          >
             <Field
               name='adminCharge'
               render={args => {
@@ -235,7 +262,13 @@ export const General = props => {
                 )
               }}
             />
-            <div style={{ position: 'absolute', right: 0, top: 0 }}>
+            <div
+              style={{
+                position: 'absolute',
+                right: 0,
+                top: 0,
+              }}
+            >
               <Field
                 name='adminChargeType'
                 render={args => (
@@ -271,14 +304,27 @@ export const General = props => {
 
         <GridItem md={6}>
           {isEnableAutoGenerateStatement && (
-            <div style={{ position: 'relative', paddingLeft: 220 }}>
-              <div style={{ position: 'absolute', left: 0, top: 0 }}>
+            <div
+              style={{
+                position: 'relative',
+                paddingLeft: 220,
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                }}
+              >
                 <FastField
                   name='isAutoGenerateStatementEnabled'
                   render={args => {
                     return (
                       <Checkbox
-                        style={{ marginTop: '22px' }}
+                        style={{
+                          marginTop: '22px',
+                        }}
                         label='Auto Generate Statement'
                         onChange={e => {
                           if (!e.target.value) {
