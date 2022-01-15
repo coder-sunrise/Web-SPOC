@@ -195,6 +195,8 @@ const VisitInfoCard = ({
       setFieldValue('mcReportPriority', 'Normal')
     }
 
+    setFieldValue('visitBasicExaminations[0].visitPurposeFK', v)
+
     if (template) {
       handleVisitOrderTemplateChange(v, template)
     }

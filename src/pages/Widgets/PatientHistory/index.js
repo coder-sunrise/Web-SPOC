@@ -713,6 +713,7 @@ class PatientHistory extends Component {
       referralPatientName: history.referralPatientName,
       referralRemarks: history.referralRemarks,
       visitPurposeFK: history.visitPurposeFK,
+      patientGender: history.patientGender,
     }
     let visitDetails = {
       visitDate: history.visitDate,
@@ -1116,6 +1117,56 @@ class PatientHistory extends Component {
     return '-'
   }
 
+  showBasicExaminationsGeneral = (basicExaminations = []) => {
+    if (
+      basicExaminations.find(
+        row =>
+          WidgetConfig.inputValue(row.temperatureC) ||
+          WidgetConfig.inputValue(row.bpSysMMHG) ||
+          WidgetConfig.inputValue(row.bpDiaMMHG) ||
+          WidgetConfig.inputValue(row.pulseRateBPM) ||
+          WidgetConfig.inputValue(row.saO2) ||
+          WidgetConfig.inputValue(row.weightKG) ||
+          WidgetConfig.inputValue(row.heightCM) ||
+          WidgetConfig.inputValue(row.bmi),
+      )
+    )
+      return true
+    return false
+  }
+
+  showBasicExaminationsOther1 = (basicExaminations = []) => {
+    if (
+      basicExaminations.find(
+        row =>
+          WidgetConfig.inputValue(row.bodyFatPercentage) ||
+          WidgetConfig.inputValue(row.degreeOfObesity) ||
+          WidgetConfig.inputValue(row.headCircumference) ||
+          WidgetConfig.inputValue(row.chestCircumference) ||
+          WidgetConfig.inputValue(row.waistCircumference) ||
+          WidgetConfig.inputValue(row.isPregnancy),
+      )
+    )
+      return true
+    return false
+  }
+
+  showBasicExaminationsOther2 = (basicExaminations = []) => {
+    if (
+      basicExaminations.find(
+        row =>
+          WidgetConfig.inputValue(row.hepetitisVaccinationA) ||
+          WidgetConfig.inputValue(row.hepetitisVaccinationB) ||
+          WidgetConfig.inputValue(row.isFasting) ||
+          WidgetConfig.inputValue(row.isSmoking) ||
+          WidgetConfig.inputValue(row.isAlcohol) ||
+          WidgetConfig.inputValue(row.isMensus),
+      )
+    )
+      return true
+    return false
+  }
+
   printHandel = async () => {
     let reportContext = []
     const result = await getReportContext(68)
@@ -1181,7 +1232,7 @@ class PatientHistory extends Component {
           visitDate: visit.visitDate,
           userName: visit.userName,
           userTitle: visit.userTitle,
-          visitPurposeFK: visit.visitPurposeFK,
+          patientGender: visit.patientGender,
         }
         const { isNurseNote, nurseNotes = '', visitPurposeFK } = current
         let isShowDoctorNote = false
@@ -1242,7 +1293,7 @@ class PatientHistory extends Component {
           visitPurposeFK,
           current.isNurseNote,
         )
-        const isShowVitalSign = this.checkShowData(
+        const isShowBasicExaminations = this.checkShowData(
           WidgetConfig.WIDGETS_ID.VITALSIGN,
           current,
           visitPurposeFK,
@@ -1271,7 +1322,7 @@ class PatientHistory extends Component {
           isShowEyeVisualAcuityTest ||
           isShowRefractionForm ||
           isShowEyeExaminations ||
-          isShowVitalSign ||
+          isShowBasicExaminations ||
           isShowOrders ||
           isShowConsultationDocument
         ) {
@@ -1304,6 +1355,7 @@ class PatientHistory extends Component {
             visitRefractionFormTests = [],
             ...restRefractionFormProps
           } = refractionFormDetails
+
           // visitListing
           visitListing.push({
             currentId: current.currentId,
@@ -1319,6 +1371,17 @@ class PatientHistory extends Component {
             noteTitle2,
             noteTitle3,
             noteTitle4,
+            patientGender: current.patientGender || '',
+            isShowBasicExaminations: isShowBasicExaminations,
+            isShowBasicExaminationsGeneral: this.showBasicExaminationsGeneral(
+              current.patientNoteVitalSigns,
+            ),
+            isShowBasicExaminationsOther1: this.showBasicExaminationsOther1(
+              current.patientNoteVitalSigns,
+            ),
+            isShowBasicExaminationsOther2: this.showBasicExaminationsOther2(
+              current.patientNoteVitalSigns,
+            ),
           })
 
           // treatment
@@ -1384,32 +1447,98 @@ class PatientHistory extends Component {
           }
 
           // Vital Sign
-          if (isShowVitalSign) {
+          if (isShowBasicExaminations) {
             vitalSign = vitalSign.concat(
               current.patientNoteVitalSigns.map(o => {
                 return {
                   visitFK: current.currentId,
-                  temperatureC: `${
-                    o.temperatureC ? numeral(o.temperatureC).format('0.0') : 0.0
-                  } \u00b0C`,
-                  bpSysMMHG: `${
-                    o.bpSysMMHG ? numeral(o.bpSysMMHG).format('0.0') : 0.0
-                  } mmHg`,
-                  bpDiaMMHG: `${
-                    o.bpDiaMMHG ? numeral(o.bpDiaMMHG).format('0.0') : 0.0
-                  } mmHg`,
-                  pulseRateBPM: `${
-                    o.pulseRateBPM ? numeral(o.pulseRateBPM).format('0.0') : 0.0
-                  } bpm`,
-                  weightKG: `${
-                    o.weightKG ? numeral(o.weightKG).format('0.0') : 0.0
-                  } KG`,
-                  heightCM: `${
-                    o.heightCM ? numeral(o.heightCM).format('0.0') : 0.0
-                  } CM`,
-                  bmi: `${
-                    o.bmi ? numeral(o.bmi).format('0.0') : 0.0
-                  } kg/m\u00b2`,
+                  temperatureC: WidgetConfig.inputValue(o.temperatureC)
+                    ? `${numeral(o.temperatureC).format('0.0')} \u00b0C`
+                    : '-',
+                  bpSysMMHG: WidgetConfig.inputValue(o.bpSysMMHG)
+                    ? `${numeral(o.bpSysMMHG).format('0')} mmHg`
+                    : '-',
+                  bpDiaMMHG: WidgetConfig.inputValue(o.bpDiaMMHG)
+                    ? `${numeral(o.bpDiaMMHG).format('0')} mmHg`
+                    : '-',
+                  pulseRateBPM: WidgetConfig.inputValue(o.pulseRateBPM)
+                    ? `${numeral(o.pulseRateBPM).format('0')} bpm`
+                    : '-',
+                  weightKG: WidgetConfig.inputValue(o.weightKG)
+                    ? `${numeral(o.weightKG).format('0.0')} KG`
+                    : '-',
+                  heightCM: WidgetConfig.inputValue(o.heightCM)
+                    ? `${numeral(o.heightCM).format('0.0')} CM`
+                    : '-',
+                  bmi: WidgetConfig.inputValue(o.bmi)
+                    ? `${numeral(o.bmi).format('0.0')} kg/m\u00b2`
+                    : '-',
+                  saO2: WidgetConfig.inputValue(o.saO2)
+                    ? `${numeral(o.saO2).format('0.0')} %`
+                    : '-',
+                  bodyFatPercentage: WidgetConfig.inputValue(
+                    o.bodyFatPercentage,
+                  )
+                    ? `${numeral(o.bodyFatPercentage).format('0.0')} %`
+                    : '-',
+                  degreeOfObesity: WidgetConfig.inputValue(o.degreeOfObesity)
+                    ? `${numeral(o.degreeOfObesity).format('0.0')} %`
+                    : '-',
+                  headCircumference: WidgetConfig.inputValue(
+                    o.headCircumference,
+                  )
+                    ? `${numeral(o.headCircumference).format('0.0')} CM`
+                    : '-',
+                  chestCircumference: WidgetConfig.inputValue(
+                    o.chestCircumference,
+                  )
+                    ? `${numeral(o.chestCircumference).format('0.0')} CM`
+                    : '-',
+                  waistCircumference:
+                    o.isChild || o.isPregnancy
+                      ? 'Not Available'
+                      : WidgetConfig.inputValue(o.waistCircumference)
+                      ? `${numeral(o.waistCircumference).format('0.0')} CM`
+                      : '-',
+                  isPregnancy: WidgetConfig.inputValue(o.isPregnancy)
+                    ? o.isPregnancy
+                      ? 'Yes'
+                      : 'No'
+                    : '-',
+                  hepetitisVaccinationA: WidgetConfig.inputValue(
+                    o.hepetitisVaccinationA,
+                  )
+                    ? o.hepetitisVaccinationA
+                      ? 'Yes'
+                      : 'No'
+                    : '-',
+                  hepetitisVaccinationB: WidgetConfig.inputValue(
+                    o.hepetitisVaccinationB,
+                  )
+                    ? o.hepetitisVaccinationB
+                      ? 'Yes'
+                      : 'No'
+                    : '-',
+                  isFasting: WidgetConfig.inputValue(o.isFasting)
+                    ? o.isFasting
+                      ? 'Yes'
+                      : 'No'
+                    : '-',
+                  isSmoking: WidgetConfig.inputValue(o.isSmoking)
+                    ? o.isSmoking
+                      ? 'Yes'
+                      : 'No'
+                    : '-',
+                  isAlcohol: WidgetConfig.inputValue(o.isAlcohol)
+                    ? o.isAlcohol
+                      ? 'Yes'
+                      : 'No'
+                    : '-',
+                  isMensus: WidgetConfig.inputValue(o.isMensus)
+                    ? o.isMensus
+                      ? 'Yes'
+                      : 'No'
+                    : '-',
                 }
               }),
             )

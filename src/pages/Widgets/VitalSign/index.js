@@ -3,7 +3,7 @@ import { FieldArray, withFormik } from 'formik'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 // import model from './models'
-import VitalSignCard from './VitalSignCard'
+import BasicExaminations from './BasicExaminations'
 import { Alert } from 'antd'
 import { AuthorizedContext } from '@/components'
 import Authorized from '@/utils/Authorized'
@@ -22,25 +22,28 @@ const styles = theme => ({
   },
 })
 
-@connect(({ patientVitalSign }) => ({
+@connect(({ patientVitalSign, patient }) => ({
   patientVitalSign,
+  patientInfo: patient.entity || {},
 }))
 class index extends PureComponent {
   state = {
     showWarningMessage: false,
   }
 
-  handleCalculateBMI = i => {
+  handleCalculateBMI = () => {
     const { form } = this.arrayHelpers
-    const { heightCM, weightKG } = form.values.corPatientNoteVitalSign[i]
+    const { heightCM, weightKG } = form.values.corPatientNoteVitalSign[0]
     const { setFieldValue, setFieldTouched } = form
     if (heightCM && weightKG) {
       const heightM = heightCM / 100
       const bmi = weightKG / heightM ** 2
       const bmiInTwoDecimal = Math.round(bmi * 100) / 100
-      setFieldValue(`corPatientNoteVitalSign[${i}].bmi`, bmiInTwoDecimal)
-      setFieldTouched(`corPatientNoteVitalSign[${i}].bmi`, true)
+      setFieldValue(`corPatientNoteVitalSign[0].bmi`, bmiInTwoDecimal)
+    } else {
+      setFieldValue('corPatientNoteVitalSign[0].bmi', null)
     }
+    setFieldTouched(`corPatientNoteVitalSign[0].bmi`, true)
   }
 
   updateCORVitalSign = vitalSign => {
@@ -68,21 +71,35 @@ class index extends PureComponent {
     return (
       <div>
         <AuthorizedContext.Provider value={this.getVitalSignAccessRight()}>
-          <VitalSignCard
-            {...this.props}
-            index={0}
-            handleCalculateBMI={this.handleCalculateBMI}
-            weightOnChange={() => {
-              this.updateCORVitalSign([
-                ...(this.arrayHelpers.form.values.corPatientNoteVitalSign ||
-                  []),
-              ])
-              this.setState({ showWarningMessage: true })
-              setTimeout(() => {
-                this.setState({ showWarningMessage: false })
-              }, 3000)
+          <FieldArray
+            name='corPatientNoteVitalSign'
+            render={arrayHelpers => {
+              this.arrayHelpers = arrayHelpers
+              return (
+                arrayHelpers.form.values.corPatientNoteVitalSign || []
+              ).map((v, i) => {
+                return (
+                  <div key={i}>
+                    <BasicExaminations
+                      {...this.props}
+                      arrayHelpers={arrayHelpers}
+                      handleCalculateBMI={this.handleCalculateBMI}
+                      weightOnChange={() => {
+                        this.updateCORVitalSign([
+                          ...(this.arrayHelpers.form.values
+                            .corPatientNoteVitalSign || []),
+                        ])
+                        this.setState({ showWarningMessage: true })
+                        setTimeout(() => {
+                          this.setState({ showWarningMessage: false })
+                        }, 3000)
+                      }}
+                      fieldName='corPatientNoteVitalSign'
+                    />
+                  </div>
+                )
+              })
             }}
-            isShowDelete={false}
           />
         </AuthorizedContext.Provider>
 

@@ -182,7 +182,9 @@ export const formikMapPropsToValues = ({
     if (Object.keys(visitInfo).length > 0) {
       qNo = visitInfo.queueNo
     }
-    const { visit = { visitDoctor: [] } } = visitInfo
+    const {
+      visit = { visitDoctor: [], visitBasicExaminations: [{}] },
+    } = visitInfo
 
     const visitEntries = Object.keys(visit).reduce(
       (entries, key) => ({
@@ -350,6 +352,10 @@ export const formikMapPropsToValues = ({
         ...visitEntries.visitDoctor.filter(d => !d.isPrimaryDoctor),
       ],
       visitPrimaryDoctor: visitEntries.visitDoctor.find(d => d.isPrimaryDoctor),
+      visitBasicExaminations: visitEntries.visitBasicExaminations.map(be => ({
+        ...be,
+        visitPurposeFK: visitEntries.visitPurposeFK || visitPurposeFK,
+      })),
     }
   } catch (error) {
     console.log({ error })
