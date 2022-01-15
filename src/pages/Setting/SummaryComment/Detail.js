@@ -88,7 +88,15 @@ const Detail = ({
           <GridItem md={4}>
             <FastField
               name='sortOrder'
-              render={args => <NumberInput label='Sort Order' {...args} />}
+              render={args => (
+                <NumberInput
+                  precision={0}
+                  max={9999}
+                  min={-9999}
+                  label='Sort Order'
+                  {...args}
+                />
+              )}
             />
           </GridItem>
           {isUseSecondLanguage && (
