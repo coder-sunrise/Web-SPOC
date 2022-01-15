@@ -154,7 +154,7 @@ const defaultColumns = [
           title='Select “All” will retrieve active and inactive co-payers'
         >
           <CodeSelect
-            style={{ width: 150 }}
+            style={{ width: 250 }}
             label={formatMessage({
               id: 'finance.scheme.search.cpname',
             })}

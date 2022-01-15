@@ -9,22 +9,19 @@ import { AuthorizedContext, Button } from '@/components'
 import Authorized from '@/utils/Authorized'
 import ICD10DiagnosisItem from './item'
 
-const styles = (theme) => ({
+const styles = theme => ({
   diagnosisRow: {
     marginBottom: theme.spacing(1),
     padding: theme.spacing(0.5),
   },
 })
-
-const { Secured } = Authorized
-@Secured('queue.consultation.widgets.diagnosis')
 @connect(({ diagnosis, codetable, consultation }) => ({
   diagnosis,
   codetable,
   consultation,
 }))
 class ICD10Diagnosis extends PureComponent {
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props
     dispatch({
       type: 'diagnosis/getUserPreference',
@@ -37,7 +34,7 @@ class ICD10Diagnosis extends PureComponent {
       payload: {
         type: '8',
       },
-    }).then((response) => {
+    }).then(response => {
       if (response) {
         const { favouriteDiagnosisLanguage: favouriteLanguage } = response
         this.props.dispatch({
@@ -50,8 +47,11 @@ class ICD10Diagnosis extends PureComponent {
     })
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (!this.props.diagnosis.shouldAddNew && nextProps.diagnosis.shouldAddNew) {
+  componentWillReceiveProps(nextProps) {
+    if (
+      !this.props.diagnosis.shouldAddNew &&
+      nextProps.diagnosis.shouldAddNew
+    ) {
       let index = 0
       if (this.diagnosises.length === 0) {
         index = 1
@@ -68,7 +68,7 @@ class ICD10Diagnosis extends PureComponent {
     }
   }
 
-  addDiagnosis = (index) => {
+  addDiagnosis = index => {
     this.arrayHelpers.push({
       // onsetDate: moment(),
       uid: getUniqueGUID(),
@@ -91,11 +91,18 @@ class ICD10Diagnosis extends PureComponent {
     const { dispatch, diagnosis } = this.props
     let newFavouriteDiagnosis
     let addNewFavorite
-    if ((diagnosis.favouriteDiagnosis || []).find((d) => d === icD10DiagnosisCode)) {
-      newFavouriteDiagnosis = (diagnosis.favouriteDiagnosis || []).filter((d) => d !== icD10DiagnosisCode)
+    if (
+      (diagnosis.favouriteDiagnosis || []).find(d => d === icD10DiagnosisCode)
+    ) {
+      newFavouriteDiagnosis = (diagnosis.favouriteDiagnosis || []).filter(
+        d => d !== icD10DiagnosisCode,
+      )
     } else {
       addNewFavorite = true
-      newFavouriteDiagnosis = [ ...(diagnosis.favouriteDiagnosis || []), icD10DiagnosisCode ]
+      newFavouriteDiagnosis = [
+        ...(diagnosis.favouriteDiagnosis || []),
+        icD10DiagnosisCode,
+      ]
     }
     dispatch({
       type: 'diagnosis/saveUserPreference',
@@ -107,20 +114,20 @@ class ICD10Diagnosis extends PureComponent {
         itemIdentifier: 'FavouriteICD10Diagnosis',
         type: '7',
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         dispatch({
           type: 'diagnosis/getUserPreference',
           payload: {
             type: '7',
           },
-        }).then((response) => {
+        }).then(response => {
           if (response) {
             const { form } = this.arrayHelpers
             const { values, setFieldValue } = form
             setFieldValue(
               'corDiagnosis',
-              (values.corDiagnosis || []).map((d) => {
+              (values.corDiagnosis || []).map(d => {
                 if (d.uid === uid) {
                   return {
                     ...d,
@@ -130,7 +137,7 @@ class ICD10Diagnosis extends PureComponent {
                   }
                 }
                 return d
-              })
+              }),
             )
 
             setTimeout(() => {
@@ -142,12 +149,12 @@ class ICD10Diagnosis extends PureComponent {
     })
   }
 
-  clearFavouriteDiagnosisMessage = (uid) => {
+  clearFavouriteDiagnosisMessage = uid => {
     const { form } = this.arrayHelpers
     const { values, setFieldValue } = form
     setFieldValue(
       'corDiagnosis',
-      (values.corDiagnosis || []).map((d) => {
+      (values.corDiagnosis || []).map(d => {
         if (d.uid === uid) {
           return {
             ...d,
@@ -155,18 +162,29 @@ class ICD10Diagnosis extends PureComponent {
           }
         }
         return d
-      })
+      }),
     )
   }
 
-  render () {
+  getDiagnosisAccessRight = () => {
+    const { isEnableEditOrder = true } = this.props
+    let right = Authorized.check('queue.consultation.widgets.diagnosis') || {
+      rights: 'hidden',
+    }
+    if (right.rights === 'enable' && !isEnableEditOrder) {
+      right = { rights: 'disable' }
+    }
+    return right
+  }
+
+  render() {
     const { rights, diagnosis } = this.props
 
     return (
       <div>
         <FieldArray
-          name="corDiagnosis"
-          render={(arrayHelpers) => {
+          name='corDiagnosis'
+          render={arrayHelpers => {
             const { form } = arrayHelpers
             const { values } = form
             this.diagnosis = values.corDiagnosis || []
@@ -180,33 +198,49 @@ class ICD10Diagnosis extends PureComponent {
             return this.diagnosis.map((v, i) => {
               if (v.isDeleted === true) return null
               return (
-                <Authorized authority={"queue.consultation.widgets.diagnosis"}>
-                <div key={v.uid}>
-                {(diagnosis.favouriteDiagnosisLanguage && <ICD10DiagnosisItem
-                  {...this.props}
-                  index={i}
-                  arrayHelpers={arrayHelpers}
-                  diagnosis={this.diagnosis}
-                  saveDiagnosisAsFavourite={this.saveDiagnosisAsFavourite}
-                  uid={v.uid}
-                  icD10DiagnosisCode={v.icD10DiagnosisCode}
-                  favouriteDiagnosisMessage={v.favouriteDiagnosisMessage}
-                  favouriteDiagnosis={diagnosis.favouriteDiagnosis || []}
-                />)}
-              </div>
-              </Authorized>
+                <AuthorizedContext.Provider
+                  value={this.getDiagnosisAccessRight()}
+                >
+                  <div key={v.uid}>
+                    {diagnosis.favouriteDiagnosisLanguage && (
+                      <ICD10DiagnosisItem
+                        {...this.props}
+                        index={i}
+                        arrayHelpers={arrayHelpers}
+                        diagnosis={this.diagnosis}
+                        saveDiagnosisAsFavourite={this.saveDiagnosisAsFavourite}
+                        uid={v.uid}
+                        icD10DiagnosisCode={v.icD10DiagnosisCode}
+                        favouriteDiagnosisMessage={v.favouriteDiagnosisMessage}
+                        favouriteDiagnosis={diagnosis.favouriteDiagnosis || []}
+                        defaultLanguage={diagnosis.favouriteDiagnosisLanguage}
+                      />
+                    )}
+                  </div>
+                </AuthorizedContext.Provider>
               )
             })
           }}
         />
 
-        <Authorized authority={"queue.consultation.widgets.diagnosis"}>
-              <div>
-                <Button size="sm" color="primary" onClick={this.handleAddDiagnosisClick} >
-                  <Add /> Add Diagnosis
-                </Button>
-              </div>
-        </Authorized>
+        <AuthorizedContext.Provider
+          value={{
+            rights:
+              this.getDiagnosisAccessRight().rights !== 'enable'
+                ? 'hidden'
+                : 'enable',
+          }}
+        >
+          <div>
+            <Button
+              size='sm'
+              color='primary'
+              onClick={this.handleAddDiagnosisClick}
+            >
+              <Add /> Add Diagnosis
+            </Button>
+          </div>
+        </AuthorizedContext.Provider>
       </div>
     )
   }

@@ -22,6 +22,9 @@ import Authorized from '@/utils/Authorized'
 import { General } from './General'
 import { ContactPersonList } from './ContactPersonList'
 import { InformationList } from './InformationList'
+import withWebSocket from '@/components/Decorator/withWebSocket'
+import { getRawData } from '@/services/report'
+import { REPORT_ID } from '@/utils/constants'
 
 const styles = () => ({
   actionDiv: {
@@ -97,6 +100,38 @@ const Detail = props => {
   const [activeTabIndex, setActiveTabIndex] = useState('0')
   const [showDocument, setShowDocument] = useState(false)
 
+  const printLabel = async (copayerId, contactPersonName) => {
+    if (!Number.isInteger(copayerId)) return
+    const { handlePrint, clinicSettings } = props
+    const { labelPrinterSize } = clinicSettings.settings
+
+    const sizeConverter = sizeCM => {
+      return sizeCM
+        .split('x')
+        .map(o =>
+          (10 * parseFloat(o.replace('cm', ''))).toString().concat('MM'),
+        )
+        .join('_')
+    }
+    const reportID =
+      REPORT_ID[
+        'COPAYER_ADDRESS_LABEL_'.concat(sizeConverter(labelPrinterSize))
+      ]
+
+    const data = await getRawData(reportID, {
+      copayerId,
+      contactPersonName: contactPersonName ? contactPersonName : '',
+    })
+    const payload = [
+      {
+        ReportId: reportID,
+        ReportData: JSON.stringify({
+          ...data,
+        }),
+      },
+    ]
+    handlePrint(JSON.stringify(payload))
+  }
   const onEditingList = (listName, isEditing) => {
     let newEditingList = []
 
@@ -114,6 +149,7 @@ const Detail = props => {
   }
 
   const compProps = {
+    onPrint: printLabel,
     onEditingListControl: onEditingList,
     ...props,
     height: fromCommonModal
@@ -320,4 +356,5 @@ export default compose(
       })
     },
   }),
+  withWebSocket(),
 )(Detail)

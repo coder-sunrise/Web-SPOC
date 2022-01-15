@@ -3,7 +3,7 @@ import * as Yup from 'yup'
 import _ from 'lodash'
 import { getRawData } from '@/services/report'
 import { connect } from 'dva'
-import { REPORT_ID } from '@/utils/constants'
+import { REPORT_ID, LANGUAGES } from '@/utils/constants'
 // common components
 import { withStyles } from '@material-ui/core'
 import {
@@ -12,10 +12,12 @@ import {
   NumberInput,
   Checkbox,
   EditableTableGrid,
+  notification,
   CheckboxGroup,
   CommonTableGrid,
 } from '@/components'
 import { Alert } from 'antd'
+import { ThreeSixtySharp } from '@material-ui/icons'
 
 @connect(({ clinicSettings, patient }) => ({
   clinicSettings: clinicSettings.settings || clinicSettings.default,
@@ -61,19 +63,29 @@ class DrugLeafletSelection extends PureComponent {
       tranlationFK,
       patient,
       clinicSettings,
+      type,
     } = this.props
     const preferLanguage =
-      (tranlationFK || (patient && patient.translationLinkFK)) === 5
-        ? 'JP'
-        : clinicSettings.primaryPrintoutLanguage
+      LANGUAGES[tranlationFK || (patient && patient.translationLinkFK)] ??
+      clinicSettings.primaryPrintoutLanguage
     this.setState({ printlanguage: [preferLanguage] })
-    this.setState({
-      selectedRows: rows
-        .filter(t => t.displayInLeaflet)
-        .map(x => {
-          return x.id
-        }),
-    })
+    if (type === 'PIL') {
+      this.setState({
+        selectedRows: rows
+          .filter(t => t.displayInLeaflet)
+          .map(x => {
+            return x.id
+          }),
+      })
+    } else {
+      this.setState({
+        selectedRows: rows
+          .filter(t => t.dispenseByPharmacy)
+          .map(x => {
+            return x.id
+          }),
+      })
+    }
   }
   constructor(props) {
     super(props)
@@ -112,6 +124,27 @@ class DrugLeafletSelection extends PureComponent {
         language: lan,
         visitId: visitid,
       })
+      if (!data || !data.DrugDetailsList) {
+        return
+      }
+      // ingredient in leaflet will max to 2 lines and end with ', etc...' if more than 2 lines;
+      data.DrugDetailsList.forEach(t => {
+        if (t.ingredient) {
+          if (t.ingredient.length > 28) {
+            t.ingredient1 = '(' + t.ingredient.substr(0, 28)
+            if (t.ingredient.length > 49) {
+              t.ingredient2 = t.ingredient.substr(28, 21) + ', etc...)'
+            } else {
+              t.ingredient2 = t.ingredient.substr(28, 21) + ')'
+            }
+          } else {
+            t.ingredient1 = '(' + t.ingredient + ')'
+          }
+        } else {
+          t.ingredient1 = ''
+          t.ingredient2 = ''
+        }
+      })
       const payload = [
         {
           ReportId: REPORT_ID.PATIENT_INFO_LEAFLET,
@@ -130,6 +163,86 @@ class DrugLeafletSelection extends PureComponent {
     })
   }
 
+  printDrugSummaryLabel = async (printData = {}) => {
+    const { visitid } = this.props
+    const visitinvoicedrugids = _.join(
+      printData.map(x => {
+        return x.visitInvoiceDrugId
+      }),
+    )
+    const instructionIds = _.join(
+      printData
+        // skip drug mixture
+        .filter(xx => xx.instructionId && xx.instructionId.length > 0)
+        .map(x => {
+          return _.join(x.instructionId, ',')
+        }),
+    )
+    this.state.printlanguage.forEach(async lan => {
+      const data = await getRawData(REPORT_ID.DRUG_SUMMARY_LABEL_80MM_45MM, {
+        visitinvoicedrugids,
+        instructionIds,
+        language: lan,
+        visitId: visitid,
+      })
+      if (!data || !data.DrugDetailsList) {
+        notification.error({
+          message: `Get drug summary label data failed.`,
+        })
+        return
+      }
+      data.DrugDetailsList.forEach(t => {
+        if (t.isDrugMixture) {
+          const instructions = (t.instruction || '').split('\n')
+          // if it's drug mixture then first line will not show(occupied by drug mixture's drug name)
+          t.FirstLine = ''
+          t.SecondLine = t.ingredient
+          // If language is EN, instruction need to auto breakline and show in 2 lines
+          // If JP, then need to separate to 2 lines. last line will include the last remaining 2 step dose.
+          if (lan === 'JP') {
+            t.ThirdLine = instructions.length > 0 ? instructions[0] : ''
+            t.FourthLine = instructions.length > 1 ? instructions[1] : ''
+            if (instructions.length > 2) {
+              t.FourthLine = `${t.FourthLine} ${instructions[2]}`
+            }
+          } else {
+            t.ThirdLine = t.instruction
+          }
+        } else {
+          const instructions = (t.instruction || '').split('\n')
+          t.FirstLine = t.ingredient
+          t.SecondLine = t.indication
+          // If language is EN, instruction need to auto breakline and show in 2 lines
+          // If JP, then need to separate to 2 lines. last line will include the last remaining 2 step dose.
+          if (lan === 'JP') {
+            t.ThirdLine = instructions.length > 0 ? instructions[0] : ''
+            t.FourthLine = instructions.length > 1 ? instructions[1] : ''
+            if (instructions.length > 2) {
+              t.FourthLine = `${t.FourthLine} ${instructions[2]}`
+            }
+          } else {
+            t.ThirdLine = t.instruction
+          }
+        }
+      })
+      console.log(data)
+      const payload = [
+        {
+          ReportId: REPORT_ID.DRUG_SUMMARY_LABEL_80MM_45MM,
+          ReportData: JSON.stringify({
+            ...data,
+          }),
+        },
+      ]
+      await this.props.handlePrint(JSON.stringify(payload))
+      if (
+        this.state.printlanguage.indexOf(lan) ==
+        this.state.printlanguage.length - 1
+      ) {
+        this.props.onConfirmPrintLeaflet()
+      }
+    })
+  }
   render() {
     const {
       onConfirmPrintLeaflet,
@@ -208,7 +321,12 @@ class DrugLeafletSelection extends PureComponent {
             const selectedData = rows.filter(item =>
               selectedRows.includes(item.id),
             )
-            this.printLeaflet(selectedData)
+            console.log(this.props.type)
+            if (this.props.type === 'PIL') {
+              this.printLeaflet(selectedData)
+            } else if (this.props.type === 'drugsummarylabel') {
+              this.printDrugSummaryLabel(selectedData)
+            }
           },
           confirmBtnText: 'Confirm',
           confirmProps: { disabled: showDrugWarning || showLanguageWarning },

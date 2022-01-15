@@ -273,6 +273,7 @@ export const REPORT_ID = {
   PRESCRIPTION: 84,
   PATIENT_INFO_LEAFLET: 87,
   DRUG_LABEL_80MM_45MM_V2: 88,
+  DRUG_SUMMARY_LABEL_80MM_45MM: 90,
 }
 
 export const INVOICE_STATUS = {
@@ -783,6 +784,13 @@ export const CHECKLIST_CATEGORY = {
 
 export const GENDER = { FEMALE: 1, MALE: 2 }
 
+export const MODALITY_STATUS = {
+  PENDING: 1,
+  PROCESSING: 2,
+  SUCCESSFUL: 3,
+  FAILED: 4,
+}
+
 export const FOLDER_TYPE = {
   PATIENT: 'Patient',
   COPAYER: 'CoPayer',
@@ -909,4 +917,16 @@ export const LAB_SPECIMEN_DETAILS_STEP = {
   5: 'P. 2nd Verify',
   6: 'Completed',
   7: 'Discarded',
+}
+
+export const VISITDOCTOR_CONSULTATIONSTATUS = {
+  WAITING: 'Waiting',
+  INPROGRESS: 'In Progress',
+  PAUSED: 'Paused',
+  COMPLETED: 'Completed',
+}
+
+export const LANGUAGES = {
+  2: 'EN',
+  5: 'JP',
 }

@@ -22,11 +22,14 @@ import {
   ProgressButton,
   CodeSelect,
   DateRangePicker,
+  dateFormatLong,
+  dateFormatLongWithTimeNoSec,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 // utils
 import { findGetParameter, commonDataReaderTransform } from '@/utils/utils'
 import { VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
+import { scribbleTypes } from '@/utils/codes'
 import { DoctorProfileSelect, ServePatientButton } from '@/components/_medisys'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import { getReportContext } from '@/services/report'
@@ -143,7 +146,19 @@ class PatientHistory extends Component {
     this.widgets = WidgetConfig.widgets(
       props,
       this.scribbleNoteUpdateState,
+      this.getSelectNoteTypes,
     ).filter(o => {
+      if (o.id === WidgetConfig.WIDGETS_ID.DOCTORNOTE) {
+        return this.getCategoriesOptions().find(
+          c =>
+            [
+              WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
+              WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
+              WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
+              WidgetConfig.WIDGETS_ID.PLAN,
+            ].indexOf(c.value) >= 0,
+        )
+      }
       return this.getCategoriesOptions().find(c => c.value === o.id)
     })
 
@@ -630,6 +645,16 @@ class PatientHistory extends Component {
   checkSelectWidget = widgetId => {
     const { selectCategories = [] } = this.state
     if (selectCategories.length > 0) {
+      if (widgetId === WidgetConfig.WIDGETS_ID.DOCTORNOTE)
+        return selectCategories.find(
+          c =>
+            [
+              WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
+              WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
+              WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
+              WidgetConfig.WIDGETS_ID.PLAN,
+            ].indexOf(c) >= 0,
+        )
       return selectCategories.find(c => c === widgetId)
     }
     return true
@@ -676,7 +701,6 @@ class PatientHistory extends Component {
         </div>
       )
     }
-
     let current = {
       ...history.patientHistoryDetail,
       visitAttachments: history.visitAttachments,
@@ -688,6 +712,7 @@ class PatientHistory extends Component {
       referralPerson: history.referralPerson,
       referralPatientName: history.referralPatientName,
       referralRemarks: history.referralRemarks,
+      visitPurposeFK: history.visitPurposeFK,
     }
     let visitDetails = {
       visitDate: history.visitDate,
@@ -862,6 +887,29 @@ class PatientHistory extends Component {
     ]
   }
 
+  getSelectNoteTypes = () => {
+    const { selectCategories = [] } = this.state
+    if (selectCategories.length) {
+      return [
+        WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
+        WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
+        WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
+        WidgetConfig.WIDGETS_ID.PLAN,
+      ].filter(n => selectCategories.indexOf(n) >= 0)
+    }
+    return [
+      WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
+      WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
+      WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
+      WidgetConfig.WIDGETS_ID.PLAN,
+    ].filter(
+      n =>
+        this.getCategoriesOptions()
+          .map(c => c.value)
+          .indexOf(n) >= 0,
+    )
+  }
+
   checkShowData = (widgetId, current, visitPurposeFK, isNurseNote) => {
     if (isNurseNote) return false
     if (visitPurposeFK === VISIT_TYPE.OTC) {
@@ -877,8 +925,36 @@ class PatientHistory extends Component {
     }
     return (
       this.checkSelectWidget(widgetId) &&
-      WidgetConfig.showWidget(current, widgetId)
+      WidgetConfig.showWidget(current, widgetId, this.getSelectNoteTypes())
     )
+  }
+
+  checkShowNoteInReport = (widgetId, current, visitPurposeFK, isNurseNote) => {
+    if (isNurseNote) return false
+    if (visitPurposeFK === VISIT_TYPE.OTC) return false
+    const checkContainsNote = () => {
+      const notesType = WidgetConfig.notesTypes.find(
+        type => type.value === widgetId,
+      )
+      if (!notesType) return false
+
+      const { doctorNotes = [] } = current
+      const scribbleType = scribbleTypes.find(
+        o => o.type === notesType.fieldName,
+      )
+      if (
+        !doctorNotes.find(
+          note =>
+            note[notesType.fieldName] !== undefined &&
+            note[notesType.fieldName] !== null &&
+            note[notesType.fieldName].trim().length,
+        )
+      ) {
+        return false
+      }
+      return true
+    }
+    return this.checkSelectWidget(widgetId) && checkContainsNote()
   }
 
   getReferral = current => {
@@ -981,6 +1057,65 @@ class PatientHistory extends Component {
     }
   }
 
+  getNoteContent = (note, selectNoteTypes, index) => {
+    if (selectNoteTypes.length > index) {
+      const notesType = WidgetConfig.notesTypes.find(
+        type => type.value === selectNoteTypes[index],
+      )
+      if (!notesType) return undefined
+      return note[notesType.fieldName]
+    }
+    return undefined
+  }
+
+  checkPrintNote = (note, selectNoteTypes) => {
+    return selectNoteTypes.find(selectNote => {
+      const notesType = WidgetConfig.notesTypes.find(
+        type => type.value === selectNote,
+      )
+      return (
+        note[notesType.fieldName] !== undefined &&
+        note[notesType.fieldName] !== null &&
+        note[notesType.fieldName].trim().length
+      )
+    })
+  }
+
+  getNotes = (selectNoteTypes, current) => {
+    return current.doctorNotes
+      .filter(note => this.checkPrintNote(note, selectNoteTypes))
+      .map(note => {
+        const noteUserName = `${
+          note.signedByUserTitle && note.signedByUserTitle.trim().length
+            ? `${note.signedByUserTitle} ${note.signedByUserName || ''}`
+            : `${note.signedByUserName || ''}`
+        }`
+        return {
+          id: note.id,
+          visitFK: current.currentId,
+          content1: this.getNoteContent(note, selectNoteTypes, 0) || '',
+          content2: this.getNoteContent(note, selectNoteTypes, 1) || '',
+          content3: this.getNoteContent(note, selectNoteTypes, 2) || '',
+          content4: this.getNoteContent(note, selectNoteTypes, 3) || '',
+          doctor: noteUserName,
+          updateDate: moment(note.signedDate).format(
+            dateFormatLongWithTimeNoSec,
+          ),
+          noteColumnCount: selectNoteTypes.length,
+        }
+      })
+  }
+
+  getNoteTitle = (selectNoteTypes, index) => {
+    if (selectNoteTypes.length > index) {
+      const notesType = WidgetConfig.notesTypes.find(
+        type => type.value === selectNoteTypes[index],
+      )
+      return notesType.title
+    }
+    return '-'
+  }
+
   printHandel = async () => {
     let reportContext = []
     const result = await getReportContext(68)
@@ -1024,6 +1159,7 @@ class PatientHistory extends Component {
     let vitalSign = []
     let orders = []
     let consultationDocument = []
+    let doctorNote = []
 
     loadVisits
       .filter(visit => selectItems.find(item => item === visit.currentId))
@@ -1045,32 +1181,25 @@ class PatientHistory extends Component {
           visitDate: visit.visitDate,
           userName: visit.userName,
           userTitle: visit.userTitle,
+          visitPurposeFK: visit.visitPurposeFK,
         }
         const { isNurseNote, nurseNotes = '', visitPurposeFK } = current
-        const isShowHistory = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
-          current,
-          visitPurposeFK,
-          isNurseNote,
-        )
-        const isShowChiefComplaints = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
-          current,
-          visitPurposeFK,
-          isNurseNote,
-        )
-        const isShowClinicNotes = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
-          current,
-          visitPurposeFK,
-          isNurseNote,
-        )
-        const isShowPlan = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.PLAN,
-          current,
-          visitPurposeFK,
-          isNurseNote,
-        )
+        let isShowDoctorNote = false
+        const selectNoteTypes = this.getSelectNoteTypes()
+        const noteTitle1 = this.getNoteTitle(selectNoteTypes, 0)
+        const noteTitle2 = this.getNoteTitle(selectNoteTypes, 1)
+        const noteTitle3 = this.getNoteTitle(selectNoteTypes, 2)
+        const noteTitle4 = this.getNoteTitle(selectNoteTypes, 3)
+        if (selectNoteTypes.length) {
+          isShowDoctorNote = selectNoteTypes.find(noteType =>
+            this.checkShowNoteInReport(
+              noteType,
+              current,
+              visitPurposeFK,
+              isNurseNote,
+            ),
+          )
+        }
         const isShowReferral = this.checkShowData(
           WidgetConfig.WIDGETS_ID.REFERRAL,
           current,
@@ -1134,10 +1263,7 @@ class PatientHistory extends Component {
 
         if (
           isNurseNote ||
-          isShowHistory ||
-          isShowChiefComplaints ||
-          isShowClinicNotes ||
-          isShowPlan ||
+          isShowDoctorNote ||
           isShowReferral ||
           isShowVisitRemarks ||
           isShowTreatment ||
@@ -1183,18 +1309,16 @@ class PatientHistory extends Component {
             currentId: current.currentId,
             visitDate: moment(current.visitDate).format('DD MMM YYYY HH:mm'),
             doctor: `${current.userTitle || ''} ${current.userName || ''}`,
-            history: isShowHistory ? current.history : '',
-            chiefComplaints: isShowChiefComplaints
-              ? current.chiefComplaints
-              : '',
-            clinicNotes: isShowClinicNotes ? current.note : '',
-            plan: isShowPlan ? current.plan : '',
             isNurseNote: isNurseNote || false,
             nurseNotes,
             visitRemarks: isShowVisitRemarks ? current.visitRemarks : '',
             ...referral,
             ...restRefractionFormProps,
             ...eyeVisualAcuityTestDetails,
+            noteTitle1,
+            noteTitle2,
+            noteTitle3,
+            noteTitle4,
           })
 
           // treatment
@@ -1321,6 +1445,13 @@ class PatientHistory extends Component {
               }),
             )
           }
+
+          //show doctor notes
+          if (isShowDoctorNote) {
+            doctorNote = doctorNote.concat(
+              this.getNotes(selectNoteTypes, current),
+            )
+          }
         }
       })
 
@@ -1340,6 +1471,7 @@ class PatientHistory extends Component {
       VitalSign: vitalSign,
       Orders: orders,
       ConsultationDocument: consultationDocument,
+      DoctorNote: doctorNote,
       ReportContext: reportContext,
     }
     const payload1 = [
@@ -1932,6 +2064,7 @@ class PatientHistory extends Component {
             closeHistoryDetails={this.closeHistoryDetails}
             selectHistory={selectHistory}
             scribbleNoteUpdateState={this.scribbleNoteUpdateState}
+            getCategoriesOptions={this.getCategoriesOptions}
           />
         </CommonModal>
         <CommonModal

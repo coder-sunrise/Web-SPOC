@@ -21,6 +21,8 @@ import Authorized from '@/utils/Authorized'
 import NurseWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/NurseWorkItemInfo'
 import RadioWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/RadioWorkItemInfo'
 import LabWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/LabWorkItemInfo'
+import { VISIT_TYPE } from '@/utils/constants'
+import DoctorConsultationStatus from './DoctorConsultationStatus'
 
 const compareString = (a, b) => a.localeCompare(b)
 const compareDoctor = (a, b) => {
@@ -378,9 +380,21 @@ export const QueueColumnExtensions = [
   },
   {
     columnName: 'doctor',
-    compare: compareDoctor,
-    render: row => <DoctorLabel doctor={row.doctor} hideMCR />,
-    width: 150,
+    render: row => {
+      if (row.visitPurposeFK !== VISIT_TYPE.MC) {
+        return <DoctorLabel doctor={row.doctor} hideMCR />
+      }
+
+      const showVisitDoctor = () => {
+        return row.visitDoctor.map(d => {
+          return <DoctorConsultationStatus doctor={d} />
+        })
+      }
+
+      return <DoctorConsultationStatus visitDoctor={row.visitDoctor} />
+    },
+    sortingEnabled: false,
+    width: 280,
   },
   {
     columnName: 'visitOrderTemplate',

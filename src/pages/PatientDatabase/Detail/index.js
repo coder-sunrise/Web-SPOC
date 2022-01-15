@@ -200,7 +200,7 @@ class PatientDetail extends PureComponent {
           loader: () => import('./ClaimHistory'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet {...p} />
+            return <Cmpnet {...p} patientProfileFK={props.values.id} />
           },
           loading: Loading,
         }),
@@ -381,7 +381,7 @@ class PatientDetail extends PureComponent {
     }
 
     const viewClaimHistoryRight = Authorized.check(
-      'patientdatabase.patientprofiledetails.viewclaimhistory',
+      'patientdatabase.patientprofiledetails.claimhistory',
     ) || { rights: 'hidden' }
     if (viewClaimHistoryRight.rights !== 'enable') {
       this.widgets = this.widgets.filter(t => t.id !== '12')
@@ -459,34 +459,62 @@ class PatientDetail extends PureComponent {
   }
 
   checkFamilyMembersInfoDiff = (initialValues, values) => {
-    let familyMembers = values.patientFamilyGroup?.patientFamilyMember.filter(x => !x.isDeleted)  || []
-    let anyAddressDiff = false, anySchemeDiff = false
+    let familyMembers =
+      values.patientFamilyGroup?.patientFamilyMember.filter(
+        x => !x.isDeleted,
+      ) || []
+    let anyAddressDiff = false,
+      anySchemeDiff = false
     if (familyMembers.length > 0) {
-      const newAddressVal = this.getAddressCompareVal(values.contact.contactAddress)
+      const newAddressVal = this.getAddressCompareVal(
+        values.contact.contactAddress,
+      )
       const newSchemeVal = this.getSchemeCompareVal(values.patientScheme)
       familyMembers = familyMembers.map(x => {
         const otherMemberAddress = this.getAddressCompareVal(x.contactAddress)
-        const otherMemberAddressDiff = _.differenceWith(newAddressVal, otherMemberAddress, _.isEqual)
-        if(!anyAddressDiff) anyAddressDiff = otherMemberAddressDiff.length > 0
+        const otherMemberAddressDiff = _.differenceWith(
+          newAddressVal,
+          otherMemberAddress,
+          _.isEqual,
+        )
+        if (!anyAddressDiff) anyAddressDiff = otherMemberAddressDiff.length > 0
 
         const otherMemberScheme = this.getSchemeCompareVal(x.patientScheme)
-        const otherMemberSchemeDiff = _.differenceWith(newSchemeVal, otherMemberScheme, _.isEqual)
-        if(!anySchemeDiff) anySchemeDiff = otherMemberSchemeDiff.length > 0
-        return { isNew: x.isNew, familyMemberFK: x.familyMemberFK, isAddressDiff: otherMemberAddressDiff.length > 0, isSchemeDiff: otherMemberSchemeDiff.length > 0 }
+        const otherMemberSchemeDiff = _.differenceWith(
+          newSchemeVal,
+          otherMemberScheme,
+          _.isEqual,
+        )
+        if (!anySchemeDiff) anySchemeDiff = otherMemberSchemeDiff.length > 0
+        return {
+          isNew: x.isNew,
+          familyMemberFK: x.familyMemberFK,
+          isAddressDiff: otherMemberAddressDiff.length > 0,
+          isSchemeDiff: otherMemberSchemeDiff.length > 0,
+        }
       })
     }
-    return [familyMembers.filter(x=> x.isAddressDiff||x.isSchemeDiff), anyAddressDiff, anySchemeDiff]
+    return [
+      familyMembers.filter(x => x.isAddressDiff || x.isSchemeDiff),
+      anyAddressDiff,
+      anySchemeDiff,
+    ]
   }
 
   beforeHandleSubmit = () => {
     const { handleSubmit, dispatch, values, dirty, initialValues } = this.props
     if (dirty) {
-      const [familyMembers, address, scheme] = this.checkFamilyMembersInfoDiff(initialValues,values)
+      const [familyMembers, address, scheme] = this.checkFamilyMembersInfoDiff(
+        initialValues,
+        values,
+      )
       if (address || scheme) {
         const familyMembersInfoUpdateTitle = `Confirm Update Family Members' ${[
           address ? 'Address' : '',
           scheme ? 'Corporate Scheme' : '',
-        ].filter(x => x).join(', ')}`
+        ]
+          .filter(x => x)
+          .join(', ')}`
         this.setState({
           isUpdateFamilyMembersInfo: true,
           familyMembersInfoUpdateTitle,
@@ -642,9 +670,6 @@ class PatientDetail extends PureComponent {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     const { errors, dispatch, patient, values, validateForm } = nextProps
-    // validateForm(values).then((o) => {
-    //   console.log(o)
-    // })
     const menuErrors = {}
     Object.keys(errors).forEach(k => {
       this.widgets.forEach(w => {

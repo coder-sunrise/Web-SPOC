@@ -5,6 +5,8 @@ import { withStyles } from '@material-ui/core'
 // import model from './models'
 import VitalSignCard from './VitalSignCard'
 import { Alert } from 'antd'
+import { AuthorizedContext } from '@/components'
+import Authorized from '@/utils/Authorized'
 // window.g_app.replaceModel(model)
 
 const styles = theme => ({
@@ -17,7 +19,7 @@ const styles = theme => ({
     paddingBottom: 3,
     lineHeight: '25px',
     fontSize: '0.85rem',
-  }
+  },
 })
 
 @connect(({ patientVitalSign }) => ({
@@ -26,44 +28,6 @@ const styles = theme => ({
 class index extends PureComponent {
   state = {
     showWarningMessage: false,
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (
-      !this.props.patientVitalSign.shouldAddNew &&
-      nextProps.patientVitalSign.shouldAddNew
-    ) {
-      this.addPatientVitalSign()
-      this.props.dispatch({
-        type: 'patientVitalSign/updateState',
-        payload: {
-          shouldAddNew: false,
-        },
-      })
-    }
-  }
-
-  addPatientVitalSign = () => {
-    this.arrayHelpers.push({
-      temperatureC: undefined,
-      bpSysMMHG: undefined,
-      bpDiaMMHG: undefined,
-      pulseRateBPM: undefined,
-      weightKG: undefined,
-      heightCM: undefined,
-      bmi: undefined,
-    })
-
-    this.updateCORVitalSign([...(this.arrayHelpers.form.values.corPatientNoteVitalSign || []),
-    {
-      temperatureC: undefined,
-      bpSysMMHG: undefined,
-      bpDiaMMHG: undefined,
-      pulseRateBPM: undefined,
-      weightKG: undefined,
-      heightCM: undefined,
-      bmi: undefined,
-    }])
   }
 
   handleCalculateBMI = i => {
@@ -79,58 +43,57 @@ class index extends PureComponent {
     }
   }
 
-  updateCORVitalSign = (vitalSign) => {
+  updateCORVitalSign = vitalSign => {
     const { dispatch } = this.props
     dispatch({
       type: 'orders/updateState',
       payload: {
-        corVitalSign: vitalSign
-      }
+        corVitalSign: vitalSign,
+      },
     })
+  }
+
+  getVitalSignAccessRight = () => {
+    const { isEnableEditOrder = true } = this.props
+    let right = Authorized.check('queue.consultation.widgets.vitalsign') || {
+      rights: 'hidden',
+    }
+    if (right.rights === 'enable' && !isEnableEditOrder) {
+      right = { rights: 'disable' }
+    }
+    return right
   }
   render() {
     const { theme, values, classes } = this.props
     return (
       <div>
-        <FieldArray
-          name='corPatientNoteVitalSign'
-          render={arrayHelpers => {
-            this.arrayHelpers = arrayHelpers
-            return (arrayHelpers.form.values.corPatientNoteVitalSign || []).map(
-              (v, i) => {
-                if (v.isDeleted === true) return null
-                return (
-                  <div key={i}>
-                    <VitalSignCard
-                      {...this.props}
-                      index={i}
-                      arrayHelpers={arrayHelpers}
-                      handleCalculateBMI={this.handleCalculateBMI}
-                      handelDelete={() => {
-                        this.updateCORVitalSign([...(this.arrayHelpers.form.values.corPatientNoteVitalSign || [])])
-                      }}
-                      weightOnChange={
-                        () => {
-                          this.updateCORVitalSign([...(this.arrayHelpers.form.values.corPatientNoteVitalSign || [])])
-                          this.setState({ showWarningMessage: true })
-                          setTimeout(() => {
-                            this.setState({ showWarningMessage: false })
-                          }, 3000);
-                        }
-                      }
-                    />
-                  </div>
-                )
-              },
-            )
-          }}
-        />
+        <AuthorizedContext.Provider value={this.getVitalSignAccessRight()}>
+          <VitalSignCard
+            {...this.props}
+            index={0}
+            handleCalculateBMI={this.handleCalculateBMI}
+            weightOnChange={() => {
+              this.updateCORVitalSign([
+                ...(this.arrayHelpers.form.values.corPatientNoteVitalSign ||
+                  []),
+              ])
+              this.setState({ showWarningMessage: true })
+              setTimeout(() => {
+                this.setState({ showWarningMessage: false })
+              }, 3000)
+            }}
+            isShowDelete={false}
+          />
+        </AuthorizedContext.Provider>
+
         <div>
-          {this.state.showWarningMessage &&
-            <Alert message={`Weight changes will only take effect on new medication's instruction setting.`}
+          {this.state.showWarningMessage && (
+            <Alert
+              message={`Weight changes will only take effect on new medication's instruction setting.`}
               banner
-              className={classes.alertStyle} />
-          }
+              className={classes.alertStyle}
+            />
+          )}
         </div>
       </div>
     )

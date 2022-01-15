@@ -192,7 +192,13 @@ const EditableCell = ({
 }
 
 export const ContactPersonList = props => {
-  const { dispatch, values, onEditingListControl, enableEditDetails } = props
+  const {
+    dispatch,
+    values,
+    onEditingListControl,
+    onPrint,
+    enableEditDetails,
+  } = props
   const { contactPersons } = values
 
   const [form] = Form.useForm()
@@ -225,6 +231,12 @@ export const ContactPersonList = props => {
     }
   }
 
+  const printCopayer = async record => {
+    if (onPrint) {
+      console.log(record)
+      onPrint(values.id, record.name)
+    }
+  }
   const cancel = async record => {
     try {
       setEditingHasError(false)
@@ -515,8 +527,11 @@ export const ContactPersonList = props => {
                   </Popconfirm>
                 </Typography.Link>
               )}
-              {record.isDefault && (
-                <Typography.Link color='primary' onClick={() => {}}>
+              {values.id > 0 && (
+                <Typography.Link
+                  color='primary'
+                  onClick={() => printCopayer(record)}
+                >
                   <PrinterFilled style={actionIconStyle} />
                 </Typography.Link>
               )}

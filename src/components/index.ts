@@ -52,6 +52,7 @@ export confirm from './SimpleModal/confirm'
 export * from '@/utils/format'
 
 export OutlinedTextField from './OutlinedTextField'
+export MultipleTextField from './MultipleTextField'
 
 export PageHeaderWrapper from './PageHeaderWrapper'
 export SizeContainer from './Size'
