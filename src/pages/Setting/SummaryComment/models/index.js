@@ -30,7 +30,7 @@ export default createListViewModel({
     },
     effects: {
       *query({ payload }, { put, select, call }) {
-        const clinicSetting = yield select(st => st.clinicSettings)
+        const clinicSetting = yield select(st => st.clinicSettings) 
         const result = yield call(service.queryList, payload)
 
         if (result.status === '200') {
