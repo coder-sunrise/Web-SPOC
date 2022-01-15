@@ -19,6 +19,7 @@ import {
   NumberInput,
   GridContainer,
   GridItem,
+  ProgressButton,
 } from '@/components'
 import { VisitTypeTag } from '@/components/_medisys'
 import { SpecimenStatusTag } from '../components/SpecimenStatusTag'
@@ -26,16 +27,49 @@ import { TestPanelColumn } from '../components/TestPanelColumn'
 import { SpecimenDetailsStep } from './components'
 import { useCodeTable } from '@/utils/hooks'
 import { EditableTable } from './components/LabResultTable'
+import { HeaderInfo } from './components/HeaderInfo'
+import {
+  LAB_SPECIMEN_STATUS,
+  LAB_SPECIMEN_STATUS_COLORS,
+} from '@/utils/constants'
 
 const { Panel } = Collapse
 
+const ActionButtons = ({ specimenStatusFK, onStart, onRetest, onVerify }) => {
+  return (
+    <React.Fragment>
+      {specimenStatusFK === LAB_SPECIMEN_STATUS.NEW && (
+        <ProgressButton color='success' onClick={onStart}>
+          Start
+        </ProgressButton>
+      )}
+      {(specimenStatusFK === LAB_SPECIMEN_STATUS.PENDINGFIRSTVERIFIER ||
+        specimenStatusFK === LAB_SPECIMEN_STATUS.PENDINGSECONDVERIFIER) && (
+        <ProgressButton color='warning' onClick={onRetest}>
+          Retest
+        </ProgressButton>
+      )}
+      {(specimenStatusFK === LAB_SPECIMEN_STATUS.INPROGRESS ||
+        specimenStatusFK === LAB_SPECIMEN_STATUS.FORRETEST ||
+        specimenStatusFK === LAB_SPECIMEN_STATUS.PENDINGFIRSTVERIFIER ||
+        specimenStatusFK === LAB_SPECIMEN_STATUS.PENDINGSECONDVERIFIER) && (
+        <ProgressButton color='success' onClick={onVerify}>
+          Verify
+        </ProgressButton>
+      )}
+    </React.Fragment>
+  )
+}
+
 export const SpecimenDetails = ({ id, onClose, onConfirm }) => {
   const dispatch = useDispatch()
+  const [isOpenModal, setIsOpenModal] = useState(false)
   const cttestcategory = useCodeTable('cttestcategory')
   const ctspecimentype = useCodeTable('ctspecimentype')
   const cttestpanel = useCodeTable('cttestpanel')
   const { entity } = useSelector(s => s.worklistSpecimenDetails)
   const [isResultFullScreen, setIsResultFullScreen] = useState(false)
+  const currentStatus = entity.specimenStatusFK
   const [form] = Form.useForm()
 
   // const data = [
@@ -50,11 +84,16 @@ export const SpecimenDetails = ({ id, onClose, onConfirm }) => {
         type: 'worklistSpecimenDetails/query',
         payload: { id },
       }).then(val => {
-        if (val) console.log('lab-module logs: SpecimenDetails', val)
+        if (val) {
+          setIsOpenModal(true)
+        }
       })
     }
 
     return () => {
+      form.resetFields()
+      setIsResultFullScreen(false)
+      setIsOpenModal(false)
       dispatch({
         type: 'worklistSpecimenDetails/updateState',
         payload: { entity: {} },
@@ -62,122 +101,83 @@ export const SpecimenDetails = ({ id, onClose, onConfirm }) => {
     }
   }, [id])
 
-  const specimenInfoColumns = [
-    {
-      title: 'Accession No.',
-      dataIndex: 'accessionNo',
-      key: 'accessionNo',
-      width: 160,
-    },
-    {
-      title: 'Category',
-      dataIndex: 'testCategoryFK',
-      key: 'testCategoryFK',
-      ellipsis: true,
-      width: 160,
-      render: (text, record, index) => {
-        const testCategory = cttestcategory.find(
-          item => item.id === record.testCategoryFK,
-        )
-        return testCategory ? testCategory.name : ''
-      },
-    },
-    {
-      title: 'Specimen Type',
-      width: 150,
-      dataIndex: 'specimenTypeFK',
-      key: 'specimenTypeFK',
-      ellipsis: true,
-      render: (text, record, index) => {
-        const speicmenType = ctspecimentype.find(
-          item => record.specimenTypeFK === item.id,
-        )
+  useEffect(() => {
+    form.setFieldsValue({ ...entity })
+  }, [entity])
 
-        return speicmenType ? speicmenType.name : ''
-      },
-    },
-    {
-      title: 'Remarks',
-      dataIndex: 'specimenCollectionRemarks',
-      key: 'specimenCollectionRemarks',
-      width: 300,
-    },
-    {
-      title: 'Status',
-      dataIndex: 'specimenStatusFK',
-      key: 'specimenStatusFK',
-      width: 100,
-      align: 'center',
-      render: (text, record, index) => <SpecimenStatusTag statusId={text} />,
-    },
-    {
-      title: 'Action',
-      width: 85,
-      dataIndex: 'operation',
-      key: 'operation',
-      align: 'left',
-      render: (text, record, index) => <span>hello</span>,
-    },
-  ]
+  const handleStart = () => {
+    if (currentStatus === LAB_SPECIMEN_STATUS.NEW) {
+      dispatch({
+        type: 'worklistSpecimenDetails/startLabTest',
+        payload: entity,
+      }).then(result => {
+        if (result) {
+          setIsOpenModal(false)
+          onConfirm && onConfirm()
+        }
+      })
+    }
+  }
 
-  const orderInfoColumns = [
-    {
-      title: 'Service',
-      dataIndex: 'serviceName',
-      key: 'serviceName',
-      width: 160,
-    },
+  const handleVerify = () => {
+    if (
+      currentStatus !== LAB_SPECIMEN_STATUS.NEW &&
+      currentStatus !== LAB_SPECIMEN_STATUS.DISCARDED &&
+      currentStatus !== LAB_SPECIMEN_STATUS.COMPLETED
+    ) {
+      dispatch({
+        type: 'worklistSpecimenDetails/verifyLabTest',
+        payload: entity,
+      }).then(result => {
+        if (result) {
+          setIsOpenModal(false)
+          onConfirm && onConfirm()
+        }
+      })
+    }
+  }
 
-    {
-      title: 'Test Panel',
-      dataIndex: 'testPanel',
-      key: 'testPanel',
-      width: 200,
-      render: (text, record, index) => {
-        const testPanels = record.labWorkitems.map(item => ({
-          priority: item.priority,
-          testPanelName: cttestpanel.find(
-            testPanel => testPanel.id === item.testPanelFK,
-          )?.name,
-        }))
-
-        return <TestPanelColumn testPanels={testPanels} />
-      },
-    },
-    {
-      title: 'Priority',
-      dataIndex: 'priority',
-      key: 'priority',
-      width: 120,
-    },
-    {
-      title: 'Ordered Date',
-      dataIndex: 'orderedDate',
-      key: 'orderedDate',
-      width: 150,
-      render: (text, record, index) => text.format(dateFormatLongWithTimeNoSec),
-    },
-
-    {
-      title: 'Instructions',
-      dataIndex: 'instruction',
-      key: 'instruction',
-      width: 120,
-    },
-    {
-      title: 'Remarks',
-      dataIndex: 'remarks',
-      key: 'remarks',
-      width: 120,
-    },
-  ]
+  const handleSave = async () => {
+    try {
+      const values = await form.validateFields()
+      dispatch({
+        type: 'worklistSpecimenDetails/saveLabTest',
+        payload: { ...entity, ...values },
+      }).then(result => {
+        if (result) {
+          setIsOpenModal(false)
+          onConfirm && onConfirm()
+        }
+      })
+    } catch (errInfo) {
+      console.log('Save failed:', errInfo)
+    }
+  }
 
   return (
     <CommonModal
-      open={id && id > 0}
+      open={isOpenModal}
       title='Lab Test Specimen Details'
-      onClose={onClose}
-      onConfirm={() => form.submit()}
+      onClose={() => {
+        setIsOpenModal(false)
+        onClose && onClose()
+      }}
+      footProps={{
+        extraButtons: [
+          <ActionButtons
+            specimenStatusFK={entity.specimenStatusFK}
+            onStart={handleStart}
+            onVerify={handleVerify}
+          />,
+        ],
+        onConfirm:
+          entity.specimenStatusFK !== LAB_SPECIMEN_STATUS.COMPLETED
+            ? () => {
+                handleSave()
+              }
+            : undefined,
+      }}
+      confirmText='Save'
       showFooter={true}
       maxWidth='lg'
     >
@@ -187,7 +187,6 @@ export const SpecimenDetails = ({ id, onClose, onConfirm }) => {
         >
           {!isResultFullScreen && (
             <React.Fragment>
-              {' '}
               <GridItem md={12}>
                 <div style={{ padding: 8 }}>
                   <Banner />
@@ -197,64 +196,44 @@ export const SpecimenDetails = ({ id, onClose, onConfirm }) => {
                 <SpecimenDetailsStep />
               </GridItem>
               <GridItem md={12}>
-                <GridContainer>
-                  <GridItem md={8} style={{ paddingTop: 16 }}>
-                    <Typography.Text strong>Specimen Details: </Typography.Text>
-                  </GridItem>
-                  <GridItem md={4} style={{ padding: 8, textAlign: 'right' }}>
-                    <VisitTypeTag type={entity.visitPurposeFK} />
-                  </GridItem>
-                  <GridItem md={12} style={{ padding: 8 }}>
-                    <Table
-                      bordered
-                      columns={specimenInfoColumns}
-                      dataSource={[entity]}
-                      pagination={false}
-                      size='small'
-                    />
-                  </GridItem>
-                  <GridItem md={12} style={{ paddingTop: 16 }}>
-                    <Typography.Text strong>Order Details: </Typography.Text>
-                  </GridItem>
-                  <GridItem md={12} style={{ padding: 8 }}>
-                    <Table
-                      bordered
-                      columns={orderInfoColumns}
-                      dataSource={[...(entity.specimenOrders ?? [])].sort(
-                        item => item.serviceName,
-                      )}
-                      pagination={false}
-                      size='small'
-                    />
-                  </GridItem>
-                </GridContainer>
+                <HeaderInfo entity={entity} />
               </GridItem>
             </React.Fragment>
           )}
-          <GridItem md={12}>
-            <GridContainer>
-              <GridItem md={12} style={{ paddingTop: 16, display: 'flex' }}>
-                <Space>
-                  <Typography.Text strong style={{ flexGrow: 1 }}>
-                    Final Result:
-                  </Typography.Text>
+          {entity.specimenStatusFK !== LAB_SPECIMEN_STATUS.NEW && (
+            <GridItem md={12}>
+              <Form form={form} initialValues={{ ...entity }}>
+                <GridContainer>
+                  <GridItem md={12} style={{ paddingTop: 16, display: 'flex' }}>
+                    <Space>
+                      <Typography.Text strong style={{ flexGrow: 1 }}>
+                        Final Result:
+                      </Typography.Text>
 
-                  <Checkbox onChange={e => console.log} />
-                  <span>Display Raw Data</span>
-                </Space>
-                <div style={{ flexGrow: 1, textAlign: 'right' }}>
-                  <Icon
-                    type={isResultFullScreen ? 'fullscreen-exit' : 'fullscreen'}
-                    style={{ border: '1px solid', fontSize: '1rem' }}
-                    onClick={() => setIsResultFullScreen(!isResultFullScreen)}
-                  />
-                </div>
-              </GridItem>
-              <GridItem md={12} style={{ paddingTop: 8 }}>
-                <EditableTable />
-              </GridItem>
-            </GridContainer>
-          </GridItem>
+                      <Checkbox onChange={e => console.log} />
+                      <span>Display Raw Data</span>
+                    </Space>
+                    <div style={{ flexGrow: 1, textAlign: 'right' }}>
+                      <Icon
+                        type={
+                          isResultFullScreen ? 'fullscreen-exit' : 'fullscreen'
+                        }
+                        style={{ border: '1px solid', fontSize: '1rem' }}
+                        onClick={() =>
+                          setIsResultFullScreen(!isResultFullScreen)
+                        }
+                      />
+                    </div>
+                  </GridItem>
+                  <GridItem md={12} style={{ paddingTop: 8 }}>
+                    <Form.Item name='labWorkitemResults'>
+                      <EditableTable />
+                    </Form.Item>
+                  </GridItem>
+                </GridContainer>
+              </Form>
+            </GridItem>
+          )}
         </GridContainer>
       </div>
     </CommonModal>

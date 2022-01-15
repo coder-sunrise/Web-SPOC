@@ -163,10 +163,7 @@ const CollectSpecimen = ({ visitId, onConfirm, onClose }) => {
               <Select
                 label='Specimen Type'
                 style={{ width: 160 }}
-                options={[
-                  { value: 1, name: 'Pure Blood' },
-                  { value: 2, name: 'EDTA Blood' },
-                ]}
+                options={[{ value: 1, name: 'EDTA' }]}
               ></Select>
             </Form.Item>
             <Form.Item

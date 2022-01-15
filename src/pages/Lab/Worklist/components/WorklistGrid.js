@@ -273,13 +273,11 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
                 <Tooltip title='Open Specimen Details'>
                   <Button
                     onClick={() => {
-                      if (currentModal.modal === MODALS.NONE) {
-                        setCurrentModal({
-                          modal: MODALS.SPECIMEN_DETAILS,
-                          para: record.labSpecimenFK,
-                        })
-                        setIsAnyWorklistModelOpened(true)
-                      }
+                      setCurrentModal({
+                        modal: MODALS.SPECIMEN_DETAILS,
+                        para: record.labSpecimenFK,
+                      })
+                      setIsAnyWorklistModelOpened(true)
                     }}
                     justIcon
                     color='primary'
@@ -315,13 +313,11 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
                 <Tooltip title='Discard Specimen'>
                   <Button
                     onClick={() => {
-                      if (currentModal.modal === MODALS.NONE) {
-                        setCurrentModal({
-                          modal: MODALS.DISCARD_SPECIMEN,
-                          para: record.labSpecimenFK,
-                        })
-                        setIsAnyWorklistModelOpened(true)
-                      }
+                      setCurrentModal({
+                        modal: MODALS.DISCARD_SPECIMEN,
+                        para: record.labSpecimenFK,
+                      })
+                      setIsAnyWorklistModelOpened(true)
                     }}
                     justIcon
                     color='danger'

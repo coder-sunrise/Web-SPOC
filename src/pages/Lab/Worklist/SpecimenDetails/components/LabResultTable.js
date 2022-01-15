@@ -1,10 +1,13 @@
 import React, { useContext, useState, useEffect, useRef } from 'react'
+import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import { Table, Input, Button, Popconfirm, Form } from 'antd'
+import { Table, Input, Button, Popconfirm, Form, InputNumber } from 'antd'
+import { useCodeTable } from '@/utils/hooks'
 const EditableContext = React.createContext(null)
 
 const EditableRow = ({ index, ...props }) => {
   const [form] = Form.useForm()
+
   return (
     <Form form={form} component={false}>
       <EditableContext.Provider value={form}>
@@ -21,101 +24,91 @@ const EditableCell = ({
   dataIndex,
   record,
   handleSave,
+  render,
   ...restProps
 }) => {
   const [editing, setEditing] = useState(false)
-  const inputRef = useRef(null)
   const form = useContext(EditableContext)
-  useEffect(() => {
-    if (editing) {
-      inputRef.current.focus()
-    }
-  }, [editing])
 
-  const toggleEdit = () => {
-    setEditing(!editing)
-    form.setFieldsValue({
-      [dataIndex]: record[dataIndex],
-    })
-  }
+  const fieldName =
+    typeof dataIndex === 'function' ? dataIndex(record) : dataIndex
+
+  if (typeof dataIndex === 'function')
+    console.log('Editable Cell: fieldName', fieldName)
+
+  useEffect(() => {
+    if (record) {
+      form.setFieldsValue({
+        [fieldName]: record[fieldName],
+      })
+    }
+  }, [record])
 
   const save = async () => {
     try {
       const values = await form.validateFields()
-      toggleEdit()
       handleSave({ ...record, ...values })
     } catch (errInfo) {
       console.log('Save failed:', errInfo)
     }
   }
+  console.log('Editable Cell: render', render)
 
-  let childNode = children
-
-  if (editable) {
-    childNode = (
-      <Form.Item
-        style={{
-          margin: 0,
-        }}
-        name={dataIndex}
-        rules={[
-          {
-            required: true,
-            message: `${title} is required.`,
-          },
-        ]}
-      >
-        <Input ref={inputRef} onPressEnter={save} onBlur={save} />
-      </Form.Item>
-    )
-  }
+  let childNode = (
+    <Form.Item
+      noStyle
+      style={{
+        margin: 0,
+      }}
+      name={fieldName}
+    >
+      {render ? render(record, record[fieldName], save) : children}
+    </Form.Item>
+  )
 
   return <td {...restProps}>{childNode}</td>
 }
 
-export const EditableTable = props => {
-  const [dataSource, setDataSource] = useState([])
-
-  useEffect(
-    () =>
-      setDataSource([
-        {
-          key: '0',
-          testPanelItem: 'CRE',
-          result: 'hello',
-          rawResult: '32',
-          unit: 'mmHg',
-          referenceRange: '1-10',
-        },
-        {
-          key: '1',
-          testPanelItem: 'BUN',
-          result: 'hello',
-          rawResult: '32',
-          unit: 'mmHg',
-          referenceRange: '50-80',
-        },
-      ]),
-    [],
-  )
-
+export const EditableTable = ({ value, onChange }) => {
+  const cttestpanelitem = useCodeTable('cttestpanelitem')
+  console.log('Editable Table: Value', value)
   const columns = [
     {
       title: 'Test Panel Item',
-      dataIndex: 'testPanelItem',
+      dataIndex: 'testPanelItemFK',
       width: 150,
+      render: (record, onSave) => {
+        return <span>{record.testPanelItemFK}</span>
+      },
     },
     {
       title: 'Result',
-      dataIndex: 'result',
-      width: 120,
+      dataIndex: record => {
+        const testpanelItem = cttestpanelitem.find(
+          item => item.id === record.testPanelItemFK,
+        )
+        console.log('Editable Cell: cttestpanelitem', cttestpanelitem)
+        console.log('Editable Cell: testpanelItem', testpanelItem)
+
+        return testpanelItem?.resultTypeFK === 1
+          ? 'numericResult'
+          : 'stringResult'
+      },
+      width: 80,
       editable: true,
+      render: (record, text, onSave) => (
+        <InputNumber
+          defaultValue={text}
+          controls={false}
+          onPressEnter={onSave}
+          onBlur={onSave}
+        />
+      ),
     },
     {
       title: 'Raw Data',
       dataIndex: 'rawResult',
       width: 120,
-      editable: true,
     },
     {
       title: 'Unit',
@@ -125,16 +118,15 @@ export const EditableTable = props => {
     {
       title: 'Reference Range',
       dataIndex: 'referenceRange',
-      width: 200,
     },
   ]
 
   const handleSave = row => {
-    const newData = [...dataSource]
-    const index = newData.findIndex(item => row.key === item.key)
+    const newData = [...value]
+    const index = newData.findIndex(item => row.id === item.id)
     const item = newData[index]
     newData.splice(index, 1, { ...item, ...row })
-    setDataSource(newData)
+    onChange(newData)
   }
 
   const components = {
@@ -144,10 +136,6 @@ export const EditableTable = props => {
     },
   }
   const tableColumns = columns.map(col => {
-    if (!col.editable) {
-      return col
-    }
-
     return {
       ...col,
       onCell: record => ({
@@ -155,7 +143,9 @@ export const EditableTable = props => {
         editable: col.editable,
         dataIndex: col.dataIndex,
         title: col.title,
+        width: col.width,
         handleSave: handleSave,
+        ...col,
       }),
     }
   })
@@ -164,11 +154,20 @@ export const EditableTable = props => {
       <Table
         components={components}
         bordered
-        dataSource={dataSource}
+        dataSource={value}
         columns={tableColumns}
         pagination={false}
         size='small'
       />
     </div>
   )
+}
+
+EditableTable.propTypes = {
+  value: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
+  onChange: PropTypes.func,
 }
