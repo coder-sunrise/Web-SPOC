@@ -79,12 +79,11 @@ class Grid extends PureComponent {
           },
           {
             columnName: 'displayValue',
-            sortingEnabled: false,
           },
           {
             columnName: 'summaryCommentCategory',
-            sortingEnabled: false,
             width: 200,
+            sortBy: 'SummaryCommentCategoryFKNavigation.DisplayValue',
           },
           {
             columnName: 'code',

@@ -6,7 +6,7 @@ import { REPORT_TYPE } from '@/utils/constants'
 // import { QueueListingDummyData } from '@/pages/Report/dummyData'
 const reportContextUrl = '/api/Reports/context'
 
-export const getReportContext = async (reportID) => {
+export const getReportContext = async reportID => {
   return request(`${reportContextUrl}/${reportID}`, {
     method: 'GET',
   })
@@ -110,32 +110,32 @@ export const exportExcelReport = async (reportID, payload) => {
   )
 }
 
-export const getPatientListingReport = async (payload) => {
+export const getPatientListingReport = async payload => {
   /* use this when API is ready to return raw data */
   const url = '/api/reports/2'
   return request(url, {
     method: 'GET',
     body: convertToQuery(
       { reportParameters: commonDataWriterTransform(payload) },
-      [
-        'reportParameters',
-      ],
+      ['reportParameters'],
     ),
   })
 }
 
 export const exportUnsavedReport = (
   reportID,
-  reportFormat = 'pdf',
+  reportFormat = 'PDF',
   reportContent,
   subject,
 ) => {
   const _subject = subject || REPORT_TYPE[reportID]
+  let type = 'PDF'
+  if (reportFormat === 'Excel') type = 'xlsx'
   download(
     `/api/Reports/${reportID}?ReportFormat=${reportFormat}`,
     {
       subject: _subject,
-      type: 'pdf',
+      type: type,
     },
     {
       method: 'POST',

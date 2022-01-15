@@ -7,20 +7,24 @@ import { CardContainer, CommonModal, withSettingBase } from '@/components'
 import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
+import withWebSocket from '@/components/Decorator/withWebSocket'
+import { getRawData } from '@/services/report'
+import { REPORT_ID } from '@/utils/constants'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingCompany, global }) => ({
+@connect(({ settingCompany, global, clinicSettings }) => ({
   settingCompany,
+  clinicSettings,
   mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({ modelName: 'settingCompany' })
 class Supplier extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     const { route, dispatch } = this.props
     const suppSorting = [
       { columnName: 'effectiveEndDate', direction: 'desc' },
@@ -50,7 +54,49 @@ class Supplier extends PureComponent {
     })
   }
 
-  render () {
+  printLabel = async (copayerId, contactPersonName) => {
+    if (!Number.isInteger(copayerId)) return
+
+    const { handlePrint, clinicSettings } = this.props
+    const { labelPrinterSize } = clinicSettings.settings
+
+    const sizeConverter = sizeCM => {
+      return sizeCM
+        .split('x')
+        .map(o =>
+          (10 * parseFloat(o.replace('cm', ''))).toString().concat('MM'),
+        )
+        .join('_')
+    }
+    const { route } = this.props
+    const reportID =
+      REPORT_ID[
+        (route.name === 'copayer'
+          ? 'COPAYER_ADDRESS_LABEL_'
+          : 'SUPPLIER_ADDRESS_LABEL_'
+        ).concat(sizeConverter(labelPrinterSize))
+      ]
+
+    const data = await getRawData(
+      reportID,
+      route.name === 'copayer'
+        ? {
+            copayerId,
+            contactPersonName: contactPersonName ? contactPersonName : '',
+          }
+        : { supplierId: copayerId },
+    )
+    const payload = [
+      {
+        ReportId: reportID,
+        ReportData: JSON.stringify({
+          ...data,
+        }),
+      },
+    ]
+    handlePrint(JSON.stringify(payload))
+  }
+  render() {
     const { settingCompany, route, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
@@ -64,7 +110,12 @@ class Supplier extends PureComponent {
         <div className='filterBar'>
           <Filter {...cfg} {...this.props} />
         </div>
-        <Grid {...cfg} {...this.props} height={height} />
+        <Grid
+          {...cfg}
+          {...this.props}
+          onPrint={this.printLabel}
+          height={height}
+        />
 
         <CommonModal
           open={settingCompany.showModal}
@@ -77,11 +128,13 @@ class Supplier extends PureComponent {
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
         >
-          <Detail {...cfg} {...this.props} />
+          <Detail {...cfg} {...this.props} onPrint={this.printLabel} />
         </CommonModal>
       </CardContainer>
     )
   }
 }
 
-export default withStyles(styles, { withTheme: true })(Supplier)
+export default withWebSocket()(
+  withStyles(styles, { withTheme: true })(Supplier),
+)

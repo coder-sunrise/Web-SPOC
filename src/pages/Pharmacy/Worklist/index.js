@@ -9,7 +9,7 @@ import moment from 'moment'
 import _ from 'lodash'
 import { HistoryOutlined } from '@ant-design/icons'
 import { CommonModal, Button, Tooltip } from '@/components'
-import { Worklist } from '@/pages/Radiology/Components'
+import { Worklist } from '../Components'
 import WorklistContext, {
   WorklistContextProvider,
 } from '@/pages/Radiology/Worklist/WorklistContext'
@@ -154,7 +154,7 @@ const PharmacyWorklist = () => {
           />
         }
       >
-        <Worklist columns={columns} worklistType='Pharmacy' />
+        <Worklist columns={columns} />
         <PharmacyDetails
           refreshClick={refreshClick}
           startRefreshTimer={startRefreshTimer}

@@ -80,11 +80,10 @@ class Grid extends PureComponent {
           },
           {
             columnName: 'displayValue',
-            sortingEnabled: false,
           },
           {
             columnName: 'examinationItem',
-            sortingEnabled: false,
+            sortBy: 'examinationItemFKNavigation.DisplayValue',
             width: 200,
           },
           {
