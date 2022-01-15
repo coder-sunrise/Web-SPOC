@@ -1,17 +1,11 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'umi'
-import { Space } from 'antd'
-import { WorklistFilter } from './components/WorklistFilter'
-import { WorklistGrid } from './components/WorklistGrid'
+import { Space, Card } from 'antd'
+import { Worklist } from './components/Worklist'
 import { WorklistContextProvider } from './WorklistContext'
 
 const LabWorklist = props => {
-  return (
-    <Space style={{ width: '100%' }} direction='vertical'>
-      <WorklistFilter {...props} />
-      <WorklistGrid {...props} />
-    </Space>
-  )
+  return <Worklist {...props} />
 }
 
 const LabWorklistWithProvider = props => (

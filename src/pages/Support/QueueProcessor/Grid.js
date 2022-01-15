@@ -2,18 +2,22 @@ import React, { PureComponent } from 'react'
 
 import moment from 'moment'
 import { connect } from 'dva'
-import { CommonTableGrid, Tooltip, dateFormatLong, dateFormatLongWithTime12h } from '@/components'
+import {
+  CommonTableGrid,
+  Tooltip,
+  dateFormatLong,
+  dateFormatLongWithTime12h,
+} from '@/components'
 import { queueProcessorType, queueItemStatus } from '@/utils/codes'
 
 @connect(({ queueProcessor, clinicSettings }) => ({
   queueProcessor,
   clinicSettings,
 }))
-
 class Grid extends PureComponent {
   configs = {
     columns: [
-      { name: 'queueProcessTypeFK', title: 'Process Type' },
+      { name: 'queueName', title: 'Process Type' },
       { name: 'requestedBy', title: 'Requested By' },
       { name: 'createDate', title: 'Request Date' },
       { name: 'updateDate', title: 'Completed Date' },
@@ -23,15 +27,15 @@ class Grid extends PureComponent {
     ],
     columnExtensions: [
       {
-        columnName: 'queueProcessTypeFK', width: 220,
-        render: (row) => {
-          return queueProcessorType.find(x => x.value === row.queueProcessTypeFK).name
-        },
+        columnName: 'queueName',
+        width: 220,
       },
       {
-        columnName: 'queueProcessStatusFK', width: 110,
-        render: (row) => {
-          return queueItemStatus.find(x => x.value === row.queueProcessStatusFK).name
+        columnName: 'queueProcessStatusFK',
+        width: 110,
+        render: row => {
+          return queueItemStatus.find(x => x.value === row.queueProcessStatusFK)
+            .name
         },
       },
       {
@@ -40,16 +44,21 @@ class Grid extends PureComponent {
         sortBy: 'CreateByUserFkNavigation.ClinicianProfile.Name',
       },
       {
-        columnName: 'createDate', width: 190,
+        columnName: 'createDate',
+        width: 190,
         type: 'date',
         showTime: true,
       },
       {
-        columnName: 'updateDate', width: 190,
+        columnName: 'updateDate',
+        width: 190,
         type: 'date',
         showTime: true,
-        render: (row) => {
-          if (row.queueProcessStatusFK === 3 || row.queueProcessStatusFK === 4) {
+        render: row => {
+          if (
+            row.queueProcessStatusFK === 3 ||
+            row.queueProcessStatusFK === 4
+          ) {
             return moment(row.updateDate).format(dateFormatLongWithTime12h)
           }
           return undefined
@@ -57,24 +66,41 @@ class Grid extends PureComponent {
       },
       {
         columnName: 'data',
-        render: (row) => {
+        render: row => {
           let result = this.formatParameter(row)
           return (
             <Tooltip title={result} placement='top'>
-              <div style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>{result}</div>
+              <div
+                style={{
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                }}
+              >
+                {result}
+              </div>
             </Tooltip>
           )
         },
         sortingEnabled: false,
       },
       {
-        columnName: 'result', width: 260,
-        render: (row) => {
+        columnName: 'result',
+        width: 260,
+        render: row => {
           let result = this.formatResultMessage(row)
           let tooltip = this.getTooltip(row)
           return (
             <Tooltip title={tooltip} placement='top'>
-              <div style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>{result}</div>
+              <div
+                style={{
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                }}
+              >
+                {result}
+              </div>
             </Tooltip>
           )
         },
@@ -83,25 +109,44 @@ class Grid extends PureComponent {
     ],
   }
 
-  formatParameter = (row) => {
+  formatParameter = row => {
     let type = row.queueProcessTypeFK
     const { clinicSettings } = this.props
     const { systemTimeZoneInt } = clinicSettings.settings
     if (type === 1) {
       let parameter = JSON.parse(row.data)
-      return `Statement Date: ${moment.utc(parameter.StatementDate).add(systemTimeZoneInt, 'hours').format(dateFormatLong)}
+      return `Statement Date: ${moment
+        .utc(parameter.StatementDate)
+        .add(systemTimeZoneInt, 'hours')
+        .format(dateFormatLong)}
       , Payment Terms: ${parameter.PaymentTerms} day(s)
-      , Invoice Date From: ${parameter.InvoiceDateFrom ? moment.utc(parameter.InvoiceDateFrom).add(systemTimeZoneInt, 'hours').format(dateFormatLong) : '-'}
-      , Invoice Date To: ${parameter.InvoiceDateTo ? moment.utc(parameter.InvoiceDateTo).add(systemTimeZoneInt, 'hours').format(dateFormatLong) : '-'}`
+      , Invoice Date From: ${
+        parameter.InvoiceDateFrom
+          ? moment
+              .utc(parameter.InvoiceDateFrom)
+              .add(systemTimeZoneInt, 'hours')
+              .format(dateFormatLong)
+          : '-'
+      }
+      , Invoice Date To: ${
+        parameter.InvoiceDateTo
+          ? moment
+              .utc(parameter.InvoiceDateTo)
+              .add(systemTimeZoneInt, 'hours')
+              .format(dateFormatLong)
+          : '-'
+      }`
     }
     return ''
   }
 
-  formatResultMessage = (row) => {
+  formatResultMessage = row => {
     let type = row.queueProcessTypeFK
     if (type === 1) {
       if (row.queueProcessStatusFK === 3) {
-        return `${(JSON.parse(row.result) || []).length} statement(s) has been generated`
+        return `${
+          (JSON.parse(row.result) || []).length
+        } statement(s) has been generated`
       }
       if (row.queueProcessStatusFK === 4) {
         return row.result
@@ -110,13 +155,13 @@ class Grid extends PureComponent {
     return ''
   }
 
-  getTooltip = (row) => {
+  getTooltip = row => {
     let type = row.queueProcessTypeFK
     if (type === 1) {
       if (row.queueProcessStatusFK === 3) {
         let newStatementNo = JSON.parse(row.result)
         if (newStatementNo && newStatementNo.length === 0) {
-          return "0 statement(s) has been generated"
+          return '0 statement(s) has been generated'
         }
         return `New Statement(s): ${newStatementNo.join(', ')}`
       }
@@ -124,7 +169,7 @@ class Grid extends PureComponent {
     return ''
   }
 
-  render () {
+  render() {
     return (
       <CommonTableGrid
         forceRender

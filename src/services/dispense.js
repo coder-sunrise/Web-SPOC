@@ -130,7 +130,7 @@ const fns = {
     })
     return r
   },
-  queryDrugLabelList: async params =>
+  getSeparatedDrugInstructions: async params =>
     await request(
       `/api/pharmacyWorklist/GetSeparatedDrugInstructions/${params.id}`,
       {

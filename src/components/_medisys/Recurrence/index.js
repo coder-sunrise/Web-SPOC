@@ -55,7 +55,7 @@ const Recurrence = ({
   size = 'md',
   formValues,
   recurrenceDto = RecurrenceDTO,
-  handleRecurrencePatternChange = (f) => f,
+  handleRecurrencePatternChange = f => f,
   checkedRecurrence,
 }) => {
   const { isEnableRecurrence, currentAppointment, eventDate } = formValues
@@ -68,16 +68,16 @@ const Recurrence = ({
   else selectEventDate = eventDate
   return (
     <Fragment>
-      <FastField
+      <Field
         name='isEnableRecurrence'
-        render={(args) => {
+        render={args => {
           return (
             <Checkbox
               {...args}
               disabled={disabled}
               simple
               label='Enable Recurrence'
-              onChange={(e) => {
+              onChange={e => {
                 if (e.target.value && checkedRecurrence) {
                   checkedRecurrence()
                 }
@@ -95,7 +95,7 @@ const Recurrence = ({
             <GridItem xs md={_inputSize}>
               <FastField
                 name='recurrenceDto.recurrencePatternFK'
-                render={(args) => (
+                render={args => (
                   <CodeSelect
                     {...args}
                     disabled={disabled}
@@ -136,7 +136,7 @@ const Recurrence = ({
               <GridItem md={12}>
                 <FastField
                   name='recurrenceDto.recurrenceRange'
-                  render={(args) => (
+                  render={args => (
                     <RadioGroup
                       // label='Range of Recurrence'
                       disabled={disabled}
@@ -160,7 +160,7 @@ const Recurrence = ({
                 {recurrenceRange === RECURRENCE_RANGE.AFTER && (
                   <FastField
                     name='recurrenceDto.recurrenceCount'
-                    render={(args) => (
+                    render={args => (
                       <NumberInput
                         {...args}
                         min={1}
@@ -175,7 +175,7 @@ const Recurrence = ({
                 {recurrenceRange === RECURRENCE_RANGE.BY && (
                   <Field
                     name='recurrenceDto.recurrenceEndDate'
-                    render={(args) => (
+                    render={args => (
                       <DatePicker
                         disabled={disabled}
                         recurrenceRestrict={selectEventDate}
@@ -208,11 +208,7 @@ const Recurrence = ({
 
 Recurrence.propTypes = {
   formValues: PropTypes.object,
-  size: PropTypes.oneOf([
-    'sm',
-    'md',
-    'lg',
-  ]),
+  size: PropTypes.oneOf(['sm', 'md', 'lg']),
 }
 
 export default withStyles(styles, { name: 'RecurrenceComponent' })(Recurrence)

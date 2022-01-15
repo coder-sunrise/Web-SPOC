@@ -43,6 +43,7 @@ import {
   NOTIFICATION_TYPE,
   NOTIFICATION_STATUS,
   NURSE_WORKITEM_STATUS,
+  RADIOLOGY_WORKITEM_STATUS,
 } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
@@ -578,6 +579,97 @@ const DispenseDetails = ({
     setPopperOpen(false)
     onDrugLabelClick()
   }
+
+  const finalizeInvoice = () => {
+    if (dispense && dispense.totalWithGST < 0) {
+      window.g_app._store.dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          isInformType: true,
+          customWidth: 'md',
+          openConfirmContent: () => {
+            return (
+              <div>
+                <Warining
+                  style={{
+                    width: '1.3rem',
+                    height: '1.3rem',
+                    marginLeft: '10px',
+                    color: 'red',
+                  }}
+                />
+                <h3
+                  style={{
+                    marginLeft: '10px',
+                    display: 'inline-block',
+                  }}
+                >
+                  Unable to finalize, total amount cannot be{' '}
+                  <span style={{ fontWeight: 400 }}>negative</span>.
+                </h3>
+              </div>
+            )
+          },
+          openConfirmText: 'OK',
+          onConfirmClose: () => {
+            window.g_app._store.dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                customWidth: undefined,
+              },
+            })
+          },
+        },
+      })
+    } else if (coPayerPayments.length > 0) {
+      setShowRemovePayment(true)
+    } else {
+      if (
+        dispenseItems?.filter(x => isActualizable(x)).length > 0 ||
+        service?.filter(x => isActualizable(x)).length > 0
+      )
+        notification.error({
+          message: 'Actualize all nursing work items before finalize.',
+        })
+      else onFinalizeClick()
+    }
+  }
+
+  const existsCanceledRadiology = () => {
+    const { entity = {} } = dispense
+    const { service = [] } = entity
+    if (
+      service.find(s => {
+        const { workitem = {} } = s
+        const { radiologyWorkitem = {} } = workitem
+        return (
+          radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED
+        )
+      })
+    ) {
+      return true
+    }
+    return false
+  }
+
+  const onHandelFinalize = () => {
+    if (existsCanceledRadiology()) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmContent: 'Confirm to finalize with cancelled item?',
+          onConfirmSave: finalizeInvoice,
+          openConfirmText: 'Yes',
+          cancelText: 'No',
+        },
+      })
+    } else {
+      finalizeInvoice()
+    }
+  }
+
   return (
     <React.Fragment>
       <GridContainer>
@@ -764,66 +856,7 @@ const DispenseDetails = ({
                   size='sm'
                   icon={<AttachMoney />}
                   disabled={isIncludeExpiredItem}
-                  onClick={() => {
-                    if (dispense && dispense.totalWithGST < 0) {
-                      window.g_app._store.dispatch({
-                        type: 'global/updateAppState',
-                        payload: {
-                          openConfirm: true,
-                          isInformType: true,
-                          customWidth: 'md',
-                          openConfirmContent: () => {
-                            return (
-                              <div>
-                                <Warining
-                                  style={{
-                                    width: '1.3rem',
-                                    height: '1.3rem',
-                                    marginLeft: '10px',
-                                    color: 'red',
-                                  }}
-                                />
-                                <h3
-                                  style={{
-                                    marginLeft: '10px',
-                                    display: 'inline-block',
-                                  }}
-                                >
-                                  Unable to finalize, total amount cannot be{' '}
-                                  <span style={{ fontWeight: 400 }}>
-                                    negative
-                                  </span>
-                                  .
-                                </h3>
-                              </div>
-                            )
-                          },
-                          openConfirmText: 'OK',
-                          onConfirmClose: () => {
-                            window.g_app._store.dispatch({
-                              type: 'global/updateAppState',
-                              payload: {
-                                customWidth: undefined,
-                              },
-                            })
-                          },
-                        },
-                      })
-                    } else if (coPayerPayments.length > 0) {
-                      setShowRemovePayment(true)
-                    } else {
-                      if (
-                        dispenseItems?.filter(x => isActualizable(x)).length >
-                          0 ||
-                        service?.filter(x => isActualizable(x)).length > 0
-                      )
-                        notification.error({
-                          message:
-                            'Actualize all nursing work items before finalize.',
-                        })
-                      else onFinalizeClick()
-                    }
-                  }}
+                  onClick={onHandelFinalize}
                 >
                   Finalize
                 </ProgressButton>

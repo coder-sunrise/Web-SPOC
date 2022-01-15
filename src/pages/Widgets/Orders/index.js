@@ -143,14 +143,15 @@ class Orders extends PureComponent {
 
   render() {
     const { props } = this
-    const { className, footer, ...restProps } = props
+    const { className, footer, isEnableEditOrder = true, ...restProps } = props
     return (
       <div className={className}>
-        <Detail {...restProps} />
+        {isEnableEditOrder && <Detail {...restProps} />}
         {/* <Divider light /> */}
 
         <Grid
           {...props}
+          isEnableEditOrder={isEnableEditOrder}
           // summary={this.state}
           // handleAddAdjustment={this.addAdjustment}
         />

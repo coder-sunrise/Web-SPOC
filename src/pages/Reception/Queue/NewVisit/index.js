@@ -30,13 +30,17 @@ import RefractionFormCard from './RefractionFormCard'
 import PrintLabLabelButton from '@/components/_medisys/PatientInfoSideBanner/PatientLabelBtn'
 
 // import ParticipantCard from './ParticipantCard'
-import VisitValidationSchema from './validationScheme'
+import {
+  VisitValidationSchema,
+  reportingDoctorSchema,
+} from './validationScheme'
 import FormFieldName from './formField'
 // services
 // misc utils
 import { formikMapPropsToValues, formikHandleSubmit } from './miscUtils'
 import { VISIT_STATUS } from '../variables'
 import PreOrderCard from './PreOrderCard'
+import MCCard from './MCCard'
 import { preOrderItemCategory } from '@/utils/codes'
 
 const styles = theme => ({
@@ -99,6 +103,7 @@ const getHeight = propsHeight => {
     doctorProfiles: codetable.doctorprofile,
     ctinvoiceadjustment: codetable.ctinvoiceadjustment,
     ctvisitpurpose: codetable.ctvisitpurpose,
+    ctlanguage: codetable.ctlanguage,
   }),
 )
 @withFormikExtend({
@@ -179,6 +184,13 @@ class NewVisit extends PureComponent {
         filter: {
           isActive: true,
         },
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctlanguage',
+        force: true,
       },
     })
   }
@@ -543,6 +555,9 @@ class NewVisit extends PureComponent {
       return { ...po }
     })
 
+    const validateReportLanguage =
+      values.visitPurposeFK !== VISIT_TYPE.MC ||
+      (values.mcReportLanguage || []).length > 0
     return (
       <React.Fragment>
         <LoadingWrapper
@@ -651,6 +666,24 @@ class NewVisit extends PureComponent {
                             />
                           </CommonCard>
                         </GridItem>
+                        {values.visitPurposeFK === VISIT_TYPE.MC && (
+                          <GridItem xs={12} className={classes.row}>
+                            <CommonCard title='Medical Check Up'>
+                              <MCCard
+                                {...this.props}
+                                mode='visitregistration'
+                                isVisitReadonlyAfterSigned={
+                                  isReadonlyAfterSigned
+                                }
+                                isSigned={
+                                  values.isLastClinicalObjectRecordSigned
+                                }
+                                reportingDoctorSchema={reportingDoctorSchema}
+                                validateReportLanguage={validateReportLanguage}
+                              />
+                            </CommonCard>
+                          </GridItem>
+                        )}
                         {values.visitPreOrderItem &&
                           values.visitPreOrderItem?.length !== 0 && (
                             <GridItem xs={12} className={classes.row}>
@@ -708,7 +741,10 @@ class NewVisit extends PureComponent {
               confirmBtnText: isEdit ? 'Save' : 'Register visit',
               onConfirm: this.validatePatient,
               confirmProps: {
-                disabled: isReadonlyAfterSigned || !this.state.hasActiveSession,
+                disabled:
+                  isReadonlyAfterSigned ||
+                  !this.state.hasActiveSession ||
+                  !validateReportLanguage,
               },
             })}
         </div>

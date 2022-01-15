@@ -234,10 +234,10 @@ export const mapPropsToValues = ({
         isUpdated = true
         if (
           (view === CALENDAR_VIEWS.MONTH || view === CALENDAR_VIEWS.WEEK) &&
-          moment(newStartTime).startOf('day') !==
+          moment(newStartTime).formatUTC() !==
             moment(appointment.appointmentDate)
         ) {
-          appointmentDate = moment(newStartTime).startOf('day')
+          appointmentDate = moment(newStartTime).formatUTC()
         }
         let updateResource = apptResources.find(
           r => r.id === updateApptResourceId,

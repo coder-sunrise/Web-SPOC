@@ -346,17 +346,6 @@ class SearchBar extends PureComponent {
                 New Statement
               </Button>
             </Authorized>
-            {isEnableAutoGenerateStatement && (
-              <Authorized authority='finance.statement.autogeneratestatement'>
-                <Button
-                  variant='contained'
-                  color='primary'
-                  onClick={showGenerateStatement}
-                >
-                  Generate Statements
-                </Button>
-              </Authorized>
-            )}
             <Button
               variant='contained'
               color='primary'

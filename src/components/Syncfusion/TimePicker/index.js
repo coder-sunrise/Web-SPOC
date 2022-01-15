@@ -167,6 +167,7 @@ class TimePicker extends PureComponent {
       max,
       min,
       step,
+      disabled = false,
       ...restProps
     } = this.props
     let { format } = restProps
@@ -198,6 +199,7 @@ class TimePicker extends PureComponent {
           <div className='control-section'>
             <div className='timepicker-control-section'>
               <TimePickerComponent
+                enabled={!disabled}
                 value={
                   this.state.value
                     ? moment(
