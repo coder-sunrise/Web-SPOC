@@ -4,7 +4,7 @@ import { formatMessage } from 'umi'
 import numeral from 'numeral'
 import { Tooltip } from '@/components'
 import tablestyles from './PatientHistoryStyle.less'
-import { inputValue } from './config'
+import { inputValue, getHistoryValueForBoolean } from './config'
 
 export default ({ current }) => {
   const { patientNoteVitalSigns = [] } = current
@@ -202,9 +202,7 @@ export default ({ current }) => {
       dataIndex: 'isPregnancy',
       title: 'Pregnancy',
       render: (text, row) => (
-        <span>
-          {inputValue(row.isPregnancy) ? (row.isPregnancy ? 'Yes' : 'No') : '-'}
-        </span>
+        <span>{getHistoryValueForBoolean(row.isPregnancy)}</span>
       ),
     },
   ].filter(
@@ -216,62 +214,42 @@ export default ({ current }) => {
       dataIndex: 'hepetitisVaccinationA',
       title: 'Hepetitis A Vaccination',
       render: (text, row) => (
-        <span>
-          {inputValue(row.hepetitisVaccinationA)
-            ? row.hepetitisVaccinationA
-              ? 'Yes'
-              : 'No'
-            : '-'}
-        </span>
+        <span>{getHistoryValueForBoolean(row.hepetitisVaccinationA)}</span>
       ),
     },
     {
       dataIndex: 'hepetitisVaccinationB',
       title: 'Hepetitis B Vaccination',
       render: (text, row) => (
-        <span>
-          {inputValue(row.hepetitisVaccinationB)
-            ? row.hepetitisVaccinationB
-              ? 'Yes'
-              : 'No'
-            : '-'}
-        </span>
+        <span>{getHistoryValueForBoolean(row.hepetitisVaccinationB)}</span>
       ),
     },
     {
       dataIndex: 'isFasting',
       title: 'Fasting',
       render: (text, row) => (
-        <span>
-          {inputValue(row.isFasting) ? (row.isFasting ? 'Yes' : 'No') : '-'}
-        </span>
+        <span>{getHistoryValueForBoolean(row.isFasting)}</span>
       ),
     },
     {
       dataIndex: 'isSmoking',
       title: 'Smoking',
       render: (text, row) => (
-        <span>
-          {inputValue(row.isSmoking) ? (row.isSmoking ? 'Yes' : 'No') : '-'}
-        </span>
+        <span>{getHistoryValueForBoolean(row.isSmoking)}</span>
       ),
     },
     {
       dataIndex: 'isAlcohol',
       title: 'Alcohol',
       render: (text, row) => (
-        <span>
-          {inputValue(row.isAlcohol) ? (row.isAlcohol ? 'Yes' : 'No') : '-'}
-        </span>
+        <span>{getHistoryValueForBoolean(row.isAlcohol)}</span>
       ),
     },
     {
       dataIndex: 'isMensus',
       title: 'Mensus',
       render: (text, row) => (
-        <span>
-          {inputValue(row.isMensus) ? (row.isMensus ? 'Yes' : 'No') : '-'}
-        </span>
+        <span>{getHistoryValueForBoolean(row.isMensus)}</span>
       ),
     },
   ].filter(c => current.patientGender !== 'Male' || c.dataIndex !== 'isMensus')

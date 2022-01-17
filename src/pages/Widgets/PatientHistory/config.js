@@ -442,6 +442,10 @@ export const inputValue = value => {
   return value !== undefined && value !== null
 }
 
+export const getHistoryValueForBoolean = value => {
+  return inputValue(value) ? (value ? 'Yes' : 'No') : '-'
+}
+
 const checkNote = (widgetId, current) => {
   const notesType = notesTypes.find(type => type.value === widgetId)
   if (notesType) {

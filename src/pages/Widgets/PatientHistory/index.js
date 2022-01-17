@@ -1500,45 +1500,25 @@ class PatientHistory extends Component {
                       : WidgetConfig.inputValue(o.waistCircumference)
                       ? `${numeral(o.waistCircumference).format('0.0')} CM`
                       : '-',
-                  isPregnancy: WidgetConfig.inputValue(o.isPregnancy)
-                    ? o.isPregnancy
-                      ? 'Yes'
-                      : 'No'
-                    : '-',
-                  hepetitisVaccinationA: WidgetConfig.inputValue(
+                  isPregnancy: WidgetConfig.getHistoryValueForBoolean(
+                    o.isPregnancy,
+                  ),
+                  hepetitisVaccinationA: WidgetConfig.getHistoryValueForBoolean(
                     o.hepetitisVaccinationA,
-                  )
-                    ? o.hepetitisVaccinationA
-                      ? 'Yes'
-                      : 'No'
-                    : '-',
-                  hepetitisVaccinationB: WidgetConfig.inputValue(
+                  ),
+                  hepetitisVaccinationB: WidgetConfig.getHistoryValueForBoolean(
                     o.hepetitisVaccinationB,
-                  )
-                    ? o.hepetitisVaccinationB
-                      ? 'Yes'
-                      : 'No'
-                    : '-',
-                  isFasting: WidgetConfig.inputValue(o.isFasting)
-                    ? o.isFasting
-                      ? 'Yes'
-                      : 'No'
-                    : '-',
-                  isSmoking: WidgetConfig.inputValue(o.isSmoking)
-                    ? o.isSmoking
-                      ? 'Yes'
-                      : 'No'
-                    : '-',
-                  isAlcohol: WidgetConfig.inputValue(o.isAlcohol)
-                    ? o.isAlcohol
-                      ? 'Yes'
-                      : 'No'
-                    : '-',
-                  isMensus: WidgetConfig.inputValue(o.isMensus)
-                    ? o.isMensus
-                      ? 'Yes'
-                      : 'No'
-                    : '-',
+                  ),
+                  isFasting: WidgetConfig.getHistoryValueForBoolean(
+                    o.isFasting,
+                  ),
+                  isSmoking: WidgetConfig.getHistoryValueForBoolean(
+                    o.isSmoking,
+                  ),
+                  isAlcohol: WidgetConfig.getHistoryValueForBoolean(
+                    o.isAlcohol,
+                  ),
+                  isMensus: WidgetConfig.getHistoryValueForBoolean(o.isMensus),
                 }
               }),
             )
