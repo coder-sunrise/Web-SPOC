@@ -511,6 +511,7 @@ class AntdSelect extends React.PureComponent {
     const {
       valueField,
       labelField,
+      tooltipField,
       optionLabelLength = 0,
       mode,
       showOptionTitle = true,
@@ -531,10 +532,16 @@ class AntdSelect extends React.PureComponent {
       .map((option, index) => {
         const hasIsActive = option.isActive !== undefined
         const isActive = hasIsActive ? option.isActive : true
+        let tooltip = showOptionTitle
+          ? option.customTooltipField || option.label
+          : undefined
+        if (tooltipField) {
+          tooltip = option[tooltipField]
+        }
         return (
           <Select.Option
             data={option}
-            title={showOptionTitle ? option.customTooltipField || option.label: undefined} 
+            title={tooltip}
             label={
               optionLabelLength
                 ? option.label.substring(0, optionLabelLength)
