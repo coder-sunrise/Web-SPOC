@@ -14,11 +14,37 @@ import {
   RadioGroup,
 } from '@/components'
 import { YESNOOPTIUONS, GENDER } from '@/utils/constants'
+import { inputValue } from '@/pages/Widgets/PatientHistory/config'
 
 class BasicExaminations extends PureComponent {
   constructor(props) {
     super(props)
     this.myRef = React.createRef()
+  }
+
+  expandOthers = () => {
+    const { arrayHelpers, fieldName = 'corPatientNoteVitalSign' } = this.props
+    const values = arrayHelpers ? arrayHelpers.form.values : this.props.values
+    if (
+      (values[fieldName] || []).find(
+        row =>
+          inputValue(row.bodyFatPercentage) ||
+          inputValue(row.degreeOfObesity) ||
+          inputValue(row.headCircumference) ||
+          inputValue(row.chestCircumference) ||
+          inputValue(row.waistCircumference) ||
+          inputValue(row.isPregnancy) ||
+          inputValue(row.hepetitisVaccinationA) ||
+          inputValue(row.hepetitisVaccinationB) ||
+          inputValue(row.isFasting) ||
+          inputValue(row.isSmoking) ||
+          inputValue(row.isAlcohol) ||
+          inputValue(row.isMensus) ||
+          inputValue(row.isChild),
+      )
+    )
+      return true
+    return false
   }
 
   getBasicExaminations = () => {
@@ -73,12 +99,12 @@ class BasicExaminations extends PureComponent {
                 name={`${fieldName}[0].bpSysMMHG`}
                 render={args => (
                   <NumberInput
-                    {...args}
                     label='Blood Pressure SYS'
                     suffix={formatMessage({
                       id: 'reception.queue.visitRegistration.mmhg',
                     })}
                     precision={0}
+                    {...args}
                   />
                 )}
               />
@@ -88,12 +114,12 @@ class BasicExaminations extends PureComponent {
                 name={`${fieldName}[0].bpDiaMMHG`}
                 render={args => (
                   <NumberInput
-                    {...args}
                     label='Blood Pressure DIA'
                     suffix={formatMessage({
                       id: 'reception.queue.visitRegistration.mmhg',
                     })}
                     precision={0}
+                    {...args}
                   />
                 )}
               />
@@ -103,7 +129,6 @@ class BasicExaminations extends PureComponent {
                 name={`${fieldName}[0].pulseRateBPM`}
                 render={args => (
                   <NumberInput
-                    {...args}
                     label={formatMessage({
                       id: 'reception.queue.visitRegistration.heartRate',
                     })}
@@ -111,6 +136,7 @@ class BasicExaminations extends PureComponent {
                       id: 'reception.queue.visitRegistration.heartRate.suffix',
                     })}
                     precision={0}
+                    {...args}
                   />
                 )}
               />
@@ -436,6 +462,12 @@ class BasicExaminations extends PureComponent {
   render() {
     let div = $(this.myRef.current).find('div[aria-expanded]:eq(0)')
     if (div.attr('aria-expanded') === 'false') div.click()
+
+    if (this.expandOthers()) {
+      let divOthers = $(this.myRef.current).find('div[aria-expanded]:eq(1)')
+      if (divOthers.attr('aria-expanded') === 'false') divOthers.click()
+    }
+
     return (
       <div ref={this.myRef}>
         <Accordion mode='multiple' collapses={this.getBasicExaminations()} />

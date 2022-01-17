@@ -72,9 +72,8 @@ export const visitBasicExaminationsSchema = Yup.object().shape({
     .transform(value =>
       value === null || Number.isNaN(value) ? undefined : value,
     )
-    .integer('Height can only be a whole number')
     .min(0, VitalSignMessage[FormField['vitalsign.heightCM']])
-    .max(999, VitalSignMessage[FormField['vitalsign.heightCM']]),
+    .max(999.9, VitalSignMessage[FormField['vitalsign.heightCM']]),
   [FormField['vitalsign.bodyFatPercentage']]: Yup.number()
     .transform(value =>
       value === null || Number.isNaN(value) ? undefined : value,
