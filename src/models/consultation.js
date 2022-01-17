@@ -553,6 +553,15 @@ export default createFormViewModel({
           },
         })
 
+        const corPatientNoteVitalSign = (data.corPatientNoteVitalSign || [])
+          .length
+          ? data.corPatientNoteVitalSign
+          : [{}]
+        data.corPatientNoteVitalSign = corPatientNoteVitalSign.map(vs => ({
+          ...vs,
+          visitPurposeFK: data.visitPurposeFK,
+        }))
+
         let newResponse = ParseEyeFormData(data)
         const { corEyeRefractionForm, corEyeExaminationForm } = newResponse
         data.corEyeRefractionForm = corEyeRefractionForm

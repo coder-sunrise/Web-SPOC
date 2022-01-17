@@ -240,6 +240,7 @@ class HistoryDetails extends PureComponent {
       referralPatientName: selectHistory.referralPatientName,
       referralRemarks: selectHistory.referralRemarks,
       visitPurposeFK: visitPurposeFK,
+      patientGender: selectHistory.patientGender,
     }
     return (
       <CardContainer
