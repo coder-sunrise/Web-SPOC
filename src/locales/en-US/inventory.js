@@ -89,6 +89,16 @@ export default {
   'inventory.master.stock.criticalThreshold': 'Critical Threshold',
   'inventory.master.stock.excessThreshold': 'Excess Threshold',
 
+  //Purchase Request
+  'inventory.purchaserequest.prno': 'Purchase Request #',
+  'inventory.purchaserequest.status': 'PR Status',
+  'inventory.purchaserequest.detail.requestedBy': 'Request By',
+  'inventory.purchaserequest.detail.save': 'Save',
+  'inventory.purchaserequest.detail.submit': 'Submit',
+  'inventory.purchaserequest.detail.remarks' : 'Remarks',
+  'inventory.purchaserequest.detail.requestdate': 'Purchase Request Date',
+  'inventory.purchaserequest.detail.expectedDeliveryDate': 'Expected Delivery Date',
+
   // Purchasing & Receiving
   'inventory.pr.reason': 'Reason',
   'inventory.pr.diplicatePO': 'Duplicate Purchase Order',
