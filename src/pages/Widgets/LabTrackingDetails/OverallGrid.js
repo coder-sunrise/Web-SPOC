@@ -9,7 +9,9 @@ class OverallGrid extends PureComponent {
     columns: [
       { name: 'visitDate', title: 'Visit Date' },
       { name: 'patientAccountNo', title: 'Acc. No' },
+      { name: 'referreceNo', title: 'Ref. No' },
       { name: 'patientName', title: 'Patient name' },
+      { name: 'visitPurposeFK', title: 'Visit Type' },
       {
         name: 'doctorProfileFKNavigation.ClinicianProfile.Name',
         title: 'Doctor',
@@ -36,6 +38,19 @@ class OverallGrid extends PureComponent {
           return (
             <Tooltip title={row.doctorName}>
               <span>{row.doctorName}</span>
+            </Tooltip>
+          )
+        },
+      },
+      {
+        columnName: 'visitPurposeFK',
+        width: 80,
+        render: row => {
+          const { visitPurpose } = this.props
+          var pupose = visitPurpose.find(x => x.id === row.visitPurposeFK)
+          return (
+            <Tooltip title={pupose.displayValue}>
+              <span>{pupose.code}</span>
             </Tooltip>
           )
         },
