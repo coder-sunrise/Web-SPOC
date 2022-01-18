@@ -6,6 +6,7 @@ import { connect } from 'dva'
 import { compose } from 'redux'
 import numeral from 'numeral'
 import { withStyles } from '@material-ui/core'
+import { roundTo } from '@/utils/utils'
 import {
   Icon,
   dateFormatLongWithTimeNoSec12h,
@@ -155,9 +156,7 @@ const WorkitemBody = props => {
 
   const { isQueueNoDecimal } = clinicSettings
   const queueNo =
-    !item.queueNo || !item.queueNo.trim().length
-      ? '-'
-      : numeral(item.queueNo).format(isQueueNoDecimal ? '0.0' : '0')
+    !item.queueNo || !item.queueNo.trim().length ? '-' : item.queueNo
   return (
     <div className={classes.bodayPanel}>
       <div style={{ position: 'relative', paddingRight: 90 }}>

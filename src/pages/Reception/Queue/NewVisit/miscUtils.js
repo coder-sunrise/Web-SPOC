@@ -6,6 +6,7 @@ import { VISIT_TYPE, VISITDOCTOR_CONSULTATIONSTATUS } from '@/utils/constants'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
 import { notification } from '@/components'
 import { VISIT_STATUS } from '../variables'
+import { roundTo } from '@/utils/utils'
 
 const filterDeletedFiles = item => {
   // filter out not yet confirmed files
@@ -174,7 +175,10 @@ export const formikMapPropsToValues = ({
           parseFloat(queueNo) > largest ? parseFloat(queueNo) : largest,
         0,
       )
-      qNo = parseFloat(largestQNo + 1).toFixed(1)
+      qNo = roundTo(
+        largestQNo + 1,
+        clinicSettings.settings.isQueueNoDecimal ? 1 : 0,
+      )
     }
 
     const { visitInfo, roomFK, appointment } = visitRegistration
@@ -380,6 +384,7 @@ export const formikHandleSubmit = (
     queueLog,
     patientInfo,
     visitRegistration,
+    clinicSettings,
     onConfirm,
   } = props
 
@@ -461,7 +466,7 @@ export const formikHandleSubmit = (
     },
     id,
     ...restVisitInfo,
-    queueNo: parseFloat(queueNo).toFixed(1),
+    queueNo: roundTo(queueNo, clinicSettings.settings.isQueueNoDecimal ? 1 : 0),
     queueNoPrefix: sessionInfo.sessionNoPrefix,
     visit: {
       visitAttachment: uploaded,
