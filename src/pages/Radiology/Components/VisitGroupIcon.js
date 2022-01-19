@@ -24,9 +24,7 @@ const VisitGroupIcon = props => {
             sortingEnabled: false,
             render: (text, row) => {
               const queueNo =
-                !row.queueNo || !row.queueNo.trim().length
-                  ? '-'
-                  : numeral(row.queueNo).format(isQueueNoDecimal ? '0.0' : '0')
+                !row.queueNo || !row.queueNo.trim().length ? '-' : row.queueNo
               return <div>{queueNo}</div>
             },
           },
