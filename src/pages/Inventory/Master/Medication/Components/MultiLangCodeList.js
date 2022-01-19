@@ -73,8 +73,7 @@ const MultiLangCodeList = ({
           : [],
       )
     }
-  }, [currentCodesetList, data])
-  console.log(codeList, labelField)
+  }, [currentCodesetList, data]) 
   return (
     <List
       bordered
