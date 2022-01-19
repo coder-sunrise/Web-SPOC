@@ -62,7 +62,6 @@ export default createFormViewModel({
       },
       *queryPurchaseRequest({ payload }, { call, put }) {
         const response = yield call(service.queryById, { id: payload.id })
-        console.log('*queryPurchaseRequest',response)
         const { data } = response
         if (data && data.id) {
           return yield put({
@@ -90,14 +89,18 @@ export default createFormViewModel({
       },
 
       setPurchaseRequest(state, { payload }) {
-        const { purchaseRequestItem } = payload
+        const { purchaseRequestItem = [] } = payload
         const itemRows = purchaseRequestItem.map(x => {
           return {
             ...x,
+            type: x.itemTypeFK,
+            code: x.itemFK,
+            name: x.itemFK,
+            uom: x.itemFK,
+            uomString: x.uom,
             uid: getUniqueId(),
           }
         })
-
         return {
           ...state,
           purchaseRequest: {

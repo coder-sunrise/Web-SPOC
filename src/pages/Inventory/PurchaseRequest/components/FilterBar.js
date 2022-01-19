@@ -164,7 +164,6 @@ class FilterBar extends PureComponent {
                   isAllDateChecked,
                   requestBy,
                 } = values
-                console.log('search values',values)
 
                 dispatch({
                   type: 'purchaseRequestList/query',

@@ -61,32 +61,45 @@ const styles = theme => ({
   handleSubmit: () => {},
 })
 class Index extends Component {
+
   componentDidMount() {
     this.getData()
   }
 
+  componentWillUnmount() {
+    this.props.dispatch({
+      type: 'purchaseRequestDetails/initializePurchaseRequest',
+    })
+  }
+
   getData = prid => {
+    const { purchaseRequestDetails } = this.props
+    const { id, type } = purchaseRequestDetails
     const { dispatch } = window.g_app._store
-    let {
-      history: {
-        location: {
-          query: { id, type },
-        },
-      },
-    } = this.props
-    if (prid) {
-      id = prid
-      type = 'edit'
-    }
+
     switch (type) {
+      // Edit order
       case 'edit':
         dispatch({
           type: 'purchaseRequestDetails/queryPurchaseRequest',
           payload: { id, type },
         })
         break
+      // Create new order
       default:
-        history.push(`/inventory/purchaserequest/details?type=new`)
+        if (prid && type === 'new') {
+          history.push(
+            `/inventory/purchaserequest/details?id=${prid}&&type=${'edit'}`,
+          )
+          dispatch({
+            type: 'purchaseRequestDetails/querypurchaseRequest',
+            payload: { id: prid, type: 'edit' },
+          })
+        } else {
+          dispatch({
+            type: 'purchaseRequestDetails/initializepurchaseRequest',
+          })
+        }
         break
     }
   }
@@ -160,17 +173,18 @@ class Index extends Component {
           sortOrder: x.sortOrder,
           uom: x.uomString,
           itemTypeFK: itemType.value,
+          itemFK: x.itemFK,
           itemCode: x.codeString,
           itemName: x.nameString,
         }
       } else {
         result = {
           ...x,
+          uom: x.uomString,
         }
       }
       return result
     })
-
     return {
       ...purchaseRequest,
       purchaseRequestStatusFK,
@@ -183,7 +197,6 @@ class Index extends Component {
     const { purchaseRequest, rows } = values
     const isEditable =
       pr.purchaseRequestStatusFK != PURCHASE_REQUEST_STATUS.SUBMITTED
-    console.log('details render values', values)
     return (
       <div>
         <PRForm {...this.props} isReadOnly={!isEditable} />
@@ -196,32 +209,36 @@ class Index extends Component {
         <AuthorizedContext.Provider
           value={{ rights: this.getRights(type) }}
         ></AuthorizedContext.Provider>
-        <GridContainer
-          style={{
-            marginTop: 20,
-            display: 'flex',
-            justifyContent: 'flex-end',
-          }}
-        >
-          <div>
-            <ProgressButton
-              color='primary'
-              icon={null}
-              onClick={() => this.onSubmitButtonClicked(prSubmitAction.SAVE)}
-            >
-              {formatMessage({ id: 'inventory.purchaserequest.detail.save' })}
-            </ProgressButton>
-            <ProgressButton
-              color='success'
-              icon={null}
-              onClick={() =>
-                this.onSubmitButtonClicked(prSubmitAction.SUBMITTED)
-              }
-            >
-              {formatMessage({ id: 'inventory.purchaserequest.detail.submit' })}
-            </ProgressButton>
-          </div>
-        </GridContainer>
+        {isEditable && (
+          <GridContainer
+            style={{
+              marginTop: 20,
+              display: 'flex',
+              justifyContent: 'flex-end',
+            }}
+          >
+            <div>
+              <ProgressButton
+                color='primary'
+                icon={null}
+                onClick={() => this.onSubmitButtonClicked(prSubmitAction.SAVE)}
+              >
+                {formatMessage({ id: 'inventory.purchaserequest.detail.save' })}
+              </ProgressButton>
+              <ProgressButton
+                color='success'
+                icon={null}
+                onClick={() =>
+                  this.onSubmitButtonClicked(prSubmitAction.SUBMITTED)
+                }
+              >
+                {formatMessage({
+                  id: 'inventory.purchaserequest.detail.submit',
+                })}
+              </ProgressButton>
+            </div>
+          </GridContainer>
+        )}
       </div>
     )
   }

@@ -105,7 +105,7 @@ class Grid extends PureComponent {
     row.nameString = option.name
     row.uom = option.value
     row.uomString = option.uom
-    row.qty = 0
+    // row.qty = 0
     this.setState({
       selectedItem: option,
       onClickColumn: 'item',
@@ -227,6 +227,7 @@ class Grid extends PureComponent {
           type: 'select',
           options: podoOrderType,
           sortingEnabled: false,
+          disabled: !isEditable,
           onChange: e => {
             if (e.option) {
               this.handleOnOrderTypeChanged(e)
@@ -238,6 +239,7 @@ class Grid extends PureComponent {
           type: 'select',
           labelField: 'code',
           sortingEnabled: false,
+          disabled: !isEditable,
           options: row => {
             return this.rowOptions(row)
           },
@@ -252,6 +254,7 @@ class Grid extends PureComponent {
           type: 'select',
           labelField: 'name',
           sortingEnabled: false,
+          disabled: !isEditable,
           options: row => {
             return this.rowOptions(row)
           },
@@ -284,6 +287,7 @@ class Grid extends PureComponent {
           columnName: 'qty',
           type: 'number',
           precision: 1,
+          disabled: !isEditable,
         },
       ],
       onRowDoubleClick: undefined,
