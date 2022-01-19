@@ -4,11 +4,13 @@ import { List } from 'antd'
 import Delete from '@material-ui/icons/Delete'
 import { Button, Tooltip } from '@/components'
 
-const formatCodes = codes => {
+const formatCodes = (codes, isMultiLanguage, labelField) => {
   const tempFormattedCodes = []
   codes.forEach(current => {
     const formattedCode = {
-      displayValue: current.displayValue,
+      displayValue: isMultiLanguage
+        ? current.displayValue
+        : current[labelField],
       id: current.id,
     }
     if (current.translationData)
@@ -21,7 +23,9 @@ const formatCodes = codes => {
         formattedCode[fieldName] = langDisplayValue
       })
     else {
-      formattedCode['displayValue'] = current.displayValue
+      formattedCode[labelField] = isMultiLanguage
+        ? current.displayValue
+        : current[labelField]
     }
     tempFormattedCodes.push(formattedCode)
   })
@@ -35,6 +39,8 @@ const MultiLangCodeList = ({
   label,
   codeset,
   onChange,
+  isMultiLanguage,
+  labelField,
 }) => {
   const codetable = useSelector(s => s.codetable)
   const [codeList, setCodeList] = useState([])
@@ -48,7 +54,7 @@ const MultiLangCodeList = ({
       payload: { code: codesetName },
     }).then(result => {
       if (result) {
-        setCurrentCodesetList(formatCodes(result))
+        setCurrentCodesetList(formatCodes(result, isMultiLanguage, labelField))
       }
     })
   }, [codeset])
@@ -68,7 +74,7 @@ const MultiLangCodeList = ({
       )
     }
   }, [currentCodesetList, data])
-
+  console.log(codeList, labelField)
   return (
     <List
       bordered
@@ -76,18 +82,18 @@ const MultiLangCodeList = ({
       locale={{
         emptyText: <span></span>,
       }}
-      style={{ height: 200, overflow: 'auto' }}
+      style={{ height: 150, overflow: 'auto' }}
       dataSource={codeList}
       renderItem={(item, i) => {
         return (
-          <div style={{ padding: 10, display: 'flex' }}>
+          <div style={{ padding: '5px 10px', display: 'flex' }}>
             <span
               style={{ marginRight: 15, fontWeight: 200, flex: '0 0 auto' }}
             >
               {`${label} ${i + 1}`}
             </span>
             <span style={{ flexGrow: 1 }}>
-              {item['displayValue' + language]}
+              {item[isMultiLanguage ? 'displayValue' + language : labelField]}
             </span>
             <span>
               <Tooltip title={`Remove ${label.toLowerCase()}`}>

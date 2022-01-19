@@ -245,44 +245,6 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                   Add New
                 </Button>
               </Authorized>
-
-              <Button color='primary' onClick={onExportClick}>
-                <ImportExport />
-                Export
-              </Button>
-
-              <Authorized authority='inventorymaster.newinventoryitem'>
-                <input
-                  style={{ display: 'none' }}
-                  type='file'
-                  accept={allowedFiles}
-                  id='importConsumableFile'
-                  ref={inputEl}
-                  multiple={false}
-                  onChange={onFileChange}
-                  onClick={clearValue}
-                />
-
-                <Button color='primary' onClick={onImportClick}>
-                  <AttachFile />
-                  Import
-                </Button>
-              </Authorized>
-              {/* <Button
-                variant='contained'
-                color='primary'
-                onClick={() => {
-                  this.props.dispatch({
-                    type: 'consumable/updateState',
-                    payload: {
-                      showBatchEditModal: true,
-                    },
-                  })
-                }}
-              >
-                <GridOn />
-                Batch Edit
-              </Button> */}
             </div>
           </LoadingWrapper>
         </GridItem>
