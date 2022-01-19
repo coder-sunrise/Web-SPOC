@@ -6,6 +6,7 @@ import { connect } from 'dva'
 import { compose } from 'redux'
 import numeral from 'numeral'
 import { withStyles } from '@material-ui/core'
+import { roundTo } from '@/utils/utils'
 import {
   Icon,
   dateFormatLongWithTimeNoSec12h,
@@ -17,9 +18,9 @@ import { VISIT_TYPE, VISIT_TYPE_NAME, PHARMACY_STATUS } from '@/utils/constants'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import { FileDoneOutlined } from '@ant-design/icons'
 import Warning from '@material-ui/icons/Error'
-import WorklistContext from '../Worklist/WorklistContext'
-import VisitGroupIcon from './VisitGroupIcon'
-import PrintPrescription from '../../Pharmacy/Components/PrintPrescription'
+import WorklistContext from '../../Radiology/Worklist/WorklistContext'
+import VisitGroupIcon from '../../Radiology/Components/VisitGroupIcon'
+import PrintPrescription from './PrintPrescription'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import { CallingQueueButton } from '@/components/_medisys'
 
@@ -155,9 +156,7 @@ const WorkitemBody = props => {
 
   const { isQueueNoDecimal } = clinicSettings
   const queueNo =
-    !item.queueNo || !item.queueNo.trim().length
-      ? '-'
-      : numeral(item.queueNo).format(isQueueNoDecimal ? '0.0' : '0')
+    !item.queueNo || !item.queueNo.trim().length ? '-' : item.queueNo
   return (
     <div className={classes.bodayPanel}>
       <div style={{ position: 'relative', paddingRight: 90 }}>

@@ -29,7 +29,7 @@ const MCCard = ({
   theme,
   values,
   clinicSettings,
-  ctlanguage,
+  ctlanguage = [],
   isVisitReadonlyAfterSigned,
   validateReportLanguage,
 }) => {

@@ -63,7 +63,17 @@ const styles = () => ({
 class SystemSetting extends PureComponent {
   constructor(props) {
     super(props)
-    this.group = _.groupBy(menuData, 'title')
+    const { clinicSettings } = this.props
+    const { settings = [] } = clinicSettings
+    let filteredMenu = menuData
+    Object.entries(settings).forEach(([key, value]) => {
+      if (typeof value === 'boolean' && !value) {
+        filteredMenu = filteredMenu.filter(
+          set => set.hiddenWhenClinicSettingIsOff !== key,
+        )
+      }
+    })
+    this.group = _.groupBy(filteredMenu, 'title')
   }
 
   menus = () => {

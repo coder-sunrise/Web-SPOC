@@ -186,6 +186,13 @@ class NewVisit extends PureComponent {
         },
       },
     })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctlanguage',
+        force: true,
+      },
+    })
   }
   componentWillUnmount() {
     // call file index API METHOD='DELETE'
@@ -205,21 +212,6 @@ class NewVisit extends PureComponent {
         !item.isDeleted && deleteFileByFileID(item.id)
       })
     }
-  }
-
-  calculateBMI = () => {
-    const { heightCM, weightKG } = this.props.values
-
-    const { setFieldValue, setFieldTouched } = this.props
-    if (heightCM && weightKG) {
-      const heightM = heightCM / 100
-      const bmi = weightKG / heightM ** 2
-      const bmiInTwoDecimal = Math.round(bmi * 100) / 100
-      setFieldValue(FormFieldName['vitalsign.bmi'], bmiInTwoDecimal)
-    } else {
-      setFieldValue(FormFieldName['vitalsign.bmi'], null)
-    }
-    setFieldTouched(FormFieldName['vitalsign.bmi'], true)
   }
 
   updateAttachments = ({ added, deleted }) => {
@@ -637,7 +629,14 @@ class NewVisit extends PureComponent {
                               <GridItem xs={12} className={classes.row}>
                                 <VitalSignCard
                                   // isReadOnly={isReadOnly}
-                                  handleCalculateBMI={this.calculateBMI}
+                                  disabled={
+                                    ((isReadOnly ||
+                                      isRetail ||
+                                      vitalAccessRight === 'enable') &&
+                                      isReadonlyAfterSigned) ||
+                                    vitalAccessRight !== 'enable'
+                                  }
+                                  {...this.props}
                                 />
                               </GridItem>
                             </Authorized.Context.Provider>

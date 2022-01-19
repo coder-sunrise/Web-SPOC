@@ -114,7 +114,7 @@ const VisitInfoCard = ({
   const disableConsReady = Authorized.check('queue.modifyconsultationready')
 
   const validateQNo = value => {
-    const qNo = parseFloat(value).toFixed(1)
+    const qNo = roundTo(value, clinicSettings.settings.isQueueNoDecimal ? 1 : 0)
     if (existingQNo.includes(qNo))
       return 'Queue No. already existed in current queue list'
     return ''
@@ -195,6 +195,8 @@ const VisitInfoCard = ({
       setFieldValue('mcReportPriority', 'Normal')
     }
 
+    setFieldValue('visitBasicExaminations[0].visitPurposeFK', v)
+
     if (template) {
       handleVisitOrderTemplateChange(v, template)
     }
@@ -236,7 +238,11 @@ const VisitInfoCard = ({
     values.visitStatus === VISIT_STATUS.WAITING ||
     values.visitStatus === VISIT_STATUS.UPCOMING_APPT
 
-  const { isEnablePackage = false, visitTypeSetting } = clinicSettings.settings
+  const {
+    isEnablePackage = false,
+    visitTypeSetting,
+    isQueueNoDecimal,
+  } = clinicSettings.settings
 
   let visitTypeSettingsObj = undefined
   let visitPurpose = undefined
@@ -340,14 +346,17 @@ const VisitInfoCard = ({
             render={args => (
               <NumberInput
                 {...args}
-                format='0.0'
+                format={isQueueNoDecimal ? '0.0' : '0'}
+                precision={isQueueNoDecimal ? 1 : 0}
                 // disabled={isReadOnly}
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.queueNo',
                 })}
                 formatter={value => {
                   const isNaN = Number.isNaN(parseFloat(value))
-                  return isNaN ? value : parseFloat(value).toFixed(1)
+                  return isNaN
+                    ? value
+                    : roundTo(parseFloat(value), isQueueNoDecimal ? 1 : 0)
                 }}
               />
             )}

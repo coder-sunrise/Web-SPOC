@@ -13,13 +13,14 @@ import {
   RADIOLOGY_WORKITEM_STATUS,
   RADIOLOGY_WORKLIST_STATUS_COLOR,
   GENDER,
+  MODALITY_STATUS,
 } from '@/utils/constants'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import WorklistContext from '../Worklist/WorklistContext'
 import CombinedOrderIcon from './CombinedOrderIcon'
 import VisitGroupIcon from './VisitGroupIcon'
+import ModalityStatusIcon from './ModalityStatusIcon'
 import { CallingQueueButton } from '@/components/_medisys'
-
 const blueColor = '#1890f8'
 const statusUpdateDateTooltip = {
   1: '', //No tooltip is needed as new status only have order create date.
@@ -115,6 +116,11 @@ const WorkitemTitle = ({ item }) => {
         <LeftLabel tooltip={item.patientInfo.patientReferenceNo}>
           {item.patientInfo.patientReferenceNo}
         </LeftLabel>
+        {item.statusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS &&
+          (item.modalityStatusFK === MODALITY_STATUS.PENDING ||
+            item.modalityStatusFK === MODALITY_STATUS.FAILED) && (
+            <ModalityStatusIcon itemModalityStatusFK={item.modalityStatusFK} />
+          )}
         <RightLabel width={150}>{item.patientInfo.patientAccountNo}</RightLabel>
       </WorkitemRow>
     </div>
@@ -139,8 +145,7 @@ const WorkitemBody = ({ item }) => {
   const queueNo =
     !item.visitInfo.queueNo || !item.visitInfo.queueNo.trim().length
       ? '-'
-      : numeral(item.visitInfo.queueNo).format(isQueueNoDecimal ? '0.0' : '0')
-
+      : item.visitInfo.queueNo
   const doctorName = getNameWithTitle(
     visitInfo.doctorTitle,
     visitInfo.doctorName,

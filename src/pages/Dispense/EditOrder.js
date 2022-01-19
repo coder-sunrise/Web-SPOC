@@ -32,6 +32,7 @@ import { sendNotification } from '@/utils/realtime'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 import ConsumePackage from '@/pages/Widgets/Orders/Detail/ConsumePackage'
+import { visitBasicExaminationsSchema } from '@/pages/Reception/Queue/NewVisit/validationScheme'
 
 const discardConsultation = async ({
   dispatch,
@@ -95,6 +96,9 @@ const styles = () => ({})
         then: Yup.string().required(),
       }),
     }),
+    corPatientNoteVitalSign: Yup.array()
+      .compact(v => v.isDeleted)
+      .of(visitBasicExaminationsSchema),
   }),
   dirtyCheckMessage: 'Discard edit order?',
   onDirtyDiscard: discardConsultation,
@@ -375,6 +379,7 @@ class EditOrder extends Component {
     const orderWidget = widgets.find(o => o.id === '5')
     const cdWidget = widgets.find(o => o.id === '3')
     const formsWidget = widgets.find(o => o.id === '12')
+    const basicExaminationsWidget = widgets.find(o => o.id === '7')
     const Order = orderWidget.component
     const ConsultationDocument = cdWidget.component
     const consultationDocumentAccessRight = Authorized.check(
@@ -382,39 +387,22 @@ class EditOrder extends Component {
     )
     const Forms = formsWidget.component
     const formAccessRight = Authorized.check(formsWidget.accessRight)
+    const BasicExaminations = basicExaminationsWidget.component
+    const basicExaminationsAccessRight = Authorized.check(
+      basicExaminationsWidget.accessRight,
+    )
     return (
       <div className={classes.content} style={{ backgroundColor: 'white' }}>
         <GridContainer>
           <GridItem xs={12} md={6}>
-            <h5>Orders</h5>
-            <Order className={classes.orderPanel} status='' from='EditOrder' />
-          </GridItem>
-          <GridItem xs={12} md={6}>
-            {formAccessRight && formAccessRight.rights !== 'hidden' && (
-              <div>
-                <h5>
-                  <span style={{ display: 'inline-block' }}>Forms</span>
-                  <span className={classes.cdAddButton}>
-                    {cdWidget.toolbarAddon}
-                  </span>
-                </h5>
-                <Forms />
-              </div>
-            )}
-            {consultationDocumentAccessRight &&
-              consultationDocumentAccessRight.rights !== 'hidden' && (
-                <div>
-                  <h5>
-                    <span style={{ display: 'inline-block' }}>
-                      Consultation Document
-                    </span>
-                    <span className={classes.cdAddButton}>
-                      {cdWidget.toolbarAddon}
-                    </span>
-                  </h5>
-                  <ConsultationDocument forDispense />
-                </div>
-              )}
+            <GridItem xs={12}>
+              <h5>Orders</h5>
+              <Order
+                className={classes.orderPanel}
+                status=''
+                from='EditOrder'
+              />
+            </GridItem>
             <GridItem xs={12} md={6}>
               <FastField
                 name='dispenseAcknowledgement.editDispenseReasonFK'
@@ -477,6 +465,44 @@ class EditOrder extends Component {
                 Save
               </ProgressButton>
             </GridItem>
+          </GridItem>
+          <GridItem xs={12} md={6}>
+            {formAccessRight && formAccessRight.rights !== 'hidden' && (
+              <div>
+                <h5>
+                  <span style={{ display: 'inline-block' }}>Forms</span>
+                  <span className={classes.cdAddButton}>
+                    {cdWidget.toolbarAddon}
+                  </span>
+                </h5>
+                <Forms />
+              </div>
+            )}
+            {consultationDocumentAccessRight &&
+              consultationDocumentAccessRight.rights !== 'hidden' && (
+                <div>
+                  <h5>
+                    <span style={{ display: 'inline-block' }}>
+                      Consultation Document
+                    </span>
+                    <span className={classes.cdAddButton}>
+                      {cdWidget.toolbarAddon}
+                    </span>
+                  </h5>
+                  <ConsultationDocument forDispense />
+                </div>
+              )}
+            {basicExaminationsAccessRight &&
+              basicExaminationsAccessRight.rights !== 'hidden' && (
+                <div>
+                  <h5>
+                    <span style={{ display: 'inline-block' }}>
+                      Basic Examinations
+                    </span>
+                  </h5>
+                  <BasicExaminations />
+                </div>
+              )}
           </GridItem>
         </GridContainer>
 

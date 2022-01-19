@@ -158,7 +158,11 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       if (activeVitalSign) {
         weightKG = activeVitalSign.weightKG
       } else {
-        weightKG = visitRegistration.entity.visit.weightKG
+        const visitBasicExaminations =
+          visitRegistration.entity?.visit?.visitBasicExaminations || []
+        if (visitBasicExaminations.length) {
+          weightKG = visitBasicExaminations[0].weightKG
+        }
       }
 
       let age

@@ -5,9 +5,6 @@ import { connect } from 'dva'
 import { CommonTableGrid, Button, Tooltip, notification } from '@/components'
 import { status, gstEnabled } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
-import withWebSocket from '@/components/Decorator/withWebSocket'
-import { getRawData } from '@/services/report'
-import { REPORT_ID } from '@/utils/constants'
 
 @connect(({ clinicSettings }) => ({
   clinicSettings,
@@ -59,41 +56,10 @@ class Grid extends PureComponent {
   }
 
   handleClick = async copayerId => {
-    if (!Number.isInteger(copayerId)) return
-
-    const { handlePrint, clinicSettings } = this.props
-    const { labelPrinterSize } = clinicSettings.settings
-
-    const sizeConverter = sizeCM => {
-      return sizeCM
-        .split('x')
-        .map(o =>
-          (10 * parseFloat(o.replace('cm', ''))).toString().concat('MM'),
-        )
-        .join('_')
+    const { onPrint } = this.props
+    if (onPrint) {
+      onPrint(copayerId)
     }
-    const { route } = this.props
-    const reportID =
-      REPORT_ID[
-        (route.name === 'copayer'
-          ? 'COPAYER_ADDRESS_LABEL_'
-          : 'SUPPLIER_ADDRESS_LABEL_'
-        ).concat(sizeConverter(labelPrinterSize))
-      ]
-
-    const data = await getRawData(
-      reportID,
-      route.name === 'copayer' ? { copayerId } : { supplierId: copayerId },
-    )
-    const payload = [
-      {
-        ReportId: reportID,
-        ReportData: JSON.stringify({
-          ...data,
-        }),
-      },
-    ]
-    handlePrint(JSON.stringify(payload))
   }
 
   render() {
@@ -121,7 +87,7 @@ class Grid extends PureComponent {
                   { name: 'contactNo', title: 'Contact No.' },
                   { name: 'copayerContactPersonEmail', title: 'Email' },
                   { name: 'url', title: 'Website' },
-                  { name: 'copayerCreditInformation', title: 'Credit Code' },
+                  { name: 'creditFacility', title: 'Credit Facility' },
                   { name: 'isActive', title: 'Status' },
                   { name: 'action', title: 'Action' },
                 ]
@@ -236,20 +202,8 @@ class Grid extends PureComponent {
               },
             },
             {
-              columnName: 'copayerCreditInformation',
-              sortingEnabled: false,
-              render: row => {
-                let cell = <span>-</span>
-                if (row.creditInformation && row.creditInformation !== '') {
-                  cell = (
-                    <Tooltip title={row.creditInformation} placement='top'>
-                      <span>{row.creditInformation}</span>
-                    </Tooltip>
-                  )
-                }
-
-                return cell
-              },
+              columnName: 'creditFacility',
+              sortBy: 'creditFacilityFKNavigation.DisplayValue',
             },
             {
               columnName: 'faxNo',
@@ -391,4 +345,4 @@ class Grid extends PureComponent {
   }
 }
 
-export default withWebSocket()(Grid)
+export default Grid

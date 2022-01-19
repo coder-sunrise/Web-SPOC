@@ -351,15 +351,23 @@ export const menuData = [
            url: '/setting/resource',
          },
          {
-           //  authority: 'settings.clinicsetting.individualcomment',
+           authority: 'settings.clinicsetting.individualcomment',
            title: 'Templates',
            text: 'Individual Comment',
            url: '/setting/individualcomment',
+           hiddenWhenClinicSettingIsOff: 'isEnableMedicalCheckupModule',
          },
          {
-           //  authority: 'settings.clinicsetting.summarycomment',
+           authority: 'settings.clinicsetting.summarycomment',
            title: 'Templates',
            text: 'Summary Comment',
            url: '/setting/summarycomment',
+           hiddenWhenClinicSettingIsOff: 'isEnableMedicalCheckupModule',
+         },
+         {
+           authority: 'settings.clinicsetting.creditfacility',
+           title: 'Clinic Setting',
+           text: 'Credit Facility',
+           url: '/setting/creditfacility',
          },
        ]

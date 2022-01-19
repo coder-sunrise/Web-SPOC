@@ -1,170 +1,52 @@
 import React, { PureComponent } from 'react'
 // formik
-import { Field } from 'formik'
 // umi
 import { formatMessage, FormattedMessage } from 'umi'
 // common components
-import { NumberInput, CommonCard, GridContainer, GridItem } from '@/components'
+import { CommonCard, Tooltip } from '@/components'
 import Authorized from '@/utils/Authorized'
-import FormField from './formField'
+import BasicExaminations from '@/pages/Widgets/VitalSign/BasicExaminations'
 
 class VitalSignCard extends PureComponent {
+  handleCalculateBMI = () => {
+    const { setFieldValue, setFieldTouched, values } = this.props
+    const { heightCM, weightKG } = values.visitBasicExaminations[0]
+    if (heightCM && weightKG) {
+      const heightM = heightCM / 100
+      const bmi = weightKG / heightM ** 2
+      const bmiInTwoDecimal = Math.round(bmi * 100) / 100
+      setFieldValue('visitBasicExaminations[0].bmi', bmiInTwoDecimal)
+    } else {
+      setFieldValue('visitBasicExaminations[0].bmi', null)
+    }
+    setFieldTouched('visitBasicExaminations[0].bmi', true)
+  }
   render() {
     const accessRight = Authorized.check('queue.registervisit.vitalsign')
 
     if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
       return null
-
-    const { handleCalculateBMI, isReadOnly = false } = this.props
+    const { disabled = false, values } = this.props
     return (
       <CommonCard
         title={
           <FormattedMessage id='reception.queue.visitRegistration.vitalSign' />
         }
+        tooltip={
+          disabled
+            ? 'Edit order or edit consultation to update the basic examinations'
+            : ''
+        }
       >
-        <GridContainer>
-          <GridItem xs={12} sm={4} md={3}>
-            <Field
-              name={FormField['vitalsign.temperatureC']}
-              render={args => (
-                <NumberInput
-                  {...args}
-                  format='0.0'
-                  // disabled={isReadOnly}
-                  label={formatMessage({
-                    id: 'reception.queue.visitRegistration.temperature',
-                  })}
-                  suffix={formatMessage({
-                    id: 'reception.queue.visitRegistration.temperature.suffix',
-                  })}
-                  min={0}
-                  max={200}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs={12} sm={4} md={3}>
-            <Field
-              name={FormField['vitalsign.bpSysMMHG']}
-              render={args => (
-                <NumberInput
-                  {...args}
-                  // disabled={isReadOnly}
-                  label='Blood Pressure SYS'
-                  suffix={formatMessage({
-                    id: 'reception.queue.visitRegistration.mmhg',
-                  })}
-                  min={0}
-                  max={999}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs={12} sm={4} md={3}>
-            <Field
-              name={FormField['vitalsign.bpDiaMMHG']}
-              render={args => (
-                <NumberInput
-                  {...args}
-                  // disabled={isReadOnly}
-                  label='Blood Pressure DIA'
-                  suffix={formatMessage({
-                    id: 'reception.queue.visitRegistration.mmhg',
-                  })}
-                  min={0}
-                  max={999}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs={12} sm={4} md={3}>
-            <Field
-              name={FormField['vitalsign.pulseRateBPM']}
-              render={args => (
-                <NumberInput
-                  {...args}
-                  // disabled={isReadOnly}
-                  label={formatMessage({
-                    id: 'reception.queue.visitRegistration.heartRate',
-                  })}
-                  suffix={formatMessage({
-                    id: 'reception.queue.visitRegistration.heartRate.suffix',
-                  })}
-                  min={0}
-                  max={999}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs={12} sm={4} md={3}>
-            <Field
-              name={FormField['vitalsign.weightKG']}
-              render={args => (
-                <NumberInput
-                  {...args}
-                  // disabled={isReadOnly}
-                  format='0.0'
-                  label={formatMessage({
-                    id: 'reception.queue.visitRegistration.weight',
-                  })}
-                  suffix={formatMessage({
-                    id: 'reception.queue.visitRegistration.weight.suffix',
-                  })}
-                  onChange={() => {
-                    setTimeout(() => {
-                      handleCalculateBMI()
-                    }, 1)
-                  }}
-                  min={0}
-                  max={999}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs={12} sm={4} md={3}>
-            <Field
-              name={FormField['vitalsign.heightCM']}
-              render={args => (
-                <NumberInput
-                  {...args}
-                  precision={0}
-                  // disabled={isReadOnly}
-                  label={formatMessage({
-                    id: 'reception.queue.visitRegistration.height',
-                  })}
-                  suffix={formatMessage({
-                    id: 'reception.queue.visitRegistration.height.suffix',
-                  })}
-                  // formatter={(value) => Math.floor(value)}
-                  onChange={() => {
-                    setTimeout(() => {
-                      handleCalculateBMI()
-                    }, 1)
-                  }}
-                  min={0}
-                  max={999}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs={12} sm={4} md={3}>
-            <Field
-              name={FormField['vitalsign.bmi']}
-              render={args => (
-                <NumberInput
-                  {...args}
-                  label={formatMessage({
-                    id: 'reception.queue.visitRegistration.bmi',
-                  })}
-                  suffix={formatMessage({
-                    id: 'reception.queue.visitRegistration.bmi.suffix',
-                  })}
-                  disabled
-                />
-              )}
-            />
-          </GridItem>
-        </GridContainer>
+        <BasicExaminations
+          {...this.props}
+          fieldName={
+            (values.corBasicExaminations || []).length
+              ? 'corBasicExaminations'
+              : 'visitBasicExaminations'
+          }
+          handleCalculateBMI={this.handleCalculateBMI}
+        />
       </CommonCard>
     )
   }

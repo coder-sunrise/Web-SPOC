@@ -20,6 +20,7 @@ import {
   Select,
   reversedDateFormat,
   ProgressButton,
+  VisitTypeSelect,
   Tooltip,
   Checkbox,
 } from '@/components'
@@ -46,6 +47,7 @@ const searchResult = (values, props) => {
     labTrackingStatusFK,
     serviceName,
     searchValue,
+    visitTypeIDs,
   } = values
 
   const visitStartDate =
@@ -60,37 +62,28 @@ const searchResult = (values, props) => {
           .set({ hour: 23, minute: 59, second: 59 })
           .formatUTC(false)
       : undefined
-
-  const payload = IsOverallGrid
-    ? {
-        visitFKNavigation: undefined,
-        lgteql_visitDate: isAllDateChecked
-          ? undefined
-          : visitStartDate || undefined,
-        lsteql_visitDate: isAllDateChecked
-          ? undefined
-          : visitEndDate || undefined,
-        labTrackingStatusFK: labTrackingStatusFK || undefined,
-        apiCriteria: searchValue ? { searchValue } : undefined,
-        serviceName: serviceName || undefined,
-      }
-    : {
-        visitFKNavigation: patientID
-          ? {
-              patientProfileFK: patientID,
-            }
+  const payload = {
+    visitFKNavigation: IsOverallGrid
+      ? undefined
+      : patientID
+      ? {
+          patientProfileFK: patientID,
+        }
+      : undefined,
+    lgteql_visitDate: isAllDateChecked
+      ? undefined
+      : visitStartDate || undefined,
+    lsteql_visitDate: isAllDateChecked ? undefined : visitEndDate || undefined,
+    labTrackingStatusFK: labTrackingStatusFK || undefined,
+    apiCriteria: {
+      searchValue: searchValue ? searchValue : undefined,
+      visitTypeIDs:
+        visitTypeIDs && visitTypeIDs.length > 0
+          ? visitTypeIDs.join(',')
           : undefined,
-        lgteql_visitDate: isAllDateChecked
-          ? undefined
-          : visitStartDate || undefined,
-        lsteql_visitDate: isAllDateChecked
-          ? undefined
-          : visitEndDate || undefined,
-        labTrackingStatusFK: labTrackingStatusFK || undefined,
-        serviceName: serviceName || undefined,
-        apiCriteria: searchValue ? { searchValue } : undefined,
-      }
-
+    },
+    serviceName: serviceName || undefined,
+  }
   dispatch({
     type: 'labTrackingDetails/query',
     payload,
@@ -126,37 +119,46 @@ class FilterBar extends PureComponent {
     return (
       <div>
         <GridContainer>
-          <GridItem md={3}>
-            {IsOverallGrid ? (
+          {IsOverallGrid && (
+            <GridItem md={3} sm={6}>
               <FastField
                 name='searchValue'
                 render={args => (
                   <TextField
                     {...args}
-                    label={formatMessage({
-                      id: 'patient.patientresult.searchValue',
-                    })}
+                    label='Patient Name, Acc. no, Patient Referrence No'
                     autoFocus
                   />
                 )}
               />
-            ) : (
-              <FastField
-                name='serviceName'
-                render={args => (
-                  <TextField
-                    {...args}
-                    label={formatMessage({
-                      id: 'patient.patientresult.serviceName',
-                    })}
-                    autoFocus
-                  />
-                )}
-              />
-            )}
+            </GridItem>
+          )}
+          <GridItem md={2} sm={3}>
+            <FastField
+              name='serviceName'
+              render={args => <TextField {...args} label='Service Name' />}
+            />
           </GridItem>
-          <GridItem md={1} />
-          <GridItem md={3}>
+          <GridItem md={2} sm={3}>
+            <FastField
+              name='visitTypeIDs'
+              render={args => (
+                <Tooltip
+                  placement='right'
+                  title='Select "All" will retrieve active and inactive visit type'
+                >
+                  <VisitTypeSelect
+                    label='Visit Type'
+                    {...args}
+                    mode='multiple'
+                    maxTagPlaceholder='Visit Types'
+                    allowClear={true}
+                  />
+                </Tooltip>
+              )}
+            />
+          </GridItem>
+          <GridItem md={3} sm={4}>
             <Field
               name='visitDate'
               render={args => (
@@ -169,7 +171,7 @@ class FilterBar extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem xs sm={4} md={1}>
+          <GridItem xs sm={2} md={1}>
             <FastField
               name='isAllDateChecked'
               render={args => {
@@ -192,8 +194,7 @@ class FilterBar extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem md={1} />
-          <GridItem md={3}>
+          <GridItem md={2} sm={3}>
             <FastField
               name='labTrackingStatusFK'
               render={args => (
@@ -205,10 +206,11 @@ class FilterBar extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem xs sm={8} md={4}>
+          <GridItem xs sm={3} md={1}>
             <ProgressButton
               icon={<Search />}
               color='primary'
+              style={{ position: 'relative', marginTop: '20px' }}
               size='sm'
               onClick={handleSubmit}
             >

@@ -147,7 +147,7 @@ export const categoryTypes = [
   },
   {
     value: WIDGETS_ID.VITALSIGN,
-    name: 'Vital Sign',
+    name: 'Basic Examinations',
     authority: 'queue.consultation.widgets.vitalsign',
   },
   {
@@ -334,7 +334,7 @@ export const widgets = (
 
   {
     id: WIDGETS_ID.VITALSIGN,
-    name: 'Vital Sign',
+    name: 'Basic Examinations',
     authority: 'queue.consultation.widgets.vitalsign',
     component: Loadable({
       loader: () => import('./VitalSign'),
@@ -437,6 +437,14 @@ export const widgets = (
     }),
   },
 ]
+
+export const inputValue = value => {
+  return value !== undefined && value !== null
+}
+
+export const getHistoryValueForBoolean = value => {
+  return inputValue(value) ? (value ? 'Yes' : 'No') : '-'
+}
 
 const checkNote = (widgetId, current) => {
   const notesType = notesTypes.find(type => type.value === widgetId)
@@ -588,8 +596,29 @@ export const showWidget = (current, widgetId, selectNoteTypes = []) => {
   // check show vital sign
   if (
     widgetId === WIDGETS_ID.VITALSIGN &&
-    (!current.patientNoteVitalSigns ||
-      current.patientNoteVitalSigns.length === 0)
+    !(current.patientNoteVitalSigns || []).find(
+      row =>
+        inputValue(row.temperatureC) ||
+        inputValue(row.bpSysMMHG) ||
+        inputValue(row.bpDiaMMHG) ||
+        inputValue(row.pulseRateBPM) ||
+        inputValue(row.saO2) ||
+        inputValue(row.weightKG) ||
+        inputValue(row.heightCM) ||
+        inputValue(row.bmi) ||
+        inputValue(row.bodyFatPercentage) ||
+        inputValue(row.degreeOfObesity) ||
+        inputValue(row.headCircumference) ||
+        inputValue(row.chestCircumference) ||
+        inputValue(row.waistCircumference) ||
+        inputValue(row.isPregnancy) ||
+        inputValue(row.hepetitisVaccinationA) ||
+        inputValue(row.hepetitisVaccinationB) ||
+        inputValue(row.isFasting) ||
+        inputValue(row.isSmoking) ||
+        inputValue(row.isAlcohol) ||
+        inputValue(row.isMensus),
+    )
   )
     return false
   // check show visit referral

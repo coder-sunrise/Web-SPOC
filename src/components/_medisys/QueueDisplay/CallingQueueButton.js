@@ -26,8 +26,7 @@ const CallingQueueButton = ({
   from,
   queueCalling: { oriQCallList = [], lastUpdateDate, tracker, ...restValues },
 }) => {
-  // console.log({ qId })
-  const qNo = qId.includes('.0') ? qId.replace('.0', '') : qId
+  const qNo = qId.toString().includes('.0') ? qId.replace('.0', '') : qId
   const roomCode = localStorage.getItem('roomCode')
   const [disable, setDisable] = useState(false)
 

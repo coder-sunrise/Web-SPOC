@@ -480,12 +480,12 @@ const CalendarView = ({
         .format(timeFormat24Hour)
       for (let index = 0; index < dailyCapacity.length; index++) {
         if (
-          ((startTime < dailyCapacity[index].startTime &&
-            endTime < dailyCapacity[index].endTime) ||
-            (startTime >= dailyCapacity[index].startTime &&
-              startTime < dailyCapacity[index].endTime) ||
+          ((startTime >= dailyCapacity[index].startTime &&
+            startTime < dailyCapacity[index].endTime) ||
             (endTime > dailyCapacity[index].startTime &&
-              endTime <= dailyCapacity[index].endTime)) &&
+              endTime <= dailyCapacity[index].endTime) ||
+            (startTime < dailyCapacity[index].startTime &&
+              endTime > dailyCapacity[index].endTime)) &&
           dailyCapacity[index].maxCapacity <= dailyCapacity[index].usedSlot
         ) {
           dispatch({

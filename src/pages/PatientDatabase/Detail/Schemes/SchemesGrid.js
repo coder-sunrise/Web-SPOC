@@ -1,12 +1,23 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
-import { CodeSelect, EditableTableGrid, notification } from '@/components'
+import {
+  CodeSelect,
+  EditableTableGrid,
+  notification,
+  Popconfirm,
+  Button,
+} from '@/components'
 import Authorized from '@/utils/Authorized'
 
 import { getCodes } from '@/utils/codetable'
 import { SCHEME_TYPE } from '@/utils/constants'
 import codetable from '@/models/codetable'
+import Delete from '@material-ui/icons/Delete'
+import Print from '@material-ui/icons/Print'
+import withWebSocket from '@/components/Decorator/withWebSocket'
+import { getRawData } from '@/services/report'
+import { REPORT_ID } from '@/utils/constants'
 
 // let schemeTypes = []
 // getCodes('ctSchemeType').then((codetableData) => {
@@ -35,6 +46,7 @@ class SchemesGrid extends PureComponent {
         { name: 'coPaymentSchemeFK', title: 'Scheme Name' },
         { name: 'accountNumber', title: 'Account Number' },
         { name: 'validRange', title: 'Valid Period' },
+        { name: 'action', title: 'Action' },
       ],
       columnExtensions: [
         {
@@ -67,6 +79,7 @@ class SchemesGrid extends PureComponent {
 
             if (row.coPaymentSchemeFK) {
               row.coPaymentSchemeFK = null
+              row.copayerFK = null
             }
 
             const st = ctSchemeTypes.find(o => o.id === val)
@@ -199,7 +212,7 @@ class SchemesGrid extends PureComponent {
             const patCoPaymentScheme = copaymentscheme.find(
               item => item.id === row.coPaymentSchemeFK,
             )
-
+            row.copayerFK = option.copayerFK
             if (!patCoPaymentScheme.isActive) {
               row.coPaymentSchemeFK = undefined
               notification.error({
@@ -213,6 +226,51 @@ class SchemesGrid extends PureComponent {
           sortingEnabled: false,
           isDisabled: row => {
             return !this.isCorporate(row)
+          },
+        },
+        {
+          columnName: 'action',
+          width: 90,
+          isReactComponent: true,
+          sortingEnabled: false,
+          isDisabled: row => true,
+          render: e => {
+            const { row, columnConfig } = e
+            const { control } = columnConfig
+            const { commitChanges } = control
+            return (
+              <Fragment>
+                <Popconfirm
+                  title='Confirm to delete?'
+                  onConfirm={() => {
+                    commitChanges({
+                      changed: {
+                        [row.id]: {
+                          isDeleted: true,
+                        },
+                      },
+                    })
+                  }}
+                >
+                  <Button size='sm' justIcon color='danger'>
+                    <Delete />
+                  </Button>
+                </Popconfirm>
+                <Button
+                  size='sm'
+                  justIcon
+                  color='primary'
+                  disabled={!row.copayerFK}
+                >
+                  <Print
+                    onClick={() => {
+                      console.log(row)
+                      this.printLabel(row.copayerFK)
+                    }}
+                  />
+                </Button>
+              </Fragment>
+            )
           },
         },
       ],
@@ -349,12 +407,45 @@ class SchemesGrid extends PureComponent {
     setFieldValue('patientScheme', newRows)
   }
 
+  printLabel = async copayerId => {
+    if (!Number.isInteger(copayerId)) return
+
+    const { handlePrint, clinicSettings } = this.props
+    const { labelPrinterSize } = clinicSettings.settings
+
+    const sizeConverter = sizeCM => {
+      return sizeCM
+        .split('x')
+        .map(o =>
+          (10 * parseFloat(o.replace('cm', ''))).toString().concat('MM'),
+        )
+        .join('_')
+    }
+    const { values } = this.props
+    const reportID =
+      REPORT_ID[
+        'COPAYER_ADDRESS_LABEL_'.concat(sizeConverter(labelPrinterSize))
+      ]
+    const data = await getRawData(reportID, {
+      copayerId,
+      patientprofileid: values.id,
+    })
+    const payload = [
+      {
+        ReportId: reportID,
+        ReportData: JSON.stringify({
+          ...data,
+        }),
+      },
+    ]
+    handlePrint(JSON.stringify(payload))
+  }
   render() {
     const { editingRowIds, rowChanges } = this.state
     const { type, rows, schema, errors } = this.props
     const EditingProps = {
       showAddCommand: true,
-
+      showCommandColumn: false,
       onCommitChanges: this.commitChanges,
     }
     return (
@@ -371,4 +462,4 @@ class SchemesGrid extends PureComponent {
   }
 }
 
-export default SchemesGrid
+export default withWebSocket()(SchemesGrid)

@@ -90,16 +90,14 @@ const ReportLayoutWrapper = ({
                 <Menu.Item
                   key='export-excel'
                   disabled={!loaded || isExporting}
-                  id='excel'
+                  id='Excel'
                   onClick={onExportExcelClick}
                 >
                   <span>Excel</span>
                 </Menu.Item>
               </Menu>
             }
-            trigger={[
-              'click',
-            ]}
+            trigger={['click']}
           >
             <Button color='info' size='sm' disabled={!loaded || isExporting}>
               <SolidExpandMore />
