@@ -82,7 +82,9 @@ class Supplier extends PureComponent {
       route.name === 'copayer'
         ? {
             copayerId,
-            contactPersonName: contactPersonName ? contactPersonName : '',
+            contactPersonName: contactPersonName
+              ? contactPersonName
+              : undefined,
           }
         : { supplierId: copayerId },
     )
