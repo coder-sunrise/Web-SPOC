@@ -1,5 +1,6 @@
 import moment from 'moment'
 import { serverDateFormat } from '@/utils/format'
+import { AGETYPE } from '@/utils/constants'
 
 export const formatDateToText = (value = undefined, parseFormat) => {
   if (moment.isMoment(value)) return value.format(serverDateFormat)
@@ -24,4 +25,12 @@ export const formatDatesToUTC = dates => {
   }
 
   return []
+}
+
+export const calculateAgeType = (dob, date) => {
+  const year = Math.floor(moment.duration(moment(date).diff(dob)).asYears())
+  if (year >= 16) return AGETYPE.ADULT
+  if (year >= 6) return AGETYPE.YOUTH
+  const month = Math.floor(moment.duration(moment(date).diff(dob)).asMonths())
+  if (month >= 3) return AGETYPE.CHILD
 }

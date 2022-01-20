@@ -1,6 +1,7 @@
 import React, { PureComponent, useState } from 'react'
 // formik
 import { FastField, Field } from 'formik'
+import _ from 'lodash'
 import $ from 'jquery'
 // umi
 import { formatMessage, FormattedMessage } from 'umi'
@@ -59,6 +60,8 @@ class BasicExaminations extends PureComponent {
       arrayHelpers,
       fieldName = 'corPatientNoteVitalSign',
       patientInfo,
+      calculateStandardWeight,
+      calculateBodyFatMass,
     } = this.props
     const setFieldValue = arrayHelpers
       ? arrayHelpers.form.setFieldValue
@@ -179,6 +182,7 @@ class BasicExaminations extends PureComponent {
                       setFieldValue(`${fieldName}[0].weightKG`, e.target.value)
                       setTimeout(() => {
                         handleCalculateBMI()
+                        calculateBodyFatMass()
                       }, 1)
                       weightOnChange()
                     }}
@@ -201,6 +205,7 @@ class BasicExaminations extends PureComponent {
                     onChange={e => {
                       setTimeout(() => {
                         handleCalculateBMI()
+                        calculateStandardWeight()
                       }, 1)
                     }}
                   />
@@ -245,6 +250,11 @@ class BasicExaminations extends PureComponent {
                       id:
                         'reception.queue.visitRegistration.bodyFatPercentage.suffix',
                     })}
+                    onChange={async e => {
+                      setTimeout(() => {
+                        calculateBodyFatMass()
+                      }, 1)
+                    }}
                   />
                 )}
               />
