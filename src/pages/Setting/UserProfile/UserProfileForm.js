@@ -231,6 +231,10 @@ class UserProfileForm extends React.PureComponent {
     canEditDoctorMCR: false,
   }
 
+  componentDidMount() {
+    this.onRoleChange(this.props?.values?.role)
+  }
+
   toggleChangePasswordModal = () => {
     this.setState(preState => ({
       showChangePassword: !preState.showChangePassword,
@@ -246,7 +250,6 @@ class UserProfileForm extends React.PureComponent {
   onRoleChange = value => {
     const { ctRole, setFieldValue } = this.props
     const role = ctRole.find(item => item.id === value)
-
     this.setState({
       canEditDoctorMCR:
         role !== undefined &&
@@ -492,7 +495,10 @@ class UserProfileForm extends React.PureComponent {
                         label='User Group'
                         code='role'
                         localFilter={item => {
-                          if (_oldRole && currentClinicalRole?.clinicalRoleName === 'Doctor') {
+                          if (
+                            _oldRole &&
+                            currentClinicalRole?.clinicalRoleName === 'Doctor'
+                          ) {
                             return (
                               item.clinicalRoleName ===
                               currentClinicalRole?.clinicalRoleName
@@ -507,11 +513,13 @@ class UserProfileForm extends React.PureComponent {
                   />
                 </GridItem>
                 <GridItem md={6}>
-                  {_oldRole && currentClinicalRole?.clinicalRoleName === 'Doctor' && (
-                    <div style={{ marginTop :20 }}>
-                      Current user can switch to any user group under doctor clinical role
-                    </div>
-                  )}
+                  {_oldRole &&
+                    currentClinicalRole?.clinicalRoleName === 'Doctor' && (
+                      <div style={{ marginTop: 20 }}>
+                        Current user can switch to any user group under doctor
+                        clinical role
+                      </div>
+                    )}
                 </GridItem>
               </GridContainer>
 
@@ -545,11 +553,7 @@ class UserProfileForm extends React.PureComponent {
                   <FastField
                     name='userAccountNo'
                     render={args => (
-                      <TextField
-                        {...args}
-                        label='User Account No.'
-                        disabled={isEdit}
-                      />
+                      <TextField {...args} label='User Account No.' />
                     )}
                   />
                 </GridItem>
