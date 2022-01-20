@@ -104,6 +104,7 @@ class FilterBar extends PureComponent {
           .add(-1, 'd')
           .toDate(),
       ])
+      setFieldValue('visitTypeIDs', [-99] )
     }, 1)
   }
 
@@ -142,6 +143,7 @@ class FilterBar extends PureComponent {
           <GridItem md={2} sm={3}>
             <FastField
               name='visitTypeIDs'
+              initialValue={[-99]}
               render={args => (
                 <Tooltip
                   placement='right'
@@ -151,6 +153,7 @@ class FilterBar extends PureComponent {
                     label='Visit Type'
                     {...args}
                     mode='multiple'
+                    maxTagCount={0}
                     maxTagPlaceholder='Visit Types'
                     allowClear={true}
                   />
