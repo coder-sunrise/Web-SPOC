@@ -398,8 +398,10 @@ export default compose(
         isDisplayInLeaflet,
         isOnlyClinicInternalUsage,
         inventoryMedication_MedicationIngredient,
+        inventoryMedication_MedicationGroup,
         inventoryMedication_MedicationSideEffect,
         inventoryMedication_MedicationPrecaution,
+        inventoryMedication_Medication,
         inventoryMedication_MedicationContraIndication,
         inventoryMedication_MedicationInteraction,
         inventoryMedication_DrugAllergy,
@@ -439,9 +441,9 @@ export default compose(
           'indication',
         )
 
-      let medicationIngredients = inventoryMedication_MedicationIngredient?.map(
-        item => item.medicationIngredientFK,
-      )
+      let medicationIngredients = inventoryMedication_MedicationIngredient
+        ?.sort(item => item.sequence)
+        .map(item => item.medicationIngredientFK)
 
       let drugAllergies = inventoryMedication_DrugAllergy?.map(
         item => item.drugAllergyFK,
@@ -462,10 +464,15 @@ export default compose(
       let medicationInteractions = inventoryMedication_MedicationInteraction
         ?.sort(item => item.sequence)
         .map(item => item.medicationInteractionFK)
+ 
+      let medicationGroups = inventoryMedication_MedicationGroup
+        ?.sort(item => item.sequence)
+        .map(item => item.medicationGroupFK)
 
       return {
         ...medicationDetails,
         medicationIngredients,
+        medicationGroups,
         drugAllergies,
         medicationSideEffects,
         medicationPrecautions,
@@ -548,6 +555,7 @@ export default compose(
         effectiveDates,
         attachment,
         medicationIngredients = [],
+        medicationGroups = [],
         medicationSideEffects = [],
         medicationPrecautions = [],
         medicationInteractions = [],
@@ -594,19 +602,15 @@ export default compose(
         fileInfo.fileName = newAttach?.fileName
       }
 
-      let medicationIngredientList = undefined
-      const allOptionId = -99
-
+      let medicationIngredientList = undefined 
       if (medicationIngredients) {
-        medicationIngredientList = medicationIngredients
-          .filter(m => m !== allOptionId)
-          .map((m, index) => {
-            return {
-              medicationIngredientFK: m,
-              inventoryMedicationFK: id,
-              sequence: index + 1,
-            }
-          })
+        medicationIngredientList = medicationIngredients.map((item, index) => {
+          return {
+            medicationIngredientFK: item,
+            sequence: index,
+            inventoryMedicationFK: id,
+          }
+        }) 
       }
 
       let drugAllergyList = undefined
@@ -634,6 +638,17 @@ export default compose(
         precautionList = medicationPrecautions.map((item, index) => {
           return {
             medicationPrecautionFK: item,
+            sequence: index,
+            inventoryMedicationFK: id,
+          }
+        })
+      }
+
+      let groupList = undefined
+      if (medicationGroups) {
+        groupList = medicationGroups.map((item, index) => {
+          return {
+            medicationGroupFK: item,
             sequence: index,
             inventoryMedicationFK: id,
           }
@@ -702,6 +717,7 @@ export default compose(
         medicationStock: defaultMedicationStock,
         suggestSellingPrice: roundTo(restValues.suggestSellingPrice),
         inventoryMedication_MedicationIngredient: medicationIngredientList,
+        inventoryMedication_MedicationGroup: groupList,
         inventoryMedication_MedicationSideEffect: sideEffectList,
         inventoryMedication_MedicationPrecaution: precautionList,
         inventoryMedication_MedicationContraIndication: contraIndicationList,

@@ -11,6 +11,7 @@ import Detail from './Detail'
 import FilterBar from './FilterBar'
 import OverallGrid from './OverallGrid'
 import PatientGrid from './PatientGrid'
+import clinicSettings from '@/models/clinicSettings'
 // import model from './models'
 
 // window.g_app.replaceModel(model)
@@ -33,9 +34,14 @@ const styles = theme => ({
   mainDivHeight: global.mainDivHeight,
 }))
 class LabTrackingDetails extends PureComponent {
+  constructor(props) {
+    super(props)
+    this.state = {
+      visitPurpose: JSON.parse(props.clinicSettings.visitTypeSetting),
+    }
+  }
   componentDidMount() {
     const { dispatch } = this.props
-
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
@@ -59,7 +65,6 @@ class LabTrackingDetails extends PureComponent {
       },
     })
   }
-
   handlePrintClick = async row => {
     const { clinicSettings, handlePrint } = this.props
     const { labelPrinterSize } = clinicSettings
@@ -126,11 +131,17 @@ class LabTrackingDetails extends PureComponent {
 
         <div style={{ margin: 10 }}>
           {IsOverallGrid ? (
-            <OverallGrid dispatch={dispatch} {...cfg} {...this.props} />
+            <OverallGrid
+              dispatch={dispatch}
+              {...cfg}
+              visitPurpose={this.state.visitPurpose}
+              {...this.props}
+            />
           ) : (
             <PatientGrid
               readOnly={isPatientInactive}
               dispatch={dispatch}
+              visitPurpose={this.state.visitPurpose}
               {...cfg}
               {...this.props}
             />
@@ -138,7 +149,7 @@ class LabTrackingDetails extends PureComponent {
         </div>
         <CommonModal
           open={labTrackingDetails.showModal}
-          title='Edit Lab Tracking / Results'
+          title='Edit External Tracking / Results'
           observe='LabResultsDetail'
           maxWidth='md'
           bodyNoPadding

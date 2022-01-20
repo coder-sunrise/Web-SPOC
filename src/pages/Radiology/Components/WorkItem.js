@@ -21,7 +21,6 @@ import CombinedOrderIcon from './CombinedOrderIcon'
 import VisitGroupIcon from './VisitGroupIcon'
 import ModalityStatusIcon from './ModalityStatusIcon'
 import { CallingQueueButton } from '@/components/_medisys'
-
 const blueColor = '#1890f8'
 const statusUpdateDateTooltip = {
   1: '', //No tooltip is needed as new status only have order create date.
@@ -146,8 +145,7 @@ const WorkitemBody = ({ item }) => {
   const queueNo =
     !item.visitInfo.queueNo || !item.visitInfo.queueNo.trim().length
       ? '-'
-      : numeral(item.visitInfo.queueNo).format(isQueueNoDecimal ? '0.0' : '0')
-
+      : item.visitInfo.queueNo
   const doctorName = getNameWithTitle(
     visitInfo.doctorTitle,
     visitInfo.doctorName,

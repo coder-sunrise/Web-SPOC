@@ -294,7 +294,8 @@ export const General = props => {
                 label='Credit Facility'
                 code='ctcreditfacility'
                 autocomplete='off'
-                orderBy={['displayValue', 'asc']}
+                tooltipField='description'
+                orderBy={(['displayValue'], ['asc'])}
                 {...args}
               />
             )}

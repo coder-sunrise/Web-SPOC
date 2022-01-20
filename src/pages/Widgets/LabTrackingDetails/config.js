@@ -7,35 +7,35 @@ export const WIDGETS_ID = {
 }
 
 export const widgets = (props, setShowMessage) => [
-  {
-    id: WIDGETS_ID.LAB_TRACKING_DETAILS,
-    name: 'Lab Tracking Details',
-    component: Loadable({
-      loader: () => import('./LabDetails'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return (
-          <Cmpnet
-            {...props}
-            {...p}
-            setShowMessage={setShowMessage}
-            fieldName='LabDetails'
-          />
-        )
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: WIDGETS_ID.LAB_RESULTS,
-    name: 'Lab Results',
-    component: Loadable({
-      loader: () => import('./LabResult'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='LabResult' />
-      },
-      loading: Loading,
-    }),
-  },
-]
+         {
+           id: WIDGETS_ID.LAB_TRACKING_DETAILS,
+           name: 'External Tracking Details',
+           component: Loadable({
+             loader: () => import('./LabDetails'),
+             render: (loaded, p) => {
+               let Cmpnet = loaded.default
+               return (
+                 <Cmpnet
+                   {...props}
+                   {...p}
+                   setShowMessage={setShowMessage}
+                   fieldName='LabDetails'
+                 />
+               )
+             },
+             loading: Loading,
+           }),
+         },
+         {
+           id: WIDGETS_ID.LAB_RESULTS,
+           name: 'Lab Results',
+           component: Loadable({
+             loader: () => import('./LabResult'),
+             render: (loaded, p) => {
+               let Cmpnet = loaded.default
+               return <Cmpnet {...props} {...p} fieldName='LabResult' />
+             },
+             loading: Loading,
+           }),
+         },
+       ]
