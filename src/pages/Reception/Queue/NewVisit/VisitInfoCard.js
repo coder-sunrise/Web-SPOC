@@ -243,7 +243,6 @@ const VisitInfoCard = ({
     visitTypeSetting,
     isQueueNoDecimal,
   } = clinicSettings.settings
-
   let visitTypeSettingsObj = undefined
   let visitPurpose = undefined
   if (visitTypeSetting) {
@@ -356,7 +355,7 @@ const VisitInfoCard = ({
                   const isNaN = Number.isNaN(parseFloat(value))
                   return isNaN
                     ? value
-                    : roundTo(parseFloat(value), isQueueNoDecimal ? 1 : 0)
+                    : parseFloat(value).toFixed(isQueueNoDecimal ? 1 : 0)
                 }}
               />
             )}
