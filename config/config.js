@@ -99,7 +99,7 @@ export default defineConfig({
   },
   proxy: {
     '/api/': {
-      target: 'https://semr2dev2010.emr.com.sg/api/',
+      target: '',
       changeOrigin: true,
     },
   },

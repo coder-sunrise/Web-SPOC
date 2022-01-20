@@ -1,5 +1,6 @@
 // https://umijs.org/config/
 import os from 'os'
+
 import { defineConfig } from 'umi'
 import pageRoutes from './router.config'
 import webpackPlugin from './plugin.config'
@@ -11,9 +12,6 @@ const plugins = {
   dva: {
     hmr: true,
     skipModelValidate: true,
-  },
-  targets: {
-    ie: 11,
   },
   // layout: {
   //   // https://umijs.org/zh-CN/plugins/plugin-layout
@@ -62,15 +60,14 @@ export default defineConfig({
   targets: {
     ie: 11,
   },
+  title: false,
   hash: true,
   define: {
     APP_TYPE: process.env.APP_TYPE || '',
-    'process.env.client_env': 'uat',
-    'process.env.client_secret':
-      '20e392d2ea9bfa76f2a9cb26c31a34d675ad81281a31f89ed5d572de8da0b9e7',
-    'process.env.url': 'https://jgh-uat-api-211028.semr2.com',
-    'process.env.signalrUrl':
-      'https://medicloud-uat-websocket-200729.semr2.com/notificationHub',
+    'process.env.client_env': '{environment}',
+    'process.env.client_secret': '{client_secret}',
+    'process.env.url': '{url}',
+    'process.env.signalrUrl': '{signalr_url}',
   },
   // 路由配置
   routes: pageRoutes,
@@ -83,6 +80,9 @@ export default defineConfig({
     'border-radius-base': '3px',
     'border-radius-sm': '2px',
     'component-background': 'white',
+    // 'font-size-base': '1rem',
+    // 'font-size-lg': '1.2rem',
+    // 'font-size-sm': '0.9rem',
     'zindex-popoconfirm': '2000',
     'zindex-notification': '2010',
     'zindex-message': '2010',
@@ -96,7 +96,7 @@ export default defineConfig({
   },
   proxy: {
     '/api/': {
-      target: 'https://semr2uat2010.emr.com.sg/api/',
+      target: '',
       changeOrigin: true,
     },
   },
