@@ -402,16 +402,23 @@ const getVisitDoctorUserId = props => {
           } else {
             nextStepdose = ''
           }
-
-          const itemDuration = item.duration
-            ? ` For ${item.duration} day(s)`
-            : ''
-
-          instruction += `${getTranslationValue(
-            usage?.translationData,
-            language,
-            'displayValue',
-          )} ${getTranslationValue(
+          let itemDuration = item.duration ? ` For ${item.duration} day(s)` : ''
+          let separator = nextStepdose
+          if (language === 'JP') {
+            separator = nextStepdose === '' ? '<br>' : ''
+            itemDuration = item.duration ? `${item.duration} 日分` : ''
+          }
+          let usagePrefix = ''
+          if (language === 'JP' && item.dosageFK) {
+            usagePrefix = '1回'
+          } else {
+            usagePrefix = getTranslationValue(
+              usage?.translationData,
+              language,
+              'displayValue',
+            )
+          }
+          instruction += `${usagePrefix} ${getTranslationValue(
             dosage?.translationData,
             language,
             'displayValue',
@@ -423,7 +430,7 @@ const getVisitDoctorUserId = props => {
             frequency?.translationData,
             language,
             'displayValue',
-          )}${itemDuration}${nextStepdose}`
+          )}${itemDuration}${separator}`
         }
       }
       return instruction
