@@ -10,7 +10,8 @@ pool:
 
 variables:
   #override the npm_config_cache environment variable to the custom path
-  npm_config_cache: $(Build.SourcesDirectory)/node_modules
+  - name: npm_config_cache
+    value: $(Build.SourcesDirectory)/node_modules
   - group: ui-uat-variable
 
 jobs:
