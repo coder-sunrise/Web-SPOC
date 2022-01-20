@@ -32,7 +32,7 @@ jobs:
 
       - script: dir & copy "config\config.template.js" "config\config.js" /Y
         displayName: 'Copy template config to config file'
-      
+
       - powershell: |
           ((Get-Content -path config\config.js -Raw) -replace '{environment}',$env:environment) | Set-Content -Path config\config.js
           ((Get-Content -path config\config.js -Raw) -replace '{client_secret}',$env:client_secret) | Set-Content -Path config\config.js
@@ -40,7 +40,7 @@ jobs:
           ((Get-Content -path config\config.js -Raw) -replace '{environment_url}',$env:environment_url) | Set-Content -Path config\config.js
           (Get-Content -path config\config.js -Raw)
         env:
-          environment: $(process.env.client_env) 
+          environment: $(process.env.client_env)
           client_secret: $(process.env.client_secret)
           signalR_url: $(process.env.signalrUrl)
           environment_url: $(process.env.url)
