@@ -28,7 +28,11 @@ import {
   MobileNumberInput,
 } from '@/components/_medisys'
 // utils
-import { NOTIFICATION_TYPE, NOTIFICATION_STATUS, CLINICAL_ROLE } from '@/utils/constants'
+import {
+  NOTIFICATION_TYPE,
+  NOTIFICATION_STATUS,
+  CLINICAL_ROLE,
+} from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
 import * as queueServices from '@/services/queue'
 import clinicServices from '@/services/clinicInfo'
@@ -228,11 +232,6 @@ class UserProfileForm extends React.PureComponent {
     showActiveSessionWarning: false,
     showChangePassword: false,
     showPrimaryClinicianChanges: false,
-    canEditDoctorMCR: false,
-  }
-
-  componentDidMount() {
-    this.onRoleChange(this.props?.values?.role)
   }
 
   toggleChangePasswordModal = () => {
@@ -245,17 +244,6 @@ class UserProfileForm extends React.PureComponent {
     this.setState(preState => ({
       showPrimaryClinicianChanges: !preState.showPrimaryClinicianChanges,
     }))
-  }
-
-  onRoleChange = value => {
-    const { ctRole, setFieldValue } = this.props
-    const role = ctRole.find(item => item.id === value)
-    this.setState({
-      canEditDoctorMCR:
-        role !== undefined &&
-        (role.clinicalRoleName === 'Doctor' ||
-          role.clinicalRoleName === 'Doctor Owner'),
-    })
   }
 
   promptPrimaryClinicianChanges = currentPrimaryRegisteredDoctorFK => {
@@ -372,7 +360,6 @@ class UserProfileForm extends React.PureComponent {
     const {
       currentPrimaryRegisteredDoctorFK,
       showChangePassword,
-      canEditDoctorMCR,
       showPrimaryClinicianChanges,
       showActiveSessionWarning,
       isValidating,
@@ -385,8 +372,12 @@ class UserProfileForm extends React.PureComponent {
       userProfile: { role = [] },
       _oldRole,
     } = values
-    const currentClinicalRole = ctRole?.find(item => item.id === role.id)
-
+    const currentClinicalRole = ctRole?.find(
+      item => item.id === (values.role || role.id),
+    )
+    const canEditDoctorMCR =
+      currentClinicalRole !== undefined &&
+      currentClinicalRole.clinicalRoleName === 'Doctor'
     return (
       <LoadingWrapper loading={isValidating}>
         <React.Fragment>
@@ -507,7 +498,6 @@ class UserProfileForm extends React.PureComponent {
                           return item
                         }}
                         disabled={isMyAccount}
-                        onChange={this.onRoleChange}
                       />
                     )}
                   />
@@ -553,7 +543,11 @@ class UserProfileForm extends React.PureComponent {
                   <FastField
                     name='userAccountNo'
                     render={args => (
-                      <TextField {...args} label='User Account No.' />
+                      <TextField
+                        {...args}
+                        label='User Account No.'
+                        disabled={isEdit}
+                      />
                     )}
                   />
                 </GridItem>
