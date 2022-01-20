@@ -1211,6 +1211,8 @@ class PatientHistory extends Component {
     let orders = []
     let consultationDocument = []
     let doctorNote = []
+    let corEyeExaminations = []
+    let corAudiometryTest = []
 
     loadVisits
       .filter(visit => selectItems.find(item => item === visit.currentId))
@@ -1311,7 +1313,18 @@ class PatientHistory extends Component {
           visitPurposeFK,
           isNurseNote,
         )
-
+        const isShowJGHEyeExaminations = this.checkShowData(
+          WidgetConfig.WIDGETS_ID.EYEEXAMINATIONS,
+          current,
+          visitPurposeFK,
+          isNurseNote,
+        )
+        const isShowAudiometryTest = this.checkShowData(
+          WidgetConfig.WIDGETS_ID.AUDIOMETRYTEST,
+          current,
+          visitPurposeFK,
+          isNurseNote,
+        )
         if (
           isNurseNote ||
           isShowDoctorNote ||
@@ -1324,7 +1337,9 @@ class PatientHistory extends Component {
           isShowEyeExaminations ||
           isShowBasicExaminations ||
           isShowOrders ||
-          isShowConsultationDocument
+          isShowConsultationDocument ||
+          isShowJGHEyeExaminations ||
+          isShowAudiometryTest
         ) {
           let referral = { isShowReferral: false }
           if (isShowReferral) {
@@ -1382,6 +1397,8 @@ class PatientHistory extends Component {
             isShowBasicExaminationsOther2: this.showBasicExaminationsOther2(
               current.patientNoteVitalSigns,
             ),
+            isShowJGHEyeExaminations,
+            isShowAudiometryTest,
           })
 
           // treatment
@@ -1524,6 +1541,113 @@ class PatientHistory extends Component {
             )
           }
 
+          // JGH Eye Examinations
+          if (isShowJGHEyeExaminations) {
+            corEyeExaminations = corEyeExaminations.concat(
+              current.corEyeExaminations.map(o => {
+                return {
+                  visitFK: current.currentId,
+                  visionCorrectionMethod: o.visionCorrectionMethod || '',
+                  rightBareEye5: WidgetConfig.inputValue(o.rightBareEye5)
+                    ? `${numeral(o.rightBareEye5).format('0.0')}`
+                    : '-',
+                  rightCorrectedVision5: WidgetConfig.inputValue(
+                    o.rightCorrectedVision5,
+                  )
+                    ? `${numeral(o.rightCorrectedVision5).format('0.0')}`
+                    : '-',
+                  rightBareEye50: WidgetConfig.inputValue(o.rightBareEye50)
+                    ? `${numeral(o.rightBareEye50).format('0.0')}`
+                    : '-',
+                  rightCorrectedVision50: WidgetConfig.inputValue(
+                    o.rightCorrectedVision50,
+                  )
+                    ? `${numeral(o.rightCorrectedVision50).format('0.0')}`
+                    : '-',
+                  leftBareEye5: WidgetConfig.inputValue(o.leftBareEye5)
+                    ? `${numeral(o.leftBareEye5).format('0.0')}`
+                    : '-',
+                  leftCorrectedVision5: WidgetConfig.inputValue(
+                    o.leftCorrectedVision5,
+                  )
+                    ? `${numeral(o.leftCorrectedVision5).format('0.0')}`
+                    : '-',
+                  leftBareEye50: WidgetConfig.inputValue(o.leftBareEye50)
+                    ? `${numeral(o.leftBareEye50).format('0.0')}`
+                    : '-',
+                  leftCorrectedVision50: WidgetConfig.inputValue(
+                    o.leftCorrectedVision50,
+                  )
+                    ? `${numeral(o.leftCorrectedVision50).format('0.0')}`
+                    : '-',
+                  rightFirstResult: WidgetConfig.inputValue(o.rightFirstResult)
+                    ? `${o.rightFirstResult}`
+                    : '-',
+                  rightSecondResult: WidgetConfig.inputValue(
+                    o.rightSecondResult,
+                  )
+                    ? `${o.rightSecondResult}`
+                    : '-',
+                  rightThirdResult: WidgetConfig.inputValue(o.rightThirdResult)
+                    ? `${o.rightThirdResult}`
+                    : '-',
+                  rightAverageResult: WidgetConfig.inputValue(
+                    o.rightAverageResult,
+                  )
+                    ? `${numeral(o.rightAverageResult).format('0.0')}`
+                    : '-',
+                  leftFirstResult: WidgetConfig.inputValue(o.leftFirstResult)
+                    ? `${o.leftFirstResult}`
+                    : '-',
+                  leftSecondResult: WidgetConfig.inputValue(o.leftSecondResult)
+                    ? `${o.leftSecondResult}`
+                    : '-',
+                  leftThirdResult: WidgetConfig.inputValue(o.leftThirdResult)
+                    ? `${o.leftThirdResult}`
+                    : '-',
+                  leftAverageResult: WidgetConfig.inputValue(
+                    o.leftAverageResult,
+                  )
+                    ? `${numeral(o.leftAverageResult).format('0.0')}`
+                    : '-',
+                  colorVisionTestResult: o.colorVisionTestResult || '',
+                  remarks:
+                    WidgetConfig.inputValue(o.remarks) &&
+                    o.remarks.trim().length
+                      ? o.remarks
+                      : '-',
+                }
+              }),
+            )
+          }
+
+          //  Audiometry Test
+          if (isShowAudiometryTest) {
+            corAudiometryTest = corAudiometryTest.concat(
+              current.corAudiometryTest.map(o => {
+                return {
+                  visitFK: current.currentId,
+                  rightResult1000Hz: WidgetConfig.inputValue(
+                    o.rightResult1000Hz,
+                  )
+                    ? `${o.rightResult1000Hz} dB`
+                    : '-',
+                  rightResult4000Hz: WidgetConfig.inputValue(
+                    o.rightResult4000Hz,
+                  )
+                    ? `${o.rightResult4000Hz} dB`
+                    : '-',
+                  leftResult1000Hz: WidgetConfig.inputValue(o.leftResult1000Hz)
+                    ? `${o.leftResult1000Hz} dB`
+                    : '-',
+                  leftResult4000Hz: WidgetConfig.inputValue(o.leftResult4000Hz)
+                    ? `${o.leftResult4000Hz} dB`
+                    : '-',
+                }
+              }),
+            )
+          }
+
           // orders
           if (isShowOrders) {
             orders = orders.concat(
@@ -1581,6 +1705,8 @@ class PatientHistory extends Component {
       Orders: orders,
       ConsultationDocument: consultationDocument,
       DoctorNote: doctorNote,
+      COREyeExaminations: corEyeExaminations,
+      CORAudiometryTest: corAudiometryTest,
       ReportContext: reportContext,
     }
     const payload1 = [

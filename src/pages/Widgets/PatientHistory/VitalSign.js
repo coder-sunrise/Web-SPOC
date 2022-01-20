@@ -292,7 +292,7 @@ export default ({ current }) => {
     )
   }
   return (
-    <div>
+    <div style={{ marginBottom: 8 }}>
       {showGeneral() && (
         <div>
           <div style={{ fontWeight: 'bold', margin: '6px 0px' }}>General</div>

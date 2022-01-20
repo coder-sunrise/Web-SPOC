@@ -21,6 +21,10 @@ class BasicExaminations extends PureComponent {
     super(props)
     this.myRef = React.createRef()
   }
+  state = {
+    expandedGeneral: false,
+    expandedOthers: false,
+  }
 
   expandOthers = () => {
     const { arrayHelpers, fieldName = 'corPatientNoteVitalSign' } = this.props
@@ -460,17 +464,30 @@ class BasicExaminations extends PureComponent {
   }
 
   render() {
-    let div = $(this.myRef.current).find('div[aria-expanded]:eq(0)')
-    if (div.attr('aria-expanded') === 'false') div.click()
+    if (!this.state.expandedGeneral) {
+      let div = $(this.myRef.current).find('div[aria-expanded]:eq(0)')
+      if (div.attr('aria-expanded') === 'false') div.click()
+    }
 
-    if (this.expandOthers()) {
+    if (!this.state.expandedOthers && this.expandOthers()) {
       let divOthers = $(this.myRef.current).find('div[aria-expanded]:eq(1)')
       if (divOthers.attr('aria-expanded') === 'false') divOthers.click()
     }
 
     return (
       <div ref={this.myRef}>
-        <Accordion mode='multiple' collapses={this.getBasicExaminations()} />
+        <Accordion
+          mode='multiple'
+          collapses={this.getBasicExaminations()}
+          onChange={(event, p, expanded) => {
+            if (p.key === 0 && expanded && !this.state.expandedGeneral) {
+              this.setState({ expandedGeneral: true })
+            }
+            if (p.key === 1 && expanded && !this.state.expandedOthers) {
+              this.setState({ expandedOthers: true })
+            }
+          }}
+        />
       </div>
     )
   }
