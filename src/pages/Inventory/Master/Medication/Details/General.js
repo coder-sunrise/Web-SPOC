@@ -379,20 +379,6 @@ const General = ({
         </GridItem>
         <GridItem xs={12} md={4}>
           <FastField
-            name='medicationGroupFK'
-            render={args => (
-              <CodeSelect
-                label={formatMessage({
-                  id: 'inventory.master.medication.medicationGroup',
-                })}
-                code='ctMedicationGroup'
-                {...args}
-              />
-            )}
-          />
-        </GridItem>
-        <GridItem xs={12} md={4}>
-          <FastField
             name='genericMedicationFK'
             render={args => (
               <CodeSelect
@@ -441,22 +427,6 @@ const General = ({
             )}
           />
         </GridItem>
-        <GridItem xs={12} md={4}>
-          <FastField
-            name='medicationIngredients'
-            render={args => (
-              <CodeSelect
-                label={formatMessage({
-                  id: 'inventory.master.medication.medicationIngredient',
-                })}
-                code='ctMedicationIngredient'
-                mode='multiple'
-                disableAll
-                {...args}
-              />
-            )}
-          />
-        </GridItem>
 
         <GridItem xs={12} md={4}>
           <FastField
@@ -470,6 +440,37 @@ const General = ({
                 {...args}
               />
             )}
+          />
+        </GridItem>
+        <GridItem xs={12} md={4}>
+          <Field
+            name='effectiveDates'
+            render={args => (
+              <DateRangePicker
+                format={dateFormatLong}
+                label='Effective Start Date'
+                label2='End Date'
+                disabled={!!(medicationDetail.entity && hasActiveSession)}
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem xs={12} md={4}>
+          <FastField
+            name='remarks'
+            render={args => {
+              return (
+                <TextField
+                  label={formatMessage({
+                    id: 'inventory.master.medication.remarks',
+                  })}
+                  multiline
+                  rowsMax='5'
+                  {...args}
+                />
+              )
+            }}
           />
         </GridItem>
         <GridItem md={12} style={{ padding: '0px 8px' }}>
@@ -514,37 +515,6 @@ const General = ({
               </Button>
             </GridItem>
           </GridContainer>
-        </GridItem>
-        <GridItem xs={12} md={4}>
-          <Field
-            name='effectiveDates'
-            render={args => (
-              <DateRangePicker
-                format={dateFormatLong}
-                label='Effective Start Date'
-                label2='End Date'
-                disabled={!!(medicationDetail.entity && hasActiveSession)}
-                {...args}
-              />
-            )}
-          />
-        </GridItem>
-        <GridItem xs={12} md={4}>
-          <FastField
-            name='remarks'
-            render={args => {
-              return (
-                <TextField
-                  label={formatMessage({
-                    id: 'inventory.master.medication.remarks',
-                  })}
-                  multiline
-                  rowsMax='5'
-                  {...args}
-                />
-              )
-            }}
-          />
         </GridItem>
       </GridContainer>
 

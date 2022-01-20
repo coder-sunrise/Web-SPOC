@@ -8,14 +8,22 @@ import { IconButton, Popover, Tooltip } from '@/components'
 import { DOSAGE_RULE, DOSAGE_RULE_OPERATOR } from '@/utils/constants'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 
-const LowStockInfo = ({ sourceType, values = {}, codetable, visitRegistration = {}, patient = {}, corVitalSign = [], right = -5 }) => {
+const LowStockInfo = ({
+  sourceType,
+  values = {},
+  codetable,
+  visitRegistration = {},
+  patient = {},
+  corVitalSign = [],
+  right = -5,
+}) => {
   const {
     inventorymedication = [],
     inventoryconsumable = [],
     inventoryvaccination = [],
   } = codetable
   let source = {}
- 
+
   if (
     sourceType === 'medication' ||
     (sourceType === 'prescriptionSet' && values.inventoryMedicationFK)
@@ -114,7 +122,11 @@ const LowStockInfo = ({ sourceType, values = {}, codetable, visitRegistration = 
           if (activeVitalSign) {
             weightKG = activeVitalSign.weightKG
           } else {
-            weightKG = visitRegistration.entity?.visit?.weightKG
+            const visitBasicExaminations =
+              visitRegistration.entity?.visit?.visitBasicExaminations || []
+            if (visitBasicExaminations.length) {
+              weightKG = visitBasicExaminations[0].weightKG
+            }
           }
 
           let age

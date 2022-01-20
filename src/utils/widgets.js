@@ -194,7 +194,6 @@ const widgets = [
         return <Cmpnet {...p} widget />
       },
       // render (loaded, props) {
-      //   console.log(loaded, props)
       //   let Component = loaded.default
       //   return <Component {...props} />
       // },
@@ -231,7 +230,7 @@ const widgets = [
   // },
   {
     id: '7',
-    name: 'Vital Sign',
+    name: 'Basic Examinations',
     accessRight: 'queue.consultation.widgets.vitalsign',
     component: Loadable({
       loader: () => import('@/pages/Widgets/VitalSign'),
@@ -306,7 +305,6 @@ const widgets = [
                   dispatch,
                   consultation,
                 }) => {
-                  // console.log(updated, form, dispatch, consultation)
                   form.setFieldValue('corAttachment', updated)
                   const { entity } = consultation
                   entity.corAttachment = updated

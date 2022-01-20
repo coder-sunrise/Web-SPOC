@@ -831,7 +831,7 @@ const Main = props => {
   const queueNo =
     !workitem.queueNo || !workitem.queueNo.trim().length
       ? '-'
-      : numeral(workitem.queueNo).format(isQueueNoDecimal ? '0.0' : '0')
+      : workitem.queueNo
 
   let visitTypeSettingsObj = []
   if (visitTypeSetting) {

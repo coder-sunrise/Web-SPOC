@@ -26,6 +26,7 @@ const SelectList = props => {
     note = '',
     isMultiLanguage,
     onChange,
+    labelField = 'displayValue',
     initialValue,
     ...restPros
   } = props
@@ -57,7 +58,6 @@ const SelectList = props => {
     setCurrentSelected(null)
     if (onChange) onChange(newListItems)
   }
-
   return (
     <div>
       <SectionHeader style={{ marginBottom: 0 }}>{header}</SectionHeader>
@@ -71,6 +71,8 @@ const SelectList = props => {
           max={10}
           value={currentSelected ? currentSelected.id : null}
           valueField='id'
+          isMultiLanguage={isMultiLanguage}
+          labelField={labelField}
           onChange={(value, opt) => {
             if (value && opt) setCurrentSelected(opt)
           }}

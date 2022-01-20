@@ -1272,6 +1272,12 @@ const _routes = [
             component: './Setting/SummaryComment',
             // authority: ['settings.clinicsetting.individualcomment'],
           },
+          {
+            path: '/setting/creditfacility',
+            name: 'creditfacility',
+            component: './Setting/creditfacility',
+            authority: ['settings.clinicsetting.creditfacility'],
+          },
         ],
       },
       // Settings

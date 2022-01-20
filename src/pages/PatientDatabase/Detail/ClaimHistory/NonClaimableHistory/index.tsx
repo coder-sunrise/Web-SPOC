@@ -74,16 +74,7 @@ const NonClaimableHistory = ({ dispatch, height, patientProfileFK }) => {
           }${row.updateUserName || ''}`
           return (
             <Tooltip title={updateUser}>
-              <div
-                style={{
-                  textOverflow: 'ellipsis',
-                  overflow: 'hidden',
-                  whiteSpace: 'nowrap',
-                  width: 94,
-                }}
-              >
-                {updateUser}
-              </div>
+              <div>{updateUser}</div>
             </Tooltip>
           )
         },

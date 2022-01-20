@@ -920,3 +920,8 @@ export const LANGUAGES = {
   2: 'EN',
   5: 'JP',
 }
+
+export const YESNOOPTIUONS = [
+  { value: false, label: 'No' },
+  { value: true, label: 'Yes' },
+]
