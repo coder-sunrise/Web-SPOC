@@ -480,12 +480,12 @@ export const widgets = (
   },
 ]
 
-export const inputValue = value => {
+export const hasValue = value => {
   return value !== undefined && value !== null
 }
 
 export const getHistoryValueForBoolean = value => {
-  return inputValue(value) ? (value ? 'Yes' : 'No') : '-'
+  return hasValue(value) ? (value ? 'Yes' : 'No') : '-'
 }
 
 const checkNote = (widgetId, current) => {
@@ -695,26 +695,26 @@ const showPatientNoteVitalSigns = (patientNoteVitalSigns = []) => {
   if (
     patientNoteVitalSigns.find(
       row =>
-        inputValue(row.temperatureC) ||
-        inputValue(row.bpSysMMHG) ||
-        inputValue(row.bpDiaMMHG) ||
-        inputValue(row.pulseRateBPM) ||
-        inputValue(row.saO2) ||
-        inputValue(row.weightKG) ||
-        inputValue(row.heightCM) ||
-        inputValue(row.bmi) ||
-        inputValue(row.bodyFatPercentage) ||
-        inputValue(row.degreeOfObesity) ||
-        inputValue(row.headCircumference) ||
-        inputValue(row.chestCircumference) ||
-        inputValue(row.waistCircumference) ||
-        inputValue(row.isPregnancy) ||
-        inputValue(row.hepetitisVaccinationA) ||
-        inputValue(row.hepetitisVaccinationB) ||
-        inputValue(row.isFasting) ||
-        inputValue(row.isSmoking) ||
-        inputValue(row.isAlcohol) ||
-        inputValue(row.isMensus),
+        hasValue(row.temperatureC) ||
+        hasValue(row.bpSysMMHG) ||
+        hasValue(row.bpDiaMMHG) ||
+        hasValue(row.pulseRateBPM) ||
+        hasValue(row.saO2) ||
+        hasValue(row.weightKG) ||
+        hasValue(row.heightCM) ||
+        hasValue(row.bmi) ||
+        hasValue(row.bodyFatPercentage) ||
+        hasValue(row.degreeOfObesity) ||
+        hasValue(row.headCircumference) ||
+        hasValue(row.chestCircumference) ||
+        hasValue(row.waistCircumference) ||
+        hasValue(row.isPregnancy) ||
+        hasValue(row.hepetitisVaccinationA) ||
+        hasValue(row.hepetitisVaccinationB) ||
+        hasValue(row.isFasting) ||
+        hasValue(row.isSmoking) ||
+        hasValue(row.isAlcohol) ||
+        hasValue(row.isMensus),
     )
   )
     return true
@@ -725,23 +725,23 @@ export const showEyeExaminations = (corEyeExaminations = []) => {
   if (
     corEyeExaminations.find(
       row =>
-        inputValue(row.visionCorrectionMethod) ||
-        inputValue(row.leftBareEye5) ||
-        inputValue(row.leftCorrectedVision5) ||
-        inputValue(row.leftBareEye50) ||
-        inputValue(row.leftCorrectedVision50) ||
-        inputValue(row.rightBareEye5) ||
-        inputValue(row.rightCorrectedVision5) ||
-        inputValue(row.rightBareEye50) ||
-        inputValue(row.rightCorrectedVision50) ||
-        inputValue(row.leftFirstResult) ||
-        inputValue(row.leftSecondResult) ||
-        inputValue(row.leftThirdResult) ||
-        inputValue(row.rightFirstResult) ||
-        inputValue(row.rightSecondResult) ||
-        inputValue(row.rightThirdResult) ||
-        inputValue(row.colorVisionTestResult) ||
-        (inputValue(row.remarks) && row.remarks.trim().length),
+        hasValue(row.visionCorrectionMethod) ||
+        hasValue(row.leftBareEye5) ||
+        hasValue(row.leftCorrectedVision5) ||
+        hasValue(row.leftBareEye50) ||
+        hasValue(row.leftCorrectedVision50) ||
+        hasValue(row.rightBareEye5) ||
+        hasValue(row.rightCorrectedVision5) ||
+        hasValue(row.rightBareEye50) ||
+        hasValue(row.rightCorrectedVision50) ||
+        hasValue(row.leftFirstResult) ||
+        hasValue(row.leftSecondResult) ||
+        hasValue(row.leftThirdResult) ||
+        hasValue(row.rightFirstResult) ||
+        hasValue(row.rightSecondResult) ||
+        hasValue(row.rightThirdResult) ||
+        hasValue(row.colorVisionTestResult) ||
+        (hasValue(row.remarks) && row.remarks.trim().length),
     )
   )
     return true
@@ -752,10 +752,10 @@ export const showAudiometryTest = (corEyeExaminations = []) => {
   if (
     corEyeExaminations.find(
       row =>
-        inputValue(row.leftResult1000Hz) ||
-        inputValue(row.leftResult4000Hz) ||
-        inputValue(row.rightResult1000Hz) ||
-        inputValue(row.rightResult4000Hz),
+        hasValue(row.leftResult1000Hz) ||
+        hasValue(row.leftResult4000Hz) ||
+        hasValue(row.rightResult1000Hz) ||
+        hasValue(row.rightResult4000Hz),
     )
   )
     return true

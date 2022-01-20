@@ -36,10 +36,6 @@ import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 import ConsumePackage from '@/pages/Widgets/Orders/Detail/ConsumePackage'
 import { visitBasicExaminationsSchema } from '@/pages/Reception/Queue/NewVisit/validationScheme'
 import {
-  eyeExaminationsSchema,
-  audiometryTestSchema,
-} from '@/pages/Consultation/schema'
-import {
   showEyeExaminations,
   showAudiometryTest,
 } from '../Widgets/PatientHistory/config'
@@ -109,12 +105,6 @@ const styles = () => ({})
     corPatientNoteVitalSign: Yup.array()
       .compact(v => v.isDeleted)
       .of(visitBasicExaminationsSchema),
-    corAudiometryTest: Yup.array()
-      .compact(v => v.isDeleted)
-      .of(audiometryTestSchema),
-    corEyeExaminations: Yup.array()
-      .compact(v => v.isDeleted)
-      .of(eyeExaminationsSchema),
   }),
   dirtyCheckMessage: 'Discard edit order?',
   onDirtyDiscard: discardConsultation,

@@ -6,7 +6,7 @@ import numeral from 'numeral'
 import { withStyles } from '@material-ui/core'
 import { AuthorizedContext, GridContainer, GridItem } from '@/components'
 import Authorized from '@/utils/Authorized'
-import { inputValue } from '../PatientHistory/config'
+import { hasValue } from '../PatientHistory/config'
 import Details from './Details'
 
 const styles = theme => ({
@@ -123,9 +123,9 @@ class index extends PureComponent {
       const secondResult = newValue[`${type}SecondResult`]
       const thirdResult = newValue[`${type}ThirdResult`]
       if (
-        inputValue(firstResult) &&
-        inputValue(secondResult) &&
-        inputValue(thirdResult)
+        hasValue(firstResult) &&
+        hasValue(secondResult) &&
+        hasValue(thirdResult)
       ) {
         newAverageResult = _.round(
           (firstResult + secondResult + thirdResult) / 3,

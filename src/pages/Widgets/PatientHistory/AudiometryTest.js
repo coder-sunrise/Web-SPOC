@@ -4,7 +4,7 @@ import { formatMessage } from 'umi'
 import numeral from 'numeral'
 import { Tooltip } from '@/components'
 import tablestyles from './PatientHistoryStyle.less'
-import { inputValue, getHistoryValueForBoolean } from './config'
+import { hasValue, getHistoryValueForBoolean } from './config'
 
 const getRows = (corAudiometryTest = []) => {
   let data = []
@@ -12,20 +12,20 @@ const getRows = (corAudiometryTest = []) => {
     {
       id: 1,
       type: 'Right',
-      result1000Hz: inputValue(corAudiometryTest[0].rightResult1000Hz)
+      result1000Hz: hasValue(corAudiometryTest[0].rightResult1000Hz)
         ? `${corAudiometryTest[0].rightResult1000Hz} dB`
         : '-',
-      result4000Hz: inputValue(corAudiometryTest[0].rightResult4000Hz)
+      result4000Hz: hasValue(corAudiometryTest[0].rightResult4000Hz)
         ? `${corAudiometryTest[0].rightResult4000Hz} dB`
         : '-',
     },
     {
       id: 2,
       type: 'Left',
-      result1000Hz: inputValue(corAudiometryTest[0].leftResult1000Hz)
+      result1000Hz: hasValue(corAudiometryTest[0].leftResult1000Hz)
         ? `${corAudiometryTest[0].leftResult1000Hz} dB`
         : '-',
-      result4000Hz: inputValue(corAudiometryTest[0].leftResult4000Hz)
+      result4000Hz: hasValue(corAudiometryTest[0].leftResult4000Hz)
         ? `${corAudiometryTest[0].leftResult4000Hz} dB`
         : '-',
     },

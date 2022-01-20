@@ -4,7 +4,7 @@ import { formatMessage } from 'umi'
 import numeral from 'numeral'
 import { Tooltip, RadioGroup } from '@/components'
 import tablestyles from './PatientHistoryStyle.less'
-import { inputValue, getHistoryValueForBoolean } from './config'
+import { hasValue, getHistoryValueForBoolean } from './config'
 
 const getVisualAcuityTestRows = (corEyeExaminations = []) => {
   let data = []
@@ -12,20 +12,18 @@ const getVisualAcuityTestRows = (corEyeExaminations = []) => {
     {
       id: 1,
       type: 'Right Eye',
-      bareEye5: inputValue(corEyeExaminations[0].rightBareEye5)
+      bareEye5: hasValue(corEyeExaminations[0].rightBareEye5)
         ? `${numeral(corEyeExaminations[0].rightBareEye5).format('0.0')}`
         : '-',
-      correctedVision5: inputValue(corEyeExaminations[0].rightCorrectedVision5)
+      correctedVision5: hasValue(corEyeExaminations[0].rightCorrectedVision5)
         ? `${numeral(corEyeExaminations[0].rightCorrectedVision5).format(
             '0.0',
           )}`
         : '-',
-      bareEye50: inputValue(corEyeExaminations[0].rightBareEye50)
+      bareEye50: hasValue(corEyeExaminations[0].rightBareEye50)
         ? `${numeral(corEyeExaminations[0].rightBareEye50).format('0.0')}`
         : '-',
-      correctedVision50: inputValue(
-        corEyeExaminations[0].rightCorrectedVision50,
-      )
+      correctedVision50: hasValue(corEyeExaminations[0].rightCorrectedVision50)
         ? `${numeral(corEyeExaminations[0].rightCorrectedVision50).format(
             '0.0',
           )}`
@@ -34,16 +32,16 @@ const getVisualAcuityTestRows = (corEyeExaminations = []) => {
     {
       id: 2,
       type: 'Left Eye',
-      bareEye5: inputValue(corEyeExaminations[0].leftBareEye5)
+      bareEye5: hasValue(corEyeExaminations[0].leftBareEye5)
         ? `${numeral(corEyeExaminations[0].leftBareEye5).format('0.0')}`
         : '-',
-      correctedVision5: inputValue(corEyeExaminations[0].leftCorrectedVision5)
+      correctedVision5: hasValue(corEyeExaminations[0].leftCorrectedVision5)
         ? `${numeral(corEyeExaminations[0].leftCorrectedVision5).format('0.0')}`
         : '-',
-      bareEye50: inputValue(corEyeExaminations[0].leftBareEye50)
+      bareEye50: hasValue(corEyeExaminations[0].leftBareEye50)
         ? `${numeral(corEyeExaminations[0].leftBareEye50).format('0.0')}`
         : '-',
-      correctedVision50: inputValue(corEyeExaminations[0].leftCorrectedVision50)
+      correctedVision50: hasValue(corEyeExaminations[0].leftCorrectedVision50)
         ? `${numeral(corEyeExaminations[0].leftCorrectedVision50).format(
             '0.0',
           )}`
@@ -59,32 +57,32 @@ const getIntraocularPressureTestRows = (corEyeExaminations = []) => {
     {
       id: 1,
       type: 'Right Eye',
-      firstResult: inputValue(corEyeExaminations[0].rightFirstResult)
+      firstResult: hasValue(corEyeExaminations[0].rightFirstResult)
         ? `${corEyeExaminations[0].rightFirstResult}`
         : '-',
-      secondResult: inputValue(corEyeExaminations[0].rightSecondResult)
+      secondResult: hasValue(corEyeExaminations[0].rightSecondResult)
         ? `${corEyeExaminations[0].rightSecondResult}`
         : '-',
-      thirdResult: inputValue(corEyeExaminations[0].rightThirdResult)
+      thirdResult: hasValue(corEyeExaminations[0].rightThirdResult)
         ? `${corEyeExaminations[0].rightThirdResult}`
         : '-',
-      averageResult: inputValue(corEyeExaminations[0].rightAverageResult)
+      averageResult: hasValue(corEyeExaminations[0].rightAverageResult)
         ? `${numeral(corEyeExaminations[0].rightAverageResult).format('0.0')}`
         : '-',
     },
     {
       id: 2,
       type: 'Left Eye',
-      firstResult: inputValue(corEyeExaminations[0].leftFirstResult)
+      firstResult: hasValue(corEyeExaminations[0].leftFirstResult)
         ? `${corEyeExaminations[0].leftFirstResult}`
         : '-',
-      secondResult: inputValue(corEyeExaminations[0].leftSecondResult)
+      secondResult: hasValue(corEyeExaminations[0].leftSecondResult)
         ? `${corEyeExaminations[0].leftSecondResult}`
         : '-',
-      thirdResult: inputValue(corEyeExaminations[0].leftThirdResult)
+      thirdResult: hasValue(corEyeExaminations[0].leftThirdResult)
         ? `${corEyeExaminations[0].leftThirdResult}`
         : '-',
-      averageResult: inputValue(corEyeExaminations[0].leftAverageResult)
+      averageResult: hasValue(corEyeExaminations[0].leftAverageResult)
         ? `${numeral(corEyeExaminations[0].leftAverageResult).format('0.0')}`
         : '-',
     },
@@ -96,15 +94,15 @@ const showVisualAcuityTest = (corEyeExaminations = []) => {
   if (
     corEyeExaminations.find(
       row =>
-        inputValue(row.visionCorrectionMethod) ||
-        inputValue(row.leftBareEye5) ||
-        inputValue(row.leftCorrectedVision5) ||
-        inputValue(row.leftBareEye50) ||
-        inputValue(row.leftCorrectedVision50) ||
-        inputValue(row.rightBareEye5) ||
-        inputValue(row.rightCorrectedVision5) ||
-        inputValue(row.rightBareEye50) ||
-        inputValue(row.rightCorrectedVision50),
+        hasValue(row.visionCorrectionMethod) ||
+        hasValue(row.leftBareEye5) ||
+        hasValue(row.leftCorrectedVision5) ||
+        hasValue(row.leftBareEye50) ||
+        hasValue(row.leftCorrectedVision50) ||
+        hasValue(row.rightBareEye5) ||
+        hasValue(row.rightCorrectedVision5) ||
+        hasValue(row.rightBareEye50) ||
+        hasValue(row.rightCorrectedVision50),
     )
   )
     return true
@@ -115,12 +113,12 @@ const showIOP = (corEyeExaminations = []) => {
   if (
     corEyeExaminations.find(
       row =>
-        inputValue(row.leftFirstResult) ||
-        inputValue(row.leftSecondResult) ||
-        inputValue(row.leftThirdResult) ||
-        inputValue(row.rightFirstResult) ||
-        inputValue(row.rightSecondResult) ||
-        inputValue(row.rightThirdResult),
+        hasValue(row.leftFirstResult) ||
+        hasValue(row.leftSecondResult) ||
+        hasValue(row.leftThirdResult) ||
+        hasValue(row.rightFirstResult) ||
+        hasValue(row.rightSecondResult) ||
+        hasValue(row.rightThirdResult),
     )
   )
     return true
@@ -130,8 +128,8 @@ const showColorVisionTest = (corEyeExaminations = []) => {
   if (
     corEyeExaminations.find(
       row =>
-        inputValue(row.colorVisionTestResult) ||
-        (inputValue(row.remarks) && row.remarks.trim().length),
+        hasValue(row.colorVisionTestResult) ||
+        (hasValue(row.remarks) && row.remarks.trim().length),
     )
   )
     return true
@@ -168,22 +166,22 @@ export default ({ current }) => {
               },
               {
                 dataIndex: 'bareEye5',
-                title: '5 meters (Bare Eye)',
+                title: '5m (Bare Eye)',
                 align: 'center',
               },
               {
                 dataIndex: 'correctedVision5',
-                title: '5 meters (Corrected Vision)',
+                title: '5m (Corrected Vision)',
                 align: 'center',
               },
               {
                 dataIndex: 'bareEye50',
-                title: '50 meters (Bare Eye)',
+                title: '50cm (Bare Eye)',
                 align: 'center',
               },
               {
                 dataIndex: 'correctedVision50',
-                title: '50 meters (Corrected Vision)',
+                title: '50cm (Corrected Vision)',
                 align: 'center',
               },
             ]}
@@ -269,7 +267,7 @@ export default ({ current }) => {
                 Remarks
               </div>
               <div>
-                {inputValue(corEyeExaminations[0].remarks) &&
+                {hasValue(corEyeExaminations[0].remarks) &&
                 corEyeExaminations[0].remarks.trim().length
                   ? corEyeExaminations[0].remarks
                   : '-'}

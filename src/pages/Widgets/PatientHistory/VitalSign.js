@@ -4,7 +4,7 @@ import { formatMessage } from 'umi'
 import numeral from 'numeral'
 import { Tooltip } from '@/components'
 import tablestyles from './PatientHistoryStyle.less'
-import { inputValue, getHistoryValueForBoolean } from './config'
+import { hasValue, getHistoryValueForBoolean } from './config'
 
 export default ({ current }) => {
   const { patientNoteVitalSigns = [] } = current
@@ -14,7 +14,7 @@ export default ({ current }) => {
       title: 'Temperature',
       render: (text, row) => (
         <span>
-          {inputValue(row.temperatureC)
+          {hasValue(row.temperatureC)
             ? `${numeral(row.temperatureC).format('0.0')} ${formatMessage({
                 id: 'reception.queue.visitRegistration.temperature.suffix',
               })}`
@@ -27,7 +27,7 @@ export default ({ current }) => {
       title: 'Blood Presure SYS',
       render: (text, row) => (
         <span>
-          {inputValue(row.bpSysMMHG)
+          {hasValue(row.bpSysMMHG)
             ? `${numeral(row.bpSysMMHG).format('0')} ${formatMessage({
                 id: 'reception.queue.visitRegistration.mmhg',
               })}`
@@ -41,7 +41,7 @@ export default ({ current }) => {
       title: 'Blood Presure DIA',
       render: (text, row) => (
         <span>
-          {inputValue(row.bpDiaMMHG)
+          {hasValue(row.bpDiaMMHG)
             ? `${numeral(row.bpDiaMMHG).format('0')} ${formatMessage({
                 id: 'reception.queue.visitRegistration.mmhg',
               })}`
@@ -54,7 +54,7 @@ export default ({ current }) => {
       title: 'Heart Rate',
       render: (text, row) => (
         <span>
-          {inputValue(row.pulseRateBPM)
+          {hasValue(row.pulseRateBPM)
             ? `${numeral(row.pulseRateBPM).format('0')} ${formatMessage({
                 id: 'reception.queue.visitRegistration.heartRate.suffix',
               })}`
@@ -67,7 +67,7 @@ export default ({ current }) => {
       title: 'SaO2',
       render: (text, row) => (
         <span>
-          {inputValue(row.saO2)
+          {hasValue(row.saO2)
             ? `${numeral(row.saO2).format('0.0')} ${formatMessage({
                 id: 'reception.queue.visitRegistration.saO2.suffix',
               })}`
@@ -80,7 +80,7 @@ export default ({ current }) => {
       title: 'Weight',
       render: (text, row) => (
         <span>
-          {inputValue(row.weightKG)
+          {hasValue(row.weightKG)
             ? `${numeral(row.weightKG).format('0.0')} ${formatMessage({
                 id: 'reception.queue.visitRegistration.weight.suffix',
               })}`
@@ -93,7 +93,7 @@ export default ({ current }) => {
       title: 'Height',
       render: (text, row) => (
         <span>
-          {inputValue(row.heightCM)
+          {hasValue(row.heightCM)
             ? `${numeral(row.heightCM).format('0.0')} ${formatMessage({
                 id: 'reception.queue.visitRegistration.height.suffix',
               })}`
@@ -106,7 +106,7 @@ export default ({ current }) => {
       title: 'Body Mass Index (BMI)',
       render: (text, row) => (
         <span>
-          {inputValue(row.bmi)
+          {hasValue(row.bmi)
             ? `${numeral(row.bmi).format('0.0')} ${formatMessage({
                 id: 'reception.queue.visitRegistration.bmi.suffix',
               })}`
@@ -122,7 +122,7 @@ export default ({ current }) => {
       title: 'Body Fat %',
       render: (text, row) => (
         <span>
-          {inputValue(row.bodyFatPercentage)
+          {hasValue(row.bodyFatPercentage)
             ? `${numeral(row.bodyFatPercentage).format('0.0')} ${formatMessage({
                 id:
                   'reception.queue.visitRegistration.bodyFatPercentage.suffix',
@@ -136,7 +136,7 @@ export default ({ current }) => {
       title: 'Degree of Obesity',
       render: (text, row) => (
         <span>
-          {inputValue(row.degreeOfObesity)
+          {hasValue(row.degreeOfObesity)
             ? `${numeral(row.degreeOfObesity).format('0.0')} ${formatMessage({
                 id: 'reception.queue.visitRegistration.degreeOfObesity.suffix',
               })}`
@@ -149,7 +149,7 @@ export default ({ current }) => {
       title: 'Head Circumference',
       render: (text, row) => (
         <span>
-          {inputValue(row.headCircumference)
+          {hasValue(row.headCircumference)
             ? `${numeral(row.headCircumference).format('0.0')} ${formatMessage({
                 id:
                   'reception.queue.visitRegistration.headCircumference.suffix',
@@ -163,7 +163,7 @@ export default ({ current }) => {
       title: 'Chest Circumference',
       render: (text, row) => (
         <span>
-          {inputValue(row.chestCircumference)
+          {hasValue(row.chestCircumference)
             ? `${numeral(row.chestCircumference).format('0.0')} ${formatMessage(
                 {
                   id:
@@ -186,7 +186,7 @@ export default ({ current }) => {
           )
         return (
           <span>
-            {inputValue(row.waistCircumference)
+            {hasValue(row.waistCircumference)
               ? `${numeral(row.waistCircumference).format(
                   '0.0',
                 )} ${formatMessage({
@@ -257,38 +257,38 @@ export default ({ current }) => {
   const showGeneral = () => {
     return patientNoteVitalSigns.find(
       row =>
-        inputValue(row.temperatureC) ||
-        inputValue(row.bpSysMMHG) ||
-        inputValue(row.bpDiaMMHG) ||
-        inputValue(row.pulseRateBPM) ||
-        inputValue(row.saO2) ||
-        inputValue(row.weightKG) ||
-        inputValue(row.heightCM) ||
-        inputValue(row.bmi),
+        hasValue(row.temperatureC) ||
+        hasValue(row.bpSysMMHG) ||
+        hasValue(row.bpDiaMMHG) ||
+        hasValue(row.pulseRateBPM) ||
+        hasValue(row.saO2) ||
+        hasValue(row.weightKG) ||
+        hasValue(row.heightCM) ||
+        hasValue(row.bmi),
     )
   }
 
   const showOther1 = () => {
     return patientNoteVitalSigns.find(
       row =>
-        inputValue(row.bodyFatPercentage) ||
-        inputValue(row.degreeOfObesity) ||
-        inputValue(row.headCircumference) ||
-        inputValue(row.chestCircumference) ||
-        inputValue(row.waistCircumference) ||
-        inputValue(row.isPregnancy),
+        hasValue(row.bodyFatPercentage) ||
+        hasValue(row.degreeOfObesity) ||
+        hasValue(row.headCircumference) ||
+        hasValue(row.chestCircumference) ||
+        hasValue(row.waistCircumference) ||
+        hasValue(row.isPregnancy),
     )
   }
 
   const showOther2 = () => {
     return patientNoteVitalSigns.find(
       row =>
-        inputValue(row.hepetitisVaccinationA) ||
-        inputValue(row.hepetitisVaccinationB) ||
-        inputValue(row.isFasting) ||
-        inputValue(row.isSmoking) ||
-        inputValue(row.isAlcohol) ||
-        inputValue(row.isMensus),
+        hasValue(row.hepetitisVaccinationA) ||
+        hasValue(row.hepetitisVaccinationB) ||
+        hasValue(row.isFasting) ||
+        hasValue(row.isSmoking) ||
+        hasValue(row.isAlcohol) ||
+        hasValue(row.isMensus),
     )
   }
   return (

@@ -14,7 +14,7 @@ import {
   RadioGroup,
 } from '@/components'
 import { YESNOOPTIUONS, GENDER } from '@/utils/constants'
-import { inputValue } from '@/pages/Widgets/PatientHistory/config'
+import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 
 class BasicExaminations extends PureComponent {
   constructor(props) {
@@ -32,19 +32,19 @@ class BasicExaminations extends PureComponent {
     if (
       (values[fieldName] || []).find(
         row =>
-          inputValue(row.bodyFatPercentage) ||
-          inputValue(row.degreeOfObesity) ||
-          inputValue(row.headCircumference) ||
-          inputValue(row.chestCircumference) ||
-          inputValue(row.waistCircumference) ||
-          inputValue(row.isPregnancy) ||
-          inputValue(row.hepetitisVaccinationA) ||
-          inputValue(row.hepetitisVaccinationB) ||
-          inputValue(row.isFasting) ||
-          inputValue(row.isSmoking) ||
-          inputValue(row.isAlcohol) ||
-          inputValue(row.isMensus) ||
-          inputValue(row.isChild),
+          hasValue(row.bodyFatPercentage) ||
+          hasValue(row.degreeOfObesity) ||
+          hasValue(row.headCircumference) ||
+          hasValue(row.chestCircumference) ||
+          hasValue(row.waistCircumference) ||
+          hasValue(row.isPregnancy) ||
+          hasValue(row.hepetitisVaccinationA) ||
+          hasValue(row.hepetitisVaccinationB) ||
+          hasValue(row.isFasting) ||
+          hasValue(row.isSmoking) ||
+          hasValue(row.isAlcohol) ||
+          hasValue(row.isMensus) ||
+          hasValue(row.isChild),
       )
     )
       return true

@@ -56,10 +56,10 @@ export default ({
   const tableVisualAcuityTestParas = {
     columns: [
       { name: 'type', title: 'Eye/Distance' },
-      { name: 'BareEye5', title: '5 meters (Bare Eye)' },
-      { name: 'CorrectedVision5', title: '5 meters (Corrected Vision)' },
-      { name: 'BareEye50', title: '50 meters (Bare Eye)' },
-      { name: 'CorrectedVision50', title: '50 meters (Corrected Vision)' },
+      { name: 'BareEye5', title: '5m (Bare Eye)' },
+      { name: 'CorrectedVision5', title: '5m (Corrected Vision)' },
+      { name: 'BareEye50', title: '50cm (Bare Eye)' },
+      { name: 'CorrectedVision50', title: '50cm (Corrected Vision)' },
     ],
 
     columnExtensions: [
