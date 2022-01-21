@@ -10,6 +10,7 @@ const fns = {
   queryById: params => service.query(url, params),
   queryRunningNumber: params =>
     service.query(`${runningNumberUrl}/${params.prefix}`, params),
+  delete: params => service.upsert(`${url}/delete`, params),
 }
 
 export default fns

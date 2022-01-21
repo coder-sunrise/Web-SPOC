@@ -45,6 +45,10 @@ class PurchaseRequest extends Component {
   }
 
   componentDidMount() {
+    this.queryList()
+  }
+
+  queryList = () => {
     const { dispatch, purchaseRequestList } = this.props
     dispatch({
       type: 'purchaseRequestList/query',
@@ -63,6 +67,16 @@ class PurchaseRequest extends Component {
     this.toggleReport()
   }
 
+  onDeleteRow = id => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'purchaseRequestDetails/deletePR',
+      payload: { id },
+    }).then(r => {
+      this.queryList()
+    })
+  }
+
   onSelectionChange = selection => this.setState({ selectedRows: selection })
 
   handleLoadingVisibility = (visibility = false) =>
@@ -79,7 +93,7 @@ class PurchaseRequest extends Component {
         history.push(`${location.pathname}/details?type=${type}`)
         break
       case 'edit':
-        if (!getAccessRight()) {
+        if (!getAccessRight('purchasingrequest.modifypurchasingrequest')) {
           notification.error({
             message: 'Current user is not authorized to access',
           })
@@ -104,17 +118,14 @@ class PurchaseRequest extends Component {
       handleNavigate: this.onNavigate,
       handleOnSelectionChange: this.onSelectionChange,
       handlePrintPRReport: this.printPRReport,
+      handleDelete: this.onDeleteRow,
     }
     const { selectedRows, isLoading } = this.state
     let height = mainDivHeight - 170 - ($('.filterBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <LoadingWrapper
-          linear
-          loading={isLoading}
-          text='Loading...'
-        >
+        <LoadingWrapper linear loading={isLoading} text='Loading...'>
           <div className='filterBar'>
             <FilterBar
               actions={actionProps}

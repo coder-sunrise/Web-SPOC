@@ -2,6 +2,7 @@
 import moment from 'moment'
 import Edit from '@material-ui/icons/Edit'
 import View from '@material-ui/icons/Visibility'
+import Delete from '@material-ui/icons/Delete'
 import Print from '@material-ui/icons/Print'
 import Authorized from '@/utils/Authorized'
 
@@ -51,19 +52,26 @@ export const PurchaseRequestGridCol = [
 ]
 
 export const ContextMenuOptions = row => {
-  // TODO new & edit access right
-  const viewEditAuthority = Authorized.check(
-    'inventory/purchasingrequest',
+  const editAuthority = Authorized.check(
+    'purchasingrequest.modifypurchasingrequest',
   ) || { rights: 'hidden' }
-  const isView =
-    row.purchaseRequestStatusFK === PURCHASE_REQUEST_STATUS.SUBMITTED  ||
-    viewEditAuthority.rights !== 'enable'
+  const editable =
+    row.purchaseRequestStatusFK !== PURCHASE_REQUEST_STATUS.SUBMITTED  &&
+    editAuthority.rights === 'enable'
+
   let menuOptions = [
     {
       id: 0,
-      label: isView ? 'View' : 'Edit',
-      Icon: isView ? View : Edit,
-      disabled: viewEditAuthority.rights !== 'enable',
+      label: editable ? 'Edit' : 'View',
+      Icon: editable ? Edit : View,
+      width: 130,
+    },
+    { isDivider: true },
+    {
+      id: 1,
+      label: 'Delete',
+      Icon: Delete,
+      disabled: !editable,
       width: 130,
     },
     { isDivider: true },

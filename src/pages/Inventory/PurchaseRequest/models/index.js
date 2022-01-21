@@ -29,10 +29,7 @@ export default createListViewModel({
       })
     },
     effects: {
-      *batchWriteOff({ payload }, { call }) {
-        const r = yield call(service.upsert, payload)
-        return r
-      },
+
     },
     reducers: {
       queryDone(state, { payload }) {

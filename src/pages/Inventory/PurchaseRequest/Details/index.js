@@ -16,6 +16,7 @@ import {
 import { ReportViewer } from '@/components/_medisys'
 import { podoOrderType } from '@/utils/codes'
 import AuthorizedContext from '@/components/Context/Authorized'
+import Authorized from '@/utils/Authorized'
 import Warining from '@material-ui/icons/Error'
 import {
   prSubmitAction,
@@ -67,7 +68,8 @@ class Index extends Component {
   }
 
   componentWillUnmount() {
-    this.props.dispatch({
+    const { dispatch } = window.g_app._store
+    dispatch({
       type: 'purchaseRequestDetails/initializePurchaseRequest',
     })
   }
@@ -92,7 +94,7 @@ class Index extends Component {
             `/inventory/purchaserequest/details?id=${prid}&&type=${'edit'}`,
           )
           dispatch({
-            type: 'purchaseRequestDetails/querypurchaseRequest',
+            type: 'purchaseRequestDetails/queryPurchaseRequest',
             payload: { id: prid, type: 'edit' },
           })
         } else {
@@ -104,18 +106,18 @@ class Index extends Component {
     }
   }
 
-  getRights = type => {
+  getRights = (type, editable) => {
     const authorityUrl =
       type === 'new'
-        ? 'inventory/purchasingrequest'
-        : 'inventory/purchasingrequest'
+        ? 'purchasingrequest.createpurchasingrequest'
+        : 'purchasingrequest.modifypurchasingrequest'
 
-    if (!getAccessRight(authorityUrl)) return 'disable'
-    return 'enable'
+    return getAccessRight(authorityUrl) && editable ? 'enable' : 'disable'
   }
 
   onSubmitButtonClicked = async action => {
-    const { dispatch, validateForm, history, values, handleSubmit } = this.props
+    const { validateForm, history, values, handleSubmit } = this.props
+    const { dispatch } = window.g_app._store
     let dispatchType = 'purchaseRequestDetails/savePR'
     let payload = {}
     const isFormValid = await validateForm()
@@ -125,8 +127,7 @@ class Index extends Component {
       handleSubmit()
     } else {
       const submit = () => {
-        window.g_app._store
-          .dispatch({
+        dispatch({
             type: dispatchType,
             payload: {
               ...payload,
@@ -193,23 +194,30 @@ class Index extends Component {
   }
   render() {
     const { purchaseRequestDetails, values, errors, classes } = this.props
-    const { purchaseRequest: pr, type } = purchaseRequestDetails
+    const { purchaseRequest: originPR, type } = purchaseRequestDetails
     const { purchaseRequest, rows } = values
-    const isEditable =
-      pr.purchaseRequestStatusFK != PURCHASE_REQUEST_STATUS.SUBMITTED
+
+    const modifyAuthority = Authorized.check(
+      'purchasingrequest.modifypurchasingrequest',
+    ) || { rights: 'hidden' }
+    const editable =
+      modifyAuthority.rights === 'enable' &&
+      originPR.purchaseRequestStatusFK != PURCHASE_REQUEST_STATUS.SUBMITTED
     return (
       <div>
-        <PRForm {...this.props} isReadOnly={!isEditable} />
-        <AuthorizedContext.Provider value={{ rights: this.getRights(type) }}>
+        <PRForm {...this.props} isReadOnly={!editable} />
+        <AuthorizedContext.Provider
+          value={{ rights: this.getRights(type, editable) }}
+        >
           {errors.rows && (
             <p className={classes.errorMsgStyle}>{errors.rows}</p>
           )}
-          <PRGrid {...this.props} isEditable={isEditable} />
+          <PRGrid {...this.props} isEditable={editable} />
         </AuthorizedContext.Provider>
         <AuthorizedContext.Provider
-          value={{ rights: this.getRights(type) }}
+          value={{ rights: this.getRights(type, editable) }}
         ></AuthorizedContext.Provider>
-        {isEditable && (
+        {editable && (
           <GridContainer
             style={{
               marginTop: 20,

@@ -6,6 +6,7 @@ import { ContextMenuOptions, PurchaseRequestGridCol } from '../variables'
 const PurchaseRequestDataGrid = ({
   selectedRows,
   actions: {
+    handleDelete,
     handleNavigate,
     handleOnSelectionChange,
     handlePrintPRReport,
@@ -16,6 +17,9 @@ const PurchaseRequestDataGrid = ({
     switch (id) {
       case '0':
         handleNavigate('edit', row.id)
+        break
+      case '1':
+        handleDelete(row.id)
         break
       case '2':
         handlePrintPRReport(row.id)

@@ -70,6 +70,13 @@ export default createFormViewModel({
           })
         }
       },
+      *deletePR({ payload }, { call }) {
+        const r = yield call(service.delete, payload)
+        if (r) {
+          return r
+        }
+        return false
+      },
       *savePR({ payload }, { call }) {
         const r = yield call(service.upsert, payload)
         if (r) {
