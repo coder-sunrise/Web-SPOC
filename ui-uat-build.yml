@@ -42,7 +42,7 @@ jobs:
         env:
           environment: $(process.env.client_env)
           client_secret: $(process.env.client_secret)
-          signalr_url: $(process.env.signalrUrl)
+          signalr_url: $(process.env.signalrurl)
           environment_url: $(process.env.url)
         displayName: Replace placeholders with actual values
 
