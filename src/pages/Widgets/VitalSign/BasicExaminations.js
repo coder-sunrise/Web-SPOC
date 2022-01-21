@@ -1,6 +1,7 @@
 import React, { PureComponent, useState } from 'react'
 // formik
 import { FastField, Field } from 'formik'
+import _ from 'lodash'
 import $ from 'jquery'
 // umi
 import { formatMessage, FormattedMessage } from 'umi'
@@ -14,12 +15,16 @@ import {
   RadioGroup,
 } from '@/components'
 import { YESNOOPTIUONS, GENDER } from '@/utils/constants'
-import { inputValue } from '@/pages/Widgets/PatientHistory/config'
+import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 
 class BasicExaminations extends PureComponent {
   constructor(props) {
     super(props)
     this.myRef = React.createRef()
+  }
+  state = {
+    expandedGeneral: false,
+    expandedOthers: false,
   }
 
   expandOthers = () => {
@@ -28,19 +33,19 @@ class BasicExaminations extends PureComponent {
     if (
       (values[fieldName] || []).find(
         row =>
-          inputValue(row.bodyFatPercentage) ||
-          inputValue(row.degreeOfObesity) ||
-          inputValue(row.headCircumference) ||
-          inputValue(row.chestCircumference) ||
-          inputValue(row.waistCircumference) ||
-          inputValue(row.isPregnancy) ||
-          inputValue(row.hepetitisVaccinationA) ||
-          inputValue(row.hepetitisVaccinationB) ||
-          inputValue(row.isFasting) ||
-          inputValue(row.isSmoking) ||
-          inputValue(row.isAlcohol) ||
-          inputValue(row.isMensus) ||
-          inputValue(row.isChild),
+          hasValue(row.bodyFatPercentage) ||
+          hasValue(row.degreeOfObesity) ||
+          hasValue(row.headCircumference) ||
+          hasValue(row.chestCircumference) ||
+          hasValue(row.waistCircumference) ||
+          hasValue(row.isPregnancy) ||
+          hasValue(row.hepetitisVaccinationA) ||
+          hasValue(row.hepetitisVaccinationB) ||
+          hasValue(row.isFasting) ||
+          hasValue(row.isSmoking) ||
+          hasValue(row.isAlcohol) ||
+          hasValue(row.isMensus) ||
+          hasValue(row.isChild),
       )
     )
       return true
@@ -55,6 +60,8 @@ class BasicExaminations extends PureComponent {
       arrayHelpers,
       fieldName = 'corPatientNoteVitalSign',
       patientInfo,
+      calculateStandardWeight,
+      calculateBodyFatMass,
     } = this.props
     const setFieldValue = arrayHelpers
       ? arrayHelpers.form.setFieldValue
@@ -175,6 +182,7 @@ class BasicExaminations extends PureComponent {
                       setFieldValue(`${fieldName}[0].weightKG`, e.target.value)
                       setTimeout(() => {
                         handleCalculateBMI()
+                        calculateBodyFatMass()
                       }, 1)
                       weightOnChange()
                     }}
@@ -197,6 +205,7 @@ class BasicExaminations extends PureComponent {
                     onChange={e => {
                       setTimeout(() => {
                         handleCalculateBMI()
+                        calculateStandardWeight()
                       }, 1)
                     }}
                   />
@@ -241,6 +250,11 @@ class BasicExaminations extends PureComponent {
                       id:
                         'reception.queue.visitRegistration.bodyFatPercentage.suffix',
                     })}
+                    onChange={async e => {
+                      setTimeout(() => {
+                        calculateBodyFatMass()
+                      }, 1)
+                    }}
                   />
                 )}
               />
@@ -460,17 +474,30 @@ class BasicExaminations extends PureComponent {
   }
 
   render() {
-    let div = $(this.myRef.current).find('div[aria-expanded]:eq(0)')
-    if (div.attr('aria-expanded') === 'false') div.click()
+    if (!this.state.expandedGeneral) {
+      let div = $(this.myRef.current).find('div[aria-expanded]:eq(0)')
+      if (div.attr('aria-expanded') === 'false') div.click()
+    }
 
-    if (this.expandOthers()) {
+    if (!this.state.expandedOthers && this.expandOthers()) {
       let divOthers = $(this.myRef.current).find('div[aria-expanded]:eq(1)')
       if (divOthers.attr('aria-expanded') === 'false') divOthers.click()
     }
 
     return (
       <div ref={this.myRef}>
-        <Accordion mode='multiple' collapses={this.getBasicExaminations()} />
+        <Accordion
+          mode='multiple'
+          collapses={this.getBasicExaminations()}
+          onChange={(event, p, expanded) => {
+            if (p.key === 0 && expanded && !this.state.expandedGeneral) {
+              this.setState({ expandedGeneral: true })
+            }
+            if (p.key === 1 && expanded && !this.state.expandedOthers) {
+              this.setState({ expandedOthers: true })
+            }
+          }}
+        />
       </div>
     )
   }

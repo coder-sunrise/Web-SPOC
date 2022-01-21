@@ -246,7 +246,40 @@ const widgets = [
       },
     },
   },
-
+  {
+    id: '23',
+    name: 'Eye Examinations',
+    accessRight: 'queue.consultation.widgets.eyeexaminations',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/EyeExaminations'),
+      loading: Loading,
+    }),
+    associatedProps: ['corEyeExaminations'],
+    layoutConfig: {
+      minW: 12,
+      minH: 10,
+      style: {
+        padding: '0 5px',
+      },
+    },
+  },
+  {
+    id: '24',
+    name: 'Audiometry Test',
+    accessRight: 'queue.consultation.widgets.audiometrytest',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/AudiometryTest'),
+      loading: Loading,
+    }),
+    associatedProps: ['corAudiometryTest'],
+    layoutConfig: {
+      minW: 12,
+      minH: 10,
+      style: {
+        padding: '0 5px',
+      },
+    },
+  },
   {
     id: '21',
     name: 'Dental Chart',

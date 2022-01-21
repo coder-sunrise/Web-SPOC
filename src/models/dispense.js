@@ -612,6 +612,8 @@ export default createFormViewModel({
       default: {
         corAttachment: [],
         corPatientNoteVitalSign: [],
+        corAudiometryTest: [],
+        corEyeExaminations: [],
         invoice: {
           isGSTInclusive: false,
           invoiceAdjustment: [],

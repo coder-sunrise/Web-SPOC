@@ -1,6 +1,6 @@
 import Yup from '@/utils/yup'
 import { visitBasicExaminationsSchema } from '@/pages/Reception/Queue/NewVisit/validationScheme'
-
+import { hasValue } from '../Widgets/PatientHistory/config'
 const schema = Yup.object().shape({
   // corPrescriptionItem: Yup.array().of(
   //   Yup.object().shape({

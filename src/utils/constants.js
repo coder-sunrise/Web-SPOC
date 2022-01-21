@@ -925,3 +925,9 @@ export const YESNOOPTIUONS = [
   { value: false, label: 'No' },
   { value: true, label: 'Yes' },
 ]
+
+export const AGETYPE = {
+  CHILD: 'Child',
+  YOUTH: 'Youth',
+  ADULT: 'Adult',
+}

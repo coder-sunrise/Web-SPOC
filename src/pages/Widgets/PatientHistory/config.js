@@ -28,6 +28,8 @@ export const WIDGETS_ID = {
   CONSULTATION_DOCUMENT: '20',
   NURSENOTES: '21',
   DOCTORNOTE: '22',
+  EYEEXAMINATIONS: '23',
+  AUDIOMETRYTEST: '24',
 }
 
 export const GPCategory = [
@@ -39,6 +41,8 @@ export const GPCategory = [
   WIDGETS_ID.VISITREMARKS,
   WIDGETS_ID.REFERRAL,
   WIDGETS_ID.VITALSIGN,
+  WIDGETS_ID.EYEEXAMINATIONS,
+  WIDGETS_ID.AUDIOMETRYTEST,
   WIDGETS_ID.ORDERS,
   WIDGETS_ID.INVOICE,
   WIDGETS_ID.CONSULTATION_DOCUMENT,
@@ -59,6 +63,8 @@ export const EyeCategory = [
   WIDGETS_ID.VISITREMARKS,
   WIDGETS_ID.REFERRAL,
   WIDGETS_ID.VITALSIGN,
+  WIDGETS_ID.EYEEXAMINATIONS,
+  WIDGETS_ID.AUDIOMETRYTEST,
   WIDGETS_ID.ORDERS,
   WIDGETS_ID.INVOICE,
   WIDGETS_ID.CONSULTATION_DOCUMENT,
@@ -149,6 +155,16 @@ export const categoryTypes = [
     value: WIDGETS_ID.VITALSIGN,
     name: 'Basic Examinations',
     authority: 'queue.consultation.widgets.vitalsign',
+  },
+  {
+    value: WIDGETS_ID.EYEEXAMINATIONS,
+    name: 'Eye Examinations',
+    authority: 'queue.consultation.widgets.eyeexaminations',
+  },
+  {
+    value: WIDGETS_ID.AUDIOMETRYTEST,
+    name: 'Audiometry Test',
+    authority: 'queue.consultation.widgets.audiometrytest',
   },
   {
     value: WIDGETS_ID.ORDERS,
@@ -346,6 +362,32 @@ export const widgets = (
     }),
   },
   {
+    id: WIDGETS_ID.EYEEXAMINATIONS,
+    name: 'Eye Examinations',
+    authority: 'queue.consultation.widgets.eyeexaminations',
+    component: Loadable({
+      loader: () => import('./EyeExaminations'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} />
+      },
+      loading: Loading,
+    }),
+  },
+  {
+    id: WIDGETS_ID.AUDIOMETRYTEST,
+    name: 'Audiometry Test',
+    authority: 'queue.consultation.widgets.audiometrytest',
+    component: Loadable({
+      loader: () => import('./AudiometryTest'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} />
+      },
+      loading: Loading,
+    }),
+  },
+  {
     id: WIDGETS_ID.INTRA_ORAL,
     name: 'Intra Oral',
     authority: 'queue.consultation.clinicalnotes.intraoral',
@@ -438,12 +480,12 @@ export const widgets = (
   },
 ]
 
-export const inputValue = value => {
+export const hasValue = value => {
   return value !== undefined && value !== null
 }
 
 export const getHistoryValueForBoolean = value => {
-  return inputValue(value) ? (value ? 'Yes' : 'No') : '-'
+  return hasValue(value) ? (value ? 'Yes' : 'No') : '-'
 }
 
 const checkNote = (widgetId, current) => {
@@ -596,29 +638,20 @@ export const showWidget = (current, widgetId, selectNoteTypes = []) => {
   // check show vital sign
   if (
     widgetId === WIDGETS_ID.VITALSIGN &&
-    !(current.patientNoteVitalSigns || []).find(
-      row =>
-        inputValue(row.temperatureC) ||
-        inputValue(row.bpSysMMHG) ||
-        inputValue(row.bpDiaMMHG) ||
-        inputValue(row.pulseRateBPM) ||
-        inputValue(row.saO2) ||
-        inputValue(row.weightKG) ||
-        inputValue(row.heightCM) ||
-        inputValue(row.bmi) ||
-        inputValue(row.bodyFatPercentage) ||
-        inputValue(row.degreeOfObesity) ||
-        inputValue(row.headCircumference) ||
-        inputValue(row.chestCircumference) ||
-        inputValue(row.waistCircumference) ||
-        inputValue(row.isPregnancy) ||
-        inputValue(row.hepetitisVaccinationA) ||
-        inputValue(row.hepetitisVaccinationB) ||
-        inputValue(row.isFasting) ||
-        inputValue(row.isSmoking) ||
-        inputValue(row.isAlcohol) ||
-        inputValue(row.isMensus),
-    )
+    !showPatientNoteVitalSigns(current.patientNoteVitalSigns)
+  )
+    return false
+  // check show eye examinations
+  if (
+    widgetId === WIDGETS_ID.EYEEXAMINATIONS &&
+    !showEyeExaminations(current.corEyeExaminations)
+  )
+    return false
+
+  // check show Audiometry Test
+  if (
+    widgetId === WIDGETS_ID.AUDIOMETRYTEST &&
+    !showAudiometryTest(current.corAudiometryTest)
   )
     return false
   // check show visit referral
@@ -656,4 +689,75 @@ export const showNote = (
     return false
   }
   return true
+}
+
+const showPatientNoteVitalSigns = (patientNoteVitalSigns = []) => {
+  if (
+    patientNoteVitalSigns.find(
+      row =>
+        hasValue(row.temperatureC) ||
+        hasValue(row.bpSysMMHG) ||
+        hasValue(row.bpDiaMMHG) ||
+        hasValue(row.pulseRateBPM) ||
+        hasValue(row.saO2) ||
+        hasValue(row.weightKG) ||
+        hasValue(row.heightCM) ||
+        hasValue(row.bmi) ||
+        hasValue(row.bodyFatPercentage) ||
+        hasValue(row.degreeOfObesity) ||
+        hasValue(row.headCircumference) ||
+        hasValue(row.chestCircumference) ||
+        hasValue(row.waistCircumference) ||
+        hasValue(row.isPregnancy) ||
+        hasValue(row.hepetitisVaccinationA) ||
+        hasValue(row.hepetitisVaccinationB) ||
+        hasValue(row.isFasting) ||
+        hasValue(row.isSmoking) ||
+        hasValue(row.isAlcohol) ||
+        hasValue(row.isMensus),
+    )
+  )
+    return true
+  return false
+}
+
+export const showEyeExaminations = (corEyeExaminations = []) => {
+  if (
+    corEyeExaminations.find(
+      row =>
+        hasValue(row.visionCorrectionMethod) ||
+        hasValue(row.leftBareEye5) ||
+        hasValue(row.leftCorrectedVision5) ||
+        hasValue(row.leftBareEye50) ||
+        hasValue(row.leftCorrectedVision50) ||
+        hasValue(row.rightBareEye5) ||
+        hasValue(row.rightCorrectedVision5) ||
+        hasValue(row.rightBareEye50) ||
+        hasValue(row.rightCorrectedVision50) ||
+        hasValue(row.leftFirstResult) ||
+        hasValue(row.leftSecondResult) ||
+        hasValue(row.leftThirdResult) ||
+        hasValue(row.rightFirstResult) ||
+        hasValue(row.rightSecondResult) ||
+        hasValue(row.rightThirdResult) ||
+        hasValue(row.colorVisionTestResult) ||
+        (hasValue(row.remarks) && row.remarks.trim().length),
+    )
+  )
+    return true
+  return false
+}
+
+export const showAudiometryTest = (corEyeExaminations = []) => {
+  if (
+    corEyeExaminations.find(
+      row =>
+        hasValue(row.leftResult1000Hz) ||
+        hasValue(row.leftResult4000Hz) ||
+        hasValue(row.rightResult1000Hz) ||
+        hasValue(row.rightResult4000Hz),
+    )
+  )
+    return true
+  return false
 }
