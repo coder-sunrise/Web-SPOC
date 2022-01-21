@@ -148,7 +148,7 @@ class PurchaseRequest extends Component {
           maxWidth='lg'
         >
           <ReportViewer
-            reportID={26}
+            reportID={91}
             reportParameters={{
               PurchaseRequestId: this.state.selectedRowId,
             }}
