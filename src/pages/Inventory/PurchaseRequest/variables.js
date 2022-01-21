@@ -62,25 +62,24 @@ export const ContextMenuOptions = row => {
   let menuOptions = [
     {
       id: 0,
-      label: editable ? 'Edit' : 'View',
-      Icon: editable ? Edit : View,
-      width: 130,
+      label: 'Edit',
+      Icon: Edit,
+      disabled: editAuthority.rights === 'enable',
+      color:'primary',
     },
-    { isDivider: true },
     {
       id: 1,
       label: 'Delete',
       Icon: Delete,
       disabled: !editable,
-      width: 130,
+      color:'danger',
     },
-    { isDivider: true },
     {
       id: 2,
       label: 'Print',
       Icon: Print,
       disabled: false,
-      width: 130,
+      color:'primary',
     },
   ]
   return menuOptions

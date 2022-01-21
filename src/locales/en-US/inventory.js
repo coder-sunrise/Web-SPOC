@@ -93,6 +93,8 @@ export default {
   'inventory.purchaserequest.prno': 'Purchase Request #',
   'inventory.purchaserequest.status': 'PR Status',
   'inventory.purchaserequest.detail.requestedBy': 'Request By',
+  'inventory.purchaserequest.detail.delete': 'Delete',
+  'inventory.purchaserequest.detail.print': 'Print',
   'inventory.purchaserequest.detail.save': 'Save',
   'inventory.purchaserequest.detail.submit': 'Submit',
   'inventory.purchaserequest.detail.remarks' : 'Remarks',

@@ -77,7 +77,7 @@ class FilterBar extends PureComponent {
                 noTodayLimit
                 args={args}
                 disabled={isAllDateChecked}
-                label='Transaction Date From'
+                label='Date From'
                 formValues={{
                   startDate: transactionStartDate,
                   endDate: transactionEndDate,
@@ -94,7 +94,7 @@ class FilterBar extends PureComponent {
                 noTodayLimit
                 isEndDate
                 args={args}
-                label='Transaction Date To'
+                label='Date To'
                 disabled={isAllDateChecked}
                 formValues={{
                   startDate: transactionStartDate,
@@ -183,7 +183,7 @@ class FilterBar extends PureComponent {
             >
               <FormattedMessage id='form.search' />
             </ProgressButton>
-            <Authorized authority='inventory/purchasingrequest'>
+            <Authorized authority='purchasingrequest.createpurchasingrequest'>
               <Button onClick={() => handleNavigate('new')} color='primary'>
                 <Add />
                 Add New

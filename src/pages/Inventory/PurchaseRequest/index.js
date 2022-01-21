@@ -53,7 +53,7 @@ class PurchaseRequest extends Component {
     dispatch({
       type: 'purchaseRequestList/query',
       payload: {
-        sorting: [{ columnName: 'purchaseRequestNo', direction: 'asc' }],
+        sorting: [{ columnName: 'purchaseRequestNo', direction: 'desc' }],
         lgteql_purchaseRequestDate:
           purchaseRequestList.filterSearch.transactionDates[0],
         lsteql_purchaseRequestDate:
@@ -67,13 +67,24 @@ class PurchaseRequest extends Component {
     this.toggleReport()
   }
 
-  onDeleteRow = id => {
+  onDeleteRow = row => {
     const { dispatch } = this.props
     dispatch({
-      type: 'purchaseRequestDetails/deletePR',
-      payload: { id },
-    }).then(r => {
-      this.queryList()
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: `Confirm to delete ${row.purchaseRequestNo} ?`,
+        openConfirmText: 'Confirm',
+        onConfirmSave: () => {
+          dispatch({
+            type: 'purchaseRequestDetails/deletePR',
+            payload: { id: row.id },
+          }).then(r => {
+            notification.success({ message: 'PR cancelled' })
+            this.queryList()
+          })
+        },
+      },
     })
   }
 

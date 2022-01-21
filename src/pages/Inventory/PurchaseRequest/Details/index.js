@@ -43,7 +43,11 @@ const styles = theme => ({
   purchaseRequestDetails,
 }))
 @withFormikExtend({
-  authority: ['inventory/purchasingrequest'],
+  authority: [
+    'purchasingrequest.createpurchasingrequest',
+    'purchasingrequest.modifypurchasingrequest',
+    'inventort/purchaserequest',
+  ],
   displayName: 'purchaseRequestDetails',
   enableReinitialize: true,
   mapPropsToValues: ({ purchaseRequestDetails }) => {
@@ -62,7 +66,10 @@ const styles = theme => ({
   handleSubmit: () => {},
 })
 class Index extends Component {
-
+  state = {
+    showReport: false,
+    selectedRowId: 0,
+  }
   componentDidMount() {
     this.getData()
   }
@@ -128,27 +135,24 @@ class Index extends Component {
     } else {
       const submit = () => {
         dispatch({
-            type: dispatchType,
-            payload: {
-              ...payload,
-            },
-          })
-          .then(r => {
-            if (r) {
-              let message = ''
-              if (action === prSubmitAction.SAVE) message = 'PR saved'
-              else if (action === prSubmitAction.SUBMITTED)
-                message = 'PR submitted'
-              notification.success({ message })
+          type: dispatchType,
+          payload: {
+            ...payload,
+          },
+        }).then(r => {
+          if (r) {
+            let message = ''
+            if (action === prSubmitAction.SAVE) message = 'PR saved'
+            else if (action === prSubmitAction.SUBMITTED)
+              message = 'PR submitted'
 
-              if (getAccessRight()) {
-                const { id } = r
-                this.getData(id)
-              } else {
-                history.push('/inventory/purchaserequest')
-              }
+            if (getAccessRight()) {
+              this.getData(r.id)
+            } else {
+              history.push('/inventory/purchaserequest')
             }
-          })
+          }
+        })
         validation = true
         return validation
       }
@@ -163,7 +167,10 @@ class Index extends Component {
     const { purchaseRequestDetails, values } = this.props
     const { type } = purchaseRequestDetails
     const { purchaseRequest, rows } = values
-    let purchaseRequestStatusFK = action
+    let purchaseRequestStatusFK =
+      action != PURCHASE_REQUEST_STATUS.SUBMITTED
+        ? PURCHASE_REQUEST_STATUS.SAVE
+        : action
     let purchaseRequestItem = rows.map(x => {
       const itemType = podoOrderType.find(y => y.value === x.type)
       let result = {}
@@ -192,47 +199,97 @@ class Index extends Component {
       purchaseRequestItem,
     }
   }
+
+  onDeleteRow = row => {
+    const { dispatch } = window.g_app._store
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: `Confirm to delete ${row.purchaseRequestNo} ?`,
+        openConfirmText: 'Confirm',
+        onConfirmSave: () => {
+          dispatch({
+            type: 'purchaseRequestDetails/deletePR',
+            payload: { id: row.id },
+          }).then(r => {
+            notification.success({ message: 'PR cancelled' })
+            history.push('/inventory/purchaserequest')
+          })
+        },
+      },
+    })
+  }
+
+  printPRReport = rowId => {
+    this.setState({ selectedRowId: rowId })
+    this.toggleReport()
+  }
+
+  toggleReport = () => {
+    this.setState(preState => ({
+      showReport: !preState?.showReport,
+    }))
+  }
+
   render() {
     const { purchaseRequestDetails, values, errors, classes } = this.props
     const { purchaseRequest: originPR, type } = purchaseRequestDetails
     const { purchaseRequest, rows } = values
 
-    const modifyAuthority = Authorized.check(
-      'purchasingrequest.modifypurchasingrequest',
-    ) || { rights: 'hidden' }
-    const editable =
-      modifyAuthority.rights === 'enable' &&
+    const modifyAR = getAccessRight('purchasingrequest.modifypurchasingrequest')
+    const createAR = getAccessRight('purchasingrequest.createpurchasingrequest')
+    const unsubmit =
       originPR.purchaseRequestStatusFK != PURCHASE_REQUEST_STATUS.SUBMITTED
+    const isEditMode = originPR.id
+    const editable = modifyAR && unsubmit && isEditMode
+    const creatable = createAR && !isEditMode
+    const isReadOnly = !editable && !creatable
+    console.log(this.state)
     return (
       <div>
-        <PRForm {...this.props} isReadOnly={!editable} />
-        <AuthorizedContext.Provider
+        <PRForm {...this.props} isReadOnly={isReadOnly} />
+        {/* <AuthorizedContext.Provider
           value={{ rights: this.getRights(type, editable) }}
-        >
+        > */}
+        <div>
           {errors.rows && (
             <p className={classes.errorMsgStyle}>{errors.rows}</p>
           )}
-          <PRGrid {...this.props} isEditable={editable} />
-        </AuthorizedContext.Provider>
-        <AuthorizedContext.Provider
-          value={{ rights: this.getRights(type, editable) }}
-        ></AuthorizedContext.Provider>
-        {editable && (
-          <GridContainer
-            style={{
-              marginTop: 20,
-              display: 'flex',
-              justifyContent: 'flex-end',
-            }}
-          >
-            <div>
+          <PRGrid {...this.props} isEditable={!isReadOnly} />
+        </div>
+        {/* </AuthorizedContext.Provider> */}
+        <GridContainer
+          style={{
+            marginTop: 20,
+            display: 'flex',
+            justifyContent: 'flex-end',
+          }}
+        >
+          <div>
+            {editable && unsubmit && (
+              <ProgressButton
+                color='danger'
+                icon={null}
+                onClick={() => this.onDeleteRow(originPR)}
+              >
+                {formatMessage({
+                  id: 'inventory.purchaserequest.detail.delete',
+                })}
+              </ProgressButton>
+            )}
+            {(creatable || editable) && unsubmit && (
               <ProgressButton
                 color='primary'
                 icon={null}
                 onClick={() => this.onSubmitButtonClicked(prSubmitAction.SAVE)}
               >
-                {formatMessage({ id: 'inventory.purchaserequest.detail.save' })}
+                {formatMessage({
+                  id: 'inventory.purchaserequest.detail.save',
+                })}
               </ProgressButton>
+            )}
+            {(creatable || editable) && unsubmit && (
               <ProgressButton
                 color='success'
                 icon={null}
@@ -244,9 +301,33 @@ class Index extends Component {
                   id: 'inventory.purchaserequest.detail.submit',
                 })}
               </ProgressButton>
-            </div>
-          </GridContainer>
-        )}
+            )}
+            {isEditMode && (
+              <ProgressButton
+                color='primary'
+                icon={null}
+                onClick={() => printPRReport(originPR.id)}
+              >
+                {formatMessage({
+                  id: 'inventory.purchaserequest.detail.print',
+                })}
+              </ProgressButton>
+            )}
+          </div>
+        </GridContainer>
+        <CommonModal
+          open={this.state.showReport}
+          onClose={this.toggleReport}
+          title='Purchase Request'
+          maxWidth='lg'
+        >
+          <ReportViewer
+            reportID={91}
+            reportParameters={{
+              PurchaseRequestId: this.state.selectedRowId,
+            }}
+          />
+        </CommonModal>
       </div>
     )
   }

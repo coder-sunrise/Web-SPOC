@@ -1,7 +1,10 @@
 import React from 'react'
 import { GridContextMenuButton as GridButton } from 'medisys-components'
-import { CommonTableGrid, Tooltip } from '@/components'
-import { ContextMenuOptions, PurchaseRequestGridCol } from '../variables'
+import { CommonTableGrid, Tooltip, Button } from '@/components'
+import { getAccessRight , PurchaseRequestGridCol, PURCHASE_REQUEST_STATUS } from '../variables'
+import Edit from '@material-ui/icons/Edit'
+import Delete from '@material-ui/icons/Delete'
+import Print from '@material-ui/icons/Print'
 
 const PurchaseRequestDataGrid = ({
   selectedRows,
@@ -15,13 +18,13 @@ const PurchaseRequestDataGrid = ({
 }) => {
   const onContextButtonClick = (row, id) => {
     switch (id) {
-      case '0':
+      case 0:
         handleNavigate('edit', row.id)
         break
-      case '1':
-        handleDelete(row.id)
+      case 1:
+        handleDelete(row)
         break
-      case '2':
+      case 2:
         handlePrintPRReport(row.id)
         break
       default:
@@ -70,17 +73,39 @@ const PurchaseRequestDataGrid = ({
         {
           columnName: 'action',
           align: 'center',
+          width: 130,
           render: row => {
+            const editableAR = getAccessRight('purchasingrequest.modifypurchasingrequest')
+            const editable = editableAR && row.purchaseRequestStatusFK !== PURCHASE_REQUEST_STATUS.SUBMITTED
             return (
-              <Tooltip title='More Actions'>
-                <div style={{ display: 'inline-block' }}>
-                  <GridButton
-                    row={row}
-                    onClick={onContextButtonClick}
-                    contextMenuOptions={ContextMenuOptions(row)}
-                  />
-                </div>
-              </Tooltip>
+              <div>
+                <Button
+                  color='primary'
+                  justIcon
+                  title='Edit'
+                  disabled={!editableAR}
+                  onClick={() => onContextButtonClick(row, 0)}
+                >
+                  <Edit />
+                </Button>
+                <Button
+                  color='danger'
+                  justIcon
+                  title='Delete'
+                  disabled={!editable}
+                  onClick={() => onContextButtonClick(row, 1)}
+                >
+                  <Delete />
+                </Button>
+                <Button
+                  color='primary'
+                  justIcon
+                  title='Print'
+                  onClick={() => onContextButtonClick(row, 2)}
+                >
+                  <Print />
+                </Button>
+              </div>
             )
           },
         },
