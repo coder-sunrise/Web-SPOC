@@ -34,12 +34,14 @@ steps:
       ((Get-Content -path config\config.js -Raw) -replace '{client_secret}',$env:client_secret) | Set-Content -Path config\config.js
       ((Get-Content -path config\config.js -Raw) -replace '{signalr_url}',$env:signalr_url) | Set-Content -Path config\config.js
       ((Get-Content -path config\config.js -Raw) -replace '{url}',$env:environment_url) | Set-Content -Path config\config.js
+      ((Get-Content -path config\config.js -Raw) -replace '{url}',$env:default_cliniccode) | Set-Content -Path config\config.js
       (Get-Content -path config\config.js -Raw)
     env:
       environment: $(process.env.client_env)
       client_secret: $(process.env.client_secret)
       signalr_url: $(process.env.signalrUrl)
       environment_url: $(process.env.url)
+      default_cliniccode: $(process.env.default_cliniccode)
     displayName: Replace placeholders with actual values
 
   - script:

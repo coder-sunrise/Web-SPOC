@@ -115,13 +115,11 @@ const submitKey = 'login/getToken'
 @connect(({ login, routing }) => ({ login, routing }))
 @withFormik({
   mapPropsToValues: () => {
-    if (process.env.NODE_ENV === 'development')
-      return {
-        username: '',
-        password: '',
-        clinicCode: '',
-      }
-    return { username: '', password: '', clinicCode: '' }
+    return {
+      username: '',
+      password: '',
+      clinicCode: process.env.default_cliniccode,
+    }
   },
   handleSubmit: (values, { props }) => {
     const { username, password, clinicCode } = values
@@ -205,6 +203,15 @@ class NewLogin extends React.Component {
     const { classes, login = { isInvalidLogin: false } } = this.props
     const { isInvalidLogin } = login
     const { cardAnimation } = this.state
+    const defaultClinicCode = process.env.client_env
+    const showClinicCode =
+      history.location.pathname.toLowerCase() === '/user/login/clinic'
+
+    console.log(
+      'process.env.default_cliniccode',
+      process.env.default_cliniccode,
+    )
+
     return (
       <React.Fragment>
         <div className={classes.container}>
@@ -262,15 +269,17 @@ class NewLogin extends React.Component {
                       />
                     )}
                   />
-                  <FastField
-                    name='clinicCode'
-                    render={args => (
-                      <TextField
-                        {...args}
-                        label={formatMessage({ id: 'app.login.clinicCode' })}
-                      />
-                    )}
-                  />
+                  {showClinicCode && (
+                    <FastField
+                      name='clinicCode'
+                      render={args => (
+                        <TextField
+                          {...args}
+                          label={formatMessage({ id: 'app.login.clinicCode' })}
+                        />
+                      )}
+                    />
+                  )}
                 </CardBody>
                 <CardFooter
                   className={classnames(classes.justifyContentCenter)}

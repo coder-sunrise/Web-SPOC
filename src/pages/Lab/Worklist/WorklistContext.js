@@ -12,18 +12,6 @@ export const WorklistContextProvider = props => {
   const [isAnyWorklistModelOpened, setIsAnyWorklistModelOpened] = useState(
     false,
   )
-  const [ctvisitpurpose, setCtVisitPurpose] = useState([])
-
-  useEffect(() => {
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctvisitpurpose',
-      },
-    }).then(v => {
-      setCtVisitPurpose(v)
-    })
-  }, [])
 
   return (
     // this is the provider providing state

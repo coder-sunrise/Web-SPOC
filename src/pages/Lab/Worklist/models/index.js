@@ -1,3 +1,4 @@
+import { notification } from '@/components'
 import { createListViewModel } from 'medisys-model'
 import service from '../services'
 
@@ -9,7 +10,26 @@ export default createListViewModel({
     state: {},
     setting: {},
     subscriptions: ({ dispatch }) => {},
-    effects: {},
+    effects: {
+      *receiveSpecimen({ payload }, { call, put }) {
+        const status = yield call(service.receiveSpecimen, payload)
+
+        if (status === 200) {
+          notification.success({ message: 'Lab specimen received.' })
+          return true
+        }
+        return status
+      },
+      *discardSpecimen({ payload }, { call, put }) {
+        const status = yield call(service.discardSpecimen, payload)
+
+        if (status === 200) {
+          notification.success({ message: 'Lab specimen discarded.' })
+          return true
+        }
+        return status
+      },
+    },
     reducers: {},
   },
 })

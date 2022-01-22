@@ -283,7 +283,6 @@ const RadiologyDetails = () => {
         }}
         confirmProps={{ disable: true }}
         maxWidth='lg'
-        overrideLoading
       >
         <GridContainer
           style={{ height: !isReadOnly ? 700 : undefined, overflowY: 'scroll' }}
