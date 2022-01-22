@@ -205,7 +205,8 @@ class NewLogin extends React.Component {
     const { cardAnimation } = this.state
     const defaultClinicCode = process.env.client_env
     const showClinicCode =
-      history.location.pathname.toLowerCase() === '/user/login/clinic'
+      history.location.pathname.toLowerCase() === '/user/login/clinic' ||
+      process.env.client_env !== 'production'
 
     console.log(
       'process.env.default_cliniccode',
