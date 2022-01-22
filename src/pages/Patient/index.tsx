@@ -158,6 +158,7 @@ const defaultColumns = [
             label={formatMessage({
               id: 'finance.scheme.search.cpname',
             })}
+            maxTagCount={0}
             mode='multiple'
             code='ctCopayer'
             labelField='displayValue'
