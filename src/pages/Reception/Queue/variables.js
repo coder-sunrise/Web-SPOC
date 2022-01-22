@@ -47,21 +47,21 @@ export const filterMap = {
 }
 
 export const AppointmentContextMenu = [
-  {
-    id: 8,
-    label: 'Register Visit',
-    Icon: Edit,
-    disabled: true,
-    authority: 'queue.registervisit',
-  },
-  {
-    id: 9,
-    label: 'Register Patient',
-    Icon: Person,
-    disabled: true,
-    authority: 'patientdatabase.newpatient',
-  },
-]
+         {
+           id: 8,
+           label: 'New Visit',
+           Icon: Edit,
+           disabled: true,
+           authority: 'queue.registervisit',
+         },
+         {
+           id: 9,
+           label: 'Register Patient',
+           Icon: Person,
+           disabled: true,
+           authority: 'patientdatabase.newpatient',
+         },
+       ]
 
 export const ContextMenuOptions = [
   {

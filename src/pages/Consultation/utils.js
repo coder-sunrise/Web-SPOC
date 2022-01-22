@@ -555,7 +555,11 @@ const getOrdersData = val => {
         if (activeVitalSign) {
           weightKG = activeVitalSign.weightKG
         } else {
-          weightKG = visitRegistration.entity.visit.weightKG
+          const visitBasicExaminations =
+            visitRegistration.entity?.visit?.visitBasicExaminations || []
+          if (visitBasicExaminations.length) {
+            weightKG = visitBasicExaminations[0].weightKG
+          }
         }
 
         const { dob } = patient
@@ -895,17 +899,23 @@ const getInstruction = (instructions, language, codetable) => {
         nextStepdose = ''
       }
 
-      const itemDuration = item.duration ? ` For ${item.duration} day(s)` : ''
-
-      instruction += `${getTranslationValue(
-        usage?.translationData,
-        language,
-        'displayValue',
-      )} ${getTranslationValue(
-        dosage?.translationData,
-        language,
-        'displayValue',
-      )} ${getTranslationValue(
+      let itemDuration = item.duration ? ` For ${item.duration} day(s)` : ''
+      let separator = nextStepdose
+      if (language === 'JP') {
+        separator = nextStepdose === '' ? '<br>' : ''
+        itemDuration = item.duration ? `${item.duration} 日分` : ''
+      }
+      let usagePrefix = ''
+      if (language === 'JP' && item.dosageFK) {
+        usagePrefix = '1回'
+      } else {
+        usagePrefix = getTranslationValue(
+          usage?.translationData,
+          language,
+          'displayValue',
+        )
+      }
+      instruction += `${usagePrefix} ${getTranslationValue(
         uom?.translationData,
         language,
         'displayValue',
@@ -913,7 +923,7 @@ const getInstruction = (instructions, language, codetable) => {
         frequency?.translationData,
         language,
         'displayValue',
-      )}${itemDuration}${nextStepdose}`
+      )}${itemDuration}${separator}`
     }
   }
   return instruction

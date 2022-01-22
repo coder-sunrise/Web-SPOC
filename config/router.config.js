@@ -401,6 +401,19 @@ const _routes = [
           //   component: './Inventory/PurchaseDelivery/Detail',
           // },
           {
+            path: '/inventory/purchaserequest',
+            name: 'purchaserequest',
+            component: './Inventory/PurchaseRequest',
+            authority: ['inventory/purchasingrequest'],
+          },
+          {
+            path: '/inventory/purchaserequest/details',
+            name: 'purchaserequest.detail',
+            hideInMenu: true,
+            component: './Inventory/PurchaseRequest/Details',
+            authority: ['inventory/purchasingrequest'],
+          },
+          {
             path: '/inventory/pr',
             name: 'pd',
             component: './Inventory/PurchaseReceive',
@@ -1276,6 +1289,12 @@ const _routes = [
             name: 'summarycomment',
             component: './Setting/SummaryComment',
             // authority: ['settings.clinicsetting.individualcomment'],
+          },
+          {
+            path: '/setting/creditfacility',
+            name: 'creditfacility',
+            component: './Setting/creditfacility',
+            authority: ['settings.clinicsetting.creditfacility'],
           },
         ],
       },

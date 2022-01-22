@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from 'react'
+import React, { memo, useEffect, useState, Fragment } from 'react'
 import { withStyles } from '@material-ui/core'
 // antd
 import InfoCircleOutlined from '@ant-design/icons/InfoCircleOutlined'
@@ -18,6 +18,8 @@ import {
   CodeSelect,
   Select,
   ClinicianSelect,
+  Checkbox,
+  Tooltip,
   Switch,
   Popover,
   IconButton,
@@ -114,7 +116,7 @@ const VisitInfoCard = ({
   const disableConsReady = Authorized.check('queue.modifyconsultationready')
 
   const validateQNo = value => {
-    const qNo = parseFloat(value).toFixed(1)
+    const qNo = roundTo(value, clinicSettings.settings.isQueueNoDecimal ? 1 : 0)
     if (existingQNo.includes(qNo))
       return 'Queue No. already existed in current queue list'
     return ''
@@ -195,6 +197,8 @@ const VisitInfoCard = ({
       setFieldValue('mcReportPriority', 'Normal')
     }
 
+    setFieldValue('visitBasicExaminations[0].visitPurposeFK', v)
+
     if (template) {
       handleVisitOrderTemplateChange(v, template)
     }
@@ -236,8 +240,11 @@ const VisitInfoCard = ({
     values.visitStatus === VISIT_STATUS.WAITING ||
     values.visitStatus === VISIT_STATUS.UPCOMING_APPT
 
-  const { isEnablePackage = false, visitTypeSetting } = clinicSettings.settings
-
+  const {
+    isEnablePackage = false,
+    visitTypeSetting,
+    isQueueNoDecimal,
+  } = clinicSettings.settings
   let visitTypeSettingsObj = undefined
   let visitPurpose = undefined
   if (visitTypeSetting) {
@@ -340,14 +347,17 @@ const VisitInfoCard = ({
             render={args => (
               <NumberInput
                 {...args}
-                format='0.0'
+                format={isQueueNoDecimal ? '0.0' : '0'}
+                precision={isQueueNoDecimal ? 1 : 0}
                 // disabled={isReadOnly}
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.queueNo',
                 })}
                 formatter={value => {
                   const isNaN = Number.isNaN(parseFloat(value))
-                  return isNaN ? value : parseFloat(value).toFixed(1)
+                  return isNaN
+                    ? value
+                    : parseFloat(value).toFixed(isQueueNoDecimal ? 1 : 0)
                 }}
               />
             )}
@@ -369,6 +379,17 @@ const VisitInfoCard = ({
               )}
             />
           )}
+          <Field
+            name='isForInvoiceReplacement'
+            render={args => (
+              <Checkbox
+                style={{ position: 'relative', top: 5 }}
+                {...args}
+                tooltip='This visit is created for past invoice replacement.'
+                label='For Invoice Replacement'
+              />
+            )}
+          />
         </GridItem>
         <GridItem xs md={3}>
           <Field
@@ -564,27 +585,30 @@ const VisitInfoCard = ({
           </Authorized>
         </GridItem>
         <GridItem xs md={3}>
-          <Authorized authority='queue.visitgroup'>
-            <Popover
-              icon={null}
-              visible={visitGroupPopup}
-              placement='topLeft'
-              content={
-                <div>
-                  <p>- Search by existing group number or patient name.</p>
-                  <p>- Selecting visit group will set Cons. Ready to "No".</p>
-                </div>
-              }
-            >
-              <IconButton
-                size='small'
-                onMouseOver={handleVisitGroupFocus}
-                onMouseOut={handleVisitGroupBlur}
+          <Fragment>
+            <Authorized authority='queue.visitgroup'>
+              <Popover
+                icon={null}
+                visible={visitGroupPopup}
+                placement='topLeft'
+                content={
+                  <div>
+                    <p>- Search by existing group number or patient name.</p>
+                    <p>- Selecting visit group will set Cons. Ready to "No".</p>
+                  </div>
+                }
               >
-                <InfoCircleOutlined />
-              </IconButton>
-            </Popover>
-          </Authorized>
+                <IconButton
+                  size='small'
+                  style={{ position: 'relative', top: 8 }}
+                  onMouseOver={handleVisitGroupFocus}
+                  onMouseOut={handleVisitGroupBlur}
+                >
+                  <InfoCircleOutlined />
+                </IconButton>
+              </Popover>
+            </Authorized>
+          </Fragment>
         </GridItem>
         {showAdjusment &&
         ((ctinvoiceadjustment || []).length > 0 ||

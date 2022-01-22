@@ -288,9 +288,16 @@ export const General = props => {
 
         <GridItem md={3}>
           <Field
-            name='creditInformation'
+            name='creditFacilityFK'
             render={args => (
-              <TextField label='Credit Code' maxLength={300} {...args} />
+              <CodeSelect
+                label='Credit Facility'
+                code='ctcreditfacility'
+                autocomplete='off'
+                tooltipField='description'
+                orderBy={(['displayValue'], ['asc'])}
+                {...args}
+              />
             )}
           />
         </GridItem>

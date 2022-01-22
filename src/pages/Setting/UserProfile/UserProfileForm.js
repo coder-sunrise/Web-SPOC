@@ -28,7 +28,11 @@ import {
   MobileNumberInput,
 } from '@/components/_medisys'
 // utils
-import { NOTIFICATION_TYPE, NOTIFICATION_STATUS, CLINICAL_ROLE } from '@/utils/constants'
+import {
+  NOTIFICATION_TYPE,
+  NOTIFICATION_STATUS,
+  CLINICAL_ROLE,
+} from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
 import * as queueServices from '@/services/queue'
 import clinicServices from '@/services/clinicInfo'
@@ -79,31 +83,31 @@ const styles = theme => ({
       }),
       name: Yup.string().required('Name is a required field'),
       // phoneNumber: Yup.string().required('Contact No. is a required field'),
-      userAccountNo: Yup.string().required(
-        'User Account No. is a required field',
-      ),
+      // userAccountNo: Yup.string().required(
+      //   'User Account No. is a required field',
+      // ),
       email: Yup.string().email('Invalid email'),
       effectiveDates: Yup.array()
         .of(Yup.date())
         .min(2)
         .required(),
       role: Yup.string().required('Role is a required field'),
-      doctorProfile: Yup.object()
-        .transform(value => (value === null ? {} : value))
-        .when('role', {
-          is(val) {
-            if (val === undefined) return false
-            return (
-              ctRole.find(item => item.id === parseInt(val, 10))
-                .clinicalRoleName === 'Doctor' ||
-              ctRole.find(item => item.id === parseInt(val, 10))
-                .clinicalRoleName === 'Doctor Owner'
-            )
-          },
-          then: Yup.object().shape({
-            doctorMCRNo: Yup.string().required(),
-          }),
-        }),
+      // doctorProfile: Yup.object()
+      //   .transform(value => (value === null ? {} : value))
+      //   .when('role', {
+      //     is(val) {
+      //       if (val === undefined) return false
+      //       return (
+      //         ctRole.find(item => item.id === parseInt(val, 10))
+      //           .clinicalRoleName === 'Doctor' ||
+      //         ctRole.find(item => item.id === parseInt(val, 10))
+      //           .clinicalRoleName === 'Doctor Owner'
+      //       )
+      //     },
+      //     then: Yup.object().shape({
+      //       doctorMCRNo: Yup.string().required(),
+      //     }),
+      //   }),
     }
     return isEdit
       ? Yup.object().shape(baseValidationRule)
@@ -228,7 +232,6 @@ class UserProfileForm extends React.PureComponent {
     showActiveSessionWarning: false,
     showChangePassword: false,
     showPrimaryClinicianChanges: false,
-    canEditDoctorMCR: false,
   }
 
   toggleChangePasswordModal = () => {
@@ -241,18 +244,6 @@ class UserProfileForm extends React.PureComponent {
     this.setState(preState => ({
       showPrimaryClinicianChanges: !preState.showPrimaryClinicianChanges,
     }))
-  }
-
-  onRoleChange = value => {
-    const { ctRole, setFieldValue } = this.props
-    const role = ctRole.find(item => item.id === value)
-
-    this.setState({
-      canEditDoctorMCR:
-        role !== undefined &&
-        (role.clinicalRoleName === 'Doctor' ||
-          role.clinicalRoleName === 'Doctor Owner'),
-    })
   }
 
   promptPrimaryClinicianChanges = currentPrimaryRegisteredDoctorFK => {
@@ -369,7 +360,6 @@ class UserProfileForm extends React.PureComponent {
     const {
       currentPrimaryRegisteredDoctorFK,
       showChangePassword,
-      canEditDoctorMCR,
       showPrimaryClinicianChanges,
       showActiveSessionWarning,
       isValidating,
@@ -382,8 +372,12 @@ class UserProfileForm extends React.PureComponent {
       userProfile: { role = [] },
       _oldRole,
     } = values
-    const currentClinicalRole = ctRole?.find(item => item.id === role.id)
-
+    const currentClinicalRole = ctRole?.find(
+      item => item.id === (values.role || role.id),
+    )
+    const canEditDoctorMCR =
+      currentClinicalRole !== undefined &&
+      currentClinicalRole.clinicalRoleName === 'Doctor'
     return (
       <LoadingWrapper loading={isValidating}>
         <React.Fragment>
@@ -492,7 +486,10 @@ class UserProfileForm extends React.PureComponent {
                         label='User Group'
                         code='role'
                         localFilter={item => {
-                          if (_oldRole && currentClinicalRole?.clinicalRoleName === 'Doctor') {
+                          if (
+                            _oldRole &&
+                            currentClinicalRole?.clinicalRoleName === 'Doctor'
+                          ) {
                             return (
                               item.clinicalRoleName ===
                               currentClinicalRole?.clinicalRoleName
@@ -501,17 +498,18 @@ class UserProfileForm extends React.PureComponent {
                           return item
                         }}
                         disabled={isMyAccount}
-                        onChange={this.onRoleChange}
                       />
                     )}
                   />
                 </GridItem>
                 <GridItem md={6}>
-                  {_oldRole && currentClinicalRole?.clinicalRoleName === 'Doctor' && (
-                    <div style={{ marginTop :20 }}>
-                      Current user can switch to any user group under doctor clinical role
-                    </div>
-                  )}
+                  {_oldRole &&
+                    currentClinicalRole?.clinicalRoleName === 'Doctor' && (
+                      <div style={{ marginTop: 20 }}>
+                        Current user can switch to any user group under doctor
+                        clinical role
+                      </div>
+                    )}
                 </GridItem>
               </GridContainer>
 

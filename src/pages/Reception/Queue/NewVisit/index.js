@@ -214,21 +214,6 @@ class NewVisit extends PureComponent {
     }
   }
 
-  calculateBMI = () => {
-    const { heightCM, weightKG } = this.props.values
-
-    const { setFieldValue, setFieldTouched } = this.props
-    if (heightCM && weightKG) {
-      const heightM = heightCM / 100
-      const bmi = weightKG / heightM ** 2
-      const bmiInTwoDecimal = Math.round(bmi * 100) / 100
-      setFieldValue(FormFieldName['vitalsign.bmi'], bmiInTwoDecimal)
-    } else {
-      setFieldValue(FormFieldName['vitalsign.bmi'], null)
-    }
-    setFieldTouched(FormFieldName['vitalsign.bmi'], true)
-  }
-
   updateAttachments = ({ added, deleted }) => {
     const {
       values: { visitAttachment = [] },
@@ -644,7 +629,14 @@ class NewVisit extends PureComponent {
                               <GridItem xs={12} className={classes.row}>
                                 <VitalSignCard
                                   // isReadOnly={isReadOnly}
-                                  handleCalculateBMI={this.calculateBMI}
+                                  disabled={
+                                    ((isReadOnly ||
+                                      isRetail ||
+                                      vitalAccessRight === 'enable') &&
+                                      isReadonlyAfterSigned) ||
+                                    vitalAccessRight !== 'enable'
+                                  }
+                                  {...this.props}
                                 />
                               </GridItem>
                             </Authorized.Context.Provider>
@@ -738,7 +730,7 @@ class NewVisit extends PureComponent {
         <div style={{ position: 'relative' }}>
           {footer &&
             footer({
-              confirmBtnText: isEdit ? 'Save' : 'Register visit',
+              confirmBtnText: isEdit ? 'Save' : 'Register Visit',
               onConfirm: this.validatePatient,
               confirmProps: {
                 disabled:

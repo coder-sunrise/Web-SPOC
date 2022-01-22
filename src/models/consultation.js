@@ -71,6 +71,8 @@ export default createFormViewModel({
       default: {
         corAttachment: [],
         corPatientNoteVitalSign: [],
+        corAudiometryTest: [],
+        corEyeExaminations: [],
       },
       selectedWidgets: ['1'],
       showSignOffModal: false,
@@ -552,6 +554,23 @@ export default createFormViewModel({
             rows: _.sortBy(data.corDiagnosis, 'sequence'),
           },
         })
+
+        const corPatientNoteVitalSign = (data.corPatientNoteVitalSign || [])
+          .length
+          ? data.corPatientNoteVitalSign
+          : [{}]
+        data.corPatientNoteVitalSign = corPatientNoteVitalSign.map(vs => ({
+          ...vs,
+          visitPurposeFK: data.visitPurposeFK,
+        }))
+
+        data.corAudiometryTest = (data.corAudiometryTest || []).length
+          ? data.corAudiometryTest
+          : [{}]
+
+        data.corEyeExaminations = (data.corEyeExaminations || []).length
+          ? data.corEyeExaminations
+          : [{}]
 
         let newResponse = ParseEyeFormData(data)
         const { corEyeRefractionForm, corEyeExaminationForm } = newResponse

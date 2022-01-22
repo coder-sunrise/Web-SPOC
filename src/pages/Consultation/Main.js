@@ -833,24 +833,20 @@ class Main extends React.Component {
     })
   }
 
-  pauseConsultation = () => {
-    saveConsultation({
-      props: this.props,
-      confirmMessage: 'Pause consultation?',
-      successMessage: 'Consultation paused.',
-      action: 'pause',
-    })
+  pauseConsultation = async () => {
+    const { validateForm, handleSubmit } = this.props
+    const isFormValid = await validateForm()
+    if (!_.isEmpty(isFormValid)) {
+      handleSubmit()
+    } else {
+      saveConsultation({
+        props: this.props,
+        confirmMessage: 'Pause consultation?',
+        successMessage: 'Consultation paused.',
+        action: 'pause',
+      })
+    }
   }
-
-  // discardConsultation = () => {
-  //   const { dispatch, values } = this.props
-  //   dispatch({
-  //     type: 'consultation/discard',
-  //     payload: values.id,
-  //   })
-  //   history.push('/reception/queue')
-  // }
-
   resumeConsultation = () => {
     const {
       dispatch,
@@ -962,7 +958,7 @@ class Main extends React.Component {
     })
   }
 
-  handleSignOffClick = () => {
+  handleSignOffClick = async () => {
     const {
       visitRegistration,
       orders,
@@ -970,62 +966,69 @@ class Main extends React.Component {
       handleSubmit,
       values,
       forms,
+      validateForm,
     } = this.props
-    const { rows, _originalRows } = orders
-    const { entity: vistEntity = {} } = visitRegistration
-    const { visit = {} } = vistEntity
-    const {
-      visitPurposeFK = VISIT_TYPE.CON,
-      visitStatus = VISIT_STATUS.DISPENSE,
-    } = visit
-
-    const isModifiedOrder = _.isEqual(
-      rows.filter(i => !(i.id === undefined && i.isDeleted)),
-      _originalRows,
-    )
-    if (forms.rows.filter(o => o.statusFK === 1 && !o.isDeleted).length > 0) {
-      notification.warning({
-        message: `Draft forms found, please finalize it before sign off.`,
-      })
-      return
-    }
-
-    if (
-      (visitPurposeFK === VISIT_TYPE.BF || visitPurposeFK === VISIT_TYPE.MC) &&
-      visitStatus === VISIT_STATUS.BILLING &&
-      isModifiedOrder
-    ) {
-      dispatch({
-        type: 'global/updateState',
-        payload: {
-          showCustomConfirm: true,
-          customConfirmCfg: {
-            title: 'Confirm',
-            content: 'Do you want to complete the visit?',
-            actions: [
-              {
-                text: 'Cancel',
-                color: 'danger',
-                onClick: () => {
-                  // do nothing
-                },
-              },
-              {
-                text: 'No',
-                color: 'danger',
-                onClick: this.signOffOnly,
-              },
-              {
-                text: 'Yes',
-                color: 'primary',
-                onClick: this.signOffAndCompleteBilling,
-              },
-            ],
-          },
-        },
-      })
-    } else {
+    const isFormValid = await validateForm()
+    if (!_.isEmpty(isFormValid)) {
       handleSubmit()
+    } else {
+      const { rows, _originalRows } = orders
+      const { entity: vistEntity = {} } = visitRegistration
+      const { visit = {} } = vistEntity
+      const {
+        visitPurposeFK = VISIT_TYPE.CON,
+        visitStatus = VISIT_STATUS.DISPENSE,
+      } = visit
+
+      const isModifiedOrder = _.isEqual(
+        rows.filter(i => !(i.id === undefined && i.isDeleted)),
+        _originalRows,
+      )
+      if (forms.rows.filter(o => o.statusFK === 1 && !o.isDeleted).length > 0) {
+        notification.warning({
+          message: `Draft forms found, please finalize it before sign off.`,
+        })
+        return
+      }
+
+      if (
+        (visitPurposeFK === VISIT_TYPE.BF ||
+          visitPurposeFK === VISIT_TYPE.MC) &&
+        visitStatus === VISIT_STATUS.BILLING &&
+        isModifiedOrder
+      ) {
+        dispatch({
+          type: 'global/updateState',
+          payload: {
+            showCustomConfirm: true,
+            customConfirmCfg: {
+              title: 'Confirm',
+              content: 'Do you want to complete the visit?',
+              actions: [
+                {
+                  text: 'Cancel',
+                  color: 'danger',
+                  onClick: () => {
+                    // do nothing
+                  },
+                },
+                {
+                  text: 'No',
+                  color: 'danger',
+                  onClick: this.signOffOnly,
+                },
+                {
+                  text: 'Yes',
+                  color: 'primary',
+                  onClick: this.signOffAndCompleteBilling,
+                },
+              ],
+            },
+          },
+        })
+      } else {
+        handleSubmit()
+      }
     }
   }
 

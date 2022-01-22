@@ -364,4 +364,10 @@ export const menuData = [
            url: '/setting/summarycomment',
            hiddenWhenClinicSettingIsOff: 'isEnableMedicalCheckupModule',
          },
+         {
+           authority: 'settings.clinicsetting.creditfacility',
+           title: 'Clinic Setting',
+           text: 'Credit Facility',
+           url: '/setting/creditfacility',
+         },
        ]

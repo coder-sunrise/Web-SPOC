@@ -87,7 +87,7 @@ class Grid extends PureComponent {
                   { name: 'contactNo', title: 'Contact No.' },
                   { name: 'copayerContactPersonEmail', title: 'Email' },
                   { name: 'url', title: 'Website' },
-                  { name: 'copayerCreditInformation', title: 'Credit Code' },
+                  { name: 'creditFacility', title: 'Credit Facility' },
                   { name: 'isActive', title: 'Status' },
                   { name: 'action', title: 'Action' },
                 ]
@@ -202,20 +202,8 @@ class Grid extends PureComponent {
               },
             },
             {
-              columnName: 'copayerCreditInformation',
-              sortingEnabled: false,
-              render: row => {
-                let cell = <span>-</span>
-                if (row.creditInformation && row.creditInformation !== '') {
-                  cell = (
-                    <Tooltip title={row.creditInformation} placement='top'>
-                      <span>{row.creditInformation}</span>
-                    </Tooltip>
-                  )
-                }
-
-                return cell
-              },
+              columnName: 'creditFacility',
+              sortBy: 'creditFacilityFKNavigation.DisplayValue',
             },
             {
               columnName: 'faxNo',

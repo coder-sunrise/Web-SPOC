@@ -130,7 +130,7 @@ class CheckboxGroup extends React.Component {
             <Tooltip
               title={
                 o.tooltip ? (
-                  <span style={{ fontSize: '1.5em' }}>{o.tooltip}</span>
+                  <span style={{ fontSize: '1.2em' }}>{o.tooltip}</span>
                 ) : (
                   ''
                 )

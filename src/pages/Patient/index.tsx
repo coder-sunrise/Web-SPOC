@@ -277,7 +277,7 @@ const PatientIndex = ({
                   })
                 }}
               >
-                Register New Patient
+                New Patient
               </Button>,
             ]
           return []

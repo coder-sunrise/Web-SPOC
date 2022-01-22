@@ -48,6 +48,7 @@ class VisitTypeSelect extends React.Component {
         valueField='id'
         mode={mode}
         label={label}
+        maxTagCount={0}
         maxTagPlaceholder={maxTagPlaceholder}
         options={this.state.ctVisitpurpose}
         labelField='name'

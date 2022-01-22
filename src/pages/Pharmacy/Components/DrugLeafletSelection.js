@@ -130,19 +130,7 @@ class DrugLeafletSelection extends PureComponent {
       // ingredient in leaflet will max to 2 lines and end with ', etc...' if more than 2 lines;
       data.DrugDetailsList.forEach(t => {
         if (t.ingredient) {
-          if (t.ingredient.length > 28) {
-            t.ingredient1 = '(' + t.ingredient.substr(0, 28)
-            if (t.ingredient.length > 49) {
-              t.ingredient2 = t.ingredient.substr(28, 21) + ', etc...)'
-            } else {
-              t.ingredient2 = t.ingredient.substr(28, 21) + ')'
-            }
-          } else {
-            t.ingredient1 = '(' + t.ingredient + ')'
-          }
-        } else {
-          t.ingredient1 = ''
-          t.ingredient2 = ''
+          t.ingredient = `(${t.ingredient})`
         }
       })
       const payload = [
@@ -196,7 +184,10 @@ class DrugLeafletSelection extends PureComponent {
           const instructions = (t.instruction || '').split('\n')
           // if it's drug mixture then first line will not show(occupied by drug mixture's drug name)
           t.FirstLine = ''
-          t.SecondLine = t.ingredient
+          t.SecondLine =
+            (t.ingredient || '').length > 54
+              ? `(${t.ingredient.substr(0, 53)}…)`
+              : `(${t.ingredient}}`
           // If language is EN, instruction need to auto breakline and show in 2 lines
           // If JP, then need to separate to 2 lines. last line will include the last remaining 2 step dose.
           if (lan === 'JP') {
@@ -210,7 +201,10 @@ class DrugLeafletSelection extends PureComponent {
           }
         } else {
           const instructions = (t.instruction || '').split('\n')
-          t.FirstLine = t.ingredient
+          t.FirstLine =
+            (t.ingredient || '').length > 54
+              ? `(${t.ingredient.substr(0, 53)}…)`
+              : `(${t.ingredient}}`
           t.SecondLine = t.indication
           // If language is EN, instruction need to auto breakline and show in 2 lines
           // If JP, then need to separate to 2 lines. last line will include the last remaining 2 step dose.

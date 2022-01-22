@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import _ from 'lodash'
+import $ from 'jquery'
 import { history } from 'umi'
 import moment from 'moment'
 import { connect } from 'dva'
@@ -18,6 +19,7 @@ import {
   Button,
   ProgressButton,
   CommonModal,
+  Accordion,
 } from '@/components'
 import Yup from '@/utils/yup'
 import {
@@ -32,6 +34,11 @@ import { sendNotification } from '@/utils/realtime'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 import ConsumePackage from '@/pages/Widgets/Orders/Detail/ConsumePackage'
+import { visitBasicExaminationsSchema } from '@/pages/Reception/Queue/NewVisit/validationScheme'
+import {
+  showEyeExaminations,
+  showAudiometryTest,
+} from '../Widgets/PatientHistory/config'
 
 const discardConsultation = async ({
   dispatch,
@@ -95,6 +102,9 @@ const styles = () => ({})
         then: Yup.string().required(),
       }),
     }),
+    corPatientNoteVitalSign: Yup.array()
+      .compact(v => v.isDeleted)
+      .of(visitBasicExaminationsSchema),
   }),
   dirtyCheckMessage: 'Discard edit order?',
   onDirtyDiscard: discardConsultation,
@@ -102,9 +112,17 @@ const styles = () => ({})
   displayName: 'EditOrder',
 })
 class EditOrder extends Component {
+  constructor(props) {
+    super(props)
+    this.eyeExaminationsRef = React.createRef()
+    this.audiometryTestRef = React.createRef()
+  }
+
   state = {
     acknowledged: false,
     isShowPackageSelectModal: false,
+    expandedEyeExaminations: false,
+    expandedAudiometryTest: false,
   }
 
   componentDidMount() {
@@ -371,10 +389,13 @@ class EditOrder extends Component {
   }
 
   render() {
-    const { classes, theme } = this.props
+    const { classes, theme, values } = this.props
     const orderWidget = widgets.find(o => o.id === '5')
     const cdWidget = widgets.find(o => o.id === '3')
     const formsWidget = widgets.find(o => o.id === '12')
+    const basicExaminationsWidget = widgets.find(o => o.id === '7')
+    const eyeExaminationsWidget = widgets.find(o => o.id === '23')
+    const audiometryTestWidget = widgets.find(o => o.id === '24')
     const Order = orderWidget.component
     const ConsultationDocument = cdWidget.component
     const consultationDocumentAccessRight = Authorized.check(
@@ -382,39 +403,53 @@ class EditOrder extends Component {
     )
     const Forms = formsWidget.component
     const formAccessRight = Authorized.check(formsWidget.accessRight)
+    const BasicExaminations = basicExaminationsWidget.component
+    const basicExaminationsAccessRight = Authorized.check(
+      basicExaminationsWidget.accessRight,
+    )
+    const EyeExaminations = eyeExaminationsWidget.component
+    const eyeExaminationsAccessRight = Authorized.check(
+      eyeExaminationsWidget.accessRight,
+    )
+    const AudiometryTest = audiometryTestWidget.component
+    const audiometryTestAccessRight = Authorized.check(
+      audiometryTestWidget.accessRight,
+    )
+
+    if (
+      eyeExaminationsAccessRight.rights !== 'hidden' &&
+      !this.state.expandedEyeExaminations &&
+      showEyeExaminations(values.corEyeExaminations)
+    ) {
+      let div = $(this.eyeExaminationsRef.current).find(
+        'div[aria-expanded]:eq(0)',
+      )
+      if (div.attr('aria-expanded') === 'false') div.click()
+    }
+
+    if (
+      audiometryTestAccessRight.rights !== 'hidden' &&
+      !this.state.expandedEyeExaminations &&
+      showAudiometryTest(values.corAudiometryTest)
+    ) {
+      let div = $(this.audiometryTestRef.current).find(
+        'div[aria-expanded]:eq(0)',
+      )
+      if (div.attr('aria-expanded') === 'false') div.click()
+    }
+
     return (
       <div className={classes.content} style={{ backgroundColor: 'white' }}>
         <GridContainer>
           <GridItem xs={12} md={6}>
-            <h5>Orders</h5>
-            <Order className={classes.orderPanel} status='' from='EditOrder' />
-          </GridItem>
-          <GridItem xs={12} md={6}>
-            {formAccessRight && formAccessRight.rights !== 'hidden' && (
-              <div>
-                <h5>
-                  <span style={{ display: 'inline-block' }}>Forms</span>
-                  <span className={classes.cdAddButton}>
-                    {cdWidget.toolbarAddon}
-                  </span>
-                </h5>
-                <Forms />
-              </div>
-            )}
-            {consultationDocumentAccessRight &&
-              consultationDocumentAccessRight.rights !== 'hidden' && (
-                <div>
-                  <h5>
-                    <span style={{ display: 'inline-block' }}>
-                      Consultation Document
-                    </span>
-                    <span className={classes.cdAddButton}>
-                      {cdWidget.toolbarAddon}
-                    </span>
-                  </h5>
-                  <ConsultationDocument forDispense />
-                </div>
-              )}
+            <GridItem xs={12}>
+              <h5>Orders</h5>
+              <Order
+                className={classes.orderPanel}
+                status=''
+                from='EditOrder'
+              />
+            </GridItem>
             <GridItem xs={12} md={6}>
               <FastField
                 name='dispenseAcknowledgement.editDispenseReasonFK'
@@ -477,6 +512,90 @@ class EditOrder extends Component {
                 Save
               </ProgressButton>
             </GridItem>
+          </GridItem>
+          <GridItem xs={12} md={6}>
+            {formAccessRight && formAccessRight.rights !== 'hidden' && (
+              <div>
+                <h5>
+                  <span style={{ display: 'inline-block' }}>Forms</span>
+                  <span className={classes.cdAddButton}>
+                    {cdWidget.toolbarAddon}
+                  </span>
+                </h5>
+                <Forms />
+              </div>
+            )}
+            {consultationDocumentAccessRight &&
+              consultationDocumentAccessRight.rights !== 'hidden' && (
+                <div>
+                  <h5>
+                    <span style={{ display: 'inline-block' }}>
+                      Consultation Document
+                    </span>
+                    <span className={classes.cdAddButton}>
+                      {cdWidget.toolbarAddon}
+                    </span>
+                  </h5>
+                  <ConsultationDocument forDispense />
+                </div>
+              )}
+            {basicExaminationsAccessRight &&
+              basicExaminationsAccessRight.rights !== 'hidden' && (
+                <div>
+                  <h5>
+                    <span style={{ display: 'inline-block' }}>
+                      Basic Examinations
+                    </span>
+                  </h5>
+                  <BasicExaminations />
+                </div>
+              )}
+            {eyeExaminationsAccessRight &&
+              eyeExaminationsAccessRight.rights !== 'hidden' && (
+                <div ref={this.eyeExaminationsRef}>
+                  <Accordion
+                    mode='multiple'
+                    onChange={(event, p, expanded) => {
+                      if (expanded && !this.state.expandedEyeExaminations) {
+                        this.setState({ expandedEyeExaminations: true })
+                      }
+                    }}
+                    collapses={[
+                      {
+                        title: 'Eye Examinations',
+                        content: (
+                          <div style={{ padding: '5px' }}>
+                            <EyeExaminations />
+                          </div>
+                        ),
+                      },
+                    ]}
+                  />
+                </div>
+              )}
+            {audiometryTestAccessRight &&
+              audiometryTestAccessRight.rights !== 'hidden' && (
+                <div ref={this.audiometryTestRef}>
+                  <Accordion
+                    mode='multiple'
+                    onChange={(event, p, expanded) => {
+                      if (expanded && !this.state.expandedAudiometryTest) {
+                        this.setState({ expandedAudiometryTest: true })
+                      }
+                    }}
+                    collapses={[
+                      {
+                        title: 'Audiometry Test',
+                        content: (
+                          <div style={{ padding: '5px' }}>
+                            <AudiometryTest />
+                          </div>
+                        ),
+                      },
+                    ]}
+                  />
+                </div>
+              )}
           </GridItem>
         </GridContainer>
 
