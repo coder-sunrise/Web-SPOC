@@ -124,7 +124,7 @@ const ReportViewer = ({
   const onNextClick = () => changePage(1)
 
   const onPrintClick = () =>
-    printJS({ printable: pdfData, type: 'PDF', base64: true })
+    printJS({ printable: pdfData, type: 'pdf', base64: true })
 
   const onExportClick = async ({ key }) => {
     setExporting(true)
