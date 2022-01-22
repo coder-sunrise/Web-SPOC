@@ -396,6 +396,19 @@ const _routes = [
           //   component: './Inventory/PurchaseDelivery/Detail',
           // },
           {
+            path: '/inventory/purchaserequest',
+            name: 'purchaserequest',
+            component: './Inventory/PurchaseRequest',
+            authority: ['inventory/purchasingrequest'],
+          },
+          {
+            path: '/inventory/purchaserequest/details',
+            name: 'purchaserequest.detail',
+            hideInMenu: true,
+            component: './Inventory/PurchaseRequest/Details',
+            authority: ['inventory/purchasingrequest'],
+          },
+          {
             path: '/inventory/pr',
             name: 'pd',
             component: './Inventory/PurchaseReceive',
