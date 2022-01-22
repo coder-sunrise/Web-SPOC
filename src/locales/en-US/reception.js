@@ -21,8 +21,8 @@ export default {
   'reception.queue.status.inProgress': 'In Progress',
   'reception.queue.status.completed': 'Completed',
 
-  'reception.queue.registerVisit': 'Register Visit',
-  'reception.queue.createPatient': 'Register New Patient',
+  'reception.queue.registerVisit': 'Visit',
+  'reception.queue.createPatient': 'New Patient',
   'reception.queue.deleteVisit': 'Delete Visit',
   'reception.queue.printTotal': 'Print Total',
   'reception.queue.endSession': 'End Session',
@@ -114,8 +114,8 @@ export default {
 
   'reception.queue.patientName': 'Patient Name',
   'reception.queue.search': 'Search',
-  'reception.queue.patientSearch.registerNewPatient': 'Register New Patient',
-  'reception.queue.patientSearch.registerVisit': 'Register Visit',
+  'reception.queue.patientSearch.registerNewPatient': 'New Patient',
+  'reception.queue.patientSearch.registerVisit': 'New Visit',
   'reception.queue.patientSearchPlaceholder':
     'Patient Name, Acc No., Patient Ref. No., Contact No.',
   'reception.queue.patientSearch': 'Search Patient',
@@ -176,7 +176,7 @@ export default {
   'reception.queue.visitRegistration.balance': 'Balance',
   'reception.queue.visitRegistration.validity': 'Validity',
 
-  'reception.queue.visitRegistration.registerVisit': 'Register Visit',
+  'reception.queue.visitRegistration.registerVisit': 'New Visit',
 
   'reception.queue.newVisit.addNew': 'Add New',
   'reception.queue.newVisit.doctor': 'Doctor',

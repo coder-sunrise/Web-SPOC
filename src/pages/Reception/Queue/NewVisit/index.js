@@ -730,7 +730,7 @@ class NewVisit extends PureComponent {
         <div style={{ position: 'relative' }}>
           {footer &&
             footer({
-              confirmBtnText: isEdit ? 'Save' : 'Register visit',
+              confirmBtnText: isEdit ? 'Save' : 'Register Visit',
               onConfirm: this.validatePatient,
               confirmProps: {
                 disabled:
