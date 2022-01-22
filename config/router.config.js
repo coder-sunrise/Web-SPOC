@@ -12,6 +12,11 @@ const _routes = [
         hideInMenu: true,
       },
       {
+        path: '/user/login/clinic',
+        component: './NewLogin',
+        hideInMenu: true,
+      },
+      {
         path: '/user/forgotpassword',
         component: './ForgotPassword',
         hideInMenu: true,
