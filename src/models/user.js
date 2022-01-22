@@ -220,9 +220,13 @@ export default {
 
     *saveUserPreference({ payload }, { call, put }) {
       const response = yield call(saveUserPreference, {
-        userPreferenceDetails: JSON.stringify(payload.data),
-        itemIdentifier: payload.itemIdentifier,
-        type: 4,
+        List: [
+          {
+            userPreferenceDetails: JSON.stringify(payload.data),
+            itemIdentifier: payload.itemIdentifier,
+            type: 4,
+          },
+        ],
       })
       if (response) {
         const userSession = JSON.parse(sessionStorage.getItem('user'))
