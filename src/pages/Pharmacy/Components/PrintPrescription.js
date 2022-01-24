@@ -15,6 +15,7 @@ const PrintPrescription = props => {
     id: pharmacyWorkitemId,
     patientProfileFK,
   } = item
+  console.log(translationLinkFK)
   const [showLeafletSelectionPopup, setShowLeafletSelectionPopup] = useState(
     false,
   )
