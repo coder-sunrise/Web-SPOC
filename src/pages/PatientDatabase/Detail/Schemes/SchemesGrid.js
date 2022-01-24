@@ -7,6 +7,7 @@ import {
   notification,
   Popconfirm,
   Button,
+  Tooltip,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 
@@ -256,19 +257,21 @@ class SchemesGrid extends PureComponent {
                     <Delete />
                   </Button>
                 </Popconfirm>
-                <Button
-                  size='sm'
-                  justIcon
-                  color='primary'
-                  disabled={!row.copayerFK}
-                >
-                  <Print
-                    onClick={() => {
-                      console.log(row)
-                      this.printLabel(row.copayerFK)
-                    }}
-                  />
-                </Button>
+                <Tooltip title="Print Patient's Co-Payer Label">
+                  <Button
+                    size='sm'
+                    justIcon
+                    color='primary'
+                    disabled={!row.copayerFK}
+                  >
+                    <Print
+                      onClick={() => {
+                        console.log(row)
+                        this.printLabel(row.copayerFK)
+                      }}
+                    />
+                  </Button>
+                </Tooltip>
               </Fragment>
             )
           },

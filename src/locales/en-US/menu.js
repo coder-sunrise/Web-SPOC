@@ -66,6 +66,8 @@ export default {
   'menu.patient.new': 'New Patient',
 
   'menu.inventory': 'Inventory',
+  'menu.inventory.purchaserequest': 'Purchase Request',
+  'menu.inventory.purchaserequest.detail': 'Purchase Request Details',
   'menu.inventory.pd': 'Purchasing & Receiving',
   'menu.inventory.pd.detail': 'PO & DO Detail',
   'menu.inventory.rg': 'Receiving Goods',

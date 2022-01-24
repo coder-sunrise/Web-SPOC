@@ -3,27 +3,27 @@ import request from '@/utils/request'
 
 const userProfileURL = '/api/UserProfile'
 
-export async function query () {
+export async function query() {
   return request('/api/users')
 }
 
-export async function queryCurrent () {
+export async function queryCurrent() {
   return request('/api/userprofile/current')
 }
 
-export const changeCurrentUserPassword = (payload) =>
+export const changeCurrentUserPassword = payload =>
   request(`${userProfileURL}/ChangeCurrentUserPassword`, {
     method: 'PUT',
     body: payload,
   })
 
-export const changeUserPassword = (payload) =>
+export const changeUserPassword = payload =>
   request(`${userProfileURL}/ChangePassworByUserId`, {
     method: 'PUT',
     body: payload,
   })
 
-export const getOTP = async (payload) =>
+export const getOTP = async payload =>
   request(
     `${userProfileURL}/generateResetPasswordCode`,
     {
@@ -35,14 +35,17 @@ export const getOTP = async (payload) =>
     false,
   )
 
-export const resetPassword = (payload) =>
+export const resetPassword = payload =>
   request(`${userProfileURL}/ResetPassword`, {
     method: 'POST',
     data: stringify(payload),
     contentType: 'application/x-www-form-urlencoded',
   })
 
-export const saveUserPreference = async (payload) => {
+export const saveUserPreference = async payload => {
+  if (!payload.List) {
+    payload = { List: [payload] }
+  }
   const r = await request(`${userProfileURL}/SaveUserPreference`, {
     method: 'POST',
     body: payload,
@@ -51,7 +54,7 @@ export const saveUserPreference = async (payload) => {
   return r
 }
 
-export const getUserPreference = async (payload) => {
+export const getUserPreference = async payload => {
   const r = await request(`${userProfileURL}/GetUserPreference/${payload}`, {
     method: 'GET',
   })

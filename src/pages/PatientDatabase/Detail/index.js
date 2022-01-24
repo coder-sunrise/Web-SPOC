@@ -816,7 +816,7 @@ class PatientDetail extends PureComponent {
                       style={{ marginTop: theme.spacing(1) }}
                       onClick={this.registerVisit}
                     >
-                      Register Visit
+                      New Visit
                     </Button>
                   </Authorized>
                 )}

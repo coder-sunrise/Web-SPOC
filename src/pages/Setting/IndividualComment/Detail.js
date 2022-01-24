@@ -188,14 +188,8 @@ export default compose(
       groupNo: Yup.number().required(),
       examinationItemFK: Yup.string().required(),
       sortOrder: Yup.number()
-        .min(
-          -2147483648,
-          'The number should between -2,147,483,648 and 2,147,483,647',
-        )
-        .max(
-          2147483647,
-          'The number should between -2,147,483,648 and 2,147,483,647',
-        )
+        .min(-9999, 'The number should between -9999 and 9999')
+        .max(9999, 'The number should between -9999 and 9999')
         .nullable(),
       secondDisplayValue: Yup.string().when('secondLanguage', {
         is: v => v !== undefined,

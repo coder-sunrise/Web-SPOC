@@ -8,6 +8,7 @@ import { FastField, withFormik, Field } from 'formik'
 import { Hidden, withStyles } from '@material-ui/core'
 import PersonAdd from '@material-ui/icons/PersonAdd'
 import Search from '@material-ui/icons/Search'
+import Add from '@material-ui/icons/Add'
 // custom components
 import {
   Button,
@@ -127,7 +128,7 @@ const Filterbar = props => {
               color='primary'
               icon={
                 <Hidden mdDown>
-                  <Search />
+                  <Add />
                 </Hidden>
               }
               onClick={() => {
@@ -140,7 +141,7 @@ const Filterbar = props => {
               size='sm'
               submitKey='patientSearch/query'
             >
-              Create Visit
+              New Visit
             </ProgressButton>
           </Authorized>
           <Authorized authority='patientdatabase.newpatient'>

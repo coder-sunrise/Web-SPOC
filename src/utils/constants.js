@@ -909,6 +909,16 @@ export const LAB_SPECIMEN_STATUS_DESCRIPTION = {
   7: 'Discarded',
 }
 
+export const LAB_SPECIMEN_DETAILS_STEP = {
+  1: 'New',
+  2: 'In Progress',
+  3: 'P. Retest',
+  4: 'P. 1st Verify',
+  5: 'P. 2nd Verify',
+  6: 'Completed',
+  7: 'Discarded',
+}
+
 export const VISITDOCTOR_CONSULTATIONSTATUS = {
   WAITING: 'Waiting',
   INPROGRESS: 'In Progress',

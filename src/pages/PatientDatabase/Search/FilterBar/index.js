@@ -81,6 +81,7 @@ class FilterBar extends PureComponent {
                   variant='contained'
                   color='primary'
                   icon={<Search />}
+                  size='sm'
                   onClick={() => {
                     // console.log(this.props.values)
                     // this.props.dispatch({
@@ -122,6 +123,7 @@ class FilterBar extends PureComponent {
                 {!disableAdd && (
                   <Button
                     variant='contained'
+                    size='sm'
                     color='primary'
                     onClick={() => {
                       dispatch({

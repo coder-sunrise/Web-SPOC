@@ -12,6 +12,11 @@ const _routes = [
         hideInMenu: true,
       },
       {
+        path: '/user/login/clinic',
+        component: './NewLogin',
+        hideInMenu: true,
+      },
+      {
         path: '/user/forgotpassword',
         component: './ForgotPassword',
         hideInMenu: true,
@@ -395,6 +400,19 @@ const _routes = [
           //   hideInMenu: true,
           //   component: './Inventory/PurchaseDelivery/Detail',
           // },
+          {
+            path: '/inventory/purchaserequest',
+            name: 'purchaserequest',
+            component: './Inventory/PurchaseRequest',
+            authority: ['inventory/purchasingrequest'],
+          },
+          {
+            path: '/inventory/purchaserequest/details',
+            name: 'purchaserequest.detail',
+            hideInMenu: true,
+            component: './Inventory/PurchaseRequest/Details',
+            authority: ['inventory/purchasingrequest'],
+          },
           {
             path: '/inventory/pr',
             name: 'pd',
