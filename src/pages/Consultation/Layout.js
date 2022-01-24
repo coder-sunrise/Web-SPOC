@@ -462,21 +462,21 @@ class Layout extends PureComponent {
     return ((this.props.height || window.innerHeight) - topHeight) / 6
   }
 
-  onAnchorClick = (id) => {
+  onAnchorClick = id => {
     const parentElement = document.getElementById('main-page')
     const element = document.getElementById(id)
     try {
       if (parentElement && element) {
         const screenPosition = element.getBoundingClientRect()
         const { scrollTop } = parentElement
-        const { top, left } = screenPosition 
+        const { top, left } = screenPosition
         parentElement.scrollTo({
           // scrolled top position + element top position - Nav header height and Patient Banner height
           top:
             scrollTop +
             top -
             (document.getElementById('patientBanner').offsetHeight + 108),
-          left, 
+          left,
         })
       }
     } catch (error) {
@@ -621,14 +621,6 @@ class Layout extends PureComponent {
                 })}
               </GridItem>
               <GridItem md={3} style={{ textAlign: 'right' }}>
-                <Button
-                  size='sm'
-                  color='info'
-                  onClick={this.toggleLabTrackingDrawer}
-                >
-                  <Accessibility />
-                  Results
-                </Button>
                 <Button size='sm' color='info' onClick={this.toggleDrawer}>
                   <Settings />
                   Widgets

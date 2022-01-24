@@ -216,7 +216,15 @@ class PatientDetail extends PureComponent {
           loader: () => import('./Results'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet {...p} widget mode='integrated' />
+            return (
+              <Cmpnet
+                {...p}
+                widget
+                mode='integrated'
+                patientProfileFK={props.values.id}
+                genderFK={props.values.genderFK}
+              />
+            )
           },
           loading: Loading,
         }),
@@ -385,6 +393,13 @@ class PatientDetail extends PureComponent {
     ) || { rights: 'hidden' }
     if (viewClaimHistoryRight.rights === 'hidden') {
       this.widgets = this.widgets.filter(t => t.id !== '12')
+    }
+
+    const viewPatientResultsRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.patientresults',
+    ) || { rights: 'hidden' }
+    if (viewPatientResultsRight.rights === 'hidden') {
+      this.widgets = this.widgets.filter(t => t.id !== '5')
     }
   }
 

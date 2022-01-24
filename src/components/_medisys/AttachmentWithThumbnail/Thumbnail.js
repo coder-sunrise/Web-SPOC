@@ -102,6 +102,7 @@ const Thumbnail = ({
   fieldName,
   size = { width: 64, height: 64 },
   hideRemarks,
+  hiddenDelete,
 }) => {
   const {
     fileIndexFK,
@@ -233,7 +234,7 @@ const Thumbnail = ({
             </Tooltip>
           </GridItem>
           <GridItem md={3}>
-            {!isReadOnly && (
+            {!isReadOnly && !hiddenDelete && (
               <DeleteWithPopover
                 disabled={isReadOnly}
                 onConfirmDelete={handleConfirmDelete}

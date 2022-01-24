@@ -7,6 +7,7 @@ import { CommonModal } from '@/components'
 import { findGetParameter } from '@/utils/utils'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import { getRawData } from '@/services/report'
+import Authorized from '@/utils/Authorized'
 import Detail from './Detail'
 import FilterBar from './FilterBar'
 import OverallGrid from './OverallGrid'
@@ -97,27 +98,32 @@ class LabTrackingDetails extends PureComponent {
       patientId,
       isPatientInactive,
       mainDivHeight = 700,
+      height,
     } = this.props
     const IsOverallGrid = resultType === PATIENT_LAB.LAB_TRACKING
 
     let patientID = patientId || Number(findGetParameter('pid')) || undefined
 
-    let height
+    let tableHeight
     if (resultType === PATIENT_LAB.LAB_TRACKING) {
-      height = mainDivHeight - 120 - ($('.filterBar').height() || 0)
+      tableHeight = mainDivHeight - 120 - ($('.filterBar').height() || 0)
     } else if (resultType === PATIENT_LAB.CONSULTATION) {
-      height = mainDivHeight - 80 - ($('.filterBar').height() || 0)
+      tableHeight = mainDivHeight - 80 - ($('.filterBar').height() || 0)
     } else {
-      height = mainDivHeight - 280 - ($('.filterBar').height() || 0)
+      tableHeight = height - 290 - ($('.filterBar').height() || 0)
     }
 
-    if (height < 300) height = 300
+    if (tableHeight < 300) tableHeight = 300
 
     const cfg = {
       toggleModal: this.toggleModal,
       handlePrintClick: this.handlePrintClick,
-      height,
+      height: tableHeight,
     }
+
+    const editExternalTrackingRight = Authorized.check(
+      'reception/labtracking',
+    ) || { rights: 'hidden' }
 
     return (
       <div>
@@ -133,17 +139,20 @@ class LabTrackingDetails extends PureComponent {
           {IsOverallGrid ? (
             <OverallGrid
               dispatch={dispatch}
+              {...this.props}
               {...cfg}
               visitPurpose={this.state.visitPurpose}
-              {...this.props}
             />
           ) : (
             <PatientGrid
-              readOnly={isPatientInactive}
+              readOnly={
+                isPatientInactive ||
+                editExternalTrackingRight.rights !== 'enable'
+              }
               dispatch={dispatch}
               visitPurpose={this.state.visitPurpose}
-              {...cfg}
               {...this.props}
+              {...cfg}
             />
           )}
         </div>
