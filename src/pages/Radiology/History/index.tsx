@@ -666,7 +666,7 @@ const RadiologyWorklistHistoryIndex = ({
           columnsStateMap={radiologyHistoryColumnSetting}
           onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
           defaultColumns={[]}
-          pagination={{ pageSize: 100 }}
+          pagination={{ pageSize: 20 }}
           features={[
             {
               code: 'details',

@@ -24,6 +24,7 @@ import { getUniqueNumericId } from '@/utils/utils'
 import service from '@/services/patient'
 import { MobileNumberInput } from '@/components/_medisys'
 import Address from './Address'
+import clinicSettings from '@/models/clinicSettings'
 
 const { queryList } = service
 const styles = () => ({
@@ -167,7 +168,11 @@ class Demographic extends PureComponent {
   render() {
     const { props } = this
     const { values, theme, setFieldValue, classes, dispatch } = props
-    const { isPatientNameAutoUpperCase } = props.clinicSettings
+    const {
+      isPatientNameAutoUpperCase,
+      primaryPrintoutLanguage,
+      secondaryPrintoutLanguage,
+    } = props.clinicSettings
     return (
       <div>
         <GridContainer gutter={0}>
@@ -567,6 +572,10 @@ class Demographic extends PureComponent {
                       <CodeSelect
                         label='Preferred Printout Language'
                         code='ctlanguage'
+                        localFilter={item =>
+                          item.code === primaryPrintoutLanguage ||
+                          item.code === secondaryPrintoutLanguage
+                        }
                         {...args}
                       />
                     )

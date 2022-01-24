@@ -535,7 +535,7 @@ const ClaimTracking = ({
         defaultColumns={[]}
         search={false}
         scroll={{ x: 2000, y: height - 260 }}
-        pagination={{ pageSize: 100 }}
+        pagination={{ pageSize: 20 }}
       />
 
       <CommonModal

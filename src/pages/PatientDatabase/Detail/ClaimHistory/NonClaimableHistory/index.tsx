@@ -201,7 +201,7 @@ const NonClaimableHistory = ({ dispatch, height, patientProfileFK }) => {
         defaultColumns={[]}
         search={false}
         scroll={{ x: 1200, y: height - 330 }}
-        pagination={{ pageSize: 100 }}
+        pagination={{ pageSize: 20 }}
       />
       {addNonClaimableHistoryDetailsRight.rights === 'enable' && (
         <Link>
