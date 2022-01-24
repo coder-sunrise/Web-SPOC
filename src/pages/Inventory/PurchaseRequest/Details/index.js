@@ -169,7 +169,7 @@ class Index extends Component {
     const { purchaseRequest, rows } = values
     let purchaseRequestStatusFK =
       action != PURCHASE_REQUEST_STATUS.SUBMITTED
-        ? PURCHASE_REQUEST_STATUS.SAVE
+        ? PURCHASE_REQUEST_STATUS.DRAFT
         : action
     let purchaseRequestItem = rows.map(x => {
       const itemType = podoOrderType.find(y => y.value === x.type)
@@ -245,7 +245,7 @@ class Index extends Component {
     const editable = modifyAR && unsubmit && isEditMode
     const creatable = createAR && !isEditMode
     const isReadOnly = !editable && !creatable
-    console.log(this.state)
+
     return (
       <div>
         <PRForm {...this.props} isReadOnly={isReadOnly} />

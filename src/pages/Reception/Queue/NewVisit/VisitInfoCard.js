@@ -116,7 +116,9 @@ const VisitInfoCard = ({
   const disableConsReady = Authorized.check('queue.modifyconsultationready')
 
   const validateQNo = value => {
-    const qNo = roundTo(value, clinicSettings.settings.isQueueNoDecimal ? 1 : 0)
+    const qNo = parseFloat(value).toFixed(
+      clinicSettings.settings.isQueueNoDecimal ? 1 : 0,
+    )
     if (existingQNo.includes(qNo))
       return 'Queue No. already existed in current queue list'
     return ''
