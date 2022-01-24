@@ -306,7 +306,7 @@ class Index extends Component {
               <ProgressButton
                 color='primary'
                 icon={null}
-                onClick={() => printPRReport(originPR.id)}
+                onClick={() => this.printPRReport(originPR.id)}
               >
                 {formatMessage({
                   id: 'inventory.purchaserequest.detail.print',
