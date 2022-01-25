@@ -322,7 +322,6 @@ class PatientHistory extends Component {
     if (visitDate && visitDate.length > 1) {
       visitToDate = visitDate[1]
     }
-    console.log(values)
     dispatch({
       type: 'patientHistory/queryVisitHistory',
       payload: {
@@ -376,7 +375,6 @@ class PatientHistory extends Component {
 
   selectOnChange = (e, row) => {
     const { setFieldValue, values } = this.props
-    console.log('a')
     if (e.target.value) {
       this.setState(
         preState => {
@@ -1719,7 +1717,6 @@ class PatientHistory extends Component {
       CORAudiometryTest: corAudiometryTest,
       ReportContext: reportContext,
     }
-    console.log('11111', doctorNote)
     const payload1 = [
       {
         ReportId: 68,
@@ -2182,7 +2179,6 @@ class PatientHistory extends Component {
       selectCategories,
       visitTypeIDs,
     } = values
-    console.log(values)
     this.setState(
       {
         visitDate,
@@ -2252,7 +2248,6 @@ class PatientHistory extends Component {
   }
 
   render() {
-    console.log(11)
     const { clinicSettings, scriblenotes, fromModule } = this.props
     const cfg = {}
     const {

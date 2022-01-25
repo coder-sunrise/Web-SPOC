@@ -50,6 +50,16 @@ const NonClaimableHistory = ({ dispatch, height, patientProfileFK }) => {
         dataIndex: 'details',
         sorter: false,
         search: false,
+        render: (_dom, row) => {
+          const newDetails = (row.details || '').split('\n')
+          return (
+            <div>
+              {newDetails.map(d => (
+                <div>{d}</div>
+              ))}
+            </div>
+          )
+        },
       },
       {
         key: 'remarks',
@@ -58,6 +68,16 @@ const NonClaimableHistory = ({ dispatch, height, patientProfileFK }) => {
         sorter: false,
         search: false,
         width: 400,
+        render: (_dom, row) => {
+          const newDetails = (row.remarks || '').split('\n')
+          return (
+            <div>
+              {newDetails.map(d => (
+                <div>{d}</div>
+              ))}
+            </div>
+          )
+        },
       },
       {
         key: 'updateUser',
@@ -80,14 +100,14 @@ const NonClaimableHistory = ({ dispatch, height, patientProfileFK }) => {
         },
       },
       {
-        key: 'updateDate',
+        key: 'lastUpdateDate',
         title: 'Updated Date',
-        dataIndex: 'updateDate',
+        dataIndex: 'lastUpdateDate',
         width: 140,
         sorter: false,
         search: false,
         render: (_dom, row) => {
-          const updateDate = moment(row.updateDate).format(
+          const updateDate = moment(row.lastUpdateDate).format(
             dateFormatLongWithTimeNoSec,
           )
           return (

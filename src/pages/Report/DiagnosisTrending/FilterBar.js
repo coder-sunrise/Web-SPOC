@@ -118,7 +118,7 @@ const FilterBar = ({
                     filterStyle={{
                       position: 'absolute',
                       bottom: 0,
-                      right: -110,
+                      right: -130,
                     }}
                     onICD10AMLanguageChange={setcurrentDiagnosisLanguage}
                   />
