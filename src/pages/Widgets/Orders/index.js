@@ -83,8 +83,7 @@ class Orders extends PureComponent {
   }
 
   componentWillMount() {
-    const { dispatch, status } = this.props
-
+    const { dispatch, status, visitRegistration } = this.props 
     const codeTableNameArray = [
       'inventorymedication',
       'inventoryvaccination',
@@ -144,6 +143,7 @@ class Orders extends PureComponent {
   render() {
     const { props } = this
     const { className, footer, isEnableEditOrder = true, ...restProps } = props
+    console.log(props)
     return (
       <div className={className}>
         {isEnableEditOrder && <Detail {...restProps} />}

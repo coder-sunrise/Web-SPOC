@@ -40,8 +40,11 @@ export default ({
   theme,
   isFullScreen = false,
   isEnableEditOrder = true,
+  visitRegistration,
+  ...restProps
 }) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
+  console.log(visitRegistration, 211)
   const { total, gst, totalWithGST, subTotal } = summary
   const [checkedStatusIncldGST, setCheckedStatusIncldGST] = useState(
     isGSTInclusive,
@@ -532,6 +535,17 @@ export default ({
       )
     return ''
   }
+
+  const getVisitOrderTemplateDetails = rows => {
+    const { entity } = visitRegistration
+    const { visit } = entity
+    const { visitOrderTemplate } = visit
+    const { visitOrderTemplateItemDtos } = visitOrderTemplate
+
+    console.log(rows)
+
+    return visit?.visitOrderTemplateDetails
+  }
   return (
     <CommonTableGrid
       size='sm'
@@ -631,7 +645,9 @@ export default ({
                     colSpan={4}
                     key={1}
                     style={{ position: 'relative' }}
-                  />,
+                  >
+                    {getVisitOrderTemplateDetails(rows)}
+                  </Table.Cell>,
                   React.cloneElement(children[7], {
                     colSpan: 3,
                     ...restProps,
@@ -643,7 +659,9 @@ export default ({
                     colSpan={3}
                     key={1}
                     style={{ position: 'relative' }}
-                  />,
+                  >
+                    {getVisitOrderTemplateDetails(rows)}
+                  </Table.Cell>,
                   React.cloneElement(children[6], {
                     colSpan: 2,
                     ...restProps,
