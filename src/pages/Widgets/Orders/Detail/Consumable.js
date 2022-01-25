@@ -285,13 +285,15 @@ class Consumable extends PureComponent {
           nextProps.global.openAdjustment) ||
         nextProps.orders.shouldPushToState
       ) {
-        nextProps.dispatch({
-          type: 'orders/updateState',
-          payload: {
-            entity: nextProps.values,
-            shouldPushToState: false,
-          },
-        })
+        if (nextProps.values.uid) {
+          nextProps.dispatch({
+            type: 'orders/updateState',
+            payload: {
+              entity: nextProps.values,
+              shouldPushToState: false,
+            },
+          })
+        }
       }
 
     const { values: nextValues } = nextProps

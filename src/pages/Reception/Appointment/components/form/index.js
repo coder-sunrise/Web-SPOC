@@ -1239,6 +1239,7 @@ class Form extends React.PureComponent {
       dispatch,
       setFieldValue,
       handleCopyAppointmentClick,
+      registerToVisit = () => {},
     } = this.props
 
     const {
@@ -1338,7 +1339,7 @@ class Form extends React.PureComponent {
                     onCreatePatientClick={this.togglePatientProfileModal}
                     onRegisterToVisitClick={navigateDirtyCheck({
                       redirectUrl: this.getVisregUrl(),
-                      onProceed: this.onCloseFormClick.bind(this),
+                      onProceed: () => registerToVisit(),
                     })}
                     patientContactNo={values.patientContactNo}
                     patientName={values.patientName}
