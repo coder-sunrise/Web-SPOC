@@ -1432,6 +1432,7 @@ class Form extends React.PureComponent {
                 <GridItem xs md={12} className={classes.footerGrid}>
                   <FormFooter
                     // isNew={slotInfo.type === 'add'}
+                    id={currentAppointment.id}
                     appointmentStatusFK={currentAppointment.appointmentStatusFk}
                     onClose={onClose}
                     disabled={disableFooterButton}

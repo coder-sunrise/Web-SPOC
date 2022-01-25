@@ -680,7 +680,7 @@ class PatientHistory extends Component {
               WidgetConfig.WIDGETS_ID.PLAN,
             ].indexOf(c) >= 0,
         )
-      return selectCategories.find(c => c === widgetId)
+      return selectCategories.find(c => c === widgetId) || false
     }
     return true
   }
@@ -1422,8 +1422,6 @@ class PatientHistory extends Component {
             isShowBasicExaminationsOther2: this.showBasicExaminationsOther2(
               current.patientNoteVitalSigns,
             ),
-            isShowJGHEyeExaminations,
-            isShowAudiometryTest,
           })
 
           // treatment
@@ -1721,6 +1719,7 @@ class PatientHistory extends Component {
       CORAudiometryTest: corAudiometryTest,
       ReportContext: reportContext,
     }
+    console.log('11111', doctorNote)
     const payload1 = [
       {
         ReportId: 68,
