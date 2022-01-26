@@ -85,6 +85,7 @@ class index extends PureComponent {
   calculateStandardWeight = () => {
     const { form } = this.arrayHelpers
     const { heightCM } = form.values.corPatientNoteVitalSign[0]
+    const { setFieldValue, setFieldTouched } = form
     if (heightCM) {
       const heightM = heightCM / 100
       const standardWeight = heightM ** 2 * 22
@@ -103,6 +104,7 @@ class index extends PureComponent {
       weightKG,
       bodyFatPercentage,
     } = form.values.corPatientNoteVitalSign[0]
+    const { setFieldValue, setFieldTouched } = form
     if (weightKG && bodyFatPercentage) {
       const bodyFatMass = weightKG * (bodyFatPercentage / 100)
       setFieldValue(

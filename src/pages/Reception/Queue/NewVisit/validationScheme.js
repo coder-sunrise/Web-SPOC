@@ -11,7 +11,7 @@ const VitalSignMessage = {
     'Blood pressure must be between 0 and 999',
   [FormField['vitalsign.bpDiaMMHG']]:
     'Blood pressure must be between 0 and 999',
-  [FormField['vitalsign.pulseRateBPM']]: 'Heart rate must be between 0 and 999',
+  [FormField['vitalsign.pulseRateBPM']]: 'Pulse must be between 0 and 999',
   [FormField['vitalsign.weightKG']]: 'Weight must be between 0 and 999.9',
   [FormField['vitalsign.saO2']]: 'SaO2 must be between 0 and 100%',
   [FormField['vitalsign.heightCM']]: 'Height must be between 0 and 999',
@@ -22,9 +22,9 @@ const VitalSignMessage = {
   [FormField['vitalsign.headCircumference']]:
     'Head circumference must be between 0 and 99.9CM',
   [FormField['vitalsign.chestCircumference']]:
-    'Head circumference must be between 0 and 999.9',
+    'Chest circumference must be between 0 and 999.9',
   [FormField['vitalsign.waistCircumference']]:
-    'Head circumference must be between 0 and 999.9',
+    'Waist circumference must be between 0 and 999.9',
 }
 
 export const reportingDoctorSchema = Yup.object().shape({

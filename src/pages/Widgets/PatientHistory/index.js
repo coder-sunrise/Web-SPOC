@@ -1523,7 +1523,7 @@ class PatientHistory extends Component {
                     ? `${numeral(o.bmi).format('0.0')} kg/m\u00b2`
                     : '-',
                   saO2: WidgetConfig.hasValue(o.saO2)
-                    ? `${numeral(o.saO2).format('0.0')} %`
+                    ? `${numeral(o.saO2).format('0')} %`
                     : '-',
                   bodyFatPercentage: WidgetConfig.hasValue(o.bodyFatPercentage)
                     ? `${numeral(o.bodyFatPercentage).format('0.0')} %`
