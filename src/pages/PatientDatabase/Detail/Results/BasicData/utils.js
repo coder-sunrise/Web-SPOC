@@ -47,7 +47,6 @@ export const defaultData = [
     type: 'Sa02 (%)',
     tableName: 'basicExaminations',
     fieldName: 'saO2',
-    format: '0.0',
   },
   {
     id: 7,
