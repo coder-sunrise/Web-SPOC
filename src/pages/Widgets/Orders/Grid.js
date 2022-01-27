@@ -393,8 +393,8 @@ export default ({
       (_.max(rows.filter(t => !t.isDeleted).map(t => t.sequence)) || 0) + 1
 
     const { entity: visitEntity } = visitRegistration
-    const { entity } = patient
-    const { name, patientAccountNo, genderFK, dob } = entity
+    const { patientEntity } = patient
+    const { name, patientAccountNo, genderFK, dob } = patientEntity
     const {
       ctgender = [],
       inventoryvaccination,
