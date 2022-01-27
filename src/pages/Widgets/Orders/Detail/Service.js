@@ -92,6 +92,7 @@ const getVisitDoctorUserId = props => {
   handleSubmit: (values, { props, onConfirm, setValues }) => {
     const { dispatch, orders, currentType, getNextSequence, user } = props
     const { rows } = orders
+    console.log(111)
     const data = {
       isOrderedByDoctor:
         user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
@@ -106,7 +107,7 @@ const getVisitDoctorUserId = props => {
       packageGlobalId:
         values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
-
+    console.log(data)
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
