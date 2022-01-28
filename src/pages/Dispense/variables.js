@@ -119,15 +119,24 @@ const checkActualizable = row => {
 }
 
 export const isActualizable = row => {
-  const { isNurseActualizeRequired, statusFK } = checkActualizable(row)
-  return (
+  const {
+    isNurseActualizeRequired = false,
+    workitem: { nurseWorkitem: { statusFK } = {} } = {},
+    isPreOrder,
+    isExternalPrescription,
+  } = row
+  if (
+    !isPreOrder &&
+    !isExternalPrescription &&
     isNurseActualizeRequired &&
     [NURSE_WORKITEM_STATUS.NEW, NURSE_WORKITEM_STATUS.CANCELLED].includes(
       statusFK,
     )
-  )
+  ) {
+    return true
+  }
+  return false
 }
-
 const actualizationButton = (row, buttonClickCallback) => {
   let actualizationBtn = null
   const { isNurseActualizeRequired, statusFK } = checkActualizable(row)
@@ -286,23 +295,6 @@ export const DispenseItemsColumnExtensions = (
   onActualizeBtnClick,
   showDrugLabelRemark,
 ) => {
-  const checkActualizable = row => {
-    const {
-      isNurseActualizeRequired = false,
-      workitem: { nurseWorkitem: { statusFK } = {} } = {},
-      isPreOrder,
-      isExternalPrescription,
-    } = row
-    if (
-      !isPreOrder &&
-      !isExternalPrescription &&
-      isNurseActualizeRequired &&
-      statusFK !== NURSE_WORKITEM_STATUS.ACTUALIZED
-    ) {
-      return true
-    }
-    return false
-  }
   return [
     {
       columnName: 'dispenseGroupId',
@@ -314,7 +306,7 @@ export const DispenseItemsColumnExtensions = (
       width: 50,
       sortingEnabled: false,
       type: 'checkbox',
-      isVisible: row => checkActualizable(row),
+      isVisible: row => isActualizable(row),
     },
     {
       columnName: 'type',

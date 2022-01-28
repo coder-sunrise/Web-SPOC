@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import _ from 'lodash'
-import Add from '@material-ui/icons/Add'
+import { PlusOutlined, DeleteFilled, EditFilled } from '@ant-design/icons'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 //import CheckCircle from '@material-ui/icons/CheckCircle'
@@ -19,13 +19,13 @@ import {
 } from '@/utils/constants'
 import {
   CommonTableGrid,
-  Button,
   Tooltip,
   NumberInput,
   Checkbox,
   Switch,
   AuthorizedContext,
 } from '@/components'
+import { Button } from 'antd'
 import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
@@ -352,34 +352,33 @@ export default ({
           >
             <Tooltip title='Edit Adjustment'>
               <Button
-                justIcon
-                color='primary'
+                size='small'
+                type='primary'
                 style={{
                   top: -1,
                 }}
-              >
-                <Edit onClick={() => editAdjustment(adj)} />
-              </Button>
+                onClick={() => editAdjustment(adj)}
+                icon={<EditFilled />}
+              ></Button>
             </Tooltip>
             <Tooltip title='Delete Adjustment'>
               <Button
-                justIcon
-                color='danger'
+                size='small'
+                type='danger'
                 style={{
                   top: -1,
+                  marginLeft: 8,
                 }}
-              >
-                <Delete
-                  onClick={() =>
-                    dispatch({
-                      type: 'orders/deleteFinalAdjustment',
-                      payload: {
-                        uid: adj.uid,
-                      },
-                    })
-                  }
-                />
-              </Button>
+                onClick={() =>
+                  dispatch({
+                    type: 'orders/deleteFinalAdjustment',
+                    payload: {
+                      uid: adj.uid,
+                    },
+                  })
+                }
+                icon={<DeleteFilled />}
+              ></Button>
             </Tooltip>
           </div>
         </AuthorizedContext.Provider>
@@ -715,16 +714,15 @@ export default ({
                               value={getOrderAccessRight(OrderAccessRight())}
                             >
                               <Button
-                                justIcon
-                                color='primary'
+                                size='small'
+                                type='primary'
                                 style={{
                                   top: -1,
                                   marginLeft: theme.spacing(1),
                                 }}
                                 onClick={addAdjustment}
-                              >
-                                <Add />
-                              </Button>
+                                icon={<PlusOutlined />}
+                              ></Button>
                             </AuthorizedContext.Provider>
                           </Tooltip>
                         </span>
@@ -1024,12 +1022,11 @@ export default ({
                 <div>
                   <Tooltip title={editMessage}>
                     <Button
-                      size='sm'
+                      size='small'
                       onClick={() => {
                         editRow(row)
                       }}
-                      justIcon
-                      color='primary'
+                      type='primary'
                       style={{ marginRight: 5 }}
                       disabled={
                         row.isEditingEntity ||
@@ -1039,56 +1036,52 @@ export default ({
                         row.isPreOrderActualize ||
                         !editEnable
                       }
-                    >
-                      <Edit />
-                    </Button>
+                      icon={<EditFilled />}
+                    ></Button>
                   </Tooltip>
                   <Tooltip title={deleteMessage}>
                     <Button
-                      size='sm'
-                      color='danger'
-                      justIcon
+                      size='small'
+                      type='danger'
                       disabled={
                         row.isEditingEntity ||
                         row.isPreOrderActualize ||
                         !deleteEnable
                       }
-                    >
-                      <Delete
-                        onClick={() => {
+                      onClick={() => {
+                        dispatch({
+                          type: 'orders/deleteRow',
+                          payload: {
+                            uid: row.uid,
+                          },
+                        })
+
+                        if (row.isPackage === true) {
                           dispatch({
-                            type: 'orders/deleteRow',
+                            type: 'orders/deletePackageItem',
                             payload: {
-                              uid: row.uid,
+                              packageGlobalId: row.packageGlobalId,
                             },
                           })
+                        }
 
-                          if (row.isPackage === true) {
-                            dispatch({
-                              type: 'orders/deletePackageItem',
-                              payload: {
-                                packageGlobalId: row.packageGlobalId,
-                              },
-                            })
-                          }
-
-                          dispatch({
-                            type: 'orders/updateState',
-                            payload: {
-                              entity: undefined,
-                            },
-                          })
-                          // let commitCount = 1000 // uniqueNumber
-                          // dispatch({
-                          //   // force current edit row components to update
-                          //   type: 'global/updateState',
-                          //   payload: {
-                          //     commitCount: (commitCount += 1),
-                          //   },
-                          // })
-                        }}
-                      />
-                    </Button>
+                        dispatch({
+                          type: 'orders/updateState',
+                          payload: {
+                            entity: undefined,
+                          },
+                        })
+                        // let commitCount = 1000 // uniqueNumber
+                        // dispatch({
+                        //   // force current edit row components to update
+                        //   type: 'global/updateState',
+                        //   payload: {
+                        //     commitCount: (commitCount += 1),
+                        //   },
+                        // })
+                      }}
+                      icon={<DeleteFilled />}
+                    ></Button>
                   </Tooltip>
                 </div>
               </AuthorizedContext.Provider>

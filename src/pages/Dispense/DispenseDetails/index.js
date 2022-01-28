@@ -35,6 +35,7 @@ import {
   NumberInput,
   Popper,
   notification,
+  Checkbox,
 } from '@/components'
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import Authorized from '@/utils/Authorized'
@@ -165,6 +166,7 @@ const DispenseDetails = ({
   const [popperOpen, setPopperOpen] = useState(false)
   const openPopper = () => setPopperOpen(true)
   const closePopper = () => setPopperOpen(false)
+  const [selectedAll, setSelectedAll] = useState(false)
 
   const { inventorymedication, inventoryvaccination } = codetable
   const { settings = {} } = clinicSettings
@@ -572,6 +574,7 @@ const DispenseDetails = ({
       const balanceQty =
         editRow.quantity - _.sumBy(matchItems, 'dispenseQuantity')
       matchItems.forEach(item => (item.stockBalance = balanceQty))
+      updateSelectAll(rows)
       setFieldValue('dispenseItems', rows)
     }
   }
@@ -667,6 +670,32 @@ const DispenseDetails = ({
       })
     } else {
       finalizeInvoice()
+    }
+  }
+
+  const onChangeSelectAll = value => {
+    let newItems = [...dispenseItems]
+    newItems.forEach(item => {
+      if (isActualizable(item) && item.isCheckActualize !== value) {
+        item.isCheckActualize = value
+      }
+    })
+    setFieldValue('dispenseItems', newItems)
+  }
+
+  const updateSelectAll = newItems => {
+    var enableItems = newItems.filter(item => isActualizable(item))
+    if (
+      enableItems.filter(item => item.isCheckActualize).length ===
+      enableItems.length
+    ) {
+      if (!selectedAll) {
+        setSelectedAll(true)
+      }
+    } else {
+      if (selectedAll) {
+        setSelectedAll(false)
+      }
     }
   }
 
@@ -866,78 +895,94 @@ const DispenseDetails = ({
         )}
         <GridItem md={12}>
           <Paper className={classes.paper}>
-            <TableData
-              oddEven={false}
-              title='Dispense Details'
-              titleExtend={
-                viewOnly
-                  ? null
-                  : actualizeSelectedItemButton('DispenseItems', dispenseItems)
-              }
-              EditingProps={{
-                showCommandColumn: false,
-                onCommitChanges: commitChanges,
-              }}
-              FuncProps={{
-                pager: false,
-                grouping: true,
-                groupingConfig: {
-                  isDisableExpandedGroups: true,
-                  state: {
-                    grouping: [{ columnName: 'dispenseGroupId' }],
-                    expandedGroups: defaultExpandedGroups,
-                  },
-                  row: {
-                    indentColumnWidth: 0,
-                    iconComponent: icon => <span></span>,
-                    contentComponent: group => {
-                      const { row } = group
-                      const groupRow = dispenseItems.find(
-                        data => data.dispenseGroupId === row.value,
+            <div style={{ position: 'relative' }}>
+              <div style={{ position: 'absolute', left: 26, top: 40 }}>
+                {isShowDispenseActualie && !viewOnly && (
+                  <Checkbox
+                    checked={selectedAll}
+                    onChange={e => {
+                      setSelectedAll(e.target.value)
+                      onChangeSelectAll(e.target.value)
+                    }}
+                  />
+                )}
+              </div>
+              <TableData
+                oddEven={false}
+                title='Dispense Details'
+                titleExtend={
+                  viewOnly
+                    ? null
+                    : actualizeSelectedItemButton(
+                        'DispenseItems',
+                        dispenseItems,
                       )
-                      if (row.value === 'NormalDispense')
-                        return (
-                          <div className={classes.groupStyle}>
-                            <span style={{ fontWeight: 600 }}>
-                              Normal Dispense Items
-                            </span>
-                          </div>
-                        )
-                      if (row.value === 'NoNeedToDispense')
-                        return (
-                          <div className={classes.groupStyle}>
-                            <span style={{ fontWeight: 600 }}>
-                              No Need To Dispense Items
-                            </span>
-                          </div>
-                        )
-                      return (
-                        <div className={classes.groupStyle}>
-                          <span style={{ fontWeight: 600 }}>
-                            {'Drug Mixture: '}
-                          </span>
-                          {groupRow.drugMixtureName}
-                        </div>
-                      )
+                }
+                EditingProps={{
+                  showCommandColumn: false,
+                  onCommitChanges: commitChanges,
+                }}
+                FuncProps={{
+                  pager: false,
+                  grouping: true,
+                  groupingConfig: {
+                    isDisableExpandedGroups: true,
+                    state: {
+                      grouping: [{ columnName: 'dispenseGroupId' }],
+                      expandedGroups: defaultExpandedGroups,
                     },
+                    row: {
+                      indentColumnWidth: 0,
+                      iconComponent: icon => <span></span>,
+                      contentComponent: group => {
+                        const { row } = group
+                        const groupRow = dispenseItems.find(
+                          data => data.dispenseGroupId === row.value,
+                        )
+                        if (row.value === 'NormalDispense')
+                          return (
+                            <div className={classes.groupStyle}>
+                              <span style={{ fontWeight: 600 }}>
+                                Normal Dispense Items
+                              </span>
+                            </div>
+                          )
+                        if (row.value === 'NoNeedToDispense')
+                          return (
+                            <div className={classes.groupStyle}>
+                              <span style={{ fontWeight: 600 }}>
+                                No Need To Dispense Items
+                              </span>
+                            </div>
+                          )
+                        return (
+                          <div className={classes.groupStyle}>
+                            <span style={{ fontWeight: 600 }}>
+                              {'Drug Mixture: '}
+                            </span>
+                            {groupRow.drugMixtureName}
+                          </div>
+                        )
+                      },
+                    },
+                    backgroundColor: 'rgb(240, 248, 255)',
                   },
-                  backgroundColor: 'rgb(240, 248, 255)',
-                },
-              }}
-              forceRender
-              columns={columns}
-              colExtensions={DispenseItemsColumnExtensions(
-                viewOnly,
-                onDrugLabelClick,
-                onActualizeBtnClick,
-                showDrugLabelRemark,
-              )}
-              data={dispenseItems}
-              TableProps={{
-                rowComponent: orderItemRow,
-              }}
-              getRowId={r => r.uid}
-            />
+                }}
+                forceRender
+                columns={columns}
+                colExtensions={DispenseItemsColumnExtensions(
+                  viewOnly,
+                  onDrugLabelClick,
+                  onActualizeBtnClick,
+                  showDrugLabelRemark,
+                )}
+                data={dispenseItems}
+                TableProps={{
+                  rowComponent: orderItemRow,
+                }}
+                getRowId={r => r.uid}
+              />
+            </div>
 
             <TableData
               title='Service'

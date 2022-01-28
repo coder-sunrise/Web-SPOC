@@ -29,8 +29,9 @@ const FormFooter = ({
   handleSaveDraftClick,
   handleConfirmClick,
   handleValidateClick,
+  id,
 }) => {
-  const isNew = appointmentStatusFK === undefined
+  const isNew = appointmentStatusFK === undefined || !id
   const isDraft = appointmentStatusFK === 2
   const isTurnedUp =
     appointmentStatusFK === APPOINTMENT_STATUS.TURNEDUP ||
