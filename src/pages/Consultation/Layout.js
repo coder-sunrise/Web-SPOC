@@ -626,14 +626,6 @@ class Layout extends PureComponent {
                 })}
               </GridItem>
               <GridItem md={3} style={{ textAlign: 'right' }}>
-                <Button
-                  size='sm'
-                  color='info'
-                  onClick={this.toggleLabTrackingDrawer}
-                >
-                  <Accessibility />
-                  Results
-                </Button>
                 <Button size='sm' color='info' onClick={this.toggleDrawer}>
                   <Settings />
                   Widgets
