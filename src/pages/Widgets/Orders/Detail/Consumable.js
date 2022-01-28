@@ -125,6 +125,7 @@ const getVisitDoctorUserId = props => {
       packageGlobalId:
         values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
+    console.log('consumable', data)
     dispatch({
       type: 'orders/upsertRow',
       payload: data,

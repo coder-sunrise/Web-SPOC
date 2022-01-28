@@ -25,6 +25,8 @@ import {
   RADIOLOGY_WORKITEM_STATUS,
   NURSE_WORKITEM_STATUS,
   ORDER_TYPES,
+  INVENTORY_TYPE,
+  SERVICE_CENTER_CATEGORY,
 } from '@/utils/constants'
 import {
   CommonTableGrid,
@@ -33,6 +35,7 @@ import {
   CommonModal,
   NumberInput,
   Checkbox,
+  notification,
   Switch,
   AuthorizedContext,
 } from '@/components'
@@ -381,7 +384,7 @@ export default ({
     }
   }
 
-  GetNewVaccination = currentVisitOrderTemplate => {
+  const GetNewVaccination = currentVisitOrderTemplate => {
     const inventoryVaccinationFK =
       currentVisitOrderTemplate.visitOrderTemplateVaccinationItemDto
         .inventoryVaccinationFK
@@ -393,8 +396,7 @@ export default ({
       (_.max(rows.filter(t => !t.isDeleted).map(t => t.sequence)) || 0) + 1
 
     const { entity: visitEntity } = visitRegistration
-    const { patientEntity } = patient
-    const { name, patientAccountNo, genderFK, dob } = patientEntity
+    const { name, patientAccountNo, genderFK, dob } = patient.entity
     const {
       ctgender = [],
       inventoryvaccination,
@@ -408,60 +410,59 @@ export default ({
     if (allDocs && allDocs.length > 0) {
       const { sequence: documentSequence } = _.maxBy(allDocs, 'sequence')
       nextSequence = documentSequence + 1
-    } 
+    }
     let vaccination = inventoryvaccination.find(
       vacc => vacc.id === inventoryVaccinationFK,
     )
+    console.log('vaccination', vaccination)
     let defaultBatch = vaccination.vaccinationStock.find(
       o => o.isDefault === true,
     )
 
     let usage = ctvaccinationusage.find(
-      vaccUsage => vaccUsage.id === vaccination.usageMethodFK,
+      vaccUsage => vaccUsage.id === vaccination.vaccinationUsageFK,
     )
 
     let dosage = ctmedicationdosage.find(
-      vaccdosage => vaccdosage.id === vaccination.dosageFK,
+      vaccdosage => vaccdosage.id === vaccination.prescribingDosageFK,
     )
 
     let uom = ctvaccinationunitofmeasurement.find(
-      vaccuom => vaccuom.id === vaccination.uomfk,
+      vaccuom => vaccuom.id === vaccination.prescribingUOMFK,
     )
     let dispenseUOM = ctvaccinationunitofmeasurement.find(
-      vaccuom => vaccuom.id === vaccination.dispenseUOMFK,
+      vaccuom => vaccuom.id === vaccination.dispensingUOMFK,
     )
-    let newTotalQuantity =
-      currentVisitOrderTemplate.visitOrderTemplateVaccinationItemDto.quantity
 
     const totalPrice =
       currentVisitOrderTemplate.visitOrderTemplateVaccinationItemDto.total
 
     let newVaccination = {
-      type,
-      inventoryVaccinationFK: vaccination.inventoryVaccinationFK,
-      vaccinationGivenDate: vaccination.vaccinationGivenDate,
+      type: ORDER_TYPES.VACCINATION,
+      inventoryVaccinationFK: vaccination.id,
+      vaccinationGivenDate: moment(),
       vaccinationCode: vaccination.code,
       vaccinationName: vaccination.displayValue,
-      usageMethodFK: usage?.id,
-      usageMethodCode: usage?.code,
-      usageMethodDisplayValue: usage?.name,
-      dosageFK: dosage?.id,
-      dosageCode: dosage?.code,
-      dosageDisplayValue: dosage?.displayValue,
-      uomfk: uom?.id,
-      uomCode: uom?.code,
-      uomDisplayValue: uom?.name,
-      dispenseUOMFK: dispenseUOM?.id,
-      dispenseUOMCode: dispenseUOM?.code,
-      dispenseUOMDisplayValue: dispenseUOM?.name,
-      quantity: newTotalQuantity,
-      unitPrice: vaccination.sellingPrice,
-      totalPrice,
+      usageMethodFK: vaccination.vaccinationUsage?.id,
+      usageMethodCode: vaccination.vaccinationUsage?.code,
+      usageMethodDisplayValue: vaccination.vaccinationUsage?.name,
+      dosageFK: vaccination.prescribingDosage?.id,
+      dosageCode: vaccination.prescribingDosage?.code,
+      dosageDisplayValue: vaccination.prescribingDosage?.name,
+      uomfk: vaccination.prescribingUOM?.id,
+      uomCode: vaccination.prescribingUOM?.code,
+      uomDisplayValue: vaccination.prescribingUOM?.name,
+      dispenseUOMFK: vaccination.dispensingUOM?.id,
+      dispenseUOMCode: vaccination.dispensingUOM?.code,
+      dispenseUOMDisplayValue: vaccination.dispensingUOM?.name,
+      quantity: currentVisitOrderTemplate.quantity,
+      unitPrice: currentVisitOrderTemplate.unitPrice,
+      totalPrice: currentVisitOrderTemplate.total,
       adjAmount: 0.0,
       adjType: 'ExactAmount',
       adjValue: 0,
-      totalAfterItemAdjustment: totalPrice,
-      sequence: currentSequence,
+      totalAfterItemAdjustment: currentVisitOrderTemplate.total,
+      sequence: sequence,
       expiryDate: defaultBatch ? defaultBatch.expiryDate : undefined,
       batchNo: defaultBatch ? defaultBatch.batchNo : undefined,
       remarks: vaccination.remarks,
@@ -470,11 +471,11 @@ export default ({
       subject: vaccination.displayValue,
       caution: vaccination.caution,
       isGenerateCertificate: vaccination.isAutoGenerateCertificate,
-      performingUserFK: this.getVisitDoctorUserId(this.props),
-      packageGlobalId: '',
+      performingUserFK: user.data.clinicianProfile.userProfile.id,
       isNurseActualizeRequired: vaccination.isNurseActualizable,
       instruction: `${usage?.name || ''} ${dosage?.displayValue ||
         ''} ${uom?.name || ''}`,
+      visitOrderTemplateItemFK: currentVisitOrderTemplate.id,
     }
     let newCORVaccinationCert = []
     if (newVaccination.isGenerateCertificate) {
@@ -486,7 +487,7 @@ export default ({
         newCORVaccinationCert = [
           {
             type: '3',
-            certificateDate: moment(),
+            certificateDate: moment().date(),
             issuedByUserFK: user.data.clinicianProfile.userProfile.id,
             subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
               ''}, ${Math.floor(
@@ -497,6 +498,7 @@ export default ({
               newVaccination,
             ),
             sequence: nextSequence,
+            uid: getUniqueId(),
           },
         ]
         nextSequence += 1
@@ -507,6 +509,98 @@ export default ({
     return {
       ...newVaccination,
       corVaccinationCert: newCORVaccinationCert,
+    }
+  }
+  const GetService = currentVisitOrderTemplate => {
+    const { fullService } = orders
+    var service = fullService.find(
+      t =>
+        t.serviceCenter_ServiceId ===
+        currentVisitOrderTemplate.visitOrderTemplateServiceItemDto
+          .serviceCenterServiceFK,
+    )
+    let sequence =
+      (_.max(rows.filter(t => !t.isDeleted).map(t => t.sequence)) || 0) + 1
+    let type = ORDER_TYPES.SERVICE
+    if (
+      service.serviceCenterCategoryFK ===
+      SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER
+    ) {
+      type = ORDER_TYPES.RADIOLOGY
+    } else if (
+      service.serviceCenterCategoryFK ===
+      SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER
+    ) {
+      type = ORDER_TYPES.LAB
+    }
+    return {
+      adjAmount: 0,
+      adjType: 'ExactAmount',
+      adjValue: 0,
+      isActive: true,
+      isDeleted: false,
+      isDisplayValueChangable: service.isDisplayValueChangable,
+      isExactAmount: true,
+      isMinus: true,
+      isNurseActualizeRequired: service.isNurseActualizable,
+      isOrderedByDoctor:
+        user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
+      performingUserFK: user.data.clinicianProfile.userProfile.id,
+      quantity: currentVisitOrderTemplate.quantity,
+      sequence: sequence,
+      serviceCenterFK: service.serviceCenterId,
+      serviceCenterServiceFK: service.serviceCenter_ServiceId,
+      serviceCode: service.code,
+      serviceFK: service.id,
+      serviceName: service.displayValue,
+      subject: service.displayValue,
+      total: currentVisitOrderTemplate.total,
+      totalAfterItemAdjustment: currentVisitOrderTemplate.total,
+      type: type,
+      unitPrice: currentVisitOrderTemplate.unitPrice,
+      visitPurposeFK: currentVisitOrderTemplate.visitOrderTemplateFK,
+      visitOrderTemplateItemFK: currentVisitOrderTemplate.id,
+    }
+  }
+  const GetConsumable = currentVisitOrderTemplate => {
+    const { inventoryconsumable = [] } = codetable
+    var consumable = inventoryconsumable.find(
+      t =>
+        t.serviceCenter_ServiceId ===
+        currentVisitOrderTemplate.visitOrderTemplateServiceItemDto
+          .inventoryConsumableFK,
+    )
+    let defaultBatch = consumable?.consumableStock.find(
+      o => o.isDefault === true,
+    )
+    return {
+      adjAmount: 0,
+      adjType: 'ExactAmount',
+      adjValue: 0,
+      batchNo: defaultBatch?.batchNo,
+      consumableCode: consumable.code,
+      consumableName: consumable.displayValue,
+      inventoryConsumableFK: consumable.id,
+      isActive: true,
+      isDeleted: false,
+      isDispensedByPharmacy: consumable.isDispensedByPharmacy,
+      isExactAmount: true,
+      isMinus: true,
+      isNurseActualizeRequired: consumable.isNurseActualizable,
+      isOrderedByDoctor: true,
+      packageGlobalId: '',
+      performingUserFK:
+        user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
+      quantity: currentVisitOrderTemplate.quantity,
+      sequence:
+        (_.max(rows.filter(t => !t.isDeleted).map(t => t.sequence)) || 0) + 1,
+      subject: consumable.displayValue,
+      totalAfterItemAdjustment: currentVisitOrderTemplate.total,
+      totalPrice: currentVisitOrderTemplate.total,
+      type: ORDER_TYPES.CONSUMABLE,
+      unitOfMeasurement: consumable.uom?.name,
+      unitPrice: currentVisitOrderTemplate.unitPrice,
+      visitOrderTemplateItemFK: currentVisitOrderTemplate.id,
     }
   }
   useEffect(() => {
@@ -1030,15 +1124,60 @@ export default ({
     var newDrugItems = data.map(templateItem => {
       console.log(111, templateItem)
       if (templateItem.visitOrderTemplateMedicationItemDto) {
-        const newDrug = GetNewMedication(templateItem)
-        console.log(newDrug)
-        dispatch({
-          type: 'orders/upsertRow',
-          payload: newDrug,
-        })
+        try {
+          const newDrug = GetNewMedication(templateItem)
+          console.log(newDrug)
+          dispatch({
+            type: 'orders/upsertRow',
+            payload: newDrug,
+          })
+        } catch (error) {
+          console.log(error)
+          notification.error({
+            message: `Revert drug ${templateItem?.inventoryItemName} failed.`,
+          })
+        }
       } else if (templateItem.visitOrderTemplateVaccinationItemDto) {
+        try {
+          const newVaccine = GetNewVaccination(templateItem)
+          console.log(newVaccine)
+          dispatch({
+            type: 'orders/upsertRow',
+            payload: newVaccine,
+          })
+        } catch (error) {
+          notification.error({
+            message: `Revert vaccination ${templateItem?.inventoryItemName} failed.`,
+          })
+        }
       } else if (templateItem.visitOrderTemplateConsumableItemDto) {
+        try {
+          const newConsumable = GetConsumable(templateItem)
+          console.log(newConsumable)
+          dispatch({
+            type: 'orders/upsertRow',
+            payload: newConsumable,
+          })
+        } catch (error) {
+          console.log(error)
+          notification.error({
+            message: `Revert consumable ${templateItem?.inventoryItemName} failed.`,
+          })
+        }
       } else if (templateItem.visitOrderTemplateServiceItemDto) {
+        try {
+          const newService = GetService(templateItem)
+          console.log(newService)
+          dispatch({
+            type: 'orders/upsertRow',
+            payload: newService,
+          })
+        } catch (error) {
+          console.log(error)
+          notification.error({
+            message: `Revert service ${templateItem?.inventoryItemName} failed.`,
+          })
+        }
       }
     })
     setShowRevertVisitPurposeItem(false)
