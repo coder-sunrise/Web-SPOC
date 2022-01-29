@@ -145,7 +145,6 @@ class Orders extends PureComponent {
   render() {
     const { props } = this
     const { className, footer, isEnableEditOrder = true, ...restProps } = props
-    console.log(props)
     return (
       <div className={className}>
         {isEnableEditOrder && <Detail {...restProps} />}

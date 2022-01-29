@@ -99,27 +99,35 @@ export default createListViewModel({
     service: {},
     state: { ...initialState },
     subscriptions: ({ dispatch, history }) => {
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'ctservice',
-          force: true,
-          filter: {
-            'serviceFKNavigation.IsActive': true,
-            'serviceCenterFKNavigation.IsActive': true,
-            combineCondition: 'and',
-          },
-        },
-      }).then(list => {
-        if (list) {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              fullService: list,
-            },
-          })
-        }
-      })
+        history.listen(async (loct, method) => {
+          const { pathname, search, query = {} } = loct
+          if (
+            pathname.indexOf('/reception/queue/consultation') === 0 &&
+            Number(query.cid)
+          ) {
+            dispatch({
+              type: 'codetable/fetchCodes',
+              payload: {
+                code: 'ctservice',
+                force: true,
+                filter: {
+                  'serviceFKNavigation.IsActive': true,
+                  'serviceCenterFKNavigation.IsActive': true,
+                  combineCondition: 'and',
+                },
+              },
+            }).then(list => {
+              if (list) {
+                dispatch({
+                  type: 'updateState',
+                  payload: {
+                    fullService: list,
+                  },
+                })
+              }
+            })
+          }
+        })
     },
     effects: {
       *upsertRow({ payload }, { select, call, put, delay }) {

@@ -303,6 +303,7 @@ const validDispense = (dispenseItems = []) => {
 class Main extends Component {
   state = {
     showOrderModal: false,
+    hasShowOrderModal: false,
     showDrugLabelSelection: false,
     showCautionAlert: false,
     isShowOrderUpdated: false,
@@ -339,6 +340,15 @@ class Main extends Component {
     })
   }
 
+  componentWillUnmount = () => {
+    console.log('unm')
+    this.props.dispatch({
+      type: `dispense/updateState`,
+      payload: {
+        queryCodeTablesDone: false,
+      },
+    })
+  }
   componentDidMount = async () => {
     const {
       dispatch,
@@ -350,55 +360,11 @@ class Main extends Component {
 
     const { entity = {} } = visitRegistration
     const { visit = {} } = entity
-    const { otherOrder = [], prescription = [], packageItem = [] } = values
     dispatch({
       type: 'dispense/incrementLoadCount',
     })
+    const { otherOrder = [], prescription = [], packageItem = [] } = values
     const isEmptyDispense = otherOrder.length === 0 && prescription.length === 0
-    const noClinicalObjectRecord = !values.clinicalObjectRecordFK
-
-    const accessRights = Authorized.check('queue.dispense.editorder')
-    if (visit.visitPurposeFK === VISIT_TYPE.OTC && isEmptyDispense) {
-      this.setState(
-        prevState => {
-          return {
-            showOrderModal: !prevState.showOrderModal,
-            isFirstAddOrder: true,
-          }
-        },
-        () => {
-          this.openFirstTabAddOrder()
-        },
-      )
-      return
-    }
-
-    if (
-      accessRights &&
-      accessRights.rights !== 'hidden' &&
-      (visit.visitPurposeFK === VISIT_TYPE.BF ||
-        visit.visitPurposeFK === VISIT_TYPE.MC) &&
-      isEmptyDispense &&
-      noClinicalObjectRecord &&
-      dispense.loadCount === 0
-    ) {
-      this.setState({ showCautionAlert: true })
-      this.editOrder()
-    }
-
-    let drugList = []
-    prescription.forEach(item => {
-      drugList.push(item)
-    })
-    packageItem.forEach(item => {
-      if (item.type === 'Medication') {
-        drugList.push({
-          ...item,
-          name: item.description,
-          dispensedQuanity: item.packageConsumeQuantity,
-        })
-      }
-    })
 
     // set default language based on patient tranlsation and clinic setting.
     const preferLanguage =
@@ -406,14 +372,6 @@ class Main extends Component {
         ? 'JP'
         : clinicSettings.primaryPrintoutLanguage
     this.setState({ selectedLanguage: [preferLanguage] })
-
-    this.setState(() => {
-      return {
-        selectedDrugs: drugList.map(x => {
-          return { ...x, no: 1, selected: true }
-        }),
-      }
-    })
   }
 
   makePayment = async (voidPayment = false, voidReason = '') => {
@@ -657,7 +615,100 @@ class Main extends Component {
     return false
   }
 
+  checkOTCAddOrder = () => {
+    const {
+      dispatch,
+      values,
+      dispense,
+      clinicSettings,
+      visitRegistration,
+    } = this.props
+    if (this.state.hasShowOrderModal || !dispense.queryCodeTablesDone) {
+      return
+    }
+    const { entity = {} } = visitRegistration
+    const { visit = {} } = entity
+    const { otherOrder = [], prescription = [], packageItem = [] } = values
+    const isEmptyDispense = otherOrder.length === 0 && prescription.length === 0
+    const noClinicalObjectRecord = !values.clinicalObjectRecordFK
+    if (visit.visitPurposeFK === VISIT_TYPE.OTC && isEmptyDispense) {
+      this.setState(
+        prevState => {
+          return {
+            showOrderModal: !prevState.showOrderModal,
+            hasShowOrderModal: true,
+            isFirstAddOrder: true,
+          }
+        },
+        () => {
+          this.openFirstTabAddOrder()
+        },
+      )
+    }
+  }
+
+  checkBillFirstAndMC = () => {
+    const {
+      dispatch,
+      values,
+      dispense,
+      clinicSettings,
+      visitRegistration,
+    } = this.props
+    if (!dispense.queryCodeTablesDone) {
+      return
+    }
+
+    const { entity = {} } = visitRegistration
+    const { visit = {} } = entity
+    const { otherOrder = [], prescription = [], packageItem = [] } = values
+    const isEmptyDispense = otherOrder.length === 0 && prescription.length === 0
+    const accessRights = Authorized.check('queue.dispense.editorder')
+    if (
+      accessRights &&
+      accessRights.rights !== 'hidden' &&
+      (visit.visitPurposeFK === VISIT_TYPE.BF ||
+        visit.visitPurposeFK === VISIT_TYPE.MC) &&
+      isEmptyDispense &&
+      noClinicalObjectRecord &&
+      dispense.loadCount === 0
+    ) {
+      this.setState({ showCautionAlert: true })
+      this.editOrder()
+      dispatch({
+        type: 'dispense/incrementLoadCount',
+      })
+    }
+
+    let drugList = []
+    prescription.forEach(item => {
+      drugList.push(item)
+    })
+    packageItem.forEach(item => {
+      if (item.type === 'Medication') {
+        drugList.push({
+          ...item,
+          name: item.description,
+          dispensedQuanity: item.packageConsumeQuantity,
+        })
+      }
+    })
+    if (dispense.loadCount === 0) {
+      this.setState(() => {
+        return {
+          selectedDrugs: drugList.map(x => {
+            return { ...x, no: 1, selected: true }
+          }),
+        }
+      })
+      dispatch({
+        type: 'dispense/incrementLoadCount',
+      })
+    }
+  }
   render() {
+    this.checkOTCAddOrder()
+    this.checkBillFirstAndMC()
     const {
       classes,
       handleSubmit,
@@ -672,6 +723,7 @@ class Main extends Component {
       this.actualizeEditOrder()
       dispense.openOrderPopUpAfterActualize = false
     }
+    console.log(1231, this.props)
     return (
       <div className={classes.root}>
         <DispenseDetails
@@ -695,7 +747,9 @@ class Main extends Component {
           observe='OrderPage'
         >
           <AddOrder
-            visitType={values.visitPurposeFK}
+            visitType={
+              this.props.visitRegistration?.entity?.visit?.visitPurposeFK
+            }
             isFirstLoad={this.state.isFirstAddOrder}
             onReloadClick={() => {
               reloadDispense(this.props)

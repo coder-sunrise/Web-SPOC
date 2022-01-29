@@ -1072,7 +1072,7 @@ export default ({
   }
 
   const getVisitOrderTemplateDetails = rows => {
-    const { entity } = visitRegistration
+    const { entity } = visitRegistration || {}
     if (!entity) return ''
     const { visit } = entity
     const { visitOrderTemplate } = visit
@@ -1274,10 +1274,11 @@ export default ({
             row: {
               messages,
               totalRowComponent: p => {
-                const { entity } = visitRegistration
+                const { entity } = visitRegistration || {}
                 const { visit } = entity || {}
                 const { children, ...restProps } = p
                 let newChildren = []
+                console.log(visit)
                 let indicate = getVisitOrderTemplateDetails(rows)
                 if (isExistPackage) {
                   newChildren = [
