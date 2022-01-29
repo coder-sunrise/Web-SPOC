@@ -329,7 +329,7 @@ class Appointment extends React.PureComponent {
     }))
   }
 
-  closeAppointmentForm = async () => {
+  closeAppointmentForm = async (clearPatient = true) => {
     this.setState({
       selectedAppointmentFK: -1,
       showAppointmentForm: false,
@@ -353,11 +353,12 @@ class Appointment extends React.PureComponent {
       },
     })
 
-    dispatch({
-      type: 'patient/updateState',
-      payload: { entity: null },
-    })
-
+    if (clearPatient) {
+      dispatch({
+        type: 'patient/updateState',
+        payload: { entity: null },
+      })
+    }
     history.push(getRemovedUrl(['md', 'pid', 'apptid']))
   }
 
@@ -1083,6 +1084,9 @@ class Appointment extends React.PureComponent {
               apptTimeSlotDuration={apptTimeSlotDuration}
               handleCopyAppointmentClick={this.handleCopyAppointmentClick}
               appointmentTypes={appointmentTypes}
+              registerToVisit={() => {
+                this.closeAppointmentForm(false)
+              }}
             />
           )}
         </CommonModal>

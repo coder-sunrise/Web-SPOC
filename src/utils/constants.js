@@ -941,3 +941,23 @@ export const AGETYPE = {
   YOUTH: 'Youth',
   ADULT: 'Adult',
 }
+
+export const TESTTYPES = {
+  BASICEXAMINATION: 'BasicExamination',
+  BPSYS: 'BPSys',
+  BPDIA: 'BPDIA',
+  PULSE: 'Pulse',
+  BMI: 'BMI',
+  ROHRER: 'Rohrer',
+  KAUP: 'kaup',
+  WAIST: 'Waist',
+  IOP: 'IOP',
+  AUDIOMETRY: 'Audiometry',
+  COLORVISIONTEST: 'ColorVisionTest',
+  PREGNANCY: 'Pregnancy',
+  MENSUS: 'Mensus',
+  R5MCORRECTED: 'Right5mCorrected',
+  R50CMCORRECTED: 'Right50cmCorrected',
+  L5MCORRECTED: 'Left5mCorrected',
+  L50CMCORRECTED: 'Left50cmCorrected',
+}

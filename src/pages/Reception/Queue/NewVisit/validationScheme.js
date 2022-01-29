@@ -2,6 +2,7 @@ import * as Yup from 'yup'
 import { VISIT_TYPE } from '@/utils/constants'
 // Form field
 import FormField from './formField'
+import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 
 const VitalSignMessage = {
   [FormField['visit.visit.queueNo']]: 'Queue No cannot be blank',
@@ -11,7 +12,7 @@ const VitalSignMessage = {
     'Blood pressure must be between 0 and 999',
   [FormField['vitalsign.bpDiaMMHG']]:
     'Blood pressure must be between 0 and 999',
-  [FormField['vitalsign.pulseRateBPM']]: 'Heart rate must be between 0 and 999',
+  [FormField['vitalsign.pulseRateBPM']]: 'Pulse must be between 0 and 999',
   [FormField['vitalsign.weightKG']]: 'Weight must be between 0 and 999.9',
   [FormField['vitalsign.saO2']]: 'SaO2 must be between 0 and 100%',
   [FormField['vitalsign.heightCM']]: 'Height must be between 0 and 999',
@@ -22,9 +23,9 @@ const VitalSignMessage = {
   [FormField['vitalsign.headCircumference']]:
     'Head circumference must be between 0 and 99.9CM',
   [FormField['vitalsign.chestCircumference']]:
-    'Head circumference must be between 0 and 999.9',
+    'Chest circumference must be between 0 and 999.9',
   [FormField['vitalsign.waistCircumference']]:
-    'Head circumference must be between 0 and 999.9',
+    'Waist circumference must be between 0 and 999.9',
 }
 
 export const reportingDoctorSchema = Yup.object().shape({
@@ -122,6 +123,43 @@ export const visitBasicExaminationsSchema = Yup.object().shape({
           )
       },
     ),
+})
+
+export const eyeExaminationsSchema = Yup.object().shape({
+  visionCorrectionMethod: Yup.string().when(
+    [
+      'rightBareEye5',
+      'rightCorrectedVision5',
+      'rightBareEye50',
+      'rightCorrectedVision50',
+      'leftBareEye5',
+      'leftCorrectedVision5',
+      'leftBareEye50',
+      'leftCorrectedVision50',
+    ],
+    (
+      rightBareEye5,
+      rightCorrectedVision5,
+      rightBareEye50,
+      rightCorrectedVision50,
+      leftBareEye5,
+      leftCorrectedVision5,
+      leftBareEye50,
+      leftCorrectedVision50,
+    ) => {
+      if (
+        hasValue(rightBareEye5) ||
+        hasValue(rightCorrectedVision5) ||
+        hasValue(rightBareEye50) ||
+        hasValue(rightCorrectedVision50) ||
+        hasValue(leftBareEye5) ||
+        hasValue(leftCorrectedVision5) ||
+        hasValue(leftBareEye50) ||
+        hasValue(leftCorrectedVision50)
+      )
+        return Yup.string().required()
+    },
+  ),
 })
 
 const schemaVisit = {
