@@ -100,7 +100,7 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
   }
   return (
     <React.Fragment>
-      <div style={{ height: window.innerHeight - 160, overflow: 'scroll' }}>
+      <div style={{ height: window.innerHeight - 180, overflow: 'scroll' }}>
         {viewMode === 'card' ? (
           <CardView key='cardview' {...restProps} {...cfg} />
         ) : (
@@ -127,14 +127,14 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
       {editingFile && (
         <CommonModal
           open={editingFile.showNameEditor}
-          title='Change File Name'
+          title='Change Document Name'
           maxWidth='sm'
           onClose={() => {
             setEditingFile(undefined)
           }}
         >
           <TextEditor
-            item={{ label: 'File Name', value: editingFile.fileName }}
+            item={{ label: 'Document Name', value: editingFile.fileName }}
             handleSubmit={name => {
               onFileUpdated({ ...editingFile, fileName: name })
               setEditingFile(undefined)

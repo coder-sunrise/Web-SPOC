@@ -6,7 +6,7 @@ import service from '../services/folder'
 export default createListViewModel({
   namespace: 'folder',
   codetable: {
-    message: 'Folder updated',
+    message: 'Tag updated',
     code: 'ctfolder',
   },
   param: {

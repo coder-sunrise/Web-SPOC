@@ -76,28 +76,32 @@ const CardZoom = [
 ]
 
 class CardView extends Component {
-  downloadFile = (row) => {
+  downloadFile = row => {
     downloadAttachment(row)
   }
 
-  render () {
+  render() {
     const {
       classes,
       attachmentList = {},
       selectedFolderFK,
       zoom = 4,
+      filterDocumentValue = '',
     } = this.props
-    const zoomStyle = CardZoom.find((c) => c.zoom === zoom)
+    const zoomStyle = CardZoom.find(c => c.zoom === zoom)
 
     return (
       <div className={classes.root}>
         {attachmentList
           .filter(
-            (f) =>
-              f.folderFKs.includes(selectedFolderFK) ||
-              selectedFolderFK === -99,
+            f =>
+              (f.fileName || '')
+                .toUpperCase()
+                .indexOf(filterDocumentValue.toUpperCase()) >= 0 &&
+              (f.folderFKs.includes(selectedFolderFK) ||
+                selectedFolderFK === -99),
           )
-          .map((p) => {
+          .map(p => {
             return (
               <Card
                 style={{

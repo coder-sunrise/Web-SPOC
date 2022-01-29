@@ -12,6 +12,7 @@ import {
   Button,
   Tooltip,
   Popover,
+  TextField,
 } from '@/components'
 // sub components
 import { findGetParameter } from '@/utils/utils'
@@ -38,6 +39,7 @@ class AttachmentDocument extends Component {
     selectedFolderFK: -99, // all
     viewMode: 'card',
     zoom: 4,
+    fileFilters: [],
   }
 
   componentDidMount() {
@@ -84,16 +86,14 @@ class AttachmentDocument extends Component {
     let updated = [...(field.value || [])]
     if (added) {
       const addedFiles = added.map(file => {
-        const { 0: fileDetails, attachmentType } = file
+        const { id, ...otherValue } = file
         return {
-          ...fileDetails,
-          fileIndexFK: fileDetails.id,
-          attachmentType,
+          ...otherValue,
+          fileIndexFK: id,
         }
       })
       updated = [...updated, ...addedFiles]
     }
-
     if (deleted)
       updated = updated.reduce((attachments, item) => {
         if (
@@ -110,7 +110,6 @@ class AttachmentDocument extends Component {
       return 0
     })
     const startOrder = list.reduce(getLargestSortOrder, 0) + 1
-
     Promise.all(
       sorted.map((attachment, index) => {
         let payload = {
@@ -135,6 +134,20 @@ class AttachmentDocument extends Component {
       .catch(error => {})
   }
 
+  debouncedAction = _.debounce(e => {
+    const { fileFilters, selectedFolderFK } = this.state
+    var newFilters = [...fileFilters]
+    var selectedFilter = newFilters.find(f => f.id === selectedFolderFK)
+    if (selectedFilter) {
+      selectedFilter.filterDocumentValue = e.target.value
+    } else {
+      newFilters.push({
+        id: selectedFolderFK,
+        filterDocumentValue: e.target.value,
+      })
+    }
+    this.setState({ fileFilters: [...newFilters] })
+  }, 100)
   render() {
     const {
       patientAttachment,
@@ -144,7 +157,7 @@ class AttachmentDocument extends Component {
       type,
       modelName,
     } = this.props
-    const { viewMode, selectedFolderFK, zoom } = this.state
+    const { viewMode, selectedFolderFK, zoom, fileFilters } = this.state
     const { list = [] } = this.props[modelName]
 
     let folderList = (folder.list || []).map(l => {
@@ -157,6 +170,9 @@ class AttachmentDocument extends Component {
       { id: -99, displayValue: 'All', sortOrder: -99, fileCount: list.length },
       ...folderList,
     ]
+    const filterDocumentValue = (
+      fileFilters.find(f => f.id === selectedFolderFK) || {}
+    ).filterDocumentValue
     return (
       <GridContainer>
         <GridItem md={3}>
@@ -182,8 +198,15 @@ class AttachmentDocument extends Component {
             style={{ height: window.innerHeight - 100, overflow: 'scroll' }}
           >
             <GridContainer style={{ height: 'auto' }}>
-              <GridItem md={12} align='Right' style={{ marginBottom: 10 }}>
-                <div>
+              <GridItem md={6} style={{ marginBottom: 10 }}>
+                <TextField
+                  inputProps={{ placeholder: 'Key in to filter documents' }}
+                  onChange={this.debouncedAction}
+                  value={filterDocumentValue}
+                />
+              </GridItem>
+              <GridItem md={6} align='Right' style={{ marginBottom: 10 }}>
+                <div style={{ marginTop: 8 }}>
                   {viewMode === 'card' && (
                     <Popover
                       icon={null}
@@ -249,6 +272,7 @@ class AttachmentDocument extends Component {
                   viewMode={viewMode}
                   attachmentList={list}
                   selectedFolderFK={selectedFolderFK}
+                  filterDocumentValue={filterDocumentValue}
                 />
               </GridItem>
             </GridContainer>

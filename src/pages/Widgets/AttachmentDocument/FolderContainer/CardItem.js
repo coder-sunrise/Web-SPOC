@@ -3,18 +3,18 @@ import moment from 'moment'
 import _ from 'lodash'
 import { NavLink } from 'react-router-dom'
 // material ui
-import { withStyles, Chip } from '@material-ui/core'
-import { Delete, Edit } from '@material-ui/icons'
+import { withStyles } from '@material-ui/core'
 import { scaleImage } from '@/utils/image'
 
 import {
-  Button,
   GridContainer,
   GridItem,
   Tooltip,
   dateFormatLong,
   Popconfirm,
 } from '@/components'
+import { Button, Tag } from 'antd'
+import { EditFilled, DeleteFilled } from '@ant-design/icons'
 import { LoadingWrapper } from 'medisys-components'
 import { downloadAttachment, getFileByFileID } from '@/services/file'
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
@@ -164,15 +164,15 @@ class CardItem extends Component {
                 <div className={classes.Toolbar}>
                   {isEnableEditDocument && (
                     <Button
-                      color='primary'
-                      justIcon
+                      type='primary'
+                      size='small'
                       disabled={readOnly}
                       onClick={() => {
                         onEditFileName(file)
                       }}
-                    >
-                      <Edit />
-                    </Button>
+                      style={{ marginRight: 8 }}
+                      icon={<EditFilled />}
+                    ></Button>
                   )}
                   {isEnableEditDocument && (
                     <SetFolderWithPopover
@@ -196,6 +196,7 @@ class CardItem extends Component {
                         }
                       }}
                       onAddNewFolders={onAddNewFolders}
+                      type={this.props.type}
                     />
                   )}
                   {isEnableDeleteDocument && (
@@ -216,13 +217,12 @@ class CardItem extends Component {
                     >
                       <Tooltip title='Delete'>
                         <Button
-                          size='sm'
-                          color='danger'
-                          justIcon
+                          size='small'
+                          type='danger'
+                          icon={<DeleteFilled />}
                           disabled={readOnly}
-                        >
-                          <Delete />
-                        </Button>
+                          style={{ marginRight: 8 }}
+                        ></Button>
                       </Tooltip>
                     </Popconfirm>
                   )}
@@ -281,18 +281,13 @@ class CardItem extends Component {
                   </p>
                 </Tooltip>
               </GridItem>
-              <GridItem md={12} style={{ overflow: 'auto', height: 29 }}>
+              <GridItem md={12} style={{ overflow: 'auto', height: 28 }}>
                 {folderList
                   .filter(f => file.folderFKs.includes(f.id))
                   .map(item => (
-                    <Chip
-                      style={{ marginBottom: 5, marginRight: 5 }}
-                      key={item.id}
-                      size='small'
-                      variant='outlined'
-                      label={item.displayValue}
-                      color='primary'
-                    />
+                    <Tag style={{ margin: '2px 5px 2px 0px' }}>
+                      {item.displayValue}
+                    </Tag>
                   ))}
               </GridItem>
             </GridContainer>
