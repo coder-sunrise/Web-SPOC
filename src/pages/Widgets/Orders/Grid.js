@@ -57,7 +57,6 @@ export default ({
   isFullScreen = false,
   isEnableEditOrder = true,
   visitRegistration,
-  footer,
 }) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
   console.log(visitRegistration, 211)

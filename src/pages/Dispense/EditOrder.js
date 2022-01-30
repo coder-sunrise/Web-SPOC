@@ -445,6 +445,7 @@ class EditOrder extends Component {
             <GridItem xs={12}>
               <h5>Orders</h5>
               <Order
+                visitRegistration={this.props.visitRegistration}
                 className={classes.orderPanel}
                 status=''
                 from='EditOrder'

@@ -655,7 +655,7 @@ class Main extends Component {
       clinicSettings,
       visitRegistration,
     } = this.props
-    if (!dispense.queryCodeTablesDone) {
+    if (!dispense.queryCodeTablesDone || this.state.hasShowOrderModal) {
       return
     }
 
@@ -664,20 +664,39 @@ class Main extends Component {
     const { otherOrder = [], prescription = [], packageItem = [] } = values
     const isEmptyDispense = otherOrder.length === 0 && prescription.length === 0
     const accessRights = Authorized.check('queue.dispense.editorder')
+    const noClinicalObjectRecord = !values.clinicalObjectRecordFK
+    console.log(
+      accessRights &&
+        accessRights.rights !== 'hidden' &&
+        (visit.visitPurposeFK === VISIT_TYPE.BF ||
+          visit.visitPurposeFK === VISIT_TYPE.MC) &&
+        isEmptyDispense &&
+        noClinicalObjectRecord &&
+        dispense.loadCount === 0,
+      233,
+    )
     if (
       accessRights &&
       accessRights.rights !== 'hidden' &&
       (visit.visitPurposeFK === VISIT_TYPE.BF ||
         visit.visitPurposeFK === VISIT_TYPE.MC) &&
       isEmptyDispense &&
-      noClinicalObjectRecord &&
-      dispense.loadCount === 0
+      noClinicalObjectRecord
     ) {
-      this.setState({ showCautionAlert: true })
-      this.editOrder()
-      dispatch({
-        type: 'dispense/incrementLoadCount',
-      })
+      this.setState(
+        prevState => {
+          return {
+            showCautionAlert: !prevState.showCautionAlert,
+            hasShowOrderModal: true,
+          }
+        },
+        () => {
+          this.editOrder()
+          dispatch({
+            type: 'dispense/incrementLoadCount',
+          })
+        },
+      )
     }
 
     let drugList = []
@@ -750,6 +769,7 @@ class Main extends Component {
             visitType={
               this.props.visitRegistration?.entity?.visit?.visitPurposeFK
             }
+            visitRegistration={this.props.visitRegistration}
             isFirstLoad={this.state.isFirstAddOrder}
             onReloadClick={() => {
               reloadDispense(this.props)
