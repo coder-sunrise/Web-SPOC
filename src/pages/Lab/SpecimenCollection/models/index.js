@@ -33,6 +33,38 @@ export default createListViewModel({
       })
     },
     effects: {
+      *getLabSpecimenById({ payload }, { call, put }) {
+        const r = yield call(service.queryLabSpecimenById, payload)
+        const { status, data } = r
+
+        if (status === '200') {
+          if (data) {
+            return data
+          }
+          return null
+        }
+      },
+      *getVisitSpecimenCollection({ payload }, { call, put }) {
+        const r = yield call(service.queryVisitSpecimenCollection, payload)
+        const { status, data } = r
+
+        if (status === '200') {
+          if (data) {
+            const visitSpecimenCollection = data
+            return visitSpecimenCollection
+          }
+          return null
+        }
+      },
+      *upsert({ payload }, { call, put }) {
+        const r = yield call(service.upsert, payload)
+
+        if (r && r.status === '200') {
+          notification.success({ message: 'Saved' })
+          return true
+        }
+        return r
+      },
       *saveUserPreference({ payload }, { call, put, select }) {
         const r = yield call(saveUserPreference, {
           userPreferenceDetails: JSON.stringify(payload.userPreferenceDetails),

@@ -29,9 +29,9 @@ const RadioWorkItemInfo = ({ values = {} }) => {
   const sortingWorkItems = sortedDateWorkedItem.map(row => {
     const { radiologyWorkitem } = row
     if (radiologyWorkitem.priority === 'Urgent') {
-        sortedWorkItem = [...sortedWorkItem,{...row,prior : 1}]
+      sortedWorkItem = [...sortedWorkItem, { ...row, prior: 1 }]
     } else {
-        sortedWorkItem = [...sortedWorkItem,{...row,prior : 0}]
+      sortedWorkItem = [...sortedWorkItem, { ...row, prior: 0 }]
     }
   })
 
@@ -125,7 +125,11 @@ const RadioWorkItemInfo = ({ values = {} }) => {
           </tr>
           <td>
             <div style={{ maxHeight: '250px', overflow: 'auto' }}>
-              <table>{radioWorkItemDetails(sortedWorkItem.sort((a,b) => b.prior - a.prior))}</table>
+              <table>
+                {radioWorkItemDetails(
+                  sortedWorkItem.sort((a, b) => b.prior - a.prior),
+                )}
+              </table>
             </div>
           </td>
         </table>

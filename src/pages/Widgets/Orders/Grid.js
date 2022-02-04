@@ -15,6 +15,7 @@ import numeral from 'numeral'
 import {
   RADIOLOGY_WORKITEM_STATUS,
   NURSE_WORKITEM_STATUS,
+  LAB_WORKITEM_STATUS,
   ORDER_TYPES,
 } from '@/utils/constants'
 import {
@@ -977,14 +978,18 @@ export default ({
 
             const editAccessRight = OrderItemAccessRight(row)
             const { workitem = {} } = row
-            const { nurseWorkitem = {}, radiologyWorkitem = {} } = workitem
+            const {
+              nurseWorkitem = {},
+              radiologyWorkitem = {},
+              labWorkitems = [],
+            } = workitem
             const { nuseActualize = [] } = nurseWorkitem
             let editMessage = 'Edit'
             let deleteMessage = 'Delete'
             let editEnable = true
             let deleteEnable = true
             if (!row.isPreOrder) {
-              if (row.type === '10') {
+              if (row.type === ORDER_TYPES.RADIOLOGY) {
                 if (
                   [
                     RADIOLOGY_WORKITEM_STATUS.INPROGRESS,
@@ -1001,6 +1006,16 @@ export default ({
                   RADIOLOGY_WORKITEM_STATUS.CANCELLED
                 ) {
                   editEnable = false
+                }
+              } else if (row.type === ORDER_TYPES.LAB) {
+                if (
+                  labWorkitems.filter(
+                    item => item.statusFK !== LAB_WORKITEM_STATUS.NEW,
+                  ).length > 0
+                ) {
+                  deleteEnable = false
+                  deleteMessage =
+                    'Specimen Collected. No modification is allowed on processed order'
                 }
               } else {
                 if (
@@ -1044,51 +1059,53 @@ export default ({
                     </Button>
                   </Tooltip>
                   <Tooltip title={deleteMessage}>
-                    <Button
-                      size='sm'
-                      color='danger'
-                      justIcon
-                      disabled={
-                        row.isEditingEntity ||
-                        row.isPreOrderActualize ||
-                        !deleteEnable
-                      }
-                    >
-                      <Delete
-                        onClick={() => {
-                          dispatch({
-                            type: 'orders/deleteRow',
-                            payload: {
-                              uid: row.uid,
-                            },
-                          })
-
-                          if (row.isPackage === true) {
+                    <span>
+                      <Button
+                        size='sm'
+                        color='danger'
+                        justIcon
+                        disabled={
+                          row.isEditingEntity ||
+                          row.isPreOrderActualize ||
+                          !deleteEnable
+                        }
+                      >
+                        <Delete
+                          onClick={() => {
                             dispatch({
-                              type: 'orders/deletePackageItem',
+                              type: 'orders/deleteRow',
                               payload: {
-                                packageGlobalId: row.packageGlobalId,
+                                uid: row.uid,
                               },
                             })
-                          }
 
-                          dispatch({
-                            type: 'orders/updateState',
-                            payload: {
-                              entity: undefined,
-                            },
-                          })
-                          // let commitCount = 1000 // uniqueNumber
-                          // dispatch({
-                          //   // force current edit row components to update
-                          //   type: 'global/updateState',
-                          //   payload: {
-                          //     commitCount: (commitCount += 1),
-                          //   },
-                          // })
-                        }}
-                      />
-                    </Button>
+                            if (row.isPackage === true) {
+                              dispatch({
+                                type: 'orders/deletePackageItem',
+                                payload: {
+                                  packageGlobalId: row.packageGlobalId,
+                                },
+                              })
+                            }
+
+                            dispatch({
+                              type: 'orders/updateState',
+                              payload: {
+                                entity: undefined,
+                              },
+                            })
+                            // let commitCount = 1000 // uniqueNumber
+                            // dispatch({
+                            //   // force current edit row components to update
+                            //   type: 'global/updateState',
+                            //   payload: {
+                            //     commitCount: (commitCount += 1),
+                            //   },
+                            // })
+                          }}
+                        />
+                      </Button>
+                    </span>
                   </Tooltip>
                 </div>
               </AuthorizedContext.Provider>

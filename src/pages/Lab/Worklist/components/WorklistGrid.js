@@ -157,9 +157,6 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
       filteredWorklist
         .filter(item => item.visitFK === record.visitFK)
         .map(item => ({
-          visitFK: item.visitFK,
-          labSpecimenFK: item.labSpecimenFK,
-          patientReferenceNo: item.patientReferenceNo,
           firstOrderDate: _(filteredWorklist)
             .filter(innerItem => innerItem.labSpecimenFK === item.labSpecimenFK)
             .minBy(innerItem => innerItem.generateDate).generateDate,
