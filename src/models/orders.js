@@ -38,6 +38,7 @@ const initialState = {
   defaultMedication: {
     ...sharedMedicationValue,
   },
+  fullService: [],
   defaultService: {
     unitPrice: 0,
     isMinus: true,
@@ -97,7 +98,37 @@ export default createListViewModel({
   param: {
     service: {},
     state: { ...initialState },
-    subscriptions: ({ dispatch, history }) => {},
+    subscriptions: ({ dispatch, history }) => {
+        history.listen(async (loct, method) => {
+          const { pathname, search, query = {} } = loct
+          if (
+            pathname.indexOf('/reception/queue/consultation') === 0 &&
+            Number(query.cid)
+          ) {
+            dispatch({
+              type: 'codetable/fetchCodes',
+              payload: {
+                code: 'ctservice',
+                force: true,
+                filter: {
+                  'serviceFKNavigation.IsActive': true,
+                  'serviceCenterFKNavigation.IsActive': true,
+                  combineCondition: 'and',
+                },
+              },
+            }).then(list => {
+              if (list) {
+                dispatch({
+                  type: 'updateState',
+                  payload: {
+                    fullService: list,
+                  },
+                })
+              }
+            })
+          }
+        })
+    },
     effects: {
       *upsertRow({ payload }, { select, call, put, delay }) {
         const upsert = yield put({
@@ -105,6 +136,7 @@ export default createListViewModel({
           payload,
         })
         const orders = yield select(st => st.orders)
+        console.log('orders', orders)
         const consultationDocument = yield select(st => st.consultationDocument)
         const { rows } = consultationDocument
         const {
@@ -401,6 +433,10 @@ export default createListViewModel({
           }
           rows.push(newRow)
         }
+        console.log(
+          newRow,
+          rows.find(r => r.uid === payload.uid),
+        )
         return {
           ...state,
           rows,

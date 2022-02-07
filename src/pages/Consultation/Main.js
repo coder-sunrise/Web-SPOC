@@ -1459,7 +1459,7 @@ class Main extends React.Component {
       }
       return { ...po }
     })
-
+    console.log(this.props)
     return (
       <div className={classes.root}>
         <PatientBanner

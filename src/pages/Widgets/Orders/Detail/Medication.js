@@ -536,7 +536,7 @@ const getVisitDoctorUserId = props => {
       packageGlobalId:
         values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
-
+    console.log(data)
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
@@ -1102,6 +1102,7 @@ class Medication extends PureComponent {
   validateAndSubmitIfOk = async () => {
     const { handleSubmit, validateForm, values, codetable } = this.props
     const validateResult = await validateForm()
+    console.log(validateResult)
     const isFormValid = _.isEmpty(validateResult)
     if (isFormValid) {
       const {
