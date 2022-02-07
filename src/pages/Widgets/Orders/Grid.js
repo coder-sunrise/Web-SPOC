@@ -56,7 +56,6 @@ export default ({
   visitRegistration,
 }) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
-  console.log(visitRegistration, 211)
   const { total, gst, totalWithGST, subTotal } = summary
   const [checkedStatusIncldGST, setCheckedStatusIncldGST] = useState(
     isGSTInclusive,
@@ -410,7 +409,6 @@ export default ({
     let vaccination = inventoryvaccination.find(
       vacc => vacc.id === inventoryVaccinationFK,
     )
-    console.log('vaccination', vaccination)
     let defaultBatch = vaccination.vaccinationStock.find(
       o => o.isDefault === true,
     )
@@ -1070,8 +1068,8 @@ export default ({
     const { entity } = visitRegistration || {}
     if (!entity) return ''
     const { visit } = entity
-    const { visitOrderTemplate } = visit
-    const { visitOrderTemplateItemDtos } = visitOrderTemplate
+    const { visitOrderTemplate = {} } = visit
+    const { visitOrderTemplateItemDtos = [] } = visitOrderTemplate
     const remainedTemplateItemIds = rows
       .filter(t => !t.isDeleted && t.visitOrderTemplateItemFK)
       .map(t => t.visitOrderTemplateItemFK)
@@ -1090,7 +1088,6 @@ export default ({
         }),
       ',',
     )
-    console.log(removedItemString, newItemString)
     return `${indicateString}${
       removedItemString ? ' - (' + removedItemString + ')' : ''
     }${newItemString ? ' + (' + newItemString + ')' : ''}`
@@ -1111,17 +1108,14 @@ export default ({
         return undefined
       } else return t
     })
-    console.log(3, removedTemplateItems)
     setRemovedVisitOrderTemplateItem(removedTemplateItems)
     setShowRevertVisitPurposeItem(true)
   }
   const confirmRevert = data => {
     var newDrugItems = data.map(templateItem => {
-      console.log(111, templateItem)
       if (templateItem.visitOrderTemplateMedicationItemDto) {
         try {
           const newDrug = GetNewMedication(templateItem)
-          console.log(newDrug)
           dispatch({
             type: 'orders/upsertRow',
             payload: newDrug,
@@ -1135,7 +1129,6 @@ export default ({
       } else if (templateItem.visitOrderTemplateVaccinationItemDto) {
         try {
           const newVaccine = GetNewVaccination(templateItem)
-          console.log(newVaccine)
           dispatch({
             type: 'orders/upsertRow',
             payload: newVaccine,
@@ -1148,7 +1141,6 @@ export default ({
       } else if (templateItem.visitOrderTemplateConsumableItemDto) {
         try {
           const newConsumable = GetConsumable(templateItem)
-          console.log(newConsumable)
           dispatch({
             type: 'orders/upsertRow',
             payload: newConsumable,
@@ -1162,7 +1154,6 @@ export default ({
       } else if (templateItem.visitOrderTemplateServiceItemDto) {
         try {
           const newService = GetService(templateItem)
-          console.log(newService)
           dispatch({
             type: 'orders/upsertRow',
             payload: newService,
@@ -1273,7 +1264,6 @@ export default ({
                 const { visit } = entity || {}
                 const { children, ...restProps } = p
                 let newChildren = []
-                console.log(visit)
                 let indicate = getVisitOrderTemplateDetails(rows)
                 if (isExistPackage) {
                   newChildren = [
@@ -1464,7 +1454,7 @@ export default ({
         columnExtensions={[
           {
             columnName: 'type',
-            width: 140,
+            width: 135,
             render: row => {
               const otype = orderTypes.find(o => o.value === row.type)
               let texts = []
@@ -1605,7 +1595,7 @@ export default ({
           },
           {
             columnName: 'description',
-            width: isFullScreen ? 300 : isExistPackage ? 120 : 160,
+            width: isFullScreen ? 300 : isExistPackage ? 120 : 150,
             observeFields: ['instruction', 'remark', 'remarks'],
             render: row => {
               return (
@@ -1630,7 +1620,7 @@ export default ({
           {
             columnName: 'currentTotal',
             type: 'currency',
-            width: 100,
+            width: 90,
           },
           {
             columnName: 'quantity',
@@ -1662,7 +1652,7 @@ export default ({
           },
           {
             columnName: 'actions',
-            width: 70,
+            width: 68,
             align: 'center',
             sortingEnabled: false,
             render: row => {
@@ -1677,7 +1667,7 @@ export default ({
               let editEnable = true
               let deleteEnable = true
               if (!row.isPreOrder) {
-                if (row.type === '10') {
+                if (row.type === ORDER_TYPES.RADIOLOGY) {
                   if (
                     [
                       RADIOLOGY_WORKITEM_STATUS.INPROGRESS,
@@ -1695,18 +1685,23 @@ export default ({
                   ) {
                     editEnable = false
                   }
-                } else {
-                  if (
-                    nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
-                  ) {
+                }
+
+                if (
+                  nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
+                ) {
+                  const lastNuseActualize = _.orderBy(
+                    nuseActualize,
+                    ['actulizeDate'],
+                    ['desc'],
+                  )[0]
+                  if (editEnable) {
                     editEnable = false
+                    editMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
+                  }
+                  if (deleteEnable) {
                     deleteEnable = false
-                    const lastNuseActualize = _.orderBy(
-                      nuseActualize,
-                      ['actulizeDate'],
-                      ['desc'],
-                    )[0]
-                    deleteMessage = editMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
+                    deleteMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
                   }
                 }
               }
