@@ -819,7 +819,7 @@ class CommonTableGrid extends PureComponent {
     const { state, props } = this
     const {
       classes,
-      pageSizes = [5, 10, 50, 100],
+      pageSizes = [10, 20, 50, 100],
       columns = [],
       type,
       defaultSorting = [],

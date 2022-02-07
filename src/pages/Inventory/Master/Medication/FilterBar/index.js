@@ -74,9 +74,11 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
         code,
         displayValue,
         favouriteSupplierFK,
-        medicationGroupFK,
         genericMedicationFK,
         isActive,
+        apiCriteria: {
+          medicationGroupFK: medicationGroupFK,
+        },
       },
     })
   }

@@ -84,7 +84,7 @@ class BasicExaminations extends PureComponent {
         content: (
           <GridContainer>
             <GridItem xs={12} sm={4} md={3}>
-              <FastField
+              <Field
                 name={`${fieldName}[0].temperatureC`}
                 render={args => (
                   <NumberInput
@@ -102,7 +102,7 @@ class BasicExaminations extends PureComponent {
               />
             </GridItem>
             <GridItem xs={12} sm={4} md={3}>
-              <FastField
+              <Field
                 name={`${fieldName}[0].bpSysMMHG`}
                 render={args => (
                   <NumberInput
@@ -117,7 +117,7 @@ class BasicExaminations extends PureComponent {
               />
             </GridItem>
             <GridItem xs={12} sm={4} md={3}>
-              <FastField
+              <Field
                 name={`${fieldName}[0].bpDiaMMHG`}
                 render={args => (
                   <NumberInput
@@ -132,7 +132,7 @@ class BasicExaminations extends PureComponent {
               />
             </GridItem>
             <GridItem xs={12} sm={4} md={3}>
-              <FastField
+              <Field
                 name={`${fieldName}[0].pulseRateBPM`}
                 render={args => (
                   <NumberInput
@@ -153,20 +153,20 @@ class BasicExaminations extends PureComponent {
                 name={`${fieldName}[0].saO2`}
                 render={args => (
                   <NumberInput
-                    {...args}
-                    format='0.0'
+                    precision={0}
                     label={formatMessage({
                       id: 'reception.queue.visitRegistration.saO2',
                     })}
                     suffix={formatMessage({
                       id: 'reception.queue.visitRegistration.saO2.suffix',
                     })}
+                    {...args}
                   />
                 )}
               />
             </GridItem>
             <GridItem xs={12} sm={4} md={3}>
-              <FastField
+              <Field
                 name={`${fieldName}[0].weightKG`}
                 render={args => (
                   <NumberInput
@@ -191,7 +191,7 @@ class BasicExaminations extends PureComponent {
               />
             </GridItem>
             <GridItem xs={12} sm={4} md={3}>
-              <FastField
+              <Field
                 name={`${fieldName}[0].heightCM`}
                 render={args => (
                   <NumberInput
@@ -213,7 +213,7 @@ class BasicExaminations extends PureComponent {
               />
             </GridItem>
             <GridItem xs={11} sm={4} md={3}>
-              <FastField
+              <Field
                 name={`${fieldName}[0].bmi`}
                 render={args => (
                   <NumberInput
@@ -237,7 +237,7 @@ class BasicExaminations extends PureComponent {
         content: (
           <GridContainer>
             <GridItem xs={12} sm={4} md={3}>
-              <FastField
+              <Field
                 name={`${fieldName}[0].bodyFatPercentage`}
                 render={args => (
                   <NumberInput
@@ -260,7 +260,7 @@ class BasicExaminations extends PureComponent {
               />
             </GridItem>
             <GridItem xs={12} sm={4} md={3}>
-              <FastField
+              <Field
                 name={`${fieldName}[0].degreeOfObesity`}
                 render={args => (
                   <NumberInput
@@ -278,7 +278,7 @@ class BasicExaminations extends PureComponent {
               />
             </GridItem>
             <GridItem xs={12} sm={4} md={3}>
-              <FastField
+              <Field
                 name={`${fieldName}[0].headCircumference`}
                 render={args => (
                   <NumberInput
@@ -296,7 +296,7 @@ class BasicExaminations extends PureComponent {
               />
             </GridItem>
             <GridItem xs={12} sm={4} md={3}>
-              <FastField
+              <Field
                 name={`${fieldName}[0].chestCircumference`}
                 render={args => (
                   <NumberInput
@@ -381,7 +381,7 @@ class BasicExaminations extends PureComponent {
               />
             </GridItem>
             <GridItem xs={12} sm={4} md={3}>
-              <FastField
+              <Field
                 name={`${fieldName}[0].hepetitisVaccinationA`}
                 render={args => (
                   <RadioGroup
@@ -396,7 +396,7 @@ class BasicExaminations extends PureComponent {
               />
             </GridItem>
             <GridItem xs={12} sm={4} md={3}>
-              <FastField
+              <Field
                 name={`${fieldName}[0].hepetitisVaccinationB`}
                 render={args => (
                   <RadioGroup
@@ -411,7 +411,7 @@ class BasicExaminations extends PureComponent {
               />
             </GridItem>
             <GridItem xs={12} sm={4} md={3}>
-              <FastField
+              <Field
                 name={`${fieldName}[0].isFasting`}
                 render={args => (
                   <RadioGroup
@@ -425,7 +425,7 @@ class BasicExaminations extends PureComponent {
               />
             </GridItem>
             <GridItem xs={12} sm={4} md={3}>
-              <FastField
+              <Field
                 name={`${fieldName}[0].isSmoking`}
                 render={args => (
                   <RadioGroup
@@ -439,7 +439,7 @@ class BasicExaminations extends PureComponent {
               />
             </GridItem>
             <GridItem xs={12} sm={4} md={3}>
-              <FastField
+              <Field
                 name={`${fieldName}[0].isAlcohol`}
                 render={args => (
                   <RadioGroup
@@ -453,7 +453,7 @@ class BasicExaminations extends PureComponent {
               />
             </GridItem>
             <GridItem xs={12} sm={4} md={3}>
-              <FastField
+              <Field
                 name={`${fieldName}[0].isMensus`}
                 render={args => (
                   <RadioGroup

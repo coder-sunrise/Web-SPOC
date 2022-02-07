@@ -31,8 +31,9 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
   }) => {
     if (orders.entity) {
       if (orders.entity.treatmentFK && _.isEmpty(dentalChartComponent)) {
-        const treatment = (codetable.cttreatment || [])
-          .find((o) => o.id === orders.entity.treatmentFK)
+        const treatment = (codetable.cttreatment || []).find(
+          o => o.id === orders.entity.treatmentFK,
+        )
         return {
           ...orders.entity,
           treatmentCategoryFK: treatment ? treatment.treatmentCategoryFK : null,
@@ -49,26 +50,28 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     let treatment
 
     if (orders.entity) {
-      treatment = (codetable.cttreatment || [])
-        .find((o) => o.id === orders.entity.treatmentFK)
+      treatment = (codetable.cttreatment || []).find(
+        o => o.id === orders.entity.treatmentFK,
+      )
     }
 
     if (!treatment) {
       treatment =
-        (codetable.cttreatment || [])
-          .find((o) => o.id === action.dentalTreatmentFK) || {}
+        (codetable.cttreatment || []).find(
+          o => o.id === action.dentalTreatmentFK,
+        ) || {}
     }
 
     const existedTooths = []
     const otherTreatmentTooths = []
     rows
       .filter(
-        (o) =>
+        o =>
           !o.isDeleted &&
           o.type === '7' &&
           o.treatmentFK === action.dentalTreatmentFK,
       )
-      .forEach((r) => {
+      .forEach(r => {
         let matches = (r.itemNotes || '').matchAll(rangeReg)
         for (let result of matches) {
           if (result[2]) {
@@ -92,7 +95,7 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
       })
 
     const dataFiltered = data.filter(
-      (o) =>
+      o =>
         o.action.dentalTreatmentFK === treatment.id &&
         (existedTooths.indexOf(o.toothNo) >= 0 ||
           otherTreatmentTooths.indexOf(o.toothNo) < 0),
@@ -102,9 +105,9 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     let quantity = orders.entity ? orders.entity.quantity : undefined
     if (treatment.id && treatment.chartMethod) {
       let groups = _.groupBy(dataFiltered, 'toothNo')
-      groupsAry = Object.keys(groups).map((k) => {
+      groupsAry = Object.keys(groups).map(k => {
         return {
-          text: `#${k}(${groups[k].map((o) => o.name).join(',')})`.replace(
+          text: `#${k}(${groups[k].map(o => o.name).join(',')})`.replace(
             '(tooth)',
             '',
           ),
@@ -114,7 +117,7 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
       quantity = groupsAry.length
       if (action.chartMethodTypeFK === 3) {
         quantity = 0
-        groupsAry = Object.values(_.groupBy(dataFiltered, 'nodes')).map((o) => {
+        groupsAry = Object.values(_.groupBy(dataFiltered, 'nodes')).map(o => {
           const { nodes } = o[0]
           quantity += o.length
 
@@ -148,7 +151,7 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
       totalAfterItemAdjustment: final.amount || undefined,
       quantity,
       groups: groupsAry,
-      itemNotes: groupsAry.map((o) => o.text).join(','),
+      itemNotes: groupsAry.map(o => o.text).join(','),
     }
   },
   validationSchema: Yup.object().shape({
@@ -205,7 +208,7 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
   displayName: 'TreatmentForm',
 })
 class Treatment extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.props.dispatch({
       type: 'codetable/fetchCodes',
@@ -221,20 +224,22 @@ class Treatment extends PureComponent {
     })
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.orders.type === this.props.type)
       if (
         (!this.props.global.openAdjustment &&
           nextProps.global.openAdjustment) ||
         nextProps.orders.shouldPushToState
       ) {
-        nextProps.dispatch({
-          type: 'orders/updateState',
-          payload: {
-            entity: nextProps.values,
-            shouldPushToState: false,
-          },
-        })
+        if (nextProps.values.uid) {
+          nextProps.dispatch({
+            type: 'orders/updateState',
+            payload: {
+              entity: nextProps.values,
+              shouldPushToState: false,
+            },
+          })
+        }
       }
   }
 
@@ -267,7 +272,7 @@ class Treatment extends PureComponent {
     }
   }
 
-  updateTotalPrice = (v) => {
+  updateTotalPrice = v => {
     if (v || v === 0) {
       const { adjType, adjValue } = this.props.values
       const adjustment = calculateAdjustAmount(
@@ -283,13 +288,16 @@ class Treatment extends PureComponent {
     }
   }
 
-  getTreatmentOptions = (isDoctor) => {
-    const { values, codetable: { cttreatment = [] } } = this.props
+  getTreatmentOptions = isDoctor => {
+    const {
+      values,
+      codetable: { cttreatment = [] },
+    } = this.props
 
     const treatments = isDoctor
       ? cttreatment
       : cttreatment.filter(
-          (o) => o.treatmentCategoryFK === values.treatmentCategoryFK,
+          o => o.treatmentCategoryFK === values.treatmentCategoryFK,
         )
 
     return treatments.reduce((p, c) => {
@@ -300,10 +308,7 @@ class Treatment extends PureComponent {
           2,
         )})`,
       }
-      return [
-        ...p,
-        opt,
-      ]
+      return [...p, opt]
     }, [])
   }
 
@@ -315,7 +320,7 @@ class Treatment extends PureComponent {
     setFieldValue('itemName', option.displayValue)
   }
 
-  updateValueToStore = (vals) => {
+  updateValueToStore = vals => {
     this.props.dispatch({
       type: 'orders/updateState',
       payload: {
@@ -327,24 +332,26 @@ class Treatment extends PureComponent {
     })
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.orders.type === this.props.type)
       if (
         (!this.props.global.openAdjustment &&
           nextProps.global.openAdjustment) ||
         nextProps.orders.shouldPushToState
       ) {
-        nextProps.dispatch({
-          type: 'orders/updateState',
-          payload: {
-            entity: nextProps.values,
-            shouldPushToState: false,
-          },
-        })
+        if (nextProps.values.uid) {
+          nextProps.dispatch({
+            type: 'orders/updateState',
+            payload: {
+              entity: nextProps.values,
+              shouldPushToState: false,
+            },
+          })
+        }
       }
   }
 
-  render () {
+  render() {
     const {
       classes,
       dispense,
@@ -365,11 +372,12 @@ class Treatment extends PureComponent {
     return (
       <Authorized
         authority={
-          from === 'doctor' ? (
-            ''
-          ) : (
-            GetOrderItemAccessRight(from, 'queue.consultation.order.treatment')
-          )
+          from === 'doctor'
+            ? ''
+            : GetOrderItemAccessRight(
+                from,
+                'queue.consultation.order.treatment',
+              )
         }
       >
         <div>
@@ -378,14 +386,14 @@ class Treatment extends PureComponent {
               {/* <p style={{ marginBottom: 0 }}>Tooth No. {values.tooth}</p> */}
               <p>
                 {/* Tooth No.{' '} */}
-                {(values.groups || []).map((o) => {
+                {(values.groups || []).map(o => {
                   return (
                     <Chip
                       label={o.text}
                       onDelete={() => {
                         dispatch({
                           type: 'dentalChartComponent/toggleMultiSelect',
-                          payload: o.items.map((m) => ({
+                          payload: o.items.map(m => ({
                             ...m,
                             deleted: true,
                           })),
@@ -399,14 +407,14 @@ class Treatment extends PureComponent {
               </p>
               <FastField
                 name='remark'
-                render={(args) => (
+                render={args => (
                   <OutlinedTextField
                     label='Treatment Details'
                     multiline
                     maxLength={2000}
                     rowsMax={6}
                     rows={6}
-                    onChange={(e) => {
+                    onChange={e => {
                       this.updateValueToStore({
                         remark: e.target.value,
                       })
@@ -420,7 +428,7 @@ class Treatment extends PureComponent {
               {!isDoctor && (
                 <FastField
                   name='treatmentCategoryFK'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect
                       label='Treatment Category'
                       code='cttreatmentcategory'
@@ -433,7 +441,7 @@ class Treatment extends PureComponent {
               )}
               <Field
                 name='treatmentFK'
-                render={(args) => (
+                render={args => (
                   <Select
                     options={this.getTreatmentOptions(isDoctor)}
                     valueField='id'
@@ -449,7 +457,7 @@ class Treatment extends PureComponent {
               />
               <FastField
                 name='quantity'
-                render={(args) => (
+                render={args => (
                   <NumberInput
                     label='Unit'
                     onChange={() => {
@@ -464,11 +472,11 @@ class Treatment extends PureComponent {
               />
               <FastField
                 name='unitPrice'
-                render={(args) => (
+                render={args => (
                   <NumberInput
                     label='Unit Price'
                     currency
-                    onChange={(v) => {
+                    onChange={v => {
                       setTimeout(() => {
                         this.setTotalPrice()
                       }, 1)
@@ -479,7 +487,7 @@ class Treatment extends PureComponent {
               />
               <FastField
                 name='totalPrice'
-                render={(args) => {
+                render={args => {
                   return (
                     <NumberInput label='Total' disabled currency {...args} />
                   )
@@ -487,7 +495,7 @@ class Treatment extends PureComponent {
               />
               <FastField
                 name='totalAfterItemAdjustment'
-                render={(args) => (
+                render={args => (
                   <NumberInput
                     disabled
                     currency

@@ -68,6 +68,7 @@ export default defineConfig({
     'process.env.client_secret': '{client_secret}',
     'process.env.url': '{url}',
     'process.env.signalrUrl': '{signalr_url}',
+    'process.env.default_cliniccode': '{default_cliniccode}',
   },
   // 路由配置
   routes: pageRoutes,

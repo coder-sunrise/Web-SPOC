@@ -262,7 +262,12 @@ class HistoryDetails extends PureComponent {
             return WidgetConfig.showWidget(
               current,
               _widget.id,
-              getCategoriesOptions(),
+              [
+                WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
+                WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
+                WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
+                WidgetConfig.WIDGETS_ID.PLAN,
+              ].filter(w => getCategoriesOptions().find(c => c.value === w)),
             )
           })
           .map(o => {
