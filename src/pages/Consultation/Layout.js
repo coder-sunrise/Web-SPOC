@@ -70,7 +70,12 @@ class Layout extends PureComponent {
     this.ordersRef = React.createRef()
     this.myRefs = []
 
-    const { userDefaultLayout, clinicInfo, consultation } = props
+    const {
+      userDefaultLayout,
+      clinicInfo,
+      consultation,
+      visitRegistration,
+    } = props
 
     let { defaultConsultationTemplate = '[]' } = clinicInfo
     if (!defaultConsultationTemplate || defaultConsultationTemplate === '[]') {
@@ -515,14 +520,17 @@ class Layout extends PureComponent {
       height,
       rights,
       clinicInfo,
+      visitRegistration,
       onSaveLayout = f => f,
       onSaveFavouriteDiagnosisLanguage = s => s,
     } = restProps
     const widgetProps = {
       status: 'consultation',
       rights,
+      visitRegistration,
     }
 
+    console.log(visitRegistration,222)
     const {
       isEnableJapaneseICD10Diagnosis,
       diagnosisDataSource,

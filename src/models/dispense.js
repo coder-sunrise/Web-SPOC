@@ -668,12 +668,6 @@ export default createFormViewModel({
               },
             }),
           ])
-          dispatch({
-            type: 'dispense/updateState',
-            payload: {
-              queryCodeTablesDone: true,
-            },
-          })
 
           dispatch({
             type: 'initState',
@@ -728,6 +722,12 @@ export default createFormViewModel({
         })
         yield take('query/@@end')
 
+        yield put({
+          type: 'dispense/updateState',
+          payload: {
+            queryCodeTablesDone: true,
+          },
+        })
         yield put({
           type: 'getServingPersons',
           payload: { visitFK: visitID },
