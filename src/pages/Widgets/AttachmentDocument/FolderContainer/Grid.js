@@ -63,25 +63,35 @@ class Grid extends PureComponent {
       <CommonTableGrid
         style={{ margin: '0px 1px 0px 0px' }}
         forceRender
-        rows={attachmentList
-          .filter(
+        rows={_.orderBy(
+          attachmentList.filter(
             f =>
               (f.fileName || '')
                 .toUpperCase()
                 .indexOf(filterDocumentValue.toUpperCase()) >= 0 &&
               (selectedFolderFK === -99 ||
                 f.folderFKs.includes(selectedFolderFK)),
-          )
-          .map(a => {
-            return { ...a, folderList: _.sortBy(folderList, 'sortOrder') }
-          })}
+          ),
+          [data => (data.fileName || '').toLowerCase()],
+          ['asc'],
+        ).map(a => {
+          return { ...a, folderList: _.sortBy(folderList, 'sortOrder') }
+        })}
         FuncProps={{
-          pager: false,
+          pager: true,
         }}
         columns={[
-          { name: 'fileName', title: 'Document Name' },
+          {
+            name: 'fileName',
+            title: 'Document Name',
+            sortBy: data => (data.fileName || '').toLowerCase(),
+          },
           { name: 'folderFKs', title: 'Tags' },
-          { name: 'createByUserName', title: 'Created By' },
+          {
+            name: 'createByUserName',
+            title: 'Created By',
+            sortBy: data => (data.createByUserName || '').toLowerCase(),
+          },
           { name: 'createDate', title: 'Created Date' },
           { name: 'action', title: 'Action' },
         ]}

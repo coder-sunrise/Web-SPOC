@@ -251,10 +251,8 @@ class FolderList extends Component {
                                 const { 0: fileDetails } = ad
                                 const retVal = {
                                   ...ad,
-                                  0: {
-                                    ...fileDetails,
-                                    [`${modelName}_Folder`]: [{ folderFK }],
-                                  },
+                                  ...fileDetails,
+                                  [`${modelName}_Folder`]: [{ folderFK }],
                                 }
                                 return retVal
                               })

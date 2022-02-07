@@ -60,7 +60,7 @@ class AttachmentDocument extends Component {
       dispatch({
         type: `${modelName}/query`,
         payload: {
-          pagesize: 999,
+          pagesize: 9999,
           'PatientProfileFKNavigation.Id': values.id,
         },
       })
@@ -68,7 +68,7 @@ class AttachmentDocument extends Component {
       dispatch({
         type: `${modelName}/query`,
         payload: {
-          pagesize: 999,
+          pagesize: 9999,
           'CoPayerFKNavigation.Id': values.id,
         },
       })
@@ -134,6 +134,25 @@ class AttachmentDocument extends Component {
       .catch(error => {})
   }
 
+  filterDocumentCount = () => {
+    const { selectedFolderFK, fileFilters } = this.state
+    const { modelName } = this.props
+    const { list = [] } = this.props[modelName]
+    const filterDocumentValue =
+      (fileFilters.find(f => f.id === selectedFolderFK) || {})
+        .filterDocumentValue || ''
+
+    const filterItems = list.filter(
+      f =>
+        (f.fileName || '')
+          .toUpperCase()
+          .indexOf(filterDocumentValue.toUpperCase()) >= 0 &&
+        (f.folderFKs.includes(selectedFolderFK) || selectedFolderFK === -99),
+    )
+
+    return filterItems.length
+  }
+
   debouncedAction = _.debounce(e => {
     const { fileFilters, selectedFolderFK } = this.state
     var newFilters = [...fileFilters]
@@ -150,7 +169,6 @@ class AttachmentDocument extends Component {
   }, 100)
   render() {
     const {
-      patientAttachment,
       folder,
       readOnly = false,
       coPayerAttachment,
@@ -198,12 +216,23 @@ class AttachmentDocument extends Component {
             style={{ height: window.innerHeight - 100, overflow: 'scroll' }}
           >
             <GridContainer style={{ height: 'auto' }}>
-              <GridItem md={6} style={{ marginBottom: 10 }}>
+              <GridItem
+                md={6}
+                style={{
+                  marginBottom: 10,
+                  paddingRight: 130,
+                  position: 'relative',
+                }}
+                container
+              >
                 <TextField
                   inputProps={{ placeholder: 'Key in to filter documents' }}
                   onChange={this.debouncedAction}
                   value={filterDocumentValue}
                 />
+                <div style={{ position: 'absolute', right: 0, top: 16 }}>
+                  {`${this.filterDocumentCount()} items filtered`}
+                </div>
               </GridItem>
               <GridItem md={6} align='Right' style={{ marginBottom: 10 }}>
                 <div style={{ marginTop: 8 }}>

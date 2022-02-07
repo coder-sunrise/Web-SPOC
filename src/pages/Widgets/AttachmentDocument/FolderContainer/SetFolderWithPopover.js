@@ -8,6 +8,7 @@ import {
   Popover,
   Checkbox,
   IconButton,
+  Tooltip,
 } from '@/components'
 import { Button } from 'antd'
 
@@ -103,16 +104,20 @@ class SetFolderWithPopover extends Component {
         }}
       >
         {justIcon ? (
-          <IconButton color='primary'>
-            <TagOutlined />
-          </IconButton>
+          <Tooltip title='Tags'>
+            <IconButton color='primary'>
+              <TagOutlined />
+            </IconButton>
+          </Tooltip>
         ) : (
-          <Button
-            size='small'
-            style={{ marginRight: 8 }}
-            type='primary'
-            icon={<TagFilled />}
-          ></Button>
+          <Tooltip title='Tags'>
+            <Button
+              size='small'
+              style={{ marginRight: 8 }}
+              type='primary'
+              icon={<TagFilled />}
+            ></Button>
+          </Tooltip>
         )}
       </Popover>
     )

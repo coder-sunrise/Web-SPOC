@@ -50,7 +50,7 @@ class CardItem extends Component {
     super(props)
     this.state = {
       loading: false,
-      imageData: undefined,
+      thumbnail: undefined,
       originalImageSize: {},
     }
     this.imgRef = React.createRef()
@@ -68,37 +68,47 @@ class CardItem extends Component {
 
   refreshImage = () => {
     const {
-      file: { fileExtension, fileIndexFK, imageData },
+      file: { fileExtension, fileIndexFK, thumbnailFK },
+      attachmentList = [],
     } = this.props
 
+    const thumbnail = attachmentList.find(
+      att => att.fileIndexFK === fileIndexFK,
+    )?.thumbnail
+
     if (imageExt.includes(fileExtension.toUpperCase())) {
-      if (!imageData) this.fetchImage(fileIndexFK)
-      else this.setState({ imageData })
+      if (!thumbnail) {
+        if (!thumbnailFK) {
+          this.setState({ thumbnail: dummyIcon })
+        } else {
+          this.fetchImage(fileIndexFK, thumbnailFK)
+        }
+      } else this.setState({ thumbnail })
     } else if (wordExt.includes(fileExtension.toUpperCase())) {
-      this.setState({ imageData: wordIcon })
+      this.setState({ thumbnail: wordIcon })
     } else if (excelExt.includes(fileExtension.toUpperCase())) {
-      this.setState({ imageData: excelIcon })
+      this.setState({ thumbnail: excelIcon })
     } else if (fileExtension.toUpperCase() === 'PDF') {
-      this.setState({ imageData: pdfIcon })
+      this.setState({ thumbnail: pdfIcon })
     } else if (pptExt.includes(fileExtension.toUpperCase())) {
-      this.setState({ imageData: pptIcon })
+      this.setState({ thumbnail: pptIcon })
     } else {
-      this.setState({ imageData: dummyIcon })
+      this.setState({ thumbnail: dummyIcon })
     }
   }
 
-  fetchImage = selectedFileId => {
+  fetchImage = (selectedFileId, selectedThumbnailFK) => {
     this.setState({ loading: true })
 
-    getFileByFileID(selectedFileId).then(response => {
+    getFileByFileID(selectedThumbnailFK).then(response => {
       if (response) {
         const contentInBase64 =
           base64Prefix + arrayBufferToBase64(response.data)
         this.setState({
           loading: false,
-          imageData: contentInBase64,
+          thumbnail: contentInBase64,
         })
-        this.props.onImageLoaded(selectedFileId, contentInBase64)
+        this.props.onThumbnailLoaded(selectedFileId, contentInBase64)
       }
     })
   }
@@ -149,7 +159,7 @@ class CardItem extends Component {
       isEnableDeleteDocument = true,
       isEnableEditDocument = true,
     } = this.props
-    const { loading, imageData } = this.state
+    const { loading, thumbnail } = this.state
     return (
       <InView as='div' onChange={this.handleInViewChanged}>
         <div className={classes.CardContainer}>
@@ -163,16 +173,18 @@ class CardItem extends Component {
               <GridItem md={6} align='Right' style={{ padding: 0, height: 20 }}>
                 <div className={classes.Toolbar}>
                   {isEnableEditDocument && (
-                    <Button
-                      type='primary'
-                      size='small'
-                      disabled={readOnly}
-                      onClick={() => {
-                        onEditFileName(file)
-                      }}
-                      style={{ marginRight: 8 }}
-                      icon={<EditFilled />}
-                    ></Button>
+                    <Tooltip title='Edit'>
+                      <Button
+                        type='primary'
+                        size='small'
+                        disabled={readOnly}
+                        onClick={() => {
+                          onEditFileName(file)
+                        }}
+                        style={{ marginRight: 8 }}
+                        icon={<EditFilled />}
+                      ></Button>
+                    </Tooltip>
                   )}
                   {isEnableEditDocument && (
                     <SetFolderWithPopover
@@ -231,27 +243,31 @@ class CardItem extends Component {
               <GridItem md={12}>
                 <Tooltip title={`Created by: ${file.createByUserName}`}>
                   <div
-                    style={{ textAlign: 'center', marginTop: 10 }}
-                    onClick={() => {
-                      onPreview(file)
+                    style={{
+                      marginTop: 10,
                     }}
                   >
-                    {imageData && (
-                      <div
-                        style={{
-                          height: height - 120,
-                          overflow: 'hidden',
-                          display: 'inline-block',
-                        }}
-                      >
+                    <div
+                      style={{
+                        display: 'table-cell',
+                        textAlign: 'center',
+                        width,
+                        height: height - 120,
+                        verticalAlign: 'middle',
+                      }}
+                      onClick={() => {
+                        onPreview(file)
+                      }}
+                    >
+                      {thumbnail && (
                         <img
                           ref={this.imgRef}
-                          src={imageData}
+                          src={thumbnail}
                           alt={file.fileName}
                           onLoad={this.handleImageLoaded.bind(this)}
                         />
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </Tooltip>
               </GridItem>

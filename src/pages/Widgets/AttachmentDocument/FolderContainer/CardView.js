@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
 import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
@@ -92,35 +93,32 @@ class CardView extends Component {
 
     return (
       <div className={classes.root}>
-        {attachmentList
-          .filter(
+        {_.orderBy(
+          attachmentList.filter(
             f =>
               (f.fileName || '')
                 .toUpperCase()
                 .indexOf(filterDocumentValue.toUpperCase()) >= 0 &&
               (f.folderFKs.includes(selectedFolderFK) ||
                 selectedFolderFK === -99),
+          ),
+          [data => (data.fileName || '').toLowerCase()],
+          ['asc'],
+        ).map(p => {
+          return (
+            <Card
+              style={{
+                width: zoomStyle.width,
+                height: zoomStyle.height,
+                margin: 5,
+              }}
+            >
+              <CardContent>
+                <CardItem key={p.id} file={p} {...this.props} {...zoomStyle} />
+              </CardContent>
+            </Card>
           )
-          .map(p => {
-            return (
-              <Card
-                style={{
-                  width: zoomStyle.width,
-                  height: zoomStyle.height,
-                  margin: 5,
-                }}
-              >
-                <CardContent>
-                  <CardItem
-                    key={p.id}
-                    file={p}
-                    {...this.props}
-                    {...zoomStyle}
-                  />
-                </CardContent>
-              </Card>
-            )
-          })}
+        })}
       </div>
     )
   }
