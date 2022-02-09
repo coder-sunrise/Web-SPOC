@@ -5,7 +5,7 @@ import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { Divider } from '@material-ui/core'
 import Cross from '@material-ui/icons/HighlightOff'
-import VisitPurposeIndicateString from './VisitPurposeIndicateString'
+import VisitOrderTemplateIndicateString from './VisitOrderTemplateIndicateString'
 import {
   isMatchInstructionRule,
   ReplaceCertificateTeplate,
@@ -1088,14 +1088,14 @@ export default ({
           return t.subject
         }),
       ',',
-    ) 
+    )
     return {
       indicateString: `${indicateString}`,
       removedItemString: `${
         removedItemString ? ' - (' + removedItemString + ')' : ''
       }`,
       newItemString: `${newItemString ? ' + (' + newItemString + ')' : ''}`,
-    } 
+    }
   }
 
   const revertVisitPurpose = () => {
@@ -1112,8 +1112,8 @@ export default ({
       ) {
         return undefined
       } else return t
-    }) 
-    _.sortBy(removedTemplateItems, 'inventoryItemTypeFK') 
+    })
+    _.sortBy(removedTemplateItems, 'inventoryItemTypeFK')
     setRemovedVisitOrderTemplateItem(removedTemplateItems)
     setShowRevertVisitPurposeItem(true)
   }
@@ -1269,7 +1269,7 @@ export default ({
                 const { entity } = visitRegistration || {}
                 const { visit } = entity || {}
                 const { children, ...restProps } = p
-                let newChildren = [] 
+                let newChildren = []
                 let indicate = visit?.visitOrderTemplateFK
                   ? getVisitOrderTemplateDetails(rows)
                   : {}
@@ -1295,7 +1295,7 @@ export default ({
                       <span></span>
                     )}
                   </span>
-                ) 
+                )
                 if (isExistPackage) {
                   newChildren = [
                     <Table.Cell
@@ -1306,9 +1306,9 @@ export default ({
                       {visit && visit.visitOrderTemplateFK && (
                         <div>
                           <div>
-                            <VisitPurposeIndicateString
+                            <VisitOrderTemplateIndicateString
                               indicate={indicate}
-                            ></VisitPurposeIndicateString>
+                            ></VisitOrderTemplateIndicateString>
                           </div>
                           <div>
                             <Link
@@ -1339,9 +1339,9 @@ export default ({
                       {visit && visit.visitOrderTemplateFK && (
                         <div>
                           <div>
-                            <VisitPurposeIndicateString
+                            <VisitOrderTemplateIndicateString
                               indicate={indicate}
-                            ></VisitPurposeIndicateString>
+                            ></VisitOrderTemplateIndicateString>
                           </div>
                           <div>
                             <Link

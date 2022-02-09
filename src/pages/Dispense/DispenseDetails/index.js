@@ -53,7 +53,7 @@ import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 import TableData from './TableData'
 import DrugLabelSelection from './DrugLabelSelection'
 import NurseActualization from './NurseActualization'
-import VisitPurposeIndicateString from '@/pages/Widgets/Orders/VisitPurposeIndicateString'
+import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 
 // variables
 import {
@@ -709,7 +709,7 @@ const DispenseDetails = ({
     } else {
       finalizeInvoice()
     }
-  } 
+  }
   const onChangeSelectAll = value => {
     let newItems = [...dispenseItems]
     newItems.forEach(item => {
@@ -735,7 +735,7 @@ const DispenseDetails = ({
       }
     }
   }
- 
+
   return (
     <React.Fragment>
       <GridContainer>
@@ -1079,12 +1079,12 @@ const DispenseDetails = ({
               id: 'reception.queue.visitRegistration.visitRemarks',
             })}
           />
-          <VisitPurposeIndicateString
+          <VisitOrderTemplateIndicateString
             visitOrderTemplateDetails={
               dispense?.entity?.visitOrderTemplateDetails ||
               values?.visitOrderTemplateDetails
             }
-          ></VisitPurposeIndicateString>
+          ></VisitOrderTemplateIndicateString>
         </GridItem>
         {!viewOnly && (
           <GridItem xs={5} md={5}>

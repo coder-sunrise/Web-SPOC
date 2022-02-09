@@ -3,7 +3,7 @@ import { Popover } from 'antd'
 
 // This component is for display visit order template details.
 // Has 2 kinds of data source, one is from order cart, one is from persisted VisitOrderTemplateDetails in visit table(need to extract the information first)
-const VisitPurposeIndicateString = props => {
+const VisitOrderTemplateIndicateString = props => {
   const { visitOrderTemplateDetails } = props
   let indicate = props.indicate
   if (visitOrderTemplateDetails) {
@@ -70,4 +70,4 @@ const VisitPurposeIndicateString = props => {
   )
 }
 
-export default VisitPurposeIndicateString
+export default VisitOrderTemplateIndicateString

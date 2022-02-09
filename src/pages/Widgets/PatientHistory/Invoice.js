@@ -9,7 +9,7 @@ import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import AmountSummary from './AmountSummary'
 import tablestyles from './PatientHistoryStyle.less'
 import { mergeClasses } from '@material-ui/styles'
-import VisitPurposeIndicateString from '@/pages/Widgets/Orders/VisitPurposeIndicateString'
+import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 const numberstyle = {
   color: 'darkBlue',
   fontWeight: 500,
@@ -267,9 +267,9 @@ export default ({ current, theme, isFullScreen = true, classes }) => {
                 </div>
               )}
               <div>
-                <VisitPurposeIndicateString
+                <VisitOrderTemplateIndicateString
                   visitOrderTemplateDetails={current.visitOrderTemplateDetails}
-                ></VisitPurposeIndicateString>
+                ></VisitOrderTemplateIndicateString>
               </div>
             </div>
           )}
