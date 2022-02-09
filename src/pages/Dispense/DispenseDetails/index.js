@@ -48,6 +48,7 @@ import {
 } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 // sub components
 import TableData from './TableData'
 import DrugLabelSelection from './DrugLabelSelection'
@@ -656,7 +657,43 @@ const DispenseDetails = ({
     return false
   }
 
+  const isMandatoryWaistCircumference = () => {
+    const { entity = {} } = visitRegistration
+    const { visit = {} } = entity
+    const {
+      visitPurposeFK,
+      visitBasicExaminations = [],
+      corBasicExaminations = [],
+    } = visit
+    if (visitPurposeFK === VISIT_TYPE.MC) {
+      const basicExamination = corBasicExaminations.length
+        ? corBasicExaminations
+        : visitBasicExaminations
+      if (
+        !basicExamination[0].isChild &&
+        !basicExamination[0].isPregnancy &&
+        !hasValue(basicExamination[0].waistCircumference)
+      ) {
+        return true
+      }
+    }
+    return false
+  }
+
   const onHandelFinalize = () => {
+    if (isMandatoryWaistCircumference()) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          isInformType: true,
+          openConfirmContent:
+            'Please fill in Waist Circumference before finalize.',
+          openConfirmText: 'OK',
+        },
+      })
+      return
+    }
     if (existsCanceledRadiology()) {
       dispatch({
         type: 'global/updateAppState',

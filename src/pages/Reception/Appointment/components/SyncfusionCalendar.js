@@ -61,7 +61,7 @@ class SyncfusionCalendar extends React.PureComponent {
       { text: 'Cut', iconCss: 'e-icons e-cut', id: 'Cut' },
       { text: 'Paste', iconCss: 'e-icons e-paste', id: 'Paste' },
     ]
-    this.state = { previousDate: undefined }
+    this.state = { previousDate: undefined, selectedData: undefined }
   }
 
   resourceHeaderTemplate = props => {
@@ -255,6 +255,7 @@ class SyncfusionCalendar extends React.PureComponent {
                   let eventObj = this.scheduleObj.getEventDetails(
                     this.selectedTarget,
                   )
+                  this.setState({ selectedData: { ...eventObj } })
                   const viewApptAccessRight = Authorized.check(
                     'appointment.appointmentdetails',
                   )
@@ -292,18 +293,12 @@ class SyncfusionCalendar extends React.PureComponent {
               }}
               select={e => {
                 if (e.item.id === 'Copy') {
-                  let eventObj = this.scheduleObj.getEventDetails(
-                    this.selectedTarget,
-                  )
                   if (onCopyClick) {
-                    onCopyClick(eventObj)
+                    onCopyClick(this.state.selectedData)
                   }
                 } else if (e.item.id === 'Cut') {
-                  let eventObj = this.scheduleObj.getEventDetails(
-                    this.selectedTarget,
-                  )
                   if (onCutClick) {
-                    onCutClick(eventObj)
+                    onCutClick(this.state.selectedData)
                   }
                 } else if (e.item.id === 'Paste') {
                   let eventObj = this.scheduleObj.getCellDetails(
