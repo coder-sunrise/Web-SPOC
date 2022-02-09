@@ -561,8 +561,8 @@ export default ({
     const { inventoryconsumable = [] } = codetable
     var consumable = inventoryconsumable.find(
       t =>
-        t.serviceCenter_ServiceId ===
-        currentVisitOrderTemplate.visitOrderTemplateServiceItemDto
+        t.id ===
+        currentVisitOrderTemplate.visitOrderTemplateConsumableItemDto
           .inventoryConsumableFK,
     )
     let defaultBatch = consumable?.consumableStock.find(

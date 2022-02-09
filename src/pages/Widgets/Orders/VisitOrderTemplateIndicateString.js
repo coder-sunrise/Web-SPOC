@@ -6,6 +6,7 @@ import { Popover } from 'antd'
 const VisitOrderTemplateIndicateString = props => {
   const { visitOrderTemplateDetails } = props
   let indicate = props.indicate
+  console.log(props)
   if (visitOrderTemplateDetails) {
     const removedItemIndex = visitOrderTemplateDetails.indexOf(' - (')
     const addedItemIndex = visitOrderTemplateDetails.indexOf(' + (')
@@ -56,12 +57,31 @@ const VisitOrderTemplateIndicateString = props => {
       )}
     </span>
   )
+  const indicateStringContent_Full = (
+    <span>
+      {indicate?.indicateString ? (
+        <span>{indicate.indicateString}</span>
+      ) : (
+        <span></span>
+      )}
+      {indicate?.removedItemString ? (
+        <span style={{ color: '#FF0000' }}>{indicate.removedItemString}</span>
+      ) : (
+        <span></span>
+      )}
+      {indicate?.newItemString ? (
+        <span style={{ color: '#389e0d' }}>{indicate.newItemString}</span>
+      ) : (
+        <span></span>
+      )}
+    </span>
+  )
   return (
     <Popover
       style={{ width: 500 }}
       placement='topLeft'
       overlayStyle={{ width: 500 }}
-      content={indicateStringContent}
+      content={indicateStringContent_Full}
       title='Visit Purpose Details'
       trigger='hover'
     >
