@@ -158,6 +158,7 @@ class Appointment extends React.PureComponent {
     const response = await dispatch({
       type: 'calendarResource/query',
       payload: {
+        pagesize: 9999,
         apiCriteria: {
           IncludeDailyCapacity: true,
           DateFrom: moment()
@@ -581,6 +582,7 @@ class Appointment extends React.PureComponent {
     const response = await dispatch({
       type: 'calendarResource/query',
       payload: {
+        pagesize: 9999,
         apiCriteria: {
           IncludeDailyCapacity: true,
           DateFrom: dateFrom,
