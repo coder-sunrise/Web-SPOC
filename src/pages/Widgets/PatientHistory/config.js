@@ -496,8 +496,7 @@ const checkNote = (widgetId, current) => {
     if (
       !doctorNotes.find(
         note =>
-          note[notesType.fieldName] !== undefined &&
-          note[notesType.fieldName] !== null &&
+          hasValue(note[notesType.fieldName]) &&
           note[notesType.fieldName].trim().length,
       ) &&
       (!scribbleType ||

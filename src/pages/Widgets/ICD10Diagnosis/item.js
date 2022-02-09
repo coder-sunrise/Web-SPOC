@@ -81,7 +81,7 @@ const ICD10DiagnosisItem = ({
                 filterStyle={{
                   position: 'absolute',
                   bottom: -3,
-                  right: -140,
+                  right: -160,
                 }}
                 from='Consultaion'
                 defaultLanguage={defaultLanguage}

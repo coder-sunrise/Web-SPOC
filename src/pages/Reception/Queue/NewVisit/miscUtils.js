@@ -175,8 +175,7 @@ export const formikMapPropsToValues = ({
           parseFloat(queueNo) > largest ? parseFloat(queueNo) : largest,
         0,
       )
-      qNo = roundTo(
-        largestQNo + 1,
+      qNo = parseFloat(largestQNo + 1).toFixed(
         clinicSettings.settings.isQueueNoDecimal ? 1 : 0,
       )
     }
@@ -459,14 +458,15 @@ export const formikHandleSubmit = (
   if (values.visitPurposeFK === VISIT_TYPE.MC) {
     mcReportLanguage = values.mcReportLanguage.join(',')
   }
-
   const payload = {
     cfg: {
       message: id ? 'Visit updated' : 'Visit created',
     },
     id,
     ...restVisitInfo,
-    queueNo: roundTo(queueNo, clinicSettings.settings.isQueueNoDecimal ? 1 : 0),
+    queueNo: parseFloat(queueNo).toFixed(
+      clinicSettings.settings.isQueueNoDecimal ? 1 : 0,
+    ),
     queueNoPrefix: sessionInfo.sessionNoPrefix,
     visit: {
       visitAttachment: uploaded,

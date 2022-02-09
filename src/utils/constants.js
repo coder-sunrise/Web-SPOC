@@ -909,6 +909,16 @@ export const LAB_SPECIMEN_STATUS_DESCRIPTION = {
   7: 'Discarded',
 }
 
+export const LAB_SPECIMEN_DETAILS_STEP = {
+  1: 'New',
+  2: 'In Progress',
+  3: 'P. Retest',
+  4: 'P. 1st Verify',
+  5: 'P. 2nd Verify',
+  6: 'Completed',
+  7: 'Discarded',
+}
+
 export const VISITDOCTOR_CONSULTATIONSTATUS = {
   WAITING: 'Waiting',
   INPROGRESS: 'In Progress',
@@ -930,4 +940,24 @@ export const AGETYPE = {
   CHILD: 'Child',
   YOUTH: 'Youth',
   ADULT: 'Adult',
+}
+
+export const TESTTYPES = {
+  BASICEXAMINATION: 'BasicExamination',
+  BPSYS: 'BPSys',
+  BPDIA: 'BPDIA',
+  PULSE: 'Pulse',
+  BMI: 'BMI',
+  ROHRER: 'Rohrer',
+  KAUP: 'kaup',
+  WAIST: 'Waist',
+  IOP: 'IOP',
+  AUDIOMETRY: 'Audiometry',
+  COLORVISIONTEST: 'ColorVisionTest',
+  PREGNANCY: 'Pregnancy',
+  MENSUS: 'Mensus',
+  R5MCORRECTED: 'Right5mCorrected',
+  R50CMCORRECTED: 'Right50cmCorrected',
+  L5MCORRECTED: 'Left5mCorrected',
+  L50CMCORRECTED: 'Left50cmCorrected',
 }

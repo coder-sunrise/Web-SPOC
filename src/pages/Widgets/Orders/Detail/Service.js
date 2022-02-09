@@ -186,16 +186,18 @@ class Service extends PureComponent {
           nextProps.global.openAdjustment) ||
         nextProps.orders.shouldPushToState
       ) {
-        nextProps.dispatch({
-          type: 'orders/updateState',
-          payload: {
-            entity: {
-              ...nextProps.values,
-              totalPrice: nextProps.values.total,
+        if (nextProps.values.uid) {
+          nextProps.dispatch({
+            type: 'orders/updateState',
+            payload: {
+              entity: {
+                ...nextProps.values,
+                totalPrice: nextProps.values.total,
+              },
+              shouldPushToState: false,
             },
-            shouldPushToState: false,
-          },
-        })
+          })
+        }
       }
   }
 

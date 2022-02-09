@@ -45,9 +45,9 @@ const Details = ({ values, onClose, handleSubmit }) => {
         : ''
     }${values.updateUserName || ''}`
 
-    return `Last Updated by ${updateUser} on ${moment(values.updateDate).format(
-      dateFormatLongWithTimeNoSec,
-    )}`
+    return `Last Updated by ${updateUser} on ${moment(
+      values.lastUpdateDate,
+    ).format(dateFormatLongWithTimeNoSec)}`
   }
   return (
     <div style={{ padding: '0px 10px' }}>

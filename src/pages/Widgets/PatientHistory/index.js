@@ -321,7 +321,15 @@ class PatientHistory extends Component {
 
     if (visitDate && visitDate.length > 1) {
       visitToDate = visitDate[1]
-    }
+    } 
+    let searchCategories
+    if (!selectCategories.length) {
+      searchCategories = this.getCategoriesOptions()
+        .map(v => v.value)
+        .join(',')
+    } else {
+      searchCategories = selectCategories.join(',')
+    } 
     dispatch({
       type: 'patientHistory/queryVisitHistory',
       payload: {
@@ -341,6 +349,7 @@ class PatientHistory extends Component {
         pageSize: viewVisitPageSize,
         patientProfileId: patientHistory.patientID,
         selectDoctors: selectDoctors.join(','),
+        searchCategories,
         isViewNurseNote:
           selectCategories.length === 0 ||
           !_.isEmpty(
@@ -375,7 +384,6 @@ class PatientHistory extends Component {
 
   selectOnChange = (e, row) => {
     const { setFieldValue, values } = this.props
-    console.log('a')
     if (e.target.value) {
       this.setState(
         preState => {
@@ -488,6 +496,7 @@ class PatientHistory extends Component {
                 label=''
                 checked={isSelect}
                 onChange={e => this.selectOnChange(e, row)}
+                style={{ width: 20 }}
               />
             </div>
           )}
@@ -506,7 +515,7 @@ class PatientHistory extends Component {
           </span>
         </div>
         {isNurseNote && (
-          <div style={{ fontSize: '0.9em', fontWeight: 500, marginTop: 12 }}>
+          <div style={{ fontSize: '0.9em', fontWeight: 500, marginTop: 14 }}>
             {`${moment(visitDate).format('DD MMM YYYY HH:MM')} - Notes${
               docotrName ? ` - ${docotrName}` : ''
             }`}
@@ -514,7 +523,7 @@ class PatientHistory extends Component {
         )}
         {!isNurseNote && (
           <div style={{ fontSize: '0.9em' }}>
-            <div style={{ fontWeight: 500, marginTop: 4 }}>
+            <div style={{ fontWeight: 500, marginTop: 6 }}>
               {`${moment(visitDate).format('DD MMM YYYY')} (Time In: ${moment(
                 timeIn,
               ).format('HH:mm')} Time Out: ${
@@ -679,7 +688,7 @@ class PatientHistory extends Component {
               WidgetConfig.WIDGETS_ID.PLAN,
             ].indexOf(c) >= 0,
         )
-      return selectCategories.find(c => c === widgetId)
+      return selectCategories.find(c => c === widgetId) || false
     }
     return true
   }
@@ -1422,8 +1431,6 @@ class PatientHistory extends Component {
             isShowBasicExaminationsOther2: this.showBasicExaminationsOther2(
               current.patientNoteVitalSigns,
             ),
-            isShowJGHEyeExaminations,
-            isShowAudiometryTest,
           })
 
           // treatment
@@ -1516,7 +1523,7 @@ class PatientHistory extends Component {
                     ? `${numeral(o.bmi).format('0.0')} kg/m\u00b2`
                     : '-',
                   saO2: WidgetConfig.hasValue(o.saO2)
-                    ? `${numeral(o.saO2).format('0.0')} %`
+                    ? `${numeral(o.saO2).format('0')} %`
                     : '-',
                   bodyFatPercentage: WidgetConfig.hasValue(o.bodyFatPercentage)
                     ? `${numeral(o.bodyFatPercentage).format('0.0')} %`
@@ -2183,7 +2190,6 @@ class PatientHistory extends Component {
       selectCategories,
       visitTypeIDs,
     } = values
-    console.log(values)
     this.setState(
       {
         visitDate,

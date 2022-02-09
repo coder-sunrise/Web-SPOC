@@ -80,6 +80,7 @@ class DrugLabelSelection extends React.PureComponent {
       currentDrugToPrint,
       visitid,
       source = 'dispense',
+      translationLinkFK,
     } = props
     dispatch({
       type: 'dispense/getSeparatedDrugInstructions',
@@ -113,9 +114,10 @@ class DrugLabelSelection extends React.PureComponent {
         }
         // set default language based on patient tranlsation and clinic setting.
         const translationFK =
-          this.props.patient &&
-          this.props.patient.entity &&
-          this.props.patient.entity.translationLinkFK
+          translationLinkFK ||
+          (this.props.patient &&
+            this.props.patient.entity &&
+            this.props.patient.entity.translationLinkFK)
         const preferLanguage =
           LANGUAGES[translationFK] ??
           this.props.clinicSettings.primaryPrintoutLanguage

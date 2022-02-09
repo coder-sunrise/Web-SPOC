@@ -51,7 +51,7 @@ export default ({ current }) => {
     },
     {
       dataIndex: 'pulseRateBPM',
-      title: 'Heart Rate',
+      title: 'Pulse',
       render: (text, row) => (
         <span>
           {hasValue(row.pulseRateBPM)
@@ -68,7 +68,7 @@ export default ({ current }) => {
       render: (text, row) => (
         <span>
           {hasValue(row.saO2)
-            ? `${numeral(row.saO2).format('0.0')} ${formatMessage({
+            ? `${numeral(row.saO2).format('0')} ${formatMessage({
                 id: 'reception.queue.visitRegistration.saO2.suffix',
               })}`
             : '-'}

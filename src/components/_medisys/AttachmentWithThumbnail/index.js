@@ -362,6 +362,7 @@ class AttachmentWithThumbnail extends Component {
       disableScanner = false,
       handleOpenScanner,
       extenstions = '',
+      hiddenDelete,
     } = this.props
     let { showPopper, uploading, errorText, downloading } = this.state
 
@@ -501,6 +502,7 @@ class AttachmentWithThumbnail extends Component {
       noBorder: simple && !allowedMultiple,
       fieldName,
       hideRemarks,
+      hiddenDelete,
     }
 
     let Body =

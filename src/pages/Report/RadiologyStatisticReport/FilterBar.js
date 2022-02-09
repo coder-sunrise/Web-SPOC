@@ -24,11 +24,14 @@ const FilterBar = ({
   ctservice = [],
   cttag = [],
 }) => {
-  const serviceOptions = Object.values(_.groupBy(ctservice, 'serviceId')).map(
-    x => {
-      return { id: x[0].serviceId, name: x[0].displayValue }
-    },
-  )
+  const serviceOptions = Object.values(
+    _.groupBy(
+      ctservice.filter(t => t.serviceCenterCategoryFK === 3),
+      'serviceId',
+    ),
+  ).map(x => {
+    return { id: x[0].serviceId, name: x[0].displayValue }
+  })
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
