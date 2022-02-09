@@ -942,6 +942,16 @@ export const AGETYPE = {
   ADULT: 'Adult',
 }
 
+export const INVOICE_REPORT_TYPES = {
+  SUMMARYINVOICE: 'Summary Invoice',
+  GROUPINVOICE: 'Group Invoice',
+  INDIVIDUALINVOICE: 'Individual Invoice',
+  CLAIMABLEITEMCATEGORYINVOICE: 'Claimable Item Category Invoice',
+  ITEMCATEGORYINVOICE: 'Item Category Invoice',
+  CLAIMABLEITEMINVOICE: 'Claimable Item Invoice',
+  DETAILEDINVOICE: 'Detailed Invoice',
+}
+
 export const TESTTYPES = {
   BASICEXAMINATION: 'BasicExamination',
   BPSYS: 'BPSys',

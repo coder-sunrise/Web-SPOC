@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import * as Yup from 'yup'
 import moment from 'moment'
 import _ from 'lodash'
@@ -6,7 +6,7 @@ import { Add, Print } from '@material-ui/icons'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
 // common utils
-import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+import { INVOICE_PAYER_TYPE, INVOICE_REPORT_TYPES } from '@/utils/constants'
 // common components
 import {
   Button,
@@ -16,11 +16,14 @@ import {
   CommonTableGrid,
   EditableTableGrid,
   CardContainer,
+  Popover,
 } from '@/components'
 // sub components
 import PaymentSummary from '@/pages/Finance/Invoice/Details/PaymentDetails/PaymentSummary'
 import PaymentRow from '@/pages/Finance/Invoice/Details/PaymentDetails/PaymentRow'
 import { roundTo } from '@/utils/utils'
+import MenuItem from '@material-ui/core/MenuItem'
+import MenuList from '@material-ui/core/MenuList'
 import MaxCap from './MaxCap'
 import BalanceLabel from './BalanceLabel'
 import DeleteWithPopover from '../components/DeleteWithPopover'
@@ -102,6 +105,7 @@ const Scheme = ({
   clinicSettings = {},
   isUpdatedAppliedInvoicePayerInfo,
   showRefreshOrder,
+  visitOrderTemplateFK,
 }) => {
   const {
     name,
@@ -124,12 +128,12 @@ const Scheme = ({
     schemePayerFK,
     payerName,
   } = invoicePayer
-
   const handleSchemeChange = value => onSchemeChange(value, index)
   const handleCancelClick = () => onCancelClick(index)
   const handleEditClick = () => onEditClick(index)
   const handleApplyClick = () => onApplyClick(index)
   const handleDeleteClick = () => onDeleteClick(index)
+  const [showPrintInvoiceMenu, setShowPrintInvoiceMenu] = useState(false)
 
   const shouldDisableDelete = () => {
     if (invoicePayment.find(o => o.isCancelled === false)) {
@@ -430,26 +434,106 @@ const Scheme = ({
                   <Add />
                   Add Payment
                 </Button>
-                <Button
-                  {...ButtonProps}
-                  disabled={
-                    shouldDisable() ||
-                    isUpdatedAppliedInvoicePayerInfo ||
-                    showRefreshOrder
-                  }
-                  onClick={() =>
-                    onPrinterClick(
-                      'TaxInvoice',
-                      undefined,
-                      companyFK,
-                      id,
-                      index,
-                    )
+                <Popover
+                  icon={null}
+                  trigger='click'
+                  placement='right'
+                  visible={showPrintInvoiceMenu}
+                  onVisibleChange={() => {
+                    setShowPrintInvoiceMenu(!showPrintInvoiceMenu)
+                  }}
+                  content={
+                    <MenuList
+                      role='menu'
+                      onClick={() => setShowPrintInvoiceMenu(false)}
+                    >
+                      {visitOrderTemplateFK && (
+                        <MenuItem
+                          onClick={() =>
+                            onPrinterClick(
+                              'TaxInvoice',
+                              undefined,
+                              companyFK,
+                              id,
+                              index,
+                              INVOICE_REPORT_TYPES.SUMMARYINVOICE,
+                            )
+                          }
+                        >
+                          Summary Invoice
+                        </MenuItem>
+                      )}
+                      <MenuItem
+                        onClick={() =>
+                          onPrinterClick(
+                            'TaxInvoice',
+                            undefined,
+                            companyFK,
+                            id,
+                            index,
+                            INVOICE_REPORT_TYPES.CLAIMABLEITEMCATEGORYINVOICE,
+                          )
+                        }
+                      >
+                        Claimable Item Category Invoice
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() =>
+                          onPrinterClick(
+                            'TaxInvoice',
+                            undefined,
+                            companyFK,
+                            id,
+                            index,
+                            INVOICE_REPORT_TYPES.ITEMCATEGORYINVOICE,
+                          )
+                        }
+                      >
+                        Item Category Invoice
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() =>
+                          onPrinterClick(
+                            'TaxInvoice',
+                            undefined,
+                            companyFK,
+                            id,
+                            index,
+                            INVOICE_REPORT_TYPES.CLAIMABLEITEMINVOICE,
+                          )
+                        }
+                      >
+                        Claimable Item Invoice
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() =>
+                          onPrinterClick(
+                            'TaxInvoice',
+                            undefined,
+                            companyFK,
+                            id,
+                            index,
+                            INVOICE_REPORT_TYPES.DETAILEDINVOICE,
+                          )
+                        }
+                      >
+                        Detailed Invoice
+                      </MenuItem>
+                    </MenuList>
                   }
                 >
-                  <Print />
-                  Print Invoice
-                </Button>
+                  <Button
+                    {...ButtonProps}
+                    disabled={
+                      shouldDisable() ||
+                      isUpdatedAppliedInvoicePayerInfo ||
+                      showRefreshOrder
+                    }
+                  >
+                    <Print />
+                    Print Invoice
+                  </Button>
+                </Popover>
               </div>
             </GridItem>
             <GridItem
