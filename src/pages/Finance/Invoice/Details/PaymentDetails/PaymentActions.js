@@ -1,13 +1,16 @@
-import React from 'react'
+import React, { useState } from 'react'
 // material ui
 import Printer from '@material-ui/icons/Print'
 import Add from '@material-ui/icons/Add'
 import RepeatIcon from '@material-ui/icons/Repeat'
 // common components
-import { Button } from '@/components'
+import { Button, Popover } from '@/components'
+import { ableToViewByAuthority } from '@/utils/utils'
+import { INVOICE_REPORT_TYPES } from '@/utils/constants'
+import MenuItem from '@material-ui/core/MenuItem'
+import MenuList from '@material-ui/core/MenuList'
 // constants variables
 import { PayerType } from './variables'
-import { ableToViewByAuthority } from '@/utils/utils'
 
 const PaymentActions = ({
   handleAddPayment,
@@ -21,7 +24,9 @@ const PaymentActions = ({
   companyFK,
   readOnly,
   isEnableWriteOffinInvoice,
+  visitOrderTemplateFK,
 }) => {
+  const [showPrintInvoiceMenu, setShowPrintInvoiceMenu] = useState(false)
   const ButtonProps = {
     icon: true,
     simple: true,
@@ -81,16 +86,110 @@ const PaymentActions = ({
           Transfer
         </Button>
       )}
-      <Button
-        onClick={() =>
-          handlePrinterClick('TaxInvoice', undefined, companyFK, invoicePayerFK)
+      <Popover
+        icon={null}
+        trigger='click'
+        placement='right'
+        visible={showPrintInvoiceMenu}
+        onVisibleChange={() => {
+          if (!companyFK && !visitOrderTemplateFK) {
+            handlePrinterClick(
+              'TaxInvoice',
+              undefined,
+              companyFK,
+              invoicePayerFK,
+              INVOICE_REPORT_TYPES.INDIVIDUALINVOICE,
+            )
+          } else {
+            setShowPrintInvoiceMenu(!showPrintInvoiceMenu)
+          }
+        }}
+        content={
+          <MenuList role='menu' onClick={() => setShowPrintInvoiceMenu(false)}>
+            {visitOrderTemplateFK && (
+              <MenuItem
+                onClick={() =>
+                  handlePrinterClick(
+                    'TaxInvoice',
+                    undefined,
+                    companyFK,
+                    invoicePayerFK,
+                    INVOICE_REPORT_TYPES.SUMMARYINVOICE,
+                  )
+                }
+              >
+                Summary Invoice
+              </MenuItem>
+            )}
+            {companyFK && (
+              <MenuItem
+                onClick={() =>
+                  handlePrinterClick(
+                    'TaxInvoice',
+                    undefined,
+                    companyFK,
+                    invoicePayerFK,
+                    INVOICE_REPORT_TYPES.CLAIMABLEITEMCATEGORYINVOICE,
+                  )
+                }
+              >
+                Claimable Item Category Invoice
+              </MenuItem>
+            )}
+            {companyFK && (
+              <MenuItem
+                onClick={() =>
+                  handlePrinterClick(
+                    'TaxInvoice',
+                    undefined,
+                    companyFK,
+                    invoicePayerFK,
+                    INVOICE_REPORT_TYPES.ITEMCATEGORYINVOICE,
+                  )
+                }
+              >
+                Item Category Invoice
+              </MenuItem>
+            )}
+            {companyFK && (
+              <MenuItem
+                onClick={() =>
+                  handlePrinterClick(
+                    'TaxInvoice',
+                    undefined,
+                    companyFK,
+                    invoicePayerFK,
+                    invoicePayerFK,
+                    INVOICE_REPORT_TYPES.CLAIMABLEITEMINVOICE,
+                  )
+                }
+              >
+                Claimable Item Invoice
+              </MenuItem>
+            )}
+            <MenuItem
+              onClick={() =>
+                handlePrinterClick(
+                  'TaxInvoice',
+                  undefined,
+                  companyFK,
+                  invoicePayerFK,
+                  companyFK
+                    ? INVOICE_REPORT_TYPES.DETAILEDINVOICE
+                    : INVOICE_REPORT_TYPES.INDIVIDUALINVOICE,
+                )
+              }
+            >
+              {companyFK ? 'Detailed Invoice' : 'Individual Invoice'}
+            </MenuItem>
+          </MenuList>
         }
-        disabled={!handlePrinterClick}
-        {...ButtonProps}
       >
-        <Printer />
-        Print Invoice
-      </Button>
+        <Button disabled={!handlePrinterClick} {...ButtonProps}>
+          <Printer />
+          Print Invoice
+        </Button>
+      </Popover>
     </div>
   )
 }

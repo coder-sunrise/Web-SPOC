@@ -56,6 +56,7 @@ const PaymentCard = ({
   patientIsActive,
   hasActiveSession,
   isEnableWriteOffinInvoice,
+  visitOrderTemplateFK,
   actions: { handleVoidClick, handlePrinterClick, ...buttonActions },
 }) => {
   let _payerName = (
@@ -120,6 +121,7 @@ const PaymentCard = ({
             readOnly={readOnly || !patientIsActive}
             hasActiveSession={hasActiveSession}
             handlePrinterClick={handlePrinterClick}
+            visitOrderTemplateFK={visitOrderTemplateFK}
             {...buttonActions}
           />
         </GridItem>

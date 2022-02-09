@@ -373,6 +373,10 @@ class EditOrder extends Component {
             }),
           ])
           dispatch({
+            type: `visitRegistration/query`,
+            payload: dispense.visitID,
+          })
+          dispatch({
             type: `dispense/refresh`,
             payload: dispense.visitID,
           })

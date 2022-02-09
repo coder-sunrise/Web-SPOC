@@ -3,12 +3,10 @@ import { findDOMNode } from 'react-dom'
 import { DragSource, DropTarget, useDrag, useDrop } from 'react-dnd'
 import { MenuItem, ListItemText, ListItemIcon } from '@material-ui/core'
 import _ from 'lodash'
-import { IconButton, Button, Badge, TextField, Tooltip } from '@/components'
-import {
-  DragIndicator,
-  Delete,
-  ImportContactsOutlined,
-} from '@material-ui/icons'
+import { IconButton, Badge, TextField, Tooltip } from '@/components'
+import { Button, Tag } from 'antd'
+import { DeleteFilled } from '@ant-design/icons'
+import { DragIndicator, ImportContactsOutlined } from '@material-ui/icons'
 
 const Types = {
   Folder: 'Folder',
@@ -103,13 +101,13 @@ class DragableItem extends Component {
           >
             {isEditMode ? (
               !isItemAll && (
-                <div style={{ margin: '10px 0px' }}>
+                <div style={{ margin: '5px 0px' }}>
                   <div
                     style={{
                       float: 'left',
                       width: '100%',
                       paddingLeft: 10,
-                      paddingRight: 40,
+                      paddingRight: 30,
                       marginRight: -35,
                       overflow: 'hidden',
                     }}
@@ -124,18 +122,18 @@ class DragableItem extends Component {
                   </div>
 
                   <Button
-                    color='danger'
-                    justIcon
+                    type='danger'
+                    size='small'
                     disabled={!item.isEmpty}
                     style={{
                       float: 'right',
+                      marginTop: 8,
                     }}
                     onClick={e => {
                       onItemChanged({ ...item, isDeleted: true })
                     }}
-                  >
-                    <Delete />
-                  </Button>
+                    icon={<DeleteFilled />}
+                  ></Button>
                 </div>
               )
             ) : (

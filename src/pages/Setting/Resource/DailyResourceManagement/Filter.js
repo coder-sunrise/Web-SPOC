@@ -37,7 +37,7 @@ class Filter extends PureComponent {
               label='Month'
               timeFormat={false}
               allowClear={false}
-              format='YYYY MMM'
+              format='MMM YYYY'
               value={calendarResource.selectMonth}
               onChange={e => {
                 dispatch({

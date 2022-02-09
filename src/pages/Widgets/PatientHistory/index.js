@@ -1148,7 +1148,7 @@ class PatientHistory extends Component {
       )
       return notesType.title
     }
-    return '-'
+    return ''
   }
 
   showBasicExaminationsGeneral = (basicExaminations = []) => {

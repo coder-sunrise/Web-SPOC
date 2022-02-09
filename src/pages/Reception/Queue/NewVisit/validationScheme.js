@@ -103,26 +103,8 @@ export const visitBasicExaminationsSchema = Yup.object().shape({
     .transform(value =>
       value === null || Number.isNaN(value) ? undefined : value,
     )
-    .when(
-      ['visitPurposeFK', 'isChild', 'isPregnancy'],
-      (visitPurposeFK, isChild, isPregnancy) => {
-        if (visitPurposeFK === VISIT_TYPE.MC && !isChild && !isPregnancy) {
-          return Yup.number()
-            .required()
-            .min(0, VitalSignMessage[FormField['vitalsign.waistCircumference']])
-            .max(
-              999.9,
-              VitalSignMessage[FormField['vitalsign.waistCircumference']],
-            )
-        }
-        return Yup.number()
-          .min(0, VitalSignMessage[FormField['vitalsign.waistCircumference']])
-          .max(
-            999.9,
-            VitalSignMessage[FormField['vitalsign.waistCircumference']],
-          )
-      },
-    ),
+    .min(0, VitalSignMessage[FormField['vitalsign.waistCircumference']])
+    .max(999.9, VitalSignMessage[FormField['vitalsign.waistCircumference']]),
 })
 
 export const eyeExaminationsSchema = Yup.object().shape({

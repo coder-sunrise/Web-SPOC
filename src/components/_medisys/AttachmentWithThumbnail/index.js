@@ -1,7 +1,5 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'dva'
-// material ui
-import { AttachFile, Scanner } from '@material-ui/icons'
 import {
   withStyles,
   MenuList,
@@ -12,7 +10,9 @@ import {
   MenuItem,
 } from '@material-ui/core'
 // common components
-import { Button, CardContainer, Danger, GridContainer } from '@/components'
+import { CardContainer, Danger, GridContainer } from '@/components'
+import { Button } from 'antd'
+import { CloudUploadOutlined, ScanOutlined } from '@ant-design/icons'
 import { LoadingWrapper } from '@/components/_medisys'
 // sub components
 import {
@@ -100,10 +100,11 @@ class AttachmentWithThumbnail extends Component {
       },
 
       fileCategory,
+      fileStatus,
     } = this.props
 
     const type = corAttchementTypes.find(o => o.type === attachmentType) || {}
-    const fileStatusFK = FILE_STATUS.UPLOADED
+    const fileStatusFK = fileStatus || FILE_STATUS.UPLOADED
     const fileExtension = getFileExtension(name).toLowerCase()
     let _thumbnailDto
     if (['jpg', 'jpeg', 'png'].includes(fileExtension)) {
@@ -387,8 +388,8 @@ class AttachmentWithThumbnail extends Component {
           >
             <div>
               <Button
-                color='primary'
-                size='sm'
+                type='primary'
+                size='small'
                 onClick={e => {
                   e.stopPropagation()
                   this.setState({
@@ -401,13 +402,15 @@ class AttachmentWithThumbnail extends Component {
                 buttonRef={node => {
                   this.popperRef = node
                 }}
+                icon={<CloudUploadOutlined />}
+                style={{ marginRight: 8 }}
               >
-                <AttachFile /> Upload
+                Upload
               </Button>
               {!disableScanner && (
                 <Button
-                  color='primary'
-                  size='sm'
+                  type='primary'
+                  size='small'
                   onClick={e => {
                     e.stopPropagation()
                     this.setState({
@@ -420,8 +423,9 @@ class AttachmentWithThumbnail extends Component {
                   className={
                     fileAttachments.length >= 1 ? classes.uploadBtn : ''
                   }
+                  icon={<ScanOutlined />}
                 >
-                  <Scanner /> Scan
+                  Scan
                 </Button>
               )}
               <Popper
@@ -466,23 +470,26 @@ class AttachmentWithThumbnail extends Component {
         ) : (
           <React.Fragment>
             <Button
-              color='primary'
-              size='sm'
+              type='primary'
+              size='small'
               onClick={this.onUploadClick}
               disabled={isReadOnly || uploading || global.disableSave}
               className={fileAttachments.length >= 1 ? classes.uploadBtn : ''}
+              icon={<CloudUploadOutlined />}
+              style={{ marginRight: 8 }}
             >
-              <AttachFile /> Upload
+              Upload
             </Button>
             {!disableScanner && (
               <Button
-                color='primary'
-                size='sm'
+                type='primary'
+                size='small'
                 onClick={handleOpenScanner}
                 disabled={isReadOnly || uploading || global.disableSave}
                 className={fileAttachments.length >= 1 ? classes.uploadBtn : ''}
+                icon={<ScanOutlined />}
               >
-                <Scanner /> Scan
+                Scan
               </Button>
             )}
           </React.Fragment>
