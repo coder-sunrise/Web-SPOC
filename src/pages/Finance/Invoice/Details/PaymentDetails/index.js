@@ -219,7 +219,13 @@ class PaymentDetails extends Component {
     this.setState({ showAddCrNote: true })
   }
 
-  onPrinterClick = (type, itemID, copayerID, invoicePayerid) => {
+  onPrinterClick = (
+    type,
+    itemID,
+    copayerID,
+    invoicePayerid,
+    invoiceReportType,
+  ) => {
     const { invoicePayment } = this.props
 
     switch (type) {
@@ -427,7 +433,9 @@ class PaymentDetails extends Component {
       readOnly,
       patientIsActive,
       clinicSettings,
+      invoiceDetail = {},
     } = this.props
+    const { entity } = invoiceDetail
     const { hasActiveSession } = this.state
 
     const isEnableWriteOffinInvoice =
@@ -497,6 +505,7 @@ class PaymentDetails extends Component {
                     patientIsActive={patientIsActive}
                     hasActiveSession={hasActiveSession}
                     isEnableWriteOffinInvoice={isEnableWriteOffinInvoice}
+                    visitOrderTemplateFK={entity?.visitOrderTemplateFK}
                   />
                 )
               })
