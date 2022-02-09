@@ -78,6 +78,14 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
   const onEditFileName = file => {
     setEditingFile({ ...file, showNameEditor: true })
   }
+  const onThumbnailLoaded = (fileIndexFK, thumbnail) => {
+    const cached = cachedImageDatas.find(f => f.fileIndexFK === fileIndexFK)
+    if (cached) {
+      cached.thumbnail = thumbnail
+    } else {
+      setCachedImageDatas([...cachedImageDatas, { fileIndexFK, thumbnail }])
+    }
+  }
   const onImageLoaded = (fileIndexFK, imageData) => {
     const cached = cachedImageDatas.find(f => f.fileIndexFK === fileIndexFK)
     if (cached) {
@@ -90,17 +98,18 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
     attachmentList: attachmentList.map(a => {
       const cached =
         cachedImageDatas.find(f => f.fileIndexFK === a.fileIndexFK) || {}
-      return { ...a, imageData: cached.imageData }
+      return { ...a, imageData: cached.imageData, thumbnail: cached.thumbnail }
     }),
     onAddNewFolders,
     onEditFileName,
     onFileUpdated,
     onPreview,
     onImageLoaded,
+    onThumbnailLoaded,
   }
   return (
     <React.Fragment>
-      <div style={{ height: window.innerHeight - 160, overflow: 'scroll' }}>
+      <div style={{ height: window.innerHeight - 180, overflow: 'scroll' }}>
         {viewMode === 'card' ? (
           <CardView key='cardview' {...restProps} {...cfg} />
         ) : (
@@ -127,14 +136,14 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
       {editingFile && (
         <CommonModal
           open={editingFile.showNameEditor}
-          title='Change File Name'
+          title='Change Document Name'
           maxWidth='sm'
           onClose={() => {
             setEditingFile(undefined)
           }}
         >
           <TextEditor
-            item={{ label: 'File Name', value: editingFile.fileName }}
+            item={{ label: 'Document Name', value: editingFile.fileName }}
             handleSubmit={name => {
               onFileUpdated({ ...editingFile, fileName: name })
               setEditingFile(undefined)

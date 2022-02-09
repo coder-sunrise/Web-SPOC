@@ -6,12 +6,19 @@ import {
   GridContainer,
   GridItem,
   IconButton,
-  Button,
   CommonModal,
   Tooltip,
+  TextField,
 } from '@/components'
-import { Attachment } from '@/components/_medisys'
-import { CreateNewFolder, Edit, Save, Cancel } from '@material-ui/icons'
+import { Button, Tag } from 'antd'
+import {
+  EditFilled,
+  SaveFilled,
+  CloseCircleFilled,
+  FolderAddFilled,
+} from '@ant-design/icons'
+import { AttachmentWithThumbnail } from '@/components/_medisys'
+import { FILE_CATEGORY, FILE_STATUS } from '@/utils/constants'
 import TextEditor from '../TextEditor'
 import DragableList from './DragableList'
 
@@ -19,7 +26,26 @@ class FolderList extends Component {
   state = {
     showNewFolder: false,
     folderList: [],
+    filterValue: '',
   }
+
+  debouncedAction = _.debounce(e => {
+    this.setState({ filterValue: e.target.value }, () => {
+      const { onSelectionChange, selectedFolderFK } = this.props
+      if (
+        !this.state.folderList.find(
+          f =>
+            !f.isDeleted &&
+            f.id === selectedFolderFK &&
+            (f.displayValue || '')
+              .toUpperCase()
+              .indexOf((this.state.filterValue || '').toUpperCase()) >= 0,
+        )
+      ) {
+        onSelectionChange({ id: -99 })
+      }
+    })
+  }, 100)
 
   // eslint-disable-next-line react/sort-comp
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -198,25 +224,24 @@ class FolderList extends Component {
           <GridItem md={12}>
             <div>
               <div style={{ display: 'flex', float: 'left' }}>
-                <IconButton
-                  color='primary'
-                  style={{ width: 50, marginTop: 5 }}
-                  onClick={() => {
-                    this.setState({ showNewFolder: true })
-                  }}
-                >
-                  <CreateNewFolder
-                    fontSize='inherit'
-                    style={{ width: 40, height: 40 }}
-                  />
-                </IconButton>
-                <div style={{ marginTop: 15 }}>
+                <Tooltip title='Add New Tag'>
+                  <Button
+                    type='primary'
+                    style={{ marginRight: 8, marginTop: 8 }}
+                    onClick={() => {
+                      this.setState({ showNewFolder: true })
+                    }}
+                    size='small'
+                    icon={<FolderAddFilled />}
+                  ></Button>
+                </Tooltip>
+                <div>
                   <FastField
                     name={`${modelName}`}
                     render={args => {
                       this.form = args.form
                       return (
-                        <Attachment
+                        <AttachmentWithThumbnail
                           attachmentType={`${modelName}`}
                           handleUpdateAttachments={att => {
                             let { added = [] } = att
@@ -226,10 +251,8 @@ class FolderList extends Component {
                                 const { 0: fileDetails } = ad
                                 const retVal = {
                                   ...ad,
-                                  0: {
-                                    ...fileDetails,
-                                    [`${modelName}_Folder`]: [{ folderFK }],
-                                  },
+                                  ...fileDetails,
+                                  [`${modelName}_Folder`]: [{ folderFK }],
                                 }
                                 return retVal
                               })
@@ -237,7 +260,17 @@ class FolderList extends Component {
                             updateAttachments(args)({ ...att, added })
                           }}
                           attachments={args.field.value}
+                          fileCategory={
+                            modelName === 'patientAttachment'
+                              ? FILE_CATEGORY.PATIENT
+                              : FILE_CATEGORY.COPAYER
+                          }
+                          fileStatus={FILE_STATUS.CONFIRMED}
                           label=''
+                          thumbnailSize={{
+                            height: 256,
+                            width: 256,
+                          }}
                         />
                       )
                     }}
@@ -249,77 +282,87 @@ class FolderList extends Component {
                   display: 'flex',
                   alignItems: 'center',
                   float: 'right',
-                  marginTop: 15,
+                  marginTop: 8,
                 }}
               >
                 {isEditMode ? (
                   <React.Fragment>
                     <Tooltip title='Save'>
                       <Button
-                        justIcon
-                        color='primary'
-                        size='sm'
+                        type='primary'
+                        size='small'
                         onClick={() => {
                           this.handleOnSave()
                           this.setState({ isEditMode: false })
                         }}
-                      >
-                        <Save />
-                      </Button>
+                        style={{ marginRight: 8 }}
+                        icon={<SaveFilled />}
+                      ></Button>
                     </Tooltip>
                     <Tooltip title='Cancel'>
                       <Button
-                        justIcon
-                        color='danger'
-                        size='sm'
+                        type='danger'
+                        size='small'
                         onClick={() => {
                           this.mapPropsToStates()
                           this.setState({ isEditMode: false })
                         }}
-                      >
-                        <Cancel />
-                      </Button>
+                        icon={<CloseCircleFilled />}
+                      ></Button>
                     </Tooltip>
                   </React.Fragment>
                 ) : (
                   <Button
-                    justIcon
-                    color='primary'
-                    size='sm'
+                    type='primary'
+                    size='small'
                     onClick={() => {
                       this.setState({ isEditMode: true })
                     }}
-                  >
-                    <Edit />
-                  </Button>
+                    icon={<EditFilled />}
+                  ></Button>
                 )}
               </div>
             </div>
           </GridItem>
         )}
         <GridItem md={12}>
-          <DragableList
-            readOnly={readOnly}
-            isEditMode={isEditMode}
-            folderList={folderList.filter(f => !f.isDeleted)}
-            selectedFolderFK={selectedFolderFK}
-            onMoving={this.handleOnMoving}
-            onItemClick={this.onItemClick}
-            onEndDrag={this.handleOnEndDrag}
-            onItemChanged={this.onItemChanged}
-            isEnableEditDocument={isEnableEditDocument}
-          />
+          <div>
+            <TextField
+              inputProps={{ placeholder: 'Key in to filter tags' }}
+              onChange={this.debouncedAction}
+              value={this.state.filterValue}
+            />
+            <DragableList
+              readOnly={readOnly}
+              isEditMode={isEditMode}
+              folderList={folderList.filter(
+                f =>
+                  !f.isDeleted &&
+                  (f.id === -99 ||
+                    (f.displayValue || '')
+                      .toUpperCase()
+                      .indexOf((this.state.filterValue || '').toUpperCase()) >=
+                      0),
+              )}
+              selectedFolderFK={selectedFolderFK}
+              onMoving={this.handleOnMoving}
+              onItemClick={this.onItemClick}
+              onEndDrag={this.handleOnEndDrag}
+              onItemChanged={this.onItemChanged}
+              isEnableEditDocument={isEnableEditDocument}
+            />
+          </div>
         </GridItem>
 
         <CommonModal
           open={showNewFolder}
-          title='New Folder'
+          title='New Tag'
           maxWidth='sm'
           onConfirm={this.closeNewFolderModal}
           onClose={this.closeNewFolderModal}
         >
           <TextEditor
-            item={{ label: 'New Folder' }}
+            item={{ label: 'New Tag' }}
             handleSubmit={this.onSaveNewFolder}
           />
         </CommonModal>

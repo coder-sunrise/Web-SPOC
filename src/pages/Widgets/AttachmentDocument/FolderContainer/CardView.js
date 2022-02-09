@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
 import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
@@ -76,47 +77,48 @@ const CardZoom = [
 ]
 
 class CardView extends Component {
-  downloadFile = (row) => {
+  downloadFile = row => {
     downloadAttachment(row)
   }
 
-  render () {
+  render() {
     const {
       classes,
       attachmentList = {},
       selectedFolderFK,
       zoom = 4,
+      filterDocumentValue = '',
     } = this.props
-    const zoomStyle = CardZoom.find((c) => c.zoom === zoom)
+    const zoomStyle = CardZoom.find(c => c.zoom === zoom)
 
     return (
       <div className={classes.root}>
-        {attachmentList
-          .filter(
-            (f) =>
-              f.folderFKs.includes(selectedFolderFK) ||
-              selectedFolderFK === -99,
+        {_.orderBy(
+          attachmentList.filter(
+            f =>
+              (f.fileName || '')
+                .toUpperCase()
+                .indexOf(filterDocumentValue.toUpperCase()) >= 0 &&
+              (f.folderFKs.includes(selectedFolderFK) ||
+                selectedFolderFK === -99),
+          ),
+          [data => (data.fileName || '').toLowerCase()],
+          ['asc'],
+        ).map(p => {
+          return (
+            <Card
+              style={{
+                width: zoomStyle.width,
+                height: zoomStyle.height,
+                margin: 5,
+              }}
+            >
+              <CardContent>
+                <CardItem key={p.id} file={p} {...this.props} {...zoomStyle} />
+              </CardContent>
+            </Card>
           )
-          .map((p) => {
-            return (
-              <Card
-                style={{
-                  width: zoomStyle.width,
-                  height: zoomStyle.height,
-                  margin: 5,
-                }}
-              >
-                <CardContent>
-                  <CardItem
-                    key={p.id}
-                    file={p}
-                    {...this.props}
-                    {...zoomStyle}
-                  />
-                </CardContent>
-              </Card>
-            )
-          })}
+        })}
       </div>
     )
   }
