@@ -322,7 +322,6 @@ class PatientHistory extends Component {
     if (visitDate && visitDate.length > 1) {
       visitToDate = visitDate[1]
     }
-    console.log(values)
     dispatch({
       type: 'patientHistory/queryVisitHistory',
       payload: {
@@ -739,6 +738,7 @@ class PatientHistory extends Component {
       referralRemarks: history.referralRemarks,
       visitPurposeFK: history.visitPurposeFK,
       patientGender: history.patientGender,
+      visitOrderTemplateDetails: history.visitOrderTemplateDetails,
     }
     let visitDetails = {
       visitDate: history.visitDate,
@@ -2253,7 +2253,6 @@ class PatientHistory extends Component {
   }
 
   render() {
-    console.log(11)
     const { clinicSettings, scriblenotes, fromModule } = this.props
     const cfg = {}
     const {

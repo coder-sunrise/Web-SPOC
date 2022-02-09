@@ -8,6 +8,7 @@ import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { Divider } from '@material-ui/core'
 import Cross from '@material-ui/icons/HighlightOff'
+import VisitPurposeIndicateString from './VisitPurposeIndicateString'
 import {
   isMatchInstructionRule,
   ReplaceCertificateTeplate,
@@ -1094,10 +1095,13 @@ export default ({
         }),
       ',',
     )
-    console.log(removedItemString, newItemString)
-    return `${indicateString}${
-      removedItemString ? ' - (' + removedItemString + ')' : ''
-    }${newItemString ? ' + (' + newItemString + ')' : ''}`
+    return {
+      indicateString: `${indicateString}`,
+      removedItemString: `${
+        removedItemString ? ' - (' + removedItemString + ')' : ''
+      }`,
+      newItemString: `${newItemString ? ' + (' + newItemString + ')' : ''}`,
+    }
   }
 
   const revertVisitPurpose = () => {
@@ -1115,7 +1119,7 @@ export default ({
         return undefined
       } else return t
     })
-    console.log(3, removedTemplateItems)
+    _.sortBy(removedTemplateItems, 'inventoryItemTypeFK')
     setRemovedVisitOrderTemplateItem(removedTemplateItems)
     setShowRevertVisitPurposeItem(true)
   }
@@ -1277,8 +1281,32 @@ export default ({
                 const { visit } = entity || {}
                 const { children, ...restProps } = p
                 let newChildren = []
-                console.log(visit)
-                let indicate = getVisitOrderTemplateDetails(rows)
+                let indicate = visit?.visitOrderTemplateFK
+                  ? getVisitOrderTemplateDetails(rows)
+                  : {}
+                const indicateStringContent = (
+                  <span className='threeline_textblock'>
+                    {indicate.indicateString ? (
+                      <span>{indicate.indicateString}</span>
+                    ) : (
+                      <span></span>
+                    )}
+                    {indicate.removedItemString ? (
+                      <span style={{ color: '#FF0000' }}>
+                        {indicate.removedItemString}
+                      </span>
+                    ) : (
+                      <span></span>
+                    )}
+                    {indicate.newItemString ? (
+                      <span style={{ color: '#389e0d' }}>
+                        {indicate.newItemString}
+                      </span>
+                    ) : (
+                      <span></span>
+                    )}
+                  </span>
+                )
                 if (isExistPackage) {
                   newChildren = [
                     <Table.Cell
@@ -1289,9 +1317,9 @@ export default ({
                       {visit && visit.visitOrderTemplateFK && (
                         <div>
                           <div>
-                            <Tooltip title={indicate}>
-                              <span>{indicate}</span>
-                            </Tooltip>
+                            <VisitPurposeIndicateString
+                              indicate={indicate}
+                            ></VisitPurposeIndicateString>
                           </div>
                           <div>
                             <Link
@@ -1322,11 +1350,9 @@ export default ({
                       {visit && visit.visitOrderTemplateFK && (
                         <div>
                           <div>
-                            <Tooltip title={indicate}>
-                              <span className='threeline_textblock'>
-                                {indicate}
-                              </span>
-                            </Tooltip>
+                            <VisitPurposeIndicateString
+                              indicate={indicate}
+                            ></VisitPurposeIndicateString>
                           </div>
                           <div>
                             <Link
