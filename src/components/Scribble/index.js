@@ -7,7 +7,7 @@ import {
   List,
   Divider,
 } from '@material-ui/core'
-import { CloudUploadOutlined, CopyOutlined } from '@ant-design/icons';
+import { CloudUploadOutlined, CopyOutlined } from '@ant-design/icons'
 import { CompactPicker } from 'react-color'
 import ToggleButton from '@material-ui/lab/ToggleButton'
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup'
@@ -21,7 +21,7 @@ import UndoIcon from '@material-ui/icons/Undo'
 import RedoIcon from '@material-ui/icons/Redo'
 import DeleteIcon from '@material-ui/icons/Delete'
 import Save from '@material-ui/icons/SaveAlt'
-import SaveIcon from '@material-ui/icons/Save';
+import SaveIcon from '@material-ui/icons/Save'
 import Erase from '@material-ui/icons/HowToVote'
 import Remove from '@material-ui/icons/Remove'
 import Backspace from '@material-ui/icons/CompareArrowsTwoTone'
@@ -35,7 +35,7 @@ import EditIcon from '@material-ui/icons/Edit'
 import AddIcon from '@material-ui/icons/Add'
 import MaterialTextField from '@material-ui/core/TextField'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener'
-import ReplayIcon from '@material-ui/icons/Replay';
+import ReplayIcon from '@material-ui/icons/Replay'
 import keydown, { Keys } from 'react-keydown'
 import { Radio } from 'antd'
 import { connect } from 'dva'
@@ -64,7 +64,6 @@ import {
 } from '@/utils/utils'
 import { Add } from '@material-ui/icons'
 import moment from 'moment'
-
 
 const styles = () => ({
   container: {
@@ -113,7 +112,7 @@ const styles = () => ({
     alignItems: 'center',
     textAlign: 'center',
     display: 'block',
-    margin:5,
+    margin: 5,
   },
   rightButton: {
     display: 'flex',
@@ -122,40 +121,40 @@ const styles = () => ({
   },
   sketchArea: {
     paddingTop: 30,
-    paddingRight:0,
+    paddingRight: 0,
   },
-  imageTemplateArea:{
+  imageTemplateArea: {
     paddingTop: 10,
   },
-  templateItemActions:{
+  templateItemActions: {
     // height: 30,
     position: 'relative',
-    '& > #templateItemActions':{
+    '& > #templateItemActions': {
       display: 'none',
       position: 'absolute',
       right: 0,
       bottom: 0,
     },
-    '&:hover > #templateItemActions':{
+    '&:hover > #templateItemActions': {
       display: 'inline-block',
     },
-    '& > div > div > input:not([disabled])':{
+    '& > div > div > input:not([disabled])': {
       width: 'calc(100% - 44px)',
     },
-    '&:hover > span#readOnlyDescription':{
+    '&:hover > span#readOnlyDescription': {
       paddingRight: 66,
     },
-    '& > span#readOnlyDescription':{
+    '& > span#readOnlyDescription': {
       textOverflow: 'ellipsis',
       overflow: 'hidden',
       whiteSpace: 'nowrap',
       display: 'block',
       textAlign: 'left',
       borderBottom: '1px solid gray',
-      padding:'1.5px 0'
+      padding: '1.5px 0',
     },
   },
-  templateItemEditActions:{
+  templateItemEditActions: {
     position: 'absolute',
     right: 0,
     bottom: 0,
@@ -178,9 +177,15 @@ class ScribbleTemplateItem extends React.Component {
   }
   render() {
     const { isEdit, item, description } = this.state
-    const { setTemplate, upsertTemplate, classes, onEditingTemplate, isTemplateEditing } = this.props
+    const {
+      setTemplate,
+      upsertTemplate,
+      classes,
+      onEditingTemplate,
+      isTemplateEditing,
+    } = this.props
     return (
-      <div style={{paddingBottom:5}}>
+      <div style={{ paddingBottom: 5 }}>
         <div>
           <img
             style={{ height: 140, border: '1px solid gray' }}
@@ -188,7 +193,7 @@ class ScribbleTemplateItem extends React.Component {
           />
         </div>
         <div className={classes.templateItemActions}>
-          {isEdit ? 
+          {isEdit ? (
             <TextField
               ref={this.inputRef}
               disabled={!isEdit}
@@ -204,11 +209,12 @@ class ScribbleTemplateItem extends React.Component {
               onChange={e => {
                 this.setState({ description: e.target.value })
               }}
-            /> :
+            />
+          ) : (
             <Tooltip title={item.description}>
               <span id='readOnlyDescription'>{item.description}</span>
             </Tooltip>
-          }
+          )}
           {isEdit ? (
             <span className={classes.templateItemEditActions}>
               <Tooltip title='Restore'>
@@ -229,8 +235,7 @@ class ScribbleTemplateItem extends React.Component {
                 <Button
                   {...this.buttonProps}
                   onClick={() => {
-                    if(!description || !description.trim())
-                      return
+                    if (!description || !description.trim()) return
                     const savedItem = { ...item, description }
                     this.setState({
                       isEdit: false,
@@ -247,8 +252,8 @@ class ScribbleTemplateItem extends React.Component {
             </span>
           ) : (
             <span id='templateItemActions'>
-             <Tooltip title='Edit'>
-              <Button
+              <Tooltip title='Edit'>
+                <Button
                   {...this.buttonProps}
                   disabled={isTemplateEditing}
                   onClick={() => {
@@ -258,7 +263,7 @@ class ScribbleTemplateItem extends React.Component {
                 >
                   <EditIcon />
                 </Button>
-             </Tooltip>
+              </Tooltip>
               <Tooltip title='Apply'>
                 <Button
                   disabled={isTemplateEditing}
@@ -581,11 +586,14 @@ class Scribble extends React.Component {
       reader.readAsDataURL(accepted[0])
     }
   }
-  
+
   uploadTemplate = file => {
     let reader = new FileReader()
     reader.onloadend = () => {
-      const newItem = this.generateScribbleTemplateDto(file.name.substring(0,50), reader.result)
+      const newItem = this.generateScribbleTemplateDto(
+        file.name.substring(0, 50),
+        reader.result,
+      )
       this.upsertTemplate(newItem)
     }
     reader.readAsDataURL(file)
@@ -599,7 +607,11 @@ class Scribble extends React.Component {
       layerContent: base64,
       isUserMaintainable: true,
       isDeleted: false,
-      sortOrder: this.state.templateList.reduce((maxSortOrder,t) => Math.max(maxSortOrder,t.sortOrder||0),0) + 1,
+      sortOrder:
+        this.state.templateList.reduce(
+          (maxSortOrder, t) => Math.max(maxSortOrder, t.sortOrder || 0),
+          0,
+        ) + 1,
       effectiveStartDate: moment().formatUTC(false),
       effectiveEndDate: moment('2099-12-31').formatUTC(false),
       scribbleNoteType: this.props.scribbleNoteType,
@@ -607,11 +619,12 @@ class Scribble extends React.Component {
     return dto
   }
 
-  queryTemplateList = ()=>{
+  queryTemplateList = () => {
     const { dispatch } = this.props
     dispatch({
       type: 'scriblenotes/queryTemplateList',
       payload: {
+        pagesize: 999,
         scribbleNoteType: this.props.scribbleNoteType,
       },
     }).then(templateList => {
@@ -628,12 +641,11 @@ class Scribble extends React.Component {
       type: 'scriblenotes/upsertTemplate',
       payload: item,
     }).then(r => {
-      if (r) 
-        this.queryTemplateList()
+      if (r) this.queryTemplateList()
     })
   }
 
-  handleEditingTemplate = (mode) => {
+  handleEditingTemplate = mode => {
     this.setState({ isTemplateEditing: mode })
   }
 
@@ -652,7 +664,7 @@ class Scribble extends React.Component {
 
   _setTemplate = (layerContent, id, description) => {
     this._sketch.setTemplate(layerContent, id, description)
-    this.props.setFieldValue('subject', description.substr(0,50))
+    this.props.setFieldValue('subject', description.substr(0, 50))
   }
 
   toolDrawingHandleClickAway = () => {
@@ -1322,7 +1334,7 @@ class Scribble extends React.Component {
                     onClick={navigateDirtyCheck({
                       displayName: 'ScribbleNotePage',
                       onProceed: toggleScribbleModal,
-                      openConfirmContent: 'Discard the changes?'
+                      openConfirmContent: 'Discard the changes?',
                     })}
                   >
                     Cancel
@@ -1427,8 +1439,8 @@ class Scribble extends React.Component {
                         <div {...getRootProps()} style={styles.dropArea}>
                           <input {...getInputProps()} />
                           <p className={classes.dropArea}>
-                            Drag and drop some files here, <br/>or click to select
-                            files
+                            Drag and drop some files here, <br />
+                            or click to select files
                           </p>
                         </div>
                       </section>

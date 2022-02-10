@@ -804,8 +804,39 @@ export default ({
     })),
   ]
   const messages = {
-    total: 'Total',
-    subTotal: 'Sub Total',
+    total: (
+      <div
+        style={{
+          textAlign: 'right',
+          position: 'relative',
+          paddingRight: 192,
+        }}
+      >
+        <div>Total</div>
+        <div style={{ position: 'absolute', right: 68, top: 0 }}>
+          <NumberInput
+            value={totalWithGST}
+            text
+            currency
+            style={{ width: 90 }}
+          />
+        </div>
+      </div>
+    ),
+    subTotal: (
+      <div
+        style={{
+          textAlign: 'right',
+          position: 'relative',
+          paddingRight: 192,
+        }}
+      >
+        <div>Sub Total</div>
+        <div style={{ position: 'absolute', right: 68, top: 0 }}>
+          <NumberInput value={subTotal} text currency style={{ width: 90 }} />
+        </div>
+      </div>
+    ),
   }
 
   if (gstValue >= 0) {
@@ -814,7 +845,7 @@ export default ({
         style={{
           textAlign: 'right',
           position: 'relative',
-          marginLeft: theme.spacing(1),
+          paddingRight: 175,
         }}
       >
         <AuthorizedContext.Provider
@@ -823,10 +854,6 @@ export default ({
           <Checkbox
             simple
             label={`Inclusive GST (${numeral(gstValue).format('0.00')}%)`}
-            style={{
-              position: 'absolute',
-              marginTop: -1,
-            }}
             controlStyle={{ fontWeight: 500 }}
             checked={checkedStatusIncldGST}
             onChange={e => {
@@ -842,6 +869,9 @@ export default ({
             }}
           />
         </AuthorizedContext.Provider>
+        <div style={{ position: 'absolute', right: 68, top: 0 }}>
+          <NumberInput value={gst} text currency style={{ width: 90 }} />
+        </div>
       </div>
     )
   }
@@ -853,18 +883,17 @@ export default ({
     messages[adj.uid] = (
       <div
         style={{
+          textAlign: 'right',
           position: 'relative',
+          paddingRight: 225,
         }}
       >
         <div
           style={{
-            width: isExistPackage ? '54%' : '58%',
             overflow: 'hidden',
-            display: 'inline-block',
             textOverflow: 'ellipsis',
-            marginLeft: theme.spacing(-1),
             textAlign: 'right',
-            position: 'absolute',
+            margin: '6px 0px',
           }}
         >
           <Tooltip title={adj.adjRemark}>
@@ -876,10 +905,9 @@ export default ({
         >
           <div
             style={{
-              marginLeft: isExistPackage
-                ? theme.spacing(31.5)
-                : theme.spacing(36.5),
               position: 'absolute',
+              right: 160,
+              top: 0,
             }}
           >
             <Tooltip title='Edit Adjustment'>
@@ -914,6 +942,14 @@ export default ({
             </Tooltip>
           </div>
         </AuthorizedContext.Provider>
+        <div style={{ position: 'absolute', right: 68, top: 0 }}>
+          <NumberInput
+            value={adj.adjAmount}
+            text
+            currency
+            style={{ width: 90 }}
+          />
+        </div>
       </div>
     )
   })
@@ -1336,10 +1372,7 @@ export default ({
               },
               itemComponent: p => {
                 return (
-                  <div className={classes.summaryRow}>
-                    {messages[p.type]}
-                    {p.children}
-                  </div>
+                  <div className={classes.summaryRow}>{messages[p.type]}</div>
                 )
               },
               totalCellComponent: p => {
@@ -1367,15 +1400,7 @@ export default ({
                       }}
                     >
                       <div>
-                        <div
-                          style={{
-                            marginLeft: isExistPackage
-                              ? theme.spacing(23)
-                              : theme.spacing(28),
-                          }}
-                        >
-                          {itemSubTotal}
-                        </div>
+                        {itemSubTotal}
                         <div
                           style={{
                             marginBottom: theme.spacing(1),
@@ -1387,9 +1412,9 @@ export default ({
                         </div>
                         <div
                           style={{
-                            marginLeft: isExistPackage
-                              ? theme.spacing(15)
-                              : theme.spacing(20),
+                            textAlign: 'right',
+                            position: 'relative',
+                            paddingRight: 160,
                           }}
                         >
                           <span>
@@ -1413,17 +1438,7 @@ export default ({
                           </span>
                         </div>
                         {itemAdj}
-                        {gstValue >= 0 && (
-                          <div
-                            style={{
-                              marginLeft: isExistPackage
-                                ? theme.spacing(10)
-                                : theme.spacing(15),
-                            }}
-                          >
-                            {itemGST}
-                          </div>
-                        )}
+                        {gstValue >= 0 && itemGST}
                         <div
                           style={{
                             marginBottom: theme.spacing(1),
@@ -1433,15 +1448,7 @@ export default ({
                         >
                           <Divider />
                         </div>
-                        <div
-                          style={{
-                            marginLeft: isExistPackage
-                              ? theme.spacing(26.5)
-                              : theme.spacing(31.5),
-                          }}
-                        >
-                          {itemTotal}
-                        </div>
+                        {itemTotal}
                       </div>
                     </Table.Cell>
                   )
