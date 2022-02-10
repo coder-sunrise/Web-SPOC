@@ -295,7 +295,6 @@ const AddOrder = ({
     }
   }
   useEffect(() => {
-    console.log(224, dispense)
     const { entity } = dispense
     const { invoice } = entity || {}
     if (visitType === VISIT_TYPE.OTC && invoice)

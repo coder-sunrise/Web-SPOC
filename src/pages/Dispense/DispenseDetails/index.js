@@ -53,6 +53,7 @@ import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 import TableData from './TableData'
 import DrugLabelSelection from './DrugLabelSelection'
 import NurseActualization from './NurseActualization'
+import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 
 // variables
 import {
@@ -709,7 +710,6 @@ const DispenseDetails = ({
       finalizeInvoice()
     }
   }
-
   const onChangeSelectAll = value => {
     let newItems = [...dispenseItems]
     newItems.forEach(item => {
@@ -814,26 +814,6 @@ const DispenseDetails = ({
               </Button>
             </Popper>
           </div>
-          {/* <Button
-            color='primary'
-            size='sm'
-            onClick={onDrugLabelClick}
-            disabled={sendingJob}
-          >
-            {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
-            Drug Label
-          </Button>
-          <Button
-            color='primary'
-            size='sm'
-            onClick={() => {
-              onPrint({ type: CONSTANTS.PATIENT_LABEL })
-            }}
-            disabled={sendingJob}
-          >
-            {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
-            Patient Label
-          </Button> */}
           {orderCreateTime && (
             <span style={{ color: '#999999' }}>
               Order created by
@@ -1099,6 +1079,12 @@ const DispenseDetails = ({
               id: 'reception.queue.visitRegistration.visitRemarks',
             })}
           />
+          <VisitOrderTemplateIndicateString
+            visitOrderTemplateDetails={
+              dispense?.entity?.visitOrderTemplateDetails ||
+              values?.visitOrderTemplateDetails
+            }
+          ></VisitOrderTemplateIndicateString>
         </GridItem>
         {!viewOnly && (
           <GridItem xs={5} md={5}>
@@ -1225,7 +1211,7 @@ const DispenseDetails = ({
                 onFinalizeClick(true, voidReason)
               }}
             >
-              void
+              Void
             </Button>
             <Button
               color='primary'
@@ -1234,7 +1220,7 @@ const DispenseDetails = ({
                 onFinalizeClick()
               }}
             >
-              skip
+              Skip
             </Button>
           </GridContainer>
         </div>

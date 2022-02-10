@@ -6,6 +6,7 @@ import { FastField, Field } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Search from '@material-ui/icons/Search'
+import PersonAdd from '@material-ui/icons/PersonAdd'
 // custom component
 import {
   Button,
@@ -118,7 +119,8 @@ const PatientInfoInput = ({
                     disabled={disabled}
                     onClick={onCreatePatientClick}
                   >
-                    Create Patient
+                    <PersonAdd />
+                    New Patient
                   </Button>
                 </Authorized>
               )}
