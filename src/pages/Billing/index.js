@@ -814,10 +814,12 @@ class Billing extends Component {
         CopayerId: copayerID,
         InvoicePayerid: invoicePayerid,
         printIndex: index,
+        printType: invoiceReportType,
       }
     } else {
       parametrPaload = {
         InvoiceId: values.invoice ? values.invoice.id : '',
+        printType: invoiceReportType,
       }
     }
     if (modifiedOrNewAddedPayer.length > 0) {
@@ -851,6 +853,7 @@ class Billing extends Component {
                 parametrPaload = {
                   ...parametrPaload,
                   InvoicePayerid: entity.invoicePayer[currentPrintIndex].id,
+                  printType: invoiceReportType,
                 }
               }
 
@@ -1078,6 +1081,16 @@ class Billing extends Component {
     })
   }
 
+  updateInvoiceSignature = signature => {
+    const { dispatch, values, patient, setFieldValue } = this.props
+    const { thumbnail } = signature
+    setFieldValue('invoice', {
+      ...values.invoice,
+      signatureName: patient.name,
+      signature: thumbnail,
+    })
+  }
+
   render() {
     const {
       showReport,
@@ -1154,13 +1167,21 @@ class Billing extends Component {
       isEnableVisitationInvoiceReport = false,
       autoPrintOnCompletePayment = false,
     } = clinicSettings
-    let src
+    let packageDrawdownSignatureSrc
     if (
       values.packageRedeemAcknowledge &&
       values.packageRedeemAcknowledge.signature !== '' &&
       values.packageRedeemAcknowledge.signature !== undefined
     ) {
-      src = `${base64Prefix}${values.packageRedeemAcknowledge.signature}`
+      packageDrawdownSignatureSrc = `${base64Prefix}${values.packageRedeemAcknowledge.signature}`
+    }
+    let invoiceSignatureSrc
+    if (
+      values?.invoice?.signature &&
+      values?.invoice?.signature !== '' &&
+      values?.invoice?.signature !== undefined
+    ) {
+      invoiceSignatureSrc = `${base64Prefix}${values?.invoice?.signature}`
     }
 
     return (
@@ -1334,7 +1355,10 @@ class Billing extends Component {
                 {isEnablePackage && this.state.isConsumedPackage && (
                   <Button
                     color={
-                      src !== '' && src !== undefined ? 'success' : 'danger'
+                      packageDrawdownSignatureSrc !== '' &&
+                      packageDrawdownSignatureSrc !== undefined
+                        ? 'success'
+                        : 'danger'
                     }
                     onClick={() => {
                       this.setState({
@@ -1347,7 +1371,25 @@ class Billing extends Component {
                   </Button>
                 )}
                 <Button
+                  size='sm'
+                  color={
+                    invoiceSignatureSrc !== '' &&
+                    invoiceSignatureSrc !== undefined
+                      ? 'success'
+                      : 'danger'
+                  }
+                  onClick={() => {
+                    this.setState({
+                      isShowInvoiceSignature: true,
+                    })
+                  }}
+                  disabled={this.state.isEditing || values.id === undefined}
+                >
+                  Patient Signature
+                </Button>
+                <Button
                   color='info'
+                  size='sm'
                   onClick={this.backToDispense}
                   disabled={
                     this.state.isEditing ||
@@ -1364,6 +1406,7 @@ class Billing extends Component {
                 </Button>
                 <Button
                   color='primary'
+                  size='sm'
                   onClick={this.handleSaveBillingClick}
                   disabled={
                     this.state.isEditing ||
@@ -1376,6 +1419,7 @@ class Billing extends Component {
                 </Button>
                 <Button
                   color='success'
+                  size='sm'
                   disabled={
                     this.state.isEditing ||
                     values.id === undefined ||
@@ -1458,8 +1502,27 @@ class Billing extends Component {
           <Signature
             signatureName={patient.name}
             updateSignature={this.updateSignature}
-            image={src}
-            isEditable={src === '' || src === undefined}
+            image={packageDrawdownSignatureSrc}
+            isEditable={
+              packageDrawdownSignatureSrc === '' ||
+              packageDrawdownSignatureSrc === undefined
+            }
+            signatureNameLabel='Patient Name'
+          />
+        </CommonModal>
+        <CommonModal
+          open={this.state.isShowInvoiceSignature}
+          title='Patient Signature'
+          onClose={() => {
+            this.setState({
+              isShowInvoiceSignature: false,
+            })
+          }}
+        >
+          <Signature
+            signatureName={patient.name}
+            updateSignature={this.updateInvoiceSignature}
+            image={invoiceSignatureSrc} 
             signatureNameLabel='Patient Name'
           />
         </CommonModal>
