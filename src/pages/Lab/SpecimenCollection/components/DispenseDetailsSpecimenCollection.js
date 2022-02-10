@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'umi'
 import _, { curry } from 'lodash'
-import { Space } from 'antd'
+import { Space, Typography } from 'antd'
 import PropTypes from 'prop-types'
 import TableData from '@/pages/Dispense/DispenseDetails/TableData'
 import Authorized from '@/utils/Authorized'
@@ -21,19 +21,26 @@ import {
   notification,
   Icon,
   Tooltip,
+  dateFormatLongWithTimeNoSec,
 } from '@/components'
 import Print from '@material-ui/icons/Print'
 import { TestPanelColumn } from '../../Worklist/components/TestPanelColumn'
 import CollectSpecimen from './CollectSpecimen'
 import { useCodeTable } from '@/utils/hooks'
+import { DiscardSpecimen } from '../../Worklist/components'
 
 const DispenseDetailsSpecimenCollection = ({ visitId, ...restProps }) => {
   const dispatch = useDispatch()
   const [labSpecimens, setLabSpecimens] = useState([])
+  const [newLabWorkitems, setNewLabWorkitems] = useState([])
   const [collectSpecimenPara, setCollectSpecimenPara] = useState({
     open: false,
     id: undefined,
     mode: 'new',
+  })
+  const [discardSpecimenPara, setDiscardSpecimenPara] = useState({
+    open: false,
+    id: undefined,
   })
   const cttestpanel = useCodeTable('cttestpanel')
   const ctspecimentype = useCodeTable('ctspecimentype')
@@ -52,7 +59,7 @@ const DispenseDetailsSpecimenCollection = ({ visitId, ...restProps }) => {
       name: 'testPanels',
     },
     {
-      title: 'Accession No',
+      title: 'Accession No.',
       name: 'accessionNo',
     },
     { name: 'action', title: 'Action' },
@@ -71,26 +78,46 @@ const DispenseDetailsSpecimenCollection = ({ visitId, ...restProps }) => {
     },
     {
       columnName: 'accessionNo',
-      width: 150,
+      width: 110,
       render: row => {
-        return row.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW ? (
-          <Link
-            component='button'
-            style={{ marginLeft: 10 }}
-            onClick={() => {
-              setCollectSpecimenPara({
-                visitId,
-                labSpecimenId: row.labSpecimenFK,
-                open: true,
-                mode: 'edit',
-              })
-            }}
-          >
-            {row.accessionNo}
-          </Link>
-        ) : (
-          row.accessionNo
-        )
+        if (row.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW) {
+          return (
+            <Link
+              component='button'
+              onClick={() => {
+                setCollectSpecimenPara({
+                  visitId,
+                  labSpecimenId: row.labSpecimenFK,
+                  open: true,
+                  mode: 'edit',
+                })
+              }}
+            >
+              {row.accessionNo}
+            </Link>
+          )
+        }
+
+        if (row.specimenStatusFK === LAB_SPECIMEN_STATUS.DISCARDED) {
+          return (
+            <Tooltip
+              useTooltip2
+              title={
+                <div>
+                  <div>
+                    Discarded by {row.lastUpdatedClinicianName} at{' '}
+                    {row.lastUpdatedDate?.format(dateFormatLongWithTimeNoSec)}
+                  </div>
+                  <div>Reason: {row.specimenDiscardReason}</div>
+                </div>
+              }
+            >
+              <div>
+                <Typography.Text delete>{row.accessionNo}</Typography.Text>
+              </div>
+            </Tooltip>
+          )
+        }
       },
     },
     {
@@ -118,34 +145,34 @@ const DispenseDetailsSpecimenCollection = ({ visitId, ...restProps }) => {
                 </Button>
               </Tooltip>
             )}
-          <Button
-            color='primary'
-            onClick={() => {}}
-            size='sm'
-            justIcon
-            style={{ height: 25, marginTop: 2 }}
-          >
-            <Print />
-          </Button>
-          {row.dateReceived &&
-            row.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW && (
-              <Tooltip title='Discard Specimen'>
-                <Button
-                  onClick={() => {
-                    // setCurrentModal({
-                    //   modal: MODALS.DISCARD_SPECIMEN,
-                    //   para: row.labSpecimenFK,
-                    // })
-                    // setIsAnyWorklistModelOpened(true)
-                  }}
-                  justIcon
-                  color='danger'
-                  size='sm'
-                >
-                  <Icon type='flask-empty' />
-                </Button>
-              </Tooltip>
-            )}
+          {row.specimenStatusFK !== LAB_SPECIMEN_STATUS.DISCARDED && (
+            <Button
+              color='primary'
+              onClick={() => {}}
+              size='sm'
+              justIcon
+              style={{ height: 25, marginTop: 2 }}
+            >
+              <Print />
+            </Button>
+          )}
+          {row.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW && (
+            <Tooltip title='Discard Specimen'>
+              <Button
+                onClick={() => {
+                  setDiscardSpecimenPara({
+                    open: true,
+                    id: row.labSpecimenFK,
+                  })
+                }}
+                justIcon
+                color='danger'
+                size='sm'
+              >
+                <Icon type='flask-empty' />
+              </Button>
+            </Tooltip>
+          )}
         </Space>
       ),
     },
@@ -157,6 +184,11 @@ const DispenseDetailsSpecimenCollection = ({ visitId, ...restProps }) => {
       payload: { id: visitId },
     }).then(result => {
       if (result) {
+        setNewLabWorkitems(
+          result.labWorkitems.filter(
+            lw => lw.statusFK === LAB_WORKITEM_STATUS.NEW,
+          ),
+        )
         setLabSpecimens(groupWorkitemsBySpecimens(result.specimenLabWorkitems))
       }
     })
@@ -178,6 +210,14 @@ const DispenseDetailsSpecimenCollection = ({ visitId, ...restProps }) => {
       visitId: undefined,
       labSpecimenId: undefined,
       mode: 'new',
+    })
+    getVisitSpecimenCollection()
+  }
+
+  const closeDiscardSpecimen = () => {
+    setDiscardSpecimenPara({
+      open: false,
+      id: undefined,
     })
     getVisitSpecimenCollection()
   }
@@ -235,20 +275,22 @@ const DispenseDetailsSpecimenCollection = ({ visitId, ...restProps }) => {
         colExtensions={columnExtensions}
         data={labSpecimens}
       />
-      <Link
-        component='button'
-        style={{ marginLeft: 10, textDecoration: 'underline' }}
-        onClick={() => {
-          setCollectSpecimenPara({
-            open: true,
-            visitId,
-            labSpecimenId: undefined,
-            mode: 'new',
-          })
-        }}
-      >
-        Collect Specimen
-      </Link>
+      {newLabWorkitems && newLabWorkitems.length > 0 && (
+        <Link
+          component='button'
+          style={{ marginLeft: 10, textDecoration: 'underline' }}
+          onClick={() => {
+            setCollectSpecimenPara({
+              open: true,
+              visitId,
+              labSpecimenId: undefined,
+              mode: 'new',
+            })
+          }}
+        >
+          Collect Specimen
+        </Link>
+      )}
       <CollectSpecimen
         {...collectSpecimenPara}
         onConfirm={() => {
@@ -258,6 +300,15 @@ const DispenseDetailsSpecimenCollection = ({ visitId, ...restProps }) => {
           closeCollectSpecimen()
         }}
       ></CollectSpecimen>
+      <DiscardSpecimen
+        {...discardSpecimenPara}
+        onClose={() => {
+          closeDiscardSpecimen()
+        }}
+        onConfirm={() => {
+          closeDiscardSpecimen()
+        }}
+      />
     </React.Fragment>
   )
 }

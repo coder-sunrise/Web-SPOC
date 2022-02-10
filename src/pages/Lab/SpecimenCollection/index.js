@@ -393,6 +393,9 @@ const SpecimenCollection = ({
         />
       </PageContainer>
       <CollectSpecimen
+        enableReceiveSpecimen
+        mode='new'
+        open={visitId != undefined && visitId != null}
         visitId={visitId}
         onConfirm={() => {
           setVisitId(undefined)

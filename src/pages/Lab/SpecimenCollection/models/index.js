@@ -1,3 +1,4 @@
+import { notification } from '@/components'
 import { createListViewModel } from 'medisys-model'
 import service from '../services'
 import { getUserPreference, saveUserPreference } from '@/services/user'
@@ -58,9 +59,13 @@ export default createListViewModel({
       },
       *upsert({ payload }, { call, put }) {
         const r = yield call(service.upsert, payload)
+        if (r && !payload.id) {
+          notification.success({ message: 'Lab specimen added.' })
+          return true
+        }
 
-        if (r && r.status === '200') {
-          notification.success({ message: 'Saved' })
+        if (payload.id && r && r === 204) {
+          notification.success({ message: 'Lab specimen edited.' })
           return true
         }
         return r

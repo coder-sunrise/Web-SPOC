@@ -22,11 +22,7 @@ import PackageDrawdownInfo from '@/pages/Widgets/Orders/Detail/PackageDrawdownIn
 import { InventoryTypes } from '@/utils/codes'
 import CONSTANTS from './DispenseDetails/constants'
 import Cross from '@material-ui/icons/HighlightOff'
-import {
-  UnorderedListOutlined,
-  CheckOutlined,
-  FileTextOutlined,
-} from '@ant-design/icons'
+import { UnorderedListOutlined, CheckOutlined } from '@ant-design/icons'
 import {
   NURSE_WORKITEM_STATUS,
   RADIOLOGY_WORKITEM_STATUS,
@@ -198,7 +194,7 @@ const radiologyDetailsButton = (row, buttonClickCallback) => {
           justIcon
           onClick={() => buttonClickCallback(radiologyWorkitemID)}
         >
-          <FileTextOutlined />
+          <UnorderedListOutlined />
         </Button>
       </Tooltip>
     )

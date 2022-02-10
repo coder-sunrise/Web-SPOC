@@ -142,7 +142,7 @@ export default ({
         return
       }
     }
-    //TODO::Check for changes to make for Lab
+
     if (row.isPreOrderActualize) return
     if (
       !row.isActive &&
@@ -1013,6 +1013,7 @@ export default ({
                     item => item.statusFK !== LAB_WORKITEM_STATUS.NEW,
                   ).length > 0
                 ) {
+                  editEnable = false
                   deleteEnable = false
                   deleteMessage =
                     'Specimen Collected. No modification is allowed on processed order'
@@ -1131,11 +1132,11 @@ export default ({
               radiologyWorkitem = {
                 statusFK: RADIOLOGY_WORKITEM_STATUS.NEW,
               },
+              labWorkitems = [],
             } = workitem
             let editEnable = true
             if (!row.isPreOrder) {
               if (row.type === ORDER_TYPES.RADIOLOGY) {
-                //TODO::Win-Check the same logic for Lab once status are defined.
                 if (
                   radiologyWorkitem.statusFK !== RADIOLOGY_WORKITEM_STATUS.NEW
                 ) {
@@ -1145,6 +1146,13 @@ export default ({
                 nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
               ) {
                 editEnable = false
+              } else if (row.type === ORDER_TYPES.LAB) {
+                if (
+                  labWorkitems.filter(
+                    item => item.statusFK !== LAB_WORKITEM_STATUS.NEW,
+                  ).length > 0
+                )
+                  editEnable = false
               }
             }
             return (
