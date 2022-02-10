@@ -524,7 +524,7 @@ class ImagePreviewer extends Component {
 
                   {isEnableDeleteDocument && (
                     <Popconfirm
-                      title='Permanently delete this file in all folders?'
+                      title='Permanently delete this document in all tags?'
                       onConfirm={() => {
                         this.deleteImage(selectedImage)
                       }}
