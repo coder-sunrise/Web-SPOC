@@ -6,7 +6,6 @@ import { Popover } from 'antd'
 const VisitOrderTemplateIndicateString = props => {
   const { visitOrderTemplateDetails } = props
   let indicate = props.indicate
-  console.log(props)
   if (visitOrderTemplateDetails) {
     const removedItemIndex = visitOrderTemplateDetails.indexOf(' - (')
     const addedItemIndex = visitOrderTemplateDetails.indexOf(' + (')
