@@ -1682,7 +1682,7 @@ export default ({
           },
           {
             columnName: 'actions',
-          width: 70,
+            width: 70,
             align: 'center',
             sortingEnabled: false,
             render: row => {
@@ -1715,33 +1715,34 @@ export default ({
                   ) {
                     editEnable = false
                   }
-              } else if (row.type === ORDER_TYPES.LAB) {
-                if (
-                  labWorkitems.filter(
-                    item => item.statusFK !== LAB_WORKITEM_STATUS.NEW,
-                  ).length > 0
-                ) {
-                  editEnable = false
-                  deleteEnable = false
-                  deleteMessage =
-                    'Specimen Collected. No modification is allowed on processed order'
-                }
-              } else {
-                if (
-                  nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
-                ) {
-                  const lastNuseActualize = _.orderBy(
-                    nuseActualize,
-                    ['actulizeDate'],
-                    ['desc'],
-                  )[0]
-                  if (editEnable) {
+                } else if (row.type === ORDER_TYPES.LAB) {
+                  if (
+                    labWorkitems.filter(
+                      item => item.statusFK !== LAB_WORKITEM_STATUS.NEW,
+                    ).length > 0
+                  ) {
                     editEnable = false
-                    editMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
-                  }
-                  if (deleteEnable) {
                     deleteEnable = false
-                    deleteMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
+                    deleteMessage =
+                      'Specimen Collected. No modification is allowed on processed order'
+                  }
+                } else {
+                  if (
+                    nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
+                  ) {
+                    const lastNuseActualize = _.orderBy(
+                      nuseActualize,
+                      ['actulizeDate'],
+                      ['desc'],
+                    )[0]
+                    if (editEnable) {
+                      editEnable = false
+                      editMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
+                    }
+                    if (deleteEnable) {
+                      deleteEnable = false
+                      deleteMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
+                    }
                   }
                 }
               }
@@ -1788,11 +1789,12 @@ export default ({
 
                           if (row.isPackage === true) {
                             dispatch({
-                              type: 'orders/deleteRow',
+                              type: 'orders/deletePackageItem',
                               payload: {
-                                uid: row.uid,
+                                packageGlobalId: row.packageGlobalId,
                               },
                             })
+                          }
 
                           dispatch({
                             type: 'orders/updateState',
@@ -1800,14 +1802,6 @@ export default ({
                               entity: undefined,
                             },
                           })
-                          // let commitCount = 1000 // uniqueNumber
-                          // dispatch({
-                          //   // force current edit row components to update
-                          //   type: 'global/updateState',
-                          //   payload: {
-                          //     commitCount: (commitCount += 1),
-                          //   },
-                          // })
                         }}
                         icon={<DeleteFilled />}
                       ></Button>
