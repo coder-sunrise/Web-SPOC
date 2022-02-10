@@ -37,7 +37,15 @@ const resourceCapacitySchema = Yup.object().shape({
         return Yup.string().required('Time to should be more than time from.')
     },
   ),
+  startTimeRange: Yup.string().when('startTime', {
+    is: val => val < '07:00' || val > '22:00',
+    then: Yup.string().required('Value must be from 07:00 to 22:00'),
+  }),
   startTime: Yup.string().required(),
+  endTimeRange: Yup.string().when('endTime', {
+    is: val => val < '07:00' || val > '22:00',
+    then: Yup.string().required('Value must be from 07:00 to 22:00'),
+  }),
   endTime: Yup.string().required(),
   maxCapacity: Yup.number()
     .required()
@@ -318,8 +326,14 @@ class Detail extends PureComponent {
                     const startError = (row._errors || []).find(
                       se => se.path === 'startTime',
                     )
+                    const startRangeError = (row._errors || []).find(
+                      se => se.path === 'startTimeRange',
+                    )
                     const endError = (row._errors || []).find(
                       se => se.path === 'endTime',
+                    )
+                    const endRangeError = (row._errors || []).find(
+                      se => se.path === 'endTimeRange',
                     )
                     const moreThanError = (row._errors || []).find(
                       se => se.path === 'capacityTime',
@@ -363,8 +377,12 @@ class Detail extends PureComponent {
                                 top: 10,
                               }}
                             >
-                              {startError && (
-                                <Tooltip title={startError.message}>
+                              {(startError || startRangeError) && (
+                                <Tooltip
+                                  title={
+                                    (startError || startRangeError).message
+                                  }
+                                >
                                   <Warning color='error' />
                                 </Tooltip>
                               )}
@@ -409,9 +427,12 @@ class Detail extends PureComponent {
                                 top: 10,
                               }}
                             >
-                              {(endError || moreThanError) && (
+                              {(endError || endRangeError || moreThanError) && (
                                 <Tooltip
-                                  title={(endError || moreThanError).message}
+                                  title={
+                                    (endError || endRangeError || moreThanError)
+                                      .message
+                                  }
                                 >
                                   <Warning color='error' />
                                 </Tooltip>

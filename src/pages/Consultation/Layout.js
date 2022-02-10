@@ -70,7 +70,12 @@ class Layout extends PureComponent {
     this.ordersRef = React.createRef()
     this.myRefs = []
 
-    const { userDefaultLayout, clinicInfo, consultation } = props
+    const {
+      userDefaultLayout,
+      clinicInfo,
+      consultation,
+      visitRegistration,
+    } = props
 
     let { defaultConsultationTemplate = '[]' } = clinicInfo
     if (!defaultConsultationTemplate || defaultConsultationTemplate === '[]') {
@@ -462,21 +467,21 @@ class Layout extends PureComponent {
     return ((this.props.height || window.innerHeight) - topHeight) / 6
   }
 
-  onAnchorClick = (id) => {
+  onAnchorClick = id => {
     const parentElement = document.getElementById('main-page')
     const element = document.getElementById(id)
     try {
       if (parentElement && element) {
         const screenPosition = element.getBoundingClientRect()
         const { scrollTop } = parentElement
-        const { top, left } = screenPosition 
+        const { top, left } = screenPosition
         parentElement.scrollTo({
           // scrolled top position + element top position - Nav header height and Patient Banner height
           top:
             scrollTop +
             top -
             (document.getElementById('patientBanner').offsetHeight + 108),
-          left, 
+          left,
         })
       }
     } catch (error) {
@@ -515,14 +520,17 @@ class Layout extends PureComponent {
       height,
       rights,
       clinicInfo,
+      visitRegistration,
       onSaveLayout = f => f,
       onSaveFavouriteDiagnosisLanguage = s => s,
     } = restProps
     const widgetProps = {
       status: 'consultation',
       rights,
+      visitRegistration,
     }
 
+    console.log(visitRegistration,222)
     const {
       isEnableJapaneseICD10Diagnosis,
       diagnosisDataSource,
@@ -614,21 +622,18 @@ class Layout extends PureComponent {
 
                   const onClick = () => this.onAnchorClick(w.id)
                   return (
-                    <Button size='sm' color='primary' onClick={onClick}>
+                    <Button
+                      size='sm'
+                      color='primary'
+                      onClick={onClick}
+                      style={{ marginTop: 2, marginBottom: 2 }}
+                    >
                       {w.name}
                     </Button>
                   )
                 })}
               </GridItem>
               <GridItem md={3} style={{ textAlign: 'right' }}>
-                <Button
-                  size='sm'
-                  color='info'
-                  onClick={this.toggleLabTrackingDrawer}
-                >
-                  <Accessibility />
-                  Results
-                </Button>
                 <Button size='sm' color='info' onClick={this.toggleDrawer}>
                   <Settings />
                   Widgets

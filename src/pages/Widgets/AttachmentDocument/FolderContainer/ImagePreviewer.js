@@ -9,11 +9,12 @@ import {
   GridContainer,
   GridItem,
   Select,
-  Button,
   TextField,
   dateFormatLong,
   Popconfirm,
 } from '@/components'
+import { Button } from 'antd'
+import { PrinterFilled, DeleteFilled, SaveFilled } from '@ant-design/icons'
 import { LoadingWrapper, ZImage } from 'medisys-components'
 import printJS from 'print-js'
 // import 'react-responsive-carousel/lib/styles/carousel.min.css'
@@ -412,7 +413,7 @@ class ImagePreviewer extends Component {
           </GridItem>
           <GridItem md={12}>
             <TextField
-              label='File Name'
+              label='Document Name'
               value={selectedImage.fileName}
               maxLength={50}
               onChange={e => {
@@ -425,7 +426,7 @@ class ImagePreviewer extends Component {
           </GridItem>
           <GridItem md={12} style={{ marginTop: 10 }}>
             <div>
-              <span style={{ marginRight: 10 }}>Folder as:</span>
+              <span style={{ marginRight: 10 }}>Tag as:</span>
               {!readOnly && isEnableEditDocument && (
                 <SetFolderWithPopover
                   key={selectedImage.id}
@@ -446,6 +447,7 @@ class ImagePreviewer extends Component {
                     }
                   }}
                   onAddNewFolders={onAddNewFolders}
+                  type={this.props.type}
                 />
               )}
             </div>
@@ -485,7 +487,8 @@ class ImagePreviewer extends Component {
           <GridItem md={12}>
             <div>
               <Button
-                color='primary'
+                size='small'
+                type='primary'
                 onClick={() => {
                   printJS({
                     printable: selectedImage.image.src,
@@ -494,14 +497,17 @@ class ImagePreviewer extends Component {
                     header: '',
                   })
                 }}
+                icon={<PrinterFilled />}
+                style={{ marginRight: 8 }}
               >
-                <Print /> Print
+                Print
               </Button>
               {!readOnly && (
                 <React.Fragment>
                   {isEnableEditDocument && (
                     <Button
-                      color='primary'
+                      size='small'
+                      type='primary'
                       disabled={
                         selectedImage.fileName === undefined ||
                         selectedImage.fileName.trim() === ''
@@ -509,8 +515,10 @@ class ImagePreviewer extends Component {
                       onClick={() => {
                         onFileUpdated(selectedImage)
                       }}
+                      icon={<SaveFilled />}
+                      style={{ marginRight: 8 }}
                     >
-                      <Save /> Save
+                      Save
                     </Button>
                   )}
 
@@ -521,8 +529,12 @@ class ImagePreviewer extends Component {
                         this.deleteImage(selectedImage)
                       }}
                     >
-                      <Button color='danger'>
-                        <Delete /> Delete
+                      <Button
+                        type='danger'
+                        size='small'
+                        icon={<DeleteFilled />}
+                      >
+                        Delete
                       </Button>
                     </Popconfirm>
                   )}

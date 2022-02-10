@@ -1,6 +1,8 @@
-import { PageContainer, Icon } from '@/components'
-import { ProTable, Select, Input, Button } from '@medisys/component'
+import { PageContainer, Button } from '@/components'
+import { ProTable, Select, Input } from '@medisys/component'
 import patientService from '@/services/patient'
+import PersonAdd from '@material-ui/icons/PersonAdd'
+import PersonSharp from '@material-ui/icons/PersonSharp'
 import { connect, history } from 'umi'
 import { formatMessage } from 'umi'
 import { getAppendUrl } from '@/utils/utils'
@@ -261,9 +263,8 @@ const PatientIndex = ({
           )
             return [
               <Button
-                type='primary'
-                icon={<Icon type='adduser' />}
                 color='primary'
+                size='sm'
                 disabled={createPatProfileAccessRight.rights == 'disable'}
                 onClick={() => {
                   dispatch({
@@ -278,6 +279,7 @@ const PatientIndex = ({
                   })
                 }}
               >
+                <PersonAdd />
                 New Patient
               </Button>,
             ]
@@ -294,9 +296,12 @@ const PatientIndex = ({
                   onClick={() => {
                     showPatient(row)
                   }}
-                  type='primary'
-                  icon={<Icon type='user' />}
-                />
+                  color='primary'
+                  size='sm'
+                  justIcon
+                >
+                  <PersonSharp />
+                </Button>
               )
             },
           },

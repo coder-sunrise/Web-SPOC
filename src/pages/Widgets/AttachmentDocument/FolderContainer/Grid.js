@@ -11,15 +11,19 @@ import {
 import {
   CommonTableGrid,
   EditableTableGrid,
-  Button,
   Tooltip,
   Popconfirm,
   DatePicker,
   IconButton,
 } from '@/components'
+import { Button, Tag } from 'antd'
+import {
+  EditOutlined,
+  CloudDownloadOutlined,
+  DeleteFilled,
+} from '@ant-design/icons'
 import _ from 'lodash'
 import { NavLink } from 'react-router-dom'
-import { Chip } from '@material-ui/core'
 
 import { downloadAttachment } from '@/services/file'
 import SetFolderWithPopover from './SetFolderWithPopover'
@@ -52,28 +56,42 @@ class Grid extends PureComponent {
       modelName,
       isEnableEditDocument = true,
       isEnableDeleteDocument = true,
+      filterDocumentValue = '',
     } = this.props
 
     return (
       <CommonTableGrid
         style={{ margin: '0px 1px 0px 0px' }}
         forceRender
-        rows={attachmentList
-          .filter(
+        rows={_.orderBy(
+          attachmentList.filter(
             f =>
-              selectedFolderFK === -99 ||
-              f.folderFKs.includes(selectedFolderFK),
-          )
-          .map(a => {
-            return { ...a, folderList: _.sortBy(folderList, 'sortOrder') }
-          })}
+              (f.fileName || '')
+                .toUpperCase()
+                .indexOf(filterDocumentValue.toUpperCase()) >= 0 &&
+              (selectedFolderFK === -99 ||
+                f.folderFKs.includes(selectedFolderFK)),
+          ),
+          [data => (data.fileName || '').toLowerCase()],
+          ['asc'],
+        ).map(a => {
+          return { ...a, folderList: _.sortBy(folderList, 'sortOrder') }
+        })}
         FuncProps={{
-          pager: false,
+          pager: true,
         }}
         columns={[
-          { name: 'fileName', title: 'Document' },
-          { name: 'folderFKs', title: 'Folders' },
-          { name: 'createByUserName', title: 'Created By' },
+          {
+            name: 'fileName',
+            title: 'Document Name',
+            sortBy: data => (data.fileName || '').toLowerCase(),
+          },
+          { name: 'folderFKs', title: 'Tags' },
+          {
+            name: 'createByUserName',
+            title: 'Created By',
+            sortBy: data => (data.createByUserName || '').toLowerCase(),
+          },
           { name: 'createDate', title: 'Created Date' },
           { name: 'action', title: 'Action' },
         ]}
@@ -116,7 +134,7 @@ class Grid extends PureComponent {
                           onEditFileName(row)
                         }}
                       >
-                        <BorderColor />
+                        <EditOutlined />
                       </IconButton>
                     </div>
                   )}
@@ -130,21 +148,52 @@ class Grid extends PureComponent {
             sortingEnabled: false,
             render: row => {
               return (
-                <div style={{ whiteSpace: 'pre-wrap' }}>
-                  {row.folderList
-                    .filter(f => row.folderFKs.includes(f.id))
-                    .map(item => (
-                      <Chip
-                        style={{
-                          margin: '0px 0px 5px 5px',
+                <div style={{ marginRight: 20 }}>
+                  <div style={{ whiteSpace: 'pre-wrap', float: 'left' }}>
+                    {row.folderList
+                      .filter(f => row.folderFKs.includes(f.id))
+                      .map(item => (
+                        <Tag
+                          style={{
+                            margin: '2px 5px 2px 0px',
+                          }}
+                        >
+                          {item.displayValue}
+                        </Tag>
+                      ))}
+                  </div>
+                  {!readOnly && isEnableEditDocument && (
+                    <div
+                      style={{
+                        float: 'right',
+                        width: 40,
+                        marginRight: -40,
+                      }}
+                    >
+                      <SetFolderWithPopover
+                        justIcon
+                        key={row.id}
+                        folderList={row.folderList}
+                        selectedFolderFKs={row.folderFKs || []}
+                        onClose={selectedFolder => {
+                          const originalFolders = _.sortedUniq(
+                            row.folderFKs || [],
+                          )
+                          const newFolders = _.sortedUniq(selectedFolder)
+
+                          if (
+                            originalFolders.length !== newFolders.length ||
+                            originalFolders.join(',') !== newFolders.join(',')
+                          ) {
+                            row.folderFKs = newFolders
+                            onFileUpdated(row)
+                          }
                         }}
-                        key={item.id}
-                        size='small'
-                        variant='outlined'
-                        label={item.displayValue}
-                        color='primary'
+                        type={this.props.type}
+                        onAddNewFolders={onAddNewFolders}
                       />
-                    ))}
+                    </div>
+                  )}
                 </div>
               )
             },
@@ -165,45 +214,21 @@ class Grid extends PureComponent {
             columnName: 'action',
             sortingEnabled: false,
             disabled: true,
-            width: 110,
+            width: 80,
             render: row => {
               return (
                 <div>
                   <Tooltip title='Download'>
                     <Button
-                      size='sm'
+                      size='small'
                       onClick={() => {
                         this.downloadFile(row)
                       }}
-                      justIcon
-                      color='primary'
-                      style={{ marginRight: 5 }}
-                    >
-                      <Download />
-                    </Button>
+                      icon={<CloudDownloadOutlined />}
+                      type='primary'
+                      style={{ marginRight: 8 }}
+                    ></Button>
                   </Tooltip>
-                  {!readOnly && isEnableEditDocument && (
-                    <SetFolderWithPopover
-                      key={row.id}
-                      folderList={row.folderList}
-                      selectedFolderFKs={row.folderFKs || []}
-                      onClose={selectedFolder => {
-                        const originalFolders = _.sortedUniq(
-                          row.folderFKs || [],
-                        )
-                        const newFolders = _.sortedUniq(selectedFolder)
-
-                        if (
-                          originalFolders.length !== newFolders.length ||
-                          originalFolders.join(',') !== newFolders.join(',')
-                        ) {
-                          row.folderFKs = newFolders
-                          onFileUpdated(row)
-                        }
-                      }}
-                      onAddNewFolders={onAddNewFolders}
-                    />
-                  )}
                   {isEnableDeleteDocument && (
                     <Popconfirm
                       title='Permanently delete this file in all folders?'
@@ -222,13 +247,11 @@ class Grid extends PureComponent {
                     >
                       <Tooltip title='Delete'>
                         <Button
-                          size='sm'
+                          size='small'
                           disabled={readOnly}
-                          color='danger'
-                          justIcon
-                        >
-                          <Delete />
-                        </Button>
+                          type='danger'
+                          icon={<DeleteFilled />}
+                        ></Button>
                       </Tooltip>
                     </Popconfirm>
                   )}

@@ -125,6 +125,7 @@ const getVisitDoctorUserId = props => {
       packageGlobalId:
         values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
+    console.log('consumable', data)
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
@@ -285,13 +286,15 @@ class Consumable extends PureComponent {
           nextProps.global.openAdjustment) ||
         nextProps.orders.shouldPushToState
       ) {
-        nextProps.dispatch({
-          type: 'orders/updateState',
-          payload: {
-            entity: nextProps.values,
-            shouldPushToState: false,
-          },
-        })
+        if (nextProps.values.uid) {
+          nextProps.dispatch({
+            type: 'orders/updateState',
+            payload: {
+              entity: nextProps.values,
+              shouldPushToState: false,
+            },
+          })
+        }
       }
 
     const { values: nextValues } = nextProps

@@ -15,6 +15,7 @@ import {
 } from '@/components'
 // utils
 import { roundTo } from '@/utils/utils'
+import { INVOICE_REPORT_TYPES } from '@/utils/constants'
 import Payments from './Payments'
 import MenuItem from '@material-ui/core/MenuItem'
 import MenuList from '@material-ui/core/MenuList'
@@ -66,7 +67,14 @@ const InvoiceSummary = ({
   const [showAddPaymentMenu, setShowAddPaymentMenu] = useState(false)
   const [showPrintInvoiceMenu, setShowPrintInvoiceMenu] = useState(false)
 
-  const { invoicePayment, invoice, visitGroup, visitGroupStatusDetails, patientID } = values
+  const {
+    invoicePayment,
+    invoice,
+    visitGroup,
+    visitGroupStatusDetails,
+    patientID,
+    visitOrderTemplateFK,
+  } = values
   const {
     gstValue,
     gstAmount,
@@ -77,17 +85,19 @@ const InvoiceSummary = ({
   } = invoice
 
   let totalCashRound = 0
-  invoicePayment.filter((o) => !o.isCancelled).forEach((o) => {
-    totalCashRound += _.sumBy(
-      o.invoicePaymentMode || [],
-      (payment) => payment.cashRounding,
-    )
-  })
+  invoicePayment
+    .filter(o => !o.isCancelled)
+    .forEach(o => {
+      totalCashRound += _.sumBy(
+        o.invoicePaymentMode || [],
+        payment => payment.cashRounding,
+      )
+    })
 
   const handleConfirmDelete = useCallback(
     (id, toggleVisibleCallback) => {
       const payment = invoicePayment.find(
-        (item) => parseInt(item.id, 10) === parseInt(id, 10),
+        item => parseInt(item.id, 10) === parseInt(id, 10),
       )
 
       if (payment.cancelReason === '' || payment.cancelReason === undefined) {
@@ -97,32 +107,32 @@ const InvoiceSummary = ({
         handleDeletePaymentClick(id)
       }
     },
-    [
-      invoicePayment,
-    ],
+    [invoicePayment],
   )
 
-  const onCancelReasonChange = (event) => {
+  const onCancelReasonChange = event => {
     if (event.target.value !== '' || event.target.value !== undefined)
       setShowError(false)
   }
 
-  const shouldDisableGroupPayment = !visitGroupStatusDetails || _.sumBy(visitGroupStatusDetails,'outstandingBalance') <= 0 || !visitGroupStatusDetails.some(x=> x.isBillingSaved)
-  const shouldDisableIndividualPayment = outstandingBalance !== undefined && outstandingBalance <= 0
-  const shouldDisableAddPayment = disabled || (shouldDisableIndividualPayment && shouldDisableGroupPayment)
+  const shouldDisableGroupPayment =
+    !visitGroupStatusDetails ||
+    _.sumBy(visitGroupStatusDetails, 'outstandingBalance') <= 0 ||
+    !visitGroupStatusDetails.some(x => x.isBillingSaved)
+  const shouldDisableIndividualPayment =
+    outstandingBalance !== undefined && outstandingBalance <= 0
+  const shouldDisableAddPayment =
+    disabled || (shouldDisableIndividualPayment && shouldDisableGroupPayment)
 
   const handleCancelClick = useCallback(
-    (id) => {
+    id => {
       const index = invoicePayment.findIndex(
-        (item) => parseInt(item.id, 10) === parseInt(id, 10),
+        item => parseInt(item.id, 10) === parseInt(id, 10),
       )
       setFieldValue(`invoicePayment[${index}].cancelReason`, undefined)
     },
-    [
-      invoicePayment,
-    ],
+    [invoicePayment],
   )
-
   return (
     <React.Fragment>
       <GridItem md={12}>
@@ -135,7 +145,8 @@ const InvoiceSummary = ({
               <React.Fragment>
                 <GridItem md={6}>
                   <h5>
-                    {roundTo(gstValue).toFixed(2)}% GST{isGstInclusive ? ' inclusive' : ''}
+                    {roundTo(gstValue).toFixed(2)}% GST
+                    {isGstInclusive ? ' inclusive' : ''}
                   </h5>
                 </GridItem>
                 <GridItem md={6} className={classes.rightAlign}>
@@ -239,18 +250,48 @@ const InvoiceSummary = ({
                   placement='right'
                   visible={showPrintInvoiceMenu}
                   onVisibleChange={() => {
-                    if (visitGroup) {
+                    if (visitGroup || visitOrderTemplateFK) {
                       setShowPrintInvoiceMenu(!showPrintInvoiceMenu)
                     } else {
-                      handlePrintInvoiceClick()
+                      handlePrintInvoiceClick(
+                        INVOICE_REPORT_TYPES.INDIVIDUALINVOICE,
+                      )
                     }
                   }}
                   content={
-                    <MenuList role='menu' onClick={()=>setShowPrintInvoiceMenu(false)}>
-                      <MenuItem onClick={() => handlePrintInvoiceClick(true)}>
-                        Group Invoice
-                      </MenuItem>
-                      <MenuItem onClick={() => handlePrintInvoiceClick()}>
+                    <MenuList
+                      role='menu'
+                      onClick={() => setShowPrintInvoiceMenu(false)}
+                    >
+                      {visitOrderTemplateFK && (
+                        <MenuItem
+                          onClick={() =>
+                            handlePrintInvoiceClick(
+                              INVOICE_REPORT_TYPES.SUMMARYINVOICE,
+                            )
+                          }
+                        >
+                          Summary Invoice
+                        </MenuItem>
+                      )}
+                      {visitGroup && (
+                        <MenuItem
+                          onClick={() =>
+                            handlePrintInvoiceClick(
+                              INVOICE_REPORT_TYPES.GROUPINVOICE,
+                            )
+                          }
+                        >
+                          Group Invoice
+                        </MenuItem>
+                      )}
+                      <MenuItem
+                        onClick={() =>
+                          handlePrintInvoiceClick(
+                            INVOICE_REPORT_TYPES.INDIVIDUALINVOICE,
+                          )
+                        }
+                      >
                         Individual Invoice
                       </MenuItem>
                     </MenuList>
@@ -268,7 +309,7 @@ const InvoiceSummary = ({
                 </Popover>
               </span>
             </GridItem>
-            
+
             <GridItem md={5}>
               {isEnableVisitationInvoiceReport && (
                 <Button
@@ -283,7 +324,7 @@ const InvoiceSummary = ({
                 </Button>
               )}
             </GridItem>
-        
+
             <GridItem md={3} className={classes.rightAlign}>
               <Popover
                 icon={null}
@@ -298,7 +339,10 @@ const InvoiceSummary = ({
                   }
                 }}
                 content={
-                  <MenuList role='menu' onClick={()=>setShowAddPaymentMenu(false)}>
+                  <MenuList
+                    role='menu'
+                    onClick={() => setShowAddPaymentMenu(false)}
+                  >
                     <MenuItem
                       disabled={shouldDisableGroupPayment}
                       onClick={() => handleAddPaymentClick(true)}

@@ -1,52 +1,68 @@
-import React, { PureComponent, Fragment } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import { withStyles } from '@material-ui/core'
-import { CardContainer } from '@/components'
-import LabTrackingDetails from '@/pages/Widgets/LabTrackingDetails'
-import { PATIENT_LAB } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
+import { withStyles } from '@material-ui/core/styles'
+import { Tooltip, Button, CommonModal, Tabs } from '@/components'
+import BasicData from './BasicData'
+import Examinations from './Examinations'
+import ExternalTracking from './ExternalTracking'
+import LabResults from './LabResults'
 
-const styles = () => ({
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    height: 'calc(100vh - 80px)',
-  },
-})
+const patientResultTabs = props => {
+  const viewExaminationsRight = Authorized.check(
+    'patientdatabase.patientprofiledetails.patientresults.viewexaminations',
+  ) || { rights: 'hidden' }
+  const viewBasiceDataRight = Authorized.check(
+    'patientdatabase.patientprofiledetails.patientresults.viewbasicdata',
+  ) || { rights: 'hidden' }
+  const viewLabResultsRight = Authorized.check(
+    'patientdatabase.patientprofiledetails.patientresults.viewlabresults',
+  ) || { rights: 'hidden' }
+  const viewExternalTrackingRight = Authorized.check(
+    'patientdatabase.patientprofiledetails.patientresults.viewexternaltracking',
+  ) || { rights: 'hidden' }
 
-class Results extends PureComponent {
-  componentDidMount () {
-    this.resize()
-    window.addEventListener('resize', this.resize.bind(this))
+  let options = []
+  if (viewExaminationsRight.rights === 'enable') {
+    options.push({
+      name: <span>Examinations</span>,
+      content: <Examinations {...props} />,
+    })
   }
-
-  componentWillUnmount () {
-    window.removeEventListener('resize', this.resize.bind(this))
+  if (viewBasiceDataRight.rights === 'enable') {
+    options.push({
+      name: <span>Basice Data</span>,
+      content: <BasicData {...props} />,
+    })
   }
-
-  resize () {
-    if (this.divElement) {
-      const height = this.divElement.clientHeight
-      if (height > 0) {
-        this.setState({ height: height > 0 ? height / 2 - 144 : 300 })
-      }
-    }
+  if (viewLabResultsRight.rights === 'enable') {
+    options.push({
+      name: <span>Lab Results</span>,
+      content: <LabResults {...props} />,
+    })
   }
+  if (viewExternalTrackingRight.rights === 'enable') {
+    options.push({
+      name: <span>External Tracking</span>,
+      content: <ExternalTracking {...props} />,
+    })
+  }
+  return options.map((item, index) => ({ ...item, id: index }))
+}
 
-  render () {
-    const { patient: { entity } } = this.props
-    const isPatientInactive = !entity || !entity.isActive
+const styles = () => ({})
+
+class PatientResult extends PureComponent {
+  render() {
+    const { theme } = this.props
     return (
-      <div>
-        <CardContainer hideHeader size='sm'>
-          <LabTrackingDetails
-            isPatientInactive={isPatientInactive}
-            resultType={PATIENT_LAB.PATIENT_PROFILE}
-          />
-        </CardContainer>
+      <div style={{ minHeight: 500 }}>
+        <Tabs
+          style={{ marginTop: theme.spacing(1) }}
+          options={patientResultTabs(this.props)}
+        />
       </div>
     )
   }
 }
-
-export default withStyles(styles, { withTheme: true })(Results)
+export default withStyles(styles, { withTheme: true })(PatientResult)

@@ -3,18 +3,18 @@ import moment from 'moment'
 import _ from 'lodash'
 import { NavLink } from 'react-router-dom'
 // material ui
-import { withStyles, Chip } from '@material-ui/core'
-import { Delete, Edit } from '@material-ui/icons'
+import { withStyles } from '@material-ui/core'
 import { scaleImage } from '@/utils/image'
 
 import {
-  Button,
   GridContainer,
   GridItem,
   Tooltip,
   dateFormatLong,
   Popconfirm,
 } from '@/components'
+import { Button, Tag } from 'antd'
+import { EditFilled, DeleteFilled } from '@ant-design/icons'
 import { LoadingWrapper } from 'medisys-components'
 import { downloadAttachment, getFileByFileID } from '@/services/file'
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
@@ -50,7 +50,7 @@ class CardItem extends Component {
     super(props)
     this.state = {
       loading: false,
-      imageData: undefined,
+      thumbnail: undefined,
       originalImageSize: {},
     }
     this.imgRef = React.createRef()
@@ -68,37 +68,47 @@ class CardItem extends Component {
 
   refreshImage = () => {
     const {
-      file: { fileExtension, fileIndexFK, imageData },
+      file: { fileExtension, fileIndexFK, thumbnailFK },
+      attachmentList = [],
     } = this.props
 
+    const thumbnail = attachmentList.find(
+      att => att.fileIndexFK === fileIndexFK,
+    )?.thumbnail
+
     if (imageExt.includes(fileExtension.toUpperCase())) {
-      if (!imageData) this.fetchImage(fileIndexFK)
-      else this.setState({ imageData })
+      if (!thumbnail) {
+        if (!thumbnailFK) {
+          this.setState({ thumbnail: dummyIcon })
+        } else {
+          this.fetchImage(fileIndexFK, thumbnailFK)
+        }
+      } else this.setState({ thumbnail })
     } else if (wordExt.includes(fileExtension.toUpperCase())) {
-      this.setState({ imageData: wordIcon })
+      this.setState({ thumbnail: wordIcon })
     } else if (excelExt.includes(fileExtension.toUpperCase())) {
-      this.setState({ imageData: excelIcon })
+      this.setState({ thumbnail: excelIcon })
     } else if (fileExtension.toUpperCase() === 'PDF') {
-      this.setState({ imageData: pdfIcon })
+      this.setState({ thumbnail: pdfIcon })
     } else if (pptExt.includes(fileExtension.toUpperCase())) {
-      this.setState({ imageData: pptIcon })
+      this.setState({ thumbnail: pptIcon })
     } else {
-      this.setState({ imageData: dummyIcon })
+      this.setState({ thumbnail: dummyIcon })
     }
   }
 
-  fetchImage = selectedFileId => {
+  fetchImage = (selectedFileId, selectedThumbnailFK) => {
     this.setState({ loading: true })
 
-    getFileByFileID(selectedFileId).then(response => {
+    getFileByFileID(selectedThumbnailFK).then(response => {
       if (response) {
         const contentInBase64 =
           base64Prefix + arrayBufferToBase64(response.data)
         this.setState({
           loading: false,
-          imageData: contentInBase64,
+          thumbnail: contentInBase64,
         })
-        this.props.onImageLoaded(selectedFileId, contentInBase64)
+        this.props.onThumbnailLoaded(selectedFileId, contentInBase64)
       }
     })
   }
@@ -149,7 +159,7 @@ class CardItem extends Component {
       isEnableDeleteDocument = true,
       isEnableEditDocument = true,
     } = this.props
-    const { loading, imageData } = this.state
+    const { loading, thumbnail } = this.state
     return (
       <InView as='div' onChange={this.handleInViewChanged}>
         <div className={classes.CardContainer}>
@@ -163,16 +173,18 @@ class CardItem extends Component {
               <GridItem md={6} align='Right' style={{ padding: 0, height: 20 }}>
                 <div className={classes.Toolbar}>
                   {isEnableEditDocument && (
-                    <Button
-                      color='primary'
-                      justIcon
-                      disabled={readOnly}
-                      onClick={() => {
-                        onEditFileName(file)
-                      }}
-                    >
-                      <Edit />
-                    </Button>
+                    <Tooltip title='Edit'>
+                      <Button
+                        type='primary'
+                        size='small'
+                        disabled={readOnly}
+                        onClick={() => {
+                          onEditFileName(file)
+                        }}
+                        style={{ marginRight: 8 }}
+                        icon={<EditFilled />}
+                      ></Button>
+                    </Tooltip>
                   )}
                   {isEnableEditDocument && (
                     <SetFolderWithPopover
@@ -196,6 +208,7 @@ class CardItem extends Component {
                         }
                       }}
                       onAddNewFolders={onAddNewFolders}
+                      type={this.props.type}
                     />
                   )}
                   {isEnableDeleteDocument && (
@@ -216,13 +229,12 @@ class CardItem extends Component {
                     >
                       <Tooltip title='Delete'>
                         <Button
-                          size='sm'
-                          color='danger'
-                          justIcon
+                          size='small'
+                          type='danger'
+                          icon={<DeleteFilled />}
                           disabled={readOnly}
-                        >
-                          <Delete />
-                        </Button>
+                          style={{ marginRight: 8 }}
+                        ></Button>
                       </Tooltip>
                     </Popconfirm>
                   )}
@@ -231,27 +243,31 @@ class CardItem extends Component {
               <GridItem md={12}>
                 <Tooltip title={`Created by: ${file.createByUserName}`}>
                   <div
-                    style={{ textAlign: 'center', marginTop: 10 }}
-                    onClick={() => {
-                      onPreview(file)
+                    style={{
+                      marginTop: 10,
                     }}
                   >
-                    {imageData && (
-                      <div
-                        style={{
-                          height: height - 120,
-                          overflow: 'hidden',
-                          display: 'inline-block',
-                        }}
-                      >
+                    <div
+                      style={{
+                        display: 'table-cell',
+                        textAlign: 'center',
+                        width,
+                        height: height - 120,
+                        verticalAlign: 'middle',
+                      }}
+                      onClick={() => {
+                        onPreview(file)
+                      }}
+                    >
+                      {thumbnail && (
                         <img
                           ref={this.imgRef}
-                          src={imageData}
+                          src={thumbnail}
                           alt={file.fileName}
                           onLoad={this.handleImageLoaded.bind(this)}
                         />
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </Tooltip>
               </GridItem>
@@ -281,18 +297,13 @@ class CardItem extends Component {
                   </p>
                 </Tooltip>
               </GridItem>
-              <GridItem md={12} style={{ overflow: 'auto', height: 29 }}>
+              <GridItem md={12} style={{ overflow: 'auto', height: 28 }}>
                 {folderList
                   .filter(f => file.folderFKs.includes(f.id))
                   .map(item => (
-                    <Chip
-                      style={{ marginBottom: 5, marginRight: 5 }}
-                      key={item.id}
-                      size='small'
-                      variant='outlined'
-                      label={item.displayValue}
-                      color='primary'
-                    />
+                    <Tag style={{ margin: '2px 5px 2px 0px' }}>
+                      {item.displayValue}
+                    </Tag>
                   ))}
               </GridItem>
             </GridContainer>

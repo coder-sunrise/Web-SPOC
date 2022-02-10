@@ -28,7 +28,7 @@ class LabTracking extends React.Component {
   render() {
     const accessRight = Authorized.check('reception/labtracking')
     let disabledByAccessRight = true
-    if (accessRight) disabledByAccessRight = accessRight.rights === 'disable'
+    if (accessRight) disabledByAccessRight = accessRight.rights !== 'enable'
 
     return (
       <CardContainer hideHeader>

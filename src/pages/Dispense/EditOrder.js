@@ -34,7 +34,10 @@ import { sendNotification } from '@/utils/realtime'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 import ConsumePackage from '@/pages/Widgets/Orders/Detail/ConsumePackage'
-import { visitBasicExaminationsSchema } from '@/pages/Reception/Queue/NewVisit/validationScheme'
+import {
+  visitBasicExaminationsSchema,
+  eyeExaminationsSchema,
+} from '@/pages/Reception/Queue/NewVisit/validationScheme'
 import {
   showEyeExaminations,
   showAudiometryTest,
@@ -105,6 +108,9 @@ const styles = () => ({})
     corPatientNoteVitalSign: Yup.array()
       .compact(v => v.isDeleted)
       .of(visitBasicExaminationsSchema),
+    corEyeExaminations: Yup.array()
+      .compact(v => v.isDeleted)
+      .of(eyeExaminationsSchema),
   }),
   dirtyCheckMessage: 'Discard edit order?',
   onDirtyDiscard: discardConsultation,
@@ -367,6 +373,10 @@ class EditOrder extends Component {
             }),
           ])
           dispatch({
+            type: `visitRegistration/query`,
+            payload: dispense.visitID,
+          })
+          dispatch({
             type: `dispense/refresh`,
             payload: dispense.visitID,
           })
@@ -445,6 +455,7 @@ class EditOrder extends Component {
             <GridItem xs={12}>
               <h5>Orders</h5>
               <Order
+                visitRegistration={this.props.visitRegistration}
                 className={classes.orderPanel}
                 status=''
                 from='EditOrder'

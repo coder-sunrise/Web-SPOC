@@ -35,6 +35,7 @@ import {
   NumberInput,
   Popper,
   notification,
+  Checkbox,
 } from '@/components'
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import Authorized from '@/utils/Authorized'
@@ -47,10 +48,12 @@ import {
 } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 // sub components
 import TableData from './TableData'
 import DrugLabelSelection from './DrugLabelSelection'
 import NurseActualization from './NurseActualization'
+import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 
 // variables
 import {
@@ -167,6 +170,7 @@ const DispenseDetails = ({
   const [popperOpen, setPopperOpen] = useState(false)
   const openPopper = () => setPopperOpen(true)
   const closePopper = () => setPopperOpen(false)
+  const [selectedAll, setSelectedAll] = useState(false)
 
   const { inventorymedication, inventoryvaccination } = codetable
   const { settings = {} } = clinicSettings
@@ -574,6 +578,7 @@ const DispenseDetails = ({
       const balanceQty =
         editRow.quantity - _.sumBy(matchItems, 'dispenseQuantity')
       matchItems.forEach(item => (item.stockBalance = balanceQty))
+      updateSelectAll(rows)
       setFieldValue('dispenseItems', rows)
     }
   }
@@ -655,7 +660,43 @@ const DispenseDetails = ({
     return false
   }
 
+  const isMandatoryWaistCircumference = () => {
+    const { entity = {} } = visitRegistration
+    const { visit = {} } = entity
+    const {
+      visitPurposeFK,
+      visitBasicExaminations = [],
+      corBasicExaminations = [],
+    } = visit
+    if (visitPurposeFK === VISIT_TYPE.MC) {
+      const basicExamination = corBasicExaminations.length
+        ? corBasicExaminations
+        : visitBasicExaminations
+      if (
+        !basicExamination[0].isChild &&
+        !basicExamination[0].isPregnancy &&
+        !hasValue(basicExamination[0].waistCircumference)
+      ) {
+        return true
+      }
+    }
+    return false
+  }
+
   const onHandelFinalize = () => {
+    if (isMandatoryWaistCircumference()) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          isInformType: true,
+          openConfirmContent:
+            'Please fill in Waist Circumference before finalize.',
+          openConfirmText: 'OK',
+        },
+      })
+      return
+    }
     if (existsCanceledRadiology()) {
       dispatch({
         type: 'global/updateAppState',
@@ -669,6 +710,31 @@ const DispenseDetails = ({
       })
     } else {
       finalizeInvoice()
+    }
+  }
+  const onChangeSelectAll = value => {
+    let newItems = [...dispenseItems]
+    newItems.forEach(item => {
+      if (isActualizable(item) && item.isCheckActualize !== value) {
+        item.isCheckActualize = value
+      }
+    })
+    setFieldValue('dispenseItems', newItems)
+  }
+
+  const updateSelectAll = newItems => {
+    var enableItems = newItems.filter(item => isActualizable(item))
+    if (
+      enableItems.filter(item => item.isCheckActualize).length ===
+      enableItems.length
+    ) {
+      if (!selectedAll) {
+        setSelectedAll(true)
+      }
+    } else {
+      if (selectedAll) {
+        setSelectedAll(false)
+      }
     }
   }
 
@@ -763,26 +829,6 @@ const DispenseDetails = ({
               </Button>
             </Popper>
           </div>
-          {/* <Button
-            color='primary'
-            size='sm'
-            onClick={onDrugLabelClick}
-            disabled={sendingJob}
-          >
-            {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
-            Drug Label
-          </Button>
-          <Button
-            color='primary'
-            size='sm'
-            onClick={() => {
-              onPrint({ type: CONSTANTS.PATIENT_LABEL })
-            }}
-            disabled={sendingJob}
-          >
-            {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
-            Patient Label
-          </Button> */}
           {orderCreateTime && (
             <span style={{ color: '#999999' }}>
               Order created by
@@ -881,78 +927,94 @@ const DispenseDetails = ({
         )}
         <GridItem md={12}>
           <Paper className={classes.paper}>
-            <TableData
-              oddEven={false}
-              title='Dispense Details'
-              titleExtend={
-                viewOnly
-                  ? null
-                  : actualizeSelectedItemButton('DispenseItems', dispenseItems)
-              }
-              EditingProps={{
-                showCommandColumn: false,
-                onCommitChanges: commitChanges,
-              }}
-              FuncProps={{
-                pager: false,
-                grouping: true,
-                groupingConfig: {
-                  isDisableExpandedGroups: true,
-                  state: {
-                    grouping: [{ columnName: 'dispenseGroupId' }],
-                    expandedGroups: defaultExpandedGroups,
-                  },
-                  row: {
-                    indentColumnWidth: 0,
-                    iconComponent: icon => <span></span>,
-                    contentComponent: group => {
-                      const { row } = group
-                      const groupRow = dispenseItems.find(
-                        data => data.dispenseGroupId === row.value,
+            <div style={{ position: 'relative' }}>
+              <div style={{ position: 'absolute', left: 26, top: 40 }}>
+                {isShowDispenseActualie && !viewOnly && (
+                  <Checkbox
+                    checked={selectedAll}
+                    onChange={e => {
+                      setSelectedAll(e.target.value)
+                      onChangeSelectAll(e.target.value)
+                    }}
+                  />
+                )}
+              </div>
+              <TableData
+                oddEven={false}
+                title='Dispense Details'
+                titleExtend={
+                  viewOnly
+                    ? null
+                    : actualizeSelectedItemButton(
+                        'DispenseItems',
+                        dispenseItems,
                       )
-                      if (row.value === 'NormalDispense')
-                        return (
-                          <div className={classes.groupStyle}>
-                            <span style={{ fontWeight: 600 }}>
-                              Normal Dispense Items
-                            </span>
-                          </div>
-                        )
-                      if (row.value === 'NoNeedToDispense')
-                        return (
-                          <div className={classes.groupStyle}>
-                            <span style={{ fontWeight: 600 }}>
-                              No Need To Dispense Items
-                            </span>
-                          </div>
-                        )
-                      return (
-                        <div className={classes.groupStyle}>
-                          <span style={{ fontWeight: 600 }}>
-                            {'Drug Mixture: '}
-                          </span>
-                          {groupRow.drugMixtureName}
-                        </div>
-                      )
+                }
+                EditingProps={{
+                  showCommandColumn: false,
+                  onCommitChanges: commitChanges,
+                }}
+                FuncProps={{
+                  pager: false,
+                  grouping: true,
+                  groupingConfig: {
+                    isDisableExpandedGroups: true,
+                    state: {
+                      grouping: [{ columnName: 'dispenseGroupId' }],
+                      expandedGroups: defaultExpandedGroups,
                     },
+                    row: {
+                      indentColumnWidth: 0,
+                      iconComponent: icon => <span></span>,
+                      contentComponent: group => {
+                        const { row } = group
+                        const groupRow = dispenseItems.find(
+                          data => data.dispenseGroupId === row.value,
+                        )
+                        if (row.value === 'NormalDispense')
+                          return (
+                            <div className={classes.groupStyle}>
+                              <span style={{ fontWeight: 600 }}>
+                                Normal Dispense Items
+                              </span>
+                            </div>
+                          )
+                        if (row.value === 'NoNeedToDispense')
+                          return (
+                            <div className={classes.groupStyle}>
+                              <span style={{ fontWeight: 600 }}>
+                                No Need To Dispense Items
+                              </span>
+                            </div>
+                          )
+                        return (
+                          <div className={classes.groupStyle}>
+                            <span style={{ fontWeight: 600 }}>
+                              {'Drug Mixture: '}
+                            </span>
+                            {groupRow.drugMixtureName}
+                          </div>
+                        )
+                      },
+                    },
+                    backgroundColor: 'rgb(240, 248, 255)',
                   },
-                  backgroundColor: 'rgb(240, 248, 255)',
-                },
-              }}
-              forceRender
-              columns={columns}
-              colExtensions={DispenseItemsColumnExtensions(
-                viewOnly,
-                onDrugLabelClick,
-                onActualizeBtnClick,
-                showDrugLabelRemark,
-              )}
-              data={dispenseItems}
-              TableProps={{
-                rowComponent: orderItemRow,
-              }}
-              getRowId={r => r.uid}
-            />
+                }}
+                forceRender
+                columns={columns}
+                colExtensions={DispenseItemsColumnExtensions(
+                  viewOnly,
+                  onDrugLabelClick,
+                  onActualizeBtnClick,
+                  showDrugLabelRemark,
+                )}
+                data={dispenseItems}
+                TableProps={{
+                  rowComponent: orderItemRow,
+                }}
+                getRowId={r => r.uid}
+              />
+            </div>
 
             <TableData
               title='Service'
@@ -1036,6 +1098,12 @@ const DispenseDetails = ({
               id: 'reception.queue.visitRegistration.visitRemarks',
             })}
           />
+          <VisitOrderTemplateIndicateString
+            visitOrderTemplateDetails={
+              dispense?.entity?.visitOrderTemplateDetails ||
+              values?.visitOrderTemplateDetails
+            }
+          ></VisitOrderTemplateIndicateString>
         </GridItem>
         {!viewOnly && (
           <GridItem xs={5} md={5}>
@@ -1162,7 +1230,7 @@ const DispenseDetails = ({
                 onFinalizeClick(true, voidReason)
               }}
             >
-              void
+              Void
             </Button>
             <Button
               color='primary'
@@ -1171,7 +1239,7 @@ const DispenseDetails = ({
                 onFinalizeClick()
               }}
             >
-              skip
+              Skip
             </Button>
           </GridContainer>
         </div>

@@ -42,6 +42,7 @@ const AddOrder = ({
   location,
   clinicInfo,
   isFirstLoad,
+  visitRegistration,
 }) => {
   const displayExistingOrders = async (id, servicesList) => {
     const r = await dispatch({
@@ -296,15 +297,18 @@ const AddOrder = ({
   useEffect(() => {
     const { entity } = dispense
     const { invoice } = entity || {}
-
-    if (visitType === VISIT_TYPE.OTC)
+    if (visitType === VISIT_TYPE.OTC && invoice)
       displayExistingOrders(invoice.id, ctservice)
   }, [])
   return (
     <React.Fragment>
       <SizeContainer size='sm'>
         <div style={{ maxHeight: height - 128, overflow: 'auto' }}>
-          <Order fromDispense={visitType === VISIT_TYPE.OTC} from='AddOrder' />
+          <Order
+            visitRegistration={visitRegistration}
+            fromDispense={visitType === VISIT_TYPE.OTC}
+            from='AddOrder'
+          />
         </div>
       </SizeContainer>
       {footer &&

@@ -92,6 +92,7 @@ const getVisitDoctorUserId = props => {
   handleSubmit: (values, { props, onConfirm, setValues }) => {
     const { dispatch, orders, currentType, getNextSequence, user } = props
     const { rows } = orders
+    console.log(111)
     const data = {
       isOrderedByDoctor:
         user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
@@ -106,7 +107,7 @@ const getVisitDoctorUserId = props => {
       packageGlobalId:
         values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
-
+    console.log(data)
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
@@ -185,16 +186,18 @@ class Service extends PureComponent {
           nextProps.global.openAdjustment) ||
         nextProps.orders.shouldPushToState
       ) {
-        nextProps.dispatch({
-          type: 'orders/updateState',
-          payload: {
-            entity: {
-              ...nextProps.values,
-              totalPrice: nextProps.values.total,
+        if (nextProps.values.uid) {
+          nextProps.dispatch({
+            type: 'orders/updateState',
+            payload: {
+              entity: {
+                ...nextProps.values,
+                totalPrice: nextProps.values.total,
+              },
+              shouldPushToState: false,
             },
-            shouldPushToState: false,
-          },
-        })
+          })
+        }
       }
   }
 

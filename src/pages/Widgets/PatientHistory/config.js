@@ -491,20 +491,36 @@ export const getHistoryValueForBoolean = value => {
 const checkNote = (widgetId, current) => {
   const notesType = notesTypes.find(type => type.value === widgetId)
   if (notesType) {
-    const { scribbleNotes = [], doctorNotes = [] } = current
-    const scribbleType = scribbleTypes.find(o => o.type === notesType.fieldName)
     if (
-      !doctorNotes.find(
-        note =>
-          note[notesType.fieldName] !== undefined &&
-          note[notesType.fieldName] !== null &&
-          note[notesType.fieldName].trim().length,
-      ) &&
-      (!scribbleType ||
-        scribbleNotes.filter(o => o.scribbleNoteTypeFK === scribbleType.typeFK)
-          .length === 0)
+      [
+        WIDGETS_ID.ASSOCIATED_HISTORY,
+        WIDGETS_ID.CHIEF_COMPLAINTS,
+        WIDGETS_ID.CLINICAL_NOTE,
+        WIDGETS_ID.PLAN,
+      ].indexOf(widgetId) < 0
     ) {
-      return false
+      return (
+        hasValue(current[notesType.fieldName]) &&
+        current[notesType.fieldName].trim().length > 0
+      )
+    } else {
+      const { scribbleNotes = [], doctorNotes = [] } = current
+      const scribbleType = scribbleTypes.find(
+        o => o.type === notesType.fieldName,
+      )
+      if (
+        !doctorNotes.find(
+          note =>
+            hasValue(note[notesType.fieldName]) &&
+            note[notesType.fieldName].trim().length,
+        ) &&
+        (!scribbleType ||
+          scribbleNotes.filter(
+            o => o.scribbleNoteTypeFK === scribbleType.typeFK,
+          ).length === 0)
+      ) {
+        return false
+      }
     }
     return true
   }

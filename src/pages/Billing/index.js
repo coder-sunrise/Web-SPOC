@@ -26,6 +26,7 @@ import { roundTo, getUniqueId } from '@/utils/utils'
 import {
   INVOICE_PAYER_TYPE,
   PACKAGE_SIGNATURE_CHECK_OPTION,
+  INVOICE_REPORT_TYPES,
 } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import Authorized from '@/utils/Authorized'
@@ -357,16 +358,27 @@ class Billing extends Component {
     isConsumedPackage: false,
   }
 
-  componentDidMount(){
-    subscribeNotification('QueueListing',{
+  componentDidMount() {
+    subscribeNotification('QueueListing', {
       callback: response => {
         const { visitID, senderId } = response
-        if(visitID){
-          const {values, dispatch} = this.props
-          if (values.visitId === visitID){
-            const { isGroupPrint, showReport, reportPayload:{ reportID }={}, isGroupPayment, showAddPaymentModal } = this.state
-            if((isGroupPrint && (reportID === 89 && showReport)) || (isGroupPayment && showAddPaymentModal)){
-              notification.error({ message: `The status for one of the invoices had been changed. Please check all invoices is in billing status and the billing is saved.`,})
+        if (visitID) {
+          const { values, dispatch } = this.props
+          if (values.visitId === visitID) {
+            const {
+              isGroupPrint,
+              showReport,
+              reportPayload: { reportID } = {},
+              isGroupPayment,
+              showAddPaymentModal,
+            } = this.state
+            if (
+              (isGroupPrint && reportID === 89 && showReport) ||
+              (isGroupPayment && showAddPaymentModal)
+            ) {
+              notification.error({
+                message: `The status for one of the invoices had been changed. Please check all invoices is in billing status and the billing is saved.`,
+              })
               this.setState({ disabledPayment: true })
               dispatch({
                 type: 'groupInvoice/fetchVisitGroupStatusDetails',
@@ -375,7 +387,7 @@ class Billing extends Component {
             }
           }
         }
-      }
+      },
     })
   }
 
@@ -627,7 +639,11 @@ class Billing extends Component {
 
   toggleAddPaymentModal = async isGroupPayment => {
     const { showAddPaymentModal } = this.state
-    this.setState({ isGroupPayment, disabledPayment:undefined, showAddPaymentModal: !showAddPaymentModal })
+    this.setState({
+      isGroupPayment,
+      disabledPayment: undefined,
+      showAddPaymentModal: !showAddPaymentModal,
+    })
   }
 
   calculateOutstandingBalance = async invoicePayment => {
@@ -760,22 +776,30 @@ class Billing extends Component {
     })
   }
 
-  onPrinterClick = (type, itemID, copayerID, invoicePayerid, index) => {
+  onPrinterClick = (
+    type,
+    itemID,
+    copayerID,
+    invoicePayerid,
+    index,
+    invoiceReportType,
+  ) => {
     switch (type) {
       case 'Payment':
         this.onShowReport(29, { InvoicePaymentId: itemID })
         break
       case 'TaxInvoice':
-        this.onPrintInvoice(copayerID, invoicePayerid, index)
+        this.onPrintInvoice(copayerID, invoicePayerid, index, invoiceReportType)
         break
       default:
         break
     }
   }
 
-  onPrintInvoice = (copayerID, invoicePayerid, index, isGroup) => {
+  onPrintInvoice = (copayerID, invoicePayerid, index, invoiceReportType) => {
     const { values, dispatch } = this.props
     const { invoicePayer, visitGroup } = values
+    const isGroup = invoiceReportType === INVOICE_REPORT_TYPES.GROUPINVOICE
     const reportID = isGroup ? 89 : 15
     this.setState({ isGroupPrint: isGroup })
     const modifiedOrNewAddedPayer = invoicePayer.filter(payer => {
@@ -841,21 +865,32 @@ class Billing extends Component {
     }
   }
 
-  onPrintInvoiceClick = isGroup => {
-    const { dispatch, values:{visitGroupStatusDetails=[]} } = this.props
-    if (isGroup && visitGroupStatusDetails.some(x => !x.isBillingSaved)) {
+  onPrintInvoiceClick = invoiceReportType => {
+    const {
+      dispatch,
+      values: { visitGroupStatusDetails = [] },
+    } = this.props
+    if (
+      invoiceReportType === INVOICE_REPORT_TYPES.GROUPINVOICE &&
+      visitGroupStatusDetails.some(x => !x.isBillingSaved)
+    ) {
       dispatch({
         type: 'global/updateAppState',
         payload: {
           openConfirm: true,
           openConfirmContent: `One or more invoice(s) are not in \'Billing\' status. Confirm to print?`,
           onConfirmSave: () => {
-            this.onPrintInvoice(undefined, undefined, undefined, isGroup)
+            this.onPrintInvoice(
+              undefined,
+              undefined,
+              undefined,
+              invoiceReportType,
+            )
           },
         },
       })
     } else {
-      this.onPrintInvoice(undefined, undefined, undefined, isGroup)
+      this.onPrintInvoice(undefined, undefined, undefined, invoiceReportType)
     }
   }
 
@@ -1366,7 +1401,7 @@ class Billing extends Component {
         </CommonModal>
         <CommonModal
           open={showAddPaymentModal}
-          title={`Add ${isGroupPayment?'Group':''} Payment`}
+          title={`Add ${isGroupPayment ? 'Group' : ''} Payment`}
           onClose={this.toggleAddPaymentModal}
           observe='AddPaymentForm'
           maxWidth='lg'
@@ -1388,7 +1423,9 @@ class Billing extends Component {
               }}
               disabledPayment={disabledPayment}
               isGroupPayment={isGroupPayment}
-              visitGroupStatusDetails={values.visitGroupStatusDetails?.filter(x=>x.outstandingBalance > 0)}
+              visitGroupStatusDetails={values.visitGroupStatusDetails?.filter(
+                x => x.outstandingBalance > 0,
+              )}
             />
           )}
         </CommonModal>
