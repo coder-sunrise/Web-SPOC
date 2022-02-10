@@ -28,7 +28,7 @@ const VisitOrderTemplateIndicateString = props => {
     if (removedItemIndex > -1) {
       indicateString = visitOrderTemplateDetails.substr(0, removedItemIndex)
     }
-    if (newItemString > -1) {
+    if (addedItemIndex > -1) {
       indicateString = visitOrderTemplateDetails.substr(0, addedItemIndex)
     }
     indicate = {
