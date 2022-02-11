@@ -629,7 +629,23 @@ class Billing extends Component {
       },
     })
   }
-
+  getInvoiceReportTitle = reportPayload => {
+    switch (reportPayload?.reportParameters?.printType) {
+      case INVOICE_REPORT_TYPES.GROUPINVOICE:
+        return 'Invoice'
+      case INVOICE_REPORT_TYPES.CLAIMABLEITEMCATEGORYINVOICE:
+        return 'Claimable Item Category Invoice'
+      case INVOICE_REPORT_TYPES.CLAIMABLEITEMINVOICE:
+        return 'Claimable Item Invoice'
+      case INVOICE_REPORT_TYPES.INDIVIDUALINVOICE:
+        return 'Visitation Invocie'
+      case INVOICE_REPORT_TYPES.ITEMCATEGORYINVOICE:
+        return 'Item Category Invoice'
+      case INVOICE_REPORT_TYPES.SUMMARYINVOICE:
+        return 'Summary Invoice'
+    }
+    return 'Invoice'
+  }
   backToDispense = () => {
     const { dispatch, billing } = this.props
     dispatch({
@@ -807,9 +823,9 @@ class Billing extends Component {
       if (payer.id) return payer.isModified
       return true
     })
-    let parametrPaload
+    let parametrPayload
     if (copayerID) {
-      parametrPaload = {
+      parametrPayload = {
         InvoiceId: values.invoice ? values.invoice.id : '',
         CopayerId: copayerID,
         InvoicePayerid: invoicePayerid,
@@ -817,7 +833,7 @@ class Billing extends Component {
         printType: invoiceReportType,
       }
     } else {
-      parametrPaload = {
+      parametrPayload = {
         InvoiceId: values.invoice ? values.invoice.id : '',
         printType: invoiceReportType,
       }
@@ -832,9 +848,9 @@ class Billing extends Component {
           openConfirmContent: `Save changes and print invoice?`,
           onConfirmSave: () => {
             let currentPrintIndex
-            if (parametrPaload.printIndex !== undefined) {
-              const { printIndex, ...other } = parametrPaload
-              parametrPaload = {
+            if (parametrPayload.printIndex !== undefined) {
+              const { printIndex, ...other } = parametrPayload
+              parametrPayload = {
                 ...other,
               }
               currentPrintIndex = invoicePayer.filter(
@@ -850,21 +866,21 @@ class Billing extends Component {
                 const {
                   billing: { entity = {} },
                 } = this.props
-                parametrPaload = {
-                  ...parametrPaload,
+                parametrPayload = {
+                  ...parametrPayload,
                   InvoicePayerid: entity.invoicePayer[currentPrintIndex].id,
                   printType: invoiceReportType,
                 }
               }
 
-              this.onShowReport(reportID, { visitGroup, ...parametrPaload })
+              this.onShowReport(reportID, { visitGroup, ...parametrPayload })
             }
             this.upsertBilling(callback)
           },
         },
       })
     } else {
-      this.onShowReport(reportID, { visitGroup, ...parametrPaload })
+      this.onShowReport(reportID, { visitGroup, ...parametrPayload })
     }
   }
 
@@ -899,11 +915,11 @@ class Billing extends Component {
 
   onPrintVisitInvoiceClick = () => {
     const { values } = this.props
-    const parametrPaload = {
+    const parametrPayload = {
       InvoiceId: values.invoice ? values.invoice.id : '',
     }
 
-    this.onShowReport(80, parametrPaload)
+    this.onShowReport(80, parametrPayload)
   }
 
   handleAddPayment = async payment => {
@@ -1476,11 +1492,7 @@ class Billing extends Component {
         <CommonModal
           open={showReport}
           onClose={this.onCloseReport}
-          title={
-            [15, 89].indexOf(reportPayload.reportID) > 0
-              ? 'Invoice'
-              : 'Visitation Invoice'
-          }
+          title={this.getInvoiceReportTitle(reportPayload)}
           maxWidth='lg'
         >
           <ReportViewer
@@ -1522,7 +1534,7 @@ class Billing extends Component {
           <Signature
             signatureName={patient.name}
             updateSignature={this.updateInvoiceSignature}
-            image={invoiceSignatureSrc} 
+            image={invoiceSignatureSrc}
             signatureNameLabel='Patient Name'
           />
         </CommonModal>
