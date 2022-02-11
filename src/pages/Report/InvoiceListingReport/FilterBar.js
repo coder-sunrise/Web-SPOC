@@ -24,7 +24,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
             fromDateFieldName='listingFrom'
             toDateFieldName='listingTo'
           />
-          <GridItem md={2}>
+          <GridItem md={8} container style={{ position: 'relative' }}>
             <FastField
               name='groupBy'
               render={args => (
@@ -48,21 +48,21 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                 />
               )}
             />
-          </GridItem>
-          <GridItem md={1}>
-            <FastField
-              name='asAt'
-              render={args => <Checkbox {...args} label='As At' />}
-            />
-          </GridItem>
-          <GridItem md={2}>
-            <Button
-              color='primary'
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-            >
-              Generate Report
-            </Button>
+            <div style={{ position: 'absolute', left: 280, top: 18 }}>
+              <FastField
+                name='asAt'
+                render={args => <Checkbox {...args} label='As At' />}
+              />
+            </div>
+            <div style={{ position: 'absolute', left: 360, top: 16 }}>
+              <Button
+                color='primary'
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+              >
+                Generate Report
+              </Button>
+            </div>
           </GridItem>
           <GridItem md={4}>
             <FastField

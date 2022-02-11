@@ -38,12 +38,12 @@ const resourceCapacitySchema = Yup.object().shape({
     },
   ),
   startTimeRange: Yup.string().when('startTime', {
-    is: val => val < '07:00' || val > '22:00',
+    is: val => val < '07:00' || val > '22:00:00',
     then: Yup.string().required('Value must be from 07:00 to 22:00'),
   }),
   startTime: Yup.string().required(),
   endTimeRange: Yup.string().when('endTime', {
-    is: val => val < '07:00' || val > '22:00',
+    is: val => val < '07:00' || val > '22:00:00',
     then: Yup.string().required('Value must be from 07:00 to 22:00'),
   }),
   endTime: Yup.string().required(),
