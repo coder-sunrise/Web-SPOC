@@ -1524,6 +1524,7 @@ class Banner extends PureComponent {
           <ClaimHistory
             defaultTab='NonClaimableHistory'
             patientProfileFK={entity.id}
+            values={{ isActive: entity.isActive }}
           />
         </CommonModal>
       </Paper>

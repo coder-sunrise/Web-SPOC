@@ -20,6 +20,7 @@ const ClaimTracking = ({
   height,
   clinicSettings,
   patientProfileFK,
+  values,
 }) => {
   const [showEditClaimDetails, setShowEditClaimDetails] = useState(false)
   const myRef = useRef<ActionType>()
@@ -476,7 +477,7 @@ const ClaimTracking = ({
       columns = columns.filter(c => c.dataIndex !== 'diagnosisJP')
     }
 
-    if (editClaimHistoryRight.rights !== 'enable') {
+    if (editClaimHistoryRight.rights !== 'enable' || !values.isActive) {
       columns = columns.filter(c => c.dataIndex !== 'action')
     }
     return columns
