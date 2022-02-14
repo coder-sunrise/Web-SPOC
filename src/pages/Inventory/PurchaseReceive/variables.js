@@ -146,10 +146,11 @@ export const PurchaseReceiveGridCol = [
   { name: 'purchaseOrderDate', title: 'PO Date' },
   { name: 'supplier', title: 'Supplier' },
   { name: 'exceptedDeliveryDate', title: 'Expected Delivery Date' },
+  { name: 'purchaseRequestNo', title: 'PR No' },
   { name: 'purchaseOrderStatus', title: 'PO Status' },
   { name: 'totalAftGst', title: 'Total' },
-  { name: 'outstanding', title: 'Outstanding' },
-  { name: 'invoiceStatus', title: 'Inv. Status' },
+  // { name: 'outstanding', title: 'Outstanding' },
+  // { name: 'invoiceStatus', title: 'Inv. Status' },
   { name: 'remark', title: 'Remarks' },
   { name: 'action', title: 'Action' },
 ]
@@ -170,14 +171,14 @@ export const ContextMenuOptions = row => {
       disabled: viewEditAuthority.rights !== 'enable',
       width: 130,
     },
-    {
-      id: 1,
-      label: 'Duplicate PO',
-      Icon: Duplicate,
-      disabled:
-        isDuplicatePOAllowed(row.purchaseOrderStatus) ||
-        createAuthority.rights !== 'enable',
-    },
+    // {
+    //   id: 1,
+    //   label: 'Duplicate PO',
+    //   Icon: Duplicate,
+    //   disabled:
+    //     isDuplicatePOAllowed(row.purchaseOrderStatus) ||
+    //     createAuthority.rights !== 'enable',
+    // },
     { isDivider: true },
     {
       id: 2,

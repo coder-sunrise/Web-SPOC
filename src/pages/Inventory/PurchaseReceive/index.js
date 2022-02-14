@@ -17,6 +17,7 @@ import PurchaseReceiveDataGrid from './components/PurchaseReceiveDataGrid'
 import WriteOff from './components/Modal/WriteOff'
 import DuplicatePO from './components/Modal/DuplicatePO'
 import { getPurchaseOrderStatusFK, getAccessRight } from './variables'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -53,7 +54,7 @@ class PurchaseReceive extends Component {
       type: 'purchaseReceiveList/query',
       payload: {
         sorting: [
-          { columnName: 'purchaseOrderNo', direction: 'asc' },
+          { columnName: 'purchaseOrderNo', direction: 'desc' },
         ],
         lgteql_purchaseOrderDate:
           purchaseReceiveList.filterSearch.transactionDates[0],
@@ -141,7 +142,7 @@ class PurchaseReceive extends Component {
             type: 'purchaseReceiveList/query',
             payload: {
               sorting: [
-                { columnName: 'purchaseOrderNo', direction: 'asc' },
+                { columnName: 'purchaseOrderNo', direction: 'desc' },
               ],
             },
           })
@@ -240,13 +241,15 @@ class PurchaseReceive extends Component {
           </CommonModal>
 
           <GridItem md={4} className={classes.buttonGroup}>
-            <Button
-              color='primary'
-              onClick={this.onWriteOffClick}
-              disabled={selectedRows.length === 0 || selectedRows === undefined}
-            >
-              Write-Off
-            </Button>
+            <Authorized authority='purchasingandreceiving.newpurchasingandreceiving'>
+              <Button
+                color='primary'
+                onClick={this.onWriteOffClick}
+                disabled={selectedRows.length === 0 || selectedRows === undefined}
+              >
+                Write-Off
+              </Button>
+            </Authorized>
           </GridItem>
         </LoadingWrapper>
 
