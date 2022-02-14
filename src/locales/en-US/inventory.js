@@ -90,7 +90,7 @@ export default {
   'inventory.master.stock.excessThreshold': 'Excess Threshold',
 
   //Purchase Request
-  'inventory.purchaserequest.prno': 'Purchase Request #',
+  'inventory.purchaserequest.prno': 'Purchase Request No.',
   'inventory.purchaserequest.status': 'PR Status',
   'inventory.purchaserequest.detail.requestedBy': 'Request By',
   'inventory.purchaserequest.detail.delete': 'Delete',
@@ -107,7 +107,9 @@ export default {
   'inventory.pr.duplicatePOConfirmation':
     'Duplicate purchase order based on PO No.: ',
   'inventory.pr.addnew': 'Add New',
-  'inventory.pr.pono': 'Purchase Order #',
+  'inventory.pr.pono': 'Purchase Order No.',
+  'inventory.pr.prno': 'Corresponding Purchase Request No.',
+  'inventory.pr.filter.pono': 'Purchase Order No., Purchase Request No.',
   'inventory.pr.supplier': 'Supplier',
   'inventory.pr.invoiceStatus': 'Inv. Status',
   'inventory.pr.status': 'Status',
