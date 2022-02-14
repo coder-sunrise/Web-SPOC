@@ -126,7 +126,7 @@ export const DiscardSpecimen = ({ open, id, onClose, onConfirm }) => {
             rules={[{ required: true, message: 'Receiving date is required.' }]}
           >
             <TextField
-              label='Discard Reason'
+              label='Reason'
               onChange={e =>
                 setHasDiscardReason(e.target.value && e.target.value !== '')
               }
