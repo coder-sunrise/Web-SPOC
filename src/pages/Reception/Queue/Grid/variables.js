@@ -72,7 +72,10 @@ const filterNurseWorkItem = workItem => {
 }
 
 const filterLabWorkItem = workItem => {
-  return workItem.filter(x => x.type === 'Lab')
+  return workItem
+    .filter(x => x.type === 'Lab')
+    .map(x => x.labWorkitems)
+    .flat()
 }
 
 export const FuncConfig = {
@@ -418,6 +421,14 @@ export const QueueColumnExtensions = [
       ) || { rights: 'hidden' }
       return (
         <div style={{ justifyContent: 'space-between' }}>
+          {labWorkItemsAccessRight.rights === 'enable' &&
+            labWorkItems &&
+            labWorkItems.length > 0 && (
+              <LabWorkItemInfo
+                values={labWorkItems}
+                style={{ marginRight: 18 }}
+              />
+            )}
           {radiologyWorkItemsAccessRight.rights === 'enable' &&
             radioWorkItems &&
             radioWorkItems.length > 0 && (

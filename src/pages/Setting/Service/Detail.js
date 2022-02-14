@@ -148,7 +148,6 @@ const testPanelSchema = Yup.object().shape({
     } = values
     const { dispatch, onConfirm } = props
     const selectedOptions = {}
-    console.log('handleSubmit')
     dispatch({
       type: 'settingClinicService/upsert',
       payload: {
@@ -250,7 +249,6 @@ class Detail extends PureComponent {
         checkedValue: true,
         uncheckedValue: false,
         onChange: ({ row, checked }) => {
-          // console.log(this)
           if (checked) {
             const { values, setFieldValue, setFieldTouched } = this.props
             const serviceSettingItem = _.cloneDeep(
@@ -298,7 +296,7 @@ class Detail extends PureComponent {
   }
 
   testPanelTableParas = {
-    columns: [{ name: 'testPanelFK', title: 'TestPanel' }],
+    columns: [{ name: 'testPanelFK', title: 'Lab Test Panel' }],
     columnExtensions: [
       {
         columnName: 'testPanelFK',
@@ -700,7 +698,6 @@ class Detail extends PureComponent {
     } = this.state
     const serviceSettingsErrMsg = errors.ctServiceCenter_ServiceNavigation
     const testPanelErrMsg = errors.ctService_TestPanel
-    console.log('errors lalalal', errors)
     const shoudDisableSaveButton =
       serviceSettings.filter(row => !row.isDeleted).length === 0
     const { settings = [] } = clinicSettings

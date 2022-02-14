@@ -1,3 +1,4 @@
+import { notification } from '@/components'
 import { createListViewModel } from 'medisys-model'
 import service from '../services'
 import { getUserPreference, saveUserPreference } from '@/services/user'
@@ -33,6 +34,42 @@ export default createListViewModel({
       })
     },
     effects: {
+      *getLabSpecimenById({ payload }, { call, put }) {
+        const r = yield call(service.queryLabSpecimenById, payload)
+        const { status, data } = r
+
+        if (status === '200') {
+          if (data) {
+            return data
+          }
+          return null
+        }
+      },
+      *getVisitSpecimenCollection({ payload }, { call, put }) {
+        const r = yield call(service.queryVisitSpecimenCollection, payload)
+        const { status, data } = r
+
+        if (status === '200') {
+          if (data) {
+            const visitSpecimenCollection = data
+            return visitSpecimenCollection
+          }
+          return null
+        }
+      },
+      *upsert({ payload }, { call, put }) {
+        const r = yield call(service.upsert, payload)
+        if (r && !payload.id) {
+          notification.success({ message: 'Lab specimen added.' })
+          return true
+        }
+
+        if (payload.id && r && r === 204) {
+          notification.success({ message: 'Lab specimen edited.' })
+          return true
+        }
+        return r
+      },
       *saveUserPreference({ payload }, { call, put, select }) {
         const r = yield call(saveUserPreference, {
           userPreferenceDetails: JSON.stringify(payload.userPreferenceDetails),

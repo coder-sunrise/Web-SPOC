@@ -4,7 +4,7 @@ import { PRIORITY_VALUES } from '@/utils/constants'
 
 export const TestPanelColumn = ({ testPanels }) => {
   console.log('lab-module logs: TestPanelColumn - testPanels', testPanels)
-  const testPanelHtml = testPanels
+  const testPanelHtml = [...testPanels]
     //Sort by Priority then by the alphabetical order
     .sort((a, b) =>
       a.priority === b.priority

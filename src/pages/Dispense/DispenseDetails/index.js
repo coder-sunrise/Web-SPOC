@@ -75,6 +75,7 @@ import RadiologyDetails from '@/pages/Radiology/Worklist/Details'
 import WorklistContext, {
   WorklistContextProvider,
 } from '@/pages/Radiology/Worklist/WorklistContext'
+import DispenseDetailsSpecimenCollection from '@/pages/Lab/SpecimenCollection/components/DispenseDetailsSpecimenCollection'
 
 const styles = theme => ({
   paper: {
@@ -155,6 +156,8 @@ const DispenseDetails = ({
     orderCreateTime,
     orderCreateBy,
     visitStatus,
+    hasAnySpecimenCollected,
+    id: visitId,
   } = values || {
     invoice: { invoiceItem: [] },
   }
@@ -164,7 +167,6 @@ const DispenseDetails = ({
     totalPayment,
     coPayer = [],
   } = invoice
-
   const [popperOpen, setPopperOpen] = useState(false)
   const openPopper = () => setPopperOpen(true)
   const closePopper = () => setPopperOpen(false)
@@ -736,6 +738,19 @@ const DispenseDetails = ({
     }
   }
 
+  const hasAnyLabWorkitems = (() => {
+    if (!service) return false
+
+    return (
+      service.filter(
+        svc =>
+          svc.workitem &&
+          svc.workitem.labWorkitems &&
+          svc.workitem.labWorkitems.length > 0,
+      ).length > 0
+    )
+  })()
+
   return (
     <React.Fragment>
       <GridContainer>
@@ -1027,6 +1042,10 @@ const DispenseDetails = ({
               )}
               data={service}
             />
+
+            {(hasAnySpecimenCollected || hasAnyLabWorkitems) && (
+              <DispenseDetailsSpecimenCollection visitId={visitId} />
+            )}
 
             <TableData
               oddEven={false}
