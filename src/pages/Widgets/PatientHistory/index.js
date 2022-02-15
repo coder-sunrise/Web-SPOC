@@ -229,15 +229,15 @@ class PatientHistory extends Component {
           selectCategories = result
             .find(xx => xx.Identifier === 'SelectCategories')
             .SelectCategories.filter(o => selectCategories.find(c => c === o))
+          var preferVisitTypeIDs =
+            result.find(tt => tt.Identifier === 'SelectedVisitTypeIDs')
+              ?.SelectedVisitTypeIDs || []
+          this.setState({ visitTypeIDs: preferVisitTypeIDs }, () => {
+            setFieldValue('visitTypeIDs', preferVisitTypeIDs)
+          })
         }
         this.setState({ selectCategories }, () => {
           setFieldValue('selectCategories', selectCategories)
-        })
-        var preferVisitTypeIDs =
-          result.find(tt => tt.Identifier === 'SelectedVisitTypeIDs')
-            ?.SelectedVisitTypeIDs || []
-        this.setState({ visitTypeIDs: preferVisitTypeIDs }, () => {
-          setFieldValue('visitTypeIDs', preferVisitTypeIDs)
         })
         this.queryVisitHistory()
       })
@@ -321,7 +321,7 @@ class PatientHistory extends Component {
 
     if (visitDate && visitDate.length > 1) {
       visitToDate = visitDate[1]
-    } 
+    }
     let searchCategories
     if (!selectCategories.length) {
       searchCategories = this.getCategoriesOptions()
@@ -329,7 +329,7 @@ class PatientHistory extends Component {
         .join(',')
     } else {
       searchCategories = selectCategories.join(',')
-    } 
+    }
     dispatch({
       type: 'patientHistory/queryVisitHistory',
       payload: {
