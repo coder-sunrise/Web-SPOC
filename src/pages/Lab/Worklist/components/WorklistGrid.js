@@ -22,6 +22,7 @@ import {
   CoffeeOutlined,
   UnorderedListOutlined,
 } from '@ant-design/icons'
+import Print from '@material-ui/icons/Print'
 import Delete from '@material-ui/icons/Delete'
 import {
   LAB_SPECIMEN_STATUS,
@@ -76,6 +77,14 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
   const [currentModal, setCurrentModal] = useState({
     modal: MODALS.NONE,
     para: undefined,
+  })
+  const [discardSpecimenPara, setDiscardSpecimenPara] = useState({
+    open: false,
+    id: undefined,
+  })
+  const [receiveSpecimenPara, setReceiveSpecimenPara] = useState({
+    open: false,
+    id: undefined,
   })
 
   useEffect(() => {
@@ -152,14 +161,39 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
     setIsAnyWorklistModelOpened(false)
   }
 
+  const closeDiscardSpecimen = () => {
+    setDiscardSpecimenPara({
+      open: false,
+      id: undefined,
+    })
+    setIsAnyWorklistModelOpened(false)
+  }
+
+  const closeReceiveSpecimen = () => {
+    setReceiveSpecimenPara({
+      open: false,
+      id: undefined,
+    })
+    setIsAnyWorklistModelOpened(false)
+  }
+
   const expandedRowRender = (record, index, indent, expanded) => {
-    const groupedTestPanels = _.uniqBy(
+    const groupedTestPanels = _(
       filteredWorklist
         .filter(item => item.visitFK === record.visitFK)
         .map(item => ({
+          ...item,
           firstOrderDate: _(filteredWorklist)
             .filter(innerItem => innerItem.labSpecimenFK === item.labSpecimenFK)
             .minBy(innerItem => innerItem.generateDate).generateDate,
+          testCategories: filteredWorklist
+            .filter(innerItem => innerItem.labSpecimenFK === item.labSpecimenFK)
+            .reduce((prev, cur) => {
+              const testCategory = cttestcategory.find(
+                item => item.id === cur.testCategoryFK,
+              )
+              return `${prev ? prev + ', ' : ''}${testCategory?.name}`
+            }, ''),
           testPanels: _.uniq(
             filteredWorklist
               .filter(
@@ -173,38 +207,34 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
                 priority: innerItem.priority,
               })),
           ),
-          ...item,
         })),
-      'labSpecimenFK',
     )
-
+      .uniqBy('labSpecimenFK')
+      .orderBy('firstOrderDate')
+      .reverse()
+      .value()
     const columns = [
       {
-        title: 'Category',
-        dataIndex: 'testCategoryFK',
-        key: 'testCategoryFK',
+        title: 'Test Category',
+        dataIndex: 'testCategories',
+        key: 'testCategories',
         ellipsis: true,
         width: 160,
-        render: (text, record, index) => {
-          const testCategory = cttestcategory.find(
-            item => item.id === record.testCategoryFK,
-          )
-          return testCategory ? testCategory.name : ''
-        },
       },
       {
-        title: 'Test',
+        title: 'Test Panel',
         dataIndex: 'testPanels',
         key: 'testPanels',
-        width: 350,
+        width: 320,
         render: (text, record, index) => {
-          console.log('lab-module logs: testPanels - ', record.testPanels)
-          return <TestPanelColumn testPanels={record.testPanels} />
+          return (
+            <TestPanelColumn columnWidth={320} testPanels={record.testPanels} />
+          )
         },
       },
       {
         title: 'Specimen Type',
-        width: 150,
+        width: 120,
         dataIndex: 'specimenTypeFK',
         key: 'specimenTypeFK',
         ellipsis: true,
@@ -217,37 +247,49 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
         },
       },
       {
-        title: 'Accession No',
+        title: 'Accession No.',
         dataIndex: 'accessionNo',
         key: 'accessionNo',
-        width: 150,
+        width: 120,
+      },
+      {
+        title: 'Collected Date',
+        dataIndex: 'specimenCollectionDate',
+        key: 'specimenCollectionDate',
+        width: 135,
+        render: (text, record, index) =>
+          record.specimenCollectionDate?.format(dateFormatLongWithTimeNoSec),
+      },
+      {
+        title: 'Received Date',
+        dataIndex: 'dateReceived',
+        key: 'dateReceived',
+        width: 135,
+        render: (text, record, index) =>
+          record.dateReceived?.format(dateFormatLongWithTimeNoSec),
       },
       {
         title: 'First Order Date',
         dataIndex: 'firstOrderDate',
         key: 'firstOrderDate',
         ellipsis: true,
+        width: 135,
         render: (text, record, index) =>
           record.firstOrderDate?.format(dateFormatLongWithTimeNoSec),
-      },
-      {
-        title: 'Date Collected',
-        dataIndex: 'specimenCollectionDate',
-        key: 'specimenCollectionDate',
-        render: (text, record, index) =>
-          record.specimenCollectionDate?.format(dateFormatLongWithTimeNoSec),
       },
       {
         title: 'First Verifier',
         dataIndex: 'firstVerifier',
         key: 'firstVerifier',
         ellipsis: true,
+        width: 150,
       },
       {
         title: 'Second Verifier',
         dataIndex: 'secondVerifier',
         key: 'secondVerifier',
         ellipsis: true,
+        width: 150,
       },
       {
         title: 'Status',
@@ -289,13 +331,11 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
                 <Tooltip title='Receive Specimen'>
                   <Button
                     onClick={() => {
-                      if (currentModal.modal === MODALS.NONE) {
-                        setCurrentModal({
-                          modal: MODALS.RECEIVE_SPECIMEN,
-                          para: record.labSpecimenFK,
-                        })
-                        setIsAnyWorklistModelOpened(true)
-                      }
+                      setReceiveSpecimenPara({
+                        open: true,
+                        id: record.labSpecimenFK,
+                      })
+                      setIsAnyWorklistModelOpened(true)
                     }}
                     justIcon
                     color='primary'
@@ -310,9 +350,9 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
                 <Tooltip title='Discard Specimen'>
                   <Button
                     onClick={() => {
-                      setCurrentModal({
-                        modal: MODALS.DISCARD_SPECIMEN,
-                        para: record.labSpecimenFK,
+                      setDiscardSpecimenPara({
+                        open: true,
+                        id: record.labSpecimenFK,
                       })
                       setIsAnyWorklistModelOpened(true)
                     }}
@@ -356,7 +396,18 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
               </Typography.Text>
               <VisitTypeTag type={record.visitPurposeFK} />
             </Space>
-            <span>{getSpecimenCountByCategory(record.visitFK)}</span>
+            <Space>
+              <span>{getSpecimenCountByCategory(record.visitFK)}</span>
+              <Button
+                color='primary'
+                onClick={() => {}}
+                size='sm'
+                justIcon
+                style={{ height: 25, marginTop: 2 }}
+              >
+                <Print />
+              </Button>
+            </Space>
           </div>
         )
       },
@@ -440,29 +491,21 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
         }}
       />
       <ReceiveSpecimen
-        id={
-          currentModal.modal === MODALS.RECEIVE_SPECIMEN
-            ? currentModal.para
-            : undefined
-        }
+        {...receiveSpecimenPara}
         onClose={() => {
-          closeModal()
+          closeReceiveSpecimen()
         }}
         onConfirm={() => {
-          closeModal()
+          closeReceiveSpecimen()
         }}
       />
       <DiscardSpecimen
-        id={
-          currentModal.modal === MODALS.DISCARD_SPECIMEN
-            ? currentModal.para
-            : undefined
-        }
+        {...discardSpecimenPara}
         onClose={() => {
-          closeModal()
+          closeDiscardSpecimen()
         }}
         onConfirm={() => {
-          closeModal()
+          closeDiscardSpecimen()
         }}
       />
     </Card>

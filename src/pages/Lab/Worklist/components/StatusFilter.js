@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { Form, Button, Card, Tag, Avatar, Badge, Tooltip } from 'antd'
+import { Form, Button, Card, Tag, Avatar, Badge } from 'antd'
 import { CheckSquareFilled } from '@ant-design/icons'
+import { Tooltip } from '@/components'
 import {
   LAB_SPECIMEN_STATUS,
   LAB_SPECIMEN_STATUS_COLORS,
@@ -25,42 +26,48 @@ const TagWithCount = ({
   console.log('lab-module logs: checked', checked)
   return (
     <Tooltip title={tooltip}>
-      <Badge
-        offset={[-10, 0]}
-        count={
-          checked ? (
-            <CheckSquareFilled
-              style={{ color: '#4255bd', backgroundColor: 'white' }}
-            />
-          ) : (
-            0
-          )
-        }
-      >
-        <Tag color={tagColor} style={{ minWidth: 80 }} onClick={onClick}>
-          <div
-            style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
-          >
-            <span style={{ flexGrow: 1, marginRight: 5 }}>{label}</span>
-            <span
+      <span>
+        <Badge
+          offset={[-10, 0]}
+          count={
+            checked ? (
+              <CheckSquareFilled
+                style={{ color: '#4255bd', backgroundColor: 'white' }}
+              />
+            ) : (
+              0
+            )
+          }
+        >
+          <Tag color={tagColor} style={{ minWidth: 80 }} onClick={onClick}>
+            <div
               style={{
-                textAlign: 'center',
-                justifyContent: 'end',
-                alignItems: 'flex-end',
-                background: 'white',
-                borderRadius: '10px',
-                margin: '3px 0px',
-                color: tagColor,
-                width: '20px',
-                height: '20px',
-                fontSize: '0.8em',
+                display: 'flex',
+                alignItems: 'center',
+                cursor: 'pointer',
               }}
             >
-              {count}
-            </span>
-          </div>
-        </Tag>
-      </Badge>
+              <span style={{ flexGrow: 1, marginRight: 5 }}>{label}</span>
+              <span
+                style={{
+                  textAlign: 'center',
+                  justifyContent: 'end',
+                  alignItems: 'flex-end',
+                  background: 'white',
+                  borderRadius: '10px',
+                  margin: '3px 0px',
+                  color: tagColor,
+                  width: '20px',
+                  height: '20px',
+                  fontSize: '0.8em',
+                }}
+              >
+                {count}
+              </span>
+            </div>
+          </Tag>
+        </Badge>
+      </span>
     </Tooltip>
   )
 }

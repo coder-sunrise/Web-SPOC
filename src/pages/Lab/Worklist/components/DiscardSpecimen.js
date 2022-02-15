@@ -35,8 +35,6 @@ export const DiscardSpecimen = ({ open, id, onClose, onConfirm }) => {
       dispatch({
         type: 'worklistSpecimenDetails/query',
         payload: { id },
-      }).then(r => {
-        if (r) setShowModal(true)
       })
     }
 

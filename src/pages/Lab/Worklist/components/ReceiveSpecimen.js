@@ -18,8 +18,8 @@ import {
 } from '@/components'
 import { useCodeTable } from '@/utils/hooks'
 
-export const ReceiveSpecimen = ({ id, onClose, onConfirm }) => {
-  const [isOpenModal, setIsOpenModal] = useState(false)
+export const ReceiveSpecimen = ({ open, id, onClose, onConfirm }) => {
+  const [showModal, setShowModal] = useState(false)
   const ctspecimentype = useCodeTable('ctspecimentype')
   const cttestcategory = useCodeTable('cttestcategory')
   const { entity } = useSelector(s => s.worklistSpecimenDetails)
@@ -28,12 +28,11 @@ export const ReceiveSpecimen = ({ id, onClose, onConfirm }) => {
   const [form] = Form.useForm()
 
   useEffect(() => {
-    if (id) {
+    setShowModal(open)
+    if (open && id) {
       dispatch({
         type: 'worklistSpecimenDetails/query',
         payload: { id },
-      }).then(r => {
-        if (r) setIsOpenModal(true)
       })
     }
 
@@ -48,10 +47,10 @@ export const ReceiveSpecimen = ({ id, onClose, onConfirm }) => {
 
   return (
     <CommonModal
-      open={isOpenModal}
+      open={showModal}
       title='Receive Specimen'
       onClose={() => {
-        setIsOpenModal(false)
+        setShowModal(false)
         onClose && onClose()
       }}
       onConfirm={() => {
@@ -78,12 +77,6 @@ export const ReceiveSpecimen = ({ id, onClose, onConfirm }) => {
           <Descriptions.Item label='Patient Ref. No.'>
             {patient?.patientReferenceNo}
           </Descriptions.Item>
-          <Descriptions.Item label='Test Category'>
-            {
-              cttestcategory.find(item => item.id === entity.testCategoryFK)
-                ?.name
-            }
-          </Descriptions.Item>
           <Descriptions.Item label='Accession No.'>
             {entity.accessionNo}
           </Descriptions.Item>
@@ -92,6 +85,9 @@ export const ReceiveSpecimen = ({ id, onClose, onConfirm }) => {
               ctspecimentype.find(item => item.id === entity.specimenTypeFK)
                 ?.name
             }
+          </Descriptions.Item>
+          <Descriptions.Item label='Test Panels'>
+            {entity.testPanels}
           </Descriptions.Item>
           <Descriptions.Item label='Receiving Date'>
             <Form
@@ -110,7 +106,7 @@ export const ReceiveSpecimen = ({ id, onClose, onConfirm }) => {
                   payload,
                 }).then(result => {
                   if (result) {
-                    setIsOpenModal(false)
+                    setShowModal(false)
                     onConfirm && onConfirm()
                   }
                 })

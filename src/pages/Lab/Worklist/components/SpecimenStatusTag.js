@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
-import { Tag, Tooltip } from 'antd'
+import { Tag } from 'antd'
+import { Tooltip } from '@/components'
 import {
   LAB_SPECIMEN_STATUS_COLORS,
   LAB_SPECIMEN_STATUS_LABELS,
