@@ -2,8 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { PRIORITY_VALUES } from '@/utils/constants'
 
-export const TestPanelColumn = ({ testPanels }) => {
-  console.log('lab-module logs: TestPanelColumn - testPanels', testPanels)
+export const TestPanelColumn = ({ testPanels, columnWidth = 350 }) => {
   const testPanelHtml = [...testPanels]
     //Sort by Priority then by the alphabetical order
     .sort((a, b) =>
@@ -25,7 +24,7 @@ export const TestPanelColumn = ({ testPanels }) => {
   return (
     <p
       style={{
-        width: 334, //Column width - 16 (left and righ 8 px padding)
+        width: columnWidth - 16, //Column width - 16 (left and righ 8 px padding)
         display: '-webkit-box',
         WebkitBoxOrient: 'vertical',
         WebkitLineClamp: 2,

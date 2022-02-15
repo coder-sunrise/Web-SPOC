@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
-import { Tag, Tooltip } from 'antd'
+import { Tag } from 'antd'
+import { Tooltip } from '@/components'
 import { useVisitTypes } from '@/utils/hooks'
 import { VISIT_TYPE } from '@/utils/constants'
 
