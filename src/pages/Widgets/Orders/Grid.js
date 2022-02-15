@@ -983,7 +983,11 @@ export default ({
   }
 
   const getDisplayName = row => {
-    if (row.type === '10' || row.type === '3') {
+    if (
+      row.type === ORDER_TYPES.RADIOLOGY ||
+      row.type === ORDER_TYPES.SERVICE ||
+      ORDER_TYPES.LAB
+    ) {
       if (row.newServiceName && row.newServiceName.trim() !== '') {
         return row.newServiceName
       }
