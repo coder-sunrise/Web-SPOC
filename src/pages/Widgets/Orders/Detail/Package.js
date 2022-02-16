@@ -27,7 +27,11 @@ import {
   openCautionAlertPrompt,
   ReplaceCertificateTeplate,
 } from '@/pages/Widgets/Orders/utils'
-import { DURATION_UNIT, SERVICE_CENTER_CATEGORY } from '@/utils/constants'
+import {
+  DURATION_UNIT,
+  ORDER_TYPES,
+  SERVICE_CENTER_CATEGORY,
+} from '@/utils/constants'
 import {
   isMatchInstructionRule,
   getDrugAllergy,
@@ -563,14 +567,14 @@ import { CollectionsOutlined } from '@material-ui/icons'
             newOrder.serviceCenterCategoryFK ===
               SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE
           ) {
-            type = '9'
+            type = ORDER_TYPES.LAB
           } else if (
             newOrder.serviceCenterCategoryFK ===
               SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER ||
             newOrder.serviceCenterCategoryFK ===
               SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE
           ) {
-            type = '10'
+            type = ORDER_TYPES.RADIOLOGY
           }
         }
         const data = {

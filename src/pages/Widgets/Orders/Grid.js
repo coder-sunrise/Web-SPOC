@@ -1019,7 +1019,11 @@ export default ({
   }
 
   const getDisplayName = row => {
-    if (row.type === '10' || row.type === '3') {
+    if (
+      row.type === ORDER_TYPES.RADIOLOGY ||
+      row.type === ORDER_TYPES.SERVICE ||
+      ORDER_TYPES.LAB
+    ) {
       if (row.newServiceName && row.newServiceName.trim() !== '') {
         return row.newServiceName
       }
@@ -1670,12 +1674,13 @@ export default ({
                   '0,0.0',
                 )} ${row.dispenseUOMDisplayValue || ''}`
               } else if (
-                row.type === '3' ||
-                row.type === '7' ||
-                row.type === '10'
+                row.type === ORDER_TYPES.SERVICE ||
+                row.type === ORDER_TYPES.TREATMENT ||
+                row.type === ORDER_TYPES.RADIOLOGY ||
+                row.type === ORDER_TYPES.LAB
               ) {
                 qty = `${numeral(row.quantity || 0).format('0,0.0')}`
-              } else if (row.type === '4') {
+              } else if (row.type === ORDER_TYPES.CONSUMABLE) {
                 qty = `${numeral(row.quantity || 0).format('0,0.0')} ${
                   row.unitOfMeasurement
                 }`

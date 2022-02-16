@@ -297,7 +297,26 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
         dataIndex: 'specimenStatusFK',
         key: 'specimenStatusFK',
         align: 'center',
-        render: (text, record, index) => <SpecimenStatusTag statusId={text} />,
+        render: (specimenStatus, record, index) => (
+          <SpecimenStatusTag
+            customToolTip={
+              specimenStatus === LAB_SPECIMEN_STATUS.DISCARDED ? (
+                <div>
+                  <div>
+                    Discarded by {record.lastUpdatedClinicianName} at{' '}
+                    {record.lastUpdatedDate?.format(
+                      dateFormatLongWithTimeNoSec,
+                    )}
+                  </div>
+                  <div>Reason: {record.specimenDiscardReason}</div>
+                </div>
+              ) : (
+                ''
+              )
+            }
+            statusId={specimenStatus}
+          />
+        ),
       },
       {
         title: 'Action',
