@@ -67,13 +67,13 @@ export const WorklistFilter = () => {
       stopTimer()
     } else {
       handleSearch()
-      startTimer()
     }
 
     return () => clearInterval(timer.current)
   }, [isAnyWorklistModelOpened])
 
   const handleSearch = () => {
+    stopTimer()
     const {
       searchValue,
       visitType,
@@ -108,6 +108,7 @@ export const WorklistFilter = () => {
       if (val) {
         setRefreshDate(moment())
       }
+      startTimer()
     })
   }
 
