@@ -24,6 +24,14 @@ export const WorklistContextProvider = props => {
     console.log('WorklistContext - Timer Stopped.', new Date())
   }
 
+  const startTimer = () => {
+    timer.current = setInterval(() => {
+      filterWorklist()
+    }, autoRefreshRadiologyWorklistInterval * 1000)
+
+    console.log('WorklistContext - Timer Started.', new Date())
+  }
+
   useEffect(() => {
     if (oriQCallList) {
       setRadiologyQueueCallList(
@@ -120,21 +128,22 @@ export const WorklistContextProvider = props => {
     }).then(val => {
       if (val) {
         setRefreshDate(moment())
-        timer.current = setInterval(() => {
-          filterWorklist(currentParams)
-        }, autoRefreshRadiologyWorklistInterval * 1000)
-        console.log('WorklistContext - Timer Started.', new Date())
+        startTimer()
       }
     })
     setLastFilter({ ...currentParams })
   }
 
   const setDetailsId = (id, readonly = false) => {
+    stopTimer()
     setIsReadOnly(readonly)
     setDetailsIdInternal(id)
 
     //set back the default value.
-    if (!id) setIsReadOnly(false)
+    if (!id) {
+      setIsReadOnly(false)
+      startTimer()
+    }
   }
 
   return (

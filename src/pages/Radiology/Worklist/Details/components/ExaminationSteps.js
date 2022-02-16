@@ -3,7 +3,7 @@ import moment from 'moment'
 import { CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons'
 import { RADIOLOGY_WORKITEM_STATUS } from '@/utils/constants'
 import { examinationSteps } from '@/utils/codes'
-import { dateFormatLongWithTimeNoSec } from '@/components'
+import { dateFormatLongWithTimeNoSec, Tooltip } from '@/components'
 import styles from './ExaminationStep.less'
 
 const { Step } = Steps
@@ -53,6 +53,23 @@ const getStatusStep = (status, statusHistory, currentStatusFK) => {
     history => history.statusFK === status.statusFK,
   )
 
+  let updateTimeTooltip
+  if (lastStatus) {
+    if (lastStatus.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW) {
+      updateTimeTooltip = 'Order Created Time'
+    } else if (lastStatus.statusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS) {
+      updateTimeTooltip = 'Examination Start Time'
+    } else if (
+      lastStatus.statusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED
+    ) {
+      updateTimeTooltip = 'Modality Completed Time'
+    } else if (lastStatus.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED) {
+      updateTimeTooltip = 'Completed Time'
+    } else {
+      updateTimeTooltip = 'Cancelled Time'
+    }
+  }
+
   return (
     <Step
       title={<span style={{ fontWeight: 500 }}>{status.name}</span>}
@@ -68,11 +85,15 @@ const getStatusStep = (status, statusHistory, currentStatusFK) => {
           : ''
       }
       description={
-        lastStatus
-          ? `${moment(lastStatus.actionDate).format(
-              dateFormatLongWithTimeNoSec,
-            )}`
-          : ''
+        <Tooltip title={updateTimeTooltip}>
+          <div>
+            {lastStatus
+              ? `${moment(lastStatus.actionDate).format(
+                  dateFormatLongWithTimeNoSec,
+                )}`
+              : ''}
+          </div>
+        </Tooltip>
       }
     />
   )
@@ -89,6 +110,7 @@ export const ExaminationSteps = ({ item }) => {
       : examinationSteps.filter(
           s => s.statusFK !== RADIOLOGY_WORKITEM_STATUS.CANCELLED,
         )
+
   return (
     <div className='order-steps'>
       <Steps
