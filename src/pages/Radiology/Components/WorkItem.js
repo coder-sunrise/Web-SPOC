@@ -284,12 +284,10 @@ const WorkitemBody = ({ item }) => {
   )
 }
 
-export const Workitem = item => (
+export const Workitem = (item, style) => (
   <div
     key={item.radiologyWorkitemId}
     style={{
-      height: 220,
-      margin: '10px 5px',
       borderRadius: 10,
       backgroundColor:
         (item.isNurseActualized || !item.isNurseActualizeRequired) &&
@@ -298,6 +296,7 @@ export const Workitem = item => (
           ? '#d3fed1'
           : 'white',
       border: '#cdcdcd solid 2px',
+      ...style,
     }}
   >
     <WorkitemTitle item={item} />

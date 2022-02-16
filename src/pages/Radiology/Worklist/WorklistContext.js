@@ -11,10 +11,18 @@ export const WorklistContextProvider = props => {
   const codetable = useSelector(st => st.codetable)
   const clinicianProfile = useSelector(st => st.user.data.clinicianProfile)
   const oriQCallList = useSelector(st => st.queueCalling.oriQCallList)
-  const [lastFilter, setLastFilter] = useState({})
   const [refreshDate, setRefreshDate] = useState(moment())
   const [radiologyQueueCallList, setRadiologyQueueCallList] = useState([])
   const [pharmacyQueueCallList, setPharmacyQueueCallList] = useState([])
+  const [lastFilter, setLastFilter] = useState({})
+  const { settings } = useSelector(s => s.clinicSettings)
+  const { autoRefreshRadiologyWorklistInterval = 30 } = settings
+  const timer = React.useRef(null)
+
+  const stopTimer = () => {
+    clearInterval(timer.current)
+    console.log('WorklistContext - Timer Stopped.', new Date())
+  }
 
   useEffect(() => {
     if (oriQCallList) {
@@ -74,9 +82,9 @@ export const WorklistContextProvider = props => {
     }
   }
 
-  const filterWorklist = param => {
-    const currentFilter = param ?? lastFilter
-
+  const filterWorklist = filterParam => {
+    stopTimer()
+    const currentParams = filterParam ?? lastFilter
     const {
       searchValue,
       visitType,
@@ -85,7 +93,7 @@ export const WorklistContextProvider = props => {
       dateTo,
       isUrgent,
       isMyPatientOnly,
-    } = currentFilter
+    } = currentParams
 
     dispatch({
       type: 'radiologyWorklist/query',
@@ -100,9 +108,11 @@ export const WorklistContextProvider = props => {
             ? modality.filter(t => t !== -99).join(',')
             : undefined,
           filterFrom: dateFrom,
-          filterTo: moment(dateTo)
-            .endOf('day')
-            .formatUTC(false),
+          filterTo: dateTo
+            ? moment(dateTo)
+                .endOf('day')
+                .formatUTC(false)
+            : undefined,
           isUrgent: isUrgent,
           clinicianProfileId: isMyPatientOnly ? clinicianProfile.id : undefined,
         },
@@ -110,9 +120,13 @@ export const WorklistContextProvider = props => {
     }).then(val => {
       if (val) {
         setRefreshDate(moment())
+        timer.current = setInterval(() => {
+          filterWorklist(currentParams)
+        }, autoRefreshRadiologyWorklistInterval * 1000)
+        console.log('WorklistContext - Timer Started.', new Date())
       }
     })
-    setLastFilter({ ...currentFilter })
+    setLastFilter({ ...currentParams })
   }
 
   const setDetailsId = (id, readonly = false) => {

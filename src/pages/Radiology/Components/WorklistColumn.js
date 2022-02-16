@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from 'react'
+import React, { Fragment, useState, useEffect, useRef } from 'react'
 import { Typography } from 'antd'
 import _ from 'lodash'
 import ProCard from '@ant-design/pro-card'
@@ -16,11 +16,12 @@ const defaultColumnStyle = {
 }
 
 const columnBodyStyle = {
+  position: 'relative',
   backgroundColor: 'white',
   margin: 3,
   flex: '1 1 auto',
   overflow: 'auto',
-  height: 0,
+  height: '0',
   padding: '3px',
 }
 
@@ -147,11 +148,82 @@ const sortItems = data => {
 }
 
 const WorklistColumnBody = ({ data, renderWorkitem }) => {
-  const sortedData = sortItems(data)
+  const viewPortRef = useRef()
+  const marginTop = 10
+  const offsetHeight = 230
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [columnData, setColumnData] = useState([])
+  const [containerHeight, setContainerHeight] = useState(0)
+
+  useEffect(() => {
+    window.addEventListener('resize', loadCurrentData)
+
+    return () => window.removeEventListener('resize', loadCurrentData)
+  }, [])
+
+  useEffect(() => {
+    if (data && data.workitems.length > 0) {
+      const height = data.workitems.length * offsetHeight
+      setContainerHeight(height)
+    }
+    return () => {
+      setContainerHeight(0)
+      setColumnData([])
+      setCurrentIndex(0)
+    }
+  }, [data])
+
+  useEffect(() => {
+    loadCurrentData()
+  }, [data, currentIndex])
+
+  const loadCurrentData = () => {
+    // re-calculate the newIndex in case if the change is only data which will result
+    calculateCurrentIndex()
+
+    const height = viewPortRef.current.offsetHeight
+    const numVisibleItems = Math.trunc(height / offsetHeight) + 1
+    const datalength = data.workitems.length > 0 ? data.workitems.length : 1
+
+    const start =
+      currentIndex - numVisibleItems >= datalength
+        ? currentIndex - numVisibleItems
+        : currentIndex
+
+    const end =
+      currentIndex + numVisibleItems >= datalength
+        ? datalength
+        : currentIndex + numVisibleItems
+
+    //Load the data based on the current viewport. Virtual rendering.
+    const currentData = sortItems(data).slice(start, end)
+    setColumnData(currentData)
+  }
+
+  const calculateCurrentIndex = () => {
+    console.log('calculateCurrentIndex')
+    const scrollTop = viewPortRef.current.scrollTop
+    const newIndex = Math.trunc(scrollTop / offsetHeight)
+    if (newIndex != currentIndex) setCurrentIndex(newIndex)
+  }
 
   return (
-    <div style={columnBodyStyle}>
-      {sortedData.map(item => renderWorkitem(item))}
+    <div
+      ref={viewPortRef}
+      style={columnBodyStyle}
+      onScroll={calculateCurrentIndex}
+    >
+      <div style={{ height: containerHeight }}>
+        {columnData.map((item, i) =>
+          renderWorkitem(item, {
+            position: 'absolute',
+            top: marginTop + (currentIndex + i) * offsetHeight,
+            left: 5,
+            right: 5,
+            height: offsetHeight - marginTop,
+          }),
+        )}
+      </div>
     </div>
   )
 }

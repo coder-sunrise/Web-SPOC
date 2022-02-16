@@ -4,6 +4,7 @@ import ProCard from '@ant-design/pro-card'
 import { Icon } from '@/components'
 import { WorklistColumn } from './WorklistColumn'
 import { Workitem } from './WorkItem'
+import { useSelector, useDispatch, connect } from 'dva'
 
 export const Worklist = ({ columns }) => {
   const [columnPercentage, setColumnPercentage] = useState(100)
@@ -30,6 +31,7 @@ export const Worklist = ({ columns }) => {
           columnPercentage={100}
           data={column}
           renderWorkitem={Workitem}
+          key={index}
         />
       ))}
     </div>

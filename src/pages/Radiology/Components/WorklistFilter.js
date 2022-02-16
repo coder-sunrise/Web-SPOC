@@ -54,34 +54,14 @@ export const WorklistFilter = () => {
   const dispatch = useDispatch()
 
   const { detailsId, filterWorklist } = useContext(WorklistContext)
-  const { settings } = useSelector(s => s.clinicSettings)
   const clinicianProfile = useSelector(
     state => state.user.data.clinicianProfile,
   )
 
-  const { autoRefreshRadiologyWorklistInterval = 30 } = settings
-
-  const timer = React.useRef(null)
-
-  const startTimer = () => {
-    timer.current = setInterval(() => {
-      handleSearch()
-    }, autoRefreshRadiologyWorklistInterval * 1000)
-  }
-
-  const stopTimer = () => {
-    clearInterval(timer.current)
-  }
-
   useEffect(() => {
-    if (detailsId) {
-      stopTimer()
-    } else {
+    if (!detailsId) {
       handleSearch()
-      startTimer()
     }
-
-    return () => clearInterval(timer.current)
   }, [detailsId])
 
   const handleSearch = () => {

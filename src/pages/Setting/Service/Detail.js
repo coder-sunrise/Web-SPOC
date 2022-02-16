@@ -1055,7 +1055,7 @@ class Detail extends PureComponent {
               <React.Fragment>
                 <h4 style={{ fontWeight: 400 }}>
                   <b>Lab Test Panel Settings</b>
-                </h4>{' '}
+                </h4>
                 {testPanelErrMsg && (
                   <p className={classes.serviceSettingStyle}>
                     {testPanelErrMsg}
