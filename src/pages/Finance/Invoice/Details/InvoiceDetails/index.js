@@ -34,6 +34,7 @@ class InvoiceDetails extends Component {
     isExistPackage: false,
     expandedGroups: [],
     showPrintInvoiceMenu: false,
+    invoiceReportType: '',
   }
 
   componentWillReceiveProps(nextProps) {
@@ -67,7 +68,10 @@ class InvoiceDetails extends Component {
   }
 
   toggleReport = invoiceReportType => {
-    this.setState(preState => ({ showReport: !preState.showReport }))
+    this.setState(preState => ({
+      showReport: !preState.showReport,
+      invoiceReportType: invoiceReportType,
+    }))
   }
 
   toggleVisitInvoiceReport = () => {
@@ -145,7 +149,7 @@ class InvoiceDetails extends Component {
             visible={this.state.showPrintInvoiceMenu}
             onVisibleChange={() => {
               if (!values.visitOrderTemplateFK) {
-                this.toggleReport(row, INVOICE_REPORT_TYPES.INDIVIDUALINVOICE)
+                this.toggleReport(INVOICE_REPORT_TYPES.INDIVIDUALINVOICE)
               } else {
                 this.setState(preState => {
                   return {
@@ -247,7 +251,10 @@ class InvoiceDetails extends Component {
         >
           <ReportViewer
             reportID={15}
-            reportParameters={{ InvoiceID: values ? values.id : '' }}
+            reportParameters={{
+              InvoiceID: values ? values.id : '',
+              printType: this.state.invoiceReportType,
+            }}
           />
         </CommonModal>
         <CommonModal

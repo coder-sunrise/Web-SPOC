@@ -123,6 +123,7 @@ class Details extends PureComponent {
           CopayerId: undefined,
           InvoicePayerid: undefined,
           isSaved: true,
+          printType: 'Detailed Invoice',
         },
       },
     })

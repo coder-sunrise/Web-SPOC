@@ -84,14 +84,18 @@ class Signature extends React.Component {
       <div>
         <GridContainer>
           {signatureName && (
-          <GridItem xs={12} md={12}>
-            <TextField label={signatureNameLabel} disabled value={signatureName} />
-          </GridItem>
+            <GridItem xs={12} md={12}>
+              <TextField
+                label={signatureNameLabel}
+                disabled
+                value={signatureName}
+              />
+            </GridItem>
           )}
           <GridItem xs={12} md={12} onClick={this.contentModifyed}>
             <SketchField
               name='sketch'
-              ref={(c) => {
+              ref={c => {
                 this._sketch = c
               }}
               lineWidth={6}
@@ -120,7 +124,7 @@ class Signature extends React.Component {
           </Button>
           {isEditable && (
             <React.Fragment>
-              <Button color='danger' icon={null} onClick={this.clearSignature}>
+              <Button color='info' icon={null} onClick={this.clearSignature}>
                 Clear
               </Button>
               <Button
