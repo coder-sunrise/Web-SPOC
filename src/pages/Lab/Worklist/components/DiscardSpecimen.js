@@ -121,7 +121,7 @@ export const DiscardSpecimen = ({ open, id, onClose, onConfirm }) => {
           <Form.Item
             name='specimenDiscardReason'
             style={{ margin: 8 }}
-            rules={[{ required: true, message: 'Receiving date is required.' }]}
+            rules={[{ required: true, message: 'Reason is required.' }]}
           >
             <TextField
               label='Reason'
