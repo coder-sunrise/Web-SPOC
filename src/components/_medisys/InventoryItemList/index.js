@@ -16,7 +16,8 @@ import {
   Switch,
   SizeContainer,
 } from '@/components'
-import { getUniqueId } from '@/utils/utils'
+import { getUniqueId,calculateAdjustAmount } from '@/utils/utils'
+import { isNumber } from 'util'
 import { InventoryTypes, visitOrderTemplateItemTypes } from '@/utils/codes'
 import { ITEM_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
@@ -268,20 +269,21 @@ class InventoryItemList extends React.Component {
       }
 
       itemFieldName = InventoryTypes.filter(x => x.ctName === type)[0]
+      const unitPrice = itemFieldName.value === ITEM_TYPE.SERVICE
+      ? tempSelectedItem.unitPrice
+      : tempSelectedItem.sellingPrice
       let newItemRow = {
         uid: getUniqueId(),
         type: itemFieldName.value,
         [itemFieldName.itemFKName]: tempSelectedItemFK,
         itemFK: tempSelectedItemFK,
-        unitPrice:
-          itemFieldName.value === ITEM_TYPE.SERVICE
-            ? tempSelectedItem.unitPrice
-            : tempSelectedItem.sellingPrice,
+        unitPrice: unitPrice,
         code: tempSelectedItem.code,
         name: tempSelectedItem.displayValue,
         itemValueType: 'ExactAmount',
         quantity: 1,
         itemValue: 0,
+        totalAftAdj: unitPrice,
       }
       this.addItemToRows(newItemRow)
     }
@@ -326,7 +328,7 @@ class InventoryItemList extends React.Component {
                       type === 'inventorymedication' ||
                       type === 'inventoryvaccination'
                     ) {
-                      uomName = dispensingUOM.name
+                      uomName = dispensingUOM?.name
                     } else if (type === 'inventoryconsumable') {
                       uomName = uom.name
                     } else if (type === 'ctservice') {
@@ -497,7 +499,15 @@ class InventoryItemList extends React.Component {
       })
       commonColumns.splice(commonColumns.length - 1, 0, {
         name: 'amount',
-        title: 'Amount',
+        title: 'Total Bef. Adj.',
+      })
+      commonColumns.splice(commonColumns.length - 1, 0, {
+        name: 'adjAmt',
+        title: 'Adjustment',
+      })
+      commonColumns.splice(commonColumns.length - 1, 0, {
+        name: 'totalAftAdj',
+        title: 'Total Aft. Adj.',
       })
     } else {
       commonColumns.splice(commonColumns.length - 1, 0, {
@@ -507,6 +517,38 @@ class InventoryItemList extends React.Component {
     }
 
     return commonColumns
+  }
+
+  onAdjustmentConditionChange = index => {
+    const { setFieldValue, values } = this.props
+    const { rows = [] } = values
+    const { adjValue, isMinus, isExactAmount } = rows[index]
+    if (!isNumber(adjValue)) return
+    let value = adjValue
+    if (!isExactAmount && adjValue > 100) {
+      value = 100
+      setFieldValue(`rows[${index}].adjValue`, 100)
+    }
+    if (!isMinus) {
+      value = Math.abs(value)
+    } else {
+      value = -Math.abs(value)
+    }
+
+    this.getFinalAmount({ value, index })
+  }
+
+  getFinalAmount = ({ value, index } = {}) => {
+    const { setFieldValue, values } = this.props
+    const { rows = [] } = values
+    const { isExactAmount, adjValue, total = 0 } = rows[index]
+    const finalAmount = calculateAdjustAmount(
+      isExactAmount,
+      total,
+      value || adjValue,
+    )
+    setFieldValue(`rows[${index}].totalAftAdj`, finalAmount.amount)
+    setFieldValue(`rows[${index}].adjAmt`, finalAmount.adjAmount)
   }
 
   getColumnsExtensions = values => {
@@ -630,6 +672,172 @@ class InventoryItemList extends React.Component {
                   currency
                   value={_.round(row.unitPrice * row.quantity, 2)}
                 />
+              </p>
+            )
+          },
+        },
+        {
+          columnName: 'adjAmt',
+          width: 200,
+          isReactComponent: true,
+          sortingEnabled: false,
+          render: currentrow => {
+            const { focused = false } = this.state
+            const { rows = [] } = values
+            const { row } = currentrow
+            const index = rows.map(i => i.uid).indexOf(row.uid)
+            return (
+              <div style={{ display: 'flex' }}>
+                <Field
+                  name={`rows[${index}].isMinus`}
+                  render={args => (
+                    <Switch
+                      style={{ margin: 0 }}
+                      checkedChildren='-'
+                      unCheckedChildren='+'
+                      label=''
+                      onChange={() => {
+                        setTimeout(() => {
+                          this.onAdjustmentConditionChange(index)
+                        }, 1)
+                      }}
+                      {...args}
+                      inputProps={{
+                        onMouseUp: e => {
+                          if (!focused) {
+                            this.setState({focused:true})
+                            e.target.click()
+                          }
+                        },
+                      }}
+                      disabled={false}
+                    />
+                  )}
+                />
+                <div
+                  style={{
+                    marginLeft: -24,
+                    marginRight: 10,
+                  }}
+                >
+                  {row.isExactAmount ? (
+                    <Field
+                      name={`rows[${index}].adjValue`}
+                      render={args => (
+                        <NumberInput
+                          style={{
+                            marginBottom: 0,
+                            marginTop: 0,
+                          }}
+                          currency
+                          label=''
+                          onChange={() => {
+                            setTimeout(() => {
+                              this.onAdjustmentConditionChange(index)
+                            }, 1)
+                          }}
+                          min={0}
+                          precision={2}
+                          {...args}
+                          inputProps={{
+                            onMouseUp: e => {
+                              if (!focused) {
+                                this.setState({ focused: true })
+                                e.target.focus()
+                              }
+                            },
+                          }}
+                          disabled={false}
+                        />
+                      )}
+                    />
+                  ) : (
+                    <Field
+                      name={`rows[${index}].adjValue`}
+                      render={args => (
+                        <NumberInput
+                          style={{
+                            marginBottom: 0,
+                            marginTop: 0,
+                          }}
+                          percentage
+                          max={100}
+                          label=''
+                          onChange={() => {
+                            setTimeout(() => {
+                              this.onAdjustmentConditionChange(index)
+                            }, 1)
+                          }}
+                          min={0}
+                          precision={2}
+                          {...args}
+                          inputProps={{
+                            onMouseUp: e => {
+                              if (!focused) {
+                                this.setState({ focused: true })
+                                e.target.focus()
+                              }
+                            },
+                          }}
+                          disabled={false}
+                        />
+                      )}
+                    />
+                  )}
+                </div>
+                <Field
+                  name={`rows[${index}].isExactAmount`}
+                  render={args => (
+                    <Switch
+                      style={{
+                        marginRight: -30,
+                        marginBottom: 0,
+                        marginTop: 0,
+                      }}
+                      checkedChildren='$'
+                      // checkedValue='ExactAmount'
+                      unCheckedChildren='%'
+                      // unCheckedValue='Percentage'
+                      label=''
+                      onChange={() => {
+                        setTimeout(() => {
+                          this.onAdjustmentConditionChange(index)
+                        }, 1)
+                      }}
+                      {...args}
+                      inputProps={{
+                        onMouseUp: e => {
+                          if (!focused) {
+                            this.setState({ focused: true })
+                            e.target.click()
+                          }
+                        },
+                      }}
+                      disabled={false}
+                    />
+                  )}
+                />
+              </div>
+            )
+          },
+        },
+        {
+          columnName: 'totalAftAdj',
+          observeFields: ['amount', 'adjAmt'],
+          type: 'currency',
+          render: row => {
+            return (
+              <p
+                style={{
+                  color: 'darkblue',
+                  fontWeight: 500,
+                }}
+              >
+                <NumberInput
+                    text
+                    currency
+                    value={row.totalAftAdj}
+                  />
               </p>
             )
           },
