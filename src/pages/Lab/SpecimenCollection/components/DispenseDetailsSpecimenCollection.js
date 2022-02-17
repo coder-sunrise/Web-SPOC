@@ -226,11 +226,11 @@ const DispenseDetailsSpecimenCollection = ({ visitId, ...restProps }) => {
         )
 
         const serviceName = _(curSpecimenLabWorkitems)
-          .sortBy('serviceName')
+          .sortBy(x => x.serviceName.toLowerCase())
           .uniqBy('serviceName')
-          .reduce((prev, current) => {
-            return `${prev ? prev + ', ' : ''}${current.serviceName}`
-          }, '')
+          .value()
+          .map(x => x.serviceName)
+          .join(', ')
 
         const specimenType = ctspecimentype.find(
           specimenType => specimenType.id === item.specimenTypeFK,
