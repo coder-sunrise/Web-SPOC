@@ -50,13 +50,14 @@ const DispenseDetailsSpecimenCollection = ({ visitId, ...restProps }) => {
       title: 'Service Name',
       name: 'serviceName',
     },
+
+    {
+      title: 'Test Panels',
+      name: 'testPanelNames',
+    },
     {
       title: 'Specimen Type',
       name: 'specimenType',
-    },
-    {
-      title: 'Test Panels',
-      name: 'testPanels',
     },
     {
       title: 'Accession No.',
@@ -69,12 +70,6 @@ const DispenseDetailsSpecimenCollection = ({ visitId, ...restProps }) => {
     {
       columnName: 'specimenType',
       width: 180,
-    },
-    {
-      columnName: 'testPanels',
-      render: row => {
-        return <TestPanelColumn testPanels={row.testPanels} />
-      },
     },
     {
       columnName: 'accessionNo',
@@ -189,6 +184,7 @@ const DispenseDetailsSpecimenCollection = ({ visitId, ...restProps }) => {
             lw => lw.statusFK === LAB_WORKITEM_STATUS.NEW,
           ),
         )
+
         setLabSpecimens(groupWorkitemsBySpecimens(result.specimenLabWorkitems))
       }
     })
@@ -229,32 +225,31 @@ const DispenseDetailsSpecimenCollection = ({ visitId, ...restProps }) => {
           innerItem => innerItem.labSpecimenFK === item.labSpecimenFK,
         )
 
-        const serviceName = _.sortBy(
-          curSpecimenLabWorkitems,
-          'serviceName',
-        ).reduce((prev, current) => {
-          return `${prev ? prev + ', ' : ''}${current.serviceName}`
-        }, '')
+        const serviceName = _(curSpecimenLabWorkitems)
+          .sortBy(x => x.serviceName.toLowerCase())
+          .uniqBy('serviceName')
+          .value()
+          .map(x => x.serviceName)
+          .join(', ')
 
         const specimenType = ctspecimentype.find(
           specimenType => specimenType.id === item.specimenTypeFK,
         ).name
 
-        const testPanels = _.uniq(
-          curSpecimenLabWorkitems.map(innerItem => ({
-            testPanelFK: innerItem.testPanelFK,
-            testPanelName: cttestpanel.find(
+        const testPanelNames = _.uniq(
+          curSpecimenLabWorkitems.map(innerItem => {
+            const testPanelName = cttestpanel.find(
               item => item.id === innerItem.testPanelFK,
-            )?.name,
-            priority: innerItem.priority,
-          })),
-        )
+            )?.name
+            return testPanelName ? testPanelName : ''
+          }),
+        ).join(', ')
 
         return {
           ...item,
           serviceName,
           specimenType,
-          testPanels,
+          testPanelNames,
         }
       }),
       'labSpecimenFK',
