@@ -242,6 +242,7 @@ class PaymentDetails extends Component {
             InvoiceId: invoicePayment ? invoicePayment.currentId : '',
             CopayerId: copayerID,
             InvoicePayerid: invoicePayerid,
+            printType: invoiceReportType,
           },
           'Invoice',
         )

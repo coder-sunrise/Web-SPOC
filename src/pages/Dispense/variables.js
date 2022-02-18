@@ -5,6 +5,7 @@ import { FormattedMessage } from 'umi'
 import numeral from 'numeral'
 import _ from 'lodash'
 import { currencySymbol, currencyFormat } from '@/utils/config'
+import { Space } from 'antd'
 import {
   NumberInput,
   TextField,
@@ -21,15 +22,12 @@ import PackageDrawdownInfo from '@/pages/Widgets/Orders/Detail/PackageDrawdownIn
 import { InventoryTypes } from '@/utils/codes'
 import CONSTANTS from './DispenseDetails/constants'
 import Cross from '@material-ui/icons/HighlightOff'
-import {
-  UnorderedListOutlined,
-  CheckOutlined,
-  FileTextOutlined,
-} from '@ant-design/icons'
+import { UnorderedListOutlined, CheckOutlined } from '@ant-design/icons'
 import {
   NURSE_WORKITEM_STATUS,
   RADIOLOGY_WORKITEM_STATUS,
 } from '@/utils/constants'
+import LabWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/LabWorkItemInfo'
 import Authorized from '@/utils/Authorized'
 export const tableConfig = {
   FuncProps: { pager: false },
@@ -205,7 +203,7 @@ const radiologyDetailsButton = (row, buttonClickCallback) => {
           justIcon
           onClick={() => buttonClickCallback(radiologyWorkitemID)}
         >
-          <FileTextOutlined />
+          <UnorderedListOutlined />
         </Button>
       </Tooltip>
     )
@@ -903,11 +901,8 @@ const urgentIndicator = (row, right) => {
       <Tooltip title='Urgent'>
         <div
           style={{
-            right: right,
             borderRadius: 4,
             backgroundColor: 'red',
-            position: 'absolute',
-            bottom: 2,
             fontWeight: 500,
             color: 'white',
             fontSize: '0.7rem',
@@ -929,9 +924,6 @@ const radiologyWorkitemStatus = radiologyWorkitemStatusFK => {
       <Tooltip title='New'>
         <div
           style={{
-            position: 'absolute',
-            bottom: 2,
-            right: -20,
             borderRadius: 8,
             height: 16,
             width: 16,
@@ -960,9 +952,6 @@ const radiologyWorkitemStatus = radiologyWorkitemStatusFK => {
       >
         <div
           style={{
-            position: 'absolute',
-            bottom: 2,
-            right: -20,
             borderRadius: 8,
             height: 16,
             width: 16,
@@ -980,9 +969,6 @@ const radiologyWorkitemStatus = radiologyWorkitemStatusFK => {
       <Tooltip title='Cancelled'>
         <div
           style={{
-            position: 'absolute',
-            bottom: -4,
-            right: -20,
             cursor: 'pointer',
           }}
         >
@@ -1005,13 +991,20 @@ export const OtherOrdersColumnExtensions = (
   {
     columnName: 'type',
     compare: compareString,
-    width: 120,
+    width: 180,
     render: row => {
       let radiologyWorkitemStatusFK
       if (row.type === 'Radiology' && !row.isPreOrder) {
         const { workitem: { radiologyWorkitem: { statusFK } = {} } = {} } = row
         // const { radiologyWorkitem = {} } = workitem
         radiologyWorkitemStatusFK = statusFK
+      }
+
+      let labWorkItems = []
+      let labItemStyle = {}
+      if (row.type === 'Lab' && !row.isPreOrder) {
+        const { workitem } = row
+        labWorkItems = workitem?.labWorkitems
       }
 
       let paddingRight = row.isPreOrder ? 24 : 0
@@ -1027,41 +1020,48 @@ export const OtherOrdersColumnExtensions = (
       }
 
       return (
-        <div style={{ position: 'relative' }}>
-          <div
+        <div
+          style={{
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+            display: 'flex',
+            justifyContent: 'space-between',
+            padding: 5,
+          }}
+        >
+          <span style={{ width: 80 }}>{row.type}</span>
+          <Space
+            direction='horizontal'
+            align='end'
             style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-              paddingRight: paddingRight,
+              flexGrow: 1,
+              alignItems: 'start',
             }}
           >
-            {row.type}
-            <div style={{ position: 'relative', top: 2 }}>
-              {row.isPreOrder && (
-                <Tooltip title='New Pre-Order'>
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: 2,
-                      right: -24,
-                      borderRadius: 4,
-                      backgroundColor: '#4255bd',
-                      fontWeight: 500,
-                      color: 'white',
-                      fontSize: '0.7rem',
-                      padding: '2px 3px',
-                      height: 20,
-                    }}
-                  >
-                    Pre
-                  </div>
-                </Tooltip>
-              )}
-              {radiologyWorkitemStatusFK &&
-                radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
-              {urgentIndicator(row, urgentRight)}
-            </div>
-          </div>
+            {row.isPreOrder && (
+              <Tooltip title='New Pre-Order'>
+                <div
+                  style={{
+                    borderRadius: 4,
+                    backgroundColor: '#4255bd',
+                    fontWeight: 500,
+                    color: 'white',
+                    fontSize: '0.7rem',
+                    padding: '2px 3px',
+                    height: 20,
+                  }}
+                >
+                  Pre
+                </div>
+              </Tooltip>
+            )}
+            {radiologyWorkitemStatusFK &&
+              radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
+            {labWorkItems && labWorkItems.length > 0 && (
+              <LabWorkItemInfo values={labWorkItems} />
+            )}
+            {urgentIndicator(row, urgentRight)}
+          </Space>
         </div>
       )
     },

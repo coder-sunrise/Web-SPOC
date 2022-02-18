@@ -14,7 +14,7 @@ export default createListViewModel({
       *receiveSpecimen({ payload }, { call, put }) {
         const status = yield call(service.receiveSpecimen, payload)
 
-        if (status === 200) {
+        if (status === 200 || status === 204) {
           notification.success({ message: 'Lab specimen received.' })
           return true
         }
@@ -23,7 +23,7 @@ export default createListViewModel({
       *discardSpecimen({ payload }, { call, put }) {
         const status = yield call(service.discardSpecimen, payload)
 
-        if (status === 200) {
+        if (status === 200 || status === 204) {
           notification.success({ message: 'Lab specimen discarded.' })
           return true
         }

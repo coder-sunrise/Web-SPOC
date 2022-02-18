@@ -12,6 +12,7 @@ import { CommonModal } from '@/components'
 import RadiologyDetails from './Details'
 import { Worklist, WorklistFilter, StatusPanel } from '../Components'
 import WorklistContext, { WorklistContextProvider } from './WorklistContext'
+import { LoadingWrapper } from '@/components/_medisys'
 
 const columnsTemplate = [
   {
@@ -52,12 +53,7 @@ const RadiologyWorklist = props => {
   const dispatch = useDispatch()
   const [columns, setColumns] = useState([])
   const entity = useSelector(s => s.radiologyWorklist)
-
-  useEffect(() => {
-    dispatch({
-      type: 'radiologyWorklist/query',
-    })
-  }, [])
+  const loading = useSelector(s => s.loading.effects['radiologyWorklist/query'])
 
   useEffect(() => {
     if (entity && entity.list) {
@@ -81,6 +77,7 @@ const RadiologyWorklist = props => {
         height: '100%',
       }}
       gutter={[16, 16]}
+      load
       title={
         <div style={{ display: 'flex', alignItems: 'end' }}>
           <WorklistFilter />
@@ -88,7 +85,12 @@ const RadiologyWorklist = props => {
       }
       extra={<StatusPanel />}
     >
-      <Worklist columns={columns} />
+      {loading && (
+        <LoadingWrapper loading={loading} linear>
+          <div style={{ height: '80vh' }}></div>
+        </LoadingWrapper>
+      )}
+      {!loading && <Worklist columns={columns} />}
       <RadiologyDetails {...props} />
     </ProCard>
   )

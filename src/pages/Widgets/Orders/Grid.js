@@ -22,6 +22,7 @@ import numeral from 'numeral'
 import {
   RADIOLOGY_WORKITEM_STATUS,
   NURSE_WORKITEM_STATUS,
+  LAB_WORKITEM_STATUS,
   ORDER_TYPES,
   INVENTORY_TYPE,
   SERVICE_CENTER_CATEGORY,
@@ -674,7 +675,7 @@ export default ({
         return
       }
     }
-    //TODO::Check for changes to make for Lab
+
     if (row.isPreOrderActualize) return
     if (
       !row.isActive &&
@@ -1018,7 +1019,11 @@ export default ({
   }
 
   const getDisplayName = row => {
-    if (row.type === '10' || row.type === '3') {
+    if (
+      row.type === ORDER_TYPES.RADIOLOGY ||
+      row.type === ORDER_TYPES.SERVICE ||
+      ORDER_TYPES.LAB
+    ) {
       if (row.newServiceName && row.newServiceName.trim() !== '') {
         return row.newServiceName
       }
@@ -1669,12 +1674,13 @@ export default ({
                   '0,0.0',
                 )} ${row.dispenseUOMDisplayValue || ''}`
               } else if (
-                row.type === '3' ||
-                row.type === '7' ||
-                row.type === '10'
+                row.type === ORDER_TYPES.SERVICE ||
+                row.type === ORDER_TYPES.TREATMENT ||
+                row.type === ORDER_TYPES.RADIOLOGY ||
+                row.type === ORDER_TYPES.LAB
               ) {
                 qty = `${numeral(row.quantity || 0).format('0,0.0')}`
-              } else if (row.type === '4') {
+              } else if (row.type === ORDER_TYPES.CONSUMABLE) {
                 qty = `${numeral(row.quantity || 0).format('0,0.0')} ${
                   row.unitOfMeasurement
                 }`
@@ -1688,7 +1694,7 @@ export default ({
           },
           {
             columnName: 'actions',
-            width: 68,
+            width: 70,
             align: 'center',
             sortingEnabled: false,
             render: row => {
@@ -1696,7 +1702,11 @@ export default ({
 
               const editAccessRight = OrderItemAccessRight(row)
               const { workitem = {} } = row
-              const { nurseWorkitem = {}, radiologyWorkitem = {} } = workitem
+              const {
+                nurseWorkitem = {},
+                radiologyWorkitem = {},
+                labWorkitems = [],
+              } = workitem
               const { nuseActualize = [] } = nurseWorkitem
               let editMessage = 'Edit'
               let deleteMessage = 'Delete'
@@ -1721,23 +1731,34 @@ export default ({
                   ) {
                     editEnable = false
                   }
-                }
-
-                if (
-                  nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
-                ) {
-                  const lastNuseActualize = _.orderBy(
-                    nuseActualize,
-                    ['actulizeDate'],
-                    ['desc'],
-                  )[0]
-                  if (editEnable) {
+                } else if (row.type === ORDER_TYPES.LAB) {
+                  if (
+                    labWorkitems.filter(
+                      item => item.statusFK !== LAB_WORKITEM_STATUS.NEW,
+                    ).length > 0
+                  ) {
                     editEnable = false
-                    editMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
-                  }
-                  if (deleteEnable) {
                     deleteEnable = false
-                    deleteMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
+                    deleteMessage =
+                      'Specimen Collected. No modification is allowed on processed order'
+                  }
+                } else {
+                  if (
+                    nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
+                  ) {
+                    const lastNuseActualize = _.orderBy(
+                      nuseActualize,
+                      ['actulizeDate'],
+                      ['desc'],
+                    )[0]
+                    if (editEnable) {
+                      editEnable = false
+                      editMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
+                    }
+                    if (deleteEnable) {
+                      deleteEnable = false
+                      deleteMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
+                    }
                   }
                 }
               }
@@ -1797,14 +1818,6 @@ export default ({
                               entity: undefined,
                             },
                           })
-                          // let commitCount = 1000 // uniqueNumber
-                          // dispatch({
-                          //   // force current edit row components to update
-                          //   type: 'global/updateState',
-                          //   payload: {
-                          //     commitCount: (commitCount += 1),
-                          //   },
-                          // })
                         }}
                         icon={<DeleteFilled />}
                       ></Button>
@@ -1833,11 +1846,11 @@ export default ({
                 radiologyWorkitem = {
                   statusFK: RADIOLOGY_WORKITEM_STATUS.NEW,
                 },
+                labWorkitems = [],
               } = workitem
               let editEnable = true
               if (!row.isPreOrder) {
                 if (row.type === ORDER_TYPES.RADIOLOGY) {
-                  //TODO::Win-Check the same logic for Lab once status are defined.
                   if (
                     radiologyWorkitem.statusFK !== RADIOLOGY_WORKITEM_STATUS.NEW
                   ) {
@@ -1847,6 +1860,13 @@ export default ({
                   nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
                 ) {
                   editEnable = false
+                } else if (row.type === ORDER_TYPES.LAB) {
+                  if (
+                    labWorkitems.filter(
+                      item => item.statusFK !== LAB_WORKITEM_STATUS.NEW,
+                    ).length > 0
+                  )
+                    editEnable = false
                 }
               }
               return (

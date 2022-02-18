@@ -226,8 +226,24 @@ const POForm = ({
               />
             </GridItem>
             <GridItem xs={12}>
-              <p style={{ minHeight: 52 }} />
+              <FastField
+                name={`${prefix}.purchaseRequestNo`}
+                render={args => {
+                  return (
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.pr.prno',
+                      })}
+                      disabled
+                      {...args}
+                    />
+                  )
+                }}
+              />
             </GridItem>
+            {/* <GridItem xs={12}>
+              <p style={{ minHeight: 52 }} />
+            </GridItem> */}
           </GridContainer>
         </GridItem>
 

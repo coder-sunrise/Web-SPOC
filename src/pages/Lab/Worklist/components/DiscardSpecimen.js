@@ -20,23 +20,21 @@ import {
 } from '@/components'
 import { useCodeTable } from '@/utils/hooks'
 
-export const DiscardSpecimen = ({ id, onClose, onConfirm }) => {
-  const [isOpenModal, setIsOpenModal] = useState(false)
+export const DiscardSpecimen = ({ open, id, onClose, onConfirm }) => {
+  const [showModal, setShowModal] = useState(false)
   const [hasDiscardReason, setHasDiscardReason] = useState(false)
   const ctspecimentype = useCodeTable('ctspecimentype')
-  const cttestcategory = useCodeTable('cttestcategory')
   const { entity } = useSelector(s => s.worklistSpecimenDetails)
   const { entity: patient } = useSelector(s => s.patient)
   const dispatch = useDispatch()
   const [form] = Form.useForm()
 
   useEffect(() => {
-    if (id) {
+    setShowModal(open)
+    if (open && id) {
       dispatch({
         type: 'worklistSpecimenDetails/query',
         payload: { id },
-      }).then(r => {
-        if (r) setIsOpenModal(true)
       })
     }
 
@@ -52,7 +50,7 @@ export const DiscardSpecimen = ({ id, onClose, onConfirm }) => {
 
   return (
     <CommonModal
-      open={isOpenModal}
+      open={showModal}
       title='Discard Specimen'
       footProps={{
         confirmProps: {
@@ -60,7 +58,7 @@ export const DiscardSpecimen = ({ id, onClose, onConfirm }) => {
         },
       }}
       onClose={() => {
-        setIsOpenModal(false)
+        setShowModal(false)
         onClose && onClose()
       }}
       onConfirm={() => {
@@ -87,12 +85,7 @@ export const DiscardSpecimen = ({ id, onClose, onConfirm }) => {
           <Descriptions.Item label='Patient Ref. No.'>
             {patient?.patientReferenceNo}
           </Descriptions.Item>
-          <Descriptions.Item label='Test Category'>
-            {
-              cttestcategory.find(item => item.id === entity.testCategoryFK)
-                ?.name
-            }
-          </Descriptions.Item>
+
           <Descriptions.Item label='Accession No.'>
             {entity.accessionNo}
           </Descriptions.Item>
@@ -119,7 +112,7 @@ export const DiscardSpecimen = ({ id, onClose, onConfirm }) => {
               payload,
             }).then(result => {
               if (result) {
-                setIsOpenModal(false)
+                setShowModal(false)
                 onConfirm && onConfirm()
               }
             })
@@ -128,10 +121,10 @@ export const DiscardSpecimen = ({ id, onClose, onConfirm }) => {
           <Form.Item
             name='specimenDiscardReason'
             style={{ margin: 8 }}
-            rules={[{ required: true, message: 'Receiving date is required.' }]}
+            rules={[{ required: true, message: 'Reason is required.' }]}
           >
             <TextField
-              label='Discard Reason'
+              label='Reason'
               onChange={e =>
                 setHasDiscardReason(e.target.value && e.target.value !== '')
               }

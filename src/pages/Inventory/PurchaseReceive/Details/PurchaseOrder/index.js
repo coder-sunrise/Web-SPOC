@@ -696,7 +696,7 @@ class Index extends Component {
         >
           {poStatus !== PURCHASE_ORDER_STATUS.COMPLETED && (
             <div>
-              {poStatus <= PURCHASE_ORDER_STATUS.FINALIZED &&
+              {/* {poStatus <= PURCHASE_ORDER_STATUS.FINALIZED &&
                 deliveryOrder.length === 0 &&
                 purchaseOrderPayment.length === 0 &&
                 !isWriteOff &&
@@ -713,7 +713,7 @@ class Index extends Component {
                       id: 'inventory.pr.detail.pod.cancelpo',
                     })}
                   </ProgressButton>
-                )}
+                )} */}
 
               <ProgressButton
                 color='primary'

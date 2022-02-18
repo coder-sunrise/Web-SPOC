@@ -27,7 +27,7 @@ import { getServices } from '@/utils/codetable'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
 import { CANNED_TEXT_TYPE, SERVICE_CENTER_CATEGORY } from '@/utils/constants'
-import { RADIOLOGY_WORKITEM_STATUS } from '@/utils/constants'
+import { LAB_WORKITEM_STATUS } from '@/utils/constants'
 import CannedTextButton from './CannedTextButton'
 
 const { CheckableTag } = Tag
@@ -518,15 +518,15 @@ class Lab extends PureComponent {
       this.setState({ isPreOrderItemExists: false })
 
     const { workitem = {}, isPreOrder } = editService
-    //TODO::TO change according to final design of Lab.
-    const { radiologyWorkitem: labWorkitem = {} } = workitem
+
+    const { labWorkitems = [] } = workitem
+
     const isStartedLab =
       !isPreOrder &&
-      [
-        RADIOLOGY_WORKITEM_STATUS.INPROGRESS,
-        RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED,
-        RADIOLOGY_WORKITEM_STATUS.COMPLETED,
-      ].indexOf(labWorkitem.statusFK) >= 0
+      labWorkitems.filter(item => item.statusFK !== LAB_WORKITEM_STATUS.NEW)
+        .length > 0
+
+    console.log('Lab-module logs: edit service', editService, isStartedLab)
 
     return (
       <Authorized

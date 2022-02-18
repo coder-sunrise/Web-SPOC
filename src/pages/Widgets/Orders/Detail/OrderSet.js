@@ -29,7 +29,7 @@ import {
   isMatchInstructionRule,
   getDrugAllergy,
 } from '@/pages/Widgets/Orders/utils'
-import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
+import { ORDER_TYPES, SERVICE_CENTER_CATEGORY } from '@/utils/constants'
 import { getClinicianProfile } from '../../ConsultationDocument/utils'
 
 @connect(
@@ -520,14 +520,14 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
             newOrder.serviceCenterCategoryFK ===
               SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE
           ) {
-            type = '9'
+            type = ORDER_TYPES.LAB
           } else if (
             newOrder.serviceCenterCategoryFK ===
               SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER ||
             newOrder.serviceCenterCategoryFK ===
               SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE
           ) {
-            type = '10'
+            type = ORDER_TYPES.RADIOLOGY
           }
         }
         const data = {

@@ -13,7 +13,7 @@ import Yup from '@/utils/yup'
 import { getTranslationValue } from '@/utils/utils'
 import { DoctorProfileSelect, DoctorLabel } from '@/components/_medisys'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
-import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
+import { SERVICE_CENTER_CATEGORY, ORDER_TYPES } from '@/utils/constants'
 
 const getNextSequence = props => {
   const {
@@ -471,14 +471,14 @@ const getType = typeId => {
               newOrder.serviceCenterCategoryFK ===
                 SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE
             ) {
-              type = '9'
+              type = ORDER_TYPES.LAB
             } else if (
               newOrder.serviceCenterCategoryFK ===
                 SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER ||
               newOrder.serviceCenterCategoryFK ===
                 SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE
             ) {
-              type = '10'
+              type = ORDER_TYPES.RADIOLOGY
             }
           }
           const data = {

@@ -67,13 +67,13 @@ export const WorklistFilter = () => {
       stopTimer()
     } else {
       handleSearch()
-      startTimer()
     }
 
     return () => clearInterval(timer.current)
   }, [isAnyWorklistModelOpened])
 
   const handleSearch = () => {
+    stopTimer()
     const {
       searchValue,
       visitType,
@@ -108,6 +108,7 @@ export const WorklistFilter = () => {
       if (val) {
         setRefreshDate(moment())
       }
+      startTimer()
     })
   }
 
@@ -134,7 +135,7 @@ export const WorklistFilter = () => {
               maxTagPlaceholder='Visit Doctor'
             />
           </Form.Item>
-          <Form.Item name='priority' initialValue={[-99]}>
+          <Form.Item name='priority' initialValue={[]}>
             <Select
               label={formatMessage({ id: 'lab.search.priority' })}
               options={PRIORITY_OPTIONS}
@@ -164,7 +165,7 @@ export const WorklistFilter = () => {
           >
             <DatePicker
               style={{ width: 100 }}
-              label={formatMessage({ id: 'radiology.search.dateFrom' })}
+              label={formatMessage({ id: 'lab.search.dateFrom' })}
             />
           </Form.Item>
           <Form.Item
@@ -175,7 +176,7 @@ export const WorklistFilter = () => {
           >
             <DatePicker
               bordered={true}
-              label={formatMessage({ id: 'radiology.search.dateTo' })}
+              label={formatMessage({ id: 'lab.search.dateTo' })}
               style={{ width: 100 }}
             />
           </Form.Item>

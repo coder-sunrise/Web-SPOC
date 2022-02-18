@@ -1,12 +1,8 @@
-import {
-  IconButton,
-  Popover,
-} from '@/components'
+import { IconButton, Popover } from '@/components'
 import { FileDoneOutlined } from '@ant-design/icons'
 import { NURSE_WORKITEM_STATUS } from '@/utils/constants'
 
 const NurseWorkItemInfo = ({ values = {} }) => {
-
   let completedWorkItemCount = 0
   let TotalWorkItemCount = 0
   let sortedWorkItem = []
@@ -24,9 +20,9 @@ const NurseWorkItemInfo = ({ values = {} }) => {
   const sortingWorkItems = sortedDateWorkedItem.map(row => {
     const { nurseWorkitem } = row
     if (nurseWorkitem.priority === 'Urgent') {
-        sortedWorkItem = [...sortedWorkItem,{...row,prior : 1}]
+      sortedWorkItem = [...sortedWorkItem, { ...row, prior: 1 }]
     } else {
-        sortedWorkItem = [...sortedWorkItem,{...row,prior : 0}]
+      sortedWorkItem = [...sortedWorkItem, { ...row, prior: 0 }]
     }
   })
 
@@ -90,34 +86,38 @@ const NurseWorkItemInfo = ({ values = {} }) => {
       arrowPointAtCenter
       content={
         <table
-        style={{
-          fontSize: 14,
-        }}
-      >
-        <tr>
+          style={{
+            fontSize: 14,
+          }}
+        >
+          <tr>
+            <td>
+              <table
+                style={{
+                  fontWeight: 'bold',
+                }}
+              >
+                <tr>
+                  <th style={{ width: '35px' }}>No.</th>
+                  <th style={{ width: '200px' }}>Name</th>
+                  <th style={{ width: '200px' }}>Instructions</th>
+                  <th style={{ width: '200px' }}>Remarks</th>
+                  <th style={{ width: '65px' }}>Priority</th>
+                  <th style={{ width: '100px' }}>Status</th>
+                </tr>
+              </table>
+            </td>
+          </tr>
           <td>
-            <table
-              style={{
-                fontWeight: 'bold',
-              }}
-            >
-              <tr>
-                <th style={{ width: '35px' }}>No.</th>
-                <th style={{ width: '200px' }}>Name</th>
-                <th style={{ width: '200px' }}>Instructions</th>
-                <th style={{ width: '200px' }}>Remarks</th>
-                <th style={{ width: '65px' }}>Priority</th>
-                <th style={{ width: '100px' }}>Status</th>
-              </tr>
-            </table>
+            <div style={{ maxHeight: '250px', overflow: 'auto' }}>
+              <table>
+                {nurseWorkItemDetails(
+                  sortedWorkItem.sort((a, b) => b.prior - a.prior),
+                )}
+              </table>
+            </div>
           </td>
-        </tr>
-        <td>
-          <div style={{ maxHeight: '250px', overflow: 'auto' }}>
-            <table>{nurseWorkItemDetails(sortedWorkItem.sort((a,b) => b.prior - a.prior))}</table>
-          </div>
-        </td>
-      </table>
+        </table>
       }
     >
       <div style={{ display: 'inline-block' }}>
@@ -126,13 +126,17 @@ const NurseWorkItemInfo = ({ values = {} }) => {
             position: 'relative',
             color: 'white',
             backgroundColor:
-              TotalWorkItemCount === completedWorkItemCount ? 'green' : '#4255bd',
+              TotalWorkItemCount === completedWorkItemCount
+                ? 'green'
+                : '#4255bd',
           }}
           size='large'
         >
           <FileDoneOutlined />
         </IconButton>
-        {completedWorkItemCount >= 1 && <span style={dotStyle}>{completedWorkItemCount}</span>}
+        {completedWorkItemCount >= 1 && (
+          <span style={dotStyle}>{completedWorkItemCount}</span>
+        )}
         {completedWorkItemCount < 1 && (
           <div
             style={{

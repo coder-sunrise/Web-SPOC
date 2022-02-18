@@ -47,7 +47,7 @@ const Detail = ({
   errors,
   clinicSettings,
 }) => {
-  const [hasActiveSession, setHasActiveSession] = useState(true)
+  const [hasActiveSession, setHasActiveSession] = useState(false)
 
   const detailProps = {
     consumableDetail,

@@ -25,7 +25,7 @@ import LinkIcon from '@material-ui/icons/Link'
 import IconButton from '@/components/Button/IconButton'
 import { withStyles } from '@material-ui/core'
 import { useVisitTypes } from '@/utils/hooks'
-import CollectSpecimen from '../CollectSpecimen'
+import CollectSpecimen from './components/CollectSpecimen'
 
 const { queryList } = service
 const api = {
@@ -393,6 +393,9 @@ const SpecimenCollection = ({
         />
       </PageContainer>
       <CollectSpecimen
+        enableReceiveSpecimen
+        mode='new'
+        open={visitId != undefined && visitId != null}
         visitId={visitId}
         onConfirm={() => {
           setVisitId(undefined)

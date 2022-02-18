@@ -119,7 +119,7 @@ const getVisitOrderTemplateTotal = (vType, template) => {
     )
     currentTypeItems.map(item => {
       if (item[type.dtoName].isActive === true) {
-        activeItemTotal += item.total || 0
+        activeItemTotal += item.totalAftAdj || 0
       }
     })
   })
