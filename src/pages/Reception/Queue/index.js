@@ -37,6 +37,7 @@ import {
   VISIT_TYPE,
   NOTIFICATION_TYPE,
   NOTIFICATION_STATUS,
+  DISPENSE_FROM,
 } from '@/utils/constants'
 import { initRoomAssignment } from '@/utils/codes'
 import { sendNotification } from '@/utils/realtime'
@@ -557,10 +558,17 @@ class Queue extends React.Component {
             queueNo: row.queueNo,
           },
         }).then(o => {
-          if (o)
+          if (o) {
+            dispatch({
+              type: `dispense/updateState`,
+              payload: {
+                openFrom: DISPENSE_FROM.QUEUE,
+              },
+            })
             history.push(
               `/reception/queue/dispense?isInitialLoading=${isInitialLoading}&qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
             )
+          }
         })
 
         break
@@ -790,7 +798,16 @@ class Queue extends React.Component {
   }
 
   showVisitForms = async row => {
-    const { id, visitStatus, doctor, patientAccountNo, patientName, gender, patientReferenceNo, dob} = row
+    const {
+      id,
+      visitStatus,
+      doctor,
+      patientAccountNo,
+      patientName,
+      gender,
+      patientReferenceNo,
+      dob,
+    } = row
     await this.props.dispatch({
       type: 'formListing/updateState',
       payload: {

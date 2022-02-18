@@ -539,17 +539,17 @@ class NewVisit extends PureComponent {
       }
       return { ...po }
     })
-
     const validateReportLanguage =
       values.visitPurposeFK !== VISIT_TYPE.MC ||
-      (values.mcReportLanguage || []).length > 0
+      values.isForInvoiceReplacement ||
+      ((values.medicalCheckupWorkitem || [{}])[0].reportLanguage || []).length >
+        0
     return (
       <React.Fragment>
         <LoadingWrapper
           loading={isSubmitting || fetchingVisitInfo}
           text={!fetchingInfoText ? loadingText : fetchingInfoText}
         >
-          {/* <Chip label='Read Only' className={classes.readOnlyChip} /> */}
           <GridContainer className={classes.gridContainer}>
             <GridItem xs sm={12} md={12}>
               <div style={{ padding: 8, marginTop: -20 }}>
@@ -658,24 +658,27 @@ class NewVisit extends PureComponent {
                             />
                           </CommonCard>
                         </GridItem>
-                        {values.visitPurposeFK === VISIT_TYPE.MC && (
-                          <GridItem xs={12} className={classes.row}>
-                            <CommonCard title='Medical Check Up'>
-                              <MCCard
-                                {...this.props}
-                                mode='visitregistration'
-                                isVisitReadonlyAfterSigned={
-                                  isReadonlyAfterSigned
-                                }
-                                isSigned={
-                                  values.isLastClinicalObjectRecordSigned
-                                }
-                                reportingDoctorSchema={reportingDoctorSchema}
-                                validateReportLanguage={validateReportLanguage}
-                              />
-                            </CommonCard>
-                          </GridItem>
-                        )}
+                        {values.visitPurposeFK === VISIT_TYPE.MC &&
+                          !values.isForInvoiceReplacement && (
+                            <GridItem xs={12} className={classes.row}>
+                              <CommonCard title='Medical Check Up'>
+                                <MCCard
+                                  {...this.props}
+                                  mode='visitregistration'
+                                  isVisitReadonlyAfterSigned={
+                                    isReadonlyAfterSigned
+                                  }
+                                  isSigned={
+                                    values.isLastClinicalObjectRecordSigned
+                                  }
+                                  reportingDoctorSchema={reportingDoctorSchema}
+                                  validateReportLanguage={
+                                    validateReportLanguage
+                                  }
+                                />
+                              </CommonCard>
+                            </GridItem>
+                          )}
                         {values.visitPreOrderItem &&
                           values.visitPreOrderItem?.length !== 0 && (
                             <GridItem xs={12} className={classes.row}>

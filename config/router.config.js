@@ -194,6 +194,33 @@ const _routes = [
         ],
       },
       {
+        path: '/medicalcheckup',
+        icon: 'icon-file-text-fill',
+        name: 'medicalcheckup',
+        moduleName: 'MedicalCheckup',
+        authority: ['medicalcheckup'],
+        clinicSetting: ['isEnableMedicalCheckupModule'],
+        specialist: ['GP', 'Dental'],
+        routes: [
+          {
+            path: '/medicalcheckup/worklist',
+            name: 'worklist',
+            component: './MedicalCheckup/Worklist',
+            mini: 'MC',
+            exact: true,
+            authority: ['medicalcheckup/worklist'],
+          },
+          {
+            path: '/medicalcheckup/history',
+            name: 'history',
+            component: './MedicalCheckup/History',
+            mini: 'MC',
+            exact: true,
+            authority: ['medicalcheckup/history'],
+          },
+        ],
+      },
+      {
         path: '/pharmacy',
         icon: 'icon-medicinebox-fill',
         name: 'pharmacy',

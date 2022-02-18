@@ -45,6 +45,7 @@ import {
   NOTIFICATION_STATUS,
   NURSE_WORKITEM_STATUS,
   RADIOLOGY_WORKITEM_STATUS,
+  DISPENSE_FROM,
 } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
@@ -165,6 +166,8 @@ const DispenseDetails = ({
     coPayer = [],
   } = invoice
 
+  const { openFrom } = dispense
+  const isFromMedicalCheckup = openFrom === DISPENSE_FROM.MEDICALCHECKUP
   const [popperOpen, setPopperOpen] = useState(false)
   const openPopper = () => setPopperOpen(true)
   const closePopper = () => setPopperOpen(false)
@@ -834,7 +837,7 @@ const DispenseDetails = ({
         </GridItem>
         {!viewOnly && (
           <GridItem className={classes.rightActionButtons} md={5}>
-            {(isRetailVisit || isBillFirstVisit) && (
+            {!isFromMedicalCheckup && (isRetailVisit || isBillFirstVisit) && (
               <ProgressButton
                 color='danger'
                 size='sm'
@@ -845,7 +848,7 @@ const DispenseDetails = ({
                 Discard
               </ProgressButton>
             )}
-            {!isBillFirstVisit && (
+            {!isFromMedicalCheckup && !isBillFirstVisit && (
               <Authorized authority='queue.dispense.savedispense'>
                 <ProgressButton
                   color='success'
@@ -883,19 +886,21 @@ const DispenseDetails = ({
                 />
               </Authorized>
             )}
-            {!isRetailVisit && visitStatus !== VISIT_STATUS.PAUSED && (
-              <Authorized authority='queue.dispense.editorder'>
-                <ProgressButton
-                  color='primary'
-                  size='sm'
-                  icon={<Edit />}
-                  onClick={onEditOrderClick}
-                >
-                  Edit Order
-                </ProgressButton>
-              </Authorized>
-            )}
-            {visitStatus !== VISIT_STATUS.PAUSED && (
+            {!isFromMedicalCheckup &&
+              !isRetailVisit &&
+              visitStatus !== VISIT_STATUS.PAUSED && (
+                <Authorized authority='queue.dispense.editorder'>
+                  <ProgressButton
+                    color='primary'
+                    size='sm'
+                    icon={<Edit />}
+                    onClick={onEditOrderClick}
+                  >
+                    Edit Order
+                  </ProgressButton>
+                </Authorized>
+              )}
+            {!isFromMedicalCheckup && visitStatus !== VISIT_STATUS.PAUSED && (
               <Authorized authority='queue.dispense.makepayment'>
                 <ProgressButton
                   color='primary'
