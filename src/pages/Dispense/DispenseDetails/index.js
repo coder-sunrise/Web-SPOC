@@ -130,7 +130,7 @@ const DispenseDetails = ({
   onEditOrderClick,
   onFinalizeClick,
   codetable,
-  dispense,
+  dispense = {},
   handlePrint,
   history,
   onDrugLabelClick,
@@ -169,7 +169,7 @@ const DispenseDetails = ({
     coPayer = [],
   } = invoice
 
-  const openFrom = 1
+  const { openFrom } = dispense
   const isFromMedicalCheckup = openFrom === DISPENSE_FROM.MEDICALCHECKUP
   const [popperOpen, setPopperOpen] = useState(false)
   const openPopper = () => setPopperOpen(true)
