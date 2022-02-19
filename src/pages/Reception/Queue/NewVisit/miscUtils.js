@@ -2,7 +2,11 @@ import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import { bool } from 'prop-types'
 import _ from 'lodash'
 import { cleanFields } from '@/pages/Consultation/utils'
-import { VISIT_TYPE, VISITDOCTOR_CONSULTATIONSTATUS } from '@/utils/constants'
+import {
+  VISIT_TYPE,
+  VISITDOCTOR_CONSULTATIONSTATUS,
+  MEDICALCHECKUP_WORKITEM_STATUS,
+} from '@/utils/constants'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
 import { notification } from '@/components'
 import { VISIT_STATUS } from '../variables'
@@ -159,8 +163,7 @@ export const formikMapPropsToValues = ({
     let currentVisitOrderTemplateFK
     let defaultVisitPreOrderItem = []
     let totalTempCharge
-    let mcReportLanguage
-    let mcReportPriority
+    let medicalCheckupWorkitem
     if (clinicInfo) {
       // doctorProfile = doctorProfiles.find(
       //   (item) => item.doctorMCRNo === clinicInfo.primaryMCRNO,
@@ -186,7 +189,10 @@ export const formikMapPropsToValues = ({
       qNo = visitInfo.queueNo
     }
     const {
-      visit = { visitDoctor: [], visitBasicExaminations: [{}] },
+      visit = {
+        visitDoctor: [],
+        visitBasicExaminations: [{}],
+      },
     } = visitInfo
 
     const visitEntries = Object.keys(visit).reduce(
@@ -207,9 +213,15 @@ export const formikMapPropsToValues = ({
     if (clinicSettings) {
       visitPurposeFK = Number(clinicSettings.settings.defaultVisitType)
       if (visitPurposeFK === VISIT_TYPE.MC) {
-        mcReportPriority = 'Normal'
-        mcReportLanguage = [
-          getMCReportLanguage(patientInfo, clinicSettings.settings),
+        medicalCheckupWorkitem = [
+          {
+            reportPriority: 'Normal',
+            statusFK: MEDICALCHECKUP_WORKITEM_STATUS.NEW,
+            reportLanguage: getMCReportLanguage(
+              patientInfo,
+              clinicSettings.settings,
+            ),
+          },
         ]
       }
     }
@@ -299,8 +311,19 @@ export const formikMapPropsToValues = ({
         referralType = 'Patient'
       }
 
-      if (visitEntries.visitPurposeFK === VISIT_TYPE.MC) {
-        mcReportLanguage = visitEntries.mcReportLanguage.split(',')
+      if (
+        visitEntries.visitPurposeFK === VISIT_TYPE.MC &&
+        !visitEntries.isForInvoiceReplacement &&
+        visitEntries.medicalCheckupWorkitem.length > 0
+      ) {
+        medicalCheckupWorkitem = [
+          {
+            ...visitEntries.medicalCheckupWorkitem[0],
+            reportLanguage: visitEntries.medicalCheckupWorkitem[0].reportLanguage.split(
+              ',',
+            ),
+          },
+        ]
       }
     } else if (
       patientInfo &&
@@ -317,14 +340,13 @@ export const formikMapPropsToValues = ({
     return {
       queueNo: qNo,
       visitPurposeFK,
-      mcReportPriority,
       consReady,
       roomFK: roomAssignmentFK || roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
       doctorProfileFK,
       ...visitEntries,
-      mcReportLanguage,
+      medicalCheckupWorkitem,
       visitOrderTemplateFK: isVisitOrderTemplateActive
         ? currentVisitOrderTemplateFK
         : undefined,
@@ -364,6 +386,53 @@ export const formikMapPropsToValues = ({
     console.log({ error })
     return {}
   }
+}
+
+const getMedicalCheckupCWorkitemDoctor = (
+  medicalCheckupWorkitemDoctor = [],
+  visitDoctor = [],
+) => {
+  const removeDoctor = medicalCheckupWorkitemDoctor.filter(
+    item =>
+      !visitDoctor.find(
+        d => !d.isDeleted && item.doctorProfileFK === d.doctorProfileFK,
+      ),
+  )
+
+  const remainDoctor = medicalCheckupWorkitemDoctor.filter(item =>
+    visitDoctor.find(
+      d => !d.isDeleted && item.doctorProfileFK === d.doctorProfileFK,
+    ),
+  )
+
+  const newDoctor = visitDoctor.filter(
+    item =>
+      !item.isDeleted &&
+      !medicalCheckupWorkitemDoctor.find(
+        d => item.doctorProfileFK === d.doctorProfileFK,
+      ),
+  )
+
+  let newMCWorkitemDoctor = [
+    ...remainDoctor,
+    ...removeDoctor.map(item => ({
+      ...item,
+      isDelete: true,
+    })),
+    ...newDoctor.map(item => ({
+      doctorProfileFK: item.doctorProfileFK,
+    })),
+  ]
+
+  newMCWorkitemDoctor.forEach(item => {
+    var doctor = visitDoctor.find(
+      d => !d.isDeleted && item.doctorProfileFK === d.doctorProfileFK,
+    )
+    item.isPrimaryDoctor = doctor.isPrimaryDoctor
+    item.sequence = doctor.sequence
+  })
+
+  return newMCWorkitemDoctor
 }
 
 export const formikHandleSubmit = (
@@ -454,9 +523,37 @@ export const formikHandleSubmit = (
     })
   }
 
-  let mcReportLanguage
-  if (values.visitPurposeFK === VISIT_TYPE.MC) {
-    mcReportLanguage = values.mcReportLanguage.join(',')
+  if (
+    values.visitPurposeFK === VISIT_TYPE.MC &&
+    !values.isForInvoiceReplacement
+  ) {
+    restValues.medicalCheckupWorkitem = [
+      {
+        ...values.medicalCheckupWorkitem[0],
+        reportLanguage: values.medicalCheckupWorkitem[0].reportLanguage.join(
+          ',',
+        ),
+        medicalCheckupWorkitemDoctor: getMedicalCheckupCWorkitemDoctor(
+          values.medicalCheckupWorkitem[0].medicalCheckupWorkitemDoctor,
+          newVisitDoctor,
+        ),
+        statusFK:
+          values.medicalCheckupWorkitem[0].statusFK ||
+          MEDICALCHECKUP_WORKITEM_STATUS.NEW,
+      },
+    ]
+  } else if (
+    values.medicalCheckupWorkitem &&
+    values.medicalCheckupWorkitem.length > 0
+  ) {
+    if (values.medicalCheckupWorkitem[0].id) {
+      restValues.medicalCheckupWorkitem[0].isDeleted = true
+      restValues.medicalCheckupWorkitem[0].medicalCheckupWorkitemDoctor.forEach(
+        item => (item.isDeleted = true),
+      )
+    } else {
+      restValues.medicalCheckupWorkitem = []
+    }
   }
   const payload = {
     cfg: {
@@ -480,7 +577,6 @@ export const formikHandleSubmit = (
       visitDoctor: newVisitDoctor,
       referralBy: _referralBy,
       visitEyeRefractionForm,
-      mcReportLanguage,
     },
   }
 

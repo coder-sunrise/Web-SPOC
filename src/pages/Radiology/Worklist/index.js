@@ -56,12 +56,6 @@ const RadiologyWorklist = props => {
   const loading = useSelector(s => s.loading.effects['radiologyWorklist/query'])
 
   useEffect(() => {
-    dispatch({
-      type: 'radiologyWorklist/query',
-    })
-  }, [])
-
-  useEffect(() => {
     if (entity && entity.list) {
       const worklist = entity.list.map(w => ({
         ...w,

@@ -4,13 +4,14 @@ import { Button, Tooltip } from '@/components'
 import WorklistContext from '../Worklist/WorklistContext'
 
 export const StatusPanel = () => {
-  const { refreshDate, filterWorklist, radiologyQueueCallList } = useContext(
+  const { refreshDate, refreshWorklist, radiologyQueueCallList } = useContext(
     WorklistContext,
   )
   let nowServing = undefined
   if (radiologyQueueCallList.length > 0) {
     nowServing = `${radiologyQueueCallList?.[0]?.qNo}.0 (${radiologyQueueCallList?.[0]?.patientName})`
   }
+
   return (
     <div style={{ display: 'flex', alignItems: 'end' }}>
       <div>
@@ -50,7 +51,7 @@ export const StatusPanel = () => {
           style={{
             height: 26,
           }}
-          onClick={() => filterWorklist()}
+          onClick={() => refreshWorklist()}
         >
           <Refresh />
         </Button>

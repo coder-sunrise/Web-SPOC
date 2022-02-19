@@ -218,6 +218,10 @@ export default {
   'menu.radiology.worklist': 'Worklist',
   'menu.radiology.history': 'History',
 
+  'menu.medicalcheckup': 'Medical Checkup',
+  'menu.medicalcheckup.worklist': 'Worklist',
+  'menu.medicalcheckup.history': 'History',
+
   'menu.pharmacy': 'Pharmacy',
   'menu.pharmacy.worklist': 'Worklist',
   'menu.pharmacy.history': 'History',
