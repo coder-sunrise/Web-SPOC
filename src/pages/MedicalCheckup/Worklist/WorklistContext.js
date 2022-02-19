@@ -11,9 +11,6 @@ export const WorklistContextProvider = props => {
   const [isAnyWorklistModelOpened, setIsAnyWorklistModelOpened] = useState(
     false,
   )
-  const [detailsId, setDetailsId] = useState(undefined)
-  const [formCategory, setFormCategory] = useState(undefined)
-  const [showForms, setShowForms] = useState(false)
 
   return (
     // this is the provider providing state
@@ -21,10 +18,6 @@ export const WorklistContextProvider = props => {
       value={{
         isAnyWorklistModelOpened,
         setIsAnyWorklistModelOpened,
-        detailsId,
-        setDetailsId,
-        showForms,
-        setShowForms,
       }}
     >
       {props.children}

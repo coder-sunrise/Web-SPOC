@@ -6,14 +6,9 @@ import { WorklistGrid } from './WorklistGrid'
 
 export const Worklist = props => {
   return (
-    <Card>
-      <Space
-        style={{ width: '100%', overflowY: 'scroll' }}
-        direction='vertical'
-      >
-        <WorklistFilter {...props} />
-        <WorklistGrid {...props} />
-      </Space>
-    </Card>
+    <div>
+      <WorklistFilter {...props} />
+      <WorklistGrid {...props} />
+    </div>
   )
 }

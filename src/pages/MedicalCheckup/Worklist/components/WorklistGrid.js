@@ -26,6 +26,7 @@ import Description from '@material-ui/icons/Description'
 import VisitForms from '@/pages/Reception/Queue/VisitForms'
 import WorklistContext from '../WorklistContext'
 import { StatusFilter } from './StatusFilter'
+import ReportingDetails from './ReportingDetails'
 
 const allMedicalCheckupReportStatuses = Object.values(
   MEDICALCHECKUP_WORKITEM_STATUS,
@@ -61,14 +62,11 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
   const [filteredStatuses, setFilteredStatuses] = useState(
     allMedicalCheckupReportStatuses,
   )
-  const [workitem, setWorkitem] = useState([])
-  const {
-    detailsId,
-    setDetailsId,
-    showForms,
-    setShowForms,
-    setIsAnyWorklistModelOpened,
-  } = useContext(WorklistContext)
+  const [workitems, setWorkitems] = useState([])
+  const [showReportingForm, setShowReportingForm] = useState(false)
+  const [showReportForm, setShowReportForm] = useState(false)
+  const [showForms, setShowForms] = useState(false)
+  const { setIsAnyWorklistModelOpened } = useContext(WorklistContext)
   useEffect(() => {
     if (originalWorklist) {
       const currentFilteredWorklist = _.orderBy(
@@ -78,7 +76,7 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
         ['visitDate'],
         ['asc'],
       )
-      setWorkitem(currentFilteredWorklist)
+      setWorkitems(currentFilteredWorklist)
     }
   }, [originalWorklist, filteredStatuses])
 
@@ -86,7 +84,6 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
     const target = !showForms
     setShowForms(target)
     setIsAnyWorklistModelOpened(target)
-    // closing Forms
     if (!target) {
       dispatch({
         type: 'formListing/updateState',
@@ -129,6 +126,62 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
     toggleForms()
   }
 
+  const toggleReportingForm = () => {
+    const target = !showReportingForm
+    setShowReportingForm(target)
+    setIsAnyWorklistModelOpened(target)
+    if (!target) {
+      dispatch({
+        type: 'formListing/updateState',
+        payload: {
+          list: [],
+        },
+      })
+    }
+  }
+
+  const showReportingDetails = async row => {
+    const { id, visitFK, patientProfileFK } = row
+    await dispatch({
+      type: 'medicalCheckupWorklist/updateState',
+      payload: {
+        id,
+        visitFK,
+        patientProfileFK,
+      },
+    })
+    toggleReportingForm()
+  }
+
+  const toggleReportForm = () => {
+    const target = !showReportForm
+    setShowReportForm(target)
+    setIsAnyWorklistModelOpened(target)
+    if (!target) {
+      dispatch({
+        type: 'medicalCheckupWorklist/updateState',
+        payload: {
+          entity: undefined,
+          id: undefined,
+          visitFK: undefined,
+          patientProfileFK: undefined,
+        },
+      })
+    }
+  }
+
+  const showReportDetails = async row => {
+    const { id, visitFK } = row
+    await dispatch({
+      type: 'medicalCheckupDetails/updateState',
+      payload: {
+        id,
+        visitFK,
+      },
+    })
+    toggleReportForm()
+  }
+
   const handleMenuItemClick = (row, id) => {
     switch (id) {
       case '1':
@@ -160,6 +213,12 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
             )
           }
         })
+        break
+      case '3':
+        showReportingDetails(row)
+        break
+      case '4':
+        showReportDetails(row)
         break
     }
   }
@@ -332,7 +391,7 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
         fixed: 'right',
         width: 60,
         render: (item, entity) => {
-          if (entity.statusFK === MEDICALCHECKUP_WORKITEM_STATUS.NEW) return ''
+          //if (entity.statusFK === MEDICALCHECKUP_WORKITEM_STATUS.NEW) return ''
 
           const handleClick = event => {
             const { key } = event
@@ -377,7 +436,7 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
         columns={columns}
         search={false}
         options={{ density: false, reload: false }}
-        dataSource={workitem}
+        dataSource={workitems}
         pagination={false}
         columnsStateMap={medicalCheckupWorklistColumnSetting}
         onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
@@ -393,6 +452,27 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
         overrideLoading
       >
         <VisitForms formCategory={FORM_CATEGORY.CORFORM} />
+      </CommonModal>
+
+      <CommonModal
+        open={showReportingForm}
+        title='Reporting Details'
+        onClose={toggleReportingForm}
+        onConfirm={toggleReportingForm}
+        fullScreen
+        overrideLoading
+      >
+        <ReportingDetails />
+      </CommonModal>
+      <CommonModal
+        open={showReportForm}
+        title='View Report'
+        onClose={toggleReportForm}
+        onConfirm={toggleReportForm}
+        fullScreen
+        overrideLoading
+      >
+        <div>View Report</div>
       </CommonModal>
     </Card>
   )
