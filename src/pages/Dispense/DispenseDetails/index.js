@@ -169,7 +169,7 @@ const DispenseDetails = ({
     coPayer = [],
   } = invoice
 
-  const { openFrom } = dispense
+  const openFrom = 1
   const isFromMedicalCheckup = openFrom === DISPENSE_FROM.MEDICALCHECKUP
   const [popperOpen, setPopperOpen] = useState(false)
   const openPopper = () => setPopperOpen(true)
@@ -1045,7 +1045,7 @@ const DispenseDetails = ({
                 onActualizeBtnClick,
                 onRadiologyBtnClick,
                 dispatch,
-                visitRegistration?.entity?.id,
+                history?.location?.query?.vid,
               )}
               data={service}
             />

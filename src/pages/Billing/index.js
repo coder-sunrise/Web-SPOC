@@ -1228,6 +1228,7 @@ class Billing extends Component {
                               )
                             : dispense.entity
                         }
+                        history={this.props.history}
                         dispatch={this.props.dispatch}
                         onDrugLabelClick={this.handleDrugLabelClick}
                         showDrugLabelSelection={
