@@ -9,9 +9,11 @@ import {
 import _ from 'lodash'
 import React, { useState } from 'react'
 import { Badge } from 'antd'
+import { useDispatch } from 'dva'
 
 const RadioWorkItemInfo = props => {
-  const { dispatch, workItemSummary, visitFK } = props
+  const { workItemSummary, visitFK } = props
+  const dispatch = useDispatch()
   const [completedWorkItemCount, setCompletedWorkItemCount] = useState(
     workItemSummary.completedWorkItemCount || 0,
   )

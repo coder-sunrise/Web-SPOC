@@ -7,9 +7,11 @@ import New from '@/pages/ClaimSubmission/chas/New'
 import React, { useState } from 'react'
 import { Badge } from 'antd'
 import _ from 'lodash'
+import { useDispatch } from 'dva'
 
 const LabWorkItemInfo = props => {
-  const { dispatch, workItemSummary, visitFK, style, workItemFK } = props
+  const { workItemSummary, visitFK, style, workItemFK } = props
+  const dispatch = useDispatch()
   const [completedWorkItemCount, setCompletedWorkItemCount] = useState(
     workItemSummary.completedWorkItemCount || 0,
   )
