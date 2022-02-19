@@ -428,7 +428,7 @@ export const QueueColumnExtensions = props => {
               labWorkItems.totalWorkItem > 0 && (
                 <LabWorkItemInfo
                   {...props}
-                  row={row}
+                  visitFK={row.visitFK}
                   workItemSummary={labWorkItems}
                   style={{ marginRight: 18 }}
                 />
@@ -438,7 +438,7 @@ export const QueueColumnExtensions = props => {
               radioWorkItems.totalWorkItem > 0 && (
                 <RadioWorkItemInfo
                   {...props}
-                  row={row}
+                  visitFK={row.visitFK}
                   workItemSummary={radioWorkItems}
                 />
               )}
@@ -447,7 +447,7 @@ export const QueueColumnExtensions = props => {
               nurseWorkItems.totalWorkItem > 0 && (
                 <NurseWorkItemInfo
                   {...props}
-                  row={row}
+                  visitFK={row.visitFK}
                   workItemSummary={nurseWorkItems}
                 />
               )}

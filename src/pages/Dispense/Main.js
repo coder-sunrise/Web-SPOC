@@ -341,7 +341,6 @@ class Main extends Component {
   }
 
   componentWillUnmount = () => {
-    console.log('unm')
     this.props.dispatch({
       type: `dispense/updateState`,
       payload: {
@@ -742,7 +741,6 @@ class Main extends Component {
       this.actualizeEditOrder()
       dispense.openOrderPopUpAfterActualize = false
     }
-    console.log(1231, this.props)
     return (
       <div className={classes.root}>
         <DispenseDetails

@@ -9,8 +9,7 @@ import { Badge } from 'antd'
 import _ from 'lodash'
 
 const LabWorkItemInfo = props => {
-  const { dispatch, workItemSummary, row, style } = props
-  const { visitFK } = row
+  const { dispatch, workItemSummary, visitFK, style, workItemFK } = props
   const [completedWorkItemCount, setCompletedWorkItemCount] = useState(
     workItemSummary.completedWorkItemCount || 0,
   )
@@ -29,6 +28,7 @@ const LabWorkItemInfo = props => {
       payload: {
         visitFK: visitFK,
         workItemType: WORK_ITEM_TYPES_ENUM.LAB,
+        workItemFK: workItemFK,
       },
     }).then(detailData => {
       const workItemFKArray = _.uniqBy(detailData, 'workitemFK').map(

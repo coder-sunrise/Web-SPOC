@@ -750,7 +750,6 @@ const DispenseDetails = ({
       ).length > 0
     )
   })()
-
   return (
     <React.Fragment>
       <GridContainer>
@@ -1039,6 +1038,8 @@ const DispenseDetails = ({
                 onPrint,
                 onActualizeBtnClick,
                 onRadiologyBtnClick,
+                dispatch,
+                visitRegistration?.entity?.id,
               )}
               data={service}
             />

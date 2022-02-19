@@ -11,8 +11,7 @@ import React, { useState } from 'react'
 import { Badge } from 'antd'
 
 const RadioWorkItemInfo = props => {
-  const { dispatch, workItemSummary, row } = props
-  const { visitFK } = row
+  const { dispatch, workItemSummary, visitFK } = props
   const [completedWorkItemCount, setCompletedWorkItemCount] = useState(
     workItemSummary.completedWorkItemCount || 0,
   )
