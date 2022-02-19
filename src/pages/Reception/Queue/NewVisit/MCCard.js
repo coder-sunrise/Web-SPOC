@@ -64,7 +64,7 @@ const MCCard = ({
     return (
       <div style={{ width: 180 }}>
         <Field
-          name='mcReportLanguage'
+          name='medicalCheckupWorkitem[0].reportLanguage'
           render={args => (
             <CheckboxGroup
               label='Report Language'
@@ -88,7 +88,7 @@ const MCCard = ({
         </div>
         <div style={{ marginLeft: 10 }}>
           <Field
-            name='mcReportPriority'
+            name='medicalCheckupWorkitem[0].reportPriority'
             render={args => (
               <RadioGroup
                 label='Report Priority'
@@ -113,9 +113,10 @@ const MCCard = ({
           />
         </div>
         <div style={{ marginLeft: 10, width: 500 }}>
-          {values.mcReportPriority === 'Urgent' && (
+          {(values.medicalCheckupWorkitem || [{}])[0].reportPriority ===
+            'Urgent' && (
             <Field
-              name='mcUrgentReportRemarks'
+              name='medicalCheckupWorkitem[0].urgentReportRemarks'
               render={args => (
                 <TextField
                   {...args}
