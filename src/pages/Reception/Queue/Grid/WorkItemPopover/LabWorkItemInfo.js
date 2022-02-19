@@ -36,7 +36,6 @@ const LabWorkItemInfo = props => {
       const workItemFKArray = _.uniqBy(detailData, 'workitemFK').map(
         t => t.workitemFK,
       )
-      console.log(workItemFKArray)
       _.forEach(detailData, item => {
         ;(item.number = workItemFKArray.indexOf(item.workitemFK) + 1),
           (item.rowspan = detailData.filter(
@@ -48,7 +47,6 @@ const LabWorkItemInfo = props => {
               detailData.filter(x => x.workitemFK === item.workitemFK)[0],
             ))
       })
-      console.log(detailData)
       setWorkItemDetails(detailData)
       setTotalWorkItemCount(detailData.length)
       setCompletedWorkItemCount(
