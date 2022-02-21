@@ -981,6 +981,19 @@ export const TESTTYPES = {
   L5MCORRECTED: 'Left5mCorrected',
   L50CMCORRECTED: 'Left50cmCorrected',
 }
+ 
+export const WORK_ITEM_TYPES = {
+  LAB: 'Lab',
+  RADIOLOGY: 'Radiology',
+  NURSEACTUALIZE: 'NurseActualize',
+  PHARMACY: 'Pharmacy',
+}
+export const WORK_ITEM_TYPES_ENUM = {
+  LAB: 0,
+  RADIOLOGY: 1,
+  NURSEACTUALIZE: 2,
+  PHARMACY: 3,
+}
 
 export const MEDICALCHECKUP_WORKITEM_STATUS = {
   NEW: 1,
@@ -1014,5 +1027,5 @@ export const MEDICALCHECKUP_WORKITEM_STATUS_DESCRIPTION = {
 }
 export const DISPENSE_FROM = {
   QUEUE: 1,
-  MEDICALCHECKUP: 2,
+  MEDICALCHECKUP: 2, 
 }
