@@ -62,22 +62,7 @@ const mapServingPersonsString = servingByList =>
 const compareServingPerson = (a, b) => {
   return compareString(mapServingPersonsString(a), mapServingPersonsString(b))
 }
-
-const filterRadioWorkItem = workItem => {
-  return workItem.filter(x => x.type === 'Radiology')
-}
-
-const filterNurseWorkItem = workItem => {
-  return workItem.filter(x => x.nurseWorkitem)
-}
-
-const filterLabWorkItem = workItem => {
-  return workItem
-    .filter(x => x.type === 'Lab')
-    .map(x => x.labWorkitems)
-    .flat()
-}
-
+ 
 export const FuncConfig = {
   pager: false,
   sort: true,
