@@ -10,7 +10,12 @@ import {
   MEDICALCHECKUP_WORKITEM_STATUS_DESCRIPTION,
   FORM_CATEGORY,
   DISPENSE_FROM,
+  VISIT_TYPE,
+  WORK_ITEM_TYPES,
 } from '@/utils/constants'
+import NurseWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/NurseWorkItemInfo'
+import RadioWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/RadioWorkItemInfo'
+import LabWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/LabWorkItemInfo'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import {
   CommonModal,
@@ -341,7 +346,42 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
         dataIndex: 'workItem',
         sorter: false,
         search: false,
-        width: 130,
+        width: 160,
+        render: (item, entity) => {
+          const dispatch = useDispatch()
+          const workItemSummary = JSON.parse(entity.workItemSummary)
+          const radioWorkItems =
+            workItemSummary.find(t => t.type === WORK_ITEM_TYPES.RADIOLOGY) ||
+            {}
+          const labWorkItems =
+            workItemSummary.find(t => t.type === WORK_ITEM_TYPES.LAB) || {}
+          const nurseWorkItems =
+            workItemSummary.find(
+              t => t.type === WORK_ITEM_TYPES.NURSEACTUALIZE,
+            ) || {}
+          return (
+            <div style={{ justifyContent: 'space-between' }}>
+              {labWorkItems && labWorkItems.totalWorkItem > 0 && (
+                <LabWorkItemInfo
+                  visitFK={entity.visitFK}
+                  workItemSummary={labWorkItems}
+                />
+              )}
+              {radioWorkItems && radioWorkItems.totalWorkItem > 0 && (
+                <RadioWorkItemInfo
+                  visitFK={entity.visitFK}
+                  workItemSummary={radioWorkItems}
+                />
+              )}
+              {nurseWorkItems && nurseWorkItems.totalWorkItem > 0 && (
+                <NurseWorkItemInfo
+                  visitFK={entity.visitFK}
+                  workItemSummary={nurseWorkItems}
+                />
+              )}
+            </div>
+          )
+        },
       },
       {
         key: 'medicalCheckupWorkitemDoctor',

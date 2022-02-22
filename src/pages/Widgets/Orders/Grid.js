@@ -26,6 +26,7 @@ import {
   ORDER_TYPES,
   INVENTORY_TYPE,
   SERVICE_CENTER_CATEGORY,
+  VISIT_TYPE,
 } from '@/utils/constants'
 import {
   CommonTableGrid,
@@ -1128,7 +1129,7 @@ export default ({
         .map(t => {
           return t.subject
         }),
-      ',',
+      ', ',
     )
     return {
       indicateString: `${indicateString}`,
@@ -1145,7 +1146,7 @@ export default ({
     const { visitOrderTemplate } = visit
     const { visitOrderTemplateItemDtos } = visitOrderTemplate
 
-    const removedTemplateItems = visitOrderTemplateItemDtos.filter(t => {
+    let removedTemplateItems = visitOrderTemplateItemDtos.filter(t => {
       if (
         rows.filter(
           x => x.isDeleted === false && x.visitOrderTemplateItemFK === t.id,
@@ -1154,6 +1155,11 @@ export default ({
         return undefined
       } else return t
     })
+    if (visit.visitPurposeFK === VISIT_TYPE.OTC) {
+      removedTemplateItems = removedTemplateItems.filter(
+        t => t.inventoryItemTypeFK != 3,
+      )
+    }
     _.sortBy(removedTemplateItems, 'inventoryItemTypeFK')
     setRemovedVisitOrderTemplateItem(removedTemplateItems)
     setShowRevertVisitPurposeItem(true)

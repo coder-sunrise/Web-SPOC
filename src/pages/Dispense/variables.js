@@ -24,8 +24,11 @@ import CONSTANTS from './DispenseDetails/constants'
 import Cross from '@material-ui/icons/HighlightOff'
 import { UnorderedListOutlined, CheckOutlined } from '@ant-design/icons'
 import {
+  LAB_WORKITEM_STATUS,
   NURSE_WORKITEM_STATUS,
   RADIOLOGY_WORKITEM_STATUS,
+  RADIOLOGY_WORKITEM_STATUS_TITLE,
+  WORK_ITEM_TYPES,
 } from '@/utils/constants'
 import LabWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/LabWorkItemInfo'
 import Authorized from '@/utils/Authorized'
@@ -987,6 +990,8 @@ export const OtherOrdersColumnExtensions = (
   onPrint,
   onActualizeBtnClick,
   onRadiologyBtnClick,
+  dispatch,
+  visitFK,
 ) => [
   {
     columnName: 'type',
@@ -1000,11 +1005,17 @@ export const OtherOrdersColumnExtensions = (
         radiologyWorkitemStatusFK = statusFK
       }
 
-      let labWorkItems = []
+      let labWorkItems = {}
       let labItemStyle = {}
       if (row.type === 'Lab' && !row.isPreOrder) {
         const { workitem } = row
-        labWorkItems = workitem?.labWorkitems
+        labWorkItems = {
+          type: WORK_ITEM_TYPES.LAB,
+          totalWorkItem: workitem?.labWorkitems?.length,
+          completedWorkItemCount: workitem?.labWorkitems?.filter(
+            t => t.statusFK === LAB_WORKITEM_STATUS.COMPLETED,
+          ).length,
+        }
       }
 
       let paddingRight = row.isPreOrder ? 24 : 0
@@ -1018,7 +1029,6 @@ export const OtherOrdersColumnExtensions = (
         paddingRight += 34
         urgentRight = -paddingRight
       }
-
       return (
         <div
           style={{
@@ -1057,9 +1067,15 @@ export const OtherOrdersColumnExtensions = (
             )}
             {radiologyWorkitemStatusFK &&
               radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
-            {labWorkItems && labWorkItems.length > 0 && (
-              <LabWorkItemInfo values={labWorkItems} />
-            )}
+            {row.workitem?.labWorkitems &&
+              row.workitem?.labWorkitems?.length > 0 && (
+                <LabWorkItemInfo
+                  dispatch={dispatch}
+                  visitFK={visitFK}
+                  workItemFK={row.workitem?.id}
+                  workItemSummary={labWorkItems}
+                />
+              )}
             {urgentIndicator(row, urgentRight)}
           </Space>
         </div>

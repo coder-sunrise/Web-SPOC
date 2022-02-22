@@ -331,6 +331,12 @@ export default createListViewModel({
           }
         }
       },
+      *getWorkItemDetailStatus({ payload }, { call, put, select }) {
+        const r = yield call(service.workItemDetailStatus, payload)
+        const { status, data = [] } = r
+        if (status === '200') return data
+        return []
+      },
       *deleteQueueByQueueID({ payload }, { call, put }) {
         const result = yield call(service.deleteQueue, payload)
         if (result) {

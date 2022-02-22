@@ -21,7 +21,7 @@ import Authorized from '@/utils/Authorized'
 import NurseWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/NurseWorkItemInfo'
 import RadioWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/RadioWorkItemInfo'
 import LabWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/LabWorkItemInfo'
-import { VISIT_TYPE } from '@/utils/constants'
+import { VISIT_TYPE, WORK_ITEM_TYPES } from '@/utils/constants'
 import DoctorConsultationStatus from './DoctorConsultationStatus'
 
 const compareString = (a, b) => a.localeCompare(b)
@@ -62,22 +62,7 @@ const mapServingPersonsString = servingByList =>
 const compareServingPerson = (a, b) => {
   return compareString(mapServingPersonsString(a), mapServingPersonsString(b))
 }
-
-const filterRadioWorkItem = workItem => {
-  return workItem.filter(x => x.type === 'Radiology')
-}
-
-const filterNurseWorkItem = workItem => {
-  return workItem.filter(x => x.nurseWorkitem)
-}
-
-const filterLabWorkItem = workItem => {
-  return workItem
-    .filter(x => x.type === 'Lab')
-    .map(x => x.labWorkitems)
-    .flat()
-}
-
+ 
 export const FuncConfig = {
   pager: false,
   sort: true,
@@ -218,265 +203,274 @@ export const QueueTableConfig = {
   identifier: 'reception',
 }
 
-export const QueueColumnExtensions = [
-  // {
-  //   columnName: 'visitStatus',
-  //   width: 180,
-  //   render: (row) => <VisitStatusTag row={row} />,
-  // },
-  {
-    columnName: 'queueNo',
-    width: 80,
-    compare: compareQueueNo,
-    render: row => {
-      return (
-        <Fragment>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <span>{row.queueNo}</span>
-            <div>
-              {row.patientIsActive &&
-                row.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
-                  <Authorized authority='openqueuedisplay'>
-                    <CallingQueueButton
-                      qId={row.queueNo}
+export const QueueColumnExtensions = props => {
+  return [
+    {
+      columnName: 'queueNo',
+      width: 80,
+      compare: compareQueueNo,
+      render: row => {
+        return (
+          <Fragment>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <span>{row.queueNo}</span>
+              <div>
+                {row.patientIsActive &&
+                  row.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
+                    <Authorized authority='openqueuedisplay'>
+                      <CallingQueueButton
+                        qId={row.queueNo}
+                        patientName={row.patientName}
+                        from='Queue'
+                      />
+                    </Authorized>
+                  )}
+              </div>
+            </div>
+          </Fragment>
+        )
+      },
+    },
+    { columnName: 'patientAccountNo', compare: compareString, width: 120 },
+    {
+      columnName: 'visitGroup',
+      align: 'center',
+    },
+    {
+      columnName: 'invoiceNo',
+      width: 120,
+    },
+    {
+      columnName: 'roomNo',
+      width: 120,
+    },
+    {
+      columnName: 'remarks',
+      width: 180,
+    },
+    {
+      columnName: 'patientScheme',
+      width: 200,
+    },
+    {
+      columnName: 'invoiceStatus',
+      width: 120,
+    },
+    {
+      columnName: 'patientMobile',
+      width: 120,
+    },
+    // {
+    //   columnName: 'invoicePaymentMode',
+    //   width: 150,
+    //   render: (row) => row.invoicePaymentMode || '-',
+    // },
+    {
+      columnName: 'patientName',
+      width: 250,
+      compare: compareString,
+    },
+    {
+      columnName: 'orderCreateTime',
+      width: 150,
+      type: 'date',
+      showTime: true,
+      render: row => {
+        if (row.orderCreateTime) {
+          return moment(row.orderCreateTime).format('DD MMM YYYY HH:mm')
+        }
+        return '-'
+      },
+    },
+    { columnName: 'referralCompany', width: 150 },
+    { columnName: 'referralPerson', width: 150 },
+    { columnName: 'referralRemarks', width: 150 },
+    { columnName: 'invoiceAmount', type: 'number', currency: true, width: 120 },
+    {
+      columnName: 'invoicePaymentAmount',
+      type: 'number',
+      currency: true,
+      width: 120,
+    },
+    { columnName: 'invoiceGST', type: 'number', currency: true, width: 120 },
+    {
+      columnName: 'invoiceOutstanding',
+      type: 'number',
+      currency: true,
+      width: 120,
+    },
+    {
+      columnName: 'timeIn',
+      width: 150,
+      type: 'date',
+      showTime: true,
+      render: row => {
+        if (row.timeIn) {
+          return moment(row.timeIn).format('DD MMM YYYY HH:mm')
+        }
+        return '-'
+      },
+    },
+    {
+      columnName: 'timeOut',
+      width: 150,
+      type: 'date',
+      showTime: true,
+      render: row => {
+        if (row.timeOut) {
+          return moment(row.timeOut).format('DD MMM YYYY HH:mm')
+        }
+        return '-'
+      },
+    },
+    {
+      columnName: 'gender/age',
+      render: row => {
+        const { dob, gender = 'U' } = row
+
+        const ageLabel = calculateAgeFromDOB(dob)
+        return (
+          <Tooltip title={`${gender}/${ageLabel}`}>
+            <span>{`${gender}/${ageLabel}`}</span>
+          </Tooltip>
+        )
+      },
+      width: 100,
+      sortingEnabled: false,
+    },
+    {
+      columnName: 'appointmentTime',
+      width: 150,
+      type: 'date',
+      showTime: true,
+      // compare: compareTime,
+      render: row => {
+        if (row.appointmentTime) {
+          const appointmentDate = moment(row.appointmentTime).format(
+            'DD MMM YYYY',
+          )
+          return moment(
+            `${appointmentDate} ${row.appointmentResourceStartTime}`,
+          ).format('DD MMM YYYY HH:mm')
+        }
+        return '-'
+      },
+    },
+    {
+      columnName: 'doctor',
+      render: row => {
+        if (row.visitPurposeFK !== VISIT_TYPE.MC) {
+          return <DoctorLabel doctor={row.doctor} hideMCR />
+        }
+
+        const showVisitDoctor = () => {
+          return row.visitDoctor.map(d => {
+            return <DoctorConsultationStatus doctor={d} />
+          })
+        }
+
+        return <DoctorConsultationStatus visitDoctor={row.visitDoctor} />
+      },
+      sortingEnabled: false,
+      width: 280,
+    },
+    {
+      columnName: 'visitOrderTemplate',
+      width: 180,
+    },
+    {
+      columnName: 'workItem',
+      width: 180,
+      render: row => {
+        const labWorkItems = row.workItemSummary.find(
+          t => t.type === WORK_ITEM_TYPES.LAB,
+        )
+        const radioWorkItems = row.workItemSummary.find(
+          t => t.type === WORK_ITEM_TYPES.RADIOLOGY,
+        )
+        const nurseWorkItems = row.workItemSummary.find(
+          t => t.type === WORK_ITEM_TYPES.NURSEACTUALIZE,
+        )
+        const labWorkItemsAccessRight = Authorized.check(
+          'queue.workitem.labworkitem',
+        ) || { rights: 'hidden' }
+        const radiologyWorkItemsAccessRight = Authorized.check(
+          'queue.workitem.radiologyworkitem',
+        ) || { rights: 'hidden' }
+        const nurseWorkItemsAccessRight = Authorized.check(
+          'queue.workitem.nurseworkitem',
+        ) || { rights: 'hidden' }
+        return (
+          <div style={{ justifyContent: 'space-between' }}>
+            {labWorkItemsAccessRight.rights === 'enable' &&
+              labWorkItems &&
+              labWorkItems.totalWorkItem > 0 && (
+                <LabWorkItemInfo
+                  visitFK={row.visitFK}
+                  workItemSummary={labWorkItems}
+                />
+              )}
+            {radiologyWorkItemsAccessRight.rights === 'enable' &&
+              radioWorkItems &&
+              radioWorkItems.totalWorkItem > 0 && (
+                <RadioWorkItemInfo
+                  visitFK={row.visitFK}
+                  workItemSummary={radioWorkItems}
+                />
+              )}
+            {nurseWorkItemsAccessRight.rights === 'enable' &&
+              nurseWorkItems &&
+              nurseWorkItems.totalWorkItem > 0 && (
+                <NurseWorkItemInfo
+                  visitFK={row.visitFK}
+                  workItemSummary={nurseWorkItems}
+                />
+              )}
+          </div>
+        )
+      },
+    },
+    {
+      columnName: 'servingByList',
+      compare: compareServingPerson,
+      width: 130,
+      render: row => {
+        const servingPersons = mapServingPersonsString(row.servingByList)
+        return (
+          <Fragment>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'left',
+              }}
+            >
+              <Tooltip title={servingPersons}>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {servingPersons}
+                </span>
+              </Tooltip>
+              <div>
+                {row.visitFK && (
+                  <Authorized authority='queue.servepatient'>
+                    <ServePatientButton
+                      visitFK={row.visitFK}
+                      servingPersons={row.servingByList}
                       patientName={row.patientName}
-                      from='Queue'
                     />
                   </Authorized>
                 )}
+              </div>
             </div>
-          </div>
-        </Fragment>
-      )
-    },
-  },
-  { columnName: 'patientAccountNo', compare: compareString, width: 120 },
-  {
-    columnName: 'visitGroup',
-    align: 'center',
-  },
-  {
-    columnName: 'invoiceNo',
-    width: 120,
-  },
-  {
-    columnName: 'roomNo',
-    width: 120,
-  },
-  {
-    columnName: 'remarks',
-    width: 180,
-  },
-  {
-    columnName: 'patientScheme',
-    width: 200,
-  },
-  {
-    columnName: 'invoiceStatus',
-    width: 120,
-  },
-  {
-    columnName: 'patientMobile',
-    width: 120,
-  },
-  // {
-  //   columnName: 'invoicePaymentMode',
-  //   width: 150,
-  //   render: (row) => row.invoicePaymentMode || '-',
-  // },
-  {
-    columnName: 'patientName',
-    width: 250,
-    compare: compareString,
-  },
-  {
-    columnName: 'orderCreateTime',
-    width: 150,
-    type: 'date',
-    showTime: true,
-    render: row => {
-      if (row.orderCreateTime) {
-        return moment(row.orderCreateTime).format('DD MMM YYYY HH:mm')
-      }
-      return '-'
-    },
-  },
-  { columnName: 'referralCompany', width: 150 },
-  { columnName: 'referralPerson', width: 150 },
-  { columnName: 'referralRemarks', width: 150 },
-  { columnName: 'invoiceAmount', type: 'number', currency: true, width: 120 },
-  {
-    columnName: 'invoicePaymentAmount',
-    type: 'number',
-    currency: true,
-    width: 120,
-  },
-  { columnName: 'invoiceGST', type: 'number', currency: true, width: 120 },
-  {
-    columnName: 'invoiceOutstanding',
-    type: 'number',
-    currency: true,
-    width: 120,
-  },
-  {
-    columnName: 'timeIn',
-    width: 150,
-    type: 'date',
-    showTime: true,
-    render: row => {
-      if (row.timeIn) {
-        return moment(row.timeIn).format('DD MMM YYYY HH:mm')
-      }
-      return '-'
-    },
-  },
-  {
-    columnName: 'timeOut',
-    width: 150,
-    type: 'date',
-    showTime: true,
-    render: row => {
-      if (row.timeOut) {
-        return moment(row.timeOut).format('DD MMM YYYY HH:mm')
-      }
-      return '-'
-    },
-  },
-  {
-    columnName: 'gender/age',
-    render: row => {
-      const { dob, gender = 'U' } = row
-
-      const ageLabel = calculateAgeFromDOB(dob)
-      return (
-        <Tooltip title={`${gender}/${ageLabel}`}>
-          <span>{`${gender}/${ageLabel}`}</span>
-        </Tooltip>
-      )
-    },
-    width: 100,
-    sortingEnabled: false,
-  },
-  {
-    columnName: 'appointmentTime',
-    width: 150,
-    type: 'date',
-    showTime: true,
-    // compare: compareTime,
-    render: row => {
-      if (row.appointmentTime) {
-        const appointmentDate = moment(row.appointmentTime).format(
-          'DD MMM YYYY',
+          </Fragment>
         )
-        return moment(
-          `${appointmentDate} ${row.appointmentResourceStartTime}`,
-        ).format('DD MMM YYYY HH:mm')
-      }
-      return '-'
+      },
     },
-  },
-  {
-    columnName: 'doctor',
-    render: row => {
-      if (row.visitPurposeFK !== VISIT_TYPE.MC) {
-        return <DoctorLabel doctor={row.doctor} hideMCR />
-      }
-
-      const showVisitDoctor = () => {
-        return row.visitDoctor.map(d => {
-          return <DoctorConsultationStatus doctor={d} />
-        })
-      }
-
-      return <DoctorConsultationStatus visitDoctor={row.visitDoctor} />
-    },
-    sortingEnabled: false,
-    width: 280,
-  },
-  {
-    columnName: 'visitOrderTemplate',
-    width: 180,
-  },
-  {
-    columnName: 'workItem',
-    width: 180,
-    render: row => {
-      const labWorkItems = filterLabWorkItem(row.workItem)
-      const radioWorkItems = filterRadioWorkItem(row.workItem)
-      const nurseWorkItems = filterNurseWorkItem(row.workItem)
-      const labWorkItemsAccessRight = Authorized.check(
-        'queue.workitem.labworkitem',
-      ) || { rights: 'hidden' }
-      const radiologyWorkItemsAccessRight = Authorized.check(
-        'queue.workitem.radiologyworkitem',
-      ) || { rights: 'hidden' }
-      const nurseWorkItemsAccessRight = Authorized.check(
-        'queue.workitem.nurseworkitem',
-      ) || { rights: 'hidden' }
-      return (
-        <div style={{ justifyContent: 'space-between' }}>
-          {labWorkItemsAccessRight.rights === 'enable' &&
-            labWorkItems &&
-            labWorkItems.length > 0 && (
-              <LabWorkItemInfo
-                values={labWorkItems}
-                style={{ marginRight: 18 }}
-              />
-            )}
-          {radiologyWorkItemsAccessRight.rights === 'enable' &&
-            radioWorkItems &&
-            radioWorkItems.length > 0 && (
-              <RadioWorkItemInfo values={radioWorkItems} />
-            )}
-          {nurseWorkItemsAccessRight.rights === 'enable' &&
-            nurseWorkItems &&
-            nurseWorkItems.length > 0 && (
-              <NurseWorkItemInfo values={nurseWorkItems} />
-            )}
-        </div>
-      )
-    },
-  },
-  {
-    columnName: 'servingByList',
-    compare: compareServingPerson,
-    width: 130,
-    render: row => {
-      const servingPersons = mapServingPersonsString(row.servingByList)
-      return (
-        <Fragment>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'left',
-            }}
-          >
-            <Tooltip title={servingPersons}>
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {servingPersons}
-              </span>
-            </Tooltip>
-            <div>
-              {row.visitFK && (
-                <Authorized authority='queue.servepatient'>
-                  <ServePatientButton
-                    visitFK={row.visitFK}
-                    servingPersons={row.servingByList}
-                    patientName={row.patientName}
-                  />
-                </Authorized>
-              )}
-            </div>
-          </div>
-        </Fragment>
-      )
-    },
-  },
-]
+  ]
+}

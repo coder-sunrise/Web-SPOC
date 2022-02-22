@@ -130,7 +130,7 @@ const DispenseDetails = ({
   onEditOrderClick,
   onFinalizeClick,
   codetable,
-  dispense,
+  dispense = {},
   handlePrint,
   history,
   onDrugLabelClick,
@@ -754,7 +754,6 @@ const DispenseDetails = ({
       ).length > 0
     )
   })()
-
   return (
     <React.Fragment>
       <GridContainer>
@@ -1045,6 +1044,8 @@ const DispenseDetails = ({
                 onPrint,
                 onActualizeBtnClick,
                 onRadiologyBtnClick,
+                dispatch,
+                history?.location?.query?.vid,
               )}
               data={service}
             />

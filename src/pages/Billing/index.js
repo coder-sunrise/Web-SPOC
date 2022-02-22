@@ -356,6 +356,7 @@ class Billing extends Component {
     selectedDrugs: [],
     isUpdatedAppliedInvoicePayerInfo: false,
     isConsumedPackage: false,
+    hasNewSignature: false,
   }
 
   componentDidMount() {
@@ -812,17 +813,18 @@ class Billing extends Component {
     }
   }
 
-  onPrintInvoice = (copayerID, invoicePayerid, index, invoiceReportType) => {
+  onPrintInvoice = (
+    copayerID,
+    invoicePayerid,
+    index,
+    invoiceReportType,
+    forceSave = false,
+  ) => {
     const { values, dispatch } = this.props
     const { invoicePayer, visitGroup } = values
     const isGroup = invoiceReportType === INVOICE_REPORT_TYPES.GROUPINVOICE
     const reportID = isGroup ? 89 : 15
     this.setState({ isGroupPrint: isGroup })
-    const modifiedOrNewAddedPayer = invoicePayer.filter(payer => {
-      if (payer.id === undefined && payer.isCancelled) return false
-      if (payer.id) return payer.isModified
-      return true
-    })
     let parametrPayload
     if (copayerID) {
       parametrPayload = {
@@ -838,49 +840,65 @@ class Billing extends Component {
         printType: invoiceReportType,
       }
     }
-    if (modifiedOrNewAddedPayer.length > 0) {
-      dispatch({
-        type: 'global/updateState',
-        payload: {
-          openConfirm: true,
-          openConfirmTitle: '',
-          openConfirmText: 'Confirm',
-          openConfirmContent: `Save changes and print invoice?`,
-          onConfirmSave: () => {
-            let currentPrintIndex
-            if (parametrPayload.printIndex !== undefined) {
-              const { printIndex, ...other } = parametrPayload
-              parametrPayload = {
-                ...other,
-              }
-              currentPrintIndex = invoicePayer.filter(
-                (item, i) => !item.isCancelled && i < printIndex,
-              ).length
-            }
+    const saveAndPrint = () => {
+      let currentPrintIndex
+      if (parametrPayload.printIndex !== undefined) {
+        const { printIndex, ...other } = parametrPayload
+        parametrPayload = {
+          ...other,
+        }
+        currentPrintIndex = invoicePayer.filter(
+          (item, i) => !item.isCancelled && i < printIndex,
+        ).length
+      }
 
-            const callback = () => {
-              this.setState(preState => ({
-                submitCount: preState.submitCount + 1,
-              }))
-              if (currentPrintIndex !== undefined) {
-                const {
-                  billing: { entity = {} },
-                } = this.props
-                parametrPayload = {
-                  ...parametrPayload,
-                  InvoicePayerid: entity.invoicePayer[currentPrintIndex].id,
-                  printType: invoiceReportType,
-                }
-              }
+      const callback = () => {
+        this.setState(preState => ({
+          submitCount: preState.submitCount + 1,
+          hasNewSignature: !preState.hasNewSignature,
+        }))
+        if (currentPrintIndex !== undefined) {
+          const {
+            billing: { entity = {} },
+          } = this.props
+          parametrPayload = {
+            ...parametrPayload,
+            InvoicePayerid: entity.invoicePayer[currentPrintIndex].id,
+            printType: invoiceReportType,
+          }
+        }
 
-              this.onShowReport(reportID, { visitGroup, ...parametrPayload })
-            }
-            this.upsertBilling(callback)
-          },
-        },
-      })
+        this.onShowReport(reportID, {
+          visitGroup,
+          ...parametrPayload,
+        })
+      }
+      this.upsertBilling(callback)
+    }
+    if (forceSave) {
+      saveAndPrint()
     } else {
-      this.onShowReport(reportID, { visitGroup, ...parametrPayload })
+      const modifiedOrNewAddedPayer = invoicePayer.filter(payer => {
+        if (payer.id === undefined && payer.isCancelled) return false
+        if (payer.id) return payer.isModified
+        return true
+      })
+      if (modifiedOrNewAddedPayer.length > 0 || this.state.hasNewSignature) {
+        dispatch({
+          type: 'global/updateState',
+          payload: {
+            openConfirm: true,
+            openConfirmTitle: '',
+            openConfirmText: 'Confirm',
+            openConfirmContent: `Save changes and print invoice?`,
+            onConfirmSave: () => {
+              saveAndPrint()
+            },
+          },
+        })
+      } else {
+        this.onShowReport(reportID, { visitGroup, ...parametrPayload })
+      }
     }
   }
 
@@ -904,6 +922,7 @@ class Billing extends Component {
               undefined,
               undefined,
               invoiceReportType,
+              true,
             )
           },
         },
@@ -1100,10 +1119,13 @@ class Billing extends Component {
   updateInvoiceSignature = signature => {
     const { dispatch, values, patient, setFieldValue } = this.props
     const { thumbnail } = signature
+    if (thumbnail) {
+      this.setState({ hasNewSignature: true })
+    }
     setFieldValue('invoice', {
       ...values.invoice,
-      signatureName: patient.name,
-      signature: thumbnail,
+      signatureName: thumbnail ? patient.name : undefined,
+      signature: thumbnail ? thumbnail : undefined,
     })
   }
 
@@ -1140,7 +1162,6 @@ class Billing extends Component {
       clinicSettings,
       codetable,
     } = this.props
-
     const setValues = v => {
       let newValues = v
       if (v.visitGroupStatusDetails?.length > 0) {
@@ -1228,6 +1249,7 @@ class Billing extends Component {
                               )
                             : dispense.entity
                         }
+                        history={this.props.history}
                         dispatch={this.props.dispatch}
                         onDrugLabelClick={this.handleDrugLabelClick}
                         showDrugLabelSelection={
@@ -1536,6 +1558,7 @@ class Billing extends Component {
             updateSignature={this.updateInvoiceSignature}
             image={invoiceSignatureSrc}
             signatureNameLabel='Patient Name'
+            allowClear={true}
           />
         </CommonModal>
         <ViewPatientHistory top='239px' />

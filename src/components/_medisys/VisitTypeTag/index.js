@@ -8,11 +8,11 @@ const visitTypeColors = {
   1: 'purple',
   2: 'blue',
   3: 'volcano',
-  4: 'magenta',
+  4: 'green',
 }
 
 const VisitTypeTag = ({ type }) => {
-  const visitTypes = useVisitTypes()
+  const visitTypes = useVisitTypes(true)
 
   const currentVisitType = visitTypes.find(item => item.id === type)
 

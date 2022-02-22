@@ -894,7 +894,7 @@ export const LAB_SPECIMEN_STATUS_COLORS = {
   4: '#993333',
   5: '#0000ff',
   6: '#009933',
-  7: '#33cc99',
+  7: '#777777',
 }
 
 export const LAB_SPECIMEN_ALL_LABEL = 'All'
@@ -980,6 +980,19 @@ export const TESTTYPES = {
   R50CMCORRECTED: 'Right50cmCorrected',
   L5MCORRECTED: 'Left5mCorrected',
   L50CMCORRECTED: 'Left50cmCorrected',
+}
+
+export const WORK_ITEM_TYPES = {
+  LAB: 'Lab',
+  RADIOLOGY: 'Radiology',
+  NURSEACTUALIZE: 'NurseActualize',
+  PHARMACY: 'Pharmacy',
+}
+export const WORK_ITEM_TYPES_ENUM = {
+  LAB: 0,
+  RADIOLOGY: 1,
+  NURSEACTUALIZE: 2,
+  PHARMACY: 3,
 }
 
 export const MEDICALCHECKUP_WORKITEM_STATUS = {

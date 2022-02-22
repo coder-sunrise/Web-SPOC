@@ -258,6 +258,7 @@ class Grid extends React.Component {
     if (height < 500) height = 500
     const TableProps = { height }
     if (!height) return <Skeleton variant='rect' height={500} />
+    const queueColumns = QueueColumnExtensions(this.props)
     return (
       <div>
         <LoadingWrapper
@@ -272,7 +273,7 @@ class Grid extends React.Component {
               rows={queueListingData}
               forceRender
               columnExtensions={[
-                ...QueueColumnExtensions,
+                ...queueColumns,
                 {
                   columnName: 'visitStatus',
                   width: 200,

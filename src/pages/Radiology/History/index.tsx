@@ -19,6 +19,7 @@ import {
   RADIOLOGY_WORKITEM_STATUS_TITLE,
   VISIT_TYPE_NAME,
   VISIT_TYPE,
+  CLINICAL_ROLE,
 } from '@/utils/constants'
 import { PrinterOutlined, UnorderedListOutlined } from '@ant-design/icons'
 import moment from 'moment'
@@ -497,7 +498,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       initialValue: [-99],
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
         const radiographer = (codetable.clinicianprofile || []).filter(
-          x => x.userProfile.role.normalizedName === 'RADIOGRAPHER',
+          x => x.userProfile.role.clinicRoleFK === CLINICAL_ROLE.RADIOGRAPHER,
         )
         const radiographerOptions = radiographer.map(x => {
           return { value: x.userProfile.id, name: x.name }

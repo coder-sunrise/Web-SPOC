@@ -104,7 +104,8 @@ export default createListViewModel({
         if (
           (pathname.indexOf('/reception/queue/consultation') === 0 &&
             Number(query.cid)) ||
-          pathname.indexOf('/reception/queue/dispense') === 0
+          pathname.indexOf('/reception/queue/dispense') === 0 ||
+          pathname.indexOf('/pharmacy/worklist') === 0
         ) {
           dispatch({
             type: 'codetable/fetchCodes',
@@ -137,7 +138,6 @@ export default createListViewModel({
           payload,
         })
         const orders = yield select(st => st.orders)
-        console.log('orders', orders)
         const consultationDocument = yield select(st => st.consultationDocument)
         const { rows } = consultationDocument
         const {
@@ -433,11 +433,7 @@ export default createListViewModel({
             corVaccinationCert: getCertificate(uid),
           }
           rows.push(newRow)
-        }
-        console.log(
-          newRow,
-          rows.find(r => r.uid === payload.uid),
-        )
+        } 
         return {
           ...state,
           rows,
