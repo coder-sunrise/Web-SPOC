@@ -221,6 +221,7 @@ export default {
   'menu.medicalcheckup': 'Medical Checkup',
   'menu.medicalcheckup.worklist': 'Worklist',
   'menu.medicalcheckup.history': 'History',
+  'menu.medicalcheckup.worklist.reportingdetails': 'Reporting details',
 
   'menu.pharmacy': 'Pharmacy',
   'menu.pharmacy.worklist': 'Worklist',

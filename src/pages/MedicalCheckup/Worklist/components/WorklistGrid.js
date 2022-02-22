@@ -26,7 +26,6 @@ import Description from '@material-ui/icons/Description'
 import VisitForms from '@/pages/Reception/Queue/VisitForms'
 import WorklistContext from '../WorklistContext'
 import { StatusFilter } from './StatusFilter'
-import ReportingDetails from './ReportingDetails'
 
 const allMedicalCheckupReportStatuses = Object.values(
   MEDICALCHECKUP_WORKITEM_STATUS,
@@ -63,7 +62,6 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
     allMedicalCheckupReportStatuses,
   )
   const [workitems, setWorkitems] = useState([])
-  const [showReportingForm, setShowReportingForm] = useState(false)
   const [showReportForm, setShowReportForm] = useState(false)
   const [showForms, setShowForms] = useState(false)
   const { setIsAnyWorklistModelOpened } = useContext(WorklistContext)
@@ -126,31 +124,11 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
     toggleForms()
   }
 
-  const toggleReportingForm = () => {
-    const target = !showReportingForm
-    setShowReportingForm(target)
-    setIsAnyWorklistModelOpened(target)
-    if (!target) {
-      dispatch({
-        type: 'formListing/updateState',
-        payload: {
-          list: [],
-        },
-      })
-    }
-  }
-
   const showReportingDetails = async row => {
-    const { id, visitFK, patientProfileFK } = row
-    await dispatch({
-      type: 'medicalCheckupWorklist/updateState',
-      payload: {
-        id,
-        visitFK,
-        patientProfileFK,
-      },
-    })
-    toggleReportingForm()
+    const version = Date.now()
+    history.push(
+      `/medicalcheckup/worklist/reportingdetails?mcid=${row.id}&qid=${row.queueId}&vid=${row.visitFK}&pid=${row.patientProfileFK}&v=${version}`,
+    )
   }
 
   const toggleReportForm = () => {
@@ -454,16 +432,6 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
         <VisitForms formCategory={FORM_CATEGORY.CORFORM} />
       </CommonModal>
 
-      <CommonModal
-        open={showReportingForm}
-        title='Reporting Details'
-        onClose={toggleReportingForm}
-        onConfirm={toggleReportingForm}
-        fullScreen
-        overrideLoading
-      >
-        <ReportingDetails />
-      </CommonModal>
       <CommonModal
         open={showReportForm}
         title='View Report'
