@@ -26,6 +26,7 @@ import {
   ORDER_TYPES,
   INVENTORY_TYPE,
   SERVICE_CENTER_CATEGORY,
+  VISIT_TYPE,
 } from '@/utils/constants'
 import {
   CommonTableGrid,
@@ -1154,7 +1155,7 @@ export default ({
         return undefined
       } else return t
     })
-    if (visit.visitPurposeFK === 3) {
+    if (visit.visitPurposeFK === VISIT_TYPE.OTC) {
       removedTemplateItems = removedTemplateItems.filter(
         t => t.inventoryItemTypeFK != 3,
       )

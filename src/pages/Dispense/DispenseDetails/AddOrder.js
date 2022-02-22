@@ -674,6 +674,7 @@ export default compose(
           }
           return {
             id: o.outerLayerId,
+            visitOrderTemplateItemFK: o.visitOrderTemplateItemFK,
             concurrencyToken: o.outerLayerConcurrencyToken,
             description: o.subject,
             adjAmt: o.adjAmount,

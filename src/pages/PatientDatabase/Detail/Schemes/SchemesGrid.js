@@ -37,7 +37,14 @@ class SchemesGrid extends PureComponent {
   constructor(props) {
     super(props)
 
-    const { title, titleChildren, dispatch, type, clinicSettings } = props
+    const {
+      title,
+      titleChildren,
+      dispatch,
+      type,
+      clinicSettings,
+      values,
+    } = props
     const { state } = this
     const isMedisaveEnable = clinicSettings.settings.isEnableMedisave
 
@@ -262,11 +269,10 @@ class SchemesGrid extends PureComponent {
                     size='sm'
                     justIcon
                     color='primary'
-                    disabled={!row.copayerFK}
+                    disabled={!row.copayerFK || !values.id}
                   >
                     <Print
                       onClick={() => {
-                        console.log(row)
                         this.printLabel(row.copayerFK)
                       }}
                     />

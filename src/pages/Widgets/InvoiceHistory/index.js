@@ -84,6 +84,7 @@ const InvoiceHistory = ({
 
   const { settings = [] } = clinicSettings
   const { isEnableVisitationInvoiceReport = false } = settings
+  const [showPrintInvoiceMenu, setShowPrintInvoiceMenu] = useState(false)
 
   const [hasActiveSession, setHasActiveSession] = useState(true)
 
@@ -104,8 +105,12 @@ const InvoiceHistory = ({
     refreshInvoiceList()
   }, [])
 
-  const [showReport, setShowReport] = useState({ show: false, invoiceId: null })
-  const { show, invoiceId } = showReport
+  const [showReport, setShowReport] = useState({
+    show: false,
+    invoiceId: null,
+    printType,
+  })
+  const { show, invoiceId, printType } = showReport
 
   const toggleReport = (row, invoiceReportType) => {
     const setShowValue = !show
@@ -113,6 +118,7 @@ const InvoiceHistory = ({
       ...showReport,
       show: setShowValue,
       invoiceId: setShowValue ? row.id : null,
+      printType: invoiceReportType,
     })
   }
 
@@ -187,7 +193,10 @@ const InvoiceHistory = ({
                   icon={null}
                   trigger='click'
                   placement='left'
-                  onVisibleChange={() => {}}
+                  visible={showPrintInvoiceMenu}
+                  onVisibleChange={() => {
+                    setShowPrintInvoiceMenu(!showPrintInvoiceMenu)
+                  }}
                   content={
                     <MenuList
                       role='menu'
@@ -313,7 +322,10 @@ const InvoiceHistory = ({
         >
           <ReportViewer
             reportID={15}
-            reportParameters={{ InvoiceID: invoiceId || '' }}
+            reportParameters={{
+              InvoiceID: invoiceId || '',
+              printType: printType,
+            }}
           />
         </CommonModal>
         <CommonModal
