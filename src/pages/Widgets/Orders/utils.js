@@ -59,8 +59,14 @@ const getCautionAlertContent = (cautionItems = [], allergyItems = [], vaccinatio
                   dataIndex: 'onsetDate',
                   title: 'Onset Date',
                   width: 100,
-                  render: (text, row) => <span>{row.onsetDate ? moment(row.onsetDate).format("DD MMM YYYY") : '-'}</span>
-                }
+                  render: (text, row) => (
+                    <span>
+                      {row.onsetDate
+                        ? moment(row.onsetDate).format('DD MMM YYYY')
+                        : '-'}
+                    </span>
+                  ),
+                },
               ]}
               dataSource={allergyItems}
               rowClassName={(record, index) => {
@@ -99,7 +105,7 @@ const getCautionAlertContent = (cautionItems = [], allergyItems = [], vaccinatio
                 {
                   dataIndex: 'caution',
                   title: 'Cautions',
-                }
+                },
               ]}
               dataSource={cautionItems}
               rowClassName={(record, index) => {
@@ -117,7 +123,7 @@ const getCautionAlertContent = (cautionItems = [], allergyItems = [], vaccinatio
               <h4
                 style={{ fontWeight: 400, textAlign: 'left', marginBottom: 10 }}
               >
-                Vaccination item(s) will not to ne added.
+                Vaccination item(s) will not to be added.
               </h4>
             </p>
             <Table

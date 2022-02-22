@@ -894,7 +894,7 @@ export const LAB_SPECIMEN_STATUS_COLORS = {
   4: '#993333',
   5: '#0000ff',
   6: '#009933',
-  7: '#33cc99',
+  7: '#777777',
 }
 
 export const LAB_SPECIMEN_ALL_LABEL = 'All'
@@ -981,7 +981,7 @@ export const TESTTYPES = {
   L5MCORRECTED: 'Left5mCorrected',
   L50CMCORRECTED: 'Left50cmCorrected',
 }
- 
+
 export const WORK_ITEM_TYPES = {
   LAB: 'Lab',
   RADIOLOGY: 'Radiology',
@@ -1027,5 +1027,5 @@ export const MEDICALCHECKUP_WORKITEM_STATUS_DESCRIPTION = {
 }
 export const DISPENSE_FROM = {
   QUEUE: 1,
-  MEDICALCHECKUP: 2, 
+  MEDICALCHECKUP: 2,
 }

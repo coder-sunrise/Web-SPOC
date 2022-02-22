@@ -397,13 +397,13 @@ export default compose(
         isExclusive,
         isDisplayInLeaflet,
         isOnlyClinicInternalUsage,
-        inventoryMedication_MedicationIngredient,
-        inventoryMedication_MedicationGroup,
-        inventoryMedication_MedicationSideEffect,
-        inventoryMedication_MedicationPrecaution,
+        inventoryMedication_MedicationIngredient = [],
+        inventoryMedication_MedicationGroup = [],
+        inventoryMedication_MedicationSideEffect = [],
+        inventoryMedication_MedicationPrecaution = [],
         inventoryMedication_Medication,
-        inventoryMedication_MedicationContraIndication,
-        inventoryMedication_MedicationInteraction,
+        inventoryMedication_MedicationContraIndication = [],
+        inventoryMedication_MedicationInteraction = [],
         inventoryMedication_DrugAllergy,
         isDispensedByPharmacy,
         isNurseActualizable,
@@ -441,33 +441,46 @@ export default compose(
           'indication',
         )
 
-      let medicationIngredients = inventoryMedication_MedicationIngredient
-        ?.sort(item => item.sequence)
-        .map(item => item.medicationIngredientFK)
+      let medicationIngredients = _.orderBy(
+        inventoryMedication_MedicationIngredient,
+        'sequence',
+        'asc',
+      ).map(item => item.medicationIngredientFK)
+      let drugAllergies = _.orderBy(
+        inventoryMedication_DrugAllergy,
+        'sequence',
+        'asc',
+      ).map(item => item.drugAllergyFK)
 
-      let drugAllergies = inventoryMedication_DrugAllergy?.map(
-        item => item.drugAllergyFK,
-      )
+      let medicationSideEffects = _.orderBy(
+        inventoryMedication_MedicationSideEffect,
+        'sequence',
+        'asc',
+      ).map(item => item.medicationSideEffectFK)
 
-      let medicationSideEffects = inventoryMedication_MedicationSideEffect
-        ?.sort(item => item.sequence)
-        .map(item => item.medicationSideEffectFK)
+      let medicationPrecautions = _.orderBy(
+        inventoryMedication_MedicationPrecaution,
+        'sequence',
+        'asc',
+      ).map(item => item.medicationPrecautionFK)
 
-      let medicationPrecautions = inventoryMedication_MedicationPrecaution
-        ?.sort(item => item.sequence)
-        .map(item => item.medicationPrecautionFK)
+      let medicationContraindications = _.orderBy(
+        inventoryMedication_MedicationContraIndication,
+        'sequence',
+        'asc',
+      ).map(item => item.medicationContraIndicationFK)
 
-      let medicationContraindications = inventoryMedication_MedicationContraIndication
-        ?.sort(item => item.sequence)
-        .map(item => item.medicationContraIndicationFK)
+      let medicationInteractions = _.orderBy(
+        inventoryMedication_MedicationInteraction,
+        'sequence',
+        'asc',
+      ).map(item => item.medicationInteractionFK)
 
-      let medicationInteractions = inventoryMedication_MedicationInteraction
-        ?.sort(item => item.sequence)
-        .map(item => item.medicationInteractionFK)
- 
-      let medicationGroups = inventoryMedication_MedicationGroup
-        ?.sort(item => item.sequence)
-        .map(item => item.medicationGroupFK)
+      let medicationGroups = _.orderBy(
+        inventoryMedication_MedicationGroup,
+        'sequence',
+        'asc',
+      ).map(item => item.medicationGroupFK)
 
       return {
         ...medicationDetails,
@@ -602,7 +615,7 @@ export default compose(
         fileInfo.fileName = newAttach?.fileName
       }
 
-      let medicationIngredientList = undefined 
+      let medicationIngredientList = undefined
       if (medicationIngredients) {
         medicationIngredientList = medicationIngredients.map((item, index) => {
           return {
@@ -610,16 +623,14 @@ export default compose(
             sequence: index,
             inventoryMedicationFK: id,
           }
-        }) 
+        })
       }
 
       let drugAllergyList = undefined
       if (drugAllergies) {
-        drugAllergyList = drugAllergies
-          .filter(m => m !== allOptionId)
-          .map(m => {
-            return { drugAllergyFK: m, inventoryMedicationFK: id }
-          })
+        drugAllergyList = drugAllergies.map(m => {
+          return { drugAllergyFK: m, inventoryMedicationFK: id }
+        })
       }
 
       let sideEffectList = undefined

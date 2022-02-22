@@ -187,7 +187,9 @@ class DrugLeafletSelection extends PureComponent {
           t.SecondLine =
             (t.ingredient || '').length > 54
               ? `(${t.ingredient.substr(0, 53)}…)`
-              : `(${t.ingredient}}`
+              : t.ingredient && t.ingredient.length > 0
+              ? `(${t.ingredient})`
+              : ''
           // If language is EN, instruction need to auto breakline and show in 2 lines
           // If JP, then need to separate to 2 lines. last line will include the last remaining 2 step dose.
           if (lan === 'JP') {
@@ -204,7 +206,9 @@ class DrugLeafletSelection extends PureComponent {
           t.FirstLine =
             (t.ingredient || '').length > 54
               ? `(${t.ingredient.substr(0, 53)}…)`
-              : `(${t.ingredient}}`
+              : t.ingredient && t.ingredient.length > 0
+              ? `(${t.ingredient})`
+              : ''
           t.SecondLine = t.indication
           // If language is EN, instruction need to auto breakline and show in 2 lines
           // If JP, then need to separate to 2 lines. last line will include the last remaining 2 step dose.
@@ -219,7 +223,6 @@ class DrugLeafletSelection extends PureComponent {
           }
         }
       })
-      console.log(data)
       const payload = [
         {
           ReportId: REPORT_ID.DRUG_SUMMARY_LABEL_80MM_45MM,
@@ -315,7 +318,6 @@ class DrugLeafletSelection extends PureComponent {
             const selectedData = rows.filter(item =>
               selectedRows.includes(item.id),
             )
-            console.log(this.props.type)
             if (this.props.type === 'PIL') {
               this.printLeaflet(selectedData)
             } else if (this.props.type === 'drugsummarylabel') {

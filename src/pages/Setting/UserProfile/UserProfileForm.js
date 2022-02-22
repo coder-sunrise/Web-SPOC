@@ -543,11 +543,7 @@ class UserProfileForm extends React.PureComponent {
                   <FastField
                     name='userAccountNo'
                     render={args => (
-                      <TextField
-                        {...args}
-                        label='User Account No.'
-                        disabled={isEdit}
-                      />
+                      <TextField {...args} label='User Account No.' />
                     )}
                   />
                 </GridItem>

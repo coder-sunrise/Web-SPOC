@@ -31,7 +31,6 @@ export const General = props => {
   const { isEnableAutoGenerateStatement = true } = clinicSettings
 
   const isNew = values.id ? false : true
-
   return (
     <React.Fragment>
       <GridContainer>
@@ -295,7 +294,7 @@ export const General = props => {
                 code='ctcreditfacility'
                 autocomplete='off'
                 tooltipField='description'
-                orderBy={(['name'], ['asc'])}
+                orderBy={[['name'], ['asc']]}
                 {...args}
               />
             )}

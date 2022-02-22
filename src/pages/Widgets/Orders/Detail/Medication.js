@@ -513,7 +513,7 @@ const getVisitDoctorUserId = props => {
               )
             : ''
         item.prescribeUOMDisplayValue = prescribeUOM?.displayValue
-
+        item.sequence = index
         if (item.isNew && item.id < 0) item.id = undefined
       })
     }
@@ -536,7 +536,6 @@ const getVisitDoctorUserId = props => {
       packageGlobalId:
         values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
-    console.log(data)
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
@@ -1100,9 +1099,14 @@ class Medication extends PureComponent {
   }
 
   validateAndSubmitIfOk = async () => {
-    const { handleSubmit, validateForm, values, codetable } = this.props
+    const {
+      handleSubmit,
+      validateForm,
+      values,
+      codetable,
+      setFieldValue,
+    } = this.props
     const validateResult = await validateForm()
-    console.log(validateResult)
     const isFormValid = _.isEmpty(validateResult)
     if (isFormValid) {
       const {
@@ -1114,13 +1118,19 @@ class Medication extends PureComponent {
       let drugMixtureItems
       if (type === '1' && isDrugMixture) {
         const { inventorymedication = [] } = codetable
+        let sequence = 0
         drugMixtureItems = corPrescriptionItemDrugMixture
           .filter(o => !o.isDeleted)
           .map(m => {
             let drug =
               inventorymedication.find(f => f.id === m.inventoryMedicationFK) ||
               {}
-            return { ...m, subject: m.drugName, caution: drug.caution }
+            return {
+              ...m,
+              sequence: sequence++,
+              subject: m.drugName,
+              caution: drug.caution,
+            }
           })
         if (drugMixtureItems.length < 2) {
           notification.warn({
@@ -1128,6 +1138,8 @@ class Medication extends PureComponent {
           })
           return false
         }
+
+        setFieldValue('corPrescriptionItemDrugMixture', drugMixtureItems)
       }
       handleSubmit()
       return true
@@ -1311,6 +1323,8 @@ class Medication extends PureComponent {
       }
 
       tempDrugMixtureRows = _rows
+      var tempSequnence = 0
+      _rows.forEach(item => (item.sequence = tempSequnence++))
       setFieldValue('corPrescriptionItemDrugMixture', _rows)
     }
 
