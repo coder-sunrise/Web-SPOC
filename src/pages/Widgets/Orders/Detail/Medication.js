@@ -514,7 +514,6 @@ const getVisitDoctorUserId = props => {
             : ''
         item.prescribeUOMDisplayValue = prescribeUOM?.displayValue
         item.sequence = index
-        console.log(index, 123)
         if (item.isNew && item.id < 0) item.id = undefined
       })
     }
@@ -537,7 +536,6 @@ const getVisitDoctorUserId = props => {
       packageGlobalId:
         values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
-    console.log(data)
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
@@ -1141,7 +1139,6 @@ class Medication extends PureComponent {
           return false
         }
 
-        console.log(drugMixtureItems)
         setFieldValue('corPrescriptionItemDrugMixture', drugMixtureItems)
       }
       handleSubmit()
@@ -1328,7 +1325,6 @@ class Medication extends PureComponent {
       tempDrugMixtureRows = _rows
       var tempSequnence = 0
       _rows.forEach(item => (item.sequence = tempSequnence++))
-      console.log(_rows)
       setFieldValue('corPrescriptionItemDrugMixture', _rows)
     }
 

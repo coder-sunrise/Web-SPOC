@@ -92,7 +92,6 @@ class DrugLeafletSelection extends PureComponent {
   }
 
   handleSelectionChange = rows => {
-    console.log(rows)
     this.setState(() => ({
       selectedRows: rows,
     }))
@@ -224,7 +223,6 @@ class DrugLeafletSelection extends PureComponent {
           }
         }
       })
-      console.log(data)
       const payload = [
         {
           ReportId: REPORT_ID.DRUG_SUMMARY_LABEL_80MM_45MM,
@@ -317,11 +315,9 @@ class DrugLeafletSelection extends PureComponent {
         {footer({
           onConfirm: () => {
             const { selectedRows } = this.state
-            console.log(rows, 111)
             const selectedData = rows.filter(item =>
               selectedRows.includes(item.id),
             )
-            console.log(this.props.type)
             if (this.props.type === 'PIL') {
               this.printLeaflet(selectedData)
             } else if (this.props.type === 'drugsummarylabel') {
