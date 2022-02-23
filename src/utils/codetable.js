@@ -279,6 +279,24 @@ const tenantCodesMap = new Map([
       pagesize: 99999,
     },
   ],
+  [
+    'ctexaminationitem',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctindividualcomment',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctsummarycomment',
+    {
+      ...defaultParams,
+    },
+  ],
 ])
 
 // always get latest codetable

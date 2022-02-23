@@ -1742,7 +1742,7 @@ class PatientHistory extends Component {
   }
 
   getFilterBar = () => {
-    const { values } = this.props
+    const { values, fromModule } = this.props
     const { isAllDate } = values
     const { selectItems } = this.state
     return (
@@ -1757,7 +1757,7 @@ class PatientHistory extends Component {
                   mode='multiple'
                   maxTagPlaceholder='Visit Types'
                   style={{
-                    width: 200,
+                    width: fromModule === 'MedicalCheckup' ? 170 : 200,
                     display: 'inline-Block',
                     marginBottom: -16,
                   }}
@@ -1777,7 +1777,7 @@ class PatientHistory extends Component {
                 render={args => (
                   <DateRangePicker
                     style={{
-                      width: 300,
+                      width: fromModule === 'MedicalCheckup' ? 210 : 300,
                     }}
                     label='Visit Date From'
                     label2='To'
@@ -1802,7 +1802,7 @@ class PatientHistory extends Component {
                   mode='multiple'
                   maxTagCount={0}
                   style={{
-                    width: 240,
+                    width: fromModule === 'MedicalCheckup' ? 168 : 240,
                     display: 'inline-Block',
                     marginBottom: -16,
                   }}
@@ -1816,7 +1816,7 @@ class PatientHistory extends Component {
               render={args => (
                 <DoctorProfileSelect
                   style={{
-                    width: 240,
+                    width: fromModule === 'MedicalCheckup' ? 180 : 240,
                     display: 'inline-Block',
                     marginLeft: 10,
                     marginBottom: -16,
@@ -2259,7 +2259,7 @@ class PatientHistory extends Component {
   }
 
   render() {
-    const { clinicSettings, scriblenotes, fromModule } = this.props
+    const { clinicSettings, scriblenotes, fromModule, height } = this.props
     const cfg = {}
     const {
       showHistoryDetails,
@@ -2284,7 +2284,10 @@ class PatientHistory extends Component {
     } else if (fromModule === 'PatientHistory') {
       otherHeight = 390
     }
-    const visitContentHeight = currentHeight - otherHeight
+    let visitContentHeight = currentHeight - otherHeight
+    if (fromModule === 'MedicalCheckup') {
+      visitContentHeight = height - 165
+    }
     return (
       <div {...cfg}>
         <CardContainer hideHeader size='sm'>
