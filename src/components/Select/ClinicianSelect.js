@@ -5,7 +5,7 @@ import CodeSelect from './CodeSelect'
 
 @connect(({ codetable, user }) => ({ codetable, user }))
 class ClinicianSelect extends React.PureComponent {
-  render () {
+  render() {
     const { field, form, codetable, user, label, noDefaultValue } = this.props
     if (
       field &&
@@ -24,6 +24,7 @@ class ClinicianSelect extends React.PureComponent {
         valueField='userProfileFK'
         labelField='name'
         defaultValue={user.data.clinicianProfile.userProfileFK}
+        orderBy={[[source => source.name.toUpperCase()], ['asc']]}
         {...this.props}
       />
     )

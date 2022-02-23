@@ -66,12 +66,12 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                     {...args}
                     label='Type'
                     options={[
-                      { name: 'Consumable', value: 'Consumable' },
                       { name: 'Medication', value: 'Medication' },
-                      { name: 'Service', value: 'Service' },
-                      { name: 'Lab', value: 'Lab' },
-                      { name: 'Radiology', value: 'Radiology' },
+                      { name: 'Consumable', value: 'Consumable' },
                       { name: 'Vaccination', value: 'Vaccination' },
+                      { name: 'Service', value: 'Service' },
+                      { name: 'Radiology', value: 'Radiology' },
+                      { name: 'Lab', value: 'Lab' },
                     ]}
                     allowClear={true}
                     onChange={e => {
@@ -94,7 +94,15 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                     placement='right'
                     title='Select "All" will retrieve active and inactive items'
                   >
-                    <ItemSelect {...args} itemType={form.values.itemType} />
+                    <ItemSelect
+                      {...args}
+                      label='Item List'
+                      mode='multiple'
+                      labelField='displayValue'
+                      itemType={form.values.itemType}
+                      disabled={!form.values.itemType}
+                      temp
+                    />
                   </Tooltip>
                 )
               }}
@@ -106,7 +114,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
               render={args => (
                 <Tooltip
                   placement='right'
-                  title='Select "All" will retrieve active and inactive radiographers'
+                  title='Select "All" will retrieve active and inactive users'
                 >
                   <ClinicianSelect
                     label='Order By'
@@ -127,11 +135,8 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                 <Select
                   {...args}
                   label='Status'
+                  mode='multiple'
                   options={[
-                    {
-                      name: 'All',
-                      value: 'All',
-                    },
                     {
                       name: 'New',
                       value: 'New',
@@ -145,7 +150,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                       value: 'Actualized',
                     },
                   ]}
-                  allowClear={false}
+                  maxTagCount={0}
                   labelField='name'
                   valueField='value'
                 />
