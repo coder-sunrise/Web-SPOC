@@ -2,6 +2,7 @@ import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
 import { scribbleTypes } from '@/utils/codes'
 import { cleanFields } from '@/pages/Consultation/utils'
+import { VISIT_TYPE } from '@/utils/constants'
 import _ from 'lodash'
 
 export const WIDGETS_ID = {
@@ -26,6 +27,9 @@ export const WIDGETS_ID = {
   REFERRAL: '19',
   CONSULTATION_DOCUMENT: '20',
   NURSENOTES: '21',
+  DOCTORNOTE: '22',
+  EYEEXAMINATIONS: '23',
+  AUDIOMETRYTEST: '24',
 }
 
 export const GPCategory = [
@@ -37,6 +41,8 @@ export const GPCategory = [
   WIDGETS_ID.VISITREMARKS,
   WIDGETS_ID.REFERRAL,
   WIDGETS_ID.VITALSIGN,
+  WIDGETS_ID.EYEEXAMINATIONS,
+  WIDGETS_ID.AUDIOMETRYTEST,
   WIDGETS_ID.ORDERS,
   WIDGETS_ID.INVOICE,
   WIDGETS_ID.CONSULTATION_DOCUMENT,
@@ -57,6 +63,8 @@ export const EyeCategory = [
   WIDGETS_ID.VISITREMARKS,
   WIDGETS_ID.REFERRAL,
   WIDGETS_ID.VITALSIGN,
+  WIDGETS_ID.EYEEXAMINATIONS,
+  WIDGETS_ID.AUDIOMETRYTEST,
   WIDGETS_ID.ORDERS,
   WIDGETS_ID.INVOICE,
   WIDGETS_ID.CONSULTATION_DOCUMENT,
@@ -145,8 +153,18 @@ export const categoryTypes = [
   },
   {
     value: WIDGETS_ID.VITALSIGN,
-    name: 'Vital Sign',
+    name: 'Basic Examinations',
     authority: 'queue.consultation.widgets.vitalsign',
+  },
+  {
+    value: WIDGETS_ID.EYEEXAMINATIONS,
+    name: 'Eye Examinations',
+    authority: 'queue.consultation.widgets.eyeexaminations',
+  },
+  {
+    value: WIDGETS_ID.AUDIOMETRYTEST,
+    name: 'Audiometry Test',
+    authority: 'queue.consultation.widgets.audiometrytest',
   },
   {
     value: WIDGETS_ID.ORDERS,
@@ -166,7 +184,7 @@ export const categoryTypes = [
   {
     value: WIDGETS_ID.FORMS,
     name: 'Forms',
-    authority: 'patientdashboard.forms',
+    authority: 'queue.consultation.form',
   },
   {
     value: WIDGETS_ID.ATTACHMENT,
@@ -182,22 +200,33 @@ export const categoryTypes = [
 ]
 
 export const notesTypes = [
-  { value: WIDGETS_ID.ASSOCIATED_HISTORY, fieldName: 'history' },
-  { value: WIDGETS_ID.CHIEF_COMPLAINTS, fieldName: 'chiefComplaints' },
-  { value: WIDGETS_ID.CLINICAL_NOTE, fieldName: 'note' },
-  { value: WIDGETS_ID.PLAN, fieldName: 'plan' },
+  {
+    value: WIDGETS_ID.ASSOCIATED_HISTORY,
+    fieldName: 'history',
+    title: 'History',
+  },
+  {
+    value: WIDGETS_ID.CHIEF_COMPLAINTS,
+    fieldName: 'chiefComplaints',
+    title: 'Chief Complaints',
+  },
+  { value: WIDGETS_ID.CLINICAL_NOTE, fieldName: 'note', title: 'Note' },
+  { value: WIDGETS_ID.PLAN, fieldName: 'plan', title: 'Plan' },
   { value: WIDGETS_ID.INTRA_ORAL, fieldName: 'intraOral' },
   { value: WIDGETS_ID.EXTRA_ORAL, fieldName: 'extraOral' },
   { value: WIDGETS_ID.VISITREMARKS, fieldName: 'visitRemarks' },
 ]
 
-export const widgets = (props, scribbleNoteUpdateState = () => { }) => [
+export const widgets = (
+  props,
+  scribbleNoteUpdateState = () => {},
+  getSelectNoteTypes = () => {},
+) => [
   {
-    id: WIDGETS_ID.ASSOCIATED_HISTORY,
-    name: 'History',
-    authority: 'queue.consultation.clinicalnotes.history',
+    id: WIDGETS_ID.DOCTORNOTE,
+    name: 'Doctor Notes',
     component: Loadable({
-      loader: () => import('./Notes'),
+      loader: () => import('./DoctorNotes'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return (
@@ -205,68 +234,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => { }) => [
             {...props}
             {...p}
             scribbleNoteUpdateState={scribbleNoteUpdateState}
-            fieldName='history'
-          />
-        )
-      },
-      loading: Loading,
-    }),
-  },
-
-  {
-    id: WIDGETS_ID.CHIEF_COMPLAINTS,
-    name: 'Chief Complaints',
-    authority: 'queue.consultation.clinicalnotes.chiefcomplaints',
-    component: Loadable({
-      loader: () => import('./Notes'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return (
-          <Cmpnet
-            {...props}
-            {...p}
-            scribbleNoteUpdateState={scribbleNoteUpdateState}
-            fieldName='chiefComplaints'
-          />
-        )
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: WIDGETS_ID.CLINICAL_NOTE,
-    name: 'Clinical Notes',
-    authority: 'queue.consultation.clinicalnotes.clinicalnotes',
-    component: Loadable({
-      loader: () => import('./Notes'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return (
-          <Cmpnet
-            {...props}
-            {...p}
-            scribbleNoteUpdateState={scribbleNoteUpdateState}
-            fieldName='note'
-          />
-        )
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: WIDGETS_ID.PLAN,
-    name: 'Plan',
-    authority: 'queue.consultation.clinicalnotes.plan',
-    component: Loadable({
-      loader: () => import('./Notes'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return (
-          <Cmpnet
-            {...props}
-            scribbleNoteUpdateState={scribbleNoteUpdateState}
-            {...p}
-            fieldName='plan'
+            getSelectNoteTypes={getSelectNoteTypes}
           />
         )
       },
@@ -382,10 +350,36 @@ export const widgets = (props, scribbleNoteUpdateState = () => { }) => [
 
   {
     id: WIDGETS_ID.VITALSIGN,
-    name: 'Vital Sign',
+    name: 'Basic Examinations',
     authority: 'queue.consultation.widgets.vitalsign',
     component: Loadable({
       loader: () => import('./VitalSign'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} />
+      },
+      loading: Loading,
+    }),
+  },
+  {
+    id: WIDGETS_ID.EYEEXAMINATIONS,
+    name: 'Eye Examinations',
+    authority: 'queue.consultation.widgets.eyeexaminations',
+    component: Loadable({
+      loader: () => import('./EyeExaminations'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} />
+      },
+      loading: Loading,
+    }),
+  },
+  {
+    id: WIDGETS_ID.AUDIOMETRYTEST,
+    name: 'Audiometry Test',
+    authority: 'queue.consultation.widgets.audiometrytest',
+    component: Loadable({
+      loader: () => import('./AudiometryTest'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return <Cmpnet {...props} {...p} />
@@ -461,7 +455,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => { }) => [
   {
     id: WIDGETS_ID.FORMS,
     name: 'Forms',
-    authority: 'queue.consultation.widgets.forms',
+    authority: 'queue.consultation.form',
     component: Loadable({
       loader: () => import('./Forms'),
       render: (loaded, p) => {
@@ -486,23 +480,65 @@ export const widgets = (props, scribbleNoteUpdateState = () => { }) => [
   },
 ]
 
-export const showWidget = (current, widgetId) => {
-  // check show notes
-  const notesType = notesTypes.find((type) => type.value === widgetId)
+export const hasValue = value => {
+  return value !== undefined && value !== null
+}
 
+export const getHistoryValueForBoolean = value => {
+  return hasValue(value) ? (value ? 'Yes' : 'No') : '-'
+}
+
+const checkNote = (widgetId, current) => {
+  const notesType = notesTypes.find(type => type.value === widgetId)
   if (notesType) {
-    const { scribbleNotes = [] } = current
-    const scribbleType = scribbleTypes.find(
-      (o) => o.type === notesType.fieldName,
-    )
     if (
-      !current[notesType.fieldName] &&
-      (!scribbleType ||
-        scribbleNotes.filter(
-          (o) => o.scribbleNoteTypeFK === scribbleType.typeFK,
-        ).length === 0)
-    )
-      return false
+      [
+        WIDGETS_ID.ASSOCIATED_HISTORY,
+        WIDGETS_ID.CHIEF_COMPLAINTS,
+        WIDGETS_ID.CLINICAL_NOTE,
+        WIDGETS_ID.PLAN,
+      ].indexOf(widgetId) < 0
+    ) {
+      return (
+        hasValue(current[notesType.fieldName]) &&
+        current[notesType.fieldName].trim().length > 0
+      )
+    } else {
+      const { scribbleNotes = [], doctorNotes = [] } = current
+      const scribbleType = scribbleTypes.find(
+        o => o.type === notesType.fieldName,
+      )
+      if (
+        !doctorNotes.find(
+          note =>
+            hasValue(note[notesType.fieldName]) &&
+            note[notesType.fieldName].trim().length,
+        ) &&
+        (!scribbleType ||
+          scribbleNotes.filter(
+            o => o.scribbleNoteTypeFK === scribbleType.typeFK,
+          ).length === 0)
+      ) {
+        return false
+      }
+    }
+    return true
+  }
+  return true
+}
+
+export const showWidget = (current, widgetId, selectNoteTypes = []) => {
+  // check show notes
+  if (!checkNote(widgetId, current)) {
+    return false
+  }
+
+  // check show Dcotor Notes
+  if (
+    widgetId === WIDGETS_ID.DOCTORNOTE &&
+    !selectNoteTypes.find(c => checkNote(c, current))
+  ) {
+    return false
   }
 
   // check show diagnosis
@@ -612,26 +648,132 @@ export const showWidget = (current, widgetId) => {
   if (
     widgetId === WIDGETS_ID.TREATMENT &&
     (!current.orders ||
-      current.orders.filter((o) => o.type === 'Treatment').length === 0)
+      current.orders.filter(o => o.type === 'Treatment').length === 0)
   )
     return false
   // check show vital sign
   if (
     widgetId === WIDGETS_ID.VITALSIGN &&
-    (!current.patientNoteVitalSigns ||
-      current.patientNoteVitalSigns.length === 0)
+    !showPatientNoteVitalSigns(current.patientNoteVitalSigns)
+  )
+    return false
+  // check show eye examinations
+  if (
+    widgetId === WIDGETS_ID.EYEEXAMINATIONS &&
+    !showEyeExaminations(current.corEyeExaminations)
+  )
+    return false
+
+  // check show Audiometry Test
+  if (
+    widgetId === WIDGETS_ID.AUDIOMETRYTEST &&
+    !showAudiometryTest(current.corAudiometryTest)
   )
     return false
   // check show visit referral
   if (widgetId === WIDGETS_ID.REFERRAL) {
-    const { referralSourceFK, referralPersonFK, referralPatientProfileFK } = current
-    if (
-      !referralSourceFK &&
-      !referralPersonFK &&
-      !referralPatientProfileFK
-    )
+    const {
+      referralSourceFK,
+      referralPersonFK,
+      referralPatientProfileFK,
+    } = current
+    if (!referralSourceFK && !referralPersonFK && !referralPatientProfileFK)
       return false
   }
 
   return true
+}
+
+export const showNote = (
+  note,
+  scribbleNotes = [],
+  noteType,
+  visitPurposeFK,
+) => {
+  const scribbleType = scribbleTypes.find(o => o.type === noteType.fieldName)
+  if (
+    (note[noteType.fieldName] === null ||
+      note[noteType.fieldName] === undefined ||
+      !note[noteType.fieldName].trim().length) &&
+    !scribbleNotes.find(
+      s =>
+        s.scribbleNoteTypeFK === scribbleType?.typeFK &&
+        (visitPurposeFK !== VISIT_TYPE.MC ||
+          s.signedByUserFK === note.signedByUserFK),
+    )
+  ) {
+    return false
+  }
+  return true
+}
+
+const showPatientNoteVitalSigns = (patientNoteVitalSigns = []) => {
+  if (
+    patientNoteVitalSigns.find(
+      row =>
+        hasValue(row.temperatureC) ||
+        hasValue(row.bpSysMMHG) ||
+        hasValue(row.bpDiaMMHG) ||
+        hasValue(row.pulseRateBPM) ||
+        hasValue(row.saO2) ||
+        hasValue(row.weightKG) ||
+        hasValue(row.heightCM) ||
+        hasValue(row.bmi) ||
+        hasValue(row.bodyFatPercentage) ||
+        hasValue(row.degreeOfObesity) ||
+        hasValue(row.headCircumference) ||
+        hasValue(row.chestCircumference) ||
+        hasValue(row.waistCircumference) ||
+        hasValue(row.isPregnancy) ||
+        hasValue(row.hepetitisVaccinationA) ||
+        hasValue(row.hepetitisVaccinationB) ||
+        hasValue(row.isFasting) ||
+        hasValue(row.isSmoking) ||
+        hasValue(row.isAlcohol) ||
+        hasValue(row.isMensus),
+    )
+  )
+    return true
+  return false
+}
+
+export const showEyeExaminations = (corEyeExaminations = []) => {
+  if (
+    corEyeExaminations.find(
+      row =>
+        hasValue(row.visionCorrectionMethod) ||
+        hasValue(row.leftBareEye5) ||
+        hasValue(row.leftCorrectedVision5) ||
+        hasValue(row.leftBareEye50) ||
+        hasValue(row.leftCorrectedVision50) ||
+        hasValue(row.rightBareEye5) ||
+        hasValue(row.rightCorrectedVision5) ||
+        hasValue(row.rightBareEye50) ||
+        hasValue(row.rightCorrectedVision50) ||
+        hasValue(row.leftFirstResult) ||
+        hasValue(row.leftSecondResult) ||
+        hasValue(row.leftThirdResult) ||
+        hasValue(row.rightFirstResult) ||
+        hasValue(row.rightSecondResult) ||
+        hasValue(row.rightThirdResult) ||
+        hasValue(row.colorVisionTestResult) ||
+        (hasValue(row.remarks) && row.remarks.trim().length),
+    )
+  )
+    return true
+  return false
+}
+
+export const showAudiometryTest = (corEyeExaminations = []) => {
+  if (
+    corEyeExaminations.find(
+      row =>
+        hasValue(row.leftResult1000Hz) ||
+        hasValue(row.leftResult4000Hz) ||
+        hasValue(row.rightResult1000Hz) ||
+        hasValue(row.rightResult4000Hz),
+    )
+  )
+    return true
+  return false
 }

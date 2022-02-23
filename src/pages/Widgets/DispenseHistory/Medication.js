@@ -75,7 +75,7 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
               <div style={{ position: 'relative', top: 2 }}>
                 {drugMixtureIndicator(row, -20)}
                 {row.isPreOrder && (
-                  <Tooltip title='Pre-Order'>
+                  <Tooltip title='New Pre-Order'>
                     <div
                       className={classes.rightIcon}
                       style={{
@@ -113,11 +113,11 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
       dataIndex: 'instruction',
       title: 'Instructions',
       width: 200,
-      render: text =>(
-          <Tooltip title={text}>
-            <div>{text}</div>
-          </Tooltip>
-        )
+      render: text => (
+        <Tooltip title={text}>
+          <div>{text}</div>
+        </Tooltip>
+      ),
     },
     {
       dataIndex: 'dispensedQuanity',
@@ -169,7 +169,7 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
       width: 90,
       render: (text, row) =>
         showCurrency(
-          row.isPreOrder && !row.isChargeToday
+          (row.isPreOrder && !row.isChargeToday) || row.hasPaid
             ? 0
             : row.totalAfterItemAdjustment,
         ),
@@ -184,38 +184,43 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
           row.drugLabelRemarks.trim() !== ''
         return (
           <div style={{ position: 'relative' }}>
-            <Tooltip title={row.remarks || ' '}>
-              <div
-                style={{
-                  wordWrap: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                  paddingRight: existsDrugLabelRemarks ? 10 : 0,
-                }}
-              >
-                {row.remarks || ' '}
-              </div>
-            </Tooltip>
-
-            {existsDrugLabelRemarks && (
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: -2,
-                  right: -8,
-                }}
-              >
-                <Tooltip
-                  title={
-                    <div>
-                      <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
-                      <div>{row.drugLabelRemarks}</div>
-                    </div>
-                  }
+            <div
+              style={{
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                paddingRight: existsDrugLabelRemarks ? 10 : 0,
+                minHeight: 20,
+              }}
+            >
+              <Tooltip title={row.remarks || ' '}>
+                <span> {row.remarks || ' '}</span>
+              </Tooltip>
+            </div>
+            <div style={{ position: 'relative', top: 6 }}>
+              {existsDrugLabelRemarks && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: 2,
+                    right: -8,
+                  }}
                 >
-                  <FileCopySharp style={{ color: '#4255bd' }} />
-                </Tooltip>
-              </div>
-            )}
+                  <Tooltip
+                    title={
+                      <div>
+                        <div style={{ fontWeight: 500 }}>
+                          Drug Label Remarks
+                        </div>
+                        <div>{row.drugLabelRemarks}</div>
+                      </div>
+                    }
+                  >
+                    <FileCopySharp style={{ color: '#4255bd' }} />
+                  </Tooltip>
+                </div>
+              )}
+            </div>
           </div>
         )
       },
@@ -223,7 +228,7 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
   ]
 
   const { labelPrinterSize } = clinicSettings.settings
-  const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
+  const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
 
   return (
     <CardContainer hideHeader size='sm' style={{ margin: 0 }}>

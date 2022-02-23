@@ -1,10 +1,6 @@
 import React, { useState } from 'react'
 import numeral from 'numeral'
-import {
-  CommonTableGrid,
-  dateFormatLong,
-  RadioGroup,
-} from '@/components'
+import { CommonTableGrid, dateFormatLong, RadioGroup } from '@/components'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import { getRawData, getReportContext } from '@/services/report'
 
@@ -15,20 +11,14 @@ const BatchPrintStatement = ({
   onConfirm,
   handlePrint,
 }) => {
-  const [
-    selectedRows,
-    setSelectedRows,
-  ] = useState([])
+  const [selectedRows, setSelectedRows] = useState([])
 
-  const [
-    reportGroupBy,
-    setReportGroupBy,
-  ] = useState('AsInvoice')
+  const [reportGroupBy, setReportGroupBy] = useState('AsInvoice')
 
   let height = mainDivHeight - 200
   if (height < 300) height = 300
 
-  const handleSelectionChange = (selection) => {
+  const handleSelectionChange = selection => {
     setSelectedRows(selection)
   }
 
@@ -42,7 +32,7 @@ const BatchPrintStatement = ({
         ReportId: 25,
         ReportData: JSON.stringify({
           ...data,
-          ReportContext: data.ReportContext.map((o) => {
+          ReportContext: data.ReportContext.map(o => {
             const {
               customLetterHeadHeight = 0,
               isDisplayCustomLetterHead = false,
@@ -66,7 +56,7 @@ const BatchPrintStatement = ({
               ...restProps,
             }
           }),
-          PaymentDetails: data.PaymentDetails.map((p) => {
+          PaymentDetails: data.PaymentDetails.map(p => {
             return {
               ...p,
               paymentRefNo: p.paymentRefNo || '',
@@ -111,7 +101,7 @@ const BatchPrintStatement = ({
               label: 'By Item',
             },
           ]}
-          onChange={(v) => {
+          onChange={v => {
             setReportGroupBy(v.target.value)
           }}
         />
@@ -123,7 +113,7 @@ const BatchPrintStatement = ({
         columns={[
           { name: 'statementNo', title: 'Statement No.' },
           { name: 'statementDate', title: 'Statement Date' },
-          { name: 'company', title: 'Company' },
+          { name: 'company', title: 'Co-Payer' },
           { name: 'payableAmount', title: 'Payable Amount' },
           { name: 'totalPaid', title: 'Paid' },
           { name: 'outstandingAmount', title: 'Outstanding' },
@@ -189,12 +179,12 @@ const BatchPrintStatement = ({
           selectable: true,
           selectConfig: {
             showSelectAll: true,
-            rowSelectionEnabled: (row) => true,
+            rowSelectionEnabled: row => true,
           },
         }}
         selection={selectedRows}
         onSelectionChange={handleSelectionChange}
-        getRowId={(row) => row.id}
+        getRowId={row => row.id}
       />
       {footer &&
         footer({

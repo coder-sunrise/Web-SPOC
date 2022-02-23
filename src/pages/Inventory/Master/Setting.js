@@ -183,8 +183,12 @@ const Setting = ({
                   id: 'inventory.master.setting.dispenseUOM',
                 })}
                 // Fix work item ID: 10993
-                labelField='displayValue'
-                code='ctmedicationunitofmeasurement'
+                labelField={showTransfer ? 'displayValue' : 'name'}
+                code={
+                  showTransfer
+                    ? 'ctmedicationunitofmeasurement'
+                    : 'ctvaccinationunitofmeasurement'
+                }
                 {...args}
               />
             )}
@@ -212,7 +216,7 @@ const Setting = ({
             name='prescribingUOMFK'
             render={args => (
               <CodeSelect
-                style={{ marginTop: 15 }}
+                style={{ marginTop: 30 }}
                 label=''
                 text
                 labelField={showTransfer ? 'displayValue' : 'name'}
@@ -237,12 +241,16 @@ const Setting = ({
             name='dispensingUOMFK'
             render={args => (
               <CodeSelect
-                style={{ marginTop: 15 }}
+                style={{ marginTop: 30 }}
                 optionLabelLength={optionLabelLength}
                 text
                 label=''
-                labelField='displayValue'
-                code='ctmedicationunitofmeasurement'
+                labelField={showTransfer ? 'displayValue' : 'name'}
+                code={
+                  showTransfer
+                    ? 'ctmedicationunitofmeasurement'
+                    : 'ctvaccinationunitofmeasurement'
+                }
                 {...args}
               />
             )}

@@ -120,13 +120,12 @@ export default compose(
       return schemeDetail.entity ? schemeDetail.entity : schemeDetail.default
     },
     validationSchema: Yup.object().shape({
-      code: Yup.string()
-        .required()
-        .max(30),
+      code: Yup.string().max(100),
       name: Yup.string()
         .required()
         .max(100),
       schemeCategoryFK: Yup.number().required(),
+      schemeTypeFK: Yup.number().required(),
       copayerFK: Yup.number().required(),
       // coverageMaxCap: Yup.number().required(),
       effectiveDates: Yup.array()
@@ -142,7 +141,6 @@ export default compose(
 
       const { effectiveDates, ...restValues } = values
       const { dispatch, history, onConfirm } = props
-      console.log({ restValues })
       dispatch({
         type: 'schemeDetail/upsert',
         payload: {

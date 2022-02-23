@@ -1,6 +1,6 @@
 import * as service from '@/services/common'
 
-const url = '/api/Consultation/ScribbleNote'
+const url = '/api/ScribbleNote'
 
 const templateUrl = '/api/CTScribbleNoteTemplate'
 
@@ -14,5 +14,6 @@ const fns = {
   },
 
   queryTemplateList: params => service.queryList(templateUrl, params),
+  upsertTemplate: params => service.upsert(templateUrl, params),
 }
 export default fns

@@ -52,9 +52,10 @@ class FamilyMemberGrid extends PureComponent {
               this.props.history.push(targetUrl)
             }, 1000)
           }
+          const { values: { id: currentPatientId } } = this.props
           return(
             <div>
-              {this.props.patient.entity.id === row.familyMemberFK
+              {currentPatientId === row.familyMemberFK
               ?row.name
               :<Link
                 to={targetUrl}
@@ -213,6 +214,8 @@ class FamilyMemberGrid extends PureComponent {
       accountNoTypeFK:o.patientAccountNoTypeFK,
       accountNo:o.patientAccountNo,
       contactNo:o.contact.mobileContactNumber.number,
+      contactAddress:o.contact.contactAddress,
+      patientScheme:o.patientScheme,
     })
     setFieldValue('patientFamilyGroup.patientFamilyMember', patientFamilyMember)
     this.toggleModal()
@@ -257,7 +260,7 @@ class FamilyMemberGrid extends PureComponent {
           schema={schema.patientFamilyMember._subType}
           FuncProps={{
             pagerConfig: {
-              containerExtraComponent: (
+              containerExtraComponent: !this.props.disabled && (
                 <Button
                   onClick={this.toggleModal}
                   // hideIfNoEditRights
@@ -273,6 +276,7 @@ class FamilyMemberGrid extends PureComponent {
           }}
           EditingProps={{
             showAddCommand: false,
+            isDeletable: row => !this.props.disabled,
             onCommitChanges: this.commitChanges,
             onAddedRowsChange: rows => {
               return rows.map(o => {

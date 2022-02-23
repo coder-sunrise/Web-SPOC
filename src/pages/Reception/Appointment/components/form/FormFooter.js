@@ -29,8 +29,9 @@ const FormFooter = ({
   handleSaveDraftClick,
   handleConfirmClick,
   handleValidateClick,
+  id,
 }) => {
-  const isNew = appointmentStatusFK === undefined
+  const isNew = appointmentStatusFK === undefined || !id
   const isDraft = appointmentStatusFK === 2
   const isTurnedUp =
     appointmentStatusFK === APPOINTMENT_STATUS.TURNEDUP ||
@@ -44,7 +45,6 @@ const FormFooter = ({
   }
 
   const confirmBtnText = isNew || isDraft ? ButtonText.ADD : ButtonText.EDIT
-
   return (
     <SizeContainer size='md'>
       <div className={classnames(classes.footer)}>
@@ -59,7 +59,7 @@ const FormFooter = ({
           </Button>
         </Authorized>
         <Button
-          disabled={disabledCheckAvailability || isTurnedUp ||　isCancelled}
+          disabled={disabledCheckAvailability || isTurnedUp || isCancelled}
           color='success'
           onClick={handleValidateClick}
         >

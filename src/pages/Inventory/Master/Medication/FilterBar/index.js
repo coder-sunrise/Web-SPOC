@@ -74,9 +74,11 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
         code,
         displayValue,
         favouriteSupplierFK,
-        medicationGroupFK,
         genericMedicationFK,
         isActive,
+        apiCriteria: {
+          medicationGroupFK: medicationGroupFK,
+        },
       },
     })
   }
@@ -273,46 +275,6 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                   Add New
                 </Button>
               </Authorized>
-
-              <Button color='primary' onClick={onExportClick}>
-                <ImportExport />
-                Export
-              </Button>
-
-              <Authorized authority='inventorymaster.newinventoryitem'>
-                <input
-                  style={{ display: 'none' }}
-                  type='file'
-                  accept={allowedFiles}
-                  id='importMedicationFile'
-                  ref={inputEl}
-                  multiple={false}
-                  onChange={onFileChange}
-                  onClick={clearValue}
-                />
-
-                <Button color='primary' onClick={onImportClick}>
-                  <AttachFile />
-                  Import
-                </Button>
-              </Authorized>
-
-              {/* <Button
-              variant='contained'
-              color='primary'
-              onClick={() => {
-                // this.props.history.push(
-                //   getAppendUrl({
-                //     md: 'pt',
-                //     cmt: '1',
-                //     new: 1,
-                //   }),
-                // )
-              }}
-            >
-              <GridOn />
-              Batch Edit
-            </Button> */}
             </div>
           </LoadingWrapper>
         </GridItem>

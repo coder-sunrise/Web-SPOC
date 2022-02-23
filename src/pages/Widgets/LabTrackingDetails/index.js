@@ -7,10 +7,12 @@ import { CommonModal } from '@/components'
 import { findGetParameter } from '@/utils/utils'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import { getRawData } from '@/services/report'
+import Authorized from '@/utils/Authorized'
 import Detail from './Detail'
 import FilterBar from './FilterBar'
 import OverallGrid from './OverallGrid'
 import PatientGrid from './PatientGrid'
+import clinicSettings from '@/models/clinicSettings'
 // import model from './models'
 
 // window.g_app.replaceModel(model)
@@ -33,9 +35,14 @@ const styles = theme => ({
   mainDivHeight: global.mainDivHeight,
 }))
 class LabTrackingDetails extends PureComponent {
+  constructor(props) {
+    super(props)
+    this.state = {
+      visitPurpose: JSON.parse(props.clinicSettings.visitTypeSetting),
+    }
+  }
   componentDidMount() {
     const { dispatch } = this.props
-
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
@@ -59,7 +66,6 @@ class LabTrackingDetails extends PureComponent {
       },
     })
   }
-
   handlePrintClick = async row => {
     const { clinicSettings, handlePrint } = this.props
     const { labelPrinterSize } = clinicSettings
@@ -92,27 +98,32 @@ class LabTrackingDetails extends PureComponent {
       patientId,
       isPatientInactive,
       mainDivHeight = 700,
+      height,
     } = this.props
     const IsOverallGrid = resultType === PATIENT_LAB.LAB_TRACKING
 
     let patientID = patientId || Number(findGetParameter('pid')) || undefined
 
-    let height
+    let tableHeight
     if (resultType === PATIENT_LAB.LAB_TRACKING) {
-      height = mainDivHeight - 120 - ($('.filterBar').height() || 0)
+      tableHeight = mainDivHeight - 120 - ($('.filterBar').height() || 0)
     } else if (resultType === PATIENT_LAB.CONSULTATION) {
-      height = mainDivHeight - 80 - ($('.filterBar').height() || 0)
+      tableHeight = mainDivHeight - 80 - ($('.filterBar').height() || 0)
     } else {
-      height = mainDivHeight - 280 - ($('.filterBar').height() || 0)
+      tableHeight = height - 290 - ($('.filterBar').height() || 0)
     }
 
-    if (height < 300) height = 300
+    if (tableHeight < 300) tableHeight = 300
 
     const cfg = {
       toggleModal: this.toggleModal,
       handlePrintClick: this.handlePrintClick,
-      height,
+      height: tableHeight,
     }
+
+    const editExternalTrackingRight = Authorized.check(
+      'reception/labtracking',
+    ) || { rights: 'hidden' }
 
     return (
       <div>
@@ -126,19 +137,28 @@ class LabTrackingDetails extends PureComponent {
 
         <div style={{ margin: 10 }}>
           {IsOverallGrid ? (
-            <OverallGrid dispatch={dispatch} {...cfg} {...this.props} />
+            <OverallGrid
+              dispatch={dispatch}
+              {...this.props}
+              {...cfg}
+              visitPurpose={this.state.visitPurpose}
+            />
           ) : (
             <PatientGrid
-              readOnly={isPatientInactive}
+              readOnly={
+                isPatientInactive ||
+                editExternalTrackingRight.rights !== 'enable'
+              }
               dispatch={dispatch}
-              {...cfg}
+              visitPurpose={this.state.visitPurpose}
               {...this.props}
+              {...cfg}
             />
           )}
         </div>
         <CommonModal
           open={labTrackingDetails.showModal}
-          title='Edit Lab Tracking / Results'
+          title='Edit External Tracking / Results'
           observe='LabResultsDetail'
           maxWidth='md'
           bodyNoPadding

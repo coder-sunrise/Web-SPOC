@@ -19,6 +19,8 @@ import {
   dateFormatLong,
   withFormikExtend,
   CommonModal,
+  SyncfusionTimePicker,
+  timeFormat24Hour,
 } from '@/components'
 import {
   Recurrence,
@@ -32,7 +34,7 @@ import { filterRecurrenceDto } from './formUtils'
 import style from './style'
 import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...style,
   tooltip: {
     ...tooltip,
@@ -64,8 +66,6 @@ const styles = (theme) => ({
   },
 })
 
-const _timeFormat = 'hh:mm a'
-
 const durationHours = [
   { value: '0', name: '0' },
   { value: '1', name: '1' },
@@ -86,16 +86,14 @@ const durationMinutes = [
 ]
 
 const convertReccurenceDaysOfTheWeek = (week = '') =>
-  week !== null
-    ? week.split(', ').map((eachDay) => parseInt(eachDay, 10))
-    : week
+  week !== null ? week.split(', ').map(eachDay => parseInt(eachDay, 10)) : week
 
 const generateRecurringDoctorBlock = (recurrenceDto, doctorBlock) => {
   const rrule = computeRRule({ recurrenceDto, date: doctorBlock.eventDate })
   if (rrule) {
     const allDates = rrule.all() || []
     const { id, ...restDoctorBlockValues } = doctorBlock
-    return allDates.map((date) => ({
+    return allDates.map(date => ({
       ...restDoctorBlockValues,
       eventDate: date,
     }))
@@ -112,9 +110,10 @@ const initDailyRecurrence = {
   recurrenceDayOfTheMonth: undefined,
 }
 
-@connect(({ doctorBlock }) => ({
+@connect(({ doctorBlock, clinicSettings }) => ({
   currentViewDoctorBlock: doctorBlock.currentViewDoctorBlock,
   doctorBlockMode: doctorBlock.mode,
+  apptTimeIntervel: clinicSettings.settings.apptTimeIntervel,
 }))
 @withFormikExtend({
   displayName: 'DoctorBlockForm',
@@ -136,6 +135,7 @@ const initDailyRecurrence = {
       recurrenceDto,
       doctorBlocks: oldDoctorBlocks,
       overwriteEntireSeries,
+      apptTimeIntervel,
       ...restValues
     } = values
 
@@ -153,9 +153,7 @@ const initDailyRecurrence = {
           : doctorBlockMode === 'single',
       }
       // generate recurrence
-      let doctorBlocks = [
-        doctorBlock,
-      ]
+      let doctorBlocks = [doctorBlock]
       if (isEnableRecurrence && restValues.id === undefined) {
         doctorBlocks = generateRecurringDoctorBlock(recurrenceDto, doctorBlock)
       }
@@ -163,13 +161,11 @@ const initDailyRecurrence = {
         if (doctorBlockMode === 'series') {
           doctorBlocks = oldDoctorBlocks
         } else {
-          doctorBlocks = [
-            doctorBlock,
-          ]
+          doctorBlocks = [doctorBlock]
         }
       }
       // compute startTime and endTime on all recurrence
-      doctorBlocks = doctorBlocks.map((item) => {
+      doctorBlocks = doctorBlocks.map(item => {
         const { eventDate: date, startDateTime, ...rest } = item
         const doctorBlockDate = moment(date || startDateTime).format(
           dateFormatLong,
@@ -177,14 +173,14 @@ const initDailyRecurrence = {
 
         const endDate = moment(
           `${doctorBlockDate} ${eventTime}`,
-          `${dateFormatLong} ${_timeFormat}`,
+          `${dateFormatLong} ${timeFormat24Hour}`,
         )
         endDate.add(parseInt(durationHour, 10), 'hours')
         endDate.add(parseInt(durationMinute, 10), 'minutes')
 
         const startDate = moment(
           `${doctorBlockDate} ${eventTime}`,
-          `${dateFormatLong} ${_timeFormat}`,
+          `${dateFormatLong} ${timeFormat24Hour}`,
         )
         if (
           doctorBlockMode === 'series' &&
@@ -215,7 +211,7 @@ const initDailyRecurrence = {
       dispatch({
         type: restValues.id ? 'doctorBlock/update' : 'doctorBlock/upsert',
         payload,
-      }).then((response) => {
+      }).then(response => {
         if (response) {
           if (handleAfterSubmit) {
             handleAfterSubmit()
@@ -224,34 +220,47 @@ const initDailyRecurrence = {
           onClose()
         }
       })
-    } catch (error) {
-      console.log({ error })
-    }
+    } catch (error) {}
   },
-  mapPropsToValues: ({ currentViewDoctorBlock }) => {
+  mapPropsToValues: ({ currentViewDoctorBlock, updateEvent }) => {
     if (Object.keys(currentViewDoctorBlock).length > 0) {
       const {
         doctorBlocks,
         recurrenceDto,
+        isFromCopy,
         ...restValues
       } = currentViewDoctorBlock
       const doctorBlock = doctorBlocks[0]
-      const start = moment(doctorBlock.startDateTime)
-      const end = moment(doctorBlock.endDateTime)
+      let start = moment(doctorBlock.startDateTime)
+      let end = moment(doctorBlock.endDateTime)
+      let doctorBlockUserFk = restValues.doctorBlockUserFk
+      let isUpdated
+      if (isFromCopy) {
+        isUpdated = true
+      }
+      if (updateEvent) {
+        isUpdated = true
+        const { newStartTime, newEndTime, newResourceId } = updateEvent
+        start = moment(newStartTime)
+        end = moment(newEndTime)
+        if (newResourceId) {
+          doctorBlockUserFk = newResourceId
+        }
+      }
       const hour = end.diff(start, 'hour')
-      // const minute = end.format(timeFormat24Hour).split(':')[1]
       const minute = (end.diff(start, 'minute') / 60 - hour) * 60
 
       return {
         ...restValues,
         doctorBlockFK: doctorBlock.id,
         eventDate: start.formatUTC(),
-        eventTime: start.format(_timeFormat),
+        eventTime: start.format(timeFormat24Hour),
         durationHour: hour,
         durationMinute: minute,
         restDoctorBlock: { ...doctorBlock },
         remarks: doctorBlock.remarks,
         doctorBlocks,
+        doctorBlockUserFk,
         recurrenceDto:
           recurrenceDto !== null && recurrenceDto !== undefined
             ? {
@@ -261,6 +270,7 @@ const initDailyRecurrence = {
                 ),
               }
             : { ...initDailyRecurrence },
+        isUpdated,
       }
     }
     return {
@@ -281,6 +291,14 @@ const initDailyRecurrence = {
 class DoctorEventForm extends React.PureComponent {
   state = {
     showSeriesUpdateConfirmation: false,
+  }
+  componentDidMount = async () => {
+    setTimeout(() => {
+      const { values, setFieldValue } = this.props
+      if (values.isUpdated) {
+        setFieldValue('isUpdated', false)
+      }
+    }, 500)
   }
 
   onClickDelete = () => {
@@ -335,18 +353,17 @@ class DoctorEventForm extends React.PureComponent {
     })
   }
 
-  closeSeriesUpdateConfirmation = (callback = (f) => f) => {
+  closeSeriesUpdateConfirmation = (callback = f => f) => {
     this.setState({ showSeriesUpdateConfirmation: false }, callback)
   }
 
   onConfirmClick = () => {
     const { handleSubmit, values, doctorBlockMode } = this.props
-    const hasModifiedAsSingle = (values.doctorBlocks || [])
-      .reduce(
-        (editedAsSingle, doctorBlock) =>
-          doctorBlock.isEditedAsSingleDoctorBlock || editedAsSingle,
-        false,
-      )
+    const hasModifiedAsSingle = (values.doctorBlocks || []).reduce(
+      (editedAsSingle, doctorBlock) =>
+        doctorBlock.isEditedAsSingleDoctorBlock || editedAsSingle,
+      false,
+    )
     if (
       values.id !== undefined &&
       doctorBlockMode === 'series' &&
@@ -360,14 +377,14 @@ class DoctorEventForm extends React.PureComponent {
     return true
   }
 
-  onConfirmSeriesUpdate = async (type) => {
+  onConfirmSeriesUpdate = async type => {
     await this.props.setFieldValue('overwriteEntireSeries', type === '2', false)
     const { handleSubmit } = this.props
     this.closeSeriesUpdateConfirmation(handleSubmit)
   }
 
-  render () {
-    const { classes, values, onClose } = this.props
+  render() {
+    const { classes, values, onClose, apptTimeIntervel = 30 } = this.props
     const { showSeriesUpdateConfirmation } = this.state
     return (
       <div style={{ padding: 8 }}>
@@ -375,11 +392,11 @@ class DoctorEventForm extends React.PureComponent {
           <GridItem xs md={12}>
             <Field
               name='doctorBlockUserFk'
-              render={(args) => (
+              render={args => (
                 <DoctorProfileSelect
                   {...args}
                   valueField='clinicianProfile.userProfileFK'
-                  localFilter={(option) => option.clinicianProfile.isActive}
+                  localFilter={option => option.clinicianProfile.isActive}
                   disabled={
                     values.id !== undefined && values.isEnableRecurrence
                   }
@@ -391,7 +408,7 @@ class DoctorEventForm extends React.PureComponent {
             <GridItem xs md={4}>
               <FastField
                 name='eventDate'
-                render={(args) => (
+                render={args => (
                   <DatePicker
                     {...args}
                     label='Date'
@@ -404,17 +421,19 @@ class DoctorEventForm extends React.PureComponent {
                 )}
               />
             </GridItem>
+
             <GridItem xs md={4}>
               <FastField
                 name='eventTime'
-                render={(args) => (
-                  <TimePicker
-                    {...args}
-                    label='Time'
-                    format={_timeFormat}
-                    use12Hours
-                  />
-                )}
+                render={args => {
+                  return (
+                    <SyncfusionTimePicker
+                      label='Time'
+                      step={apptTimeIntervel}
+                      {...args}
+                    />
+                  )
+                }}
               />
             </GridItem>
           </GridContainer>
@@ -422,7 +441,7 @@ class DoctorEventForm extends React.PureComponent {
             <GridItem xs md={4}>
               <FastField
                 name='durationHour'
-                render={(args) => (
+                render={args => (
                   <Select {...args} label='Hour(s)' options={durationHours} />
                 )}
               />
@@ -430,7 +449,7 @@ class DoctorEventForm extends React.PureComponent {
             <GridItem xs md={4}>
               <FastField
                 name='durationMinute'
-                render={(args) => (
+                render={args => (
                   <Select
                     {...args}
                     label='Minute(s)'
@@ -443,7 +462,7 @@ class DoctorEventForm extends React.PureComponent {
           <GridItem xs md={12}>
             <FastField
               name='remarks'
-              render={(args) => (
+              render={args => (
                 <TextField {...args} label='Remarks' multiline rowsMax={4} />
               )}
             />

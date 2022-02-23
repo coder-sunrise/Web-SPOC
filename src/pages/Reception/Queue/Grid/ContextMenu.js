@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, usese } from 'react'
 // ant design
 import { Menu } from 'antd'
+import { useSelector } from 'dva'
 // material ui core
 import withStyles from '@material-ui/core/styles/withStyles'
 import { primaryColor } from 'mui-pro-jss'
@@ -80,7 +81,8 @@ const ContextMenu = ({
   )
   // const isStatusDispense = row.visitStatus === VISIT_STATUS.DISPENSE
   const isRetailVisit = row.visitPurposeFK === VISIT_TYPE.OTC
-  const isBillFirstVisit = row.visitPurposeFK === VISIT_TYPE.BF
+  const isBillFirstVisit =
+    row.visitPurposeFK === VISIT_TYPE.BF || row.visitPurposeFK === VISIT_TYPE.MC
 
   const isStatusCompleted = [
     VISIT_STATUS.BILLING,
@@ -89,15 +91,18 @@ const ContextMenu = ({
     VISIT_STATUS.ORDER_UPDATED,
   ].includes(row.visitStatus)
 
-  const hideResumeButton = ![
-    VISIT_STATUS.IN_CONS,
-    VISIT_STATUS.PAUSED,
-  ].includes(row.visitStatus)
+  const user = useSelector(st => st.user)
+  const clinicRoleFK = user.data.clinicianProfile.userProfile.role?.clinicRoleFK
+  const hideResumeButton =
+    clinicRoleFK === 1
+      ? ![VISIT_STATUS.IN_CONS, VISIT_STATUS.PAUSED].includes(row.visitStatus)
+      : true
 
   const enableDispense = () => {
     const consDispense = [
       VISIT_STATUS.DISPENSE,
       VISIT_STATUS.ORDER_UPDATED,
+      VISIT_STATUS.PAUSED,
     ].includes(row.visitStatus)
 
     const retailDispense = [
@@ -120,10 +125,9 @@ const ContextMenu = ({
     return consDispense
   }
 
-  const enableBilling = [
-    VISIT_STATUS.BILLING,
-    VISIT_STATUS.COMPLETED,
-  ].includes(row.visitStatus)
+  const enableBilling = [VISIT_STATUS.BILLING, VISIT_STATUS.COMPLETED].includes(
+    row.visitStatus,
+  )
 
   const hideEditConsultation =
     !isStatusCompleted ||
@@ -132,13 +136,13 @@ const ContextMenu = ({
 
   const contextMenuOptions = useMemo(() => {
     if (row.visitStatus === VISIT_STATUS.UPCOMING_APPT) {
-      return AppointmentContextMenu.map((opt) => {
+      return AppointmentContextMenu.map(opt => {
         switch (opt.id) {
           case 8: // register visit
             return {
               ...opt,
               disabled: !row.patientProfileFk || !row.patientIsActive,
-              hidden: !row.patientProfileFk,
+              hidden: !row.patientProfileFk || !row.doctorName,
             }
           case 9: // register patient
             return {
@@ -152,7 +156,7 @@ const ContextMenu = ({
       })
     }
 
-    return ContextMenuOptions.map((opt) => {
+    return ContextMenuOptions.map(opt => {
       const isDisabled = rights === 'disable'
       switch (opt.id) {
         case 0: // edit visit
@@ -203,7 +207,7 @@ const ContextMenu = ({
 
   const MenuItemsOverlay = (
     <Menu
-      onClick={(menu) => {
+      onClick={menu => {
         onMenuItemClick(row, menu.key)
         if (onMenuClick) onMenuClick()
       }}

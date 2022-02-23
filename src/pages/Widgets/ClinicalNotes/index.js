@@ -18,6 +18,7 @@ import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 // import cannedTextModel from './models/cannedText'
 import { getDefaultActivePanel, getConfig, getContent } from './utils'
 import NoteDetails from './noteDetails'
+import { scribbleTypes } from '@/utils/codes'
 
 const styles = theme => ({
   editor: {
@@ -165,6 +166,23 @@ class ClinicalNotes extends Component {
           },
         },
       })
+
+      dispatch({
+        type: 'scriblenotes/upsert',
+        payload: {
+          id: newArrayItems[scriblenotes.selectedIndex].scribbleNoteFK,
+          scribbleNoteTypeFK: newArrayItems[scriblenotes.selectedIndex].scribbleNoteTypeFK,
+          scribbleNoteLayers: temp.map(t => {
+            return {
+              ...t,
+              scribbleNoteFK: newArrayItems[scriblenotes.selectedIndex].scribbleNoteFK,
+            }
+          }),
+          subject,
+          thumbnail,
+        },
+      })
+
       scribbleNoteData[category] = newArrayItems
       previousData = Object.keys(scribbleNoteData).reduce((result, key) => {
         return [...result, ...scribbleNoteData[key]]
@@ -177,6 +195,15 @@ class ClinicalNotes extends Component {
         scribbleNoteTypeName: category,
         scribbleNoteLayers: temp,
       }
+      dispatch({
+        type: 'scriblenotes/upsert',
+        payload: newData,
+      }).then((o) => {
+        if(o) {
+          newData.scribbleNoteFK = o.id
+        }
+      })
+
       dispatch({
         type: 'scriblenotes/updateState',
         payload: {
@@ -210,6 +237,11 @@ class ClinicalNotes extends Component {
     const updatedCategoryScribbleArray = currentScribbleNoteData[
       category
     ].filter((_, index) => index !== scriblenotes.selectedIndex)
+
+    dispatch({
+      type: 'scriblenotes/removeScribble',
+      payload: deleteItem.scribbleNoteFK,
+    })
 
     dispatch({
       type: 'scriblenotes/updateState',
@@ -589,10 +621,11 @@ class ClinicalNotes extends Component {
           <ScribbleNote
             {...this.props}
             addScribble={this.scribbleNoteDrawing}
-            exportToClinicalNote={this.insertIntoClinicalNote}
+            // exportToClinicalNote={this.insertIntoClinicalNote}
             toggleScribbleModal={this.toggleScribbleModal}
             scribbleData={this.state.selectedData}
             deleteScribbleNote={this.deleteScribbleNote}
+            scribbleNoteType={scribbleTypes.find(x=>x.typeFK === this.state.categoryIndex)?.type}
           />
         </CommonModal>
       </div>

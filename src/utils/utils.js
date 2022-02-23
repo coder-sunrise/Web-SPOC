@@ -1040,13 +1040,16 @@ const calculateAmount = (
   } = {},
 ) => {
   let gst = 0
-  rows.filter(o => !o.isDeleted && o.isPreOrder && o.isChargeToday).forEach(r => {
-    r[adjustedField] = r[totalField]
-    r[gstField] = r[adjustedField]
-    r[gstAmtField] = 0
-  }
+  rows
+    .filter(o => !o.isDeleted && o.isPreOrder && o.isChargeToday && !o.hasPaid)
+    .forEach(r => {
+      r[adjustedField] = r[totalField]
+      r[gstField] = r[adjustedField]
+      r[gstAmtField] = 0
+    })
+  const activeRows = rows.filter(
+    o => !o.isDeleted && (!o.isPreOrder || o.isChargeToday) && !o.hasPaid,
   )
-  const activeRows = rows.filter(o => !o.isDeleted && (!o.isPreOrder || o.isChargeToday))
   const activeAdjustments = adjustments.filter(o => !o.isDeleted)
 
   const total = roundTo(
@@ -1109,7 +1112,6 @@ const calculateAmount = (
   const totalAfterAdj = roundTo(
     activeRows.map(o => o[adjustedField]).reduce(sumReducer, 0),
   )
-
 
   if (gstValue) {
     if (isGSTInclusive) {
@@ -1394,6 +1396,13 @@ const checkAuthoritys = (pathname, history) => {
   }
 }
 
+const ableToViewByAuthority = authority => {
+  const accessRight = Authorized.check(authority) || {
+    rights: 'hidden',
+  }
+  return accessRight.rights === 'enable'
+}
+
 const getModuleSequence = moduleName => {
   const sequence = RouterConfig[2].routes
     .filter(r => r.moduleName)
@@ -1487,7 +1496,9 @@ const getTranslationValue = (translationDatas = [], language, key) => {
   let displayValue = ''
   const translationData = translationDatas.find(t => t.language === language)
   if (translationData) {
-    const displayValueItem = (translationData.list || []).find(l => l.key === key)
+    const displayValueItem = (translationData.list || []).find(
+      l => l.key === key,
+    )
     if (displayValueItem) {
       displayValue = displayValueItem.value
     }
@@ -1499,21 +1510,24 @@ const getMappedVisitType = (visitpurpose, visitTypeSettingsObj) => {
   return visitpurpose
     .map((item, index) => {
       const { name, code, sortOrder, ...rest } = item
-      const vstType = visitTypeSettingsObj
+      const visitType = visitTypeSettingsObj
         ? visitTypeSettingsObj[index]
         : undefined
       return {
         ...rest,
-        name: vstType?.displayValue || name,
-        code: vstType?.code || code,
-        isEnabled: vstType?.isEnabled || 'true',
-        sortOrder: vstType?.sortOrder || 0,
-        customTooltipField: `${vstType?.code ||
-          code} - ${vstType?.displayValue || name}`,
+        name: visitType?.displayValue || name,
+        code: visitType?.code || code,
+        isEnabled: visitType?.isEnabled || 'true',
+        sortOrder: visitType?.sortOrder || 0,
+        customTooltipField: `Code: ${visitType?.code ||
+          code}\nName: ${visitType?.displayValue || name}`,
       }
     })
     .sort((a, b) => (a.sortOrder >= b.sortOrder ? 1 : -1))
 }
+
+const getNameWithTitle = (title, name) =>
+  `${title && name.trim().length ? `${title}. ` : ''}${name || ''}`
 
 export {
   sleep,
@@ -1546,6 +1560,8 @@ export {
   getModuleSequence,
   getTranslationValue,
   getMappedVisitType,
+  ableToViewByAuthority,
+  getNameWithTitle,
   // toUTC,
   // toLocal,
 }

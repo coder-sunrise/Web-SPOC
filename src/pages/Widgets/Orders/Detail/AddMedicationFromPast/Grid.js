@@ -61,37 +61,62 @@ const styles = () => ({
     fontSize: '0.7rem',
     padding: '2px 3px',
     height: 20,
-    cursor: 'pointer'
-  }
+    cursor: 'pointer',
+  },
 })
 class Grid extends PureComponent {
   drugMixtureIndicator = (row, right) => {
-    const activePrescriptionItemDrugMixture = (row.corPrescriptionItemDrugMixture || row.retailPrescriptionItemDrugMixture || []).filter(
-      item => !item.isDeleted,
-    )
+    const activePrescriptionItemDrugMixture = (
+      row.corPrescriptionItemDrugMixture ||
+      row.retailPrescriptionItemDrugMixture ||
+      []
+    ).filter(item => !item.isDeleted)
 
     return (
       <DrugMixtureInfo
         values={activePrescriptionItemDrugMixture}
-        isShowTooltip={false} right={right}
+        right={right}
       />
     )
   }
 
-  enableSelectItem = (item) => {
-    const firstInstruction = (item.corPrescriptionItemInstruction || []).find(item => !item.isDeleted)
-    if (item.isDrugMixture) {
-      const drugMixtures = item.corPrescriptionItemDrugMixture || item.retailPrescriptionItemDrugMixture || []
-      if (drugMixtures.find(drugMixture => !drugMixture.isActive
-        || drugMixture.inventoryDispenseUOMFK !== drugMixture.uomfk
-        || drugMixture.inventoryPrescribingUOMFK !== drugMixture.prescribeUOMFK)) {
-        return false
+  enableSelectItem = item => {
+    const { type } = this.props
+    if (type === '1') {
+      const firstInstruction = (item.corPrescriptionItemInstruction || []).find(
+        item => !item.isDeleted,
+      )
+      if (item.isDrugMixture) {
+        const drugMixtures =
+          item.corPrescriptionItemDrugMixture ||
+          item.retailPrescriptionItemDrugMixture ||
+          []
+        if (
+          drugMixtures.find(
+            drugMixture =>
+              !drugMixture.isActive ||
+              drugMixture.isOnlyClinicInternalUsage ||
+              drugMixture.inventoryDispenseUOMFK !== drugMixture.uomfk ||
+              drugMixture.inventoryPrescribingUOMFK !==
+                drugMixture.prescribeUOMFK,
+          )
+        ) {
+          return false
+        }
+        return true
       }
-      return true
+      return (
+        item.isActive &&
+        !item.isOnlyClinicInternalUsage &&
+        item.inventoryDispenseUOMFK === item.dispenseUOMFK &&
+        firstInstruction?.prescribeUOMFK === item.inventoryPrescribingUOMFK
+      )
     }
-    return (item.isActive
-      && item.inventoryDispenseUOMFK === item.dispenseUOMFK
-      && firstInstruction?.prescribeUOMFK === item.inventoryPrescribingUOMFK)
+    return (
+      item.isActive &&
+      item.inventoryDispenseUOMFK === item.dispenseUOMFK &&
+      item.inventoryPrescribingUOMFK === item.uomfk
+    )
   }
 
   Visits = () => {
@@ -105,52 +130,30 @@ class Grid extends PureComponent {
       clickCollapseHeader,
       activeKey,
     } = this.props
-    return loadVisits.map((o) => {
+    return loadVisits.map(o => {
       let items = []
       if (type === '1') {
         if (o.corPrescriptionItem && o.corPrescriptionItem.length > 0) {
           items = _.orderBy(
-            o.corPrescriptionItem.filter((drug) => {
+            o.corPrescriptionItem.filter(drug => {
               return !isRetail || !drug.isExternalPrescription
             }),
-            [
-              'drugName',
-            ],
-            [
-              'asc',
-            ],
+            ['drugName'],
+            ['asc'],
           )
         } else if (
           o.retailPrescriptionItem &&
           o.retailPrescriptionItem.length > 0
         ) {
-          items = _.orderBy(
-            o.retailPrescriptionItem,
-            [
-              'drugName',
-            ],
-            [
-              'asc',
-            ],
-          )
+          items = _.orderBy(o.retailPrescriptionItem, ['drugName'], ['asc'])
         }
       } else if (type === '2') {
         if (o.corVaccinationItem && o.corVaccinationItem.length > 0) {
-          items = _.orderBy(
-            o.corVaccinationItem,
-            [
-              'vaccinationName',
-            ],
-            [
-              'asc',
-            ],
-          )
+          items = _.orderBy(o.corVaccinationItem, ['vaccinationName'], ['asc'])
         }
       }
 
-      const enableItem = items.filter(
-        (item) => this.enableSelectItem(item)
-      )
+      const enableItem = items.filter(item => this.enableSelectItem(item))
 
       return {
         header: (
@@ -169,7 +172,7 @@ class Grid extends PureComponent {
               <span
                 className={classes.addIcon}
                 style={{ color: enableItem.length ? primaryColor : grayColor }}
-                onClick={(event) => {
+                onClick={event => {
                   event.stopPropagation()
                   onSelectItems(enableItem)
                 }}
@@ -182,8 +185,10 @@ class Grid extends PureComponent {
                 </span>
                 <span
                   style={{
-                    position: 'absolute', marginTop: -2,
-                    marginLeft: 30, marginTop: 14
+                    position: 'absolute',
+                    marginTop: -2,
+                    marginLeft: 30,
+                    marginTop: 14,
                   }}
                 >
                   Add All
@@ -198,11 +203,9 @@ class Grid extends PureComponent {
               }}
             >
               <span className='material-icons'>
-                {activeKey.find((key) => key === o.id) ? (
-                  'expand_more'
-                ) : (
-                  'navigate_next'
-                )}
+                {activeKey.find(key => key === o.id)
+                  ? 'expand_more'
+                  : 'navigate_next'}
               </span>
             </div>
           </div>
@@ -212,37 +215,67 @@ class Grid extends PureComponent {
         visitDate: o.visitDate,
         content: (
           <div>
-            {items.map((item) => {
-              let addedItem = addedItems.find((added) => added.id === item.id)
-              const firstInstruction = (item.corPrescriptionItemInstruction || []).find(item => !item.isDeleted)
+            {items.map(item => {
+              let addedItem = addedItems.find(added => added.id === item.id)
+              const firstInstruction = (
+                item.corPrescriptionItemInstruction || []
+              ).find(item => !item.isDeleted)
               let warningLabel
-              if (item.isDrugMixture) {
-                const drugMixtures = item.corPrescriptionItemDrugMixture || item.retailPrescriptionItemDrugMixture || []
-                if (drugMixtures.find(drugMixture => !drugMixture.isActive)) {
-                  warningLabel = '#1'
+              if (type === '1') {
+                if (item.isDrugMixture) {
+                  const drugMixtures =
+                    item.corPrescriptionItemDrugMixture ||
+                    item.retailPrescriptionItemDrugMixture ||
+                    []
+                  if (drugMixtures.find(drugMixture => !drugMixture.isActive)) {
+                    warningLabel = '#1'
+                  } else if (
+                    drugMixtures.find(
+                      drugMixture => drugMixture.isOnlyClinicInternalUsage,
+                    )
+                  ) {
+                    warningLabel = '#2'
+                  } else if (
+                    drugMixtures.find(
+                      drugMixture =>
+                        drugMixture.inventoryDispenseUOMFK !==
+                          drugMixture.uomfk ||
+                        drugMixture.inventoryPrescribingUOMFK !==
+                          drugMixture.prescribeUOMFK,
+                    )
+                  ) {
+                    warningLabel = '#3'
+                  }
+                } else {
+                  if (!item.isActive) {
+                    warningLabel = '#1'
+                  } else if (item.isOnlyClinicInternalUsage) {
+                    warningLabel = '#2'
+                  } else if (
+                    item.inventoryDispenseUOMFK !== item.dispenseUOMFK ||
+                    firstInstruction?.prescribeUOMFK !==
+                      item.inventoryPrescribingUOMFK
+                  ) {
+                    warningLabel = '#3'
+                  } else if (item.isExternalPrescription) {
+                    warningLabel = '#4'
+                  }
                 }
-                else if (drugMixtures.find(drugMixture => drugMixture.inventoryDispenseUOMFK !== drugMixture.uomfk
-                  || drugMixture.inventoryPrescribingUOMFK !== drugMixture.prescribeUOMFK)) {
-                  warningLabel = '#2'
-                }
-              }
-              else {
+              } else {
                 if (!item.isActive) {
                   warningLabel = '#1'
-                }
-                else if (item.inventoryDispenseUOMFK !== item.dispenseUOMFK
-                  || firstInstruction?.prescribeUOMFK !== item.inventoryPrescribingUOMFK) {
+                } else if (
+                  item.inventoryDispenseUOMFK !== item.dispenseUOMFK ||
+                  item.inventoryPrescribingUOMFK !== item.uomfk
+                ) {
                   warningLabel = '#2'
-                } else if (item.isExternalPrescription) {
-                  warningLabel = '#3'
                 }
               }
 
               let paddingRight = 0
               if (item.isPreOrder && item.isExclusive) {
                 paddingRight = 62
-              }
-              else if (item.isPreOrder || item.isExclusive) {
+              } else if (item.isPreOrder || item.isExclusive) {
                 paddingRight = 34
               }
               if (item.isDrugMixture) {
@@ -257,8 +290,10 @@ class Grid extends PureComponent {
                   }}
                 >
                   <GridContainer>
-                    <div className={classes.nameColumn}
-                      style={{ paddingRight: paddingRight }}>
+                    <div
+                      className={classes.nameColumn}
+                      style={{ paddingRight: paddingRight }}
+                    >
                       {warningLabel && (
                         <span style={{ color: 'red', fontStyle: 'italic' }}>
                           <sup>{warningLabel}&nbsp;</sup>
@@ -268,9 +303,10 @@ class Grid extends PureComponent {
                         <span>{item.drugName || item.vaccinationName}</span>
                       </Tooltip>
                       <div style={{ position: 'relative' }}>
-                        {item.isDrugMixture && this.drugMixtureIndicator(item, -20)}
+                        {item.isDrugMixture &&
+                          this.drugMixtureIndicator(item, -20)}
                         {item.isPreOrder && (
-                          <Tooltip title='Pre-Order'>
+                          <Tooltip title='New Pre-Order'>
                             <div
                               className={classes.rightIcon}
                               style={{
@@ -278,7 +314,10 @@ class Grid extends PureComponent {
                                 borderRadius: 4,
                                 backgroundColor: '#4255bd',
                               }}
-                            > Pre</div>
+                            >
+                              {' '}
+                              Pre
+                            </div>
                           </Tooltip>
                         )}
                         {item.isExclusive && (
@@ -290,7 +329,9 @@ class Grid extends PureComponent {
                                 borderRadius: 4,
                                 backgroundColor: 'green',
                               }}
-                            >Excl.</div>
+                            >
+                              Excl.
+                            </div>
                           </Tooltip>
                         )}
                       </div>
@@ -300,31 +341,30 @@ class Grid extends PureComponent {
                         title={
                           item.instruction ||
                           `${item.usageMethodDisplayValue ||
-                          ''} ${item.dosageDisplayValue ||
-                          ''} ${item.uomDisplayValue || ''}`
+                            ''} ${item.dosageDisplayValue ||
+                            ''} ${item.uomDisplayValue || ''}`
                         }
                       >
                         <span>
                           {item.instruction ||
                             `${item.usageMethodDisplayValue ||
-                            ''} ${item.dosageDisplayValue ||
-                            ''} ${item.uomDisplayValue || ''}`}
+                              ''} ${item.dosageDisplayValue ||
+                              ''} ${item.uomDisplayValue || ''}`}
                         </span>
                       </Tooltip>
                     </div>
                     <div className={classes.quantityColumn}>
                       <Tooltip
-                        title={`${item.quantity} ${item.dispenseUOMDisplayValue ||
-                          item.uomDisplayValue}`}
+                        title={`${item.quantity} ${item.dispenseUOMDisplayValue}`}
                       >
                         <span>
-                          {`${item.quantity} ${item.dispenseUOMDisplayValue ||
-                            item.uomDisplayValue}`}
+                          {`${item.quantity} ${item.dispenseUOMDisplayValue}`}
                         </span>
                       </Tooltip>
                     </div>
                     <div className={classes.actionColumn}>
-                      {this.enableSelectItem(item) && (!addedItem ? (
+                      {this.enableSelectItem(item) &&
+                        (!addedItem ? (
                           <span
                             className='material-icons'
                             style={{
@@ -377,15 +417,11 @@ class Grid extends PureComponent {
       activeKey,
     } = this.props
     let visits = _.orderBy(
-      this.Visits().filter((visit) => {
+      this.Visits().filter(visit => {
         return visit.itemCount > 0
       }),
-      [
-        'visitDate',
-      ],
-      [
-        'desc',
-      ],
+      ['visitDate'],
+      ['desc'],
     )
     const ContentHeight = height - 300
     const visitContentHeight = ContentHeight - 30
@@ -399,7 +435,7 @@ class Grid extends PureComponent {
             }}
           >
             <Collapse activeKey={activeKey} expandIconPosition={null}>
-              {visits.map((visit) => {
+              {visits.map(visit => {
                 return (
                   <Collapse.Panel
                     header={visit.header}
@@ -450,11 +486,15 @@ class Grid extends PureComponent {
                   <span style={{ color: 'red', fontStyle: 'italic' }}>
                     <sup>#2&nbsp;</sup>
                   </span>
+                  non-orderable medication&nbsp;&nbsp;
+                  <span style={{ color: 'red', fontStyle: 'italic' }}>
+                    <sup>#3&nbsp;</sup>
+                  </span>
                   dispense/prescribe UOM changed&nbsp;&nbsp;
                   {!isRetail && (
                     <span>
                       <span style={{ color: 'red', fontStyle: 'italic' }}>
-                        <sup>#3&nbsp;</sup>
+                        <sup>4&nbsp;</sup>
                       </span>
                       external prescription
                     </span>
@@ -463,12 +503,15 @@ class Grid extends PureComponent {
               )}
               {type === '2' && (
                 <span>
-                  Note:&nbsp;<span
-                    style={{ color: 'red', fontStyle: 'italic' }}
-                  >
+                  Note:&nbsp;
+                  <span style={{ color: 'red', fontStyle: 'italic' }}>
                     <sup>#1&nbsp;</sup>
                   </span>
-                  inactive vaccination
+                  inactive vaccination&nbsp;&nbsp;
+                  <span style={{ color: 'red', fontStyle: 'italic' }}>
+                    <sup>#2&nbsp;</sup>
+                  </span>
+                  dispense/prescribe UOM changed&nbsp;&nbsp;
                 </span>
               )}
             </div>
@@ -488,7 +531,7 @@ class Grid extends PureComponent {
     )
   }
 
-  render () {
+  render() {
     return <CardContainer hideHeader>{this.content()}</CardContainer>
   }
 }

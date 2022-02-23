@@ -89,13 +89,27 @@ export default {
   'inventory.master.stock.criticalThreshold': 'Critical Threshold',
   'inventory.master.stock.excessThreshold': 'Excess Threshold',
 
+  //Purchase Request
+  'inventory.purchaserequest.prno': 'Purchase Request No.',
+  'inventory.purchaserequest.status': 'PR Status',
+  'inventory.purchaserequest.detail.requestedBy': 'Request By',
+  'inventory.purchaserequest.detail.delete': 'Delete',
+  'inventory.purchaserequest.detail.print': 'Print',
+  'inventory.purchaserequest.detail.save': 'Save',
+  'inventory.purchaserequest.detail.submit': 'Submit',
+  'inventory.purchaserequest.detail.remarks' : 'Remarks',
+  'inventory.purchaserequest.detail.requestdate': 'Purchase Request Date',
+  'inventory.purchaserequest.detail.expectedDeliveryDate': 'Expected Delivery Date',
+
   // Purchasing & Receiving
   'inventory.pr.reason': 'Reason',
   'inventory.pr.diplicatePO': 'Duplicate Purchase Order',
   'inventory.pr.duplicatePOConfirmation':
     'Duplicate purchase order based on PO No.: ',
   'inventory.pr.addnew': 'Add New',
-  'inventory.pr.pono': 'Purchase Order #',
+  'inventory.pr.pono': 'Purchase Order No.',
+  'inventory.pr.prno': 'Corresponding Purchase Request No.',
+  'inventory.pr.filter.pono': 'Purchase Order No., Purchase Request No.',
   'inventory.pr.supplier': 'Supplier',
   'inventory.pr.invoiceStatus': 'Inv. Status',
   'inventory.pr.status': 'Status',

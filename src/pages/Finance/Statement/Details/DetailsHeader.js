@@ -16,6 +16,7 @@ import {
   Field,
   FastField,
 } from '@/components'
+import { COPAYER_TYPE } from '@/utils/constants'
 
 const styles = theme => ({
   root: {
@@ -87,6 +88,11 @@ class DetailsHeader extends PureComponent {
                   rightAlign
                   text
                   labelField='displayValue'
+                  localFilter={item =>
+                    [COPAYER_TYPE.CORPORATE, COPAYER_TYPE.INSURANCE].indexOf(
+                      item.coPayerTypeFK,
+                    ) >= 0
+                  }
                   {...cfg}
                   {...args}
                 />

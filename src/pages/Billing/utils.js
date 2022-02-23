@@ -2,8 +2,9 @@ import moment from 'moment'
 import { notification } from '@/components'
 import { INVOICE_ITEM_TYPE, INVOICE_PAYER_TYPE } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import { SCHEME_TYPE } from '@/utils/constants'
 
-export const constructPayload = (values) => {
+export const constructPayload = values => {
   const {
     concurrencyToken,
     visitId,
@@ -13,11 +14,14 @@ export const constructPayload = (values) => {
     invoicePayer = [],
     invoicePayment = [],
     mode,
+    visitOrderTemplateFK,
+    visitGroup,
+    signatureName,
+    signature,
   } = values
-
   const { invoiceItems, ...restInvoice } = invoice
 
-  let _invoicePayer = invoicePayer.filter((payer) => {
+  let _invoicePayer = invoicePayer.filter(payer => {
     if (payer.id === undefined && payer.isCancelled) return false
     return true
   })
@@ -33,8 +37,8 @@ export const constructPayload = (values) => {
   }
 
   _invoicePayer = _invoicePayer
-    .filter((payer) => (payer.id ? payer.isModified : true))
-    .map((payer) => {
+    .filter(payer => (payer.id ? payer.isModified : true))
+    .map(payer => {
       const {
         schemeConfig,
         _indexInClaimableSchemes,
@@ -50,8 +54,8 @@ export const constructPayload = (values) => {
         ...restPayer,
         isModified: restPayer.id ? isModified : false,
         invoicePayerItem: payer.invoicePayerItem
-          .filter((item) => item.claimAmount > 0)
-          .map((item) => {
+          .filter(item => item.claimAmount > 0)
+          .map(item => {
             if (typeof item.id !== 'string') {
               return { ...item }
             }
@@ -89,31 +93,38 @@ export const constructPayload = (values) => {
     mode,
     concurrencyToken,
     visitId,
+    visitOrderTemplateFK,
     visitStatus,
     invoicePayment: invoicePayment
-      .filter((item) => {
+      .filter(item => {
         if (item.id && item.isCancelled) return true
         if (!item.id) return true
         return false
       })
-      .map((item) => ({
+      .map(item => ({
         ...item,
         invoicePayerFK: undefined,
       })),
     invoice: restInvoice,
     invoicePayer: _invoicePayer,
+    visitGroup,
   }
   return payload
 }
 
-const getPatientCorporateScheme = (patient) => {
+const getPatientCorporateScheme = patient => {
   const today = moment()
   return patient.patientScheme
-    .filter((ps) => {
+    .filter(ps => {
       const isExpired = today.isAfter(moment(ps.validTo))
-      return !isExpired && ps.schemeTypeFK === 15
+      return (
+        !isExpired &&
+        [SCHEME_TYPE.CORPORATE, SCHEME_TYPE.INSURANCE].indexOf(
+          ps.schemeTypeFK,
+        ) >= 0
+      )
     })
-    .map((item) => {
+    .map(item => {
       return item.coPaymentSchemeFK
     })
 }
@@ -126,24 +137,23 @@ const getPatientGovernmentScheme = ({
   const today = moment()
   return patient.patientScheme.reduce((result, ps) => {
     const isExpired = today.isAfter(moment(ps.validTo))
-    if (ps.schemeTypeFK !== 15 && !isExpired) {
-      const schemeType = ctschemetype.find((st) => st.id === ps.schemeTypeFK)
+    if (
+      [SCHEME_TYPE.CORPORATE, SCHEME_TYPE.INSURANCE].indexOf(ps.schemeTypeFK) <
+        0 &&
+      !isExpired
+    ) {
+      const schemeType = ctschemetype.find(st => st.id === ps.schemeTypeFK)
       const copaymentschemes = ctcopaymentscheme.filter(
-        (cs) => cs.schemeTypeName === schemeType.name,
+        cs => cs.schemeTypeName === schemeType.name,
       )
 
-      return [
-        ...result,
-        ...copaymentschemes.map((i) => i.id),
-      ]
+      return [...result, ...copaymentschemes.map(i => i.id)]
     }
-    return [
-      ...result,
-    ]
+    return [...result]
   }, [])
 }
 
-export const validateApplySchemesWithPatientSchemes = (props) => {
+export const validateApplySchemesWithPatientSchemes = props => {
   const {
     invoicePayers = [],
     ctcopaymentscheme = [],
@@ -153,10 +163,10 @@ export const validateApplySchemesWithPatientSchemes = (props) => {
 
   try {
     const _appliedSchemes = invoicePayers.filter(
-      (payer) =>
+      payer =>
         payer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME && !payer.isCancelled,
     )
-    const schemePayers = _appliedSchemes.map((item) => item.copaymentSchemeFK)
+    const schemePayers = _appliedSchemes.map(item => item.copaymentSchemeFK)
     const patientCorporateSchemes = getPatientCorporateScheme(patient)
     const patientGovernmentSchemes = getPatientGovernmentScheme({
       ctcopaymentscheme,
@@ -180,23 +190,27 @@ export const validateApplySchemesWithPatientSchemes = (props) => {
     let schemes = { patient: [], billing: [] }
 
     if (doesNotMatch) {
-      const mapPatientSchemeForValidation = (ps) => {
+      const mapPatientSchemeForValidation = ps => {
         const isExpired = moment().isAfter(moment(ps.validTo))
-        if (ps.schemeTypeFK === 15) {
+        if (
+          [SCHEME_TYPE.CORPORATE, SCHEME_TYPE.INSURANCE].indexOf(
+            ps.schemeTypeFK,
+          ) >= 0
+        ) {
           const _scheme = ctcopaymentscheme.find(
-            (scheme) => scheme.id === ps.coPaymentSchemeFK,
+            scheme => scheme.id === ps.coPaymentSchemeFK,
           )
           return { name: _scheme.name, isExpired }
         }
 
         const _scheme = ctschemetype.find(
-          (scheme) => scheme.id === ps.schemeTypeFK,
+          scheme => scheme.id === ps.schemeTypeFK,
         )
         return { name: _scheme.name, isExpired }
       }
       schemes = {
         patient: patient.patientScheme.map(mapPatientSchemeForValidation),
-        billing: _appliedSchemes.map((ps) => ({
+        billing: _appliedSchemes.map(ps => ({
           name: ps.name,
           isExpired: false,
           isDeleted: !patientSchemes.includes(ps.copaymentSchemeFK),

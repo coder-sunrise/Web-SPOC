@@ -196,6 +196,7 @@ class AmountSummary extends PureComponent {
       config = {},
       showAdjustment = true,
       global,
+      isViewOnly = false,
     } = this.props
     const { summary, adjustments } = this.state
     if (!summary) return null
@@ -262,7 +263,7 @@ class AmountSummary extends PureComponent {
               </div>
             </GridItem>
             <GridItem xs={2}>
-              {showAddAdjustment && (
+              {showAddAdjustment && !isViewOnly && (
                 <Button
                   color='primary'
                   size='sm'
@@ -289,6 +290,7 @@ class AmountSummary extends PureComponent {
                 onDelete={this.deleteAdjustment}
                 onEdit={this.editAdjustment}
                 amountProps={amountProps}
+                isViewOnly={isViewOnly}
                 // calcPurchaseOrderSummary={calcPurchaseOrderSummary}
                 {...v}
                 theme={theme}
@@ -312,6 +314,7 @@ class AmountSummary extends PureComponent {
                   controlStyle={{ fontWeight: 500 }}
                   label={`Inclusive GST (${numeral(gstValue).format('0.00')}%)`}
                   simple
+                  disabled={isViewOnly}
                   checked={isGSTInclusive}
                   onChange={e => {
                     this.onChangeGstToggle(e.target.value)

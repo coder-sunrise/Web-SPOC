@@ -129,7 +129,7 @@ const ReportViewer = ({
   const onExportClick = async ({ key }) => {
     setExporting(true)
     if (unsavedReport) {
-      const reportFormat = key === 'export-excel' ? 'excel' : 'pdf'
+      const reportFormat = key === 'export-excel' ? 'Excel' : 'PDF'
       await exportUnsavedReport(reportID, reportFormat, reportContent)
       setExporting(false)
       return true
@@ -144,11 +144,11 @@ const ReportViewer = ({
     return true
   }
 
-  const onPageNumberChange = (value) => {
+  const onPageNumberChange = value => {
     if (value <= numOfPages && value > 0) setPageNumber(value)
   }
 
-  const handleDoubleClick = (event) => {
+  const handleDoubleClick = event => {
     event.stopPropagation()
   }
 
@@ -163,17 +163,15 @@ const ReportViewer = ({
               disabled={!pdfData}
               overlay={
                 <Menu onClick={onExportClick}>
-                  <Menu.Item key='export-pdf' id='pdf'>
+                  <Menu.Item key='export-pdf' id='PDF'>
                     <span>PDF</span>
                   </Menu.Item>
-                  <Menu.Item key='export-excel' id='excel'>
+                  <Menu.Item key='export-excel' id='Excel'>
                     <span>Excel</span>
                   </Menu.Item>
                 </Menu>
               }
-              trigger={[
-                'click',
-              ]}
+              trigger={['click']}
             >
               <Button color='info' size='sm' disabled={!pdfData}>
                 <Down />
@@ -260,8 +258,7 @@ const ReportViewer = ({
                 />
               </Document>
             )}
-            {!pdfData &&
-            !showError && (
+            {!pdfData && !showError && (
               <React.Fragment>
                 <CircularProgress />
                 <h5>Loading report...</h5>

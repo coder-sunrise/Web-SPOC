@@ -26,14 +26,23 @@ export default createFormViewModel({
         })
 
         yield take('patient/query/@@end')
-
-        const patientInfo = yield select(st => st.patient)
       },
       *initState({ payload }, { call, select, put, take }) {},
       *updateRadiologyWorkitem({ payload }, { put, select, call }) {
         const radiologyDetails = yield select(state => state.radiologyDetails)
 
         const response = yield call(service.upsert, payload)
+        if (response === 204) {
+          notification.success({ message: 'Saved successfully.' })
+          return true
+        }
+        return false
+      },
+
+      *cancelRadiologyWorkitem({ payload }, { put, select, call }) {
+        const radiologyDetails = yield select(state => state.radiologyDetails)
+
+        const response = yield call(service.cancel, payload)
         if (response === 204) {
           notification.success({ message: 'Saved successfully.' })
           return true

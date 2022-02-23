@@ -1,102 +1,88 @@
 import { IconButton, Popover } from '@/components'
 import { createFromIconfontCN } from '@ant-design/icons'
 import defaultSettings from '@/defaultSettings'
-import { RADIOLOGY_WORKITEM_STATUS } from '@/utils/constants'
+import {
+  RADIOLOGY_WORKITEM_STATUS,
+  WORK_ITEM_TYPES,
+  WORK_ITEM_TYPES_ENUM,
+} from '@/utils/constants'
 import _ from 'lodash'
+import React, { useState } from 'react'
+import { Badge } from 'antd'
+import { useDispatch } from 'dva'
 
-const RadioWorkItemInfo = ({ values = {} }) => {
+const RadioWorkItemInfo = props => {
+  const { workItemSummary, visitFK } = props
+  const dispatch = useDispatch()
+  const [completedWorkItemCount, setCompletedWorkItemCount] = useState(
+    workItemSummary.completedWorkItemCount || 0,
+  )
+  const [totalWorkItemCount, setTotalWorkItemCount] = useState(
+    workItemSummary.totalWorkItem || 0,
+  )
+  const [workItemDetails, setWorkItemDetails] = useState([])
   let IconFont = createFromIconfontCN({
     scriptUrl: defaultSettings.iconfontUrl,
   })
-
-  let completedWorkItemCount = 0
-  let TotalWorkItemCount = 0
-  let sortedWorkItem = []
-
-  const sortedDateWorkedItem = _.orderBy(values, ['generateDate'], ['desc'])
-
-  const completedWorkItemsCount = sortedDateWorkedItem.map(row => {
-    const { radiologyWorkitem } = row
-    TotalWorkItemCount += 1
-    if (
-      radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
-      radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED
-    ) {
-      completedWorkItemCount += 1
-    }
-  })
-
-  const sortingWorkItems = sortedDateWorkedItem.map(row => {
-    const { radiologyWorkitem } = row
-    if (radiologyWorkitem.priority === 'Urgent') {
-        sortedWorkItem = [...sortedWorkItem,{...row,prior : 1}]
-    } else {
-        sortedWorkItem = [...sortedWorkItem,{...row,prior : 0}]
-    }
-  })
-
-  const dotStyle = {
-    height: '18px',
-    width: '18px',
-    backgroundColor: 'red',
-    borderRadius: '50%',
-    display: 'inline-block',
-    position: 'relative',
-    top: '-11px',
-    right: '8px',
-    textAlign: 'center',
-    fontSize: 13,
-    color: 'white',
+  const getDetails = () => {
+    dispatch({
+      type: 'queueLog/getWorkItemDetailStatus',
+      payload: {
+        visitFK: visitFK,
+        workItemType: WORK_ITEM_TYPES_ENUM.RADIOLOGY,
+      },
+    }).then(detailData => {
+      setWorkItemDetails(detailData)
+      setTotalWorkItemCount(detailData.length)
+      setCompletedWorkItemCount(
+        detailData.filter(
+          t => t.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED,
+        ).length,
+      )
+    })
   }
 
   const radioWorkItemDetails = (row = []) => {
-    if (row.length > 0) {
-      let number = 0
-      return row.map(row => {
-        const { radiologyWorkitem } = row
-        number += 1
-        return (
-          <tr>
-            <td style={{ width: '35px' }}>{number}</td>
-            <td style={{ width: '200px' }}>{radiologyWorkitem.name || '-'}</td>
-            <td style={{ width: '200px' }}>
-              {radiologyWorkitem.instructions || '-'}
-            </td>
-            <td style={{ width: '200px' }}>
-              {radiologyWorkitem.remarks || '-'}
-            </td>
-            <td
-              style={{
-                width: '65px',
-                color:
-                  radiologyWorkitem.priority === 'Urgent' ? 'red' : 'black',
-              }}
-            >
-              {radiologyWorkitem.priority || '-'}
-            </td>
-            <td
-              style={{
-                width: '100px',
-                color:
-                  radiologyWorkitem.statusFK ===
-                    RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
-                  radiologyWorkitem.statusFK ===
-                    RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED
-                    ? 'green'
-                    : 'black',
-              }}
-            >
-              {radiologyWorkitem.status}
-            </td>
-          </tr>
-        )
-      })
-    }
+    if (row.length === 0) return
+    let number = 0
+    return row.map(workItem => {
+      number += 1
+      return (
+        <tr>
+          <td style={{ width: '35px' }}>{number}</td>
+          <td style={{ width: '200px' }}>{workItem.name || '-'}</td>
+          <td style={{ width: '200px' }}>{workItem.instructions || '-'}</td>
+          <td style={{ width: '200px' }}>{workItem.remarks || '-'}</td>
+          <td
+            style={{
+              width: '65px',
+              color: workItem.priority === 'Urgent' ? 'red' : 'black',
+            }}
+          >
+            {workItem.priority || '-'}
+          </td>
+          <td
+            style={{
+              width: '100px',
+              color:
+                workItem.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
+                workItem.statusFK ===
+                  RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED
+                  ? 'green'
+                  : 'black',
+            }}
+          >
+            {workItem.status}
+          </td>
+        </tr>
+      )
+    })
   }
 
   return (
     <Popover
       icon={null}
+      overlayStyle={{ maxHeight: 350 }}
       placement='bottomLeft'
       arrowPointAtCenter
       content={
@@ -125,38 +111,34 @@ const RadioWorkItemInfo = ({ values = {} }) => {
           </tr>
           <td>
             <div style={{ maxHeight: '250px', overflow: 'auto' }}>
-              <table>{radioWorkItemDetails(sortedWorkItem.sort((a,b) => b.prior - a.prior))}</table>
+              <table>{radioWorkItemDetails(workItemDetails)}</table>
             </div>
           </td>
         </table>
       }
     >
-      <div style={{ display: 'inline-block' }}>
-        <IconButton
-          style={{
-            position: 'relative',
-            color: 'white',
-            backgroundColor:
-              TotalWorkItemCount === completedWorkItemCount
-                ? 'green'
-                : '#4255bd',
-          }}
-          size='large'
+      <div style={{ display: 'inline-block', marginRight: 15 }}>
+        <Badge
+          color='red'
+          count={completedWorkItemCount}
+          style={{ paddingRight: 4, paddingLeft: 4 }}
+          size='small'
         >
-          <IconFont type='icon-radiology' />
-        </IconButton>
-        {completedWorkItemCount >= 1 && (
-          <span style={dotStyle}>{completedWorkItemCount}</span>
-        )}
-        {completedWorkItemCount < 1 && (
-          <div
+          <IconButton
             style={{
-              width: '18px',
-              display: 'inline-block',
               position: 'relative',
+              color: 'white',
+              backgroundColor:
+                totalWorkItemCount === completedWorkItemCount
+                  ? 'green'
+                  : '#4255bd',
             }}
-          />
-        )}
+            size='large'
+            onClick={getDetails}
+          >
+            <IconFont type='icon-radiology' />
+          </IconButton>
+        </Badge>
       </div>
     </Popover>
   )

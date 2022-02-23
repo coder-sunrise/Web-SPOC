@@ -3,9 +3,12 @@ import { primaryColor } from 'mui-pro-jss'
 import moment from 'moment'
 import color from 'color'
 import withStyles from '@material-ui/core/styles/withStyles'
-import { Tooltip } from '@material-ui/core'
 import { Delete, Edit, Print, Add } from '@material-ui/icons'
-import { FORM_CATEGORY } from '@/utils/constants'
+import {
+  FORM_CATEGORY,
+  DOCUMENT_CATEGORY,
+  DOCUMENTCATEGORY_DOCUMENTTYPE,
+} from '@/utils/constants'
 import { formTypes, formStatus } from '@/utils/codes'
 import {
   CommonTableGrid,
@@ -16,8 +19,11 @@ import {
   Danger,
   Popover,
   Checkbox,
+  Tooltip,
+  DocumentEditor,
 } from '@/components'
 import VoidWithPopover from './FormDetail/VoidWithPopover'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   item: {
@@ -50,15 +56,16 @@ const styles = (theme) => ({
   popoverContainer: {
     width: 200,
     textAlign: 'left',
+    marginTop: -10,
   },
   listContainer: {
-    maxHeight: 300,
+    maxHeight: 132,
     overflowY: 'auto',
   },
 })
 
 class VisitFormGrid extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { dispatch } = props
     this.state = {
@@ -75,15 +82,30 @@ class VisitFormGrid extends PureComponent {
   }
 
   toggleVisibleChange = () =>
-    this.setState((ps) => {
+    this.setState(ps => {
       return {
         openFormType: !ps.openFormType,
       }
     })
 
+  setFilterFormTemplate = (val) => {
+    this.setState({ filterFormTemplate: val })
+  }
+
+  debouncedFilterFormTemplateAction = _.debounce(
+    e => {
+      this.setFilterFormTemplate(e.target.value)
+    },
+    100,
+    {
+      leading: true,
+      trailing: false,
+    },
+  )
+
   ListItem = ({ classes, title, onClick }) => {
     return (
-      <Tooltip title={title} style={{ pidding: 0 }}>
+      <Tooltip title={title}>
         <div className={classes.item} onClick={onClick}>
           <span>{title}</span>
         </div>
@@ -91,7 +113,7 @@ class VisitFormGrid extends PureComponent {
     )
   }
 
-  editRow = async (row) => {
+  editRow = async row => {
     const { formListing, formCategory, formFrom, dispatch } = this.props
     const { visitDetail = {} } = formListing
     let { isCanEditForms = false } = visitDetail
@@ -101,6 +123,7 @@ class VisitFormGrid extends PureComponent {
       response = await this.props.dispatch({
         type: 'formListing/getVisitForm',
         payload: {
+          type: row.type,
           id: row.id,
         },
       })
@@ -108,6 +131,7 @@ class VisitFormGrid extends PureComponent {
       response = await dispatch({
         type: 'formListing/getCORForm',
         payload: {
+          type: row.type,
           id: row.id,
         },
       })
@@ -129,11 +153,12 @@ class VisitFormGrid extends PureComponent {
     }
   }
 
+  printRow = row => {
+    DocumentEditor.print({ documentName: row.formName, document: row.formData })
+  }
+
   VoidForm = ({ classes, dispatch, row, user }) => {
-    const [
-      reason,
-      setReason,
-    ] = useState(undefined)
+    const [reason, setReason] = useState(undefined)
 
     const handleConfirmDelete = useCallback((i, voidVisibleChange) => {
       if (reason) {
@@ -162,6 +187,7 @@ class VisitFormGrid extends PureComponent {
             type: 'formListing/saveCORForm',
             payload: {
               ...voidData,
+              action: 'void',
             },
           }).then(() => {
             this.props.queryFormListing()
@@ -180,7 +206,7 @@ class VisitFormGrid extends PureComponent {
               label='Void Reason'
               autoFocus
               value={reason}
-              onChange={(e) => {
+              onChange={e => {
                 setReason(e.target.value)
               }}
             />
@@ -199,17 +225,24 @@ class VisitFormGrid extends PureComponent {
     )
   }
 
-  render () {
+  render() {
     let { formListing, dispatch, theme, classes, user } = this.props
-    let { list, visitDetail = {} } = formListing
+    let { list, visitDetail = {}, formTemplates = [] } = formListing
     let { isCanEditForms = true } = visitDetail
+
+    const modifyAR = Authorized.check('queue.consultation.form.modify')
+    const voidAR = Authorized.check('queue.consultation.form.void')
+
+    const isHiddenModify = modifyAR && modifyAR.rights !== 'enable'
+    const isHiddenVoid = voidAR && voidAR.rights !== 'enable'
+
     return (
       <div>
         <Checkbox
           label='Include voided forms'
           value={this.state.includeVoidForms}
           onChange={() => {
-            this.setState((ps) => {
+            this.setState(ps => {
               return {
                 ...ps,
                 includeVoidForms: !ps.includeVoidForms,
@@ -218,55 +251,71 @@ class VisitFormGrid extends PureComponent {
           }}
         />
         <CommonTableGrid
-          getRowId={(r) => r.id}
+          getRowId={r => r.id}
           forceRender
           size='sm'
           style={{ margin: 0 }}
           rows={
-            this.state.includeVoidForms ? (
-              list
-            ) : (
-              list.filter((o) => o.statusFK !== 4)
-            )
+            this.state.includeVoidForms
+              ? list
+              : list.filter(o => o.statusFK !== 4)
           }
           onRowDoubleClick={this.editRow}
           columns={[
-            { name: 'typeName', title: 'Type' },
-            { name: 'updateByUser', title: 'Last Update By' },
+            { name: 'formName', title: 'Form' },
+            { name: 'updateByUser', title: 'Last Updated By' },
+            { name: 'updateDate', title: 'Last Updated Date' },
             { name: 'statusFK', title: 'Status' },
             { name: 'action', title: 'Action' },
           ]}
           FuncProps={{ pager: false }}
           columnExtensions={[
             {
-              columnName: 'typeName',
+              columnName: 'formName',
               type: 'link',
               linkField: 'href',
-              onClick: (row) => {
-                this.props.viewReport(row, this.props)
+              onClick: row => {
+                // this.props.viewReport(row, this.props)
+                this.editRow(row)
               },
             },
             {
               columnName: 'updateByUser',
             },
             {
+              columnName: 'updateDate',
+              render: r => {
+                const updateDate = moment(r.updateDate)
+                  .format('DD MMM YYYY HH:mm')
+                return (
+                  <Tooltip title={updateDate}>
+                    <span>{updateDate}</span>
+                  </Tooltip>
+                )
+              },
+            },
+            {
               columnName: 'statusFK',
-              type: 'select',
-              options: formStatus,
+              render: r => {
+                const status = formStatus.find(x => x.value === r.statusFK).name
+                const title = r.statusFK === 4 ? `${status}, Reason: ${r.voidReason}.` : status
+                return <Tooltip title={title}><span>{status}</span></Tooltip>
+              },
             },
             {
               columnName: 'action',
               width: 110,
               align: 'left',
-              render: (row) => {
+              render: row => {
                 return (
                   <React.Fragment>
                     <Tooltip title='Print'>
                       <Button
                         size='sm'
                         onClick={() => {
-                          const { formCategory, printRow } = this.props
-                          printRow(row, formCategory)
+                          // const { formCategory, printRow } = this.props
+                          // printRow(row, formCategory)
+                          this.printRow(row)
                         }}
                         justIcon
                         color='primary'
@@ -275,7 +324,7 @@ class VisitFormGrid extends PureComponent {
                         <Print />
                       </Button>
                     </Tooltip>
-                    {(row.statusFK === 1 || row.statusFK === 2) && (
+                    {row.statusFK === 1 && !isHiddenModify && (
                       <Tooltip title='Edit'>
                         <Button
                           disabled={!row.isCanEditForms}
@@ -291,7 +340,7 @@ class VisitFormGrid extends PureComponent {
                         </Button>
                       </Tooltip>
                     )}
-                    {(row.statusFK === 1 || row.statusFK === 2) && (
+                    {row.statusFK === 1 && (
                       <Popconfirm
                         onConfirm={() => {
                           const { formCategory } = this.props
@@ -301,7 +350,6 @@ class VisitFormGrid extends PureComponent {
                             isDeleted: true,
                             visitID: formListing.visitID,
                           }
-
                           if (formCategory === FORM_CATEGORY.VISITFORM) {
                             dispatch({
                               type: 'formListing/saveVisitForm',
@@ -323,19 +371,21 @@ class VisitFormGrid extends PureComponent {
                           }
                         }}
                       >
-                        <Tooltip title='Delete'>
-                          <Button
-                            disabled={!row.isCanEditForms}
-                            size='sm'
-                            color='danger'
-                            justIcon
-                          >
-                            <Delete />
-                          </Button>
-                        </Tooltip>
+                        {!isHiddenModify && (
+                          <Tooltip title='Delete'>
+                            <Button
+                              disabled={!row.isCanEditForms}
+                              size='sm'
+                              color='danger'
+                              justIcon
+                            >
+                              <Delete />
+                            </Button>
+                          </Tooltip>
+                        )}
                       </Popconfirm>
                     )}
-                    {row.statusFK === 3 && (
+                    {row.statusFK === 2 && !isHiddenVoid && (
                       <this.VoidForm
                         classes={classes}
                         dispatch={dispatch}
@@ -350,9 +400,23 @@ class VisitFormGrid extends PureComponent {
           ]}
         />
         <AuthorizedContext>
-          {(r) => {
-            if ((r && r.rights !== 'enable') || !isCanEditForms) return null
-
+          {r => {
+            if ((r && r.rights !== 'enable') || isHiddenModify || !isCanEditForms) return null
+            let unionFormTypes = formTemplates//formTypes.concat(formTemplates)
+            unionFormTypes = this.state.filterFormTemplate
+              ? unionFormTypes.filter(
+                  x =>
+                    x.name
+                      .toUpperCase()
+                      .indexOf(this.state.filterFormTemplate.toUpperCase()) >=
+                    0,
+                )
+              : unionFormTypes
+            const formDocumentTypes =
+              DOCUMENTCATEGORY_DOCUMENTTYPE.find(
+                y => y.documentCategoryFK === DOCUMENT_CATEGORY.FORM,
+              )?.templateTypes || []
+            const orderedTemplates = _.orderBy(unionFormTypes,[a=>formDocumentTypes.findIndex(x=>x===a.documentTemplateTypeFK),b=>b.name])
             return (
               <Popover
                 icon={null}
@@ -362,11 +426,17 @@ class VisitFormGrid extends PureComponent {
                 onVisibleChange={this.toggleVisibleChange}
                 content={
                   <div className={classes.popoverContainer}>
+                    <TextField
+                      label='Filter Template'
+                      onChange={e => {
+                        this.debouncedFilterFormTemplateAction(e)
+                      }}
+                    />
                     <div className={classes.listContainer}>
-                      {formTypes.map((item) => {
+                      {orderedTemplates.map(item => {
                         return (
                           <this.ListItem
-                            key={item.value}
+                            key={item.formTemplateFK}
                             title={item.name}
                             classes={classes}
                             onClick={() => {
@@ -377,6 +447,9 @@ class VisitFormGrid extends PureComponent {
                                   type: item.value,
                                   entity: undefined,
                                   formCategory: this.props.formCategory,
+                                  formName: item.name,
+                                  templateContent: item.templateContent,
+                                  formTemplateFK: item.formTemplateFK,
                                 },
                               })
                               this.toggleVisibleChange()

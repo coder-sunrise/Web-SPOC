@@ -1,13 +1,16 @@
-// big calendar
-import BigCalendar from 'react-big-calendar'
 // moment
 import moment from 'moment'
 // medisys model
 import { history } from 'umi'
 import { createListViewModel } from 'medisys-model'
 // common components
-import { notification } from '@/components'
-import { APPOINTMENT_STATUS } from '@/utils/constants'
+import { notification, timeFormat24Hour } from '@/components'
+import {
+  APPOINTMENT_STATUS,
+  CALENDAR_VIEWS,
+  CALENDAR_RESOURCE,
+} from '@/utils/constants'
+import { roundTo } from '@/utils/utils'
 import * as service from '@/services/calendar'
 import phServices from '@/pages/Setting/PublicHoliday/services'
 import cbServices from '@/pages/Setting/ClinicBreakHour/services'
@@ -62,6 +65,12 @@ const updateApptResources = oldResources => (
   ]
 }
 
+const calculateDuration = (startTime, endTime) => {
+  const hour = endTime.diff(startTime, 'hour')
+  const minute = roundTo((endTime.diff(startTime, 'minute') / 60 - hour) * 60)
+  return { hour, minute }
+}
+
 export default createListViewModel({
   namespace: 'calendar',
   config: {
@@ -77,7 +86,7 @@ export default createListViewModel({
       currentViewAppointment: {
         appointments: [],
       },
-      calendarView: BigCalendar.Views.DAY,
+      calendarView: CALENDAR_VIEWS.DAY,
       publicHolidayList: [],
       clinicBreakHourList: {},
       clinicOperationHourList: {},
@@ -139,7 +148,7 @@ export default createListViewModel({
             ...restFormikValues
           } = formikValues
 
-          const isEdit = formikValues.id !== undefined && !formikValues.isCopyedAppt
+          const isEdit = formikValues.id !== undefined
           let isRecurrenceChanged =
             formikValues.isEnableRecurrence &&
             compareDto(
@@ -164,7 +173,9 @@ export default createListViewModel({
             appointments_Resources: appointmentResources.map(o => {
               return {
                 ...o,
-                clinicianFK: o.isDeleted ? o.preClinicianFK : o.clinicianFK,
+                calendarResourceFK: o.isDeleted
+                  ? o.preCalendarResourceFK
+                  : o.calendarResourceFK,
               }
             }),
             rescheduleReason,
@@ -197,7 +208,7 @@ export default createListViewModel({
             )
 
             const updatedOldResources = oldResources.map(item => ({
-              clinicianFK: item.clinicianFK,
+              calendarResourceFK: item.calendarResourceFK,
               appointmentTypeFK: item.appointmentTypeFK,
               startTime: item.startTime,
               endTime: item.endTime,
@@ -284,20 +295,6 @@ export default createListViewModel({
             appointments,
             recurrenceDto: recurrence,
           }
-          if (restFormikValues.isCopyedAppt) {
-            savePayload = {
-              ...savePayload,
-              id: 0,
-              appointments: savePayload.appointments.map(appt => ({
-                ...appt,
-                id: 0,
-                appointmentGroupFK: 0,
-                appointments_Resources: appt.appointments_Resources.map(
-                  res => ({ ...res, id: 0, appointmentFK: 0 }),
-                ),
-              })),
-            }
-          }
           if (validate) {
             return yield put({
               type: 'validate',
@@ -322,9 +319,7 @@ export default createListViewModel({
             type: actionKey,
             payload: savePayload,
           })
-        } catch (error) {
-          console.log({ error })
-        }
+        } catch (error) {}
         return false
       },
       *validate({ payload }, { call, put }) {
@@ -365,22 +360,80 @@ export default createListViewModel({
         }
         return false
       },
-      *copyAppointment({ payload }, { call, put }) {
-        const result = yield call(service.query, payload)
+      *copyAppointment({ payload }, { call, put, select }) {
+        const { updateReource, ...other } = payload
+        const result = yield call(service.query, other)
         const { status, data } = result
         if (parseInt(status, 10) === 200) {
+          const { id, recurrenceDto, recurrenceFK, ...restData } = data
+          let appointmentDate = moment().formatUTC()
+          let apptResources = [...data.appointments[0].appointments_Resources]
+          if (updateReource) {
+            const codetable = yield select(st => st.codetable)
+            const { ctcalendarresource = [] } = codetable
+            const {
+              updateApptResourceId,
+              newStartTime,
+              newEndTime,
+              newResourceId,
+              view,
+            } = updateReource
+
+            appointmentDate = moment(newStartTime).formatUTC()
+            let updateResource = apptResources.find(
+              r => r.id === updateApptResourceId,
+            )
+
+            if (view !== CALENDAR_VIEWS.MONTH) {
+              const startTime = moment(newStartTime, timeFormat24Hour)
+              const endTime = moment(newEndTime, timeFormat24Hour)
+              const { hour, minute } = calculateDuration(startTime, endTime)
+              updateResource.startTime = startTime.format(timeFormat24Hour)
+              updateResource.endTime = endTime.format(timeFormat24Hour)
+              updateResource.apptDurationHour = hour
+              updateResource.apptDurationMinute = minute
+            }
+            if (newResourceId) {
+              const source = ctcalendarresource.find(
+                source => source.id === newResourceId,
+              )
+              if (source.resourceType === CALENDAR_RESOURCE.RESOURCE) {
+                updateResource.isPrimaryClinician = false
+              } else if (
+                !apptResources.find(
+                  r => r.id !== updateApptResourceId && r.isPrimaryClinician,
+                )
+              ) {
+                updateResource.isPrimaryClinician = true
+              }
+              updateResource.calendarResourceFK = newResourceId
+              updateResource.calendarResource = { ...source }
+            }
+          }
           const copyAppt = {
-            ...data,
-            appointments: data.appointments.map(item => ({
-              ...item,
-              appointmentDate: moment().formatUTC(),
-              appointmentStatusFk: undefined,//undefined is new, will updated to Darft
-              isEditedAsSingleAppointment: false,
-              appointmentPreOrderItem:[],
-            })),
+            ...restData,
+            appointments: data.appointments.map(item => {
+              const { id, appointmentGroupFK, ...restApptData } = item
+              return {
+                ...restApptData,
+                appointmentDate: appointmentDate,
+                appointmentStatusFk: APPOINTMENT_STATUS.DRAFT, //undefined is new, will updated to Darft
+                isEditedAsSingleAppointment: false,
+                appointmentPreOrderItem: [],
+                appointments_Resources: [
+                  ...apptResources.map((res, index) => {
+                    const { id, appointmentFK, ...restResourceData } = res
+                    return {
+                      id: -1 * (index + 1),
+                      ...restResourceData,
+                    }
+                  }),
+                ],
+              }
+            }),
             bookedByUserFk: payload.bookedByUserFk,
-            isEnableRecurrence:false,
-            isCopyedAppt:true,
+            isEnableRecurrence: false,
+            isFromCopy: true,
           }
           yield put({
             type: 'setViewAppointment',
@@ -502,22 +555,24 @@ export default createListViewModel({
       },
       *navigateCalendar({ payload }, { all, select, put }) {
         const calendarState = yield select(state => state.calendar)
-        const { date, view } = payload
+        const { date, view, doctor = [] } = payload
         const targetDate =
           date !== undefined ? date : calendarState.currentViewDate
         const targetView =
           view !== undefined ? view : calendarState.calendarView
-        yield put({
-          type: 'setCurrentViewDate',
-          payload: targetDate,
-        })
+        if (date) {
+          yield put({
+            type: 'setCurrentViewDate',
+            payload: targetDate,
+          })
+        }
         let start
         let end
         let isDayView = false
         let calendarView = 'month'
 
-        if (targetView === BigCalendar.Views.WEEK) calendarView = 'week'
-        if (targetView === BigCalendar.Views.DAY) {
+        if (targetView === CALENDAR_VIEWS.WEEK) calendarView = 'week'
+        if (targetView === CALENDAR_VIEWS.DAY) {
           isDayView = true
           calendarView = 'day'
         }
@@ -532,6 +587,7 @@ export default createListViewModel({
         const getCalendarListPayload = {
           apptDateFrom: start,
           apptDateTo: end,
+          doctor: doctor.join(),
           appStatus: [
             APPOINTMENT_STATUS.CONFIRMED,
             APPOINTMENT_STATUS.DRAFT,
@@ -573,8 +629,8 @@ export default createListViewModel({
         let end
         let calendarView = 'month'
 
-        if (targetView === BigCalendar.Views.WEEK) calendarView = 'week'
-        if (targetView === BigCalendar.Views.DAY) calendarView = 'day'
+        if (targetView === CALENDAR_VIEWS.WEEK) calendarView = 'week'
+        if (targetView === CALENDAR_VIEWS.DAY) calendarView = 'day'
 
         start = moment(targetDate)
           .startOf(calendarView)
@@ -651,7 +707,7 @@ export default createListViewModel({
               ...m,
               apptDurationHour: difH,
               apptDurationMinute: difM,
-              preClinicianFK: m.clinicianFK,
+              preCalendarResourceFK: m.calendarResourceFK,
             }
           })
           return {

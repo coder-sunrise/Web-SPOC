@@ -26,6 +26,7 @@ import { roundTo, getUniqueId } from '@/utils/utils'
 import {
   INVOICE_PAYER_TYPE,
   PACKAGE_SIGNATURE_CHECK_OPTION,
+  INVOICE_REPORT_TYPES,
 } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import Authorized from '@/utils/Authorized'
@@ -47,6 +48,7 @@ import {
   constructPayload,
   validateApplySchemesWithPatientSchemes,
 } from './utils'
+import { subscribeNotification } from '@/utils/realtime'
 
 const styles = theme => ({
   accordionContainer: {
@@ -88,6 +90,7 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
   const defaultItem = (item, groupName) => {
     return {
       ...item,
+      stockBalance: item.quantity,
       dispenseGroupId: groupName,
       countNumber: 1,
       rowspan: 1,
@@ -133,6 +136,7 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
         dispenseUOM: drugMixture.uomDisplayValue,
         isDispensedByPharmacy: drugMixture.isDispensedByPharmacy,
         drugMixtureName: item.name,
+        stockBalance: drugMixture.quantity,
         uid: getUniqueId(),
       }
       if (drugMixture.dispenseItem.length) {
@@ -196,18 +200,24 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
   }
 
   const sortOrderItems = [
-    ...(entity.prescription || []).filter(
-      item => item.type === 'Medication' && !item.isDrugMixture,
-    ),
+    ...(entity.prescription || [])
+      .filter(item => item.type === 'Medication' && !item.isDrugMixture)
+      .map(item => {
+        return { ...item, quantity: item.dispensedQuanity }
+      }),
     ...(entity.vaccination || []),
     ...(entity.consumable || []),
     ...(entity.prescription || []).filter(
       item => item.type === 'Medication' && item.isDrugMixture,
     ),
-    ...(entity.prescription || []).filter(
-      item => item.type === 'Open Prescription',
-    ),
-    ...(entity.externalPrescription || []),
+    ...(entity.prescription || [])
+      .filter(item => item.type === 'Open Prescription')
+      .map(item => {
+        return { ...item, quantity: item.dispensedQuanity }
+      }),
+    ...(entity.externalPrescription || []).map(item => {
+      return { ...item, quantity: item.dispensedQuanity }
+    }),
   ]
 
   sortOrderItems.forEach(item => {
@@ -274,7 +284,7 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
   notDirtyDuration: 3,
   displayName: 'BillingForm',
   enableReinitialize: true,
-  mapPropsToValues: ({ billing, clinicSettings }) => {
+  mapPropsToValues: ({ billing, clinicSettings, patient }) => {
     const { autoPrintReportsOnCompletePayment = '' } = clinicSettings
     try {
       if (billing.entity) {
@@ -305,8 +315,8 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
           autoPrintReportsOnCompletePayment: autoPrintReportsOnCompletePayment.split(
             ',',
           ),
+          patientID: patient.id,
         }
-
         return values
       }
     } catch (error) {
@@ -346,6 +356,40 @@ class Billing extends Component {
     selectedDrugs: [],
     isUpdatedAppliedInvoicePayerInfo: false,
     isConsumedPackage: false,
+    hasNewSignature: false,
+  }
+
+  componentDidMount() {
+    subscribeNotification('QueueListing', {
+      callback: response => {
+        const { visitID, senderId } = response
+        if (visitID) {
+          const { values, dispatch } = this.props
+          if (values.visitId === visitID) {
+            const {
+              isGroupPrint,
+              showReport,
+              reportPayload: { reportID } = {},
+              isGroupPayment,
+              showAddPaymentModal,
+            } = this.state
+            if (
+              (isGroupPrint && reportID === 89 && showReport) ||
+              (isGroupPayment && showAddPaymentModal)
+            ) {
+              notification.error({
+                message: `The status for one of the invoices had been changed. Please check all invoices is in billing status and the billing is saved.`,
+              })
+              this.setState({ disabledPayment: true })
+              dispatch({
+                type: 'groupInvoice/fetchVisitGroupStatusDetails',
+                payload: { visitGroup: values.visitGroup },
+              })
+            }
+          }
+        }
+      },
+    })
   }
 
   componentWillUnmount() {
@@ -366,7 +410,7 @@ class Billing extends Component {
   }
 
   fetchCodeTables = async () => {
-    const { history, dispatch } = this.props
+    const { history, dispatch, billing } = this.props
     const { query } = history.location
     await dispatch({
       type: 'codetable/fetchCodes',
@@ -405,26 +449,19 @@ class Billing extends Component {
       },
     })
     if (query.vid) {
-      await dispatch({
-        type: 'billing/query',
-        payload: {
-          id: query.vid,
-        },
-      }).then(response => {
-        const { invoice } = response
-        const { invoiceItems } = invoice
+      const { invoice } = billing.entity || billing.default
+      const { invoiceItems } = invoice
 
-        if (invoiceItems && invoiceItems.length > 0) {
-          const consumedItems = invoiceItems.filter(
-            i => i.isPackage && i.packageConsumeQuantity > 0,
-          )
-          if (consumedItems.length > 0) {
-            this.setState({
-              isConsumedPackage: true,
-            })
-          }
+      if (invoiceItems && invoiceItems.length > 0) {
+        const consumedItems = invoiceItems.filter(
+          i => i.isPackage && i.packageConsumeQuantity > 0,
+        )
+        if (consumedItems.length > 0) {
+          this.setState({
+            isConsumedPackage: true,
+          })
         }
-      })
+      }
     }
   }
 
@@ -593,25 +630,37 @@ class Billing extends Component {
       },
     })
   }
-
+  getInvoiceReportTitle = reportPayload => {
+    switch (reportPayload?.reportParameters?.printType) {
+      case INVOICE_REPORT_TYPES.GROUPINVOICE:
+        return 'Invoice'
+      case INVOICE_REPORT_TYPES.CLAIMABLEITEMCATEGORYINVOICE:
+        return 'Claimable Item Category Invoice'
+      case INVOICE_REPORT_TYPES.CLAIMABLEITEMINVOICE:
+        return 'Claimable Item Invoice'
+      case INVOICE_REPORT_TYPES.INDIVIDUALINVOICE:
+        return 'Visitation Invocie'
+      case INVOICE_REPORT_TYPES.ITEMCATEGORYINVOICE:
+        return 'Item Category Invoice'
+      case INVOICE_REPORT_TYPES.SUMMARYINVOICE:
+        return 'Summary Invoice'
+    }
+    return 'Invoice'
+  }
   backToDispense = () => {
-    const refreshOrder = this.showRefreshOrder()
     const { dispatch, billing } = this.props
     dispatch({
       type: 'billing/backToDispense',
-    }).then(() => {
-      if (refreshOrder) {
-        dispatch({
-          type: 'dispense/refresh',
-          payload: billing.visitID,
-        })
-      }
     })
   }
 
-  toggleAddPaymentModal = () => {
+  toggleAddPaymentModal = async isGroupPayment => {
     const { showAddPaymentModal } = this.state
-    this.setState({ showAddPaymentModal: !showAddPaymentModal })
+    this.setState({
+      isGroupPayment,
+      disabledPayment: undefined,
+      showAddPaymentModal: !showAddPaymentModal,
+    })
   }
 
   calculateOutstandingBalance = async invoicePayment => {
@@ -744,96 +793,152 @@ class Billing extends Component {
     })
   }
 
-  onPrinterClick = (type, itemID, copayerID, invoicePayerid, index) => {
+  onPrinterClick = (
+    type,
+    itemID,
+    copayerID,
+    invoicePayerid,
+    index,
+    invoiceReportType,
+  ) => {
     switch (type) {
       case 'Payment':
         this.onShowReport(29, { InvoicePaymentId: itemID })
         break
       case 'TaxInvoice':
-        this.onPrintInvoice(copayerID, invoicePayerid, index)
+        this.onPrintInvoice(copayerID, invoicePayerid, index, invoiceReportType)
         break
       default:
         break
     }
   }
 
-  onPrintInvoice = (copayerID, invoicePayerid, index) => {
+  onPrintInvoice = (
+    copayerID,
+    invoicePayerid,
+    index,
+    invoiceReportType,
+    forceSave = false,
+  ) => {
     const { values, dispatch } = this.props
-    const { invoicePayer } = values
-    const modifiedOrNewAddedPayer = invoicePayer.filter(payer => {
-      if (payer.id === undefined && payer.isCancelled) return false
-      if (payer.id) return payer.isModified
-      return true
-    })
-    let parametrPaload
+    const { invoicePayer, visitGroup } = values
+    const isGroup = invoiceReportType === INVOICE_REPORT_TYPES.GROUPINVOICE
+    const reportID = isGroup ? 89 : 15
+    this.setState({ isGroupPrint: isGroup })
+    let parametrPayload
     if (copayerID) {
-      parametrPaload = {
+      parametrPayload = {
         InvoiceId: values.invoice ? values.invoice.id : '',
         CopayerId: copayerID,
         InvoicePayerid: invoicePayerid,
         printIndex: index,
+        printType: invoiceReportType,
       }
     } else {
-      parametrPaload = {
+      parametrPayload = {
         InvoiceId: values.invoice ? values.invoice.id : '',
+        printType: invoiceReportType,
       }
     }
-    if (modifiedOrNewAddedPayer.length > 0) {
+    const saveAndPrint = () => {
+      let currentPrintIndex
+      if (parametrPayload.printIndex !== undefined) {
+        const { printIndex, ...other } = parametrPayload
+        parametrPayload = {
+          ...other,
+        }
+        currentPrintIndex = invoicePayer.filter(
+          (item, i) => !item.isCancelled && i < printIndex,
+        ).length
+      }
+
+      const callback = () => {
+        this.setState(preState => ({
+          submitCount: preState.submitCount + 1,
+          hasNewSignature: !preState.hasNewSignature,
+        }))
+        if (currentPrintIndex !== undefined) {
+          const {
+            billing: { entity = {} },
+          } = this.props
+          parametrPayload = {
+            ...parametrPayload,
+            InvoicePayerid: entity.invoicePayer[currentPrintIndex].id,
+            printType: invoiceReportType,
+          }
+        }
+
+        this.onShowReport(reportID, {
+          visitGroup,
+          ...parametrPayload,
+        })
+      }
+      this.upsertBilling(callback)
+    }
+    if (forceSave) {
+      saveAndPrint()
+    } else {
+      const modifiedOrNewAddedPayer = invoicePayer.filter(payer => {
+        if (payer.id === undefined && payer.isCancelled) return false
+        if (payer.id) return payer.isModified
+        return true
+      })
+      if (modifiedOrNewAddedPayer.length > 0 || this.state.hasNewSignature) {
+        dispatch({
+          type: 'global/updateState',
+          payload: {
+            openConfirm: true,
+            openConfirmTitle: '',
+            openConfirmText: 'Confirm',
+            openConfirmContent: `Save changes and print invoice?`,
+            onConfirmSave: () => {
+              saveAndPrint()
+            },
+          },
+        })
+      } else {
+        this.onShowReport(reportID, { visitGroup, ...parametrPayload })
+      }
+    }
+  }
+
+  onPrintInvoiceClick = invoiceReportType => {
+    const {
+      dispatch,
+      values: { visitGroupStatusDetails = [] },
+    } = this.props
+    if (
+      invoiceReportType === INVOICE_REPORT_TYPES.GROUPINVOICE &&
+      visitGroupStatusDetails.some(x => !x.isBillingSaved)
+    ) {
       dispatch({
-        type: 'global/updateState',
+        type: 'global/updateAppState',
         payload: {
           openConfirm: true,
-          openConfirmTitle: '',
-          openConfirmText: 'Confirm',
-          openConfirmContent: `Save changes and print invoice?`,
+          openConfirmContent: `One or more invoice(s) are not in \'Billing\' status. Confirm to print?`,
           onConfirmSave: () => {
-            let currentPrintIndex
-            if (parametrPaload.printIndex !== undefined) {
-              const { printIndex, ...other } = parametrPaload
-              parametrPaload = {
-                ...other,
-              }
-              currentPrintIndex = invoicePayer.filter(
-                (item, i) => !item.isCancelled && i < printIndex,
-              ).length
-            }
-
-            const callback = () => {
-              this.setState(preState => ({
-                submitCount: preState.submitCount + 1,
-              }))
-              if (currentPrintIndex !== undefined) {
-                const {
-                  billing: { entity = {} },
-                } = this.props
-                parametrPaload = {
-                  ...parametrPaload,
-                  InvoicePayerid: entity.invoicePayer[currentPrintIndex].id,
-                }
-              }
-
-              this.onShowReport(15, parametrPaload)
-            }
-            this.upsertBilling(callback)
+            this.onPrintInvoice(
+              undefined,
+              undefined,
+              undefined,
+              invoiceReportType,
+              true,
+            )
           },
         },
       })
     } else {
-      this.onShowReport(15, parametrPaload)
+      this.onPrintInvoice(undefined, undefined, undefined, invoiceReportType)
     }
-  }
-
-  onPrintInvoiceClick = () => {
-    this.onPrintInvoice(undefined)
   }
 
   onPrintVisitInvoiceClick = () => {
     const { values } = this.props
-    const parametrPaload = {
+    const parametrPayload = {
       InvoiceId: values.invoice ? values.invoice.id : '',
     }
 
-    this.onShowReport(80, parametrPaload)
+    this.onShowReport(80, parametrPayload)
   }
 
   handleAddPayment = async payment => {
@@ -1011,6 +1116,19 @@ class Billing extends Component {
     })
   }
 
+  updateInvoiceSignature = signature => {
+    const { dispatch, values, patient, setFieldValue } = this.props
+    const { thumbnail } = signature
+    if (thumbnail) {
+      this.setState({ hasNewSignature: true })
+    }
+    setFieldValue('invoice', {
+      ...values.invoice,
+      signatureName: thumbnail ? patient.name : undefined,
+      signature: thumbnail ? thumbnail : undefined,
+    })
+  }
+
   render() {
     const {
       showReport,
@@ -1019,6 +1137,8 @@ class Billing extends Component {
       showSchemeValidationPrompt,
       schemeValidations,
       submitCount,
+      isGroupPayment,
+      disabledPayment,
     } = this.state
     const {
       classes,
@@ -1028,7 +1148,7 @@ class Billing extends Component {
       loading,
       dispenseLoading,
       setFieldValue,
-      setValues,
+      setValues: setValuesHook,
       patient,
       sessionInfo,
       user,
@@ -1042,6 +1162,25 @@ class Billing extends Component {
       clinicSettings,
       codetable,
     } = this.props
+    const setValues = v => {
+      let newValues = v
+      if (v.visitGroupStatusDetails?.length > 0) {
+        newValues = {
+          ...v,
+          visitGroupStatusDetails: v.visitGroupStatusDetails.map(x => {
+            if (x.visitFK === v.id)
+              return {
+                ...x,
+                totalClaim: v.finalClaim,
+                outstandingBalance: v.invoice.outstandingBalance,
+              }
+            return x
+          }),
+        }
+      }
+      setValuesHook(newValues)
+    }
+
     const formikBag = {
       values,
       setFieldValue,
@@ -1065,13 +1204,21 @@ class Billing extends Component {
       isEnableVisitationInvoiceReport = false,
       autoPrintOnCompletePayment = false,
     } = clinicSettings
-    let src
+    let packageDrawdownSignatureSrc
     if (
       values.packageRedeemAcknowledge &&
       values.packageRedeemAcknowledge.signature !== '' &&
       values.packageRedeemAcknowledge.signature !== undefined
     ) {
-      src = `${base64Prefix}${values.packageRedeemAcknowledge.signature}`
+      packageDrawdownSignatureSrc = `${base64Prefix}${values.packageRedeemAcknowledge.signature}`
+    }
+    let invoiceSignatureSrc
+    if (
+      values?.invoice?.signature &&
+      values?.invoice?.signature !== '' &&
+      values?.invoice?.signature !== undefined
+    ) {
+      invoiceSignatureSrc = `${base64Prefix}${values?.invoice?.signature}`
     }
 
     return (
@@ -1102,6 +1249,7 @@ class Billing extends Component {
                               )
                             : dispense.entity
                         }
+                        history={this.props.history}
                         dispatch={this.props.dispatch}
                         onDrugLabelClick={this.handleDrugLabelClick}
                         showDrugLabelSelection={
@@ -1245,7 +1393,10 @@ class Billing extends Component {
                 {isEnablePackage && this.state.isConsumedPackage && (
                   <Button
                     color={
-                      src !== '' && src !== undefined ? 'success' : 'danger'
+                      packageDrawdownSignatureSrc !== '' &&
+                      packageDrawdownSignatureSrc !== undefined
+                        ? 'success'
+                        : 'danger'
                     }
                     onClick={() => {
                       this.setState({
@@ -1258,7 +1409,25 @@ class Billing extends Component {
                   </Button>
                 )}
                 <Button
+                  size='sm'
+                  color={
+                    invoiceSignatureSrc !== '' &&
+                    invoiceSignatureSrc !== undefined
+                      ? 'success'
+                      : 'danger'
+                  }
+                  onClick={() => {
+                    this.setState({
+                      isShowInvoiceSignature: true,
+                    })
+                  }}
+                  disabled={this.state.isEditing || values.id === undefined}
+                >
+                  Patient Signature
+                </Button>
+                <Button
                   color='info'
+                  size='sm'
                   onClick={this.backToDispense}
                   disabled={
                     this.state.isEditing ||
@@ -1275,6 +1444,7 @@ class Billing extends Component {
                 </Button>
                 <Button
                   color='primary'
+                  size='sm'
                   onClick={this.handleSaveBillingClick}
                   disabled={
                     this.state.isEditing ||
@@ -1287,6 +1457,7 @@ class Billing extends Component {
                 </Button>
                 <Button
                   color='success'
+                  size='sm'
                   disabled={
                     this.state.isEditing ||
                     values.id === undefined ||
@@ -1312,33 +1483,38 @@ class Billing extends Component {
         </CommonModal>
         <CommonModal
           open={showAddPaymentModal}
-          title='Add Payment'
+          title={`Add ${isGroupPayment ? 'Group' : ''} Payment`}
           onClose={this.toggleAddPaymentModal}
           observe='AddPaymentForm'
           maxWidth='lg'
         >
-          <AddPayment
-            handleSubmit={this.handleAddPayment}
-            invoicePayerName={patient.name}
-            invoicePayment={values.invoicePayment}
-            invoice={{
-              ...values.invoice,
-              outstandingBalance: values.invoice.outstandingBalance,
-              payerTypeFK: INVOICE_PAYER_TYPE.PATIENT,
-              paymentReceivedByUserFK: user.id,
-              paymentCreatedBizSessionFK: sessionInfo.id,
-              paymentReceivedBizSessionFK: sessionInfo.id,
-              finalPayable: values.finalPayable,
-              totalClaim: values.finalClaim,
-            }}
-          />
+          {showAddPaymentModal && (
+            <AddPayment
+              handleSubmit={this.handleAddPayment}
+              invoicePayerName={patient.name}
+              invoicePayment={values.invoicePayment}
+              invoice={{
+                ...values.invoice,
+                outstandingBalance: values.invoice.outstandingBalance,
+                payerTypeFK: INVOICE_PAYER_TYPE.PATIENT,
+                paymentReceivedByUserFK: user.id,
+                paymentCreatedBizSessionFK: sessionInfo.id,
+                paymentReceivedBizSessionFK: sessionInfo.id,
+                finalPayable: values.finalPayable,
+                totalClaim: values.finalClaim,
+              }}
+              disabledPayment={disabledPayment}
+              isGroupPayment={isGroupPayment}
+              visitGroupStatusDetails={values.visitGroupStatusDetails?.filter(
+                x => x.outstandingBalance > 0,
+              )}
+            />
+          )}
         </CommonModal>
         <CommonModal
           open={showReport}
           onClose={this.onCloseReport}
-          title={
-            reportPayload.reportID === 15 ? 'Invoice' : 'Visitation Invoice'
-          }
+          title={this.getInvoiceReportTitle(reportPayload)}
           maxWidth='lg'
         >
           <ReportViewer
@@ -1360,9 +1536,29 @@ class Billing extends Component {
           <Signature
             signatureName={patient.name}
             updateSignature={this.updateSignature}
-            image={src}
-            isEditable={src === '' || src === undefined}
+            image={packageDrawdownSignatureSrc}
+            isEditable={
+              packageDrawdownSignatureSrc === '' ||
+              packageDrawdownSignatureSrc === undefined
+            }
             signatureNameLabel='Patient Name'
+          />
+        </CommonModal>
+        <CommonModal
+          open={this.state.isShowInvoiceSignature}
+          title='Patient Signature'
+          onClose={() => {
+            this.setState({
+              isShowInvoiceSignature: false,
+            })
+          }}
+        >
+          <Signature
+            signatureName={patient.name}
+            updateSignature={this.updateInvoiceSignature}
+            image={invoiceSignatureSrc}
+            signatureNameLabel='Patient Name'
+            allowClear={true}
           />
         </CommonModal>
         <ViewPatientHistory top='239px' />

@@ -16,7 +16,7 @@ import Authorized from '@/utils/Authorized'
 import { findGetParameter } from '@/utils/utils'
 import * as WidgetConfig from './config'
 
-const styles = (theme) => ({
+const styles = theme => ({
   root: {},
   hide: {
     display: 'none',
@@ -40,9 +40,6 @@ const styles = (theme) => ({
   listItemDate: {
     position: 'absolute',
     right: '21%',
-  },
-  paragraph: {
-    marginLeft: theme.spacing(1),
   },
   leftPanel: {
     position: 'sticky',
@@ -84,8 +81,8 @@ const styles = (theme) => ({
     fontSize: '0.7rem',
     padding: '2px 3px',
     height: 20,
-    cursor: 'pointer'
-  }
+    cursor: 'pointer',
+  },
 })
 @withFormikExtend({
   mapPropsToValues: ({ patientHistory }) => {},
@@ -98,12 +95,12 @@ const styles = (theme) => ({
   mainDivHeight: global.mainDivHeight,
 }))
 class DispenseHistory extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.myRef = React.createRef()
 
-    this.widgets = WidgetConfig.widgets(props).filter((o) => {
+    this.widgets = WidgetConfig.widgets(props).filter(o => {
       if (o.authority === undefined) return true
       const accessRight = Authorized.check(o.authority)
       return accessRight && accessRight.rights !== 'hidden'
@@ -112,11 +109,11 @@ class DispenseHistory extends Component {
     this.state = {
       selectedItems: localStorage.getItem('patientHistoryWidgets')
         ? JSON.parse(localStorage.getItem('patientHistoryWidgets'))
-        : this.widgets.map((widget) => widget.id),
+        : this.widgets.map(widget => widget.id),
     }
   }
 
-  componentWillMount () {
+  componentWillMount() {
     const { dispatch, mode } = this.props
 
     dispatch({
@@ -127,7 +124,7 @@ class DispenseHistory extends Component {
     })
   }
 
-  getTitle = (row) => {
+  getTitle = row => {
     const { name = '' } = row
 
     return (
@@ -143,13 +140,13 @@ class DispenseHistory extends Component {
     )
   }
 
-  getContent = (data) => {
+  getContent = data => {
     const Widget = data.component
     const { dispenseHistory } = this.props.patientHistory
     return <Widget current={dispenseHistory || {}} />
   }
 
-  render () {
+  render() {
     const {
       style,
       classes,
@@ -185,14 +182,12 @@ class DispenseHistory extends Component {
               height,
             }}
           >
-            {this.widgets.map((o) => {
+            {this.widgets.map(o => {
               return (
                 <div ref={this.myRef}>
                   <Accordion
                     mode='multiple'
-                    defaultActive={[
-                      0,
-                    ]}
+                    defaultActive={[0]}
                     onChange={(event, p, expanded) => {
                       if (expanded) {
                         setTimeout(() => {

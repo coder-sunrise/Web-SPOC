@@ -43,13 +43,7 @@ class PaymentCollection extends ReportBase {
   renderContent = (reportDatas) => {
     return (
       <Accordion
-        // active={this.state.activePanel}
-        // onChange={this.handleActivePanelChange}
-        defaultActive={[
-          0,
-          1,
-          2,
-        ]}
+        defaultActive={[0, 1, 2]}
         mode='multiple'
         leftIcon
         expandIcon={<SolidExpandMore fontSize='large' />}
@@ -68,29 +62,7 @@ class PaymentCollection extends ReportBase {
           },
         ]}
       />
-    )
-    // return (
-    //   <GridContainer>
-    //     <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
-    //       <h4>Payment Collection Details</h4>
-    //     </GridItem>
-    //     <GridItem md={12}>
-    //       <PaymentCollectionList reportDatas={reportDatas} />
-    //     </GridItem>
-    //     <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
-    //       <h4>Summary</h4>
-    //     </GridItem>
-    //     <GridItem md={12}>
-    //       <Summary reportDatas={reportDatas} />
-    //     </GridItem>
-    //     <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
-    //       <h4>Summary By Payment Mode</h4>
-    //     </GridItem>
-    //     <GridItem md={12}>
-    //       <SumList reportDatas={reportDatas} />
-    //     </GridItem>
-    //   </GridContainer>
-    // )
+    ) 
   }
 }
 

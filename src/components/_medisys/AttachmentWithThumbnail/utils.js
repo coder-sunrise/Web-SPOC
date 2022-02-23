@@ -7,24 +7,11 @@ export const imageFileExtensions = [
   'png',
 ]
 
-export const wordFileExtensions = [
-  '.doc',
-  '.docx',
-  'doc',
-  'docx',
-]
+export const wordFileExtensions = ['.doc', '.docx', 'doc', 'docx']
 
-export const excelFileExtensions = [
-  '.xls',
-  '.xlsx',
-  'xlsx',
-  'xls',
-]
+export const excelFileExtensions = ['.xls', '.xlsx', 'xlsx', 'xls']
 
-export const pdfFileExtensions = [
-  '.pdf',
-  'pdf',
-]
+export const pdfFileExtensions = ['.pdf', 'pdf']
 
 export const getThumbnail = (original, { scale, width, height }) => {
   let canvas = document.createElement('canvas')
@@ -57,7 +44,18 @@ export const generateThumbnailAsync = async (
         const image = new Image()
         image.src = imageSource
         image.onload = () => {
-          const thumbnail = getThumbnail(image, size)
+          let newWidth = size.width
+          let newHeight = size.height
+
+          if (image.height * (size.width / image.width) > size.height) {
+            newWidth = (size.width * size.height) / image.height
+          } else {
+            newHeight = image.height * (size.width / image.width)
+          }
+          const thumbnail = getThumbnail(image, {
+            width: newWidth,
+            height: newHeight,
+          })
           thumbnailData = thumbnail.toDataURL(`image/${fileExtension}`)
           resolve()
         }

@@ -5,8 +5,6 @@ import moment from 'moment'
 import { withStyles } from '@material-ui/core'
 import AccessTime from '@material-ui/icons/AccessTime'
 import ErrorOutline from '@material-ui/icons/ErrorOutline'
-// big calendar
-import BigCalendar from 'react-big-calendar'
 // common component
 import {
   CardBody,
@@ -18,6 +16,7 @@ import {
   timeFormat,
   timeFormat24Hour,
 } from '@/components'
+import { CALENDAR_VIEWS } from '@/utils/constants'
 
 const styles = () => ({
   icon: {
@@ -38,7 +37,7 @@ const styles = () => ({
   },
 })
 
-const getTimeString = (value) => {
+const getTimeString = value => {
   if (moment(value, timeFormat).isValid()) {
     return moment(value, timeFormat).format(timeFormat)
   }
@@ -48,7 +47,7 @@ const getTimeString = (value) => {
   return 'N/A'
 }
 
-const getDoctorBlockTimeString = (value) => moment(value).format(timeFormat)
+const getDoctorBlockTimeString = value => moment(value).format(timeFormat)
 
 const DoctorEventContent = ({ popoverEvent, classes }) => {
   const startTime = getDoctorBlockTimeString(popoverEvent.startDateTime)
@@ -89,7 +88,7 @@ const DoctorEventContent = ({ popoverEvent, classes }) => {
 class DoctorBlockPopover extends React.Component {
   getTimeRange = () => {
     const { classes, popoverEvent, calendarView } = this.props
-    if (calendarView === BigCalendar.Views.MONTH) return ''
+    if (calendarView === CALENDAR_VIEWS.MONTH) return ''
 
     return (
       <Fragment>
@@ -102,7 +101,7 @@ class DoctorBlockPopover extends React.Component {
     )
   }
 
-  render () {
+  render() {
     const { popoverEvent, classes } = this.props
     const { appointmentStatusFk } = popoverEvent
 

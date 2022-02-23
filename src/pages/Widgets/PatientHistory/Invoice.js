@@ -9,7 +9,7 @@ import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import AmountSummary from './AmountSummary'
 import tablestyles from './PatientHistoryStyle.less'
 import { mergeClasses } from '@material-ui/styles'
-
+import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 const numberstyle = {
   color: 'darkBlue',
   fontWeight: 500,
@@ -106,7 +106,7 @@ const baseColumns = classes => {
               <div style={{ position: 'relative', top: 2 }}>
                 {drugMixtureIndicator(row, -20)}
                 {row.isPreOrder && (
-                  <Tooltip title='Pre-Order'>
+                  <Tooltip title='New Pre-Order'>
                     <div
                       className={classes.rightIcon}
                       style={{
@@ -188,8 +188,7 @@ const baseColumns = classes => {
       title: 'UOM',
       width: 80,
       render: (text, row) => (
-        <Tooltip
-          title = {row.dispenseUOMDisplayValue}>
+        <Tooltip title={row.dispenseUOMDisplayValue}>
           <div style={wrapCellTextStyle}>{text}</div>
         </Tooltip>
       ),
@@ -208,7 +207,7 @@ const baseColumns = classes => {
       align: 'right',
       render: (text, row) =>
         showCurrency(
-          row.isPreOrder && !row.isChargeToday
+          (row.isPreOrder && !row.isChargeToday) || row.hasPaid
             ? 0
             : row.totalAfterItemAdjustment,
         ),
@@ -253,16 +252,25 @@ export default ({ current, theme, isFullScreen = true, classes }) => {
       />
       <GridContainer style={{ paddingTop: theme.spacing(2) }}>
         <GridItem xs={12} sm={6} md={isFullScreen ? 8 : 6}>
-          {current.invoice && current.invoice.remark && (
+          {current.invoice && (
             <div style={{ marginLeft: -8 }}>
-              <span style={{ fontWeight: 500 }}>Invoice Remarks:</span>
-              <TextField
-                inputRootCustomClasses={tablestyles.historyText}
-                noUnderline
-                multiline
-                disabled
-                value={current.invoice.remark || ''}
-              />
+              {current.invoice.remark && (
+                <div>
+                  <span style={{ fontWeight: 500 }}>Invoice Remarks:</span>
+                  <TextField
+                    inputRootCustomClasses={tablestyles.historyText}
+                    noUnderline
+                    multiline
+                    disabled
+                    value={current.invoice.remark || ''}
+                  />
+                </div>
+              )}
+              <div>
+                <VisitOrderTemplateIndicateString
+                  visitOrderTemplateDetails={current.visitOrderTemplateDetails}
+                ></VisitOrderTemplateIndicateString>
+              </div>
             </div>
           )}
         </GridItem>

@@ -114,7 +114,7 @@ const Detail = ({
                           id: 'inventory.master.vaccination.code',
                         })}
                         {...args}
-                        disabled={values.isActive}
+                        disabled={values.isActive && values.id}
                       />
                     )
                   }}
@@ -176,7 +176,7 @@ const Detail = ({
                       simple
                       valueField='id'
                       textField='name'
-                      options={(()=>{
+                      options={(() => {
                         var arr = []
                         arr.push({
                           id: 'isAutoGenerateCertificate',
@@ -186,25 +186,29 @@ const Detail = ({
                             style: {},
                           },
                         })
-                        if(clinicSettings.isEnableCHAS){
-                          arr.push(...[{
-                            id: 'isChasAcuteClaimable',
-                            name: 'CHAS Acute Claimable',
-  
-                            layoutConfig: {
-                              style: {},
-                            },
-                          },
-                          {
-                            id: 'isChasChronicClaimable',
-                            name: 'CHAS Chronic Claimable',
-  
-                            layoutConfig: {
-                              style: {},
-                            },
-                          }])
+                        if (clinicSettings.isEnableCHAS) {
+                          arr.push(
+                            ...[
+                              {
+                                id: 'isChasAcuteClaimable',
+                                name: 'CHAS Acute Claimable',
+
+                                layoutConfig: {
+                                  style: {},
+                                },
+                              },
+                              {
+                                id: 'isChasChronicClaimable',
+                                name: 'CHAS Chronic Claimable',
+
+                                layoutConfig: {
+                                  style: {},
+                                },
+                              },
+                            ],
+                          )
                         }
-                        if(clinicSettings.isEnableMedisave){
+                        if (clinicSettings.isEnableMedisave) {
                           arr.push({
                             id: 'isMedisaveClaimable',
                             name: 'CDMP Claimable',
@@ -214,20 +218,21 @@ const Detail = ({
                             },
                           })
                         }
-                        if(clinicSettings.isEnableNurseWorkItem){
+                        if (clinicSettings.isEnableNurseWorkItem) {
                           arr.push({
                             id: 'isNurseActualizable',
-                            name: 'Actualize by Nurse',
-                            tooltip: 'Item will generate task for nurse to actualize',
-                            disabled: hasActiveSession && vaccinationDetail.entity?.id,
+                            name: 'Actualized by Nurse',
+                            tooltip:
+                              'Item will generate task for nurse to actualize',
+                            disabled:
+                              hasActiveSession && vaccinationDetail.entity?.id,
                             layoutConfig: {
                               style: {},
                             },
                           })
                         }
                         return arr
-                      })()
-                      }
+                      })()}
                       onChange={(e, s) => {
                         if (s.isMedisaveClaimable !== undefined)
                           toggleMedisaveVaccination(s)

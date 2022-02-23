@@ -3,7 +3,9 @@ import service from '../services'
 
 export default createListViewModel({
   namespace: 'radiologyWorklist',
-  config: {},
+  config: {
+    queryOnLoad: false,
+  },
   param: {
     service,
     state: {},

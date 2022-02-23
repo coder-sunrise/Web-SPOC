@@ -4,7 +4,11 @@ import numeral from 'numeral'
 import Authorized from '@/utils/Authorized'
 import { currencySymbol, qtyFormat } from '@/utils/config'
 import { dateFormatLong, dateFormatLongWithTime } from '@/components'
-import { UNFIT_TYPE, SCRIBBLE_NOTE_TYPE } from './constants'
+import {
+  UNFIT_TYPE,
+  SCRIBBLE_NOTE_TYPE,
+  VISITDOCTOR_CONSULTATIONSTATUS,
+} from './constants'
 import { calculateAgeFromDOB } from './dateUtils'
 
 const status = [
@@ -323,7 +327,7 @@ const consultationDocumentTypes = [
     name: 'Certificate of Attendance',
     prop: 'corCertificateOfAttendance',
     getSubject: r => {
-      return `Certificate of Attendance ${r.accompaniedBy}`
+      return `Certificate of Attendance ${r.accompaniedBy || ''}`
     },
     convert: r => {
       return {
@@ -1231,7 +1235,7 @@ export const inventoryItemListing = (
 ) => {
   let inventoryItemList = list.map(x => {
     const { code, displayValue, sellingPrice = 0 } = x
-    const uom = x.dispensingUOM ? x.dispensingUOM.name : x.uom.name
+    const uom = x.dispensingUOM ? x.dispensingUOM.name : x.uom?.name
 
     return {
       value: x.id,
@@ -1384,9 +1388,10 @@ export const ReportsOnSignOffOption = {
   Memo: 'Memo',
   VaccinationCertificate: 'Vaccination Certificate',
   OtherDocuments: 'Other Documents',
+  PrescriptionSheet: 'Prescription Sheet',
 }
 export const ReportsOnSignOff = [
-  { code: ReportsOnSignOffOption.DrugLabel, description: 'Drug Label' },
+  // { code: ReportsOnSignOffOption.DrugLabel, description: 'Drug Label' },
   {
     code: ReportsOnSignOffOption.MedicalCertificate,
     description: 'Medical Certificate',
@@ -1408,6 +1413,10 @@ export const ReportsOnSignOff = [
     code: ReportsOnSignOffOption.OtherDocuments,
     description: 'Other Documents',
   },
+  {
+    code: ReportsOnSignOffOption.PrescriptionSheet,
+    description: 'Prescription Sheet',
+  },
 ]
 export const ReportsOnCompletePaymentOption = {
   DrugLabel: 'Drug Label',
@@ -1415,7 +1424,7 @@ export const ReportsOnCompletePaymentOption = {
   Receipt: 'Receipt',
 }
 export const ReportsOnCompletePayment = [
-  { code: ReportsOnCompletePaymentOption.DrugLabel, description: 'Drug Label' },
+  // { code: ReportsOnCompletePaymentOption.DrugLabel, description: 'Drug Label' },
   { code: ReportsOnCompletePaymentOption.Invoice, description: 'Invoice' },
   { code: ReportsOnCompletePaymentOption.Receipt, description: 'Receipt' },
 ]
@@ -1436,6 +1445,7 @@ const scribbleTypes = [
   { type: 'chiefComplaints', typeFK: SCRIBBLE_NOTE_TYPE.CHIEFCOMPLAINTS },
   { type: 'note', typeFK: SCRIBBLE_NOTE_TYPE.CLINICALNOTES },
   { type: 'plan', typeFK: SCRIBBLE_NOTE_TYPE.PLAN },
+  { type: 'radiology', typeFK: SCRIBBLE_NOTE_TYPE.RADIOLOGY },
 ]
 
 const formTypes = [
@@ -1602,6 +1612,17 @@ const formTypes = [
           LCFormSurgicalChargesAnnex,
         }
       },
+    },
+  },
+  {
+    value: '2',
+    name: 'From',
+    prop: 'corForm',
+    downloadConfig: {
+      id: 0,
+      key: 'FormId',
+      subject: 'From',
+      draft: row => {},
     },
   },
 ]
@@ -1864,7 +1885,15 @@ const ltAdmittingSpecialty = [
 const queueProcessorType = [
   {
     value: 1,
-    name: 'Auto Generate Statement',
+    name: 'XRay Interface',
+  },
+  {
+    value: 2,
+    name: 'SAP Interface',
+  },
+  {
+    value: 3,
+    name: 'Lab Interface',
   },
 ]
 
@@ -1884,21 +1913,6 @@ const queueItemStatus = [
   {
     value: 4,
     name: 'Failed',
-  },
-]
-
-export const costPriceTypes = [
-  {
-    value: 1,
-    name: 'Average Cost Price',
-  },
-  {
-    value: 2,
-    name: 'Last Cost Price (Before Bonus)',
-  },
-  {
-    value: 3,
-    name: 'Last Cost Price (After Bonus)',
   },
 ]
 
@@ -1929,6 +1943,11 @@ const preOrderItemCategory = [
   },
 ]
 
+export const documentCategorys = [
+  { value: 1, name: 'Consultation Document' },
+  { value: 2, name: 'Form' },
+]
+
 export const documentTemplateTypes = [
   {
     value: 1,
@@ -1945,6 +1964,14 @@ export const documentTemplateTypes = [
   {
     value: 4,
     name: 'Others',
+  },
+  {
+    value: 5,
+    name: 'Consent Form',
+  },
+  {
+    value: 6,
+    name: 'Questionnaire',
   },
 ]
 
@@ -1969,7 +1996,7 @@ const pharmacyStatus = [
   {
     statusFK: 4,
     name: 'Completed',
-  }
+  },
 ]
 
 const examinationSteps = [
@@ -1995,6 +2022,39 @@ const examinationSteps = [
     statusFK: 5,
     name: 'Cancelled',
   },
+]
+const individualCommentGroup = [
+  {
+    value: 1,
+    name: '1',
+  },
+  {
+    value: 2,
+    name: '2',
+  },
+  {
+    value: 3,
+    name: '3',
+  },
+  {
+    value: 4,
+    name: '4',
+  },
+  {
+    value: 5,
+    name: '5',
+  },
+  {
+    value: 6,
+    name: '6',
+  },
+]
+
+const visitDoctorConsultationStatusColor = [
+  { value: VISITDOCTOR_CONSULTATIONSTATUS.WAITING, color: '#4255BD' },
+  { value: VISITDOCTOR_CONSULTATIONSTATUS.INPROGRESS, color: '#CF1322' },
+  { value: VISITDOCTOR_CONSULTATIONSTATUS.PAUSED, color: '#CF1322' },
+  { value: VISITDOCTOR_CONSULTATIONSTATUS.COMPLETED, color: '#777' },
 ]
 
 export {
@@ -2036,4 +2096,6 @@ export {
   languageCategory,
   pharmacyStatus,
   examinationSteps,
+  individualCommentGroup,
+  visitDoctorConsultationStatusColor,
 }

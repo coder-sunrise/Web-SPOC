@@ -1,14 +1,17 @@
-import { PageContainer, Icon } from '@/components'
-import { ProTable, Select, Input, Button } from '@medisys/component'
+import { PageContainer, Button } from '@/components'
+import { ProTable, Select, Input } from '@medisys/component'
 import patientService from '@/services/patient'
+import PersonAdd from '@material-ui/icons/PersonAdd'
+import PersonSharp from '@material-ui/icons/PersonSharp'
 import { connect, history } from 'umi'
 import { formatMessage } from 'umi'
 import { getAppendUrl } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 
-import { TextField, DatePicker } from '@/components'
+import { TextField, DatePicker, CodeSelect } from '@/components'
 import { useState, useRef } from 'react'
 import { ActionType } from '@ant-design/pro-table'
+import { Tooltip } from '@material-ui/core'
 const { queryList, upsert, query, remove } = patientService
 const api = {
   remove,
@@ -74,7 +77,8 @@ const defaultColumns = [
     key: 'dob',
     dataIndex: 'dob',
     title: 'DOB',
-    render: (_dom: any, entity: any) => entity.dob?.format('DD MMM yyyy') || '-',
+    render: (_dom: any, entity: any) =>
+      entity.dob?.format('DD MMM yyyy') || '-',
     width: 100,
     search: false,
   },
@@ -83,6 +87,12 @@ const defaultColumns = [
     key: 'nationality',
     dataIndex: 'nationality',
     title: 'Nationality',
+    search: false,
+  },
+  {
+    key: 'copayers',
+    dataIndex: 'copayers',
+    title: 'Co-Payers',
     search: false,
   },
   {
@@ -132,8 +142,30 @@ const defaultColumns = [
     title: '',
     dataIndex: 'dob',
     renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
+      return <DatePicker style={{ width: 150 }} label='DOB' placeholder='' />
+    },
+  },
+  {
+    hideInTable: true,
+    title: '',
+    dataIndex: 'copayer',
+    renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
       return (
-        <DatePicker style={{ width: 150 }} label='DOB' placeholder='' />
+        <Tooltip
+          placement='left'
+          title='Select “All” will retrieve active and inactive co-payers'
+        >
+          <CodeSelect
+            style={{ width: 250 }}
+            label={formatMessage({
+              id: 'finance.scheme.search.cpname',
+            })}
+            maxTagCount={0}
+            mode='multiple'
+            code='ctCopayer'
+            labelField='displayValue'
+          />
+        </Tooltip>
       )
     },
   },
@@ -181,14 +213,14 @@ const saveColumnsSetting = (dispatch, columnsSetting) => {
 
 const PatientIndex = ({
   dispatch,
-  patient: { favPatDBColumnSetting = {} , onRefresh = false},
+  patient: { favPatDBColumnSetting = {}, onRefresh = false },
 }) => {
   const createPatProfileAccessRight = Authorized.check(
     'patientdatabase.newpatient',
   )
-  const actionRef = useRef<ActionType>();
+  const actionRef = useRef<ActionType>()
 
-  if(onRefresh){
+  if (onRefresh) {
     actionRef?.current?.reload()
     dispatch({
       type: 'patient/updateState',
@@ -199,12 +231,12 @@ const PatientIndex = ({
   }
   return (
     <PageContainer pageHeaderRender={false}>
-      <ProTable 
-        search={{span:8}}
+      <ProTable
+        search={{ span: 8 }}
         rowSelection={false}
         columns={defaultColumns}
         api={api}
-        actionRef={actionRef} 
+        actionRef={actionRef}
         search={{
           optionRender: (searchConfig, formProps, dom) => {
             return (
@@ -225,12 +257,14 @@ const PatientIndex = ({
         onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
         options={{ density: false, reload: false }}
         toolBarRender={() => {
-          if(createPatProfileAccessRight && createPatProfileAccessRight.rights !== 'hidden')
+          if (
+            createPatProfileAccessRight &&
+            createPatProfileAccessRight.rights !== 'hidden'
+          )
             return [
               <Button
-                type='primary'
-                icon={<Icon type='adduser' />}
                 color='primary'
+                size='sm'
                 disabled={createPatProfileAccessRight.rights == 'disable'}
                 onClick={() => {
                   dispatch({
@@ -245,7 +279,8 @@ const PatientIndex = ({
                   })
                 }}
               >
-                Register New Patient
+                <PersonAdd />
+                New Patient
               </Button>,
             ]
           return []
@@ -261,25 +296,30 @@ const PatientIndex = ({
                   onClick={() => {
                     showPatient(row)
                   }}
-                  type='primary'
-                  icon={<Icon type='user' />}
-                />
+                  color='primary'
+                  size='sm'
+                  justIcon
+                >
+                  <PersonSharp />
+                </Button>
               )
             },
           },
         ]}
-        beforeSearchSubmit={({ search, dob, ...values }) => {
+        beforeSearchSubmit={({ search, dob, copayer, ...values }) => {
           dispatch({
             type: 'patient/updateState',
             payload: {
               shouldQueryOnClose: location.pathname.includes('patient'),
             },
           })
+          if (copayer && copayer.length > 0 && copayer[0] === -99) copayer = []
           return {
             ...values,
             apiCriteria: {
               searchValue: search,
               dob: dob,
+              copayerIds: (copayer || []).join('|'),
               includeinactive: true,
             },
           }

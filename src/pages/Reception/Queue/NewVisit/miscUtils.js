@@ -2,11 +2,17 @@ import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import { bool } from 'prop-types'
 import _ from 'lodash'
 import { cleanFields } from '@/pages/Consultation/utils'
-import { VISIT_TYPE } from '@/utils/constants'
+import {
+  VISIT_TYPE,
+  VISITDOCTOR_CONSULTATIONSTATUS,
+  MEDICALCHECKUP_WORKITEM_STATUS,
+} from '@/utils/constants'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
+import { notification } from '@/components'
 import { VISIT_STATUS } from '../variables'
+import { roundTo } from '@/utils/utils'
 
-const filterDeletedFiles = (item) => {
+const filterDeletedFiles = item => {
   // filter out not yet confirmed files
   // fileIndexFK ===
   if (item.fileIndexFK === undefined && item.isDeleted) return false
@@ -27,29 +33,29 @@ const mapAttachmentToUploadInput = (
 ) =>
   !fileIndexFK
     ? {
-      // file status === uploaded, only 4 info needed for API
-      fileIndexFK: rest.id,
-      thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
-      sortOrder: index,
-      fileName,
-      attachmentType,
-      attachmentTypeFK,
-      isDeleted,
-      remarks: rest.remarks,
-    }
+        // file status === uploaded, only 4 info needed for API
+        fileIndexFK: rest.id,
+        thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
+        sortOrder: index,
+        fileName,
+        attachmentType,
+        attachmentTypeFK,
+        isDeleted,
+        remarks: rest.remarks,
+      }
     : {
-      // file status === confirmed, need to provide full object for API
-      ...rest,
-      fileIndexFK,
-      thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
-      fileName,
-      attachmentType,
-      attachmentTypeFK,
-      isDeleted,
-      sortOrder: index,
-    }
+        // file status === confirmed, need to provide full object for API
+        ...rest,
+        fileIndexFK,
+        thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
+        fileName,
+        attachmentType,
+        attachmentTypeFK,
+        isDeleted,
+        sortOrder: index,
+      }
 
-const convertEyeForms = (values) => {
+const convertEyeForms = values => {
   let { visitEyeRefractionForm = {}, visitEyeVisualAcuityTest } = values
   const durtyFields = [
     'isDeleted',
@@ -63,11 +69,7 @@ const convertEyeForms = (values) => {
     typeof visitEyeRefractionForm.formData === 'object'
   ) {
     let { formData } = visitEyeRefractionForm
-    cleanFields(formData, [
-      ...durtyFields,
-      'OD',
-      'OS',
-    ])
+    cleanFields(formData, [...durtyFields, 'OD', 'OS'])
 
     values.visitEyeRefractionForm.formData = _.isEmpty(formData)
       ? undefined
@@ -79,7 +81,7 @@ const convertEyeForms = (values) => {
     cleanFields(clone, durtyFields)
 
     const newTestForm = testForm.reduce((p, c) => {
-      let newItem = clone.find((i) => i.id === c.id)
+      let newItem = clone.find(i => i.id === c.id)
       if (!newItem) {
         if (c.id > 0 && c.concurrencyToken && c.isDeleted === false) {
           return [
@@ -117,11 +119,29 @@ const getVisitOrderTemplateTotal = (vType, template) => {
     )
     currentTypeItems.map(item => {
       if (item[type.dtoName].isActive === true) {
-        activeItemTotal += item.total || 0
+        activeItemTotal += item.totalAftAdj || 0
       }
     })
   })
   return activeItemTotal
+}
+
+export const getMCReportLanguage = (patient, clinicSettings) => {
+  const {
+    primaryPrintoutLanguage = 'EN',
+    secondaryPrintoutLanguage = '',
+  } = clinicSettings
+  const { printLanguageCode = '' } = patient
+  if (
+    printLanguageCode.trim().length &&
+    (printLanguageCode.toUpperCase() ===
+      primaryPrintoutLanguage.toUpperCase() ||
+      printLanguageCode.toUpperCase() ===
+        secondaryPrintoutLanguage.toUpperCase())
+  ) {
+    return printLanguageCode.toUpperCase()
+  }
+  return primaryPrintoutLanguage
 }
 
 export const formikMapPropsToValues = ({
@@ -143,6 +163,7 @@ export const formikMapPropsToValues = ({
     let currentVisitOrderTemplateFK
     let defaultVisitPreOrderItem = []
     let totalTempCharge
+    let medicalCheckupWorkitem
     if (clinicInfo) {
       // doctorProfile = doctorProfiles.find(
       //   (item) => item.doctorMCRNo === clinicInfo.primaryMCRNO,
@@ -157,7 +178,9 @@ export const formikMapPropsToValues = ({
           parseFloat(queueNo) > largest ? parseFloat(queueNo) : largest,
         0,
       )
-      qNo = parseFloat(largestQNo + 1).toFixed(1)
+      qNo = parseFloat(largestQNo + 1).toFixed(
+        clinicSettings.settings.isQueueNoDecimal ? 1 : 0,
+      )
     }
 
     const { visitInfo, roomFK, appointment } = visitRegistration
@@ -165,7 +188,12 @@ export const formikMapPropsToValues = ({
     if (Object.keys(visitInfo).length > 0) {
       qNo = visitInfo.queueNo
     }
-    const { visit = {} } = visitInfo
+    const {
+      visit = {
+        visitDoctor: [],
+        visitBasicExaminations: [{}],
+      },
+    } = visitInfo
 
     const visitEntries = Object.keys(visit).reduce(
       (entries, key) => ({
@@ -174,18 +202,28 @@ export const formikMapPropsToValues = ({
       }),
       {},
     )
-
     const { location } = history
     if (location.query.pdid) {
       doctorProfile = doctorProfiles.find(
-        (item) =>
-          item.clinicianProfile.id === parseInt(location.query.pdid, 10),
+        item => item.clinicianProfile.id === parseInt(location.query.pdid, 10),
       )
       doctorProfileFK = doctorProfile ? doctorProfile.id : doctorProfileFK
     }
 
     if (clinicSettings) {
       visitPurposeFK = Number(clinicSettings.settings.defaultVisitType)
+      if (visitPurposeFK === VISIT_TYPE.MC) {
+        medicalCheckupWorkitem = [
+          {
+            reportPriority: 'Normal',
+            statusFK: MEDICALCHECKUP_WORKITEM_STATUS.NEW,
+            reportLanguage: getMCReportLanguage(
+              patientInfo,
+              clinicSettings.settings,
+            ),
+          },
+        ]
+      }
     }
 
     const { visitOrderTemplateFK, visitEyeRefractionForm } = visitEntries
@@ -198,7 +236,7 @@ export const formikMapPropsToValues = ({
         }
       } else if (doctorProfileFK) {
         const defaultDoctor = doctorProfiles.find(
-          (doctor) => doctor.id === doctorProfileFK,
+          doctor => doctor.id === doctorProfileFK,
         )
         if (defaultDoctor.clinicianProfile.roomAssignment) {
           roomAssignmentFK =
@@ -206,48 +244,55 @@ export const formikMapPropsToValues = ({
         }
       }
       if (appointment && appointment.appointments.length) {
-        currentVisitOrderTemplateFK = appointment.appointments[0].visitOrderTemplateFK
-        const visitOrderTemplate = (visitRegistration.visitOrderTemplateOptions ||
-          []).find(vi => vi.id === currentVisitOrderTemplateFK)
+        currentVisitOrderTemplateFK =
+          appointment.appointments[0].visitOrderTemplateFK
+        const visitOrderTemplate = (
+          visitRegistration.visitOrderTemplateOptions || []
+        ).find(vi => vi.id === currentVisitOrderTemplateFK)
         if (visitOrderTemplate) {
-          totalTempCharge = getVisitOrderTemplateTotal(currentVisitOrderTemplateFK, visitOrderTemplate)
+          totalTempCharge = getVisitOrderTemplateTotal(
+            currentVisitOrderTemplateFK,
+            visitOrderTemplate,
+          )
         }
-        defaultVisitPreOrderItem = appointment.appointments[0].appointmentPreOrderItem.map(po => {
-          const { 
-            actualizedPreOrderItemFK,
-            preOrderItemType,
-            itemName,
-            quantity,
-            orderByUser,
-            orderDate,
-            remarks,
-            amount,
-            hasPaid,
-            dispenseUOM,
-            code,
-          } = po
-          return {
-            actualizedPreOrderItemFK,
-            preOrderItemType,
-            itemName,
-            quantity,
-            orderByUser,
-            orderDate,
-            remarks,
-            amount,
-            hasPaid,
-            dispenseUOM,
-            code,
-          }
-        })
+        defaultVisitPreOrderItem = appointment.appointments[0].appointmentPreOrderItem.map(
+          po => {
+            const {
+              actualizedPreOrderItemFK,
+              preOrderItemType,
+              itemName,
+              quantity,
+              orderByUser,
+              orderDate,
+              remarks,
+              amount,
+              hasPaid,
+              dispenseUOM,
+              code,
+            } = po
+            return {
+              actualizedPreOrderItemFK,
+              preOrderItemType,
+              itemName,
+              quantity,
+              orderByUser,
+              orderDate,
+              remarks,
+              amount,
+              hasPaid,
+              dispenseUOM,
+              code,
+            }
+          },
+        )
       }
-    }
-    else {
+    } else {
       currentVisitOrderTemplateFK = visitOrderTemplateFK
     }
-    const isVisitOrderTemplateActive = (visitRegistration.visitOrderTemplateOptions ||
-      [])
-      .map((option) => option.id)
+    const isVisitOrderTemplateActive = (
+      visitRegistration.visitOrderTemplateOptions || []
+    )
+      .map(option => option.id)
       .includes(currentVisitOrderTemplateFK)
 
     let newFormData
@@ -265,17 +310,32 @@ export const formikMapPropsToValues = ({
       } else if (visitEntries.referralPatientProfileFK) {
         referralType = 'Patient'
       }
-    } else if (patientInfo && (
-      patientInfo.referredBy === 'Company' ||
-      patientInfo.referredBy === 'Patient')
+
+      if (
+        visitEntries.visitPurposeFK === VISIT_TYPE.MC &&
+        !visitEntries.isForInvoiceReplacement &&
+        visitEntries.medicalCheckupWorkitem.length > 0
+      ) {
+        medicalCheckupWorkitem = [
+          {
+            ...visitEntries.medicalCheckupWorkitem[0],
+            reportLanguage: visitEntries.medicalCheckupWorkitem[0].reportLanguage.split(
+              ',',
+            ),
+          },
+        ]
+      }
+    } else if (
+      patientInfo &&
+      (patientInfo.referredBy === 'Company' ||
+        patientInfo.referredBy === 'Patient')
     ) {
       referralType = patientInfo.referredBy
     } else if (clinicSettings.settings.isVisitReferralSourceMandatory) {
       referralType = 'Company'
     }
 
-    if(visitRegistration.consReady === undefined)
-      consReady = true
+    if (visitRegistration.consReady === undefined) consReady = true
 
     return {
       queueNo: qNo,
@@ -286,11 +346,16 @@ export const formikMapPropsToValues = ({
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
       doctorProfileFK,
       ...visitEntries,
+      medicalCheckupWorkitem,
       visitOrderTemplateFK: isVisitOrderTemplateActive
         ? currentVisitOrderTemplateFK
         : undefined,
-      visitPreOrderItem: !visitEntries.id ? defaultVisitPreOrderItem : visitEntries.visitPreOrderItem,
-      visitOrderTemplateTotal: !visitEntries.id ? totalTempCharge : visitEntries.visitOrderTemplateTotal,
+      visitPreOrderItem: !visitEntries.id
+        ? defaultVisitPreOrderItem
+        : visitEntries.visitPreOrderItem,
+      visitOrderTemplateTotal: !visitEntries.id
+        ? totalTempCharge
+        : visitEntries.visitOrderTemplateTotal,
       visitEyeRefractionForm: {
         ...visitEyeRefractionForm,
         formData: newFormData,
@@ -308,11 +373,66 @@ export const formikMapPropsToValues = ({
       referralPatientProfileFK: visitEntries.id
         ? visitEntries.referralPatientProfileFK
         : patientInfo.referredByPatientFK,
+      visitDoctor: [
+        ...visitEntries.visitDoctor.filter(d => !d.isPrimaryDoctor),
+      ],
+      visitPrimaryDoctor: visitEntries.visitDoctor.find(d => d.isPrimaryDoctor),
+      visitBasicExaminations: visitEntries.visitBasicExaminations.map(be => ({
+        ...be,
+        visitPurposeFK: visitEntries.visitPurposeFK || visitPurposeFK,
+      })),
     }
   } catch (error) {
     console.log({ error })
     return {}
   }
+}
+
+const getMedicalCheckupCWorkitemDoctor = (
+  medicalCheckupWorkitemDoctor = [],
+  visitDoctor = [],
+) => {
+  const removeDoctor = medicalCheckupWorkitemDoctor.filter(
+    item =>
+      !visitDoctor.find(
+        d => !d.isDeleted && item.doctorProfileFK === d.doctorProfileFK,
+      ),
+  )
+
+  const remainDoctor = medicalCheckupWorkitemDoctor.filter(item =>
+    visitDoctor.find(
+      d => !d.isDeleted && item.doctorProfileFK === d.doctorProfileFK,
+    ),
+  )
+
+  const newDoctor = visitDoctor.filter(
+    item =>
+      !item.isDeleted &&
+      !medicalCheckupWorkitemDoctor.find(
+        d => item.doctorProfileFK === d.doctorProfileFK,
+      ),
+  )
+
+  let newMCWorkitemDoctor = [
+    ...remainDoctor,
+    ...removeDoctor.map(item => ({
+      ...item,
+      isDelete: true,
+    })),
+    ...newDoctor.map(item => ({
+      doctorProfileFK: item.doctorProfileFK,
+    })),
+  ]
+
+  newMCWorkitemDoctor.forEach(item => {
+    var doctor = visitDoctor.find(
+      d => !d.isDeleted && item.doctorProfileFK === d.doctorProfileFK,
+    )
+    item.isPrimaryDoctor = doctor.isPrimaryDoctor
+    item.sequence = doctor.sequence
+  })
+
+  return newMCWorkitemDoctor
 }
 
 export const formikHandleSubmit = (
@@ -332,6 +452,7 @@ export const formikHandleSubmit = (
     queueLog,
     patientInfo,
     visitRegistration,
+    clinicSettings,
     onConfirm,
   } = props
 
@@ -378,13 +499,71 @@ export const formikHandleSubmit = (
     )
   }
 
+  let newVisitDoctor = restValues.visitDoctor
+    .filter(d => d.id > 0 || !d.isDeleted)
+    .map((d, index) => {
+      return {
+        ...d,
+        sequence: index,
+        consultationStatus: VISITDOCTOR_CONSULTATIONSTATUS.WAITING,
+      }
+    })
+
+  if (restValues.visitPrimaryDoctor) {
+    newVisitDoctor.push({
+      ...restValues.visitPrimaryDoctor,
+      doctorProfileFK: restValues.doctorProfileFK,
+    })
+  } else {
+    newVisitDoctor.push({
+      doctorProfileFK: restValues.doctorProfileFK,
+      isPrimaryDoctor: true,
+      sequence: -1,
+      consultationStatus: VISITDOCTOR_CONSULTATIONSTATUS.WAITING,
+    })
+  }
+
+  if (
+    values.visitPurposeFK === VISIT_TYPE.MC &&
+    !values.isForInvoiceReplacement
+  ) {
+    restValues.medicalCheckupWorkitem = [
+      {
+        ...values.medicalCheckupWorkitem[0],
+        reportLanguage: values.medicalCheckupWorkitem[0].reportLanguage.join(
+          ',',
+        ),
+        medicalCheckupWorkitemDoctor: getMedicalCheckupCWorkitemDoctor(
+          values.medicalCheckupWorkitem[0].medicalCheckupWorkitemDoctor,
+          newVisitDoctor,
+        ),
+        statusFK:
+          values.medicalCheckupWorkitem[0].statusFK ||
+          MEDICALCHECKUP_WORKITEM_STATUS.NEW,
+      },
+    ]
+  } else if (
+    values.medicalCheckupWorkitem &&
+    values.medicalCheckupWorkitem.length > 0
+  ) {
+    if (values.medicalCheckupWorkitem[0].id) {
+      restValues.medicalCheckupWorkitem[0].isDeleted = true
+      restValues.medicalCheckupWorkitem[0].medicalCheckupWorkitemDoctor.forEach(
+        item => (item.isDeleted = true),
+      )
+    } else {
+      restValues.medicalCheckupWorkitem = []
+    }
+  }
   const payload = {
     cfg: {
       message: id ? 'Visit updated' : 'Visit created',
     },
     id,
     ...restVisitInfo,
-    queueNo: parseFloat(queueNo).toFixed(1),
+    queueNo: parseFloat(queueNo).toFixed(
+      clinicSettings.settings.isQueueNoDecimal ? 1 : 0,
+    ),
     queueNoPrefix: sessionInfo.sessionNoPrefix,
     visit: {
       visitAttachment: uploaded,
@@ -395,6 +574,7 @@ export const formikHandleSubmit = (
       roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       ...restValues, // override using formik values
+      visitDoctor: newVisitDoctor,
       referralBy: _referralBy,
       visitEyeRefractionForm,
     },
@@ -403,7 +583,7 @@ export const formikHandleSubmit = (
   dispatch({
     type: 'visitRegistration/upsert',
     payload,
-  }).then((response) => {
+  }).then(response => {
     if (response) {
       const { location } = history
       sendQueueNotification({
@@ -414,14 +594,13 @@ export const formikHandleSubmit = (
         dispatch({
           type: 'calendar/refresh',
         })
-      else{
+      else {
         dispatch({
           type: 'queueLog/initState',
         })
         dispatch({
           type: 'queueLog/refresh',
         })
-
       }
       // reset form can not after onConfirm function.
       // bcz in NewVisit component have function 'componentWillUnmount'

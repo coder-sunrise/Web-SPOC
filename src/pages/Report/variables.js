@@ -103,6 +103,12 @@ export const menuData = [
   },
   {
     title: 'Finance',
+    text: 'Radiology Statistic Report',
+    url: '/report/radiologystatisticreport',
+    authority: 'report.finance.radiologystatisticreport',
+  },
+  {
+    title: 'Finance',
     text: 'Xero Invoices Report',
     url: '/report/xeroinvoicesreport',
     authority: 'report.finance.xeroinvoicesreport',
@@ -115,7 +121,7 @@ export const menuData = [
   },
   {
     title: 'Inventory',
-    text: 'Low Stock Report',
+    text: 'Inventory Threshold Report',
     url: '/report/lowstockreport',
     authority: 'report.inventory.lowstock',
   },
@@ -149,6 +155,13 @@ export const menuData = [
     url: '/report/expiringstockreport',
     authority: 'report.inventory.expiringstockreport',
   },
+
+  {
+    title: 'Inventory',
+    text: 'Dispensary Report',
+    url: '/report/dispensaryreport',
+    authority: 'report.inventory.partialdispensereport',
+  },
   {
     title: 'Other',
     text: 'Diagnosis Trending Report',
@@ -178,5 +191,11 @@ export const menuData = [
     text: 'Package Expiry Report',
     url: '/report/packageexpiry',
     authority: 'report.finance.packageexpiryreport',
+  },
+  {
+    title: 'Finance',
+    text: 'Pre-Order Listing Report',
+    url: '/report/preorderlistingreport',
+    authority: 'report.finance.preorderlistingreport',
   },
 ]

@@ -211,7 +211,7 @@ export default createFormViewModel({
             type: 'updateState',
             payload: {
               shouldQueryOnClose: false,
-              onRefresh : true,
+              onRefresh: true,
             },
           })
         }
@@ -222,6 +222,7 @@ export default createFormViewModel({
           'dispense',
           'consultation',
           'patientdashboard',
+          'reportingdetails',
         ]
 
         const matchesExceptionalPath =
@@ -410,7 +411,7 @@ export default createFormViewModel({
         }
         return null
       },
-      *getStickyNotes({ payload }, { call,put }) {
+      *getStickyNotes({ payload }, { call, put }) {
         const r = yield call(service.queryStickyNotes, payload)
         const { status, data = [] } = r
         yield put({
@@ -421,14 +422,20 @@ export default createFormViewModel({
         })
         return data
       },
-      *saveStickyNotes({ payload }, { call,put }){
+      *saveStickyNotes({ payload }, { call, put }) {
         let r = {}
-        if(payload.id){
+        if (payload.id) {
           r = yield call(service.upsertStickyNotes, payload)
-        }else{
+        } else {
           r = yield call(service.createStickyNotes, payload)
         }
         return r
+      },
+      *getFamilyMembersInfo({ payload }, { call, put }) {
+        const r = yield call(service.getFamilyMembersInfo, payload)
+        const { status, data = [] } = r
+        if (status === '200') return data
+        return null
       },
     },
     reducers: {

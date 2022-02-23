@@ -798,11 +798,53 @@ th[class*='MuiTableCell-root-'] {
 }
 
 [class*='MuiCheckbox-colorSecondary-'] {
-    &.Mui-checked {
-        color: #3f51b5 !important;
-    }
+  &.Mui-checked {
+    color: #3f51b5 !important;
+  }
 }
 
-td[class*='TableGroupCell-cell-'] {
-  cursor: default !important;
+tr[class*='disableexpandedgroup'] {
+  td {
+    cursor: default !important;
+    div {
+      z-index: 0 !important;
+    }
+  }
+}
+
+td[class='ant-table-cell ant-table-cell-ellipsis'] {
+  span {
+    width: 100% !important;
+  }
+  div {
+    span[class='anticon anticon-exclamation-circle'] {
+      width: 18px !important;
+    }
+  }
+}
+
+.MuiTooltip-tooltip {
+  font-size: 0.8rem !important;
+}
+//fix bug 21300
+.ant-select-selection-overflow {
+  flex-wrap: unset;
+}
+
+.ant-btn-danger {
+  border-color: #cf1322;
+  background-color: #cf1322;
+}
+
+.ant-radio-disabled + span {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.threeline_textblock {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    max-height: 84px;
+    white-space: pre-wrap;
+    overflow: hidden;
 }

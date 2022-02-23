@@ -17,9 +17,9 @@ import withWebSocket from '@/components/Decorator/withWebSocket'
 import { getRawData } from '@/services/report'
 
 const labelTypes = [
-  'PATIENT_LABEL',
-  'PATIENT_LAB_LABEL',
-  'PATIENT_ADDRESS_LABEL',
+  'Patient_Label',
+  'Patient_Lab_Label',
+  'Patient_Address_Label',
 ]
 
 const useStyles = makeStyles(() => ({
@@ -46,33 +46,25 @@ const PatientLabelButton = ({
 }) => {
   const classes = useStyles()
 
-  const [
-    copyNo,
-    setCopyNo,
-  ] = useState(
+  const [copyNo, setCopyNo] = useState(
     labelTypes.reduce((a, b) => {
       return { ...a, [b]: 1 }
     }, {}),
   )
 
-  const [
-    popperOpen,
-    setPopperOpen,
-  ] = useState(false)
+  const [popperOpen, setPopperOpen] = useState(false)
 
   const openPopper = () => setPopperOpen(true)
   const closePopper = () => setPopperOpen(false)
 
-  const sizeConverter = (sizeCM) => {
+  const sizeConverter = sizeCM => {
     return sizeCM
       .split('x')
-      .map((o) =>
-        (10 * parseFloat(o.replace('cm', ''))).toString().concat('MM'),
-      )
+      .map(o => (10 * parseFloat(o.replace('cm', ''))).toString().concat('MM'))
       .join('_')
   }
 
-  const handleClick = async (labelType) => {
+  const handleClick = async labelType => {
     if (!Number.isInteger(copyNo[labelType])) return
 
     const { labelPrinterSize } = clinicSettings
@@ -101,34 +93,35 @@ const PatientLabelButton = ({
     <div className={classes.root}>
       <Popper
         open={popperOpen}
+        placement='bottom-start'
         transition
         overlay={
           <ClickAwayListener onClickAway={closePopper}>
             <MenuList role='menu'>
               {labelTypes.length > 0 &&
-                labelTypes.map((o) => {
+                labelTypes.map(o => {
                   return (
                     <MenuItem>
                       <Button
                         color='primary'
+                        size='sm'
+                        style={{ width: 120 }}
                         onClick={() => handleClick(o)}
                         disabled={!Number.isInteger(copyNo[o]) || sendingJob}
                       >
-                        {o !== 'PATIENT_LABEL' ? (
-                          o.replace('PATIENT_', '').replace('_', ' ')
-                        ) : (
-                          o.replace('_', ' ')
-                        )}
+                        {o !== 'Patient_Label'
+                          ? o.replace('Patient_', '').replace('_', ' ')
+                          : o.replace('_', ' ')}
                       </Button>
                       <InputNumber
                         size='small'
                         min={1}
                         max={10}
                         value={copyNo[o]}
-                        onChange={(value) => handleCopyNoChange(value, o)}
+                        onChange={value => handleCopyNoChange(value, o)}
                         className={classes.inputStyle}
                       />
-                      <span className={classes.qtyFont}>&nbsp;Qty</span>
+                      <span className={classes.qtyFont}>&nbsp;Copies</span>
                     </MenuItem>
                   )
                 })}

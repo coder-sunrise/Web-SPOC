@@ -1,71 +1,98 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { useSelector, useDispatch } from 'dva'
-import { Typography, Input } from 'antd'
+import { Table, Radio, Form } from 'antd'
+import { formatMessage } from 'umi'
 import moment from 'moment'
 import {
   GridContainer,
   ProgressButton,
+  Button,
   GridItem,
   CommonModal,
   dateFormatLongWithTimeNoSec12h,
+  Popconfirm,
+  TextField,
 } from '@/components'
+import Authorized from '@/utils/Authorized'
 import Banner from '@/pages/PatientDashboard/Banner'
 import {
   ExaminationSteps,
-  CannedTextButton,
-  RadiographerTag,
-} from '../../Components'
+  OrderDetails,
+  ExaminationDetails,
+  CancelConfirmation,
+  StartExaminationConfirmation,
+} from './components'
+import { SectionTitle, RightAlignGridItem } from '../../Components'
 import {
   RADIOLOGY_WORKITEM_STATUS,
   RADIOLOGY_WORKITEM_BUTTON,
-  CANNED_TEXT_TYPE,
 } from '@/utils/constants'
 import WorklistContext from '../WorklistContext'
-import Findings from '../../Components/Findings'
+import { examinationSteps } from '@/utils/codes'
+import { ReportViewer } from '@/components/_medisys'
 
-const RightAlignGridItem = ({ children, md = 6 }) => {
-  return (
-    <GridItem md={md} style={{ textAlign: 'right' }}>
-      {children}
-    </GridItem>
-  )
-}
-
-const RadiologyDetails = props => {
+const RadiologyDetails = () => {
   const dispatch = useDispatch()
-  const {
-    detailsId,
-    setDetailsId,
-    showDetails,
-    setShowDetails,
-    visitPurpose,
-  } = useContext(WorklistContext)
+  const { detailsId, setDetailsId, isReadOnly } = useContext(WorklistContext)
+
+  const [form] = Form.useForm()
 
   const details = useSelector(state => state.radiologyDetails)
-  const [examinationFinding, setExaminationFinding] = useState('')
-  const [comment, setComment] = useState('')
-  const patientBannerEntity = useSelector(state => state.patient)
+  const [showDetails, setShowDetails] = useState(false)
+  const [isDirty, setIsDirty] = useState(false)
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
+  const [showStartConfirm, setShowStartConfirm] = useState(false)
+  const [showRequiredField, setShowRequiredField] = useState(false)
   const [workitem, setWorkItem] = useState({})
 
+  const [combinedWorkitems, setCombinedWorkitems] = useState([])
+  const [examinationDetails, setExaminationDetails] = useState({})
+  const [showReport, setShowReport] = useState(false)
+  const patientProfileFK = details?.entity?.patientProfileFK
   useEffect(() => {
     if (detailsId) {
       dispatch({
         type: 'radiologyDetails/query',
         payload: { id: detailsId },
+      }).then(val => {
+        if (val) setShowDetails(true)
       })
-      setShowDetails(true)
     } else {
       setShowDetails(false)
+    }
+
+    return () => {
+      dispatch({
+        type: 'radiologyDetails/updateState',
+        payload: { entity: {} },
+      })
+
+      setWorkItem({})
+      setCombinedWorkitems([])
+      setExaminationDetails({})
+
+      setShowDetails(false)
+      setShowRequiredField(false)
+      setIsDirty(false)
     }
   }, [detailsId])
 
   useEffect(() => {
     if (details && details.entity) {
-      setWorkItem(details.entity)
-      setComment(details.entity.comment)
-      setExaminationFinding(details.entity.examinationFinding)
+      const { entity } = details
+      setWorkItem(entity)
+      setExaminationDetails({
+        comment: entity.comment,
+        examinationFinding: entity.examinationFinding,
+        radiologyScribbleNote: entity.radiologyScribbleNote,
+        assignedRadiographers: entity.assignedRadiographers,
+      })
     }
   }, [details])
+
+  useEffect(() => {
+    setCombinedWorkitems(getCombinedWorkitems(workitem.visitWorkitems))
+  }, [workitem, examinationDetails])
 
   const renderStatusButtons = () => {
     if (!details || !details.entity) return
@@ -74,242 +101,272 @@ const RadiologyDetails = props => {
       s => s.currentStatusFK === details.entity.statusFK,
     )
 
-    if (!buttonInfo) return
+    if (
+      !buttonInfo ||
+      Authorized.check(buttonInfo.authority).rights !== 'enable'
+    )
+      return
 
     return (
-      <>
-        {buttonInfo.enableCancel && (
-          <ProgressButton
-            color='#797979'
-            onClick={() => {
-              dispatch({
-                type: 'radiologyDetails/updateRadiologyWorkitem',
-                payload: {
-                  ...details.entity,
-                  id: details.entity.radiologyWorkitemId,
-                  statusFK: RADIOLOGY_WORKITEM_STATUS.CANCELLED,
-                },
-              })
-
-              setShowDetails(false)
-            }}
-          >
-            Cancel Examination
-          </ProgressButton>
-        )}
+      <React.Fragment>
+        {buttonInfo.enableCancel &&
+          Authorized.check('radiologyworklist.cancelexamination').rights ===
+            'enable' && (
+            <ProgressButton
+              color='#797979'
+              onClick={() => {
+                setShowCancelConfirm(true)
+              }}
+            >
+              Cancel Examination
+            </ProgressButton>
+          )}
         <ProgressButton
           color='success'
           onClick={() => {
-            handleSave(buttonInfo.nextStatusFK)
+            if (examinationDetails.assignedRadiographers.length === 0) {
+              setShowRequiredField(true)
+              return
+            }
+
+            const { visitWorkitems } = workitem
+
+            const currentPrimaryWorkitemFK = visitWorkitems.find(
+              v => v.radiologyWorkitemId === workitem.radiologyWorkitemId,
+            ).primaryWorkitemFK
+            if (
+              workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW &&
+              currentPrimaryWorkitemFK &&
+              visitWorkitems.filter(
+                v =>
+                  v.primaryWorkitemFK &&
+                  v.primaryWorkitemFK === currentPrimaryWorkitemFK,
+              ).length > 1
+            ) {
+              setShowStartConfirm(true)
+              return
+            }
+            handleSave({
+              statusFK: buttonInfo.nextStatusFK,
+            })
           }}
         >
           {buttonInfo.name}
         </ProgressButton>
-      </>
+      </React.Fragment>
     )
   }
 
-  const handleSave = statusFK => {
+  const toggleReport = () => {
+    setShowReport(!showReport)
+  }
+  const renderPrintButton = () => {
+    if (!details || !details.entity) return
+    const { statusFK: currentStatusFK } = details.entity
+    return (
+      [
+        RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED,
+        RADIOLOGY_WORKITEM_STATUS.COMPLETED,
+      ].includes(currentStatusFK) && (
+        <Button color='primary' onClick={toggleReport}>
+          Print
+        </Button>
+      )
+    )
+  }
+  const handleSave = (payload = {}) => {
     dispatch({
       type: 'radiologyDetails/updateRadiologyWorkitem',
       payload: {
-        ...details.entity,
+        ...workitem,
         id: details.entity.radiologyWorkitemId,
-        statusFK: statusFK ? statusFK : details.entity.statusFK,
-        comment: comment,
-        examinationFinding: examinationFinding,
+        ...examinationDetails,
+        ...payload,
       },
+    }).then(value => {
+      setDetailsId(null)
+      setShowDetails(false)
     })
-
-    setShowDetails(false)
-    setDetailsId(null)
   }
 
+  const handleClose = () => {
+    setDetailsId(null)
+    setShowDetails(false)
+  }
+
+  const handleCancel = cancellationReason => {
+    dispatch({
+      type: 'radiologyDetails/cancelRadiologyWorkitem',
+      payload: {
+        ...workitem,
+        id: workitem.radiologyWorkitemId,
+        ...examinationDetails,
+        statusFK: RADIOLOGY_WORKITEM_STATUS.CANCELLED,
+        cancellationReason: cancellationReason,
+      },
+    }).then(() => {
+      setShowDetails(false)
+      setDetailsId(null)
+      setShowCancelConfirm(false)
+    })
+  }
+
+  const getCombinedWorkitems = (allVisitWorkItems = []) => {
+    const primaryWorkitemFK = allVisitWorkItems.find(
+      c => c.radiologyWorkitemId === workitem.radiologyWorkitemId,
+    )?.primaryWorkitemFK
+    if (!primaryWorkitemFK) {
+      return []
+    }
+
+    return allVisitWorkItems
+      .filter(w => w.primaryWorkitemFK === primaryWorkitemFK)
+      .map(w => {
+        if (w.radiologyWorkitemId !== workitem.radiologyWorkitemId) return w
+
+        //To ensure to append current assigned radiographers for current opening workitem.
+        return {
+          ...w,
+          assignedRadiographers: examinationDetails.assignedRadiographers,
+        }
+      })
+  }
+
+  useEffect(() => {
+    console.log('isDirty', isDirty)
+  }, [isDirty])
+
+  const showOnlyCloseButton =
+    isReadOnly ||
+    workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
+    workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED ||
+    (
+      Authorized.check('radiologyworklist.saveexamination') || {
+        rights: 'hidden',
+      }
+    ).rights !== 'enable'
+
   return (
-    <CommonModal
-      open={showDetails}
-      title='Radiology Examination Details'
-      showFooter={true}
-      onConfirm={() => handleSave()}
-      onClose={() => {
-        setDetailsId(null)
-        setShowDetails(false)
-      }}
-      footProps={{
-        extraButtons: renderStatusButtons(),
-      }}
-      maxWidth='lg'
-      overrideLoading
-      observe=''
-    >
-      <GridContainer style={{ height: 700, overflowY: 'scroll' }}>
-        <GridItem md={12}>
-          <div style={{ padding: 8 }}>
-            <Banner
-              from='Radiology'
-              // activePreOrderItem={patientBannerEntity?.entity?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
-              patientInfo={patientBannerEntity}
-            />
-          </div>
-        </GridItem>
-        <GridItem md={12}>
-          <ExaminationSteps item={details.entity} />
-        </GridItem>
-        <GridItem md={12}>
-          <div>
-            <Typography.Title level={5}>Order Details</Typography.Title>
-            <GridContainer>
-              <GridItem md={4}>
-                <GridContainer>
-                  <RightAlignGridItem>Accession No :</RightAlignGridItem>
-                  <GridItem md={6}>{workitem.accessionNo}</GridItem>
-
-                  <RightAlignGridItem>Examination :</RightAlignGridItem>
-                  <GridItem md={6}>{workitem.itemDescription}</GridItem>
-
-                  <RightAlignGridItem>Priority :</RightAlignGridItem>
-                  <GridItem md={6}>{workitem.priority}</GridItem>
-
-                  <RightAlignGridItem>Doctor Instructions :</RightAlignGridItem>
-                  <GridItem md={6}>{workitem.instruction}</GridItem>
-                  <RightAlignGridItem>Remarks :</RightAlignGridItem>
-                  <GridItem md={6}>{workitem.remark}</GridItem>
-                </GridContainer>
-              </GridItem>
-              <GridItem md={2} />
-              <GridItem md={4}>
-                <GridContainer>
-                  <RightAlignGridItem>Order Created Time :</RightAlignGridItem>
-                  <GridItem md={6}>
-                    {moment(workitem.generateDate).format(
-                      dateFormatLongWithTimeNoSec12h,
-                    )}
-                  </GridItem>
-
-                  <RightAlignGridItem>Modality :</RightAlignGridItem>
-                  <GridItem md={6}> {workitem.modalityDescription} </GridItem>
-
-                  <RightAlignGridItem>Visit Type :</RightAlignGridItem>
-                  <GridItem md={6}>
-                    {visitPurpose &&
-                      workitem?.visitInfo &&
-                      visitPurpose.find(
-                        p => p.id === workitem.visitInfo.visitPurposeFK,
-                      ).name}
-                  </GridItem>
-
-                  <RightAlignGridItem>Visit Group No :</RightAlignGridItem>
-                  <GridItem md={6}>{workitem?.visitInfo?.visitGroup}</GridItem>
-                </GridContainer>
-              </GridItem>
-            </GridContainer>
-          </div>
-        </GridItem>
-        <GridItem md={12}>
-          <div>
-            <Typography.Title level={5}>Examination Details</Typography.Title>
-            {details.entity &&
-            details.entity.statusFK <=
-              RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT ? (
-              <GridContainer>
-                <GridItem md={2}>
-                  <RightAlignGridItem md={12}>
-                    Radiographer :
-                  </RightAlignGridItem>
-                </GridItem>
-                <GridItem md={10}>{/*  <RadiographerTag /> */}</GridItem>
-                <GridItem md={2}>
-                  <RightAlignGridItem md={12}>
-                    Radiographer Comment:
-                  </RightAlignGridItem>
-                </GridItem>
-                <GridItem md={10} style={{ textAlign: 'right' }}>
-                  <CannedTextButton
-                    buttonType='text'
-                    cannedTextTypeFK={CANNED_TEXT_TYPE.RADIOLOGYINSTRUCTION}
-                    style={{
-                      marginRight: 0,
-                      marginBottom: 8,
-                    }}
-                    handleSelectCannedText={cannedText => {
-                      setComment(comment + '\n' + cannedText.text)
-                    }}
-                  />
-                </GridItem>
-                <GridItem md={12}>
-                  <Input.TextArea
-                    value={comment}
-                    onChange={e => setComment(e.target.value)}
-                    autoSize={{ minRows: 3, maxRows: 5 }}
-                  />
-                </GridItem>
-              </GridContainer>
-            ) : (
-              <GridContainer>
-                <GridItem md={2}>
-                  <RightAlignGridItem md={12}>
-                    Radiographer :
-                  </RightAlignGridItem>
-                </GridItem>
-                <GridItem md={10}>Tamy Wu, Wammy Tu</GridItem>
-
-                <GridItem md={2}>
-                  <RightAlignGridItem md={12}>
-                    Radiographer Comment:
-                  </RightAlignGridItem>
-                </GridItem>
-                <GridItem md={10}>{workitem.comment}</GridItem>
-
-                {details.entity &&
-                details.entity.statusFK ===
-                  RADIOLOGY_WORKITEM_STATUS.COMPLETED ? (
-                  <>
-                    <GridItem md={2}>
-                      <RightAlignGridItem md={12}>
-                        Examination Findings:
-                      </RightAlignGridItem>
-                    </GridItem>
-
-                    <GridItem md={10}>
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: workitem.examinationFinding,
-                        }}
-                      />
-                    </GridItem>
-                  </>
-                ) : (
-                  <>
-                    <GridItem md={2}>
-                      <RightAlignGridItem md={12}>
-                        Cancel Reason:
-                      </RightAlignGridItem>
-                    </GridItem>
-
-                    <GridItem md={10}>{workitem.comment}</GridItem>
-                  </>
-                )}
-              </GridContainer>
-            )}
-          </div>
-        </GridItem>
-
-        {details.entity &&
-          details.entity.statusFK ===
-            RADIOLOGY_WORKITEM_STATUS.PENDINGREPORT && (
-            <GridItem md={12} style={{ marginTop: 5 }}>
-              <div>
-                <Findings
-                  defaultValue={details?.entity?.examinationFinding}
-                  onChange={value => setExaminationFinding(value)}
-                  workItem={workitem}
-                  {...props}
-                />
+    <React.Fragment>
+      <CommonModal
+        open={showDetails}
+        title='Radiology Examination Details'
+        showFooter={true}
+        confirmText='Save'
+        onClose={() => {
+          if (isDirty) {
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                openConfirm: true,
+                openConfirmContent: formatMessage({
+                  id: 'app.general.leave-without-save',
+                }),
+                onConfirmSave: handleClose,
+              },
+            })
+          } else {
+            setDetailsId(null)
+            setShowDetails(false)
+          }
+        }}
+        footProps={{
+          extraButtons: [
+            !showOnlyCloseButton ? renderStatusButtons() : undefined,
+            renderPrintButton(),
+          ],
+          onConfirm: !showOnlyCloseButton
+            ? () => {
+                handleSave()
+              }
+            : undefined,
+        }}
+        confirmProps={{ disable: true }}
+        maxWidth='lg'
+      >
+        <GridContainer
+          style={{ height: !isReadOnly ? 700 : undefined, overflowY: 'scroll' }}
+        >
+          {!isReadOnly && (
+            <GridItem md={12}>
+              <div style={{ padding: 8 }}>
+                <Banner from='Radiology' />
               </div>
             </GridItem>
           )}
-      </GridContainer>
-    </CommonModal>
+          <GridItem md={12}>
+            <ExaminationSteps item={workitem} />
+          </GridItem>
+          <GridItem md={12}>
+            <OrderDetails
+              workitem={workitem}
+              onCombinedOrderChange={value => {
+                setWorkItem({
+                  ...workitem,
+                  primaryWorkitemFK: value.find(
+                    v => v.radiologyWorkitemId == workitem.radiologyWorkitemId,
+                  ).primaryWorkitemFK,
+                  visitWorkitems: value,
+                  ...examinationDetails,
+                })
+                setIsDirty(true)
+              }}
+            />
+          </GridItem>
+          <GridItem md={12}>
+            <ExaminationDetails
+              onChange={val => {
+                setExaminationDetails(val)
+                setIsDirty(true)
+              }}
+              showRequiredField={showRequiredField}
+              workitem={workitem}
+            />
+          </GridItem>
+        </GridContainer>
+        <CancelConfirmation
+          open={showCancelConfirm}
+          workitem={workitem}
+          onCancelConfirm={cancellationReason => {
+            handleCancel(cancellationReason)
+          }}
+          onCancelClose={() => setShowCancelConfirm(false)}
+        />
+
+        <StartExaminationConfirmation
+          open={showStartConfirm}
+          workitem={workitem}
+          combinedWorkitems={combinedWorkitems}
+          onStartConfirm={() => {
+            handleSave({
+              statusFK: RADIOLOGY_WORKITEM_STATUS.INPROGRESS,
+              assignedRadiographers: _.uniqBy(
+                combinedWorkitems.flatMap(w => w.assignedRadiographers),
+                c => c.userProfileFK,
+              ),
+            })
+            setShowStartConfirm(false)
+          }}
+          onStartClose={() => setShowStartConfirm(false)}
+        />
+      </CommonModal>
+      <CommonModal
+        open={showReport}
+        onClose={toggleReport}
+        title='Radiology Examination Finding Report'
+        maxWidth='lg'
+      >
+        <ReportViewer
+          showTopDivider={false}
+          reportID={82}
+          reportParameters={{
+            radiologyWorkitemId: detailsId,
+            patientProfileFK,
+          }}
+          defaultScale={1.5}
+        />
+      </CommonModal>
+    </React.Fragment>
   )
 }
 

@@ -11,7 +11,7 @@ import Authorized from '@/utils/Authorized'
 class CheckboxGroup extends React.Component {
   state = {}
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     const {
       options = [],
@@ -22,40 +22,39 @@ class CheckboxGroup extends React.Component {
     } = props
     const v = {}
 
-    options.forEach((o) => {
+    options.forEach(o => {
       v[`${o[valueField]}`] = false
     })
     if (field && Array.isArray(field.value)) {
-      field.value.forEach((e) => {
+      field.value.forEach(e => {
         v[`${e}`] = true
       })
     } else if (value || defaultValue) {
-      ;(value || defaultValue).forEach((e) => {
+      ;(value || defaultValue).forEach(e => {
         v[`${e}`] = true
       })
     }
     this.state = v
   }
 
-  static getDerivedStateFromProps (nextProps, preState) {
+  static getDerivedStateFromProps(nextProps, preState) {
     const { options, field, value, valueField = 'value' } = nextProps
-    const v = preState
-    // console.log(value)
+    const v = preState 
     if (field && Array.isArray(field.value)) {
-      options.forEach((o) => {
+      options.forEach(o => {
         v[`${o[valueField]}`] = false
       })
-      field.value.forEach((e) => {
+      field.value.forEach(e => {
         v[`${e}`] = true
       })
 
       return v
     }
     if (value) {
-      options.forEach((o) => {
+      options.forEach(o => {
         v[`${o[valueField]}`] = false
       })
-      value.forEach((e) => {
+      value.forEach(e => {
         v[`${e}`] = true
       })
       return v
@@ -63,7 +62,7 @@ class CheckboxGroup extends React.Component {
     return null
   }
 
-  handleChange = (name) => (event) => {
+  handleChange = name => event => {
     const newVal = {
       [name]: event.target.checked,
     }
@@ -78,12 +77,12 @@ class CheckboxGroup extends React.Component {
     const v = {
       target: {
         value: Object.keys(newSt)
-          .map((o) => ({
+          .map(o => ({
             v: o,
             selected: newSt[o],
           }))
-          .filter((n) => n.selected)
-          .map((n) => n.v),
+          .filter(n => n.selected)
+          .map(n => n.v),
       },
     }
     if (form && field) {
@@ -107,48 +106,58 @@ class CheckboxGroup extends React.Component {
       valueField = 'value',
       textField = 'label',
       labelClass,
+      displayInlineBlock = false,
       ...resetProps
     } = this.props
-
-    // console.log(options, valueField, textField)
+ 
     return (
       <div
         className={classnames({
           [className]: true,
           'checkbox-container': true,
         })}
-        style={{ width: '100%', height: 'auto' }}
+        style={{
+          width: '100%',
+          height: 'auto',
+          display: displayInlineBlock ? 'inline-block' : 'block',
+        }}
         {...props}
       >
-        {options.map((o) => {
+        {options.map(o => {
           const v = `${o[valueField]}`
-          
+
           return (
             <Tooltip
-              title={o.tooltip ? <span style={{ fontSize: '1.5em' }}>{o.tooltip}</span> : ''}
+              title={
+                o.tooltip ? (
+                  <span style={{ fontSize: '1.2em' }}>{o.tooltip}</span>
+                ) : (
+                  ''
+                )
+              }
               disableFocusListener
             >
               <div
-                className={`${classes.checkboxAndRadio} ${vertical
-                  ? ''
-                  : classes.checkboxAndRadioHorizontal}`}
+                className={`${classes.checkboxAndRadio} ${
+                  vertical ? '' : classes.checkboxAndRadioHorizontal
+                }`}
                 key={v}
               >
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                      style={o.disabled ? { pointerEvents: "none" } : {}}
-                        checked={state[v]}
-                        onChange={this.handleChange(v)}
-                        value={v}
-                        color='primary'
-                        disabled={o.disabled || disabled}
-                      />
-                    }
-                    label={
-                      <span dangerouslySetInnerHTML={{ __html: o[textField] }} />
-                    }
-                  />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      style={o.disabled ? { pointerEvents: 'none' } : {}}
+                      checked={state[v]}
+                      onChange={this.handleChange(v)}
+                      value={v}
+                      color='primary'
+                      disabled={o.disabled || disabled}
+                    />
+                  }
+                  label={
+                    <span dangerouslySetInnerHTML={{ __html: o[textField] }} />
+                  }
+                />
               </div>
             </Tooltip>
           )
@@ -157,7 +166,7 @@ class CheckboxGroup extends React.Component {
     )
   }
 
-  render () {
+  render() {
     const { classes, form, field, onChange, ...restProps } = this.props
     return (
       <CustomInput

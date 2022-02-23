@@ -4,15 +4,26 @@ import { compose } from 'redux'
 import _ from 'lodash'
 import moment from 'moment'
 // material ui
-import { Paper, withStyles, Link } from '@material-ui/core'
 import Print from '@material-ui/icons/Print'
 import Refresh from '@material-ui/icons/Refresh'
 import Edit from '@material-ui/icons/Edit'
+import { InputNumber } from 'antd'
+import {
+  MenuList,
+  ClickAwayListener,
+  MenuItem,
+  makeStyles,
+  Paper,
+  withStyles,
+  Link,
+} from '@material-ui/core'
 import Delete from '@material-ui/icons/Delete'
+import withWebSocket from '@/components/Decorator/withWebSocket'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import { formatMessage } from 'umi' // common component
 import Warining from '@material-ui/icons/Error'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
+import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import {
   Button,
   ProgressButton,
@@ -22,7 +33,9 @@ import {
   TextField,
   CommonModal,
   NumberInput,
+  Popper,
   notification,
+  Checkbox,
 } from '@/components'
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import Authorized from '@/utils/Authorized'
@@ -31,12 +44,17 @@ import {
   NOTIFICATION_TYPE,
   NOTIFICATION_STATUS,
   NURSE_WORKITEM_STATUS,
+  RADIOLOGY_WORKITEM_STATUS,
+  DISPENSE_FROM,
 } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 // sub components
 import TableData from './TableData'
 import DrugLabelSelection from './DrugLabelSelection'
 import NurseActualization from './NurseActualization'
+import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 
 // variables
 import {
@@ -58,6 +76,7 @@ import RadiologyDetails from '@/pages/Radiology/Worklist/Details'
 import WorklistContext, {
   WorklistContextProvider,
 } from '@/pages/Radiology/Worklist/WorklistContext'
+import DispenseDetailsSpecimenCollection from '@/pages/Lab/SpecimenCollection/components/DispenseDetailsSpecimenCollection'
 
 const styles = theme => ({
   paper: {
@@ -93,7 +112,7 @@ const styles = theme => ({
   },
   groupStyle: {
     padding: '3px 0px',
-    backgroundColor: '#CCCCCC',
+    backgroundColor: 'rgb(240, 248, 255)',
   },
 })
 
@@ -111,20 +130,20 @@ const DispenseDetails = ({
   onEditOrderClick,
   onFinalizeClick,
   codetable,
-  dispense,
+  dispense = {},
+  handlePrint,
   history,
   onDrugLabelClick,
   showDrugLabelSelection,
   onDrugLabelSelectionClose,
-  onDrugLabelSelected,
-  onDrugLabelNoChanged,
   selectedDrugs,
+  currentDrugToPrint,
   clinicSettings,
   servingPersons = [],
-  visit,
-  doctorprofile = [],
   patient,
   user,
+  visitRegistration,
+  isIncludeExpiredItem = false,
 }) => {
   const {
     dispenseItems = [],
@@ -135,6 +154,11 @@ const DispenseDetails = ({
     visitPurposeFK,
     visitRemarks,
     defaultExpandedGroups,
+    orderCreateTime,
+    orderCreateBy,
+    visitStatus,
+    hasAnySpecimenCollected,
+    id: visitId,
   } = values || {
     invoice: { invoiceItem: [] },
   }
@@ -145,12 +169,15 @@ const DispenseDetails = ({
     coPayer = [],
   } = invoice
 
+  const { openFrom } = dispense
+  const isFromMedicalCheckup = openFrom === DISPENSE_FROM.MEDICALCHECKUP
+  const [popperOpen, setPopperOpen] = useState(false)
+  const openPopper = () => setPopperOpen(true)
+  const closePopper = () => setPopperOpen(false)
+  const [selectedAll, setSelectedAll] = useState(false)
+
   const { inventorymedication, inventoryvaccination } = codetable
   const { settings = {} } = clinicSettings
-  const currentDoc = doctorprofile.filter(x => x.id === visit.doctorProfileFK)
-  const docInfo =
-    currentDoc && currentDoc.length > 0 ? currentDoc[0].clinicianProfile : {}
-
   const discardCallback = r => {
     if (r) {
       const userProfile = user.data.clinicianProfile
@@ -159,6 +186,16 @@ const DispenseDetails = ({
           ? `${userProfile.title}. ${userProfile.name || ''}`
           : `${userProfile.name || ''}`
       }`
+      const { entity } = visitRegistration
+      const visitTypeName = JSON.parse(settings.visitTypeSetting).find(
+        t => t.id === entity.visit.visitPurposeFK,
+      ).displayValue
+      notification.success({ message: `${visitTypeName} visit discarded.` })
+      sendQueueNotification({
+        message: `${visitTypeName} visit discarded.`,
+        queueNo: entity.queueNo,
+        visitID: entity.id,
+      })
       const message = `${userName} discard prescription at ${moment().format(
         'HH:mm',
       )}`
@@ -181,6 +218,12 @@ const DispenseDetails = ({
         id,
       },
     }).then(r => {
+      if (r) {
+        const { entity } = visitRegistration
+        const visitTypeName = JSON.parse(settings.visitTypeSetting).find(
+          t => t.id === entity.visit.visitPurposeFK,
+        ).displayValue
+      }
       sendNotification('EditedConsultation', {
         type: NOTIFICATION_TYPE.CONSULTAION,
         status: NOTIFICATION_STATUS.OK,
@@ -264,7 +307,8 @@ const DispenseDetails = ({
   }
 
   const isRetailVisit = visitPurposeFK === VISIT_TYPE.OTC
-  const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BF
+  const isBillFirstVisit =
+    visitPurposeFK === VISIT_TYPE.BF || visitPurposeFK === VISIT_TYPE.MC
   const disableRefreshOrder = isBillFirstVisit && !clinicalObjectRecordFK
   const disableDiscard = totalPayment > 0 || !!clinicalObjectRecordFK
   const [showRemovePayment, setShowRemovePayment] = useState(false)
@@ -366,7 +410,7 @@ const DispenseDetails = ({
 
   const { detailsId, setDetailsId } = useContext(WorklistContext)
   const onRadiologyBtnClick = radiologyWorkitemID => {
-    setDetailsId(radiologyWorkitemID)
+    setDetailsId(radiologyWorkitemID, true)
   }
 
   const handleMultiActualizationClick = type => {
@@ -431,7 +475,7 @@ const DispenseDetails = ({
   }
 
   const { labelPrinterSize } = settings
-  const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
+  const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
 
   const isShowDispenseActualie =
     !viewOnly && isShowActualizeSelection(dispenseItems)
@@ -475,9 +519,7 @@ const DispenseDetails = ({
             },
           })),
       )
-
       newchildren.push(batchColumns)
-
       newchildren.push(
         children
           .filter((value, index) => index === endColIndex)
@@ -540,50 +582,262 @@ const DispenseDetails = ({
       const balanceQty =
         editRow.quantity - _.sumBy(matchItems, 'dispenseQuantity')
       matchItems.forEach(item => (item.stockBalance = balanceQty))
+      updateSelectAll(rows)
       setFieldValue('dispenseItems', rows)
     }
   }
+  const printDrugLabel = () => {
+    setPopperOpen(false)
+    onDrugLabelClick()
+  }
+
+  const finalizeInvoice = () => {
+    if (dispense && dispense.totalWithGST < 0) {
+      window.g_app._store.dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          isInformType: true,
+          customWidth: 'md',
+          openConfirmContent: () => {
+            return (
+              <div>
+                <Warining
+                  style={{
+                    width: '1.3rem',
+                    height: '1.3rem',
+                    marginLeft: '10px',
+                    color: 'red',
+                  }}
+                />
+                <h3
+                  style={{
+                    marginLeft: '10px',
+                    display: 'inline-block',
+                  }}
+                >
+                  Unable to finalize, total amount cannot be{' '}
+                  <span style={{ fontWeight: 400 }}>negative</span>.
+                </h3>
+              </div>
+            )
+          },
+          openConfirmText: 'OK',
+          onConfirmClose: () => {
+            window.g_app._store.dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                customWidth: undefined,
+              },
+            })
+          },
+        },
+      })
+    } else if (coPayerPayments.length > 0) {
+      setShowRemovePayment(true)
+    } else {
+      if (
+        dispenseItems?.filter(x => isActualizable(x)).length > 0 ||
+        service?.filter(x => isActualizable(x)).length > 0
+      )
+        notification.error({
+          message: 'Actualize all nursing work items before finalize.',
+        })
+      else onFinalizeClick()
+    }
+  }
+
+  const existsCanceledRadiology = () => {
+    const { entity = {} } = dispense
+    const { service = [] } = entity
+    if (
+      service.find(s => {
+        const { workitem = {} } = s
+        const { radiologyWorkitem = {} } = workitem
+        return (
+          radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED
+        )
+      })
+    ) {
+      return true
+    }
+    return false
+  }
+
+  const isMandatoryWaistCircumference = () => {
+    const { entity = {} } = visitRegistration
+    const { visit = {} } = entity
+    const {
+      visitPurposeFK,
+      visitBasicExaminations = [],
+      corBasicExaminations = [],
+    } = visit
+    if (visitPurposeFK === VISIT_TYPE.MC) {
+      const basicExamination = corBasicExaminations.length
+        ? corBasicExaminations
+        : visitBasicExaminations
+      if (
+        !basicExamination[0].isChild &&
+        !basicExamination[0].isPregnancy &&
+        !hasValue(basicExamination[0].waistCircumference)
+      ) {
+        return true
+      }
+    }
+    return false
+  }
+
+  const onHandelFinalize = () => {
+    if (isMandatoryWaistCircumference()) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          isInformType: true,
+          openConfirmContent:
+            'Please fill in Waist Circumference before finalize.',
+          openConfirmText: 'OK',
+        },
+      })
+      return
+    }
+    if (existsCanceledRadiology()) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmContent: 'Confirm to finalize with cancelled item?',
+          onConfirmSave: finalizeInvoice,
+          openConfirmText: 'Yes',
+          cancelText: 'No',
+        },
+      })
+    } else {
+      finalizeInvoice()
+    }
+  }
+  const onChangeSelectAll = value => {
+    let newItems = [...dispenseItems]
+    newItems.forEach(item => {
+      if (isActualizable(item) && item.isCheckActualize !== value) {
+        item.isCheckActualize = value
+      }
+    })
+    setFieldValue('dispenseItems', newItems)
+  }
+
+  const updateSelectAll = newItems => {
+    var enableItems = newItems.filter(item => isActualizable(item))
+    if (
+      enableItems.filter(item => item.isCheckActualize).length ===
+      enableItems.length
+    ) {
+      if (!selectedAll) {
+        setSelectedAll(true)
+      }
+    } else {
+      if (selectedAll) {
+        setSelectedAll(false)
+      }
+    }
+  }
+
+  const hasAnyLabWorkitems = (() => {
+    if (!service) return false
+
+    return (
+      service.filter(
+        svc =>
+          svc.workitem &&
+          svc.workitem.labWorkitems &&
+          svc.workitem.labWorkitems.length > 0,
+      ).length > 0
+    )
+  })()
   return (
     <React.Fragment>
       <GridContainer>
         <GridItem justify='flex-start' md={7} className={classes.actionButtons}>
-          {!viewOnly && !isRetailVisit && (
-            <Button
-              color='info'
-              size='sm'
-              onClick={handleReloadClick}
-              disabled={disableRefreshOrder}
+          <div style={{ display: 'inline-block' }}>
+            <Popper
+              open={popperOpen}
+              style={{ marginTop: 10 }}
+              placement='bottom-start'
+              transition
+              overlay={
+                <ClickAwayListener onClickAway={closePopper}>
+                  <MenuList role='menu'>
+                    <MenuItem>
+                      <Button
+                        color='primary'
+                        size='sm'
+                        style={{ width: 120 }}
+                        onClick={() => {
+                          onPrint({ type: CONSTANTS.PATIENT_LABEL })
+                        }}
+                        disabled={sendingJob}
+                      >
+                        Patient Label
+                      </Button>
+                      <InputNumber
+                        size='small'
+                        min={1}
+                        max={10}
+                        value={1}
+                        className={classes.inputStyle}
+                      />
+                      <span className={classes.qtyFont}>&nbsp;Copies</span>
+                    </MenuItem>
+                    <MenuItem>
+                      <Button
+                        color='primary'
+                        size='sm'
+                        style={{ width: 120 }}
+                        onClick={() => {}}
+                        disabled={sendingJob}
+                      >
+                        Lab Label
+                      </Button>
+                      <InputNumber
+                        size='small'
+                        min={1}
+                        max={10}
+                        value={1}
+                        className={classes.inputStyle}
+                      />
+                      <span className={classes.qtyFont}>&nbsp;Copies</span>
+                    </MenuItem>
+                    <MenuItem>
+                      <Button
+                        color='primary'
+                        size='sm'
+                        onClick={printDrugLabel}
+                        disabled={sendingJob}
+                        style={{ width: 120 }}
+                      >
+                        Drug Label
+                      </Button>
+                    </MenuItem>
+                  </MenuList>
+                </ClickAwayListener>
+              }
             >
-              <Refresh />
-              Refresh Order
-            </Button>
-          )}
-          <Button
-            color='primary'
-            size='sm'
-            onClick={onDrugLabelClick}
-            disabled={sendingJob}
-          >
-            {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
-            Drug Label
-          </Button>
-          <Button
-            color='primary'
-            size='sm'
-            onClick={() => {
-              onPrint({ type: CONSTANTS.PATIENT_LABEL })
-            }}
-            disabled={sendingJob}
-          >
-            {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
-            Patient Label
-          </Button>
-          {visit.orderCreateTime && (
+              <Button
+                color='primary'
+                onClick={openPopper}
+                size='sm'
+                style={{ height: 25, marginTop: 2 }}
+              >
+                <Print /> Label
+              </Button>
+            </Popper>
+          </div>
+          {orderCreateTime && (
             <span style={{ color: '#999999' }}>
-              Order created by{' '}
+              Order created by
               <span style={{ fontWeight: 500 }}>
-                {`${docInfo.title ? `${docInfo.title}.` : null}${docInfo.name}`}{' '}
-                at {visit.orderCreateTime.format('DD MMM yyyy HH:mm')}
+                {` ${orderCreateBy} `}
+                at {orderCreateTime.format('DD MMM yyyy HH:mm')}
               </span>{' '}
             </span>
           )}
@@ -598,7 +852,7 @@ const DispenseDetails = ({
         </GridItem>
         {!viewOnly && (
           <GridItem className={classes.rightActionButtons} md={5}>
-            {(isRetailVisit || isBillFirstVisit) && (
+            {!isFromMedicalCheckup && (isRetailVisit || isBillFirstVisit) && (
               <ProgressButton
                 color='danger'
                 size='sm'
@@ -609,9 +863,14 @@ const DispenseDetails = ({
                 Discard
               </ProgressButton>
             )}
-            {!isBillFirstVisit && (
+            {!isFromMedicalCheckup && !isBillFirstVisit && (
               <Authorized authority='queue.dispense.savedispense'>
-                <ProgressButton color='success' size='sm' onClick={onSaveClick}>
+                <ProgressButton
+                  color='success'
+                  size='sm'
+                  onClick={onSaveClick}
+                  disabled={isIncludeExpiredItem}
+                >
                   Save Dispense
                 </ProgressButton>
               </Authorized>
@@ -636,164 +895,131 @@ const DispenseDetails = ({
                   onConfirm={() => {
                     dispatch({
                       type: 'dispense/setServingPerson',
-                      payload: { visitFK: visit.id },
+                      payload: { visitFK: values?.id },
                     })
                   }}
                 />
               </Authorized>
             )}
-            {!isRetailVisit && (
-              <Authorized authority='queue.dispense.editorder'>
+            {!isFromMedicalCheckup &&
+              !isRetailVisit &&
+              visitStatus !== VISIT_STATUS.PAUSED && (
+                <Authorized authority='queue.dispense.editorder'>
+                  <ProgressButton
+                    color='primary'
+                    size='sm'
+                    icon={<Edit />}
+                    onClick={onEditOrderClick}
+                  >
+                    Edit Order
+                  </ProgressButton>
+                </Authorized>
+              )}
+            {!isFromMedicalCheckup && visitStatus !== VISIT_STATUS.PAUSED && (
+              <Authorized authority='queue.dispense.makepayment'>
                 <ProgressButton
                   color='primary'
                   size='sm'
-                  icon={<Edit />}
-                  onClick={onEditOrderClick}
+                  icon={<AttachMoney />}
+                  disabled={isIncludeExpiredItem}
+                  onClick={onHandelFinalize}
                 >
-                  Edit Order
+                  Finalize
                 </ProgressButton>
               </Authorized>
             )}
-            <Authorized authority='queue.dispense.makepayment'>
-              <ProgressButton
-                color='primary'
-                size='sm'
-                icon={<AttachMoney />}
-                onClick={() => {
-                  if (dispense && dispense.totalWithGST < 0) {
-                    window.g_app._store.dispatch({
-                      type: 'global/updateAppState',
-                      payload: {
-                        openConfirm: true,
-                        isInformType: true,
-                        customWidth: 'md',
-                        openConfirmContent: () => {
-                          return (
-                            <div>
-                              <Warining
-                                style={{
-                                  width: '1.3rem',
-                                  height: '1.3rem',
-                                  marginLeft: '10px',
-                                  color: 'red',
-                                }}
-                              />
-                              <h3
-                                style={{
-                                  marginLeft: '10px',
-                                  display: 'inline-block',
-                                }}
-                              >
-                                Unable to finalize, total amount cannot be{' '}
-                                <span style={{ fontWeight: 400 }}>
-                                  negative
-                                </span>
-                                .
-                              </h3>
-                            </div>
-                          )
-                        },
-                        openConfirmText: 'OK',
-                        onConfirmClose: () => {
-                          window.g_app._store.dispatch({
-                            type: 'global/updateAppState',
-                            payload: {
-                              customWidth: undefined,
-                            },
-                          })
-                        },
-                      },
-                    })
-                  } else if (coPayerPayments.length > 0) {
-                    setShowRemovePayment(true)
-                  } else {
-                    if(dispenseItems.filter(x => isActualizable(x)).length > 0 || service.filter(x => isActualizable(x)).length > 0)
-                      notification.error({
-                        message: 'Actualize all nursing work items before finalize.',
-                      })
-                    else
-                      onFinalizeClick()
-                  }
-                }}
-              >
-                Finalize
-              </ProgressButton>
-            </Authorized>
           </GridItem>
         )}
         <GridItem md={12}>
           <Paper className={classes.paper}>
-            <TableData
-              oddEven={false}
-              title='Dispense Details'
-              titleExtend={
-                viewOnly
-                  ? null
-                  : actualizeSelectedItemButton('DispenseItems', dispenseItems)
-              }
-              EditingProps={{
-                showCommandColumn: false,
-                onCommitChanges: commitChanges,
-              }}
-              FuncProps={{
-                pager: false,
-                grouping: true,
-                groupingConfig: {
-                  state: {
-                    grouping: [{ columnName: 'dispenseGroupId' }],
-                    expandedGroups: defaultExpandedGroups,
-                  },
-                  row: {
-                    indentColumnWidth: 0,
-                    iconComponent: icon => <span></span>,
-                    contentComponent: group => {
-                      const { row } = group
-                      const groupRow = dispenseItems.find(
-                        data => data.dispenseGroupId === row.value,
+            <div style={{ position: 'relative' }}>
+              <div style={{ position: 'absolute', left: 26, top: 40 }}>
+                {isShowDispenseActualie && !viewOnly && (
+                  <Checkbox
+                    checked={selectedAll}
+                    onChange={e => {
+                      setSelectedAll(e.target.value)
+                      onChangeSelectAll(e.target.value)
+                    }}
+                  />
+                )}
+              </div>
+              <TableData
+                oddEven={false}
+                title='Dispense Details'
+                titleExtend={
+                  viewOnly
+                    ? null
+                    : actualizeSelectedItemButton(
+                        'DispenseItems',
+                        dispenseItems,
                       )
-                      if (row.value === 'NormalDispense')
-                        return (
-                          <div className={classes.groupStyle}>
-                            <span style={{ fontWeight: 600 }}>
-                              Normal Dispense Items
-                            </span>
-                          </div>
-                        )
-                      if (row.value === 'NoNeedToDispense')
-                        return (
-                          <div className={classes.groupStyle}>
-                            <span style={{ fontWeight: 600 }}>
-                              No Need To Dispense Items
-                            </span>
-                          </div>
-                        )
-                      return (
-                        <div className={classes.groupStyle}>
-                          <span style={{ fontWeight: 600 }}>
-                            {'Drug Mixture: '}
-                          </span>
-                          {groupRow.drugMixtureName}
-                        </div>
-                      )
+                }
+                EditingProps={{
+                  showCommandColumn: false,
+                  onCommitChanges: commitChanges,
+                }}
+                FuncProps={{
+                  pager: false,
+                  grouping: true,
+                  groupingConfig: {
+                    isDisableExpandedGroups: true,
+                    state: {
+                      grouping: [{ columnName: 'dispenseGroupId' }],
+                      expandedGroups: defaultExpandedGroups,
                     },
+                    row: {
+                      indentColumnWidth: 0,
+                      iconComponent: icon => <span></span>,
+                      contentComponent: group => {
+                        const { row } = group
+                        const groupRow = dispenseItems.find(
+                          data => data.dispenseGroupId === row.value,
+                        )
+                        if (row.value === 'NormalDispense')
+                          return (
+                            <div className={classes.groupStyle}>
+                              <span style={{ fontWeight: 600 }}>
+                                Normal Dispense Items
+                              </span>
+                            </div>
+                          )
+                        if (row.value === 'NoNeedToDispense')
+                          return (
+                            <div className={classes.groupStyle}>
+                              <span style={{ fontWeight: 600 }}>
+                                No Need To Dispense Items
+                              </span>
+                            </div>
+                          )
+                        return (
+                          <div className={classes.groupStyle}>
+                            <span style={{ fontWeight: 600 }}>
+                              {'Drug Mixture: '}
+                            </span>
+                            {groupRow.drugMixtureName}
+                          </div>
+                        )
+                      },
+                    },
+                    backgroundColor: 'rgb(240, 248, 255)',
                   },
-                  backgroundColor: '#CCCCCC',
-                },
-              }}
-              forceRender
-              columns={columns}
-              colExtensions={DispenseItemsColumnExtensions(
-                viewOnly,
-                onPrint,
-                onActualizeBtnClick,
-                showDrugLabelRemark,
-              )}
-              data={dispenseItems}
-              TableProps={{
-                rowComponent: orderItemRow,
-              }}
-              getRowId={r => r.uid}
-            />
+                }}
+                forceRender
+                columns={columns}
+                colExtensions={DispenseItemsColumnExtensions(
+                  viewOnly,
+                  onDrugLabelClick,
+                  onActualizeBtnClick,
+                  showDrugLabelRemark,
+                )}
+                data={dispenseItems}
+                TableProps={{
+                  rowComponent: orderItemRow,
+                }}
+                getRowId={r => r.uid}
+              />
+            </div>
 
             <TableData
               title='Service'
@@ -818,9 +1044,15 @@ const DispenseDetails = ({
                 onPrint,
                 onActualizeBtnClick,
                 onRadiologyBtnClick,
+                dispatch,
+                history?.location?.query?.vid,
               )}
               data={service}
             />
+
+            {(hasAnySpecimenCollected || hasAnyLabWorkitems) && (
+              <DispenseDetailsSpecimenCollection visitId={visitId} />
+            )}
 
             <TableData
               oddEven={false}
@@ -873,11 +1105,18 @@ const DispenseDetails = ({
               id: 'reception.queue.visitRegistration.visitRemarks',
             })}
           />
+          <VisitOrderTemplateIndicateString
+            visitOrderTemplateDetails={
+              dispense?.entity?.visitOrderTemplateDetails ||
+              values?.visitOrderTemplateDetails
+            }
+          ></VisitOrderTemplateIndicateString>
         </GridItem>
         {!viewOnly && (
           <GridItem xs={5} md={5}>
             <div style={{ paddingRight: 90 }}>
               <AmountSummary
+                isViewOnly={true}
                 rows={invoiceItem}
                 adjustments={invoiceAdjustment}
                 config={{
@@ -895,6 +1134,7 @@ const DispenseDetails = ({
         )}
       </GridContainer>
       <CommonModal
+        maxWidth='sm'
         title='Print Drug Labels'
         open={showDrugLabelSelection}
         observe='DispenseDetails'
@@ -903,13 +1143,15 @@ const DispenseDetails = ({
         }}
       >
         <DrugLabelSelection
-          prescription={selectedDrugs}
-          codetable={codetable}
-          handleDrugLabelSelected={onDrugLabelSelected}
-          handleDrugLabelNoChanged={onDrugLabelNoChanged}
+          handlePrint={handlePrint}
+          values={values}
+          currentDrugToPrint={currentDrugToPrint}
+          dispatch={dispatch}
+          patient={patient}
+          source='dispense'
+          visitid={values?.id}
           handleSubmit={() => {
             onDrugLabelSelectionClose()
-            onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
           }}
         />
       </CommonModal>
@@ -995,7 +1237,7 @@ const DispenseDetails = ({
                 onFinalizeClick(true, voidReason)
               }}
             >
-              void
+              Void
             </Button>
             <Button
               color='primary'
@@ -1004,7 +1246,7 @@ const DispenseDetails = ({
                 onFinalizeClick()
               }}
             >
-              skip
+              Skip
             </Button>
           </GridContainer>
         </div>
@@ -1032,14 +1274,6 @@ const DispenseDetails = ({
                 id: values.id,
                 version: version,
               },
-            }).then(r => {
-              dispatch({
-                type: 'dispense/updateState',
-                payload: {
-                  entity: r,
-                  version: version,
-                },
-              })
             })
           }}
         />
@@ -1056,21 +1290,21 @@ const _DispenseDetails = props => (
 )
 
 export default compose(
+  withWebSocket(),
   withStyles(styles, { name: 'DispenseDetailsGrid' }),
   connect(
     ({
       codetable,
+      visitRegistration,
       clinicSettings,
       dispense,
-      visitRegistration,
       patient,
       user,
     }) => ({
       codetable,
       clinicSettings,
+      visitRegistration,
       servingPersons: dispense.servingPersons,
-      visit: visitRegistration?.entity?.visit || {},
-      doctorprofile: codetable.doctorprofile || [],
       patient: patient.entity || {},
       user,
     }),

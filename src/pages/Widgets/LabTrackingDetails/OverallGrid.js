@@ -9,7 +9,9 @@ class OverallGrid extends PureComponent {
     columns: [
       { name: 'visitDate', title: 'Visit Date' },
       { name: 'patientAccountNo', title: 'Acc. No' },
+      { name: 'referreceNo', title: 'Ref. No' },
       { name: 'patientName', title: 'Patient name' },
+      { name: 'visitPurposeFK', title: 'Visit Type' },
       {
         name: 'doctorProfileFKNavigation.ClinicianProfile.Name',
         title: 'Doctor',
@@ -32,10 +34,23 @@ class OverallGrid extends PureComponent {
       { columnName: 'receivedDate', type: 'date' },
       {
         columnName: 'doctorProfileFKNavigation.ClinicianProfile.Name',
-        render: (row) => {
+        render: row => {
           return (
             <Tooltip title={row.doctorName}>
               <span>{row.doctorName}</span>
+            </Tooltip>
+          )
+        },
+      },
+      {
+        columnName: 'visitPurposeFK',
+        width: 80,
+        render: row => {
+          const { visitPurpose } = this.props
+          var pupose = visitPurpose.find(x => x.id === row.visitPurposeFK)
+          return (
+            <Tooltip title={pupose.displayValue}>
+              <span>{pupose.code}</span>
             </Tooltip>
           )
         },
@@ -45,9 +60,13 @@ class OverallGrid extends PureComponent {
         sortingEnabled: false,
         align: 'center',
         width: 100,
-        render: (row) => {
-          const { clinicSettings, handlePrintClick } = this.props
-          const readOnly = !row.patientIsActive
+        render: row => {
+          const {
+            clinicSettings,
+            handlePrintClick,
+            disabledByAccessRight,
+          } = this.props
+          const readOnly = disabledByAccessRight
 
           return (
             <React.Fragment>
@@ -78,9 +97,9 @@ class OverallGrid extends PureComponent {
   }
 
   editRow = (row, e) => {
-    const { dispatch, labTrackingDetails } = this.props
+    const { dispatch, labTrackingDetails, disabledByAccessRight } = this.props
     const { list } = labTrackingDetails
-    const readOnly = !row.patientIsActive
+    const readOnly = disabledByAccessRight
 
     if (readOnly) return
 
@@ -88,12 +107,12 @@ class OverallGrid extends PureComponent {
       type: 'labTrackingDetails/updateState',
       payload: {
         showModal: true,
-        entity: list.find((o) => o.id === row.id),
+        entity: list.find(o => o.id === row.id),
       },
     })
   }
 
-  render () {
+  render() {
     const { height } = this.props
     return (
       <CommonTableGrid

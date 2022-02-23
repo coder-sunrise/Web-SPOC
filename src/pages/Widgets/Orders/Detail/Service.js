@@ -24,6 +24,7 @@ import { currencySymbol } from '@/utils/config'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
 import { DoctorProfileSelect } from '@/components/_medisys'
 import CannedTextButton from './CannedTextButton'
+import { Alert } from 'antd'
 
 const getVisitDoctorUserId = props => {
   const { doctorprofile } = props.codetable
@@ -37,11 +38,12 @@ const getVisitDoctorUserId = props => {
   return visitDoctorUserId
 }
 
-@connect(({ codetable, global, user, visitRegistration }) => ({
+@connect(({ codetable, global, user, visitRegistration, patient }) => ({
   codetable,
   global,
   user,
   visitRegistration,
+  patient,
 }))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type, codetable, visitRegistration }) => {
@@ -90,6 +92,7 @@ const getVisitDoctorUserId = props => {
   handleSubmit: (values, { props, onConfirm, setValues }) => {
     const { dispatch, orders, currentType, getNextSequence, user } = props
     const { rows } = orders
+    console.log(111)
     const data = {
       isOrderedByDoctor:
         user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
@@ -104,7 +107,7 @@ const getVisitDoctorUserId = props => {
       packageGlobalId:
         values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
-
+    console.log(data)
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
@@ -114,6 +117,7 @@ const getVisitDoctorUserId = props => {
       ...orders.defaultService,
       type: orders.type,
       performingUserFK: getVisitDoctorUserId(props),
+      visitPurposeFK: orders.visitPurposeFK,
     })
   },
   displayName: 'OrderPage',
@@ -171,6 +175,7 @@ class Service extends PureComponent {
     this.state = {
       services: [],
       serviceCenters: [],
+      isPreOrderItemExists: false,
     }
   }
 
@@ -181,16 +186,18 @@ class Service extends PureComponent {
           nextProps.global.openAdjustment) ||
         nextProps.orders.shouldPushToState
       ) {
-        nextProps.dispatch({
-          type: 'orders/updateState',
-          payload: {
-            entity: {
-              ...nextProps.values,
-              totalPrice: nextProps.values.total,
+        if (nextProps.values.uid) {
+          nextProps.dispatch({
+            type: 'orders/updateState',
+            payload: {
+              entity: {
+                ...nextProps.values,
+                totalPrice: nextProps.values.total,
+              },
+              shouldPushToState: false,
             },
-            shouldPushToState: false,
-          },
-        })
+          })
+        }
       }
   }
 
@@ -282,6 +289,7 @@ class Service extends PureComponent {
       ...orders.defaultService,
       type: orders.type,
       performingUserFK: getVisitDoctorUserId(this.props),
+      visitPurposeFK: orders.visitPurposeFK,
     })
   }
 
@@ -331,6 +339,35 @@ class Service extends PureComponent {
     return false
   }
 
+  checkIsPreOrderItemExistsInListing = isPreOrderChecked => {
+    const {
+      setFieldValue,
+      values,
+      codetable,
+      visitRegistration,
+      patient,
+      orders = {},
+    } = this.props
+    if (isPreOrderChecked) {
+      const servicePreOrderItem = patient?.entity?.pendingPreOrderItem.filter(
+        x => x.preOrderItemType === 'Service' || x.preOrderItemType === 'Lab',
+      )
+      if (servicePreOrderItem) {
+        servicePreOrderItem.filter(item => {
+          const { preOrderServiceItem = {} } = item
+          const CheckIfPreOrderItemExists =
+            preOrderServiceItem.serviceFK === values.serviceFK
+          if (CheckIfPreOrderItemExists) {
+            this.setState({ isPreOrderItemExists: true })
+            return
+          }
+        })
+      }
+    } else {
+      this.setState({ isPreOrderItemExists: false })
+    }
+  }
+
   render() {
     const {
       theme,
@@ -339,13 +376,32 @@ class Service extends PureComponent {
       footer,
       from,
       setFieldValue,
+      orders,
     } = this.props
-    const { services, serviceCenters } = this.state
-    const { serviceFK, serviceCenterFK, isPreOrder, workitem = {}, priority } = values
+    const { services, serviceCenters, isPreOrderItemExists } = this.state
+    const {
+      serviceFK,
+      serviceCenterFK,
+      isPreOrder,
+      workitem = {},
+      priority,
+    } = values
 
     const totalPriceReadonly =
       Authorized.check('queue.consultation.modifyorderitemtotalprice')
         .rights !== 'enable'
+
+    const isDisabledHasPaidPreOrder =
+      orders.entity?.actualizedPreOrderItemFK && orders.entity?.hasPaid == true
+        ? true
+        : false
+
+    const isDisabledNoPaidPreOrder = orders.entity?.actualizedPreOrderItemFK
+      ? true
+      : false
+
+    if (orders.isPreOrderItemExists === false && !values.isPreOrder)
+      this.setState({ isPreOrderItemExists: false })
 
     const totalAfterAdjElement = (
       <GridItem xs={3} className={classes.editor}>
@@ -368,7 +424,6 @@ class Service extends PureComponent {
         />
       </GridItem>
     )
-    
 
     return (
       <Authorized
@@ -395,17 +450,27 @@ class Service extends PureComponent {
                               m => m.value === serviceCenterFK,
                             ),
                         )}
-                        onChange={(v, op = {}) => {
-                          setFieldValue(
-                            'isNurseActualizeRequired',
-                            op.isNurseActualizable,
-                          )
+                        onChange={(v, op) => {
+                          if (!op) {
+                            setFieldValue('isNurseActualizeRequired', undefined)
+                            setFieldValue('serviceCenterFK', undefined)
+                          } else {
+                            setFieldValue(
+                              'isNurseActualizeRequired',
+                              op.isNurseActualizable,
+                            )
+                          }
+
+                          if (values.isPreOrder)
+                            this.props.setFieldValue('isPreOrder', false)
+                          if (isPreOrderItemExists)
+                            this.setState({ isPreOrderItemExists: false })
 
                           setTimeout(() => {
                             this.getServiceCenterService()
                           }, 1)
                         }}
-                        disabled={values.isPackage}
+                        disabled={values.isPackage || isDisabledNoPaidPreOrder}
                         {...args}
                       />
                     </div>
@@ -430,7 +495,7 @@ class Service extends PureComponent {
                           this.getServiceCenterService()
                         }, 1)
                       }
-                      disabled={values.isPackage}
+                      disabled={values.isPackage || isDisabledNoPaidPreOrder}
                       {...args}
                     />
                   )
@@ -503,6 +568,7 @@ class Service extends PureComponent {
                             this.updateTotalPrice(total)
                           }
                         }}
+                        disabled={isDisabledHasPaidPreOrder}
                         {...args}
                       />
                     )
@@ -556,7 +622,11 @@ class Service extends PureComponent {
                       onChange={e => {
                         this.updateTotalPrice(e.target.value)
                       }}
-                      disabled={totalPriceReadonly || values.isPackage}
+                      disabled={
+                        totalPriceReadonly ||
+                        values.isPackage ||
+                        isDisabledHasPaidPreOrder
+                      }
                       {...args}
                     />
                   )
@@ -591,7 +661,11 @@ class Service extends PureComponent {
                               this.onAdjustmentConditionChange()
                             }, 1)
                           }}
-                          disabled={totalPriceReadonly || values.isPackage}
+                          disabled={
+                            totalPriceReadonly ||
+                            values.isPackage ||
+                            isDisabledHasPaidPreOrder
+                          }
                           {...args}
                         />
                       )
@@ -616,7 +690,11 @@ class Service extends PureComponent {
                               this.onAdjustmentConditionChange()
                             }, 1)
                           }}
-                          disabled={totalPriceReadonly || values.isPackage}
+                          disabled={
+                            totalPriceReadonly ||
+                            values.isPackage ||
+                            isDisabledHasPaidPreOrder
+                          }
                           {...args}
                         />
                       )
@@ -635,7 +713,11 @@ class Service extends PureComponent {
                             this.onAdjustmentConditionChange()
                           }, 1)
                         }}
-                        disabled={totalPriceReadonly || values.isPackage}
+                        disabled={
+                          totalPriceReadonly ||
+                          values.isPackage ||
+                          isDisabledHasPaidPreOrder
+                        }
                         {...args}
                       />
                     )
@@ -658,7 +740,11 @@ class Service extends PureComponent {
                             this.onAdjustmentConditionChange()
                           }, 1)
                         }}
-                        disabled={totalPriceReadonly || values.isPackage}
+                        disabled={
+                          totalPriceReadonly ||
+                          values.isPackage ||
+                          isDisabledHasPaidPreOrder
+                        }
                         {...args}
                       />
                     )
@@ -736,7 +822,7 @@ class Service extends PureComponent {
                   </div>
                   {values.visitPurposeFK !== VISIT_TYPE.OTC && (
                     <div style={{ display: 'inline-block', marginLeft: 20 }}>
-                      <FastField
+                      <Field
                         name='isPreOrder'
                         render={args => {
                           return (
@@ -744,10 +830,14 @@ class Service extends PureComponent {
                               label='Pre-Order'
                               style={{ position: 'absolute', bottom: 2 }}
                               {...args}
+                              disabled={isDisabledNoPaidPreOrder}
                               onChange={e => {
                                 if (!e.target.value) {
                                   setFieldValue('isChargeToday', false)
                                 }
+                                this.checkIsPreOrderItemExistsInListing(
+                                  e.target.value,
+                                )
                               }}
                             />
                           )
@@ -768,6 +858,25 @@ class Service extends PureComponent {
                                 {...args}
                               />
                             )
+                          }}
+                        />
+                      )}
+                      {isPreOrderItemExists && (
+                        <Alert
+                          message={
+                            "Item exists in Pre-Order. Plesae check patient's Pre-Order."
+                          }
+                          type='warning'
+                          style={{
+                            position: 'absolute',
+                            top: 40,
+                            left: 230,
+                            whiteSpace: 'nowrap',
+                            textOverflow: 'ellipsis',
+                            display: 'inline-block',
+                            overflow: 'hidden',
+                            lineHeight: '25px',
+                            fontSize: '0.85rem',
                           }}
                         />
                       )}

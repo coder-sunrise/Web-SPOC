@@ -28,7 +28,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, setFieldValue, values }) => {
           <GridItem md={2}>
             <FastField
               name='doctorID'
-              render={(args) => <DoctorProfileSelect {...args} />}
+              render={args => <DoctorProfileSelect {...args} />}
             />
           </GridItem>
           <GridItem md={2}>
@@ -39,23 +39,23 @@ const FilterBar = ({ handleSubmit, isSubmitting, setFieldValue, values }) => {
             >
               <FastField
                 name='companyIDS'
-                render={(args) => (
+                render={args => (
                   <CodeSelect
                     {...args}
                     code='ctcopayer'
                     labelField='displayValue'
                     mode='multiple'
-                    label='Company'
+                    label='Co-Payer'
                     all={-99}
                     defaultOptions={[
                       {
                         isExtra: true,
                         id: -99,
-                        displayValue: 'All companies',
+                        displayValue: 'All Co-Payers',
                       },
                     ]}
                     maxTagCount={maxcompanyIDSCount}
-                    maxTagPlaceholder='companies'
+                    maxTagPlaceholder='Co-Payers'
                   />
                 )}
               />
@@ -64,7 +64,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, setFieldValue, values }) => {
           <GridItem md={2}>
             <FastField
               name='paymentModes'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   {...args}
                   label='Payment Mode'
@@ -81,7 +81,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, setFieldValue, values }) => {
           <GridItem md={2}>
             <FastField
               name='payerType'
-              render={(args) => (
+              render={args => (
                 <RadioGroup
                   {...args}
                   label='Payer Type'
@@ -92,14 +92,14 @@ const FilterBar = ({ handleSubmit, isSubmitting, setFieldValue, values }) => {
                     },
                     {
                       value: 'Company',
-                      label: 'Company',
+                      label: 'Co-Payer',
                     },
                     {
                       value: 'Patient',
                       label: 'Patient',
                     },
                   ]}
-                  onChange={(v) => {
+                  onChange={v => {
                     if (v.target.value === 'Patient') {
                       setFieldValue('companyIDS', [])
                     }
@@ -112,7 +112,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, setFieldValue, values }) => {
           <GridItem>
             <FastField
               name='groupBy'
-              render={(args) => (
+              render={args => (
                 <RadioGroup
                   {...args}
                   label='Group By'
@@ -134,7 +134,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, setFieldValue, values }) => {
           <GridItem md={1}>
             <FastField
               name='isDisplayGST'
-              render={(args) => <Checkbox {...args} label='Show GST' />}
+              render={args => <Checkbox {...args} label='Show GST' />}
             />
           </GridItem>
           <GridItem md={2}>

@@ -7,11 +7,12 @@ import { PharmacyWorkitemStatus } from '@/utils/constants'
 import Refresh from '@material-ui/icons/Refresh'
 import moment from 'moment'
 import _ from 'lodash'
-import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import { HistoryOutlined } from '@ant-design/icons'
 import { CommonModal, Button, Tooltip } from '@/components'
-import { Worklist } from '@/pages/Radiology/Components'
-import { WorklistContextProvider } from '@/pages/Radiology/Worklist/WorklistContext'
+import { Worklist } from '../Components'
+import WorklistContext, {
+  WorklistContextProvider,
+} from '@/pages/Radiology/Worklist/WorklistContext'
 import PharmacyDetails from './Details'
 import { WorklistFilter } from '../Components'
 const columnsTemplate = [
@@ -41,13 +42,23 @@ const PharmacyWorklist = () => {
   const dispatch = useDispatch()
   const [columns, setColumns] = useState([])
   const entity = useSelector(s => s.pharmacyWorklist)
+  const clinicSettings = useSelector(s => s.clinicSettings)
   const [refreshDate, setRefreshDate] = useState(moment())
   const [filterValue, setFilterValue] = useState('')
-
+  const { autoRefreshPharmacyWorklistInterval = 60 } =
+    clinicSettings.settings || {}
+  const timer = React.useRef(null)
+  const { pharmacyQueueCallList = [] } = useContext(WorklistContext)
   useEffect(() => {
     dispatch({
       type: 'pharmacyWorklist/query',
+      payload: { pagesize: 9999 },
     })
+    stopRefreshTimer()
+    startRefreshTimer()
+    return () => {
+      stopRefreshTimer()
+    }
   }, [])
 
   useEffect(() => {
@@ -64,47 +75,27 @@ const PharmacyWorklist = () => {
             w.name.toUpperCase().indexOf(filterValue.toUpperCase()) >= 0,
         )
         .map(w => {
-          const visitGroupListing = _.orderBy(
-            w.visitGroupListing.map(l => {
-              const age = l.dob ? calculateAgeFromDOB(l.dob) : 0
-              let gender = '-'
-              if (l.genderFK === 1) {
-                gender = 'F'
-              } else if (l.genderFK === 2) {
-                gender = 'M'
-              }
-              return {
-                queueNo: l.queueNo,
-                name: l.patientName,
-                gender,
-                age: `${age} ${age > 1 ? 'Yrs' : 'Yr'}`,
-                orderQueueNo: parseFloat(l.queueNo)
-              }
-            }),
-            ['orderQueueNo'],
-            ['asc'],
-          )
           return {
             ...w,
             status: PharmacyWorkitemStatus[w.statusFK],
-            visitGroupListing,
           }
         })
       const mapped = columnsTemplate.map(item => {
         let filterItems = worklist.filter(w => w.status === item.title)
         if (item.title === 'Completed') {
-          filterItems = _.orderBy(filterItems,
-            ['updateDate'],
-            ['desc'])
+          filterItems = _.orderBy(filterItems, ['updateDate'], ['desc'])
         } else if (item.title === 'New') {
-          filterItems = _.orderBy(filterItems,
+          filterItems = _.orderBy(
+            filterItems,
             ['paymentDate', 'generateDate'],
-            ['asc'])
-        }
-        else {
-          filterItems = _.orderBy(filterItems,
+            ['asc'],
+          )
+        } else {
+          filterItems = _.orderBy(
+            filterItems,
             ['paymentDate', 'updateDate'],
-            ['asc'])
+            ['asc'],
+          )
         }
         return {
           ...item,
@@ -115,10 +106,20 @@ const PharmacyWorklist = () => {
       setColumns(mapped)
     }
   }, [entity, filterValue])
+  const startRefreshTimer = () => {
+    timer.current = setInterval(() => {
+      refreshClick()
+    }, autoRefreshPharmacyWorklistInterval * 1000)
+  }
+
+  const stopRefreshTimer = () => {
+    clearInterval(timer.current)
+  }
 
   const refreshClick = () => {
     dispatch({
       type: 'pharmacyWorklist/query',
+      payload: { pagesize: 9999 },
     })
     setRefreshDate(moment())
   }
@@ -133,6 +134,12 @@ const PharmacyWorklist = () => {
       trailing: false,
     },
   )
+
+  let nowServing = undefined
+  if (pharmacyQueueCallList.length > 0) {
+    nowServing = `${pharmacyQueueCallList?.[0]?.qNo}.0 (${pharmacyQueueCallList?.[0]?.patientName})`
+  }
+
   return (
     <div style={{ position: 'relative', height: '100%' }}>
       <ProCard
@@ -147,8 +154,12 @@ const PharmacyWorklist = () => {
           />
         }
       >
-        <Worklist columns={columns} worklistType='Pharmacy' />
-        <PharmacyDetails refreshClick={refreshClick} />
+        <Worklist columns={columns} />
+        <PharmacyDetails
+          refreshClick={refreshClick}
+          startRefreshTimer={startRefreshTimer}
+          stopRefreshTimer={stopRefreshTimer}
+        />
       </ProCard>
 
       <div>
@@ -156,13 +167,12 @@ const PharmacyWorklist = () => {
           style={{
             position: 'absolute',
             top: 25,
-            right: 175,
-            width: 300,
-            textAlign: 'right',
+            right: 150,
+            width: 200,
           }}
         >
-          <p style={{ fontWeight: 600 }}>Now Serving:</p>
-          <Tooltip title='1.0(genery)'>
+          <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>Now Serving:</p>
+          <Tooltip title={nowServing || '-'}>
             <p
               style={{
                 color: '#1890f8',
@@ -172,50 +182,32 @@ const PharmacyWorklist = () => {
                 marginTop: 4,
               }}
             >
-              1.0(genery)
+              {nowServing || '-'}
             </p>
           </Tooltip>
         </div>
-
-        <Tooltip title=''>
-          <span
-            className='material-icons'
-            style={{
-              color: 'gray',
-              position: 'absolute',
-              top: 22,
-              right: 143,
-              width: 26,
-              height: 26,
-            }}
-            onClick={event => { }}
-          >
-            history
-          </span>
-        </Tooltip>
-
         <div style={{ position: 'absolute', top: 25, right: 50 }}>
-          <p style={{ fontWeight: 600 }}>Last Refresh:</p>
-          <p style={{ color: '#1890f8', marginTop: 4 }}>
-            {' '}
-            {refreshDate.format('HH:mm')}
-          </p>
+          <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>Last Refresh:</p>
+          <span>
+            <p style={{ color: '#1890f8', marginTop: 4, fontSize: '0.9rem' }}>
+              {refreshDate.format('HH:mm')}
+            </p>
+            <Button
+              color='primary'
+              justIcon
+              style={{
+                position: 'absolute',
+                top: 20,
+                left: 80,
+                width: 26,
+                height: 26,
+              }}
+              onClick={refreshClick}
+            >
+              <Refresh />
+            </Button>
+          </span>
         </div>
-
-        <Button
-          color='primary'
-          justIcon
-          style={{
-            position: 'absolute',
-            top: 22,
-            right: 10,
-            width: 26,
-            height: 26,
-          }}
-          onClick={refreshClick}
-        >
-          <Refresh />
-        </Button>
       </div>
     </div>
   )

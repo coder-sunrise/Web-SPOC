@@ -56,7 +56,7 @@ const isSameOrAfterTime = (startTime, endTime) =>
   validationSchema: Yup.object().shape({
     issueDate: Yup.date().required(),
     issuedByUserFK: Yup.number().required(),
-    accompaniedBy: Yup.string().required(),
+    accompaniedBy: Yup.string(),
     attendanceStartTime: Yup.string().required(),
     attendanceEndTime: Yup.string()
       .equalAndLaterThan(
@@ -68,12 +68,12 @@ const isSameOrAfterTime = (startTime, endTime) =>
 
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm, currentType, getNextSequence } = props
-    const fullFormatAttendanceEndTime = `${moment().format(
-      'YYYY-MM-DD',
-    )}T${values.attendanceEndTime}`
-    const fullFormatAttendanceStartTime = `${moment().format(
-      'YYYY-MM-DD',
-    )}T${values.attendanceStartTime}`
+    const fullFormatAttendanceEndTime = `${moment().format('YYYY-MM-DD')}T${
+      values.attendanceEndTime
+    }`
+    const fullFormatAttendanceStartTime = `${moment().format('YYYY-MM-DD')}T${
+      values.attendanceStartTime
+    }`
 
     const newValues = {
       ...values,
@@ -98,11 +98,11 @@ const isSameOrAfterTime = (startTime, endTime) =>
   displayName: 'AddConsultationDocument',
 })
 class CertificateAttendance extends PureComponent {
-  componentDidMount () {
+  componentDidMount() {
     const { setFieldValue, values } = this.props
     // console.log({ values })
     if (values.referenceNo === '-')
-      service.runningNumber('coa').then((o) => {
+      service.runningNumber('coa').then(o => {
         if (o && o.data) {
           setFieldValue('referenceNo', o.data)
         } else {
@@ -113,7 +113,7 @@ class CertificateAttendance extends PureComponent {
       })
   }
 
-  render () {
+  render() {
     const { footer, handleSubmit, classes, values } = this.props
     // console.log({ values })
     return (
@@ -123,7 +123,7 @@ class CertificateAttendance extends PureComponent {
             <GridItem xs={6}>
               <FastField
                 name='referenceNo'
-                render={(args) => {
+                render={args => {
                   return <TextField disabled label='Reference No' {...args} />
                 }}
               />
@@ -135,7 +135,7 @@ class CertificateAttendance extends PureComponent {
           <GridItem xs={6}>
             <FastField
               name='issueDate'
-              render={(args) => {
+              render={args => {
                 return <DatePicker label='Issue Date' autoFocus {...args} />
               }}
             />
@@ -143,7 +143,7 @@ class CertificateAttendance extends PureComponent {
           <GridItem xs={6}>
             <Field
               name='issuedByUserFK'
-              render={(args) => {
+              render={args => {
                 return <ClinicianSelect label='Issue By' disabled {...args} />
               }}
             />
@@ -151,7 +151,7 @@ class CertificateAttendance extends PureComponent {
           <GridItem xs={6}>
             <FastField
               name='attendanceStartTime'
-              render={(args) => {
+              render={args => {
                 return <TimePicker label='From' {...args} />
               }}
             />
@@ -159,7 +159,7 @@ class CertificateAttendance extends PureComponent {
           <GridItem xs={6}>
             <FastField
               name='attendanceEndTime'
-              render={(args) => {
+              render={args => {
                 return <TimePicker label='To' {...args} />
               }}
             />
@@ -167,7 +167,7 @@ class CertificateAttendance extends PureComponent {
           <GridItem xs={12}>
             <FastField
               name='accompaniedBy'
-              render={(args) => {
+              render={args => {
                 return <TextField label='Accompanied By' {...args} />
               }}
             />
@@ -175,7 +175,7 @@ class CertificateAttendance extends PureComponent {
           <GridItem xs={12} className={classes.editor}>
             <FastField
               name='remarks'
-              render={(args) => {
+              render={args => {
                 return (
                   <TextField
                     label='Remarks'

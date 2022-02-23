@@ -10,6 +10,7 @@ import {
   TextField,
 } from '@/components'
 import { AttachmentWithThumbnail } from '@/components/_medisys'
+import Authorized from '@/utils/Authorized'
 
 export default ({
   classes,
@@ -19,11 +20,14 @@ export default ({
   isReadOnly = false,
   attachment,
 }) => {
+  const deleteExternalTrackingAttachmentRight = Authorized.check(
+    'reception.viewexternaltracking.deleteattachment',
+  ) || { rights: 'hidden' }
   return (
     <CardContainer hideHeader size='sm' style={{ margin: 0, width: '100%' }}>
       <Field
         name='remarks'
-        render={(args) => (
+        render={args => (
           <TextField
             {...args}
             multiline
@@ -39,6 +43,7 @@ export default ({
         handleUpdateAttachments={updateAttachments}
         attachments={attachment}
         isReadOnly={isReadOnly}
+        hiddenDelete={deleteExternalTrackingAttachmentRight.rights !== 'enable'}
         hideRemarks
         fieldName='labTrackingResults'
       />

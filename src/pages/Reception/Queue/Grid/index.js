@@ -43,7 +43,7 @@ const styles = theme => ({
 })
 
 class Grid extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     props.dispatch({
       type: 'codetable/fetchCodes',
@@ -51,12 +51,13 @@ class Grid extends React.Component {
     })
   }
 
-  shouldComponentUpdate (nextProps) {
+  shouldComponentUpdate(nextProps) {
     if (this.props.loading !== nextProps.loading) return true
     if (this.props.selfOnly !== nextProps.selfOnly) return true
     if (this.props.filter !== nextProps.filter) return true
     if (this.props.mainDivHeight !== nextProps.mainDivHeight) return true
     if (this.props.searchQuery !== nextProps.searchQuery) return true
+    if (this.props.visitType !== nextProps.visitType) return true
 
     if (
       nextProps.filter === 'appointment' &&
@@ -66,14 +67,13 @@ class Grid extends React.Component {
     return false
   }
 
-  onRowDoubleClick = (row) => {
+  onRowDoubleClick = row => {
     const { visitStatus, visitPurposeFK = VISIT_TYPE.CON } = row
     const isWaiting = visitStatus === VISIT_STATUS.WAITING
-    const { clinicianProfile: { doctorProfile } } = this.props.user.data
-    const retailVisits = [
-      VISIT_TYPE.OTC,
-      VISIT_TYPE.BF,
-    ]
+    const {
+      clinicianProfile: { doctorProfile },
+    } = this.props.user.data
+    const retailVisits = [VISIT_TYPE.OTC, VISIT_TYPE.BF, VISIT_TYPE.MC]
     if (!doctorProfile || retailVisits.includes(visitPurposeFK)) return false
 
     if (isWaiting) this.props.onMenuItemClick(row, '5') // start consultation context menu id = 5
@@ -90,51 +90,56 @@ class Grid extends React.Component {
       searchQuery,
       selfOnly = false,
       queueList = [],
+      visitType = [],
     } = this.props
 
     const { clinicianProfile } = user.data
     if (filter === StatusIndicator.APPOINTMENT) {
       if (selfOnly) {
-        return calendarEvents.filter(
-          (item) =>
-            clinicianProfile
-              ? item.clinicianProfileFk === clinicianProfile.id
-              : true,
+        return calendarEvents.filter(item =>
+          clinicianProfile
+            ? item.clinicianProfileFk === clinicianProfile.id
+            : true,
         )
       }
       return calendarEvents
     }
 
     if (filter === StatusIndicator.E_QUEUE) return eQueueEvents
-    let data = [
-      ...queueList,
-    ]
+    let data = [...queueList]
 
-    if (selfOnly){
+    if (selfOnly) {
       const servePatientRight = Authorized.check('queue.servepatient')
       const userRole = user.data.clinicianProfile.userProfile.role
       const userFK = user.data.clinicianProfile.userProfile.id
-      const isServePatientEnable = userRole && userRole.clinicRoleFK === 2 && servePatientRight && servePatientRight.rights !== 'hidden'
+      const isServePatientEnable =
+        userRole &&
+        userRole.clinicRoleFK === 2 &&
+        servePatientRight &&
+        servePatientRight.rights !== 'hidden'
 
-      data = data.filter((item) => {
+      data = data.filter(item => {
         if (!item.doctor && !isServePatientEnable) return false
-        const { doctor: { id } } = item
+        const {
+          doctor: { id },
+        } = item
         return clinicianProfile.doctorProfile
           ? id === clinicianProfile.doctorProfile.id
-          : item.servingByList.filter(o=> o.servingByUserFK === userFK).length > 0
+          : item.servingByList.filter(o => o.servingByUserFK === userFK)
+              .length > 0
       })
     }
 
-    return filterData(filter, data, searchQuery)
+    return filterData(filter, data, searchQuery, visitType)
   }
 
-  getActionButton = (row) => (
+  getActionButton = row => (
     <Button
       justIcon
       round
       color='primary'
       size='sm'
-      onClick={(e) => {
+      onClick={e => {
         this.props.onContextMenu(row, e)
         e.preventDefault()
         return false
@@ -144,15 +149,19 @@ class Grid extends React.Component {
     </Button>
   )
 
-  handleStatusTagClick = (row) => {
+  handleStatusTagClick = row => {
     let id = '5' // default as Start Consultation
     const {
       visitStatus,
       visitPurposeFK,
       patientProfileFk,
       appointmentStatusFk,
+      doctorName,
     } = row
     if (visitStatus === VISIT_STATUS.UPCOMING_APPT) {
+      if (patientProfileFk && !doctorName) {
+        return
+      }
       id = patientProfileFk ? '8' : '9'
 
       this.props.onMenuItemClick(row, id)
@@ -163,14 +172,24 @@ class Grid extends React.Component {
       case VISIT_STATUS.WAITING:
         if (
           visitPurposeFK === VISIT_TYPE.OTC ||
-          visitPurposeFK === VISIT_TYPE.BF
+          visitPurposeFK === VISIT_TYPE.BF ||
+          visitPurposeFK === VISIT_TYPE.MC
         )
           id = '1'
         else id = '5'
         break
       case VISIT_STATUS.IN_CONS:
-      case VISIT_STATUS.PAUSED:
         id = '6'
+        break
+      case VISIT_STATUS.PAUSED:
+        const { user } = this.props
+        const clinicRoleFK =
+          user.data.clinicianProfile.userProfile.role?.clinicRoleFK
+        if (clinicRoleFK === 1) {
+          id = '6'
+        } else {
+          id = '1'
+        }
         break
       case VISIT_STATUS.DISPENSE:
       case VISIT_STATUS.ORDER_UPDATED:
@@ -196,7 +215,7 @@ class Grid extends React.Component {
     this.props.onMenuItemClick(row, id)
   }
 
-  render () {
+  render() {
     const {
       classes,
       codetable,
@@ -216,8 +235,16 @@ class Grid extends React.Component {
     const queueConfig = {
       ...QueueTableConfig,
       columns: QueueTableConfig.columns
-      .filter(col => showConsReady && showConsReady.rights === 'hidden' ? col.name !== 'consReady' : true)
-      .filter(col => showVisitGroup && showVisitGroup.rights === 'hidden' ? col.name !== 'visitGroup' : true)
+        .filter(col =>
+          showConsReady && showConsReady.rights === 'hidden'
+            ? col.name !== 'consReady'
+            : true,
+        )
+        .filter(col =>
+          showVisitGroup && showVisitGroup.rights === 'hidden'
+            ? col.name !== 'visitGroup'
+            : true,
+        ),
     }
 
     const isLoading = showingVisitRegistration ? false : loading
@@ -231,6 +258,7 @@ class Grid extends React.Component {
     if (height < 500) height = 500
     const TableProps = { height }
     if (!height) return <Skeleton variant='rect' height={500} />
+    const queueColumns = QueueColumnExtensions(this.props)
     return (
       <div>
         <LoadingWrapper
@@ -245,11 +273,11 @@ class Grid extends React.Component {
               rows={queueListingData}
               forceRender
               columnExtensions={[
-                ...QueueColumnExtensions,
+                ...queueColumns,
                 {
                   columnName: 'visitStatus',
                   width: 200,
-                  render: (row) => (
+                  render: row => (
                     <VisitStatusTag
                       row={row}
                       onClick={this.handleStatusTagClick}
@@ -259,20 +287,24 @@ class Grid extends React.Component {
                 {
                   columnName: 'consReady',
                   align: 'center',
-                  render: (row) => {
-                    return <Switch
-                      className={classes.switchContainer}
-                      value={row.consReady}
-                      preventToggle
-                      onClick={(checked, event) => {
-                        this.props.onQueueListing({
-                          ...row,
-                          consReady: checked,
-                        })
-                      }}
-                      disabled={showConsReady && showConsReady.rights !== 'enable'}
-                      {...this.props}
-                    />
+                  render: row => {
+                    return (
+                      <Switch
+                        className={classes.switchContainer}
+                        value={row.consReady}
+                        preventToggle
+                        onClick={(checked, event) => {
+                          this.props.onQueueListing({
+                            ...row,
+                            consReady: checked,
+                          })
+                        }}
+                        disabled={
+                          showConsReady && showConsReady.rights !== 'enable'
+                        }
+                        {...this.props}
+                      />
+                    )
                   },
                   sortingEnabled: false,
                 },
@@ -286,9 +318,8 @@ class Grid extends React.Component {
                   columnName: 'visitPurposeFK',
                   width: 60,
                   align: 'left',
-                  render: (row) => {
-                    return 
-                      ''
+                  render: row => {
+                    return ''
                   },
                 },
               ]}
@@ -309,7 +340,7 @@ class Grid extends React.Component {
                 {
                   columnName: 'visitStatus',
                   width: 200,
-                  render: (row) => (
+                  render: row => (
                     <VisitStatusTag
                       row={row}
                       onClick={this.handleStatusTagClick}
@@ -325,12 +356,12 @@ class Grid extends React.Component {
                 },
                 {
                   columnName: 'gender/age',
-                  render: (row) => {
+                  render: row => {
                     const { dob, genderFK = 3, patientProfileFk } = row
                     if (!patientProfileFk) return null
                     const { ctgender = [] } = codetable
                     const age = calculateAgeFromDOB(dob)
-                    const gender = ctgender.find((g) => g.id === genderFK)
+                    const gender = ctgender.find(g => g.id === genderFK)
                     return (
                       <Tooltip title={`${gender.code}/${age}`}>
                         <span>{`${gender.code}/${age}`}</span>

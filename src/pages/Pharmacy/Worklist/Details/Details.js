@@ -10,6 +10,9 @@ import EditOrder from '@/pages/Dispense/EditOrder'
 import style from '@/pages/Dispense/style'
 import { LoadingWrapper } from '@/components/_medisys'
 
+import { getOrdersData } from '@/pages/Consultation/utils'
+import { VISIT_TYPE } from '@/utils/constants'
+
 const styles = theme => ({
   ...style,
   contentPanel: {
@@ -19,7 +22,20 @@ const styles = theme => ({
 })
 
 const Details = props => {
-  const { patient, classes, pharmacyDetails, dispatch, loading } = props
+  const {
+    patient,
+    classes,
+    pharmacyDetails,
+    dispatch,
+    loading,
+    orders,
+    fromModule,
+    visitRegistration,
+  } = props
+  const { entity = {} } = visitRegistration
+  const { visit = {} } = entity
+  const { rows } = orders
+
   const [editingOrder, setEditingOrder] = useState(false)
   const closeEditOrder = () => {
     dispatch({
@@ -30,13 +46,87 @@ const Details = props => {
   }
   const banner = document.getElementById('patientBanner')
   const contentHeight = (props.height || 0) - (banner?.offsetHeight || 0)
+
+  const draftPreOrderItem = patient?.pendingPreOrderItem?.map(po => {
+    const selectPreOrder = rows.find(
+      apo => apo.actualizedPreOrderItemFK === po.id,
+    )
+    if (selectPreOrder) {
+      return {
+        ...po,
+        preOrderItemStatus: selectPreOrder.isDeleted ? 'New' : 'Actualizing',
+      }
+    }
+    return { ...po }
+  })
+
+  const onSelectPreOrder = async (selectPreOrder = []) => {
+    const {
+      orders,
+      dispatch,
+      codetable,
+      visitRegistration,
+      patient,
+      user,
+      clinicSettings,
+    } = props
+    const { entity = {} } = visitRegistration
+    const { visit = {} } = entity
+    await props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctservice',
+      },
+    })
+
+    if (!editingOrder && visit.visitPurposeFK === VISIT_TYPE.OTC) {
+      dispatch({
+        type: 'pharmacyDetails/updateState',
+        payload: {
+          openOrderPopUpAfterActualize: true,
+          ordersData: getOrdersData({
+            selectPreOrder,
+            orders,
+            codetable,
+            visitRegistration,
+            patient,
+            user,
+            clinicSettings,
+          }),
+        },
+      })
+    } else {
+      dispatch({
+        type: 'orders/upsertRows',
+        payload: getOrdersData({
+          selectPreOrder,
+          orders,
+          codetable,
+          visitRegistration,
+          patient,
+          user,
+          clinicSettings,
+        }),
+      })
+    }
+  }
+
   return (
     <div>
       <LoadingWrapper
         loading={loading.models.dispense || loading.models.pharmacyDetails}
       >
         <div style={{ padding: 8, marginTop: -20 }}>
-          <Banner from='Pharmacy' patientInfo={patient} />
+          <Banner
+            from='Pharmacy'
+            patientInfo={patient}
+            editingOrder={
+              editingOrder || visit?.visitPurposeFK === VISIT_TYPE.OTC
+            }
+            onSelectPreOrder={onSelectPreOrder}
+            activePreOrderItems={draftPreOrderItem}
+            isRetail={visit?.visitPurposeFK === VISIT_TYPE.OTC}
+          />
         </div>
         <div className={classes.contentPanel} style={{ height: contentHeight }}>
           <SizeContainer size='sm'>
@@ -72,6 +162,8 @@ export default compose(
       orders,
       visitRegistration,
       loading,
+      codetable,
+      user,
     }) => ({
       patient: patient.entity || {},
       forms,
@@ -83,6 +175,8 @@ export default compose(
       orders,
       visitRegistration,
       loading,
+      codetable,
+      user,
     }),
   ),
 )(Details)

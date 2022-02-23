@@ -124,61 +124,22 @@ export default createFormViewModel({
 
         const newOSItem = purchaseOrderOutstandingItem.map(o => {
           if (MedicationItemList.length > 0 && o.type === 1) {
-            const m = MedicationItemList.find(
-              f =>
-                f.inventoryMedicationFK === o.inventoryMedicationFK &&
-                f.stock &&
-                f.stock.length > 0,
-            )
-            const { id, batchNo, expiryDate } = m.stock.find(
-              s => s.isDefault === true,
-            )
-
+           
             return {
               ...o,
-              id: undefined,
-              batchNo,
-              batchNoId: id,
-              expiryDate,
+              id: undefined, 
             }
           }
-          if (ConsumableItemList.length > 0 && o.type === 2) {
-            const m = ConsumableItemList.find(
-              f =>
-                f.inventoryConsumableFK === o.inventoryConsumableFK &&
-                f.stock &&
-                f.stock.length > 0,
-            )
-
-            const { id, batchNo, expiryDate } = m.stock.find(
-              s => s.isDefault === true,
-            )
-
+          if (ConsumableItemList.length > 0 && o.type === 2) { 
             return {
               ...o,
               id: undefined,
-              batchNo,
-              batchNoId: id,
-              expiryDate,
             }
           }
-          if (VaccinationItemList.length > 0 && o.type === 3) {
-            const m = VaccinationItemList.find(
-              f =>
-                f.inventoryVaccinationFK === o.inventoryVaccinationFK &&
-                f.stock &&
-                f.stock.length > 0,
-            )
-            const { id, batchNo, expiryDate } = m.stock.find(
-              s => s.isDefault === true,
-            )
-
+          if (VaccinationItemList.length > 0 && o.type === 3) {  
             return {
               ...o,
-              id: undefined,
-              batchNo,
-              batchNoId: id,
-              expiryDate,
+              id: undefined, 
             }
           }
           return o

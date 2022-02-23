@@ -1,14 +1,18 @@
-import React, { useCallback, useMemo, useRef  } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { connect } from 'dva'
 // moment
 import moment from 'moment'
-// big calendar
-import BigCalendar from 'react-big-calendar'
-import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 // material ui
 import { withStyles } from '@material-ui/core'
 // components
-import { serverDateFormat, Tooltip, Button } from '@/components'
+import {
+  serverDateFormat,
+  Tooltip,
+  Button,
+  Popover,
+  notification,
+  timeFormat24Hour,
+} from '@/components'
 // medisys components
 import { LoadingWrapper } from '@/components/_medisys'
 // setting
@@ -22,6 +26,13 @@ import { getFirstAppointmentType } from './form/formUtils'
 // assets
 import { primaryColor } from '@/assets/jss'
 import { PrinterOutlined } from '@ant-design/icons'
+import SyncfusionCalendar from './SyncfusionCalendar'
+import {
+  CALENDAR_VIEWS,
+  CALENDAR_RESOURCE,
+  APPOINTMENT_STATUS,
+} from '@/utils/constants'
+import consultationDocument from '@/models/consultationDocument'
 
 const styles = () => ({
   customMaxWidth: {
@@ -43,39 +54,36 @@ const styles = () => ({
     fontWeight: '450',
     color: '#fff',
   },
-
 })
 
 const calendarViewstyles = () => ({
   dayHeaderContainer: {
-    height:'100%',
-    '& > span:last-child': {
-      float:'right',
+    height: '100%',
+    '& > div:last-child': {
+      float: 'right',
       visibility: 'hidden',
     },
     '&:hover': {
-      '& > span:last-child': {
+      '& > div:last-child': {
         visibility: 'visible',
       },
     },
   },
-  calendarHeightSettingStyle:{
-    '& .rbc-time-view > .rbc-time-content > .rbc-time-column':{
-      height:1400,
-      '& > .rbc-timeslot-group':{
-        minHeight:'unset',
-        '& > div':{
-          minHeight:'unset !important',
-          maxHeight:'unset !important',
-          height:'100%',
+  calendarHeightSettingStyle: {
+    '& .rbc-time-view > .rbc-time-content > .rbc-time-column': {
+      height: 1400,
+      '& > .rbc-timeslot-group': {
+        minHeight: 'unset',
+        '& > div': {
+          minHeight: 'unset !important',
+          maxHeight: 'unset !important',
+          height: '100%',
         },
-      }
+      },
     },
   },
 })
 
-const DragAndDropCalendar = withDragAndDrop(BigCalendar)
-const localizer = BigCalendar.momentLocalizer(moment)
 const today = new Date()
 const minTime = new Date(
   today.getFullYear(),
@@ -94,7 +102,7 @@ const maxTime = new Date(
   0,
 )
 
-const applyFilter = (filter, data, isDayView) => {
+const applyFilter = (filter, data, isDayView, ctcalendarresource) => {
   const {
     filterByApptType = [],
     filterByDoctor = [],
@@ -130,8 +138,11 @@ const applyFilter = (filter, data, isDayView) => {
 
           return (
             patientProfile.name.toLowerCase().indexOf(_searchStr) >= 0 ||
-            patientProfile.patientAccountNo.toLowerCase().indexOf(_searchStr) >= 0 ||
-            patientProfile.patientRefrenceNo.toLowerCase().indexOf(_searchStr) >= 0 ||
+            patientProfile.patientAccountNo.toLowerCase().indexOf(_searchStr) >=
+              0 ||
+            patientProfile.patientRefrenceNo
+              .toLowerCase()
+              .indexOf(_searchStr) >= 0 ||
             mobile.number.toLowerCase().indexOf(_searchStr) >= 0
           )
         }
@@ -153,18 +164,29 @@ const applyFilter = (filter, data, isDayView) => {
     if (isDayView) {
       if (filterByDoctor.length > 0 && filterByDoctor.indexOf(-99) !== 0) {
         returnData = returnData.filter(eachData => {
-          if (eachData.isDoctorBlock)
-            return filterByDoctor.includes(eachData.doctor.clinicianProfile.id)
-
-          return filterByDoctor.includes(eachData.clinicianFK)
+          if (eachData.isDoctorBlock) {
+            const selectResource = ctcalendarresource.find(
+              r =>
+                r.resourceType === CALENDAR_RESOURCE.DOCTOR &&
+                r.clinicianProfileDto.id ===
+                  eachData.doctor.clinicianProfile.id,
+            )
+            return selectResource && filterByDoctor.includes(selectResource.id)
+          }
+          return filterByDoctor.includes(eachData.calendarResourceFK)
         })
       }
     } else {
       returnData = returnData.filter(eachData => {
-        if (eachData.isDoctorBlock)
-          return filterBySingleDoctor === eachData.doctor.clinicianProfile.id
-
-        return filterBySingleDoctor === eachData.clinicianFK
+        if (eachData.isDoctorBlock) {
+          const selectResource = ctcalendarresource.find(
+            r =>
+              r.resourceType === CALENDAR_RESOURCE.doctor &&
+              r.clinicianProfileDto.id === eachData.doctor.clinicianProfile.id,
+          )
+          return filterBySingleDoctor === selectResource.id
+        }
+        return filterBySingleDoctor === eachData.calendarResourceFK
       })
     }
 
@@ -176,9 +198,7 @@ const applyFilter = (filter, data, isDayView) => {
           filterByApptType.includes(eachData.appointmentTypeFK),
       )
     }
-  } catch (error) {
-    console.log({ error })
-  }
+  } catch (error) {}
 
   return returnData
 }
@@ -224,10 +244,14 @@ const MonthDateHeader = withStyles(styles, { name: 'MonthDateHeader' })(
   }),
 )
 
-const changeTimeRulerExtentPixel = (height) => {
-  var calendarView = Object.values(document.styleSheets).filter(x=> x.ownerNode.dataset.meta === 'CalendarView')
-  var heightStyle = Object.values(calendarView[0].cssRules).filter(x=>x.selectorText.endsWith('rbc-time-column'))[0]
-  heightStyle.style.height = `${height||1400}px`
+const changeTimeRulerExtentPixel = height => {
+  var calendarView = Object.values(document.styleSheets).filter(
+    x => x.ownerNode.dataset.meta === 'CalendarView',
+  )
+  var heightStyle = Object.values(calendarView[0].cssRules).filter(x =>
+    x.selectorText.endsWith('rbc-time-column'),
+  )[0]
+  heightStyle.style.height = `${height || 1400}px`
 }
 
 const CalendarView = ({
@@ -236,7 +260,6 @@ const CalendarView = ({
   handleSelectSlot,
   handleDoubleClick,
   handleOnDragStart,
-  handleEventMouseOver,
   handleMoveEvent,
   // --- variables ---
   calendarEvents,
@@ -248,13 +271,16 @@ const CalendarView = ({
   filter,
   loading,
   appointmentTypes,
-  apptTimeIntervel = 15 ,
-  apptTimeRulerExtent = 1400 ,
+  apptTimeIntervel = 15,
+  apptTimeRulerExtent = 1400,
   printDailyAppointmentReport,
   classes,
+  calendar,
+  ctcalendarresource,
+  onResourceDateChange,
+  onUpdateEvent,
+  apptTimeSlotDuration = 15,
 }) => {
-  const calendar = useRef(null);
-
   changeTimeRulerExtentPixel(apptTimeRulerExtent)
 
   const _draggableAccessor = event => {
@@ -263,54 +289,33 @@ const CalendarView = ({
     return true
   }
   const _eventColors = event => {
-    const { doctor } = event
+    const { isDoctorBlock } = event.data
 
-    if (doctor) {
-      return {
-        style: {
-          backgroundColor: doctorEventColorOpts.value,
-        },
-      }
+    if (isDoctorBlock) {
+      event.element.style.backgroundColor = doctorEventColorOpts.value
+      return
     }
 
-    let appointmentType
-    if (calendarView !== BigCalendar.Views.MONTH) {
-      appointmentType = appointmentTypes.find(
-        item => item.id === event.appointmentTypeFK,
-      )
-    } else {
-      const appointmentTypeFK = getFirstAppointmentType(event)
-      appointmentType =
-        appointmentTypeFK !== null &&
-        appointmentTypes.find(item => item.id === appointmentTypeFK)
-    }
+    const appointmentType = appointmentTypes.find(
+      item => item.id === event.data.appointmentTypeFK,
+    )
 
-    return {
-      style: {
-        backgroundColor: !appointmentType
-          ? primaryColor
-          : appointmentType.tagColorHex,
-      },
-    }
+    event.element.style.backgroundColor = !appointmentType
+      ? primaryColor
+      : appointmentType.tagColorHex
   }
 
   const _customDayPropGetter = date => {
-    // const { publicHolidays } = this.props
-    // console.log({ date })
     const momentDate = moment(date)
     const publicHoliday = publicHolidays.find(item => {
       const momentStartDate = moment(item.startDate)
       const momentEndDate = moment(item.endDate)
-
-      // if (momentStartDate.diff(momentDate, 'day') === 0) {
-      //   return true
-      // }
       if (momentDate.isBetween(momentStartDate, momentEndDate, 'days', '[]'))
         return true
       return false
     })
 
-    if (calendarView === BigCalendar.Views.MONTH && publicHoliday)
+    if (calendarView === CALENDAR_VIEWS.MONTH && publicHoliday)
       return {
         className: 'calendar-holiday',
       }
@@ -318,112 +323,68 @@ const CalendarView = ({
   }
 
   const _jumpToDate = date => {
+    onResourceDateChange(calendarView, date)
     dispatch({
       type: 'calendar/navigateCalendar',
-      payload: { date },
+      payload: {
+        date,
+        doctor:
+          calendarView === CALENDAR_VIEWS.DAY
+            ? filter.filterByDoctor
+            : [filter.filterBySingleDoctor],
+      },
     })
-    // this.props.dispatch({ type: 'calendar/setCurrentViewDate', date })
   }
 
-  const _onViewChange = view => {
-    dispatch({
-      type: 'calendar/navigateCalendar',
-      payload: { view },
-    })
+  const _onViewChange = (view, date) => {
     dispatch({
       type: 'calendar/setCalendarView',
       payload: view,
     })
-  }
-
-  const _moveEvent = props => {
-    handleMoveEvent({ props })
-
-    // const { handleMoveEvent } = this.props
-    // const { id, _appointmentID } = event
-
-    // const resourceID = resourceId !== undefined ? resourceId : event.resourceId
-
-    // const updatedEvent = {
-    //   start,
-    //   end,
-    //   resourceId: resourceID,
-    // }
-  }
-
-  const _jumpToSelectedValue = (value, type, currentDate) => {
-    const desiredDate = moment(currentDate)
-      .add(value, type)
-      .toDate()
-
+    onResourceDateChange(view, date)
     dispatch({
       type: 'calendar/navigateCalendar',
-      payload: { date: desiredDate },
+      payload: {
+        view,
+        date,
+        doctor:
+          view === CALENDAR_VIEWS.DAY
+            ? filter.filterByDoctor
+            : [filter.filterBySingleDoctor],
+      },
     })
   }
 
-  const Toolbar = toolbarProps => {
+  const EventComponent = event => {
     return (
-      <CalendarToolbar
-        {...toolbarProps}
-        handleViewChange={_onViewChange}
-        handleDateChange={_jumpToDate}
-        handleSelectedValue={_jumpToSelectedValue}
-      />
+      <div class='event'>
+        <Event event={event} calendarView={calendarView} />
+      </div>
     )
   }
 
-  const EventComponent = eventProps => {
-    return (
-      <Event
-        {...eventProps}
-        // calendarView={calendarView}
-        // handleMouseOver={handleEventMouseOver}
-      />
-    )
+  const isReadonly = appointment => {
+    const {
+      appointmentStatusFk,
+      patientProfileFK,
+      patientProfile,
+    } = appointment
+
+    const patientIsActive =
+      patientProfileFK > 0 ? patientProfile && patientProfile.isActive : true
+
+    const _disabledStatus = [
+      APPOINTMENT_STATUS.CANCELLED,
+      APPOINTMENT_STATUS.TURNEDUP,
+      APPOINTMENT_STATUS.TURNEDUPLATE,
+    ]
+    if (_disabledStatus.includes(appointmentStatusFk) || !patientIsActive) {
+      return true
+    }
+    return false
   }
 
   const eventList = useMemo(() => {
-    if (calendarView === BigCalendar.Views.MONTH)
-      return calendarEvents.reduce((events, appointment) => {
-        const { appointment_Resources: apptResources = [] } = appointment
-
-        // TODO: need to fix sortOrder calculation, should exclude deleted appointments when calculating sortOrder
-        const firstApptRes = apptResources.find(item => item.isPrimaryClinician)
-
-        if (!firstApptRes) return events
-
-        const firstClinicianFK =
-          firstApptRes !== undefined ? firstApptRes.clinicianFK : undefined
-
-        const firstAppointmentTypeFK =
-          firstApptRes !== undefined
-            ? firstApptRes.appointmentTypeFK
-            : undefined
-
-        return [
-          ...events,
-          {
-            ...appointment,
-            appointmentTypeFK: firstAppointmentTypeFK,
-            clinicianFK: firstClinicianFK,
-            resourceId: firstClinicianFK,
-            clinicianName: !firstApptRes
-              ? undefined
-              : firstApptRes.clinicianName,
-            start: moment(
-              `${appointment.appointmentDate} ${firstApptRes.startTime}`,
-              `${serverDateFormat} HH:mm`,
-            ).toDate(),
-            end: moment(
-              `${appointment.appointmentDate} ${firstApptRes.endTime}`,
-              `${serverDateFormat} HH:mm`,
-            ).toDate(),
-            updateByUser:appointment.updateByUser,
-            updateDate:appointment.updateDate,
-          },
-        ]
-      }, [])
     return calendarEvents.reduce((events, appointment) => {
       const {
         appointmentDate,
@@ -443,8 +404,8 @@ const CalendarView = ({
 
       const apptEvents = apptResources.map(item => ({
         ...item,
-        resourceId: item.clinicianFK,
-        clinicianFK: item.clinicianFK,
+        resourceId: item.calendarResourceFK,
+        resourceName: item.calendarResource.name,
         patientProfile,
         patientName,
         patientContactNo,
@@ -458,14 +419,27 @@ const CalendarView = ({
         stage: appointment.stage,
         start: moment(
           `${appointmentDate} ${item.startTime}`,
-          `${serverDateFormat} HH:mm`,
+          `${serverDateFormat} ${timeFormat24Hour}`,
         ).toDate(),
         end: moment(
           `${appointmentDate} ${item.endTime}`,
-          `${serverDateFormat} HH:mm`,
+          `${serverDateFormat} ${timeFormat24Hour}`,
+        ).toDate(),
+        StartTime: moment(
+          `${appointmentDate} ${item.startTime}`,
+          `${serverDateFormat} ${timeFormat24Hour}`,
+        ).toDate(),
+        EndTime: moment(
+          `${appointmentDate} ${item.endTime}`,
+          `${serverDateFormat} ${timeFormat24Hour}`,
         ).toDate(),
         updateByUser,
         updateDate,
+        resourceFK:
+          item.calendarResource.resourceType === CALENDAR_RESOURCE.DOCTOR
+            ? `Doctor-${item.calendarResource.clinicianProfileDto.id}`
+            : `Resource-${item.calendarResource.resourceDto.id}`,
+        IsReadonly: isReadonly(appointment),
       }))
       return [...events, ...apptEvents]
     }, [])
@@ -482,102 +456,288 @@ const CalendarView = ({
             resourceId: item.doctor.clinicianProfile.id,
             start: moment(item.startDateTime).toDate(),
             end: moment(item.endDateTime).toDate(),
+            StartTime: moment(item.startDateTime).toDate(),
+            EndTime: moment(item.endDateTime).toDate(),
+            resourceFK: `Doctor-${item.doctor.clinicianProfile.id}`,
           })),
         ],
-        calendarView === BigCalendar.Views.DAY,
+        calendarView === CALENDAR_VIEWS.DAY,
+        ctcalendarresource,
       ),
     [calendarView, filter, doctorBlocks, eventList],
   )
 
+  const cellDoubleClick = props => {
+    const resource = resources[props.groupIndex]
+    if (resource.resourceType === CALENDAR_RESOURCE.RESOURCE) {
+      const dailyCapacity = resource.calendarResourceDailyCapacity || []
+      const startTime = moment(props.startTime).format(timeFormat24Hour)
+      const hour = Math.floor(apptTimeSlotDuration / 60)
+      const minute = apptTimeSlotDuration % 60
+      const endTime = moment(props.startTime)
+        .add(hour, 'hour')
+        .add(minute, 'minute')
+        .format(timeFormat24Hour)
+      for (let index = 0; index < dailyCapacity.length; index++) {
+        if (
+          ((startTime >= dailyCapacity[index].startTime &&
+            startTime < dailyCapacity[index].endTime) ||
+            (endTime > dailyCapacity[index].startTime &&
+              endTime <= dailyCapacity[index].endTime) ||
+            (startTime < dailyCapacity[index].startTime &&
+              endTime > dailyCapacity[index].endTime)) &&
+          dailyCapacity[index].maxCapacity <= dailyCapacity[index].usedSlot
+        ) {
+          dispatch({
+            type: 'global/updateAppState',
+            payload: {
+              openConfirm: true,
+              isInformType: true,
+              openConfirmText: 'OK',
+              openConfirmContent: `${resource.name} reach maximum booking in this time slot. Please select another time.`,
+            },
+          })
+          props.cancel = true
+          return
+        }
+      }
+    }
+    handleSelectSlot({
+      start: props.startTime,
+      end: props.endTime,
+      resourceId: resources[props.groupIndex].id,
+      action: props.name,
+    })
+    props.cancel = true
+  }
+
+  const renderCell = event => {
+    if (
+      event.elementType === 'monthCells' ||
+      event.elementType === 'dateHeader'
+    ) {
+      const resource = resources[event.groupIndex]
+      if (resource && resource.resourceType === CALENDAR_RESOURCE.RESOURCE) {
+        const dailyCapacity = _.orderBy(
+          resource.calendarResourceDailyCapacity.filter(
+            c =>
+              moment(c.dailyDate).format('DD MMM YYYY') ===
+              moment(event.date).format('DD MMM YYYY'),
+          ),
+          ['startTime'],
+          ['asc'],
+        )
+        if (dailyCapacity.length) {
+          const tooltip = dailyCapacity
+            .map(c => {
+              const startTime = moment(
+                new Date(`${moment().format('DD MMM YYYY')} ${c.startTime}`),
+              ).format('hh:mm A')
+              const endTime = moment(
+                new Date(`${moment().format('DD MMM YYYY')} ${c.endTime}`),
+              ).format('hh:mm A')
+              return `${startTime} - ${endTime} Maximum slot: ${
+                c.maxCapacity
+              } Balance slot: ${c.maxCapacity -
+                c.usedSlot}\r\nRemarks: ${c.remarks || '-'}`
+            })
+            .join('\r\n')
+          const maxSlot = dailyCapacity.map(c => c.maxCapacity).join(', ')
+          const balanceSlot = dailyCapacity
+            .map(c => {
+              const balance = c.maxCapacity - c.usedSlot
+              return `<span style="color:${
+                balance > 0 ? 'black' : 'red'
+              }">${balance}</span>`
+            })
+            .join(', ')
+          event.element.innerHTML = `<div style="position:relative;">${event.element.innerHTML}<div title="${tooltip}" style="position:absolute;right:6px;top:1px;color:black;">Max: ${maxSlot} Bal: ${balanceSlot}</div></div>`
+        }
+      }
+    }
+  }
+
+  const eventClick = event => {
+    handleDoubleClick(event.event)
+    event.cancel = true
+  }
+
+  const [eventAction, setEventAction] = useState(undefined)
   return (
     <LoadingWrapper loading={loading} text='Loading appointments...'>
-      <DragAndDropCalendar
-        ref={calendar}
-        components={{
-          // https://github.com/intljusticemission/react-big-calendar/blob/master/src/Calendar.js
-          toolbar: Toolbar,
-          event: EventComponent,
-          timeSlotWrapper: TimeSlotComponent,
-          month: {
-            dateHeader: MonthDateHeader,
-          },
-          resourceHeader: props => {
-            var { date } = calendar?.current.props
-            var { clinicianFK } = props?.resource
-            return (
-              <div className={classes.dayHeaderContainer}>
-                <span>{props.label}</span>
-                <span>
-                  <Button
-                    size='sm'
-                    color='transparent'
-                    justIcon
-                    onClick={() => {
-                      var { date } = calendar?.current.props
-                      var { clinicianFK } = props?.resource
-                      printDailyAppointmentReport(date, clinicianFK)
-                    }}
-                  >
-                    <PrinterOutlined />
-                  </Button>
-                </span>
-              </div>
-            )
-          },
-        }}
-        localizer={localizer}
-        date={displayDate}
-        min={minTime}
-        max={maxTime}
+      <SyncfusionCalendar
+        printDailyAppointmentReport={printDailyAppointmentReport}
+        startHour='07:00 AM'
+        endHour='22:00 PM'
+        height={820}
         view={calendarView}
-        // #region values props
-        events={filtered}
-        // #endregion
+        eventSettings={{
+          dataSource: filtered.filter(
+            e =>
+              !eventAction ||
+              eventAction.type === 'Copy' ||
+              !(
+                e.id == eventAction.event.id &&
+                e.isDoctorBlock === eventAction.event.isDoctorBlock
+              ),
+          ),
+          template: EventComponent,
+          enableTooltip: false,
+        }}
+        resources={resources}
+        timeScale={{ interval: apptTimeIntervel * 2, slotCount: 2 }}
+        cellDoubleClick={cellDoubleClick}
+        eventClick={eventClick}
+        eventRendered={_eventColors}
+        renderCell={renderCell}
+        cellTemplate={slot => {
+          return <TimeSlotComponent slot={slot} />
+        }}
+        displayDate={displayDate}
+        onViewChange={_onViewChange}
+        jumpToDate={_jumpToDate}
+        resourceIdAccessor='resourceFK'
+        resourceTitleAccessor='calendarResourceName'
+        eventAction={eventAction}
+        dragStart={e => {
+          //e.navigation.enable = true
+        }}
+        dragStop={e => {
+          if (
+            calendarView === CALENDAR_VIEWS.DAY &&
+            e.data.isDoctorBlock &&
+            resources[e.target.cellIndex].resourceType ===
+              CALENDAR_RESOURCE.RESOURCE
+          ) {
+            notification.error({
+              message: 'can not drag doctor block to resource.',
+            })
+            return
+          }
 
-        // #region --- functional props ---
-        selectable='ignoreEvents'
-        resizable={false}
-        showMultiDayTimes={false}
-        step={apptTimeIntervel}
-        className={classes.calendarHeightSettingStyle}
-        timeslots={1}
-        longPressThreshold={500}
-        tooltipAccessor={null}
-        // #endregion --- functional props ---
-        // #region --- resources ---
-        resources={
-          calendarView === BigCalendar.Views.DAY ? resources : undefined
-        }
-        resourceIdAccessor='clinicianFK'
-        resourceTitleAccessor='doctorName'
-        // #endregion --- resources ---
-        // #region --- event handlers ---
-        draggableAccessor={_draggableAccessor}
-        onNavigate={_jumpToDate}
-        onEventDrop={_moveEvent}
-        onView={_onViewChange}
-        eventPropGetter={_eventColors}
-        dayPropGetter={_customDayPropGetter}
-        // slotPropGetter={TimeSlotComponent}
-        onSelectSlot={handleSelectSlot}
-        onDoubleClickEvent={handleDoubleClick}
-        onDragStart={handleOnDragStart}
-        // #endregion --- event handlers ---
+          let startTime = e.data.StartTime
+          let endTime = e.data.EndTime
+          if (e.data.isDoctorBlock && calendarView === CALENDAR_VIEWS.MONTH) {
+            startTime = moment(
+              new Date(
+                `${moment(startTime).format('YYYY MM DD')} ${moment(
+                  e.data.startDateTime,
+                ).format(timeFormat24Hour)}`,
+              ),
+            ).toDate()
+            endTime = moment(
+              new Date(
+                `${moment(endTime).format('YYYY MM DD')} ${moment(
+                  e.data.endDateTime,
+                ).format(timeFormat24Hour)}`,
+              ),
+            ).toDate()
+          }
+          onUpdateEvent({
+            ...e.data,
+            resourceId:
+              calendarView === CALENDAR_VIEWS.DAY
+                ? e.data.isDoctorBlock
+                  ? resources[e.target.cellIndex].clinicianProfileDto
+                      .userProfileFK
+                  : resources[e.target.cellIndex].id
+                : undefined,
+            view: calendarView,
+            startTime,
+            endTime,
+          })
+          setEventAction(undefined)
+        }}
+        resizeStop={e => {
+          onUpdateEvent({
+            ...e.data,
+            view: calendarView,
+            startTime: e.data.StartTime,
+            endTime: e.data.EndTime,
+          })
+          setEventAction(undefined)
+        }}
+        onCopyClick={data => {
+          setEventAction({ type: 'Copy', event: { ...data } })
+        }}
+        onCutClick={data => {
+          setEventAction({ type: 'Cut', event: { ...data } })
+        }}
+        onPasteClick={data => {
+          const newResource = resources[data.groupIndex]
+          if (
+            eventAction.event.isDoctorBlock &&
+            newResource.resourceType === CALENDAR_RESOURCE.RESOURCE
+          ) {
+            notification.error({
+              message: 'can not paste doctor block to resource.',
+            })
+            return
+          }
+
+          let oldStartTime = eventAction.event.StartTime
+          let oldEndTime = eventAction.event.EndTime
+          if (eventAction.event.isDoctorBlock) {
+            oldStartTime = eventAction.event.startDateTime
+            oldEndTime = eventAction.event.endDateTime
+          }
+
+          let startTime = data.startTime
+          if (calendarView === CALENDAR_VIEWS.MONTH) {
+            startTime = moment(
+              new Date(
+                `${moment(data.startTime).format('YYYY MM DD')} ${moment(
+                  oldStartTime,
+                ).format(timeFormat24Hour)}`,
+              ),
+            ).toDate()
+          }
+          const hour = moment(oldEndTime).diff(moment(oldStartTime), 'hour')
+          const minute =
+            (moment(oldEndTime).diff(moment(oldStartTime), 'minute') / 60 -
+              hour) *
+            60
+          const endTime = moment(startTime)
+            .add(hour, 'hour')
+            .add(minute, 'minute')
+            .toDate()
+
+          onUpdateEvent({
+            ...eventAction.event,
+            resourceId:
+              calendarView === CALENDAR_VIEWS.DAY
+                ? eventAction.event.isDoctorBlock
+                  ? newResource.clinicianProfileDto.userProfileFK
+                  : newResource.id
+                : undefined,
+            view: calendarView,
+            startTime,
+            endTime,
+            isFromCopy: eventAction.type === 'Copy',
+          })
+          setEventAction(undefined)
+        }}
       />
     </LoadingWrapper>
   )
 }
 
-const _CalendarView = connect(({ calendar, codetable, loading, doctorBlock, clinicSettings }) => ({
-  displayDate: calendar.currentViewDate,
-  calendarView: calendar.calendarView,
-  calendarEvents: calendar.list || [],
-  publicHolidays: calendar.publicHolidayList,
-  doctorBlocks: doctorBlock.list || [],
-  appointmentTypes: codetable.ctappointmenttype || [],
-  loading: loading.models.calendar,
-  apptTimeIntervel: clinicSettings.settings.apptTimeIntervel,
-  apptTimeRulerExtent: clinicSettings.settings.apptTimeRulerExtent,
-}))(CalendarView)
+const _CalendarView = connect(
+  ({ calendar, codetable, loading, doctorBlock, clinicSettings }) => ({
+    displayDate: calendar.currentViewDate,
+    calendarView: calendar.calendarView,
+    calendarEvents: calendar.list || [],
+    publicHolidays: calendar.publicHolidayList,
+    doctorBlocks: doctorBlock.list || [],
+    appointmentTypes: codetable.ctappointmenttype || [],
+    loading: loading.models.calendar,
+    apptTimeIntervel: clinicSettings.settings.apptTimeIntervel,
+    apptTimeRulerExtent: clinicSettings.settings.apptTimeRulerExtent,
+    apptTimeSlotDuration: clinicSettings.settings.apptTimeSlotDuration,
+  }),
+)(CalendarView)
 
-export default withStyles(calendarViewstyles, { name:"CalendarView", withTheme: true })(_CalendarView)
+export default withStyles(calendarViewstyles, {
+  name: 'CalendarView',
+  withTheme: true,
+})(_CalendarView)

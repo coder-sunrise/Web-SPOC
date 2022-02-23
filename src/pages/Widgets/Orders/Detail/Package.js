@@ -14,16 +14,28 @@ import {
   serverDateTimeFormatFull,
   notification,
   DatePicker,
-  Tooltip
+  Tooltip,
 } from '@/components'
 import Yup from '@/utils/yup'
-import { getUniqueId, getUniqueGUID, roundTo, getTranslationValue } from '@/utils/utils'
+import {
+  getUniqueId,
+  getUniqueGUID,
+  roundTo,
+  getTranslationValue,
+} from '@/utils/utils'
 import {
   openCautionAlertPrompt,
   ReplaceCertificateTeplate,
 } from '@/pages/Widgets/Orders/utils'
-import { DURATION_UNIT, SERVICE_CENTER_CATEGORY, } from '@/utils/constants'
-import { isMatchInstructionRule, getDrugAllergy } from '@/pages/Widgets/Orders/utils'
+import {
+  DURATION_UNIT,
+  ORDER_TYPES,
+  SERVICE_CENTER_CATEGORY,
+} from '@/utils/constants'
+import {
+  isMatchInstructionRule,
+  getDrugAllergy,
+} from '@/pages/Widgets/Orders/utils'
 import { getClinicianProfile } from '../../ConsultationDocument/utils'
 import { CollectionsOutlined } from '@material-ui/icons'
 
@@ -47,9 +59,7 @@ import { CollectionsOutlined } from '@material-ui/icons'
   }),
 )
 @withFormikExtend({
-  authority: [
-    'queue.consultation.order.package',
-  ],
+  authority: ['queue.consultation.order.package'],
   mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
       ...(orders.entity || orders.defaultPackage),
@@ -73,7 +83,10 @@ import { CollectionsOutlined } from '@material-ui/icons'
       consultationDocument: { rows = [] },
       clinicSettings,
     } = props
-    const { primaryPrintoutLanguage = 'EN', secondaryPrintoutLanguage = '' } = clinicSettings
+    const {
+      primaryPrintoutLanguage = 'EN',
+      secondaryPrintoutLanguage = '',
+    } = clinicSettings
     const { corVitalSign = [] } = orders
     const {
       ctmedicationusage = [],
@@ -88,17 +101,16 @@ import { CollectionsOutlined } from '@material-ui/icons'
     } = codetable
 
     const { doctorProfileFK } = visitRegistration.entity.visit
-    const visitDoctorUserId = doctorprofile.find(
-      (d) => d.id === doctorProfileFK,
-    ).clinicianProfile.userProfileFK
+    const visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK)
+      .clinicianProfile.userProfileFK
 
     const { entity: visitEntity } = visitRegistration
     const clinicianProfile = getClinicianProfile(codetable, visitEntity)
     const { entity } = patient
     const { name, patientAccountNo, genderFK, dob } = entity
     const { ctgender = [] } = codetable
-    const gender = ctgender.find((o) => o.id === genderFK) || {}
-    const allDocs = rows.filter((s) => !s.isDeleted)
+    const gender = ctgender.find(o => o.id === genderFK) || {}
+    const allDocs = rows.filter(s => !s.isDeleted)
     let nextDocumentSequence = 1
     if (allDocs && allDocs.length > 0) {
       const { sequence: documentSequence } = _.maxBy(allDocs, 'sequence')
@@ -109,12 +121,22 @@ import { CollectionsOutlined } from '@material-ui/icons'
     const packageGlobalId = getUniqueGUID()
 
     const getInstruction = (medication, matchInstruction, language) => {
-      const usage = ctmedicationusage.find(usage => usage.id === medication.medicationUsage?.id)
-      const uom = ctmedicationunitofmeasurement.find(uom => uom.id === medication.prescribingUOM.id)
-      const frequency = ctmedicationfrequency.find(frequency => frequency.id === matchInstruction?.medicationFrequency?.id)
-      const dosage = ctmedicationdosage.find(dosage => dosage.id === matchInstruction?.prescribingDosage?.id)
+      const usage = ctmedicationusage.find(
+        usage => usage.id === medication.medicationUsage?.id,
+      )
+      const uom = ctmedicationunitofmeasurement.find(
+        uom => uom.id === medication.prescribingUOM.id,
+      )
+      const frequency = ctmedicationfrequency.find(
+        frequency => frequency.id === matchInstruction?.medicationFrequency?.id,
+      )
+      const dosage = ctmedicationdosage.find(
+        dosage => dosage.id === matchInstruction?.prescribingDosage?.id,
+      )
 
-      const itemDuration = matchInstruction?.duration ? ` For ${matchInstruction.duration} day(s)` : ''
+      const itemDuration = matchInstruction?.duration
+        ? ` For ${matchInstruction.duration} day(s)`
+        : ''
 
       const instruction = `${getTranslationValue(
         usage?.translationData,
@@ -142,26 +164,36 @@ import { CollectionsOutlined } from '@material-ui/icons'
       packageItem,
     ) => {
       const medication = inventorymedication.find(
-        (item) => item.id === packageItem.inventoryMedicationFK,
+        item => item.id === packageItem.inventoryMedicationFK,
       )
       const { medicationInstructionRule = [] } = medication
       let weightKG
       const activeVitalSign = corVitalSign.find(vs => !vs.isDeleted)
       if (activeVitalSign) {
         weightKG = activeVitalSign.weightKG
-      }
-      else {
-        weightKG = visitRegistration.entity.visit.weightKG
+      } else {
+        const visitBasicExaminations =
+          visitRegistration.entity?.visit?.visitBasicExaminations || []
+        if (visitBasicExaminations.length) {
+          weightKG = visitBasicExaminations[0].weightKG
+        }
       }
 
       let age
       if (dob) {
         age = Math.floor(moment.duration(moment().diff(dob)).asYears())
       }
-      var matchInstruction = medicationInstructionRule.find(i => isMatchInstructionRule(i, age, weightKG))
-      const uom = ctmedicationunitofmeasurement.find(uom => uom.id === medication.dispensingUOM.id)
+      var matchInstruction = medicationInstructionRule.find(i =>
+        isMatchInstructionRule(i, age, weightKG),
+      )
+      const uom = ctmedicationunitofmeasurement.find(
+        uom => uom.id === medication.dispensingUOM.id,
+      )
       let item
-      if (medication.isActive === true) {
+      if (
+        medication.isActive === true &&
+        !medication.isOnlyClinicInternalUsage
+      ) {
         const medicationdispensingUOM = medication.dispensingUOM
         const medicationusage = medication.medicationUsage
         const medicationfrequency = matchInstruction?.medicationFrequency
@@ -170,11 +202,11 @@ import { CollectionsOutlined } from '@material-ui/icons'
         const medicationPrecautions =
           medication.inventoryMedication_MedicationPrecaution
         const isDefaultBatchNo = medication.medicationStock.find(
-          (o) => o.isDefault === true,
+          o => o.isDefault === true,
         )
         let currentMedicationPrecautions = []
         currentMedicationPrecautions = currentMedicationPrecautions.concat(
-          medicationPrecautions.map((o) => {
+          medicationPrecautions.map(o => {
             return {
               precautionCode: o.medicationPrecautionCode,
               Precaution: o.medicationPrecautionName,
@@ -204,8 +236,19 @@ import { CollectionsOutlined } from '@material-ui/icons'
             : undefined,
           batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
           isExternalPrescription: false,
-          instruction: getInstruction(medication, matchInstruction, primaryPrintoutLanguage),
-          secondInstruction: secondaryPrintoutLanguage !== '' ? getInstruction(medication, matchInstruction, secondaryPrintoutLanguage) : '',
+          instruction: getInstruction(
+            medication,
+            matchInstruction,
+            primaryPrintoutLanguage,
+          ),
+          secondInstruction:
+            secondaryPrintoutLanguage !== ''
+              ? getInstruction(
+                  medication,
+                  matchInstruction,
+                  secondaryPrintoutLanguage,
+                )
+              : '',
           dispenseUOMFK: medication?.dispensingUOM?.id,
           inventoryDispenseUOMFK: medication?.dispensingUOM?.id,
           inventoryPrescribingUOMFK: medication?.prescribingUOM?.id,
@@ -217,11 +260,14 @@ import { CollectionsOutlined } from '@material-ui/icons'
             primaryPrintoutLanguage,
             'displayValue',
           ),
-          secondDispenseUOMDisplayValue: secondaryPrintoutLanguage !== '' ? getTranslationValue(
-            uom?.translationData,
-            secondaryPrintoutLanguage,
-            'displayValue',
-          ) : '',
+          secondDispenseUOMDisplayValue:
+            secondaryPrintoutLanguage !== ''
+              ? getTranslationValue(
+                  uom?.translationData,
+                  secondaryPrintoutLanguage,
+                  'displayValue',
+                )
+              : '',
           corPrescriptionItemPrecaution: currentMedicationPrecautions,
           corPrescriptionItemInstruction: [
             {
@@ -232,9 +278,7 @@ import { CollectionsOutlined } from '@material-ui/icons'
               usageMethodDisplayValue: medicationusage
                 ? medicationusage.name
                 : undefined,
-              dosageFK: medicationdosage
-                ? medicationdosage.id
-                : undefined,
+              dosageFK: medicationdosage ? medicationdosage.id : undefined,
               dosageCode: medicationdosage ? medicationdosage.code : undefined,
               dosageDisplayValue: medicationdosage
                 ? medicationdosage.name
@@ -284,16 +328,17 @@ import { CollectionsOutlined } from '@material-ui/icons'
       packageItem,
     ) => {
       const vaccination = inventoryvaccination.find(
-        (item) => item.id === packageItem.inventoryVaccinationFK,
+        item => item.id === packageItem.inventoryVaccinationFK,
       )
 
       let item
       if (vaccination.isActive === true) {
         const vaccinationUOM = vaccination.prescribingUOM
+        const vaccinationDispenseUOM = vaccination.despensingUOM
         const vaccinationusage = vaccination.vaccinationUsage
         const vaccinationdosage = vaccination.prescribingDosage
         const isDefaultBatchNo = vaccination.vaccinationStock.find(
-          (o) => o.isDefault === true,
+          o => o.isDefault === true,
         )
 
         item = {
@@ -302,19 +347,18 @@ import { CollectionsOutlined } from '@material-ui/icons'
           vaccinationGivenDate: moment().format(serverDateTimeFormatFull),
           vaccinationCode: vaccination.code,
           vaccinationName: vaccination.displayValue,
-          usageMethodFK: vaccinationusage ? vaccinationusage.id : undefined,
-          usageMethodCode: vaccinationusage ? vaccinationusage.code : undefined,
-          usageMethodDisplayValue: vaccinationusage
-            ? vaccinationusage.name
-            : undefined,
-          dosageFK: vaccinationdosage ? vaccinationdosage.id : undefined,
-          dosageCode: vaccinationdosage ? vaccinationdosage.code : undefined,
-          dosageDisplayValue: vaccinationdosage
-            ? vaccinationdosage.name
-            : undefined,
-          uomfk: vaccinationUOM ? vaccinationUOM.id : undefined,
-          uomCode: vaccinationUOM ? vaccinationUOM.code : undefined,
-          uomDisplayValue: vaccinationUOM ? vaccinationUOM.name : undefined,
+          usageMethodFK: vaccinationusage?.id,
+          usageMethodCode: vaccinationusage?.code,
+          usageMethodDisplayValue: vaccinationusage?.name,
+          dosageFK: vaccinationdosage?.id,
+          dosageCode: vaccinationdosage?.code,
+          dosageDisplayValue: vaccinationdosage?.name,
+          uomfk: vaccinationUOM?.id,
+          uomCode: vaccinationUOM?.code,
+          uomDisplayValue: vaccinationUOM?.name,
+          dispenseUOMFK: vaccinationDispenseUOM?.id,
+          dispenseUOMCode: vaccinationDispenseUOM?.code,
+          dispenseUOMDisplayValue: vaccinationDispenseUOM?.name,
           quantity: packageItem.quantity,
           unitPrice: packageItem.unitPrice,
           totalPrice: packageItem.subTotal,
@@ -339,6 +383,9 @@ import { CollectionsOutlined } from '@material-ui/icons'
           subject: vaccination.displayValue,
           isGenerateCertificate: vaccination.isAutoGenerateCertificate,
           isNurseActualizeRequired: vaccination.isNurseActualizable,
+          instruction: `${vaccinationusage?.name ||
+            ''} ${vaccinationdosage?.displayValue ||
+            ''} ${vaccinationUOM?.name || ''}`,
         }
       }
 
@@ -346,7 +393,7 @@ import { CollectionsOutlined } from '@material-ui/icons'
       if (item.isGenerateCertificate) {
         const { documenttemplate = [] } = codetable
         const defaultTemplate = documenttemplate.find(
-          (dt) =>
+          dt =>
             dt.isDefaultTemplate === true && dt.documentTemplateTypeFK === 3,
         )
         if (defaultTemplate) {
@@ -357,8 +404,8 @@ import { CollectionsOutlined } from '@material-ui/icons'
               issuedByUserFK: clinicianProfile.userProfileFK,
               subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
                 ''}, ${Math.floor(
-                  moment.duration(moment().diff(dob)).asYears(),
-                )}`,
+                moment.duration(moment().diff(dob)).asYears(),
+              )}`,
               content: ReplaceCertificateTeplate(
                 defaultTemplate.templateContent,
                 item,
@@ -380,7 +427,7 @@ import { CollectionsOutlined } from '@material-ui/icons'
       packageItem,
     ) => {
       const service = ctservice.find(
-        (item) => item.id === packageItem.serviceCenterServiceFK,
+        item => item.id === packageItem.serviceCenterServiceFK,
       )
       let item
       item = {
@@ -407,7 +454,7 @@ import { CollectionsOutlined } from '@material-ui/icons'
         performingUserFK: visitDoctorUserId,
         packageGlobalId,
         isNurseActualizeRequired: service.isNurseActualizable,
-        serviceCenterCategoryFK: service.serviceCenterCategoryFK
+        serviceCenterCategoryFK: service.serviceCenterCategoryFK,
       }
       return item
     }
@@ -418,48 +465,54 @@ import { CollectionsOutlined } from '@material-ui/icons'
       packageItem,
     ) => {
       const consumable = inventoryconsumable.find(
-        (item) => item.id === packageItem.inventoryConsumableFK,
+        item => item.id === packageItem.inventoryConsumableFK,
       )
 
       let item
-      let isDefaultBatchNo
-      let unitOfMeasurement
-      if (consumable) {
-        isDefaultBatchNo = consumable.consumableStock.find(
-          (o) => o.isDefault === true,
-        )
+      if (
+        consumable.isActive === true &&
+        !consumable.isOnlyClinicInternalUsage
+      ) {
+        let isDefaultBatchNo
+        let unitOfMeasurement
+        if (consumable) {
+          isDefaultBatchNo = consumable.consumableStock.find(
+            o => o.isDefault === true,
+          )
 
-        unitOfMeasurement = consumable.uom ? consumable.uom.name : undefined
+          unitOfMeasurement = consumable.uom ? consumable.uom.name : undefined
+        }
+
+        item = {
+          inventoryConsumableFK: packageItem.inventoryConsumableFK,
+          isActive: packageItem.isActive,
+          quantity: packageItem.quantity,
+          unitPrice: packageItem.unitPrice,
+          totalPrice: packageItem.subTotal,
+          adjAmount: 0,
+          adjType: 'ExactAmount',
+          adjValue: 0,
+          totalAfterItemAdjustment: packageItem.subTotal,
+          totalAfterOverallAdjustment: packageItem.subTotal,
+          consumableCode: packageItem.consumableCode,
+          consumableName: packageItem.consumableName,
+          unitOfMeasurement,
+          expiryDate: isDefaultBatchNo
+            ? isDefaultBatchNo.expiryDate
+            : undefined,
+          batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
+          isPackage: true,
+          packageCode,
+          packageName,
+          defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
+          packageConsumeQuantity: packageItem.consumeQuantity,
+          remainingQuantity: packageItem.quantity,
+          performingUserFK: visitDoctorUserId,
+          packageGlobalId,
+          isDispensedByPharmacy: consumable.isDispensedByPharmacy,
+          isNurseActualizeRequired: consumable.isNurseActualizable,
+        }
       }
-
-      item = {
-        inventoryConsumableFK: packageItem.inventoryConsumableFK,
-        isActive: packageItem.isActive,
-        quantity: packageItem.quantity,
-        unitPrice: packageItem.unitPrice,
-        totalPrice: packageItem.subTotal,
-        adjAmount: 0,
-        adjType: 'ExactAmount',
-        adjValue: 0,
-        totalAfterItemAdjustment: packageItem.subTotal,
-        totalAfterOverallAdjustment: packageItem.subTotal,
-        consumableCode: packageItem.consumableCode,
-        consumableName: packageItem.consumableName,
-        unitOfMeasurement,
-        expiryDate: isDefaultBatchNo ? isDefaultBatchNo.expiryDate : undefined,
-        batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
-        isPackage: true,
-        packageCode,
-        packageName,
-        defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
-        packageConsumeQuantity: packageItem.consumeQuantity,
-        remainingQuantity: packageItem.quantity,
-        performingUserFK: visitDoctorUserId,
-        packageGlobalId,
-        isDispensedByPharmacy: consumable.isDispensedByPharmacy,
-        isNurseActualizeRequired: consumable.isNurseActualizable,
-      }
-
       return item
     }
 
@@ -508,10 +561,21 @@ import { CollectionsOutlined } from '@material-ui/icons'
       if (newOrder) {
         let type = packageItems[index].type
         if (packageItems[index].type === '3') {
-          if (newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER
-            || newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE) { type = '9' }
-          else if (newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER
-            || newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE) { type = '10' }
+          if (
+            newOrder.serviceCenterCategoryFK ===
+              SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER ||
+            newOrder.serviceCenterCategoryFK ===
+              SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE
+          ) {
+            type = ORDER_TYPES.LAB
+          } else if (
+            newOrder.serviceCenterCategoryFK ===
+              SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER ||
+            newOrder.serviceCenterCategoryFK ===
+              SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE
+          ) {
+            type = ORDER_TYPES.RADIOLOGY
+          }
         }
         const data = {
           isOrderedByDoctor:
@@ -563,7 +627,7 @@ import { CollectionsOutlined } from '@material-ui/icons'
   displayName: 'PackagePage',
 })
 class Package extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { dispatch, classes } = props
     dispatch({
@@ -606,14 +670,16 @@ class Package extends PureComponent {
     dispatch({
       type: 'codetable/batchFetch',
       payload: {
-        codes: ['ctmedicationusage',
+        codes: [
+          'ctmedicationusage',
           'ctmedicationunitofmeasurement',
           'ctmedicationfrequency',
-          'ctmedicationdosage'],
+          'ctmedicationdosage',
+        ],
       },
     })
 
-    const calUnitPrice = (e) => {
+    const calUnitPrice = e => {
       const { row } = e
       const { subTotal, quantity } = row
       row.unitPrice = 0
@@ -623,16 +689,20 @@ class Package extends PureComponent {
     }
 
     this.packageItemSchema = Yup.object().shape({
-      quantity: Yup.number().required().min(1),
+      quantity: Yup.number()
+        .required()
+        .min(1),
       consumeQuantity: Yup.number()
         .required()
         .min(0, 'Consumed quantity must be greater than or equal to 0')
         .max(Yup.ref('quantity'), 'Consumed quantity cannot exceed Quantity'),
-      subTotal: Yup.number().required().min(0),
+      subTotal: Yup.number()
+        .required()
+        .min(0),
     })
 
     this.tableProps = {
-      getRowId: (r) => r.uid,
+      getRowId: r => r.uid,
       columns: [
         { name: 'typeName', title: 'Type' },
         { name: 'name', title: 'Name' },
@@ -648,31 +718,37 @@ class Package extends PureComponent {
           sortingEnabled: false,
           disabled: true,
           render: row => {
-            return <div style={{ position: 'relative' }}>
-              <div style={{
-                wordWrap: 'break-word',
-                whiteSpace: 'pre-wrap',
-                paddingRight: row.isExclusive ? 24 : 0
-              }}>
-                <Tooltip title={row.typeName}>
-                  <span >{row.typeName}</span>
-                </Tooltip>
-                <div style={{ position: 'relative', top: 2 }}>
-                  {row.isExclusive && (
-                    <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
-                      <div
-                        className={classes.rightIcon}
-                        style={{
-                          right: -30,
-                          borderRadius: 4,
-                          backgroundColor: 'green',
-                        }}
-                      >Excl.</div>
-                    </Tooltip>
-                  )}
+            return (
+              <div style={{ position: 'relative' }}>
+                <div
+                  style={{
+                    wordWrap: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                    paddingRight: row.isExclusive ? 24 : 0,
+                  }}
+                >
+                  <Tooltip title={row.typeName}>
+                    <span>{row.typeName}</span>
+                  </Tooltip>
+                  <div style={{ position: 'relative', top: 2 }}>
+                    {row.isExclusive && (
+                      <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
+                        <div
+                          className={classes.rightIcon}
+                          style={{
+                            right: -30,
+                            borderRadius: 4,
+                            backgroundColor: 'green',
+                          }}
+                        >
+                          Excl.
+                        </div>
+                      </Tooltip>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            )
           },
         },
         {
@@ -687,7 +763,7 @@ class Package extends PureComponent {
           type: 'number',
           format: '0.0',
           sortingEnabled: false,
-          isDisabled: (row) => row.isActive !== true,
+          isDisabled: row => row.isActive !== true,
         },
         {
           columnName: 'quantity',
@@ -695,7 +771,7 @@ class Package extends PureComponent {
           type: 'number',
           format: '0.0',
           sortingEnabled: false,
-          isDisabled: (row) => row.isActive !== true,
+          isDisabled: row => row.isActive !== true,
           onChange: calUnitPrice,
         },
         {
@@ -704,7 +780,7 @@ class Package extends PureComponent {
           type: 'number',
           currency: true,
           sortingEnabled: false,
-          isDisabled: (row) => row.isActive !== true,
+          isDisabled: row => row.isActive !== true,
           onChange: calUnitPrice,
         },
       ],
@@ -716,16 +792,24 @@ class Package extends PureComponent {
       if (duration) {
         switch (durationUnit) {
           case DURATION_UNIT.DAY:
-            untilDate = moment(today).add(duration, 'days').toDate()
+            untilDate = moment(today)
+              .add(duration, 'days')
+              .toDate()
             break
           case DURATION_UNIT.WEEK:
-            untilDate = moment(today).add(duration, 'weeks').toDate()
+            untilDate = moment(today)
+              .add(duration, 'weeks')
+              .toDate()
             break
           case DURATION_UNIT.MONTH:
-            untilDate = moment(today).add(duration, 'months').toDate()
+            untilDate = moment(today)
+              .add(duration, 'months')
+              .toDate()
             break
           case DURATION_UNIT.YEAR:
-            untilDate = moment(today).add(duration, 'years').toDate()
+            untilDate = moment(today)
+              .add(duration, 'years')
+              .toDate()
             break
           default:
             break
@@ -751,9 +835,9 @@ class Package extends PureComponent {
       let rows = []
       let cautions = []
       let allergys = []
-      const insertAllergys = (inventoryMedicationFK) => {
+      const insertAllergys = inventoryMedicationFK => {
         let drug = inventorymedication.find(
-          (medication) => medication.id === inventoryMedicationFK,
+          medication => medication.id === inventoryMedicationFK,
         )
         if (!drug) return
         const newAllergys = getDrugAllergy(drug, patientAllergy)
@@ -763,9 +847,15 @@ class Package extends PureComponent {
       }
       if (op && op.medicationPackageItem) {
         rows = rows.concat(
-          op.medicationPackageItem.map((o) => {
-            if (o.caution && o.caution.trim() !== '' &&
-              !cautions.find((f) => f.type === 'Medication' && f.id === o.inventoryMedicationFK)) {
+          op.medicationPackageItem.map(o => {
+            if (
+              o.caution &&
+              o.caution.trim() !== '' &&
+              !cautions.find(
+                f =>
+                  f.type === 'Medication' && f.id === o.inventoryMedicationFK,
+              )
+            ) {
               cautions.push({
                 type: 'Medication',
                 subject: o.medicationName,
@@ -774,13 +864,11 @@ class Package extends PureComponent {
               })
             }
 
-            if (!allergys.find(
-              (f) => f.id === o.inventoryMedicationFK,
-            )) {
+            if (!allergys.find(f => f.id === o.inventoryMedicationFK)) {
               insertAllergys(o.inventoryMedicationFK)
             }
             const medication = inventorymedication.find(
-              (item) => item.id === o.inventoryMedicationFK,
+              item => item.id === o.inventoryMedicationFK,
             )
             return {
               ...o,
@@ -788,21 +876,27 @@ class Package extends PureComponent {
               uid: getUniqueId(),
               type: '1',
               typeName:
-                orderTypes.find((type) => type.value === '1').name +
+                orderTypes.find(type => type.value === '1').name +
                 (o.isActive === true ? '' : ' (Inactive)'),
               isActive: o.isActive === true,
               caution: o.caution,
               subject: o.medicationName,
-              isExclusive: medication.isExclusive
+              isExclusive: medication.isExclusive,
             }
           }),
         )
       }
       if (op && op.vaccinationPackageItem) {
         rows = rows.concat(
-          op.vaccinationPackageItem.map((o) => {
-            if (o.caution && o.caution.trim() !== '' &&
-              !cautions.find((c) => c.type === 'Vaccination' && c.id === o.inventoryVaccinationFK)) {
+          op.vaccinationPackageItem.map(o => {
+            if (
+              o.caution &&
+              o.caution.trim() !== '' &&
+              !cautions.find(
+                c =>
+                  c.type === 'Vaccination' && c.id === o.inventoryVaccinationFK,
+              )
+            ) {
               cautions.push({
                 type: 'Vaccination',
                 subject: o.vaccinationName,
@@ -816,7 +910,7 @@ class Package extends PureComponent {
               uid: getUniqueId(),
               type: '2',
               typeName:
-                orderTypes.find((type) => type.value === '2').name +
+                orderTypes.find(type => type.value === '2').name +
                 (o.isActive === true ? '' : ' (Inactive)'),
               isActive: o.isActive === true,
               caution: o.caution,
@@ -827,23 +921,32 @@ class Package extends PureComponent {
       }
       if (op && op.servicePackageItem) {
         rows = rows.concat(
-          op.servicePackageItem.map((o) => {
+          op.servicePackageItem.map(o => {
             const service = ctservice.find(
-              (item) => item.id === o.serviceCenterServiceFK,
+              item => item.id === o.serviceCenterServiceFK,
             )
             let typeName = 'Service'
-            if (service.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER
-              || service.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE) { typeName = "Lab" }
-            else if (service.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER
-              || service.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE) { typeName = 'Radiology' }
+            if (
+              service.serviceCenterCategoryFK ===
+                SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER ||
+              service.serviceCenterCategoryFK ===
+                SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE
+            ) {
+              typeName = 'Lab'
+            } else if (
+              service.serviceCenterCategoryFK ===
+                SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER ||
+              service.serviceCenterCategoryFK ===
+                SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE
+            ) {
+              typeName = 'Radiology'
+            }
             return {
               ...o,
               name: o.serviceName,
               uid: getUniqueId(),
               type: '3',
-              typeName:
-                typeName +
-                (o.isActive ? '' : ' (Inactive)'),
+              typeName: typeName + (o.isActive ? '' : ' (Inactive)'),
               isActive: o.isActive === true,
             }
           }),
@@ -851,14 +954,14 @@ class Package extends PureComponent {
       }
       if (op && op.consumablePackageItem) {
         rows = rows.concat(
-          op.consumablePackageItem.map((o) => {
+          op.consumablePackageItem.map(o => {
             return {
               ...o,
               name: o.consumableName,
               uid: getUniqueId(),
               type: '4',
               typeName:
-                orderTypes.find((type) => type.value === '4').name +
+                orderTypes.find(type => type.value === '4').name +
                 (o.isActive === true ? '' : ' (Inactive)'),
               isActive: o.isActive === true,
             }
@@ -878,7 +981,7 @@ class Package extends PureComponent {
       })
 
       if (cautions.length || allergys.length) {
-        openCautionAlertPrompt(cautions, allergys, [], () => { })
+        openCautionAlertPrompt(cautions, allergys, [], () => {})
       }
     }
 
@@ -900,9 +1003,7 @@ class Package extends PureComponent {
     const validateResult = await validateForm()
     const isFormValid = _.isEmpty(validateResult)
     if (isFormValid) {
-      const inactivePackageItems = packageItems.filter(
-        (f) => f.isActive !== true,
-      )
+      const inactivePackageItems = packageItems.filter(f => f.isActive !== true)
       if (inactivePackageItems.length > 0) {
         notification.error({
           message: 'One or more items in the package are inactive.',
@@ -916,12 +1017,12 @@ class Package extends PureComponent {
     return false
   }
 
-  render () {
+  render() {
     const { theme, values, footer, handleSubmit } = this.props
 
-    const SummaryRow = (p) => {
+    const SummaryRow = p => {
       const { children } = p
-      let countCol = children.find((c) => {
+      let countCol = children.find(c => {
         if (!c.props.tableColumn.column) return false
         return c.props.tableColumn.column.name === 'subTotal'
       })
@@ -952,7 +1053,7 @@ class Package extends PureComponent {
           <GridItem xs={6}>
             <Field
               name='packageFK'
-              render={(args) => {
+              render={args => {
                 return (
                   <div id={`autofocus_${values.type}`}>
                     <CodeSelect
@@ -971,7 +1072,7 @@ class Package extends PureComponent {
           <GridItem xs={2}>
             <Field
               name='expiryDate'
-              render={(args) => {
+              render={args => {
                 return <DatePicker label='Expiry Date' {...args} />
               }}
             />
@@ -992,9 +1093,7 @@ class Package extends PureComponent {
                 summary: true,
                 summaryConfig: {
                   state: {
-                    totalItems: [
-                      { columnName: 'subTotal', type: 'sum' },
-                    ],
+                    totalItems: [{ columnName: 'subTotal', type: 'sum' }],
                   },
                   integrated: {
                     calculator: IntegratedSummary.defaultCalculator,

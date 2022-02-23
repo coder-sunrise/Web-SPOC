@@ -32,14 +32,10 @@ export const VISIT_STATUS = {
 
 export const filterMap = {
   [StatusIndicator.ALL]: [
-    ...Object.keys(VISIT_STATUS).map((key) => VISIT_STATUS[key]),
-  ].filter((item) => item !== VISIT_STATUS.UPCOMING_APPT),
-  [StatusIndicator.APPOINTMENT]: [
-    VISIT_STATUS.UPCOMING_APPT,
-  ],
-  [StatusIndicator.WAITING]: [
-    VISIT_STATUS.WAITING,
-  ],
+    ...Object.keys(VISIT_STATUS).map(key => VISIT_STATUS[key]),
+  ].filter(item => item !== VISIT_STATUS.UPCOMING_APPT),
+  [StatusIndicator.APPOINTMENT]: [VISIT_STATUS.UPCOMING_APPT],
+  [StatusIndicator.WAITING]: [VISIT_STATUS.WAITING],
   [StatusIndicator.IN_PROGRESS]: [
     VISIT_STATUS.DISPENSE,
     VISIT_STATUS.IN_CONS,
@@ -47,27 +43,25 @@ export const filterMap = {
     VISIT_STATUS.ORDER_UPDATED,
     VISIT_STATUS.BILLING,
   ],
-  [StatusIndicator.COMPLETED]: [
-    VISIT_STATUS.COMPLETED,
-  ],
+  [StatusIndicator.COMPLETED]: [VISIT_STATUS.COMPLETED],
 }
 
 export const AppointmentContextMenu = [
-  {
-    id: 8,
-    label: 'Register Visit',
-    Icon: Edit,
-    disabled: true,
-    authority: 'queue.registervisit',
-  },
-  {
-    id: 9,
-    label: 'Register Patient',
-    Icon: Person,
-    disabled: true,
-    authority: 'patientdatabase.newpatient',
-  },
-]
+         {
+           id: 8,
+           label: 'New Visit',
+           Icon: Edit,
+           disabled: true,
+           authority: 'queue.registervisit',
+         },
+         {
+           id: 9,
+           label: 'Register Patient',
+           Icon: Person,
+           disabled: true,
+           authority: 'patientdatabase.newpatient',
+         },
+       ]
 
 export const ContextMenuOptions = [
   {
@@ -151,6 +145,6 @@ export const ContextMenuOptions = [
     Icon: Description,
     disabled: false,
     hidden: false,
-    authority: 'patientdashboard.forms',
+    authority: 'queue.consultation.form',
   },
 ]

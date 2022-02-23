@@ -33,12 +33,14 @@ import {
   convertToConsultation,
   convertConsultationDocument,
   isPharmacyOrderUpdated,
+  getOrdersData,
 } from '@/pages/Consultation/utils'
 // import model from '@/pages/Widgets/Orders/models'
 import {
   VISIT_TYPE,
   NOTIFICATION_TYPE,
   NOTIFICATION_STATUS,
+  REPORT_ID,
 } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { CallingQueueButton } from '@/components/_medisys'
@@ -59,6 +61,7 @@ import Layout from './Layout'
 import schema from './schema'
 import styles from './style'
 import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
+import { getRawData } from '@/services/report'
 
 const discardMessage = 'Discard consultation?'
 const onPageLeaveMessage = 'Do you want to save consultation notes?'
@@ -170,6 +173,33 @@ const generatePrintData = async (
       printData = printData.concat(
         getPrintData('Vaccination Certificate', corVaccinationCert),
       )
+    if (
+      reportsOnSignOff.indexOf(ReportsOnSignOffOption.PrescriptionSheet) > -1
+    ) {
+      const { rows = [] } = orders || {}
+      if (rows.length > 0) {
+        // drug & consumable (pharmacy item)
+        const anyPharmacyItem = rows.some(
+          f =>
+            !f.isDeleted &&
+            !f.isPreOrder &&
+            !f.isExternalPrescription &&
+            f.isDispensedByPharmacy &&
+            ['1', '2'].some(x => x === f.type),
+        )
+        if (anyPharmacyItem)
+          printData = printData.concat([
+            {
+              item: ReportsOnSignOffOption.PrescriptionSheet,
+              description: ReportsOnSignOffOption.PrescriptionSheet,
+              Copies: 1,
+              print: true,
+              ReportId: REPORT_ID.PRESCRIPTION,
+              ReportDate: null,
+            },
+          ])
+      }
+    }
     return printData
   }
   return []
@@ -192,7 +222,12 @@ const saveConsultation = ({
     forms = {},
     user,
     clinicSettings,
+    visitRegistration,
   } = props
+  const { entity: vistEntity = {} } = visitRegistration
+  const { visit = {} } = vistEntity
+  const { visitPurposeFK = VISIT_TYPE.CON } = visit
+
   let settings = JSON.parse(localStorage.getItem('clinicSettings'))
   const { diagnosisDataSource } = settings
 
@@ -220,6 +255,19 @@ const saveConsultation = ({
         forms,
       },
     )
+    if (!newValues.corDoctorNote.length) {
+      newValues.corDoctorNote = [{}]
+    }
+
+    newValues.corDoctorNote.forEach(note => {
+      note.signedByUserFK = user.data.id
+      note.signedDate = moment()
+    })
+
+    newValues.corScribbleNotes.forEach(
+      note => (note.signedByUserFK = user.data.id),
+    )
+
     newValues.duration = Math.floor(
       Number(sessionStorage.getItem(`${values.id}_consultationTimer`)) || 0,
     )
@@ -346,6 +394,9 @@ const pauseConsultation = ({
     user,
     visitRegistration,
   } = rest
+  const { entity: vistEntity = {} } = visitRegistration
+  const { visit = {} } = vistEntity
+  const { visitPurposeFK = VISIT_TYPE.CON } = visit
   let settings = JSON.parse(localStorage.getItem('clinicSettings'))
   const { diagnosisDataSource, isEnablePharmacyModule } = settings
   if (isEnablePharmacyModule) {
@@ -369,6 +420,20 @@ const pauseConsultation = ({
       forms,
     },
   )
+
+  if (!newValues.corDoctorNote.length) {
+    newValues.corDoctorNote = [{}]
+  }
+
+  newValues.corDoctorNote.forEach(note => {
+    note.signedByUserFK = user.data.id
+    note.signedDate = moment()
+  })
+
+  newValues.corScribbleNotes.forEach(
+    note => (note.signedByUserFK = user.data.id),
+  )
+
   newValues.duration = Math.floor(
     Number(sessionStorage.getItem(`${values.id}_consultationTimer`)) || 0,
   )
@@ -442,6 +507,7 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
     user,
     patient,
     forms,
+    codetable,
   }) => ({
     clinicInfo,
     consultation,
@@ -455,6 +521,7 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
     user,
     patient,
     forms,
+    codetable,
   }),
 )
 @withFormikExtend({
@@ -553,18 +620,57 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
                   let printedData = result
                   if (printedData && printedData.length > 0) {
                     const token = localStorage.getItem('token')
-                    printedData = printedData.map(item => ({
-                      ReportId: item.ReportId,
-                      DocumentName: `${item.item}(${item.description})`,
-                      ReportData: item.ReportData,
-                      Copies: item.Copies,
-                      Token: token,
-                      BaseUrl: process.env.url,
-                    }))
-                    handlePrint(JSON.stringify(printedData))
+                    if (
+                      printedData.some(
+                        x => x.ReportId === REPORT_ID.PRESCRIPTION,
+                      )
+                    ) {
+                      const {
+                        visitRegistration: {
+                          entity: {
+                            visit: { id: visitFK, patientProfileFK },
+                          },
+                        },
+                      } = props
+                      getRawData(REPORT_ID.PRESCRIPTION, {
+                        visitFK,
+                        patientProfileFK,
+                      }).then(r => {
+                        printedData = printedData.map(item => ({
+                          ReportId: item.ReportId,
+                          DocumentName:
+                            item.ReportId === REPORT_ID.PRESCRIPTION
+                              ? item.description
+                              : `${item.item}(${item.description})`,
+                          ReportData:
+                            item.ReportId === REPORT_ID.PRESCRIPTION
+                              ? JSON.stringify(
+                                  (delete r.ReportSettingParameter,
+                                  delete r.ReportContext,
+                                  r),
+                                )
+                              : item.ReportData,
+                          Copies: item.Copies,
+                          Token: token,
+                          BaseUrl: process.env.url,
+                        }))
+                        handlePrint(JSON.stringify(printedData))
+                        props.dispatch({ type: 'consultation/closeModal' })
+                      })
+                    } else {
+                      printedData = printedData.map(item => ({
+                        ReportId: item.ReportId,
+                        DocumentName: `${item.item}(${item.description})`,
+                        ReportData: item.ReportData,
+                        Copies: item.Copies,
+                        Token: token,
+                        BaseUrl: process.env.url,
+                      }))
+                      handlePrint(JSON.stringify(printedData))
+                      props.dispatch({ type: 'consultation/closeModal' })
+                    }
                   }
                 }
-                props.dispatch({ type: 'consultation/closeModal' })
               },
             })
           },
@@ -623,6 +729,18 @@ class Main extends React.Component {
         saveDraftDoctorNote(this.props)
       }, autoSaveClinicNoteInterval * 1000)
     }
+
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctservice',
+      },
+    })
+
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'inventoryconsumable' },
+    })
   }
 
   componentWillUnmount() {
@@ -715,24 +833,20 @@ class Main extends React.Component {
     })
   }
 
-  pauseConsultation = () => {
-    saveConsultation({
-      props: this.props,
-      confirmMessage: 'Pause consultation?',
-      successMessage: 'Consultation paused.',
-      action: 'pause',
-    })
+  pauseConsultation = async () => {
+    const { validateForm, handleSubmit } = this.props
+    const isFormValid = await validateForm()
+    if (!_.isEmpty(isFormValid)) {
+      handleSubmit()
+    } else {
+      saveConsultation({
+        props: this.props,
+        confirmMessage: 'Pause consultation?',
+        successMessage: 'Consultation paused.',
+        action: 'pause',
+      })
+    }
   }
-
-  // discardConsultation = () => {
-  //   const { dispatch, values } = this.props
-  //   dispatch({
-  //     type: 'consultation/discard',
-  //     payload: values.id,
-  //   })
-  //   history.push('/reception/queue')
-  // }
-
   resumeConsultation = () => {
     const {
       dispatch,
@@ -844,7 +958,7 @@ class Main extends React.Component {
     })
   }
 
-  handleSignOffClick = () => {
+  handleSignOffClick = async () => {
     const {
       visitRegistration,
       orders,
@@ -852,62 +966,69 @@ class Main extends React.Component {
       handleSubmit,
       values,
       forms,
+      validateForm,
     } = this.props
-    const { rows, _originalRows } = orders
-    const { entity: vistEntity = {} } = visitRegistration
-    const { visit = {} } = vistEntity
-    const {
-      visitPurposeFK = VISIT_TYPE.CON,
-      visitStatus = VISIT_STATUS.DISPENSE,
-    } = visit
-
-    const isModifiedOrder = _.isEqual(
-      rows.filter(i => !(i.id === undefined && i.isDeleted)),
-      _originalRows,
-    )
-    if (forms.rows.filter(o => o.statusFK === 1 && !o.isDeleted).length > 0) {
-      notification.warning({
-        message: `Draft forms found, please finalize it before sign off.`,
-      })
-      return
-    }
-
-    if (
-      visitPurposeFK === VISIT_TYPE.BF &&
-      visitStatus === VISIT_STATUS.BILLING &&
-      isModifiedOrder
-    ) {
-      dispatch({
-        type: 'global/updateState',
-        payload: {
-          showCustomConfirm: true,
-          customConfirmCfg: {
-            title: 'Confirm',
-            content: 'Do you want to complete the visit?',
-            actions: [
-              {
-                text: 'Cancel',
-                color: 'danger',
-                onClick: () => {
-                  // do nothing
-                },
-              },
-              {
-                text: 'No',
-                color: 'danger',
-                onClick: this.signOffOnly,
-              },
-              {
-                text: 'Yes',
-                color: 'primary',
-                onClick: this.signOffAndCompleteBilling,
-              },
-            ],
-          },
-        },
-      })
-    } else {
+    const isFormValid = await validateForm()
+    if (!_.isEmpty(isFormValid)) {
       handleSubmit()
+    } else {
+      const { rows, _originalRows } = orders
+      const { entity: vistEntity = {} } = visitRegistration
+      const { visit = {} } = vistEntity
+      const {
+        visitPurposeFK = VISIT_TYPE.CON,
+        visitStatus = VISIT_STATUS.DISPENSE,
+      } = visit
+
+      const isModifiedOrder = _.isEqual(
+        rows.filter(i => !(i.id === undefined && i.isDeleted)),
+        _originalRows,
+      )
+      if (forms.rows.filter(o => o.statusFK === 1 && !o.isDeleted).length > 0) {
+        notification.warning({
+          message: `Draft forms found, please finalize it before sign off.`,
+        })
+        return
+      }
+
+      if (
+        (visitPurposeFK === VISIT_TYPE.BF ||
+          visitPurposeFK === VISIT_TYPE.MC) &&
+        visitStatus === VISIT_STATUS.BILLING &&
+        isModifiedOrder
+      ) {
+        dispatch({
+          type: 'global/updateState',
+          payload: {
+            showCustomConfirm: true,
+            customConfirmCfg: {
+              title: 'Confirm',
+              content: 'Do you want to complete the visit?',
+              actions: [
+                {
+                  text: 'Cancel',
+                  color: 'danger',
+                  onClick: () => {
+                    // do nothing
+                  },
+                },
+                {
+                  text: 'No',
+                  color: 'danger',
+                  onClick: this.signOffOnly,
+                },
+                {
+                  text: 'Yes',
+                  color: 'primary',
+                  onClick: this.signOffAndCompleteBilling,
+                },
+              ],
+            },
+          },
+        })
+      } else {
+        handleSubmit()
+      }
     }
   }
 
@@ -921,11 +1042,13 @@ class Main extends React.Component {
       orders = {},
       visitRegistration,
       clinicSettings,
+      patient,
     } = this.props
     const { entity: vistEntity = {} } = visitRegistration
     // if (!vistEntity) return null
     const { visit = {}, queueNo } = vistEntity
     const { summary } = orders
+    const patientName = patient?.entity?.name
     // const { adjustments, total, gst, totalWithGst } = summary
 
     return (
@@ -1062,8 +1185,8 @@ class Main extends React.Component {
                 <div style={{ marginRight: 10 }}>
                   <CallingQueueButton
                     qId={queueNo}
-                    roomNo={visit.roomFK}
-                    doctor={visit.doctorProfileFK}
+                    patientName={patientName}
+                    from='Queue'
                   />
                 </div>
               </Authorized>
@@ -1263,6 +1386,31 @@ class Main extends React.Component {
     })
   }
 
+  onSelectPreOrder = (selectPreOrder = []) => {
+    const {
+      orders,
+      dispatch,
+      codetable,
+      visitRegistration,
+      patient,
+      user,
+      clinicSettings,
+    } = this.props
+
+    dispatch({
+      type: 'orders/upsertRows',
+      payload: getOrdersData({
+        selectPreOrder,
+        orders,
+        codetable,
+        visitRegistration,
+        patient,
+        user,
+        clinicSettings,
+      }),
+    })
+  }
+
   render() {
     const { props, state } = this
     const {
@@ -1298,12 +1446,27 @@ class Main extends React.Component {
           ? 'disable'
           : rights,
     }
+    const { rows } = orders
+    const draftPreOrderItem = patient?.entity?.pendingPreOrderItem?.map(po => {
+      const selectPreOrder = rows.find(
+        apo => apo.actualizedPreOrderItemFK === po.id,
+      )
+      if (selectPreOrder) {
+        return {
+          ...po,
+          preOrderItemStatus: selectPreOrder.isDeleted ? 'New' : 'Actualizing',
+        }
+      }
+      return { ...po }
+    })
+    console.log(this.props)
     return (
       <div className={classes.root}>
         <PatientBanner
           from='Consultation'
-          // activePreOrderItem={patient?.entity?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
-          extraCmt={this.getExtraComponent()}
+          onSelectPreOrder={this.onSelectPreOrder}
+          activePreOrderItems={draftPreOrderItem}
+          extraCmt={this.getExtraComponent}
           {...this.props}
         />
         <Authorized.Context.Provider value={matches}>

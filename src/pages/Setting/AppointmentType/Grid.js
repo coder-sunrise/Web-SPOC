@@ -10,6 +10,8 @@ const columns = [
   { name: 'code', title: 'Code' },
   { name: 'displayValue', title: 'Display Value' },
   { name: 'tagColorHex', title: 'Appt. Type Color' },
+  { name: 'sortOrder', title: 'Sort Order' },
+  { name: 'isDefault', title: 'Default' },
   { name: 'isActive', title: 'Status' },
   {
     name: 'action',
@@ -21,13 +23,27 @@ class Grid extends React.PureComponent {
   state = {
     columnExtensions: [
       {
+        columnName:'sortOrder',
+        sortingEnabled: true,
+        width:'100px',
+      },
+      {
+        columnName:'isDefault',
+        sortingEnabled: false,
+        align: 'center',
+        width:'100px',
+        render: row => (row.isDefault ? 'Yes' : 'No'),
+      },
+      {
         columnName: 'isActive',
         sortingEnabled: false,
         type: 'select',
         options: status,
+        width:'100px',
       },
       {
         columnName: 'tagColorHex',
+        width: '200px',
         render: (row) => (
           <div
             style={{

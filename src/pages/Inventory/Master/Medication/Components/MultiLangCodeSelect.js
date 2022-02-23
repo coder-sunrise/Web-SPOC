@@ -1,12 +1,20 @@
 import React from 'react'
 import { CodeSelect } from '@/components'
 
-const MultiLangCodeSelect = ({ code, language, ...restProps }) => {
+const MultiLangCodeSelect = ({
+  code,
+  language,
+  labelField,
+  isMultiLanguage,
+  ...restProps
+}) => {
   const formatCodes = codes => {
     const tempFormattedCodes = []
     codes.forEach(current => {
       const formattedCode = {
-        displayValue: current.displayValue,
+        displayValue: isMultiLanguage
+          ? current.displayValue
+          : current[labelField],
         id: current.id,
       }
       if (current.translationData)
@@ -19,7 +27,9 @@ const MultiLangCodeSelect = ({ code, language, ...restProps }) => {
           formattedCode[fieldName] = langDisplayValue
         })
       else {
-        formattedCode['displayValue'] = current.displayValue
+        formattedCode[labelField] = isMultiLanguage
+          ? current.displayValue
+          : current[labelField]
       }
       tempFormattedCodes.push(formattedCode)
     })
@@ -31,7 +41,7 @@ const MultiLangCodeSelect = ({ code, language, ...restProps }) => {
     <CodeSelect
       formatCodes={formatCodes}
       code={code}
-      labelField={'displayValue' + language}
+      labelField={isMultiLanguage ? 'displayValue' + language : labelField}
       {...restProps}
     />
   )

@@ -28,7 +28,7 @@ import WorklistContext, {
 import { Fragment, useContext } from 'react'
 import PharmacyDetails from '../Worklist/Details'
 import { compose } from 'redux'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'dva'
 import _ from 'lodash'
 import LinkIcon from '@material-ui/icons/Link'
@@ -45,6 +45,11 @@ const api = {
 }
 
 const style = theme => ({})
+
+const IsFullyDispensedStatus = {
+  false: 'Partially',
+  true: 'Completed',
+}
 
 const orderDateForm = moment()
   .add(-1, 'week')
@@ -82,6 +87,8 @@ const defaultColumns = (codetable, setDetailsId) => {
       search: false,
       fixed: 'left',
       width: 200,
+      sortBy:
+        'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.Name',
     },
     {
       key: 'patientReferenceNo',
@@ -90,6 +97,8 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 100,
+      sortBy:
+        'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.PatientReferenceNo',
     },
     {
       key: 'patientAccountNo',
@@ -98,6 +107,8 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 100,
+      sortBy:
+        'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo',
     },
     {
       key: 'genderAge',
@@ -123,6 +134,8 @@ const defaultColumns = (codetable, setDetailsId) => {
       key: 'orderDate',
       title: 'Order Time',
       dataIndex: 'orderDate',
+      defaultSortOrder: 'descend',
+      sortBy: 'WorkitemFKNavigation.GenerateDate',
       valueType: 'dateTime',
       render: (_dom: any, entity: any) =>
         entity.orderTime?.format('DD MMM YYYY HH:mm') || '-',
@@ -193,8 +206,6 @@ const defaultColumns = (codetable, setDetailsId) => {
       dataIndex: 'status',
       sorter: false,
       search: false,
-      renderText: (item, { type, defaultRender, ...rest }, form) =>
-        Object.values(PharmacyWorkitemStatus)[item - 1],
       width: 100,
       fixed: 'right',
     },
@@ -246,7 +257,7 @@ const defaultColumns = (codetable, setDetailsId) => {
         return (
           <DatePicker
             style={{ width: 250 }}
-            label='Order Date Form'
+            label='Order Date From'
             placeholder=''
           />
         )
@@ -307,10 +318,10 @@ const defaultColumns = (codetable, setDetailsId) => {
           <Select
             label='Status'
             mode='multiple'
-            options={[
-              { value: 6, name: 'Partially' },
-              { value: 4, name: 'Completed' },
-            ]}
+            options={Object.entries(IsFullyDispensedStatus).map(x => ({
+              value: x[0],
+              name: x[1],
+            }))}
             placeholder=''
             style={{ width: 250 }}
             maxTagCount={0}
@@ -330,6 +341,7 @@ const PharmacyWorklistHistoryIndex = ({
 }) => {
   const dispatch = useDispatch()
   const { detailsId, setDetailsId } = useContext(WorklistContext)
+  const actionRef = useRef()
 
   useEffect(() => {
     dispatch({
@@ -342,12 +354,10 @@ const PharmacyWorklistHistoryIndex = ({
         },
       },
     })
-  })
+  }, [])
 
   const refreshClick = () => {
-    // dispatch({
-    //   type: 'pharmacyHisotry/query',
-    // })
+    actionRef.current.reload()
   }
 
   const columns = defaultColumns(codetable, setDetailsId)
@@ -356,15 +366,16 @@ const PharmacyWorklistHistoryIndex = ({
     <Fragment>
       <PageContainer pageHeaderRender={false}>
         <ProTable
+          actionRef={actionRef}
           rowSelection={false}
           columns={columns}
           api={api}
           search={{
-            span:8,
+            span: 8,
             collapsed: false,
             collapseRender: false,
-            searchText: 'SEARCH',
-            resetText: 'RESET',
+            searchText: 'Search',
+            resetText: 'Reset',
             optionRender: (searchConfig, formProps, dom) => {
               return (
                 <div
@@ -384,7 +395,7 @@ const PharmacyWorklistHistoryIndex = ({
           columnsStateMap={pharmacyHistoryColumnSetting}
           onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
           defaultColumns={[]}
-          pagination={{ pageSize: 100 }}
+          pagination={{ pageSize: 20 }}
           features={[
             {
               code: 'details',
@@ -413,17 +424,21 @@ const PharmacyWorklistHistoryIndex = ({
               ...values,
               apiCriteria: {
                 searchValue: searchPatient,
-                orderDateForm: searchOrderDateForm,
-                orderDateTo: searchOrderDateTo,
-                visitDoctor: searchOrderBy?.indexOf(-99) > -1 ? null : searchOrderBy?.join(),
-                status: searchStatus?.indexOf(-99) > -1 ? null : searchStatus?.join(),
+                orderDateForm: moment(searchOrderDateForm).set({ hour: 0, minute: 0, second: 0, millisecond:0 }).formatUTC(false),
+                orderDateTo: moment(searchOrderDateTo).set({ hour: 23, minute: 59, second: 59, millisecond:0 }).formatUTC(false),
+                visitDoctor: searchOrderBy?.includes(-99)
+                  ? null
+                  : searchOrderBy?.join(),
+                status: searchStatus?.includes(-99)
+                  ? null
+                  : searchStatus?.join(),
               },
             }
           }}
           scroll={{ x: 1100 }}
         />
       </PageContainer>
-      <PharmacyDetails refreshClick={refreshClick} />
+      <PharmacyDetails refreshClick={refreshClick} fromModule='History' />
     </Fragment>
   )
 }
@@ -440,7 +455,7 @@ const historyIndex = compose(
   connect(({ pharmacyHisotry, codetable, clinicSettings }) => ({
     pharmacyHisotry,
     codetable,
-    clinicSettings:clinicSettings.settings || clinicSettings.default,
+    clinicSettings: clinicSettings.settings || clinicSettings.default,
   })),
 )(HistoryIndex)
 

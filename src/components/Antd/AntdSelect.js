@@ -312,13 +312,7 @@ class AntdSelect extends React.PureComponent {
       return handleFilter(input, option)
     }
     try {
-      if (Array.isArray(option.props.children)) {
-        // return (
-        //   option.props.children.filter(
-        //     (o) =>
-        //       o.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0,
-        //   ).length > 0
-        // )
+      if (Array.isArray(option.props.children)) { 
         match = false
       }
       match = option.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -511,6 +505,7 @@ class AntdSelect extends React.PureComponent {
     const {
       valueField,
       labelField,
+      tooltipField,
       optionLabelLength = 0,
       mode,
       showOptionTitle = true,
@@ -531,10 +526,16 @@ class AntdSelect extends React.PureComponent {
       .map((option, index) => {
         const hasIsActive = option.isActive !== undefined
         const isActive = hasIsActive ? option.isActive : true
+        let tooltip = showOptionTitle
+          ? option.customTooltipField || option.label
+          : undefined
+        if (tooltipField) {
+          tooltip = option[tooltipField]
+        }
         return (
           <Select.Option
             data={option}
-            title={showOptionTitle ? option.customTooltipField || option.label: undefined} 
+            title={tooltip}
             label={
               optionLabelLength
                 ? option.label.substring(0, optionLabelLength)
@@ -745,21 +746,12 @@ class AntdSelect extends React.PureComponent {
         this.state.shrink ||
         this.state.focus
     } else {
-      // console.log(
-      //   value,
-      //   this.state.shrink,
-      //   value !== undefined,
-      //   value !== null,
-      //   value !== '',
-      //   value.length > 0,
-      // )
       labelProps.shrink =
         (value && value.length > 0) || this.state.shrink || this.state.focus
       if (labelProps.shrink === undefined) {
         labelProps.shrink = false
       }
-    }
-    // console.log(value && value.length > 0, this.state.shrink, this.state.focus)
+    } 
     return (
       <CustomInput
         labelProps={labelProps}

@@ -9,7 +9,7 @@ import { LoadingWrapper } from '@/components/_medisys'
 import { APPOINTMENT_STATUSOPTIONS } from '@/utils/constants'
 import { futureApptTableParams, previousApptTableParams } from './variables'
 
-const styles = (theme) => ({
+const styles = theme => ({
   gridRow: {
     marginTop: theme.spacing(1),
   },
@@ -25,6 +25,7 @@ const styles = (theme) => ({
   patient: patient.entity || {},
   user,
   appointmentTypes: codetable.ctappointmenttype,
+  ctcalendarresource: codetable.ctcalendarresource,
 }))
 class AppointmentHistory extends PureComponent {
   state = {
@@ -35,7 +36,7 @@ class AppointmentHistory extends PureComponent {
     loadingAppt: false,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
     if (this.props.patient && this.props.patient.id > 0) {
@@ -43,19 +44,17 @@ class AppointmentHistory extends PureComponent {
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('resize', this.resize.bind(this))
   }
 
-  async getAppts (patientId) {
+  async getAppts(patientId) {
     this.setState({ loadingAppt: true })
     try {
-      const { user, dispatch } = this.props
+      const { user, dispatch, ctcalendarresource } = this.props
       const commonParams = {
         combineCondition: 'and',
-        sorting: [
-          { columnName: 'appointmentDate', direction: 'desc' },
-        ],
+        sorting: [{ columnName: 'appointmentDate', direction: 'desc' }],
       }
 
       const viewOtherApptAccessRight = Authorized.check(
@@ -67,7 +66,14 @@ class AppointmentHistory extends PureComponent {
         !viewOtherApptAccessRight ||
         viewOtherApptAccessRight.rights !== 'enable'
       ) {
-        doctor = user.data.clinicianProfile.id
+        const calendarresource = ctcalendarresource.find(
+          resource =>
+            resource.isActive &&
+            resource.clinicianProfileDto?.id === user.data.clinicianProfile.id,
+        )
+        if (calendarresource) {
+          doctor = calendarresource.id
+        }
       }
 
       await dispatch({
@@ -78,10 +84,7 @@ class AppointmentHistory extends PureComponent {
       })
 
       // const future = undefined
-      const [
-        previous,
-        future,
-      ] = await Promise.all([
+      const [previous, future] = await Promise.all([
         queryAppointments({
           apiCriteria: {
             // appStatus: [
@@ -90,7 +93,9 @@ class AppointmentHistory extends PureComponent {
             //   APPOINTMENT_STATUS.TURNEDUPLATE,
             //   // APPOINTMENT_STATUS.NOSHOW,
             // ].join(),
-            apptDateTo: moment().add(-1, 'd').formatUTC(),
+            apptDateTo: moment()
+              .add(-1, 'd')
+              .formatUTC(),
             patientProfileId: patientId,
             doctor,
             isIncludeHistory: true,
@@ -132,12 +137,11 @@ class AppointmentHistory extends PureComponent {
         loadingAppt: false,
       })
     } catch (error) {
-      console.log(error)
       this.setState({ loadingAppt: false })
     }
   }
 
-  async UNSAFE_componentWillReceiveProps (nextProps) {
+  async UNSAFE_componentWillReceiveProps(nextProps) {
     const { patient } = nextProps
 
     if (this.state.patientProfileFK !== patient.id && patient.id > 0) {
@@ -148,7 +152,7 @@ class AppointmentHistory extends PureComponent {
     }
   }
 
-  resize () {
+  resize() {
     if (this.divElement) {
       const height = this.divElement.clientHeight
       if (height > 0) {
@@ -157,34 +161,34 @@ class AppointmentHistory extends PureComponent {
     }
   }
 
-  reBuildApptDatas (data) {
-    return data.map((o) => {
+  reBuildApptDatas(data) {
+    return data.map(o => {
       const firstAppointment = o.appointment_Resources.find(
-        (item) => item.sortOrder === 0,
+        item => item.sortOrder === 0,
       )
       let startTime = ''
-      let doctor = 0
+      let calendarResourceFK = 0
       let { appointmentDate } = o
 
       if (firstAppointment) {
         startTime = moment(firstAppointment.startTime, 'HH:mm:ss').format(
           'hh:mm A',
         )
-        doctor = firstAppointment.clinicianFK
+        calendarResourceFK = firstAppointment.calendarResourceFK
         appointmentDate = `${moment(o.appointmentDate).format(
           'YYYY-MM-DD',
         )} ${moment(firstAppointment.startTime, 'HH:mm:ss').format('HH:mm:ss')}`
       }
       const apptStatusId = parseInt(o.appointmentStatusFk, 10)
       const apptStatus = APPOINTMENT_STATUSOPTIONS.find(
-        (m) => m.id === apptStatusId,
+        m => m.id === apptStatusId,
       )
 
       const newRow = {
         ...o,
         appointmentDate,
         startTime,
-        doctor,
+        calendarResourceFK,
         appointmentStatus: apptStatus ? apptStatus.name || '' : '',
         appointmentStatusFk: apptStatusId,
         appointmentRemarks: o.appointmentRemarks || '',
@@ -193,8 +197,14 @@ class AppointmentHistory extends PureComponent {
     })
   }
 
-  render () {
-    const { classes, theme, handleRowDoubleClick, appointmentTypes, handleCopyAppointmentClick } = this.props
+  render() {
+    const {
+      classes,
+      theme,
+      handleRowDoubleClick,
+      appointmentTypes,
+      handleCopyAppointmentClick,
+    } = this.props
     const { previousAppt, futureAppt, loadingAppt } = this.state
 
     return (

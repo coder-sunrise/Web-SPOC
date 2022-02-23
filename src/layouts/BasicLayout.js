@@ -323,7 +323,7 @@ class BasicLayout extends React.PureComponent {
       <React.Fragment>
         <MuiThemeProvider theme={_theme}>
           <CssBaseline />
-          <div id='main-page' style={{ height: '100vh' }}>
+          <div id='main-page' style={{ height: '100vh', overflow: 'auto' }}>
             <ErrorBoundary>
               <ProLayout
                 // {...defaultProps}

@@ -13,12 +13,14 @@ import Yup from '@/utils/yup'
 import { getTranslationValue } from '@/utils/utils'
 import { DoctorProfileSelect, DoctorLabel } from '@/components/_medisys'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
-import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
+import { SERVICE_CENTER_CATEGORY, ORDER_TYPES } from '@/utils/constants'
 
-const getNextSequence = (props) => {
-  const { orders: { rows } } = props
+const getNextSequence = props => {
+  const {
+    orders: { rows },
+  } = props
 
-  const allDocs = rows.filter((s) => !s.isDeleted)
+  const allDocs = rows.filter(s => !s.isDeleted)
   let nextSequence = 1
   if (allDocs && allDocs.length > 0) {
     const { sequence } = _.maxBy(allDocs, 'sequence')
@@ -27,7 +29,7 @@ const getNextSequence = (props) => {
   return nextSequence
 }
 
-const getType = (typeId) => {
+const getType = typeId => {
   let type = ''
   switch (typeId) {
     case 1:
@@ -58,8 +60,19 @@ const getType = (typeId) => {
 @withFormikExtend({
   mapPropsToValues: ({ consultation }) => consultation.entity,
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, user, codetable, visitRegistration, patient, clinicSettings } = props
-    const { primaryPrintoutLanguage = 'EN', secondaryPrintoutLanguage = '' } = clinicSettings
+    const {
+      dispatch,
+      onConfirm,
+      user,
+      codetable,
+      visitRegistration,
+      patient,
+      clinicSettings,
+    } = props
+    const {
+      primaryPrintoutLanguage = 'EN',
+      secondaryPrintoutLanguage = '',
+    } = clinicSettings
     const { pendingPackage } = values
     const {
       inventorymedication = [],
@@ -69,7 +82,7 @@ const getType = (typeId) => {
       ctmedicationunitofmeasurement = [],
       ctmedicationfrequency = [],
       ctmedicationdosage = [],
-      ctservice = []
+      ctservice = [],
     } = codetable
     const { weightKG } = visitRegistration.entity.visit
     const { dob } = patient.entity
@@ -84,12 +97,22 @@ const getType = (typeId) => {
     }
 
     const getInstruction = (medication, matchInstruction, language) => {
-      const usage = ctmedicationusage.find(usage => usage.id === medication.medicationUsage?.id)
-      const uom = ctmedicationunitofmeasurement.find(uom => uom.id === medication.prescribingUOM.id)
-      const frequency = ctmedicationfrequency.find(frequency => frequency.id === matchInstruction?.medicationFrequency?.id)
-      const dosage = ctmedicationdosage.find(dosage => dosage.id === matchInstruction?.prescribingDosage?.id)
+      const usage = ctmedicationusage.find(
+        usage => usage.id === medication.medicationUsage?.id,
+      )
+      const uom = ctmedicationunitofmeasurement.find(
+        uom => uom.id === medication.prescribingUOM.id,
+      )
+      const frequency = ctmedicationfrequency.find(
+        frequency => frequency.id === matchInstruction?.medicationFrequency?.id,
+      )
+      const dosage = ctmedicationdosage.find(
+        dosage => dosage.id === matchInstruction?.prescribingDosage?.id,
+      )
 
-      const itemDuration = matchInstruction?.duration ? ` For ${matchInstruction.duration} day(s)` : ''
+      const itemDuration = matchInstruction?.duration
+        ? ` For ${matchInstruction.duration} day(s)`
+        : ''
 
       const instruction = `${getTranslationValue(
         usage?.translationData,
@@ -111,10 +134,9 @@ const getType = (typeId) => {
       return instruction
     }
 
-    const getMedicationFromPackage = (packageItem) => {
+    const getMedicationFromPackage = packageItem => {
       const medication = inventorymedication.find(
-        (item) =>
-          item.id === packageItem.inventoryMedicationFK,
+        item => item.id === packageItem.inventoryMedicationFK,
       )
       const { medicationInstructionRule = [] } = medication
       let age
@@ -124,9 +146,14 @@ const getType = (typeId) => {
       var matchInstruction = medicationInstructionRule.find(i =>
         isMatchInstructionRule(i, age, weightKG),
       )
-      const uom = ctmedicationunitofmeasurement.find(uom => uom.id === medication.dispensingUOM.id)
+      const uom = ctmedicationunitofmeasurement.find(
+        uom => uom.id === medication.dispensingUOM.id,
+      )
       let item
-      if (medication.isActive === true) {
+      if (
+        medication.isActive === true &&
+        !medication.isOnlyClinicInternalUsage
+      ) {
         const medicationdispensingUOM = medication.dispensingUOM
         const medicationusage = medication.medicationUsage
         const medicationfrequency = matchInstruction?.medicationFrequency
@@ -135,11 +162,11 @@ const getType = (typeId) => {
         const medicationPrecautions =
           medication.inventoryMedication_MedicationPrecaution
         const isDefaultBatchNo = medication.medicationStock.find(
-          (o) => o.isDefault === true,
+          o => o.isDefault === true,
         )
         let currentMedicationPrecautions = []
         currentMedicationPrecautions = currentMedicationPrecautions.concat(
-          medicationPrecautions.map((o) => {
+          medicationPrecautions.map(o => {
             return {
               precautionCode: o.medicationPrecautionCode,
               Precaution: o.medicationPrecautionName,
@@ -169,8 +196,19 @@ const getType = (typeId) => {
             : undefined,
           batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
           isExternalPrescription: false,
-          instruction: getInstruction(medication, matchInstruction, primaryPrintoutLanguage),
-          secondInstruction: secondaryPrintoutLanguage !== '' ? getInstruction(medication, matchInstruction, secondaryPrintoutLanguage) : '',
+          instruction: getInstruction(
+            medication,
+            matchInstruction,
+            primaryPrintoutLanguage,
+          ),
+          secondInstruction:
+            secondaryPrintoutLanguage !== ''
+              ? getInstruction(
+                  medication,
+                  matchInstruction,
+                  secondaryPrintoutLanguage,
+                )
+              : '',
           dispenseUOMFK: medication?.dispensingUOM?.id,
           inventoryDispenseUOMFK: medication?.dispensingUOM?.id,
           inventoryPrescribingUOMFK: medication?.prescribingUOM?.id,
@@ -182,11 +220,14 @@ const getType = (typeId) => {
             primaryPrintoutLanguage,
             'displayValue',
           ),
-          secondDispenseUOMDisplayValue: secondaryPrintoutLanguage !== '' ? getTranslationValue(
-            uom?.translationData,
-            secondaryPrintoutLanguage,
-            'displayValue',
-          ) : '',
+          secondDispenseUOMDisplayValue:
+            secondaryPrintoutLanguage !== ''
+              ? getTranslationValue(
+                  uom?.translationData,
+                  secondaryPrintoutLanguage,
+                  'displayValue',
+                )
+              : '',
           corPrescriptionItemPrecaution: currentMedicationPrecautions,
           corPrescriptionItemInstruction: [
             {
@@ -197,9 +238,7 @@ const getType = (typeId) => {
               usageMethodDisplayValue: medicationusage
                 ? medicationusage.name
                 : undefined,
-              dosageFK: medicationdosage
-                ? medicationdosage.id
-                : undefined,
+              dosageFK: medicationdosage ? medicationdosage.id : undefined,
               dosageCode: medicationdosage ? medicationdosage.code : undefined,
               dosageDisplayValue: medicationdosage
                 ? medicationdosage.name
@@ -236,24 +275,25 @@ const getType = (typeId) => {
           isDispensedByPharmacy: medication.isDispensedByPharmacy,
           isNurseActualizeRequired: medication.isNurseActualizable,
           isExclusive: medication.isExclusive,
+          isOnlyClinicInternalUsage: medication.isOnlyClinicInternalUsage,
         }
       }
       return item
     }
 
-    const getVaccinationFromPackage = (packageItem) => {
+    const getVaccinationFromPackage = packageItem => {
       const vaccination = inventoryvaccination.find(
-        (item) =>
-          item.id === packageItem.inventoryVaccinationFK,
+        item => item.id === packageItem.inventoryVaccinationFK,
       )
 
       let item
       if (vaccination.isActive === true) {
         const vaccinationUOM = vaccination.prescribingUOM
+        const vaccinationDispenseUOM = vaccination.despensingUOM
         const vaccinationusage = vaccination.vaccinationUsage
         const vaccinationdosage = vaccination.prescribingDosage
         const isDefaultBatchNo = vaccination.vaccinationStock.find(
-          (o) => o.isDefault === true,
+          o => o.isDefault === true,
         )
 
         item = {
@@ -263,18 +303,17 @@ const getType = (typeId) => {
           vaccinationCode: vaccination.code,
           vaccinationName: vaccination.displayValue,
           usageMethodFK: vaccination.vaccinationUsage.id,
-          usageMethodCode: vaccinationusage ? vaccinationusage.code : undefined,
-          usageMethodDisplayValue: vaccinationusage
-            ? vaccinationusage.name
-            : undefined,
+          usageMethodCode: vaccinationusage?.code,
+          usageMethodDisplayValue: vaccinationusage?.name,
           dosageFK: vaccination.prescribingDosage.id,
-          dosageCode: vaccinationdosage ? vaccinationdosage.code : undefined,
-          dosageDisplayValue: vaccinationdosage
-            ? vaccinationdosage.name
-            : undefined,
-          uomfk: vaccination.prescribingUOM.id,
-          uomCode: vaccinationUOM ? vaccinationUOM.code : undefined,
-          uomDisplayValue: vaccinationUOM ? vaccinationUOM.name : undefined,
+          dosageCode: vaccinationdosage?.code,
+          dosageDisplayValue: vaccinationdosage?.name,
+          uomfk: vaccinationUOM?.id,
+          uomCode: vaccinationUOM?.code,
+          uomDisplayValue: vaccinationUOM?.name,
+          dispenseUOMFK: vaccinationDispenseUOM?.id,
+          dispenseUOMCode: vaccinationDispenseUOM?.code,
+          dispenseUOMDisplayValue: vaccinationDispenseUOM?.name,
           quantity: 0,
           unitPrice: packageItem.unitPrice,
           totalPrice: 0,
@@ -297,14 +336,17 @@ const getType = (typeId) => {
           packageGlobalId: packageItem.packageGlobalId,
           corVaccinationCert: [],
           isNurseActualizeRequired: vaccination.isNurseActualizable,
+          instruction: `${vaccinationusage?.name ||
+            ''} ${vaccinationdosage?.displayValue ||
+            ''} ${vaccinationUOM?.name || ''}`,
         }
       }
       return item
     }
 
-    const getServiceCenterServiceFromPackage = (packageItem) => {      
+    const getServiceCenterServiceFromPackage = packageItem => {
       const service = ctservice.find(
-        (item) => item.id === packageItem.serviceCenterServiceFK,
+        item => item.id === packageItem.serviceCenterServiceFK,
       )
       let item
       if (packageItem.isActive) {
@@ -332,30 +374,32 @@ const getType = (typeId) => {
           performingUserFK: packageItem.performingUserFK,
           packageGlobalId: packageItem.packageGlobalId,
           isNurseActualizeRequired: service.isNurseActualizable,
-          serviceCenterCategoryFK: service.serviceCenterCategoryFK
+          serviceCenterCategoryFK: service.serviceCenterCategoryFK,
         }
       }
       return item
     }
 
-    const getConsumableFromPackage = (packageItem) => {
+    const getConsumableFromPackage = packageItem => {
       const consumable = inventoryconsumable.find(
-        (item) =>
-          item.id === packageItem.inventoryConsumableFK,
+        item => item.id === packageItem.inventoryConsumableFK,
       )
 
       let item
-      let isDefaultBatchNo
-      if (consumable) {
-        isDefaultBatchNo = consumable.consumableStock.find(
-          (o) => o.isDefault === true,
-        )
-      }
+      if (
+        consumable.isActive === true &&
+        !consumable.isOnlyClinicInternalUsage
+      ) {
+        let isDefaultBatchNo
+        if (consumable) {
+          isDefaultBatchNo = consumable.consumableStock.find(
+            o => o.isDefault === true,
+          )
+        }
 
-      if (packageItem.isActive) {
         item = {
           inventoryConsumableFK: packageItem.inventoryConsumableFK,
-          isActive: packageItem.isActive,
+          isActive: consumable.isActive,
           quantity: 0,
           unitPrice: packageItem.unitPrice,
           totalPrice: 0,
@@ -380,13 +424,13 @@ const getType = (typeId) => {
           packageGlobalId: packageItem.packageGlobalId,
           isDispensedByPharmacy: consumable.isDispensedByPharmacy,
           isNurseActualizeRequired: consumable.isNurseActualizable,
+          isOnlyClinicInternalUsage: consumable.isOnlyClinicInternalUsage,
         }
       }
-
       return item
     }
 
-    const getItemFromPackage = (packageItem) => {
+    const getItemFromPackage = packageItem => {
       let item
       if (packageItem.invoiceItemTypeFK === 1) {
         item = getMedicationFromPackage(packageItem)
@@ -404,7 +448,7 @@ const getType = (typeId) => {
       return item
     }
 
-    const getType = (invoiceItemTypeFK) => {
+    const getType = invoiceItemTypeFK => {
       if (invoiceItemTypeFK === 1) return '1'
       if (invoiceItemTypeFK === 2) return '4'
       if (invoiceItemTypeFK === 3) return '2'
@@ -412,17 +456,30 @@ const getType = (typeId) => {
     }
 
     if (pendingPackage) {
-      const consumeItems = pendingPackage.filter(p => p.consumeQuantity > 0 && p.isActive)
+      const consumeItems = pendingPackage.filter(
+        p => p.consumeQuantity > 0 && p.isActive,
+      )
       let nextSequence = getNextSequence(props)
       for (let index = 0; index < consumeItems.length; index++) {
         const newOrder = getItemFromPackage(consumeItems[index])
         if (newOrder) {
           let type = getType(pendingPackage[index].invoiceItemTypeFK)
           if (type === '3') {
-            if (newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER
-              || newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE) { type = '9' }
-            else if (newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER
-              || newOrder.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE) { type = '10' }
+            if (
+              newOrder.serviceCenterCategoryFK ===
+                SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER ||
+              newOrder.serviceCenterCategoryFK ===
+                SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE
+            ) {
+              type = ORDER_TYPES.LAB
+            } else if (
+              newOrder.serviceCenterCategoryFK ===
+                SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER ||
+              newOrder.serviceCenterCategoryFK ===
+                SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE
+            ) {
+              type = ORDER_TYPES.RADIOLOGY
+            }
           }
           const data = {
             isOrderedByDoctor:
@@ -433,7 +490,8 @@ const getType = (typeId) => {
             isDeleted: false,
             type,
             packageDrawdown: consumeItems[index].packageDrawdown,
-            packageDrawdownAsAtDate: consumeItems[index].packageDrawdownAsAtDate,
+            packageDrawdownAsAtDate:
+              consumeItems[index].packageDrawdownAsAtDate,
             packageDrawdownFK: consumeItems[index].id,
           }
           datas.push(data)
@@ -446,7 +504,6 @@ const getType = (typeId) => {
   },
   displayName: 'ConsumePackage',
 })
-
 class ConsumePackage extends Component {
   gridColumnExtensions = [
     {
@@ -460,19 +517,12 @@ class ConsumePackage extends Component {
       columnName: 'itemName',
       sortingEnabled: false,
       disabled: true,
-      render: (row) => {
+      render: row => {
         let texts = []
 
-        texts = [
-          row.itemName,
-          row.isActive ? '' : '(Inactive)',
-        ].join(' ')
+        texts = [row.itemName, row.isActive ? '' : '(Inactive)'].join(' ')
 
-        return (
-          <div>
-            {texts}
-          </div>
-        )
+        return <div>{texts}</div>
       },
     },
     {
@@ -489,7 +539,7 @@ class ConsumePackage extends Component {
       sortingEnabled: false,
       type: 'number',
       format: '0.0',
-      isDisabled: (row) => row.isActive !== true,
+      isDisabled: row => row.isActive !== true,
     },
     {
       columnName: 'remainingQuantity',
@@ -510,7 +560,7 @@ class ConsumePackage extends Component {
       remoteFilter: {
         'clinicianProfile.isActive': true,
       },
-      renderDropdown: (option) => <DoctorLabel doctor={option} />,
+      renderDropdown: option => <DoctorLabel doctor={option} />,
       onChange: ({ option, row }) => {
         const { pendingPackage } = this.props.values
         const changedRow = pendingPackage.find(p => p.id === row.id)
@@ -521,7 +571,7 @@ class ConsumePackage extends Component {
     },
   ]
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { dispatch } = props
     const codeTableNameArray = [
@@ -537,11 +587,11 @@ class ConsumePackage extends Component {
       },
     })
 
-    const newColumnExtensions = this.gridColumnExtensions.map((column) => {
+    const newColumnExtensions = this.gridColumnExtensions.map(column => {
       if (column.columnName === 'consumeQuantity') {
         return {
           ...column,
-          render: (row) => {
+          render: row => {
             return (
               <NumberInput
                 value={row.consumeQuantity}
@@ -555,7 +605,7 @@ class ConsumePackage extends Component {
       if (column.columnName === 'performingUserFK') {
         return {
           ...column,
-          render: (row) => {
+          render: row => {
             return (
               <DoctorProfileSelect
                 label=''
@@ -571,9 +621,7 @@ class ConsumePackage extends Component {
       return { ...column }
     })
 
-    this.newColumnExtensions = [
-      ...newColumnExtensions,
-    ]
+    this.newColumnExtensions = [...newColumnExtensions]
   }
 
   state = {
@@ -585,18 +633,13 @@ class ConsumePackage extends Component {
     this.expandAllPackages(values)
   }
 
-  expandAllPackages = (values) => {
+  expandAllPackages = values => {
     if (values.pendingPackage) {
       const groups = values.pendingPackage.reduce(
         (distinct, data) =>
           distinct.includes(data.patientPackageFK.toString())
-            ? [
-              ...distinct,
-            ]
-            : [
-              ...distinct,
-              data.patientPackageFK.toString(),
-            ],
+            ? [...distinct]
+            : [...distinct, data.patientPackageFK.toString()],
         [],
       )
 
@@ -606,14 +649,18 @@ class ConsumePackage extends Component {
     }
   }
 
-  render () {
+  render() {
     const { footer, values, setFieldValue, theme } = this.props
     const { pendingPackage } = values
 
     const pendingPackageSchema = Yup.object().shape({
-      consumeQuantity: Yup.number().required()
+      consumeQuantity: Yup.number()
+        .required()
         .min(0, 'Consumed quantity must be greater than or equal to 0')
-        .max(Yup.ref('remainingQuantity'), 'Consumed quantity cannot exceed Remaining Quantity'),
+        .max(
+          Yup.ref('remainingQuantity'),
+          'Consumed quantity cannot exceed Remaining Quantity',
+        ),
       performingUserFK: Yup.number().required(),
     })
 
@@ -634,32 +681,34 @@ class ConsumePackage extends Component {
       setFieldValue('pendingPackage', rows)
     }
 
-    const handleExpandedGroupsChange = (e) => {
+    const handleExpandedGroupsChange = e => {
       this.setState({
         expandedGroups: e,
       })
     }
 
     const packageGroupCellContent = ({ row }) => {
-      if (row.value === undefined || row.value === '')
-        return null
+      if (row.value === undefined || row.value === '') return null
 
       let label = 'Package'
       let expiryDateLabel = '-'
       if (!pendingPackage) return ''
       const data = pendingPackage.filter(
-        (item) => item.patientPackageFK === row.value,
+        item => item.patientPackageFK === row.value,
       )
       if (data.length > 0) {
         label = `${data[0].packageCode} - ${data[0].packageName} (Total: `
-        expiryDateLabel = `Exp. Date: ${data[0].expiryDate ? moment(data[0].expiryDate).format('DD MMM YYYY') : '-'}`
+        expiryDateLabel = `Exp. Date: ${
+          data[0].expiryDate
+            ? moment(data[0].expiryDate).format('DD MMM YYYY')
+            : '-'
+        }`
       }
       return (
         <span style={{ verticalAlign: 'middle' }}>
           <strong>
             {label}
-            <NumberInput text currency value={data[0].packageTotalPrice} />
-            )
+            <NumberInput text currency value={data[0].packageTotalPrice} />)
           </strong>
           <span style={{ marginLeft: theme.spacing(5) }}>
             {expiryDateLabel}
@@ -686,12 +735,8 @@ class ConsumePackage extends Component {
               grouping: true,
               groupingConfig: {
                 state: {
-                  grouping: [
-                    { columnName: 'patientPackageFK' },
-                  ],
-                  expandedGroups: [
-                    ...this.state.expandedGroups,
-                  ],
+                  grouping: [{ columnName: 'patientPackageFK' }],
+                  expandedGroups: [...this.state.expandedGroups],
                   onExpandedGroupsChange: handleExpandedGroupsChange,
                 },
                 row: {
@@ -701,10 +746,11 @@ class ConsumePackage extends Component {
             }}
           />
         </div>
-        {footer && footer({
-          onConfirm: this.props.handleSubmit,
-          confirmBtnText: 'Confirm',
-        })}
+        {footer &&
+          footer({
+            onConfirm: this.props.handleSubmit,
+            confirmBtnText: 'Confirm',
+          })}
       </CardContainer>
     )
   }

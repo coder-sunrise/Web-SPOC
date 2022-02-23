@@ -13,7 +13,7 @@ const sharedMedicationValue = {
     {
       precaution: '',
       sequence: 0,
-      uid: getUniqueId()
+      uid: getUniqueId(),
     },
   ],
   corPrescriptionItemInstruction: [
@@ -21,7 +21,7 @@ const sharedMedicationValue = {
       sequence: 0,
       stepdose: 'AND',
       unitPrice: 0,
-      uid: getUniqueId()
+      uid: getUniqueId(),
     },
   ],
   corPrescriptionItemDrugMixture: [],
@@ -38,6 +38,7 @@ const initialState = {
   defaultMedication: {
     ...sharedMedicationValue,
   },
+  fullService: [],
   defaultService: {
     unitPrice: 0,
     isMinus: true,
@@ -80,6 +81,14 @@ const initialState = {
     selectTag: 'All',
     filterService: '',
   },
+  defaultLab: {
+    editServiceId: undefined,
+    isEdit: false,
+    labItems: [],
+    selectCategory: 'All',
+    selectTag: 'All',
+    filterService: '',
+  },
 }
 export default createListViewModel({
   namespace: 'orders',
@@ -89,7 +98,39 @@ export default createListViewModel({
   param: {
     service: {},
     state: { ...initialState },
-    subscriptions: ({ dispatch, history }) => {},
+    subscriptions: ({ dispatch, history }) => {
+      history.listen(async (loct, method) => {
+        const { pathname, search, query = {} } = loct
+        if (
+          (pathname.indexOf('/reception/queue/consultation') === 0 &&
+            Number(query.cid)) ||
+          pathname.indexOf('/reception/queue/dispense') === 0 ||
+          pathname.indexOf('/pharmacy/worklist') === 0
+        ) {
+          dispatch({
+            type: 'codetable/fetchCodes',
+            payload: {
+              code: 'ctservice',
+              force: true,
+              filter: {
+                'serviceFKNavigation.IsActive': true,
+                'serviceCenterFKNavigation.IsActive': true,
+                combineCondition: 'and',
+              },
+            },
+          }).then(list => {
+            if (list) {
+              dispatch({
+                type: 'updateState',
+                payload: {
+                  fullService: list,
+                },
+              })
+            }
+          })
+        }
+      })
+    },
     effects: {
       *upsertRow({ payload }, { select, call, put, delay }) {
         const upsert = yield put({
@@ -326,6 +367,23 @@ export default createListViewModel({
           payload,
         })
       },
+
+      *updatePriority({ payload }, { put, select }) {
+        const orders = yield select(st => st.orders)
+        const { rows = [] } = orders
+        const { uid, priority } = payload
+        let tempRows = [...rows]
+        tempRows = tempRows.map(o => ({
+          ...o,
+          priority: o.uid === uid ? priority : o.priority,
+        }))
+        yield put({
+          type: 'updateState',
+          payload: {
+            rows: tempRows,
+          },
+        })
+      },
     },
 
     reducers: {
@@ -375,7 +433,7 @@ export default createListViewModel({
             corVaccinationCert: getCertificate(uid),
           }
           rows.push(newRow)
-        }
+        } 
         return {
           ...state,
           rows,

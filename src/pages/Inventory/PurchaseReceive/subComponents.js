@@ -41,12 +41,12 @@ export const PurchaseReceiveDetailOption = (poStatus, props) => [
     content: addContent(2, props),
     disabled: tabbedPaneAvailability(poStatus),
   },
-  {
-    id: 2,
-    name: formatMessage({
-      id: 'inventory.pr.detail.payment',
-    }),
-    content: addContent(3, props),
-    disabled: tabbedPaneAvailability(poStatus),
-  },
+  // {
+  //   id: 2,
+  //   name: formatMessage({
+  //     id: 'inventory.pr.detail.payment',
+  //   }),
+  //   content: addContent(3, props),
+  //   disabled: tabbedPaneAvailability(poStatus),
+  // },
 ]

@@ -1,13 +1,14 @@
 import React from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
+import { CALENDAR_VIEWS } from '@/utils/constants'
 // big calendar
 import BigCalendar from 'react-big-calendar'
 
 const checkIsTodayPublicHoliday = (publicHolidays = [], currentTime) => {
   const currentDate = moment(currentTime)
 
-  const holidays = publicHolidays.filter((item) => {
+  const holidays = publicHolidays.filter(item => {
     const startDate = moment(item.startDate)
     const endDate = moment(item.endDate)
     if (currentDate.isBetween(startDate, endDate, 'days', '[]')) {
@@ -20,29 +21,20 @@ const checkIsTodayPublicHoliday = (publicHolidays = [], currentTime) => {
   return { isPublicHoliday: holidays.length > 0, holidayLabel }
 }
 
-const getHourAndMinute = (value) =>
-  value.split(':').map((item) => parseInt(item, 10))
+const getHourAndMinute = value =>
+  value.split(':').map(item => parseInt(item, 10))
 
 const compareOperationHour = (value, operationHour = []) => {
-  const [
-    valueHour,
-    valueMinute,
-  ] = getHourAndMinute(value)
+  const [valueHour, valueMinute] = getHourAndMinute(value)
 
   if (operationHour.length === 0) return false
 
   const isBeforeOperationHour = operationHour.reduce((_matched, item) => {
     const { start, end } = item || {}
     if (!start || !end) return false
-    const [
-      startHour,
-      startMinute,
-    ] = getHourAndMinute(start)
+    const [startHour, startMinute] = getHourAndMinute(start)
 
-    const [
-      endHour,
-      endMinute,
-    ] = getHourAndMinute(end)
+    const [endHour, endMinute] = getHourAndMinute(end)
     const beforeStart =
       valueHour < startHour ||
       (valueHour === startHour && valueMinute < startMinute)
@@ -57,10 +49,7 @@ const compareOperationHour = (value, operationHour = []) => {
 }
 
 const compareBreakHour = (value, breakHour) => {
-  const [
-    valueHour,
-    valueMinute,
-  ] = getHourAndMinute(value)
+  const [valueHour, valueMinute] = getHourAndMinute(value)
 
   if (breakHour.length === 0) return false
 
@@ -68,15 +57,9 @@ const compareBreakHour = (value, breakHour) => {
     (_matched, item) => {
       const { start, end } = item || {}
       if (!start || !end) return false
-      const [
-        startHour,
-        startMinute,
-      ] = getHourAndMinute(start)
+      const [startHour, startMinute] = getHourAndMinute(start)
 
-      const [
-        endHour,
-        endMinute,
-      ] = getHourAndMinute(end)
+      const [endHour, endMinute] = getHourAndMinute(end)
       // 15:45 start
       // 16:15 value
       const afterStart =
@@ -103,32 +86,32 @@ const Block = ({ label }) => (
     style={{
       backgroundColor: '#7d7d7d',
       color: '#fff',
-      minHeight: '39px',
-      maxHeight: '39px',
+      minHeight: '34px',
+      maxHeight: '34px',
     }}
   >
     <span>{label}</span>
   </div>
 )
 
-const TimeSlotComponent = (props) => {
+const TimeSlotComponent = props => {
   const {
     calendarView,
     publicHolidays,
     clinicBreakHours,
     clinicOperationHours,
-    children,
-    value,
+    slot,
   } = props
-  if (calendarView === BigCalendar.Views.MONTH) return children
-  if (children.props.children) return children
+  //if (calendarView === CALENDAR_VIEWS.MONTH) return ''
+  //if (children.props.children) return children
+  if (slot.type !== 'workCells') return ''
   try {
-    const timeSlot = moment(value).format('HH:mm:ss')
-    const currentDayOfWeek = moment(value).weekday()
+    const timeSlot = moment(slot.date).format('HH:mm:ss')
+    const currentDayOfWeek = moment(slot.date).weekday()
 
     const { isPublicHoliday, holidayLabel } =
       publicHolidays.length > 0
-        ? checkIsTodayPublicHoliday(publicHolidays, value)
+        ? checkIsTodayPublicHoliday(publicHolidays, slot.date)
         : { isPublicHoliday: false, holidayLabel: '' }
 
     if (isPublicHoliday)
@@ -149,10 +132,8 @@ const TimeSlotComponent = (props) => {
     }
 
     if (isBreakHour) return <Block label={same ? 'Break Hour' : ''} />
-  } catch (error) {
-    console.log({ error })
-  }
-  return children
+  } catch (error) {}
+  return ''
 }
 
 export default React.memo(

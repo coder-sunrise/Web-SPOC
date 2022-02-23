@@ -22,11 +22,12 @@ const Setting = ({ classes, showTransfer, dispatch, global, ...props }) => {
   const { medicationDetail, theme, values, setFieldValue } = props
   const {
     medicationSideEffects,
+    medicationGroups,
+    medicationIngredients,
     medicationPrecautions,
     medicationContraindications,
     medicationInteractions,
   } = values
-
   const optionLabelLength = 40
   const { isMultiLanguage, languageLabel, currentLanguage } = useContext(
     DetailsContext,
@@ -46,6 +47,50 @@ const Setting = ({ classes, showTransfer, dispatch, global, ...props }) => {
       <GridContainer>
         <GridItem md={6}>
           <Field
+            name='medicationGroups'
+            render={args => (
+              <SelectList
+                header='Group'
+                codeset='ctMedicationGroup'
+                isMultiLanguage={false}
+                initialValue={medicationGroups}
+                labelField='name'
+                label='#'
+                onChange={value =>
+                  setFieldValue(
+                    'medicationGroups',
+                    value.map(v => v),
+                  )
+                }
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem md={6}>
+          <Field
+            name='medicationIngredients'
+            render={args => (
+              <SelectList
+                header={'Ingredient'}
+                codeset='ctMedicationIngredient'
+                isMultiLanguage={false}
+                label='#'
+                labelField='name'
+                initialValue={medicationIngredients}
+                onChange={value =>
+                  setFieldValue(
+                    'medicationIngredients',
+                    value.map(v => v),
+                  )
+                }
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem md={6}>
+          <Field
             name='medicationPrecautions'
             render={args => (
               <SelectList
@@ -55,9 +100,7 @@ const Setting = ({ classes, showTransfer, dispatch, global, ...props }) => {
                 isMultiLanguage={isMultiLanguage}
                 initialValue={medicationPrecautions}
                 note='* ONLY THE TOP 3 PRECAUTIONS WILL BE DISPLAYED IN DRUG LABEL'
-                label={formatMessage({
-                  id: 'inventory.master.medication.precaution',
-                })}
+                label='#'
                 onChange={value =>
                   setFieldValue(
                     'medicationPrecautions',
@@ -78,9 +121,7 @@ const Setting = ({ classes, showTransfer, dispatch, global, ...props }) => {
                 codeset='ctMedicationSideEffect'
                 language={currentLanguage}
                 isMultiLanguage={isMultiLanguage}
-                label={formatMessage({
-                  id: 'inventory.master.medication.sideEffect',
-                })}
+                label='#'
                 initialValue={medicationSideEffects}
                 onChange={value =>
                   setFieldValue(
@@ -102,9 +143,7 @@ const Setting = ({ classes, showTransfer, dispatch, global, ...props }) => {
                 codeset='ctMedicationContraIndication'
                 language={currentLanguage}
                 isMultiLanguage={isMultiLanguage}
-                label={formatMessage({
-                  id: 'inventory.master.medication.contraindication',
-                })}
+                label='#'
                 initialValue={medicationContraindications}
                 onChange={value =>
                   setFieldValue(
@@ -126,9 +165,7 @@ const Setting = ({ classes, showTransfer, dispatch, global, ...props }) => {
                 codeset='ctMedicationInteraction'
                 language={currentLanguage}
                 isMultiLanguage={isMultiLanguage}
-                label={formatMessage({
-                  id: 'inventory.master.medication.interaction',
-                })}
+                label='#'
                 initialValue={medicationInteractions}
                 onChange={value =>
                   setFieldValue(

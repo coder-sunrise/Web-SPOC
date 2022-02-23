@@ -1,8 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import service from '../services'
 
-console.log('service', service)
-
 export default createListViewModel({
   namespace: 'pharmacyWorklist',
   config: {},
@@ -10,7 +8,7 @@ export default createListViewModel({
     service,
     state: {},
     setting: {},
-    subscriptions: ({ dispatch }) => { },
+    subscriptions: ({ dispatch }) => {},
     effects: {},
     reducers: {},
   },

@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from 'react'
+import React, { memo, useEffect, useState, Fragment } from 'react'
 import { withStyles } from '@material-ui/core'
 // antd
 import InfoCircleOutlined from '@ant-design/icons/InfoCircleOutlined'
@@ -18,25 +18,35 @@ import {
   CodeSelect,
   Select,
   ClinicianSelect,
+  Checkbox,
+  Tooltip,
   Switch,
   Popover,
   IconButton,
   Icon,
+  EditableTableGrid,
+  Popconfirm,
+  Button,
 } from '@/components'
 // medisys components
 import {
-  DoctorLabel,
   DoctorProfileSelect,
   Attachment,
   AttachmentWithThumbnail,
 } from '@/components/_medisys'
-import { VISIT_TYPE } from '@/utils/constants'
+import {
+  VISIT_TYPE,
+  CANNED_TEXT_TYPE,
+  MEDICALCHECKUP_WORKITEM_STATUS,
+} from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
 import { roundTo, getMappedVisitType } from '@/utils/utils'
 import numeral from 'numeral'
 import FormField from './formField'
+import { getMCReportLanguage } from './miscUtils'
 import Authorized from '@/utils/Authorized'
+import CannedTextButton from '@/pages/Widgets/Orders/Detail/CannedTextButton'
 
 const styles = theme => ({
   verticalSpacing: {
@@ -110,7 +120,9 @@ const VisitInfoCard = ({
   const disableConsReady = Authorized.check('queue.modifyconsultationready')
 
   const validateQNo = value => {
-    const qNo = parseFloat(value).toFixed(1)
+    const qNo = parseFloat(value).toFixed(
+      clinicSettings.settings.isQueueNoDecimal ? 1 : 0,
+    )
     if (existingQNo.includes(qNo))
       return 'Queue No. already existed in current queue list'
     return ''
@@ -126,7 +138,7 @@ const VisitInfoCard = ({
       )
       currentTypeItems.map(item => {
         if (item[type.dtoName].isActive === true) {
-          activeItemTotal += item.total || 0
+          activeItemTotal += item.totalAftAdj || 0
         }
       })
     })
@@ -173,9 +185,39 @@ const VisitInfoCard = ({
       i => i.id === values.visitOrderTemplateFK,
     )
     setFieldValue(FormField['visit.visitType'], v)
+    updateMedicalCheckup(v, values.isForInvoiceReplacement)
+    setFieldValue('visitBasicExaminations[0].visitPurposeFK', v)
+
     if (template) {
       handleVisitOrderTemplateChange(v, template)
     }
+  }
+
+  const updateMedicalCheckup = (visitPurposeFK, isForInvoiceReplacement) => {
+    if (visitPurposeFK != VISIT_TYPE.MC || isForInvoiceReplacement) {
+      setFieldValue('visitDoctor', [
+        ...values.visitDoctor.map(d => {
+          return { ...d, isDeleted: true }
+        }),
+      ])
+      setFieldValue('medicalCheckupWorkitem[0].reportLanguage', undefined)
+      setFieldValue('medicalCheckupWorkitem[0].reportPriority', undefined)
+      setFieldValue('medicalCheckupWorkitem[0].urgentReportRemarks', undefined)
+    } else {
+      setFieldValue('medicalCheckupWorkitem[0].reportLanguage', [
+        getMCReportLanguage(patientInfo, clinicSettings.settings),
+      ])
+      setFieldValue('medicalCheckupWorkitem[0].reportPriority', 'Normal')
+      setFieldValue(
+        'medicalCheckupWorkitem[0].statusFK',
+        MEDICALCHECKUP_WORKITEM_STATUS.NEW,
+      )
+    }
+  }
+
+  const handleIsForInvoiceReplacementChange = v => {
+    const { values } = restProps
+    updateMedicalCheckup(values.visitPurposeFK, v.target.value)
   }
 
   const handleVisitGroupChange = (v, op) => {
@@ -214,8 +256,11 @@ const VisitInfoCard = ({
     values.visitStatus === VISIT_STATUS.WAITING ||
     values.visitStatus === VISIT_STATUS.UPCOMING_APPT
 
-  const { isEnablePackage = false, visitTypeSetting } = clinicSettings.settings
-
+  const {
+    isEnablePackage = false,
+    visitTypeSetting,
+    isQueueNoDecimal,
+  } = clinicSettings.settings
   let visitTypeSettingsObj = undefined
   let visitPurpose = undefined
   if (visitTypeSetting) {
@@ -224,16 +269,16 @@ const VisitInfoCard = ({
     } catch {}
   }
   if ((ctvisitpurpose || []).length > 0) {
-    visitPurpose = getMappedVisitType(ctvisitpurpose, visitTypeSettingsObj).filter(
-      vstType => vstType['isEnabled'] === 'true',
-    )
+    visitPurpose = getMappedVisitType(
+      ctvisitpurpose,
+      visitTypeSettingsObj,
+    ).filter(vstType => vstType['isEnabled'] === 'true')
   }
 
   const family = patientInfo?.patientFamilyGroup?.patientFamilyMember
-  const familyMembers = family ? [
-    ...family.map(mem => mem.name), 
-    patientInfo?.patientFamilyGroup.name
-  ] : []
+  const familyMembers = family
+    ? [...family.map(mem => mem.name), patientInfo?.patientFamilyGroup.name]
+    : []
   const visitGroups = [
     ...queueLog.list
       .filter((q, i, a) => {
@@ -318,14 +363,17 @@ const VisitInfoCard = ({
             render={args => (
               <NumberInput
                 {...args}
-                format='0.0'
+                format={isQueueNoDecimal ? '0.0' : '0'}
+                precision={isQueueNoDecimal ? 1 : 0}
                 // disabled={isReadOnly}
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.queueNo',
                 })}
                 formatter={value => {
                   const isNaN = Number.isNaN(parseFloat(value))
-                  return isNaN ? value : parseFloat(value).toFixed(1)
+                  return isNaN
+                    ? value
+                    : parseFloat(value).toFixed(isQueueNoDecimal ? 1 : 0)
                 }}
               />
             )}
@@ -347,6 +395,18 @@ const VisitInfoCard = ({
               )}
             />
           )}
+          <Field
+            name='isForInvoiceReplacement'
+            render={args => (
+              <Checkbox
+                style={{ position: 'relative', top: 5 }}
+                {...args}
+                tooltip='This visit is created for past invoice replacement.'
+                label='For Invoice Replacement'
+                onChange={handleIsForInvoiceReplacementChange}
+              />
+            )}
+          />
         </GridItem>
         <GridItem xs md={3}>
           <Field
@@ -430,22 +490,40 @@ const VisitInfoCard = ({
           </Authorized>
         </GridItem>
         <GridItem xs md={6}>
-          <Field
-            name={FormField['visit.visitRemarks']}
-            render={args => (
-              <TextField
-                {...args}
-                // disabled={isReadOnly}
-                multiline
-                rowsMax={3}
-                authority='none'
-                disabled={isVisitReadonlyAfterSigned}
-                label={formatMessage({
-                  id: 'reception.queue.visitRegistration.visitRemarks',
-                })}
-              />
-            )}
-          />
+          <div style={{ position: 'relative' }}>
+            <Field
+              name={FormField['visit.visitRemarks']}
+              render={args => (
+                <TextField
+                  {...args}
+                  // disabled={isReadOnly}
+                  multiline
+                  rowsMax={3}
+                  authority='none'
+                  disabled={isVisitReadonlyAfterSigned}
+                  label={formatMessage({
+                    id: 'reception.queue.visitRegistration.visitRemarks',
+                  })}
+                />
+              )}
+            />
+            <CannedTextButton
+              disabled={isVisitReadonlyAfterSigned}
+              cannedTextTypeFK={CANNED_TEXT_TYPE.APPOINTMENTREMARKS}
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                right: -5,
+              }}
+              handleSelectCannedText={cannedText => {
+                const remarks = values.visitRemarks
+                const newRemaks = `${
+                  remarks ? remarks + ' ' : ''
+                }${cannedText.text || ''}`.substring(0, 2000)
+                setFieldValue(FormField['visit.visitRemarks'], newRemaks)
+              }}
+            />
+          </div>
         </GridItem>
         <GridItem xs md={3}>
           <Authorized authority='queue.visitgroup'>
@@ -455,7 +533,11 @@ const VisitInfoCard = ({
                 labelField='displayValue'
                 value={values.visitGroup}
                 disabled={isVisitReadonlyAfterSigned}
-                options={_.orderBy(visitGroups, ['isFamilyMember','order'], ['desc','desc'])}
+                options={_.orderBy(
+                  visitGroups,
+                  ['isFamilyMember', 'order'],
+                  ['desc', 'desc'],
+                )}
                 handleFilter={(input, option) => {
                   return (
                     option.data.visitGroup
@@ -520,27 +602,30 @@ const VisitInfoCard = ({
           </Authorized>
         </GridItem>
         <GridItem xs md={3}>
-          <Authorized authority='queue.visitgroup'>
-            <Popover
-              icon={null}
-              visible={visitGroupPopup}
-              placement='topLeft'
-              content={
-                <div>
-                  <p>- Search by existing group number or patient name.</p>
-                  <p>- Selecting visit group will set Cons. Ready to "No".</p>
-                </div>
-              }
-            >
-              <IconButton
-                size='small'
-                onMouseOver={handleVisitGroupFocus}
-                onMouseOut={handleVisitGroupBlur}
+          <Fragment>
+            <Authorized authority='queue.visitgroup'>
+              <Popover
+                icon={null}
+                visible={visitGroupPopup}
+                placement='topLeft'
+                content={
+                  <div>
+                    <p>- Search by existing group number or patient name.</p>
+                    <p>- Selecting visit group will set Cons. Ready to "No".</p>
+                  </div>
+                }
               >
-                <InfoCircleOutlined />
-              </IconButton>
-            </Popover>
-          </Authorized>
+                <IconButton
+                  size='small'
+                  style={{ position: 'relative', top: 8 }}
+                  onMouseOver={handleVisitGroupFocus}
+                  onMouseOut={handleVisitGroupBlur}
+                >
+                  <InfoCircleOutlined />
+                </IconButton>
+              </Popover>
+            </Authorized>
+          </Fragment>
         </GridItem>
         {showAdjusment &&
         ((ctinvoiceadjustment || []).length > 0 ||

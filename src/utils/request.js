@@ -19,7 +19,7 @@ export const baseUrl = process.env.url
 
 const uatUrl = 'https://semr2uat2010.emr.com.sg'
 const localApiUrl = 'http://localhost:55314'
-let dynamicURL = baseUrl 
+let dynamicURL = baseUrl
 // let dynamicURL = 'http://semr2-dev-api.ap-southeast-1.elasticbeanstalk.com'
 // if (process.env.NODE_ENV === 'development')
 //   dynamicURL = 'http://localhost:55314'
@@ -540,7 +540,7 @@ const request = (
 }
 export const download = async (
   requestUrl,
-  { subject = 'file', type = 'pdf' },
+  { subject = 'file', type = 'excel' },
   options,
 ) => {
   const data = await request(requestUrl, {

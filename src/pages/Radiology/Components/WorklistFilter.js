@@ -1,7 +1,10 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { Form, Button } from 'antd'
+import InfoCircleOutlined from '@ant-design/icons/InfoCircleOutlined'
+import { CLINICAL_ROLE } from '@/utils/constants'
+import moment from 'moment'
 import Search from '@material-ui/icons/Search'
-import { useDispatch } from 'dva'
+import { useDispatch, useSelector } from 'dva'
 import { VISIT_TYPE } from '@/utils/constants'
 import {
   TextField,
@@ -10,48 +13,60 @@ import {
   Select,
   ProgressButton,
   CodeSelect,
+  dateFormatLong,
+  IconButton,
+  Popover,
+  VisitTypeSelect,
 } from '@/components'
 import { formatMessage } from 'umi'
-import WorlistContext from '../Worklist/WorklistContext'
+import WorklistContext from '../Worklist/WorklistContext'
+
+const DateFilterInfo = () => {
+  const [showDateFilterInfo, setShowDateFilterInfo] = useState(false)
+  return (
+    <Popover
+      icon={null}
+      visible={showDateFilterInfo}
+      placement='topLeft'
+      content={
+        <div style={{ width: 280 }}>
+          <p>
+            All states filter using "Order Created date" except Completed state
+            filter using "Reporting Completed date"
+          </p>
+        </div>
+      }
+    >
+      <IconButton
+        size='small'
+        style={{ alignSelf: 'flex-end', marginRight: 16, marginBottom: 8 }}
+        onMouseOver={() => setShowDateFilterInfo(true)}
+        onMouseOut={() => setShowDateFilterInfo(false)}
+      >
+        <InfoCircleOutlined />
+      </IconButton>
+    </Popover>
+  )
+}
 
 export const WorklistFilter = () => {
   const [form] = Form.useForm()
   const dispatch = useDispatch()
-  const { showDetails, visitPurpose } = useContext(WorlistContext)
+
+  const { detailsId, filterWorklist } = useContext(WorklistContext)
+  const clinicianProfile = useSelector(
+    state => state.user.data.clinicianProfile,
+  )
 
   useEffect(() => {
-    handleSearch()
-  }, [showDetails])
+    if (!detailsId) {
+      handleSearch()
+    }
+  }, [detailsId])
 
   const handleSearch = () => {
-    const {
-      searchValue,
-      visitType,
-      modality,
-      dateFrom,
-      dateTo,
-      isUrgent,
-      isMyPatientOnly,
-    } = form.getFieldsValue(true)
-
-    dispatch({
-      type: 'radiologyWorklist/query',
-      payload: {
-        apiCriteria: {
-          searchValue: searchValue,
-          visitType: visitType
-            ? visitType.filter(t => t !== -99).join(',')
-            : undefined,
-          modality: modality
-            ? modality.filter(t => t !== -99).join(',')
-            : undefined,
-          filterFrom: dateFrom,
-          filterTo: dateTo,
-          isUrgent: isUrgent,
-          isMyPatientOnly: isMyPatientOnly,
-        },
-      },
-    })
+    const filter = form.getFieldsValue(true)
+    filterWorklist(filter)
   }
 
   return (
@@ -62,50 +77,66 @@ export const WorklistFilter = () => {
           style={{ width: 350 }}
         />
       </Form.Item>
-      <Form.Item name='visitType'>
-        <CodeSelect
+      <Form.Item name='visitType' initialValue={[-99]}>
+        <VisitTypeSelect
           label='Visit Type'
-          code='ctvisitpurpose'
-          options={visitPurpose || []}
-          style={{ width: 180 }}
           mode='multiple'
-          localFilter={item => item.id !== VISIT_TYPE.RETAIL}
+          maxTagCount={0}
+          maxTagPlaceholder='Visit Types'
+          style={{ width: 170 }}
+          localFilter={item => {
+            return item.id !== VISIT_TYPE.OTC
+          }}
+          allowClear={true}
         />
       </Form.Item>
-      <Form.Item name='modality'>
+      <Form.Item name='modality' initialValue={[-99]}>
         <CodeSelect
           mode='multiple'
-          style={{ width: 150 }}
+          style={{ width: 165 }}
           label='Modality'
           code='ctmodality'
-          onChange={() => console.log('modality')}
+          maxTagPlaceholder='Modalities'
         />
       </Form.Item>
-      <Form.Item name='dateFrom'>
+      <Form.Item
+        name='dateFrom'
+        initialValue={moment(moment().toDate()).formatUTC()}
+      >
         <DatePicker
           style={{ width: 100 }}
           label={formatMessage({ id: 'radiology.search.dateFrom' })}
         />
       </Form.Item>
-      <Form.Item name='dateTo'>
+      <Form.Item
+        noStyle
+        name='dateTo'
+        initialValue={moment()
+          .endOf('day')
+          .formatUTC(false)}
+      >
         <DatePicker
           bordered={true}
           label={formatMessage({ id: 'radiology.search.dateTo' })}
           style={{ width: 100 }}
         />
       </Form.Item>
+      <DateFilterInfo />
       <Form.Item name='isUrgent' style={{ alignSelf: 'flex-end' }}>
         <Checkbox
-          style={{ width: 70 }}
+          style={{ width: 65 }}
           label={formatMessage({ id: 'radiology.search.urgentOnly' })}
         />
       </Form.Item>
-      <Form.Item name='isMyPatientOnly' style={{ alignSelf: 'flex-end' }}>
-        <Checkbox
-          style={{ width: 125 }}
-          label={formatMessage({ id: 'radiology.search.myPatientOnly' })}
-        />
-      </Form.Item>
+      {clinicianProfile.userProfile?.role?.clinicRoleFK ===
+        CLINICAL_ROLE.RADIOGRAPHER && (
+        <Form.Item name='isMyPatientOnly' style={{ alignSelf: 'flex-end' }}>
+          <Checkbox
+            style={{ width: 95 }}
+            label={formatMessage({ id: 'radiology.search.myPatientOnly' })}
+          />
+        </Form.Item>
+      )}
       <Form.Item style={{ alignSelf: 'flex-end' }}>
         <ProgressButton
           variant='contained'

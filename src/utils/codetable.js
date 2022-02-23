@@ -177,6 +177,7 @@ const tenantCodesMap = new Map([
     'ctcopayer',
     {
       ...defaultParams,
+      sorting: [{ columnName: 'displayValue', direction: 'asc' }],
     },
   ],
   [
@@ -266,10 +267,40 @@ const tenantCodesMap = new Map([
       ...defaultParams,
     },
   ],
+  [
+    'cttestpanelitem',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctcalendarresource',
+    {
+      pagesize: 99999,
+    },
+  ],
+  [
+    'ctexaminationitem',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctindividualcomment',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctsummarycomment',
+    {
+      ...defaultParams,
+    },
+  ],
 ])
 
 // always get latest codetable
-const skipCache = ['doctorprofile', 'clinicianprofile']
+const skipCache = ['doctorprofile', 'clinicianprofile', 'ctcalendarresource']
 
 const noSortOrderProp = ['doctorprofile', 'clinicianprofile', 'role', 'cttag']
 
@@ -302,9 +333,9 @@ const fetchCodeTable = async (code, params, isReturnStatusCode = false) => {
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)
     : convertToQuery(
-      { ...criteriaForTenantCodes, ...params },
-      convertExcludeFields,
-    )
+        { ...criteriaForTenantCodes, ...params },
+        convertExcludeFields,
+      )
 
   const response = await request(`${url}${code}`, {
     method: 'GET',
@@ -315,6 +346,14 @@ const fetchCodeTable = async (code, params, isReturnStatusCode = false) => {
   let newData = []
   if (parseInt(statusCode, 10) === 200) {
     newData = [...data.data]
+  }
+
+  if (code === 'ctcalendarresource') {
+    newData = _.orderBy(
+      newData,
+      ['resourceType', 'sortOrder', source => source.name.toUpperCase()],
+      ['asc'],
+    )
   }
 
   if (isReturnStatusCode === true) {
@@ -518,6 +557,12 @@ const getServices = data => {
             name: m.tagDisplayValue,
           }
         }),
+        serviceTestCategories: (o[0].serviceTestPanel || []).map(m => {
+          return {
+            value: m.testCategoryFK,
+            name: m.testCategory,
+          }
+        }),
         isDisplayValueChangable: o[0].isDisplayValueChangable,
       }
     }),
@@ -555,7 +600,7 @@ const getServices = data => {
 
   let serviceTags = []
   data.forEach(service => {
-    (service.serviceTag || []).forEach(tag => {
+    ;(service.serviceTag || []).forEach(tag => {
       serviceTags = serviceTags.concat({
         value: tag.tagFK,
         name: tag.tagDisplayValue,
@@ -573,12 +618,33 @@ const getServices = data => {
     ['asc'],
   )
 
+  let serviceTestCategories = []
+  data.forEach(service => {
+    ;(service.serviceTestPanel || []).forEach(testPanel => {
+      serviceTestCategories = serviceTestCategories.concat({
+        value: testPanel.testCategoryFK,
+        name: testPanel.testCategory,
+      })
+    })
+  })
+  serviceTestCategories = _.orderBy(
+    Object.values(_.groupBy(serviceTestCategories, 'value')).map(o => {
+      return {
+        value: o[0].value,
+        name: o[0].name,
+      }
+    }),
+    ['name'],
+    ['asc'],
+  )
+
   return {
     serviceCenterServices: data,
     services,
     serviceCenters,
     serviceCatetorys,
     serviceTags,
+    serviceTestCategories,
   }
 }
 export {

@@ -44,7 +44,6 @@ const urgentIndicator = (row, right) => {
 }
 
 export default ({ current, classes, showDrugLabelRemark }) => {
-
   return (
     <div style={{ marginBottom: 8, marginTop: 8 }}>
       <Table
@@ -85,7 +84,7 @@ export default ({ current, classes, showDrugLabelRemark }) => {
                     <div style={{ position: 'relative', top: 2 }}>
                       {drugMixtureIndicator(row, -20)}
                       {row.isPreOrder && (
-                        <Tooltip title='Pre-Order'>
+                        <Tooltip title='New Pre-Order'>
                           <div
                             className={classes.rightIcon}
                             style={{
@@ -161,35 +160,41 @@ export default ({ current, classes, showDrugLabelRemark }) => {
                 <div style={{ position: 'relative' }}>
                   <div
                     style={{
-                      wordWrap: 'break-word',
-                      whiteSpace: 'pre-wrap',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
                       paddingRight: existsDrugLabelRemarks ? 10 : 0,
+                      minHeight: 20,
                     }}
                   >
-                    {row.remarks || ' '}
+                    <Tooltip title={row.remarks || ' '}>
+                      <span> {row.remarks || ' '}</span>
+                    </Tooltip>
                   </div>
-                  {existsDrugLabelRemarks && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        bottom: -2,
-                        right: -8,
-                      }}
-                    >
-                      <Tooltip
-                        title={
-                          <div>
-                            <div style={{ fontWeight: 500 }}>
-                              Drug Label Remarks
-                            </div>
-                            <div>{row.drugLabelRemarks}</div>
-                          </div>
-                        }
+                  <div style={{ position: 'relative', top: 6 }}>
+                    {existsDrugLabelRemarks && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          bottom: 2,
+                          right: -8,
+                        }}
                       >
-                        <FileCopySharp style={{ color: '#4255bd' }} />
-                      </Tooltip>
-                    </div>
-                  )}
+                        <Tooltip
+                          title={
+                            <div>
+                              <div style={{ fontWeight: 500 }}>
+                                Drug Label Remarks
+                              </div>
+                              <div>{row.drugLabelRemarks}</div>
+                            </div>
+                          }
+                        >
+                          <FileCopySharp style={{ color: '#4255bd' }} />
+                        </Tooltip>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )
             },
@@ -257,7 +262,7 @@ export default ({ current, classes, showDrugLabelRemark }) => {
                 }}
               >
                 {`${currencySymbol}${numeral(
-                  row.isPreOrder && !row.isChargeToday
+                  (row.isPreOrder && !row.isChargeToday) || row.hasPaid
                     ? 0
                     : row.totalAfterItemAdjustment || 0,
                 ).format('0,0.00')}`}

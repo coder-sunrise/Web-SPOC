@@ -397,11 +397,13 @@ export default compose(
         isExclusive,
         isDisplayInLeaflet,
         isOnlyClinicInternalUsage,
-        inventoryMedication_MedicationIngredient,
-        inventoryMedication_MedicationSideEffect,
-        inventoryMedication_MedicationPrecaution,
-        inventoryMedication_MedicationContraIndication,
-        inventoryMedication_MedicationInteraction,
+        inventoryMedication_MedicationIngredient = [],
+        inventoryMedication_MedicationGroup = [],
+        inventoryMedication_MedicationSideEffect = [],
+        inventoryMedication_MedicationPrecaution = [],
+        inventoryMedication_Medication,
+        inventoryMedication_MedicationContraIndication = [],
+        inventoryMedication_MedicationInteraction = [],
         inventoryMedication_DrugAllergy,
         isDispensedByPharmacy,
         isNurseActualizable,
@@ -427,7 +429,7 @@ export default compose(
       if (isDispensedByPharmacy || !medicationDetails.id) {
         checkboxGroup.push('isDispensedByPharmacy')
       }
-      if (isNurseActualizable || !medicationDetails.id) {
+      if (isNurseActualizable) {
         checkboxGroup.push('isNurseActualizable')
       }
 
@@ -439,33 +441,51 @@ export default compose(
           'indication',
         )
 
-      let medicationIngredients = inventoryMedication_MedicationIngredient?.map(
-        item => item.medicationIngredientFK,
-      )
+      let medicationIngredients = _.orderBy(
+        inventoryMedication_MedicationIngredient,
+        'sequence',
+        'asc',
+      ).map(item => item.medicationIngredientFK)
+      let drugAllergies = _.orderBy(
+        inventoryMedication_DrugAllergy,
+        'sequence',
+        'asc',
+      ).map(item => item.drugAllergyFK)
 
-      let drugAllergies = inventoryMedication_DrugAllergy?.map(
-        item => item.drugAllergyFK,
-      )
+      let medicationSideEffects = _.orderBy(
+        inventoryMedication_MedicationSideEffect,
+        'sequence',
+        'asc',
+      ).map(item => item.medicationSideEffectFK)
 
-      let medicationSideEffects = inventoryMedication_MedicationSideEffect
-        ?.sort(item => item.sequence)
-        .map(item => item.medicationSideEffectFK)
+      let medicationPrecautions = _.orderBy(
+        inventoryMedication_MedicationPrecaution,
+        'sequence',
+        'asc',
+      ).map(item => item.medicationPrecautionFK)
 
-      let medicationPrecautions = inventoryMedication_MedicationPrecaution
-        ?.sort(item => item.sequence)
-        .map(item => item.medicationPrecautionFK)
+      let medicationContraindications = _.orderBy(
+        inventoryMedication_MedicationContraIndication,
+        'sequence',
+        'asc',
+      ).map(item => item.medicationContraIndicationFK)
 
-      let medicationContraindications = inventoryMedication_MedicationContraIndication
-        ?.sort(item => item.sequence)
-        .map(item => item.medicationContraIndicationFK)
+      let medicationInteractions = _.orderBy(
+        inventoryMedication_MedicationInteraction,
+        'sequence',
+        'asc',
+      ).map(item => item.medicationInteractionFK)
 
-      let medicationInteractions = inventoryMedication_MedicationInteraction
-        ?.sort(item => item.sequence)
-        .map(item => item.medicationInteractionFK)
+      let medicationGroups = _.orderBy(
+        inventoryMedication_MedicationGroup,
+        'sequence',
+        'asc',
+      ).map(item => item.medicationGroupFK)
 
       return {
         ...medicationDetails,
         medicationIngredients,
+        medicationGroups,
         drugAllergies,
         medicationSideEffects,
         medicationPrecautions,
@@ -489,12 +509,12 @@ export default compose(
       revenueCategoryFK: Yup.number().required(),
       indication: Yup.string().test(
         'oneOfRequired',
-        'Please enter indication in both languages',
+        'Please enter indication in all languages',
         validateIndication,
       ),
       indicationSecondary: Yup.string().test(
         'oneOfRequired',
-        'Please enter indication in both languages',
+        'Please enter indication in all languages',
         validateIndication,
       ),
       isMultiLanguage: Yup.boolean(),
@@ -515,7 +535,10 @@ export default compose(
 
       suggestSellingPrice: Yup.number()
         .min(0, 'Suggested Selling Price must between 0 and 999,999.99')
-        .max(999999.99, 'Suggested Selling Price must between 0 and 999,999.99'),
+        .max(
+          999999.99,
+          'Suggested Selling Price must between 0 and 999,999.99',
+        ),
 
       sellingPrice: Yup.number()
         .required()
@@ -545,6 +568,7 @@ export default compose(
         effectiveDates,
         attachment,
         medicationIngredients = [],
+        medicationGroups = [],
         medicationSideEffects = [],
         medicationPrecautions = [],
         medicationInteractions = [],
@@ -574,6 +598,8 @@ export default compose(
         isExclusive: false,
         isDisplayInLeaflet: false,
         isOnlyClinicInternalUsage: false,
+        isDispensedByPharmacy: false,
+        isNurseActualizable: false,
       }
       values.checkboxGroup.forEach(o => {
         checkboxGroup[o] = true
@@ -590,23 +616,21 @@ export default compose(
       }
 
       let medicationIngredientList = undefined
-      const allOptionId = -99
-
       if (medicationIngredients) {
-        medicationIngredientList = medicationIngredients
-          .filter(m => m !== allOptionId)
-          .map(m => {
-            return { medicationIngredientFK: m, inventoryMedicationFK: id }
-          })
+        medicationIngredientList = medicationIngredients.map((item, index) => {
+          return {
+            medicationIngredientFK: item,
+            sequence: index,
+            inventoryMedicationFK: id,
+          }
+        })
       }
 
       let drugAllergyList = undefined
       if (drugAllergies) {
-        drugAllergyList = drugAllergies
-          .filter(m => m !== allOptionId)
-          .map(m => {
-            return { drugAllergyFK: m, inventoryMedicationFK: id }
-          })
+        drugAllergyList = drugAllergies.map(m => {
+          return { drugAllergyFK: m, inventoryMedicationFK: id }
+        })
       }
 
       let sideEffectList = undefined
@@ -625,6 +649,17 @@ export default compose(
         precautionList = medicationPrecautions.map((item, index) => {
           return {
             medicationPrecautionFK: item,
+            sequence: index,
+            inventoryMedicationFK: id,
+          }
+        })
+      }
+
+      let groupList = undefined
+      if (medicationGroups) {
+        groupList = medicationGroups.map((item, index) => {
+          return {
+            medicationGroupFK: item,
             sequence: index,
             inventoryMedicationFK: id,
           }
@@ -693,6 +728,7 @@ export default compose(
         medicationStock: defaultMedicationStock,
         suggestSellingPrice: roundTo(restValues.suggestSellingPrice),
         inventoryMedication_MedicationIngredient: medicationIngredientList,
+        inventoryMedication_MedicationGroup: groupList,
         inventoryMedication_MedicationSideEffect: sideEffectList,
         inventoryMedication_MedicationPrecaution: precautionList,
         inventoryMedication_MedicationContraIndication: contraIndicationList,

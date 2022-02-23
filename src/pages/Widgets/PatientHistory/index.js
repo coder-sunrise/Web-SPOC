@@ -4,29 +4,35 @@ import { Collapse } from 'antd'
 import _ from 'lodash'
 import moment from 'moment'
 import { Edit, Print } from '@material-ui/icons'
+import SvgIcon from '@material-ui/core/SvgIcon'
 import { connect } from 'dva'
-import { history } from 'umi'
+import { history, formatMessage } from 'umi'
 import { Field } from 'formik'
 import numeral from 'numeral'
 import Search from '@material-ui/icons/Search'
+import { VisitTypeTag } from '@/components/_medisys'
 // material ui
 import { withStyles, Link } from '@material-ui/core'
+import { Tooltip } from 'antd'
 // common components
 import {
   CardContainer,
   withFormikExtend,
   CommonModal,
   Button,
-  Tooltip,
   Checkbox,
   ProgressButton,
   CodeSelect,
   DateRangePicker,
+  VisitTypeSelect,
+  dateFormatLong,
+  dateFormatLongWithTimeNoSec,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 // utils
 import { findGetParameter, commonDataReaderTransform } from '@/utils/utils'
 import { VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
+import { scribbleTypes } from '@/utils/codes'
 import { DoctorProfileSelect, ServePatientButton } from '@/components/_medisys'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import { getReportContext } from '@/services/report'
@@ -35,6 +41,7 @@ import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import HistoryDetails from './HistoryDetails'
 import customtyles from './PatientHistoryStyle.less'
 import NurseActualization from '@/pages/Dispense/DispenseDetails/NurseActualization'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 
 const defaultValue = {
   visitDate: [
@@ -46,6 +53,7 @@ const defaultValue = {
       .toDate(),
   ],
   selectDoctors: [],
+  visitTypeIDs: [-99],
   selectCategories: [],
   isAllDate: true,
 }
@@ -142,7 +150,19 @@ class PatientHistory extends Component {
     this.widgets = WidgetConfig.widgets(
       props,
       this.scribbleNoteUpdateState,
+      this.getSelectNoteTypes,
     ).filter(o => {
+      if (o.id === WidgetConfig.WIDGETS_ID.DOCTORNOTE) {
+        return this.getCategoriesOptions().find(
+          c =>
+            [
+              WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
+              WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
+              WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
+              WidgetConfig.WIDGETS_ID.PLAN,
+            ].indexOf(c.value) >= 0,
+        )
+      }
       return this.getCategoriesOptions().find(c => c.value === o.id)
     })
 
@@ -162,6 +182,7 @@ class PatientHistory extends Component {
       ],
       selectDoctors: [],
       selectCategories: [],
+      visitTypeIDs: [],
       isAllDate: true,
       pageIndex: 0,
       loadVisits: [],
@@ -205,14 +226,20 @@ class PatientHistory extends Component {
           ...this.getCategoriesOptions().map(o => o.value),
         ]
         if (result) {
-          selectCategories = result.SelectCategories.filter(o =>
-            selectCategories.find(c => c === o),
-          )
+          selectCategories = result
+            .find(xx => xx.Identifier === 'SelectCategories')
+            .SelectCategories.filter(o => selectCategories.find(c => c === o))
+          var preferVisitTypeIDs =
+            result.find(tt => tt.Identifier === 'SelectedVisitTypeIDs')
+              ?.SelectedVisitTypeIDs || []
+          this.setState({ visitTypeIDs: preferVisitTypeIDs }, () => {
+            setFieldValue('visitTypeIDs', preferVisitTypeIDs)
+          })
         }
         this.setState({ selectCategories }, () => {
           setFieldValue('selectCategories', selectCategories)
-          this.queryVisitHistory()
         })
+        this.queryVisitHistory()
       })
     })
   }
@@ -273,6 +300,7 @@ class PatientHistory extends Component {
       pageIndex,
       selectDoctors = [],
       visitDate,
+      visitTypeIDs = [],
       selectCategories = [],
     } = this.state
     const {
@@ -294,7 +322,14 @@ class PatientHistory extends Component {
     if (visitDate && visitDate.length > 1) {
       visitToDate = visitDate[1]
     }
-
+    let searchCategories
+    if (!selectCategories.length) {
+      searchCategories = this.getCategoriesOptions()
+        .map(v => v.value)
+        .join(',')
+    } else {
+      searchCategories = selectCategories.join(',')
+    }
     dispatch({
       type: 'patientHistory/queryVisitHistory',
       payload: {
@@ -309,10 +344,12 @@ class PatientHistory extends Component {
               .formatUTC(false)
           : undefined,
         isAllDate,
+        visitTypeIDs: visitTypeIDs.join(','),
         pageIndex: pageIndex + 1,
         pageSize: viewVisitPageSize,
         patientProfileId: patientHistory.patientID,
         selectDoctors: selectDoctors.join(','),
+        searchCategories,
         isViewNurseNote:
           selectCategories.length === 0 ||
           !_.isEmpty(
@@ -392,9 +429,11 @@ class PatientHistory extends Component {
       visitPurposeFK,
       timeIn,
       timeOut,
+      isForInvoiceReplacement,
       visitPurposeName,
       coHistory = [],
       isNurseNote,
+      visitStatus,
     } = row
     const { settings = [] } = clinicSettings
     const { patientID } = patientHistory
@@ -415,13 +454,6 @@ class PatientHistory extends Component {
     }
     const isSelect = !!this.state.selectItems.find(o => o === row.currentId)
 
-    let visitTypeSettingsObj = []
-    try {
-      visitTypeSettingsObj = JSON.parse(settings.visitTypeSetting)
-    } catch {}
-
-    const mappedVisitPurposeName = visitTypeSettingsObj.find(x => x.id === visitPurposeFK)
-    
     return (
       <div
         style={{ display: 'flex', padding: '3px 0px 8px 0px', height: 36 }}
@@ -464,6 +496,7 @@ class PatientHistory extends Component {
                 label=''
                 checked={isSelect}
                 onChange={e => this.selectOnChange(e, row)}
+                style={{ width: 20 }}
               />
             </div>
           )}
@@ -482,7 +515,7 @@ class PatientHistory extends Component {
           </span>
         </div>
         {isNurseNote && (
-          <div style={{ fontSize: '0.9em', fontWeight: 500, marginTop: 12 }}>
+          <div style={{ fontSize: '0.9em', fontWeight: 500, marginTop: 14 }}>
             {`${moment(visitDate).format('DD MMM YYYY HH:MM')} - Notes${
               docotrName ? ` - ${docotrName}` : ''
             }`}
@@ -490,7 +523,7 @@ class PatientHistory extends Component {
         )}
         {!isNurseNote && (
           <div style={{ fontSize: '0.9em' }}>
-            <div style={{ fontWeight: 500, marginTop: 4 }}>
+            <div style={{ fontWeight: 500, marginTop: 6 }}>
               {`${moment(visitDate).format('DD MMM YYYY')} (Time In: ${moment(
                 timeIn,
               ).format('HH:mm')} Time Out: ${
@@ -499,8 +532,9 @@ class PatientHistory extends Component {
             </div>
             <div style={{ marginTop: 18 }}>
               <span>
-                {`${mappedVisitPurposeName?.displayValue || visitPurposeName}, Last Update By: ${LastUpdateBy ||
-                  ''} on ${moment(signOffDate).format('DD MMM YYYY HH:mm')}`}
+                {`Last Update By: ${LastUpdateBy || ''} on ${moment(
+                  signOffDate,
+                ).format('DD MMM YYYY HH:mm')}`}
               </span>
               <span style={{ marginLeft: 5 }}>
                 {row.servingByList?.length > 0
@@ -521,6 +555,7 @@ class PatientHistory extends Component {
           >
             {patientIsActive &&
               !isRetailVisit &&
+              visitStatus != VISIT_STATUS.PAUSED &&
               fromModule !== 'Consultation' &&
               fromModule !== 'History' && (
                 <Authorized authority='patientdashboard.editconsultation'>
@@ -591,32 +626,51 @@ class PatientHistory extends Component {
               )}
           </div>
         )}
-        {!isNurseNote && settings.showConsultationVersioning && !isRetailVisit && (
-          <div
-            style={{
-              marginLeft: 'auto',
-              display: 'flex',
-              alignItems: 'center',
-              marginRight: 10,
-            }}
-          >
-            <Tooltip title='View History'>
-              <span
-                className='material-icons'
-                style={{ color: 'gray' }}
-                onClick={event => {
-                  event.stopPropagation()
-                  this.setState({
-                    showHistoryDetails: true,
-                    selectHistory: { ...row },
-                  })
-                }}
-              >
-                history
-              </span>
-            </Tooltip>
+        <div
+          style={{
+            marginLeft: 'auto',
+            display: 'flex',
+            alignItems: 'center',
+            marginRight: 10,
+          }}
+        >
+          <div style={{ display: 'inline-block', width: 30 }}>
+            {isForInvoiceReplacement && (
+              <Tooltip title='Replacement Invoice'>
+                <SvgIcon fontSize='inherit' viewBox='0 0 1024 1024'>
+                  <path
+                    d='M940.3 761.5c-8.5-13.3-19.3-24.8-31.9-34.1 13.3-19.5 20.7-43.7 20.7-69.2 0-61.5-43-111.5-95.9-111.5H671.8c-29.3 0-53.1 23.8-53.1 53.1v304c0 29.3 23.8 53.1 53.1 53.1h160.4c34.3 0 66.6-13.5 90.9-37.9 24.1-24.2 37.3-56 37.1-89.7 0-24.2-6.9-47.6-19.9-67.8z m-67.6 107.7c-10.6 10.6-24.7 16.5-39.5 16.5H689.8V773.6h143.3c14.8 0 28.9 5.9 39.5 16.5 10.6 10.6 16.5 24.7 16.5 39.5s-5.8 29-16.4 39.6z m-25.3-178.9c-2.1 2.5-7.7 8.4-14.3 8.4H689.8v-80.9h143.3c6.6 0 12.2 5.9 14.3 8.4 6.6 8 10.6 20 10.6 32.1 0 12-3.9 24-10.6 32zM456 406.6l-128-320C322.5 73 309.3 64 294.5 64h-64c-14.7 0-28 9-33.4 22.6l-128 320c-7.4 18.5 1.6 39.4 20.1 46.8 18.5 7.4 39.4-1.6 46.8-20.1L178.1 328H347l42.1 105.4c5.6 14.1 19.1 22.6 33.4 22.6 4.5 0 9-0.8 13.4-2.6 18.5-7.4 27.5-28.3 20.1-46.8zM206.9 256l48-120h15.3l48 120H206.9z m345.8 582.3l-113.5 67c-5.7 3.4-12 5-18.3 5-12.3 0-24.3-6.3-31-17.7-10.1-17.1-4.4-39.2 12.7-49.3l38.9-23c-47.1-14.5-88.6-35.2-124.1-62-40.2-30.3-72.5-68.1-96-112.5-39.9-75.3-40.6-143.8-40.6-146.7v-0.1c0-19.9 16.1-36 36-36s35.9 16.1 36 35.9v-0.2c0 0.6 1 56.1 33.6 116 18.7 34.4 44.3 63.8 75.9 87.2 29 21.5 63.4 38.3 102.6 50.1l-23-44.1c-9.2-17.6-2.4-39.4 15.3-48.6 17.6-9.2 39.4-2.4 48.6 15.3l60.5 115.9c8.9 17.1 2.9 38.1-13.6 47.8z'
+                    fill='#d81e06'
+                  ></path>
+                </SvgIcon>
+              </Tooltip>
+            )}
           </div>
-        )}
+          <div style={{ display: 'inline-block', width: 40 }}>
+            {visitPurposeFK && <VisitTypeTag type={visitPurposeFK} />}
+          </div>
+          <div style={{ display: 'inline-block', width: 30 }}>
+            {!isNurseNote &&
+              settings.showConsultationVersioning &&
+              !isRetailVisit && (
+                <Tooltip title='View History'>
+                  <span
+                    className='material-icons'
+                    style={{ color: 'gray' }}
+                    onClick={event => {
+                      event.stopPropagation()
+                      this.setState({
+                        showHistoryDetails: true,
+                        selectHistory: { ...row },
+                      })
+                    }}
+                  >
+                    history
+                  </span>
+                </Tooltip>
+              )}
+          </div>
+        </div>
       </div>
     )
   }
@@ -624,7 +678,17 @@ class PatientHistory extends Component {
   checkSelectWidget = widgetId => {
     const { selectCategories = [] } = this.state
     if (selectCategories.length > 0) {
-      return selectCategories.find(c => c === widgetId)
+      if (widgetId === WidgetConfig.WIDGETS_ID.DOCTORNOTE)
+        return selectCategories.find(
+          c =>
+            [
+              WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
+              WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
+              WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
+              WidgetConfig.WIDGETS_ID.PLAN,
+            ].indexOf(c) >= 0,
+        )
+      return selectCategories.find(c => c === widgetId) || false
     }
     return true
   }
@@ -670,7 +734,6 @@ class PatientHistory extends Component {
         </div>
       )
     }
-
     let current = {
       ...history.patientHistoryDetail,
       visitAttachments: history.visitAttachments,
@@ -682,6 +745,9 @@ class PatientHistory extends Component {
       referralPerson: history.referralPerson,
       referralPatientName: history.referralPatientName,
       referralRemarks: history.referralRemarks,
+      visitPurposeFK: history.visitPurposeFK,
+      patientGender: history.patientGender,
+      visitOrderTemplateDetails: history.visitOrderTemplateDetails,
     }
     let visitDetails = {
       visitDate: history.visitDate,
@@ -699,7 +765,7 @@ class PatientHistory extends Component {
 
     const { settings = {} } = clinicSettings
     const { labelPrinterSize } = settings
-    const showDrugLabelRemark = labelPrinterSize === '5.4cmx8.2cm'
+    const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
 
     return (
       <div
@@ -856,6 +922,29 @@ class PatientHistory extends Component {
     ]
   }
 
+  getSelectNoteTypes = () => {
+    const { selectCategories = [] } = this.state
+    if (selectCategories.length) {
+      return [
+        WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
+        WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
+        WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
+        WidgetConfig.WIDGETS_ID.PLAN,
+      ].filter(n => selectCategories.indexOf(n) >= 0)
+    }
+    return [
+      WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
+      WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
+      WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
+      WidgetConfig.WIDGETS_ID.PLAN,
+    ].filter(
+      n =>
+        this.getCategoriesOptions()
+          .map(c => c.value)
+          .indexOf(n) >= 0,
+    )
+  }
+
   checkShowData = (widgetId, current, visitPurposeFK, isNurseNote) => {
     if (isNurseNote) return false
     if (visitPurposeFK === VISIT_TYPE.OTC) {
@@ -871,8 +960,36 @@ class PatientHistory extends Component {
     }
     return (
       this.checkSelectWidget(widgetId) &&
-      WidgetConfig.showWidget(current, widgetId)
+      WidgetConfig.showWidget(current, widgetId, this.getSelectNoteTypes())
     )
+  }
+
+  checkShowNoteInReport = (widgetId, current, visitPurposeFK, isNurseNote) => {
+    if (isNurseNote) return false
+    if (visitPurposeFK === VISIT_TYPE.OTC) return false
+    const checkContainsNote = () => {
+      const notesType = WidgetConfig.notesTypes.find(
+        type => type.value === widgetId,
+      )
+      if (!notesType) return false
+
+      const { doctorNotes = [] } = current
+      const scribbleType = scribbleTypes.find(
+        o => o.type === notesType.fieldName,
+      )
+      if (
+        !doctorNotes.find(
+          note =>
+            note[notesType.fieldName] !== undefined &&
+            note[notesType.fieldName] !== null &&
+            note[notesType.fieldName].trim().length,
+        )
+      ) {
+        return false
+      }
+      return true
+    }
+    return this.checkSelectWidget(widgetId) && checkContainsNote()
   }
 
   getReferral = current => {
@@ -975,6 +1092,115 @@ class PatientHistory extends Component {
     }
   }
 
+  getNoteContent = (note, selectNoteTypes, index) => {
+    if (selectNoteTypes.length > index) {
+      const notesType = WidgetConfig.notesTypes.find(
+        type => type.value === selectNoteTypes[index],
+      )
+      if (!notesType) return undefined
+      return note[notesType.fieldName]
+    }
+    return undefined
+  }
+
+  checkPrintNote = (note, selectNoteTypes) => {
+    return selectNoteTypes.find(selectNote => {
+      const notesType = WidgetConfig.notesTypes.find(
+        type => type.value === selectNote,
+      )
+      return (
+        note[notesType.fieldName] !== undefined &&
+        note[notesType.fieldName] !== null &&
+        note[notesType.fieldName].trim().length
+      )
+    })
+  }
+
+  getNotes = (selectNoteTypes, current) => {
+    return current.doctorNotes
+      .filter(note => this.checkPrintNote(note, selectNoteTypes))
+      .map(note => {
+        const noteUserName = `${
+          note.signedByUserTitle && note.signedByUserTitle.trim().length
+            ? `${note.signedByUserTitle} ${note.signedByUserName || ''}`
+            : `${note.signedByUserName || ''}`
+        }`
+        return {
+          id: note.id,
+          visitFK: current.currentId,
+          content1: this.getNoteContent(note, selectNoteTypes, 0) || '',
+          content2: this.getNoteContent(note, selectNoteTypes, 1) || '',
+          content3: this.getNoteContent(note, selectNoteTypes, 2) || '',
+          content4: this.getNoteContent(note, selectNoteTypes, 3) || '',
+          doctor: noteUserName,
+          updateDate: moment(note.signedDate).format(
+            dateFormatLongWithTimeNoSec,
+          ),
+          noteColumnCount: selectNoteTypes.length,
+        }
+      })
+  }
+
+  getNoteTitle = (selectNoteTypes, index) => {
+    if (selectNoteTypes.length > index) {
+      const notesType = WidgetConfig.notesTypes.find(
+        type => type.value === selectNoteTypes[index],
+      )
+      return notesType.title
+    }
+    return ''
+  }
+
+  showBasicExaminationsGeneral = (basicExaminations = []) => {
+    if (
+      basicExaminations.find(
+        row =>
+          WidgetConfig.hasValue(row.temperatureC) ||
+          WidgetConfig.hasValue(row.bpSysMMHG) ||
+          WidgetConfig.hasValue(row.bpDiaMMHG) ||
+          WidgetConfig.hasValue(row.pulseRateBPM) ||
+          WidgetConfig.hasValue(row.saO2) ||
+          WidgetConfig.hasValue(row.weightKG) ||
+          WidgetConfig.hasValue(row.heightCM) ||
+          WidgetConfig.hasValue(row.bmi),
+      )
+    )
+      return true
+    return false
+  }
+
+  showBasicExaminationsOther1 = (basicExaminations = []) => {
+    if (
+      basicExaminations.find(
+        row =>
+          WidgetConfig.hasValue(row.bodyFatPercentage) ||
+          WidgetConfig.hasValue(row.degreeOfObesity) ||
+          WidgetConfig.hasValue(row.headCircumference) ||
+          WidgetConfig.hasValue(row.chestCircumference) ||
+          WidgetConfig.hasValue(row.waistCircumference) ||
+          WidgetConfig.hasValue(row.isPregnancy),
+      )
+    )
+      return true
+    return false
+  }
+
+  showBasicExaminationsOther2 = (basicExaminations = []) => {
+    if (
+      basicExaminations.find(
+        row =>
+          WidgetConfig.hasValue(row.hepetitisVaccinationA) ||
+          WidgetConfig.hasValue(row.hepetitisVaccinationB) ||
+          WidgetConfig.hasValue(row.isFasting) ||
+          WidgetConfig.hasValue(row.isSmoking) ||
+          WidgetConfig.hasValue(row.isAlcohol) ||
+          WidgetConfig.hasValue(row.isMensus),
+      )
+    )
+      return true
+    return false
+  }
+
   printHandel = async () => {
     let reportContext = []
     const result = await getReportContext(68)
@@ -1018,6 +1244,9 @@ class PatientHistory extends Component {
     let vitalSign = []
     let orders = []
     let consultationDocument = []
+    let doctorNote = []
+    let corEyeExaminations = []
+    let corAudiometryTest = []
 
     loadVisits
       .filter(visit => selectItems.find(item => item === visit.currentId))
@@ -1039,32 +1268,25 @@ class PatientHistory extends Component {
           visitDate: visit.visitDate,
           userName: visit.userName,
           userTitle: visit.userTitle,
+          patientGender: visit.patientGender,
         }
         const { isNurseNote, nurseNotes = '', visitPurposeFK } = current
-        const isShowHistory = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
-          current,
-          visitPurposeFK,
-          isNurseNote,
-        )
-        const isShowChiefComplaints = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
-          current,
-          visitPurposeFK,
-          isNurseNote,
-        )
-        const isShowClinicNotes = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
-          current,
-          visitPurposeFK,
-          isNurseNote,
-        )
-        const isShowPlan = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.PLAN,
-          current,
-          visitPurposeFK,
-          isNurseNote,
-        )
+        let isShowDoctorNote = false
+        const selectNoteTypes = this.getSelectNoteTypes()
+        const noteTitle1 = this.getNoteTitle(selectNoteTypes, 0)
+        const noteTitle2 = this.getNoteTitle(selectNoteTypes, 1)
+        const noteTitle3 = this.getNoteTitle(selectNoteTypes, 2)
+        const noteTitle4 = this.getNoteTitle(selectNoteTypes, 3)
+        if (selectNoteTypes.length) {
+          isShowDoctorNote = selectNoteTypes.find(noteType =>
+            this.checkShowNoteInReport(
+              noteType,
+              current,
+              visitPurposeFK,
+              isNurseNote,
+            ),
+          )
+        }
         const isShowReferral = this.checkShowData(
           WidgetConfig.WIDGETS_ID.REFERRAL,
           current,
@@ -1107,7 +1329,7 @@ class PatientHistory extends Component {
           visitPurposeFK,
           current.isNurseNote,
         )
-        const isShowVitalSign = this.checkShowData(
+        const isShowBasicExaminations = this.checkShowData(
           WidgetConfig.WIDGETS_ID.VITALSIGN,
           current,
           visitPurposeFK,
@@ -1125,13 +1347,21 @@ class PatientHistory extends Component {
           visitPurposeFK,
           isNurseNote,
         )
-
+        const isShowJGHEyeExaminations = this.checkShowData(
+          WidgetConfig.WIDGETS_ID.EYEEXAMINATIONS,
+          current,
+          visitPurposeFK,
+          isNurseNote,
+        )
+        const isShowAudiometryTest = this.checkShowData(
+          WidgetConfig.WIDGETS_ID.AUDIOMETRYTEST,
+          current,
+          visitPurposeFK,
+          isNurseNote,
+        )
         if (
           isNurseNote ||
-          isShowHistory ||
-          isShowChiefComplaints ||
-          isShowClinicNotes ||
-          isShowPlan ||
+          isShowDoctorNote ||
           isShowReferral ||
           isShowVisitRemarks ||
           isShowTreatment ||
@@ -1139,9 +1369,11 @@ class PatientHistory extends Component {
           isShowEyeVisualAcuityTest ||
           isShowRefractionForm ||
           isShowEyeExaminations ||
-          isShowVitalSign ||
+          isShowBasicExaminations ||
           isShowOrders ||
-          isShowConsultationDocument
+          isShowConsultationDocument ||
+          isShowJGHEyeExaminations ||
+          isShowAudiometryTest
         ) {
           let referral = { isShowReferral: false }
           if (isShowReferral) {
@@ -1172,23 +1404,33 @@ class PatientHistory extends Component {
             visitRefractionFormTests = [],
             ...restRefractionFormProps
           } = refractionFormDetails
+
           // visitListing
           visitListing.push({
             currentId: current.currentId,
             visitDate: moment(current.visitDate).format('DD MMM YYYY HH:mm'),
             doctor: `${current.userTitle || ''} ${current.userName || ''}`,
-            history: isShowHistory ? current.history : '',
-            chiefComplaints: isShowChiefComplaints
-              ? current.chiefComplaints
-              : '',
-            clinicNotes: isShowClinicNotes ? current.note : '',
-            plan: isShowPlan ? current.plan : '',
             isNurseNote: isNurseNote || false,
             nurseNotes,
             visitRemarks: isShowVisitRemarks ? current.visitRemarks : '',
             ...referral,
             ...restRefractionFormProps,
             ...eyeVisualAcuityTestDetails,
+            noteTitle1,
+            noteTitle2,
+            noteTitle3,
+            noteTitle4,
+            patientGender: current.patientGender || '',
+            isShowBasicExaminations: isShowBasicExaminations,
+            isShowBasicExaminationsGeneral: this.showBasicExaminationsGeneral(
+              current.patientNoteVitalSigns,
+            ),
+            isShowBasicExaminationsOther1: this.showBasicExaminationsOther1(
+              current.patientNoteVitalSigns,
+            ),
+            isShowBasicExaminationsOther2: this.showBasicExaminationsOther2(
+              current.patientNoteVitalSigns,
+            ),
           })
 
           // treatment
@@ -1254,32 +1496,172 @@ class PatientHistory extends Component {
           }
 
           // Vital Sign
-          if (isShowVitalSign) {
+          if (isShowBasicExaminations) {
             vitalSign = vitalSign.concat(
               current.patientNoteVitalSigns.map(o => {
                 return {
                   visitFK: current.currentId,
-                  temperatureC: `${
-                    o.temperatureC ? numeral(o.temperatureC).format('0.0') : 0.0
-                  } \u00b0C`,
-                  bpSysMMHG: `${
-                    o.bpSysMMHG ? numeral(o.bpSysMMHG).format('0.0') : 0.0
-                  } mmHg`,
-                  bpDiaMMHG: `${
-                    o.bpDiaMMHG ? numeral(o.bpDiaMMHG).format('0.0') : 0.0
-                  } mmHg`,
-                  pulseRateBPM: `${
-                    o.pulseRateBPM ? numeral(o.pulseRateBPM).format('0.0') : 0.0
-                  } bpm`,
-                  weightKG: `${
-                    o.weightKG ? numeral(o.weightKG).format('0.0') : 0.0
-                  } KG`,
-                  heightCM: `${
-                    o.heightCM ? numeral(o.heightCM).format('0.0') : 0.0
-                  } CM`,
-                  bmi: `${
-                    o.bmi ? numeral(o.bmi).format('0.0') : 0.0
-                  } kg/m\u00b2`,
+                  temperatureC: WidgetConfig.hasValue(o.temperatureC)
+                    ? `${numeral(o.temperatureC).format('0.0')} \u00b0C`
+                    : '-',
+                  bpSysMMHG: WidgetConfig.hasValue(o.bpSysMMHG)
+                    ? `${numeral(o.bpSysMMHG).format('0')} mmHg`
+                    : '-',
+                  bpDiaMMHG: WidgetConfig.hasValue(o.bpDiaMMHG)
+                    ? `${numeral(o.bpDiaMMHG).format('0')} mmHg`
+                    : '-',
+                  pulseRateBPM: WidgetConfig.hasValue(o.pulseRateBPM)
+                    ? `${numeral(o.pulseRateBPM).format('0')} bpm`
+                    : '-',
+                  weightKG: WidgetConfig.hasValue(o.weightKG)
+                    ? `${numeral(o.weightKG).format('0.0')} KG`
+                    : '-',
+                  heightCM: WidgetConfig.hasValue(o.heightCM)
+                    ? `${numeral(o.heightCM).format('0.0')} CM`
+                    : '-',
+                  bmi: WidgetConfig.hasValue(o.bmi)
+                    ? `${numeral(o.bmi).format('0.0')} kg/m\u00b2`
+                    : '-',
+                  saO2: WidgetConfig.hasValue(o.saO2)
+                    ? `${numeral(o.saO2).format('0')} %`
+                    : '-',
+                  bodyFatPercentage: WidgetConfig.hasValue(o.bodyFatPercentage)
+                    ? `${numeral(o.bodyFatPercentage).format('0.0')} %`
+                    : '-',
+                  degreeOfObesity: WidgetConfig.hasValue(o.degreeOfObesity)
+                    ? `${numeral(o.degreeOfObesity).format('0.0')} %`
+                    : '-',
+                  headCircumference: WidgetConfig.hasValue(o.headCircumference)
+                    ? `${numeral(o.headCircumference).format('0.0')} CM`
+                    : '-',
+                  chestCircumference: WidgetConfig.hasValue(
+                    o.chestCircumference,
+                  )
+                    ? `${numeral(o.chestCircumference).format('0.0')} CM`
+                    : '-',
+                  waistCircumference:
+                    o.isChild || o.isPregnancy
+                      ? 'Not Available'
+                      : WidgetConfig.hasValue(o.waistCircumference)
+                      ? `${numeral(o.waistCircumference).format('0.0')} CM`
+                      : '-',
+                  isPregnancy: WidgetConfig.getHistoryValueForBoolean(
+                    o.isPregnancy,
+                  ),
+                  hepetitisVaccinationA: WidgetConfig.getHistoryValueForBoolean(
+                    o.hepetitisVaccinationA,
+                  ),
+                  hepetitisVaccinationB: WidgetConfig.getHistoryValueForBoolean(
+                    o.hepetitisVaccinationB,
+                  ),
+                  isFasting: WidgetConfig.getHistoryValueForBoolean(
+                    o.isFasting,
+                  ),
+                  isSmoking: WidgetConfig.getHistoryValueForBoolean(
+                    o.isSmoking,
+                  ),
+                  isAlcohol: WidgetConfig.getHistoryValueForBoolean(
+                    o.isAlcohol,
+                  ),
+                  isMensus: WidgetConfig.getHistoryValueForBoolean(o.isMensus),
+                }
+              }),
+            )
+          }
+
+          // JGH Eye Examinations
+          if (isShowJGHEyeExaminations) {
+            corEyeExaminations = corEyeExaminations.concat(
+              current.corEyeExaminations.map(o => {
+                return {
+                  visitFK: current.currentId,
+                  visionCorrectionMethod: o.visionCorrectionMethod || '',
+                  rightBareEye5: WidgetConfig.hasValue(o.rightBareEye5)
+                    ? `${numeral(o.rightBareEye5).format('0.0')}`
+                    : '-',
+                  rightCorrectedVision5: WidgetConfig.hasValue(
+                    o.rightCorrectedVision5,
+                  )
+                    ? `${numeral(o.rightCorrectedVision5).format('0.0')}`
+                    : '-',
+                  rightBareEye50: WidgetConfig.hasValue(o.rightBareEye50)
+                    ? `${numeral(o.rightBareEye50).format('0.0')}`
+                    : '-',
+                  rightCorrectedVision50: WidgetConfig.hasValue(
+                    o.rightCorrectedVision50,
+                  )
+                    ? `${numeral(o.rightCorrectedVision50).format('0.0')}`
+                    : '-',
+                  leftBareEye5: WidgetConfig.hasValue(o.leftBareEye5)
+                    ? `${numeral(o.leftBareEye5).format('0.0')}`
+                    : '-',
+                  leftCorrectedVision5: WidgetConfig.hasValue(
+                    o.leftCorrectedVision5,
+                  )
+                    ? `${numeral(o.leftCorrectedVision5).format('0.0')}`
+                    : '-',
+                  leftBareEye50: WidgetConfig.hasValue(o.leftBareEye50)
+                    ? `${numeral(o.leftBareEye50).format('0.0')}`
+                    : '-',
+                  leftCorrectedVision50: WidgetConfig.hasValue(
+                    o.leftCorrectedVision50,
+                  )
+                    ? `${numeral(o.leftCorrectedVision50).format('0.0')}`
+                    : '-',
+                  rightFirstResult: WidgetConfig.hasValue(o.rightFirstResult)
+                    ? `${o.rightFirstResult}`
+                    : '-',
+                  rightSecondResult: WidgetConfig.hasValue(o.rightSecondResult)
+                    ? `${o.rightSecondResult}`
+                    : '-',
+                  rightThirdResult: WidgetConfig.hasValue(o.rightThirdResult)
+                    ? `${o.rightThirdResult}`
+                    : '-',
+                  rightAverageResult: WidgetConfig.hasValue(
+                    o.rightAverageResult,
+                  )
+                    ? `${numeral(o.rightAverageResult).format('0.0')}`
+                    : '-',
+                  leftFirstResult: WidgetConfig.hasValue(o.leftFirstResult)
+                    ? `${o.leftFirstResult}`
+                    : '-',
+                  leftSecondResult: WidgetConfig.hasValue(o.leftSecondResult)
+                    ? `${o.leftSecondResult}`
+                    : '-',
+                  leftThirdResult: WidgetConfig.hasValue(o.leftThirdResult)
+                    ? `${o.leftThirdResult}`
+                    : '-',
+                  leftAverageResult: WidgetConfig.hasValue(o.leftAverageResult)
+                    ? `${numeral(o.leftAverageResult).format('0.0')}`
+                    : '-',
+                  colorVisionTestResult: o.colorVisionTestResult || '',
+                  remarks:
+                    WidgetConfig.hasValue(o.remarks) && o.remarks.trim().length
+                      ? o.remarks
+                      : '-',
+                }
+              }),
+            )
+          }
+
+          //  Audiometry Test
+          if (isShowAudiometryTest) {
+            corAudiometryTest = corAudiometryTest.concat(
+              current.corAudiometryTest.map(o => {
+                return {
+                  visitFK: current.currentId,
+                  rightResult1000Hz: WidgetConfig.hasValue(o.rightResult1000Hz)
+                    ? `${o.rightResult1000Hz} dB`
+                    : '-',
+                  rightResult4000Hz: WidgetConfig.hasValue(o.rightResult4000Hz)
+                    ? `${o.rightResult4000Hz} dB`
+                    : '-',
+                  leftResult1000Hz: WidgetConfig.hasValue(o.leftResult1000Hz)
+                    ? `${o.leftResult1000Hz} dB`
+                    : '-',
+                  leftResult4000Hz: WidgetConfig.hasValue(o.leftResult4000Hz)
+                    ? `${o.leftResult4000Hz} dB`
+                    : '-',
                 }
               }),
             )
@@ -1315,6 +1697,13 @@ class PatientHistory extends Component {
               }),
             )
           }
+
+          //show doctor notes
+          if (isShowDoctorNote) {
+            doctorNote = doctorNote.concat(
+              this.getNotes(selectNoteTypes, current),
+            )
+          }
         }
       })
 
@@ -1334,6 +1723,9 @@ class PatientHistory extends Component {
       VitalSign: vitalSign,
       Orders: orders,
       ConsultationDocument: consultationDocument,
+      DoctorNote: doctorNote,
+      COREyeExaminations: corEyeExaminations,
+      CORAudiometryTest: corAudiometryTest,
       ReportContext: reportContext,
     }
     const payload1 = [
@@ -1350,16 +1742,34 @@ class PatientHistory extends Component {
   }
 
   getFilterBar = () => {
-    const { values } = this.props
+    const { values, fromModule } = this.props
     const { isAllDate } = values
     const { selectItems } = this.state
     return (
       <div>
         <div style={{ display: 'flex' }}>
           <div>
+            <Field
+              name='visitTypeIDs'
+              render={args => (
+                <VisitTypeSelect
+                  label={formatMessage({ id: 'lab.search.visittype' })}
+                  mode='multiple'
+                  maxTagPlaceholder='Visit Types'
+                  style={{
+                    width: fromModule === 'MedicalCheckup' ? 170 : 200,
+                    display: 'inline-Block',
+                    marginBottom: -16,
+                  }}
+                  {...args}
+                  allowClear={true}
+                />
+              )}
+            />
             <div
               style={{
                 display: 'inline-Block',
+                marginLeft: 10,
               }}
             >
               <Field
@@ -1367,7 +1777,7 @@ class PatientHistory extends Component {
                 render={args => (
                   <DateRangePicker
                     style={{
-                      width: 300,
+                      width: fromModule === 'MedicalCheckup' ? 210 : 300,
                     }}
                     label='Visit Date From'
                     label2='To'
@@ -1390,8 +1800,9 @@ class PatientHistory extends Component {
                   valueField='value'
                   label='Categories'
                   mode='multiple'
+                  maxTagCount={0}
                   style={{
-                    width: 240,
+                    width: fromModule === 'MedicalCheckup' ? 168 : 240,
                     display: 'inline-Block',
                     marginBottom: -16,
                   }}
@@ -1405,7 +1816,7 @@ class PatientHistory extends Component {
               render={args => (
                 <DoctorProfileSelect
                   style={{
-                    width: 240,
+                    width: fromModule === 'MedicalCheckup' ? 180 : 240,
                     display: 'inline-Block',
                     marginLeft: 10,
                     marginBottom: -16,
@@ -1413,6 +1824,7 @@ class PatientHistory extends Component {
                   label='Doctors'
                   mode='multiple'
                   {...args}
+                  maxTagCount={0}
                   allValue={-99}
                   allValueOption={{
                     id: -99,
@@ -1545,6 +1957,23 @@ class PatientHistory extends Component {
       <div>
         <div style={{ display: 'flex', marginBottom: isFullScreen ? 10 : 0 }}>
           <div>
+            <Field
+              name='visitTypeIDs'
+              render={args => (
+                <VisitTypeSelect
+                  label={formatMessage({ id: 'lab.search.visittype' })}
+                  mode='multiple'
+                  maxTagPlaceholder='Visit Types'
+                  style={{
+                    width: !isFullScreen ? 160 : 240,
+                    display: 'inline-Block',
+                    marginBottom: -10,
+                  }}
+                  {...args}
+                  allowClear={true}
+                />
+              )}
+            />
             <div
               style={{
                 display: 'inline-Block',
@@ -1581,7 +2010,7 @@ class PatientHistory extends Component {
                   style={{
                     width: !isFullScreen ? 150 : 240,
                     display: 'inline-Block',
-                    marginBottom: -16,
+                    marginBottom: -10,
                   }}
                   options={this.getCategoriesOptions()}
                   {...args}
@@ -1614,18 +2043,16 @@ class PatientHistory extends Component {
                 />
               )}
             />
-            {isFullScreen && (
-              <div style={{ display: 'inline-Block', marginLeft: 5 }}>
-                <ProgressButton
-                  color='primary'
-                  size='sm'
-                  icon={<Search />}
-                  onClick={this.handelSearch}
-                >
-                  Search
-                </ProgressButton>
-              </div>
-            )}
+            <div style={{ display: 'inline-Block', marginLeft: 5 }}>
+              <ProgressButton
+                color='primary'
+                size='sm'
+                icon={<Search />}
+                onClick={this.handelSearch}
+              >
+                Search
+              </ProgressButton>
+            </div>
           </div>
           {isFullScreen && (
             <div
@@ -1686,21 +2113,6 @@ class PatientHistory extends Component {
         </div>
         {!isFullScreen && (
           <div style={{ display: 'flex' }}>
-            <div
-              style={{
-                position: 'relative',
-                bottom: -8,
-              }}
-            >
-              <ProgressButton
-                color='primary'
-                size='sm'
-                icon={<Search />}
-                onClick={this.handelSearch}
-              >
-                Search
-              </ProgressButton>
-            </div>
             <div style={{ marginLeft: 'auto' }}>
               <div>
                 <span
@@ -1771,7 +2183,13 @@ class PatientHistory extends Component {
 
   handelSearch = () => {
     const { values, dispatch, patientHistory } = this.props
-    const { visitDate, isAllDate, selectDoctors, selectCategories } = values
+    const {
+      visitDate,
+      isAllDate,
+      selectDoctors,
+      selectCategories,
+      visitTypeIDs,
+    } = values
     this.setState(
       {
         visitDate,
@@ -1782,32 +2200,51 @@ class PatientHistory extends Component {
         selectItems: [],
         totalVisits: 0,
         selectDoctors,
+        visitTypeIDs,
         selectCategories,
         isLoadingData: true,
       },
       () => {
         const currentSelectCategories = selectCategories.filter(o => o !== -99)
-        if (
-          !patientHistory.SelectCategories ||
-          !_.isEqual(
-            patientHistory.SelectCategories.sort(),
-            currentSelectCategories.sort(),
-          )
-        ) {
+        const currentSelectVisitTypeIds = visitTypeIDs.filter(o => o !== -99)
+        const newPreference = [
+          {
+            SelectCategories: currentSelectCategories || [],
+            Identifier: 'SelectCategories',
+          },
+          {
+            SelectedVisitTypeIDs: visitTypeIDs || [],
+            Identifier: 'SelectedVisitTypeIDs',
+          },
+        ]
+        if (!_.isEqual(patientHistory.preference, newPreference)) {
           dispatch({
             type: 'patientHistory/saveUserPreference',
             payload: {
-              userPreferenceDetails: {
-                SelectCategories: currentSelectCategories,
-                Identifier: 'SelectCategories',
-              },
-              itemIdentifier: 'SelectCategories',
+              List: [
+                {
+                  userPreferenceDetails: JSON.stringify({
+                    SelectCategories: currentSelectCategories || [],
+                    Identifier: 'SelectCategories',
+                  }),
+                  type: 5,
+                  itemIdentifier: 'SelectCategories',
+                },
+                {
+                  userPreferenceDetails: JSON.stringify({
+                    SelectedVisitTypeIDs: visitTypeIDs || [],
+                    Identifier: 'SelectedVisitTypeIDs',
+                  }),
+                  type: 5,
+                  itemIdentifier: 'SelectedVisitTypeIDs',
+                },
+              ],
             },
           }).then(r => {
             if (r) {
               dispatch({
-                type: 'patientHistory/getUserPreference',
-                payload: {},
+                type: 'patientHistory/updateState',
+                payload: { preference: newPreference },
               })
             }
           })
@@ -1822,7 +2259,7 @@ class PatientHistory extends Component {
   }
 
   render() {
-    const { clinicSettings, scriblenotes, fromModule } = this.props
+    const { clinicSettings, scriblenotes, fromModule, height } = this.props
     const cfg = {}
     const {
       showHistoryDetails,
@@ -1847,7 +2284,10 @@ class PatientHistory extends Component {
     } else if (fromModule === 'PatientHistory') {
       otherHeight = 390
     }
-    const visitContentHeight = currentHeight - otherHeight
+    let visitContentHeight = currentHeight - otherHeight
+    if (fromModule === 'MedicalCheckup') {
+      visitContentHeight = height - 165
+    }
     return (
       <div {...cfg}>
         <CardContainer hideHeader size='sm'>
@@ -1926,6 +2366,7 @@ class PatientHistory extends Component {
             closeHistoryDetails={this.closeHistoryDetails}
             selectHistory={selectHistory}
             scribbleNoteUpdateState={this.scribbleNoteUpdateState}
+            getCategoriesOptions={this.getCategoriesOptions}
           />
         </CommonModal>
         <CommonModal

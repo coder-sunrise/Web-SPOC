@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { connect } from 'dva'
 // formik
 import { FastField } from 'formik'
@@ -13,10 +13,11 @@ import {
   SizeContainer,
   RadioGroup,
 } from '@/components'
-import { DiagnosisSelect } from '@/components/_medisys'
+import { DiagnosisSelect, ICD10DiagnosisSelect } from '@/components/_medisys'
+import { DIAGNOSIS_TYPE } from '@/utils/constants'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
-const styles = (theme) => ({
+const styles = theme => ({
   generateBtn: {
     marginBottom: theme.spacing(1),
   },
@@ -27,23 +28,35 @@ const FilterBar = ({
   handleSubmit,
   isSubmitting,
   formikProps,
+  clinicSettings,
   ctdiagnosis = [],
+  cticd10diagnosis = [],
 }) => {
   const { values, setFieldValue } = formikProps
-
   const { diagnosisIds = [] } = values
+  const [currentDiagnosisLanguage, setcurrentDiagnosisLanguage] = useState('EN')
+  const {
+    diagnosisDataSource = DIAGNOSIS_TYPE.SNOMEDDIAGNOSIS,
+    isEnableJapaneseICD10Diagnosis = false,
+  } = clinicSettings
 
-  const selectedDiagnosis = ctdiagnosis.filter((diagnosis) =>
-    diagnosisIds.includes(diagnosis.id),
-  )
-
-  const handleDelete = (diagnosisID) => {
-    setFieldValue(
-      'diagnosisIds',
-      diagnosisIds.filter((item) => item !== diagnosisID),
+  let selectedDiagnosis = []
+  if (diagnosisDataSource === DIAGNOSIS_TYPE.SNOMEDDIAGNOSIS) {
+    selectedDiagnosis = ctdiagnosis.filter(diagnosis =>
+      diagnosisIds.includes(diagnosis.id),
+    )
+  } else {
+    selectedDiagnosis = cticd10diagnosis.filter(diagnosis =>
+      diagnosisIds.includes(diagnosis.id),
     )
   }
 
+  const handleDelete = diagnosisID => {
+    setFieldValue(
+      'diagnosisIds',
+      diagnosisIds.filter(item => item !== diagnosisID),
+    )
+  }
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
@@ -56,7 +69,7 @@ const FilterBar = ({
           <GridItem md={2}>
             <FastField
               name='viewBy'
-              render={(args) => (
+              render={args => (
                 <RadioGroup
                   {...args}
                   label='View By'
@@ -87,23 +100,62 @@ const FilterBar = ({
           <GridItem md={4}>
             <FastField
               name='diagnosisIds'
-              render={(args) => <DiagnosisSelect {...args} mode='multiple' />}
+              render={args =>
+                diagnosisDataSource === DIAGNOSIS_TYPE.SNOMEDDIAGNOSIS ? (
+                  <DiagnosisSelect
+                    {...args}
+                    mode='multiple'
+                    maxTagCount={0}
+                    maxTagPlaceholder='Diagnosis'
+                  />
+                ) : (
+                  <ICD10DiagnosisSelect
+                    {...args}
+                    mode='multiple'
+                    maxTagCount={0}
+                    maxTagPlaceholder='Diagnosis'
+                    defaultLanguage='EN'
+                    filterStyle={{
+                      position: 'absolute',
+                      bottom: 0,
+                      right: -130,
+                    }}
+                    onICD10AMLanguageChange={setcurrentDiagnosisLanguage}
+                  />
+                )
+              }
             />
           </GridItem>
           <GridItem md={4}>
             <FastField
               name='showDetails'
-              render={(args) => <Checkbox {...args} label='Show Details' />}
+              render={args => (
+                <Checkbox
+                  style={{
+                    marginLeft:
+                      diagnosisDataSource === DIAGNOSIS_TYPE.SNOMEDDIAGNOSIS ||
+                      !isEnableJapaneseICD10Diagnosis
+                        ? 0
+                        : 110,
+                  }}
+                  {...args}
+                  label='Show Details'
+                />
+              )}
             />
           </GridItem>
           <GridItem md={12}>
-            {selectedDiagnosis.map((item) => (
+            {selectedDiagnosis.map(item => (
               <Chip
                 style={{ margin: 8 }}
                 key={item.code}
                 size='small'
                 variant='outlined'
-                label={item.displayvalue}
+                label={
+                  currentDiagnosisLanguage === 'EN'
+                    ? item.displayvalue
+                    : item.JpnDisplayValue
+                }
                 color='primary'
                 onDelete={() => handleDelete(item.id)}
               />
@@ -115,8 +167,10 @@ const FilterBar = ({
   )
 }
 
-const Connected = connect(({ codetable }) => ({
+const Connected = connect(({ codetable, clinicSettings }) => ({
   ctdiagnosis: codetable['codetable/ctsnomeddiagnosis'],
+  cticd10diagnosis: codetable['codetable/CTICD10AM'],
+  clinicSettings: clinicSettings.settings,
 }))(FilterBar)
 
 export default withStyles(styles, { name: 'SalesSummaryFilterBar' })(Connected)

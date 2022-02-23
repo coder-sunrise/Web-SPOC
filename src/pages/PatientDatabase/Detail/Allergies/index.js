@@ -9,6 +9,7 @@ import {
 } from '@/components'
 
 import AllergyGrid from './AllergyGrid'
+import Authorized from '@/utils/Authorized'
 
 @connect(({ global, codetable }) => ({ global, codetable }))
 class Allergies extends PureComponent {
@@ -98,6 +99,11 @@ class Allergies extends PureComponent {
   }
 
   render() {
+    const accessRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.allergies',
+    )
+    let disabledByAccessRight = true
+    if (accessRight) disabledByAccessRight = accessRight.rights === 'disable'
     const { classes, dispatch, values, schema, ...restProps } = this.props
     const allergyDisabled = this.isDisableAllergy()
 
@@ -110,7 +116,7 @@ class Allergies extends PureComponent {
               render={args => {
                 return (
                   <Checkbox
-                    disabled={allergyDisabled}
+                    disabled={disabledByAccessRight || allergyDisabled}
                     simple
                     label={"This patient doesn't have any allergy"}
                     {...args}
@@ -125,6 +131,7 @@ class Allergies extends PureComponent {
               render={args => {
                 return (
                   <CodeSelect
+                    disabled={disabledByAccessRight}
                     code='ctg6pd'
                     style={{ top: -25 }}
                     {...args}
@@ -144,9 +151,10 @@ class Allergies extends PureComponent {
               type='Allergy'
               title='Allergy'
               isEditable={
-                !values.patientAllergyMetaData[0] ||
-                (values.patientAllergyMetaData[0].noAllergies || false) ===
-                  false
+                !disabledByAccessRight &&
+                (!values.patientAllergyMetaData[0] ||
+                  (values.patientAllergyMetaData[0].noAllergies || false) ===
+                    false)
               }
               setArrayValue={this.updateValue('Allergy')}
               schema={schema.patientAllergy._subType}
@@ -164,9 +172,10 @@ class Allergies extends PureComponent {
               type='Ingredient'
               title='Ingredient'
               isEditable={
-                !values.patientAllergyMetaData[0] ||
-                (values.patientAllergyMetaData[0].noAllergies || false) ===
-                  false
+                !disabledByAccessRight &&
+                (!values.patientAllergyMetaData[0] ||
+                  (values.patientAllergyMetaData[0].noAllergies || false) ===
+                    false)
               }
               setArrayValue={this.updateValue('Ingredient')}
               schema={schema.patientAllergy._subType}
@@ -184,9 +193,10 @@ class Allergies extends PureComponent {
               type='NonAllergy'
               title='Medical Alert'
               isEditable={
-                !values.patientAllergyMetaData[0] ||
-                (values.patientAllergyMetaData[0].noAllergies || false) ===
-                  false
+                !disabledByAccessRight &&
+                (!values.patientAllergyMetaData[0] ||
+                  (values.patientAllergyMetaData[0].noAllergies || false) ===
+                    false)
               }
               setArrayValue={this.updateValue('NonAllergy')}
               schema={schema.patientAllergy._subType}

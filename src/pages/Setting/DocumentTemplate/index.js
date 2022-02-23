@@ -9,6 +9,7 @@ import { CardContainer, CommonModal, withSettingBase } from '@/components'
 import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
+import { DOCUMENT_CATEGORY } from '@/utils/constants'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -19,7 +20,7 @@ const styles = (theme) => ({
   mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({ modelName: 'settingDocumentTemplate' })
-class ServiceCenter extends PureComponent {
+class DocumentTemplate extends PureComponent {
   state = {}
 
   componentDidMount () {
@@ -38,12 +39,13 @@ class ServiceCenter extends PureComponent {
   }
 
   render () {
-    const { settingDocumentTemplate, mainDivHeight = 700 } = this.props
+    const { settingDocumentTemplate, mainDivHeight = 700, settingDocumentTemplate:{documentCategoryFK} } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
     let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
     if (height < 300) height = 300
+    const isFullScreen = (settingDocumentTemplate.entity?.documentCategoryFK || documentCategoryFK) === DOCUMENT_CATEGORY.FORM
     return (
       <CardContainer hideHeader>
         <div className='filterBar'>
@@ -57,7 +59,8 @@ class ServiceCenter extends PureComponent {
           title={`${settingDocumentTemplate.entity
             ? 'Edit '
             : 'Add '}Document Template`}
-          maxWidth='md'
+          maxWidth='lg'
+          fullScreen={isFullScreen}
           bodyNoPadding
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
@@ -69,4 +72,4 @@ class ServiceCenter extends PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(ServiceCenter)
+export default withStyles(styles, { withTheme: true })(DocumentTemplate)

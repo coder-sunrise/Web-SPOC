@@ -124,13 +124,13 @@ class ClinicInfo extends PureComponent {
           <GridItem md={6}>
             <FastField
               name='clinicName'
-              render={(args) => <TextField label='Clinic Name' {...args} />}
+              render={args => <TextField label='Clinic Name' {...args} />}
             />
           </GridItem>
           <GridItem md={3}>
             <FastField
               name='heCode'
-              render={(args) => (
+              render={args => (
                 <TextField label='Clinic ID (HCI Code)' disabled {...args} />
               )}
               disabled
@@ -139,7 +139,7 @@ class ClinicInfo extends PureComponent {
           <GridItem md={3}>
             <FastField
               name='hospitalCode'
-              render={(args) => (
+              render={args => (
                 <TextField label='Hospital Code' disabled {...args} />
               )}
               disabled
@@ -150,17 +150,18 @@ class ClinicInfo extends PureComponent {
           <GridItem md={6}>
             <Field
               name='primaryRegisteredDoctorFK'
-              render={(args) => (
+              render={args => (
                 <Select
                   {...args}
                   allowClear={false}
                   label='Primary Clinician'
                   options={primaryClinician}
-                  onChange={(option) =>
+                  onChange={option =>
                     setFieldValue(
                       'primaryMCRNO',
-                      doctorProfile.find((o) => o.id === option).doctorMCRNo,
-                    )}
+                      doctorProfile.find(o => o.id === option).doctorMCRNo,
+                    )
+                  }
                 />
               )}
             />
@@ -183,7 +184,7 @@ class ClinicInfo extends PureComponent {
           <GridItem md={3}>
             <Field
               name='primaryMCRNO'
-              render={(args) => (
+              render={args => (
                 <TextField
                   label='Primary Clinician MCR Number'
                   disabled
@@ -195,7 +196,7 @@ class ClinicInfo extends PureComponent {
           <GridItem md={3}>
             <Field
               name='clinicShortCode'
-              render={(args) => (
+              render={args => (
                 <TextField
                   label='Clinic Short Code'
                   {...args}
@@ -208,14 +209,27 @@ class ClinicInfo extends PureComponent {
           <GridItem md={6}>
             <FastField
               name='acra'
-              render={(args) => <TextField label='ACRA' disabled {...args} />}
+              render={args => <TextField label='ACRA' disabled {...args} />}
             />
           </GridItem>
 
           <GridItem md={3}>
             <FastField
               name='contact.mobileContactNumber.number'
-              render={(args) => <TextField label='Contact No.' {...args} />}
+              render={args => <TextField label='Contact No.' {...args} />}
+            />
+          </GridItem>
+          <GridItem md={3}>
+            <Field
+              name='website'
+              render={args => (
+                <TextField
+                  label='Website'
+                  {...args}
+                  inputProps={{ maxLength: 50 }}
+                  maxLength={50}
+                />
+              )}
             />
           </GridItem>
         </GridContainer>
@@ -233,7 +247,7 @@ class ClinicInfo extends PureComponent {
           <GridItem xs={12}>
             <FieldArray
               name='contact.contactAddress'
-              render={(arrayHelpers) => {
+              render={arrayHelpers => {
                 // this.arrayHelpers = arrayHelpers
                 // if (!values || !values.contact) return null
                 return (

@@ -17,10 +17,14 @@ import {
   CommonModal,
   WarningSnackbar,
   NumberInput,
+  Popover,
 } from '@/components'
 // utils
 import { ReportViewer } from '@/components/_medisys'
 import { getBizSession } from '@/services/queue'
+import { INVOICE_REPORT_TYPES } from '@/utils/constants'
+import MenuItem from '@material-ui/core/MenuItem'
+import MenuList from '@material-ui/core/MenuList'
 import PaymentDetails from './PaymentDetails'
 
 const styles = () => ({
@@ -55,8 +59,8 @@ const styles = () => ({
     fontSize: '0.7rem',
     padding: '2px 3px',
     height: 20,
-    cursor: 'pointer'
-  }
+    cursor: 'pointer',
+  },
 })
 
 const InvoiceHistory = ({
@@ -80,17 +84,15 @@ const InvoiceHistory = ({
 
   const { settings = [] } = clinicSettings
   const { isEnableVisitationInvoiceReport = false } = settings
+  const [showPrintInvoiceMenu, setShowPrintInvoiceMenu] = useState(false)
 
-  const [
-    hasActiveSession,
-    setHasActiveSession,
-  ] = useState(true)
+  const [hasActiveSession, setHasActiveSession] = useState(true)
 
   const checkHasActiveSession = () => {
     const bizSessionPayload = {
       IsClinicSessionClosed: false,
     }
-    getBizSession(bizSessionPayload).then((result) => {
+    getBizSession(bizSessionPayload).then(result => {
       if (result) {
         const { data } = result.data
         setHasActiveSession(data.length > 0)
@@ -103,28 +105,30 @@ const InvoiceHistory = ({
     refreshInvoiceList()
   }, [])
 
-  const [
-    showReport,
-    setShowReport,
-  ] = useState({ show: false, invoiceId: null })
-  const { show, invoiceId } = showReport
+  const [showReport, setShowReport] = useState({
+    show: false,
+    invoiceId: null,
+    printType,
+  })
+  const { show, invoiceId, printType } = showReport
 
-  const toggleReport = (row) => {
+  const toggleReport = (row, invoiceReportType) => {
     const setShowValue = !show
     setShowReport({
       ...showReport,
       show: setShowValue,
       invoiceId: setShowValue ? row.id : null,
+      printType: invoiceReportType,
     })
   }
 
-  const [
-    showVisitInvoiceReport,
-    setShowVisitInvoiceReport,
-  ] = useState({ showVisitInvoice: false, invoiceId: null })
+  const [showVisitInvoiceReport, setShowVisitInvoiceReport] = useState({
+    showVisitInvoice: false,
+    invoiceId: null,
+  })
   const { showVisitInvoice, invId } = showVisitInvoiceReport
 
-  const toggleVisitInvoiceReport = (row) => {
+  const toggleVisitInvoiceReport = row => {
     const setShowVisitInvoiceValue = !showVisitInvoice
     setShowVisitInvoiceReport({
       ...showVisitInvoiceReport,
@@ -133,7 +137,7 @@ const InvoiceHistory = ({
     })
   }
 
-  const getContent = (o) => {
+  const getContent = o => {
     const { entity = {} } = patient || {}
 
     return (
@@ -149,14 +153,16 @@ const InvoiceHistory = ({
     )
   }
 
-  const getTitle = (row) => {
+  const getTitle = row => {
     const {
       invoiceNo,
       invoiceDate,
       totalPayment,
       patientOutstanding,
       invoiceTotalAftGST,
+      invoiceDetail = {},
     } = row
+    const { visitOrderTemplateFK } = invoiceDetail
 
     return (
       <GridContainer>
@@ -182,28 +188,79 @@ const InvoiceHistory = ({
               <NumberInput text currency value={patientOutstanding} />
             </p>
             <p className={classes.printButtonStyle}>
-              <Button
-                size='sm'
-                color='primary'
-                icon
-                onClick={(event) => {
-                  toggleReport(row)
-                  event.stopPropagation()
-                }}
-              >
-                <Printer />Print Invoice
-              </Button>
+              {visitOrderTemplateFK && (
+                <Popover
+                  icon={null}
+                  trigger='click'
+                  placement='left'
+                  visible={showPrintInvoiceMenu}
+                  onVisibleChange={() => {
+                    setShowPrintInvoiceMenu(!showPrintInvoiceMenu)
+                  }}
+                  content={
+                    <MenuList
+                      role='menu'
+                      onClick={() => setShowPrintInvoiceMenu(false)}
+                    >
+                      <MenuItem
+                        onClick={() =>
+                          toggleReport(row, INVOICE_REPORT_TYPES.SUMMARYINVOICE)
+                        }
+                      >
+                        Summary Invoice
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() =>
+                          toggleReport(
+                            row,
+                            INVOICE_REPORT_TYPES.INDIVIDUALINVOICE,
+                          )
+                        }
+                      >
+                        Individual Invoice
+                      </MenuItem>
+                    </MenuList>
+                  }
+                >
+                  <Button
+                    size='sm'
+                    color='primary'
+                    icon
+                    onClick={event => {
+                      event.stopPropagation()
+                    }}
+                  >
+                    <Printer />
+                    Print Invoice
+                  </Button>
+                </Popover>
+              )}
+              {!visitOrderTemplateFK && (
+                <Button
+                  size='sm'
+                  color='primary'
+                  icon
+                  onClick={event => {
+                    toggleReport(row, INVOICE_REPORT_TYPES.INDIVIDUALINVOICE)
+                    event.stopPropagation()
+                  }}
+                >
+                  <Printer />
+                  Print Invoice
+                </Button>
+              )}
               {isEnableVisitationInvoiceReport && (
                 <Button
                   size='sm'
                   color='primary'
                   icon
-                  onClick={(event) => {
+                  onClick={event => {
                     toggleVisitInvoiceReport(row)
                     event.stopPropagation()
                   }}
                 >
-                  <Printer />Print Visit Invoice
+                  <Printer />
+                  Print Visit Invoice
                 </Button>
               )}
             </p>
@@ -244,7 +301,7 @@ const InvoiceHistory = ({
         <div style={{ height, marginTop: 50, overflow: 'auto' }}>
           <Accordion
             mode='multiple'
-            collapses={list.map((o) => {
+            collapses={list.map(o => {
               const returnValue = {
                 title: getTitle(o),
                 content: getContent(o),
@@ -265,7 +322,10 @@ const InvoiceHistory = ({
         >
           <ReportViewer
             reportID={15}
-            reportParameters={{ InvoiceID: invoiceId || '' }}
+            reportParameters={{
+              InvoiceID: invoiceId || '',
+              printType: printType,
+            }}
           />
         </CommonModal>
         <CommonModal

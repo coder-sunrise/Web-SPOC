@@ -31,7 +31,7 @@ import {
   wordFileExtensions,
 } from './utils'
 
-const styles = (theme) => ({
+const styles = theme => ({
   simpleRoot: {
     position: 'relative',
     display: 'inline-block',
@@ -41,12 +41,6 @@ const styles = (theme) => ({
     '& button': {
       marginRight: 0,
       padding: '0px !important',
-    },
-    '&:hover': {
-      '& img': {
-        opacity: 0.4,
-        background: 'darkgrey',
-      },
     },
   },
   root: {
@@ -81,17 +75,13 @@ const styles = (theme) => ({
   },
   simpleButtonGroup: {
     position: 'absolute',
-    top: 0,
+    bottom: 8,
+    right: 0,
     // left: '24px',
-    width: '100%',
-    height: '100%',
+    textAlign: 'right',
+    width: '35px',
+    height: '35px',
     paddingTop: theme.spacing(1),
-    opacity: 0,
-    '&:hover': {
-      opacity: 1,
-      '-webkit-animation': 'fadeInFromNone 0.5s ease-out',
-      animation: 'fadeInFromNone 0.5s ease-out',
-    },
     '& button': {
       margin: 4,
       padding: '0px !important',
@@ -112,6 +102,7 @@ const Thumbnail = ({
   fieldName,
   size = { width: 64, height: 64 },
   hideRemarks,
+  hiddenDelete,
 }) => {
   const {
     fileIndexFK,
@@ -124,15 +115,9 @@ const Thumbnail = ({
     remarks,
   } = attachment
 
-  const [
-    imgSrc,
-    setImgSrc,
-  ] = useState(dummyThumbnail)
+  const [imgSrc, setImgSrc] = useState(dummyThumbnail)
 
-  const [
-    loadingThumbnail,
-    setLoadingThumbnail,
-  ] = useState(true)
+  const [loadingThumbnail, setLoadingThumbnail] = useState(true)
 
   const doFetch = async () => {
     try {
@@ -168,9 +153,7 @@ const Thumbnail = ({
     doFetch()
   }
 
-  useEffect(getThumbnail, [
-    attachment.id,
-  ])
+  useEffect(getThumbnail, [attachment.id])
 
   const handleConfirmDelete = () => {
     onConfirmDelete(fileIndexFK, id)
@@ -211,25 +194,20 @@ const Thumbnail = ({
       <div className={simpleThumbnailClass}>
         <LoadingWrapper loading={loadingThumbnail}>
           <React.Fragment>
-            <Tooltip title={fileName}>
+            <Tooltip title={`Click to preview ${fileName}`}>
               <div
                 className={classes.imageContainer}
                 onClick={handleAttachmentClicked}
               >
                 <img
                   src={imgSrc}
-                  alt='test'
+                  alt={fileName || ''}
                   width={size.width}
                   height={size.height}
                 />
               </div>
             </Tooltip>
             <div className={classes.simpleButtonGroup}>
-              {/* <Tooltip title='Change'>
-                <Button justIcon color='primary' size='sm'>
-                  <Edit />
-                </Button>
-              </Tooltip> */}
               <Tooltip title='Delete'>
                 <DeleteWithPopover
                   disabled={isReadOnly}
@@ -256,7 +234,7 @@ const Thumbnail = ({
             </Tooltip>
           </GridItem>
           <GridItem md={3}>
-            {!isReadOnly && (
+            {!isReadOnly && !hiddenDelete && (
               <DeleteWithPopover
                 disabled={isReadOnly}
                 onConfirmDelete={handleConfirmDelete}
@@ -282,7 +260,7 @@ const Thumbnail = ({
                 {!isReadOnly ? (
                   <FastField
                     name={`${fieldName}[${indexInAllAttachments}].remarks`}
-                    render={(args) => (
+                    render={args => (
                       <TextField {...args} size='sm' label='Remarks' />
                     )}
                   />

@@ -1,11 +1,14 @@
 import React, { PureComponent } from 'react'
 import { FieldArray, withFormik } from 'formik'
 import { connect } from 'dva'
+import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
-// import model from './models'
-import VitalSignCard from './VitalSignCard'
+import BasicExaminations from './BasicExaminations'
 import { Alert } from 'antd'
-// window.g_app.replaceModel(model)
+import { AuthorizedContext } from '@/components'
+import Authorized from '@/utils/Authorized'
+import { calculateAgeType } from '@/utils/dateUtils'
+import { AGETYPE } from '@/utils/constants'
 
 const styles = theme => ({
   alertStyle: {
@@ -17,120 +20,149 @@ const styles = theme => ({
     paddingBottom: 3,
     lineHeight: '25px',
     fontSize: '0.85rem',
-  }
+  },
 })
 
-@connect(({ patientVitalSign }) => ({
+@connect(({ patientVitalSign, patient, visitRegistration }) => ({
   patientVitalSign,
+  patientInfo: patient.entity || {},
+  visitRegistration,
 }))
 class index extends PureComponent {
   state = {
     showWarningMessage: false,
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (
-      !this.props.patientVitalSign.shouldAddNew &&
-      nextProps.patientVitalSign.shouldAddNew
-    ) {
-      this.addPatientVitalSign()
-      this.props.dispatch({
-        type: 'patientVitalSign/updateState',
-        payload: {
-          shouldAddNew: false,
-        },
-      })
-    }
-  }
-
-  addPatientVitalSign = () => {
-    this.arrayHelpers.push({
-      temperatureC: undefined,
-      bpSysMMHG: undefined,
-      bpDiaMMHG: undefined,
-      pulseRateBPM: undefined,
-      weightKG: undefined,
-      heightCM: undefined,
-      bmi: undefined,
-    })
-
-    this.updateCORVitalSign([...(this.arrayHelpers.form.values.corPatientNoteVitalSign || []),
-    {
-      temperatureC: undefined,
-      bpSysMMHG: undefined,
-      bpDiaMMHG: undefined,
-      pulseRateBPM: undefined,
-      weightKG: undefined,
-      heightCM: undefined,
-      bmi: undefined,
-    }])
-  }
-
-  handleCalculateBMI = i => {
+  handleCalculateBMI = () => {
+    const { patientInfo = {}, visitRegistration } = this.props
+    const { entity = {} } = visitRegistration
+    const { visit = {} } = entity
     const { form } = this.arrayHelpers
-    const { heightCM, weightKG } = form.values.corPatientNoteVitalSign[i]
+    const { heightCM, weightKG } = form.values.corPatientNoteVitalSign[0]
     const { setFieldValue, setFieldTouched } = form
     if (heightCM && weightKG) {
-      const heightM = heightCM / 100
-      const bmi = weightKG / heightM ** 2
-      const bmiInTwoDecimal = Math.round(bmi * 100) / 100
-      setFieldValue(`corPatientNoteVitalSign[${i}].bmi`, bmiInTwoDecimal)
-      setFieldTouched(`corPatientNoteVitalSign[${i}].bmi`, true)
+      const getAgeType = calculateAgeType(patientInfo.dob, visit.visitDate)
+      if (getAgeType === AGETYPE.ADULT) {
+        const heightM = heightCM / 100
+        const bmi = weightKG / heightM ** 2
+        setFieldValue('corPatientNoteVitalSign[0].bmi', _.round(bmi, 1))
+      } else if (getAgeType === AGETYPE.YOUTH) {
+        const rohrer = (weightKG / heightCM ** 3) * 10 ** 7
+        setFieldValue('corPatientNoteVitalSign[0].rohrer', _.round(rohrer, 1))
+      } else if (getAgeType === AGETYPE.CHILD) {
+        const kaup = (weightKG / heightCM ** 2) * 10 ** 2
+        setFieldValue('corPatientNoteVitalSign[0].kaup', _.round(kaup, 1))
+      }
+    } else {
+      setFieldValue('corPatientNoteVitalSign[0].bmi', undefined)
+      setFieldValue('corPatientNoteVitalSign[0].rohrer', undefined)
+      setFieldValue('corPatientNoteVitalSign[0].kaup', undefined)
     }
+    setFieldTouched(`corPatientNoteVitalSign[0].bmi`, true)
   }
 
-  updateCORVitalSign = (vitalSign) => {
+  updateCORVitalSign = vitalSign => {
     const { dispatch } = this.props
     dispatch({
       type: 'orders/updateState',
       payload: {
-        corVitalSign: vitalSign
-      }
+        corVitalSign: vitalSign,
+      },
     })
   }
+
+  getVitalSignAccessRight = () => {
+    const { isEnableEditOrder = true } = this.props
+    let right = Authorized.check('queue.consultation.widgets.vitalsign') || {
+      rights: 'hidden',
+    }
+    if (right.rights === 'enable' && !isEnableEditOrder) {
+      right = { rights: 'disable' }
+    }
+    return right
+  }
+
+  calculateStandardWeight = () => {
+    const { form } = this.arrayHelpers
+    const { heightCM } = form.values.corPatientNoteVitalSign[0]
+    const { setFieldValue, setFieldTouched } = form
+    if (heightCM) {
+      const heightM = heightCM / 100
+      const standardWeight = heightM ** 2 * 22
+      setFieldValue(
+        `corPatientNoteVitalSign[0].standardWeight`,
+        _.round(standardWeight, 1),
+      )
+    } else {
+      setFieldValue(`corPatientNoteVitalSign[0].standardWeight`, undefined)
+    }
+  }
+
+  calculateBodyFatMass = () => {
+    const { form } = this.arrayHelpers
+    const {
+      weightKG,
+      bodyFatPercentage,
+    } = form.values.corPatientNoteVitalSign[0]
+    const { setFieldValue, setFieldTouched } = form
+    if (weightKG && bodyFatPercentage) {
+      const bodyFatMass = weightKG * (bodyFatPercentage / 100)
+      setFieldValue(
+        `corPatientNoteVitalSign[0].bodyFatMass`,
+        _.round(bodyFatMass, 1),
+      )
+    } else {
+      setFieldValue(`corPatientNoteVitalSign[0].bodyFatMass`, undefined)
+    }
+  }
+
   render() {
     const { theme, values, classes } = this.props
     return (
       <div>
-        <FieldArray
-          name='corPatientNoteVitalSign'
-          render={arrayHelpers => {
-            this.arrayHelpers = arrayHelpers
-            return (arrayHelpers.form.values.corPatientNoteVitalSign || []).map(
-              (v, i) => {
-                if (v.isDeleted === true) return null
+        <AuthorizedContext.Provider value={this.getVitalSignAccessRight()}>
+          <FieldArray
+            name='corPatientNoteVitalSign'
+            render={arrayHelpers => {
+              this.arrayHelpers = arrayHelpers
+              return (
+                arrayHelpers.form.values.corPatientNoteVitalSign || []
+              ).map((v, i) => {
                 return (
                   <div key={i}>
-                    <VitalSignCard
+                    <BasicExaminations
                       {...this.props}
-                      index={i}
                       arrayHelpers={arrayHelpers}
                       handleCalculateBMI={this.handleCalculateBMI}
-                      handelDelete={() => {
-                        this.updateCORVitalSign([...(this.arrayHelpers.form.values.corPatientNoteVitalSign || [])])
+                      calculateStandardWeight={this.calculateStandardWeight}
+                      calculateBodyFatMass={this.calculateBodyFatMass}
+                      weightOnChange={() => {
+                        this.updateCORVitalSign([
+                          ...(this.arrayHelpers.form.values
+                            .corPatientNoteVitalSign || []),
+                        ])
+                        this.setState({ showWarningMessage: true })
+                        setTimeout(() => {
+                          this.setState({ showWarningMessage: false })
+                        }, 3000)
                       }}
-                      weightOnChange={
-                        () => {
-                          this.updateCORVitalSign([...(this.arrayHelpers.form.values.corPatientNoteVitalSign || [])])
-                          this.setState({ showWarningMessage: true })
-                          setTimeout(() => {
-                            this.setState({ showWarningMessage: false })
-                          }, 3000);
-                        }
-                      }
+                      fieldName='corPatientNoteVitalSign'
                     />
                   </div>
                 )
-              },
-            )
-          }}
-        />
+              })
+            }}
+          />
+        </AuthorizedContext.Provider>
+
         <div>
-          {this.state.showWarningMessage &&
-            <Alert message={`Weight changes will only take effect on new medication's instruction setting.`}
+          {this.state.showWarningMessage && (
+            <Alert
+              message={`Weight changes will only take effect on new medication's instruction setting.`}
               banner
-              className={classes.alertStyle} />
-          }
+              className={classes.alertStyle}
+            />
+          )}
         </div>
       </div>
     )

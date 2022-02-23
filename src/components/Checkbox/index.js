@@ -4,6 +4,7 @@ import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import withStyles from '@material-ui/core/styles/withStyles'
 import CustomInput from 'mui-pro-components/CustomInput'
+import { Tooltip } from '@/components'
 import {
   FormLabel,
   Checkbox as MUICheckbox,
@@ -25,7 +26,7 @@ class Checkbox extends React.Component {
     checked: false,
   }
 
-  static getDerivedStateFromProps (nextProps, preState) {
+  static getDerivedStateFromProps(nextProps, preState) {
     const { checked, field } = nextProps
     if (checked !== undefined && preState.checked !== checked) {
       return {
@@ -59,6 +60,7 @@ class Checkbox extends React.Component {
       onChange,
       notCentered = false,
       disabled,
+      tooltip,
       ...resetProps
     } = this.props
     const opts = {
@@ -94,43 +96,45 @@ class Checkbox extends React.Component {
         style={{ width: '100%', ...controlStyle }}
         {...props}
       >
-        <FormControlLabel
-          style={notCentered ? style : null}
-          classes={{
-            root: classes.root,
-          }}
-          control={
-            isSwitch ? (
-              <Switch
-                // classes={{
-                //   checked: classes.checked,
-                //   switchBase: classes.switchBase,
-                //   root: classes.switchRoot,
-                // }}
-                {...opts}
-              />
-            ) : (
-              <MUICheckbox
-                checked={this.state.checked}
-                // classes={{
-                //   checked: classes.checked,
-                //   root: classes.checkRoot,
-                // }}
-                {...opts}
-              />
-            )
-          }
-          // classes={{
-          //   root: classes.labelRoot,
-          // }}
-          labelPlacement={labelPlacement}
-          label={label}
-        />
+        <Tooltip title={tooltip}>
+          <FormControlLabel
+            style={notCentered ? style : null}
+            classes={{
+              root: classes.root,
+            }}
+            control={
+              isSwitch ? (
+                <Switch
+                  // classes={{
+                  //   checked: classes.checked,
+                  //   switchBase: classes.switchBase,
+                  //   root: classes.switchRoot,
+                  // }}
+                  {...opts}
+                />
+              ) : (
+                <MUICheckbox
+                  checked={this.state.checked}
+                  // classes={{
+                  //   checked: classes.checked,
+                  //   root: classes.checkRoot,
+                  // }}
+                  {...opts}
+                />
+              )
+            }
+            // classes={{
+            //   root: classes.labelRoot,
+            // }}
+            labelPlacement={labelPlacement}
+            label={label}
+          />
+        </Tooltip>
       </div>
     )
   }
 
-  render () {
+  render() {
     const {
       label,
       inputLabel,

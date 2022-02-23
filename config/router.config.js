@@ -12,6 +12,11 @@ const _routes = [
         hideInMenu: true,
       },
       {
+        path: '/user/login/clinic',
+        component: './NewLogin',
+        hideInMenu: true,
+      },
+      {
         path: '/user/forgotpassword',
         component: './ForgotPassword',
         hideInMenu: true,
@@ -53,7 +58,7 @@ const _routes = [
       { path: '/reception', redirect: '/reception/queue' },
       {
         path: '/reception',
-        icon: 'icon-medicinebox-fill',
+        icon: 'icon-solution',
         name: 'reception',
         moduleName: 'Reception',
         authority: ['reception'],
@@ -132,6 +137,7 @@ const _routes = [
         name: 'radiology',
         moduleName: 'Radiology',
         authority: ['radiology'],
+        clinicSetting: ['isEnableRadiologyModule'],
         specialist: ['GP', 'Dental'],
         routes: [
           {
@@ -140,7 +146,7 @@ const _routes = [
             component: './Radiology/Worklist',
             mini: 'RW',
             exact: true,
-            //authority: ['reception/queue'], TODO:: to replace with actual permission
+            authority: ['radiology/worklist'],
           },
           {
             path: '/radiology/history',
@@ -153,8 +159,79 @@ const _routes = [
         ],
       },
       {
+        path: '/lab',
+        icon: 'icon-lab',
+        name: 'lab',
+        moduleName: 'Lab',
+        authority: ['lab'],
+        clinicSetting: ['isEnableLabModule'],
+        specialist: ['GP'],
+        routes: [
+          {
+            path: '/lab/worklist',
+            name: 'worklist',
+            component: './Lab/Worklist',
+            mini: 'LW',
+            exact: true,
+            //authority: ['lab/worklist'],
+          },
+          {
+            path: '/lab/specimenCollection',
+            name: 'specimenCollection',
+            component: './Lab/SpecimenCollection',
+            mini: 'PS',
+            exact: true,
+            //authority: ['lab/worklist'],
+          },
+          {
+            path: '/lab/history',
+            name: 'history',
+            component: './Lab/History',
+            mini: 'LH',
+            exact: true,
+            //authority: ['lab/worklisthistory'],
+          },
+        ],
+      },
+      {
+        path: '/medicalcheckup',
+        icon: 'icon-file-text-fill',
+        name: 'medicalcheckup',
+        moduleName: 'MedicalCheckup',
+        authority: ['medicalcheckup'],
+        clinicSetting: ['isEnableMedicalCheckupModule'],
+        specialist: ['GP', 'Dental'],
+        routes: [
+          {
+            path: '/medicalcheckup/worklist',
+            name: 'worklist',
+            component: './MedicalCheckup/Worklist',
+            mini: 'MC',
+            exact: true,
+            authority: ['medicalcheckup/worklist'],
+          },
+          {
+            path: '/medicalcheckup/history',
+            name: 'history',
+            component: './MedicalCheckup/History',
+            mini: 'MC',
+            exact: true,
+            authority: ['medicalcheckup/history'],
+          },
+          {
+            path: '/medicalcheckup/worklist/reportingdetails',
+            name: 'worklist.reportingdetails',
+            observe: 'ReportingDetails',
+            hideInMenu: true,
+            exact: true,
+            component: './MedicalCheckup/Worklist/components/ReportingDetails',
+            authority: ['medicalcheckup/worklist'],
+          },
+        ],
+      },
+      {
         path: '/pharmacy',
-        icon: 'icon-plus-square',
+        icon: 'icon-medicinebox-fill',
         name: 'pharmacy',
         moduleName: 'Pharmacy',
         authority: ['pharmacy'],
@@ -360,6 +437,19 @@ const _routes = [
           //   component: './Inventory/PurchaseDelivery/Detail',
           // },
           {
+            path: '/inventory/purchaserequest',
+            name: 'purchaserequest',
+            component: './Inventory/PurchaseRequest',
+            authority: ['inventory/purchasingrequest'],
+          },
+          {
+            path: '/inventory/purchaserequest/details',
+            name: 'purchaserequest.detail',
+            hideInMenu: true,
+            component: './Inventory/PurchaseRequest/Details',
+            authority: ['inventory/purchasingrequest'],
+          },
+          {
             path: '/inventory/pr',
             name: 'pd',
             component: './Inventory/PurchaseReceive',
@@ -528,6 +618,20 @@ const _routes = [
             name: 'copayer',
             mini: 'CP',
             component: './Setting/Company',
+            authority: ['finance/copayer'],
+          },
+          {
+            path: '/finance/copayer/newcopayer',
+            name: 'copayer/newcopayer',
+            hideInMenu: true,
+            component: './Setting/Company/CopayerDetails',
+            authority: ['finance/copayer'],
+          },
+          {
+            path: '/finance/copayer/editcopayer',
+            name: 'copayer/editcopayer',
+            hideInMenu: true,
+            component: './Setting/Company/CopayerDetails',
             authority: ['finance/copayer'],
           },
         ],
@@ -744,6 +848,24 @@ const _routes = [
             component: './Report/expiringstockreport',
             authority: ['report.inventory.expiringstockreport'],
           },
+          {
+            path: '/report/radiologystatisticreport',
+            name: 'radiologystatisticreport',
+            component: './Report/RadiologyStatisticReport',
+            authority: ['report.finance.radiologystatisticreport'],
+          },
+          {
+            path: '/report/dispensaryreport',
+            name: 'partialdispensereport',
+            component: './Report/PartialDispenseReport',
+            authority: ['report.inventory.partialdispensereport'],
+          },
+          {
+            path: '/report/preorderlistingreport',
+            name: 'preorderlistingreport',
+            component: './Report/PreOrderListingReport',
+            authority: ['report.finance.preorderlistingreport'],
+          },
         ],
       },
       // Report
@@ -808,14 +930,14 @@ const _routes = [
       // Claim Submission
       //
       // Forms
-      {
-        path: '/forms',
-        icon: 'icon-pic-right',
-        name: 'forms',
-        moduleName: 'Forms',
-        component: './FormListing',
-        authority: ['forms'],
-      },
+      // {
+      //   path: '/forms',
+      //   icon: 'icon-pic-right',
+      //   name: 'forms',
+      //   moduleName: 'Forms',
+      //   component: './FormListing',
+      //   authority: ['forms'],
+      // },
       // Forms
       //
       // Settings
@@ -1109,6 +1231,12 @@ const _routes = [
             authority: ['settings.templates.visitordertemplate'],
           },
           {
+            path: '/setting/medicinetrivia',
+            name: 'medicinetrivia',
+            component: './Setting/medicineTrivia',
+            authority: ['settings.clinicsetting.medicinetrivia'],
+          },
+          {
             path: '/setting/refractiontesttype',
             name: 'refractiontesttype',
             component: './Setting/RefractionTestType',
@@ -1179,6 +1307,30 @@ const _routes = [
             name: 'administrationroute',
             component: './Setting/AdministrationRoute',
             authority: ['settings.clinicsetting.administrationroute'],
+          },
+          {
+            path: '/setting/resource',
+            name: 'resource',
+            component: './Setting/Resource',
+            authority: ['settings.clinicsetting.resource'],
+          },
+          {
+            path: '/setting/individualcomment',
+            name: 'individualcomment',
+            component: './Setting/IndividualComment',
+            // authority: ['settings.clinicsetting.individualcomment'],
+          },
+          {
+            path: '/setting/summarycomment',
+            name: 'summarycomment',
+            component: './Setting/SummaryComment',
+            // authority: ['settings.clinicsetting.individualcomment'],
+          },
+          {
+            path: '/setting/creditfacility',
+            name: 'creditfacility',
+            component: './Setting/creditfacility',
+            authority: ['settings.clinicsetting.creditfacility'],
           },
         ],
       },

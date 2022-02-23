@@ -1,7 +1,7 @@
 import React from 'react'
 // formik
 import { FastField, Field } from 'formik'
-import { status, costPriceTypes } from '@/utils/codes'
+import { status } from '@/utils/codes'
 // common components
 import {
   Button,
@@ -80,21 +80,6 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
               name='IsActive'
               render={(args) => {
                 return <Select label='Status' {...args} options={status} />
-              }}
-            />
-          </GridItem>
-          <GridItem md={3}>
-            <FastField
-              name='costPriceType'
-              render={(args) => {
-                return (
-                  <Select
-                    label='Cost Price Type'
-                    {...args}
-                    options={costPriceTypes}
-                    allowClear={false}
-                  />
-                )
               }}
             />
           </GridItem>

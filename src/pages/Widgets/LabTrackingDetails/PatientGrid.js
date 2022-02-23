@@ -13,6 +13,7 @@ class PatientGrid extends PureComponent {
         title: 'Doctor',
       },
       { name: 'serviceName', title: 'Service Name' },
+      { name: 'visitPurposeFK', title: 'Visit Type' },
       { name: 'caseTypeDisplayValue', title: 'Case Type' },
       { name: 'caseDescriptionDisplayValue', title: 'Case Description' },
       { name: 'labTrackingStatusDisplayValue', title: 'Status' },
@@ -23,10 +24,23 @@ class PatientGrid extends PureComponent {
       { columnName: 'visitDate', type: 'date' },
       {
         columnName: 'doctorProfileFKNavigation.ClinicianProfile.Name',
-        render: (row) => {
+        render: row => {
           return (
             <Tooltip title={row.doctorName}>
               <span>{row.doctorName}</span>
+            </Tooltip>
+          )
+        },
+      },
+      {
+        columnName: 'visitPurposeFK',
+        width: 80,
+        render: row => {
+          const { visitPurpose } = this.props
+          const pupose = visitPurpose.find(x => x.id === row.visitPurposeFK)
+          return (
+            <Tooltip title={pupose.displayValue}>
+              <span>{pupose.code}</span>
             </Tooltip>
           )
         },
@@ -36,7 +50,7 @@ class PatientGrid extends PureComponent {
         sortingEnabled: false,
         align: 'center',
         width: 100,
-        render: (row) => {
+        render: row => {
           const { clinicSettings, handlePrintClick, readOnly } = this.props
           return (
             <React.Fragment>
@@ -76,12 +90,12 @@ class PatientGrid extends PureComponent {
       type: 'labTrackingDetails/updateState',
       payload: {
         showModal: true,
-        entity: list.find((o) => o.id === row.id),
+        entity: list.find(o => o.id === row.id),
       },
     })
   }
 
-  render () {
+  render() {
     const { height } = this.props
     return (
       <CommonTableGrid

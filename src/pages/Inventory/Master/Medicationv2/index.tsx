@@ -188,49 +188,6 @@ const MedicationIndex = ({ dispatch }) => {
           >
             Add New
           </Button>,
-
-          <Authorized authority='inventorymaster.newinventoryitem'>
-            <input
-              style={{ display: 'none' }}
-              type='file'
-              accept={allowedFiles}
-              id='importMedicationFile'
-              ref={inputEl}
-              multiple={false}
-              onChange={onFileChange}
-              onClick={clearValue}
-            />
-
-            <Button
-              type='primary'
-              icon={<Icon type='attachment' />}
-              onClick={() => {
-                // console.log(actionRef?.current?.getRecords())
-                inputEl.current.click()
-              }}
-            >
-              Import
-            </Button>
-          </Authorized>,
-          <Button
-            type='primary'
-            icon={<Icon type='file-excel' />}
-            loading={exporting}
-            onClick={async () => {
-              setExporting(true)
-              setLoadingText('Exporting...')
-              dispatch({
-                type: 'medication/export',
-              }).then(result => {
-                if (result) {
-                  downloadFile(result, 'Medication.xlsx')
-                }
-                setExporting(false)
-              })
-            }}
-          >
-            Export
-          </Button>,
         ]
       }}
       onRowDblClick={goDetailPage}

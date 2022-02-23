@@ -146,10 +146,11 @@ export const PurchaseReceiveGridCol = [
   { name: 'purchaseOrderDate', title: 'PO Date' },
   { name: 'supplier', title: 'Supplier' },
   { name: 'exceptedDeliveryDate', title: 'Expected Delivery Date' },
+  { name: 'purchaseRequestNo', title: 'PR No' },
   { name: 'purchaseOrderStatus', title: 'PO Status' },
   { name: 'totalAftGst', title: 'Total' },
-  { name: 'outstanding', title: 'Outstanding' },
-  { name: 'invoiceStatus', title: 'Inv. Status' },
+  // { name: 'outstanding', title: 'Outstanding' },
+  // { name: 'invoiceStatus', title: 'Inv. Status' },
   { name: 'remark', title: 'Remarks' },
   { name: 'action', title: 'Action' },
 ]
@@ -157,10 +158,10 @@ export const PurchaseReceiveGridCol = [
 export const ContextMenuOptions = row => {
   const createAuthority = Authorized.check(
     'purchasingandreceiving.newpurchasingandreceiving',
-  )
+  ) || { rights: 'hidden' }
   const viewEditAuthority = Authorized.check(
     'purchasingandreceiving.purchasingandreceivingdetails',
-  )
+  ) || { rights: 'hidden' }
 
   let menuOptions = [
     {
@@ -170,14 +171,14 @@ export const ContextMenuOptions = row => {
       disabled: viewEditAuthority.rights !== 'enable',
       width: 130,
     },
-    {
-      id: 1,
-      label: 'Duplicate PO',
-      Icon: Duplicate,
-      disabled:
-        isDuplicatePOAllowed(row.purchaseOrderStatus) ||
-        createAuthority.rights !== 'enable',
-    },
+    // {
+    //   id: 1,
+    //   label: 'Duplicate PO',
+    //   Icon: Duplicate,
+    //   disabled:
+    //     isDuplicatePOAllowed(row.purchaseOrderStatus) ||
+    //     createAuthority.rights !== 'enable',
+    // },
     { isDivider: true },
     {
       id: 2,
@@ -211,169 +212,7 @@ export const amountProps = {
   rightAlign: true,
   normalText: true,
 }
-
-export const fakeQueryDoneData = {
-  purchaseOrder: {
-    poNo: 'PO/000999',
-    poDate: moment(),
-    // status: 'Draft',
-    status: 'Finalized',
-    shippingAddress:
-      '24 Raffles Place, Clifford Centre, #07-02A, Singapore 048621',
-    isGSTEnabled: true,
-    isGstInclusive: true,
-    invoiceGST: 10.7,
-    invoiceTotal: 163.6,
-  },
-  rows: [],
-  purchaseOrderMedicationItem: [
-    {
-      id: 1,
-      inventoryMedicationFK: 35,
-      uom: 35,
-      orderQty: 1,
-      bonusQty: 0,
-      totalQty: 1,
-      totalAfterAdjustments: 0.0,
-      totalAfterGst: 0.0,
-      quantityReceived: 0,
-      totalPrice: 25.0,
-      unitPrice: 25.0,
-      isDeleted: false,
-    },
-  ],
-  purchaseOrderVaccinationItem: [
-    {
-      id: 1,
-      inventoryVaccinationFK: 10,
-      uom: 10,
-      orderQty: 1,
-      bonusQty: 0,
-      totalQty: 1,
-      totalAfterAdjustments: 0.0,
-      totalAfterGst: 0.0,
-      quantityReceived: 0,
-      totalPrice: 40.0,
-      unitPrice: 40.0,
-      isDeleted: false,
-    },
-  ],
-  purchaseOrderConsumableItem: [
-    {
-      id: 1,
-      inventoryConsumableFK: 8,
-      uom: 8,
-      orderQty: 1,
-      bonusQty: 0,
-      totalQty: 1,
-      totalAfterAdjustments: 0.0,
-      totalAfterGst: 0.0,
-      quantityReceived: 0,
-      totalPrice: 48.0,
-      unitPrice: 48.0,
-      isDeleted: false,
-    },
-    {
-      id: 1,
-      inventoryConsumableFK: 10,
-      uom: 10,
-      orderQty: 1,
-      bonusQty: 0,
-      totalQty: 1,
-      totalAfterAdjustments: 0.0, // tempSubTotal || totalPrice - itemLevelGST
-      totalAfterGst: 0.0, // tempSubTotal + itemLevelGST
-      quantityReceived: 1,
-      totalPrice: 50.0,
-      unitPrice: 50.0,
-      isDeleted: false,
-    },
-  ],
-  purchaseOrderAdjustment: [
-    {
-      id: 1,
-      adjRemark: 'Adj 001',
-      adjType: 'ExactAmount',
-      adjValue: -24,
-      sequence: 1,
-      adjDisplayAmount: -24,
-      isDeleted: false,
-    },
-    {
-      id: 2,
-      adjRemark: 'Adj 002',
-      adjType: 'Percentage',
-      adjValue: 10,
-      sequence: 2,
-      adjDisplayAmount: 13.9,
-      isDeleted: false,
-    },
-  ],
-}
-
-export const fakeDOQueryDoneData = [
-  {
-    id: 1,
-    doNo: 'DO/000001',
-    doDate: moment(),
-    total: 20,
-    outstanding: 15,
-    remarks: 'Will provide on 31 Jun 2018',
-  },
-  {
-    id: 2,
-    doNo: 'DO/000002',
-    doDate: moment(),
-    total: 50,
-    outstanding: 0,
-    remarks: 'Completed',
-  },
-  {
-    id: 3,
-    doNo: 'DO/000003',
-    doDate: moment(),
-    total: 20,
-    outstanding: 15,
-    remarks: 'Need Another Orders',
-  },
-  {
-    id: 4,
-    doNo: 'DO/000004',
-    doDate: moment(),
-    total: 20,
-    outstanding: 15,
-    remarks: 'Need Another Orders',
-  },
-  {
-    id: 5,
-    doNo: 'DO/000004',
-    doDate: moment(),
-    total: 20,
-    outstanding: 15,
-    remarks: 'Need Another Orders',
-  },
-]
-
-export const fakePodoPaymentData = [
-  {
-    id: 1,
-    paymentNo: 'P/000001',
-    paymentDate: moment(),
-    paymentMode: 'Cash',
-    reference: 'REF/000001',
-    paymentAmount: 119.99,
-    remarks: 'Paid',
-  },
-  {
-    id: 2,
-    paymentNo: 'P/000002',
-    paymentDate: moment(),
-    paymentMode: 'Cash',
-    reference: 'REF/000002',
-    paymentAmount: 129.99,
-    remarks: 'Paid',
-  },
-]
-
+ 
 export const getAccessRight = (
   authorityUrl = 'purchasingandreceiving.purchasingandreceivingdetails',
 ) => {
@@ -384,6 +223,6 @@ export const getAccessRight = (
   if (!accessRight || accessRight.rights === 'hidden') return allowAccess
   if (accessRight.rights === 'readwrite' || accessRight.rights === 'enable')
     allowAccess = true
-
+    
   return allowAccess
 }

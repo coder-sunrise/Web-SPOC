@@ -94,6 +94,7 @@ export const LAB_TRACKING_STATUS = {
 export const COPAYER_TYPE = {
   CORPORATE: 1,
   GOVERNMENT: 2,
+  INSURANCE: 3,
 }
 
 export const INVOICE_PAYER_TYPE = {
@@ -269,6 +270,10 @@ export const REPORT_ID = {
   REFERRAL_SOURCE_LABEL_80MM_45MM: 73,
   REFERRAL_SOURCE_LABEL_89MM_36MM: 74,
   REFERRAL_SOURCE_LABEL_76MM_38MM: 75,
+  PRESCRIPTION: 84,
+  PATIENT_INFO_LEAFLET: 87,
+  DRUG_LABEL_80MM_45MM_V2: 88,
+  DRUG_SUMMARY_LABEL_80MM_45MM: 90,
 }
 
 export const INVOICE_STATUS = {
@@ -365,14 +370,6 @@ export const ADD_ON_FEATURE = {
   MIMS: 2,
 }
 
-export const RadiologyWorkitemStatus = {
-  1: 'New',
-  2: 'In Progress',
-  3: 'Modality Completed',
-  4: 'Completed',
-  5: 'Cancelled',
-}
-
 export const PharmacyWorkitemStatus = {
   1: 'New',
   2: 'Prepared',
@@ -441,6 +438,7 @@ export const SCRIBBLE_NOTE_TYPE = {
   CHIEFCOMPLAINTS: 2,
   PLAN: 6,
   HISTORY: 3,
+  RADIOLOGY: 9,
 }
 
 export const SMS_STATUS = {
@@ -482,6 +480,8 @@ export const CANNED_TEXT_TYPE = {
   MEDICATIONREMARKS: 9,
   APPOINTMENTREMARKS: 10,
   SERVICEINSTRUCTION: 11,
+  LABINSTRUCTION: 12,
+  RADIOGRAPHERCOMMENT: 13,
 }
 
 export const CANNED_TEXT_TYPE_BASE_TEXT = [
@@ -490,6 +490,8 @@ export const CANNED_TEXT_TYPE_BASE_TEXT = [
   CANNED_TEXT_TYPE.MEDICATIONREMARKS,
   CANNED_TEXT_TYPE.APPOINTMENTREMARKS,
   CANNED_TEXT_TYPE.SERVICEINSTRUCTION,
+  CANNED_TEXT_TYPE.LABINSTRUCTION,
+  CANNED_TEXT_TYPE.RADIOGRAPHERCOMMENT,
 ]
 
 export const DENTAL_CANNED_TEXT_TYPE_FIELD = {
@@ -511,6 +513,8 @@ export const FILE_CATEGORY = {
   VISITREG: 1,
   CONSULTATION: 2,
   PATIENT: 3,
+  QUEUEDISPLAY: 4,
+  COPAYER: 5,
 }
 
 export const PURCHASE_ORDER_STATUS = {
@@ -556,6 +560,12 @@ export const VALUE_KEYS = {
 
 export const SCHEME_TYPE = {
   CORPORATE: 15,
+  INSURANCE: 16,
+}
+
+export const SCHEME_CATEGORY = {
+  CORPORATE: 5,
+  INSURANCE: 11,
 }
 
 export const INVOICE_VIEW_MODE = {
@@ -632,6 +642,11 @@ export const RADIOLOGY_CATEGORY = [
   SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE,
 ]
 
+export const LAB_CATEGORY = [
+  SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER,
+  SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE,
+]
+
 export const DOSAGE_RULE_OPERATOR = {
   to: 'to',
   lessThan: 'less than',
@@ -644,6 +659,14 @@ export const DOSAGE_RULE = {
   default: 'default',
 }
 
+export const RADIOLOGY_WORKITEM_STATUS_TITLE = {
+  1: 'New',
+  2: 'In Progress',
+  3: 'Modality Completed',
+  4: 'Completed',
+  5: 'Cancelled',
+}
+
 export const RADIOLOGY_WORKITEM_STATUS = {
   NEW: 1,
   INPROGRESS: 2,
@@ -652,24 +675,35 @@ export const RADIOLOGY_WORKITEM_STATUS = {
   CANCELLED: 5,
 }
 
+export const RADIOLOGY_WORKLIST_STATUS_COLOR = {
+  1: '#009933',
+  2: '#960',
+  3: '#099',
+  4: '#366',
+  5: '#797979',
+}
+
 export const RADIOLOGY_WORKITEM_BUTTON = [
   {
     name: 'Start Examination',
     currentStatusFK: 1,
     nextStatusFK: 2,
     enableCancel: true,
+    authority: 'radiologyworklist.startexamination',
   },
   {
     name: 'Complete Modality',
     currentStatusFK: 2,
     nextStatusFK: 3,
     enableCancel: true,
+    authority: 'radiologyworklist.completemodality',
   },
   {
     name: 'Complete Reporting',
     currentStatusFK: 3,
     nextStatusFK: 4,
     enableCancel: false,
+    authority: 'radiologyworklist.completereporting',
   },
 ]
 
@@ -740,9 +774,258 @@ export const PHARMACY_ACTION = {
   VERIFY: 'Verify',
   COMPLETE: 'Complete',
   CANCEL: 'Cancel',
+  COMPLETEPARTIAL: 'CompletePartial',
 }
 
 export const CHECKLIST_CATEGORY = {
   RADIOLOGY: 1,
   DOCTORCONSULTATION: 2,
+}
+
+export const GENDER = { FEMALE: 1, MALE: 2 }
+
+export const MODALITY_STATUS = {
+  PENDING: 1,
+  PROCESSING: 2,
+  SUCCESSFUL: 3,
+  FAILED: 4,
+}
+
+export const FOLDER_TYPE = {
+  PATIENT: 'Patient',
+  COPAYER: 'CoPayer',
+}
+
+export const PRIORITY_VALUES = { NORMAL: 'Normal', URGENT: 'Urgent' }
+
+export const PRIORITY_OPTIONS = [
+  {
+    value: 'Normal',
+    name: 'Normal',
+  },
+  {
+    value: 'Urgent',
+    name: 'Urgent',
+  },
+]
+
+export const DOCUMENT_CATEGORY = {
+  CONSULTATIONDOCUMENT: 1,
+  FORM: 2,
+}
+
+export const DOCUMENT_TEMPLATE_TYPE = {
+  REFERRALLETTER: 1,
+  MEMO: 2,
+  VACCCERT: 3,
+  OTHERS: 4,
+  CONSENTFORM: 5,
+  QUESTIONNAIRE: 6,
+}
+
+export const DOCUMENTCATEGORY_DOCUMENTTYPE = [
+  {
+    documentCategoryFK: DOCUMENT_CATEGORY.CONSULTATIONDOCUMENT,
+    templateTypes: [
+      DOCUMENT_TEMPLATE_TYPE.REFERRALLETTER,
+      DOCUMENT_TEMPLATE_TYPE.MEMO,
+      DOCUMENT_TEMPLATE_TYPE.VACCCERT,
+      DOCUMENT_TEMPLATE_TYPE.OTHERS,
+    ],
+  },
+  {
+    documentCategoryFK: DOCUMENT_CATEGORY.FORM,
+    templateTypes: [
+      DOCUMENT_TEMPLATE_TYPE.CONSENTFORM,
+      DOCUMENT_TEMPLATE_TYPE.QUESTIONNAIRE,
+      DOCUMENT_TEMPLATE_TYPE.OTHERS,
+    ],
+  },
+]
+
+export const CALENDAR_VIEWS = {
+  DAY: 'Day',
+  WEEK: 'Week',
+  MONTH: 'Month',
+}
+
+export const CALENDAR_RESOURCE = {
+  DOCTOR: 'Doctor',
+  RESOURCE: 'Resource',
+}
+
+export const ORDER_TYPES = {
+  MEDICATION: '1',
+  VACCINATION: '2',
+  SERVICE: '3',
+  CONSUMABLE: '4',
+  OPEN_PRESCRIPTION: '5',
+  ORDER_SET: '6',
+  TREATMENT: '7',
+  PACKAGE: '8',
+  RADIOLOGY: '10',
+  LAB: '11',
+}
+
+export const LAB_WORKITEM_STATUS = {
+  NEW: 1,
+  SPECIMENCOLLECTED: 2,
+  INPROGRESS: 3,
+  FORRETEST: 4,
+  PENDINGFIRSTVERIFIER: 5,
+  PENDINGSECONDVERIFIER: 6,
+  COMPLETED: 7,
+}
+
+export const LAB_SPECIMEN_STATUS = {
+  NEW: 1,
+  INPROGRESS: 2,
+  FORRETEST: 3,
+  PENDINGFIRSTVERIFIER: 4,
+  PENDINGSECONDVERIFIER: 5,
+  COMPLETED: 6,
+  DISCARDED: 7,
+}
+export const LAB_SPECIMEN_ALL_COLOR = '#5a9cde'
+export const LAB_SPECIMEN_STATUS_COLORS = {
+  1: '#999900',
+  2: '#009999',
+  3: '#DA6300',
+  4: '#993333',
+  5: '#0000ff',
+  6: '#009933',
+  7: '#777777',
+}
+
+export const LAB_SPECIMEN_ALL_LABEL = 'All'
+export const LAB_SPECIMEN_STATUS_LABELS = {
+  1: 'New',
+  2: 'In Progress',
+  3: 'P. Retest',
+  4: 'P. 1st Verify',
+  5: 'P. 2nd Verify',
+  6: 'Completed',
+  7: 'Discarded',
+}
+
+export const LAB_SPECIMEN_ALL_DESCRIPTION = 'All'
+export const LAB_SPECIMEN_STATUS_DESCRIPTION = {
+  1: 'New',
+  2: 'In Progress',
+  3: 'Pending for Retest',
+  4: 'Pending First Verification',
+  5: 'Pending Second Verification',
+  6: 'Completed',
+  7: 'Discarded',
+}
+
+export const LAB_SPECIMEN_DETAILS_STEP = {
+  1: 'New',
+  2: 'In Progress',
+  3: 'P. Retest',
+  4: 'P. 1st Verify',
+  5: 'P. 2nd Verify',
+  6: 'Completed',
+  7: 'Discarded',
+}
+
+export const VISITDOCTOR_CONSULTATIONSTATUS = {
+  WAITING: 'Waiting',
+  INPROGRESS: 'In Progress',
+  PAUSED: 'Paused',
+  COMPLETED: 'Completed',
+}
+
+export const LANGUAGES = {
+  2: 'EN',
+  5: 'JP',
+}
+
+export const YESNOOPTIUONS = [
+  { value: false, label: 'No' },
+  { value: true, label: 'Yes' },
+]
+
+export const AGETYPE = {
+  CHILD: 'Child',
+  YOUTH: 'Youth',
+  ADULT: 'Adult',
+}
+
+export const INVOICE_REPORT_TYPES = {
+  SUMMARYINVOICE: 'Summary Invoice',
+  GROUPINVOICE: 'Group Invoice',
+  INDIVIDUALINVOICE: 'Individual Invoice',
+  CLAIMABLEITEMCATEGORYINVOICE: 'Claimable Item Category Invoice',
+  ITEMCATEGORYINVOICE: 'Item Category Invoice',
+  CLAIMABLEITEMINVOICE: 'Claimable Item Invoice',
+  DETAILEDINVOICE: 'Detailed Invoice',
+}
+
+export const TESTTYPES = {
+  BASICEXAMINATION: 'BasicExamination',
+  BPSYS: 'BPSys',
+  BPDIA: 'BPDIA',
+  PULSE: 'Pulse',
+  BMI: 'BMI',
+  ROHRER: 'Rohrer',
+  KAUP: 'kaup',
+  WAIST: 'Waist',
+  IOP: 'IOP',
+  AUDIOMETRY: 'Audiometry',
+  COLORVISIONTEST: 'ColorVisionTest',
+  PREGNANCY: 'Pregnancy',
+  MENSUS: 'Mensus',
+  R5MCORRECTED: 'Right5mCorrected',
+  R50CMCORRECTED: 'Right50cmCorrected',
+  L5MCORRECTED: 'Left5mCorrected',
+  L50CMCORRECTED: 'Left50cmCorrected',
+}
+
+export const WORK_ITEM_TYPES = {
+  LAB: 'Lab',
+  RADIOLOGY: 'Radiology',
+  NURSEACTUALIZE: 'NurseActualize',
+  PHARMACY: 'Pharmacy',
+}
+export const WORK_ITEM_TYPES_ENUM = {
+  LAB: 0,
+  RADIOLOGY: 1,
+  NURSEACTUALIZE: 2,
+  PHARMACY: 3,
+}
+
+export const MEDICALCHECKUP_WORKITEM_STATUS = {
+  NEW: 1,
+  INPROGRESS: 2,
+  REPORTING: 3,
+  PENDINGVERIFICATION: 4,
+  COMPLETED: 5,
+}
+
+export const MEDICALCHECKUP_WORKITEM_STATUS_ALL_COLOR = '#5a9cde'
+export const MEDICALCHECKUP_WORKITEM_STATUS_LABELS = {
+  [`${MEDICALCHECKUP_WORKITEM_STATUS.NEW}`]: 'New',
+  [`${MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS}`]: 'In Progress',
+  [`${MEDICALCHECKUP_WORKITEM_STATUS.REPORTING}`]: 'Reporting',
+  [`${MEDICALCHECKUP_WORKITEM_STATUS.PENDINGVERIFICATION}`]: 'P. Verification',
+  [`${MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED}`]: 'Completed',
+}
+export const MEDICALCHECKUP_WORKITEM_STATUS_COLORS = {
+  [`${MEDICALCHECKUP_WORKITEM_STATUS.NEW}`]: '#999900',
+  [`${MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS}`]: '#009999',
+  [`${MEDICALCHECKUP_WORKITEM_STATUS.REPORTING}`]: '#CC6633',
+  [`${MEDICALCHECKUP_WORKITEM_STATUS.PENDINGVERIFICATION}`]: '#44A2FF',
+  [`${MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED}`]: '#009933',
+}
+export const MEDICALCHECKUP_WORKITEM_STATUS_DESCRIPTION = {
+  [`${MEDICALCHECKUP_WORKITEM_STATUS.NEW}`]: 'New',
+  [`${MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS}`]: 'In Progress',
+  [`${MEDICALCHECKUP_WORKITEM_STATUS.REPORTING}`]: 'Reporting',
+  [`${MEDICALCHECKUP_WORKITEM_STATUS.PENDINGVERIFICATION}`]: 'Pending Verification',
+  [`${MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED}`]: 'Completed',
+}
+export const DISPENSE_FROM = {
+  QUEUE: 1,
+  MEDICALCHECKUP: 2,
 }

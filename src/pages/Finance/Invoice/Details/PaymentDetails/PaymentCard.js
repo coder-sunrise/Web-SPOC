@@ -55,6 +55,8 @@ const PaymentCard = ({
   readOnly,
   patientIsActive,
   hasActiveSession,
+  isEnableWriteOffinInvoice,
+  visitOrderTemplateFK,
   actions: { handleVoidClick, handlePrinterClick, ...buttonActions },
 }) => {
   let _payerName = (
@@ -95,20 +97,19 @@ const PaymentCard = ({
     <CardContainer hideHeader>
       {_payerName}
       <CardContainer hideHeader size='sm'>
-        {payments ? (
-          payments
-            .sort((a, b) => moment(a.date) - moment(b.date))
-            .map((payment) => (
-              <PaymentRow
-                {...payment}
-                handleVoidClick={handleVoidClick}
-                handlePrinterClick={handlePrinterClick}
-                readOnly={readOnly || !patientIsActive}
-              />
-            ))
-        ) : (
-          ''
-        )}
+        {payments
+          ? payments
+              .sort((a, b) => moment(a.date) - moment(b.date))
+              .map(payment => (
+                <PaymentRow
+                  {...payment}
+                  isEnableWriteOffinInvoice={isEnableWriteOffinInvoice}
+                  handleVoidClick={handleVoidClick}
+                  handlePrinterClick={handlePrinterClick}
+                  readOnly={readOnly || !patientIsActive}
+                />
+              ))
+          : ''}
       </CardContainer>
       <GridContainer alignItems='center'>
         <GridItem md={7}>
@@ -116,9 +117,11 @@ const PaymentCard = ({
             type={payerTypeFK}
             invoicePayerFK={invoicePayerFK}
             companyFK={companyFK}
+            isEnableWriteOffinInvoice={isEnableWriteOffinInvoice}
             readOnly={readOnly || !patientIsActive}
             hasActiveSession={hasActiveSession}
             handlePrinterClick={handlePrinterClick}
+            visitOrderTemplateFK={visitOrderTemplateFK}
             {...buttonActions}
           />
         </GridItem>

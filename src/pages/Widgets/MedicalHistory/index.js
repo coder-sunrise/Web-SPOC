@@ -17,23 +17,7 @@ const { Secured } = Authorized
 @connect(({ patient }) => ({
   patient,
 }))
-@withFormikExtend({
-  mapPropsToValues: ({ patient }) => {
-    // console.log(patient)
-    return {}
-  },
-})
 class MedicalHistory extends PureComponent {
-  componentDidMount() {
-    // const { dispatch } = this.props
-    // dispatch({
-    //   type: 'codetable/fetchCodes',
-    //   payload: {
-    //     code: 'ctComplication',
-    //   },
-    // })
-  }
-
   componentWillReceiveProps() {}
 
   render() {

@@ -24,6 +24,7 @@ import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
 import moment from 'moment'
 import LowStockInfo from './LowStockInfo'
 import { DoctorProfileSelect } from '@/components/_medisys'
+import { Alert } from 'antd'
 
 const getVisitDoctorUserId = props => {
   const { doctorprofile } = props.codetable
@@ -37,11 +38,12 @@ const getVisitDoctorUserId = props => {
   return visitDoctorUserId
 }
 
-@connect(({ global, codetable, user, visitRegistration }) => ({
+@connect(({ global, codetable, user, visitRegistration, patient }) => ({
   global,
   codetable,
   user,
   visitRegistration,
+  patient,
 }))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type, codetable, visitRegistration }) => {
@@ -123,6 +125,7 @@ const getVisitDoctorUserId = props => {
       packageGlobalId:
         values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
+    console.log('consumable', data)
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
@@ -132,6 +135,7 @@ const getVisitDoctorUserId = props => {
       ...orders.defaultConsumable,
       type: orders.type,
       performingUserFK: getVisitDoctorUserId(props),
+      visitPurposeFK: orders.visitPurposeFK,
     })
   },
   displayName: 'OrderPage',
@@ -157,6 +161,7 @@ class Consumable extends PureComponent {
       selectedConsumable,
       batchNo: '',
       expiryDate: '',
+      isPreOrderItemExists: false,
     }
   }
 
@@ -164,22 +169,24 @@ class Consumable extends PureComponent {
     const {
       codetable: { inventoryconsumable = [] },
     } = this.props
-    return inventoryconsumable.filter(m => m.isOnlyClinicInternalUsage).reduce((p, c) => {
-      const { code, displayValue, sellingPrice = 0, uom = {} } = c
-      const { name: uomName = '' } = uom
-      let opt = {
-        ...c,
-        combinDisplayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
-          2,
-        )} / ${uomName})`,
-      }
-      return [...p, opt]
-    }, [])
+    return inventoryconsumable
+      .filter(m => m.isOnlyClinicInternalUsage)
+      .reduce((p, c) => {
+        const { code, displayValue, sellingPrice = 0, uom = {} } = c
+        const { name: uomName = '' } = uom
+        let opt = {
+          ...c,
+          combinDisplayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
+            2,
+          )} / ${uomName})`,
+        }
+        return [...p, opt]
+      }, [])
   }
 
   changeConsumable = (v, op = {}) => {
     const { setFieldValue, values, disableEdit } = this.props
-
+    const { isPreOrderItemExists } = this.state
     setFieldValue('isDispensedByPharmacy', op.isDispensedByPharmacy)
     setFieldValue('isNurseActualizeRequired', op.isNurseActualizable)
 
@@ -217,6 +224,9 @@ class Consumable extends PureComponent {
     setFieldValue('totalPrice', unitprice * values.quantity)
     this.updateTotalPrice(unitprice * values.quantity)
     this.onExpiryDateChange()
+
+    if (values.isPreOrder) this.props.setFieldValue('isPreOrder', false)
+    if (isPreOrderItemExists) this.setState({ isPreOrderItemExists: false })
   }
 
   updateTotalPrice = v => {
@@ -254,6 +264,7 @@ class Consumable extends PureComponent {
       ...orders.defaultConsumable,
       type: orders.type,
       performingUserFK: getVisitDoctorUserId(this.props),
+      visitPurposeFK: orders.visitPurposeFK,
     })
   }
 
@@ -275,13 +286,15 @@ class Consumable extends PureComponent {
           nextProps.global.openAdjustment) ||
         nextProps.orders.shouldPushToState
       ) {
-        nextProps.dispatch({
-          type: 'orders/updateState',
-          payload: {
-            entity: nextProps.values,
-            shouldPushToState: false,
-          },
-        })
+        if (nextProps.values.uid) {
+          nextProps.dispatch({
+            type: 'orders/updateState',
+            payload: {
+              entity: nextProps.values,
+              shouldPushToState: false,
+            },
+          })
+        }
       }
 
     const { values: nextValues } = nextProps
@@ -370,6 +383,36 @@ class Consumable extends PureComponent {
     }, 300)
   }
 
+  checkIsPreOrderItemExistsInListing = isPreOrderChecked => {
+    const {
+      setFieldValue,
+      values,
+      codetable,
+      visitRegistration,
+      patient,
+      orders = {},
+    } = this.props
+    if (isPreOrderChecked) {
+      const consumablePreOrderItem = patient?.entity?.pendingPreOrderItem.filter(
+        x => x.preOrderItemType === 'Consumable',
+      )
+      if (consumablePreOrderItem) {
+        consumablePreOrderItem.filter(item => {
+          const { preOrderConsumableItem = {} } = item
+          const CheckIfPreOrderItemExists =
+            preOrderConsumableItem.inventoryConsumableFK ===
+            values.inventoryConsumableFK
+          if (CheckIfPreOrderItemExists) {
+            this.setState({ isPreOrderItemExists: true })
+            return
+          }
+        })
+      }
+    } else {
+      this.setState({ isPreOrderItemExists: false })
+    }
+  }
+
   render() {
     const {
       theme,
@@ -380,10 +423,26 @@ class Consumable extends PureComponent {
       classes,
       disableEdit,
       from,
+      orders,
     } = this.props
+
+    const { isPreOrderItemExists } = this.state
+
     const totalPriceReadonly =
       Authorized.check('queue.consultation.modifyorderitemtotalprice')
         .rights !== 'enable'
+
+    const isDisabledHasPaidPreOrder =
+      orders.entity?.actualizedPreOrderItemFK && orders.entity?.hasPaid == true
+        ? true
+        : false
+
+    const isDisabledNoPaidPreOrder = orders.entity?.actualizedPreOrderItemFK
+      ? true
+      : false
+
+    if (orders.isPreOrderItemExists === false && !values.isPreOrder)
+      this.setState({ isPreOrderItemExists: false })
 
     return (
       <Authorized
@@ -411,7 +470,7 @@ class Consumable extends PureComponent {
                         options={this.getConsumableOptions()}
                         {...args}
                         style={{ paddingRight: 20 }}
-                        disabled={values.isPackage}
+                        disabled={values.isPackage || isDisabledNoPaidPreOrder}
                       />
                       <LowStockInfo sourceType='consumable' {...this.props} />
                     </div>
@@ -485,6 +544,7 @@ class Consumable extends PureComponent {
                             this.updateTotalPrice(total)
                           }
                         }}
+                        disabled={isDisabledHasPaidPreOrder}
                         {...args}
                       />
                     )
@@ -557,7 +617,11 @@ class Consumable extends PureComponent {
                         this.updateTotalPrice(e.target.value)
                       }}
                       min={0}
-                      disabled={totalPriceReadonly || values.isPackage}
+                      disabled={
+                        totalPriceReadonly ||
+                        values.isPackage ||
+                        isDisabledHasPaidPreOrder
+                      }
                       {...args}
                     />
                   )
@@ -592,7 +656,11 @@ class Consumable extends PureComponent {
                               this.onAdjustmentConditionChange()
                             }, 1)
                           }}
-                          disabled={totalPriceReadonly || values.isPackage}
+                          disabled={
+                            totalPriceReadonly ||
+                            values.isPackage ||
+                            isDisabledHasPaidPreOrder
+                          }
                           {...args}
                         />
                       )
@@ -617,7 +685,11 @@ class Consumable extends PureComponent {
                               this.onAdjustmentConditionChange()
                             }, 1)
                           }}
-                          disabled={totalPriceReadonly || values.isPackage}
+                          disabled={
+                            totalPriceReadonly ||
+                            values.isPackage ||
+                            isDisabledHasPaidPreOrder
+                          }
                           {...args}
                         />
                       )
@@ -636,7 +708,11 @@ class Consumable extends PureComponent {
                             this.onAdjustmentConditionChange()
                           }, 1)
                         }}
-                        disabled={totalPriceReadonly || values.isPackage}
+                        disabled={
+                          totalPriceReadonly ||
+                          values.isPackage ||
+                          isDisabledHasPaidPreOrder
+                        }
                         {...args}
                       />
                     )
@@ -659,7 +735,11 @@ class Consumable extends PureComponent {
                             this.onAdjustmentConditionChange()
                           }, 1)
                         }}
-                        disabled={totalPriceReadonly || values.isPackage}
+                        disabled={
+                          totalPriceReadonly ||
+                          values.isPackage ||
+                          isDisabledHasPaidPreOrder
+                        }
                         {...args}
                       />
                     )
@@ -685,17 +765,21 @@ class Consumable extends PureComponent {
                 values.visitPurposeFK !== VISIT_TYPE.OTC && (
                   <div>
                     <div style={{ display: 'inline-block' }}>
-                      <FastField
+                      <Field
                         name='isPreOrder'
                         render={args => {
                           return (
                             <Checkbox
                               label='Pre-Order'
                               {...args}
+                              disabled={isDisabledNoPaidPreOrder}
                               onChange={e => {
                                 if (!e.target.value) {
                                   setFieldValue('isChargeToday', false)
                                 }
+                                this.checkIsPreOrderItemExistsInListing(
+                                  e.target.value,
+                                )
                               }}
                             />
                           )
@@ -711,6 +795,25 @@ class Consumable extends PureComponent {
                           }}
                         />
                       </div>
+                    )}
+                    {isPreOrderItemExists && (
+                      <Alert
+                        message={
+                          "Item exists in Pre-Order. Plesae check patient's Pre-Order."
+                        }
+                        type='warning'
+                        style={{
+                          position: 'absolute',
+                          top: 30,
+                          left: 10,
+                          whiteSpace: 'nowrap',
+                          textOverflow: 'ellipsis',
+                          display: 'inline-block',
+                          overflow: 'hidden',
+                          lineHeight: '25px',
+                          fontSize: '0.85rem',
+                        }}
+                      />
                     )}
                   </div>
                 )

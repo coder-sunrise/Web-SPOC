@@ -61,9 +61,19 @@ const styles = () => ({
   clinicSettings,
 }))
 class SystemSetting extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
-    this.group = _.groupBy(menuData, 'title')
+    const { clinicSettings } = this.props
+    const { settings = [] } = clinicSettings
+    let filteredMenu = menuData
+    Object.entries(settings).forEach(([key, value]) => {
+      if (typeof value === 'boolean' && !value) {
+        filteredMenu = filteredMenu.filter(
+          set => set.hiddenWhenClinicSettingIsOff !== key,
+        )
+      }
+    })
+    this.group = _.groupBy(filteredMenu, 'title')
   }
 
   menus = () => {
@@ -76,26 +86,22 @@ class SystemSetting extends PureComponent {
     const filterByAccessRight = (_result, m) => {
       const accessRight = Authorized.check(m.authority)
 
-      if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
-        return [
-          ..._result,
-        ]
+      if (
+        !accessRight ||
+        (accessRight && accessRight.rights === 'hidden') ||
+        accessRight.rights === 'disable'
+      )
+        return [..._result]
 
-      if (m.text === 'Package' && !settings.isEnablePackage)
-        return [
-          ..._result,
-        ]
+      if (m.text === 'Package' && !settings.isEnablePackage) return [..._result]
 
-      return [
-        ..._result,
-        { ...m, rights: accessRight.rights },
-      ]
+      return [..._result, { ...m, rights: accessRight.rights }]
     }
 
-    return Object.keys(this.group).map((o) => {
+    return Object.keys(this.group).map(o => {
       const filteredByAccessRight = this.group[o]
         .reduce(filterByAccessRight, [])
-        .filter((m) => {
+        .filter(m => {
           return (
             m.text.toLocaleLowerCase().indexOf(searchText) >= 0 || !searchText
           )
@@ -110,7 +116,8 @@ class SystemSetting extends PureComponent {
         content: (
           <GridContainer style={{ marginTop: theme.spacing(1) }} key={o}>
             {filteredByAccessRight.map((item, i) => {
-              const disabled = item.rights === 'disable'
+              // New design concept is hide element from ui when access right is 'disable'
+              // const disabled = item.rights === 'disable'
               return (
                 <GridItem
                   key={i}
@@ -125,7 +132,7 @@ class SystemSetting extends PureComponent {
                       [classes.baseBtn]: true,
                     })}
                     variant='outlined'
-                    disabled={disabled}
+                    // disabled={disabled}
                     onClick={() => {
                       this.props.history.push(item.url)
                     }}
@@ -142,7 +149,7 @@ class SystemSetting extends PureComponent {
     })
   }
 
-  setActivePanelKey = (activeKeys) => {
+  setActivePanelKey = activeKeys => {
     const { dispatch, systemSetting } = this.props
     const { filterValues } = systemSetting
     dispatch({
@@ -158,38 +165,27 @@ class SystemSetting extends PureComponent {
     const { filterValues } = systemSetting
     const { actives, searchText } = filterValues
 
-    let newActives = [
-      ...actives,
-    ]
+    let newActives = [...actives]
     const isMultiple = searchText.length > 0
 
     if (!isMultiple) {
-      const activeKeys = expanded
-        ? [
-            panel.key,
-          ]
-        : []
+      const activeKeys = expanded ? [panel.key] : []
       this.setActivePanelKey(activeKeys)
       return
     }
 
     if (expanded) {
-      newActives = [
-        ...newActives,
-        panel.key,
-      ]
-    } else newActives = newActives.filter((key) => key !== panel.key)
+      newActives = [...newActives, panel.key]
+    } else newActives = newActives.filter(key => key !== panel.key)
     this.setActivePanelKey(newActives)
   }
 
-  onSearchTextChange = (e) => {
+  onSearchTextChange = e => {
     this.props.dispatch({
       type: 'systemSetting/updateState',
       payload: {
         filterValues: {
-          actives: [
-            0,
-          ],
+          actives: [0],
           searchText: e.target.value.toLowerCase(),
         },
       },
@@ -210,7 +206,7 @@ class SystemSetting extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { classes, user, systemSetting } = this.props
     const { filterValues } = systemSetting
     const { actives, searchText } = filterValues
@@ -222,7 +218,7 @@ class SystemSetting extends PureComponent {
           activedKeys: actives,
         }
       : { active: actives[0] }
-    const menus = this.menus().filter((item) => item.itemCount > 0)
+    const menus = this.menus().filter(item => item.itemCount > 0)
 
     return (
       <CardContainer hideHeader>
@@ -238,9 +234,9 @@ class SystemSetting extends PureComponent {
           mode={isMultiple ? 'multiple' : 'default'}
           {...activeConfig}
           onChange={this.onAccordionChange}
-          collapses={menus.filter((item) => {
+          collapses={menus.filter(item => {
             const accessRight = accessRights.find(
-              (menuItem) => menuItem.name === item.authority,
+              menuItem => menuItem.name === item.authority,
             )
             const hide =
               !accessRight || (accessRights && accessRights === 'hidden')
@@ -248,7 +244,7 @@ class SystemSetting extends PureComponent {
             return (
               !searchText ||
               item.items.find(
-                (m) => m.text.toLocaleLowerCase().indexOf(searchText) >= 0,
+                m => m.text.toLocaleLowerCase().indexOf(searchText) >= 0,
               )
             )
           })}

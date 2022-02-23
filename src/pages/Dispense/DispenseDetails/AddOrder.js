@@ -42,6 +42,7 @@ const AddOrder = ({
   location,
   clinicInfo,
   isFirstLoad,
+  visitRegistration,
 }) => {
   const displayExistingOrders = async (id, servicesList) => {
     const r = await dispatch({
@@ -97,12 +98,18 @@ const AddOrder = ({
                   return {
                     ...instruction,
                     stepdose: instruction.stepdose || 'AND',
+                    uid: getUniqueId(),
                   }
                 },
               ),
-              corPrescriptionItemPrecaution:
-                o.retailVisitInvoiceDrug.retailPrescriptionItem
-                  .retailPrescriptionItemPrecaution,
+              corPrescriptionItemPrecaution: retailPrescriptionItemPrecaution.map(
+                pp => {
+                  return {
+                    ...pp,
+                    uid: getUniqueId(),
+                  }
+                },
+              ),
               corPrescriptionItemDrugMixture:
                 o.retailVisitInvoiceDrug.retailPrescriptionItem
                   .retailPrescriptionItemDrugMixture,
@@ -276,13 +283,21 @@ const AddOrder = ({
         },
       })
     }
+    if (dispense.ordersData) {
+      dispatch({
+        type: 'orders/upsertRows',
+        payload: dispense.ordersData,
+      })
+      dispatch({
+        type: 'dispense/updateState',
+        payload: { ordersData: undefined },
+      })
+    }
   }
-
   useEffect(() => {
     const { entity } = dispense
     const { invoice } = entity || {}
-
-    if (visitType === VISIT_TYPE.OTC)
+    if (visitType === VISIT_TYPE.OTC && invoice)
       displayExistingOrders(invoice.id, ctservice)
   }, [])
   return (
@@ -290,6 +305,7 @@ const AddOrder = ({
       <SizeContainer size='sm'>
         <div style={{ maxHeight: height - 128, overflow: 'auto' }}>
           <Order
+            visitRegistration={visitRegistration}
             fromDispense={visitType === VISIT_TYPE.OTC}
             from='AddOrder'
           />
@@ -585,7 +601,10 @@ export default compose(
                 adjType: o.adjType,
                 adjValue: o.adjValue,
                 itemCode: o.serviceCode,
-                itemName: o.serviceName,
+                itemName:
+                  o.newServiceName && o.newServiceName.trim() !== ''
+                    ? o.newServiceName
+                    : o.serviceName,
                 subTotal: roundTo(o.total),
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.SERVICE,
                 unitPrice: roundTo(o.total) || 0,
@@ -655,6 +674,7 @@ export default compose(
           }
           return {
             id: o.outerLayerId,
+            visitOrderTemplateItemFK: o.visitOrderTemplateItemFK,
             concurrencyToken: o.outerLayerConcurrencyToken,
             description: o.subject,
             adjAmt: o.adjAmount,
@@ -714,7 +734,7 @@ export default compose(
           }
         })
       }
-      if (visitType === VISIT_TYPE.BF) {
+      if (visitType === VISIT_TYPE.BF || visitType === VISIT_TYPE.MC) {
         const billFirstPayload = convertToConsultation(consultation.entity, {
           consultationDocument: { rows: [] },
           orders,

@@ -3,12 +3,7 @@ import React from 'react'
 import { withStyles } from '@material-ui/core'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 // common components
-import {
-  GridContainer,
-  GridItem,
-  NumberInput,
-  Tooltip,
-} from '@/components'
+import { GridContainer, GridItem, NumberInput, Tooltip } from '@/components'
 // styling
 import styles from './styles'
 
@@ -24,64 +19,74 @@ const titleStyle = {
 
 const PayerHeader = ({
   classes,
-  patient,
-  invoice,
+  invoiceNo,
   invoicePayerName,
+  patientReferenceNo,
   outstandingAfterPayment,
+  totalClaim,
+  totalAftGst,
+  payerTypeFK,
 }) => {
-  const { totalClaim } = invoice
-  const showReferrenceNo = invoice.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT
-  const payerColumnConfig = showReferrenceNo ? { md: 6 } : { md: 10 }  
+  const showReferrenceNo = payerTypeFK === INVOICE_PAYER_TYPE.PATIENT
   return (
     <div>
       <GridContainer justify='space-between' className={classes.payerHeader}>
         <GridItem md={2}>
           <h5 style={titleStyle}>Payer: </h5>
         </GridItem>
-        <GridItem {...payerColumnConfig} className={classes.leftAlignText}>
+        <GridItem md={6} className={classes.leftAlignText}>
           <Tooltip title={invoicePayerName}>
-            <h5 title={invoicePayerName} style={titleStyle}>{invoicePayerName}</h5>
+            <h5 style={{ marginTop: 0 }} title={invoicePayerName}>
+              {invoicePayerName}
+            </h5>
           </Tooltip>
         </GridItem>
-        {showReferrenceNo && (
-          <GridItem md={2}>
-            <h5 style={titleStyle}>Referrence No.: </h5>
-          </GridItem>
-        )}
-        {showReferrenceNo && (
-          <GridItem md={2} className={classes.leftAlignText}>
-            <h5 style={{ marginTop: 0 }}>{patient.patientReferenceNo}</h5>
-          </GridItem>
-        )}
-      </GridContainer>
-      <GridContainer justify='space-between' className={classes.payerHeader}>
         <GridItem md={2}>
           <h5 style={titleStyle}>Total Payable: </h5>
         </GridItem>
         <GridItem md={2} className={classes.leftAlignText}>
-          <NumberInput text currency value={invoice.totalAftGst} />
+          <NumberInput text currency value={totalAftGst} />
         </GridItem>
-        {totalClaim !== undefined && (
+      </GridContainer>
+      {(showReferrenceNo || totalClaim != undefined) && (
+        <GridContainer justify='space-between' className={classes.payerHeader}>
           <GridItem md={2}>
-            <h5 style={titleStyle}>Total Claim: </h5>
+            {showReferrenceNo && <h5 style={titleStyle}>Referrence No.: </h5>}
           </GridItem>
-        )}
-        {totalClaim !== undefined && (
+          <GridItem md={6} className={classes.leftAlignText}>
+            {showReferrenceNo && (
+              <Tooltip title={patientReferenceNo}>
+                <h5 style={{ marginTop: 0 }}>{patientReferenceNo}</h5>
+              </Tooltip>
+            )}
+          </GridItem>
+          <GridItem md={2}>
+            {totalClaim !== undefined && (
+              <h5 style={titleStyle}>Total Claim: </h5>
+            )}
+          </GridItem>
           <GridItem md={2} className={classes.leftAlignText}>
-            <NumberInput text currency value={totalClaim} />
+            {totalClaim !== undefined && (
+              <NumberInput text currency value={totalClaim} />
+            )}
           </GridItem>
-        )}
-        {totalClaim === undefined && (
-          <GridItem md={4} className={classes.leftAlignText}>
-            <span>&nbsp;</span>
-          </GridItem>
-        )}
+        </GridContainer>
+      )}
+      <GridContainer justify='space-between' className={classes.payerHeader}>
+        <GridItem md={2}>
+          <Tooltip title={invoiceNo}>
+            <h5 style={titleStyle}>Invoice No.: </h5>
+          </Tooltip>
+        </GridItem>
+        <GridItem md={6} className={classes.leftAlignText}>
+          <h5 style={{ marginTop: 0 }}>{invoiceNo}</h5>
+        </GridItem>
         <GridItem md={2}>
           <h5 style={titleStyle}>Outstanding: </h5>
         </GridItem>
         <GridItem md={2} className={classes.leftAlignText}>
           <NumberInput text currency value={outstandingAfterPayment} />
-        </GridItem> 
+        </GridItem>
       </GridContainer>
     </div>
   )

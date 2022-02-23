@@ -71,6 +71,8 @@ export default createFormViewModel({
       default: {
         corAttachment: [],
         corPatientNoteVitalSign: [],
+        corAudiometryTest: [],
+        corEyeExaminations: [],
       },
       selectedWidgets: ['1'],
       showSignOffModal: false,
@@ -182,6 +184,7 @@ export default createFormViewModel({
           sendQueueNotification({
             message: 'Consultation paused.',
             queueNo: entity.queueNo,
+            visitID: entity.id,
           })
 
           yield put({ type: 'closeModal' })
@@ -219,6 +222,7 @@ export default createFormViewModel({
             sendQueueNotification({
               message: 'Consultation resumed.',
               queueNo: entity.queueNo,
+              visitID: entity.id,
             })
           }
         }
@@ -272,6 +276,7 @@ export default createFormViewModel({
           sendQueueNotification({
             message: 'Consultation signed-off.',
             queueNo: entity.queueNo,
+            visitID: entity.id,
           })
         }
         return response
@@ -286,6 +291,7 @@ export default createFormViewModel({
           sendQueueNotification({
             message: 'Consultation discarded.',
             queueNo: entity.queueNo,
+            visitID: entity.id,
           })
         }
         return response
@@ -549,10 +555,28 @@ export default createFormViewModel({
           },
         })
 
+        const corPatientNoteVitalSign = (data.corPatientNoteVitalSign || [])
+          .length
+          ? data.corPatientNoteVitalSign
+          : [{}]
+        data.corPatientNoteVitalSign = corPatientNoteVitalSign.map(vs => ({
+          ...vs,
+          visitPurposeFK: data.visitPurposeFK,
+        }))
+
+        data.corAudiometryTest = (data.corAudiometryTest || []).length
+          ? data.corAudiometryTest
+          : [{}]
+
+        data.corEyeExaminations = (data.corEyeExaminations || []).length
+          ? data.corEyeExaminations
+          : [{}]
+
         let newResponse = ParseEyeFormData(data)
         const { corEyeRefractionForm, corEyeExaminationForm } = newResponse
         data.corEyeRefractionForm = corEyeRefractionForm
         data.corEyeExaminationForm = corEyeExaminationForm
+        data.loaded = true
         return payload
       },
     },
