@@ -349,7 +349,7 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
         width: 160,
         render: (item, entity) => {
           const dispatch = useDispatch()
-          const workItemSummary = JSON.parse(entity.workItemSummary)
+          const workItemSummary = JSON.parse(entity.workItemSummary || '[]')
           const radioWorkItems =
             workItemSummary.find(t => t.type === WORK_ITEM_TYPES.RADIOLOGY) ||
             {}

@@ -73,46 +73,53 @@ class IndividualCommentDetails extends PureComponent {
         disablePadding
         onClick={() => {}}
       >
-        {group.list.map(item => {
-          return (
-            <ListItem
-              alignItems='flex-start'
-              classes={{
-                root: this.props.classes.listItemRoot,
-              }}
-              selected={selectedItem[group.groupNo]?.id === item.id}
-              divider
-              disableGutters
-              button
-              onClick={() => {
-                this.setState(
-                  {
-                    selectedItem: {
-                      ...selectedItem,
-                      [group.groupNo]: { ...item },
-                    },
-                  },
-                  this.generateComment,
-                )
-              }}
-            >
-              <Tooltip title={item.displayValue}>
-                <div
-                  style={{
-                    width: '100%',
-                    marginLeft: 2,
-                    fontSize: '0.8rem',
-                    textOverflow: 'ellipsis',
-                    overflow: 'hidden',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {item.displayValue}
-                </div>
-              </Tooltip>
-            </ListItem>
+        {group.list
+          .filter(
+            item =>
+              item.displayValue
+                .toUpperCase()
+                .indexOf(searchValue.toUpperCase()) >= 0,
           )
-        })}
+          .map(item => {
+            return (
+              <ListItem
+                alignItems='flex-start'
+                classes={{
+                  root: this.props.classes.listItemRoot,
+                }}
+                selected={selectedItem[group.groupNo]?.id === item.id}
+                divider
+                disableGutters
+                button
+                onClick={() => {
+                  this.setState(
+                    {
+                      selectedItem: {
+                        ...selectedItem,
+                        [group.groupNo]: { ...item },
+                      },
+                    },
+                    this.generateComment,
+                  )
+                }}
+              >
+                <Tooltip title={item.displayValue}>
+                  <div
+                    style={{
+                      width: '100%',
+                      marginLeft: 2,
+                      fontSize: '0.8rem',
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {item.displayValue}
+                  </div>
+                </Tooltip>
+              </ListItem>
+            )
+          })}
       </List>
     )
   }
