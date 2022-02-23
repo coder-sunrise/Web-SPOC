@@ -16,7 +16,19 @@ const ItemSelect = ({ codetable, itemType, ...props }) => {
     ctservice = [],
   } = codetable
   const dispatch = useDispatch()
-
+  let selectProps = props
+  const initMaxTagCount =
+    props.field && props.field.value && props.field.value.length === 1 ? 1 : 0
+  const [maxTagCount, setMaxTagCount] = useState(
+    props.maxTagCount !== undefined ? props.maxTagCount : initMaxTagCount,
+  )
+  if (
+    props.maxTagCount === undefined &&
+    props.mode &&
+    props.mode === 'multiple'
+  ) {
+    selectProps = { ...props, maxTagCount }
+  }
   useEffect(() => {
     fetchCodeTables()
   }, [])
@@ -75,15 +87,24 @@ const ItemSelect = ({ codetable, itemType, ...props }) => {
       : itemType === preOrderItemCategory[5].value
       ? radiologysFilter
       : []
-
   return (
     <Select
       valueField='id'
-      labelField='displayValue'
-      label='Item List'
       mode='multiple'
-      options={optionsList}
-      {...props}
+      options={optionsList || []}
+      onChange={(values, opts) => {
+        if (
+          props.maxTagCount === undefined &&
+          props.mode &&
+          props.mode === 'multiple'
+        ) {
+          setMaxTagCount(values && values.length === 1 ? 1 : 0)
+        }
+        if (props.onChange) {
+          props.onChange(values, opts)
+        }
+      }}
+      {...selectProps}
     />
   )
 }
