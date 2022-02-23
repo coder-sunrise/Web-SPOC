@@ -20,17 +20,26 @@ Yup.addMethod(Yup.string, 'NRIC', function(message) {
     const firstChar = value[0] || ''
     const lastChar = value[value.length - 1] || ''
     let outputChars = []
+    let weight = 0
     switch (typeFK) {
       // case 1: // fin
       case 4: // SO
         if (firstChar === 'F')
           // prettier-ignore
-          outputChars = ['X', 'W', 'U', 'T', 'R', 'Q', 'P', 'N', 'M', 'L', 'K']
+          outputChars = ['X','W','U','T','R','Q','P','N','M','L','K']
         else if (firstChar === 'G')
+        {
           // prettier-ignore
-          outputChars = ['R', 'Q', 'P', 'N', 'M', 'L', 'K', 'X', 'W', 'U', 'T']
-        break
-
+          outputChars = ['X','W','U','T','R','Q','P','N','M','L','K']
+          // outputChars = ['R','Q','P','N','M','L','K','X','W','U','T']
+          weight = 4
+        }
+        else if (firstChar === 'M')
+        {
+          // prettier-ignore
+          outputChars = ['X','W','U','T','R','Q','P','N','J','L','K']
+          weight = 3
+        }
       case 1: // SP
       case 2: // SH
       case 3: // SB
@@ -38,8 +47,12 @@ Yup.addMethod(Yup.string, 'NRIC', function(message) {
           // prettier-ignore
           outputChars = ['J', 'Z', 'I', 'H', 'G', 'F', 'E', 'D', 'C', 'B', 'A']
         else if (firstChar === 'T')
+        {
           // prettier-ignore
-          outputChars = ['G', 'F', 'E', 'D', 'C', 'B', 'A', 'J', 'Z', 'I', 'H']
+          outputChars = ['J','Z','I','H','G','F','E','D','C','B','A']
+          // outputChars = ['G','F','E','D','C','B','A','J','Z','I','H']
+          weight = 4
+        }
         break
 
       default:
@@ -65,6 +78,7 @@ Yup.addMethod(Yup.string, 'NRIC', function(message) {
       numberNRIC /= 10
       numberNRIC = Math.floor(numberNRIC)
     }
+    total += weight
     if (
       total % 11 > outputChars.length - 1 ||
       lastChar !== outputChars[total % 11]
