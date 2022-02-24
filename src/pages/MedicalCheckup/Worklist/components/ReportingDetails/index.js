@@ -13,7 +13,13 @@ import { GridContainer, GridItem, SizeContainer } from '@/components'
 const styles = theme => ({})
 
 const ReportingDetails = props => {
-  const { loading, patient, medicalCheckupReportingDetails, dispatch } = props
+  const {
+    loading,
+    patient,
+    medicalCheckupReportingDetails,
+    visitRegistration,
+    dispatch,
+  } = props
   const height = window.innerHeight
   const banner = document.getElementById('patientBanner')
   const contentHeight = (height || 0) - (banner?.offsetHeight || 0) - 105
@@ -24,6 +30,7 @@ const ReportingDetails = props => {
         <Banner
           from='MedicalCheckup'
           patientInfo={patient}
+          visitInfo={visitRegistration}
           editingOrder={false}
           activePreOrderItems={[]}
           isRetail={false}
@@ -118,9 +125,17 @@ const ReportingDetails = props => {
 
 export default compose(
   withStyles(styles),
-  connect(({ patient, loading, medicalCheckupReportingDetails }) => ({
-    patient: patient.entity || {},
-    loading,
-    medicalCheckupReportingDetails,
-  })),
+  connect(
+    ({
+      patient,
+      loading,
+      medicalCheckupReportingDetails,
+      visitRegistration,
+    }) => ({
+      patient: patient.entity || {},
+      loading,
+      visitRegistration,
+      medicalCheckupReportingDetails,
+    }),
+  ),
 )(ReportingDetails)

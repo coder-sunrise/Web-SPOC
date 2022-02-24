@@ -3,7 +3,7 @@ import { Link } from 'umi'
 import { connect } from 'dva'
 import _ from 'lodash'
 import moment from 'moment'
-import { Drawer } from 'antd'
+import { Drawer, Row, Col } from 'antd'
 import { Paper } from '@material-ui/core'
 import { headerHeight } from 'mui-pro-jss'
 import Warning from '@material-ui/icons/Error'
@@ -52,13 +52,21 @@ const styles = theme => ({
   header: {
     color: 'darkblue',
     fontWeight: 500,
+    height: 26,
+    display: 'inline-block',
     position: 'relative',
   },
-  cell: {
-    margin: '3px 0',
-  },
+  // cell: {
+  //   margin: '3px 0',
+  // },
   part: {
     display: 'inline-block',
+  },
+  newContent: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    paddingLeft: '5px',
   },
   contents: {
     overflow: 'hidden',
@@ -175,7 +183,7 @@ class Banner extends PureComponent {
               })}
               tabIndex='-1'
             >
-              <IconButton>
+              <IconButton style={{ padding: 0 }}>
                 <Edit color='action' />
               </IconButton>
             </Link>
@@ -335,7 +343,7 @@ class Banner extends PureComponent {
           ps => ps.coPaymentSchemeFK === s.coPaymentSchemeFK,
         ) || {}
       return (
-        <span style={{ paddingRight: 5, display: 'inline-block' }}>
+        <span style={{ paddingRight: 5 }}>
           {chasOrMedisave &&
           chasOrMedisave.find(list => s.schemeTypeFK === list.schemeTypeFK) ? (
             <Popover
@@ -907,12 +915,8 @@ class Banner extends PureComponent {
         position: 'sticky',
         overflowY: 'auto',
         top: headerHeight,
-        zIndex: 998,
-        // paddingLeft: 16,
-        // paddingRight: 16,
-        // maxHeight: 100,
-        backgroundColor: '#f0f8ff',
-
+        zIndex: 998, 
+        backgroundColor: '#f0f8ff', 
         marginTop: '-8px',
       },
       refreshingBalance,
@@ -922,6 +926,7 @@ class Banner extends PureComponent {
       isRetail,
       editingOrder,
       clinicSettings,
+      visitInfo,
     } = props
 
     const { isEnableJapaneseICD10Diagnosis } = clinicSettings
@@ -1014,447 +1019,566 @@ class Banner extends PureComponent {
     const viewNonClaimableHistoryRight = Authorized.check(
       'patientdatabase.patientprofiledetails.claimhistory.viewnonclaimablehistory',
     ) || { rights: 'hidden' }
+
+    const patientTitle = (
+      <GridItem md={12} className={classes.cell}>
+        <Link
+          className={classes.header}
+          style={{
+            display: 'inline-flex',
+            paddingRight: 5,
+          }}
+          to={getAppendUrl({
+            md: 'pt',
+            cmt: 1,
+            pid: info.id,
+          })}
+          disabled={
+            !viewPatientProfileAccess ||
+            (viewPatientProfileAccess &&
+              viewPatientProfileAccess.rights !== 'enable')
+          }
+          tabIndex='-1'
+        >
+          <Tooltip title={name} placement='bottom-start'>
+            <span
+              style={{
+                textOverflow: 'ellipsis',
+                textDecoration: 'underline',
+                display: 'inline-block',
+                width: '100%',
+                overflow: 'hidden',
+                fontWeight: 500,
+                fontSize: '1.1rem',
+                color: 'rgb(75, 172, 198)',
+              }}
+            >
+              {name}
+            </span>
+          </Tooltip>
+        </Link>
+        {'( '}
+        <span className={classes.part}>{info.patientReferenceNo}</span>
+        {') '}
+        <span className={classes.part}>{info.patientAccountNo}</span>
+        {', '}
+        <span className={classes.part}>
+          {
+            <CodeSelect
+              code='ctGender'
+              // optionLabelLength={1}
+              text
+              labelField='code'
+              value={info.genderFK}
+            />
+          }
+        </span>
+        {'/'}
+        <span className={classes.part}>{year > 1 ? `${year}` : `${year}`}</span>
+        {', '}
+        <span className={classes.part}>
+          <DatePicker
+            className={classes.part}
+            text
+            format={dateFormatLong}
+            value={info.dob}
+          />
+        </span>
+        {', '}
+        <span className={classes.part}>
+          <CodeSelect
+            className={classes.part}
+            text
+            code='ctNationality'
+            value={info.nationalityFK}
+          />
+        </span>
+
+        <span className={classes.part} style={{ top: 3, position: 'relative' }}>
+          <PatientStickyNotesBtn patientProfileFK={info.id} />
+        </span>
+      </GridItem>
+    )
+    const patientTag = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header}>Tag: </span>
+        </Col>
+        <Col flex='auto' className={classes.newContent}>
+          <Tooltip
+            title={this.getTagData()}
+            placement='bottom-start'
+            interactive='true'
+          >
+            <span>{this.getTagData()}</span>
+          </Tooltip>
+        </Col>
+      </Row>
+    )
+    const patientG6PD = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header}>G6PD: </span>
+        </Col>
+        <Col flex='auto' className={classes.newContent}>
+          <span>{g6PD ? g6PD.name : '-'}</span>
+        </Col>
+      </Row>
+    )
+    const patientOS = (
+      <div>
+        <span
+          style={{
+            ...headerStyles,
+            color: info.outstandingBalance ? 'red' : headerStyles.color,
+          }}
+        >
+          O/S Bal.:&nbsp;
+        </span>
+        <Tooltip
+          title={
+            info.outstandingBalance
+              ? `${currencySymbol}${_.round(info.outstandingBalance, 2)}`
+              : ''
+          }
+        >
+          <span
+            style={{
+              fontWeight: 500,
+              marginTop: 5,
+            }}
+          >
+            {info.outstandingBalance ? (
+              <NumberInput
+                text
+                currency
+                value={_.round(info.outstandingBalance, 2)}
+              />
+            ) : (
+              '-'
+            )}
+          </span>
+        </Tooltip>
+      </div>
+    )
+    const patientSchemeDetails = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header}>Scheme: </span>
+        </Col>
+        <Col flex='auto' className={classes.newContent}>
+          {/* <LoadingWrapper
+            loading={refreshingBalance}
+            text='Retrieving balance...'
+          > */}
+          <Tooltip
+            title={
+              <div>
+                {this.getSchemeList(
+                  _.orderBy(
+                    schemeDataList,
+                    ['schemeTypeFK', 'validTo'],
+                    ['desc', 'asc'],
+                  ),
+                )}
+              </div>
+            }
+            interactive='true'
+          >
+            <span>
+              {entity.isActive &&
+                (entity.patientScheme || []).filter(
+                  o => o.schemeTypeFK <= 6 || this.isMedisave(o.schemeTypeFK),
+                ).length > 0 && (
+                  <IconButton onClick={this.refreshGovtBalance}>
+                    <Refresh />
+                  </IconButton>
+                )}
+              {this.getSchemeList(
+                _.orderBy(
+                  schemeDataList,
+                  ['schemeTypeFK', 'validTo'],
+                  ['desc', 'asc'],
+                ),
+              )}
+            </span>
+          </Tooltip>
+          {/* </LoadingWrapper> */}
+        </Col>
+      </Row>
+    )
+    const patientRequest = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header}>Patient Request: </span>
+        </Col>
+        <Col flex='auto' className={classes.newContent}>
+          <Tooltip title={info.patientRequest} interactive='true'>
+            <span> {info.patientRequest || '-'}</span>
+          </Tooltip>
+        </Col>
+      </Row>
+    )
+    const patientHRP = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span
+            className={classes.header}
+            style={{
+              color: info.patientMedicalHistory?.highRiskCondition
+                ? 'red'
+                : 'darkblue',
+            }}
+          >
+            HRP:{' '}
+          </span>
+        </Col>
+        <Col flex='auto' className={classes.newContent}>
+          <Tooltip
+            title={info.patientMedicalHistory?.highRiskCondition}
+            interactive='true'
+          >
+            <span>{info.patientMedicalHistory?.highRiskCondition || '-'}</span>
+          </Tooltip>
+        </Col>
+      </Row>
+    )
+    const patientPersistDiagnosis = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header}>Persistent Diagnosis: </span>
+        </Col>
+        <Col flex='auto' className={classes.newContent}>
+          <Tooltip title={persistentDiagnosis} interactive='true'>
+            <span>{persistentDiagnosis}</span>
+          </Tooltip>
+        </Col>
+      </Row>
+    )
+    const longTermMedication = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header}>Long Term Medication: </span>
+        </Col>
+        <Col flex='auto' className={classes.newContent}>
+          <Tooltip
+            title={info.patientMedicalHistory?.longTermMedication}
+            interactive='true'
+          >
+            <span>{info.patientMedicalHistory?.longTermMedication || '-'}</span>
+          </Tooltip>
+        </Col>
+      </Row>
+    )
+    const patientAllergy = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span
+            className={classes.header}
+            style={{ color: this.getAllergyData() ? 'red' : 'inherit' }}
+          >
+            Allergy:
+          </span>
+          <span>{this.getAllergyLink('link')}</span>
+        </Col>
+        <Col flex='auto' className={classes.newContent}>
+          <Tooltip title={this.getAllergyData()} interactive='true'>
+            <span>{this.getAllergyData()}</span>
+          </Tooltip>
+        </Col>
+      </Row>
+    )
+    const visitDateElm = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header}>Visit Date: </span>
+        </Col>
+        <Col flex='auto' className={classes.newContent}>
+          {moment(visitInfo?.entity?.visit?.visitDate).format(dateFormatLong)}
+        </Col>
+      </Row>
+    )
+    const visitPurposeElm = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header}>Visit Purpose: </span>
+        </Col>
+        <Col flex='auto' className={classes.newContent}>
+          <Tooltip
+            title={visitInfo?.entity?.visit?.visitOrderTemplateDetails || '-'}
+            interactive='true'
+          >
+            <span>
+              {visitInfo?.entity?.visit?.visitOrderTemplateDetails || '-'}
+            </span>
+          </Tooltip>
+        </Col>
+      </Row>
+    )
+    const visitRemarksElm = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header}>Visit Remarks: </span>
+        </Col>
+        <Col flex='auto' className={classes.newContent}>
+          <Tooltip
+            title={visitInfo?.entity?.visit?.visitRemarks || '-'}
+            interactive='true'
+          >
+            <span>{visitInfo?.entity?.visit?.visitRemarks || '-'}</span>
+          </Tooltip>
+        </Col>
+      </Row>
+    )
+    const visitPriorityElm = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header}>Report Priority:</span>
+        </Col>
+        <Col flex='auto' className={classes.newContent}>
+          {visitInfo?.entity?.visit?.medicalCheckupWorkitem &&
+            visitInfo?.entity?.visit?.medicalCheckupWorkitem[0]?.reportPriority}
+        </Col>
+      </Row>
+    )
+    const visitLanguageElm = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header}>Report Language:</span>
+        </Col>
+        <Col flex='auto' className={classes.newContent}>
+          {visitInfo?.entity?.visit?.medicalCheckupWorkitem &&
+            visitInfo?.entity?.visit?.medicalCheckupWorkitem[0]?.reportLanguage}
+        </Col>
+      </Row>
+    )
+    const patientNotesLinkElm = (
+      <Link className={classes.header}>
+        <span
+          style={{
+            display: 'block',
+            textDecoration: 'underline',
+          }}
+          onClick={e => {
+            this.openNotes()
+          }}
+        >
+          Notes
+        </span>
+      </Link>
+    )
+    const patientEditVisitElm = (
+      <Link className={classes.header}>
+        <span
+          style={{
+            display: 'block',
+            textDecoration: 'underline',
+          }}
+          onClick={e => {
+            this.openNotes()
+          }}
+        >
+          Edit Visit
+        </span>
+      </Link>
+    )
     return (
       <Paper id='patientBanner' style={style}>
         {/* Please do not change the height below (By default is 100) */}
-        <GridContainer
-          style={{ minHeight: 100, width: '100%', padding: '5px 0' }}
-        >
-          <GridItem xs={9} md={this.getBannerMd()}>
-            <GridContainer>
-              <GridItem xs={10} md={10} className={classes.cell}>
-                <GridContainer>
-                  {/* left half */}
-                  <GridItem xs={6} md={12} className={classes.cell}>
-                    <Link
-                      className={classes.header}
-                      style={{
-                        display: 'inline-flex',
-                        paddingRight: 5,
-                      }}
-                      to={getAppendUrl({
-                        md: 'pt',
-                        cmt: 1,
-                        pid: info.id,
-                      })}
-                      disabled={
-                        !viewPatientProfileAccess ||
-                        (viewPatientProfileAccess &&
-                          viewPatientProfileAccess.rights !== 'enable')
-                      }
-                      tabIndex='-1'
-                    >
-                      <Tooltip title={name} placement='bottom-start'>
-                        <span
-                          style={{
-                            textOverflow: 'ellipsis',
-                            textDecoration: 'underline',
-                            display: 'inline-block',
-                            width: '100%',
-                            overflow: 'hidden',
-                            fontWeight: 500,
-                            fontSize: '1.1rem',
-                            color: 'rgb(75, 172, 198)',
-                          }}
-                        >
-                          {name}
-                        </span>
-                      </Tooltip>
-                    </Link>
-                    {'( '}
-                    <span className={classes.part}>
-                      {info.patientReferenceNo}
-                    </span>
-                    {') '}
-                    <span className={classes.part}>
-                      {info.patientAccountNo}
-                    </span>
-                    {', '}
-                    <span className={classes.part}>
-                      {
-                        <CodeSelect
-                          code='ctGender'
-                          // optionLabelLength={1}
-                          text
-                          labelField='code'
-                          value={info.genderFK}
-                        />
-                      }
-                    </span>
-                    {'/'}
-                    <span className={classes.part}>
-                      {year > 1 ? `${year}` : `${year}`}
-                    </span>
-                    {', '}
-                    <span className={classes.part}>
-                      <DatePicker
-                        className={classes.part}
-                        text
-                        format={dateFormatLong}
-                        value={info.dob}
-                      />
-                    </span>
-                    {', '}
-                    <span className={classes.part}>
-                      <CodeSelect
-                        className={classes.part}
-                        text
-                        code='ctNationality'
-                        value={info.nationalityFK}
-                      />
-                    </span>
-
-                    <span
-                      className={classes.part}
-                      style={{ top: 3, position: 'relative' }}
-                    >
-                      <PatientStickyNotesBtn patientProfileFK={info.id} />
-                    </span>
-                  </GridItem>
-                  <GridItem xs={6} md={4} className={classes.cell}>
-                    <div style={{ position: 'relative', paddingLeft: 35 }}>
-                      <div
-                        className={classes.header}
-                        style={{ position: 'absolute', left: 0 }}
-                      >
-                        Tag:
-                      </div>
-                      <Tooltip
-                        title={this.getTagData()}
-                        placement='bottom-start'
-                        interactive='true'
-                      >
-                        <div
-                          style={{
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                          }}
-                        >
-                          {this.getTagData()}
-                        </div>
-                      </Tooltip>
-                    </div>
-                  </GridItem>
-                  <GridItem xs={6} md={4} className={classes.cell}>
-                    <div>
-                      <span className={classes.header}>G6PD: </span>
-                      <span>{g6PD ? g6PD.name : '-'}</span>
-                    </div>
-                  </GridItem>
-                  <GridItem xs={6} md={4} className={classes.cell}>
-                    <span
-                      style={{
-                        ...headerStyles,
-                        color: info.outstandingBalance
-                          ? 'red'
-                          : headerStyles.color,
-                      }}
-                    >
-                      O/S Bal.:&nbsp;
-                    </span>
-                    <Tooltip
-                      title={
-                        info.outstandingBalance
-                          ? `${currencySymbol}${_.round(
-                              info.outstandingBalance,
-                              2,
-                            )}`
-                          : ''
-                      }
-                    >
-                      <span
-                        style={{
-                          fontWeight: 500,
-                          marginTop: 5,
-                        }}
-                      >
-                        {info.outstandingBalance ? (
-                          <NumberInput
-                            text
-                            currency
-                            value={_.round(info.outstandingBalance, 2)}
-                          />
-                        ) : (
-                          '-'
-                        )}
-                      </span>
-                    </Tooltip>
-                  </GridItem>
-                  <GridItem xs={6} md={4} className={classes.cell}>
-                    <LoadingWrapper
-                      loading={refreshingBalance}
-                      text='Retrieving balance...'
-                    >
-                      <span className={classes.header}>Scheme: </span>
-                      <Tooltip
-                        title={this.getSchemeList(
-                          _.orderBy(schemeDataList, ['schemeTypeFK'], ['asc']),
-                        )}
-                        interactive='true'
-                      >
-                        <span className={classes.contents}>
-                          {entity.isActive &&
-                            (entity.patientScheme || []).filter(
-                              o =>
-                                o.schemeTypeFK <= 6 ||
-                                this.isMedisave(o.schemeTypeFK),
-                            ).length > 0 && (
-                              <IconButton onClick={this.refreshGovtBalance}>
-                                <Refresh />
-                              </IconButton>
-                            )}
-                          {this.getSchemeList(
-                            _.orderBy(
-                              schemeDataList,
-                              ['schemeTypeFK'],
-                              ['asc'],
-                            ),
-                          )}
-                        </span>
-                      </Tooltip>
-                    </LoadingWrapper>
-                  </GridItem>
-                  <GridItem xs={6} md={4} className={classes.cell}>
-                    <span className={classes.header}>Patient Request: </span>
-
-                    <Tooltip title={info.patientRequest} interactive='true'>
-                      <span
-                        className={classes.contents}
-                        style={{ WebkitLineClamp: 1 }}
-                      >
-                        {info.patientRequest || '-'}
-                      </span>
-                    </Tooltip>
-                  </GridItem>
-                  <GridItem xs={6} md={4} className={classes.cell}>
-                    <div>
-                      <span
-                        style={{
-                          ...headerStyles,
-                          color: 'red',
-                        }}
-                      >
-                        HRP:{' '}
-                      </span>
-                      <Tooltip
-                        title={info.patientMedicalHistory?.highRiskCondition}
-                        interactive='true'
-                      >
-                        <span
-                          className={classes.contents}
-                          style={{ WebkitLineClamp: 1 }}
-                        >
-                          {info.patientMedicalHistory?.highRiskCondition || '-'}
-                        </span>
-                      </Tooltip>
-                    </div>
-                  </GridItem>
-                  <GridItem xs={6} md={4} className={classes.cell}>
-                    <span className={classes.header}>
-                      Persistent Diagnosis:{' '}
-                    </span>
-                    <Tooltip title={persistentDiagnosis} interactive='true'>
-                      <span className={classes.contents}>
-                        {persistentDiagnosis}
-                      </span>
-                    </Tooltip>
-                  </GridItem>
-                  <GridItem xs={6} md={4} className={classes.cell}>
-                    <span className={classes.header}>
-                      Long Term Medication:{' '}
-                    </span>
-                    <Tooltip
-                      title={info.patientMedicalHistory?.longTermMedication}
-                      interactive='true'
-                    >
-                      <span className={classes.contents}>
-                        {info.patientMedicalHistory?.longTermMedication || '-'}
-                      </span>
-                    </Tooltip>
-                  </GridItem>
-                  <GridItem xs={6} md={4} className={classes.cell}>
-                    <span
-                      style={{
-                        ...headerStyles,
-                        color: 'red',
-                      }}
-                    >
-                      {this.state.showWarning && (
-                        <Warning
-                          style={{ position: 'absolute' }}
-                          color='error'
-                        />
-                      )}
-                      <span
-                        style={{
-                          marginLeft: this.state.showWarning ? 20 : 'inherit',
-                        }}
-                      >
-                        {'Allergies:'}
-                      </span>
-                    </span>
-                    <span>{this.getAllergyLink('link')}</span>
-                    <Tooltip title={this.getAllergyData()} interactive='true'>
-                      <span className={classes.contents}>
-                        {this.getAllergyData()}
-                      </span>
-                    </Tooltip>
-                  </GridItem>
-                </GridContainer>
-              </GridItem>
-
-              <GridItem xs={2} md={2} className={classes.cell}>
-                {/* right half */}
-                <GridContainer>
-                  {entity?.lastVisitDate ? (
-                    <GridItem
-                      xs={12}
-                      md={12}
-                      style={{ position: 'relative', top: 5 }}
-                      className={classes.cell}
-                    >
-                      <span>Last Visit: </span>
-                      <Tooltip
-                        title={moment(entity.lastVisitDate).format(
-                          'DD MMM YYYY',
-                        )}
-                      >
-                        <span>
-                          {moment(entity.lastVisitDate).format('DD MMM YYYY')}
-                        </span>
-                      </Tooltip>
+        {from != 'MedicalCheckup' && (
+          <GridContainer
+            style={{ minHeight: 100, width: '100%', padding: '5px 0' }}
+          >
+            <GridItem xs={9} md={this.getBannerMd()}>
+              <GridContainer>
+                <GridItem xs={10} md={10}>
+                  <GridContainer>
+                    {patientTitle}
+                    <GridItem xs={6} md={4}>
+                      {patientTag}
                     </GridItem>
-                  ) : (
-                    <GridItem
-                      xs={12}
-                      md={12}
-                      style={{ height: 22 }}
-                      className={classes.cell}
-                    ></GridItem>
-                  )}
-                  <GridItem xs={12} md={12} className={classes.cell}>
-                    {notesHistoryAccessRight.rights !== 'hidden' && (
-                      <Link className={classes.header}>
-                        <span
-                          style={{
-                            display: 'block',
-                            textDecoration: 'underline',
-                            margin: '5px 0px',
-                          }}
-                          onClick={e => {
-                            this.openNotes()
-                          }}
+                    <GridItem xs={6} md={4}>
+                      {patientG6PD}
+                    </GridItem>
+                    <GridItem xs={6} md={4}>
+                      {patientOS}
+                    </GridItem>
+                    <GridItem xs={6} md={4}>
+                      {patientSchemeDetails}
+                    </GridItem>
+                    <GridItem xs={6} md={4}>
+                      {patientRequest}
+                    </GridItem>
+                    <GridItem xs={6} md={4}>
+                      {patientHRP}
+                    </GridItem>
+                    <GridItem xs={6} md={4}>
+                      {patientPersistDiagnosis}
+                    </GridItem>
+                    <GridItem xs={6} md={4}>
+                      {longTermMedication}
+                    </GridItem>
+                    <GridItem xs={6} md={4}>
+                      {patientAllergy}
+                    </GridItem>
+                  </GridContainer>
+                </GridItem>
+                <GridItem xs={2} md={2}>
+                  {/* right half */}
+                  <GridContainer>
+                    {entity?.lastVisitDate ? (
+                      <GridItem
+                        xs={12}
+                        md={12}
+                        style={{ height: 26, paddingTop: 5 }}
+                      >
+                        <span style={{ color: 'darkblue' }}>Last Visit: </span>
+                        <Tooltip
+                          title={moment(entity.lastVisitDate).format(
+                            'DD MMM YYYY',
+                          )}
                         >
-                          Notes
-                        </span>
-                      </Link>
+                          <span>
+                            {moment(entity.lastVisitDate).format('DD MMM YYYY')}
+                          </span>
+                        </Tooltip>
+                      </GridItem>
+                    ) : (
+                      <GridItem xs={12} md={12}></GridItem>
                     )}
+                    <GridItem xs={12} md={12}>
+                      {notesHistoryAccessRight.rights !== 'hidden' &&
+                        patientNotesLinkElm}
 
-                    {viewNonClaimableHistoryRight.rights === 'enable' && (
-                      <Link className={classes.header}>
-                        <span
-                          style={{
-                            display: 'block',
-                            textDecoration: 'underline',
-                            margin: '5px 0px',
-                          }}
-                          onClick={e => {
-                            this.openNonClaimableHistory()
-                          }}
+                      {viewNonClaimableHistoryRight.rights === 'enable' && (
+                        <Link className={classes.header}>
+                          <span
+                            style={{
+                              display: 'block',
+                              textDecoration: 'underline',
+                            }}
+                            onClick={e => {
+                              this.openNonClaimableHistory()
+                            }}
+                          >
+                            {`Non Claimable History (${info.nonClaimableHistoryCount ||
+                              0})`}
+                          </span>
+                        </Link>
+                      )}
+
+                      {preOrderAccessRight.rights === 'enable' && (
+                        <Link
+                          className={classes.header}
+                          disabled={preOrderAccessRight.rights === 'disable'}
                         >
-                          {`Non Claimable History (${info.nonClaimableHistoryCount ||
-                            0})`}
-                        </span>
-                      </Link>
-                    )}
+                          <span
+                            style={{
+                              display: 'block',
+                              textDecoration: 'underline',
+                            }}
+                            onClick={e => {
+                              e.preventDefault()
+                              if (preOrderAccessRight.rights === 'disable') {
+                                notification.error({
+                                  message:
+                                    'Current user is not authorized to access',
+                                })
+                                return
+                              }
 
-                    {preOrderAccessRight.rights === 'enable' && (
+                              if (
+                                disablePreOrder &&
+                                disablePreOrder.some(cond => {
+                                  if (cond.condition) {
+                                    dispatch({
+                                      type: 'global/updateAppState',
+                                      payload: {
+                                        openConfirm: true,
+                                        isInformType: true,
+                                        openConfirmText: 'OK',
+                                        openConfirmContent: cond.message,
+                                      },
+                                    })
+                                    return true
+                                  }
+                                  return false
+                                })
+                              )
+                                return
+
+                              this.openPreOrders()
+                            }}
+                          >
+                            {`Pre-Order (${
+                              activePreOrderItems
+                                ? activePreOrderItems.length
+                                : (pendingPreOrderItems &&
+                                    pendingPreOrderItems.length) ||
+                                  0
+                            })`}
+                          </span>
+                        </Link>
+                      )}
+
                       <Link
                         className={classes.header}
-                        disabled={preOrderAccessRight.rights === 'disable'}
+                        style={{
+                          display: 'block',
+                          paddingRight: 10,
+                          textDecoration: 'underline',
+                        }}
+                        to={getAppendUrl({
+                          md: 'pt',
+                          cmt: 1,
+                          pid: info.id,
+                        })}
+                        // disabled={}
+                        tabIndex='-1'
                       >
-                        <span
-                          style={{
-                            display: 'block',
-                            textDecoration: 'underline',
-                            margin: '5px 0px',
-                          }}
-                          onClick={e => {
-                            e.preventDefault()
-                            if (preOrderAccessRight.rights === 'disable') {
-                              notification.error({
-                                message:
-                                  'Current user is not authorized to access',
-                              })
-                              return
-                            }
-
-                            if (
-                              disablePreOrder &&
-                              disablePreOrder.some(cond => {
-                                if (cond.condition) {
-                                  dispatch({
-                                    type: 'global/updateAppState',
-                                    payload: {
-                                      openConfirm: true,
-                                      isInformType: true,
-                                      openConfirmText: 'OK',
-                                      openConfirmContent: cond.message,
-                                    },
-                                  })
-                                  return true
-                                }
-                                return false
-                              })
-                            )
-                              return
-
-                            this.openPreOrders()
-                          }}
-                        >
-                          {`Pre-Order (${
-                            activePreOrderItems
-                              ? activePreOrderItems.length
-                              : (pendingPreOrderItems &&
-                                  pendingPreOrderItems.length) ||
-                                0
-                          })`}
-                        </span>
+                        Examination Results
                       </Link>
-                    )}
-
-                    <Link
-                      className={classes.header}
-                      style={{
-                        display: 'block',
-                        paddingRight: 10,
-                        textDecoration: 'underline',
-                        margin: '5px 0px',
-                      }}
-                      to={getAppendUrl({
-                        md: 'pt',
-                        cmt: 1,
-                        pid: info.id,
-                      })}
-                      // disabled={}
-                      tabIndex='-1'
-                    >
-                      Examination Results
-                    </Link>
-                  </GridItem>
-                </GridContainer>
-              </GridItem>
-            </GridContainer>
-          </GridItem>
-
-          {extraCmt && (
-            <GridItem xs={3} md={12 - this.getBannerMd()}>
-              {extraCmt()}
+                    </GridItem>
+                  </GridContainer>
+                </GridItem>
+              </GridContainer>
             </GridItem>
-          )}
-        </GridContainer>
 
+            {extraCmt && (
+              <GridItem xs={3} md={12 - this.getBannerMd()}>
+                {extraCmt()}
+              </GridItem>
+            )}
+          </GridContainer>
+        )}
+        {from === 'MedicalCheckup' && (
+          <GridContainer
+            style={{ minHeight: 100, width: '100%', padding: '5px 10px' }}
+          >
+            <GridItem md={12}>{patientTitle}</GridItem>
+            <GridItem md={3}>{patientG6PD}</GridItem>
+            <GridItem md={3}>{patientHRP}</GridItem>
+            <GridItem md={3}>{visitDateElm}</GridItem>
+            <GridItem md={3}>{visitPriorityElm}</GridItem>
+            <GridItem md={3}>{patientSchemeDetails}</GridItem>
+            <GridItem md={3}>{patientAllergy}</GridItem>
+            <GridItem md={3}>{visitPurposeElm}</GridItem>
+            <GridItem md={3}>{visitLanguageElm}</GridItem>
+            <GridItem md={3}>{patientPersistDiagnosis}</GridItem>
+            <GridItem md={3}>{longTermMedication}</GridItem>
+            <GridItem md={3}>{visitRemarksElm}</GridItem>
+            <GridItem md={3}>
+              <div>
+                <span style={{ display: 'inline-block', marginRight: 10 }}>
+                  {patientNotesLinkElm}
+                </span>
+                <span style={{ display: 'inline-block' }}>
+                  {patientEditVisitElm}
+                </span>
+              </div>
+            </GridItem>
+          </GridContainer>
+        )}
         <CommonModal
           open={this.state.showPatientProfile}
           onClose={this.closePatientProfile}
