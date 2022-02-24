@@ -62,7 +62,7 @@ const mapServingPersonsString = servingByList =>
 const compareServingPerson = (a, b) => {
   return compareString(mapServingPersonsString(a), mapServingPersonsString(b))
 }
- 
+
 export const FuncConfig = {
   pager: false,
   sort: true,
@@ -367,12 +367,6 @@ export const QueueColumnExtensions = props => {
       render: row => {
         if (row.visitPurposeFK !== VISIT_TYPE.MC) {
           return <DoctorLabel doctor={row.doctor} hideMCR />
-        }
-
-        const showVisitDoctor = () => {
-          return row.visitDoctor.map(d => {
-            return <DoctorConsultationStatus doctor={d} />
-          })
         }
 
         return <DoctorConsultationStatus visitDoctor={row.visitDoctor} />

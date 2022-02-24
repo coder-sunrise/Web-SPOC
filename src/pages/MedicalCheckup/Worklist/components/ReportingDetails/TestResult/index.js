@@ -64,7 +64,7 @@ const TestResult = props => {
               textDecoration: 'underline',
             }}
             onClick={e => {
-              //this.openNonClaimableHistory()
+              e.preventDefault()
             }}
           >
             Result Details

@@ -1,38 +1,31 @@
 import React, { PureComponent } from 'react'
 import moment from 'moment'
+import { connect } from 'dva'
 import Yup from '@/utils/yup'
 import { Tabs, withFormikExtend } from '@/components'
 import { Button } from 'antd'
 import IndividualComment from './IndividualComment'
 import SummaryComment from './SummaryComment'
 
+@connect(({ medicalCheckupReportingDetails, user }) => ({
+  medicalCheckupReportingDetails,
+  user,
+}))
 @withFormikExtend({
-  mapPropsToValues: ({}) => {
-    return {
-      individualComment: [
-        {
-          id: 1,
-          examinationType: 'Lab',
-          createBy: 'Dr. Lim',
-          japaneseComment: 'Japanese Comment',
-          englishComment: 'English Comment',
-          isCustomized: false,
-          isVerified: false,
-        },
-        {
-          id: 2,
-          examinationType: 'Lab',
-          createBy: 'Dr. Lim',
-          isCustomized: true,
-          isVerified: true,
-        },
-      ],
-      summaryComment: [{ id: 1, createBy: 'Dr. Lim' }],
-    }
+  mapPropsToValues: ({ medicalCheckupReportingDetails }) => {
+    return medicalCheckupReportingDetails.entity || {}
   },
   validationSchema: Yup.object().shape({}),
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, onConfirm } = props
+    dispatch({
+      type: 'medicalCheckupReportingDetails/upsert',
+      payload: { ...values },
+    }).then(r => {
+      if (r) {
+        onConfirm()
+      }
+    })
   },
   enableReinitialize: true,
   displayName: 'CommentVerification',
