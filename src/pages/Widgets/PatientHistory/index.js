@@ -220,7 +220,7 @@ class PatientHistory extends Component {
         type: 'patientHistory/getUserPreference',
         payload: {},
       }).then(result => {
-        const { setFieldValue } = this.props
+        const { setFieldValue, clinicSettings } = this.props
         let selectCategories = [
           -99,
           ...this.getCategoriesOptions().map(o => o.value),
@@ -229,9 +229,17 @@ class PatientHistory extends Component {
           selectCategories = result
             .find(xx => xx.Identifier === 'SelectCategories')
             .SelectCategories.filter(o => selectCategories.find(c => c === o))
-          var preferVisitTypeIDs =
+          let preferVisitTypeIDs =
             result.find(tt => tt.Identifier === 'SelectedVisitTypeIDs')
               ?.SelectedVisitTypeIDs || []
+
+          const visitTypeSetting = JSON.parse(
+            clinicSettings.settings.visitTypeSetting,
+          )
+          preferVisitTypeIDs = _.intersection(
+            preferVisitTypeIDs,
+            visitTypeSetting.filter(x => x.isEnabled === 'true').map(x => x.id),
+          )
           this.setState({ visitTypeIDs: preferVisitTypeIDs }, () => {
             setFieldValue('visitTypeIDs', preferVisitTypeIDs)
           })
@@ -1753,7 +1761,7 @@ class PatientHistory extends Component {
               name='visitTypeIDs'
               render={args => (
                 <VisitTypeSelect
-                  label={formatMessage({ id: 'lab.search.visittype' })}
+                  label='Visit Type'
                   mode='multiple'
                   maxTagPlaceholder='Visit Types'
                   style={{
