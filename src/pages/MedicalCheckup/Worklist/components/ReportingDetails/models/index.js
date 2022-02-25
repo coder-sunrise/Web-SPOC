@@ -1,3 +1,4 @@
+import { history } from 'umi'
 import { notification } from '@/components'
 import { createFormViewModel } from 'medisys-model'
 import service from '../../../services'
@@ -34,7 +35,13 @@ export default createFormViewModel({
       *initState({ payload }, { all, put, select, take }) {
         const { version, visitID, pid, mcid, qid } = payload
         const patientState = yield select(st => st.patient)
-
+        yield put({
+          type: 'global/updateState',
+          payload: {
+            fullscreen: true,
+            showMedicalCheckupReportingDetails: true,
+          },
+        })
         yield put({
           type: 'updateState',
           payload: {
@@ -69,15 +76,70 @@ export default createFormViewModel({
         })
         yield take('query/@@end')
       },
+      *closeMedicalCheckupReportingDetailsModal(
+        { payload },
+        { all, put, select },
+      ) {
+        history.push('/medicalcheckup/worklist')
+        return yield all([
+          yield put({
+            type: 'global/updateAppState',
+            payload: {
+              disableSave: false,
+              showMedicalCheckupReportingDetails: false,
+              fullscreen: false,
+              currentPatientId: null,
+            },
+          }),
+          // reset patient model state to default state
+          yield put({
+            type: 'updateState',
+            payload: {
+              entity: undefined,
+              medicalCheckupWorkitemId: undefined,
+              visitID: undefined,
+              patientID: undefined,
+            },
+          }),
+        ])
+      },
       *queryIndividualCommentHistory({ payload }, { call, put }) {
         const response = yield call(
           service.queryIndividualCommentHistory,
           payload,
         )
+        yield put({
+          type: 'updateState',
+          payload: {
+            individualCommentList: response.data.data,
+          },
+        })
         return response
       },
       *querySummaryCommentHistory({ payload }, { call, put }) {
         const response = yield call(service.querySummaryCommentHistory, payload)
+        yield put({
+          type: 'updateState',
+          payload: {
+            summaryCommentList: response.data.data,
+          },
+        })
+        return response
+      },
+      *deleteSummaryComment({ payload }, { call, put }) {
+        const response = yield call(service.deleteSummaryComment, payload)
+        return response
+      },
+      *generateReport({ payload }, { call, put }) {
+        const response = yield call(service.generateReport, payload)
+        return response
+      },
+      *copyComment({ payload }, { call, put }) {
+        const response = yield call(service.copyComment, payload)
+        return response
+      },
+      *updateReportingDoctor({ payload }, { call, put }) {
+        const response = yield call(service.updateReportingDoctor, payload)
         return response
       },
     },

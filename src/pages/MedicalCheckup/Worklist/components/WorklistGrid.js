@@ -31,6 +31,7 @@ import Description from '@material-ui/icons/Description'
 import VisitForms from '@/pages/Reception/Queue/VisitForms'
 import WorklistContext from '../WorklistContext'
 import { StatusFilter } from './StatusFilter'
+import ReportingDoctorTag from './ReportingDoctorTag'
 
 const allMedicalCheckupReportStatuses = Object.values(
   MEDICALCHECKUP_WORKITEM_STATUS,
@@ -61,6 +62,7 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
   const {
     list: originalWorklist = [],
     medicalCheckupWorklistColumnSetting = [],
+    showReportingForm,
   } = medicalCheckupWorklist
   const dispatch = useDispatch()
   const [filteredStatuses, setFilteredStatuses] = useState(
@@ -130,6 +132,7 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
   }
 
   const showReportingDetails = async row => {
+    setIsAnyWorklistModelOpened(true)
     const version = Date.now()
     history.push(
       `/medicalcheckup/worklist/reportingdetails?mcid=${row.id}&qid=${row.queueId}&vid=${row.visitFK}&pid=${row.patientProfileFK}&v=${version}`,
@@ -389,7 +392,16 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
         dataIndex: 'medicalCheckupWorkitemDoctor',
         sorter: false,
         search: false,
-        width: 250,
+        width: 280,
+        render: (item, entity) => {
+          return (
+            <div style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
+              <ReportingDoctorTag
+                medicalCheckupDoctor={entity.medicalCheckupWorkitemDoctor}
+              />
+            </div>
+          )
+        },
       },
       {
         key: 'visitRemarks',

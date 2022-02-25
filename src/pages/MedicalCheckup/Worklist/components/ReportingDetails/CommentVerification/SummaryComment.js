@@ -9,6 +9,7 @@ import {
   MultipleTextField,
 } from '@/components'
 import { CheckOutlined } from '@ant-design/icons'
+import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 
 const SummaryComment = ({
   height: mainDivHeight = 700,
@@ -16,7 +17,7 @@ const SummaryComment = ({
   values,
 }) => {
   const commitSummaryCommentChanges = ({ rows, changed }) => {
-    setFieldValue('summaryComment', rows)
+    setFieldValue('medicalCheckupSummaryComment', rows)
   }
   let height = mainDivHeight - 180
   if (height < 300) height = 300
@@ -26,7 +27,7 @@ const SummaryComment = ({
         TableProps={{
           height,
         }}
-        rows={values.summaryComment}
+        rows={values.medicalCheckupSummaryComment}
         forceRender
         EditingProps={{
           showAddCommand: false,
@@ -46,6 +47,15 @@ const SummaryComment = ({
             width: 140,
             sortingEnabled: false,
             disabled: true,
+            render: row => {
+              return (
+                <span>{`${
+                  hasValue(row.commentByUserTitle)
+                    ? `${row.commentByUserTitle}.`
+                    : ''
+                }${row.commentByUser}`}</span>
+              )
+            },
           },
           {
             columnName: 'japaneseComment',

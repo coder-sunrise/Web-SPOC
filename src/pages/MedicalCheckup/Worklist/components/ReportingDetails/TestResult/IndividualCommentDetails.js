@@ -1,6 +1,10 @@
 import React, { PureComponent } from 'react'
 import Yup from '@/utils/yup'
 import _ from 'lodash'
+import { Button } from 'antd'
+import { connect } from 'dva'
+import moment from 'moment'
+import { getUniqueId } from '@/utils/utils'
 import {
   CodeSelect,
   GridContainer,
@@ -11,9 +15,9 @@ import {
   FastField,
   TextField,
   Tooltip,
+  FieldArray,
+  Field,
 } from '@/components'
-import { Button } from 'antd'
-import { connect } from 'dva'
 import { List, ListItem, ListItemText, withStyles } from '@material-ui/core'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 
@@ -28,18 +32,52 @@ const styles = theme => ({
   },
 })
 
-@connect(({ medicalCheckupReportingDetails }) => ({
+@connect(({ medicalCheckupReportingDetails, user }) => ({
   medicalCheckupReportingDetails,
+  user,
 }))
 @withFormikExtend({
   mapPropsToValues: ({ medicalCheckupReportingDetails }) => {
     return medicalCheckupReportingDetails.individualCommentEntity || {}
   },
   validationSchema: Yup.object().shape({
-    comment: Yup.string().required(),
+    //comment: Yup.string().required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
-    const { dispatch, onConfirm } = props
+    const {
+      medicalCheckupReportingDetails,
+      dispatch,
+      onConfirm,
+      saveComment = () => {},
+    } = props
+    const {
+      medicalCheckupIndividualComment,
+      medicalCheckupSummaryComment,
+      medicalCheckupWorkitemDoctor,
+      ...resetValue
+    } = medicalCheckupReportingDetails.entity
+    let newComents = values.medicalCheckupIndividualComment.filter(
+      item => item.id || !item.isDeletd,
+    )
+    let index = 0
+    newComents.forEach(item => {
+      if (!item.isDeleted) {
+        item.sequence = index
+        index = index + 1
+      }
+    })
+    const newValue = {
+      ...resetValue,
+      medicalCheckupIndividualComment: newComents,
+    }
+    dispatch({
+      type: 'medicalCheckupReportingDetails/upsert',
+      payload: { ...newValue },
+    }).then(r => {
+      if (r) {
+        saveComment()
+      }
+    })
   },
   enableReinitialize: true,
   displayName: 'IndividualCommentDetails',
@@ -53,14 +91,31 @@ class IndividualCommentDetails extends PureComponent {
     const { setFieldValue } = this.props
     const { selectedItem } = this.state
     const keys = Object.keys(selectedItem)
-    setFieldValue(
-      'tempComment',
-      keys.map(key => selectedItem[key].displayValue).join(' '),
-    )
+    const englishComment = keys
+      .map(
+        key =>
+          selectedItem[key].translationData
+            .find(l => l.language === 'EN')
+            ?.list?.find(l => (l.key = 'displayValue'))?.value,
+      )
+      .join(' ')
+    const japaneseComment = keys
+      .map(
+        key =>
+          selectedItem[key].translationData
+            .find(l => l.language === 'JP')
+            ?.list?.find(l => (l.key = 'displayValue'))?.value,
+      )
+      .join(' ')
+    setFieldValue('originalJapaneseComment', japaneseComment)
+    setFieldValue('japaneseComment', japaneseComment)
+    setFieldValue('originalEnglishComment', englishComment)
+    setFieldValue('englishComment', englishComment)
   }
 
   getSelection = group => {
     const { selectedItem, searchValue = '' } = this.state
+    const { selectedLanguage } = this.props
     return (
       <List
         style={{
@@ -81,6 +136,9 @@ class IndividualCommentDetails extends PureComponent {
                 .indexOf(searchValue.toUpperCase()) >= 0,
           )
           .map(item => {
+            const showValue = item.translationData
+              .find(l => l.language === selectedLanguage)
+              ?.list?.find(l => (l.key = 'displayValue'))?.value
             return (
               <ListItem
                 alignItems='flex-start'
@@ -103,7 +161,7 @@ class IndividualCommentDetails extends PureComponent {
                   )
                 }}
               >
-                <Tooltip title={item.displayValue}>
+                <Tooltip title={showValue}>
                   <div
                     style={{
                       width: '100%',
@@ -114,7 +172,7 @@ class IndividualCommentDetails extends PureComponent {
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    {item.displayValue}
+                    {showValue}
                   </div>
                 </Tooltip>
               </ListItem>
@@ -125,27 +183,46 @@ class IndividualCommentDetails extends PureComponent {
   }
 
   insertComment = () => {
-    const { values, setFieldValue } = this.props
-    const { editIndividualComment, tempComment } = values
-    if (
-      tempComment === null ||
-      tempComment === undefined ||
-      !tempComment.trim().length
-    ) {
-      return
-    }
-    setFieldValue('editIndividualComment', [
-      ...editIndividualComment,
-      { id: 6, comment: tempComment },
+    const { values, setFieldValue, user } = this.props
+    const {
+      medicalCheckupIndividualComment,
+      selectExaminationItemId,
+      originalJapaneseComment,
+      japaneseComment,
+      originalEnglishComment,
+      englishComment,
+    } = values
+    setFieldValue('medicalCheckupIndividualComment', [
+      ...medicalCheckupIndividualComment,
+      {
+        uid: getUniqueId(),
+        examinationItemFK: selectExaminationItemId,
+        originalJapaneseComment,
+        japaneseComment,
+        originalEnglishComment,
+        englishComment,
+        commentDate: moment(),
+        commentByUserFK: user.data.clinicianProfile.userProfile.id,
+      },
     ])
 
     this.setState({ selectedItem: {} })
-    setFieldValue('tempComment', undefined)
+    setFieldValue('originalJapaneseComment', undefined)
+    setFieldValue('japaneseComment', undefined)
+    setFieldValue('originalEnglishComment', undefined)
+    setFieldValue('englishComment', undefined)
   }
   render() {
-    const { values, commentGroupList = [], height } = this.props
-    const { editIndividualComment = [] } = values
-    const categoryListHeight = height - 260
+    const {
+      values,
+      commentGroupList = [],
+      height,
+      selectedLanguage,
+      handleSubmit,
+      setFieldValue,
+    } = this.props
+    const { medicalCheckupIndividualComment = [] } = values
+    const categoryListHeight = height - 263
     return (
       <div
         style={{
@@ -170,6 +247,7 @@ class IndividualCommentDetails extends PureComponent {
                   display: 'inline-block',
                   overflow: 'auto',
                   height: categoryListHeight,
+                  borderTop: '1px solid #CCCCCC',
                   borderLeft: '1px solid #CCCCCC',
                   borderBottom: '1px solid #CCCCCC',
                 }}
@@ -180,8 +258,10 @@ class IndividualCommentDetails extends PureComponent {
           })}
         </div>
         <div style={{ padding: '4px 35px 4px 8px', position: 'relative' }}>
-          <FastField
-            name='tempComment'
+          <Field
+            name={
+              selectedLanguage === 'EN' ? 'englishComment' : 'japaneseComment'
+            }
             render={args => (
               <TextField
                 inputProps={{ placeholder: 'Enter Comment' }}
@@ -198,38 +278,66 @@ class IndividualCommentDetails extends PureComponent {
           ></Button>
         </div>
         <div style={{ height: 90, overflow: 'auto' }}>
-          {editIndividualComment.map(item => {
-            return (
-              <div
-                style={{
-                  position: 'relative',
-                  paddingLeft: 8,
-                  paddingRight: 30,
-                }}
-              >
-                <TextField value={item.comment} />
-                <IconButton
-                  style={{
-                    color: 'red',
-                    position: 'absolute',
-                    right: 0,
-                    top: 0,
-                  }}
-                >
-                  <MinusCircleOutlined />
-                </IconButton>
-              </div>
-            )
-          })}
+          <FieldArray
+            name='medicalCheckupIndividualComment'
+            render={arrayHelpers => {
+              this.ArrayHelpers = arrayHelpers
+              const activeRows = medicalCheckupIndividualComment.filter(
+                val => !val.isDeleted,
+              )
+              return activeRows.map(val => {
+                if (val && val.isDeleted) return null
+                const i = medicalCheckupIndividualComment.findIndex(
+                  item => val.uid === item.uid,
+                )
+                const displayFieldName = `medicalCheckupIndividualComment[${i}].${
+                  selectedLanguage === 'EN'
+                    ? 'englishComment'
+                    : 'japaneseComment'
+                }`
+                return (
+                  <div key={i}>
+                    <div
+                      style={{
+                        position: 'relative',
+                        paddingLeft: 8,
+                        paddingRight: 30,
+                      }}
+                    >
+                      <Field
+                        name={displayFieldName}
+                        render={args => {
+                          return <TextField {...args} />
+                        }}
+                      />
+                      <IconButton
+                        style={{
+                          color: 'red',
+                          position: 'absolute',
+                          right: 0,
+                          top: 0,
+                        }}
+                        onClick={() =>
+                          setFieldValue(
+                            `medicalCheckupIndividualComment[${i}].isDeleted`,
+                            true,
+                          )
+                        }
+                      >
+                        <MinusCircleOutlined />
+                      </IconButton>
+                    </div>
+                  </div>
+                )
+              })
+            }}
+          />
         </div>
         <Button
           size='small'
           type='primary'
           style={{ margin: 8 }}
-          onClick={e => {
-            const { handleSubmit } = this.props
-            if (handleSubmit) handleSubmit()
-          }}
+          onClick={handleSubmit}
         >
           Save Comment
         </Button>

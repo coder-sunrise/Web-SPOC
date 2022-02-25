@@ -1029,3 +1029,9 @@ export const DISPENSE_FROM = {
   QUEUE: 1,
   MEDICALCHECKUP: 2,
 }
+
+export const REPORTINGDOCTOR_STATUS = {
+  NEW: 'New',
+  COMMENTDONE: 'CommentDone',
+  VERIFIED: 'Verified',
+}
