@@ -289,7 +289,7 @@ const RadiologyDetails = () => {
         >
           {!isReadOnly && (
             <GridItem md={12}>
-              <div style={{ padding: 8 }}>
+              <div>
                 <Banner from='Radiology' />
               </div>
             </GridItem>

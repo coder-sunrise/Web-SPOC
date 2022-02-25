@@ -90,10 +90,12 @@ class GlobalModalContainer extends PureComponent {
     dispatch({
       type: 'visitRegistration/closeModal',
     })
-    dispatch({
-      type: 'patient/updateState',
-      payload: { entity: null },
-    })
+    if (!global.showMedicalCheckupReportingDetails) {
+      dispatch({
+        type: 'patient/updateState',
+        payload: { entity: null },
+      })
+    }
   }
 
   closeConfirmationPrompt = () => {

@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { Link } from 'umi'
+import { Link, history } from 'umi'
 import { connect } from 'dva'
 import _ from 'lodash'
 import moment from 'moment'
@@ -9,6 +9,8 @@ import { headerHeight } from 'mui-pro-jss'
 import Warning from '@material-ui/icons/Error'
 import Edit from '@material-ui/icons/Edit'
 import Refresh from '@material-ui/icons/Sync'
+import ExpandMoreTwoTone from '@material-ui/icons/ExpandMoreTwoTone'
+import ExpandLessTwoTone from '@material-ui/icons/ExpandLessTwoTone'
 import { getAppendUrl } from '@/utils/utils'
 import classnames from 'classnames'
 import { withStyles } from '@material-ui/core/styles'
@@ -17,6 +19,7 @@ import PatientStickyNotesBtn from '@/components/_medisys/PatientInfoSideBanner/P
 import SelectPreOrder from '@/pages/Reception/Appointment/components/form/SelectPreOrder'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import { MoreButton, LoadingWrapper } from '@/components/_medisys'
+import PrintLabLabelButton from '@/components/_medisys/PatientInfoSideBanner/PatientLabelBtn'
 import {
   GridContainer,
   GridItem,
@@ -62,10 +65,13 @@ const styles = theme => ({
   part: {
     display: 'inline-block',
   },
-  newContent: {
+  contentWithWrap: {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+    paddingLeft: '5px',
+  },
+  contentWithoutWrap: {
     paddingLeft: '5px',
   },
   contents: {
@@ -78,15 +84,18 @@ const styles = theme => ({
 })
 
 @control()
-@connect(({ patient, codetable, loading, clinicSettings }) => ({
-  patient,
-  codetable,
-  ctschemetype: codetable.ctschemetype || [],
-  clinicSettings: clinicSettings.settings || clinicSettings.default,
-  refreshingBalance:
-    loading.effects['patient/refreshChasBalance'] ||
-    loading.effects['patient/refreshMedisaveBalance'],
-}))
+@connect(
+  ({ patient, codetable, loading, visitRegistration, clinicSettings }) => ({
+    patient,
+    codetable,
+    visitRegistration,
+    ctschemetype: codetable.ctschemetype || [],
+    clinicSettings: clinicSettings.settings || clinicSettings.default,
+    refreshingBalance:
+      loading.effects['patient/refreshChasBalance'] ||
+      loading.effects['patient/refreshMedisaveBalance'],
+  }),
+)
 class Banner extends PureComponent {
   state = {
     showWarning: false,
@@ -98,6 +107,7 @@ class Banner extends PureComponent {
     showSchemeModal: false,
     showNonClaimableHistoryModal: false,
     showPreOrderModal: false,
+    isExpanded: false,
   }
 
   constructor(props) {
@@ -267,6 +277,13 @@ class Banner extends PureComponent {
   }
 
   openNotes = () => this.setState({ showNotesModal: true })
+  openEditVisit = () => {
+    const parameter = {
+      md: 'visreg',
+    }
+    parameter.vis = this.props.visitRegistration?.entity?.visit?.id
+    history.push(getAppendUrl(parameter))
+  }
   closeNotes = () => this.setState({ showNotesModal: false })
   openPreOrders = () => this.setState({ showPreOrderModal: true })
   closePreOrders = () => this.setState({ showPreOrderModal: false })
@@ -458,36 +475,34 @@ class Banner extends PureComponent {
               </Link>
             </Popover>
           ) : (
-            <Link>
-              <span
-                style={{
-                  color: scheme.isExpired
-                    ? 'red'
-                    : scheme.schemeTypeFK === SCHEME_TYPE.INSURANCE
-                    ? `#${schemeInsuranceDisplayColorCode}`
-                    : 'black',
-                  textDecoration: 'underline',
-                  whiteSpace: 'nowrap',
-                }}
-                onClick={e => {
-                  const editDetailAccessRight = Authorized.check(
-                    'copayer.copayerdetails',
-                  ) || {
-                    rights: 'hidden',
-                  }
-                  if (editDetailAccessRight.rights === 'hidden') return
-                  if (scheme.copayerFK) {
-                    this.openScheme(scheme.copayerFK)
-                  }
-                }}
-              >
-                {s.copaymentSchemeName || s.schemeTypeName}
-                {s.validTo
-                  ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`
-                  : ' (Exp: -)'}
-                {i < arr.length - 1 ? ',' : ''}
-              </span>
-            </Link>
+            <span
+              style={{
+                cursor: 'pointer',
+                color: scheme.isExpired
+                  ? 'red'
+                  : scheme.schemeTypeFK === SCHEME_TYPE.INSURANCE
+                  ? `#${schemeInsuranceDisplayColorCode}`
+                  : 'black',
+                textDecoration: 'underline',
+              }}
+              onClick={e => {
+                const editDetailAccessRight = Authorized.check(
+                  'copayer.copayerdetails',
+                ) || {
+                  rights: 'hidden',
+                }
+                if (editDetailAccessRight.rights === 'hidden') return
+                if (scheme.copayerFK) {
+                  this.openScheme(scheme.copayerFK)
+                }
+              }}
+            >
+              {s.copaymentSchemeName || s.schemeTypeName}
+              {s.validTo
+                ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`
+                : ' (Exp: -)'}
+              {i < arr.length - 1 ? ',' : ''}
+            </span>
           )}
         </span>
       )
@@ -861,6 +876,7 @@ class Banner extends PureComponent {
   getBannerMd = () => {
     const { from, extraCmt } = this.props
     if (from === 'Consultation' || from === 'PatientDashboard') return 9
+    if (from === 'VisitReg') return 12
     if (extraCmt) return 11
     return 12
   }
@@ -895,6 +911,9 @@ class Banner extends PureComponent {
     })
     this.setState({ showNonClaimableHistoryModal: false })
   }
+  expandOrCollespe = () => {
+    this.setState({ isExpanded: !this.state.isExpanded })
+  }
 
   render() {
     const { props } = this
@@ -915,9 +934,8 @@ class Banner extends PureComponent {
         position: 'sticky',
         overflowY: 'auto',
         top: headerHeight,
-        zIndex: 998, 
-        backgroundColor: '#f0f8ff', 
-        marginTop: '-8px',
+        zIndex: 998,
+        backgroundColor: '#f0f8ff',
       },
       refreshingBalance,
       disablePreOrder,
@@ -926,11 +944,14 @@ class Banner extends PureComponent {
       isRetail,
       editingOrder,
       clinicSettings,
-      visitInfo,
+      visitRegistration,
     } = props
 
+    const visitInfo = visitRegistration?.entity?.visit
     const { isEnableJapaneseICD10Diagnosis } = clinicSettings
-
+    const contentClass = this.state.isExpanded
+      ? classes.contentWithoutWrap
+      : classes.contentWithWrap
     const preOrderAccessRight = Authorized.check(
       'patientdatabase.modifypreorder',
     ) || { rights: 'hidden' }
@@ -1021,7 +1042,7 @@ class Banner extends PureComponent {
     ) || { rights: 'hidden' }
 
     const patientTitle = (
-      <GridItem md={12} className={classes.cell}>
+      <div>
         <Link
           className={classes.header}
           style={{
@@ -1040,7 +1061,7 @@ class Banner extends PureComponent {
           }
           tabIndex='-1'
         >
-          <Tooltip title={name} placement='bottom-start'>
+          <Tooltip enterDelay={100} title={name} placement='bottom-start'>
             <span
               style={{
                 textOverflow: 'ellipsis',
@@ -1095,17 +1116,35 @@ class Banner extends PureComponent {
         </span>
 
         <span className={classes.part} style={{ top: 3, position: 'relative' }}>
-          <PatientStickyNotesBtn patientProfileFK={info.id} />
+          <Tooltip
+            enterDelay={100}
+            title='Sticky Notes'
+            placement='bottom-start'
+          >
+            <PatientStickyNotesBtn patientProfileFK={info.id} />
+          </Tooltip>
         </span>
-      </GridItem>
+        {from === 'VisitReg' && (
+          <span
+            className={classes.part}
+            style={{ top: 3, position: 'relative' }}
+          >
+            <PrintLabLabelButton
+              patientId={info.id}
+              clinicSettings={clinicSettings?.settings}
+            />
+          </span>
+        )}
+      </div>
     )
     const patientTag = (
       <Row wrap={false}>
         <Col flex='none'>
           <span className={classes.header}>Tag: </span>
         </Col>
-        <Col flex='auto' className={classes.newContent}>
+        <Col flex='auto' className={contentClass}>
           <Tooltip
+            enterDelay={100}
             title={this.getTagData()}
             placement='bottom-start'
             interactive='true'
@@ -1118,9 +1157,14 @@ class Banner extends PureComponent {
     const patientG6PD = (
       <Row wrap={false}>
         <Col flex='none'>
-          <span className={classes.header}>G6PD: </span>
+          <span
+            className={classes.header}
+            style={{ color: g6PD && g6PD.name === 'Yes' ? 'red' : 'darkblue' }}
+          >
+            G6PD:{' '}
+          </span>
         </Col>
-        <Col flex='auto' className={classes.newContent}>
+        <Col flex='auto' className={contentClass}>
           <span>{g6PD ? g6PD.name : '-'}</span>
         </Col>
       </Row>
@@ -1133,9 +1177,10 @@ class Banner extends PureComponent {
             color: info.outstandingBalance ? 'red' : headerStyles.color,
           }}
         >
-          O/S Bal.:&nbsp;
+          O/S Balance:
         </span>
         <Tooltip
+          enterDelay={100}
           title={
             info.outstandingBalance
               ? `${currencySymbol}${_.round(info.outstandingBalance, 2)}`
@@ -1146,6 +1191,7 @@ class Banner extends PureComponent {
             style={{
               fontWeight: 500,
               marginTop: 5,
+              paddingLeft: 5,
             }}
           >
             {info.outstandingBalance ? (
@@ -1164,14 +1210,24 @@ class Banner extends PureComponent {
     const patientSchemeDetails = (
       <Row wrap={false}>
         <Col flex='none'>
-          <span className={classes.header}>Scheme: </span>
+          <span className={classes.header}>
+            Scheme
+            {schemeDataList.length > 0 ? (
+              <span>{`(${schemeDataList.length})`}</span>
+            ) : (
+              <span></span>
+            )}
+            :
+          </span>
         </Col>
-        <Col flex='auto' className={classes.newContent}>
+        <Col flex='auto' className={contentClass}>
           {/* <LoadingWrapper
             loading={refreshingBalance}
             text='Retrieving balance...'
           > */}
           <Tooltip
+            enterDelay={100}
+            style={{ width: 300 }}
             title={
               <div>
                 {this.getSchemeList(
@@ -1212,8 +1268,12 @@ class Banner extends PureComponent {
         <Col flex='none'>
           <span className={classes.header}>Patient Request: </span>
         </Col>
-        <Col flex='auto' className={classes.newContent}>
-          <Tooltip title={info.patientRequest} interactive='true'>
+        <Col flex='auto' className={contentClass}>
+          <Tooltip
+            enterDelay={100}
+            title={info.patientRequest}
+            interactive='true'
+          >
             <span> {info.patientRequest || '-'}</span>
           </Tooltip>
         </Col>
@@ -1233,8 +1293,9 @@ class Banner extends PureComponent {
             HRP:{' '}
           </span>
         </Col>
-        <Col flex='auto' className={classes.newContent}>
+        <Col flex='auto' className={contentClass}>
           <Tooltip
+            enterDelay={100}
             title={info.patientMedicalHistory?.highRiskCondition}
             interactive='true'
           >
@@ -1248,8 +1309,12 @@ class Banner extends PureComponent {
         <Col flex='none'>
           <span className={classes.header}>Persistent Diagnosis: </span>
         </Col>
-        <Col flex='auto' className={classes.newContent}>
-          <Tooltip title={persistentDiagnosis} interactive='true'>
+        <Col flex='auto' className={contentClass}>
+          <Tooltip
+            enterDelay={100}
+            title={persistentDiagnosis}
+            interactive='true'
+          >
             <span>{persistentDiagnosis}</span>
           </Tooltip>
         </Col>
@@ -1260,8 +1325,9 @@ class Banner extends PureComponent {
         <Col flex='none'>
           <span className={classes.header}>Long Term Medication: </span>
         </Col>
-        <Col flex='auto' className={classes.newContent}>
+        <Col flex='auto' className={contentClass}>
           <Tooltip
+            enterDelay={100}
             title={info.patientMedicalHistory?.longTermMedication}
             interactive='true'
           >
@@ -1275,14 +1341,18 @@ class Banner extends PureComponent {
         <Col flex='none'>
           <span
             className={classes.header}
-            style={{ color: this.getAllergyData() ? 'red' : 'inherit' }}
+            style={{ color: this.getAllergyData() ? 'red' : 'darkblue' }}
           >
             Allergy:
           </span>
           <span>{this.getAllergyLink('link')}</span>
         </Col>
-        <Col flex='auto' className={classes.newContent}>
-          <Tooltip title={this.getAllergyData()} interactive='true'>
+        <Col flex='auto' className={contentClass}>
+          <Tooltip
+            enterDelay={100}
+            title={this.getAllergyData()}
+            interactive='true'
+          >
             <span>{this.getAllergyData()}</span>
           </Tooltip>
         </Col>
@@ -1293,8 +1363,10 @@ class Banner extends PureComponent {
         <Col flex='none'>
           <span className={classes.header}>Visit Date: </span>
         </Col>
-        <Col flex='auto' className={classes.newContent}>
-          {moment(visitInfo?.entity?.visit?.visitDate).format(dateFormatLong)}
+        <Col flex='auto' className={contentClass}>
+          {moment(visitRegistration?.entity?.visit?.visitDate).format(
+            dateFormatLong,
+          )}
         </Col>
       </Row>
     )
@@ -1303,13 +1375,17 @@ class Banner extends PureComponent {
         <Col flex='none'>
           <span className={classes.header}>Visit Purpose: </span>
         </Col>
-        <Col flex='auto' className={classes.newContent}>
+        <Col flex='auto' className={contentClass}>
           <Tooltip
-            title={visitInfo?.entity?.visit?.visitOrderTemplateDetails || '-'}
+            enterDelay={100}
+            title={
+              visitRegistration?.entity?.visit?.visitOrderTemplateDetails || '-'
+            }
             interactive='true'
           >
             <span>
-              {visitInfo?.entity?.visit?.visitOrderTemplateDetails || '-'}
+              {visitRegistration?.entity?.visit?.visitOrderTemplateDetails ||
+                '-'}
             </span>
           </Tooltip>
         </Col>
@@ -1320,12 +1396,13 @@ class Banner extends PureComponent {
         <Col flex='none'>
           <span className={classes.header}>Visit Remarks: </span>
         </Col>
-        <Col flex='auto' className={classes.newContent}>
+        <Col flex='auto' className={contentClass}>
           <Tooltip
-            title={visitInfo?.entity?.visit?.visitRemarks || '-'}
+            enterDelay={100}
+            title={visitRegistration?.entity?.visit?.visitRemarks || '-'}
             interactive='true'
           >
-            <span>{visitInfo?.entity?.visit?.visitRemarks || '-'}</span>
+            <span>{visitRegistration?.entity?.visit?.visitRemarks || '-'}</span>
           </Tooltip>
         </Col>
       </Row>
@@ -1335,9 +1412,10 @@ class Banner extends PureComponent {
         <Col flex='none'>
           <span className={classes.header}>Report Priority:</span>
         </Col>
-        <Col flex='auto' className={classes.newContent}>
-          {visitInfo?.entity?.visit?.medicalCheckupWorkitem &&
-            visitInfo?.entity?.visit?.medicalCheckupWorkitem[0]?.reportPriority}
+        <Col flex='auto' className={contentClass}>
+          {visitRegistration?.entity?.visit?.medicalCheckupWorkitem &&
+            visitRegistration?.entity?.visit?.medicalCheckupWorkitem[0]
+              ?.reportPriority}
         </Col>
       </Row>
     )
@@ -1346,42 +1424,50 @@ class Banner extends PureComponent {
         <Col flex='none'>
           <span className={classes.header}>Report Language:</span>
         </Col>
-        <Col flex='auto' className={classes.newContent}>
-          {visitInfo?.entity?.visit?.medicalCheckupWorkitem &&
-            visitInfo?.entity?.visit?.medicalCheckupWorkitem[0]?.reportLanguage}
+        <Col flex='auto' className={contentClass}>
+          {visitRegistration?.entity?.visit?.medicalCheckupWorkitem &&
+            visitRegistration?.entity?.visit?.medicalCheckupWorkitem[0]
+              ?.reportLanguage}
         </Col>
       </Row>
     )
     const patientNotesLinkElm = (
-      <Link className={classes.header}>
-        <span
-          style={{
-            display: 'block',
-            textDecoration: 'underline',
-          }}
-          onClick={e => {
-            this.openNotes()
-          }}
-        >
-          Notes
-        </span>
-      </Link>
+      <span
+        className={classes.header}
+        style={{
+          display: 'inline-block',
+          textDecoration: 'underline',
+          cursor: 'pointer',
+        }}
+        onClick={e => {
+          this.openNotes()
+        }}
+      >
+        Notes
+      </span>
     )
     const patientEditVisitElm = (
-      <Link className={classes.header}>
-        <span
-          style={{
-            display: 'block',
-            textDecoration: 'underline',
-          }}
-          onClick={e => {
-            this.openNotes()
-          }}
-        >
-          Edit Visit
-        </span>
-      </Link>
+      <span
+        className={classes.header}
+        style={{
+          display: 'block',
+          cursor: 'pointer',
+          textDecoration: 'underline',
+        }}
+        onClick={e => {
+          this.openEditVisit()
+        }}
+      >
+        Edit Visit
+      </span>
     )
+    const schemeCountElm =
+      schemeDataList.length > 0 ? (
+        <span>{`(${schemeDataList.length})`}</span>
+      ) : (
+        <span></span>
+      )
+
     return (
       <Paper id='patientBanner' style={style}>
         {/* Please do not change the height below (By default is 100) */}
@@ -1389,11 +1475,11 @@ class Banner extends PureComponent {
           <GridContainer
             style={{ minHeight: 100, width: '100%', padding: '5px 0' }}
           >
-            <GridItem xs={9} md={this.getBannerMd()}>
+            <GridItem style={{ padding: 0 }} xs={9} md={this.getBannerMd()}>
               <GridContainer>
                 <GridItem xs={10} md={10}>
                   <GridContainer>
-                    {patientTitle}
+                    <GridItem md={12}>{patientTitle}</GridItem>
                     <GridItem xs={6} md={4}>
                       {patientTag}
                     </GridItem>
@@ -1432,30 +1518,22 @@ class Banner extends PureComponent {
                         md={12}
                         style={{ height: 26, paddingTop: 5 }}
                       >
-                        <span style={{ color: 'darkblue' }}>Last Visit: </span>
-                        <Tooltip
-                          title={moment(entity.lastVisitDate).format(
-                            'DD MMM YYYY',
-                          )}
-                        >
-                          <span>
-                            {moment(entity.lastVisitDate).format('DD MMM YYYY')}
-                          </span>
-                        </Tooltip>
+                        <span className={classes.header}>Last Visit: </span>
+                        <span style={{ paddingLeft: 5 }}>
+                          {moment(entity.lastVisitDate).format('DD MMM YYYY')}
+                        </span>
                       </GridItem>
                     ) : (
                       <GridItem xs={12} md={12}></GridItem>
                     )}
                     <GridItem xs={12} md={12}>
-                      {notesHistoryAccessRight.rights !== 'hidden' &&
-                        patientNotesLinkElm}
-
                       {viewNonClaimableHistoryRight.rights === 'enable' && (
-                        <Link className={classes.header}>
+                        <span className={classes.header}>
                           <span
                             style={{
                               display: 'block',
                               textDecoration: 'underline',
+                              cursor: 'pointer',
                             }}
                             onClick={e => {
                               this.openNonClaimableHistory()
@@ -1464,69 +1542,76 @@ class Banner extends PureComponent {
                             {`Non Claimable History (${info.nonClaimableHistoryCount ||
                               0})`}
                           </span>
-                        </Link>
+                        </span>
                       )}
-
-                      {preOrderAccessRight.rights === 'enable' && (
-                        <Link
-                          className={classes.header}
-                          disabled={preOrderAccessRight.rights === 'disable'}
-                        >
+                      <div>
+                        {notesHistoryAccessRight.rights !== 'hidden' && (
                           <span
-                            style={{
-                              display: 'block',
-                              textDecoration: 'underline',
-                            }}
-                            onClick={e => {
-                              e.preventDefault()
-                              if (preOrderAccessRight.rights === 'disable') {
-                                notification.error({
-                                  message:
-                                    'Current user is not authorized to access',
-                                })
-                                return
-                              }
-
-                              if (
-                                disablePreOrder &&
-                                disablePreOrder.some(cond => {
-                                  if (cond.condition) {
-                                    dispatch({
-                                      type: 'global/updateAppState',
-                                      payload: {
-                                        openConfirm: true,
-                                        isInformType: true,
-                                        openConfirmText: 'OK',
-                                        openConfirmContent: cond.message,
-                                      },
-                                    })
-                                    return true
-                                  }
-                                  return false
-                                })
-                              )
-                                return
-
-                              this.openPreOrders()
-                            }}
+                            className={classes.header}
+                            style={{ marginRight: 10 }}
                           >
-                            {`Pre-Order (${
-                              activePreOrderItems
-                                ? activePreOrderItems.length
-                                : (pendingPreOrderItems &&
-                                    pendingPreOrderItems.length) ||
-                                  0
-                            })`}
+                            {patientNotesLinkElm}
                           </span>
-                        </Link>
-                      )}
+                        )}
+                        {preOrderAccessRight.rights === 'enable' && (
+                          <span className={classes.header}>
+                            <span
+                              style={{
+                                display: 'block',
+                                textDecoration: 'underline',
+                                cursor: 'pointer',
+                              }}
+                              onClick={e => {
+                                e.preventDefault()
+                                if (preOrderAccessRight.rights === 'disable') {
+                                  notification.error({
+                                    message:
+                                      'Current user is not authorized to access',
+                                  })
+                                  return
+                                }
 
-                      <Link
+                                if (
+                                  disablePreOrder &&
+                                  disablePreOrder.some(cond => {
+                                    if (cond.condition) {
+                                      dispatch({
+                                        type: 'global/updateAppState',
+                                        payload: {
+                                          openConfirm: true,
+                                          isInformType: true,
+                                          openConfirmText: 'OK',
+                                          openConfirmContent: cond.message,
+                                        },
+                                      })
+                                      return true
+                                    }
+                                    return false
+                                  })
+                                )
+                                  return
+
+                                this.openPreOrders()
+                              }}
+                            >
+                              {`Pre-Order (${
+                                activePreOrderItems
+                                  ? activePreOrderItems.length
+                                  : (pendingPreOrderItems &&
+                                      pendingPreOrderItems.length) ||
+                                    0
+                              })`}
+                            </span>
+                          </span>
+                        )}
+                      </div>
+                      <span
                         className={classes.header}
                         style={{
                           display: 'block',
                           paddingRight: 10,
                           textDecoration: 'underline',
+                          cursor: 'pointer',
                         }}
                         to={getAppendUrl({
                           md: 'pt',
@@ -1537,7 +1622,7 @@ class Banner extends PureComponent {
                         tabIndex='-1'
                       >
                         Examination Results
-                      </Link>
+                      </span>
                     </GridItem>
                   </GridContainer>
                 </GridItem>
@@ -1553,7 +1638,7 @@ class Banner extends PureComponent {
         )}
         {from === 'MedicalCheckup' && (
           <GridContainer
-            style={{ minHeight: 100, width: '100%', padding: '5px 10px' }}
+            style={{ minHeight: 100, width: '100%', padding: '5px' }}
           >
             <GridItem md={12}>{patientTitle}</GridItem>
             <GridItem md={3}>{patientG6PD}</GridItem>
@@ -1579,6 +1664,27 @@ class Banner extends PureComponent {
             </GridItem>
           </GridContainer>
         )}
+
+        <span
+          style={{
+            top: 3,
+            display: 'inline-block',
+            position: 'absolute',
+            right: 10,
+          }}
+        >
+          <IconButton onClick={this.expandOrCollespe}>
+            {this.state.isExpanded ? (
+              <Tooltip title='Expand Panel'>
+                <ExpandLessTwoTone />
+              </Tooltip>
+            ) : (
+              <Tooltip title='Collapse Panel'>
+                <ExpandMoreTwoTone />
+              </Tooltip>
+            )}
+          </IconButton>
+        </span>
         <CommonModal
           open={this.state.showPatientProfile}
           onClose={this.closePatientProfile}

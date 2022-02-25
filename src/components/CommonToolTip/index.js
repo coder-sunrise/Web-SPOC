@@ -38,15 +38,12 @@ class CommonTooltip extends PureComponent {
       useTooltip2 = false,
       ...restProps
     } = this.props
-    // console.log(placement, restProps)
     return (
       <Tooltip
         classes={{
           tooltip: useTooltip2 ? classes.tooltip2 : classes.tooltip,
           popper: classes.popper,
         }}
-        // interactive
-        // leaveDelay={999999}
         title={title}
         enterDelay={enterDelay}
         placement={placement}
