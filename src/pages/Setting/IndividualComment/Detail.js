@@ -147,6 +147,7 @@ const Detail = ({
                 <CodeSelect
                   label='Examination'
                   code='ctexaminationitem'
+                  labelField='displayValue'
                   {...args}
                 />
               )}

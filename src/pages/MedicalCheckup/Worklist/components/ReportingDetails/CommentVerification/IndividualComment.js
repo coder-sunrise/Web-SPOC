@@ -9,6 +9,7 @@ import {
   MultipleTextField,
 } from '@/components'
 import { CheckOutlined } from '@ant-design/icons'
+import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 
 const IndividualComment = ({
   height: mainDivHeight = 700,
@@ -16,7 +17,7 @@ const IndividualComment = ({
   values,
 }) => {
   const commitIndividualCommentChanges = ({ rows, changed }) => {
-    setFieldValue('individualComment', rows)
+    setFieldValue('medicalCheckupIndividualComment', rows)
   }
   let height = mainDivHeight - 180
   if (height < 300) height = 300
@@ -26,7 +27,7 @@ const IndividualComment = ({
         TableProps={{
           height,
         }}
-        rows={values.individualComment}
+        rows={values.medicalCheckupIndividualComment}
         forceRender
         EditingProps={{
           showAddCommand: false,
@@ -34,7 +35,7 @@ const IndividualComment = ({
           onCommitChanges: commitIndividualCommentChanges,
         }}
         columns={[
-          { name: 'examinationType', title: 'Examination' },
+          { name: 'examinationItemName', title: 'Examination' },
           { name: 'createBy', title: 'Create By' },
           { name: 'japaneseComment', title: 'Japanese Comment' },
           { name: 'englishComment', title: 'English Comment' },
@@ -43,7 +44,7 @@ const IndividualComment = ({
         ]}
         columnExtensions={[
           {
-            columnName: 'examinationType',
+            columnName: 'examinationItemName',
             width: 140,
             sortingEnabled: false,
             disabled: true,
@@ -53,6 +54,15 @@ const IndividualComment = ({
             width: 140,
             sortingEnabled: false,
             disabled: true,
+            render: row => {
+              return (
+                <span>{`${
+                  hasValue(row.commentByUserTitle)
+                    ? `${row.commentByUserTitle}.`
+                    : ''
+                }${row.commentByUser}`}</span>
+              )
+            },
           },
           {
             columnName: 'japaneseComment',

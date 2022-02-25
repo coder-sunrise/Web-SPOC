@@ -1,5 +1,8 @@
 import React, { PureComponent } from 'react'
 import Yup from '@/utils/yup'
+import { Button } from 'antd'
+import { connect } from 'dva'
+import moment from 'moment'
 import {
   CodeSelect,
   GridContainer,
@@ -10,21 +13,52 @@ import {
   FastField,
   Field,
 } from '@/components'
-import { Button } from 'antd'
-import { connect } from 'dva'
+import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 
-@connect(({ medicalCheckupReportingDetails }) => ({
+@connect(({ medicalCheckupReportingDetails, user }) => ({
   medicalCheckupReportingDetails,
+  user,
 }))
 @withFormikExtend({
   mapPropsToValues: ({ medicalCheckupReportingDetails }) => {
     return medicalCheckupReportingDetails.summaryCommentEntity || {}
   },
   validationSchema: Yup.object().shape({
-    comment: Yup.string().required(),
+    //comment: Yup.string().required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
-    const { dispatch, onConfirm } = props
+    const {
+      medicalCheckupReportingDetails,
+      dispatch,
+      onConfirm,
+      saveComment = () => {},
+      user,
+    } = props
+    const {
+      medicalCheckupIndividualComment,
+      medicalCheckupSummaryComment,
+      medicalCheckupWorkitemDoctor,
+      ...resetValue
+    } = medicalCheckupReportingDetails.entity
+    const newValue = {
+      ...resetValue,
+      medicalCheckupSummaryComment: [
+        {
+          commentDate: moment(),
+          commentByUserFK: user.data.clinicianProfile.userProfile.id,
+          sequence: medicalCheckupSummaryComment.length,
+          ...values,
+        },
+      ],
+    }
+    dispatch({
+      type: 'medicalCheckupReportingDetails/upsert',
+      payload: { ...newValue },
+    }).then(r => {
+      if (r) {
+        saveComment()
+      }
+    })
   },
   enableReinitialize: true,
   displayName: 'SummaryCommentDetails',
@@ -37,14 +71,51 @@ class SummaryCommentDetails extends PureComponent {
       type: 'medicalCheckupReportingDetails/updateState',
       payload: { summaryCommentEntity: undefined },
     })
-    setValues({
-      comment: undefined,
-      selectCategory: undefined,
-      selectTemplate: undefined,
-    })
+    setValues({})
+  }
+
+  onSelectComment = (val, option) => {
+    if (option) {
+      const { dispatch, setFieldValue, values } = this.props
+      const englishComment = option.translationData
+        .find(l => l.language === 'EN')
+        ?.list?.find(l => (l.key = 'displayValue'))?.value
+      const japaneseComment = option.translationData
+        .find(l => l.language === 'JP')
+        ?.list?.find(l => (l.key = 'displayValue'))?.value
+
+      setFieldValue(
+        'originalJapaneseComment',
+        `${
+          hasValue(values.originalJapaneseComment)
+            ? `${values.originalJapaneseComment}, `
+            : ``
+        }${japaneseComment}`,
+      )
+      setFieldValue(
+        'japaneseComment',
+        `${
+          hasValue(values.japaneseComment) ? `${values.japaneseComment}, ` : ``
+        }${japaneseComment}`,
+      )
+      setFieldValue(
+        'originalEnglishComment',
+        `${
+          hasValue(values.originalEnglishComment)
+            ? `${values.originalEnglishComment}, `
+            : ``
+        }${englishComment}`,
+      )
+      setFieldValue(
+        'englishComment',
+        `${
+          hasValue(values.englishComment) ? `${values.englishComment}, ` : ``
+        }${englishComment}`,
+      )
+    }
   }
   render() {
-    const { values } = this.props
+    const { values, selectedLanguage, setFieldValue } = this.props
     return (
       <GridContainer>
         <GridItem
@@ -62,6 +133,9 @@ class SummaryCommentDetails extends PureComponent {
                 valueField='id'
                 code='CTSummaryCommentCategory'
                 {...args}
+                onChange={() => {
+                  setFieldValue('selectComment', undefined)
+                }}
               />
             )}
           />
@@ -86,13 +160,16 @@ class SummaryCommentDetails extends PureComponent {
                   item.summaryCommentCategoryFK === values.selectCategory
                 }
                 {...args}
+                onChange={this.onSelectComment}
               />
             )}
           />
         </GridItem>
         <GridItem md={12}>
-          <FastField
-            name='comment'
+          <Field
+            name={
+              selectedLanguage === 'EN' ? 'englishComment' : 'japaneseComment'
+            }
             render={args => (
               <MultipleTextField
                 maxLength={2000}

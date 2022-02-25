@@ -13,6 +13,7 @@ import moment from 'moment'
 import { Table, Button } from 'antd'
 import { useDispatch } from 'dva'
 import { DeleteFilled, EditFilled, CopyOutlined } from '@ant-design/icons'
+import { getUniqueId } from '@/utils/utils'
 import customtyles from '../../Style.less'
 import IndividualCommentDetails from './IndividualCommentDetails'
 
@@ -24,6 +25,8 @@ const Examination = props => {
     ctexaminationcategory,
     ctexaminationitem,
     ctindividualcomment,
+    queryIndividualCommentHistory,
+    refreshMedicalCheckup,
   } = props
   const [selectRow, setSelectRow] = useState(undefined)
   const [commentGroupList, setCommentGroupList] = useState([])
@@ -35,28 +38,26 @@ const Examination = props => {
       medicalCheckupReportingDetails.patientID &&
       medicalCheckupReportingDetails.visitID
     ) {
-      queryIndividualCommentHistory(
-        medicalCheckupReportingDetails.patientID,
-        medicalCheckupReportingDetails.visitID,
-      )
+      queryIndividualCommentHistory()
     }
   }, [
     medicalCheckupReportingDetails.visitID,
     medicalCheckupReportingDetails.patientID,
   ])
-  const queryIndividualCommentHistory = (patientProfileFK, visitFK) => {
-    dispatch({
-      type: 'medicalCheckupReportingDetails/queryIndividualCommentHistory',
-      payload: {
-        apiCriteria: { patientProfileFK, visitFK },
-      },
-    }).then(response => {
-      if (response && response.status === '200') {
-        setData(response.data.data)
-      }
-    })
-  }
+  useEffect(() => {
+    setDataSource([
+      ...dataSource.map(item => ({
+        ...item,
+        selectedLanguage,
+      })),
+    ])
+  }, [selectedLanguage])
+
+  useEffect(() => {
+    setData(medicalCheckupReportingDetails.individualCommentList)
+  }, [medicalCheckupReportingDetails.individualCommentList])
   const setData = individualComment => {
+    const { classes } = props
     const defaultData = getDataSource()
     const data = _.orderBy(individualComment, ['visitDate'], ['desc'])
     let newData = defaultData.map(row => {
@@ -64,7 +65,7 @@ const Examination = props => {
       data.forEach((item, index) => {
         let commentList = []
         if (!row.isGroup) {
-          commentList = (item.individualComments || []).filter(
+          commentList = (item.medicalCheckupIndividualComment || []).filter(
             c => c.examinationItemFK === row.id,
           )
         }
@@ -108,7 +109,47 @@ const Examination = props => {
           return (
             <div style={{ padding: 4 }}>
               {row[`valueColumn${index + 1}`].map(item => {
-                return <div>11111</div>
+                const showValue =
+                  item[
+                    `${
+                      row.selectedLanguage === 'EN'
+                        ? 'englishComment'
+                        : 'japaneseComment'
+                    }`
+                  ]
+                return (
+                  <div
+                    style={{ position: 'relative' }}
+                    className={classes.commentContainer}
+                  >
+                    <Tooltip title={showValue}>
+                      <div
+                        style={{
+                          textOverflow: 'ellipsis',
+                          overflow: 'hidden',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {showValue}
+                      </div>
+                    </Tooltip>
+                    <div
+                      style={{ position: 'absolute', right: '-4px', top: 0 }}
+                    >
+                      <Tooltip title='Copy Comment'>
+                        <IconButton
+                          size='small'
+                          color='primary'
+                          onClick={() => {
+                            copyComment(item.id)
+                          }}
+                        >
+                          <CopyOutlined />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                  </div>
+                )
               })}
             </div>
           )
@@ -130,6 +171,7 @@ const Examination = props => {
         id: category.id,
         examinationType: category.name,
         isGroup: true,
+        selectedLanguage,
       })
       const examinationitems = ctexaminationitem.filter(
         item => item.examinationCategoryFK === category.id,
@@ -139,6 +181,7 @@ const Examination = props => {
           id: item.id,
           examinationType: item.displayValue,
           isGroup: false,
+          selectedLanguage,
         })),
       )
     })
@@ -183,11 +226,43 @@ const Examination = props => {
       payload: {
         individualCommentEntity: {
           selectExaminationItemId: row.id,
-          editIndividualComment: [...row['valueColumn1']],
+          medicalCheckupIndividualComment: [
+            ...medicalCheckupReportingDetails.entity.medicalCheckupIndividualComment
+              .filter(c => c.examinationItemFK === row.id)
+              .map(c => ({ ...c, uid: getUniqueId() })),
+          ],
         },
       },
     })
     setSelectRow(row.id)
+  }
+
+  const onSaveComment = () => {
+    queryIndividualCommentHistory()
+    refreshMedicalCheckup()
+
+    setCommentGroupList([])
+    dispatch({
+      type: 'medicalCheckupReportingDetails/updateState',
+      payload: {
+        individualCommentEntity: undefined,
+      },
+    })
+    setSelectRow(undefined)
+  }
+
+  const copyComment = id => {
+    dispatch({
+      type: 'medicalCheckupReportingDetails/copyComment',
+      payload: {
+        medicalCheckupWorkitemFK: medicalCheckupReportingDetails.entity.id,
+        sourceCommentFK: id,
+        commentType: 'Individual',
+      },
+    }).then(r => {
+      queryIndividualCommentHistory()
+      refreshMedicalCheckup()
+    })
   }
   return (
     <div
@@ -233,6 +308,7 @@ const Examination = props => {
           <IndividualCommentDetails
             {...props}
             commentGroupList={commentGroupList}
+            saveComment={onSaveComment}
           />
         </div>
       )}
