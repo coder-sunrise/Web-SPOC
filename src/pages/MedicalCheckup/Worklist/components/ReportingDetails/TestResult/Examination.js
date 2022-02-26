@@ -54,6 +54,15 @@ const Examination = props => {
   }, [selectedLanguage])
 
   useEffect(() => {
+    setDataSource([
+      ...dataSource.map(item => ({
+        ...item,
+        isSelected: selectRow && !item.isGroup && item.id === selectRow,
+      })),
+    ])
+  }, [selectRow])
+
+  useEffect(() => {
     setData(medicalCheckupReportingDetails.individualCommentList)
   }, [medicalCheckupReportingDetails.individualCommentList])
   const setData = individualComment => {
@@ -86,11 +95,18 @@ const Examination = props => {
         width: 120,
         render: (text, row) => {
           return (
-            <div style={{ padding: row.isGroup ? 4 : '4px 4px 4px 10px' }}>
+            <div
+              style={{
+                padding: row.isGroup ? 4 : '4px 4px 4px 10px',
+              }}
+            >
               {text}
             </div>
           )
         },
+        onCell: row => ({
+          style: { backgroundColor: row.isSelected ? 'red' : 'white' },
+        }),
       },
     ]
 
@@ -107,7 +123,11 @@ const Examination = props => {
         width: 200,
         render: (text, row) => {
           return (
-            <div style={{ padding: 4 }}>
+            <div
+              style={{
+                padding: 4,
+              }}
+            >
               {row[`valueColumn${index + 1}`].map(item => {
                 const showValue =
                   item[
@@ -154,6 +174,9 @@ const Examination = props => {
             </div>
           )
         },
+        onCell: row => ({
+          style: { backgroundColor: row.isSelected ? 'red' : 'white' },
+        }),
       })
     })
 
@@ -161,6 +184,9 @@ const Examination = props => {
       dataIndex: 'action',
       title: '',
       width: '100%',
+      onCell: row => ({
+        style: { backgroundColor: row.isSelected ? 'red' : 'white' },
+      }),
     })
     setColumns(defaultColumns)
   }
@@ -182,6 +208,7 @@ const Examination = props => {
           examinationType: item.displayValue,
           isGroup: false,
           selectedLanguage,
+          isSelected: selectRow && item.id === selectRow,
         })),
       )
     })
@@ -287,8 +314,8 @@ const Examination = props => {
             columns={columns}
             scroll={{ y: height - 90 }}
             rowClassName={(record, index) => {
-              if (!record.isGroup && record.id === selectRow)
-                return customtyles.selectRow
+              //if (!record.isGroup && record.id === selectRow)
+              //return customtyles.selectRow
               //return index % 2 === 0 ? customtyles.once : customtyles.two
             }}
             onRow={(record, rowIndex) => {

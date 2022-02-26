@@ -3,19 +3,26 @@ import _ from 'lodash'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import moment from 'moment'
-import { withStyles } from '@material-ui/core'
+import { withStyles, Divider } from '@material-ui/core'
 import Banner from '@/pages/PatientDashboard/Banner'
 import { LoadingWrapper } from '@/components/_medisys'
 import SummaryComment from './SummaryComment'
 import TestResult from './TestResult'
 import ReportHistory from './ReportHistory'
-import { Button } from 'antd'
+import ResultDetails from './ResultDetails'
+import { Button, Drawer } from 'antd'
 import { Link, history } from 'umi'
+import {
+  DoubleLeftOutlined,
+  DoubleRightOutlined,
+  CloseOutlined,
+} from '@ant-design/icons'
 import {
   GridContainer,
   GridItem,
   SizeContainer,
   CommonModal,
+  Tooltip,
 } from '@/components'
 
 const styles = theme => ({
@@ -43,10 +50,11 @@ const ReportingDetails = props => {
   } = props
   const height = window.innerHeight
   const banner = document.getElementById('patientBanner')
-  const contentHeight = (height || 0) - (banner?.offsetHeight || 0) - 105
+  const contentHeight = (height || 0) - (banner?.offsetHeight || 0) - 92
   const [selectedLanguage, setSelectedLanguage] = useState('EN')
   const [showReportHistory, setShowReportHistory] = useState(false)
-
+  const [showResultDetails, setShowResultDetails] = useState(false)
+  const [placement, setPlacement] = useState('right')
   const generateReport = reportType => {
     dispatch({
       type: 'medicalCheckupReportingDetails/generateReport',
@@ -96,6 +104,21 @@ const ReportingDetails = props => {
       },
     })
   }
+
+  const changePlacement = () => {
+    if (placement === 'left') {
+      setPlacement('right')
+    } else {
+      setPlacement('left')
+    }
+  }
+
+  const onShowShowResultDetails = () => {
+    if (!showResultDetails) {
+      setShowResultDetails(true)
+      setPlacement('right')
+    }
+  }
   return (
     <div>
       <LoadingWrapper loading={loading.models.medicalCheckupReportingDetails}>
@@ -125,6 +148,7 @@ const ReportingDetails = props => {
                   querySummaryCommentHistory={querySummaryCommentHistory}
                   queryIndividualCommentHistory={queryIndividualCommentHistory}
                   refreshMedicalCheckup={refreshMedicalCheckup}
+                  setShowResultDetails={onShowShowResultDetails}
                 />
               </GridItem>
               <GridItem md={5} style={{ padding: 0 }}>
@@ -194,6 +218,73 @@ const ReportingDetails = props => {
             </div>
           </div>
         </SizeContainer>
+
+        <Drawer
+          placement={placement}
+          width='40%'
+          getContainer={false}
+          style={{
+            position: 'absolute',
+            //top: banner?.offsetHeight,
+            //height: contentHeight,
+          }}
+          closable={false}
+          bodyStyle={{
+            padding: '0px 6px',
+          }}
+          visible={showResultDetails}
+          onClose={() => setShowResultDetails(false)}
+          mask={false}
+        >
+          <div>
+            <div style={{ position: 'relative', marginTop: 4 }}>
+              <div style={{ fontWeight: 600, fontSize: '1.2rem' }}>
+                Result Details
+              </div>
+              <Button
+                size='small'
+                type='text'
+                icon={<CloseOutlined style={{ color: '#cccccc' }} />}
+                style={{ position: 'absolute', right: 0, top: 2 }}
+                onClick={() => setShowResultDetails(false)}
+              ></Button>
+            </div>
+            <Divider style={{ marginBottom: 4 }} />
+            <ResultDetails height={height - 130} />
+            <div style={{ textAlign: 'center', marginTop: 10 }}>
+              {placement === 'right' && (
+                <Tooltip title='Show on Left'>
+                  <Button
+                    type='primary'
+                    size='small'
+                    style={{ margin: '0px 5px', width: 55 }}
+                    icon={<DoubleLeftOutlined />}
+                    onClick={changePlacement}
+                  ></Button>
+                </Tooltip>
+              )}
+              <Button
+                size='small'
+                type='danger'
+                style={{ margin: '0px 5px' }}
+                onClick={() => setShowResultDetails(false)}
+              >
+                Close
+              </Button>
+              {placement === 'left' && (
+                <Tooltip title='Show on Right'>
+                  <Button
+                    type='primary'
+                    size='small'
+                    style={{ margin: '0px 5px', width: 55 }}
+                    icon={<DoubleRightOutlined />}
+                    onClick={changePlacement}
+                  ></Button>
+                </Tooltip>
+              )}
+            </div>
+          </div>
+        </Drawer>
       </LoadingWrapper>
       <CommonModal
         open={showReportHistory}

@@ -6,12 +6,13 @@ import { useCodeTable } from '@/utils/hooks'
 import BasicData from '@/pages/PatientDatabase/Detail/Results/BasicData'
 import PatientHistory from '@/pages/Widgets/PatientHistory'
 import Examination from './Examination'
+import ExternalService from './ExternalService'
 
 const TestResult = props => {
   const ctexaminationcategory = useCodeTable('ctexaminationcategory')
   const ctexaminationitem = useCodeTable('ctexaminationitem')
   const ctindividualcomment = useCodeTable('ctindividualcomment')
-  const { height } = props
+  const { height, setShowResultDetails } = props
   const options = [
     {
       id: 0,
@@ -39,7 +40,7 @@ const TestResult = props => {
     {
       id: 3,
       name: 'External Service',
-      content: <dix>External Service</dix>,
+      content: <ExternalService {...props} height={height} />,
     },
     {
       id: 4,
@@ -65,6 +66,7 @@ const TestResult = props => {
             }}
             onClick={e => {
               e.preventDefault()
+              setShowResultDetails(true)
             }}
           >
             Result Details

@@ -21,7 +21,7 @@ import { DeleteFilled, EditFilled, CopyOutlined } from '@ant-design/icons'
 import customtyles from '../../Style.less'
 import CommentDetails from './SummaryCommentDetails'
 import CommentVerification from '../CommentVerification'
-import ReportingDoctorTag from '../../ReportingDoctorTag'
+import ReportingDoctorTag from '../../ReportingDoctorList'
 import { mergeClasses } from '@material-ui/styles'
 import { REPORTINGDOCTOR_STATUS } from '@/utils/constants'
 

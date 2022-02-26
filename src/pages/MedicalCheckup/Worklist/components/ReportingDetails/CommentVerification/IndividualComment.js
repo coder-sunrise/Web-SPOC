@@ -36,7 +36,7 @@ const IndividualComment = ({
         }}
         columns={[
           { name: 'examinationItemName', title: 'Examination' },
-          { name: 'createBy', title: 'Create By' },
+          { name: 'createBy', title: 'Created By' },
           { name: 'japaneseComment', title: 'Japanese Comment' },
           { name: 'englishComment', title: 'English Comment' },
           { name: 'isCustomized', title: 'Customized' },
@@ -55,12 +55,15 @@ const IndividualComment = ({
             sortingEnabled: false,
             disabled: true,
             render: row => {
+              const createBy = `${
+                hasValue(row.commentByUserTitle)
+                  ? `${row.commentByUserTitle}.`
+                  : ''
+              }${row.commentByUser}`
               return (
-                <span>{`${
-                  hasValue(row.commentByUserTitle)
-                    ? `${row.commentByUserTitle}.`
-                    : ''
-                }${row.commentByUser}`}</span>
+                <Tooltip title={createBy}>
+                  <span>{createBy}</span>
+                </Tooltip>
               )
             },
           },
