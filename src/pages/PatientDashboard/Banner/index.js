@@ -1407,15 +1407,35 @@ class Banner extends PureComponent {
         </Col>
       </Row>
     )
+    const mcWorkItem =
+      visitRegistration?.entity?.visit?.medicalCheckupWorkitem &&
+      visitRegistration?.entity?.visit?.medicalCheckupWorkitem[0]
     const visitPriorityElm = (
       <Row wrap={false}>
         <Col flex='none'>
-          <span className={classes.header}>Report Priority:</span>
+          <span
+            className={classes.header}
+            style={{
+              color:
+                mcWorkItem?.reportPriority === 'Urgent' ? 'red' : 'darkblue',
+            }}
+          >
+            Report Priority:
+          </span>
         </Col>
         <Col flex='auto' className={contentClass}>
-          {visitRegistration?.entity?.visit?.medicalCheckupWorkitem &&
-            visitRegistration?.entity?.visit?.medicalCheckupWorkitem[0]
-              ?.reportPriority}
+          <Tooltip
+            enterDelay={100}
+            title={mcWorkItem?.urgentReportRemarks}
+            interactive='true'
+          >
+            <span>
+              {mcWorkItem?.reportPriority}
+              {mcWorkItem?.urgentReportRemarks
+                ? ' (' + mcWorkItem?.urgentReportRemarks + ')'
+                : ''}
+            </span>
+          </Tooltip>
         </Col>
       </Row>
     )
@@ -1667,10 +1687,10 @@ class Banner extends PureComponent {
 
         <span
           style={{
-            top: 3,
+            top: 5,
+            right: 5,
             display: 'inline-block',
             position: 'absolute',
-            right: 10,
           }}
         >
           <IconButton onClick={this.expandOrCollespe}>

@@ -281,6 +281,7 @@ class ReferralCard extends PureComponent {
       isVisitReadonlyAfterSigned,
       mode,
       patient,
+      fromMedicalCheckupReporting,
     } = this.props
     const {
       referralList,
@@ -298,10 +299,10 @@ class ReferralCard extends PureComponent {
     ) {
       disabled = false
     }
-    if(patient.entity && !patient.entity.isActive) {
+    if (patient.entity && !patient.entity.isActive) {
       disabled = true
     }
-
+    if (fromMedicalCheckupReporting) disabled = true
     const cfg = {
       onAddReferralPersonClose: this.onAddReferralPersonClose,
       onAddReferralSourceClose: this.onAddReferralSourceClose,
@@ -461,6 +462,7 @@ class ReferralCard extends PureComponent {
             {mode !== 'patientprofile' && (
               <AttachmentWithThumbnail
                 label='Attachment'
+                isReadOnly={disabled}
                 attachmentType='VisitReferral'
                 handleUpdateAttachments={handleUpdateAttachments}
                 attachments={attachments}

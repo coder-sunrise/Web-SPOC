@@ -99,6 +99,7 @@ const amountProps = {
 const VisitInfoCard = ({
   classes,
   isReadOnly = false,
+  fromMedicalCheckupReporting = false,
   isVisitReadonlyAfterSigned = false,
   attachments,
   handleUpdateAttachments,
@@ -793,7 +794,7 @@ const VisitInfoCard = ({
             attachmentType='Visit'
             handleUpdateAttachments={handleUpdateAttachments}
             attachments={attachments}
-            isReadOnly={isReadOnly}
+            isReadOnly={isReadOnly || fromMedicalCheckupReporting}
             disableScanner={isReadOnly}
             fieldName='visitAttachment'
           />
