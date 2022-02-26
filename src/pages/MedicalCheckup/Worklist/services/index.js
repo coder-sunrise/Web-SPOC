@@ -25,5 +25,10 @@ const fns = {
   copyComment: params => service.upsert(`${url}/CopyComment`, params),
   updateReportingDoctor: params =>
     service.upsert(`${url}/UpdateReportingDoctor`, params),
+  queryExternalService: params =>
+    service.queryList(`${url}/ExternalService`, {
+      ...params,
+      pagesize: 9999,
+    }),
 }
 export default fns

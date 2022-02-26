@@ -1004,6 +1004,39 @@ export const MEDICALCHECKUP_WORKITEM_STATUS = {
 }
 
 export const MEDICALCHECKUP_WORKITEM_STATUS_ALL_COLOR = '#5a9cde'
+export const MEDICALCHECKUP_WORKITEM_STATUSES = [
+  {
+    id: MEDICALCHECKUP_WORKITEM_STATUS.NEW,
+    label: 'New',
+    color: '#999900',
+    description: 'New',
+  },
+  {
+    id: MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS,
+    label: 'In Progress',
+    color: '#009999',
+    description: 'In Progress',
+  },
+  {
+    id: MEDICALCHECKUP_WORKITEM_STATUS.REPORTING,
+    label: 'Reporting',
+    color: '#CC6633',
+    description: 'Reporting',
+  },
+  {
+    id: MEDICALCHECKUP_WORKITEM_STATUS.PENDINGVERIFICATION,
+    label: 'P. Verification',
+    color: '#44A2FF',
+    description: 'Pending Verification',
+  },
+  {
+    id: MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED,
+    label: 'Completed',
+    color: '#009933',
+    description: 'Completed',
+  },
+]
+
 export const MEDICALCHECKUP_WORKITEM_STATUS_LABELS = {
   [`${MEDICALCHECKUP_WORKITEM_STATUS.NEW}`]: 'New',
   [`${MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS}`]: 'In Progress',
@@ -1034,4 +1067,9 @@ export const REPORTINGDOCTOR_STATUS = {
   NEW: 'New',
   COMMENTDONE: 'CommentDone',
   VERIFIED: 'Verified',
+}
+
+export const MEDICALCHECKUP_REPORTTYPE = {
+  TEMPORARY: 'Temporary Report',
+  FINAL: 'Final Report',
 }

@@ -105,7 +105,7 @@ const Examination = props => {
           )
         },
         onCell: row => ({
-          style: { backgroundColor: row.isSelected ? 'red' : 'white' },
+          style: { backgroundColor: row.isSelected ? '#CCCCCC' : 'white' },
         }),
       },
     ]
@@ -175,7 +175,7 @@ const Examination = props => {
           )
         },
         onCell: row => ({
-          style: { backgroundColor: row.isSelected ? 'red' : 'white' },
+          style: { backgroundColor: row.isSelected ? '#CCCCCC' : 'white' },
         }),
       })
     })
@@ -185,7 +185,7 @@ const Examination = props => {
       title: '',
       width: '100%',
       onCell: row => ({
-        style: { backgroundColor: row.isSelected ? 'red' : 'white' },
+        style: { backgroundColor: row.isSelected ? '#CCCCCC' : 'white' },
       }),
     })
     setColumns(defaultColumns)

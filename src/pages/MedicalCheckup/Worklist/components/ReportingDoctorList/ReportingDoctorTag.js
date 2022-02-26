@@ -126,7 +126,9 @@ const ReportingDoctorTag = ({
     )
   }
 
-  const sendMessage = () => {}
+  const sendMessage = () => {
+    searchMessage()
+  }
 
   const getPopoverContent = () => {
     let toUserName = 'All PRO'

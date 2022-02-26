@@ -74,12 +74,8 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
   const { setIsAnyWorklistModelOpened } = useContext(WorklistContext)
   useEffect(() => {
     if (originalWorklist) {
-      const currentFilteredWorklist = _.orderBy(
-        originalWorklist.filter(item =>
-          filteredStatuses.includes(item.statusFK),
-        ),
-        ['visitDate'],
-        ['asc'],
+      const currentFilteredWorklist = originalWorklist.filter(item =>
+        filteredStatuses.includes(item.statusFK),
       )
       setWorkitems(currentFilteredWorklist)
     }
@@ -421,7 +417,7 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
         fixed: 'right',
         width: 60,
         render: (item, entity) => {
-          //if (entity.statusFK === MEDICALCHECKUP_WORKITEM_STATUS.NEW) return ''
+          if (entity.statusFK === MEDICALCHECKUP_WORKITEM_STATUS.NEW) return ''
 
           const handleClick = event => {
             const { key } = event
@@ -431,7 +427,9 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
             <Tooltip title='More Actions'>
               <GridButton
                 row={entity}
-                contextMenuOptions={menus}
+                contextMenuOptions={menus.filter(
+                  m => entity.isExistsVerifiedReport || m.id !== 4,
+                )}
                 onClick={handleMenuItemClick}
               />
             </Tooltip>

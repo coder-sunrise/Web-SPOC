@@ -4,6 +4,7 @@ import { connect } from 'dva'
 import Yup from '@/utils/yup'
 import { Tabs, withFormikExtend } from '@/components'
 import { Button } from 'antd'
+import { LoadingWrapper } from '@/components/_medisys'
 import { withStyles } from '@material-ui/core'
 import IndividualComment from './IndividualComment'
 import SummaryComment from './SummaryComment'
@@ -20,9 +21,10 @@ const styles = theme => ({
     display: 'inline-block',
   },
 })
-@connect(({ medicalCheckupReportingDetails, user }) => ({
+@connect(({ medicalCheckupReportingDetails, user, loading }) => ({
   medicalCheckupReportingDetails,
   user,
+  loading,
 }))
 @withFormikExtend({
   mapPropsToValues: ({ medicalCheckupReportingDetails }) => {
@@ -85,9 +87,15 @@ class CommentVerification extends PureComponent {
   }
 
   render() {
-    const { footer, values, handleSubmit, calendarResource } = this.props
+    const {
+      footer,
+      values,
+      handleSubmit,
+      calendarResourcem,
+      loading,
+    } = this.props
     return (
-      <React.Fragment>
+      <LoadingWrapper loading={loading.models.medicalCheckupReportingDetails}>
         <Tabs options={this.getOptions()} defaultActiveKey='0' />
         {footer &&
           footer({
@@ -97,7 +105,7 @@ class CommentVerification extends PureComponent {
               disabled: false,
             },
           })}
-      </React.Fragment>
+      </LoadingWrapper>
     )
   }
 }
