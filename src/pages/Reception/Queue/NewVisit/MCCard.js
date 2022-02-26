@@ -28,6 +28,7 @@ const MCCard = ({
   reportingDoctorSchema,
   theme,
   values,
+  fromMedicalCheckupReporting = false,
   clinicSettings,
   ctlanguage = [],
   isVisitReadonlyAfterSigned,
@@ -76,7 +77,58 @@ const MCCard = ({
       </div>
     )
   }
+  const columns = [
+    {
+      name: 'doctorProfileFK',
+      title: 'Reporting Doctor',
+    },
+  ]
 
+  if (!fromMedicalCheckupReporting) {
+    columns.push({ name: 'action', title: ' ' })
+  }
+
+  const columnExtension = [
+    {
+      columnName: 'doctorProfileFK',
+      sortingEnabled: false,
+      type: 'codeSelect',
+      code: 'doctorprofile',
+      isDisabled: row => fromMedicalCheckupReporting,
+      labelField: 'clinicianProfile.name',
+      localFilter: o => o.clinicianProfile.isActive,
+      renderDropdown: option => <DoctorLabel doctor={option} />,
+    },
+    {
+      columnName: 'action',
+      width: 60,
+      isReactComponent: true,
+      sortingEnabled: false,
+      render: e => {
+        const { row, columnConfig } = e
+        const { control } = columnConfig
+        const { commitChanges } = control
+        return (
+          <Popconfirm
+            title='Confirm to delete?'
+            onConfirm={() => {
+              commitChanges({
+                changed: {
+                  [row.id]: {
+                    isDeleted: true,
+                  },
+                },
+              })
+            }}
+          >
+            <Button size='sm' justIcon color='danger'>
+              <Delete />
+            </Button>
+          </Popconfirm>
+        )
+      },
+    },
+  ]
   return (
     <GridContainer alignItems='center'>
       <GridItem xs md={12} container>
@@ -104,7 +156,10 @@ const MCCard = ({
                 ]}
                 onChange={e => {
                   if (e.target.value !== 'Urgent') {
-                    setFieldValue('mcUrgentReportRemarks', undefined)
+                    setFieldValue(
+                      'medicalCheckupWorkitem[0].urgentReportRemarks',
+                      undefined,
+                    )
                   }
                 }}
                 {...args}
@@ -124,7 +179,9 @@ const MCCard = ({
                   rowsMax={3}
                   maxLength={2000}
                   authority='none'
-                  disabled={isVisitReadonlyAfterSigned}
+                  disabled={
+                    !fromMedicalCheckupReporting && isVisitReadonlyAfterSigned
+                  }
                   label='Urgent Report Remarks'
                 />
               )}
@@ -141,55 +198,12 @@ const MCCard = ({
           rows={values.visitDoctor}
           EditingProps={{
             showCommandColumn: false,
-            showAddCommand: true,
+            showAddCommand: fromMedicalCheckupReporting ? false : true,
             onCommitChanges: commitChanges,
           }}
           schema={reportingDoctorSchema}
-          columns={[
-            { name: 'doctorProfileFK', title: 'Reporting Doctor' },
-            { name: 'action', title: ' ' },
-          ]}
-          columnExtensions={[
-            {
-              columnName: 'doctorProfileFK',
-              sortingEnabled: false,
-              type: 'codeSelect',
-              code: 'doctorprofile',
-              labelField: 'clinicianProfile.name',
-              localFilter: o => o.clinicianProfile.isActive,
-              renderDropdown: option => <DoctorLabel doctor={option} />,
-            },
-            {
-              columnName: 'action',
-              width: 60,
-              isReactComponent: true,
-              sortingEnabled: false,
-              isDisabled: row => true,
-              render: e => {
-                const { row, columnConfig } = e
-                const { control } = columnConfig
-                const { commitChanges } = control
-                return (
-                  <Popconfirm
-                    title='Confirm to delete?'
-                    onConfirm={() => {
-                      commitChanges({
-                        changed: {
-                          [row.id]: {
-                            isDeleted: true,
-                          },
-                        },
-                      })
-                    }}
-                  >
-                    <Button size='sm' justIcon color='danger'>
-                      <Delete />
-                    </Button>
-                  </Popconfirm>
-                )
-              },
-            },
-          ]}
+          columns={columns}
+          columnExtensions={columnExtension}
           FuncProps={{
             pager: false,
           }}

@@ -86,7 +86,7 @@ class GlobalModalContainer extends PureComponent {
   }
 
   closeVisitRegistration = () => {
-    const { dispatch } = this.props
+    const { dispatch, global } = this.props
     dispatch({
       type: 'visitRegistration/closeModal',
     })
@@ -95,7 +95,7 @@ class GlobalModalContainer extends PureComponent {
         type: 'patient/updateState',
         payload: { entity: null },
       })
-    }
+    } 
   }
 
   closeConfirmationPrompt = () => {
