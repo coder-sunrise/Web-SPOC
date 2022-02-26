@@ -632,7 +632,7 @@ class PatientStickyNotesBtn extends Component {
       <Popper
         open={openPopper}
         overlay={openPopper && this.renderStickyNotes()}
-        placement='right-end'
+        placement='right'
         style={popperStyle}
       >
         <span style={{ cursor: 'pointer', marginLeft: 8 }}>

@@ -559,7 +559,7 @@ class NewVisit extends PureComponent {
                   onSelectPreOrder={this.onSelectPreOrder}
                   activePreOrderItems={draftPreOrderItem}
                   isRetail={isRetail}
-                  extraCmt={this.getExtraComponent}
+                  // extraCmt={this.getExtraComponent}
                   {...this.props}
                 />
               </div>
