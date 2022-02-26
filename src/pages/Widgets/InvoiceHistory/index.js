@@ -84,8 +84,6 @@ const InvoiceHistory = ({
 
   const { settings = [] } = clinicSettings
   const { isEnableVisitationInvoiceReport = false } = settings
-  const [showPrintInvoiceMenu, setShowPrintInvoiceMenu] = useState(false)
-
   const [hasActiveSession, setHasActiveSession] = useState(true)
 
   const checkHasActiveSession = () => {
@@ -191,12 +189,8 @@ const InvoiceHistory = ({
               {visitOrderTemplateFK && (
                 <Popover
                   icon={null}
-                  trigger='click'
+                  trigger='hover'
                   placement='left'
-                  visible={showPrintInvoiceMenu}
-                  onVisibleChange={() => {
-                    setShowPrintInvoiceMenu(!showPrintInvoiceMenu)
-                  }}
                   content={
                     <MenuList
                       role='menu'
