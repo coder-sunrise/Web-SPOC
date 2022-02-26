@@ -4,9 +4,22 @@ import { connect } from 'dva'
 import Yup from '@/utils/yup'
 import { Tabs, withFormikExtend } from '@/components'
 import { Button } from 'antd'
+import { withStyles } from '@material-ui/core'
 import IndividualComment from './IndividualComment'
 import SummaryComment from './SummaryComment'
 
+const styles = theme => ({
+  pendingVerifyCount: {
+    marginLeft: 10,
+    color: 'white',
+    backgroundColor: 'red',
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    textAlign: 'center',
+    display: 'inline-block',
+  },
+})
 @connect(({ medicalCheckupReportingDetails, user }) => ({
   medicalCheckupReportingDetails,
   user,
@@ -32,15 +45,40 @@ import SummaryComment from './SummaryComment'
 })
 class CommentVerification extends PureComponent {
   getOptions = () => {
+    const { values, classes } = this.props
+    const {
+      medicalCheckupIndividualComment = [],
+      medicalCheckupSummaryComment = [],
+    } = values
+    const individualPendingVerifyCount = medicalCheckupIndividualComment.filter(
+      item => !item.isVerified,
+    ).length
+    const summaryPendingVerifyCount = medicalCheckupSummaryComment.filter(
+      item => !item.isVerified,
+    ).length
     return [
       {
         id: 0,
-        name: 'Individual Comment',
+        name: (
+          <div>
+            <span style={{ display: 'inline-block' }}>Individual Comment</span>
+            <div className={classes.pendingVerifyCount}>
+              {individualPendingVerifyCount}
+            </div>
+          </div>
+        ),
         content: <IndividualComment {...this.props} />,
       },
       {
         id: 1,
-        name: 'Summary Comment',
+        name: (
+          <div>
+            <span style={{ display: 'inline-block' }}>Summary Comment</span>
+            <div className={classes.pendingVerifyCount}>
+              {summaryPendingVerifyCount}
+            </div>
+          </div>
+        ),
         content: <SummaryComment {...this.props} />,
       },
     ]
@@ -63,4 +101,6 @@ class CommentVerification extends PureComponent {
     )
   }
 }
-export default CommentVerification
+export default withStyles(styles, { name: 'CommentVerification' })(
+  CommentVerification,
+)

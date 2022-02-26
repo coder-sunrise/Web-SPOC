@@ -18,6 +18,7 @@ import {
   IconButton,
   Popover,
   Button,
+  Tooltip,
 } from '@/components'
 import WorklistContext from '../WorklistContext'
 
@@ -120,17 +121,22 @@ export const WorklistFilter = () => {
             />
           </Form.Item>
           <Form.Item name='visitDoctor' initialValue={[-99]}>
-            <Select
-              label='Visit Doctor'
-              options={doctorprofile.map(item => ({
-                value: item.id,
-                name: item.clinicianProfile.name,
-              }))}
-              style={{ width: 180 }}
-              mode='multiple'
-              maxTagCount={0}
-              maxTagPlaceholder='Visit Doctor'
-            />
+            <Tooltip
+              placement='right'
+              title='Select "All" will retrieve active and inactive doctors'
+            >
+              <Select
+                label='Visit Doctor'
+                options={doctorprofile.map(item => ({
+                  value: item.id,
+                  name: item.clinicianProfile.name,
+                }))}
+                style={{ width: 180 }}
+                mode='multiple'
+                maxTagCount={0}
+                maxTagPlaceholder='Visit Doctor'
+              />
+            </Tooltip>
           </Form.Item>
 
           <Form.Item name='dateFrom'>

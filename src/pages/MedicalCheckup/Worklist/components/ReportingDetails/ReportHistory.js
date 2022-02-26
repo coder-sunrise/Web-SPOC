@@ -16,6 +16,7 @@ const ReportHistory = props => {
     medicalCheckupReportingDetails,
     dispatch,
     user,
+    onClose,
   } = props
   const height = window.innerHeight
   const [selectedRow, setSelectedRow] = useState(undefined)
@@ -51,7 +52,7 @@ const ReportHistory = props => {
         ></Table>
       </div>
       <div style={{ textAlign: 'right' }}>
-        <Button size='samll' type='danger'>
+        <Button size='samll' type='danger' onClick={onClose}>
           Close
         </Button>
       </div>

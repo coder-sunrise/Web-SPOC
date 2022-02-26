@@ -26,8 +26,7 @@ const styles = theme => ({
     width: '100%',
   },
   listItemRoot: {
-    paddingTop: 4,
-    paddingBottom: 4,
+    padding: 4,
     fontSize: '0.85em',
   },
 })
@@ -61,6 +60,12 @@ const styles = theme => ({
     )
     let index = 0
     newComents.forEach(item => {
+      if (
+        item.originalJapaneseComment !== item.japaneseComment ||
+        item.originalEnglishComment !== item.englishComment
+      ) {
+        item.isCustomized = true
+      }
       if (!item.isDeleted) {
         item.sequence = index
         index = index + 1

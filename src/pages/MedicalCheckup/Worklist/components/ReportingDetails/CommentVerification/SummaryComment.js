@@ -35,7 +35,7 @@ const SummaryComment = ({
           onCommitChanges: commitSummaryCommentChanges,
         }}
         columns={[
-          { name: 'createBy', title: 'Create By' },
+          { name: 'createBy', title: 'Created By' },
           { name: 'japaneseComment', title: 'Japanese Comment' },
           { name: 'englishComment', title: 'English Comment' },
           { name: 'isCustomized', title: 'Customized' },
@@ -48,12 +48,15 @@ const SummaryComment = ({
             sortingEnabled: false,
             disabled: true,
             render: row => {
+              const createBy = `${
+                hasValue(row.commentByUserTitle)
+                  ? `${row.commentByUserTitle}.`
+                  : ''
+              }${row.commentByUser}`
               return (
-                <span>{`${
-                  hasValue(row.commentByUserTitle)
-                    ? `${row.commentByUserTitle}.`
-                    : ''
-                }${row.commentByUser}`}</span>
+                <Tooltip title={createBy}>
+                  <span>{createBy}</span>
+                </Tooltip>
               )
             },
           },

@@ -31,7 +31,7 @@ import Description from '@material-ui/icons/Description'
 import VisitForms from '@/pages/Reception/Queue/VisitForms'
 import WorklistContext from '../WorklistContext'
 import { StatusFilter } from './StatusFilter'
-import ReportingDoctorTag from './ReportingDoctorTag'
+import ReportingDoctorList from './ReportingDoctorList'
 
 const allMedicalCheckupReportStatuses = Object.values(
   MEDICALCHECKUP_WORKITEM_STATUS,
@@ -396,7 +396,7 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
         render: (item, entity) => {
           return (
             <div style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
-              <ReportingDoctorTag
+              <ReportingDoctorList
                 medicalCheckupDoctor={entity.medicalCheckupWorkitemDoctor}
               />
             </div>
