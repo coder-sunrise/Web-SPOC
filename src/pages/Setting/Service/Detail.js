@@ -806,6 +806,7 @@ class Detail extends PureComponent {
                         <CodeSelect
                           label='Examination'
                           code='ctexaminationitem'
+                          labelField='displayValue'
                           {...args}
                         />
                       )
