@@ -1709,6 +1709,7 @@ class Medication extends PureComponent {
                           this.props.setFieldValue('isMinus', true)
                           this.props.setFieldValue('isExactAmount', true)
                           this.props.setFieldValue('adjValue', 0)
+                          this.props.setFieldValue('isPreOrder', false)
                         } else {
                           setTimeout(() => {
                             this.calculateQuantity()
@@ -1730,7 +1731,10 @@ class Medication extends PureComponent {
                       <Checkbox
                         label='Pre-Order'
                         {...args}
-                        disabled={isDisabledNoPaidPreOrder}
+                        disabled={
+                          isDisabledNoPaidPreOrder ||
+                          values.isExternalPrescription
+                        }
                         onChange={e => {
                           if (!e.target.value) {
                             this.props.setFieldValue('isChargeToday', false)

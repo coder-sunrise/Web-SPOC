@@ -745,6 +745,13 @@ const getOrdersData = val => {
           preOrderVaccinationItem?.prescribingUOMDisplayValue ||
           prescribingUOM?.name,
         uomfk: preOrderVaccinationItem?.prescribingUOMFK || prescribingUOM?.id,
+        dispenseUOMFK:
+          preOrderVaccinationItem?.dispensingUOMFK || dispensingUOM?.id,
+        dispenseUOMCode:
+          preOrderVaccinationItem?.dispensingUOMCode || dispensingUOM?.code,
+        dispenseUOMDisplayValue:
+          preOrderVaccinationItem?.dispensingUOMDisplayValue ||
+          dispensingUOM?.name,
         usageMethodCode:
           preOrderVaccinationItem?.usageMethodCode || vaccinationUsage?.code,
         usageMethodDisplayValue:
