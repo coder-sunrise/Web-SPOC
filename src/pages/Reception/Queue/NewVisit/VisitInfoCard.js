@@ -210,7 +210,7 @@ const VisitInfoCard = ({
       setFieldValue('medicalCheckupWorkitem[0].reportPriority', 'Normal')
       setFieldValue(
         'medicalCheckupWorkitem[0].statusFK',
-        MEDICALCHECKUP_WORKITEM_STATUS.NEW,
+        MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS,
       )
     }
   }

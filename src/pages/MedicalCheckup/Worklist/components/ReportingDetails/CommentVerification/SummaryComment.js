@@ -15,6 +15,7 @@ const SummaryComment = ({
   height: mainDivHeight = 700,
   setFieldValue,
   values,
+  isEditEnable = true,
 }) => {
   const commitSummaryCommentChanges = ({ rows, changed }) => {
     setFieldValue('medicalCheckupSummaryComment', rows)
@@ -72,6 +73,7 @@ const SummaryComment = ({
                 <MultipleTextField
                   value={row.japaneseComment}
                   maxLength={2000}
+                  disabled={!isEditEnable}
                   onChange={e => {
                     const { commitChanges } = control
                     commitChanges({
@@ -98,6 +100,7 @@ const SummaryComment = ({
                 <MultipleTextField
                   value={row.englishComment}
                   maxLength={2000}
+                  disabled={!isEditEnable}
                   onChange={e => {
                     const { commitChanges } = control
                     commitChanges({
@@ -137,7 +140,12 @@ const SummaryComment = ({
               if (row.isVerified)
                 return (
                   <Tooltip title='Verified'>
-                    <Button color='success' size='small' justIcon>
+                    <Button
+                      color='success'
+                      size='small'
+                      justIcon
+                      disabled={!isEditEnable}
+                    >
                       <CheckOutlined />
                     </Button>
                   </Tooltip>
@@ -148,6 +156,7 @@ const SummaryComment = ({
                     color='primary'
                     size='small'
                     justIcon
+                    disabled={!isEditEnable}
                     onClick={e => {
                       const { commitChanges } = control
                       commitChanges({

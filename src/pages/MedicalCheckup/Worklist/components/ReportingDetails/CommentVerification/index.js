@@ -6,6 +6,7 @@ import { Tabs, withFormikExtend } from '@/components'
 import { Button } from 'antd'
 import { LoadingWrapper } from '@/components/_medisys'
 import { withStyles } from '@material-ui/core'
+import { MEDICALCHECKUP_WORKITEM_STATUS } from '@/utils/constants'
 import IndividualComment from './IndividualComment'
 import SummaryComment from './SummaryComment'
 
@@ -69,7 +70,12 @@ class CommentVerification extends PureComponent {
             </div>
           </div>
         ),
-        content: <IndividualComment {...this.props} />,
+        content: (
+          <IndividualComment
+            {...this.props}
+            isEditEnable={this.getEditCommentEnable()}
+          />
+        ),
       },
       {
         id: 1,
@@ -81,9 +87,24 @@ class CommentVerification extends PureComponent {
             </div>
           </div>
         ),
-        content: <SummaryComment {...this.props} />,
+        content: (
+          <SummaryComment
+            {...this.props}
+            isEditEnable={this.getEditCommentEnable()}
+          />
+        ),
       },
     ]
+  }
+
+  getEditCommentEnable = () => {
+    const { medicalCheckupReportingDetails } = this.props
+    const medicalCheckupstatus = medicalCheckupReportingDetails.entity?.statusFK
+    return (
+      medicalCheckupstatus !==
+        MEDICALCHECKUP_WORKITEM_STATUS.PENDINGVERIFICATION &&
+      medicalCheckupstatus !== MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED
+    )
   }
 
   render() {

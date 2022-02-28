@@ -143,7 +143,10 @@ const ReportingDetails = props => {
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
-        openConfirmContent: `Confirm to generate report (Finalized) ?`,
+        openConfirmContent:
+          reportingStatus === MEDICALCHECKUP_WORKITEM_STATUS.REPORTING
+            ? `Confirm to generate report (Finalized) ?`
+            : 'Not all test has completed, generating report will exclude incomlete test. Confirm to generate?',
         onConfirmSave: () => {
           generateReport(MEDICALCHECKUP_REPORTTYPE.FINAL)
         },
@@ -166,6 +169,39 @@ const ReportingDetails = props => {
     )
       return true
     return false
+  }
+
+  const clearEditComment = () => {
+    dispatch({
+      type: 'medicalCheckupReportingDetails/updateState',
+      payload: {
+        summaryCommentEntity: undefined,
+      },
+    })
+
+    dispatch({
+      type: 'medicalCheckupReportingDetails/updateState',
+      payload: {
+        individualCommentEntity: undefined,
+      },
+    })
+  }
+
+  const canGenerateReport = () => {
+    return (
+      reportingStatus !== MEDICALCHECKUP_WORKITEM_STATUS.PENDINGVERIFICATION &&
+      reportingStatus !== MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED
+    )
+  }
+
+  const getEditEnable = () => {
+    return false
+    const medicalCheckupstatus = medicalCheckupReportingDetails.entity?.statusFK
+    return (
+      medicalCheckupstatus !==
+        MEDICALCHECKUP_WORKITEM_STATUS.PENDINGVERIFICATION &&
+      medicalCheckupstatus !== MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED
+    )
   }
   return (
     <div>
@@ -197,6 +233,7 @@ const ReportingDetails = props => {
                   queryIndividualCommentHistory={queryIndividualCommentHistory}
                   refreshMedicalCheckup={refreshMedicalCheckup}
                   setShowResultDetails={onShowShowResultDetails}
+                  isEditEnable={getEditEnable()}
                 />
               </GridItem>
               <GridItem md={5} style={{ padding: 0 }}>
@@ -208,6 +245,8 @@ const ReportingDetails = props => {
                   querySummaryCommentHistory={querySummaryCommentHistory}
                   queryIndividualCommentHistory={queryIndividualCommentHistory}
                   refreshMedicalCheckup={refreshMedicalCheckup}
+                  clearEditComment={clearEditComment}
+                  isEditEnable={getEditEnable()}
                 />
               </GridItem>
             </GridContainer>
@@ -242,8 +281,7 @@ const ReportingDetails = props => {
                 >
                   Back To List
                 </Button>
-                {reportingStatus !==
-                  MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED && (
+                {canGenerateReport() && (
                   <Button
                     size='small'
                     type='primary'
@@ -255,8 +293,7 @@ const ReportingDetails = props => {
                     Generate Temporary Report
                   </Button>
                 )}
-                {reportingStatus !==
-                  MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED && (
+                {canGenerateReport() && (
                   <Button
                     size='small'
                     type='primary'

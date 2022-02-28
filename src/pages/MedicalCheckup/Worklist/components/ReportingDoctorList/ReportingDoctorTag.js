@@ -13,23 +13,16 @@ import {
 import { CheckOutlined } from '@ant-design/icons'
 import { REPORTINGDOCTOR_STATUS } from '@/utils/constants'
 import { Message } from '@material-ui/icons'
+import { Tag } from 'antd'
 
 const styles = theme => ({
-  panel: {
-    float: 'left',
+  tag: {
     width: 120,
-    fontWeight: 400,
-    letterSpacing: 'inherit',
-    borderRadius: '3px',
     margin: '1px 8px 1px 0px',
-    padding: '2px',
-    color: 'white',
-    cursor: 'hand',
-  },
-  text: {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+    padding: 2,
   },
 })
 
@@ -38,6 +31,7 @@ const ReportingDoctorTag = ({
   classes,
   isShowMessage = false,
   updateReportingDoctor = () => {},
+  isEditEnable = true,
 }) => {
   const [messages, setMessages] = useState([])
   const [isNewMessage, setIsNewMessage] = useState(false)
@@ -79,28 +73,22 @@ const ReportingDoctorTag = ({
 
   const getDoctorTag = () => {
     return (
-      <div style={{ position: 'relative' }} onClick={searchMessage}>
-        {medicalCheckupDoctor.status == 'Verified' && (
-          <Tooltip title='Verified'>
-            <Button
-              color='success'
-              size='small'
-              style={{ position: 'absolute', top: 0, left: 2 }}
-              justIcon
-            >
-              <CheckOutlined />
-            </Button>
-          </Tooltip>
-        )}
+      <div>
         <Tooltip title={name}>
-          <div
-            className={classes.text}
-            style={{
-              paddingLeft: medicalCheckupDoctor.status == 'Verified' ? 30 : 0,
-            }}
+          <Tag
+            icon={
+              medicalCheckupDoctor.status == 'Verified' ? (
+                <CheckOutlined style={{ backgroundColor: 'green' }} />
+              ) : (
+                undefined
+              )
+            }
+            className={classes.tag}
+            color={reportingDoctorColor}
+            onClick={searchMessage}
           >
             {name}
-          </div>
+          </Tag>
         </Tooltip>
       </div>
     )
@@ -210,54 +198,54 @@ const ReportingDoctorTag = ({
               New Message
             </span>
           </Link>
-          {medicalCheckupDoctor.status === REPORTINGDOCTOR_STATUS.VERIFIED && (
-            <Link style={{ display: 'inline-block' }}>
-              <span
-                style={{
-                  display: 'block',
-                  textDecoration: 'underline',
-                }}
-                onClick={e => {
-                  e.preventDefault()
-                  updateReportingDoctor(
-                    medicalCheckupDoctor,
-                    REPORTINGDOCTOR_STATUS.NEW,
-                  )
-                }}
-              >
-                Return to Doctor
-              </span>
-            </Link>
-          )}
-          {medicalCheckupDoctor.status ===
-            REPORTINGDOCTOR_STATUS.COMMENTDONE && (
-            <Link style={{ display: 'inline-block' }}>
-              <span
-                style={{
-                  display: 'block',
-                  textDecoration: 'underline',
-                }}
-                onClick={e => {
-                  e.preventDefault()
-                  updateReportingDoctor(
-                    medicalCheckupDoctor,
-                    REPORTINGDOCTOR_STATUS.VERIFIED,
-                  )
-                }}
-              >
-                Verify Comments
-              </span>
-            </Link>
-          )}
+          {medicalCheckupDoctor.status === REPORTINGDOCTOR_STATUS.VERIFIED &&
+            isEditEnable && (
+              <Link style={{ display: 'inline-block' }}>
+                <span
+                  style={{
+                    display: 'block',
+                    textDecoration: 'underline',
+                  }}
+                  onClick={e => {
+                    e.preventDefault()
+                    updateReportingDoctor(
+                      medicalCheckupDoctor,
+                      REPORTINGDOCTOR_STATUS.NEW,
+                    )
+                  }}
+                >
+                  Return to Doctor
+                </span>
+              </Link>
+            )}
+          {medicalCheckupDoctor.status === REPORTINGDOCTOR_STATUS.COMMENTDONE &&
+            isEditEnable && (
+              <Link style={{ display: 'inline-block' }}>
+                <span
+                  style={{
+                    display: 'block',
+                    textDecoration: 'underline',
+                  }}
+                  onClick={e => {
+                    e.preventDefault()
+                    updateReportingDoctor(
+                      medicalCheckupDoctor,
+                      REPORTINGDOCTOR_STATUS.VERIFIED,
+                    )
+                  }}
+                >
+                  Verify Comments
+                </span>
+              </Link>
+            )}
         </div>
       </div>
     )
   }
   return (
     <div
-      className={classes.panel}
       style={{
-        backgroundColor: reportingDoctorColor,
+        float: 'left',
       }}
     >
       {isShowMessage ? (

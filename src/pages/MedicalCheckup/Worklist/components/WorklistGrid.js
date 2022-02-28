@@ -6,12 +6,13 @@ import { history } from 'umi'
 import { Menu, Dropdown, Space, Typography, Card, Tag, Tooltip } from 'antd'
 import {
   MEDICALCHECKUP_WORKITEM_STATUS,
-  MEDICALCHECKUP_WORKITEM_STATUS_COLORS,
-  MEDICALCHECKUP_WORKITEM_STATUS_DESCRIPTION,
+  MEDICALCHECKUP_WORKITEM_STATUSES,
   FORM_CATEGORY,
   DISPENSE_FROM,
   VISIT_TYPE,
   WORK_ITEM_TYPES,
+  MEDICALCHECKUP_REPORTTYPE,
+  MEDICALCHECKUP_REPORTSTATUS,
 } from '@/utils/constants'
 import NurseWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/NurseWorkItemInfo'
 import RadioWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/RadioWorkItemInfo'
@@ -58,7 +59,7 @@ const saveColumnsSetting = (dispatch, columnsSetting) => {
   })
 }
 
-export const WorklistGrid = ({ medicalCheckupWorklist }) => {
+export const WorklistGrid = ({ medicalCheckupWorklist, user }) => {
   const {
     list: originalWorklist = [],
     medicalCheckupWorklistColumnSetting = [],
@@ -217,31 +218,49 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
   ]
 
   const renderWorkitemStatus = row => {
-    const statusColor = MEDICALCHECKUP_WORKITEM_STATUS_COLORS[`${row.statusFK}`]
-    const statusName =
-      MEDICALCHECKUP_WORKITEM_STATUS_DESCRIPTION[`${row.statusFK}`]
+    const status = MEDICALCHECKUP_WORKITEM_STATUSES.find(
+      x => x.id === row.statusFK,
+    )
+    const statusColor = status.color
+    const statusName = status.label
+
+    let subTitle
+    if (
+      row.statusFK === MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS ||
+      row.statusFK === MEDICALCHECKUP_WORKITEM_STATUS.REPORTING
+    ) {
+      if (row.lastReportType) {
+        subTitle = `(${
+          row.lastReportType === MEDICALCHECKUP_REPORTTYPE.TEMPORARY
+            ? 'Temp. Rpt.'
+            : 'Final Rpt.'
+        } ${
+          row.lastReportStatus === MEDICALCHECKUP_REPORTSTATUS.VERIFIED
+            ? 'Completed'
+            : 'Verifying'
+        })`
+      }
+    }
     return (
-      <div
+      <Tag
         style={{
-          borderRadius: 3,
           backgroundColor: statusColor,
           textAlign: 'center',
           color: 'white',
-          lineHeight: 1,
-          height: '25px',
+          width: '100%',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          padding: 2,
         }}
       >
-        <span
-          style={{
-            position: 'relative',
-            top: 5,
-            fontSize: '0.9rem',
-            fontWeight: 400,
-          }}
-        >
-          {statusName}
-        </span>
-      </div>
+        {
+          <div>
+            <span>{statusName}</span>
+            {subTitle && <div>{subTitle}</div>}
+          </div>
+        }
+      </Tag>
     )
   }
 
@@ -255,7 +274,7 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
         search: false,
         align: 'center',
         fixed: 'left',
-        width: 130,
+        width: 146,
         render: (item, entity) => {
           return renderWorkitemStatus(entity)
         },
@@ -417,7 +436,17 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
         fixed: 'right',
         width: 60,
         render: (item, entity) => {
-          if (entity.statusFK === MEDICALCHECKUP_WORKITEM_STATUS.NEW) return ''
+          const isDoctor =
+            user.data.clinicianProfile.userProfile.role?.clinicRoleFK === 1
+          if (
+            isDoctor &&
+            !entity.medicalCheckupWorkitemDoctor.find(
+              x =>
+                x.userProfileFK === user.data.clinicianProfile.userProfile.id,
+            )
+          ) {
+            return ''
+          }
 
           const handleClick = event => {
             const { key } = event
