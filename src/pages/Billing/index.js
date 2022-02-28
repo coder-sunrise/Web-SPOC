@@ -855,7 +855,7 @@ class Billing extends Component {
       const callback = () => {
         this.setState(preState => ({
           submitCount: preState.submitCount + 1,
-          hasNewSignature: !preState.hasNewSignature,
+          hasNewSignature: false,
         }))
         if (currentPrintIndex !== undefined) {
           const {
@@ -883,6 +883,10 @@ class Billing extends Component {
         if (payer.id) return payer.isModified
         return true
       })
+      console.log(
+        modifiedOrNewAddedPayer.length > 0,
+        this.state.hasNewSignature,
+      )
       if (modifiedOrNewAddedPayer.length > 0 || this.state.hasNewSignature) {
         dispatch({
           type: 'global/updateState',

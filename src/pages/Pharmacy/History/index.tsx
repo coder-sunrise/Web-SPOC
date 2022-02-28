@@ -149,7 +149,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       dataIndex: 'preparedBy',
       sorter: false,
       search: false,
-      width: 85,
+      width: 130,
     },
     {
       key: 'preparedTime',

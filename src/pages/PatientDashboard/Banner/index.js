@@ -1131,6 +1131,7 @@ class Banner extends PureComponent {
           >
             <PrintLabLabelButton
               patientId={info.id}
+              iconOnly={true}
               clinicSettings={clinicSettings?.settings}
             />
           </span>
