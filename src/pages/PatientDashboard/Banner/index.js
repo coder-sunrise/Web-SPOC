@@ -123,6 +123,14 @@ class Banner extends PureComponent {
     })
   }
 
+  componentWillUnmount() {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'patient/updateState',
+      payload: { entity: null },
+    })
+  }
+
   getAllergyData() {
     const { patient } = this.props
     const { entity } = patient
@@ -1267,7 +1275,9 @@ class Banner extends PureComponent {
     const patientRequest = (
       <Row wrap={false}>
         <Col flex='none'>
-          <span className={classes.header}>Patient Request: </span>
+          <Tooltip title='Patient Request'>
+            <span className={classes.header}>Request: </span>
+          </Tooltip>
         </Col>
         <Col flex='auto' className={contentClass}>
           <Tooltip
@@ -1308,7 +1318,18 @@ class Banner extends PureComponent {
     const patientPersistDiagnosis = (
       <Row wrap={false}>
         <Col flex='none'>
-          <span className={classes.header}>Persistent Diagnosis: </span>
+          <Tooltip title='Persistent Diagnosis'>
+            <span className={classes.header}>
+              P. Diagnosis
+              {isEnableJapaneseICD10Diagnosis === true &&
+              info?.patientHistoryDiagnosis?.length > 0 ? (
+                <span>{`(${info?.patientHistoryDiagnosis?.length})`}</span>
+              ) : (
+                <span></span>
+              )}
+              :{' '}
+            </span>
+          </Tooltip>
         </Col>
         <Col flex='auto' className={contentClass}>
           <Tooltip
@@ -1324,7 +1345,9 @@ class Banner extends PureComponent {
     const longTermMedication = (
       <Row wrap={false}>
         <Col flex='none'>
-          <span className={classes.header}>Long Term Medication: </span>
+          <Tooltip title='Long Term Medication'>
+            <span className={classes.header}>L.T. Med.: </span>
+          </Tooltip>
         </Col>
         <Col flex='auto' className={contentClass}>
           <Tooltip
