@@ -70,9 +70,11 @@ const styles = theme => ({
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
     paddingLeft: '5px',
+    wordBreak: 'break-word',
   },
   contentWithoutWrap: {
     paddingLeft: '5px',
+    wordBreak: 'break-word',
   },
   contents: {
     overflow: 'hidden',
@@ -484,6 +486,7 @@ class Banner extends PureComponent {
                   ? `#${schemeInsuranceDisplayColorCode}`
                   : 'black',
                 textDecoration: 'underline',
+                wordBreak: 'break-word',
               }}
               onClick={e => {
                 const editDetailAccessRight = Authorized.check(

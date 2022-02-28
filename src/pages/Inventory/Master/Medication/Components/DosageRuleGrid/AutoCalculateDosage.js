@@ -18,6 +18,7 @@ const AutoCalculateDosage = ({
   languageLabel,
   setFieldValue,
   values,
+  codetable,
   ...restProps
 }) => {
   const [ruleType, setRuleType] = useState(DOSAGE_RULE.default)
@@ -76,6 +77,13 @@ const AutoCalculateDosage = ({
   }
   const optionLabelLength = 40
   const conversionDisabled = !values.prescribingUOMFK
+
+  const dispenseUOM = codetable?.ctmedicationunitofmeasurement?.find(
+    t => t.id === values.dispensingUOMFK,
+  )?.displayValue
+  const prescribeUOM = codetable?.ctmedicationunitofmeasurement?.find(
+    t => t.id === values.prescribingUOMFK,
+  )?.displayValue
   return (
     <GridContainer>
       <GridItem md={6}>
@@ -119,7 +127,7 @@ const AutoCalculateDosage = ({
           )}
         />
       </GridItem>
-      <GridItem md={3}>
+      <GridItem md={2}>
         <FastField
           name='dispensingUOMFK'
           render={args => (
@@ -134,7 +142,7 @@ const AutoCalculateDosage = ({
           )}
         />
       </GridItem>
-      <GridItem md={3}>
+      <GridItem md={4}>
         {conversionEnabled && (
           <GridContainer>
             <GridItem md={5}>
@@ -153,40 +161,38 @@ const AutoCalculateDosage = ({
               />
             </GridItem>
             <GridItem>
-              <FastField
-                name='prescribingUOMFK'
-                render={args => (
-                  <CodeSelect
-                    style={{ marginTop: 25 }}
-                    label=''
-                    text
-                    labelField='displayValue'
-                    optionLabelLength={optionLabelLength}
-                    code='ctmedicationunitofmeasurement'
-                    {...args}
-                  />
-                )}
-              />
+              <span
+                title={prescribeUOM}
+                style={{
+                  display: 'inline-block',
+                  maxWidth: 110,
+                  marginTop: 25,
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                }}
+              >
+                {prescribeUOM}
+              </span>
             </GridItem>
 
             <GridItem>
               <div style={{ marginTop: 25, fontSize: 16 }}>= 1.0</div>
             </GridItem>
             <GridItem>
-              <FastField
-                name='dispensingUOMFK'
-                render={args => (
-                  <CodeSelect
-                    style={{ marginTop: 25 }}
-                    label=''
-                    text
-                    labelField='displayValue'
-                    optionLabelLength={optionLabelLength}
-                    code='ctmedicationunitofmeasurement'
-                    {...args}
-                  />
-                )}
-              />
+              <span
+                title={dispenseUOM}
+                style={{
+                  display: 'inline-block',
+                  maxWidth: 110,
+                  marginTop: 25,
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                }}
+              >
+                {dispenseUOM}
+              </span>
             </GridItem>
           </GridContainer>
         )}
