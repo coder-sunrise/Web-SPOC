@@ -18,7 +18,14 @@ import {
 import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 
 const SummaryCommentDetails = props => {
-  const { values, selectedLanguage, setFieldValue, dispatch, setValues } = props
+  const {
+    values,
+    selectedLanguage,
+    setFieldValue,
+    dispatch,
+    setValues,
+    isEditEnable = true,
+  } = props
   const onDiscard = () => {
     dispatch({
       type: 'medicalCheckupReportingDetails/updateState',
@@ -78,7 +85,6 @@ const SummaryCommentDetails = props => {
   }
 
   const commentOptions = getCommentOptions()
-
   return (
     <GridContainer>
       <GridItem
@@ -95,6 +101,7 @@ const SummaryCommentDetails = props => {
             <CodeSelect
               valueField='id'
               code='CTSummaryCommentCategory'
+              disabled={!isEditEnable}
               {...args}
               onChange={() => {
                 setFieldValue('selectComment', undefined)
@@ -117,6 +124,7 @@ const SummaryCommentDetails = props => {
             <CodeSelect
               options={commentOptions}
               valueField='id'
+              disabled={!isEditEnable}
               labelField={
                 selectedLanguage === 'EN'
                   ? 'englishDisplayValue'
@@ -140,6 +148,7 @@ const SummaryCommentDetails = props => {
           render={args => (
             <MultipleTextField
               maxLength={2000}
+              disabled={!isEditEnable}
               autoSize={{ minRows: 4, maxRows: 4 }}
               {...args}
             />
@@ -147,13 +156,19 @@ const SummaryCommentDetails = props => {
         />
       </GridItem>
       <GridItem md={12} style={{ textAlign: 'right' }}>
-        <Button size='small' type='danger' onClick={onDiscard}>
+        <Button
+          size='small'
+          type='danger'
+          onClick={onDiscard}
+          disabled={!isEditEnable}
+        >
           Discard
         </Button>
         <Button
           size='small'
           type='primary'
           style={{ marginLeft: 10 }}
+          disabled={!isEditEnable}
           onClick={e => {
             const { handleSubmit } = props
             if (handleSubmit) handleSubmit()

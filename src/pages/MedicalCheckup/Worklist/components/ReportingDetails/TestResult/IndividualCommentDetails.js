@@ -96,31 +96,68 @@ class IndividualCommentDetails extends PureComponent {
     const { setFieldValue } = this.props
     const { selectedItem } = this.state
     const keys = Object.keys(selectedItem)
-    const englishComment = keys
-      .map(
-        key =>
-          selectedItem[key].translationData
-            .find(l => l.language === 'EN')
-            ?.list?.find(l => (l.key = 'displayValue'))?.value,
-      )
-      .join(' ')
-    const japaneseComment = keys
-      .map(
-        key =>
-          selectedItem[key].translationData
-            .find(l => l.language === 'JP')
-            ?.list?.find(l => (l.key = 'displayValue'))?.value,
-      )
-      .join(' ')
+    let englishComment
+    let japaneseComment
+    keys.forEach(key => {
+      const selectGroupItems = selectedItem[key] || []
+      const strEnglish = selectGroupItems
+        .map(
+          item =>
+            item.translationData
+              .find(l => l.language === 'EN')
+              ?.list?.find(l => (l.key = 'displayValue'))?.value,
+        )
+        .join(' ')
+      englishComment = `${
+        englishComment ? `${englishComment} ` : ''
+      }${strEnglish}`
+
+      const strJapanese = selectGroupItems
+        .map(
+          item =>
+            item.translationData
+              .find(l => l.language === 'JP')
+              ?.list?.find(l => (l.key = 'displayValue'))?.value,
+        )
+        .join(' ')
+      japaneseComment = `${
+        japaneseComment ? `${japaneseComment} ` : ''
+      }${strJapanese}`
+    })
     setFieldValue('originalJapaneseComment', japaneseComment)
     setFieldValue('japaneseComment', japaneseComment)
     setFieldValue('originalEnglishComment', englishComment)
     setFieldValue('englishComment', englishComment)
   }
 
+  onCategoryChange = (group, item) => {
+    this.setState(
+      preState => {
+        let selectGroupItems = preState.selectedItem[group.groupNo] || []
+        let selectItem = selectGroupItems.find(i => i.id === item.id)
+        if (selectItem) {
+          selectGroupItems = selectGroupItems.filter(i => i.id !== item.id)
+        } else {
+          selectGroupItems = [...selectGroupItems, { ...item }]
+        }
+        return {
+          ...preState,
+          selectedItem: {
+            ...preState.selectedItem,
+            [group.groupNo]: [...selectGroupItems],
+          },
+        }
+      },
+      () => {
+        document.activeElement.blur()
+        this.generateComment()
+      },
+    )
+  }
+
   getSelection = group => {
     const { selectedItem, searchValue = '' } = this.state
-    const { selectedLanguage } = this.props
+    const { selectedLanguage, commentGroupList = [] } = this.props
     return (
       <List
         style={{
@@ -144,27 +181,37 @@ class IndividualCommentDetails extends PureComponent {
             const showValue = item.translationData
               .find(l => l.language === selectedLanguage)
               ?.list?.find(l => (l.key = 'displayValue'))?.value
+
+            const isSelected = selectedItem[group.groupNo]?.find(
+              i => i.id === item.id,
+            )
+
+            let isNextGroupSelect
+            for (
+              let index = group.groupNo;
+              index < commentGroupList.length;
+              index++
+            ) {
+              if (
+                (selectedItem[commentGroupList[index].groupNo] || []).length
+              ) {
+                isNextGroupSelect = true
+                break
+              }
+            }
+
             return (
               <ListItem
                 alignItems='flex-start'
                 classes={{
                   root: this.props.classes.listItemRoot,
                 }}
-                selected={selectedItem[group.groupNo]?.id === item.id}
+                selected={isSelected}
                 divider
                 disableGutters
                 button
-                onClick={() => {
-                  this.setState(
-                    {
-                      selectedItem: {
-                        ...selectedItem,
-                        [group.groupNo]: { ...item },
-                      },
-                    },
-                    this.generateComment,
-                  )
-                }}
+                disabled={isNextGroupSelect}
+                onClick={() => this.onCategoryChange(group, item)}
               >
                 <Tooltip title={showValue}>
                   <div

@@ -36,9 +36,9 @@ const ReportingDoctorList = props => {
     label,
   } = props
   return (
-    <div style={{ position: 'relative' }}>
+    <div>
       {isShowLabel && (
-        <div style={{ float: 'left', marginRight: 6, marginTop: 6 }}>
+        <div style={{ float: 'left', marginRight: 6, marginTop: 4 }}>
           {label}
         </div>
       )}

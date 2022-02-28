@@ -3,10 +3,8 @@ import { CheckSquareFilled } from '@ant-design/icons'
 import { TagWithCount } from '@/components/_medisys'
 import {
   MEDICALCHECKUP_WORKITEM_STATUS,
-  MEDICALCHECKUP_WORKITEM_STATUS_COLORS,
   MEDICALCHECKUP_WORKITEM_STATUS_ALL_COLOR,
-  MEDICALCHECKUP_WORKITEM_STATUS_LABELS,
-  MEDICALCHECKUP_WORKITEM_STATUS_DESCRIPTION,
+  MEDICALCHECKUP_WORKITEM_STATUSES,
 } from '@/utils/constants'
 
 const ALL_STATUS_VALUE = -99
@@ -15,11 +13,11 @@ const allMedicalCheckupReportStatuses = Object.values(
 )
 
 const getStatusColor = statusId =>
-  MEDICALCHECKUP_WORKITEM_STATUS_COLORS[`${statusId}`]
+  MEDICALCHECKUP_WORKITEM_STATUSES.find(x => x.id === statusId).color
 const getStatusLabel = statusId =>
-  MEDICALCHECKUP_WORKITEM_STATUS_LABELS[`${statusId}`]
+  MEDICALCHECKUP_WORKITEM_STATUSES.find(x => x.id === statusId).label
 const getStatusDescription = statusId =>
-  MEDICALCHECKUP_WORKITEM_STATUS_DESCRIPTION[`${statusId}`]
+  MEDICALCHECKUP_WORKITEM_STATUSES.find(x => x.id === statusId).description
 
 export const StatusFilter = ({
   counts,
@@ -72,10 +70,7 @@ export const StatusFilter = ({
           label={getStatusLabel(status)}
           tooltip={getStatusDescription(status)}
           checked={selectedStatus.includes(status)}
-          count={(() => {
-            const statusCount = counts.find(item => item.status === status)
-            return statusCount ? statusCount.count : 0
-          })()}
+          count={counts.filter(item => item.status === status).length}
           onClick={() => {
             handleTagClick(status)
           }}

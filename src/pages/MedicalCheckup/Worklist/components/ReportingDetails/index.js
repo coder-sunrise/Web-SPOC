@@ -3,6 +3,8 @@ import _ from 'lodash'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import moment from 'moment'
+import { Button, Drawer } from 'antd'
+import { Link, history } from 'umi'
 import { withStyles, Divider } from '@material-ui/core'
 import Banner from '@/pages/PatientDashboard/Banner'
 import { LoadingWrapper } from '@/components/_medisys'
@@ -10,8 +12,10 @@ import SummaryComment from './SummaryComment'
 import TestResult from './TestResult'
 import ReportHistory from './ReportHistory'
 import ResultDetails from './ResultDetails'
-import { Button, Drawer } from 'antd'
-import { Link, history } from 'umi'
+import {
+  MEDICALCHECKUP_WORKITEM_STATUS,
+  MEDICALCHECKUP_REPORTTYPE,
+} from '@/utils/constants'
 import {
   DoubleLeftOutlined,
   DoubleRightOutlined,
@@ -119,6 +123,86 @@ const ReportingDetails = props => {
       setPlacement('right')
     }
   }
+
+  const onUnlock = () => {
+    dispatch({
+      type: 'medicalCheckupReportingDetails/upsert',
+      payload: {
+        ...medicalCheckupReportingDetails.entity,
+        statusFK: MEDICALCHECKUP_WORKITEM_STATUS.REPORTING,
+      },
+    }).then(r => {
+      if (r) {
+        refreshMedicalCheckup()
+      }
+    })
+  }
+
+  const generateFinalReport = () => {
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent:
+          reportingStatus === MEDICALCHECKUP_WORKITEM_STATUS.REPORTING
+            ? `Confirm to generate report (Finalized) ?`
+            : 'Not all test has completed, generating report will exclude incomlete test. Confirm to generate?',
+        onConfirmSave: () => {
+          generateReport(MEDICALCHECKUP_REPORTTYPE.FINAL)
+        },
+      },
+    })
+  }
+
+  const reportingStatus = medicalCheckupReportingDetails.entity?.statusFK
+
+  const canCompletedReport = () => {
+    const medicalCheckupReport = _.sortBy(
+      medicalCheckupReportingDetails.entity?.medicalCheckupReport,
+      ['versionNumber'],
+      ['desc'],
+    )
+    if (
+      medicalCheckupReport.length &&
+      medicalCheckupReport[0].reportType === MEDICALCHECKUP_REPORTTYPE.FINAL &&
+      medicalCheckupReport[0].status === 'Verified'
+    )
+      return true
+    return false
+  }
+
+  const clearEditComment = () => {
+    dispatch({
+      type: 'medicalCheckupReportingDetails/updateState',
+      payload: {
+        summaryCommentEntity: undefined,
+      },
+    })
+
+    dispatch({
+      type: 'medicalCheckupReportingDetails/updateState',
+      payload: {
+        individualCommentEntity: undefined,
+      },
+    })
+  }
+
+  const canGenerateReport = () => {
+    return (
+      reportingStatus !== MEDICALCHECKUP_WORKITEM_STATUS.PENDINGVERIFICATION &&
+      reportingStatus !== MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED
+    )
+  }
+
+  const getEditEnable = () => {
+    return false
+    const medicalCheckupstatus = medicalCheckupReportingDetails.entity?.statusFK
+    return (
+      medicalCheckupstatus !==
+        MEDICALCHECKUP_WORKITEM_STATUS.PENDINGVERIFICATION &&
+      medicalCheckupstatus !== MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED
+    )
+  }
   return (
     <div>
       <LoadingWrapper loading={loading.models.medicalCheckupReportingDetails}>
@@ -149,6 +233,7 @@ const ReportingDetails = props => {
                   queryIndividualCommentHistory={queryIndividualCommentHistory}
                   refreshMedicalCheckup={refreshMedicalCheckup}
                   setShowResultDetails={onShowShowResultDetails}
+                  isEditEnable={getEditEnable()}
                 />
               </GridItem>
               <GridItem md={5} style={{ padding: 0 }}>
@@ -160,6 +245,8 @@ const ReportingDetails = props => {
                   querySummaryCommentHistory={querySummaryCommentHistory}
                   queryIndividualCommentHistory={queryIndividualCommentHistory}
                   refreshMedicalCheckup={refreshMedicalCheckup}
+                  clearEditComment={clearEditComment}
+                  isEditEnable={getEditEnable()}
                 />
               </GridItem>
             </GridContainer>
@@ -194,26 +281,55 @@ const ReportingDetails = props => {
                 >
                   Back To List
                 </Button>
-                <Button
-                  size='small'
-                  type='primary'
-                  style={{ margin: '0px 5px' }}
-                  onClick={() => {
-                    generateReport('Temporary Report')
-                  }}
-                >
-                  Generate Temporary Report
-                </Button>
-                <Button
-                  size='small'
-                  type='primary'
-                  style={{ margin: '0px 5px' }}
-                  onClick={() => {
-                    generateReport('Final Report')
-                  }}
-                >
-                  Generate Report
-                </Button>
+                {canGenerateReport() && (
+                  <Button
+                    size='small'
+                    type='primary'
+                    style={{ margin: '0px 5px' }}
+                    onClick={() => {
+                      generateReport(MEDICALCHECKUP_REPORTTYPE.TEMPORARY)
+                    }}
+                  >
+                    Generate Temporary Report
+                  </Button>
+                )}
+                {canGenerateReport() && (
+                  <Button
+                    size='small'
+                    type='primary'
+                    style={{ margin: '0px 5px' }}
+                    onClick={generateFinalReport}
+                  >
+                    Generate Report
+                  </Button>
+                )}
+                {canCompletedReport() && (
+                  <Button
+                    size='small'
+                    style={{
+                      margin: '0px 5px',
+                      backgroundColor: '#007D00',
+                      color: 'white',
+                    }}
+                    onClick={generateFinalReport}
+                  >
+                    Complete Report Verification
+                  </Button>
+                )}
+                {reportingStatus ===
+                  MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED && (
+                  <Button
+                    size='small'
+                    style={{
+                      margin: '0px 5px',
+                      backgroundColor: '#5a9cde',
+                      color: 'white',
+                    }}
+                    onClick={onUnlock}
+                  >
+                    Unlock
+                  </Button>
+                )}
               </div>
             </div>
           </div>

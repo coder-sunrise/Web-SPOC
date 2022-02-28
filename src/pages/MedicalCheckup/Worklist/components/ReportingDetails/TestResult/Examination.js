@@ -27,8 +27,11 @@ const Examination = props => {
     ctindividualcomment,
     queryIndividualCommentHistory,
     refreshMedicalCheckup,
+    isEditEnable = true,
   } = props
-  const [selectRow, setSelectRow] = useState(undefined)
+  const [selectExaminationItemId, setSelectExaminationItemId] = useState(
+    undefined,
+  )
   const [commentGroupList, setCommentGroupList] = useState([])
   const [dataSource, setDataSource] = useState([])
   const [columns, setColumns] = useState([])
@@ -57,14 +60,24 @@ const Examination = props => {
     setDataSource([
       ...dataSource.map(item => ({
         ...item,
-        isSelected: selectRow && !item.isGroup && item.id === selectRow,
+        isSelected:
+          selectExaminationItemId &&
+          !item.isGroup &&
+          item.id === selectExaminationItemId,
       })),
     ])
-  }, [selectRow])
+  }, [selectExaminationItemId])
 
   useEffect(() => {
     setData(medicalCheckupReportingDetails.individualCommentList)
   }, [medicalCheckupReportingDetails.individualCommentList])
+
+  useEffect(() => {
+    if (!medicalCheckupReportingDetails.individualCommentEntity) {
+      setCommentGroupList([])
+      setSelectExaminationItemId(undefined)
+    }
+  }, [medicalCheckupReportingDetails.individualCommentEntity])
   const setData = individualComment => {
     const { classes } = props
     const defaultData = getDataSource()
@@ -105,7 +118,7 @@ const Examination = props => {
           )
         },
         onCell: row => ({
-          style: { backgroundColor: row.isSelected ? 'red' : 'white' },
+          style: { backgroundColor: row.isSelected ? '#CCCCCC' : 'white' },
         }),
       },
     ]
@@ -156,17 +169,21 @@ const Examination = props => {
                     <div
                       style={{ position: 'absolute', right: '-4px', top: 0 }}
                     >
-                      <Tooltip title='Copy Comment'>
-                        <IconButton
-                          size='small'
-                          color='primary'
-                          onClick={() => {
-                            copyComment(item.id)
-                          }}
-                        >
-                          <CopyOutlined />
-                        </IconButton>
-                      </Tooltip>
+                      {isEditEnable ? (
+                        <Tooltip title='Copy Comment'>
+                          <IconButton
+                            size='small'
+                            color='primary'
+                            onClick={() => {
+                              copyComment(item.id)
+                            }}
+                          >
+                            <CopyOutlined />
+                          </IconButton>
+                        </Tooltip>
+                      ) : (
+                        ''
+                      )}
                     </div>
                   </div>
                 )
@@ -175,7 +192,7 @@ const Examination = props => {
           )
         },
         onCell: row => ({
-          style: { backgroundColor: row.isSelected ? 'red' : 'white' },
+          style: { backgroundColor: row.isSelected ? '#CCCCCC' : 'white' },
         }),
       })
     })
@@ -185,7 +202,7 @@ const Examination = props => {
       title: '',
       width: '100%',
       onCell: row => ({
-        style: { backgroundColor: row.isSelected ? 'red' : 'white' },
+        style: { backgroundColor: row.isSelected ? '#CCCCCC' : 'white' },
       }),
     })
     setColumns(defaultColumns)
@@ -208,7 +225,8 @@ const Examination = props => {
           examinationType: item.displayValue,
           isGroup: false,
           selectedLanguage,
-          isSelected: selectRow && item.id === selectRow,
+          isSelected:
+            selectExaminationItemId && item.id === selectExaminationItemId,
         })),
       )
     })
@@ -261,21 +279,18 @@ const Examination = props => {
         },
       },
     })
-    setSelectRow(row.id)
+    setSelectExaminationItemId(row.id)
   }
 
   const onSaveComment = () => {
     queryIndividualCommentHistory()
     refreshMedicalCheckup()
-
-    setCommentGroupList([])
     dispatch({
       type: 'medicalCheckupReportingDetails/updateState',
       payload: {
         individualCommentEntity: undefined,
       },
     })
-    setSelectRow(undefined)
   }
 
   const copyComment = id => {
@@ -295,7 +310,7 @@ const Examination = props => {
     <div
       style={{
         position: 'relative',
-        paddingRight: selectRow
+        paddingRight: selectExaminationItemId
           ? commentGroupList.length
             ? commentGroupList.length * 100
             : 400
@@ -322,6 +337,7 @@ const Examination = props => {
               return {
                 onClick: event => {
                   if (record.isGroup) return
+                  if (!isEditEnable) return
                   selectExamination(record)
                 }, // click row
               }
@@ -330,7 +346,7 @@ const Examination = props => {
           ></Table>
         </GridItem>
       </GridContainer>
-      {selectRow && (
+      {selectExaminationItemId && (
         <div style={{ position: 'absolute', right: 0, top: 0 }}>
           <IndividualCommentDetails
             {...props}

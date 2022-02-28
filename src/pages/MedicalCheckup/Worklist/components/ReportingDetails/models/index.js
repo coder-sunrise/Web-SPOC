@@ -108,22 +108,26 @@ export default createFormViewModel({
           service.queryIndividualCommentHistory,
           payload,
         )
-        yield put({
-          type: 'updateState',
-          payload: {
-            individualCommentList: response.data.data,
-          },
-        })
+        if (response && response.status === '200') {
+          yield put({
+            type: 'updateState',
+            payload: {
+              individualCommentList: response.data.data,
+            },
+          })
+        }
         return response
       },
       *querySummaryCommentHistory({ payload }, { call, put }) {
         const response = yield call(service.querySummaryCommentHistory, payload)
-        yield put({
-          type: 'updateState',
-          payload: {
-            summaryCommentList: response.data.data,
-          },
-        })
+        if (response && response.status === '200') {
+          yield put({
+            type: 'updateState',
+            payload: {
+              summaryCommentList: response.data.data,
+            },
+          })
+        }
         return response
       },
       *deleteSummaryComment({ payload }, { call, put }) {
@@ -140,6 +144,10 @@ export default createFormViewModel({
       },
       *updateReportingDoctor({ payload }, { call, put }) {
         const response = yield call(service.updateReportingDoctor, payload)
+        return response
+      },
+      *queryExternalService({ payload }, { call, put }) {
+        const response = yield call(service.queryExternalService, payload)
         return response
       },
     },

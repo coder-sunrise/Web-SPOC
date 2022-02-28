@@ -34,11 +34,15 @@ const SummaryComment = props => {
     querySummaryCommentHistory,
     queryIndividualCommentHistory,
     refreshMedicalCheckup,
+    clearEditComment,
     user,
+    isEditEnable = true,
   } = props
   const [showVerification, setShowVerification] = useState(false)
   const [commentOption, setCommentOption] = useState([])
   const dispatch = useDispatch()
+  const isDoctor =
+    user.data.clinicianProfile.userProfile.role?.clinicRoleFK === 1
 
   useEffect(() => {
     if (
@@ -57,6 +61,7 @@ const SummaryComment = props => {
   }, [selectedLanguage, medicalCheckupReportingDetails.summaryCommentList])
 
   const showCommentVerification = () => {
+    clearEditComment()
     toggleCommentVerification()
   }
   const toggleCommentVerification = () => {
@@ -89,6 +94,16 @@ const SummaryComment = props => {
       if (r) {
         querySummaryCommentHistory()
         refreshMedicalCheckup()
+        if (
+          medicalCheckupReportingDetails.summaryCommentEntity?.id === row.id
+        ) {
+          dispatch({
+            type: 'medicalCheckupReportingDetails/updateState',
+            payload: {
+              summaryCommentEntity: undefined,
+            },
+          })
+        }
       }
     })
   }
@@ -129,24 +144,28 @@ const SummaryComment = props => {
                   </div>
                 </Tooltip>
                 <div style={{ position: 'absolute', right: 0, top: 0 }}>
-                  <Tooltip title='Copy Comment'>
-                    <IconButton
-                      size='small'
-                      color='primary'
-                      onClick={() => {
-                        copyComment(row.id)
-                      }}
-                    >
-                      <CopyOutlined />
-                    </IconButton>
-                  </Tooltip>
+                  {isEditEnable ? (
+                    <Tooltip title='Copy Comment'>
+                      <IconButton
+                        size='small'
+                        color='primary'
+                        onClick={() => {
+                          copyComment(row.id)
+                        }}
+                      >
+                        <CopyOutlined />
+                      </IconButton>
+                    </Tooltip>
+                  ) : (
+                    ''
+                  )}
                 </div>
               </div>
             )
           },
         },
       ]
-      if (index === 0) {
+      if (index === 0 && isEditEnable) {
         columns.push({
           dataIndex: 'action',
           title: <div style={{ padding: 4 }}> Action</div>,
@@ -238,6 +257,7 @@ const SummaryComment = props => {
   }
 
   const isShowMarkAsCommentsDone = () => {
+    if (!isEditEnable) return false
     if (user.data.clinicianProfile.userProfile.role?.clinicRoleFK === 1) {
       const currentDoctor = (
         medicalCheckupReportingDetails.entity?.medicalCheckupWorkitemDoctor ||
@@ -257,7 +277,7 @@ const SummaryComment = props => {
   }
 
   const activeReportingDoctors = () => {
-    if (user.data.clinicianProfile.userProfile.role?.clinicRoleFK === 1) {
+    if (isDoctor) {
       return (
         medicalCheckupReportingDetails.entity?.medicalCheckupWorkitemDoctor ||
         []
@@ -316,25 +336,27 @@ const SummaryComment = props => {
       >
         <div style={{ position: 'relative' }}>
           <span style={{ fontWeight: 'bold' }}>Summary Comment</span>
-          <Badge
-            style={{
-              paddingLeft: '4px',
-              paddingRight: '4px',
-            }}
-            size='small'
-            onClick={showCommentVerification}
-            count={getNonVerifyCount()}
-          >
-            <IconButton
+          {!isDoctor && (
+            <Badge
               style={{
-                color: 'white',
-                backgroundColor: '#4255bd',
-                marginLeft: 8,
+                paddingLeft: '4px',
+                paddingRight: '4px',
               }}
+              size='small'
+              onClick={showCommentVerification}
+              count={getNonVerifyCount()}
             >
-              <TranslateOutlined style={{ width: 16, height: 16 }} />
-            </IconButton>
-          </Badge>
+              <IconButton
+                style={{
+                  color: 'white',
+                  backgroundColor: '#4255bd',
+                  marginLeft: 8,
+                }}
+              >
+                <TranslateOutlined style={{ width: 16, height: 16 }} />
+              </IconButton>
+            </Badge>
+          )}
           {isShowMarkAsCommentsDone() && (
             <Link style={{ display: 'inline-block', marginLeft: 8 }}>
               <span
@@ -360,6 +382,7 @@ const SummaryComment = props => {
             isShowLabel
             label='Doctor(s):'
             updateReportingDoctor={updateReportingDoctor}
+            isEditEnable={isEditEnable}
           />
         </div>
       </div>
