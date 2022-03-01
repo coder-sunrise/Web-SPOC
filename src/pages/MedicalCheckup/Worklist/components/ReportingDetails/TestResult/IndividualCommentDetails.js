@@ -264,6 +264,11 @@ class IndividualCommentDetails extends PureComponent {
     setFieldValue('originalEnglishComment', undefined)
     setFieldValue('englishComment', undefined)
   }
+
+  onDiscard = () => {
+    const { clearEditComment } = this.props
+    clearEditComment()
+  }
   render() {
     const {
       values,
@@ -281,6 +286,7 @@ class IndividualCommentDetails extends PureComponent {
           position: 'relative',
           border: '1px solid #CCCCCC',
           backgroundColor: 'white',
+          width: 610,
         }}
       >
         <div style={{ padding: '0px 8px 8px 8px' }}>
@@ -385,14 +391,19 @@ class IndividualCommentDetails extends PureComponent {
             }}
           />
         </div>
-        <Button
-          size='small'
-          type='primary'
-          style={{ margin: 8 }}
-          onClick={handleSubmit}
-        >
-          Save Comment
-        </Button>
+        <div style={{ textAlign: 'right', margin: 8 }}>
+          <Button size='small' type='danger' onClick={this.onDiscard}>
+            Discard
+          </Button>
+          <Button
+            size='small'
+            type='primary'
+            style={{ marginLeft: 10 }}
+            onClick={handleSubmit}
+          >
+            Save Comment
+          </Button>
+        </div>
       </div>
     )
   }
