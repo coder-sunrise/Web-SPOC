@@ -176,6 +176,8 @@ const ReportingDetails = props => {
       type: 'medicalCheckupReportingDetails/updateState',
       payload: {
         summaryCommentEntity: undefined,
+        individualCommentEntity: undefined,
+        isNeedToClearSummaryComment: true,
       },
     })
 
@@ -195,7 +197,6 @@ const ReportingDetails = props => {
   }
 
   const getEditEnable = () => {
-    return false
     const medicalCheckupstatus = medicalCheckupReportingDetails.entity?.statusFK
     return (
       medicalCheckupstatus !==

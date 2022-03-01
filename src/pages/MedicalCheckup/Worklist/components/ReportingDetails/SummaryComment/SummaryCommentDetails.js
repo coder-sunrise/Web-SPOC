@@ -1,4 +1,4 @@
-import React, { PureComponent, useState } from 'react'
+import React, { PureComponent, useState, useEffect } from 'react'
 import { compose } from 'redux'
 import Yup from '@/utils/yup'
 import { Button } from 'antd'
@@ -25,7 +25,21 @@ const SummaryCommentDetails = props => {
     dispatch,
     setValues,
     isEditEnable = true,
+    medicalCheckupReportingDetails,
   } = props
+
+  useEffect(() => {
+    if (medicalCheckupReportingDetails.isNeedToClearSummaryComment) {
+      setValues({})
+      dispatch({
+        type: 'medicalCheckupReportingDetails/updateState',
+        payload: {
+          isNeedToClearSummaryComment: false,
+        },
+      })
+    }
+  }, [medicalCheckupReportingDetails.isNeedToClearSummaryComment])
+
   const onDiscard = () => {
     dispatch({
       type: 'medicalCheckupReportingDetails/updateState',

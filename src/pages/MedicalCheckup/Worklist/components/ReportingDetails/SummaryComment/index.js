@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'umi'
+import { Link, formatMessage } from 'umi'
 import { useDispatch } from 'dva'
 import moment from 'moment'
 import {
@@ -58,11 +58,44 @@ const SummaryComment = props => {
 
   useEffect(() => {
     setData(medicalCheckupReportingDetails.summaryCommentList)
-  }, [selectedLanguage, medicalCheckupReportingDetails.summaryCommentList])
+  }, [
+    selectedLanguage,
+    medicalCheckupReportingDetails.summaryCommentList,
+    medicalCheckupReportingDetails.summaryCommentEntity,
+  ])
 
-  const showCommentVerification = () => {
+  const onConfirm = () => {
     clearEditComment()
     toggleCommentVerification()
+  }
+
+  const showCommentVerification = e => {
+    if (
+      window.dirtyForms['SummaryCommentDetails'] ||
+      window.dirtyForms['IndividualCommentDetails']
+    ) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmContent: formatMessage({
+            id: 'app.general.leave-without-save',
+          }),
+          onConfirmSave: onConfirm,
+          openConfirmText: 'Confirm',
+          onConfirmClose: () => {
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                openConfirm: false,
+              },
+            })
+          },
+        },
+      })
+    } else {
+      onConfirm()
+    }
   }
   const toggleCommentVerification = () => {
     const target = !showVerification
@@ -112,6 +145,9 @@ const SummaryComment = props => {
     const { classes } = props
     const data = _.orderBy(queryData, ['visitDate'], ['desc'])
     let options = []
+    const isEditingRow = _.isObject(
+      medicalCheckupReportingDetails.summaryCommentEntity,
+    )
     data.forEach((item, index) => {
       const commentList = item.medicalCheckupSummaryComment || []
       let columns = [
@@ -144,7 +180,7 @@ const SummaryComment = props => {
                   </div>
                 </Tooltip>
                 <div style={{ position: 'absolute', right: 0, top: 0 }}>
-                  {isEditEnable ? (
+                  {isEditEnable && index !== 0 ? (
                     <Tooltip title='Copy Comment'>
                       <IconButton
                         size='small'
@@ -181,6 +217,7 @@ const SummaryComment = props => {
                     style={{ marginRight: 5 }}
                     icon={<EditFilled />}
                     onClick={() => editComment(row)}
+                    disabled={isEditingRow}
                   ></Button>
                 </Tooltip>
                 <Popconfirm
@@ -197,6 +234,7 @@ const SummaryComment = props => {
                       type='danger'
                       style={{ marginRight: 5 }}
                       icon={<DeleteFilled />}
+                      disabled={isEditingRow}
                     ></Button>
                   </Tooltip>
                 </Popconfirm>

@@ -13,7 +13,7 @@ import moment from 'moment'
 import { Table, Button } from 'antd'
 import { useDispatch } from 'dva'
 import { DeleteFilled, EditFilled, CopyOutlined } from '@ant-design/icons'
-import { getUniqueId } from '@/utils/utils'
+import { getUniqueId, navigateDirtyCheck } from '@/utils/utils'
 import customtyles from '../../Style.less'
 import IndividualCommentDetails from './IndividualCommentDetails'
 
@@ -118,7 +118,13 @@ const Examination = props => {
           )
         },
         onCell: row => ({
-          style: { backgroundColor: row.isSelected ? '#CCCCCC' : 'white' },
+          style: {
+            backgroundColor: row.isSelected
+              ? '#CCCCCC'
+              : row.isGroup
+              ? '#daecf5'
+              : 'white',
+          },
         }),
       },
     ]
@@ -169,7 +175,7 @@ const Examination = props => {
                     <div
                       style={{ position: 'absolute', right: '-4px', top: 0 }}
                     >
-                      {isEditEnable ? (
+                      {isEditEnable && index !== 0 ? (
                         <Tooltip title='Copy Comment'>
                           <IconButton
                             size='small'
@@ -192,7 +198,13 @@ const Examination = props => {
           )
         },
         onCell: row => ({
-          style: { backgroundColor: row.isSelected ? '#CCCCCC' : 'white' },
+          style: {
+            backgroundColor: row.isSelected
+              ? '#CCCCCC'
+              : row.isGroup
+              ? '#daecf5'
+              : 'white',
+          },
         }),
       })
     })
@@ -202,7 +214,13 @@ const Examination = props => {
       title: '',
       width: '100%',
       onCell: row => ({
-        style: { backgroundColor: row.isSelected ? '#CCCCCC' : 'white' },
+        style: {
+          backgroundColor: row.isSelected
+            ? '#CCCCCC'
+            : row.isGroup
+            ? '#daecf5'
+            : 'white',
+        },
       }),
     })
     setColumns(defaultColumns)
@@ -285,6 +303,16 @@ const Examination = props => {
   const onSaveComment = () => {
     queryIndividualCommentHistory()
     refreshMedicalCheckup()
+    clearEditComment()
+  }
+
+  const clearEditComment = () => {
+    dispatch({
+      type: 'medicalCheckupReportingDetails/updateState',
+      payload: {
+        individualCommentEntity: undefined,
+      },
+    })
     dispatch({
       type: 'medicalCheckupReportingDetails/updateState',
       payload: {
@@ -306,15 +334,12 @@ const Examination = props => {
       refreshMedicalCheckup()
     })
   }
+
   return (
     <div
       style={{
         position: 'relative',
-        paddingRight: selectExaminationItemId
-          ? commentGroupList.length
-            ? commentGroupList.length * 100
-            : 400
-          : 0,
+        paddingRight: selectExaminationItemId ? 610 : 0,
         height: height - 48,
         border: '1px solid #CCCCCC',
       }}
@@ -328,17 +353,20 @@ const Examination = props => {
             dataSource={dataSource}
             columns={columns}
             scroll={{ y: height - 90 }}
-            rowClassName={(record, index) => {
-              //if (!record.isGroup && record.id === selectRow)
-              //return customtyles.selectRow
-              //return index % 2 === 0 ? customtyles.once : customtyles.two
-            }}
             onRow={(record, rowIndex) => {
               return {
                 onClick: event => {
                   if (record.isGroup) return
                   if (!isEditEnable) return
-                  selectExamination(record)
+                  navigateDirtyCheck({
+                    displayName: 'IndividualCommentDetails',
+                    onProceed: () => {
+                      selectExamination(record)
+                    },
+                    onConfirm: () => {
+                      selectExamination(record)
+                    },
+                  })(event)
                 }, // click row
               }
             }}
@@ -352,6 +380,7 @@ const Examination = props => {
             {...props}
             commentGroupList={commentGroupList}
             saveComment={onSaveComment}
+            clearEditComment={clearEditComment}
           />
         </div>
       )}
