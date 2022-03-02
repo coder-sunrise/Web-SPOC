@@ -75,14 +75,8 @@ const TestResultLabel = ({
   return (
     <span>
       <Tooltip title={tooltip}>
-        <span>
-          {showValue ? (
-            <span style={{ color: showWarnning ? 'red' : 'black' }}>
-              {showValue}
-            </span>
-          ) : (
-            <span>&nbsp;</span>
-          )}
+        <span style={{ color: showWarnning ? 'red' : 'black' }}>
+          {showValue}
         </span>
       </Tooltip>
     </span>

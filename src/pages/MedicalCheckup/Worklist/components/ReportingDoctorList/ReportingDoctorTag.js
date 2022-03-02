@@ -3,12 +3,14 @@ import React, { useState } from 'react'
 import { Link } from 'umi'
 import { withStyles } from '@material-ui/core'
 import { useSelector } from 'dva'
+import moment from 'moment'
 import {
   Tooltip,
   Button,
   Popover,
   IconButton,
   MultipleTextField,
+  dateFormatLongWithTimeNoSec,
 } from '@/components'
 import { CheckOutlined } from '@ant-design/icons'
 import { REPORTINGDOCTOR_STATUS } from '@/utils/constants'
@@ -40,20 +42,25 @@ const ReportingDoctorTag = ({
   const searchMessage = () => {
     if (!isShowMessage) return
     setMessages([
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
+      { content: 'aaaaaa', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'bbbbbbbbbbbbbb', from: 'AA', to: 'BB', sendSate: moment() },
+      {
+        content: 'ccccccccccccccccccc',
+        from: 'AA',
+        to: 'BB',
+        sendSate: moment(),
+      },
+      { content: 'ddddddddddddd', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'eeeeeeeeeeeeeee', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'fffffffffffffff', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'hhhhhhhhhhh', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'tttttttttttttttt', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'sssssssssssssss', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'rrrrrrrrrrrrrrr', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'llllllllllllll', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'vvvvvvvvv', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'ddd', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'rrrrrrrrr', from: 'AA', to: 'BB', sendSate: moment() },
     ])
   }
   let reportingDoctorColor = '#CC0033'
@@ -84,6 +91,7 @@ const ReportingDoctorTag = ({
               )
             }
             className={classes.tag}
+            style={{ cursor: isShowMessage ? 'pointer' : 'default' }}
             color={reportingDoctorColor}
             onClick={searchMessage}
           >
@@ -103,11 +111,13 @@ const ReportingDoctorTag = ({
           padding: 2,
         }}
       >
-        {item.content}
+        <div style={{ fontWeight: 600 }}>{item.content}</div>
         <div style={{ position: 'relative' }}>
-          <div>To: G.lian</div>
+          <div>{`To: ${item.from}`}</div>
           <div style={{ position: 'absolute', right: 0, top: 0 }}>
-            From: Jhon, 10 Jan 2020 17:10
+            {`From: ${item.to}, ${moment(item.sendSate).format(
+              dateFormatLongWithTimeNoSec,
+            )}`}
           </div>
         </div>
       </div>

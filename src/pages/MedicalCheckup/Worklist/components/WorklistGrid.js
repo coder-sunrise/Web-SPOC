@@ -179,6 +179,7 @@ export const WorklistGrid = ({ medicalCheckupWorklist, user }) => {
             version,
             qid: row.queueId,
             queueNo: row.queueNo,
+            isFromMedicalCheckupWorklist: true,
           },
         }).then(o => {
           if (o) {
@@ -190,7 +191,7 @@ export const WorklistGrid = ({ medicalCheckupWorklist, user }) => {
               },
             })
             history.push(
-              `/reception/queue/dispense?isInitialLoading=${false}&qid=${
+              `/medicalcheckup/worklist/orderdetails?isInitialLoading=${false}&qid=${
                 row.queueId
               }&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
             )

@@ -15,6 +15,7 @@ import ResultDetails from './ResultDetails'
 import {
   MEDICALCHECKUP_WORKITEM_STATUS,
   MEDICALCHECKUP_REPORTTYPE,
+  MEDICALCHECKUP_REPORTSTATUS,
 } from '@/utils/constants'
 import {
   DoubleLeftOutlined,
@@ -51,11 +52,15 @@ const ReportingDetails = props => {
     dispatch,
     user,
     onClose = () => {},
+    clinicSettings,
   } = props
+  const { primaryPrintoutLanguage = 'EN' } = clinicSettings.settings
   const height = window.innerHeight
   const banner = document.getElementById('patientBanner')
   const contentHeight = (height || 0) - (banner?.offsetHeight || 0) - 92
-  const [selectedLanguage, setSelectedLanguage] = useState('EN')
+  const [selectedLanguage, setSelectedLanguage] = useState(
+    primaryPrintoutLanguage,
+  )
   const [showReportHistory, setShowReportHistory] = useState(false)
   const [showResultDetails, setShowResultDetails] = useState(false)
   const [placement, setPlacement] = useState('right')
@@ -130,6 +135,8 @@ const ReportingDetails = props => {
       payload: {
         ...medicalCheckupReportingDetails.entity,
         statusFK: MEDICALCHECKUP_WORKITEM_STATUS.REPORTING,
+        unlockDate: moment(),
+        unlockByUserFK: user.data.clinicianProfile.userProfile.id,
       },
     }).then(r => {
       if (r) {
@@ -156,8 +163,8 @@ const ReportingDetails = props => {
 
   const reportingStatus = medicalCheckupReportingDetails.entity?.statusFK
 
-  const canCompletedReport = () => {
-    const medicalCheckupReport = _.sortBy(
+  const canCompleteReport = () => {
+    const medicalCheckupReport = _.orderBy(
       medicalCheckupReportingDetails.entity?.medicalCheckupReport,
       ['versionNumber'],
       ['desc'],
@@ -165,7 +172,7 @@ const ReportingDetails = props => {
     if (
       medicalCheckupReport.length &&
       medicalCheckupReport[0].reportType === MEDICALCHECKUP_REPORTTYPE.FINAL &&
-      medicalCheckupReport[0].status === 'Verified'
+      medicalCheckupReport[0].status === MEDICALCHECKUP_REPORTSTATUS.VERIFIED
     )
       return true
     return false
@@ -203,6 +210,22 @@ const ReportingDetails = props => {
         MEDICALCHECKUP_WORKITEM_STATUS.PENDINGVERIFICATION &&
       medicalCheckupstatus !== MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED
     )
+  }
+
+  const completeMedicalCheckup = () => {
+    dispatch({
+      type: 'medicalCheckupReportingDetails/upsert',
+      payload: {
+        ...medicalCheckupReportingDetails.entity,
+        statusFK: MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED,
+        completedDate: moment(),
+        completedByUserFK: user.data.clinicianProfile.userProfile.id,
+      },
+    }).then(r => {
+      if (r) {
+        refreshMedicalCheckup()
+      }
+    })
   }
   return (
     <div>
@@ -304,7 +327,7 @@ const ReportingDetails = props => {
                     Generate Report
                   </Button>
                 )}
-                {canCompletedReport() && (
+                {canCompleteReport() && (
                   <Button
                     size='small'
                     style={{
@@ -312,7 +335,7 @@ const ReportingDetails = props => {
                       backgroundColor: '#007D00',
                       color: 'white',
                     }}
-                    onClick={generateFinalReport}
+                    onClick={completeMedicalCheckup}
                   >
                     Complete Report Verification
                   </Button>
@@ -412,7 +435,7 @@ const ReportingDetails = props => {
         observe='ReportHistory'
         overrideLoading
       >
-        <ReportHistory />
+        <ReportHistory refreshMedicalCheckup={refreshMedicalCheckup} />
       </CommonModal>
     </div>
   )
@@ -420,10 +443,19 @@ const ReportingDetails = props => {
 
 export default compose(
   withStyles(styles),
-  connect(({ patient, loading, medicalCheckupReportingDetails, user }) => ({
-    patient: patient.entity || {},
-    loading,
-    medicalCheckupReportingDetails,
-    user,
-  })),
+  connect(
+    ({
+      patient,
+      loading,
+      medicalCheckupReportingDetails,
+      user,
+      clinicSettings,
+    }) => ({
+      patient: patient.entity || {},
+      loading,
+      medicalCheckupReportingDetails,
+      user,
+      clinicSettings,
+    }),
+  ),
 )(ReportingDetails)

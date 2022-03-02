@@ -30,5 +30,6 @@ const fns = {
       ...params,
       pagesize: 9999,
     }),
+  verifyReport: params => service.upsert(`${url}/VerifyReport`, params),
 }
 export default fns

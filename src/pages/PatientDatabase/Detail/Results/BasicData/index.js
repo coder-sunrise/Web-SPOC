@@ -175,7 +175,6 @@ class BasicData extends Component {
           return (
             <div
               style={{
-                backgroundColor: i === 0 ? '#daecf5' : 'white',
                 padding: '2px 4px',
               }}
             >
@@ -197,11 +196,12 @@ class BasicData extends Component {
           onCell: row => {
             if (row.isGroup)
               return {
-                colSpan: Object.keys(row).filter(name =>
-                  name.includes('valueColumn'),
-                ).length,
+                colSpan:
+                  Object.keys(row).filter(name => name.includes('valueColumn'))
+                    .length + 1,
+                style: { backgroundColor: '#daecf5' },
               }
-            return { colSpan: 1 }
+            return { colSpan: 1, style: { backgroundColor: '#daecf5' } }
           },
         }
       }
