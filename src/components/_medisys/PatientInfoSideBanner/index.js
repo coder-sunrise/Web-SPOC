@@ -37,26 +37,25 @@ class PatientInfoSideBanner extends PureComponent {
   componentDidMount = () => {
     const { entity, autoRefreshChas, allowChangePatientStatus } = this.props
     if (autoRefreshChas && entity && entity.patientScheme) {
-      entity.patientScheme.filter((o) => o.schemeTypeFK <= 6).map((o) => {
-        const schemeData = this.getSchemeDetails(o)
-        this.refreshChasBalance(
-          schemeData.patientCoPaymentSchemeFK,
-          schemeData.schemeTypeFK,
-        )
-        return schemeData
-      })
-      if(entity.schemePayer.length > 0)
-        this.refreshMedisaveBalance(
-          entity.schemePayer
-        )
+      entity.patientScheme
+        .filter(o => o.schemeTypeFK <= 6)
+        .map(o => {
+          const schemeData = this.getSchemeDetails(o)
+          this.refreshChasBalance(
+            schemeData.patientCoPaymentSchemeFK,
+            schemeData.schemeTypeFK,
+          )
+          return schemeData
+        })
+      if (entity.schemePayer.length > 0)
+        this.refreshMedisaveBalance(entity.schemePayer)
     }
     if (allowChangePatientStatus && entity)
       this.checkPatientIntoActiveSession(entity.id)
   }
 
-  isMedisave = (schemeTypeFK) => {
-    if(schemeTypeFK)
-      return [12,13,14].indexOf(schemeTypeFK) >= 0
+  isMedisave = schemeTypeFK => {
+    if (schemeTypeFK) return [12, 13, 14].indexOf(schemeTypeFK) >= 0
     return false
   }
 
@@ -72,7 +71,7 @@ class PatientInfoSideBanner extends PureComponent {
         isSaveToDb,
         patientProfileId: entity.id,
       },
-    }).then((result) => {
+    }).then(result => {
       if (result) {
         const params = locationQueryParameters()
         if (params.md !== 'visreg') {
@@ -81,7 +80,7 @@ class PatientInfoSideBanner extends PureComponent {
             payload: {
               id: entity.id,
             },
-          }).then((pat) => {
+          }).then(pat => {
             setValues(pat)
           })
         }
@@ -130,8 +129,8 @@ class PatientInfoSideBanner extends PureComponent {
       }
     })
   }
-  
-  refreshMedisaveBalance = (schemePayers) => {
+
+  refreshMedisaveBalance = schemePayers => {
     const { dispatch, entity, setValues } = this.props
     const isSaveToDb = true
 
@@ -143,7 +142,7 @@ class PatientInfoSideBanner extends PureComponent {
         patientProfileId: entity.id,
         schemePayers,
       },
-    }).then((result) => {
+    }).then(result => {
       if (result) {
         const params = locationQueryParameters()
         if (params.md !== 'visreg') {
@@ -152,7 +151,7 @@ class PatientInfoSideBanner extends PureComponent {
             payload: {
               id: entity.id,
             },
-          }).then((pat) => {
+          }).then(pat => {
             setValues(pat)
           })
         }
@@ -165,21 +164,20 @@ class PatientInfoSideBanner extends PureComponent {
           statusDescription,
         } = result
         let payerBalanceList = []
-        if (isSuccessful && payerBalance)
-        {
+        if (isSuccessful && payerBalance) {
           payerBalance.forEach(pb => {
-            if(pb.enquiryType === 'MSVBAL') return
+            if (pb.enquiryType === 'MSVBAL') return
             // if (oldSchemeTypeFK !== pb.schemeTypeFK) {
             //   isShowReplacementModal = true
             // }
             const { finalBalance } = pb
             payerBalanceList.push({
-                finalBalance,
-                schemeTypeFK: pb.schemeTypeFK,
-                schemePayerFK: pb.schemePayerFK,
-                validFrom,
-                validTo,
-                isSuccessful,
+              finalBalance,
+              schemeTypeFK: pb.schemeTypeFK,
+              schemePayerFK: pb.schemePayerFK,
+              validFrom,
+              validTo,
+              isSuccessful,
             })
           })
         }
@@ -191,23 +189,24 @@ class PatientInfoSideBanner extends PureComponent {
             payerBalanceList,
           },
         })
-
       }
     })
   }
 
-  checkPatientIntoActiveSession = (patientId) => {
+  checkPatientIntoActiveSession = patientId => {
     const bizSessionPayload = {
       'Visit.PatientProfileFK': patientId,
       IsClinicSessionClosed: false,
     }
-    getBizSession(bizSessionPayload).then((result) => {
-      const { data: { totalRecords } } = result
+    getBizSession(bizSessionPayload).then(result => {
+      const {
+        data: { totalRecords },
+      } = result
       this.setState({ patientIntoActiveSession: totalRecords > 0 })
     })
   }
 
-  getSchemeDetails = (schemeData) => {
+  getSchemeDetails = schemeData => {
     if (
       !_.isEmpty(this.state.refreshedSchemeData) &&
       this.state.refreshedSchemeData.isSuccessful === true
@@ -269,24 +268,29 @@ class PatientInfoSideBanner extends PureComponent {
     }
   }
 
-  
-  getSchemePayerDetails = (schemePayer) => {
+  getSchemePayerDetails = schemePayer => {
     const { patientScheme } = this.props.entity
-    const schemeData = patientScheme.find((row) => row.schemeTypeFK === schemePayer.schemeFK) || {}
+    const schemeData =
+      patientScheme.find(row => row.schemeTypeFK === schemePayer.schemeFK) || {}
     const { patientSchemeBalance = [] } = schemeData
-    const balanceData = patientSchemeBalance.find((row) => row.schemePayerFK === schemePayer.id)
+    const balanceData = patientSchemeBalance.find(
+      row => row.schemePayerFK === schemePayer.id,
+    )
 
     if (
-      !_.isEmpty(this.state.refreshedSchemePayerData.payerBalanceList) 
-      && this.state.refreshedSchemePayerData.isSuccessful === true
+      !_.isEmpty(this.state.refreshedSchemePayerData.payerBalanceList) &&
+      this.state.refreshedSchemePayerData.isSuccessful === true
     ) {
-      const refreshData = this.state.refreshedSchemePayerData.payerBalanceList.find((row) => row.schemePayerFK === schemePayer.id)
+      const refreshData = this.state.refreshedSchemePayerData.payerBalanceList.find(
+        row => row.schemePayerFK === schemePayer.id,
+      )
 
-      if(refreshData)
+      if (refreshData)
         return {
           payerName: schemePayer.payerName,
           payerAccountNo: schemePayer.payerID,
-          balance: refreshData.finalBalance >= 0 ? refreshData.finalBalance : '-',
+          balance:
+            refreshData.finalBalance >= 0 ? refreshData.finalBalance : '-',
           patientCoPaymentSchemeFK: balanceData.patientCoPaymentSchemeFK,
           schemeTypeFK: refreshData.schemeTypeFK,
           schemeType: schemePayer.schemeType,
@@ -294,9 +298,7 @@ class PatientInfoSideBanner extends PureComponent {
           validTo: schemeData.validTo,
           statusDescription: null,
           isSuccessful:
-          refreshData.isSuccessful !== ''
-              ? refreshData.isSuccessful
-              : '',
+            refreshData.isSuccessful !== '' ? refreshData.isSuccessful : '',
         }
     }
 
@@ -315,7 +317,7 @@ class PatientInfoSideBanner extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const {
       height,
       theme,
@@ -334,8 +336,11 @@ class PatientInfoSideBanner extends PureComponent {
       [classes.isInActive]: !entity || !entity.isActive,
     })
 
-    const medisaveAccessRight = Authorized.check('patientdatabase.checkmedisavebalance')
-    const isMedisaveEnable = clinicSettings.isEnableMedisave && medisaveAccessRight.rights !== 'hidden'
+    const medisaveAccessRight = Authorized.check(
+      'patientdatabase.checkmedisavebalance',
+    )
+    const isMedisaveEnable =
+      clinicSettings.isEnableMedisave && medisaveAccessRight.rights !== 'hidden'
     const isCHASEnable = clinicSettings.isEnableCHAS
     // console.log('isMedisaveEnable',clinicSettings, medisaveAccessRight)
 
@@ -612,7 +617,9 @@ class PatientInfoSideBanner extends PureComponent {
 }
 const ConnectedPatientInfoSideBanner = connect(
   ({ loading, clinicSettings }) => ({
-    loading: loading.effects['patient/refreshChasBalance'] || loading.effects['patient/refreshMedisaveBalance'],
+    loading:
+      loading.effects['patient/refreshChasBalance'] ||
+      loading.effects['patient/refreshMedisaveBalance'],
     clinicSettings: clinicSettings.settings,
   }),
 )(PatientInfoSideBanner)
