@@ -10,7 +10,7 @@ import { primaryColor } from 'mui-pro-jss'
 import { Button } from '@/components'
 import Authorized from '@/utils/Authorized'
 
-const style = (theme) => ({
+const style = theme => ({
   leftAlign: {
     justifyContent: 'start',
   },
@@ -33,6 +33,8 @@ const style = (theme) => ({
   icon: {
     color: primaryColor,
     marginRight: theme.spacing(1),
+    position: 'relative',
+    top: 5,
   },
 })
 
@@ -48,10 +50,10 @@ const GridContextMenuButton = ({
       isDivider: false,
     },
   ],
-  onClick = (f) => f,
+  onClick = f => f,
   row = {},
 }) => {
-  const handleClick = (event) => {
+  const handleClick = event => {
     const { key } = event
     onClick(row, key)
   }
@@ -61,13 +63,23 @@ const GridContextMenuButton = ({
       id='gridContextMenuButton'
       onClick={handleClick}
       className={classes.menu}
-      onContextMenu={(event) => {
+      onContextMenu={event => {
         event.preventDefault()
       }}
     >
       {contextMenuOptions.map(
         (
-          { disabled, label, Icon, id, isDivider, hidden, authority, ...rest },
+          {
+            disabled,
+            label,
+            Icon,
+            id,
+            style,
+            isDivider,
+            hidden,
+            authority,
+            ...rest
+          },
           index,
         ) => {
           if (isDivider) return <Menu.Divider key={`divider-${index}`} />
@@ -82,13 +94,13 @@ const GridContextMenuButton = ({
             <Menu.Item
               key={id}
               id={`gridContextMenuButton-${id}`}
-              onContextMenu={(event) => {
+              onContextMenu={event => {
                 event.preventDefault()
               }}
               disabled={disabled || disabledByAccessRight}
               style={{ width: rest.width || '100%' }}
             >
-              <Icon className={classes.icon} />
+              <Icon style={style} className={classes.icon} />
               <span>{label}</span>
             </Menu.Item>
           )
@@ -102,9 +114,7 @@ const GridContextMenuButton = ({
   return (
     <Dropdown
       overlay={MenuItemsOverlay}
-      trigger={[
-        'click',
-      ]}
+      trigger={['click']}
       placement='bottomRight'
     >
       <Button justIcon round color={color} size='sm'>

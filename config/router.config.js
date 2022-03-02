@@ -195,7 +195,7 @@ const _routes = [
       },
       {
         path: '/medicalcheckup',
-        icon: 'icon-file-text-fill',
+        icon: 'icon-xueshengtijianshuju',
         name: 'medicalcheckup',
         moduleName: 'MedicalCheckup',
         authority: ['medicalcheckup'],

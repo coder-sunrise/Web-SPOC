@@ -6,6 +6,7 @@ import { Space, Collapse, Checkbox, InputNumber, Form, Typography } from 'antd'
 import { useDispatch } from 'umi'
 import { makeStyles } from '@material-ui/styles'
 import { useCodeTable } from '@/utils/hooks'
+import { REPORT_ID } from '@/utils/constants'
 import {
   dateFormatLongWithTimeNoSec,
   DatePicker,
@@ -165,7 +166,8 @@ const CollectSpecimen = ({
       payload,
     }).then(result => {
       if (result) {
-        onConfirm && onConfirm()
+        console.log(result)
+        onConfirm && onConfirm(result.id)
         cleanUpStates()
       }
     })

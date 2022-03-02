@@ -28,7 +28,11 @@ import { ProTable } from '@medisys/component'
 import { GridContextMenuButton as GridButton } from 'medisys-components'
 import MoreVert from '@material-ui/icons/MoreVert'
 import Description from '@material-ui/icons/Description'
+import FindInPage from '@material-ui/icons/FindInPage'
 import VisitForms from '@/pages/Reception/Queue/VisitForms'
+import FormatListBulletedOutlinedIcon from '@material-ui/icons/FormatListBulletedOutlined'
+import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined'
+import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined'
 import WorklistContext from '../WorklistContext'
 import { StatusFilter } from './StatusFilter'
 import ReportingDoctorList from './ReportingDoctorList'
@@ -215,9 +219,21 @@ export const WorklistGrid = ({ medicalCheckupWorklist }) => {
       Icon: Description,
       authority: 'queue.consultation.form',
     },
-    { id: 2, label: 'Order Details', Icon: Description },
-    { id: 3, label: 'Reporting Details', Icon: Description },
-    { id: 4, label: 'View Reports', Icon: Description },
+    {
+      id: 2,
+      label: 'Order Details',
+      Icon: ListAltOutlinedIcon,
+    },
+    {
+      id: 3,
+      label: 'Reporting Details',
+      Icon: AssignmentOutlined,
+    },
+    {
+      id: 4,
+      label: 'View Reports',
+      Icon: FindInPage,
+    },
   ]
 
   const renderWorkitemStatus = row => {
