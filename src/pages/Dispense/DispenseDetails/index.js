@@ -637,8 +637,10 @@ const DispenseDetails = ({
       setShowRemovePayment(true)
     } else {
       if (
-        dispenseItems?.filter(x => isActualizable(x)).length > 0 ||
-        service?.filter(x => isActualizable(x)).length > 0
+        (dispense.entity?.visitPurposeFK !== VISIT_TYPE.MC ||
+          dispense.entity?.isForInvoiceReplacement) &&
+        (dispenseItems?.filter(x => isActualizable(x)).length > 0 ||
+          service?.filter(x => isActualizable(x)).length > 0)
       )
         notification.error({
           message: 'Actualize all nursing work items before finalize.',

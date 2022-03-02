@@ -626,7 +626,11 @@ export default createFormViewModel({
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
 
-        if (pathname === '/reception/queue/dispense' && Number(query.vid)) {
+        if (
+          (pathname === '/reception/queue/dispense' ||
+            pathname === '/medicalcheckup/worklist/orderdetails') &&
+          Number(query.vid)
+        ) {
           await Promise.all([
             dispatch({
               type: 'codetable/fetchCodes',
@@ -770,7 +774,7 @@ export default createFormViewModel({
       },
 
       *start({ payload }, { call, put }) {
-        const response = yield call(service.create, payload.id)
+        const response = yield call(service.create, payload)
         const { id } = response
         if (id) {
           //yield put({

@@ -218,6 +218,15 @@ const _routes = [
             exact: true,
             authority: ['medicalcheckup/history'],
           },
+          {
+            path: '/medicalcheckup/worklist/orderdetails',
+            name: 'orderdetails',
+            observe: 'EditOrder',
+            hideInMenu: true,
+            exact: true,
+            component: './Dispense',
+            authority: ['queue.dispense'],
+          },
         ],
       },
       {

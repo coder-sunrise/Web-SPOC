@@ -80,7 +80,10 @@ export default createFormViewModel({
         { payload },
         { all, put, select },
       ) {
-        history.push('/medicalcheckup/worklist')
+        const index = window.location.pathname.indexOf('reportingdetails')
+        const newUrl = window.location.pathname.substr(0, index - 1)
+
+        history.push(newUrl)
         return yield all([
           yield put({
             type: 'global/updateAppState',
@@ -148,6 +151,10 @@ export default createFormViewModel({
       },
       *queryExternalService({ payload }, { call, put }) {
         const response = yield call(service.queryExternalService, payload)
+        return response
+      },
+      *verifyReport({ payload }, { call, put }) {
+        const response = yield call(service.verifyReport, payload)
         return response
       },
     },

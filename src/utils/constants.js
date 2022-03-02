@@ -1049,3 +1049,9 @@ export const MEDICALCHECKUP_REPORTSTATUS = {
   NEW: 'New',
   VERIFIED: 'Verified',
 }
+
+export const EXAMINATION_STATUS = {
+  NEW: 'New',
+  INPROGRESS: 'In Progress',
+  COMPLETED: 'Completed',
+}

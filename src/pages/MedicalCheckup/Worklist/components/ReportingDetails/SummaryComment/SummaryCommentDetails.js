@@ -14,6 +14,7 @@ import {
   withFormikExtend,
   FastField,
   Field,
+  notification,
 } from '@/components'
 import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 
@@ -26,6 +27,7 @@ const SummaryCommentDetails = props => {
     setValues,
     isEditEnable = true,
     medicalCheckupReportingDetails,
+    handleSubmit,
   } = props
 
   useEffect(() => {
@@ -99,6 +101,20 @@ const SummaryCommentDetails = props => {
   }
 
   const commentOptions = getCommentOptions()
+
+  const onSave = () => {
+    const { japaneseComment, englishComment } = values
+    if (
+      (!hasValue(japaneseComment) || !japaneseComment.trim().length) &&
+      (!hasValue(englishComment) || !englishComment.trim().length)
+    ) {
+      notification.warning({
+        message: 'Please input comment.',
+      })
+      return
+    }
+    if (handleSubmit) handleSubmit()
+  }
   return (
     <GridContainer>
       <GridItem
@@ -183,10 +199,7 @@ const SummaryCommentDetails = props => {
           type='primary'
           style={{ marginLeft: 10 }}
           disabled={!isEditEnable}
-          onClick={e => {
-            const { handleSubmit } = props
-            if (handleSubmit) handleSubmit()
-          }}
+          onClick={onSave}
         >
           Save
         </Button>

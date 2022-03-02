@@ -17,9 +17,11 @@ import {
   Tooltip,
   FieldArray,
   Field,
+  notification,
 } from '@/components'
 import { List, ListItem, ListItemText, withStyles } from '@material-ui/core'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 
 const styles = theme => ({
   listRoot: {
@@ -158,6 +160,23 @@ class IndividualCommentDetails extends PureComponent {
   getSelection = group => {
     const { selectedItem, searchValue = '' } = this.state
     const { selectedLanguage, commentGroupList = [] } = this.props
+    const listItems = group.list.filter(
+      item =>
+        item.displayValue.toUpperCase().indexOf(searchValue.toUpperCase()) >= 0,
+    )
+    if (!listItems.length)
+      return (
+        <div
+          style={{
+            width: 100,
+            textAlign: 'center',
+            color: '#cccccc',
+            paddingTop: 8,
+          }}
+        >
+          No data
+        </div>
+      )
     return (
       <List
         style={{
@@ -170,66 +189,54 @@ class IndividualCommentDetails extends PureComponent {
         disablePadding
         onClick={() => {}}
       >
-        {group.list
-          .filter(
-            item =>
-              item.displayValue
-                .toUpperCase()
-                .indexOf(searchValue.toUpperCase()) >= 0,
+        {listItems.map(item => {
+          const showValue = item.translationData
+            .find(l => l.language === selectedLanguage)
+            ?.list?.find(l => (l.key = 'displayValue'))?.value
+
+          const isSelected = selectedItem[group.groupNo]?.find(
+            i => i.id === item.id,
           )
-          .map(item => {
-            const showValue = item.translationData
-              .find(l => l.language === selectedLanguage)
-              ?.list?.find(l => (l.key = 'displayValue'))?.value
 
-            const isSelected = selectedItem[group.groupNo]?.find(
-              i => i.id === item.id,
-            )
-
-            let isNextGroupSelect
-            for (
-              let index = group.groupNo;
-              index < commentGroupList.length;
-              index++
-            ) {
-              if (
-                (selectedItem[commentGroupList[index].groupNo] || []).length
-              ) {
-                isNextGroupSelect = true
-                break
-              }
+          let isNextGroupSelect
+          for (
+            let index = group.groupNo;
+            index < commentGroupList.length;
+            index++
+          ) {
+            if ((selectedItem[commentGroupList[index].groupNo] || []).length) {
+              isNextGroupSelect = true
+              break
             }
+          }
 
-            return (
-              <ListItem
-                alignItems='flex-start'
-                classes={{
-                  root: this.props.classes.listItemRoot,
-                }}
-                selected={isSelected}
-                divider
-                disableGutters
-                button
-                disabled={isNextGroupSelect}
-                onClick={() => this.onCategoryChange(group, item)}
-              >
-                <Tooltip title={showValue}>
-                  <div
-                    style={{
-                      width: '100%',
-                      marginLeft: 2,
-                      fontSize: '0.8rem',
-                      textOverflow: 'ellipsis',
-                      overflow: 'hidden',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {showValue}
-                  </div>
-                </Tooltip>
-              </ListItem>
-            )
-          })}
+          return (
+            <ListItem
+              alignItems='flex-start'
+              classes={{
+                root: this.props.classes.listItemRoot,
+              }}
+              selected={isSelected}
+              divider
+              disableGutters
+              button
+              disabled={isNextGroupSelect}
+              onClick={() => this.onCategoryChange(group, item)}
+            >
+              <Tooltip title={showValue}>
+                <div
+                  style={{
+                    width: '100%',
+                    marginLeft: 2,
+                    fontSize: '0.8rem',
+                  }}
+                >
+                  {showValue}
+                </div>
+              </Tooltip>
+            </ListItem>
+          )
+        })}
       </List>
     )
   }
@@ -244,6 +251,17 @@ class IndividualCommentDetails extends PureComponent {
       originalEnglishComment,
       englishComment,
     } = values
+
+    if (
+      (!hasValue(japaneseComment) || !japaneseComment.trim().length) &&
+      (!hasValue(englishComment) || !englishComment.trim().length)
+    ) {
+      notification.warning({
+        message: 'Please input comment.',
+      })
+      return
+    }
+
     setFieldValue('medicalCheckupIndividualComment', [
       ...medicalCheckupIndividualComment,
       {
@@ -291,7 +309,7 @@ class IndividualCommentDetails extends PureComponent {
       >
         <div style={{ padding: '0px 8px 8px 8px' }}>
           <TextField
-            inputProps={{ placeholder: 'Enter Keyworks' }}
+            inputProps={{ placeholder: 'Enter Keywords' }}
             onChange={e => {
               this.setState({ searchValue: e.target.value })
             }}

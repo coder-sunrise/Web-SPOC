@@ -8,24 +8,7 @@ import { REPORTINGDOCTOR_STATUS } from '@/utils/constants'
 import { Message } from '@material-ui/icons'
 import ReportingDoctorTag from './ReportingDoctorTag'
 
-const styles = theme => ({
-  panel: {
-    float: 'left',
-    width: 120,
-    fontWeight: 400,
-    letterSpacing: 'inherit',
-    borderRadius: '3px',
-    margin: '1px 8px 1px 0px',
-    padding: '2px',
-    color: 'white',
-    cursor: 'hand',
-  },
-  text: {
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  },
-})
+const styles = theme => ({})
 
 const ReportingDoctorList = props => {
   const {
