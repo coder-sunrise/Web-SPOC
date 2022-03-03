@@ -23,7 +23,8 @@ import { ITEM_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 import { currencySymbol } from '@/utils/config'
 import _ from 'lodash'
-
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
+import { Table } from '@devexpress/dx-react-grid-material-ui'
 const CPSwitch = label => args => {
   if (!args.field.value) {
     args.field.value = 'ExactAmount'
@@ -136,6 +137,7 @@ class InventoryItemList extends React.Component {
     const newItems = newItemArray.map(item => {
       const itemFieldName = InventoryTypes.filter(x => x.value === item.type)[0]
       const typeFieldName = item[itemFieldName.field]
+      const total = _.round(item.quantity * item.unitPrice, 2)
       const newItemRow = {
         uid: getUniqueId(),
         type: itemFieldName.value,
@@ -154,6 +156,13 @@ class InventoryItemList extends React.Component {
         itemValueType: 'ExactAmount',
         itemValue: 0,
         quantity: item.quantity,
+        total: total,
+        totalAftAdj: total,
+        adjValue: 0,
+        adjAmt: 0,
+        adjType:'ExactAmount',
+        isMinus: false,
+        isExactAmount: true,
       }
 
       return newItemRow
@@ -283,7 +292,13 @@ class InventoryItemList extends React.Component {
         itemValueType: 'ExactAmount',
         quantity: 1,
         itemValue: 0,
+        total: unitPrice,
         totalAftAdj: unitPrice,
+        adjValue: 0,
+        adjAmt: 0,
+        adjType:'ExactAmount',
+        isMinus: false,
+        isExactAmount: true,
       }
       this.addItemToRows(newItemRow)
     }
@@ -498,7 +513,7 @@ class InventoryItemList extends React.Component {
         title: 'Quantity',
       })
       commonColumns.splice(commonColumns.length - 1, 0, {
-        name: 'amount',
+        name: 'total',
         title: 'Total Bef. Adj.',
       })
       commonColumns.splice(commonColumns.length - 1, 0, {
@@ -541,7 +556,10 @@ class InventoryItemList extends React.Component {
   getFinalAmount = ({ value, index } = {}) => {
     const { setFieldValue, values } = this.props
     const { rows = [] } = values
-    const { isExactAmount, adjValue, total = 0 } = rows[index]
+    const { isExactAmount, adjValue, unitPrice, quantity } = rows[index]
+    const total = _.round(unitPrice * quantity, 2)
+    setFieldValue(`rows[${index}].total`, total)
+
     const finalAmount = calculateAdjustAmount(
       isExactAmount,
       total,
@@ -556,6 +574,7 @@ class InventoryItemList extends React.Component {
       {
         columnName: 'type',
         type: 'select',
+        width:100,
         options: InventoryTypes,
         render: row => {
           const itemType = `${
@@ -613,6 +632,7 @@ class InventoryItemList extends React.Component {
           columnName: 'quantity',
           type: 'number',
           align: 'left',
+          width: 90,
           render: row => {
             const { rows = [] } = values
             const index = rows.map(i => i.uid).indexOf(row.uid)
@@ -622,6 +642,11 @@ class InventoryItemList extends React.Component {
                 render={args => (
                   <NumberInput
                     {...args}
+                    onChange={() => {
+                      setTimeout(() => {
+                        this.onAdjustmentConditionChange(index)
+                      }, 1)
+                    }}
                     min={1}
                     precision={0}
                     positiveOnly
@@ -636,6 +661,7 @@ class InventoryItemList extends React.Component {
           columnName: 'unitPrice',
           type: 'currency',
           align: 'left',
+          width: 100,
           render: row => {
             const { rows = [] } = values
             const index = rows.map(i => i.uid).indexOf(row.uid)
@@ -645,6 +671,11 @@ class InventoryItemList extends React.Component {
                 render={args => (
                   <NumberInput
                     {...args}
+                    onChange={() => {
+                      setTimeout(() => {
+                        this.onAdjustmentConditionChange(index)
+                      }, 1)
+                    }}
                     currency
                     positiveOnly
                     min={0}
@@ -656,25 +687,10 @@ class InventoryItemList extends React.Component {
           },
         },
         {
-          columnName: 'amount',
+          columnName: 'total',
           observeFields: ['quantity', 'unitPrice'],
           type: 'currency',
-          render: row => {
-            return (
-              <p
-                style={{
-                  color: 'darkblue',
-                  fontWeight: 500,
-                }}
-              >
-                <NumberInput
-                  text
-                  currency
-                  value={_.round(row.unitPrice * row.quantity, 2)}
-                />
-              </p>
-            )
-          },
+          width: 118,
         },
         {
           columnName: 'adjAmt',
@@ -705,7 +721,7 @@ class InventoryItemList extends React.Component {
                       inputProps={{
                         onMouseUp: e => {
                           if (!focused) {
-                            this.setState({focused:true})
+                            this.setState({ focused: true })
                             e.target.click()
                           }
                         },
@@ -823,24 +839,8 @@ class InventoryItemList extends React.Component {
         },
         {
           columnName: 'totalAftAdj',
-          observeFields: ['amount', 'adjAmt'],
           type: 'currency',
-          render: row => {
-            return (
-              <p
-                style={{
-                  color: 'darkblue',
-                  fontWeight: 500,
-                }}
-              >
-                <NumberInput
-                    text
-                    currency
-                    value={row.totalAftAdj}
-                  />
-              </p>
-            )
-          },
+          width: 118,
         },
       )
     } else {
@@ -907,7 +907,7 @@ class InventoryItemList extends React.Component {
   }
 
   render() {
-    const { theme, values } = this.props
+    const { theme, values, includeOrderSet = false } = this.props
     return (
       <SizeContainer size='sm'>
         <div style={{ marginTop: theme.spacing(1) }}>
@@ -925,6 +925,52 @@ class InventoryItemList extends React.Component {
             columnExtensions={this.getColumnsExtensions(values)}
             FuncProps={{
               pager: false,
+              summary: includeOrderSet,
+              summaryConfig: {
+                state: {
+                  totalItems: [
+                    { columnName: 'total', type: 'total' },
+                    { columnName: 'totalAftAdj', type: 'totalAftAdj' },
+                  ],
+                },
+                integrated: {
+                  calculator: (type, rows, getValue) => {
+                    if (type == 'total' || type == 'totalAftAdj') 
+                      return rows.reduce((acc, row) => acc + row[type], 0)
+                    return IntegratedSummary.defaultCalculator(type, rows, getValue)
+                  },
+                },
+                row: {
+                  totalRowComponent: p => {
+                    const { children } = p
+                    const newChildren = []
+                    for (var i = 0, colSpan = 1; i < children.length; i++, colSpan++) 
+                    {
+                      var col = children[i]
+                      var colName = col.props.tableColumn.column?.name
+                      if (['total', 'totalAftAdj', 'action'].includes(colName)) {
+                        var newChild = [
+                          {
+                            ...col,
+                            props: {
+                              ...col.props,
+                              colSpan,
+                            },
+                            key: `${colName}_${i}`,
+                          },
+                        ]
+                        colSpan = 0
+                        newChildren.push(newChild)
+                      }
+                    }
+                    return <Table.Row {...p}>{newChildren}</Table.Row>
+                  },
+                  messages: {
+                    total: 'Total Before Adjustment',
+                    totalAftAdj: 'Sub Total',
+                  },
+                },
+              },
             }}
           />
         </div>
