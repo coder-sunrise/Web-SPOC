@@ -137,6 +137,7 @@ class InventoryItemList extends React.Component {
     const newItems = newItemArray.map(item => {
       const itemFieldName = InventoryTypes.filter(x => x.value === item.type)[0]
       const typeFieldName = item[itemFieldName.field]
+      const total = _.round(item.quantity * item.unitPrice, 2)
       const newItemRow = {
         uid: getUniqueId(),
         type: itemFieldName.value,
@@ -155,6 +156,13 @@ class InventoryItemList extends React.Component {
         itemValueType: 'ExactAmount',
         itemValue: 0,
         quantity: item.quantity,
+        total: total,
+        totalAftAdj: total,
+        adjValue: 0,
+        adjAmt: 0,
+        adjType:'ExactAmount',
+        isMinus: false,
+        isExactAmount: true,
       }
 
       return newItemRow
@@ -284,6 +292,7 @@ class InventoryItemList extends React.Component {
         itemValueType: 'ExactAmount',
         quantity: 1,
         itemValue: 0,
+        total: unitPrice,
         totalAftAdj: unitPrice,
         adjValue: 0,
         adjAmt: 0,
@@ -504,7 +513,7 @@ class InventoryItemList extends React.Component {
         title: 'Quantity',
       })
       commonColumns.splice(commonColumns.length - 1, 0, {
-        name: 'amount',
+        name: 'total',
         title: 'Total Bef. Adj.',
       })
       commonColumns.splice(commonColumns.length - 1, 0, {
@@ -549,6 +558,8 @@ class InventoryItemList extends React.Component {
     const { rows = [] } = values
     const { isExactAmount, adjValue, unitPrice, quantity } = rows[index]
     const total = _.round(unitPrice * quantity, 2)
+    setFieldValue(`rows[${index}].total`, total)
+
     const finalAmount = calculateAdjustAmount(
       isExactAmount,
       total,
@@ -676,26 +687,10 @@ class InventoryItemList extends React.Component {
           },
         },
         {
-          columnName: 'amount',
+          columnName: 'total',
           observeFields: ['quantity', 'unitPrice'],
-          type: 'number',
+          type: 'currency',
           width: 118,
-          render: row => {
-            return (
-              <span
-                style={{
-                  color: 'darkblue',
-                  fontWeight: 500,
-                }}
-              >
-                <NumberInput
-                  text
-                  currency
-                  value={_.round(row.unitPrice * row.quantity, 2)}
-                />
-              </span>
-            )
-          },
         },
         {
           columnName: 'adjAmt',
@@ -844,21 +839,8 @@ class InventoryItemList extends React.Component {
         },
         {
           columnName: 'totalAftAdj',
-          observeFields: ['amount', 'adjAmt'],
           type: 'currency',
           width: 118,
-          render: row => {
-            return (
-              <span
-                style={{
-                  color: 'darkblue',
-                  fontWeight: 500,
-                }}
-              >
-                <NumberInput text currency value={row.totalAftAdj} />
-              </span>
-            )
-          },
         },
       )
     } else {
@@ -947,7 +929,7 @@ class InventoryItemList extends React.Component {
               summaryConfig: {
                 state: {
                   totalItems: [
-                    { columnName: 'amount', type: 'total' },
+                    { columnName: 'total', type: 'total' },
                     { columnName: 'totalAftAdj', type: 'totalAftAdj' },
                   ],
                 },
@@ -966,7 +948,7 @@ class InventoryItemList extends React.Component {
                     {
                       var col = children[i]
                       var colName = col.props.tableColumn.column?.name
-                      if (['amount', 'totalAftAdj'].includes(colName)) {
+                      if (['total', 'totalAftAdj', 'action'].includes(colName)) {
                         var newChild = [
                           {
                             ...col,
@@ -982,7 +964,6 @@ class InventoryItemList extends React.Component {
                       }
                     }
                     return <Table.Row {...p}>{newChildren}</Table.Row>
-                    // return <Table.Row {...p}>{children}</Table.Row>
                   },
                   messages: {
                     total: 'Total Before Adjustment',
