@@ -30,27 +30,6 @@ const useStyles = makeStyles(theme => ({
 
 const MODE = { NEW: 'new', EDIT: 'edit' }
 
-const PrintLabel = () => (
-  <div
-    style={{
-      margin: '10px 0px',
-      display: 'flex',
-      alignItems: 'start',
-      justifyContent: 'start',
-    }}
-  >
-    <Checkbox defaultChecked>Print Label </Checkbox>
-    <InputNumber
-      defaultValue={1}
-      size='small'
-      min={1}
-      max={10}
-      style={{ width: '50px', textAlign: 'right', marginRight: 5 }}
-    />
-    <span> copies</span>
-  </div>
-)
-
 const CollectSpecimen = ({
   open,
   visitId,
@@ -63,6 +42,8 @@ const CollectSpecimen = ({
   const classes = useStyles()
   const dispatch = useDispatch()
   const [workItemsByTestCategory, setWorkitemsByTestCategory] = useState([])
+  const [isPrintLabel, setIsPrintLabel] = useState(true)
+  const [copies, setCopies] = useState(1)
   const [testPanelValidationError, setTestPanelValidationError] = useState('')
   const [receivedSpecimen, setReceivedSpecimen] = useState(false)
   const [showModal, setShowModal] = useState(false)
@@ -80,6 +61,8 @@ const CollectSpecimen = ({
   useEffect(() => {
     setShowModal(open)
     if (open) {
+      setCopies(1)
+      setIsPrintLabel(true)
       dispatch({
         type: 'specimenCollection/getVisitSpecimenCollection',
         payload: { id: visitId },
@@ -95,6 +78,37 @@ const CollectSpecimen = ({
     }
   }, [open])
 
+  const PrintLabel = () => (
+    <div
+      style={{
+        margin: '10px 0px',
+        display: 'flex',
+        alignItems: 'start',
+        justifyContent: 'start',
+      }}
+    >
+      <Checkbox
+        defaultChecked
+        onChange={e => {
+          setIsPrintLabel(e.target.checked)
+        }}
+        checked={isPrintLabel}
+      >
+        Print Label{' '}
+      </Checkbox>
+      <InputNumber
+        defaultValue={copies}
+        size='small'
+        min={1}
+        max={10}
+        onChange={v => {
+          setCopies(v)
+        }}
+        style={{ width: '50px', textAlign: 'right', marginRight: 5 }}
+      />
+      <span> copies</span>
+    </div>
+  )
   const initializeNewData = visitData => {
     prepareLabWorkitemsByCategory(
       visitData.labWorkitems.filter(
@@ -166,8 +180,8 @@ const CollectSpecimen = ({
       payload,
     }).then(result => {
       if (result) {
-        console.log(result)
-        onConfirm && onConfirm(result.id)
+        onConfirm &&
+          onConfirm(result.id, { isPrintLabel: isPrintLabel, copies: copies })
         cleanUpStates()
       }
     })

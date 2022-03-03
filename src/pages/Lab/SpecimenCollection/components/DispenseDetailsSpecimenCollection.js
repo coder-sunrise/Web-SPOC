@@ -198,7 +198,7 @@ const DispenseDetailsSpecimenCollection = ({
     })
   }
 
-  const printLabel = specimenId => {
+  const printLabel = (specimenId, copies) => {
     dispatch({
       type: 'specimenCollection/getLabSpecimenById',
       payload: { id: specimenId },
@@ -227,6 +227,7 @@ const DispenseDetailsSpecimenCollection = ({
         }
         const payload = [
           {
+            Copies: copies,
             ReportId: REPORT_ID.LAB_SPECIMEN_LABEL_50MM_34MM,
             ReportData: JSON.stringify({
               ...data,
@@ -335,8 +336,10 @@ const DispenseDetailsSpecimenCollection = ({
       )}
       <CollectSpecimen
         {...collectSpecimenPara}
-        onConfirm={newId => {
-          printLabel(newId)
+        onConfirm={(newId, printInfo) => {
+          if (printInfo.isPrintLabel) {
+            printLabel(newId, printInfo.copies)
+          }
           closeCollectSpecimen()
         }}
         patient={patient}
@@ -349,6 +352,7 @@ const DispenseDetailsSpecimenCollection = ({
         onClose={() => {
           closeDiscardSpecimen()
         }}
+        patient={patient}
         onConfirm={() => {
           closeDiscardSpecimen()
         }}

@@ -15,13 +15,6 @@ export default createFormViewModel({
         const { entity: specimenDetails } = yield select(
           st => st.worklistSpecimenDetails,
         )
-        console.log('query done', specimenDetails)
-        yield put({
-          type: 'patient/query',
-          payload: { id: specimenDetails.patientProfileFK },
-        })
-
-        yield take('patient/query/@@end')
       },
       *startLabTest({ payload }, { call, put }) {
         const status = yield call(service.startLabTest, payload)

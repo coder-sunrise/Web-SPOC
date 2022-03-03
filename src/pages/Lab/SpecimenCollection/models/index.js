@@ -66,7 +66,7 @@ export default createListViewModel({
 
         if (payload.id && r && r === 204) {
           notification.success({ message: 'Lab specimen edited.' })
-          return payload.id
+          return payload
         }
         return r
       },
