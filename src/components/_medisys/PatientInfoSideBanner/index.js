@@ -391,6 +391,7 @@ class PatientInfoSideBanner extends PureComponent {
             }}
           >
             <PatientStickyNotesBtn
+              patientProfileFK={entity.id}
               popperStyle={{
                 zIndex: 1500,
                 marginTop: 100,

@@ -7,6 +7,7 @@ import TableData from '@/pages/Dispense/DispenseDetails/TableData'
 import Authorized from '@/utils/Authorized'
 import { UnorderedListOutlined } from '@ant-design/icons'
 import { LAB_SPECIMEN_STATUS, LAB_WORKITEM_STATUS } from '@/utils/constants'
+import { REPORT_ID } from '@/utils/constants'
 import { Link } from '@material-ui/core'
 import {
   Button,
@@ -29,7 +30,12 @@ import CollectSpecimen from './CollectSpecimen'
 import { useCodeTable } from '@/utils/hooks'
 import { DiscardSpecimen } from '../../Worklist/components'
 
-const DispenseDetailsSpecimenCollection = ({ visitId, ...restProps }) => {
+const DispenseDetailsSpecimenCollection = ({
+  visitId,
+  handlePrint,
+  patient,
+  ...restProps
+}) => {
   const dispatch = useDispatch()
   const [labSpecimens, setLabSpecimens] = useState([])
   const [newLabWorkitems, setNewLabWorkitems] = useState([])
@@ -143,7 +149,9 @@ const DispenseDetailsSpecimenCollection = ({ visitId, ...restProps }) => {
           {row.specimenStatusFK !== LAB_SPECIMEN_STATUS.DISCARDED && (
             <Button
               color='primary'
-              onClick={() => {}}
+              onClick={() => {
+                printLabel(row.labSpecimenFK)
+              }}
               size='sm'
               justIcon
               style={{ height: 25, marginTop: 2 }}
@@ -190,6 +198,46 @@ const DispenseDetailsSpecimenCollection = ({ visitId, ...restProps }) => {
     })
   }
 
+  const printLabel = (specimenId, copies) => {
+    dispatch({
+      type: 'specimenCollection/getLabSpecimenById',
+      payload: { id: specimenId },
+    }).then(labSpecimenData => {
+      if (labSpecimenData) {
+        let testPanel = labSpecimenData.labSpecimenWorkitems
+          .map(labWorkitemt => labWorkitemt.labWorkitem.testPanel)
+          .join(',')
+        const data = {
+          SampleLabelDetails: [
+            {
+              Gender:
+                patient.genderFK === 1
+                  ? 'Male'
+                  : patient.genderFK === 2
+                  ? 'Female'
+                  : 'Unknown',
+              Name: patient.name,
+              AccessionNo: labSpecimenData.accessionNo,
+              TestPanel: testPanel,
+              SpecimenType: labSpecimenData.specimenType,
+              SpecimenCollectionDate: labSpecimenData.specimenCollectionDate,
+              ReferenceNo: patient.patientReferenceNo,
+            },
+          ],
+        }
+        const payload = [
+          {
+            Copies: copies,
+            ReportId: REPORT_ID.LAB_SPECIMEN_LABEL_50MM_34MM,
+            ReportData: JSON.stringify({
+              ...data,
+            }),
+          },
+        ]
+        handlePrint(JSON.stringify(payload))
+      }
+    })
+  }
   useEffect(() => {
     if (visitId && cttestpanel.length > 0 && ctspecimentype.length > 0)
       getVisitSpecimenCollection()
@@ -288,9 +336,13 @@ const DispenseDetailsSpecimenCollection = ({ visitId, ...restProps }) => {
       )}
       <CollectSpecimen
         {...collectSpecimenPara}
-        onConfirm={() => {
+        onConfirm={(newId, printInfo) => {
+          if (printInfo.isPrintLabel) {
+            printLabel(newId, printInfo.copies)
+          }
           closeCollectSpecimen()
         }}
+        patient={patient}
         onClose={() => {
           closeCollectSpecimen()
         }}
@@ -300,6 +352,7 @@ const DispenseDetailsSpecimenCollection = ({ visitId, ...restProps }) => {
         onClose={() => {
           closeDiscardSpecimen()
         }}
+        patient={patient}
         onConfirm={() => {
           closeDiscardSpecimen()
         }}
