@@ -745,7 +745,7 @@ class InventoryItemList extends React.Component {
                             marginBottom: 0,
                             marginTop: 0,
                           }}
-                          currency
+                          original
                           label=''
                           onChange={() => {
                             setTimeout(() => {
@@ -776,7 +776,7 @@ class InventoryItemList extends React.Component {
                             marginBottom: 0,
                             marginTop: 0,
                           }}
-                          percentage
+                          original
                           max={100}
                           label=''
                           onChange={() => {

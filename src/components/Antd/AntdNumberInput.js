@@ -51,7 +51,7 @@ const STYLES = () => {
       },
       '& .ant-input-number-handler-up-inner, .ant-input-number-handler-down-inner': {
         right: 6,
-      }, 
+      },
     },
   }
 }
@@ -241,7 +241,7 @@ class AntdNumberInput extends React.PureComponent {
       newV = this.props.max
     }
     if (!newV && newV !== 0) newV = ''
-    else{
+    else {
       newV = roundTo(Number(newV), this.state.convertedPrecision)
     }
     this.setState({
@@ -255,11 +255,12 @@ class AntdNumberInput extends React.PureComponent {
     }
     return true
   }
- 
+
   getConfig = () => {
     const {
       currency,
       percentage,
+      original,
       formatter,
       max,
       min,
@@ -297,6 +298,12 @@ class AntdNumberInput extends React.PureComponent {
         }
         return `${v}`
       }
+    } else if (original) {
+      extraCfg.formatter = v => {
+        return v
+      }
+      extraCfg.max = extraCfg.max || 100
+      extraCfg.min = -100
     } else if (percentage) {
       if (!format) format = percentageFormat
 
@@ -414,7 +421,7 @@ class AntdNumberInput extends React.PureComponent {
           onKeyUp={this.handleKeyUp}
           {...this.getConfig()}
           {...restProps}
-          precision={this.state.convertedPrecision} 
+          precision={this.state.convertedPrecision}
         />
       </div>
     )
