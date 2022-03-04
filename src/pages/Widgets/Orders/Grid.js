@@ -1120,23 +1120,21 @@ export default ({
     let removedItemString = _.join(
       visitOrderTemplateItemDtos
         .filter(t => remainedTemplateItemIds.indexOf(t.id) < 0)
-        .map(t => t.inventoryItemName),
-      ', ',
+        .map(t => ' - ' + t.inventoryItemName),
+      ' ',
     )
     let newItemString = _.join(
       rows
         .filter(t => !t.isDeleted && !t.visitOrderTemplateItemFK)
         .map(t => {
-          return t.subject
+          return ' + ' + t.subject
         }),
-      ', ',
+      ' ',
     )
     return {
       indicateString: `${indicateString}`,
-      removedItemString: `${
-        removedItemString ? ' - (' + removedItemString + ')' : ''
-      }`,
-      newItemString: `${newItemString ? ' + (' + newItemString + ')' : ''}`,
+      removedItemString: `${removedItemString ? removedItemString : ''}`,
+      newItemString: `${newItemString ? newItemString : ''}`,
     }
   }
 
