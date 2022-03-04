@@ -20,13 +20,19 @@ export default createFormViewModel({
           Number(query.mcid)
         ) {
           dispatch({
+            type: 'global/updateState',
+            payload: {
+              fullscreen: true,
+              showMedicalCheckupReportingDetails: true,
+            },
+          })
+          dispatch({
             type: 'initState',
             payload: {
               version: Number(query.v) || undefined,
               visitID: Number(query.vid),
               pid: Number(query.pid),
               mcid: Number(query.mcid),
-              qid: Number(query.qid),
             },
           })
         }
@@ -34,15 +40,8 @@ export default createFormViewModel({
     },
     effects: {
       *initState({ payload }, { all, put, select, take }) {
-        const { version, visitID, pid, mcid, qid } = payload
+        const { version, visitID, pid, mcid } = payload
         const patientState = yield select(st => st.patient)
-        yield put({
-          type: 'global/updateState',
-          payload: {
-            fullscreen: true,
-            showMedicalCheckupReportingDetails: true,
-          },
-        })
         yield put({
           type: 'updateState',
           payload: {
@@ -61,12 +60,6 @@ export default createFormViewModel({
           })
           yield take('patient/query/@@end')
         }
-
-        if (qid)
-          yield put({
-            type: 'visitRegistration/query',
-            payload: { id: payload.qid, version: payload.v },
-          })
 
         yield put({
           type: 'query',

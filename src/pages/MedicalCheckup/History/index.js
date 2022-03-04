@@ -72,7 +72,7 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
   const showReportingDetails = row => {
     const version = Date.now()
     history.push(
-      `/medicalcheckup/history/reportingdetails?mcid=${row.id}&qid=${row.queueId}&vid=${row.visitFK}&pid=${row.patientProfileFK}&v=${version}`,
+      `/medicalcheckup/history/reportingdetails?mcid=${row.id}&vid=${row.visitFK}&pid=${row.patientProfileFK}&v=${version}`,
     )
   }
 
@@ -370,6 +370,20 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
       },
     ]
   }
+
+  const onRowDoubleClick = row => {
+    const isDoctor =
+      user.data.clinicianProfile.userProfile.role?.clinicRoleFK === 1
+    if (
+      isDoctor &&
+      !(row.medicalCheckupWorkitemDoctor || []).find(
+        x => x.userProfileFK === user.data.clinicianProfile.userProfile.id,
+      )
+    ) {
+      return
+    }
+    showReportingDetails(row)
+  }
   const columns = defaultColumns()
   const height = window.innerHeight - 300
   return (
@@ -438,6 +452,13 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         })
       }}
       scroll={{ x: 1100, y: height }}
+      onRow={row => {
+        return {
+          onDoubleClick: () => {
+            onRowDoubleClick(row)
+          },
+        }
+      }}
     />
   )
 }
