@@ -9,6 +9,7 @@ import { UnorderedListOutlined } from '@ant-design/icons'
 import { LAB_SPECIMEN_STATUS, LAB_WORKITEM_STATUS } from '@/utils/constants'
 import { REPORT_ID } from '@/utils/constants'
 import { Link } from '@material-ui/core'
+import moment from 'moment'
 import {
   Button,
   ProgressButton,
@@ -20,6 +21,7 @@ import {
   NumberInput,
   Popper,
   notification,
+  labSpecimenLabelDateFormat,
   Icon,
   Tooltip,
   dateFormatLongWithTimeNoSec,
@@ -205,8 +207,8 @@ const DispenseDetailsSpecimenCollection = ({
     }).then(labSpecimenData => {
       if (labSpecimenData) {
         let testPanel = labSpecimenData.labSpecimenWorkitems
-          .map(labWorkitemt => labWorkitemt.labWorkitem.testPanel)
-          .join(',')
+          .map(labWorkitem => labWorkitem.labWorkitem.testPanel)
+          .join(', ')
         const data = {
           SampleLabelDetails: [
             {
@@ -220,7 +222,9 @@ const DispenseDetailsSpecimenCollection = ({
               AccessionNo: labSpecimenData.accessionNo,
               TestPanel: testPanel,
               SpecimenType: labSpecimenData.specimenType,
-              SpecimenCollectionDate: labSpecimenData.specimenCollectionDate,
+              SpecimenCollectionDate: moment(
+                labSpecimenData.specimenCollectionDate,
+              ).format(labSpecimenLabelDateFormat),
               ReferenceNo: patient.patientReferenceNo,
             },
           ],
