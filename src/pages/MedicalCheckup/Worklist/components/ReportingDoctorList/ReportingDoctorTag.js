@@ -26,6 +26,11 @@ const styles = theme => ({
     whiteSpace: 'nowrap',
     padding: 2,
   },
+  messageComment: {
+    margin: '4px 0px',
+    border: '1px solid #cccccc',
+    padding: 2,
+  },
 })
 
 const ReportingDoctorTag = ({
@@ -104,13 +109,7 @@ const ReportingDoctorTag = ({
 
   const messageComment = item => {
     return (
-      <div
-        style={{
-          margin: '4px 0px',
-          border: '1px solid #cccccc',
-          padding: 2,
-        }}
-      >
+      <div className={classes.messageComment}>
         <div style={{ fontWeight: 600 }}>{item.content}</div>
         <div style={{ position: 'relative' }}>
           <div>{`To: ${item.from}`}</div>

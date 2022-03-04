@@ -15,7 +15,17 @@ import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 import { MEDICALCHECKUP_REPORTSTATUS } from '@/utils/constants'
 import customtyles from '../Style.less'
 
-const styles = theme => ({})
+const styles = theme => ({
+  cell: {
+    padding: 4,
+  },
+  toDo: {
+    fontSize: 12,
+    lineHeight: '17px',
+    width: 17,
+    textAlign: 'center',
+  },
+})
 
 const ReportHistory = props => {
   const {
@@ -26,6 +36,7 @@ const ReportHistory = props => {
     user,
     onClose,
     refreshMedicalCheckup,
+    classes,
   } = props
   const height = window.innerHeight
   const verifyReport = row => {
@@ -52,27 +63,27 @@ const ReportHistory = props => {
             {
               dataIndex: 'reportType',
               width: 130,
-              title: <div style={{ padding: 4 }}>Type</div>,
+              title: <div className={classes.cell}>Type</div>,
               render: (text, row) => {
-                return <div style={{ padding: 4 }}>{row.reportType}</div>
+                return <div className={classes.cell}>{row.reportType}</div>
               },
             },
             {
               dataIndex: 'versionNumber',
               width: 70,
               align: 'center',
-              title: <div style={{ padding: 4 }}>Version</div>,
+              title: <div className={classes.cell}>Version</div>,
               render: (text, row) => {
-                return <div style={{ padding: 4 }}>{row.versionNumber}</div>
+                return <div className={classes.cell}>{row.versionNumber}</div>
               },
             },
             {
               dataIndex: 'generateDate',
               width: 130,
-              title: <div style={{ padding: 4 }}>Generate Date</div>,
+              title: <div className={classes.cell}>Generate Date</div>,
               render: (text, row) => {
                 return (
-                  <div style={{ padding: 4 }}>
+                  <div className={classes.cell}>
                     {moment(row.generateDate).format(
                       dateFormatLongWithTimeNoSec,
                     )}
@@ -82,7 +93,7 @@ const ReportHistory = props => {
             },
             {
               dataIndex: 'generateByUser',
-              title: <div style={{ padding: 4 }}>Generate By User</div>,
+              title: <div className={classes.cell}>Generate By User</div>,
               render: (text, row) => {
                 const name = `${
                   hasValue(row.generateByUserTitle) &&
@@ -90,16 +101,16 @@ const ReportHistory = props => {
                     ? `${row.generateByUserTitle}.`
                     : ''
                 }${row.generateByUser}`
-                return <div style={{ padding: 4 }}>{name}</div>
+                return <div className={classes.cell}>{name}</div>
               },
             },
             {
               dataIndex: 'verifyDate',
               width: 130,
-              title: <div style={{ padding: 4 }}>Verify Date</div>,
+              title: <div className={classes.cell}>Verify Date</div>,
               render: (text, row) => {
                 return (
-                  <div style={{ padding: 4 }}>
+                  <div className={classes.cell}>
                     {row.verifyDate
                       ? moment(row.verifyDate).format(
                           dateFormatLongWithTimeNoSec,
@@ -111,7 +122,7 @@ const ReportHistory = props => {
             },
             {
               dataIndex: 'verifyByUser',
-              title: <div style={{ padding: 4 }}>Verify By User</div>,
+              title: <div className={classes.cell}>Verify By User</div>,
               render: (text, row) => {
                 const name = `${
                   hasValue(row.verifyByUserTitle) &&
@@ -119,16 +130,16 @@ const ReportHistory = props => {
                     ? `${row.verifyByUserTitle}.`
                     : ''
                 }${row.verifyByUser || ''}`
-                return <div style={{ padding: 4 }}>{name}</div>
+                return <div className={classes.cell}>{name}</div>
               },
             },
             {
               dataIndex: 'action',
               width: 105,
-              title: <div style={{ padding: 4 }}>Action</div>,
+              title: <div className={classes.cell}>Action</div>,
               render: (text, row, index) => {
                 return (
-                  <div style={{ padding: 4 }}>
+                  <div className={classes.cell}>
                     {row.status === MEDICALCHECKUP_REPORTSTATUS.VERIFIED && (
                       <Tooltip title='Verified'>
                         <Button color='success' size='sm' justIcon>
@@ -147,16 +158,7 @@ const ReportHistory = props => {
                               verifyReport(row)
                             }}
                           >
-                            <span
-                              style={{
-                                fontSize: 12,
-                                lineHeight: '17px',
-                                width: 17,
-                                textAlign: 'center',
-                              }}
-                            >
-                              TD
-                            </span>
+                            <span className={classes.toDo}>TD</span>
                           </Button>
                         </Tooltip>
                       )}

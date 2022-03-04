@@ -227,7 +227,9 @@ const Examination = props => {
               ? '#daecf5'
               : 'white',
             cursor:
-              row.isGroup || row.status !== EXAMINATION_STATUS.COMPLETED
+              !isEditEnable ||
+              row.isGroup ||
+              row.status !== EXAMINATION_STATUS.COMPLETED
                 ? 'default'
                 : 'pointer',
           },
@@ -303,7 +305,9 @@ const Examination = props => {
               ? '#daecf5'
               : 'white',
             cursor:
-              row.isGroup || row.status !== EXAMINATION_STATUS.COMPLETED
+              !isEditEnable ||
+              row.isGroup ||
+              row.status !== EXAMINATION_STATUS.COMPLETED
                 ? 'default'
                 : 'pointer',
           },
@@ -323,7 +327,9 @@ const Examination = props => {
             ? '#daecf5'
             : 'white',
           cursor:
-            row.isGroup || row.status !== EXAMINATION_STATUS.COMPLETED
+            !isEditEnable ||
+            row.isGroup ||
+            row.status !== EXAMINATION_STATUS.COMPLETED
               ? 'default'
               : 'pointer',
         },

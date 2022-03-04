@@ -15,7 +15,8 @@ export default createFormViewModel({
       history.listen(async loct => {
         const { query = {}, pathname } = loct
         if (
-          pathname === '/medicalcheckup/worklist/reportingdetails' &&
+          (pathname === '/medicalcheckup/worklist/reportingdetails' ||
+            pathname === '/medicalcheckup/history/reportingdetails') &&
           Number(query.mcid)
         ) {
           dispatch({
