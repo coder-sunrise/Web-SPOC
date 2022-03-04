@@ -116,7 +116,7 @@ export const WorklistFilter = () => {
         <div style={{ display: 'flex', width: '100%' }}>
           <Form.Item name='searchValue'>
             <TextField
-              label='Patient Name, Acc No., Patient Ref. No.'
+              label='Patient Name, Acc. No., Patient Ref. No.'
               style={{ width: 350 }}
             />
           </Form.Item>
@@ -140,13 +140,13 @@ export const WorklistFilter = () => {
           </Form.Item>
 
           <Form.Item name='dateFrom'>
-            <DatePicker style={{ width: 100 }} label='Visit From' />
+            <DatePicker style={{ width: 140 }} label='Visit Date From' />
           </Form.Item>
           <Form.Item name='dateTo'>
             <DatePicker
               bordered={true}
-              label='Visit To'
-              style={{ width: 100, marginRight: 20 }}
+              label='Visit Date To'
+              style={{ width: 140, marginRight: 20 }}
             />
           </Form.Item>
 

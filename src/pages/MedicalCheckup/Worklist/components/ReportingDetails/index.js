@@ -170,6 +170,7 @@ const ReportingDetails = props => {
       ['desc'],
     )
     if (
+      reportingStatus !== MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED &&
       medicalCheckupReport.length &&
       medicalCheckupReport[0].reportType === MEDICALCHECKUP_REPORTTYPE.FINAL &&
       medicalCheckupReport[0].status === MEDICALCHECKUP_REPORTSTATUS.VERIFIED
@@ -243,7 +244,6 @@ const ReportingDetails = props => {
           <div
             style={{
               border: '1px solid #CCCCCC',
-
               backgroundColor: 'white',
             }}
           >

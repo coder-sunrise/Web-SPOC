@@ -31,6 +31,17 @@ const styles = theme => ({
     padding: 4,
     fontSize: '0.85em',
   },
+  listItemText: {
+    width: '100%',
+    marginLeft: 2,
+    fontSize: '0.8rem',
+  },
+  rootPanel: {
+    position: 'relative',
+    border: '1px solid #CCCCCC',
+    backgroundColor: 'white',
+    width: 610,
+  },
 })
 
 @connect(({ medicalCheckupReportingDetails, user }) => ({
@@ -224,13 +235,7 @@ class IndividualCommentDetails extends PureComponent {
               onClick={() => this.onCategoryChange(group, item)}
             >
               <Tooltip title={showValue}>
-                <div
-                  style={{
-                    width: '100%',
-                    marginLeft: 2,
-                    fontSize: '0.8rem',
-                  }}
-                >
+                <div className={this.props.classes.listItemText}>
                   {showValue}
                 </div>
               </Tooltip>
@@ -295,18 +300,12 @@ class IndividualCommentDetails extends PureComponent {
       selectedLanguage,
       handleSubmit,
       setFieldValue,
+      classes,
     } = this.props
     const { medicalCheckupIndividualComment = [] } = values
     const categoryListHeight = height - 263
     return (
-      <div
-        style={{
-          position: 'relative',
-          border: '1px solid #CCCCCC',
-          backgroundColor: 'white',
-          width: 610,
-        }}
-      >
+      <div className={classes.rootPanel}>
         <div style={{ padding: '0px 8px 8px 8px' }}>
           <TextField
             inputProps={{ placeholder: 'Enter Keywords' }}

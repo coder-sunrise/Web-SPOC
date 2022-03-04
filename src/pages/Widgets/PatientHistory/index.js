@@ -27,6 +27,7 @@ import {
   VisitTypeSelect,
   dateFormatLong,
   dateFormatLongWithTimeNoSec,
+  timeFormat24Hour,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 // utils
@@ -524,7 +525,7 @@ class PatientHistory extends Component {
         </div>
         {isNurseNote && (
           <div style={{ fontSize: '0.9em', fontWeight: 500, marginTop: 14 }}>
-            {`${moment(visitDate).format('DD MMM YYYY HH:MM')} - Notes${
+            {`${moment(visitDate).format(dateFormatLongWithTimeNoSec)} - Notes${
               docotrName ? ` - ${docotrName}` : ''
             }`}
           </div>
@@ -532,17 +533,17 @@ class PatientHistory extends Component {
         {!isNurseNote && (
           <div style={{ fontSize: '0.9em' }}>
             <div style={{ fontWeight: 500, marginTop: 6 }}>
-              {`${moment(visitDate).format('DD MMM YYYY')} (Time In: ${moment(
+              {`${moment(visitDate).format(dateFormatLong)} (Time In: ${moment(
                 timeIn,
-              ).format('HH:mm')} Time Out: ${
-                timeOut ? moment(timeOut).format('HH:mm') : '-'
+              ).format(timeFormat24Hour)} Time Out: ${
+                timeOut ? moment(timeOut).format(timeFormat24Hour) : '-'
               })${docotrName ? ` - ${docotrName}` : ''}`}
             </div>
             <div style={{ marginTop: 18 }}>
               <span>
                 {`Last Update By: ${LastUpdateBy || ''} on ${moment(
                   signOffDate,
-                ).format('DD MMM YYYY HH:mm')}`}
+                ).format(dateFormatLongWithTimeNoSec)}`}
               </span>
               <span style={{ marginLeft: 5 }}>
                 {row.servingByList?.length > 0
@@ -1416,7 +1417,9 @@ class PatientHistory extends Component {
           // visitListing
           visitListing.push({
             currentId: current.currentId,
-            visitDate: moment(current.visitDate).format('DD MMM YYYY HH:mm'),
+            visitDate: moment(current.visitDate).format(
+              dateFormatLongWithTimeNoSec,
+            ),
             doctor: `${current.userTitle || ''} ${current.userName || ''}`,
             isNurseNote: isNurseNote || false,
             nurseNotes,

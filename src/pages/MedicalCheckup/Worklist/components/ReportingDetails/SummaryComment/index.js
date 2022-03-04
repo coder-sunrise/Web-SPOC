@@ -62,6 +62,7 @@ const SummaryComment = props => {
     selectedLanguage,
     medicalCheckupReportingDetails.summaryCommentList,
     medicalCheckupReportingDetails.summaryCommentEntity,
+    isEditEnable,
   ])
 
   const onConfirm = () => {

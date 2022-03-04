@@ -8,7 +8,13 @@ import { REPORTINGDOCTOR_STATUS } from '@/utils/constants'
 import { Message } from '@material-ui/icons'
 import ReportingDoctorTag from './ReportingDoctorTag'
 
-const styles = theme => ({})
+const styles = theme => ({
+  label: {
+    float: 'left',
+    marginRight: 6,
+    marginTop: 4,
+  },
+})
 
 const ReportingDoctorList = props => {
   const {
@@ -20,11 +26,7 @@ const ReportingDoctorList = props => {
   } = props
   return (
     <div>
-      {isShowLabel && (
-        <div style={{ float: 'left', marginRight: 6, marginTop: 4 }}>
-          {label}
-        </div>
-      )}
+      {isShowLabel && <div className={classes.label}>{label}</div>}
       {medicalCheckupDoctor.map(item => {
         return <ReportingDoctorTag {...props} medicalCheckupDoctor={item} />
       })}

@@ -31,6 +31,7 @@ const defaultColumns = [
     width: 100,
     sorter: true,
     search: false,
+    fixed: 'left',
   },
   {
     key: 'patientAccountNo',
@@ -38,6 +39,8 @@ const defaultColumns = [
     dataIndex: 'patientAccountNo',
     sorter: true,
     search: false,
+    width: 100,
+    fixed: 'left',
   },
   {
     key: 'name',
@@ -46,6 +49,7 @@ const defaultColumns = [
     sorter: true,
     search: false,
     width: 200,
+    fixed: 'left',
   },
   {
     key: 'lastVisitDate',
@@ -61,12 +65,14 @@ const defaultColumns = [
     key: 'status',
     title: 'Status',
     dataIndex: 'status',
+    width: 60,
     search: false,
   },
   {
     key: 'gender/age',
     dataIndex: 'gender/age',
     title: 'Gender / Age',
+    width: 105,
     render: (_dom: any, entity: any) =>
       `${entity.gender?.substring(0, 1)}/${Math.floor(
         entity.dob?.toDate()?.duration('year'),
@@ -82,11 +88,12 @@ const defaultColumns = [
     width: 100,
     search: false,
   },
-  { key: 'race', dataIndex: 'race', title: 'Race', search: false },
+  { key: 'race', dataIndex: 'race', title: 'Race', width: 100, search: false },
   {
     key: 'nationality',
     dataIndex: 'nationality',
     title: 'Nationality',
+    width: 100,
     search: false,
   },
   {
@@ -94,25 +101,35 @@ const defaultColumns = [
     dataIndex: 'copayers',
     title: 'Co-Payers',
     search: false,
+    width: 200,
   },
   {
     key: 'mobileNo',
     dataIndex: 'mobileNo',
     title: 'Mobile No.',
     search: false,
+    width: 100,
   },
-  { key: 'homeNo', dataIndex: 'homeNo', title: 'Home No.', search: false },
+  {
+    key: 'homeNo',
+    dataIndex: 'homeNo',
+    title: 'Home No.',
+    width: 100,
+    search: false,
+  },
   {
     key: 'officeNo',
     dataIndex: 'officeNo',
     title: 'Office No.',
+    width: 100,
     search: false,
   },
   {
     key: 'outstandingBalance',
     dataIndex: 'outstandingBalance',
-    title: 'Total O/S Balance',
+    title: 'Total O/S Bal.',
     valueType: 'money',
+    width: 110,
     search: false,
     align: 'right',
   },
@@ -168,6 +185,13 @@ const defaultColumns = [
         </Tooltip>
       )
     },
+  },
+  {
+    key: 'options',
+    title: 'Action',
+    align: 'center',
+    dataIndex: 'options',
+    width: 60,
   },
 ]
 const showPatient = row => {
@@ -230,7 +254,7 @@ const PatientIndex = ({
     })
   }
   return (
-    <PageContainer pageHeaderRender={false}>
+    <div>
       <ProTable
         search={{ span: 8 }}
         rowSelection={false}
@@ -255,7 +279,7 @@ const PatientIndex = ({
         }}
         columnsStateMap={favPatDBColumnSetting}
         onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
-        options={{ density: false, reload: false }}
+        options={{ density: false, reload: false, width: 60 }}
         toolBarRender={() => {
           if (
             createPatProfileAccessRight &&
@@ -324,9 +348,9 @@ const PatientIndex = ({
             },
           }
         }}
-        scroll={{ x: 1100 }}
+        scroll={{ x: 1100, y: window.innerHeight - 300 }}
       />
-    </PageContainer>
+    </div>
   )
 }
 
