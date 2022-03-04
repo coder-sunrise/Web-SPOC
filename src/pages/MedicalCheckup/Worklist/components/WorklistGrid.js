@@ -132,7 +132,7 @@ export const WorklistGrid = ({ medicalCheckupWorklist, user }) => {
     setIsAnyWorklistModelOpened(true)
     const version = Date.now()
     history.push(
-      `/medicalcheckup/worklist/reportingdetails?mcid=${row.id}&qid=${row.queueId}&vid=${row.visitFK}&pid=${row.patientProfileFK}&v=${version}`,
+      `/medicalcheckup/worklist/reportingdetails?mcid=${row.id}&vid=${row.visitFK}&pid=${row.patientProfileFK}&v=${version}`,
     )
   }
 
@@ -263,6 +263,20 @@ export const WorklistGrid = ({ medicalCheckupWorklist, user }) => {
         }
       </Tag>
     )
+  }
+
+  const onRowDoubleClick = row => {
+    const isDoctor =
+      user.data.clinicianProfile.userProfile.role?.clinicRoleFK === 1
+    if (
+      isDoctor &&
+      !(row.medicalCheckupWorkitemDoctor || []).find(
+        x => x.userProfileFK === user.data.clinicianProfile.userProfile.id,
+      )
+    ) {
+      return
+    }
+    showReportingDetails(row)
   }
 
   const defaultColumns = () => {
@@ -499,6 +513,13 @@ export const WorklistGrid = ({ medicalCheckupWorklist, user }) => {
         columnsStateMap={medicalCheckupWorklistColumnSetting}
         onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
         defaultColumns={[]}
+        onRow={row => {
+          return {
+            onDoubleClick: () => {
+              onRowDoubleClick(row)
+            },
+          }
+        }}
         scroll={{ x: 1100, y: height }}
       />
       <CommonModal

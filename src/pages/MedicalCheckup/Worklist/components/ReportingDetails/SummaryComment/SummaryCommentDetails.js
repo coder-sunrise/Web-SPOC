@@ -125,7 +125,7 @@ const SummaryCommentDetails = props => {
         <div style={{ position: 'absolute', left: 8, bottom: 2 }}>
           Category:
         </div>
-        <FastField
+        <Field
           name='selectCategory'
           render={args => (
             <CodeSelect

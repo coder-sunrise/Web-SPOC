@@ -348,6 +348,13 @@ const PatientIndex = ({
             },
           }
         }}
+        onRow={row => {
+          return {
+            onDoubleClick: () => {
+              showPatient(row)
+            },
+          }
+        }}
         scroll={{ x: 1100, y: window.innerHeight - 300 }}
       />
     </div>
