@@ -16,6 +16,7 @@ import {
   MEDICALCHECKUP_WORKITEM_STATUS,
   MEDICALCHECKUP_REPORTTYPE,
   MEDICALCHECKUP_REPORTSTATUS,
+  REPORTINGDOCTOR_STATUS,
 } from '@/utils/constants'
 import {
   DoubleLeftOutlined,
@@ -33,7 +34,6 @@ import {
 const styles = theme => ({
   commentContainer: {
     '& > div:last-child': {
-      //float: 'right',
       visibility: 'hidden',
     },
     '&:hover': {
@@ -54,6 +54,7 @@ const ReportingDetails = props => {
     onClose = () => {},
     clinicSettings,
   } = props
+  const reportingStatus = medicalCheckupReportingDetails.entity?.statusFK
   const { primaryPrintoutLanguage = 'EN' } = clinicSettings.settings
   const height = window.innerHeight
   const banner = document.getElementById('patientBanner')
@@ -131,52 +132,15 @@ const ReportingDetails = props => {
 
   const onUnlock = () => {
     dispatch({
-      type: 'medicalCheckupReportingDetails/upsert',
+      type: 'medicalCheckupReportingDetails/unlock',
       payload: {
         ...medicalCheckupReportingDetails.entity,
-        statusFK: MEDICALCHECKUP_WORKITEM_STATUS.REPORTING,
-        unlockDate: moment(),
-        unlockByUserFK: user.data.clinicianProfile.userProfile.id,
       },
     }).then(r => {
       if (r) {
         refreshMedicalCheckup()
       }
     })
-  }
-
-  const generateFinalReport = () => {
-    dispatch({
-      type: 'global/updateAppState',
-      payload: {
-        openConfirm: true,
-        openConfirmContent:
-          reportingStatus === MEDICALCHECKUP_WORKITEM_STATUS.REPORTING
-            ? `Confirm to generate report (Finalized) ?`
-            : 'Not all test has completed, generating report will exclude incomlete test. Confirm to generate?',
-        onConfirmSave: () => {
-          generateReport(MEDICALCHECKUP_REPORTTYPE.FINAL)
-        },
-      },
-    })
-  }
-
-  const reportingStatus = medicalCheckupReportingDetails.entity?.statusFK
-
-  const canCompleteReport = () => {
-    const medicalCheckupReport = _.orderBy(
-      medicalCheckupReportingDetails.entity?.medicalCheckupReport,
-      ['versionNumber'],
-      ['desc'],
-    )
-    if (
-      reportingStatus !== MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED &&
-      medicalCheckupReport.length &&
-      medicalCheckupReport[0].reportType === MEDICALCHECKUP_REPORTTYPE.FINAL &&
-      medicalCheckupReport[0].status === MEDICALCHECKUP_REPORTSTATUS.VERIFIED
-    )
-      return true
-    return false
   }
 
   const clearEditComment = () => {
@@ -197,19 +161,10 @@ const ReportingDetails = props => {
     })
   }
 
-  const canGenerateReport = () => {
+  const getEditEnable = () => {
     return (
       reportingStatus !== MEDICALCHECKUP_WORKITEM_STATUS.PENDINGVERIFICATION &&
       reportingStatus !== MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED
-    )
-  }
-
-  const getEditEnable = () => {
-    const medicalCheckupstatus = medicalCheckupReportingDetails.entity?.statusFK
-    return (
-      medicalCheckupstatus !==
-        MEDICALCHECKUP_WORKITEM_STATUS.PENDINGVERIFICATION &&
-      medicalCheckupstatus !== MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED
     )
   }
 
@@ -227,6 +182,20 @@ const ReportingDetails = props => {
         refreshMedicalCheckup()
       }
     })
+  }
+
+  const isEnableFinalReport = () => {
+    const { medicalCheckupWorkitemDoctor = [] } =
+      medicalCheckupReportingDetails.entity || {}
+    if (
+      reportingStatus === MEDICALCHECKUP_WORKITEM_STATUS.REPORTING &&
+      medicalCheckupWorkitemDoctor.filter(
+        x => x.status === REPORTINGDOCTOR_STATUS.VERIFIED,
+      ).length === medicalCheckupWorkitemDoctor.length
+    ) {
+      return true
+    }
+    return false
   }
   return (
     <div>
@@ -305,7 +274,10 @@ const ReportingDetails = props => {
                 >
                   Back To List
                 </Button>
-                {canGenerateReport() && (
+                {(reportingStatus ===
+                  MEDICALCHECKUP_WORKITEM_STATUS.REPORTING ||
+                  reportingStatus ===
+                    MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS) && (
                   <Button
                     size='small'
                     type='primary'
@@ -317,27 +289,16 @@ const ReportingDetails = props => {
                     Generate Temporary Report
                   </Button>
                 )}
-                {canGenerateReport() && (
+                {isEnableFinalReport() && (
                   <Button
                     size='small'
                     type='primary'
                     style={{ margin: '0px 5px' }}
-                    onClick={generateFinalReport}
+                    onClick={() => {
+                      generateReport(MEDICALCHECKUP_REPORTTYPE.FINAL)
+                    }}
                   >
                     Generate Report
-                  </Button>
-                )}
-                {canCompleteReport() && (
-                  <Button
-                    size='small'
-                    style={{
-                      margin: '0px 5px',
-                      backgroundColor: '#007D00',
-                      color: 'white',
-                    }}
-                    onClick={completeMedicalCheckup}
-                  >
-                    Complete Report Verification
                   </Button>
                 )}
                 {reportingStatus ===

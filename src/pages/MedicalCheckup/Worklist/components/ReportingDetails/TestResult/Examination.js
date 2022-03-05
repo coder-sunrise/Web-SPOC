@@ -37,7 +37,7 @@ const getStatusIcon = status => {
   }
 
   return (
-    <Tooltip title='Inprogress'>
+    <Tooltip title={status}>
       <div
         style={{
           borderRadius: 8,
