@@ -250,22 +250,6 @@ const General = ({
         </GridItem>
         <GridItem xs={12} md={4}>
           <FastField
-            name='favouriteSupplierFK'
-            render={args => (
-              <CodeSelect
-                label={formatMessage({
-                  id: 'inventory.master.medication.supplier',
-                })}
-                code='ctSupplier'
-                labelField='displayValue'
-                max={10}
-                {...args}
-              />
-            )}
-          />
-        </GridItem>
-        <GridItem xs={12} md={4}>
-          <FastField
             name='description'
             render={args => {
               return (
@@ -293,7 +277,6 @@ const General = ({
             )}
           />
         </GridItem>
-
         <GridItem xs={12} md={4}>
           <GridContainer>
             <GridItem md={12} style={{ padding: 0 }}>
@@ -379,6 +362,20 @@ const General = ({
         </GridItem>
         <GridItem xs={12} md={4}>
           <FastField
+            name='revenueCategoryFK'
+            render={args => (
+              <CodeSelect
+                label={formatMessage({
+                  id: 'inventory.master.medication.revenueCategory',
+                })}
+                code='ctRevenueCategory'
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem xs={12} md={4}>
+          <FastField
             name='genericMedicationFK'
             render={args => (
               <CodeSelect
@@ -392,7 +389,6 @@ const General = ({
             )}
           />
         </GridItem>
-
         <GridItem xs={12} md={4}>
           <Field
             name='administrationRouteFK'
@@ -427,16 +423,33 @@ const General = ({
             )}
           />
         </GridItem>
-
         <GridItem xs={12} md={4}>
           <FastField
-            name='revenueCategoryFK'
+            name='favouriteSupplierFK'
             render={args => (
               <CodeSelect
                 label={formatMessage({
-                  id: 'inventory.master.medication.revenueCategory',
+                  id: 'inventory.master.medication.supplier',
                 })}
-                code='ctRevenueCategory'
+                code='ctSupplier'
+                labelField='displayValue'
+                max={10}
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem xs={12} md={4}>
+          <FastField
+            name='manufacturerFK'
+            render={args => (
+              <CodeSelect
+                label={formatMessage({
+                  id: 'inventory.master.medication.manufacturer',
+                })}
+                code='ctManufacturer'
+                labelField='displayValue'
+                max={10}
                 {...args}
               />
             )}
@@ -454,23 +467,6 @@ const General = ({
                 {...args}
               />
             )}
-          />
-        </GridItem>
-        <GridItem xs={12} md={4}>
-          <FastField
-            name='remarks'
-            render={args => {
-              return (
-                <TextField
-                  label={formatMessage({
-                    id: 'inventory.master.medication.remarks',
-                  })}
-                  multiline
-                  rowsMax='5'
-                  {...args}
-                />
-              )
-            }}
           />
         </GridItem>
         <GridItem md={12} style={{ padding: '0px 8px' }}>
@@ -515,6 +511,23 @@ const General = ({
               </Button>
             </GridItem>
           </GridContainer>
+        </GridItem>
+        <GridItem xs={12} md={4}>
+          <FastField
+            name='remarks'
+            render={args => {
+              return (
+                <TextField
+                  label={formatMessage({
+                    id: 'inventory.master.medication.remarks',
+                  })}
+                  multiline
+                  rowsMax='5'
+                  {...args}
+                />
+              )
+            }}
+          />
         </GridItem>
       </GridContainer>
 

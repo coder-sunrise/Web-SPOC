@@ -1132,6 +1132,12 @@ const _routes = [
             authority: ['settings.contact.supplier'],
           },
           {
+            path: '/setting/company/3',
+            name: 'manufacturer',
+            component: './Setting/Company',
+            authority: ['settings.contact.manufacturer'],
+          },
+          {
             path: '/setting/servicecenter',
             name: 'servicecenter',
             component: './Setting/serviceCenter',

@@ -7,6 +7,7 @@ import service from '../services'
 let companyTypes = [
   { id: 1, name: 'copayer' },
   { id: 2, name: 'supplier' },
+  { id: 3, name: 'manufacturer' },
 ]
 
 export default createListViewModel({
@@ -20,9 +21,16 @@ export default createListViewModel({
             type: NOTIFICATION_TYPE.CODETABLE,
             status: NOTIFICATION_STATUS.OK,
           }
-        : {
+        : companyTypeFK === 2
+        ? {
             message: 'Supplier updated',
             code: 'ctsupplier',
+            type: NOTIFICATION_TYPE.CODETABLE,
+            status: NOTIFICATION_STATUS.OK,
+          }
+        : {
+            message: 'Manufacturer updated',
+            code: 'ctmanufacturer',
             type: NOTIFICATION_TYPE.CODETABLE,
             status: NOTIFICATION_STATUS.OK,
           },
@@ -121,6 +129,19 @@ export default createListViewModel({
 
       *upsertSupplier({ payload }, { call, put }) {
         const r = yield call(service.upsertSup, payload)
+        if (r.id) {
+          notification.success({ message: 'Created' })
+          return true
+        }
+        if (r) {
+          notification.success({ message: 'Saved' })
+          return true
+        }
+        return r
+      },
+
+      *upsertManufacturer({ payload }, { call, put }) {
+        const r = yield call(service.upsertManu, payload)
         if (r.id) {
           notification.success({ message: 'Created' })
           return true
