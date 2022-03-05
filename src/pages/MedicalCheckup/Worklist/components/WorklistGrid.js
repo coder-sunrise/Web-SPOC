@@ -234,7 +234,7 @@ export const WorklistGrid = ({ medicalCheckupWorklist, user }) => {
         subTitle = `(${
           row.lastReportType === MEDICALCHECKUP_REPORTTYPE.TEMPORARY
             ? 'Temp. Rpt.'
-            : 'Final Rpt.'
+            : 'Rpt.'
         } ${
           row.lastReportStatus === MEDICALCHECKUP_REPORTSTATUS.VERIFIED
             ? 'Completed'

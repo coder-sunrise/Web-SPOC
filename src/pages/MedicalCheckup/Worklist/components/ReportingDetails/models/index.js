@@ -147,8 +147,12 @@ export default createFormViewModel({
         const response = yield call(service.queryExternalService, payload)
         return response
       },
-      *verifyReport({ payload }, { call, put }) {
-        const response = yield call(service.verifyReport, payload)
+      *updateReportStatus({ payload }, { call, put }) {
+        const response = yield call(service.updateReportStatus, payload)
+        return response
+      },
+      *unlock({ payload }, { call, put }) {
+        const response = yield call(service.unlock, payload)
         return response
       },
     },

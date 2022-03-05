@@ -30,6 +30,8 @@ const fns = {
       ...params,
       pagesize: 9999,
     }),
-  verifyReport: params => service.upsert(`${url}/VerifyReport`, params),
+  updateReportStatus: params =>
+    service.upsert(`${url}/UpdateReportStatus`, params),
+  unlock: params => service.upsert(`${url}/Unlock`, params),
 }
 export default fns

@@ -1046,8 +1046,11 @@ export const MEDICALCHECKUP_REPORTTYPE = {
 }
 
 export const MEDICALCHECKUP_REPORTSTATUS = {
-  NEW: 'New',
+  PENDINGVERIFY: 'Pending Verify',
   VERIFIED: 'Verified',
+  REJECT: 'Reject',
+  DISCARD: 'Discard',
+  ABANDONED: 'Abandoned',
 }
 
 export const EXAMINATION_STATUS = {

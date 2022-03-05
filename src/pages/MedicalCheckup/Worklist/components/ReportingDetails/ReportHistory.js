@@ -5,12 +5,18 @@ import { compose } from 'redux'
 import moment from 'moment'
 import { withStyles } from '@material-ui/core'
 import { Table } from 'antd'
-import { dateFormatLongWithTimeNoSec, Button, Tooltip } from '@/components'
+import {
+  dateFormatLongWithTimeNoSec,
+  Button,
+  Tooltip,
+  Popconfirm,
+} from '@/components'
 import {
   CheckOutlined,
   PrinterOutlined,
   CloudDownloadOutlined,
 } from '@ant-design/icons'
+import Undo from '@material-ui/icons/Undo'
 import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 import { MEDICALCHECKUP_REPORTSTATUS } from '@/utils/constants'
 import customtyles from '../Style.less'
@@ -39,16 +45,19 @@ const ReportHistory = props => {
     classes,
   } = props
   const height = window.innerHeight
-  const verifyReport = row => {
+  const updateReportStatus = (row, status) => {
     dispatch({
-      type: 'medicalCheckupReportingDetails/verifyReport',
+      type: 'medicalCheckupReportingDetails/updateReportStatus',
       payload: {
         ...row,
+        status,
       },
     }).then(r => {
       refreshMedicalCheckup()
     })
   }
+
+  const userProfileFK = user.data.clinicianProfile.userProfile.id
   return (
     <div style={{ padding: '0px 8px' }}>
       <div style={{ height: height - 270 }}>
@@ -105,73 +114,86 @@ const ReportHistory = props => {
               },
             },
             {
-              dataIndex: 'verifyDate',
+              dataIndex: 'status',
               width: 130,
-              title: <div className={classes.cell}>Verify Date</div>,
+              title: <div className={classes.cell}>Status</div>,
               render: (text, row) => {
-                return (
-                  <div className={classes.cell}>
-                    {row.verifyDate
-                      ? moment(row.verifyDate).format(
-                          dateFormatLongWithTimeNoSec,
-                        )
-                      : ''}
-                  </div>
-                )
-              },
-            },
-            {
-              dataIndex: 'verifyByUser',
-              title: <div className={classes.cell}>Verify By User</div>,
-              render: (text, row) => {
-                const name = `${
-                  hasValue(row.verifyByUserTitle) &&
-                  row.verifyByUserTitle.trim().length
-                    ? `${row.verifyByUserTitle}.`
-                    : ''
-                }${row.verifyByUser || ''}`
-                return <div className={classes.cell}>{name}</div>
+                if (row.status === MEDICALCHECKUP_REPORTSTATUS.VERIFIED) {
+                  const verifyDate = moment(row.verifyDate).format(
+                    dateFormatLongWithTimeNoSec,
+                  )
+                  const verifyUser = `${
+                    hasValue(row.verifyByUserTitle) &&
+                    row.verifyByUserTitle.trim().length
+                      ? `${row.verifyByUserTitle}.`
+                      : ''
+                  }${row.verifyByUser || ''}`
+                  return (
+                    <Tooltip
+                      title={
+                        <div>
+                          <div>Verified Date: {verifyDate}</div>
+                          <div>Verified By: {verifyUser}</div>
+                        </div>
+                      }
+                    >
+                      <div className={classes.cell}>{row.status}</div>
+                    </Tooltip>
+                  )
+                }
+                return <div className={classes.cell}>{row.status}</div>
               },
             },
             {
               dataIndex: 'action',
-              width: 105,
+              width: 115,
               title: <div className={classes.cell}>Action</div>,
               render: (text, row, index) => {
                 return (
                   <div className={classes.cell}>
-                    {row.status === MEDICALCHECKUP_REPORTSTATUS.VERIFIED && (
-                      <Tooltip title='Verified'>
-                        <Button color='success' size='sm' justIcon>
-                          <CheckOutlined />
-                        </Button>
-                      </Tooltip>
-                    )}
-                    {index === 0 &&
-                      row.status !== MEDICALCHECKUP_REPORTSTATUS.VERIFIED && (
-                        <Tooltip title='To do'>
-                          <Button
-                            color='primary'
-                            size='sm'
-                            justIcon
-                            onClick={() => {
-                              verifyReport(row)
-                            }}
-                          >
-                            <span className={classes.toDo}>TD</span>
-                          </Button>
-                        </Tooltip>
-                      )}
                     <Tooltip title='Print'>
                       <Button color='primary' size='sm' justIcon>
                         <PrinterOutlined />
                       </Button>
                     </Tooltip>
-                    <Tooltip title='Download'>
-                      <Button color='primary' size='sm' justIcon>
-                        <CloudDownloadOutlined />
-                      </Button>
-                    </Tooltip>
+                    {row.status ===
+                      MEDICALCHECKUP_REPORTSTATUS.PENDINGVERIFY && (
+                      <Tooltip title='To do'>
+                        <Button
+                          color='primary'
+                          size='sm'
+                          justIcon
+                          onClick={() => {
+                            updateReportStatus(
+                              row,
+                              MEDICALCHECKUP_REPORTSTATUS.VERIFIED,
+                            )
+                          }}
+                        >
+                          <span className={classes.toDo}>TD</span>
+                        </Button>
+                      </Tooltip>
+                    )}
+                    {row.status === MEDICALCHECKUP_REPORTSTATUS.PENDINGVERIFY &&
+                      userProfileFK === row.generateByUserFK && (
+                        <Popconfirm
+                          title='Are you sure?'
+                          onConfirm={() => {
+                            setTimeout(() => {
+                              updateReportStatus(
+                                row,
+                                MEDICALCHECKUP_REPORTSTATUS.DISCARD,
+                              )
+                            }, 1)
+                          }}
+                        >
+                          <Tooltip title='Discard'>
+                            <Button color='danger' size='sm' justIcon>
+                              <Undo />
+                            </Button>
+                          </Tooltip>
+                        </Popconfirm>
+                      )}
                   </div>
                 )
               },
@@ -195,7 +217,8 @@ const ReportHistory = props => {
 
 export default compose(
   withStyles(styles),
-  connect(({ medicalCheckupReportingDetails }) => ({
+  connect(({ medicalCheckupReportingDetails, user }) => ({
     medicalCheckupReportingDetails,
+    user,
   })),
 )(ReportHistory)
