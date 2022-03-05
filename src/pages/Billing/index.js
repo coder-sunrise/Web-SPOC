@@ -598,6 +598,7 @@ class Billing extends Component {
             })
             this.setState(preState => ({
               submitCount: preState.submitCount + 1,
+              hasNewSignature: false,
             }))
           }
           resetForm()
