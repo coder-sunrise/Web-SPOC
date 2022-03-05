@@ -3,33 +3,33 @@ import React, { useState } from 'react'
 import { Link } from 'umi'
 import { withStyles } from '@material-ui/core'
 import { useSelector } from 'dva'
+import moment from 'moment'
 import {
   Tooltip,
   Button,
   Popover,
   IconButton,
   MultipleTextField,
+  dateFormatLongWithTimeNoSec,
 } from '@/components'
 import { CheckOutlined } from '@ant-design/icons'
 import { REPORTINGDOCTOR_STATUS } from '@/utils/constants'
 import { Message } from '@material-ui/icons'
+import { Tag } from 'antd'
 
 const styles = theme => ({
-  panel: {
-    float: 'left',
+  tag: {
     width: 120,
-    fontWeight: 400,
-    letterSpacing: 'inherit',
-    borderRadius: '3px',
     margin: '1px 8px 1px 0px',
-    padding: '2px',
-    color: 'white',
-    cursor: 'hand',
-  },
-  text: {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+    padding: 2,
+  },
+  messageComment: {
+    margin: '4px 0px',
+    border: '1px solid #cccccc',
+    padding: 2,
   },
 })
 
@@ -38,6 +38,7 @@ const ReportingDoctorTag = ({
   classes,
   isShowMessage = false,
   updateReportingDoctor = () => {},
+  isEditEnable = true,
 }) => {
   const [messages, setMessages] = useState([])
   const [isNewMessage, setIsNewMessage] = useState(false)
@@ -46,20 +47,25 @@ const ReportingDoctorTag = ({
   const searchMessage = () => {
     if (!isShowMessage) return
     setMessages([
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
-      { content: 'aaaaaa' },
+      { content: 'aaaaaa', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'bbbbbbbbbbbbbb', from: 'AA', to: 'BB', sendSate: moment() },
+      {
+        content: 'ccccccccccccccccccc',
+        from: 'AA',
+        to: 'BB',
+        sendSate: moment(),
+      },
+      { content: 'ddddddddddddd', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'eeeeeeeeeeeeeee', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'fffffffffffffff', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'hhhhhhhhhhh', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'tttttttttttttttt', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'sssssssssssssss', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'rrrrrrrrrrrrrrr', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'llllllllllllll', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'vvvvvvvvv', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'ddd', from: 'AA', to: 'BB', sendSate: moment() },
+      { content: 'rrrrrrrrr', from: 'AA', to: 'BB', sendSate: moment() },
     ])
   }
   let reportingDoctorColor = '#CC0033'
@@ -79,28 +85,23 @@ const ReportingDoctorTag = ({
 
   const getDoctorTag = () => {
     return (
-      <div style={{ position: 'relative' }} onClick={searchMessage}>
-        {medicalCheckupDoctor.status == 'Verified' && (
-          <Tooltip title='Verified'>
-            <Button
-              color='success'
-              size='small'
-              style={{ position: 'absolute', top: 0, left: 2 }}
-              justIcon
-            >
-              <CheckOutlined />
-            </Button>
-          </Tooltip>
-        )}
+      <div>
         <Tooltip title={name}>
-          <div
-            className={classes.text}
-            style={{
-              paddingLeft: medicalCheckupDoctor.status == 'Verified' ? 30 : 0,
-            }}
+          <Tag
+            icon={
+              medicalCheckupDoctor.status == 'Verified' ? (
+                <CheckOutlined style={{ backgroundColor: 'green' }} />
+              ) : (
+                undefined
+              )
+            }
+            className={classes.tag}
+            style={{ cursor: isShowMessage ? 'pointer' : 'default' }}
+            color={reportingDoctorColor}
+            onClick={searchMessage}
           >
             {name}
-          </div>
+          </Tag>
         </Tooltip>
       </div>
     )
@@ -108,25 +109,23 @@ const ReportingDoctorTag = ({
 
   const messageComment = item => {
     return (
-      <div
-        style={{
-          margin: '4px 0px',
-          border: '1px solid #cccccc',
-          padding: 2,
-        }}
-      >
-        {item.content}
+      <div className={classes.messageComment}>
+        <div style={{ fontWeight: 600 }}>{item.content}</div>
         <div style={{ position: 'relative' }}>
-          <div>To: G.lian</div>
+          <div>{`To: ${item.from}`}</div>
           <div style={{ position: 'absolute', right: 0, top: 0 }}>
-            From: Jhon, 10 Jan 2020 17:10
+            {`From: ${item.to}, ${moment(item.sendSate).format(
+              dateFormatLongWithTimeNoSec,
+            )}`}
           </div>
         </div>
       </div>
     )
   }
 
-  const sendMessage = () => {}
+  const sendMessage = () => {
+    searchMessage()
+  }
 
   const getPopoverContent = () => {
     let toUserName = 'All PRO'
@@ -208,54 +207,54 @@ const ReportingDoctorTag = ({
               New Message
             </span>
           </Link>
-          {medicalCheckupDoctor.status === REPORTINGDOCTOR_STATUS.VERIFIED && (
-            <Link style={{ display: 'inline-block' }}>
-              <span
-                style={{
-                  display: 'block',
-                  textDecoration: 'underline',
-                }}
-                onClick={e => {
-                  e.preventDefault()
-                  updateReportingDoctor(
-                    medicalCheckupDoctor,
-                    REPORTINGDOCTOR_STATUS.NEW,
-                  )
-                }}
-              >
-                Return to Doctor
-              </span>
-            </Link>
-          )}
-          {medicalCheckupDoctor.status ===
-            REPORTINGDOCTOR_STATUS.COMMENTDONE && (
-            <Link style={{ display: 'inline-block' }}>
-              <span
-                style={{
-                  display: 'block',
-                  textDecoration: 'underline',
-                }}
-                onClick={e => {
-                  e.preventDefault()
-                  updateReportingDoctor(
-                    medicalCheckupDoctor,
-                    REPORTINGDOCTOR_STATUS.VERIFIED,
-                  )
-                }}
-              >
-                Verify Comments
-              </span>
-            </Link>
-          )}
+          {medicalCheckupDoctor.status === REPORTINGDOCTOR_STATUS.VERIFIED &&
+            isEditEnable && (
+              <Link style={{ display: 'inline-block' }}>
+                <span
+                  style={{
+                    display: 'block',
+                    textDecoration: 'underline',
+                  }}
+                  onClick={e => {
+                    e.preventDefault()
+                    updateReportingDoctor(
+                      medicalCheckupDoctor,
+                      REPORTINGDOCTOR_STATUS.NEW,
+                    )
+                  }}
+                >
+                  Return to Doctor
+                </span>
+              </Link>
+            )}
+          {medicalCheckupDoctor.status === REPORTINGDOCTOR_STATUS.COMMENTDONE &&
+            isEditEnable && (
+              <Link style={{ display: 'inline-block' }}>
+                <span
+                  style={{
+                    display: 'block',
+                    textDecoration: 'underline',
+                  }}
+                  onClick={e => {
+                    e.preventDefault()
+                    updateReportingDoctor(
+                      medicalCheckupDoctor,
+                      REPORTINGDOCTOR_STATUS.VERIFIED,
+                    )
+                  }}
+                >
+                  Verify Comments
+                </span>
+              </Link>
+            )}
         </div>
       </div>
     )
   }
   return (
     <div
-      className={classes.panel}
       style={{
-        backgroundColor: reportingDoctorColor,
+        float: 'left',
       }}
     >
       {isShowMessage ? (

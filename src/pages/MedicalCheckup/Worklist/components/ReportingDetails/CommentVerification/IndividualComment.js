@@ -15,6 +15,7 @@ const IndividualComment = ({
   height: mainDivHeight = 700,
   setFieldValue,
   values,
+  isEditEnable = true,
 }) => {
   const commitIndividualCommentChanges = ({ rows, changed }) => {
     setFieldValue('medicalCheckupIndividualComment', rows)
@@ -79,6 +80,7 @@ const IndividualComment = ({
                 <MultipleTextField
                   value={row.japaneseComment}
                   maxLength={2000}
+                  disabled={!isEditEnable}
                   onChange={e => {
                     const { commitChanges } = control
                     commitChanges({
@@ -105,6 +107,7 @@ const IndividualComment = ({
                 <MultipleTextField
                   value={row.englishComment}
                   maxLength={2000}
+                  disabled={!isEditEnable}
                   onChange={e => {
                     const { commitChanges } = control
                     commitChanges({
@@ -144,7 +147,12 @@ const IndividualComment = ({
               if (row.isVerified)
                 return (
                   <Tooltip title='Verified'>
-                    <Button color='success' size='small' justIcon>
+                    <Button
+                      color='success'
+                      size='small'
+                      justIcon
+                      disabled={!isEditEnable}
+                    >
                       <CheckOutlined />
                     </Button>
                   </Tooltip>
@@ -155,6 +163,7 @@ const IndividualComment = ({
                     color='primary'
                     size='small'
                     justIcon
+                    disabled={!isEditEnable}
                     onClick={e => {
                       const { commitChanges } = control
                       commitChanges({

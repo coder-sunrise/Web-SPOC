@@ -130,7 +130,7 @@ const PatientLabelButton = ({
           </ClickAwayListener>
         }
       >
-        {iconOnly ? (
+        {!iconOnly ? (
           <Button
             color='primary'
             onClick={openPopper}

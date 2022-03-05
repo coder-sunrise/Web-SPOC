@@ -3,6 +3,8 @@ import _ from 'lodash'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import moment from 'moment'
+import { Button, Drawer } from 'antd'
+import { Link, history } from 'umi'
 import { withStyles, Divider } from '@material-ui/core'
 import Banner from '@/pages/PatientDashboard/Banner'
 import { LoadingWrapper } from '@/components/_medisys'
@@ -10,8 +12,12 @@ import SummaryComment from './SummaryComment'
 import TestResult from './TestResult'
 import ReportHistory from './ReportHistory'
 import ResultDetails from './ResultDetails'
-import { Button, Drawer } from 'antd'
-import { Link, history } from 'umi'
+import {
+  MEDICALCHECKUP_WORKITEM_STATUS,
+  MEDICALCHECKUP_REPORTTYPE,
+  MEDICALCHECKUP_REPORTSTATUS,
+  REPORTINGDOCTOR_STATUS,
+} from '@/utils/constants'
 import {
   DoubleLeftOutlined,
   DoubleRightOutlined,
@@ -28,7 +34,6 @@ import {
 const styles = theme => ({
   commentContainer: {
     '& > div:last-child': {
-      //float: 'right',
       visibility: 'hidden',
     },
     '&:hover': {
@@ -47,11 +52,16 @@ const ReportingDetails = props => {
     dispatch,
     user,
     onClose = () => {},
+    clinicSettings,
   } = props
+  const reportingStatus = medicalCheckupReportingDetails.entity?.statusFK
+  const { primaryPrintoutLanguage = 'EN' } = clinicSettings.settings
   const height = window.innerHeight
   const banner = document.getElementById('patientBanner')
   const contentHeight = (height || 0) - (banner?.offsetHeight || 0) - 92
-  const [selectedLanguage, setSelectedLanguage] = useState('EN')
+  const [selectedLanguage, setSelectedLanguage] = useState(
+    primaryPrintoutLanguage,
+  )
   const [showReportHistory, setShowReportHistory] = useState(false)
   const [showResultDetails, setShowResultDetails] = useState(false)
   const [placement, setPlacement] = useState('right')
@@ -119,6 +129,74 @@ const ReportingDetails = props => {
       setPlacement('right')
     }
   }
+
+  const onUnlock = () => {
+    dispatch({
+      type: 'medicalCheckupReportingDetails/unlock',
+      payload: {
+        ...medicalCheckupReportingDetails.entity,
+      },
+    }).then(r => {
+      if (r) {
+        refreshMedicalCheckup()
+      }
+    })
+  }
+
+  const clearEditComment = () => {
+    dispatch({
+      type: 'medicalCheckupReportingDetails/updateState',
+      payload: {
+        summaryCommentEntity: undefined,
+        individualCommentEntity: undefined,
+        isNeedToClearSummaryComment: true,
+      },
+    })
+
+    dispatch({
+      type: 'medicalCheckupReportingDetails/updateState',
+      payload: {
+        individualCommentEntity: undefined,
+      },
+    })
+  }
+
+  const getEditEnable = () => {
+    return (
+      reportingStatus !== MEDICALCHECKUP_WORKITEM_STATUS.PENDINGVERIFICATION &&
+      reportingStatus !== MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED
+    )
+  }
+
+  const completeMedicalCheckup = () => {
+    dispatch({
+      type: 'medicalCheckupReportingDetails/upsert',
+      payload: {
+        ...medicalCheckupReportingDetails.entity,
+        statusFK: MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED,
+        completedDate: moment(),
+        completedByUserFK: user.data.clinicianProfile.userProfile.id,
+      },
+    }).then(r => {
+      if (r) {
+        refreshMedicalCheckup()
+      }
+    })
+  }
+
+  const isEnableFinalReport = () => {
+    const { medicalCheckupWorkitemDoctor = [] } =
+      medicalCheckupReportingDetails.entity || {}
+    if (
+      reportingStatus === MEDICALCHECKUP_WORKITEM_STATUS.REPORTING &&
+      medicalCheckupWorkitemDoctor.filter(
+        x => x.status === REPORTINGDOCTOR_STATUS.VERIFIED,
+      ).length === medicalCheckupWorkitemDoctor.length
+    ) {
+      return true
+    }
+    return false
+  }
   return (
     <div>
       <LoadingWrapper loading={loading.models.medicalCheckupReportingDetails}>
@@ -135,7 +213,6 @@ const ReportingDetails = props => {
           <div
             style={{
               border: '1px solid #CCCCCC',
-
               backgroundColor: 'white',
             }}
           >
@@ -149,6 +226,7 @@ const ReportingDetails = props => {
                   queryIndividualCommentHistory={queryIndividualCommentHistory}
                   refreshMedicalCheckup={refreshMedicalCheckup}
                   setShowResultDetails={onShowShowResultDetails}
+                  isEditEnable={getEditEnable()}
                 />
               </GridItem>
               <GridItem md={5} style={{ padding: 0 }}>
@@ -160,6 +238,8 @@ const ReportingDetails = props => {
                   querySummaryCommentHistory={querySummaryCommentHistory}
                   queryIndividualCommentHistory={queryIndividualCommentHistory}
                   refreshMedicalCheckup={refreshMedicalCheckup}
+                  clearEditComment={clearEditComment}
+                  isEditEnable={getEditEnable()}
                 />
               </GridItem>
             </GridContainer>
@@ -194,26 +274,47 @@ const ReportingDetails = props => {
                 >
                   Back To List
                 </Button>
-                <Button
-                  size='small'
-                  type='primary'
-                  style={{ margin: '0px 5px' }}
-                  onClick={() => {
-                    generateReport('Temporary Report')
-                  }}
-                >
-                  Generate Temporary Report
-                </Button>
-                <Button
-                  size='small'
-                  type='primary'
-                  style={{ margin: '0px 5px' }}
-                  onClick={() => {
-                    generateReport('Final Report')
-                  }}
-                >
-                  Generate Report
-                </Button>
+                {(reportingStatus ===
+                  MEDICALCHECKUP_WORKITEM_STATUS.REPORTING ||
+                  reportingStatus ===
+                    MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS) && (
+                  <Button
+                    size='small'
+                    type='primary'
+                    style={{ margin: '0px 5px' }}
+                    onClick={() => {
+                      generateReport(MEDICALCHECKUP_REPORTTYPE.TEMPORARY)
+                    }}
+                  >
+                    Generate Temporary Report
+                  </Button>
+                )}
+                {isEnableFinalReport() && (
+                  <Button
+                    size='small'
+                    type='primary'
+                    style={{ margin: '0px 5px' }}
+                    onClick={() => {
+                      generateReport(MEDICALCHECKUP_REPORTTYPE.FINAL)
+                    }}
+                  >
+                    Generate Report
+                  </Button>
+                )}
+                {reportingStatus ===
+                  MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED && (
+                  <Button
+                    size='small'
+                    style={{
+                      margin: '0px 5px',
+                      backgroundColor: '#5a9cde',
+                      color: 'white',
+                    }}
+                    onClick={onUnlock}
+                  >
+                    Unlock
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -295,7 +396,7 @@ const ReportingDetails = props => {
         observe='ReportHistory'
         overrideLoading
       >
-        <ReportHistory />
+        <ReportHistory refreshMedicalCheckup={refreshMedicalCheckup} />
       </CommonModal>
     </div>
   )
@@ -303,10 +404,19 @@ const ReportingDetails = props => {
 
 export default compose(
   withStyles(styles),
-  connect(({ patient, loading, medicalCheckupReportingDetails, user }) => ({
-    patient: patient.entity || {},
-    loading,
-    medicalCheckupReportingDetails,
-    user,
-  })),
+  connect(
+    ({
+      patient,
+      loading,
+      medicalCheckupReportingDetails,
+      user,
+      clinicSettings,
+    }) => ({
+      patient: patient.entity || {},
+      loading,
+      medicalCheckupReportingDetails,
+      user,
+      clinicSettings,
+    }),
+  ),
 )(ReportingDetails)

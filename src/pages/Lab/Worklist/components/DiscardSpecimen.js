@@ -20,12 +20,11 @@ import {
 } from '@/components'
 import { useCodeTable } from '@/utils/hooks'
 
-export const DiscardSpecimen = ({ open, id, onClose, onConfirm }) => {
+export const DiscardSpecimen = ({ open, id, patient, onClose, onConfirm }) => {
   const [showModal, setShowModal] = useState(false)
   const [hasDiscardReason, setHasDiscardReason] = useState(false)
   const ctspecimentype = useCodeTable('ctspecimentype')
   const { entity } = useSelector(s => s.worklistSpecimenDetails)
-  const { entity: patient } = useSelector(s => s.patient)
   const dispatch = useDispatch()
   const [form] = Form.useForm()
 

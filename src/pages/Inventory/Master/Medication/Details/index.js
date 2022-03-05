@@ -726,6 +726,7 @@ export default compose(
         ...checkboxGroup,
         ...fileInfo,
         id,
+        isOnlyClinicInternalUsage: !checkboxGroup.isOnlyClinicInternalUsage,
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
         medicationStock: defaultMedicationStock,

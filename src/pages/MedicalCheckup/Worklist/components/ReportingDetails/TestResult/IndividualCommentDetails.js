@@ -17,9 +17,11 @@ import {
   Tooltip,
   FieldArray,
   Field,
+  notification,
 } from '@/components'
 import { List, ListItem, ListItemText, withStyles } from '@material-ui/core'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 
 const styles = theme => ({
   listRoot: {
@@ -28,6 +30,17 @@ const styles = theme => ({
   listItemRoot: {
     padding: 4,
     fontSize: '0.85em',
+  },
+  listItemText: {
+    width: '100%',
+    marginLeft: 2,
+    fontSize: '0.8rem',
+  },
+  rootPanel: {
+    position: 'relative',
+    border: '1px solid #CCCCCC',
+    backgroundColor: 'white',
+    width: 610,
   },
 })
 
@@ -96,31 +109,85 @@ class IndividualCommentDetails extends PureComponent {
     const { setFieldValue } = this.props
     const { selectedItem } = this.state
     const keys = Object.keys(selectedItem)
-    const englishComment = keys
-      .map(
-        key =>
-          selectedItem[key].translationData
-            .find(l => l.language === 'EN')
-            ?.list?.find(l => (l.key = 'displayValue'))?.value,
-      )
-      .join(' ')
-    const japaneseComment = keys
-      .map(
-        key =>
-          selectedItem[key].translationData
-            .find(l => l.language === 'JP')
-            ?.list?.find(l => (l.key = 'displayValue'))?.value,
-      )
-      .join(' ')
+    let englishComment
+    let japaneseComment
+    keys.forEach(key => {
+      const selectGroupItems = selectedItem[key] || []
+      const strEnglish = selectGroupItems
+        .map(
+          item =>
+            item.translationData
+              .find(l => l.language === 'EN')
+              ?.list?.find(l => (l.key = 'displayValue'))?.value,
+        )
+        .join(' ')
+      englishComment = `${
+        englishComment ? `${englishComment} ` : ''
+      }${strEnglish}`
+
+      const strJapanese = selectGroupItems
+        .map(
+          item =>
+            item.translationData
+              .find(l => l.language === 'JP')
+              ?.list?.find(l => (l.key = 'displayValue'))?.value,
+        )
+        .join(' ')
+      japaneseComment = `${
+        japaneseComment ? `${japaneseComment} ` : ''
+      }${strJapanese}`
+    })
     setFieldValue('originalJapaneseComment', japaneseComment)
     setFieldValue('japaneseComment', japaneseComment)
     setFieldValue('originalEnglishComment', englishComment)
     setFieldValue('englishComment', englishComment)
   }
 
+  onCategoryChange = (group, item) => {
+    this.setState(
+      preState => {
+        let selectGroupItems = preState.selectedItem[group.groupNo] || []
+        let selectItem = selectGroupItems.find(i => i.id === item.id)
+        if (selectItem) {
+          selectGroupItems = selectGroupItems.filter(i => i.id !== item.id)
+        } else {
+          selectGroupItems = [...selectGroupItems, { ...item }]
+        }
+        return {
+          ...preState,
+          selectedItem: {
+            ...preState.selectedItem,
+            [group.groupNo]: [...selectGroupItems],
+          },
+        }
+      },
+      () => {
+        document.activeElement.blur()
+        this.generateComment()
+      },
+    )
+  }
+
   getSelection = group => {
     const { selectedItem, searchValue = '' } = this.state
-    const { selectedLanguage } = this.props
+    const { selectedLanguage, commentGroupList = [] } = this.props
+    const listItems = group.list.filter(
+      item =>
+        item.displayValue.toUpperCase().indexOf(searchValue.toUpperCase()) >= 0,
+    )
+    if (!listItems.length)
+      return (
+        <div
+          style={{
+            width: 100,
+            textAlign: 'center',
+            color: '#cccccc',
+            paddingTop: 8,
+          }}
+        >
+          No data
+        </div>
+      )
     return (
       <List
         style={{
@@ -133,56 +200,48 @@ class IndividualCommentDetails extends PureComponent {
         disablePadding
         onClick={() => {}}
       >
-        {group.list
-          .filter(
-            item =>
-              item.displayValue
-                .toUpperCase()
-                .indexOf(searchValue.toUpperCase()) >= 0,
+        {listItems.map(item => {
+          const showValue = item.translationData
+            .find(l => l.language === selectedLanguage)
+            ?.list?.find(l => (l.key = 'displayValue'))?.value
+
+          const isSelected = selectedItem[group.groupNo]?.find(
+            i => i.id === item.id,
           )
-          .map(item => {
-            const showValue = item.translationData
-              .find(l => l.language === selectedLanguage)
-              ?.list?.find(l => (l.key = 'displayValue'))?.value
-            return (
-              <ListItem
-                alignItems='flex-start'
-                classes={{
-                  root: this.props.classes.listItemRoot,
-                }}
-                selected={selectedItem[group.groupNo]?.id === item.id}
-                divider
-                disableGutters
-                button
-                onClick={() => {
-                  this.setState(
-                    {
-                      selectedItem: {
-                        ...selectedItem,
-                        [group.groupNo]: { ...item },
-                      },
-                    },
-                    this.generateComment,
-                  )
-                }}
-              >
-                <Tooltip title={showValue}>
-                  <div
-                    style={{
-                      width: '100%',
-                      marginLeft: 2,
-                      fontSize: '0.8rem',
-                      textOverflow: 'ellipsis',
-                      overflow: 'hidden',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {showValue}
-                  </div>
-                </Tooltip>
-              </ListItem>
-            )
-          })}
+
+          let isNextGroupSelect
+          for (
+            let index = group.groupNo;
+            index < commentGroupList.length;
+            index++
+          ) {
+            if ((selectedItem[commentGroupList[index].groupNo] || []).length) {
+              isNextGroupSelect = true
+              break
+            }
+          }
+
+          return (
+            <ListItem
+              alignItems='flex-start'
+              classes={{
+                root: this.props.classes.listItemRoot,
+              }}
+              selected={isSelected}
+              divider
+              disableGutters
+              button
+              disabled={isNextGroupSelect}
+              onClick={() => this.onCategoryChange(group, item)}
+            >
+              <Tooltip title={showValue}>
+                <div className={this.props.classes.listItemText}>
+                  {showValue}
+                </div>
+              </Tooltip>
+            </ListItem>
+          )
+        })}
       </List>
     )
   }
@@ -197,6 +256,17 @@ class IndividualCommentDetails extends PureComponent {
       originalEnglishComment,
       englishComment,
     } = values
+
+    if (
+      (!hasValue(japaneseComment) || !japaneseComment.trim().length) &&
+      (!hasValue(englishComment) || !englishComment.trim().length)
+    ) {
+      notification.warning({
+        message: 'Please input comment.',
+      })
+      return
+    }
+
     setFieldValue('medicalCheckupIndividualComment', [
       ...medicalCheckupIndividualComment,
       {
@@ -217,6 +287,11 @@ class IndividualCommentDetails extends PureComponent {
     setFieldValue('originalEnglishComment', undefined)
     setFieldValue('englishComment', undefined)
   }
+
+  onDiscard = () => {
+    const { clearEditComment } = this.props
+    clearEditComment()
+  }
   render() {
     const {
       values,
@@ -225,20 +300,15 @@ class IndividualCommentDetails extends PureComponent {
       selectedLanguage,
       handleSubmit,
       setFieldValue,
+      classes,
     } = this.props
     const { medicalCheckupIndividualComment = [] } = values
     const categoryListHeight = height - 263
     return (
-      <div
-        style={{
-          position: 'relative',
-          border: '1px solid #CCCCCC',
-          backgroundColor: 'white',
-        }}
-      >
+      <div className={classes.rootPanel}>
         <div style={{ padding: '0px 8px 8px 8px' }}>
           <TextField
-            inputProps={{ placeholder: 'Enter Keyworks' }}
+            inputProps={{ placeholder: 'Enter Keywords' }}
             onChange={e => {
               this.setState({ searchValue: e.target.value })
             }}
@@ -338,14 +408,19 @@ class IndividualCommentDetails extends PureComponent {
             }}
           />
         </div>
-        <Button
-          size='small'
-          type='primary'
-          style={{ margin: 8 }}
-          onClick={handleSubmit}
-        >
-          Save Comment
-        </Button>
+        <div style={{ textAlign: 'right', margin: 8 }}>
+          <Button size='small' type='danger' onClick={this.onDiscard}>
+            Discard
+          </Button>
+          <Button
+            size='small'
+            type='primary'
+            style={{ marginLeft: 10 }}
+            onClick={handleSubmit}
+          >
+            Save Comment
+          </Button>
+        </div>
       </div>
     )
   }

@@ -293,12 +293,12 @@ class NewVisit extends PureComponent {
             x.preOrderItemType === preOrderItemCategory[5].value,
         ).length > 0
 
-      if (isVaccinationFound) msg.push('Vaccination ')
-      if (isLabFound) msg.push('Lab test ')
-      if (isRadiologyFound) msg.push('Radiology examination ')
+      if (isVaccinationFound) msg.push('Vaccination')
+      if (isLabFound) msg.push('Lab test')
+      if (isRadiologyFound) msg.push('Radiology examination')
 
       if (msg.length > 0) {
-        errorMessage = `${msg.join(',')} ${errorMessage}`
+        errorMessage = `${msg.join(', ')} ${errorMessage}`
       }
     }
     if (msg.length > 0) {

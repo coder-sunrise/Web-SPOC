@@ -8,6 +8,7 @@ import { Tooltip, withStyles } from '@material-ui/core'
 const STYLES = () => ({
   tooltip: {
     fontSize: '0.8rem',
+    maxWidth: 600,
   },
   tooltip2: {
     fontSize: '0.8rem',
@@ -28,7 +29,7 @@ class CommonTooltip extends PureComponent {
     title: '',
   }
 
-  render () {
+  render() {
     const {
       classes,
       title,

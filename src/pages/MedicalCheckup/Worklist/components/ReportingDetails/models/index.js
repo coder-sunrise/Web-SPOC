@@ -15,9 +15,17 @@ export default createFormViewModel({
       history.listen(async loct => {
         const { query = {}, pathname } = loct
         if (
-          pathname === '/medicalcheckup/worklist/reportingdetails' &&
+          (pathname === '/medicalcheckup/worklist/reportingdetails' ||
+            pathname === '/medicalcheckup/history/reportingdetails') &&
           Number(query.mcid)
         ) {
+          dispatch({
+            type: 'global/updateState',
+            payload: {
+              fullscreen: true,
+              showMedicalCheckupReportingDetails: true,
+            },
+          })
           dispatch({
             type: 'initState',
             payload: {
@@ -25,7 +33,6 @@ export default createFormViewModel({
               visitID: Number(query.vid),
               pid: Number(query.pid),
               mcid: Number(query.mcid),
-              qid: Number(query.qid),
             },
           })
         }
@@ -33,15 +40,8 @@ export default createFormViewModel({
     },
     effects: {
       *initState({ payload }, { all, put, select, take }) {
-        const { version, visitID, pid, mcid, qid } = payload
+        const { version, visitID, pid, mcid } = payload
         const patientState = yield select(st => st.patient)
-        yield put({
-          type: 'global/updateState',
-          payload: {
-            fullscreen: true,
-            showMedicalCheckupReportingDetails: true,
-          },
-        })
         yield put({
           type: 'updateState',
           payload: {
@@ -61,12 +61,6 @@ export default createFormViewModel({
           yield take('patient/query/@@end')
         }
 
-        if (qid)
-          yield put({
-            type: 'visitRegistration/query',
-            payload: { id: payload.qid, version: payload.v },
-          })
-
         yield put({
           type: 'query',
           payload: {
@@ -80,7 +74,10 @@ export default createFormViewModel({
         { payload },
         { all, put, select },
       ) {
-        history.push('/medicalcheckup/worklist')
+        const index = window.location.pathname.indexOf('reportingdetails')
+        const newUrl = window.location.pathname.substr(0, index - 1)
+
+        history.push(newUrl)
         return yield all([
           yield put({
             type: 'global/updateAppState',
@@ -108,22 +105,26 @@ export default createFormViewModel({
           service.queryIndividualCommentHistory,
           payload,
         )
-        yield put({
-          type: 'updateState',
-          payload: {
-            individualCommentList: response.data.data,
-          },
-        })
+        if (response && response.status === '200') {
+          yield put({
+            type: 'updateState',
+            payload: {
+              individualCommentList: response.data.data,
+            },
+          })
+        }
         return response
       },
       *querySummaryCommentHistory({ payload }, { call, put }) {
         const response = yield call(service.querySummaryCommentHistory, payload)
-        yield put({
-          type: 'updateState',
-          payload: {
-            summaryCommentList: response.data.data,
-          },
-        })
+        if (response && response.status === '200') {
+          yield put({
+            type: 'updateState',
+            payload: {
+              summaryCommentList: response.data.data,
+            },
+          })
+        }
         return response
       },
       *deleteSummaryComment({ payload }, { call, put }) {
@@ -140,6 +141,18 @@ export default createFormViewModel({
       },
       *updateReportingDoctor({ payload }, { call, put }) {
         const response = yield call(service.updateReportingDoctor, payload)
+        return response
+      },
+      *queryExternalService({ payload }, { call, put }) {
+        const response = yield call(service.queryExternalService, payload)
+        return response
+      },
+      *updateReportStatus({ payload }, { call, put }) {
+        const response = yield call(service.updateReportStatus, payload)
+        return response
+      },
+      *unlock({ payload }, { call, put }) {
+        const response = yield call(service.unlock, payload)
         return response
       },
     },

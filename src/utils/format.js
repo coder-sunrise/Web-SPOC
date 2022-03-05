@@ -43,6 +43,7 @@ const timeFormatWithoutSecond = 'HH:mm'
 const fullDateTime = 'DD-MM-YYYY hh:mm A'
 const serverDateFormat = 'YYYY-MM-DD'
 const serverDateTimeFormatFull = 'YYYY-MM-DDTHH:mm:ss'
+const labSpecimenLabelDateFormat = 'DD/MM/YYYY HH:mm:ss'
 const timeFormat = 'hh:mm A'
 const timeFormatSmallCase = 'hh:mm a'
 const timeFormat24Hour = 'HH:mm'
@@ -98,6 +99,7 @@ export {
   timeFormatSmallCase,
   serverDateFormat,
   serverDateTimeFormatFull,
+  labSpecimenLabelDateFormat,
   timeFormat,
   timeFormatWithSecond,
   timeFormatWithoutSecond,

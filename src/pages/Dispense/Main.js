@@ -131,7 +131,7 @@ const constructPayload = values => {
   const updateTempDispenseItem = (items, inventoryFiledName) => {
     return items?.map(m => {
       let tempDispenseItem = []
-      if (!m.isPreOrder) {
+      if (!m.isPreOrder || (m.isPreOrder && m.isChargeToday)) {
         const matchItem = values.dispenseItems.filter(
           d =>
             d.type === m.type &&

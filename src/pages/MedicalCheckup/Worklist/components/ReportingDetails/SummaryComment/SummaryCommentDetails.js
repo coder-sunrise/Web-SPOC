@@ -1,4 +1,4 @@
-import React, { PureComponent, useState } from 'react'
+import React, { PureComponent, useState, useEffect } from 'react'
 import { compose } from 'redux'
 import Yup from '@/utils/yup'
 import { Button } from 'antd'
@@ -14,11 +14,34 @@ import {
   withFormikExtend,
   FastField,
   Field,
+  notification,
 } from '@/components'
 import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 
 const SummaryCommentDetails = props => {
-  const { values, selectedLanguage, setFieldValue, dispatch, setValues } = props
+  const {
+    values,
+    selectedLanguage,
+    setFieldValue,
+    dispatch,
+    setValues,
+    isEditEnable = true,
+    medicalCheckupReportingDetails,
+    handleSubmit,
+  } = props
+
+  useEffect(() => {
+    if (medicalCheckupReportingDetails.isNeedToClearSummaryComment) {
+      setValues({})
+      dispatch({
+        type: 'medicalCheckupReportingDetails/updateState',
+        payload: {
+          isNeedToClearSummaryComment: false,
+        },
+      })
+    }
+  }, [medicalCheckupReportingDetails.isNeedToClearSummaryComment])
+
   const onDiscard = () => {
     dispatch({
       type: 'medicalCheckupReportingDetails/updateState',
@@ -79,6 +102,19 @@ const SummaryCommentDetails = props => {
 
   const commentOptions = getCommentOptions()
 
+  const onSave = () => {
+    const { japaneseComment, englishComment } = values
+    if (
+      (!hasValue(japaneseComment) || !japaneseComment.trim().length) &&
+      (!hasValue(englishComment) || !englishComment.trim().length)
+    ) {
+      notification.warning({
+        message: 'Please input comment.',
+      })
+      return
+    }
+    if (handleSubmit) handleSubmit()
+  }
   return (
     <GridContainer>
       <GridItem
@@ -89,12 +125,13 @@ const SummaryCommentDetails = props => {
         <div style={{ position: 'absolute', left: 8, bottom: 2 }}>
           Category:
         </div>
-        <FastField
+        <Field
           name='selectCategory'
           render={args => (
             <CodeSelect
               valueField='id'
               code='CTSummaryCommentCategory'
+              disabled={!isEditEnable}
               {...args}
               onChange={() => {
                 setFieldValue('selectComment', undefined)
@@ -117,6 +154,7 @@ const SummaryCommentDetails = props => {
             <CodeSelect
               options={commentOptions}
               valueField='id'
+              disabled={!isEditEnable}
               labelField={
                 selectedLanguage === 'EN'
                   ? 'englishDisplayValue'
@@ -140,6 +178,7 @@ const SummaryCommentDetails = props => {
           render={args => (
             <MultipleTextField
               maxLength={2000}
+              disabled={!isEditEnable}
               autoSize={{ minRows: 4, maxRows: 4 }}
               {...args}
             />
@@ -147,17 +186,20 @@ const SummaryCommentDetails = props => {
         />
       </GridItem>
       <GridItem md={12} style={{ textAlign: 'right' }}>
-        <Button size='small' type='danger' onClick={onDiscard}>
+        <Button
+          size='small'
+          type='danger'
+          onClick={onDiscard}
+          disabled={!isEditEnable}
+        >
           Discard
         </Button>
         <Button
           size='small'
           type='primary'
           style={{ marginLeft: 10 }}
-          onClick={e => {
-            const { handleSubmit } = props
-            if (handleSubmit) handleSubmit()
-          }}
+          disabled={!isEditEnable}
+          onClick={onSave}
         >
           Save
         </Button>

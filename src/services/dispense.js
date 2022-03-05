@@ -11,9 +11,10 @@ const fns = {
     // console.log(url, params)
     return service.query(url, params)
   },
-  create: async visitFK => {
-    const r = await request(`${url}/${visitFK}`, {
+  create: async params => {
+    const r = await request(`${url}/${params.id}`, {
       method: 'POST',
+      body: params,
     })
     return r
   },

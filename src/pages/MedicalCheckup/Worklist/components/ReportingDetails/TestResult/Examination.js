@@ -10,12 +10,46 @@ import {
   dateFormatLong,
 } from '@/components'
 import moment from 'moment'
-import { Table, Button } from 'antd'
+import { Table, Button, Popover } from 'antd'
 import { useDispatch } from 'dva'
 import { DeleteFilled, EditFilled, CopyOutlined } from '@ant-design/icons'
-import { getUniqueId } from '@/utils/utils'
+import { getUniqueId, navigateDirtyCheck } from '@/utils/utils'
+import { EXAMINATION_STATUS } from '@/utils/constants'
 import customtyles from '../../Style.less'
 import IndividualCommentDetails from './IndividualCommentDetails'
+
+const getStatusIcon = status => {
+  if (!status) return ''
+
+  if (status === EXAMINATION_STATUS.NEW) {
+    return (
+      <Tooltip title='New'>
+        <div
+          style={{
+            borderRadius: 8,
+            height: 16,
+            width: 16,
+            border: '2px solid #4876FF',
+          }}
+        ></div>
+      </Tooltip>
+    )
+  }
+
+  return (
+    <Tooltip title={status}>
+      <div
+        style={{
+          borderRadius: 8,
+          height: 16,
+          width: 16,
+          backgroundColor:
+            status === EXAMINATION_STATUS.INPROGRESS ? '#1890FF' : '#009900',
+        }}
+      ></div>
+    </Tooltip>
+  )
+}
 
 const Examination = props => {
   const {
@@ -27,8 +61,11 @@ const Examination = props => {
     ctindividualcomment,
     queryIndividualCommentHistory,
     refreshMedicalCheckup,
+    isEditEnable = true,
   } = props
-  const [selectRow, setSelectRow] = useState(undefined)
+  const [selectExaminationItemId, setSelectExaminationItemId] = useState(
+    undefined,
+  )
   const [commentGroupList, setCommentGroupList] = useState([])
   const [dataSource, setDataSource] = useState([])
   const [columns, setColumns] = useState([])
@@ -57,14 +94,91 @@ const Examination = props => {
     setDataSource([
       ...dataSource.map(item => ({
         ...item,
-        isSelected: selectRow && !item.isGroup && item.id === selectRow,
+        isSelected:
+          selectExaminationItemId &&
+          !item.isGroup &&
+          item.id === selectExaminationItemId,
       })),
     ])
-  }, [selectRow])
+  }, [selectExaminationItemId])
 
   useEffect(() => {
     setData(medicalCheckupReportingDetails.individualCommentList)
-  }, [medicalCheckupReportingDetails.individualCommentList])
+    setCommentGroupList([])
+    setSelectExaminationItemId(undefined)
+  }, [medicalCheckupReportingDetails.individualCommentList, isEditEnable])
+
+  useEffect(() => {
+    if (!medicalCheckupReportingDetails.individualCommentEntity) {
+      setCommentGroupList([])
+      setSelectExaminationItemId(undefined)
+    }
+  }, [medicalCheckupReportingDetails.individualCommentEntity])
+
+  const renderExaminationType = row => {
+    return (
+      <div style={{ position: 'relative' }}>
+        <div
+          style={{
+            padding: row.isGroup ? 4 : '4px 24px 4px 10px',
+          }}
+        >
+          {row.examinationType}
+        </div>
+        <div style={{ position: 'absolute', right: 4, top: 6 }}>
+          {getStatusIcon(row.status)}
+        </div>
+      </div>
+    )
+  }
+
+  const renderExaminationItems = examinationItemService => {
+    return (
+      <div style={{ width: 300 }}>
+        <Table
+          size='small'
+          bordered
+          pagination={false}
+          dataSource={examinationItemService}
+          columns={[
+            {
+              dataIndex: 'serviceName',
+              title: <div style={{ padding: 4 }}>Examination</div>,
+              render: (text, row) => {
+                return <div style={{ padding: 4 }}>{text}</div>
+              },
+            },
+            {
+              dataIndex: 'status',
+              title: <div style={{ padding: 4 }}>Status</div>,
+              width: 100,
+              render: (text, row) => {
+                return (
+                  <div
+                    style={{
+                      padding: 4,
+                      color:
+                        row.status === EXAMINATION_STATUS.COMPLETED
+                          ? '#009900'
+                          : 'black',
+                    }}
+                  >
+                    {text}
+                  </div>
+                )
+              },
+            },
+          ]}
+          scroll={{ y: 600 }}
+          rowClassName={(record, index) => {
+            return index % 2 === 0 ? customtyles.once : customtyles.two
+          }}
+          className={customtyles.table}
+        ></Table>
+      </div>
+    )
+  }
+
   const setData = individualComment => {
     const { classes } = props
     const defaultData = getDataSource()
@@ -94,18 +208,31 @@ const Examination = props => {
         fixed: 'left',
         width: 120,
         render: (text, row) => {
-          return (
-            <div
-              style={{
-                padding: row.isGroup ? 4 : '4px 4px 4px 10px',
-              }}
+          return row.isGroup || !row.examinationItemService.length ? (
+            renderExaminationType(row)
+          ) : (
+            <Popover
+              placement='right'
+              content={renderExaminationItems(row.examinationItemService)}
             >
-              {text}
-            </div>
+              {renderExaminationType(row)}
+            </Popover>
           )
         },
         onCell: row => ({
-          style: { backgroundColor: row.isSelected ? 'red' : 'white' },
+          style: {
+            backgroundColor: row.isSelected
+              ? '#CCCCCC'
+              : row.isGroup
+              ? '#daecf5'
+              : 'white',
+            cursor:
+              !isEditEnable ||
+              row.isGroup ||
+              row.status !== EXAMINATION_STATUS.COMPLETED
+                ? 'default'
+                : 'pointer',
+          },
         }),
       },
     ]
@@ -143,30 +270,26 @@ const Examination = props => {
                     className={classes.commentContainer}
                   >
                     <Tooltip title={showValue}>
-                      <div
-                        style={{
-                          textOverflow: 'ellipsis',
-                          overflow: 'hidden',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {showValue}
-                      </div>
+                      <div>{showValue}</div>
                     </Tooltip>
                     <div
                       style={{ position: 'absolute', right: '-4px', top: 0 }}
                     >
-                      <Tooltip title='Copy Comment'>
-                        <IconButton
-                          size='small'
-                          color='primary'
-                          onClick={() => {
-                            copyComment(item.id)
-                          }}
-                        >
-                          <CopyOutlined />
-                        </IconButton>
-                      </Tooltip>
+                      {isEditEnable && index !== 0 ? (
+                        <Tooltip title='Copy Comment'>
+                          <IconButton
+                            size='small'
+                            color='primary'
+                            onClick={() => {
+                              copyComment(item.id)
+                            }}
+                          >
+                            <CopyOutlined />
+                          </IconButton>
+                        </Tooltip>
+                      ) : (
+                        ''
+                      )}
                     </div>
                   </div>
                 )
@@ -175,7 +298,19 @@ const Examination = props => {
           )
         },
         onCell: row => ({
-          style: { backgroundColor: row.isSelected ? 'red' : 'white' },
+          style: {
+            backgroundColor: row.isSelected
+              ? '#CCCCCC'
+              : row.isGroup
+              ? '#daecf5'
+              : 'white',
+            cursor:
+              !isEditEnable ||
+              row.isGroup ||
+              row.status !== EXAMINATION_STATUS.COMPLETED
+                ? 'default'
+                : 'pointer',
+          },
         }),
       })
     })
@@ -185,13 +320,27 @@ const Examination = props => {
       title: '',
       width: '100%',
       onCell: row => ({
-        style: { backgroundColor: row.isSelected ? 'red' : 'white' },
+        style: {
+          backgroundColor: row.isSelected
+            ? '#CCCCCC'
+            : row.isGroup
+            ? '#daecf5'
+            : 'white',
+          cursor:
+            !isEditEnable ||
+            row.isGroup ||
+            row.status !== EXAMINATION_STATUS.COMPLETED
+              ? 'default'
+              : 'pointer',
+        },
       }),
     })
     setColumns(defaultColumns)
   }
+
   const getDataSource = () => {
     let defaultData = []
+    const { examinationItem = [] } = medicalCheckupReportingDetails.entity
     ctexaminationcategory.forEach(category => {
       defaultData.push({
         id: category.id,
@@ -199,7 +348,7 @@ const Examination = props => {
         isGroup: true,
         selectedLanguage,
       })
-      const examinationitems = ctexaminationitem.filter(
+      const examinationitems = examinationItem.filter(
         item => item.examinationCategoryFK === category.id,
       )
       defaultData = defaultData.concat(
@@ -208,7 +357,10 @@ const Examination = props => {
           examinationType: item.displayValue,
           isGroup: false,
           selectedLanguage,
-          isSelected: selectRow && item.id === selectRow,
+          isSelected:
+            selectExaminationItemId && item.id === selectExaminationItemId,
+          status: item.status,
+          examinationItemService: item.examinationItemService,
         })),
       )
     })
@@ -238,6 +390,12 @@ const Examination = props => {
     const groupList = _.uniqBy(filterComment, 'groupNo').map(
       group => group.groupNo,
     )
+
+    for (let index = 1; index <= 6; index++) {
+      if (groupList.indexOf(index) < 0) {
+        groupList.push(index)
+      }
+    }
     setCommentGroupList(
       _.orderBy(
         groupList.map(group => ({
@@ -261,21 +419,28 @@ const Examination = props => {
         },
       },
     })
-    setSelectRow(row.id)
+    setSelectExaminationItemId(row.id)
   }
 
   const onSaveComment = () => {
     queryIndividualCommentHistory()
     refreshMedicalCheckup()
+    clearEditComment()
+  }
 
-    setCommentGroupList([])
+  const clearEditComment = () => {
     dispatch({
       type: 'medicalCheckupReportingDetails/updateState',
       payload: {
         individualCommentEntity: undefined,
       },
     })
-    setSelectRow(undefined)
+    dispatch({
+      type: 'medicalCheckupReportingDetails/updateState',
+      payload: {
+        individualCommentEntity: undefined,
+      },
+    })
   }
 
   const copyComment = id => {
@@ -291,15 +456,12 @@ const Examination = props => {
       refreshMedicalCheckup()
     })
   }
+
   return (
     <div
       style={{
         position: 'relative',
-        paddingRight: selectRow
-          ? commentGroupList.length
-            ? commentGroupList.length * 100
-            : 400
-          : 0,
+        paddingRight: selectExaminationItemId ? 610 : 0,
         height: height - 48,
         border: '1px solid #CCCCCC',
       }}
@@ -313,16 +475,24 @@ const Examination = props => {
             dataSource={dataSource}
             columns={columns}
             scroll={{ y: height - 90 }}
-            rowClassName={(record, index) => {
-              //if (!record.isGroup && record.id === selectRow)
-              //return customtyles.selectRow
-              //return index % 2 === 0 ? customtyles.once : customtyles.two
-            }}
             onRow={(record, rowIndex) => {
               return {
                 onClick: event => {
-                  if (record.isGroup) return
-                  selectExamination(record)
+                  if (
+                    !isEditEnable ||
+                    record.isGroup ||
+                    record.status !== EXAMINATION_STATUS.COMPLETED
+                  )
+                    return
+                  navigateDirtyCheck({
+                    displayName: 'IndividualCommentDetails',
+                    onProceed: () => {
+                      selectExamination(record)
+                    },
+                    onConfirm: () => {
+                      selectExamination(record)
+                    },
+                  })(event)
                 }, // click row
               }
             }}
@@ -330,12 +500,13 @@ const Examination = props => {
           ></Table>
         </GridItem>
       </GridContainer>
-      {selectRow && (
+      {selectExaminationItemId && (
         <div style={{ position: 'absolute', right: 0, top: 0 }}>
           <IndividualCommentDetails
             {...props}
             commentGroupList={commentGroupList}
             saveComment={onSaveComment}
+            clearEditComment={clearEditComment}
           />
         </div>
       )}

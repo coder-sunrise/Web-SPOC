@@ -216,7 +216,7 @@ export const formikMapPropsToValues = ({
         medicalCheckupWorkitem = [
           {
             reportPriority: 'Normal',
-            statusFK: MEDICALCHECKUP_WORKITEM_STATUS.NEW,
+            statusFK: MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS,
             reportLanguage: getMCReportLanguage(
               patientInfo,
               clinicSettings.settings,
@@ -539,7 +539,7 @@ export const formikHandleSubmit = (
         ),
         statusFK:
           values.medicalCheckupWorkitem[0].statusFK ||
-          MEDICALCHECKUP_WORKITEM_STATUS.NEW,
+          MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS,
       },
     ]
   } else if (

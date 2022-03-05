@@ -61,12 +61,12 @@ export default createListViewModel({
         const r = yield call(service.upsert, payload)
         if (r && !payload.id) {
           notification.success({ message: 'Lab specimen added.' })
-          return true
+          return r
         }
 
         if (payload.id && r && r === 204) {
           notification.success({ message: 'Lab specimen edited.' })
-          return true
+          return payload
         }
         return r
       },
