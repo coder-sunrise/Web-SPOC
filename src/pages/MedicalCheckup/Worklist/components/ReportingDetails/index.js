@@ -16,6 +16,7 @@ import {
   MEDICALCHECKUP_WORKITEM_STATUS,
   MEDICALCHECKUP_REPORTTYPE,
   MEDICALCHECKUP_REPORTSTATUS,
+  REPORTINGDOCTOR_STATUS,
 } from '@/utils/constants'
 import {
   DoubleLeftOutlined,
@@ -33,7 +34,6 @@ import {
 const styles = theme => ({
   commentContainer: {
     '& > div:last-child': {
-      //float: 'right',
       visibility: 'hidden',
     },
     '&:hover': {
@@ -54,6 +54,7 @@ const ReportingDetails = props => {
     onClose = () => {},
     clinicSettings,
   } = props
+  const reportingStatus = medicalCheckupReportingDetails.entity?.statusFK
   const { primaryPrintoutLanguage = 'EN' } = clinicSettings.settings
   const height = window.innerHeight
   const banner = document.getElementById('patientBanner')
@@ -142,8 +143,6 @@ const ReportingDetails = props => {
     })
   }
 
-  const reportingStatus = medicalCheckupReportingDetails.entity?.statusFK
-
   const clearEditComment = () => {
     dispatch({
       type: 'medicalCheckupReportingDetails/updateState',
@@ -163,11 +162,9 @@ const ReportingDetails = props => {
   }
 
   const getEditEnable = () => {
-    const medicalCheckupstatus = medicalCheckupReportingDetails.entity?.statusFK
     return (
-      medicalCheckupstatus !==
-        MEDICALCHECKUP_WORKITEM_STATUS.PENDINGVERIFICATION &&
-      medicalCheckupstatus !== MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED
+      reportingStatus !== MEDICALCHECKUP_WORKITEM_STATUS.PENDINGVERIFICATION &&
+      reportingStatus !== MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED
     )
   }
 
@@ -185,6 +182,20 @@ const ReportingDetails = props => {
         refreshMedicalCheckup()
       }
     })
+  }
+
+  const isEnableFinalReport = () => {
+    const { medicalCheckupWorkitemDoctor = [] } =
+      medicalCheckupReportingDetails.entity || {}
+    if (
+      reportingStatus === MEDICALCHECKUP_WORKITEM_STATUS.REPORTING &&
+      medicalCheckupWorkitemDoctor.filter(
+        x => x.status === REPORTINGDOCTOR_STATUS.VERIFIED,
+      ).length === medicalCheckupWorkitemDoctor.length
+    ) {
+      return true
+    }
+    return false
   }
   return (
     <div>
@@ -278,8 +289,7 @@ const ReportingDetails = props => {
                     Generate Temporary Report
                   </Button>
                 )}
-                {reportingStatus ===
-                  MEDICALCHECKUP_WORKITEM_STATUS.REPORTING && (
+                {isEnableFinalReport() && (
                   <Button
                     size='small'
                     type='primary'

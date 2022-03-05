@@ -10,6 +10,7 @@ import {
   Button,
   Tooltip,
   Popconfirm,
+  CommonModal,
 } from '@/components'
 import {
   CheckOutlined,
@@ -19,7 +20,8 @@ import {
 import Undo from '@material-ui/icons/Undo'
 import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 import { MEDICALCHECKUP_REPORTSTATUS } from '@/utils/constants'
-import customtyles from '../Style.less'
+import VerifyForm from './VerifyForm'
+import customtyles from '../../Style.less'
 
 const styles = theme => ({
   cell: {
@@ -34,6 +36,9 @@ const styles = theme => ({
 })
 
 const ReportHistory = props => {
+  const [showVerifyForm, setShowVerifyForm] = useState(false)
+  const [verifyRow, setVerifyRow] = useState(false)
+
   const {
     loading,
     patient,
@@ -44,17 +49,24 @@ const ReportHistory = props => {
     refreshMedicalCheckup,
     classes,
   } = props
+
   const height = window.innerHeight
-  const updateReportStatus = (row, status) => {
+  const updateReportStatus = (row, status, verifyRemarks) => {
     dispatch({
       type: 'medicalCheckupReportingDetails/updateReportStatus',
       payload: {
         ...row,
         status,
+        verifyRemarks,
       },
     }).then(r => {
       refreshMedicalCheckup()
     })
+  }
+
+  const onVerificationSave = value => {
+    updateReportStatus(verifyRow, value.status, value.verifyRemarks)
+    setShowVerifyForm(false)
   }
 
   const userProfileFK = user.data.clinicianProfile.userProfile.id
@@ -115,25 +127,41 @@ const ReportHistory = props => {
             },
             {
               dataIndex: 'status',
-              width: 130,
+              width: 100,
               title: <div className={classes.cell}>Status</div>,
               render: (text, row) => {
+                const verifyDate = row.verifyDate
+                  ? moment(row.verifyDate).format(dateFormatLongWithTimeNoSec)
+                  : ''
+                const verifyUser = `${
+                  hasValue(row.verifyByUserTitle) &&
+                  row.verifyByUserTitle.trim().length
+                    ? `${row.verifyByUserTitle}.`
+                    : ''
+                }${row.verifyByUser || ''}`
                 if (row.status === MEDICALCHECKUP_REPORTSTATUS.VERIFIED) {
-                  const verifyDate = moment(row.verifyDate).format(
-                    dateFormatLongWithTimeNoSec,
-                  )
-                  const verifyUser = `${
-                    hasValue(row.verifyByUserTitle) &&
-                    row.verifyByUserTitle.trim().length
-                      ? `${row.verifyByUserTitle}.`
-                      : ''
-                  }${row.verifyByUser || ''}`
                   return (
                     <Tooltip
                       title={
                         <div>
                           <div>Verified Date: {verifyDate}</div>
                           <div>Verified By: {verifyUser}</div>
+                          <div>Remarks: {row.verifyRemarks}</div>
+                        </div>
+                      }
+                    >
+                      <div className={classes.cell}>{row.status}</div>
+                    </Tooltip>
+                  )
+                }
+                if (row.status === MEDICALCHECKUP_REPORTSTATUS.REJECT) {
+                  return (
+                    <Tooltip
+                      title={
+                        <div>
+                          <div>Reject Date: {verifyDate}</div>
+                          <div>Reject By: {verifyUser}</div>
+                          <div>Remarks: {row.verifyRemarks}</div>
                         </div>
                       }
                     >
@@ -146,7 +174,7 @@ const ReportHistory = props => {
             },
             {
               dataIndex: 'action',
-              width: 115,
+              width: 111,
               title: <div className={classes.cell}>Action</div>,
               render: (text, row, index) => {
                 return (
@@ -164,10 +192,8 @@ const ReportHistory = props => {
                           size='sm'
                           justIcon
                           onClick={() => {
-                            updateReportStatus(
-                              row,
-                              MEDICALCHECKUP_REPORTSTATUS.VERIFIED,
-                            )
+                            setVerifyRow(row)
+                            setShowVerifyForm(true)
                           }}
                         >
                           <span className={classes.toDo}>TD</span>
@@ -211,6 +237,18 @@ const ReportHistory = props => {
           Close
         </Button>
       </div>
+      <CommonModal
+        open={showVerifyForm}
+        title='Report Verification'
+        onClose={() => {
+          setShowVerifyForm(false)
+        }}
+        maxWidth='sm'
+        observe='VerifyForm'
+        overrideLoading
+      >
+        <VerifyForm onVerificationSave={onVerificationSave} />
+      </CommonModal>
     </div>
   )
 }
