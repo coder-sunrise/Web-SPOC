@@ -291,6 +291,7 @@ export default compose(
           ...restValues,
           ...optionGrp,
           id,
+          isOnlyClinicInternalUsage: !optionGrp.isOnlyClinicInternalUsage,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],
           consumableStock: defaultConsumableStock,

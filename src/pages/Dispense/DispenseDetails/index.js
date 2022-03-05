@@ -1053,7 +1053,11 @@ const DispenseDetails = ({
             />
 
             {(hasAnySpecimenCollected || hasAnyLabWorkitems) && (
-              <DispenseDetailsSpecimenCollection visitId={visitId} />
+              <DispenseDetailsSpecimenCollection
+                handlePrint={handlePrint}
+                patient={patient}
+                visitId={visitId}
+              />
             )}
 
             <TableData
