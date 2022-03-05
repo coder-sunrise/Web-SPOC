@@ -1136,7 +1136,7 @@ class Lab extends PureComponent {
                         style={{
                           position: 'absolute',
                           bottom: 2,
-                          left: '330px',
+                          left: '380px',
                         }}
                         label='Charge Today'
                         onChange={e => {
@@ -1252,7 +1252,7 @@ class Lab extends PureComponent {
                         style={{
                           position: 'absolute',
                           bottom: 0,
-                          left: '330px',
+                          left: '380px',
                         }}
                         label='Charge Today'
                         onChange={e => {
