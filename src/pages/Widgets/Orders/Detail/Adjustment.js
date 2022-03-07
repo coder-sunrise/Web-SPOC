@@ -70,6 +70,7 @@ class Adjustment extends PureComponent {
                         autoFocus
                         currency
                         label='Adjustment'
+                        noSuffix
                         {...args}
                       />
                     )
@@ -78,6 +79,7 @@ class Adjustment extends PureComponent {
                     <NumberInput
                       percentage
                       autoFocus
+                      noSuffix
                       label='Adjustment'
                       {...args}
                     />

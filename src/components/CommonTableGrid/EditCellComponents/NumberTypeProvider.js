@@ -69,7 +69,7 @@ class NumberEditor extends PureComponent {
     commonCfg.defaultValue = value
 
     commonCfg.currency = currency || type === 'currency'
-    return <NumberInput {...commonCfg} />
+    return <NumberInput noSuffix {...commonCfg} />
   }
 
   render() {

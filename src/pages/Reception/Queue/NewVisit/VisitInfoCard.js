@@ -364,7 +364,7 @@ const VisitInfoCard = ({
             render={args => (
               <NumberInput
                 {...args}
-                format={isQueueNoDecimal ? '0.0' : '0'}
+                // format={isQueueNoDecimal ? '0.0' : '0'}
                 precision={isQueueNoDecimal ? 1 : 0}
                 // disabled={isReadOnly}
                 label={formatMessage({
@@ -372,6 +372,11 @@ const VisitInfoCard = ({
                 })}
                 formatter={value => {
                   const isNaN = Number.isNaN(parseFloat(value))
+                  console.log(
+                    isNaN
+                      ? value
+                      : parseFloat(value).toFixed(isQueueNoDecimal ? 1 : 0),
+                  )
                   return isNaN
                     ? value
                     : parseFloat(value).toFixed(isQueueNoDecimal ? 1 : 0)
@@ -458,6 +463,7 @@ const VisitInfoCard = ({
                   {...args}
                   currency
                   authority='none'
+                  suffix='$'
                   disabled={readOnly || isVisitReadonlyAfterSigned}
                   label={formatMessage({
                     id:

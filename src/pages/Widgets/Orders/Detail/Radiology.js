@@ -982,6 +982,7 @@ class Radiology extends PureComponent {
                     }}
                     min={0}
                     currency
+                    noSuffix
                     label='Adjustment'
                     onChange={e => {
                       editService.adjValue = e.target.value
@@ -1007,6 +1008,7 @@ class Radiology extends PureComponent {
                     }}
                     percentage
                     max={100}
+                    noSuffix
                     min={0}
                     label='Adjustment'
                     onChange={e => {

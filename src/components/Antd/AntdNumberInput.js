@@ -81,7 +81,7 @@ class AntdNumberInput extends React.PureComponent {
     allowEmpty: true,
     max: 999999999,
     min: -999999999,
-    debounceDuration: 1000,
+    debounceDuration: 500,
     precision: 1,
   }
 
@@ -119,42 +119,40 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   handleFocus = e => {
-    this.setState({
-      focused: true,
-    })
-    const { target } = e
-    setTimeout(() => {
-      const v = `${this.state.value}`
-
-      if (v) {
-        const dotIndex = v.indexOf('.') > 0 ? v.indexOf('.') : v.length
-
-        if (dotIndex) {
-          target.setSelectionRange(dotIndex, dotIndex)
-        }
-      }
-    }, 0)
+    // this.setState({
+    //   focused: true,
+    // })
+    // const { target } = e
+    // setTimeout(() => {
+    //   const v = `${this.state.value}`
+    //   if (v) {
+    //     const dotIndex = v.indexOf('.') > 0 ? v.indexOf('.') : v.length
+    //     if (dotIndex) {
+    //       target.setSelectionRange(dotIndex, dotIndex)
+    //     }
+    //   }
+    // }, 0)
   }
 
   handleBlur = e => {
-    let v = e.target.value
-    if (
-      !e.target.value &&
-      !this.props.allowEmpty &&
-      (this.props.min || this.props.min === 0)
-    ) {
-      v = this.props.min
-    }
-    this._onChange(
-      v || v === 0
-        ? roundTo(Number(v), this.state.convertedPrecision)
-        : undefined,
-    )
-
     this.debouncedOnChange.cancel()
-    this.setState({
-      focused: false,
-    })
+    // let v = e.target.value
+    // if (
+    //   !e.target.value &&
+    //   !this.props.allowEmpty &&
+    //   (this.props.min || this.props.min === 0)
+    // ) {
+    //   v = this.props.min
+    // }
+    // this._onChange(
+    //   v || v === 0
+    //     ? roundTo(Number(v), this.state.convertedPrecision)
+    //     : undefined,
+    // )
+    // this.debouncedOnChange.cancel()
+    // this.setState({
+    //   focused: false,
+    // })
   }
 
   _onChange = value => {
@@ -276,66 +274,64 @@ class AntdNumberInput extends React.PureComponent {
       min,
     }
 
-    if (!format) {
-      let precisionStr = '.'
-      for (let i = 0; i < extraCfg.precision; i++) {
-        precisionStr += '0'
-      }
-      if (currency) {
-        format = `$0,0` + (precisionStr.length > 1 ? precisionStr : '')
-      } else {
-        format = `0` + (precisionStr.length > 1 ? precisionStr : '')
-      }
-    }
-    if (currency) {
-      extraCfg.formatter = v => {
-        if (v === '') return ''
-        if (!this.state.focused) {
-          const nv = numeral(v)
-          if (nv._value < 0) return `(${numeral(Math.abs(v)).format(format)})`
+    // if (!format) {
+    //   let precisionStr = '.'
+    //   for (let i = 0; i < extraCfg.precision; i++) {
+    //     precisionStr += '0'
+    //   }
+    //   if (currency) {
+    //     format = `0,0` + (precisionStr.length > 1 ? precisionStr : '')
+    //   } else {
+    //     format = `0` + (precisionStr.length > 1 ? precisionStr : '')
+    //   }
+    // }
+    // if (currency) {
+    //   extraCfg.formatter = v => {
+    //     if (v === '') return ''
+    //     // if (!this.state.focused) {
+    //     //   const nv = numeral(v)
+    //     //   if (nv._value < 0) return `(${numeral(Math.abs(v)).format(format)})`
 
-          return nv.format(format)
-        }
-        return `${v}`
-      }
-    } else if (original) {
-      extraCfg.formatter = v => {
-        return v
-      }
-      extraCfg.max = extraCfg.max || 100
-      extraCfg.min = -100
-    } else if (percentage) {
-      if (!format) format = percentageFormat
+    //     //   console.log(nv.format(format))
+    //     //   return nv.format(format)
+    //     // }
+    //     console.log(numeral(v).format(format))
+    //     return numeral(v).format(format)
+    //   }
+    // } else if (original) {
+    //   extraCfg.formatter = v => {
+    //     return v
+    //   }
+    //   extraCfg.max = extraCfg.max || 100
+    //   extraCfg.min = -100
+    // } else if (percentage) {
+    //   if (!format) format = percentageFormat
 
-      extraCfg.formatter = v => {
-        if (v === '') return ''
-        if (!this.state.focused) {
-          if (v > 100) v = 100
-          return numeral(v / 100).format(percentageFormat)
-        }
-        return v
-      }
+    //   extraCfg.formatter = v => {
+    //     if (v === '') return ''
+    //     return numeral(v).format(percentageFormat)
+    //   }
 
-      extraCfg.max = extraCfg.max || 100
-      extraCfg.min = -100
-    } else if (formatter) {
-      extraCfg.formatter = v => {
-        if (v === '') return ''
+    //   extraCfg.max = extraCfg.max || 100
+    //   extraCfg.min = -100
+    // } else if (formatter) {
+    //   extraCfg.formatter = v => {
+    //     if (v === '') return ''
 
-        if (!this.state.focused) {
-          return formatter(v)
-        }
-        return v
-      }
-    } else if (format) {
-      extraCfg.formatter = v => {
-        if (v === '') return ''
-        if (!this.state.focused) {
-          return numeral(v).format(format)
-        }
-        return v
-      }
-    }
+    //     // if (!this.state.focused) {
+    //     //   return formatter(v)
+    //     // }
+    //     return formatter(v)
+    //   }
+    // } else if (format) {
+    //   extraCfg.formatter = v => {
+    //     if (v === '') return ''
+    //     // if (!this.state.focused) {
+    //     //   return numeral(v).format(format)
+    //     // }
+    //     return numeral(v).format(format)
+    //   }
+    // }
     if (!parser) {
       const dotPos =
         format && format.indexOf('.') >= 0
@@ -391,6 +387,7 @@ class AntdNumberInput extends React.PureComponent {
       currency,
       percentage,
       style,
+      precision,
       formatter,
       ...restProps
     } = this.props
@@ -400,12 +397,33 @@ class AntdNumberInput extends React.PureComponent {
         return <span>-</span>
 
       const cfg = this.getConfig()
+      let val = ''
+      let precisionStr = '.'
+      for (let i = 0; i < this.state.convertedPrecision; i++) {
+        precisionStr += '0'
+      }
+      let format = ''
+      if (currency) {
+        if (this.state.value < 0) {
+          format = `$0,0` + (precisionStr.length > 1 ? precisionStr : '')
+          val = `(${numeral(Math.abs(this.state.value)).format(format)})`
+        } else {
+          format = `$0,0` + (precisionStr.length > 1 ? precisionStr : '')
+          val = numeral(this.state.value).format(format)
+        }
+      } else if (percentage) {
+        format = `0` + (precisionStr.length > 1 ? precisionStr : '') + '%'
+        val = numeral(this.state.value).format(format)
+      } else {
+        format = `0` + (precisionStr.length > 1 ? precisionStr : '')
+        val = numeral(this.state.value).format(format)
+      }
       return (
         <AutosizeInput
           readOnly
           tabIndex='-1'
           inputClassName={props.className}
-          value={cfg.formatter(this.state.value)}
+          value={val}
         />
       )
     }
