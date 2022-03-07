@@ -1,11 +1,12 @@
 import { createFormViewModel } from 'medisys-model'
-import { connect } from "dva"
+import { connect } from 'dva'
 import service from '../services'
 import moment from 'moment'
 
 let companyTypes = [
   { id: 1, name: 'copayer' },
   { id: 2, name: 'supplier' },
+  { id: 3, name: 'manufacturer' },
 ]
 
 const { queryOne } = service
@@ -57,35 +58,35 @@ export default createFormViewModel({
           dispatch({
             type: 'queryCopayerDetails',
             payload: { id: query.id },
-          });
+          })
         }
       })
     },
     effects: {
       *queryCopayerDetails({ payload }, { call, put }) {
-        const response = yield call(queryOne, payload);
+        const response = yield call(queryOne, payload)
         yield put({
           type: 'copayerDetailsResult',
           payload: response.status === '200' ? response.data : {},
-        });
-      }
+        })
+      },
     },
     reducers: {
       copayerDetailsResult(state, { payload }) {
-        const data = payload;
+        const data = payload
         if (data.contactPersons && data.contactPersons.length > 0) {
-          for (let i = 0; i < data.contactPersons.length; i++){
-            data.contactPersons[i].key = i;
-            data.contactPersons[i].recordStatus = 'Existing';
-            data.contactPersons[i].isNewRecord = false;
+          for (let i = 0; i < data.contactPersons.length; i++) {
+            data.contactPersons[i].key = i
+            data.contactPersons[i].recordStatus = 'Existing'
+            data.contactPersons[i].isNewRecord = false
           }
         }
 
         if (data.informations && data.informations.length > 0) {
           for (let i = 0; i < data.informations.length; i++) {
-            data.informations[i].key = i;
-            data.informations[i].recordStatus = 'Existing';
-            data.informations[i].isNewRecord = false;
+            data.informations[i].key = i
+            data.informations[i].recordStatus = 'Existing'
+            data.informations[i].isNewRecord = false
           }
         }
 
@@ -94,9 +95,9 @@ export default createFormViewModel({
           entity: {
             ...data,
             effectiveDates: [data.effectiveStartDate, data.effectiveEndDate],
-          }
+          },
         }
       },
-    }
+    },
   },
 })

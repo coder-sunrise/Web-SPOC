@@ -25,6 +25,7 @@ import {
 class Filter extends PureComponent {
   state = {
     isCopayer: undefined,
+    isSupplier: undefined,
   }
 
   checkIsCopayer(name) {
@@ -33,12 +34,19 @@ class Filter extends PureComponent {
     })
   }
 
+  checkIsSupplier(name) {
+    this.setState({
+      isSupplier: name === 'supplier',
+    })
+  }
+
   render() {
     const { classes, history, route, settingCompany } = this.props
     const { name } = route
     const { companyType } = settingCompany
     this.checkIsCopayer(name)
-    const { isCopayer } = this.state
+    this.checkIsSupplier(name)
+    const { isCopayer, isSupplier } = this.state
     const newCopayerAccessRight = Authorized.check('copayer.newcopayer') || {
       rights: 'hidden',
     }
@@ -52,7 +60,11 @@ class Filter extends PureComponent {
                 return (
                   <TextField
                     label={
-                      isCopayer ? 'Co-Payer Code/Name' : 'Supplier Code/Name'
+                      isCopayer
+                        ? 'Co-Payer Code/Name'
+                        : isSupplier
+                        ? 'Supplier Code/Name'
+                        : 'Manufacturer Code/Name'
                     }
                     {...args}
                   />
@@ -135,8 +147,26 @@ class Filter extends PureComponent {
                       Add New
                     </Button>
                   )
-                ) : (
+                ) : isSupplier ? (
                   <Authorized authority='settings.supplier.newsupplier'>
+                    <Button
+                      color='primary'
+                      onClick={() => {
+                        this.props.dispatch({
+                          type: 'settingCompany/updateState',
+                          payload: {
+                            entity: undefined,
+                          },
+                        })
+                        this.props.toggleModal()
+                      }}
+                    >
+                      <Add />
+                      Add New
+                    </Button>
+                  </Authorized>
+                ) : (
+                  <Authorized authority='settings.manufacturer.newmanufacturer'>
                     <Button
                       color='primary'
                       onClick={() => {

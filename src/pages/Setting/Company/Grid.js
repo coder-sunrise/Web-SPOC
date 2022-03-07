@@ -30,8 +30,18 @@ class Grid extends PureComponent {
       if (accessRight && accessRight.rights === 'hidden') {
         return
       }
-    } else {
+    } else if (name === 'supplier') {
       const accessRight = Authorized.check('settings.supplier.supplierdetails')
+      if (accessRight && accessRight.rights !== 'enable') {
+        notification.error({
+          message: 'Current user is not authorized to access',
+        })
+        return
+      }
+    } else {
+      const accessRight = Authorized.check(
+        'settings.manufacturer.manufacturerdetails',
+      )
       if (accessRight && accessRight.rights !== 'enable') {
         notification.error({
           message: 'Current user is not authorized to access',
@@ -91,7 +101,8 @@ class Grid extends PureComponent {
                   { name: 'isActive', title: 'Status' },
                   { name: 'action', title: 'Action' },
                 ]
-              : [
+              : name === 'supplier'
+              ? [
                   { name: 'code', title: 'Company Code' },
                   { name: 'displayValue', title: 'Company Name' },
                   { name: 'contactPerson', title: 'Contact Person' },
@@ -99,6 +110,16 @@ class Grid extends PureComponent {
                   { name: 'officeNum', title: 'Office Number' },
                   { name: 'faxNo', title: 'Fax Number' },
                   { name: 'isGSTEnabled', title: 'GST Enable' },
+                  { name: 'isActive', title: 'Status' },
+                  { name: 'action', title: 'Action' },
+                ]
+              : [
+                  { name: 'code', title: 'Company Code' },
+                  { name: 'displayValue', title: 'Company Name' },
+                  { name: 'contactPerson', title: 'Contact Person' },
+                  { name: 'contactNo', title: 'Contact No.' },
+                  { name: 'officeNum', title: 'Office Number' },
+                  { name: 'faxNo', title: 'Fax Number' },
                   { name: 'isActive', title: 'Status' },
                   { name: 'action', title: 'Action' },
                 ]

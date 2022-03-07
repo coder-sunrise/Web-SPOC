@@ -180,7 +180,7 @@ class Detail extends PureComponent {
     } = props
     const { name } = route
     const isCopayer = name === 'copayer'
-
+    const isSupplier = name === 'supplier'
     const {
       isUserMaintainable,
       isGSTEnabled,
@@ -258,15 +258,27 @@ class Detail extends PureComponent {
                   </GridItem>
                 </React.Fragment>
               )}
-              <React.Fragment>
-                <GridItem md={4}>
-                  <Field
-                    name='adminCharge'
-                    render={args => {
-                      if (values.adminChargeType === 'ExactAmount') {
+              {(isCopayer || isSupplier) && (
+                <React.Fragment>
+                  <GridItem md={4}>
+                    <Field
+                      name='adminCharge'
+                      render={args => {
+                        if (values.adminChargeType === 'ExactAmount') {
+                          return (
+                            <NumberInput
+                              currency
+                              label='Corporate Charges'
+                              defaultValue='0.00'
+                              min={0}
+                              precision={2}
+                              {...args}
+                            />
+                          )
+                        }
                         return (
                           <NumberInput
-                            currency
+                            percentage
                             label='Corporate Charges'
                             defaultValue='0.00'
                             min={0}
@@ -274,36 +286,26 @@ class Detail extends PureComponent {
                             {...args}
                           />
                         )
-                      }
-                      return (
-                        <NumberInput
-                          percentage
-                          label='Corporate Charges'
-                          defaultValue='0.00'
-                          min={0}
-                          precision={2}
+                      }}
+                    />
+                  </GridItem>
+                  <GridItem md={2}>
+                    <Field
+                      name='adminChargeType'
+                      render={args => (
+                        <Switch
+                          checkedChildren='$'
+                          checkedValue='ExactAmount'
+                          unCheckedChildren='%'
+                          unCheckedValue='Percentage'
+                          label=' '
                           {...args}
                         />
-                      )
-                    }}
-                  />
-                </GridItem>
-                <GridItem md={2}>
-                  <Field
-                    name='adminChargeType'
-                    render={args => (
-                      <Switch
-                        checkedChildren='$'
-                        checkedValue='ExactAmount'
-                        unCheckedChildren='%'
-                        unCheckedValue='Percentage'
-                        label=' '
-                        {...args}
-                      />
-                    )}
-                  />
-                </GridItem>
-              </React.Fragment>
+                      )}
+                    />
+                  </GridItem>
+                </React.Fragment>
+              )}
 
               {isCopayer && (
                 <React.Fragment>
@@ -405,7 +407,7 @@ class Detail extends PureComponent {
               )}
               <React.Fragment>
                 <GridItem md={2}>
-                  {!isCopayer ? (
+                  {!isCopayer && isSupplier ? (
                     <div style={{ position: 'relative', top: 16 }}>
                       <CustomInput label='' disabled style={{ width: 0 }} />
                       <div
@@ -431,7 +433,7 @@ class Detail extends PureComponent {
                   )}
                 </GridItem>
                 <GridItem md={4}>
-                  {!isCopayer ? (
+                  {!isCopayer && isSupplier ? (
                     <Field
                       name='gstValue'
                       render={args => (
