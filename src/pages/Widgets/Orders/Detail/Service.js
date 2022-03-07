@@ -684,6 +684,7 @@ class Service extends PureComponent {
                             paddingRight: theme.spacing(6),
                           }}
                           currency
+                          noSuffix
                           label='Adjustment'
                           onChange={() => {
                             setTimeout(() => {
@@ -706,6 +707,7 @@ class Service extends PureComponent {
                           paddingRight: theme.spacing(6),
                         }}
                         percentage
+                        noSuffix
                         max={100}
                         label='Adjustment'
                         onChange={() => {
@@ -852,7 +854,7 @@ class Service extends PureComponent {
                                 style={{
                                   position: 'absolute',
                                   bottom: 2,
-                                  left: '330px',
+                                  left: '380px',
                                 }}
                                 label='Charge Today'
                                 {...args}

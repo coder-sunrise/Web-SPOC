@@ -68,10 +68,10 @@ export default {
   'inventory.master.pricing.lastCostPriceAftBonus':
     'Last Cost Price (After Bonus)',
   'inventory.master.pricing.averageCostPrice': 'Average Cost Price',
-  'inventory.master.pricing.profitMarginPercentage': 'Markup Margin (%)',
+  'inventory.master.pricing.profitMarginPercentage': 'Markup Margin',
   'inventory.master.pricing.suggestedSellingPrice': 'Suggested Selling Price',
   'inventory.master.pricing.sellingPrice': 'Selling Price',
-  'inventory.master.pricing.maxDiscount': 'Max Discount (%)',
+  'inventory.master.pricing.maxDiscount': 'Max Discount',
 
   'inventory.master.setting.dosage': 'Dosage',
   'inventory.master.setting.frequency': 'Frequency',

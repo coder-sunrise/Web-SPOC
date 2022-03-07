@@ -2689,6 +2689,7 @@ class Medication extends PureComponent {
                             paddingRight: theme.spacing(6),
                           }}
                           currency
+                          noSuffix
                           label='Adjustment'
                           disabled={
                             values.isExternalPrescription ||
@@ -2712,6 +2713,7 @@ class Medication extends PureComponent {
                           paddingRight: theme.spacing(6),
                         }}
                         percentage
+                        noSuffix
                         max={100}
                         label='Adjustment'
                         disabled={

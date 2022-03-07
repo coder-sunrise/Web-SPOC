@@ -985,6 +985,7 @@ class Lab extends PureComponent {
                     }}
                     min={0}
                     currency
+                    noSuffix
                     label='Adjustment'
                     onChange={e => {
                       editService.adjValue = e.target.value
@@ -1008,6 +1009,7 @@ class Lab extends PureComponent {
                       marginLeft: theme.spacing(7),
                       paddingRight: theme.spacing(6),
                     }}
+                    noSuffix
                     percentage
                     max={100}
                     min={0}
@@ -1136,7 +1138,7 @@ class Lab extends PureComponent {
                         style={{
                           position: 'absolute',
                           bottom: 2,
-                          left: '330px',
+                          left: '380px',
                         }}
                         label='Charge Today'
                         onChange={e => {
@@ -1252,7 +1254,7 @@ class Lab extends PureComponent {
                         style={{
                           position: 'absolute',
                           bottom: 0,
-                          left: '330px',
+                          left: '380px',
                         }}
                         label='Charge Today'
                         onChange={e => {

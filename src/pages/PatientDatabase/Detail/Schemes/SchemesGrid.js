@@ -32,6 +32,12 @@ class SchemesGrid extends PureComponent {
   state = {
     editingRowIds: [],
     rowChanges: {},
+    isPatientProfileSaved: false,
+  }
+
+  componentDidMount = () => {
+    const { values } = this.props
+    this.setState({ isPatientProfileSaved: values.id })
   }
 
   constructor(props) {
@@ -431,7 +437,7 @@ class SchemesGrid extends PureComponent {
                   size='sm'
                   justIcon
                   color='primary'
-                  disabled={!row.copayerFK || !values.id}
+                  disabled={row.id < 1}
                 >
                   <Print
                     onClick={() => {
