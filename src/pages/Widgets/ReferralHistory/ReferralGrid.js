@@ -30,12 +30,13 @@ class ReferralGrid extends PureComponent {
   }
 
   render () {
-    const { patientHistory, mainDivHeight = 700 } = this.props
+    const { patientHistory, mainDivHeight = 700, patient } = this.props
     let height = mainDivHeight - 300
     if (height < 300) height = 300
+    console.log(patient)
     return (
       <CommonTableGrid
-        getRowId={(r) => r.id}
+        getRowId={r => r.id}
         forceRender
         rows={patientHistory.patientReferralHistory.entity.data}
         TableProps={{
@@ -61,11 +62,11 @@ class ReferralGrid extends PureComponent {
           {
             columnName: 'action',
             sortingEnabled: false,
-            render: (row) => {
+            render: row => {
               return (
                 <Tooltip title='Edit'>
                   <Button
-                    disabled={!this.tableEditable}
+                    disabled={!this.tableEditable || !patient?.entity?.isActive}
                     size='sm'
                     onClick={() => {
                       this.editRow(row)
