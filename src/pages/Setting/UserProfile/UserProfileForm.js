@@ -8,6 +8,7 @@ import { FastField, Field } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Key from '@material-ui/icons/VpnKey'
+import { Tooltip } from '@/components'
 // common component
 import {
   Button,
@@ -190,12 +191,19 @@ const styles = theme => ({
 
     const userProfile = constructUserProfile(values, role)
 
-    const payload = {
+    let payload = {
       ...restValues,
       doctorProfile,
       effectiveStartDate: values.effectiveDates[0],
       effectiveEndDate: values.effectiveDates[1],
       userProfile,
+    }
+
+    if (payload.shortName === '') {
+      payload.shortName = undefined
+    }
+    if (payload.name_JP === '') {
+      payload.name_JP = undefined
     }
 
     dispatch({
@@ -485,6 +493,7 @@ class UserProfileForm extends React.PureComponent {
                         {...args}
                         label='User Group'
                         code='role'
+                        orderBy={[['name'], ['asc']]}
                         localFilter={item => {
                           if (
                             _oldRole &&
@@ -517,15 +526,7 @@ class UserProfileForm extends React.PureComponent {
                 <h4>Profile</h4>
               </GridItem>
               <GridContainer className={classes.indent}>
-                <GridItem md={6}>
-                  <FastField
-                    name='name'
-                    render={args => (
-                      <TextField {...args} label='Name' disabled={isEdit} />
-                    )}
-                  />
-                </GridItem>
-                <GridItem md={6}>
+                <GridItem md={2}>
                   <FastField
                     name='title'
                     render={args => (
@@ -539,24 +540,53 @@ class UserProfileForm extends React.PureComponent {
                     )}
                   />
                 </GridItem>
-                <GridItem md={6}>
+                <GridItem md={4}>
                   <FastField
-                    name='userAccountNo'
+                    name='name'
                     render={args => (
-                      <TextField {...args} label='User Account No.' />
+                      <Tooltip
+                        title='Name will display in report and printout.'
+                        placement='right'
+                      >
+                        <TextField {...args} label='Name' />
+                      </Tooltip>
                     )}
                   />
                 </GridItem>
                 <GridItem md={6}>
-                  <Field
-                    name='doctorProfile.doctorMCRNo'
+                  <FastField
+                    name='shortName'
                     render={args => (
-                      <TextField
-                        {...args}
-                        label='Doctor MCR No.'
-                        disabled={!canEditDoctorMCR}
-                      />
+                      <Tooltip
+                        title='Short Name will display in system for other users to identify.'
+                        placement='right'
+                      >
+                        <TextField
+                          maxLength={100}
+                          {...args}
+                          label='Short Name'
+                        />
+                      </Tooltip>
                     )}
+                  />
+                </GridItem>
+                <GridItem md={6}>
+                  <FastField
+                    name='name_JP'
+                    render={args => (
+                      <Tooltip
+                        title='Name (JP) will display in report and printout.'
+                        placement='right'
+                      >
+                        <TextField {...args} label='Name(JP)' />
+                      </Tooltip>
+                    )}
+                  />
+                </GridItem>
+                <GridItem md={6}>
+                  <FastField
+                    name='userAccountNo'
+                    render={args => <TextField {...args} label='Account No.' />}
                   />
                 </GridItem>
                 <GridItem md={2}>
@@ -587,10 +617,14 @@ class UserProfileForm extends React.PureComponent {
                   />
                 </GridItem>
                 <GridItem md={6}>
-                  <FastField
-                    name='genderFK'
+                  <Field
+                    name='doctorProfile.doctorMCRNo'
                     render={args => (
-                      <CodeSelect {...args} label='Gender' code='ctgender' />
+                      <TextField
+                        {...args}
+                        label='Doctor MCR No.'
+                        disabled={!canEditDoctorMCR}
+                      />
                     )}
                   />
                 </GridItem>
@@ -601,14 +635,14 @@ class UserProfileForm extends React.PureComponent {
                     render={args => <TextField {...args} label='Email' />}
                   />
                 </GridItem>
-
                 <GridItem md={6}>
                   <FastField
-                    name='designation'
-                    render={args => <TextField {...args} label='Designation' />}
+                    name='genderFK'
+                    render={args => (
+                      <CodeSelect {...args} label='Gender' code='ctgender' />
+                    )}
                   />
                 </GridItem>
-
                 <GridItem md={6}>
                   <FastField
                     name='dob'
@@ -617,9 +651,12 @@ class UserProfileForm extends React.PureComponent {
                     )}
                   />
                 </GridItem>
-
-                <GridItem md={6} />
-
+                <GridItem md={6}>
+                  <FastField
+                    name='designation'
+                    render={args => <TextField {...args} label='Designation' />}
+                  />
+                </GridItem>
                 <GridItem md={12}>
                   <FastField
                     name='effectiveDates'

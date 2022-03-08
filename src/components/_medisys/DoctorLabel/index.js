@@ -1,7 +1,7 @@
 import React, { memo } from 'react'
 import { Tooltip } from '@/components'
 
-const DoctorLabel = ({ doctor, hideMCR = true }) => {
+const DoctorLabel = ({ doctor, type = 'name', hideMCR = true }) => {
   let label = ''
   try {
     let { clinicianProfile, doctorMCRNo } = doctor
@@ -17,8 +17,11 @@ const DoctorLabel = ({ doctor, hideMCR = true }) => {
       if (clinicianProfile.doctorProfile)
         mcrNo = `(${clinicianProfile.doctorProfile.doctorMCRNo})`
     }
-
-    label = `${title}${clinicianProfile.name} ${mcrNo}`
+    let doctorName = clinicianProfile[type]
+    if (type == 'shortName' && !doctorName) {
+      doctorName = clinicianProfile['name']
+    }
+    label = `${title}${doctorName} ${mcrNo}`
   } catch (error) {
     // console.log({ error })
   }
