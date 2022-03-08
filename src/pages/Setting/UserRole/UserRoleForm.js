@@ -53,11 +53,12 @@ class UserRoleForm extends React.PureComponent {
               <GridItem md={4} className={classes.verticalSpacing}>
                 <FastField
                   name='role'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect
                       {...args}
                       label='Existing User Group'
                       code='role'
+                      orderBy={[['name'], ['asc']]}
                       onChange={this.onSelect}
                     />
                   )}

@@ -17,6 +17,7 @@ import {
   CommonTableGrid,
   GridContainer,
   GridItem,
+  CodeSelect,
   ProgressButton,
   Select,
   TextField,
@@ -109,6 +110,7 @@ class UserProfile extends React.Component {
 
   handleSearchClick = () => {
     const { dispatch, values } = this.props
+    console.log(values)
     dispatch({
       type: 'settingUserProfile/query',
       payload: {
@@ -121,6 +123,7 @@ class UserProfile extends React.Component {
         ],
         // current: 1,
         isActive: values.status,
+        'userProfileFKNavigation.userRole.roleId': values.userGroupFK,
       },
     })
   }
@@ -151,7 +154,7 @@ class UserProfile extends React.Component {
       <CardContainer hideHeader>
         <div className='filterBar'>
           <GridContainer>
-            <GridItem md={4}>
+            <GridItem md={2}>
               <FastField
                 name='searchQuery'
                 render={args => (
@@ -159,6 +162,19 @@ class UserProfile extends React.Component {
                     {...args}
                     label='Login Account / Name'
                     autocomplete='off'
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={2}>
+              <FastField
+                name='userGroupFK'
+                render={args => (
+                  <CodeSelect
+                    {...args}
+                    orderBy={[['name'], ['asc']]}
+                    label='User Group'
+                    code='role'
                   />
                 )}
               />
