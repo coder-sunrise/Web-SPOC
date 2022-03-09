@@ -39,6 +39,7 @@ const MultiLangCodeList = ({
   label,
   codeset,
   onChange,
+  isShowFreeText,
   isMultiLanguage,
   labelField,
 }) => {
@@ -69,11 +70,16 @@ const MultiLangCodeList = ({
     if (data && currentCodesetList) {
       setCodeList(
         currentCodesetList.length > 0
-          ? data.map(item => currentCodesetList.find(c => c.id === item))
+          ? data.map(item => {
+              return {
+                ...currentCodesetList.find(c => c.id === item.id),
+                freeText: item.freeText,
+              }
+            })
           : [],
       )
     }
-  }, [currentCodesetList, data]) 
+  }, [currentCodesetList, data])
   return (
     <List
       bordered
@@ -93,6 +99,7 @@ const MultiLangCodeList = ({
             </span>
             <span style={{ flexGrow: 1 }}>
               {item[isMultiLanguage ? 'displayValue' + language : labelField]}
+              <span>{isShowFreeText ? ` ${item.freeText || ''}` : ''}</span>
             </span>
             <span>
               <Tooltip title={`Remove ${label.toLowerCase()}`}>
@@ -101,6 +108,7 @@ const MultiLangCodeList = ({
                   color='danger'
                   size='sm'
                   id={item.id}
+                  style={{ position: 'relative', right: -10 }}
                   justIcon
                   rounded
                   onClick={() => removeItemFromList(item.id)}
