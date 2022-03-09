@@ -445,42 +445,71 @@ export default compose(
         inventoryMedication_MedicationIngredient,
         'sequence',
         'asc',
-      ).map(item => item.medicationIngredientFK)
+      ).map(item => {
+        return {
+          id: item.medicationIngredientFK,
+          freeText: item.concentration,
+        }
+      })
       let drugAllergies = _.orderBy(
         inventoryMedication_DrugAllergy,
         'sequence',
         'asc',
-      ).map(item => item.drugAllergyFK)
+      ).map(item => {
+        return {
+          id: item.drugAllergyFK,
+        }
+      })
 
       let medicationSideEffects = _.orderBy(
         inventoryMedication_MedicationSideEffect,
         'sequence',
         'asc',
-      ).map(item => item.medicationSideEffectFK)
+      ).map(item => {
+        return {
+          id: item.medicationSideEffectFK,
+        }
+      })
 
       let medicationPrecautions = _.orderBy(
         inventoryMedication_MedicationPrecaution,
         'sequence',
         'asc',
-      ).map(item => item.medicationPrecautionFK)
+      ).map(item => {
+        return {
+          id: item.medicationPrecautionFK,
+        }
+      })
 
       let medicationContraindications = _.orderBy(
         inventoryMedication_MedicationContraIndication,
         'sequence',
         'asc',
-      ).map(item => item.medicationContraIndicationFK)
+      ).map(item => {
+        return {
+          id: item.medicationContraIndicationFK,
+        }
+      })
 
       let medicationInteractions = _.orderBy(
         inventoryMedication_MedicationInteraction,
         'sequence',
         'asc',
-      ).map(item => item.medicationInteractionFK)
+      ).map(item => {
+        return {
+          id: item.medicationInteractionFK,
+        }
+      })
 
       let medicationGroups = _.orderBy(
         inventoryMedication_MedicationGroup,
         'sequence',
         'asc',
-      ).map(item => item.medicationGroupFK)
+      ).map(item => {
+        return {
+          id: item.medicationGroupFK,
+        }
+      })
 
       return {
         ...medicationDetails,
@@ -622,8 +651,9 @@ export default compose(
       if (medicationIngredients) {
         medicationIngredientList = medicationIngredients.map((item, index) => {
           return {
-            medicationIngredientFK: item,
+            medicationIngredientFK: item.id,
             sequence: index,
+            concentration: item.freeText,
             inventoryMedicationFK: id,
           }
         })
@@ -632,7 +662,7 @@ export default compose(
       let drugAllergyList = undefined
       if (drugAllergies) {
         drugAllergyList = drugAllergies.map(m => {
-          return { drugAllergyFK: m, inventoryMedicationFK: id }
+          return { drugAllergyFK: m.id, inventoryMedicationFK: id }
         })
       }
 
@@ -640,7 +670,7 @@ export default compose(
       if (medicationSideEffects) {
         sideEffectList = medicationSideEffects.map((item, index) => {
           return {
-            medicationSideEffectFK: item,
+            medicationSideEffectFK: item.id,
             sequence: index,
             inventoryMedicationFK: id,
           }
@@ -651,7 +681,7 @@ export default compose(
       if (medicationPrecautions) {
         precautionList = medicationPrecautions.map((item, index) => {
           return {
-            medicationPrecautionFK: item,
+            medicationPrecautionFK: item.id,
             sequence: index,
             inventoryMedicationFK: id,
           }
@@ -662,7 +692,7 @@ export default compose(
       if (medicationGroups) {
         groupList = medicationGroups.map((item, index) => {
           return {
-            medicationGroupFK: item,
+            medicationGroupFK: item.id,
             sequence: index,
             inventoryMedicationFK: id,
           }
@@ -674,7 +704,7 @@ export default compose(
         contraIndicationList = medicationContraindications.map(
           (item, index) => {
             return {
-              medicationContraIndicationFK: item,
+              medicationContraIndicationFK: item.id,
               sequence: index,
               inventoryMedicationFK: id,
             }
@@ -686,7 +716,7 @@ export default compose(
       if (medicationInteractions) {
         interactionList = medicationInteractions.map((item, index) => {
           return {
-            medicationInteractionFK: item,
+            medicationInteractionFK: item.id,
             sequence: index,
             inventoryMedicationFK: id,
           }

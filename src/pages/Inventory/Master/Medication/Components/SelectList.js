@@ -10,6 +10,7 @@ import {
   CodeSelect,
   NumberInput,
   Tooltip,
+  TextField,
   Button,
   notification,
 } from '@/components'
@@ -26,11 +27,13 @@ const SelectList = props => {
     note = '',
     isMultiLanguage,
     onChange,
+    isShowFreeText = false,
     labelField = 'displayValue',
     initialValue,
     ...restPros
   } = props
   const [currentSelected, setCurrentSelected] = useState(null)
+  const [freeText, setFreeText] = useState(null)
   const [listItems, setListItems] = useState([])
 
   useEffect(() => {
@@ -38,28 +41,26 @@ const SelectList = props => {
   }, [initialValue])
 
   const addItemToList = () => {
-                                const newListItems = [...listItems]
+    const newListItems = [...listItems]
 
-                                if (!currentSelected) return
+    if (!currentSelected) return
 
-                                const isDuplicate =
-                                  listItems.findIndex(
-                                    item => item === currentSelected.id,
-                                  ) >= 0
+    const isDuplicate =
+      listItems.findIndex(item => item.id === currentSelected.id) >= 0
 
-                                if (isDuplicate) {
-                                  notification.error({
-                                    message: `Selected ${label.toLowerCase()} is already in the list.`,
-                                  })
-                                  return
-                                }
+    if (isDuplicate) {
+      notification.error({
+        message: `Selected ${label.toLowerCase()} is already in the list.`,
+      })
+      return
+    }
 
-                                newListItems.push(currentSelected.id)
+    newListItems.push({ id: currentSelected.id, freeText: freeText })
 
-                                setListItems(newListItems)
-                                setCurrentSelected(null)
-                                if (onChange) onChange(newListItems)
-                              } 
+    setListItems(newListItems)
+    setCurrentSelected(null)
+    if (onChange) onChange(newListItems)
+  }
   return (
     <div>
       <SectionHeader style={{ marginBottom: 0 }}>{header}</SectionHeader>
@@ -68,7 +69,7 @@ const SelectList = props => {
           code={codeset}
           language={isMultiLanguage ? language : ''}
           localFilter={item => {
-            return listItems.findIndex(i => i === item.id) === -1
+            return listItems.findIndex(i => i.id === item.id) === -1
           }}
           max={10}
           value={currentSelected ? currentSelected.id : null}
@@ -79,6 +80,22 @@ const SelectList = props => {
             if (value && opt) setCurrentSelected(opt)
           }}
         />
+        {isShowFreeText && (
+          <TextField
+            label='Concentration'
+            maxLength={50}
+            style={{
+              position: 'relative',
+              width: 150,
+              top: -8,
+              marginLeft: 10,
+            }}
+            onChange={e => {
+              setFreeText(e.target.value)
+            }}
+            inputProps={{ maxLength: 50 }}
+          ></TextField>
+        )}
 
         <Button
           style={{ marginLeft: 15 }}
@@ -93,7 +110,7 @@ const SelectList = props => {
         </Button>
       </div>
 
-      <MultiLangCodeList data={listItems} {...props} />
+      <MultiLangCodeList isShowFreeText data={listItems} {...props} />
 
       <span
         style={{ fontStyle: 'italic', fontSize: '0.8rem', fontWeight: 400 }}
