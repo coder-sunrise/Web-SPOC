@@ -65,7 +65,7 @@ const initStream = () => {
     .build()
 
   connection.on('NewNotification', (type, response) => {
-    const { sender, message } = response
+    const { sender, message, list } = response
 
     const { dispatch, getState } = window.g_app._store
 
@@ -89,8 +89,12 @@ const initStream = () => {
       } = getState()
       if (sender !== user.data.clinicianProfile.name) {
         const { notifications = [] } = header
-
-        notifications.push(response)
+      if (type == 'AppNotification')
+      {
+        const notification = list.find(x => x.toUserFK === user.data.id)
+        if(notification) notifications.push(notification)
+      }
+      else notifications.push(response)
         dispatch({
           type: 'header/updateState',
           payload: notifications,
