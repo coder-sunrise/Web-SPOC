@@ -541,47 +541,51 @@ class UserProfileForm extends React.PureComponent {
                   />
                 </GridItem>
                 <GridItem md={4}>
-                  <FastField
-                    name='name'
-                    render={args => (
-                      <Tooltip
-                        title='Name will display in report and printout.'
-                        placement='right'
-                      >
-                        <TextField {...args} label='Name' />
-                      </Tooltip>
-                    )}
-                  />
+                  <Tooltip
+                    title='Name will display in report and printout.'
+                    placement='bottom-start'
+                  >
+                    <div>
+                      <FastField
+                        name='name'
+                        render={args => <TextField {...args} label='Name' />}
+                      />
+                    </div>
+                  </Tooltip>
                 </GridItem>
                 <GridItem md={6}>
-                  <FastField
-                    name='shortName'
-                    render={args => (
-                      <Tooltip
-                        title='Short Name will display in system for other users to identify.'
-                        placement='right'
-                      >
-                        <TextField
-                          maxLength={100}
-                          {...args}
-                          label='Short Name'
-                        />
-                      </Tooltip>
-                    )}
-                  />
+                  <Tooltip
+                    title='Short Name will display in system for other users to identify.'
+                    placement='bottom-start'
+                  >
+                    <div>
+                      <FastField
+                        name='shortName'
+                        render={args => (
+                          <TextField
+                            maxLength={100}
+                            {...args}
+                            label='Short Name'
+                          />
+                        )}
+                      />
+                    </div>
+                  </Tooltip>
                 </GridItem>
                 <GridItem md={6}>
-                  <FastField
-                    name='name_JP'
-                    render={args => (
-                      <Tooltip
-                        title='Name (JP) will display in report and printout.'
-                        placement='right'
-                      >
-                        <TextField {...args} label='Name(JP)' />
-                      </Tooltip>
-                    )}
-                  />
+                  <Tooltip
+                    title='Name (JP) will display in report and printout.'
+                    placement='bottom-start'
+                  >
+                    <div>
+                      <FastField
+                        name='name_JP'
+                        render={args => (
+                          <TextField {...args} label='Name (JP)' />
+                        )}
+                      />
+                    </div>
+                  </Tooltip>
                 </GridItem>
                 <GridItem md={6}>
                   <FastField
