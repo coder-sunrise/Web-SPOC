@@ -1124,7 +1124,7 @@ class Billing extends Component {
   updateInvoiceSignature = signature => {
     const { dispatch, values, patient, setFieldValue } = this.props
     const { thumbnail } = signature
-    if (thumbnail) {
+    if (thumbnail != values.invoice.signature) {
       this.setState({ hasNewSignature: true })
     }
     setFieldValue('invoice', {
