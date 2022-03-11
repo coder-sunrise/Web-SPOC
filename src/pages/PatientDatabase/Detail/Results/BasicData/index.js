@@ -29,7 +29,7 @@ class BasicData extends Component {
     }
   }
 
-  componentDidMount() {
+  componentWillReceiveProps(nextProps) {
     this.searchData()
   }
 
@@ -50,10 +50,11 @@ class BasicData extends Component {
   }
 
   loadData = () => {
-    const { dispatch, patientProfileFK } = this.props
+    const { dispatch, patientProfileFK, visitFK } = this.props
     dispatch({
       type: 'patientResults/queryBasicDataList',
       payload: {
+        apiCriteria: { VisitFK: visitFK },
         sort: [
           {
             sortby: 'visitDate',

@@ -3,6 +3,7 @@ import { compose } from 'redux'
 import Yup from '@/utils/yup'
 import { Button } from 'antd'
 import { connect } from 'dva'
+import _ from 'lodash'
 import moment from 'moment'
 import { useCodeTable } from '@/utils/hooks'
 import {
@@ -30,9 +31,12 @@ const SummaryCommentDetails = props => {
     handleSubmit,
   } = props
 
+  const [selectCategory, setSelectCategory] = useState()
+  const [selectComment, setSelectComment] = useState()
+
   useEffect(() => {
     if (medicalCheckupReportingDetails.isNeedToClearSummaryComment) {
-      setValues({})
+      clearValues()
       dispatch({
         type: 'medicalCheckupReportingDetails/updateState',
         payload: {
@@ -43,14 +47,21 @@ const SummaryCommentDetails = props => {
   }, [medicalCheckupReportingDetails.isNeedToClearSummaryComment])
 
   const onDiscard = () => {
+    clearValues()
     dispatch({
       type: 'medicalCheckupReportingDetails/updateState',
       payload: { summaryCommentEntity: undefined },
     })
+  }
+
+  const clearValues = () => {
     setValues({})
+    setSelectCategory(null)
+    setSelectComment(null)
   }
 
   const onSelectComment = (val, option) => {
+    setSelectComment(val)
     if (option) {
       setFieldValue(
         'originalJapaneseComment',
@@ -115,6 +126,8 @@ const SummaryCommentDetails = props => {
     }
     if (handleSubmit) handleSubmit()
   }
+
+  const isAnyChange = !_.isEmpty(window.dirtyForms['SummaryCommentDetails'])
   return (
     <GridContainer>
       <GridItem
@@ -125,19 +138,15 @@ const SummaryCommentDetails = props => {
         <div style={{ position: 'absolute', left: 8, bottom: 2 }}>
           Category:
         </div>
-        <Field
-          name='selectCategory'
-          render={args => (
-            <CodeSelect
-              valueField='id'
-              code='CTSummaryCommentCategory'
-              disabled={!isEditEnable}
-              {...args}
-              onChange={() => {
-                setFieldValue('selectComment', undefined)
-              }}
-            />
-          )}
+        <CodeSelect
+          valueField='id'
+          code='CTSummaryCommentCategory'
+          disabled={!isEditEnable}
+          value={selectCategory}
+          onChange={val => {
+            setSelectCategory(val)
+            setSelectComment(null)
+          }}
         />
       </GridItem>
       <GridItem
@@ -148,26 +157,20 @@ const SummaryCommentDetails = props => {
         <div style={{ position: 'absolute', left: 8, bottom: 2 }}>
           Template:
         </div>
-        <Field
-          name='selectComment'
-          render={args => (
-            <CodeSelect
-              options={commentOptions}
-              valueField='id'
-              disabled={!isEditEnable}
-              labelField={
-                selectedLanguage === 'EN'
-                  ? 'englishDisplayValue'
-                  : 'japaneseDisplayValue'
-              }
-              localFilter={item =>
-                !values.selectCategory ||
-                item.summaryCommentCategoryFK === values.selectCategory
-              }
-              {...args}
-              onChange={onSelectComment}
-            />
-          )}
+        <CodeSelect
+          options={commentOptions}
+          valueField='id'
+          disabled={!isEditEnable}
+          labelField={
+            selectedLanguage === 'EN'
+              ? 'englishDisplayValue'
+              : 'japaneseDisplayValue'
+          }
+          value={selectComment}
+          localFilter={item =>
+            !selectCategory || item.summaryCommentCategoryFK === selectCategory
+          }
+          onChange={onSelectComment}
         />
       </GridItem>
       <GridItem md={12}>
@@ -180,6 +183,7 @@ const SummaryCommentDetails = props => {
               maxLength={2000}
               disabled={!isEditEnable}
               autoSize={{ minRows: 4, maxRows: 4 }}
+              onChange={() => setFieldValue('isVerified', false)}
               {...args}
             />
           )}
@@ -198,7 +202,7 @@ const SummaryCommentDetails = props => {
           size='small'
           type='primary'
           style={{ marginLeft: 10 }}
-          disabled={!isEditEnable}
+          disabled={!isEditEnable || !isAnyChange}
           onClick={onSave}
         >
           Save
@@ -255,8 +259,11 @@ export default compose(
         payload: { ...newValue },
       }).then(r => {
         if (r) {
-          setValues({})
           saveComment()
+          dispatch({
+            type: 'medicalCheckupReportingDetails/updateState',
+            payload: { isNeedToClearSummaryComment: true },
+          })
         }
       })
     },

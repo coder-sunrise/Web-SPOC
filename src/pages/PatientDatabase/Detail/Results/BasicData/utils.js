@@ -44,7 +44,7 @@ export const defaultData = [
   },
   {
     id: 6,
-    type: 'Sa02 (%)',
+    type: 'SaO2 (%)',
     tableName: 'basicExaminations',
     fieldName: 'saO2',
   },

@@ -12,44 +12,16 @@ import {
 import moment from 'moment'
 import { Table, Button, Popover } from 'antd'
 import { useDispatch } from 'dva'
-import { DeleteFilled, EditFilled, CopyOutlined } from '@ant-design/icons'
+import {
+  DeleteFilled,
+  EditFilled,
+  CopyOutlined,
+  CheckCircleOutlined,
+} from '@ant-design/icons'
 import { getUniqueId, navigateDirtyCheck } from '@/utils/utils'
 import { EXAMINATION_STATUS } from '@/utils/constants'
 import customtyles from '../../Style.less'
 import IndividualCommentDetails from './IndividualCommentDetails'
-
-const getStatusIcon = status => {
-  if (!status) return ''
-
-  if (status === EXAMINATION_STATUS.NEW) {
-    return (
-      <Tooltip title='New'>
-        <div
-          style={{
-            borderRadius: 8,
-            height: 16,
-            width: 16,
-            border: '2px solid #4876FF',
-          }}
-        ></div>
-      </Tooltip>
-    )
-  }
-
-  return (
-    <Tooltip title={status}>
-      <div
-        style={{
-          borderRadius: 8,
-          height: 16,
-          width: 16,
-          backgroundColor:
-            status === EXAMINATION_STATUS.INPROGRESS ? '#1890FF' : '#009900',
-        }}
-      ></div>
-    </Tooltip>
-  )
-}
 
 const Examination = props => {
   const {
@@ -120,61 +92,20 @@ const Examination = props => {
       <div style={{ position: 'relative' }}>
         <div
           style={{
-            padding: row.isGroup ? 4 : '4px 24px 4px 10px',
+            padding: row.isGroup ? 4 : '4px 20px 4px 10px',
           }}
         >
           {row.examinationType}
         </div>
-        <div style={{ position: 'absolute', right: 4, top: 6 }}>
-          {getStatusIcon(row.status)}
-        </div>
-      </div>
-    )
-  }
-
-  const renderExaminationItems = examinationItemService => {
-    return (
-      <div style={{ width: 300 }}>
-        <Table
-          size='small'
-          bordered
-          pagination={false}
-          dataSource={examinationItemService}
-          columns={[
-            {
-              dataIndex: 'serviceName',
-              title: <div style={{ padding: 4 }}>Examination</div>,
-              render: (text, row) => {
-                return <div style={{ padding: 4 }}>{text}</div>
-              },
-            },
-            {
-              dataIndex: 'status',
-              title: <div style={{ padding: 4 }}>Status</div>,
-              width: 100,
-              render: (text, row) => {
-                return (
-                  <div
-                    style={{
-                      padding: 4,
-                      color:
-                        row.status === EXAMINATION_STATUS.COMPLETED
-                          ? '#009900'
-                          : 'black',
-                    }}
-                  >
-                    {text}
-                  </div>
-                )
-              },
-            },
-          ]}
-          scroll={{ y: 600 }}
-          rowClassName={(record, index) => {
-            return index % 2 === 0 ? customtyles.once : customtyles.two
-          }}
-          className={customtyles.table}
-        ></Table>
+        {row.status === EXAMINATION_STATUS.COMPLETED && (
+          <div style={{ position: 'absolute', right: 4, top: 6 }}>
+            <Tooltip title='Completed'>
+              <CheckCircleOutlined
+                style={{ color: '#009900', fontSize: '1rem' }}
+              />
+            </Tooltip>
+          </div>
+        )}
       </div>
     )
   }
@@ -208,16 +139,7 @@ const Examination = props => {
         fixed: 'left',
         width: 120,
         render: (text, row) => {
-          return row.isGroup || !row.examinationItemService.length ? (
-            renderExaminationType(row)
-          ) : (
-            <Popover
-              placement='right'
-              content={renderExaminationItems(row.examinationItemService)}
-            >
-              {renderExaminationType(row)}
-            </Popover>
-          )
+          return renderExaminationType(row)
         },
         onCell: row => ({
           style: {
@@ -226,12 +148,7 @@ const Examination = props => {
               : row.isGroup
               ? '#daecf5'
               : 'white',
-            cursor:
-              !isEditEnable ||
-              row.isGroup ||
-              row.status !== EXAMINATION_STATUS.COMPLETED
-                ? 'default'
-                : 'pointer',
+            cursor: !isEditEnable || row.isGroup ? 'default' : 'pointer',
           },
         }),
       },
@@ -304,12 +221,7 @@ const Examination = props => {
               : row.isGroup
               ? '#daecf5'
               : 'white',
-            cursor:
-              !isEditEnable ||
-              row.isGroup ||
-              row.status !== EXAMINATION_STATUS.COMPLETED
-                ? 'default'
-                : 'pointer',
+            cursor: !isEditEnable || row.isGroup ? 'default' : 'pointer',
           },
         }),
       })
@@ -326,12 +238,7 @@ const Examination = props => {
             : row.isGroup
             ? '#daecf5'
             : 'white',
-          cursor:
-            !isEditEnable ||
-            row.isGroup ||
-            row.status !== EXAMINATION_STATUS.COMPLETED
-              ? 'default'
-              : 'pointer',
+          cursor: !isEditEnable || row.isGroup ? 'default' : 'pointer',
         },
       }),
     })
@@ -456,7 +363,6 @@ const Examination = props => {
       refreshMedicalCheckup()
     })
   }
-
   return (
     <div
       style={{
@@ -478,12 +384,7 @@ const Examination = props => {
             onRow={(record, rowIndex) => {
               return {
                 onClick: event => {
-                  if (
-                    !isEditEnable ||
-                    record.isGroup ||
-                    record.status !== EXAMINATION_STATUS.COMPLETED
-                  )
-                    return
+                  if (!isEditEnable || record.isGroup) return
                   navigateDirtyCheck({
                     displayName: 'IndividualCommentDetails',
                     onProceed: () => {

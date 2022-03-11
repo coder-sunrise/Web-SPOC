@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { MultipleTextField, Field, withFormikExtend } from '@/components'
-import { Button } from 'antd'
+import {
+  MultipleTextField,
+  Field,
+  withFormikExtend,
+  Button,
+} from '@/components'
 import { compose } from 'redux'
 import Yup from '@/utils/yup'
 import { MEDICALCHECKUP_REPORTSTATUS } from '@/utils/constants'
@@ -23,21 +27,22 @@ const VerifyForm = props => {
         />
       </div>
       <div style={{ textAlign: 'right', padding: '8px 0px' }}>
-        <Button type='danger' onClick={onClose} style={{ marginRight: 8 }}>
+        <Button color='danger' size='sm' onClick={onClose}>
           Cancel
         </Button>
         <Button
-          type='primary'
+          color='primary'
+          size='sm'
           onClick={async () => {
             await setFieldValue('status', MEDICALCHECKUP_REPORTSTATUS.REJECT)
             handleSubmit()
           }}
-          style={{ marginRight: 8 }}
         >
           Reject
         </Button>
         <Button
-          type='primary'
+          color='success'
+          size='sm'
           onClick={async () => {
             await setFieldValue('status', MEDICALCHECKUP_REPORTSTATUS.VERIFIED)
             handleSubmit()

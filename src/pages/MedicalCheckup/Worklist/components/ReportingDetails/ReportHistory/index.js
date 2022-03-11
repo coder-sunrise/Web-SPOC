@@ -11,15 +11,15 @@ import {
   Tooltip,
   Popconfirm,
   CommonModal,
+  dateFormatLong,
 } from '@/components'
-import {
-  CheckOutlined,
-  PrinterOutlined,
-  CloudDownloadOutlined,
-} from '@ant-design/icons'
+import Print from '@material-ui/icons/Print'
 import Undo from '@material-ui/icons/Undo'
 import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 import { MEDICALCHECKUP_REPORTSTATUS } from '@/utils/constants'
+import withWebSocket from '@/components/Decorator/withWebSocket'
+import { commonDataReaderTransform } from '@/utils/utils'
+import { getReportContext } from '@/services/report'
 import VerifyForm from './VerifyForm'
 import customtyles from '../../Style.less'
 
@@ -48,6 +48,7 @@ const ReportHistory = props => {
     onClose,
     refreshMedicalCheckup,
     classes,
+    handlePreviewReport,
   } = props
 
   const height = window.innerHeight
@@ -70,6 +71,91 @@ const ReportHistory = props => {
   }
 
   const userProfileFK = user.data.clinicianProfile.userProfile.id
+
+  const printReport = async row => {
+    dispatch({
+      type: 'medicalCheckupReportingDetails/queryReportData',
+      payload: {
+        id: row.id,
+      },
+    }).then(response => {
+      if (response && response.status === '200') {
+        const {
+          patientInfo = [],
+          basicExamination = [],
+          visualAcuity = [],
+          intraocularPressure = [],
+          audiometry = [],
+          individualComment = [],
+          summaryComment = [],
+          labTestPanel = [],
+          reportContext = [],
+        } = response.data
+        const printData = {
+          PatientInfo: patientInfo.map(p => ({
+            ...p,
+            patientAge: p.patientAge ? `${p.patientAge}` : '',
+            patientDOB: p.patientDOB
+              ? moment(p.patientDOB).format(dateFormatLong)
+              : '',
+            visitDate: p.visitDate
+              ? moment(p.visitDate).format(dateFormatLong)
+              : '',
+            currentDate: p.currentDate
+              ? moment(p.currentDate).format(dateFormatLong)
+              : '',
+            lastDate: p.lastDate
+              ? moment(p.lastDate).format(dateFormatLong)
+              : '',
+            beforeLastDate: p.beforeLastDate
+              ? moment(p.beforeLastDate).format(dateFormatLong)
+              : '',
+          })),
+          BasicExamination: basicExamination,
+          VisualAcuity: visualAcuity,
+          IntraocularPressure: intraocularPressure,
+          Audiometry: audiometry,
+          IndividualComment: individualComment,
+          SummaryComment: summaryComment,
+          LabTestPanel: labTestPanel,
+          ReportContext: reportContext.map(o => {
+            const {
+              customLetterHeadHeight = 0,
+              isDisplayCustomLetterHead = false,
+              standardHeaderInfoHeight = 0,
+              isDisplayStandardHeader = false,
+              footerInfoHeight = 0,
+              isDisplayFooterInfo = false,
+              footerDisclaimerHeight = 0,
+              isDisplayFooterInfoDisclaimer = false,
+              ...restProps
+            } = o
+            return {
+              customLetterHeadHeight,
+              isDisplayCustomLetterHead,
+              standardHeaderInfoHeight,
+              isDisplayStandardHeader,
+              footerInfoHeight,
+              isDisplayFooterInfo,
+              footerDisclaimerHeight,
+              isDisplayFooterInfoDisclaimer,
+              ...restProps,
+            }
+          }),
+        }
+        const payload = [
+          {
+            ReportId: 93,
+            Copies: 1,
+            ReportData: JSON.stringify({
+              ...commonDataReaderTransform(printData),
+            }),
+          },
+        ]
+        handlePreviewReport(JSON.stringify(payload))
+      }
+    })
+  }
   return (
     <div style={{ padding: '0px 8px' }}>
       <div style={{ height: height - 270 }}>
@@ -114,7 +200,7 @@ const ReportHistory = props => {
             },
             {
               dataIndex: 'generateByUser',
-              title: <div className={classes.cell}>Generate By User</div>,
+              title: <div className={classes.cell}>Generate By</div>,
               render: (text, row) => {
                 const name = `${
                   hasValue(row.generateByUserTitle) &&
@@ -126,64 +212,78 @@ const ReportHistory = props => {
               },
             },
             {
-              dataIndex: 'status',
-              width: 100,
-              title: <div className={classes.cell}>Status</div>,
+              dataIndex: 'verifyDate',
+              width: 130,
+              title: <div className={classes.cell}>Verify Date</div>,
               render: (text, row) => {
-                const verifyDate = row.verifyDate
-                  ? moment(row.verifyDate).format(dateFormatLongWithTimeNoSec)
-                  : ''
-                const verifyUser = `${
+                return (
+                  <div className={classes.cell}>
+                    {row.verifyDate
+                      ? moment(row.verifyDate).format(
+                          dateFormatLongWithTimeNoSec,
+                        )
+                      : ''}
+                  </div>
+                )
+              },
+            },
+            {
+              dataIndex: 'verifyByUser',
+              title: <div className={classes.cell}>Verify By</div>,
+              render: (text, row) => {
+                const name = `${
                   hasValue(row.verifyByUserTitle) &&
                   row.verifyByUserTitle.trim().length
                     ? `${row.verifyByUserTitle}.`
                     : ''
                 }${row.verifyByUser || ''}`
-                if (row.status === MEDICALCHECKUP_REPORTSTATUS.VERIFIED) {
-                  return (
-                    <Tooltip
-                      title={
-                        <div>
-                          <div>Verified Date: {verifyDate}</div>
-                          <div>Verified By: {verifyUser}</div>
-                          <div>Remarks: {row.verifyRemarks}</div>
-                        </div>
-                      }
-                    >
-                      <div className={classes.cell}>{row.status}</div>
-                    </Tooltip>
-                  )
-                }
-                if (row.status === MEDICALCHECKUP_REPORTSTATUS.REJECT) {
-                  return (
-                    <Tooltip
-                      title={
-                        <div>
-                          <div>Reject Date: {verifyDate}</div>
-                          <div>Reject By: {verifyUser}</div>
-                          <div>Remarks: {row.verifyRemarks}</div>
-                        </div>
-                      }
-                    >
-                      <div className={classes.cell}>{row.status}</div>
-                    </Tooltip>
-                  )
-                }
-                return <div className={classes.cell}>{row.status}</div>
+                return <div className={classes.cell}>{name}</div>
+              },
+            },
+            {
+              dataIndex: 'verifyRemarks',
+              title: <div className={classes.cell}>Remarks</div>,
+              render: (text, row) => {
+                return row.status ===
+                  MEDICALCHECKUP_REPORTSTATUS.PENDINGVERIFY ? (
+                  ''
+                ) : (
+                  <div className={classes.cell}>{row.verifyRemarks || '-'}</div>
+                )
+              },
+            },
+            {
+              dataIndex: 'status',
+              width: 130,
+              align: 'center',
+              title: <div className={classes.cell}>Verification Status</div>,
+              render: (text, row) => {
+                return (
+                  <div className={classes.cell} style={{ fontStyle: 'italic' }}>
+                    {row.status}
+                  </div>
+                )
               },
             },
             {
               dataIndex: 'action',
-              width: 111,
+              width: 80,
               title: <div className={classes.cell}>Action</div>,
               render: (text, row, index) => {
                 return (
                   <div className={classes.cell}>
-                    <Tooltip title='Print'>
-                      <Button color='primary' size='sm' justIcon>
-                        <PrinterOutlined />
-                      </Button>
-                    </Tooltip>
+                    {row.status !== MEDICALCHECKUP_REPORTSTATUS.REJECT && (
+                      <Tooltip title='Print'>
+                        <Button
+                          color='primary'
+                          size='sm'
+                          justIcon
+                          onClick={() => printReport(row)}
+                        >
+                          <Print />
+                        </Button>
+                      </Tooltip>
+                    )}
                     {row.status ===
                       MEDICALCHECKUP_REPORTSTATUS.PENDINGVERIFY && (
                       <Tooltip title='To do'>
@@ -200,7 +300,9 @@ const ReportHistory = props => {
                         </Button>
                       </Tooltip>
                     )}
-                    {row.status === MEDICALCHECKUP_REPORTSTATUS.PENDINGVERIFY &&
+                    {false &&
+                      row.status ===
+                        MEDICALCHECKUP_REPORTSTATUS.PENDINGVERIFY &&
                       userProfileFK === row.generateByUserFK && (
                         <Popconfirm
                           title='Are you sure?'
@@ -253,10 +355,12 @@ const ReportHistory = props => {
   )
 }
 
-export default compose(
-  withStyles(styles),
-  connect(({ medicalCheckupReportingDetails, user }) => ({
-    medicalCheckupReportingDetails,
-    user,
-  })),
-)(ReportHistory)
+export default withWebSocket()(
+  compose(
+    withStyles(styles),
+    connect(({ medicalCheckupReportingDetails, user }) => ({
+      medicalCheckupReportingDetails,
+      user,
+    })),
+  )(ReportHistory),
+)

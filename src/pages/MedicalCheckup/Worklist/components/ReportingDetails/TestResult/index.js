@@ -12,12 +12,19 @@ const TestResult = props => {
   const ctexaminationcategory = useCodeTable('ctexaminationcategory')
   const ctexaminationitem = useCodeTable('ctexaminationitem')
   const ctindividualcomment = useCodeTable('ctindividualcomment')
-  const { height, setShowResultDetails } = props
+  const { height, setShowResultDetails, medicalCheckupReportingDetails } = props
   const options = [
     {
       id: 0,
       name: 'Basic Data',
-      content: <BasicData height={height - 52} defaultSelectMedicalCheckup />,
+      content: (
+        <BasicData
+          height={height - 52}
+          defaultSelectMedicalCheckup
+          visitFK={medicalCheckupReportingDetails.visitID}
+          patientProfileFK={medicalCheckupReportingDetails.patientID}
+        />
+      ),
     },
     {
       id: 1,
