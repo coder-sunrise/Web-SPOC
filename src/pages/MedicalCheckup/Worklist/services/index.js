@@ -33,5 +33,8 @@ const fns = {
   updateReportStatus: params =>
     service.upsert(`${url}/UpdateReportStatus`, params),
   unlock: params => service.upsert(`${url}/Unlock`, params),
+  queryReportData: params => service.query(`${url}/GetReportData`, params),
+  queryLastReportData: params =>
+    service.query(`${url}/GetLastReportData`, params),
 }
 export default fns

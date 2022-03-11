@@ -87,6 +87,7 @@ const IndividualComment = ({
                       changed: {
                         [row.id]: {
                           japaneseComment: e.target.value,
+                          isVerified: false,
                         },
                       },
                     })
@@ -114,6 +115,7 @@ const IndividualComment = ({
                       changed: {
                         [row.id]: {
                           englishComment: e.target.value,
+                          isVerified: false,
                         },
                       },
                     })

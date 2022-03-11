@@ -257,7 +257,7 @@ const SummaryComment = props => {
             pagination={false}
             dataSource={commentList}
             columns={columns}
-            scroll={{ y: height - 320 }}
+            scroll={{ y: height - 300 }}
             rowClassName={(record, index) => {
               return index % 2 === 0 ? customtyles.once : customtyles.two
             }}
@@ -307,7 +307,7 @@ const SummaryComment = props => {
       )
       if (
         currentDoctor &&
-        currentDoctor.status !== REPORTINGDOCTOR_STATUS.COMMENTDONE
+        currentDoctor.status !== REPORTINGDOCTOR_STATUS.COMMENTVERIFYING
       ) {
         return true
       }
@@ -334,7 +334,10 @@ const SummaryComment = props => {
     ).find(
       item => item.userProfileFK === user.data.clinicianProfile.userProfile.id,
     )
-    updateReportingDoctor(currentDoctor, REPORTINGDOCTOR_STATUS.COMMENTDONE)
+    updateReportingDoctor(
+      currentDoctor,
+      REPORTINGDOCTOR_STATUS.COMMENTVERIFYING,
+    )
   }
 
   const updateReportingDoctor = (reportingDoctor, status) => {
@@ -408,7 +411,7 @@ const SummaryComment = props => {
                   onCommentAsDone()
                 }}
               >
-                Mark As Comments Done
+                Complete Comment
               </span>
             </Link>
           )}
@@ -425,7 +428,7 @@ const SummaryComment = props => {
           />
         </div>
       </div>
-      <div style={{ height: height - 230 }}>
+      <div style={{ height: height - 210 }}>
         <Tabs
           options={commentOption}
           tabBarStyle={{ paddingRight: 8 }}

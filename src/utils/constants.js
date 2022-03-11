@@ -1049,7 +1049,7 @@ export const DISPENSE_FROM = {
 
 export const REPORTINGDOCTOR_STATUS = {
   NEW: 'New',
-  COMMENTDONE: 'CommentDone',
+  COMMENTVERIFYING: 'Comment Verifying',
   VERIFIED: 'Verified',
 }
 
@@ -1061,8 +1061,8 @@ export const MEDICALCHECKUP_REPORTTYPE = {
 export const MEDICALCHECKUP_REPORTSTATUS = {
   PENDINGVERIFY: 'Pending Verify',
   VERIFIED: 'Verified',
-  REJECT: 'Reject',
-  DISCARD: 'Discard',
+  REJECT: 'Rejected',
+  DISCARD: 'Discarded',
   ABANDONED: 'Abandoned',
 }
 

@@ -93,7 +93,7 @@ const ExternalService = props => {
                           }}
                           onClick={e => {
                             e.preventDefault()
-                            onPreview(result)
+                            //onPreview(result)
                           }}
                         >
                           {result.fileName}

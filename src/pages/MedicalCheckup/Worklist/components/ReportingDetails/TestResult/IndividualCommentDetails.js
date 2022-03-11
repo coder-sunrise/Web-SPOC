@@ -52,10 +52,8 @@ const styles = theme => ({
   mapPropsToValues: ({ medicalCheckupReportingDetails }) => {
     return medicalCheckupReportingDetails.individualCommentEntity || {}
   },
-  validationSchema: Yup.object().shape({
-    //comment: Yup.string().required(),
-  }),
-  handleSubmit: (values, { props, resetForm }) => {
+  validationSchema: Yup.object().shape({}),
+  handleSubmit: (values, { props }) => {
     const {
       medicalCheckupReportingDetails,
       dispatch,
@@ -105,6 +103,29 @@ class IndividualCommentDetails extends PureComponent {
     super(props)
     this.state = { selectedItem: {}, searchValue: undefined }
   }
+
+  componentWillReceiveProps(nextProps) {
+    if (
+      this.props.medicalCheckupReportingDetails.isNeedToClearIndividualComment
+    ) {
+      const { dispatch } = this.props
+      this.setState({
+        selectedItem: {},
+        searchValue: undefined,
+        englishComment: undefined,
+        originalEnglishComment: undefined,
+        japaneseComment: undefined,
+        originalJapaneseComment: undefined,
+      })
+      dispatch({
+        type: 'medicalCheckupReportingDetails/updateState',
+        payload: {
+          isNeedToClearIndividualComment: false,
+        },
+      })
+    }
+  }
+
   generateComment = () => {
     const { setFieldValue } = this.props
     const { selectedItem } = this.state
@@ -137,10 +158,13 @@ class IndividualCommentDetails extends PureComponent {
         japaneseComment ? `${japaneseComment} ` : ''
       }${strJapanese}`
     })
-    setFieldValue('originalJapaneseComment', japaneseComment)
-    setFieldValue('japaneseComment', japaneseComment)
-    setFieldValue('originalEnglishComment', englishComment)
-    setFieldValue('englishComment', englishComment)
+
+    this.setState({
+      englishComment: englishComment,
+      originalEnglishComment: englishComment,
+      japaneseComment: japaneseComment,
+      originalJapaneseComment: japaneseComment,
+    })
   }
 
   onCategoryChange = (group, item) => {
@@ -248,14 +272,14 @@ class IndividualCommentDetails extends PureComponent {
 
   insertComment = () => {
     const { values, setFieldValue, user } = this.props
+    const { medicalCheckupIndividualComment, selectExaminationItemId } = values
+
     const {
-      medicalCheckupIndividualComment,
-      selectExaminationItemId,
       originalJapaneseComment,
       japaneseComment,
       originalEnglishComment,
       englishComment,
-    } = values
+    } = this.state
 
     if (
       (!hasValue(japaneseComment) || !japaneseComment.trim().length) &&
@@ -281,16 +305,25 @@ class IndividualCommentDetails extends PureComponent {
       },
     ])
 
-    this.setState({ selectedItem: {} })
-    setFieldValue('originalJapaneseComment', undefined)
-    setFieldValue('japaneseComment', undefined)
-    setFieldValue('originalEnglishComment', undefined)
-    setFieldValue('englishComment', undefined)
+    this.setState({
+      selectedItem: {},
+      searchValue: undefined,
+      englishComment: undefined,
+      originalEnglishComment: undefined,
+      japaneseComment: undefined,
+      originalJapaneseComment: undefined,
+    })
   }
 
   onDiscard = () => {
     const { clearEditComment } = this.props
     clearEditComment()
+  }
+
+  updateComment = i => {
+    const { form } = this.ArrayHelpers
+    const { setFieldValue } = form
+    setFieldValue(`medicalCheckupIndividualComment[${i}].isVerified`, false)
   }
   render() {
     const {
@@ -302,8 +335,12 @@ class IndividualCommentDetails extends PureComponent {
       setFieldValue,
       classes,
     } = this.props
+    const { englishComment, japaneseComment, searchValue } = this.state
     const { medicalCheckupIndividualComment = [] } = values
     const categoryListHeight = height - 263
+    const isAnyChange = !_.isEmpty(
+      window.dirtyForms['IndividualCommentDetails'],
+    )
     return (
       <div className={classes.rootPanel}>
         <div style={{ padding: '0px 8px 8px 8px' }}>
@@ -312,6 +349,7 @@ class IndividualCommentDetails extends PureComponent {
             onChange={e => {
               this.setState({ searchValue: e.target.value })
             }}
+            value={searchValue}
           />
         </div>
         <div style={{ width: commentGroupList.length ? 'auto' : '400px' }}>
@@ -333,16 +371,16 @@ class IndividualCommentDetails extends PureComponent {
           })}
         </div>
         <div style={{ padding: '4px 35px 4px 8px', position: 'relative' }}>
-          <Field
-            name={
-              selectedLanguage === 'EN' ? 'englishComment' : 'japaneseComment'
-            }
-            render={args => (
-              <TextField
-                inputProps={{ placeholder: 'Enter Comment' }}
-                {...args}
-              />
-            )}
+          <TextField
+            inputProps={{ placeholder: 'Enter Comment' }}
+            onChange={e => {
+              if (selectedLanguage === 'EN') {
+                this.setState({ englishComment: e.target.value })
+              } else {
+                this.setState({ japaneseComment: e.target.value })
+              }
+            }}
+            value={selectedLanguage === 'EN' ? englishComment : japaneseComment}
           />
           <Button
             size='small'
@@ -360,8 +398,7 @@ class IndividualCommentDetails extends PureComponent {
               const activeRows = medicalCheckupIndividualComment.filter(
                 val => !val.isDeleted,
               )
-              return activeRows.map(val => {
-                if (val && val.isDeleted) return null
+              return activeRows.map((val, index) => {
                 const i = medicalCheckupIndividualComment.findIndex(
                   item => val.uid === item.uid,
                 )
@@ -377,12 +414,27 @@ class IndividualCommentDetails extends PureComponent {
                         position: 'relative',
                         paddingLeft: 8,
                         paddingRight: 30,
+                        paddingLeft: 24,
                       }}
                     >
+                      <div
+                        style={{
+                          position: 'absolute',
+                          left: 8,
+                          bottom: 0,
+                        }}
+                      >
+                        {index + 1}
+                      </div>
                       <Field
                         name={displayFieldName}
                         render={args => {
-                          return <TextField {...args} />
+                          return (
+                            <TextField
+                              {...args}
+                              onChange={() => this.updateComment(i)}
+                            />
+                          )
                         }}
                       />
                       <IconButton
@@ -417,6 +469,7 @@ class IndividualCommentDetails extends PureComponent {
             type='primary'
             style={{ marginLeft: 10 }}
             onClick={handleSubmit}
+            disabled={!isAnyChange}
           >
             Save Comment
           </Button>

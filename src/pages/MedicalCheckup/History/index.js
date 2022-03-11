@@ -72,7 +72,7 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
   const showReportingDetails = row => {
     const version = Date.now()
     history.push(
-      `/medicalcheckup/history/reportingdetails?mcid=${row.id}&vid=${row.visitFK}&pid=${row.patientProfileFK}&v=${version}`,
+      `/medicalcheckup/history/reportingdetails?mcid=${row.id}&qid=${row.queueId}&vid=${row.visitFK}&pid=${row.patientProfileFK}&v=${version}`,
     )
   }
 

@@ -68,6 +68,10 @@ export default createListViewModel({
         }
         return null
       },
+      *queryLastReportData({ payload }, { call, put }) {
+        const response = yield call(service.queryLastReportData, payload)
+        return response
+      },
     },
     reducers: {},
   },

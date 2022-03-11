@@ -70,7 +70,7 @@ const ReportingDoctorTag = ({
   }
   let reportingDoctorColor = '#CC0033'
   if (
-    medicalCheckupDoctor.status === REPORTINGDOCTOR_STATUS.COMMENTDONE ||
+    medicalCheckupDoctor.status === REPORTINGDOCTOR_STATUS.COMMENTVERIFYING ||
     medicalCheckupDoctor.status === REPORTINGDOCTOR_STATUS.VERIFIED
   ) {
     reportingDoctorColor = '#33CC00'
@@ -207,27 +207,28 @@ const ReportingDoctorTag = ({
               New Message
             </span>
           </Link>
-          {medicalCheckupDoctor.status === REPORTINGDOCTOR_STATUS.VERIFIED &&
-            isEditEnable && (
-              <Link style={{ display: 'inline-block' }}>
-                <span
-                  style={{
-                    display: 'block',
-                    textDecoration: 'underline',
-                  }}
-                  onClick={e => {
-                    e.preventDefault()
-                    updateReportingDoctor(
-                      medicalCheckupDoctor,
-                      REPORTINGDOCTOR_STATUS.NEW,
-                    )
-                  }}
-                >
-                  Return to Doctor
-                </span>
-              </Link>
-            )}
-          {medicalCheckupDoctor.status === REPORTINGDOCTOR_STATUS.COMMENTDONE &&
+          {isEditEnable && (
+            <Link style={{ display: 'inline-block' }}>
+              <span
+                style={{
+                  display: 'block',
+                  textDecoration: 'underline',
+                  marginRight: 10,
+                }}
+                onClick={e => {
+                  e.preventDefault()
+                  updateReportingDoctor(
+                    medicalCheckupDoctor,
+                    REPORTINGDOCTOR_STATUS.NEW,
+                  )
+                }}
+              >
+                Return to Doctor
+              </span>
+            </Link>
+          )}
+          {medicalCheckupDoctor.status ===
+            REPORTINGDOCTOR_STATUS.COMMENTVERIFYING &&
             isEditEnable && (
               <Link style={{ display: 'inline-block' }}>
                 <span

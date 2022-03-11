@@ -33,6 +33,7 @@ export default createFormViewModel({
               visitID: Number(query.vid),
               pid: Number(query.pid),
               mcid: Number(query.mcid),
+              qid: Number(query.qid),
             },
           })
         }
@@ -40,7 +41,7 @@ export default createFormViewModel({
     },
     effects: {
       *initState({ payload }, { all, put, select, take }) {
-        const { version, visitID, pid, mcid } = payload
+        const { version, visitID, pid, mcid, qid } = payload
         const patientState = yield select(st => st.patient)
         yield put({
           type: 'updateState',
@@ -60,6 +61,12 @@ export default createFormViewModel({
           })
           yield take('patient/query/@@end')
         }
+
+        if (qid)
+          yield put({
+            type: 'visitRegistration/query',
+            payload: { id: payload.qid, version: payload.v },
+          })
 
         yield put({
           type: 'query',
@@ -153,6 +160,10 @@ export default createFormViewModel({
       },
       *unlock({ payload }, { call, put }) {
         const response = yield call(service.unlock, payload)
+        return response
+      },
+      *queryReportData({ payload }, { call, put }) {
+        const response = yield call(service.queryReportData, payload)
         return response
       },
     },

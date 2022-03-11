@@ -4,7 +4,7 @@ import { connect } from 'dva'
 import { compose } from 'redux'
 import moment from 'moment'
 import { Button, Drawer } from 'antd'
-import { Link, history } from 'umi'
+import { Link, history, formatMessage } from 'umi'
 import { withStyles, Divider } from '@material-ui/core'
 import Banner from '@/pages/PatientDashboard/Banner'
 import { LoadingWrapper } from '@/components/_medisys'
@@ -29,6 +29,7 @@ import {
   SizeContainer,
   CommonModal,
   Tooltip,
+  notification,
 } from '@/components'
 
 const styles = theme => ({
@@ -65,7 +66,7 @@ const ReportingDetails = props => {
   const [showReportHistory, setShowReportHistory] = useState(false)
   const [showResultDetails, setShowResultDetails] = useState(false)
   const [placement, setPlacement] = useState('right')
-  const generateReport = reportType => {
+  const generateReport = (reportType, message) => {
     dispatch({
       type: 'medicalCheckupReportingDetails/generateReport',
       payload: {
@@ -73,7 +74,12 @@ const ReportingDetails = props => {
         reportType,
       },
     }).then(r => {
-      refreshMedicalCheckup()
+      if (r) {
+        notification.success({
+          message: message,
+        })
+        refreshMedicalCheckup()
+      }
     })
   }
 
@@ -197,6 +203,74 @@ const ReportingDetails = props => {
     }
     return false
   }
+
+  const genrateTemporaryReport = () => {
+    if (reportingStatus === MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmContent: `Not all test has completed, generating report will exclude incomplete test. Confirm to generate ?`,
+          onConfirmSave: () => {
+            generateReport(
+              MEDICALCHECKUP_REPORTTYPE.TEMPORARY,
+              'Temporary report generated.',
+            )
+          },
+        },
+      })
+    } else {
+      generateReport(
+        MEDICALCHECKUP_REPORTTYPE.TEMPORARY,
+        'Temporary report generated.',
+      )
+    }
+  }
+
+  const genrateFinalReport = () => {
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: `Confirm to generate report (Finalized) ?`,
+        onConfirmSave: () => {
+          generateReport(
+            MEDICALCHECKUP_REPORTTYPE.FINAL,
+            'Final report generated.',
+          )
+        },
+      },
+    })
+  }
+
+  const checkUnsaveChange = onConfirm => {
+    if (
+      window.dirtyForms['SummaryCommentDetails'] ||
+      window.dirtyForms['IndividualCommentDetails']
+    ) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmContent: formatMessage({
+            id: 'app.general.leave-without-save',
+          }),
+          onConfirmSave: onConfirm,
+          openConfirmText: 'Confirm',
+          onConfirmClose: () => {
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                openConfirm: false,
+              },
+            })
+          },
+        },
+      })
+    } else {
+      onConfirm()
+    }
+  }
   return (
     <div>
       <LoadingWrapper loading={loading.models.medicalCheckupReportingDetails}>
@@ -250,21 +324,27 @@ const ReportingDetails = props => {
                 margin: '10px 0px',
               }}
             >
-              <Link>
-                <span
-                  style={{
-                    display: 'block',
-                    textDecoration: 'underline',
-                  }}
-                  onClick={e => {
-                    e.preventDefault()
-                    toggleReportHistory()
-                  }}
-                >
-                  {`Report History (${medicalCheckupReportingDetails.entity
-                    ?.medicalCheckupReport?.length || 0})`}
-                </span>
-              </Link>
+              <div
+                style={{
+                  width: 140,
+                }}
+              >
+                <Link>
+                  <span
+                    style={{
+                      display: 'block',
+                      textDecoration: 'underline',
+                    }}
+                    onClick={e => {
+                      e.preventDefault()
+                      toggleReportHistory()
+                    }}
+                  >
+                    {`Report History (${medicalCheckupReportingDetails.entity
+                      ?.medicalCheckupReport?.length || 0})`}
+                  </span>
+                </Link>
+              </div>
               <div style={{ position: 'absolute', right: 3, top: 0 }}>
                 <Button
                   size='small'
@@ -272,7 +352,7 @@ const ReportingDetails = props => {
                   style={{ margin: '0px 5px' }}
                   onClick={onClose}
                 >
-                  Back To List
+                  Close
                 </Button>
                 {(reportingStatus ===
                   MEDICALCHECKUP_WORKITEM_STATUS.REPORTING ||
@@ -282,9 +362,7 @@ const ReportingDetails = props => {
                     size='small'
                     type='primary'
                     style={{ margin: '0px 5px' }}
-                    onClick={() => {
-                      generateReport(MEDICALCHECKUP_REPORTTYPE.TEMPORARY)
-                    }}
+                    onClick={() => checkUnsaveChange(genrateTemporaryReport)}
                   >
                     Generate Temporary Report
                   </Button>
@@ -294,9 +372,7 @@ const ReportingDetails = props => {
                     size='small'
                     type='primary'
                     style={{ margin: '0px 5px' }}
-                    onClick={() => {
-                      generateReport(MEDICALCHECKUP_REPORTTYPE.FINAL)
-                    }}
+                    onClick={() => checkUnsaveChange(genrateFinalReport)}
                   >
                     Generate Report
                   </Button>
@@ -392,7 +468,7 @@ const ReportingDetails = props => {
         title='Report History'
         onClose={toggleReportHistory}
         onConfirm={toggleReportHistory}
-        maxWidth='md'
+        maxWidth='lg'
         observe='ReportHistory'
         overrideLoading
       >

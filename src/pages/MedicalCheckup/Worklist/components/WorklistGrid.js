@@ -24,6 +24,7 @@ import {
   Icon,
   Button,
   Popover,
+  dateFormatLong,
 } from '@/components'
 import { ProTable } from '@medisys/component'
 import { GridContextMenuButton as GridButton } from 'medisys-components'
@@ -34,6 +35,8 @@ import VisitForms from '@/pages/Reception/Queue/VisitForms'
 import FormatListBulletedOutlinedIcon from '@material-ui/icons/FormatListBulletedOutlined'
 import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined'
 import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined'
+import { commonDataReaderTransform } from '@/utils/utils'
+import withWebSocket from '@/components/Decorator/withWebSocket'
 import WorklistContext from '../WorklistContext'
 import { StatusFilter } from './StatusFilter'
 import ReportingDoctorList from './ReportingDoctorList'
@@ -63,7 +66,11 @@ const saveColumnsSetting = (dispatch, columnsSetting) => {
   })
 }
 
-export const WorklistGrid = ({ medicalCheckupWorklist, user }) => {
+const WorklistGrid = ({
+  medicalCheckupWorklist,
+  user,
+  handlePreviewReport,
+}) => {
   const {
     list: originalWorklist = [],
     medicalCheckupWorklistColumnSetting = [],
@@ -74,7 +81,6 @@ export const WorklistGrid = ({ medicalCheckupWorklist, user }) => {
     allMedicalCheckupReportStatuses,
   )
   const [workitems, setWorkitems] = useState([])
-  const [showReportForm, setShowReportForm] = useState(false)
   const [showForms, setShowForms] = useState(false)
   const { setIsAnyWorklistModelOpened } = useContext(WorklistContext)
   useEffect(() => {
@@ -136,37 +142,93 @@ export const WorklistGrid = ({ medicalCheckupWorklist, user }) => {
     setIsAnyWorklistModelOpened(true)
     const version = Date.now()
     history.push(
-      `/medicalcheckup/worklist/reportingdetails?mcid=${row.id}&vid=${row.visitFK}&pid=${row.patientProfileFK}&v=${version}`,
+      `/medicalcheckup/worklist/reportingdetails?mcid=${row.id}&qid=${row.queueId}&vid=${row.visitFK}&pid=${row.patientProfileFK}&v=${version}`,
     )
   }
 
-  const toggleReportForm = () => {
-    const target = !showReportForm
-    setShowReportForm(target)
-    setIsAnyWorklistModelOpened(target)
-    if (!target) {
-      dispatch({
-        type: 'medicalCheckupWorklist/updateState',
-        payload: {
-          entity: undefined,
-          id: undefined,
-          visitFK: undefined,
-          patientProfileFK: undefined,
-        },
-      })
-    }
-  }
-
-  const showReportDetails = async row => {
-    const { id, visitFK } = row
-    await dispatch({
-      type: 'medicalCheckupDetails/updateState',
+  const viewReport = async row => {
+    dispatch({
+      type: 'medicalCheckupWorklist/queryLastReportData',
       payload: {
-        id,
-        visitFK,
+        id: row.id,
       },
+    }).then(response => {
+      if (response && response.status === '200') {
+        const {
+          patientInfo = [],
+          basicExamination = [],
+          visualAcuity = [],
+          intraocularPressure = [],
+          audiometry = [],
+          individualComment = [],
+          summaryComment = [],
+          labTestPanel = [],
+          reportContext = [],
+        } = response.data
+        const printData = {
+          PatientInfo: patientInfo.map(p => ({
+            ...p,
+            patientAge: p.patientAge ? `${p.patientAge}` : '',
+            patientDOB: p.patientDOB
+              ? moment(p.patientDOB).format(dateFormatLong)
+              : '',
+            visitDate: p.visitDate
+              ? moment(p.visitDate).format(dateFormatLong)
+              : '',
+            currentDate: p.currentDate
+              ? moment(p.currentDate).format(dateFormatLong)
+              : '',
+            lastDate: p.lastDate
+              ? moment(p.lastDate).format(dateFormatLong)
+              : '',
+            beforeLastDate: p.beforeLastDate
+              ? moment(p.beforeLastDate).format(dateFormatLong)
+              : '',
+          })),
+          BasicExamination: basicExamination,
+          VisualAcuity: visualAcuity,
+          IntraocularPressure: intraocularPressure,
+          Audiometry: audiometry,
+          IndividualComment: individualComment,
+          SummaryComment: summaryComment,
+          LabTestPanel: labTestPanel,
+          ReportContext: reportContext.map(o => {
+            const {
+              customLetterHeadHeight = 0,
+              isDisplayCustomLetterHead = false,
+              standardHeaderInfoHeight = 0,
+              isDisplayStandardHeader = false,
+              footerInfoHeight = 0,
+              isDisplayFooterInfo = false,
+              footerDisclaimerHeight = 0,
+              isDisplayFooterInfoDisclaimer = false,
+              ...restProps
+            } = o
+            return {
+              customLetterHeadHeight,
+              isDisplayCustomLetterHead,
+              standardHeaderInfoHeight,
+              isDisplayStandardHeader,
+              footerInfoHeight,
+              isDisplayFooterInfo,
+              footerDisclaimerHeight,
+              isDisplayFooterInfoDisclaimer,
+              ...restProps,
+            }
+          }),
+        }
+        const payload = [
+          {
+            ReportId: 93,
+            Copies: 1,
+            ReportData: JSON.stringify({
+              ...commonDataReaderTransform(printData),
+            }),
+          },
+        ]
+        handlePreviewReport(JSON.stringify(payload))
+      }
     })
-    toggleReportForm()
   }
 
   const handleMenuItemClick = (row, id) => {
@@ -206,7 +268,7 @@ export const WorklistGrid = ({ medicalCheckupWorklist, user }) => {
         showReportingDetails(row)
         break
       case '4':
-        showReportDetails(row)
+        viewReport(row)
         break
     }
   }
@@ -242,21 +304,18 @@ export const WorklistGrid = ({ medicalCheckupWorklist, user }) => {
     const statusName = status.label
 
     let subTitle
+
     if (
-      row.statusFK === MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS ||
-      row.statusFK === MEDICALCHECKUP_WORKITEM_STATUS.REPORTING
+      (row.statusFK === MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS ||
+        row.statusFK === MEDICALCHECKUP_WORKITEM_STATUS.REPORTING) &&
+      (row.lastReportStatus === MEDICALCHECKUP_REPORTSTATUS.PENDINGVERIFY ||
+        row.lastReportStatus === MEDICALCHECKUP_REPORTSTATUS.VERIFIED)
     ) {
-      if (row.lastReportType) {
-        subTitle = `(${
-          row.lastReportType === MEDICALCHECKUP_REPORTTYPE.TEMPORARY
-            ? 'Temp. Rpt.'
-            : 'Rpt.'
-        } ${
-          row.lastReportStatus === MEDICALCHECKUP_REPORTSTATUS.VERIFIED
-            ? 'Completed'
-            : 'Verifying'
-        })`
-      }
+      subTitle = `(Temp. Rpt. ${
+        row.lastReportStatus === MEDICALCHECKUP_REPORTSTATUS.VERIFIED
+          ? 'Completed'
+          : 'Verifying'
+      })`
     }
     return (
       <Tag
@@ -305,7 +364,7 @@ export const WorklistGrid = ({ medicalCheckupWorklist, user }) => {
         search: false,
         align: 'center',
         fixed: 'left',
-        width: 146,
+        width: 150,
         render: (item, entity) => {
           return renderWorkitemStatus(entity)
         },
@@ -548,17 +607,8 @@ export const WorklistGrid = ({ medicalCheckupWorklist, user }) => {
       >
         <VisitForms formCategory={FORM_CATEGORY.CORFORM} />
       </CommonModal>
-
-      <CommonModal
-        open={showReportForm}
-        title='View Report'
-        onClose={toggleReportForm}
-        onConfirm={toggleReportForm}
-        fullScreen
-        overrideLoading
-      >
-        <div>View Report</div>
-      </CommonModal>
     </Card>
   )
 }
+
+export default withWebSocket()(WorklistGrid)
