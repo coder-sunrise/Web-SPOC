@@ -4,7 +4,7 @@ import { connect } from 'dva'
 import { compose } from 'redux'
 import moment from 'moment'
 import { Button, Drawer } from 'antd'
-import { Link, history } from 'umi'
+import { Link, history, formatMessage } from 'umi'
 import { withStyles, Divider } from '@material-ui/core'
 import Banner from '@/pages/PatientDashboard/Banner'
 import { LoadingWrapper } from '@/components/_medisys'
@@ -226,6 +226,51 @@ const ReportingDetails = props => {
       )
     }
   }
+
+  const genrateFinalReport = () => {
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: `Confirm to generate report (Finalized) ?`,
+        onConfirmSave: () => {
+          generateReport(
+            MEDICALCHECKUP_REPORTTYPE.FINAL,
+            'Final report generated.',
+          )
+        },
+      },
+    })
+  }
+
+  const checkUnsaveChange = onConfirm => {
+    if (
+      window.dirtyForms['SummaryCommentDetails'] ||
+      window.dirtyForms['IndividualCommentDetails']
+    ) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmContent: formatMessage({
+            id: 'app.general.leave-without-save',
+          }),
+          onConfirmSave: onConfirm,
+          openConfirmText: 'Confirm',
+          onConfirmClose: () => {
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                openConfirm: false,
+              },
+            })
+          },
+        },
+      })
+    } else {
+      onConfirm()
+    }
+  }
   return (
     <div>
       <LoadingWrapper loading={loading.models.medicalCheckupReportingDetails}>
@@ -317,7 +362,7 @@ const ReportingDetails = props => {
                     size='small'
                     type='primary'
                     style={{ margin: '0px 5px' }}
-                    onClick={genrateTemporaryReport}
+                    onClick={() => checkUnsaveChange(genrateTemporaryReport)}
                   >
                     Generate Temporary Report
                   </Button>
@@ -327,21 +372,7 @@ const ReportingDetails = props => {
                     size='small'
                     type='primary'
                     style={{ margin: '0px 5px' }}
-                    onClick={() => {
-                      dispatch({
-                        type: 'global/updateAppState',
-                        payload: {
-                          openConfirm: true,
-                          openConfirmContent: `Confirm to generate report (Finalized) ?`,
-                          onConfirmSave: () => {
-                            generateReport(
-                              MEDICALCHECKUP_REPORTTYPE.FINAL,
-                              'Final report generated.',
-                            )
-                          },
-                        },
-                      })
-                    }}
+                    onClick={() => checkUnsaveChange(genrateFinalReport)}
                   >
                     Generate Report
                   </Button>

@@ -103,6 +103,29 @@ class IndividualCommentDetails extends PureComponent {
     super(props)
     this.state = { selectedItem: {}, searchValue: undefined }
   }
+
+  componentWillReceiveProps(nextProps) {
+    if (
+      this.props.medicalCheckupReportingDetails.isNeedToClearIndividualComment
+    ) {
+      const { dispatch } = this.props
+      this.setState({
+        selectedItem: {},
+        searchValue: undefined,
+        englishComment: undefined,
+        originalEnglishComment: undefined,
+        japaneseComment: undefined,
+        originalJapaneseComment: undefined,
+      })
+      dispatch({
+        type: 'medicalCheckupReportingDetails/updateState',
+        payload: {
+          isNeedToClearIndividualComment: false,
+        },
+      })
+    }
+  }
+
   generateComment = () => {
     const { setFieldValue } = this.props
     const { selectedItem } = this.state

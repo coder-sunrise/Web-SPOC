@@ -257,7 +257,7 @@ const SummaryComment = props => {
             pagination={false}
             dataSource={commentList}
             columns={columns}
-            scroll={{ y: height - 320 }}
+            scroll={{ y: height - 300 }}
             rowClassName={(record, index) => {
               return index % 2 === 0 ? customtyles.once : customtyles.two
             }}
@@ -428,7 +428,7 @@ const SummaryComment = props => {
           />
         </div>
       </div>
-      <div style={{ height: height - 230 }}>
+      <div style={{ height: height - 210 }}>
         <Tabs
           options={commentOption}
           tabBarStyle={{ paddingRight: 8 }}

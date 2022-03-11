@@ -316,6 +316,7 @@ const Examination = props => {
     dispatch({
       type: 'medicalCheckupReportingDetails/updateState',
       payload: {
+        isNeedToClearIndividualComment: true,
         individualCommentEntity: {
           selectExaminationItemId: row.id,
           medicalCheckupIndividualComment: [
