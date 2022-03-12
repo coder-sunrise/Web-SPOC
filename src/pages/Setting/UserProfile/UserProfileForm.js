@@ -39,6 +39,7 @@ import * as queueServices from '@/services/queue'
 import clinicServices from '@/services/clinicInfo'
 import { constructUserProfile } from './utils'
 import PrimaryClinicianChanges from './PrimaryClinicianChanges'
+import roomAssignment from '@/models/roomAssignment'
 
 const styles = theme => ({
   container: {
@@ -188,15 +189,14 @@ const styles = theme => ({
           ...restValues.doctorProfile,
           isDeleted: !isDoctor,
         }
-
     const userProfile = constructUserProfile(values, role)
-
     let payload = {
       ...restValues,
       doctorProfile,
       effectiveStartDate: values.effectiveDates[0],
       effectiveEndDate: values.effectiveDates[1],
       userProfile,
+      roomAssignment: undefined
     }
 
     if (payload.shortName === '') {

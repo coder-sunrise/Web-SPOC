@@ -20,11 +20,15 @@ const styles = theme => ({
   },
 })
 
-const DoctorConsultationStatus = ({ visitDoctor = [], classes }) => {
+const DoctorConsultationStatus = ({
+  type = 'name',
+  visitDoctor = [],
+  classes,
+}) => {
   const showVisitDoctor = () => {
     return visitDoctor.map(d => {
       const title = d.title && d.title.trim().length ? `${d.title} ` : ''
-      const name = `${title}${d.name}`
+      const name = `${title}${type === 'name' ? d.name : d.shortName || d.name}`
       const consultationColor = visitDoctorConsultationStatusColor.find(
         c => c.value === d.consultationStatus,
       )

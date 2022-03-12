@@ -17,6 +17,7 @@ import {
   CustomInput,
 } from '@/components'
 import AuthorizedContext from '@/components/Context/Authorized'
+import Authorized from '@/utils/Authorized'
 import Contact from './Contact'
 
 @connect(({ clinicSettings }) => ({
@@ -192,6 +193,20 @@ class Detail extends PureComponent {
     if (rights === 'disable') finalRights = 'disable'
 
     const { isEnableAutoGenerateStatement = false } = clinicSettings
+
+    let hideConfirm = false
+    if (isSupplier) {
+      const right = Authorized.check('settings.supplier.supplierdetails') || {
+        rights: 'hidden',
+      }
+      hideConfirm = values.id > 0 ? right.rights != 'enable' : false
+    }
+    if (isCopayer) {
+      const right = Authorized.check('copayer.copayerdetails') || {
+        rights: 'hidden',
+      }
+      hideConfirm = values.id > 0 ? right.rights != 'enable' : false
+    }
     return (
       <React.Fragment>
         <AuthorizedContext.Provider
@@ -505,7 +520,7 @@ class Detail extends PureComponent {
           </div>
           {footer &&
             footer({
-              onConfirm: props.handleSubmit,
+              onConfirm: hideConfirm ? undefined : props.handleSubmit,
               confirmBtnText: 'Save',
               confirmProps: {
                 disabled: false,
