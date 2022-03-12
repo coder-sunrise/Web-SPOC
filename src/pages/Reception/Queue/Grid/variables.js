@@ -368,8 +368,12 @@ export const QueueColumnExtensions = props => {
         if (row.visitPurposeFK !== VISIT_TYPE.MC) {
           return <DoctorLabel type='shortName' doctor={row.doctor} hideMCR />
         }
-
-        return <DoctorConsultationStatus visitDoctor={row.visitDoctor} />
+        return (
+          <DoctorConsultationStatus
+            type='shortName'
+            visitDoctor={row.visitDoctor}
+          />
+        )
       },
       sortingEnabled: false,
       width: 280,

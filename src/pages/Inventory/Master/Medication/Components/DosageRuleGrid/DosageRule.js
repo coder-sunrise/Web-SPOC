@@ -51,6 +51,14 @@ const SingleDecimalInput = ({ onChange, ...props }) => {
   const [currentValue, setCurrentValue] = useState(null)
 
   function handlChange(val) {
+    if (val === null) {
+      setCurrentValue(val)
+      if (onChange) {
+        onChange(val)
+      }
+      return
+    }
+
     let singleDecimalRegex = /^(([0-9]+)|([0-9]+.[0-9]?))$/
 
     if (!singleDecimalRegex.test(val)) return
@@ -527,9 +535,7 @@ const DosageRuleTable = ({
     {
       title: 'Duration(Days)',
       dataIndex: 'duration',
-
       editable: true,
-
       width: 120,
       render: (item = {}, record) => {
         const editing = isEditing(record)

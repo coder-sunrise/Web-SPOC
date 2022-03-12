@@ -623,7 +623,11 @@ class Appointment extends React.PureComponent {
         .map(calendarResource => ({
           ...calendarResource,
           calendarResourceFK: calendarResource.id,
-          calendarResourceName: calendarResource.name,
+          calendarResourceName:
+            calendarResource.resourceType === 'Doctor'
+              ? calendarResource.clinicianProfileDto.shortName ||
+                calendarResource.clinicianProfileDto.name
+              : calendarResource.name,
           resourceFK:
             calendarResource.resourceType === CALENDAR_RESOURCE.DOCTOR
               ? `Doctor-${calendarResource.clinicianProfileDto.id}`

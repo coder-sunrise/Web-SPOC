@@ -63,7 +63,15 @@ const MultiLangCodeList = ({
   const removeItemFromList = id => {
     const newList = [...codeList.filter(c => c.id !== id)]
     setCodeList(newList)
-    if (onChange) onChange(newList.map(item => item.id))
+    if (onChange)
+      onChange(
+        newList.map(item => {
+          return {
+            id: item.id,
+            freeText: item.freeText,
+          }
+        }),
+      )
   }
 
   useEffect(() => {

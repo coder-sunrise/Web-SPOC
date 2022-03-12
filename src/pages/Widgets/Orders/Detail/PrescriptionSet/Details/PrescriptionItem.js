@@ -1622,9 +1622,6 @@ class Detail extends PureComponent {
                                             id:
                                               'inventory.master.setting.duration',
                                           })}
-                                          formatter={v =>
-                                            `${v} Day${v > 1 ? 's' : ''}`
-                                          }
                                           step={1}
                                           min={0}
                                           {...args}

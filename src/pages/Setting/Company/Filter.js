@@ -4,6 +4,7 @@ import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 import { status } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
+import { ableToViewByAuthority } from '@/utils/utils'
 import {
   withFormikExtend,
   FastField,
@@ -48,6 +49,11 @@ class Filter extends PureComponent {
     this.checkIsSupplier(name)
     const { isCopayer, isSupplier } = this.state
     const newCopayerAccessRight = Authorized.check('copayer.newcopayer') || {
+      rights: 'hidden',
+    }
+    const newSupplierAccessRight = Authorized.check(
+      'settings.supplier.newsupplier',
+    ) || {
       rights: 'hidden',
     }
     return (
@@ -148,7 +154,7 @@ class Filter extends PureComponent {
                     </Button>
                   )
                 ) : isSupplier ? (
-                  <Authorized authority='settings.supplier.newsupplier'>
+                  newSupplierAccessRight.rights === 'enable' && (
                     <Button
                       color='primary'
                       onClick={() => {
@@ -164,7 +170,7 @@ class Filter extends PureComponent {
                       <Add />
                       Add New
                     </Button>
-                  </Authorized>
+                  )
                 ) : (
                   <Authorized authority='settings.manufacturer.newmanufacturer'>
                     <Button

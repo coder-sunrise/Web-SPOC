@@ -159,7 +159,7 @@ const PatientInfoInput = ({
       </GridItem>
       {!isRegisteredPatient && (
         <React.Fragment>
-          <GridItem xs md={3}>
+          <GridItem xs md={4}>
             {isEdit ? (
               <TextField
                 value={values.patientName}
@@ -183,7 +183,7 @@ const PatientInfoInput = ({
               />
             )}
           </GridItem>
-          <GridItem xs md={3}>
+          <GridItem xs md={2}>
             <Field
               name='countryCodeFK'
               render={args => (

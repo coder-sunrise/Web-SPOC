@@ -5,6 +5,7 @@ import { connect } from 'dva'
 import { CommonTableGrid, Button, Tooltip, notification } from '@/components'
 import { status, gstEnabled } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
+import { ableToViewByAuthority } from '@/utils/utils'
 
 @connect(({ clinicSettings }) => ({
   clinicSettings,
@@ -32,7 +33,7 @@ class Grid extends PureComponent {
       }
     } else if (name === 'supplier') {
       const accessRight = Authorized.check('settings.supplier.supplierdetails')
-      if (accessRight && accessRight.rights !== 'enable') {
+      if (accessRight && accessRight.rights === 'hidden') {
         notification.error({
           message: 'Current user is not authorized to access',
         })
@@ -42,7 +43,7 @@ class Grid extends PureComponent {
       const accessRight = Authorized.check(
         'settings.manufacturer.manufacturerdetails',
       )
-      if (accessRight && accessRight.rights !== 'enable') {
+      if (accessRight && accessRight.rights === 'hidden') {
         notification.error({
           message: 'Current user is not authorized to access',
         })
@@ -329,9 +330,14 @@ class Grid extends PureComponent {
                     </div>
                   )
                 }
+                const editSupplierDetailAccessRight = Authorized.check(
+                  'settings.supplier.supplierdetails',
+                ) || {
+                  rights: 'hidden',
+                }
                 return (
-                  <Authorized authority='settings.supplier.supplierdetails'>
-                    <Fragment>
+                  <Fragment>
+                    {editSupplierDetailAccessRight.rights !== 'hidden' && (
                       <Tooltip title='Edit Supplier' placement='bottom'>
                         <Button
                           size='sm'
@@ -344,18 +350,18 @@ class Grid extends PureComponent {
                           <Edit />
                         </Button>
                       </Tooltip>
-                      <Tooltip title='Print Supplier Label' placement='bottom'>
-                        <Button
-                          size='sm'
-                          justIcon
-                          color='primary'
-                          onClick={() => this.handleClick(row.id)}
-                        >
-                          <Print />
-                        </Button>
-                      </Tooltip>
-                    </Fragment>
-                  </Authorized>
+                    )}
+                    <Tooltip title='Print Supplier Label' placement='bottom'>
+                      <Button
+                        size='sm'
+                        justIcon
+                        color='primary'
+                        onClick={() => this.handleClick(row.id)}
+                      >
+                        <Print />
+                      </Button>
+                    </Tooltip>
+                  </Fragment>
                 )
               },
             },
