@@ -377,6 +377,20 @@ export default createFormViewModel({
           })
         }
       },
+      *queryForNewVisit({ payload }, { select, call, put }) {
+        console.log(payload, 12)
+        const response = yield call(service.queryForNewVisit, payload)
+        if (response && response.status === '200') {
+          const { data = {} } = response
+          this.props.dispatch({
+            type: 'patientSearch/updateState',
+            payload: {
+              filter: payload,
+              list: data,
+            },
+          })
+        }
+      },
       *saveUserPreference({ payload }, { call, put, select }) {
         const r = yield call(saveUserPreference, {
           userPreferenceDetails: JSON.stringify(payload.userPreferenceDetails),
