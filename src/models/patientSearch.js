@@ -4,6 +4,7 @@ import service from '@/services/patient'
 export default createListViewModel({
   namespace: 'patientSearch',
   config: {},
+  queryFnName: 'queryForNewVisit',
   param: {
     service,
     state: {},

@@ -8,18 +8,16 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
   }
 
   effects() {
-    const { namespace, param } = this.options
+    const { namespace, param, queryFnName = 'queryList' } = this.options
     const { service, effects } = param
     return {
-      ...super.effects({ queryFnName: 'queryList' }),
+      ...super.effects({ queryFnName: queryFnName }),
 
       *queryOne(
         { payload = { keepFilter: true, defaultQuery: false }, history },
         { call, put, select },
       ) {
-        // console.log('queryOne', service, payload)
         const response = yield call(service.query, payload)
-        // console.log(response)
         const { data, status, message } = response
         if (status === '200' || data) {
           yield put({
@@ -36,7 +34,6 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
           })
         }
         return data
-        // }
       },
 
       *create({ payload }, { select, call, put }) {
@@ -66,7 +63,6 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
         if (data) {
           const { id } = data
           const newEntity = payload ? { ...payload, id } : data
-          // //console.log(data)
           const response = yield call(service.update, newEntity)
           if (response.success) {
             yield put({ type: 'hideModal' })
