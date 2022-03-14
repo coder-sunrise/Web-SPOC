@@ -103,6 +103,8 @@ export default createFormViewModel({
               medicalCheckupWorkitemId: undefined,
               visitID: undefined,
               patientID: undefined,
+              summaryCommentEntity: undefined,
+              individualCommentEntity: undefined,
             },
           }),
         ])

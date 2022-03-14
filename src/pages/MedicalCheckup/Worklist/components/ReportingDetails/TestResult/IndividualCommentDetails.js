@@ -64,6 +64,7 @@ const styles = theme => ({
       medicalCheckupIndividualComment,
       medicalCheckupSummaryComment,
       medicalCheckupWorkitemDoctor,
+      medicalCheckupReport,
       ...resetValue
     } = medicalCheckupReportingDetails.entity
     let newComents = values.medicalCheckupIndividualComment.filter(
