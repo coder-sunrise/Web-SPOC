@@ -271,6 +271,43 @@ const ReportingDetails = props => {
       onConfirm()
     }
   }
+
+  const isShowCompleteComment = () => {
+    if (!getEditEnable()) return false
+    if (user.data.clinicianProfile.userProfile.role?.clinicRoleFK === 1) {
+      const currentDoctor = (
+        medicalCheckupReportingDetails.entity?.medicalCheckupWorkitemDoctor ||
+        []
+      ).find(
+        item =>
+          item.userProfileFK === user.data.clinicianProfile.userProfile.id,
+      )
+      if (
+        currentDoctor &&
+        currentDoctor.status !== REPORTINGDOCTOR_STATUS.COMMENTVERIFYING
+      ) {
+        return true
+      }
+    }
+    return false
+  }
+
+  const onCompleteComment = () => {
+    const currentDoctor = (
+      medicalCheckupReportingDetails.entity?.medicalCheckupWorkitemDoctor || []
+    ).find(
+      item => item.userProfileFK === user.data.clinicianProfile.userProfile.id,
+    )
+    dispatch({
+      type: 'medicalCheckupReportingDetails/updateReportingDoctor',
+      payload: {
+        ...currentDoctor,
+        status: REPORTINGDOCTOR_STATUS.COMMENTVERIFYING,
+      },
+    }).then(r => {
+      if (r) onClose()
+    })
+  }
   return (
     <div>
       <LoadingWrapper loading={loading.models.medicalCheckupReportingDetails}>
@@ -324,27 +361,20 @@ const ReportingDetails = props => {
                 margin: '10px 0px',
               }}
             >
-              <div
-                style={{
-                  width: 140,
-                }}
-              >
-                <Link>
-                  <span
-                    style={{
-                      display: 'block',
-                      textDecoration: 'underline',
-                    }}
-                    onClick={e => {
-                      e.preventDefault()
-                      toggleReportHistory()
-                    }}
-                  >
-                    {`Report History (${medicalCheckupReportingDetails.entity
-                      ?.medicalCheckupReport?.length || 0})`}
-                  </span>
-                </Link>
-              </div>
+              <Link>
+                <span
+                  style={{
+                    textDecoration: 'underline',
+                  }}
+                  onClick={e => {
+                    e.preventDefault()
+                    toggleReportHistory()
+                  }}
+                >
+                  {`Report History (${medicalCheckupReportingDetails.entity
+                    ?.medicalCheckupReport?.length || 0})`}
+                </span>
+              </Link>
               <div style={{ position: 'absolute', right: 3, top: 0 }}>
                 <Button
                   size='small'
@@ -354,6 +384,19 @@ const ReportingDetails = props => {
                 >
                   Close
                 </Button>
+                {isShowCompleteComment() && (
+                  <Button
+                    size='small'
+                    style={{
+                      margin: '0px 5px',
+                      backgroundColor: '#389e0d',
+                      color: 'white',
+                    }}
+                    onClick={onCompleteComment}
+                  >
+                    Complete Comment
+                  </Button>
+                )}
                 {(reportingStatus ===
                   MEDICALCHECKUP_WORKITEM_STATUS.REPORTING ||
                   reportingStatus ===
@@ -383,7 +426,7 @@ const ReportingDetails = props => {
                     size='small'
                     style={{
                       margin: '0px 5px',
-                      backgroundColor: '#5a9cde',
+                      backgroundColor: '#389e0d',
                       color: 'white',
                     }}
                     onClick={onUnlock}

@@ -334,7 +334,7 @@ const ReportHistory = props => {
           className={customtyles.table}
         ></Table>
       </div>
-      <div style={{ textAlign: 'right' }}>
+      <div style={{ textAlign: 'right', marginTop: 6 }}>
         <Button size='sm' color='danger' onClick={onClose}>
           Close
         </Button>

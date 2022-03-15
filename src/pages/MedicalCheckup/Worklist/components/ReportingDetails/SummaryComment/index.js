@@ -13,6 +13,7 @@ import {
   dateFormatLong,
   Tooltip,
   Popconfirm,
+  DragableTableGrid,
 } from '@/components'
 import { Badge, Button, Table } from 'antd'
 import { TranslateOutlined } from '@material-ui/icons'
@@ -24,6 +25,7 @@ import CommentVerification from '../CommentVerification'
 import ReportingDoctorTag from '../../ReportingDoctorList'
 import { mergeClasses } from '@material-ui/styles'
 import { REPORTINGDOCTOR_STATUS } from '@/utils/constants'
+import { ListBoxComponent } from '@syncfusion/ej2-react-dropdowns'
 
 const SummaryComment = props => {
   const {
@@ -118,6 +120,7 @@ const SummaryComment = props => {
       },
     })
   }
+
   const deleteComment = row => {
     dispatch({
       type: 'medicalCheckupReportingDetails/deleteSummaryComment',
@@ -142,6 +145,75 @@ const SummaryComment = props => {
     })
   }
 
+  const handleRowDrop = (rows, oldIndex, newIndex) => {
+    return
+    if (oldIndex !== newIndex) {
+      const currentCannedTextId = rows[newIndex].id
+      let targetCannedTextId
+      let isInsertBefore = false
+      if (newIndex < rows.length - 1) {
+        targetCannedTextId = rows[newIndex + 1].id
+        isInsertBefore = true
+      } else {
+        targetCannedTextId = rows[newIndex - 1].id
+      }
+      changeOrder({
+        currentCannedTextId,
+        targetCannedTextId,
+        isInsertBefore,
+        cannedTextTypeFK: rows[newIndex].cannedTextTypeFK,
+      })
+    }
+  }
+
+  const getDisplayValue = row => {
+    const showValue = row[
+      `${selectedLanguage === 'EN' ? 'englishComment' : 'japaneseComment'}`
+    ] || <span>&nbsp;</span>
+    return (
+      <Tooltip title={showValue}>
+        <div
+          style={{
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {showValue}
+        </div>
+      </Tooltip>
+    )
+  }
+
+  const onDropGroup = e => {
+    if (e.previousIndex === e.currentIndex) {
+      return
+    }
+
+    const newSummaryComment = e.source.currentData.map((x, index) => ({
+      ...x,
+      sequence: index,
+    }))
+
+    const {
+      medicalCheckupIndividualComment,
+      medicalCheckupSummaryComment,
+      medicalCheckupWorkitemDoctor,
+      medicalCheckupReport,
+      ...resetValue
+    } = medicalCheckupReportingDetails.entity
+    dispatch({
+      type: 'medicalCheckupReportingDetails/upsert',
+      payload: {
+        ...resetValue,
+        medicalCheckupSummaryComment: newSummaryComment,
+      },
+    }).then(r => {
+      querySummaryCommentHistory()
+      refreshMedicalCheckup()
+    })
+  }
+
   const setData = queryData => {
     const { classes } = props
     const data = _.orderBy(queryData, ['visitDate'], ['desc'])
@@ -151,120 +223,156 @@ const SummaryComment = props => {
     )
     data.forEach((item, index) => {
       const commentList = item.medicalCheckupSummaryComment || []
-      let columns = [
-        {
-          dataIndex: 'comment',
-          title: <div style={{ padding: 4 }}>Comment</div>,
-          render: (text, row) => {
-            const showValue = row[
-              `${
-                selectedLanguage === 'EN' ? 'englishComment' : 'japaneseComment'
-              }`
-            ] || <span>&nbsp;</span>
+      if (index === 0) {
+        let itemTemplate
+        if (selectedLanguage === 'EN') {
+          itemTemplate = row => {
             return (
               <div
                 style={{
+                  padding: '6px 70px 6px 10px',
                   position: 'relative',
-                  padding: '4px',
                 }}
-                className={classes.commentContainer}
               >
-                <Tooltip title={showValue}>
-                  <div
-                    style={{
-                      textOverflow: 'ellipsis',
-                      overflow: 'hidden',
-                      whiteSpace: 'nowrap',
+                {getDisplayValue(row)}
+                <div style={{ position: 'absolute', right: 4, top: 4 }}>
+                  <Tooltip title='Edit Summary Comment'>
+                    <Button
+                      size='small'
+                      type='primary'
+                      style={{ marginRight: 5 }}
+                      icon={<EditFilled />}
+                      onClick={() => editComment(row)}
+                    ></Button>
+                  </Tooltip>
+                  <Popconfirm
+                    title='Are you sure?'
+                    onConfirm={() => {
+                      setTimeout(() => {
+                        deleteComment(row)
+                      }, 1)
                     }}
                   >
-                    {showValue}
-                  </div>
-                </Tooltip>
-                <div style={{ position: 'absolute', right: 0, top: 0 }}>
-                  {isEditEnable && index !== 0 ? (
-                    <Tooltip title='Copy Comment'>
-                      <IconButton
+                    <Tooltip title='Delete Summary Comment'>
+                      <Button
                         size='small'
-                        color='primary'
-                        onClick={() => {
-                          copyComment(row.id)
-                        }}
-                      >
-                        <CopyOutlined />
-                      </IconButton>
+                        type='danger'
+                        style={{ marginRight: 5 }}
+                        icon={<DeleteFilled />}
+                      ></Button>
                     </Tooltip>
-                  ) : (
-                    ''
-                  )}
+                  </Popconfirm>
                 </div>
               </div>
             )
-          },
-        },
-      ]
-      if (index === 0 && isEditEnable) {
-        columns.push({
-          dataIndex: 'action',
-          title: <div style={{ padding: 4 }}> Action</div>,
-          align: 'center',
-          width: 80,
-          render: (text, row) => {
+          }
+        } else {
+          itemTemplate = row => {
             return (
-              <div style={{ padding: 4 }}>
-                <Tooltip title='Edit Summary Comment'>
-                  <Button
-                    size='small'
-                    type='primary'
-                    style={{ marginRight: 5 }}
-                    icon={<EditFilled />}
-                    onClick={() => editComment(row)}
-                    disabled={isEditingRow}
-                  ></Button>
-                </Tooltip>
-                <Popconfirm
-                  title='Are you sure?'
-                  onConfirm={() => {
-                    setTimeout(() => {
-                      deleteComment(row)
-                    }, 1)
-                  }}
-                >
-                  <Tooltip title='Delete Summary Comment'>
+              <div
+                style={{
+                  padding: '6px 70px 6px 10px',
+                  position: 'relative',
+                }}
+              >
+                {getDisplayValue(row)}
+                <div style={{ position: 'absolute', right: 4, top: 4 }}>
+                  <Tooltip title='Edit Summary Comment'>
                     <Button
                       size='small'
-                      type='danger'
+                      type='primary'
                       style={{ marginRight: 5 }}
-                      icon={<DeleteFilled />}
-                      disabled={isEditingRow}
+                      icon={<EditFilled />}
+                      onClick={() => editComment(row)}
                     ></Button>
                   </Tooltip>
-                </Popconfirm>
+                  <Popconfirm
+                    title='Are you sure?'
+                    onConfirm={() => {
+                      setTimeout(() => {
+                        deleteComment(row)
+                      }, 1)
+                    }}
+                  >
+                    <Tooltip title='Delete Summary Comment'>
+                      <Button
+                        size='small'
+                        type='danger'
+                        style={{ marginRight: 5 }}
+                        icon={<DeleteFilled />}
+                      ></Button>
+                    </Tooltip>
+                  </Popconfirm>
+                </div>
               </div>
             )
-          },
+          }
+        }
+        options.push({
+          id: index,
+          name: 'Current',
+          content: (
+            <div style={{ height: height - 270, overflow: 'auto' }}>
+              <ListBoxComponent
+                enabled={isEditEnable && !isEditingRow}
+                dataSource={commentList}
+                allowDragAndDrop={true}
+                scope='combined-list'
+                fields={{ text: 'englishComment' }}
+                selectionSettings={{ mode: 'Single' }}
+                itemTemplate={itemTemplate}
+                drop={onDropGroup}
+              />
+            </div>
+          ),
+        })
+      } else {
+        options.push({
+          id: index,
+          name: moment(item.visitDate).format(dateFormatLong),
+          content: (
+            <div
+              style={{
+                height: height - 270,
+                overflow: 'auto',
+                border: '1px solid #dee2e6',
+              }}
+            >
+              {commentList.map(row => {
+                return (
+                  <div
+                    style={{
+                      position: 'relative',
+                      padding: '6px 6px 6px 10px',
+                      borderBottom: '1px solid #dee2e6',
+                    }}
+                    className={classes.commentContainer}
+                  >
+                    {getDisplayValue(row)}
+                    <div style={{ position: 'absolute', right: 0, top: 4 }}>
+                      {isEditEnable ? (
+                        <Tooltip title='Copy Comment'>
+                          <IconButton
+                            size='small'
+                            color='primary'
+                            onClick={() => {
+                              copyComment(row.id)
+                            }}
+                          >
+                            <CopyOutlined />
+                          </IconButton>
+                        </Tooltip>
+                      ) : (
+                        ''
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          ),
         })
       }
-      options.push({
-        id: index,
-        name:
-          index === 0
-            ? 'Current'
-            : moment(item.visitDate).format(dateFormatLong),
-        content: (
-          <Table
-            size='small'
-            bordered
-            pagination={false}
-            dataSource={commentList}
-            columns={columns}
-            scroll={{ y: height - 300 }}
-            rowClassName={(record, index) => {
-              return index % 2 === 0 ? customtyles.once : customtyles.two
-            }}
-            className={customtyles.table}
-          ></Table>
-        ),
-      })
     })
     setCommentOption(options)
   }
@@ -295,26 +403,6 @@ const SummaryComment = props => {
     })
   }
 
-  const isShowMarkAsCommentsDone = () => {
-    if (!isEditEnable) return false
-    if (user.data.clinicianProfile.userProfile.role?.clinicRoleFK === 1) {
-      const currentDoctor = (
-        medicalCheckupReportingDetails.entity?.medicalCheckupWorkitemDoctor ||
-        []
-      ).find(
-        item =>
-          item.userProfileFK === user.data.clinicianProfile.userProfile.id,
-      )
-      if (
-        currentDoctor &&
-        currentDoctor.status !== REPORTINGDOCTOR_STATUS.COMMENTVERIFYING
-      ) {
-        return true
-      }
-    }
-    return false
-  }
-
   const activeReportingDoctors = () => {
     if (isDoctor) {
       return (
@@ -326,18 +414,6 @@ const SummaryComment = props => {
       )
     }
     return medicalCheckupReportingDetails.entity?.medicalCheckupWorkitemDoctor
-  }
-
-  const onCommentAsDone = () => {
-    const currentDoctor = (
-      medicalCheckupReportingDetails.entity?.medicalCheckupWorkitemDoctor || []
-    ).find(
-      item => item.userProfileFK === user.data.clinicianProfile.userProfile.id,
-    )
-    updateReportingDoctor(
-      currentDoctor,
-      REPORTINGDOCTOR_STATUS.COMMENTVERIFYING,
-    )
   }
 
   const updateReportingDoctor = (reportingDoctor, status) => {
@@ -399,22 +475,6 @@ const SummaryComment = props => {
               </IconButton>
             </Badge>
           )}
-          {isShowMarkAsCommentsDone() && (
-            <Link style={{ display: 'inline-block', marginLeft: 8 }}>
-              <span
-                style={{
-                  display: 'block',
-                  textDecoration: 'underline',
-                }}
-                onClick={e => {
-                  e.preventDefault()
-                  onCommentAsDone()
-                }}
-              >
-                Complete Comment
-              </span>
-            </Link>
-          )}
         </div>
 
         <div style={{ position: 'absolute', right: 0, top: 4 }}>
@@ -428,23 +488,22 @@ const SummaryComment = props => {
           />
         </div>
       </div>
-      <div style={{ height: height - 210 }}>
-        <Tabs
-          options={commentOption}
-          tabBarStyle={{ paddingRight: 8 }}
-          tabBarExtraContent={
-            <Switch
-              checkedChildren='EN'
-              checkedValue='EN'
-              unCheckedChildren='JP'
-              unCheckedValue='JP'
-              label=''
-              value={selectedLanguage}
-              onChange={setSelectedLanguage}
-            />
-          }
-        />
-      </div>
+      <Tabs
+        options={commentOption}
+        style={{ height: height - 210 }}
+        tabBarStyle={{ paddingRight: 8 }}
+        tabBarExtraContent={
+          <Switch
+            checkedChildren='EN'
+            checkedValue='EN'
+            unCheckedChildren='JP'
+            unCheckedValue='JP'
+            label=''
+            value={selectedLanguage}
+            onChange={setSelectedLanguage}
+          />
+        }
+      />
       <Divider style={{ marginTop: 4 }} />
       <div>
         <CommentDetails {...props} saveComment={onSaveComment} />
