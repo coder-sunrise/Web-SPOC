@@ -99,9 +99,7 @@ const DispenseDetailsSpecimenCollection = ({
               {row.accessionNo}
             </Link>
           )
-        }
-
-        if (row.specimenStatusFK === LAB_SPECIMEN_STATUS.DISCARDED) {
+        } else if (row.specimenStatusFK === LAB_SPECIMEN_STATUS.DISCARDED) {
           return (
             <Tooltip
               useTooltip2
@@ -120,6 +118,8 @@ const DispenseDetailsSpecimenCollection = ({
               </div>
             </Tooltip>
           )
+        } else {
+          return <span>{row.accessionNo}</span>
         }
       },
     },
