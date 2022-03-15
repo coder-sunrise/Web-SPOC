@@ -7,8 +7,6 @@ import { VISIT_TYPE } from '@/utils/constants'
 const WorklistContext = createContext(null)
 
 export const WorklistContextProvider = props => {
-  const dispatch = useDispatch()
-  const { visitTypeSetting } = useSelector(st => st.clinicSettings.settings)
   const [isAnyWorklistModelOpened, setIsAnyWorklistModelOpened] = useState(
     false,
   )

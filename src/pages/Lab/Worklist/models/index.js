@@ -29,6 +29,26 @@ export default createListViewModel({
         }
         return status
       },
+      *selectRetestResult({ payload }, { call, put }) {
+        const status = yield call(service.selectRetestResult, payload)
+
+        if (status === 200 || status === 204) {
+          notification.success({ message: 'Retest result saved successfully.' })
+          return true
+        }
+        return status
+      },
+      *getRetestDetails({ payload }, { call, put }) {
+        const r = yield call(service.getRetestDetails, payload)
+        const { status, data } = r
+
+        if (status === '200') {
+          if (data) {
+            return data
+          }
+          return null
+        }
+      },
     },
     reducers: {},
   },

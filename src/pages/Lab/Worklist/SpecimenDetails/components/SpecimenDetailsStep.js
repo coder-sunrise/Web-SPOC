@@ -2,75 +2,67 @@ import { Steps } from 'antd'
 import moment from 'moment'
 import { CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons'
 import { LAB_SPECIMEN_DETAILS_STEP } from '@/utils/constants'
-import { examinationSteps } from '@/utils/codes'
 import { dateFormatLongWithTimeNoSec } from '@/components'
 import styles from './SpecimenDetailsStep.less'
 
 const { Step } = Steps
 
-const showIcon = (statusFK, currentStatusFK) => {
-  if (
-    currentStatusFK === LAB_SPECIMEN_DETAILS_STEP.CANCELLED &&
-    statusFK === currentStatusFK
-  ) {
-    return <CloseCircleFilled style={{ color: '#999999' }} />
+const CompletedStep = () => <CheckCircleFilled style={{ color: '#33CC33' }} />
+
+const NextStep = () => (
+  <div
+    style={{
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      backgroundColor: '#33CC33',
+    }}
+  ></div>
+)
+
+const DefaultStep = () => (
+  <div
+    style={{
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      backgroundColor: '#999999',
+    }}
+  ></div>
+)
+
+export const SpecimenDetailsStep = ({ timeline = [] }) => {
+  const nextStep = (() => {
+    const remainingSteps = timeline.filter(
+      step => step.actionDate === null || step.actionDate === undefined,
+    )
+
+    if (remainingSteps && remainingSteps.length > 0) return remainingSteps[0]
+  })()
+
+  const renderIcon = currentStep => {
+    if (currentStep.actionDate) return <CompletedStep />
+    console.log('SpecimenDetailsStep - nextStep', nextStep)
+    if (nextStep && nextStep.status === currentStep.status) return <NextStep />
+
+    return <DefaultStep />
   }
 
-  if (
-    currentStatusFK === LAB_SPECIMEN_DETAILS_STEP.COMPLETED ||
-    statusFK <= currentStatusFK
-  ) {
-    return <CheckCircleFilled style={{ color: '#33CC33' }} />
-  }
-
-  //Next Status
-  if (statusFK === currentStatusFK + 1) {
+  const renderStep = currentStep => {
     return (
-      <div
-        style={{
-          width: 24,
-          height: 24,
-          borderRadius: 12,
-          backgroundColor: '#33CC33',
-        }}
-      ></div>
+      <Step
+        title={<span style={{ fontWeight: 500 }}>{currentStep.status}</span>}
+        icon={renderIcon(currentStep)}
+        subTitle={currentStep.actionUserName ? currentStep.actionUserName : ''}
+        description={
+          currentStep.actionDate
+            ? moment(currentStep.actionDate).format('DD MMM YYYY HH:mm')
+            : ''
+        }
+      />
     )
   }
-  return (
-    <div
-      style={{
-        width: 24,
-        height: 24,
-        borderRadius: 12,
-        backgroundColor: '#999999',
-      }}
-    ></div>
-  )
-}
 
-const getStep = status => {
-  return (
-    <Step
-      title={<span style={{ fontWeight: 500 }}>{status.name}</span>}
-      icon={
-        <div
-          style={{
-            width: 24,
-            height: 24,
-            borderRadius: 12,
-            backgroundColor: '#33CC33',
-          }}
-        ></div>
-      }
-      subTitle={''}
-      description={''}
-    />
-  )
-}
-
-console.log('lab-module logs: examinationSteps', examinationSteps)
-
-export const SpecimenDetailsStep = ({ item }) => {
   return (
     <div>
       <Steps
@@ -78,9 +70,9 @@ export const SpecimenDetailsStep = ({ item }) => {
         size='small'
         labelPlacement='vertical'
       >
-        {examinationSteps &&
-          examinationSteps.map(status => {
-            return getStep(status)
+        {timeline &&
+          timeline.map(step => {
+            return renderStep(step)
           })}
       </Steps>
     </div>

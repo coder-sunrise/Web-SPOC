@@ -39,6 +39,7 @@ export const WorklistFilter = () => {
   const timer = React.useRef(null)
 
   const startTimer = () => {
+    clearInterval(timer.current)
     timer.current = setInterval(() => {
       handleSearch()
     }, autoRefreshLabWorklistInterval * 1000)
@@ -69,7 +70,10 @@ export const WorklistFilter = () => {
       handleSearch()
     }
 
-    return () => clearInterval(timer.current)
+    return () => {
+      console.log('Clean up Lab WorklistFilter')
+      clearInterval(timer.current)
+    }
   }, [isAnyWorklistModelOpened])
 
   const handleSearch = () => {

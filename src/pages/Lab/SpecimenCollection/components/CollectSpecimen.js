@@ -73,7 +73,7 @@ const CollectSpecimen = ({
     setWorkitemsByTestCategory([])
     setTestPanelValidationError('')
     setShowModal(false)
-    form.resetFields()
+    form.setFieldsValue({})
   }
 
   useEffect(() => {
@@ -104,7 +104,7 @@ const CollectSpecimen = ({
       specimenCollectionDate: moment(),
       dateReceived: undefined,
       specimenTypeFK: undefined,
-      labSpecimenWorkitems: [],
+      labWorkitems: [],
     })
   }
 
@@ -118,7 +118,7 @@ const CollectSpecimen = ({
           ...visitData.labWorkitems.filter(
             item => item.statusFK === LAB_WORKITEM_STATUS.NEW,
           ),
-          ...labSpecimenData.labSpecimenWorkitems.map(item => item.labWorkitem),
+          ...labSpecimenData.labWorkitems.map(item => item),
         ])
         form.setFieldsValue(labSpecimenData)
       }
@@ -126,6 +126,7 @@ const CollectSpecimen = ({
   }
 
   const prepareLabWorkitemsByCategory = labWorkitems => {
+    debugger
     setWorkitemsByTestCategory(
       _(
         labWorkitems.map(item => ({
@@ -144,7 +145,11 @@ const CollectSpecimen = ({
     )
   }
   const checkSpecimenWorkitems = (_, value) => {
-    if (value.filter(item => item.isDeleted === false).length > 0) {
+    if (
+      value.filter(
+        item => item.statusFK === LAB_WORKITEM_STATUS.SPECIMENCOLLECTED,
+      ).length > 0
+    ) {
       setTestPanelValidationError('')
       return Promise.resolve()
     }
@@ -245,7 +250,7 @@ const CollectSpecimen = ({
         </Space>
         {workItemsByTestCategory.length > 0 && (
           <Form.Item
-            name='labSpecimenWorkitems'
+            name='labWorkitems'
             rules={[
               {
                 validator: checkSpecimenWorkitems,

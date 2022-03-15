@@ -886,6 +886,16 @@ export const LAB_SPECIMEN_STATUS = {
   COMPLETED: 6,
   DISCARDED: 7,
 }
+
+export const LAB_SPECIMEN_TIMELINE_STATUS = {
+  FIRSTORDERED: 'First Ordered',
+  SPECIMENCOLLECTED: 'Specimen Collected',
+  SPECIMENRECEIVED: 'Specimen Received',
+  TESTSTARTED: 'Test Started',
+  FIRSTVERIFIED: 'First Verified',
+  COMPLETED: 'Completed',
+}
+
 export const LAB_SPECIMEN_ALL_COLOR = '#5a9cde'
 export const LAB_SPECIMEN_STATUS_COLORS = {
   1: '#999900',

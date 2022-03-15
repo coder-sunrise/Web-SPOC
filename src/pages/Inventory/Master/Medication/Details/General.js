@@ -403,6 +403,7 @@ const General = ({
                     id: 'inventory.master.medication.administrationRoute',
                   }) + languageLabel
                 }
+                isMultiLanguage={isMultiLanguage}
                 code='ctadministrationroute'
                 language={currentLanguage}
                 {...args}
