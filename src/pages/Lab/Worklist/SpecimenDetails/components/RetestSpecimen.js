@@ -20,11 +20,12 @@ import {
 } from '@/components'
 import { useCodeTable } from '@/utils/hooks'
 
-export const DiscardSpecimen = ({ open, id, patient, onClose, onConfirm }) => {
+export const RetestSpecimen = ({ open, id, onClose, onConfirm }) => {
   const [showModal, setShowModal] = useState(false)
-  const [hasDiscardReason, setHasDiscardReason] = useState(false)
+  const [hasRetestReason, setHasRetestReason] = useState(false)
   const ctspecimentype = useCodeTable('ctspecimentype')
   const { entity } = useSelector(s => s.worklistSpecimenDetails)
+  const { entity: patient } = useSelector(s => s.patient)
   const dispatch = useDispatch()
   const [form] = Form.useForm()
 
@@ -38,7 +39,7 @@ export const DiscardSpecimen = ({ open, id, patient, onClose, onConfirm }) => {
     }
 
     return () => {
-      setHasDiscardReason(false)
+      setHasRetestReason(false)
       form.setFieldsValue({})
       dispatch({
         type: 'worklistSpecimenDetails/updateState',
@@ -50,10 +51,10 @@ export const DiscardSpecimen = ({ open, id, patient, onClose, onConfirm }) => {
   return (
     <CommonModal
       open={showModal}
-      title='Discard Specimen'
+      title='Retest Specimen'
       footProps={{
         confirmProps: {
-          disabled: !hasDiscardReason,
+          disabled: !hasRetestReason,
         },
       }}
       onClose={() => {
@@ -70,7 +71,7 @@ export const DiscardSpecimen = ({ open, id, patient, onClose, onConfirm }) => {
         <Descriptions
           title={
             <span style={{ fontWeight: 'normal' }}>
-              Confirm to discard the specimen below?
+              Confirm to retest the specimen below?
             </span>
           }
           layout='horizontal'
@@ -98,16 +99,17 @@ export const DiscardSpecimen = ({ open, id, patient, onClose, onConfirm }) => {
         <Form
           form={form}
           initialValues={{
-            specimenDiscardReason: '',
+            specimenRetestReason: '',
           }}
-          onFinish={({ specimenDiscardReason }) => {
+          onFinish={({ specimenRetestReason }) => {
             const payload = {
               ...entity,
-              specimenDiscardReason,
+              specimenRetestReason,
             }
+            console.log('triggering on Finish')
 
             dispatch({
-              type: 'labWorklist/discardSpecimen',
+              type: 'worklistSpecimenDetails/retestSpecimen',
               payload,
             }).then(result => {
               if (result) {
@@ -118,14 +120,14 @@ export const DiscardSpecimen = ({ open, id, patient, onClose, onConfirm }) => {
           }}
         >
           <Form.Item
-            name='specimenDiscardReason'
+            name='specimenRetestReason'
             style={{ margin: 8 }}
             rules={[{ required: true, message: 'Reason is required.' }]}
           >
             <TextField
               label='Reason'
               onChange={e =>
-                setHasDiscardReason(e.target.value && e.target.value !== '')
+                setHasRetestReason(e.target.value && e.target.value !== '')
               }
             />
           </Form.Item>

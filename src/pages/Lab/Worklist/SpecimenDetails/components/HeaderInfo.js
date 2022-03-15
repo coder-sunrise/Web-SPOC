@@ -37,16 +37,10 @@ export const HeaderInfo = ({ entity }) => {
     },
     {
       title: 'Category',
-      dataIndex: 'testCategoryFK',
-      key: 'testCategoryFK',
+      dataIndex: 'testCategories',
+      key: 'testCategories',
       ellipsis: true,
       width: 160,
-      render: (text, record, index) => {
-        const testCategory = cttestcategory.find(
-          item => item.id === record.testCategoryFK,
-        )
-        return testCategory ? testCategory.name : ''
-      },
     },
     {
       title: 'Specimen Type',

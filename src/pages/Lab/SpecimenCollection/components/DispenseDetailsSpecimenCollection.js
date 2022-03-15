@@ -108,7 +108,7 @@ const DispenseDetailsSpecimenCollection = ({
               title={
                 <div>
                   <div>
-                    Discarded by {row.lastUpdatedClinicianName} at{' '}
+                    Discarded by {row.specimenDiscardedClinicianName} at{' '}
                     {row.lastUpdatedDate?.format(dateFormatLongWithTimeNoSec)}
                   </div>
                   <div>Reason: {row.specimenDiscardReason}</div>

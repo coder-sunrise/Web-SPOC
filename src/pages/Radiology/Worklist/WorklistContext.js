@@ -106,6 +106,8 @@ export const WorklistContextProvider = props => {
   }
 
   const refreshWorklist = () => {
+    if (!currentFilter) return
+
     const {
       searchValue,
       visitType,

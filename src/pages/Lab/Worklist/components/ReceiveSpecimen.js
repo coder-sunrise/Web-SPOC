@@ -37,7 +37,7 @@ export const ReceiveSpecimen = ({ open, id, onClose, onConfirm }) => {
     }
 
     return () => {
-      form.resetFields()
+      form.setFieldsValue({})
       dispatch({
         type: 'worklistSpecimenDetails/updateState',
         payload: { entity: {} },
