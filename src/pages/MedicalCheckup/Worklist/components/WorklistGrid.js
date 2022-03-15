@@ -164,11 +164,12 @@ const WorklistGrid = ({
           summaryComment = [],
           labTestPanel = [],
           reportContext = [],
+          reportingDoctor = [],
         } = response.data
         const printData = {
           PatientInfo: patientInfo.map(p => ({
             ...p,
-            patientAge: p.patientAge ? `${p.patientAge}` : '',
+            patientAge: p.patientAge ? `${p.patientAge} yrs` : '',
             patientDOB: p.patientDOB
               ? moment(p.patientDOB).format(dateFormatLong)
               : '',
@@ -192,6 +193,7 @@ const WorklistGrid = ({
           IndividualComment: individualComment,
           SummaryComment: summaryComment,
           LabTestPanel: labTestPanel,
+          ReportingDoctor: reportingDoctor,
           ReportContext: reportContext.map(o => {
             const {
               customLetterHeadHeight = 0,
@@ -330,12 +332,21 @@ const WorklistGrid = ({
           padding: 2,
         }}
       >
-        {
-          <div>
-            <span>{statusName}</span>
-            {subTitle && <div>{subTitle}</div>}
-          </div>
-        }
+        <div>
+          <span>{statusName}</span>
+          {subTitle && (
+            <div
+              style={{
+                height: 10,
+                fontSize: '0.6rem',
+                position: 'relative',
+                top: '-6px',
+              }}
+            >
+              {subTitle}
+            </div>
+          )}
+        </div>
       </Tag>
     )
   }
@@ -364,7 +375,7 @@ const WorklistGrid = ({
         search: false,
         align: 'center',
         fixed: 'left',
-        width: 150,
+        width: 130,
         render: (item, entity) => {
           return renderWorkitemStatus(entity)
         },

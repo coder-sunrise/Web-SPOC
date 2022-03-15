@@ -29,11 +29,16 @@ class BasicData extends Component {
     }
   }
 
+  componentDidMount() {
+    this.searchData()
+  }
+
   componentWillReceiveProps(nextProps) {
     this.searchData()
   }
 
   searchData = () => {
+    if (!this.props.patientProfileFK) return
     const { genderFK } = this.props
     this.setState(
       {

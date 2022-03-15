@@ -248,6 +248,23 @@ const Examination = props => {
   const getDataSource = () => {
     let defaultData = []
     const { examinationItem = [] } = medicalCheckupReportingDetails.entity
+
+    const nuCategoryItems = examinationItem.filter(
+      item => !item.examinationCategoryFK,
+    )
+    defaultData = defaultData.concat(
+      nuCategoryItems.map(item => ({
+        id: item.id,
+        examinationType: item.displayValue,
+        isGroup: false,
+        selectedLanguage,
+        isSelected:
+          selectExaminationItemId && item.id === selectExaminationItemId,
+        status: item.status,
+        examinationItemService: item.examinationItemService,
+      })),
+    )
+
     ctexaminationcategory.forEach(category => {
       defaultData.push({
         id: category.id,

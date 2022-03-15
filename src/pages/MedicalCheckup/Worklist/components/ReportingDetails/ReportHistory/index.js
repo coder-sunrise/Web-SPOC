@@ -40,7 +40,6 @@ const ReportHistory = props => {
   const [verifyRow, setVerifyRow] = useState(false)
 
   const {
-    loading,
     patient,
     medicalCheckupReportingDetails,
     dispatch,
@@ -90,11 +89,12 @@ const ReportHistory = props => {
           summaryComment = [],
           labTestPanel = [],
           reportContext = [],
+          reportingDoctor = [],
         } = response.data
         const printData = {
           PatientInfo: patientInfo.map(p => ({
             ...p,
-            patientAge: p.patientAge ? `${p.patientAge}` : '',
+            patientAge: p.patientAge ? `${p.patientAge} yrs` : '',
             patientDOB: p.patientDOB
               ? moment(p.patientDOB).format(dateFormatLong)
               : '',
@@ -118,6 +118,7 @@ const ReportHistory = props => {
           IndividualComment: individualComment,
           SummaryComment: summaryComment,
           LabTestPanel: labTestPanel,
+          ReportingDoctor: reportingDoctor,
           ReportContext: reportContext.map(o => {
             const {
               customLetterHeadHeight = 0,
@@ -347,7 +348,6 @@ const ReportHistory = props => {
         }}
         maxWidth='sm'
         observe='VerifyForm'
-        overrideLoading
       >
         <VerifyForm onVerificationSave={onVerificationSave} />
       </CommonModal>

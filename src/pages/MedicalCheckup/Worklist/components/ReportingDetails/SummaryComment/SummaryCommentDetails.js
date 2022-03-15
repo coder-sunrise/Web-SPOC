@@ -263,7 +263,10 @@ export default compose(
           saveComment()
           dispatch({
             type: 'medicalCheckupReportingDetails/updateState',
-            payload: { isNeedToClearSummaryComment: true },
+            payload: {
+              isNeedToClearSummaryComment: true,
+              summaryCommentEntity: undefined,
+            },
           })
         }
       })

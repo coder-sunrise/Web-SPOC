@@ -90,7 +90,7 @@ const ReportingDoctorTag = ({
           <Tag
             icon={
               medicalCheckupDoctor.status == 'Verified' ? (
-                <CheckOutlined style={{ backgroundColor: 'green' }} />
+                <CheckOutlined />
               ) : (
                 undefined
               )
