@@ -227,12 +227,12 @@ class FilterBar extends PureComponent {
             >
               <FormattedMessage id='form.search' />
             </ProgressButton>
-            <Authorized authority='purchasingandreceiving.newpurchasingandreceiving'>
+            {/* <Authorized authority='purchasingandreceiving.newpurchasingandreceiving'>
               <Button onClick={() => handleNavigate('new')} color='primary'>
                 <Add />
                 Add New
               </Button>
-            </Authorized>
+            </Authorized> */}
           </div>
         </GridItem>
       </GridContainer>

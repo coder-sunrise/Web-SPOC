@@ -240,7 +240,7 @@ class PurchaseReceive extends Component {
             <DuplicatePO actions={actionProps} {...this.props} />
           </CommonModal>
 
-          <GridItem md={4} className={classes.buttonGroup}>
+          {/* <GridItem md={4} className={classes.buttonGroup}>
             <Authorized authority='purchasingandreceiving.newpurchasingandreceiving'>
               <Button
                 color='primary'
@@ -250,7 +250,7 @@ class PurchaseReceive extends Component {
                 Write-Off
               </Button>
             </Authorized>
-          </GridItem>
+          </GridItem> */}
         </LoadingWrapper>
 
         <CommonModal
