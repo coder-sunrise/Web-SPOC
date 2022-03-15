@@ -4,6 +4,7 @@ import { FastField } from 'formik'
 import { formatMessage } from 'umi'
 import { GridContainer, GridItem, NumberInput, Field } from '@/components'
 import SharedContainer from './SharedContainer'
+import { InputNumber } from 'antd'
 
 const styles = () => ({})
 
@@ -61,6 +62,7 @@ const Pricing = ({
                   label={formatMessage({
                     id: 'inventory.master.pricing.lastCostPriceBefBonus',
                   })}
+                  precision={2}
                   disabled={isEditMode()}
                   {...args}
                 />
@@ -78,6 +80,7 @@ const Pricing = ({
                   label={formatMessage({
                     id: 'inventory.master.pricing.lastCostPriceAftBonus',
                   })}
+                  precision={2}
                   disabled={isEditMode()}
                   {...args}
                 />
@@ -90,7 +93,7 @@ const Pricing = ({
             name='averageCostPrice'
             render={args => (
               <NumberInput
-                format='$0,0.0000'
+                // format='0,0.0000'
                 label={formatMessage({
                   id: 'inventory.master.pricing.averageCostPrice',
                 })}
@@ -119,8 +122,9 @@ const Pricing = ({
                   const inputValue = e.target.value || 0
                   setMarkupMargin(inputValue)
                 }}
+                percentage
                 defaultValue='0.0'
-                format='0.0'
+                precision={1}
                 {...args}
               />
             )}
@@ -164,6 +168,7 @@ const Pricing = ({
                 label={formatMessage({
                   id: 'inventory.master.pricing.maxDiscount',
                 })}
+                percentage
                 format='0.0'
                 {...args}
               />

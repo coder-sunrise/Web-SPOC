@@ -76,9 +76,7 @@ class PatientSearch extends PureComponent {
           apiCriteria: {
             includeinactive: window.location.pathname.includes('patient'),
           },
-          sorting: [
-            { columnName: 'name', direction: 'asc' },
-          ],
+          sorting: [{ columnName: 'name', direction: 'asc' }],
         },
       })
     }

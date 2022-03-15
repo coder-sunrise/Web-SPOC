@@ -38,7 +38,7 @@ class AttachmentDocument extends Component {
   state = {
     selectedFolderFK: -99, // all
     viewMode: 'card',
-    zoom: 4,
+    zoom: 1,
     fileFilters: [],
   }
 
@@ -245,7 +245,7 @@ class AttachmentDocument extends Component {
                           <Slider
                             // orientation='vertical'
                             // getAriaValueText={valuetext}
-                            defaultValue={4}
+                            defaultValue={1}
                             aria-labelledby='vertical-slider'
                             valueLabelDisplay='off'
                             step={1}

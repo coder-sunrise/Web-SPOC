@@ -27,6 +27,7 @@ import {
   VisitTypeSelect,
   dateFormatLong,
   dateFormatLongWithTimeNoSec,
+  timeFormat24Hour,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 // utils
@@ -220,7 +221,7 @@ class PatientHistory extends Component {
         type: 'patientHistory/getUserPreference',
         payload: {},
       }).then(result => {
-        const { setFieldValue } = this.props
+        const { setFieldValue, clinicSettings } = this.props
         let selectCategories = [
           -99,
           ...this.getCategoriesOptions().map(o => o.value),
@@ -229,15 +230,23 @@ class PatientHistory extends Component {
           selectCategories = result
             .find(xx => xx.Identifier === 'SelectCategories')
             .SelectCategories.filter(o => selectCategories.find(c => c === o))
+          let preferVisitTypeIDs =
+            result.find(tt => tt.Identifier === 'SelectedVisitTypeIDs')
+              ?.SelectedVisitTypeIDs || []
+
+          const visitTypeSetting = JSON.parse(
+            clinicSettings.settings.visitTypeSetting,
+          )
+          preferVisitTypeIDs = _.intersection(
+            preferVisitTypeIDs,
+            visitTypeSetting.filter(x => x.isEnabled === 'true').map(x => x.id),
+          )
+          this.setState({ visitTypeIDs: preferVisitTypeIDs }, () => {
+            setFieldValue('visitTypeIDs', preferVisitTypeIDs)
+          })
         }
         this.setState({ selectCategories }, () => {
           setFieldValue('selectCategories', selectCategories)
-        })
-        var preferVisitTypeIDs =
-          result.find(tt => tt.Identifier === 'SelectedVisitTypeIDs')
-            ?.SelectedVisitTypeIDs || []
-        this.setState({ visitTypeIDs: preferVisitTypeIDs }, () => {
-          setFieldValue('visitTypeIDs', preferVisitTypeIDs)
         })
         this.queryVisitHistory()
       })
@@ -321,7 +330,7 @@ class PatientHistory extends Component {
 
     if (visitDate && visitDate.length > 1) {
       visitToDate = visitDate[1]
-    } 
+    }
     let searchCategories
     if (!selectCategories.length) {
       searchCategories = this.getCategoriesOptions()
@@ -329,7 +338,7 @@ class PatientHistory extends Component {
         .join(',')
     } else {
       searchCategories = selectCategories.join(',')
-    } 
+    }
     dispatch({
       type: 'patientHistory/queryVisitHistory',
       payload: {
@@ -516,7 +525,7 @@ class PatientHistory extends Component {
         </div>
         {isNurseNote && (
           <div style={{ fontSize: '0.9em', fontWeight: 500, marginTop: 14 }}>
-            {`${moment(visitDate).format('DD MMM YYYY HH:MM')} - Notes${
+            {`${moment(visitDate).format(dateFormatLongWithTimeNoSec)} - Notes${
               docotrName ? ` - ${docotrName}` : ''
             }`}
           </div>
@@ -524,17 +533,17 @@ class PatientHistory extends Component {
         {!isNurseNote && (
           <div style={{ fontSize: '0.9em' }}>
             <div style={{ fontWeight: 500, marginTop: 6 }}>
-              {`${moment(visitDate).format('DD MMM YYYY')} (Time In: ${moment(
+              {`${moment(visitDate).format(dateFormatLong)} (Time In: ${moment(
                 timeIn,
-              ).format('HH:mm')} Time Out: ${
-                timeOut ? moment(timeOut).format('HH:mm') : '-'
+              ).format(timeFormat24Hour)} Time Out: ${
+                timeOut ? moment(timeOut).format(timeFormat24Hour) : '-'
               })${docotrName ? ` - ${docotrName}` : ''}`}
             </div>
             <div style={{ marginTop: 18 }}>
               <span>
                 {`Last Update By: ${LastUpdateBy || ''} on ${moment(
                   signOffDate,
-                ).format('DD MMM YYYY HH:mm')}`}
+                ).format(dateFormatLongWithTimeNoSec)}`}
               </span>
               <span style={{ marginLeft: 5 }}>
                 {row.servingByList?.length > 0
@@ -1408,7 +1417,9 @@ class PatientHistory extends Component {
           // visitListing
           visitListing.push({
             currentId: current.currentId,
-            visitDate: moment(current.visitDate).format('DD MMM YYYY HH:mm'),
+            visitDate: moment(current.visitDate).format(
+              dateFormatLongWithTimeNoSec,
+            ),
             doctor: `${current.userTitle || ''} ${current.userName || ''}`,
             isNurseNote: isNurseNote || false,
             nurseNotes,
@@ -1742,7 +1753,7 @@ class PatientHistory extends Component {
   }
 
   getFilterBar = () => {
-    const { values } = this.props
+    const { values, fromModule } = this.props
     const { isAllDate } = values
     const { selectItems } = this.state
     return (
@@ -1753,11 +1764,11 @@ class PatientHistory extends Component {
               name='visitTypeIDs'
               render={args => (
                 <VisitTypeSelect
-                  label={formatMessage({ id: 'lab.search.visittype' })}
+                  label='Visit Type'
                   mode='multiple'
                   maxTagPlaceholder='Visit Types'
                   style={{
-                    width: 200,
+                    width: fromModule === 'MedicalCheckup' ? 170 : 200,
                     display: 'inline-Block',
                     marginBottom: -16,
                   }}
@@ -1777,7 +1788,7 @@ class PatientHistory extends Component {
                 render={args => (
                   <DateRangePicker
                     style={{
-                      width: 300,
+                      width: fromModule === 'MedicalCheckup' ? 210 : 300,
                     }}
                     label='Visit Date From'
                     label2='To'
@@ -1802,7 +1813,7 @@ class PatientHistory extends Component {
                   mode='multiple'
                   maxTagCount={0}
                   style={{
-                    width: 240,
+                    width: fromModule === 'MedicalCheckup' ? 168 : 240,
                     display: 'inline-Block',
                     marginBottom: -16,
                   }}
@@ -1816,7 +1827,7 @@ class PatientHistory extends Component {
               render={args => (
                 <DoctorProfileSelect
                   style={{
-                    width: 240,
+                    width: fromModule === 'MedicalCheckup' ? 180 : 240,
                     display: 'inline-Block',
                     marginLeft: 10,
                     marginBottom: -16,
@@ -2259,7 +2270,7 @@ class PatientHistory extends Component {
   }
 
   render() {
-    const { clinicSettings, scriblenotes, fromModule } = this.props
+    const { clinicSettings, scriblenotes, fromModule, height } = this.props
     const cfg = {}
     const {
       showHistoryDetails,
@@ -2284,7 +2295,10 @@ class PatientHistory extends Component {
     } else if (fromModule === 'PatientHistory') {
       otherHeight = 390
     }
-    const visitContentHeight = currentHeight - otherHeight
+    let visitContentHeight = currentHeight - otherHeight
+    if (fromModule === 'MedicalCheckup') {
+      visitContentHeight = height - 165
+    }
     return (
       <div {...cfg}>
         <CardContainer hideHeader size='sm'>

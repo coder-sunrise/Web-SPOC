@@ -18,18 +18,18 @@ class BasicData extends Component {
     this.visitTypeSetting = JSON.parse(
       props.clinicSettings.settings.visitTypeSetting,
     )
-    const { genderFK } = props
+    const { genderFK, defaultSelectMedicalCheckup = false } = props
     this.state = {
       data: defaultData,
       columns: defaultColumns(genderFK),
       currentPage: 0,
       total: 0,
-      isOnlySearchMC: false,
+      isOnlySearchMC: defaultSelectMedicalCheckup,
       loadedData: [],
     }
   }
 
-  componentDidMount() {
+  componentWillReceiveProps(nextProps) {
     this.searchData()
   }
 
@@ -50,10 +50,11 @@ class BasicData extends Component {
   }
 
   loadData = () => {
-    const { dispatch, patientProfileFK } = this.props
+    const { dispatch, patientProfileFK, visitFK } = this.props
     dispatch({
       type: 'patientResults/queryBasicDataList',
       payload: {
+        apiCriteria: { VisitFK: visitFK },
         sort: [
           {
             sortby: 'visitDate',
@@ -175,7 +176,6 @@ class BasicData extends Component {
           return (
             <div
               style={{
-                backgroundColor: i === 0 ? '#daecf5' : 'white',
                 padding: '2px 4px',
               }}
             >
@@ -197,11 +197,12 @@ class BasicData extends Component {
           onCell: row => {
             if (row.isGroup)
               return {
-                colSpan: Object.keys(row).filter(name =>
-                  name.includes('valueColumn'),
-                ).length,
+                colSpan:
+                  Object.keys(row).filter(name => name.includes('valueColumn'))
+                    .length + 1,
+                style: { backgroundColor: '#daecf5' },
               }
-            return { colSpan: 1 }
+            return { colSpan: 1, style: { backgroundColor: '#daecf5' } }
           },
         }
       }
@@ -227,7 +228,7 @@ class BasicData extends Component {
         <div style={{ position: 'relative', height: 40 }}>
           {clinicSettings.settings.isEnableMedicalCheckupModule && (
             <Checkbox
-              value={this.state.isOnlySearchMC}
+              checked={this.state.isOnlySearchMC}
               label='Display Medical Check Up Only'
               onChange={e => {
                 this.setState(
@@ -261,7 +262,7 @@ class BasicData extends Component {
           columns={this.state.columns}
           dataSource={this.state.data}
           className={tablestyles.table}
-          scroll={{ y: height - 300 }}
+          scroll={{ y: height - 80 }}
         />
       </div>
     )

@@ -8,30 +8,7 @@ import { Tooltip, withStyles } from '@material-ui/core'
 const STYLES = () => ({
   tooltip: {
     fontSize: '0.8rem',
-    // padding: '5px 7px',
-    // minWidth: '130px',
-    // color: '#FFFFFF',
-    // lineHeight: '1.2em',
-    // background: 'rgba(85,85,85,0.9)',
-    // border: 'none',
-    // borderRadius: '3px',
-    // opacity: '1!important',
-    // boxShadow:
-    //   '0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.2)',
-    // textAlign: 'center',
-    // // maxWidth: '200px',
-    // // fontFamily: '"Helvetica Neue",Helvetica,Arial,sans-serif',
-    // fontSize: '0.75rem',
-    // fontStyle: 'normal',
-    // fontWeight: '400',
-    // textShadow: 'none',
-    // textTransform: 'none',
-    // letterSpacing: 'normal',
-    // wordBreak: 'normal',
-    // wordSpacing: 'normal',
-    // wordWrap: 'normal',
-    // whiteSpace: 'normal',
-    // lineBreak: 'auto',
+    maxWidth: 600,
   },
   tooltip2: {
     fontSize: '0.8rem',
@@ -52,7 +29,7 @@ class CommonTooltip extends PureComponent {
     title: '',
   }
 
-  render () {
+  render() {
     const {
       classes,
       title,
@@ -62,15 +39,12 @@ class CommonTooltip extends PureComponent {
       useTooltip2 = false,
       ...restProps
     } = this.props
-    // console.log(placement, restProps)
     return (
       <Tooltip
         classes={{
           tooltip: useTooltip2 ? classes.tooltip2 : classes.tooltip,
           popper: classes.popper,
         }}
-        // interactive
-        // leaveDelay={999999}
         title={title}
         enterDelay={enterDelay}
         placement={placement}

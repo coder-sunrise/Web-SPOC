@@ -8,7 +8,7 @@ import {
   infoColor,
   warningColor,
 } from 'mui-pro-jss'
-import { NOTIFICATION_TYPE } from '@/utils/constants'
+import { NOTIFICATION_TYPE, APPNOTIFICATION_SCHEMA } from '@/utils/constants'
 
 export const TITLE = {
   [NOTIFICATION_TYPE.QUEUE]: 'Q. No.',
@@ -26,6 +26,22 @@ export const TYPES = [
   {
     id: 1,
     name: 'Queue',
+  },
+  {
+    id: APPNOTIFICATION_SCHEMA.LAB.id,
+    name: APPNOTIFICATION_SCHEMA.LAB.name,
+  },
+  {
+    id: APPNOTIFICATION_SCHEMA.RADIOLOGY.id,
+    name: APPNOTIFICATION_SCHEMA.RADIOLOGY.name,
+  },
+  {
+    id: APPNOTIFICATION_SCHEMA.PHARMACY.id,
+    name: APPNOTIFICATION_SCHEMA.PHARMACY.name,
+  },
+  {
+    id: APPNOTIFICATION_SCHEMA.MC.id,
+    name: APPNOTIFICATION_SCHEMA.MC.name,
   },
   {
     id: 2,

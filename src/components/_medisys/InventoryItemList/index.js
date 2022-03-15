@@ -16,13 +16,15 @@ import {
   Switch,
   SizeContainer,
 } from '@/components'
-import { getUniqueId } from '@/utils/utils'
+import { getUniqueId,calculateAdjustAmount } from '@/utils/utils'
+import { isNumber } from 'util'
 import { InventoryTypes, visitOrderTemplateItemTypes } from '@/utils/codes'
 import { ITEM_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 import { currencySymbol } from '@/utils/config'
 import _ from 'lodash'
-
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
+import { Table } from '@devexpress/dx-react-grid-material-ui'
 const CPSwitch = label => args => {
   if (!args.field.value) {
     args.field.value = 'ExactAmount'
@@ -135,6 +137,7 @@ class InventoryItemList extends React.Component {
     const newItems = newItemArray.map(item => {
       const itemFieldName = InventoryTypes.filter(x => x.value === item.type)[0]
       const typeFieldName = item[itemFieldName.field]
+      const total = _.round(item.quantity * item.unitPrice, 2)
       const newItemRow = {
         uid: getUniqueId(),
         type: itemFieldName.value,
@@ -153,6 +156,13 @@ class InventoryItemList extends React.Component {
         itemValueType: 'ExactAmount',
         itemValue: 0,
         quantity: item.quantity,
+        total: total,
+        totalAftAdj: total,
+        adjValue: 0,
+        adjAmt: 0,
+        adjType:'ExactAmount',
+        isMinus: false,
+        isExactAmount: true,
       }
 
       return newItemRow
@@ -268,20 +278,27 @@ class InventoryItemList extends React.Component {
       }
 
       itemFieldName = InventoryTypes.filter(x => x.ctName === type)[0]
+      const unitPrice = itemFieldName.value === ITEM_TYPE.SERVICE
+      ? tempSelectedItem.unitPrice
+      : tempSelectedItem.sellingPrice
       let newItemRow = {
         uid: getUniqueId(),
         type: itemFieldName.value,
         [itemFieldName.itemFKName]: tempSelectedItemFK,
         itemFK: tempSelectedItemFK,
-        unitPrice:
-          itemFieldName.value === ITEM_TYPE.SERVICE
-            ? tempSelectedItem.unitPrice
-            : tempSelectedItem.sellingPrice,
+        unitPrice: unitPrice,
         code: tempSelectedItem.code,
         name: tempSelectedItem.displayValue,
         itemValueType: 'ExactAmount',
         quantity: 1,
         itemValue: 0,
+        total: unitPrice,
+        totalAftAdj: unitPrice,
+        adjValue: 0,
+        adjAmt: 0,
+        adjType:'ExactAmount',
+        isMinus: false,
+        isExactAmount: true,
       }
       this.addItemToRows(newItemRow)
     }
@@ -326,7 +343,7 @@ class InventoryItemList extends React.Component {
                       type === 'inventorymedication' ||
                       type === 'inventoryvaccination'
                     ) {
-                      uomName = dispensingUOM.name
+                      uomName = dispensingUOM?.name
                     } else if (type === 'inventoryconsumable') {
                       uomName = uom.name
                     } else if (type === 'ctservice') {
@@ -496,8 +513,16 @@ class InventoryItemList extends React.Component {
         title: 'Quantity',
       })
       commonColumns.splice(commonColumns.length - 1, 0, {
-        name: 'amount',
-        title: 'Amount',
+        name: 'total',
+        title: 'Total Bef. Adj.',
+      })
+      commonColumns.splice(commonColumns.length - 1, 0, {
+        name: 'adjAmt',
+        title: 'Adjustment',
+      })
+      commonColumns.splice(commonColumns.length - 1, 0, {
+        name: 'totalAftAdj',
+        title: 'Total Aft. Adj.',
       })
     } else {
       commonColumns.splice(commonColumns.length - 1, 0, {
@@ -509,11 +534,48 @@ class InventoryItemList extends React.Component {
     return commonColumns
   }
 
+  onAdjustmentConditionChange = index => {
+    const { setFieldValue, values } = this.props
+    const { rows = [] } = values
+    const { adjValue, isMinus, isExactAmount } = rows[index]
+    if (!isNumber(adjValue)) return
+    let value = adjValue
+    if (!isExactAmount && adjValue > 100) {
+      value = 100
+      setFieldValue(`rows[${index}].adjValue`, 100)
+    }
+    if (!isMinus) {
+      value = Math.abs(value)
+    } else {
+      value = -Math.abs(value)
+    }
+
+    this.getFinalAmount({ value, index })
+  }
+
+  getFinalAmount = ({ value, index } = {}) => {
+    const { setFieldValue, values } = this.props
+    const { rows = [] } = values
+    const { isExactAmount, adjValue, unitPrice, quantity } = rows[index]
+    const total = _.round(unitPrice * quantity, 2)
+    setFieldValue(`rows[${index}].total`, total)
+
+    const finalAmount = calculateAdjustAmount(
+      isExactAmount,
+      total,
+      value || adjValue,
+    )
+    setFieldValue(`rows[${index}].totalAftAdj`, finalAmount.amount)
+    setFieldValue(`rows[${index}].adjAmt`, finalAmount.adjAmount)
+  }
+
   getColumnsExtensions = values => {
     const commonExtensions = [
       {
         columnName: 'type',
         type: 'select',
+        sortingEnabled: false,
+        width: 100,
         options: InventoryTypes,
         render: row => {
           const itemType = `${
@@ -532,6 +594,7 @@ class InventoryItemList extends React.Component {
       },
       {
         columnName: 'itemFK',
+        sortingEnabled: false,
         render: row => {
           const inventory = InventoryTypes.filter(x => x.value === row.type)[0]
           const { ctName, itemFKName } = inventory
@@ -571,6 +634,8 @@ class InventoryItemList extends React.Component {
           columnName: 'quantity',
           type: 'number',
           align: 'left',
+          sortingEnabled: false,
+          width: 90,
           render: row => {
             const { rows = [] } = values
             const index = rows.map(i => i.uid).indexOf(row.uid)
@@ -580,6 +645,11 @@ class InventoryItemList extends React.Component {
                 render={args => (
                   <NumberInput
                     {...args}
+                    onChange={() => {
+                      setTimeout(() => {
+                        this.onAdjustmentConditionChange(index)
+                      }, 1)
+                    }}
                     min={1}
                     precision={0}
                     positiveOnly
@@ -592,8 +662,10 @@ class InventoryItemList extends React.Component {
         },
         {
           columnName: 'unitPrice',
+          sortingEnabled: false,
           type: 'currency',
           align: 'left',
+          width: 100,
           render: row => {
             const { rows = [] } = values
             const index = rows.map(i => i.uid).indexOf(row.uid)
@@ -603,6 +675,11 @@ class InventoryItemList extends React.Component {
                 render={args => (
                   <NumberInput
                     {...args}
+                    onChange={() => {
+                      setTimeout(() => {
+                        this.onAdjustmentConditionChange(index)
+                      }, 1)
+                    }}
                     currency
                     positiveOnly
                     min={0}
@@ -614,25 +691,162 @@ class InventoryItemList extends React.Component {
           },
         },
         {
-          columnName: 'amount',
+          columnName: 'total',
           observeFields: ['quantity', 'unitPrice'],
           type: 'currency',
-          render: row => {
+          sortingEnabled: false,
+          width: 118,
+        },
+        {
+          columnName: 'adjAmt',
+          width: 200,
+          isReactComponent: true,
+          sortingEnabled: false,
+          render: currentrow => {
+            const { focused = false } = this.state
+            const { rows = [] } = values
+            const { row } = currentrow
+            const index = rows.map(i => i.uid).indexOf(row.uid)
             return (
-              <p
-                style={{
-                  color: 'darkblue',
-                  fontWeight: 500,
-                }}
-              >
-                <NumberInput
-                  text
-                  currency
-                  value={_.round(row.unitPrice * row.quantity, 2)}
+              <div style={{ display: 'flex' }}>
+                <Field
+                  name={`rows[${index}].isMinus`}
+                  render={args => (
+                    <Switch
+                      style={{ margin: 0 }}
+                      checkedChildren='-'
+                      unCheckedChildren='+'
+                      label=''
+                      onChange={() => {
+                        setTimeout(() => {
+                          this.onAdjustmentConditionChange(index)
+                        }, 1)
+                      }}
+                      {...args}
+                      inputProps={{
+                        onMouseUp: e => {
+                          if (!focused) {
+                            this.setState({ focused: true })
+                            e.target.click()
+                          }
+                        },
+                      }}
+                      disabled={false}
+                    />
+                  )}
                 />
-              </p>
+                <div
+                  style={{
+                    marginLeft: -24,
+                    marginRight: 10,
+                  }}
+                >
+                  {row.isExactAmount ? (
+                    <Field
+                      name={`rows[${index}].adjValue`}
+                      render={args => (
+                        <NumberInput
+                          style={{
+                            marginBottom: 0,
+                            marginTop: 0,
+                          }}
+                          original
+                          label=''
+                          onChange={() => {
+                            setTimeout(() => {
+                              this.onAdjustmentConditionChange(index)
+                            }, 1)
+                          }}
+                          min={0}
+                          precision={2}
+                          {...args}
+                          inputProps={{
+                            onMouseUp: e => {
+                              if (!focused) {
+                                this.setState({ focused: true })
+                                e.target.focus()
+                              }
+                            },
+                          }}
+                          disabled={false}
+                        />
+                      )}
+                    />
+                  ) : (
+                    <Field
+                      name={`rows[${index}].adjValue`}
+                      render={args => (
+                        <NumberInput
+                          style={{
+                            marginBottom: 0,
+                            marginTop: 0,
+                          }}
+                          original
+                          max={100}
+                          label=''
+                          onChange={() => {
+                            setTimeout(() => {
+                              this.onAdjustmentConditionChange(index)
+                            }, 1)
+                          }}
+                          min={0}
+                          precision={2}
+                          {...args}
+                          inputProps={{
+                            onMouseUp: e => {
+                              if (!focused) {
+                                this.setState({ focused: true })
+                                e.target.focus()
+                              }
+                            },
+                          }}
+                          disabled={false}
+                        />
+                      )}
+                    />
+                  )}
+                </div>
+                <Field
+                  name={`rows[${index}].isExactAmount`}
+                  render={args => (
+                    <Switch
+                      style={{
+                        marginRight: -30,
+                        marginBottom: 0,
+                        marginTop: 0,
+                      }}
+                      checkedChildren='$'
+                      // checkedValue='ExactAmount'
+                      unCheckedChildren='%'
+                      // unCheckedValue='Percentage'
+                      label=''
+                      onChange={() => {
+                        setTimeout(() => {
+                          this.onAdjustmentConditionChange(index)
+                        }, 1)
+                      }}
+                      {...args}
+                      inputProps={{
+                        onMouseUp: e => {
+                          if (!focused) {
+                            this.setState({ focused: true })
+                            e.target.click()
+                          }
+                        },
+                      }}
+                      disabled={false}
+                    />
+                  )}
+                />
+              </div>
             )
           },
+        },
+        {
+          columnName: 'totalAftAdj',
+          sortingEnabled: false,
+          type: 'currency',
+          width: 118,
         },
       )
     } else {
@@ -699,7 +913,7 @@ class InventoryItemList extends React.Component {
   }
 
   render() {
-    const { theme, values } = this.props
+    const { theme, values, includeOrderSet = false } = this.props
     return (
       <SizeContainer size='sm'>
         <div style={{ marginTop: theme.spacing(1) }}>
@@ -717,6 +931,52 @@ class InventoryItemList extends React.Component {
             columnExtensions={this.getColumnsExtensions(values)}
             FuncProps={{
               pager: false,
+              summary: includeOrderSet,
+              summaryConfig: {
+                state: {
+                  totalItems: [
+                    { columnName: 'total', type: 'total' },
+                    { columnName: 'totalAftAdj', type: 'totalAftAdj' },
+                  ],
+                },
+                integrated: {
+                  calculator: (type, rows, getValue) => {
+                    if (type == 'total' || type == 'totalAftAdj') 
+                      return rows.reduce((acc, row) => acc + row[type], 0)
+                    return IntegratedSummary.defaultCalculator(type, rows, getValue)
+                  },
+                },
+                row: {
+                  totalRowComponent: p => {
+                    const { children } = p
+                    const newChildren = []
+                    for (var i = 0, colSpan = 1; i < children.length; i++, colSpan++) 
+                    {
+                      var col = children[i]
+                      var colName = col.props.tableColumn.column?.name
+                      if (['total', 'totalAftAdj', 'action'].includes(colName)) {
+                        var newChild = [
+                          {
+                            ...col,
+                            props: {
+                              ...col.props,
+                              colSpan,
+                            },
+                            key: `${colName}_${i}`,
+                          },
+                        ]
+                        colSpan = 0
+                        newChildren.push(newChild)
+                      }
+                    }
+                    return <Table.Row {...p}>{newChildren}</Table.Row>
+                  },
+                  messages: {
+                    total: 'Total Before Adjustment',
+                    totalAftAdj: 'Sub Total',
+                  },
+                },
+              },
             }}
           />
         </div>

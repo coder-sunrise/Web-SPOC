@@ -185,7 +185,7 @@ class Main extends React.Component {
         })
         .then(response => {
           const result = response.data.filter(m => {
-            return m.userProfile.role.id === userRole.id
+            return m.userProfile?.role?.id === userRole.id
           })
           this.setState({ hasUser: result.length > 0 })
         })
@@ -647,12 +647,14 @@ class Main extends React.Component {
       isEnablePharmacyModule,
       isEnableLabModule,
       isEnableNurseWorkItem,
+      isEnableMedicalCheckupModule,
     } = clinicSettings.settings
     let filterArray = [CLINICAL_ROLE.DOCTOR, CLINICAL_ROLE.OTHERS]
     if (isEnableRadiologyModule) filterArray.push(CLINICAL_ROLE.RADIOGRAPHER)
     if (isEnablePharmacyModule) filterArray.push(CLINICAL_ROLE.PHARMACIST)
     if (isEnableLabModule) filterArray.push(CLINICAL_ROLE.LABTECH)
     if (isEnableNurseWorkItem) filterArray.push(CLINICAL_ROLE.NURSE)
+    if (isEnableMedicalCheckupModule) filterArray.push(CLINICAL_ROLE.PRO)
 
     const isEdit = !!id
     return (

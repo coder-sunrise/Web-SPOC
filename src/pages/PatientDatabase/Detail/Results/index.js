@@ -31,8 +31,8 @@ const patientResultTabs = props => {
   }
   if (viewBasiceDataRight.rights === 'enable') {
     options.push({
-      name: <span>Basice Data</span>,
-      content: <BasicData {...props} />,
+      name: <span>Basic Data</span>,
+      content: <BasicData {...props} height={props.height - 220} />,
     })
   }
   if (viewLabResultsRight.rights === 'enable') {

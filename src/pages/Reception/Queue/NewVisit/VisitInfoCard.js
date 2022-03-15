@@ -34,7 +34,11 @@ import {
   Attachment,
   AttachmentWithThumbnail,
 } from '@/components/_medisys'
-import { VISIT_TYPE, CANNED_TEXT_TYPE } from '@/utils/constants'
+import {
+  VISIT_TYPE,
+  CANNED_TEXT_TYPE,
+  MEDICALCHECKUP_WORKITEM_STATUS,
+} from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
 import { roundTo, getMappedVisitType } from '@/utils/utils'
@@ -95,6 +99,7 @@ const amountProps = {
 const VisitInfoCard = ({
   classes,
   isReadOnly = false,
+  fromMedicalCheckupReporting = false,
   isVisitReadonlyAfterSigned = false,
   attachments,
   handleUpdateAttachments,
@@ -134,7 +139,7 @@ const VisitInfoCard = ({
       )
       currentTypeItems.map(item => {
         if (item[type.dtoName].isActive === true) {
-          activeItemTotal += item.total || 0
+          activeItemTotal += item.totalAftAdj || 0
         }
       })
     })
@@ -181,29 +186,39 @@ const VisitInfoCard = ({
       i => i.id === values.visitOrderTemplateFK,
     )
     setFieldValue(FormField['visit.visitType'], v)
-
-    if (v != VISIT_TYPE.MC) {
-      setFieldValue('visitDoctor', [
-        ...values.visitDoctor.map(d => {
-          return { ...d, isDeleted: true }
-        }),
-      ])
-
-      setFieldValue('mcReportLanguage', undefined)
-      setFieldValue('mcReportPriority', undefined)
-      setFieldValue('mcUrgentReportRemarks', undefined)
-    } else {
-      setFieldValue('mcReportLanguage', [
-        getMCReportLanguage(patientInfo, clinicSettings.settings),
-      ])
-      setFieldValue('mcReportPriority', 'Normal')
-    }
-
+    updateMedicalCheckup(v, values.isForInvoiceReplacement)
     setFieldValue('visitBasicExaminations[0].visitPurposeFK', v)
 
     if (template) {
       handleVisitOrderTemplateChange(v, template)
     }
+  }
+
+  const updateMedicalCheckup = (visitPurposeFK, isForInvoiceReplacement) => {
+    if (visitPurposeFK != VISIT_TYPE.MC || isForInvoiceReplacement) {
+      setFieldValue('visitDoctor', [
+        ...values.visitDoctor.map(d => {
+          return { ...d, isDeleted: true }
+        }),
+      ])
+      setFieldValue('medicalCheckupWorkitem[0].reportLanguage', undefined)
+      setFieldValue('medicalCheckupWorkitem[0].reportPriority', undefined)
+      setFieldValue('medicalCheckupWorkitem[0].urgentReportRemarks', undefined)
+    } else {
+      setFieldValue('medicalCheckupWorkitem[0].reportLanguage', [
+        getMCReportLanguage(patientInfo, clinicSettings.settings),
+      ])
+      setFieldValue('medicalCheckupWorkitem[0].reportPriority', 'Normal')
+      setFieldValue(
+        'medicalCheckupWorkitem[0].statusFK',
+        MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS,
+      )
+    }
+  }
+
+  const handleIsForInvoiceReplacementChange = v => {
+    const { values } = restProps
+    updateMedicalCheckup(values.visitPurposeFK, v.target.value)
   }
 
   const handleVisitGroupChange = (v, op) => {
@@ -349,7 +364,7 @@ const VisitInfoCard = ({
             render={args => (
               <NumberInput
                 {...args}
-                format={isQueueNoDecimal ? '0.0' : '0'}
+                // format={isQueueNoDecimal ? '0.0' : '0'}
                 precision={isQueueNoDecimal ? 1 : 0}
                 // disabled={isReadOnly}
                 label={formatMessage({
@@ -357,6 +372,11 @@ const VisitInfoCard = ({
                 })}
                 formatter={value => {
                   const isNaN = Number.isNaN(parseFloat(value))
+                  console.log(
+                    isNaN
+                      ? value
+                      : parseFloat(value).toFixed(isQueueNoDecimal ? 1 : 0),
+                  )
                   return isNaN
                     ? value
                     : parseFloat(value).toFixed(isQueueNoDecimal ? 1 : 0)
@@ -389,6 +409,7 @@ const VisitInfoCard = ({
                 {...args}
                 tooltip='This visit is created for past invoice replacement.'
                 label='For Invoice Replacement'
+                onChange={handleIsForInvoiceReplacementChange}
               />
             )}
           />
@@ -442,6 +463,7 @@ const VisitInfoCard = ({
                   {...args}
                   currency
                   authority='none'
+                  suffix='$'
                   disabled={readOnly || isVisitReadonlyAfterSigned}
                   label={formatMessage({
                     id:
@@ -778,7 +800,7 @@ const VisitInfoCard = ({
             attachmentType='Visit'
             handleUpdateAttachments={handleUpdateAttachments}
             attachments={attachments}
-            isReadOnly={isReadOnly}
+            isReadOnly={isReadOnly || fromMedicalCheckupReporting}
             disableScanner={isReadOnly}
             fieldName='visitAttachment'
           />

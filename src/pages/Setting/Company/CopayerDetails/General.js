@@ -28,10 +28,8 @@ export const General = props => {
     autoInvoiceAdjustmentType,
     adminChargeType,
   } = values
-  const { isEnableAutoGenerateStatement = true } = clinicSettings
-
+  const { isEnableAutoGenerateStatement = true } = clinicSettings.settings
   const isNew = values.id ? false : true
-
   return (
     <React.Fragment>
       <GridContainer>
@@ -295,22 +293,24 @@ export const General = props => {
                 code='ctcreditfacility'
                 autocomplete='off'
                 tooltipField='description'
-                orderBy={(['name'], ['asc'])}
+                orderBy={[['name'], ['asc']]}
                 {...args}
               />
             )}
           />
         </GridItem>
 
-        <GridItem md={6}>
+        <GridItem md={isEnableAutoGenerateStatement ? 6 : 12}>
           <Field
             name='remark'
-            render={args => <TextField label='Remarks' {...args} />}
+            render={args => (
+              <TextField multiline rowsMax={4} label='Remarks' {...args} />
+            )}
           />
         </GridItem>
 
-        <GridItem md={6}>
-          {isEnableAutoGenerateStatement && (
+        {isEnableAutoGenerateStatement && (
+          <GridItem md={6}>
             <div
               style={{
                 position: 'relative',
@@ -360,8 +360,8 @@ export const General = props => {
                 />
               )}
             </div>
-          )}
-        </GridItem>
+          </GridItem>
+        )}
       </GridContainer>
 
       {/* Company Address */}

@@ -797,21 +797,23 @@ class Detail extends PureComponent {
                     }}
                   />
                 </GridItem>
-
-                <GridItem xs={6}>
-                  <FastField
-                    name='examinationItemFK'
-                    render={args => {
-                      return (
-                        <CodeSelect
-                          label='Examination'
-                          code='ctexaminationitem'
-                          {...args}
-                        />
-                      )
-                    }}
-                  />
-                </GridItem>
+                {settings.isEnableMedicalCheckupModule && (
+                  <GridItem xs={6}>
+                    <FastField
+                      name='examinationItemFK'
+                      render={args => {
+                        return (
+                          <CodeSelect
+                            label='Examination'
+                            code='ctexaminationitem'
+                            labelField='displayValue'
+                            {...args}
+                          />
+                        )
+                      }}
+                    />
+                  </GridItem>
+                )}
                 {settings.isEnableMedisave && (
                   <GridItem xs={12}>
                     <FastField
@@ -832,7 +834,6 @@ class Detail extends PureComponent {
                     />
                   </GridItem>
                 )}
-
                 {labAndRadiologySetting &&
                   !hiddenFields.includes('ctService_Tag') && (
                     <GridItem xs={12}>

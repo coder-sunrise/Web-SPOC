@@ -19,9 +19,10 @@ import TransferToDepositModal from '@/pages/Finance/Deposit/Modal'
 import styles from '@/pages/Finance/Invoice/Details/PaymentDetails/styles'
 import AddCrNote from './AddCrNote'
 
-@connect(({ patient, clinicSettings }) => ({
+@connect(({ patient, clinicSettings, invoicePayment }) => ({
   patient,
   clinicSettings,
+  invoicePayment,
 }))
 class PaymentDetails extends Component {
   state = {
@@ -190,6 +191,7 @@ class PaymentDetails extends Component {
             InvoiceId: invoiceDetail.id,
             CopayerId: copayerID,
             InvoicePayerid: invoicePayerid,
+            printType: invoiceReportType,
           },
           'Invoice',
         )
@@ -306,7 +308,7 @@ class PaymentDetails extends Component {
     dispatch({
       type: 'invoicePayment/query',
       payload: {
-        id: invoiceDetail.currentId,
+        id: invoiceDetail.id,
       },
     }).then(response => {
       if (response.length > 0) {

@@ -44,7 +44,7 @@ export const defaultData = [
   },
   {
     id: 6,
-    type: 'Sa02 (%)',
+    type: 'SaO2 (%)',
     tableName: 'basicExaminations',
     fieldName: 'saO2',
   },
@@ -359,7 +359,6 @@ export const defaultColumns = genderFK => {
             <div style={{ position: 'relative' }}>
               <div
                 style={{
-                  backgroundColor: '#daecf5',
                   fontWeight: 'bold',
                   paddingLeft: 4,
                   paddingTop: 2,
@@ -453,6 +452,12 @@ export const defaultColumns = genderFK => {
           </div>
         )
       },
+      onCell: row => {
+        if (row.isGroup)
+          return {
+            style: { backgroundColor: '#daecf5' },
+          }
+      },
     },
     {
       dataIndex: 'refRange',
@@ -477,13 +482,18 @@ export const defaultColumns = genderFK => {
         return (
           <div
             style={{
-              backgroundColor: row.isGroup ? '#daecf5' : 'white',
               padding: '2px 4px',
             }}
           >
-            {range ? <span>{range}</span> : <span>&nbsp;</span>}
+            {range}
           </div>
         )
+      },
+      onCell: row => {
+        if (row.isGroup)
+          return {
+            style: { backgroundColor: '#daecf5' },
+          }
       },
     },
     {

@@ -25,7 +25,7 @@ const styles = () => ({
   displayName: 'Signature',
 })
 class Signature extends React.Component {
-  componentDidMount () {
+  componentDidMount() {
     const { image } = this.props
     if (image) this._sketch.setBackgroundFromData(image)
   }
@@ -65,33 +65,54 @@ class Signature extends React.Component {
   }
 
   onSubmitButtonClicked = async () => {
-    const { onClose, updateSignature } = this.props
+    const { onClose, updateSignature, allowClear } = this.props
     const temp = this._sketch.getAllLayerData()
     if (temp.length <= 0) {
-      notification.warning({
-        message: `Please set signature.`,
-      })
-      return
+      if (!allowClear) {
+        notification.warning({
+          message: `Please set signature.`,
+        })
+        return
+      }
     }
-    const thumbnail = await this._generateThumbnail()
-    if (updateSignature) updateSignature({ thumbnail: thumbnail.split(',')[1] })
+    if (temp.length > 0) {
+      const thumbnail = await this._generateThumbnail()
+      if (updateSignature)
+        updateSignature({
+          thumbnail: thumbnail.split(',')[1],
+        })
+    } else {
+      updateSignature({
+        thumbnail: undefined,
+      })
+    }
     if (onClose) onClose(true)
   }
 
-  render () {
-    const { classes, signatureName, isEditable = true, signatureNameLabel = 'Signature Name' } = this.props
+  render() {
+    const {
+      classes,
+      signatureName,
+      isEditable = true,
+      allowClear = false,
+      signatureNameLabel = 'Signature Name',
+    } = this.props
     return (
       <div>
         <GridContainer>
           {signatureName && (
-          <GridItem xs={12} md={12}>
-            <TextField label={signatureNameLabel} disabled value={signatureName} />
-          </GridItem>
+            <GridItem xs={12} md={12}>
+              <TextField
+                label={signatureNameLabel}
+                disabled
+                value={signatureName}
+              />
+            </GridItem>
           )}
           <GridItem xs={12} md={12} onClick={this.contentModifyed}>
             <SketchField
               name='sketch'
-              ref={(c) => {
+              ref={c => {
                 this._sketch = c
               }}
               lineWidth={6}
@@ -120,7 +141,7 @@ class Signature extends React.Component {
           </Button>
           {isEditable && (
             <React.Fragment>
-              <Button color='danger' icon={null} onClick={this.clearSignature}>
+              <Button color='info' icon={null} onClick={this.clearSignature}>
                 Clear
               </Button>
               <Button

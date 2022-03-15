@@ -231,7 +231,7 @@ class Grid extends PureComponent {
                   </Tooltip>
                   {isEnableDeleteDocument && (
                     <Popconfirm
-                      title='Permanently delete this file in all folders?'
+                      title='Permanently delete this document in all tags?'
                       onConfirm={() => {
                         dispatch({
                           type: `${modelName}/removeRow`,

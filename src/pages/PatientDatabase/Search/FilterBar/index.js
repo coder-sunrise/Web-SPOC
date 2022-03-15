@@ -83,11 +83,6 @@ class FilterBar extends PureComponent {
                   icon={<Search />}
                   size='sm'
                   onClick={() => {
-                    // console.log(this.props.values)
-                    // this.props.dispatch({
-                    //   type: 'patientSearch/updateFilter',
-                    //   payload: this.props.values,
-                    // })
                     const { search, dob } = this.props.values
                     const prefix = this.props.values.isExactSearch
                       ? 'eql_'
@@ -95,16 +90,6 @@ class FilterBar extends PureComponent {
                     this.props.dispatch({
                       type: 'patientSearch/query',
                       payload: {
-                        // group: [
-                        //   {
-                        //     // [`${prefix}patientReferenceNo`]: search,
-                        //     [`${prefix}name`]: search,
-                        //     [`${prefix}patientAccountNo`]: search,
-                        //     [`${prefix}patientReferenceNo`]: search,
-                        //     [`${prefix}contactFkNavigation.contactNumber.number`]: search,
-                        //     combineCondition: 'or',
-                        //   },
-                        // ],
                         apiCriteria: {
                           searchValue: search,
                           dob: dob,

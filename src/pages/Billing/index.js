@@ -356,6 +356,7 @@ class Billing extends Component {
     selectedDrugs: [],
     isUpdatedAppliedInvoicePayerInfo: false,
     isConsumedPackage: false,
+    hasNewSignature: false,
   }
 
   componentDidMount() {
@@ -597,6 +598,7 @@ class Billing extends Component {
             })
             this.setState(preState => ({
               submitCount: preState.submitCount + 1,
+              hasNewSignature: false,
             }))
           }
           resetForm()
@@ -629,7 +631,23 @@ class Billing extends Component {
       },
     })
   }
-
+  getInvoiceReportTitle = reportPayload => {
+    switch (reportPayload?.reportParameters?.printType) {
+      case INVOICE_REPORT_TYPES.GROUPINVOICE:
+        return 'Invoice'
+      case INVOICE_REPORT_TYPES.CLAIMABLEITEMCATEGORYINVOICE:
+        return 'Claimable Item Category Invoice'
+      case INVOICE_REPORT_TYPES.CLAIMABLEITEMINVOICE:
+        return 'Claimable Item Invoice'
+      case INVOICE_REPORT_TYPES.INDIVIDUALINVOICE:
+        return 'Visitation Invocie'
+      case INVOICE_REPORT_TYPES.ITEMCATEGORYINVOICE:
+        return 'Item Category Invoice'
+      case INVOICE_REPORT_TYPES.SUMMARYINVOICE:
+        return 'Summary Invoice'
+    }
+    return 'Invoice'
+  }
   backToDispense = () => {
     const { dispatch, billing } = this.props
     dispatch({
@@ -796,72 +814,96 @@ class Billing extends Component {
     }
   }
 
-  onPrintInvoice = (copayerID, invoicePayerid, index, invoiceReportType) => {
+  onPrintInvoice = (
+    copayerID,
+    invoicePayerid,
+    index,
+    invoiceReportType,
+    forceSave = false,
+  ) => {
     const { values, dispatch } = this.props
     const { invoicePayer, visitGroup } = values
     const isGroup = invoiceReportType === INVOICE_REPORT_TYPES.GROUPINVOICE
     const reportID = isGroup ? 89 : 15
     this.setState({ isGroupPrint: isGroup })
-    const modifiedOrNewAddedPayer = invoicePayer.filter(payer => {
-      if (payer.id === undefined && payer.isCancelled) return false
-      if (payer.id) return payer.isModified
-      return true
-    })
-    let parametrPaload
+    let parametrPayload
     if (copayerID) {
-      parametrPaload = {
+      parametrPayload = {
         InvoiceId: values.invoice ? values.invoice.id : '',
         CopayerId: copayerID,
         InvoicePayerid: invoicePayerid,
         printIndex: index,
+        printType: invoiceReportType,
       }
     } else {
-      parametrPaload = {
+      parametrPayload = {
         InvoiceId: values.invoice ? values.invoice.id : '',
+        printType: invoiceReportType,
       }
     }
-    if (modifiedOrNewAddedPayer.length > 0) {
-      dispatch({
-        type: 'global/updateState',
-        payload: {
-          openConfirm: true,
-          openConfirmTitle: '',
-          openConfirmText: 'Confirm',
-          openConfirmContent: `Save changes and print invoice?`,
-          onConfirmSave: () => {
-            let currentPrintIndex
-            if (parametrPaload.printIndex !== undefined) {
-              const { printIndex, ...other } = parametrPaload
-              parametrPaload = {
-                ...other,
-              }
-              currentPrintIndex = invoicePayer.filter(
-                (item, i) => !item.isCancelled && i < printIndex,
-              ).length
-            }
+    const saveAndPrint = () => {
+      let currentPrintIndex
+      if (parametrPayload.printIndex !== undefined) {
+        const { printIndex, ...other } = parametrPayload
+        parametrPayload = {
+          ...other,
+        }
+        currentPrintIndex = invoicePayer.filter(
+          (item, i) => !item.isCancelled && i < printIndex,
+        ).length
+      }
 
-            const callback = () => {
-              this.setState(preState => ({
-                submitCount: preState.submitCount + 1,
-              }))
-              if (currentPrintIndex !== undefined) {
-                const {
-                  billing: { entity = {} },
-                } = this.props
-                parametrPaload = {
-                  ...parametrPaload,
-                  InvoicePayerid: entity.invoicePayer[currentPrintIndex].id,
-                }
-              }
+      const callback = () => {
+        this.setState(preState => ({
+          submitCount: preState.submitCount + 1,
+          hasNewSignature: false,
+        }))
+        if (currentPrintIndex !== undefined) {
+          const {
+            billing: { entity = {} },
+          } = this.props
+          parametrPayload = {
+            ...parametrPayload,
+            InvoicePayerid: entity.invoicePayer[currentPrintIndex].id,
+            printType: invoiceReportType,
+          }
+        }
 
-              this.onShowReport(reportID, { visitGroup, ...parametrPaload })
-            }
-            this.upsertBilling(callback)
-          },
-        },
-      })
+        this.onShowReport(reportID, {
+          visitGroup,
+          ...parametrPayload,
+        })
+      }
+      this.upsertBilling(callback)
+    }
+    if (forceSave) {
+      saveAndPrint()
     } else {
-      this.onShowReport(reportID, { visitGroup, ...parametrPaload })
+      const modifiedOrNewAddedPayer = invoicePayer.filter(payer => {
+        if (payer.id === undefined && payer.isCancelled) return false
+        if (payer.id) return payer.isModified
+        return true
+      })
+      console.log(
+        modifiedOrNewAddedPayer.length > 0,
+        this.state.hasNewSignature,
+      )
+      if (modifiedOrNewAddedPayer.length > 0 || this.state.hasNewSignature) {
+        dispatch({
+          type: 'global/updateState',
+          payload: {
+            openConfirm: true,
+            openConfirmTitle: '',
+            openConfirmText: 'Confirm',
+            openConfirmContent: `Save changes and print invoice?`,
+            onConfirmSave: () => {
+              saveAndPrint()
+            },
+          },
+        })
+      } else {
+        this.onShowReport(reportID, { visitGroup, ...parametrPayload })
+      }
     }
   }
 
@@ -885,6 +927,7 @@ class Billing extends Component {
               undefined,
               undefined,
               invoiceReportType,
+              true,
             )
           },
         },
@@ -896,11 +939,11 @@ class Billing extends Component {
 
   onPrintVisitInvoiceClick = () => {
     const { values } = this.props
-    const parametrPaload = {
+    const parametrPayload = {
       InvoiceId: values.invoice ? values.invoice.id : '',
     }
 
-    this.onShowReport(80, parametrPaload)
+    this.onShowReport(80, parametrPayload)
   }
 
   handleAddPayment = async payment => {
@@ -1078,6 +1121,19 @@ class Billing extends Component {
     })
   }
 
+  updateInvoiceSignature = signature => {
+    const { dispatch, values, patient, setFieldValue } = this.props
+    const { thumbnail } = signature
+    if (thumbnail != values.invoice.signature) {
+      this.setState({ hasNewSignature: true })
+    }
+    setFieldValue('invoice', {
+      ...values.invoice,
+      signatureName: thumbnail ? patient.name : undefined,
+      signature: thumbnail ? thumbnail : undefined,
+    })
+  }
+
   render() {
     const {
       showReport,
@@ -1111,7 +1167,6 @@ class Billing extends Component {
       clinicSettings,
       codetable,
     } = this.props
-
     const setValues = v => {
       let newValues = v
       if (v.visitGroupStatusDetails?.length > 0) {
@@ -1154,13 +1209,21 @@ class Billing extends Component {
       isEnableVisitationInvoiceReport = false,
       autoPrintOnCompletePayment = false,
     } = clinicSettings
-    let src
+    let packageDrawdownSignatureSrc
     if (
       values.packageRedeemAcknowledge &&
       values.packageRedeemAcknowledge.signature !== '' &&
       values.packageRedeemAcknowledge.signature !== undefined
     ) {
-      src = `${base64Prefix}${values.packageRedeemAcknowledge.signature}`
+      packageDrawdownSignatureSrc = `${base64Prefix}${values.packageRedeemAcknowledge.signature}`
+    }
+    let invoiceSignatureSrc
+    if (
+      values?.invoice?.signature &&
+      values?.invoice?.signature !== '' &&
+      values?.invoice?.signature !== undefined
+    ) {
+      invoiceSignatureSrc = `${base64Prefix}${values?.invoice?.signature}`
     }
 
     return (
@@ -1191,6 +1254,7 @@ class Billing extends Component {
                               )
                             : dispense.entity
                         }
+                        history={this.props.history}
                         dispatch={this.props.dispatch}
                         onDrugLabelClick={this.handleDrugLabelClick}
                         showDrugLabelSelection={
@@ -1334,7 +1398,10 @@ class Billing extends Component {
                 {isEnablePackage && this.state.isConsumedPackage && (
                   <Button
                     color={
-                      src !== '' && src !== undefined ? 'success' : 'danger'
+                      packageDrawdownSignatureSrc !== '' &&
+                      packageDrawdownSignatureSrc !== undefined
+                        ? 'success'
+                        : 'danger'
                     }
                     onClick={() => {
                       this.setState({
@@ -1347,7 +1414,25 @@ class Billing extends Component {
                   </Button>
                 )}
                 <Button
+                  size='sm'
+                  color={
+                    invoiceSignatureSrc !== '' &&
+                    invoiceSignatureSrc !== undefined
+                      ? 'success'
+                      : 'danger'
+                  }
+                  onClick={() => {
+                    this.setState({
+                      isShowInvoiceSignature: true,
+                    })
+                  }}
+                  disabled={this.state.isEditing || values.id === undefined}
+                >
+                  Patient Signature
+                </Button>
+                <Button
                   color='info'
+                  size='sm'
                   onClick={this.backToDispense}
                   disabled={
                     this.state.isEditing ||
@@ -1364,6 +1449,7 @@ class Billing extends Component {
                 </Button>
                 <Button
                   color='primary'
+                  size='sm'
                   onClick={this.handleSaveBillingClick}
                   disabled={
                     this.state.isEditing ||
@@ -1376,6 +1462,7 @@ class Billing extends Component {
                 </Button>
                 <Button
                   color='success'
+                  size='sm'
                   disabled={
                     this.state.isEditing ||
                     values.id === undefined ||
@@ -1432,11 +1519,7 @@ class Billing extends Component {
         <CommonModal
           open={showReport}
           onClose={this.onCloseReport}
-          title={
-            [15, 89].indexOf(reportPayload.reportID) > 0
-              ? 'Invoice'
-              : 'Visitation Invoice'
-          }
+          title={this.getInvoiceReportTitle(reportPayload)}
           maxWidth='lg'
         >
           <ReportViewer
@@ -1458,9 +1541,29 @@ class Billing extends Component {
           <Signature
             signatureName={patient.name}
             updateSignature={this.updateSignature}
-            image={src}
-            isEditable={src === '' || src === undefined}
+            image={packageDrawdownSignatureSrc}
+            isEditable={
+              packageDrawdownSignatureSrc === '' ||
+              packageDrawdownSignatureSrc === undefined
+            }
             signatureNameLabel='Patient Name'
+          />
+        </CommonModal>
+        <CommonModal
+          open={this.state.isShowInvoiceSignature}
+          title='Patient Signature'
+          onClose={() => {
+            this.setState({
+              isShowInvoiceSignature: false,
+            })
+          }}
+        >
+          <Signature
+            signatureName={patient.name}
+            updateSignature={this.updateInvoiceSignature}
+            image={invoiceSignatureSrc}
+            signatureNameLabel='Patient Name'
+            allowClear={true}
           />
         </CommonModal>
         <ViewPatientHistory top='239px' />

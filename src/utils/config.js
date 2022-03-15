@@ -179,7 +179,7 @@ export const validation = {
   },
 }
 export const currencyFormat = '0,0.00'
-export const percentageFormat = '0.00%'
+export const percentageFormat = '0.00'
 export const currencySymbol = '$'
 export const qtyFormat = '0.0'
 export const numberFormat = '0,0'

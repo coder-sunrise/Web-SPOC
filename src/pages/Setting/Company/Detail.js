@@ -17,6 +17,7 @@ import {
   CustomInput,
 } from '@/components'
 import AuthorizedContext from '@/components/Context/Authorized'
+import Authorized from '@/utils/Authorized'
 import Contact from './Contact'
 
 @connect(({ clinicSettings }) => ({
@@ -180,7 +181,7 @@ class Detail extends PureComponent {
     } = props
     const { name } = route
     const isCopayer = name === 'copayer'
-
+    const isSupplier = name === 'supplier'
     const {
       isUserMaintainable,
       isGSTEnabled,
@@ -192,6 +193,20 @@ class Detail extends PureComponent {
     if (rights === 'disable') finalRights = 'disable'
 
     const { isEnableAutoGenerateStatement = false } = clinicSettings
+
+    let hideConfirm = false
+    if (isSupplier) {
+      const right = Authorized.check('settings.supplier.supplierdetails') || {
+        rights: 'hidden',
+      }
+      hideConfirm = values.id > 0 ? right.rights != 'enable' : false
+    }
+    if (isCopayer) {
+      const right = Authorized.check('copayer.copayerdetails') || {
+        rights: 'hidden',
+      }
+      hideConfirm = values.id > 0 ? right.rights != 'enable' : false
+    }
     return (
       <React.Fragment>
         <AuthorizedContext.Provider
@@ -258,15 +273,27 @@ class Detail extends PureComponent {
                   </GridItem>
                 </React.Fragment>
               )}
-              <React.Fragment>
-                <GridItem md={4}>
-                  <Field
-                    name='adminCharge'
-                    render={args => {
-                      if (values.adminChargeType === 'ExactAmount') {
+              {(isCopayer || isSupplier) && (
+                <React.Fragment>
+                  <GridItem md={4}>
+                    <Field
+                      name='adminCharge'
+                      render={args => {
+                        if (values.adminChargeType === 'ExactAmount') {
+                          return (
+                            <NumberInput
+                              currency
+                              label='Corporate Charges'
+                              defaultValue='0.00'
+                              min={0}
+                              precision={2}
+                              {...args}
+                            />
+                          )
+                        }
                         return (
                           <NumberInput
-                            currency
+                            percentage
                             label='Corporate Charges'
                             defaultValue='0.00'
                             min={0}
@@ -274,36 +301,26 @@ class Detail extends PureComponent {
                             {...args}
                           />
                         )
-                      }
-                      return (
-                        <NumberInput
-                          percentage
-                          label='Corporate Charges'
-                          defaultValue='0.00'
-                          min={0}
-                          precision={2}
+                      }}
+                    />
+                  </GridItem>
+                  <GridItem md={2}>
+                    <Field
+                      name='adminChargeType'
+                      render={args => (
+                        <Switch
+                          checkedChildren='$'
+                          checkedValue='ExactAmount'
+                          unCheckedChildren='%'
+                          unCheckedValue='Percentage'
+                          label=' '
                           {...args}
                         />
-                      )
-                    }}
-                  />
-                </GridItem>
-                <GridItem md={2}>
-                  <Field
-                    name='adminChargeType'
-                    render={args => (
-                      <Switch
-                        checkedChildren='$'
-                        checkedValue='ExactAmount'
-                        unCheckedChildren='%'
-                        unCheckedValue='Percentage'
-                        label=' '
-                        {...args}
-                      />
-                    )}
-                  />
-                </GridItem>
-              </React.Fragment>
+                      )}
+                    />
+                  </GridItem>
+                </React.Fragment>
+              )}
 
               {isCopayer && (
                 <React.Fragment>
@@ -405,7 +422,7 @@ class Detail extends PureComponent {
               )}
               <React.Fragment>
                 <GridItem md={2}>
-                  {!isCopayer ? (
+                  {!isCopayer && isSupplier ? (
                     <div style={{ position: 'relative', top: 16 }}>
                       <CustomInput label='' disabled style={{ width: 0 }} />
                       <div
@@ -431,7 +448,7 @@ class Detail extends PureComponent {
                   )}
                 </GridItem>
                 <GridItem md={4}>
-                  {!isCopayer ? (
+                  {!isCopayer && isSupplier ? (
                     <Field
                       name='gstValue'
                       render={args => (
@@ -503,7 +520,7 @@ class Detail extends PureComponent {
           </div>
           {footer &&
             footer({
-              onConfirm: props.handleSubmit,
+              onConfirm: hideConfirm ? undefined : props.handleSubmit,
               confirmBtnText: 'Save',
               confirmProps: {
                 disabled: false,

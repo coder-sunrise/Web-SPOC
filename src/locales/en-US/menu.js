@@ -159,6 +159,7 @@ export default {
   'menu.setting.generalsetting': 'General Setting',
   'menu.setting.queuedisplaysetup': 'Queue Display Setup',
   'menu.setting.supplier': 'Supplier',
+  'menu.setting.manufacturer': 'Manufacturer',
   'menu.setting.paymentmode': 'Payment Mode',
   'menu.setting.appointmenttype': 'Appointment Type',
   'menu.setting.referralsource': 'Referral Source',
@@ -217,6 +218,12 @@ export default {
   'menu.radiology': 'Radiology Center',
   'menu.radiology.worklist': 'Worklist',
   'menu.radiology.history': 'History',
+
+  'menu.medicalcheckup': 'Medical Checkup',
+  'menu.medicalcheckup.worklist': 'Worklist',
+  'menu.medicalcheckup.history': 'History',
+  'menu.medicalcheckup.worklist.reportingdetails': 'Reporting details',
+  'menu.medicalcheckup.orderdetails': 'Order Details',
 
   'menu.pharmacy': 'Pharmacy',
   'menu.pharmacy.worklist': 'Worklist',

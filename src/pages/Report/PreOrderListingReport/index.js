@@ -58,13 +58,11 @@ const PreOrderListingReportWithFormik = withFormik({
   validationSchema: Yup.object().shape({}),
   mapPropsToValues: () => ({
     patientCriteria: '',
-    apptDateFrom: moment(new Date())
-      .add('-1', 'M')
-      .toDate(),
+    apptDateFrom: moment(new Date()).toDate(),
     apptDateTo: moment(new Date())
-      .add('0', 'M')
+      .add('1', 'M')
       .toDate(),
-    status: 'All',
+    status: [-99, 'New', 'Actualizing', 'Actualized'],
   }),
 })(PreOrderListingReport)
 

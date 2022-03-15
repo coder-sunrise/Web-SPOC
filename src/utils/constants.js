@@ -111,6 +111,7 @@ export const CLINICAL_ROLE = {
   PHARMACIST: 4,
   LABTECH: 5,
   NURSE: 6,
+  PRO: 7,
 }
 
 export const UNFIT_TYPE = {
@@ -274,6 +275,7 @@ export const REPORT_ID = {
   PATIENT_INFO_LEAFLET: 87,
   DRUG_LABEL_80MM_45MM_V2: 88,
   DRUG_SUMMARY_LABEL_80MM_45MM: 90,
+  LAB_SPECIMEN_LABEL_50MM_34MM: 92,
 }
 
 export const INVOICE_STATUS = {
@@ -539,11 +541,22 @@ export const NUMBER_TYPE = {
   FAX: 4,
 }
 
+export const APPNOTIFICATION_SCHEMA = {
+  LAB: { id: 5, name: 'Lab' },
+  RADIOLOGY: { id: 6, name: 'Radiology' },
+  PHARMACY: { id: 7, name: 'Pharmacy' },
+  MC: { id: 8, name: 'MC' },
+}
+
 export const NOTIFICATION_TYPE = {
   QUEUE: 1,
   CODETABLE: 2,
   ERROR: 3,
   CONSULTAION: 4,
+  LAB: APPNOTIFICATION_SCHEMA.LAB.id,
+  RADIOLOGY: APPNOTIFICATION_SCHEMA.RADIOLOGY.id,
+  PHARMACY: APPNOTIFICATION_SCHEMA.PHARMACY.id,
+  MC: APPNOTIFICATION_SCHEMA.MC.id,
 }
 
 export const NOTIFICATION_STATUS = {
@@ -904,7 +917,7 @@ export const LAB_SPECIMEN_STATUS_COLORS = {
   4: '#993333',
   5: '#0000ff',
   6: '#009933',
-  7: '#33cc99',
+  7: '#777777',
 }
 
 export const LAB_SPECIMEN_ALL_LABEL = 'All'
@@ -990,4 +1003,81 @@ export const TESTTYPES = {
   R50CMCORRECTED: 'Right50cmCorrected',
   L5MCORRECTED: 'Left5mCorrected',
   L50CMCORRECTED: 'Left50cmCorrected',
+}
+
+export const WORK_ITEM_TYPES = {
+  LAB: 'Lab',
+  RADIOLOGY: 'Radiology',
+  NURSEACTUALIZE: 'NurseActualize',
+  PHARMACY: 'Pharmacy',
+}
+export const WORK_ITEM_TYPES_ENUM = {
+  LAB: 0,
+  RADIOLOGY: 1,
+  NURSEACTUALIZE: 2,
+  PHARMACY: 3,
+}
+
+export const MEDICALCHECKUP_WORKITEM_STATUS = {
+  INPROGRESS: 1,
+  REPORTING: 2,
+  PENDINGVERIFICATION: 3,
+  COMPLETED: 4,
+}
+
+export const MEDICALCHECKUP_WORKITEM_STATUS_ALL_COLOR = '#5a9cde'
+export const MEDICALCHECKUP_WORKITEM_STATUSES = [
+  {
+    id: MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS,
+    label: 'In Progress',
+    color: '#009999',
+    description: 'In Progress',
+  },
+  {
+    id: MEDICALCHECKUP_WORKITEM_STATUS.REPORTING,
+    label: 'Reporting',
+    color: '#CC6633',
+    description: 'Reporting',
+  },
+  {
+    id: MEDICALCHECKUP_WORKITEM_STATUS.PENDINGVERIFICATION,
+    label: 'P. Verification',
+    color: '#44A2FF',
+    description: 'Pending Verification',
+  },
+  {
+    id: MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED,
+    label: 'Completed',
+    color: '#009933',
+    description: 'Completed',
+  },
+]
+export const DISPENSE_FROM = {
+  QUEUE: 1,
+  MEDICALCHECKUP: 2,
+}
+
+export const REPORTINGDOCTOR_STATUS = {
+  NEW: 'New',
+  COMMENTVERIFYING: 'Comment Verifying',
+  VERIFIED: 'Verified',
+}
+
+export const MEDICALCHECKUP_REPORTTYPE = {
+  TEMPORARY: 'Temporary Report',
+  FINAL: 'Final Report',
+}
+
+export const MEDICALCHECKUP_REPORTSTATUS = {
+  PENDINGVERIFY: 'Pending Verify',
+  VERIFIED: 'Verified',
+  REJECT: 'Rejected',
+  DISCARD: 'Discarded',
+  ABANDONED: 'Abandoned',
+}
+
+export const EXAMINATION_STATUS = {
+  NEW: 'New',
+  INPROGRESS: 'In Progress',
+  COMPLETED: 'Completed',
 }

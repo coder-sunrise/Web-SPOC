@@ -130,10 +130,7 @@ const Grid = ({ prescriptionSet, dispatch }) => {
               paddingRight = 10
             }
             return (
-              <div
-                style={wrapCellTextStyle}
-                style={{ paddingRight: paddingRight }}
-              >
+              <div style={{ ...wrapCellTextStyle, paddingRight: paddingRight }}>
                 <Tooltip title={texts}>
                   <span>
                     {warningLabel && (

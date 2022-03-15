@@ -34,7 +34,7 @@ class TextField extends React.PureComponent {
     useTrailing: true,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     // this.myRef = React.createRef()
     const {
@@ -80,7 +80,7 @@ class TextField extends React.PureComponent {
   //   return null
   // }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.state.focused) return
     const { field, value, defaultValue } = nextProps
     if (field) {
@@ -129,7 +129,7 @@ class TextField extends React.PureComponent {
     // })
   }
 
-  onChange = (event) => {
+  onChange = event => {
     // console.log(event)
     this.setState({
       value: event.target.value,
@@ -145,16 +145,12 @@ class TextField extends React.PureComponent {
     }
   }
 
-  shouldFocus = (error) => {
+  shouldFocus = error => {
     return error && this.props.form.submitCount !== this.validationCount
   }
 
-  onKeyUp = (e) => {
-    if (
-      [
-        13,
-      ].includes(e.which)
-    ) {
+  onKeyUp = e => {
+    if ([13].includes(e.which)) {
       this._onChange(e.target.value)
       if (this.debouncedOnChange.cancel) this.debouncedOnChange.cancel()
     }
@@ -178,7 +174,7 @@ class TextField extends React.PureComponent {
     // window.$_inputFocused = true
   }
 
-  handleBlur = (e) => {
+  handleBlur = e => {
     // console.log('input blur')
     this.setState({
       focused: false,
@@ -187,7 +183,7 @@ class TextField extends React.PureComponent {
     if (this.debouncedOnChange.cancel) this.debouncedOnChange.cancel()
   }
 
-  render () {
+  render() {
     const { state, props } = this
     // console.log(props)
     let {
@@ -211,6 +207,7 @@ class TextField extends React.PureComponent {
       fullWidth,
       number,
       currency,
+      percentage,
       creditCard,
       qty,
       control = 1,
@@ -223,6 +220,7 @@ class TextField extends React.PureComponent {
       onKeyUp,
       onKeyDown,
       onFocus,
+      noSuffix, // for adjustment control
       onBlur,
       preventDefaultChangeEvent,
       value,
@@ -295,15 +293,19 @@ class TextField extends React.PureComponent {
         cfg.value = cfg.value.toLowerCase()
       }
     }
-    // console.log(cfg)
-    // console.log(inputProps)
-    // console.log('custominput', resetProps, cfg)
-
+    let defaultSuffix = suffix
+    if (currency && !text && !noSuffix) {
+      defaultSuffix = '$'
+    }
+    if (percentage && !text && !noSuffix) {
+      defaultSuffix = '%'
+    }
     return (
       <BaseInput
         inputRootCustomClasses={inputRootCustomClasses}
         {...resetProps}
         {...cfg}
+        suffix={defaultSuffix}
         // isDebouncing={this.state.isDebouncing}
       />
     )
@@ -321,11 +323,7 @@ TextField.propTypes = {
     PropTypes.bool,
     PropTypes.string,
   ]),
-  autocomplete: PropTypes.oneOf([
-    'off',
-    'on',
-    'nope',
-  ]),
+  autocomplete: PropTypes.oneOf(['off', 'on', 'nope']),
   success: PropTypes.bool,
   white: PropTypes.bool,
   help: PropTypes.node,

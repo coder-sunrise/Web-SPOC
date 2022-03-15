@@ -47,7 +47,7 @@ const Detail = ({
   errors,
   clinicSettings,
 }) => {
-  const [hasActiveSession, setHasActiveSession] = useState(true)
+  const [hasActiveSession, setHasActiveSession] = useState(false)
 
   const detailProps = {
     consumableDetail,
@@ -291,6 +291,7 @@ export default compose(
           ...restValues,
           ...optionGrp,
           id,
+          isOnlyClinicInternalUsage: !optionGrp.isOnlyClinicInternalUsage,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],
           consumableStock: defaultConsumableStock,

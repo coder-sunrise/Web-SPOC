@@ -32,252 +32,26 @@ class SchemesGrid extends PureComponent {
   state = {
     editingRowIds: [],
     rowChanges: {},
+    isPatientProfileSaved: false,
+  }
+
+  componentDidMount = () => {
+    const { values } = this.props
+    this.setState({ isPatientProfileSaved: values.id })
   }
 
   constructor(props) {
     super(props)
 
-    const { title, titleChildren, dispatch, type, clinicSettings } = props
+    const {
+      title,
+      titleChildren,
+      dispatch,
+      type,
+      clinicSettings,
+      values,
+    } = props
     const { state } = this
-    const isMedisaveEnable = clinicSettings.settings.isEnableMedisave
-
-    this.tableParas = {
-      columns: [
-        { name: 'schemeTypeFK', title: 'Scheme Type' },
-        { name: 'coPaymentSchemeFK', title: 'Scheme Name' },
-        { name: 'accountNumber', title: 'Account Number' },
-        { name: 'validRange', title: 'Valid Period' },
-        { name: 'action', title: 'Action' },
-      ],
-      columnExtensions: [
-        {
-          columnName: 'validRange',
-          type: 'daterange',
-          getInitialValue: row => {
-            return [row.validFrom, row.validTo]
-          },
-          sortingEnabled: false,
-          isDisabled: row => {
-            return this.isPHPC(row)
-          },
-        },
-        {
-          columnName: 'schemeTypeFK',
-          type: 'codeSelect',
-          code: 'ctSchemeType',
-          sortingEnabled: false,
-          localFilter: opt => {
-            return isMedisaveEnable ? opt : !this.isMedisave(opt)
-          },
-          onChange: ({ val, option, row, onValueChange }) => {
-            let { rows } = this.props
-            if (!row.id) {
-              rows = rows.concat([row])
-            }
-            const ctSchemeTypes = this.props.codetable[
-              ctSchemeType.toLowerCase()
-            ]
-
-            if (row.coPaymentSchemeFK) {
-              row.coPaymentSchemeFK = null
-              row.copayerFK = null
-            }
-
-            const st = ctSchemeTypes.find(o => o.id === val)
-            if (!st) return
-            if (this.isPHPC(row)) {
-              row.validRange = []
-              row.validFrom = undefined
-              row.validTo = undefined
-              // row.accountNumber = undefined
-            }
-            const rs = rows.filter(
-              o =>
-                !o.isDeleted &&
-                o.schemeTypeFK === val &&
-                ['CORPORATE', 'INSURANCE'].indexOf(st.code.toUpperCase()) < 0 &&
-                o.id !== row.id,
-            )
-            if (rs.length >= 1) {
-              row.schemeTypeFK = undefined
-              notification.error({
-                message: 'The Schemes record already exists in the system',
-              })
-            }
-            if (
-              this.isCHAS(val) &&
-              rows.filter(
-                o =>
-                  !o.isDeleted &&
-                  this.isCHAS(o.schemeTypeFK) &&
-                  o.id !== row.id,
-              ).length > 0
-            ) {
-              row.schemeTypeFK = undefined
-
-              notification.error({
-                message: 'Patient already has a CHAS Scheme Added',
-              })
-            }
-            if (
-              this.medisaveCheck(row) &&
-              rows.filter(
-                o => !o.isDeleted && this.medisaveCheck(o) && o.id !== row.id,
-              ).length > 0
-            ) {
-              row.schemeTypeFK = undefined
-
-              notification.error({
-                message:
-                  'Patient can only either Medisave 500 Visit or Outpantient Scan at any point of time',
-              })
-              return
-            }
-          },
-          isDisabled: row => {
-            return this.isExistingRow(row)
-          },
-        },
-        {
-          columnName: 'coPaymentSchemeFK',
-          sortingEnabled: false,
-          type: 'codeSelect',
-          options: row => {
-            const { codetable } = this.props
-            const { copaymentscheme = [] } = codetable
-            let filterOptions = []
-            if (row.schemeTypeFK === SCHEME_TYPE.CORPORATE)
-              filterOptions = copaymentscheme.filter(
-                cps => cps.schemeTypeName === 'Corporate',
-              )
-            else if (row.schemeTypeFK === SCHEME_TYPE.INSURANCE)
-              filterOptions = copaymentscheme.filter(
-                cps => cps.schemeTypeName === 'Insurance',
-              )
-            return filterOptions
-          },
-          isDisabled: row => !this.isCorporate(row),
-          render: row => {
-            const { copaymentscheme = [] } = this.props.codetable
-            const patCoPaymentScheme = copaymentscheme.find(
-              item => item.id === row.coPaymentSchemeFK,
-            )
-
-            if (
-              (row.schemeTypeFK === SCHEME_TYPE.CORPORATE ||
-                row.schemeTypeFK === SCHEME_TYPE.INSURANCE) &&
-              patCoPaymentScheme
-            ) {
-              const isActiveLabel = !patCoPaymentScheme.isActive
-                ? ' (Inactive)'
-                : ''
-              return (
-                <span>
-                  {patCoPaymentScheme ? patCoPaymentScheme.name : ''}
-                  {isActiveLabel}
-                </span>
-              )
-            }
-            return (
-              <span>{patCoPaymentScheme ? patCoPaymentScheme.name : ''}</span>
-            )
-          },
-          onChange: ({ val, option, row, onValueChange }) => {
-            let { rows } = this.props
-            if (!row.id) {
-              rows = rows.concat([row])
-            }
-            const {
-              copaymentscheme = [],
-              ctschemetype: ctSchemeTypes = [],
-            } = this.props.codetable
-
-            const st = ctSchemeTypes.find(o => o.id === row.schemeTypeFK)
-
-            const rs = rows.filter(
-              o =>
-                !o.isDeleted &&
-                o.coPaymentSchemeFK === val &&
-                ['CORPORATE', 'INSURANCE'].indexOf(st.code.toUpperCase()) < 0 &&
-                o.id !== row.id,
-            )
-
-            if (rs.length >= 1) {
-              row.coPaymentSchemeFK = undefined
-
-              notification.error({
-                message: 'The Schemes record already exists in the system',
-              })
-              return
-            }
-            const patCoPaymentScheme = copaymentscheme.find(
-              item => item.id === row.coPaymentSchemeFK,
-            )
-            row.copayerFK = option.copayerFK
-            if (!patCoPaymentScheme.isActive) {
-              row.coPaymentSchemeFK = undefined
-              notification.error({
-                message: 'Selected scheme is an inactive schemes',
-              })
-            }
-          },
-        },
-        {
-          columnName: 'accountNumber',
-          sortingEnabled: false,
-          isDisabled: row => {
-            return !this.isCorporate(row)
-          },
-        },
-        {
-          columnName: 'action',
-          width: 90,
-          isReactComponent: true,
-          sortingEnabled: false,
-          isDisabled: row => true,
-          render: e => {
-            const { row, columnConfig } = e
-            const { control } = columnConfig
-            const { commitChanges } = control
-            return (
-              <Fragment>
-                <Popconfirm
-                  title='Confirm to delete?'
-                  onConfirm={() => {
-                    commitChanges({
-                      changed: {
-                        [row.id]: {
-                          isDeleted: true,
-                        },
-                      },
-                    })
-                  }}
-                >
-                  <Button size='sm' justIcon color='danger'>
-                    <Delete />
-                  </Button>
-                </Popconfirm>
-                <Tooltip title="Print Patient's Co-Payer Label">
-                  <Button
-                    size='sm'
-                    justIcon
-                    color='primary'
-                    disabled={!row.copayerFK}
-                  >
-                    <Print
-                      onClick={() => {
-                        console.log(row)
-                        this.printLabel(row.copayerFK)
-                      }}
-                    />
-                  </Button>
-                </Tooltip>
-              </Fragment>
-            )
-          },
-        },
-      ],
-    }
 
     this.commitChanges = ({ rows, added, changed, deleted }) => {
       const { setFieldValue } = this.props
@@ -443,14 +217,241 @@ class SchemesGrid extends PureComponent {
     ]
     handlePrint(JSON.stringify(payload))
   }
+
   render() {
     const { editingRowIds, rowChanges } = this.state
-    const { type, rows, schema, errors } = this.props
+    const { type, rows, schema, values, errors, clinicSettings } = this.props
     const EditingProps = {
       showAddCommand: true,
       showCommandColumn: false,
       onCommitChanges: this.commitChanges,
     }
+
+    const isMedisaveEnable = clinicSettings.settings.isEnableMedisave
+    const columnExtensions = [
+      {
+        columnName: 'validRange',
+        type: 'daterange',
+        getInitialValue: row => {
+          return [row.validFrom, row.validTo]
+        },
+        sortingEnabled: false,
+        isDisabled: row => {
+          return this.isPHPC(row)
+        },
+      },
+      {
+        columnName: 'schemeTypeFK',
+        type: 'codeSelect',
+        code: 'ctSchemeType',
+        sortingEnabled: false,
+        localFilter: opt => {
+          return isMedisaveEnable ? opt : !this.isMedisave(opt)
+        },
+        onChange: ({ val, option, row, onValueChange }) => {
+          let { rows } = this.props
+          if (!row.id) {
+            rows = rows.concat([row])
+          }
+          const ctSchemeTypes = this.props.codetable[ctSchemeType.toLowerCase()]
+
+          if (row.coPaymentSchemeFK) {
+            row.coPaymentSchemeFK = null
+            row.copayerFK = null
+          }
+
+          const st = ctSchemeTypes.find(o => o.id === val)
+          if (!st) return
+          if (this.isPHPC(row)) {
+            row.validRange = []
+            row.validFrom = undefined
+            row.validTo = undefined
+            // row.accountNumber = undefined
+          }
+          const rs = rows.filter(
+            o =>
+              !o.isDeleted &&
+              o.schemeTypeFK === val &&
+              ['CORPORATE', 'INSURANCE'].indexOf(st.code.toUpperCase()) < 0 &&
+              o.id !== row.id,
+          )
+          if (rs.length >= 1) {
+            row.schemeTypeFK = undefined
+            notification.error({
+              message: 'The Schemes record already exists in the system',
+            })
+          }
+          if (
+            this.isCHAS(val) &&
+            rows.filter(
+              o =>
+                !o.isDeleted && this.isCHAS(o.schemeTypeFK) && o.id !== row.id,
+            ).length > 0
+          ) {
+            row.schemeTypeFK = undefined
+
+            notification.error({
+              message: 'Patient already has a CHAS Scheme Added',
+            })
+          }
+          if (
+            this.medisaveCheck(row) &&
+            rows.filter(
+              o => !o.isDeleted && this.medisaveCheck(o) && o.id !== row.id,
+            ).length > 0
+          ) {
+            row.schemeTypeFK = undefined
+
+            notification.error({
+              message:
+                'Patient can only either Medisave 500 Visit or Outpantient Scan at any point of time',
+            })
+            return
+          }
+        },
+        isDisabled: row => {
+          return this.isExistingRow(row)
+        },
+      },
+      {
+        columnName: 'coPaymentSchemeFK',
+        sortingEnabled: false,
+        type: 'codeSelect',
+        options: row => {
+          const { codetable } = this.props
+          const { copaymentscheme = [] } = codetable
+          let filterOptions = []
+          if (row.schemeTypeFK === SCHEME_TYPE.CORPORATE)
+            filterOptions = copaymentscheme.filter(
+              cps => cps.schemeTypeName === 'Corporate',
+            )
+          else if (row.schemeTypeFK === SCHEME_TYPE.INSURANCE)
+            filterOptions = copaymentscheme.filter(
+              cps => cps.schemeTypeName === 'Insurance',
+            )
+          return filterOptions
+        },
+        isDisabled: row => !this.isCorporate(row),
+        render: row => {
+          const { copaymentscheme = [] } = this.props.codetable
+          const patCoPaymentScheme = copaymentscheme.find(
+            item => item.id === row.coPaymentSchemeFK,
+          )
+
+          if (
+            (row.schemeTypeFK === SCHEME_TYPE.CORPORATE ||
+              row.schemeTypeFK === SCHEME_TYPE.INSURANCE) &&
+            patCoPaymentScheme
+          ) {
+            const isActiveLabel = !patCoPaymentScheme.isActive
+              ? ' (Inactive)'
+              : ''
+            return (
+              <span>
+                {patCoPaymentScheme ? patCoPaymentScheme.name : ''}
+                {isActiveLabel}
+              </span>
+            )
+          }
+          return (
+            <span>{patCoPaymentScheme ? patCoPaymentScheme.name : ''}</span>
+          )
+        },
+        onChange: ({ val, option, row, onValueChange }) => {
+          let { rows } = this.props
+          if (!row.id) {
+            rows = rows.concat([row])
+          }
+          const {
+            copaymentscheme = [],
+            ctschemetype: ctSchemeTypes = [],
+          } = this.props.codetable
+
+          const st = ctSchemeTypes.find(o => o.id === row.schemeTypeFK)
+
+          const rs = rows.filter(
+            o =>
+              !o.isDeleted &&
+              o.coPaymentSchemeFK === val &&
+              ['CORPORATE', 'INSURANCE'].indexOf(st.code.toUpperCase()) < 0 &&
+              o.id !== row.id,
+          )
+
+          if (rs.length >= 1) {
+            row.coPaymentSchemeFK = undefined
+
+            notification.error({
+              message: 'The Schemes record already exists in the system',
+            })
+            return
+          }
+          const patCoPaymentScheme = copaymentscheme.find(
+            item => item.id === row.coPaymentSchemeFK,
+          )
+          row.copayerFK = option.copayerFK
+          if (!patCoPaymentScheme.isActive) {
+            row.coPaymentSchemeFK = undefined
+            notification.error({
+              message: 'Selected scheme is an inactive schemes',
+            })
+          }
+        },
+      },
+      {
+        columnName: 'accountNumber',
+        sortingEnabled: false,
+        isDisabled: row => {
+          return !this.isCorporate(row)
+        },
+      },
+      {
+        columnName: 'action',
+        width: 90,
+        isReactComponent: true,
+        sortingEnabled: false,
+        isDisabled: row => true,
+        render: e => {
+          const { row, columnConfig } = e
+          const { control } = columnConfig
+          const { commitChanges } = control
+          return (
+            <Fragment>
+              <Popconfirm
+                title='Confirm to delete?'
+                onConfirm={() => {
+                  commitChanges({
+                    changed: {
+                      [row.id]: {
+                        isDeleted: true,
+                      },
+                    },
+                  })
+                }}
+              >
+                <Button size='sm' justIcon color='danger'>
+                  <Delete />
+                </Button>
+              </Popconfirm>
+              <Tooltip title="Print Patient's Co-Payer Label">
+                <Button
+                  size='sm'
+                  justIcon
+                  color='primary'
+                  disabled={row.id < 1}
+                >
+                  <Print
+                    onClick={() => {
+                      this.printLabel(row.copayerFK)
+                    }}
+                  />
+                </Button>
+              </Tooltip>
+            </Fragment>
+          )
+        },
+      },
+    ]
+
     return (
       <EditableTableGrid
         rows={this.getSortedRows(rows)}
@@ -459,7 +460,14 @@ class SchemesGrid extends PureComponent {
         FuncProps={{ pager: false }}
         EditingProps={EditingProps}
         schema={schema}
-        {...this.tableParas}
+        columns={[
+          { name: 'schemeTypeFK', title: 'Scheme Type' },
+          { name: 'coPaymentSchemeFK', title: 'Scheme Name' },
+          { name: 'accountNumber', title: 'Account Number' },
+          { name: 'validRange', title: 'Valid Period' },
+          { name: 'action', title: 'Action' },
+        ]}
+        columnExtensions={columnExtensions}
       />
     )
   }

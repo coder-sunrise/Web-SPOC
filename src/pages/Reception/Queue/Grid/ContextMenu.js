@@ -247,8 +247,6 @@ const ContextMenu = ({
   return MenuItemsOverlay
 }
 
-const SecuredContextMenu = Secured('reception/queue')(ContextMenu)
-
 export default withStyles(styles, { name: 'QueueListingContextMenu' })(
-  SecuredContextMenu,
+  ContextMenu,
 )

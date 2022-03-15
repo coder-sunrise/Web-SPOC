@@ -6,9 +6,6 @@ import Add from '@material-ui/icons/Add'
 // custom component
 import { Button } from '@/components'
 import Authorized from '@/utils/Authorized'
-
-const { Secured } = Authorized
-@Secured('queue.registervisit')
 class ViewDetailsBtn extends PureComponent {
   handleClick = () => {
     const { onClick, row } = this.props
@@ -17,15 +14,17 @@ class ViewDetailsBtn extends PureComponent {
 
   render() {
     return (
-      <Button
-        style={{ marginRight: 0 }}
-        size='sm'
-        color='primary'
-        onClick={this.handleClick}
-      >
-        <Add />
-        New Visit
-      </Button>
+      <Authorized authority='queue.registervisit'>
+        <Button
+          style={{ marginRight: 0 }}
+          size='sm'
+          color='primary'
+          onClick={this.handleClick}
+        >
+          <Add />
+          New Visit
+        </Button>
+      </Authorized>
     )
   }
 }

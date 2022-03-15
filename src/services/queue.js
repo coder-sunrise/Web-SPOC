@@ -3,7 +3,9 @@ import request, { axiosRequest } from '@/utils/request'
 
 const queueAPIUrl = '/api/queue'
 const bizSessionAPIURL = '/api/bizsession'
+const workitemAPIUrl = '/api/workitem'
 const appointmentAPIURL = '/api/Appointment/PatientAppointmentListing'
+import { stringify } from 'qs'
 
 export const startSession = async () => {
   const response = await request('/api/bizsession/', { method: 'POST' })
@@ -57,3 +59,9 @@ export const setServingPerson = async visitFK => {
 
 export const queryVisitGroup = params =>
   commonServices.query(`${queueAPIUrl}/GetVisitGroup`, params.visitID)
+
+export const workItemDetailStatus = async params => {
+  return await request(
+    `${workitemAPIUrl}/workItemDetailStatus?${stringify(params)}`,
+  )
+}

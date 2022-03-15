@@ -23,7 +23,7 @@ import Delete from '@material-ui/icons/Delete'
 
 const formItemStyle = {
   margin: 0,
-  justifyContent: 'center',
+  display: 'block',
 }
 
 const EditableRow = ({ index, ...props }) => {
@@ -51,6 +51,14 @@ const SingleDecimalInput = ({ onChange, ...props }) => {
   const [currentValue, setCurrentValue] = useState(null)
 
   function handlChange(val) {
+    if (val === null) {
+      setCurrentValue(val)
+      if (onChange) {
+        onChange(val)
+      }
+      return
+    }
+
     let singleDecimalRegex = /^(([0-9]+)|([0-9]+.[0-9]?))$/
 
     if (!singleDecimalRegex.test(val)) return
@@ -341,8 +349,6 @@ const DosageRuleTable = ({
     {
       title: ruleLabel[rule ?? DOSAGE_RULE.default],
       dataIndex: 'range',
-      align: 'center',
-      width: '20%',
       editable: true,
       render: (item = {}, record) => {
         if (rule === DOSAGE_RULE.default) return <></>
@@ -355,7 +361,7 @@ const DosageRuleTable = ({
                   {selectedOperator === DOSAGE_RULE_OPERATOR.to && (
                     <Form.Item name={['leftOperand']} style={formItemStyle}>
                       <SingleDecimalInput
-                        style={{ width: 75, marginRight: 3 }}
+                        style={{ width: '100%' }}
                         min={0}
                         max={maxInput}
                         placeholder={rule}
@@ -369,7 +375,7 @@ const DosageRuleTable = ({
                     <Select
                       getPopupContainer={node => node.parentNode}
                       value={selectedOperator}
-                      style={{ width: 110 }}
+                      style={{ width: '100%' }}
                       onChange={val => {
                         setSelectedOperator(val)
                         if (val !== DOSAGE_RULE_OPERATOR.to)
@@ -391,7 +397,7 @@ const DosageRuleTable = ({
                 <GridItem md={3}>
                   <Form.Item name={['rightOperand']} style={formItemStyle}>
                     <SingleDecimalInput
-                      style={{ width: 75, marginRight: 3 }}
+                      style={{ width: '100%' }}
                       min={0}
                       max={maxInput}
                       placeholder={rule}
@@ -434,9 +440,8 @@ const DosageRuleTable = ({
     {
       title: 'Usage',
       dataIndex: 'usage',
-      align: 'center',
       editable: true,
-      width: 180,
+      width: 200,
       render: (item = {}, record) => {
         return (
           <span>{getDisplayValue('ctmedicationusage', medicationUsageFK)}</span>
@@ -446,7 +451,7 @@ const DosageRuleTable = ({
     {
       title: 'Dosage',
       dataIndex: 'prescribingDosageFK',
-      align: 'center',
+
       editable: true,
       width: 120,
       render: (item = {}, record) => {
@@ -454,22 +459,15 @@ const DosageRuleTable = ({
         return (
           <>
             {editing ? (
-              <Form.Item
-                name={['prescribingDosageFK']}
-                style={formItemStyle}
-                rules={[
-                  {
-                    required: true,
-                    message: `Required.`,
-                  },
-                ]}
-              >
+              <Form.Item name={['prescribingDosageFK']} style={formItemStyle}>
                 <Select
+                  allowClear
                   getPopupContainer={node => node.parentNode}
                   options={codetable.ctmedicationdosage?.map(item => {
                     return { label: item.displayValue, value: item.id }
                   })}
                   maxLength={10}
+                  style={{ width: '100%' }}
                   placeholder='Dosage'
                 />
               </Form.Item>
@@ -488,7 +486,7 @@ const DosageRuleTable = ({
     {
       title: 'Prescribe UOM',
       dataIndex: 'prescribeUom',
-      align: 'center',
+
       editable: true,
       width: 180,
       render: (item = {}, record) => {
@@ -502,7 +500,7 @@ const DosageRuleTable = ({
     {
       title: 'Frequency',
       dataIndex: 'medicationFrequencyFK',
-      align: 'center',
+
       editable: true,
       width: 200,
       render: (item = {}, record) => {
@@ -510,21 +508,14 @@ const DosageRuleTable = ({
         return (
           <>
             {editing ? (
-              <Form.Item
-                name={['medicationFrequencyFK']}
-                style={formItemStyle}
-                rules={[
-                  {
-                    required: true,
-                    message: `Required.`,
-                  },
-                ]}
-              >
+              <Form.Item name={['medicationFrequencyFK']} style={formItemStyle}>
                 <Select
+                  allowClear
                   getPopupContainer={node => node.parentNode}
                   options={codetable.ctmedicationfrequency?.map(item => {
                     return { label: item.displayValue, value: item.id }
                   })}
+                  style={{ width: '100%' }}
                   maxLength={10}
                   placeholder='Frequency'
                 />
@@ -544,38 +535,29 @@ const DosageRuleTable = ({
     {
       title: 'Duration(Days)',
       dataIndex: 'duration',
-      align: 'center',
       editable: true,
-      align: 'center',
       width: 120,
       render: (item = {}, record) => {
         const editing = isEditing(record)
         return (
           <div>
             {editing ? (
-              <Form.Item
-                name={['duration']}
-                style={formItemStyle}
-                rules={[
-                  {
-                    required: true,
-                    message: `Required.`,
-                  },
-                ]}
-              >
+              <Form.Item name={['duration']} style={formItemStyle}>
                 <SingleDecimalInput
-                  style={{ width: 60 }}
+                  style={{ width: '100%' }}
                   min={1}
                   max={maxInput}
                 ></SingleDecimalInput>
               </Form.Item>
             ) : (
               <>
-                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'left' }}>
                   <span>{record.duration}</span>
-                  <span style={{ marginLeft: 3 }}>
-                    {record.duration == 1 ? 'day' : 'days'}{' '}
-                  </span>
+                  {record.duration && (
+                    <span style={{ marginLeft: 3 }}>
+                      {record.duration == 1 ? 'day' : 'days'}{' '}
+                    </span>
+                  )}
                 </div>
               </>
             )}
@@ -584,9 +566,8 @@ const DosageRuleTable = ({
       },
     },
     {
-      title: 'Dispense Qty',
+      title: 'Dispense Qty.',
       dataIndex: 'dispensingQuantity',
-      align: 'center',
       width: 120,
       render: (item = {}, record) => {
         const editing = isEditing(record)
@@ -604,7 +585,7 @@ const DosageRuleTable = ({
                 ]}
               >
                 <SingleDecimalInput
-                  style={{ width: 60, marginRight: 3 }}
+                  style={{ width: '100%' }}
                   min={0}
                   max={maxInput}
                 ></SingleDecimalInput>
@@ -619,7 +600,6 @@ const DosageRuleTable = ({
     {
       title: 'Dispense UOM',
       dataIndex: 'dispenseUom',
-      align: 'center',
       editable: true,
       width: 180,
       render: (item = {}, record) => {
@@ -633,7 +613,8 @@ const DosageRuleTable = ({
     {
       title: 'Action',
       dataIndex: 'operation',
-      align: 'center',
+
+      width: 80,
       render: (item = {}, record) => {
         const editing = isEditing(record)
         return editing ? (
@@ -707,6 +688,7 @@ const DosageRuleTable = ({
             cell: EditableCell,
           },
         }}
+        size='middle'
         bordered
         dataSource={data}
         columns={mergedColumns}

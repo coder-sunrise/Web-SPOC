@@ -63,7 +63,7 @@ class FilterBar extends PureComponent {
               return (
                 <TextField
                   label={formatMessage({
-                    id: 'inventory.pr.pono',
+                    id: 'inventory.pr.filter.pono',
                   })}
                   {...args}
                 />
@@ -79,7 +79,7 @@ class FilterBar extends PureComponent {
                 noTodayLimit
                 args={args}
                 disabled={isAllDateChecked}
-                label='Transaction Date From'
+                label='Date From'
                 formValues={{
                   startDate: transactionStartDate,
                   endDate: transactionEndDate,
@@ -96,7 +96,7 @@ class FilterBar extends PureComponent {
                 noTodayLimit
                 isEndDate
                 args={args}
-                label='Transaction Date To'
+                label='Date To'
                 disabled={isAllDateChecked}
                 formValues={{
                   startDate: transactionStartDate,
@@ -129,7 +129,7 @@ class FilterBar extends PureComponent {
             }}
           />
         </GridItem>
-        <GridItem xs={6} md={3}>
+        {/* <GridItem xs={6} md={3}>
           <FastField
             name='invoiceStatusFK'
             render={args => {
@@ -145,7 +145,7 @@ class FilterBar extends PureComponent {
               )
             }}
           />
-        </GridItem>
+        </GridItem> */}
         <GridItem xs={6} md={3}>
           <FastField
             name='supplierFK'
@@ -180,7 +180,7 @@ class FilterBar extends PureComponent {
             }}
           />
         </GridItem>
-        <GridItem xs={12}>
+        <GridItem xs={12} md={3}>
           <div className={classes.buttonGroup}>
             <ProgressButton
               color='primary'
@@ -188,13 +188,13 @@ class FilterBar extends PureComponent {
               onClick={() => {
                 const {
                   purchaseOrderNo,
+                  purchaseRequestNo,
                   invoiceStatusFK,
                   purchaseOrderStatusFK,
                   // transactionDates,
                   supplierFK,
                   isAllDateChecked,
                 } = values
-
                 // const fromToDates = (index) => {
                 //   if (transactionDates && !isAllDateChecked)
                 //     return transactionDates[index]
@@ -210,31 +210,29 @@ class FilterBar extends PureComponent {
                     lsteql_purchaseOrderDate: isAllDateChecked
                       ? undefined
                       : transactionEndDate,
-                    purchaseOrderNo,
+                    // purchaseOrderNo,
                     invoiceStatusFK,
                     purchaseOrderStatusFK,
                     supplierFK,
-                    // group: [
-                    //   {
-                    //     purchaseOrderNo,
-                    //     invoiceStatusFK,
-                    //     purchaseOrderStatusFK,
-                    //     supplierFK,
-                    //     combineCondition: 'or',
-                    //   },
-                    // ],
+                    group: [
+                      {
+                        purchaseOrderNo,
+                        purchaseRequestNo:purchaseOrderNo,
+                        combineCondition: 'or',
+                      },
+                    ],
                   },
                 })
               }}
             >
               <FormattedMessage id='form.search' />
             </ProgressButton>
-            <Authorized authority='purchasingandreceiving.newpurchasingandreceiving'>
+            {/* <Authorized authority='purchasingandreceiving.newpurchasingandreceiving'>
               <Button onClick={() => handleNavigate('new')} color='primary'>
                 <Add />
                 Add New
               </Button>
-            </Authorized>
+            </Authorized> */}
           </div>
         </GridItem>
       </GridContainer>

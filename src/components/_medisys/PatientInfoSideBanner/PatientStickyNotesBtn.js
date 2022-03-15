@@ -76,7 +76,6 @@ class PatientStickyNotesBtn extends Component {
     openPopper: false,
     stickyNotes: [],
     isFlaggedOnlyShow: true,
-    patientProfileFK: undefined,
     flaggedNoteCount: 0,
   }
 
@@ -94,11 +93,10 @@ class PatientStickyNotesBtn extends Component {
     dispatch({
       type: 'patient/getStickyNotes',
       payload: {
-        patientProfileFK: patientProfileFK || patient.id,
+        patientProfileFK: patientProfileFK,
       },
     }).then(result => {
       this.setState({
-        patientProfileFK: patientProfileFK,
         stickyNotes: result || [],
         flaggedNoteCount: (result || []).filter(x => x.id && x.isFlagged)
           .length,
@@ -156,18 +154,19 @@ class PatientStickyNotesBtn extends Component {
   }
 
   saveStickyNotes = (note, callback) => {
-    const { patient, dispatch } = this.props
+    const { patient, dispatch, patientProfileFK } = this.props
     dispatch({
       type: 'patient/saveStickyNotes',
       payload: { ...note },
     }).then(result => {
       dispatch({
         type: 'patient/getStickyNotes',
-        payload: { patientProfileFK: patient.id },
+        payload: { patientProfileFK: patientProfileFK },
       }).then(notes => {
         this.setState({
           stickyNotes: notes,
-          flaggedNoteCount: (notes || []).filter(x => x.id && x.isFlagged).length,
+          flaggedNoteCount: (notes || []).filter(x => x.id && x.isFlagged)
+            .length,
         })
         callback?.call(this)
       })
@@ -189,7 +188,7 @@ class PatientStickyNotesBtn extends Component {
     }
   }
 
-  onColorClick = (note,color) => {
+  onColorClick = (note, color) => {
     const { patient, dispatch } = this.props
     const { index, editedNote } = this.state.editedItem
     note.color = color
@@ -326,7 +325,9 @@ class PatientStickyNotesBtn extends Component {
                 <Button
                   justIcon
                   color='transparent'
-                  onClick={() => {this.onFlagClick(note)}}
+                  onClick={() => {
+                    this.onFlagClick(note)
+                  }}
                   style={{
                     margin: 0,
                     color: note.isFlagged ? 'red' : 'gray',
@@ -375,7 +376,7 @@ class PatientStickyNotesBtn extends Component {
                               border: '1px solid gray',
                               boxShadow: '0px 3px 10px rgba(0, 0, 0, 0.1)',
                             }}
-                            onClick={() => this.onColorClick(note,x)}
+                            onClick={() => this.onColorClick(note, x)}
                           />
                         ))}
                       </div>
@@ -511,11 +512,11 @@ class PatientStickyNotesBtn extends Component {
   addNewClick = (e, isDisabled) => {
     e.preventDefault()
     if (isDisabled) return
-    const { patient } = this.props
+    const { patient, patientProfileFK } = this.props
     const { stickyNotes } = this.state
     const newNote = {
       id: undefined,
-      patientProfileFK: patient.id,
+      patientProfileFK: patientProfileFK,
       notes: '',
       isFlagged: true,
       color: '#FFFFFF',
@@ -613,26 +614,19 @@ class PatientStickyNotesBtn extends Component {
       stickyNotes = [],
       currentDeletingNote,
       flaggedNoteCount,
-      patientProfileFK,
     } = this.state
 
     const defaultPopperStyle = {
       zIndex: 1500,
     }
 
-    const {
-      popperStyle = defaultPopperStyle,
-      patientProfileFK: newPatientProfileFK,
-    } = this.props
-
-    if (patientProfileFK && patientProfileFK != newPatientProfileFK)
-      this.getLatest()
+    const { popperStyle = defaultPopperStyle } = this.props
 
     return (
       <Popper
         open={openPopper}
         overlay={openPopper && this.renderStickyNotes()}
-        placement='right-end'
+        placement='right'
         style={popperStyle}
       >
         <span style={{ cursor: 'pointer', marginLeft: 8 }}>

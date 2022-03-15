@@ -40,12 +40,16 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
         (row) => row.type === type.id,
       )
       const updatedRows = currentTypeRows.map((row) => {
+        const total = row.quantity * row.unitPrice
+        const totalAftAdj = row.totalAftAdj ? row.totalAftAdj : total
         return {
           ...row,
           inventoryItemTypeFK: type.id,
           inventoryItemCode: row.code,
           inventoryItemName: row.name,
-          total: row.quantity * row.unitPrice,
+          total: total,
+          totalAftAdj: totalAftAdj,  
+          adjType: row.isExactAmount ? 'ExactAmount' : 'Percentage',
           [type.dtoName]: {
             ...row[type.dtoName],
             [type.itemFKName]: row.itemFK,

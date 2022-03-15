@@ -77,6 +77,7 @@ const Setting = ({ classes, showTransfer, dispatch, global, ...props }) => {
                 isMultiLanguage={false}
                 label='#'
                 labelField='name'
+                isShowFreeText
                 initialValue={medicationIngredients}
                 onChange={value =>
                   setFieldValue(
@@ -183,8 +184,9 @@ const Setting = ({ classes, showTransfer, dispatch, global, ...props }) => {
   )
 }
 
-const ConnectedSetting = connect(({ global }) => ({
+const ConnectedSetting = connect(({ global, codetable }) => ({
   global,
+  codetable,
 }))(Setting)
 
 export default compose(

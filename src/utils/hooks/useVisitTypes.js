@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'dva'
 import _ from 'lodash'
 import { getMappedVisitType } from '@/utils/utils'
 
-export function useVisitTypes() {
+export function useVisitTypes(allTypes) {
   const dispatch = useDispatch()
   const [ctvisitpurpose, setCtVisitPurpose] = useState([])
   const { visitTypeSetting } = useSelector(st => st.clinicSettings.settings)
@@ -31,7 +31,7 @@ export function useVisitTypes() {
     visitTypes = getMappedVisitType(
       ctvisitpurpose,
       visitTypeSettingsObj,
-    ).filter(vstType => vstType['isEnabled'] === 'true')
+    ).filter(vstType => (allTypes ? true : vstType['isEnabled'] === 'true'))
   }
 
   return visitTypes

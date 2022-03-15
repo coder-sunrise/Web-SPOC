@@ -112,7 +112,6 @@ const PrintPrescription = props => {
       )
       setDrugSummaryLabelData(data)
       setShowDrugSummaryLabelSelectionPopup(true)
-      console.log(data)
     })
   }
   const handleClose = () => {
@@ -229,7 +228,7 @@ const PrintPrescription = props => {
         <DrugLabelSelection
           {...props}
           batchInformation={batchInformation}
-          tranlationFK={translationLinkFK}
+          translationLinkFK={translationLinkFK}
           handleSubmit={onConfirmPrintDrugLabel}
           source='pharmacy'
           visitid={visitFK}

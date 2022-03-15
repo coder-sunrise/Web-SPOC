@@ -211,7 +211,7 @@ export default createFormViewModel({
             type: 'updateState',
             payload: {
               shouldQueryOnClose: false,
-              onRefresh : true,
+              onRefresh: true,
             },
           })
         }
@@ -222,6 +222,7 @@ export default createFormViewModel({
           'dispense',
           'consultation',
           'patientdashboard',
+          'reportingdetails',
         ]
 
         const matchesExceptionalPath =
@@ -376,6 +377,20 @@ export default createFormViewModel({
           })
         }
       },
+      *queryForNewVisit({ payload }, { select, call, put }) {
+        console.log(payload, 12)
+        const response = yield call(service.queryForNewVisit, payload)
+        if (response && response.status === '200') {
+          const { data = {} } = response
+          this.props.dispatch({
+            type: 'patientSearch/updateState',
+            payload: {
+              filter: payload,
+              list: data,
+            },
+          })
+        }
+      },
       *saveUserPreference({ payload }, { call, put, select }) {
         const r = yield call(saveUserPreference, {
           userPreferenceDetails: JSON.stringify(payload.userPreferenceDetails),
@@ -410,7 +425,7 @@ export default createFormViewModel({
         }
         return null
       },
-      *getStickyNotes({ payload }, { call,put }) {
+      *getStickyNotes({ payload }, { call, put }) {
         const r = yield call(service.queryStickyNotes, payload)
         const { status, data = [] } = r
         yield put({
@@ -421,11 +436,11 @@ export default createFormViewModel({
         })
         return data
       },
-      *saveStickyNotes({ payload }, { call,put }){
+      *saveStickyNotes({ payload }, { call, put }) {
         let r = {}
-        if(payload.id){
+        if (payload.id) {
           r = yield call(service.upsertStickyNotes, payload)
-        }else{
+        } else {
           r = yield call(service.createStickyNotes, payload)
         }
         return r
@@ -433,8 +448,7 @@ export default createFormViewModel({
       *getFamilyMembersInfo({ payload }, { call, put }) {
         const r = yield call(service.getFamilyMembersInfo, payload)
         const { status, data = [] } = r
-        if(status === '200')
-          return data
+        if (status === '200') return data
         return null
       },
     },

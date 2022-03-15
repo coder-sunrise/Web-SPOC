@@ -107,7 +107,7 @@ class Detail extends PureComponent {
                   })
                   window.location.reload()
                 }}
-                disabled={false}
+                disabled={!values.id}
               >
                 Save As Local Identity
               </Button>

@@ -4,6 +4,7 @@ import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 import { status } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
+import { ableToViewByAuthority } from '@/utils/utils'
 import {
   withFormikExtend,
   FastField,
@@ -25,6 +26,7 @@ import {
 class Filter extends PureComponent {
   state = {
     isCopayer: undefined,
+    isSupplier: undefined,
   }
 
   checkIsCopayer(name) {
@@ -33,13 +35,25 @@ class Filter extends PureComponent {
     })
   }
 
+  checkIsSupplier(name) {
+    this.setState({
+      isSupplier: name === 'supplier',
+    })
+  }
+
   render() {
     const { classes, history, route, settingCompany } = this.props
     const { name } = route
     const { companyType } = settingCompany
     this.checkIsCopayer(name)
-    const { isCopayer } = this.state
+    this.checkIsSupplier(name)
+    const { isCopayer, isSupplier } = this.state
     const newCopayerAccessRight = Authorized.check('copayer.newcopayer') || {
+      rights: 'hidden',
+    }
+    const newSupplierAccessRight = Authorized.check(
+      'settings.supplier.newsupplier',
+    ) || {
       rights: 'hidden',
     }
     return (
@@ -52,7 +66,11 @@ class Filter extends PureComponent {
                 return (
                   <TextField
                     label={
-                      isCopayer ? 'Co-Payer Code/Name' : 'Supplier Code/Name'
+                      isCopayer
+                        ? 'Co-Payer Code/Name'
+                        : isSupplier
+                        ? 'Supplier Code/Name'
+                        : 'Manufacturer Code/Name'
                     }
                     {...args}
                   />
@@ -135,8 +153,26 @@ class Filter extends PureComponent {
                       Add New
                     </Button>
                   )
+                ) : isSupplier ? (
+                  newSupplierAccessRight.rights === 'enable' && (
+                    <Button
+                      color='primary'
+                      onClick={() => {
+                        this.props.dispatch({
+                          type: 'settingCompany/updateState',
+                          payload: {
+                            entity: undefined,
+                          },
+                        })
+                        this.props.toggleModal()
+                      }}
+                    >
+                      <Add />
+                      Add New
+                    </Button>
+                  )
                 ) : (
-                  <Authorized authority='settings.supplier.newsupplier'>
+                  <Authorized authority='settings.manufacturer.newmanufacturer'>
                     <Button
                       color='primary'
                       onClick={() => {

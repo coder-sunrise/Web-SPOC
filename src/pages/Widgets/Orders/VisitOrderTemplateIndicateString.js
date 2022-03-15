@@ -7,8 +7,8 @@ const VisitOrderTemplateIndicateString = props => {
   const { visitOrderTemplateDetails } = props
   let indicate = props.indicate
   if (visitOrderTemplateDetails) {
-    const removedItemIndex = visitOrderTemplateDetails.indexOf(' - (')
-    const addedItemIndex = visitOrderTemplateDetails.indexOf(' + (')
+    const removedItemIndex = visitOrderTemplateDetails.indexOf(' - ')
+    const addedItemIndex = visitOrderTemplateDetails.indexOf(' + ')
     let removedItemString = ''
     if (removedItemIndex > -1 && addedItemIndex > -1) {
       removedItemString = visitOrderTemplateDetails.substr(
@@ -28,7 +28,7 @@ const VisitOrderTemplateIndicateString = props => {
     if (removedItemIndex > -1) {
       indicateString = visitOrderTemplateDetails.substr(0, removedItemIndex)
     }
-    if (addedItemIndex > -1) {
+    if (addedItemIndex > -1 && removedItemIndex == -1) {
       indicateString = visitOrderTemplateDetails.substr(0, addedItemIndex)
     }
     indicate = {

@@ -159,7 +159,6 @@ const PaymentActions = ({
                     undefined,
                     companyFK,
                     invoicePayerFK,
-                    invoicePayerFK,
                     INVOICE_REPORT_TYPES.CLAIMABLEITEMINVOICE,
                   )
                 }

@@ -223,7 +223,9 @@ const SelectPreOrder = ({
       {footer &&
         footer({
           onConfirm:
-            actualizePreOrderAccessRight.rights === 'enable' ? onConfirm : null,
+            actualizePreOrderAccessRight.rights === 'enable' && !disabled
+              ? onConfirm
+              : null,
           confirmBtnText: 'Actualize',
           confirmProps: {
             disabled: !selectedPreOrders.length || disabled,

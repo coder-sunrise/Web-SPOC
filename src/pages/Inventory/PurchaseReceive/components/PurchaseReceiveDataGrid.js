@@ -52,10 +52,10 @@ const PurchaseReceiveDataGrid = ({
         height,
       }}
       columnExtensions={[
-        {
-          columnName: 'invoiceStatus',
-          sortBy: 'invoiceStatusFKNavigation.DisplayValue',
-        },
+        // {
+        //   columnName: 'invoiceStatus',
+        //   sortBy: 'invoiceStatusFKNavigation.DisplayValue',
+        // },
         {
           columnName: 'supplier',
           sortBy: 'supplierFKNavigation.displayValue',
@@ -68,13 +68,18 @@ const PurchaseReceiveDataGrid = ({
           columnName: 'exceptedDeliveryDate',
           type: 'date',
         },
-        { columnName: 'totalAftGst', type: 'number', currency: true },
         {
-          columnName: 'outstanding',
-          type: 'number',
-          currency: true,
-          sortingEnabled: false,
+          columnName: 'purchaseRequestNo',
+          type: 'text',
         },
+        
+        { columnName: 'totalAftGst', type: 'number', currency: true },
+        // {
+        //   columnName: 'outstanding',
+        //   type: 'number',
+        //   currency: true,
+        //   sortingEnabled: false,
+        // },
         {
           columnName: 'purchaseOrderStatus',
           sortBy: 'purchaseOrderStatusFKNavigation.displayValue',
@@ -98,9 +103,9 @@ const PurchaseReceiveDataGrid = ({
         },
       ]}
       FuncProps={{
-        selectable: true,
+        selectable: false,
         selectConfig: {
-          showSelectAll: true,
+          showSelectAll: false,
           rowSelectionEnabled: (row) =>
             enabledSelectPOStatus.includes(row.purchaseOrderStatus) &&
             row.invoiceStatus === INVOICE_STATUS_TEXT.OUTSTANDING,

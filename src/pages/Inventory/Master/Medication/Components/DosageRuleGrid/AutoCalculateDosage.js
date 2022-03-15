@@ -18,9 +18,11 @@ const AutoCalculateDosage = ({
   languageLabel,
   setFieldValue,
   values,
+  codetable,
   ...restProps
 }) => {
   const [ruleType, setRuleType] = useState(DOSAGE_RULE.default)
+  const [conversionEnabled, setConversionEnabled] = useState(false)
   const { isEditingDosageRule } = useContext(DetailsContext)
   // console.log(ruleType, values)
   useEffect(() => {
@@ -32,6 +34,11 @@ const AutoCalculateDosage = ({
     }
   }, [values.medicationInstructionRule])
 
+  useEffect(() => {
+    if (values.prescribingUOMFK) {
+      setConversionEnabled(true)
+    }
+  }, [values.prescribingUOMFK])
   let switchingRuleType = ''
   const handleRuleTypeClick = e => {
     const clickedItem = e.currentTarget.dataset.ruletype
@@ -60,7 +67,23 @@ const AutoCalculateDosage = ({
     setRuleType(switchingRuleType)
   }
 
+  const prescribleUOMChanged = val => {
+    if (!val) {
+      setFieldValue('prescriptionToDispenseConversion', undefined)
+      setConversionEnabled(false)
+    } else {
+      setConversionEnabled(true)
+    }
+  }
   const optionLabelLength = 40
+  const conversionDisabled = !values.prescribingUOMFK
+
+  const dispenseUOM = codetable?.ctmedicationunitofmeasurement?.find(
+    t => t.id === values.dispensingUOMFK,
+  )?.displayValue
+  const prescribeUOM = codetable?.ctmedicationunitofmeasurement?.find(
+    t => t.id === values.prescribingUOMFK,
+  )?.displayValue
   return (
     <GridContainer>
       <GridItem md={6}>
@@ -96,6 +119,7 @@ const AutoCalculateDosage = ({
               label={formatMessage({
                 id: 'inventory.master.setting.prescribeUOM',
               })}
+              onChange={prescribleUOMChanged}
               labelField='displayValue'
               code='ctmedicationunitofmeasurement'
               {...args}
@@ -103,7 +127,7 @@ const AutoCalculateDosage = ({
           )}
         />
       </GridItem>
-      <GridItem md={3}>
+      <GridItem md={2}>
         <FastField
           name='dispensingUOMFK'
           render={args => (
@@ -118,60 +142,60 @@ const AutoCalculateDosage = ({
           )}
         />
       </GridItem>
-      <GridItem md={3}>
-        <GridContainer>
-          <GridItem md={5}>
-            <FastField
-              name='prescriptionToDispenseConversion'
-              render={args => (
-                <NumberInput
-                  label={formatMessage({
-                    id:
-                      'inventory.master.setting.prescriptionToDispenseConversion',
-                  })}
-                  format='0.0'
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem>
-            <FastField
-              name='prescribingUOMFK'
-              render={args => (
-                <CodeSelect
-                  style={{ marginTop: 15 }}
-                  label=''
-                  text
-                  labelField='displayValue'
-                  optionLabelLength={optionLabelLength}
-                  code='ctmedicationunitofmeasurement'
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
+      <GridItem md={4}>
+        {conversionEnabled && (
+          <GridContainer>
+            <GridItem md={5}>
+              <FastField
+                name='prescriptionToDispenseConversion'
+                render={args => (
+                  <NumberInput
+                    label={formatMessage({
+                      id:
+                        'inventory.master.setting.prescriptionToDispenseConversion',
+                    })}
+                    format='0.0'
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem>
+              <span
+                title={prescribeUOM}
+                style={{
+                  display: 'inline-block',
+                  maxWidth: 110,
+                  marginTop: 25,
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                }}
+              >
+                {prescribeUOM}
+              </span>
+            </GridItem>
 
-          <GridItem>
-            <div style={{ marginTop: 30, fontSize: 16 }}>= 1.0</div>
-          </GridItem>
-          <GridItem>
-            <FastField
-              name='dispensingUOMFK'
-              render={args => (
-                <CodeSelect
-                  style={{ marginTop: 15 }}
-                  label=''
-                  text
-                  labelField='displayValue'
-                  optionLabelLength={optionLabelLength}
-                  code='ctmedicationunitofmeasurement'
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-        </GridContainer>
+            <GridItem>
+              <div style={{ marginTop: 25, fontSize: 16 }}>= 1.0</div>
+            </GridItem>
+            <GridItem>
+              <span
+                title={dispenseUOM}
+                style={{
+                  display: 'inline-block',
+                  maxWidth: 110,
+                  marginTop: 25,
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                }}
+              >
+                {dispenseUOM}
+              </span>
+            </GridItem>
+          </GridContainer>
+        )}
       </GridItem>
       <GridItem md={12}>
         <SectionHeader style={{ display: 'inline-flex', marginRight: 20 }}>
@@ -207,7 +231,7 @@ const AutoCalculateDosage = ({
                   checked={ruleType === DOSAGE_RULE.age}
                   disabled={isEditingDosageRule}
                 >
-                  by Age
+                  By Age
                 </Radio>
               </span>
               <span
@@ -219,7 +243,7 @@ const AutoCalculateDosage = ({
                   checked={ruleType === DOSAGE_RULE.weight}
                   disabled={isEditingDosageRule}
                 >
-                  by Weight
+                  By Weight
                 </Radio>
               </span>
             </Popconfirm>

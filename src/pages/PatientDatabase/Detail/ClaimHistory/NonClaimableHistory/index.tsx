@@ -17,7 +17,12 @@ import Delete from '@material-ui/icons/Delete'
 import service from './services'
 import Details from './Details'
 
-const NonClaimableHistory = ({ dispatch, height, patientProfileFK }) => {
+const NonClaimableHistory = ({
+  dispatch,
+  height,
+  patientProfileFK,
+  values,
+}) => {
   const [
     showEditNonClaimableHistoryDetails,
     setShowEditNonClaimableHistoryDetails,
@@ -43,7 +48,7 @@ const NonClaimableHistory = ({ dispatch, height, patientProfileFK }) => {
       'patientdatabase.patientprofiledetails.claimhistory.viewnonclaimablehistory.delete',
     ) || { rights: 'hidden' }
 
-    return [
+    let columns = [
       {
         key: 'details',
         title: 'Reason',
@@ -159,6 +164,12 @@ const NonClaimableHistory = ({ dispatch, height, patientProfileFK }) => {
         },
       },
     ]
+
+    if (!values.isActive) {
+      columns = columns.filter(c => c.dataIndex !== 'action')
+    }
+
+    return columns
   }
 
   const closeForm = () => {
@@ -223,21 +234,22 @@ const NonClaimableHistory = ({ dispatch, height, patientProfileFK }) => {
         scroll={{ x: 1200, y: height - 330 }}
         pagination={{ pageSize: 20 }}
       />
-      {addNonClaimableHistoryDetailsRight.rights === 'enable' && (
-        <Link>
-          <span
-            style={{
-              textDecoration: 'underline',
-              marginLeft: 12,
-            }}
-            onClick={() => {
-              setShowEditNonClaimableHistoryDetails(true)
-            }}
-          >
-            + New
-          </span>
-        </Link>
-      )}
+      {addNonClaimableHistoryDetailsRight.rights === 'enable' &&
+        values.isActive && (
+          <Link>
+            <span
+              style={{
+                textDecoration: 'underline',
+                marginLeft: 12,
+              }}
+              onClick={() => {
+                setShowEditNonClaimableHistoryDetails(true)
+              }}
+            >
+              + New
+            </span>
+          </Link>
+        )}
 
       <CommonModal
         open={showEditNonClaimableHistoryDetails}

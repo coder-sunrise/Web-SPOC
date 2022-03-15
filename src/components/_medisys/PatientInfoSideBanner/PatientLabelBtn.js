@@ -10,7 +10,7 @@ import {
 // ant design
 import { InputNumber } from 'antd'
 // common components
-import { Button, Popper } from '@/components'
+import { Button, Popper, IconButton } from '@/components'
 import { REPORT_ID } from '@/utils/constants'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 // services
@@ -43,6 +43,7 @@ const PatientLabelButton = ({
   patientId,
   clinicSettings,
   sendingJob,
+  iconOnly = false,
 }) => {
   const classes = useStyles()
 
@@ -129,14 +130,28 @@ const PatientLabelButton = ({
           </ClickAwayListener>
         }
       >
-        <Button
-          color='primary'
-          onClick={openPopper}
-          size='sm'
-          style={{ height: 25, marginTop: 2 }}
-        >
-          <Print /> Label
-        </Button>
+        {!iconOnly ? (
+          <Button
+            color='primary'
+            onClick={openPopper}
+            size='sm'
+            style={{ height: 25, marginTop: 2 }}
+          >
+            <Print /> Label
+          </Button>
+        ) : (
+          <IconButton
+            size='small'
+            style={{
+              marginLeft: 10,
+              color: '#4255bd',
+              position: 'relative',
+              top: '-3px',
+            }}
+          >
+            <Print style={{ width: 22, height: 22 }} onClick={openPopper} />
+          </IconButton>
+        )}
       </Popper>
     </div>
   )

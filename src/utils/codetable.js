@@ -25,6 +25,22 @@ const defaultParams = {
   excludeInactiveCodes: true,
 }
 
+const defaultCodeTablePath = '/codetable'
+const customCodetablePath = new Map([
+  [
+    'ctcopayer',
+    {
+      path: defaultCodeTablePath,
+    },
+  ],
+  [
+    'copaymentscheme',
+    {
+      path: defaultCodeTablePath,
+    },
+  ],
+])
+
 const tenantCodesMap = new Map([
   [
     'doctorprofile',
@@ -115,6 +131,12 @@ const tenantCodesMap = new Map([
   ],
   [
     'ctsupplier',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctmanufacturer',
     {
       ...defaultParams,
     },
@@ -285,6 +307,24 @@ const tenantCodesMap = new Map([
       pagesize: 99999,
     },
   ],
+  [
+    'ctexaminationitem',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctindividualcomment',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctsummarycomment',
+    {
+      ...defaultParams,
+    },
+  ],
 ])
 
 // always get latest codetable
@@ -305,12 +345,16 @@ const fetchCodeTable = async (code, params, isReturnStatusCode = false) => {
   const searchURL = `${baseURL}/search?excludeInactiveCodes=true&ctname=`
 
   let url = searchURL
+  let customPath = ''
 
   let criteriaForTenantCodes = defaultParams
   if (tenantCodesMap.has(code.toLowerCase())) {
     url = '/api/'
     useGeneral = false
     criteriaForTenantCodes = tenantCodesMap.get(code.toLowerCase())
+    if (customCodetablePath.has(code.toLowerCase())) {
+      customPath = customCodetablePath.get(code.toLowerCase()).path
+    }
   }
 
   const newParams = {
@@ -325,7 +369,8 @@ const fetchCodeTable = async (code, params, isReturnStatusCode = false) => {
         convertExcludeFields,
       )
 
-  const response = await request(`${url}${code}`, {
+  console.log(customPath)
+  const response = await request(`${url}${code}${customPath}`, {
     method: 'GET',
     body,
   })

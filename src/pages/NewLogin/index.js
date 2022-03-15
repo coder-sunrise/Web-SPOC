@@ -164,6 +164,8 @@ const submitKey = 'login/getToken'
           reloadAuthorized()
           await versionCheck()
           history.push(loginDestination)
+
+          dispatch({ type: 'appNotification/loadNotifications' })
         }
       })
       .catch(error => {

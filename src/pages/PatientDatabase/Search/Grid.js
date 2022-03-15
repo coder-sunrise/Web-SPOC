@@ -24,7 +24,7 @@ class Grid extends PureComponent {
         { name: 'mobileNo', title: 'Mobile No.' },
         { name: 'homeNo', title: 'Home No.' },
         { name: 'officeNo', title: 'Office No.' },
-        { name: 'outstandingBalance', title: 'Total O/S Balance' },
+        // { name: 'outstandingBalance', title: 'Total O/S Balance' },
         { name: 'action', title: 'Action' },
       ],
       columnExtensions: [
@@ -35,7 +35,7 @@ class Grid extends PureComponent {
         },
         {
           columnName: 'gender/age',
-          render: (row) =>
+          render: row =>
             `${row.gender.substring(0, 1)}/${calculateAgeFromDOB(row.dob)}`,
           sortingEnabled: false,
         },
@@ -52,8 +52,8 @@ class Grid extends PureComponent {
           columnName: 'action',
           align: 'center',
           sortingEnabled: false,
-          render: (row) => {
-            const { renderActionFn = (f) => f } = props
+          render: row => {
+            const { renderActionFn = f => f } = props
             return (
               <Authorized authority='patientdatabase.patientprofiledetails'>
                 {renderActionFn(row)}
@@ -77,12 +77,12 @@ class Grid extends PureComponent {
         { columnName: 'mobileNo', sortingEnabled: false },
         { columnName: 'homeNo', sortingEnabled: false },
         { columnName: 'officeNo', sortingEnabled: false },
-        {
-          columnName: 'outstandingBalance',
-          type: 'number',
-          currency: true,
-          sortingEnabled: false,
-        },
+        // {
+        //   columnName: 'outstandingBalance',
+        //   type: 'number',
+        //   currency: true,
+        //   sortingEnabled: false,
+        // },
       ],
       FuncProps: {
         pager: true,

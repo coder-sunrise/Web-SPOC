@@ -982,6 +982,7 @@ class Radiology extends PureComponent {
                     }}
                     min={0}
                     currency
+                    noSuffix
                     label='Adjustment'
                     onChange={e => {
                       editService.adjValue = e.target.value
@@ -1007,6 +1008,7 @@ class Radiology extends PureComponent {
                     }}
                     percentage
                     max={100}
+                    noSuffix
                     min={0}
                     label='Adjustment'
                     onChange={e => {
@@ -1133,7 +1135,7 @@ class Radiology extends PureComponent {
                         style={{
                           position: 'absolute',
                           bottom: 2,
-                          left: '330px',
+                          left: '380px',
                         }}
                         label='Charge Today'
                         onChange={e => {
@@ -1249,7 +1251,7 @@ class Radiology extends PureComponent {
                         style={{
                           position: 'absolute',
                           bottom: 0,
-                          left: '330px',
+                          left: '380px',
                         }}
                         label='Charge Today'
                         onChange={e => {
