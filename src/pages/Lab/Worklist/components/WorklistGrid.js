@@ -21,6 +21,7 @@ import {
   MinusCircleTwoTone,
   CoffeeOutlined,
   UnorderedListOutlined,
+  ExclamationCircleFilled,
 } from '@ant-design/icons'
 import Print from '@material-ui/icons/Print'
 import Delete from '@material-ui/icons/Delete'
@@ -50,14 +51,8 @@ import { SpecimenDetails } from '../SpecimenDetails'
 import { SpecimenStatusTag } from './SpecimenStatusTag'
 import { TestPanelColumn } from './TestPanelColumn'
 import styles from './WorklistGrid.less'
-
-const MODALS = {
-  NONE: '',
-  SPECIMEN_COLLECTION: 'SPECIMEN_COLLECTION',
-  SPECIMEN_DETAILS: 'SPECIMEN_DETAILS',
-  DISCARD_SPECIMEN: 'DISCARD_SPECIMEN',
-  RECEIVE_SPECIMEN: 'RECEIVE_SPECIMEN',
-}
+import { LabResultReportPreview } from './LabResultReportPreview'
+import { RetestDetails } from './RetestDetails'
 
 const allSpecimenStatuses = Object.values(LAB_SPECIMEN_STATUS)
 
@@ -74,10 +69,6 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
   const ctspecimentype = useCodeTable('ctspecimentype')
   const dispatch = useDispatch()
   const visitTypes = useVisitTypes()
-  const [currentModal, setCurrentModal] = useState({
-    modal: MODALS.NONE,
-    para: undefined,
-  })
   const [discardSpecimenPara, setDiscardSpecimenPara] = useState({
     open: false,
     id: undefined,
@@ -85,8 +76,19 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
   const [receiveSpecimenPara, setReceiveSpecimenPara] = useState({
     open: false,
     id: undefined,
+  }) 
+  const [labResultReportPreviewPara, setLabResultReportPreviewPara] = useState({
+    open: false,
+    visitId: undefined,
+  }) 
+  const [specimenDetailsPara, setSpecimenDetailsPara] = useState({
+    open: false,
+    id: undefined,
   })
-
+  const [retestDetailsPara, setRetestDetailsPara] = useState({
+    open: false,
+    id: undefined,
+  }) 
   useEffect(() => {
     if (originalWorklist) {
       const currentFilteredWorklist = _(
@@ -156,9 +158,21 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
       )
   }
 
-  const closeModal = () => {
-    setCurrentModal({ modal: MODALS.NONE })
+  const closeRetestDetails = () => {
+    setRetestDetailsPara({
+      open: false,
+      id: undefined,
+    })
     setIsAnyWorklistModelOpened(false)
+  }
+
+  const confirmRetestDetails = specimenId => {
+    closeRetestDetails()
+    setSpecimenDetailsPara({
+      open: true,
+      id: specimenId,
+    })
+    setIsAnyWorklistModelOpened(true)
   }
 
   const closeDiscardSpecimen = () => {
@@ -177,6 +191,22 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
     setIsAnyWorklistModelOpened(false)
   }
 
+  const closeLabResultReportPreview = () => {
+    setLabResultReportPreviewPara({ 
+      open: false,
+      id: undefined,
+    })
+    setIsAnyWorklistModelOpened(false)
+  }
+
+  const closeSpecimenDetails = () => {
+    setSpecimenDetailsPara({ 
+      open: false,
+      id: undefined,
+    })
+    setIsAnyWorklistModelOpened(false)
+  }
+
   const expandedRowRender = (record, index, indent, expanded) => {
     const groupedTestPanels = _(
       filteredWorklist
@@ -186,14 +216,17 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
           firstOrderDate: _(filteredWorklist)
             .filter(innerItem => innerItem.labSpecimenFK === item.labSpecimenFK)
             .minBy(innerItem => innerItem.generateDate).generateDate,
-          testCategories: filteredWorklist
-            .filter(innerItem => innerItem.labSpecimenFK === item.labSpecimenFK)
-            .reduce((prev, cur) => {
-              const testCategory = cttestcategory.find(
-                item => item.id === cur.testCategoryFK,
-              )
-              return `${prev ? prev + ', ' : ''}${testCategory?.name}`
-            }, ''),
+          testCategories: _.uniqBy(
+            filteredWorklist.filter(
+              innerItem => innerItem.labSpecimenFK === item.labSpecimenFK,
+            ),
+            'testCategoryFK',
+          ).reduce((prev, cur) => {
+            const testCategory = cttestcategory.find(
+              item => item.id === cur.testCategoryFK,
+            )
+            return `${prev ? prev + ', ' : ''}${testCategory?.name}`
+          }, ''),
           testPanels: _.uniq(
             filteredWorklist
               .filter(
@@ -219,13 +252,13 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
         dataIndex: 'testCategories',
         key: 'testCategories',
         ellipsis: true,
-        width: 160,
+        width: 170,
       },
       {
         title: 'Test Panel',
         dataIndex: 'testPanels',
         key: 'testPanels',
-        width: 320,
+        width: 290,
         render: (text, record, index) => {
           return (
             <TestPanelColumn columnWidth={320} testPanels={record.testPanels} />
@@ -251,12 +284,20 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
         dataIndex: 'accessionNo',
         key: 'accessionNo',
         width: 120,
+        render: (text, record) =>
+          record.hasAnyPendingRetestResult ? (
+            <span>
+              {text} <ExclamationCircleFilled style={{ color: 'red' }} />
+            </span>
+          ) : (
+            <span>{text}</span>
+          ),
       },
       {
         title: 'Collected Date',
         dataIndex: 'specimenCollectionDate',
         key: 'specimenCollectionDate',
-        width: 135,
+        width: 145,
         render: (text, record, index) =>
           record.specimenCollectionDate?.format(dateFormatLongWithTimeNoSec),
       },
@@ -264,7 +305,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
         title: 'Received Date',
         dataIndex: 'dateReceived',
         key: 'dateReceived',
-        width: 135,
+        width: 145,
         render: (text, record, index) =>
           record.dateReceived?.format(dateFormatLongWithTimeNoSec),
       },
@@ -273,7 +314,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
         dataIndex: 'firstOrderDate',
         key: 'firstOrderDate',
         ellipsis: true,
-        width: 135,
+        width: 145,
         render: (text, record, index) =>
           record.firstOrderDate?.format(dateFormatLongWithTimeNoSec),
       },
@@ -303,7 +344,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
               specimenStatus === LAB_SPECIMEN_STATUS.DISCARDED ? (
                 <div>
                   <div>
-                    Discarded by {record.lastUpdatedClinicianName} at{' '}
+                    Discarded by {record.specimenDiscardedClinicianName} at{' '}
                     {record.lastUpdatedDate?.format(
                       dateFormatLongWithTimeNoSec,
                     )}
@@ -331,10 +372,15 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
                 <Tooltip title='Open Specimen Details'>
                   <Button
                     onClick={() => {
-                      setCurrentModal({
-                        modal: MODALS.SPECIMEN_DETAILS,
-                        para: record.labSpecimenFK,
-                      })
+                      record.hasAnyPendingRetestResult
+                        ? setRetestDetailsPara({
+                            open: true,
+                            id: record.labSpecimenFK,
+                          })
+                        : setSpecimenDetailsPara({
+                            open: true,
+                            id: record.labSpecimenFK,
+                          })
                       setIsAnyWorklistModelOpened(true)
                     }}
                     justIcon
@@ -403,10 +449,24 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
       dataIndex: 'patientName',
       key: 'patientName',
       render: (text, record) => {
-        console.log('WorklistGrid - Top Level Records : ', record)
         return (
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Space style={{ flexGrow: 1 }}>
+              <Button
+                color='primary'
+                onClick={() => {
+                  setIsAnyWorklistModelOpened(true)
+                  setLabResultReportPreviewPara({
+                    open: true,
+                    visitId: record.visitFK,
+                  })
+                }}
+                size='sm'
+                justIcon
+                style={{ height: 25, marginTop: 2 }}
+              >
+                <Print />
+              </Button>
               <Typography.Text strong>
                 {record.patientName} ({record.patientReferenceNo})
               </Typography.Text>
@@ -416,23 +476,13 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
               <VisitTypeTag type={record.visitPurposeFK} />
             </Space>
             <Space>
-              <span>{getSpecimenCountByCategory(record.visitFK)}</span>
-              <Button
-                color='primary'
-                onClick={() => {}}
-                size='sm'
-                justIcon
-                style={{ height: 25, marginTop: 2 }}
-              >
-                <Print />
-              </Button>
+              <span>{getSpecimenCountByCategory(record.visitFK)}</span> 
             </Space>
           </div>
         )
       },
     },
   ]
-
   return (
     <Card>
       <div style={{ display: 'flex', alignItems: 'start' }}>
@@ -497,16 +547,22 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
       </section>
 
       <SpecimenDetails
-        id={
-          currentModal.modal === MODALS.SPECIMEN_DETAILS
-            ? currentModal.para
-            : undefined
-        }
+        {...specimenDetailsPara}
         onClose={() => {
-          closeModal()
+          closeSpecimenDetails()
         }}
         onConfirm={() => {
-          closeModal()
+          closeSpecimenDetails()
+        }}
+      />
+      <RetestDetails
+        {...retestDetailsPara}
+        onClose={() => {
+          closeRetestDetails()
+        }}
+        onConfirm={specimenId => {
+          debugger
+          confirmRetestDetails(specimenId)
         }}
       />
       <ReceiveSpecimen
@@ -525,6 +581,15 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
         }}
         onConfirm={() => {
           closeDiscardSpecimen()
+        }}
+      />
+      <LabResultReportPreview
+        {...labResultReportPreviewPara}
+        onClose={() => {
+          closeLabResultReportPreview()
+        }}
+        onConfirm={() => {
+          closeLabResultReportPreview()
         }}
       />
     </Card>

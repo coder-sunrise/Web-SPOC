@@ -136,6 +136,12 @@ const tenantCodesMap = new Map([
     },
   ],
   [
+    'ctmanufacturer',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
     'ctpaymentmode',
     {
       ...defaultParams,
@@ -217,6 +223,12 @@ const tenantCodesMap = new Map([
   ],
   [
     'ctcasedescription',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'cttestpanelitemresultoption',
     {
       ...defaultParams,
     },

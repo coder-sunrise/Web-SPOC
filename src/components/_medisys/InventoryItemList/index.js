@@ -574,7 +574,8 @@ class InventoryItemList extends React.Component {
       {
         columnName: 'type',
         type: 'select',
-        width:100,
+        sortingEnabled: false,
+        width: 100,
         options: InventoryTypes,
         render: row => {
           const itemType = `${
@@ -593,6 +594,7 @@ class InventoryItemList extends React.Component {
       },
       {
         columnName: 'itemFK',
+        sortingEnabled: false,
         render: row => {
           const inventory = InventoryTypes.filter(x => x.value === row.type)[0]
           const { ctName, itemFKName } = inventory
@@ -632,6 +634,7 @@ class InventoryItemList extends React.Component {
           columnName: 'quantity',
           type: 'number',
           align: 'left',
+          sortingEnabled: false,
           width: 90,
           render: row => {
             const { rows = [] } = values
@@ -659,6 +662,7 @@ class InventoryItemList extends React.Component {
         },
         {
           columnName: 'unitPrice',
+          sortingEnabled: false,
           type: 'currency',
           align: 'left',
           width: 100,
@@ -690,6 +694,7 @@ class InventoryItemList extends React.Component {
           columnName: 'total',
           observeFields: ['quantity', 'unitPrice'],
           type: 'currency',
+          sortingEnabled: false,
           width: 118,
         },
         {
@@ -839,6 +844,7 @@ class InventoryItemList extends React.Component {
         },
         {
           columnName: 'totalAftAdj',
+          sortingEnabled: false,
           type: 'currency',
           width: 118,
         },

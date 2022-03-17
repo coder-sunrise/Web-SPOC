@@ -19,8 +19,8 @@ const AppointmentDate = ({
     patientProfileFK !== undefined && patientProfileFK !== null
   return (
     <React.Fragment>
-      {!isRegisteredPatient && <GridItem xs md={3} />}
-      <GridItem xs md={3}>
+      {!isRegisteredPatient && <GridItem xs md={2} />}
+      <GridItem xs md={2}>
         <Field
           name='currentAppointment.appointmentDate'
           // validate={this.startDateValidation}
@@ -35,7 +35,7 @@ const AppointmentDate = ({
         />
       </GridItem>
 
-      <GridItem xs md={3}>
+      <GridItem xs md={2}>
         <FastField
           name='appointmentStatusFk'
           render={args => (
@@ -49,14 +49,14 @@ const AppointmentDate = ({
         />
       </GridItem>
 
-      <GridItem xs md={3}>
+      <GridItem xs md={2}>
         <FastField
           name='bookedByUser'
           render={args => <TextField label='Booked By' disabled {...args} />}
         />
       </GridItem>
 
-      <GridItem xs md={3}>
+      <GridItem xs md={6}>
         <Field
           name='currentAppointment.visitOrderTemplateFK'
           render={args => (

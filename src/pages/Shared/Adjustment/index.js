@@ -258,6 +258,7 @@ class Adjustment extends PureComponent {
                         autoFocus
                         currency
                         label='Adjustment'
+                        noSuffix
                         onChange={() => {
                           setTimeout(() => {
                             this.onConditionChange()
@@ -272,6 +273,7 @@ class Adjustment extends PureComponent {
                       formControlProps={{
                         className: classes.mainInput,
                       }}
+                      noSuffix
                       percentage
                       autoFocus
                       max={999}

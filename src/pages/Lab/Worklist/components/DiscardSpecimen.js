@@ -39,7 +39,7 @@ export const DiscardSpecimen = ({ open, id, patient, onClose, onConfirm }) => {
 
     return () => {
       setHasDiscardReason(false)
-      form.resetFields()
+      form.setFieldsValue({})
       dispatch({
         type: 'worklistSpecimenDetails/updateState',
         payload: { entity: {} },

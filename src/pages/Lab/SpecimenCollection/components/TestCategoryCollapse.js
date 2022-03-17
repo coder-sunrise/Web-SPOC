@@ -40,10 +40,11 @@ const TestCategoryPanel = ({
           .map(item => (
             <GridItem md={4} key={item.id}>
               <Checkbox
-                checked={
-                  checkedWorkitems.find(cur => cur.labWorkitemFK === item.id)
-                    ?.isDeleted === false
-                }
+                checked={checkedWorkitems.find(
+                  cur =>
+                    cur.id === item.id &&
+                    cur.statusFK === LAB_WORKITEM_STATUS.SPECIMENCOLLECTED,
+                )}
                 onChange={e =>
                   e.target.checked
                     ? onAddWorkitem(item)
@@ -73,29 +74,22 @@ const TestCategoryCollapse = ({
   const handleAdd = newItem => {
     const prev = [...checkedItems]
     const added =
-      prev.findIndex(prevItem => prevItem.labWorkitemFK === newItem.id) >= 0
+      prev.findIndex(prevItem => prevItem.id === newItem.id) >= 0
         ? prev.map(prevItem =>
-            newItem.id === prevItem.labWorkitemFK
+            newItem.id === prevItem.id
               ? {
                   ...prevItem,
-                  labWorkitem: {
-                    ...prevItem.labWorkitem,
-                    statusFK: LAB_WORKITEM_STATUS.SPECIMENCOLLECTED,
-                  },
-                  isDeleted: false,
+                  labSpecimenFK: labSpecimenId,
+                  statusFK: LAB_WORKITEM_STATUS.SPECIMENCOLLECTED,
                 }
               : prevItem,
           )
         : [
             ...prev,
             {
-              labWorkitemFK: newItem.id,
+              ...newItem,
               labSpecimenFK: labSpecimenId,
-              labWorkitem: {
-                ...newItem,
-                statusFK: LAB_WORKITEM_STATUS.SPECIMENCOLLECTED,
-              },
-              isDeleted: false,
+              statusFK: LAB_WORKITEM_STATUS.SPECIMENCOLLECTED,
             },
           ]
     onChange(added)
@@ -105,14 +99,11 @@ const TestCategoryCollapse = ({
     const prev = [...checkedItems]
 
     const removed = prev.map(prevItem =>
-      removeItem.id === prevItem.labWorkitemFK
+      removeItem.id === prevItem.id
         ? {
             ...prevItem,
-            labWorkitem: {
-              ...prevItem.labWorkitem,
-              statusFK: LAB_WORKITEM_STATUS.NEW,
-            },
-            isDeleted: true,
+            labSpecimenFK: undefined,
+            statusFK: LAB_WORKITEM_STATUS.NEW,
           }
         : prevItem,
     )

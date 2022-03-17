@@ -36,6 +36,12 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
       dispatch({
         type: 'codetable/fetchCodes',
         payload: {
+          code: 'ctManufacturer',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
           code: 'ctmedicationgroup',
         },
       }),

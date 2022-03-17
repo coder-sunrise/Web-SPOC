@@ -265,7 +265,7 @@ class EditInvoice extends Component {
             color='danger'
             onClick={navigateDirtyCheck({ onProceed: this.switchMode })}
           >
-            cancel
+            Cancel
           </Button>
           <ProgressButton
             icon={<Save />}
@@ -421,6 +421,7 @@ class EditInvoice extends Component {
                                   marginBottom: 0,
                                   marginTop: 0,
                                 }}
+                                noSuffix
                                 currency
                                 label=''
                                 onChange={() => {
@@ -456,6 +457,7 @@ class EditInvoice extends Component {
                                   marginTop: 0,
                                 }}
                                 percentage
+                                noSuffix
                                 max={100}
                                 label=''
                                 onChange={() => {

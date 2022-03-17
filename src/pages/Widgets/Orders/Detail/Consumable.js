@@ -679,6 +679,7 @@ class Consumable extends PureComponent {
                             paddingRight: theme.spacing(6),
                           }}
                           currency
+                          noSuffix
                           label='Adjustment'
                           onChange={() => {
                             setTimeout(() => {
@@ -702,6 +703,7 @@ class Consumable extends PureComponent {
                         }}
                         percentage
                         max={100}
+                        noSuffix
                         label='Adjustment'
                         onChange={() => {
                           setTimeout(() => {

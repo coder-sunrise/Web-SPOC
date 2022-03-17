@@ -24,8 +24,9 @@ const amountProps = {
   disabled: true,
   rightAlign: true,
   normalText: true,
+  text: true,
 }
-
+const customStyle = { position: 'relative', top: 10 }
 const InvoiceBanner = ({ classes, ...restProps }) => {
   const { values, patient = {} } = restProps
   const { entity = {} } = patient
@@ -37,13 +38,11 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
       hideHeader
       size='sm'
       style={
-        entity && !entity.isActive ? (
-          {
-            backgroundColor: 'lightYellow',
-          }
-        ) : (
-          {}
-        )
+        entity && !entity.isActive
+          ? {
+              backgroundColor: 'lightYellow',
+            }
+          : {}
       }
     >
       <GridContainer xs={12}>
@@ -67,8 +66,7 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
                   {pateintDisplayName}
                 </span>
               </Tooltip>
-              {entity &&
-              !entity.isActive && (
+              {entity && !entity.isActive && (
                 <Tooltip title='This patient has been inactived.'>
                   <Warining
                     color='error'
@@ -105,7 +103,13 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
           <GridItem md={4}>
             <FastField
               name='invoiceTotalAftGST'
-              render={(args) => <NumberInput {...amountProps} {...args} />}
+              render={args => (
+                <NumberInput
+                  style={{ ...customStyle }}
+                  {...amountProps}
+                  {...args}
+                />
+              )}
             />
           </GridItem>
           <GridItem md={3} />
@@ -115,7 +119,13 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
           <GridItem md={4}>
             <FastField
               name='writeOffAmount'
-              render={(args) => <NumberInput {...amountProps} {...args} />}
+              render={args => (
+                <NumberInput
+                  style={{ ...customStyle }}
+                  {...amountProps}
+                  {...args}
+                />
+              )}
             />
           </GridItem>
           <GridItem md={3} />
@@ -135,7 +145,13 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
           <GridItem md={3}>
             <FastField
               name='totalPayment'
-              render={(args) => <NumberInput {...amountProps} {...args} />}
+              render={args => (
+                <NumberInput
+                  style={{ ...customStyle }}
+                  {...amountProps}
+                  {...args}
+                />
+              )}
             />
           </GridItem>
           <GridItem md={4} />
@@ -145,7 +161,13 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
           <GridItem md={3}>
             <FastField
               name='totalCreditNoteAmt'
-              render={(args) => <NumberInput {...amountProps} {...args} />}
+              render={args => (
+                <NumberInput
+                  style={{ ...customStyle }}
+                  {...amountProps}
+                  {...args}
+                />
+              )}
             />
           </GridItem>
           <GridItem md={4} />
@@ -164,7 +186,13 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
           <GridItem md={4}>
             <FastField
               name='outstandingBalance'
-              render={(args) => <NumberInput {...amountProps} {...args} />}
+              render={args => (
+                <NumberInput
+                  style={{ ...customStyle }}
+                  {...amountProps}
+                  {...args}
+                />
+              )}
             />
           </GridItem>
           <GridItem md={4} />

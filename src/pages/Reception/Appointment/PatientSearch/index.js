@@ -24,7 +24,7 @@ class PatientSearch extends PureComponent {
       { name: 'action', title: 'Action' },
     ],
     columnExtensions: [
-      // { columnName: 'name', width: 300 },
+      { columnName: 'name', width: 242 },
       { columnName: 'patientAccountNo', width: 120 },
       { columnName: 'patientReferenceNo', width: 120 },
       { columnName: 'mobileNo', width: 140, sortingEnabled: false },
@@ -32,7 +32,7 @@ class PatientSearch extends PureComponent {
         columnName: 'gender/age',
         width: 95,
         sortingEnabled: false,
-        render: (row) =>
+        render: row =>
           `${row.gender.substring(0, 1)}/${calculateAgeFromDOB(row.dob)}`,
       },
       {
@@ -43,9 +43,9 @@ class PatientSearch extends PureComponent {
       },
       {
         columnName: 'action',
-        width: 150,
+        width: 120,
         align: 'center',
-        render: (row) => this.ActionButton(row),
+        render: row => this.ActionButton(row),
       },
     ],
   }
@@ -53,7 +53,7 @@ class PatientSearch extends PureComponent {
   SearchPatient = Loadable({
     loader: () => import('@/pages/PatientDatabase/Search'),
     loading: Loading,
-    render: (loaded) => {
+    render: loaded => {
       const Component = loaded.default
       const { search } = this.props
       return (
@@ -73,7 +73,7 @@ class PatientSearch extends PureComponent {
     },
   })
 
-  ActionButton = (row) => (
+  ActionButton = row => (
     <Button
       style={{ marginRight: 0 }}
       size='sm'
@@ -82,18 +82,18 @@ class PatientSearch extends PureComponent {
       onClick={() => this.props.handleSelectClick(row)}
     >
       <Add />
-      Select Patient
+      Select
     </Button>
   )
 
-  handleDoubleClick = (row) => {
+  handleDoubleClick = row => {
     this.props.handleSelectClick(row)
   }
 
-  render () {
+  render() {
     const { loading } = this.props
     const show = loading.effects['patientSearch/query']
-    const { SearchPatient = (f) => f } = this
+    const { SearchPatient = f => f } = this
     return (
       <React.Fragment>
         <LoadingWrapper loading={show} text='Retrieving patient list...'>

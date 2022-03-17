@@ -541,11 +541,22 @@ export const NUMBER_TYPE = {
   FAX: 4,
 }
 
+export const APPNOTIFICATION_SCHEMA = {
+  LAB: { id: 5, name: 'Lab' },
+  RADIOLOGY: { id: 6, name: 'Radiology' },
+  PHARMACY: { id: 7, name: 'Pharmacy' },
+  MC: { id: 8, name: 'MC' },
+}
+
 export const NOTIFICATION_TYPE = {
   QUEUE: 1,
   CODETABLE: 2,
   ERROR: 3,
   CONSULTAION: 4,
+  LAB: APPNOTIFICATION_SCHEMA.LAB.id,
+  RADIOLOGY: APPNOTIFICATION_SCHEMA.RADIOLOGY.id,
+  PHARMACY: APPNOTIFICATION_SCHEMA.PHARMACY.id,
+  MC: APPNOTIFICATION_SCHEMA.MC.id,
 }
 
 export const NOTIFICATION_STATUS = {
@@ -888,6 +899,16 @@ export const LAB_SPECIMEN_STATUS = {
   COMPLETED: 6,
   DISCARDED: 7,
 }
+
+export const LAB_SPECIMEN_TIMELINE_STATUS = {
+  FIRSTORDERED: 'First Ordered',
+  SPECIMENCOLLECTED: 'Specimen Collected',
+  SPECIMENRECEIVED: 'Specimen Received',
+  TESTSTARTED: 'Test Started',
+  FIRSTVERIFIED: 'First Verified',
+  COMPLETED: 'Completed',
+}
+
 export const LAB_SPECIMEN_ALL_COLOR = '#5a9cde'
 export const LAB_SPECIMEN_STATUS_COLORS = {
   1: '#999900',

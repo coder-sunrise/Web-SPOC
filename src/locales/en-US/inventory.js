@@ -23,6 +23,7 @@ export default {
   'inventory.master.medication.sddID': 'SDD ID',
   'inventory.master.medication.sddDescription': 'SDD Description',
   'inventory.master.medication.supplier': 'Supplier',
+  'inventory.master.medication.manufacturer': 'Manufacturer',
   'inventory.master.medication.precaution': 'Precaution',
   'inventory.master.medication.sideEffect': 'Side Effect',
   'inventory.master.medication.contraindication': 'Contraindication',
@@ -67,10 +68,10 @@ export default {
   'inventory.master.pricing.lastCostPriceAftBonus':
     'Last Cost Price (After Bonus)',
   'inventory.master.pricing.averageCostPrice': 'Average Cost Price',
-  'inventory.master.pricing.profitMarginPercentage': 'Markup Margin (%)',
+  'inventory.master.pricing.profitMarginPercentage': 'Markup Margin',
   'inventory.master.pricing.suggestedSellingPrice': 'Suggested Selling Price',
   'inventory.master.pricing.sellingPrice': 'Selling Price',
-  'inventory.master.pricing.maxDiscount': 'Max Discount (%)',
+  'inventory.master.pricing.maxDiscount': 'Max Discount',
 
   'inventory.master.setting.dosage': 'Dosage',
   'inventory.master.setting.frequency': 'Frequency',
@@ -97,9 +98,10 @@ export default {
   'inventory.purchaserequest.detail.print': 'Print',
   'inventory.purchaserequest.detail.save': 'Save',
   'inventory.purchaserequest.detail.submit': 'Submit',
-  'inventory.purchaserequest.detail.remarks' : 'Remarks',
+  'inventory.purchaserequest.detail.remarks': 'Remarks',
   'inventory.purchaserequest.detail.requestdate': 'Purchase Request Date',
-  'inventory.purchaserequest.detail.expectedDeliveryDate': 'Expected Delivery Date',
+  'inventory.purchaserequest.detail.expectedDeliveryDate':
+    'Expected Delivery Date',
 
   // Purchasing & Receiving
   'inventory.pr.reason': 'Reason',

@@ -159,6 +159,7 @@ export default {
   'menu.setting.generalsetting': 'General Setting',
   'menu.setting.queuedisplaysetup': 'Queue Display Setup',
   'menu.setting.supplier': 'Supplier',
+  'menu.setting.manufacturer': 'Manufacturer',
   'menu.setting.paymentmode': 'Payment Mode',
   'menu.setting.appointmenttype': 'Appointment Type',
   'menu.setting.referralsource': 'Referral Source',

@@ -2302,9 +2302,6 @@ class Medication extends PureComponent {
                                           id:
                                             'inventory.master.setting.duration',
                                         })}
-                                        formatter={v =>
-                                          `${v} Day${v > 1 ? 's' : ''}`
-                                        }
                                         step={1}
                                         min={0}
                                         {...args}
@@ -2689,6 +2686,7 @@ class Medication extends PureComponent {
                             paddingRight: theme.spacing(6),
                           }}
                           currency
+                          noSuffix
                           label='Adjustment'
                           disabled={
                             values.isExternalPrescription ||
@@ -2712,6 +2710,7 @@ class Medication extends PureComponent {
                           paddingRight: theme.spacing(6),
                         }}
                         percentage
+                        noSuffix
                         max={100}
                         label='Adjustment'
                         disabled={

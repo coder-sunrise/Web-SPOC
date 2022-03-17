@@ -77,6 +77,7 @@ const Setting = ({ classes, showTransfer, dispatch, global, ...props }) => {
                 isMultiLanguage={false}
                 label='#'
                 labelField='name'
+                isShowFreeText
                 initialValue={medicationIngredients}
                 onChange={value =>
                   setFieldValue(

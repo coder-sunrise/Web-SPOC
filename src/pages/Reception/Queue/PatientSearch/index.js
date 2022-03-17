@@ -41,8 +41,8 @@ class PatientSearch extends PureComponent {
       {
         align: 'left',
         columnName: 'name',
-        // width: 240,
-        render: (row) => {
+        width: 242,
+        render: row => {
           const accessRight = Authorized.check(
             'patientdatabase.patientprofiledetails',
           )
@@ -51,9 +51,15 @@ class PatientSearch extends PureComponent {
             (accessRight.rights === 'hidden' ||
               accessRight.rights === 'disable')
           return (
-            <Tooltip title='View patient profile'>
+            <Tooltip title={row.name}>
               {isDisabled ? (
-                <span style={{ color: primaryColor }}>{row.name}</span>
+                <span
+                  style={{
+                    color: primaryColor,
+                  }}
+                >
+                  {row.name}
+                </span>
               ) : (
                 <Button
                   className={this.props.classes.patientNameBtn}
@@ -77,7 +83,7 @@ class PatientSearch extends PureComponent {
         columnName: 'gender/age',
         width: 95,
         sortingEnabled: false,
-        render: (row) =>
+        render: row =>
           `${row.gender.substring(0, 1)}/${calculateAgeFromDOB(row.dob)}`,
       },
       {
@@ -88,9 +94,9 @@ class PatientSearch extends PureComponent {
       },
       {
         columnName: 'action',
-        width: 140,
+        width: 120,
         align: 'center',
-        render: (row) => this.Cell(row),
+        render: row => this.Cell(row),
       },
     ],
   }
@@ -98,7 +104,7 @@ class PatientSearch extends PureComponent {
   SearchPatient = Loadable({
     loader: () => import('@/pages/PatientDatabase/Search'),
     loading: Loading,
-    render: (loaded) => {
+    render: loaded => {
       const Component = loaded.default
       const { search } = this.props
       return (
@@ -118,29 +124,27 @@ class PatientSearch extends PureComponent {
     },
   })
 
-  handleDoubleClick = (row) => {
+  handleDoubleClick = row => {
     this.registerVisitClick(row.id)
   }
 
-  registerVisitClick = (patientID) => {
+  registerVisitClick = patientID => {
     const { handleRegisterVisitClick } = this.props
     handleRegisterVisitClick({ patientID })
   }
 
-  viewPatientProfile = (event) => {
+  viewPatientProfile = event => {
     const { currentTarget } = event
     const { id } = currentTarget
     this.props.onViewPatientProfileClick(id)
   }
 
-  Cell = (row) => (
-    <RegisterVisitBtn row={row} onClick={this.registerVisitClick} />
-  )
+  Cell = row => <RegisterVisitBtn row={row} onClick={this.registerVisitClick} />
 
-  render () {
+  render() {
     const { loading } = this.props
 
-    const { SearchPatient = (f) => f } = this
+    const { SearchPatient = f => f } = this
     const show =
       loading.effects['patientSearch/query'] || loading.effects['patient/query']
 

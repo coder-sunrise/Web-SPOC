@@ -36,10 +36,11 @@ class Supplier extends PureComponent {
       { columnName: 'displayValue', direction: 'asc' },
     ]
     const copayer = route.name === 'copayer'
+    const supplier = route.name === 'supplier'
     dispatch({
       type: 'settingCompany/query',
       payload: {
-        companyTypeFK: copayer ? 1 : 2,
+        companyTypeFK: copayer ? 1 : supplier ? 2 : 3,
         sorting: copayer ? copayerSorting : suppSorting,
       },
     })
@@ -104,7 +105,12 @@ class Supplier extends PureComponent {
       toggleModal: this.toggleModal,
     }
     const { name } = route
-    const companyType = name === 'copayer' ? 'Co-Payer' : 'Supplier'
+    const companyType =
+      name === 'copayer'
+        ? 'Co-Payer'
+        : name === 'supplier'
+        ? 'Supplier'
+        : 'Manufacturer'
     let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
     if (height < 300) height = 300
     return (

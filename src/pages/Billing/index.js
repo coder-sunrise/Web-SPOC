@@ -598,6 +598,7 @@ class Billing extends Component {
             })
             this.setState(preState => ({
               submitCount: preState.submitCount + 1,
+              hasNewSignature: false,
             }))
           }
           resetForm()
@@ -1123,7 +1124,7 @@ class Billing extends Component {
   updateInvoiceSignature = signature => {
     const { dispatch, values, patient, setFieldValue } = this.props
     const { thumbnail } = signature
-    if (thumbnail) {
+    if (thumbnail != values.invoice.signature) {
       this.setState({ hasNewSignature: true })
     }
     setFieldValue('invoice', {

@@ -99,16 +99,14 @@ const DispenseDetailsSpecimenCollection = ({
               {row.accessionNo}
             </Link>
           )
-        }
-
-        if (row.specimenStatusFK === LAB_SPECIMEN_STATUS.DISCARDED) {
+        } else if (row.specimenStatusFK === LAB_SPECIMEN_STATUS.DISCARDED) {
           return (
             <Tooltip
               useTooltip2
               title={
                 <div>
                   <div>
-                    Discarded by {row.lastUpdatedClinicianName} at{' '}
+                    Discarded by {row.specimenDiscardedClinicianName} at{' '}
                     {row.lastUpdatedDate?.format(dateFormatLongWithTimeNoSec)}
                   </div>
                   <div>Reason: {row.specimenDiscardReason}</div>
@@ -120,6 +118,8 @@ const DispenseDetailsSpecimenCollection = ({
               </div>
             </Tooltip>
           )
+        } else {
+          return <span>{row.accessionNo}</span>
         }
       },
     },
