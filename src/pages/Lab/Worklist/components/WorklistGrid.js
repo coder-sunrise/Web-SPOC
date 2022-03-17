@@ -54,15 +54,6 @@ import styles from './WorklistGrid.less'
 import { LabResultReportPreview } from './LabResultReportPreview'
 import { RetestDetails } from './RetestDetails'
 
-const MODALS = {
-  NONE: '',
-  SPECIMEN_COLLECTION: 'SPECIMEN_COLLECTION',
-  SPECIMEN_DETAILS: 'SPECIMEN_DETAILS',
-  DISCARD_SPECIMEN: 'DISCARD_SPECIMEN',
-  RECEIVE_SPECIMEN: 'RECEIVE_SPECIMEN',
-  LAB_REPORT_PREVIEW: 'LAB_REPORT_PREVIEW',
-}
-
 const allSpecimenStatuses = Object.values(LAB_SPECIMEN_STATUS)
 
 export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
