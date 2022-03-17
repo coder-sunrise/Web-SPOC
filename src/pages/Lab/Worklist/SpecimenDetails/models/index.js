@@ -15,13 +15,20 @@ export default createFormViewModel({
         const { entity: specimenDetails } = yield select(
           st => st.worklistSpecimenDetails,
         )
+
+        yield put({
+          type: 'patient/query',
+          payload: { id: specimenDetails.patientProfileFK },
+        })
+
+        yield take('patient/query/@@end')
       },
       *startLabTest({ payload }, { call, put }) {
         const status = yield call(service.startLabTest, payload)
 
         if (status === 200 || status === 204) {
           notification.success({
-            message: 'Manual tests started. Orders sent to analyzer.',
+            message: 'Manual tests started. Analyzer orders sent if any.',
           })
           return true
         }
@@ -32,6 +39,16 @@ export default createFormViewModel({
         if (status === 200 || status === 204) {
           notification.success({
             message: 'Lab tests saved.',
+          })
+          return true
+        }
+        return status
+      },
+      *retestSpecimen({ payload }, { call, put }) {
+        const status = yield call(service.retestSpecimen, payload)
+        if (status === 200 || status === 204) {
+          notification.success({
+            message: 'The specimen is ready for retest.',
           })
           return true
         }

@@ -235,6 +235,7 @@ export default compose(
         medicalCheckupIndividualComment,
         medicalCheckupSummaryComment,
         medicalCheckupWorkitemDoctor,
+        medicalCheckupReport,
         ...resetValue
       } = medicalCheckupReportingDetails.entity
       if (

@@ -6,7 +6,9 @@ import {
   Typography,
   Table,
   Checkbox,
+  Input,
   Form,
+  Button,
 } from 'antd'
 import Banner from '@/pages/PatientDashboard/Banner'
 import { useSelector, useDispatch } from 'dva'
@@ -24,6 +26,7 @@ import {
 import { VisitTypeTag } from '@/components/_medisys'
 import { SpecimenStatusTag } from '../components/SpecimenStatusTag'
 import { TestPanelColumn } from '../components/TestPanelColumn'
+import { RetestSpecimen } from './components/RetestSpecimen'
 import { SpecimenDetailsStep } from './components'
 import { useCodeTable } from '@/utils/hooks'
 import { EditableTable } from './components/LabResultTable'
@@ -34,6 +37,7 @@ import {
 } from '@/utils/constants'
 
 const { Panel } = Collapse
+const { TextArea } = Input
 
 const ActionButtons = ({ specimenStatusFK, onStart, onRetest, onVerify }) => {
   return (
@@ -61,48 +65,68 @@ const ActionButtons = ({ specimenStatusFK, onStart, onRetest, onVerify }) => {
   )
 }
 
-export const SpecimenDetails = ({ id, onClose, onConfirm }) => {
+export const SpecimenDetails = ({ open, id, onClose, onConfirm }) => {
   const dispatch = useDispatch()
-  const [isOpenModal, setIsOpenModal] = useState(false)
   const cttestcategory = useCodeTable('cttestcategory')
   const ctspecimentype = useCodeTable('ctspecimentype')
   const cttestpanel = useCodeTable('cttestpanel')
   const { entity } = useSelector(s => s.worklistSpecimenDetails)
   const [isResultFullScreen, setIsResultFullScreen] = useState(false)
+  const [formValues, setFormValues] = useState({})
+  const [showReportRemarks, setShowReportRemarks] = useState(false)
+  const [retestSpecimenPara, setRetestSpecimenPara] = useState({
+    open: false,
+    id: undefined,
+  })
+  const [showRawData, setShowRawData] = useState(false)
+  const [showModal, setShowModal] = useState(false)
   const currentStatus = entity.specimenStatusFK
   const [form] = Form.useForm()
 
-  // const data = [
-  //   { testPanel: 'CRE', rawData: '100', unit: 'mmHg', referenceRange: 0 - 10 },
-  //   { testPanel: 'BUN', rawData: '100', unit: 'mmHg', referenceRange: 0 - 10 },
-  //   { testPanel: 'GOT', rawData: '100', unit: 'mmHg', referenceRange: 0 - 10 },
-  // ]
+  const querySpecimenDetails = () => {
+    dispatch({
+      type: 'worklistSpecimenDetails/query',
+      payload: { id },
+    })
+  }
+
+  const cleanUp = () => {
+    form.setFieldsValue({})
+    setIsResultFullScreen(false)
+    setShowModal(false)
+    setShowReportRemarks(false)
+    setRetestSpecimenPara({
+      open: false,
+      id: undefined,
+    })
+    dispatch({
+      type: 'worklistSpecimenDetails/updateState',
+      payload: { entity: {} },
+    })
+  }
 
   useEffect(() => {
-    if (id) {
-      dispatch({
-        type: 'worklistSpecimenDetails/query',
-        payload: { id },
-      }).then(val => {
-        if (val) {
-          setIsOpenModal(true)
-        }
-      })
+    setShowModal(open)
+    if (open && id) {
+      querySpecimenDetails()
     }
 
     return () => {
-      form.resetFields()
-      setIsResultFullScreen(false)
-      setIsOpenModal(false)
-      dispatch({
-        type: 'worklistSpecimenDetails/updateState',
-        payload: { entity: {} },
-      })
+      cleanUp()
     }
   }, [id])
 
   useEffect(() => {
-    form.setFieldsValue({ ...entity })
+    if (!showModal) cleanUp()
+  }, [showModal])
+
+  useEffect(() => {
+    form.setFieldsValue(entity)
+    setFormValues(entity) //https://github.com/ant-design/ant-design/issues/21829
+
+    if (entity.reportRemarks && entity.reportRemarks.trim().length > 0) {
+      setShowReportRemarks(true)
+    }
   }, [entity])
 
   const handleStart = () => {
@@ -112,40 +136,80 @@ export const SpecimenDetails = ({ id, onClose, onConfirm }) => {
         payload: entity,
       }).then(result => {
         if (result) {
-          setIsOpenModal(false)
+          setShowModal(false)
           onConfirm && onConfirm()
         }
       })
     }
   }
 
-  const handleVerify = () => {
-    if (
-      currentStatus !== LAB_SPECIMEN_STATUS.NEW &&
-      currentStatus !== LAB_SPECIMEN_STATUS.DISCARDED &&
-      currentStatus !== LAB_SPECIMEN_STATUS.COMPLETED
-    ) {
-      dispatch({
-        type: 'worklistSpecimenDetails/verifyLabTest',
-        payload: entity,
-      }).then(result => {
-        if (result) {
-          setIsOpenModal(false)
-          onConfirm && onConfirm()
-        }
-      })
+  const handleRetest = () => {
+    setShowModal(false)
+    setRetestSpecimenPara({
+      open: true,
+      id: entity.id,
+    })
+  }
+
+  const closeRetestSpecimen = () => {
+    setRetestSpecimenPara({
+      open: false,
+      id: undefined,
+    })
+    setShowModal(true)
+    querySpecimenDetails()
+  }
+
+  const getChangedResults = values =>
+    entity.labWorkitemResults.filter(
+      x =>
+        values.labWorkitemResults.findIndex(
+          y =>
+            x.id === y.id &&
+            x.finalResult?.toString() != y.finalResult?.toString(),
+        ) != -1,
+    )
+
+  const handleVerify = async () => {
+    try {
+      if (
+        currentStatus !== LAB_SPECIMEN_STATUS.NEW &&
+        currentStatus !== LAB_SPECIMEN_STATUS.DISCARDED &&
+        currentStatus !== LAB_SPECIMEN_STATUS.COMPLETED
+      ) {
+        const values = await form.validateFields()
+        const changedResults = getChangedResults(values)
+
+        console.log('hasAnyValueChanged', changedResults.length > 0)
+
+        dispatch({
+          type: 'worklistSpecimenDetails/verifyLabTest',
+          payload: { ...entity, ...values },
+        }).then(result => {
+          if (result) {
+            setShowModal(false)
+            onConfirm && onConfirm()
+          }
+        })
+      }
+    } catch (errInfo) {
+      console.log('Save failed:', errInfo)
     }
   }
 
   const handleSave = async () => {
     try {
       const values = await form.validateFields()
+      const changedResults = getChangedResults(values)
+
+      console.log('hasAnyValueChanged', changedResults.length > 0)
+
       dispatch({
         type: 'worklistSpecimenDetails/saveLabTest',
         payload: { ...entity, ...values },
       }).then(result => {
         if (result) {
-          setIsOpenModal(false)
+          setShowModal(false)
           onConfirm && onConfirm()
         }
       })
@@ -154,88 +218,170 @@ export const SpecimenDetails = ({ id, onClose, onConfirm }) => {
     }
   }
 
-  return (
-    <CommonModal
-      open={isOpenModal}
-      title='Lab Test Specimen Details'
-      onClose={() => {
-        setIsOpenModal(false)
-        onClose && onClose()
-      }}
-      footProps={{
-        extraButtons: [
-          <ActionButtons
-            specimenStatusFK={entity.specimenStatusFK}
-            onStart={handleStart}
-            onVerify={handleVerify}
-          />,
-        ],
-        onConfirm:
-          entity.specimenStatusFK !== LAB_SPECIMEN_STATUS.COMPLETED
-            ? () => {
-                handleSave()
-              }
-            : undefined,
-      }}
-      confirmText='Save'
-      showFooter={true}
-      maxWidth='lg'
-    >
-      <div>
-        <GridContainer
-          style={{ height: 700, alignItems: 'start', overflowY: 'scroll' }}
-        >
-          {!isResultFullScreen && (
-            <React.Fragment>
+  const renderRemarks = () => {
+    if (currentStatus === LAB_SPECIMEN_STATUS.COMPLETED)
+      return (
+        <React.Fragment>
+          {formValues.reportRemarks &&
+            formValues.reportRemarks.trim().length > 0 && (
               <GridItem md={12}>
-                <div style={{ padding: 8 }}>
-                  <Banner />
-                </div>
+                <Typography.Text strong>Report Remarks: </Typography.Text>
+                <span>{formValues.reportRemarks}</span>
               </GridItem>
+            )}
+          {formValues.internalRemarks &&
+            formValues.internalRemarks.trim().length > 0 && (
               <GridItem md={12}>
-                <SpecimenDetailsStep />
+                <Typography.Text strong>Internal Remarks: </Typography.Text>
+                <span>{formValues.internalRemarks}</span>
               </GridItem>
-              <GridItem md={12}>
-                <HeaderInfo entity={entity} />
-              </GridItem>
-            </React.Fragment>
-          )}
-          {entity.specimenStatusFK !== LAB_SPECIMEN_STATUS.NEW && (
-            <GridItem md={12}>
-              <Form form={form} initialValues={{ ...entity }}>
-                <GridContainer>
-                  <GridItem md={12} style={{ paddingTop: 16, display: 'flex' }}>
-                    <Space>
-                      <Typography.Text strong style={{ flexGrow: 1 }}>
-                        Final Result:
-                      </Typography.Text>
+            )}
+        </React.Fragment>
+      )
 
-                      <Checkbox onChange={e => console.log} />
-                      <span>Display Raw Data</span>
-                    </Space>
-                    <div style={{ flexGrow: 1, textAlign: 'right' }}>
-                      <Icon
-                        type={
-                          isResultFullScreen ? 'fullscreen-exit' : 'fullscreen'
-                        }
-                        style={{ border: '1px solid', fontSize: '1rem' }}
-                        onClick={() =>
-                          setIsResultFullScreen(!isResultFullScreen)
-                        }
-                      />
+    return (
+      <React.Fragment>
+        {showReportRemarks ? (
+          <GridItem md={12}>
+            <Typography.Text strong>Report Remarks</Typography.Text>
+            <Form.Item name='reportRemarks'>
+              <TextArea rows={4} maxLength={2000} />
+            </Form.Item>
+          </GridItem>
+        ) : (
+          <GridItem md={12}>
+            <Typography.Link
+              underline
+              onClick={() => setShowReportRemarks(true)}
+            >
+              Add Report Remarks
+            </Typography.Link>
+          </GridItem>
+        )}
+        <GridItem md={12}>
+          <Typography.Text strong>Internal Remarks</Typography.Text>
+          <Form.Item name='internalRemarks'>
+            <TextArea rows={4} maxLength={2000} />
+          </Form.Item>
+        </GridItem>
+      </React.Fragment>
+    )
+  }
+
+  console.log('form initial values')
+
+  return (
+    <React.Fragment>
+      <CommonModal
+        open={showModal}
+        title='Lab Test Specimen Details'
+        onClose={() => {
+          setShowModal(false)
+          onClose && onClose()
+        }}
+        footProps={{
+          extraButtons: [
+            <ActionButtons
+              specimenStatusFK={entity.specimenStatusFK}
+              onStart={handleStart}
+              onVerify={handleVerify}
+              onRetest={handleRetest}
+            />,
+          ],
+          onConfirm:
+            entity.specimenStatusFK !== LAB_SPECIMEN_STATUS.COMPLETED
+              ? () => {
+                  handleSave()
+                }
+              : undefined,
+        }}
+        confirmText='Save'
+        showFooter={true}
+        maxWidth='lg'
+      >
+        <div>
+          <Form
+            form={form}
+            initialValues={{ ...entity }}
+            onValuesChange={(_, values) => setFormValues(values)}
+          >
+            <GridContainer
+              style={{ height: 700, alignItems: 'start', overflowY: 'scroll' }}
+            >
+              {!isResultFullScreen && (
+                <React.Fragment>
+                  <GridItem md={12}>
+                    <div style={{ padding: 8 }}>
+                      <Banner />
                     </div>
                   </GridItem>
-                  <GridItem md={12} style={{ paddingTop: 8 }}>
-                    <Form.Item name='labWorkitemResults'>
-                      <EditableTable />
-                    </Form.Item>
+                  <GridItem md={12}>
+                    <SpecimenDetailsStep timeline={entity.timeline} />
                   </GridItem>
-                </GridContainer>
-              </Form>
-            </GridItem>
-          )}
-        </GridContainer>
-      </div>
-    </CommonModal>
+                  <GridItem md={12}>
+                    <HeaderInfo entity={entity} />
+                  </GridItem>
+                </React.Fragment>
+              )}
+              {entity.specimenStatusFK !== LAB_SPECIMEN_STATUS.NEW && (
+                <GridItem md={12}>
+                  <GridContainer>
+                    <GridItem
+                      md={12}
+                      style={{ paddingTop: 16, display: 'flex' }}
+                    >
+                      <Space>
+                        <Typography.Text strong style={{ flexGrow: 1 }}>
+                          Final Result:
+                        </Typography.Text>
+
+                        <Checkbox
+                          onChange={e => setShowRawData(e.target.checked)}
+                        />
+                        <span>Display Raw Data</span>
+                      </Space>
+                      <div style={{ flexGrow: 1, textAlign: 'right' }}>
+                        <Icon
+                          type={
+                            isResultFullScreen
+                              ? 'fullscreen-exit'
+                              : 'fullscreen'
+                          }
+                          style={{ border: '1px solid', fontSize: '1rem' }}
+                          onClick={() =>
+                            setIsResultFullScreen(!isResultFullScreen)
+                          }
+                        />
+                      </div>
+                    </GridItem>
+                    <GridItem md={12} style={{ paddingTop: 8 }}>
+                      <Form.Item name='labWorkitemResults'>
+                        <EditableTable
+                          showRawData={showRawData}
+                          isReadonly={
+                            entity.specimenStatusFK ===
+                            LAB_SPECIMEN_STATUS.COMPLETED
+                          }
+                        />
+                      </Form.Item>
+                    </GridItem>
+                    {renderRemarks()}
+                  </GridContainer>
+                </GridItem>
+              )}
+            </GridContainer>
+          </Form>
+        </div>
+      </CommonModal>
+      <RetestSpecimen
+        {...retestSpecimenPara}
+        onClose={() => {
+          closeRetestSpecimen()
+        }}
+        onConfirm={() => {
+          closeRetestSpecimen()
+        }}
+      />
+    </React.Fragment>
   )
 }

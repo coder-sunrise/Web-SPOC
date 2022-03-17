@@ -228,6 +228,12 @@ const tenantCodesMap = new Map([
     },
   ],
   [
+    'cttestpanelitemresultoption',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
     'ctinvoiceadjustment',
     {
       ...defaultParams,
