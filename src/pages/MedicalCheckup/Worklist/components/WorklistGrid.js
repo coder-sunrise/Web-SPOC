@@ -321,10 +321,9 @@ const WorklistGrid = ({
     }
     return (
       <Tag
+        color={statusColor}
         style={{
-          backgroundColor: statusColor,
           textAlign: 'center',
-          color: 'white',
           width: '100%',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
