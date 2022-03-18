@@ -42,7 +42,7 @@ const ResultDetails = props => {
                 style={{ position: 'relative', top: 1, marginRight: 6 }}
                 type='icon-lab'
               />
-              Lab Test
+              {`Lab Test (${data.labResultDetails.length})`}
             </h4>
           }
           className='resultDetails'
@@ -68,22 +68,30 @@ const ResultDetails = props => {
                 }
                 description={
                   <div style={{ paddingLeft: 10 }}>
-                    <div style={{ color: 'black' }}>
-                      <div style={{ fontWeight: 'bold', fontStyle: 'italic' }}>
-                        Internal Remarks:{' '}
+                    {item.internalRemarks && (
+                      <div style={{ color: 'black' }}>
+                        <div
+                          style={{ fontWeight: 'bold', fontStyle: 'italic' }}
+                        >
+                          Internal Remarks:{' '}
+                        </div>
+                        <div style={{ display: 'inline-block' }}>
+                          {item.internalRemarks}
+                        </div>
                       </div>
-                      <div style={{ display: 'inline-block' }}>
-                        {item.internalRemarks}
+                    )}
+                    {item.reportRemarks && (
+                      <div style={{ color: 'black' }}>
+                        <div
+                          style={{ fontWeight: 'bold', fontStyle: 'italic' }}
+                        >
+                          Report Remarks:
+                        </div>
+                        <span style={{ display: 'inline-block' }}>
+                          {item.reportRemarks}
+                        </span>
                       </div>
-                    </div>
-                    <div style={{ color: 'black' }}>
-                      <div style={{ fontWeight: 'bold', fontStyle: 'italic' }}>
-                        Report Remarks:
-                      </div>
-                      <span style={{ display: 'inline-block' }}>
-                        {item.reportRemarks}
-                      </span>
-                    </div>
+                    )}
                   </div>
                 }
               />
@@ -100,7 +108,7 @@ const ResultDetails = props => {
                 style={{ position: 'relative', top: 1, marginRight: 6 }}
                 type='icon-radiology'
               />
-              Examination
+              {`Examination (${data.radiologyResultDetails.length})`}
             </h4>
           }
           className='resultDetails'
@@ -126,22 +134,30 @@ const ResultDetails = props => {
                 }
                 description={
                   <div style={{ paddingLeft: 10 }}>
-                    <div style={{ color: 'black' }}>
-                      <div style={{ fontWeight: 'bold', fontStyle: 'italic' }}>
-                        Findings:{' '}
+                    {item.findings && (
+                      <div style={{ color: 'black' }}>
+                        <div
+                          style={{ fontWeight: 'bold', fontStyle: 'italic' }}
+                        >
+                          Findings:{' '}
+                        </div>
+                        <div style={{ display: 'inline-block' }}>
+                          {ReactHtmlParser(item.findings)}
+                        </div>
                       </div>
-                      <div style={{ display: 'inline-block' }}>
-                        {ReactHtmlParser(item.findings)}
+                    )}
+                    {item.examinationComments && (
+                      <div style={{ color: 'black' }}>
+                        <div
+                          style={{ fontWeight: 'bold', fontStyle: 'italic' }}
+                        >
+                          Examination Comments:
+                        </div>
+                        <span style={{ display: 'inline-block' }}>
+                          {item.examinationComments}
+                        </span>
                       </div>
-                    </div>
-                    <div style={{ color: 'black' }}>
-                      <div style={{ fontWeight: 'bold', fontStyle: 'italic' }}>
-                        Examination Comments:
-                      </div>
-                      <span style={{ display: 'inline-block' }}>
-                        {item.examinationComments}
-                      </span>
-                    </div>
+                    )}
                   </div>
                 }
               />
