@@ -9,7 +9,7 @@ import moment from 'moment'
 import { Link } from 'umi'
 
 const { TextArea } = Input
-const dateTimeFormat = 'DD MMM YYYY HH:mm'
+const dateTimeFormat = 'DD MMM YYYY HH:mm:ss'
 const formatDateTime = datetime =>
   datetime ? moment(datetime).format(dateTimeFormat) : undefined
 
