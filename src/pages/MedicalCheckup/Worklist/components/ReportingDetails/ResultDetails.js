@@ -3,6 +3,8 @@ import { List } from 'antd'
 import { useDispatch } from 'dva'
 import ReactHtmlParser from 'react-html-parser'
 import { withStyles } from '@material-ui/core'
+import { createFromIconfontCN } from '@ant-design/icons'
+import defaultSettings from '@/defaultSettings'
 
 const styles = () => ({
   '.ant-list-header': {
@@ -15,6 +17,9 @@ const ResultDetails = props => {
   const [data, setData] = useState([])
   const [loaded, setLoaded] = useState(false)
   const dispatch = useDispatch()
+  let IconFont = createFromIconfontCN({
+    scriptUrl: defaultSettings.iconfontUrl,
+  })
   useEffect(() => {
     if (!loaded && showResultDetails && visitId) {
       setLoaded(true)
@@ -31,7 +36,15 @@ const ResultDetails = props => {
       {data?.labResultDetails && (
         <List
           itemLayout='horizontal'
-          header={<h4 style={{ fontWeight: 'bold' }}>Lab Test</h4>}
+          header={
+            <h4 style={{ fontWeight: 'bold', color: 'rgb(56, 158, 13)' }}>
+              <IconFont
+                style={{ position: 'relative', top: 1, marginRight: 6 }}
+                type='icon-lab'
+              />
+              Lab Test
+            </h4>
+          }
           className='resultDetails'
           size='small'
           dataSource={data.labResultDetails}
@@ -81,7 +94,15 @@ const ResultDetails = props => {
       {data?.radiologyResultDetails && (
         <List
           itemLayout='horizontal'
-          header={<h4 style={{ fontWeight: 'bold' }}>Examination</h4>}
+          header={
+            <h4 style={{ fontWeight: 'bold', color: 'rgb(56, 158, 13)' }}>
+              <IconFont
+                style={{ position: 'relative', top: 1, marginRight: 6 }}
+                type='icon-radiology'
+              />
+              Examination
+            </h4>
+          }
           className='resultDetails'
           size='small'
           dataSource={data.radiologyResultDetails}
