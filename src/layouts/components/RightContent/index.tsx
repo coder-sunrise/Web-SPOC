@@ -116,13 +116,13 @@ class HeaderLinks extends React.Component {
           <SizeContainer size='lg'>
             <div>
               <AppNotificationPopover
-                  dispatch={this.props.dispatch}
-                  title='+'
-                  source={APPNOTIFICATION_SCHEMA.LAB.name}
-                  sourceRecordId={0} //visitFK
-                  doctor={{ userFK: 10, name: 'Miss.Caoli' }}
-                  buttonProps={{justIcon:true,style:{width:24}}}
-                />
+                dispatch={this.props.dispatch}
+                title='+'
+                source={APPNOTIFICATION_SCHEMA.LAB.name}
+                sourceRecordId={0} //visitFK
+                doctor={{ userFK: user.data.id, name: name }}
+                buttonProps={{ justIcon: true, style: { width: 24 } }}
+              />
               <Notification
                 dispatch={this.props.dispatch}
                 notifications={notifications}
