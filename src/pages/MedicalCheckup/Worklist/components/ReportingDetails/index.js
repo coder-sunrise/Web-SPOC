@@ -443,41 +443,33 @@ const ReportingDetails = props => {
           placement={placement}
           width='40%'
           getContainer={false}
-          style={{
-            position: 'absolute',
-            //top: banner?.offsetHeight,
-            //height: contentHeight,
-          }}
-          closable={false}
           bodyStyle={{
             padding: '0px 6px',
           }}
+          title='Result Details'
           visible={showResultDetails}
           onClose={() => setShowResultDetails(false)}
           mask={false}
         >
-          <div>
-            <div style={{ position: 'relative', marginTop: 4 }}>
-              <div style={{ fontWeight: 600, fontSize: '1.2rem' }}>
-                Result Details
-              </div>
-              <Button
-                size='small'
-                type='text'
-                icon={<CloseOutlined style={{ color: '#cccccc' }} />}
-                style={{ position: 'absolute', right: 0, top: 2 }}
-                onClick={() => setShowResultDetails(false)}
-              ></Button>
-            </div>
-            <Divider style={{ marginBottom: 4 }} />
-            <ResultDetails height={height - 130} />
-            <div style={{ textAlign: 'center', marginTop: 10 }}>
+          <div style={{ height: '100%', paddingBottom: 40 }}>
+            <ResultDetails
+              showResultDetails={showResultDetails}
+              visitId={medicalCheckupReportingDetails.visitID}
+            />
+            <div
+              style={{ textAlign: 'right', position: 'absolute', bottom: 10 }}
+            >
               {placement === 'right' && (
                 <Tooltip title='Show on Left'>
                   <Button
                     type='primary'
                     size='small'
-                    style={{ margin: '0px 5px', width: 55 }}
+                    style={{
+                      margin: '0px 5px',
+                      position: 'relative',
+                      top: -1,
+                      width: 55,
+                    }}
                     icon={<DoubleLeftOutlined />}
                     onClick={changePlacement}
                   ></Button>
@@ -496,7 +488,12 @@ const ReportingDetails = props => {
                   <Button
                     type='primary'
                     size='small'
-                    style={{ margin: '0px 5px', width: 55 }}
+                    style={{
+                      margin: '0px 5px',
+                      position: 'relative',
+                      top: -1,
+                      width: 55,
+                    }}
                     icon={<DoubleRightOutlined />}
                     onClick={changePlacement}
                   ></Button>
