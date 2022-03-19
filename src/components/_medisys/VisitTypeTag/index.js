@@ -18,7 +18,12 @@ const VisitTypeTag = ({ type }) => {
 
   return (
     <Tooltip title={currentVisitType?.name}>
-      <Tag color={visitTypeColors[type]}>{currentVisitType?.code}</Tag>
+      <Tag
+        style={{ width: 40, textAlign: 'center' }}
+        color={visitTypeColors[type]}
+      >
+        {currentVisitType?.code}
+      </Tag>
     </Tooltip>
   )
 }
