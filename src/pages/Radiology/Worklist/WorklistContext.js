@@ -27,6 +27,7 @@ export const WorklistContextProvider = props => {
   }
 
   const startTimer = () => {
+    stopTimer()
     timer.current = setInterval(() => {
       refreshWorklist()
     }, autoRefreshRadiologyWorklistInterval * 1000)
