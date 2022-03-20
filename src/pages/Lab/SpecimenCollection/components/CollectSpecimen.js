@@ -45,7 +45,6 @@ const CollectSpecimen = ({
   const [isPrintLabel, setIsPrintLabel] = useState(true)
   const [copies, setCopies] = useState(1)
   const [testPanelValidationError, setTestPanelValidationError] = useState('')
-  const [receivedSpecimen, setReceivedSpecimen] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const ctTestCategory = useCodeTable('cttestcategory')
   const ctspecimentype = useCodeTable('ctspecimentype')
@@ -117,7 +116,7 @@ const CollectSpecimen = ({
     )
     form.setFieldsValue({
       specimenCollectionDate: moment(),
-      dateReceived: undefined,
+      dateReceived: enableReceiveSpecimen ? moment() : undefined,
       specimenTypeFK: undefined,
       labWorkitems: [],
     })
@@ -243,7 +242,6 @@ const CollectSpecimen = ({
             <Fragment>
               <Form.Item name='dateReceived'>
                 <DatePicker
-                  disabled={!receivedSpecimen}
                   showTime
                   style={{ width: 150 }}
                   label='Date Received'
@@ -251,11 +249,11 @@ const CollectSpecimen = ({
                 />
               </Form.Item>
               <Checkbox
+                defaultChecked={true}
                 onChange={e => {
                   form.setFieldsValue({
                     dateReceived: e.target.checked ? moment() : undefined,
                   })
-                  setReceivedSpecimen(e.target.checked)
                 }}
                 style={{ marginTop: 30 }}
               >

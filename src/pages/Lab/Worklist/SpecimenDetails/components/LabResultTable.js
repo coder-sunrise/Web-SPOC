@@ -128,7 +128,7 @@ export const EditableTable = ({
     {
       title: 'Result',
       dataIndex: 'finalResult',
-      width: 150,
+      width: 175,
       editable: true,
       render: (record = {}, text, onSave) => {
         console.log('record.shouldFlag', record.shouldFlag)
@@ -175,7 +175,7 @@ export const EditableTable = ({
         }
         //Attachement
         else {
-          return <span>Result is an attachment.</span>
+          return <div>Result is an attachment.</div>
         }
       },
     },
