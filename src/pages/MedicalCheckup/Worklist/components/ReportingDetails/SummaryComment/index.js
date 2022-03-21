@@ -14,11 +14,13 @@ import {
   Tooltip,
   Popconfirm,
   DragableTableGrid,
+  SizeContainer,
 } from '@/components'
 import { Badge, Button, Table } from 'antd'
 import { TranslateOutlined } from '@material-ui/icons'
 import { Divider } from '@material-ui/core'
 import { DeleteFilled, EditFilled, CopyOutlined } from '@ant-design/icons'
+import Authorized from '@/utils/Authorized'
 import customtyles from '../../Style.less'
 import CommentDetails from './SummaryCommentDetails'
 import CommentVerification from '../CommentVerification'
@@ -39,6 +41,8 @@ const SummaryComment = props => {
     clearEditComment,
     user,
     isEditEnable = true,
+    isModifyCommentEnable,
+    isModifyOthersCommentEnable,
   } = props
   const [showVerification, setShowVerification] = useState(false)
   const [commentOption, setCommentOption] = useState([])
@@ -129,18 +133,27 @@ const SummaryComment = props => {
       },
     }).then(r => {
       if (r) {
-        querySummaryCommentHistory()
-        refreshMedicalCheckup()
-        if (
-          medicalCheckupReportingDetails.summaryCommentEntity?.id === row.id
-        ) {
-          dispatch({
-            type: 'medicalCheckupReportingDetails/updateState',
-            payload: {
-              summaryCommentEntity: undefined,
+        dispatch({
+          type: 'medicalCheckupReportingDetails/querySummaryCommentHistory',
+          payload: {
+            apiCriteria: {
+              patientProfileFK: row.patientProfileFK,
+              visitFK: row.visitFK,
             },
-          })
-        }
+          },
+        })
+        dispatch({
+          type: 'medicalCheckupReportingDetails/query',
+          payload: {
+            id: row.medicalCheckupWorkitemFK,
+          },
+        })
+        dispatch({
+          type: 'medicalCheckupReportingDetails/updateState',
+          payload: {
+            summaryCommentEntity: undefined,
+          },
+        })
       }
     })
   }
@@ -167,9 +180,10 @@ const SummaryComment = props => {
   }
 
   const getDisplayValue = row => {
-    const showValue = row[
-      `${selectedLanguage === 'EN' ? 'englishComment' : 'japaneseComment'}`
-    ] || <span>&nbsp;</span>
+    const showValue =
+      row[
+        `${selectedLanguage === 'EN' ? 'englishComment' : 'japaneseComment'}`
+      ] || '-'
     return (
       <Tooltip title={showValue}>
         <div
@@ -214,6 +228,42 @@ const SummaryComment = props => {
     })
   }
 
+  const actions = row => {
+    if (row.commentByUserFK === user.data.clinicianProfile.userProfile.id) {
+      if (!isModifyCommentEnable) return ''
+    } else {
+      if (!isModifyOthersCommentEnable) return ''
+    }
+    return (
+      <div style={{ position: 'absolute', right: 4, top: 4 }}>
+        <Tooltip title='Edit Summary Comment'>
+          <Button
+            size='small'
+            type='primary'
+            style={{ marginRight: 5 }}
+            icon={<EditFilled />}
+            onClick={() => editComment(row)}
+          ></Button>
+        </Tooltip>
+        <Popconfirm
+          title='Are you sure?'
+          onConfirm={() => {
+            deleteComment(row)
+          }}
+        >
+          <Tooltip title='Delete Summary Comment'>
+            <Button
+              size='small'
+              type='danger'
+              style={{ marginRight: 5 }}
+              icon={<DeleteFilled />}
+            ></Button>
+          </Tooltip>
+        </Popconfirm>
+      </div>
+    )
+  }
+
   const setData = queryData => {
     const { classes } = props
     const data = _.orderBy(queryData, ['visitDate'], ['desc'])
@@ -222,7 +272,11 @@ const SummaryComment = props => {
       medicalCheckupReportingDetails.summaryCommentEntity,
     )
     data.forEach((item, index) => {
-      const commentList = item.medicalCheckupSummaryComment || []
+      const commentList = (item.medicalCheckupSummaryComment || []).map(x => ({
+        ...x,
+        visitFK: medicalCheckupReportingDetails.visitID,
+        patientProfileFK: medicalCheckupReportingDetails.patientID,
+      }))
       if (index === 0) {
         let itemTemplate
         if (selectedLanguage === 'EN') {
@@ -235,34 +289,7 @@ const SummaryComment = props => {
                 }}
               >
                 {getDisplayValue(row)}
-                <div style={{ position: 'absolute', right: 4, top: 4 }}>
-                  <Tooltip title='Edit Summary Comment'>
-                    <Button
-                      size='small'
-                      type='primary'
-                      style={{ marginRight: 5 }}
-                      icon={<EditFilled />}
-                      onClick={() => editComment(row)}
-                    ></Button>
-                  </Tooltip>
-                  <Popconfirm
-                    title='Are you sure?'
-                    onConfirm={() => {
-                      setTimeout(() => {
-                        deleteComment(row)
-                      }, 1)
-                    }}
-                  >
-                    <Tooltip title='Delete Summary Comment'>
-                      <Button
-                        size='small'
-                        type='danger'
-                        style={{ marginRight: 5 }}
-                        icon={<DeleteFilled />}
-                      ></Button>
-                    </Tooltip>
-                  </Popconfirm>
-                </div>
+                {actions(row)}
               </div>
             )
           }
@@ -276,34 +303,7 @@ const SummaryComment = props => {
                 }}
               >
                 {getDisplayValue(row)}
-                <div style={{ position: 'absolute', right: 4, top: 4 }}>
-                  <Tooltip title='Edit Summary Comment'>
-                    <Button
-                      size='small'
-                      type='primary'
-                      style={{ marginRight: 5 }}
-                      icon={<EditFilled />}
-                      onClick={() => editComment(row)}
-                    ></Button>
-                  </Tooltip>
-                  <Popconfirm
-                    title='Are you sure?'
-                    onConfirm={() => {
-                      setTimeout(() => {
-                        deleteComment(row)
-                      }, 1)
-                    }}
-                  >
-                    <Tooltip title='Delete Summary Comment'>
-                      <Button
-                        size='small'
-                        type='danger'
-                        style={{ marginRight: 5 }}
-                        icon={<DeleteFilled />}
-                      ></Button>
-                    </Tooltip>
-                  </Popconfirm>
-                </div>
+                {actions(row)}
               </div>
             )
           }
@@ -312,18 +312,16 @@ const SummaryComment = props => {
           id: index,
           name: 'Current',
           content: (
-            <div style={{ height: height - 270, overflow: 'auto' }}>
-              <ListBoxComponent
-                enabled={isEditEnable && !isEditingRow}
-                dataSource={commentList}
-                allowDragAndDrop={true}
-                scope='combined-list'
-                fields={{ text: 'englishComment' }}
-                selectionSettings={{ mode: 'Single' }}
-                itemTemplate={itemTemplate}
-                drop={onDropGroup}
-              />
-            </div>
+            <ListBoxComponent
+              enabled={isEditEnable && !isEditingRow}
+              dataSource={commentList}
+              allowDragAndDrop={true}
+              scope='combined-list'
+              fields={{ text: 'englishComment' }}
+              selectionSettings={{ mode: 'Single' }}
+              itemTemplate={itemTemplate}
+              drop={onDropGroup}
+            />
           ),
         })
       } else {
@@ -333,8 +331,6 @@ const SummaryComment = props => {
           content: (
             <div
               style={{
-                height: height - 270,
-                overflow: 'auto',
                 border: '1px solid #dee2e6',
               }}
             >
@@ -350,7 +346,7 @@ const SummaryComment = props => {
                   >
                     {getDisplayValue(row)}
                     <div style={{ position: 'absolute', right: 0, top: 4 }}>
-                      {isEditEnable ? (
+                      {isEditEnable && isModifyCommentEnable ? (
                         <Tooltip title='Copy Comment'>
                           <IconButton
                             size='small'
@@ -380,13 +376,6 @@ const SummaryComment = props => {
   const onSaveComment = () => {
     querySummaryCommentHistory()
     refreshMedicalCheckup()
-
-    dispatch({
-      type: 'medicalCheckupReportingDetails/updateState',
-      payload: {
-        summaryCommentEntity: undefined,
-      },
-    })
   }
 
   const copyComment = id => {
@@ -438,6 +427,16 @@ const SummaryComment = props => {
       medicalCheckupSummaryComment.filter(item => !item.isVerified).length
     )
   }
+
+  const isCommentVerificationEnable = () => {
+    const commentVerificationAccessRight = Authorized.check(
+      'medicalcheckupworklist.commentverification',
+    ) || {
+      rights: 'hidden',
+    }
+    if (commentVerificationAccessRight.rights === 'enable') return true
+    return false
+  }
   return (
     <div
       style={{
@@ -454,7 +453,7 @@ const SummaryComment = props => {
       >
         <div style={{ position: 'relative' }}>
           <span style={{ fontWeight: 'bold' }}>Summary Comment</span>
-          {!isDoctor && (
+          {isCommentVerificationEnable() && (
             <Badge
               style={{
                 paddingLeft: '4px',
@@ -515,7 +514,6 @@ const SummaryComment = props => {
         onConfirm={confirmCommentVerification}
         maxWidth='lg'
         observe='CommentVerification'
-        overrideLoading
       >
         <CommentVerification />
       </CommonModal>

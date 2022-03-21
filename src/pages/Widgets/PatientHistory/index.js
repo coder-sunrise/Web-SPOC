@@ -43,6 +43,7 @@ import HistoryDetails from './HistoryDetails'
 import customtyles from './PatientHistoryStyle.less'
 import NurseActualization from '@/pages/Dispense/DispenseDetails/NurseActualization'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import { getMedicalCheckupReportPayload } from '@/pages/MedicalCheckup/Worklist/components/Util'
 
 const defaultValue = {
   visitDate: [
@@ -443,6 +444,8 @@ class PatientHistory extends Component {
       coHistory = [],
       isNurseNote,
       visitStatus,
+      medicalCheckupWorkitemFK,
+      isExistsVerifiedReport,
     } = row
     const { settings = [] } = clinicSettings
     const { patientID } = patientHistory
@@ -465,7 +468,10 @@ class PatientHistory extends Component {
 
     return (
       <div
-        style={{ display: 'flex', padding: '3px 0px 8px 0px', height: 36 }}
+        style={{
+          padding: '3px 0px 8px 0px',
+          height: 36,
+        }}
         onClick={() => {
           this.setState(preState => {
             if (preState.activeKey.find(key => key === row.currentId)) {
@@ -483,168 +489,199 @@ class PatientHistory extends Component {
           })
         }}
       >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
-          {fromModule !== 'Consultation' && (
-            <div
-              style={{
-                marginTop: fromModule === 'History' ? -12 : -16,
-                marginLeft: 5,
-                height: 24,
-                width: 30,
-              }}
-              onClick={event => {
-                event.stopPropagation()
-              }}
-            >
-              <Checkbox
-                label=''
-                checked={isSelect}
-                onChange={e => this.selectOnChange(e, row)}
-                style={{ width: 20 }}
-              />
-            </div>
-          )}
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            marginLeft: fromModule !== 'Consultation' ? -14 : 0,
-          }}
-        >
-          <span className='material-icons'>
-            {this.state.activeKey.find(key => key === row.currentId)
-              ? 'expand_more'
-              : 'navigate_next'}
-          </span>
-        </div>
-        {isNurseNote && (
-          <div style={{ fontSize: '0.9em', fontWeight: 500, marginTop: 14 }}>
-            {`${moment(visitDate).format(dateFormatLongWithTimeNoSec)} - Notes${
-              docotrName ? ` - ${docotrName}` : ''
-            }`}
-          </div>
-        )}
-        {!isNurseNote && (
-          <div style={{ fontSize: '0.9em' }}>
-            <div style={{ fontWeight: 500, marginTop: 6 }}>
-              {`${moment(visitDate).format(dateFormatLong)} (Time In: ${moment(
-                timeIn,
-              ).format(timeFormat24Hour)} Time Out: ${
-                timeOut ? moment(timeOut).format(timeFormat24Hour) : '-'
-              })${docotrName ? ` - ${docotrName}` : ''}`}
-            </div>
-            <div style={{ marginTop: 18 }}>
-              <span>
-                {`Last Update By: ${LastUpdateBy || ''} on ${moment(
-                  signOffDate,
-                ).format(dateFormatLongWithTimeNoSec)}`}
-              </span>
-              <span style={{ marginLeft: 5 }}>
-                {row.servingByList?.length > 0
-                  ? `Served by ${row.servingByList
-                      .map(x => x.servingBy)
-                      .join(', ')}.`
-                  : null}
-              </span>
-            </div>
-          </div>
-        )}
-        {!isNurseNote && (
+        <div style={{ display: 'flex' }}>
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
             }}
           >
-            {patientIsActive &&
-              !isRetailVisit &&
-              visitStatus != VISIT_STATUS.PAUSED &&
-              fromModule !== 'Consultation' &&
-              fromModule !== 'History' && (
-                <Authorized authority='patientdashboard.editconsultation'>
-                  <Tooltip title='Edit Consultation'>
-                    <Button
-                      color='primary'
-                      style={{ marginLeft: theme.spacing(2) }}
-                      size='sm'
-                      justIcon
-                      onClick={event => {
-                        event.stopPropagation()
-
-                        dispatch({
-                          type: `consultation/edit`,
-                          payload: {
-                            id: row.id,
-                            version: patientHistory.version,
-                          },
-                        }).then(o => {
-                          if (o) {
-                            if (o.updateByUserFK !== user.data.id) {
-                              const { clinicianprofile = [] } = codetable
-                              const version = Date.now()
-                              const editingUser = clinicianprofile.find(
-                                m => m.userProfileFK === o.updateByUserFK,
-                              ) || {
-                                name: 'Someone',
-                              }
-                              dispatch({
-                                type: 'global/updateAppState',
-                                payload: {
-                                  openConfirm: true,
-                                  openConfirmContent: `${editingUser.name} is currently editing the patient note, do you want to overwrite?`,
-                                  onConfirmSave: () => {
-                                    dispatch({
-                                      type: `consultation/overwrite`,
-                                      payload: {
-                                        id: row.id,
-                                        version,
-                                      },
-                                    }).then(c => {
-                                      dispatch({
-                                        type: 'patient/closePatientModal',
-                                      })
-                                      history.push(
-                                        `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${c.id}&v=${version}`,
-                                      )
-                                    })
-                                  },
-                                },
-                              })
-                            } else {
-                              dispatch({
-                                type: 'patient/closePatientModal',
-                              })
-                              history.push(
-                                `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
-                              )
-                            }
-                          }
-                        })
-                      }}
-                    >
-                      <Edit />
-                    </Button>
-                  </Tooltip>
-                </Authorized>
-              )}
+            {fromModule !== 'Consultation' && (
+              <div
+                style={{
+                  marginTop:
+                    fromModule === 'History' || fromModule === 'MedicalCheckup'
+                      ? -12
+                      : -16,
+                  marginLeft: 5,
+                  height: 24,
+                  width: 30,
+                }}
+                onClick={event => {
+                  event.stopPropagation()
+                }}
+              >
+                <Checkbox
+                  label=''
+                  checked={isSelect}
+                  onChange={e => this.selectOnChange(e, row)}
+                  style={{ width: 20 }}
+                />
+              </div>
+            )}
           </div>
-        )}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              marginLeft: fromModule !== 'Consultation' ? -14 : 0,
+            }}
+          >
+            <span className='material-icons'>
+              {this.state.activeKey.find(key => key === row.currentId)
+                ? 'expand_more'
+                : 'navigate_next'}
+            </span>
+          </div>
+          {isNurseNote && (
+            <div style={{ fontSize: '0.9em', fontWeight: 500, marginTop: 14 }}>
+              {`${moment(visitDate).format(
+                dateFormatLongWithTimeNoSec,
+              )} - Notes${docotrName ? ` - ${docotrName}` : ''}`}
+            </div>
+          )}
+          {!isNurseNote && (
+            <div style={{ fontSize: '0.9em' }}>
+              <div style={{ fontWeight: 500, marginTop: 6 }}>
+                {`${moment(visitDate).format(
+                  dateFormatLong,
+                )} (Time In: ${moment(timeIn).format(
+                  timeFormat24Hour,
+                )} Time Out: ${
+                  timeOut ? moment(timeOut).format(timeFormat24Hour) : '-'
+                })${docotrName ? ` - ${docotrName}` : ''}`}
+              </div>
+              <div style={{ marginTop: 18 }}>
+                <span>
+                  {`Last Update By: ${LastUpdateBy || ''} on ${moment(
+                    signOffDate,
+                  ).format(dateFormatLongWithTimeNoSec)}`}
+                </span>
+                <span style={{ marginLeft: 5 }}>
+                  {row.servingByList?.length > 0
+                    ? `Served by ${row.servingByList
+                        .map(x => x.servingBy)
+                        .join(', ')}.`
+                    : null}
+                </span>
+              </div>
+            </div>
+          )}
+          {!isNurseNote && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              {patientIsActive &&
+                !isRetailVisit &&
+                visitStatus != VISIT_STATUS.PAUSED &&
+                fromModule !== 'Consultation' &&
+                fromModule !== 'History' && (
+                  <Authorized authority='patientdashboard.editconsultation'>
+                    <Tooltip title='Edit Consultation'>
+                      <Button
+                        color='primary'
+                        style={{ marginLeft: theme.spacing(2) }}
+                        size='sm'
+                        justIcon
+                        onClick={event => {
+                          event.stopPropagation()
+
+                          dispatch({
+                            type: `consultation/edit`,
+                            payload: {
+                              id: row.id,
+                              version: patientHistory.version,
+                            },
+                          }).then(o => {
+                            if (o) {
+                              if (o.updateByUserFK !== user.data.id) {
+                                const { clinicianprofile = [] } = codetable
+                                const version = Date.now()
+                                const editingUser = clinicianprofile.find(
+                                  m => m.userProfileFK === o.updateByUserFK,
+                                ) || {
+                                  name: 'Someone',
+                                }
+                                dispatch({
+                                  type: 'global/updateAppState',
+                                  payload: {
+                                    openConfirm: true,
+                                    openConfirmContent: `${editingUser.name} is currently editing the patient note, do you want to overwrite?`,
+                                    onConfirmSave: () => {
+                                      dispatch({
+                                        type: `consultation/overwrite`,
+                                        payload: {
+                                          id: row.id,
+                                          version,
+                                        },
+                                      }).then(c => {
+                                        dispatch({
+                                          type: 'patient/closePatientModal',
+                                        })
+                                        history.push(
+                                          `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${c.id}&v=${version}`,
+                                        )
+                                      })
+                                    },
+                                  },
+                                })
+                              } else {
+                                dispatch({
+                                  type: 'patient/closePatientModal',
+                                })
+                                history.push(
+                                  `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
+                                )
+                              }
+                            }
+                          })
+                        }}
+                      >
+                        <Edit />
+                      </Button>
+                    </Tooltip>
+                  </Authorized>
+                )}
+            </div>
+          )}
+        </div>
         <div
           style={{
-            marginLeft: 'auto',
-            display: 'flex',
-            alignItems: 'center',
-            marginRight: 10,
+            position: 'absolute',
+            right: 0,
+            top: '-2px',
           }}
         >
-          <div style={{ display: 'inline-block', width: 30 }}>
-            {isForInvoiceReplacement && (
+          {isExistsVerifiedReport && (
+            <div style={{ display: 'inline-block' }}>
+              <Tooltip title='Medical Checkup Report'>
+                <Button
+                  color='primary'
+                  icon={null}
+                  size='sm'
+                  onClick={event => {
+                    event.stopPropagation()
+                    this.handelPrintMedicalCheckup(medicalCheckupWorkitemFK)
+                  }}
+                >
+                  <Print />
+                  MC Report
+                </Button>
+              </Tooltip>
+            </div>
+          )}
+          {isForInvoiceReplacement && (
+            <div
+              style={{
+                display: 'inline-block',
+                marginRight: 10,
+                position: 'relative',
+                top: 6,
+              }}
+            >
               <Tooltip title='Replacement Invoice'>
                 <SvgIcon fontSize='inherit' viewBox='0 0 1024 1024'>
                   <path
@@ -653,12 +690,21 @@ class PatientHistory extends Component {
                   ></path>
                 </SvgIcon>
               </Tooltip>
-            )}
-          </div>
-          <div style={{ display: 'inline-block', width: 40 }}>
+            </div>
+          )}
+          <div style={{ display: 'inline-block', width: 40, marginRight: 10 }}>
             {visitPurposeFK && <VisitTypeTag type={visitPurposeFK} />}
           </div>
-          <div style={{ display: 'inline-block', width: 30 }}>
+          <div
+            style={{
+              display: 'inline-block',
+              width: 24,
+              position: 'relative',
+              top: 8,
+              height: 24,
+              marginRight: 6,
+            }}
+          >
             {!isNurseNote &&
               settings.showConsultationVersioning &&
               !isRetailVisit && (
@@ -2269,6 +2315,20 @@ class PatientHistory extends Component {
     this.queryVisitHistory()
   }
 
+  handelPrintMedicalCheckup = medicalCheckupWorkitemFK => {
+    const { dispatch, handlePreviewReport } = this.props
+    dispatch({
+      type: 'medicalCheckupWorklist/queryLastReportData',
+      payload: {
+        id: medicalCheckupWorkitemFK,
+      },
+    }).then(response => {
+      if (response && response.status === '200') {
+        const payload = getMedicalCheckupReportPayload(response.data)
+        handlePreviewReport(JSON.stringify(payload))
+      }
+    })
+  }
   render() {
     const { clinicSettings, scriblenotes, fromModule, height } = this.props
     const cfg = {}

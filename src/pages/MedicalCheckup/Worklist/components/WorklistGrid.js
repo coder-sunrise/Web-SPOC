@@ -40,6 +40,7 @@ import withWebSocket from '@/components/Decorator/withWebSocket'
 import WorklistContext from '../WorklistContext'
 import { StatusFilter } from './StatusFilter'
 import ReportingDoctorList from './ReportingDoctorList'
+import { getMedicalCheckupReportPayload } from './Util'
 
 const allMedicalCheckupReportStatuses = Object.values(
   MEDICALCHECKUP_WORKITEM_STATUS,
@@ -154,78 +155,7 @@ const WorklistGrid = ({
       },
     }).then(response => {
       if (response && response.status === '200') {
-        const {
-          patientInfo = [],
-          basicExamination = [],
-          visualAcuity = [],
-          intraocularPressure = [],
-          audiometry = [],
-          individualComment = [],
-          summaryComment = [],
-          labTestPanel = [],
-          reportContext = [],
-        } = response.data
-        const printData = {
-          PatientInfo: patientInfo.map(p => ({
-            ...p,
-            patientAge: p.patientAge ? `${p.patientAge}` : '',
-            patientDOB: p.patientDOB
-              ? moment(p.patientDOB).format(dateFormatLong)
-              : '',
-            visitDate: p.visitDate
-              ? moment(p.visitDate).format(dateFormatLong)
-              : '',
-            currentDate: p.currentDate
-              ? moment(p.currentDate).format(dateFormatLong)
-              : '',
-            lastDate: p.lastDate
-              ? moment(p.lastDate).format(dateFormatLong)
-              : '',
-            beforeLastDate: p.beforeLastDate
-              ? moment(p.beforeLastDate).format(dateFormatLong)
-              : '',
-          })),
-          BasicExamination: basicExamination,
-          VisualAcuity: visualAcuity,
-          IntraocularPressure: intraocularPressure,
-          Audiometry: audiometry,
-          IndividualComment: individualComment,
-          SummaryComment: summaryComment,
-          LabTestPanel: labTestPanel,
-          ReportContext: reportContext.map(o => {
-            const {
-              customLetterHeadHeight = 0,
-              isDisplayCustomLetterHead = false,
-              standardHeaderInfoHeight = 0,
-              isDisplayStandardHeader = false,
-              footerInfoHeight = 0,
-              isDisplayFooterInfo = false,
-              footerDisclaimerHeight = 0,
-              isDisplayFooterInfoDisclaimer = false,
-              ...restProps
-            } = o
-            return {
-              customLetterHeadHeight,
-              isDisplayCustomLetterHead,
-              standardHeaderInfoHeight,
-              isDisplayStandardHeader,
-              footerInfoHeight,
-              isDisplayFooterInfo,
-              footerDisclaimerHeight,
-              isDisplayFooterInfoDisclaimer,
-              ...restProps,
-            }
-          }),
-        }
-        const payload = [
-          {
-            ReportId: 93,
-            Copies: 1,
-            ReportData: JSON.stringify({
-              ...commonDataReaderTransform(printData),
-            }),
-          },
-        ]
+        const payload = getMedicalCheckupReportPayload(response.data)
         handlePreviewReport(JSON.stringify(payload))
       }
     })
@@ -319,10 +249,9 @@ const WorklistGrid = ({
     }
     return (
       <Tag
+        color={statusColor}
         style={{
-          backgroundColor: statusColor,
           textAlign: 'center',
-          color: 'white',
           width: '100%',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -330,12 +259,21 @@ const WorklistGrid = ({
           padding: 2,
         }}
       >
-        {
-          <div>
-            <span>{statusName}</span>
-            {subTitle && <div>{subTitle}</div>}
-          </div>
-        }
+        <div>
+          <span>{statusName}</span>
+          {subTitle && (
+            <div
+              style={{
+                height: 10,
+                fontSize: '0.6rem',
+                position: 'relative',
+                top: '-6px',
+              }}
+            >
+              {subTitle}
+            </div>
+          )}
+        </div>
       </Tag>
     )
   }
@@ -364,7 +302,7 @@ const WorklistGrid = ({
         search: false,
         align: 'center',
         fixed: 'left',
-        width: 150,
+        width: 130,
         render: (item, entity) => {
           return renderWorkitemStatus(entity)
         },

@@ -118,6 +118,7 @@ class HistoryDetails extends PureComponent {
         }}
         disablePadding
         onClick={() => {}}
+        style={{ overflow: 'auto', height: window.innerHeight - 96 }}
       >
         {newArray.map(o => {
           const updateByUser = o.userName
@@ -250,6 +251,7 @@ class HistoryDetails extends PureComponent {
           [classes.rightPanel]: true,
           [override.rightPanel]: true,
         })}
+        style={{ overflow: 'auto', height: window.innerHeight - 80 }}
       >
         {this.widgets
           .filter(_widget => {

@@ -20,6 +20,8 @@ import { MEDICALCHECKUP_REPORTSTATUS } from '@/utils/constants'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import { commonDataReaderTransform } from '@/utils/utils'
 import { getReportContext } from '@/services/report'
+import { getMedicalCheckupReportPayload } from '@/pages/MedicalCheckup/Worklist/components/Util'
+import Authorized from '@/utils/Authorized'
 import VerifyForm from './VerifyForm'
 import customtyles from '../../Style.less'
 
@@ -40,7 +42,6 @@ const ReportHistory = props => {
   const [verifyRow, setVerifyRow] = useState(false)
 
   const {
-    loading,
     patient,
     medicalCheckupReportingDetails,
     dispatch,
@@ -80,81 +81,20 @@ const ReportHistory = props => {
       },
     }).then(response => {
       if (response && response.status === '200') {
-        const {
-          patientInfo = [],
-          basicExamination = [],
-          visualAcuity = [],
-          intraocularPressure = [],
-          audiometry = [],
-          individualComment = [],
-          summaryComment = [],
-          labTestPanel = [],
-          reportContext = [],
-        } = response.data
-        const printData = {
-          PatientInfo: patientInfo.map(p => ({
-            ...p,
-            patientAge: p.patientAge ? `${p.patientAge}` : '',
-            patientDOB: p.patientDOB
-              ? moment(p.patientDOB).format(dateFormatLong)
-              : '',
-            visitDate: p.visitDate
-              ? moment(p.visitDate).format(dateFormatLong)
-              : '',
-            currentDate: p.currentDate
-              ? moment(p.currentDate).format(dateFormatLong)
-              : '',
-            lastDate: p.lastDate
-              ? moment(p.lastDate).format(dateFormatLong)
-              : '',
-            beforeLastDate: p.beforeLastDate
-              ? moment(p.beforeLastDate).format(dateFormatLong)
-              : '',
-          })),
-          BasicExamination: basicExamination,
-          VisualAcuity: visualAcuity,
-          IntraocularPressure: intraocularPressure,
-          Audiometry: audiometry,
-          IndividualComment: individualComment,
-          SummaryComment: summaryComment,
-          LabTestPanel: labTestPanel,
-          ReportContext: reportContext.map(o => {
-            const {
-              customLetterHeadHeight = 0,
-              isDisplayCustomLetterHead = false,
-              standardHeaderInfoHeight = 0,
-              isDisplayStandardHeader = false,
-              footerInfoHeight = 0,
-              isDisplayFooterInfo = false,
-              footerDisclaimerHeight = 0,
-              isDisplayFooterInfoDisclaimer = false,
-              ...restProps
-            } = o
-            return {
-              customLetterHeadHeight,
-              isDisplayCustomLetterHead,
-              standardHeaderInfoHeight,
-              isDisplayStandardHeader,
-              footerInfoHeight,
-              isDisplayFooterInfo,
-              footerDisclaimerHeight,
-              isDisplayFooterInfoDisclaimer,
-              ...restProps,
-            }
-          }),
-        }
-        const payload = [
-          {
-            ReportId: 93,
-            Copies: 1,
-            ReportData: JSON.stringify({
-              ...commonDataReaderTransform(printData),
-            }),
-          },
-        ]
+        const payload = getMedicalCheckupReportPayload(response.data)
         handlePreviewReport(JSON.stringify(payload))
       }
     })
+  }
+
+  const isVerifyEnable = () => {
+    const verifyReportAccessRight = Authorized.check(
+      'medicalcheckupworklist.verifyreport',
+    ) || {
+      rights: 'hidden',
+    }
+    if (verifyReportAccessRight.rights === 'enable') return true
+    return false
   }
   return (
     <div style={{ padding: '0px 8px' }}>
@@ -284,43 +224,22 @@ const ReportHistory = props => {
                         </Button>
                       </Tooltip>
                     )}
-                    {row.status ===
-                      MEDICALCHECKUP_REPORTSTATUS.PENDINGVERIFY && (
-                      <Tooltip title='To do'>
-                        <Button
-                          color='primary'
-                          size='sm'
-                          justIcon
-                          onClick={() => {
-                            setVerifyRow(row)
-                            setShowVerifyForm(true)
-                          }}
-                        >
-                          <span className={classes.toDo}>TD</span>
-                        </Button>
-                      </Tooltip>
-                    )}
-                    {false &&
+                    {isVerifyEnable() &&
                       row.status ===
-                        MEDICALCHECKUP_REPORTSTATUS.PENDINGVERIFY &&
-                      userProfileFK === row.generateByUserFK && (
-                        <Popconfirm
-                          title='Are you sure?'
-                          onConfirm={() => {
-                            setTimeout(() => {
-                              updateReportStatus(
-                                row,
-                                MEDICALCHECKUP_REPORTSTATUS.DISCARD,
-                              )
-                            }, 1)
-                          }}
-                        >
-                          <Tooltip title='Discard'>
-                            <Button color='danger' size='sm' justIcon>
-                              <Undo />
-                            </Button>
-                          </Tooltip>
-                        </Popconfirm>
+                        MEDICALCHECKUP_REPORTSTATUS.PENDINGVERIFY && (
+                        <Tooltip title='To do'>
+                          <Button
+                            color='primary'
+                            size='sm'
+                            justIcon
+                            onClick={() => {
+                              setVerifyRow(row)
+                              setShowVerifyForm(true)
+                            }}
+                          >
+                            <span className={classes.toDo}>TD</span>
+                          </Button>
+                        </Tooltip>
                       )}
                   </div>
                 )
@@ -347,7 +266,6 @@ const ReportHistory = props => {
         }}
         maxWidth='sm'
         observe='VerifyForm'
-        overrideLoading
       >
         <VerifyForm onVerificationSave={onVerificationSave} />
       </CommonModal>

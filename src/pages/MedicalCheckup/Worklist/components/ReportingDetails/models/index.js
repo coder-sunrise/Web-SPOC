@@ -168,6 +168,10 @@ export default createFormViewModel({
         const response = yield call(service.queryReportData, payload)
         return response
       },
+      *markCommentAsDone({ payload }, { call, put }) {
+        const response = yield call(service.markCommentAsDone, payload)
+        return response
+      },
     },
     reducers: {},
   },

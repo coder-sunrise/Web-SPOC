@@ -3,7 +3,7 @@ import request from '@/utils/request'
 const url = '/api/medicalCheckupWorklist'
 
 const fns = {
-  query: params => service.query(url, { ...params, pagesize: 9999 }),
+  query: params => service.query(url, params),
   queryList: params => service.queryList(url, { ...params, pagesize: 9999 }),
   upsert: params => service.upsert(url, params),
   queryIndividualCommentHistory: params =>
@@ -36,5 +36,7 @@ const fns = {
   queryReportData: params => service.query(`${url}/GetReportData`, params),
   queryLastReportData: params =>
     service.query(`${url}/GetLastReportData`, params),
+  markCommentAsDone: params =>
+    service.upsert(`${url}/MarkCommentAsDone`, params),
 }
 export default fns
