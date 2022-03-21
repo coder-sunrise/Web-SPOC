@@ -8,6 +8,7 @@ import { Link, history, formatMessage } from 'umi'
 import { withStyles, Divider } from '@material-ui/core'
 import Banner from '@/pages/PatientDashboard/Banner'
 import { LoadingWrapper } from '@/components/_medisys'
+import Authorized from '@/utils/Authorized'
 import SummaryComment from './SummaryComment'
 import TestResult from './TestResult'
 import ReportHistory from './ReportHistory'
@@ -190,7 +191,7 @@ const ReportingDetails = props => {
     })
   }
 
-  const isEnableFinalReport = () => {
+  const isShowGenerateFinalReport = () => {
     const { medicalCheckupWorkitemDoctor = [] } =
       medicalCheckupReportingDetails.entity || {}
     if (
@@ -199,9 +200,31 @@ const ReportingDetails = props => {
         x => x.status === REPORTINGDOCTOR_STATUS.VERIFIED,
       ).length === medicalCheckupWorkitemDoctor.length
     ) {
-      return true
+      const generateReportAccessRight = Authorized.check(
+        'medicalcheckupworklist.generatereport',
+      ) || {
+        rights: 'hidden',
+      }
+      if (generateReportAccessRight.rights === 'enable') return true
     }
     return false
+  }
+
+  const isShowGenerateTemporaryReport = () => {
+    if (
+      reportingStatus !== MEDICALCHECKUP_WORKITEM_STATUS.REPORTING &&
+      reportingStatus !== MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS
+    )
+      return false
+
+    const generateTemporaryReportAccessRight = Authorized.check(
+      'medicalcheckupworklist.generatetemporaryreport',
+    ) || {
+      rights: 'hidden',
+    }
+    if (generateTemporaryReportAccessRight.rights !== 'enable') return false
+
+    return true
   }
 
   const genrateTemporaryReport = () => {
@@ -308,6 +331,52 @@ const ReportingDetails = props => {
       if (r) onClose()
     })
   }
+
+  const isEditVisitEnable = () => {
+    if (reportingStatus === MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED)
+      return false
+
+    const editVisitAccessRight = Authorized.check(
+      'medicalcheckupworklist.editvisit',
+    ) || {
+      rights: 'hidden',
+    }
+    if (editVisitAccessRight.rights !== 'enable') return false
+
+    return true
+  }
+
+  const isShowUnlockReport = () => {
+    if (reportingStatus !== MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED)
+      return false
+    const unlockReportAccessRight = Authorized.check(
+      'medicalcheckupworklist.unlockreport',
+    ) || {
+      rights: 'hidden',
+    }
+    if (unlockReportAccessRight.rights !== 'enable') return false
+    return true
+  }
+
+  const isModifyCommentEnable = () => {
+    const modifyCommentAccessRight = Authorized.check(
+      'medicalcheckupworklist.modifycomment',
+    ) || {
+      rights: 'hidden',
+    }
+    if (modifyCommentAccessRight.rights === 'enable') return true
+    return false
+  }
+
+  const isModifyOthersCommentEnable = () => {
+    const modifyOthersCommentAccessRight = Authorized.check(
+      'medicalcheckupworklist.modifyotherscomment',
+    ) || {
+      rights: 'hidden',
+    }
+    if (modifyOthersCommentAccessRight.rights === 'enable') return true
+    return false
+  }
   return (
     <div>
       <div style={{ marginTop: '-20px' }}>
@@ -317,6 +386,7 @@ const ReportingDetails = props => {
           editingOrder={false}
           activePreOrderItems={[]}
           isRetail={false}
+          isEditVisitEnable={isEditVisitEnable()}
         />
       </div>
       <SizeContainer size='sm'>
@@ -337,6 +407,8 @@ const ReportingDetails = props => {
                 refreshMedicalCheckup={refreshMedicalCheckup}
                 setShowResultDetails={onShowShowResultDetails}
                 isEditEnable={getEditEnable()}
+                isModifyCommentEnable={isModifyCommentEnable()}
+                isModifyOthersCommentEnable={isModifyOthersCommentEnable()}
               />
             </GridItem>
             <GridItem md={5} style={{ padding: 0 }}>
@@ -350,6 +422,8 @@ const ReportingDetails = props => {
                 refreshMedicalCheckup={refreshMedicalCheckup}
                 clearEditComment={clearEditComment}
                 isEditEnable={getEditEnable()}
+                isModifyCommentEnable={isModifyCommentEnable()}
+                isModifyOthersCommentEnable={isModifyOthersCommentEnable()}
               />
             </GridItem>
           </GridContainer>
@@ -396,9 +470,7 @@ const ReportingDetails = props => {
                   Complete Comment
                 </Button>
               )}
-              {(reportingStatus === MEDICALCHECKUP_WORKITEM_STATUS.REPORTING ||
-                reportingStatus ===
-                  MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS) && (
+              {isShowGenerateTemporaryReport() && (
                 <Button
                   size='small'
                   type='primary'
@@ -408,7 +480,7 @@ const ReportingDetails = props => {
                   Generate Temporary Report
                 </Button>
               )}
-              {isEnableFinalReport() && (
+              {isShowGenerateFinalReport() && (
                 <Button
                   size='small'
                   type='primary'
@@ -418,7 +490,7 @@ const ReportingDetails = props => {
                   Generate Report
                 </Button>
               )}
-              {reportingStatus === MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED && (
+              {isShowUnlockReport() && (
                 <Button
                   size='small'
                   style={{
@@ -436,70 +508,67 @@ const ReportingDetails = props => {
         </div>
       </SizeContainer>
 
-        <Drawer
-          placement={placement}
-          width='40%'
-          getContainer={false}
-          bodyStyle={{
-            padding: '0px 6px',
-          }}
-          title='Result Details'
-          visible={showResultDetails}
-          onClose={() => setShowResultDetails(false)}
-          mask={false}
-        >
-          <div style={{ height: '100%', paddingBottom: 40 }}>
-            <ResultDetails
-              showResultDetails={showResultDetails}
-              visitId={medicalCheckupReportingDetails.visitID}
-            />
-            <div
-              style={{ textAlign: 'right', position: 'absolute', bottom: 10 }}
+      <Drawer
+        placement={placement}
+        width='40%'
+        getContainer={false}
+        bodyStyle={{
+          padding: '0px 6px',
+        }}
+        title='Result Details'
+        visible={showResultDetails}
+        onClose={() => setShowResultDetails(false)}
+        mask={false}
+      >
+        <div style={{ height: '100%', paddingBottom: 40 }}>
+          <ResultDetails
+            showResultDetails={showResultDetails}
+            visitId={medicalCheckupReportingDetails.visitID}
+          />
+          <div style={{ textAlign: 'right', position: 'absolute', bottom: 10 }}>
+            {placement === 'right' && (
+              <Tooltip title='Show on Left'>
+                <Button
+                  type='primary'
+                  size='small'
+                  style={{
+                    margin: '0px 5px',
+                    position: 'relative',
+                    top: -1,
+                    width: 55,
+                  }}
+                  icon={<DoubleLeftOutlined />}
+                  onClick={changePlacement}
+                ></Button>
+              </Tooltip>
+            )}
+            <Button
+              size='small'
+              type='danger'
+              style={{ margin: '0px 5px' }}
+              onClick={() => setShowResultDetails(false)}
             >
-              {placement === 'right' && (
-                <Tooltip title='Show on Left'>
-                  <Button
-                    type='primary'
-                    size='small'
-                    style={{
-                      margin: '0px 5px',
-                      position: 'relative',
-                      top: -1,
-                      width: 55,
-                    }}
-                    icon={<DoubleLeftOutlined />}
-                    onClick={changePlacement}
-                  ></Button>
-                </Tooltip>
-              )}
-              <Button
-                size='small'
-                type='danger'
-                style={{ margin: '0px 5px' }}
-                onClick={() => setShowResultDetails(false)}
-              >
-                Close
-              </Button>
-              {placement === 'left' && (
-                <Tooltip title='Show on Right'>
-                  <Button
-                    type='primary'
-                    size='small'
-                    style={{
-                      margin: '0px 5px',
-                      position: 'relative',
-                      top: -1,
-                      width: 55,
-                    }}
-                    icon={<DoubleRightOutlined />}
-                    onClick={changePlacement}
-                  ></Button>
-                </Tooltip>
-              )}
-            </div>
+              Close
+            </Button>
+            {placement === 'left' && (
+              <Tooltip title='Show on Right'>
+                <Button
+                  type='primary'
+                  size='small'
+                  style={{
+                    margin: '0px 5px',
+                    position: 'relative',
+                    top: -1,
+                    width: 55,
+                  }}
+                  icon={<DoubleRightOutlined />}
+                  onClick={changePlacement}
+                ></Button>
+              </Tooltip>
+            )}
           </div>
-        </Drawer>
-      </LoadingWrapper>
+        </div>
+      </Drawer>
       <CommonModal
         open={showReportHistory}
         title='Report History'

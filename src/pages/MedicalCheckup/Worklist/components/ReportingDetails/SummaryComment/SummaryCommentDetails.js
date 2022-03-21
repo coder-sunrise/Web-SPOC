@@ -29,6 +29,7 @@ const SummaryCommentDetails = props => {
     isEditEnable = true,
     medicalCheckupReportingDetails,
     handleSubmit,
+    isModifyCommentEnable,
   } = props
 
   const [selectCategory, setSelectCategory] = useState()
@@ -128,6 +129,9 @@ const SummaryCommentDetails = props => {
   }
 
   const isAnyChange = !_.isEmpty(window.dirtyForms['SummaryCommentDetails'])
+
+  const isCommentEditEnable =
+    isEditEnable && (values.id || isModifyCommentEnable)
   return (
     <GridContainer>
       <GridItem
@@ -141,7 +145,7 @@ const SummaryCommentDetails = props => {
         <CodeSelect
           valueField='id'
           code='CTSummaryCommentCategory'
-          disabled={!isEditEnable}
+          disabled={!isCommentEditEnable}
           value={selectCategory}
           onChange={val => {
             setSelectCategory(val)
@@ -160,7 +164,7 @@ const SummaryCommentDetails = props => {
         <CodeSelect
           options={commentOptions}
           valueField='id'
-          disabled={!isEditEnable}
+          disabled={!isCommentEditEnable}
           labelField={
             selectedLanguage === 'EN'
               ? 'englishDisplayValue'
@@ -181,7 +185,7 @@ const SummaryCommentDetails = props => {
           render={args => (
             <MultipleTextField
               maxLength={2000}
-              disabled={!isEditEnable}
+              disabled={!isCommentEditEnable}
               autoSize={{ minRows: 4, maxRows: 4 }}
               onChange={() => setFieldValue('isVerified', false)}
               {...args}
@@ -189,25 +193,27 @@ const SummaryCommentDetails = props => {
           )}
         />
       </GridItem>
-      <GridItem md={12} style={{ textAlign: 'right' }}>
-        <Button
-          size='small'
-          type='danger'
-          onClick={onDiscard}
-          disabled={!isEditEnable}
-        >
-          Discard
-        </Button>
-        <Button
-          size='small'
-          type='primary'
-          style={{ marginLeft: 10 }}
-          disabled={!isEditEnable || !isAnyChange}
-          onClick={onSave}
-        >
-          Save
-        </Button>
-      </GridItem>
+      {isCommentEditEnable && (
+        <GridItem md={12} style={{ textAlign: 'right' }}>
+          <Button
+            size='small'
+            type='danger'
+            onClick={onDiscard}
+            disabled={!isCommentEditEnable}
+          >
+            Discard
+          </Button>
+          <Button
+            size='small'
+            type='primary'
+            style={{ marginLeft: 10 }}
+            disabled={!isAnyChange}
+            onClick={onSave}
+          >
+            Save
+          </Button>
+        </GridItem>
+      )}
     </GridContainer>
   )
 }

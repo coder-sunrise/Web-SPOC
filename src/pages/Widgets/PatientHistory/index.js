@@ -499,7 +499,10 @@ class PatientHistory extends Component {
             {fromModule !== 'Consultation' && (
               <div
                 style={{
-                  marginTop: fromModule === 'History' ? -12 : -16,
+                  marginTop:
+                    fromModule === 'History' || fromModule === 'MedicalCheckup'
+                      ? -12
+                      : -16,
                   marginLeft: 5,
                   height: 24,
                   width: 30,
@@ -676,7 +679,7 @@ class PatientHistory extends Component {
                 display: 'inline-block',
                 marginRight: 10,
                 position: 'relative',
-                top: 7,
+                top: 6,
               }}
             >
               <Tooltip title='Replacement Invoice'>

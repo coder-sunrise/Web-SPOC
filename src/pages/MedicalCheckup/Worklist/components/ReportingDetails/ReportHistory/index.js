@@ -21,6 +21,7 @@ import withWebSocket from '@/components/Decorator/withWebSocket'
 import { commonDataReaderTransform } from '@/utils/utils'
 import { getReportContext } from '@/services/report'
 import { getMedicalCheckupReportPayload } from '@/pages/MedicalCheckup/Worklist/components/Util'
+import Authorized from '@/utils/Authorized'
 import VerifyForm from './VerifyForm'
 import customtyles from '../../Style.less'
 
@@ -84,6 +85,16 @@ const ReportHistory = props => {
         handlePreviewReport(JSON.stringify(payload))
       }
     })
+  }
+
+  const isVerifyEnable = () => {
+    const verifyReportAccessRight = Authorized.check(
+      'medicalcheckupworklist.verifyreport',
+    ) || {
+      rights: 'hidden',
+    }
+    if (verifyReportAccessRight.rights === 'enable') return true
+    return false
   }
   return (
     <div style={{ padding: '0px 8px' }}>
@@ -213,43 +224,22 @@ const ReportHistory = props => {
                         </Button>
                       </Tooltip>
                     )}
-                    {row.status ===
-                      MEDICALCHECKUP_REPORTSTATUS.PENDINGVERIFY && (
-                      <Tooltip title='To do'>
-                        <Button
-                          color='primary'
-                          size='sm'
-                          justIcon
-                          onClick={() => {
-                            setVerifyRow(row)
-                            setShowVerifyForm(true)
-                          }}
-                        >
-                          <span className={classes.toDo}>TD</span>
-                        </Button>
-                      </Tooltip>
-                    )}
-                    {false &&
+                    {isVerifyEnable() &&
                       row.status ===
-                        MEDICALCHECKUP_REPORTSTATUS.PENDINGVERIFY &&
-                      userProfileFK === row.generateByUserFK && (
-                        <Popconfirm
-                          title='Are you sure?'
-                          onConfirm={() => {
-                            setTimeout(() => {
-                              updateReportStatus(
-                                row,
-                                MEDICALCHECKUP_REPORTSTATUS.DISCARD,
-                              )
-                            }, 1)
-                          }}
-                        >
-                          <Tooltip title='Discard'>
-                            <Button color='danger' size='sm' justIcon>
-                              <Undo />
-                            </Button>
-                          </Tooltip>
-                        </Popconfirm>
+                        MEDICALCHECKUP_REPORTSTATUS.PENDINGVERIFY && (
+                        <Tooltip title='To do'>
+                          <Button
+                            color='primary'
+                            size='sm'
+                            justIcon
+                            onClick={() => {
+                              setVerifyRow(row)
+                              setShowVerifyForm(true)
+                            }}
+                          >
+                            <span className={classes.toDo}>TD</span>
+                          </Button>
+                        </Tooltip>
                       )}
                   </div>
                 )

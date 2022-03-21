@@ -16,6 +16,7 @@ import { CheckOutlined } from '@ant-design/icons'
 import { REPORTINGDOCTOR_STATUS } from '@/utils/constants'
 import { Message } from '@material-ui/icons'
 import { Tag } from 'antd'
+import Authorized from '@/utils/Authorized'
 
 const styles = theme => ({
   tag: {
@@ -127,6 +128,28 @@ const ReportingDoctorTag = ({
     searchMessage()
   }
 
+  const isRevertCommentEnable = () => {
+    if (!isEditEnable) return false
+    const revertCommentAccessRight = Authorized.check(
+      'medicalcheckupworklist.revertcommenttodoctor',
+    ) || {
+      rights: 'hidden',
+    }
+    if (revertCommentAccessRight.rights !== 'enable') return false
+    return true
+  }
+
+  const isVerifyCommentEnable = () => {
+    if (!isEditEnable) return false
+    const verifyCommentAccessRight = Authorized.check(
+      'medicalcheckupworklist.markcommentasverified',
+    ) || {
+      rights: 'hidden',
+    }
+    if (verifyCommentAccessRight.rights !== 'enable') return false
+    return true
+  }
+
   const getPopoverContent = () => {
     let toUserName = 'All PRO'
     if (!isDoctor) {
@@ -207,7 +230,7 @@ const ReportingDoctorTag = ({
               New Message
             </span>
           </Link>
-          {isEditEnable && (
+          {isRevertCommentEnable() && (
             <Link style={{ display: 'inline-block' }}>
               <span
                 style={{
@@ -223,13 +246,13 @@ const ReportingDoctorTag = ({
                   )
                 }}
               >
-                Return to Doctor
+                Revert Comment to Doctor
               </span>
             </Link>
           )}
           {medicalCheckupDoctor.status ===
             REPORTINGDOCTOR_STATUS.COMMENTVERIFYING &&
-            isEditEnable && (
+            isVerifyCommentEnable() && (
               <Link style={{ display: 'inline-block' }}>
                 <span
                   style={{
@@ -244,7 +267,7 @@ const ReportingDoctorTag = ({
                     )
                   }}
                 >
-                  Verify Comments
+                  Mark Comment as Verified
                 </span>
               </Link>
             )}
