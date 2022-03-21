@@ -299,7 +299,7 @@ const ReportingDetails = props => {
       item => item.userProfileFK === user.data.clinicianProfile.userProfile.id,
     )
     dispatch({
-      type: 'medicalCheckupReportingDetails/updateReportingDoctor',
+      type: 'medicalCheckupReportingDetails/markCommentAsDone',
       payload: {
         ...currentDoctor,
         status: REPORTINGDOCTOR_STATUS.COMMENTVERIFYING,

@@ -36,5 +36,7 @@ const fns = {
   queryReportData: params => service.query(`${url}/GetReportData`, params),
   queryLastReportData: params =>
     service.query(`${url}/GetLastReportData`, params),
+  markCommentAsDone: params =>
+    service.upsert(`${url}/MarkCommentAsDone`, params),
 }
 export default fns
