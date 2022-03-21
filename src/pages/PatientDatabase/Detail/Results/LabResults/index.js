@@ -1,5 +1,7 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { withStyles } from '@material-ui/core/styles'
+import { connect } from 'dva'
+import moment from 'moment'
 import {
   TreeGridComponent,
   ColumnsDirective,
@@ -9,250 +11,129 @@ import {
 } from '@syncfusion/ej2-react-treegrid'
 import './index.css'
 import { Button } from 'antd'
+import { useEffect } from 'react'
 const styles = theme => ({})
+
+@connect(({ workitem }) => ({
+  workitem,
+}))
 class LabResults extends React.PureComponent {
+  componentDidMount() {}
   constructor(props) {
     super(props)
+    const { dispatch, patientProfileFK } = props
+    this.resultTemplate = this.resultTemplate
     this.state = {
-      data: [
-        {
-          taskID: 1,
-          taskName: 'Biochemistry',
-          subtasks: [
-            {
-              taskID: 2,
-              taskName: 'GOT/AST',
-              referenceRange: '<50',
-              endDate: new Date('02/07/2017'),
-              GOT: 5,
-              v2: 100,
-              v3: 100,
-              approved: false,
-            },
-            {
-              taskID: 2,
-              taskName: 'GOT/AST',
-              referenceRange: '<50',
-              endDate: new Date('02/07/2017'),
-              GOT: 5,
-              v2: 100,
-              v3: 100,
-              approved: false,
-            },
-            {
-              taskID: 2,
-              taskName: 'GOT/AST',
-              referenceRange: '<50',
-              endDate: new Date('02/07/2017'),
-              GOT: 5,
-              v2: 100,
-              v3: 100,
-              approved: false,
-            },
-            {
-              taskID: 2,
-              taskName: 'GOT/AST',
-              referenceRange: '<50',
-              endDate: new Date('02/07/2017'),
-              GOT: 5,
-              v2: 100,
-              v3: 100,
-              approved: false,
-            },
-            {
-              taskID: 2,
-              taskName: 'GOT/AST',
-              referenceRange: '<50',
-              endDate: new Date('02/07/2017'),
-              GOT: 5,
-              v2: 100,
-              v3: 100,
-              approved: false,
-            },
-            {
-              taskID: 2,
-              taskName: 'GOT/AST',
-              referenceRange: '<50',
-              endDate: new Date('02/07/2017'),
-              GOT: 5,
-              v2: 100,
-              v3: 100,
-              approved: false,
-            },
-            {
-              taskID: 2,
-              taskName: 'GOT/AST',
-              referenceRange: '<50',
-              endDate: new Date('02/07/2017'),
-              GOT: 5,
-              v2: 100,
-              v3: 100,
-              approved: false,
-            },
-            {
-              taskID: 2,
-              taskName: 'GOT/AST',
-              referenceRange: '<50',
-              endDate: new Date('02/07/2017'),
-              GOT: 5,
-              v2: 100,
-              v3: 100,
-              approved: false,
-            },
-            {
-              taskID: 2,
-              taskName: 'GOT/AST',
-              referenceRange: '<50',
-              endDate: new Date('02/07/2017'),
-              GOT: 5,
-              v2: 100,
-              v3: 100,
-              approved: false,
-            },
-            {
-              taskID: 2,
-              taskName: 'GOT/AST',
-              referenceRange: '<50',
-              endDate: new Date('02/07/2017'),
-              GOT: 5,
-              v2: 100,
-              v3: 100,
-              approved: false,
-            },
-            {
-              taskID: 2,
-              taskName: 'GOT/AST',
-              referenceRange: '<50',
-              endDate: new Date('02/07/2017'),
-              GOT: 5,
-              v2: 100,
-              v3: 100,
-              approved: false,
-            },
-            {
-              taskID: 2,
-              taskName: 'GOT/AST',
-              referenceRange: '<50',
-              endDate: new Date('02/07/2017'),
-              GOT: 5,
-              v2: 100,
-              v3: 100,
-              approved: false,
-            },
-            {
-              taskID: 3,
-              taskName: 'GPT/ALT',
-              referenceRange: '<40',
-              endDate: new Date('02/07/2017'),
-              GOT: 5,
-              v2: 100,
-              v3: 12,
-              approved: true,
-            },
-            {
-              taskID: 4,
-              taskName: 'ALP',
-              referenceRange: '30-117',
-              endDate: new Date('02/07/2017'),
-              GOT: 5,
-              v2: 100,
-              v3: 31,
-              approved: false,
-            },
-            {
-              taskID: 5,
-              taskName: 'LDH',
-              referenceRange: '200-480',
-              endDate: new Date('02/07/2017'),
-              GOT: 0,
-              v2: 0,
-              v3: 24,
-              approved: true,
-            },
-          ],
-        },
-        {
-          taskID: 6,
-          taskName: 'Heamotology',
-          subtasks: [
-            {
-              taskID: 7,
-              taskName: 'Software Specification',
-              referenceRange: new Date('02/10/2017'),
-              endDate: new Date('02/12/2017'),
-              GOT: 3,
-              v2: 60,
-              v3: 'Normal',
-              approved: false,
-            },
-            {
-              taskID: 8,
-              taskName: 'Develop prototype',
-              referenceRange: new Date('02/10/2017'),
-              endDate: new Date('02/12/2017'),
-              GOT: 3,
-              v2: 100,
-              v3: 'Critical',
-              approved: false,
-            },
-            {
-              taskID: 9,
-              taskName: 'Get approval from customer',
-              referenceRange: new Date('02/13/2017'),
-              endDate: new Date('02/14/2017'),
-              GOT: 2,
-              v2: 100,
-              v3: 'Low',
-              approved: true,
-            },
-            {
-              taskID: 10,
-              taskName: 'Design Documentation',
-              referenceRange: new Date('02/13/2017'),
-              endDate: new Date('02/14/2017'),
-              GOT: 2,
-              v2: 100,
-              v3: 'High',
-              approved: true,
-            },
-            {
-              taskID: 11,
-              taskName: 'Design complete',
-              referenceRange: new Date('02/14/2017'),
-              endDate: new Date('02/14/2017'),
-              GOT: 0,
-              v2: 0,
-              v3: 'Normal',
-              approved: true,
-            },
-          ],
-        },
-        {
-          taskID: 12,
-          taskName: 'Urine',
-          subtasks: [
-            {
-              taskID: 13,
-              taskName: 'Phase 1',
-              referenceRange: new Date('02/17/2017'),
-              endDate: new Date('02/27/2017'),
-              v3: 'High',
-              approved: false,
-              v2: 50,
-              GOT: 11,
-            },
-          ],
-        },
+      columns: [
+        // { header: 'Test Name', field: 'testName' },
+        // { header: 'Ref. Range', field: 'referenceRange' },
       ],
+      endTime: undefined, // last visit date of currently retrieved
+      testPanelItems: [],
+      data: [],
     }
-    this.taskName = () => {
-      return (
-        <div>
-          <b>Task Name</b>
-        </div>
-      )
-    }
+    dispatch({
+      type: 'workitem/getTestPanelItemWithRefRange',
+      payload: { patientProfileFK },
+    }).then(data => {
+      if (data) {
+        console.log(data)
+        this.setState({ testPanelItems: data })
+        this.constructTestPanelItem()
+        this.loadData()
+      }
+    })
   }
+  loadData = () => {
+    const { dispatch, patientProfileFK } = this.props
+    dispatch({
+      type: 'workitem/getLabResults',
+      payload: {
+        patientProfileFK: patientProfileFK,
+        endTime: this.state.endTime,
+        pageSize: 5,
+      },
+    }).then(data => {
+      if (data) {
+        if (data.labResultDetails.length > 0) {
+          this.constData(data.labResultDetails)
+          this.setState({
+            endTime: _.maxBy(data.labResultDetails, 'visitDate').visitDate,
+          })
+        }
+      }
+    })
+  }
+  constData = data => {
+    let newData = this.state.data
+    data.forEach(visitData => {
+      visitData.testPanelItemResults.forEach(result => {
+        newData.forEach(d => {
+          var target = d.testPanelItems.find(
+            t => t.id === result.testPanelItemFK,
+          )
+          if (target) {
+            target[`v_${visitData.visitId}`] = result
+          }
+        })
+      })
+    })
+    var currentVisitLength = this.state.columns.length
+    this.setState({
+      columns: _.concat(
+        this.state.columns,
+        data.map((x, index) => {
+          return {
+            field: `v_${currentVisitLength + (index + 1)}`,
+            header: moment(x.visitDate).format('DD MMM YYYY'),
+          }
+        }),
+      ),
+    })
+  }
+  resultTemplate(props) {
+    console.log(props)
+    return <div style={{ display: 'inline' }}>{props.finalResult || 0}</div>
+  }
+  constructTestPanelItem = () => {
+    let category = _.uniqWith(
+      this.state.testPanelItems.map(item => {
+        return {
+          testCategoryFK: item.testCategoryFK,
+          itemName: item.testCategory,
+        }
+      }),
+      _.isEqual,
+    )
+    category.forEach(item => {
+      item.testPanelItems = this.state.testPanelItems
+        .filter(x => x.testCategoryFK === item.testCategoryFK)
+        .map(subItem => {
+          return {
+            testCategoryFK: subItem.testCategoryFK,
+            testCategory: subItem.testCategory,
+            id: subItem.id,
+            itemName: subItem.displayValue,
+            testPanelFK: subItem.testPanelFK,
+            referenceRange: subItem.referenceRange,
+          }
+        })
+    })
+    this.setState({ testPanelItems: category, data: category })
+  }
+  getColumns = (header, field) => {
+    return (
+      <ColumnDirective
+        field={field}
+        headerText={header}
+        width='120'
+        rowHeight={25}
+        template={this.resultTemplate}
+        textAlign='Right'
+      />
+    )
+  }
+
   render() {
     console.log(this.state)
     return (
@@ -260,10 +141,10 @@ class LabResults extends React.PureComponent {
         <div>
           <Button
             onClick={() => {
-              this.setState({ data: [] })
+              this.loadData()
             }}
           >
-            Hello
+            Load More
           </Button>
         </div>
         <div className='control-pane'>
@@ -272,50 +153,30 @@ class LabResults extends React.PureComponent {
               frozenColumns={2}
               dataSource={this.state.data}
               treeColumnIndex={0}
-              childMapping='subtasks'
+              height={this.props.height - 120}
+              clipMode='EllipsisWithTooltip'
+              childMapping='testPanelItems'
               enableHover='true'
-              height={400}
             >
               <ColumnsDirective>
                 <ColumnDirective
-                  field='taskName'
+                  field='itemName'
                   headerText='Test Name'
-                  width='200'
-                  headerTemplate={() => {
-                    return <div>aaa</div>
-                  }}
+                  width='150'
+                  // headerTemplate={() => {
+                  //   return <div>aaa</div>
+                  // }}
                 ></ColumnDirective>
                 <ColumnDirective
                   field='referenceRange'
-                  headerText='Ref. Range'
-                  width='120'
+                  // customAttributes={{ class: 'customcss' }}
+                  headerText='Reference Range'
+                  width='150'
                   textAlign='Right'
-                />
-                <ColumnDirective
-                  field='GOT'
-                  headerText='21 Mar 2021'
-                  // headerTemplate={() => {
-                  //   return (
-                  //     <div>
-                  //       <b className='e-header'>Task Name</b>
-                  //     </div>
-                  //   )
-                  // }}
-                  width='120'
-                  textAlign='Right'
-                />
-                <ColumnDirective
-                  field='v2'
-                  headerText='21 Mar 2021'
-                  width='120'
-                  textAlign='Right'
-                />
-                <ColumnDirective
-                  field='v3'
-                  headerText='11 Jan 2021'
-                  width='120'
-                  textAlign='Right'
-                />
+                ></ColumnDirective>
+                {this.state.columns.map(x => {
+                  return this.getColumns(x.header, x.field)
+                })}
               </ColumnsDirective>
               <Inject services={[Freeze]} />
             </TreeGridComponent>

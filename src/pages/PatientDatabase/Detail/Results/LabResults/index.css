@@ -1,1 +1,4 @@
 @import url('https://cdn.syncfusion.com/ej2/material.css');
+.e-grid .customcss {
+ background-color: rgb(146, 201, 146);
+}

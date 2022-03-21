@@ -30,7 +30,13 @@ const TestResult = props => {
     {
       id: 1,
       name: 'Lab Result',
-      content: <LabResults></LabResults>,
+      content: (
+        <LabResults
+          visitFK={medicalCheckupReportingDetails.visitID}
+          height={height}
+          patientProfileFK={medicalCheckupReportingDetails.patientID}
+        ></LabResults>
+      ),
     },
     {
       id: 2,
