@@ -206,8 +206,8 @@ const DispenseDetailsSpecimenCollection = ({
       payload: { id: specimenId },
     }).then(labSpecimenData => {
       if (labSpecimenData) {
-        let testPanel = labSpecimenData.labSpecimenWorkitems
-          .map(labWorkitem => labWorkitem.labWorkitem.testPanel)
+        let testPanel = labSpecimenData?.labSpecimenWorkitems
+          ?.map(labWorkitem => labWorkitem.labWorkitem.testPanel)
           .join(', ')
         const data = {
           SampleLabelDetails: [

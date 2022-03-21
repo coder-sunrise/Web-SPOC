@@ -849,6 +849,21 @@ td[class='ant-table-cell ant-table-cell-ellipsis'] {
   overflow: hidden;
 }
 
+.ant-list-split .ant-list-item {
+  border-bottom: 1px solid #c0c0c0;
+}
+.resultDetails .ant-list-header {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-left: 2px;
+}
+.ant-drawer-header {
+  padding: 9px;
+}
+.ant-drawer-header .ant-drawer-close {
+  padding: 11px;
+}
+
 .ant-tabs-content-holder {
   overflow: auto;
 }

@@ -952,6 +952,12 @@ export const LAB_SPECIMEN_DETAILS_STEP = {
   7: 'Discarded',
 }
 
+export const LAB_RESULT_TYPE = {
+  NUMERIC: 1,
+  STRING: 2,
+  ATTACHMENT: 3,
+}
+
 export const VISITDOCTOR_CONSULTATIONSTATUS = {
   WAITING: 'Waiting',
   INPROGRESS: 'In Progress',

@@ -11,6 +11,9 @@ import {
   Select,
 } from 'antd'
 import { useCodeTable } from '@/utils/hooks'
+import styles from './LabResultTable.less'
+import { LAB_RESULT_TYPE } from '@/utils/constants'
+
 const EditableContext = React.createContext(null)
 
 const EditableRow = ({ index, ...props }) => {
@@ -76,6 +79,31 @@ const EditableCell = ({
   return <td {...restProps}>{childNode}</td>
 }
 
+const FlagIndicator = () => (
+  <span style={{ color: 'red', marginLeft: 5 }}> *</span>
+)
+
+const ResultSelect = ({
+  value,
+  defaultValue,
+  options,
+  shouldFlag,
+  onChange,
+}) => {
+  return (
+    <div style={{ display: 'flex' }}>
+      <Select
+        className={shouldFlag ? styles.flaggedSelect : styles.normalSelect}
+        defaultValue={defaultValue}
+        value={value}
+        onChange={onChange}
+        options={options}
+      />
+      {shouldFlag && <FlagIndicator />}
+    </div>
+  )
+}
+
 export const EditableTable = ({
   value,
   onChange,
@@ -84,6 +112,7 @@ export const EditableTable = ({
 }) => {
   const cttestpanelitem = useCodeTable('cttestpanelitem')
   const ctresultoption = useCodeTable('cttestpanelitemresultoption')
+  const ctnumericreferencerange = useCodeTable('ctnumericreferencerange')
   const allColumns = [
     {
       title: 'Test Panel Item',
@@ -99,32 +128,54 @@ export const EditableTable = ({
     {
       title: 'Result',
       dataIndex: 'finalResult',
-      width: 150,
+      width: 175,
       editable: true,
-      render: (record, text, onSave) => {
+      render: (record = {}, text, onSave) => {
+        console.log('record.shouldFlag', record.shouldFlag)
+        if (isReadonly)
+          return record.shouldFlag ? (
+            <React.Fragment>
+              <span style={{ color: 'red' }}>{text}</span>
+              <FlagIndicator />
+            </React.Fragment>
+          ) : (
+            <span>{text}</span>
+          )
+
         const testpanelItem = cttestpanelitem.find(
           item => item.id === record?.testPanelItemFK,
         )
 
-        if (testpanelItem?.resultTypeFK === 1) {
-          return !isReadonly ? (
-            <InputNumber
-              defaultValue={text}
-              controls={false}
-              onPressEnter={onSave}
-              onBlur={onSave}
-            />
-          ) : (
-            text
+        if (testpanelItem?.resultTypeFK === LAB_RESULT_TYPE.NUMERIC) {
+          return (
+            <div>
+              <InputNumber
+                style={{ color: record.shouldFlag ? 'red' : 'black' }}
+                defaultValue={text}
+                controls={false}
+                onPressEnter={onSave}
+                onBlur={onSave}
+              />
+              {record.shouldFlag && <FlagIndicator />}
+            </div>
           )
-        } else if (testpanelItem?.resultTypeFK === 2) {
+        } else if (testpanelItem?.resultTypeFK === LAB_RESULT_TYPE.STRING) {
           const options = ctresultoption
             .filter(x => x.testPanelItemFK === testpanelItem.id)
             .map(x => ({ label: x.resultOption, value: x.resultOption }))
 
           return (
-            <Select defaultValue={text} options={options} onChange={onSave} />
+            <ResultSelect
+              defaultValue={text}
+              shouldFlag={record.shouldFlag}
+              onChange={onSave}
+              options={options}
+            />
           )
+        }
+        //Attachement
+        else {
+          return <div>Result is an attachment.</div>
         }
       },
     },
@@ -140,7 +191,7 @@ export const EditableTable = ({
     },
     {
       title: 'Reference Range',
-      dataIndex: 'referenceRange',
+      dataIndex: 'referenceRangeDescription',
     },
   ]
 
@@ -148,11 +199,51 @@ export const EditableTable = ({
     ? allColumns
     : allColumns.filter(x => x.dataIndex !== 'resultBeforeInterpretation')
 
+  const checkShouldFlag = (finalResult, refereneceRangeId, testPanelItemId) => {
+    const testPanelItem = cttestpanelitem.find(x => x.id === testPanelItemId)
+    debugger
+    if (refereneceRangeId === null || refereneceRangeId === undefined)
+      return false
+
+    if (testPanelItem.resultTypeFK === LAB_RESULT_TYPE.NUMERIC) {
+      const currentRange = ctnumericreferencerange.find(
+        x => x.id === refereneceRangeId,
+      )
+      const hasMetMinimumRange = currentRange.isMinValInclusive
+        ? parseFloat(finalResult) >= currentRange.referenceRangeMin
+        : parseFloat(finalResult) > currentRange.referenceRangeMin
+
+      const hasMetMaximumRange = currentRange.isMaxValInclusive
+        ? parseFloat(finalResult) <= currentRange.referenceRangeMax
+        : parseFloat(finalResult) < currentRange.referenceRangeMax
+
+      return !hasMetMinimumRange || !hasMetMaximumRange
+    } else if (testPanelItem.resultTypeFK === LAB_RESULT_TYPE.STRING) {
+      const currentResultOption = ctresultoption.find(
+        x =>
+          x.testPanelItemFK === testPanelItemId &&
+          x.resultOption === finalResult,
+      )
+
+      return currentResultOption.shouldFlag
+    } else {
+      return false
+    }
+  }
+
   const handleSave = row => {
     const newData = [...value]
     const index = newData.findIndex(item => row.id === item.id)
     const item = newData[index]
-    newData.splice(index, 1, { ...item, ...row })
+
+    const shouldFlag = checkShouldFlag(
+      row.finalResult,
+      item.referenceRangeSource,
+      item.testPanelItemFK,
+    )
+
+    newData.splice(index, 1, { ...item, ...row, shouldFlag })
+    console.log('newData', newData)
     onChange(newData)
   }
 

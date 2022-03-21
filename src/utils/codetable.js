@@ -234,6 +234,12 @@ const tenantCodesMap = new Map([
     },
   ],
   [
+    'ctnumericreferencerange',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
     'ctinvoiceadjustment',
     {
       ...defaultParams,
