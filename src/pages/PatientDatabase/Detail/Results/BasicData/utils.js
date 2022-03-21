@@ -23,7 +23,7 @@ export const defaultData = [
     testCode: TESTTYPES.BPSYS,
     type: 'BP Sys (mmHg)',
     typeTootip: 'Blood Pressure Systole',
-    refRange: '(<30)',
+    refRange: '(<130)',
     tableName: 'basicExaminations',
     fieldName: 'bpSysMMHG',
   },
