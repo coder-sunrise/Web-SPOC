@@ -60,9 +60,13 @@ const AppNotificationList = ({
   notifications = [],
   user,
   source,
+  appNotification,
 }) => {
-  const loadNotifications = () => {
-    dispatch({ type: 'appNotification/loadNotifications' })
+  const loadNotifications = loadMore => {
+    dispatch({
+      type: 'appNotification/loadNotifications',
+      payload: { loadMore },
+    })
   }
 
   const clearNotification = () => {
@@ -100,6 +104,7 @@ const AppNotificationList = ({
         readDate: moment().formatUTC(false),
       })),
     }).then(r => {
+      console.log('read all',r)
       if (r == 204) loadNotifications()
     })
   }
@@ -125,12 +130,11 @@ const AppNotificationList = ({
   }
 
   if (notifications.length > 0) {
-    const sorted = _.orderBy(notifications, ['generateDate'], ['desc'])
-
+    // const sorted = _.orderBy(notifications, ['generateDate'], ['desc'])
     return (
       <div>
         <div className={rootClass}>
-          {sorted.map((notification, index) => (
+          {notifications.map((notification, index) => (
             <ListItem
               button
               className={classes.itemRoot}
@@ -171,6 +175,14 @@ const AppNotificationList = ({
           >
             Clear
           </Button>
+          <Button
+            className={classes.buttonLink}
+            link
+            size='sm'
+            onClick={() => loadNotifications(true)}
+          >
+            {`(${appNotification.pageSize}/${appNotification.totalRecords}) `}Load More
+          </Button>
         </div>
       </div>
     )
@@ -184,7 +196,8 @@ const AppNotificationList = ({
 
 export default compose(
   withStyles(styles, { name: 'AppNotificationList' }),
-  connect(({ user }) => ({
+  connect(({ user, appNotification }) => ({
     user: user,
+    appNotification: appNotification,
   })),
 )(AppNotificationList)

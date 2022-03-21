@@ -14,7 +14,8 @@ const styles = theme => ({
   popoverContainer: {
     textAlign: 'left',
     width: 600,
-    height: 300,
+    minHeight: 300,
+    maxHeight: 600,
   },
 })
 

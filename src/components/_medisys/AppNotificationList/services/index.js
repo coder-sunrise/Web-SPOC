@@ -4,7 +4,15 @@ import request from '@/utils/request'
 const url = '/api/ApplicationNotification'
 
 const exportFns = {
-  query: params =>  service.query(url, params),
+  queryList: params => service.queryList(url, params),
+  readNotifications: params => {
+    return request(`${url}/ReadNotifications`, {
+      method: 'PUT',
+      body: params,
+    })
+  },
+  queryOfCurrentUser: params =>
+    service.query(`${url}/GetAllOfCurrentUser`, params),
   upsert: params => service.upsert(url, params),
 }
 

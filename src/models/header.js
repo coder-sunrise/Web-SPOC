@@ -28,7 +28,6 @@ export default createBasicModel({
       readNotification(state, { payload = {} }) {
         const { notification = {}, type } = payload
         const { id, timestamp } = notification
-        console.log('before map',state.notifications)
         const list = state.notifications.map(o => ({
           ...o,
           read:
@@ -36,7 +35,6 @@ export default createBasicModel({
               ? id === o.id
               : timestamp === o.timestamp || type === o.type,
         }))
-        console.log('after map',list)
         sessionStorage.setItem('notifications', JSON.stringify(list))
 
         return {
