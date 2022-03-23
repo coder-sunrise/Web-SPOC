@@ -98,7 +98,7 @@ class Checkbox extends React.Component {
       >
         <Tooltip title={tooltip}>
           <FormControlLabel
-            style={notCentered ? style : null}
+            style={{ fontSize: 14, ...(notCentered ? style : null) }}
             classes={{
               root: classes.root,
             }}

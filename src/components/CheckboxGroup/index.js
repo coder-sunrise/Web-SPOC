@@ -39,7 +39,7 @@ class CheckboxGroup extends React.Component {
 
   static getDerivedStateFromProps(nextProps, preState) {
     const { options, field, value, valueField = 'value' } = nextProps
-    const v = preState 
+    const v = preState
     if (field && Array.isArray(field.value)) {
       options.forEach(o => {
         v[`${o[valueField]}`] = false
@@ -109,7 +109,7 @@ class CheckboxGroup extends React.Component {
       displayInlineBlock = false,
       ...resetProps
     } = this.props
- 
+
     return (
       <div
         className={classnames({
@@ -155,7 +155,10 @@ class CheckboxGroup extends React.Component {
                     />
                   }
                   label={
-                    <span dangerouslySetInnerHTML={{ __html: o[textField] }} />
+                    <span
+                      style={{ fontSize: 14 }}
+                      dangerouslySetInnerHTML={{ __html: o[textField] }}
+                    />
                   }
                 />
               </div>

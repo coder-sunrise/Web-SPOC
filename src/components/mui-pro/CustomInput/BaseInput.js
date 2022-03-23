@@ -46,13 +46,13 @@ const _config = {
 const inputIdPrefix = 'medsysinput'
 let inputIdCounter = 0
 class BaseInput extends React.PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.uid = inputIdPrefix + inputIdCounter
     inputIdCounter += 1
   }
 
-  _onKeyUp = (e) => {
+  _onKeyUp = e => {
     // console.log(e.target)
     if (this.props.preventDefaultKeyDownEvent) return
     if (e.target.tagName === 'TEXTAREA') return
@@ -103,15 +103,15 @@ class BaseInput extends React.PureComponent {
     }
   }
 
-  getRef = (ref) => {
+  getRef = ref => {
     this.refEl = ref
   }
 
   focus = () => {}
-  
+
   blur = () => {}
 
-  getClass = (classes) => {
+  getClass = classes => {
     const {
       success,
       simple,
@@ -177,13 +177,13 @@ class BaseInput extends React.PureComponent {
     }
   }
 
-  render () {
+  render() {
     // console.log(this)
     const { field, form, theme, classes, ...props } = this.props
     for (const key in _config) {
       if (Object.prototype.hasOwnProperty.call(_config, key)) {
         const element = _config[key]
-        element.value.forEach((o) => {
+        element.value.forEach(o => {
           if (props[o] !== undefined) {
             if (!props[element.key]) props[element.key] = {}
             props[element.key][o] = props[o]
@@ -305,11 +305,9 @@ class BaseInput extends React.PureComponent {
         >
           <Tooltip
             title={
-              typeof error === 'string' ? (
-                error
-              ) : (
-                Object.byString(form.errors, field.name)
-              )
+              typeof error === 'string'
+                ? error
+                : Object.byString(form.errors, field.name)
             }
             enterDelay={0}
           >
