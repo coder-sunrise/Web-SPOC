@@ -12,7 +12,7 @@ import WifiOff from '@material-ui/icons/WifiOff'
 // common components
 import { Badge, SizeContainer, Popper, Button, Tooltip } from '@/components'
 // subcomponents
-import {AppNotificationPopover, Notification } from '@/components/_medisys'
+import { Notification } from '@/components/_medisys'
 // utils
 import { updateAPIType } from '@/utils/request'
 import { navigateDirtyCheck } from '@/utils/utils'
@@ -115,14 +115,6 @@ class HeaderLinks extends React.Component {
         <div>
           <SizeContainer size='lg'>
             <div>
-              <AppNotificationPopover
-                dispatch={this.props.dispatch}
-                title='+'
-                source={APPNOTIFICATION_SCHEMA.LAB.name}
-                sourceRecordId={0} //visitFK
-                doctor={{ userFK: user.data.id, name: name }}
-                buttonProps={{ justIcon: true, style: { width: 24 } }}
-              />
               <Notification
                 dispatch={this.props.dispatch}
                 notifications={notifications}

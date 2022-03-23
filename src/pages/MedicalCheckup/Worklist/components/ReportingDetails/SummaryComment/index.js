@@ -69,6 +69,7 @@ const SummaryComment = props => {
     medicalCheckupReportingDetails.summaryCommentList,
     medicalCheckupReportingDetails.summaryCommentEntity,
     isEditEnable,
+    medicalCheckupReportingDetails.entity,
   ])
 
   const onConfirm = () => {
@@ -117,6 +118,9 @@ const SummaryComment = props => {
   }
 
   const editComment = row => {
+    if (document.activeElement) {
+      document.activeElement.blur()
+    }
     dispatch({
       type: 'medicalCheckupReportingDetails/updateState',
       payload: {
@@ -158,44 +162,19 @@ const SummaryComment = props => {
     })
   }
 
-  const handleRowDrop = (rows, oldIndex, newIndex) => {
-    return
-    if (oldIndex !== newIndex) {
-      const currentCannedTextId = rows[newIndex].id
-      let targetCannedTextId
-      let isInsertBefore = false
-      if (newIndex < rows.length - 1) {
-        targetCannedTextId = rows[newIndex + 1].id
-        isInsertBefore = true
-      } else {
-        targetCannedTextId = rows[newIndex - 1].id
-      }
-      changeOrder({
-        currentCannedTextId,
-        targetCannedTextId,
-        isInsertBefore,
-        cannedTextTypeFK: rows[newIndex].cannedTextTypeFK,
-      })
-    }
-  }
-
   const getDisplayValue = row => {
     const showValue =
       row[
         `${selectedLanguage === 'EN' ? 'englishComment' : 'japaneseComment'}`
       ] || '-'
     return (
-      <Tooltip title={showValue}>
-        <div
-          style={{
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {showValue}
-        </div>
-      </Tooltip>
+      <div
+        style={{
+          whiteSpace: 'pre-wrap',
+        }}
+      >
+        {showValue}
+      </div>
     )
   }
 
@@ -276,6 +255,8 @@ const SummaryComment = props => {
         ...x,
         visitFK: medicalCheckupReportingDetails.visitID,
         patientProfileFK: medicalCheckupReportingDetails.patientID,
+        currentMedicalCheckupWorkitemId:
+          medicalCheckupReportingDetails.medicalCheckupWorkitemId,
       }))
       if (index === 0) {
         let itemTemplate
@@ -310,14 +291,14 @@ const SummaryComment = props => {
         }
         options.push({
           id: index,
-          name: 'Current',
+          name: moment(item.visitDate).format(dateFormatLong),
           content: (
             <ListBoxComponent
               enabled={isEditEnable && !isEditingRow}
               dataSource={commentList}
               allowDragAndDrop={true}
               scope='combined-list'
-              fields={{ text: 'englishComment' }}
+              fields={{ text: 'id' }}
               selectionSettings={{ mode: 'Single' }}
               itemTemplate={itemTemplate}
               drop={onDropGroup}
@@ -352,7 +333,7 @@ const SummaryComment = props => {
                             size='small'
                             color='primary'
                             onClick={() => {
-                              copyComment(row.id)
+                              copyComment(row)
                             }}
                           >
                             <CopyOutlined />
@@ -378,17 +359,30 @@ const SummaryComment = props => {
     refreshMedicalCheckup()
   }
 
-  const copyComment = id => {
+  const copyComment = row => {
     dispatch({
       type: 'medicalCheckupReportingDetails/copyComment',
       payload: {
-        medicalCheckupWorkitemFK: medicalCheckupReportingDetails.entity.id,
-        sourceCommentFK: id,
+        medicalCheckupWorkitemFK: row.currentMedicalCheckupWorkitemId,
+        sourceCommentFK: row.id,
         commentType: 'Summary',
       },
     }).then(r => {
-      querySummaryCommentHistory()
-      refreshMedicalCheckup()
+      dispatch({
+        type: 'medicalCheckupReportingDetails/querySummaryCommentHistory',
+        payload: {
+          apiCriteria: {
+            patientProfileFK: row.patientProfileFK,
+            visitFK: row.visitFK,
+          },
+        },
+      })
+      dispatch({
+        type: 'medicalCheckupReportingDetails/query',
+        payload: {
+          id: row.currentMedicalCheckupWorkitemId,
+        },
+      })
     })
   }
 
@@ -484,6 +478,7 @@ const SummaryComment = props => {
             label='Doctor(s):'
             updateReportingDoctor={updateReportingDoctor}
             isEditEnable={isEditEnable}
+            medicalCheckupWorkitemId={medicalCheckupReportingDetails.entity?.id}
           />
         </div>
       </div>

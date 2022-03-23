@@ -48,6 +48,9 @@ const SummaryCommentDetails = props => {
   }, [medicalCheckupReportingDetails.isNeedToClearSummaryComment])
 
   const onDiscard = () => {
+    if (document.activeElement) {
+      document.activeElement.blur()
+    }
     clearValues()
     dispatch({
       type: 'medicalCheckupReportingDetails/updateState',

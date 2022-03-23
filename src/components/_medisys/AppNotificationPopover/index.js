@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
+import { Link } from 'umi'
 import withFormikExtend from '@/components/Decorator/withFormikExtend'
 import { ListItem, ListItemText, withStyles, Divider } from '@material-ui/core'
 import { Button, Popover, SizeContainer, Tooltip } from '@/components'
@@ -10,27 +11,23 @@ import { compose } from 'redux'
 import { APPNOTIFICATION_SCHEMA } from '@/utils/constants'
 import appNotification from '@/models/appNotification'
 
-const styles = theme => ({
-  popoverContainer: {
-    textAlign: 'left',
-    width: 600,
-    minHeight: 300,
-    maxHeight: 600,
-  },
-})
+const styles = theme => ({})
 
 const AppNotificationPopover = ({
   user,
-  notifications,
   classes,
   dispatch,
   title,
   source,
   sourceRecordId,
-  doctor,//: { userFK = 0, name = '' } = {},
+  doctor,
   buttonProps,
+  children,
+  exactControl,
+  isMessageThreadEnable,
 }) => {
   const [show, setShow] = useState(false)
+  const [notifications, setNotifications] = useState([])
   const [newNotification, setNewNotification] = useState(null)
 
   const isDoctorRole =
@@ -89,8 +86,12 @@ const AppNotificationPopover = ({
   }
 
   const queryNotifications = () => {
-    dispatch({ type: 'appNotification/queryNotifications' }).then(r => {
+    dispatch({
+      type: 'appNotification/queryNotifications',
+      payload: { source, sourceRecordId },
+    }).then(r => {
       if (r.status == 200) {
+        setNotifications(r.data)
         setShow(true)
       }
     })
@@ -107,52 +108,71 @@ const AppNotificationPopover = ({
     <Popover
       icon={null}
       trigger='click'
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'left',
-      }}
-      transformOrigin={{
-        vertical: 'bottom',
-        horizontal: 'right',
-      }}
+      placement='bottomRight'
       visible={show}
       onVisibleChange={() => setShow(!show)}
       content={
-        show && (
-          <div className={classes.popoverContainer}>
-            <SizeContainer size='sm'>
-              <div style={{ marginRight: 8 }}>
-                {newNotification && (
-                  <AppNotificationContent
-                    key={0}
-                    dispatch={dispatch}
-                    notification={newNotification}
-                    currentUserFK={user.data.id}
-                    {...actions}
-                  />
-                )}
-                {notifications.map((notification, index) => (
-                  <AppNotificationContent
-                    key={index}
-                    dispatch={dispatch}
-                    notification={notification}
-                    currentUserFK={user.data.id}
-                    {...actions}
-                  />
-                ))}
-              </div>
-            </SizeContainer>
-            <Button size='sm' color='primary' onClick={handleItemNew}>
-              New Message
-            </Button>
+        <div style={{ width: 600 }}>
+          <div style={{ position: 'relative' }}>
+            <div style={{ fontSize: '1rem' }}>Message Thread</div>
+            {isMessageThreadEnable && (
+              <Link style={{ position: 'absolute', right: 0, top: 0 }}>
+                <span
+                  style={{
+                    display: 'block',
+                    textDecoration: 'underline',
+                    marginRight: 10,
+                  }}
+                  onClick={e => {
+                    e.preventDefault()
+                    handleItemNew()
+                  }}
+                >
+                  + New Message
+                </span>
+              </Link>
+            )}
           </div>
-        )
+          <div style={{ maxHeight: 500, overflow: 'auto' }}>
+            {notifications.map((notification, index) => (
+              <AppNotificationContent
+                key={index}
+                dispatch={dispatch}
+                notification={notification}
+                currentUserFK={user.data.id}
+                customeStyle={{
+                  margin: '4px 0px',
+                  border: '1px solid #cccccc',
+                  padding: 4,
+                }}
+                {...actions}
+              />
+            ))}
+          </div>
+          <div style={{ marginTop: 8 }}>
+            {newNotification && (
+              <AppNotificationContent
+                key={0}
+                dispatch={dispatch}
+                notification={newNotification}
+                currentUserFK={user.data.id}
+                {...actions}
+              />
+            )}
+          </div>
+          {exactControl ? exactControl() : ''}
+        </div>
       }
     >
       <Tooltip title={title}>
-        <Button color='primary' {...buttonProps} onClick={queryNotifications}>
-          {title}
-        </Button>
+        <div
+          onClick={() => {
+            if (show) return
+            queryNotifications()
+          }}
+        >
+          {children}
+        </div>
       </Tooltip>
     </Popover>
   )
@@ -160,8 +180,7 @@ const AppNotificationPopover = ({
 
 export default compose(
   withStyles(styles, { name: 'AppNotificationPopover' }),
-  connect(({ user, appNotification }) => ({
+  connect(({ user }) => ({
     user: user,
-    notifications: appNotification.notifications || [],
   })),
 )(AppNotificationPopover)

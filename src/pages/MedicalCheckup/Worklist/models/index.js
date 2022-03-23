@@ -72,6 +72,11 @@ export default createListViewModel({
         const response = yield call(service.queryLastReportData, payload)
         return response
       },
+
+      *generateAutoComment({ payload }, { call, put }) {
+        const response = yield call(service.generateAutoComment, payload)
+        return response
+      },
     },
     reducers: {},
   },

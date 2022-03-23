@@ -141,10 +141,15 @@ const WorklistGrid = ({
 
   const showReportingDetails = async row => {
     setIsAnyWorklistModelOpened(true)
-    const version = Date.now()
-    history.push(
-      `/medicalcheckup/worklist/reportingdetails?mcid=${row.id}&qid=${row.queueId}&vid=${row.visitFK}&pid=${row.patientProfileFK}&v=${version}`,
-    )
+    dispatch({
+      type: 'medicalCheckupWorklist/generateAutoComment',
+      payload: { id: row.id },
+    }).then(() => {
+      const version = Date.now()
+      history.push(
+        `/medicalcheckup/worklist/reportingdetails?mcid=${row.id}&qid=${row.queueId}&vid=${row.visitFK}&pid=${row.patientProfileFK}&v=${version}`,
+      )
+    })
   }
 
   const viewReport = async row => {

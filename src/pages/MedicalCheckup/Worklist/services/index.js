@@ -38,5 +38,7 @@ const fns = {
     service.query(`${url}/GetLastReportData`, params),
   markCommentAsDone: params =>
     service.upsert(`${url}/MarkCommentAsDone`, params),
+  generateAutoComment: params =>
+    service.upsert(`${url}/GenerateAutoComment`, params),
 }
 export default fns
