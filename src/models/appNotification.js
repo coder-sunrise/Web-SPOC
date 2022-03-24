@@ -56,10 +56,8 @@ export default createBasicModel({
         var user = yield select(st => st.user)
         var response = yield call(service.queryList, {
           toUserFK: user.data.id,
-          pageSize:
-            loadMore && pageSize != totalRecords
-              ? pageSize + morePageSize
-              : pageSize,
+          pageSize: loadMore ? pageSize + Math.min(totalRecords - pageSize, morePageSize) : pageSize,
+
           current: 1,
           sorting: [
             {
