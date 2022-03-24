@@ -51,6 +51,7 @@ import { SpecimenDetails } from '../SpecimenDetails'
 import { SpecimenStatusTag } from './SpecimenStatusTag'
 import { TestPanelColumn } from './TestPanelColumn'
 import styles from './WorklistGrid.less'
+import { LabResultReportPreview } from './LabResultReportPreview'
 import { RetestDetails } from './RetestDetails'
 
 const allSpecimenStatuses = Object.values(LAB_SPECIMEN_STATUS)
@@ -75,7 +76,11 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
   const [receiveSpecimenPara, setReceiveSpecimenPara] = useState({
     open: false,
     id: undefined,
-  })
+  }) 
+  const [labResultReportPreviewPara, setLabResultReportPreviewPara] = useState({
+    open: false,
+    visitId: undefined,
+  }) 
   const [specimenDetailsPara, setSpecimenDetailsPara] = useState({
     open: false,
     id: undefined,
@@ -83,8 +88,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
   const [retestDetailsPara, setRetestDetailsPara] = useState({
     open: false,
     id: undefined,
-  })
-
+  }) 
   useEffect(() => {
     if (originalWorklist) {
       const currentFilteredWorklist = _(
@@ -187,8 +191,16 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
     setIsAnyWorklistModelOpened(false)
   }
 
+  const closeLabResultReportPreview = () => {
+    setLabResultReportPreviewPara({ 
+      open: false,
+      id: undefined,
+    })
+    setIsAnyWorklistModelOpened(false)
+  }
+
   const closeSpecimenDetails = () => {
-    setSpecimenDetailsPara({
+    setSpecimenDetailsPara({ 
       open: false,
       id: undefined,
     })
@@ -437,13 +449,18 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
       dataIndex: 'patientName',
       key: 'patientName',
       render: (text, record) => {
-        console.log('WorklistGrid - Top Level Records : ', record)
         return (
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Space style={{ flexGrow: 1 }}>
               <Button
                 color='primary'
-                onClick={() => {}}
+                onClick={() => {
+                  setIsAnyWorklistModelOpened(true)
+                  setLabResultReportPreviewPara({
+                    open: true,
+                    visitId: record.visitFK,
+                  })
+                }}
                 size='sm'
                 justIcon
                 style={{ height: 25, marginTop: 2 }}
@@ -459,14 +476,13 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
               <VisitTypeTag type={record.visitPurposeFK} />
             </Space>
             <Space>
-              <span>{getSpecimenCountByCategory(record.visitFK)}</span>
+              <span>{getSpecimenCountByCategory(record.visitFK)}</span> 
             </Space>
           </div>
         )
       },
     },
   ]
-
   return (
     <Card>
       <div style={{ display: 'flex', alignItems: 'start' }}>
@@ -564,6 +580,15 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
         }}
         onConfirm={() => {
           closeDiscardSpecimen()
+        }}
+      />
+      <LabResultReportPreview
+        {...labResultReportPreviewPara}
+        onClose={() => {
+          closeLabResultReportPreview()
+        }}
+        onConfirm={() => {
+          closeLabResultReportPreview()
         }}
       />
     </Card>

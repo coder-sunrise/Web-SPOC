@@ -34,6 +34,7 @@ const Examination = props => {
     queryIndividualCommentHistory,
     refreshMedicalCheckup,
     isEditEnable = true,
+    isModifyCommentEnable,
   } = props
   const [selectExaminationItemId, setSelectExaminationItemId] = useState(
     undefined,
@@ -187,12 +188,20 @@ const Examination = props => {
                     className={classes.commentContainer}
                   >
                     <Tooltip title={showValue}>
-                      <div>{showValue}</div>
+                      <div
+                        style={{
+                          textOverflow: 'ellipsis',
+                          overflow: 'hidden',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {showValue}
+                      </div>
                     </Tooltip>
                     <div
                       style={{ position: 'absolute', right: '-4px', top: 0 }}
                     >
-                      {isEditEnable && index !== 0 ? (
+                      {isEditEnable && index !== 0 && isModifyCommentEnable ? (
                         <Tooltip title='Copy Comment'>
                           <IconButton
                             size='small'
@@ -248,6 +257,23 @@ const Examination = props => {
   const getDataSource = () => {
     let defaultData = []
     const { examinationItem = [] } = medicalCheckupReportingDetails.entity
+
+    const nuCategoryItems = examinationItem.filter(
+      item => !item.examinationCategoryFK,
+    )
+    defaultData = defaultData.concat(
+      nuCategoryItems.map(item => ({
+        id: item.id,
+        examinationType: item.displayValue,
+        isGroup: false,
+        selectedLanguage,
+        isSelected:
+          selectExaminationItemId && item.id === selectExaminationItemId,
+        status: item.status,
+        examinationItemService: item.examinationItemService,
+      })),
+    )
+
     ctexaminationcategory.forEach(category => {
       defaultData.push({
         id: category.id,

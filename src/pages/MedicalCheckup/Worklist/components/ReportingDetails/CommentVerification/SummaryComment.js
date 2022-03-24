@@ -69,11 +69,10 @@ const SummaryComment = ({
             render: rowProps => {
               const { row, columnConfig, cellProps } = rowProps
               const { control, error, validSchema } = columnConfig
-              return (
+              return isEditEnable ? (
                 <MultipleTextField
                   value={row.japaneseComment}
                   maxLength={2000}
-                  disabled={!isEditEnable}
                   onChange={e => {
                     const { commitChanges } = control
                     commitChanges({
@@ -86,6 +85,14 @@ const SummaryComment = ({
                     })
                   }}
                 />
+              ) : (
+                <div
+                  style={{
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  {row.japaneseComment}
+                </div>
               )
             },
           },
@@ -97,11 +104,10 @@ const SummaryComment = ({
             render: rowProps => {
               const { row, columnConfig, cellProps } = rowProps
               const { control, error, validSchema } = columnConfig
-              return (
+              return isEditEnable ? (
                 <MultipleTextField
                   value={row.englishComment}
                   maxLength={2000}
-                  disabled={!isEditEnable}
                   onChange={e => {
                     const { commitChanges } = control
                     commitChanges({
@@ -114,6 +120,14 @@ const SummaryComment = ({
                     })
                   }}
                 />
+              ) : (
+                <div
+                  style={{
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  {row.englishComment}
+                </div>
               )
             },
           },

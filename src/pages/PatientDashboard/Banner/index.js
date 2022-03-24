@@ -956,6 +956,7 @@ class Banner extends PureComponent {
       editingOrder,
       clinicSettings,
       visitRegistration,
+      isEditVisitEnable = false,
     } = props
 
     const visitInfo = visitRegistration?.entity?.visit
@@ -1704,9 +1705,11 @@ class Banner extends PureComponent {
                 <span style={{ display: 'inline-block', marginRight: 10 }}>
                   {patientNotesLinkElm}
                 </span>
-                <span style={{ display: 'inline-block' }}>
-                  {patientEditVisitElm}
-                </span>
+                {isEditVisitEnable && (
+                  <span style={{ display: 'inline-block' }}>
+                    {patientEditVisitElm}
+                  </span>
+                )}
               </div>
             </GridItem>
           </GridContainer>

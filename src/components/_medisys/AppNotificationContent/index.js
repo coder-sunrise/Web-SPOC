@@ -2,16 +2,20 @@ import React, { Component } from 'react'
 import withFormikExtend from '@/components/Decorator/withFormikExtend'
 import { FastField } from 'formik'
 import { ListItem, ListItemText, withStyles } from '@material-ui/core'
-import { Input } from 'antd'
-import { Button, TextField } from '@/components'
+import {
+  Button,
+  TextField,
+  MultipleTextField,
+  dateFormatLongWithTimeNoSec,
+  IconButton,
+  Tooltip,
+} from '@/components'
 import { Done, Replay } from '@material-ui/icons'
 import moment from 'moment'
 import { Link } from 'umi'
 
-const { TextArea } = Input
-const dateTimeFormat = 'DD MMM YYYY HH:mm'
 const formatDateTime = datetime =>
-  datetime ? moment(datetime).format(dateTimeFormat) : undefined
+  datetime ? moment(datetime).format(dateFormatLongWithTimeNoSec) : ''
 
 const styles = theme => ({
   buttonLink: { margin: 'auto' },
@@ -51,6 +55,7 @@ class AppNotificationContent extends Component {
       onCancel,
       onSave,
       onAcknowledge,
+      customeStyle = {},
     } = this.props
     const {
       isNew,
@@ -68,73 +73,109 @@ class AppNotificationContent extends Component {
     const { internalContent = content } = this.state
 
     return (
-      <div>
+      <div style={{ ...customeStyle }}>
         <div>
           {isNew ? (
             <div>
-              <p>{`To: ${toUser}`}</p>
-              <TextArea
+              <div>{`To: ${toUser}`}</div>
+              <MultipleTextField
+                maxLength={2000}
+                autoSize={{ minRows: 4, maxRows: 4 }}
                 value={internalContent}
                 onChange={e => {
                   this.setState({ internalContent: e.target.value })
                 }}
-                readOnly={!isNew}
-                autoSize={{ minRows: 1, maxRows: 99 }}
               />
             </div>
           ) : (
-            <p>{internalContent}</p>
+            <div style={{ whiteSpace: 'pre-wrap', fontWeight: 'bold' }}>
+              {internalContent}
+            </div>
           )}
         </div>
         <div>
           {isNew ? (
-            <span>
-              <Button
-                className={classes.buttonLink}
-                link
-                size='sm'
-                onClick={() => onCancel(notification)}
-              >
-                Cancel
-              </Button>
-              <Button
-                className={classes.buttonLink}
-                link
-                size='sm'
-                onClick={() => {
-                  if (!internalContent?.trim()) return
-                  onSave({ ...notification, content: internalContent })
-                  this.setState({ internalContent: '' })
-                }}
-              >
-                Save
-              </Button>
-            </span>
-          ) : (
-            <span>
-              {isAcknowledgeRequired && (
-                <Button
-                  justIcon
-                  color={isAcknowledged ? 'success' : 'action'}
-                  onClick={e => {
-                    e.stopPropagation()
-                    console.log('acknoledge button click')
-                    onAcknowledge(notification)
+            <div style={{ textAlign: 'Right' }}>
+              <Link style={{ display: 'inline-block' }}>
+                <span
+                  style={{
+                    display: 'block',
+                    textDecoration: 'underline',
+                    marginRight: 10,
+                    color: 'red',
                   }}
-                  title={formatDateTime(acknowledgeDate)}
-                  disabled={!(currentUserFK != fromUserFK && !isAcknowledged)}
+                  onClick={e => {
+                    e.preventDefault()
+                    onCancel(notification)
+                  }}
                 >
-                  <Done />
-                </Button>
+                  Cancel
+                </span>
+              </Link>
+              <Link style={{ display: 'inline-block' }}>
+                <span
+                  style={{
+                    display: 'block',
+                    textDecoration: 'underline',
+                  }}
+                  onClick={e => {
+                    e.preventDefault()
+                    if (!internalContent?.trim()) return
+                    onSave({ ...notification, content: internalContent })
+                    this.setState({ internalContent: '' })
+                  }}
+                >
+                  Save
+                </span>
+              </Link>
+            </div>
+          ) : (
+            <div style={{ position: 'relative', height: 24 }}>
+              {isAcknowledgeRequired &&
+                (currentUserFK != fromUserFK || isAcknowledged) &&
+                (isAcknowledged ? (
+                  <div style={{ width: 22, height: 22, padding: 3 }}>
+                    <Done style={{ color: '#389e0d' }} />
+                  </div>
+                ) : (
+                  <Tooltip title='Acknowledge Message'>
+                    <Button
+                      justIcon
+                      size='sm'
+                      color='primary'
+                      onClick={e => {
+                        e.stopPropagation()
+                        onAcknowledge(notification)
+                      }}
+                      title={formatDateTime(acknowledgeDate)}
+                    >
+                      <Done />
+                    </Button>
+                  </Tooltip>
+                ))}
+              {currentUserFK == fromUserFK && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: 25,
+                    bottom: 0,
+                    fontSize: '0.75rem',
+                  }}
+                >{`To: ${toUser}`}</div>
               )}
-              <span className={classes.timestampText}>
-                {`${
-                  currentUserFK == fromUserFK
-                    ? `To: ${toUser}`
-                    : `From: ${fromUser}`
-                }, ${formatDateTime(generateDate)}`}
-              </span>
-            </span>
+              {currentUserFK != fromUserFK && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: 0,
+                    bottom: 0,
+                    fontSize: '0.75rem',
+                  }}
+                >
+                  {`From: ${fromUser}, ${formatDateTime(generateDate)}`}
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>

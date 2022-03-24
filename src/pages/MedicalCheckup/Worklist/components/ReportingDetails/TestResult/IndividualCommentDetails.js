@@ -195,7 +195,11 @@ class IndividualCommentDetails extends PureComponent {
 
   getSelection = group => {
     const { selectedItem, searchValue = '' } = this.state
-    const { selectedLanguage, commentGroupList = [] } = this.props
+    const {
+      selectedLanguage,
+      commentGroupList = [],
+      isModifyCommentEnable,
+    } = this.props
     const listItems = group.list.filter(
       item =>
         item.displayValue.toUpperCase().indexOf(searchValue.toUpperCase()) >= 0,
@@ -256,7 +260,7 @@ class IndividualCommentDetails extends PureComponent {
               divider
               disableGutters
               button
-              disabled={isNextGroupSelect}
+              disabled={!isModifyCommentEnable || isNextGroupSelect}
               onClick={() => this.onCategoryChange(group, item)}
             >
               <Tooltip title={showValue}>
@@ -317,6 +321,9 @@ class IndividualCommentDetails extends PureComponent {
   }
 
   onDiscard = () => {
+    if (document.activeElement) {
+      document.activeElement.blur()
+    }
     const { clearEditComment } = this.props
     clearEditComment()
   }
@@ -326,6 +333,7 @@ class IndividualCommentDetails extends PureComponent {
     const { setFieldValue } = form
     setFieldValue(`medicalCheckupIndividualComment[${i}].isVerified`, false)
   }
+
   render() {
     const {
       values,
@@ -335,6 +343,9 @@ class IndividualCommentDetails extends PureComponent {
       handleSubmit,
       setFieldValue,
       classes,
+      isModifyCommentEnable,
+      isModifyOthersCommentEnable,
+      user,
     } = this.props
     const { englishComment, japaneseComment, searchValue } = this.state
     const { medicalCheckupIndividualComment = [] } = values
@@ -351,6 +362,7 @@ class IndividualCommentDetails extends PureComponent {
               this.setState({ searchValue: e.target.value })
             }}
             value={searchValue}
+            disabled={!isModifyCommentEnable}
           />
         </div>
         <div style={{ width: commentGroupList.length ? 'auto' : '400px' }}>
@@ -382,14 +394,17 @@ class IndividualCommentDetails extends PureComponent {
               }
             }}
             value={selectedLanguage === 'EN' ? englishComment : japaneseComment}
+            disabled={!isModifyCommentEnable}
           />
-          <Button
-            size='small'
-            type='primary'
-            style={{ position: 'absolute', right: 4, top: 4 }}
-            onClick={this.insertComment}
-            icon={<PlusOutlined />}
-          ></Button>
+          {isModifyCommentEnable && (
+            <Button
+              size='small'
+              type='primary'
+              style={{ position: 'absolute', right: 4, top: 4 }}
+              onClick={this.insertComment}
+              icon={<PlusOutlined />}
+            ></Button>
+          )}
         </div>
         <div style={{ height: 90, overflow: 'auto' }}>
           <FieldArray
@@ -408,6 +423,17 @@ class IndividualCommentDetails extends PureComponent {
                     ? 'englishComment'
                     : 'japaneseComment'
                 }`
+
+                let isModifyEnable
+                if (
+                  val.commentByUserFK ===
+                  user.data.clinicianProfile.userProfile.id
+                ) {
+                  isModifyEnable = isModifyCommentEnable
+                } else {
+                  isModifyEnable = isModifyOthersCommentEnable
+                }
+
                 return (
                   <div key={i}>
                     <div
@@ -434,26 +460,29 @@ class IndividualCommentDetails extends PureComponent {
                             <TextField
                               {...args}
                               onChange={() => this.updateComment(i)}
+                              disabled={!isModifyEnable}
                             />
                           )
                         }}
                       />
-                      <IconButton
-                        style={{
-                          color: 'red',
-                          position: 'absolute',
-                          right: 0,
-                          top: 0,
-                        }}
-                        onClick={() =>
-                          setFieldValue(
-                            `medicalCheckupIndividualComment[${i}].isDeleted`,
-                            true,
-                          )
-                        }
-                      >
-                        <MinusCircleOutlined />
-                      </IconButton>
+                      {isModifyEnable && (
+                        <IconButton
+                          style={{
+                            color: 'red',
+                            position: 'absolute',
+                            right: 0,
+                            top: 0,
+                          }}
+                          onClick={() =>
+                            setFieldValue(
+                              `medicalCheckupIndividualComment[${i}].isDeleted`,
+                              true,
+                            )
+                          }
+                        >
+                          <MinusCircleOutlined />
+                        </IconButton>
+                      )}
                     </div>
                   </div>
                 )
