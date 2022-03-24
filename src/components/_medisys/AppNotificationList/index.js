@@ -141,6 +141,7 @@ const AppNotificationList = ({
               disabled={notification.read}
               onClick={() => {
                 readNotification(notification)
+                document.activeElement?.blur()
               }}
             >
               <ListItemText
