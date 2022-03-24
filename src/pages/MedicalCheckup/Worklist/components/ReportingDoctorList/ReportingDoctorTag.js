@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 // material ui
 import { Link } from 'umi'
 import { withStyles } from '@material-ui/core'
-import { useSelector } from 'dva'
+import { useSelector, useDispatch } from 'dva'
 import moment from 'moment'
 import {
   Tooltip,
@@ -13,10 +13,14 @@ import {
   dateFormatLongWithTimeNoSec,
 } from '@/components'
 import { CheckOutlined } from '@ant-design/icons'
-import { REPORTINGDOCTOR_STATUS } from '@/utils/constants'
+import {
+  REPORTINGDOCTOR_STATUS,
+  APPNOTIFICATION_SCHEMA,
+} from '@/utils/constants'
 import { Message } from '@material-ui/icons'
 import { Tag } from 'antd'
 import Authorized from '@/utils/Authorized'
+import { AppNotificationPopover } from '@/components/_medisys'
 
 const styles = theme => ({
   tag: {
@@ -27,11 +31,6 @@ const styles = theme => ({
     whiteSpace: 'nowrap',
     padding: 2,
   },
-  messageComment: {
-    margin: '4px 0px',
-    border: '1px solid #cccccc',
-    padding: 2,
-  },
 })
 
 const ReportingDoctorTag = ({
@@ -40,34 +39,19 @@ const ReportingDoctorTag = ({
   isShowMessage = false,
   updateReportingDoctor = () => {},
   isEditEnable = true,
+  medicalCheckupWorkitemId,
 }) => {
-  const [messages, setMessages] = useState([])
-  const [isNewMessage, setIsNewMessage] = useState(false)
-  const [message, setMessage] = useState(undefined)
+  const [notifications, setNotifications] = useState([])
+  const [newNotification, setNewNotification] = useState(undefined)
+  const dispatch = useDispatch()
   const user = useSelector(st => st.user)
-  const searchMessage = () => {
+  const queryNotifications = () => {
     if (!isShowMessage) return
-    setMessages([
-      { content: 'aaaaaa', from: 'AA', to: 'BB', sendSate: moment() },
-      { content: 'bbbbbbbbbbbbbb', from: 'AA', to: 'BB', sendSate: moment() },
-      {
-        content: 'ccccccccccccccccccc',
-        from: 'AA',
-        to: 'BB',
-        sendSate: moment(),
-      },
-      { content: 'ddddddddddddd', from: 'AA', to: 'BB', sendSate: moment() },
-      { content: 'eeeeeeeeeeeeeee', from: 'AA', to: 'BB', sendSate: moment() },
-      { content: 'fffffffffffffff', from: 'AA', to: 'BB', sendSate: moment() },
-      { content: 'hhhhhhhhhhh', from: 'AA', to: 'BB', sendSate: moment() },
-      { content: 'tttttttttttttttt', from: 'AA', to: 'BB', sendSate: moment() },
-      { content: 'sssssssssssssss', from: 'AA', to: 'BB', sendSate: moment() },
-      { content: 'rrrrrrrrrrrrrrr', from: 'AA', to: 'BB', sendSate: moment() },
-      { content: 'llllllllllllll', from: 'AA', to: 'BB', sendSate: moment() },
-      { content: 'vvvvvvvvv', from: 'AA', to: 'BB', sendSate: moment() },
-      { content: 'ddd', from: 'AA', to: 'BB', sendSate: moment() },
-      { content: 'rrrrrrrrr', from: 'AA', to: 'BB', sendSate: moment() },
-    ])
+    dispatch({ type: 'appNotification/queryNotifications' }).then(response => {
+      if (response && response.status === '200') {
+        setNewNotification(response.data)
+      }
+    })
   }
   let reportingDoctorColor = '#CC0033'
   if (
@@ -99,33 +83,13 @@ const ReportingDoctorTag = ({
             className={classes.tag}
             style={{ cursor: isShowMessage ? 'pointer' : 'default' }}
             color={reportingDoctorColor}
-            onClick={searchMessage}
+            //onClick={queryNotifications}
           >
             {name}
           </Tag>
         </Tooltip>
       </div>
     )
-  }
-
-  const messageComment = item => {
-    return (
-      <div className={classes.messageComment}>
-        <div style={{ fontWeight: 600 }}>{item.content}</div>
-        <div style={{ position: 'relative' }}>
-          <div>{`To: ${item.from}`}</div>
-          <div style={{ position: 'absolute', right: 0, top: 0 }}>
-            {`From: ${item.to}, ${moment(item.sendSate).format(
-              dateFormatLongWithTimeNoSec,
-            )}`}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  const sendMessage = () => {
-    searchMessage()
   }
 
   const isRevertCommentEnable = () => {
@@ -150,69 +114,21 @@ const ReportingDoctorTag = ({
     return true
   }
 
-  const getPopoverContent = () => {
-    let toUserName = 'All PRO'
-    if (!isDoctor) {
-      toUserName = name
+  const isMessageThreadEnable = () => {
+    if (!isEditEnable) return false
+    const modifyMessageThreadAccessRight = Authorized.check(
+      'medicalcheckupworklist.modifymessagethread',
+    ) || {
+      rights: 'hidden',
     }
+    if (modifyMessageThreadAccessRight.rights !== 'enable') return false
+    return true
+  }
+
+  const exactControl = () => {
     return (
-      <div style={{ width: 600 }}>
-        <div style={{ fontWeight: 'bold' }}>Message Thread</div>
-        <div style={{ maxHeight: 400, overflow: 'auto' }}>
-          {messages.map(item => {
-            return messageComment(item)
-          })}
-        </div>
-        {isNewMessage && (
-          <div style={{ marginTop: 6 }}>
-            <div>{`To: ${toUserName}`}</div>
-            <MultipleTextField
-              maxLength={2000}
-              autoSize={{ minRows: 4, maxRows: 4 }}
-              value={message}
-              onChange={e => {
-                setMessage(e.target.value)
-              }}
-            />
-            <div style={{ textAlign: 'Right' }}>
-              <Link style={{ display: 'inline-block' }}>
-                <span
-                  style={{
-                    display: 'block',
-                    textDecoration: 'underline',
-                    marginRight: 10,
-                    color: 'red',
-                  }}
-                  onClick={e => {
-                    e.preventDefault()
-                    setIsNewMessage(false)
-                    setMessage(undefined)
-                  }}
-                >
-                  Cancel
-                </span>
-              </Link>
-              <Link style={{ display: 'inline-block' }}>
-                <span
-                  style={{
-                    display: 'block',
-                    textDecoration: 'underline',
-                  }}
-                  onClick={e => {
-                    e.preventDefault()
-                    sendMessage()
-                  }}
-                >
-                  Save
-                </span>
-              </Link>
-            </div>
-          </div>
-        )}
-        <div style={{ marginTop: 6 }}>
-          <IconButton color='primary' justIcon size='sm'>
-            <Message />
-          </IconButton>
+      <div style={{ marginTop: 6 }}>
+        {isRevertCommentEnable() && (
           <Link style={{ display: 'inline-block' }}>
             <span
               style={{
@@ -222,56 +138,37 @@ const ReportingDoctorTag = ({
               }}
               onClick={e => {
                 e.preventDefault()
-                if (!isNewMessage) {
-                  setIsNewMessage(true)
-                }
+                updateReportingDoctor(
+                  medicalCheckupDoctor,
+                  REPORTINGDOCTOR_STATUS.NEW,
+                )
               }}
             >
-              New Message
+              Revert Comment to Doctor
             </span>
           </Link>
-          {isRevertCommentEnable() && (
+        )}
+        {medicalCheckupDoctor.status ===
+          REPORTINGDOCTOR_STATUS.COMMENTVERIFYING &&
+          isVerifyCommentEnable() && (
             <Link style={{ display: 'inline-block' }}>
               <span
                 style={{
                   display: 'block',
                   textDecoration: 'underline',
-                  marginRight: 10,
                 }}
                 onClick={e => {
                   e.preventDefault()
                   updateReportingDoctor(
                     medicalCheckupDoctor,
-                    REPORTINGDOCTOR_STATUS.NEW,
+                    REPORTINGDOCTOR_STATUS.VERIFIED,
                   )
                 }}
               >
-                Revert Comment to Doctor
+                Mark Comment as Verified
               </span>
             </Link>
           )}
-          {medicalCheckupDoctor.status ===
-            REPORTINGDOCTOR_STATUS.COMMENTVERIFYING &&
-            isVerifyCommentEnable() && (
-              <Link style={{ display: 'inline-block' }}>
-                <span
-                  style={{
-                    display: 'block',
-                    textDecoration: 'underline',
-                  }}
-                  onClick={e => {
-                    e.preventDefault()
-                    updateReportingDoctor(
-                      medicalCheckupDoctor,
-                      REPORTINGDOCTOR_STATUS.VERIFIED,
-                    )
-                  }}
-                >
-                  Mark Comment as Verified
-                </span>
-              </Link>
-            )}
-        </div>
       </div>
     )
   }
@@ -282,14 +179,17 @@ const ReportingDoctorTag = ({
       }}
     >
       {isShowMessage ? (
-        <Popover
-          icon={null}
-          trigger='click'
-          placement='bottomRight'
-          content={getPopoverContent()}
+        <AppNotificationPopover
+          dispatch={dispatch}
+          source={APPNOTIFICATION_SCHEMA.MC.name}
+          sourceRecordId={medicalCheckupWorkitemId}
+          doctor={{ userFK: medicalCheckupDoctor.userProfileFK, name: name }}
+          buttonProps={{ justIcon: true, style: { width: 24 } }}
+          isMessageThreadEnable={isMessageThreadEnable()}
+          exactControl={exactControl}
         >
           {getDoctorTag()}
-        </Popover>
+        </AppNotificationPopover>
       ) : (
         getDoctorTag()
       )}

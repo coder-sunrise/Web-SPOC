@@ -123,7 +123,7 @@ class CommentVerification extends PureComponent {
             onConfirm: handleSubmit,
             confirmBtnText: 'Save',
             confirmProps: {
-              disabled: false,
+              disabled: !this.getEditCommentEnable(),
             },
           })}
       </LoadingWrapper>

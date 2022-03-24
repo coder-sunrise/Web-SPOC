@@ -321,6 +321,9 @@ class IndividualCommentDetails extends PureComponent {
   }
 
   onDiscard = () => {
+    if (document.activeElement) {
+      document.activeElement.blur()
+    }
     const { clearEditComment } = this.props
     clearEditComment()
   }
