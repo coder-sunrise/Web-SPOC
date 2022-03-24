@@ -98,7 +98,10 @@ class Checkbox extends React.Component {
       >
         <Tooltip title={tooltip}>
           <FormControlLabel
-            style={{ fontSize: 14, ...(notCentered ? style : null) }}
+            style={{
+              fontSize: 14,
+              ...(notCentered ? style : null),
+            }}
             classes={{
               root: classes.root,
             }}
@@ -119,6 +122,7 @@ class Checkbox extends React.Component {
                   //   checked: classes.checked,
                   //   root: classes.checkRoot,
                   // }}
+                  style={{ position: 'relative', top: -1 }}
                   {...opts}
                 />
               )

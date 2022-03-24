@@ -39,6 +39,8 @@ class LabResults extends React.PureComponent {
     console.log(this.props, 1111)
     const { dispatch, patientProfileFK, clinicSettings } = this.props
     const { visitTypeSetting } = clinicSettings.settings
+    // need to preload the visit type data before treegrid data render
+    // if use useVisitType hook function will cause treegrid ui render issue
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
@@ -56,15 +58,16 @@ class LabResults extends React.PureComponent {
       if ((v || []).length > 0) {
         visitTypes = getMappedVisitType(v, visitTypeSettingsObj)
       }
+      // get all the active test panel item first
       this.setState({ visitType: visitTypes }, () => {
         dispatch({
           type: 'workitem/getTestPanelItemWithRefRange',
           payload: { patientProfileFK },
         }).then(data => {
           if (data) {
-            console.log(data)
-            // this.setState({ data: data })
+            // prepare the tree structure by test category and test panel item
             this.constructTestPanelItem(data)
+            // load first page data
             this.loadData(true)
           }
         })
@@ -86,11 +89,6 @@ class LabResults extends React.PureComponent {
       outOfRangeAll: false,
       currentVisitId: visitFK,
     }
-    // this.toolbarOptions = [
-    //   'ExpandAll',
-    //   'CollapseAll',
-    //   { text: 'Load More', tooltipText: 'Load More', id: 'loadMore' },
-    // ]
   }
 
   disableLoadMore() {
@@ -131,6 +129,7 @@ class LabResults extends React.PureComponent {
   }
   prepareData = data => {
     let newData = this.state.data
+    // iterate the returned data and based on the test panel item FK to update the value of each test panel item
     data.labResultDetails.forEach(visitData => {
       visitData.testPanelItemResults.forEach(result => {
         newData.forEach(d => {
@@ -139,11 +138,14 @@ class LabResults extends React.PureComponent {
           )
           if (target) {
             target[`v_${visitData.visitId}_finalResult`] = result.finalResult
-            target[
-              `v_${visitData.visitId}_shouldFlag`
-            ] = result.shouldFlag.toString()
+            target[`v_${visitData.visitId}_shouldFlag`] = result.shouldFlag
+              ? '__true'
+              : '__false'
             target[`v_${visitData.visitId}_referenceRange`] =
               result.referenceRange
+            // as long as there is a matched test panel item result returned, then update the "hasData" column to true
+            // by default the table will only show the test panel item which has at least one result.
+            target.hasData = '__yes'
           }
         })
       })
@@ -155,14 +157,18 @@ class LabResults extends React.PureComponent {
         allRetrieved: data.allRetrieved,
       },
       () => {
+        // base on returned visit record to push column
         data.labResultDetails.map((x, index) => {
           this.treegridObj.columns.push({
             width: 170,
             customAttributes: {
+              // use this to highlight the latest visit record
               class:
-                this.treegridObj.columns.length == 2 ? 'customcss' : 'normal',
+                this.treegridObj.columns.length == 3 ? 'customcss' : 'normal',
               visitTypeFK: x.visitTypeFK,
             },
+            visible: x.visitTypeFK !== 4 ? !this.state.onlyMC : true,
+            // filed set to 'shouldFlag' is only for out of range filter usage.
             field: `v_${x.visitId}_shouldFlag`,
             textAlign: 'Right',
             headerText: `${moment(x.visitDate).format('DD MMM YYYY')}`,
@@ -180,7 +186,7 @@ class LabResults extends React.PureComponent {
                       <Print
                         style={{
                           position: 'relative',
-                          top: 6,
+                          top: 4,
                           cursor: 'pointer',
                           color: '#4255bd',
                           left: 3,
@@ -200,8 +206,8 @@ class LabResults extends React.PureComponent {
                       >
                         <FileCopySharp
                           style={{
-                            width: 17,
-                            height: 17,
+                            width: 15,
+                            height: 15,
                             position: 'relative',
                             top: 4,
                             cursor: 'pointer',
@@ -229,7 +235,7 @@ class LabResults extends React.PureComponent {
                   <span
                     style={{
                       color:
-                        props.taskData[`v_${x.visitId}_shouldFlag`] === 'true'
+                        props.taskData[`v_${x.visitId}_shouldFlag`] === '__true'
                           ? 'red'
                           : 'inherit',
                     }}
@@ -243,8 +249,17 @@ class LabResults extends React.PureComponent {
         })
         this.treegridObj.refreshColumns()
         this.treegridObj.refresh()
-        // this.treegridObj.searchSettings = { operator: 'notequal' }
-        // this.treegridObj.search('')
+        if (this.state.outOfRangeAll) {
+          this.filterOutOfRangeOfAll()
+        } else {
+          // after data filtering, always show the test panel item which has data
+          this.treegridObj.search('__yes')
+          // need to clear the current filter condtion then trigger based on if only show out of range of latest..
+          this.treegridObj.clearFiltering()
+          if (this.state.outOfRangeLatest) {
+            this.filterOutOfRangeOfLatest()
+          }
+        }
       },
     )
   }
@@ -269,11 +284,13 @@ class LabResults extends React.PureComponent {
             itemName: subItem.displayValue,
             testPanelFK: subItem.testPanelFK,
             referenceRange: subItem.referenceRange,
+            hasData: 'no',
           }
         })
     })
     this.setState({ data: category })
   }
+  // filter MC by hide/show column based on visit type fk.
   filterMC = () => {
     if (this.state.onlyMC) {
       this.treegridObj.hideColumns(
@@ -287,18 +304,47 @@ class LabResults extends React.PureComponent {
       )
     } else {
       this.treegridObj.showColumns(
-        this.treegridObj.getColumns().map(x => x.field),
+        this.treegridObj
+          .getColumns()
+          .map(x => x.field)
+          .filter(column => column != 'hasData'),
         'field',
       )
     }
   }
   onCloseReport = () => {
     this.setState({ showModal: false })
+    // need to call the refresh so that the treegrid able to render correctly
     this.treegridObj.refresh()
   }
   onCloseResultDetails = () => {
     this.setState({ showResultDetails: false })
+    // need to call the refresh so that the treegrid able to render correctly
     this.treegridObj.refresh()
+  }
+  filterOutOfRangeOfLatest = () => {
+    this.treegridObj.search('__yes')
+    var latestColumnName = this.treegridObj.getColumns()[3].field
+    if (this.state.outOfRangeLatest) {
+      if (this.state.outOfRangeAll) {
+        this.setState({ outOfRangeAll: false })
+      }
+      this.treegridObj.filterByColumn(latestColumnName, 'startswith', '__t')
+    } else {
+      this.treegridObj.clearFiltering()
+    }
+  }
+  filterOutOfRangeOfAll = () => {
+    this.treegridObj.clearFiltering()
+    var allColumns = this.treegridObj.getColumns().filter(x => x.index > 1)
+    if (this.state.outOfRangeAll) {
+      if (this.state.outOfRangeLatest) {
+        this.setState({ outOfRangeLatest: false })
+      }
+      this.treegridObj.search('__true')
+    } else {
+      this.treegridObj.search('__yes')
+    }
   }
   render() {
     console.log(this.state)
@@ -327,19 +373,9 @@ class LabResults extends React.PureComponent {
               label='Out of Range (Latest Visit)'
               checked={this.state.outOfRangeLatest}
               onChange={e => {
-                this.treegridObj.search('')
-                var latestColumnName = this.treegridObj.getColumns()[2].field
-                this.setState({ outOfRangeLatest: e?.terget?.value })
-                if (e.target.value) {
-                  this.setState({ outOfRangeAll: false })
-                  this.treegridObj.filterByColumn(
-                    latestColumnName,
-                    'startswith',
-                    't',
-                  )
-                } else {
-                  this.treegridObj.clearFiltering()
-                }
+                this.setState({ outOfRangeLatest: e.target.value }, () => {
+                  this.filterOutOfRangeOfLatest(e.target.value)
+                })
               }}
             ></Checkbox>
             <Checkbox
@@ -350,23 +386,9 @@ class LabResults extends React.PureComponent {
               label='Out of Range (All Visit)'
               checked={this.state.outOfRangeAll}
               onChange={e => {
-                this.treegridObj.clearFiltering()
-                var allColumns = this.treegridObj
-                  .getColumns()
-                  .filter(x => x.index > 1)
-                this.setState({ outOfRangeAll: e?.terget?.value })
-
-                if (e.target.value) {
-                  this.setState({ outOfRangeLatest: false })
-                  // console.log(allColumns.map(x => x.field))
-                  // this.treegridObj.searchSettings = {
-                  //   fields: allColumns.map(x => x.field),
-                  //   operator: 'equal',
-                  // }
-                  this.treegridObj.search('true')
-                } else {
-                  this.treegridObj.search('')
-                }
+                this.setState({ outOfRangeAll: e.target.value }, () => {
+                  this.filterOutOfRangeOfAll(e.target.value)
+                })
               }}
             ></Checkbox>
           </GridItem>
@@ -380,7 +402,8 @@ class LabResults extends React.PureComponent {
                   marginRight: -8,
                   top: 3,
                 }}
-                onClick={() => {
+                onClick={e => {
+                  e.preventDefault()
                   this.loadData()
                 }}
               >
@@ -435,6 +458,10 @@ class LabResults extends React.PureComponent {
                         </Tooltip>
                       )
                     }}
+                  ></ColumnDirective>
+                  <ColumnDirective
+                    field='hasData'
+                    visible={false}
                   ></ColumnDirective>
                 </ColumnsDirective>
                 <Inject services={[Filter, Freeze, Toolbar, Page]} />
