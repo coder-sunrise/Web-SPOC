@@ -70,14 +70,14 @@ export const RetestDetails = ({ open, id, onClose, onConfirm }) => {
       dataIndex: 'result',
       key: 'result',
       ellipsis: true,
-      width: 80,
+      width: 150,
     },
     {
       title: 'Unit',
       dataIndex: 'unit',
       key: 'unit',
       ellipsis: true,
-      width: 80,
+      width: 100,
     },
   ]
 
@@ -108,6 +108,7 @@ export const RetestDetails = ({ open, id, onClose, onConfirm }) => {
           disabled: isSelectedAnalyzerResult === null,
         },
       }}
+      cancelText='Cancel'
       onClose={() => {
         setShowModal(false)
         onClose && onClose()

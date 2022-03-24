@@ -31,6 +31,7 @@ import { TestPanelColumn } from '../../Worklist/components/TestPanelColumn'
 import CollectSpecimen from './CollectSpecimen'
 import { useCodeTable } from '@/utils/hooks'
 import { DiscardSpecimen } from '../../Worklist/components'
+import { SpecimenDetails } from '../../Worklist/SpecimenDetails'
 
 const DispenseDetailsSpecimenCollection = ({
   visitId,
@@ -47,6 +48,10 @@ const DispenseDetailsSpecimenCollection = ({
     mode: 'new',
   })
   const [discardSpecimenPara, setDiscardSpecimenPara] = useState({
+    open: false,
+    id: undefined,
+  })
+  const [specimenDetailsPara, setSpecimenDetailsPara] = useState({
     open: false,
     id: undefined,
   })
@@ -134,11 +139,10 @@ const DispenseDetailsSpecimenCollection = ({
               <Tooltip title='Open Specimen Details'>
                 <Button
                   onClick={() => {
-                    // setCurrentModal({
-                    //   modal: MODALS.SPECIMEN_DETAILS,
-                    //   para: record.labSpecimenFK,
-                    // })
-                    // setIsAnyWorklistModelOpened(true)
+                    setSpecimenDetailsPara({
+                      open: true,
+                      id: row.labSpecimenFK,
+                    })
                   }}
                   justIcon
                   color='primary'
@@ -206,8 +210,8 @@ const DispenseDetailsSpecimenCollection = ({
       payload: { id: specimenId },
     }).then(labSpecimenData => {
       if (labSpecimenData) {
-        let testPanel = labSpecimenData?.labSpecimenWorkitems
-          ?.map(labWorkitem => labWorkitem.labWorkitem.testPanel)
+        let testPanel = labSpecimenData?.labWorkitems
+          .map(labWorkitem => labWorkitem.testPanel)
           .join(', ')
         const data = {
           SampleLabelDetails: [
@@ -264,6 +268,14 @@ const DispenseDetailsSpecimenCollection = ({
 
   const closeDiscardSpecimen = () => {
     setDiscardSpecimenPara({
+      open: false,
+      id: undefined,
+    })
+    getVisitSpecimenCollection()
+  }
+
+  const closeSpecimenDetails = () => {
+    setSpecimenDetailsPara({
       open: false,
       id: undefined,
     })
@@ -360,6 +372,16 @@ const DispenseDetailsSpecimenCollection = ({
         onConfirm={() => {
           closeDiscardSpecimen()
         }}
+      />
+      <SpecimenDetails
+        {...specimenDetailsPara}
+        onClose={() => {
+          closeSpecimenDetails()
+        }}
+        onConfirm={() => {
+          closeSpecimenDetails()
+        }}
+        isReadonly={true}
       />
     </React.Fragment>
   )

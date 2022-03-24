@@ -1741,7 +1741,6 @@ export default ({
                       item => item.statusFK !== LAB_WORKITEM_STATUS.NEW,
                     ).length > 0
                   ) {
-                    editEnable = false
                     deleteEnable = false
                     deleteMessage =
                       'Specimen Collected. No modification is allowed on processed order'

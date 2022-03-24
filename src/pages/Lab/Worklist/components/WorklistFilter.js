@@ -72,7 +72,7 @@ export const WorklistFilter = () => {
 
     return () => {
       console.log('Clean up Lab WorklistFilter')
-      clearInterval(timer.current)
+      stopTimer()
     }
   }, [isAnyWorklistModelOpened])
 
