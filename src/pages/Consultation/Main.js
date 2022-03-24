@@ -577,7 +577,7 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
       values.isPharmacyOrderUpdated = isPharmacyOrderUpdated(orders)
     }
     let printData = []
-    if (versionNumber === 1) {
+    if (versionNumber >= 1) {
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
       const { autoPrintOnSignOff } = settings
 
@@ -618,58 +618,56 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
                 dispatch({ type: `consultation/closeSignOffModal` })
                 if (result && result.length > 0) {
                   let printedData = result
-                  if (printedData && printedData.length > 0) {
-                    const token = localStorage.getItem('token')
-                    if (
-                      printedData.some(
-                        x => x.ReportId === REPORT_ID.PRESCRIPTION,
-                      )
-                    ) {
-                      const {
-                        visitRegistration: {
-                          entity: {
-                            visit: { id: visitFK, patientProfileFK },
-                          },
+                  const token = localStorage.getItem('token')
+                  if (
+                    printedData.some(x => x.ReportId === REPORT_ID.PRESCRIPTION)
+                  ) {
+                    const {
+                      visitRegistration: {
+                        entity: {
+                          visit: { id: visitFK, patientProfileFK },
                         },
-                      } = props
-                      getRawData(REPORT_ID.PRESCRIPTION, {
-                        visitFK,
-                        patientProfileFK,
-                      }).then(r => {
-                        printedData = printedData.map(item => ({
-                          ReportId: item.ReportId,
-                          DocumentName:
-                            item.ReportId === REPORT_ID.PRESCRIPTION
-                              ? item.description
-                              : `${item.item}(${item.description})`,
-                          ReportData:
-                            item.ReportId === REPORT_ID.PRESCRIPTION
-                              ? JSON.stringify(
-                                  (delete r.ReportSettingParameter,
-                                  delete r.ReportContext,
-                                  r),
-                                )
-                              : item.ReportData,
-                          Copies: item.Copies,
-                          Token: token,
-                          BaseUrl: process.env.url,
-                        }))
-                        handlePrint(JSON.stringify(printedData))
-                        props.dispatch({ type: 'consultation/closeModal' })
-                      })
-                    } else {
+                      },
+                    } = props
+                    getRawData(REPORT_ID.PRESCRIPTION, {
+                      visitFK,
+                      patientProfileFK,
+                    }).then(r => {
                       printedData = printedData.map(item => ({
                         ReportId: item.ReportId,
-                        DocumentName: `${item.item}(${item.description})`,
-                        ReportData: item.ReportData,
+                        DocumentName:
+                          item.ReportId === REPORT_ID.PRESCRIPTION
+                            ? item.description
+                            : `${item.item}(${item.description})`,
+                        ReportData:
+                          item.ReportId === REPORT_ID.PRESCRIPTION
+                            ? JSON.stringify(
+                                (delete r.ReportSettingParameter,
+                                delete r.ReportContext,
+                                r),
+                              )
+                            : item.ReportData,
                         Copies: item.Copies,
                         Token: token,
                         BaseUrl: process.env.url,
                       }))
                       handlePrint(JSON.stringify(printedData))
-                      props.dispatch({ type: 'consultation/closeModal' })
-                    }
+                      dispatch({ type: 'consultation/closeModal' })
+                    })
+                  } else {
+                    printedData = printedData.map(item => ({
+                      ReportId: item.ReportId,
+                      DocumentName: `${item.item}(${item.description})`,
+                      ReportData: item.ReportData,
+                      Copies: item.Copies,
+                      Token: token,
+                      BaseUrl: process.env.url,
+                    }))
+                    handlePrint(JSON.stringify(printedData))
+                    dispatch({ type: 'consultation/closeModal' })
                   }
+                } else {
+                  dispatch({ type: 'consultation/closeModal' })
                 }
               },
             })
@@ -1459,7 +1457,7 @@ class Main extends React.Component {
       }
       return { ...po }
     })
-    console.log(this.props)
+
     return (
       <div className={classes.root}>
         <PatientBanner
