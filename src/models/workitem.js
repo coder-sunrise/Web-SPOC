@@ -6,8 +6,19 @@ export default createBasicModel({
     state: [],
     effects: {
       *getResultDetails({ payload }, { call, put, select }) {
-        console.log(1)
         const r = yield call(service.queryResultDetails, payload)
+        const { status, data = [] } = r
+        if (status === '200') return data
+        return []
+      },
+      *getTestPanelItemWithRefRange({ payload }, { call, put, select }) {
+        const r = yield call(service.getTestPanelItemWithRefRange, payload)
+        const { status, data = [] } = r
+        if (status === '200') return data
+        return []
+      },
+      *getLabResults({ payload }, { call, put, select }) {
+        const r = yield call(service.getLabResults, payload)
         const { status, data = [] } = r
         if (status === '200') return data
         return []
