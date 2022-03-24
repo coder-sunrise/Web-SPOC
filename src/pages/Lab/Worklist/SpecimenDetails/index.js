@@ -65,7 +65,13 @@ const ActionButtons = ({ specimenStatusFK, onStart, onRetest, onVerify }) => {
   )
 }
 
-export const SpecimenDetails = ({ open, id, onClose, onConfirm }) => {
+export const SpecimenDetails = ({
+  open,
+  id,
+  onClose,
+  onConfirm,
+  isReadonly = false,
+}) => {
   const dispatch = useDispatch()
   const cttestcategory = useCodeTable('cttestcategory')
   const ctspecimentype = useCodeTable('ctspecimentype')
@@ -91,7 +97,10 @@ export const SpecimenDetails = ({ open, id, onClose, onConfirm }) => {
   }
 
   const cleanUp = () => {
+    console.log('being clean up')
     form.setFieldsValue({})
+    form.resetFields()
+    setFormValues({})
     setIsResultFullScreen(false)
     setShowModal(false)
     setShowReportRemarks(false)
@@ -110,10 +119,6 @@ export const SpecimenDetails = ({ open, id, onClose, onConfirm }) => {
     if (open && id) {
       querySpecimenDetails()
     }
-
-    return () => {
-      cleanUp()
-    }
   }, [id])
 
   useEffect(() => {
@@ -121,6 +126,7 @@ export const SpecimenDetails = ({ open, id, onClose, onConfirm }) => {
   }, [showModal])
 
   useEffect(() => {
+    form.resetFields() //to ensure to reset fields from previous item.
     form.setFieldsValue(entity)
     setFormValues(entity) //https://github.com/ant-design/ant-design/issues/21829
 
@@ -144,7 +150,6 @@ export const SpecimenDetails = ({ open, id, onClose, onConfirm }) => {
   }
 
   const handleRetest = () => {
-    setShowModal(false)
     setRetestSpecimenPara({
       open: true,
       id: entity.id,
@@ -156,7 +161,6 @@ export const SpecimenDetails = ({ open, id, onClose, onConfirm }) => {
       open: false,
       id: undefined,
     })
-    setShowModal(true)
     querySpecimenDetails()
   }
 
@@ -219,7 +223,7 @@ export const SpecimenDetails = ({ open, id, onClose, onConfirm }) => {
   }
 
   const renderRemarks = () => {
-    if (currentStatus === LAB_SPECIMEN_STATUS.COMPLETED)
+    if (currentStatus === LAB_SPECIMEN_STATUS.COMPLETED || isReadonly)
       return (
         <React.Fragment>
           {formValues.reportRemarks &&
@@ -268,6 +272,13 @@ export const SpecimenDetails = ({ open, id, onClose, onConfirm }) => {
     )
   }
 
+  const resendOrder = () => {
+    dispatch({
+      type: 'worklistSpecimenDetails/resendOrder',
+      payload: { id },
+    })
+  }
+
   console.log('form initial values')
 
   return (
@@ -280,16 +291,19 @@ export const SpecimenDetails = ({ open, id, onClose, onConfirm }) => {
           onClose && onClose()
         }}
         footProps={{
-          extraButtons: [
-            <ActionButtons
-              specimenStatusFK={entity.specimenStatusFK}
-              onStart={handleStart}
-              onVerify={handleVerify}
-              onRetest={handleRetest}
-            />,
-          ],
+          extraButtons: !isReadonly
+            ? [
+                <ActionButtons
+                  specimenStatusFK={entity.specimenStatusFK}
+                  onStart={handleStart}
+                  onVerify={handleVerify}
+                  onRetest={handleRetest}
+                />,
+              ]
+            : [],
           onConfirm:
-            entity.specimenStatusFK !== LAB_SPECIMEN_STATUS.COMPLETED
+            entity.specimenStatusFK !== LAB_SPECIMEN_STATUS.COMPLETED &&
+            !isReadonly
               ? () => {
                   handleSave()
                 }
@@ -341,6 +355,9 @@ export const SpecimenDetails = ({ open, id, onClose, onConfirm }) => {
                         <span>Display Raw Data</span>
                       </Space>
                       <div style={{ flexGrow: 1, textAlign: 'right' }}>
+                        <Button type='link' onClick={resendOrder}>
+                          Resend Order
+                        </Button>
                         <Icon
                           type={
                             isResultFullScreen
@@ -359,8 +376,9 @@ export const SpecimenDetails = ({ open, id, onClose, onConfirm }) => {
                         <EditableTable
                           showRawData={showRawData}
                           isReadonly={
+                            isReadonly ||
                             entity.specimenStatusFK ===
-                            LAB_SPECIMEN_STATUS.COMPLETED
+                              LAB_SPECIMEN_STATUS.COMPLETED
                           }
                         />
                       </Form.Item>
