@@ -1004,7 +1004,7 @@ export const TESTTYPES = {
   AUDIOMETRY: 'Audiometry',
   COLORVISIONTEST: 'ColorVisionTest',
   PREGNANCY: 'Pregnancy',
-  MENSUS: 'Mensus',
+  MENSES: 'Menses',
   R5MCORRECTED: 'Right5mCorrected',
   R50CMCORRECTED: 'Right50cmCorrected',
   L5MCORRECTED: 'Left5mCorrected',

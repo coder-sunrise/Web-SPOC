@@ -417,7 +417,7 @@ const getMedicalCheckupCWorkitemDoctor = (
     ...remainDoctor,
     ...removeDoctor.map(item => ({
       ...item,
-      isDelete: true,
+      isDeleted: true,
     })),
     ...newDoctor.map(item => ({
       doctorProfileFK: item.doctorProfileFK,
@@ -428,8 +428,10 @@ const getMedicalCheckupCWorkitemDoctor = (
     var doctor = visitDoctor.find(
       d => !d.isDeleted && item.doctorProfileFK === d.doctorProfileFK,
     )
-    item.isPrimaryDoctor = doctor.isPrimaryDoctor
-    item.sequence = doctor.sequence
+    if (doctor) {
+      item.isPrimaryDoctor = doctor.isPrimaryDoctor
+      item.sequence = doctor.sequence
+    }
   })
 
   return newMCWorkitemDoctor

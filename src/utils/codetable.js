@@ -395,6 +395,14 @@ const fetchCodeTable = async (code, params, isReturnStatusCode = false) => {
     )
   }
 
+  if (code === 'doctorprofile') {
+    newData = _.orderBy(
+      newData,
+      [source => source.clinicianProfile.name.toUpperCase()],
+      ['asc'],
+    )
+  }
+
   if (isReturnStatusCode === true) {
     return { statusCode, newData }
   }

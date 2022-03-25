@@ -73,6 +73,17 @@ const resourceCapacitySchema = Yup.object().shape({
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
+    const oldCapacity =
+      values.calendarResource.oldCtCalendarResourceCapacity || []
+    const deletedResourceCapacity = restValues.calendarResource.ctCalendarResourceCapacity.filter(
+      csc => csc.id > 0 && csc.isDeleted,
+    )
+    deletedResourceCapacity.forEach(item => {
+      const deleteItem = oldCapacity.find(x => x.id === item.id)
+      item.startTime = deleteItem.startTime
+      item.endTime = deleteItem.endTime
+      item.maxCapacity = deleteItem.maxCapacity
+    })
     dispatch({
       type: 'settingResource/upsert',
       payload: {
@@ -186,8 +197,9 @@ class Detail extends PureComponent {
 
   checkConflictTime = () => {
     const { values } = this.props
-    const resourceCapacity =
+    const resourceCapacity = (
       values.calendarResource?.ctCalendarResourceCapacity || []
+    ).filter(x => !x.isDeleted)
     let containsConflictTime = false
     for (let index = 0; index < resourceCapacity.length; index++) {
       if (

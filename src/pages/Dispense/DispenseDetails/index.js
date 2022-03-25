@@ -1014,6 +1014,7 @@ const DispenseDetails = ({
                   onDrugLabelClick,
                   onActualizeBtnClick,
                   showDrugLabelRemark,
+                  isFromMedicalCheckup,
                 )}
                 data={dispenseItems}
                 TableProps={{
