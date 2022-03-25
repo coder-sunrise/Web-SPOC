@@ -501,6 +501,7 @@ class EditOrder extends Component {
                           acknowledged: e.target.value,
                         })
                       }}
+                      checked
                       label='I hereby confirm the above orders are instructed by the attending physician'
                       {...args}
                     />
