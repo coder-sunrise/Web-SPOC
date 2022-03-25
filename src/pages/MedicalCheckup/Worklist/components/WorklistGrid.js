@@ -282,7 +282,7 @@ const WorklistGrid = ({
               border: '1px solid #ccc',
             }}
           >
-            Temp
+            Temp.
           </div>
         )}
       </div>
