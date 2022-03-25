@@ -201,7 +201,6 @@ export const EditableTable = ({
 
   const checkShouldFlag = (finalResult, refereneceRangeId, testPanelItemId) => {
     const testPanelItem = cttestpanelitem.find(x => x.id === testPanelItemId)
-    debugger
     if (refereneceRangeId === null || refereneceRangeId === undefined)
       return false
 

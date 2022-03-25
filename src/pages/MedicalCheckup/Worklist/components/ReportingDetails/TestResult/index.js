@@ -7,6 +7,7 @@ import BasicData from '@/pages/PatientDatabase/Detail/Results/BasicData'
 import PatientHistory from '@/pages/Widgets/PatientHistory'
 import Examination from './Examination'
 import ExternalService from './ExternalService'
+import LabResults from '@/pages/PatientDatabase/Detail/Results/LabResults'
 
 const TestResult = props => {
   const ctexaminationcategory = useCodeTable('ctexaminationcategory')
@@ -35,7 +36,13 @@ const TestResult = props => {
     {
       id: 1,
       name: 'Lab Result',
-      content: <dix>Lab Result</dix>,
+      content: (
+        <LabResults
+          visitFK={medicalCheckupReportingDetails.visitID}
+          height={height}
+          patientProfileFK={medicalCheckupReportingDetails.patientID}
+        ></LabResults>
+      ),
     },
     {
       id: 2,

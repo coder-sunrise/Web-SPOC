@@ -64,6 +64,16 @@ export default createFormViewModel({
         }
         return status
       },
+      *resendOrder({ payload }, { call, put }) {
+        const status = yield call(service.resendOrder, payload)
+        if (status === 200 || status === 204) {
+          notification.success({
+            message: 'Order has resent to analyzer.',
+          })
+          return true
+        }
+        return status
+      },
     },
     reducers: {},
   },

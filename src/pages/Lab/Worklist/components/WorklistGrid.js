@@ -561,7 +561,6 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
           closeRetestDetails()
         }}
         onConfirm={specimenId => {
-          debugger
           confirmRetestDetails(specimenId)
         }}
       />

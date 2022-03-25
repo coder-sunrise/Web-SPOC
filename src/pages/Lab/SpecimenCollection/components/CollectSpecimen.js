@@ -140,7 +140,6 @@ const CollectSpecimen = ({
   }
 
   const prepareLabWorkitemsByCategory = labWorkitems => {
-    debugger
     setWorkitemsByTestCategory(
       _(
         labWorkitems.map(item => ({
