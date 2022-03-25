@@ -280,6 +280,7 @@ const CalendarView = ({
   onResourceDateChange,
   onUpdateEvent,
   apptTimeSlotDuration = 15,
+  allResources = [],
 }) => {
   changeTimeRulerExtentPixel(apptTimeRulerExtent)
 
@@ -519,10 +520,7 @@ const CalendarView = ({
   }
 
   const renderCell = event => {
-    if (
-      event.elementType === 'monthCells' ||
-      event.elementType === 'dateHeader'
-    ) {
+    if (event.elementType === 'dateHeader') {
       const resource = resources[event.groupIndex]
       if (resource && resource.resourceType === CALENDAR_RESOURCE.RESOURCE) {
         const dailyCapacity = _.orderBy(
@@ -558,9 +556,36 @@ const CalendarView = ({
               }">${balance}</span>`
             })
             .join(', ')
-          event.element.innerHTML = `<div style="position:relative;">${event.element.innerHTML}<div title="${tooltip}" style="position:absolute;right:6px;top:1px;color:black;">Max: ${maxSlot} Bal: ${balanceSlot}</div></div>`
+          event.element.innerHTML = `<div style="position:relative;">${event.element.innerHTML}<div title="${tooltip}" style="position:absolute;right:4px;top:1px;color:black;">Max: ${maxSlot} Bal: ${balanceSlot}</div></div>`
         }
       }
+    } else if (event.elementType === 'monthCells') {
+      let tooltip
+      let resourceList = ''
+      const newAllResources = _.orderBy(
+        allResources || [],
+        ['sortOrder', source => source.name.toUpperCase()],
+        ['asc'],
+      )
+      newAllResources.map((item, index) => {
+        const dailyCapacitys = (
+          item.calendarResourceDailyCapacity || []
+        ).filter(
+          c =>
+            moment(c.dailyDate).format('DD MMM YYYY') ===
+            moment(event.date).format('DD MMM YYYY'),
+        )
+        if (dailyCapacitys.length) {
+          const totalMaxCapacity = _.sumBy(dailyCapacitys, 'maxCapacity')
+          const totalUsedSlot = _.sumBy(dailyCapacitys, 'usedSlot')
+          const totalBalCapacity = totalMaxCapacity - totalUsedSlot
+          tooltip = `${tooltip ? `${tooltip} \n` : ''}${
+            item.name
+          } bal.: ${totalBalCapacity}`
+          resourceList = `${resourceList}<div style="border:1px solid #ccc;display:inline-block;padding:0px 4px;height:20px;">${totalMaxCapacity}</div>`
+        }
+      })
+      event.element.innerHTML = `<div style="position:relative;">${event.element.innerHTML}<div title="${tooltip}" style="position:absolute;right:4px;top:0px;">${resourceList}</div></div>`
     }
   }
 

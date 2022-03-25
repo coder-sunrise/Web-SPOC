@@ -91,6 +91,7 @@ class Appointment extends React.PureComponent {
     showDoctorEventModal: false,
     showSearchAppointmentModal: false,
     resources: [],
+    allResources: [],
     selectedSlot: {},
     filter: {
       search: '',
@@ -245,6 +246,9 @@ class Appointment extends React.PureComponent {
         },
         primaryCalendarResourceFK,
         resources,
+        allResources: (response?.data || []).filter(
+          x => x.resourceType === CALENDAR_RESOURCE.RESOURCE,
+        ),
       }))
     } else {
       this.setState({ filter })
@@ -327,6 +331,9 @@ class Appointment extends React.PureComponent {
     }
     this.setState(() => ({
       resources: newResources.length > 0 ? newResources : [],
+      allResources: (response?.data || []).filter(
+        x => x.resourceType === CALENDAR_RESOURCE.RESOURCE,
+      ),
     }))
   }
 
@@ -624,7 +631,7 @@ class Appointment extends React.PureComponent {
           ...calendarResource,
           calendarResourceFK: calendarResource.id,
           calendarResourceName:
-            calendarResource.resourceType === 'Doctor'
+            calendarResource.resourceType === CALENDAR_RESOURCE.DOCTOR
               ? calendarResource.clinicianProfileDto.shortName ||
                 calendarResource.clinicianProfileDto.name
               : calendarResource.name,
@@ -645,6 +652,9 @@ class Appointment extends React.PureComponent {
     this.setState(() => ({
       filter: { ...updFilter },
       resources: newResources.length > 0 ? newResources : [],
+      allResources: (response?.data || []).filter(
+        x => x.resourceType === CALENDAR_RESOURCE.RESOURCE,
+      ),
     }))
 
     this.props.dispatch({
@@ -830,6 +840,9 @@ class Appointment extends React.PureComponent {
       this.setState(preFilter => ({
         ...preFilter,
         resources: newResources.length > 0 ? newResources : [],
+        allResources: (response?.data || []).filter(
+          x => x.resourceType === CALENDAR_RESOURCE.RESOURCE,
+        ),
       }))
     }
   }
@@ -1016,6 +1029,7 @@ class Appointment extends React.PureComponent {
       eventType,
       showDailyAppointmentListingReport,
       updateEvent,
+      allResources,
     } = this.state
 
     const { currentViewAppointment, mode, calendarView } = CalendarModel
@@ -1049,6 +1063,7 @@ class Appointment extends React.PureComponent {
           <div style={{ marginTop: 16, height: '100%' }}>
             <FuncCalendarView
               resources={resources}
+              allResources={allResources}
               filter={filter}
               handleSelectSlot={this.onSelectSlot}
               handleDoubleClick={this.onDoubleClickEvent}
