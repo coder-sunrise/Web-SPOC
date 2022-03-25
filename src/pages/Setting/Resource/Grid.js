@@ -43,6 +43,7 @@ class Grid extends PureComponent {
           { name: 'description', title: 'Description' },
           { name: 'sortOrder', title: 'Sort Order' },
           { name: 'isActive', title: 'Status' },
+          { name: 'balanceTagColorHex', title: 'Bal. Color' },
           {
             name: 'action',
             title: 'Action',
@@ -56,6 +57,27 @@ class Grid extends PureComponent {
             options: status,
             align: 'center',
             width: 100,
+          },
+          {
+            columnName: 'code',
+            width: 200,
+          },
+          {
+            columnName: 'balanceTagColorHex',
+            width: 100,
+            sortingEnabled: false,
+            render: row => (
+              <div
+                style={{
+                  width: '3rem',
+                  height: '1rem',
+                  borderRadius: '10%',
+                  backgroundColor: row.balanceTagColorHex
+                    ? row.balanceTagColorHex
+                    : '',
+                }}
+              />
+            ),
           },
           {
             columnName: 'sortOrder',
