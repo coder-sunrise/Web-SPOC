@@ -9,6 +9,7 @@ import {
   Input,
   Form,
   Button,
+  Tooltip,
 } from 'antd'
 import Banner from '@/pages/PatientDashboard/Banner'
 import { useSelector, useDispatch } from 'dva'
@@ -346,8 +347,19 @@ export const SpecimenDetails = ({
                     >
                       <Space>
                         <Typography.Text strong style={{ flexGrow: 1 }}>
-                          Final Result:
+                          Final Result
                         </Typography.Text>
+                        <Tooltip title='Final Result History'>
+                          <span
+                            className='material-icons'
+                            style={{ color: 'gray', cursor: 'pointer' }}
+                            onClick={event => {
+                              console.log('Final result history clicked')
+                            }}
+                          >
+                            history
+                          </span>
+                        </Tooltip>
 
                         <Checkbox
                           onChange={e => setShowRawData(e.target.checked)}
