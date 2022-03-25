@@ -12,7 +12,12 @@ const TestResult = props => {
   const ctexaminationcategory = useCodeTable('ctexaminationcategory')
   const ctexaminationitem = useCodeTable('ctexaminationitem')
   const ctindividualcomment = useCodeTable('ctindividualcomment')
-  const { height, setShowResultDetails, medicalCheckupReportingDetails } = props
+  const {
+    height,
+    setShowResultDetails,
+    medicalCheckupReportingDetails,
+    genderFK,
+  } = props
   const options = [
     {
       id: 0,
@@ -23,6 +28,7 @@ const TestResult = props => {
           defaultSelectMedicalCheckup
           visitFK={medicalCheckupReportingDetails.visitID}
           patientProfileFK={medicalCheckupReportingDetails.patientID}
+          genderFK={genderFK}
         />
       ),
     },

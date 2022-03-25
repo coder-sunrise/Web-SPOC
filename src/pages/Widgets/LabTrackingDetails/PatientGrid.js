@@ -59,21 +59,20 @@ class PatientGrid extends PureComponent {
                 clinicSettings={clinicSettings}
                 handlePrint={handlePrintClick}
               />
-              {!readOnly && (
-                <Tooltip title='Edit Patient Lab Result' placement='bottom'>
-                  <Button
-                    size='sm'
-                    onClick={() => {
-                      this.editRow(row)
-                    }}
-                    justIcon
-                    color='primary'
-                    style={{ marginRight: 0 }}
-                  >
-                    <Edit />
-                  </Button>
-                </Tooltip>
-              )}
+              <Tooltip title='Edit Patient Lab Result' placement='bottom'>
+                <Button
+                  size='sm'
+                  onClick={() => {
+                    this.editRow(row)
+                  }}
+                  justIcon
+                  color='primary'
+                  style={{ marginRight: 0 }}
+                  disabled={readOnly}
+                >
+                  <Edit />
+                </Button>
+              </Tooltip>
             </React.Fragment>
           )
         },

@@ -238,48 +238,54 @@ const WorklistGrid = ({
     const statusColor = status.color
     const statusName = status.label
 
-    let subTitle
-
+    let isShowTag
+    let tagBGColor
     if (
       (row.statusFK === MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS ||
         row.statusFK === MEDICALCHECKUP_WORKITEM_STATUS.REPORTING) &&
       (row.lastReportStatus === MEDICALCHECKUP_REPORTSTATUS.PENDINGVERIFY ||
         row.lastReportStatus === MEDICALCHECKUP_REPORTSTATUS.VERIFIED)
     ) {
-      subTitle = `(Temp. Rpt. ${
+      isShowTag = true
+      tagBGColor =
         row.lastReportStatus === MEDICALCHECKUP_REPORTSTATUS.VERIFIED
-          ? 'Completed'
-          : 'Verifying'
-      })`
+          ? '#009933'
+          : '#44A2FF'
     }
     return (
-      <Tag
-        color={statusColor}
-        style={{
-          textAlign: 'center',
-          width: '100%',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          padding: 2,
-        }}
-      >
-        <div>
-          <span>{statusName}</span>
-          {subTitle && (
-            <div
-              style={{
-                height: 10,
-                fontSize: '0.6rem',
-                position: 'relative',
-                top: '-6px',
-              }}
-            >
-              {subTitle}
-            </div>
-          )}
-        </div>
-      </Tag>
+      <div style={{ position: 'relative' }}>
+        <Tag
+          color={statusColor}
+          style={{
+            textAlign: 'center',
+            width: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            padding: 2,
+          }}
+        >
+          {statusName}
+        </Tag>
+        {isShowTag && (
+          <div
+            style={{
+              position: 'absolute',
+              top: -8,
+              right: -6,
+              backgroundColor: tagBGColor,
+              height: 14,
+              fontSize: '0.55rem',
+              padding: '0px 3px',
+              color: 'white',
+              borderRadius: 2,
+              border: '1px solid #ccc',
+            }}
+          >
+            Temp
+          </div>
+        )}
+      </div>
     )
   }
 
@@ -307,7 +313,7 @@ const WorklistGrid = ({
         search: false,
         align: 'center',
         fixed: 'left',
-        width: 130,
+        width: 110,
         render: (item, entity) => {
           return renderWorkitemStatus(entity)
         },

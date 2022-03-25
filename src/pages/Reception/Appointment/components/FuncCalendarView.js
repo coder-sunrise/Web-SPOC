@@ -396,9 +396,11 @@ const CalendarView = ({
         appointmentRemarks,
         appointmentStatusFk,
         bookedByUser,
+        bookedByUserTitle,
         createDate,
         isEditedAsSingleAppointment,
         updateByUser,
+        updateByUserTitle,
         updateDate,
       } = appointment
 
@@ -412,7 +414,9 @@ const CalendarView = ({
         isEnableRecurrence,
         appointmentRemarks,
         appointmentStatusFk,
-        bookedByUser,
+        bookedByUser: `${
+          bookedByUserTitle ? `${bookedByUserTitle} ` : ''
+        }${bookedByUser || ''}`,
         createDate,
         isEditedAsSingleAppointment,
         stageColorHex: appointment.stageColorHex,
@@ -433,13 +437,16 @@ const CalendarView = ({
           `${appointmentDate} ${item.endTime}`,
           `${serverDateFormat} ${timeFormat24Hour}`,
         ).toDate(),
-        updateByUser,
+        updateByUser: `${
+          updateByUserTitle ? `${updateByUserTitle} ` : ''
+        }${updateByUser || ''}`,
         updateDate,
         resourceFK:
           item.calendarResource.resourceType === CALENDAR_RESOURCE.DOCTOR
             ? `Doctor-${item.calendarResource.clinicianProfileDto.id}`
             : `Resource-${item.calendarResource.resourceDto.id}`,
         IsReadonly: isReadonly(appointment),
+        appointmentDate: appointmentDate,
       }))
       return [...events, ...apptEvents]
     }, [])
@@ -569,7 +576,7 @@ const CalendarView = ({
         printDailyAppointmentReport={printDailyAppointmentReport}
         startHour='07:00 AM'
         endHour='22:00 PM'
-        height={820}
+        height={740}
         view={calendarView}
         eventSettings={{
           dataSource: filtered.filter(

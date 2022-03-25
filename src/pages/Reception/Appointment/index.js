@@ -1046,7 +1046,7 @@ class Appointment extends React.PureComponent {
           toggleSearchAppointmentModal={this.toggleSearchAppointmentModal}
         />
         <Authorized authority='appointment.appointmentdetails'>
-          <div style={{ marginTop: 16, minHeight: '80vh', height: '100%' }}>
+          <div style={{ marginTop: 16, height: '100%' }}>
             <FuncCalendarView
               resources={resources}
               filter={filter}
