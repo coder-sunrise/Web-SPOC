@@ -561,13 +561,13 @@ const CalendarView = ({
       }
     } else if (event.elementType === 'monthCells') {
       let tooltip
-      let resourceList = ''
+      let resourceList
       const newAllResources = _.orderBy(
         allResources || [],
         ['sortOrder', source => source.name.toUpperCase()],
         ['asc'],
       )
-      newAllResources.map((item, index) => {
+      newAllResources.map(item => {
         const dailyCapacitys = (
           item.calendarResourceDailyCapacity || []
         ).filter(
@@ -576,16 +576,24 @@ const CalendarView = ({
             moment(event.date).format('DD MMM YYYY'),
         )
         if (dailyCapacitys.length) {
+          const bgResourceColor = item.resourceDto?.balanceTagColorHex
           const totalMaxCapacity = _.sumBy(dailyCapacitys, 'maxCapacity')
           const totalUsedSlot = _.sumBy(dailyCapacitys, 'usedSlot')
           const totalBalCapacity = totalMaxCapacity - totalUsedSlot
           tooltip = `${tooltip ? `${tooltip} \n` : ''}${
             item.name
           } bal.: ${totalBalCapacity}`
-          resourceList = `${resourceList}<div style="border:1px solid #ccc;display:inline-block;padding:0px 4px;height:20px;">${totalMaxCapacity}</div>`
+          resourceList = `${resourceList ? resourceList : ''}<div style="${
+            resourceList ? 'border-left:1px solid #ccc;' : ''
+          }display:inline-block;padding:0px 4px;background-color:${bgResourceColor ||
+            'white'};color:${
+            bgResourceColor ? 'white' : 'black'
+          }">${totalMaxCapacity}</div>`
         }
       })
-      event.element.innerHTML = `<div style="position:relative;">${event.element.innerHTML}<div title="${tooltip}" style="position:absolute;right:4px;top:0px;">${resourceList}</div></div>`
+      if (resourceList) {
+        event.element.innerHTML = `<div style="position:relative;">${event.element.innerHTML}<div title="${tooltip}" style="position:absolute;right:4px;top:0px;border:1px solid #ccc;">${resourceList}</div></div>`
+      }
     }
   }
 
