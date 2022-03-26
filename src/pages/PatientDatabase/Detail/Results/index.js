@@ -52,6 +52,7 @@ const patientResultTabs = props => {
 
 const styles = () => ({})
 
+@connect(({ clinicSettings }) => ({ clinicSettings }))
 class PatientResult extends PureComponent {
   render() {
     const { theme } = this.props

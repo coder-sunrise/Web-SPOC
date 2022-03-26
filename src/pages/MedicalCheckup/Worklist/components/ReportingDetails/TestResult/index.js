@@ -18,6 +18,7 @@ const TestResult = props => {
     setShowResultDetails,
     medicalCheckupReportingDetails,
     genderFK,
+    clinicSettings,
   } = props
   const options = [
     {
@@ -40,6 +41,7 @@ const TestResult = props => {
         <LabResults
           visitFK={medicalCheckupReportingDetails.visitID}
           height={height}
+          clinicSettings={clinicSettings}
           patientProfileFK={medicalCheckupReportingDetails.patientID}
         ></LabResults>
       ),
