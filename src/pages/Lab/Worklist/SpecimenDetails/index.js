@@ -9,6 +9,7 @@ import {
   Input,
   Form,
   Button,
+  Tooltip,
 } from 'antd'
 import Banner from '@/pages/PatientDashboard/Banner'
 import { useSelector, useDispatch } from 'dva'
@@ -35,6 +36,7 @@ import {
   LAB_SPECIMEN_STATUS,
   LAB_SPECIMEN_STATUS_COLORS,
 } from '@/utils/constants'
+import { RetestHistory } from './components/RetestHistory'
 
 const { Panel } = Collapse
 const { TextArea } = Input
@@ -81,6 +83,10 @@ export const SpecimenDetails = ({
   const [formValues, setFormValues] = useState({})
   const [showReportRemarks, setShowReportRemarks] = useState(false)
   const [retestSpecimenPara, setRetestSpecimenPara] = useState({
+    open: false,
+    id: undefined,
+  })
+  const [retestHistoryPara, setRetestHistoryPara] = useState({
     open: false,
     id: undefined,
   })
@@ -162,6 +168,13 @@ export const SpecimenDetails = ({
       id: undefined,
     })
     querySpecimenDetails()
+  }
+
+  const closeRetestHistory = () => {
+    setRetestHistoryPara({
+      open: false,
+      id: undefined,
+    })
   }
 
   const getChangedResults = values =>
@@ -346,8 +359,22 @@ export const SpecimenDetails = ({
                     >
                       <Space>
                         <Typography.Text strong style={{ flexGrow: 1 }}>
-                          Final Result:
+                          Final Result
                         </Typography.Text>
+                        <Tooltip title='Final Result History'>
+                          <span
+                            className='material-icons'
+                            style={{ color: 'gray', cursor: 'pointer' }}
+                            onClick={event => {
+                              setRetestHistoryPara({
+                                open: true,
+                                dataSource: entity.labRetestHistories,
+                              })
+                            }}
+                          >
+                            history
+                          </span>
+                        </Tooltip>
 
                         <Checkbox
                           onChange={e => setShowRawData(e.target.checked)}
@@ -398,6 +425,15 @@ export const SpecimenDetails = ({
         }}
         onConfirm={() => {
           closeRetestSpecimen()
+        }}
+      />
+      <RetestHistory
+        {...retestHistoryPara}
+        onClose={() => {
+          closeRetestHistory()
+        }}
+        onConfirm={() => {
+          closeRetestHisotry()
         }}
       />
     </React.Fragment>

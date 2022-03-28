@@ -399,7 +399,10 @@ html {
   padding: 0 16px;
 }
 .ant-card-body {
-  padding: 8px;
+  padding: 8px !important;
+}
+.ant-pro-card-body {
+  padding: 8px !important;
 }
 .ant-pro-table-search {
   padding: 8px;

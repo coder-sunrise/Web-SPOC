@@ -135,7 +135,7 @@ export const HeaderInfo = ({ entity }) => {
   return (
     <GridContainer>
       <GridItem md={8} style={{ paddingTop: 16 }}>
-        <Typography.Text strong>Specimen Details: </Typography.Text>
+        <Typography.Text strong>Specimen Details </Typography.Text>
       </GridItem>
       <GridItem md={4} style={{ padding: 8, textAlign: 'right' }}>
         <VisitTypeTag type={entity.visitPurposeFK} />
@@ -150,7 +150,7 @@ export const HeaderInfo = ({ entity }) => {
         />
       </GridItem>
       <GridItem md={12} style={{ paddingTop: 16 }}>
-        <Typography.Text strong>Order Details: </Typography.Text>
+        <Typography.Text strong>Order Details </Typography.Text>
       </GridItem>
       <GridItem md={12} style={{ padding: 8 }}>
         <Table
