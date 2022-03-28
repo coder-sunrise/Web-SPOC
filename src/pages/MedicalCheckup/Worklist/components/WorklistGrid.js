@@ -509,7 +509,7 @@ const WorklistGrid = ({
   const columns = defaultColumns()
   const height = window.innerHeight - 350
   return (
-    <Card>
+    <div style={{ backgroundColor: 'white', paddingTop: 8, marginTop: 2 }}>
       <div style={{ display: 'flex', alignItems: 'start' }}>
         <StatusFilter
           defaultSelection={allMedicalCheckupReportStatuses}
@@ -556,7 +556,7 @@ const WorklistGrid = ({
       >
         <VisitForms formCategory={FORM_CATEGORY.CORFORM} />
       </CommonModal>
-    </Card>
+    </div>
   )
 }
 
