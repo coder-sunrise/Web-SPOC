@@ -284,7 +284,7 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
   notDirtyDuration: 3,
   displayName: 'BillingForm',
   enableReinitialize: true,
-  mapPropsToValues: ({ billing, clinicSettings, patient }) => {
+  mapPropsToValues: ({ billing, clinicSettings }) => {
     const { autoPrintReportsOnCompletePayment = '' } = clinicSettings
     try {
       if (billing.entity) {
@@ -315,7 +315,7 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
           autoPrintReportsOnCompletePayment: autoPrintReportsOnCompletePayment.split(
             ',',
           ),
-          patientID: patient.id,
+          patientID: billing.patientID,
         }
         return values
       }
