@@ -271,7 +271,7 @@ const WorklistGrid = ({
           <div
             style={{
               position: 'absolute',
-              top: -8,
+              top: -6,
               right: -6,
               backgroundColor: tagBGColor,
               height: 14,
