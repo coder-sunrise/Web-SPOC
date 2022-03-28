@@ -1054,7 +1054,7 @@ export const MEDICALCHECKUP_WORKITEM_STATUSES = [
   {
     id: MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED,
     label: 'Completed',
-    color: '#009933',
+    color: '#007D00',
     description: 'Completed',
   },
 ]

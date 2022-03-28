@@ -249,7 +249,7 @@ const WorklistGrid = ({
       isShowTag = true
       tagBGColor =
         row.lastReportStatus === MEDICALCHECKUP_REPORTSTATUS.VERIFIED
-          ? '#009933'
+          ? '#007D00'
           : '#44A2FF'
     }
     return (
