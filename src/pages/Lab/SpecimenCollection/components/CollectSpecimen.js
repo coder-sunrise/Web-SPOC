@@ -114,6 +114,7 @@ const CollectSpecimen = ({
         item => item.statusFK === LAB_WORKITEM_STATUS.NEW,
       ),
     )
+    form.resetFields()
     form.setFieldsValue({
       specimenCollectionDate: moment(),
       dateReceived: enableReceiveSpecimen ? moment() : undefined,
