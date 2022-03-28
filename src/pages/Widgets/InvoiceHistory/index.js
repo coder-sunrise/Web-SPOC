@@ -161,7 +161,8 @@ const InvoiceHistory = ({
       invoiceDetail = {},
     } = row
     const { visitOrderTemplateFK } = invoiceDetail
-
+ 
+    const [showPrintInvoiceMenu, setShowPrintInvoiceMenu] = useState(false)
     return (
       <GridContainer>
         <GridItem sm={12}>
@@ -189,27 +190,29 @@ const InvoiceHistory = ({
               {visitOrderTemplateFK && (
                 <Popover
                   icon={null}
-                  trigger='hover'
+                  trigger='click'
                   placement='left'
+                  visible={showPrintInvoiceMenu}
                   content={
-                    <MenuList
-                      role='menu'
-                      onClick={() => setShowPrintInvoiceMenu(false)}
-                    >
+                    <MenuList role='menu'>
                       <MenuItem
-                        onClick={() =>
+                        onClick={e => {
+                          e.stopPropagation()
+                          setShowPrintInvoiceMenu(false)
                           toggleReport(row, INVOICE_REPORT_TYPES.SUMMARYINVOICE)
-                        }
+                        }}
                       >
                         Summary Invoice
                       </MenuItem>
                       <MenuItem
-                        onClick={() =>
+                        onClick={e => {
+                          e.stopPropagation()
+                          setShowPrintInvoiceMenu(false)
                           toggleReport(
                             row,
                             INVOICE_REPORT_TYPES.INDIVIDUALINVOICE,
                           )
-                        }
+                        }}
                       >
                         Individual Invoice
                       </MenuItem>
@@ -221,6 +224,7 @@ const InvoiceHistory = ({
                     color='primary'
                     icon
                     onClick={event => {
+                      setShowPrintInvoiceMenu(true)
                       event.stopPropagation()
                     }}
                   >
