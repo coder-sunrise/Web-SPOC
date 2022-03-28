@@ -4,7 +4,7 @@ import { Popover } from 'antd'
 // This component is for display visit order template details.
 // Has 2 kinds of data source, one is from order cart, one is from persisted VisitOrderTemplateDetails in visit table(need to extract the information first)
 const VisitOrderTemplateIndicateString = props => {
-  const { visitOrderTemplateDetails } = props
+  const { visitOrderTemplateDetails, oneline } = props
   let indicate = props.indicate
   if (visitOrderTemplateDetails) {
     const removedItemIndex = visitOrderTemplateDetails.indexOf(' - ')
@@ -38,7 +38,7 @@ const VisitOrderTemplateIndicateString = props => {
     }
   }
   const indicateStringContent = (
-    <span className='threeline_textblock'>
+    <span className={oneline ? '' : 'threeline_textblock'}>
       {indicate?.indicateString ? (
         <span>{indicate.indicateString}</span>
       ) : (
