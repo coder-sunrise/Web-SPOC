@@ -9,6 +9,7 @@ import {
 } from '@material-ui/core'
 // ant design
 import { InputNumber } from 'antd'
+import _ from 'lodash'
 // common components
 import { Button, Popper, IconButton } from '@/components'
 import { REPORT_ID } from '@/utils/constants'
@@ -71,8 +72,13 @@ const PatientLabelButton = ({
     const { labelPrinterSize } = clinicSettings
 
     const reportID =
-      REPORT_ID[labelType.concat('_').concat(sizeConverter(labelPrinterSize))]
-
+      REPORT_ID[
+        labelType
+          .concat('_')
+          .concat(sizeConverter(labelPrinterSize))
+          .toString()
+          .toUpperCase()
+      ]
     const data = await getRawData(reportID, { patientId })
     const payload = [
       {
