@@ -6,7 +6,8 @@ import { withStyles } from '@material-ui/core'
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
 import { getBizSession } from '@/services/queue'
-import { Tag, Input, Tooltip } from 'antd'
+import { Tag, Input } from 'antd'
+import { Tooltip } from '@/components'
 import { PlusOutlined } from '@ant-design/icons'
 import {
   GridContainer,
@@ -799,19 +800,29 @@ class Detail extends PureComponent {
                 </GridItem>
                 {settings.isEnableMedicalCheckupModule && (
                   <GridItem xs={6}>
-                    <FastField
-                      name='examinationItemFK'
-                      render={args => {
-                        return (
-                          <CodeSelect
-                            label='Examination'
-                            code='ctexaminationitem'
-                            labelField='displayValue'
-                            {...args}
-                          />
-                        )
-                      }}
-                    />
+                    <Tooltip
+                      title='Name (JP) will display in report and printout.'
+                      placement='bottom-start'
+                    >
+                      <div>
+                        <FastField
+                          name='examinationItemFK'
+                          render={args => {
+                            return (
+                              <CodeSelect
+                                label='Medical Checkup Examination'
+                                code='ctexaminationitem'
+                                labelField='displayValue'
+                                allClear={true}
+                                maxTagCount={0}
+                                mode='multiple'
+                                {...args}
+                              />
+                            )
+                          }}
+                        />
+                      </div>
+                    </Tooltip>
                   </GridItem>
                 )}
                 {settings.isEnableMedisave && (
