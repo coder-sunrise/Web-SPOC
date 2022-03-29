@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'dva'
 import moment from 'moment'
 import _ from 'lodash'
 import { history } from 'umi'
-import { Menu, Dropdown, Space, Typography, Card, Tag, Tooltip } from 'antd'
+import { Menu, Dropdown, Space, Typography, Card, Tag } from 'antd'
 import {
   MEDICALCHECKUP_WORKITEM_STATUS,
   MEDICALCHECKUP_WORKITEM_STATUSES,
@@ -25,6 +25,7 @@ import {
   Button,
   Popover,
   dateFormatLong,
+  Tooltip,
 } from '@/components'
 import { ProTable } from '@medisys/component'
 import { GridContextMenuButton as GridButton } from 'medisys-components'
@@ -367,13 +368,30 @@ const WorklistGrid = ({
         render: (_dom, entity) => {
           if (entity.reportPriority === 'Urgent') {
             return (
-              <span>
-                <Icon
-                  type='thunder'
-                  style={{ fontSize: 15, color: 'red', alignSelf: 'center' }}
-                />
-                <span>{entity.urgentReportRemarks}</span>
-              </span>
+              <Tooltip title={entity.urgentReportRemarks}>
+                <div style={{ position: 'relative', paddingLeft: 15 }}>
+                  <Icon
+                    type='thunder'
+                    style={{
+                      fontSize: 15,
+                      color: 'red',
+                      alignSelf: 'center',
+                      position: 'absolute',
+                      left: 0,
+                      top: 2,
+                    }}
+                  />
+                  <div
+                    style={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {entity.urgentReportRemarks}
+                  </div>
+                </div>
+              </Tooltip>
             )
           }
           return ''
@@ -386,6 +404,21 @@ const WorklistGrid = ({
         sorter: false,
         search: false,
         width: 200,
+        render: (_dom, entity) => {
+          return (
+            <Tooltip title={entity.visitOrderTemplateName}>
+              <div
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {entity.visitOrderTemplateName || '-'}
+              </div>
+            </Tooltip>
+          )
+        },
       },
       {
         key: 'visitDate',
@@ -464,6 +497,21 @@ const WorklistGrid = ({
         sorter: false,
         search: false,
         width: 250,
+        render: (_dom, entity) => {
+          return (
+            <Tooltip title={entity.visitRemarks}>
+              <div
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {entity.visitRemarks || '-'}
+              </div>
+            </Tooltip>
+          )
+        },
       },
       {
         key: 'action',
