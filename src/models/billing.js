@@ -70,6 +70,14 @@ export default createFormViewModel({
       *initState({ payload }, { select, put, take }) {
         const queueLogState = yield select(st => st.queueLog)
 
+        yield put({
+          type: 'updateState',
+          payload: {
+            visitID: payload.visitID,
+            patientID: payload.pid,
+          },
+        })
+
         if (payload.visitID) {
           yield put({
             type: 'billing/query',
@@ -78,7 +86,7 @@ export default createFormViewModel({
             },
           })
         }
-        
+
         if (payload.pid) {
           yield put({
             type: 'patient/query',
@@ -103,14 +111,6 @@ export default createFormViewModel({
             type: 'visitRegistration/query',
             payload: { id: payload.qid, version: payload.v },
           })
-
-        yield put({
-          type: 'updateState',
-          payload: {
-            visitID: payload.visitID,
-            patientID: payload.pid,
-          },
-        })
       },
       *showDispenseDetails({ payload }, { select, put }) {
         return yield put({
