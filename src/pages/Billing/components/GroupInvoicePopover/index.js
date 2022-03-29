@@ -40,7 +40,7 @@ const GroupInvoicesPopover = ({ classes, visitGroup, patientID }) => {
         if (r) {
           var filterOutSelf = r.filter(x=> x.patientProfileFK !== patientID)
           var sorted = _.orderBy(filterOutSelf,['queueNo'],['asc'])
-          setVisitGroupStatusDetails(r)
+          setVisitGroupStatusDetails(sorted)
         }
       })
       setShow(true)
