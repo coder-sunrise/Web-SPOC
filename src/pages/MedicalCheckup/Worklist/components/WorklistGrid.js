@@ -493,13 +493,15 @@ const WorklistGrid = ({
           }
           return (
             <Tooltip title='More Actions'>
-              <GridButton
-                row={entity}
-                contextMenuOptions={menus.filter(
-                  m => entity.isExistsVerifiedReport || m.id !== 4,
-                )}
-                onClick={handleMenuItemClick}
-              />
+              <div>
+                <GridButton
+                  row={entity}
+                  contextMenuOptions={menus.filter(
+                    m => entity.isExistsVerifiedReport || m.id !== 4,
+                  )}
+                  onClick={handleMenuItemClick}
+                />
+              </div>
             </Tooltip>
           )
         },
