@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'dva'
 import moment from 'moment'
 import _ from 'lodash'
 import { history, connect } from 'umi'
-import { Card, Tooltip, Button } from 'antd'
+import { Card, Button } from 'antd'
 import { WORK_ITEM_TYPES } from '@/utils/constants'
 import NurseWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/NurseWorkItemInfo'
 import RadioWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/RadioWorkItemInfo'
@@ -16,6 +16,7 @@ import {
   TextField,
   Select,
   DatePicker,
+  Tooltip,
 } from '@/components'
 import { ProTable } from '@medisys/component'
 import service from './services'
@@ -134,13 +135,30 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         render: (_dom, entity) => {
           if (entity.reportPriority === 'Urgent') {
             return (
-              <span>
-                <Icon
-                  type='thunder'
-                  style={{ fontSize: 15, color: 'red', alignSelf: 'center' }}
-                />
-                <span>{entity.urgentReportRemarks}</span>
-              </span>
+              <Tooltip title={entity.urgentReportRemarks}>
+                <div style={{ position: 'relative', paddingLeft: 15 }}>
+                  <Icon
+                    type='thunder'
+                    style={{
+                      fontSize: 15,
+                      color: 'red',
+                      alignSelf: 'center',
+                      position: 'absolute',
+                      left: 0,
+                      top: 2,
+                    }}
+                  />
+                  <div
+                    style={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {entity.urgentReportRemarks}
+                  </div>
+                </div>
+              </Tooltip>
             )
           }
           return ''
@@ -153,6 +171,21 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         sorter: false,
         search: false,
         width: 200,
+        render: (_dom, entity) => {
+          return (
+            <Tooltip title={entity.visitOrderTemplateName}>
+              <div
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {entity.visitOrderTemplateName || '-'}
+              </div>
+            </Tooltip>
+          )
+        },
       },
       {
         key: 'visitDate',
