@@ -93,7 +93,10 @@ const testPanelSchema = Yup.object().shape({
       serviceCenterList: allServiceCenters,
       entity = {},
     } = settingClinicService
-    const { ctServiceCenter_ServiceNavigation: currentServiceCenters } = entity
+    const {
+      ctServiceCenter_ServiceNavigation: currentServiceCenters,
+      ctService_ExaminationItem,
+    } = entity
 
     const returnValue =
       settingClinicService.entity || settingClinicService.default
@@ -106,13 +109,13 @@ const testPanelSchema = Yup.object().shape({
         ctServiceCenter_ServiceNavigation[0].isDefault = true
       }
     }
-
     return {
       ...returnValue,
       hasInternalLabServiceCenter: checkAnyInternalLabServiceCenter(
         currentServiceCenters,
         allServiceCenters,
       ),
+      examinationItems: ctService_ExaminationItem.map(x => x.examinationItemFK),
     }
   },
 
@@ -637,6 +640,35 @@ class Detail extends PureComponent {
     setFieldValue('ctService_Tag', [...currentTags, ...deletedTags])
   }
 
+  handleExaminationItemChange = examinationItems => {
+    const { setFieldValue } = this.props
+    const {
+      ctService_ExaminationItem: originalExaminationItems = [],
+      id: serviceId,
+    } = this.props.initialValues
+
+    const currentExaminations = examinationItems.map(t => {
+      return {
+        serviceFK: serviceId,
+        examinationItemFK: t,
+        isDeleted: false,
+        ...originalExaminationItems.find(x => x.examinationItemFK === t),
+      }
+    })
+
+    console.log(originalExaminationItems)
+    const deletedExaminationItems = originalExaminationItems
+      .filter(t => !examinationItems.includes(t.examinationItemFK))
+      .map(t => {
+        return { ...t, isDeleted: true }
+      })
+
+    console.log([...currentExaminations, ...deletedExaminationItems])
+    setFieldValue('ctService_ExaminationItem', [
+      ...currentExaminations,
+      ...deletedExaminationItems,
+    ])
+  }
   computeHiddenFields = rows => {
     const serviceSettings = rows.filter(r => !r.isDeleted)
 
@@ -801,12 +833,12 @@ class Detail extends PureComponent {
                 {settings.isEnableMedicalCheckupModule && (
                   <GridItem xs={6}>
                     <Tooltip
-                      title='Name (JP) will display in report and printout.'
-                      placement='bottom-start'
+                      title='When this service is ordered in Medical Checkup, comment for this service will be written in the selected examination'
+                      placement='right-start'
                     >
                       <div>
                         <FastField
-                          name='examinationItemFK'
+                          name='examinationItems'
                           render={args => {
                             return (
                               <CodeSelect
@@ -816,6 +848,9 @@ class Detail extends PureComponent {
                                 allClear={true}
                                 maxTagCount={0}
                                 mode='multiple'
+                                onChange={v => {
+                                  this.handleExaminationItemChange(v)
+                                }}
                                 {...args}
                               />
                             )
