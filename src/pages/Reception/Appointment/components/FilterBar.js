@@ -129,8 +129,8 @@ const FilterBar = props => {
                 <Authorized authority='appointment.viewotherappointment'>
                   <CodeSelect
                     {...args}
-                    disableAll
                     allowClear={false}
+                    all={-99}
                     label='Filter by Resource'
                     mode='multiple'
                     localFilter={option => option.isActive}
