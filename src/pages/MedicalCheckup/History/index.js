@@ -165,49 +165,6 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
           entity.visitDate?.format(dateFormatLongWithTimeNoSec) || '-',
       },
       {
-        key: 'workItem',
-        title: 'Work Item',
-        dataIndex: 'workItem',
-        sorter: false,
-        search: false,
-        width: 160,
-        render: (item, entity) => {
-          const dispatch = useDispatch()
-          const workItemSummary = JSON.parse(entity.workItemSummary || '[]')
-          const radioWorkItems =
-            workItemSummary.find(t => t.type === WORK_ITEM_TYPES.RADIOLOGY) ||
-            {}
-          const labWorkItems =
-            workItemSummary.find(t => t.type === WORK_ITEM_TYPES.LAB) || {}
-          const nurseWorkItems =
-            workItemSummary.find(
-              t => t.type === WORK_ITEM_TYPES.NURSEACTUALIZE,
-            ) || {}
-          return (
-            <div style={{ justifyContent: 'space-between' }}>
-              {labWorkItems && labWorkItems.totalWorkItem > 0 && (
-                <LabWorkItemInfo
-                  visitFK={entity.visitFK}
-                  workItemSummary={labWorkItems}
-                />
-              )}
-              {radioWorkItems && radioWorkItems.totalWorkItem > 0 && (
-                <RadioWorkItemInfo
-                  visitFK={entity.visitFK}
-                  workItemSummary={radioWorkItems}
-                />
-              )}
-              {nurseWorkItems && nurseWorkItems.totalWorkItem > 0 && (
-                <NurseWorkItemInfo
-                  visitFK={entity.visitFK}
-                  workItemSummary={nurseWorkItems}
-                />
-              )}
-            </div>
-          )
-        },
-      },
-      {
         key: 'medicalCheckupWorkitemDoctor',
         title: 'Doctor',
         dataIndex: 'medicalCheckupWorkitemDoctor',
@@ -240,30 +197,22 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         },
       },
       {
-        key: 'verifiedDate',
-        title: 'Verified Date',
-        dataIndex: 'verifiedDate',
+        key: 'completedDate',
+        title: 'Completed Date',
+        dataIndex: 'completedDate',
         render: (_dom, entity) =>
-          entity.verifiedDate?.format(dateFormatLongWithTimeNoSec) || '-',
+          entity.completedDate?.format(dateFormatLongWithTimeNoSec) || '-',
         sorter: false,
         search: false,
         width: 140,
       },
       {
-        key: 'verifiedByUser',
-        title: 'Verified By',
-        dataIndex: 'verifiedByUser',
+        key: 'completedByUser',
+        title: 'Completed By',
+        dataIndex: 'completedByUser',
         sorter: false,
         search: false,
         width: 180,
-      },
-      {
-        key: 'visitRemarks',
-        title: 'Visit Remarks',
-        dataIndex: 'visitRemarks',
-        sorter: false,
-        search: false,
-        width: 250,
       },
       {
         key: 'action',
