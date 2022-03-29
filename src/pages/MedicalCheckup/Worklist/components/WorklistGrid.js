@@ -507,9 +507,9 @@ const WorklistGrid = ({
     ]
   }
   const columns = defaultColumns()
-  const height = window.innerHeight - 350
+  const height = window.innerHeight - 280
   return (
-    <div style={{ backgroundColor: 'white', paddingTop: 8, marginTop: 2 }}>
+    <div style={{ backgroundColor: 'white', paddingTop: 12, marginTop: 2 }}>
       <div style={{ display: 'flex', alignItems: 'start' }}>
         <StatusFilter
           defaultSelection={allMedicalCheckupReportStatuses}
@@ -522,7 +522,7 @@ const WorklistGrid = ({
           style={{
             flexGrow: 1,
             justifyContent: 'end',
-            marginBottom: 10,
+            marginBottom: 4,
           }}
           onFilterChange={selected => setFilteredStatuses(selected)}
         />
