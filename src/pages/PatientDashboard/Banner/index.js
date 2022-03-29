@@ -20,6 +20,7 @@ import SelectPreOrder from '@/pages/Reception/Appointment/components/form/Select
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import { MoreButton, LoadingWrapper } from '@/components/_medisys'
 import PrintLabLabelButton from '@/components/_medisys/PatientInfoSideBanner/PatientLabelBtn'
+import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 import {
   GridContainer,
   GridItem,
@@ -1404,18 +1405,16 @@ class Banner extends PureComponent {
           <span className={classes.header}>Visit Purpose: </span>
         </Col>
         <Col flex='auto' className={contentClass}>
-          <Tooltip
-            enterDelay={100}
-            title={
-              visitRegistration?.entity?.visit?.visitOrderTemplateDetails || '-'
-            }
-            interactive='true'
-          >
-            <span>
-              {visitRegistration?.entity?.visit?.visitOrderTemplateDetails ||
-                '-'}
-            </span>
-          </Tooltip>
+          {visitRegistration?.entity?.visit?.visitOrderTemplateDetails ? (
+            <VisitOrderTemplateIndicateString
+              oneline
+              visitOrderTemplateDetails={
+                visitRegistration?.entity?.visit?.visitOrderTemplateDetails
+              }
+            ></VisitOrderTemplateIndicateString>
+          ) : (
+            <span>-</span>
+          )}
         </Col>
       </Row>
     )

@@ -12,11 +12,7 @@ import { AESEncryptor } from '@/utils/aesEncryptor'
 import { getUniqueGUID } from '@/utils/utils'
 import Scanner from './scanner/index'
 
-const defaultSocketPortsState = [
-  7182,
-  7183,
-  7184,
-]
+const defaultSocketPortsState = [7182, 7183, 7184]
 const WebSocketMessageType = {
   Print: 1,
   Scan: 2,
@@ -26,9 +22,9 @@ const WebSocketMessageType = {
   AutoUpdate: 99,
 }
 
-const withWebSocket = () => (Component) => {
+const withWebSocket = () => Component => {
   class WebSocketBase extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props)
       this.state = {
         pendingJob: [],
@@ -43,7 +39,7 @@ const withWebSocket = () => (Component) => {
       this.tryConnectSocket()
     }
 
-    componentWillUnmount () {
+    componentWillUnmount() {
       const { isWsConnected } = this.state
 
       if (this.wsConnection && isWsConnected === true) this.wsConnection.close()
@@ -64,8 +60,9 @@ const withWebSocket = () => (Component) => {
         if (this.wsConnection.readyState === 1) {
           this.wsConnection.send(content)
           sendSuccess = true
-        } 
-      } else if (!autoupdate) {
+        }
+      }  
+      if (!sendSuccess && !autoupdate) {
         notification.error({
           message: `Medicloud printing tool is not running, please start it.`,
         })
@@ -83,7 +80,6 @@ const withWebSocket = () => (Component) => {
       }
       const { printToolSocketURL = '' } = settings
       const [prefix = '', ip = ''] = printToolSocketURL.split(':')
-
       for (let index = 0; index < defaultSocketPortsState.length; index++) {
         const port = defaultSocketPortsState[index]
         const wsUrl = `${prefix}:${ip}:${port}`
@@ -95,6 +91,9 @@ const withWebSocket = () => (Component) => {
             this.setState({
               isWsConnected: true,
             })
+          }
+          this.wsConnection.onclose = () => {
+            this.setState({ isWsConnected: false })
           }
           this.wsConnection.onmessage = this.onReceivedMessage
           connected = await this.connectionAsync(this.wsConnection)
@@ -125,7 +124,7 @@ const withWebSocket = () => (Component) => {
       return false
     }
 
-    handlePreviewReport = async (content) => {
+    handlePreviewReport = async content => {
       if (content) {
         const result = await this.prepareJobForWebSocket(
           AESEncryptor.encrypt(
@@ -140,7 +139,7 @@ const withWebSocket = () => (Component) => {
       return false
     }
 
-    onReceivedMessage = (message) => {
+    onReceivedMessage = message => {
       if (message && message.data) {
         const { data } = message
         const returnMessage = JSON.parse(data)
@@ -163,7 +162,7 @@ const withWebSocket = () => (Component) => {
         } else if (MessageType === WebSocketMessageType.Scan) {
           const { Image, FileExtension } = Data
 
-          this.setState((preState) => ({
+          this.setState(preState => ({
             scanResults: [
               ...preState.scanResults,
               {
@@ -185,7 +184,7 @@ const withWebSocket = () => (Component) => {
       }
     }
 
-    handleScaning = async (params) => {
+    handleScaning = async params => {
       // console.log('handleScaning', params)
       let jsonStr = JSON.stringify({
         MessageType: WebSocketMessageType.Scan,
@@ -197,7 +196,7 @@ const withWebSocket = () => (Component) => {
       if (result) this.setState({ loading: true })
     }
 
-    handleDeleteItem = (uid) => {
+    handleDeleteItem = uid => {
       const { scanResults = [] } = this.state
       scanResults.forEach((o, index) => {
         if (o.uid === uid) scanResults.splice(index, 1)
@@ -206,10 +205,10 @@ const withWebSocket = () => (Component) => {
       this.setState({ scanResults })
     }
 
-    handleUpdateName = (row) => {
+    handleUpdateName = row => {
       const { uid, name } = row
-      this.setState((prevState) => ({
-        scanResults: prevState.scanResults.map((m) => {
+      this.setState(prevState => ({
+        scanResults: prevState.scanResults.map(m => {
           if (m.uid === uid) {
             return { ...m, name }
           }
@@ -218,7 +217,7 @@ const withWebSocket = () => (Component) => {
       }))
     }
 
-    handleUploading = (imgDatas) => {
+    handleUploading = imgDatas => {
       // console.log(this._CompRef)
       if (this._CompRef && this._CompRef.onUploadFromScan)
         this._CompRef.onUploadFromScan(imgDatas)
@@ -236,14 +235,14 @@ const withWebSocket = () => (Component) => {
       const ttl = timeout / intrasleep // time to loop
       let loop = 0
       while (socket.readyState === WebSocket.CONNECTING && loop < ttl) {
-        await new Promise((resolve) => setTimeout(resolve, intrasleep))
+        await new Promise(resolve => setTimeout(resolve, intrasleep))
         loop += 1
       }
       return isOpened()
     }
 
     toggleModal = () => {
-      this.setState((preState) => ({
+      this.setState(preState => ({
         showScanner: !preState.showScanner,
         loading: false,
         scanResults: [],
@@ -260,13 +259,15 @@ const withWebSocket = () => (Component) => {
     versionCheck = async () => {
       try {
         const token = localStorage.getItem('token')
-        const response = await request(`/api/files/downloadlink?key=AutoUpdatePrintingToolDownloadLinkSection`, {
-          method: 'GET',
-        })
+        const response = await request(
+          `/api/files/downloadlink?key=AutoUpdatePrintingToolDownloadLinkSection`,
+          {
+            method: 'GET',
+          },
+        )
         const { data, status } = response
         if (status === '200') {
-          let payload =
-          {
+          let payload = {
             Token: token,
             BaseUrl: process.env.url,
             SigningLink: data,
@@ -277,19 +278,19 @@ const withWebSocket = () => (Component) => {
                 messageType: WebSocketMessageType.AutoUpdate,
                 message: JSON.stringify(payload),
               }),
-            ), true
+            ),
+            true,
           )
           return result
         }
         return false
-
       } catch (error) {
         console.log(error)
         return false
       }
     }
 
-    render () {
+    render() {
       const {
         pendingJob = [],
         scanResults = [],
@@ -308,7 +309,7 @@ const withWebSocket = () => (Component) => {
             handleOpenScanner={this.requestOpenScan}
             handlePreviewReport={this.handlePreviewReport}
             sendingJob={pendingJob.length > 0}
-            onRef={(child) => {
+            onRef={child => {
               this._CompRef = child
             }}
           />
@@ -331,25 +332,23 @@ const withWebSocket = () => (Component) => {
               >
                 <div
                   style={
-                    loading ? (
-                      {
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        zIndex: 1200,
-                        '& h4': {
-                          fontWeight: 500,
-                        },
-                      }
-                    ) : (
-                        { display: 'none' }
-                      )
+                    loading
+                      ? {
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          zIndex: 1200,
+                          '& h4': {
+                            fontWeight: 500,
+                          },
+                        }
+                      : { display: 'none' }
                   }
                 >
                   <CircularProgress />
