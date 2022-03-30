@@ -365,7 +365,7 @@ class Billing extends Component {
         const { visitID, senderId } = response
         if (visitID) {
           const { values, dispatch } = this.props
-          if (values.visitId === visitID) {
+          if (values.visitGroupStatusDetails.some(x=>x.visitFK === visitID)) {
             const {
               isGroupPrint,
               showReport,
@@ -377,7 +377,9 @@ class Billing extends Component {
               (isGroupPrint && reportID === 89 && showReport) ||
               (isGroupPayment && showAddPaymentModal)
             ) {
+              notification.destroy()
               notification.error({
+                duration: 999,
                 message: `The status for one of the invoices had been changed. Please check all invoices is in billing status and the billing is saved.`,
               })
               this.setState({ disabledPayment: true })
