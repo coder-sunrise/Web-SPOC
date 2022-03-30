@@ -623,7 +623,10 @@ export default createListViewModel({
       *filterCalendar({ payload }, { all, select, put }) {
         const calendarState = yield select(state => state.calendar)
         const { search, dob, doctor = [], appType = [] } = payload
-        const { targetDate, targetView } = calendarState
+        const {
+          currentViewDate: targetDate,
+          calendarView: targetView,
+        } = calendarState
 
         let start
         let end
