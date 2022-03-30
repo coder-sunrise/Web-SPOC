@@ -179,12 +179,14 @@ class UserRole extends React.Component {
       isEnablePharmacyModule,
       isEnableLabModule,
       isEnableNurseWorkItem,
+      isEnableMedicalCheckupModule,
     } = clinicSettings.settings
     let filterArray = [CLINICAL_ROLE.DOCTOR, CLINICAL_ROLE.OTHERS]
     if (isEnableRadiologyModule) filterArray.push(CLINICAL_ROLE.RADIOGRAPHER)
     if (isEnablePharmacyModule) filterArray.push(CLINICAL_ROLE.PHARMACIST)
     if (isEnableLabModule) filterArray.push(CLINICAL_ROLE.LABTECH)
     if (isEnableNurseWorkItem) filterArray.push(CLINICAL_ROLE.NURSE)
+    if (isEnableMedicalCheckupModule) filterArray.push(CLINICAL_ROLE.PRO)
 
     return (
       <CardContainer hideHeader>
