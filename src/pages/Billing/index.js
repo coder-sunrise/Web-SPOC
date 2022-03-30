@@ -365,7 +365,7 @@ class Billing extends Component {
         const { visitID, senderId } = response
         if (visitID) {
           const { values, dispatch } = this.props
-          if (values.visitGroupStatusDetails.some(x=>x.visitFK === visitID)) {
+          if (values.visitGroupStatusDetails?.some(x=>x.visitFK === visitID)) {
             const {
               isGroupPrint,
               showReport,
