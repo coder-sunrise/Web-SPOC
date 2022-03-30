@@ -60,18 +60,13 @@ const ReportingDoctorTag = ({
   ) {
     reportingDoctorColor = '#33CC00'
   }
-  const title =
-    medicalCheckupDoctor.title && medicalCheckupDoctor.title.trim().length
-      ? `${medicalCheckupDoctor.title}.`
-      : ''
-  const name = `${title}${medicalCheckupDoctor.name}`
   const isDoctor =
     user.data.clinicianProfile.userProfile.role?.clinicRoleFK === 1
 
   const getDoctorTag = () => {
     return (
       <div>
-        <Tooltip title={name}>
+        <Tooltip title={medicalCheckupDoctor.name}>
           <Tag
             icon={
               medicalCheckupDoctor.status == 'Verified' ? (
@@ -83,9 +78,8 @@ const ReportingDoctorTag = ({
             className={classes.tag}
             style={{ cursor: isShowMessage ? 'pointer' : 'default' }}
             color={reportingDoctorColor}
-            //onClick={queryNotifications}
           >
-            {name}
+            {medicalCheckupDoctor.name}
           </Tag>
         </Tooltip>
       </div>
