@@ -11,6 +11,7 @@ import {
   CodeSelect,
   DateRangePicker,
   withFormikExtend,
+  Tooltip,
   Select,
 } from '@/components'
 import { ReportDateRangePicker } from '@/pages/Report/ReportDateRangePicker'
@@ -49,12 +50,6 @@ const searchResult = (values, props) => {
     doctorIDs: doctorIDs,
     status: status,
   }
-  console.log(payload)
-  return
-  dispatch({
-    type: 'labTrackingDetails/query',
-    payload,
-  })
 }
 const FilterBar = props => {
   const [category, setCategory] = useState('Lab')
@@ -63,7 +58,15 @@ const FilterBar = props => {
   const { setFieldValue } = props
   useEffect(() => {
     setFieldValue('category', 'Lab')
+    setFieldValue('status', [6])
   }, [])
+  useEffect(() => {
+    if (category === 'Lab') {
+      setFieldValue('status', [6])
+    } else {
+      setFieldValue('status', [3, 4])
+    }
+  }, [category])
   const radiologyStatus = [
     {
       id: 4,
@@ -93,7 +96,7 @@ const FilterBar = props => {
   ]
   const labStatus = [
     {
-      id: 8,
+      id: 6,
       code: 'Completed',
       name: 'Completed',
     },
@@ -162,8 +165,8 @@ const FilterBar = props => {
                       top: -5,
                       marginRight: 10,
                     }}
-                    label='Order Date From'
-                    label2='Order Date To'
+                    label='Visit Date From'
+                    label2='To'
                     {...args}
                   />
                 )
@@ -190,23 +193,28 @@ const FilterBar = props => {
             <FastField
               name='doctorIDs'
               render={args => (
-                <DoctorProfileSelect
-                  mode='multiple'
-                  {...args}
-                  style={{ width: 200, marginRight: 10 }}
-                  allValue={-99}
-                  allValueOption={{
-                    id: -99,
-                    clinicianProfile: {
-                      name: 'All',
-                    },
-                  }}
-                  labelField='clinicianProfile.name'
-                />
+                <Tooltip
+                  placement='right'
+                  title='Select "All" will retrieve active and inactive doctors'
+                >
+                  <DoctorProfileSelect
+                    mode='multiple'
+                    {...args}
+                    style={{ width: 200, marginRight: 10 }}
+                    allValue={-99}
+                    allValueOption={{
+                      id: -99,
+                      clinicianProfile: {
+                        name: 'All',
+                      },
+                    }}
+                    labelField='clinicianProfile.name'
+                  />
+                </Tooltip>
               )}
             />
             {category === 'Lab' && (
-              <Field
+              <FastField
                 name='status'
                 render={args => {
                   const { form } = args
@@ -225,8 +233,9 @@ const FilterBar = props => {
               />
             )}
             {category === 'Radiology' && (
-              <Field
+              <FastField
                 name='status'
+                initialValue={[3, 4]}
                 render={args => {
                   const { form } = args
                   return (
@@ -261,8 +270,12 @@ export default memo(
   withFormikExtend({
     handleSubmit: (values, { props, resetForm }) => {
       const { search } = props
-      search(values)
-      // searchResult(values, props)
+      const payload = {
+        ...values,
+        doctorIDs: (values.doctorIDs || []).join('|'),
+        status: (values.status || []).join('|'),
+      }
+      search(payload)
     },
   })(FilterBar),
 )

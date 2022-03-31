@@ -57,11 +57,8 @@ class PatientResult extends PureComponent {
   render() {
     const { theme } = this.props
     return (
-      <div style={{ minHeight: 500 }}>
-        <Tabs
-          style={{ marginTop: theme.spacing(1) }}
-          options={patientResultTabs(this.props)}
-        />
+      <div style={{ minHeight: 500, height: '100%' }} className='fullHeightTab'>
+        <Tabs options={patientResultTabs(this.props)} />
       </div>
     )
   }
