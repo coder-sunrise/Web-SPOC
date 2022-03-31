@@ -8,6 +8,15 @@ export const OrderDetailsTable = props => {
   const { data } = props
   const defaultColumns = [
     {
+      title: '#',
+      align: 'center',
+      width: 40,
+      dataIndex: 'ServiceName',
+      render: (text, row, index) => {
+        return <span>{index + 1}</span>
+      },
+    },
+    {
       title: 'Service',
       dataIndex: 'ServiceName',
       width: 200,

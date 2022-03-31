@@ -109,13 +109,34 @@ const Examinations = props => {
       })
     }
   }, [firstLoad])
+
+  const acknowledge = id => {
+    dispatch({
+      type: 'specimenCollection/ack',
+      payload: { id: id },
+    }).then(r => {
+      if (r) {
+        notification.success({ message: 'Acknowledged' })
+        var currentSpecimen = data.find(t => t.id === id)
+        currentSpecimen.isAcknowledged = true
+        setData(data)
+      } else {
+        notification.error({ message: 'Acknowledge Failed' })
+      }
+    })
+  }
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ height: 60 }}>
         <FilterBar search={search} {...props}></FilterBar>
       </div>
       <div style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
-        {category === 'Lab' && <LabExaminations data={data}></LabExaminations>}
+        {category === 'Lab' && (
+          <LabExaminations
+            acknowledge={acknowledge}
+            data={data}
+          ></LabExaminations>
+        )}
         {category === 'Radiology' && (
           <RadiologyExaminations data={data}></RadiologyExaminations>
         )}

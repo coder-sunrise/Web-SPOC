@@ -8,11 +8,14 @@ import { SpecimenStatusTag } from '@/pages/Lab/Worklist/components/SpecimenStatu
 import _ from 'lodash'
 import { withStyles } from '@material-ui/core/styles'
 import moment from 'moment'
+import { notification } from '@/components'
+import { useDispatch } from 'react-redux'
 const { Panel } = Collapse
 
 const styles = theme => ({})
 export const LabExaminations = props => {
-  const { data } = props
+  const { data, acknowledge } = props
+  const dispatch = useDispatch()
   const genExtra = lab => (
     <div>
       Visit Date:{' '}
@@ -35,7 +38,7 @@ export const LabExaminations = props => {
         {data.map(lab => {
           return (
             <Panel header={lab.testPanels} key={lab.id} extra={genExtra(lab)}>
-              <ResultTable data={lab}></ResultTable>
+              <ResultTable data={lab} acknowledge={acknowledge}></ResultTable>
               <OrderDetailsTable data={lab}></OrderDetailsTable>
               <SpecimenTable data={lab}></SpecimenTable>
             </Panel>

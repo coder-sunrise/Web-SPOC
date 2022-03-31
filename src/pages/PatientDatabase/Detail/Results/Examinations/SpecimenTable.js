@@ -8,6 +8,15 @@ export const SpecimenTable = props => {
   const { data } = props
   const defaultColumns = [
     {
+      title: '#',
+      width: 40,
+      dataIndex: 'accesionNo',
+      align: 'center',
+      render: (text, row, index) => {
+        return <span>{index + 1}</span>
+      },
+    },
+    {
       title: 'Accession No',
       dataIndex: 'accesionNo',
       width: 200,

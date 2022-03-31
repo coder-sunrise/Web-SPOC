@@ -1,11 +1,21 @@
 import { Table } from 'antd'
 import { useState } from 'react'
 import { useEffect } from 'react'
-import { Checkbox } from '@/components'
-
+import { Checkbox, Button } from '@/components'
+import { Tag } from 'antd'
+import { CheckCircleOutlined } from '@ant-design/icons'
 export const ResultTable = props => {
-  const { data } = props
+  const { data, acknowledge } = props
   const defaultColumns = [
+    {
+      title: '#',
+      width: 40,
+      align: 'center',
+      dataIndex: 'TestPanelItem',
+      render: (text, row, index) => {
+        return <span>{index + 1}</span>
+      },
+    },
     {
       title: 'Test Panel Item',
       dataIndex: 'TestPanelItem',
@@ -68,27 +78,55 @@ export const ResultTable = props => {
         size='small'
         title={() => {
           return (
-            <p>
-              <h5 style={{ display: 'inline-block', fontWeight: 'bold' }}>
-                Result
-              </h5>
-              <Checkbox
-                style={{
-                  display: 'inline-block',
-                  marginLeft: 10,
-                  marginRight: 10,
-                }}
-                label='Display Raw Data'
-                simple
-                onChange={e => {
-                  setShowRowData(e.target.value)
-                }}
-              />
-              Last Verified By:
-              <span style={{ display: 'inline-block', marginLeft: 10 }}>
-                {data.lastVerifiedBy}
-              </span>
-            </p>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}
+            >
+              <div>
+                <h5 style={{ display: 'inline-block', fontWeight: 'bold' }}>
+                  Result
+                </h5>
+                <Checkbox
+                  style={{
+                    display: 'inline-block',
+                    marginLeft: 10,
+                    marginRight: 10,
+                  }}
+                  label='Display Raw Data'
+                  simple
+                  onChange={e => {
+                    setShowRowData(e.target.value)
+                  }}
+                />
+                Last Verified By:
+                <span style={{ display: 'inline-block', marginLeft: 10 }}>
+                  {data.lastVerifiedBy}
+                </span>
+              </div>
+              <div>
+                {!data.isAcknowledged && (
+                  <div>
+                    <Button
+                      color='primary'
+                      size='sm'
+                      onClick={() => {
+                        acknowledge(data.id)
+                      }}
+                    >
+                      Acknowledge
+                    </Button>{' '}
+                  </div>
+                )}
+                {data.isAcknowledged && (
+                  <Tag icon={<CheckCircleOutlined />} color='success'>
+                    Acknowledged
+                  </Tag>
+                )}
+              </div>
+            </div>
           )
         }}
         footer={() => {

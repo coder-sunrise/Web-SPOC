@@ -10,5 +10,6 @@ const fns = {
   queryVisitSpecimenCollection: params =>
     service.query(queryVisitSpecimenCollection, params),
   upsert: params => service.upsert(url, params),
+  ack: params => service.upsert(`${url}/ack`, params),
 }
 export default fns
