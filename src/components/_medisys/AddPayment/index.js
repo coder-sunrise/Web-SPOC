@@ -277,7 +277,6 @@ class AddPayment extends Component {
     const newPaymentList = [...values.paymentList, payment]
     await setFieldValue('paymentList', newPaymentList)
     this.calculatePayment()
-    console.log('payment',newPaymentList,visitGroupStatusDetails)
   }
 
   onDeleteClick = async paymentID => {

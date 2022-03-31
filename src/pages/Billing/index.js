@@ -670,7 +670,7 @@ class Billing extends Component {
     const { values, setFieldValue } = this.props
 
     const totalPaid = invoicePayment.reduce((totalAmtPaid, payment) => {
-      if (!payment.isCancelled) return totalAmtPaid + payment.totalAmtPaid
+      if (!payment.isCancelled && payment.id) return totalAmtPaid + payment.totalAmtPaid
       return totalAmtPaid
     }, 0)
     const newOutstandingBalance = roundTo(values.finalPayable - totalPaid)
