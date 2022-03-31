@@ -139,7 +139,7 @@ export const RadiographerTag = ({
       )}
       {!readonly && !inputVisible && (
         <Tag className='site-tag-plus' onClick={showInput}>
-          <PlusOutlined /> New Radaographer
+          <PlusOutlined /> New Radiographer
         </Tag>
       )}
     </div>
