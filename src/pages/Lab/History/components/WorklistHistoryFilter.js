@@ -146,7 +146,7 @@ export const WorklistHistoryFilter = () => {
             initialValue={moment(moment().subtract(7, 'd')).formatUTC()}
           >
             <DatePicker
-              style={{ width: 110 }}
+              style={{ width: 115 }}
               label={formatMessage({
                 id: 'lab.worklisthistory.search.dateFrom',
               })}
@@ -161,7 +161,7 @@ export const WorklistHistoryFilter = () => {
             <DatePicker
               bordered={true}
               label={formatMessage({ id: 'lab.worklisthistory.search.dateTo' })}
-              style={{ width: 110 }}
+              style={{ width: 115 }}
             />
           </Form.Item>
           <Form.Item name='status' initialValue={[]}>
