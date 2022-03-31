@@ -75,6 +75,7 @@ const GroupInvoicesPopover = ({ classes, visitGroup, patientID }) => {
           <div className={classes.listContainer}>
             <CommonTableGrid
               size='sm'
+              forceRender
               getRowId={r => r.visitFK}
               rows={visitGroupStatusDetails}
               columns={[

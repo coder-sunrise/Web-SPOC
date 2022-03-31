@@ -147,12 +147,14 @@ export default createFormViewModel({
               message: 'Visit completed.',
               queueNo: entity.queueNo,
               visitID: entity.id,
+              isBillingSaved: true,
             })
           } else {
             sendQueueNotification({
               message: 'Billing updated.',
               queueNo: entity.queueNo,
               visitID: entity.id,
+              isBillingSaved: true,
             })
           }
           return response
@@ -197,6 +199,7 @@ export default createFormViewModel({
             message: 'Invoice unlocked. Ready for dispensing.',
             queueNo: entity.queueNo,
             visitID: entity.id,
+            isBillingSaved: false,
           })
           history.push(destinationUrl)
         }
