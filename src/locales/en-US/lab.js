@@ -10,4 +10,11 @@ export default {
   'lab.specimenCollection.dateTo': 'Order To',
   'lab.specimenCollection.visitDoctor': 'Visit Doctor',
   'lab.specimenCollection.visittype': 'Visit Type',
+  'lab.worklisthistory.search.general':
+    'Patient Name, Patient Ref. No., Accession No.',
+  'lab.worklisthistory.search.dateFrom': 'Visit Date From',
+  'lab.worklisthistory.search.dateTo': 'Visit Date To',
+  'lab.worklisthistory.search.visitDoctor': 'Visit Doctor',
+  'lab.worklisthistory.search.status': 'Status',
+  'lab.worklisthistory.search.visittype': 'Visit Type',
 }
