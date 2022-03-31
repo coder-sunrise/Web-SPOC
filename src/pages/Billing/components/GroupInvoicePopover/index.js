@@ -16,7 +16,15 @@ import {
 } from '@/components'
 import { getAppendUrl } from '@/utils/utils'
 
-const styles = theme => ({})
+const styles = theme => ({
+  billingHyperLink: {
+    textDecoration: 'underline',
+    fontStyle: 'italic',
+    paddingLeft: 0,
+    color: 'darkblue',
+    cursor: 'pointer',
+  },
+})
 
 const GroupInvoicesPopover = ({ classes, visitGroup, patientID }) => {
   const dispatch = useDispatch()
@@ -30,7 +38,9 @@ const GroupInvoicesPopover = ({ classes, visitGroup, patientID }) => {
         payload: { visitGroup },
       }).then(r => {
         if (r) {
-          setVisitGroupStatusDetails(r.filter(x=> x.patientProfileFK !== patientID))
+          var filterOutSelf = r.filter(x=> x.patientProfileFK !== patientID)
+          var sorted = _.orderBy(filterOutSelf,['queueNo'],['asc'])
+          setVisitGroupStatusDetails(sorted)
         }
       })
       setShow(true)
@@ -56,14 +66,20 @@ const GroupInvoicesPopover = ({ classes, visitGroup, patientID }) => {
       onVisibleChange={() => setShow(!show)}
       content={
         <div className={classes.popoverContainer} style={{ width: 581 }}>
-          <div><span style={{textDecoration:'underline',fontWeight:'bold'}}>Visit Group:</span>{` ${visitGroup}`}</div>
+          <div>
+            <span style={{ textDecoration: 'underline', fontWeight: 'bold' }}>
+              Visit Group:
+            </span>
+            {` ${visitGroup}`}
+          </div>
           <div className={classes.listContainer}>
             <CommonTableGrid
               size='sm'
+              forceRender
               getRowId={r => r.visitFK}
               rows={visitGroupStatusDetails}
               columns={[
-                { name: 'queueNo', title: 'Q.No.' },
+                { name: 'queueNo', title: 'Q. No.' },
                 { name: 'name', title: 'Name' },
                 { name: 'gender', title: 'Gender' },
                 { name: 'age', title: 'Age' },
@@ -79,28 +95,30 @@ const GroupInvoicesPopover = ({ classes, visitGroup, patientID }) => {
                   columnName: 'status',
                   width: 120,
                   render: row => {
-                    if(row.status != 'Billing')
-                      return <span style={{fontStyle:'italic'}}>{row.status}</span>
+                    if (row.status != 'Billing')
+                      return (
+                        <span style={{ fontStyle: 'italic' }}>
+                          {row.status}
+                        </span>
+                      )
                     return (
-                      <Button
-                        link
-                        color='info'
-                        style={{textDecoration:'underline',fontStyle:'italic',paddingLeft:0}}
+                      <span
+                        className={classes.billingHyperLink}
                         onClick={() => {
-                            dispatch({
-                              type: 'global/updateAppState',
-                              payload: {
-                                openConfirm: true,
-                                openConfirmContent: `Confirm to switch to ${row.name}'s billing page ?`,
-                                onConfirmSave: () => {
-                                  history.push(getVisitBillingUrl(row))
-                                },
+                          dispatch({
+                            type: 'global/updateAppState',
+                            payload: {
+                              openConfirm: true,
+                              openConfirmContent: `Confirm to switch to ${row.name}'s billing page ?`,
+                              onConfirmSave: () => {
+                                history.push(getVisitBillingUrl(row))
                               },
-                            })
+                            },
+                          })
                         }}
                       >
                         {row.status}
-                      </Button>
+                      </span>
                     )
                   },
                 },
@@ -135,7 +153,7 @@ const GroupInvoicesPopover = ({ classes, visitGroup, patientID }) => {
         color='transparent'
         onClick={groupIconButtonClick}
       >
-        <Icon style={{ fontSize: 20, color:'#cf1322' }} type='family' />
+        <Icon style={{ fontSize: 20, color: '#cf1322' }} type='family' />
       </Button>
     </Popover>
   )

@@ -177,7 +177,7 @@ const WorkitemBody = ({ item }) => {
             <CombinedOrderIcon workitemId={item.radiologyWorkitemId} />
           )}
         </LeftLabel>
-        <RightLabel width={120}>Q.No.: {queueNo}</RightLabel>
+        <RightLabel width={120}>Q. No.: {queueNo}</RightLabel>
       </WorkitemRow>
 
       <WorkitemRow>
