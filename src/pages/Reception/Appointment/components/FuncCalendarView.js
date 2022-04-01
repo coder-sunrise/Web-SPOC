@@ -588,7 +588,7 @@ const CalendarView = ({
           }display:inline-block;padding:0px 4px;background-color:${bgResourceColor ||
             'white'};color:${
             bgResourceColor ? 'white' : 'black'
-          }">${totalMaxCapacity}</div>`
+          }">${totalBalCapacity}</div>`
         }
       })
       if (resourceList) {
