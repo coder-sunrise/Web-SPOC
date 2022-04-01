@@ -63,7 +63,7 @@ export const OrderDetailsTable = props => {
         title={() => {
           return (
             <p>
-              <h5 style={{ display: 'inline-block', fontWeight: 'bold' }}>
+              <h5 style={{ display: 'inline-block', fontWeight: '500' }}>
                 Order Details
               </h5>
             </p>

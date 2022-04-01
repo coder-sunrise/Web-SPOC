@@ -28,7 +28,6 @@ export const SpecimenTable = props => {
     },
     {
       title: 'Specimen Type',
-      width: 200,
       dataIndex: 'specimenType',
     },
   ]
@@ -53,7 +52,7 @@ export const SpecimenTable = props => {
         title={() => {
           return (
             <p>
-              <h5 style={{ display: 'inline-block', fontWeight: 'bold' }}>
+              <h5 style={{ display: 'inline-block', fontWeight: '500' }}>
                 Specimen Details
               </h5>
             </p>

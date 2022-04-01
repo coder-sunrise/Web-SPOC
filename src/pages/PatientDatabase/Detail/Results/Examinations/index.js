@@ -117,9 +117,10 @@ const Examinations = props => {
     }).then(r => {
       if (r) {
         notification.success({ message: 'Acknowledged' })
-        var currentSpecimen = data.find(t => t.id === id)
+        var newData = [...data]
+        var currentSpecimen = newData.find(t => t.id === id)
         currentSpecimen.isAcknowledged = true
-        setData(data)
+        setData(newData)
       } else {
         notification.error({ message: 'Acknowledge Failed' })
       }

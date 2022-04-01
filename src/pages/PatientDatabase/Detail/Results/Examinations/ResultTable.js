@@ -86,7 +86,7 @@ export const ResultTable = props => {
               }}
             >
               <div>
-                <h5 style={{ display: 'inline-block', fontWeight: 'bold' }}>
+                <h5 style={{ display: 'inline-block', fontWeight: '500' }}>
                   Result
                 </h5>
                 <Checkbox
@@ -136,7 +136,7 @@ export const ResultTable = props => {
                 <p>
                   <span
                     style={{
-                      fontWeight: 'bold',
+                      fontWeight: '500',
                       display: 'inline-block',
                       marginRight: 10,
                     }}
@@ -150,7 +150,7 @@ export const ResultTable = props => {
                 <p>
                   <span
                     style={{
-                      fontWeight: 'bold',
+                      fontWeight: '500',
                       display: 'inline-block',
                       marginRight: 10,
                     }}
