@@ -115,7 +115,9 @@ const testPanelSchema = Yup.object().shape({
         currentServiceCenters,
         allServiceCenters,
       ),
-      examinationItems: ctService_ExaminationItem.map(x => x.examinationItemFK),
+      examinationItems: (ctService_ExaminationItem || []).map(
+        x => x.examinationItemFK,
+      ),
     }
   },
 
