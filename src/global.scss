@@ -873,7 +873,10 @@ td[class='ant-table-cell ant-table-cell-ellipsis'] {
 
 .e-disabled {
   opacity: 0.7;
-}
+}  
+.ant-table .ant-table-expanded-row-fixed {
+  margin: 0px -16px !important;
+} 
 .noPaddingCollapse .ant-collapse-content-box {
   padding: 0;
 }

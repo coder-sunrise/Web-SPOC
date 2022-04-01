@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'dva'
 import moment from 'moment'
 import _ from 'lodash'
 import { history, connect } from 'umi'
-import { Card, Tooltip, Button } from 'antd'
+import { Card, Button } from 'antd'
 import { WORK_ITEM_TYPES } from '@/utils/constants'
 import NurseWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/NurseWorkItemInfo'
 import RadioWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/RadioWorkItemInfo'
@@ -16,6 +16,7 @@ import {
   TextField,
   Select,
   DatePicker,
+  Tooltip,
 } from '@/components'
 import { ProTable } from '@medisys/component'
 import service from './services'
@@ -134,13 +135,30 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         render: (_dom, entity) => {
           if (entity.reportPriority === 'Urgent') {
             return (
-              <span>
-                <Icon
-                  type='thunder'
-                  style={{ fontSize: 15, color: 'red', alignSelf: 'center' }}
-                />
-                <span>{entity.urgentReportRemarks}</span>
-              </span>
+              <Tooltip title={entity.urgentReportRemarks}>
+                <div style={{ position: 'relative', paddingLeft: 15 }}>
+                  <Icon
+                    type='thunder'
+                    style={{
+                      fontSize: 15,
+                      color: 'red',
+                      alignSelf: 'center',
+                      position: 'absolute',
+                      left: 0,
+                      top: 2,
+                    }}
+                  />
+                  <div
+                    style={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {entity.urgentReportRemarks}
+                  </div>
+                </div>
+              </Tooltip>
             )
           }
           return ''
@@ -153,6 +171,21 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         sorter: false,
         search: false,
         width: 200,
+        render: (_dom, entity) => {
+          return (
+            <Tooltip title={entity.visitOrderTemplateName}>
+              <div
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {entity.visitOrderTemplateName || '-'}
+              </div>
+            </Tooltip>
+          )
+        },
       },
       {
         key: 'visitDate',
@@ -163,49 +196,6 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         width: 140,
         render: (_dom, entity) =>
           entity.visitDate?.format(dateFormatLongWithTimeNoSec) || '-',
-      },
-      {
-        key: 'workItem',
-        title: 'Work Item',
-        dataIndex: 'workItem',
-        sorter: false,
-        search: false,
-        width: 160,
-        render: (item, entity) => {
-          const dispatch = useDispatch()
-          const workItemSummary = JSON.parse(entity.workItemSummary || '[]')
-          const radioWorkItems =
-            workItemSummary.find(t => t.type === WORK_ITEM_TYPES.RADIOLOGY) ||
-            {}
-          const labWorkItems =
-            workItemSummary.find(t => t.type === WORK_ITEM_TYPES.LAB) || {}
-          const nurseWorkItems =
-            workItemSummary.find(
-              t => t.type === WORK_ITEM_TYPES.NURSEACTUALIZE,
-            ) || {}
-          return (
-            <div style={{ justifyContent: 'space-between' }}>
-              {labWorkItems && labWorkItems.totalWorkItem > 0 && (
-                <LabWorkItemInfo
-                  visitFK={entity.visitFK}
-                  workItemSummary={labWorkItems}
-                />
-              )}
-              {radioWorkItems && radioWorkItems.totalWorkItem > 0 && (
-                <RadioWorkItemInfo
-                  visitFK={entity.visitFK}
-                  workItemSummary={radioWorkItems}
-                />
-              )}
-              {nurseWorkItems && nurseWorkItems.totalWorkItem > 0 && (
-                <NurseWorkItemInfo
-                  visitFK={entity.visitFK}
-                  workItemSummary={nurseWorkItems}
-                />
-              )}
-            </div>
-          )
-        },
       },
       {
         key: 'medicalCheckupWorkitemDoctor',
@@ -240,30 +230,22 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         },
       },
       {
-        key: 'verifiedDate',
-        title: 'Verified Date',
-        dataIndex: 'verifiedDate',
+        key: 'completedDate',
+        title: 'Completed Date',
+        dataIndex: 'completedDate',
         render: (_dom, entity) =>
-          entity.verifiedDate?.format(dateFormatLongWithTimeNoSec) || '-',
+          entity.completedDate?.format(dateFormatLongWithTimeNoSec) || '-',
         sorter: false,
         search: false,
         width: 140,
       },
       {
-        key: 'verifiedByUser',
-        title: 'Verified By',
-        dataIndex: 'verifiedByUser',
+        key: 'completedByUser',
+        title: 'Completed By',
+        dataIndex: 'completedByUser',
         sorter: false,
         search: false,
         width: 180,
-      },
-      {
-        key: 'visitRemarks',
-        title: 'Visit Remarks',
-        dataIndex: 'visitRemarks',
-        sorter: false,
-        search: false,
-        width: 250,
       },
       {
         key: 'action',

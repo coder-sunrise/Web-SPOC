@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'dva'
 import moment from 'moment'
 import _ from 'lodash'
 import { history } from 'umi'
-import { Menu, Dropdown, Space, Typography, Card, Tag, Tooltip } from 'antd'
+import { Menu, Dropdown, Space, Typography, Card, Tag } from 'antd'
 import {
   MEDICALCHECKUP_WORKITEM_STATUS,
   MEDICALCHECKUP_WORKITEM_STATUSES,
@@ -25,6 +25,7 @@ import {
   Button,
   Popover,
   dateFormatLong,
+  Tooltip,
 } from '@/components'
 import { ProTable } from '@medisys/component'
 import { GridContextMenuButton as GridButton } from 'medisys-components'
@@ -249,7 +250,7 @@ const WorklistGrid = ({
       isShowTag = true
       tagBGColor =
         row.lastReportStatus === MEDICALCHECKUP_REPORTSTATUS.VERIFIED
-          ? '#009933'
+          ? '#007D00'
           : '#44A2FF'
     }
     return (
@@ -271,7 +272,7 @@ const WorklistGrid = ({
           <div
             style={{
               position: 'absolute',
-              top: -8,
+              top: -6,
               right: -6,
               backgroundColor: tagBGColor,
               height: 14,
@@ -367,13 +368,30 @@ const WorklistGrid = ({
         render: (_dom, entity) => {
           if (entity.reportPriority === 'Urgent') {
             return (
-              <span>
-                <Icon
-                  type='thunder'
-                  style={{ fontSize: 15, color: 'red', alignSelf: 'center' }}
-                />
-                <span>{entity.urgentReportRemarks}</span>
-              </span>
+              <Tooltip title={entity.urgentReportRemarks}>
+                <div style={{ position: 'relative', paddingLeft: 15 }}>
+                  <Icon
+                    type='thunder'
+                    style={{
+                      fontSize: 15,
+                      color: 'red',
+                      alignSelf: 'center',
+                      position: 'absolute',
+                      left: 0,
+                      top: 2,
+                    }}
+                  />
+                  <div
+                    style={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {entity.urgentReportRemarks}
+                  </div>
+                </div>
+              </Tooltip>
             )
           }
           return ''
@@ -386,6 +404,21 @@ const WorklistGrid = ({
         sorter: false,
         search: false,
         width: 200,
+        render: (_dom, entity) => {
+          return (
+            <Tooltip title={entity.visitOrderTemplateName}>
+              <div
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {entity.visitOrderTemplateName || '-'}
+              </div>
+            </Tooltip>
+          )
+        },
       },
       {
         key: 'visitDate',
@@ -464,6 +497,21 @@ const WorklistGrid = ({
         sorter: false,
         search: false,
         width: 250,
+        render: (_dom, entity) => {
+          return (
+            <Tooltip title={entity.visitRemarks}>
+              <div
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {entity.visitRemarks || '-'}
+              </div>
+            </Tooltip>
+          )
+        },
       },
       {
         key: 'action',
@@ -493,13 +541,15 @@ const WorklistGrid = ({
           }
           return (
             <Tooltip title='More Actions'>
-              <GridButton
-                row={entity}
-                contextMenuOptions={menus.filter(
-                  m => entity.isExistsVerifiedReport || m.id !== 4,
-                )}
-                onClick={handleMenuItemClick}
-              />
+              <div>
+                <GridButton
+                  row={entity}
+                  contextMenuOptions={menus.filter(
+                    m => entity.isExistsVerifiedReport || m.id !== 4,
+                  )}
+                  onClick={handleMenuItemClick}
+                />
+              </div>
             </Tooltip>
           )
         },
@@ -507,9 +557,9 @@ const WorklistGrid = ({
     ]
   }
   const columns = defaultColumns()
-  const height = window.innerHeight - 350
+  const height = window.innerHeight - 280
   return (
-    <div style={{ backgroundColor: 'white', paddingTop: 8, marginTop: 2 }}>
+    <div style={{ backgroundColor: 'white', paddingTop: 12, marginTop: 2 }}>
       <div style={{ display: 'flex', alignItems: 'start' }}>
         <StatusFilter
           defaultSelection={allMedicalCheckupReportStatuses}
@@ -522,7 +572,7 @@ const WorklistGrid = ({
           style={{
             flexGrow: 1,
             justifyContent: 'end',
-            marginBottom: 10,
+            marginBottom: 4,
           }}
           onFilterChange={selected => setFilteredStatuses(selected)}
         />

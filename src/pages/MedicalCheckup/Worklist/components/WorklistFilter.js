@@ -173,38 +173,27 @@ export const WorklistFilter = () => {
               {formatMessage({ id: 'form.search' })}
             </ProgressButton>
           </Form.Item>
-          <div
-            style={{
-              display: 'inline-flex',
-              flexGrow: 1,
-              justifyContent: 'end',
-              alignItems: 'center',
-            }}
-          >
-            <div>
-              <p
-                style={{
-                  fontWeight: 400,
-                  fontSize: '0.8rem',
-                  minWidth: 80,
-                }}
-              >
-                Last Refresh:
-              </p>
-              <p style={{ color: '#1890f8', fontSize: '0.9rem' }}>
+          <div style={{ position: 'absolute', top: 12, right: 40 }}>
+            <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>Last Refresh:</p>
+            <span>
+              <p style={{ color: '#1890f8', marginTop: 4, fontSize: '0.9rem' }}>
                 {refreshDate.format('HH:mm')}
               </p>
-            </div>
-            <Button
-              color='primary'
-              justIcon
-              style={{
-                height: 26,
-              }}
-              onClick={() => handleSearch()}
-            >
-              <Refresh />
-            </Button>
+              <Button
+                color='primary'
+                justIcon
+                style={{
+                  position: 'absolute',
+                  top: 20,
+                  left: 80,
+                  width: 26,
+                  height: 26,
+                }}
+                onClick={handleSearch}
+              >
+                <Refresh />
+              </Button>
+            </span>
           </div>
         </div>
       </Form>

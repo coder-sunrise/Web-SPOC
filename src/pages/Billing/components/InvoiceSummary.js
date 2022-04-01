@@ -115,10 +115,11 @@ const InvoiceSummary = ({
       setShowError(false)
   }
 
-  const shouldDisableGroupPayment =
-    !visitGroupStatusDetails ||
-    _.sumBy(visitGroupStatusDetails, 'outstandingBalance') <= 0 ||
-    !visitGroupStatusDetails.some(x => x.isBillingSaved)
+  const shouldDisableGroupPayment = !(
+    visitGroupStatusDetails?.length > 0 &&
+    _.sumBy(visitGroupStatusDetails, 'outstandingBalance') > 0 &&
+    !visitGroupStatusDetails.some(x => !x.isBillingSaved)
+  )
   const shouldDisableIndividualPayment =
     outstandingBalance !== undefined && outstandingBalance <= 0
   const shouldDisableAddPayment =

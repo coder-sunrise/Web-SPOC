@@ -157,6 +157,7 @@ const PatientInfoInput = ({
           )}
         </div>
       </GridItem>
+      <GridItem xs md={2} />
       {!isRegisteredPatient && (
         <React.Fragment>
           <GridItem xs md={4}>
@@ -208,6 +209,7 @@ const PatientInfoInput = ({
               )}
             />
           </GridItem>
+          <GridItem xs md={3} />
         </React.Fragment>
       )}
     </React.Fragment>
