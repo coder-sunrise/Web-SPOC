@@ -49,11 +49,7 @@ const SummaryComment = ({
             sortingEnabled: false,
             disabled: true,
             render: row => {
-              const createBy = `${
-                hasValue(row.commentByUserTitle)
-                  ? `${row.commentByUserTitle}.`
-                  : ''
-              }${row.commentByUser}`
+              const createBy = row.commentByUser || ''
               return (
                 <Tooltip title={createBy}>
                   <span>{createBy}</span>
