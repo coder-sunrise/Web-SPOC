@@ -4,7 +4,7 @@ import {
   Tooltip,
   GridContainer,
   GridItem,
-  dateFormatLongWithTimeNoSec12h,
+  dateFormatLongWithTimeNoSec,
   CommonModal,
 } from '@/components'
 import moment from 'moment'
@@ -111,7 +111,7 @@ const ExternalService = props => {
             width: 150,
             render: (text, row) => (
               <div style={{ padding: 4 }}>
-                {moment(row.updateDate).format(dateFormatLongWithTimeNoSec12h)}
+                {moment(row.updateDate).format(dateFormatLongWithTimeNoSec)}
               </div>
             ),
           },

@@ -21,6 +21,9 @@ import {
 import { ProTable } from '@medisys/component'
 import service from './services'
 import { hasValue } from '@/pages/Widgets/PatientHistory/config'
+import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
+import { getVisitOrderTemplateContent } from '../Worklist/components/Util'
+
 const { queryList, query } = service
 const api = {
   remove: null,
@@ -78,7 +81,7 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
   }
 
   const visitDateForm = moment()
-    .add(-1, 'week')
+    .add(-1, 'month')
     .toDate()
   const visitDateTo = moment()
     .add(-1, 'day')
@@ -86,6 +89,16 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
 
   const defaultColumns = () => {
     return [
+      {
+        key: 'patientName',
+        title: 'Patient Name',
+        dataIndex: 'patientName',
+        sorter: true,
+        search: false,
+        fixed: 'left',
+        width: 200,
+        sortBy: 'patientName',
+      },
       {
         key: 'patientReferenceNo',
         title: 'Ref. No.',
@@ -103,15 +116,6 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         search: false,
         fixed: 'left',
         width: 100,
-      },
-      {
-        key: 'patientName',
-        title: 'Patient Name',
-        dataIndex: 'patientName',
-        sorter: false,
-        search: false,
-        fixed: 'left',
-        width: 200,
       },
       {
         key: 'genderAge',
@@ -161,19 +165,22 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
               </Tooltip>
             )
           }
-          return ''
+          return 'Normal'
         },
       },
       {
-        key: 'visitOrderTemplateName',
+        key: 'visitOrderTemplateDetails',
         title: 'Visit Purpose',
-        dataIndex: 'visitOrderTemplateName',
+        dataIndex: 'visitOrderTemplateDetails',
         sorter: false,
         search: false,
         width: 200,
         render: (_dom, entity) => {
+          const visitOrderTemplateContent = getVisitOrderTemplateContent(
+            entity.visitOrderTemplateDetails,
+          )
           return (
-            <Tooltip title={entity.visitOrderTemplateName}>
+            <Tooltip title={visitOrderTemplateContent}>
               <div
                 style={{
                   overflow: 'hidden',
@@ -181,7 +188,7 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
                   whiteSpace: 'nowrap',
                 }}
               >
-                {entity.visitOrderTemplateName || '-'}
+                {visitOrderTemplateContent || '-'}
               </div>
             </Tooltip>
           )
@@ -191,9 +198,11 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         key: 'visitDate',
         title: 'Visit Date',
         dataIndex: 'visitDate',
-        sorter: false,
+        sorter: true,
         search: false,
         width: 140,
+        defaultSortOrder: 'descend',
+        sortBy: 'visitDate',
         render: (_dom, entity) =>
           entity.visitDate?.format(dateFormatLongWithTimeNoSec) || '-',
       },
@@ -207,11 +216,7 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         render: (item, entity) => {
           const doctors = (entity.medicalCheckupWorkitemDoctor || [])
             .map(doctor => {
-              return `${
-                hasValue(doctor.title) && doctor.title.trim().length
-                  ? `${doctor.title}.`
-                  : ''
-              }${doctor.name || ''}`
+              return doctor.name
             })
             .join(', ')
           return (
@@ -424,12 +429,20 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         }
       }}
       request={params => {
+        const { sort = [] } = params
+        let sortBy
+        let order
+        if (sort.length) {
+          sortBy = sort[0].sortby
+          order = sort[0].order
+        }
         return queryList({
-          ...params,
           apiCriteria: {
             ...params.apiCriteria,
             current: params.current,
             pageSize: params.pageSize,
+            sortBy,
+            order: order,
           },
         })
       }}

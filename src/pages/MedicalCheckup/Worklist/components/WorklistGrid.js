@@ -38,10 +38,15 @@ import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined'
 import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined'
 import { commonDataReaderTransform } from '@/utils/utils'
 import withWebSocket from '@/components/Decorator/withWebSocket'
+import { CheckOutlined } from '@ant-design/icons'
 import WorklistContext from '../WorklistContext'
 import { StatusFilter } from './StatusFilter'
 import ReportingDoctorList from './ReportingDoctorList'
-import { getMedicalCheckupReportPayload } from './Util'
+import {
+  getMedicalCheckupReportPayload,
+  getVisitOrderTemplateContent,
+} from './Util'
+import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 
 const allMedicalCheckupReportStatuses = Object.values(
   MEDICALCHECKUP_WORKITEM_STATUS,
@@ -394,19 +399,22 @@ const WorklistGrid = ({
               </Tooltip>
             )
           }
-          return ''
+          return 'Normal'
         },
       },
       {
-        key: 'visitOrderTemplateName',
+        key: 'visitOrderTemplateDetails',
         title: 'Visit Purpose',
-        dataIndex: 'visitOrderTemplateName',
+        dataIndex: 'visitOrderTemplateDetails',
         sorter: false,
         search: false,
         width: 200,
         render: (_dom, entity) => {
+          const visitOrderTemplateContent = getVisitOrderTemplateContent(
+            entity.visitOrderTemplateDetails,
+          )
           return (
-            <Tooltip title={entity.visitOrderTemplateName}>
+            <Tooltip title={visitOrderTemplateContent}>
               <div
                 style={{
                   overflow: 'hidden',
@@ -414,7 +422,7 @@ const WorklistGrid = ({
                   whiteSpace: 'nowrap',
                 }}
               >
-                {entity.visitOrderTemplateName || '-'}
+                {visitOrderTemplateContent || '-'}
               </div>
             </Tooltip>
           )
@@ -527,7 +535,7 @@ const WorklistGrid = ({
             user.data.clinicianProfile.userProfile.role?.clinicRoleFK === 1
           if (
             isDoctor &&
-            !entity.medicalCheckupWorkitemDoctor.find(
+            !(entity.medicalCheckupWorkitemDoctor || []).find(
               x =>
                 x.userProfileFK === user.data.clinicianProfile.userProfile.id,
             )
@@ -557,10 +565,10 @@ const WorklistGrid = ({
     ]
   }
   const columns = defaultColumns()
-  const height = window.innerHeight - 280
+  const height = window.innerHeight - 310
   return (
     <div style={{ backgroundColor: 'white', paddingTop: 12, marginTop: 2 }}>
-      <div style={{ display: 'flex', alignItems: 'start' }}>
+      <div style={{ textAlign: 'right' }}>
         <StatusFilter
           defaultSelection={allMedicalCheckupReportStatuses}
           counts={(originalWorklist || []).map(items => {
@@ -577,25 +585,91 @@ const WorklistGrid = ({
           onFilterChange={selected => setFilteredStatuses(selected)}
         />
       </div>
-      <ProTable
-        rowSelection={false}
-        columns={columns}
-        search={false}
-        options={{ density: false, reload: false }}
-        dataSource={workitems}
-        pagination={false}
-        columnsStateMap={medicalCheckupWorklistColumnSetting}
-        onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
-        defaultColumns={[]}
-        onRow={row => {
-          return {
-            onDoubleClick: () => {
-              onRowDoubleClick(row)
-            },
-          }
-        }}
-        scroll={{ x: 1100, y: height }}
-      />
+      <div style={{ height: height + 95 }}>
+        <ProTable
+          rowSelection={false}
+          columns={columns}
+          search={false}
+          options={{ density: false, reload: false }}
+          dataSource={workitems}
+          pagination={false}
+          columnsStateMap={medicalCheckupWorklistColumnSetting}
+          onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
+          defaultColumns={[]}
+          onRow={row => {
+            return {
+              onDoubleClick: () => {
+                onRowDoubleClick(row)
+              },
+            }
+          }}
+          scroll={{ x: 1100, y: height }}
+        />
+      </div>
+      <div style={{ textAlign: 'right', marginRight: 100 }}>
+        <span
+          style={{
+            display: 'inline-block',
+            height: 16,
+            width: 16,
+            backgroundColor: '#CC0033',
+          }}
+        />
+        <span
+          style={{
+            display: 'inline-block',
+            marginRight: 8,
+            position: 'relative',
+            top: '-3px',
+            marginLeft: 2,
+          }}
+        >
+          Reporting In Progress
+        </span>
+        <span
+          style={{
+            display: 'inline-block',
+            height: 16,
+            width: 16,
+            backgroundColor: '#33CC00',
+          }}
+        />
+        <span
+          style={{
+            display: 'inline-block',
+            marginRight: 8,
+            position: 'relative',
+            top: '-3px',
+            marginLeft: 2,
+          }}
+        >
+          Comment Verifying By PRO
+        </span>
+
+        <CheckOutlined
+          style={{
+            color: 'white',
+            display: 'inline-block',
+            height: 16,
+            width: 16,
+            backgroundColor: '#33CC00',
+            position: 'relative',
+            top: '-4px',
+          }}
+        />
+
+        <span
+          style={{
+            display: 'inline-block',
+            marginRight: 8,
+            position: 'relative',
+            top: '-3px',
+            marginLeft: 2,
+          }}
+        >
+          Comment Verified By PRO
+        </span>
+      </div>
       <CommonModal
         open={showForms}
         title='Forms'

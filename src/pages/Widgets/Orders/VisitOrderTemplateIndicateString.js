@@ -81,7 +81,7 @@ const VisitOrderTemplateIndicateString = props => {
       placement='topLeft'
       overlayStyle={{ width: 500 }}
       content={indicateStringContent_Full}
-      title='Visit Purpose Details'
+      //title='Visit Purpose Details'
       trigger='hover'
     >
       {indicateStringContent}
