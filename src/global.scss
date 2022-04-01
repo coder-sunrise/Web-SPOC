@@ -873,8 +873,26 @@ td[class='ant-table-cell ant-table-cell-ellipsis'] {
 
 .e-disabled {
   opacity: 0.7;
-}
-
+}  
 .ant-table .ant-table-expanded-row-fixed {
   margin: 0px -16px !important;
+} 
+.noPaddingCollapse .ant-collapse-content-box {
+  padding: 0;
+}
+.customizedAntTable .ant-table-title {
+  padding: 2px 8px!important;
+}
+.fullHeightTab .ant-tabs-card {
+  height: 100%;
+}
+.fullHeightTab .ant-tabs-content-holder {
+  height: 100%;
+}
+.fullHeightTab .ant-tabs-content {
+  height: 100%;
+}
+.radiologyDescription .ant-descriptions-item-label{
+  font-weight: 500;
+  text-align: right;
 }

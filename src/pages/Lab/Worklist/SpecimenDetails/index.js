@@ -25,7 +25,6 @@ import {
   ProgressButton,
 } from '@/components'
 import { VisitTypeTag } from '@/components/_medisys'
-import { SpecimenStatusTag } from '../components/SpecimenStatusTag'
 import { TestPanelColumn } from '../components/TestPanelColumn'
 import { RetestSpecimen } from './components/RetestSpecimen'
 import { SpecimenDetailsStep } from './components'
@@ -103,7 +102,6 @@ export const SpecimenDetails = ({
   }
 
   const cleanUp = () => {
-    console.log('being clean up')
     form.setFieldsValue({})
     form.resetFields()
     setFormValues({})

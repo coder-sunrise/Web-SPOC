@@ -9,18 +9,18 @@ import {
 } from '@/utils/constants'
 
 export const SpecimenStatusTag = ({ statusId, customToolTip = '' }) => (
-  <Tooltip
-    title={
-      customToolTip
-        ? customToolTip
-        : LAB_SPECIMEN_STATUS_DESCRIPTION[`${statusId}`]
-    }
-  >
-    <Tag
-      color={LAB_SPECIMEN_STATUS_COLORS[`${statusId}`]}
-      style={{ width: 80, margin: 0, textAlign: 'center' }}
-    >
-      {LAB_SPECIMEN_STATUS_LABELS[`${statusId}`]}
-    </Tag>
-  </Tooltip>
-)
+         <Tooltip
+           title={
+             customToolTip
+               ? customToolTip
+               : LAB_SPECIMEN_STATUS_DESCRIPTION[statusId]
+           }
+         >
+           <Tag
+             color={LAB_SPECIMEN_STATUS_COLORS[statusId]}
+             style={{ width: 80, margin: 0, textAlign: 'center' }}
+           >
+             {LAB_SPECIMEN_STATUS_LABELS[statusId]}
+           </Tag>
+         </Tooltip>
+       )

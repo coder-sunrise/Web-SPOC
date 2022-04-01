@@ -19,6 +19,13 @@ export default createListViewModel({
         })
         return response
       },
+      *queryExaminationsList({ payload }, { call, put }) {
+        const response = yield call(service.queryExaminationsList, {
+          ...payload,
+          pagesize: 10,
+        })
+        return response
+      },
     },
     reducers: {},
   },
