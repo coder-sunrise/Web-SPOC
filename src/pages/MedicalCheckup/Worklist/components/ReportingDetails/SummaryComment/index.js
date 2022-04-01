@@ -422,15 +422,16 @@ const SummaryComment = props => {
     )
   }
 
-  const isCommentVerificationEnable = () => {
+  const isShowCommentVerification = () => {
     const commentVerificationAccessRight = Authorized.check(
       'medicalcheckupworklist.commentverification',
     ) || {
       rights: 'hidden',
     }
-    if (commentVerificationAccessRight.rights === 'enable') return true
+    if (commentVerificationAccessRight.rights !== 'hidden') return true
     return false
   }
+
   return (
     <div
       style={{
@@ -447,7 +448,7 @@ const SummaryComment = props => {
       >
         <div style={{ position: 'relative' }}>
           <span style={{ fontWeight: 'bold' }}>Summary Comment</span>
-          {isCommentVerificationEnable() && (
+          {isShowCommentVerification() && (
             <Badge
               style={{
                 paddingLeft: '4px',
