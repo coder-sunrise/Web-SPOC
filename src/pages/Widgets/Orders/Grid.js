@@ -1116,26 +1116,20 @@ export default ({
     const remainedTemplateItemIds = rows
       .filter(t => !t.isDeleted && t.visitOrderTemplateItemFK)
       .map(t => t.visitOrderTemplateItemFK)
-    let indicateString = visitOrderTemplate.displayValue
-    let removedItemString = _.join(
-      visitOrderTemplateItemDtos
-        .filter(t => remainedTemplateItemIds.indexOf(t.id) < 0)
-        .map(t => ' - ' + t.inventoryItemName),
-      ' ',
-    )
-    let newItemString = _.join(
-      rows
-        .filter(t => !t.isDeleted && !t.visitOrderTemplateItemFK)
-        .map(t => {
-          return ' + ' + t.subject
-        }),
-      ' ',
-    )
-    return {
-      indicateString: `${indicateString}`,
-      removedItemString: `${removedItemString ? removedItemString : ''}`,
-      newItemString: `${newItemString ? newItemString : ''}`,
-    }
+    let visitPurpose = visitOrderTemplate.displayValue
+    let removedItems = visitOrderTemplateItemDtos
+      .filter(t => remainedTemplateItemIds.indexOf(t.id) < 0)
+      .map(t => t.inventoryItemName)
+    let addedItems = rows
+      .filter(t => !t.isDeleted && !t.visitOrderTemplateItemFK)
+      .map(t => {
+        return t.subject
+      })
+    return JSON.stringify({
+      visitPurpose: visitPurpose,
+      removedItems: removedItems,
+      addedItems: addedItems,
+    })
   }
 
   const revertVisitPurpose = () => {
@@ -1315,32 +1309,9 @@ export default ({
                 const { visit } = entity || {}
                 const { children, ...restProps } = p
                 let newChildren = []
-                let indicate = visit?.visitOrderTemplateFK
+                let visitOrderTemplateDetails = visit?.visitOrderTemplateFK
                   ? getVisitOrderTemplateDetails(rows)
                   : {}
-                const indicateStringContent = (
-                  <span className='threeline_textblock'>
-                    {indicate.indicateString ? (
-                      <span>{indicate.indicateString}</span>
-                    ) : (
-                      <span></span>
-                    )}
-                    {indicate.removedItemString ? (
-                      <span style={{ color: '#FF0000' }}>
-                        {indicate.removedItemString}
-                      </span>
-                    ) : (
-                      <span></span>
-                    )}
-                    {indicate.newItemString ? (
-                      <span style={{ color: '#389e0d' }}>
-                        {indicate.newItemString}
-                      </span>
-                    ) : (
-                      <span></span>
-                    )}
-                  </span>
-                )
                 if (isExistPackage) {
                   newChildren = [
                     <Table.Cell
@@ -1352,7 +1323,9 @@ export default ({
                         <div>
                           <div>
                             <VisitOrderTemplateIndicateString
-                              indicate={indicate}
+                              visitOrderTemplateDetails={
+                                visitOrderTemplateDetails
+                              }
                             ></VisitOrderTemplateIndicateString>
                           </div>
                           <div>
@@ -1385,7 +1358,9 @@ export default ({
                         <div>
                           <div>
                             <VisitOrderTemplateIndicateString
-                              indicate={indicate}
+                              visitOrderTemplateDetails={
+                                visitOrderTemplateDetails
+                              }
                             ></VisitOrderTemplateIndicateString>
                           </div>
                           <div>

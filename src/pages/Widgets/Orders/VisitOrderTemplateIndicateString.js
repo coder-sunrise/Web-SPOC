@@ -5,36 +5,13 @@ import { Popover } from 'antd'
 // Has 2 kinds of data source, one is from order cart, one is from persisted VisitOrderTemplateDetails in visit table(need to extract the information first)
 const VisitOrderTemplateIndicateString = props => {
   const { visitOrderTemplateDetails, oneline } = props
-  let indicate = props.indicate
+  let indicate = {}
   if (visitOrderTemplateDetails) {
-    const removedItemIndex = visitOrderTemplateDetails.indexOf(' - ')
-    const addedItemIndex = visitOrderTemplateDetails.indexOf(' + ')
-    let removedItemString = ''
-    if (removedItemIndex > -1 && addedItemIndex > -1) {
-      removedItemString = visitOrderTemplateDetails.substr(
-        removedItemIndex,
-        addedItemIndex - removedItemIndex,
-      )
-    }
-    if (removedItemIndex > -1 && addedItemIndex == -1) {
-      removedItemString = visitOrderTemplateDetails.substr(removedItemIndex)
-    }
-    let newItemString = ''
-    if (addedItemIndex > -1) {
-      newItemString = visitOrderTemplateDetails.substr(addedItemIndex)
-    }
-
-    let indicateString = visitOrderTemplateDetails
-    if (removedItemIndex > -1) {
-      indicateString = visitOrderTemplateDetails.substr(0, removedItemIndex)
-    }
-    if (addedItemIndex > -1 && removedItemIndex == -1) {
-      indicateString = visitOrderTemplateDetails.substr(0, addedItemIndex)
-    }
+    const temp = JSON.parse(visitOrderTemplateDetails)
     indicate = {
-      indicateString,
-      removedItemString,
-      newItemString,
+      indicateString: temp.visitPurpose,
+      removedItemString: (temp.removedItems || []).join(' - '),
+      newItemString: (temp.addedItems || []).join(' + '),
     }
   }
   const indicateStringContent = (
@@ -45,12 +22,16 @@ const VisitOrderTemplateIndicateString = props => {
         <span></span>
       )}
       {indicate?.removedItemString ? (
-        <span style={{ color: '#FF0000' }}>{indicate.removedItemString}</span>
+        <span style={{ color: '#FF0000' }}>
+          {` - ${indicate.removedItemString}`}
+        </span>
       ) : (
         <span></span>
       )}
       {indicate?.newItemString ? (
-        <span style={{ color: '#389e0d' }}>{indicate.newItemString}</span>
+        <span
+          style={{ color: '#389e0d' }}
+        >{` + ${indicate.newItemString}`}</span>
       ) : (
         <span></span>
       )}
@@ -64,12 +45,16 @@ const VisitOrderTemplateIndicateString = props => {
         <span></span>
       )}
       {indicate?.removedItemString ? (
-        <span style={{ color: '#FF0000' }}>{indicate.removedItemString}</span>
+        <span style={{ color: '#FF0000' }}>
+          {` - ${indicate.removedItemString}`}
+        </span>
       ) : (
         <span></span>
       )}
       {indicate?.newItemString ? (
-        <span style={{ color: '#389e0d' }}>{indicate.newItemString}</span>
+        <span style={{ color: '#389e0d' }}>
+          {` + ${indicate.newItemString}`}
+        </span>
       ) : (
         <span></span>
       )}
