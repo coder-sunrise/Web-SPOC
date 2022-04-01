@@ -145,7 +145,10 @@ const ReportingDetails = props => {
       },
     }).then(r => {
       if (r) {
-        refreshMedicalCheckup()
+        notification.success({
+          message: 'Medical Checkup report unlocked.',
+        })
+        onClose()
       }
     })
   }
