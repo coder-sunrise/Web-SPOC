@@ -61,7 +61,7 @@ const TestResult = props => {
     },
     {
       id: 3,
-      name: 'External Service',
+      name: 'External Tracking',
       content: <ExternalService {...props} height={height} />,
     },
     {
