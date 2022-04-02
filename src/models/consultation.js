@@ -277,6 +277,7 @@ export default createFormViewModel({
             message: 'Consultation signed-off.',
             queueNo: entity.queueNo,
             visitID: entity.id,
+            isBillingSaved: payload.versionNumber > 1 ? false : undefined,
           })
         }
         return response

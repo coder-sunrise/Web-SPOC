@@ -366,9 +366,9 @@ class Billing extends Component {
         const {
           dispatch,
           values: { id, visitGroup, visitGroupStatusDetails = [] },
+          location: { pathname },
         } = this.props
-
-        if (visitID != id && isBillingSaved !== undefined) {
+        if (visitID != id && isBillingSaved !== undefined && pathname == "/reception/queue/billing") {
           if (visitGroupStatusDetails.some(x => x.visitFK === visitID)) {
             dispatch({
               type: 'groupInvoice/fetchVisitGroupStatusDetails',
