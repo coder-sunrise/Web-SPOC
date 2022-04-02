@@ -34,7 +34,7 @@ export const ValidationSchema = Yup.object().shape({
       const isFullPayment = isGroupPayment && totalAmtPaid < finalPayable
       if(isFullPayment) {
         min = finalPayable
-        minMsg = 'Outstanding must be paid full'
+        minMsg = 'Outstanding balance of current visit group must to be fully paid.'
       }
       return schema.of(
         Yup.object().shape({

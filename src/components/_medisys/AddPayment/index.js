@@ -466,6 +466,7 @@ class AddPayment extends Component {
                 hideDeposit={values.payerTypeFK !== INVOICE_PAYER_TYPE.PATIENT}
                 patientInfo={patient}
                 handlePaymentTypeClick={this.onPaymentTypeClick}
+                currentOSAmount={values.invoiceOSAmount}
               />
             </GridItem>
             <GridItem md={9}>

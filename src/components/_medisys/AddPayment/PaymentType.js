@@ -16,9 +16,10 @@ const PayerHeader = ({
   handlePaymentTypeClick,
   patientInfo,
   currentPayments = [],
+  currentOSAmount,
 }) => {
   const disableCash = currentPayments.includes(PAYMENT_MODE.CASH)
-  const disableDeposit = currentPayments.includes(PAYMENT_MODE.DEPOSIT)
+  const disableDeposit = currentPayments.includes(PAYMENT_MODE.DEPOSIT) || currentOSAmount <= 0
   return (
     <CardContainer className={classes.paymentModeContainer} hideHeader>
       {paymentModes.map((mode) => (
