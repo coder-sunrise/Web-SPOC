@@ -4,7 +4,7 @@ import { connect } from 'dva'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { Button, GridContainer, GridItem, serverDateFormat } from '@/components'
+import { Button, GridContainer, GridItem, serverDateFormat, notification } from '@/components'
 import withFormikExtend from '@/components/Decorator/withFormikExtend'
 // sub component
 import { roundTo } from '@/utils/utils'
@@ -493,7 +493,13 @@ class AddPayment extends Component {
               </Button>
               <Button
                 color='primary'
-                onClick={handleSubmit}
+                onClick={()=>{
+                  if (values.outstandingAfterPayment > 0) {
+                    notification.warning({
+                      message:'Outstanding balance of current visit group must to be fully paid.',
+                    })
+                  }else handleSubmit()
+                }}
                 disabled={values.paymentList.length === 0 || disabledPayment}
               >
                 Confirm
