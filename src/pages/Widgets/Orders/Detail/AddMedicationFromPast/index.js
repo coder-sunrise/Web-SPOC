@@ -181,6 +181,7 @@ class PastMedication extends PureComponent {
       ctmedicationdosage,
       ctmedicationunitofmeasurement,
       ctmedicationfrequency,
+      ctmedicationprecaution,
     } = codetable
 
     const medications = this.state.addedItems
@@ -277,10 +278,13 @@ class PastMedication extends PureComponent {
               drug.inventoryMedication_MedicationPrecaution.map(o => {
                 let currentPrecautionSequence = precautionIndex
                 precautionIndex += 1
+                const precaution = ctmedicationprecaution.find(
+                  x => x.id === o.medicationPrecautionFK,
+                )
                 return {
                   medicationPrecautionFK: o.medicationPrecautionFK,
-                  precaution: o.medicationPrecautionName,
-                  precautionCode: o.medicationPrecautionCode,
+                  precaution: precaution.displayValue,
+                  precautionCode: precaution.code,
                   sequence: currentPrecautionSequence,
                   isDeleted: false,
                   uid: getUniqueId(),

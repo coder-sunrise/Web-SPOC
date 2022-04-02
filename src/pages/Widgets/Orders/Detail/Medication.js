@@ -667,11 +667,8 @@ class Medication extends PureComponent {
     }
 
     newTotalQuantity = Math.ceil(newTotalQuantity * 10) / 10 || 0
-    const { prescriptionToDispenseConversion } = currentMedication
-    if (prescriptionToDispenseConversion)
-      newTotalQuantity = Math.ceil(
-        newTotalQuantity / prescriptionToDispenseConversion,
-      )
+    const { conversion } = currentMedication
+    if (conversion) newTotalQuantity = Math.ceil(newTotalQuantity / conversion)
     setFieldValue(`quantity`, newTotalQuantity)
 
     if (
@@ -807,6 +804,7 @@ class Medication extends PureComponent {
       orders = {},
     } = this.props
     const { corVitalSign = [] } = orders
+    const { ctmedicationprecaution } = codetable
     setFieldValue('costPrice', op.averageCostPrice || 0)
     const {
       corPrescriptionItemInstruction = [],
@@ -903,17 +901,20 @@ class Medication extends PureComponent {
       op.inventoryMedication_MedicationPrecaution.length > 0
     ) {
       op.inventoryMedication_MedicationPrecaution.forEach((im, i) => {
+        const precaution = ctmedicationprecaution.find(
+          t => t.id === im.medicationPrecautionFK,
+        )
         setFieldValue(
           `corPrescriptionItemPrecaution[${i}].medicationPrecautionFK`,
           im.medicationPrecautionFK,
         )
         setFieldValue(
           `corPrescriptionItemPrecaution[${i}].precaution`,
-          im.medicationPrecautionName,
+          precaution.displayValue,
         )
         setFieldValue(
           `corPrescriptionItemPrecaution[${i}].precautionCode`,
-          im.medicationPrecautionCode,
+          precaution.code,
         )
         setFieldValue(`corPrescriptionItemPrecaution[${i}].sequence`, i)
       })
@@ -1057,6 +1058,10 @@ class Medication extends PureComponent {
         payload: { code: 'inventorymedication' },
       })
     }
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'ctmedicationprecaution' },
+    })
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {

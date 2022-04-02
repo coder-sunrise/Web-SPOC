@@ -4,13 +4,14 @@ import { history } from 'umi'
 import { withStyles } from '@material-ui/core'
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 import { findGetParameter } from '@/utils/utils'
-import { ProgressButton } from '@/components'
+import { ProgressButton, Tooltip } from '@/components'
 import PatientHistory from '@/pages/Widgets/PatientHistory'
 import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE } from '@/utils/constants'
 import { CallingQueueButton } from '@/components/_medisys'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { initRoomAssignment } from '@/utils/codes'
+import PlayArrow from '@material-ui/icons/PlayArrow'
 import { openCautionAlertOnStartConsultation } from '@/pages/Widgets/Orders/utils'
 import Banner from './Banner'
 
@@ -166,17 +167,20 @@ class PatientDashboard extends PureComponent {
             patientProfile.isActive && (
               <Authorized authority='patientdashboard.startresumeconsultation'>
                 <div style={{ padding: '30px 0' }}>
-                  <ProgressButton
-                    color='primary'
-                    onClick={this.startConsultation}
-                    disabled={
-                      visitPurposeFK === VISIT_TYPE.OTC ||
-                      visitPurposeFK === VISIT_TYPE.BF ||
-                      visitPurposeFK === VISIT_TYPE.MC
-                    }
-                  >
-                    Start Consultation
-                  </ProgressButton>
+                  <Tooltip title='Start Consultation'>
+                    <ProgressButton
+                      color='primary'
+                      onClick={this.startConsultation}
+                      disabled={
+                        visitPurposeFK === VISIT_TYPE.OTC ||
+                        visitPurposeFK === VISIT_TYPE.BF ||
+                        visitPurposeFK === VISIT_TYPE.MC
+                      }
+                      round
+                      justIcon
+                      icon={<PlayArrow />}
+                    ></ProgressButton>
+                  </Tooltip>
                 </div>
               </Authorized>
             )}

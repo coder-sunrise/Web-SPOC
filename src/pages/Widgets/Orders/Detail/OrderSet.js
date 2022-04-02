@@ -86,6 +86,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       ctmedicationfrequency,
       ctmedicationdosage,
       ctvaccinationunitofmeasurement,
+      ctmedicationprecaution,
       ctvaccinationusage,
       doctorprofile,
     } = codetable
@@ -197,9 +198,12 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
         let currentMedicationPrecautions = []
         currentMedicationPrecautions = currentMedicationPrecautions.concat(
           medicationPrecautions.map(o => {
+            const precuation = ctmedicationprecaution.find(
+              t => t.id === o.medicationPrecautionFK,
+            )
             return {
-              precautionCode: o.medicationPrecautionCode,
-              Precaution: o.medicationPrecautionName,
+              precautionCode: precuation.code,
+              Precaution: precuation.displayValue,
               sequence: o.sequence,
               medicationPrecautionFK: o.medicationPrecautionFK,
             }
@@ -579,6 +583,11 @@ class OrderSet extends PureComponent {
       payload: {
         codes: codeTableNameArray,
       },
+    })
+
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'ctmedicationprecaution' },
     })
 
     this.tableProps = {

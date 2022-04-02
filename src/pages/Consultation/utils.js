@@ -524,6 +524,7 @@ const getOrdersData = val => {
     inventoryconsumable,
     inventorymedication,
     inventoryvaccination,
+    ctmedicationprecaution,
     ctservice,
   } = codetable
 
@@ -627,10 +628,13 @@ const getOrdersData = val => {
           inventoryMedication_MedicationPrecaution.map(o => {
             let currentPrecautionSequence = precautionIndex
             precautionIndex += 1
+            const precaution = ctmedicationprecaution.find(
+              t => t.id === o.medicationPrecautionFK,
+            )
             return {
               medicationPrecautionFK: o.medicationPrecautionFK,
-              precaution: o.medicationPrecautionName,
-              precautionCode: o.medicationPrecautionCode,
+              precaution: precaution.displayValue,
+              precautionCode: precaution.code,
               sequence: currentPrecautionSequence,
               isDeleted: false,
             }
