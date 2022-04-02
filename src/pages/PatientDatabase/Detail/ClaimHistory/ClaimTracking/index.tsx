@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
-import { Edit, Info } from '@material-ui/icons'
+import { Edit } from '@material-ui/icons'
+import { InfoCircleOutlined } from '@ant-design/icons'
 import Authorized from '@/utils/Authorized'
 import {
   Tooltip,
@@ -12,6 +13,7 @@ import {
 } from '@/components'
 import { ProTable } from '@medisys/component'
 import { ActionType } from '@ant-design/pro-table'
+import { useVisitTypes } from '@/utils/hooks'
 import service from './services'
 import Details from './Details'
 
@@ -28,8 +30,9 @@ const ClaimTracking = ({
     diagnosisDataSource = 'Snomed',
     isEnableJapaneseICD10Diagnosis = false,
   } = clinicSettings
+  const visitTypes = useVisitTypes()
 
-  const getColumns = () => {
+  const getColumns = (visitTypes = []) => {
     const editClaimHistoryRight = Authorized.check(
       'patientdatabase.patientprofiledetails.claimhistory.viewclaimtracking.edit',
     ) || { rights: 'hidden' }
@@ -41,6 +44,7 @@ const ClaimTracking = ({
         dataIndex: 'visitDate',
         sorter: false,
         search: false,
+        fixed: 'left',
         render: (_dom, row) => {
           const visitDate = moment(row.visitDate).format(dateFormatLong)
           return (
@@ -50,6 +54,23 @@ const ClaimTracking = ({
           )
         },
         width: 100,
+      },
+      {
+        key: 'visitType',
+        title: 'Visit Type',
+        dataIndex: 'visitType',
+        sorter: false,
+        search: false,
+        fixed: 'left',
+        render: (_dom, row) => {
+          const vt = visitTypes.find(x => x.id === row.visitPurposeFK)
+          return (
+            <Tooltip title={vt?.code}>
+              <div>{vt?.code}</div>
+            </Tooltip>
+          )
+        },
+        width: 80,
       },
       {
         key: 'doctor',
@@ -180,12 +201,17 @@ const ClaimTracking = ({
         key: 'isClaimable',
         title: 'Claimable',
         dataIndex: 'isClaimable',
-        width: 80,
+        width: 85,
         align: 'center',
         sorter: false,
         search: false,
         render: (_dom, row) => {
-          const claimable = row.isClaimable ? 'Yes' : 'No'
+          let claimable = '-'
+          if (row.isClaimable === true) {
+            claimable = 'Yes'
+          } else if (row.isClaimable === false) {
+            claimable = 'No'
+          }
           return (
             <Tooltip title={claimable}>
               <div>{claimable}</div>
@@ -215,7 +241,7 @@ const ClaimTracking = ({
         key: 'firstVisitDate',
         title: 'First Visit Date',
         dataIndex: 'firstVisitDate',
-        width: 110,
+        width: 115,
         sorter: false,
         search: false,
         render: (_dom, row) => {
@@ -265,12 +291,12 @@ const ClaimTracking = ({
                   </div>
                 }
               >
-                <Info
+                <InfoCircleOutlined
                   style={{
-                    color: 'red',
+                    color: 'gray',
                     marginLeft: 2,
                     position: 'relative',
-                    bottom: '-4px',
+                    bottom: '-2px',
                     fontSize: '1rem',
                   }}
                 />
@@ -324,12 +350,12 @@ const ClaimTracking = ({
                 </div>
               }
             >
-              <Info
+              <InfoCircleOutlined
                 style={{
-                  color: 'red',
+                  color: 'gray',
                   marginLeft: 2,
                   position: 'relative',
-                  bottom: '-4px',
+                  bottom: '-2px',
                   fontSize: '1rem',
                 }}
               />
@@ -370,6 +396,34 @@ const ClaimTracking = ({
                 }}
               >
                 {row.diagnosisRemarks || '-'}
+              </div>
+            </Tooltip>
+          )
+        },
+      },
+      {
+        key: 'remarks',
+        title: 'Remarks',
+        dataIndex: 'remarks',
+        sorter: false,
+        search: false,
+        width: 200,
+        render: (_dom, row) => {
+          return (
+            <Tooltip
+              title={
+                <div style={{ whiteSpace: 'pre-wrap' }}>{row.remarks}</div>
+              }
+            >
+              <div
+                style={{
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  width: 184,
+                }}
+              >
+                {row.remarks || '-'}
               </div>
             </Tooltip>
           )
@@ -418,30 +472,6 @@ const ClaimTracking = ({
           return (
             <Tooltip title={updateDate}>
               <div>{updateDate}</div>
-            </Tooltip>
-          )
-        },
-      },
-      {
-        key: 'remarks',
-        title: 'Remarks',
-        dataIndex: 'remarks',
-        sorter: false,
-        search: false,
-        width: 200,
-        render: (_dom, row) => {
-          return (
-            <Tooltip title={row.remarks}>
-              <div
-                style={{
-                  textOverflow: 'ellipsis',
-                  overflow: 'hidden',
-                  whiteSpace: 'nowrap',
-                  width: 184,
-                }}
-              >
-                {row.remarks || '-'}
-              </div>
             </Tooltip>
           )
         },
@@ -531,7 +561,7 @@ const ClaimTracking = ({
         actionRef={myRef}
         rowSelection={false}
         options={false}
-        columns={getColumns()}
+        columns={getColumns(visitTypes)}
         api={api}
         defaultColumns={[]}
         search={false}

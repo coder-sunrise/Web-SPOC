@@ -17,6 +17,7 @@ import {
   Tooltip,
   dateFormatLong,
   dateFormatLongWithTimeNoSec,
+  MultipleTextField,
 } from '@/components'
 
 const styles = theme => ({})
@@ -333,7 +334,9 @@ const Details = ({
         <ContentGridItem title='Remarks:'>
           <FastField
             name='remarks'
-            render={args => <TextField multiple maxLength={2000} {...args} />}
+            render={args => (
+              <MultipleTextField maxLength={2000} rows={4} {...args} />
+            )}
           />
         </ContentGridItem>
       </GridContainer>

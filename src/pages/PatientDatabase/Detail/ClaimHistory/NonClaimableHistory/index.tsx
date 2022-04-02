@@ -56,13 +56,8 @@ const NonClaimableHistory = ({
         sorter: false,
         search: false,
         render: (_dom, row) => {
-          const newDetails = (row.details || '').split('\n')
           return (
-            <div>
-              {newDetails.map(d => (
-                <div>{d}</div>
-              ))}
-            </div>
+            <div style={{ whiteSpace: 'pre-wrap' }}>{row.details || ''}</div>
           )
         },
       },
@@ -74,13 +69,8 @@ const NonClaimableHistory = ({
         search: false,
         width: 400,
         render: (_dom, row) => {
-          const newDetails = (row.remarks || '').split('\n')
           return (
-            <div>
-              {newDetails.map(d => (
-                <div>{d}</div>
-              ))}
-            </div>
+            <div style={{ whiteSpace: 'pre-wrap' }}>{row.remarks || ''}</div>
           )
         },
       },
