@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'dva'
 import moment from 'moment'
 import _ from 'lodash'
 import { history, connect } from 'umi'
-import { Card, Tooltip, Button } from 'antd'
+import { Card, Button } from 'antd'
 import { WORK_ITEM_TYPES } from '@/utils/constants'
 import NurseWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/NurseWorkItemInfo'
 import RadioWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/RadioWorkItemInfo'
@@ -16,10 +16,14 @@ import {
   TextField,
   Select,
   DatePicker,
+  Tooltip,
 } from '@/components'
 import { ProTable } from '@medisys/component'
 import service from './services'
 import { hasValue } from '@/pages/Widgets/PatientHistory/config'
+import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
+import { getVisitOrderTemplateContent } from '../Worklist/components/Util'
+
 const { queryList, query } = service
 const api = {
   remove: null,
@@ -77,7 +81,7 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
   }
 
   const visitDateForm = moment()
-    .add(-1, 'week')
+    .add(-1, 'month')
     .toDate()
   const visitDateTo = moment()
     .add(-1, 'day')
@@ -85,6 +89,16 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
 
   const defaultColumns = () => {
     return [
+      {
+        key: 'patientName',
+        title: 'Patient Name',
+        dataIndex: 'patientName',
+        sorter: true,
+        search: false,
+        fixed: 'left',
+        width: 200,
+        sortBy: 'patientName',
+      },
       {
         key: 'patientReferenceNo',
         title: 'Ref. No.',
@@ -102,15 +116,6 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         search: false,
         fixed: 'left',
         width: 100,
-      },
-      {
-        key: 'patientName',
-        title: 'Patient Name',
-        dataIndex: 'patientName',
-        sorter: false,
-        search: false,
-        fixed: 'left',
-        width: 200,
       },
       {
         key: 'genderAge',
@@ -134,78 +139,72 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         render: (_dom, entity) => {
           if (entity.reportPriority === 'Urgent') {
             return (
-              <span>
-                <Icon
-                  type='thunder'
-                  style={{ fontSize: 15, color: 'red', alignSelf: 'center' }}
-                />
-                <span>{entity.urgentReportRemarks}</span>
-              </span>
+              <Tooltip title={entity.urgentReportRemarks}>
+                <div style={{ position: 'relative', paddingLeft: 15 }}>
+                  <Icon
+                    type='thunder'
+                    style={{
+                      fontSize: 15,
+                      color: 'red',
+                      alignSelf: 'center',
+                      position: 'absolute',
+                      left: 0,
+                      top: 2,
+                    }}
+                  />
+                  <div
+                    style={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {entity.urgentReportRemarks}
+                  </div>
+                </div>
+              </Tooltip>
             )
           }
-          return ''
+          return 'Normal'
         },
       },
       {
-        key: 'visitOrderTemplateName',
+        key: 'visitOrderTemplateDetails',
         title: 'Visit Purpose',
-        dataIndex: 'visitOrderTemplateName',
+        dataIndex: 'visitOrderTemplateDetails',
         sorter: false,
         search: false,
         width: 200,
+        render: (_dom, entity) => {
+          const visitOrderTemplateContent = getVisitOrderTemplateContent(
+            entity.visitOrderTemplateDetails,
+          )
+          return (
+            <Tooltip title={visitOrderTemplateContent}>
+              <div
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {visitOrderTemplateContent || '-'}
+              </div>
+            </Tooltip>
+          )
+        },
       },
       {
         key: 'visitDate',
         title: 'Visit Date',
         dataIndex: 'visitDate',
-        sorter: false,
+        sorter: true,
         search: false,
         width: 140,
+        defaultSortOrder: 'descend',
+        sortBy: 'visitDate',
         render: (_dom, entity) =>
           entity.visitDate?.format(dateFormatLongWithTimeNoSec) || '-',
-      },
-      {
-        key: 'workItem',
-        title: 'Work Item',
-        dataIndex: 'workItem',
-        sorter: false,
-        search: false,
-        width: 160,
-        render: (item, entity) => {
-          const dispatch = useDispatch()
-          const workItemSummary = JSON.parse(entity.workItemSummary || '[]')
-          const radioWorkItems =
-            workItemSummary.find(t => t.type === WORK_ITEM_TYPES.RADIOLOGY) ||
-            {}
-          const labWorkItems =
-            workItemSummary.find(t => t.type === WORK_ITEM_TYPES.LAB) || {}
-          const nurseWorkItems =
-            workItemSummary.find(
-              t => t.type === WORK_ITEM_TYPES.NURSEACTUALIZE,
-            ) || {}
-          return (
-            <div style={{ justifyContent: 'space-between' }}>
-              {labWorkItems && labWorkItems.totalWorkItem > 0 && (
-                <LabWorkItemInfo
-                  visitFK={entity.visitFK}
-                  workItemSummary={labWorkItems}
-                />
-              )}
-              {radioWorkItems && radioWorkItems.totalWorkItem > 0 && (
-                <RadioWorkItemInfo
-                  visitFK={entity.visitFK}
-                  workItemSummary={radioWorkItems}
-                />
-              )}
-              {nurseWorkItems && nurseWorkItems.totalWorkItem > 0 && (
-                <NurseWorkItemInfo
-                  visitFK={entity.visitFK}
-                  workItemSummary={nurseWorkItems}
-                />
-              )}
-            </div>
-          )
-        },
       },
       {
         key: 'medicalCheckupWorkitemDoctor',
@@ -217,11 +216,7 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         render: (item, entity) => {
           const doctors = (entity.medicalCheckupWorkitemDoctor || [])
             .map(doctor => {
-              return `${
-                hasValue(doctor.title) && doctor.title.trim().length
-                  ? `${doctor.title}.`
-                  : ''
-              }${doctor.name || ''}`
+              return doctor.name
             })
             .join(', ')
           return (
@@ -240,30 +235,22 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         },
       },
       {
-        key: 'verifiedDate',
-        title: 'Verified Date',
-        dataIndex: 'verifiedDate',
+        key: 'completedDate',
+        title: 'Completed Date',
+        dataIndex: 'completedDate',
         render: (_dom, entity) =>
-          entity.verifiedDate?.format(dateFormatLongWithTimeNoSec) || '-',
+          entity.completedDate?.format(dateFormatLongWithTimeNoSec) || '-',
         sorter: false,
         search: false,
         width: 140,
       },
       {
-        key: 'verifiedByUser',
-        title: 'Verified By',
-        dataIndex: 'verifiedByUser',
+        key: 'completedByUser',
+        title: 'Completed By',
+        dataIndex: 'completedByUser',
         sorter: false,
         search: false,
         width: 180,
-      },
-      {
-        key: 'visitRemarks',
-        title: 'Visit Remarks',
-        dataIndex: 'visitRemarks',
-        sorter: false,
-        search: false,
-        width: 250,
       },
       {
         key: 'action',
@@ -442,12 +429,20 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         }
       }}
       request={params => {
+        const { sort = [] } = params
+        let sortBy
+        let order
+        if (sort.length) {
+          sortBy = sort[0].sortby
+          order = sort[0].order
+        }
         return queryList({
-          ...params,
           apiCriteria: {
             ...params.apiCriteria,
             current: params.current,
             pageSize: params.pageSize,
+            sortBy,
+            order: order,
           },
         })
       }}

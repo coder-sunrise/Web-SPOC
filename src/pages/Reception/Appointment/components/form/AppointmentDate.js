@@ -10,16 +10,9 @@ import {
   CodeSelect,
 } from '@/components'
 
-const AppointmentDate = ({
-  disabled,
-  visitOrderTemplateOptions,
-  patientProfileFK,
-}) => {
-  const isRegisteredPatient =
-    patientProfileFK !== undefined && patientProfileFK !== null
+const AppointmentDate = ({ disabled, visitOrderTemplateOptions }) => {
   return (
     <React.Fragment>
-      {!isRegisteredPatient && <GridItem xs md={2} />}
       <GridItem xs md={2}>
         <Field
           name='currentAppointment.appointmentDate'

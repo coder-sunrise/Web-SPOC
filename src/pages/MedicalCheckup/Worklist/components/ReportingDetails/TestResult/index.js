@@ -13,7 +13,13 @@ const TestResult = props => {
   const ctexaminationcategory = useCodeTable('ctexaminationcategory')
   const ctexaminationitem = useCodeTable('ctexaminationitem')
   const ctindividualcomment = useCodeTable('ctindividualcomment')
-  const { height, setShowResultDetails, medicalCheckupReportingDetails } = props
+  const {
+    height,
+    setShowResultDetails,
+    medicalCheckupReportingDetails,
+    genderFK,
+    clinicSettings,
+  } = props
   const options = [
     {
       id: 0,
@@ -24,6 +30,7 @@ const TestResult = props => {
           defaultSelectMedicalCheckup
           visitFK={medicalCheckupReportingDetails.visitID}
           patientProfileFK={medicalCheckupReportingDetails.patientID}
+          genderFK={genderFK}
         />
       ),
     },
@@ -34,6 +41,7 @@ const TestResult = props => {
         <LabResults
           visitFK={medicalCheckupReportingDetails.visitID}
           height={height}
+          clinicSettings={clinicSettings}
           patientProfileFK={medicalCheckupReportingDetails.patientID}
         ></LabResults>
       ),
@@ -53,7 +61,7 @@ const TestResult = props => {
     },
     {
       id: 3,
-      name: 'External Service',
+      name: 'External Tracking',
       content: <ExternalService {...props} height={height} />,
     },
     {

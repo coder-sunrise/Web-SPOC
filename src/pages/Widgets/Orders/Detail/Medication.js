@@ -2162,7 +2162,6 @@ class Medication extends PureComponent {
                                         label={formatMessage({
                                           id: 'inventory.master.setting.usage',
                                         })}
-                                        allowClear={false}
                                         style={{
                                           marginLeft: 15,
                                           paddingRight: 15,
@@ -2197,7 +2196,6 @@ class Medication extends PureComponent {
                                       label={formatMessage({
                                         id: 'inventory.master.setting.dosage',
                                       })}
-                                      allowClear={false}
                                       code='ctMedicationDosage'
                                       labelField='displayValue'
                                       {...commonSelectProps}
@@ -2266,7 +2264,6 @@ class Medication extends PureComponent {
                                           'inventory.master.setting.frequency',
                                       })}
                                       labelField='displayValue'
-                                      allowClear={false}
                                       code='ctMedicationFrequency'
                                       {...commonSelectProps}
                                       {...args}

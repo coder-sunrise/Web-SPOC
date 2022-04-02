@@ -227,8 +227,9 @@ class DrugLabelSelection extends React.PureComponent {
           indicationArray.length > 2
             ? indicationArray[2] +
               ' ' +
+              (t.isDrugMixture && indicationArray.length > 3 ? ', ' : '') +
               // currently will append all the precaution into last line if it's AND
-              (t.isDrugMixture ? _.takeRight(indicationArray, 2).join(' ') : '')
+              (t.isDrugMixture ? _.slice(indicationArray, 3).join(', ') : '')
             : ' '
         // If it's drugmixture, then just duplicate by copies.
         if (t.isDrugMixture) {

@@ -883,11 +883,12 @@ export const ORDER_TYPES = {
 export const LAB_WORKITEM_STATUS = {
   NEW: 1,
   SPECIMENCOLLECTED: 2,
-  INPROGRESS: 3,
-  FORRETEST: 4,
-  PENDINGFIRSTVERIFIER: 5,
-  PENDINGSECONDVERIFIER: 6,
-  COMPLETED: 7,
+  SPECIMENRECEIVED: 3,
+  INPROGRESS: 4,
+  FORRETEST: 5,
+  PENDINGFIRSTVERIFIER: 6,
+  PENDINGSECONDVERIFIER: 7,
+  COMPLETED: 8,
 }
 
 export const LAB_SPECIMEN_STATUS = {
@@ -1004,7 +1005,7 @@ export const TESTTYPES = {
   AUDIOMETRY: 'Audiometry',
   COLORVISIONTEST: 'ColorVisionTest',
   PREGNANCY: 'Pregnancy',
-  MENSUS: 'Mensus',
+  MENSES: 'Menses',
   R5MCORRECTED: 'Right5mCorrected',
   R50CMCORRECTED: 'Right50cmCorrected',
   L5MCORRECTED: 'Left5mCorrected',
@@ -1054,7 +1055,7 @@ export const MEDICALCHECKUP_WORKITEM_STATUSES = [
   {
     id: MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED,
     label: 'Completed',
-    color: '#009933',
+    color: '#007D00',
     description: 'Completed',
   },
 ]

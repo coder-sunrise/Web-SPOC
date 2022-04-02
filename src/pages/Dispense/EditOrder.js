@@ -92,6 +92,7 @@ const styles = () => ({})
     return {
       ...(consultation.entity || consultation.default),
       dummyField: '',
+      acknowledged: true,
       dispenseAcknowledgement: {
         editDispenseReasonFK: 1,
       },
@@ -125,7 +126,7 @@ class EditOrder extends Component {
   }
 
   state = {
-    acknowledged: false,
+    acknowledged: true,
     isShowPackageSelectModal: false,
     expandedEyeExaminations: false,
     expandedAudiometryTest: false,

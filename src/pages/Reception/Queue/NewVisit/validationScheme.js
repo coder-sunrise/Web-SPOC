@@ -110,33 +110,21 @@ export const visitBasicExaminationsSchema = Yup.object().shape({
 export const eyeExaminationsSchema = Yup.object().shape({
   visionCorrectionMethod: Yup.string().when(
     [
-      'rightBareEye5',
       'rightCorrectedVision5',
-      'rightBareEye50',
       'rightCorrectedVision50',
-      'leftBareEye5',
       'leftCorrectedVision5',
-      'leftBareEye50',
       'leftCorrectedVision50',
     ],
     (
-      rightBareEye5,
       rightCorrectedVision5,
-      rightBareEye50,
       rightCorrectedVision50,
-      leftBareEye5,
       leftCorrectedVision5,
-      leftBareEye50,
       leftCorrectedVision50,
     ) => {
       if (
-        hasValue(rightBareEye5) ||
         hasValue(rightCorrectedVision5) ||
-        hasValue(rightBareEye50) ||
         hasValue(rightCorrectedVision50) ||
-        hasValue(leftBareEye5) ||
         hasValue(leftCorrectedVision5) ||
-        hasValue(leftBareEye50) ||
         hasValue(leftCorrectedVision50)
       )
         return Yup.string().required()

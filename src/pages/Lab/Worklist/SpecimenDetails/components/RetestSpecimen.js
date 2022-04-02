@@ -32,6 +32,7 @@ export const RetestSpecimen = ({ open, id, onClose, onConfirm }) => {
   useEffect(() => {
     setShowModal(open)
     if (open && id) {
+      form.resetFields()
       dispatch({
         type: 'worklistSpecimenDetails/query',
         payload: { id },

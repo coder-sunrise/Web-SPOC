@@ -6,7 +6,8 @@ import { withStyles } from '@material-ui/core'
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
 import { getBizSession } from '@/services/queue'
-import { Tag, Input, Tooltip } from 'antd'
+import { Tag, Input } from 'antd'
+import { Tooltip } from '@/components'
 import { PlusOutlined } from '@ant-design/icons'
 import {
   GridContainer,
@@ -92,7 +93,10 @@ const testPanelSchema = Yup.object().shape({
       serviceCenterList: allServiceCenters,
       entity = {},
     } = settingClinicService
-    const { ctServiceCenter_ServiceNavigation: currentServiceCenters } = entity
+    const {
+      ctServiceCenter_ServiceNavigation: currentServiceCenters,
+      ctService_ExaminationItem,
+    } = entity
 
     const returnValue =
       settingClinicService.entity || settingClinicService.default
@@ -105,12 +109,14 @@ const testPanelSchema = Yup.object().shape({
         ctServiceCenter_ServiceNavigation[0].isDefault = true
       }
     }
-
     return {
       ...returnValue,
       hasInternalLabServiceCenter: checkAnyInternalLabServiceCenter(
         currentServiceCenters,
         allServiceCenters,
+      ),
+      examinationItems: (ctService_ExaminationItem || []).map(
+        x => x.examinationItemFK,
       ),
     }
   },
@@ -636,6 +642,35 @@ class Detail extends PureComponent {
     setFieldValue('ctService_Tag', [...currentTags, ...deletedTags])
   }
 
+  handleExaminationItemChange = examinationItems => {
+    const { setFieldValue } = this.props
+    const {
+      ctService_ExaminationItem: originalExaminationItems = [],
+      id: serviceId,
+    } = this.props.initialValues
+
+    const currentExaminations = examinationItems.map(t => {
+      return {
+        serviceFK: serviceId,
+        examinationItemFK: t,
+        isDeleted: false,
+        ...originalExaminationItems.find(x => x.examinationItemFK === t),
+      }
+    })
+
+    console.log(originalExaminationItems)
+    const deletedExaminationItems = originalExaminationItems
+      .filter(t => !examinationItems.includes(t.examinationItemFK))
+      .map(t => {
+        return { ...t, isDeleted: true }
+      })
+
+    console.log([...currentExaminations, ...deletedExaminationItems])
+    setFieldValue('ctService_ExaminationItem', [
+      ...currentExaminations,
+      ...deletedExaminationItems,
+    ])
+  }
   computeHiddenFields = rows => {
     const serviceSettings = rows.filter(r => !r.isDeleted)
 
@@ -799,19 +834,32 @@ class Detail extends PureComponent {
                 </GridItem>
                 {settings.isEnableMedicalCheckupModule && (
                   <GridItem xs={6}>
-                    <FastField
-                      name='examinationItemFK'
-                      render={args => {
-                        return (
-                          <CodeSelect
-                            label='Examination'
-                            code='ctexaminationitem'
-                            labelField='displayValue'
-                            {...args}
-                          />
-                        )
-                      }}
-                    />
+                    <Tooltip
+                      title='When this service is ordered in Medical Checkup, comment for this service will be written in the selected examination'
+                      placement='right-start'
+                    >
+                      <div>
+                        <FastField
+                          name='examinationItems'
+                          render={args => {
+                            return (
+                              <CodeSelect
+                                label='Medical Checkup Examination'
+                                code='ctexaminationitem'
+                                labelField='displayValue'
+                                allClear={true}
+                                maxTagCount={0}
+                                mode='multiple'
+                                onChange={v => {
+                                  this.handleExaminationItemChange(v)
+                                }}
+                                {...args}
+                              />
+                            )
+                          }}
+                        />
+                      </div>
+                    </Tooltip>
                   </GridItem>
                 )}
                 {settings.isEnableMedisave && (
