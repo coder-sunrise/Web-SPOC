@@ -295,6 +295,7 @@ export const DispenseItemsColumnExtensions = (
   onDrugLabelClick,
   onActualizeBtnClick,
   showDrugLabelRemark,
+  isFromMedicalCheckup = false,
 ) => {
   return [
     {
@@ -547,10 +548,15 @@ export const DispenseItemsColumnExtensions = (
       sortingEnabled: false,
       type: 'number',
       isDisabled: row => {
-        return viewOnly || !row.allowToDispense || row.isDispensedByPharmacy
+        return (
+          isFromMedicalCheckup ||
+          viewOnly ||
+          !row.allowToDispense ||
+          row.isDispensedByPharmacy
+        )
       },
       render: row => {
-        if (viewOnly || !row.allowToDispense) {
+        if (isFromMedicalCheckup || viewOnly || !row.allowToDispense) {
           const qty = !row.stockFK
             ? '-'
             : numeral(row.dispenseQuantity).format('0.0')
@@ -738,7 +744,7 @@ export const DispenseItemsColumnExtensions = (
         )
       },
       isDisabled: row => {
-        return viewOnly || !row.allowToDispense
+        return isFromMedicalCheckup || viewOnly || !row.allowToDispense
       },
       onChange: ({ option, row }) => {
         if (option) {
@@ -785,7 +791,7 @@ export const DispenseItemsColumnExtensions = (
       sortingEnabled: false,
       type: 'date',
       isDisabled: row => {
-        return viewOnly || !row.isDefault
+        return isFromMedicalCheckup || viewOnly || !row.isDefault
       },
       render: row => {
         const expiryDate = row.expiryDate

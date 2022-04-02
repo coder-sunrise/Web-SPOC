@@ -6,6 +6,7 @@ import { Tabs, withFormikExtend } from '@/components'
 import { Button } from 'antd'
 import { LoadingWrapper } from '@/components/_medisys'
 import { withStyles } from '@material-ui/core'
+import Authorized from '@/utils/Authorized'
 import { MEDICALCHECKUP_WORKITEM_STATUS } from '@/utils/constants'
 import IndividualComment from './IndividualComment'
 import SummaryComment from './SummaryComment'
@@ -65,9 +66,11 @@ class CommentVerification extends PureComponent {
         name: (
           <div>
             <span style={{ display: 'inline-block' }}>Individual Comment</span>
-            <div className={classes.pendingVerifyCount}>
-              {individualPendingVerifyCount}
-            </div>
+            {individualPendingVerifyCount > 0 && (
+              <div className={classes.pendingVerifyCount}>
+                {individualPendingVerifyCount}
+              </div>
+            )}
           </div>
         ),
         content: (
@@ -82,9 +85,11 @@ class CommentVerification extends PureComponent {
         name: (
           <div>
             <span style={{ display: 'inline-block' }}>Summary Comment</span>
-            <div className={classes.pendingVerifyCount}>
-              {summaryPendingVerifyCount}
-            </div>
+            {summaryPendingVerifyCount > 0 && (
+              <div className={classes.pendingVerifyCount}>
+                {summaryPendingVerifyCount}
+              </div>
+            )}
           </div>
         ),
         content: (
@@ -97,13 +102,24 @@ class CommentVerification extends PureComponent {
     ]
   }
 
+  isCommentVerificationEnable = () => {
+    const commentVerificationAccessRight = Authorized.check(
+      'medicalcheckupworklist.commentverification',
+    ) || {
+      rights: 'hidden',
+    }
+    if (commentVerificationAccessRight.rights === 'enable') return true
+    return false
+  }
+
   getEditCommentEnable = () => {
     const { medicalCheckupReportingDetails } = this.props
     const medicalCheckupstatus = medicalCheckupReportingDetails.entity?.statusFK
     return (
       medicalCheckupstatus !==
         MEDICALCHECKUP_WORKITEM_STATUS.PENDINGVERIFICATION &&
-      medicalCheckupstatus !== MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED
+      medicalCheckupstatus !== MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED &&
+      this.isCommentVerificationEnable()
     )
   }
 

@@ -135,7 +135,8 @@ const LabWorkItemInfo = props => {
                       : 'black',
                 }}
               >
-                {labWorkitem.statusFK === LAB_WORKITEM_STATUS.NEW
+                {labWorkitem.statusFK === LAB_WORKITEM_STATUS.NEW ||
+                labWorkitem.statusFK === LAB_WORKITEM_STATUS.SPECIMENCOLLECTED
                   ? 'New'
                   : labWorkitem.statusFK === LAB_WORKITEM_STATUS.COMPLETED
                   ? 'Completed'

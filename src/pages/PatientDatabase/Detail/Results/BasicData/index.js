@@ -9,6 +9,7 @@ import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 import { TESTTYPES, GENDER } from '@/utils/constants'
 import TestResultLabel from './TestResultLabel'
 import tablestyles from './index.less'
+import { set } from 'lodash'
 
 const styles = theme => ({})
 @connect(({ clinicSettings }) => ({ clinicSettings }))
@@ -38,7 +39,8 @@ class BasicData extends Component {
   }
 
   searchData = () => {
-    if (!this.props.patientProfileFK) return
+    if (!this.props.patientProfileFK || this.state.isLoaded) return
+    this.setState({ isLoaded: true })
     const { genderFK } = this.props
     this.setState(
       {
@@ -105,7 +107,7 @@ class BasicData extends Component {
       .filter(
         d =>
           genderFK !== GENDER.MALE ||
-          [TESTTYPES.PREGNANCY, TESTTYPES.MENSUS].indexOf(d.testCode) < 0,
+          [TESTTYPES.PREGNANCY, TESTTYPES.MENSES].indexOf(d.testCode) < 0,
       )
       .map(row => {
         let insertVisit = {}
@@ -142,14 +144,6 @@ class BasicData extends Component {
         return { ...row, ...insertVisit }
       })
 
-    if (!this.hasAnyValue(TESTTYPES.ROHRER, newData)) {
-      newData = newData.filter(d => d.testCode !== TESTTYPES.ROHRER)
-    }
-
-    if (!this.hasAnyValue(TESTTYPES.KAUP, newData)) {
-      newData = newData.filter(d => d.testCode !== TESTTYPES.KAUP)
-    }
-
     let newColumns = defaultColumns(genderFK).filter(
       c => c.dataIndex !== 'action',
     )
@@ -178,6 +172,15 @@ class BasicData extends Component {
           if (row.testCode === TESTTYPES.COLORVISIONTEST) {
             tooltip = row[`colorVisionRemarksColumn${i + 1}`]
           }
+
+          if (
+            row.testCode === TESTTYPES.WAIST &&
+            row[`valueColumn${i + 1}`] === 'NA'
+          ) {
+            tooltip =
+              'Waist circumference is not available for children or pregnant women'
+          }
+
           return (
             <div
               style={{
@@ -227,7 +230,7 @@ class BasicData extends Component {
   render() {
     const { height, clinicSettings } = this.props
     const { total, currentPage } = this.state
-    const showLoadMore = currentPage * 5 < total
+    const showLoadMore = currentPage * 10 < total
     return (
       <div>
         <div style={{ position: 'relative', height: 40 }}>

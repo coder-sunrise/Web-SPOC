@@ -140,14 +140,10 @@ const ReportHistory = props => {
             },
             {
               dataIndex: 'generateByUser',
+              width: 160,
               title: <div className={classes.cell}>Generate By</div>,
               render: (text, row) => {
-                const name = `${
-                  hasValue(row.generateByUserTitle) &&
-                  row.generateByUserTitle.trim().length
-                    ? `${row.generateByUserTitle}.`
-                    : ''
-                }${row.generateByUser}`
+                const name = row.generateByUser || ''
                 return <div className={classes.cell}>{name}</div>
               },
             },
@@ -169,14 +165,10 @@ const ReportHistory = props => {
             },
             {
               dataIndex: 'verifyByUser',
+              width: 160,
               title: <div className={classes.cell}>Verify By</div>,
               render: (text, row) => {
-                const name = `${
-                  hasValue(row.verifyByUserTitle) &&
-                  row.verifyByUserTitle.trim().length
-                    ? `${row.verifyByUserTitle}.`
-                    : ''
-                }${row.verifyByUser || ''}`
+                const name = row.verifyByUser || ''
                 return <div className={classes.cell}>{name}</div>
               },
             },
@@ -188,7 +180,12 @@ const ReportHistory = props => {
                   MEDICALCHECKUP_REPORTSTATUS.PENDINGVERIFY ? (
                   ''
                 ) : (
-                  <div className={classes.cell}>{row.verifyRemarks || '-'}</div>
+                  <div
+                    className={classes.cell}
+                    style={{ whiteSpace: 'pre-wrap' }}
+                  >
+                    {row.verifyRemarks || '-'}
+                  </div>
                 )
               },
             },

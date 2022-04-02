@@ -70,6 +70,10 @@ export default createListViewModel({
         }
         return r
       },
+      *ack({ payload }, { call, put }) {
+        const r = yield call(service.ack, payload)
+        return r && r === 204
+      },
       *saveUserPreference({ payload }, { call, put, select }) {
         const r = yield call(saveUserPreference, {
           userPreferenceDetails: JSON.stringify(payload.userPreferenceDetails),

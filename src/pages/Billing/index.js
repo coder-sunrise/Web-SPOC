@@ -284,7 +284,7 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
   notDirtyDuration: 3,
   displayName: 'BillingForm',
   enableReinitialize: true,
-  mapPropsToValues: ({ billing, clinicSettings, patient }) => {
+  mapPropsToValues: ({ billing, clinicSettings }) => {
     const { autoPrintReportsOnCompletePayment = '' } = clinicSettings
     try {
       if (billing.entity) {
@@ -315,7 +315,7 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
           autoPrintReportsOnCompletePayment: autoPrintReportsOnCompletePayment.split(
             ',',
           ),
-          patientID: patient.id,
+          patientID: billing.patientID,
         }
         return values
       }
@@ -362,30 +362,32 @@ class Billing extends Component {
   componentDidMount() {
     subscribeNotification('QueueListing', {
       callback: response => {
-        const { visitID, senderId } = response
-        if (visitID) {
-          const { values, dispatch } = this.props
-          if (values.visitId === visitID) {
-            const {
-              isGroupPrint,
-              showReport,
-              reportPayload: { reportID } = {},
-              isGroupPayment,
-              showAddPaymentModal,
-            } = this.state
-            if (
-              (isGroupPrint && reportID === 89 && showReport) ||
-              (isGroupPayment && showAddPaymentModal)
-            ) {
-              notification.error({
-                message: `The status for one of the invoices had been changed. Please check all invoices is in billing status and the billing is saved.`,
-              })
-              this.setState({ disabledPayment: true })
-              dispatch({
-                type: 'groupInvoice/fetchVisitGroupStatusDetails',
-                payload: { visitGroup: values.visitGroup },
-              })
-            }
+        const { visitID, senderId, isBillingSaved } = response
+        const {
+          dispatch,
+          values: { id, visitGroup, visitGroupStatusDetails = [] },
+        } = this.props
+
+        if (visitID != id && isBillingSaved !== undefined) {
+          if (visitGroupStatusDetails.some(x => x.visitFK === visitID)) {
+            dispatch({
+              type: 'groupInvoice/fetchVisitGroupStatusDetails',
+              payload: { visitGroup },
+            }).then((r = []) => {
+              const disabledPayment = !(
+                _.sumBy(r, 'outstandingBalance') > 0 &&
+                !r.some(x => !x.isBillingSaved)
+              )
+              if(disabledPayment != (this.state.disabledPayment??false))
+              {
+                notification.destroy()
+                notification.error({
+                  duration: 999,
+                  message: `The status for one of the invoices had been changed. Please check all invoices is in billing status and the billing is saved.`,
+                })
+                this.setState({ disabledPayment })
+              }
+            })
           }
         }
       },
@@ -884,10 +886,6 @@ class Billing extends Component {
         if (payer.id) return payer.isModified
         return true
       })
-      console.log(
-        modifiedOrNewAddedPayer.length > 0,
-        this.state.hasNewSignature,
-      )
       if (modifiedOrNewAddedPayer.length > 0 || this.state.hasNewSignature) {
         dispatch({
           type: 'global/updateState',
