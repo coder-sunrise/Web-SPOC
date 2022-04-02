@@ -17,8 +17,18 @@ export const filterData = (
     return (
       filterMap[filter].includes(eachRow.visitStatus) &&
       (searchQuery === '' ||
-        eachRow.patientName.toLowerCase().indexOf(searchQuery.toLowerCase()) >=
-          0) &&
+        (eachRow.patientName || '')
+          .toLowerCase()
+          .indexOf(searchQuery.toLowerCase()) >= 0 ||
+        (eachRow.patientReferenceNo || '')
+          .toLowerCase()
+          .indexOf(searchQuery.toLowerCase()) >= 0 ||
+        (eachRow.patientAccountNo || '')
+          .toLowerCase()
+          .indexOf(searchQuery.toLowerCase()) >= 0 ||
+        (eachRow.patientMobile || '')
+          .toLowerCase()
+          .indexOf(searchQuery.toLowerCase()) >= 0) &&
       (visitType.length === 0 ||
         visitType.indexOf(-99) >= 0 ||
         visitType.indexOf(eachRow.visitPurposeFK) >= 0)

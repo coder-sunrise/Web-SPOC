@@ -50,12 +50,13 @@ import { rounding } from './utils'
         visitGroupStatusDetails,
         'outstandingBalance',
       ))
-      return {
+      newValues = {
         ...newValues,
         outstandingAfterPayment: outstandingBalance,
         collectableAmount: outstandingBalance,
         finalPayable: outstandingBalance,
         outstandingBalance: outstandingBalance,
+        invoiceOSAmount: invoice.outstandingBalance,
         isGroupPayment,
       }
     }
@@ -258,18 +259,25 @@ class AddPayment extends Component {
       displayValue,
       paymentModeFK: parseInt(type, 10),
       paymentMode: displayValue,
-      amt,
+      amt: roundTo(amt),
     }
-    if (isGroupPayment){
+    if (isGroupPayment) {
       const isDeposit = parseInt(type, 10) === PAYMENT_MODE.DEPOSIT 
+      const defaultRemark = isDeposit
+        ? values.invoiceNo
+        : values.paymentList.some(x => x.isDeposit)
+        ? visitGroupStatusDetails.filter(x => x.invoiceNo !== values.invoiceNo).map(x => x.invoiceNo).join('/')
+        : visitGroupStatusDetails.map(x => x.invoiceNo).join('/')
       payment = {
           ...payment,
-          remark: isDeposit ? values.invoiceNo : visitGroupStatusDetails.map(x => x.invoiceNo).join('/'),
+          isDeposit,
+          remark: defaultRemark,
         }
     }
     const newPaymentList = [...values.paymentList, payment]
     await setFieldValue('paymentList', newPaymentList)
     this.calculatePayment()
+    console.log('payment',newPaymentList,visitGroupStatusDetails)
   }
 
   onDeleteClick = async paymentID => {

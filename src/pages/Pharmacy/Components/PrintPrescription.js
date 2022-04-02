@@ -161,7 +161,7 @@ const PrintPrescription = props => {
       >
         <MenuItem onClick={printDrugLabel}>Drug Label</MenuItem>
         <MenuItem onClick={printDrugSummaryLabel}>Drug Summary Label</MenuItem>
-        <MenuItem onClick={handleClose}>Patient Label</MenuItem>
+        {/* <MenuItem onClick={handleClose}>Patient Label</MenuItem> */}
         <MenuItem onClick={printPIL}>Patient Info Leaflet</MenuItem>
         <MenuItem onClick={prescription}>Prescription</MenuItem>
       </Menu>

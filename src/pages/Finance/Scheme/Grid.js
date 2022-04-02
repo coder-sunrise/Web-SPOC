@@ -10,13 +10,13 @@ const viewSchemDetailAuthority = 'scheme.schemedetails'
 const Grid = ({ history, height }) => {
   const [tableParas] = useState({
     columns: [
-      { name: 'coPayerType', title: 'Co-Payer Type' },
       { name: 'code', title: 'Scheme Code' },
       { name: 'name', title: 'Scheme Name' },
+      { name: 'description', title: 'Description' },
       { name: 'schemeTypeName', title: 'Scheme Type' },
       { name: 'coPayerName', title: 'Co-Payer Name' },
+      { name: 'coPayerType', title: 'Co-Payer Type' },
       { name: 'isActive', title: 'Status' },
-      { name: 'description', title: 'Description' },
       { name: 'action', title: 'Action' },
     ],
     leftColumns: [],
@@ -35,12 +35,18 @@ const Grid = ({ history, height }) => {
 
   const colExtenstions = [
     {
+      columnName: 'code',
+      width: 120,
+    },
+    {
       columnName: 'schemeTypeName',
       sortBy: 'SchemeTypeFKNavigation.displayValue',
+      width: 120,
     },
     {
       columnName: 'coPayerType',
       sortBy: 'CopayerFKNavigation.copayerTypeFK',
+      width: 120,
     },
     {
       columnName: 'coPayerName',
@@ -49,11 +55,13 @@ const Grid = ({ history, height }) => {
     {
       columnName: 'isActive',
       sortingEnabled: false,
+      width: 90,
       type: 'select',
       options: status,
     },
     {
       columnName: 'action',
+      width: 90,
       align: 'center',
       render: row => (
         <Authorized authority={viewSchemDetailAuthority}>

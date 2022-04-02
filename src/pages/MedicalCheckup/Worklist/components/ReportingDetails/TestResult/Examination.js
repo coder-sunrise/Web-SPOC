@@ -335,9 +335,9 @@ const Examination = props => {
           groupNo: group,
           list: filterComment.filter(item => item.groupNo === group),
         })),
+        ['groupNo'],
+        ['asc'],
       ),
-      ['groupNo'],
-      ['asc'],
     )
     dispatch({
       type: 'medicalCheckupReportingDetails/updateState',

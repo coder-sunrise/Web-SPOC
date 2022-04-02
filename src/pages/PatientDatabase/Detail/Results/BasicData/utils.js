@@ -21,7 +21,7 @@ export const defaultData = [
   {
     id: 3,
     testCode: TESTTYPES.BPSYS,
-    type: 'BP Sys (mmHg)',
+    type: 'BP SYS (mmHg)',
     typeTootip: 'Blood Pressure Systole',
     refRange: '(<130)',
     tableName: 'basicExaminations',
@@ -38,7 +38,7 @@ export const defaultData = [
   },
   {
     id: 5,
-    type: 'Pulse (mmHg)',
+    type: 'Pulse (bpm)',
     tableName: 'basicExaminations',
     fieldName: 'pulseRateBPM',
   },
@@ -186,8 +186,8 @@ export const defaultData = [
   },
   {
     id: 25,
-    type: 'Mensus',
-    testCode: TESTTYPES.MENSUS,
+    type: 'Menses',
+    testCode: TESTTYPES.MENSES,
     tableName: 'basicExaminations',
     fieldName: 'isMensus',
     valueType: 'boolean',

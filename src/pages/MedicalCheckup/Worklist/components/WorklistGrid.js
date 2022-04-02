@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'dva'
 import moment from 'moment'
 import _ from 'lodash'
 import { history } from 'umi'
-import { Menu, Dropdown, Space, Typography, Card, Tag, Tooltip } from 'antd'
+import { Menu, Dropdown, Space, Typography, Card, Tag } from 'antd'
 import {
   MEDICALCHECKUP_WORKITEM_STATUS,
   MEDICALCHECKUP_WORKITEM_STATUSES,
@@ -25,6 +25,7 @@ import {
   Button,
   Popover,
   dateFormatLong,
+  Tooltip,
 } from '@/components'
 import { ProTable } from '@medisys/component'
 import { GridContextMenuButton as GridButton } from 'medisys-components'
@@ -37,10 +38,15 @@ import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined'
 import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined'
 import { commonDataReaderTransform } from '@/utils/utils'
 import withWebSocket from '@/components/Decorator/withWebSocket'
+import { CheckOutlined } from '@ant-design/icons'
 import WorklistContext from '../WorklistContext'
 import { StatusFilter } from './StatusFilter'
 import ReportingDoctorList from './ReportingDoctorList'
-import { getMedicalCheckupReportPayload } from './Util'
+import {
+  getMedicalCheckupReportPayload,
+  getVisitOrderTemplateContent,
+} from './Util'
+import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 
 const allMedicalCheckupReportStatuses = Object.values(
   MEDICALCHECKUP_WORKITEM_STATUS,
@@ -238,48 +244,54 @@ const WorklistGrid = ({
     const statusColor = status.color
     const statusName = status.label
 
-    let subTitle
-
+    let isShowTag
+    let tagBGColor
     if (
       (row.statusFK === MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS ||
         row.statusFK === MEDICALCHECKUP_WORKITEM_STATUS.REPORTING) &&
       (row.lastReportStatus === MEDICALCHECKUP_REPORTSTATUS.PENDINGVERIFY ||
         row.lastReportStatus === MEDICALCHECKUP_REPORTSTATUS.VERIFIED)
     ) {
-      subTitle = `(Temp. Rpt. ${
+      isShowTag = true
+      tagBGColor =
         row.lastReportStatus === MEDICALCHECKUP_REPORTSTATUS.VERIFIED
-          ? 'Completed'
-          : 'Verifying'
-      })`
+          ? '#007D00'
+          : '#44A2FF'
     }
     return (
-      <Tag
-        color={statusColor}
-        style={{
-          textAlign: 'center',
-          width: '100%',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          padding: 2,
-        }}
-      >
-        <div>
-          <span>{statusName}</span>
-          {subTitle && (
-            <div
-              style={{
-                height: 10,
-                fontSize: '0.6rem',
-                position: 'relative',
-                top: '-6px',
-              }}
-            >
-              {subTitle}
-            </div>
-          )}
-        </div>
-      </Tag>
+      <div style={{ position: 'relative' }}>
+        <Tag
+          color={statusColor}
+          style={{
+            textAlign: 'center',
+            width: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            padding: 2,
+          }}
+        >
+          {statusName}
+        </Tag>
+        {isShowTag && (
+          <div
+            style={{
+              position: 'absolute',
+              top: -6,
+              right: -6,
+              backgroundColor: tagBGColor,
+              height: 14,
+              fontSize: '0.55rem',
+              padding: '0px 3px',
+              color: 'white',
+              borderRadius: 2,
+              border: '1px solid #ccc',
+            }}
+          >
+            Temp.
+          </div>
+        )}
+      </div>
     )
   }
 
@@ -307,7 +319,7 @@ const WorklistGrid = ({
         search: false,
         align: 'center',
         fixed: 'left',
-        width: 130,
+        width: 110,
         render: (item, entity) => {
           return renderWorkitemStatus(entity)
         },
@@ -361,25 +373,60 @@ const WorklistGrid = ({
         render: (_dom, entity) => {
           if (entity.reportPriority === 'Urgent') {
             return (
-              <span>
-                <Icon
-                  type='thunder'
-                  style={{ fontSize: 15, color: 'red', alignSelf: 'center' }}
-                />
-                <span>{entity.urgentReportRemarks}</span>
-              </span>
+              <Tooltip title={entity.urgentReportRemarks}>
+                <div style={{ position: 'relative', paddingLeft: 15 }}>
+                  <Icon
+                    type='thunder'
+                    style={{
+                      fontSize: 15,
+                      color: 'red',
+                      alignSelf: 'center',
+                      position: 'absolute',
+                      left: 0,
+                      top: 2,
+                    }}
+                  />
+                  <div
+                    style={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {entity.urgentReportRemarks}
+                  </div>
+                </div>
+              </Tooltip>
             )
           }
-          return ''
+          return 'Normal'
         },
       },
       {
-        key: 'visitOrderTemplateName',
+        key: 'visitOrderTemplateDetails',
         title: 'Visit Purpose',
-        dataIndex: 'visitOrderTemplateName',
+        dataIndex: 'visitOrderTemplateDetails',
         sorter: false,
         search: false,
         width: 200,
+        render: (_dom, entity) => {
+          const visitOrderTemplateContent = getVisitOrderTemplateContent(
+            entity.visitOrderTemplateDetails,
+          )
+          return (
+            <Tooltip title={visitOrderTemplateContent}>
+              <div
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {visitOrderTemplateContent || '-'}
+              </div>
+            </Tooltip>
+          )
+        },
       },
       {
         key: 'visitDate',
@@ -458,6 +505,21 @@ const WorklistGrid = ({
         sorter: false,
         search: false,
         width: 250,
+        render: (_dom, entity) => {
+          return (
+            <Tooltip title={entity.visitRemarks}>
+              <div
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {entity.visitRemarks || '-'}
+              </div>
+            </Tooltip>
+          )
+        },
       },
       {
         key: 'action',
@@ -473,7 +535,7 @@ const WorklistGrid = ({
             user.data.clinicianProfile.userProfile.role?.clinicRoleFK === 1
           if (
             isDoctor &&
-            !entity.medicalCheckupWorkitemDoctor.find(
+            !(entity.medicalCheckupWorkitemDoctor || []).find(
               x =>
                 x.userProfileFK === user.data.clinicianProfile.userProfile.id,
             )
@@ -487,13 +549,15 @@ const WorklistGrid = ({
           }
           return (
             <Tooltip title='More Actions'>
-              <GridButton
-                row={entity}
-                contextMenuOptions={menus.filter(
-                  m => entity.isExistsVerifiedReport || m.id !== 4,
-                )}
-                onClick={handleMenuItemClick}
-              />
+              <div>
+                <GridButton
+                  row={entity}
+                  contextMenuOptions={menus.filter(
+                    m => entity.isExistsVerifiedReport || m.id !== 4,
+                  )}
+                  onClick={handleMenuItemClick}
+                />
+              </div>
             </Tooltip>
           )
         },
@@ -501,10 +565,10 @@ const WorklistGrid = ({
     ]
   }
   const columns = defaultColumns()
-  const height = window.innerHeight - 350
+  const height = window.innerHeight - 310
   return (
-    <Card>
-      <div style={{ display: 'flex', alignItems: 'start' }}>
+    <div style={{ backgroundColor: 'white', paddingTop: 12, marginTop: 2 }}>
+      <div style={{ textAlign: 'right' }}>
         <StatusFilter
           defaultSelection={allMedicalCheckupReportStatuses}
           counts={(originalWorklist || []).map(items => {
@@ -516,30 +580,96 @@ const WorklistGrid = ({
           style={{
             flexGrow: 1,
             justifyContent: 'end',
-            marginBottom: 10,
+            marginBottom: 4,
           }}
           onFilterChange={selected => setFilteredStatuses(selected)}
         />
       </div>
-      <ProTable
-        rowSelection={false}
-        columns={columns}
-        search={false}
-        options={{ density: false, reload: false }}
-        dataSource={workitems}
-        pagination={false}
-        columnsStateMap={medicalCheckupWorklistColumnSetting}
-        onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
-        defaultColumns={[]}
-        onRow={row => {
-          return {
-            onDoubleClick: () => {
-              onRowDoubleClick(row)
-            },
-          }
-        }}
-        scroll={{ x: 1100, y: height }}
-      />
+      <div style={{ height: height + 95 }}>
+        <ProTable
+          rowSelection={false}
+          columns={columns}
+          search={false}
+          options={{ density: false, reload: false }}
+          dataSource={workitems}
+          pagination={false}
+          columnsStateMap={medicalCheckupWorklistColumnSetting}
+          onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
+          defaultColumns={[]}
+          onRow={row => {
+            return {
+              onDoubleClick: () => {
+                onRowDoubleClick(row)
+              },
+            }
+          }}
+          scroll={{ x: 1100, y: height }}
+        />
+      </div>
+      <div style={{ textAlign: 'right', marginRight: 100 }}>
+        <span
+          style={{
+            display: 'inline-block',
+            height: 16,
+            width: 16,
+            backgroundColor: '#CC0033',
+          }}
+        />
+        <span
+          style={{
+            display: 'inline-block',
+            marginRight: 8,
+            position: 'relative',
+            top: '-3px',
+            marginLeft: 2,
+          }}
+        >
+          Reporting In Progress
+        </span>
+        <span
+          style={{
+            display: 'inline-block',
+            height: 16,
+            width: 16,
+            backgroundColor: '#33CC00',
+          }}
+        />
+        <span
+          style={{
+            display: 'inline-block',
+            marginRight: 8,
+            position: 'relative',
+            top: '-3px',
+            marginLeft: 2,
+          }}
+        >
+          Comment Verifying By PRO
+        </span>
+
+        <CheckOutlined
+          style={{
+            color: 'white',
+            display: 'inline-block',
+            height: 16,
+            width: 16,
+            backgroundColor: '#33CC00',
+            position: 'relative',
+            top: '-4px',
+          }}
+        />
+
+        <span
+          style={{
+            display: 'inline-block',
+            marginRight: 8,
+            position: 'relative',
+            top: '-3px',
+            marginLeft: 2,
+          }}
+        >
+          Comment Verified By PRO
+        </span>
+      </div>
       <CommonModal
         open={showForms}
         title='Forms'
@@ -550,7 +680,7 @@ const WorklistGrid = ({
       >
         <VisitForms formCategory={FORM_CATEGORY.CORFORM} />
       </CommonModal>
-    </Card>
+    </div>
   )
 }
 

@@ -9,6 +9,7 @@ import {
   withFormikExtend,
   NumberInput,
   FastField,
+  Field,
   TextField,
   DatePicker,
   CodeSelect,
@@ -16,6 +17,7 @@ import {
   Tooltip,
   dateFormatLong,
   dateFormatLongWithTimeNoSec,
+  MultipleTextField,
 } from '@/components'
 
 const styles = theme => ({})
@@ -112,6 +114,7 @@ const Details = ({
     if (diagnosisType === 'Sickness') {
       if (
         !firstVisitDate ||
+        validityDays === '' ||
         validityDays === null ||
         validityDays === undefined
       ) {
@@ -121,7 +124,12 @@ const Details = ({
         setDueDate(dueDate)
       }
     } else if (diagnosisType === 'Injury') {
-      if (!onsetDate || validityDays === null || validityDays === undefined) {
+      if (
+        !onsetDate ||
+        validityDays === '' ||
+        validityDays === null ||
+        validityDays === undefined
+      ) {
         setDueDate(undefined)
       } else {
         const dueDate = moment(onsetDate).add(validityDays, 'd')
@@ -218,7 +226,7 @@ const Details = ({
           />
         </ContentGridItem>
         <ContentGridItem title='Type:'>
-          <FastField
+          <Field
             name='diagnosisType'
             render={args => (
               <CodeSelect
@@ -234,7 +242,7 @@ const Details = ({
           />
         </ContentGridItem>
         <ContentGridItem title='Onset Date:'>
-          <FastField
+          <Field
             name='onsetDate'
             render={args => (
               <DatePicker
@@ -246,7 +254,7 @@ const Details = ({
           />
         </ContentGridItem>
         <ContentGridItem title='First Visit Date:'>
-          <FastField
+          <Field
             name='firstVisitDate'
             render={args => (
               <DatePicker
@@ -271,7 +279,7 @@ const Details = ({
           </div>
         </ContentGridItem>
         <ContentGridItem title='Validity (Days):'>
-          <FastField
+          <Field
             name='validityDays'
             render={args => (
               <NumberInput
@@ -286,7 +294,7 @@ const Details = ({
           />
         </ContentGridItem>
         <ContentGridItem title='Due Date:'>
-          <FastField
+          <Field
             name='dueDate'
             render={args => (
               <DatePicker
@@ -326,7 +334,9 @@ const Details = ({
         <ContentGridItem title='Remarks:'>
           <FastField
             name='remarks'
-            render={args => <TextField multiple maxLength={2000} {...args} />}
+            render={args => (
+              <MultipleTextField maxLength={2000} rows={4} {...args} />
+            )}
           />
         </ContentGridItem>
       </GridContainer>

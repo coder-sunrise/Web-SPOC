@@ -6,6 +6,7 @@ import Yup from '@/utils/yup'
 import { navigateDirtyCheck } from '@/utils/utils'
 import { Link } from '@material-ui/core'
 import Warning from '@material-ui/icons/Error'
+import { ChromePicker } from 'react-color'
 import {
   withFormikExtend,
   FastField,
@@ -73,6 +74,17 @@ const resourceCapacitySchema = Yup.object().shape({
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
+    const oldCapacity =
+      values.calendarResource.oldCtCalendarResourceCapacity || []
+    const deletedResourceCapacity = restValues.calendarResource.ctCalendarResourceCapacity.filter(
+      csc => csc.id > 0 && csc.isDeleted,
+    )
+    deletedResourceCapacity.forEach(item => {
+      const deleteItem = oldCapacity.find(x => x.id === item.id)
+      item.startTime = deleteItem.startTime
+      item.endTime = deleteItem.endTime
+      item.maxCapacity = deleteItem.maxCapacity
+    })
     dispatch({
       type: 'settingResource/upsert',
       payload: {
@@ -172,7 +184,10 @@ class Detail extends PureComponent {
   }
 
   onConfirm = () => {
-    const { handleSubmit } = this.props
+    const { handleSubmit, values, setFieldValue } = this.props
+    if (!values.balanceTagColorHex) {
+      setFieldValue('balanceTagColorHex', '#31C736')
+    }
     if (this.checkConflictTime()) {
       notification.error({
         message: 'Time range conflicting with other times.',
@@ -186,8 +201,9 @@ class Detail extends PureComponent {
 
   checkConflictTime = () => {
     const { values } = this.props
-    const resourceCapacity =
+    const resourceCapacity = (
       values.calendarResource?.ctCalendarResourceCapacity || []
+    ).filter(x => !x.isDeleted)
     let containsConflictTime = false
     for (let index = 0; index < resourceCapacity.length; index++) {
       if (
@@ -216,6 +232,10 @@ class Detail extends PureComponent {
       return false
     }
     return true
+  }
+  onColorChange = color => {
+    const { setFieldValue } = this.props
+    if (color) setFieldValue('balanceTagColorHex', color.hex)
   }
   render() {
     const {
@@ -294,231 +314,262 @@ class Detail extends PureComponent {
               />
             </GridItem>
           </GridContainer>
-          <h4 style={{ fontWeight: 400, margin: '8px 6px -4px 6px' }}>
-            <b>Resource Management</b>
-          </h4>
-          <div style={{ position: 'relative' }}>
-            <EditableTableGrid
-              forceRender
-              style={{
-                marginTop: theme.spacing(1),
-                margin: theme.spacing(2),
-              }}
-              rows={values.calendarResource?.ctCalendarResourceCapacity || []}
-              EditingProps={{
-                showCommandColumn: false,
-                showAddCommand: true,
-                onCommitChanges: this.commitChanges,
-              }}
-              schema={resourceCapacitySchema}
-              columns={[
-                { name: 'capacityTime', title: 'Time From & Time To' },
-                { name: 'maxCapacity', title: 'Default Maximum Capacity' },
-                { name: 'action', title: ' ' },
-              ]}
-              columnExtensions={[
-                {
-                  columnName: 'capacityTime',
-                  isReactComponent: true,
-                  render: e => {
-                    const { row, columnConfig, cellProps } = e
-                    const { control, error, validSchema } = columnConfig
-                    const startError = (row._errors || []).find(
-                      se => se.path === 'startTime',
-                    )
-                    const startRangeError = (row._errors || []).find(
-                      se => se.path === 'startTimeRange',
-                    )
-                    const endError = (row._errors || []).find(
-                      se => se.path === 'endTime',
-                    )
-                    const endRangeError = (row._errors || []).find(
-                      se => se.path === 'endTimeRange',
-                    )
-                    const moreThanError = (row._errors || []).find(
-                      se => se.path === 'capacityTime',
-                    )
-                    return (
-                      <GridContainer>
-                        <GridItem xs md={6} style={{ paddingRight: 10 }}>
-                          <div
-                            style={{ position: 'relative', paddingRight: 10 }}
-                          >
-                            <SyncfusionTimePicker
-                              step={apptTimeIntervel}
-                              value={row.startTime}
-                              min='07:00'
-                              max='22:00'
-                              onChange={e => {
-                                if (!this.isTimeChange(row.startTime, e)) return
-                                const { commitChanges } = control
-                                row.startTime = e
-                                if (
-                                  row.startTime &&
-                                  row.endTime &&
-                                  row.startTime > row.endTime
-                                ) {
-                                  row.endTime = row.startTime
-                                }
-                                commitChanges({
-                                  changed: {
-                                    [row.id]: {
-                                      startTime: row.startTime,
-                                      endTime: row.endTime,
-                                    },
-                                  },
-                                })
-                              }}
-                            />
-                            <div
-                              style={{
-                                position: 'absolute',
-                                right: '-6px',
-                                top: 10,
-                              }}
-                            >
-                              {(startError || startRangeError) && (
-                                <Tooltip
-                                  title={
-                                    (startError || startRangeError).message
-                                  }
-                                >
-                                  <Warning color='error' />
-                                </Tooltip>
-                              )}
-                            </div>
-                          </div>
-                        </GridItem>
-                        <GridItem xs md={6} style={{ paddingLeft: 20 }}>
-                          <div
-                            style={{ position: 'relative', paddingRight: 10 }}
-                          >
-                            <div
-                              style={{
-                                position: 'absolute',
-                                left: '-25px',
-                                bottom: 7,
-                              }}
-                            >
-                              To
-                            </div>
-                            <SyncfusionTimePicker
-                              step={apptTimeIntervel}
-                              value={row.endTime}
-                              min='07:00'
-                              max='22:00'
-                              onChange={e => {
-                                if (!this.isTimeChange(row.endTime, e)) return
-                                const { commitChanges } = control
-                                row.endTime = e
-                                commitChanges({
-                                  changed: {
-                                    [row.id]: {
-                                      endTime: row.endTime,
-                                    },
-                                  },
-                                })
-                              }}
-                            />
-                            <div
-                              style={{
-                                position: 'absolute',
-                                right: '-6px',
-                                top: 10,
-                              }}
-                            >
-                              {(endError || endRangeError || moreThanError) && (
-                                <Tooltip
-                                  title={
-                                    (endError || endRangeError || moreThanError)
-                                      .message
-                                  }
-                                >
-                                  <Warning color='error' />
-                                </Tooltip>
-                              )}
-                            </div>
-                          </div>
-                        </GridItem>
-                      </GridContainer>
-                    )
-                  },
-                  sortingEnabled: false,
-                },
-                {
-                  columnName: 'maxCapacity',
-                  type: 'number',
-                  max: 9999,
-                  precision: 0,
-                  min: 0,
-                  sortingEnabled: false,
-                  width: 200,
-                },
-                {
-                  columnName: 'action',
-                  width: 60,
-                  isReactComponent: true,
-                  sortingEnabled: false,
-                  isDisabled: row => true,
-                  render: e => {
-                    const { row, columnConfig } = e
-                    const { control } = columnConfig
-                    const { commitChanges } = control
-                    return (
-                      <Popconfirm
-                        title='Confirm to delete?'
-                        onConfirm={() => {
-                          commitChanges({
-                            changed: {
-                              [row.id]: {
-                                isDeleted: true,
-                              },
-                            },
-                          })
-                        }}
-                      >
-                        <Button size='sm' justIcon color='danger'>
-                          <Delete />
-                        </Button>
-                      </Popconfirm>
-                    )
-                  },
-                },
-              ]}
-              FuncProps={{
-                pager: false,
-              }}
-            />
-            <div style={{ position: 'absolute', bottom: 10, right: 14 }}>
-              {this.isEnableDailyManagement() && (
-                <Link
-                  component='button'
-                  style={{ textDecoration: 'underline' }}
-                  onClick={e => {
-                    navigateDirtyCheck({
-                      onProceed: async () => {
-                        await dispatch({
-                          type: 'calendarResource/updateState',
-                          payload: {
-                            editId: values.calendarResource.id,
-                            selectMonth: moment(),
-                          },
-                        })
-                        this.setState({ showDailyManagementModal: true })
-                      },
-                    })(e)
+          <GridContainer>
+            <GridItem md={8}>
+              <div style={{ position: 'relative' }}>
+                <h5 style={{ fontWeight: 400, margin: '8px 6px -4px 6px' }}>
+                  <b>Resource Management</b>
+                </h5>
+                <EditableTableGrid
+                  forceRender
+                  style={{
+                    marginTop: theme.spacing(1),
                   }}
-                >
-                  Daily Resource Management
-                </Link>
-              )}
-            </div>
-            {this.checkConflictTime() && (
-              <div style={{ color: 'red', marginLeft: 16 }}>
-                Time range conflicting with other times.
+                  rows={
+                    values.calendarResource?.ctCalendarResourceCapacity || []
+                  }
+                  EditingProps={{
+                    showCommandColumn: false,
+                    showAddCommand: true,
+                    onCommitChanges: this.commitChanges,
+                  }}
+                  schema={resourceCapacitySchema}
+                  columns={[
+                    { name: 'capacityTime', title: 'Time From & Time To' },
+                    { name: 'maxCapacity', title: 'Default Maximum Capacity' },
+                    { name: 'action', title: ' ' },
+                  ]}
+                  columnExtensions={[
+                    {
+                      columnName: 'capacityTime',
+                      isReactComponent: true,
+                      render: e => {
+                        const { row, columnConfig, cellProps } = e
+                        const { control, error, validSchema } = columnConfig
+                        const startError = (row._errors || []).find(
+                          se => se.path === 'startTime',
+                        )
+                        const startRangeError = (row._errors || []).find(
+                          se => se.path === 'startTimeRange',
+                        )
+                        const endError = (row._errors || []).find(
+                          se => se.path === 'endTime',
+                        )
+                        const endRangeError = (row._errors || []).find(
+                          se => se.path === 'endTimeRange',
+                        )
+                        const moreThanError = (row._errors || []).find(
+                          se => se.path === 'capacityTime',
+                        )
+                        return (
+                          <GridContainer>
+                            <GridItem xs md={6} style={{ paddingRight: 10 }}>
+                              <div
+                                style={{
+                                  position: 'relative',
+                                  paddingRight: 10,
+                                }}
+                              >
+                                <SyncfusionTimePicker
+                                  step={apptTimeIntervel}
+                                  value={row.startTime}
+                                  style={{ margin: 0 }}
+                                  min='07:00'
+                                  max='22:00'
+                                  onChange={e => {
+                                    if (!this.isTimeChange(row.startTime, e))
+                                      return
+                                    const { commitChanges } = control
+                                    row.startTime = e
+                                    if (
+                                      row.startTime &&
+                                      row.endTime &&
+                                      row.startTime > row.endTime
+                                    ) {
+                                      row.endTime = row.startTime
+                                    }
+                                    commitChanges({
+                                      changed: {
+                                        [row.id]: {
+                                          startTime: row.startTime,
+                                          endTime: row.endTime,
+                                        },
+                                      },
+                                    })
+                                  }}
+                                />
+                                <div
+                                  style={{
+                                    position: 'absolute',
+                                    right: '-6px',
+                                    top: 10,
+                                  }}
+                                >
+                                  {(startError || startRangeError) && (
+                                    <Tooltip
+                                      title={
+                                        (startError || startRangeError).message
+                                      }
+                                    >
+                                      <Warning color='error' />
+                                    </Tooltip>
+                                  )}
+                                </div>
+                              </div>
+                            </GridItem>
+                            <GridItem xs md={6} style={{ paddingLeft: 20 }}>
+                              <div
+                                style={{
+                                  position: 'relative',
+                                  paddingRight: 10,
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    position: 'absolute',
+                                    left: '-25px',
+                                    top: 10,
+                                  }}
+                                >
+                                  To
+                                </div>
+                                <SyncfusionTimePicker
+                                  step={apptTimeIntervel}
+                                  style={{ margin: 0 }}
+                                  value={row.endTime}
+                                  min='07:00'
+                                  max='22:00'
+                                  onChange={e => {
+                                    if (!this.isTimeChange(row.endTime, e))
+                                      return
+                                    const { commitChanges } = control
+                                    row.endTime = e
+                                    commitChanges({
+                                      changed: {
+                                        [row.id]: {
+                                          endTime: row.endTime,
+                                        },
+                                      },
+                                    })
+                                  }}
+                                />
+                                <div
+                                  style={{
+                                    position: 'absolute',
+                                    right: '-6px',
+                                    top: 10,
+                                  }}
+                                >
+                                  {(endError ||
+                                    endRangeError ||
+                                    moreThanError) && (
+                                    <Tooltip
+                                      title={
+                                        (
+                                          endError ||
+                                          endRangeError ||
+                                          moreThanError
+                                        ).message
+                                      }
+                                    >
+                                      <Warning color='error' />
+                                    </Tooltip>
+                                  )}
+                                </div>
+                              </div>
+                            </GridItem>
+                          </GridContainer>
+                        )
+                      },
+                      sortingEnabled: false,
+                    },
+                    {
+                      columnName: 'maxCapacity',
+                      type: 'number',
+                      max: 9999,
+                      precision: 0,
+                      min: 0,
+                      sortingEnabled: false,
+                      width: 200,
+                    },
+                    {
+                      columnName: 'action',
+                      width: 60,
+                      isReactComponent: true,
+                      sortingEnabled: false,
+                      isDisabled: row => true,
+                      render: e => {
+                        const { row, columnConfig } = e
+                        const { control } = columnConfig
+                        const { commitChanges } = control
+                        return (
+                          <Popconfirm
+                            title='Confirm to delete?'
+                            onConfirm={() => {
+                              commitChanges({
+                                changed: {
+                                  [row.id]: {
+                                    isDeleted: true,
+                                  },
+                                },
+                              })
+                            }}
+                          >
+                            <Button size='sm' justIcon color='danger'>
+                              <Delete />
+                            </Button>
+                          </Popconfirm>
+                        )
+                      },
+                    },
+                  ]}
+                  FuncProps={{
+                    pager: false,
+                  }}
+                />
+                <div style={{ position: 'absolute', bottom: 10, right: 14 }}>
+                  {this.isEnableDailyManagement() && (
+                    <Link
+                      component='button'
+                      style={{ textDecoration: 'underline' }}
+                      onClick={e => {
+                        navigateDirtyCheck({
+                          onProceed: async () => {
+                            await dispatch({
+                              type: 'calendarResource/updateState',
+                              payload: {
+                                editId: values.calendarResource.id,
+                                selectMonth: moment(),
+                              },
+                            })
+                            this.setState({ showDailyManagementModal: true })
+                          },
+                        })(e)
+                      }}
+                    >
+                      Daily Resource Management
+                    </Link>
+                  )}
+                </div>
+                {this.checkConflictTime() && (
+                  <div style={{ color: 'red', marginLeft: 16 }}>
+                    Time range conflicting with other times.
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </GridItem>
+            <GridItem md={4}>
+              <div>
+                <h5 style={{ fontWeight: 400, margin: '8px 6px 4px 6px' }}>
+                  <b>Resource Color</b>
+                </h5>
+                <ChromePicker
+                  onChangeComplete={this.onColorChange}
+                  color={values?.balanceTagColorHex ?? '#31C736'}
+                />
+              </div>
+            </GridItem>
+          </GridContainer>
         </div>
         {footer &&
           footer({

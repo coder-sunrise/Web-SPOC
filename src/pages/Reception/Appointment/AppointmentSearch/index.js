@@ -63,7 +63,7 @@ const AppointmentSearch = ({
     }
   }, [])
 
-  let height = mainDivHeight - 150 - ($('.filterBar').height() || 0)
+  let height = window.innerHeight - 210 - ($('.filterBar').height() || 0)
   if (height < 300) height = 300
   return (
     <Fragment>

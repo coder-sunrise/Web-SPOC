@@ -280,6 +280,7 @@ const CalendarView = ({
   onResourceDateChange,
   onUpdateEvent,
   apptTimeSlotDuration = 15,
+  allResources = [],
 }) => {
   changeTimeRulerExtentPixel(apptTimeRulerExtent)
 
@@ -396,9 +397,11 @@ const CalendarView = ({
         appointmentRemarks,
         appointmentStatusFk,
         bookedByUser,
+        bookedByUserTitle,
         createDate,
         isEditedAsSingleAppointment,
         updateByUser,
+        updateByUserTitle,
         updateDate,
       } = appointment
 
@@ -412,7 +415,9 @@ const CalendarView = ({
         isEnableRecurrence,
         appointmentRemarks,
         appointmentStatusFk,
-        bookedByUser,
+        bookedByUser: `${
+          bookedByUserTitle ? `${bookedByUserTitle} ` : ''
+        }${bookedByUser || ''}`,
         createDate,
         isEditedAsSingleAppointment,
         stageColorHex: appointment.stageColorHex,
@@ -433,13 +438,16 @@ const CalendarView = ({
           `${appointmentDate} ${item.endTime}`,
           `${serverDateFormat} ${timeFormat24Hour}`,
         ).toDate(),
-        updateByUser,
+        updateByUser: `${
+          updateByUserTitle ? `${updateByUserTitle} ` : ''
+        }${updateByUser || ''}`,
         updateDate,
         resourceFK:
           item.calendarResource.resourceType === CALENDAR_RESOURCE.DOCTOR
             ? `Doctor-${item.calendarResource.clinicianProfileDto.id}`
             : `Resource-${item.calendarResource.resourceDto.id}`,
         IsReadonly: isReadonly(appointment),
+        appointmentDate: appointmentDate,
       }))
       return [...events, ...apptEvents]
     }, [])
@@ -512,10 +520,7 @@ const CalendarView = ({
   }
 
   const renderCell = event => {
-    if (
-      event.elementType === 'monthCells' ||
-      event.elementType === 'dateHeader'
-    ) {
+    if (event.elementType === 'dateHeader') {
       const resource = resources[event.groupIndex]
       if (resource && resource.resourceType === CALENDAR_RESOURCE.RESOURCE) {
         const dailyCapacity = _.orderBy(
@@ -551,8 +556,43 @@ const CalendarView = ({
               }">${balance}</span>`
             })
             .join(', ')
-          event.element.innerHTML = `<div style="position:relative;">${event.element.innerHTML}<div title="${tooltip}" style="position:absolute;right:6px;top:1px;color:black;">Max: ${maxSlot} Bal: ${balanceSlot}</div></div>`
+          event.element.innerHTML = `<div style="position:relative;">${event.element.innerHTML}<div title="${tooltip}" style="position:absolute;right:4px;top:1px;color:black;">Max: ${maxSlot} Bal: ${balanceSlot}</div></div>`
         }
+      }
+    } else if (event.elementType === 'monthCells') {
+      let tooltip
+      let resourceList
+      const newAllResources = _.orderBy(
+        allResources || [],
+        ['sortOrder', source => source.name.toUpperCase()],
+        ['asc'],
+      )
+      newAllResources.map(item => {
+        const dailyCapacitys = (
+          item.calendarResourceDailyCapacity || []
+        ).filter(
+          c =>
+            moment(c.dailyDate).format('DD MMM YYYY') ===
+            moment(event.date).format('DD MMM YYYY'),
+        )
+        if (dailyCapacitys.length) {
+          const bgResourceColor = item.resourceDto?.balanceTagColorHex
+          const totalMaxCapacity = _.sumBy(dailyCapacitys, 'maxCapacity')
+          const totalUsedSlot = _.sumBy(dailyCapacitys, 'usedSlot')
+          const totalBalCapacity = totalMaxCapacity - totalUsedSlot
+          tooltip = `${tooltip ? `${tooltip} \n` : ''}${
+            item.name
+          } bal.: ${totalBalCapacity}`
+          resourceList = `${resourceList ? resourceList : ''}<div style="${
+            resourceList ? 'border-left:1px solid #ccc;' : ''
+          }display:inline-block;padding:0px 4px;background-color:${bgResourceColor ||
+            'white'};color:${
+            bgResourceColor ? 'white' : 'black'
+          }">${totalBalCapacity}</div>`
+        }
+      })
+      if (resourceList) {
+        event.element.innerHTML = `<div style="position:relative;">${event.element.innerHTML}<div title="${tooltip}" style="position:absolute;right:4px;top:0px;border:1px solid #ccc;">${resourceList}</div></div>`
       }
     }
   }
@@ -569,7 +609,7 @@ const CalendarView = ({
         printDailyAppointmentReport={printDailyAppointmentReport}
         startHour='07:00 AM'
         endHour='22:00 PM'
-        height={820}
+        height={740}
         view={calendarView}
         eventSettings={{
           dataSource: filtered.filter(

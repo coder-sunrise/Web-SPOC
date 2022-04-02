@@ -247,7 +247,7 @@ export default ({ current }) => {
     },
     {
       dataIndex: 'isMensus',
-      title: 'Mensus',
+      title: 'Menses',
       render: (text, row) => (
         <span>{getHistoryValueForBoolean(row.isMensus)}</span>
       ),

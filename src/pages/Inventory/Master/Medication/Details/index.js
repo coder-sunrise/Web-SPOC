@@ -455,11 +455,7 @@ export default compose(
         inventoryMedication_DrugAllergy,
         'sequence',
         'asc',
-      ).map(item => {
-        return {
-          id: item.drugAllergyFK,
-        }
-      })
+      ).map(item => item.drugAllergyFK)
 
       let medicationSideEffects = _.orderBy(
         inventoryMedication_MedicationSideEffect,
@@ -662,7 +658,7 @@ export default compose(
       let drugAllergyList = undefined
       if (drugAllergies) {
         drugAllergyList = drugAllergies.map(m => {
-          return { drugAllergyFK: m.id, inventoryMedicationFK: id }
+          return { drugAllergyFK: m, inventoryMedicationFK: id }
         })
       }
 

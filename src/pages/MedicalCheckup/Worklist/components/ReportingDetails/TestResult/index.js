@@ -7,12 +7,19 @@ import BasicData from '@/pages/PatientDatabase/Detail/Results/BasicData'
 import PatientHistory from '@/pages/Widgets/PatientHistory'
 import Examination from './Examination'
 import ExternalService from './ExternalService'
+import LabResults from '@/pages/PatientDatabase/Detail/Results/LabResults'
 
 const TestResult = props => {
   const ctexaminationcategory = useCodeTable('ctexaminationcategory')
   const ctexaminationitem = useCodeTable('ctexaminationitem')
   const ctindividualcomment = useCodeTable('ctindividualcomment')
-  const { height, setShowResultDetails, medicalCheckupReportingDetails } = props
+  const {
+    height,
+    setShowResultDetails,
+    medicalCheckupReportingDetails,
+    genderFK,
+    clinicSettings,
+  } = props
   const options = [
     {
       id: 0,
@@ -23,13 +30,21 @@ const TestResult = props => {
           defaultSelectMedicalCheckup
           visitFK={medicalCheckupReportingDetails.visitID}
           patientProfileFK={medicalCheckupReportingDetails.patientID}
+          genderFK={genderFK}
         />
       ),
     },
     {
       id: 1,
       name: 'Lab Result',
-      content: <dix>Lab Result</dix>,
+      content: (
+        <LabResults
+          visitFK={medicalCheckupReportingDetails.visitID}
+          height={height}
+          clinicSettings={clinicSettings}
+          patientProfileFK={medicalCheckupReportingDetails.patientID}
+        ></LabResults>
+      ),
     },
     {
       id: 2,
@@ -46,7 +61,7 @@ const TestResult = props => {
     },
     {
       id: 3,
-      name: 'External Service',
+      name: 'External Tracking',
       content: <ExternalService {...props} height={height} />,
     },
     {

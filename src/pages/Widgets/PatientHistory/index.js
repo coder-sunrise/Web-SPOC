@@ -578,7 +578,8 @@ class PatientHistory extends Component {
                 !isRetailVisit &&
                 visitStatus != VISIT_STATUS.PAUSED &&
                 fromModule !== 'Consultation' &&
-                fromModule !== 'History' && (
+                fromModule !== 'History' &&
+                fromModule !== 'MedicalCheckup' && (
                   <Authorized authority='patientdashboard.editconsultation'>
                     <Tooltip title='Edit Consultation'>
                       <Button

@@ -321,7 +321,7 @@ export const mapPropsToValues = ({
         currentAppointment: {
           ...appointment,
           appointments_Resources: apptResources,
-          appointmentDate: moment(appointmentDate),
+          appointmentDate: moment(appointmentDate).formatUTC(),
           // appointmentDate,
         },
         appointmentStatusFk: appointment.appointmentStatusFk,

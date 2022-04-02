@@ -145,7 +145,10 @@ const ReportingDetails = props => {
       },
     }).then(r => {
       if (r) {
-        refreshMedicalCheckup()
+        notification.success({
+          message: 'Medical Checkup report unlocked.',
+        })
+        onClose()
       }
     })
   }
@@ -409,6 +412,7 @@ const ReportingDetails = props => {
                 isEditEnable={getEditEnable()}
                 isModifyCommentEnable={isModifyCommentEnable()}
                 isModifyOthersCommentEnable={isModifyOthersCommentEnable()}
+                genderFK={patient?.genderFK}
               />
             </GridItem>
             <GridItem md={5} style={{ padding: 0 }}>

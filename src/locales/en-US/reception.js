@@ -169,7 +169,7 @@ export default {
   'reception.queue.visitRegistration.isFasting': 'Fasting',
   'reception.queue.visitRegistration.isSmoking': 'Smoking',
   'reception.queue.visitRegistration.isAlcohol': 'Alcohol',
-  'reception.queue.visitRegistration.isMensus': 'Mensus',
+  'reception.queue.visitRegistration.isMensus': 'Menses',
 
   'reception.queue.visitRegistration.scheme': 'Schemes',
   'reception.queue.visitRegistration.accountNo': 'Account No.',
