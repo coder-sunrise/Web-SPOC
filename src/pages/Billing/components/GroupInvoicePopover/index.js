@@ -39,8 +39,8 @@ const GroupInvoicesPopover = ({ classes, visitGroup, patientID }) => {
       }).then(r => {
         if (r) {
           var filterOutSelf = r.filter(x=> x.patientProfileFK !== patientID)
-          var sorted = _.orderBy(filterOutSelf,['queueNo'],['asc'])
-          setVisitGroupStatusDetails(sorted)
+          // var sorted = _.orderBy(filterOutSelf,['queueNo'],['asc'])
+          setVisitGroupStatusDetails(filterOutSelf)
         }
       })
       setShow(true)
@@ -141,7 +141,15 @@ const GroupInvoicesPopover = ({ classes, visitGroup, patientID }) => {
                   ),
                 },
               ]}
-              FuncProps={{ pager: false }}
+              FuncProps={{
+                pager: false,
+                sort: true,
+                sortConfig: {
+                  defaultSorting: [
+                    { columnName: 'queueFK', direction: 'asc' },
+                  ],
+                },
+              }}
             />
           </div>
         </div>
