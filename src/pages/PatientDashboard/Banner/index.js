@@ -887,7 +887,8 @@ class Banner extends PureComponent {
 
   getBannerMd = () => {
     const { from, extraCmt } = this.props
-    if (from === 'Consultation' || from === 'PatientDashboard') return 9
+    if (from === 'Consultation') return 9
+    if (from === 'PatientDashboard') return 11
     if (from === 'VisitReg') return 12
     if (extraCmt) return 11
     return 12
@@ -1522,7 +1523,11 @@ class Banner extends PureComponent {
           <GridContainer
             style={{ minHeight: 100, width: '100%', padding: '5px 0' }}
           >
-            <GridItem style={{ padding: 0 }} xs={9} md={this.getBannerMd()}>
+            <GridItem
+              style={{ padding: 0 }}
+              xs={this.getBannerMd()}
+              md={this.getBannerMd()}
+            >
               <GridContainer>
                 <GridItem xs={10} md={10}>
                   <GridContainer>

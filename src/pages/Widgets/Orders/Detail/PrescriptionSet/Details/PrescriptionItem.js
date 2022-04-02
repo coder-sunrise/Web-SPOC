@@ -385,6 +385,13 @@ const drugMixtureItemSchema = Yup.object().shape({
   displayName: 'PrescriptionItem',
 })
 class Detail extends PureComponent {
+  componentDidMount = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'ctmedicationprecaution' },
+    })
+  }
   filterOptions = (input = '', option) => {
     let match = false
     try {
@@ -519,7 +526,8 @@ class Detail extends PureComponent {
   }
 
   changeMedication = (v, op = {}) => {
-    const { setFieldValue, values } = this.props
+    const { setFieldValue, values, codetable } = this.props
+    const { ctmedicationprecaution } = codetable
     const {
       prescriptionSetItemInstruction = [],
       prescriptionSetItemPrecaution = [],
@@ -572,17 +580,20 @@ class Detail extends PureComponent {
       op.inventoryMedication_MedicationPrecaution.length > 0
     ) {
       op.inventoryMedication_MedicationPrecaution.forEach((im, i) => {
+        const precaution = ctmedicationprecaution.find(
+          x => x.id === im.medicationPrecautionFK,
+        )
         setFieldValue(
           `prescriptionSetItemPrecaution[${i}].medicationPrecautionFK`,
           im.medicationPrecautionFK,
         )
         setFieldValue(
           `prescriptionSetItemPrecaution[${i}].precaution`,
-          im.medicationPrecautionName,
+          precaution.displayValue,
         )
         setFieldValue(
           `prescriptionSetItemPrecaution[${i}].precautionCode`,
-          im.medicationPrecautionCode,
+          precaution.code,
         )
         setFieldValue(`prescriptionSetItemPrecaution[${i}].sequence`, i)
       })
@@ -876,11 +887,8 @@ class Detail extends PureComponent {
     }
 
     newTotalQuantity = Math.ceil(newTotalQuantity * 10) / 10 || 0
-    const { prescriptionToDispenseConversion } = currentMedication
-    if (prescriptionToDispenseConversion)
-      newTotalQuantity = Math.ceil(
-        newTotalQuantity / prescriptionToDispenseConversion,
-      )
+    const { conversion } = currentMedication
+    if (conversion) newTotalQuantity = Math.ceil(newTotalQuantity / conversion)
     setFieldValue(`quantity`, newTotalQuantity)
   }
 

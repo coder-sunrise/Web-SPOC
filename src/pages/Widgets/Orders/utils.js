@@ -259,8 +259,12 @@ const getDrugAllergy = (drug, patientAllergy) => {
       })
     }
   })
-  drug.inventoryMedication_MedicationIngredient.forEach(ingredient => {
-    var drugIngredient = patientAllergy.find(a => a.type === PATIENT_ALLERGY_TYPE.INGREDIENT && a.ingredientFK === ingredient.medicationIngredientFK)
+  drug.ingredient.forEach(ingredient => {
+    var drugIngredient = patientAllergy.find(
+      a =>
+        a.type === PATIENT_ALLERGY_TYPE.INGREDIENT &&
+        a.ingredientFK === ingredient.medicationIngredientFK,
+    )
     if (drugIngredient) {
       allergys.push({
         drugName: drug.displayValue,

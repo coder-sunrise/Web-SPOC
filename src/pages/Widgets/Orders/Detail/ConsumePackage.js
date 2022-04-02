@@ -82,6 +82,7 @@ const getType = typeId => {
       ctmedicationunitofmeasurement = [],
       ctmedicationfrequency = [],
       ctmedicationdosage = [],
+      ctmedicationprecaution = [],
       ctservice = [],
     } = codetable
     const { weightKG } = visitRegistration.entity.visit
@@ -167,9 +168,12 @@ const getType = typeId => {
         let currentMedicationPrecautions = []
         currentMedicationPrecautions = currentMedicationPrecautions.concat(
           medicationPrecautions.map(o => {
+            const precaution = ctmedicationprecaution.find(
+              x => x.id === o.medicationPrecautionFK,
+            )
             return {
-              precautionCode: o.medicationPrecautionCode,
-              Precaution: o.medicationPrecautionName,
+              precautionCode: precaution.code,
+              Precaution: precaution.displayValue,
               sequence: o.sequence,
               medicationPrecautionFK: o.medicationPrecautionFK,
             }
