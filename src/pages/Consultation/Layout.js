@@ -530,7 +530,6 @@ class Layout extends PureComponent {
       visitRegistration,
     }
 
-    console.log(visitRegistration,222)
     const {
       isEnableJapaneseICD10Diagnosis,
       diagnosisDataSource,
