@@ -45,6 +45,7 @@ import { SwitcherTwoTone } from '@ant-design/icons'
 import { SCHEME_TYPE } from '@/utils/constants'
 import CopayerDetails from '@/pages/Setting/Company/CopayerDetails'
 import ClaimHistory from '@/pages/PatientDatabase/Detail/ClaimHistory'
+import PatientResults from '@/pages/PatientDatabase/Detail/Results'
 
 const headerStyles = {
   color: 'darkblue',
@@ -109,6 +110,7 @@ class Banner extends PureComponent {
     showNotesModal: false,
     showSchemeModal: false,
     showNonClaimableHistoryModal: false,
+    showExaminationDetailsModal: false,
     showPreOrderModal: false,
     isExpanded: false,
   }
@@ -906,6 +908,11 @@ class Banner extends PureComponent {
 
     this.setState({ showNonClaimableHistoryModal: true })
   }
+  openExaminationResults = () => {
+    const { dispatch, patient } = this.props
+    const { entity = {} } = patient
+    this.setState({ showExaminationDetailsModal: true })
+  }
   closeNonClaimableHistory = () => {
     const { dispatch, patient } = this.props
     const { entity } = patient
@@ -923,6 +930,9 @@ class Banner extends PureComponent {
       },
     })
     this.setState({ showNonClaimableHistoryModal: false })
+  }
+  closeExaminationDetails = () => {
+    this.setState({ showExaminationDetailsModal: false })
   }
   expandOrCollespe = () => {
     this.setState({ isExpanded: !this.state.isExpanded })
@@ -1670,6 +1680,9 @@ class Banner extends PureComponent {
                           cmt: 1,
                           pid: info.id,
                         })}
+                        onClick={e => {
+                          this.openExaminationResults()
+                        }}
                         // disabled={}
                         tabIndex='-1'
                       >
@@ -1810,6 +1823,15 @@ class Banner extends PureComponent {
             patientProfileFK={entity.id}
             values={{ isActive: entity.isActive }}
           />
+        </CommonModal>
+        <CommonModal
+          open={this.state.showExaminationDetailsModal}
+          title='Examination Details'
+          onClose={this.closeExaminationDetails}
+          maxWidth='lg'
+          fullHeight
+        >
+          <PatientResults patient={patient} patientProfileFK={entity.id} />
         </CommonModal>
       </Paper>
     )
