@@ -1088,3 +1088,30 @@ export const EXAMINATION_STATUS = {
   INPROGRESS: 'In Progress',
   COMPLETED: 'Completed',
 }
+
+export const APPOINTMENT_STAGE_COLOR = [
+  {
+    code: 'Draft',
+    color: '#E36C0A',
+  },
+  {
+    code: 'Confirmed',
+    color: '#548DD4',
+  },
+  {
+    code: 'Registered',
+    color: '#47CFFF',
+  },
+  {
+    code: 'Consultation',
+    color: '#FF5353',
+  },
+  {
+    code: 'Billing',
+    color: '#97E551',
+  },
+  {
+    code: 'Completed',
+    color: '#00B853',
+  },
+]

@@ -31,6 +31,7 @@ import {
   CALENDAR_VIEWS,
   CALENDAR_RESOURCE,
   APPOINTMENT_STATUS,
+  APPOINTMENT_STAGE_COLOR,
 } from '@/utils/constants'
 import consultationDocument from '@/models/consultationDocument'
 
@@ -129,21 +130,24 @@ const applyFilter = (filter, data, isDayView, ctcalendarresource) => {
       const _searchStr = search.toLowerCase()
       returnData = returnData.filter(eachData => {
         if (eachData.isDoctorBlock) return true
-        const { patientProfile, patientName, patientContactNo } = eachData
-        if (patientProfile) {
+        const {
+          patientProfileFK,
+          patientName = '',
+          patientContactNo = '',
+          patientAccountNo = '',
+          patientRefrenceNo = '',
+        } = eachData
+        if (patientProfileFK) {
           const { contactNumbers = [] } = patientProfile
           const mobile = contactNumbers.find(
             item => item.numberTypeFK === 1,
           ) || { number: '' }
 
           return (
-            patientProfile.name.toLowerCase().indexOf(_searchStr) >= 0 ||
-            patientProfile.patientAccountNo.toLowerCase().indexOf(_searchStr) >=
-              0 ||
-            patientProfile.patientRefrenceNo
-              .toLowerCase()
-              .indexOf(_searchStr) >= 0 ||
-            mobile.number.toLowerCase().indexOf(_searchStr) >= 0
+            patientName.toLowerCase().indexOf(_searchStr) >= 0 ||
+            patientContactNo.toLowerCase().indexOf(_searchStr) >= 0 ||
+            patientAccountNo.toLowerCase().indexOf(_searchStr) >= 0 ||
+            patientRefrenceNo.toLowerCase().indexOf(_searchStr) >= 0
           )
         }
 
@@ -156,8 +160,8 @@ const applyFilter = (filter, data, isDayView, ctcalendarresource) => {
 
     //filter by DOB From , DOB To
     returnData = returnData.filter(eachData => {
-      const { patientProfile, patientName, patientContactNo } = eachData
-      return !dob || patientProfile.dob == dob
+      const { patientDOB } = eachData
+      return !dob || patientDOB == dob
     })
 
     // filter by doctor
@@ -368,11 +372,10 @@ const CalendarView = ({
     const {
       appointmentStatusFk,
       patientProfileFK,
-      patientProfile,
+      isPatientActive,
     } = appointment
 
-    const patientIsActive =
-      patientProfileFK > 0 ? patientProfile && patientProfile.isActive : true
+    const patientIsActive = patientProfileFK > 0 ? isPatientActive : true
 
     const _disabledStatus = [
       APPOINTMENT_STATUS.CANCELLED,
@@ -389,7 +392,6 @@ const CalendarView = ({
     return calendarEvents.reduce((events, appointment) => {
       const {
         appointmentDate,
-        patientProfile,
         patientName,
         patientContactNo,
         isEnableRecurrence,
@@ -397,30 +399,26 @@ const CalendarView = ({
         appointmentRemarks,
         appointmentStatusFk,
         bookedByUser,
-        bookedByUserTitle,
-        createDate,
+        bookOn,
         isEditedAsSingleAppointment,
         updateByUser,
-        updateByUserTitle,
         updateDate,
       } = appointment
-
       const apptEvents = apptResources.map(item => ({
         ...item,
         resourceId: item.calendarResourceFK,
-        resourceName: item.calendarResource.name,
-        patientProfile,
+        resourceName: item.resourceName,
         patientName,
         patientContactNo,
         isEnableRecurrence,
         appointmentRemarks,
         appointmentStatusFk,
-        bookedByUser: `${
-          bookedByUserTitle ? `${bookedByUserTitle} ` : ''
-        }${bookedByUser || ''}`,
-        createDate,
+        bookedByUser: bookedByUser,
+        bookOn,
         isEditedAsSingleAppointment,
-        stageColorHex: appointment.stageColorHex,
+        stageColorHex: APPOINTMENT_STAGE_COLOR.find(
+          x => x.code === appointment.stage,
+        )?.color,
         stage: appointment.stage,
         start: moment(
           `${appointmentDate} ${item.startTime}`,
@@ -438,14 +436,12 @@ const CalendarView = ({
           `${appointmentDate} ${item.endTime}`,
           `${serverDateFormat} ${timeFormat24Hour}`,
         ).toDate(),
-        updateByUser: `${
-          updateByUserTitle ? `${updateByUserTitle} ` : ''
-        }${updateByUser || ''}`,
+        updateByUser: updateByUser,
         updateDate,
         resourceFK:
-          item.calendarResource.resourceType === CALENDAR_RESOURCE.DOCTOR
-            ? `Doctor-${item.calendarResource.clinicianProfileDto.id}`
-            : `Resource-${item.calendarResource.resourceDto.id}`,
+          item.resourceType === CALENDAR_RESOURCE.DOCTOR
+            ? `Doctor-${item.resourceFK}`
+            : `Resource-${item.resourceFK}`,
         IsReadonly: isReadonly(appointment),
         appointmentDate: appointmentDate,
       }))

@@ -44,11 +44,23 @@ export const query = payload => {
   return request(`${url}${urlPrefix}/${payload.id}`, { method: 'GET' })
 }
 
-export const queryList = params => {
-  return commonService.queryList(url, {
+export const queryList = async params => {
+  const result = await commonService.queryList(url, {
     pagesize: 9999,
     ...params,
   })
+  return {
+    ...result,
+    data: {
+      ...result.data,
+      data: [
+        ...result.data.data.map(item => ({
+          ...item,
+          appointment_Resources: JSON.parse(item.appointment_Resources) || [],
+        })),
+      ],
+    },
+  }
 }
 
 export const deleteDraft = payload => commonService.remove(url, payload)

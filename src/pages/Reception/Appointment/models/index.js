@@ -36,8 +36,8 @@ const splitApptResource = data => {
         startTime,
         endTime,
         appointmentFK,
-        calendarResource,
         appointmentTypeFK,
+        resourceName,
       } = appt
       const commonValues = {
         ...restValues,
@@ -46,14 +46,8 @@ const splitApptResource = data => {
         roomFk,
         appointmentFK,
         apptTime: startTime,
-        resource:
-          calendarResource.resourceType === CALENDAR_RESOURCE.DOCTOR
-            ? `${calendarResource.clinicianProfileDto.title || ''} ${
-                calendarResource.clinicianProfileDto.name
-              }`
-            : calendarResource.resourceDto.displayValue,
+        resource: resourceName,
         duration: calculateDuration(startTime, endTime),
-        patientName: `${restValues.salutation || ''} ${restValues.patientName}`,
         appointmentTypeFK,
       }
 
