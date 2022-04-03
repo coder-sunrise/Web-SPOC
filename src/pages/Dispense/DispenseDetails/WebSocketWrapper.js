@@ -28,6 +28,7 @@ const WebSocketWrapper = ({
     CONSTANTS.ALL_DRUG_LABEL,
     CONSTANTS.DRUG_LABEL,
     CONSTANTS.PATIENT_LABEL,
+    CONSTANTS.LAB_LABEL,
   ]
 
   const getDrugLabelDetails = (drugLabel, prescripationItem) => {
@@ -108,7 +109,8 @@ const WebSocketWrapper = ({
     return null
   }
 
-  const getPrintResult = async (type, row, printAllDrugLabel, lan) => {
+  const getPrintResult = async (type, copies = 1) => {
+    if (!Number.isInteger(copies)) return
     let patientLabelReportID = REPORT_ID.PATIENT_LABEL_80MM_45MM
     try {
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
@@ -126,9 +128,24 @@ const WebSocketWrapper = ({
         return [
           {
             ReportId: patientLabelReportID,
+            Copies: copies,
             ReportData: JSON.stringify({
               ...data,
             }),
+          },
+        ]
+      }
+      if (type === CONSTANTS.LAB_LABEL) {
+        const { patient, values } = restProps
+        // hard code for JGH
+        let reportID = REPORT_ID.PATIENT_LAB_LABEL_80MM_45MM
+        const patientId = patient ? patient.entity.id : values.patientProfileFK
+        const data = await getRawData(reportID, { patientId })
+        return [
+          {
+            ReportId: reportID,
+            Copies: copies,
+            ReportData: JSON.stringify(data),
           },
         ]
       }
@@ -138,10 +155,24 @@ const WebSocketWrapper = ({
     return null
   }
   // Click Confirm in drug lable selector will trigger this
-  const handleOnPrint = async ({ type, row, printAllDrugLabel, printData }) => {
+  const handleOnPrint = async ({
+    type,
+    row,
+    printAllDrugLabel,
+    printData,
+    copies,
+  }) => {
     if (withoutPrintPreview.includes(type)) {
       if (type === CONSTANTS.PATIENT_LABEL) {
-        let printResult = await getPrintResult(type, row, printAllDrugLabel)
+        let printResult = await getPrintResult(type, copies)
+        if (printData && printData.length > 0)
+          printResult = (printResult || []).concat(printData)
+
+        if (!printResult || printResult.length <= 0) return
+        await handlePrint(JSON.stringify(printResult))
+      }
+      if (type === CONSTANTS.LAB_LABEL) {
+        let printResult = await getPrintResult(type, copies)
         if (printData && printData.length > 0)
           printResult = (printResult || []).concat(printData)
 
@@ -191,7 +222,6 @@ const WebSocketWrapper = ({
   }
 
   if (onPrintRef) onPrintRef(handleOnPrint)
-
   return (
     <DispenseDetails
       {...restProps}

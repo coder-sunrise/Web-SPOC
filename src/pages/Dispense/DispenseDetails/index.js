@@ -172,6 +172,8 @@ const DispenseDetails = ({
   const { openFrom } = dispense
   const isFromMedicalCheckup = openFrom === DISPENSE_FROM.MEDICALCHECKUP
   const [popperOpen, setPopperOpen] = useState(false)
+  const [patientLabelCopies, setPatientLabelCopies] = useState(1)
+  const [labLabelCopies, setLabLabelCopies] = useState(1)
   const openPopper = () => setPopperOpen(true)
   const closePopper = () => setPopperOpen(false)
   const [selectedAll, setSelectedAll] = useState(false)
@@ -775,7 +777,13 @@ const DispenseDetails = ({
                         size='sm'
                         style={{ width: 120 }}
                         onClick={() => {
-                          onPrint({ type: CONSTANTS.PATIENT_LABEL })
+                          onPrint({
+                            type: CONSTANTS.PATIENT_LABEL,
+                            undefined,
+                            undefined,
+                            undefined,
+                            copies: patientLabelCopies,
+                          })
                         }}
                         disabled={sendingJob}
                       >
@@ -785,7 +793,11 @@ const DispenseDetails = ({
                         size='small'
                         min={1}
                         max={10}
-                        value={1}
+                        value={patientLabelCopies}
+                        onChange={v => {
+                          setPatientLabelCopies(v || 1)
+                          console.log(v)
+                        }}
                         className={classes.inputStyle}
                       />
                       <span className={classes.qtyFont}>&nbsp;Copies</span>
@@ -795,7 +807,15 @@ const DispenseDetails = ({
                         color='primary'
                         size='sm'
                         style={{ width: 120 }}
-                        onClick={() => {}}
+                        onClick={() => {
+                          onPrint({
+                            type: CONSTANTS.LAB_LABEL,
+                            undefined,
+                            undefined,
+                            undefined,
+                            copies: labLabelCopies,
+                          })
+                        }}
                         disabled={sendingJob}
                       >
                         Lab Label
@@ -804,7 +824,11 @@ const DispenseDetails = ({
                         size='small'
                         min={1}
                         max={10}
-                        value={1}
+                        value={labLabelCopies}
+                        onChange={v => {
+                          setLabLabelCopies(v || 1)
+                          console.log(v)
+                        }}
                         className={classes.inputStyle}
                       />
                       <span className={classes.qtyFont}>&nbsp;Copies</span>

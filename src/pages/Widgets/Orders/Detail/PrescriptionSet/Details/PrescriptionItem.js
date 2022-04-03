@@ -964,7 +964,7 @@ class Detail extends PureComponent {
     row.prescribeUOMCode = option.prescribingUOM.code
     row.prescribeUOMDisplayValue = option.prescribingUOM.name
     row.drugName = option.displayValue
-    row.revenueCategoryFK = option.revenueCategory.id
+    row.revenueCategoryFK = option.revenueCategoryFK
     row.inventoryDispenseUOMFK = option.dispensingUOM.id
     row.inventoryPrescribingUOMFK = option.prescribingUOM.id
     row.isActive = option.isActive
