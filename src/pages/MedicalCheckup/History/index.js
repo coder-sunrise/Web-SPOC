@@ -238,9 +238,10 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         key: 'completedDate',
         title: 'Completed Date',
         dataIndex: 'completedDate',
+        sortBy: 'completedDate',
         render: (_dom, entity) =>
           entity.completedDate?.format(dateFormatLongWithTimeNoSec) || '-',
-        sorter: false,
+        sorter: true,
         search: false,
         width: 140,
       },
