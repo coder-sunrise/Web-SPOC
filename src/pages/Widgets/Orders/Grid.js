@@ -76,7 +76,7 @@ export default ({
 
   const [expandedGroups, setExpandedGroups] = useState([])
 
-  const getOrderAccessRight = accessRight => {
+  const getOrderAccessRight = (accessRight, isEnableEditOrder) => {
     let right = Authorized.check(accessRight) || {
       rights: 'hidden',
     }
@@ -852,7 +852,7 @@ export default ({
         }}
       >
         <AuthorizedContext.Provider
-          value={getOrderAccessRight(OrderAccessRight())}
+          value={getOrderAccessRight(OrderAccessRight(), isEnableEditOrder)}
         >
           <Checkbox
             simple
@@ -903,9 +903,8 @@ export default ({
             <span>{adj.adjRemark}</span>
           </Tooltip>
         </div>
-        <AuthorizedContext.Provider
-          value={getOrderAccessRight(OrderAccessRight())}
-        >
+        {getOrderAccessRight(OrderAccessRight(), isEnableEditOrder).rights !==
+          'hidden' && (
           <div
             style={{
               position: 'absolute',
@@ -921,6 +920,10 @@ export default ({
                   top: -1,
                 }}
                 onClick={() => editAdjustment(adj)}
+                disabled={
+                  getOrderAccessRight(OrderAccessRight(), isEnableEditOrder)
+                    .rights !== 'enable'
+                }
                 icon={<EditFilled />}
               ></Button>
             </Tooltip>
@@ -932,6 +935,10 @@ export default ({
                   top: -1,
                   marginLeft: 8,
                 }}
+                disabled={
+                  getOrderAccessRight(OrderAccessRight(), isEnableEditOrder)
+                    .rights !== 'enable'
+                }
                 onClick={() =>
                   dispatch({
                     type: 'orders/deleteFinalAdjustment',
@@ -944,7 +951,7 @@ export default ({
               ></Button>
             </Tooltip>
           </div>
-        </AuthorizedContext.Provider>
+        )}
         <div style={{ position: 'absolute', right: 68, top: 0 }}>
           <NumberInput
             value={adj.adjAmount}
@@ -1133,6 +1140,7 @@ export default ({
   }
 
   const revertVisitPurpose = () => {
+    if (!isEnableEditOrder) return
     const { entity } = visitRegistration
     const { visit } = entity
     const { visitOrderTemplate } = visit
@@ -1227,6 +1235,7 @@ export default ({
                 ? r.totalAfterItemAdjustment
                 : 0,
             isEditingEntity: isEditingEntity,
+            isEnableEditOrder: isEnableEditOrder,
           }
         })}
         onRowDoubleClick={editRow}
@@ -1329,12 +1338,17 @@ export default ({
                             ></VisitOrderTemplateIndicateString>
                           </div>
                           <div>
-                            <Link
-                              style={{ textDecoration: 'underline' }}
-                              onClick={revertVisitPurpose}
-                            >
-                              Click to Revert Visit Purpose Item
-                            </Link>
+                            {isEnableEditOrder && (
+                              <Link
+                                style={{ textDecoration: 'underline' }}
+                                onClick={e => {
+                                  e.preventDefault()
+                                  revertVisitPurpose()
+                                }}
+                              >
+                                Click to Revert Visit Purpose Item
+                              </Link>
+                            )}
                           </div>
                         </div>
                       )}
@@ -1364,12 +1378,17 @@ export default ({
                             ></VisitOrderTemplateIndicateString>
                           </div>
                           <div>
-                            <Link
-                              style={{ textDecoration: 'underline' }}
-                              onClick={revertVisitPurpose}
-                            >
-                              Click to Revert Visit Purpose Item
-                            </Link>
+                            {isEnableEditOrder && (
+                              <Link
+                                style={{ textDecoration: 'underline' }}
+                                onClick={e => {
+                                  e.preventDefault()
+                                  revertVisitPurpose()
+                                }}
+                              >
+                                Click to Revert Visit Purpose Item
+                              </Link>
+                            )}
                           </div>
                         </div>
                       )}
@@ -1432,10 +1451,11 @@ export default ({
                         >
                           <span>
                             Invoice Adjustment
-                            <Tooltip title='Add Adjustment'>
-                              <AuthorizedContext.Provider
-                                value={getOrderAccessRight(OrderAccessRight())}
-                              >
+                            {getOrderAccessRight(
+                              OrderAccessRight(),
+                              isEnableEditOrder,
+                            ).rights !== 'hiddent' && (
+                              <Tooltip title='Add Adjustment'>
                                 <Button
                                   size='small'
                                   type='primary'
@@ -1443,11 +1463,17 @@ export default ({
                                     top: -1,
                                     marginLeft: theme.spacing(1),
                                   }}
+                                  disabled={
+                                    getOrderAccessRight(
+                                      OrderAccessRight(),
+                                      isEnableEditOrder,
+                                    ).rights !== 'enable'
+                                  }
                                   onClick={addAdjustment}
                                   icon={<PlusOutlined />}
                                 ></Button>
-                              </AuthorizedContext.Provider>
-                            </Tooltip>
+                              </Tooltip>
+                            )}
                           </span>
                         </div>
                         {itemAdj}
@@ -1740,68 +1766,77 @@ export default ({
                   }
                 }
               }
+              if (
+                getOrderAccessRight(editAccessRight, row.isEnableEditOrder)
+                  .rights === 'hidden'
+              )
+                return ''
               return (
-                <AuthorizedContext.Provider
-                  value={getOrderAccessRight(editAccessRight)}
-                >
-                  <div>
-                    <Tooltip title={editMessage}>
-                      <Button
-                        size='small'
-                        onClick={() => {
-                          editRow(row)
-                        }}
-                        type='primary'
-                        style={{ marginRight: 5 }}
-                        disabled={
-                          row.isEditingEntity ||
-                          (!row.isActive &&
-                            row.type !== '5' &&
-                            !row.isDrugMixture) ||
-                          row.isPreOrderActualize ||
-                          !editEnable
-                        }
-                        icon={<EditFilled />}
-                      ></Button>
-                    </Tooltip>
-                    <Tooltip title={deleteMessage}>
-                      <Button
-                        size='small'
-                        type='danger'
-                        disabled={
-                          row.isEditingEntity ||
-                          row.isPreOrderActualize ||
-                          !deleteEnable
-                        }
-                        onClick={() => {
+                <div>
+                  <Tooltip title={editMessage}>
+                    <Button
+                      size='small'
+                      onClick={() => {
+                        editRow(row)
+                      }}
+                      type='primary'
+                      style={{ marginRight: 5 }}
+                      disabled={
+                        row.isEditingEntity ||
+                        (!row.isActive &&
+                          row.type !== '5' &&
+                          !row.isDrugMixture) ||
+                        row.isPreOrderActualize ||
+                        !editEnable ||
+                        getOrderAccessRight(
+                          editAccessRight,
+                          row.isEnableEditOrder,
+                        ).rights !== 'enable'
+                      }
+                      icon={<EditFilled />}
+                    ></Button>
+                  </Tooltip>
+                  <Tooltip title={deleteMessage}>
+                    <Button
+                      size='small'
+                      type='danger'
+                      disabled={
+                        row.isEditingEntity ||
+                        row.isPreOrderActualize ||
+                        !deleteEnable ||
+                        getOrderAccessRight(
+                          editAccessRight,
+                          row.isEnableEditOrder,
+                        ).rights !== 'enable'
+                      }
+                      onClick={() => {
+                        dispatch({
+                          type: 'orders/deleteRow',
+                          payload: {
+                            uid: row.uid,
+                          },
+                        })
+
+                        if (row.isPackage === true) {
                           dispatch({
-                            type: 'orders/deleteRow',
+                            type: 'orders/deletePackageItem',
                             payload: {
-                              uid: row.uid,
+                              packageGlobalId: row.packageGlobalId,
                             },
                           })
+                        }
 
-                          if (row.isPackage === true) {
-                            dispatch({
-                              type: 'orders/deletePackageItem',
-                              payload: {
-                                packageGlobalId: row.packageGlobalId,
-                              },
-                            })
-                          }
-
-                          dispatch({
-                            type: 'orders/updateState',
-                            payload: {
-                              entity: undefined,
-                            },
-                          })
-                        }}
-                        icon={<DeleteFilled />}
-                      ></Button>
-                    </Tooltip>
-                  </div>
-                </AuthorizedContext.Provider>
+                        dispatch({
+                          type: 'orders/updateState',
+                          payload: {
+                            entity: undefined,
+                          },
+                        })
+                      }}
+                      icon={<DeleteFilled />}
+                    ></Button>
+                  </Tooltip>
+                </div>
               )
             },
           },
@@ -1849,7 +1884,10 @@ export default ({
               }
               return (
                 <AuthorizedContext.Provider
-                  value={getOrderAccessRight(editAccessRight)}
+                  value={getOrderAccessRight(
+                    editAccessRight,
+                    row.isEnableEditOrder,
+                  )}
                 >
                   <Switch
                     checkedValue='Urgent'
