@@ -188,6 +188,14 @@ const AddOrder = ({
           uid: o.id,
           revenueCategoryFK: o.revenueCategoryFK,
           ...obj,
+          adjAmt: o.adjAmt,
+          adjAmount: o.adjAmt,
+          adjType: o.adjType,
+          adjValue: o.adjValue,
+          gstAmount: o.gstAmount,
+          totalAfterGST: o.totalAfterGST,
+          totalAfterItemAdjustment: o.totalAfterItemAdjustment,
+          totalAfterOverallAdjustment: o.totalAfterOverallAdjustment,
         }
       }
 
