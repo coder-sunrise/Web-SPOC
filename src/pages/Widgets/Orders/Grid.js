@@ -344,9 +344,9 @@ export default ({
 
     return {
       type: ORDER_TYPES.MEDICATION,
-      adjAmount: 0,
-      adjType: 'ExactAmount',
-      adjValue: 0,
+      adjAmount: currentVisitOrderTemplate.adjAmt,
+      adjType: currentVisitOrderTemplate.adjType,
+      adjValue: currentVisitOrderTemplate.value,
       corPrescriptionItemInstruction: [defaultInstruction],
       corPrescriptionItemPrecaution: ItemPrecautions,
       corPrescriptionItemDrugMixture: [],
@@ -459,9 +459,9 @@ export default ({
       quantity: currentVisitOrderTemplate.quantity,
       unitPrice: currentVisitOrderTemplate.unitPrice,
       totalPrice: currentVisitOrderTemplate.total,
-      adjAmount: 0.0,
-      adjType: 'ExactAmount',
-      adjValue: 0,
+      adjAmount: currentVisitOrderTemplate.adjAmt,
+      adjType: currentVisitOrderTemplate.adjType,
+      adjValue: currentVisitOrderTemplate.value,
       totalAfterItemAdjustment: currentVisitOrderTemplate.total,
       sequence: sequence,
       expiryDate: defaultBatch ? defaultBatch.expiryDate : undefined,
@@ -535,9 +535,9 @@ export default ({
       type = ORDER_TYPES.LAB
     }
     return {
-      adjAmount: 0,
-      adjType: 'ExactAmount',
-      adjValue: 0,
+      adjAmount: currentVisitOrderTemplate.adjAmt,
+      adjType: currentVisitOrderTemplate.adjType,
+      adjValue: currentVisitOrderTemplate.value,
       isActive: true,
       isDeleted: false,
       isDisplayValueChangable: service.isDisplayValueChangable,
@@ -575,9 +575,9 @@ export default ({
       o => o.isDefault === true,
     )
     return {
-      adjAmount: 0,
-      adjType: 'ExactAmount',
-      adjValue: 0,
+      adjAmount: currentVisitOrderTemplate.adjAmt,
+      adjType: currentVisitOrderTemplate.adjType,
+      adjValue: currentVisitOrderTemplate.value,
       batchNo: defaultBatch?.batchNo,
       consumableCode: consumable.code,
       consumableName: consumable.displayValue,

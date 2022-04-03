@@ -577,7 +577,7 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
       values.isPharmacyOrderUpdated = isPharmacyOrderUpdated(orders)
     }
     let printData = []
-    if (versionNumber === 1) {
+    if (versionNumber >= 1) {
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
       const { autoPrintOnSignOff } = settings
 

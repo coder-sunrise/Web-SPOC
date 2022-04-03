@@ -372,11 +372,6 @@ const VisitInfoCard = ({
                 })}
                 formatter={value => {
                   const isNaN = Number.isNaN(parseFloat(value))
-                  console.log(
-                    isNaN
-                      ? value
-                      : parseFloat(value).toFixed(isQueueNoDecimal ? 1 : 0),
-                  )
                   return isNaN
                     ? value
                     : parseFloat(value).toFixed(isQueueNoDecimal ? 1 : 0)

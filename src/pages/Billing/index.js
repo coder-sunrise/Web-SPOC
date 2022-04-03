@@ -366,9 +366,9 @@ class Billing extends Component {
         const {
           dispatch,
           values: { id, visitGroup, visitGroupStatusDetails = [] },
+          location: { pathname },
         } = this.props
-
-        if (visitID != id && isBillingSaved !== undefined) {
+        if (visitID != id && isBillingSaved !== undefined && pathname == "/reception/queue/billing") {
           if (visitGroupStatusDetails.some(x => x.visitFK === visitID)) {
             dispatch({
               type: 'groupInvoice/fetchVisitGroupStatusDetails',
@@ -670,7 +670,7 @@ class Billing extends Component {
     const { values, setFieldValue } = this.props
 
     const totalPaid = invoicePayment.reduce((totalAmtPaid, payment) => {
-      if (!payment.isCancelled) return totalAmtPaid + payment.totalAmtPaid
+      if (!payment.isCancelled && payment.id) return totalAmtPaid + payment.totalAmtPaid
       return totalAmtPaid
     }, 0)
     const newOutstandingBalance = roundTo(values.finalPayable - totalPaid)

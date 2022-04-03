@@ -381,7 +381,6 @@ const fetchCodeTable = async (code, params, isReturnStatusCode = false) => {
         convertExcludeFields,
       )
 
-  console.log(code, customPath)
   let finalUrl = `${url}${code}${customPath}`
   const response = await request(finalUrl, {
     method: 'GET',

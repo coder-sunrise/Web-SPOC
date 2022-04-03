@@ -59,7 +59,7 @@ const InvoiceSummary = ({
   values,
   setFieldValue,
   isEnableVisitationInvoiceReport,
-  handlePrintVisitInvoiceClick,
+  handlePrintVisitInvoiceClick
 }) => {
   const errorMessage = 'Cancel reason is required'
 
@@ -86,7 +86,7 @@ const InvoiceSummary = ({
 
   let totalCashRound = 0
   invoicePayment
-    .filter(o => !o.isCancelled)
+    .filter(o => !o.isCancelled && o.id)
     .forEach(o => {
       totalCashRound += _.sumBy(
         o.invoicePaymentMode || [],
@@ -121,7 +121,10 @@ const InvoiceSummary = ({
     !visitGroupStatusDetails.some(x => !x.isBillingSaved)
   )
   const shouldDisableIndividualPayment =
-    outstandingBalance !== undefined && outstandingBalance <= 0
+    (visitGroupStatusDetails?.length > 0 &&
+      _.find(visitGroupStatusDetails, x => x.visitFK == values.id)
+        .outstandingBalance <= 0) ||
+    (outstandingBalance !== undefined && outstandingBalance <= 0)
   const shouldDisableAddPayment =
     disabled || (shouldDisableIndividualPayment && shouldDisableGroupPayment)
 
@@ -204,7 +207,7 @@ const InvoiceSummary = ({
           <GridContainer justify='space-between'>
             <GridItem container md={12}>
               <Payments
-                invoicePayment={invoicePayment}
+                invoicePayment={invoicePayment.filter(x=>x.id)}
                 onCancelReasonChange={onCancelReasonChange}
                 showError={showError}
                 errorMessage={errorMessage}

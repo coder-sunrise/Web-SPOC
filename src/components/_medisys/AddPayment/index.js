@@ -4,7 +4,7 @@ import { connect } from 'dva'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { Button, GridContainer, GridItem, serverDateFormat } from '@/components'
+import { Button, GridContainer, GridItem, serverDateFormat, notification } from '@/components'
 import withFormikExtend from '@/components/Decorator/withFormikExtend'
 // sub component
 import { roundTo } from '@/utils/utils'
@@ -277,7 +277,6 @@ class AddPayment extends Component {
     const newPaymentList = [...values.paymentList, payment]
     await setFieldValue('paymentList', newPaymentList)
     this.calculatePayment()
-    console.log('payment',newPaymentList,visitGroupStatusDetails)
   }
 
   onDeleteClick = async paymentID => {
@@ -467,6 +466,7 @@ class AddPayment extends Component {
                 hideDeposit={values.payerTypeFK !== INVOICE_PAYER_TYPE.PATIENT}
                 patientInfo={patient}
                 handlePaymentTypeClick={this.onPaymentTypeClick}
+                currentOSAmount={values.invoiceOSAmount}
               />
             </GridItem>
             <GridItem md={9}>
@@ -493,7 +493,13 @@ class AddPayment extends Component {
               </Button>
               <Button
                 color='primary'
-                onClick={handleSubmit}
+                onClick={()=>{
+                  if (values.outstandingAfterPayment > 0) {
+                    notification.warning({
+                      message:'Outstanding balance of current visit group must to be fully paid.',
+                    })
+                  }else handleSubmit()
+                }}
                 disabled={values.paymentList.length === 0 || disabledPayment}
               >
                 Confirm
