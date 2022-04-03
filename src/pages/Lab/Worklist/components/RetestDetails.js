@@ -22,6 +22,7 @@ import {
 } from '@/components'
 import { useCodeTable } from '@/utils/hooks'
 import { Description } from '@material-ui/icons'
+import { FlagIndicator } from '.'
 
 export const RetestDetails = ({ open, id, onClose, onConfirm }) => {
   const [showModal, setShowModal] = useState(false)
@@ -71,6 +72,16 @@ export const RetestDetails = ({ open, id, onClose, onConfirm }) => {
       key: 'result',
       ellipsis: true,
       width: 150,
+      render: (text, record, onSave) => {
+        return record.shouldFlag ? (
+          <React.Fragment>
+            <span style={{ color: 'red' }}>{text}</span>
+            <FlagIndicator />
+          </React.Fragment>
+        ) : (
+          <span>{text}</span>
+        )
+      },
     },
     {
       title: 'Unit',

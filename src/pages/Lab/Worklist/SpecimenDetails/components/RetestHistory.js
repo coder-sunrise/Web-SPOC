@@ -23,6 +23,7 @@ import {
 import { useCodeTable } from '@/utils/hooks'
 import { Description } from '@material-ui/icons'
 import { dataReady } from '@syncfusion/ej2-react-schedule'
+import { FlagIndicator } from '../../components'
 
 export const RetestHistory = ({ open, dataSource, onClose, onConfirm }) => {
   const [showModal, setShowModal] = useState(false)
@@ -63,6 +64,16 @@ export const RetestHistory = ({ open, dataSource, onClose, onConfirm }) => {
       key: 'result',
       ellipsis: true,
       width: 150,
+      render: (text, record, onSave) => {
+        return record.shouldFlag ? (
+          <React.Fragment>
+            <span style={{ color: 'red' }}>{text}</span>
+            <FlagIndicator />
+          </React.Fragment>
+        ) : (
+          <span>{text}</span>
+        )
+      },
     },
     {
       title: 'Unit',

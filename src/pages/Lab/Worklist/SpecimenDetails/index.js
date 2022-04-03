@@ -29,7 +29,7 @@ import { TestPanelColumn } from '../components/TestPanelColumn'
 import { RetestSpecimen } from './components/RetestSpecimen'
 import { SpecimenDetailsStep } from './components'
 import { useCodeTable } from '@/utils/hooks'
-import { EditableTable } from './components/LabResultTable'
+import { LabResultTable } from './components/LabResultTable'
 import { HeaderInfo } from './components/HeaderInfo'
 import {
   LAB_SPECIMEN_STATUS,
@@ -89,6 +89,7 @@ export const SpecimenDetails = ({
     open: false,
     id: undefined,
   })
+  const [showConfirmEmptyResult, setShowConfirmEmptyResult] = useState(false)
   const [showRawData, setShowRawData] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const currentStatus = entity.specimenStatusFK
@@ -193,32 +194,43 @@ export const SpecimenDetails = ({
         currentStatus !== LAB_SPECIMEN_STATUS.COMPLETED
       ) {
         const values = await form.validateFields()
-        const changedResults = getChangedResults(values)
 
-        console.log('hasAnyValueChanged', changedResults.length > 0)
+        if (
+          values.labWorkitemResults.filter(
+            x =>
+              x.finalResult === null ||
+              x.finalResult === undefined ||
+              x.finalResult === '',
+          ).length > 0
+        ) {
+          setShowConfirmEmptyResult(true)
+          return
+        }
 
-        dispatch({
-          type: 'worklistSpecimenDetails/verifyLabTest',
-          payload: { ...entity, ...values },
-        }).then(result => {
-          if (result) {
-            setShowModal(false)
-            onConfirm && onConfirm()
-          }
-        })
+        saveVerify()
       }
     } catch (errInfo) {
       console.log('Save failed:', errInfo)
     }
   }
 
+  const saveVerify = async () => {
+    const values = await form.validateFields()
+
+    dispatch({
+      type: 'worklistSpecimenDetails/verifyLabTest',
+      payload: { ...entity, ...values },
+    }).then(result => {
+      if (result) {
+        setShowModal(false)
+        onConfirm && onConfirm()
+      }
+    })
+  }
+
   const handleSave = async () => {
     try {
       const values = await form.validateFields()
-      const changedResults = getChangedResults(values)
-
-      console.log('hasAnyValueChanged', changedResults.length > 0)
-
       dispatch({
         type: 'worklistSpecimenDetails/saveLabTest',
         payload: { ...entity, ...values },
@@ -359,20 +371,22 @@ export const SpecimenDetails = ({
                         <Typography.Text strong style={{ flexGrow: 1 }}>
                           Final Result
                         </Typography.Text>
-                        <Tooltip title='Final Result History'>
-                          <span
-                            className='material-icons'
-                            style={{ color: 'gray', cursor: 'pointer' }}
-                            onClick={event => {
-                              setRetestHistoryPara({
-                                open: true,
-                                dataSource: entity.labRetestHistories,
-                              })
-                            }}
-                          >
-                            history
-                          </span>
-                        </Tooltip>
+                        {entity.hasAnyRetest && (
+                          <Tooltip title='Final Result History'>
+                            <span
+                              className='material-icons'
+                              style={{ color: 'gray', cursor: 'pointer' }}
+                              onClick={event => {
+                                setRetestHistoryPara({
+                                  open: true,
+                                  dataSource: entity.labRetestHistories,
+                                })
+                              }}
+                            >
+                              history
+                            </span>
+                          </Tooltip>
+                        )}
 
                         <Checkbox
                           onChange={e => setShowRawData(e.target.checked)}
@@ -398,7 +412,7 @@ export const SpecimenDetails = ({
                     </GridItem>
                     <GridItem md={12} style={{ paddingTop: 8 }}>
                       <Form.Item name='labWorkitemResults'>
-                        <EditableTable
+                        <LabResultTable
                           showRawData={showRawData}
                           isReadonly={
                             isReadonly ||
@@ -434,6 +448,21 @@ export const SpecimenDetails = ({
           closeRetestHisotry()
         }}
       />
+      <CommonModal
+        open={showConfirmEmptyResult}
+        onClose={() => {
+          setShowConfirmEmptyResult(false)
+        }}
+        onConfirm={() => {
+          saveVerify()
+          setShowConfirmEmptyResult(false)
+        }}
+        showFooter={true}
+        cancelText='Cancel'
+        maxWidth='xs'
+      >
+        <div>Some final result fields are empty. Confirm to proceed?</div>
+      </CommonModal>
     </React.Fragment>
   )
 }

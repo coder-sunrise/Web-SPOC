@@ -13,6 +13,7 @@ import {
 import { useCodeTable } from '@/utils/hooks'
 import styles from './LabResultTable.less'
 import { LAB_RESULT_TYPE } from '@/utils/constants'
+import { FlagIndicator } from '../../components'
 
 const EditableContext = React.createContext(null)
 
@@ -79,10 +80,6 @@ const EditableCell = ({
   return <td {...restProps}>{childNode}</td>
 }
 
-const FlagIndicator = () => (
-  <span style={{ color: 'red', marginLeft: 5 }}> *</span>
-)
-
 const ResultSelect = ({
   value,
   defaultValue,
@@ -104,7 +101,7 @@ const ResultSelect = ({
   )
 }
 
-export const EditableTable = ({
+export const LabResultTable = ({
   value,
   onChange,
   showRawData = false,
@@ -201,7 +198,13 @@ export const EditableTable = ({
 
   const checkShouldFlag = (finalResult, refereneceRangeId, testPanelItemId) => {
     const testPanelItem = cttestpanelitem.find(x => x.id === testPanelItemId)
-    if (refereneceRangeId === null || refereneceRangeId === undefined)
+    if (
+      finalResult === null ||
+      finalResult === undefined ||
+      finalResult === '' ||
+      refereneceRangeId === null ||
+      refereneceRangeId === undefined
+    )
       return false
 
     if (testPanelItem.resultTypeFK === LAB_RESULT_TYPE.NUMERIC) {
@@ -280,7 +283,7 @@ export const EditableTable = ({
   )
 }
 
-EditableTable.propTypes = {
+LabResultTable.propTypes = {
   value: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
