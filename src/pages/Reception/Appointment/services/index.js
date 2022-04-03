@@ -3,7 +3,21 @@ import * as service from '@/services/common'
 const url = '/api/appointment'
 
 const fns = {
-  queryList: params => service.queryList(url, params),
+  queryList: async params => {
+    const result = await service.queryList(url, params)
+    return {
+      ...result,
+      data: {
+        ...result.data,
+        data: [
+          ...result.data.data.map(item => ({
+            ...item,
+            appointment_Resources: JSON.parse(item.appointment_Resources) || [],
+          })),
+        ],
+      },
+    }
+  },
 
   upsert: params => service.upsert(url, params),
   saveFilterTemplate: (userId, params) =>
