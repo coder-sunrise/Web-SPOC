@@ -548,7 +548,7 @@ const WorklistGrid = ({
             clickMenu(entity, key)
           }
           return (
-            <Tooltip title='More Actions'>
+            <Tooltip title='More Options'>
               <div>
                 <GridButton
                   row={entity}
