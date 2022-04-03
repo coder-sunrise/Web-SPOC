@@ -197,7 +197,7 @@ class Appointment extends React.PureComponent {
         }
 
         resources = _.orderBy(
-          response.data || [],
+          (response.data || []).filter(x => x.isActive),
           ['resourceType', 'sortOrder', source => source.name.toUpperCase()],
           ['asc'],
         )
@@ -247,7 +247,7 @@ class Appointment extends React.PureComponent {
         primaryCalendarResourceFK,
         resources,
         allResources: (response?.data || []).filter(
-          x => x.resourceType === CALENDAR_RESOURCE.RESOURCE,
+          x => x.isActive && x.resourceType === CALENDAR_RESOURCE.RESOURCE,
         ),
       }))
     } else {
@@ -309,7 +309,7 @@ class Appointment extends React.PureComponent {
     let newResources = []
     if (response) {
       newResources = _.orderBy(
-        response.data || [],
+        (response.data || []).filter(x => x.isActive),
         ['resourceType', 'sortOrder', source => source.name.toUpperCase()],
         ['asc'],
       )
@@ -332,7 +332,7 @@ class Appointment extends React.PureComponent {
     this.setState(() => ({
       resources: newResources.length > 0 ? newResources : [],
       allResources: (response?.data || []).filter(
-        x => x.resourceType === CALENDAR_RESOURCE.RESOURCE,
+        x => x.isActive && x.resourceType === CALENDAR_RESOURCE.RESOURCE,
       ),
     }))
   }
@@ -617,7 +617,7 @@ class Appointment extends React.PureComponent {
     let newResources = []
     if (response) {
       newResources = _.orderBy(
-        response.data || [],
+        (response.data || []).filter(x => x.isActive),
         ['resourceType', 'sortOrder', source => source.name.toUpperCase()],
         ['asc'],
       )
@@ -653,7 +653,7 @@ class Appointment extends React.PureComponent {
       filter: { ...updFilter },
       resources: newResources.length > 0 ? newResources : [],
       allResources: (response?.data || []).filter(
-        x => x.resourceType === CALENDAR_RESOURCE.RESOURCE,
+        x => x.isActive && x.resourceType === CALENDAR_RESOURCE.RESOURCE,
       ),
     }))
 
@@ -817,7 +817,7 @@ class Appointment extends React.PureComponent {
     if (response) {
       const { filterByDoctor = [], filterBySingleDoctor } = this.state.filter
       const newResources = _.orderBy(
-        response.data || [],
+        (response.data || []).filter(x => x.isActive),
         ['resourceType', 'sortOrder', source => source.name.toUpperCase()],
         ['asc'],
       )
@@ -841,7 +841,7 @@ class Appointment extends React.PureComponent {
         ...preFilter,
         resources: newResources.length > 0 ? newResources : [],
         allResources: (response?.data || []).filter(
-          x => x.resourceType === CALENDAR_RESOURCE.RESOURCE,
+          x => x.isActive && x.resourceType === CALENDAR_RESOURCE.RESOURCE,
         ),
       }))
     }
