@@ -160,7 +160,7 @@ const FilterBar = props => {
                 return (
                   <DateRangePicker
                     style={{
-                      width: 350,
+                      width: 280,
                       position: 'relative',
                       top: -5,
                       marginRight: 10,
