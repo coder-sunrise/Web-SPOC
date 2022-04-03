@@ -1248,7 +1248,7 @@ class Medication extends PureComponent {
     row.totalPrice = row.unitPrice * row.quantity
     row.drugCode = option.code
     row.drugName = option.displayValue
-    row.revenueCategoryFK = option.revenueCategory.id
+    row.revenueCategoryFK = option.revenueCategoryFK
     row.isDispensedByPharmacy = option.isDispensedByPharmacy
     row.isNurseActualizeRequired = option.isNurseActualizable
     row.prescribeUOMFK = option.prescribingUOM.id

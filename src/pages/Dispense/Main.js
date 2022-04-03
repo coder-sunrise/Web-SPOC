@@ -573,7 +573,6 @@ class Main extends Component {
       }
     })
   }
-
   handleDrugLabelSelectionClose = () => {
     this.setState(prevState => {
       return {
@@ -750,6 +749,7 @@ class Main extends Component {
           onFinalizeClick={this.makePayment}
           onReloadClick={this.handleReloadClick}
           onDrugLabelClick={this.handleDrugLabelClick}
+          onLabLabelClick={this.handleLabLabelClick}
           showDrugLabelSelection={this.state.showDrugLabelSelection}
           onDrugLabelSelectionClose={this.handleDrugLabelSelectionClose}
           currentDrugToPrint={this.state.currentDrugToPrint}

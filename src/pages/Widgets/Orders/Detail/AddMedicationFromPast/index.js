@@ -453,7 +453,7 @@ class PastMedication extends PureComponent {
                   prescribeUOMDisplayValue: drug.prescribingUOM.name,
                   batchNo: o.batchNo,
                   expiryDate: o.expiryDate,
-                  revenueCategoryFK: drug.revenueCategory.id,
+                  revenueCategoryFK: drug.revenueCategoryFK,
                   sequence: currentDrugMixtureSequence,
                   isDeleted: false,
                   isNew: true,

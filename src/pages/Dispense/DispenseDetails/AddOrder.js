@@ -515,7 +515,7 @@ export default compose(
                 c => c.id === o.inventoryMedicationFK,
               )
               revenueCategory = medication
-                ? medication.revenueCategory
+                ? { id: medication.revenueCategoryFK }
                 : { id: REVENUE_CATEGORY.OTHER }
               const {
                 corPrescriptionItemInstruction,
