@@ -35,7 +35,7 @@ import PrintSpecimenLabel, { usePrintLabLabel } from './PrintSpecimenLabel'
 const DispenseDetailsSpecimenCollection = ({
   visitId,
   handlePrint,
-  patient,
+  patient = {},
   ...restProps
 }) => {
   const dispatch = useDispatch()
