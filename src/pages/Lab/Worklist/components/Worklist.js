@@ -8,7 +8,9 @@ export const Worklist = props => {
   return (
     <Card>
       <Space
-        style={{ width: '100%', overflowY: 'scroll' }}
+        style={{
+          width: '100%',
+        }}
         direction='vertical'
       >
         <WorklistFilter {...props} />

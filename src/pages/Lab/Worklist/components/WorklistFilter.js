@@ -61,23 +61,24 @@ export const WorklistFilter = () => {
       },
     })
     handleSearch()
-  }, [])
-
-  useEffect(() => {
-    if (isAnyWorklistModelOpened) {
-      stopTimer()
-    } else {
-      handleSearch()
-    }
 
     return () => {
       console.log('Clean up Lab WorklistFilter')
       stopTimer()
     }
+  }, [])
+
+  useEffect(() => {
+    if (isAnyWorklistModelOpened) {
+      console.log('timer log - isAnyWorklistModelOpened : true')
+      stopTimer()
+    } else {
+      handleSearch()
+      startTimer()
+    }
   }, [isAnyWorklistModelOpened])
 
   const handleSearch = () => {
-    stopTimer()
     const {
       searchValue,
       visitType,
@@ -109,10 +110,14 @@ export const WorklistFilter = () => {
         },
       },
     }).then(val => {
+      console.log('timer log - val:', val)
       if (val) {
         setRefreshDate(moment())
       }
-      startTimer()
+      console.log(
+        'timer log - handleSearch isAnyWorklistModelOpened:',
+        isAnyWorklistModelOpened,
+      )
     })
   }
 

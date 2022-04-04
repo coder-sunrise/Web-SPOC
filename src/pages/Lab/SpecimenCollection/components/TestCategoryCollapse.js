@@ -40,6 +40,12 @@ const TestCategoryPanel = ({
           .map(item => (
             <GridItem md={4} key={item.id}>
               <Checkbox
+                disabled={checkedWorkitems.find(
+                  cur =>
+                    cur.testPanelFK === item.testPanelFK &&
+                    cur.id !== item.id &&
+                    cur.statusFK === LAB_WORKITEM_STATUS.SPECIMENCOLLECTED,
+                )}
                 checked={checkedWorkitems.find(
                   cur =>
                     cur.id === item.id &&

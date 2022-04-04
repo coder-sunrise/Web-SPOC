@@ -392,7 +392,7 @@ export const WorklistHistoryGrid = ({ labWorklistHistory }) => {
         showHeader={false}
         dataSource={visits}
         pagination={{
-          pageSize: 2,
+          pageSize: 20,
           total: pagination.totalRecords,
           onChange: pageNo => {
             triggerPaginationChange(pageNo)
@@ -406,7 +406,7 @@ export const WorklistHistoryGrid = ({ labWorklistHistory }) => {
           )
         }
       />
-      <section style={{ margin: 10, fontStyle: 'italic' }}>
+      <section style={{ fontStyle: 'italic' }}>
         Note: test panel in{' '}
         <span style={{ color: 'red' }}>red color = urgent </span>; test panel in
         black color = normal

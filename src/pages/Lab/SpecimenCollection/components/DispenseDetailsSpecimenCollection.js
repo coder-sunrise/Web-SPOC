@@ -21,22 +21,21 @@ import {
   NumberInput,
   Popper,
   notification,
-  labSpecimenLabelDateFormat,
   Icon,
   Tooltip,
   dateFormatLongWithTimeNoSec,
 } from '@/components'
-import Print from '@material-ui/icons/Print'
 import { TestPanelColumn } from '../../Worklist/components/TestPanelColumn'
 import CollectSpecimen from './CollectSpecimen'
 import { useCodeTable } from '@/utils/hooks'
 import { DiscardSpecimen } from '../../Worklist/components'
 import { SpecimenDetails } from '../../Worklist/SpecimenDetails'
+import PrintSpecimenLabel, { usePrintLabLabel } from './PrintSpecimenLabel'
 
 const DispenseDetailsSpecimenCollection = ({
   visitId,
   handlePrint,
-  patient,
+  patient = {},
   ...restProps
 }) => {
   const dispatch = useDispatch()
@@ -57,6 +56,7 @@ const DispenseDetailsSpecimenCollection = ({
   })
   const cttestpanel = useCodeTable('cttestpanel')
   const ctspecimentype = useCodeTable('ctspecimentype')
+  const printLabLabel = usePrintLabLabel(handlePrint)
 
   const columns = [
     {
@@ -153,17 +153,7 @@ const DispenseDetailsSpecimenCollection = ({
               </Tooltip>
             )}
           {row.specimenStatusFK !== LAB_SPECIMEN_STATUS.DISCARDED && (
-            <Button
-              color='primary'
-              onClick={() => {
-                printLabel(row.labSpecimenFK)
-              }}
-              size='sm'
-              justIcon
-              style={{ height: 25, marginTop: 2 }}
-            >
-              <Print />
-            </Button>
+            <PrintSpecimenLabel id={row.labSpecimenFK} />
           )}
           {row.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW && (
             <Tooltip title='Discard Specimen'>
@@ -204,48 +194,6 @@ const DispenseDetailsSpecimenCollection = ({
     })
   }
 
-  const printLabel = (specimenId, copies) => {
-    dispatch({
-      type: 'specimenCollection/getLabSpecimenById',
-      payload: { id: specimenId },
-    }).then(labSpecimenData => {
-      if (labSpecimenData) {
-        let testPanel = labSpecimenData?.labWorkitems
-          .map(labWorkitem => labWorkitem.testPanel)
-          .join(', ')
-        const data = {
-          SampleLabelDetails: [
-            {
-              Gender:
-                patient.genderFK === 1
-                  ? 'Male'
-                  : patient.genderFK === 2
-                  ? 'Female'
-                  : 'Unknown',
-              Name: patient.name,
-              AccessionNo: labSpecimenData.accessionNo,
-              TestPanel: testPanel,
-              SpecimenType: labSpecimenData.specimenType,
-              SpecimenCollectionDate: moment(
-                labSpecimenData.specimenCollectionDate,
-              ).format(labSpecimenLabelDateFormat),
-              ReferenceNo: patient.patientReferenceNo,
-            },
-          ],
-        }
-        const payload = [
-          {
-            Copies: copies,
-            ReportId: REPORT_ID.LAB_SPECIMEN_LABEL_50MM_34MM,
-            ReportData: JSON.stringify({
-              ...data,
-            }),
-          },
-        ]
-        handlePrint(JSON.stringify(payload))
-      }
-    })
-  }
   useEffect(() => {
     if (visitId && cttestpanel.length > 0 && ctspecimentype.length > 0)
       getVisitSpecimenCollection()
@@ -354,7 +302,7 @@ const DispenseDetailsSpecimenCollection = ({
         {...collectSpecimenPara}
         onConfirm={(newId, printInfo) => {
           if (printInfo.isPrintLabel) {
-            printLabel(newId, printInfo.copies)
+            printLabLabel(newId, printInfo.copies)
           }
           closeCollectSpecimen()
         }}

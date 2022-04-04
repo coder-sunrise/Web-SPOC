@@ -76,11 +76,11 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
   const [receiveSpecimenPara, setReceiveSpecimenPara] = useState({
     open: false,
     id: undefined,
-  }) 
+  })
   const [labResultReportPreviewPara, setLabResultReportPreviewPara] = useState({
     open: false,
     visitId: undefined,
-  }) 
+  })
   const [specimenDetailsPara, setSpecimenDetailsPara] = useState({
     open: false,
     id: undefined,
@@ -88,7 +88,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
   const [retestDetailsPara, setRetestDetailsPara] = useState({
     open: false,
     id: undefined,
-  }) 
+  })
   useEffect(() => {
     if (originalWorklist) {
       const currentFilteredWorklist = _(
@@ -192,7 +192,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
   }
 
   const closeLabResultReportPreview = () => {
-    setLabResultReportPreviewPara({ 
+    setLabResultReportPreviewPara({
       open: false,
       id: undefined,
     })
@@ -200,7 +200,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
   }
 
   const closeSpecimenDetails = () => {
-    setSpecimenDetailsPara({ 
+    setSpecimenDetailsPara({
       open: false,
       id: undefined,
     })
@@ -258,7 +258,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
         title: 'Test Panel',
         dataIndex: 'testPanels',
         key: 'testPanels',
-        width: 290,
+        width: 280,
         render: (text, record, index) => {
           return (
             <TestPanelColumn columnWidth={320} testPanels={record.testPanels} />
@@ -476,7 +476,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
               <VisitTypeTag type={record.visitPurposeFK} />
             </Space>
             <Space>
-              <span>{getSpecimenCountByCategory(record.visitFK)}</span> 
+              <span>{getSpecimenCountByCategory(record.visitFK)}</span>
             </Space>
           </div>
         )
@@ -484,7 +484,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
     },
   ]
   return (
-    <Card>
+    <Card style={{ overflow: 'scroll' }}>
       <div style={{ display: 'flex', alignItems: 'start' }}>
         <ExapandCollapseAllButton
           onExpandAllClick={() => setCollapsedKeys([])}

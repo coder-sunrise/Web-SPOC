@@ -314,6 +314,11 @@ const SpecimenCollection = ({
 
   const columns = defaultColumns(codetable, visitTypes)
 
+  const onCloseCollectSpecimen = () => {
+    setVisitId(undefined)
+    ref.current.reload()
+  }
+
   return (
     <Fragment>
       <PageContainer pageHeaderRender={false}>
@@ -397,10 +402,8 @@ const SpecimenCollection = ({
         mode='new'
         open={visitId != undefined && visitId != null}
         visitId={visitId}
-        onConfirm={() => {
-          setVisitId(undefined)
-          ref.current.reload()
-        }}
+        onConfirm={onCloseCollectSpecimen}
+        onClose={onCloseCollectSpecimen}
       ></CollectSpecimen>
     </Fragment>
   )

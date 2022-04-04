@@ -17,17 +17,21 @@ import {
   NumberInput,
   GridContainer,
   GridItem,
+  Button,
 } from '@/components'
+import Print from '@material-ui/icons/Print'
 import { VisitTypeTag } from '@/components/_medisys'
 import { SpecimenStatusTag } from '../../components/SpecimenStatusTag'
 import { TestPanelColumn } from '../../components/TestPanelColumn'
 import { useCodeTable } from '@/utils/hooks'
 import { LAB_SPECIMEN_STATUS } from '@/utils/constants'
+import PrintSpecimenLabel from '@/pages/Lab/SpecimenCollection/components/PrintSpecimenLabel'
 
 export const HeaderInfo = ({ entity }) => {
   const cttestcategory = useCodeTable('cttestcategory')
   const ctspecimentype = useCodeTable('ctspecimentype')
   const cttestpanel = useCodeTable('cttestpanel')
+
   const specimenInfoColumns = [
     {
       title: 'Accession No.',
@@ -75,8 +79,8 @@ export const HeaderInfo = ({ entity }) => {
       width: 85,
       dataIndex: 'operation',
       key: 'operation',
-      align: 'left',
-      render: (text, record, index) => <span>hello</span>,
+      align: 'center',
+      render: (text, record, index) => <PrintSpecimenLabel id={entity.id} />,
     },
   ]
 
