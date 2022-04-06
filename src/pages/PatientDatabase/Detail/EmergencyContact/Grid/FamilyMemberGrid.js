@@ -254,7 +254,14 @@ class FamilyMemberGrid extends PureComponent {
 
     return (
       <div>
-          <h5><span style={{color:'#999999',fontStyle:'italic'}}>You are currently viewing the family group of</span><span style={{fontWeight:500}}>&nbsp;&nbsp;{values.patientFamilyGroup.name}</span></h5>
+        <h5>
+          <span style={{ color: '#999999', fontStyle: 'italic' }}>
+            You are currently viewing the family group of
+          </span>
+          <span style={{ fontWeight: 500 }}>
+            &nbsp;&nbsp;{values.patientFamilyGroup.name}
+          </span>
+        </h5>
         <FastEditableTableGrid
           rows={values.patientFamilyGroup.patientFamilyMember}
           schema={schema.patientFamilyMember._subType}
@@ -267,7 +274,7 @@ class FamilyMemberGrid extends PureComponent {
                   color='info'
                   link
                 >
-                    <Add />
+                  <Add />
                   Add From Existing Patient
                 </Button>
               ),
@@ -292,7 +299,7 @@ class FamilyMemberGrid extends PureComponent {
           title='Search Patient'
           onClose={this.toggleModal}
           showFooter={false}
-          maxWidth='lg'
+          maxWidth='md'
           onConfirm={this.toggleModal}
         >
           <SearchPatient />

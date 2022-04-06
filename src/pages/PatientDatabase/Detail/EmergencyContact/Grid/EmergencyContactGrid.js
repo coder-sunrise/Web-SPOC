@@ -286,7 +286,7 @@ class EmergencyContactGrid extends PureComponent {
           title='Search Patient'
           onClose={this.toggleModal}
           showFooter={false}
-          maxWidth='lg'
+          maxWidth='md'
           onConfirm={this.toggleModal}
         >
           <SearchPatient />
