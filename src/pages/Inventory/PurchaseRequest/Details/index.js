@@ -15,6 +15,7 @@ import {
 } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
 import { podoOrderType } from '@/utils/codes'
+import { navigateDirtyCheck } from '@/utils/utils'
 import AuthorizedContext from '@/components/Context/Authorized'
 import Authorized from '@/utils/Authorized'
 import Warining from '@material-ui/icons/Error'
@@ -255,7 +256,13 @@ class Index extends Component {
           {errors.rows && (
             <p className={classes.errorMsgStyle}>{errors.rows}</p>
           )}
-          <PRGrid {...this.props} isEditable={!isReadOnly} />
+          <PRGrid
+            {...this.props}
+            propertyChange={() => {
+              this.setState({ isDirty: true })
+            }}
+            isEditable={!isReadOnly}
+          />
         </div>
         {/* </AuthorizedContext.Provider> */}
         <GridContainer
@@ -266,6 +273,32 @@ class Index extends Component {
           }}
         >
           <div>
+            {(creatable || !unsubmit) && (
+              <ProgressButton
+                authority='none'
+                color='danger'
+                icon={null}
+                onClick={() => {
+                  if (this.state.isDirty) {
+                    this.props.dispatch({
+                      type: 'global/updateAppState',
+                      payload: {
+                        openConfirm: true,
+                        openConfirmContent: formatMessage({
+                          id: 'app.general.leave-without-save',
+                        }),
+                        onConfirmSave: () =>
+                          history.push('/inventory/purchaserequest'),
+                      },
+                    })
+                  } else history.push('/inventory/purchaserequest')
+                }}
+              >
+                {formatMessage({
+                  id: 'inventory.purchaserequest.detail.close',
+                })}
+              </ProgressButton>
+            )}
             {editable && unsubmit && (
               <ProgressButton
                 color='danger'
@@ -280,7 +313,7 @@ class Index extends Component {
             {(creatable || editable) && unsubmit && (
               <ProgressButton
                 color='primary'
-                icon={null}
+                // icon={null}
                 onClick={() => this.onSubmitButtonClicked(prSubmitAction.SAVE)}
               >
                 {formatMessage({

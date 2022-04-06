@@ -97,6 +97,7 @@ export default {
   'inventory.purchaserequest.detail.delete': 'Delete',
   'inventory.purchaserequest.detail.print': 'Print',
   'inventory.purchaserequest.detail.save': 'Save',
+  'inventory.purchaserequest.detail.close': 'Close',
   'inventory.purchaserequest.detail.submit': 'Submit',
   'inventory.purchaserequest.detail.remarks': 'Remarks',
   'inventory.purchaserequest.detail.requestdate': 'Purchase Request Date',
