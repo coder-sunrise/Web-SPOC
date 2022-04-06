@@ -781,11 +781,10 @@ class NewVisit extends PureComponent {
               confirmBtnText: isEdit ? 'Save' : 'Register Visit',
               onConfirm: this.validatePatient,
               confirmProps: {
-                disabled: fromMedicalCheckupReporting
-                  ? false
-                  : isReadonlyAfterSigned ||
-                    !this.state.hasActiveSession ||
-                    !validateReportLanguage,
+                disabled:
+                  !validateReportLanguage ||
+                  (!fromMedicalCheckupReporting &&
+                    (isReadonlyAfterSigned || !this.state.hasActiveSession)),
               },
             })}
         </div>
