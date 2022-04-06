@@ -6,7 +6,7 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { withStyles, Tooltip } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
-import { CodeSelect, Select, TextField } from '@/components'
+import { CodeSelect, Select, TextField, MedicationSelect } from '@/components'
 
 import {
   updateGlobalVariable,
@@ -23,12 +23,12 @@ import {
 class SelectEditor extends PureComponent {
   state = {}
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.myRef = React.createRef()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     onComponentDidMount.call(this)
   }
 
@@ -84,13 +84,20 @@ class SelectEditor extends PureComponent {
           </div>
         )
       }
+      if (type === 'medicationSelect') {
+        return (
+          <div ref={this.myRef}>
+            <MedicationSelect {...commonCfg} isFromTable={true} />
+          </div>
+        )
+      }
       return null
     }
 
     return <TextField value={commonCfg.value} simple />
   }
 
-  render () {
+  render() {
     return getCommonRender.bind(this)(this.renderComponent)
   }
 }
@@ -136,21 +143,17 @@ class SelectTypeProvider extends React.Component {
     columnExtensions: PropTypes.array,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     const { columnExtensions, codetable, dispatch } = this.props
     const colFor = columnExtensions.filter(
-      (o) =>
-        [
-          'select',
-          'codeSelect',
-        ].indexOf(o.type) >= 0,
+      o => ['select', 'codeSelect', 'medicationSelect'].indexOf(o.type) >= 0,
     )
-    colFor.forEach((o) => {
+    colFor.forEach(o => {
       let { columnName, type, valueField, labelField } = o
       if (!valueField) {
-        if (type === 'codeSelect') {
+        if (type === 'codeSelect' || type === 'medicationSelect') {
           valueField = 'id'
         } else {
           valueField = 'value'
@@ -161,8 +164,8 @@ class SelectTypeProvider extends React.Component {
       }
       o.compare = (a, b) => {
         const codes = this.state[`${columnName}Option`] || []
-        const aa = codes.find((m) => m[valueField] === a)
-        const bb = codes.find((m) => m[valueField] === b)
+        const aa = codes.find(m => m[valueField] === a)
+        const bb = codes.find(m => m[valueField] === b)
 
         // eslint-disable-next-line no-nested-ternary
         return (aa ? aa[labelField] : a || '') > (bb ? bb[labelField] : b || '')
@@ -198,9 +201,9 @@ class SelectTypeProvider extends React.Component {
               // filter: f.remoteFilter,
               force: true,
             },
-          }).then((response) => {
+          }).then(response => {
             if (response) {
-              this.setState((prevState) => {
+              this.setState(prevState => {
                 const filtered = localFilter
                   ? response.filter(localFilter)
                   : response
@@ -220,7 +223,7 @@ class SelectTypeProvider extends React.Component {
       ...payload,
     }
 
-    this.SelectEditor = (ces, text) => (editorProps) => {
+    this.SelectEditor = (ces, text) => editorProps => {
       // console.log(ces, editorProps)
       return (
         <SelectEditor
@@ -249,12 +252,12 @@ class SelectTypeProvider extends React.Component {
     )
   }
 
-  render () {
+  render() {
     // console.log('texttypeprovider', this.props)
     const { columnExtensions } = this.props
     return (
       <DataTypeProvider
-        for={this.state.for.map((o) => o.columnName)}
+        for={this.state.for.map(o => o.columnName)}
         editorComponent={this.SelectEditor(columnExtensions)}
         formatterComponent={this.SelectEditor(columnExtensions, true)}
       />
