@@ -41,7 +41,7 @@ const NurseWorkItemInfo = props => {
     return row.map(nurseWorkitem => {
       number += 1
       return (
-        <tr>
+        <tr style={{ borderBottom: '1px solid #eeeeee' }}>
           <td style={{ width: '35px' }}>{number}</td>
           <td style={{ width: '200px' }}>{nurseWorkitem.name || '-'}</td>
           <td style={{ width: '200px' }}>
@@ -58,7 +58,7 @@ const NurseWorkItemInfo = props => {
           </td>
           <td
             style={{
-              width: '100px',
+              width: '120px',
               color:
                 nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
                   ? 'green'
@@ -91,13 +91,13 @@ const NurseWorkItemInfo = props => {
                   fontWeight: 'bold',
                 }}
               >
-                <tr>
+                <tr style={{ borderBottom: '1px solid #eeeeee' }}>
                   <th style={{ width: '35px' }}>No.</th>
                   <th style={{ width: '200px' }}>Name</th>
                   <th style={{ width: '200px' }}>Instructions</th>
                   <th style={{ width: '200px' }}>Remarks</th>
                   <th style={{ width: '65px' }}>Priority</th>
-                  <th style={{ width: '100px' }}>Status</th>
+                  <th style={{ width: '120px' }}>Status</th>
                 </tr>
               </table>
             </td>

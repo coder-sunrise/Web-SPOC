@@ -1,5 +1,5 @@
 import ReactHtmlParser from 'react-html-parser'
-import { Descriptions } from 'antd'
+import { Descriptions, Empty } from 'antd'
 import { VisitTypeTag } from '@/components/_medisys'
 import _ from 'lodash'
 import { Collapse } from 'antd'
@@ -26,65 +26,72 @@ const RadiologyExaminations = props => {
       <RadiologyStatusTag statusId={radiology.status}></RadiologyStatusTag>
     </div>
   )
+  const hasData = data && data.length > 0
   return (
     <div>
-      <Collapse defaultActiveKey={[_.take(data)]} className='noPaddingCollapse'>
-        {data.map(radiology => {
-          return (
-            <Panel
-              header={radiology.name}
-              key={radiology.id}
-              extra={genExtra(radiology)}
-            >
-              <Descriptions
-                bordered
-                size='small'
-                className='radiologyDescription'
+      {hasData && (
+        <Collapse
+          defaultActiveKey={[_.take(data)]}
+          className='noPaddingCollapse'
+        >
+          {data.map(radiology => {
+            return (
+              <Panel
+                header={radiology.name}
+                key={radiology.id}
+                extra={genExtra(radiology)}
               >
-                <Descriptions.Item
-                  label='Techonologist:'
-                  labelStyle={{ width: 190 }}
-                  span={3}
+                <Descriptions
+                  bordered
+                  size='small'
+                  className='radiologyDescription'
                 >
-                  {radiology.technologist ?? '-'}
-                </Descriptions.Item>
-                <Descriptions.Item label='Accession No.'>
-                  {radiology.accesionNo ?? '-'}
-                </Descriptions.Item>
-                <Descriptions.Item
-                  label='Order Created Date:'
-                  labelStyle={{ width: 180 }}
-                  contentStyle={{ width: 400 }}
-                >
-                  {moment(radiology.orderDate).format('DD MMM YYYY HH:mm')}
-                </Descriptions.Item>
-                <Descriptions.Item
-                  label='Modality:'
-                  labelStyle={{ width: 150 }}
-                  contentStyle={{ width: 400 }}
-                >
-                  {radiology.modality ?? '-'}
-                </Descriptions.Item>
-                <Descriptions.Item label='Priority:'>
-                  {radiology.priority ?? '-'}
-                </Descriptions.Item>
-                <Descriptions.Item label='Doctor Instructions:'>
-                  {radiology.doctorInstruction ?? '-'}
-                </Descriptions.Item>
-                <Descriptions.Item label='Doctor Remarks:'>
-                  {radiology.doctorRemarks ?? '-'}
-                </Descriptions.Item>
-                <Descriptions.Item label='Radiographer Comment:' span={3}>
-                  {radiology.radiographerComment ?? '-'}
-                </Descriptions.Item>
-                <Descriptions.Item label='Findings:' span={3}>
-                  {ReactHtmlParser(radiology.findings ?? '-')}
-                </Descriptions.Item>
-              </Descriptions>
-            </Panel>
-          )
-        })}
-      </Collapse>
+                  <Descriptions.Item
+                    label='Techonologist:'
+                    labelStyle={{ width: 190 }}
+                    span={3}
+                  >
+                    {radiology.technologist ?? '-'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label='Accession No.'>
+                    {radiology.accesionNo ?? '-'}
+                  </Descriptions.Item>
+                  <Descriptions.Item
+                    label='Order Created Date:'
+                    labelStyle={{ width: 180 }}
+                    contentStyle={{ width: 400 }}
+                  >
+                    {moment(radiology.orderDate).format('DD MMM YYYY HH:mm')}
+                  </Descriptions.Item>
+                  <Descriptions.Item
+                    label='Modality:'
+                    labelStyle={{ width: 150 }}
+                    contentStyle={{ width: 400 }}
+                  >
+                    {radiology.modality ?? '-'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label='Priority:'>
+                    {radiology.priority ?? '-'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label='Doctor Instructions:'>
+                    {radiology.doctorInstruction ?? '-'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label='Doctor Remarks:'>
+                    {radiology.doctorRemarks ?? '-'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label='Radiographer Comment:' span={3}>
+                    {radiology.radiographerComment ?? '-'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label='Findings:' span={3}>
+                    {ReactHtmlParser(radiology.findings ?? '-')}
+                  </Descriptions.Item>
+                </Descriptions>
+              </Panel>
+            )
+          })}
+        </Collapse>
+      )}
+      {!hasData && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
     </div>
   )
 }
