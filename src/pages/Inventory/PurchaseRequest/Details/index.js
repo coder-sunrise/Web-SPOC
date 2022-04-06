@@ -141,15 +141,14 @@ class Index extends Component {
           },
         }).then(r => {
           if (r) {
-            let message = ''
-            if (action === prSubmitAction.SAVE) message = 'PR saved'
-            else if (action === prSubmitAction.SUBMITTED)
-              message = 'PR submitted'
-
-            if (getAccessRight()) {
-              this.getData(r.id)
-            } else {
+            if (action === prSubmitAction.SAVE) {
+              notification.success({ message: 'PR saved' })
               history.push('/inventory/purchaserequest')
+            } else if (action === prSubmitAction.SUBMITTED) {
+              notification.success({ message: 'PR submitted' })
+              if (getAccessRight()) {
+                this.getData(r.id)
+              }
             }
           }
         })
