@@ -1,4 +1,4 @@
-import { IconButton, Popover } from '@/components'
+import { IconButton, Popover, Tooltip } from '@/components'
 import { createFromIconfontCN } from '@ant-design/icons'
 import defaultSettings from '@/defaultSettings'
 import {
@@ -10,6 +10,9 @@ import _ from 'lodash'
 import React, { useState } from 'react'
 import { Badge } from 'antd'
 import { useDispatch } from 'dva'
+import { CheckCircleOutlined } from '@material-ui/icons'
+import workitem from '@/models/workitem'
+import moment from 'moment'
 
 const RadioWorkItemInfo = props => {
   const { workItemSummary, visitFK } = props
@@ -36,7 +39,9 @@ const RadioWorkItemInfo = props => {
       setTotalWorkItemCount(detailData.length)
       setCompletedWorkItemCount(
         detailData.filter(
-          t => t.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED,
+          t =>
+            t.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
+            t.statusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED,
         ).length,
       )
     })
@@ -48,7 +53,7 @@ const RadioWorkItemInfo = props => {
     return row.map(workItem => {
       number += 1
       return (
-        <tr>
+        <tr style={{ borderBottom: '1px solid #eeeeee' }}>
           <td style={{ width: '35px' }}>{number}</td>
           <td style={{ width: '200px' }}>{workItem.name || '-'}</td>
           <td style={{ width: '200px' }}>{workItem.instructions || '-'}</td>
@@ -63,7 +68,7 @@ const RadioWorkItemInfo = props => {
           </td>
           <td
             style={{
-              width: '100px',
+              width: '140px',
               color:
                 workItem.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
                 workItem.statusFK ===
@@ -91,7 +96,7 @@ const RadioWorkItemInfo = props => {
             fontSize: 14,
           }}
         >
-          <tr>
+          <tr style={{ borderBottom: '1px solid #eeeeee' }}>
             <td>
               <table
                 style={{
@@ -104,7 +109,7 @@ const RadioWorkItemInfo = props => {
                   <th style={{ width: '200px' }}>Instructions</th>
                   <th style={{ width: '200px' }}>Remarks</th>
                   <th style={{ width: '65px' }}>Priority</th>
-                  <th style={{ width: '100px' }}>Status</th>
+                  <th style={{ width: '140px' }}>Status</th>
                 </tr>
               </table>
             </td>

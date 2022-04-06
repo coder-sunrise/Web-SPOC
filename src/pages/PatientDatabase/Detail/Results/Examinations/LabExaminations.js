@@ -1,5 +1,4 @@
-import { Table } from 'antd'
-import { Collapse } from 'antd'
+import { Collapse, Empty, Table } from 'antd'
 import { ResultTable } from './ResultTable'
 import { OrderDetailsTable } from './OrderDetailsTable'
 import { SpecimenTable } from './SpecimenTable'
@@ -33,19 +32,26 @@ export const LabExaminations = props => {
       <SpecimenStatusTag statusId={lab.status}></SpecimenStatusTag>
     </div>
   )
+  const hasData = data && data.length > 0
   return (
     <div>
-      <Collapse defaultActiveKey={[_.take(data)]} className='noPaddingCollapse'>
-        {data.map(lab => {
-          return (
-            <Panel header={lab.testPanels} key={lab.id} extra={genExtra(lab)}>
-              <ResultTable data={lab} acknowledge={acknowledge}></ResultTable>
-              <OrderDetailsTable data={lab}></OrderDetailsTable>
-              <SpecimenTable data={lab}></SpecimenTable>
-            </Panel>
-          )
-        })}
-      </Collapse>
+      {hasData && (
+        <Collapse
+          defaultActiveKey={[_.take(data)]}
+          className='noPaddingCollapse'
+        >
+          {data.map(lab => {
+            return (
+              <Panel header={lab.testPanels} key={lab.id} extra={genExtra(lab)}>
+                <ResultTable data={lab} acknowledge={acknowledge}></ResultTable>
+                <OrderDetailsTable data={lab}></OrderDetailsTable>
+                <SpecimenTable data={lab}></SpecimenTable>
+              </Panel>
+            )
+          })}
+        </Collapse>
+      )}
+      {!hasData && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
     </div>
   )
 }

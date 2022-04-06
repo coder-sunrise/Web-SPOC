@@ -1,4 +1,4 @@
-import { IconButton, Popover } from '@/components'
+import { IconButton, Popover, Tooltip } from '@/components'
 import { createFromIconfontCN } from '@ant-design/icons'
 import defaultSettings from '@/defaultSettings'
 import { LAB_WORKITEM_STATUS, WORK_ITEM_TYPES_ENUM } from '@/utils/constants'
@@ -8,6 +8,8 @@ import React, { useState } from 'react'
 import { Badge } from 'antd'
 import _ from 'lodash'
 import { useDispatch } from 'dva'
+import moment from 'moment'
+import { CheckCircleOutlined } from '@material-ui/icons'
 
 const LabWorkItemInfo = props => {
   const { workItemSummary, visitFK, style, workItemFK } = props
@@ -70,18 +72,18 @@ const LabWorkItemInfo = props => {
             minWidth: 250,
           }}
         >
-          <tr>
+          <tr style={{ borderBottom: '1px solid #eeeeee' }}>
             <th style={{ width: '35px' }}>No.</th>
             <th style={{ width: '150px' }}>Name</th>
             <th style={{ width: '150px' }}>Instructions</th>
             <th style={{ width: '150px' }}>Remarks</th>
             <th style={{ width: '65px' }}>Priority</th>
-            <th style={{ minWidth: '120px' }}>Test Panels</th>
-            <th>Status</th>
+            <th style={{ minWidth: '200px' }}>Test Panels</th>
+            <th style={{ minWidth: '120px' }}>Status</th>
           </tr>
 
           {workItemDetails.map((labWorkitem, index) => (
-            <tr>
+            <tr style={{ borderBottom: '1px solid #eeeeee' }}>
               {!labWorkitem.ishide && (
                 <td
                   rowspan={labWorkitem.rowspan}
@@ -126,21 +128,43 @@ const LabWorkItemInfo = props => {
                   {labWorkitem.priority || '-'}
                 </td>
               )}
-              <td style={{ width: 120 }}>{labWorkitem.testPanelName}</td>
+              <td style={{ width: 200 }}>{labWorkitem.testPanelName}</td>
               <td
                 style={{
+                  width: 120,
                   color:
                     labWorkitem.statusFK === LAB_WORKITEM_STATUS.COMPLETED
                       ? 'green'
                       : 'black',
                 }}
               >
-                {labWorkitem.statusFK === LAB_WORKITEM_STATUS.NEW ||
-                labWorkitem.statusFK === LAB_WORKITEM_STATUS.SPECIMENCOLLECTED
-                  ? 'New'
-                  : labWorkitem.statusFK === LAB_WORKITEM_STATUS.COMPLETED
-                  ? 'Completed'
-                  : 'In Progress'}
+                <span>
+                  {labWorkitem.statusFK === LAB_WORKITEM_STATUS.NEW ||
+                  labWorkitem.statusFK === LAB_WORKITEM_STATUS.SPECIMENCOLLECTED
+                    ? 'New'
+                    : labWorkitem.statusFK === LAB_WORKITEM_STATUS.COMPLETED
+                    ? 'Completed'
+                    : 'In Progress'}
+                </span>
+                {labWorkitem.isAcknowledged && (
+                  <Tooltip
+                    title={`Acknowledged By: ${
+                      labWorkitem.acknowledgeBy
+                    }, ${moment(labWorkitem.acknowledgeDate).format(
+                      'DD MMM YYYY, HH:mm',
+                    )}`}
+                  >
+                    <CheckCircleOutlined
+                      style={{
+                        color: 'green',
+                        position: 'relative',
+                        top: 3,
+                        float: 'right',
+                        marginLeft: 10,
+                      }}
+                    />
+                  </Tooltip>
+                )}
               </td>
             </tr>
           ))}
