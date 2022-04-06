@@ -17,9 +17,7 @@ const LabWorkItemInfo = props => {
   const [completedWorkItemCount, setCompletedWorkItemCount] = useState(
     workItemSummary.completedWorkItemCount || 0,
   )
-  const [realCompletedWorkItemCount, setRealCompletedWorkItemCount] = useState(
-    workItemSummary.realCompletedWorkItemCount || 0,
-  )
+
   const [totalWorkItemCount, setTotalWorkItemCount] = useState(
     workItemSummary.totalWorkItem || 0,
   )
@@ -55,13 +53,6 @@ const LabWorkItemInfo = props => {
       setWorkItemDetails(detailData)
       setTotalWorkItemCount(detailData.length)
       setCompletedWorkItemCount(
-        detailData.filter(
-          t =>
-            t.statusFK === LAB_SPECIMEN_STATUS.COMPLETED ||
-            t.statusFK === LAB_SPECIMEN_STATUS.DISCARDED,
-        ).length,
-      )
-      setRealCompletedWorkItemCount(
         detailData.filter(t => t.statusFK === LAB_SPECIMEN_STATUS.COMPLETED)
           .length,
       )
@@ -183,7 +174,7 @@ const LabWorkItemInfo = props => {
       <div style={{ display: 'inline-block', ...style, marginRight: 15 }}>
         <Badge
           color='red'
-          count={realCompletedWorkItemCount}
+          count={completedWorkItemCount}
           style={{ paddingRight: 4, paddingLeft: 4 }}
           size='small'
         >
