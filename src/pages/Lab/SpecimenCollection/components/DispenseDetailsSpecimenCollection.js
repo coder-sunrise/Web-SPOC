@@ -30,7 +30,7 @@ import CollectSpecimen from './CollectSpecimen'
 import { useCodeTable } from '@/utils/hooks'
 import { DiscardSpecimen } from '../../Worklist/components'
 import { SpecimenDetails } from '../../Worklist/SpecimenDetails'
-import PrintSpecimenLabel, { usePrintLabLabel } from './PrintSpecimenLabel'
+import PrintSpecimenLabel, { usePrintSpecimenLabel } from './PrintSpecimenLabel'
 
 const DispenseDetailsSpecimenCollection = ({
   visitId,
@@ -56,7 +56,7 @@ const DispenseDetailsSpecimenCollection = ({
   })
   const cttestpanel = useCodeTable('cttestpanel')
   const ctspecimentype = useCodeTable('ctspecimentype')
-  const printLabLabel = usePrintLabLabel(handlePrint)
+  const printSpecimenLabel = usePrintSpecimenLabel(handlePrint)
 
   const columns = [
     {
@@ -302,11 +302,10 @@ const DispenseDetailsSpecimenCollection = ({
         {...collectSpecimenPara}
         onConfirm={(newId, printInfo) => {
           if (printInfo.isPrintLabel) {
-            printLabLabel(newId, printInfo.copies)
+            printSpecimenLabel(newId, printInfo.copies)
           }
           closeCollectSpecimen()
         }}
-        patient={patient}
         onClose={() => {
           closeCollectSpecimen()
         }}

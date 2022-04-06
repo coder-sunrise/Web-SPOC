@@ -6,39 +6,46 @@ import { Button, labSpecimenLabelDateFormat } from '@/components'
 import { REPORT_ID } from '@/utils/constants'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 
-export const usePrintLabLabel = handlePrint => {
+export const usePrintSpecimenLabel = handlePrint => {
   const dispatch = useDispatch()
-  const { entity: patient } = useSelector(s => s.patient)
 
-  const printLabLabel = (id, copies) =>
+  const printSpecimentLabel = (id, copies) =>
     dispatch({
-      type: 'specimenCollection/getLabSpecimenById',
+      type: 'specimenCollection/getLabSpecimenLabelById',
       payload: { id },
     }).then(labSpecimenData => {
       if (labSpecimenData) {
-        let testPanel = labSpecimenData?.labWorkitems
-          .map(labWorkitem => labWorkitem.testPanel)
-          .join(', ')
+        const {
+          patientGenderFK,
+          patientName,
+          patientReferenceNo,
+          testPanel,
+          accessionNo,
+          specimenType,
+          specimenCollectionDate,
+        } = labSpecimenData
+
         const data = {
           SampleLabelDetails: [
             {
               Gender:
-                patient.genderFK === 1
+                patientGenderFK === 1
                   ? 'Male'
-                  : patient.genderFK === 2
+                  : patientGenderFK === 2
                   ? 'Female'
                   : 'Unknown',
-              Name: patient.name,
-              AccessionNo: labSpecimenData.accessionNo,
+              Name: patientName,
+              AccessionNo: accessionNo,
               TestPanel: testPanel,
-              SpecimenType: labSpecimenData.specimenType,
-              SpecimenCollectionDate: moment(
-                labSpecimenData.specimenCollectionDate,
-              ).format(labSpecimenLabelDateFormat),
-              ReferenceNo: patient.patientReferenceNo,
+              SpecimenType: specimenType,
+              SpecimenCollectionDate: moment(specimenCollectionDate).format(
+                labSpecimenLabelDateFormat,
+              ),
+              ReferenceNo: patientReferenceNo,
             },
           ],
         }
+        console.log('SampleLabelDetails', data)
         const payload = [
           {
             Copies: copies,
@@ -52,17 +59,17 @@ export const usePrintLabLabel = handlePrint => {
       }
     })
 
-  return printLabLabel
+  return printSpecimentLabel
 }
 
 const PrintSpecimenLabel = ({ handlePrint, id, copies = 1 }) => {
-  const printLabLabel = usePrintLabLabel(handlePrint)
+  const printSpecimenLabel = usePrintSpecimenLabel(handlePrint)
 
   return (
     <Button
       color='primary'
       onClick={() => {
-        printLabLabel(id, copies)
+        printSpecimenLabel(id, copies)
       }}
       size='sm'
       justIcon

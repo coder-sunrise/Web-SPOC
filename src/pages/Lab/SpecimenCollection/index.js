@@ -24,8 +24,10 @@ import _ from 'lodash'
 import LinkIcon from '@material-ui/icons/Link'
 import IconButton from '@/components/Button/IconButton'
 import { withStyles } from '@material-ui/core'
+import withWebSocket from '@/components/Decorator/withWebSocket'
 import { useVisitTypes } from '@/utils/hooks'
 import CollectSpecimen from './components/CollectSpecimen'
+import { usePrintSpecimenLabel } from './components/PrintSpecimenLabel'
 
 const { queryList } = service
 const api = {
@@ -62,11 +64,13 @@ const saveColumnsSetting = (dispatch, columnsSetting) => {
 const SpecimenCollection = ({
   specimenCollection: { specimenCollectionColumnSetting = [] },
   codetable,
+  handlePrint,
 }) => {
   const dispatch = useDispatch()
   const visitTypes = useVisitTypes()
   const [visitId, setVisitId] = useState()
   const ref = useRef()
+  const printSpecimenLabel = usePrintSpecimenLabel(handlePrint)
 
   const defaultColumns = (codetable, visitTypes = []) => {
     return [
@@ -402,14 +406,22 @@ const SpecimenCollection = ({
         mode='new'
         open={visitId != undefined && visitId != null}
         visitId={visitId}
-        onConfirm={onCloseCollectSpecimen}
+        onConfirm={(newId, printInfo) => {
+          if (printInfo.isPrintLabel) {
+            printSpecimenLabel(newId, printInfo.copies)
+          }
+          onCloseCollectSpecimen()
+        }}
         onClose={onCloseCollectSpecimen}
       ></CollectSpecimen>
     </Fragment>
   )
 }
 
-export default connect(({ specimenCollection, codetable }) => ({
-  specimenCollection,
-  codetable,
-}))(SpecimenCollection)
+export default compose(
+  withWebSocket(),
+  connect(({ specimenCollection, codetable }) => ({
+    specimenCollection,
+    codetable,
+  })),
+)(SpecimenCollection)

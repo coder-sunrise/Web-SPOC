@@ -45,6 +45,17 @@ export default createListViewModel({
           return null
         }
       },
+      *getLabSpecimenLabelById({ payload }, { call, put }) {
+        const r = yield call(service.queryLabSpecimenLabelById, payload)
+        const { status, data } = r
+
+        if (status === '200') {
+          if (data) {
+            return data
+          }
+          return null
+        }
+      },
       *getVisitSpecimenCollection({ payload }, { call, put }) {
         const r = yield call(service.queryVisitSpecimenCollection, payload)
         const { status, data } = r
