@@ -15,24 +15,24 @@ class Grid extends PureComponent {
         { name: 'patientReferenceNo', title: 'Ref. No.' },
         { name: 'patientAccountNo', title: 'Acc. No.' },
         { name: 'name', title: 'Patient Name' },
-        { name: 'lastVisitDate', title: 'Last Visit Date' },
-        { name: 'status', title: 'Status' },
+        // { name: 'lastVisitDate', title: 'Last Visit Date' },
+        // { name: 'status', title: 'Status' },
         { name: 'gender/age', title: 'Gender / Age' },
         { name: 'dob', title: 'DOB' },
-        { name: 'race', title: 'Race' },
-        { name: 'nationality', title: 'Nationality' },
+        // { name: 'race', title: 'Race' },
+        // { name: 'nationality', title: 'Nationality' },
         { name: 'mobileNo', title: 'Mobile No.' },
-        { name: 'homeNo', title: 'Home No.' },
-        { name: 'officeNo', title: 'Office No.' },
+        // { name: 'homeNo', title: 'Home No.' },
+        // { name: 'officeNo', title: 'Office No.' },
         // { name: 'outstandingBalance', title: 'Total O/S Balance' },
         { name: 'action', title: 'Action' },
       ],
       columnExtensions: [
-        {
-          columnName: 'lastVisitDate',
-          type: 'date',
-          sortingEnabled: false,
-        },
+        // {
+        //   columnName: 'lastVisitDate',
+        //   type: 'date',
+        //   sortingEnabled: false,
+        // },
         {
           columnName: 'gender/age',
           render: row =>
@@ -44,10 +44,10 @@ class Grid extends PureComponent {
           type: 'date',
           sortingEnabled: false,
         },
-        {
-          columnName: 'race',
-          sortingEnabled: false,
-        },
+        // {
+        //   columnName: 'race',
+        //   sortingEnabled: false,
+        // },
         {
           columnName: 'action',
           align: 'center',
@@ -61,22 +61,22 @@ class Grid extends PureComponent {
             )
           },
         },
-        {
-          columnName: 'status',
-          sortBy: 'isActive',
-          type: 'select',
-          sortingEnabled: false,
-          options: statusString,
-          align: 'center',
-          width: 90,
-        },
-        {
-          columnName: 'nationality',
-          sortingEnabled: false,
-        },
+        // {
+        //   columnName: 'status',
+        //   sortBy: 'isActive',
+        //   type: 'select',
+        //   sortingEnabled: false,
+        //   options: statusString,
+        //   align: 'center',
+        //   width: 90,
+        // },
+        // {
+        //   columnName: 'nationality',
+        //   sortingEnabled: false,
+        // },
         { columnName: 'mobileNo', sortingEnabled: false },
-        { columnName: 'homeNo', sortingEnabled: false },
-        { columnName: 'officeNo', sortingEnabled: false },
+        // { columnName: 'homeNo', sortingEnabled: false },
+        // { columnName: 'officeNo', sortingEnabled: false },
         // {
         //   columnName: 'outstandingBalance',
         //   type: 'number',
