@@ -68,7 +68,7 @@ jobs:
 
   - job: buildUATJob
     pool:
-      name: 'JGH-UAT'
+      name: 'Medicloud'
     workspace:
       clean: all
     steps:
