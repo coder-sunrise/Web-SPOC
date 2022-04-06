@@ -20,6 +20,9 @@ const RadioWorkItemInfo = props => {
   const [completedWorkItemCount, setCompletedWorkItemCount] = useState(
     workItemSummary.completedWorkItemCount || 0,
   )
+  const [realCompletedWorkItemCount, setRealCompletedWorkItemCount] = useState(
+    workItemSummary.realCompletedWorkItemCount || 0,
+  )
   const [totalWorkItemCount, setTotalWorkItemCount] = useState(
     workItemSummary.totalWorkItem || 0,
   )
@@ -38,6 +41,14 @@ const RadioWorkItemInfo = props => {
       setWorkItemDetails(detailData)
       setTotalWorkItemCount(detailData.length)
       setCompletedWorkItemCount(
+        detailData.filter(
+          t =>
+            t.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
+            t.statusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ||
+            t.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED,
+        ).length,
+      )
+      setRealCompletedWorkItemCount(
         detailData.filter(
           t =>
             t.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
@@ -125,7 +136,7 @@ const RadioWorkItemInfo = props => {
       <div style={{ display: 'inline-block', marginRight: 15 }}>
         <Badge
           color='red'
-          count={completedWorkItemCount}
+          count={realCompletedWorkItemCount}
           style={{ paddingRight: 4, paddingLeft: 4 }}
           size='small'
         >

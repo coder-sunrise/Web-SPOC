@@ -11,6 +11,9 @@ const NurseWorkItemInfo = props => {
   const [completedWorkItemCount, setCompletedWorkItemCount] = useState(
     workItemSummary.completedWorkItemCount || 0,
   )
+  const [realCompletedWorkItemCount, setRealCompletedWorkItemCount] = useState(
+    workItemSummary.realCompletedWorkItemCount || 0,
+  )
   const [totalWorkItemCount, setTotalWorkItemCount] = useState(
     workItemSummary.totalWorkItem || 0,
   )
@@ -29,6 +32,13 @@ const NurseWorkItemInfo = props => {
       setWorkItemDetails(detailData)
       setTotalWorkItemCount(detailData.length)
       setCompletedWorkItemCount(
+        detailData.filter(
+          t =>
+            t.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED ||
+            t.statusFK === NURSE_WORKITEM_STATUS.CANCELLED,
+        ).length,
+      )
+      setRealCompletedWorkItemCount(
         detailData.filter(t => t.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED)
           .length,
       )
@@ -113,7 +123,7 @@ const NurseWorkItemInfo = props => {
       <div style={{ display: 'inline-block', marginRight: 15 }}>
         <Badge
           color='red'
-          count={completedWorkItemCount}
+          count={realCompletedWorkItemCount}
           style={{ paddingRight: 4, paddingLeft: 4 }}
           size='small'
         >

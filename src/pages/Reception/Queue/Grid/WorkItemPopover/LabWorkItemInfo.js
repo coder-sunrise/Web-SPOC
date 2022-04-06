@@ -1,7 +1,7 @@
 import { IconButton, Popover, Tooltip } from '@/components'
 import { createFromIconfontCN } from '@ant-design/icons'
 import defaultSettings from '@/defaultSettings'
-import { LAB_WORKITEM_STATUS, WORK_ITEM_TYPES_ENUM } from '@/utils/constants'
+import { LAB_SPECIMEN_STATUS, WORK_ITEM_TYPES_ENUM } from '@/utils/constants'
 import { useCodeTable } from '@/utils/hooks'
 import New from '@/pages/ClaimSubmission/chas/New'
 import React, { useState } from 'react'
@@ -16,6 +16,9 @@ const LabWorkItemInfo = props => {
   const dispatch = useDispatch()
   const [completedWorkItemCount, setCompletedWorkItemCount] = useState(
     workItemSummary.completedWorkItemCount || 0,
+  )
+  const [realCompletedWorkItemCount, setRealCompletedWorkItemCount] = useState(
+    workItemSummary.realCompletedWorkItemCount || 0,
   )
   const [totalWorkItemCount, setTotalWorkItemCount] = useState(
     workItemSummary.totalWorkItem || 0,
@@ -52,7 +55,14 @@ const LabWorkItemInfo = props => {
       setWorkItemDetails(detailData)
       setTotalWorkItemCount(detailData.length)
       setCompletedWorkItemCount(
-        detailData.filter(t => t.statusFK === LAB_WORKITEM_STATUS.COMPLETED)
+        detailData.filter(
+          t =>
+            t.statusFK === LAB_SPECIMEN_STATUS.COMPLETED ||
+            t.statusFK === LAB_SPECIMEN_STATUS.DISCARDED,
+        ).length,
+      )
+      setRealCompletedWorkItemCount(
+        detailData.filter(t => t.statusFK === LAB_SPECIMEN_STATUS.COMPLETED)
           .length,
       )
     })
@@ -133,16 +143,15 @@ const LabWorkItemInfo = props => {
                 style={{
                   width: 120,
                   color:
-                    labWorkitem.statusFK === LAB_WORKITEM_STATUS.COMPLETED
+                    labWorkitem.statusFK === LAB_SPECIMEN_STATUS.COMPLETED
                       ? 'green'
                       : 'black',
                 }}
               >
                 <span>
-                  {labWorkitem.statusFK === LAB_WORKITEM_STATUS.NEW ||
-                  labWorkitem.statusFK === LAB_WORKITEM_STATUS.SPECIMENCOLLECTED
+                  {labWorkitem.statusFK === LAB_SPECIMEN_STATUS.NEW
                     ? 'New'
-                    : labWorkitem.statusFK === LAB_WORKITEM_STATUS.COMPLETED
+                    : labWorkitem.statusFK === LAB_SPECIMEN_STATUS.COMPLETED
                     ? 'Completed'
                     : 'In Progress'}
                 </span>
@@ -174,7 +183,7 @@ const LabWorkItemInfo = props => {
       <div style={{ display: 'inline-block', ...style, marginRight: 15 }}>
         <Badge
           color='red'
-          count={completedWorkItemCount}
+          count={realCompletedWorkItemCount}
           style={{ paddingRight: 4, paddingLeft: 4 }}
           size='small'
         >
