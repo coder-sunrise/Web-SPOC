@@ -136,8 +136,8 @@ class Grid extends PureComponent {
   }
 
   onCommitChanges = values => ({ rows, added, changed, deleted }) => {
-    const { dispatch } = this.props
-
+    const { dispatch, propertyChange } = this.props
+    propertyChange()
     if (deleted) {
       dispatch({
         type: 'purchaseRequestDetails/deleteRow',
