@@ -49,14 +49,19 @@ const Grid = ({ prescriptionSet, dispatch }) => {
       />
     )
   }
+
+  const isEditingEntity = !_.isEmpty(prescriptionSet.editPrescriptionSetItem)
   return (
     <CommonTableGrid
       size='sm'
       style={{ margin: 0 }}
       forceRender
-      rows={(prescriptionSet.prescriptionSetItems || []).filter(
-        item => !item.isDeleted,
-      )}
+      rows={(prescriptionSet.prescriptionSetItems || [])
+        .filter(item => !item.isDeleted)
+        .map(item => ({
+          ...item,
+          isEditingEntity: isEditingEntity,
+        }))}
       onRowDoubleClick={editRow}
       getRowId={r => r.uid}
       FuncProps={{
@@ -228,15 +233,21 @@ const Grid = ({ prescriptionSet, dispatch }) => {
                     color='primary'
                     style={{ marginRight: 5 }}
                     disabled={
-                      (!row.isActive || row.isOnlyClinicInternalUsage) &&
-                      !row.isDrugMixture
+                      row.isEditingEntity ||
+                      ((!row.isActive || row.isOnlyClinicInternalUsage) &&
+                        !row.isDrugMixture)
                     }
                   >
                     <Edit />
                   </Button>
                 </Tooltip>
                 <Tooltip title='Delete'>
-                  <Button size='sm' color='danger' justIcon>
+                  <Button
+                    size='sm'
+                    color='danger'
+                    justIcon
+                    disabled={row.isEditingEntity}
+                  >
                     <Delete
                       onClick={() => {
                         dispatch({

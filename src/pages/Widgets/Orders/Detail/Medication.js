@@ -1884,7 +1884,7 @@ class Medication extends PureComponent {
                         style={{ position: 'relative' }}
                       >
                         <MedicationSelect
-                          {...this.props}
+                          values={this.props.values}
                           {...args}
                           label='Medication Name, Drug Group'
                           labelField='combinDisplayValue'
