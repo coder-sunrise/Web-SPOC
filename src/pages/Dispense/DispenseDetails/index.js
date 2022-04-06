@@ -676,7 +676,7 @@ const DispenseDetails = ({
       visitBasicExaminations = [],
       corBasicExaminations = [],
     } = visit
-    if (visitPurposeFK === VISIT_TYPE.MC) {
+    if (visitPurposeFK === VISIT_TYPE.MC && !isForInvoiceReplacement) {
       const basicExamination = corBasicExaminations.length
         ? corBasicExaminations
         : visitBasicExaminations
