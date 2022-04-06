@@ -27,9 +27,9 @@ jobs:
           cacheHitVar: CACHE_RESTORED
         displayName: Cache npm
 
-      - script: npm install
+      - script: npm install --legacy-peer-deps
         condition: ne(variables.CACHE_RESTORED, 'true')
-        displayName: 'npm install'
+        displayName: 'npm install '
 
       - script: dir & copy "config\config.template.js" "config\config.js" /Y
         displayName: 'Copy template config to config file'
@@ -79,7 +79,7 @@ jobs:
           cacheHitVar: CACHE_RESTORED
         displayName: Cache npm
 
-      - script: npm install
+      - script: npm install --legacy-peer-deps
         condition: ne(variables.CACHE_RESTORED, 'true')
         displayName: 'npm install'
 
