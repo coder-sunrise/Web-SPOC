@@ -320,7 +320,7 @@ export const formikMapPropsToValues = ({
           {
             ...visitEntries.medicalCheckupWorkitem[0],
             reportLanguage: visitEntries.medicalCheckupWorkitem[0].reportLanguage.split(
-              ',',
+              ', ',
             ),
           },
         ]
@@ -533,7 +533,7 @@ export const formikHandleSubmit = (
       {
         ...values.medicalCheckupWorkitem[0],
         reportLanguage: values.medicalCheckupWorkitem[0].reportLanguage.join(
-          ',',
+          ', ',
         ),
         medicalCheckupWorkitemDoctor: getMedicalCheckupCWorkitemDoctor(
           values.medicalCheckupWorkitem[0].medicalCheckupWorkitemDoctor,
