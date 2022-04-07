@@ -26,6 +26,7 @@ import {
   Tooltip,
   Select,
   notification,
+  MedicationSelect,
 } from '@/components'
 import { currencySymbol } from '@/utils/config'
 import CannedTextButton from '@/pages/Widgets/Orders/Detail/CannedTextButton'
@@ -1041,12 +1042,10 @@ class Detail extends PureComponent {
       columnExtensions: [
         {
           columnName: 'inventoryMedicationFK',
-          type: 'codeSelect',
+          type: 'medicationSelect',
           labelField: 'combinDisplayValue',
           options: this.getMedicationOptions,
-          handleFilter: (input, option) => {
-            return this.filterMedicationOptions(input, option)
-          },
+          handleFilter: () => true,
           width: 595,
           dropdownMatchSelectWidth: false,
           dropdownStyle: {
@@ -1216,20 +1215,20 @@ class Detail extends PureComponent {
                 render={args => {
                   return (
                     <div style={{ position: 'relative' }}>
-                      <CodeSelect
-                        temp
+                      <MedicationSelect
+                        values={this.props.values}
+                        {...args}
                         label='Medication Name, Drug Group'
                         labelField='combinDisplayValue'
                         onChange={this.changeMedication}
                         options={this.getMedicationOptions()}
-                        handleFilter={this.filterMedicationOptions}
+                        handleFilter={() => true}
                         dropdownMatchSelectWidth={false}
                         dropdownClassName='ant-select-dropdown-bottom-bordered'
                         dropdownStyle={{
                           width: 600,
                         }}
                         renderDropdown={this.renderMedication}
-                        {...args}
                         style={{ paddingRight: 20 }}
                         showOptionTitle={false}
                       />

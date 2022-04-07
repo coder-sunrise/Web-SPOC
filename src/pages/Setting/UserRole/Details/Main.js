@@ -72,7 +72,7 @@ const styles = theme => ({
     textAlign: 'center',
   },
   moduleContent: {
-    height: 510,
+    height: 550,
     overflow: 'auto',
     paddingRight: 5,
   },

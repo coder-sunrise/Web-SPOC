@@ -173,7 +173,7 @@ const _routes = [
             component: './Lab/Worklist',
             mini: 'LW',
             exact: true,
-            //authority: ['lab/worklist'],
+            authority: ['lab/worklist'],
           },
           {
             path: '/lab/specimenCollection',
@@ -181,7 +181,7 @@ const _routes = [
             component: './Lab/SpecimenCollection',
             mini: 'PS',
             exact: true,
-            //authority: ['lab/worklist'],
+            authority: ['lab/specimencollection'],
           },
           {
             path: '/lab/history',
@@ -189,7 +189,7 @@ const _routes = [
             component: './Lab/History',
             mini: 'LH',
             exact: true,
-            //authority: ['lab/worklisthistory'],
+            authority: ['lab/history'],
           },
         ],
       },

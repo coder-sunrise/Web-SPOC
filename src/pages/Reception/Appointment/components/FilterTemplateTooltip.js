@@ -17,10 +17,11 @@ import {
   notification,
   SizeContainer,
   CustomInputWrapper,
+  Button,
 } from '@/components'
 // utils
 
-const styles = (theme) => ({
+const styles = theme => ({
   container: {
     margin: theme.spacing(2),
   },
@@ -37,35 +38,27 @@ const Templates = ({
   handleApplyTemplate,
   dob = null,
 }) => {
-  const [
-    templateName,
-    setTemplateName,
-  ] = useState('')
+  const [templateName, setTemplateName] = useState('')
 
-  const [
-    selectedTemplateId,
-    setSelectedTemplateId,
-  ] = useState()
+  const [selectedTemplateId, setSelectedTemplateId] = useState()
 
   if (!visible && selectedTemplateId) setSelectedTemplateId(null)
 
   const saveFilterTemplate = (requestDelete, saveAsFavorite) => {
-    let newFilterTemplates = [
-      ...filterTemplates,
-    ]
+    let newFilterTemplates = [...filterTemplates]
     let newTemplateObj
     let newId = 1
 
     if (saveAsFavorite === true) {
       const favTemplateExist = newFilterTemplates.find(
-        (template) => template.isFavorite,
+        template => template.isFavorite,
       )
       if (favTemplateExist) favTemplateExist.isFavorite = false
     }
 
     if (selectedTemplateId) {
       const selectedTemplate = filterTemplates.find(
-        (template) => template.id === selectedTemplateId,
+        template => template.id === selectedTemplateId,
       )
 
       newTemplateObj = {
@@ -78,7 +71,7 @@ const Templates = ({
       }
 
       const selectedTemplateindex = filterTemplates.findIndex(
-        (template) => template.id === selectedTemplateId,
+        template => template.id === selectedTemplateId,
       )
       newFilterTemplates[selectedTemplateindex] = newTemplateObj
     } else {
@@ -94,21 +87,18 @@ const Templates = ({
         templateName,
       }
 
-      newFilterTemplates = [
-        ...newFilterTemplates,
-        newTemplateObj,
-      ]
+      newFilterTemplates = [...newFilterTemplates, newTemplateObj]
     }
 
     newFilterTemplates = newFilterTemplates.filter(
-      (template) => !template.isDeleted,
+      template => !template.isDeleted,
     )
 
     dispatch({
       type: 'appointment/saveFilterTemplate',
       // payload: null,
       payload: _.sortBy(newFilterTemplates, 'id'),
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         if (requestDelete) {
           notification.success({
@@ -135,7 +125,7 @@ const Templates = ({
     })
   }
 
-  const loadTemplate = async (templateId) => {
+  const loadTemplate = async templateId => {
     await dispatch({
       type: 'appointment/setCurrentFilterTemplate',
       payload: {
@@ -144,7 +134,7 @@ const Templates = ({
     })
 
     const selectedTemplate = filterTemplates.find(
-      (template) => template.id === templateId,
+      template => template.id === templateId,
     )
 
     if (selectedTemplate) {
@@ -157,6 +147,28 @@ const Templates = ({
     setSelectedTemplateId(v)
   }
 
+  const onDeleteTemplate = () => {
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: 'Are you sure to delete template?',
+        onConfirmSave: () => {
+          saveFilterTemplate(true)
+        },
+        openConfirmText: 'Confirm',
+        onConfirmClose: () => {
+          dispatch({
+            type: 'global/updateAppState',
+            payload: {
+              openConfirm: false,
+            },
+          })
+        },
+      },
+    })
+    handleFilterTemplate()
+  }
   return (
     <SizeContainer size='sm'>
       <div>
@@ -177,7 +189,7 @@ const Templates = ({
                 labelField='templateName'
                 dropdownMatchSelectWidth={false}
                 onChange={onTemplateSelecteChanged}
-                renderDropdown={(o) => {
+                renderDropdown={o => {
                   return (
                     <span>
                       <font color='red'>{o.isFavorite ? ' * ' : ''}</font>
@@ -196,11 +208,11 @@ const Templates = ({
               <ProgressButton onClick={() => saveFilterTemplate()}>
                 Replace
               </ProgressButton>
-              <Popconfirm onConfirm={() => saveFilterTemplate(true)}>
-                <ProgressButton color='danger' icon={<Delete />}>
-                  Delete
-                </ProgressButton>
-              </Popconfirm>
+
+              <Button color='danger' onClick={onDeleteTemplate}>
+                <Delete />
+                Delete
+              </Button>
             </GridItem>
           </GridContainer>
         )}
@@ -222,7 +234,7 @@ const Templates = ({
                 <TextField
                   label='Filter Template Name'
                   value={templateName}
-                  onChange={(e) => setTemplateName(e.target.value)}
+                  onChange={e => setTemplateName(e.target.value)}
                 />
               </GridItem>
               <GridItem
@@ -286,7 +298,8 @@ const Templates = ({
                 >
                   <li>
                     <p>
-                      Save current filter value as my favourite(<font color='red'>*</font>).
+                      Save current filter value as my favourite(
+                      <font color='red'>*</font>).
                     </p>
                   </li>
                   <li>
