@@ -66,109 +66,114 @@ const LabWorkItemInfo = props => {
       arrowPointAtCenter
       overlayStyle={{ maxHeight: 200 }}
       content={
-        <table
-          style={{
-            fontSize: 14,
-            tableLayout: 'fixed',
-            minWidth: 250,
-          }}
-        >
-          <tr style={{ borderBottom: '1px solid #eeeeee' }}>
-            <th style={{ width: '35px' }}>No.</th>
-            <th style={{ width: '150px' }}>Name</th>
-            <th style={{ width: '150px' }}>Instructions</th>
-            <th style={{ width: '150px' }}>Remarks</th>
-            <th style={{ width: '65px' }}>Priority</th>
-            <th style={{ minWidth: '200px' }}>Test Panels</th>
-            <th style={{ minWidth: '120px' }}>Status</th>
-          </tr>
-
-          {workItemDetails.map((labWorkitem, index) => (
+        <div>
+          <h5>Lab Tracking Details</h5>
+          <table
+            style={{
+              fontSize: 14,
+              marginTop: 5,
+              tableLayout: 'fixed',
+              minWidth: 250,
+            }}
+          >
             <tr style={{ borderBottom: '1px solid #eeeeee' }}>
-              {!labWorkitem.ishide && (
+              <th style={{ width: '35px' }}>No.</th>
+              <th style={{ width: '150px' }}>Name</th>
+              <th style={{ width: '150px' }}>Instructions</th>
+              <th style={{ width: '150px' }}>Remarks</th>
+              <th style={{ width: '65px' }}>Priority</th>
+              <th style={{ minWidth: '200px' }}>Test Panels</th>
+              <th style={{ minWidth: '120px' }}>Status</th>
+            </tr>
+
+            {workItemDetails.map((labWorkitem, index) => (
+              <tr style={{ borderBottom: '1px solid #eeeeee' }}>
+                {!labWorkitem.ishide && (
+                  <td
+                    rowspan={labWorkitem.rowspan}
+                    style={{ width: '35px', verticalAlign: 'top' }}
+                  >
+                    {labWorkitem.number}
+                  </td>
+                )}
+                {!labWorkitem.ishide && (
+                  <td
+                    rowspan={labWorkitem.rowspan}
+                    style={{ width: '150px', verticalAlign: 'top' }}
+                  >
+                    {labWorkitem.name || '-'}
+                  </td>
+                )}
+                {!labWorkitem.ishide && (
+                  <td
+                    rowspan={labWorkitem.rowspan}
+                    style={{ width: '150px', verticalAlign: 'top' }}
+                  >
+                    {labWorkitem.instructions || '-'}
+                  </td>
+                )}
+                {!labWorkitem.ishide && (
+                  <td
+                    rowspan={labWorkitem.rowspan}
+                    style={{ width: '150px', verticalAlign: 'top' }}
+                  >
+                    {labWorkitem.remarks || '-'}
+                  </td>
+                )}
+                {!labWorkitem.ishide && (
+                  <td
+                    rowspan={labWorkitem.rowspan}
+                    style={{
+                      width: '65px',
+                      color:
+                        labWorkitem.priority === 'Urgent' ? 'red' : 'black',
+                      verticalAlign: 'top',
+                    }}
+                  >
+                    {labWorkitem.priority || '-'}
+                  </td>
+                )}
+                <td style={{ width: 200 }}>{labWorkitem.testPanelName}</td>
                 <td
-                  rowspan={labWorkitem.rowspan}
-                  style={{ width: '35px', verticalAlign: 'top' }}
-                >
-                  {labWorkitem.number}
-                </td>
-              )}
-              {!labWorkitem.ishide && (
-                <td
-                  rowspan={labWorkitem.rowspan}
-                  style={{ width: '150px', verticalAlign: 'top' }}
-                >
-                  {labWorkitem.name || '-'}
-                </td>
-              )}
-              {!labWorkitem.ishide && (
-                <td
-                  rowspan={labWorkitem.rowspan}
-                  style={{ width: '150px', verticalAlign: 'top' }}
-                >
-                  {labWorkitem.instructions || '-'}
-                </td>
-              )}
-              {!labWorkitem.ishide && (
-                <td
-                  rowspan={labWorkitem.rowspan}
-                  style={{ width: '150px', verticalAlign: 'top' }}
-                >
-                  {labWorkitem.remarks || '-'}
-                </td>
-              )}
-              {!labWorkitem.ishide && (
-                <td
-                  rowspan={labWorkitem.rowspan}
                   style={{
-                    width: '65px',
-                    color: labWorkitem.priority === 'Urgent' ? 'red' : 'black',
-                    verticalAlign: 'top',
+                    width: 120,
+                    color:
+                      labWorkitem.statusFK === LAB_SPECIMEN_STATUS.COMPLETED
+                        ? 'green'
+                        : 'black',
                   }}
                 >
-                  {labWorkitem.priority || '-'}
+                  <span>
+                    {labWorkitem.statusFK === LAB_SPECIMEN_STATUS.NEW
+                      ? 'New'
+                      : labWorkitem.statusFK === LAB_SPECIMEN_STATUS.COMPLETED
+                      ? 'Completed'
+                      : 'In Progress'}
+                  </span>
+                  {labWorkitem.isAcknowledged && (
+                    <Tooltip
+                      title={`Acknowledged By: ${
+                        labWorkitem.acknowledgeBy
+                      }, ${moment(labWorkitem.acknowledgeDate).format(
+                        'DD MMM YYYY, HH:mm',
+                      )}`}
+                    >
+                      <CheckCircleOutlined
+                        style={{
+                          color: 'green',
+                          position: 'relative',
+                          top: 3,
+                          float: 'right',
+                          marginLeft: 10,
+                        }}
+                      />
+                    </Tooltip>
+                  )}
                 </td>
-              )}
-              <td style={{ width: 200 }}>{labWorkitem.testPanelName}</td>
-              <td
-                style={{
-                  width: 120,
-                  color:
-                    labWorkitem.statusFK === LAB_SPECIMEN_STATUS.COMPLETED
-                      ? 'green'
-                      : 'black',
-                }}
-              >
-                <span>
-                  {labWorkitem.statusFK === LAB_SPECIMEN_STATUS.NEW
-                    ? 'New'
-                    : labWorkitem.statusFK === LAB_SPECIMEN_STATUS.COMPLETED
-                    ? 'Completed'
-                    : 'In Progress'}
-                </span>
-                {labWorkitem.isAcknowledged && (
-                  <Tooltip
-                    title={`Acknowledged By: ${
-                      labWorkitem.acknowledgeBy
-                    }, ${moment(labWorkitem.acknowledgeDate).format(
-                      'DD MMM YYYY, HH:mm',
-                    )}`}
-                  >
-                    <CheckCircleOutlined
-                      style={{
-                        color: 'green',
-                        position: 'relative',
-                        top: 3,
-                        float: 'right',
-                        marginLeft: 10,
-                      }}
-                    />
-                  </Tooltip>
-                )}
-              </td>
-            </tr>
-          ))}
-        </table>
+              </tr>
+            ))}
+          </table>
+        </div>
       }
     >
       <div style={{ display: 'inline-block', ...style, marginRight: 15 }}>
