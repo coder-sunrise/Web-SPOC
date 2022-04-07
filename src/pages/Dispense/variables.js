@@ -200,7 +200,7 @@ const radiologyDetailsButton = (row, buttonClickCallback) => {
     Authorized.check('queue.radiologyexaminationdetails').rights !== 'hidden'
   ) {
     radiologyDetailsBtn = (
-      <Tooltip title='Radiology Detail'>
+      <Tooltip title='Radiology Details'>
         <Button
           color='primary'
           justIcon

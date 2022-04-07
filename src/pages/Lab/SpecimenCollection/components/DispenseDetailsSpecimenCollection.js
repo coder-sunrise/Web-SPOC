@@ -136,7 +136,7 @@ const DispenseDetailsSpecimenCollection = ({
         <Space size='small' align='center'>
           {row.dateReceived &&
             row.specimenStatusFK !== LAB_SPECIMEN_STATUS.DISCARDED && (
-              <Tooltip title='Open Specimen Details'>
+              <Tooltip title='Lab Specimen Details'>
                 <Button
                   onClick={() => {
                     setSpecimenDetailsPara({
