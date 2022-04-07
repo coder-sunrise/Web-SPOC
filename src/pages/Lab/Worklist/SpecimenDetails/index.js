@@ -278,12 +278,14 @@ export const SpecimenDetails = ({
           </GridItem>
         ) : (
           <GridItem md={12}>
-            <Typography.Link
-              underline
-              onClick={() => setShowReportRemarks(true)}
-            >
-              Add Report Remarks
-            </Typography.Link>
+            <Tooltip title='Report remarks will display in report printout'>
+              <Typography.Link
+                underline
+                onClick={() => setShowReportRemarks(true)}
+              >
+                Add Report Remarks
+              </Typography.Link>
+            </Tooltip>
           </GridItem>
         )}
         <GridItem md={12}>

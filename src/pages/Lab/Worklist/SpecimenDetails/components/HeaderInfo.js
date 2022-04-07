@@ -61,12 +61,6 @@ export const HeaderInfo = ({ entity }) => {
       },
     },
     {
-      title: 'Remarks',
-      dataIndex: 'specimenCollectionRemarks',
-      key: 'specimenCollectionRemarks',
-      width: 250,
-    },
-    {
       title: 'Status',
       dataIndex: 'specimenStatusFK',
       key: 'specimenStatusFK',
@@ -134,12 +128,14 @@ export const HeaderInfo = ({ entity }) => {
       dataIndex: 'instruction',
       key: 'instruction',
       width: 120,
+      render: text => (text ? text : '-'),
     },
     {
       title: 'Remarks',
       dataIndex: 'remarks',
       key: 'remarks',
       width: 120,
+      render: text => (text ? text : '-'),
     },
   ]
 
