@@ -27,7 +27,7 @@ jobs:
           cacheHitVar: CACHE_RESTORED
         displayName: Cache npm
 
-      - script: npm install --legacy-peer-deps
+      - script: npm install
         condition: ne(variables.CACHE_RESTORED, 'true')
         displayName: 'npm install '
 
@@ -79,7 +79,7 @@ jobs:
           cacheHitVar: CACHE_RESTORED
         displayName: Cache npm
 
-      - script: npm install --legacy-peer-deps
+      - script: npm install
         condition: ne(variables.CACHE_RESTORED, 'true')
         displayName: 'npm install'
 
