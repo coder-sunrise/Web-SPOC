@@ -232,13 +232,17 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
               .filter(
                 innerItem => innerItem.labSpecimenFK === item.labSpecimenFK,
               )
-              .map(innerItem => ({
-                testPanelFK: innerItem.testPanelFK,
-                testPanelName: cttestpanel.find(
+              .map(innerItem => {
+                const currentTestPanel = cttestpanel.find(
                   item => item.id === innerItem.testPanelFK,
-                )?.name,
-                priority: innerItem.priority,
-              })),
+                )
+                return {
+                  testPanelFK: innerItem.testPanelFK,
+                  testPanelName: currentTestPanel?.displayValue,
+                  sortOrder: currentTestPanel?.sortOrder,
+                  priority: innerItem.priority,
+                }
+              }),
           ),
         })),
     )

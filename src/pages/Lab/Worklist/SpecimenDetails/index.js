@@ -77,7 +77,6 @@ export const SpecimenDetails = ({
   const dispatch = useDispatch()
   const cttestcategory = useCodeTable('cttestcategory')
   const ctspecimentype = useCodeTable('ctspecimentype')
-  const cttestpanel = useCodeTable('cttestpanel')
   const { entity } = useSelector(s => s.worklistSpecimenDetails)
   const [isResultFullScreen, setIsResultFullScreen] = useState(false)
   const [formValues, setFormValues] = useState({})

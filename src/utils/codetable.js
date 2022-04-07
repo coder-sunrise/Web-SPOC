@@ -314,6 +314,12 @@ const tenantCodesMap = new Map([
     },
   ],
   [
+    'cttestpanel',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
     'ctcalendarresource',
     {
       pagesize: 99999,

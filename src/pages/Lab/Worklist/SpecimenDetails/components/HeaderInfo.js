@@ -92,12 +92,17 @@ export const HeaderInfo = ({ entity }) => {
       key: 'testPanel',
       width: 200,
       render: (text, record, index) => {
-        const testPanels = record.labWorkitems.map(item => ({
-          priority: item.priority,
-          testPanelName: cttestpanel.find(
+        const testPanels = record.labWorkitems.map(item => {
+          const currentTestPanel = cttestpanel.find(
             testPanel => testPanel.id === item.testPanelFK,
-          )?.name,
-        }))
+          )
+          return {
+            priority: item.priority,
+            testPanelName: currentTestPanel?.displayValue,
+            sortOrder: currentTestPanel?.sortOrder,
+            testPanelFK: item.testPanelF,
+          }
+        })
 
         return <TestPanelColumn testPanels={testPanels} />
       },

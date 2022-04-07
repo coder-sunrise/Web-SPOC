@@ -140,7 +140,6 @@ const LabWorkItemInfo = props => {
                 }}
               >
                 <span>
-                  {labWorkitem.statusFK}
                   {labWorkitem.statusFK === LAB_WORKITEM_STATUS.NEW
                     ? 'New'
                     : labWorkitem.statusFK === LAB_WORKITEM_STATUS.COMPLETED

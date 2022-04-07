@@ -266,16 +266,21 @@ const SpecimenCollection = ({
             }
           })
           return (
-            <Select
-              label='Visit Doctor'
-              mode='multiple'
-              options={visitDoctorOptions}
-              placeholder=''
-              style={{ width: 250 }}
-              maxTagCount={0}
-              maxTagPlaceholder='Doctors'
-              // renderDropdown={(option) => <DoctorLabel doctor={option} />}
-            />
+            <Tooltip
+              placement='right'
+              title='Select "All" will retrieve active and inactive doctors'
+            >
+              <Select
+                label='Visit Doctor'
+                mode='multiple'
+                options={visitDoctorOptions}
+                placeholder=''
+                style={{ width: 250 }}
+                maxTagCount={0}
+                maxTagPlaceholder='Doctors'
+                // renderDropdown={(option) => <DoctorLabel doctor={option} />}
+              />
+            </Tooltip>
           )
         },
       },

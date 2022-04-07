@@ -27,39 +27,40 @@ const TestCategoryPanel = ({
 }) => {
   const ctTestPanels = useCodeTable('cttestpanel')
 
+  const sortedWorkitems = [...workItems]
+    .map(item => ({
+      ...item,
+      testPanel: ctTestPanels.find(panel => panel.id === item.testPanelFK)
+        ?.displayValue,
+      sortOrder: ctTestPanels.find(panel => panel.id === item.testPanelFK)
+        ?.sortOrder,
+    }))
+    .sort((a, b) => (a.sortOrder < b.sortOrder ? -1 : 1))
+
   return (
     <GridContainer>
-      {workItems.length > 0 &&
-        workItems
-          .map(item => ({
-            ...item,
-            testPanel: ctTestPanels.find(panel => panel.id === item.testPanelFK)
-              ?.name,
-          }))
-          .sort(item => item.workitemFK)
-          .map(item => (
-            <GridItem md={4} key={item.id}>
-              <Checkbox
-                disabled={checkedWorkitems.find(
-                  cur =>
-                    cur.testPanelFK === item.testPanelFK &&
-                    cur.id !== item.id &&
-                    cur.statusFK === LAB_WORKITEM_STATUS.SPECIMENCOLLECTED,
-                )}
-                checked={checkedWorkitems.find(
-                  cur =>
-                    cur.id === item.id &&
-                    cur.statusFK === LAB_WORKITEM_STATUS.SPECIMENCOLLECTED,
-                )}
-                onChange={e =>
-                  e.target.checked
-                    ? onAddWorkitem(item)
-                    : onRemoveWorkitem(item)
-                }
-              />
-              <span> {item.testPanel} </span>
-            </GridItem>
-          ))}
+      {sortedWorkitems.length > 0 &&
+        sortedWorkitems.map(item => (
+          <GridItem md={4} key={item.id}>
+            <Checkbox
+              disabled={checkedWorkitems.find(
+                cur =>
+                  cur.testPanelFK === item.testPanelFK &&
+                  cur.id !== item.id &&
+                  cur.statusFK === LAB_WORKITEM_STATUS.SPECIMENCOLLECTED,
+              )}
+              checked={checkedWorkitems.find(
+                cur =>
+                  cur.id === item.id &&
+                  cur.statusFK === LAB_WORKITEM_STATUS.SPECIMENCOLLECTED,
+              )}
+              onChange={e =>
+                e.target.checked ? onAddWorkitem(item) : onRemoveWorkitem(item)
+              }
+            />
+            <span> {item.testPanel}</span>
+          </GridItem>
+        ))}
     </GridContainer>
   )
 }
