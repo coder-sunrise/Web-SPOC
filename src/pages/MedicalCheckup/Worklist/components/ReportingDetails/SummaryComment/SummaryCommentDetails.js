@@ -190,7 +190,6 @@ const SummaryCommentDetails = props => {
               maxLength={2000}
               disabled={!isCommentEditEnable}
               autoSize={{ minRows: 4, maxRows: 4 }}
-              onChange={() => setFieldValue('isVerified', false)}
               {...args}
             />
           )}
@@ -240,13 +239,6 @@ export default compose(
         saveComment = () => {},
         user,
       } = props
-      const {
-        medicalCheckupIndividualComment,
-        medicalCheckupSummaryComment,
-        medicalCheckupWorkitemDoctor,
-        medicalCheckupReport,
-        ...resetValue
-      } = medicalCheckupReportingDetails.entity
       if (
         values.originalJapaneseComment !== values.japaneseComment ||
         values.originalEnglishComment !== values.englishComment
@@ -254,18 +246,16 @@ export default compose(
         values.isCustomized = true
       }
       const newValue = {
-        ...resetValue,
-        medicalCheckupSummaryComment: [
-          {
-            commentDate: moment(),
-            commentByUserFK: user.data.clinicianProfile.userProfile.id,
-            sequence: medicalCheckupSummaryComment.length,
-            ...values,
-          },
-        ],
+        commentDate: moment(),
+        commentByUserFK: user.data.clinicianProfile.userProfile.id,
+        sequence:
+          medicalCheckupReportingDetails.entity.medicalCheckupSummaryComment
+            .length,
+        medicalCheckupWorkitemFK: medicalCheckupReportingDetails.entity.id,
+        ...values,
       }
       dispatch({
-        type: 'medicalCheckupReportingDetails/upsert',
+        type: 'medicalCheckupReportingDetails/upsertSummaryComment',
         payload: { ...newValue },
       }).then(r => {
         if (r) {
