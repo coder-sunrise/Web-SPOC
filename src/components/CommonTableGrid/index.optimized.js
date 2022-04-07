@@ -151,9 +151,7 @@ class CommonTableGrid extends PureComponent {
     this.isScrollable = !!pHeight
     this.hashCode =
       identifier || generateHashCode(JSON.stringify(columns.map(o => o.name)))
-    const {
-      user: { gridSetting = [] },
-    } = window.g_app._store.getState()
+    const { gridSetting = [] } = JSON.parse(localStorage.getItem('user'))
     const gs = gridSetting.find(o => o.Identifier === this.hashCode) || {}
     if (gs.ColumnsOrder && gs.ColumnsOrder.length !== columns.length) {
       gs.ColumnsOrder = columns.map(o => o.name)

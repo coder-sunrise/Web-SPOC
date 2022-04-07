@@ -180,6 +180,7 @@ export default {
           //   console.log({ user })
           // }
         }
+        localStorage.setItem('user', JSON.stringify(user))
         sessionStorage.setItem('user', JSON.stringify(user))
       }
       // console.log({ accessRight: JSON.stringify(user.accessRights) })
@@ -240,6 +241,7 @@ export default {
           gridSetting.push(payload.data)
         }
         sessionStorage.setItem('user', JSON.stringify(userSession))
+        localStorage.setItem('user', JSON.stringify(userSession))
         // console.log(gridSetting)
         yield put({
           type: 'saveCurrentUser',
