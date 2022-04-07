@@ -16,7 +16,7 @@ import memoizeOne from 'memoize-one'
 import cx from 'classnames'
 import pathToRegexp from 'path-to-regexp'
 import Media from 'react-media'
-import { checkAuthoritys } from '@/utils/utils'
+import { checkAuthoritys, navigateDirtyCheck } from '@/utils/utils'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import withStyles from '@material-ui/core/styles/withStyles'
 import appStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/dashboardStyle.jsx'
@@ -282,12 +282,26 @@ class BasicLayout extends React.PureComponent {
   // };
 
   render() {
-    const { classes, loading, theme, route, clinicSettings: { settings = [] }, ...props } = this.props  
+    const {
+      classes,
+      loading,
+      theme,
+      route,
+      clinicSettings: { settings = [] },
+      ...props
+    } = this.props
     const routesConfig = {
       ...route,
       routes: route.routes.map(current => {
-        const clinicSettingDisabledRoutes = current.clinicSetting && current.clinicSetting.filter(s => typeof settings[s] === 'boolean' && !settings[s]).length >= current.clinicSetting.length
-        if(clinicSettingDisabledRoutes || Authorized.check(current.authority)?.rights === 'hidden') {
+        const clinicSettingDisabledRoutes =
+          current.clinicSetting &&
+          current.clinicSetting.filter(
+            s => typeof settings[s] === 'boolean' && !settings[s],
+          ).length >= current.clinicSetting.length
+        if (
+          clinicSettingDisabledRoutes ||
+          Authorized.check(current.authority)?.rights === 'hidden'
+        ) {
           return {
             ...current,
             hideInMenu: true,
@@ -297,9 +311,15 @@ class BasicLayout extends React.PureComponent {
         return {
           ...current,
           routes: current.routes?.map(route => {
-            const clinicSettingDisabledRoute = route.clinicSetting && route.clinicSetting.filter(s => typeof settings[s] === 'boolean' && !settings[s]).length >= route.clinicSetting.length
-            if(clinicSettingDisabledRoute || Authorized.check(route.authority)?.rights === 'hidden')
-            {
+            const clinicSettingDisabledRoute =
+              route.clinicSetting &&
+              route.clinicSetting.filter(
+                s => typeof settings[s] === 'boolean' && !settings[s],
+              ).length >= route.clinicSetting.length
+            if (
+              clinicSettingDisabledRoute ||
+              Authorized.check(route.authority)?.rights === 'hidden'
+            ) {
               return {
                 ...route,
                 hideInMenu: true,
@@ -308,7 +328,7 @@ class BasicLayout extends React.PureComponent {
             return route
           }),
         }
-      },[]),
+      }, []),
     }
 
     NProgress.start()
@@ -331,9 +351,9 @@ class BasicLayout extends React.PureComponent {
                 route={routesConfig}
                 className={styles.root}
                 headerContentRender={p => (
-                  <HeaderBreadcrumb breadcrumb={p.breadcrumb} />
+                  <HeaderBreadcrumb {...this.props} breadcrumb={p.breadcrumb} />
                 )}
-                rightContentRender={() => <RightContent />}
+                rightContentRender={() => <RightContent {...this.props} />}
                 fixedHeader
                 fixSiderbar
                 formatMessage={formatMessage}
@@ -345,7 +365,30 @@ class BasicLayout extends React.PureComponent {
                   ) {
                     return defaultDom
                   }
-                  return <Link to={menuItemProps.path}>{defaultDom}</Link>
+                  return (
+                    <Link
+                      to={menuItemProps.path}
+                      onClick={e => {
+                        const {
+                          route: { routes },
+                        } = this.props
+                        const rt =
+                          routes
+                            .map(o => o.routes || [])
+                            .reduce((a, b) => {
+                              return a.concat(b)
+                            }, [])
+                            .find(o => location.pathname === o.path) || {}
+
+                        navigateDirtyCheck({
+                          redirectUrl: menuItemProps.path,
+                          displayName: rt.observe,
+                        })(e)
+                      }}
+                    >
+                      {defaultDom}
+                    </Link>
+                  )
                 }}
                 breadcrumbRender={(routers = []) => [
                   {
