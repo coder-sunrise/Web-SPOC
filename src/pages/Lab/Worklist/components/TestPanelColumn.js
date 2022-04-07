@@ -3,11 +3,12 @@ import PropTypes from 'prop-types'
 import { PRIORITY_VALUES } from '@/utils/constants'
 
 export const TestPanelColumn = ({ testPanels, columnWidth = 350 }) => {
+  console.log('TestPanelColumn', testPanels)
   const testPanelHtml = [...testPanels]
-    //Sort by Priority then by the alphabetical order
+    //Sort by Priority then by the sort order
     .sort((a, b) =>
       a.priority === b.priority
-        ? a.testPanelName < b.testPanelName
+        ? a.sortOrder < b.sortOrder
           ? -1
           : 1
         : a.priority === PRIORITY_VALUES.URGENT

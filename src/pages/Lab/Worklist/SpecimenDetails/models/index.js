@@ -38,7 +38,7 @@ export default createFormViewModel({
         const status = yield call(service.saveLabTest, payload)
         if (status === 200 || status === 204) {
           notification.success({
-            message: 'Lab tests saved.',
+            message: 'Details have been saved.',
           })
           return true
         }

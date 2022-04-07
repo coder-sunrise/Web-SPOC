@@ -308,6 +308,8 @@ class Detail extends PureComponent {
         columnName: 'testPanelFK',
         type: 'codeSelect',
         code: 'ctTestPanel',
+        valueField: 'id',
+        labelField: 'displayValue',
         onChange: ({ val, row }) => {
           const { testPanels } = this.state
           const rs = testPanels.filter(

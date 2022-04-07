@@ -252,7 +252,7 @@ const DispenseDetailsSpecimenCollection = ({
           curSpecimenLabWorkitems.map(innerItem => {
             const testPanelName = cttestpanel.find(
               item => item.id === innerItem.testPanelFK,
-            )?.name
+            )?.displayValue
             return testPanelName ? testPanelName : ''
           }),
         ).join(', ')

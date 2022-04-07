@@ -79,6 +79,9 @@ class Checklist extends React.Component {
     this.props
       .dispatch({
         type: 'settingChecklist/query',
+        payload: {
+          isActive: true,
+        },
       })
       .then(r => {
         if (r.data) {
