@@ -24,7 +24,7 @@ class ClinicianSelect extends React.PureComponent {
         valueField='userProfileFK'
         labelField='name'
         defaultValue={user.data.clinicianProfile.userProfileFK}
-        orderBy={[[source => source.name.toUpperCase()], ['asc']]}
+        orderBy={[['name'], ['asc']]}
         {...this.props}
       />
     )
