@@ -40,5 +40,9 @@ const fns = {
     service.upsert(`${url}/MarkCommentAsDone`, params),
   generateAutoComment: params =>
     service.upsert(`${url}/GenerateAutoComment`, params),
+  upsertSummaryComment: params =>
+    service.upsert(`${url}/SummaryComment`, params),
+  upsertIndividualComment: params =>
+    service.upsert(`${url}/IndividualComment`, params),
 }
 export default fns
