@@ -494,7 +494,7 @@ class AddPayment extends Component {
               <Button
                 color='primary'
                 onClick={()=>{
-                  if (values.outstandingAfterPayment > 0) {
+                  if (this.props.isGroupPayment && values.outstandingAfterPayment > 0) {
                     notification.warning({
                       message:'Outstanding balance of current visit group must to be fully paid.',
                     })
