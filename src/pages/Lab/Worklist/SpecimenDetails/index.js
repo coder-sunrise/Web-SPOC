@@ -11,6 +11,7 @@ import {
   Button,
   Tooltip,
 } from 'antd'
+import { formatMessage } from 'umi'
 import Banner from '@/pages/PatientDashboard/Banner'
 import { useSelector, useDispatch } from 'dva'
 import {
@@ -310,8 +311,24 @@ export const SpecimenDetails = ({
         open={showModal}
         title='Lab Test Specimen Details'
         onClose={() => {
-          setShowModal(false)
-          onClose && onClose()
+          if (formValues !== entity) {
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                openConfirm: true,
+                openConfirmContent: formatMessage({
+                  id: 'app.general.leave-without-save',
+                }),
+                onConfirmSave: () => {
+                  setShowModal(false)
+                  onClose && onClose()
+                },
+              },
+            })
+          } else {
+            setShowModal(false)
+            onClose && onClose()
+          }
         }}
         footProps={{
           extraButtons: !isReadonly
