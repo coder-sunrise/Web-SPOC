@@ -9,7 +9,6 @@ import {
   Input,
   Form,
   Button,
-  Tooltip,
 } from 'antd'
 import { formatMessage } from 'umi'
 import Banner from '@/pages/PatientDashboard/Banner'
@@ -24,6 +23,7 @@ import {
   GridContainer,
   GridItem,
   ProgressButton,
+  Tooltip,
 } from '@/components'
 import { VisitTypeTag } from '@/components/_medisys'
 import { TestPanelColumn } from '../components/TestPanelColumn'
