@@ -20,15 +20,15 @@ jobs:
     workspace:
       clean: all
     steps:
-      - task: Cache@2
-        inputs:
-          key: 'internal_testing_version10 | npm | "$(Agent.OS)" | package.json'
-          path: $(npm_config_cache)
-          cacheHitVar: CACHE_RESTORED
-        displayName: Cache npm
+      # - task: Cache@2
+      #   inputs:
+      #     key: 'internal_testing_version10 | npm | "$(Agent.OS)" | package.json'
+      #     path: $(npm_config_cache)
+      #     cacheHitVar: CACHE_RESTORED
+      #   displayName: Cache npm
 
-      - script: npm install --legacy-peer-deps
-        condition: ne(variables.CACHE_RESTORED, 'true')
+      - script: npm install
+        # condition: ne(variables.CACHE_RESTORED, 'true')
         displayName: 'npm install '
 
       - script: dir & copy "config\config.template.js" "config\config.js" /Y
@@ -72,15 +72,15 @@ jobs:
     workspace:
       clean: all
     steps:
-      - task: Cache@2
-        inputs:
-          key: 'uat_version10 | npm | "$(Agent.OS)" | package.json'
-          path: $(npm_config_cache)
-          cacheHitVar: CACHE_RESTORED
-        displayName: Cache npm
+      # - task: Cache@2
+      #   inputs:
+      #     key: 'uat_version10 | npm | "$(Agent.OS)" | package.json'
+      #     path: $(npm_config_cache)
+      #     cacheHitVar: CACHE_RESTORED
+      #   displayName: Cache npm
 
-      - script: npm install --legacy-peer-deps
-        condition: ne(variables.CACHE_RESTORED, 'true')
+      - script: npm install
+        # condition: ne(variables.CACHE_RESTORED, 'true')
         displayName: 'npm install'
 
       - script: dir & copy "config\config.template.js" "config\config.js" /Y
