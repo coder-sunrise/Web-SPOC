@@ -347,8 +347,14 @@ export default ({
       adjAmount: currentVisitOrderTemplate.adjAmt,
       adjType: currentVisitOrderTemplate.adjType,
       adjValue: currentVisitOrderTemplate.value,
-      isMinus: !!(currentVisitOrderTemplate.adjValue && currentVisitOrderTemplate.adjValue < 0),
-      isExactAmount: !!(currentVisitOrderTemplate.adjType && currentVisitOrderTemplate.adjType === 'ExactAmount'),
+      isMinus: !!(
+        currentVisitOrderTemplate.adjValue &&
+        currentVisitOrderTemplate.adjValue < 0
+      ),
+      isExactAmount: !!(
+        currentVisitOrderTemplate.adjType &&
+        currentVisitOrderTemplate.adjType === 'ExactAmount'
+      ),
       corPrescriptionItemInstruction: [defaultInstruction],
       corPrescriptionItemPrecaution: ItemPrecautions,
       corPrescriptionItemDrugMixture: [],
@@ -464,8 +470,14 @@ export default ({
       adjAmount: currentVisitOrderTemplate.adjAmt,
       adjType: currentVisitOrderTemplate.adjType,
       adjValue: currentVisitOrderTemplate.value,
-      isMinus: !!(currentVisitOrderTemplate.adjValue && currentVisitOrderTemplate.adjValue < 0),
-      isExactAmount: !!(currentVisitOrderTemplate.adjType && currentVisitOrderTemplate.adjType === 'ExactAmount'),
+      isMinus: !!(
+        currentVisitOrderTemplate.adjValue &&
+        currentVisitOrderTemplate.adjValue < 0
+      ),
+      isExactAmount: !!(
+        currentVisitOrderTemplate.adjType &&
+        currentVisitOrderTemplate.adjType === 'ExactAmount'
+      ),
       totalAfterItemAdjustment: currentVisitOrderTemplate.totalAftAdj,
       sequence: sequence,
       expiryDate: defaultBatch ? defaultBatch.expiryDate : undefined,
@@ -545,8 +557,14 @@ export default ({
       isActive: true,
       isDeleted: false,
       isDisplayValueChangable: service.isDisplayValueChangable,
-      isMinus: !!(currentVisitOrderTemplate.adjValue && currentVisitOrderTemplate.adjValue < 0),
-      isExactAmount: !!(currentVisitOrderTemplate.adjType && currentVisitOrderTemplate.adjType === 'ExactAmount'),
+      isMinus: !!(
+        currentVisitOrderTemplate.adjValue &&
+        currentVisitOrderTemplate.adjValue < 0
+      ),
+      isExactAmount: !!(
+        currentVisitOrderTemplate.adjType &&
+        currentVisitOrderTemplate.adjType === 'ExactAmount'
+      ),
       isNurseActualizeRequired: service.isNurseActualizable,
       isOrderedByDoctor:
         user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
@@ -589,8 +607,14 @@ export default ({
       isActive: true,
       isDeleted: false,
       isDispensedByPharmacy: consumable.isDispensedByPharmacy,
-      isMinus: !!(currentVisitOrderTemplate.adjValue && currentVisitOrderTemplate.adjValue < 0),
-      isExactAmount: !!(currentVisitOrderTemplate.adjType && currentVisitOrderTemplate.adjType === 'ExactAmount'),
+      isMinus: !!(
+        currentVisitOrderTemplate.adjValue &&
+        currentVisitOrderTemplate.adjValue < 0
+      ),
+      isExactAmount: !!(
+        currentVisitOrderTemplate.adjType &&
+        currentVisitOrderTemplate.adjType === 'ExactAmount'
+      ),
       isNurseActualizeRequired: consumable.isNurseActualizable,
       isOrderedByDoctor: true,
       packageGlobalId: '',
@@ -679,7 +703,9 @@ export default ({
       if (
         (row.type === ORDER_TYPES.RADIOLOGY &&
           radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED) ||
-        nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
+        (row.type !== ORDER_TYPES.RADIOLOGY &&
+          row.type !== ORDER_TYPES.LAB &&
+          nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED)
       ) {
         return
       }
