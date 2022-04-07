@@ -16,7 +16,7 @@ export const usePrintSpecimenLabel = handlePrint => {
     }).then(labSpecimenData => {
       if (labSpecimenData) {
         const {
-          patientGenderFK,
+          gender,
           patientName,
           patientReferenceNo,
           testPanel,
@@ -28,12 +28,7 @@ export const usePrintSpecimenLabel = handlePrint => {
         const data = {
           SampleLabelDetails: [
             {
-              Gender:
-                patientGenderFK === 1
-                  ? 'Male'
-                  : patientGenderFK === 2
-                  ? 'Female'
-                  : 'Unknown',
+              Gender: gender,
               Name: patientName,
               AccessionNo: accessionNo,
               TestPanel: testPanel,
