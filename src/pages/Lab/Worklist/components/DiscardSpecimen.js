@@ -77,6 +77,7 @@ export const DiscardSpecimen = ({ open, id, onClose, onConfirm }) => {
             </span>
           }
           layout='horizontal'
+          labelStyle={{ width: 150 }}
           column={1}
           bordered
           size='small'
