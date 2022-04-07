@@ -1013,11 +1013,12 @@ export const TESTTYPES = {
 }
 
 export const WORK_ITEM_TYPES = {
-  LAB: 'Lab',
-  RADIOLOGY: 'Radiology',
-  NURSEACTUALIZE: 'NurseActualize',
-  PHARMACY: 'Pharmacy',
-}
+         LAB: 'Lab',
+         RADIOLOGY: 'Radiology',
+         NURSEACTUALIZE: 'NurseActualize',
+         PHARMACY: 'Pharmacy',
+         LAB_TRACKING: 'LabTracking',
+       }
 export const WORK_ITEM_TYPES_ENUM = {
   LAB: 0,
   RADIOLOGY: 1,
