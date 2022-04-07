@@ -89,35 +89,39 @@ const NurseWorkItemInfo = props => {
       overlayStyle={{ maxHeight: 350 }}
       arrowPointAtCenter
       content={
-        <table
-          style={{
-            fontSize: 14,
-          }}
-        >
-          <tr>
+        <div>
+          <h5>Nurse Work Item Details</h5>
+          <table
+            style={{
+              fontSize: 14,
+              marginTop: 5,
+            }}
+          >
+            <tr>
+              <td>
+                <table
+                  style={{
+                    fontWeight: 'bold',
+                  }}
+                >
+                  <tr style={{ borderBottom: '1px solid #eeeeee' }}>
+                    <th style={{ width: '35px' }}>No.</th>
+                    <th style={{ width: '200px' }}>Name</th>
+                    <th style={{ width: '200px' }}>Instructions</th>
+                    <th style={{ width: '200px' }}>Remarks</th>
+                    <th style={{ width: '65px' }}>Priority</th>
+                    <th style={{ width: '120px' }}>Status</th>
+                  </tr>
+                </table>
+              </td>
+            </tr>
             <td>
-              <table
-                style={{
-                  fontWeight: 'bold',
-                }}
-              >
-                <tr style={{ borderBottom: '1px solid #eeeeee' }}>
-                  <th style={{ width: '35px' }}>No.</th>
-                  <th style={{ width: '200px' }}>Name</th>
-                  <th style={{ width: '200px' }}>Instructions</th>
-                  <th style={{ width: '200px' }}>Remarks</th>
-                  <th style={{ width: '65px' }}>Priority</th>
-                  <th style={{ width: '120px' }}>Status</th>
-                </tr>
-              </table>
+              <div style={{ maxHeight: '250px', overflow: 'auto' }}>
+                <table>{nurseWorkItemDetails(workItemDetails)}</table>
+              </div>
             </td>
-          </tr>
-          <td>
-            <div style={{ maxHeight: '250px', overflow: 'auto' }}>
-              <table>{nurseWorkItemDetails(workItemDetails)}</table>
-            </div>
-          </td>
-        </table>
+          </table>
+        </div>
       }
     >
       <div style={{ display: 'inline-block', marginRight: 15 }}>

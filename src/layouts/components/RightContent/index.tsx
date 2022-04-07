@@ -47,11 +47,23 @@ class HeaderLinks extends React.Component {
       openAccount: false,
     })
 
+    const {
+      route: { routes },
+    } = this.props
+    const rt =
+      routes
+        .map(o => o.routes || [])
+        .reduce((a, b) => {
+          return a.concat(b)
+        }, [])
+        .find(o => location.pathname === o.path) || {}
+
     navigateDirtyCheck({
       onProceed: () =>
         this.props.dispatch({
           type: 'login/logout',
         }),
+      displayName: rt.observe,
     })(event)
   }
 

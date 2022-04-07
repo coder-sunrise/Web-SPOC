@@ -18,7 +18,14 @@ export default createListViewModel({
         const { pathname, search, query = {} } = loct
       })
     },
-    effects: {},
+    effects: {
+      *getLabTrackingDetailsForVisit({ payload }, { call }) {
+        const r = yield call(service.getLabTrackingDetailsForVisit, payload)
+        const { status, data = [] } = r
+        if (status === '200') return data
+        return []
+      },
+    },
     reducers: {
       queryDone(st, { payload }) {
         const { data } = payload

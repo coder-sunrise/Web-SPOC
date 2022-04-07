@@ -172,6 +172,14 @@ export default createFormViewModel({
         const response = yield call(service.markCommentAsDone, payload)
         return response
       },
+      *upsertSummaryComment({ payload }, { call, put }) {
+        const response = yield call(service.upsertSummaryComment, payload)
+        return response
+      },
+      *upsertIndividualComment({ payload }, { call, put }) {
+        const response = yield call(service.upsertIndividualComment, payload)
+        return response
+      },
     },
     reducers: {},
   },

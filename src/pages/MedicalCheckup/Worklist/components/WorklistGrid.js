@@ -17,6 +17,7 @@ import {
 import NurseWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/NurseWorkItemInfo'
 import RadioWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/RadioWorkItemInfo'
 import LabWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/LabWorkItemInfo'
+import LabTrackingItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/LabTrackingItemInfo'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import {
   CommonModal,
@@ -444,19 +445,24 @@ const WorklistGrid = ({
         dataIndex: 'workItem',
         sorter: false,
         search: false,
-        width: 160,
+        width: 180,
         render: (item, entity) => {
           const dispatch = useDispatch()
           const workItemSummary = JSON.parse(entity.workItemSummary || '[]')
           const radioWorkItems =
             workItemSummary.find(t => t.type === WORK_ITEM_TYPES.RADIOLOGY) ||
-            {}
+            []
           const labWorkItems =
-            workItemSummary.find(t => t.type === WORK_ITEM_TYPES.LAB) || {}
+            workItemSummary.find(t => t.type === WORK_ITEM_TYPES.LAB) || []
           const nurseWorkItems =
             workItemSummary.find(
               t => t.type === WORK_ITEM_TYPES.NURSEACTUALIZE,
-            ) || {}
+            ) || []
+          const labTrackingItems =
+            workItemSummary.find(
+              t => t.type === WORK_ITEM_TYPES.LAB_TRACKING,
+            ) || []
+
           return (
             <div style={{ justifyContent: 'space-between' }}>
               {labWorkItems && labWorkItems.totalWorkItem > 0 && (
@@ -475,6 +481,12 @@ const WorklistGrid = ({
                 <NurseWorkItemInfo
                   visitFK={entity.visitFK}
                   workItemSummary={nurseWorkItems}
+                />
+              )}
+              {labTrackingItems && labTrackingItems.totalWorkItem > 0 && (
+                <LabTrackingItemInfo
+                  visitFK={entity.visitFK}
+                  workItemSummary={labTrackingItems}
                 />
               )}
             </div>

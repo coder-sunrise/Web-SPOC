@@ -88,7 +88,7 @@ const styles = theme => ({
       medicalCheckupIndividualComment: newComents,
     }
     dispatch({
-      type: 'medicalCheckupReportingDetails/upsert',
+      type: 'medicalCheckupReportingDetails/upsertIndividualComment',
       payload: { ...newValue },
     }).then(r => {
       if (r) {
@@ -327,13 +327,6 @@ class IndividualCommentDetails extends PureComponent {
     const { clearEditComment } = this.props
     clearEditComment()
   }
-
-  updateComment = i => {
-    const { form } = this.ArrayHelpers
-    const { setFieldValue } = form
-    setFieldValue(`medicalCheckupIndividualComment[${i}].isVerified`, false)
-  }
-
   render() {
     const {
       values,
@@ -457,11 +450,7 @@ class IndividualCommentDetails extends PureComponent {
                         name={displayFieldName}
                         render={args => {
                           return (
-                            <TextField
-                              {...args}
-                              onChange={() => this.updateComment(i)}
-                              disabled={!isModifyEnable}
-                            />
+                            <TextField {...args} disabled={!isModifyEnable} />
                           )
                         }}
                       />

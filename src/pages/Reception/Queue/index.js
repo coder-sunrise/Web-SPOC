@@ -157,12 +157,16 @@ class Queue extends React.Component {
       },
     })
 
-    this.setState({ refreshInfo: moment().format('HH:mm') })
+    this.setState({
+      refreshInfo: moment().format('HH:mm'),
+    })
     initRoomAssignment()
 
     this._timer = setInterval(() => {
       dispatch({ type: `${modelKey}refresh` })
-      this.setState({ refreshInfo: moment().format('HH:mm') })
+      this.setState({
+        refreshInfo: moment().format('HH:mm'),
+      })
     }, 900000)
   }
 

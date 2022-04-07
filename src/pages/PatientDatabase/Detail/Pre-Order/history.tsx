@@ -196,7 +196,9 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
         type: 'date',
         render: row => {
           return (
-            <span>{moment(row.orderDate).format('DD MMM YYYY HH:mm')}</span>
+            <span>
+              {moment(row.actualizedDate).format('DD MMM YYYY HH:mm')}
+            </span>
           )
         },
         isDisabled: () => true,
