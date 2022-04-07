@@ -353,7 +353,7 @@ class BasicLayout extends React.PureComponent {
                 headerContentRender={p => (
                   <HeaderBreadcrumb {...this.props} breadcrumb={p.breadcrumb} />
                 )}
-                rightContentRender={() => <RightContent />}
+                rightContentRender={() => <RightContent {...this.props} />}
                 fixedHeader
                 fixSiderbar
                 formatMessage={formatMessage}
