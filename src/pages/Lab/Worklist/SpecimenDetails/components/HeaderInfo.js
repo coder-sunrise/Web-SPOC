@@ -27,6 +27,8 @@ import { useCodeTable } from '@/utils/hooks'
 import { LAB_SPECIMEN_STATUS } from '@/utils/constants'
 import PrintSpecimenLabel from '@/pages/Lab/SpecimenCollection/components/PrintSpecimenLabel'
 
+export const PRIORITY_VALUES = { NORMAL: 'Normal', URGENT: 'Urgent' }
+
 export const HeaderInfo = ({ entity }) => {
   const cttestcategory = useCodeTable('cttestcategory')
   const ctspecimentype = useCodeTable('ctspecimentype')
@@ -111,6 +113,13 @@ export const HeaderInfo = ({ entity }) => {
       dataIndex: 'priority',
       key: 'priority',
       width: 120,
+      render: text => {
+        return text === PRIORITY_VALUES.URGENT ? (
+          <span style={{ color: 'red' }}> {text}</span>
+        ) : (
+          text
+        )
+      },
     },
     {
       title: 'Ordered Date',
