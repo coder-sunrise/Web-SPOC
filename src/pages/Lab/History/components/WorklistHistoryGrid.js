@@ -192,7 +192,7 @@ export const WorklistHistoryGrid = ({ labWorklistHistory }) => {
         width: 290,
         render: (text, record, index) => {
           return (
-            <TestPanelColumn columnWidth={320} testPanels={record.testPanels} />
+            <TestPanelColumn columnWidth={290} testPanels={record.testPanels} />
           )
         },
       },

@@ -261,7 +261,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
         width: 280,
         render: (text, record, index) => {
           return (
-            <TestPanelColumn columnWidth={320} testPanels={record.testPanels} />
+            <TestPanelColumn columnWidth={280} testPanels={record.testPanels} />
           )
         },
       },
