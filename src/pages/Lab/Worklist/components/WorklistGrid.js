@@ -369,7 +369,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
           <Space size='small' align='center'>
             {record.dateReceived &&
               record.specimenStatusFK !== LAB_SPECIMEN_STATUS.DISCARDED && (
-                <Tooltip title='Lab Specimen Details>
+                <Tooltip title='Lab Specimen Details'>
                   <Button
                     onClick={() => {
                       record.hasAnyPendingRetestResult

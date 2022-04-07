@@ -37,21 +37,19 @@ export const HeaderInfo = ({ entity }) => {
       title: 'Accession No.',
       dataIndex: 'accessionNo',
       key: 'accessionNo',
-      width: 160,
+      width: 120,
     },
     {
       title: 'Category',
       dataIndex: 'testCategories',
       key: 'testCategories',
-      ellipsis: true,
-      width: 160,
+      width: 210,
     },
     {
       title: 'Specimen Type',
       width: 150,
       dataIndex: 'specimenTypeFK',
       key: 'specimenTypeFK',
-      ellipsis: true,
       render: (text, record, index) => {
         const speicmenType = ctspecimentype.find(
           item => record.specimenTypeFK === item.id,
@@ -64,7 +62,7 @@ export const HeaderInfo = ({ entity }) => {
       title: 'Remarks',
       dataIndex: 'specimenCollectionRemarks',
       key: 'specimenCollectionRemarks',
-      width: 300,
+      width: 250,
     },
     {
       title: 'Status',
