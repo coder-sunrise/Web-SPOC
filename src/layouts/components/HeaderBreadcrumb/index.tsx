@@ -4,6 +4,7 @@ import { useIntl, Link } from 'umi'
 import { RightOutlined } from '@ant-design/icons'
 import { Theme } from '@material-ui/core/styles/createMuiTheme'
 import { withStyles } from '@material-ui/styles'
+import { navigateDirtyCheck } from '@/utils/utils'
 
 interface IHeaderBreadcrumbProps {
   breadcrumb: any
@@ -41,7 +42,26 @@ const HeaderBreadcrumb: React.FC<IHeaderBreadcrumbProps> = props => {
             {pathname === url ? (
               <span className={classes.breadcrumbtext}>{breadcrumbName}</span>
             ) : (
-              <Link to={url}>
+              <Link
+                to={url}
+                onClick={e => {
+                  const {
+                    route: { routes },
+                  } = props
+                  const rt =
+                    routes
+                      .map(o => o.routes || [])
+                      .reduce((a, b) => {
+                        return a.concat(b)
+                      }, [])
+                      .find(o => location.pathname === o.path) || {}
+
+                  navigateDirtyCheck({
+                    redirectUrl: url,
+                    displayName: rt.observe,
+                  })(e)
+                }}
+              >
                 <span className={classes.breadcrumblink}>{breadcrumbName}</span>
               </Link>
             )}
