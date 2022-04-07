@@ -75,6 +75,7 @@ export const RetestSpecimen = ({ open, id, onClose, onConfirm }) => {
               Confirm to retest the specimen below?
             </span>
           }
+          labelStyle={{ width: 150 }}
           layout='horizontal'
           column={1}
           bordered

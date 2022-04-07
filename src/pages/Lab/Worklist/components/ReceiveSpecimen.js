@@ -62,6 +62,7 @@ export const ReceiveSpecimen = ({ open, id, onClose, onConfirm }) => {
     >
       <div>
         <Descriptions
+          labelStyle={{ width: 150 }}
           title={
             <span style={{ fontWeight: 'normal' }}>
               Confirm to receive the specimen below?
