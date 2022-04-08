@@ -34,9 +34,6 @@ class Grid extends PureComponent {
     } else if (name === 'supplier') {
       const accessRight = Authorized.check('settings.supplier.supplierdetails')
       if (accessRight && accessRight.rights === 'hidden') {
-        notification.error({
-          message: 'Current user is not authorized to access',
-        })
         return
       }
     } else {
@@ -44,9 +41,6 @@ class Grid extends PureComponent {
         'settings.manufacturer.manufacturerdetails',
       )
       if (accessRight && accessRight.rights === 'hidden') {
-        notification.error({
-          message: 'Current user is not authorized to access',
-        })
         return
       }
     }
