@@ -56,17 +56,22 @@ const LabTrackingItemInfo = props => {
       return (
         <tr style={{ borderBottom: '1px solid #eeeeee' }}>
           <td style={{ width: '35px' }}>{number}</td>
-          <td style={{ width: '150px' }}>{workItem.serviceName || '-'}</td>
-          <td style={{ width: '150px' }}>{workItem.supplierName || '-'}</td>
-          <td style={{ width: '150px' }}>
+          <td style={{ width: '150px', wordBreak: 'break-word' }}>
+            {workItem.serviceName || '-'}
+          </td>
+          <td style={{ width: '150px', wordBreak: 'break-word' }}>
+            {workItem.supplierName || '-'}
+          </td>
+          <td style={{ width: '150px', wordBreak: 'break-word' }}>
             {workItem.caseTypeDisplayValue || '-'}
           </td>
-          <td style={{ width: '165px' }}>
+          <td style={{ width: '165px', wordBreak: 'break-word' }}>
             {moment(workItem.receivedDate).format('DD MMM YYYY, HH:mm') || '-'}
           </td>
           <td
             style={{
               width: '120px',
+              wordBreak: 'break-word',
               color:
                 workItem.labTrackingStatusFK ===
                   LAB_TRACKING_STATUS.COMPLETED ||
