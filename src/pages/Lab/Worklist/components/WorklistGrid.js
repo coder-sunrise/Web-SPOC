@@ -140,8 +140,8 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
           w =>
             w.visitFK === visitFK &&
             w.testCategoryFK === item.id &&
-            (w.specimenStatusFK !== LAB_SPECIMEN_STATUS.COMPLETED ||
-              w.specimenStatusFK !== LAB_SPECIMEN_STATUS.DISCARDED),
+            w.specimenStatusFK !== LAB_SPECIMEN_STATUS.COMPLETED &&
+              w.specimenStatusFK !== LAB_SPECIMEN_STATUS.DISCARDED,
         )
         .uniqBy(w => w.labSpecimenFK)
         .value().length,

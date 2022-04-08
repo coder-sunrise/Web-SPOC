@@ -24,10 +24,8 @@ import { VisitTypeTag } from '@/components/_medisys'
 import { SpecimenStatusTag } from '../../components/SpecimenStatusTag'
 import { TestPanelColumn } from '../../components/TestPanelColumn'
 import { useCodeTable } from '@/utils/hooks'
-import { LAB_SPECIMEN_STATUS } from '@/utils/constants'
+import { LAB_SPECIMEN_STATUS, PRIORITY_VALUES } from '@/utils/constants'
 import PrintSpecimenLabel from '@/pages/Lab/SpecimenCollection/components/PrintSpecimenLabel'
-
-export const PRIORITY_VALUES = { NORMAL: 'Normal', URGENT: 'Urgent' }
 
 export const HeaderInfo = ({ entity }) => {
   const cttestcategory = useCodeTable('cttestcategory')
@@ -168,8 +166,14 @@ export const HeaderInfo = ({ entity }) => {
         <Table
           bordered
           columns={orderInfoColumns}
-          dataSource={[...(entity.specimenOrders ?? [])].sort(
-            item => item.serviceName,
+          dataSource={[...(entity.specimenOrders ?? [])].sort((a, b) =>
+            a.priority === b.priority
+              ? a.orderedDate < b.orderedDate
+                ? -1
+                : 1
+              : a.priority === PRIORITY_VALUES.URGENT
+              ? -1
+              : 1,
           )}
           pagination={false}
           size='small'

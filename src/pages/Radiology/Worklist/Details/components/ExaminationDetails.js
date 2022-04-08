@@ -177,7 +177,9 @@ export const ExaminationDetails = ({
         workitem.statusFK <= RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ? (
           <GridContainer style={{ rowGap: 10 }}>
             <GridItem md={2}>
-              <RightAlignGridItem md={12}>Radiographer :</RightAlignGridItem>
+              <RightAlignGridItem md={12}>
+                Radiology Technologist :
+              </RightAlignGridItem>
             </GridItem>
 
             <GridItem md={10}>

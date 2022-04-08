@@ -106,17 +106,19 @@ const SpecimenCollection = ({
         search: false,
         width: 200,
         render: (_dom, entity) => (
-          <p
-            style={{
-              width: _dom.width,
-              display: '-webkit-box',
-              WebkitBoxOrient: 'vertical',
-              WebkitLineClamp: 3,
-              overflow: 'hidden',
-            }}
-          >
-            {entity.testPanels}
-          </p>
+          <Tooltip title={entity.testPanels}>
+            <p
+              style={{
+                width: _dom.width,
+                display: '-webkit-box',
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: 2,
+                overflow: 'hidden',
+              }}
+            >
+              {entity.testPanels}
+            </p>
+          </Tooltip>
         ),
       },
       {
@@ -150,7 +152,11 @@ const SpecimenCollection = ({
         width: 85,
         render: (_dom, entity) => {
           const vt = visitTypes.find(x => x.id === entity.visitPurposeId)
-          return vt?.code
+          return (
+            <Tooltip title={vt?.description}>
+              <span>{vt?.code}</span>
+            </Tooltip>
+          )
         },
       },
       {
@@ -203,7 +209,7 @@ const SpecimenCollection = ({
           return (
             <DatePicker
               style={{ width: 250 }}
-              label='Order Date Form'
+              label='Order Date From'
               placeholder=''
             />
           )
@@ -361,7 +367,7 @@ const SpecimenCollection = ({
           columnsStateMap={specimenCollectionColumnSetting}
           onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
           defaultColumns={[]}
-          pagination={{ pageSize: 100 }}
+          pagination={{ pageSize: 20 }}
           features={[
             {
               code: 'details',

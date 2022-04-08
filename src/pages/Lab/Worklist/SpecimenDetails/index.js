@@ -9,6 +9,7 @@ import {
   Input,
   Form,
   Button,
+  Alert,
 } from 'antd'
 import { formatMessage } from 'umi'
 import Banner from '@/pages/PatientDashboard/Banner'
@@ -89,7 +90,7 @@ export const SpecimenDetails = ({
     open: false,
     id: undefined,
   })
-  const [showConfirmEmptyResult, setShowConfirmEmptyResult] = useState(false)
+
   const [showRawData, setShowRawData] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const currentStatus = entity.specimenStatusFK
@@ -109,6 +110,7 @@ export const SpecimenDetails = ({
     setIsResultFullScreen(false)
     setShowModal(false)
     setShowReportRemarks(false)
+    setShowRawData(false)
     setRetestSpecimenPara({
       open: false,
       id: undefined,
@@ -203,7 +205,18 @@ export const SpecimenDetails = ({
               x.finalResult === '',
           ).length > 0
         ) {
-          setShowConfirmEmptyResult(true)
+          dispatch({
+            type: 'global/updateAppState',
+            payload: {
+              openConfirm: true,
+              openConfirmContent:
+                'Some final result fields are empty. \r\n Confirm to proceed?',
+              onConfirmSave: () => {
+                saveVerify()
+              },
+            },
+          })
+
           return
         }
 
@@ -251,14 +264,14 @@ export const SpecimenDetails = ({
         <React.Fragment>
           {formValues.reportRemarks &&
             formValues.reportRemarks.trim().length > 0 && (
-              <GridItem md={12}>
+              <GridItem md={12} style={{ paddingTop: 8 }}>
                 <Typography.Text strong>Report Remarks: </Typography.Text>
                 <span>{formValues.reportRemarks}</span>
               </GridItem>
             )}
           {formValues.internalRemarks &&
             formValues.internalRemarks.trim().length > 0 && (
-              <GridItem md={12}>
+              <GridItem md={12} style={{ paddingTop: 8 }}>
                 <Typography.Text strong>Internal Remarks: </Typography.Text>
                 <span>{formValues.internalRemarks}</span>
               </GridItem>
@@ -344,6 +357,7 @@ export const SpecimenDetails = ({
             : [],
           onConfirm:
             entity.specimenStatusFK !== LAB_SPECIMEN_STATUS.COMPLETED &&
+            entity.specimenStatusFK !== LAB_SPECIMEN_STATUS.NEW &&
             !isReadonly
               ? () => {
                   handleSave()
@@ -440,6 +454,16 @@ export const SpecimenDetails = ({
                         />
                       </Form.Item>
                     </GridItem>
+                    {entity.specimenStatusFK ===
+                      LAB_SPECIMEN_STATUS.PENDINGSECONDVERIFIER && (
+                      <GridItem md={12} style={{ paddingBottom: 8 }}>
+                        <Alert
+                          message={`Update result will require second verifier to verify the result. Status will remain in "Pending Second Verification".`}
+                          type='warning'
+                          showIcon
+                        />
+                      </GridItem>
+                    )}
                     {renderRemarks()}
                   </GridContainer>
                 </GridItem>
@@ -466,21 +490,6 @@ export const SpecimenDetails = ({
           closeRetestHisotry()
         }}
       />
-      <CommonModal
-        open={showConfirmEmptyResult}
-        onClose={() => {
-          setShowConfirmEmptyResult(false)
-        }}
-        onConfirm={() => {
-          saveVerify()
-          setShowConfirmEmptyResult(false)
-        }}
-        showFooter={true}
-        cancelText='Cancel'
-        maxWidth='xs'
-      >
-        <div>Some final result fields are empty. Confirm to proceed?</div>
-      </CommonModal>
     </React.Fragment>
   )
 }
