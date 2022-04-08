@@ -17,64 +17,65 @@ const Summary = ({ invoiceDetail, classes, showGST = true }) => {
     <SizeContainer size='sm'>
       <React.Fragment>
         <GridContainer className={classes.summary} alignItems='flex-end'>
+          {showGST && <GridItem md={9} />}
           {showGST && (
-            <GridItem md={9} />)
-          }
-          {showGST && (
-          <GridItem md={3}>
-            <FastField
-              name='subTotal'
-              render={(args) => (
-                <NumberInput
-                  {...args}
-                  noUnderline
-                  currency
-                  disabled
-                  rightAlign
-                  normalText
-                  prefix='Sub Total: '
-                  defaultValue='0'
-                />
-              )}
-            />
-          </GridItem>)
-          }
-          {showGST && (
-            <GridItem md={9} />)
-          }
+            <GridItem md={3}>
+              <FastField
+                name='subTotal'
+                render={args => (
+                  <NumberInput
+                    {...args}
+                    noUnderline
+                    style={{ float: 'right' }}
+                    currency
+                    text
+                    rightAlign
+                    prefix='Sub Total: '
+                    defaultValue='0'
+                  />
+                )}
+              />
+            </GridItem>
+          )}
+          {showGST && <GridItem md={9} />}
           {showGST && (
             <GridItem md={3}>
               <FastField
                 name='gstAmount'
-                render={(args) => {
-                  return <NumberInput
-                    {...args}
-                    noUnderline
-                    currency
-                    disabled
-                    rightAlign
-                    normalText
-                    defaultValue={0}
-                    prefix={invoiceDetail.isGSTInclusive ? `${invoiceDetail.gstValue}% GST Inclusive:` : `GST (${invoiceDetail.gstValue}%):`}
-                  />
-                }
-                }
+                render={args => {
+                  return (
+                    <NumberInput
+                      {...args}
+                      noUnderline
+                      currency
+                      text
+                      style={{ float: 'right' }}
+                      rightAlign
+                      defaultValue={0}
+                      prefix={
+                        invoiceDetail.isGSTInclusive
+                          ? `${invoiceDetail.gstValue}% GST Inclusive:`
+                          : `GST (${invoiceDetail.gstValue}%):`
+                      }
+                    />
+                  )
+                }}
               />
-            </GridItem>)
-          }
+            </GridItem>
+          )}
 
           <GridItem md={9} />
           <GridItem md={3}>
             <FastField
               name='finalCredit'
-              render={(args) => (
+              render={args => (
                 <NumberInput
                   {...args}
+                  style={{ float: 'right' }}
                   noUnderline
                   currency
-                  disabled
+                  text
                   rightAlign
-                  normalText
                   prefix='Final Credit: '
                   defaultValue='0'
                 />
