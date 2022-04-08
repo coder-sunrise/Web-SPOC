@@ -55,7 +55,7 @@ const FilterBar = props => {
   const [category, setCategory] = useState('Lab')
   const dispatch = useDispatch()
   const { handleSubmit, isSubmitting } = props
-  const { setFieldValue } = props
+  const { setFieldValue, values } = props
   useEffect(() => {
     setFieldValue('category', 'Lab')
     setFieldValue('status', [6])
@@ -166,6 +166,7 @@ const FilterBar = props => {
                       top: -5,
                       marginRight: 10,
                     }}
+                    disabled={values.allDate}
                     label='Visit Date From'
                     label2='To'
                     {...args}
