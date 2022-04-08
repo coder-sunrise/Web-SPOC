@@ -401,7 +401,7 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
           )
         },
       }}
-      pagination={{ defaultPageSize: 20 }}
+      pagination={{ defaultPageSize: 20, showSizeChanger: true }}
       columnsStateMap={medicalCheckupWorklistHistoryColumnSetting}
       onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
       defaultColumns={[]}
