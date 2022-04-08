@@ -216,7 +216,7 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         render: (item, entity) => {
           const doctors = (entity.medicalCheckupWorkitemDoctor || [])
             .map(doctor => {
-              return doctor.name
+              return doctor.shortName || doctor.name
             })
             .join(', ')
           return (
