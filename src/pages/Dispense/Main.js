@@ -663,16 +663,6 @@ class Main extends Component {
     const isEmptyDispense = otherOrder.length === 0 && prescription.length === 0
     const accessRights = Authorized.check('queue.dispense.editorder')
     const noClinicalObjectRecord = !values.clinicalObjectRecordFK
-    console.log(
-      accessRights &&
-        accessRights.rights !== 'hidden' &&
-        (visit.visitPurposeFK === VISIT_TYPE.BF ||
-          visit.visitPurposeFK === VISIT_TYPE.MC) &&
-        isEmptyDispense &&
-        noClinicalObjectRecord &&
-        dispense.loadCount === 0,
-      233,
-    )
     if (
       accessRights &&
       accessRights.rights !== 'hidden' &&
