@@ -64,7 +64,11 @@ const LabWorkItemInfo = props => {
       icon={null}
       placement='bottomLeft'
       arrowPointAtCenter
-      overlayStyle={{ maxHeight: 200 }}
+      overlayInnerStyle={{
+        maxHeight: 500,
+        overflowY: 'auto',
+        overflowX: 'hidden',
+      }}
       content={
         <div>
           <h5>Lab Work Item Details</h5>
