@@ -12,7 +12,7 @@ import {
   MultipleTextField,
   dateFormatLongWithTimeNoSec,
 } from '@/components'
-import { CheckOutlined } from '@ant-design/icons'
+import { CheckCircleOutlined } from '@ant-design/icons'
 import {
   REPORTINGDOCTOR_STATUS,
   APPNOTIFICATION_SCHEMA,
@@ -24,12 +24,12 @@ import { AppNotificationPopover } from '@/components/_medisys'
 
 const styles = theme => ({
   tag: {
-    width: 120,
+    maxWidth: 120,
     margin: '1px 8px 1px 0px',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
-    padding: 2,
+    padding: '2px 6px',
   },
 })
 
@@ -69,8 +69,8 @@ const ReportingDoctorTag = ({
         <Tooltip title={medicalCheckupDoctor.name}>
           <Tag
             icon={
-              medicalCheckupDoctor.status == 'Verified' ? (
-                <CheckOutlined />
+              medicalCheckupDoctor.status == REPORTINGDOCTOR_STATUS.VERIFIED ? (
+                <CheckCircleOutlined />
               ) : (
                 undefined
               )
@@ -79,7 +79,7 @@ const ReportingDoctorTag = ({
             style={{ cursor: isShowMessage ? 'pointer' : 'default' }}
             color={reportingDoctorColor}
           >
-            {medicalCheckupDoctor.name}
+            {medicalCheckupDoctor.shortName || medicalCheckupDoctor.name}
           </Tag>
         </Tooltip>
       </div>
