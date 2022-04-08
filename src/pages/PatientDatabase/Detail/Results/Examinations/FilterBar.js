@@ -18,6 +18,7 @@ import { ReportDateRangePicker } from '@/pages/Report/ReportDateRangePicker'
 import Checkbox from '@/components/Checkbox'
 import { DoctorProfileSelect } from '@/components/_medisys'
 import { useDispatch } from 'react-redux'
+import moment from 'moment'
 
 const searchResult = (values, props) => {
   const { dispatch, setState } = props
@@ -60,6 +61,18 @@ const FilterBar = props => {
     setFieldValue('category', 'Lab')
     setFieldValue('status', [6])
     setFieldValue('doctorIDs', [-99])
+    setFieldValue(
+      'visitDate[0]',
+      moment(new Date())
+        .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+        .formatUTC(false),
+    )
+    setFieldValue(
+      'visitDate[1]',
+      moment(new Date())
+        .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+        .formatUTC(false),
+    )
   }, [])
   useEffect(() => {
     if (category === 'Lab') {
