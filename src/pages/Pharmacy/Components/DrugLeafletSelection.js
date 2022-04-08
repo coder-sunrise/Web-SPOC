@@ -117,38 +117,54 @@ class DrugLeafletSelection extends PureComponent {
           return _.join(x.instructionId, ',')
         }),
     )
-    this.state.printlanguage.forEach(async lan => {
-      const data = await getRawData(REPORT_ID.PATIENT_INFO_LEAFLET, {
+    if (this.state.printlanguage.includes('EN')) {
+      await this.doPrintLeaflet(
+        visitid,
         visitinvoicedrugids,
         instructionIds,
-        language: lan,
-        visitId: visitid,
-      })
-      if (!data || !data.DrugDetailsList) {
-        return
-      }
-      // ingredient in leaflet will max to 2 lines and end with ', etc...' if more than 2 lines;
-      data.DrugDetailsList.forEach(t => {
-        if (t.ingredient) {
-          t.ingredient = `(${t.ingredient})`
-        }
-      })
-      const payload = [
-        {
-          ReportId: REPORT_ID.PATIENT_INFO_LEAFLET,
-          ReportData: JSON.stringify({
-            ...data,
-          }),
-        },
-      ]
-      await this.props.handlePrint(JSON.stringify(payload))
-      if (
-        this.state.printlanguage.indexOf(lan) ==
-        this.state.printlanguage.length - 1
-      ) {
-        this.props.onConfirmPrintLeaflet()
+        'EN',
+      )
+    }
+    if (this.state.printlanguage.includes('JP')) {
+      await this.doPrintLeaflet(
+        visitid,
+        visitinvoicedrugids,
+        instructionIds,
+        'JP',
+      )
+    }
+    this.props.onConfirmPrintLeaflet()
+  }
+  doPrintLeaflet = async (
+    visitid,
+    visitinvoicedrugids,
+    instructionIds,
+    lan,
+  ) => {
+    const data = await getRawData(REPORT_ID.PATIENT_INFO_LEAFLET, {
+      visitinvoicedrugids,
+      instructionIds,
+      language: lan,
+      visitId: visitid,
+    })
+    if (!data || !data.DrugDetailsList) {
+      return
+    }
+    // ingredient in leaflet will max to 2 lines and end with ', etc...' if more than 2 lines;
+    data.DrugDetailsList.forEach(t => {
+      if (t.ingredient) {
+        t.ingredient = `(${t.ingredient})`
       }
     })
+    const payload = [
+      {
+        ReportId: REPORT_ID.PATIENT_INFO_LEAFLET,
+        ReportData: JSON.stringify({
+          ...data,
+        }),
+      },
+    ]
+    await this.props.handlePrint(JSON.stringify(payload))
   }
 
   printDrugSummaryLabel = async (printData = {}) => {
@@ -166,79 +182,95 @@ class DrugLeafletSelection extends PureComponent {
           return _.join(x.instructionId, ',')
         }),
     )
-    this.state.printlanguage.forEach(async lan => {
-      const data = await getRawData(REPORT_ID.DRUG_SUMMARY_LABEL_80MM_45MM, {
+    if (this.state.printlanguage.includes('EN')) {
+      await this.doPrintDrugSummaryLabel(
+        visitid,
         visitinvoicedrugids,
         instructionIds,
-        language: lan,
-        visitId: visitid,
+        'EN',
+      )
+    }
+    if (this.state.printlanguage.includes('JP')) {
+      await this.doPrintDrugSummaryLabel(
+        visitid,
+        visitinvoicedrugids,
+        instructionIds,
+        'JP',
+      )
+    }
+    this.props.onConfirmPrintLeaflet()
+  }
+  doPrintDrugSummaryLabel = async (
+    visitid,
+    visitinvoicedrugids,
+    instructionIds,
+    lan,
+  ) => {
+    const data = await getRawData(REPORT_ID.DRUG_SUMMARY_LABEL_80MM_45MM, {
+      visitinvoicedrugids,
+      instructionIds,
+      language: lan,
+      visitId: visitid,
+    })
+    if (!data || !data.DrugDetailsList) {
+      notification.error({
+        message: `Get drug summary label data failed.`,
       })
-      if (!data || !data.DrugDetailsList) {
-        notification.error({
-          message: `Get drug summary label data failed.`,
-        })
-        return
-      }
-      data.DrugDetailsList.forEach(t => {
-        if (t.isDrugMixture) {
-          const instructions = (t.instruction || '').split('\n')
-          // if it's drug mixture then first line will not show(occupied by drug mixture's drug name)
-          t.FirstLine = ''
-          t.SecondLine =
-            (t.ingredient || '').length > 54
-              ? `(${t.ingredient.substr(0, 53)}…)`
-              : t.ingredient && t.ingredient.length > 0
-              ? `(${t.ingredient})`
-              : ''
-          // If language is EN, instruction need to auto breakline and show in 2 lines
-          // If JP, then need to separate to 2 lines. last line will include the last remaining 2 step dose.
-          if (lan === 'JP') {
-            t.ThirdLine = instructions.length > 0 ? instructions[0] : ''
-            t.FourthLine = instructions.length > 1 ? instructions[1] : ''
-            if (instructions.length > 2) {
-              t.FourthLine = `${t.FourthLine} ${instructions[2]}`
-            }
-          } else {
-            t.ThirdLine = t.instruction
+      return
+    }
+    data.DrugDetailsList.forEach(t => {
+      if (t.isDrugMixture) {
+        const instructions = (t.instruction || '').split('\n')
+        // if it's drug mixture then first line will not show(occupied by drug mixture's drug name)
+        t.FirstLine = ''
+        t.SecondLine =
+          (t.ingredient || '').length > 54
+            ? `(${t.ingredient.substr(0, 53)}…)`
+            : t.ingredient && t.ingredient.length > 0
+            ? `(${t.ingredient})`
+            : ''
+        // If language is EN, instruction need to auto breakline and show in 2 lines
+        // If JP, then need to separate to 2 lines. last line will include the last remaining 2 step dose.
+        if (lan === 'JP') {
+          t.ThirdLine = instructions.length > 0 ? instructions[0] : ''
+          t.FourthLine = instructions.length > 1 ? instructions[1] : ''
+          if (instructions.length > 2) {
+            t.FourthLine = `${t.FourthLine} ${instructions[2]}`
           }
         } else {
-          const instructions = (t.instruction || '').split('\n')
-          t.FirstLine =
-            (t.ingredient || '').length > 54
-              ? `(${t.ingredient.substr(0, 53)}…)`
-              : t.ingredient && t.ingredient.length > 0
-              ? `(${t.ingredient})`
-              : ''
-          t.SecondLine = t.indication
-          // If language is EN, instruction need to auto breakline and show in 2 lines
-          // If JP, then need to separate to 2 lines. last line will include the last remaining 2 step dose.
-          if (lan === 'JP') {
-            t.ThirdLine = instructions.length > 0 ? instructions[0] : ''
-            t.FourthLine = instructions.length > 1 ? instructions[1] : ''
-            if (instructions.length > 2) {
-              t.FourthLine = `${t.FourthLine} ${instructions[2]}`
-            }
-          } else {
-            t.ThirdLine = t.instruction
-          }
+          t.ThirdLine = t.instruction
         }
-      })
-      const payload = [
-        {
-          ReportId: REPORT_ID.DRUG_SUMMARY_LABEL_80MM_45MM,
-          ReportData: JSON.stringify({
-            ...data,
-          }),
-        },
-      ]
-      await this.props.handlePrint(JSON.stringify(payload))
-      if (
-        this.state.printlanguage.indexOf(lan) ==
-        this.state.printlanguage.length - 1
-      ) {
-        this.props.onConfirmPrintLeaflet()
+      } else {
+        const instructions = (t.instruction || '').split('\n')
+        t.FirstLine =
+          (t.ingredient || '').length > 54
+            ? `(${t.ingredient.substr(0, 53)}…)`
+            : t.ingredient && t.ingredient.length > 0
+            ? `(${t.ingredient})`
+            : ''
+        t.SecondLine = t.indication
+        // If language is EN, instruction need to auto breakline and show in 2 lines
+        // If JP, then need to separate to 2 lines. last line will include the last remaining 2 step dose.
+        if (lan === 'JP') {
+          t.ThirdLine = instructions.length > 0 ? instructions[0] : ''
+          t.FourthLine = instructions.length > 1 ? instructions[1] : ''
+          if (instructions.length > 2) {
+            t.FourthLine = `${t.FourthLine} ${instructions[2]}`
+          }
+        } else {
+          t.ThirdLine = t.instruction
+        }
       }
     })
+    const payload = [
+      {
+        ReportId: REPORT_ID.DRUG_SUMMARY_LABEL_80MM_45MM,
+        ReportData: JSON.stringify({
+          ...data,
+        }),
+      },
+    ]
+    await this.props.handlePrint(JSON.stringify(payload))
   }
   render() {
     const {
