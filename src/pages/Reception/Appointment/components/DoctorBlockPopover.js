@@ -79,7 +79,13 @@ const DoctorEventContent = ({ popoverEvent, classes }) => {
         />
       </GridItem>
       <GridItem>
-        <TextField disabled label='Remarks' value={popoverEvent.remarks} />
+        <TextField
+          disabled
+          multiline
+          rowsMax={10}
+          label='Remarks'
+          value={popoverEvent.remarks}
+        />
       </GridItem>
     </GridContainer>
   )
