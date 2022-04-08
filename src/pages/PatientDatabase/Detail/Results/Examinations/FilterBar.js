@@ -59,6 +59,7 @@ const FilterBar = props => {
   useEffect(() => {
     setFieldValue('category', 'Lab')
     setFieldValue('status', [6])
+    setFieldValue('doctorIDs', [-99])
   }, [])
   useEffect(() => {
     if (category === 'Lab') {
@@ -208,6 +209,7 @@ const FilterBar = props => {
                         name: 'All',
                       },
                     }}
+                    maxTagCount={0}
                     labelField='clinicianProfile.name'
                   />
                 </Tooltip>
@@ -226,6 +228,7 @@ const FilterBar = props => {
                       options={labStatus}
                       mode='multiple'
                       labelField='name'
+                      maxTagCount={0}
                       temp
                     />
                   )
