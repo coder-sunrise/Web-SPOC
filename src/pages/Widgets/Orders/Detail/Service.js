@@ -764,6 +764,7 @@ class Service extends PureComponent {
                     return (
                       <TextField
                         rowsMax='5'
+                        maxLength={200}
                         label='New Service Name'
                         {...args}
                       />
