@@ -70,6 +70,9 @@ const MCCard = ({
             <CheckboxGroup
               label='Report Language'
               options={langueges}
+              disabled={
+                !fromMedicalCheckupReporting && isVisitReadonlyAfterSigned
+              }
               {...args}
             />
           )}
@@ -154,6 +157,9 @@ const MCCard = ({
                     label: 'Urgent',
                   },
                 ]}
+                disabled={
+                  !fromMedicalCheckupReporting && isVisitReadonlyAfterSigned
+                }
                 onChange={e => {
                   if (e.target.value !== 'Urgent') {
                     setFieldValue(
@@ -198,7 +204,9 @@ const MCCard = ({
           rows={values.visitDoctor}
           EditingProps={{
             showCommandColumn: false,
-            showAddCommand: fromMedicalCheckupReporting ? false : true,
+            showAddCommand: fromMedicalCheckupReporting
+              ? false
+              : !isVisitReadonlyAfterSigned,
             onCommitChanges: commitChanges,
           }}
           schema={reportingDoctorSchema}
