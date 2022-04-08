@@ -177,7 +177,7 @@ class Grid extends PureComponent {
           {
             columnName: 'duration',
             sortingEnabled: false,
-            width: 80,
+            width: 110,
           },
           {
             columnName: 'resource',
