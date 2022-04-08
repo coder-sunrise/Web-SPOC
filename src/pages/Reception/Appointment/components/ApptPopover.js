@@ -36,7 +36,7 @@ const styles = theme => ({
   },
   datetimeLabel: {
     display: 'inline-block',
-    fontSize: '0.9rem',
+    fontSize: '14px',
   },
   icon: {
     marginRight: theme.spacing(1),
