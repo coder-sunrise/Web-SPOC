@@ -102,7 +102,7 @@ const styles = theme => ({
 )
 class Banner extends PureComponent {
   state = {
-    showWarning: false,
+    existsAllergy: false,
     refreshedSchemeData: {},
     refreshedSchemePayerData: {},
     currPatientCoPaymentSchemeFK: 0,
@@ -148,7 +148,7 @@ class Banner extends PureComponent {
     }, '')
 
     this.setState({
-      showWarning: da.length ? true : false,
+      existsAllergy: da.length ? true : false,
     })
 
     return (
@@ -180,15 +180,9 @@ class Banner extends PureComponent {
       }
     }
 
-    if (da.length) {
-      this.setState({
-        showWarning: true,
-      })
-    } else {
-      this.setState({
-        showWarning: false,
-      })
-    }
+    this.setState({
+      existsAllergy: da.length,
+    })
     let g6PD
     if (patientAllergyMetaData.length > 0) {
       g6PD = ctg6pd.find(o => o.id === patientAllergyMetaData[0].g6PDFK)
@@ -1008,7 +1002,7 @@ class Banner extends PureComponent {
     const name = `${info.name}`
     /* const allergiesStyle = () => {
       return {
-        color: this.state.showWarning ? 'red' : 'darkblue',
+        color: this.state.existsAllergy ? 'red' : 'darkblue',
         fontWeight: 500,
       }
     } */
@@ -1381,7 +1375,7 @@ class Banner extends PureComponent {
         <Col flex='none'>
           <span
             className={classes.header}
-            style={{ color: this.getAllergyData() ? 'red' : 'darkblue' }}
+            style={{ color: this.state.existsAllergy ? 'red' : 'darkblue' }}
           >
             Allergy:
           </span>
