@@ -95,7 +95,7 @@ class GlobalModalContainer extends PureComponent {
         type: 'patient/updateState',
         payload: { entity: null },
       })
-    } 
+    }
   }
 
   closeConfirmationPrompt = () => {
@@ -176,7 +176,7 @@ class GlobalModalContainer extends PureComponent {
           }}
           open={global.showPatientInfoPanel}
           // visible={global.showPatientInfoPanel}
-          observe='PatientProfile'
+          observe='PatientDetail'
         >
           {global.showPatientInfoPanel && <PatientDetail {...this.props} />}
         </CommonModal>
