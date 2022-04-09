@@ -206,7 +206,7 @@ export const ExaminationDetails = ({
 
             <GridItem md={2}>
               <RightAlignGridItem md={12}>
-                Radiographer Comments :
+                Technologist Comments :
               </RightAlignGridItem>
             </GridItem>
             <GridItem md={10} style={{ textAlign: 'right' }}>
@@ -262,10 +262,12 @@ export const ExaminationDetails = ({
             </TextGridItem>
             <GridItem md={2}>
               <RightAlignGridItem md={12}>
-                Radiographer Comments :
+                Technologist Comments :
               </RightAlignGridItem>
             </GridItem>
-            <TextGridItem md={10}>{workitem.comment}</TextGridItem>
+            <TextGridItem style={{ whiteSpace: 'pre-wrap' }} md={10}>
+              {workitem.comment}
+            </TextGridItem>
 
             {workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ? (
               !isHiddenExaminationFinding && (

@@ -46,6 +46,7 @@ import {
   DiscardSpecimen,
   ReceiveSpecimen,
   ExapandCollapseAllButton,
+  TestPanelPriorityNote,
 } from './index'
 import { SpecimenDetails } from '../SpecimenDetails'
 import { SpecimenStatusTag } from './SpecimenStatusTag'
@@ -141,7 +142,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
             w.visitFK === visitFK &&
             w.testCategoryFK === item.id &&
             w.specimenStatusFK !== LAB_SPECIMEN_STATUS.COMPLETED &&
-              w.specimenStatusFK !== LAB_SPECIMEN_STATUS.DISCARDED,
+            w.specimenStatusFK !== LAB_SPECIMEN_STATUS.DISCARDED,
         )
         .uniqBy(w => w.labSpecimenFK)
         .value().length,
@@ -544,11 +545,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
           )
         }
       />
-      <section style={{ margin: 10, fontStyle: 'italic' }}>
-        Note: test panel in{' '}
-        <span style={{ color: 'red' }}>red color = urgent </span>; test panel in
-        black color = normal
-      </section>
+      <TestPanelPriorityNote />
 
       <SpecimenDetails
         {...specimenDetailsPara}

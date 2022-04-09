@@ -12,6 +12,7 @@ import {
   Alert,
 } from 'antd'
 import { formatMessage } from 'umi'
+import moment from 'moment'
 import Banner from '@/pages/PatientDashboard/Banner'
 import { useSelector, useDispatch } from 'dva'
 import {
@@ -69,10 +70,14 @@ const ActionButtons = ({ specimenStatusFK, onStart, onRetest, onVerify }) => {
 }
 
 const PendingSecondVerificationNote = () => (
-  <section style={{ margin: 10, fontStyle: 'italic' }}>
+  <NotePara>
     Update result will require second verifier to verify the result. Status will
     remain in "Pending Second Verification".
-  </section>
+  </NotePara>
+)
+
+const NotePara = ({ children }) => (
+  <section style={{ fontStyle: 'italic' }}>{children}</section>
 )
 
 export const SpecimenDetails = ({
@@ -91,7 +96,7 @@ export const SpecimenDetails = ({
   const [showReportRemarks, setShowReportRemarks] = useState(false)
   const [retestSpecimenPara, setRetestSpecimenPara] = useState({
     open: false,
-    id: undefined,
+    retestSpecimen: undefined,
   })
   const [retestHistoryPara, setRetestHistoryPara] = useState({
     open: false,
@@ -120,7 +125,7 @@ export const SpecimenDetails = ({
     setShowRawData(false)
     setRetestSpecimenPara({
       open: false,
-      id: undefined,
+      retestSpecimen: undefined,
     })
     dispatch({
       type: 'worklistSpecimenDetails/updateState',
@@ -163,17 +168,19 @@ export const SpecimenDetails = ({
     }
   }
 
-  const handleRetest = () => {
+  const handleRetest = async () => {
+    const values = await form.validateFields()
+    console.log('handleRetest', values)
     setRetestSpecimenPara({
       open: true,
-      id: entity.id,
+      retestSpecimen: { ...entity, ...values },
     })
   }
 
   const closeRetestSpecimen = () => {
     setRetestSpecimenPara({
       open: false,
-      id: undefined,
+      retestSpecimen: undefined,
     })
     querySpecimenDetails()
   }
@@ -273,14 +280,18 @@ export const SpecimenDetails = ({
             formValues.reportRemarks.trim().length > 0 && (
               <GridItem md={12} style={{ paddingTop: 8 }}>
                 <Typography.Text strong>Report Remarks: </Typography.Text>
-                <span>{formValues.reportRemarks}</span>
+                <p style={{ whiteSpace: 'pre-wrap' }}>
+                  {formValues.reportRemarks}
+                </p>
               </GridItem>
             )}
           {formValues.internalRemarks &&
             formValues.internalRemarks.trim().length > 0 && (
               <GridItem md={12} style={{ paddingTop: 8 }}>
                 <Typography.Text strong>Internal Remarks: </Typography.Text>
-                <span>{formValues.internalRemarks}</span>
+                <p style={{ whiteSpace: 'pre-wrap' }}>
+                  {formValues.internalRemarks}
+                </p>
               </GridItem>
             )}
         </React.Fragment>
@@ -474,13 +485,14 @@ export const SpecimenDetails = ({
                     )}
                     {renderRemarks()}
                     {entity.acknowledgedByUser && (
-                      <GridItem md={12}>
-                        {`Lab result acknowledged by ${
-                          entity.acknowledgedByUser
-                        } on ${moment(entity.acknowledgeDate).format(
-                          dateFormatLongWithTimeNoSec,
-                        )}`}
-                        }`}
+                      <GridItem md={12} style={{ paddingTop: 8 }}>
+                        <NotePara>
+                          {`Lab result acknowledged by ${
+                            entity.acknowledgedByUser
+                          } on ${moment(entity.acknowledgeDate).format(
+                            dateFormatLongWithTimeNoSec,
+                          )}`}
+                        </NotePara>
                       </GridItem>
                     )}
                   </GridContainer>
