@@ -51,7 +51,7 @@ export default ({
   let e = document.createElement('div')
   e.innerHTML = current[fieldName]
   let htmlData = (e.childNodes.length === 0 ? '' : e.childNodes[0].nodeValue)
-    .replaceAll('<p', '<div style="height:18px"')
+    .replaceAll('<p', '<div')
     .replaceAll('</p>', '</div>')
 
   const base64Prefix = 'data:image/jpeg;base64,'

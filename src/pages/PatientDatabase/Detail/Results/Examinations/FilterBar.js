@@ -55,10 +55,11 @@ const FilterBar = props => {
   const [category, setCategory] = useState('Lab')
   const dispatch = useDispatch()
   const { handleSubmit, isSubmitting } = props
-  const { setFieldValue } = props
+  const { setFieldValue, values } = props
   useEffect(() => {
     setFieldValue('category', 'Lab')
     setFieldValue('status', [6])
+    setFieldValue('doctorIDs', [-99])
   }, [])
   useEffect(() => {
     if (category === 'Lab') {
@@ -165,6 +166,7 @@ const FilterBar = props => {
                       top: -5,
                       marginRight: 10,
                     }}
+                    disabled={values.allDate}
                     label='Visit Date From'
                     label2='To'
                     {...args}
@@ -208,6 +210,7 @@ const FilterBar = props => {
                         name: 'All',
                       },
                     }}
+                    maxTagCount={0}
                     labelField='clinicianProfile.name'
                   />
                 </Tooltip>
@@ -226,6 +229,7 @@ const FilterBar = props => {
                       options={labStatus}
                       mode='multiple'
                       labelField='name'
+                      maxTagCount={0}
                       temp
                     />
                   )

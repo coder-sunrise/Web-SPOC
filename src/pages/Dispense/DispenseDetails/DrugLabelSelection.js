@@ -152,18 +152,18 @@ class DrugLabelSelection extends React.PureComponent {
       },
     },
   }
-  confirmPrint = () => {
-    this.state.selectedLanguage.forEach(async lan => {
-      let printResult = await this.getPrintResult(lan)
+  confirmPrint = async () => {
+    if (this.state.selectedLanguage.includes('JP')) {
+      let printResult = await this.getPrintResult('JP')
       if (!printResult || printResult.length <= 0) return
       await this.props.handlePrint(JSON.stringify(printResult))
-      if (
-        this.state.selectedLanguage.indexOf(lan) ==
-        this.state.selectedLanguage.length - 1
-      ) {
-        this.props.handleSubmit()
-      }
-    })
+    }
+    if (this.state.selectedLanguage.includes('EN')) {
+      let printResult = await this.getPrintResult('EN')
+      if (!printResult || printResult.length <= 0) return
+      await this.props.handlePrint(JSON.stringify(printResult))
+    }
+    this.props.handleSubmit()
   }
   getPrintResult = async lan => {
     let drugLabelReportID = REPORT_ID.DRUG_LABEL_80MM_45MM

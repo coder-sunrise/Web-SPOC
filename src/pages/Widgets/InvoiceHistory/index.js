@@ -26,6 +26,7 @@ import { INVOICE_REPORT_TYPES } from '@/utils/constants'
 import MenuItem from '@material-ui/core/MenuItem'
 import MenuList from '@material-ui/core/MenuList'
 import PaymentDetails from './PaymentDetails'
+import './CustomStyle.css'
 
 const styles = () => ({
   totalOSStyle: {
@@ -81,6 +82,8 @@ const InvoiceHistory = ({
       },
     })
   }
+
+  const [showPrintInvoiceMenu, setShowPrintInvoiceMenu] = useState(undefined)
 
   const { settings = [] } = clinicSettings
   const { isEnableVisitationInvoiceReport = false } = settings
@@ -161,8 +164,7 @@ const InvoiceHistory = ({
       invoiceDetail = {},
     } = row
     const { visitOrderTemplateFK } = invoiceDetail
- 
-    const [showPrintInvoiceMenu, setShowPrintInvoiceMenu] = useState(false)
+
     return (
       <GridContainer>
         <GridItem sm={12}>
@@ -192,13 +194,22 @@ const InvoiceHistory = ({
                   icon={null}
                   trigger='click'
                   placement='left'
-                  visible={showPrintInvoiceMenu}
+                  visible={showPrintInvoiceMenu === row.id}
+                  onVisibleChange={visible => {
+                    if (!visible && showPrintInvoiceMenu)
+                      setShowPrintInvoiceMenu(undefined)
+                  }}
                   content={
-                    <MenuList role='menu'>
+                    <MenuList
+                      role='menu'
+                      onClick={e => {
+                        e.stopPropagation()
+                      }}
+                    >
                       <MenuItem
                         onClick={e => {
                           e.stopPropagation()
-                          setShowPrintInvoiceMenu(false)
+                          setShowPrintInvoiceMenu(undefined)
                           toggleReport(row, INVOICE_REPORT_TYPES.SUMMARYINVOICE)
                         }}
                       >
@@ -207,7 +218,7 @@ const InvoiceHistory = ({
                       <MenuItem
                         onClick={e => {
                           e.stopPropagation()
-                          setShowPrintInvoiceMenu(false)
+                          setShowPrintInvoiceMenu(undefined)
                           toggleReport(
                             row,
                             INVOICE_REPORT_TYPES.INDIVIDUALINVOICE,
@@ -224,7 +235,7 @@ const InvoiceHistory = ({
                     color='primary'
                     icon
                     onClick={event => {
-                      setShowPrintInvoiceMenu(true)
+                      setShowPrintInvoiceMenu(row.id)
                       event.stopPropagation()
                     }}
                   >

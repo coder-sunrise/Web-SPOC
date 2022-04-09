@@ -222,7 +222,7 @@ const NonClaimableHistory = ({
         defaultColumns={[]}
         search={false}
         scroll={{ x: 1200, y: height - 330 }}
-        pagination={{ pageSize: 20 }}
+        pagination={{ defaultPageSize: 20, showSizeChanger: true }}
       />
       {addNonClaimableHistoryDetailsRight.rights === 'enable' &&
         values.isActive && (

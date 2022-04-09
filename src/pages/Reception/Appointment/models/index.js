@@ -14,16 +14,16 @@ const calculateDuration = (startTime, endTime) => {
 
   let string = ''
   if (hours > 0) {
-    string = hours > 1 ? `${hours} HRS` : `${hours} HR `
+    string = hours > 1 ? `${hours} hrs` : `${hours} hr `
     string += ' '
     if (mins > 0) {
-      string += mins > 1 ? ` ${mins} MINS` : `${mins} MIN`
+      string += mins > 1 ? ` ${mins} mins` : `${mins} min`
     }
   } else if (mins > 0) {
-    string = mins > 1 ? ` ${mins} MINS` : `${mins} MIN`
+    string = mins > 1 ? ` ${mins} mins` : `${mins} min`
   }
 
-  if (hours === 0 && mins === 0) string = '0 MIN'
+  if (hours === 0 && mins === 0) string = '0 min'
   return string
 }
 const splitApptResource = data => {

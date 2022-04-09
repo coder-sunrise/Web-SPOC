@@ -216,7 +216,7 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         render: (item, entity) => {
           const doctors = (entity.medicalCheckupWorkitemDoctor || [])
             .map(doctor => {
-              return doctor.name
+              return doctor.shortName || doctor.name
             })
             .join(', ')
           return (
@@ -401,7 +401,7 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
           )
         },
       }}
-      pagination={{ defaultPageSize: 20 }}
+      pagination={{ defaultPageSize: 20, showSizeChanger: true }}
       columnsStateMap={medicalCheckupWorklistHistoryColumnSetting}
       onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
       defaultColumns={[]}

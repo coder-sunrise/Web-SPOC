@@ -324,8 +324,6 @@ export const SpecimenDetails = ({
     })
   }
 
-  console.log('form initial values')
-
   return (
     <React.Fragment>
       <CommonModal
@@ -382,7 +380,11 @@ export const SpecimenDetails = ({
             onValuesChange={(_, values) => setFormValues(values)}
           >
             <GridContainer
-              style={{ height: 700, alignItems: 'start', overflowY: 'scroll' }}
+              style={{
+                height: 700,
+                alignItems: 'start',
+                overflowY: 'scroll',
+              }}
             >
               {!isResultFullScreen && (
                 <React.Fragment>
@@ -442,7 +444,10 @@ export const SpecimenDetails = ({
                               ? 'fullscreen-exit'
                               : 'fullscreen'
                           }
-                          style={{ border: '1px solid', fontSize: '1rem' }}
+                          style={{
+                            border: '1px solid',
+                            fontSize: '1rem',
+                          }}
                           onClick={() =>
                             setIsResultFullScreen(!isResultFullScreen)
                           }

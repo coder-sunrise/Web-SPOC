@@ -52,15 +52,20 @@ const NurseWorkItemInfo = props => {
       number += 1
       return (
         <tr style={{ borderBottom: '1px solid #eeeeee' }}>
-          <td style={{ width: '35px' }}>{number}</td>
-          <td style={{ width: '200px' }}>{nurseWorkitem.name || '-'}</td>
-          <td style={{ width: '200px' }}>
+          <td style={{ width: '35px', wordBreak: 'break-word' }}>{number}</td>
+          <td style={{ width: '200px', wordBreak: 'break-word' }}>
+            {nurseWorkitem.name || '-'}
+          </td>
+          <td style={{ width: '200px', wordBreak: 'break-word' }}>
             {nurseWorkitem.instructions || '-'}
           </td>
-          <td style={{ width: '200px' }}>{nurseWorkitem.remarks || '-'}</td>
+          <td style={{ width: '200px', wordBreak: 'break-word' }}>
+            {nurseWorkitem.remarks || '-'}
+          </td>
           <td
             style={{
               width: '65px',
+              wordBreak: 'break-word',
               color: nurseWorkitem.priority === 'Urgent' ? 'red' : 'black',
             }}
           >
@@ -69,6 +74,7 @@ const NurseWorkItemInfo = props => {
           <td
             style={{
               width: '120px',
+              wordBreak: 'break-word',
               color:
                 nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
                   ? 'green'

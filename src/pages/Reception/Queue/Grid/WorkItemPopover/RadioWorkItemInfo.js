@@ -66,12 +66,19 @@ const RadioWorkItemInfo = props => {
       return (
         <tr style={{ borderBottom: '1px solid #eeeeee' }}>
           <td style={{ width: '35px' }}>{number}</td>
-          <td style={{ width: '200px' }}>{workItem.name || '-'}</td>
-          <td style={{ width: '200px' }}>{workItem.instructions || '-'}</td>
-          <td style={{ width: '200px' }}>{workItem.remarks || '-'}</td>
+          <td style={{ width: '200px', wordBreak: 'break-word' }}>
+            {workItem.name || '-'}
+          </td>
+          <td style={{ width: '200px', wordBreak: 'break-word' }}>
+            {workItem.instructions || '-'}
+          </td>
+          <td style={{ width: '200px', wordBreak: 'break-word' }}>
+            {workItem.remarks || '-'}
+          </td>
           <td
             style={{
               width: '65px',
+              wordBreak: 'break-word',
               color: workItem.priority === 'Urgent' ? 'red' : 'black',
             }}
           >
@@ -80,6 +87,7 @@ const RadioWorkItemInfo = props => {
           <td
             style={{
               width: '140px',
+              wordBreak: 'break-word',
               color:
                 workItem.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
                 workItem.statusFK ===

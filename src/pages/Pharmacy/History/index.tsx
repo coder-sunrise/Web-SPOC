@@ -395,7 +395,7 @@ const PharmacyWorklistHistoryIndex = ({
           columnsStateMap={pharmacyHistoryColumnSetting}
           onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
           defaultColumns={[]}
-          pagination={{ pageSize: 20 }}
+          pagination={{ defaultPageSize: 20, showSizeChanger: true }}
           features={[
             {
               code: 'details',
@@ -424,8 +424,12 @@ const PharmacyWorklistHistoryIndex = ({
               ...values,
               apiCriteria: {
                 searchValue: searchPatient,
-                orderDateForm: moment(searchOrderDateForm).set({ hour: 0, minute: 0, second: 0, millisecond:0 }).formatUTC(false),
-                orderDateTo: moment(searchOrderDateTo).set({ hour: 23, minute: 59, second: 59, millisecond:0 }).formatUTC(false),
+                orderDateForm: moment(searchOrderDateForm)
+                  .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+                  .formatUTC(false),
+                orderDateTo: moment(searchOrderDateTo)
+                  .set({ hour: 23, minute: 59, second: 59, millisecond: 0 })
+                  .formatUTC(false),
                 visitDoctor: searchOrderBy?.includes(-99)
                   ? null
                   : searchOrderBy?.join(),

@@ -100,7 +100,11 @@ const LabWorkItemInfo = props => {
                 {!labWorkitem.ishide && (
                   <td
                     rowspan={labWorkitem.rowspan}
-                    style={{ width: '35px', verticalAlign: 'top' }}
+                    style={{
+                      width: '35px',
+                      wordBreak: 'break-word',
+                      verticalAlign: 'top',
+                    }}
                   >
                     {labWorkitem.number}
                   </td>
@@ -108,7 +112,11 @@ const LabWorkItemInfo = props => {
                 {!labWorkitem.ishide && (
                   <td
                     rowspan={labWorkitem.rowspan}
-                    style={{ width: '150px', verticalAlign: 'top' }}
+                    style={{
+                      width: '150px',
+                      wordBreak: 'break-word',
+                      verticalAlign: 'top',
+                    }}
                   >
                     {labWorkitem.name || '-'}
                   </td>
@@ -116,7 +124,11 @@ const LabWorkItemInfo = props => {
                 {!labWorkitem.ishide && (
                   <td
                     rowspan={labWorkitem.rowspan}
-                    style={{ width: '150px', verticalAlign: 'top' }}
+                    style={{
+                      width: '150px',
+                      wordBreak: 'break-word',
+                      verticalAlign: 'top',
+                    }}
                   >
                     {labWorkitem.instructions || '-'}
                   </td>
@@ -124,7 +136,11 @@ const LabWorkItemInfo = props => {
                 {!labWorkitem.ishide && (
                   <td
                     rowspan={labWorkitem.rowspan}
-                    style={{ width: '150px', verticalAlign: 'top' }}
+                    style={{
+                      width: '150px',
+                      wordBreak: 'break-word',
+                      verticalAlign: 'top',
+                    }}
                   >
                     {labWorkitem.remarks || '-'}
                   </td>
@@ -134,6 +150,7 @@ const LabWorkItemInfo = props => {
                     rowspan={labWorkitem.rowspan}
                     style={{
                       width: '65px',
+                      wordBreak: 'break-word',
                       color:
                         labWorkitem.priority === 'Urgent' ? 'red' : 'black',
                       verticalAlign: 'top',
@@ -142,10 +159,14 @@ const LabWorkItemInfo = props => {
                     {labWorkitem.priority || '-'}
                   </td>
                 )}
-                <td style={{ width: 200 }}>{labWorkitem.testPanelName}</td>
+                <td style={{ width: 200, verticalAlign: 'top' }}>
+                  {labWorkitem.testPanelName}
+                </td>
                 <td
                   style={{
                     width: 120,
+                    verticalAlign: 'top',
+                    wordBreak: 'break-word',
                     color:
                       labWorkitem.statusFK === LAB_WORKITEM_STATUS.COMPLETED
                         ? 'green'
