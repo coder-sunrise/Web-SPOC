@@ -76,7 +76,7 @@ export const StartExaminationConfirmation = ({
           dataSource={combinedWorkitems}
         />
         <div style={{ margin: 10 }}>
-          Radiographer(s): {getRadiographers(combinedWorkitems)}
+          Radiology Technologist: {getRadiographers(combinedWorkitems)}
         </div>
       </div>
     </CommonModal>
