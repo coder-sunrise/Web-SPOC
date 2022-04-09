@@ -39,7 +39,7 @@ import ListAltOutlinedIcon from '@material-ui/icons/ListAltOutlined'
 import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined'
 import { commonDataReaderTransform } from '@/utils/utils'
 import withWebSocket from '@/components/Decorator/withWebSocket'
-import { CheckOutlined } from '@ant-design/icons'
+import { CheckCircleOutlined } from '@ant-design/icons'
 import WorklistContext from '../WorklistContext'
 import { StatusFilter } from './StatusFilter'
 import ReportingDoctorList from './ReportingDoctorList'
@@ -622,8 +622,8 @@ const WorklistGrid = ({
         <span
           style={{
             display: 'inline-block',
-            height: 16,
-            width: 16,
+            height: 18,
+            width: 18,
             backgroundColor: '#CC0033',
           }}
         />
@@ -632,7 +632,7 @@ const WorklistGrid = ({
             display: 'inline-block',
             marginRight: 8,
             position: 'relative',
-            top: '-3px',
+            top: '-4px',
             marginLeft: 2,
           }}
         >
@@ -641,8 +641,8 @@ const WorklistGrid = ({
         <span
           style={{
             display: 'inline-block',
-            height: 16,
-            width: 16,
+            height: 18,
+            width: 18,
             backgroundColor: '#33CC00',
           }}
         />
@@ -651,31 +651,35 @@ const WorklistGrid = ({
             display: 'inline-block',
             marginRight: 8,
             position: 'relative',
-            top: '-3px',
+            top: '-4px',
             marginLeft: 2,
           }}
         >
           Comment Verifying By PRO
         </span>
-
-        <CheckOutlined
+        <span
           style={{
             color: 'white',
             display: 'inline-block',
-            height: 16,
-            width: 16,
+            height: 18,
+            width: 18,
             backgroundColor: '#33CC00',
             position: 'relative',
             top: '-4px',
           }}
-        />
-
+        >
+          <CheckCircleOutlined
+            style={{
+              marginRight: 2,
+            }}
+          />
+        </span>
         <span
           style={{
             display: 'inline-block',
             marginRight: 8,
             position: 'relative',
-            top: '-3px',
+            top: '-4px',
             marginLeft: 2,
           }}
         >

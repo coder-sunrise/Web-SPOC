@@ -7,13 +7,11 @@ import { Tooltip } from '@/components'
 const styles = theme => ({
   text: {
     float: 'left',
-    width: 120,
-    textAlign: 'center',
-    fontWeight: 400,
+    maxWidth: 120,
     letterSpacing: 'inherit',
     borderRadius: '3px',
-    margin: '1px 10px 1px 0px',
-    padding: '2px',
+    margin: '1px 8px 1px 0px',
+    padding: '2px 6px',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
@@ -29,11 +27,12 @@ const DoctorConsultationStatus = ({
     return visitDoctor.map(d => {
       const title = d.title && d.title.trim().length ? `${d.title} ` : ''
       const name = `${title}${type === 'name' ? d.name : d.shortName || d.name}`
+      const fullName = `${title}${d.name}`
       const consultationColor = visitDoctorConsultationStatusColor.find(
         c => c.value === d.consultationStatus,
       )
       return (
-        <Tooltip title={name}>
+        <Tooltip title={fullName}>
           <div
             className={classes.text}
             style={{
