@@ -1,8 +1,10 @@
 import { Table } from 'antd'
 import { useState } from 'react'
 import { useEffect } from 'react'
-import { Checkbox, Button } from '@/components'
+import { Checkbox, Button, Tooltip } from '@/components'
+import { useSelector } from 'dva'
 import { Tag } from 'antd'
+import moment from 'moment'
 import { CheckCircleOutlined } from '@ant-design/icons'
 export const ResultTable = props => {
   const { data, acknowledge } = props
@@ -43,16 +45,25 @@ export const ResultTable = props => {
       title: 'Raw Data',
       width: 150,
       dataIndex: 'ResultBeforeInterpretation',
+      render: (text, row, index) => {
+        return <span>{text ? text : '-'}</span>
+      },
     },
     {
       title: 'Unit',
       dataIndex: 'Unit',
       width: 150,
+      render: (text, row, index) => {
+        return <span>{text ? text : '-'}</span>
+      },
     },
     {
       title: 'Reference Range',
       width: 250,
       dataIndex: 'ReferenceRangeDescription',
+      render: (text, row, index) => {
+        return <span>{text ? text : '-'}</span>
+      },
     },
   ]
   const [showRawData, setShowRowData] = useState(false)
@@ -67,6 +78,9 @@ export const ResultTable = props => {
     }
   }, [showRawData])
 
+  const user = useSelector(st => st.user)
+  const clinicRoleFK =
+    user?.data?.clinicianProfile?.userProfile?.role?.clinicRoleFK
   return (
     <div>
       <Table
@@ -107,7 +121,7 @@ export const ResultTable = props => {
                 </span>
               </div>
               <div>
-                {!data.isAcknowledged && (
+                {!data.isAcknowledged && clinicRoleFK === 1 && (
                   <div>
                     <Button
                       color='primary'
@@ -121,9 +135,15 @@ export const ResultTable = props => {
                   </div>
                 )}
                 {data.isAcknowledged && (
-                  <Tag icon={<CheckCircleOutlined />} color='success'>
-                    Acknowledged
-                  </Tag>
+                  <Tooltip
+                    title={`Acknowledged by ${data.acknowledgeBy} on ${moment(
+                      data.acknowledgeDate,
+                    ).format('DD MMM YYYY HH:mm')}`}
+                  >
+                    <Tag icon={<CheckCircleOutlined />} color='success'>
+                      Acknowledged
+                    </Tag>
+                  </Tooltip>
                 )}
               </div>
             </div>

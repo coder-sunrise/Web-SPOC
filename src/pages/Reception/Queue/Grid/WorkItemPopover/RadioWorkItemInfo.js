@@ -106,7 +106,11 @@ const RadioWorkItemInfo = props => {
   return (
     <Popover
       icon={null}
-      overlayStyle={{ maxHeight: 350 }}
+      overlayInnerStyle={{
+        maxHeight: 500,
+        overflowY: 'auto',
+        overflowX: 'hidden',
+      }}
       placement='bottomLeft'
       arrowPointAtCenter
       content={

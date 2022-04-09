@@ -92,7 +92,11 @@ const NurseWorkItemInfo = props => {
     <Popover
       icon={null}
       placement='bottomLeft'
-      overlayStyle={{ maxHeight: 350 }}
+      overlayInnerStyle={{
+        maxHeight: 500,
+        overflowY: 'auto',
+        overflowX: 'hidden',
+      }}
       arrowPointAtCenter
       content={
         <div>

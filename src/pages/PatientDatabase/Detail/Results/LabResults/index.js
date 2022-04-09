@@ -248,7 +248,7 @@ const LabResults = ({
       payload: {
         patientProfileFK: patientProfileFK,
         currentVisitId: visitId,
-        pageSize: 2,
+        pageSize: 10,
         includeCurrentVisit: includeCurrentVisit ?? false,
       },
     }).then(data => {
