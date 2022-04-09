@@ -25,6 +25,9 @@ export const SpecimenTable = props => {
       title: 'Category',
       dataIndex: 'category',
       width: 200,
+      render: (text, row, index) => {
+        return <span>{text ? text : '-'}</span>
+      },
     },
     {
       title: 'Specimen Type',

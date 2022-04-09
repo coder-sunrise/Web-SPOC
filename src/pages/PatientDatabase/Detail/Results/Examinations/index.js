@@ -93,6 +93,13 @@ const Examinations = props => {
         category: 'Lab',
         patientProfileFK: patientProfileFK,
         currentPage: currentPage,
+        visitFromDate: moment(new Date())
+          .set({ hour: 0, minute: 0, second: 0 })
+          .formatUTC(false),
+        visitToDate: moment(new Date())
+          .set({ hour: 23, minute: 59, second: 59 })
+          .formatUTC(false),
+        status: 6,
       }
       setFilterCondition(payload)
       dispatch({
