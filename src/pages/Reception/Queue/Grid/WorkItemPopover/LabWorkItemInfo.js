@@ -59,6 +59,15 @@ const LabWorkItemInfo = props => {
     })
   }
 
+  const getQueueLabWorkitemStatus = labWorkitem =>
+    labWorkitem.statusFK === LAB_WORKITEM_STATUS.NEW ||
+    labWorkitem.statusFK === LAB_WORKITEM_STATUS.SPECIMENCOLLECTED ||
+    labWorkitem.statusFK === LAB_WORKITEM_STATUS.SPECIMENRECEIVED
+      ? 'New'
+      : labWorkitem.statusFK === LAB_WORKITEM_STATUS.COMPLETED
+      ? 'Completed'
+      : 'In Progress'
+
   return (
     <Popover
       icon={null}
@@ -143,13 +152,7 @@ const LabWorkItemInfo = props => {
                         : 'black',
                   }}
                 >
-                  <span>
-                    {labWorkitem.statusFK === LAB_WORKITEM_STATUS.NEW
-                      ? 'New'
-                      : labWorkitem.statusFK === LAB_WORKITEM_STATUS.COMPLETED
-                      ? 'Completed'
-                      : 'In Progress'}
-                  </span>
+                  <span>{getQueueLabWorkitemStatus(labWorkitem)}</span>
                   {labWorkitem.isAcknowledged && (
                     <Tooltip
                       title={`Acknowledged By: ${

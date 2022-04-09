@@ -367,7 +367,7 @@ const SpecimenCollection = ({
           columnsStateMap={specimenCollectionColumnSetting}
           onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
           defaultColumns={[]}
-          pagination={{ pageSize: 20 }}
+          pagination={{ pageSize: 20, showSizeChanger: true }}
           features={[
             {
               code: 'details',

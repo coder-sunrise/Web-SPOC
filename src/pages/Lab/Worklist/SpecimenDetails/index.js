@@ -68,6 +68,13 @@ const ActionButtons = ({ specimenStatusFK, onStart, onRetest, onVerify }) => {
   )
 }
 
+const PendingSecondVerificationNote = () => (
+  <section style={{ margin: 10, fontStyle: 'italic' }}>
+    Update result will require second verifier to verify the result. Status will
+    remain in "Pending Second Verification".
+  </section>
+)
+
 export const SpecimenDetails = ({
   open,
   id,
@@ -457,14 +464,20 @@ export const SpecimenDetails = ({
                     {entity.specimenStatusFK ===
                       LAB_SPECIMEN_STATUS.PENDINGSECONDVERIFIER && (
                       <GridItem md={12} style={{ paddingBottom: 8 }}>
-                        <Alert
-                          message={`Update result will require second verifier to verify the result. Status will remain in "Pending Second Verification".`}
-                          type='warning'
-                          showIcon
-                        />
+                        <PendingSecondVerificationNote />
                       </GridItem>
                     )}
                     {renderRemarks()}
+                    {entity.acknowledgedByUser && (
+                      <GridItem md={12}>
+                        {`Lab result acknowledged by ${
+                          entity.acknowledgedByUser
+                        } on ${moment(entity.acknowledgeDate).format(
+                          dateFormatLongWithTimeNoSec,
+                        )}`}
+                        }`}
+                      </GridItem>
+                    )}
                   </GridContainer>
                 </GridItem>
               )}
