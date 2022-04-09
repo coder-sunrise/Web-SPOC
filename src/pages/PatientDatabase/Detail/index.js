@@ -711,6 +711,7 @@ class PatientDetail extends PureComponent {
       height,
       onMenuClick = p => p,
       footer,
+      onClose,
       ...resetProps
     } = this.props
     const { hasActiveSession } = this.state
@@ -855,17 +856,7 @@ class PatientDetail extends PureComponent {
                 padding: 8,
               }}
             >
-              <Button
-                color='danger'
-                onClick={() => {
-                  dispatch({
-                    type: 'patient/closePatientModal',
-                    payload: {
-                      history: this.props.history,
-                    },
-                  })
-                }}
-              >
+              <Button color='danger' onClick={onClose}>
                 Close
               </Button>
               <ProgressButton
