@@ -20,34 +20,32 @@ import {
 } from '@/components'
 import { useCodeTable } from '@/utils/hooks'
 
-export const RetestSpecimen = ({ open, id, onClose, onConfirm }) => {
+export const RetestSpecimen = ({
+  open,
+  retestSpecimen = {},
+  onClose,
+  onConfirm,
+}) => {
   const [showModal, setShowModal] = useState(false)
   const [hasRetestReason, setHasRetestReason] = useState(false)
   const ctspecimentype = useCodeTable('ctspecimentype')
-  const { entity } = useSelector(s => s.worklistSpecimenDetails)
   const { entity: patient } = useSelector(s => s.patient)
   const dispatch = useDispatch()
   const [form] = Form.useForm()
 
   useEffect(() => {
     setShowModal(open)
-    if (open && id) {
+    if (open && retestSpecimen) {
+      setHasRetestReason(false)
       form.resetFields()
-      dispatch({
-        type: 'worklistSpecimenDetails/query',
-        payload: { id },
-      })
+      console.log('retestSpecimennn', retestSpecimen)
     }
 
     return () => {
       setHasRetestReason(false)
       form.setFieldsValue({})
-      dispatch({
-        type: 'worklistSpecimenDetails/updateState',
-        payload: { entity: {} },
-      })
     }
-  }, [id])
+  }, [retestSpecimen])
 
   return (
     <CommonModal
@@ -89,12 +87,13 @@ export const RetestSpecimen = ({ open, id, onClose, onConfirm }) => {
           </Descriptions.Item>
 
           <Descriptions.Item label='Accession No.'>
-            {entity.accessionNo}
+            {retestSpecimen.accessionNo}
           </Descriptions.Item>
           <Descriptions.Item label='Specimen Type'>
             {
-              ctspecimentype.find(item => item.id === entity.specimenTypeFK)
-                ?.name
+              ctspecimentype.find(
+                item => item.id === retestSpecimen.specimenTypeFK,
+              )?.name
             }
           </Descriptions.Item>
         </Descriptions>
@@ -105,7 +104,7 @@ export const RetestSpecimen = ({ open, id, onClose, onConfirm }) => {
           }}
           onFinish={({ specimenRetestReason }) => {
             const payload = {
-              ...entity,
+              ...retestSpecimen,
               specimenRetestReason,
             }
             console.log('triggering on Finish')

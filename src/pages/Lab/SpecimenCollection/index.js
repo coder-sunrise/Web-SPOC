@@ -28,6 +28,7 @@ import withWebSocket from '@/components/Decorator/withWebSocket'
 import { useVisitTypes } from '@/utils/hooks'
 import CollectSpecimen from './components/CollectSpecimen'
 import { usePrintSpecimenLabel } from './components/PrintSpecimenLabel'
+import { TestPanelPriorityNote } from '../Worklist/components'
 
 const { queryList } = service
 const api = {
@@ -411,7 +412,9 @@ const SpecimenCollection = ({
           }}
           scroll={{ x: 1100 }}
         />
+        <TestPanelPriorityNote />
       </PageContainer>
+
       <CollectSpecimen
         enableReceiveSpecimen
         mode='new'

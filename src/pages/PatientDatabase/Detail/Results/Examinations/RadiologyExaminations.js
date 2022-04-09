@@ -79,7 +79,7 @@ const RadiologyExaminations = props => {
                   <Descriptions.Item label='Doctor Remarks:'>
                     {radiology.doctorRemarks ?? '-'}
                   </Descriptions.Item>
-                  <Descriptions.Item label='Radiographer Comment:' span={3}>
+                  <Descriptions.Item label='Technologist Comment:' span={3}>
                     {radiology.radiographerComment ?? '-'}
                   </Descriptions.Item>
                   <Descriptions.Item label='Findings:' span={3}>
