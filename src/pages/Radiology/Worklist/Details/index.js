@@ -101,11 +101,7 @@ const RadiologyDetails = () => {
       s => s.currentStatusFK === details.entity.statusFK,
     )
 
-    if (
-      !buttonInfo ||
-      Authorized.check(buttonInfo.authority).rights !== 'enable'
-    )
-      return
+    if (!buttonInfo) return
 
     return (
       <React.Fragment>
@@ -121,38 +117,40 @@ const RadiologyDetails = () => {
               Cancel Examination
             </ProgressButton>
           )}
-        <ProgressButton
-          color='success'
-          onClick={() => {
-            if (examinationDetails.assignedRadiographers.length === 0) {
-              setShowRequiredField(true)
-              return
-            }
+        {Authorized.check(buttonInfo.authority).rights === 'enable' && (
+          <ProgressButton
+            color='success'
+            onClick={() => {
+              if (examinationDetails.assignedRadiographers.length === 0) {
+                setShowRequiredField(true)
+                return
+              }
 
-            const { visitWorkitems } = workitem
+              const { visitWorkitems } = workitem
 
-            const currentPrimaryWorkitemFK = visitWorkitems.find(
-              v => v.radiologyWorkitemId === workitem.radiologyWorkitemId,
-            ).primaryWorkitemFK
-            if (
-              workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW &&
-              currentPrimaryWorkitemFK &&
-              visitWorkitems.filter(
-                v =>
-                  v.primaryWorkitemFK &&
-                  v.primaryWorkitemFK === currentPrimaryWorkitemFK,
-              ).length > 1
-            ) {
-              setShowStartConfirm(true)
-              return
-            }
-            handleSave({
-              statusFK: buttonInfo.nextStatusFK,
-            })
-          }}
-        >
-          {buttonInfo.name}
-        </ProgressButton>
+              const currentPrimaryWorkitemFK = visitWorkitems.find(
+                v => v.radiologyWorkitemId === workitem.radiologyWorkitemId,
+              ).primaryWorkitemFK
+              if (
+                workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW &&
+                currentPrimaryWorkitemFK &&
+                visitWorkitems.filter(
+                  v =>
+                    v.primaryWorkitemFK &&
+                    v.primaryWorkitemFK === currentPrimaryWorkitemFK,
+                ).length > 1
+              ) {
+                setShowStartConfirm(true)
+                return
+              }
+              handleSave({
+                statusFK: buttonInfo.nextStatusFK,
+              })
+            }}
+          >
+            {buttonInfo.name}
+          </ProgressButton>
+        )}
       </React.Fragment>
     )
   }
@@ -239,12 +237,7 @@ const RadiologyDetails = () => {
   const showOnlyCloseButton =
     isReadOnly ||
     workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
-    workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED ||
-    (
-      Authorized.check('radiologyworklist.saveexamination') || {
-        rights: 'hidden',
-      }
-    ).rights !== 'enable'
+    workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED
 
   return (
     <React.Fragment>
@@ -275,11 +268,17 @@ const RadiologyDetails = () => {
             !showOnlyCloseButton ? renderStatusButtons() : undefined,
             renderPrintButton(),
           ],
-          onConfirm: !showOnlyCloseButton
-            ? () => {
-                handleSave()
+          onConfirm:
+            !showOnlyCloseButton &&
+            (
+              Authorized.check('radiologyworklist.saveexamination') || {
+                rights: 'hidden',
               }
-            : undefined,
+            ).rights === 'enable'
+              ? () => {
+                  handleSave()
+                }
+              : undefined,
         }}
         confirmProps={{ disable: true }}
         maxWidth='lg'
