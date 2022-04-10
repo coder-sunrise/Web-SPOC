@@ -108,7 +108,7 @@ const SpecimenCollection = ({
         search: false,
         width: 200,
         render: (_dom, entity) => (
-          <TestPanelColumn columnWidth={200} testPanels={entity.testPanels} />
+          <TestPanelColumn testPanels={entity.testPanels} />
         ),
       },
       {

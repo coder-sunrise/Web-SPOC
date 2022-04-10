@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { PRIORITY_VALUES } from '@/utils/constants'
 import { Tooltip } from '@/components'
 
-export const TestPanelColumn = ({ testPanels, columnWidth = 350 }) => {
+export const TestPanelColumn = ({ testPanels, columnWidth }) => {
   console.log('TestPanelColumn', testPanels)
   const testPanelHtml = [...testPanels]
     //Sort by Priority then by the sort order
@@ -35,7 +35,7 @@ export const TestPanelColumn = ({ testPanels, columnWidth = 350 }) => {
     >
       <p
         style={{
-          width: columnWidth - 16, //Column width - 16 (left and righ 8 px padding)
+          width: columnWidth ? columnWidth - 16 : undefined, //Column width - 16 (left and righ 8 px padding)
           display: '-webkit-box',
           WebkitBoxOrient: 'vertical',
           WebkitLineClamp: 2,
