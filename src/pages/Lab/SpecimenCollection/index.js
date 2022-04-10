@@ -29,6 +29,7 @@ import { useVisitTypes } from '@/utils/hooks'
 import CollectSpecimen from './components/CollectSpecimen'
 import { usePrintSpecimenLabel } from './components/PrintSpecimenLabel'
 import { TestPanelPriorityNote } from '../Worklist/components'
+import { TestPanelColumn } from '../Worklist/components/TestPanelColumn'
 
 const { queryList } = service
 const api = {
@@ -107,19 +108,7 @@ const SpecimenCollection = ({
         search: false,
         width: 200,
         render: (_dom, entity) => (
-          <Tooltip title={entity.testPanels}>
-            <p
-              style={{
-                width: _dom.width,
-                display: '-webkit-box',
-                WebkitBoxOrient: 'vertical',
-                WebkitLineClamp: 2,
-                overflow: 'hidden',
-              }}
-            >
-              {entity.testPanels}
-            </p>
-          </Tooltip>
+          <TestPanelColumn columnWidth={200} testPanels={entity.testPanels} />
         ),
       },
       {
@@ -369,6 +358,7 @@ const SpecimenCollection = ({
           onColumnsStateChange={map => saveColumnsSetting(dispatch, map)}
           defaultColumns={[]}
           pagination={{ pageSize: 20, showSizeChanger: true }}
+          footer={() => <TestPanelPriorityNote />}
           features={[
             {
               code: 'details',
@@ -412,7 +402,6 @@ const SpecimenCollection = ({
           }}
           scroll={{ x: 1100 }}
         />
-        <TestPanelPriorityNote />
       </PageContainer>
 
       <CollectSpecimen
