@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { Radio, Typography } from 'antd'
+import { useSelector } from 'dva'
 import moment from 'moment'
 import { useVisitTypes } from '@/utils/hooks/'
 import {
@@ -18,6 +19,7 @@ import { RADIOLOGY_WORKITEM_STATUS } from '@/utils/constants'
 import WorklistContext from '@/pages/Radiology/Worklist/WorklistContext'
 import { get } from 'immutable'
 import { Popconfirm } from '@medisys/component'
+import VisitGroupIcon from '@/pages/Radiology/Components/VisitGroupIcon'
 
 const blueColor = '#1890f8'
 
@@ -45,10 +47,12 @@ const PrimaryAccessionNoHeader = ({ accessionNo }) => (
 
 export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
   const { isReadOnly, getPrimaryWorkitem } = useContext(WorklistContext)
+  const clinicSettings = useSelector(s => s.clinicSettings)
   const visitTypes = useVisitTypes()
   const [isCombinedOrder, setIsCombinedOrder] = useState(false)
   const [isCombinedRadioYes, setIsCombinedRadioYes] = useState(false)
   const [primaryAccessionNo, setPrimaryAccessionNo] = useState('')
+  const { isQueueNoDecimal } = clinicSettings.settings || {}
 
   useEffect(() => {
     if (workitem.primaryWorkitemFK) {
@@ -112,9 +116,17 @@ export const OrderDetails = ({ workitem, onCombinedOrderChange }) => {
             </TextGridItem>
 
             <RightAlignGridItem>Visit Group No. :</RightAlignGridItem>
-            <TextGridItem md={6}>
-              {workitem?.visitInfo?.visitGroup}
-            </TextGridItem>
+            <GridItem md={6}>
+              {workitem.visitInfo.visitGroup ? (
+                <VisitGroupIcon
+                  visitGroup={workitem.visitInfo.visitGroup}
+                  visitFK={workitem.visitFK}
+                  isQueueNoDecimal={isQueueNoDecimal}
+                />
+              ) : (
+                '-'
+              )}
+            </GridItem>
 
             <RightAlignGridItem>Order Combined :</RightAlignGridItem>
 
