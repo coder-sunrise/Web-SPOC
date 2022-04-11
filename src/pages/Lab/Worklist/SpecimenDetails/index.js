@@ -14,6 +14,7 @@ import {
 import { formatMessage } from 'umi'
 import moment from 'moment'
 import Banner from '@/pages/PatientDashboard/Banner'
+import Authorized from '@/utils/Authorized'
 import { useSelector, useDispatch } from 'dva'
 import {
   Icon,
@@ -44,27 +45,32 @@ const { Panel } = Collapse
 const { TextArea } = Input
 
 const ActionButtons = ({ specimenStatusFK, onStart, onRetest, onVerify }) => {
+  console.log('Authorized.check(lab.retest)', Authorized.check('lab.retest'))
+  debugger
   return (
     <React.Fragment>
-      {specimenStatusFK === LAB_SPECIMEN_STATUS.NEW && (
-        <ProgressButton color='success' onClick={onStart}>
-          Start
-        </ProgressButton>
-      )}
+      {specimenStatusFK === LAB_SPECIMEN_STATUS.NEW &&
+        Authorized.check('lab.starttest').rights === 'enable' && (
+          <ProgressButton color='success' onClick={onStart}>
+            Start
+          </ProgressButton>
+        )}
       {(specimenStatusFK === LAB_SPECIMEN_STATUS.PENDINGFIRSTVERIFIER ||
-        specimenStatusFK === LAB_SPECIMEN_STATUS.PENDINGSECONDVERIFIER) && (
-        <ProgressButton color='warning' onClick={onRetest}>
-          Retest
-        </ProgressButton>
-      )}
+        specimenStatusFK === LAB_SPECIMEN_STATUS.PENDINGSECONDVERIFIER) &&
+        Authorized.check('lab.retest').rights === 'enable' && (
+          <ProgressButton color='warning' onClick={onRetest}>
+            Retest
+          </ProgressButton>
+        )}
       {(specimenStatusFK === LAB_SPECIMEN_STATUS.INPROGRESS ||
         specimenStatusFK === LAB_SPECIMEN_STATUS.FORRETEST ||
         specimenStatusFK === LAB_SPECIMEN_STATUS.PENDINGFIRSTVERIFIER ||
-        specimenStatusFK === LAB_SPECIMEN_STATUS.PENDINGSECONDVERIFIER) && (
-        <ProgressButton color='success' onClick={onVerify}>
-          Verify
-        </ProgressButton>
-      )}
+        specimenStatusFK === LAB_SPECIMEN_STATUS.PENDINGSECONDVERIFIER) &&
+        Authorized.check('lab.verifytest').rights === 'enable' && (
+          <ProgressButton color='success' onClick={onVerify}>
+            Verify
+          </ProgressButton>
+        )}
     </React.Fragment>
   )
 }
@@ -374,6 +380,7 @@ export const SpecimenDetails = ({
           onConfirm:
             entity.specimenStatusFK !== LAB_SPECIMEN_STATUS.COMPLETED &&
             entity.specimenStatusFK !== LAB_SPECIMEN_STATUS.NEW &&
+            Authorized.check('lab.savedetails').rights === 'enable' &&
             !isReadonly
               ? () => {
                   handleSave()

@@ -159,7 +159,7 @@ const SpecimenCollection = ({
         fixed: 'right',
         width: 95,
         render: (_dom, entity) => {
-          return (
+          return Authorized.check('lab.collectspecimen').rights === 'enable' ? (
             <Button
               onClick={() => {
                 setVisitId(entity.id)
@@ -168,6 +168,8 @@ const SpecimenCollection = ({
             >
               Collect Specimen
             </Button>
+          ) : (
+            <span></span>
           )
         },
       },
@@ -405,7 +407,9 @@ const SpecimenCollection = ({
       </PageContainer>
 
       <CollectSpecimen
-        enableReceiveSpecimen
+        enableReceiveSpecimen={
+          Authorized.check('lab.receivespecimen').rights === 'enable'
+        }
         mode='new'
         open={visitId != undefined && visitId != null}
         visitId={visitId}
