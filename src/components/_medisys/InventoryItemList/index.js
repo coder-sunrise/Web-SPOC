@@ -153,18 +153,17 @@ class InventoryItemList extends React.Component {
         code: typeFieldName.code,
         name: typeFieldName.displayValue,
 
-        itemValueType: 'ExactAmount',
+        itemValueType: 'Percentage',
         itemValue: 0,
         quantity: item.quantity,
         total: total,
         totalAftAdj: total,
         adjValue: 0,
         adjAmt: 0,
-        adjType:'ExactAmount',
-        isMinus: false,
-        isExactAmount: true,
+        adjType:'Percentage',
+        isMinus: true,
+        isExactAmount: false,
       }
-
       return newItemRow
     })
     this.addItemToRows(newItems)
@@ -289,16 +288,16 @@ class InventoryItemList extends React.Component {
         unitPrice: unitPrice,
         code: tempSelectedItem.code,
         name: tempSelectedItem.displayValue,
-        itemValueType: 'ExactAmount',
+        itemValueType: 'Percentage',
         quantity: 1,
         itemValue: 0,
         total: unitPrice,
         totalAftAdj: unitPrice,
         adjValue: 0,
         adjAmt: 0,
-        adjType:'ExactAmount',
-        isMinus: false,
-        isExactAmount: true,
+        adjType:'Percentage',
+        isMinus: true,
+        isExactAmount: false,
       }
       this.addItemToRows(newItemRow)
     }
@@ -598,7 +597,12 @@ class InventoryItemList extends React.Component {
         render: row => {
           const inventory = InventoryTypes.filter(x => x.value === row.type)[0]
           const { ctName, itemFKName } = inventory
-          return row.name ? row.name : ''
+          var item = row.name ? row.name : ''
+          return (
+            <Tooltip title={item}>
+              <span>{item}</span>
+            </Tooltip>
+          )
         },
       },
       {
@@ -702,13 +706,14 @@ class InventoryItemList extends React.Component {
           width: 200,
           isReactComponent: true,
           sortingEnabled: false,
+          align: 'right',
           render: currentrow => {
             const { focused = false } = this.state
             const { rows = [] } = values
             const { row } = currentrow
             const index = rows.map(i => i.uid).indexOf(row.uid)
             return (
-              <div style={{ display: 'flex' }}>
+              <div style={{ display: 'flex',textAlign:'left' }}>
                 <Field
                   name={`rows[${index}].isMinus`}
                   render={args => (
