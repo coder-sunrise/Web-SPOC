@@ -249,7 +249,7 @@ class PatientHistory extends Component {
         this.setState({ selectCategories }, () => {
           setFieldValue('selectCategories', selectCategories)
         })
-        this.queryVisitHistory()
+        this.queryVisitHistory(5)
       })
     })
   }
@@ -304,7 +304,7 @@ class PatientHistory extends Component {
       })
   }
 
-  queryVisitHistory = () => {
+  queryVisitHistory = pageSize => {
     const {
       isAllDate,
       pageIndex,
@@ -356,7 +356,7 @@ class PatientHistory extends Component {
         isAllDate,
         visitTypeIDs: visitTypeIDs.join(','),
         pageIndex: pageIndex + 1,
-        pageSize: viewVisitPageSize,
+        pageSize: pageSize || viewVisitPageSize,
         patientProfileId: patientHistory.patientID,
         selectDoctors: selectDoctors.join(','),
         searchCategories,
