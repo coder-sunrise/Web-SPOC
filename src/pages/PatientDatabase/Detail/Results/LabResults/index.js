@@ -375,7 +375,7 @@ const LabResults = ({
             <div>
               {row[`v_${visitColumn.visitId}_originalResult`] && (
                 <div>
-                  Analyzer Result:
+                  Raw Result:
                   {row[`v_${visitColumn.visitId}_originalResult`]}
                 </div>
               )}
