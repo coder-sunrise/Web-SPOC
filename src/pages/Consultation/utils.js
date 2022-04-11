@@ -703,7 +703,7 @@ const getOrdersData = val => {
         instruction: po?.instruction || instruction,
         hasPaid: po?.hasPaid,
         isOrderedByDoctor: true,
-        isOnlyClinicInternalUsage: true,
+        orderable: true,
         isEditMedication: false,
         isExactAmount: true,
       })

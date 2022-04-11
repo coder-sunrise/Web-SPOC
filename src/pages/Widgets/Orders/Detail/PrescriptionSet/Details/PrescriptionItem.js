@@ -573,7 +573,7 @@ class Detail extends PureComponent {
     setFieldValue('prescriptionSetItemInstruction', newPrescriptionInstruction)
 
     setFieldValue('isActive', op.isActive)
-    setFieldValue('isOnlyClinicInternalUsage', op.isOnlyClinicInternalUsage)
+    setFieldValue('orderable', op.orderable)
     setFieldValue('selectedMedication', op)
 
     if (
@@ -664,7 +664,7 @@ class Detail extends PureComponent {
       codetable: { inventorymedication = [] },
     } = this.props
     return inventorymedication
-      .filter(m => !m.isOnlyClinicInternalUsage)
+      .filter(m => m.orderable)
       .reduce((p, c) => {
         const { code, displayValue, sellingPrice = 0, dispensingUOM = {} } = c
         const { name: uomName = '' } = dispensingUOM
@@ -969,7 +969,7 @@ class Detail extends PureComponent {
     row.inventoryDispenseUOMFK = option.dispensingUOM.id
     row.inventoryPrescribingUOMFK = option.prescribingUOM.id
     row.isActive = option.isActive
-    row.isOnlyClinicInternalUsage = option.isOnlyClinicInternalUsage
+    row.orderable = option.orderable
   }
 
   commitDrugMixtureItemChanges = ({ rows, deleted, added, changed }) => {

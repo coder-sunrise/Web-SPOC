@@ -190,10 +190,7 @@ import { CollectionsOutlined } from '@material-ui/icons'
         uom => uom.id === medication.dispensingUOM.id,
       )
       let item
-      if (
-        medication.isActive === true &&
-        !medication.isOnlyClinicInternalUsage
-      ) {
+      if (medication.isActive === true && medication.orderable) {
         const medicationdispensingUOM = medication.dispensingUOM
         const medicationusage = medication.medicationUsage
         const medicationfrequency = matchInstruction?.medicationFrequency
@@ -469,10 +466,7 @@ import { CollectionsOutlined } from '@material-ui/icons'
       )
 
       let item
-      if (
-        consumable.isActive === true &&
-        !consumable.isOnlyClinicInternalUsage
-      ) {
+      if (consumable.isActive === true && consumable.orderable) {
         let isDefaultBatchNo
         let unitOfMeasurement
         if (consumable) {
