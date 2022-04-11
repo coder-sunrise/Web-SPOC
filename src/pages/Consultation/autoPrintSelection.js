@@ -121,7 +121,7 @@ class AutoPrintSelection extends React.PureComponent {
   }
 
   render () {
-    const { handleSubmit, footer, classes, showInvoiceAmountNegativeWarning } = this.props
+    const { handleSubmit, footer, classes, showInvoiceAmountNegativeWarning, triggerBy } = this.props
     const validationSchema = Yup.object().shape({
       Copies: Yup.number().min(1),
     })
@@ -132,7 +132,7 @@ class AutoPrintSelection extends React.PureComponent {
             {this.state.data && (
               <div className={classes.tableContainer}>
                 {showInvoiceAmountNegativeWarning ? <Alert style={{ padding: '5px 15px 5px 37px', marginBottom: '5px' }} message="Total invoice amount is negative." banner /> : undefined}
-                <h5>Print the following document after sign off</h5>
+                <h5>{`Print the following document after ${triggerBy} `}</h5>
                 <EditableTableGrid
                   size='sm'
                   forceRender
