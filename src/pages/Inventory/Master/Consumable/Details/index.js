@@ -175,7 +175,7 @@ export default compose(
       const {
         isChasAcuteClaimable,
         isChasChronicClaimable,
-        isOnlyClinicInternalUsage,
+        orderable,
         isDispensedByPharmacy,
         isNurseActualizable,
       } = returnValue
@@ -185,8 +185,8 @@ export default compose(
       if (isChasChronicClaimable) {
         optionGrp.push('isChasChronicClaimable')
       }
-      if (isOnlyClinicInternalUsage) {
-        optionGrp.push('isOnlyClinicInternalUsage')
+      if (orderable) {
+        optionGrp.push('orderable')
       }
       if (isDispensedByPharmacy) {
         optionGrp.push('isDispensedByPharmacy')
@@ -270,7 +270,7 @@ export default compose(
         isChasChronicClaimable: false,
         isDispensedByPharmacy: false,
         isNurseActualizable: false,
-        isOnlyClinicInternalUsage: false,
+        orderable: false,
       }
       values.chas.forEach(o => {
         if (o === 'isChasAcuteClaimable') {
@@ -281,7 +281,7 @@ export default compose(
           optionGrp[o] = true
         } else if (o === 'isNurseActualizable') {
           optionGrp[o] = true
-        } else if (o === 'isOnlyClinicInternalUsage') {
+        } else if (o === 'orderable') {
           optionGrp[o] = true
         }
       })
@@ -291,7 +291,7 @@ export default compose(
           ...restValues,
           ...optionGrp,
           id,
-          isOnlyClinicInternalUsage: !optionGrp.isOnlyClinicInternalUsage,
+          orderable: optionGrp.orderable,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],
           consumableStock: defaultConsumableStock,

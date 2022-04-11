@@ -25,8 +25,7 @@ const rightIcon = {
 
 const Grid = ({ prescriptionSet, dispatch }) => {
   const editRow = row => {
-    if ((!row.isActive || row.isOnlyClinicInternalUsage) && !row.isDrugMixture)
-      return
+    if ((!row.isActive || !row.orderable) && !row.isDrugMixture) return
     else {
       dispatch({
         type: 'prescriptionSet/updateState',
@@ -98,9 +97,7 @@ const Grid = ({ prescriptionSet, dispatch }) => {
               if (drugMixtures.find(drugMixture => !drugMixture.isActive)) {
                 warningLabel = '#1'
               } else if (
-                drugMixtures.find(
-                  drugMixture => drugMixture.isOnlyClinicInternalUsage,
-                )
+                drugMixtures.find(drugMixture => !drugMixture.orderable)
               ) {
                 warningLabel = '#2'
               } else if (
@@ -116,7 +113,7 @@ const Grid = ({ prescriptionSet, dispatch }) => {
             } else {
               if (!row.isActive) {
                 warningLabel = '#1'
-              } else if (row.isOnlyClinicInternalUsage) {
+              } else if (!row.orderable) {
                 warningLabel = '#2'
               } else if (
                 row.inventoryDispenseUOMFK !== row.dispenseUOMFK ||
@@ -234,8 +231,7 @@ const Grid = ({ prescriptionSet, dispatch }) => {
                     style={{ marginRight: 5 }}
                     disabled={
                       row.isEditingEntity ||
-                      ((!row.isActive || row.isOnlyClinicInternalUsage) &&
-                        !row.isDrugMixture)
+                      ((!row.isActive || !row.orderable) && !row.isDrugMixture)
                     }
                   >
                     <Edit />

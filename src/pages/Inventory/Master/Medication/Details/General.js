@@ -127,7 +127,7 @@ const General = ({
 
     let generalOptions = [
       {
-        id: 'isOnlyClinicInternalUsage',
+        id: 'orderable',
         name: 'Orderable',
         tooltip: 'Item is orderable and dispensable to patient',
         disabled: hasActiveSession && values.id,

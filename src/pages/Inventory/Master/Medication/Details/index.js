@@ -396,7 +396,7 @@ export default compose(
         isMedisaveClaimable,
         isExclusive,
         isDisplayInLeaflet,
-        isOnlyClinicInternalUsage,
+        orderable,
         inventoryMedication_MedicationIngredient = [],
         inventoryMedication_MedicationGroup = [],
         inventoryMedication_MedicationSideEffect = [],
@@ -423,8 +423,8 @@ export default compose(
       if (isDisplayInLeaflet) {
         checkboxGroup.push('isDisplayInLeaflet')
       }
-      if (isOnlyClinicInternalUsage || !medicationDetails.id) {
-        checkboxGroup.push('isOnlyClinicInternalUsage')
+      if (orderable || !medicationDetails.id) {
+        checkboxGroup.push('orderable')
       }
       if (isDispensedByPharmacy || !medicationDetails.id) {
         checkboxGroup.push('isDispensedByPharmacy')
@@ -625,7 +625,7 @@ export default compose(
         isMedisaveClaimable: false,
         isExclusive: false,
         isDisplayInLeaflet: false,
-        isOnlyClinicInternalUsage: false,
+        orderable: false,
         isDispensedByPharmacy: false,
         isNurseActualizable: false,
       }
@@ -752,7 +752,7 @@ export default compose(
         ...checkboxGroup,
         ...fileInfo,
         id,
-        isOnlyClinicInternalUsage: !checkboxGroup.isOnlyClinicInternalUsage,
+        orderable: checkboxGroup.orderable,
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
         medicationStock: defaultMedicationStock,

@@ -85,7 +85,7 @@ class Grid extends PureComponent {
         drugMixtures.find(
           drugMixture =>
             !drugMixture.isActive ||
-            drugMixture.isOnlyClinicInternalUsage ||
+            !drugMixture.orderable ||
             drugMixture.inventoryDispenseUOMFK !== drugMixture.uomfk ||
             drugMixture.inventoryPrescribingUOMFK !==
               drugMixture.prescribeUOMFK,
@@ -97,7 +97,7 @@ class Grid extends PureComponent {
     }
     return (
       item.isActive &&
-      !item.isOnlyClinicInternalUsage &&
+      item.orderable &&
       item.inventoryDispenseUOMFK === item.dispenseUOMFK &&
       firstInstruction?.prescribeUOMFK === item.inventoryPrescribingUOMFK
     )
@@ -322,9 +322,7 @@ class Grid extends PureComponent {
                   if (drugMixtures.find(drugMixture => !drugMixture.isActive)) {
                     warningLabel = '#1'
                   } else if (
-                    drugMixtures.find(
-                      drugMixture => drugMixture.isOnlyClinicInternalUsage,
-                    )
+                    drugMixtures.find(drugMixture => !drugMixture.orderable)
                   ) {
                     warningLabel = '#2'
                   } else if (
@@ -341,7 +339,7 @@ class Grid extends PureComponent {
                 } else {
                   if (!item.isActive) {
                     warningLabel = '#1'
-                  } else if (item.isOnlyClinicInternalUsage) {
+                  } else if (!item.orderable) {
                     warningLabel = '#2'
                   } else if (
                     item.inventoryDispenseUOMFK !== item.dispenseUOMFK ||

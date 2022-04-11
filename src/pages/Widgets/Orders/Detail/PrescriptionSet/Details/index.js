@@ -64,14 +64,14 @@ const Detail = props => {
       if (drugMixtures.find(drugMixture => !drugMixture.isActive)) {
         containsInactiveMedication = true
       } else if (
-        drugMixtures.find(drugMixture => drugMixture.isOnlyClinicInternalUsage)
+        drugMixtures.find(drugMixture => !drugMixture.orderable)
       ) {
         containsNonOrderableMedication = true
       }
     } else {
       if (!item.isActive) {
         containsInactiveMedication = true
-      } else if (item.isOnlyClinicInternalUsage) {
+      } else if (!item.orderable) {
         containsNonOrderableMedication = true
       }
     }

@@ -97,13 +97,13 @@ const PendingPreOrder: React.FC = (props: any) => {
       if (inventorymedication && inventorymedication.length > 0) {
         const retResponse = inventorymedication
           .reduce(itemWrapper, [])
-          .filter(x => x.isOnlyClinicInternalUsage === true)
+          .filter(x => x.orderable === true)
         setMedications(retResponse)
       } else {
         fetchCodeTable('inventorymedication').then(response => {
           const retResponse = response
             .reduce(itemWrapper, [])
-            .filter(x => x.isOnlyClinicInternalUsage === true)
+            .filter(x => x.orderable === true)
           setMedications(retResponse)
         })
       }
@@ -129,13 +129,13 @@ const PendingPreOrder: React.FC = (props: any) => {
       if (inventoryconsumable && inventoryconsumable.length >= 0) {
         const retResponse = inventoryconsumable
           .reduce(itemWrapper, [])
-          .filter(x => x.isOnlyClinicInternalUsage === true)
+          .filter(x => x.orderable === true)
         setConsumables(retResponse)
       } else {
         fetchCodeTable('inventoryconsumable').then(response => {
           const retResponse = response
             .reduce(itemWrapper, [])
-            .filter(x => x.isOnlyClinicInternalUsage === true)
+            .filter(x => x.orderable === true)
           setConsumables(retResponse)
         })
       }
