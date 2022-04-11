@@ -188,6 +188,13 @@ export const SpecimenDetails = ({
       open: false,
       retestSpecimen: undefined,
     })
+  }
+
+  const confirmRetestSpecimen = () => {
+    setRetestSpecimenPara({
+      open: false,
+      retestSpecimen: undefined,
+    })
     querySpecimenDetails()
   }
 
@@ -515,7 +522,7 @@ export const SpecimenDetails = ({
           closeRetestSpecimen()
         }}
         onConfirm={() => {
-          closeRetestSpecimen()
+          confirmRetestSpecimen()
         }}
       />
       <RetestHistory
