@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { useDispatch, useSelector } from 'dva'
+import Authorized from '@/utils/Authorized'
 import _ from 'lodash'
 import { formatMessage } from 'umi'
 import {
@@ -397,7 +398,8 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
                 </Tooltip>
               )}
             {!record.dateReceived &&
-              record.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW && (
+              record.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW &&
+              Authorized.check('lab.receivespecimen').rights === 'enable' && (
                 <Tooltip title='Receive Specimen'>
                   <Button
                     onClick={() => {
@@ -416,7 +418,8 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
                 </Tooltip>
               )}
             {record.dateReceived &&
-              record.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW && (
+              record.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW &&
+              Authorized.check('lab.discardspecimen').rights === 'enable' && (
                 <Tooltip title='Discard Specimen'>
                   <Button
                     onClick={() => {
