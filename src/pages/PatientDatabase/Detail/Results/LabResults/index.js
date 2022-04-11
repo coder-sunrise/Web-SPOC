@@ -265,22 +265,6 @@ const LabResults = ({
       }
     })
   }
-  const resultCellTemplate = () => {
-    return (
-      <Tooltip title={props.taskData[`v_${x.visitId}_referenceRange`]}>
-        <span
-          style={{
-            color:
-              props.taskData[`v_${x.visitId}_shouldFlag`] === '__true'
-                ? 'red'
-                : 'inherit',
-          }}
-        >
-          {props.taskData[`v_${x.visitId}_finalResult`]}
-        </span>
-      </Tooltip>
-    )
-  }
 
   const getVisitTypeCode = typeFK => {
     const currentVisitType = visitType?.find(item => item.id === typeFK)
@@ -293,21 +277,26 @@ const LabResults = ({
           {`${moment(x.visitDate).format('DD MMM YYYY')} (${getVisitTypeCode(
             x.visitTypeFK,
           )})`}
-          <Tooltip style={{ display: 'inline-block' }} title='Print Lab Report'>
-            <Print
-              style={{
-                position: 'relative',
-                top: 4,
-                cursor: 'pointer',
-                color: '#4255bd',
-                left: 3,
-              }}
-              onClick={() => {
-                setShowModal(true)
-                setTargetVisitId(x.visitId)
-              }}
-            />
-          </Tooltip>
+          {!x.isMigrate && (
+            <Tooltip
+              style={{ display: 'inline-block' }}
+              title='Print Lab Report'
+            >
+              <Print
+                style={{
+                  position: 'relative',
+                  top: 4,
+                  cursor: 'pointer',
+                  color: '#4255bd',
+                  left: 3,
+                }}
+                onClick={() => {
+                  setShowModal(true)
+                  setTargetVisitId(x.visitId)
+                }}
+              />
+            </Tooltip>
+          )}
           {x.hasLabRemarks && (
             <Tooltip style={{ display: 'inline-block' }} title='Result Details'>
               <FileCopySharp
@@ -346,6 +335,8 @@ const LabResults = ({
         newData.forEach(d => {
           let target = newData.find(x => x.id === result.testPanelItemFK)
           if (target) {
+            target[`v_${visitData.visitId}_originalResult`] =
+              result.originalResult
             target[`v_${visitData.visitId}_finalResult`] = result.finalResult
             target[`v_${visitData.visitId}_shouldFlag`] = result.shouldFlag
             target[`v_${visitData.visitId}_referenceRange`] =
@@ -380,8 +371,28 @@ const LabResults = ({
         visitId: visitColumn.visitId,
         width: 180,
         render: (text, row) => {
+          const title = (
+            <div>
+              {row[`v_${visitColumn.visitId}_originalResult`] && (
+                <div>
+                  Analyzer Result:
+                  {row[`v_${visitColumn.visitId}_originalResult`]}
+                </div>
+              )}
+              {row[`v_${visitColumn.visitId}_finalResult`] && (
+                <div>
+                  Final Result: {row[`v_${visitColumn.visitId}_finalResult`]}
+                </div>
+              )}
+              {row[`v_${visitColumn.visitId}_referenceRange`] && (
+                <div>
+                  Ref. Range: {row[`v_${visitColumn.visitId}_referenceRange`]}
+                </div>
+              )}
+            </div>
+          )
           return (
-            <Tooltip title={row[`${visitColumn.dataIndex}`]}>
+            <Tooltip title={title} placement='right'>
               <span
                 style={{
                   color: row[`v_${visitColumn.visitId}_shouldFlag`]

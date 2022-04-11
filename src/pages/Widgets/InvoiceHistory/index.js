@@ -340,7 +340,7 @@ const InvoiceHistory = ({
         <CommonModal
           open={showVisitInvoice}
           onClose={toggleVisitInvoiceReport}
-          title='Visitation Invoice'
+          title='Invoice'
           maxWidth='lg'
         >
           <ReportViewer
