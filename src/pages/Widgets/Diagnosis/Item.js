@@ -58,20 +58,14 @@ const DiagnosisItem = ({
   diagnosisCode,
   currentSelectCategory,
 }) => {
-  const [
-    show,
-    setShow,
-  ] = useState(false)
+  const [show, setShow] = useState(false)
 
   const [
     ctComplicationPairedWithDiag,
     setCtComplicationPairedWithDiag,
   ] = useState([])
 
-  const [
-    showPersistMsg,
-    setShowPersistMsg,
-  ] = useState(false)
+  const [showPersistMsg, setShowPersistMsg] = useState(false)
 
   const { form } = arrayHelpers
 
@@ -87,10 +81,10 @@ const DiagnosisItem = ({
       if (op.complication && op.complication.length) {
         if (
           currentSelectCategory.length === 1 &&
-          currentSelectCategory.find((df) => df === 'isCdmpClaimable')
+          currentSelectCategory.find(df => df === 'isCdmpClaimable')
         ) {
           const complications = op.complication.filter(
-            (c) => c.cdmpComplicationCode,
+            c => c.cdmpComplicationCode,
           )
           setCtComplicationPairedWithDiag(complications || [])
         } else setCtComplicationPairedWithDiag(op.complication)
@@ -112,7 +106,7 @@ const DiagnosisItem = ({
       },
     })
   }
-  const onDataSouceChange = (data) => {
+  const onDataSouceChange = data => {
     if (
       form.values.corDiagnosis[index] &&
       form.values.corDiagnosis[index].diagnosisFK
@@ -120,15 +114,15 @@ const DiagnosisItem = ({
       const { diagnosisFK } = form.values.corDiagnosis[index]
       const ctsnomeddiagnosis = data || []
       const diagnosis = ctsnomeddiagnosis.find(
-        (item) => parseInt(item.id, 10) === parseInt(diagnosisFK, 10),
+        item => parseInt(item.id, 10) === parseInt(diagnosisFK, 10),
       )
       if (diagnosis) {
         if (
           currentSelectCategory.length === 1 &&
-          currentSelectCategory.find((df) => df === 'isCdmpClaimable')
+          currentSelectCategory.find(df => df === 'isCdmpClaimable')
         ) {
           const complications = diagnosis.complication.filter(
-            (c) => c.cdmpComplicationCode,
+            c => c.cdmpComplicationCode,
           )
           setCtComplicationPairedWithDiag(complications || [])
         } else setCtComplicationPairedWithDiag(diagnosis.complication || [])
@@ -140,7 +134,7 @@ const DiagnosisItem = ({
     saveDiagnosisAsFavourite(diagnosisCode, uid)
   }
 
-  const updateSelectCategory = (category) => {
+  const updateSelectCategory = category => {
     const { values: vals, setValues } = form
     vals.corDiagnosis[index].currentSelectCategory = category
     setValues(vals)
@@ -160,12 +154,12 @@ const DiagnosisItem = ({
                 options={filterOptions}
                 onChange={(v, newVal) => {
                   if (newVal.all === true) {
-                    updateSelectCategory(filterOptions.map((o) => o.value))
+                    updateSelectCategory(filterOptions.map(o => o.value))
                   } else if (newVal.all === false) {
                     updateSelectCategory([])
                   } else {
                     updateSelectCategory(
-                      (v.target.value || []).filter((c) => c !== 'all'),
+                      (v.target.value || []).filter(c => c !== 'all'),
                     )
                   }
                 }}
@@ -183,7 +177,7 @@ const DiagnosisItem = ({
             )}
             {!_.isEqual(
               favouriteDiagnosisCategory.sort(),
-              currentSelectCategory.filter((c) => c !== 'all').sort(),
+              currentSelectCategory.filter(c => c !== 'all').sort(),
             ) && (
               <a
                 style={{
@@ -193,7 +187,7 @@ const DiagnosisItem = ({
                 }}
                 onClick={() => {
                   saveCategoryAsFavourite(
-                    currentSelectCategory.filter((c) => c !== 'all'),
+                    currentSelectCategory.filter(c => c !== 'all'),
                     uid,
                   )
                 }}
@@ -206,7 +200,7 @@ const DiagnosisItem = ({
         <GridItem xs={6} style={{ paddingRight: 35 }}>
           <Field
             name={`corDiagnosis[${index}].diagnosisFK`}
-            render={(args) => (
+            render={args => (
               <DiagnosisSelect
                 onChange={onDiagnosisChange}
                 onDataSouceChange={onDataSouceChange}
@@ -220,7 +214,7 @@ const DiagnosisItem = ({
                 favouriteDiagnosis={favouriteDiagnosis}
                 handelSaveDiagnosisAsFavourite={handelSaveDiagnosisAsFavourite}
                 currentSelectCategory={currentSelectCategory.filter(
-                  (o) => o !== 'all',
+                  o => o !== 'all',
                 )}
                 {...args}
               />
@@ -241,35 +235,22 @@ const DiagnosisItem = ({
                     form.values.corDiagnosis[index].isNew === true ||
                     !form.values.corDiagnosis[index].defaultIsPersist
                       ? '180px'
-                      : '340px',
+                      : '400px',
                 }}
               >
-                <p
-                  style={{
-                    paddingLeft: 20,
-                    paddingBottom: theme.spacing(2),
-                    fontSize: '0.8em',
-                  }}
-                >
+                <p style={{ color: 'orange' }}>
                   {form.values.corDiagnosis[index].isNew === true ||
-                  !form.values.corDiagnosis[index].defaultIsPersist ? (
-                    'Remove diagnosis?'
-                  ) : (
-                    'Remove persist diagnosis?'
-                  )}
+                  !form.values.corDiagnosis[index].defaultIsPersist
+                    ? 'Remove diagnosis?'
+                    : 'Remove persist diagnosis?'}
                 </p>
                 {!form.values.corDiagnosis[index].isNew &&
-                form.values.corDiagnosis[index].defaultIsPersist &&
-                form.values.corDiagnosis[index].isPersist && (
-                  <div
-                    style={{
-                      fontSize: '0.8em',
-                      paddingBottom: theme.spacing(2),
-                    }}
-                  >
-                    Diagnosis will be removed from patient's medical problem
-                  </div>
-                )}
+                  form.values.corDiagnosis[index].defaultIsPersist &&
+                  form.values.corDiagnosis[index].isPersist && (
+                    <div style={{ marginBottom: 20 }}>
+                      Diagnosis will be removed from patient's medical problem.
+                    </div>
+                  )}
                 <Button
                   onClick={() => {
                     setShow(false)
@@ -294,11 +275,9 @@ const DiagnosisItem = ({
                   }}
                 >
                   {form.values.corDiagnosis[index].isNew === true ||
-                  !form.values.corDiagnosis[index].defaultIsPersist ? (
-                    'Confirm'
-                  ) : (
-                    'Current Visit'
-                  )}
+                  !form.values.corDiagnosis[index].defaultIsPersist
+                    ? 'Confirm'
+                    : 'Current Visit'}
                 </Button>
                 <Button
                   color='primary'
@@ -346,47 +325,45 @@ const DiagnosisItem = ({
             maxTagCount={2}
             value={_.uniqBy(
               (form.values.corDiagnosis[index].corComplication || [])
-                .filter((c) => !c.isDeleted)
-                .map((o) => o.complicationFK),
+                .filter(c => !c.isDeleted)
+                .map(o => o.complicationFK),
             )}
             disableAll
             onChange={(v, opts) => {
               const { setFieldValue, values } = form
 
-              let newcorComplication = (values.corDiagnosis[index]
-                .corComplication || [])
-                .map((c) => {
-                  if (
-                    !c.isDeleted &&
-                    !opts.find((o) => o.id === c.complicationFK)
-                  ) {
-                    c.isDeleted = true
-                  } else if (
-                    c.isDeleted &&
-                    opts.find((o) => o.id === c.complicationFK)
-                  ) {
-                    c.isDeleted = false
-                  }
-                  return c
-                })
+              let newcorComplication = (
+                values.corDiagnosis[index].corComplication || []
+              ).map(c => {
+                if (
+                  !c.isDeleted &&
+                  !opts.find(o => o.id === c.complicationFK)
+                ) {
+                  c.isDeleted = true
+                } else if (
+                  c.isDeleted &&
+                  opts.find(o => o.id === c.complicationFK)
+                ) {
+                  c.isDeleted = false
+                }
+                return c
+              })
 
               newcorComplication = [
                 ...newcorComplication,
                 ...opts
                   .filter(
-                    (o) =>
-                      !newcorComplication.find(
-                        (c) => c.complicationFK === o.id,
-                      ),
+                    o =>
+                      !newcorComplication.find(c => c.complicationFK === o.id),
                   )
-                  .map((o) => {
+                  .map(o => {
                     return { complicationFK: o.id }
                   }),
               ]
 
               // remove new delete data
               newcorComplication = newcorComplication.filter(
-                (c) => !(!c.id && c.isDeleted),
+                c => !(!c.id && c.isDeleted),
               )
               setFieldValue(
                 `corDiagnosis[${index}]corComplication`,
@@ -398,13 +375,13 @@ const DiagnosisItem = ({
         <GridItem xs={6}>
           <FastField
             name={`corDiagnosis[${index}].onsetDate`}
-            render={(args) => {
+            render={args => {
               return (
                 <DatePicker
                   label='Onset Date'
                   allowClear={false}
                   {...args}
-                  onChange={(value) => {
+                  onChange={value => {
                     const { setFieldValue } = form
                     if (value === '') {
                       setFieldValue(
@@ -422,7 +399,7 @@ const DiagnosisItem = ({
           <div style={{ position: 'relative' }}>
             <FastField
               name={`corDiagnosis[${index}].isPersist`}
-              render={(args) => {
+              render={args => {
                 return (
                   <Checkbox
                     inputLabel='Persist'
@@ -460,7 +437,7 @@ const DiagnosisItem = ({
         <GridItem xs={12}>
           <FastField
             name={`corDiagnosis[${index}].remarks`}
-            render={(args) => {
+            render={args => {
               return (
                 <TextField label='Remarks' multiline rowsMax={6} {...args} />
               )
