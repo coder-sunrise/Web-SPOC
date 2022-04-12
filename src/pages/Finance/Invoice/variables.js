@@ -14,7 +14,7 @@ export const InvoiceGridColumns = [
   { name: 'patientPayableAmount', title: 'Payable Amount' },
   { name: 'totalCreditNoteAmt', title: 'Credit Notes' },
   { name: 'patientOutstanding', title: 'Patient O/S' },
-  { name: 'governmentOutstanding', title: 'Govt. O/S' },
+  // { name: 'governmentOutstanding', title: 'Govt. O/S' },
   { name: 'corporateOutstanding', title: 'Co-Payer O/S' },
   { name: 'totalOutstanding', title: 'Total O/S Bal.' },
 ]
@@ -52,12 +52,12 @@ export const InvoiceGridColExtensions = [
     currency: true,
     sortingEnabled: false,
   },
-  {
-    columnName: 'governmentOutstanding',
-    type: 'currency',
-    currency: true,
-    sortingEnabled: false,
-  },
+  // {
+  //   columnName: 'governmentOutstanding',
+  //   type: 'currency',
+  //   currency: true,
+  //   sortingEnabled: false,
+  // },
   {
     columnName: 'corporateOutstanding',
     type: 'currency',
