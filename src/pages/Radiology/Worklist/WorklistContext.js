@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState, createContext } from 'react'
 import { useSelector, useDispatch } from 'dva'
 import moment from 'moment'
 import { VALUE_KEYS } from '@/utils/constants'
+import { useVisitTypes } from '@/utils/hooks'
 import { refresh } from '@/services/login'
 const WorklistContext = createContext(null)
 
@@ -18,6 +19,7 @@ export const WorklistContextProvider = props => {
   const [currentFilter, setCurrentFilter] = useState(null)
   const { settings } = useSelector(s => s.clinicSettings)
   const { autoRefreshRadiologyWorklistInterval = 30 } = settings
+  const visitTypes = useVisitTypes()
 
   const timer = React.useRef(null)
 
@@ -177,6 +179,7 @@ export const WorklistContextProvider = props => {
         getCombinedOrders,
         radiologyQueueCallList,
         pharmacyQueueCallList,
+        visitTypes,
       }}
     >
       {props.children}
