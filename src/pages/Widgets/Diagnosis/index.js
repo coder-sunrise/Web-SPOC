@@ -47,7 +47,7 @@ class Diagnosis extends PureComponent {
         this.props.dispatch({
           type: 'diagnosis/updateState',
           payload: {
-            favouriteDiagnosisLanguage: favouriteLanguage,
+            favouriteDiagnosisLanguage: favouriteLanguage || 'EN',
           },
         })
       }
