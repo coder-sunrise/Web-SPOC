@@ -50,15 +50,20 @@ export const DataGridColExtensions = [
             }}
           >
             {row.itemType}
-            <div style={{ position: 'relative', top: 2 }}>
-              {drugMixtureIndicator(row, -20)}
+            <div style={{ position: 'absolute', top: '-1px', right: '-6px' }}>
+              <div
+                style={{
+                  display: 'inline-block',
+                  position: 'relative',
+                }}
+              >
+                {drugMixtureIndicator(row)}
+              </div>
               {row.isPreOrder && (
                 <Tooltip title='New Pre-Order'>
                   <div
                     style={{
-                      position: 'absolute',
-                      bottom: 2,
-                      right: -30,
+                      position: 'relative',
                       borderRadius: 4,
                       backgroundColor: '#4255bd',
                       fontWeight: 500,
@@ -66,9 +71,10 @@ export const DataGridColExtensions = [
                       fontSize: '0.7rem',
                       padding: '2px 3px',
                       height: 20,
+                      margin: '0px 1px',
+                      display: 'inline-block',
                     }}
                   >
-                    {' '}
                     Pre
                   </div>
                 </Tooltip>

@@ -54,14 +54,14 @@ const styles = theme => ({
     whiteSpace: 'pre-wrap',
   },
   rightIcon: {
-    position: 'absolute',
-    bottom: 2,
+    position: 'relative',
     fontWeight: 600,
     color: 'white',
     fontSize: '0.7rem',
     padding: '2px 3px',
     height: 20,
     cursor: 'pointer',
+    margin: '0px 1px',
   },
   subRow: {
     '& > td:first-child': {
@@ -888,15 +888,17 @@ const Main = props => {
                 <Tooltip title={row.itemName}>
                   <span>{row.itemName}</span>
                 </Tooltip>
-                <div style={{ position: 'relative', top: 2 }}>
+                <div
+                  style={{ position: 'absolute', top: '-1px', right: '-6px' }}
+                >
                   {row.isExclusive && (
                     <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                       <div
                         className={classes.rightIcon}
                         style={{
-                          right: -30,
                           borderRadius: 4,
                           backgroundColor: 'green',
+                          display: 'inline-block',
                         }}
                       >
                         Excl.

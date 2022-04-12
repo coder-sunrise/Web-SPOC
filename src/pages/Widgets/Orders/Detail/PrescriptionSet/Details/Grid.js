@@ -10,17 +10,17 @@ const wrapCellTextStyle = {
 }
 
 const rightIcon = {
-  position: 'absolute',
-  bottom: 2,
+  position: 'relative',
   fontWeight: 500,
   color: 'white',
   fontSize: '0.7rem',
   padding: '2px 3px',
   height: 20,
-  right: -30,
   borderRadius: 4,
   backgroundColor: 'green',
   cursor: 'pointer',
+  display: 'inline-block',
+  margin: '0px 1px',
 }
 
 const Grid = ({ prescriptionSet, dispatch }) => {
@@ -132,7 +132,13 @@ const Grid = ({ prescriptionSet, dispatch }) => {
               paddingRight = 10
             }
             return (
-              <div style={{ ...wrapCellTextStyle, paddingRight: paddingRight }}>
+              <div
+                style={{
+                  ...wrapCellTextStyle,
+                  paddingRight: paddingRight,
+                  position: 'relative',
+                }}
+              >
                 <Tooltip title={texts}>
                   <span>
                     {warningLabel && (
@@ -143,8 +149,17 @@ const Grid = ({ prescriptionSet, dispatch }) => {
                     <span>{texts}</span>
                   </span>
                 </Tooltip>
-                <div style={{ position: 'relative' }}>
-                  {row.isDrugMixture && drugMixtureIndicator(row, -20)}
+                <div
+                  style={{ position: 'absolute', top: '-1px', right: '-6px' }}
+                >
+                  <div
+                    style={{
+                      display: 'inline-block',
+                      position: 'relative',
+                    }}
+                  >
+                    {row.isDrugMixture && drugMixtureIndicator(row)}
+                  </div>
                   {row.isExclusive && (
                     <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                       <div style={rightIcon}>Excl.</div>

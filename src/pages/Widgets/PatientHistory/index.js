@@ -111,14 +111,14 @@ const styles = theme => ({
     width: '100%',
   },
   rightIcon: {
-    position: 'absolute',
-    bottom: 2,
-    fontWeight: 500,
+    position: 'relative',
+    fontWeight: 600,
     color: 'white',
     fontSize: '0.7rem',
     padding: '2px 3px',
     height: 20,
     cursor: 'pointer',
+    margin: '0px 1px',
   },
 })
 @connect(

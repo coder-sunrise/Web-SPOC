@@ -1005,7 +1005,7 @@ export default ({
     whiteSpace: 'pre-wrap',
   }
 
-  const drugMixtureIndicator = (row, right) => {
+  const drugMixtureIndicator = row => {
     if (row.type !== '1' || !row.isDrugMixture) return null
     const activePrescriptionItemDrugMixture = row.corPrescriptionItemDrugMixture.filter(
       item => !item.isDeleted,
@@ -1015,7 +1015,6 @@ export default ({
       <DrugMixtureInfo
         values={activePrescriptionItemDrugMixture}
         isShowTooltip={true}
-        right={right}
       />
     )
   }
@@ -1079,9 +1078,8 @@ export default ({
         <Tooltip title='New'>
           <div
             style={{
-              position: 'absolute',
-              bottom: 3,
-              right: -15,
+              position: 'relative',
+              top: 3,
               borderRadius: 8,
               height: 16,
               width: 16,
@@ -1111,9 +1109,8 @@ export default ({
         >
           <div
             style={{
-              position: 'absolute',
-              bottom: 3,
-              right: -15,
+              position: 'relative',
+              top: 3,
               borderRadius: 8,
               height: 16,
               width: 16,
@@ -1132,9 +1129,9 @@ export default ({
         <Tooltip title='Cancelled'>
           <div
             style={{
-              position: 'absolute',
-              bottom: -4,
-              right: -16,
+              position: 'relative',
+              top: 1,
+              right: '-1px',
               cursor: 'pointer',
             }}
           >
@@ -1563,14 +1560,25 @@ export default ({
               }
 
               let paddingRight = 0
-              if (row.isPreOrder && row.isExclusive) {
+              if (
+                (row.isPreOrder || row.actualizedPreOrderItemFK) &&
+                row.isExclusive
+              ) {
                 paddingRight = 52
-              } else if (row.isPreOrder || row.isExclusive) {
+              } else if (
+                row.isPreOrder ||
+                row.actualizedPreOrderItemFK ||
+                row.isExclusive
+              ) {
                 paddingRight = 24
               }
 
               if (row.isDrugMixture || radiologyWorkitemStatusFK) {
                 paddingRight = 10
+              }
+
+              if (row.actualizedPreOrderItemFK && radiologyWorkitemStatusFK) {
+                paddingRight = 34
               }
 
               return (
@@ -1585,16 +1593,29 @@ export default ({
                     <Tooltip title={texts}>
                       <span>{texts}</span>
                     </Tooltip>
-                    <div style={{ position: 'relative', top: 2 }}>
-                      {drugMixtureIndicator(row, -20)}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '-1px',
+                        right: '-6px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'inline-block',
+                          position: 'relative',
+                        }}
+                      >
+                        {drugMixtureIndicator(row)}
+                      </div>
                       {row.isPreOrder && (
                         <Tooltip title='New Pre-Order'>
                           <div
                             className={classes.rightIcon}
                             style={{
-                              right: -30,
                               borderRadius: 4,
                               backgroundColor: '#4255bd',
+                              display: 'inline-block',
                             }}
                           >
                             Pre
@@ -1606,9 +1627,9 @@ export default ({
                           <div
                             className={classes.rightIcon}
                             style={{
-                              right: -5,
                               borderRadius: 4,
                               backgroundColor: 'green',
+                              display: 'inline-block',
                             }}
                           >
                             Pre
@@ -1620,20 +1641,22 @@ export default ({
                           <div
                             className={classes.rightIcon}
                             style={{
-                              right:
-                                row.isPreOrder || row.actualizedPreOrderItemFK
-                                  ? -60
-                                  : -30,
                               borderRadius: 4,
                               backgroundColor: 'green',
+                              display: 'inline-block',
                             }}
                           >
                             Excl.
                           </div>
                         </Tooltip>
                       )}
-                      {radiologyWorkitemStatusFK &&
-                        radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
+                      {radiologyWorkitemStatusFK && (
+                        <div
+                          style={{ display: 'inline-block', margin: '0px 1px' }}
+                        >
+                          {radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
