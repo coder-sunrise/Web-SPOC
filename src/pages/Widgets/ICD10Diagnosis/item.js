@@ -133,14 +133,12 @@ const ICD10DiagnosisItem = ({
                     form.values.corDiagnosis[index].isNew === true ||
                     !form.values.corDiagnosis[index].defaultIsPersist
                       ? '180px'
-                      : '340px',
+                      : '400px',
                 }}
               >
                 <p
                   style={{
-                    paddingLeft: 20,
-                    paddingBottom: theme.spacing(2),
-                    fontSize: '0.8em',
+                    color: 'orange',
                   }}
                 >
                   {form.values.corDiagnosis[index].isNew === true ||
@@ -151,13 +149,8 @@ const ICD10DiagnosisItem = ({
                 {!form.values.corDiagnosis[index].isNew &&
                   form.values.corDiagnosis[index].defaultIsPersist &&
                   form.values.corDiagnosis[index].isPersist && (
-                    <div
-                      style={{
-                        fontSize: '0.8em',
-                        paddingBottom: theme.spacing(2),
-                      }}
-                    >
-                      Diagnosis will be removed from patient's medical problem
+                    <div style={{ marginBottom: 20 }}>
+                      Diagnosis will be removed from patient's medical problem.
                     </div>
                   )}
                 <Button
