@@ -1354,6 +1354,7 @@ class Form extends React.PureComponent {
                     disabled={_disableAppointmentDate}
                     visitOrderTemplateOptions={visitOrderTemplateOptions}
                     patientProfileFK={values.patientProfileFK}
+                    values={values}
                   />
                   <GridItem xs md={12} className={classes.verticalSpacing}>
                     <AppointmentDataGrid

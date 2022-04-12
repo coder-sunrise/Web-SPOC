@@ -15,6 +15,7 @@ import {
 } from '@/components'
 import * as Helper from './helper'
 import { primaryColor } from '@/assets/jss'
+import { APPOINTMENT_STATUSOPTIONS } from '@/utils/constants'
 
 const styles = theme => ({
   root: {
@@ -111,7 +112,9 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
         }`,
     )
     .join(', ')
-
+  const status = APPOINTMENT_STATUSOPTIONS.find(
+    x => x.id === appointmentStatusFk,
+  )
   return (
     <div className={classes.root}>
       <div
@@ -144,28 +147,24 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
           />
         </GridItem>
         <GridItem md={6}>
-          <CodeSelect
-            disabled
-            code='ctappointmenttype'
+          <TextField
             label='Appt. Type'
-            labelField='displayValue'
-            valueField='id'
-            value={appointmentTypeFK}
+            value={appointmentType?.displayValue || ''}
+            disabled
           />
         </GridItem>
         <GridItem md={6}>
-          <CodeSelect
-            disabled
-            code='ltappointmentstatus'
-            label='Appt. Status'
-            value={appointmentStatusFk && Number(appointmentStatusFk)}
-          />
+          <TextField label='Appt. Status' value={status?.name || ''} disabled />
         </GridItem>
         <GridItem md={6}>
           <TextField disabled label='Book By' value={bookedByUser} />
         </GridItem>
         <GridItem md={6}>
-          <DatePicker disabled label='Book On' value={bookOn} />
+          <TextField
+            label='Book On'
+            value={moment(bookOn).format('DD MMM YYYY')}
+            disabled
+          />
         </GridItem>
         <GridItem md={6}>
           <TextField disabled label='Update By' value={updateByUser} />
