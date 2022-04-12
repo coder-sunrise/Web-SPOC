@@ -101,6 +101,7 @@ const VisitInfoCard = ({
   isReadOnly = false,
   fromMedicalCheckupReporting = false,
   isVisitReadonlyAfterSigned = false,
+  isDoctorConsulted = false,
   attachments,
   handleUpdateAttachments,
   existingQNo,
@@ -341,7 +342,8 @@ const VisitInfoCard = ({
             name={FormField['visit.doctorProfileFk']}
             render={args => (
               <DoctorProfileSelect
-                // disabled={isReadOnly}
+                disabled={isVisitReadonlyAfterSigned || isDoctorConsulted}
+                authority='none'
                 onChange={(v, op = {}) => handleDoctorChange(v, op)}
                 label={
                   visitType === VISIT_TYPE.OTC

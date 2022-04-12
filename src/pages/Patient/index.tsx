@@ -173,12 +173,22 @@ const defaultColumns = [
           title='Select “All” will retrieve active and inactive co-payers'
         >
           <CodeSelect
-            style={{ width: 250 }}
+            style={{ width: 350 }}
             label={formatMessage({
               id: 'finance.scheme.search.cpname',
             })}
             maxTagCount={0}
             mode='multiple'
+            renderDropdown={option => {
+              return (
+                <div>
+                  <span
+                    style={{ fontWeight: 'bold' }}
+                  >{`${option.displayValue}`}</span>
+                  {option.code ? ` (${option.code})` : ''}
+                </div>
+              )
+            }}
             code='ctCopayer'
             labelField='displayValue'
           />
