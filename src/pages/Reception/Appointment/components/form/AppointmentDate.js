@@ -9,8 +9,12 @@ import {
   TextField,
   CodeSelect,
 } from '@/components'
+import { APPOINTMENT_STATUSOPTIONS } from '@/utils/constants'
 
-const AppointmentDate = ({ disabled, visitOrderTemplateOptions }) => {
+const AppointmentDate = ({ values, disabled, visitOrderTemplateOptions }) => {
+  const status = APPOINTMENT_STATUSOPTIONS.find(
+    x => x.id === values.appointmentStatusFk,
+  )
   return (
     <React.Fragment>
       <GridItem xs md={2}>
@@ -29,16 +33,10 @@ const AppointmentDate = ({ disabled, visitOrderTemplateOptions }) => {
       </GridItem>
 
       <GridItem xs md={2}>
-        <FastField
-          name='appointmentStatusFk'
-          render={args => (
-            <CodeSelect
-              {...args}
-              disabled
-              code='ltappointmentstatus'
-              label='Appointment Status'
-            />
-          )}
+        <TextField
+          label='Appointment Status'
+          value={status?.name || ''}
+          disabled
         />
       </GridItem>
 
