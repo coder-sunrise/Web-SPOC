@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
+import numeral from 'numeral'
 // material icon
 import { Divider, withStyles } from '@material-ui/core'
 import Calendar from '@material-ui/icons/CalendarToday'
@@ -69,6 +70,7 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
     updateByUser,
     updateDate,
     resourceName,
+    preOrder = [],
   } = popoverEvent
 
   const date = moment(appointmentDate)
@@ -100,6 +102,15 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
   const appointmentColor = appointmentType
     ? appointmentType.tagColorHex
     : primaryColor
+
+  const preOrderStr = preOrder
+    .map(
+      x =>
+        `${x.itemName || ''} ${numeral(x.quantity || '').format('0.0')}${
+          x.uom ? ` ${x.uom}` : ''
+        }`,
+    )
+    .join(', ')
 
   return (
     <div className={classes.root}>
@@ -174,6 +185,9 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
             label='Remarks'
             value={appointmentRemarks}
           />
+        </GridItem>
+        <GridItem md={12}>
+          <span>Pre Order : {preOrderStr}</span>
         </GridItem>
       </GridContainer>
     </div>

@@ -13,6 +13,7 @@ const fns = {
           ...result.data.data.map(item => ({
             ...item,
             appointment_Resources: JSON.parse(item.appointment_Resources) || [],
+            preOrder: JSON.parse(item.preOrder) || [],
           })),
         ],
       },
