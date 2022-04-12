@@ -91,7 +91,7 @@ class Grid extends PureComponent {
                   { name: 'copayerContactPerson', title: 'Contact Person' },
                   { name: 'contactNo', title: 'Contact No.' },
                   { name: 'copayerContactPersonEmail', title: 'Email' },
-                  { name: 'url', title: 'Website' },
+                  { name: 'remark', title: 'Remarks' },
                   { name: 'creditFacility', title: 'Credit Facility' },
                   { name: 'isActive', title: 'Status' },
                   { name: 'action', title: 'Action' },
@@ -121,35 +121,22 @@ class Grid extends PureComponent {
           }
           columnExtensions={[
             {
-              columnName: 'url',
+              columnName: 'remark',
               sortingEnabled: false,
-              width: 300,
-              render: row => {
-                return (
-                  <a
-                    rel='noopener noreferrer'
-                    target='_blank'
-                    href={
-                      row.contact &&
-                      row.contact.contactWebsite &&
-                      row.contact.contactWebsite.website !== ''
-                        ? row.contact.contactWebsite.website
-                        : '-'
-                    }
-                  >
-                    {row.contact &&
-                    row.contact.contactWebsite &&
-                    row.contact.contactWebsite.website !== ''
-                      ? row.contact.contactWebsite.website
-                      : '-'}
-                  </a>
-                )
-              },
+              width: 200,
             },
             {
               columnName: 'coPayerTypeName',
               sortBy: 'coPayerTypeFK',
-              width: 140,
+              width: 120,
+            },
+            {
+              columnName: 'code',
+              sortBy: 'code',
+              width: 120,
+            },
+            {
+              columnName: 'displayValue',
             },
             {
               columnName: 'officeNum',
@@ -167,6 +154,7 @@ class Grid extends PureComponent {
             },
             {
               columnName: 'contactPerson',
+              width: 150,
               render: row => (
                 <span>{row.contactPerson ? row.contactPerson : '-'}</span>
               ),
@@ -174,6 +162,7 @@ class Grid extends PureComponent {
             {
               columnName: 'copayerContactPerson',
               sortingEnabled: false,
+              width: 150,
               render: row => {
                 let cell = <span>-</span>
                 if (
@@ -197,6 +186,7 @@ class Grid extends PureComponent {
             {
               columnName: 'copayerContactPersonEmail',
               sortingEnabled: false,
+              width: 150,
               render: row => {
                 let cell = <span>-</span>
                 if (
@@ -220,6 +210,7 @@ class Grid extends PureComponent {
             {
               columnName: 'creditFacility',
               sortBy: 'creditFacilityFKNavigation.DisplayValue',
+              width: 120,
             },
             {
               columnName: 'faxNo',
@@ -275,7 +266,7 @@ class Grid extends PureComponent {
               type: 'select',
               options: status,
               align: 'center',
-              width: 100,
+              width: 80,
             },
             {
               columnName: 'isGSTEnabled',

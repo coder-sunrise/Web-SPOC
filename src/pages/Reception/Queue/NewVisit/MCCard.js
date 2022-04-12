@@ -32,6 +32,7 @@ const MCCard = ({
   clinicSettings,
   ctlanguage = [],
   isVisitReadonlyAfterSigned,
+  isDoctorConsulted,
   validateReportLanguage,
 }) => {
   const commitChanges = ({ rows }) => {
@@ -206,7 +207,7 @@ const MCCard = ({
             showCommandColumn: false,
             showAddCommand: fromMedicalCheckupReporting
               ? false
-              : !isVisitReadonlyAfterSigned,
+              : !isVisitReadonlyAfterSigned && !isDoctorConsulted,
             onCommitChanges: commitChanges,
           }}
           schema={reportingDoctorSchema}
