@@ -115,7 +115,6 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
   const status = APPOINTMENT_STATUSOPTIONS.find(
     x => x.id === appointmentStatusFk,
   )
-  console.log('111', appointmentType)
   return (
     <div className={classes.root}>
       <div
