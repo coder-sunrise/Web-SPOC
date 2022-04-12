@@ -40,7 +40,6 @@ const styles = theme => ({
     position: 'relative',
     border: '1px solid #CCCCCC',
     backgroundColor: 'white',
-    width: 610,
   },
 })
 
@@ -208,7 +207,7 @@ class IndividualCommentDetails extends PureComponent {
       return (
         <div
           style={{
-            width: 100,
+            width: 99,
             textAlign: 'center',
             color: '#cccccc',
             paddingTop: 8,
@@ -219,9 +218,6 @@ class IndividualCommentDetails extends PureComponent {
       )
     return (
       <List
-        style={{
-          width: 100,
-        }}
         component='nav'
         classes={{
           root: this.props.classes.listRoot,
@@ -358,7 +354,7 @@ class IndividualCommentDetails extends PureComponent {
             disabled={!isModifyCommentEnable}
           />
         </div>
-        <div style={{ width: commentGroupList.length ? 'auto' : '400px' }}>
+        <div>
           {commentGroupList.map(group => {
             return (
               <div
@@ -369,6 +365,7 @@ class IndividualCommentDetails extends PureComponent {
                   borderTop: '1px solid #CCCCCC',
                   borderLeft: '1px solid #CCCCCC',
                   borderBottom: '1px solid #CCCCCC',
+                  width: 100,
                 }}
               >
                 {this.getSelection(group)}

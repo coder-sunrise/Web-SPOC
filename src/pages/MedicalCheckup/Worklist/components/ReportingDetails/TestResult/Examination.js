@@ -275,27 +275,29 @@ const Examination = props => {
     )
 
     ctexaminationcategory.forEach(category => {
-      defaultData.push({
-        id: category.id,
-        examinationType: category.name,
-        isGroup: true,
-        selectedLanguage,
-      })
       const examinationitems = examinationItem.filter(
         item => item.examinationCategoryFK === category.id,
       )
-      defaultData = defaultData.concat(
-        examinationitems.map(item => ({
-          id: item.id,
-          examinationType: item.displayValue,
-          isGroup: false,
+      if (examinationitems.length) {
+        defaultData.push({
+          id: category.id,
+          examinationType: category.name,
+          isGroup: true,
           selectedLanguage,
-          isSelected:
-            selectExaminationItemId && item.id === selectExaminationItemId,
-          status: item.status,
-          examinationItemService: item.examinationItemService,
-        })),
-      )
+        })
+        defaultData = defaultData.concat(
+          examinationitems.map(item => ({
+            id: item.id,
+            examinationType: item.displayValue,
+            isGroup: false,
+            selectedLanguage,
+            isSelected:
+              selectExaminationItemId && item.id === selectExaminationItemId,
+            status: item.status,
+            examinationItemService: item.examinationItemService,
+          })),
+        )
+      }
     })
     return defaultData
   }
@@ -394,7 +396,7 @@ const Examination = props => {
     <div
       style={{
         position: 'relative',
-        paddingRight: selectExaminationItemId ? 610 : 0,
+        paddingRight: selectExaminationItemId ? 600 : 0,
         height: height - 48,
         border: '1px solid #CCCCCC',
       }}
