@@ -790,6 +790,11 @@ class PatientHistory extends Component {
         </div>
       )
     }
+    const {
+      isFromEditOrder,
+      editDispenseType,
+      editDispenseReason,
+    } = history.patientHistoryDetail
     let current = {
       ...history.patientHistoryDetail,
       visitAttachments: history.visitAttachments,
@@ -823,56 +828,71 @@ class PatientHistory extends Component {
     const { labelPrinterSize } = settings
     const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
 
+    const isShowContent = currentTagWidgets.length > 0 || isFromEditOrder
+
     return (
       <div
         style={{
           padding: 10,
         }}
       >
-        {currentTagWidgets.length > 0 ? (
-          currentTagWidgets.map(o => {
-            const Widget = o.component
-            return (
-              <div>
-                <span
-                  style={{
-                    fontWeight: 500,
-                    color: 'darkBlue',
-                    fontSize: '0.85rem',
-                  }}
-                >
-                  <span>{o.name}</span>
-                  {o.name === 'Orders' && current.isExistsActualizationHistory && (
-                    <span>
-                      <Link
-                        style={{
-                          marginLeft: 10,
-                          textDecoration: 'underline',
-                        }}
-                        onClick={() => {
-                          this.viewActualizationHistory(current.orders)
-                        }}
-                      >
-                        Actualization History
-                      </Link>
-                    </span>
+        {isShowContent ? (
+          <div>
+            {currentTagWidgets.map(o => {
+              const Widget = o.component
+              return (
+                <div>
+                  <span
+                    style={{
+                      fontWeight: 500,
+                      color: 'darkBlue',
+                      fontSize: '0.85rem',
+                    }}
+                  >
+                    <span>{o.name}</span>
+                    {o.name === 'Orders' &&
+                      current.isExistsActualizationHistory && (
+                        <span>
+                          <Link
+                            style={{
+                              marginLeft: 10,
+                              textDecoration: 'underline',
+                            }}
+                            onClick={() => {
+                              this.viewActualizationHistory(current.orders)
+                            }}
+                          >
+                            Actualization History
+                          </Link>
+                        </span>
+                      )}
+                  </span>
+                  {Widget ? (
+                    <Widget
+                      current={current}
+                      visitDetails={visitDetails}
+                      {...this.props}
+                      setFieldValue={this.props.setFieldValue}
+                      isFullScreen={isFullScreen}
+                      showDrugLabelRemark={showDrugLabelRemark}
+                    />
+                  ) : (
+                    ''
                   )}
-                </span>
-                {Widget ? (
-                  <Widget
-                    current={current}
-                    visitDetails={visitDetails}
-                    {...this.props}
-                    setFieldValue={this.props.setFieldValue}
-                    isFullScreen={isFullScreen}
-                    showDrugLabelRemark={showDrugLabelRemark}
-                  />
-                ) : (
-                  ''
-                )}
-              </div>
-            )
-          })
+                </div>
+              )
+            })}
+            {isFromEditOrder && (
+              <div
+                style={{ marginBottom: 6 }}
+              >{`Edit Order Reason: ${editDispenseType}${
+                WidgetConfig.hasValue(editDispenseReason) &&
+                editDispenseReason.trim().length
+                  ? `, ${editDispenseReason}`
+                  : ''
+              }`}</div>
+            )}
+          </div>
         ) : (
           <div> No Data</div>
         )}
