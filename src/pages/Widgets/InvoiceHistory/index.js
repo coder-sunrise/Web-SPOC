@@ -26,7 +26,6 @@ import { INVOICE_REPORT_TYPES } from '@/utils/constants'
 import MenuItem from '@material-ui/core/MenuItem'
 import MenuList from '@material-ui/core/MenuList'
 import PaymentDetails from './PaymentDetails'
-import './CustomStyle.css'
 
 const styles = () => ({
   totalOSStyle: {
