@@ -15,6 +15,7 @@ import {
   NumberInput,
   notification,
   Tooltip,
+  LocalSearchSelect,
 } from '@/components'
 import Yup from '@/utils/yup'
 import { getUniqueId, getTranslationValue } from '@/utils/utils'
@@ -858,9 +859,21 @@ class OrderSet extends PureComponent {
     }
     return false
   }
-
+  matchSearch = (option, input) => {
+    const lowerCaseInput = input.toLowerCase()
+    return (
+      option.code.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+      option.displayValue.toLowerCase().indexOf(lowerCaseInput) >= 0
+    )
+  }
   render() {
-    const { theme, values, footer, from } = this.props
+    const {
+      theme,
+      values,
+      footer,
+      from,
+      codetable: { inventoryorderset = [] },
+    } = this.props
     return (
       <Authorized
         authority={GetOrderItemAccessRight(
@@ -876,12 +889,13 @@ class OrderSet extends PureComponent {
                 render={args => {
                   return (
                     <div id={`autofocus_${values.type}`}>
-                      <CodeSelect
+                      <LocalSearchSelect
                         temp
                         label='Order Set Name'
-                        code='inventoryorderset'
                         labelField='displayValue'
                         onChange={this.changeOrderSet}
+                        options={inventoryorderset}
+                        matchSearch={this.matchSearch}
                         {...args}
                       />
                     </div>

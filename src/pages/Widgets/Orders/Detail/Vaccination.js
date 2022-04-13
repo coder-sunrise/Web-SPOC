@@ -21,6 +21,7 @@ import {
   Switch,
   Checkbox,
   notification,
+  LocalSearchSelect,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 import Yup from '@/utils/yup'
@@ -645,6 +646,14 @@ class Vaccination extends PureComponent {
     }
   }
 
+  matchSearch = (option, input) => {
+    const lowerCaseInput = input.toLowerCase()
+    return (
+      option.code.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+      option.displayValue.toLowerCase().indexOf(lowerCaseInput) >= 0
+    )
+  }
+
   render() {
     const {
       theme,
@@ -696,16 +705,16 @@ class Vaccination extends PureComponent {
                       id={`autofocus_${values.type}`}
                       style={{ position: 'relative' }}
                     >
-                      <CodeSelect
+                      <LocalSearchSelect
                         temp
                         label='Vaccination Name'
                         labelField='combinDisplayValue'
-                        code='inventoryvaccination'
                         onChange={this.changeVaccination}
                         options={this.getVaccinationOptions()}
                         {...args}
                         style={{ paddingRight: 20 }}
                         disabled={values.isPackage || isDisabledNoPaidPreOrder}
+                        matchSearch={this.matchSearch}
                       />
                       <LowStockInfo sourceType='vaccination' {...this.props} />
                     </div>
