@@ -146,7 +146,7 @@ export default createFormViewModel({
           !newPatient &&
           Number(currentId) &&
           (patient.version !== version ||
-            (patient.entity && patient.entity.id !== currentId))
+            (patient.entity?.id !== currentId))
         ) {
           yield put({
             type: 'query',
