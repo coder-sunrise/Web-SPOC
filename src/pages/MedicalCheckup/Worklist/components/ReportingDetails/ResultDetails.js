@@ -13,7 +13,7 @@ const styles = () => ({
 })
 
 const ResultDetails = props => {
-  const { visitId, showResultDetails, includeExamination } = props
+  const { visitId, showResultDetails } = props
   const [data, setData] = useState([])
   const [loaded, setLoaded] = useState(false)
   const dispatch = useDispatch()
@@ -99,7 +99,7 @@ const ResultDetails = props => {
           )}
         />
       )}
-      {includeExamination && data?.radiologyResultDetails && (
+      {data?.radiologyResultDetails && (
         <List
           itemLayout='horizontal'
           header={

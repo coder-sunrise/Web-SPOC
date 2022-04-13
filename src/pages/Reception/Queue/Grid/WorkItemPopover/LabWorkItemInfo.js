@@ -181,10 +181,12 @@ const LabWorkItemInfo = props => {
                   {labWorkitem.isAcknowledged && (
                     <Tooltip
                       title={`Acknowledged By: ${
-                        labWorkitem.acknowledgeBy
-                      }, ${moment(labWorkitem.acknowledgeDate).format(
-                        'DD MMM YYYY, HH:mm',
-                      )}`}
+                        labWorkitem.acknowledgeByUserTitle
+                          ? labWorkitem.acknowledgeByUserTitle + ', '
+                          : ''
+                      }${labWorkitem.acknowledgeBy}, ${moment(
+                        labWorkitem.acknowledgeDate,
+                      ).format('DD MMM YYYY, HH:mm')}`}
                     >
                       <CheckCircleOutlined
                         style={{
