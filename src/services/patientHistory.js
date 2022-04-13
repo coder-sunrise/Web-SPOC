@@ -1,7 +1,7 @@
 import * as service from '@/services/common'
 
 const url = '/api/PatientHistory'
-const invoiceHistoryUrl = '/api/invoice'
+const invoiceHistoryUrl = '/api/invoice/patient'
 const queueUrl = '/api/queue'
 
 const fns = {
