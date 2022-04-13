@@ -136,7 +136,11 @@ export const ResultTable = props => {
                 )}
                 {data.isAcknowledged && (
                   <Tooltip
-                    title={`Acknowledged by ${data.acknowledgeBy} on ${moment(
+                    title={`Acknowledged by ${
+                      data.acknowledgedByUserTitle
+                        ? data.acknowledgedByUserTitle + '. '
+                        : ''
+                    }${data.acknowledgedByUser} on ${moment(
                       data.acknowledgeDate,
                     ).format('DD MMM YYYY HH:mm')}`}
                   >
