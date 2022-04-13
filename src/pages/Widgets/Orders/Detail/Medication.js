@@ -8,7 +8,11 @@ import { isNumber } from 'util'
 import { qtyFormat } from '@/utils/config'
 import numeral from 'numeral'
 import { Alert } from 'antd'
-import { VISIT_TYPE, CANNED_TEXT_TYPE } from '@/utils/constants'
+import {
+  VISIT_TYPE,
+  CANNED_TEXT_TYPE,
+  NURSE_WORKITEM_STATUS,
+} from '@/utils/constants'
 import {
   Button,
   GridContainer,
@@ -565,13 +569,20 @@ class Medication extends PureComponent {
     isPreOrderItemExists: false,
   }
 
-  getActionItem = (i, arrayHelpers, prop, tooltip, defaultValue) => {
+  getActionItem = (
+    i,
+    arrayHelpers,
+    prop,
+    tooltip,
+    defaultValue,
+    isStartedMedication,
+  ) => {
     const { theme, values, setFieldValue } = this.props
     const activeRows = values[prop].filter(item => !item.isDeleted) || []
     return (
       <div style={{ position: 'absolute', bottom: 4, right: 0 }}>
         {activeRows.length > 1 && (
-          <Button justIcon color='danger'>
+          <Button justIcon color='danger' disabled={isStartedMedication}>
             <Delete
               onClick={() => {
                 setFieldValue(`${prop}[${i}].isDeleted`, true)
@@ -586,6 +597,7 @@ class Medication extends PureComponent {
         )}
         {activeRows.length < 3 && (
           <Button
+            disabled={isStartedMedication}
             justIcon
             color='info'
             onClick={() => {
@@ -1456,6 +1468,7 @@ class Medication extends PureComponent {
             }
           },
           matchSearch: this.matchSearch,
+          isDisabled: row => row.isStartedMedication,
         },
         {
           columnName: 'quantity',
@@ -1466,7 +1479,8 @@ class Medication extends PureComponent {
           onChange: e => {
             this.handleDrugMixtureItemQuantityOnChange(e)
           },
-          isDisabled: row => row.inventoryMedicationFK === undefined,
+          isDisabled: row =>
+            row.isStartedMedication || row.inventoryMedicationFK === undefined,
         },
         {
           columnName: 'uomfk',
@@ -1671,7 +1685,7 @@ class Medication extends PureComponent {
     )
   }
 
-  renderOthers = () => {
+  renderOthers = isStartedMedication => {
     const { classes, values, setDisable, orders } = this.props
     const { isPreOrderItemExists } = this.state
 
@@ -1702,7 +1716,7 @@ class Medication extends PureComponent {
                     <Checkbox
                       label='External Prescription'
                       {...args}
-                      disabled={isDisabledNoPaidPreOrder}
+                      disabled={isDisabledNoPaidPreOrder || isStartedMedication}
                       onChange={e => {
                         if (e.target.value) {
                           this.props.setFieldValue('adjAmount', 0)
@@ -1738,7 +1752,8 @@ class Medication extends PureComponent {
                         {...args}
                         disabled={
                           isDisabledNoPaidPreOrder ||
-                          values.isExternalPrescription
+                          values.isExternalPrescription ||
+                          isStartedMedication
                         }
                         onChange={e => {
                           if (!e.target.value) {
@@ -1793,6 +1808,7 @@ class Medication extends PureComponent {
             render={args => {
               return (
                 <Checkbox
+                  disabled={isStartedMedication}
                   style={{ position: 'absolute', bottom: 2 }}
                   label='Claimable'
                   {...args}
@@ -1844,7 +1860,14 @@ class Medication extends PureComponent {
     } = this.props
 
     const { corVitalSign = [] } = orders
-    const { isEditMedication, drugName, remarks, drugLabelRemarks } = values
+    const {
+      isEditMedication,
+      drugName,
+      remarks,
+      drugLabelRemarks,
+      workitem = {},
+      isPreOrder,
+    } = values
     const {
       showAddFromPastModal,
       showAddFromPrescriptionSetModal,
@@ -1881,6 +1904,10 @@ class Medication extends PureComponent {
       ENABLE_PRESCRIPTION_SET_CLINIC_ROLE.indexOf(
         user.data.clinicianProfile.userProfile.role.clinicRoleFK,
       ) >= 0
+
+    const { nurseWorkitem = {} } = workitem
+    const isStartedMedication =
+      !isPreOrder && nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
     return (
       <Authorized authority={GetOrderItemAccessRight(from, accessRight)}>
         <div>
@@ -1910,7 +1937,9 @@ class Medication extends PureComponent {
                           renderDropdown={this.renderMedication}
                           style={{ paddingRight: 20 }}
                           disabled={
-                            values.isPackage || isDisabledNoPaidPreOrder
+                            values.isPackage ||
+                            isDisabledNoPaidPreOrder ||
+                            isStartedMedication
                           }
                           showOptionTitle={false}
                           id='medication'
@@ -1953,6 +1982,7 @@ class Medication extends PureComponent {
                             label='Drug Mixture'
                             {...args}
                             maxLength={90}
+                            disabled={isStartedMedication}
                           />
                         </div>
                       )
@@ -1993,7 +2023,7 @@ class Medication extends PureComponent {
                         return (
                           <Checkbox
                             label='Drug Mixture'
-                            disabled={isEditMedication}
+                            disabled={isEditMedication || isStartedMedication}
                             {...args}
                             onChange={e => {
                               const { setValues, orders } = this.props
@@ -2077,12 +2107,15 @@ class Medication extends PureComponent {
                     marginTop: theme.spacing(1),
                   }}
                   getRowId={r => r.id}
-                  rows={values.corPrescriptionItemDrugMixture}
+                  rows={(
+                    values.corPrescriptionItemDrugMixture || []
+                  ).map(x => ({ ...x, isStartedMedication }))}
                   FuncProps={{
                     pager: false,
                   }}
                   EditingProps={{
-                    showAddCommand: true,
+                    showAddCommand: !isStartedMedication,
+                    showCommandColumn: !isStartedMedication,
                     onCommitChanges: this.commitDrugMixtureItemChanges,
                   }}
                   schema={drugMixtureItemSchema}
@@ -2152,6 +2185,7 @@ class Medication extends PureComponent {
                                           { value: 'AND', name: 'And' },
                                           { value: 'THEN', name: 'Then' },
                                         ]}
+                                        disabled={isStartedMedication}
                                         {...args}
                                       />
                                     )
@@ -2196,7 +2230,10 @@ class Medication extends PureComponent {
                                         }}
                                         {...commonSelectProps}
                                         {...args}
-                                        disabled={isDisabledHasPaidPreOrder}
+                                        disabled={
+                                          isDisabledHasPaidPreOrder ||
+                                          isStartedMedication
+                                        }
                                       />
                                     </div>
                                   )
@@ -2229,7 +2266,10 @@ class Medication extends PureComponent {
                                           this.calculateQuantity()
                                         }, 1)
                                       }}
-                                      disabled={isDisabledHasPaidPreOrder}
+                                      disabled={
+                                        isDisabledHasPaidPreOrder ||
+                                        isStartedMedication
+                                      }
                                     />
                                   )
                                 }}
@@ -2260,7 +2300,8 @@ class Medication extends PureComponent {
                                       }}
                                       disabled={
                                         !openPrescription ||
-                                        isDisabledHasPaidPreOrder
+                                        isDisabledHasPaidPreOrder ||
+                                        isStartedMedication
                                       }
                                       {...commonSelectProps}
                                       {...args}
@@ -2296,7 +2337,10 @@ class Medication extends PureComponent {
                                           this.calculateQuantity()
                                         }, 1)
                                       }}
-                                      disabled={isDisabledHasPaidPreOrder}
+                                      disabled={
+                                        isDisabledHasPaidPreOrder ||
+                                        isStartedMedication
+                                      }
                                     />
                                   )
                                 }}
@@ -2323,7 +2367,10 @@ class Medication extends PureComponent {
                                             this.calculateQuantity()
                                           }, 1)
                                         }}
-                                        disabled={isDisabledHasPaidPreOrder}
+                                        disabled={
+                                          isDisabledHasPaidPreOrder ||
+                                          isStartedMedication
+                                        }
                                       />
                                     )
                                   }}
@@ -2338,6 +2385,7 @@ class Medication extends PureComponent {
                                     sequence: activeRows.length + 1,
                                     uid: getUniqueId(),
                                   },
+                                  isStartedMedication,
                                 )}
                               </div>
                             </GridItem>
@@ -2429,6 +2477,7 @@ class Medication extends PureComponent {
                                             option.code,
                                           )
                                         }}
+                                        disabled={isStartedMedication}
                                         {...args}
                                       />
                                       {this.getActionItem(
@@ -2446,6 +2495,7 @@ class Medication extends PureComponent {
                                           sequence: newMaxSeq,
                                           uid: getUniqueId(),
                                         },
+                                        isStartedMedication,
                                       )}
                                     </div>
                                   )
@@ -2468,13 +2518,21 @@ class Medication extends PureComponent {
               style={{ paddingRight: 35 }}
             >
               <div style={{ position: 'relative' }}>
-                <FastField
+                <Field
                   name='remarks'
                   render={args => {
-                    return <TextField rowsMax='5' label='Remarks' {...args} />
+                    return (
+                      <TextField
+                        rowsMax='5'
+                        label='Remarks'
+                        disabled={isStartedMedication}
+                        {...args}
+                      />
+                    )
                   }}
                 />
                 <CannedTextButton
+                  disabled={isStartedMedication}
                   cannedTextTypeFK={CANNED_TEXT_TYPE.MEDICATIONREMARKS}
                   style={{
                     position: 'absolute',
@@ -2547,7 +2605,9 @@ class Medication extends PureComponent {
                           }, 1)
                         }}
                         {...args}
-                        disabled={isDisabledHasPaidPreOrder}
+                        disabled={
+                          isDisabledHasPaidPreOrder || isStartedMedication
+                        }
                       />
                     )
                   }}
@@ -2590,11 +2650,12 @@ class Medication extends PureComponent {
                 style={{ paddingRight: 115 }}
               >
                 <div style={{ position: 'relative' }}>
-                  <FastField
+                  <Field
                     name='drugLabelRemarks'
                     render={args => {
                       return (
                         <TextField
+                          disabled={isStartedMedication}
                           maxLength={30}
                           label='Drug Label Remarks'
                           {...args}
@@ -2624,7 +2685,7 @@ class Medication extends PureComponent {
                 </div>
               </GridItem>
             ) : (
-              this.renderOthers()
+              this.renderOthers(isStartedMedication)
             )}
             <GridItem xs={4} className={classes.editor}>
               <Field
@@ -2653,7 +2714,7 @@ class Medication extends PureComponent {
           </GridContainer>
           <GridContainer>
             {showDrugLabelRemark ? (
-              this.renderOthers()
+              this.renderOthers(isStartedMedication)
             ) : (
               <GridItem xs={8} className={classes.editor} />
             )}

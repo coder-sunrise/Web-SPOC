@@ -19,7 +19,11 @@ import {
 import Authorized from '@/utils/Authorized'
 import Yup from '@/utils/yup'
 import { getServices } from '@/utils/codetable'
-import { VISIT_TYPE, CANNED_TEXT_TYPE } from '@/utils/constants'
+import {
+  VISIT_TYPE,
+  CANNED_TEXT_TYPE,
+  NURSE_WORKITEM_STATUS,
+} from '@/utils/constants'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
@@ -432,6 +436,9 @@ class Service extends PureComponent {
       </GridItem>
     )
 
+    const { nurseWorkitem = {} } = workitem
+    const isStartedService =
+      !isPreOrder && nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
     return (
       <Authorized
         authority={GetOrderItemAccessRight(
@@ -478,7 +485,11 @@ class Service extends PureComponent {
                             this.getServiceCenterService()
                           }, 1)
                         }}
-                        disabled={values.isPackage || isDisabledNoPaidPreOrder}
+                        disabled={
+                          values.isPackage ||
+                          isDisabledNoPaidPreOrder ||
+                          isStartedService
+                        }
                         matchSearch={this.matchServiceSearch}
                         {...args}
                       />
@@ -504,7 +515,11 @@ class Service extends PureComponent {
                           this.getServiceCenterService()
                         }, 1)
                       }
-                      disabled={values.isPackage || isDisabledNoPaidPreOrder}
+                      disabled={
+                        values.isPackage ||
+                        isDisabledNoPaidPreOrder ||
+                        isStartedService
+                      }
                       {...args}
                     />
                   )
@@ -577,7 +592,7 @@ class Service extends PureComponent {
                             this.updateTotalPrice(total)
                           }
                         }}
-                        disabled={isDisabledHasPaidPreOrder}
+                        disabled={isDisabledHasPaidPreOrder || isStartedService}
                         {...args}
                       />
                     )
@@ -596,10 +611,17 @@ class Service extends PureComponent {
                 <FastField
                   name='instruction'
                   render={args => {
-                    return <TextField label='Instructions' {...args} />
+                    return (
+                      <TextField
+                        label='Instructions'
+                        {...args}
+                        disabled={isStartedService}
+                      />
+                    )
                   }}
                 />
                 <CannedTextButton
+                  disabled={isStartedService}
                   cannedTextTypeFK={CANNED_TEXT_TYPE.SERVICEINSTRUCTION}
                   style={{
                     position: 'absolute',
@@ -648,7 +670,14 @@ class Service extends PureComponent {
               <FastField
                 name='remark'
                 render={args => {
-                  return <TextField rowsMax='5' label='Remarks' {...args} />
+                  return (
+                    <TextField
+                      rowsMax='5'
+                      label='Remarks'
+                      {...args}
+                      disabled={isStartedService}
+                    />
+                  )
                 }}
               />
             </GridItem>
@@ -775,6 +804,7 @@ class Service extends PureComponent {
                         rowsMax='5'
                         maxLength={200}
                         label='New Service Name'
+                        disabled={isStartedService}
                         {...args}
                       />
                     )
@@ -814,6 +844,7 @@ class Service extends PureComponent {
                     </span>
                     <div style={{ marginLeft: 60, marginTop: 14 }}>
                       <RadioGroup
+                        disabled={isStartedService}
                         value={priority || 'Normal'}
                         label=''
                         onChange={e => {
@@ -842,7 +873,9 @@ class Service extends PureComponent {
                               label='Pre-Order'
                               style={{ position: 'absolute', bottom: 2 }}
                               {...args}
-                              disabled={isDisabledNoPaidPreOrder}
+                              disabled={
+                                isDisabledNoPaidPreOrder || isStartedService
+                              }
                               onChange={e => {
                                 if (!e.target.value) {
                                   setFieldValue('isChargeToday', false)
