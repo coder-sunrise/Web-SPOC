@@ -29,7 +29,7 @@ import {
   notification,
   EditableTableGrid,
   Switch,
-  MedicationSelect,
+  LocalSearchSelect,
 } from '@/components'
 import Yup from '@/utils/yup'
 import {
@@ -1407,7 +1407,7 @@ class Medication extends PureComponent {
       columnExtensions: [
         {
           columnName: 'inventoryMedicationFK',
-          type: 'medicationSelect',
+          type: 'localSearchSelect',
           labelField: 'combinDisplayValue',
           options: this.getMedicationOptions,
           handleFilter: () => true,
@@ -1455,6 +1455,7 @@ class Medication extends PureComponent {
               }
             }
           },
+          matchSearch: this.matchSearch,
         },
         {
           columnName: 'quantity',
@@ -1816,6 +1817,17 @@ class Medication extends PureComponent {
     )
   }
 
+  matchSearch = (option, input) => {
+    const lowerCaseInput = input.toLowerCase()
+    return (
+      option.code.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+      option.displayValue.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+      (option.medicationGroup?.name || '')
+        .toLowerCase()
+        .indexOf(lowerCaseInput) >= 0
+    )
+  }
+
   render() {
     const {
       theme,
@@ -1883,8 +1895,7 @@ class Medication extends PureComponent {
                         id={`autofocus_${values.type}`}
                         style={{ position: 'relative' }}
                       >
-                        <MedicationSelect
-                          values={this.props.values}
+                        <LocalSearchSelect
                           {...args}
                           label='Medication Name, Drug Group'
                           labelField='combinDisplayValue'
@@ -1903,6 +1914,7 @@ class Medication extends PureComponent {
                           }
                           showOptionTitle={false}
                           id='medication'
+                          matchSearch={this.matchSearch}
                         />
                         <LowStockInfo
                           sourceType='medication'

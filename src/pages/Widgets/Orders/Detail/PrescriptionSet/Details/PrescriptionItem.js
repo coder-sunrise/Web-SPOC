@@ -26,7 +26,7 @@ import {
   Tooltip,
   Select,
   notification,
-  MedicationSelect,
+  LocalSearchSelect,
 } from '@/components'
 import { currencySymbol } from '@/utils/config'
 import CannedTextButton from '@/pages/Widgets/Orders/Detail/CannedTextButton'
@@ -1042,7 +1042,7 @@ class Detail extends PureComponent {
       columnExtensions: [
         {
           columnName: 'inventoryMedicationFK',
-          type: 'medicationSelect',
+          type: 'localSearchSelect',
           labelField: 'combinDisplayValue',
           options: this.getMedicationOptions,
           handleFilter: () => true,
@@ -1125,6 +1125,7 @@ class Detail extends PureComponent {
 
             setFieldValue('cautions', newCautions)
           },
+          matchSearch: this.matchSearch,
         },
         {
           columnName: 'quantity',
@@ -1178,6 +1179,17 @@ class Detail extends PureComponent {
     return false
   }
 
+  matchSearch = (option, input) => {
+    const lowerCaseInput = input.toLowerCase()
+    return (
+      option.code.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+      option.displayValue.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+      (option.medicationGroup?.name || '')
+        .toLowerCase()
+        .indexOf(lowerCaseInput) >= 0
+    )
+  }
+
   render() {
     const {
       theme,
@@ -1215,8 +1227,7 @@ class Detail extends PureComponent {
                 render={args => {
                   return (
                     <div style={{ position: 'relative' }}>
-                      <MedicationSelect
-                        values={this.props.values}
+                      <LocalSearchSelect
                         {...args}
                         label='Medication Name, Drug Group'
                         labelField='combinDisplayValue'
@@ -1231,6 +1242,7 @@ class Detail extends PureComponent {
                         renderDropdown={this.renderMedication}
                         style={{ paddingRight: 20 }}
                         showOptionTitle={false}
+                        matchSearch={this.matchSearch}
                       />
                       <LowStockInfo
                         sourceType='prescriptionSet'

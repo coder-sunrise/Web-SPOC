@@ -14,6 +14,7 @@ import {
   Switch,
   Checkbox,
   RadioGroup,
+  LocalSearchSelect,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 import Yup from '@/utils/yup'
@@ -92,7 +93,6 @@ const getVisitDoctorUserId = props => {
   handleSubmit: (values, { props, onConfirm, setValues }) => {
     const { dispatch, orders, currentType, getNextSequence, user } = props
     const { rows } = orders
-    console.log(111)
     const data = {
       isOrderedByDoctor:
         user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
@@ -107,7 +107,6 @@ const getVisitDoctorUserId = props => {
       packageGlobalId:
         values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
-    console.log(data)
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
@@ -368,6 +367,14 @@ class Service extends PureComponent {
     }
   }
 
+  matchServiceSearch = (option, input) => {
+    const lowerCaseInput = input.toLowerCase()
+    return (
+      option.code.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+      option.name.toLowerCase().indexOf(lowerCaseInput) >= 0
+    )
+  }
+
   render() {
     const {
       theme,
@@ -440,7 +447,8 @@ class Service extends PureComponent {
                 render={args => {
                   return (
                     <div id={`autofocus_${values.type}`}>
-                      <Select
+                      <LocalSearchSelect
+                        valueField='value'
                         label='Service Name'
                         labelField='combinDisplayValue'
                         options={services.filter(
@@ -471,6 +479,7 @@ class Service extends PureComponent {
                           }, 1)
                         }}
                         disabled={values.isPackage || isDisabledNoPaidPreOrder}
+                        matchSearch={this.matchServiceSearch}
                         {...args}
                       />
                     </div>

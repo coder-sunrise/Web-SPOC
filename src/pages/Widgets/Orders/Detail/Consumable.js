@@ -14,6 +14,7 @@ import {
   DatePicker,
   Switch,
   Checkbox,
+  LocalSearchSelect,
 } from '@/components'
 import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
@@ -125,7 +126,6 @@ const getVisitDoctorUserId = props => {
       packageGlobalId:
         values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
-    console.log('consumable', data)
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
@@ -413,6 +413,14 @@ class Consumable extends PureComponent {
     }
   }
 
+  matchSearch = (option, input) => {
+    const lowerCaseInput = input.toLowerCase()
+    return (
+      option.code.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+      option.displayValue.toLowerCase().indexOf(lowerCaseInput) >= 0
+    )
+  }
+
   render() {
     const {
       theme,
@@ -462,7 +470,7 @@ class Consumable extends PureComponent {
                       id={`autofocus_${values.type}`}
                       style={{ position: 'relative' }}
                     >
-                      <CodeSelect
+                      <LocalSearchSelect
                         temp
                         label='Consumable Name'
                         labelField='combinDisplayValue'
@@ -471,6 +479,7 @@ class Consumable extends PureComponent {
                         {...args}
                         style={{ paddingRight: 20 }}
                         disabled={values.isPackage || isDisabledNoPaidPreOrder}
+                        matchSearch={this.matchSearch}
                       />
                       <LowStockInfo sourceType='consumable' {...this.props} />
                     </div>

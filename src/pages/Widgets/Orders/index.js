@@ -96,6 +96,7 @@ class Orders extends PureComponent {
       'ctVaccinationUsage',
       'ctVaccinationUnitOfMeasurement',
       'documenttemplate',
+      'inventoryorderset',
     ]
     dispatch({
       type: 'codetable/batchFetch',
