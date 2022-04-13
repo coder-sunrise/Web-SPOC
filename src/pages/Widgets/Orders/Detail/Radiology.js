@@ -27,7 +27,10 @@ import { getServices } from '@/utils/codetable'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
 import { CANNED_TEXT_TYPE, SERVICE_CENTER_CATEGORY } from '@/utils/constants'
-import { RADIOLOGY_WORKITEM_STATUS } from '@/utils/constants'
+import {
+  RADIOLOGY_WORKITEM_STATUS,
+  NURSE_WORKITEM_STATUS,
+} from '@/utils/constants'
 import CannedTextButton from './CannedTextButton'
 import { Alert } from 'antd'
 
@@ -510,14 +513,15 @@ class Radiology extends PureComponent {
       this.setState({ isPreOrderItemExists: false })
 
     const { workitem = {}, isPreOrder } = editService
-    const { radiologyWorkitem = {} } = workitem
+    const { radiologyWorkitem = {}, nurseWorkitem = {} } = workitem
     const isStartedRadiology =
       !isPreOrder &&
-      [
+      ([
         RADIOLOGY_WORKITEM_STATUS.INPROGRESS,
         RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED,
         RADIOLOGY_WORKITEM_STATUS.COMPLETED,
-      ].indexOf(radiologyWorkitem.statusFK) >= 0
+      ].indexOf(radiologyWorkitem.statusFK) >= 0 ||
+        nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED)
 
     return (
       <Authorized

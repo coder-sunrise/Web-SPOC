@@ -701,11 +701,8 @@ export default ({
     const { nuseActualize = [] } = nurseWorkitem
     if (!row.isPreOrder) {
       if (
-        (row.type === ORDER_TYPES.RADIOLOGY &&
-          radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED) ||
-        (row.type !== ORDER_TYPES.RADIOLOGY &&
-          row.type !== ORDER_TYPES.LAB &&
-          nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED)
+        row.type === ORDER_TYPES.RADIOLOGY &&
+        radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED
       ) {
         return
       }
@@ -1803,23 +1800,20 @@ export default ({
                     deleteMessage =
                       'Specimen Collected. No modification is allowed on processed order'
                   }
-                } else {
-                  if (
-                    nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
-                  ) {
-                    const lastNuseActualize = _.orderBy(
-                      nuseActualize,
-                      ['actulizeDate'],
-                      ['desc'],
-                    )[0]
-                    if (editEnable) {
-                      editEnable = false
-                      editMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
-                    }
-                    if (deleteEnable) {
-                      deleteEnable = false
-                      deleteMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
-                    }
+                }
+
+                if (
+                  deleteEnable &&
+                  nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
+                ) {
+                  const lastNuseActualize = _.orderBy(
+                    nuseActualize,
+                    ['actulizeDate'],
+                    ['desc'],
+                  )[0]
+                  if (deleteEnable) {
+                    deleteEnable = false
+                    deleteMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
                   }
                 }
               }
@@ -1926,10 +1920,6 @@ export default ({
                   ) {
                     editEnable = false
                   }
-                } else if (
-                  nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
-                ) {
-                  editEnable = false
                 } else if (row.type === ORDER_TYPES.LAB) {
                   if (
                     labWorkitems.filter(
@@ -1937,6 +1927,11 @@ export default ({
                     ).length > 0
                   )
                     editEnable = false
+                }
+                if (
+                  nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
+                ) {
+                  editEnable = false
                 }
               }
               return (

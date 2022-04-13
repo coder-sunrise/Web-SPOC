@@ -20,6 +20,7 @@ import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import { NURSE_WORKITEM_STATUS } from '@/utils/constants'
 import { currencySymbol } from '@/utils/config'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
 import moment from 'moment'
@@ -452,6 +453,11 @@ class Consumable extends PureComponent {
     if (orders.isPreOrderItemExists === false && !values.isPreOrder)
       this.setState({ isPreOrderItemExists: false })
 
+    const { workitem = {} } = values
+    const { nurseWorkitem = {} } = workitem
+    const isStartedConsumable =
+      !values.isPreOrder &&
+      nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
     return (
       <Authorized
         authority={GetOrderItemAccessRight(
@@ -478,7 +484,11 @@ class Consumable extends PureComponent {
                         options={this.getConsumableOptions()}
                         {...args}
                         style={{ paddingRight: 20 }}
-                        disabled={values.isPackage || isDisabledNoPaidPreOrder}
+                        disabled={
+                          values.isPackage ||
+                          isDisabledNoPaidPreOrder ||
+                          isStartedConsumable
+                        }
                         matchSearch={this.matchSearch}
                       />
                       <LowStockInfo sourceType='consumable' {...this.props} />
@@ -553,7 +563,9 @@ class Consumable extends PureComponent {
                             this.updateTotalPrice(total)
                           }
                         }}
-                        disabled={isDisabledHasPaidPreOrder}
+                        disabled={
+                          isDisabledHasPaidPreOrder || isStartedConsumable
+                        }
                         {...args}
                       />
                     )
@@ -586,7 +598,7 @@ class Consumable extends PureComponent {
                         }
                         this.onExpiryDateChange()
                       }}
-                      disabled={disableEdit}
+                      disabled={disableEdit || isStartedConsumable}
                       {...args}
                     />
                   )
@@ -603,7 +615,7 @@ class Consumable extends PureComponent {
                       onChange={() => {
                         this.onExpiryDateChange()
                       }}
-                      disabled={disableEdit}
+                      disabled={disableEdit || isStartedConsumable}
                       {...args}
                     />
                   )
@@ -643,7 +655,14 @@ class Consumable extends PureComponent {
               <FastField
                 name='remark'
                 render={args => {
-                  return <TextField rowsMax='5' label='Remarks' {...args} />
+                  return (
+                    <TextField
+                      rowsMax='5'
+                      label='Remarks'
+                      {...args}
+                      disabled={isStartedConsumable}
+                    />
+                  )
                 }}
               />
             </GridItem>
@@ -783,7 +802,9 @@ class Consumable extends PureComponent {
                             <Checkbox
                               label='Pre-Order'
                               {...args}
-                              disabled={isDisabledNoPaidPreOrder}
+                              disabled={
+                                isDisabledNoPaidPreOrder || isStartedConsumable
+                              }
                               onChange={e => {
                                 if (!e.target.value) {
                                   setFieldValue('isChargeToday', false)
