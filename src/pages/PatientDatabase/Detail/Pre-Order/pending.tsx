@@ -353,6 +353,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         labelField: 'combinDisplayValue',
         valueField: 'id',
         sortingEnabled: false,
+        width: 250,
         options: generateItemDataSource,
         onChange: handleItemChanged,
         render: row => {
@@ -376,7 +377,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         columnName: 'quantity',
         type: 'number',
         precision: 1,
-        width: 100,
+        width: 120,
         sortingEnabled: false,
         // onChange: handelQuantityChanged,
         render: row => {
@@ -532,6 +533,7 @@ const PendingPreOrder: React.FC = (props: any) => {
                   preOrderMedicationItem: undefined,
                   preOrderConsumableItem: undefined,
                   prescribingUOMFK: undefined,
+                  quantity:1,
                   ...o,
                 }
               })
