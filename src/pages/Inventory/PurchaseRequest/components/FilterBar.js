@@ -33,6 +33,7 @@ import { FilterBarDate } from '@/components/_medisys'
     transactionEndDate: moment()
       .endOf('day')
       .formatUTC(false),
+    requestBy: [-99],
   }),
   handleSubmit: () => {},
   displayName: 'PurchaseRequestFilter',
@@ -131,7 +132,15 @@ class FilterBar extends PureComponent {
           <Field
             name='requestBy'
             render={args => {
-              return <ClinicianSelect label='Requested By' {...args} />
+              return (
+                <ClinicianSelect
+                  label='Requested By'
+                  mode='multiple'
+                  maxTagCount={0}
+                  maxTagPlaceholder='Requesters'
+                  {...args}
+                />
+              )
             }}
           />
         </GridItem>
@@ -176,7 +185,9 @@ class FilterBar extends PureComponent {
                       : transactionEndDate,
                     purchaseRequestNo,
                     purchaseRequestStatusFK,
-                    createByUserFK: requestBy,
+                    apiCriteria: {
+                      requesters: requestBy?.includes(-99) ? undefined : requestBy?.join(),
+                    },
                   },
                 })
               }}
