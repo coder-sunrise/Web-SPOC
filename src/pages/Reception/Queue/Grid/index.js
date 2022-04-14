@@ -60,7 +60,7 @@ class Grid extends React.Component {
     if (this.props.visitType !== nextProps.visitType) return true
 
     if (
-      nextProps.filter === 'appointment' &&
+      nextProps.filter === StatusIndicator.APPOINTMENT &&
       this.props.calendarEvents !== nextProps.calendarEvents
     )
       return true
