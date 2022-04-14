@@ -27,6 +27,7 @@ import {
   Popover,
   dateFormatLong,
   Tooltip,
+  notification,
 } from '@/components'
 import { ProTable } from '@medisys/component'
 import { GridContextMenuButton as GridButton } from 'medisys-components'
@@ -305,6 +306,10 @@ const WorklistGrid = ({
         x => x.userProfileFK === user.data.clinicianProfile.userProfile.id,
       )
     ) {
+      notification.warn({
+        message:
+          "Please make sure you are the primary/reporting doctor to view this patient's worklist.",
+      })
       return
     }
     showReportingDetails(row)
