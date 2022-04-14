@@ -140,7 +140,7 @@ export default createListViewModel({
               ? userRole &&
                 ((userRole.clinicRoleFK === 1 &&
                   !startConsultPermissionIsHidden) ||
-                  (userRole.clinicRoleFK === 2 &&
+                  (userRole.clinicRoleFK === 6 &&
                     servePatientRight &&
                     servePatientRight.rights !== 'hidden'))
               : queueLogState.selfOnly,

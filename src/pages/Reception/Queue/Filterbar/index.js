@@ -164,7 +164,7 @@ const Filterbar = props => {
           </Authorized>
 
           {((clinicRoleFK === 1 && !hideSelfOnlyFilter) ||
-            (clinicRoleFK === 2 &&
+            (clinicRoleFK === 6 &&
               servePatientRight &&
               servePatientRight.rights !== 'hidden')) && (
             <div className={classes.switch}>

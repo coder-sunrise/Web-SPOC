@@ -140,7 +140,7 @@ const SummaryCommentDetails = props => {
       <GridItem
         md={5}
         container
-        style={{ position: 'relative', paddingLeft: 80 }}
+        style={{ position: 'relative', margin: '5px 0', paddingLeft: 80 }}
       >
         <div style={{ position: 'absolute', left: 8, bottom: 2 }}>
           Category:
@@ -159,7 +159,7 @@ const SummaryCommentDetails = props => {
       <GridItem
         md={7}
         container
-        style={{ position: 'relative', paddingLeft: 80 }}
+        style={{ position: 'relative', margin: '5px 0', paddingLeft: 80 }}
       >
         <div style={{ position: 'absolute', left: 8, bottom: 2 }}>
           Template:
