@@ -229,6 +229,8 @@ class HistoryDetails extends PureComponent {
       patientAccountNo: selectHistory.patientAccountNo,
     }
     const { visitPurposeFK } = selectHistory
+    const { isFromEditOrder, editDispenseType, editDispenseReason } =
+      patientHistory.entity || {}
     let current = {
       ...patientHistory.entity,
       visitAttachments: selectHistory.visitAttachments,
@@ -253,47 +255,59 @@ class HistoryDetails extends PureComponent {
         })}
         style={{ overflow: 'auto', height: window.innerHeight - 80 }}
       >
-        {this.widgets
-          .filter(_widget => {
-            if (visitPurposeFK === VISIT_TYPE.OTC) {
-              return (
-                _widget.id === WidgetConfig.WIDGETS_ID.INVOICE &&
-                WidgetConfig.showWidget(current, _widget.id)
+        <div>
+          {this.widgets
+            .filter(_widget => {
+              if (visitPurposeFK === VISIT_TYPE.OTC) {
+                return (
+                  _widget.id === WidgetConfig.WIDGETS_ID.INVOICE &&
+                  WidgetConfig.showWidget(current, _widget.id)
+                )
+              }
+              return WidgetConfig.showWidget(
+                current,
+                _widget.id,
+                [
+                  WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
+                  WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
+                  WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
+                  WidgetConfig.WIDGETS_ID.PLAN,
+                ].filter(w => getCategoriesOptions().find(c => c.value === w)),
               )
-            }
-            return WidgetConfig.showWidget(
-              current,
-              _widget.id,
-              [
-                WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
-                WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
-                WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
-                WidgetConfig.WIDGETS_ID.PLAN,
-              ].filter(w => getCategoriesOptions().find(c => c.value === w)),
-            )
-          })
-          .map(o => {
-            const Widget = o.component
-            return (
-              <div>
-                <span
-                  style={{
-                    fontWeight: 500,
-                    color: 'darkBlue',
-                    fontSize: '0.85rem',
-                  }}
-                >
-                  {o.name}
-                </span>
-                <Widget
-                  current={current}
-                  visitDetails={visitDetails}
-                  {...this.props}
-                  setFieldValue={this.props.setFieldValue}
-                />
-              </div>
-            )
-          })}
+            })
+            .map(o => {
+              const Widget = o.component
+              return (
+                <div>
+                  <span
+                    style={{
+                      fontWeight: 500,
+                      color: 'darkBlue',
+                      fontSize: '0.85rem',
+                    }}
+                  >
+                    {o.name}
+                  </span>
+                  <Widget
+                    current={current}
+                    visitDetails={visitDetails}
+                    {...this.props}
+                    setFieldValue={this.props.setFieldValue}
+                  />
+                </div>
+              )
+            })}
+          {isFromEditOrder && (
+            <div
+              style={{ marginBottom: 6 }}
+            >{`Edit Order Reason: ${editDispenseType}${
+              WidgetConfig.hasValue(editDispenseReason) &&
+              editDispenseReason.trim().length
+                ? `, ${editDispenseReason}`
+                : ''
+            }`}</div>
+          )}
+        </div>
       </CardContainer>
     )
   }

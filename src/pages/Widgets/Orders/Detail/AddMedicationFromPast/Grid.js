@@ -54,14 +54,14 @@ const styles = () => ({
     color: primaryColor,
   },
   rightIcon: {
-    position: 'absolute',
-    bottom: 2,
-    fontWeight: 500,
+    position: 'relative',
+    fontWeight: 600,
     color: 'white',
     fontSize: '0.7rem',
     padding: '2px 3px',
     height: 20,
     cursor: 'pointer',
+    margin: '0px 1px',
   },
 })
 class Grid extends PureComponent {
@@ -290,7 +290,10 @@ class Grid extends PureComponent {
                   <GridContainer>
                     <div
                       className={classes.nameColumn}
-                      style={{ paddingRight: paddingRight }}
+                      style={{
+                        paddingRight: paddingRight,
+                        position: 'relative',
+                      }}
                     >
                       {warningLabel && (
                         <span style={{ color: 'red', fontStyle: 'italic' }}>
@@ -300,20 +303,32 @@ class Grid extends PureComponent {
                       <Tooltip title={item.drugName || item.vaccinationName}>
                         <span>{item.drugName || item.vaccinationName}</span>
                       </Tooltip>
-                      <div style={{ position: 'relative' }}>
-                        {item.isDrugMixture &&
-                          this.drugMixtureIndicator(item, -20)}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '-1px',
+                          right: '0px',
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: 'inline-block',
+                            position: 'relative',
+                          }}
+                        >
+                          {item.isDrugMixture &&
+                            this.drugMixtureIndicator(item)}
+                        </div>
                         {item.isPreOrder && (
                           <Tooltip title='New Pre-Order'>
                             <div
                               className={classes.rightIcon}
                               style={{
-                                right: -27,
                                 borderRadius: 4,
                                 backgroundColor: '#4255bd',
+                                display: 'inline-block',
                               }}
                             >
-                              {' '}
                               Pre
                             </div>
                           </Tooltip>
@@ -323,9 +338,9 @@ class Grid extends PureComponent {
                             <div
                               className={classes.rightIcon}
                               style={{
-                                right: item.isPreOrder ? -60 : -30,
                                 borderRadius: 4,
                                 backgroundColor: 'green',
+                                display: 'inline-block',
                               }}
                             >
                               Excl.

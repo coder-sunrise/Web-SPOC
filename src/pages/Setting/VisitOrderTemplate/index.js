@@ -60,7 +60,7 @@ class VisitOrderTemplate extends PureComponent {
               'Add Visit Purpose'
             )
           }
-          maxWidth='md'
+          maxWidth='lg'
           bodyNoPadding
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}

@@ -57,7 +57,7 @@ export default createListViewModel({
                 name: item.inventoryItemName,
                 code: item.inventoryItemCode,
                 isActive: item[type.dtoName].isActive,
-                isMinus: !!(item.adjAmt && item.adjAmt < 0),
+                isMinus: item.adjAmt == 0 ? true : !!(item.adjAmt && item.adjAmt < 0),
                 isExactAmount: !!(item.adjType && item.adjType === 'ExactAmount'),
                 ...item,
               }

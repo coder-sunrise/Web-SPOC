@@ -31,14 +31,14 @@ import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 
 const styles = theme => ({
   rightIcon: {
-    position: 'absolute',
-    bottom: 2,
-    fontWeight: 500,
+    position: 'relative',
+    fontWeight: 600,
     color: 'white',
     fontSize: '0.7rem',
     padding: '2px 3px',
     height: 20,
     cursor: 'pointer',
+    margin: '0px 1px',
   },
 })
 @connect(({ invoiceCreditNote, invoiceDetail }) => ({
@@ -503,19 +503,31 @@ class AddCrNote extends Component {
                       }}
                     >
                       {row.itemType}
-                      <div style={{ position: 'relative', top: 2 }}>
-                        {this.drugMixtureIndicator(row, -20)}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '-1px',
+                          right: '-6px',
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: 'inline-block',
+                            position: 'relative',
+                          }}
+                        >
+                          {this.drugMixtureIndicator(row)}
+                        </div>
                         {row.isPreOrder && (
                           <Tooltip title='New Pre-Order'>
                             <div
                               className={classes.rightIcon}
                               style={{
-                                right: -30,
                                 borderRadius: 4,
                                 backgroundColor: '#4255bd',
+                                display: 'inline-block',
                               }}
                             >
-                              {' '}
                               Pre
                             </div>
                           </Tooltip>

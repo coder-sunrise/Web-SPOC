@@ -23,11 +23,9 @@ const urgentIndicator = (row, right) => {
       <Tooltip title='Urgent'>
         <div
           style={{
-            right: right,
             borderRadius: 4,
             backgroundColor: 'red',
-            position: 'absolute',
-            bottom: 2,
+            position: 'relative',
             fontWeight: 500,
             color: 'white',
             fontSize: '0.7rem',
@@ -58,7 +56,7 @@ export default ({ current, classes, showDrugLabelRemark }) => {
             render: (text, row) => {
               let paddingRight = 0
               if (row.isPreOrder && row.isExclusive) {
-                paddingRight = 52
+                paddingRight = 54
               } else if (row.isPreOrder || row.isExclusive) {
                 paddingRight = 24
               }
@@ -81,19 +79,31 @@ export default ({ current, classes, showDrugLabelRemark }) => {
                     }}
                   >
                     {row.isDrugMixture ? 'Drug Mixture' : row.type}
-                    <div style={{ position: 'relative', top: 2 }}>
-                      {drugMixtureIndicator(row, -20)}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '-1px',
+                        right: '-4px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'inline-block',
+                          position: 'relative',
+                        }}
+                      >
+                        {drugMixtureIndicator(row)}
+                      </div>
                       {row.isPreOrder && (
                         <Tooltip title='New Pre-Order'>
                           <div
                             className={classes.rightIcon}
                             style={{
-                              right: -27,
                               borderRadius: 4,
                               backgroundColor: '#4255bd',
+                              display: 'inline-block',
                             }}
                           >
-                            {' '}
                             Pre
                           </div>
                         </Tooltip>
@@ -103,16 +113,20 @@ export default ({ current, classes, showDrugLabelRemark }) => {
                           <div
                             className={classes.rightIcon}
                             style={{
-                              right: row.isPreOrder ? -60 : -30,
                               borderRadius: 4,
                               backgroundColor: 'green',
+                              display: 'inline-block',
                             }}
                           >
                             Excl.
                           </div>
                         </Tooltip>
                       )}
-                      {urgentIndicator(row, urgentRight)}
+                      <div
+                        style={{ display: 'inline-block', margin: '0px 1px' }}
+                      >
+                        {urgentIndicator(row)}
+                      </div>
                     </div>
                   </div>
                 </div>

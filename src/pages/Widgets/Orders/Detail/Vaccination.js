@@ -21,10 +21,12 @@ import {
   Switch,
   Checkbox,
   notification,
+  LocalSearchSelect,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import { NURSE_WORKITEM_STATUS } from '@/utils/constants'
 import { currencySymbol } from '@/utils/config'
 import {
   GetOrderItemAccessRight,
@@ -645,6 +647,14 @@ class Vaccination extends PureComponent {
     }
   }
 
+  matchSearch = (option, input) => {
+    const lowerCaseInput = input.toLowerCase()
+    return (
+      option.code.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+      option.displayValue.toLowerCase().indexOf(lowerCaseInput) >= 0
+    )
+  }
+
   render() {
     const {
       theme,
@@ -659,7 +669,7 @@ class Vaccination extends PureComponent {
       orders,
       ...reset
     } = this.props
-    const { isEditVaccination } = values
+    const { isEditVaccination, workitem = {} } = values
     const { showAddFromPastModal, isPreOrderItemExists } = this.state
     const caution = this.getCaution()
     const totalPriceReadonly =
@@ -678,6 +688,10 @@ class Vaccination extends PureComponent {
     if (orders.isPreOrderItemExists === false && !values.isPreOrder)
       this.setState({ isPreOrderItemExists: false })
 
+    const { nurseWorkitem = {} } = workitem
+    const isStartedVaccination =
+      !values.isPreOrder &&
+      nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
     return (
       <Authorized
         authority={GetOrderItemAccessRight(
@@ -696,16 +710,20 @@ class Vaccination extends PureComponent {
                       id={`autofocus_${values.type}`}
                       style={{ position: 'relative' }}
                     >
-                      <CodeSelect
+                      <LocalSearchSelect
                         temp
                         label='Vaccination Name'
                         labelField='combinDisplayValue'
-                        code='inventoryvaccination'
                         onChange={this.changeVaccination}
                         options={this.getVaccinationOptions()}
                         {...args}
                         style={{ paddingRight: 20 }}
-                        disabled={values.isPackage || isDisabledNoPaidPreOrder}
+                        disabled={
+                          values.isPackage ||
+                          isDisabledNoPaidPreOrder ||
+                          isStartedVaccination
+                        }
+                        matchSearch={this.matchSearch}
                       />
                       <LowStockInfo sourceType='vaccination' {...this.props} />
                     </div>
@@ -803,7 +821,9 @@ class Vaccination extends PureComponent {
                         )
                       }}
                       {...args}
-                      disabled={isDisabledHasPaidPreOrder}
+                      disabled={
+                        isDisabledHasPaidPreOrder || isStartedVaccination
+                      }
                     />
                   )
                 }}
@@ -829,7 +849,9 @@ class Vaccination extends PureComponent {
                       }}
                       valueFiled='id'
                       {...args}
-                      disabled={isDisabledHasPaidPreOrder}
+                      disabled={
+                        isDisabledHasPaidPreOrder || isStartedVaccination
+                      }
                     />
                   )
                 }}
@@ -853,7 +875,9 @@ class Vaccination extends PureComponent {
                         )
                       }}
                       {...args}
-                      disabled={isDisabledHasPaidPreOrder}
+                      disabled={
+                        isDisabledHasPaidPreOrder || isStartedVaccination
+                      }
                     />
                   )
                 }}
@@ -863,7 +887,13 @@ class Vaccination extends PureComponent {
               <FastField
                 name='vaccinationGivenDate'
                 render={args => {
-                  return <DatePicker label='Date Given' {...args} />
+                  return (
+                    <DatePicker
+                      label='Date Given'
+                      {...args}
+                      disabled={isStartedVaccination}
+                    />
+                  )
                 }}
               />
             </GridItem>
@@ -934,7 +964,9 @@ class Vaccination extends PureComponent {
                           }
                         }}
                         {...args}
-                        disabled={isDisabledHasPaidPreOrder}
+                        disabled={
+                          isDisabledHasPaidPreOrder || isStartedVaccination
+                        }
                       />
                     )
                   }}
@@ -991,7 +1023,7 @@ class Vaccination extends PureComponent {
                         }
                         this.onExpiryDateChange()
                       }}
-                      disabled={disableEdit}
+                      disabled={disableEdit || isStartedVaccination}
                       {...args}
                     />
                   )
@@ -1008,7 +1040,7 @@ class Vaccination extends PureComponent {
                       onChange={() => {
                         this.onExpiryDateChange()
                       }}
-                      disabled={disableEdit}
+                      disabled={disableEdit || isStartedVaccination}
                       {...args}
                     />
                   )
@@ -1048,7 +1080,14 @@ class Vaccination extends PureComponent {
               <FastField
                 name='remarks'
                 render={args => {
-                  return <TextField rowsMax='5' label='Remarks' {...args} />
+                  return (
+                    <TextField
+                      rowsMax='5'
+                      label='Remarks'
+                      {...args}
+                      disabled={isStartedVaccination}
+                    />
+                  )
                 }}
               />
             </GridItem>
@@ -1173,6 +1212,7 @@ class Vaccination extends PureComponent {
                     <Checkbox
                       style={{ position: 'absolute', bottom: 2 }}
                       label='Generate Certificate'
+                      disabled={isStartedVaccination}
                       {...args}
                     />
                   )
@@ -1199,7 +1239,9 @@ class Vaccination extends PureComponent {
                       return (
                         <Checkbox
                           label='Pre-Order'
-                          disabled={isDisabledNoPaidPreOrder}
+                          disabled={
+                            isDisabledNoPaidPreOrder || isStartedVaccination
+                          }
                           style={{ position: 'absolute', bottom: 2 }}
                           {...args}
                           onChange={e => {

@@ -186,8 +186,7 @@ export default createFormViewModel({
             queueNo: entity.queueNo,
             visitID: entity.id,
           })
-
-          yield put({ type: 'closeModal' })
+          // yield put({ type: 'closeModal' })
         }
         return response
       },

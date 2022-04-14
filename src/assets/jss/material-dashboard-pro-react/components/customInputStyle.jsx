@@ -42,7 +42,7 @@ const customInputStyle = {
   //   marginTop: '0 !important',
   // },
   disabled: {
-    color: 'rgba(0, 0, 0, 1)',
+    color: 'inherit',
     // cursor: 'not-allowed',
     '&:before': {
       borderBottomStyle: 'dotted',

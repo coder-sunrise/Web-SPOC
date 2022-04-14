@@ -72,19 +72,25 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
               >
                 <div>{row.name}</div>
               </Tooltip>
-              <div style={{ position: 'relative', top: 2 }}>
-                {drugMixtureIndicator(row, -20)}
+              <div style={{ position: 'absolute', top: '-1px', right: '-4px' }}>
+                <div
+                  style={{
+                    display: 'inline-block',
+                    position: 'relative',
+                  }}
+                >
+                  {drugMixtureIndicator(row)}
+                </div>
                 {row.isPreOrder && (
                   <Tooltip title='New Pre-Order'>
                     <div
                       className={classes.rightIcon}
                       style={{
-                        right: -27,
                         borderRadius: 4,
                         backgroundColor: '#4255bd',
+                        display: 'inline-block',
                       }}
                     >
-                      {' '}
                       Pre
                     </div>
                   </Tooltip>
@@ -94,9 +100,9 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
                     <div
                       className={classes.rightIcon}
                       style={{
-                        right: row.isPreOrder ? -60 : -30,
                         borderRadius: 4,
                         backgroundColor: 'green',
+                        display: 'inline-block',
                       }}
                     >
                       Excl.

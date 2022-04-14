@@ -128,8 +128,7 @@ const WorkitemTitle = ({ item }) => {
 }
 
 const WorkitemBody = ({ item }) => {
-  const { setDetailsId } = useContext(WorklistContext)
-  const visitTypes = useVisitTypes()
+  const { setDetailsId, visitTypes } = useContext(WorklistContext)
   const { visitInfo } = item
   const orderDate = moment(item.generateDate).format(
     dateFormatLongWithTimeNoSec,
