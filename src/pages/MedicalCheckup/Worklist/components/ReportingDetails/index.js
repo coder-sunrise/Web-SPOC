@@ -531,7 +531,7 @@ const ReportingDetails = props => {
           />
           <div style={{ textAlign: 'right', position: 'absolute', bottom: 10 }}>
             {placement === 'right' && (
-              <Tooltip title='Show on Left'>
+              <Tooltip title='Move to left'>
                 <Button
                   type='primary'
                   size='small'
@@ -555,7 +555,7 @@ const ReportingDetails = props => {
               Close
             </Button>
             {placement === 'left' && (
-              <Tooltip title='Show on Right'>
+              <Tooltip title='Move to right'>
                 <Button
                   type='primary'
                   size='small'
