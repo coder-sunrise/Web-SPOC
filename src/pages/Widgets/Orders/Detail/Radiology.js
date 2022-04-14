@@ -69,6 +69,7 @@ const styles = theme => ({
     border: '1px solid rgba(0, 0, 0, 0.42)',
     fontSize: '0.85rem',
     padding: '3px 10px',
+    marginBottom: 2,
   },
   groupPanel: {
     margin: '0px 5px',
@@ -533,85 +534,103 @@ class Radiology extends PureComponent {
         <div>
           <GridContainer>
             <GridItem xs={12}>
-              <div style={{ marginTop: 10 }}>
-                <span className={classes.subTitle}>Category: </span>
-                {serviceCatetorys.map(category =>
-                  isEdit ? (
-                    <Tag
-                      className={classes.tag}
-                      style={{
-                        border:
+              <div
+                style={{ marginTop: 10, position: 'relative', paddingLeft: 70 }}
+              >
+                <div
+                  className={classes.subTitle}
+                  style={{ position: 'absolute', left: 0, top: 2 }}
+                >
+                  Category:
+                </div>
+                <div>
+                  {serviceCatetorys.map(category =>
+                    isEdit ? (
+                      <Tag
+                        className={classes.tag}
+                        style={{
+                          border:
+                            selectCategory === category.value
+                              ? '1px solid rgba(0, 0, 0, 0)'
+                              : '1px solid rgba(0, 0, 0, 0.42)',
+                        }}
+                        color={
                           selectCategory === category.value
-                            ? '1px solid rgba(0, 0, 0, 0)'
-                            : '1px solid rgba(0, 0, 0, 0.42)',
-                      }}
-                      color={
-                        selectCategory === category.value
-                          ? '#4255bd'
-                          : undefined
-                      }
-                    >
-                      {category.name}
-                    </Tag>
-                  ) : (
-                    <CheckableTag
-                      key={category.value}
-                      checked={selectCategory === category.value}
-                      className={classes.tag}
-                      style={{
-                        border:
-                          selectCategory === category.value
-                            ? '1px solid rgba(0, 0, 0, 0)'
-                            : '1px solid rgba(0, 0, 0, 0.42)',
-                      }}
-                      onChange={checked => {
-                        if (!isEdit && checked)
-                          setFieldValue('selectCategory', category.value)
-                      }}
-                    >
-                      {category.name}
-                    </CheckableTag>
-                  ),
-                )}
+                            ? '#4255bd'
+                            : undefined
+                        }
+                      >
+                        {category.name}
+                      </Tag>
+                    ) : (
+                      <CheckableTag
+                        key={category.value}
+                        checked={selectCategory === category.value}
+                        className={classes.tag}
+                        style={{
+                          border:
+                            selectCategory === category.value
+                              ? '1px solid rgba(0, 0, 0, 0)'
+                              : '1px solid rgba(0, 0, 0, 0.42)',
+                        }}
+                        onChange={checked => {
+                          if (!isEdit && checked)
+                            setFieldValue('selectCategory', category.value)
+                        }}
+                      >
+                        {category.name}
+                      </CheckableTag>
+                    ),
+                  )}
+                </div>
               </div>
             </GridItem>
             <GridItem xs={12}>
-              <div style={{ marginTop: 10 }}>
-                <span className={classes.subTitle}>Tag: </span>
-                {serviceTags.map(tag =>
-                  isEdit ? (
-                    <Tag
-                      className={classes.tag}
-                      style={{
-                        border:
-                          selectTag === tag.value
-                            ? '1px solid rgba(0, 0, 0, 0)'
-                            : '1px solid rgba(0, 0, 0, 0.42)',
-                      }}
-                      color={selectTag === tag.value ? '#4255bd' : undefined}
-                    >
-                      {tag.name}
-                    </Tag>
-                  ) : (
-                    <CheckableTag
-                      key={tag.value}
-                      checked={selectTag === tag.value}
-                      className={classes.tag}
-                      style={{
-                        border:
-                          selectTag === tag.value
-                            ? '1px solid rgba(0, 0, 0, 0)'
-                            : '1px solid rgba(0, 0, 0, 0.42)',
-                      }}
-                      onChange={checked => {
-                        if (!isEdit && checked)
-                          setFieldValue('selectTag', tag.value)
-                      }}
-                    >
-                      {tag.name}
-                    </CheckableTag>
-                  ),
-                )}
+              <div
+                style={{ marginTop: 10, position: 'relative', paddingLeft: 70 }}
+              >
+                <div
+                  className={classes.subTitle}
+                  style={{ position: 'absolute', left: 0, top: 2 }}
+                >
+                  Tag:
+                </div>
+                <div>
+                  {serviceTags.map(tag =>
+                    isEdit ? (
+                      <Tag
+                        className={classes.tag}
+                        style={{
+                          border:
+                            selectTag === tag.value
+                              ? '1px solid rgba(0, 0, 0, 0)'
+                              : '1px solid rgba(0, 0, 0, 0.42)',
+                        }}
+                        color={selectTag === tag.value ? '#4255bd' : undefined}
+                      >
+                        {tag.name}
+                      </Tag>
+                    ) : (
+                      <CheckableTag
+                        key={tag.value}
+                        checked={selectTag === tag.value}
+                        className={classes.tag}
+                        style={{
+                          border:
+                            selectTag === tag.value
+                              ? '1px solid rgba(0, 0, 0, 0)'
+                              : '1px solid rgba(0, 0, 0, 0.42)',
+                        }}
+                        onChange={checked => {
+                          if (!isEdit && checked)
+                            setFieldValue('selectTag', tag.value)
+                        }}
+                      >
+                        {tag.name}
+                      </CheckableTag>
+                    ),
+                  )}
+                </div>
               </div>
             </GridItem>
             <GridItem xs={12}>
