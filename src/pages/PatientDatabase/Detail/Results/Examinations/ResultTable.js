@@ -121,19 +121,21 @@ export const ResultTable = props => {
                 </span>
               </div>
               <div>
-                {!data.isAcknowledged && clinicRoleFK === 1 && (
-                  <div>
-                    <Button
-                      color='primary'
-                      size='sm'
-                      onClick={() => {
-                        acknowledge(data.id)
-                      }}
-                    >
-                      Acknowledge
-                    </Button>{' '}
-                  </div>
-                )}
+                {!data.isAcknowledged &&
+                  data.status == 6 &&
+                  clinicRoleFK === 1 && (
+                    <div>
+                      <Button
+                        color='primary'
+                        size='sm'
+                        onClick={() => {
+                          acknowledge(data.id)
+                        }}
+                      >
+                        Acknowledge
+                      </Button>{' '}
+                    </div>
+                  )}
                 {data.isAcknowledged && (
                   <Tooltip
                     title={`Acknowledged by ${
