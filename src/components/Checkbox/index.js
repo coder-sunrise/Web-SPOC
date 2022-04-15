@@ -21,9 +21,12 @@ const styles = () => ({
 
 @control()
 class Checkbox extends React.Component {
-  state = {
-    // value:this.props.field?getValue(this.props.field.value):'',
-    checked: false,
+  constructor(props) {
+    super(props)
+    this.state = {
+      // value:this.props.field?getValue(this.props.field.value):'',
+      checked: props.defaultChecked,
+    }
   }
 
   static getDerivedStateFromProps(nextProps, preState) {
