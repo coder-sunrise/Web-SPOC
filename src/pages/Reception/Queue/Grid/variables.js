@@ -170,7 +170,7 @@ export const QueueTableConfig = {
       title: 'Cons. Ready',
       fullTitle: 'Ready for Consultation',
     },
-    { name: 'workItem', title: 'Work Item' },
+    { name: 'workItemSummary', title: 'Work Item' },
     { name: 'servingByList', title: 'Serving By' },
     { name: 'patientReferenceNo', title: 'Ref. No.' },
     { name: 'patientName', title: 'Patient Name' },
@@ -379,7 +379,7 @@ export const QueueColumnExtensions = props => {
       width: 180,
     },
     {
-      columnName: 'workItem',
+      columnName: 'workItemSummary',
       width: 140,
       render: row => {
         const labWorkItems = row.workItemSummary.find(

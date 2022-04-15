@@ -64,6 +64,11 @@ class Grid extends React.Component {
       this.props.calendarEvents !== nextProps.calendarEvents
     )
       return true
+    if (
+      nextProps.filter !== StatusIndicator.APPOINTMENT &&
+      this.props.queueList !== nextProps.queueList
+    )
+      return true 
     return false
   }
 
