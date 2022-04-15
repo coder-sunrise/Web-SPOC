@@ -31,12 +31,12 @@ const formFieldTips_Content =
   "In order to add autofill feature, you must input the exact same instance into the name column. For example: To auto-populate patient's name, you need to key in" +
   'PatientName into the name column in Forms Fields. Click on the light bulb icon for more autofill instances.'
 const formFieldTips_Tooltip =
-  "i. Patient's Name:PatientName\n" +
-  "ii.Patient's Gender:PatientGender\n" +
-  "iii Patient's DOB：PatientDOB\n" +
-  "iv.Patient's Age: PatientAge\n" +
-  "vi. Patient's Reference Number:PatientRefNo\n" +
-  "vii.Today's Date:TodayDate\n" +
+  "i.   Patient's Name:PatientName\n" +
+  "ii.  Patient's Gender:PatientGender\n" +
+  "iii. Patient's DOB：PatientDOB\n" +
+  "iv.  Patient's Age: PatientAge\n" +
+  "vi.  Patient's Reference Number:PatientRefNo\n" +
+  "vii. Today's Date:TodayDate\n" +
   '\n\nif you would like to enter twice the same instance, please' +
   'key in "<InstanceName>_<Number>".The number must be' +
   'unique throughout a form.' +
@@ -115,12 +115,12 @@ class Detail extends PureComponent {
       </span>
     )
     const formFieldTips_Tooltip =
-      "i. Patient's Name:PatientName\n" +
-      "ii.Patient's Gender:PatientGender\n" +
-      "iii Patient's DOB：PatientDOB\n" +
-      "iv.Patient's Age: PatientAge\n" +
-      "vi. Patient's Reference Number:PatientRefNo\n" +
-      "vii.Today's Date:TodayDate\n" +
+      "i.   Patient's Name:PatientName\n" +
+      "ii.  Patient's Gender:PatientGender\n" +
+      "iii. Patient's DOB：PatientDOB\n" +
+      "iv.  Patient's Age: PatientAge\n" +
+      "vi.  Patient's Reference Number:PatientRefNo\n" +
+      "vii. Today's Date:TodayDate\n" +
       '\nif you would like to enter twice the same instance, please\n' +
       'key in "<InstanceName>_<Number>".The number must be unique\n' +
       'throughout a form.\n' +

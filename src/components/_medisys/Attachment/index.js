@@ -308,6 +308,7 @@ class Attachment extends Component {
       filterTypes = [],
       attachments = [],
       isReadOnly,
+      listOnly = false,
       label = 'Attachment:',
       disableScanner = false,
       handleOpenScanner,
@@ -334,74 +335,89 @@ class Attachment extends Component {
         loading={this.state.uploading}
         text=''
       >
-        <GridContainer>
-          {/* {label && (
-          <GridItem className={labelClass}>
-            <span className={classes.attachmentLabel}>{label}</span>
-            {this.state.uploading && <CircularProgress />}
-          </GridItem>
-        )} */}
-          <GridItem md={10} className={classes.verticalSpacing}>
-            <div>
-              {fileAttachments.map(attachment => (
-                <AttachmentChipWithPopover
-                  title='Delete Attachment'
-                  contentText='Confirm to delete this attachment?'
-                  isReadOnly={isReadOnly}
-                  classes={classes}
-                  attachment={attachment}
-                  onConfirmDelete={this.onDelete}
-                  onClickAttachment={this.onClick}
-                />
-              ))}
-            </div>
-          </GridItem>
-          <GridItem className={classes.noPadding}>
-            <input
-              style={{ display: 'none' }}
-              type='file'
-              accept={allowedFiles}
-              id='uploadVisitAttachment'
-              ref={this.inputEl}
-              multiple='multiple'
-              onChange={this.onFileChange}
-              onClick={this.clearValue}
-            />
-            {!isReadOnly && (
-              <React.Fragment>
-                <Button
-                  color='primary'
-                  size='sm'
-                  onClick={this.onUploadClick}
-                  disabled={this.state.uploading || global.disableSave}
-                >
-                  <AttachFile />
-                  Upload
-                </Button>
-                {!disableScanner && (
+        {listOnly && (
+          <GridContainer>
+            <GridItem md={12} className={classes.verticalSpacing}>
+              <div>
+                {fileAttachments.map(attachment => (
+                  <AttachmentChipWithPopover
+                    title='Delete Attachment'
+                    contentText='Confirm to delete this attachment?'
+                    isReadOnly={isReadOnly}
+                    classes={classes}
+                    attachment={attachment}
+                    onConfirmDelete={this.onDelete}
+                    onClickAttachment={this.onClick}
+                  />
+                ))}
+              </div>
+            </GridItem>
+          </GridContainer>
+        )}
+        {!listOnly && (
+          <GridContainer>
+            <GridItem md={10} className={classes.verticalSpacing}>
+              <div>
+                {fileAttachments.map(attachment => (
+                  <AttachmentChipWithPopover
+                    title='Delete Attachment'
+                    contentText='Confirm to delete this attachment?'
+                    isReadOnly={isReadOnly}
+                    classes={classes}
+                    attachment={attachment}
+                    onConfirmDelete={this.onDelete}
+                    onClickAttachment={this.onClick}
+                  />
+                ))}
+              </div>
+            </GridItem>
+            <GridItem className={classes.noPadding}>
+              <input
+                style={{ display: 'none' }}
+                type='file'
+                accept={allowedFiles}
+                id='uploadVisitAttachment'
+                ref={this.inputEl}
+                multiple='multiple'
+                onChange={this.onFileChange}
+                onClick={this.clearValue}
+              />
+              {!isReadOnly && (
+                <React.Fragment>
                   <Button
                     color='primary'
                     size='sm'
-                    onClick={handleOpenScanner}
-                    disabled={
-                      isReadOnly || this.state.uploading || global.disableSave
-                    }
-                    className={
-                      fileAttachments.length >= 1 ? classes.uploadBtn : ''
-                    }
+                    onClick={this.onUploadClick}
+                    disabled={this.state.uploading || global.disableSave}
                   >
-                    <Scanner /> Scan
+                    <AttachFile />
+                    Upload
                   </Button>
-                )}
-              </React.Fragment>
-            )}
-          </GridItem>
-          <GridItem>
-            <Danger>
-              <span>{this.state.errorText}</span>
-            </Danger>
-          </GridItem>
-        </GridContainer>
+                  {!disableScanner && (
+                    <Button
+                      color='primary'
+                      size='sm'
+                      onClick={handleOpenScanner}
+                      disabled={
+                        isReadOnly || this.state.uploading || global.disableSave
+                      }
+                      className={
+                        fileAttachments.length >= 1 ? classes.uploadBtn : ''
+                      }
+                    >
+                      <Scanner /> Scan
+                    </Button>
+                  )}
+                </React.Fragment>
+              )}
+            </GridItem>
+            <GridItem>
+              <Danger>
+                <span>{this.state.errorText}</span>
+              </Danger>
+            </GridItem>
+          </GridContainer>
+        )}
       </LoadingWrapper>
     )
   }

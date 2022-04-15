@@ -64,6 +64,11 @@ class Grid extends React.Component {
       this.props.calendarEvents !== nextProps.calendarEvents
     )
       return true
+    if (
+      nextProps.filter !== StatusIndicator.APPOINTMENT &&
+      this.props.queueList !== nextProps.queueList
+    )
+      return true 
     return false
   }
 
@@ -251,8 +256,8 @@ class Grid extends React.Component {
     let loadingText = 'Refreshing queue...'
     if (!loading && queryingFormData) loadingText = ''
     let height =
-      mainDivHeight -
-      50 -
+      document.documentElement.clientHeight -
+      110 -
       ($('.filterBar').height() || 0) -
       ($('.queueHeader').height() || 0)
     if (height < 500) height = 500

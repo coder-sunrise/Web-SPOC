@@ -21,7 +21,6 @@ import Authorized from '@/utils/Authorized'
 import NurseWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/NurseWorkItemInfo'
 import RadioWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/RadioWorkItemInfo'
 import LabWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/LabWorkItemInfo'
-import LabTrackingItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/LabTrackingItemInfo'
 import { VISIT_TYPE, WORK_ITEM_TYPES } from '@/utils/constants'
 import DoctorConsultationStatus from './DoctorConsultationStatus'
 
@@ -175,7 +174,7 @@ export const QueueTableConfig = {
       title: 'Cons. Ready',
       fullTitle: 'Ready for Consultation',
     },
-    { name: 'workItem', title: 'Work Item' },
+    { name: 'workItemSummary', title: 'Work Item' },
     { name: 'servingByList', title: 'Serving By' },
     { name: 'patientReferenceNo', title: 'Ref. No.' },
     { name: 'patientName', title: 'Patient Name' },
@@ -384,8 +383,8 @@ export const QueueColumnExtensions = props => {
       width: 180,
     },
     {
-      columnName: 'workItem',
-      width: 180,
+      columnName: 'workItemSummary',
+      width: 140,
       render: row => {
         const labWorkItems = row.workItemSummary.find(
           t => t.type === WORK_ITEM_TYPES.LAB,
@@ -396,9 +395,6 @@ export const QueueColumnExtensions = props => {
         const nurseWorkItems = row.workItemSummary.find(
           t => t.type === WORK_ITEM_TYPES.NURSEACTUALIZE,
         )
-        const labTrackingWorkItems = row.workItemSummary.find(
-          t => t.type === WORK_ITEM_TYPES.LAB_TRACKING,
-        )
         const labWorkItemsAccessRight = Authorized.check(
           'queue.workitem.labworkitem',
         ) || { rights: 'hidden' }
@@ -407,9 +403,6 @@ export const QueueColumnExtensions = props => {
         ) || { rights: 'hidden' }
         const nurseWorkItemsAccessRight = Authorized.check(
           'queue.workitem.nurseworkitem',
-        ) || { rights: 'hidden' }
-        const labTrakcingItemsAccessRight = Authorized.check(
-          'reception/labtracking',
         ) || { rights: 'hidden' }
         return (
           <div style={{ justifyContent: 'space-between' }}>
@@ -435,14 +428,6 @@ export const QueueColumnExtensions = props => {
                 <NurseWorkItemInfo
                   visitFK={row.visitFK}
                   workItemSummary={nurseWorkItems}
-                />
-              )}
-            {labTrakcingItemsAccessRight.rights === 'enable' &&
-              labTrackingWorkItems &&
-              labTrackingWorkItems.totalWorkItem > 0 && (
-                <LabTrackingItemInfo
-                  visitFK={row.visitFK}
-                  workItemSummary={labTrackingWorkItems}
                 />
               )}
           </div>

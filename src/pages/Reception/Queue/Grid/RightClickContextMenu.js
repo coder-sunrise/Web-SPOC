@@ -124,8 +124,8 @@ class RightClickContextMenu extends React.Component {
                   ? anchorEl.x - 160
                   : anchorEl.x,
               top:
-                document.documentElement.clientHeight < anchorEl.y + 270
-                  ? anchorEl.y - 270
+                document.documentElement.clientHeight < anchorEl.y + 350
+                  ? anchorEl.y - 350
                   : anchorEl.y,
             }}
           >

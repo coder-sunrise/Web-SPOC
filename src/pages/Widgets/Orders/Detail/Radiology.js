@@ -1084,7 +1084,7 @@ class Radiology extends PureComponent {
                   value={editService.newServiceName}
                   disabled={!editServiceId || isStartedRadiology}
                   label='New Service Display Name'
-                  maxLength={255}
+                  maxLength={200}
                   onChange={e => {
                     editService.newServiceName = e.target.value
                     setFieldValue('radiologyItems', [...radiologyItems])

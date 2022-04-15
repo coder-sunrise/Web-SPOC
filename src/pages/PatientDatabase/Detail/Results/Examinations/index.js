@@ -124,10 +124,19 @@ const Examinations = props => {
     }).then(r => {
       if (r) {
         notification.success({ message: 'Acknowledged' })
-        var newData = [...data]
-        var currentSpecimen = newData.find(t => t.id === id)
-        currentSpecimen.isAcknowledged = true
-        setData(newData)
+
+        dispatch({
+          type: 'specimenCollection/getLabSpecimenById',
+          payload: { id: id },
+        }).then(r => {
+          var newData = [...data]
+          var currentSpecimen = newData.find(t => t.id === id)
+          currentSpecimen.isAcknowledged = r.isAcknowledged
+          currentSpecimen.acknowledgedByUserTitle = r.acknowledgedByUserTitle
+          currentSpecimen.acknowledgeDate = r.acknowledgeDate
+          currentSpecimen.acknowledgedByUser = r.acknowledgedByUser
+          setData(newData)
+        })
       } else {
         notification.error({ message: 'Acknowledge Failed' })
       }

@@ -85,6 +85,13 @@ const errorMessage = (v) => {
         .min(0.1, errorMessage(0.1))
         .max(5, errorMessage(0.1)),
     }),
+    contentDisclaimerHeight: Yup.number().when('isDisplayContentDisclaimer', {
+      is: (v) => v === true,
+      then: Yup.number()
+        .required()
+        .min(0.1, errorMessage(0.1))
+        .max(5, errorMessage(0.1)),
+    }),    
     footerInfoHeight: Yup.number().when('isDisplayFooterInfo', {
       is: (v) => v === true,
       then: Yup.number()
@@ -103,15 +110,18 @@ const errorMessage = (v) => {
       is: (v) => v === true,
       then: Yup.string().required('Letter Head Image is required.'),
     }),
-
+    contentDisclaimerImage: Yup.string().when('isDisplayContentDisclaimer', {
+      is: (v) => v === true,
+      then: Yup.string().required('Disclaimer Image is required.'),
+    }),
     footerDisclaimerImage: Yup.string().when('isDisplayFooterInfoDisclaimer', {
       is: (v) => v === true,
-      then: Yup.string().required('Footer Disclaimer Image is required.'),
+      then: Yup.string().required('Footer Image is required.'),
     }),
   }),
   handleSubmit: (values, { props }) => {
     const { dispatch } = props
-    const { customLetterHeadImage, footerDisclaimerImage, reportFK } = values
+    const { customLetterHeadImage, contentDisclaimerImage, footerDisclaimerImage, reportFK } = values
     const noHeaderBase64 = (v) => {
       if (v) return v.split(',')[1] || v
       return undefined
@@ -121,6 +131,7 @@ const errorMessage = (v) => {
       payload: {
         ...values,
         customLetterHeadImage: noHeaderBase64(customLetterHeadImage),
+        contentDisclaimerImage: noHeaderBase64(contentDisclaimerImage),
         footerDisclaimerImage: noHeaderBase64(footerDisclaimerImage),
       },
     }).then((r) => {
@@ -244,6 +255,7 @@ class printoutSetting extends PureComponent {
 
     const letterHeadImgRequired = this.props.errors.customLetterHeadImage
     const footerDisclaimerImgRequired = this.props.errors.footerDisclaimerImage
+    const contentDisclaimerImgRequired = this.props.errors.contentDisclaimerImage
     const { reportSettingParameter = [] } = values
 
     return (
@@ -253,14 +265,14 @@ class printoutSetting extends PureComponent {
             <GridItem md={3}>
               <FastField
                 name='reportFK'
-                render={(args) => (
+                render={args => (
                   <CodeSelect
                     label='Select Printout'
                     code='report'
                     allowClear={false}
                     {...args}
-                    onChange={(e) => this.checkFormIsDirty(e)}
-                    orderBy={[['name'],['asc']]}
+                    onChange={e => this.checkFormIsDirty(e)}
+                    orderBy={[['name'], ['asc']]}
                   />
                 )}
               />
@@ -285,7 +297,7 @@ class printoutSetting extends PureComponent {
                 <GridItem md={3}>
                   <FastField
                     name='isDisplayCustomLetterHead'
-                    render={(args) => (
+                    render={args => (
                       <Switch style={{ marginTop: 0 }} {...args} />
                     )}
                   />
@@ -297,7 +309,7 @@ class printoutSetting extends PureComponent {
                     <GridItem md={6}>
                       <Field
                         name='customLetterHeadHeight'
-                        render={(args) => (
+                        render={args => (
                           <NumberInput
                             label='Letter Head Height'
                             suffix='cm'
@@ -317,7 +329,7 @@ class printoutSetting extends PureComponent {
                       )}
                       <Field
                         name='customLetterHeadImage'
-                        render={(args) => {
+                        render={args => {
                           return (
                             <BrowseImage
                               title='Letter Head Image'
@@ -344,7 +356,7 @@ class printoutSetting extends PureComponent {
                 <GridItem md={3}>
                   <FastField
                     name='isDisplayStandardHeader'
-                    render={(args) => (
+                    render={args => (
                       <Switch style={{ marginTop: 0 }} {...args} />
                     )}
                   />
@@ -356,7 +368,7 @@ class printoutSetting extends PureComponent {
                     <GridItem md={6}>
                       <FastField
                         name='standardHeaderInfoHeight'
-                        render={(args) => (
+                        render={args => (
                           <NumberInput
                             label='Header Info Height'
                             suffix='cm'
@@ -374,6 +386,70 @@ class printoutSetting extends PureComponent {
               ) : (
                 ''
               )}
+              
+              {[15,89].some(r=> r === values.reportFK) && (
+                <React.Fragment>
+                  <GridContainer className={classes.verticalSpacing}>
+                    <GridItem md={2}>
+                      <h4>
+                        <b>Disclaimer</b>
+                      </h4>
+                    </GridItem>
+                    <GridItem md={3}>
+                      <FastField
+                        name='isDisplayContentDisclaimer'
+                        render={args => (
+                          <Switch style={{ marginTop: 0 }} {...args} />
+                        )}
+                      />
+                    </GridItem>
+                  </GridContainer>
+                  <GridContainer className={classes.indentDisclaimer} />
+                  {values.isDisplayContentDisclaimer === true ? (
+                    <GridContainer className={classes.indent}>
+                      <GridItem direction='column' md={6}>
+                        <GridItem md={6}>
+                          <FastField
+                            name='contentDisclaimerHeight'
+                            render={args => (
+                              <NumberInput
+                                label='Disclaimer Image Height'
+                                suffix='cm'
+                                format='0.0'
+                                min='0'
+                                max='5'
+                                {...args}
+                              />
+                            )}
+                          />
+                        </GridItem>
+
+                        <GridItem md={6}>
+                          {contentDisclaimerImgRequired && (
+                            <span className={classes.errorMsg}>
+                              {contentDisclaimerImgRequired}
+                            </span>
+                          )}
+                          <Field
+                            name='contentDisclaimerImage'
+                            render={args => (
+                              <BrowseImage
+                                title='Disclaimer Image'
+                                setImageBase64={this.setImageBase64}
+                                fieldName='contentDisclaimerImage'
+                                selected={this.state.selected}
+                                {...args}
+                              />
+                            )}
+                          />
+                        </GridItem>
+                      </GridItem>
+                    </GridContainer>
+                  ) : (
+                    ''
+                  )}
+                </React.Fragment>
+              )}
 
               <GridContainer className={classes.verticalSpacing}>
                 <GridItem md={2}>
@@ -384,7 +460,7 @@ class printoutSetting extends PureComponent {
                 <GridItem md={3}>
                   <FastField
                     name='isDisplayFooterInfo'
-                    render={(args) => (
+                    render={args => (
                       <Switch style={{ marginTop: 0 }} {...args} />
                     )}
                   />
@@ -396,7 +472,7 @@ class printoutSetting extends PureComponent {
                     <GridItem md={6}>
                       <Field
                         name='footerInfoHeight'
-                        render={(args) => (
+                        render={args => (
                           <NumberInput
                             label='Footer Info Height'
                             suffix='cm'
@@ -417,13 +493,13 @@ class printoutSetting extends PureComponent {
               <GridContainer className={classes.verticalSpacing}>
                 <GridItem md={2}>
                   <h4>
-                    <b>Disclaimer</b>
+                    <b>Footer Image</b>
                   </h4>
                 </GridItem>
                 <GridItem md={3}>
                   <FastField
                     name='isDisplayFooterInfoDisclaimer'
-                    render={(args) => (
+                    render={args => (
                       <Switch style={{ marginTop: 0 }} {...args} />
                     )}
                   />
@@ -437,9 +513,9 @@ class printoutSetting extends PureComponent {
                     <GridItem md={6}>
                       <FastField
                         name='footerDisclaimerHeight'
-                        render={(args) => (
+                        render={args => (
                           <NumberInput
-                            label='Footer Disclaimer Height'
+                            label='Footer Image Height'
                             suffix='cm'
                             format='0.0'
                             min='0'
@@ -458,9 +534,9 @@ class printoutSetting extends PureComponent {
                       )}
                       <Field
                         name='footerDisclaimerImage'
-                        render={(args) => (
+                        render={args => (
                           <BrowseImage
-                            title='Footer Disclaimer Image'
+                            title='Footer Image'
                             setImageBase64={this.setImageBase64}
                             fieldName='footerDisclaimerImage'
                             selected={this.state.selected}

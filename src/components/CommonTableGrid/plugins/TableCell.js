@@ -19,12 +19,7 @@ import {
   difference,
 } from '@/utils/utils'
 
-const actionCols = [
-  'actions',
-  'action',
-  'Action',
-  'editCommand',
-]
+const actionCols = ['actions', 'action', 'Action', 'editCommand']
 const DragHandle = SortableHandle(({ style }) => (
   <Tooltip title='Drag'>
     <span
@@ -39,7 +34,7 @@ const DragHandle = SortableHandle(({ style }) => (
 ))
 
 class TableCell extends React.Component {
-  shouldComponentUpdate (nextProps) {
+  shouldComponentUpdate(nextProps) {
     // console.log(nextProps.extraCellConfig, this.props.extraCellConfig)
     // console.log(row === this.props.row)
 
@@ -70,7 +65,7 @@ class TableCell extends React.Component {
       extraCellConfig &&
       extraCellConfig.editingCells &&
       extraCellConfig.editingCells.find(
-        (o) => o.rowId === getRowId(row), // &&
+        o => o.rowId === getRowId(row), // &&
         // o.columnName === nextProps.column.name,
       )
     ) {
@@ -83,7 +78,7 @@ class TableCell extends React.Component {
       orgConfig &&
       orgConfig.editingCells &&
       orgConfig.editingCells.find(
-        (o) => o.rowId === getRowId(this.props.row), // &&
+        o => o.rowId === getRowId(this.props.row), // &&
         // o.columnName === nextProps.column.name,
       )
     ) {
@@ -93,12 +88,11 @@ class TableCell extends React.Component {
 
     if (nextProps.column) {
       const col =
-        columnExtensions.find((o) => o.columnName === nextProps.column.name) ||
-        {}
+        columnExtensions.find(o => o.columnName === nextProps.column.name) || {}
       if (
         // typeof col.options === 'function' ||
         row._errors &&
-        row._errors.find((o) => o.params.path === nextProps.column.name)
+        row._errors.find(o => o.params.path === nextProps.column.name)
       ) {
         // console.log(1, row)
 
@@ -108,8 +102,8 @@ class TableCell extends React.Component {
       if (nextProps.value !== this.props.value) return true
 
       if (col.observeFields) {
-        const changedFields = col.observeFields.map((o) => row[o] !== orgRow[o])
-        if (changedFields.filter((o) => o).length > 0) return true
+        const changedFields = col.observeFields.map(o => row[o] !== orgRow[o])
+        if (changedFields.filter(o => o).length > 0) return true
       }
 
       //
@@ -131,7 +125,7 @@ class TableCell extends React.Component {
     if (onRowMove) onRowMove(row, direction)
   }
 
-  render () {
+  render() {
     const {
       columnExtensions = [],
       extraState,
@@ -179,7 +173,7 @@ class TableCell extends React.Component {
 
     if (extraState) {
       const colCfg =
-        columnExtensions.find((o) => o.columnName === column.name) || {}
+        columnExtensions.find(o => o.columnName === column.name) || {}
       const latestRow = window.$tempGridRow[this.gridId]
         ? window.$tempGridRow[this.gridId][getRowId(row)] || row
         : row
@@ -194,13 +188,7 @@ class TableCell extends React.Component {
         (!colCfg.isDisabled || !colCfg.isDisabled(latestRow)) &&
         !colCfg.disabled
       ) {
-        if (
-          ![
-            'radio',
-            'checkbox',
-            'custom',
-          ].includes(colCfg.type)
-        ) {
+        if (!['radio', 'checkbox', 'custom'].includes(colCfg.type)) {
           cfg.tabIndex = 0
           cfg.onFocus = onClick
         }
