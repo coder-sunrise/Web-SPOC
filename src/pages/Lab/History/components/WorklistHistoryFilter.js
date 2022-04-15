@@ -65,7 +65,7 @@ export const WorklistHistoryFilter = () => {
     setPaginationChangeHandler(handleSearch)
   }, [])
 
-  const handleSearch = pageNo => {
+  const handleSearch = (pageNo = 1, pageSize = 20) => {
     const {
       searchValue,
       visitType,
@@ -77,7 +77,8 @@ export const WorklistHistoryFilter = () => {
     dispatch({
       type: 'labWorklistHistory/query',
       payload: {
-        current: pageNo ?? 1,
+        current: pageNo,
+        pagesize: pageSize,
         apiCriteria: {
           searchValue: searchValue,
           visitType: visitType
