@@ -854,6 +854,7 @@ const getOrdersData = val => {
         quantity: po.quantity,
         remark: po?.remarks,
         sequence: 1,
+        priority: 'Normal',
         serviceCenterFK:
           preOrderServiceItem?.serviceCenterFK || service[0].serviceCenterId,
         serviceCenterServiceFK:
