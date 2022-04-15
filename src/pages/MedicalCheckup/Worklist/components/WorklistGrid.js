@@ -629,7 +629,7 @@ const WorklistGrid = ({
             display: 'inline-block',
             height: 18,
             width: 18,
-            backgroundColor: '#CC0033',
+            border: `1px solid #354497`,
           }}
         />
         <span
@@ -648,7 +648,7 @@ const WorklistGrid = ({
             display: 'inline-block',
             height: 18,
             width: 18,
-            backgroundColor: '#33CC00',
+            border: `1px solid #008B00`,
           }}
         />
         <span
@@ -664,18 +664,20 @@ const WorklistGrid = ({
         </span>
         <span
           style={{
-            color: 'white',
+            color: '#008B00',
             display: 'inline-block',
             height: 18,
             width: 18,
-            backgroundColor: '#33CC00',
+            border: `1px solid #008B00`,
             position: 'relative',
-            top: '-4px',
+            top: 0,
           }}
         >
           <CheckCircleOutlined
             style={{
-              marginRight: 2,
+              position: 'absolute',
+              top: 1,
+              left: 1,
             }}
           />
         </span>
