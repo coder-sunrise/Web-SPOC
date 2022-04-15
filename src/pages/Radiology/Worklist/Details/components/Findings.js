@@ -27,6 +27,7 @@ import { scribbleTypes } from '@/utils/codes'
 const useStyles = makeStyles(theme => ({
   editor: {
     fontSize: '0.9rem',
+    minHeight: '500px',
   },
 }))
 
@@ -336,7 +337,7 @@ export const Findings = ({
             editorState={editorState}
             onEditorStateChange={handleEditorStateChange}
             stripPastedStyles={false}
-            height={250}
+            // height={250}
           />
         </GridItem>
       </GridContainer>
