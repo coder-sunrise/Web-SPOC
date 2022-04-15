@@ -42,7 +42,9 @@ const LabTrackingItemInfo = props => {
       setTotalWorkItemCount(detailData.length)
       setCompletedWorkItemCount(
         detailData.filter(
-          t => t.labTrackingStatusFK === LAB_TRACKING_STATUS.COMPLETED,
+          t =>
+            t.labTrackingStatusFK === LAB_TRACKING_STATUS.COMPLETED ||
+            t.labTrackingStatusFK === LAB_TRACKING_STATUS.RECEIVED,
         ).length,
       )
     })
@@ -62,11 +64,10 @@ const LabTrackingItemInfo = props => {
           <td style={{ width: '150px', wordBreak: 'break-word' }}>
             {workItem.supplierName || '-'}
           </td>
-          <td style={{ width: '150px', wordBreak: 'break-word' }}>
-            {workItem.caseTypeDisplayValue || '-'}
-          </td>
           <td style={{ width: '165px', wordBreak: 'break-word' }}>
-            {moment(workItem.receivedDate).format('DD MMM YYYY, HH:mm') || '-'}
+            {workItem.receivedDate
+              ? moment(workItem.receivedDate).format('DD MMM YYYY HH:mm')
+              : '-'}
           </td>
           <td
             style={{
@@ -99,7 +100,7 @@ const LabTrackingItemInfo = props => {
       }}
       content={
         <div>
-          <h5>Lab Tracking Details</h5>
+          <h5>External Tracking Details</h5>
           <table
             style={{
               fontSize: 14,
@@ -112,7 +113,6 @@ const LabTrackingItemInfo = props => {
               <th style={{ width: '35px' }}>No.</th>
               <th style={{ width: '150px' }}>Service Name</th>
               <th style={{ width: '150px' }}>Supplier</th>
-              <th style={{ width: '150px' }}>Case Type</th>
               <th style={{ width: '165px' }}>Received Date</th>
               <th style={{ minWidth: '120px' }}>Status</th>
             </tr>

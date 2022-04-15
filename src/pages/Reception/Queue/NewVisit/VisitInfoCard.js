@@ -125,7 +125,7 @@ const VisitInfoCard = ({
     const qNo = parseFloat(value).toFixed(
       clinicSettings.settings.isQueueNoDecimal ? 1 : 0,
     )
-    if (existingQNo.includes(qNo))
+    if (!fromMedicalCheckupReporting && existingQNo.includes(qNo))
       return 'Queue No. already existed in current queue list'
     return ''
   }
