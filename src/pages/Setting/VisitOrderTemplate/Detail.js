@@ -21,7 +21,7 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
   handleSubmit: (values, { props }) => {
-    if(values.rows.some(x=>x.totalAftAdj < 0))
+    if(values.rows.some(x=> !x.isDeleted && x.totalAftAdj < 0))
       return;
     const { effectiveDates, rows, tempSelectedItem, ...restValues } = values
     const { dispatch, onConfirm } = props
@@ -162,7 +162,7 @@ class Detail extends PureComponent {
             onConfirm: handleSubmit,
             confirmBtnText: 'Save',
             confirmProps: {
-              disabled: values.rows.some(x=>x.totalAftAdj < 0),
+              disabled: values.rows.some(x=> !x.isDeleted && x.totalAftAdj < 0),
             },
           })}
       </Fragment>

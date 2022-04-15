@@ -241,7 +241,7 @@ const PendingPreOrder: React.FC = (props: any) => {
     }
 
     const { option, row } = e
-    ;(row.quantity = undefined),
+    ;(row.quantity = 1),
       (row.amount = 0),
       (row.itemName = undefined),
       (row.preOrderVaccinationItem = undefined),
