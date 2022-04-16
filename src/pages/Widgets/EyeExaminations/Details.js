@@ -157,7 +157,6 @@ export default ({
             <RadioGroup
               label='Vision Correction Method'
               options={[
-                { value: 'Lasik', label: 'Lasik' },
                 { value: 'Contact Lens', label: 'Contact Lens' },
                 { value: 'Glasses', label: 'Glasses' },
               ]}
