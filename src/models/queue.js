@@ -412,12 +412,28 @@ export default createListViewModel({
         }
       },
       *saveUserPreference({ payload }, { call, put, select }) {
+        const { queueFilterBar } = yield select(st => st.queueLog)
+        const newDetail = {
+          ...queueFilterBar,
+          ...payload.userPreferenceDetails.value,
+        }
         const r = yield call(saveUserPreference, {
-          userPreferenceDetails: JSON.stringify(payload.userPreferenceDetails),
+          userPreferenceDetails: JSON.stringify({
+            value: newDetail,
+            Identifier: 'Queue',
+          }),
           itemIdentifier: payload.itemIdentifier,
           type: payload.type,
         })
-        if (r === 204) return true
+        if (r === 204) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              queueFilterBar: newDetail,
+            },
+          })
+          return true
+        }
 
         return false
       },
@@ -442,6 +458,7 @@ export default createListViewModel({
             }
             const queue = queueFilterBar?.value || {}
             const { visitType } = queue
+            const { doctor } = queue
 
             if (visitType) {
               newVisitType = visitType.filter(
@@ -454,14 +471,18 @@ export default createListViewModel({
             yield put({
               type: 'updateState',
               payload: {
-                queueFilterBar: { ...queue, visitType: newVisitType },
+                queueFilterBar: {
+                  ...queue,
+                  visitType: newVisitType,
+                  doctor: doctor,
+                },
               },
             })
           } else {
             yield put({
               type: 'updateState',
               payload: {
-                queueFilterBar: { visitType: newVisitType },
+                queueFilterBar: { visitType: newVisitType, doctor: doctor },
               },
             })
           }

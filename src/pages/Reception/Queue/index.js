@@ -857,6 +857,7 @@ class Queue extends React.Component {
     } = this.state
     const { sessionInfo, error, queueFilterBar = {} } = queueLog
     const { visitType = [] } = queueFilterBar
+    const { doctor = [] } = queueFilterBar
     const { sessionNo, isClinicSessionClosed } = sessionInfo
     const { oriQCallList } = queueCalling
     const openQueueDisplayAccessRight = Authorized.check('openqueuedisplay')
@@ -1009,6 +1010,7 @@ class Queue extends React.Component {
                 history={history}
                 searchQuery={search}
                 visitType={visitType}
+                doctor={doctor}
               />
               <RightClickContextMenu
                 onMenuItemClick={this.onMenuItemClick}
