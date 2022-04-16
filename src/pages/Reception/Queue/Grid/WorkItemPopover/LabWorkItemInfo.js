@@ -180,7 +180,7 @@ const LabWorkItemInfo = props => {
                   <span>{getQueueLabWorkitemStatus(labWorkitem)}</span>
                   {labWorkitem.isAcknowledged && (
                     <Tooltip
-                      title={`Acknowledged By: ${
+                      title={`Acknowledged by: ${
                         labWorkitem.acknowledgeByUserTitle
                           ? labWorkitem.acknowledgeByUserTitle + ', '
                           : ''

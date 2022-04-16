@@ -492,18 +492,20 @@ const LabResults = ({
     <div>
       <GridContainer>
         <GridItem md={9}>
-          <Checkbox
-            label='Display MC Only'
-            style={{
-              display: 'inline-block',
-              fontSize: '14px!important',
-              width: 160,
-            }}
-            checked={onlyMC}
-            onChange={e => {
-              setOnlyMC(e.target?.value)
-            }}
-          ></Checkbox>
+          {clinicSettings?.settings?.isEnableMedicalCheckupModule && (
+            <Checkbox
+              label='Display MC Only'
+              style={{
+                display: 'inline-block',
+                fontSize: '14px!important',
+                width: 160,
+              }}
+              checked={onlyMC}
+              onChange={e => {
+                setOnlyMC(e.target?.value)
+              }}
+            ></Checkbox>
+          )}
           <Checkbox
             style={{
               display: 'inline-block',

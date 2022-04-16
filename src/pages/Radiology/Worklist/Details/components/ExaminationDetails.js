@@ -92,7 +92,8 @@ export const ExaminationDetails = ({
   }, [workitem])
 
   const isHiddenExaminationFinding =
-    Authorized.check('radiologyworklist.examinationfinding').rights === 'hidden'
+    Authorized.check('radiologyworklist.examinationfinding')?.rights ===
+    'hidden'
 
   let currentScribbleNotes = []
   const scribbleType = scribbleTypes.find(o => o.type === 'radiology')

@@ -3,7 +3,7 @@ import PromiseRender from './PromiseRender'
 import { CURRENT } from './renderAuthorize'
 import Authorized from '@/utils/Authorized'
 
-function isPromise (obj) {
+function isPromise(obj) {
   return (
     !!obj &&
     (typeof obj === 'object' || typeof obj === 'function') &&
@@ -20,15 +20,10 @@ const checkSinglePermission = (
 ) => {
   let match = null
 
-  const r = currentAuthority.filter((o) => o.name === authority)
+  const r = currentAuthority.filter(o => o.name === authority)
   if (r.length > 0) {
     match = r.find(
-      (o) =>
-        [
-          'enable',
-          'enabled',
-          'readwrite',
-        ].indexOf(o.rights) >= 0,
+      o => ['enable', 'enabled', 'readwrite'].indexOf(o.rights) >= 0,
     )
     if (match) {
       match.rights = 'enable'
@@ -46,12 +41,7 @@ const checkSinglePermission = (
         : target
     }
 
-    match = r.find(
-      (o) =>
-        [
-          'hidden',
-        ].indexOf(o.rights) >= 0,
-    )
+    match = r.find(o => ['hidden'].indexOf(o.rights) >= 0)
     if (match) {
       if (type === 'decorator') return match
 
@@ -60,13 +50,7 @@ const checkSinglePermission = (
         : null
     }
 
-    match = r.find(
-      (o) =>
-        [
-          'readonly',
-          'disable',
-        ].indexOf(o.rights) >= 0,
-    )
+    match = r.find(o => ['readonly', 'disable'].indexOf(o.rights) >= 0)
     if (match) {
       match.rights = 'disable'
 
@@ -123,7 +107,7 @@ const checkSinglePermission = (
  * @param { 你的权限 Your permission description  type:string} currentAuthority
  * @param { 通过的组件 Passing components } target
  * @param { 未通过的组件 no pass components } Exception
- * @param { caller type } type 
+ * @param { caller type } type
  */
 const checkPermissions = (
   authority,
@@ -132,102 +116,94 @@ const checkPermissions = (
   Exception,
   type,
 ) => {
-       // console.log(
-       //   'checkPermissions',
-       //   authority,
-       //   currentAuthority,
-       //   target,
-       //   Exception,
-       // )
-       // 没有判定权限.默认查看所有
-       // Retirement authority, return target;
-       if (
-         !authority ||
-         (Array.isArray(authority) && !authority.join(' ').trim())
-       ) {
-         return typeof target === 'function' && type !== 'decorator'
-           ? target({
-               name: 'full.edit',
-               rights: 'enable',
-             })
-           : target
-       }
-       // 数组处理
-       let match = null
-       if (Array.isArray(authority)) {
-         for (let index = 0; index < authority.length; index++) {
-           const a = authority[index]
-           const r = currentAuthority.filter(o => o.name === a)
-           if (r.length > 0) {
-             match = r.find(
-               o => ['enable', 'enabled', 'readwrite'].indexOf(o.rights) >= 0,
-             )
-             if (match) {
-               return checkSinglePermission(
-                 currentAuthority,
-                 a,
-                 target,
-                 type,
-                 Exception,
-               )
-             }
-           }
-         }
+  // console.log(
+  //   'checkPermissions',
+  //   authority,
+  //   currentAuthority,
+  //   target,
+  //   Exception,
+  // )
+  // 没有判定权限.默认查看所有
+  // Retirement authority, return target;
+  if (!authority || (Array.isArray(authority) && !authority.join(' ').trim())) {
+    return typeof target === 'function' && type !== 'decorator'
+      ? target({
+          name: 'full.edit',
+          rights: 'enable',
+        })
+      : target
+  }
+  // 数组处理
+  let match = null
+  if (Array.isArray(authority)) {
+    for (let index = 0; index < authority.length; index++) {
+      const a = authority[index]
+      const r = currentAuthority.filter(o => o.name === a)
+      if (r.length > 0) {
+        match = r.find(
+          o => ['enable', 'enabled', 'readwrite'].indexOf(o.rights) >= 0,
+        )
+        if (match) {
+          return checkSinglePermission(
+            currentAuthority,
+            a,
+            target,
+            type,
+            Exception,
+          )
+        }
+      }
+    }
 
-         return checkSinglePermission(
-           currentAuthority,
-           authority[0],
-           target,
-           type,
-           Exception,
-         )
-       }
-       // string 处理
-       if (typeof authority === 'string') {
-         return checkSinglePermission(
-           currentAuthority,
-           authority,
-           target,
-           type,
-           Exception,
-         )
-       }
+    return checkSinglePermission(
+      currentAuthority,
+      authority[0],
+      target,
+      type,
+      Exception,
+    )
+  }
+  // string 处理
+  if (typeof authority === 'string') {
+    return checkSinglePermission(
+      currentAuthority,
+      authority,
+      target,
+      type,
+      Exception,
+    )
+  }
 
-       // Promise 处理
-       if (isPromise(authority)) {
-         return (
-           <PromiseRender ok={target} error={Exception} promise={authority} />
-         )
-       }
+  // Promise 处理
+  if (isPromise(authority)) {
+    return <PromiseRender ok={target} error={Exception} promise={authority} />
+  }
 
-       // Function 处理
-       if (typeof authority === 'function') {
-         try {
-           const bool = authority(currentAuthority)
-           // 函数执行后返回值是 Promise
-           if (isPromise(bool)) {
-             return (
-               <PromiseRender ok={target} error={Exception} promise={bool} />
-             )
-           }
-           if (bool) {
-             return target
-           }
-           return typeof Exception === 'function' && type !== 'decorator'
-             ? Exception()
-             : Exception
-         } catch (error) {
-           throw error
-         }
-       }
+  // Function 处理
+  if (typeof authority === 'function') {
+    try {
+      const bool = authority(currentAuthority)
+      // 函数执行后返回值是 Promise
+      if (isPromise(bool)) {
+        return <PromiseRender ok={target} error={Exception} promise={bool} />
+      }
+      if (bool) {
+        return target
+      }
+      return typeof Exception === 'function' && type !== 'decorator'
+        ? Exception()
+        : Exception
+    } catch (error) {
+      throw error
+    }
+  }
 
-       throw new Error('unsupported parameters')
-     }
+  throw new Error('unsupported parameters')
+}
 
 export { checkPermissions }
 
-const CheckPermissions = (authority, target = (f) => f, Exception, type) => {
-  // console.log(authority, CURRENT, target, Exception)
+const CheckPermissions = (authority, target = f => f, Exception, type) => {
   return checkPermissions(authority, CURRENT, target, Exception, type)
 }
 

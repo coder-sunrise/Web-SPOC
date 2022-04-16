@@ -50,14 +50,14 @@ const ActionButtons = ({ specimenStatusFK, onStart, onRetest, onVerify }) => {
   return (
     <React.Fragment>
       {specimenStatusFK === LAB_SPECIMEN_STATUS.NEW &&
-        Authorized.check('lab.starttest').rights === 'enable' && (
+        Authorized.check('lab.starttest')?.rights === 'enable' && (
           <ProgressButton color='success' onClick={onStart}>
             Start
           </ProgressButton>
         )}
       {(specimenStatusFK === LAB_SPECIMEN_STATUS.PENDINGFIRSTVERIFIER ||
         specimenStatusFK === LAB_SPECIMEN_STATUS.PENDINGSECONDVERIFIER) &&
-        Authorized.check('lab.retest').rights === 'enable' && (
+        Authorized.check('lab.retest')?.rights === 'enable' && (
           <ProgressButton color='warning' onClick={onRetest}>
             Retest
           </ProgressButton>
@@ -66,7 +66,7 @@ const ActionButtons = ({ specimenStatusFK, onStart, onRetest, onVerify }) => {
         specimenStatusFK === LAB_SPECIMEN_STATUS.FORRETEST ||
         specimenStatusFK === LAB_SPECIMEN_STATUS.PENDINGFIRSTVERIFIER ||
         specimenStatusFK === LAB_SPECIMEN_STATUS.PENDINGSECONDVERIFIER) &&
-        Authorized.check('lab.verifytest').rights === 'enable' && (
+        Authorized.check('lab.verifytest')?.rights === 'enable' && (
           <ProgressButton color='success' onClick={onVerify}>
             Verify
           </ProgressButton>
@@ -387,7 +387,7 @@ export const SpecimenDetails = ({
           onConfirm:
             entity.specimenStatusFK !== LAB_SPECIMEN_STATUS.COMPLETED &&
             entity.specimenStatusFK !== LAB_SPECIMEN_STATUS.NEW &&
-            Authorized.check('lab.savedetails').rights === 'enable' &&
+            Authorized.check('lab.savedetails')?.rights === 'enable' &&
             !isReadonly
               ? () => {
                   handleSave()

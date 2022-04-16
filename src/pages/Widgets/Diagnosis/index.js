@@ -303,7 +303,7 @@ class Diagnosis extends PureComponent {
         <AuthorizedContext.Provider
           value={{
             rights:
-              this.getDiagnosisAccessRight().rights !== 'enable'
+              this.getDiagnosisAccessRight()?.rights !== 'enable'
                 ? 'hidden'
                 : 'enable',
           }}
