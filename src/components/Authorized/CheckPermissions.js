@@ -204,12 +204,7 @@ const checkPermissions = (
 export { checkPermissions }
 
 const CheckPermissions = (authority, target = f => f, Exception, type) => {
-  return (
-    // #20817
-    checkPermissions(authority, CURRENT, target, Exception, type) || {
-      rights: 'hidden',
-    }
-  )
+  return checkPermissions(authority, CURRENT, target, Exception, type)
 }
 
 export default CheckPermissions

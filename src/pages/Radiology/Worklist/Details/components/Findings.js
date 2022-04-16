@@ -281,7 +281,7 @@ export const Findings = ({
   }
 
   const isReadOnly =
-    Authorized.check('radiologyworklist.examinationfinding').rights ===
+    Authorized.check('radiologyworklist.examinationfinding')?.rights ===
     'disable'
 
   return (

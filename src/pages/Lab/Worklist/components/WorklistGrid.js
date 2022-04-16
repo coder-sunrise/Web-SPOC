@@ -399,7 +399,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
               )}
             {!record.dateReceived &&
               record.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW &&
-              Authorized.check('lab.receivespecimen').rights === 'enable' && (
+              Authorized.check('lab.receivespecimen')?.rights === 'enable' && (
                 <Tooltip title='Receive Specimen'>
                   <Button
                     onClick={() => {
@@ -419,7 +419,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
               )}
             {record.dateReceived &&
               record.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW &&
-              Authorized.check('lab.discardspecimen').rights === 'enable' && (
+              Authorized.check('lab.discardspecimen')?.rights === 'enable' && (
                 <Tooltip title='Discard Specimen'>
                   <Button
                     onClick={() => {

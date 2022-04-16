@@ -314,7 +314,7 @@ class ConsultationDocument extends PureComponent {
         <AuthorizedContext.Provider
           value={{
             rights:
-              this.getDocumentAccessRight().rights !== 'enable'
+              this.getDocumentAccessRight()?.rights !== 'enable'
                 ? 'hidden'
                 : 'enable',
           }}

@@ -525,7 +525,7 @@ class Forms extends PureComponent {
         <AuthorizedContext.Provider
           value={{
             rights:
-              this.getFormAccessRight().rights !== 'enable'
+              this.getFormAccessRight()?.rights !== 'enable'
                 ? 'hidden'
                 : 'enable',
           }}

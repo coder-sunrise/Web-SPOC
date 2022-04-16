@@ -197,7 +197,7 @@ const radiologyDetailsButton = (row, buttonClickCallback) => {
   if (
     type === 'Radiology' &&
     radiologyWorkitemID &&
-    Authorized.check('queue.radiologyexaminationdetails').rights !== 'hidden'
+    Authorized.check('queue.radiologyexaminationdetails')?.rights !== 'hidden'
   ) {
     radiologyDetailsBtn = (
       <Tooltip title='Radiology Details'>
