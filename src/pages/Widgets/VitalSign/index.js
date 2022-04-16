@@ -29,10 +29,6 @@ const styles = theme => ({
   visitRegistration,
 }))
 class index extends PureComponent {
-  state = {
-    showWarningMessage: false,
-  }
-
   handleCalculateBMI = () => {
     const { patientInfo = {}, visitRegistration } = this.props
     const { entity = {} } = visitRegistration
@@ -132,6 +128,7 @@ class index extends PureComponent {
                   <div key={i}>
                     <BasicExaminations
                       {...this.props}
+                      isFromConsultation
                       arrayHelpers={arrayHelpers}
                       handleCalculateBMI={this.handleCalculateBMI}
                       calculateStandardWeight={this.calculateStandardWeight}
@@ -141,10 +138,6 @@ class index extends PureComponent {
                           ...(this.arrayHelpers.form.values
                             .corPatientNoteVitalSign || []),
                         ])
-                        this.setState({ showWarningMessage: true })
-                        setTimeout(() => {
-                          this.setState({ showWarningMessage: false })
-                        }, 3000)
                       }}
                       fieldName='corPatientNoteVitalSign'
                     />
@@ -154,16 +147,6 @@ class index extends PureComponent {
             }}
           />
         </AuthorizedContext.Provider>
-
-        <div>
-          {this.state.showWarningMessage && (
-            <Alert
-              message={`Weight changes will only take effect on new medication's instruction setting.`}
-              banner
-              className={classes.alertStyle}
-            />
-          )}
-        </div>
       </div>
     )
   }
