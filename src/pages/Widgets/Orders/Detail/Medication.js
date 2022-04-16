@@ -1508,11 +1508,11 @@ class Medication extends PureComponent {
       const lowerCaseInput = input.toLowerCase()
 
       const { props } = option
-      const { code = '', displayValue = '', medicationGroup = {} } = props.data
+      const { code = '', displayValue = '', medicationGroupName } = props.data
       match =
         code.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
         displayValue.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
-        (medicationGroup.name || '').toLowerCase().indexOf(lowerCaseInput) >= 0
+        (medicationGroupName || '').toLowerCase().indexOf(lowerCaseInput) >= 0
     } catch (error) {
       match = false
     }
@@ -1524,7 +1524,7 @@ class Medication extends PureComponent {
       code,
       displayValue,
       sellingPrice = 0,
-      medicationGroup = {},
+      medicationGroupName,
       stock = 0,
       dispensingUOM = {},
       isExclusive,
@@ -1663,7 +1663,7 @@ class Medication extends PureComponent {
 
           <Tooltip
             useTooltip2
-            title={medicationGroup.name ? `Group: ${medicationGroup.name}` : ''}
+            title={medicationGroupName ? `Group: ${medicationGroupName}` : ''}
           >
             <div
               style={{
@@ -1677,7 +1677,7 @@ class Medication extends PureComponent {
               }}
             >
               {' '}
-              {medicationGroup.name ? `Grp.: ${medicationGroup.name}` : ''}
+              {medicationGroupName ? `Grp.: ${medicationGroupName}` : ''}
             </div>
           </Tooltip>
         </div>
@@ -1838,7 +1838,7 @@ class Medication extends PureComponent {
     return (
       option.code.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
       option.displayValue.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
-      (option.medicationGroup?.name || '')
+      (option.medicationGroupName || '')
         .toLowerCase()
         .indexOf(lowerCaseInput) >= 0
     )
