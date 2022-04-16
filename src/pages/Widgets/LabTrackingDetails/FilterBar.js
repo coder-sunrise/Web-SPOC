@@ -48,6 +48,7 @@ const searchResult = (values, props) => {
     serviceName,
     searchValue,
     visitTypeIDs,
+    serviceCenterIDs,
   } = values
 
   const visitStartDate =
@@ -77,6 +78,10 @@ const searchResult = (values, props) => {
     labTrackingStatusFK: labTrackingStatusFK || undefined,
     apiCriteria: {
       searchValue: searchValue ? searchValue : undefined,
+      serviceCenterIDs:
+        serviceCenterIDs && serviceCenterIDs.length > 0
+          ? serviceCenterIDs.join(',')
+          : undefined,
       visitTypeIDs:
         visitTypeIDs && visitTypeIDs.length > 0
           ? visitTypeIDs.join(',')
@@ -104,7 +109,7 @@ class FilterBar extends PureComponent {
           .add(-1, 'd')
           .toDate(),
       ])
-      setFieldValue('visitTypeIDs', [-99] )
+      setFieldValue('visitTypeIDs', [-99])
     }, 1)
   }
 
@@ -119,49 +124,79 @@ class FilterBar extends PureComponent {
     const { handleSubmit, IsOverallGrid, values } = this.props
     return (
       <div>
-        <GridContainer>
+        <GridContainer alignItems='flex-end'>
           {IsOverallGrid && (
-            <GridItem md={3} sm={6}>
-              <FastField
-                name='searchValue'
-                render={args => (
-                  <TextField
-                    {...args}
-                    label='Patient Name, Acc. no, Patient Referrence No'
-                    autoFocus
-                  />
-                )}
-              />
-            </GridItem>
-          )}
-          <GridItem md={2} sm={3}>
             <FastField
-              name='serviceName'
-              render={args => <TextField {...args} label='Service Name' />}
-            />
-          </GridItem>
-          <GridItem md={2} sm={3}>
-            <FastField
-              name='visitTypeIDs'
-              initialValue={[-99]}
+              name='searchValue'
               render={args => (
-                <Tooltip
-                  placement='right'
-                  title='Select "All" will retrieve active and inactive visit type'
-                >
-                  <VisitTypeSelect
-                    label='Visit Type'
-                    {...args}
-                    mode='multiple'
-                    maxTagCount={0}
-                    maxTagPlaceholder='Visit Types'
-                    allowClear={true}
-                  />
-                </Tooltip>
+                <TextField
+                  {...args}
+                  label='Patient Name, Acc. no, Patient Referrence No'
+                  autoFocus
+                  style={{ width: 300, marginLeft: 10 }}
+                />
               )}
             />
-          </GridItem>
-          <GridItem md={3} sm={4}>
+          )}
+          <FastField
+            name='serviceName'
+            render={args => (
+              <TextField
+                {...args}
+                label='Service Name'
+                style={{ width: 200, marginLeft: 10 }}
+              />
+            )}
+          />
+          <FastField
+            name='serviceCenterIDs'
+            render={args => {
+              return (
+                <CodeSelect
+                  code='ctServiceCenter'
+                  label='Service Center'
+                  mode='multiple'
+                  maxTagCount={0}
+                  maxTagPlaceholder='Service Centers'
+                  allowClear={true}
+                  style={{
+                    width: 200,
+
+                    marginLeft: 10,
+                  }}
+                  {...args}
+                />
+              )
+            }}
+          />
+          <FastField
+            name='visitTypeIDs'
+            initialValue={[-99]}
+            render={args => (
+              <Tooltip
+                placement='right'
+                title='Select "All" will retrieve active and inactive visit type'
+              >
+                <VisitTypeSelect
+                  label='Visit Type'
+                  {...args}
+                  mode='multiple'
+                  maxTagCount={0}
+                  maxTagPlaceholder='Visit Types'
+                  allowClear={true}
+                  style={{
+                    width: 200,
+                    marginLeft: 10,
+                  }}
+                />
+              </Tooltip>
+            )}
+          />
+          <div
+            style={{
+              marginLeft: 10,
+            }}
+          >
             <Field
               name='visitDate'
               render={args => (
@@ -170,56 +205,65 @@ class FilterBar extends PureComponent {
                   label2='To'
                   {...args}
                   disabled={values.isAllDateChecked}
+                  style={{
+                    width: 220,
+                  }}
                 />
               )}
             />
-          </GridItem>
-          <GridItem xs sm={2} md={1}>
-            <FastField
-              name='isAllDateChecked'
-              render={args => {
-                return (
-                  <Tooltip
-                    title={formatMessage({
+          </div>
+          <FastField
+            name='isAllDateChecked'
+            render={args => {
+              return (
+                <Tooltip
+                  title={formatMessage({
+                    id: 'form.date.placeholder.allDate',
+                  })}
+                  placement='bottom'
+                >
+                  <Checkbox
+                    label={formatMessage({
                       id: 'form.date.placeholder.allDate',
                     })}
-                    placement='bottom'
-                  >
-                    <Checkbox
-                      label={formatMessage({
-                        id: 'form.date.placeholder.allDate',
-                      })}
-                      inputLabel=' '
-                      {...args}
-                    />
-                  </Tooltip>
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem md={2} sm={3}>
-            <FastField
-              name='labTrackingStatusFK'
-              render={args => (
-                <CodeSelect
-                  label='Status'
-                  {...args}
-                  code='ltlabtrackingstatus'
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs sm={3} md={1}>
-            <ProgressButton
-              icon={<Search />}
-              color='primary'
-              style={{ position: 'relative', marginTop: '20px' }}
-              size='sm'
-              onClick={handleSubmit}
-            >
-              Search
-            </ProgressButton>
-          </GridItem>
+                    inputLabel=' '
+                    style={{
+                      width: 80,
+                      marginLeft: 10,
+                      position: 'relative',
+                      bottom: '-6px',
+                    }}
+                    {...args}
+                  />
+                </Tooltip>
+              )
+            }}
+          />
+          <FastField
+            name='labTrackingStatusFK'
+            render={args => (
+              <CodeSelect
+                label='Status'
+                {...args}
+                code='ltlabtrackingstatus'
+                style={{ width: 110, marginLeft: 10 }}
+              />
+            )}
+          />
+          <ProgressButton
+            icon={<Search />}
+            color='primary'
+            style={{ position: 'relative', marginTop: '20px' }}
+            size='sm'
+            onClick={handleSubmit}
+            style={{
+              marginLeft: 20,
+              position: 'relative',
+              bottom: 6,
+            }}
+          >
+            Search
+          </ProgressButton>
         </GridContainer>
       </div>
     )
