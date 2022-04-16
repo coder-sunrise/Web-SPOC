@@ -187,6 +187,9 @@ const VisitInfoCard = ({
       i => i.id === values.visitOrderTemplateFK,
     )
     setFieldValue(FormField['visit.visitType'], v)
+    if (v !== 1) {
+      setFieldValue(FormField['visit.consReady'], false)
+    }
     updateMedicalCheckup(v, values.isForInvoiceReplacement)
     setFieldValue('visitBasicExaminations[0].visitPurposeFK', v)
 
