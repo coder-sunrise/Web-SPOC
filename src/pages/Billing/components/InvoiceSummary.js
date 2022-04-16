@@ -59,7 +59,7 @@ const InvoiceSummary = ({
   values,
   setFieldValue,
   isEnableVisitationInvoiceReport,
-  handlePrintVisitInvoiceClick
+  handlePrintVisitInvoiceClick,
 }) => {
   const errorMessage = 'Cancel reason is required'
 
@@ -207,7 +207,7 @@ const InvoiceSummary = ({
           <GridContainer justify='space-between'>
             <GridItem container md={12}>
               <Payments
-                invoicePayment={invoicePayment.filter(x=>x.id)}
+                invoicePayment={invoicePayment.filter(x => x.id)}
                 onCancelReasonChange={onCancelReasonChange}
                 showError={showError}
                 errorMessage={errorMessage}
