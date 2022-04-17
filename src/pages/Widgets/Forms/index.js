@@ -318,7 +318,7 @@ class Forms extends PureComponent {
   }
 
   printRow = row => {
-    DocumentEditor.print({ documentName: row.formName, document: row.formData })
+    DocumentEditor.print({ documentName: row.formName, document: row.formData.content })
   }
 
   getFormAccessRight = () => {
