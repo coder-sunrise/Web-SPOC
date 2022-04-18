@@ -162,7 +162,7 @@ const Examination = props => {
           <div style={{ padding: 4 }}>
             {index === 0
               ? 'Current'
-              : moment(data.visitDate).format(dateFormatLong)}
+              : moment(item.visitDate).format(dateFormatLong)}
           </div>
         ),
         width: 200,

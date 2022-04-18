@@ -1255,18 +1255,20 @@ export default ({
         size='sm'
         style={{ margin: 0 }}
         forceRender
-        rows={(rows || []).map((r, index) => {
-          return {
-            ...r,
-            currentTotal:
-              (!r.isPreOrder && !r.hasPaid) || r.isChargeToday
-                ? r.totalAfterItemAdjustment
-                : 0,
-            isEditingEntity: isEditingEntity,
-            isEnableEditOrder: isEnableEditOrder,
-            number: index + 1,
-          }
-        })}
+        rows={(rows || [])
+          .filter(x => !x.isDeleted)
+          .map((r, index) => {
+            return {
+              ...r,
+              currentTotal:
+                (!r.isPreOrder && !r.hasPaid) || r.isChargeToday
+                  ? r.totalAfterItemAdjustment
+                  : 0,
+              isEditingEntity: isEditingEntity,
+              isEnableEditOrder: isEnableEditOrder,
+              number: index + 1,
+            }
+          })}
         onRowDoubleClick={editRow}
         getRowId={r => r.uid}
         columns={[
