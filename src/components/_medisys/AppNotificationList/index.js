@@ -51,6 +51,7 @@ const styles = theme => ({
     '&.Mui-disabled': {
       opacity: 1,
       backgroundColor: 'white',
+      pointerEvents: 'auto'
     },
   },
 })
@@ -139,7 +140,7 @@ const AppNotificationList = ({
               className={classes.itemRoot}
               disabled={notification.read}
               onClick={() => {
-                readNotification(notification)
+                if (!notification.read) readNotification(notification)
                 document.activeElement?.blur()
               }}
             >
