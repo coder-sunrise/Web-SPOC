@@ -80,7 +80,9 @@ const RadiologyExaminations = props => {
                     {radiology.doctorRemarks ?? '-'}
                   </Descriptions.Item>
                   <Descriptions.Item label='Technologist Comment:' span={3}>
-                    {radiology.radiographerComment ?? '-'}
+                    <span style={{ whiteSpace: 'pre-wrap' }}>
+                      {radiology.radiographerComment ?? '-'}
+                    </span>
                   </Descriptions.Item>
                   <Descriptions.Item label='Findings:' span={3}>
                     {ReactHtmlParser(radiology.findings ?? '-')}

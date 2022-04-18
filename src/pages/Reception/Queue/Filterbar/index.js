@@ -95,7 +95,7 @@ const Filterbar = props => {
               render={args => (
                 <Tooltip
                   placement='right'
-                  title='Quick filter by primary doctor or reporting doctor.'
+                  title='Filter by primary doctor or reporting doctor.'
                 >
                   <DoctorProfileSelect
                     mode='multiple'
@@ -134,7 +134,7 @@ const Filterbar = props => {
               render={args => (
                 <Tooltip
                   placement='right'
-                  title='Filter by Patient Name, Ref. No., Acc. No or Contact No..'
+                  title='Filter by Patient Name, Ref. No., Acc. No or Contact No.'
                 >
                   <TextField
                     {...args}
