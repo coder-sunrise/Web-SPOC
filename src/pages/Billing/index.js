@@ -588,11 +588,9 @@ class Billing extends Component {
         const defaultCallback = async () => {
           if (visitStatus === VISIT_STATUS.COMPLETED) {
             notification.success({
-              message: 'Billing Completed',
+              message: 'Billing Saved',
             })
             await this.printAfterComplete(autoPrintReportsOnCompletePayment)
-
-            history.push('/reception/queue')
           } else {
             notification.success({
               message: 'Billing Saved',
