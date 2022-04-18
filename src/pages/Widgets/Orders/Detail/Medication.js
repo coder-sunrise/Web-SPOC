@@ -1064,13 +1064,11 @@ class Medication extends PureComponent {
 
   componentDidMount = async () => {
     const { codetable, dispatch } = this.props
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'inventorymedication', force: true },
+    })
     const { inventorymedication = [] } = codetable
-    if (inventorymedication.length <= 0) {
-      await dispatch({
-        type: 'codetable/fetchCodes',
-        payload: { code: 'inventorymedication' },
-      })
-    }
     await dispatch({
       type: 'codetable/fetchCodes',
       payload: { code: 'ctmedicationprecaution' },
