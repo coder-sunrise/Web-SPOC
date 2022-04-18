@@ -915,7 +915,7 @@ const DispenseDetails = ({
                 Add Order
               </ProgressButton>
             )}
-            {!isRetailVisit && (
+            {
               <Authorized authority='queue.servepatient'>
                 <ServePatientButton
                   patientName={patient.name}
@@ -929,7 +929,7 @@ const DispenseDetails = ({
                   }}
                 />
               </Authorized>
-            )}
+            }
             {!isFromMedicalCheckup &&
               !isRetailVisit &&
               visitStatus !== VISIT_STATUS.PAUSED && (

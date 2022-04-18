@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import { UserAddOutlined } from '@ant-design/icons'
+import PersonAdd from '@material-ui/icons/PersonAdd'
 
 import { notification, Tooltip, Button, ProgressButton } from '@/components'
 
@@ -42,20 +43,19 @@ const ServePatientButton = ({
   const isServingAlready = isAnyServing
     ? servingPersons.filter(x => x.servingByUserFK === user.id).length > 0
     : false
-  const clinicRoleFK = user.clinicianProfile.userProfile?.role?.clinicRoleFK
   if(justShow){
     if(!isAnyServing)
       return null
   }
-  else if(clinicRoleFK !== 2 || isServingAlready)
+  else if(isServingAlready)
     return null
 
   const btn = !justIcon ? (
     <ProgressButton
-      color={'primary'}
+      color='primary'
       size='sm'
       onClick={handleServingBy}
-      icon={<UserAddOutlined />}
+      icon={<PersonAdd style={{transform:'rotateY(180deg)'}}/>}
     >
       Serve Patient
     </ProgressButton>
@@ -67,7 +67,7 @@ const ServePatientButton = ({
       style={{ marginRight: '0px' }}
       onClick={handleServingBy}
     >
-      <UserAddOutlined />
+      <PersonAdd style={{transform:'rotateY(180deg)'}}/>
     </Button>
   )
 
