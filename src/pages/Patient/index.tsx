@@ -271,6 +271,7 @@ const PatientIndex = ({
         columns={defaultColumns}
         api={api}
         actionRef={actionRef}
+        tableClassName='custom_pro'
         search={{
           optionRender: (searchConfig, formProps, dom) => {
             return (
