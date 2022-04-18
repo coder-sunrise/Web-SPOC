@@ -61,15 +61,12 @@ const Filterbar = props => {
             <FastField
               name='visitType'
               render={args => (
-                <Tooltip
-                  placement='right'
-                  title='Filter by visit type.'
-                >
+                <Tooltip placement='right' title='Filter by visit type.'>
                   <VisitTypeSelect
                     label='Visit Type'
                     {...args}
                     mode='multiple'
-                    style={{ width: 200, marginRight: 10 }}
+                    style={{ width: 180, marginRight: 10 }}
                     maxTagPlaceholder='Visit Types'
                     allowClear={true}
                     onChange={(v, op = {}) => {
@@ -96,11 +93,14 @@ const Filterbar = props => {
             <FastField
               name='doctor'
               render={args => (
-                <Tooltip placement='right' title='Quick filter by primary doctor or reporting doctor.'>
+                <Tooltip
+                  placement='right'
+                  title='Quick filter by primary doctor or reporting doctor.'
+                >
                   <DoctorProfileSelect
                     mode='multiple'
                     {...args}
-                    style={{ width: 200, marginRight: 10 }}
+                    style={{ width: 160, marginRight: 10 }}
                     allValue={-99}
                     allValueOption={{
                       id: -99,
@@ -139,11 +139,11 @@ const Filterbar = props => {
                   <TextField
                     {...args}
                     autocomplete='off'
-                    label='Quick Filter'
+                    label='Patient Name, Ref/Acc No, Contact No'
                     onChange={e => setSearch(e.target.value)}
                     bind='patientSearch/query'
                     useLeading={false}
-                    style={{ width: 200, position: 'relative', top: -9 }}
+                    style={{ width: 280, position: 'relative', top: -9 }}
                     debounceDuration={500}
                   />
                 </Tooltip>
