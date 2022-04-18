@@ -138,34 +138,30 @@ const RadioWorkItemInfo = props => {
           <h5>Radiology Work Item Details</h5>
           <table
             style={{
+              fontWeight: 'bold',
               fontSize: 14,
               marginTop: 5,
             }}
           >
-            <tr style={{ borderBottom: '1px solid #eeeeee' }}>
-              <td>
-                <table
-                  style={{
-                    fontWeight: 'bold',
-                  }}
-                >
-                  <tr>
-                    <th style={{ width: '35px' }}>No.</th>
-                    <th style={{ width: '200px' }}>Name</th>
-                    <th style={{ width: '200px' }}>Instructions</th>
-                    <th style={{ width: '200px' }}>Remarks</th>
-                    <th style={{ width: '65px' }}>Priority</th>
-                    <th style={{ width: '140px' }}>Status</th>
-                  </tr>
-                </table>
-              </td>
+            <tr>
+              <th style={{ width: '35px' }}>No.</th>
+              <th style={{ width: '200px' }}>Name</th>
+              <th style={{ width: '200px' }}>Instructions</th>
+              <th style={{ width: '200px' }}>Remarks</th>
+              <th style={{ width: '65px' }}>Priority</th>
+              <th style={{ width: '140px' }}>Status</th>
             </tr>
-            <td>
-              <div style={{ maxHeight: '250px', overflow: 'auto' }}>
-                <table>{radioWorkItemDetails(workItemDetails)}</table>
-              </div>
-            </td>
           </table>
+          <div style={{ maxHeight: 400, overflowY: 'auto' }}>
+            <table
+              style={{
+                fontSize: 14,
+                marginTop: 5,
+              }}
+            >
+              {radioWorkItemDetails(workItemDetails)}
+            </table>
+          </div>
         </div>
       }
     >
