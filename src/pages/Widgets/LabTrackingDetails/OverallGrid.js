@@ -17,9 +17,8 @@ class OverallGrid extends PureComponent {
         title: 'Doctor',
       },
       { name: 'serviceName', title: 'Service Name' },
+      { name: 'serviceCenterName', title: 'Service Center Name' },
       { name: 'supplierName', title: 'Supplier' },
-      { name: 'caseTypeDisplayValue', title: 'Case Type' },
-      { name: 'caseDescriptionDisplayValue', title: 'Case Description' },
       { name: 'orderedDate', title: 'Ordered Date' },
       { name: 'estimateReceiveDate', title: 'Est. Receive Date' },
       { name: 'receivedDate', title: 'Received Date' },
@@ -28,12 +27,21 @@ class OverallGrid extends PureComponent {
       { name: 'action', title: 'Action' },
     ],
     columnExtensions: [
-      { columnName: 'visitDate', type: 'date' },
-      { columnName: 'estimateReceiveDate', type: 'date' },
-      { columnName: 'orderedDate', type: 'date' },
-      { columnName: 'receivedDate', type: 'date' },
+      { columnName: 'visitDate', type: 'date', width: 100 },
+      { columnName: 'referreceNo', width: 90 },
+      { columnName: 'patientAccountNo', width: 100 },
+      { columnName: 'patientName', width: 180 },
+      { columnName: 'estimateReceiveDate', type: 'date', width: 130 },
+      { columnName: 'orderedDate', type: 'date', width: 100 },
+      { columnName: 'receivedDate', type: 'date', width: 105 },
+      { columnName: 'serviceName', width: 200 },
+      { columnName: 'serviceCenterName', width: 200 },
+      { columnName: 'supplierName', width: 150 },
+      { columnName: 'labTrackingStatusDisplayValue', width: 80 },
+      { columnName: 'remarks', width: 200 },
       {
         columnName: 'doctorProfileFKNavigation.ClinicianProfile.Name',
+        width: 150,
         render: row => {
           return (
             <Tooltip title={row.doctorName}>

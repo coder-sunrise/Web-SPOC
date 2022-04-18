@@ -89,7 +89,8 @@ const DispenseDetailsSpecimenCollection = ({
       width: 110,
       render: row => {
         if (row.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW) {
-          return (
+          return Authorized.check('queue.collectspecimen').rights ===
+            'enable' ? (
             <Link
               component='button'
               onClick={() => {
@@ -103,6 +104,8 @@ const DispenseDetailsSpecimenCollection = ({
             >
               {row.accessionNo}
             </Link>
+          ) : (
+            <div>{row.accessionNo}</div>
           )
         } else if (row.specimenStatusFK === LAB_SPECIMEN_STATUS.DISCARDED) {
           return (
@@ -134,7 +137,9 @@ const DispenseDetailsSpecimenCollection = ({
       width: 120,
       render: row => (
         <Space size='small' align='center'>
-          {row.dateReceived &&
+          {Authorized.check('queue.labspecimendetails').rights &&
+            Authorized.check('queue.labspecimendetails').rights !== 'hidden' &&
+            row.dateReceived &&
             row.specimenStatusFK !== LAB_SPECIMEN_STATUS.DISCARDED && (
               <Tooltip title='Lab Specimen Details'>
                 <Button
@@ -155,23 +160,24 @@ const DispenseDetailsSpecimenCollection = ({
           {row.specimenStatusFK !== LAB_SPECIMEN_STATUS.DISCARDED && (
             <PrintSpecimenLabel id={row.labSpecimenFK} />
           )}
-          {row.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW && (
-            <Tooltip title='Discard Specimen'>
-              <Button
-                onClick={() => {
-                  setDiscardSpecimenPara({
-                    open: true,
-                    id: row.labSpecimenFK,
-                  })
-                }}
-                justIcon
-                color='danger'
-                size='sm'
-              >
-                <Icon type='flask-empty' />
-              </Button>
-            </Tooltip>
-          )}
+          {Authorized.check('queue.discardspecimen').rights === 'enable' &&
+            row.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW && (
+              <Tooltip title='Discard Specimen'>
+                <Button
+                  onClick={() => {
+                    setDiscardSpecimenPara({
+                      open: true,
+                      id: row.labSpecimenFK,
+                    })
+                  }}
+                  justIcon
+                  color='danger'
+                  size='sm'
+                >
+                  <Icon type='flask-empty' />
+                </Button>
+              </Tooltip>
+            )}
         </Space>
       ),
     },
@@ -282,22 +288,24 @@ const DispenseDetailsSpecimenCollection = ({
         colExtensions={columnExtensions}
         data={labSpecimens}
       />
-      {newLabWorkitems && newLabWorkitems.length > 0 && (
-        <Link
-          component='button'
-          style={{ marginLeft: 10, textDecoration: 'underline' }}
-          onClick={() => {
-            setCollectSpecimenPara({
-              open: true,
-              visitId,
-              labSpecimenId: undefined,
-              mode: 'new',
-            })
-          }}
-        >
-          Collect Specimen
-        </Link>
-      )}
+      {Authorized.check('queue.collectspecimen').rights === 'enable' &&
+        newLabWorkitems &&
+        newLabWorkitems.length > 0 && (
+          <Link
+            component='button'
+            style={{ marginLeft: 10, textDecoration: 'underline' }}
+            onClick={() => {
+              setCollectSpecimenPara({
+                open: true,
+                visitId,
+                labSpecimenId: undefined,
+                mode: 'new',
+              })
+            }}
+          >
+            Collect Specimen
+          </Link>
+        )}
       <CollectSpecimen
         {...collectSpecimenPara}
         onConfirm={(newId, printInfo) => {

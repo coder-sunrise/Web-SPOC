@@ -396,10 +396,13 @@ export const WorklistHistoryGrid = ({ labWorklistHistory }) => {
         showHeader={false}
         dataSource={visits}
         pagination={{
-          pageSize: 20,
+          defaultPageSize: 20,
           total: pagination.totalRecords,
-          onChange: pageNo => {
-            triggerPaginationChange(pageNo)
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} of ${total} items`,
+          showSizeChanger: true,
+          onChange: (pageNo, pageSize) => {
+            triggerPaginationChange(pageNo, pageSize)
           },
         }}
         expandIcon={({ expanded, onExpand, record }) =>

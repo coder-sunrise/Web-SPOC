@@ -20,9 +20,9 @@ export const WorklistHistoryContextProvider = props => {
     handlerRef.current = handler
   }
 
-  const triggerPaginationChange = pageNo => {
-    console.log('triggerPaginationChange', handlerRef.current, pageNo)
-    if (handlerRef.current) handlerRef.current(pageNo)
+  const triggerPaginationChange = (pageNo, pageSize) => {
+    console.log('triggerPaginationChange', handlerRef.current, pageNo, pageSize)
+    if (handlerRef.current) handlerRef.current(pageNo, pageSize)
   }
 
   return (

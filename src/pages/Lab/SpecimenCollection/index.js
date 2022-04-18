@@ -143,7 +143,7 @@ const SpecimenCollection = ({
         render: (_dom, entity) => {
           const vt = visitTypes.find(x => x.id === entity.visitPurposeId)
           return (
-            <Tooltip title={vt?.description}>
+            <Tooltip title={vt?.name}>
               <span>{vt?.code}</span>
             </Tooltip>
           )
@@ -320,6 +320,7 @@ const SpecimenCollection = ({
     })
   }, [])
 
+  console.log('visitTypessss', visitTypes)
   const columns = defaultColumns(codetable, visitTypes)
 
   const onCloseCollectSpecimen = () => {

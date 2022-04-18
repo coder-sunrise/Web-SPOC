@@ -138,16 +138,15 @@ const SummaryCommentDetails = props => {
   return (
     <GridContainer>
       <GridItem
-        md={5}
+        md={12}
         container
-        style={{ position: 'relative', margin: '5px 0', paddingLeft: 80 }}
+        style={{ position: 'relative', paddingLeft: 195 }}
       >
-        <div style={{ position: 'absolute', left: 8, bottom: 2 }}>
-          Category:
-        </div>
         <CodeSelect
+          style={{ position: 'absolute', top: 0, left: 6, width: 180 }}
           valueField='id'
           code='CTSummaryCommentCategory'
+          label='Category'
           disabled={!isCommentEditEnable}
           value={selectCategory}
           onChange={val => {
@@ -155,18 +154,10 @@ const SummaryCommentDetails = props => {
             setSelectComment(null)
           }}
         />
-      </GridItem>
-      <GridItem
-        md={7}
-        container
-        style={{ position: 'relative', margin: '5px 0', paddingLeft: 80 }}
-      >
-        <div style={{ position: 'absolute', left: 8, bottom: 2 }}>
-          Template:
-        </div>
         <CodeSelect
           options={commentOptions}
           valueField='id'
+          label='Template'
           disabled={!isCommentEditEnable}
           labelField={
             selectedLanguage === 'EN'
@@ -178,6 +169,17 @@ const SummaryCommentDetails = props => {
             !selectCategory || item.summaryCommentCategoryFK === selectCategory
           }
           onChange={onSelectComment}
+          renderDropdown={option => {
+            const textField =
+              selectedLanguage === 'EN'
+                ? 'englishDisplayValue'
+                : 'japaneseDisplayValue'
+            return (
+              <div style={{ whiteSpace: 'pre-wrap' }}>
+                {option[textField] || ''}
+              </div>
+            )
+          }}
         />
       </GridItem>
       <GridItem md={12}>

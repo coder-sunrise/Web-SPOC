@@ -485,7 +485,7 @@ const SummaryComment = props => {
       </div>
       <Tabs
         options={commentOption}
-        style={{ height: height - 220 }}
+        style={{ height: height - 230 }}
         tabBarStyle={{ paddingRight: 8 }}
         tabBarExtraContent={
           <Switch

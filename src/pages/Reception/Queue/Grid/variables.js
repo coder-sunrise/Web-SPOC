@@ -81,7 +81,7 @@ export const AppointmentTableConfig = {
     { name: 'patientName', title: 'Patient Name' },
     { name: 'patientAccountNo', title: 'Acc. No.' },
     { name: 'gender/age', title: 'Gender / Age' },
-    { name: 'doctorName', title: 'Resource' },
+    { name: 'doctorName', title: 'Doctor' },
     { name: 'appointmentTime', title: 'Appt. Time' },
     { name: 'roomNo', title: 'Room No.' },
     { name: 'remarks', title: 'Remarks' },
@@ -106,6 +106,10 @@ export const ApptColumnExtensions = [
   {
     columnName: 'doctorName',
     width: 250,
+    render: row => {
+      const _title = row.title ? `${row.title || ''} ` : ''
+      return `${_title}${row.doctorName || ''}`
+    },
   },
   {
     columnName: 'gender/age',
