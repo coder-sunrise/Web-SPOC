@@ -169,14 +169,14 @@ const AppNotificationList = ({
               Make all as read
             </Button>
           )}
-          <Button
+          {/* <Button
             className={classes.buttonLink}
             link
             size='sm'
             onClick={clearNotification}
           >
             Clear
-          </Button>
+          </Button> */}
           <Button
             className={classes.buttonLink}
             link
