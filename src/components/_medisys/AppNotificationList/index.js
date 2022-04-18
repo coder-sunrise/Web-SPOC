@@ -104,7 +104,6 @@ const AppNotificationList = ({
         readDate: moment().formatUTC(false),
       })),
     }).then(r => {
-      console.log('read all',r)
       if (r == 204) loadNotifications()
     })
   }
@@ -160,14 +159,16 @@ const AppNotificationList = ({
         </div>
         <Divider />
         <div className={classes.footer}>
-          <Button
-            className={classes.buttonLink}
-            link
-            size='sm'
-            onClick={readAllNotification}
-          >
-            Make all as read
-          </Button>
+          {notifications.some(x => !x.isRead) && (
+            <Button
+              className={classes.buttonLink}
+              link
+              size='sm'
+              onClick={readAllNotification}
+            >
+              Make all as read
+            </Button>
+          )}
           <Button
             className={classes.buttonLink}
             link
@@ -182,7 +183,8 @@ const AppNotificationList = ({
             size='sm'
             onClick={() => loadNotifications(true)}
           >
-            {`(${appNotification.pageSize}/${appNotification.totalRecords}) `}Load More
+            {`(${appNotification.pageSize}/${appNotification.totalRecords}) `}
+            Load More
           </Button>
         </div>
       </div>
