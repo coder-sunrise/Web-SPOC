@@ -1806,7 +1806,7 @@ class Detail extends PureComponent {
                 }}
                 handleSelectCannedText={cannedText => {
                   const newRemaks = `${
-                    remarks ? remarks + ' ' : ''
+                    remarks ? remarks + '\n' : ''
                   }${cannedText.text || ''}`.substring(0, 2000)
                   setFieldValue('remarks', newRemaks)
                 }}

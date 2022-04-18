@@ -914,7 +914,7 @@ class Lab extends PureComponent {
                   handleSelectCannedText={cannedText => {
                     editService.instruction = `${
                       editService.instruction
-                        ? editService.instruction + ' '
+                        ? editService.instruction + '\n'
                         : ''
                     }${cannedText.text || ''}`.substring(0, 2000)
                     setFieldValue('labItems', [...labItems])
