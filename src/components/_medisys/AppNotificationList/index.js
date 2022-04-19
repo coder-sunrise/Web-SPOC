@@ -96,7 +96,7 @@ const AppNotificationList = ({
     })
   }
 
-  const readAllNotification = () => {
+  const readAllNotifications = () => {
     dispatch({
       type: 'appNotification/readAllNotification',
       payload: notifications.map(x => ({
@@ -137,6 +137,7 @@ const AppNotificationList = ({
           {notifications.map((notification, index) => (
             <ListItem
               button
+              key={notification.id}
               className={classes.itemRoot}
               disabled={notification.read}
               onClick={() => {
@@ -147,7 +148,6 @@ const AppNotificationList = ({
               <ListItemText
                 primary={
                   <AppNotificationContent
-                    key={index}
                     dispatch={dispatch}
                     notification={notification}
                     currentUserFK={user.data.id}
@@ -165,7 +165,7 @@ const AppNotificationList = ({
               className={classes.buttonLink}
               link
               size='sm'
-              onClick={readAllNotification}
+              onClick={readAllNotifications}
             >
               Make all as read
             </Button>
