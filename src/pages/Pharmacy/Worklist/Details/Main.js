@@ -184,7 +184,6 @@ const Main = props => {
     })
   }, [values.id])
 
-  const { inventorymedication = [] } = codetable
   const {
     primaryPrintoutLanguage = 'EN',
     secondaryPrintoutLanguage = '',
@@ -423,13 +422,11 @@ const Main = props => {
 
   const getDrugInteraction = row => {
     if (row.invoiceItemTypeFK !== 1) return ''
-    var medication =
-      inventorymedication.find(m => m.id === row.inventoryFK) || {}
-    const { inventoryMedication_MedicationInteraction = [] } = medication
-    if (!inventoryMedication_MedicationInteraction.length) return '-'
+    const { medicationInteraction = [] } = row
+    if (!medicationInteraction.length) return '-'
     return (
       <div>
-        {inventoryMedication_MedicationInteraction.map(item => {
+        {medicationInteraction.map(item => {
           return (
             <p>
               {getTranslationValue(
@@ -446,13 +443,11 @@ const Main = props => {
 
   const getDrugContraIndication = row => {
     if (row.invoiceItemTypeFK !== 1) return ''
-    var medication =
-      inventorymedication.find(m => m.id === row.inventoryFK) || {}
-    const { inventoryMedication_MedicationContraIndication = [] } = medication
-    if (!inventoryMedication_MedicationContraIndication.length) return '-'
+    const { medicationContraIndication = [] } = row
+    if (!medicationContraIndication.length) return '-'
     return (
       <div>
-        {inventoryMedication_MedicationContraIndication.map(item => {
+        {medicationContraIndication.map(item => {
           return (
             <p>
               {getTranslationValue(
@@ -1052,40 +1047,25 @@ const Main = props => {
         labelField: 'batchNo',
         valueField: 'id',
         options: row => {
-          const { codetable } = props
-          const {
-            inventorymedication = [],
-            inventoryconsumable = [],
-          } = codetable
           let stockList = []
           if (row.invoiceItemTypeFK === 1) {
-            const medication = inventorymedication.find(
-              m => m.id === row.inventoryFK,
+            stockList = (row.medicationStock || []).filter(
+              s =>
+                s.isDefault ||
+                (s.stock > 0 &&
+                  (!s.expiryDate ||
+                    moment(s.expiryDate).startOf('day') >=
+                      moment().startOf('day'))),
             )
-            if (medication) {
-              stockList = (medication.medicationStock || []).filter(
-                s =>
-                  s.isDefault ||
-                  (s.stock > 0 &&
-                    (!s.expiryDate ||
-                      moment(s.expiryDate).startOf('day') >=
-                        moment().startOf('day'))),
-              )
-            }
           } else {
-            const consumable = inventoryconsumable.find(
-              m => m.id === row.inventoryFK,
+            stockList = (row.consumableStock || []).filter(
+              s =>
+                s.isDefault ||
+                (s.stock > 0 &&
+                  (!s.expiryDate ||
+                    moment(s.expiryDate).startOf('day') >=
+                      moment().startOf('day'))),
             )
-            if (consumable) {
-              stockList = (consumable.consumableStock || []).filter(
-                s =>
-                  s.isDefault ||
-                  (s.stock > 0 &&
-                    (!s.expiryDate ||
-                      moment(s.expiryDate).startOf('day') >=
-                        moment().startOf('day'))),
-              )
-            }
           }
           stockList = _.orderBy(stockList, ['expiryDate'], ['asc'])
           if (row.stockFK) {
