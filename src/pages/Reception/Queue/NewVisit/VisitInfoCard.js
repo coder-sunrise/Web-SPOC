@@ -525,7 +525,7 @@ const VisitInfoCard = ({
               handleSelectCannedText={cannedText => {
                 const remarks = values.visitRemarks
                 const newRemaks = `${
-                  remarks ? remarks + ' ' : ''
+                  remarks ? remarks + '\n' : ''
                 }${cannedText.text || ''}`.substring(0, 2000)
                 setFieldValue(FormField['visit.visitRemarks'], newRemaks)
               }}

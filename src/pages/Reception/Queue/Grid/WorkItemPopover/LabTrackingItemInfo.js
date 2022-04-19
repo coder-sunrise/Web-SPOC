@@ -135,8 +135,17 @@ const LabTrackingItemInfo = props => {
               <th style={{ width: '165px' }}>Received Date</th>
               <th style={{ minWidth: '120px' }}>Status</th>
             </tr>
-            {getWorkItemDetails()}
           </table>
+          <div style={{ maxHeight: 400, overflowY: 'auto' }}>
+            <table
+              style={{
+                fontSize: 14,
+                marginTop: 5,
+              }}
+            >
+              <tbody>{getWorkItemDetails()}</tbody>
+            </table>
+          </div>
         </div>
       }
     >

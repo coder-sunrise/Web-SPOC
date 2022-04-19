@@ -630,7 +630,7 @@ class Service extends PureComponent {
                   }}
                   handleSelectCannedText={cannedText => {
                     const instruction = `${
-                      values.instruction ? values.instruction + ' ' : ''
+                      values.instruction ? values.instruction + '\n' : ''
                     }${cannedText.text || ''}`.substring(0, 2000)
                     setFieldValue('instruction', instruction)
                   }}
