@@ -366,7 +366,9 @@ class Detail extends PureComponent {
     })
   }
 
+
   initMedisaveSetting = () => {
+    
     const { settingClinicService } = this.props
     if (settingClinicService.entity) {
       this.setState({
@@ -679,6 +681,8 @@ class Detail extends PureComponent {
     const hiddenFields = []
     const { settingClinicService, clinicSettings, setFieldValue } = this.props
     const { serviceCenterList = [], entity } = settingClinicService
+
+
 
     const { isEnableNurseWorkItem } = clinicSettings.settings
 
@@ -1102,7 +1106,7 @@ class Detail extends PureComponent {
               </React.Fragment>
             )}
 
-            {!hiddenFields.includes('ctService_TestPanel') && (
+            {(!hiddenFields.includes('ctService_TestPanel') && settings.isEnableLabModule) && (
               <React.Fragment>
                 <h4 style={{ fontWeight: 400 }}>
                   <b>Lab Test Panel Settings</b>
