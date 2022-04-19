@@ -190,7 +190,7 @@ const LabWorkItemInfo = props => {
                         <Tooltip
                           title={`Acknowledged by: ${
                             labWorkitem.acknowledgeByUserTitle
-                              ? labWorkitem.acknowledgeByUserTitle + ', '
+                              ? labWorkitem.acknowledgeByUserTitle + '. '
                               : ''
                           }${labWorkitem.acknowledgeBy}, ${moment(
                             labWorkitem.acknowledgeDate,
