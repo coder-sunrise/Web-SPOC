@@ -538,6 +538,7 @@ class Billing extends Component {
                 Copies: 1,
                 ReportParam: `${JSON.stringify({
                   InvoicePaymentId: payment.id,
+                  printType: INVOICE_REPORT_TYPES.PAYMENT_RECEIPT,
                 })}`,
               })),
             )
@@ -648,6 +649,8 @@ class Billing extends Component {
         return 'Item Category Invoice'
       case INVOICE_REPORT_TYPES.SUMMARYINVOICE:
         return 'Summary Invoice'
+      case INVOICE_REPORT_TYPES.PAYMENT_RECEIPT:
+        return 'Payment Receipt'
     }
     return 'Invoice'
   }
@@ -794,7 +797,11 @@ class Billing extends Component {
       type: 'report/updateState',
       payload: {
         reportTypeID: 29,
-        reportParameters: { isSaved: true, invoicePaymentID },
+        reportParameters: {
+          isSaved: true,
+          invoicePaymentID,
+          printType: INVOICE_REPORT_TYPES.PAYMENT_RECEIPT,
+        },
       },
     })
   }
@@ -809,7 +816,10 @@ class Billing extends Component {
   ) => {
     switch (type) {
       case 'Payment':
-        this.onShowReport(29, { InvoicePaymentId: itemID })
+        this.onShowReport(29, {
+          InvoicePaymentId: itemID,
+          printType: INVOICE_REPORT_TYPES.PAYMENT_RECEIPT,
+        })
         break
       case 'TaxInvoice':
         this.onPrintInvoice(copayerID, invoicePayerid, index, invoiceReportType)
@@ -1078,12 +1088,13 @@ class Billing extends Component {
     this.props.dispatch({ type: 'global/incrementCommitCount' })
   }
 
-  onShowReport = (reportID, reportParameters) => {
+  onShowReport = (reportID, reportParameters, printType) => {
     this.setState({
       showReport: true,
       reportPayload: {
         reportID,
         reportParameters,
+        printType,
       },
     })
   }

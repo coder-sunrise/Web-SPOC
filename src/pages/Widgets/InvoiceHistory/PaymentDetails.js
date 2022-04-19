@@ -179,7 +179,7 @@ class PaymentDetails extends Component {
 
     switch (type) {
       case 'Payment':
-        this.onShowReport(29, { InvoicePaymentId: itemID }, 'Payment')
+        this.onShowReport(29, { InvoicePaymentId: itemID }, 'Payment Receipt')
         break
       case 'Credit Note':
         this.onShowReport(18, { CreditNoteId: itemID }, 'Credit Note')
