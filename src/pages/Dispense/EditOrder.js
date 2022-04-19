@@ -326,47 +326,6 @@ class EditOrder extends Component {
         })
 
         if (from === 'Dispense') {
-          await Promise.all([
-            dispatch({
-              type: 'codetable/fetchCodes',
-              payload: {
-                code: 'inventorymedication',
-                force: true,
-                temp: true,
-              },
-            }),
-            dispatch({
-              type: 'codetable/fetchCodes',
-              payload: {
-                code: 'inventoryvaccination',
-                force: true,
-                temp: true,
-              },
-            }),
-            dispatch({
-              type: 'codetable/fetchCodes',
-              payload: {
-                code: 'inventoryconsumable',
-                force: true,
-                temp: true,
-              },
-            }),
-            dispatch({
-              type: 'codetable/fetchCodes',
-              payload: {
-                code: 'ctservice',
-                force: true,
-                temp: true,
-              },
-            }),
-            dispatch({
-              type: 'codetable/fetchCodes',
-              payload: {
-                code: 'ctmedicationunitofmeasurement',
-                force: true,
-              },
-            }),
-          ])
           dispatch({
             type: `visitRegistration/query`,
             payload: dispense.visitID,
