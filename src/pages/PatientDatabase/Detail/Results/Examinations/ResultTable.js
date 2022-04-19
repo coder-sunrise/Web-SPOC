@@ -169,7 +169,9 @@ export const ResultTable = props => {
                   >
                     Internal Remarks:{' '}
                   </span>
-                  {data.internalRemarks}
+                  <span style={{ whiteSpace: 'pre-wrap' }}>
+                    {data.internalRemarks}
+                  </span>
                 </p>
               )}
               {data.reportRemarks && (
@@ -183,7 +185,9 @@ export const ResultTable = props => {
                   >
                     Report Remarks:{' '}
                   </span>
-                  {data.reportRemarks}
+                  <span style={{ whiteSpace: 'pre-wrap' }}>
+                    {data.reportRemarks}
+                  </span>
                 </p>
               )}
             </div>
