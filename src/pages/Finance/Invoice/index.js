@@ -51,7 +51,7 @@ class Invoice extends React.Component {
         <InvoiceDataGrid
           handleRowDoubleClick={this.onRowDoubleClick}
           {...this.props}
-          height='70vh'
+          height='72vh'
         />
         <div className='footerBar'>
           <p className={classes.footerNote}>
