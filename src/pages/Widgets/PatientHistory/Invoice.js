@@ -100,7 +100,11 @@ const baseColumns = classes => {
                 paddingRight: paddingRight,
               }}
             >
-              {row.isDrugMixture ? 'Drug Mixture' : row.itemType}
+              {row.isDrugMixture
+                ? 'Drug Mixture'
+                : row.isOpenPrescription
+                ? 'Open Prescription'
+                : row.itemType}
               <div style={{ position: 'absolute', top: '-1px', right: '-4px' }}>
                 <div
                   style={{
