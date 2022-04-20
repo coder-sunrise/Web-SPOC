@@ -16,31 +16,33 @@ import styles from './styles'
   invoiceList,
   global,
   mainDivHeight: global.mainDivHeight,
-  clinicSettings: clinicSettings.settings
+  clinicSettings: clinicSettings.settings,
 }))
 class Invoice extends React.Component {
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'invoiceList/query',
       payload: {
-        lgteql_invoiceDate: moment().add(-1, 'month').formatUTC(),
-        lsteql_invoiceDate: moment().endOf('day').formatUTC(false),
+        lgteql_invoiceDate: moment()
+          .add(-1, 'month')
+          .formatUTC(),
+        lsteql_invoiceDate: moment()
+          .endOf('day')
+          .formatUTC(false),
       },
     })
   }
-
-  onRowDoubleClick = (row) => {
+  onRowDoubleClick = row => {
     this.props.history.push(`/finance/invoice/details?id=${row.id}`)
   }
-
-  render () {
+  render() {
     const { classes, mainDivHeight = 700 } = this.props
-    let height =
-      mainDivHeight -
-      140 -
-      ($('.filterBar').height() || 0) -
-      ($('.footerBar').height() || 0)
-    if (height < 300) height = 300
+    // let height =
+    //   mainDivHeight -
+    //   140 -
+    //   ($('.filterBar').height() || 0) -
+    //   ($('.footerBar').height() || 0)
+    // if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
         <div className='filterBar'>
@@ -49,7 +51,7 @@ class Invoice extends React.Component {
         <InvoiceDataGrid
           handleRowDoubleClick={this.onRowDoubleClick}
           {...this.props}
-          height={height}
+          height='72vh'
         />
         <div className='footerBar'>
           <p className={classes.footerNote}>
