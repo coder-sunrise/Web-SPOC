@@ -15,7 +15,9 @@ class NoteDetails extends Component {
     const result = await this.getPrevDoctorNotes()
     if (this.richEditor && this.richEditor.props) {
       const { editorState } = this.richEditor.props
-      this.richEditor.update(RichEditor.insertHtml(editorState, result))
+      this.richEditor.update(
+        RichEditor.insertHtml(editorState, '<br/>' + result),
+      )
       setTimeout(() => {
         this.richEditor.focus()
       }, 1)
@@ -25,7 +27,9 @@ class NoteDetails extends Component {
   updateEditor = async result => {
     if (this.richEditor && this.richEditor.props) {
       const { editorState } = this.richEditor.props
-      this.richEditor.update(RichEditor.insertHtml(editorState, result))
+      this.richEditor.update(
+        RichEditor.insertHtml(editorState, '<br/>' + result),
+      )
       setTimeout(() => {
         this.richEditor.focus()
       }, 1)
