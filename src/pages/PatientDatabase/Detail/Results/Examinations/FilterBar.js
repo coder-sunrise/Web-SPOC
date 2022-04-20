@@ -261,6 +261,7 @@ const FilterBar = props => {
                       style={{ width: 180, marginRight: 10 }}
                       label='Status'
                       options={radiologyStatus}
+                      maxTagCount={0}
                       mode='multiple'
                       labelField='name'
                       temp

@@ -188,13 +188,13 @@ const LabWorkItemInfo = props => {
                       <span>{getQueueLabWorkitemStatus(labWorkitem)}</span>
                       {labWorkitem.isAcknowledged && (
                         <Tooltip
-                          title={`Acknowledged by: ${
+                          title={`Acknowledged by ${
                             labWorkitem.acknowledgeByUserTitle
-                              ? labWorkitem.acknowledgeByUserTitle + ', '
+                              ? labWorkitem.acknowledgeByUserTitle + '. '
                               : ''
-                          }${labWorkitem.acknowledgeBy}, ${moment(
+                          }${labWorkitem.acknowledgeBy} on ${moment(
                             labWorkitem.acknowledgeDate,
-                          ).format('DD MMM YYYY, HH:mm')}`}
+                          ).format('DD MMM YYYY HH:mm')}`}
                         >
                           <CheckCircleOutlined
                             style={{
