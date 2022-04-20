@@ -84,7 +84,7 @@ const LabTrackingItemInfo = props => {
             }}
           >
             {workItem.receivedDate
-              ? moment(workItem.receivedDate).format('DD MMM YYYY HH:mm')
+              ? moment(workItem.receivedDate).format('DD MMM YYYY')
               : '-'}
           </td>
           <td
