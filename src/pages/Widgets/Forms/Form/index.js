@@ -79,7 +79,6 @@ class Form extends PureComponent {
         ...values,
         updateByUser: user.data.clinicianProfile.name,
         updateDate: moment().toDate(),
-        lastUpdatedByUserFK: user.data.id,
       }
       if (action === 'submit') {
         payload = {

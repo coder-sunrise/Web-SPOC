@@ -106,7 +106,6 @@ class Form extends PureComponent {
         ...values,
         formData: JSON.stringify(values.formData),
         updateByUser: user.data.clinicianProfile.name,
-        lastUpdatedByUserFK: user.data.id,
       }
       if (action === 'submit') {
         saveData = {

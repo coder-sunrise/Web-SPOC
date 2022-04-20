@@ -51,6 +51,7 @@ const styles = theme => ({
     '&.Mui-disabled': {
       opacity: 1,
       backgroundColor: 'white',
+      pointerEvents: 'auto'
     },
   },
 })
@@ -95,7 +96,7 @@ const AppNotificationList = ({
     })
   }
 
-  const readAllNotification = () => {
+  const readAllNotifications = () => {
     dispatch({
       type: 'appNotification/readAllNotification',
       payload: notifications.map(x => ({
@@ -104,7 +105,6 @@ const AppNotificationList = ({
         readDate: moment().formatUTC(false),
       })),
     }).then(r => {
-      console.log('read all',r)
       if (r == 204) loadNotifications()
     })
   }
@@ -137,17 +137,17 @@ const AppNotificationList = ({
           {notifications.map((notification, index) => (
             <ListItem
               button
+              key={notification.id}
               className={classes.itemRoot}
               disabled={notification.read}
               onClick={() => {
-                readNotification(notification)
+                if (!notification.read) readNotification(notification)
                 document.activeElement?.blur()
               }}
             >
               <ListItemText
                 primary={
                   <AppNotificationContent
-                    key={index}
                     dispatch={dispatch}
                     notification={notification}
                     currentUserFK={user.data.id}
@@ -160,29 +160,32 @@ const AppNotificationList = ({
         </div>
         <Divider />
         <div className={classes.footer}>
-          <Button
-            className={classes.buttonLink}
-            link
-            size='sm'
-            onClick={readAllNotification}
-          >
-            Make all as read
-          </Button>
-          <Button
+          {notifications.some(x => !x.isRead) && (
+            <Button
+              className={classes.buttonLink}
+              link
+              size='sm'
+              onClick={readAllNotifications}
+            >
+              Make all as read
+            </Button>
+          )}
+          {/* <Button
             className={classes.buttonLink}
             link
             size='sm'
             onClick={clearNotification}
           >
             Clear
-          </Button>
+          </Button> */}
           <Button
             className={classes.buttonLink}
             link
             size='sm'
             onClick={() => loadNotifications(true)}
           >
-            {`(${appNotification.pageSize}/${appNotification.totalRecords}) `}Load More
+            {`(${appNotification.pageSize}/${appNotification.totalRecords}) `}
+            Load More
           </Button>
         </div>
       </div>
