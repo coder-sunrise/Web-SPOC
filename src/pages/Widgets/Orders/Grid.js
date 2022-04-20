@@ -1173,16 +1173,18 @@ export default ({
     const { visit } = entity
     const { visitOrderTemplate } = visit
     const { visitOrderTemplateItemDtos } = visitOrderTemplate
-
-    let removedTemplateItems = visitOrderTemplateItemDtos.filter(t => {
-      if (
-        rows.filter(
-          x => x.isDeleted === false && x.visitOrderTemplateItemFK === t.id,
-        ).length > 0
-      ) {
-        return undefined
-      } else return t
-    })
+ 
+    let removedTemplateItems = visitOrderTemplateItemDtos
+      .filter(t => t.orderable)
+      .filter(t => {
+        if (
+          rows.filter(
+            x => x.isDeleted === false && x.visitOrderTemplateItemFK === t.id,
+          ).length > 0
+        ) {
+          return undefined
+        } else return t
+      })
     if (visit.visitPurposeFK === VISIT_TYPE.OTC) {
       removedTemplateItems = removedTemplateItems.filter(
         t => t.inventoryItemTypeFK != 3,
