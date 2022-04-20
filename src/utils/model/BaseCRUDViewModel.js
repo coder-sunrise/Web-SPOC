@@ -82,7 +82,7 @@ export default class BaseCRUDViewModel {
           if (
             payload.version &&
             version === payload.version &&
-            payload.id === entity.id
+            payload.id === entity?.id
           )
             return list || entity
           if (typeof payload === 'object') {
