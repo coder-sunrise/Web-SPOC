@@ -573,7 +573,11 @@ class Billing extends Component {
     }
   }
 
-  upsertBilling = async (callback = null, noValidation = false) => {
+  upsertBilling = async (
+    callback = null,
+    noValidation = false,
+    backtoQueue = false,
+  ) => {
     const { dispatch, values, resetForm, patient } = this.props
     const {
       visitStatus,
@@ -589,9 +593,12 @@ class Billing extends Component {
         const defaultCallback = async () => {
           if (visitStatus === VISIT_STATUS.COMPLETED) {
             notification.success({
-              message: 'Billing Saved',
+              message: backtoQueue ? 'Billing Completed' : 'Billing Saved',
             })
             await this.printAfterComplete(autoPrintReportsOnCompletePayment)
+            if (backtoQueue) {
+              history.push('/reception/queue')
+            }
           } else {
             notification.success({
               message: 'Billing Saved',
@@ -783,7 +790,7 @@ class Billing extends Component {
         },
       })
     }
-    return this.upsertBilling()
+    return this.upsertBilling(null, null, true)
   }
 
   onCompletePaymentClick = async () => {
