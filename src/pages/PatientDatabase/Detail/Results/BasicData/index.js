@@ -85,11 +85,10 @@ class BasicData extends Component {
     })
   }
 
-  hasAnyValue = (key, data) => {
-    const rows = data.find(d => d.testCode === key)
+  hasAnyValue = row => {
     if (
-      !Object.keys(rows).find(
-        key => key.includes('valueColumn') && hasValue(rows[key]),
+      !Object.keys(row).find(
+        key => key.includes('valueColumn') && hasValue(row[key]),
       )
     ) {
       return false
@@ -143,6 +142,14 @@ class BasicData extends Component {
 
         return { ...row, ...insertVisit }
       })
+
+    newData = newData.filter(x => x.isGroup || this.hasAnyValue(x))
+
+    for (let index = 1; index <= 5; index++) {
+      if (!newData.find(x => x.groupFK === index)) {
+        newData = newData.filter(x => x.groupID !== index)
+      }
+    }
 
     let newColumns = defaultColumns(genderFK).filter(
       c => c.dataIndex !== 'action',
@@ -216,6 +223,7 @@ class BasicData extends Component {
       }
       newColumns.push(newColumn)
     })
+
     newColumns = [
       ...newColumns,
       defaultColumns(genderFK).find(c => c.dataIndex === 'action'),
