@@ -98,50 +98,68 @@ class BasicData extends Component {
 
   updateData = () => {
     const { genderFK } = this.props
-    const showData = this.state.loadedData.filter(
-      c => !this.state.isOnlySearchMC || c.visitPurposeFK === 4,
+    let newData = defaultData.filter(
+      d =>
+        genderFK !== GENDER.MALE ||
+        [TESTTYPES.PREGNANCY, TESTTYPES.MENSES].indexOf(d.testCode) < 0,
     )
 
-    let newData = defaultData
-      .filter(
-        d =>
-          genderFK !== GENDER.MALE ||
-          [TESTTYPES.PREGNANCY, TESTTYPES.MENSES].indexOf(d.testCode) < 0,
-      )
-      .map(row => {
-        let insertVisit = {}
-        let index = 0
-        showData.forEach(data => {
-          let value
-          if (!row.isGroup && row.tableName && row.fieldName) {
-            const entity = data[row.tableName]
+    const showData = this.state.loadedData.filter(
+      c =>
+        (!this.state.isOnlySearchMC || c.visitPurposeFK === 4) &&
+        newData.find(row => {
+          if (row.isGroup) return false
+          if (row.tableName && row.fieldName) {
+            const entity = c[row.tableName]
             if (entity) {
               if (
                 row.testCode === TESTTYPES.WAIST &&
                 (entity.isChild || entity.isPregnancy)
               ) {
-                value = 'NA'
+                return true
               } else {
-                value = entity[row.fieldName]
+                return hasValue(entity[row.fieldName])
               }
             }
           }
-          insertVisit = {
-            ...insertVisit,
-            [`valueColumn${index + 1}`]: value,
-          }
-          if (row.testCode === TESTTYPES.COLORVISIONTEST) {
-            const entity = data[row.tableName]
-            insertVisit = {
-              ...insertVisit,
-              [`colorVisionRemarksColumn${index + 1}`]: entity?.remarks,
+          return false
+        }),
+    )
+
+    newData = newData.map(row => {
+      let insertVisit = {}
+      let index = 0
+      showData.forEach(data => {
+        let value
+        if (!row.isGroup && row.tableName && row.fieldName) {
+          const entity = data[row.tableName]
+          if (entity) {
+            if (
+              row.testCode === TESTTYPES.WAIST &&
+              (entity.isChild || entity.isPregnancy)
+            ) {
+              value = 'NA'
+            } else {
+              value = entity[row.fieldName]
             }
           }
-          index = index + 1
-        })
-
-        return { ...row, ...insertVisit }
+        }
+        insertVisit = {
+          ...insertVisit,
+          [`valueColumn${index + 1}`]: value,
+        }
+        if (row.testCode === TESTTYPES.COLORVISIONTEST) {
+          const entity = data[row.tableName]
+          insertVisit = {
+            ...insertVisit,
+            [`colorVisionRemarksColumn${index + 1}`]: entity?.remarks,
+          }
+        }
+        index = index + 1
       })
+
+      return { ...row, ...insertVisit }
+    })
 
     newData = newData.filter(x => x.isGroup || this.hasAnyValue(x))
 
