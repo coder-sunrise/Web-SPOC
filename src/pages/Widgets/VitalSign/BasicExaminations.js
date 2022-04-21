@@ -516,6 +516,7 @@ class BasicExaminations extends PureComponent {
         <Accordion
           mode='multiple'
           collapses={this.getBasicExaminations()}
+          activedKeys={[0, 1]}
           onChange={(event, p, expanded) => {
             if (p.key === 0 && expanded && !this.state.expandedGeneral) {
               this.setState({ expandedGeneral: true })

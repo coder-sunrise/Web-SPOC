@@ -39,40 +39,7 @@ const widgets = [
       <AuthorizedContext>
         {r => {
           if (r.rights !== 'enable') return null
-          return (
-            // <Dropdown
-            //   overlay={
-            //     <Menu>
-            //       <Menu.Item
-            //         onClick={() => {
-            //           window.g_app._store.dispatch({
-            //             type: 'clinicalnotes/updateState',
-            //             payload: {
-            //               showAttachmentModal: true,
-            //             },
-            //           })
-            //         }}
-            //       >
-            //         Upload Attachment
-            //       </Menu.Item>
-            //     </Menu>
-            //   }
-            //   trigger={[
-            //     'click',
-            //   ]}
-            // >
-            //   <Button
-            //     justIcon
-            //     round
-            //     color='primary'
-            //     size='sm'
-            //     style={{ float: 'left' }}
-            //   >
-            //     <MoreVert />
-            //   </Button>
-            // </Dropdown>
-            null
-          )
+          return null
         }}
       </AuthorizedContext>
     ),
@@ -131,35 +98,6 @@ const widgets = [
         type: 'consultationDocument/deleteRow',
       })
     },
-
-    // toolbarAddon: (
-    //   <AuthorizedContext>
-    //     {(r) => {
-    //       if (r && r.rights !== 'enable') return null
-
-    //       return (
-    //         <Tooltip title='Add Consultation Document'>
-    //           <IconButton
-    //             style={{ float: 'left' }}
-    //             className='non-dragable'
-    //             onClick={() => {
-    //               window.g_app._store.dispatch({
-    //                 type: 'consultationDocument/updateState',
-    //                 payload: {
-    //                   showModal: true,
-    //                   type: '5',
-    //                   entity: undefined,
-    //                 },
-    //               })
-    //             }}
-    //           >
-    //             <Add />
-    //           </IconButton>
-    //         </Tooltip>
-    //       )
-    //     }}
-    //   </AuthorizedContext>
-    // ),
   },
   {
     id: '4',
@@ -216,18 +154,6 @@ const widgets = [
       },
     },
   },
-  // {
-  //   id: '6',
-  //   name: 'Result History',
-  //   component: Loadable({
-  //     loader: () => import('@/pages/Widgets/ResultHistory'),
-  //     loading: Loading,
-  //   }),
-  //   model: 'resultHistory',
-  //   layoutConfig: {
-  //     style: {},
-  //   },
-  // },
   {
     id: '7',
     name: 'Basic Examinations',
@@ -242,7 +168,7 @@ const widgets = [
       minW: 12,
       minH: 10,
       style: {
-        padding: '0 5px',
+        padding: '5px',
       },
     },
   },
@@ -276,7 +202,7 @@ const widgets = [
       minW: 12,
       minH: 10,
       style: {
-        padding: '0 5px',
+        padding: '5px',
       },
     },
   },
@@ -312,7 +238,7 @@ const widgets = [
       minW: 12,
       minH: 10,
       style: {
-        padding: '0 5px',
+        padding: '5px',
       },
     },
   },
