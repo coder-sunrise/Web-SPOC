@@ -320,7 +320,6 @@ const SpecimenCollection = ({
     })
   }, [])
 
-  console.log('visitTypessss', visitTypes)
   const columns = defaultColumns(codetable, visitTypes)
 
   const onCloseCollectSpecimen = () => {

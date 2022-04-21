@@ -224,48 +224,19 @@ export const SpecimenDetails = ({
       ) {
         const values = await form.validateFields()
 
-        if (
-          values.labWorkitemResults.filter(
-            x =>
-              x.finalResult === null ||
-              x.finalResult === undefined ||
-              x.finalResult === '',
-          ).length > 0
-        ) {
-          dispatch({
-            type: 'global/updateAppState',
-            payload: {
-              openConfirm: true,
-              openConfirmContent:
-                'Some final result fields are empty. \r\n Confirm to proceed?',
-              onConfirmSave: () => {
-                saveVerify()
-              },
-            },
-          })
-
-          return
-        }
-
-        saveVerify()
+        dispatch({
+          type: 'worklistSpecimenDetails/verifyLabTest',
+          payload: { ...entity, ...values },
+        }).then(result => {
+          if (result) {
+            setShowModal(false)
+            onConfirm && onConfirm()
+          }
+        })
       }
     } catch (errInfo) {
       console.log('Save failed:', errInfo)
     }
-  }
-
-  const saveVerify = async () => {
-    const values = await form.validateFields()
-
-    dispatch({
-      type: 'worklistSpecimenDetails/verifyLabTest',
-      payload: { ...entity, ...values },
-    }).then(result => {
-      if (result) {
-        setShowModal(false)
-        onConfirm && onConfirm()
-      }
-    })
   }
 
   const handleSave = async () => {
