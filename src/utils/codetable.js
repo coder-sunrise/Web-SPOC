@@ -45,6 +45,12 @@ const customCodetablePath = new Map([
       path: '/fororder',
     },
   ],
+  [
+    'clinicianprofile',
+    {
+      path: '/codetable',
+    },
+  ],
 ])
 
 const tenantCodesMap = new Map([
