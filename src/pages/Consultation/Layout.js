@@ -614,45 +614,55 @@ class Layout extends PureComponent {
             }}
           >
             <GridContainer justify='space-between'>
-              <GridItem md={9}>
-                {state.currentLayout.widgets.map(id => {
-                  const w = widgets.find(o => o.id === id)
-                  if (!w) return null
-
-                  const onClick = () => this.onAnchorClick(w.id)
-                  return (
-                    <Button
-                      size='sm'
-                      color='primary'
-                      onClick={onClick}
-                      style={{ marginTop: 2, marginBottom: 2 }}
-                    >
-                      {w.name}
-                    </Button>
-                  )
-                })}
-              </GridItem>
-              <GridItem md={3} style={{ textAlign: 'right' }}>
-                <Button size='sm' color='info' onClick={this.toggleDrawer}>
-                  <Settings />
-                  Widgets
-                </Button>
-                <Authorized authority='queue.consultation.widgets.patienthistory'>
-                  {({ rights: patientHistoryAccessRight }) => {
-                    if (patientHistoryAccessRight === 'hidden') return null
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  width: '100%',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <div>
+                  {state.currentLayout.widgets.map(id => {
+                    const w = widgets.find(o => o.id === id)
+                    if (!w) return null
+                    const onClick = () => this.onAnchorClick(w.id)
                     return (
-                      <Button
-                        size='sm'
-                        color='info'
-                        onClick={this.togglePatientHistoryDrawer}
-                      >
-                        <Accessibility />
-                        History
-                      </Button>
+                      <Tooltip title={w.name}>
+                        <Button
+                          size='sm'
+                          color='primary'
+                          onClick={onClick}
+                          style={{ marginTop: 2, marginBottom: 2 }}
+                        >
+                          {w.shortName || w.name}
+                        </Button>
+                      </Tooltip>
                     )
-                  }}
-                </Authorized>
-              </GridItem>
+                  })}
+                </div>
+                <div style={{ textAlign: 'right', width: 220 }}>
+                  <Button size='sm' color='info' onClick={this.toggleDrawer}>
+                    <Settings />
+                    Widgets
+                  </Button>
+                  <Authorized authority='queue.consultation.widgets.patienthistory'>
+                    {({ rights: patientHistoryAccessRight }) => {
+                      if (patientHistoryAccessRight === 'hidden') return null
+                      return (
+                        <Button
+                          size='sm'
+                          color='info'
+                          onClick={this.togglePatientHistoryDrawer}
+                        >
+                          <Accessibility />
+                          History
+                        </Button>
+                      )
+                    }}
+                  </Authorized>
+                </div>
+              </div>
             </GridContainer>
           </CardContainer>
         )}
