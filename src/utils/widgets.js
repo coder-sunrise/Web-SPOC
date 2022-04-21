@@ -85,6 +85,7 @@ const widgets = [
   {
     id: '3',
     name: 'Consultation Document',
+    shortName: 'Cons. Doc.',
     accessRight: 'queue.consultation.widgets.consultationdocument',
     component: Loadable({
       loader: () => import('@/pages/Widgets/ConsultationDocument'),
@@ -157,6 +158,7 @@ const widgets = [
   {
     id: '7',
     name: 'Basic Examinations',
+    shortName: 'Basic Exam.',
     accessRight: 'queue.consultation.widgets.vitalsign',
     component: Loadable({
       loader: () => import('@/pages/Widgets/VitalSign'),
@@ -175,6 +177,7 @@ const widgets = [
   {
     id: '23',
     name: 'Eye Examinations',
+    shortName: 'Eye Exam.',
     accessRight: 'queue.consultation.widgets.eyeexaminations',
     component: Loadable({
       loader: () => import('@/pages/Widgets/EyeExaminations'),
@@ -192,6 +195,7 @@ const widgets = [
   {
     id: '24',
     name: 'Audiometry Test',
+    shortName: 'Audiometry',
     accessRight: 'queue.consultation.widgets.audiometrytest',
     component: Loadable({
       loader: () => import('@/pages/Widgets/AudiometryTest'),
@@ -245,6 +249,7 @@ const widgets = [
   {
     id: '9',
     name: 'Visual Acuity Test',
+    shortName: 'Visual Acuity',
     accessRight: 'queue.consultation.widgets.eyevisualacuity',
     component: Loadable({
       loader: () => import('@/pages/Widgets/EyeVisualAcuity'),
@@ -309,6 +314,7 @@ const widgets = [
   {
     id: '11',
     name: 'Examination Form',
+    shortName: 'Exam. Form',
     accessRight: 'queue.consultation.widgets.eyeexaminationform',
     component: Loadable({
       loader: () => import('@/pages/Widgets/ExaminationForm'),
