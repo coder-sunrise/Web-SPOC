@@ -20,14 +20,14 @@ import { LAB_WORKITEM_STATUS } from '@/utils/constants'
 const { Panel } = Collapse
 
 const TestCategoryPanel = ({
-  workItems = [],
-  checkedWorkitems = [],
+  categoryWorkitems = [],
+  labWorkitems = [],
   onAddWorkitem,
   onRemoveWorkitem,
 }) => {
   const ctTestPanels = useCodeTable('cttestpanel')
 
-  const sortedWorkitems = [...workItems]
+  const sortedWorkitems = [...categoryWorkitems]
     .map(item => ({
       ...item,
       testPanel: ctTestPanels.find(panel => panel.id === item.testPanelFK)
@@ -43,13 +43,13 @@ const TestCategoryPanel = ({
         sortedWorkitems.map(item => (
           <GridItem md={4} key={item.id}>
             <Checkbox
-              disabled={checkedWorkitems.find(
+              disabled={labWorkitems.find(
                 cur =>
                   cur.testPanelFK === item.testPanelFK &&
                   cur.id !== item.id &&
                   cur.statusFK === LAB_WORKITEM_STATUS.SPECIMENCOLLECTED,
               )}
-              checked={checkedWorkitems.find(
+              checked={labWorkitems.find(
                 cur =>
                   cur.id === item.id &&
                   cur.statusFK === LAB_WORKITEM_STATUS.SPECIMENCOLLECTED,
@@ -72,14 +72,7 @@ const TestCategoryCollapse = ({
   onChange,
   value,
 }) => {
-  const [checkedItems, setCheckedItems] = useState([])
-
-  useEffect(() => {
-    setCheckedItems(value)
-  }, [value])
-
-  const handleAdd = newItem => {
-    const prev = [...checkedItems]
+  const addItem = (prev, newItem) => {
     const added =
       prev.findIndex(prevItem => prevItem.id === newItem.id) >= 0
         ? prev.map(prevItem =>
@@ -99,14 +92,30 @@ const TestCategoryCollapse = ({
               statusFK: LAB_WORKITEM_STATUS.SPECIMENCOLLECTED,
             },
           ]
-    onChange(added)
+
+    return added
   }
 
-  const handleRemove = removeItem => {
-    const prev = [...checkedItems]
+  const handleAdd = newItems => {
+    const isArray = Array.isArray(newItems)
 
+    if (!isArray) {
+      const prev = [...value]
+      const added = addItem(prev, newItems)
+      onChange(added)
+    } else {
+      let prev = [...value]
+      for (const item of newItems) {
+        prev = addItem(prev, item)
+      }
+      const added = prev
+      onChange(added)
+    }
+  }
+
+  const removeItem = (prev, item) => {
     const removed = prev.map(prevItem =>
-      removeItem.id === prevItem.id
+      item.id === prevItem.id
         ? {
             ...prevItem,
             labSpecimenFK: undefined,
@@ -114,21 +123,75 @@ const TestCategoryCollapse = ({
           }
         : prevItem,
     )
-    onChange(removed)
+
+    return removed
+  }
+
+  const handleRemove = removeItems => {
+    const isArray = Array.isArray(removeItems)
+
+    if (!isArray) {
+      const prev = [...value]
+      const removed = removeItem(prev, removeItems)
+      onChange(removed)
+    } else {
+      let prev = [...value]
+      for (const item of removeItems) {
+        prev = removeItem(prev, item)
+      }
+      const removed = prev
+      onChange(removed)
+    }
   }
 
   return (
     <Collapse defaultActiveKey={defaultActiveKey}>
-      {testCategories.map(item => (
-        <Panel header={item.testCategory} key={item.testCategoryFK}>
-          <TestCategoryPanel
-            onAddWorkitem={handleAdd}
-            onRemoveWorkitem={handleRemove}
-            workItems={item.workItems}
-            checkedWorkitems={checkedItems}
-          />
-        </Panel>
-      ))}
+      {testCategories.map(item => {
+        const { workItems: categoryWorkitems = [] } = item
+        const isAnyDuplicateTestPanels =
+          new Set(categoryWorkitems.map(x => x.testPanelFK)).size !==
+          categoryWorkitems.length
+
+        console.group('Start Group')
+        console.log('categoryWorkitems', categoryWorkitems)
+        console.log('value', value)
+        console.groupEnd()
+
+        return (
+          <Panel
+            header={
+              <Space>
+                <Checkbox
+                  onClick={e => e.stopPropagation()}
+                  disabled={isAnyDuplicateTestPanels}
+                  checked={
+                    categoryWorkitems.length ===
+                    value?.filter(
+                      x =>
+                        x.statusFK === LAB_WORKITEM_STATUS.SPECIMENCOLLECTED &&
+                        x.testCategoryFK === item.testCategoryFK,
+                    ).length
+                  }
+                  onChange={e => {
+                    e.target.checked
+                      ? handleAdd(categoryWorkitems)
+                      : handleRemove(categoryWorkitems)
+                  }}
+                ></Checkbox>
+                <span>{item.testCategory}</span>
+              </Space>
+            }
+            key={item.testCategoryFK}
+          >
+            <TestCategoryPanel
+              onAddWorkitem={handleAdd}
+              onRemoveWorkitem={handleRemove}
+              categoryWorkitems={categoryWorkitems}
+              labWorkitems={value}
+            />
+          </Panel>
+        )
+      })}
     </Collapse>
   )
 }
