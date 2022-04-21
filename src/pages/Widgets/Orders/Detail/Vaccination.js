@@ -274,11 +274,27 @@ class Vaccination extends PureComponent {
     }
   }
 
+  componentWillMount() {
+    const { dispatch } = this.props
+    const codeTableNameArray = [
+      'inventoryvaccination',
+      'ctMedicationDosage',
+      'ctMedicationFrequency',
+      'ctVaccinationUsage',
+      'ctVaccinationUnitOfMeasurement',
+      'documenttemplate',
+    ]
+    dispatch({
+      type: 'codetable/batchFetch',
+      payload: {
+        codes: codeTableNameArray,
+      },
+    })
+  }
   getVaccinationOptions = () => {
     const {
       codetable: { inventoryvaccination = [] },
     } = this.props
-
     return inventoryvaccination.reduce((p, c) => {
       const { code, displayValue, sellingPrice = 0, dispensingUOM = {} } = c
       const { name: uomName = '' } = dispensingUOM
