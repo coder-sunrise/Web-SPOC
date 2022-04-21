@@ -88,15 +88,10 @@ class Orders extends PureComponent {
     const { dispatch, status, visitRegistration } = this.props
     const codeTableNameArray = [
       'inventorymedication',
-      'inventoryvaccination',
       'ctMedicationUsage',
       'ctMedicationDosage',
       'ctMedicationUnitOfMeasurement',
       'ctMedicationFrequency',
-      'ctVaccinationUsage',
-      'ctVaccinationUnitOfMeasurement',
-      'documenttemplate',
-      'inventoryorderset',
     ]
     dispatch({
       type: 'codetable/batchFetch',
