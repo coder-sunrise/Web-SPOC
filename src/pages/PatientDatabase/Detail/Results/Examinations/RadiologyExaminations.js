@@ -47,13 +47,16 @@ const RadiologyExaminations = props => {
                   className='radiologyDescription'
                 >
                   <Descriptions.Item
-                    label='Techonologist:'
+                    label='Technologist:'
                     labelStyle={{ width: 190 }}
                     span={3}
                   >
                     {radiology.technologist ?? '-'}
                   </Descriptions.Item>
-                  <Descriptions.Item label='Accession No.'>
+                  <Descriptions.Item
+                    label='Accession No.'
+                    contentStyle={{ width: 200 }}
+                  >
                     {radiology.accesionNo ?? '-'}
                   </Descriptions.Item>
                   <Descriptions.Item
