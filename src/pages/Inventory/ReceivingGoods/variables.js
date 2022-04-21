@@ -94,10 +94,12 @@ export const ReceivingGoodsGridCol = [
 ]
 
 export const ContextMenuOptions = (row) => {
-  const createAuthority = Authorized.check('receivinggoods.newreceivinggoods')
+  const createAuthority = Authorized.check(
+    'receivinggoods.newreceivinggoods',
+  ) || { rights: 'hidden' }
   const viewEditAuthority = Authorized.check(
     'receivinggoods.receivinggoodsdetails',
-  )
+  ) || { rights: 'hidden' }
 
   let menuOptions = [
     {

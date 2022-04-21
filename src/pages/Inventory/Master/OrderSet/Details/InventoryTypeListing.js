@@ -130,12 +130,12 @@ const InventoryTypeListing = ({
         switch (x.stateName) {
           case 'ConsumableItemList': {
             return setConsumableList(
-              inventoryItemList.filter(item => !item.isOnlyClinicInternalUsage),
+              inventoryItemList.filter(item => item.orderable),
             )
           }
           case 'MedicationItemList': {
             return setMedicationList(
-              inventoryItemList.filter(item => !item.isOnlyClinicInternalUsage),
+              inventoryItemList.filter(item => item.orderable),
             )
           }
           case 'VaccinationItemList': {

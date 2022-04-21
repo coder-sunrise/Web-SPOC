@@ -136,6 +136,10 @@ class Grid extends PureComponent {
           { name: 'resource', title: 'Resource' },
           { name: 'appointmentTypeFK', title: 'Appt Type' },
           { name: 'roomFk', title: 'Room' },
+          {
+            name: 'rescheduleReason',
+            title: 'Reason',
+          },
           { name: 'appointmentRemarks', title: 'Remarks' },
           { name: 'appointmentStatusFk', title: 'Appt Status' },
           { name: 'bookedByUser', title: 'Book By' },
@@ -152,7 +156,7 @@ class Grid extends PureComponent {
           {
             columnName: 'patientRefrenceNo',
             sortBy: 'patientRefrenceNo',
-            width: 130,
+            width: 90,
           },
           {
             columnName: 'patientAccountNo',
@@ -162,7 +166,7 @@ class Grid extends PureComponent {
           {
             columnName: 'patientContactNo',
             sortBy: 'contactNumber',
-            width: 130,
+            width: 110,
           },
           {
             columnName: 'appointmentDate',
@@ -209,8 +213,14 @@ class Grid extends PureComponent {
             sortingEnabled: false,
           },
           {
+            columnName: 'rescheduleReason',
+            sortingEnabled: false,
+            width: 150,
+          },
+          {
             columnName: 'appointmentRemarks',
             sortingEnabled: false,
+            width: 150,
           },
           {
             columnName: 'appointmentStatusFk',

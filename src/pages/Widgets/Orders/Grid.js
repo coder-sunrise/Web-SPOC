@@ -701,11 +701,8 @@ export default ({
     const { nuseActualize = [] } = nurseWorkitem
     if (!row.isPreOrder) {
       if (
-        (row.type === ORDER_TYPES.RADIOLOGY &&
-          radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED) ||
-        (row.type !== ORDER_TYPES.RADIOLOGY &&
-          row.type !== ORDER_TYPES.LAB &&
-          nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED)
+        row.type === ORDER_TYPES.RADIOLOGY &&
+        radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED
       ) {
         return
       }
@@ -1005,7 +1002,7 @@ export default ({
     whiteSpace: 'pre-wrap',
   }
 
-  const drugMixtureIndicator = (row, right) => {
+  const drugMixtureIndicator = row => {
     if (row.type !== '1' || !row.isDrugMixture) return null
     const activePrescriptionItemDrugMixture = row.corPrescriptionItemDrugMixture.filter(
       item => !item.isDeleted,
@@ -1015,7 +1012,6 @@ export default ({
       <DrugMixtureInfo
         values={activePrescriptionItemDrugMixture}
         isShowTooltip={true}
-        right={right}
       />
     )
   }
@@ -1079,9 +1075,8 @@ export default ({
         <Tooltip title='New'>
           <div
             style={{
-              position: 'absolute',
-              bottom: 3,
-              right: -15,
+              position: 'relative',
+              top: 3,
               borderRadius: 8,
               height: 16,
               width: 16,
@@ -1111,9 +1106,8 @@ export default ({
         >
           <div
             style={{
-              position: 'absolute',
-              bottom: 3,
-              right: -15,
+              position: 'relative',
+              top: 3,
               borderRadius: 8,
               height: 16,
               width: 16,
@@ -1132,9 +1126,9 @@ export default ({
         <Tooltip title='Cancelled'>
           <div
             style={{
-              position: 'absolute',
-              bottom: -4,
-              right: -16,
+              position: 'relative',
+              top: 1,
+              right: '-1px',
               cursor: 'pointer',
             }}
           >
@@ -1179,16 +1173,18 @@ export default ({
     const { visit } = entity
     const { visitOrderTemplate } = visit
     const { visitOrderTemplateItemDtos } = visitOrderTemplate
-
-    let removedTemplateItems = visitOrderTemplateItemDtos.filter(t => {
-      if (
-        rows.filter(
-          x => x.isDeleted === false && x.visitOrderTemplateItemFK === t.id,
-        ).length > 0
-      ) {
-        return undefined
-      } else return t
-    })
+ 
+    let removedTemplateItems = visitOrderTemplateItemDtos
+      .filter(t => t.orderable)
+      .filter(t => {
+        if (
+          rows.filter(
+            x => x.isDeleted === false && x.visitOrderTemplateItemFK === t.id,
+          ).length > 0
+        ) {
+          return undefined
+        } else return t
+      })
     if (visit.visitPurposeFK === VISIT_TYPE.OTC) {
       removedTemplateItems = removedTemplateItems.filter(
         t => t.inventoryItemTypeFK != 3,
@@ -1261,20 +1257,24 @@ export default ({
         size='sm'
         style={{ margin: 0 }}
         forceRender
-        rows={(rows || []).map(r => {
-          return {
-            ...r,
-            currentTotal:
-              (!r.isPreOrder && !r.hasPaid) || r.isChargeToday
-                ? r.totalAfterItemAdjustment
-                : 0,
-            isEditingEntity: isEditingEntity,
-            isEnableEditOrder: isEnableEditOrder,
-          }
-        })}
+        rows={(rows || [])
+          .filter(x => !x.isDeleted)
+          .map((r, index) => {
+            return {
+              ...r,
+              currentTotal:
+                (!r.isPreOrder && !r.hasPaid) || r.isChargeToday
+                  ? r.totalAfterItemAdjustment
+                  : 0,
+              isEditingEntity: isEditingEntity,
+              isEnableEditOrder: isEnableEditOrder,
+              number: index + 1,
+            }
+          })}
         onRowDoubleClick={editRow}
         getRowId={r => r.uid}
         columns={[
+          { name: 'number', title: 'No.' },
           { name: 'type', title: 'Type' },
           { name: 'subject', title: 'Name' },
           { name: 'priority', title: 'Urgent' },
@@ -1358,7 +1358,7 @@ export default ({
                 if (isExistPackage) {
                   newChildren = [
                     <Table.Cell
-                      colSpan={4}
+                      colSpan={5}
                       key={1}
                       style={{ position: 'relative' }}
                     >
@@ -1387,7 +1387,7 @@ export default ({
                         </div>
                       )}
                     </Table.Cell>,
-                    React.cloneElement(children[7], {
+                    React.cloneElement(children[8], {
                       colSpan: 3,
                       ...restProps,
                     }),
@@ -1395,7 +1395,7 @@ export default ({
                 } else {
                   newChildren = [
                     <Table.Cell
-                      colSpan={3}
+                      colSpan={4}
                       key={1}
                       style={{
                         position: 'relative',
@@ -1427,7 +1427,7 @@ export default ({
                         </div>
                       )}
                     </Table.Cell>,
-                    React.cloneElement(children[6], {
+                    React.cloneElement(children[7], {
                       colSpan: 2,
                       ...restProps,
                     }),
@@ -1533,6 +1533,10 @@ export default ({
         }}
         columnExtensions={[
           {
+            columnName: 'number',
+            width: 40,
+          },
+          {
             columnName: 'type',
             width: 135,
             render: row => {
@@ -1563,14 +1567,25 @@ export default ({
               }
 
               let paddingRight = 0
-              if (row.isPreOrder && row.isExclusive) {
+              if (
+                (row.isPreOrder || row.actualizedPreOrderItemFK) &&
+                row.isExclusive
+              ) {
                 paddingRight = 52
-              } else if (row.isPreOrder || row.isExclusive) {
+              } else if (
+                row.isPreOrder ||
+                row.actualizedPreOrderItemFK ||
+                row.isExclusive
+              ) {
                 paddingRight = 24
               }
 
               if (row.isDrugMixture || radiologyWorkitemStatusFK) {
                 paddingRight = 10
+              }
+
+              if (row.actualizedPreOrderItemFK && radiologyWorkitemStatusFK) {
+                paddingRight = 34
               }
 
               return (
@@ -1585,16 +1600,29 @@ export default ({
                     <Tooltip title={texts}>
                       <span>{texts}</span>
                     </Tooltip>
-                    <div style={{ position: 'relative', top: 2 }}>
-                      {drugMixtureIndicator(row, -20)}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '-1px',
+                        right: '-6px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'inline-block',
+                          position: 'relative',
+                        }}
+                      >
+                        {drugMixtureIndicator(row)}
+                      </div>
                       {row.isPreOrder && (
                         <Tooltip title='New Pre-Order'>
                           <div
                             className={classes.rightIcon}
                             style={{
-                              right: -30,
                               borderRadius: 4,
                               backgroundColor: '#4255bd',
+                              display: 'inline-block',
                             }}
                           >
                             Pre
@@ -1606,9 +1634,9 @@ export default ({
                           <div
                             className={classes.rightIcon}
                             style={{
-                              right: -5,
                               borderRadius: 4,
                               backgroundColor: 'green',
+                              display: 'inline-block',
                             }}
                           >
                             Pre
@@ -1620,20 +1648,22 @@ export default ({
                           <div
                             className={classes.rightIcon}
                             style={{
-                              right:
-                                row.isPreOrder || row.actualizedPreOrderItemFK
-                                  ? -60
-                                  : -30,
                               borderRadius: 4,
                               backgroundColor: 'green',
+                              display: 'inline-block',
                             }}
                           >
                             Excl.
                           </div>
                         </Tooltip>
                       )}
-                      {radiologyWorkitemStatusFK &&
-                        radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
+                      {radiologyWorkitemStatusFK && (
+                        <div
+                          style={{ display: 'inline-block', margin: '0px 1px' }}
+                        >
+                          {radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1675,7 +1705,7 @@ export default ({
           },
           {
             columnName: 'description',
-            width: isFullScreen ? 300 : isExistPackage ? 120 : 150,
+            width: isFullScreen ? 300 : isExistPackage ? 110 : 140,
             observeFields: ['instruction', 'remark', 'remarks'],
             render: row => {
               return (
@@ -1705,7 +1735,7 @@ export default ({
           {
             columnName: 'quantity',
             type: 'number',
-            width: 100,
+            width: 80,
             render: row => {
               let qty = '0.0'
               if (row.type === '1' || row.type === '5' || row.type === '2') {
@@ -1780,23 +1810,20 @@ export default ({
                     deleteMessage =
                       'Specimen Collected. No modification is allowed on processed order'
                   }
-                } else {
-                  if (
-                    nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
-                  ) {
-                    const lastNuseActualize = _.orderBy(
-                      nuseActualize,
-                      ['actulizeDate'],
-                      ['desc'],
-                    )[0]
-                    if (editEnable) {
-                      editEnable = false
-                      editMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
-                    }
-                    if (deleteEnable) {
-                      deleteEnable = false
-                      deleteMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
-                    }
+                }
+
+                if (
+                  deleteEnable &&
+                  nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
+                ) {
+                  const lastNuseActualize = _.orderBy(
+                    nuseActualize,
+                    ['actulizeDate'],
+                    ['desc'],
+                  )[0]
+                  if (deleteEnable) {
+                    deleteEnable = false
+                    deleteMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
                   }
                 }
               }
@@ -1903,10 +1930,6 @@ export default ({
                   ) {
                     editEnable = false
                   }
-                } else if (
-                  nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
-                ) {
-                  editEnable = false
                 } else if (row.type === ORDER_TYPES.LAB) {
                   if (
                     labWorkitems.filter(
@@ -1914,6 +1937,11 @@ export default ({
                     ).length > 0
                   )
                     editEnable = false
+                }
+                if (
+                  nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
+                ) {
+                  editEnable = false
                 }
               }
               return (

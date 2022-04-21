@@ -2,7 +2,7 @@ import { compose } from 'redux'
 import LocalHospital from '@material-ui/icons/LocalHospital'
 import { IconButton, Popover, Tooltip } from '@/components'
 
-const DrugMixtureInfo = ({ values = {}, isShowTooltip = true, right = -5 }) => {
+const DrugMixtureInfo = ({ values = {}, isShowTooltip = true }) => {
   const drugMixtureDetails = (rows = []) => {
     if (rows.length > 0) {
       let number = 0
@@ -35,14 +35,7 @@ const DrugMixtureInfo = ({ values = {}, isShowTooltip = true, right = -5 }) => {
         )
       }
     >
-      <IconButton
-        style={{
-          position: 'absolute',
-          bottom: 2,
-          right: right,
-        }}
-        size='medium'
-      >
+      <IconButton size='medium'>
         <LocalHospital color='primary' />
       </IconButton>
     </Tooltip>

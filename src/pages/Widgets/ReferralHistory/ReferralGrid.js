@@ -21,15 +21,16 @@ import { Edit } from '@material-ui/icons'
   }),
 )
 class ReferralGrid extends PureComponent {
-  tableEditable = Authorized.check(
-    'patientdatabase.patientprofiledetails.patienthistory.referralhistory',
-  ).rights === 'enable'
+  tableEditable =
+    Authorized.check(
+      'patientdatabase.patientprofiledetails.patienthistory.referralhistory',
+    )?.rights === 'enable'
 
-  editRow = (row) => {
+  editRow = row => {
     this.props.onEditReferralHistoryClicked(row)
   }
 
-  render () {
+  render() {
     const { patientHistory, mainDivHeight = 700, patient } = this.props
     let height = mainDivHeight - 300
     if (height < 300) height = 300

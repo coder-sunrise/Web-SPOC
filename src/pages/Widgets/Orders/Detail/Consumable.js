@@ -14,11 +14,13 @@ import {
   DatePicker,
   Switch,
   Checkbox,
+  LocalSearchSelect,
 } from '@/components'
 import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import { NURSE_WORKITEM_STATUS } from '@/utils/constants'
 import { currencySymbol } from '@/utils/config'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
 import moment from 'moment'
@@ -125,7 +127,6 @@ const getVisitDoctorUserId = props => {
       packageGlobalId:
         values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
-    console.log('consumable', data)
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
@@ -170,7 +171,7 @@ class Consumable extends PureComponent {
       codetable: { inventoryconsumable = [] },
     } = this.props
     return inventoryconsumable
-      .filter(m => !m.isOnlyClinicInternalUsage)
+      .filter(m => m.orderable)
       .reduce((p, c) => {
         const { code, displayValue, sellingPrice = 0, uom = {} } = c
         const { name: uomName = '' } = uom
@@ -413,6 +414,14 @@ class Consumable extends PureComponent {
     }
   }
 
+  matchSearch = (option, input) => {
+    const lowerCaseInput = input.toLowerCase()
+    return (
+      option.code.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+      option.displayValue.toLowerCase().indexOf(lowerCaseInput) >= 0
+    )
+  }
+
   render() {
     const {
       theme,
@@ -444,6 +453,11 @@ class Consumable extends PureComponent {
     if (orders.isPreOrderItemExists === false && !values.isPreOrder)
       this.setState({ isPreOrderItemExists: false })
 
+    const { workitem = {} } = values
+    const { nurseWorkitem = {} } = workitem
+    const isStartedConsumable =
+      !values.isPreOrder &&
+      nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
     return (
       <Authorized
         authority={GetOrderItemAccessRight(
@@ -462,7 +476,7 @@ class Consumable extends PureComponent {
                       id={`autofocus_${values.type}`}
                       style={{ position: 'relative' }}
                     >
-                      <CodeSelect
+                      <LocalSearchSelect
                         temp
                         label='Consumable Name'
                         labelField='combinDisplayValue'
@@ -470,7 +484,12 @@ class Consumable extends PureComponent {
                         options={this.getConsumableOptions()}
                         {...args}
                         style={{ paddingRight: 20 }}
-                        disabled={values.isPackage || isDisabledNoPaidPreOrder}
+                        disabled={
+                          values.isPackage ||
+                          isDisabledNoPaidPreOrder ||
+                          isStartedConsumable
+                        }
+                        matchSearch={this.matchSearch}
                       />
                       <LowStockInfo sourceType='consumable' {...this.props} />
                     </div>
@@ -544,7 +563,9 @@ class Consumable extends PureComponent {
                             this.updateTotalPrice(total)
                           }
                         }}
-                        disabled={isDisabledHasPaidPreOrder}
+                        disabled={
+                          isDisabledHasPaidPreOrder || isStartedConsumable
+                        }
                         {...args}
                       />
                     )
@@ -577,7 +598,7 @@ class Consumable extends PureComponent {
                         }
                         this.onExpiryDateChange()
                       }}
-                      disabled={disableEdit}
+                      disabled={disableEdit || isStartedConsumable}
                       {...args}
                     />
                   )
@@ -594,7 +615,7 @@ class Consumable extends PureComponent {
                       onChange={() => {
                         this.onExpiryDateChange()
                       }}
-                      disabled={disableEdit}
+                      disabled={disableEdit || isStartedConsumable}
                       {...args}
                     />
                   )
@@ -634,7 +655,14 @@ class Consumable extends PureComponent {
               <FastField
                 name='remark'
                 render={args => {
-                  return <TextField rowsMax='5' label='Remarks' {...args} />
+                  return (
+                    <TextField
+                      rowsMax='5'
+                      label='Remarks'
+                      {...args}
+                      disabled={isStartedConsumable}
+                    />
+                  )
                 }}
               />
             </GridItem>
@@ -774,7 +802,9 @@ class Consumable extends PureComponent {
                             <Checkbox
                               label='Pre-Order'
                               {...args}
-                              disabled={isDisabledNoPaidPreOrder}
+                              disabled={
+                                isDisabledNoPaidPreOrder || isStartedConsumable
+                              }
                               onChange={e => {
                                 if (!e.target.value) {
                                   setFieldValue('isChargeToday', false)

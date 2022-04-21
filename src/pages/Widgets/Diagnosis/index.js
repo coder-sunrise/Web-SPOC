@@ -47,7 +47,7 @@ class Diagnosis extends PureComponent {
         this.props.dispatch({
           type: 'diagnosis/updateState',
           payload: {
-            favouriteDiagnosisLanguage: favouriteLanguage,
+            favouriteDiagnosisLanguage: favouriteLanguage || 'EN',
           },
         })
       }
@@ -303,7 +303,7 @@ class Diagnosis extends PureComponent {
         <AuthorizedContext.Provider
           value={{
             rights:
-              this.getDiagnosisAccessRight().rights !== 'enable'
+              this.getDiagnosisAccessRight()?.rights !== 'enable'
                 ? 'hidden'
                 : 'enable',
           }}

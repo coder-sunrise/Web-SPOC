@@ -23,6 +23,7 @@ export const usePrintSpecimenLabel = handlePrint => {
           accessionNo,
           specimenType,
           specimenCollectionDate,
+          dob,
         } = labSpecimenData
 
         const data = {
@@ -31,6 +32,7 @@ export const usePrintSpecimenLabel = handlePrint => {
               Gender: gender,
               Name: patientName,
               AccessionNo: accessionNo,
+              DOB: dob,
               TestPanel: testPanel,
               SpecimenType: specimenType,
               SpecimenCollectionDate: moment(specimenCollectionDate).format(

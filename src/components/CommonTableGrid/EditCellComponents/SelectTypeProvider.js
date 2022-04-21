@@ -6,7 +6,7 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { withStyles, Tooltip } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
-import { CodeSelect, Select, TextField, MedicationSelect } from '@/components'
+import { CodeSelect, Select, TextField, LocalSearchSelect } from '@/components'
 
 import {
   updateGlobalVariable,
@@ -84,10 +84,10 @@ class SelectEditor extends PureComponent {
           </div>
         )
       }
-      if (type === 'medicationSelect') {
+      if (type === 'localSearchSelect') {
         return (
           <div ref={this.myRef}>
-            <MedicationSelect {...commonCfg} isFromTable={true} />
+            <LocalSearchSelect {...commonCfg} isFromTable={true} />
           </div>
         )
       }
@@ -148,12 +148,12 @@ class SelectTypeProvider extends React.Component {
 
     const { columnExtensions, codetable, dispatch } = this.props
     const colFor = columnExtensions.filter(
-      o => ['select', 'codeSelect', 'medicationSelect'].indexOf(o.type) >= 0,
+      o => ['select', 'codeSelect', 'localSearchSelect'].indexOf(o.type) >= 0,
     )
     colFor.forEach(o => {
       let { columnName, type, valueField, labelField } = o
       if (!valueField) {
-        if (type === 'codeSelect' || type === 'medicationSelect') {
+        if (type === 'codeSelect' || type === 'localSearchSelect') {
           valueField = 'id'
         } else {
           valueField = 'value'

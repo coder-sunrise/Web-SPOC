@@ -139,7 +139,7 @@ const Detail = ({
                         arr.push(
                           ...[
                             {
-                              id: 'isOnlyClinicInternalUsage',
+                              id: 'orderable',
                               name: 'Orderable',
                               tooltip:
                                 'Item is orderable and dispensable to patient',

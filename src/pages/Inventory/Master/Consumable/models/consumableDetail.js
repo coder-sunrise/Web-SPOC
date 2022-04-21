@@ -52,8 +52,7 @@ export default createFormViewModel({
     },
     reducers: {
       queryDone(st, { payload }) {
-        let { data } = payload
-        data.isOnlyClinicInternalUsage = !data.isOnlyClinicInternalUsage
+        let { data } = payload 
         return {
           ...st,
           entity: {

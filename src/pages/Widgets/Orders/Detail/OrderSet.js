@@ -15,6 +15,7 @@ import {
   NumberInput,
   notification,
   Tooltip,
+  LocalSearchSelect,
 } from '@/components'
 import Yup from '@/utils/yup'
 import { getUniqueId, getTranslationValue } from '@/utils/utils'
@@ -177,7 +178,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       let item
       if (
         inventoryMedication.isActive === true &&
-        !inventoryMedication.isOnlyClinicInternalUsage
+        inventoryMedication.orderable
       ) {
         const medicationdispensingUOM = ctmedicationunitofmeasurement.find(
           uom => uom.id === inventoryMedication.dispensingUOMFK,
@@ -458,7 +459,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       let item
       if (
         inventoryConsumable.isActive === true &&
-        !inventoryConsumable.isOnlyClinicInternalUsage
+        inventoryConsumable.orderable
       ) {
         item = {
           inventoryConsumableFK: inventoryConsumable.id,
@@ -614,15 +615,17 @@ class OrderSet extends PureComponent {
                   <Tooltip title={row.typeName}>
                     <span>{row.typeName}</span>
                   </Tooltip>
-                  <div style={{ position: 'relative', top: 2 }}>
+                  <div
+                    style={{ position: 'absolute', top: '-1px', right: '-6px' }}
+                  >
                     {row.isExclusive && (
                       <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                         <div
                           className={classes.rightIcon}
                           style={{
-                            right: -30,
                             borderRadius: 4,
                             backgroundColor: 'green',
+                            display: 'inline-block',
                           }}
                         >
                           Excl.
@@ -856,9 +859,21 @@ class OrderSet extends PureComponent {
     }
     return false
   }
-
+  matchSearch = (option, input) => {
+    const lowerCaseInput = input.toLowerCase()
+    return (
+      option.code.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+      option.displayValue.toLowerCase().indexOf(lowerCaseInput) >= 0
+    )
+  }
   render() {
-    const { theme, values, footer, from } = this.props
+    const {
+      theme,
+      values,
+      footer,
+      from,
+      codetable: { inventoryorderset = [] },
+    } = this.props
     return (
       <Authorized
         authority={GetOrderItemAccessRight(
@@ -874,12 +889,13 @@ class OrderSet extends PureComponent {
                 render={args => {
                   return (
                     <div id={`autofocus_${values.type}`}>
-                      <CodeSelect
+                      <LocalSearchSelect
                         temp
                         label='Order Set Name'
-                        code='inventoryorderset'
                         labelField='displayValue'
                         onChange={this.changeOrderSet}
+                        options={inventoryorderset}
+                        matchSearch={this.matchSearch}
                         {...args}
                       />
                     </div>

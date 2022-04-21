@@ -190,10 +190,7 @@ import { CollectionsOutlined } from '@material-ui/icons'
         uom => uom.id === medication.dispensingUOM.id,
       )
       let item
-      if (
-        medication.isActive === true &&
-        !medication.isOnlyClinicInternalUsage
-      ) {
+      if (medication.isActive === true && medication.orderable) {
         const medicationdispensingUOM = medication.dispensingUOM
         const medicationusage = medication.medicationUsage
         const medicationfrequency = matchInstruction?.medicationFrequency
@@ -469,10 +466,7 @@ import { CollectionsOutlined } from '@material-ui/icons'
       )
 
       let item
-      if (
-        consumable.isActive === true &&
-        !consumable.isOnlyClinicInternalUsage
-      ) {
+      if (consumable.isActive === true && consumable.orderable) {
         let isDefaultBatchNo
         let unitOfMeasurement
         if (consumable) {
@@ -730,15 +724,17 @@ class Package extends PureComponent {
                   <Tooltip title={row.typeName}>
                     <span>{row.typeName}</span>
                   </Tooltip>
-                  <div style={{ position: 'relative', top: 2 }}>
+                  <div
+                    style={{ position: 'absolute', top: '-1px', right: '-6px' }}
+                  >
                     {row.isExclusive && (
                       <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                         <div
                           className={classes.rightIcon}
                           style={{
-                            right: -30,
                             borderRadius: 4,
                             backgroundColor: 'green',
+                            display: 'inline-block',
                           }}
                         >
                           Excl.

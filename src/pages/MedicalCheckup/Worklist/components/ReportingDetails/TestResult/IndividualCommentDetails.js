@@ -35,12 +35,12 @@ const styles = theme => ({
     width: '100%',
     marginLeft: 2,
     fontSize: '0.8rem',
+    minHeight: 20.11,
   },
   rootPanel: {
     position: 'relative',
     border: '1px solid #CCCCCC',
     backgroundColor: 'white',
-    width: 610,
   },
 })
 
@@ -208,7 +208,7 @@ class IndividualCommentDetails extends PureComponent {
       return (
         <div
           style={{
-            width: 100,
+            width: 99,
             textAlign: 'center',
             color: '#cccccc',
             paddingTop: 8,
@@ -219,9 +219,6 @@ class IndividualCommentDetails extends PureComponent {
       )
     return (
       <List
-        style={{
-          width: 100,
-        }}
         component='nav'
         classes={{
           root: this.props.classes.listRoot,
@@ -238,18 +235,7 @@ class IndividualCommentDetails extends PureComponent {
             i => i.id === item.id,
           )
 
-          let isNextGroupSelect
-          for (
-            let index = group.groupNo;
-            index < commentGroupList.length;
-            index++
-          ) {
-            if ((selectedItem[commentGroupList[index].groupNo] || []).length) {
-              isNextGroupSelect = true
-              break
-            }
-          }
-
+          const isItemEnable = hasValue(showValue) && showValue.trim().length
           return (
             <ListItem
               alignItems='flex-start'
@@ -260,7 +246,7 @@ class IndividualCommentDetails extends PureComponent {
               divider
               disableGutters
               button
-              disabled={!isModifyCommentEnable || isNextGroupSelect}
+              disabled={!isModifyCommentEnable || !isItemEnable}
               onClick={() => this.onCategoryChange(group, item)}
             >
               <Tooltip title={showValue}>
@@ -358,7 +344,7 @@ class IndividualCommentDetails extends PureComponent {
             disabled={!isModifyCommentEnable}
           />
         </div>
-        <div style={{ width: commentGroupList.length ? 'auto' : '400px' }}>
+        <div>
           {commentGroupList.map(group => {
             return (
               <div
@@ -369,6 +355,7 @@ class IndividualCommentDetails extends PureComponent {
                   borderTop: '1px solid #CCCCCC',
                   borderLeft: '1px solid #CCCCCC',
                   borderBottom: '1px solid #CCCCCC',
+                  width: 100,
                 }}
               >
                 {this.getSelection(group)}

@@ -260,7 +260,7 @@ class InvoiceDetails extends Component {
         <CommonModal
           open={this.state.showVisitInvoiceReport}
           onClose={this.toggleVisitInvoiceReport}
-          title='Visitation Invoice'
+          title='Invoice'
           maxWidth='lg'
         >
           <ReportViewer

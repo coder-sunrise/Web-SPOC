@@ -43,12 +43,17 @@ export const JournalHistory = ({ journalHistoryList = [], onClose }) => {
                 status='finish'
                 title={
                   <div>
-                    <p style={{ fontWeight: 600, height: 16 }}>
+                    <p style={{ fontWeight: 600, lineHeight: '1rem' }}>
                       {`${moment(item.actionDate).format('DD MMM YYYY HH:mm')}`}
                     </p>
-                    <p style={{ fontWeight: 400, height: 16 }}>
+                    <p style={{ lineHeight: '1rem' }}>
                       {item.actionDescription}
                     </p>
+                    <div
+                      style={{ whiteSpace: 'pre-wrap', lineHeight: '1rem' }}
+                    >
+                      {item.remarks || ''}
+                    </div>
                   </div>
                 }
                 description={`by ${

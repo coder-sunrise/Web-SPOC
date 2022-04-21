@@ -11,7 +11,7 @@ export default createFormViewModel({
     service: {},
     state: {
       default: {
-        corDiagnosis: [ {} ],
+        corDiagnosis: [{}],
       },
     },
     subscriptions: ({ dispatch, history }) => {
@@ -20,7 +20,7 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *removeWidget ({ payload }, { call, put, select }) {
+      *removeWidget({ payload }, { call, put, select }) {
         yield put({
           type: 'updateState',
           payload: {
@@ -28,7 +28,7 @@ export default createFormViewModel({
           },
         })
       },
-      *saveUserPreference ({ payload }, { call, put, select }) {
+      *saveUserPreference({ payload }, { call, put, select }) {
         const r = yield call(saveUserPreference, {
           userPreferenceDetails: JSON.stringify(payload.userPreferenceDetails),
           itemIdentifier: payload.itemIdentifier,
@@ -39,7 +39,7 @@ export default createFormViewModel({
 
         return false
       },
-      *getUserPreference ({ payload }, { call, put }) {
+      *getUserPreference({ payload }, { call, put }) {
         const r = yield call(getUserPreference, payload.type)
         const { status, data } = r
         if (status === '200') {
@@ -48,24 +48,51 @@ export default createFormViewModel({
             let favouriteDiagnosis
             let favouriteDiagnosisCategory
             let favouriteDiagnosisLanguage
-            let resultFavouriteDiagnosis
-            if (payload.type === USER_PREFERENCE_TYPE['FAVOURITEDIAGNOSISSETTING']) {
-              favouriteDiagnosis = parsedFavouriteDiagnosisSetting.find((o) => o.Identifier === 'FavouriteDiagnosis')
-              parsedFavouriteDiagnosisSetting.find((o) => o.Identifier === 'FavouriteDiagnosisCategory')
+            let resultFavouriteDiagnosis = {
+              favouriteDiagnosisLanguage: 'EN',
+            }
+            if (
+              payload.type === USER_PREFERENCE_TYPE['FAVOURITEDIAGNOSISSETTING']
+            ) {
+              favouriteDiagnosis = parsedFavouriteDiagnosisSetting.find(
+                o => o.Identifier === 'FavouriteDiagnosis',
+              )
+              parsedFavouriteDiagnosisSetting.find(
+                o => o.Identifier === 'FavouriteDiagnosisCategory',
+              )
 
               resultFavouriteDiagnosis = {
-                favouriteDiagnosis: favouriteDiagnosis ? favouriteDiagnosis.value : [],
-                favouriteDiagnosisCategory: favouriteDiagnosisCategory ? favouriteDiagnosisCategory.value : [],}
-            } else if (payload.type === USER_PREFERENCE_TYPE['FAVOURITEICD10DIAGNOSISSETTING']) {
+                favouriteDiagnosis: favouriteDiagnosis
+                  ? favouriteDiagnosis.value
+                  : [],
+                favouriteDiagnosisCategory: favouriteDiagnosisCategory
+                  ? favouriteDiagnosisCategory.value
+                  : [],
+              }
+            } else if (
+              payload.type ===
+              USER_PREFERENCE_TYPE['FAVOURITEICD10DIAGNOSISSETTING']
+            ) {
               favouriteDiagnosis = parsedFavouriteDiagnosisSetting.find(
-                (o) => o.Identifier === 'FavouriteICD10Diagnosis'
+                o => o.Identifier === 'FavouriteICD10Diagnosis',
               )
-              resultFavouriteDiagnosis = {favouriteDiagnosis: favouriteDiagnosis ? favouriteDiagnosis.value : [],}
-            } else if (payload.type === USER_PREFERENCE_TYPE['FAVOURITEDIAGNOSISLANGUAGESETTING']) {
+              resultFavouriteDiagnosis = {
+                favouriteDiagnosis: favouriteDiagnosis
+                  ? favouriteDiagnosis.value
+                  : [],
+              }
+            } else if (
+              payload.type ===
+              USER_PREFERENCE_TYPE['FAVOURITEDIAGNOSISLANGUAGESETTING']
+            ) {
               favouriteDiagnosisLanguage = parsedFavouriteDiagnosisSetting.find(
-                (o) => o.Identifier === 'FavouriteDiagnosisLanguage'
+                o => o.Identifier === 'FavouriteDiagnosisLanguage',
               )
-              resultFavouriteDiagnosis = {favouriteDiagnosisLanguage: favouriteDiagnosisLanguage ? favouriteDiagnosisLanguage.value : [],}
+              resultFavouriteDiagnosis = {
+                favouriteDiagnosisLanguage: favouriteDiagnosisLanguage
+                  ? favouriteDiagnosisLanguage.value
+                  : 'EN',
+              }
             }
             yield put({
               type: 'updateState',

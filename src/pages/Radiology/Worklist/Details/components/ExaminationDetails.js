@@ -92,7 +92,8 @@ export const ExaminationDetails = ({
   }, [workitem])
 
   const isHiddenExaminationFinding =
-    Authorized.check('radiologyworklist.examinationfinding').rights === 'hidden'
+    Authorized.check('radiologyworklist.examinationfinding')?.rights ===
+    'hidden'
 
   let currentScribbleNotes = []
   const scribbleType = scribbleTypes.find(o => o.type === 'radiology')
@@ -276,7 +277,7 @@ export const ExaminationDetails = ({
                 <React.Fragment>
                   <GridItem md={2}>
                     <RightAlignGridItem md={12}>
-                      Examination Findings:
+                      Examination Findings :
                     </RightAlignGridItem>
                   </GridItem>
 

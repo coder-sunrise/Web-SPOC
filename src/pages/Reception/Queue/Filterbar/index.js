@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { Fragment, memo } from 'react'
 import { connect } from 'umi'
 // umi locale
 import { FormattedMessage, formatMessage } from 'umi'
@@ -9,6 +9,7 @@ import { Hidden, withStyles } from '@material-ui/core'
 import PersonAdd from '@material-ui/icons/PersonAdd'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
+import { DoctorProfileSelect } from '@/components/_medisys'
 // custom components
 import {
   Button,
@@ -42,6 +43,7 @@ const Filterbar = props => {
     setSearch,
     loading,
     queueLog,
+    values,
   } = props
 
   const onSwitchClick = () => dispatch({ type: 'queueLog/toggleSelfOnly' })
@@ -54,72 +56,100 @@ const Filterbar = props => {
         justify='flex-start'
         alignItems='center'
       >
-        <GridItem xs={2} sm={2} md={2} lg={2}>
-          <FastField
-            name='visitType'
-            render={args => (
-              <Tooltip
-                placement='right'
-                title='Select "All" will retrieve active and inactive visit type'
-              >
-                <VisitTypeSelect
-                  label='Visit Type'
-                  {...args}
-                  mode='multiple'
-                  maxTagPlaceholder='Visit Types'
-                  allowClear={true}
-                  onChange={(v, op = {}) => {
-                    dispatch({
-                      type: 'queueLog/saveUserPreference',
-                      payload: {
-                        userPreferenceDetails: {
-                          value: {
-                            ...queueLog.queueFilterBar,
-                            visitType: v,
+        <GridItem xs={12} sm={12} md={5} lg={5}>
+          <Fragment>
+            <FastField
+              name='visitType'
+              render={args => (
+                <Tooltip placement='right' title='Filter by visit type.'>
+                  <VisitTypeSelect
+                    label='Visit Type'
+                    {...args}
+                    mode='multiple'
+                    style={{ width: 180, marginRight: 10 }}
+                    maxTagPlaceholder='Visit Types'
+                    allowClear={true}
+                    onChange={(v, op = {}) => {
+                      dispatch({
+                        type: 'queueLog/saveUserPreference',
+                        payload: {
+                          userPreferenceDetails: {
+                            value: {
+                              visitType: v,
+                            },
+                            Identifier: 'Queue',
                           },
-                          Identifier: 'Queue',
+                          itemIdentifier: 'Queue',
+                          type: '9',
                         },
-                        itemIdentifier: 'Queue',
-                        type: '9',
-                      },
-                    })
+                      })
+                    }}
+                    maxTagCount={0}
+                  />
+                </Tooltip>
+              )}
+            />
 
-                    dispatch({
-                      type: 'queueLog/updateState',
-                      payload: {
-                        queueFilterBar: {
-                          ...queueLog.queueFilterBar,
-                          visitType: v,
-                        },
+            <FastField
+              name='doctor'
+              render={args => (
+                <Tooltip
+                  placement='right'
+                  title='Filter by primary doctor or reporting doctor.'
+                >
+                  <DoctorProfileSelect
+                    mode='multiple'
+                    {...args}
+                    style={{ width: 160, marginRight: 10 }}
+                    allValue={-99}
+                    allValueOption={{
+                      id: -99,
+                      clinicianProfile: {
+                        name: 'All',
                       },
-                    })
-                  }}
-                  maxTagCount={0}
-                />
-              </Tooltip>
-            )}
-          />
-        </GridItem>
-        <GridItem xs={3} sm={3} md={3} lg={3}>
-          <FastField
-            name='search'
-            render={args => (
-              <TextField
-                {...args}
-                autocomplete='off'
-                // inputProps={{
-                //   autocomplete: 'queue-listing-filterbar-search',
-                // }}
-                label={formatMessage({
-                  id: 'reception.queue.patientSearchPlaceholder',
-                })}
-                onChange={e => setSearch(e.target.value)}
-                bind='patientSearch/query'
-                useLeading={false}
-                debounceDuration={500}
-              />
-            )}
-          />
+                    }}
+                    onChange={(v, op = {}) => {
+                      dispatch({
+                        type: 'queueLog/saveUserPreference',
+                        payload: {
+                          userPreferenceDetails: {
+                            value: {
+                              doctor: v,
+                            },
+                            Identifier: 'Queue',
+                          },
+                          itemIdentifier: 'Queue',
+                          type: '9',
+                        },
+                      })
+                    }}
+                    maxTagCount={0}
+                    labelField='clinicianProfile.name'
+                  />
+                </Tooltip>
+              )}
+            />
+            <FastField
+              name='search'
+              render={args => (
+                <Tooltip
+                  placement='right'
+                  title='Filter by Patient Name, Ref. No., Acc. No or Contact No.'
+                >
+                  <TextField
+                    {...args}
+                    autocomplete='off'
+                    label='Patient Name, Ref/Acc No, Contact No'
+                    onChange={e => setSearch(e.target.value)}
+                    bind='patientSearch/query'
+                    useLeading={false}
+                    style={{ width: 280, position: 'relative', top: -9 }}
+                    debounceDuration={500}
+                  />
+                </Tooltip>
+              )}
+            />
+          </Fragment>
         </GridItem>
         <GridItem xs={7} sm={7} md={7} lg={3}>
           <Authorized authority='queue.registervisit'>
@@ -164,7 +194,7 @@ const Filterbar = props => {
           </Authorized>
 
           {((clinicRoleFK === 1 && !hideSelfOnlyFilter) ||
-            (clinicRoleFK === 2 &&
+            (clinicRoleFK === 6 &&
               servePatientRight &&
               servePatientRight.rights !== 'hidden')) && (
             <div className={classes.switch}>
@@ -176,7 +206,6 @@ const Filterbar = props => {
             </div>
           )}
         </GridItem>
-
         <GridItem
           xs={12}
           sm={12}
@@ -205,9 +234,11 @@ const FilterbarWithFormik = withFormik({
   enableReinitialize: true,
   mapPropsToValues: ({ queueLog }) => {
     const { visitType } = queueLog.queueFilterBar || {}
+    const { doctor } = queueLog.queueFilterBar || {}
     return {
       search: '',
       visitType: visitType || [],
+      doctor: doctor || [],
     }
   },
   handleSubmit: ({ search }, { props }) => {

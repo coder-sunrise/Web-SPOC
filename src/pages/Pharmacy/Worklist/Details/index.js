@@ -20,45 +20,30 @@ const PharmacyDetails = ({
         type: 'pharmacyDetails/updateState',
         payload: { fromModule },
       })
-      Promise.all([
-        dispatch({
-          type: 'codetable/fetchCodes',
-          payload: { code: 'inventorymedication', force: true },
-        }),
-        dispatch({
-          type: 'codetable/fetchCodes',
-          payload: { code: 'inventoryconsumable', force: true },
-        }),
-        dispatch({
-          type: 'codetable/fetchCodes',
-          payload: { code: 'ctmedicationunitofmeasurement', force: true },
-        }),
-      ]).then(r => {
-        dispatch({
-          type: 'pharmacyDetails/query',
-          payload: { id: detailsId },
-        }).then(r => {
-          if (r) {
-            if (stopRefreshTimer) {
-              stopRefreshTimer()
-            }
-            setShowModal(true)
-          } else {
-            setDetailsId(undefined)
-            dispatch({
-              type: 'global/updateAppState',
-              payload: {
-                openConfirm: true,
-                isInformType: true,
-                openConfirmText: 'OK',
-                openConfirmContent: `Pharmacy workitem has been remove by others, click Ok to refresh worklist.`,
-                onConfirmClose: () => {
-                  refreshClick()
-                },
-              },
-            })
+      dispatch({
+        type: 'pharmacyDetails/query',
+        payload: { id: detailsId },
+      }).then(r => {
+        if (r) {
+          if (stopRefreshTimer) {
+            stopRefreshTimer()
           }
-        })
+          setShowModal(true)
+        } else {
+          setDetailsId(undefined)
+          dispatch({
+            type: 'global/updateAppState',
+            payload: {
+              openConfirm: true,
+              isInformType: true,
+              openConfirmText: 'OK',
+              openConfirmContent: `Pharmacy workitem has been remove by others, click Ok to refresh worklist.`,
+              onConfirmClose: () => {
+                refreshClick()
+              },
+            },
+          })
+        }
       })
     }
   }, [detailsId])

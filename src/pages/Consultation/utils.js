@@ -354,10 +354,6 @@ const isPharmacyOrderUpdated = orders => {
   const generateMedication = item => {
     if (!item) return {}
     return {
-      adjAmount: item.adjAmount,
-      adjType: item.adjType,
-      adjValue: item.adjValue,
-      costPrice: item.costPrice,
       dispenseUOMCode: item.dispenseUOMCode,
       dispenseUOMDisplayValue: item.dispenseUOMDisplayValue,
       dispenseUOMFK: item.dispenseUOMFK,
@@ -365,8 +361,6 @@ const isPharmacyOrderUpdated = orders => {
       drugName: item.drugName,
       instruction: item.instruction,
       inventoryMedicationFK: item.inventoryMedicationFK,
-      isChargeToday: item.isChargeToday,
-      isClaimable: item.isClaimable,
       isDeleted: item.isDeleted,
       isDispensedByPharmacy: item.isDispensedByPharmacy,
       isDrugMixture: item.isDrugMixture,
@@ -378,10 +372,6 @@ const isPharmacyOrderUpdated = orders => {
       remarks: item.remarks,
       secondInstruction: item.secondInstruction,
       seconDispenseUOMDisplayValue: item.seconDispenseUOMDisplayValue,
-      totalAfterItemAdjustment: item.totalAfterItemAdjustment,
-      totalAfterOverallAdjustment: item.totalAfterOverallAdjustment,
-      totalPrice: item.totalPrice,
-      unitPrice: item.unitPrice,
       drugLabelRemarks: item.drugLabelRemarks,
     }
   }
@@ -389,14 +379,9 @@ const isPharmacyOrderUpdated = orders => {
   const generateConsumable = item => {
     if (!item) return {}
     return {
-      adjAmount: item.adjAmount,
-      adjType: item.adjType,
-      adjValue: item.adjValue,
-      batchNo: item.batchNo,
       consumableCode: item.consumableCode,
       consumableName: item.consumableName,
       inventoryConsumableFK: item.inventoryConsumableFK,
-      isChargeToday: item.isChargeToday,
       isDeleted: item.isDeleted,
       isDispensedByPharmacy: item.isDispensedByPharmacy,
       isNurseActualizeRequired: item.isNurseActualizeRequired,
@@ -404,17 +389,12 @@ const isPharmacyOrderUpdated = orders => {
       performingUserFK: item.performingUserFK,
       quantity: item.quantity,
       remark: item.remark,
-      totalAfterItemAdjustment: item.totalAfterItemAdjustment,
-      totalAfterOverallAdjustment: item.totalAfterOverallAdjustment,
-      totalPrice: item.totalPrice,
       unitOfMeasurement: item.unitOfMeasurement,
-      unitPrice: item.unitPrice,
     }
   }
 
   const generateDrudMixture = item => {
     return {
-      costPrice: item.costPrice,
       drugCode: item.drugCode,
       drugName: item.drugName,
       inventoryMedicationFK: item.inventoryMedicationFK,
@@ -426,8 +406,6 @@ const isPharmacyOrderUpdated = orders => {
       prescribeUOMFK: item.prescribeUOMFK,
       quantity: item.quantity,
       revenueCategoryFK: item.revenueCategoryFK,
-      totalPrice: item.totalPrice,
-      unitPrice: item.unitPrice,
       uomCode: item.uomCode,
       uomDisplayValue: item.uomDisplayValue,
       uomfk: item.uomfk,
@@ -435,12 +413,48 @@ const isPharmacyOrderUpdated = orders => {
     }
   }
 
+  const isPrecationEqual = (newPrecaution = [], currentPrecaution = []) => {
+    if (
+      newPrecaution.find(x => (!x.id && !x.isDeleted) || (x.id && x.isDeleted))
+    ) {
+      return false
+    }
+
+    if (
+      currentPrecaution.find(x =>
+        newPrecaution.find(
+          n =>
+            n.id === x.id &&
+            n.medicationPrecautionFK !== x.medicationPrecautionFK,
+        ),
+      )
+    ) {
+      return false
+    }
+
+    return true
+  }
+
   const isItemUpdate = item => {
+    let isEqual = true
     const currentRow = rows.find(r => r.id === item.id && r.type === item.type)
-    const isEqual =
-      item.type === '1' || item.type === '5'
-        ? _.isEqual(generateMedication(item), generateMedication(currentRow))
-        : _.isEqual(generateConsumable(item), generateConsumable(currentRow))
+    if (item.type === '1') {
+      if (
+        !_.isEqual(generateMedication(item), generateMedication(currentRow))
+      ) {
+        isEqual = false
+      } else {
+        isEqual = isPrecationEqual(
+          item.corPrescriptionItemPrecaution,
+          currentRow.corPrescriptionItemPrecaution,
+        )
+      }
+    } else if (item.type === '5') {
+      isEqual = _.isEqual(
+        generateConsumable(item),
+        generateConsumable(currentRow),
+      )
+    }
     return !isEqual
   }
 
@@ -689,7 +703,7 @@ const getOrdersData = val => {
         instruction: po?.instruction || instruction,
         hasPaid: po?.hasPaid,
         isOrderedByDoctor: true,
-        isOnlyClinicInternalUsage: true,
+        orderable: true,
         isEditMedication: false,
         isExactAmount: true,
       })
@@ -840,6 +854,7 @@ const getOrdersData = val => {
         quantity: po.quantity,
         remark: po?.remarks,
         sequence: 1,
+        priority: 'Normal',
         serviceCenterFK:
           preOrderServiceItem?.serviceCenterFK || service[0].serviceCenterId,
         serviceCenterServiceFK:

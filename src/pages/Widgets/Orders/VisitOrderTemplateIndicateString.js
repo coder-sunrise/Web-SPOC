@@ -62,9 +62,9 @@ const VisitOrderTemplateIndicateString = props => {
   )
   return (
     <Popover
-      style={{ width: 500 }}
+      style={{ maxWidth: 500 }}
       placement='topLeft'
-      overlayStyle={{ width: 500 }}
+      overlayStyle={{ maxWidth: 500 }}
       content={indicateStringContent_Full}
       //title='Visit Purpose Details'
       trigger='hover'

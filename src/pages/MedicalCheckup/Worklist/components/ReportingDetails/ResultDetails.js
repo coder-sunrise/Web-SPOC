@@ -13,7 +13,7 @@ const styles = () => ({
 })
 
 const ResultDetails = props => {
-  const { visitId, showResultDetails, includeExamination } = props
+  const { visitId, showResultDetails } = props
   const [data, setData] = useState([])
   const [loaded, setLoaded] = useState(false)
   const dispatch = useDispatch()
@@ -75,7 +75,12 @@ const ResultDetails = props => {
                         >
                           Internal Remarks:{' '}
                         </div>
-                        <div style={{ display: 'inline-block' }}>
+                        <div
+                          style={{
+                            display: 'inline-block',
+                            whiteSpace: 'pre-wrap',
+                          }}
+                        >
                           {item.internalRemarks}
                         </div>
                       </div>
@@ -87,7 +92,12 @@ const ResultDetails = props => {
                         >
                           Report Remarks:
                         </div>
-                        <span style={{ display: 'inline-block' }}>
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            whiteSpace: 'pre-wrap',
+                          }}
+                        >
                           {item.reportRemarks}
                         </span>
                       </div>
@@ -99,7 +109,7 @@ const ResultDetails = props => {
           )}
         />
       )}
-      {includeExamination && data?.radiologyResultDetails && (
+      {data?.radiologyResultDetails && (
         <List
           itemLayout='horizontal'
           header={

@@ -106,7 +106,7 @@ const errorMessage = (v) => {
 
     footerDisclaimerImage: Yup.string().when('isDisplayFooterInfoDisclaimer', {
       is: (v) => v === true,
-      then: Yup.string().required('Footer Disclaimer Image is required.'),
+      then: Yup.string().required('Footer Image is required.'),
     }),
   }),
   handleSubmit: (values, { props }) => {
@@ -410,7 +410,7 @@ class MasterPrintoutSetting extends PureComponent {
             <GridContainer className={classes.verticalSpacing}>
               <GridItem md={1}>
                 <h4>
-                  <b>Disclaimer</b>
+                  <b>Footer Image</b>
                 </h4>
               </GridItem>
               <GridItem md={3}>
@@ -432,7 +432,7 @@ class MasterPrintoutSetting extends PureComponent {
                       name='footerDisclaimerHeight'
                       render={(args) => (
                         <NumberInput
-                          label='Footer Disclaimer Height'
+                          label='Footer Image Height'
                           suffix='cm'
                           format='0.0'
                           min='0'
@@ -453,7 +453,7 @@ class MasterPrintoutSetting extends PureComponent {
                       name='footerDisclaimerImage'
                       render={(args) => (
                         <BrowseImage
-                          title='Footer Disclaimer Image'
+                          title='Footer Image'
                           setImageBase64={this.setImageBase64}
                           fieldName='footerDisclaimerImage'
                           selected={this.state.selected}

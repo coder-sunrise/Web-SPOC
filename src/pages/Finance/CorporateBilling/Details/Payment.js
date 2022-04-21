@@ -146,8 +146,8 @@ const styles = theme => ({})
         })
       }
     })
-
   },
+  displayName: 'CorporateBillingPayment',
 })
 class Payment extends PureComponent {
   state = {
@@ -339,7 +339,6 @@ class Payment extends PureComponent {
             name='paymentDate'
             render={args => (
               <DatePicker
-                timeFomat={false}
                 onChange={this.onChangeDate}
                 disabledDate={d => !d || d.isAfter(moment())}
                 label='Date'

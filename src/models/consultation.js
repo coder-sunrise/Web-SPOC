@@ -186,8 +186,7 @@ export default createFormViewModel({
             queueNo: entity.queueNo,
             visitID: entity.id,
           })
-
-          yield put({ type: 'closeModal' })
+          // yield put({ type: 'closeModal' })
         }
         return response
       },
@@ -333,18 +332,21 @@ export default createFormViewModel({
                 o => o.Identifier === 'FavouriteDiagnosisLanguage',
               )
             }
+            let resultFavouriteDiagnosisLanguage = {
+              favouriteDiagnosisLanguage: 'EN',
+            }
             if (parsedFavouriteDiagnosisLanguage.length > 0) {
-              const resultFavouriteDiagnosisLanguage = {
+              resultFavouriteDiagnosisLanguage = {
                 favouriteDiagnosisLanguage: favouriteDiagnosisLanguage
                   ? favouriteDiagnosisLanguage.value
-                  : [],
+                  : 'EN',
               }
-              yield put({
-                type: 'updateState',
-                payload: resultFavouriteDiagnosisLanguage,
-              })
-              return resultFavouriteDiagnosisLanguage
             }
+            yield put({
+              type: 'updateState',
+              payload: resultFavouriteDiagnosisLanguage,
+            })
+            return resultFavouriteDiagnosisLanguage
           }
         }
         return null

@@ -14,11 +14,16 @@ import {
   Switch,
   Checkbox,
   RadioGroup,
+  LocalSearchSelect,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 import Yup from '@/utils/yup'
 import { getServices } from '@/utils/codetable'
-import { VISIT_TYPE, CANNED_TEXT_TYPE } from '@/utils/constants'
+import {
+  VISIT_TYPE,
+  CANNED_TEXT_TYPE,
+  NURSE_WORKITEM_STATUS,
+} from '@/utils/constants'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
@@ -92,7 +97,6 @@ const getVisitDoctorUserId = props => {
   handleSubmit: (values, { props, onConfirm, setValues }) => {
     const { dispatch, orders, currentType, getNextSequence, user } = props
     const { rows } = orders
-    console.log(111)
     const data = {
       isOrderedByDoctor:
         user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
@@ -107,7 +111,6 @@ const getVisitDoctorUserId = props => {
       packageGlobalId:
         values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
-    console.log(data)
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
@@ -368,6 +371,14 @@ class Service extends PureComponent {
     }
   }
 
+  matchServiceSearch = (option, input) => {
+    const lowerCaseInput = input.toLowerCase()
+    return (
+      option.code.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+      option.name.toLowerCase().indexOf(lowerCaseInput) >= 0
+    )
+  }
+
   render() {
     const {
       theme,
@@ -425,6 +436,9 @@ class Service extends PureComponent {
       </GridItem>
     )
 
+    const { nurseWorkitem = {} } = workitem
+    const isStartedService =
+      !isPreOrder && nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
     return (
       <Authorized
         authority={GetOrderItemAccessRight(
@@ -440,7 +454,8 @@ class Service extends PureComponent {
                 render={args => {
                   return (
                     <div id={`autofocus_${values.type}`}>
-                      <Select
+                      <LocalSearchSelect
+                        valueField='value'
                         label='Service Name'
                         labelField='combinDisplayValue'
                         options={services.filter(
@@ -470,7 +485,12 @@ class Service extends PureComponent {
                             this.getServiceCenterService()
                           }, 1)
                         }}
-                        disabled={values.isPackage || isDisabledNoPaidPreOrder}
+                        disabled={
+                          values.isPackage ||
+                          isDisabledNoPaidPreOrder ||
+                          isStartedService
+                        }
+                        matchSearch={this.matchServiceSearch}
                         {...args}
                       />
                     </div>
@@ -495,7 +515,11 @@ class Service extends PureComponent {
                           this.getServiceCenterService()
                         }, 1)
                       }
-                      disabled={values.isPackage || isDisabledNoPaidPreOrder}
+                      disabled={
+                        values.isPackage ||
+                        isDisabledNoPaidPreOrder ||
+                        isStartedService
+                      }
                       {...args}
                     />
                   )
@@ -568,7 +592,7 @@ class Service extends PureComponent {
                             this.updateTotalPrice(total)
                           }
                         }}
-                        disabled={isDisabledHasPaidPreOrder}
+                        disabled={isDisabledHasPaidPreOrder || isStartedService}
                         {...args}
                       />
                     )
@@ -587,10 +611,17 @@ class Service extends PureComponent {
                 <FastField
                   name='instruction'
                   render={args => {
-                    return <TextField label='Instructions' {...args} />
+                    return (
+                      <TextField
+                        label='Instructions'
+                        {...args}
+                        disabled={isStartedService}
+                      />
+                    )
                   }}
                 />
                 <CannedTextButton
+                  disabled={isStartedService}
                   cannedTextTypeFK={CANNED_TEXT_TYPE.SERVICEINSTRUCTION}
                   style={{
                     position: 'absolute',
@@ -599,7 +630,7 @@ class Service extends PureComponent {
                   }}
                   handleSelectCannedText={cannedText => {
                     const instruction = `${
-                      values.instruction ? values.instruction + ' ' : ''
+                      values.instruction ? values.instruction + '\n' : ''
                     }${cannedText.text || ''}`.substring(0, 2000)
                     setFieldValue('instruction', instruction)
                   }}
@@ -639,7 +670,14 @@ class Service extends PureComponent {
               <FastField
                 name='remark'
                 render={args => {
-                  return <TextField rowsMax='5' label='Remarks' {...args} />
+                  return (
+                    <TextField
+                      rowsMax='5'
+                      label='Remarks'
+                      {...args}
+                      disabled={isStartedService}
+                    />
+                  )
                 }}
               />
             </GridItem>
@@ -766,6 +804,7 @@ class Service extends PureComponent {
                         rowsMax='5'
                         maxLength={200}
                         label='New Service Name'
+                        disabled={isStartedService}
                         {...args}
                       />
                     )
@@ -805,6 +844,7 @@ class Service extends PureComponent {
                     </span>
                     <div style={{ marginLeft: 60, marginTop: 14 }}>
                       <RadioGroup
+                        disabled={isStartedService}
                         value={priority || 'Normal'}
                         label=''
                         onChange={e => {
@@ -833,7 +873,9 @@ class Service extends PureComponent {
                               label='Pre-Order'
                               style={{ position: 'absolute', bottom: 2 }}
                               {...args}
-                              disabled={isDisabledNoPaidPreOrder}
+                              disabled={
+                                isDisabledNoPaidPreOrder || isStartedService
+                              }
                               onChange={e => {
                                 if (!e.target.value) {
                                   setFieldValue('isChargeToday', false)

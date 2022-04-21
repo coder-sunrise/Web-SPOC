@@ -26,7 +26,6 @@ import { INVOICE_REPORT_TYPES } from '@/utils/constants'
 import MenuItem from '@material-ui/core/MenuItem'
 import MenuList from '@material-ui/core/MenuList'
 import PaymentDetails from './PaymentDetails'
-import './CustomStyle.css'
 
 const styles = () => ({
   totalOSStyle: {
@@ -53,14 +52,14 @@ const styles = () => ({
     marginLeft: 'auto',
   },
   rightIcon: {
-    position: 'absolute',
-    bottom: 2,
-    fontWeight: 500,
+    position: 'relative',
+    fontWeight: 600,
     color: 'white',
     fontSize: '0.7rem',
     padding: '2px 3px',
     height: 20,
     cursor: 'pointer',
+    margin: '0px 1px',
   },
 })
 
@@ -340,7 +339,7 @@ const InvoiceHistory = ({
         <CommonModal
           open={showVisitInvoice}
           onClose={toggleVisitInvoiceReport}
-          title='Visitation Invoice'
+          title='Invoice'
           maxWidth='lg'
         >
           <ReportViewer

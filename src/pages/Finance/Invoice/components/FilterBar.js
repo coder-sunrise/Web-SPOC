@@ -31,25 +31,23 @@ const getBizSessionId = async () => {
 
 const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
   const { invoiceStartDate, invoiceEndDate } = values
-
   const handleReset = async () => {
     await dispatch({
       type: 'invoiceList/resetFilter',
     })
     handleSubmit()
   }
-
   return (
     <SizeContainer>
       <React.Fragment>
         <GridContainer>
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={2}>
             <FastField
               name='invoiceNo'
               render={args => <TextField label='Invoice No' {...args} />}
             />
           </GridItem>
-          <GridItem md={3}>
+          <GridItem md={1}>
             <Field
               name='invoiceStartDate'
               render={args => (
@@ -64,7 +62,7 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
               )}
             />
           </GridItem>
-          <GridItem md={3}>
+          <GridItem md={1}>
             <Field
               name='invoiceEndDate'
               render={args => (
@@ -80,21 +78,31 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
               )}
             />
           </GridItem>
-        </GridContainer>
-        <GridContainer>
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={1}>
             <FastField
               name='patientAccountNo'
-              render={args => <TextField label='Patient Acc. No.' {...args} />}
+              render={args => (
+                <TextField
+                  style={{ width: '105%' }}
+                  label='Patient Acc. No.'
+                  {...args}
+                />
+              )}
             />
           </GridItem>
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={1}>
             <FastField
               name='patientName'
-              render={args => <TextField label='Patient Name' {...args} />}
+              render={args => (
+                <TextField
+                  style={{ width: '105%' }}
+                  label='Patient Name'
+                  {...args}
+                />
+              )}
             />
           </GridItem>
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={2}>
             <FastField
               name='session'
               render={args => (
@@ -102,9 +110,7 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
               )}
             />
           </GridItem>
-        </GridContainer>
-        <GridContainer>
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={1}>
             <FastField
               name='outstandingBalanceStatus'
               render={args => {
@@ -118,19 +124,18 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
               }}
             />
           </GridItem>
+          <div className={classes.searchButton}>
+            <ProgressButton
+              color='primary'
+              icon={<Search />}
+              onClick={handleSubmit}
+            >
+              <FormattedMessage id='form.search' />
+            </ProgressButton>
+            <Button onClick={handleReset}>Reset</Button>
+            {/* <i>Double click on record to view invoice</i> */}
+          </div>
         </GridContainer>
-
-        <div className={classes.searchButton}>
-          <ProgressButton
-            color='primary'
-            icon={<Search />}
-            onClick={handleSubmit}
-          >
-            <FormattedMessage id='form.search' />
-          </ProgressButton>
-          <Button onClick={handleReset}>Reset</Button>
-          {/* <i>Double click on record to view invoice</i> */}
-        </div>
       </React.Fragment>
     </SizeContainer>
   )

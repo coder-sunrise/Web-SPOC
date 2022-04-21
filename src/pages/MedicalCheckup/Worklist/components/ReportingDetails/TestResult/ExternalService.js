@@ -16,6 +16,7 @@ import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 import printJS from 'print-js'
 import ImagePreviewer from '@/pages/Widgets/AttachmentDocument/FolderContainer/ImagePreviewer'
 import customtyles from '../../Style.less'
+import { Attachment } from '@/components/_medisys'
 
 const ExternalService = props => {
   const { height, medicalCheckupReportingDetails } = props
@@ -76,6 +77,7 @@ const ExternalService = props => {
             dataIndex: 'serviceCenterName',
             title: <div style={{ padding: 4 }}>Service Center</div>,
             render: (text, row) => <div style={{ padding: 4 }}>{text}</div>,
+            width: 180,
           },
           {
             dataIndex: 'result',
@@ -83,25 +85,18 @@ const ExternalService = props => {
             width: 250,
             render: (text, row) => (
               <div style={{ padding: 4 }}>
-                {(row.labTrackingResults || []).map(result => {
-                  return (
-                    <div>
-                      <Link>
-                        <span
-                          style={{
-                            textDecoration: 'underline',
-                          }}
-                          onClick={e => {
-                            e.preventDefault()
-                            //onPreview(result)
-                          }}
-                        >
-                          {result.fileName}
-                        </span>
-                      </Link>
-                    </div>
-                  )
-                })}
+                {row.labTrackingResults && (
+                  <Attachment
+                    label='Attachment'
+                    attachments={row.labTrackingResults}
+                    isReadOnly={true}
+                    hideRemarks
+                    listOnly={true}
+                    simple
+                    hiddenDelete
+                    fieldName='labTrackingResults'
+                  />
+                )}
               </div>
             ),
           },

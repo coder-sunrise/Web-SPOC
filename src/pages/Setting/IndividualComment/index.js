@@ -19,8 +19,9 @@ const styles = theme => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingIndividualComment, global, clinicSettings }) => ({
+@connect(({ settingIndividualComment, codetable, global, clinicSettings }) => ({
   settingIndividualComment,
+  codetable,
   mainDivHeight: global.mainDivHeight,
   clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
@@ -29,6 +30,12 @@ class IndividualComment extends PureComponent {
   state = {}
   componentDidMount() {
     const { dispatch } = this.props
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctexaminationcategory',
+      },
+    })
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {

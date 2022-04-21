@@ -142,7 +142,7 @@ const ContextMenu = ({
             return {
               ...opt,
               disabled: !row.patientProfileFk || !row.patientIsActive,
-              hidden: !row.patientProfileFk || !row.doctorName,
+              hidden: !row.patientProfileFk,
             }
           case 9: // register patient
             return {

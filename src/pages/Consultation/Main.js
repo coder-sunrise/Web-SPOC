@@ -204,6 +204,108 @@ const generatePrintData = async (
   }
   return []
 }
+
+const autoPrintSelection = async (action, props) => {
+  let printData = []
+  let settings = JSON.parse(localStorage.getItem('clinicSettings'))
+  const { autoPrintOnSignOff } = settings
+  if (autoPrintOnSignOff === true) {
+    const {
+      consultationDocument = {},
+      orders = {},
+      visitRegistration: { entity: visitEntity },
+      patient,
+    } = props
+    printData = await generatePrintData(
+      settings,
+      consultationDocument,
+      props.user,
+      patient,
+      orders,
+      visitEntity,
+    )
+  }
+
+  if (printData && printData.length > 0) {
+    const { dispatch, handlePrint, orders = {} } = props
+    const { summary } = orders
+    dispatch({
+      type: 'consultation/showSignOffModal',
+      payload: {
+        autoPrintTriggerBy: action === 'sign' ? 'sign off' : action,
+        showSignOffModal: true,
+        printData,
+        showInvoiceAmountNegativeWarning: summary && summary.totalWithGST < 0,
+        onSignOffConfirm: result => {
+          saveConsultation({
+            props,
+            shouldPromptConfirm: false,
+            action: action,
+            successCallback: () => {
+              dispatch({ type: `consultation/closeSignOffModal` })
+              if (result && result.length > 0) {
+                let printedData = result
+                const token = localStorage.getItem('token')
+                if (
+                  printedData.some(x => x.ReportId === REPORT_ID.PRESCRIPTION)
+                ) {
+                  const {
+                    visitRegistration: {
+                      entity: {
+                        visit: { id: visitFK, patientProfileFK },
+                      },
+                    },
+                  } = props
+                  getRawData(REPORT_ID.PRESCRIPTION, {
+                    visitFK,
+                    patientProfileFK,
+                  }).then(r => {
+                    printedData = printedData.map(item => ({
+                      ReportId: item.ReportId,
+                      DocumentName:
+                        item.ReportId === REPORT_ID.PRESCRIPTION
+                          ? item.description
+                          : `${item.item}(${item.description})`,
+                      ReportData:
+                        item.ReportId === REPORT_ID.PRESCRIPTION
+                          ? JSON.stringify(
+                              (delete r.ReportSettingParameter,
+                              delete r.ReportContext,
+                              r),
+                            )
+                          : item.ReportData,
+                      Copies: item.Copies,
+                      Token: token,
+                      BaseUrl: process.env.url,
+                    }))
+                    handlePrint(JSON.stringify(printedData))              
+                    dispatch({ type: 'consultation/closeModal' })
+                  })
+                } else {
+                  printedData = printedData.map(item => ({
+                    ReportId: item.ReportId,
+                    DocumentName: `${item.item}(${item.description})`,
+                    ReportData: item.ReportData,
+                    Copies: item.Copies,
+                    Token: token,
+                    BaseUrl: process.env.url,
+                  }))
+                  handlePrint(JSON.stringify(printedData))              
+                  dispatch({ type: 'consultation/closeModal' })
+                }
+              } else {
+                dispatch({ type: 'consultation/closeModal' })
+              }
+            },
+          })
+        },
+      },
+    })
+    return true
+  }
+  return false
+}
+
 const saveConsultation = ({
   props,
   action,
@@ -377,7 +479,7 @@ const discardConsultation = ({ dispatch, values, user, visitRegistration }) => {
   }
 }
 
-const pauseConsultation = ({
+const pauseConsultation = async ({
   dispatch,
   values,
   onClose,
@@ -448,36 +550,39 @@ const pauseConsultation = ({
   ) {
     newValues.patientMedicalHistory.patientProfileFK = patient.entity.id
   }
-  dispatch({
-    type: `consultation/pause`,
-    payload: newValues,
-  }).then(r => {
-    if (r) {
-      sessionStorage.removeItem(`${values.id}_consultationTimer`)
-      notification.success({
-        message: 'Consultation paused.',
-      })
-      if (values.isPharmacyOrderUpdated) {
-        const { entity: visit = {} } = visitRegistration
-        const { id } = visit
-        const userProfile = user.data.clinicianProfile
-        const userName = `${
-          userProfile.title && userProfile.title.trim().length
-            ? `${userProfile.title}. ${userProfile.name || ''}`
-            : `${userProfile.name || ''}`
-        }`
-        const message = `${userName} amended prescription at ${moment().format(
-          'HH:mm',
-        )}`
-        sendNotification('PharmacyOrderUpdate', {
-          type: NOTIFICATION_TYPE.CONSULTAION,
-          status: NOTIFICATION_STATUS.OK,
-          message,
-          visitID: id,
+  if(!(await autoPrintSelection('pause', {dispatch,patient,values,consultation,...rest}))){
+    dispatch({
+      type: `consultation/pause`,
+      payload: newValues,
+    }).then(r => {
+      if (r) {
+        sessionStorage.removeItem(`${values.id}_consultationTimer`)
+        notification.success({
+          message: 'Consultation paused.',
         })
+        if (values.isPharmacyOrderUpdated) {
+          const { entity: visit = {} } = visitRegistration
+          const { id } = visit
+          const userProfile = user.data.clinicianProfile
+          const userName = `${
+            userProfile.title && userProfile.title.trim().length
+              ? `${userProfile.title}. ${userProfile.name || ''}`
+              : `${userProfile.name || ''}`
+          }`
+          const message = `${userName} amended prescription at ${moment().format(
+            'HH:mm',
+          )}`
+          sendNotification('PharmacyOrderUpdate', {
+            type: NOTIFICATION_TYPE.CONSULTAION,
+            status: NOTIFICATION_STATUS.OK,
+            message,
+            visitID: id,
+          })
+        }
+        dispatch({ type: 'consultation/closeModal' })
       }
-    }
-  })
+    })
+  }
 }
 
 const saveDraftDoctorNote = ({ values, visitRegistration }) => {
@@ -569,112 +674,13 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
   notDirtyDuration: 0, // this page should alwasy show warning message when leave
   onDirtyDiscard: discardConsultation,
   handleSubmit: async (values, { props }) => {
-    const { versionNumber } = values
     const { dispatch, handlePrint, orders = {}, clinicSettings } = props
     const { summary } = orders
     const { isEnablePharmacyModule } = clinicSettings
     if (isEnablePharmacyModule) {
       values.isPharmacyOrderUpdated = isPharmacyOrderUpdated(orders)
     }
-    let printData = []
-    if (versionNumber >= 1) {
-      let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-      const { autoPrintOnSignOff } = settings
-
-      if (autoPrintOnSignOff === true) {
-        const {
-          consultationDocument = {},
-          orders = {},
-          visitRegistration: { entity: visitEntity },
-          patient,
-        } = props
-        printData = await generatePrintData(
-          settings,
-          consultationDocument,
-          props.user,
-          patient,
-          orders,
-          visitEntity,
-        )
-      }
-    }
-
-    if (printData && printData.length > 0) {
-      dispatch({
-        type: 'consultation/showSignOffModal',
-        payload: {
-          showSignOffModal: true,
-          printData,
-          showInvoiceAmountNegativeWarning: summary && summary.totalWithGST < 0,
-          onSignOffConfirm: result => {
-            saveConsultation({
-              props: {
-                values,
-                ...props,
-              },
-              shouldPromptConfirm: false,
-              action: 'sign',
-              successCallback: () => {
-                dispatch({ type: `consultation/closeSignOffModal` })
-                if (result && result.length > 0) {
-                  let printedData = result
-                  const token = localStorage.getItem('token')
-                  if (
-                    printedData.some(x => x.ReportId === REPORT_ID.PRESCRIPTION)
-                  ) {
-                    const {
-                      visitRegistration: {
-                        entity: {
-                          visit: { id: visitFK, patientProfileFK },
-                        },
-                      },
-                    } = props
-                    getRawData(REPORT_ID.PRESCRIPTION, {
-                      visitFK,
-                      patientProfileFK,
-                    }).then(r => {
-                      printedData = printedData.map(item => ({
-                        ReportId: item.ReportId,
-                        DocumentName:
-                          item.ReportId === REPORT_ID.PRESCRIPTION
-                            ? item.description
-                            : `${item.item}(${item.description})`,
-                        ReportData:
-                          item.ReportId === REPORT_ID.PRESCRIPTION
-                            ? JSON.stringify(
-                                (delete r.ReportSettingParameter,
-                                delete r.ReportContext,
-                                r),
-                              )
-                            : item.ReportData,
-                        Copies: item.Copies,
-                        Token: token,
-                        BaseUrl: process.env.url,
-                      }))
-                      handlePrint(JSON.stringify(printedData))
-                      dispatch({ type: 'consultation/closeModal' })
-                    })
-                  } else {
-                    printedData = printedData.map(item => ({
-                      ReportId: item.ReportId,
-                      DocumentName: `${item.item}(${item.description})`,
-                      ReportData: item.ReportData,
-                      Copies: item.Copies,
-                      Token: token,
-                      BaseUrl: process.env.url,
-                    }))
-                    handlePrint(JSON.stringify(printedData))
-                    dispatch({ type: 'consultation/closeModal' })
-                  }
-                } else {
-                  dispatch({ type: 'consultation/closeModal' })
-                }
-              },
-            })
-          },
-        },
-      })
-    } else {
+    if (!(await autoPrintSelection('sign', {values,...props}))){
       saveConsultation({
         props: {
           values,
@@ -836,12 +842,15 @@ class Main extends React.Component {
     const isFormValid = await validateForm()
     if (!_.isEmpty(isFormValid)) {
       handleSubmit()
-    } else {
+    } else if (!(await autoPrintSelection('pause', this.props))){
       saveConsultation({
         props: this.props,
         confirmMessage: 'Pause consultation?',
         successMessage: 'Consultation paused.',
         action: 'pause',
+        successCallback: () => {
+          this.props.dispatch({ type: 'consultation/closeModal' })
+        },
       })
     }
   }
@@ -1432,6 +1441,7 @@ class Main extends React.Component {
       printData,
       showInvoiceAmountNegativeWarning,
       onSignOffConfirm,
+      autoPrintTriggerBy,
     } = consultation
     const { entity: vistEntity = {} } = visitRegistration
     // if (!vistEntity) return null
@@ -1483,7 +1493,7 @@ class Main extends React.Component {
         <CommonModal
           cancelText='Cancel'
           maxWidth='sm'
-          title='Confirm sign off current consultation?'
+          title={`Confirm ${autoPrintTriggerBy} current consultation?`}
           onClose={this.onCloseSignOffModal}
           open={showSignOffModal}
         >
@@ -1491,6 +1501,7 @@ class Main extends React.Component {
             data={printData}
             showInvoiceAmountNegativeWarning={showInvoiceAmountNegativeWarning}
             handleSubmit={onSignOffConfirm}
+            triggerBy={autoPrintTriggerBy}
           />
         </CommonModal>
 

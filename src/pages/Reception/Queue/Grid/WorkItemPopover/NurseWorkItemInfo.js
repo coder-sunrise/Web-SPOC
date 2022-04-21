@@ -52,19 +52,46 @@ const NurseWorkItemInfo = props => {
       number += 1
       return (
         <tr style={{ borderBottom: '1px solid #eeeeee' }}>
-          <td style={{ width: '35px', wordBreak: 'break-word' }}>{number}</td>
-          <td style={{ width: '200px', wordBreak: 'break-word' }}>
+          <td
+            style={{
+              width: '35px',
+              verticalAlign: 'top',
+              wordBreak: 'break-word',
+            }}
+          >
+            {number}
+          </td>
+          <td
+            style={{
+              width: '200px',
+              verticalAlign: 'top',
+              wordBreak: 'break-word',
+            }}
+          >
             {nurseWorkitem.name || '-'}
           </td>
-          <td style={{ width: '200px', wordBreak: 'break-word' }}>
+          <td
+            style={{
+              width: '200px',
+              verticalAlign: 'top',
+              wordBreak: 'break-word',
+            }}
+          >
             {nurseWorkitem.instructions || '-'}
           </td>
-          <td style={{ width: '200px', wordBreak: 'break-word' }}>
+          <td
+            style={{
+              width: '200px',
+              verticalAlign: 'top',
+              wordBreak: 'break-word',
+            }}
+          >
             {nurseWorkitem.remarks || '-'}
           </td>
           <td
             style={{
               width: '65px',
+              verticalAlign: 'top',
               wordBreak: 'break-word',
               color: nurseWorkitem.priority === 'Urgent' ? 'red' : 'black',
             }}
@@ -75,6 +102,7 @@ const NurseWorkItemInfo = props => {
             style={{
               width: '120px',
               wordBreak: 'break-word',
+              verticalAlign: 'top',
               color:
                 nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
                   ? 'green'
@@ -92,41 +120,42 @@ const NurseWorkItemInfo = props => {
     <Popover
       icon={null}
       placement='bottomLeft'
-      overlayStyle={{ maxHeight: 350 }}
+      overlayInnerStyle={{
+        maxHeight: 500,
+        overflowY: 'auto',
+        overflowX: 'hidden',
+      }}
       arrowPointAtCenter
       content={
         <div>
           <h5>Nurse Work Item Details</h5>
           <table
             style={{
+              fontWeight: 'bold',
               fontSize: 14,
               marginTop: 5,
             }}
           >
-            <tr>
-              <td>
-                <table
-                  style={{
-                    fontWeight: 'bold',
-                  }}
-                >
-                  <tr style={{ borderBottom: '1px solid #eeeeee' }}>
-                    <th style={{ width: '35px' }}>No.</th>
-                    <th style={{ width: '200px' }}>Name</th>
-                    <th style={{ width: '200px' }}>Instructions</th>
-                    <th style={{ width: '200px' }}>Remarks</th>
-                    <th style={{ width: '65px' }}>Priority</th>
-                    <th style={{ width: '120px' }}>Status</th>
-                  </tr>
-                </table>
-              </td>
+            <tr style={{ borderBottom: '1px solid #eeeeee' }}>
+              <th style={{ width: '35px' }}>No.</th>
+              <th style={{ width: '200px' }}>Name</th>
+              <th style={{ width: '200px' }}>Instructions</th>
+              <th style={{ width: '200px' }}>Remarks</th>
+              <th style={{ width: '65px' }}>Priority</th>
+              <th style={{ width: '120px' }}>Status</th>
             </tr>
-            <td>
-              <div style={{ maxHeight: '250px', overflow: 'auto' }}>
-                <table>{nurseWorkItemDetails(workItemDetails)}</table>
-              </div>
-            </td>
           </table>
+
+          <div style={{ maxHeight: 400, overflow: 'auto' }}>
+            <table
+              style={{
+                fontSize: 14,
+                marginTop: 5,
+              }}
+            >
+              {nurseWorkItemDetails(workItemDetails)}
+            </table>
+          </div>
         </div>
       }
     >

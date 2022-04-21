@@ -918,3 +918,14 @@ textarea[class*='MuiInputBase-input-'] {
   font-weight: 500;
   text-align: right;
 }
+.ant-switch-handle {
+  width: 18px !important;
+  height: 16px !important;
+}
+.custom_pro .ant-table-tbody tr:nth-child(odd) {
+  background-color: #f0f5ff !important;
+}
+
+.custom_pro .ant-table-tbody tr:nth-child(odd) td {
+  background-color: #f0f5ff !important;
+}

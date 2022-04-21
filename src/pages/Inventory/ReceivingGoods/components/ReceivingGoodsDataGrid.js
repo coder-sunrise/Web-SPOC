@@ -35,7 +35,7 @@ const ReceivingGoodsDataGrid = ({
   }
   const viewEditAuthority = Authorized.check(
     'receivinggoods.receivinggoodsdetails',
-  )
+  ) || { rights: 'hidden' }
   return (
     <CommonTableGrid
       style={{ margin: 0 }}

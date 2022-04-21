@@ -42,11 +42,17 @@ export const OrderDetailsTable = props => {
       title: 'Instructions',
       width: 300,
       dataIndex: 'Instruction',
+      render: (text, row, index) => {
+        return <span>{text ? text : '-'}</span>
+      },
     },
     {
       title: 'Remarks',
       width: 300,
       dataIndex: 'Remark',
+      render: (text, row, index) => {
+        return <span>{text ? text : '-'}</span>
+      },
     },
   ]
   const [columns, setColumns] = useState(defaultColumns)

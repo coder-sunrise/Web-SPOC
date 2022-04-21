@@ -32,6 +32,7 @@ const MCCard = ({
   clinicSettings,
   ctlanguage = [],
   isVisitReadonlyAfterSigned,
+  isDoctorConsulted,
   validateReportLanguage,
 }) => {
   const commitChanges = ({ rows }) => {
@@ -87,7 +88,7 @@ const MCCard = ({
     },
   ]
 
-  if (!fromMedicalCheckupReporting) {
+  if (!fromMedicalCheckupReporting && !isDoctorConsulted) {
     columns.push({ name: 'action', title: ' ' })
   }
 
@@ -97,7 +98,7 @@ const MCCard = ({
       sortingEnabled: false,
       type: 'codeSelect',
       code: 'doctorprofile',
-      isDisabled: row => fromMedicalCheckupReporting,
+      isDisabled: row => fromMedicalCheckupReporting || isDoctorConsulted,
       labelField: 'clinicianProfile.name',
       localFilter: o => o.clinicianProfile.isActive,
       renderDropdown: option => <DoctorLabel doctor={option} />,
@@ -206,7 +207,7 @@ const MCCard = ({
             showCommandColumn: false,
             showAddCommand: fromMedicalCheckupReporting
               ? false
-              : !isVisitReadonlyAfterSigned,
+              : !isVisitReadonlyAfterSigned && !isDoctorConsulted,
             onCommitChanges: commitChanges,
           }}
           schema={reportingDoctorSchema}

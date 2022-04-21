@@ -542,6 +542,7 @@ const _routes = [
             hideInMenu: true,
             component: './Finance/CorporateBilling/Details',
             authority: ['finance/corporatebilling'],
+            observe: 'CorporateBillingPayment',
           },
           {
             path: '/finance/deposit',

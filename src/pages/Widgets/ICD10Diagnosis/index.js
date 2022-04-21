@@ -40,7 +40,7 @@ class ICD10Diagnosis extends PureComponent {
         this.props.dispatch({
           type: 'diagnosis/updateState',
           payload: {
-            favouriteDiagnosisLanguage: favouriteLanguage,
+            favouriteDiagnosisLanguage: favouriteLanguage || 'EN',
           },
         })
       }
@@ -194,7 +194,7 @@ class ICD10Diagnosis extends PureComponent {
                 this.addDiagnosis(1)
                 return null
               }
-            }
+            } 
             return this.diagnosis.map((v, i) => {
               if (v.isDeleted === true) return null
               return (
@@ -202,20 +202,20 @@ class ICD10Diagnosis extends PureComponent {
                   value={this.getDiagnosisAccessRight()}
                 >
                   <div key={v.uid}>
-                    {diagnosis.favouriteDiagnosisLanguage && (
-                      <ICD10DiagnosisItem
-                        {...this.props}
-                        index={i}
-                        arrayHelpers={arrayHelpers}
-                        diagnosis={this.diagnosis}
-                        saveDiagnosisAsFavourite={this.saveDiagnosisAsFavourite}
-                        uid={v.uid}
-                        icD10DiagnosisCode={v.icD10DiagnosisCode}
-                        favouriteDiagnosisMessage={v.favouriteDiagnosisMessage}
-                        favouriteDiagnosis={diagnosis.favouriteDiagnosis || []}
-                        defaultLanguage={diagnosis.favouriteDiagnosisLanguage}
-                      />
-                    )}
+                    <ICD10DiagnosisItem
+                      {...this.props}
+                      index={i}
+                      arrayHelpers={arrayHelpers}
+                      diagnosis={this.diagnosis}
+                      saveDiagnosisAsFavourite={this.saveDiagnosisAsFavourite}
+                      uid={v.uid}
+                      icD10DiagnosisCode={v.icD10DiagnosisCode}
+                      favouriteDiagnosisMessage={v.favouriteDiagnosisMessage}
+                      favouriteDiagnosis={diagnosis.favouriteDiagnosis || []}
+                      defaultLanguage={
+                        diagnosis.favouriteDiagnosisLanguage || 'EN'
+                      }
+                    />
                   </div>
                 </AuthorizedContext.Provider>
               )

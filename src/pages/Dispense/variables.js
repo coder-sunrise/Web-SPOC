@@ -197,7 +197,7 @@ const radiologyDetailsButton = (row, buttonClickCallback) => {
   if (
     type === 'Radiology' &&
     radiologyWorkitemID &&
-    Authorized.check('queue.radiologyexaminationdetails').rights !== 'hidden'
+    Authorized.check('queue.radiologyexaminationdetails')?.rights !== 'hidden'
   ) {
     radiologyDetailsBtn = (
       <Tooltip title='Radiology Details'>
@@ -329,19 +329,18 @@ export const DispenseItemsColumnExtensions = (
               wordWrap: 'break-word',
               whiteSpace: 'pre-wrap',
               paddingRight: paddingRight,
+              position: 'relative',
             }}
           >
             <Tooltip title={row.type}>
               <span>{row.type}</span>
             </Tooltip>
-            <div style={{ position: 'relative', top: 2 }}>
+            <div style={{ position: 'absolute', top: '-1px', right: '-6px' }}>
               {row.isPreOrder && (
                 <Tooltip title='New Pre-Order'>
                   <div
                     style={{
-                      position: 'absolute',
-                      bottom: 2,
-                      right: -27,
+                      position: 'relative',
                       borderRadius: 4,
                       backgroundColor: '#4255bd',
                       fontWeight: 500,
@@ -349,6 +348,8 @@ export const DispenseItemsColumnExtensions = (
                       fontSize: '0.7rem',
                       padding: '2px 3px',
                       height: 20,
+                      display: 'inline-block',
+                      margin: '0px 1px',
                     }}
                   >
                     Pre
@@ -359,9 +360,7 @@ export const DispenseItemsColumnExtensions = (
                 <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                   <div
                     style={{
-                      position: 'absolute',
-                      bottom: 2,
-                      right: row.isPreOrder ? -60 : -30,
+                      position: 'relative',
                       borderRadius: 4,
                       backgroundColor: 'green',
                       fontWeight: 500,
@@ -369,6 +368,8 @@ export const DispenseItemsColumnExtensions = (
                       fontSize: '0.7rem',
                       padding: '2px 3px',
                       height: 20,
+                      display: 'inline-block',
+                      margin: '0px 1px',
                     }}
                   >
                     Excl.
@@ -1327,17 +1328,16 @@ export const PackageColumnExtensions = (onPrint, showDrugLabelRemark) => [
             wordWrap: 'break-word',
             whiteSpace: 'pre-wrap',
             paddingRight: 24,
+            position: 'relative',
           }}
         >
           {row.type}
-          <div style={{ position: 'relative', top: 2 }}>
+          <div style={{ position: 'absolute', top: '-1px', right: '-6px' }}>
             {row.isExclusive && (
               <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                 <div
                   style={{
-                    position: 'absolute',
-                    bottom: 2,
-                    right: -30,
+                    position: 'relative',
                     borderRadius: 4,
                     backgroundColor: 'green',
                     fontWeight: 500,
@@ -1345,6 +1345,8 @@ export const PackageColumnExtensions = (onPrint, showDrugLabelRemark) => [
                     fontSize: '0.7rem',
                     padding: '2px 3px',
                     height: 20,
+                    display: 'inline-block',
+                    margin: '0px 1px',
                   }}
                 >
                   Excl.

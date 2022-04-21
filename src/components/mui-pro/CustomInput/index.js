@@ -267,10 +267,7 @@ class TextField extends React.PureComponent {
       }
       cfg.rawError = error || rawError
     } else {
-      /* else if (value) {
-      cfg.value = value
-    } */ cfg.value =
-        state.value
+      cfg.value = text ? (value ?? defaultValue) : state.value
     }
     if (!preventDefaultChangeEvent) {
       cfg.onChange = this.onChange
@@ -282,7 +279,7 @@ class TextField extends React.PureComponent {
     if (!maxLength) {
       cfg.maxLength = 200
     }
-    cfg.negative = state.value < 0
+    cfg.negative = cfg.value < 0
     cfg.onKeyUp = extendFunc(onKeyUp, this.onKeyUp)
     // cfg.onKeyDown = extendFunc(onKeyDown, this.onKeyDown)
 

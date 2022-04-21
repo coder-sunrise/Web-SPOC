@@ -62,7 +62,9 @@ const PatientInfoInput = ({
                   })}
                   onKeyUp={e => {
                     if ([13].includes(e.which)) {
-                      onSearchPatientClick()
+                      setTimeout(() => {
+                        onSearchPatientClick()
+                      }, 1)
                     }
                   }}
                 />

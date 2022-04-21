@@ -52,18 +52,17 @@ export default ({ classes, current, fieldName = '' }) => {
               >
                 <div>{row.description}</div>
               </Tooltip>
-              <div style={{ position: 'relative', top: 2 }}>
+              <div style={{ position: 'absolute', top: '-1px', right: '-4px' }}>
                 {row.isPreOrder && (
                   <Tooltip title='New Pre-Order'>
                     <div
                       className={classes.rightIcon}
                       style={{
-                        right: -30,
                         borderRadius: 4,
                         backgroundColor: '#4255bd',
+                        display: 'inline-block',
                       }}
                     >
-                      {' '}
                       Pre
                     </div>
                   </Tooltip>

@@ -65,19 +65,38 @@ const RadioWorkItemInfo = props => {
       number += 1
       return (
         <tr style={{ borderBottom: '1px solid #eeeeee' }}>
-          <td style={{ width: '35px' }}>{number}</td>
-          <td style={{ width: '200px', wordBreak: 'break-word' }}>
+          <td style={{ verticalAlign: 'top', width: '35px' }}>{number}</td>
+          <td
+            style={{
+              width: '200px',
+              verticalAlign: 'top',
+              wordBreak: 'break-word',
+            }}
+          >
             {workItem.name || '-'}
           </td>
-          <td style={{ width: '200px', wordBreak: 'break-word' }}>
+          <td
+            style={{
+              width: '200px',
+              verticalAlign: 'top',
+              wordBreak: 'break-word',
+            }}
+          >
             {workItem.instructions || '-'}
           </td>
-          <td style={{ width: '200px', wordBreak: 'break-word' }}>
+          <td
+            style={{
+              width: '200px',
+              verticalAlign: 'top',
+              wordBreak: 'break-word',
+            }}
+          >
             {workItem.remarks || '-'}
           </td>
           <td
             style={{
               width: '65px',
+              verticalAlign: 'top',
               wordBreak: 'break-word',
               color: workItem.priority === 'Urgent' ? 'red' : 'black',
             }}
@@ -87,6 +106,7 @@ const RadioWorkItemInfo = props => {
           <td
             style={{
               width: '140px',
+              verticalAlign: 'top',
               wordBreak: 'break-word',
               color:
                 workItem.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
@@ -106,7 +126,11 @@ const RadioWorkItemInfo = props => {
   return (
     <Popover
       icon={null}
-      overlayStyle={{ maxHeight: 350 }}
+      overlayInnerStyle={{
+        maxHeight: 500,
+        overflowY: 'auto',
+        overflowX: 'hidden',
+      }}
       placement='bottomLeft'
       arrowPointAtCenter
       content={
@@ -114,34 +138,30 @@ const RadioWorkItemInfo = props => {
           <h5>Radiology Work Item Details</h5>
           <table
             style={{
+              fontWeight: 'bold',
               fontSize: 14,
               marginTop: 5,
             }}
           >
-            <tr style={{ borderBottom: '1px solid #eeeeee' }}>
-              <td>
-                <table
-                  style={{
-                    fontWeight: 'bold',
-                  }}
-                >
-                  <tr>
-                    <th style={{ width: '35px' }}>No.</th>
-                    <th style={{ width: '200px' }}>Name</th>
-                    <th style={{ width: '200px' }}>Instructions</th>
-                    <th style={{ width: '200px' }}>Remarks</th>
-                    <th style={{ width: '65px' }}>Priority</th>
-                    <th style={{ width: '140px' }}>Status</th>
-                  </tr>
-                </table>
-              </td>
+            <tr>
+              <th style={{ width: '35px' }}>No.</th>
+              <th style={{ width: '200px' }}>Name</th>
+              <th style={{ width: '200px' }}>Instructions</th>
+              <th style={{ width: '200px' }}>Remarks</th>
+              <th style={{ width: '65px' }}>Priority</th>
+              <th style={{ width: '140px' }}>Status</th>
             </tr>
-            <td>
-              <div style={{ maxHeight: '250px', overflow: 'auto' }}>
-                <table>{radioWorkItemDetails(workItemDetails)}</table>
-              </div>
-            </td>
           </table>
+          <div style={{ maxHeight: 400, overflowY: 'auto' }}>
+            <table
+              style={{
+                fontSize: 14,
+                marginTop: 5,
+              }}
+            >
+              {radioWorkItemDetails(workItemDetails)}
+            </table>
+          </div>
         </div>
       }
     >

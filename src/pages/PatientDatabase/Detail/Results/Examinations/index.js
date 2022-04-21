@@ -93,6 +93,13 @@ const Examinations = props => {
         category: 'Lab',
         patientProfileFK: patientProfileFK,
         currentPage: currentPage,
+        visitFromDate: moment(new Date())
+          .set({ hour: 0, minute: 0, second: 0 })
+          .formatUTC(false),
+        visitToDate: moment(new Date())
+          .set({ hour: 23, minute: 59, second: 59 })
+          .formatUTC(false),
+        status: 6,
       }
       setFilterCondition(payload)
       dispatch({
@@ -117,10 +124,19 @@ const Examinations = props => {
     }).then(r => {
       if (r) {
         notification.success({ message: 'Acknowledged' })
-        var newData = [...data]
-        var currentSpecimen = newData.find(t => t.id === id)
-        currentSpecimen.isAcknowledged = true
-        setData(newData)
+
+        dispatch({
+          type: 'specimenCollection/getLabSpecimenById',
+          payload: { id: id },
+        }).then(r => {
+          var newData = [...data]
+          var currentSpecimen = newData.find(t => t.id === id)
+          currentSpecimen.isAcknowledged = r.isAcknowledged
+          currentSpecimen.acknowledgedByUserTitle = r.acknowledgedByUserTitle
+          currentSpecimen.acknowledgeDate = r.acknowledgeDate
+          currentSpecimen.acknowledgedByUser = r.acknowledgedByUser
+          setData(newData)
+        })
       } else {
         notification.error({ message: 'Acknowledge Failed' })
       }
@@ -128,7 +144,7 @@ const Examinations = props => {
   }
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div style={{ height: 60 }}>
+      <div style={{ minHeight: 60 }}>
         <FilterBar search={search} {...props}></FilterBar>
       </div>
       <div style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>

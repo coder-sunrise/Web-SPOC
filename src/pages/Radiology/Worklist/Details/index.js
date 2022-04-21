@@ -106,7 +106,7 @@ const RadiologyDetails = () => {
     return (
       <React.Fragment>
         {buttonInfo.enableCancel &&
-          Authorized.check('radiologyworklist.cancelexamination').rights ===
+          Authorized.check('radiologyworklist.cancelexamination')?.rights ===
             'enable' && (
             <ProgressButton
               color='#797979'
@@ -117,7 +117,7 @@ const RadiologyDetails = () => {
               Cancel Examination
             </ProgressButton>
           )}
-        {Authorized.check(buttonInfo.authority).rights === 'enable' && (
+        {Authorized.check(buttonInfo.authority)?.rights === 'enable' && (
           <ProgressButton
             color='success'
             onClick={() => {
@@ -274,7 +274,7 @@ const RadiologyDetails = () => {
               Authorized.check('radiologyworklist.saveexamination') || {
                 rights: 'hidden',
               }
-            ).rights === 'enable'
+            )?.rights === 'enable'
               ? () => {
                   handleSave()
                 }

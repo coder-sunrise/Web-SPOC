@@ -241,7 +241,7 @@ export const REPORT_TYPE = {
   55: 'Letter of Certification',
   61: 'Refraction Form Report',
   68: 'Patient History Report',
-  80: 'Visitation Invoice',
+  80: 'Invoice',
 }
 
 export const REPORT_ID = {
@@ -983,14 +983,15 @@ export const AGETYPE = {
 }
 
 export const INVOICE_REPORT_TYPES = {
-  SUMMARYINVOICE: 'Summary Invoice',
-  GROUPINVOICE: 'Group Invoice',
-  INDIVIDUALINVOICE: 'Individual Invoice',
-  CLAIMABLEITEMCATEGORYINVOICE: 'Claimable Item Category Invoice',
-  ITEMCATEGORYINVOICE: 'Item Category Invoice',
-  CLAIMABLEITEMINVOICE: 'Claimable Item Invoice',
-  DETAILEDINVOICE: 'Detailed Invoice',
-}
+         SUMMARYINVOICE: 'Summary Invoice',
+         GROUPINVOICE: 'Group Invoice',
+         INDIVIDUALINVOICE: 'Individual Invoice',
+         CLAIMABLEITEMCATEGORYINVOICE: 'Claimable Item Category Invoice',
+         ITEMCATEGORYINVOICE: 'Item Category Invoice',
+         CLAIMABLEITEMINVOICE: 'Claimable Item Invoice',
+         DETAILEDINVOICE: 'Detailed Invoice',
+         PAYMENT_RECEIPT: 'Payment Receipt',
+       }
 
 export const TESTTYPES = {
   BASICEXAMINATION: 'BasicExamination',
@@ -1013,12 +1014,12 @@ export const TESTTYPES = {
 }
 
 export const WORK_ITEM_TYPES = {
-         LAB: 'Lab',
-         RADIOLOGY: 'Radiology',
-         NURSEACTUALIZE: 'NurseActualize',
-         PHARMACY: 'Pharmacy',
-         LAB_TRACKING: 'LabTracking',
-       }
+  LAB: 'Lab',
+  RADIOLOGY: 'Radiology',
+  NURSEACTUALIZE: 'NurseActualize',
+  PHARMACY: 'Pharmacy',
+  LAB_TRACKING: 'LabTracking',
+}
 export const WORK_ITEM_TYPES_ENUM = {
   LAB: 0,
   RADIOLOGY: 1,

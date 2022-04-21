@@ -318,7 +318,7 @@ class Forms extends PureComponent {
   }
 
   printRow = row => {
-    DocumentEditor.print({ documentName: row.formName, document: row.formData })
+    DocumentEditor.print({ documentName: row.formName, document: row.formData.content })
   }
 
   getFormAccessRight = () => {
@@ -413,13 +413,20 @@ class Forms extends PureComponent {
             },
             {
               columnName: 'updateByUser',
+              render: r => {
+                const updatedBy = r.lastUpdatedByUser || r.updateByUser
+                return (
+                  <Tooltip title={updatedBy}>
+                    <span>{updatedBy}</span>
+                  </Tooltip>
+                )
+              },
             },
             {
               columnName: 'updateDate',
               render: r => {
-                const updateDate = moment(r.updateDate).format(
-                  'DD MMM YYYY HH:mm',
-                )
+                const updateDate = moment(r.lastUpdatedDate || r.updateDate)
+                  .format('DD MMM YYYY HH:mm')
                 return (
                   <Tooltip title={updateDate}>
                     <span>{updateDate}</span>
@@ -525,7 +532,7 @@ class Forms extends PureComponent {
         <AuthorizedContext.Provider
           value={{
             rights:
-              this.getFormAccessRight().rights !== 'enable'
+              this.getFormAccessRight()?.rights !== 'enable'
                 ? 'hidden'
                 : 'enable',
           }}

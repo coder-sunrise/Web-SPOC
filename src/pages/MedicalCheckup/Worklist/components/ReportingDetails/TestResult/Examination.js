@@ -162,7 +162,7 @@ const Examination = props => {
           <div style={{ padding: 4 }}>
             {index === 0
               ? 'Current'
-              : moment(data.visitDate).format(dateFormatLong)}
+              : moment(item.visitDate).format(dateFormatLong)}
           </div>
         ),
         width: 200,
@@ -187,17 +187,13 @@ const Examination = props => {
                     style={{ position: 'relative' }}
                     className={classes.commentContainer}
                   >
-                    <Tooltip title={showValue}>
-                      <div
-                        style={{
-                          textOverflow: 'ellipsis',
-                          overflow: 'hidden',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {showValue}
-                      </div>
-                    </Tooltip>
+                    <div
+                      style={{
+                        whiteSpace: 'pre-wrap',
+                      }}
+                    >
+                      {showValue}
+                    </div>
                     <div
                       style={{ position: 'absolute', right: '-4px', top: 0 }}
                     >
@@ -275,27 +271,29 @@ const Examination = props => {
     )
 
     ctexaminationcategory.forEach(category => {
-      defaultData.push({
-        id: category.id,
-        examinationType: category.name,
-        isGroup: true,
-        selectedLanguage,
-      })
       const examinationitems = examinationItem.filter(
         item => item.examinationCategoryFK === category.id,
       )
-      defaultData = defaultData.concat(
-        examinationitems.map(item => ({
-          id: item.id,
-          examinationType: item.displayValue,
-          isGroup: false,
+      if (examinationitems.length) {
+        defaultData.push({
+          id: category.id,
+          examinationType: category.name,
+          isGroup: true,
           selectedLanguage,
-          isSelected:
-            selectExaminationItemId && item.id === selectExaminationItemId,
-          status: item.status,
-          examinationItemService: item.examinationItemService,
-        })),
-      )
+        })
+        defaultData = defaultData.concat(
+          examinationitems.map(item => ({
+            id: item.id,
+            examinationType: item.displayValue,
+            isGroup: false,
+            selectedLanguage,
+            isSelected:
+              selectExaminationItemId && item.id === selectExaminationItemId,
+            status: item.status,
+            examinationItemService: item.examinationItemService,
+          })),
+        )
+      }
     })
     return defaultData
   }
@@ -394,7 +392,7 @@ const Examination = props => {
     <div
       style={{
         position: 'relative',
-        paddingRight: selectExaminationItemId ? 610 : 0,
+        paddingRight: selectExaminationItemId ? 600 : 0,
         height: height - 48,
         border: '1px solid #CCCCCC',
       }}

@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
+import numeral from 'numeral'
 // material icon
 import { Divider, withStyles } from '@material-ui/core'
 import Calendar from '@material-ui/icons/CalendarToday'
@@ -14,6 +15,7 @@ import {
 } from '@/components'
 import * as Helper from './helper'
 import { primaryColor } from '@/assets/jss'
+import { APPOINTMENT_STATUSOPTIONS } from '@/utils/constants'
 
 const styles = theme => ({
   root: {
@@ -69,6 +71,7 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
     updateByUser,
     updateDate,
     resourceName,
+    preOrder = [],
   } = popoverEvent
 
   const date = moment(appointmentDate)
@@ -101,6 +104,17 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
     ? appointmentType.tagColorHex
     : primaryColor
 
+  const preOrderStr = preOrder
+    .map(
+      x =>
+        `${x.itemName || ''} ${numeral(x.quantity || '').format('0.0')}${
+          x.uom ? ` ${x.uom}` : ''
+        }`,
+    )
+    .join(', ')
+  const status = APPOINTMENT_STATUSOPTIONS.find(
+    x => x.id === appointmentStatusFk,
+  )
   return (
     <div className={classes.root}>
       <div
@@ -133,28 +147,24 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
           />
         </GridItem>
         <GridItem md={6}>
-          <CodeSelect
-            disabled
-            code='ctappointmenttype'
+          <TextField
             label='Appt. Type'
-            labelField='displayValue'
-            valueField='id'
-            value={appointmentTypeFK}
+            value={appointmentType?.displayValue || ''}
+            disabled
           />
         </GridItem>
         <GridItem md={6}>
-          <CodeSelect
-            disabled
-            code='ltappointmentstatus'
-            label='Appt. Status'
-            value={appointmentStatusFk && Number(appointmentStatusFk)}
-          />
+          <TextField label='Appt. Status' value={status?.name || ''} disabled />
         </GridItem>
         <GridItem md={6}>
           <TextField disabled label='Book By' value={bookedByUser} />
         </GridItem>
         <GridItem md={6}>
-          <DatePicker disabled label='Book On' value={bookOn} />
+          <TextField
+            label='Book On'
+            value={moment(bookOn).format('DD MMM YYYY')}
+            disabled
+          />
         </GridItem>
         <GridItem md={6}>
           <TextField disabled label='Update By' value={updateByUser} />
@@ -174,6 +184,9 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
             label='Remarks'
             value={appointmentRemarks}
           />
+        </GridItem>
+        <GridItem md={12}>
+          <span>Pre Order : {preOrderStr}</span>
         </GridItem>
       </GridContainer>
     </div>

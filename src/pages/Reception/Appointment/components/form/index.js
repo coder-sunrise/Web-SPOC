@@ -1354,6 +1354,7 @@ class Form extends React.PureComponent {
                     disabled={_disableAppointmentDate}
                     visitOrderTemplateOptions={visitOrderTemplateOptions}
                     patientProfileFK={values.patientProfileFK}
+                    values={values}
                   />
                   <GridItem xs md={12} className={classes.verticalSpacing}>
                     <AppointmentDataGrid
@@ -1397,7 +1398,7 @@ class Form extends React.PureComponent {
                         handleSelectCannedText={cannedText => {
                           const remarks = currentAppointment.appointmentRemarks
                           const newRemaks = `${
-                            remarks ? remarks + ' ' : ''
+                            remarks ? remarks + '\n' : ''
                           }${cannedText.text || ''}`.substring(0, 2000)
                           setFieldValue(
                             'currentAppointment.appointmentRemarks',

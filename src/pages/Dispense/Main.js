@@ -60,51 +60,9 @@ const calculateInvoiceAmounts = entity => {
 
 const reloadDispense = (props, effect = 'query') => {
   const { dispatch, dispense, resetForm, codetable, clinicSettings } = props
-  Promise.all([
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventorymedication',
-        force: true,
-        temp: true,
-      },
-    }),
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventoryvaccination',
-        force: true,
-        temp: true,
-      },
-    }),
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventoryconsumable',
-        force: true,
-        temp: true,
-      },
-    }),
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctservice',
-        force: true,
-        temp: true,
-      },
-    }),
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctmedicationunitofmeasurement',
-        force: true,
-      },
-    }),
-  ]).then(r => {
-    dispatch({
-      type: `dispense/${effect}`,
-      payload: dispense.visitID,
-    })
+  dispatch({
+    type: `dispense/${effect}`,
+    payload: dispense.visitID,
   })
 }
 

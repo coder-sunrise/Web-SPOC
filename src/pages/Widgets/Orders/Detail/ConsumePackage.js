@@ -151,10 +151,7 @@ const getType = typeId => {
         uom => uom.id === medication.dispensingUOM.id,
       )
       let item
-      if (
-        medication.isActive === true &&
-        !medication.isOnlyClinicInternalUsage
-      ) {
+      if (medication.isActive === true && medication.orderable) {
         const medicationdispensingUOM = medication.dispensingUOM
         const medicationusage = medication.medicationUsage
         const medicationfrequency = matchInstruction?.medicationFrequency
@@ -279,7 +276,7 @@ const getType = typeId => {
           isDispensedByPharmacy: medication.isDispensedByPharmacy,
           isNurseActualizeRequired: medication.isNurseActualizable,
           isExclusive: medication.isExclusive,
-          isOnlyClinicInternalUsage: medication.isOnlyClinicInternalUsage,
+          orderable: medication.orderable,
         }
       }
       return item
@@ -390,10 +387,7 @@ const getType = typeId => {
       )
 
       let item
-      if (
-        consumable.isActive === true &&
-        !consumable.isOnlyClinicInternalUsage
-      ) {
+      if (consumable.isActive === true && consumable.orderable) {
         let isDefaultBatchNo
         if (consumable) {
           isDefaultBatchNo = consumable.consumableStock.find(
@@ -428,7 +422,7 @@ const getType = typeId => {
           packageGlobalId: packageItem.packageGlobalId,
           isDispensedByPharmacy: consumable.isDispensedByPharmacy,
           isNurseActualizeRequired: consumable.isNurseActualizable,
-          isOnlyClinicInternalUsage: consumable.isOnlyClinicInternalUsage,
+          orderable: consumable.orderable,
         }
       }
       return item

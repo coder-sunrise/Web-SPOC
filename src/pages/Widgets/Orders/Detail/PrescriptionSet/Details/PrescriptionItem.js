@@ -26,7 +26,7 @@ import {
   Tooltip,
   Select,
   notification,
-  MedicationSelect,
+  LocalSearchSelect,
 } from '@/components'
 import { currencySymbol } from '@/utils/config'
 import CannedTextButton from '@/pages/Widgets/Orders/Detail/CannedTextButton'
@@ -416,11 +416,11 @@ class Detail extends PureComponent {
       const lowerCaseInput = input.toLowerCase()
 
       const { props } = option
-      const { code = '', displayValue = '', medicationGroup = {} } = props.data
+      const { code = '', displayValue = '', medicationGroupName } = props.data
       match =
         code.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
         displayValue.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
-        (medicationGroup.name || '').toLowerCase().indexOf(lowerCaseInput) >= 0
+        (medicationGroupName || '').toLowerCase().indexOf(lowerCaseInput) >= 0
     } catch (error) {
       match = false
     }
@@ -432,7 +432,7 @@ class Detail extends PureComponent {
       code,
       displayValue,
       sellingPrice = 0,
-      medicationGroup = {},
+      medicationGroupName,
       stock = 0,
       dispensingUOM = {},
       isExclusive,
@@ -505,7 +505,7 @@ class Detail extends PureComponent {
         >
           <Tooltip
             useTooltip2
-            title={medicationGroup.name ? `Group: ${medicationGroup.name}` : ''}
+            title={medicationGroupName ? `Group: ${medicationGroupName}` : ''}
           >
             <div
               style={{
@@ -518,7 +518,7 @@ class Detail extends PureComponent {
               }}
             >
               {' '}
-              {medicationGroup.name ? `Grp.: ${medicationGroup.name}` : ''}
+              {medicationGroupName ? `Grp.: ${medicationGroupName}` : ''}
             </div>
           </Tooltip>
         </div>
@@ -573,7 +573,7 @@ class Detail extends PureComponent {
     setFieldValue('prescriptionSetItemInstruction', newPrescriptionInstruction)
 
     setFieldValue('isActive', op.isActive)
-    setFieldValue('isOnlyClinicInternalUsage', op.isOnlyClinicInternalUsage)
+    setFieldValue('orderable', op.orderable)
     setFieldValue('selectedMedication', op)
 
     if (
@@ -664,7 +664,7 @@ class Detail extends PureComponent {
       codetable: { inventorymedication = [] },
     } = this.props
     return inventorymedication
-      .filter(m => !m.isOnlyClinicInternalUsage)
+      .filter(m => m.orderable)
       .reduce((p, c) => {
         const { code, displayValue, sellingPrice = 0, dispensingUOM = {} } = c
         const { name: uomName = '' } = dispensingUOM
@@ -969,7 +969,7 @@ class Detail extends PureComponent {
     row.inventoryDispenseUOMFK = option.dispensingUOM.id
     row.inventoryPrescribingUOMFK = option.prescribingUOM.id
     row.isActive = option.isActive
-    row.isOnlyClinicInternalUsage = option.isOnlyClinicInternalUsage
+    row.orderable = option.orderable
   }
 
   commitDrugMixtureItemChanges = ({ rows, deleted, added, changed }) => {
@@ -1042,7 +1042,7 @@ class Detail extends PureComponent {
       columnExtensions: [
         {
           columnName: 'inventoryMedicationFK',
-          type: 'medicationSelect',
+          type: 'localSearchSelect',
           labelField: 'combinDisplayValue',
           options: this.getMedicationOptions,
           handleFilter: () => true,
@@ -1125,6 +1125,7 @@ class Detail extends PureComponent {
 
             setFieldValue('cautions', newCautions)
           },
+          matchSearch: this.matchSearch,
         },
         {
           columnName: 'quantity',
@@ -1178,6 +1179,17 @@ class Detail extends PureComponent {
     return false
   }
 
+  matchSearch = (option, input) => {
+    const lowerCaseInput = input.toLowerCase()
+    return (
+      option.code.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+      option.displayValue.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+      (option.medicationGroupName || '')
+        .toLowerCase()
+        .indexOf(lowerCaseInput) >= 0
+    )
+  }
+
   render() {
     const {
       theme,
@@ -1215,8 +1227,7 @@ class Detail extends PureComponent {
                 render={args => {
                   return (
                     <div style={{ position: 'relative' }}>
-                      <MedicationSelect
-                        values={this.props.values}
+                      <LocalSearchSelect
                         {...args}
                         label='Medication Name, Drug Group'
                         labelField='combinDisplayValue'
@@ -1231,6 +1242,7 @@ class Detail extends PureComponent {
                         renderDropdown={this.renderMedication}
                         style={{ paddingRight: 20 }}
                         showOptionTitle={false}
+                        matchSearch={this.matchSearch}
                       />
                       <LowStockInfo
                         sourceType='prescriptionSet'
@@ -1794,7 +1806,7 @@ class Detail extends PureComponent {
                 }}
                 handleSelectCannedText={cannedText => {
                   const newRemaks = `${
-                    remarks ? remarks + ' ' : ''
+                    remarks ? remarks + '\n' : ''
                   }${cannedText.text || ''}`.substring(0, 2000)
                   setFieldValue('remarks', newRemaks)
                 }}

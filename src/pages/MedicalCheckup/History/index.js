@@ -17,6 +17,7 @@ import {
   Select,
   DatePicker,
   Tooltip,
+  notification,
 } from '@/components'
 import { ProTable } from '@medisys/component'
 import service from './services'
@@ -368,6 +369,10 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
         x => x.userProfileFK === user.data.clinicianProfile.userProfile.id,
       )
     ) {
+      notification.warn({
+        message:
+          "Please make sure you are the primary/reporting doctor to view this patient's worklist.",
+      })
       return
     }
     showReportingDetails(row)

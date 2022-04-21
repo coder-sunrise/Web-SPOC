@@ -609,6 +609,7 @@ class NewVisit extends PureComponent {
                             fromMedicalCheckupReporting
                           }
                           isVisitReadonlyAfterSigned={isReadonlyAfterSigned}
+                          isDoctorConsulted={values.isDoctorConsulted}
                           isSigned={values.isLastClinicalObjectRecordSigned}
                           existingQNo={existingQNo}
                           copaymentScheme={(
@@ -705,6 +706,7 @@ class NewVisit extends PureComponent {
                                 isVisitReadonlyAfterSigned={
                                   isReadonlyAfterSigned
                                 }
+                                isDoctorConsulted={values.isDoctorConsulted}
                                 isSigned={
                                   values.isLastClinicalObjectRecordSigned
                                 }

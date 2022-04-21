@@ -105,7 +105,6 @@ class Form extends PureComponent {
         sequence: nextSequence,
         ...values,
         formData: JSON.stringify(values.formData),
-        // formData: values.formData,
         updateByUser: user.data.clinicianProfile.name,
       }
       if (action === 'submit') {

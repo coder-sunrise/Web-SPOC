@@ -97,13 +97,13 @@ const PendingPreOrder: React.FC = (props: any) => {
       if (inventorymedication && inventorymedication.length > 0) {
         const retResponse = inventorymedication
           .reduce(itemWrapper, [])
-          .filter(x => x.isOnlyClinicInternalUsage === true)
+          .filter(x => x.orderable === true)
         setMedications(retResponse)
       } else {
         fetchCodeTable('inventorymedication').then(response => {
           const retResponse = response
             .reduce(itemWrapper, [])
-            .filter(x => x.isOnlyClinicInternalUsage === true)
+            .filter(x => x.orderable === true)
           setMedications(retResponse)
         })
       }
@@ -129,13 +129,13 @@ const PendingPreOrder: React.FC = (props: any) => {
       if (inventoryconsumable && inventoryconsumable.length >= 0) {
         const retResponse = inventoryconsumable
           .reduce(itemWrapper, [])
-          .filter(x => x.isOnlyClinicInternalUsage === true)
+          .filter(x => x.orderable === true)
         setConsumables(retResponse)
       } else {
         fetchCodeTable('inventoryconsumable').then(response => {
           const retResponse = response
             .reduce(itemWrapper, [])
-            .filter(x => x.isOnlyClinicInternalUsage === true)
+            .filter(x => x.orderable === true)
           setConsumables(retResponse)
         })
       }
@@ -241,7 +241,7 @@ const PendingPreOrder: React.FC = (props: any) => {
     }
 
     const { option, row } = e
-    ;(row.quantity = undefined),
+    ;(row.quantity = 1),
       (row.amount = 0),
       (row.itemName = undefined),
       (row.preOrderVaccinationItem = undefined),
@@ -353,6 +353,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         labelField: 'combinDisplayValue',
         valueField: 'id',
         sortingEnabled: false,
+        width: 250,
         options: generateItemDataSource,
         onChange: handleItemChanged,
         render: row => {
@@ -376,7 +377,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         columnName: 'quantity',
         type: 'number',
         precision: 1,
-        width: 100,
+        width: 120,
         sortingEnabled: false,
         // onChange: handelQuantityChanged,
         render: row => {
@@ -532,6 +533,7 @@ const PendingPreOrder: React.FC = (props: any) => {
                   preOrderMedicationItem: undefined,
                   preOrderConsumableItem: undefined,
                   prescribingUOMFK: undefined,
+                  quantity:1,
                   ...o,
                 }
               })
