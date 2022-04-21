@@ -77,8 +77,8 @@ const ReportingDoctorTag = ({
               )
             }
             className={classes.tag}
-            style={{ cursor: isShowMessage ? 'pointer' : 'default' }}
             style={{
+              cursor: isShowMessage ? 'pointer' : 'default',
               color: reportingDoctorColor,
               border: `1px solid ${reportingDoctorColor}`,
             }}
