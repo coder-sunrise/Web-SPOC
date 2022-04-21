@@ -255,7 +255,7 @@ export const ExaminationDetails = ({
         ) : (
           <GridContainer style={{ rowGap: 10 }}>
             <GridItem md={2}>
-              <RightAlignGridItem md={12}>Radiographer :</RightAlignGridItem>
+              <RightAlignGridItem md={12}>Radiology Technologist :</RightAlignGridItem>
             </GridItem>
             <TextGridItem md={10}>
               {assignedRadiographers.map(r => r.name).toString()}
@@ -274,7 +274,7 @@ export const ExaminationDetails = ({
                 <React.Fragment>
                   <GridItem md={2}>
                     <RightAlignGridItem md={12}>
-                      Examination Findings:
+                      Examination Findings :
                     </RightAlignGridItem>
                   </GridItem>
 
