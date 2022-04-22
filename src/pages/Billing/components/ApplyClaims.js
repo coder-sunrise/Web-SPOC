@@ -102,7 +102,7 @@ const ApplyClaims = ({
 
   const [tempInvoicePayer, setTempInvoicePayer] = useState([])
 
-  let refTempInvociePayer = useRef(tempInvoicePayer)
+  let refTempInvoicePayer = useRef(tempInvoicePayer)
 
   const [curEditInvoicePayerBackup, setCurEditInvoicePayerBackup] = useState(
     undefined,
@@ -194,7 +194,7 @@ const ApplyClaims = ({
   }
 
   const _updateTempInvoicePayer = (updatedIndex, updatedRow) => {
-    const _invoicePayersWithUpdatedClaimRow = refTempInvociePayer.current.map(
+    const _invoicePayersWithUpdatedClaimRow = refTempInvoicePayer.current.map(
       (item, oriIndex) =>
         updatedIndex === oriIndex ? { ...updatedRow } : { ...item },
     )
@@ -260,7 +260,7 @@ const ApplyClaims = ({
       [],
     )
     setTempInvoicePayer(_newTempInvoicePayer)
-    // refTempInvociePayer.current = tempInvoicePayer
+    // refTempInvoicePayer.current = tempInvoicePayer
   }
 
   const _isSubtotalLessThanZero = index => {
@@ -279,11 +279,11 @@ const ApplyClaims = ({
   }
 
   const handleClaimAmountChange = id => event => {
-    const _editingInvoicePayer = refTempInvociePayer.current.find(
+    const _editingInvoicePayer = refTempInvoicePayer.current.find(
       item => item._isEditing,
     )
-    const index = refTempInvociePayer.current.findIndex(item => item._isEditing)
-    const totalPayableBalance = refTempInvociePayer.current
+    const index = refTempInvoicePayer.current.findIndex(item => item._isEditing)
+    const totalPayableBalance = refTempInvoicePayer.current
       .reduce(flattenInvoicePayersInvoiceItemList, [])
       .filter(item =>
         item.invoiceItemFK ? item.invoiceItemFK === id : item.id === id,
@@ -296,7 +296,7 @@ const ApplyClaims = ({
         0,
       )
 
-    const currentItemClaimedAmount = refTempInvociePayer.current
+    const currentItemClaimedAmount = refTempInvoicePayer.current
       .reduce(flattenInvoicePayersInvoiceItemList, [])
       .reduce((remainingClaimable, item) => {
         if (
@@ -378,7 +378,7 @@ const ApplyClaims = ({
     // setFieldValue('invoicePayer', tempInvoicePayer)
     handleIsEditing(hasEditing())
 
-    refTempInvociePayer.current = tempInvoicePayer
+    refTempInvoicePayer.current = tempInvoicePayer
   }, [tempInvoicePayer])
 
   const handleSchemeChange = index => value => {
@@ -509,7 +509,7 @@ const ApplyClaims = ({
 
       setTempInvoicePayer(newInvoicePayers)
       setInitialState(newInvoicePayers)
-      refTempInvociePayer.current = newInvoicePayers
+      refTempInvoicePayer.current = newInvoicePayers
     } else if (claimableSchemes.length > 0 && invoicePayment.length === 0) {
       const _invoicePayer = {
         _indexInClaimableSchemes: 0,
@@ -534,7 +534,7 @@ const ApplyClaims = ({
       setInitialState([])
       setTempInvoicePayer([])
       setCurEditInvoicePayerBackup(undefined)
-      refTempInvociePayer.current = []
+      refTempInvoicePayer.current = []
     }
   }, [values.id, submitCount])
 
@@ -628,12 +628,12 @@ const ApplyClaims = ({
     toggleCopayerModal()
     const newTempInvoicePayer = [...tempInvoicePayer, invoicePayer]
     setTempInvoicePayer(newTempInvoicePayer)
-    refTempInvociePayer.current = newTempInvoicePayer
+    refTempInvoicePayer.current = newTempInvoicePayer
   }
 
   const reset = () => {
     setTempInvoicePayer(initialState)
-    refTempInvociePayer.current = initialState
+    refTempInvoicePayer.current = initialState
     setCurEditInvoicePayerBackup(undefined)
     onResetClick()
   }
@@ -683,7 +683,7 @@ const ApplyClaims = ({
 
   const renderClaimAmount = useCallback(
     index => row => {
-      const { _isConfirmed: shouldDisable } = refTempInvociePayer.current[index]
+      const { _isConfirmed: shouldDisable } = refTempInvoicePayer.current[index]
 
       return shouldDisable ? (
         <NumberInput currency text value={row.claimAmount} />
@@ -698,7 +698,7 @@ const ApplyClaims = ({
         />
       )
     },
-    [handleClaimAmountChange, refTempInvociePayer.current],
+    [handleClaimAmountChange, refTempInvoicePayer.current],
   )
 
   return (
