@@ -7,7 +7,7 @@ import moment from 'moment'
 import Print from '@material-ui/icons/Print'
 import Refresh from '@material-ui/icons/Refresh'
 import Edit from '@material-ui/icons/Edit'
-import { InputNumber } from 'antd'
+import { InputNumber, Table as AntdTable, Checkbox } from 'antd'
 import {
   MenuList,
   ClickAwayListener,
@@ -35,7 +35,6 @@ import {
   NumberInput,
   Popper,
   notification,
-  Checkbox,
 } from '@/components'
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import Authorized from '@/utils/Authorized'
@@ -68,6 +67,9 @@ import {
   actualizeTableConfig,
   getRowId,
   isActualizable,
+  ServiceColumns1,
+  OtherOrdersColumns1,
+  DispenseItemsColumns1,
 } from '../variables'
 
 import CONSTANTS from './constants'
@@ -77,6 +79,7 @@ import WorklistContext, {
   WorklistContextProvider,
 } from '@/pages/Radiology/Worklist/WorklistContext'
 import DispenseDetailsSpecimenCollection from '@/pages/Lab/SpecimenCollection/components/DispenseDetailsSpecimenCollection'
+import customtyles from './Style.less'
 
 const styles = theme => ({
   paper: {
@@ -113,6 +116,12 @@ const styles = theme => ({
   groupStyle: {
     padding: '3px 0px',
     backgroundColor: 'rgb(240, 248, 255)',
+  },
+  tableContainer: {
+    margin: theme.spacing(1),
+    '& > div:last-child': {
+      marginBottom: theme.spacing(1.5),
+    },
   },
 })
 
@@ -177,6 +186,7 @@ const DispenseDetails = ({
   const openPopper = () => setPopperOpen(true)
   const closePopper = () => setPopperOpen(false)
   const [selectedAll, setSelectedAll] = useState(false)
+  const [selectedServiceAll, setSelectedServiceAll] = useState(false)
 
   const { inventorymedication, inventoryvaccination } = codetable
   const { settings = {} } = clinicSettings
@@ -420,14 +430,13 @@ const DispenseDetails = ({
     let records = []
     switch (type) {
       case 'DispenseItems':
-        selectedRows = dispenseItems.filter(x => x.isCheckActualize)
         records = dispenseItems
         break
       case 'Service':
-        selectedRows = selectedServiceRows
         records = service
         break
     }
+    selectedRows = records.filter(x => x.isCheckActualize)
     if (selectedRows.length > 0) {
       let selectedRecords = []
       if (type === 'DispenseItems') {
@@ -439,9 +448,7 @@ const DispenseDetails = ({
           ),
         ]
       } else {
-        selectedRecords = records.filter(
-          x => selectedRows.indexOf(getRowId(x, type)) > -1,
-        )
+        selectedRecords = selectedRows
       }
       setSelectedActualizeRows(selectedRecords)
       setActualizationStatus(NURSE_WORKITEM_STATUS.NEW)
@@ -481,6 +488,7 @@ const DispenseDetails = ({
 
   const isShowDispenseActualie =
     !viewOnly && isShowActualizeSelection(dispenseItems)
+  const isShowServiceActualie = !viewOnly && isShowActualizeSelection(service)
   const orderItemRow = p => {
     const { row, children, tableRow } = p
     let newchildren = []
@@ -748,6 +756,31 @@ const DispenseDetails = ({
       }
     }
   }
+  const onChangeSelectServiceAll = value => {
+    let newItems = [...service]
+    newItems.forEach(item => {
+      if (isActualizable(item) && item.isCheckActualize !== value) {
+        item.isCheckActualize = value
+      }
+    })
+    setFieldValue('service', newItems)
+  }
+
+  const updateSelectServiceAll = newItems => {
+    var enableItems = newItems.filter(item => isActualizable(item))
+    if (
+      enableItems.filter(item => item.isCheckActualize).length ===
+      enableItems.length
+    ) {
+      if (!selectedServiceAll) {
+        setSelectedServiceAll(true)
+      }
+    } else {
+      if (selectedServiceAll) {
+        setSelectedServiceAll(false)
+      }
+    }
+  }
 
   const hasAnyLabWorkitems = (() => {
     if (!service) return false
@@ -761,6 +794,85 @@ const DispenseDetails = ({
       ).length > 0
     )
   })()
+
+  const onDispenseItemsValueChange = (uid, valueField, value) => {
+    const newItems = [...dispenseItems]
+    const editRow = newItems.find(r => r.uid === uid)
+    if (valueField === 'stockFK') {
+      if (value) {
+        editRow.stockFK = value.id
+        editRow.batchNo = value.batchNo
+        editRow.expiryDate = value.expiryDate
+        editRow.isDefault = value.isDefault
+        editRow.stock = value.stock
+      } else {
+        editRow.stockFK = undefined
+        editRow.batchNo = undefined
+        editRow.expiryDate = undefined
+        editRow.isDefault = false
+        editRow.stock = 0
+        editRow.dispenseQuantity = 0
+      }
+    } else {
+      editRow[valueField] = value
+    }
+    if (valueField === 'dispenseQuantity' || valueField === 'stockFK') {
+      let matchItems = []
+      if (editRow.isDrugMixture) {
+        matchItems = newItems.filter(
+          r => r.drugMixtureFK === editRow.drugMixtureFK,
+        )
+      } else {
+        matchItems = newItems.filter(
+          r => r.type === editRow.type && r.id === editRow.id,
+        )
+      }
+      const balanceQty =
+        editRow.quantity - _.sumBy(matchItems, 'dispenseQuantity')
+      matchItems.forEach(item => (item.stockBalance = balanceQty))
+    }
+    if (valueField === 'isCheckActualize') {
+      if (editRow.isDrugMixture) {
+        const drugMixtureIDs = newItems.filter(r => r.id === editRow.id)
+        drugMixtureIDs.forEach(x => (x[valueField] = value))
+      }
+      updateSelectAll(newItems)
+    }
+    setFieldValue('dispenseItems', newItems)
+  }
+
+  const onServiceValueChange = (id, valueField, value) => {
+    const newItems = [...service]
+    const editRow = newItems.find(r => r.id === id)
+    editRow[valueField] = value
+    updateSelectServiceAll(newItems)
+    setFieldValue('service', newItems)
+  }
+
+  const getGroupDispenseItem = () => {
+    const items = dispenseItems || []
+    let newItem = []
+    var groupId = _.uniqBy(items, 'dispenseGroupId')
+    groupId.forEach(item => {
+      newItem = newItem.concat({
+        uid: item.dispenseGroupId,
+        isGroup: true,
+        groupName: item.isDrugMixture
+          ? item.drugMixtureName
+          : item.dispenseGroupId,
+        groupNumber: 1,
+        groupRowSpan: 1,
+        countNumber: 1,
+        rowspan: 1,
+      })
+
+      newItem = newItem.concat([
+        ...items.filter(x => x.dispenseGroupId === item.dispenseGroupId),
+      ])
+    })
+
+    return newItem
+  }
   return (
     <React.Fragment>
       <GridContainer>
@@ -961,173 +1073,154 @@ const DispenseDetails = ({
         )}
         <GridItem md={12}>
           <Paper className={classes.paper}>
-            <div style={{ position: 'relative' }}>
-              <div style={{ position: 'absolute', left: 26, top: 40 }}>
-                {isShowDispenseActualie && !viewOnly && (
-                  <Checkbox
-                    checked={selectedAll}
-                    onChange={e => {
-                      setSelectedAll(e.target.value)
-                      onChangeSelectAll(e.target.value)
-                    }}
-                  />
-                )}
-              </div>
-              <TableData
-                oddEven={false}
-                title='Dispense Details'
-                titleExtend={
-                  viewOnly
-                    ? null
+            <div>
+              <div className={classes.tableContainer}>
+                <div>
+                  <h5 style={{ display: 'inline-block' }}>Dispense Details</h5>
+                  {viewOnly
+                    ? ''
                     : actualizeSelectedItemButton(
                         'DispenseItems',
                         dispenseItems,
-                      )
-                }
-                EditingProps={{
-                  showCommandColumn: false,
-                  onCommitChanges: commitChanges,
-                }}
-                FuncProps={{
-                  pager: false,
-                  grouping: true,
-                  groupingConfig: {
-                    isDisableExpandedGroups: true,
-                    state: {
-                      grouping: [{ columnName: 'dispenseGroupId' }],
-                      expandedGroups: defaultExpandedGroups,
-                    },
-                    row: {
-                      indentColumnWidth: 0,
-                      iconComponent: icon => <span></span>,
-                      contentComponent: group => {
-                        const { row } = group
-                        const groupRow = dispenseItems.find(
-                          data => data.dispenseGroupId === row.value,
-                        )
-                        if (row.value === 'NormalDispense')
-                          return (
-                            <div className={classes.groupStyle}>
-                              <span style={{ fontWeight: 600 }}>
-                                Normal Dispense Items
-                              </span>
-                            </div>
-                          )
-                        if (row.value === 'NoNeedToDispense')
-                          return (
-                            <div className={classes.groupStyle}>
-                              <span style={{ fontWeight: 600 }}>
-                                No Need To Dispense Items
-                              </span>
-                            </div>
-                          )
-                        return (
-                          <div className={classes.groupStyle}>
-                            <span style={{ fontWeight: 600 }}>
-                              {'Drug Mixture: '}
-                            </span>
-                            {groupRow.drugMixtureName}
-                          </div>
-                        )
-                      },
-                    },
-                    backgroundColor: 'rgb(240, 248, 255)',
-                  },
-                }}
-                forceRender
-                columns={columns}
-                colExtensions={DispenseItemsColumnExtensions(
-                  viewOnly,
-                  onDrugLabelClick,
-                  onActualizeBtnClick,
-                  showDrugLabelRemark,
-                  isFromMedicalCheckup,
-                )}
-                data={dispenseItems}
-                TableProps={{
-                  rowComponent: orderItemRow,
-                }}
-                getRowId={r => r.uid}
-              />
+                      )}
+                </div>
+                <div style={{ position: 'relative' }}>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: 18,
+                      top: 14,
+                      zIndex: 1,
+                    }}
+                  >
+                    {isShowDispenseActualie && !viewOnly && (
+                      <Checkbox
+                        checked={selectedAll}
+                        onClick={e => {
+                          setSelectedAll(!selectedAll)
+                          onChangeSelectAll(!selectedAll)
+                        }}
+                      />
+                    )}
+                  </div>
+                  <AntdTable
+                    className={customtyles.table}
+                    size='small'
+                    bordered
+                    pagination={false}
+                    dataSource={getGroupDispenseItem()}
+                    columns={DispenseItemsColumns1(
+                      viewOnly,
+                      onDrugLabelClick,
+                      onActualizeBtnClick,
+                      showDrugLabelRemark,
+                      onDispenseItemsValueChange,
+                      isShowDispenseActualie,
+                      isFromMedicalCheckup,
+                    )}
+                  />
+                </div>
+              </div>
             </div>
 
-            <TableData
-              title='Service'
-              forceRender
-              oddEven={false}
-              titleExtend={
-                viewOnly
-                  ? null
-                  : actualizeSelectedItemButton('Service', service)
-              }
-              selection={selectedServiceRows}
-              onSelectionChange={value => {
-                handleSelectionChange('Service', value)
-              }}
-              {...actualizeTableConfig(
-                !viewOnly && isShowActualizeSelection(service),
-              )}
-              idPrefix='Service'
-              columns={ServiceColumns}
-              colExtensions={OtherOrdersColumnExtensions(
-                viewOnly,
-                onPrint,
-                onActualizeBtnClick,
-                onRadiologyBtnClick,
-                dispatch,
-                history?.location?.query?.vid,
-              )}
-              data={service}
-            />
+            <div className={classes.tableContainer}>
+              <div>
+                <h5 style={{ display: 'inline-block' }}>Service</h5>
+                {viewOnly
+                  ? ''
+                  : actualizeSelectedItemButton('Service', service)}
+              </div>
+              <div style={{ position: 'relative' }}>
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: 18,
+                    top: 8,
+                    zIndex: 1,
+                  }}
+                >
+                  {isShowServiceActualie && !viewOnly && (
+                    <Checkbox
+                      checked={selectedServiceAll}
+                      onClick={e => {
+                        setSelectedServiceAll(!selectedServiceAll)
+                        onChangeSelectServiceAll(!selectedServiceAll)
+                      }}
+                    />
+                  )}
+                </div>
+                <AntdTable
+                  className={customtyles.table}
+                  size='small'
+                  bordered
+                  pagination={false}
+                  dataSource={service || []}
+                  columns={ServiceColumns1(
+                    viewOnly,
+                    onPrint,
+                    onActualizeBtnClick,
+                    onRadiologyBtnClick,
+                    dispatch,
+                    history?.location?.query?.vid,
+                    onServiceValueChange,
+                    isShowServiceActualie,
+                  )}
+                />
+              </div>
+            </div>
 
             {(hasAnySpecimenCollected || hasAnyLabWorkitems) && (
               <DispenseDetailsSpecimenCollection
                 handlePrint={handlePrint}
                 patient={patient}
                 visitId={visitId}
+                classes={classes}
               />
             )}
 
-            <TableData
-              oddEven={false}
-              title='Other Orders'
-              idPrefix='OtherOrders'
-              columns={OtherOrdersColumns}
-              colExtensions={OtherOrdersColumnExtensions(
-                viewOnly,
-                onPrint,
-                onActualizeBtnClick,
+            <div className={classes.tableContainer}>
+              <div>
+                <h5>Other Orders</h5>
+              </div>
+              <AntdTable
+                className={customtyles.table}
+                size='small'
+                bordered
+                pagination={false}
+                dataSource={otherOrder}
+                columns={OtherOrdersColumns1(onPrint)}
+              />
+            </div>
+
+            {false &&
+              settings.isEnablePackage &&
+              visitPurposeFK !== VISIT_TYPE.OTC && (
+                <TableData
+                  oddEven={false}
+                  title='Package'
+                  idPrefix='package'
+                  columns={PackageColumns}
+                  colExtensions={PackageColumnExtensions(
+                    onPrint,
+                    showDrugLabelRemark,
+                  )}
+                  data={packageItem}
+                  FuncProps={{
+                    pager: false,
+                    grouping: true,
+                    groupingConfig: {
+                      state: {
+                        grouping: [{ columnName: 'packageGlobalId' }],
+                        expandedGroups: [...expandedGroups],
+                        onExpandedGroupsChange: handleExpandedGroupsChange,
+                      },
+                      row: {
+                        contentComponent: packageGroupCellContent,
+                      },
+                    },
+                  }}
+                />
               )}
-              data={otherOrder}
-            />
-
-            {settings.isEnablePackage && visitPurposeFK !== VISIT_TYPE.OTC && (
-              <TableData
-                oddEven={false}
-                title='Package'
-                idPrefix='package'
-                columns={PackageColumns}
-                colExtensions={PackageColumnExtensions(
-                  onPrint,
-                  showDrugLabelRemark,
-                )}
-                data={packageItem}
-                FuncProps={{
-                  pager: false,
-                  grouping: true,
-                  groupingConfig: {
-                    state: {
-                      grouping: [{ columnName: 'packageGlobalId' }],
-                      expandedGroups: [...expandedGroups],
-                      onExpandedGroupsChange: handleExpandedGroupsChange,
-                    },
-                    row: {
-                      contentComponent: packageGroupCellContent,
-                    },
-                  },
-                }}
-              />
-            )}
           </Paper>
         </GridItem>
         <GridItem xs={7} md={7} style={{ marginTop: -14 }}>
