@@ -529,8 +529,8 @@ export default ({
     }
   }
   const GetService = currentVisitOrderTemplate => {
-    const { fullService } = orders
-    var service = fullService.find(
+    const { ctservice = [] } = codetable 
+    var service = ctservice.find(
       t =>
         t.serviceCenter_ServiceId ===
         currentVisitOrderTemplate.visitOrderTemplateServiceItemDto
@@ -1173,7 +1173,7 @@ export default ({
     const { visit } = entity
     const { visitOrderTemplate } = visit
     const { visitOrderTemplateItemDtos } = visitOrderTemplate
- 
+
     let removedTemplateItems = visitOrderTemplateItemDtos
       .filter(t => t.orderable)
       .filter(t => {
@@ -1992,6 +1992,7 @@ export default ({
       >
         <VisitOrderTemplateRevert
           data={removedVisitOrderTemplateItem}
+          dispatch={dispatch}
           confirmRevert={confirmRevert}
         ></VisitOrderTemplateRevert>
       </CommonModal>
