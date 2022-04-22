@@ -5,7 +5,7 @@ import { FormattedMessage } from 'umi'
 import numeral from 'numeral'
 import _ from 'lodash'
 import { currencySymbol, currencyFormat } from '@/utils/config'
-import { Space } from 'antd'
+import { Space, Checkbox } from 'antd'
 import {
   NumberInput,
   TextField,
@@ -13,8 +13,7 @@ import {
   DatePicker,
   Button,
   Tooltip,
-  Checkbox,
-  Select,
+  CodeSelect,
 } from '@/components'
 import LowStockInfo from '@/pages/Widgets/Orders/Detail/LowStockInfo'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
@@ -37,6 +36,72 @@ export const tableConfig = {
 }
 
 const ServiceTypes = ['Service', 'Consumable', 'Treatment', 'Radiology', 'Lab']
+
+const showMoney = (v = 0) => {
+  if (v < 0)
+    return (
+      <span
+        style={{ fontWeight: 'bold', color: 'red' }}
+      >{`(${currencySymbol}${numeral(v).format('0.00')})`}</span>
+    )
+  return (
+    <span
+      style={{ fontWeight: 'bold', color: 'darkblue' }}
+    >{`${currencySymbol}${numeral(v).format('0.00')}`}</span>
+  )
+}
+
+const getBatchOptions = row => {
+  let stockList = []
+  if (row.type === 'Medication') {
+    stockList = (row.medicationStock || []).filter(
+      s =>
+        s.isDefault ||
+        (s.stock > 0 &&
+          (!s.expiryDate ||
+            moment(s.expiryDate).startOf('day') >= moment().startOf('day'))),
+    )
+  } else if (row.type === 'Consumable') {
+    stockList = (row.consumableStock || []).filter(
+      s =>
+        s.isDefault ||
+        (s.stock > 0 &&
+          (!s.expiryDate ||
+            moment(s.expiryDate).startOf('day') >= moment().startOf('day'))),
+    )
+  } else if (row.type === 'Vaccination') {
+    stockList = (row.vaccinationStock || []).filter(
+      s =>
+        s.isDefault ||
+        (s.stock >= row.quantity &&
+          (!s.expiryDate ||
+            moment(s.expiryDate).startOf('day') >= moment().startOf('day'))),
+    )
+  }
+
+  stockList = _.orderBy(stockList, ['expiryDate'], ['asc'])
+
+  if (row.stockFK) {
+    const selectStock = stockList.find(sl => sl.id === row.stockFK)
+    if (!selectStock) {
+      return [
+        {
+          id: row.stockFK,
+          batchNo: row.batchNo,
+          expiryDate: row.expiryDate,
+          isDefault: row.isDefault,
+        },
+        ...stockList,
+      ]
+    } else {
+      return [
+        { ...selectStock },
+        ...stockList.filter(sl => sl.id !== row.stockFK),
+      ]
+    }
+  }
+  return stockList
+}
 
 export const actualizeTableConfig = selectable => {
   return {
@@ -290,6 +355,642 @@ export const DispenseItemsColumns = [
   },
 ]
 
+export const DispenseItemsColumns1 = (
+  viewOnly = false,
+  onDrugLabelClick,
+  onActualizeBtnClick,
+  showDrugLabelRemark,
+  onValueChange,
+  isShowDispenseActualie,
+  isFromMedicalCheckup = false,
+) => {
+  let columns = [
+    {
+      dataIndex: 'isCheckActualize',
+      key: 'isCheckActualize',
+      width: 50,
+      onCell: row => {
+        const mergeCell = viewOnly ? 15 : 17
+        if (row.isGroup)
+          return {
+            colSpan: mergeCell,
+            style: { backgroundColor: 'rgb(240, 248, 255)' },
+          }
+        return {
+          rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,
+        }
+      },
+      render: (_, row) => {
+        if (row.isGroup) {
+          if (row.groupName === 'NormalDispense')
+            return (
+              <div style={{ padding: '3px 0px' }}>
+                <span style={{ fontWeight: 600 }}>Normal Dispense Items</span>
+              </div>
+            )
+          if (row.groupName === 'NoNeedToDispense')
+            return (
+              <div style={{ padding: '3px 0px' }}>
+                <span style={{ fontWeight: 600 }}>
+                  No Need To Dispense Items
+                </span>
+              </div>
+            )
+          return (
+            <div style={{ padding: '3px 0px' }}>
+              <span style={{ fontWeight: 600 }}>{'Drug Mixture: '}</span>
+              {row.groupName}
+            </div>
+          )
+        }
+        if (!isActualizable(row)) return ''
+        return (
+          <Checkbox
+            style={{ marginLeft: 12 }}
+            checked={row.isCheckActualize}
+            onClick={e => {
+              onValueChange(row.uid, 'isCheckActualize', !row.isCheckActualize)
+            }}
+          />
+        )
+      },
+    },
+    {
+      dataIndex: 'type',
+      key: 'type',
+      title: 'Type',
+      width: 120,
+      onCell: row => {
+        if (row.isGroup) {
+          let mergeCell = 0
+          if (!isShowDispenseActualie || viewOnly)
+            mergeCell = viewOnly ? 15 : 16
+          return {
+            colSpan: mergeCell,
+            style: { backgroundColor: 'rgb(240, 248, 255)' },
+          }
+        }
+        return {
+          rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,
+        }
+      },
+      render: (_, row) => {
+        if (row.isGroup && (!isShowDispenseActualie || viewOnly)) {
+          if (row.groupName === 'NormalDispense')
+            return (
+              <div style={{ padding: '3px 0px' }}>
+                <span style={{ fontWeight: 600 }}>Normal Dispense Items</span>
+              </div>
+            )
+          if (row.groupName === 'NoNeedToDispense')
+            return (
+              <div style={{ padding: '3px 0px' }}>
+                <span style={{ fontWeight: 600 }}>
+                  No Need To Dispense Items
+                </span>
+              </div>
+            )
+          return (
+            <div style={{ padding: '3px 0px' }}>
+              <span style={{ fontWeight: 600 }}>{'Drug Mixture: '}</span>
+              {row.groupName}
+            </div>
+          )
+        }
+
+        let paddingRight = 0
+        if (row.isPreOrder && row.isExclusive) {
+          paddingRight = 52
+        } else if (row.isPreOrder || row.isExclusive) {
+          paddingRight = 24
+        }
+        return (
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+              paddingRight: paddingRight,
+              position: 'relative',
+            }}
+          >
+            <Tooltip title={row.type}>
+              <span>{row.type}</span>
+            </Tooltip>
+            <div style={{ position: 'absolute', top: '-1px', right: '-6px' }}>
+              {row.isPreOrder && (
+                <Tooltip title='New Pre-Order'>
+                  <div
+                    style={{
+                      position: 'relative',
+                      borderRadius: 4,
+                      backgroundColor: '#4255bd',
+                      fontWeight: 500,
+                      color: 'white',
+                      fontSize: '0.7rem',
+                      padding: '2px 3px',
+                      height: 20,
+                      display: 'inline-block',
+                      margin: '0px 1px',
+                    }}
+                  >
+                    Pre
+                  </div>
+                </Tooltip>
+              )}
+              {row.isExclusive && (
+                <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
+                  <div
+                    style={{
+                      position: 'relative',
+                      borderRadius: 4,
+                      backgroundColor: 'green',
+                      fontWeight: 500,
+                      color: 'white',
+                      fontSize: '0.7rem',
+                      padding: '2px 3px',
+                      height: 20,
+                      display: 'inline-block',
+                      margin: '0px 1px',
+                    }}
+                  >
+                    Excl.
+                  </div>
+                </Tooltip>
+              )}
+            </div>
+          </div>
+        )
+      },
+    },
+    {
+      dataIndex: 'code',
+      key: 'code',
+      title: 'Code',
+      width: 100,
+      onCell: row => ({
+        colSpan: row.isGroup ? 0 : 1,
+        rowSpan: row.countNumber === 1 ? row.rowspan : 0,
+      }),
+    },
+    {
+      dataIndex: 'name',
+      key: 'name',
+      title: 'Name',
+      onCell: row => ({
+        colSpan: row.isGroup ? 0 : 1,
+        rowSpan: row.countNumber === 1 ? row.rowspan : 0,
+      }),
+      render: (_, row) => {
+        const isShowStockIndicator =
+          ['Medication', 'Medication (Ext.)', 'Vaccination'].indexOf(row.type) >
+          -1
+        let paddingRight = 0
+        if (isShowStockIndicator) {
+          paddingRight = 10
+        }
+        return (
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+              paddingRight,
+            }}
+          >
+            <Tooltip title={row.name}>
+              <span>{row.name}</span>
+            </Tooltip>
+            <div style={{ position: 'relative', top: 2 }}>
+              {lowStockIndicator(
+                {
+                  ...row,
+                  isDrugMixture: false,
+                  type:
+                    row.type === 'Medication (Ext.)' ? 'Medication' : row.type,
+                },
+                ['Medication', 'Medication (Ext.)'].indexOf(row.type) > -1
+                  ? 'inventoryMedicationFK'
+                  : 'inventoryVaccinationFK',
+                -20,
+              )}
+            </div>
+          </div>
+        )
+      },
+    },
+    {
+      dataIndex: 'dispenseUOM',
+      key: 'dispenseUOM',
+      title: 'UOM',
+      width: 80,
+      onCell: row => ({
+        colSpan: row.isGroup ? 0 : 1,
+        rowSpan: row.countNumber === 1 ? row.rowspan : 0,
+      }),
+    },
+    {
+      dataIndex: 'quantity',
+      key: 'quantity',
+      title: (
+        <div>
+          <p style={{ height: 16 }}>Ordered</p>
+          <p style={{ height: 16 }}>Qty.</p>
+        </div>
+      ),
+      onCell: row => ({
+        colSpan: row.isGroup ? 0 : 1,
+        rowSpan: row.countNumber === 1 ? row.rowspan : 0,
+      }),
+      align: 'right',
+      width: 80,
+      render: (_, row) => {
+        const qty = numeral(row.quantity).format('0.0')
+        return (
+          <Tooltip title={qty}>
+            <span>{qty}</span>
+          </Tooltip>
+        )
+      },
+    },
+    {
+      dataIndex: 'dispenseQuantity',
+      key: 'dispenseQuantity',
+      title: (
+        <div>
+          <p style={{ height: 16 }}>Dispensed</p>
+          <p style={{ height: 16 }}>Qty.</p>
+        </div>
+      ),
+      width: 80,
+      onCell: row => ({ colSpan: row.isGroup ? 0 : 1 }),
+      align: 'right',
+      render: (_, row) => {
+        if (isFromMedicalCheckup || viewOnly || !row.allowToDispense) {
+          const qty = !row.stockFK
+            ? '-'
+            : numeral(row.dispenseQuantity).format('0.0')
+          return (
+            <Tooltip title={qty}>
+              <span>{qty}</span>
+            </Tooltip>
+          )
+        }
+        let maxQuantity
+        if (row.isDefault || row.isDispensedByPharmacy) {
+          maxQuantity = row.quantity
+        } else {
+          maxQuantity = row.quantity > row.stock ? row.stock : row.quantity
+        }
+        return (
+          <div style={{ position: 'relative' }}>
+            <NumberInput
+              label=''
+              step={1}
+              format='0.0'
+              max={maxQuantity}
+              min={0}
+              disabled={row.isDispensedByPharmacy}
+              precision={1}
+              value={row.dispenseQuantity}
+              onChange={e => {
+                onValueChange(row.uid, 'dispenseQuantity', e.target.value)
+              }}
+            />
+            {row.dispenseQuantity > maxQuantity && (
+              <Tooltip
+                title={`Dispense quantity cannot be more than ${numeral(
+                  maxQuantity,
+                ).format('0.0')}`}
+              >
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: -5,
+                    top: 5,
+                    color: 'red',
+                  }}
+                >
+                  *
+                </div>
+              </Tooltip>
+            )}
+          </div>
+        )
+      },
+    },
+    {
+      dataIndex: 'stock',
+      key: 'stock',
+      title: 'Stock Qty.',
+      width: 100,
+      onCell: row => ({ colSpan: row.isGroup ? 0 : 1 }),
+      align: 'right',
+      render: (_, row) => {
+        const stock = row.stockFK
+          ? `${numeral(row.stock || 0).format('0.0')} ${row.uomDisplayValue}`
+          : '-'
+        return (
+          <Tooltip title={stock}>
+            <span>{stock}</span>
+          </Tooltip>
+        )
+      },
+    },
+    {
+      dataIndex: 'stockFK',
+      key: 'stockFK',
+      title: 'Batch #',
+      width: 100,
+      onCell: row => ({ colSpan: row.isGroup ? 0 : 1 }),
+      render: (_, row) => {
+        const isExpire =
+          !viewOnly &&
+          row.expiryDate &&
+          moment(row.expiryDate).startOf('day') < moment().startOf('day')
+        if (isFromMedicalCheckup || viewOnly || !row.allowToDispense) {
+          return (
+            <div>
+              <Tooltip title={row.batchNo}>
+                <div
+                  style={{
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {row.batchNo || '-'}
+                </div>
+              </Tooltip>
+              {isExpire && <p style={{ color: 'red' }}>EXPIRED!</p>}
+            </div>
+          )
+        }
+        return (
+          <div>
+            <CodeSelect
+              value={row.stockFK}
+              labelField='batchNo'
+              valueField='id'
+              options={getBatchOptions(row)}
+              dropdownMatchSelectWidth={false}
+              dropdownStyle={{ width: '200px!important' }}
+              renderDropdown={option => {
+                const batchtext = option.expiryDate
+                  ? `${option.batchNo}, Exp.: ${moment(
+                      option.expiryDate,
+                    ).format('DD MMM YYYY')}`
+                  : option.batchNo
+                return (
+                  <Tooltip title={batchtext}>
+                    <div
+                      style={{
+                        display: 'inline-block',
+                        whiteSpace: 'nowrap',
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden',
+                        width: 230,
+                      }}
+                    >
+                      {batchtext}
+                    </div>
+                  </Tooltip>
+                )
+              }}
+              onChange={(v, option) => {
+                onValueChange(row.uid, 'stockFK', option)
+              }}
+            ></CodeSelect>
+            {isExpire && <p style={{ color: 'red' }}>EXPIRED!</p>}
+          </div>
+        )
+      },
+    },
+    {
+      dataIndex: 'expiryDate',
+      key: 'expiryDate',
+      title: 'Expiry Date',
+      width: 110,
+      onCell: row => ({ colSpan: row.isGroup ? 0 : 1 }),
+      render: (_, row) => {
+        if (isFromMedicalCheckup || viewOnly || !row.isDefault) {
+          const expiryDate = row.expiryDate
+            ? moment(row.expiryDate).format('DD MMM YYYY')
+            : '-'
+          const isExpire =
+            !viewOnly &&
+            row.expiryDate &&
+            moment(row.expiryDate).startOf('day') < moment().startOf('day')
+          return (
+            <Tooltip title={expiryDate}>
+              <span style={{ color: isExpire ? 'red' : 'black' }}>
+                {expiryDate}
+              </span>
+            </Tooltip>
+          )
+        } else {
+          return (
+            <DatePicker
+              value={row.expiryDate}
+              onChange={value => {
+                onValueChange(row.uid, 'expiryDate', value)
+              }}
+            />
+          )
+        }
+      },
+    },
+    {
+      dataIndex: 'stockBalance',
+      key: 'stockBalance',
+      title: 'Balance Qty.',
+      width: 100,
+      onCell: row => ({
+        colSpan: row.isGroup ? 0 : 1,
+        rowSpan: row.countNumber === 1 ? row.rowspan : 0,
+      }),
+      align: 'right',
+      render: (_, row) => {
+        const balStock = row.stockBalance
+        const stock = balStock ? `${numeral(balStock).format('0.0')}` : '-'
+        return (
+          <Tooltip title={stock}>
+            <span>{stock}</span>
+          </Tooltip>
+        )
+      },
+    },
+    {
+      dataIndex: 'instruction',
+      key: 'instruction',
+      title: 'Instructions',
+      width: 140,
+      onCell: row => ({
+        colSpan: row.isGroup ? 0 : 1,
+        rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,
+      }),
+      render: (_, row) => {
+        return (
+          <Tooltip title={<div>{row.instruction}</div>}>
+            <div
+              style={{
+                wordWrap: 'break-word',
+                whiteSpace: 'pre-wrap',
+              }}
+            >
+              {row.instruction}
+            </div>
+          </Tooltip>
+        )
+      },
+    },
+    {
+      dataIndex: 'remarks',
+      key: 'remarks',
+      title: 'Remarks',
+      width: 140,
+      onCell: row => ({
+        colSpan: row.isGroup ? 0 : 1,
+        rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,
+      }),
+      render: (_, row) => {
+        const existsDrugLabelRemarks =
+          showDrugLabelRemark &&
+          row.drugLabelRemarks &&
+          row.drugLabelRemarks.trim() !== ''
+        return (
+          <div style={{ position: 'relative' }}>
+            <div
+              style={{
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                paddingRight: existsDrugLabelRemarks ? 10 : 0,
+                minHeight: 20,
+              }}
+            >
+              <Tooltip title={row.remarks || ''}>
+                <span>{row.remarks || ' '}</span>
+              </Tooltip>
+            </div>
+            <div style={{ position: 'relative', top: 6 }}>
+              {existsDrugLabelRemarks && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: 2,
+                    right: -8,
+                  }}
+                >
+                  <Tooltip
+                    title={
+                      <div>
+                        <div style={{ fontWeight: 500 }}>
+                          Drug Label Remarks
+                        </div>
+                        <div>{row.drugLabelRemarks}</div>
+                      </div>
+                    }
+                  >
+                    <FileCopySharp style={{ color: '#4255bd' }} />
+                  </Tooltip>
+                </div>
+              )}
+            </div>
+          </div>
+        )
+      },
+    },
+    {
+      dataIndex: 'unitPrice',
+      key: 'unitPrice',
+      title: 'Unit Price ($)',
+      onCell: row => ({
+        colSpan: row.isGroup ? 0 : 1,
+        rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,
+      }),
+      align: 'right',
+      width: 110,
+      render: (_, row) => {
+        return showMoney(row.unitPrice)
+      },
+    },
+    {
+      dataIndex: 'adjAmt',
+      key: 'adjAmt',
+      title: 'Item Adj. ($)',
+      onCell: row => ({
+        colSpan: row.isGroup ? 0 : 1,
+        rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,
+      }),
+      align: 'right',
+      width: 100,
+      render: (_, row) => {
+        return showMoney(row.adjAmt)
+      },
+    },
+    {
+      dataIndex: 'totalAfterItemAdjustment',
+      key: 'totalAfterItemAdjustment',
+      title: 'Total ($)',
+      onCell: row => ({
+        colSpan: row.isGroup ? 0 : 1,
+        rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,
+      }),
+      align: 'right',
+      width: 100,
+      render: (_, row) => {
+        return showMoney(
+          (row.isPreOrder && !row.isChargeToday) || row.hasPaid
+            ? 0
+            : row.totalAfterItemAdjustment,
+        )
+      },
+    },
+    {
+      dataIndex: 'action',
+      key: 'action',
+      title: 'Action',
+      onCell: row => ({
+        colSpan: row.isGroup ? 0 : 1,
+        rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,
+      }),
+      width: 75,
+      render: (_, row) => {
+        return (
+          <div>
+            {!viewOnly && actualizationButton(row, onActualizeBtnClick)}
+            {(row.type === 'Medication' ||
+              row.type === 'Open Prescription') && (
+              <Tooltip
+                title={
+                  <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
+                }
+              >
+                <Button
+                  color='primary'
+                  onClick={() => {
+                    onDrugLabelClick(row)
+                  }}
+                  justIcon
+                >
+                  <Print />
+                </Button>
+              </Tooltip>
+            )}
+          </div>
+        )
+      },
+    },
+  ]
+
+  if (!isShowDispenseActualie || viewOnly)
+    columns = columns.filter(c => c.dataIndex !== 'isCheckActualize')
+  if (viewOnly) {
+    columns = columns.filter(c => c.dataIndex !== 'stock')
+  }
+
+  return columns
+}
+
 export const DispenseItemsColumnExtensions = (
   viewOnly = false,
   onDrugLabelClick,
@@ -517,17 +1218,13 @@ export const DispenseItemsColumnExtensions = (
       align: 'right',
       type: 'currency',
       sortingEnabled: false,
-      render: row => (
-        <NumberInput
-          value={
-            (row.isPreOrder && !row.isChargeToday) || row.hasPaid
-              ? 0
-              : row.totalAfterItemAdjustment
-          }
-          text
-          currency
-        />
-      ),
+      render: row => {
+        return showMoney(
+          (row.isPreOrder && !row.isChargeToday) || row.hasPaid
+            ? 0
+            : row.totalAfterItemAdjustment,
+        )
+      },
     },
     {
       columnName: 'adjAmt',
@@ -884,6 +1581,265 @@ export const ServiceColumns = [
   },
 ]
 
+export const ServiceColumns1 = (
+  viewOnly = false,
+  onPrint,
+  onActualizeBtnClick,
+  onRadiologyBtnClick,
+  dispatch,
+  visitFK,
+  onValueChange,
+  isShowServiceActualie,
+) => {
+  let columns = [
+    {
+      dataIndex: 'isCheckActualize',
+      key: 'isCheckActualize',
+      align: 'center',
+      width: 50,
+      render: (_, row) => {
+        if (!isActualizable(row)) return ''
+        return (
+          <Checkbox
+            checked={row.isCheckActualize}
+            onClick={e => {
+              onValueChange(row.id, 'isCheckActualize', !row.isCheckActualize)
+            }}
+          />
+        )
+      },
+    },
+    {
+      dataIndex: 'type',
+      key: 'type',
+      title: 'Type',
+      width: 180,
+      render: (_, row) => {
+        let radiologyWorkitemStatusFK
+        if (row.type === 'Radiology' && !row.isPreOrder) {
+          const {
+            workitem: { radiologyWorkitem: { statusFK } = {} } = {},
+          } = row
+          radiologyWorkitemStatusFK = statusFK
+        }
+
+        let labWorkItems = {}
+        let labItemStyle = {}
+        if (row.type === 'Lab' && !row.isPreOrder) {
+          const { workitem } = row
+          labWorkItems = {
+            type: WORK_ITEM_TYPES.LAB,
+            totalWorkItem: workitem?.labWorkitems?.length,
+            completedWorkItemCount: workitem?.labWorkitems?.filter(
+              t => t.statusFK === LAB_WORKITEM_STATUS.COMPLETED,
+            ).length,
+          }
+        }
+
+        let paddingRight = row.isPreOrder ? 24 : 0
+        let urgentRight = 0
+
+        if (radiologyWorkitemStatusFK) {
+          paddingRight += 24
+        }
+
+        if (row.priority === 'Urgent') {
+          paddingRight += 34
+          urgentRight = -paddingRight
+        }
+        return (
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+              display: 'flex',
+              justifyContent: 'space-between',
+              padding: 5,
+            }}
+          >
+            <span style={{ width: 80 }}>{row.type}</span>
+            <Space
+              direction='horizontal'
+              align='end'
+              style={{
+                flexGrow: 1,
+                alignItems: 'start',
+              }}
+            >
+              {row.isPreOrder && (
+                <Tooltip title='New Pre-Order'>
+                  <div
+                    style={{
+                      borderRadius: 4,
+                      backgroundColor: '#4255bd',
+                      fontWeight: 500,
+                      color: 'white',
+                      fontSize: '0.7rem',
+                      padding: '2px 3px',
+                      height: 20,
+                    }}
+                  >
+                    Pre
+                  </div>
+                </Tooltip>
+              )}
+              {radiologyWorkitemStatusFK &&
+                radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
+              {row.workitem?.labWorkitems &&
+                row.workitem?.labWorkitems?.length > 0 && (
+                  <LabWorkItemInfo
+                    dispatch={dispatch}
+                    visitFK={visitFK}
+                    workItemFK={row.workitem?.id}
+                    workItemSummary={labWorkItems}
+                  />
+                )}
+              {urgentIndicator(row, urgentRight)}
+            </Space>
+          </div>
+        )
+      },
+    },
+    {
+      dataIndex: 'description',
+      key: 'description',
+      title: 'Name',
+      render: (_, row) => {
+        const { code = '', description = '', unitPrice = 0 } = row
+        return (
+          <Tooltip
+            title={
+              <div>
+                {`Code: ${code}`}
+                <br />
+                {`Name: ${description}`}
+              </div>
+            }
+          >
+            <div style={{ position: 'relative' }}>
+              <div
+                style={{
+                  wordWrap: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                }}
+              >
+                {row.description}
+                <div style={{ position: 'relative', top: 2 }}>
+                  {lowStockIndicator(row, 'itemFK')}
+                </div>
+              </div>
+            </div>
+          </Tooltip>
+        )
+      },
+    },
+    {
+      dataIndex: 'instruction',
+      key: 'instruction',
+      title: 'Instructions',
+      width: 180,
+    },
+    {
+      dataIndex: 'remarks',
+      key: 'remarks',
+      title: 'Remarks',
+      width: 180,
+    },
+    {
+      dataIndex: 'quantity',
+      key: 'quantity',
+      title: 'Qty.',
+      align: 'right',
+      width: 130,
+      render: (_, row) => {
+        let qty = `${numeral(row.quantity || 0).format(
+          '0,0.0',
+        )} ${row.dispenseUOM || ''}`
+        return (
+          <Tooltip title={qty}>
+            <span>{qty}</span>
+          </Tooltip>
+        )
+      },
+    },
+    {
+      dataIndex: 'unitPrice',
+      key: 'unitPrice',
+      title: 'Unit Price ($)',
+      align: 'right',
+      width: 110,
+      render: (_, row) => {
+        const { type } = row
+        if (!ServiceTypes.includes(type)) return 'N/A'
+        return showMoney(row.unitPrice)
+      },
+    },
+    {
+      dataIndex: 'adjAmt',
+      key: 'adjAmt',
+      title: 'Item Adj. ($)',
+      align: 'right',
+      width: 100,
+      render: (_, row) => {
+        const { type } = row
+        if (!ServiceTypes.includes(type)) return 'N/A'
+        return showMoney(row.adjAmt)
+      },
+    },
+    {
+      dataIndex: 'totalAfterItemAdjustment',
+      key: 'totalAfterItemAdjustment',
+      title: 'Total ($)',
+      align: 'right',
+      width: 100,
+      render: (_, row) => {
+        const { type } = row
+        if (!ServiceTypes.includes(type)) return 'N/A'
+        return showMoney(
+          (row.isPreOrder && !row.isChargeToday) || row.hasPaid
+            ? 0
+            : row.totalAfterItemAdjustment,
+        )
+      },
+    },
+    {
+      dataIndex: 'action',
+      key: 'action',
+      title: 'Action',
+      width: 75,
+      render: (_, r) => {
+        const { type } = r
+
+        if (!viewOnly && ServiceTypes.includes(type)) {
+          return (
+            <div>
+              {actualizationButton(r, onActualizeBtnClick)}
+              {radiologyDetailsButton(r, onRadiologyBtnClick)}
+            </div>
+          )
+        }
+        return (
+          <Tooltip title='Print'>
+            <Button
+              color='primary'
+              justIcon
+              onClick={() => {
+                onPrint({ type: CONSTANTS.DOCUMENTS, row: r })
+              }}
+            >
+              <Print />
+            </Button>
+          </Tooltip>
+        )
+      },
+    },
+  ]
+  if (!isShowServiceActualie || viewOnly) {
+    columns = columns.filter(c => c.dataIndex !== 'isCheckActualize')
+  }
+  return columns
+}
+
 export const OtherOrdersColumns = [
   {
     name: 'type',
@@ -900,6 +1856,42 @@ export const OtherOrdersColumns = [
   {
     name: 'action',
     title: 'Action',
+  },
+]
+
+export const OtherOrdersColumns1 = onPrint => [
+  {
+    dataIndex: 'type',
+    key: 'type',
+    title: 'Type',
+    width: 180,
+  },
+  {
+    dataIndex: 'description',
+    key: 'description',
+    title: 'Name',
+  },
+  { dataIndex: 'remarks', key: 'remarks', title: 'Remarks' },
+  {
+    dataIndex: 'action',
+    key: 'action',
+    title: 'Action',
+    width: 70,
+    render: (_, row) => {
+      return (
+        <Tooltip title='Print'>
+          <Button
+            color='primary'
+            justIcon
+            onClick={() => {
+              onPrint({ type: CONSTANTS.DOCUMENTS, row })
+            }}
+          >
+            <Print />
+          </Button>
+        </Tooltip>
+      )
+    },
   },
 ]
 
@@ -1154,7 +2146,7 @@ export const OtherOrdersColumnExtensions = (
     render: row => {
       const { type } = row
       if (!ServiceTypes.includes(type)) return 'N/A'
-      return <NumberInput text currency showZero value={row.unitPrice} />
+      return showMoney(row.unitPrice)
     },
   },
   {
@@ -1165,7 +2157,7 @@ export const OtherOrdersColumnExtensions = (
     render: row => {
       const { type } = row
       if (!ServiceTypes.includes(type)) return 'N/A'
-      return <NumberInput text currency showZero value={row.adjAmt} />
+      return showMoney(row.adjAmt)
     },
   },
   {
@@ -1176,17 +2168,10 @@ export const OtherOrdersColumnExtensions = (
     render: row => {
       const { type } = row
       if (!ServiceTypes.includes(type)) return 'N/A'
-      return (
-        <NumberInput
-          text
-          currency
-          showZero
-          value={
-            (row.isPreOrder && !row.isChargeToday) || row.hasPaid
-              ? 0
-              : row.totalAfterItemAdjustment
-          }
-        />
+      return showMoney(
+        (row.isPreOrder && !row.isChargeToday) || row.hasPaid
+          ? 0
+          : row.totalAfterItemAdjustment,
       )
     },
   },
@@ -1533,14 +2518,7 @@ export const PackageColumnExtensions = (onPrint, showDrugLabelRemark) => [
     width: 110,
     sortingEnabled: false,
     render: row => {
-      return (
-        <NumberInput
-          text
-          currency
-          showZero
-          value={row.totalAfterItemAdjustment}
-        />
-      )
+      return showMoney(row.totalAfterItemAdjustment)
     },
   },
   {
