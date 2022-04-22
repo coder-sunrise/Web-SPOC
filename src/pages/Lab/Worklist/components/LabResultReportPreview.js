@@ -20,7 +20,7 @@ export const LabResultReportPreview = ({ open, visitId, onClose }) => {
     <CommonModal
       open={showModal}
       onClose={onCloseReport}
-      title='Lab Result Report'
+      title='Laboratory Test Report'
       maxWidth='lg'
     >
       <ReportViewer reportID={94} reportParameters={{ visitId: visitId }} />

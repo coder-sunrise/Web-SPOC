@@ -656,7 +656,7 @@ class Billing extends Component {
       case INVOICE_REPORT_TYPES.CLAIMABLEITEMINVOICE:
         return 'Claimable Item Invoice'
       case INVOICE_REPORT_TYPES.INDIVIDUALINVOICE:
-        return 'Invocie'
+        return 'Invoice'
       case INVOICE_REPORT_TYPES.ITEMCATEGORYINVOICE:
         return 'Item Category Invoice'
       case INVOICE_REPORT_TYPES.SUMMARYINVOICE:
