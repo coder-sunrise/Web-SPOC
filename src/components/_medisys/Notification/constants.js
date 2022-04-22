@@ -23,10 +23,10 @@ export const COLOR = {
 }
 
 export const TYPES = [
-  {
-    id: 1,
-    name: 'Queue',
-  },
+  // {
+  //   id: 1,
+  //   name: 'Queue',
+  // },
   {
     id: APPNOTIFICATION_SCHEMA.LAB.id,
     name: APPNOTIFICATION_SCHEMA.LAB.name,
@@ -43,18 +43,19 @@ export const TYPES = [
     id: APPNOTIFICATION_SCHEMA.MC.id,
     name: APPNOTIFICATION_SCHEMA.MC.name,
   },
-  {
-    id: 2,
-    name: 'Setting',
-  },
+  // {
+  //   id: 2,
+  //   name: 'Setting',
+  // },
   {
     id: 3,
     name: 'Error',
+    excludeBadgeCount: true,
   },
-  {
-    id: 4,
-    name: 'System Info',
-  },
+  // {
+  //   id: 4,
+  //   name: 'System Info',
+  // },
 ]
 
 export const ICONS = {
