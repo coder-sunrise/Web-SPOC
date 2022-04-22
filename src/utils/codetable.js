@@ -51,6 +51,13 @@ const customCodetablePath = new Map([
       path: '/codetable',
     },
   ],
+  [
+    'userpreference',
+    {
+      path: '/api/userprofile/allpreference',
+      singlePath: true,
+    },
+  ],
 ])
 
 const tenantCodesMap = new Map([
@@ -349,6 +356,13 @@ const tenantCodesMap = new Map([
       ...defaultParams,
     },
   ],
+  [
+    'userpreference',
+    {
+      ...defaultParams,
+      sorting: [],
+    },
+  ],
 ])
 
 // always get latest codetable
@@ -370,6 +384,7 @@ const fetchCodeTable = async (code, params, isReturnStatusCode = false) => {
 
   let url = searchURL
   let customPath = ''
+  let singlePath = false
 
   let criteriaForTenantCodes = defaultParams
   if (tenantCodesMap.has(code.toLowerCase())) {
@@ -378,6 +393,7 @@ const fetchCodeTable = async (code, params, isReturnStatusCode = false) => {
     criteriaForTenantCodes = tenantCodesMap.get(code.toLowerCase())
     if (customCodetablePath.has(code.toLowerCase())) {
       customPath = customCodetablePath.get(code.toLowerCase()).path
+      singlePath = customCodetablePath.get(code.toLowerCase()).singlePath
     }
   }
 
@@ -392,8 +408,7 @@ const fetchCodeTable = async (code, params, isReturnStatusCode = false) => {
         { ...criteriaForTenantCodes, ...params },
         convertExcludeFields,
       )
-
-  let finalUrl = `${url}${code}${customPath}`
+  let finalUrl = singlePath ? customPath : `${url}${code}${customPath}`
   const response = await request(finalUrl, {
     method: 'GET',
     body,

@@ -8,6 +8,8 @@ import Add from '@material-ui/icons/Add'
 import { AuthorizedContext, Button } from '@/components'
 import Authorized from '@/utils/Authorized'
 import Item from './Item'
+import { USER_PREFERENCE_TYPE } from '@/utils/constants'
+import codetable from '@/models/codetable'
 
 const styles = theme => ({
   diagnosisRow: {
@@ -21,25 +23,38 @@ const styles = theme => ({
   consultation,
 }))
 class Diagnosis extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+
+  fetchCodeTables = async () => {
+    await Promise.all([
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctComplication',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'userpreference' },
+      }),
+    ])
+  }
   componentDidMount() {
     const { dispatch } = this.props
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctComplication',
-      },
-    })
-
+    this.fetchCodeTables()
+    console.log(111)
     dispatch({
       type: 'diagnosis/getUserPreference',
       payload: {
-        type: '6',
+        type: USER_PREFERENCE_TYPE.FAVOURITEDIAGNOSISSETTING,
       },
     })
     dispatch({
       type: 'diagnosis/getUserPreference',
       payload: {
-        type: '8',
+        type: USER_PREFERENCE_TYPE.FAVOURITEDIAGNOSISLANGUAGESETTING,
       },
     }).then(response => {
       if (response) {
@@ -249,6 +264,7 @@ class Diagnosis extends PureComponent {
   }
   render() {
     const { rights, diagnosis, user, visitRegistration } = this.props
+    console.log(22)
     return (
       <div>
         <FieldArray

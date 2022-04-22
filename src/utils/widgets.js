@@ -29,7 +29,7 @@ const widgets = [
       minW: 12,
       minH: 7,
       style: {
-        padding: '0 5px',
+        padding: '5px',
       },
     },
     testProps: {
