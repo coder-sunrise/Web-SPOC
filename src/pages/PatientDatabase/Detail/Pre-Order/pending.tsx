@@ -380,7 +380,6 @@ const PendingPreOrder: React.FC = (props: any) => {
         precision: 1,
         width: 120,
         sortingEnabled: false,
-        // onChange: handelQuantityChanged,
         render: row => {
           return (
             <Tooltip
