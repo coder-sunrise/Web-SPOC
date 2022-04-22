@@ -253,7 +253,7 @@ const PendingPreOrder: React.FC = (props: any) => {
     const { row, option } = e
     const { dispensingUOM = {}, prescribingUOM = {}, uom = {} } = option
     row.itemName = option?.combinDisplayValue
-    row.code = option?.combinDisplayValue
+    row.code = option?.code
     if (row.preOrderItemType === preOrderItemCategory[0].value) {
       row.preOrderMedicationItem = {
         InventoryMedicationFK: option?.id,
