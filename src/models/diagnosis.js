@@ -64,7 +64,6 @@ export default createFormViewModel({
         let resultFavouriteDiagnosis = {
           favouriteDiagnosisLanguage: 'EN',
         }
-        console.log(payload)
         if (payload.type === USER_PREFERENCE_TYPE.FAVOURITEDIAGNOSISSETTING) {
           favouriteDiagnosis = parsedFavouriteDiagnosisSetting.find(
             o => o.Identifier === 'FavouriteDiagnosis',

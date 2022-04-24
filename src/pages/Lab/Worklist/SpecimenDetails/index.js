@@ -45,8 +45,6 @@ const { Panel } = Collapse
 const { TextArea } = Input
 
 const ActionButtons = ({ specimenStatusFK, onStart, onRetest, onVerify }) => {
-  console.log('Authorized.check(lab.retest)', Authorized.check('lab.retest'))
-  debugger
   return (
     <React.Fragment>
       {specimenStatusFK === LAB_SPECIMEN_STATUS.NEW &&
