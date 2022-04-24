@@ -16,6 +16,11 @@ const LowStockInfo = ({
   patient = {},
   corVitalSign = [],
   right = -5,
+  style = {
+    position: 'absolute',
+    bottom: 2,
+    right: right,
+  },
 }) => {
   const {
     inventorymedication = [],
@@ -247,14 +252,7 @@ const LowStockInfo = ({
       content={details()}
     >
       <Tooltip title={stockIconTooltip}>
-        <IconButton
-          style={{
-            position: 'absolute',
-            bottom: 2,
-            right: right,
-          }}
-          size='medium'
-        >
+        <IconButton style={{ ...style }} size='medium'>
           <Info color={isLowStock ? 'error' : 'primary'} />
         </IconButton>
       </Tooltip>

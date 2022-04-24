@@ -1329,9 +1329,6 @@ const Main = props => {
             <div style={{ position: 'relative' }}>
               <div
                 style={{
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
                   paddingRight: existsDrugLabelRemarks ? 10 : 0,
                   minHeight: 20,
                 }}
@@ -1340,30 +1337,28 @@ const Main = props => {
                   <span>{row.remarks || ' '}</span>
                 </Tooltip>
               </div>
-              <div style={{ position: 'relative', top: 6 }}>
-                {existsDrugLabelRemarks && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: 2,
-                      right: -8,
-                    }}
-                  >
-                    <Tooltip
-                      title={
-                        <div>
-                          <div style={{ fontWeight: 600 }}>
-                            Drug Label Remarks
-                          </div>
-                          <div>{row.drugLabelRemarks}</div>
+              {existsDrugLabelRemarks && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 6,
+                    right: -8,
+                  }}
+                >
+                  <Tooltip
+                    title={
+                      <div>
+                        <div style={{ fontWeight: 600 }}>
+                          Drug Label Remarks
                         </div>
-                      }
-                    >
-                      <FileCopySharp style={{ color: '#4255bd' }} />
-                    </Tooltip>
-                  </div>
-                )}
-              </div>
+                        <div>{row.drugLabelRemarks}</div>
+                      </div>
+                    }
+                  >
+                    <FileCopySharp style={{ color: '#4255bd' }} />
+                  </Tooltip>
+                </div>
+              )}
             </div>
           )
         },
