@@ -860,7 +860,7 @@ export const DispenseItemsColumns1 = (
               }}
             >
               <Tooltip title={row.remarks || ''}>
-                <span>{row.remarks || ' '}</span>
+                <span className='oneline_textblock'>{row.remarks || ' '}</span>
               </Tooltip>
             </div>
 

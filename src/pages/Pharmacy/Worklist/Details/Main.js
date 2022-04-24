@@ -1334,7 +1334,9 @@ const Main = props => {
                 }}
               >
                 <Tooltip title={row.remarks || ''}>
-                  <span>{row.remarks || ' '}</span>
+                  <span className='oneline_textblock'>
+                    {row.remarks || ' '}
+                  </span>
                 </Tooltip>
               </div>
               {existsDrugLabelRemarks && (

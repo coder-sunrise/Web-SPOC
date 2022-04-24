@@ -423,13 +423,7 @@ const ClaimTracking = ({
                 </div>
               }
             >
-              <div
-                style={{
-                  whiteSpace: 'pre-wrap',
-                }}
-              >
-                {row.remarks || '-'}
-              </div>
+              <span className='oneline_textblock'>{row.remarks || '-'}</span>
             </Tooltip>
           )
         },

@@ -192,15 +192,12 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
           <div style={{ position: 'relative' }}>
             <div
               style={{
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
                 paddingRight: existsDrugLabelRemarks ? 10 : 0,
                 minHeight: 20,
               }}
             >
               <Tooltip title={row.remarks || ' '}>
-                <span> {row.remarks || ' '}</span>
+                <span className='oneline_textblock'> {row.remarks || ' '}</span>
               </Tooltip>
             </div>
             <div style={{ position: 'relative', top: 6 }}>
