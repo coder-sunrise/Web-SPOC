@@ -13,9 +13,46 @@ const PharmacyDetails = ({
   const dispatch = useDispatch()
   const { detailsId, setDetailsId } = useContext(WorklistContext)
   const [showModal, setShowModal] = useState(false)
+  const getCodeTables = () => {
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventorymedication',
+        force: true,
+        temp: true,
+      },
+    })
 
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventoryvaccination',
+        force: true,
+        temp: true,
+      },
+    })
+
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventoryconsumable',
+        force: true,
+        temp: true,
+      },
+    })
+
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctservice',
+        force: true,
+        temp: true,
+      },
+    })
+  }
   useEffect(() => {
     if (detailsId) {
+      getCodeTables()
       dispatch({
         type: 'pharmacyDetails/updateState',
         payload: { fromModule },

@@ -33,10 +33,10 @@ const AddOrder = ({
   dispense,
   height,
   codetable: {
-    ctservice,
-    inventoryconsumable,
-    inventorymedication,
-    inventoryvaccination,
+    ctservice = [],
+    inventoryconsumable = [],
+    inventorymedication = [],
+    inventoryvaccination = [],
   },
   visitType,
   location,
@@ -44,7 +44,7 @@ const AddOrder = ({
   isFirstLoad,
   visitRegistration,
 }) => {
-  const displayExistingOrders = async (id, servicesList) => {
+  const displayExistingOrders = async id => {
     const r = await dispatch({
       type: 'dispense/queryAddOrderDetails',
       payload: {
@@ -79,7 +79,7 @@ const AddOrder = ({
               )
             } else {
               // for open prescription item
-              medicationItem = true
+              medicationItem = {}
             }
 
             obj = {
@@ -114,20 +114,14 @@ const AddOrder = ({
                 o.retailVisitInvoiceDrug.retailPrescriptionItem
                   .retailPrescriptionItemDrugMixture,
               isActive: !!medicationItem,
-              _itemId: medicationItem.id,
+              _itemId: medicationItem?.id,
               _itemType: INVOICE_ITEM_TYPE_BY_NAME.MEDICATION,
-              _caution: medicationItem.caution,
+              _caution: medicationItem?.caution,
             }
             break
           }
 
           case INVOICE_ITEM_TYPE_BY_NAME.SERVICE: {
-            const { serviceId, serviceCenterId } = servicesList.find(
-              s =>
-                s.serviceCenter_ServiceId ===
-                  o.retailVisitInvoiceService.serviceCenterServiceFK &&
-                s.isActive,
-            )
             const serviceItem = ctservice.find(
               service =>
                 service.serviceCenter_ServiceId ===
@@ -135,14 +129,14 @@ const AddOrder = ({
             )
             obj = {
               type: ORDER_TYPE_TAB.SERVICE,
-              serviceFK: serviceId,
-              serviceCenterFK: serviceCenterId,
+              serviceFK: serviceItem?.serviceId,
+              serviceCenterFK: serviceItem?.serviceCenterId,
               innerLayerId: o.retailVisitInvoiceService.id,
               innerLayerConcurrencyToken:
                 o.retailVisitInvoiceService.concurrencyToken,
               ...o.retailVisitInvoiceService,
               ...o.retailVisitInvoiceService.retailService,
-              isActive: !!serviceItem,
+              isActive: serviceItem?.isActive,
             }
             break
           }
@@ -170,9 +164,9 @@ const AddOrder = ({
               v => v.displayValue === o.itemName && v.isActive,
             )
             obj = {
-              _itemId: vaccinationItem.id,
+              _itemId: vaccinationItem?.id,
               _itemType: INVOICE_ITEM_TYPE_BY_NAME.VACCINATION,
-              _caution: vaccinationItem.caution,
+              _caution: vaccinationItem?.caution,
             }
             break
           }
@@ -305,8 +299,9 @@ const AddOrder = ({
   useEffect(() => {
     const { entity } = dispense
     const { invoice } = entity || {}
-    if (visitType === VISIT_TYPE.OTC && invoice)
-      displayExistingOrders(invoice.id, ctservice)
+    if (visitType === VISIT_TYPE.OTC && invoice) {
+      displayExistingOrders(invoice.id)
+    }
   }, [])
   return (
     <React.Fragment>
