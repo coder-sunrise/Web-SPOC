@@ -189,7 +189,7 @@ class ICD10Diagnosis extends PureComponent {
   render() {
     const { rights, diagnosis, dispatch } = this.props
 
-    const favLang = diagnosis.favouriteDiagnosisLanguage
+    const favLang = diagnosis.favouriteDiagnosisLanguage || 'EN'
     return (
       <div>
         <FieldArray

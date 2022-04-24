@@ -44,7 +44,6 @@ class Diagnosis extends PureComponent {
   componentDidMount() {
     const { dispatch } = this.props
     this.fetchCodeTables()
-    console.log(111)
     dispatch({
       type: 'diagnosis/getUserPreference',
       payload: {
