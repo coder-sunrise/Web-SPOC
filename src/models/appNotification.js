@@ -35,6 +35,10 @@ export default createBasicModel({
         }
         return response
       },
+      *upsert({ payload }, { call, put, select }) {
+        var response = yield call(service.upsert, payload)
+        return response
+      },
       *readAllNotification({ payload }, { call, put, select }) {
         const appNotificationSate = yield select(st => st.appNotification)
         const { rows } = appNotificationSate
