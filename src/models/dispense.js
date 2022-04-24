@@ -655,13 +655,6 @@ export default createFormViewModel({
           },
         })
         yield take('query/@@end')
-
-        yield put({
-          type: 'dispense/updateState',
-          payload: {
-            queryCodeTablesDone: true,
-          },
-        })
         yield put({
           type: 'getServingPersons',
           payload: { visitFK: visitID },

@@ -44,7 +44,7 @@ import { getOrdersData } from '@/pages/Consultation/utils'
 class Dispense extends PureComponent {
   constructor(props) {
     super(props)
-    //this.getCodeTables()
+    this.getCodeTables()
   }
 
   componentWillUnmount() {
@@ -94,53 +94,48 @@ class Dispense extends PureComponent {
     )
   }
 
-  getCodeTables = async () => {
+  getCodeTables = () => {
     const { dispatch } = this.props
-    await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventorymedication',
-        force: true,
-        temp: true,
-      },
-    })
-    await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventoryvaccination',
-        force: true,
-        temp: true,
-      },
-    })
-    await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventoryconsumable',
-        force: true,
-        temp: true,
-      },
-    })
-    await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctservice',
-        force: true,
-        temp: true,
-      },
-    })
-    await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctmedicationunitofmeasurement',
-        force: true,
-      },
-    })
-
-    dispatch({
-      type: 'dispense/updateState',
-      payload: {
-        queryCodeTablesDone: true,
-      },
+    Promise.all([
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'inventorymedication',
+          force: true,
+          temp: true,
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'inventoryvaccination',
+          force: true,
+          temp: true,
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'inventoryconsumable',
+          force: true,
+          temp: true,
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctservice',
+          force: true,
+          temp: true,
+        },
+      }),
+    ]).then(r => {
+      dispatch({
+        type: 'dispense/updateState',
+        payload: {
+          queryCodeTablesDone: true,
+        },
+      })
     })
   }
 
