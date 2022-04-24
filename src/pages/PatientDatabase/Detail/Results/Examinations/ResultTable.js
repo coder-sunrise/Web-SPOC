@@ -121,19 +121,21 @@ export const ResultTable = props => {
                 </span>
               </div>
               <div>
-                {!data.isAcknowledged && clinicRoleFK === 1 && (
-                  <div>
-                    <Button
-                      color='primary'
-                      size='sm'
-                      onClick={() => {
-                        acknowledge(data.id)
-                      }}
-                    >
-                      Acknowledge
-                    </Button>{' '}
-                  </div>
-                )}
+                {!data.isAcknowledged &&
+                  data.status == 6 &&
+                  clinicRoleFK === 1 && (
+                    <div>
+                      <Button
+                        color='primary'
+                        size='sm'
+                        onClick={() => {
+                          acknowledge(data.id)
+                        }}
+                      >
+                        Acknowledge
+                      </Button>{' '}
+                    </div>
+                  )}
                 {data.isAcknowledged && (
                   <Tooltip
                     title={`Acknowledged by ${
@@ -167,7 +169,9 @@ export const ResultTable = props => {
                   >
                     Internal Remarks:{' '}
                   </span>
-                  {data.internalRemarks}
+                  <div style={{ whiteSpace: 'pre-wrap', paddingLeft: 10 }}>
+                    {data.internalRemarks}
+                  </div>
                 </p>
               )}
               {data.reportRemarks && (
@@ -181,7 +185,9 @@ export const ResultTable = props => {
                   >
                     Report Remarks:{' '}
                   </span>
-                  {data.reportRemarks}
+                  <div style={{ whiteSpace: 'pre-wrap', paddingLeft: 10 }}>
+                    {data.reportRemarks}
+                  </div>
                 </p>
               )}
             </div>

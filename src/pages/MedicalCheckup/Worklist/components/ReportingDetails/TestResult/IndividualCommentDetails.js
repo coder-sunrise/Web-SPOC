@@ -35,6 +35,7 @@ const styles = theme => ({
     width: '100%',
     marginLeft: 2,
     fontSize: '0.8rem',
+    minHeight: 20.11,
   },
   rootPanel: {
     position: 'relative',
@@ -234,18 +235,7 @@ class IndividualCommentDetails extends PureComponent {
             i => i.id === item.id,
           )
 
-          let isNextGroupSelect
-          for (
-            let index = group.groupNo;
-            index < commentGroupList.length;
-            index++
-          ) {
-            if ((selectedItem[commentGroupList[index].groupNo] || []).length) {
-              isNextGroupSelect = true
-              break
-            }
-          }
-
+          const isItemEnable = hasValue(showValue) && showValue.trim().length
           return (
             <ListItem
               alignItems='flex-start'
@@ -256,7 +246,7 @@ class IndividualCommentDetails extends PureComponent {
               divider
               disableGutters
               button
-              disabled={!isModifyCommentEnable || isNextGroupSelect}
+              disabled={!isModifyCommentEnable || !isItemEnable}
               onClick={() => this.onCategoryChange(group, item)}
             >
               <Tooltip title={showValue}>

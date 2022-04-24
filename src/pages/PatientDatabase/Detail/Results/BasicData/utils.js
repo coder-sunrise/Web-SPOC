@@ -10,6 +10,7 @@ export const defaultData = [
     testCode: TESTTYPES.BASICEXAMINATION,
     type: 'Basic Examination',
     isGroup: true,
+    groupID: 1,
   },
   {
     id: 2,
@@ -17,6 +18,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'temperatureC',
     format: '0.0',
+    groupFK: 1,
   },
   {
     id: 3,
@@ -26,6 +28,7 @@ export const defaultData = [
     refRange: '(<130)',
     tableName: 'basicExaminations',
     fieldName: 'bpSysMMHG',
+    groupFK: 1,
   },
   {
     id: 4,
@@ -35,18 +38,21 @@ export const defaultData = [
     typeTootip: 'Blood Pressure Diastole',
     tableName: 'basicExaminations',
     fieldName: 'bpDiaMMHG',
+    groupFK: 1,
   },
   {
     id: 5,
     type: 'Pulse (bpm)',
     tableName: 'basicExaminations',
     fieldName: 'pulseRateBPM',
+    groupFK: 1,
   },
   {
     id: 6,
     type: 'SaO2 (%)',
     tableName: 'basicExaminations',
     fieldName: 'saO2',
+    groupFK: 1,
   },
   {
     id: 7,
@@ -54,6 +60,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'weightKG',
     format: '0.0',
+    groupFK: 1,
   },
   {
     id: 8,
@@ -61,6 +68,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'heightCM',
     format: '0.0',
+    groupFK: 1,
   },
   {
     id: 9,
@@ -69,6 +77,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'standardWeight',
     format: '0.0',
+    groupFK: 1,
   },
   {
     id: 10,
@@ -79,6 +88,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'bmi',
     format: '0.0',
+    groupFK: 1,
   },
   {
     id: 11,
@@ -88,6 +98,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'rohrer',
     format: '0.0',
+    groupFK: 1,
   },
   {
     id: 12,
@@ -97,6 +108,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'kaup',
     format: '0.0',
+    groupFK: 1,
   },
   {
     id: 13,
@@ -104,6 +116,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'bodyFatPercentage',
     format: '0.0',
+    groupFK: 1,
   },
   {
     id: 14,
@@ -111,6 +124,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'bodyFatMass',
     format: '0.0',
+    groupFK: 1,
   },
   {
     id: 15,
@@ -118,6 +132,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'degreeOfObesity',
     format: '0.0',
+    groupFK: 1,
   },
   {
     id: 16,
@@ -125,6 +140,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'headCircumference',
     format: '0.0',
+    groupFK: 1,
   },
   {
     id: 17,
@@ -132,6 +148,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'chestCircumference',
     format: '0.0',
+    groupFK: 1,
   },
   {
     id: 18,
@@ -140,6 +157,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'waistCircumference',
     format: '0.0',
+    groupFK: 1,
   },
   {
     id: 19,
@@ -148,6 +166,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'isPregnancy',
     valueType: 'boolean',
+    groupFK: 1,
   },
   {
     id: 20,
@@ -155,6 +174,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'hepetitisVaccinationA',
     valueType: 'boolean',
+    groupFK: 1,
   },
   {
     id: 21,
@@ -162,6 +182,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'hepetitisVaccinationB',
     valueType: 'boolean',
+    groupFK: 1,
   },
   {
     id: 22,
@@ -169,6 +190,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'isFasting',
     valueType: 'boolean',
+    groupFK: 1,
   },
   {
     id: 23,
@@ -176,6 +198,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'isSmoking',
     valueType: 'boolean',
+    groupFK: 1,
   },
   {
     id: 24,
@@ -183,6 +206,7 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'isAlcohol',
     valueType: 'boolean',
+    groupFK: 1,
   },
   {
     id: 25,
@@ -191,24 +215,28 @@ export const defaultData = [
     tableName: 'basicExaminations',
     fieldName: 'isMensus',
     valueType: 'boolean',
+    groupFK: 1,
   },
   {
     id: 26,
     type: 'Visual Acuity Test',
     isGroup: true,
+    groupID: 2,
   },
   {
     id: 27,
     type: 'Correction Method',
     tableName: 'eyeExaminations',
     fieldName: 'visionCorrectionMethod',
+    groupFK: 2,
   },
   {
     id: 28,
-    type: '5m (R)',
+    type: '5m Bare (R)',
     tableName: 'eyeExaminations',
     fieldName: 'rightBareEye5',
     format: '0.0',
+    groupFK: 2,
   },
   {
     id: 29,
@@ -217,13 +245,15 @@ export const defaultData = [
     tableName: 'eyeExaminations',
     fieldName: 'rightCorrectedVision5',
     format: '0.0',
+    groupFK: 2,
   },
   {
     id: 30,
-    type: '5m (L)',
+    type: '5m Bare (L)',
     tableName: 'eyeExaminations',
     fieldName: 'leftBareEye5',
     format: '0.0',
+    groupFK: 2,
   },
   {
     id: 31,
@@ -232,13 +262,15 @@ export const defaultData = [
     tableName: 'eyeExaminations',
     fieldName: 'leftCorrectedVision5',
     format: '0.0',
+    groupFK: 2,
   },
   {
     id: 32,
-    type: '50cm (R)',
+    type: '50cm Bare (R)',
     tableName: 'eyeExaminations',
     fieldName: 'rightBareEye50',
     format: '0.0',
+    groupFK: 2,
   },
   {
     id: 33,
@@ -247,13 +279,15 @@ export const defaultData = [
     tableName: 'eyeExaminations',
     fieldName: 'rightCorrectedVision50',
     format: '0.0',
+    groupFK: 2,
   },
   {
     id: 34,
-    type: '50cm (L)',
+    type: '50cm Bare (L)',
     tableName: 'eyeExaminations',
     fieldName: 'leftBareEye50',
     format: '0.0',
+    groupFK: 2,
   },
   {
     id: 35,
@@ -262,12 +296,14 @@ export const defaultData = [
     tableName: 'eyeExaminations',
     fieldName: 'leftCorrectedVision50',
     format: '0.0',
+    groupFK: 2,
   },
   {
     id: 36,
     type: 'I.O.P.',
     typeTootip: 'Intraocular Pressure',
     isGroup: true,
+    groupID: 3,
   },
   {
     id: 37,
@@ -277,6 +313,7 @@ export const defaultData = [
     tableName: 'eyeExaminations',
     fieldName: 'rightAverageResult',
     format: '0.0',
+    groupFK: 3,
   },
   {
     id: 38,
@@ -286,11 +323,13 @@ export const defaultData = [
     tableName: 'eyeExaminations',
     fieldName: 'leftAverageResult',
     format: '0.0',
+    groupFK: 3,
   },
   {
     id: 39,
     type: 'Color Vision',
     isGroup: true,
+    groupID: 4,
   },
   {
     id: 40,
@@ -298,11 +337,13 @@ export const defaultData = [
     type: 'Color Vision',
     tableName: 'eyeExaminations',
     fieldName: 'colorVisionTestResult',
+    groupFK: 4,
   },
   {
     id: 41,
     type: 'Audiometry',
     isGroup: true,
+    groupID: 5,
   },
   {
     id: 42,
@@ -311,6 +352,7 @@ export const defaultData = [
     refRange: '(<=30)',
     tableName: 'audiometryTest',
     fieldName: 'rightResult1000Hz',
+    groupFK: 5,
   },
   {
     id: 43,
@@ -319,6 +361,7 @@ export const defaultData = [
     refRange: '(<=30)',
     tableName: 'audiometryTest',
     fieldName: 'rightResult4000Hz',
+    groupFK: 5,
   },
   {
     id: 44,
@@ -327,6 +370,7 @@ export const defaultData = [
     refRange: '(<=30)',
     tableName: 'audiometryTest',
     fieldName: 'leftResult1000Hz',
+    groupFK: 5,
   },
   {
     id: 45,
@@ -335,6 +379,7 @@ export const defaultData = [
     refRange: '(<=30)',
     tableName: 'audiometryTest',
     fieldName: 'leftResult4000Hz',
+    groupFK: 5,
   },
 ]
 
@@ -441,13 +486,13 @@ export const defaultColumns = genderFK => {
         return (
           <div
             style={{
-              paddingLeft: isSub ? 36 : 4,
+              paddingLeft: 4,
               paddingTop: 2,
               paddingBottom: 2,
             }}
           >
             <Tooltip title={row.typeTootip}>
-              <span> {isSub ? 'Corrected' : row.type}</span>
+              <span> {row.type}</span>
             </Tooltip>
           </div>
         )

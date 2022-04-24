@@ -27,6 +27,7 @@ import {
   Popover,
   dateFormatLong,
   Tooltip,
+  notification,
 } from '@/components'
 import { ProTable } from '@medisys/component'
 import { GridContextMenuButton as GridButton } from 'medisys-components'
@@ -305,6 +306,10 @@ const WorklistGrid = ({
         x => x.userProfileFK === user.data.clinicianProfile.userProfile.id,
       )
     ) {
+      notification.warn({
+        message:
+          "Please make sure you are the primary/reporting doctor to view this patient's worklist.",
+      })
       return
     }
     showReportingDetails(row)
@@ -624,7 +629,7 @@ const WorklistGrid = ({
             display: 'inline-block',
             height: 18,
             width: 18,
-            backgroundColor: '#CC0033',
+            border: `1px solid #354497`,
           }}
         />
         <span
@@ -643,7 +648,7 @@ const WorklistGrid = ({
             display: 'inline-block',
             height: 18,
             width: 18,
-            backgroundColor: '#33CC00',
+            border: `1px solid #008B00`,
           }}
         />
         <span
@@ -659,18 +664,20 @@ const WorklistGrid = ({
         </span>
         <span
           style={{
-            color: 'white',
+            color: '#008B00',
             display: 'inline-block',
             height: 18,
             width: 18,
-            backgroundColor: '#33CC00',
+            border: `1px solid #008B00`,
             position: 'relative',
-            top: '-4px',
+            top: 0,
           }}
         >
           <CheckCircleOutlined
             style={{
-              marginRight: 2,
+              position: 'absolute',
+              top: 1,
+              left: 1,
             }}
           />
         </span>

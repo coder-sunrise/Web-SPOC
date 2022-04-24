@@ -849,6 +849,17 @@ class OrderSet extends PureComponent {
     }
   }
 
+  componentWillMount() {
+    const { dispatch } = this.props
+    const codeTableNameArray = ['inventoryorderset']
+    dispatch({
+      type: 'codetable/batchFetch',
+      payload: {
+        codes: codeTableNameArray,
+      },
+    })
+  }
+
   validateAndSubmitIfOk = async () => {
     const { handleSubmit, validateForm } = this.props
     const validateResult = await validateForm()

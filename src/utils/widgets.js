@@ -29,7 +29,7 @@ const widgets = [
       minW: 12,
       minH: 7,
       style: {
-        padding: '0 5px',
+        padding: '5px',
       },
     },
     testProps: {
@@ -39,40 +39,7 @@ const widgets = [
       <AuthorizedContext>
         {r => {
           if (r.rights !== 'enable') return null
-          return (
-            // <Dropdown
-            //   overlay={
-            //     <Menu>
-            //       <Menu.Item
-            //         onClick={() => {
-            //           window.g_app._store.dispatch({
-            //             type: 'clinicalnotes/updateState',
-            //             payload: {
-            //               showAttachmentModal: true,
-            //             },
-            //           })
-            //         }}
-            //       >
-            //         Upload Attachment
-            //       </Menu.Item>
-            //     </Menu>
-            //   }
-            //   trigger={[
-            //     'click',
-            //   ]}
-            // >
-            //   <Button
-            //     justIcon
-            //     round
-            //     color='primary'
-            //     size='sm'
-            //     style={{ float: 'left' }}
-            //   >
-            //     <MoreVert />
-            //   </Button>
-            // </Dropdown>
-            null
-          )
+          return null
         }}
       </AuthorizedContext>
     ),
@@ -118,6 +85,7 @@ const widgets = [
   {
     id: '3',
     name: 'Consultation Document',
+    shortName: 'Cons. Doc.',
     accessRight: 'queue.consultation.widgets.consultationdocument',
     component: Loadable({
       loader: () => import('@/pages/Widgets/ConsultationDocument'),
@@ -131,35 +99,6 @@ const widgets = [
         type: 'consultationDocument/deleteRow',
       })
     },
-
-    // toolbarAddon: (
-    //   <AuthorizedContext>
-    //     {(r) => {
-    //       if (r && r.rights !== 'enable') return null
-
-    //       return (
-    //         <Tooltip title='Add Consultation Document'>
-    //           <IconButton
-    //             style={{ float: 'left' }}
-    //             className='non-dragable'
-    //             onClick={() => {
-    //               window.g_app._store.dispatch({
-    //                 type: 'consultationDocument/updateState',
-    //                 payload: {
-    //                   showModal: true,
-    //                   type: '5',
-    //                   entity: undefined,
-    //                 },
-    //               })
-    //             }}
-    //           >
-    //             <Add />
-    //           </IconButton>
-    //         </Tooltip>
-    //       )
-    //     }}
-    //   </AuthorizedContext>
-    // ),
   },
   {
     id: '4',
@@ -216,21 +155,10 @@ const widgets = [
       },
     },
   },
-  // {
-  //   id: '6',
-  //   name: 'Result History',
-  //   component: Loadable({
-  //     loader: () => import('@/pages/Widgets/ResultHistory'),
-  //     loading: Loading,
-  //   }),
-  //   model: 'resultHistory',
-  //   layoutConfig: {
-  //     style: {},
-  //   },
-  // },
   {
     id: '7',
     name: 'Basic Examinations',
+    shortName: 'Basic Exam.',
     accessRight: 'queue.consultation.widgets.vitalsign',
     component: Loadable({
       loader: () => import('@/pages/Widgets/VitalSign'),
@@ -242,13 +170,14 @@ const widgets = [
       minW: 12,
       minH: 10,
       style: {
-        padding: '0 5px',
+        padding: '5px',
       },
     },
   },
   {
     id: '23',
     name: 'Eye Examinations',
+    shortName: 'Eye Exam.',
     accessRight: 'queue.consultation.widgets.eyeexaminations',
     component: Loadable({
       loader: () => import('@/pages/Widgets/EyeExaminations'),
@@ -266,6 +195,7 @@ const widgets = [
   {
     id: '24',
     name: 'Audiometry Test',
+    shortName: 'Audiometry',
     accessRight: 'queue.consultation.widgets.audiometrytest',
     component: Loadable({
       loader: () => import('@/pages/Widgets/AudiometryTest'),
@@ -276,7 +206,7 @@ const widgets = [
       minW: 12,
       minH: 10,
       style: {
-        padding: '0 5px',
+        padding: '5px',
       },
     },
   },
@@ -312,13 +242,14 @@ const widgets = [
       minW: 12,
       minH: 10,
       style: {
-        padding: '0 5px',
+        padding: '5px',
       },
     },
   },
   {
     id: '9',
     name: 'Visual Acuity Test',
+    shortName: 'Visual Acuity',
     accessRight: 'queue.consultation.widgets.eyevisualacuity',
     component: Loadable({
       loader: () => import('@/pages/Widgets/EyeVisualAcuity'),
@@ -383,6 +314,7 @@ const widgets = [
   {
     id: '11',
     name: 'Examination Form',
+    shortName: 'Exam. Form',
     accessRight: 'queue.consultation.widgets.eyeexaminationform',
     component: Loadable({
       loader: () => import('@/pages/Widgets/ExaminationForm'),

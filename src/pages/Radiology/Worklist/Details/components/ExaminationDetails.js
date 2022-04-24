@@ -92,7 +92,8 @@ export const ExaminationDetails = ({
   }, [workitem])
 
   const isHiddenExaminationFinding =
-    Authorized.check('radiologyworklist.examinationfinding').rights === 'hidden'
+    Authorized.check('radiologyworklist.examinationfinding')?.rights ===
+    'hidden'
 
   let currentScribbleNotes = []
   const scribbleType = scribbleTypes.find(o => o.type === 'radiology')
@@ -255,7 +256,9 @@ export const ExaminationDetails = ({
         ) : (
           <GridContainer style={{ rowGap: 10 }}>
             <GridItem md={2}>
-              <RightAlignGridItem md={12}>Radiology Technologist :</RightAlignGridItem>
+              <RightAlignGridItem md={12}>
+                Radiology Technologist :
+              </RightAlignGridItem>
             </GridItem>
             <TextGridItem md={10}>
               {assignedRadiographers.map(r => r.name).toString()}

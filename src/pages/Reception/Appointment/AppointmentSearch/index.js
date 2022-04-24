@@ -29,24 +29,12 @@ const AppointmentSearch = ({
       !viewOtherApptAccessRight ||
       viewOtherApptAccessRight.rights !== 'enable'
     ) {
-      if (isActiveCalendarResource) {
-        defaultDoctor = [isActiveCalendarResource.id]
-      } else {
-        defaultDoctor = [-1]
+        if (isActiveCalendarResource) {
+          defaultDoctor = [isActiveCalendarResource.id]
+        } else {
+          defaultDoctor = [-1]
+        }
       }
-    }
-    dispatch({
-      type: 'appointment/query',
-      payload: {
-        apiCriteria: {
-          dob: null,
-          doctor: defaultDoctor.join(),
-          isIncludeRescheduledByClinic: true,
-          isIncludeHistory: true,
-        },
-        pagesize: 100,
-      },
-    })
     return () => {
       dispatch({
         type: 'appointment/reset',

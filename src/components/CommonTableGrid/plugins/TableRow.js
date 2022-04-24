@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 
 class TableRow extends React.Component {
-  shouldComponentUpdate (nextProps) {
+  shouldComponentUpdate(nextProps) {
     // console.log(nextProps.extraCellConfig, this.props.extraCellConfig)
     // console.log(nextProps.row === this.props.row)
     if (window._forceTableUpdate) {
@@ -30,7 +30,7 @@ class TableRow extends React.Component {
       extraCellConfig &&
       extraCellConfig.editingCells &&
       extraCellConfig.editingCells.find(
-        (o) => o.rowId === getRowId(nextProps.row),
+        o => o.rowId === getRowId(nextProps.row),
       )
     )
       return true
@@ -38,7 +38,7 @@ class TableRow extends React.Component {
     if (
       orgConfig &&
       orgConfig.editingCells &&
-      orgConfig.editingCells.find((o) => o.rowId === getRowId(this.props.row))
+      orgConfig.editingCells.find(o => o.rowId === getRowId(this.props.row))
     )
       return true
 
@@ -50,12 +50,12 @@ class TableRow extends React.Component {
     return false
   }
 
-  render () {
+  render() {
     const {
       onRowDoubleClick = undefined,
       onContextMenu = undefined,
-      onRowClick = (f) => f,
-      rowMoveable = (f) => false,
+      onRowClick = f => f,
+      rowMoveable = f => false,
       row,
       tableRow,
       rowSelectionEnabled,
@@ -65,21 +65,19 @@ class TableRow extends React.Component {
     return (
       <Table.Row
         // {...restProps}
-        onDoubleClick={(event) => {
+        onDoubleClick={event => {
           onRowDoubleClick && onRowDoubleClick(row || tableRow.row, event)
         }}
-        onClick={(event) => {
+        onClick={event => {
           onRowClick(row, event)
         }}
-        onContextMenu={(event) => {
+        onContextMenu={event => {
           onContextMenu && onContextMenu(row || tableRow.row, event)
         }}
         className={
-          typeof rowMoveable === 'function' && rowMoveable(row) ? (
-            'moveable'
-          ) : (
-            ''
-          )
+          typeof rowMoveable === 'function' && rowMoveable(row)
+            ? 'moveable'
+            : ''
         }
       >
         {children}

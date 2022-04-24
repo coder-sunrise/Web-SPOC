@@ -39,7 +39,16 @@ export default createListViewModel({
           itemIdentifier: payload.itemIdentifier,
           type: payload.type,
         })
-        if (r === 204) return true
+        if (r === 204) {
+          window.g_app._store.dispatch({
+            type: 'codetable/refreshCodes',
+            payload: {
+              code: 'userpreference',
+              force: true,
+            },
+          })
+          return true
+        }
 
         return false
       },

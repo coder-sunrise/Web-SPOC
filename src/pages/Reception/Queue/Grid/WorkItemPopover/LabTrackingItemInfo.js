@@ -42,7 +42,9 @@ const LabTrackingItemInfo = props => {
       setTotalWorkItemCount(detailData.length)
       setCompletedWorkItemCount(
         detailData.filter(
-          t => t.labTrackingStatusFK === LAB_TRACKING_STATUS.COMPLETED,
+          t =>
+            t.labTrackingStatusFK === LAB_TRACKING_STATUS.COMPLETED ||
+            t.labTrackingStatusFK === LAB_TRACKING_STATUS.RECEIVED,
         ).length,
       )
     })
@@ -55,21 +57,39 @@ const LabTrackingItemInfo = props => {
       number += 1
       return (
         <tr style={{ borderBottom: '1px solid #eeeeee' }}>
-          <td style={{ width: '35px' }}>{number}</td>
-          <td style={{ width: '150px', wordBreak: 'break-word' }}>
+          <td style={{ verticalAlign: 'top', width: '35px' }}>{number}</td>
+          <td
+            style={{
+              verticalAlign: 'top',
+              width: '150px',
+              wordBreak: 'break-word',
+            }}
+          >
             {workItem.serviceName || '-'}
-          </td>
-          <td style={{ width: '150px', wordBreak: 'break-word' }}>
-            {workItem.supplierName || '-'}
-          </td>
-          <td style={{ width: '150px', wordBreak: 'break-word' }}>
-            {workItem.caseTypeDisplayValue || '-'}
-          </td>
-          <td style={{ width: '165px', wordBreak: 'break-word' }}>
-            {moment(workItem.receivedDate).format('DD MMM YYYY, HH:mm') || '-'}
           </td>
           <td
             style={{
+              verticalAlign: 'top',
+              width: '150px',
+              wordBreak: 'break-word',
+            }}
+          >
+            {workItem.supplierName || '-'}
+          </td>
+          <td
+            style={{
+              verticalAlign: 'top',
+              width: '165px',
+              wordBreak: 'break-word',
+            }}
+          >
+            {workItem.receivedDate
+              ? moment(workItem.receivedDate).format('DD MMM YYYY')
+              : '-'}
+          </td>
+          <td
+            style={{
+              verticalAlign: 'top',
               width: '120px',
               wordBreak: 'break-word',
               color:
@@ -99,7 +119,7 @@ const LabTrackingItemInfo = props => {
       }}
       content={
         <div>
-          <h5>Lab Tracking Details</h5>
+          <h5>External Tracking Details</h5>
           <table
             style={{
               fontSize: 14,
@@ -112,12 +132,20 @@ const LabTrackingItemInfo = props => {
               <th style={{ width: '35px' }}>No.</th>
               <th style={{ width: '150px' }}>Service Name</th>
               <th style={{ width: '150px' }}>Supplier</th>
-              <th style={{ width: '150px' }}>Case Type</th>
               <th style={{ width: '165px' }}>Received Date</th>
               <th style={{ minWidth: '120px' }}>Status</th>
             </tr>
-            {getWorkItemDetails()}
           </table>
+          <div style={{ maxHeight: 400, overflowY: 'auto' }}>
+            <table
+              style={{
+                fontSize: 14,
+                marginTop: 5,
+              }}
+            >
+              <tbody>{getWorkItemDetails()}</tbody>
+            </table>
+          </div>
         </div>
       }
     >

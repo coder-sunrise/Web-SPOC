@@ -5,15 +5,16 @@ import service from '../components/_medisys/AppNotificationList/services'
 import { sendNotification } from '@/utils/realtime'
 import { NOTIFICATION_STATUS, APPNOTIFICATION_SCHEMA } from '@/utils/constants'
 
+const DefaultPageSize = 10
+
 export default createBasicModel({
   namespace: 'appNotification',
   param: {
     service,
     state: {
       notifications: [],
-      pageSize: 5,
-      morePageSize: 5,
-      totalRecords: 1,
+      pageSize: DefaultPageSize,
+      morePageSize: 10,
     },
     subscriptions: ({ dispatch, history }) => {},
     effects: {
@@ -51,17 +52,23 @@ export default createBasicModel({
       },
       *loadNotifications({ payload = {} }, { call, put, select }) {
         const appNotificationSate = yield select(st => st.appNotification)
-        const { pageSize, morePageSize, totalRecords } = appNotificationSate
-        const { loadMore } = payload
+        const { pageSize, morePageSize } = appNotificationSate
+        const { source, loadMore, isRead } = payload
+        const currentPageSize = loadMore ? pageSize + morePageSize : pageSize
         var user = yield select(st => st.user)
         var response = yield call(service.queryList, {
           toUserFK: user.data.id,
-          pageSize: loadMore ? pageSize + Math.min(totalRecords - pageSize, morePageSize) : pageSize,
-
+          isRead: isRead, 
+          'applicationNotificationFKNavigation.source': source,
+          pagesize: currentPageSize > 0 ? currentPageSize : DefaultPageSize,
           current: 1,
           sorting: [
             {
               columnName: 'isRead',
+              direction: 'asc',
+            },
+            {
+              columnName: '(isAcknowledged == null ? !isAcknowledgeRequired : isAcknowledged)',
               direction: 'asc',
             },
             {
@@ -81,9 +88,7 @@ export default createBasicModel({
         yield put({
           type: 'updateState',
           payload: {
-            pageSize: response.data.pageSize,
-            currentPage: response.data.currentPage,
-            totalRecords: response.data.totalRecords,
+            pageSize: Math.min(response.data.pageSize,response.data.totalRecords),
             rows: notifications.map(x => x.id),
           },
         })
@@ -103,6 +108,16 @@ export default createBasicModel({
         return {
           ...st,
           notifications: data.data,
+        }
+      },
+      receiveMessage(st, { payload }) {
+        const notifications = [payload, ...st.notifications]
+        console.log(notifications)
+        return {
+          ...st,
+          notifications,
+          rows: notifications.map(x => x.id),
+          pageSize: notifications.length
         }
       },
     },

@@ -33,7 +33,7 @@ const Medication = ({ dispatch, history, medication, values }) => {
     { columnName: 'action', width: 80, align: 'center' },
     {
       columnName: 'favouriteSupplierName',
-       sortBy: 'FavouriteSupplierFkNavigation.displayValue',
+      sortBy: 'FavouriteSupplierFkNavigation.displayValue',
       width: 250,
     },
     {
@@ -42,7 +42,7 @@ const Medication = ({ dispatch, history, medication, values }) => {
     },
     {
       columnName: 'medicationGroupName',
-      sortBy: 'MedicationGroupFkNavigation.displayValue',
+      sortingEnabled: false,
       width: 150,
     },
     {

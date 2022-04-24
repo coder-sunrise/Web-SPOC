@@ -1429,16 +1429,24 @@ export const ReportsOnCompletePayment = [
   { code: ReportsOnCompletePaymentOption.Receipt, description: 'Receipt' },
 ]
 const initRoomAssignment = async () => {
-  const accessRight = Authorized.check('settings.clinicsetting.roomassignment')
-  if (accessRight && accessRight.rights === 'enable') {
-    await window.g_app._store.dispatch({
-      type: 'settingRoomAssignment/query',
-      payload: {
-        pagesize: 9999,
-      },
-    })
-  }
-}
+                                         // The local identity feature overwrited
+                                         return
+                                         const accessRight = Authorized.check(
+                                           'settings.clinicsetting.roomassignment',
+                                         )
+                                         if (
+                                           accessRight &&
+                                           accessRight.rights === 'enable'
+                                         ) {
+                                           await window.g_app._store.dispatch({
+                                             type:
+                                               'settingRoomAssignment/query',
+                                             payload: {
+                                               pagesize: 9999,
+                                             },
+                                           })
+                                         }
+                                       }
 
 const scribbleTypes = [
   { type: 'history', typeFK: SCRIBBLE_NOTE_TYPE.HISTORY },

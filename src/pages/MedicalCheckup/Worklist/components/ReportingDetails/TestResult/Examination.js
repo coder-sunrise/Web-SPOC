@@ -162,7 +162,7 @@ const Examination = props => {
           <div style={{ padding: 4 }}>
             {index === 0
               ? 'Current'
-              : moment(data.visitDate).format(dateFormatLong)}
+              : moment(item.visitDate).format(dateFormatLong)}
           </div>
         ),
         width: 200,
@@ -187,17 +187,13 @@ const Examination = props => {
                     style={{ position: 'relative' }}
                     className={classes.commentContainer}
                   >
-                    <Tooltip title={showValue}>
-                      <div
-                        style={{
-                          textOverflow: 'ellipsis',
-                          overflow: 'hidden',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {showValue}
-                      </div>
-                    </Tooltip>
+                    <div
+                      style={{
+                        whiteSpace: 'pre-wrap',
+                      }}
+                    >
+                      {showValue}
+                    </div>
                     <div
                       style={{ position: 'absolute', right: '-4px', top: 0 }}
                     >

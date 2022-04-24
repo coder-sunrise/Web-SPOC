@@ -144,7 +144,7 @@ const Examinations = props => {
   }
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div style={{ height: 60 }}>
+      <div style={{ minHeight: 60 }}>
         <FilterBar search={search} {...props}></FilterBar>
       </div>
       <div style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>

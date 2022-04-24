@@ -143,7 +143,7 @@ const SpecimenCollection = ({
         render: (_dom, entity) => {
           const vt = visitTypes.find(x => x.id === entity.visitPurposeId)
           return (
-            <Tooltip title={vt?.description}>
+            <Tooltip title={vt?.name}>
               <span>{vt?.code}</span>
             </Tooltip>
           )
@@ -159,7 +159,8 @@ const SpecimenCollection = ({
         fixed: 'right',
         width: 95,
         render: (_dom, entity) => {
-          return Authorized.check('lab.collectspecimen').rights === 'enable' ? (
+          return Authorized.check('lab.collectspecimen')?.rights ===
+            'enable' ? (
             <Button
               onClick={() => {
                 setVisitId(entity.id)
@@ -408,7 +409,7 @@ const SpecimenCollection = ({
 
       <CollectSpecimen
         enableReceiveSpecimen={
-          Authorized.check('lab.receivespecimen').rights === 'enable'
+          Authorized.check('lab.receivespecimen')?.rights === 'enable'
         }
         mode='new'
         open={visitId != undefined && visitId != null}

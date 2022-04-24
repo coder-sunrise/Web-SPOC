@@ -3,6 +3,7 @@ import React, { PureComponent, useState } from 'react'
 import { FastField, Field } from 'formik'
 import _ from 'lodash'
 import $ from 'jquery'
+import { Alert } from 'antd'
 // umi
 import { formatMessage, FormattedMessage } from 'umi'
 // common components
@@ -21,6 +22,9 @@ class BasicExaminations extends PureComponent {
   constructor(props) {
     super(props)
     this.myRef = React.createRef()
+    this.state = {
+      showWarningMessage: false,
+    }
   }
   state = {
     expandedGeneral: false,
@@ -62,6 +66,8 @@ class BasicExaminations extends PureComponent {
       patientInfo,
       calculateStandardWeight,
       calculateBodyFatMass,
+      classes,
+      isFromConsultation,
     } = this.props
     const setFieldValue = arrayHelpers
       ? arrayHelpers.form.setFieldValue
@@ -165,7 +171,13 @@ class BasicExaminations extends PureComponent {
                 )}
               />
             </GridItem>
-            <GridItem xs={12} sm={4} md={3}>
+            <GridItem
+              xs={12}
+              sm={4}
+              md={3}
+              container
+              style={{ position: 'relative' }}
+            >
               <Field
                 name={`${fieldName}[0].weightKG`}
                 render={args => (
@@ -185,10 +197,25 @@ class BasicExaminations extends PureComponent {
                         calculateBodyFatMass()
                       }, 1)
                       weightOnChange()
+                      if (isFromConsultation) {
+                        this.setState({ showWarningMessage: true })
+                        setTimeout(() => {
+                          this.setState({ showWarningMessage: false })
+                        }, 3000)
+                      }
                     }}
                   />
                 )}
               />
+              <div style={{ position: 'absolute', top: 42, zIndex: 1 }}>
+                {this.state.showWarningMessage && (
+                  <Alert
+                    message={`Weight changes will only take effect on new medication's instruction setting.`}
+                    banner
+                    className={classes.alertStyle}
+                  />
+                )}
+              </div>
             </GridItem>
             <GridItem xs={12} sm={4} md={3}>
               <Field
@@ -489,6 +516,7 @@ class BasicExaminations extends PureComponent {
         <Accordion
           mode='multiple'
           collapses={this.getBasicExaminations()}
+          activedKeys={[0, 1]}
           onChange={(event, p, expanded) => {
             if (p.key === 0 && expanded && !this.state.expandedGeneral) {
               this.setState({ expandedGeneral: true })

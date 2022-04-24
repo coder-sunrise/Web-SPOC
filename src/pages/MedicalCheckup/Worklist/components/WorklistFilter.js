@@ -84,6 +84,12 @@ export const WorklistFilter = () => {
     } = form.getFieldsValue(true)
 
     dispatch({
+      type: 'medicalCheckupWorklist/updateState',
+      payload: {
+        list: [],
+      },
+    })
+    dispatch({
       type: 'medicalCheckupWorklist/query',
       payload: {
         apiCriteria: {
@@ -102,8 +108,8 @@ export const WorklistFilter = () => {
             : undefined,
         },
       },
-    }).then(val => {
-      if (val) {
+    }).then(response => {
+      if (response) {
         setRefreshDate(moment())
       }
     })
@@ -155,8 +161,13 @@ export const WorklistFilter = () => {
           </Form.Item>
 
           {clinicRoleFK === 1 && (
-            <Form.Item name='isMyPatient' initialValue={false}>
-              <Checkbox simple label='My Patient' style={{ marginTop: 25 }} />
+            <Form.Item name='isMyPatient' initialValue={true}>
+              <Checkbox
+                simple
+                label='My Patient'
+                style={{ marginTop: 25 }}
+                defaultChecked={true}
+              />
             </Form.Item>
           )}
 

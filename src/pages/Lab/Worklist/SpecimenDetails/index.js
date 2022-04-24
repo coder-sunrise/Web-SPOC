@@ -50,14 +50,14 @@ const ActionButtons = ({ specimenStatusFK, onStart, onRetest, onVerify }) => {
   return (
     <React.Fragment>
       {specimenStatusFK === LAB_SPECIMEN_STATUS.NEW &&
-        Authorized.check('lab.starttest').rights === 'enable' && (
+        Authorized.check('lab.starttest')?.rights === 'enable' && (
           <ProgressButton color='success' onClick={onStart}>
             Start
           </ProgressButton>
         )}
       {(specimenStatusFK === LAB_SPECIMEN_STATUS.PENDINGFIRSTVERIFIER ||
         specimenStatusFK === LAB_SPECIMEN_STATUS.PENDINGSECONDVERIFIER) &&
-        Authorized.check('lab.retest').rights === 'enable' && (
+        Authorized.check('lab.retest')?.rights === 'enable' && (
           <ProgressButton color='warning' onClick={onRetest}>
             Retest
           </ProgressButton>
@@ -66,7 +66,7 @@ const ActionButtons = ({ specimenStatusFK, onStart, onRetest, onVerify }) => {
         specimenStatusFK === LAB_SPECIMEN_STATUS.FORRETEST ||
         specimenStatusFK === LAB_SPECIMEN_STATUS.PENDINGFIRSTVERIFIER ||
         specimenStatusFK === LAB_SPECIMEN_STATUS.PENDINGSECONDVERIFIER) &&
-        Authorized.check('lab.verifytest').rights === 'enable' && (
+        Authorized.check('lab.verifytest')?.rights === 'enable' && (
           <ProgressButton color='success' onClick={onVerify}>
             Verify
           </ProgressButton>
@@ -224,48 +224,19 @@ export const SpecimenDetails = ({
       ) {
         const values = await form.validateFields()
 
-        if (
-          values.labWorkitemResults.filter(
-            x =>
-              x.finalResult === null ||
-              x.finalResult === undefined ||
-              x.finalResult === '',
-          ).length > 0
-        ) {
-          dispatch({
-            type: 'global/updateAppState',
-            payload: {
-              openConfirm: true,
-              openConfirmContent:
-                'Some final result fields are empty. \r\n Confirm to proceed?',
-              onConfirmSave: () => {
-                saveVerify()
-              },
-            },
-          })
-
-          return
-        }
-
-        saveVerify()
+        dispatch({
+          type: 'worklistSpecimenDetails/verifyLabTest',
+          payload: { ...entity, ...values },
+        }).then(result => {
+          if (result) {
+            setShowModal(false)
+            onConfirm && onConfirm()
+          }
+        })
       }
     } catch (errInfo) {
       console.log('Save failed:', errInfo)
     }
-  }
-
-  const saveVerify = async () => {
-    const values = await form.validateFields()
-
-    dispatch({
-      type: 'worklistSpecimenDetails/verifyLabTest',
-      payload: { ...entity, ...values },
-    }).then(result => {
-      if (result) {
-        setShowModal(false)
-        onConfirm && onConfirm()
-      }
-    })
   }
 
   const handleSave = async () => {
@@ -387,7 +358,7 @@ export const SpecimenDetails = ({
           onConfirm:
             entity.specimenStatusFK !== LAB_SPECIMEN_STATUS.COMPLETED &&
             entity.specimenStatusFK !== LAB_SPECIMEN_STATUS.NEW &&
-            Authorized.check('lab.savedetails').rights === 'enable' &&
+            Authorized.check('lab.savedetails')?.rights === 'enable' &&
             !isReadonly
               ? () => {
                   handleSave()

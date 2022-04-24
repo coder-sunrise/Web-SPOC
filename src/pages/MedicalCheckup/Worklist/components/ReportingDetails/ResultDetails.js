@@ -75,7 +75,12 @@ const ResultDetails = props => {
                         >
                           Internal Remarks:{' '}
                         </div>
-                        <div style={{ display: 'inline-block' }}>
+                        <div
+                          style={{
+                            display: 'inline-block',
+                            whiteSpace: 'pre-wrap',
+                          }}
+                        >
                           {item.internalRemarks}
                         </div>
                       </div>
@@ -87,7 +92,12 @@ const ResultDetails = props => {
                         >
                           Report Remarks:
                         </div>
-                        <span style={{ display: 'inline-block' }}>
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            whiteSpace: 'pre-wrap',
+                          }}
+                        >
                           {item.reportRemarks}
                         </span>
                       </div>

@@ -15,9 +15,30 @@ import {
 import { INVOICE_ITEM_TYPE } from '@/utils/constants'
 
 const VisitOrderTemplateRevert = props => {
-  const { footer, data, confirmRevert, ...restProps } = props
+  const { footer, data, confirmRevert, dispatch, ...restProps } = props
   const [enableConfirm, setEnableConfirm] = useState(true)
   const [selectedRows, setSelectedRows] = useState([])
+
+  const codeTableNameArray = [
+    'inventorymedication',
+    'ctservice',
+    'inventoryconsumable',
+    'ctMedicationUnitOfMeasurement',
+    'ctMedicationFrequency',
+    'ctgender',
+    'inventoryvaccination',
+    'ctvaccinationusage',
+    'ctmedicationdosage',
+    'ctvaccinationunitofmeasurement',
+    'ctmedicationusage',
+    'ctmedicationprecaution',
+  ]
+  dispatch({
+    type: 'codetable/batchFetch',
+    payload: {
+      codes: codeTableNameArray,
+    },
+  })
 
   const columns = [
     {

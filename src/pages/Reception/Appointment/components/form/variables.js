@@ -204,16 +204,19 @@ export const commonExt = (appointmentTypes, handleCopyAppointmentClick) => {
           </div>
         )
       },
+      width: 140,
     },
     {
       columnName: 'appointmentDate',
       format: dateFormatLong,
       type: 'date',
+      width: 100,
     },
     {
       columnName: 'startTime',
       type: 'time',
       sortingEnabled: false,
+      width: 80,
     },
     {
       columnName: 'calendarResourceFK',
@@ -224,6 +227,7 @@ export const commonExt = (appointmentTypes, handleCopyAppointmentClick) => {
     },
     {
       columnName: 'cancellationReason',
+      sortingEnabled: false,
       render: row => {
         const { cancellationReason = '', rescheduleReason = '' } = row
         let reasons = []
@@ -236,6 +240,7 @@ export const commonExt = (appointmentTypes, handleCopyAppointmentClick) => {
           </Tooltip>
         )
       },
+      width: 150,
     },
     {
       columnName: 'appointmentTypeFK',
@@ -253,6 +258,7 @@ export const commonExt = (appointmentTypes, handleCopyAppointmentClick) => {
           />
         )
       },
+      width: 120,
     },
     {
       columnName: 'updateByUser',
@@ -353,6 +359,10 @@ export const futureApptTableParams = appointmentTypes => {
       { name: 'calendarResourceFK', title: 'Resource' },
       { name: 'appointmentTypeFK', title: 'Appt Type' },
       { name: 'appointmentStatus', title: 'Status' },
+      {
+        name: 'rescheduleReason',
+        title: 'Reason',
+      },
       { name: 'appointmentRemarks', title: 'Remarks' },
       { name: 'updateByUser', title: 'Update By' },
       { name: 'updateDate', title: 'Update On' },

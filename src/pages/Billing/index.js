@@ -368,7 +368,11 @@ class Billing extends Component {
           values: { id, visitGroup, visitGroupStatusDetails = [] },
           location: { pathname },
         } = this.props
-        if (visitID != id && isBillingSaved !== undefined && pathname == "/reception/queue/billing") {
+        if (
+          visitID != id &&
+          isBillingSaved !== undefined &&
+          pathname == '/reception/queue/billing'
+        ) {
           if (visitGroupStatusDetails.some(x => x.visitFK === visitID)) {
             dispatch({
               type: 'groupInvoice/fetchVisitGroupStatusDetails',
@@ -378,8 +382,7 @@ class Billing extends Component {
                 _.sumBy(r, 'outstandingBalance') > 0 &&
                 !r.some(x => !x.isBillingSaved)
               )
-              if(disabledPayment != (this.state.disabledPayment??false))
-              {
+              if (disabledPayment != (this.state.disabledPayment ?? false)) {
                 notification.destroy()
                 notification.error({
                   duration: 999,
@@ -535,6 +538,7 @@ class Billing extends Component {
                 Copies: 1,
                 ReportParam: `${JSON.stringify({
                   InvoicePaymentId: payment.id,
+                  printType: INVOICE_REPORT_TYPES.PAYMENT_RECEIPT,
                 })}`,
               })),
             )
@@ -569,7 +573,11 @@ class Billing extends Component {
     }
   }
 
-  upsertBilling = async (callback = null, noValidation = false) => {
+  upsertBilling = async (
+    callback = null,
+    noValidation = false,
+    backtoQueue = false,
+  ) => {
     const { dispatch, values, resetForm, patient } = this.props
     const {
       visitStatus,
@@ -583,17 +591,23 @@ class Billing extends Component {
       if (isSchemesValid) {
         const payload = constructPayload(values)
         const defaultCallback = async () => {
+          notification.success({
+            message: 'Billing Saved',
+          })
           if (visitStatus === VISIT_STATUS.COMPLETED) {
             notification.success({
-              message: 'Billing Completed',
+              message: backtoQueue ? 'Billing Completed' : 'Billing Saved',
             })
+            if (!backtoQueue) {
+              this.setState(preState => ({
+                submitCount: preState.submitCount + 1,
+              }))
+            }
             await this.printAfterComplete(autoPrintReportsOnCompletePayment)
-
-            history.push('/reception/queue')
+            if (backtoQueue) {
+              history.push('/reception/queue')
+            }
           } else {
-            notification.success({
-              message: 'Billing Saved',
-            })
             dispatch({
               type: 'patient/query',
               payload: { id: patient.id },
@@ -642,11 +656,13 @@ class Billing extends Component {
       case INVOICE_REPORT_TYPES.CLAIMABLEITEMINVOICE:
         return 'Claimable Item Invoice'
       case INVOICE_REPORT_TYPES.INDIVIDUALINVOICE:
-        return 'Invocie'
+        return 'Invoice'
       case INVOICE_REPORT_TYPES.ITEMCATEGORYINVOICE:
         return 'Item Category Invoice'
       case INVOICE_REPORT_TYPES.SUMMARYINVOICE:
         return 'Summary Invoice'
+      case INVOICE_REPORT_TYPES.PAYMENT_RECEIPT:
+        return 'Payment Receipt'
     }
     return 'Invoice'
   }
@@ -670,7 +686,9 @@ class Billing extends Component {
     const { values, setFieldValue } = this.props
 
     const totalPaid = invoicePayment.reduce((totalAmtPaid, payment) => {
-      if (!payment.isCancelled && payment.id) return totalAmtPaid + payment.totalAmtPaid
+      // || !payment.id is in order to include current payment
+      if ((!payment.isCancelled && payment.id) || !payment.id)
+        return totalAmtPaid + payment.totalAmtPaid
       return totalAmtPaid
     }, 0)
     const newOutstandingBalance = roundTo(values.finalPayable - totalPaid)
@@ -777,7 +795,7 @@ class Billing extends Component {
         },
       })
     }
-    return this.upsertBilling()
+    return this.upsertBilling(null, null, true)
   }
 
   onCompletePaymentClick = async () => {
@@ -791,7 +809,11 @@ class Billing extends Component {
       type: 'report/updateState',
       payload: {
         reportTypeID: 29,
-        reportParameters: { isSaved: true, invoicePaymentID },
+        reportParameters: {
+          isSaved: true,
+          invoicePaymentID,
+          printType: INVOICE_REPORT_TYPES.PAYMENT_RECEIPT,
+        },
       },
     })
   }
@@ -806,7 +828,10 @@ class Billing extends Component {
   ) => {
     switch (type) {
       case 'Payment':
-        this.onShowReport(29, { InvoicePaymentId: itemID })
+        this.onShowReport(29, {
+          InvoicePaymentId: itemID,
+          printType: INVOICE_REPORT_TYPES.PAYMENT_RECEIPT,
+        })
         break
       case 'TaxInvoice':
         this.onPrintInvoice(copayerID, invoicePayerid, index, invoiceReportType)
@@ -1075,12 +1100,13 @@ class Billing extends Component {
     this.props.dispatch({ type: 'global/incrementCommitCount' })
   }
 
-  onShowReport = (reportID, reportParameters) => {
+  onShowReport = (reportID, reportParameters, printType) => {
     this.setState({
       showReport: true,
       reportPayload: {
         reportID,
         reportParameters,
+        printType,
       },
     })
   }

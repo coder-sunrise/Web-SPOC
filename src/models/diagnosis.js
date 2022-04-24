@@ -35,73 +35,81 @@ export default createFormViewModel({
           type: payload.type,
         })
 
-        if (r === 204) return true
+        if (r === 204) {
+          window.g_app._store.dispatch({
+            type: 'codetable/refreshCodes',
+            payload: {
+              code: 'userpreference',
+              force: true,
+            },
+          })
+          return true
+        }
 
         return false
       },
-      *getUserPreference({ payload }, { call, put }) {
-        const r = yield call(getUserPreference, payload.type)
-        const { status, data } = r
-        if (status === '200') {
-          if (data) {
-            const parsedFavouriteDiagnosisSetting = JSON.parse(data)
-            let favouriteDiagnosis
-            let favouriteDiagnosisCategory
-            let favouriteDiagnosisLanguage
-            let resultFavouriteDiagnosis = {
-              favouriteDiagnosisLanguage: 'EN',
-            }
-            if (
-              payload.type === USER_PREFERENCE_TYPE['FAVOURITEDIAGNOSISSETTING']
-            ) {
-              favouriteDiagnosis = parsedFavouriteDiagnosisSetting.find(
-                o => o.Identifier === 'FavouriteDiagnosis',
-              )
-              parsedFavouriteDiagnosisSetting.find(
-                o => o.Identifier === 'FavouriteDiagnosisCategory',
-              )
+      *getUserPreference({ payload }, { call, put, select }) {
+        const codetable = yield select(st => st.codetable)
+        const { userpreference = [] } = codetable
+        const diagnosisPreference = userpreference.find(
+          p => p.type == payload.type,
+        )
+        if (!diagnosisPreference) return
+        const parsedFavouriteDiagnosisSetting = JSON.parse(
+          diagnosisPreference.userPreferenceDetails,
+        )
+        let favouriteDiagnosis
+        let favouriteDiagnosisCategory
+        let favouriteDiagnosisLanguage
+        let resultFavouriteDiagnosis = {
+          favouriteDiagnosisLanguage: 'EN',
+        }
+        console.log(payload)
+        if (payload.type === USER_PREFERENCE_TYPE.FAVOURITEDIAGNOSISSETTING) {
+          favouriteDiagnosis = parsedFavouriteDiagnosisSetting.find(
+            o => o.Identifier === 'FavouriteDiagnosis',
+          )
+          parsedFavouriteDiagnosisSetting.find(
+            o => o.Identifier === 'FavouriteDiagnosisCategory',
+          )
 
-              resultFavouriteDiagnosis = {
-                favouriteDiagnosis: favouriteDiagnosis
-                  ? favouriteDiagnosis.value
-                  : [],
-                favouriteDiagnosisCategory: favouriteDiagnosisCategory
-                  ? favouriteDiagnosisCategory.value
-                  : [],
-              }
-            } else if (
-              payload.type ===
-              USER_PREFERENCE_TYPE['FAVOURITEICD10DIAGNOSISSETTING']
-            ) {
-              favouriteDiagnosis = parsedFavouriteDiagnosisSetting.find(
-                o => o.Identifier === 'FavouriteICD10Diagnosis',
-              )
-              resultFavouriteDiagnosis = {
-                favouriteDiagnosis: favouriteDiagnosis
-                  ? favouriteDiagnosis.value
-                  : [],
-              }
-            } else if (
-              payload.type ===
-              USER_PREFERENCE_TYPE['FAVOURITEDIAGNOSISLANGUAGESETTING']
-            ) {
-              favouriteDiagnosisLanguage = parsedFavouriteDiagnosisSetting.find(
-                o => o.Identifier === 'FavouriteDiagnosisLanguage',
-              )
-              resultFavouriteDiagnosis = {
-                favouriteDiagnosisLanguage: favouriteDiagnosisLanguage
-                  ? favouriteDiagnosisLanguage.value
-                  : 'EN',
-              }
-            }
-            yield put({
-              type: 'updateState',
-              payload: resultFavouriteDiagnosis,
-            })
-            return resultFavouriteDiagnosis
+          resultFavouriteDiagnosis = {
+            favouriteDiagnosis: favouriteDiagnosis
+              ? favouriteDiagnosis.value
+              : [],
+            favouriteDiagnosisCategory: favouriteDiagnosisCategory
+              ? favouriteDiagnosisCategory.value
+              : [],
+          }
+        } else if (
+          payload.type === USER_PREFERENCE_TYPE.FAVOURITEICD10DIAGNOSISSETTING
+        ) {
+          favouriteDiagnosis = parsedFavouriteDiagnosisSetting.find(
+            o => o.Identifier === 'FavouriteICD10Diagnosis',
+          )
+          resultFavouriteDiagnosis = {
+            favouriteDiagnosis: favouriteDiagnosis
+              ? favouriteDiagnosis.value
+              : [],
+          }
+        } else if (
+          payload.type ===
+          USER_PREFERENCE_TYPE.FAVOURITEDIAGNOSISLANGUAGESETTING
+        ) {
+          favouriteDiagnosisLanguage = parsedFavouriteDiagnosisSetting.find(
+            o => o.Identifier === 'FavouriteDiagnosisLanguage',
+          )
+          resultFavouriteDiagnosis = {
+            favouriteDiagnosisLanguage: favouriteDiagnosisLanguage
+              ? favouriteDiagnosisLanguage.value
+              : 'EN',
           }
         }
-        return null
+        yield put({
+          type: 'updateState',
+          payload: resultFavouriteDiagnosis,
+        })
+        return resultFavouriteDiagnosis
       },
     },
     reducers: {},

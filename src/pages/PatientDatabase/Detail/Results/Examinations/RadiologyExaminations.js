@@ -47,13 +47,16 @@ const RadiologyExaminations = props => {
                   className='radiologyDescription'
                 >
                   <Descriptions.Item
-                    label='Techonologist:'
+                    label='Technologist:'
                     labelStyle={{ width: 190 }}
                     span={3}
                   >
                     {radiology.technologist ?? '-'}
                   </Descriptions.Item>
-                  <Descriptions.Item label='Accession No.'>
+                  <Descriptions.Item
+                    label='Accession No.'
+                    contentStyle={{ width: 200 }}
+                  >
                     {radiology.accesionNo ?? '-'}
                   </Descriptions.Item>
                   <Descriptions.Item
@@ -80,7 +83,9 @@ const RadiologyExaminations = props => {
                     {radiology.doctorRemarks ?? '-'}
                   </Descriptions.Item>
                   <Descriptions.Item label='Technologist Comment:' span={3}>
-                    {radiology.radiographerComment ?? '-'}
+                    <span style={{ whiteSpace: 'pre-wrap' }}>
+                      {radiology.radiographerComment ?? '-'}
+                    </span>
                   </Descriptions.Item>
                   <Descriptions.Item label='Findings:' span={3}>
                     {ReactHtmlParser(radiology.findings ?? '-')}

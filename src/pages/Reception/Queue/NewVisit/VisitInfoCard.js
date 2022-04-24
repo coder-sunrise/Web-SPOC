@@ -125,7 +125,7 @@ const VisitInfoCard = ({
     const qNo = parseFloat(value).toFixed(
       clinicSettings.settings.isQueueNoDecimal ? 1 : 0,
     )
-    if (existingQNo.includes(qNo))
+    if (!fromMedicalCheckupReporting && existingQNo.includes(qNo))
       return 'Queue No. already existed in current queue list'
     return ''
   }
@@ -187,6 +187,9 @@ const VisitInfoCard = ({
       i => i.id === values.visitOrderTemplateFK,
     )
     setFieldValue(FormField['visit.visitType'], v)
+    if (v !== 1) {
+      setFieldValue(FormField['visit.consReady'], false)
+    }
     updateMedicalCheckup(v, values.isForInvoiceReplacement)
     setFieldValue('visitBasicExaminations[0].visitPurposeFK', v)
 
@@ -522,7 +525,7 @@ const VisitInfoCard = ({
               handleSelectCannedText={cannedText => {
                 const remarks = values.visitRemarks
                 const newRemaks = `${
-                  remarks ? remarks + ' ' : ''
+                  remarks ? remarks + '\n' : ''
                 }${cannedText.text || ''}`.substring(0, 2000)
                 setFieldValue(FormField['visit.visitRemarks'], newRemaks)
               }}

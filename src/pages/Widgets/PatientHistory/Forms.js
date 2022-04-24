@@ -2,40 +2,20 @@ import React, { useState } from 'react'
 import { Table } from 'antd'
 import moment from 'moment'
 // common components
-import { notification, Checkbox } from '@/components'
+import { notification, Checkbox, DocumentEditor } from '@/components'
 import { formTypes, formStatus } from '@/utils/codes'
 import tablestyles from './PatientHistoryStyle.less'
 
-export const viewReport = (row) => {
-  const type = formTypes.find((o) => parseInt(o.value, 10) === row.type)
-  const { downloadConfig } = type
-  if (!downloadConfig) {
-    notification.error({ message: 'No configuration found' })
-    return false
-  }
-  if (row.id) {
-    window.g_app._store.dispatch({
-      type: 'report/updateState',
-      payload: {
-        reportTypeID: downloadConfig.id,
-        reportParameters: {
-          [downloadConfig.key]: row.id,
-          FormCategory: 'CORForm',
-          isSaved: true,
-        },
-      },
-    })
-  }
-
-  return true
+const printRow = row => {
+  DocumentEditor.print({
+    documentName: row.formName,
+    document: row.formData,
+  })
 }
 
 export default ({ current }) => {
   const { forms = [] } = current
-  const [
-    includeVoidForms,
-    setIncludeVoidForms,
-  ] = useState(false)
+  const [includeVoidForms, setIncludeVoidForms] = useState(false)
   return (
     <div>
       <Checkbox
@@ -51,13 +31,13 @@ export default ({ current }) => {
         pagination={false}
         columns={[
           {
-            dataIndex: 'typeName',
-            title: 'Type',
+            dataIndex: 'formName',
+            title: 'Form',
             width: 200,
             render: (text, row) => (
               <a
                 onClick={() => {
-                  viewReport(row)
+                  printRow(row)
                 }}
               >
                 {text}
@@ -77,13 +57,13 @@ export default ({ current }) => {
             title: 'Status',
             width: 200,
             render: (text, row) => {
-              const status = formStatus.find((o) => o.value === row.statusFK)
+              const status = formStatus.find(o => o.value === row.statusFK)
               return <span>{status ? status.name : ''}</span>
             },
           },
         ]}
         dataSource={
-          includeVoidForms ? forms : forms.filter((o) => o.statusFK !== 4)
+          includeVoidForms ? forms : forms.filter(o => o.statusFK !== 4)
         }
         rowClassName={(record, index) => {
           return index % 2 === 0 ? tablestyles.once : tablestyles.two

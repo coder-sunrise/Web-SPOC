@@ -59,7 +59,7 @@ const AppNotificationPopover = ({
     var notification = {
       ...row,
       isAcknowledged: true,
-      acknowledgeDate: moment().formatUTC(false),
+      // acknowledgeDate: moment().formatUTC(false),
     }
     dispatch({
       type: 'appNotification/upsert',
@@ -149,8 +149,8 @@ const AppNotificationPopover = ({
               />
             ))}
           </div>
-          <div style={{ marginTop: 8 }}>
-            {newNotification && (
+          {newNotification && (
+            <div style={{ marginTop: 8 }}>
               <AppNotificationContent
                 key={0}
                 dispatch={dispatch}
@@ -158,8 +158,11 @@ const AppNotificationPopover = ({
                 currentUserFK={user.data.id}
                 {...actions}
               />
-            )}
-          </div>
+            </div>
+          )}
+          {notifications.length === 0 && !newNotification && (
+            <div style={{ marginTop: 8 }}>No Message</div>
+          )}
           {exactControl ? exactControl() : ''}
         </div>
       }

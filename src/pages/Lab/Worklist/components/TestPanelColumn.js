@@ -4,7 +4,6 @@ import { PRIORITY_VALUES } from '@/utils/constants'
 import { Tooltip } from '@/components'
 
 export const TestPanelColumn = ({ testPanels, columnWidth }) => {
-  console.log('TestPanelColumn', testPanels)
   const testPanelHtml = [...testPanels]
     //Sort by Priority then by the sort order
     .sort((a, b) =>

@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { connect } from 'dva'
-import { Typography, Alert, Select } from 'antd'
+import { Typography, Alert, Select, Table as AntdTable } from 'antd'
 import { compose } from 'redux'
 import _ from 'lodash'
 import numeral from 'numeral'
@@ -30,6 +30,7 @@ import {
   TextField,
   DatePicker,
   CommonTableGrid,
+  CodeSelect,
 } from '@/components'
 import { FileCopySharp } from '@material-ui/icons'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
@@ -47,6 +48,7 @@ import { PharmacySteps, JournalHistory } from '../../Components'
 import RedispenseForm from '../../Components/RedispenseForm'
 import DrugLeafletSelection from '../../Components/DrugLeafletSelection'
 import DrugLabelSelection from '@/pages/Dispense/DispenseDetails/DrugLabelSelection'
+import customtyles from '@/pages/Dispense/DispenseDetails/Style.less'
 
 const styles = theme => ({
   wrapCellTextStyle: {
@@ -184,7 +186,6 @@ const Main = props => {
     })
   }, [values.id])
 
-  const { inventorymedication = [] } = codetable
   const {
     primaryPrintoutLanguage = 'EN',
     secondaryPrintoutLanguage = '',
@@ -423,13 +424,11 @@ const Main = props => {
 
   const getDrugInteraction = row => {
     if (row.invoiceItemTypeFK !== 1) return ''
-    var medication =
-      inventorymedication.find(m => m.id === row.inventoryFK) || {}
-    const { inventoryMedication_MedicationInteraction = [] } = medication
-    if (!inventoryMedication_MedicationInteraction.length) return '-'
+    const { medicationInteraction = [] } = row
+    if (!medicationInteraction.length) return '-'
     return (
       <div>
-        {inventoryMedication_MedicationInteraction.map(item => {
+        {medicationInteraction.map(item => {
           return (
             <p>
               {getTranslationValue(
@@ -446,13 +445,11 @@ const Main = props => {
 
   const getDrugContraIndication = row => {
     if (row.invoiceItemTypeFK !== 1) return ''
-    var medication =
-      inventorymedication.find(m => m.id === row.inventoryFK) || {}
-    const { inventoryMedication_MedicationContraIndication = [] } = medication
-    if (!inventoryMedication_MedicationContraIndication.length) return '-'
+    const { medicationContraIndication = [] } = row
+    if (!medicationContraIndication.length) return '-'
     return (
       <div>
-        {inventoryMedication_MedicationContraIndication.map(item => {
+        {medicationContraIndication.map(item => {
           return (
             <p>
               {getTranslationValue(
@@ -847,14 +844,92 @@ const Main = props => {
     return accessRight.rights === 'enable'
   }
 
-  const columnExtensions = (type = 'PendingItems') => {
-    return [
+  const getBatchOptions = row => {
+    let stockList = []
+    if (row.invoiceItemTypeFK === 1) {
+      stockList = (row.medicationStock || []).filter(
+        s =>
+          s.isDefault ||
+          (s.stock > 0 &&
+            (!s.expiryDate ||
+              moment(s.expiryDate).startOf('day') >= moment().startOf('day'))),
+      )
+    } else {
+      stockList = (row.consumableStock || []).filter(
+        s =>
+          s.isDefault ||
+          (s.stock > 0 &&
+            (!s.expiryDate ||
+              moment(s.expiryDate).startOf('day') >= moment().startOf('day'))),
+      )
+    }
+    stockList = _.orderBy(stockList, ['expiryDate'], ['asc'])
+    if (row.stockFK) {
+      const selectStock = stockList.find(sl => sl.id === row.stockFK)
+      if (!selectStock) {
+        return [
+          {
+            id: row.stockFK,
+            batchNo: row.batchNo,
+            expiryDate: row.expiryDate,
+            isDefault: row.isDefault,
+          },
+          ...stockList,
+        ]
+      } else {
+        return [
+          { ...selectStock },
+          ...stockList.filter(sl => sl.id !== row.stockFK),
+        ]
+      }
+    }
+    return stockList
+  }
+  const getColumns = (type = 'PendingItems', onValueChange) => {
+    const isHiddenStock =
+      (pharmacyDetails.fromModule === 'Main' &&
+        workitem.statusFK !== PHARMACY_STATUS.NEW) ||
+      type === 'CompletedItems'
+    let columns = [
       {
-        columnName: 'invoiceItemTypeFK',
-        width: 110,
-        sortingEnabled: false,
-        disabled: true,
-        render: row => {
+        dataIndex: 'invoiceItemTypeFK',
+        key: 'invoiceItemTypeFK',
+        title: 'Type',
+        width: 120,
+        onCell: row => {
+          const mergeCell = isHiddenStock ? 13 : 14
+          if (row.isGroup)
+            return {
+              colSpan: mergeCell,
+              style: { backgroundColor: 'rgb(240, 248, 255)' },
+            }
+          return {
+            rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,
+          }
+        },
+        render: (_, row) => {
+          if (row.isGroup) {
+            if (row.groupName === 'NormalDispense')
+              return (
+                <div style={{ padding: '3px 0px' }}>
+                  <span style={{ fontWeight: 600 }}>Normal Dispense Items</span>
+                </div>
+              )
+            if (row.groupName === 'NoNeedToDispense')
+              return (
+                <div style={{ padding: '3px 0px' }}>
+                  <span style={{ fontWeight: 600 }}>
+                    No Need To Dispense Items
+                  </span>
+                </div>
+              )
+            return (
+              <div style={{ padding: '3px 0px' }}>
+                <span style={{ fontWeight: 600 }}>{'Drug Mixture: '}</span>
+                {row.groupName}
+              </div>
+            )
+          }
           const type = getType(row)
           return (
             <Tooltip title={type}>
@@ -864,27 +939,32 @@ const Main = props => {
         },
       },
       {
-        columnName: 'itemCode',
+        dataIndex: 'itemCode',
+        key: 'itemCode',
+        title: 'Code',
         width: 100,
-        sortingEnabled: false,
-        disabled: true,
+        onCell: row => ({
+          colSpan: row.isGroup ? 0 : 1,
+          rowSpan: row.countNumber === 1 ? row.rowspan : 0,
+        }),
       },
       {
-        columnName: 'itemName',
+        dataIndex: 'itemName',
+        key: 'itemName',
+        title: 'Name',
         width: 200,
-        sortingEnabled: false,
-        disabled: true,
-        render: row => {
+        onCell: row => ({
+          colSpan: row.isGroup ? 0 : 1,
+          rowSpan: row.countNumber === 1 ? row.rowspan : 0,
+        }),
+        render: (_, row) => {
           let paddingRight = 0
           if (row.isExclusive) {
             paddingRight = 24
           }
           return (
             <div style={{ position: 'relative' }}>
-              <div
-                className={classes.wrapCellTextStyle}
-                style={{ paddingRight: paddingRight }}
-              >
+              <div style={{ paddingRight: paddingRight }}>
                 <Tooltip title={row.itemName}>
                   <span>{row.itemName}</span>
                 </Tooltip>
@@ -912,11 +992,15 @@ const Main = props => {
         },
       },
       {
-        columnName: 'dispenseUOM',
+        dataIndex: 'dispenseUOM',
+        key: 'dispenseUOM',
+        title: 'UOM',
         width: 80,
-        sortingEnabled: false,
-        disabled: true,
-        render: row => {
+        onCell: row => ({
+          colSpan: row.isGroup ? 0 : 1,
+          rowSpan: row.countNumber === 1 ? row.rowspan : 0,
+        }),
+        render: (_, row) => {
           const uom = getUOM(row)
           return (
             <Tooltip title={uom}>
@@ -926,11 +1010,22 @@ const Main = props => {
         },
       },
       {
-        columnName: 'quantity',
+        dataIndex: 'quantity',
+        key: 'quantity',
+        name: 'quantity',
+        title: (
+          <div>
+            <p style={{ height: 16 }}>Ordered</p>
+            <p style={{ height: 16 }}>Qty.</p>
+          </div>
+        ),
+        onCell: row => ({
+          colSpan: row.isGroup ? 0 : 1,
+          rowSpan: row.countNumber === 1 ? row.rowspan : 0,
+        }),
+        align: 'right',
         width: 80,
-        sortingEnabled: false,
-        disabled: true,
-        render: row => {
+        render: (_, row) => {
           const qty = numeral(row.quantity).format('0.0')
           return (
             <Tooltip title={qty}>
@@ -938,23 +1033,20 @@ const Main = props => {
             </Tooltip>
           )
         },
-        align: 'right',
       },
       {
-        columnName: 'dispenseQuantity',
+        dataIndex: 'dispenseQuantity',
+        key: 'dispenseQuantity',
+        title: (
+          <div>
+            <p style={{ height: 16 }}>Dispensed</p>
+            <p style={{ height: 16 }}>Qty.</p>
+          </div>
+        ),
         width: 80,
-        sortingEnabled: false,
-        format: '0.0',
-        type: 'number',
-        isDisabled: row => {
-          return (
-            (pharmacyDetails.fromModule === 'Main' &&
-              row.statusFK !== PHARMACY_STATUS.NEW) ||
-            !row.allowToDispense ||
-            type === 'CompletedItems'
-          )
-        },
-        render: row => {
+        onCell: row => ({ colSpan: row.isGroup ? 0 : 1 }),
+        align: 'right',
+        render: (_, row) => {
           if (
             (pharmacyDetails.fromModule === 'Main' &&
               row.statusFK !== PHARMACY_STATUS.NEW) ||
@@ -987,6 +1079,9 @@ const Main = props => {
                 disabled={!row.isDispensedByPharmacy}
                 precision={1}
                 value={row.dispenseQuantity}
+                onChange={e => {
+                  onValueChange(row.uid, 'dispenseQuantity', e.target.value)
+                }}
               />
               {row.dispenseQuantity > maxQuantity && (
                 <Tooltip
@@ -1009,14 +1104,15 @@ const Main = props => {
             </div>
           )
         },
-        align: 'right',
       },
       {
-        columnName: 'stock',
+        dataIndex: 'stock',
+        key: 'stock',
+        title: 'Stock Qty.',
         width: 100,
-        sortingEnabled: false,
-        disabled: true,
-        render: row => {
+        onCell: row => ({ colSpan: row.isGroup ? 0 : 1 }),
+        align: 'right',
+        render: (_, row) => {
           const stock = row.stock
             ? `${numeral(row.stock).format('0.0')} ${getDispenseUOM(row)}`
             : '-'
@@ -1026,14 +1122,135 @@ const Main = props => {
             </Tooltip>
           )
         },
-        align: 'right',
       },
       {
-        columnName: 'stockBalance',
-        width: 95,
-        sortingEnabled: false,
-        disabled: true,
-        render: row => {
+        dataIndex: 'stockFK',
+        key: 'stockFK',
+        title: 'Batch No.',
+        width: 130,
+        onCell: row => ({ colSpan: row.isGroup ? 0 : 1 }),
+        render: (_, row) => {
+          const isExpire =
+            ((pharmacyDetails.fromModule === 'Main' &&
+              row.statusFK === PHARMACY_STATUS.NEW) ||
+              type === 'PendingItems') &&
+            row.expiryDate &&
+            moment(row.expiryDate).startOf('day') < moment().startOf('day')
+          if (
+            (pharmacyDetails.fromModule === 'Main' &&
+              row.statusFK !== PHARMACY_STATUS.NEW) ||
+            !row.allowToDispense ||
+            type === 'CompletedItems'
+          ) {
+            return (
+              <div>
+                <Tooltip title={row.batchNo}>
+                  <div
+                    style={{
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {row.batchNo || '-'}
+                  </div>
+                </Tooltip>
+                {isExpire && <p style={{ color: 'red' }}>EXPIRED!</p>}
+              </div>
+            )
+          }
+          return (
+            <div>
+              <CodeSelect
+                value={row.stockFK}
+                labelField='batchNo'
+                valueField='id'
+                options={getBatchOptions(row)}
+                dropdownMatchSelectWidth={false}
+                dropdownStyle={{ width: '200px!important' }}
+                renderDropdown={option => {
+                  const batchtext = option.expiryDate
+                    ? `${option.batchNo}, Exp.: ${moment(
+                        option.expiryDate,
+                      ).format('DD MMM YYYY')}`
+                    : option.batchNo
+                  return (
+                    <Tooltip title={batchtext}>
+                      <div
+                        style={{
+                          display: 'inline-block',
+                          whiteSpace: 'nowrap',
+                          textOverflow: 'ellipsis',
+                          overflow: 'hidden',
+                          width: 230,
+                        }}
+                      >
+                        {batchtext}
+                      </div>
+                    </Tooltip>
+                  )
+                }}
+                onChange={(v, option) => {
+                  onValueChange(row.uid, 'stockFK', option)
+                }}
+              ></CodeSelect>
+              {isExpire && <p style={{ color: 'red' }}>EXPIRED!</p>}
+            </div>
+          )
+        },
+      },
+      {
+        dataIndex: 'expiryDate',
+        key: 'expiryDate',
+        title: 'Expiry Date',
+        width: 110,
+        onCell: row => ({ colSpan: row.isGroup ? 0 : 1 }),
+        render: (_, row) => {
+          if (
+            (pharmacyDetails.fromModule === 'Main' &&
+              row.statusFK !== PHARMACY_STATUS.NEW) ||
+            !row.isDefault ||
+            type === 'CompletedItems'
+          ) {
+            const expiryDate = row.expiryDate
+              ? moment(row.expiryDate).format('DD MMM YYYY')
+              : '-'
+            const isExpire =
+              ((pharmacyDetails.fromModule === 'Main' &&
+                row.statusFK === PHARMACY_STATUS.NEW) ||
+                type === 'PendingItems') &&
+              row.expiryDate &&
+              moment(row.expiryDate).startOf('day') < moment().startOf('day')
+            return (
+              <Tooltip title={expiryDate}>
+                <span style={{ color: isExpire ? 'red' : 'black' }}>
+                  {expiryDate}
+                </span>
+              </Tooltip>
+            )
+          } else {
+            return (
+              <DatePicker
+                value={row.expiryDate}
+                onChange={value => {
+                  onValueChange(row.uid, 'expiryDate', value)
+                }}
+              />
+            )
+          }
+        },
+      },
+      {
+        dataIndex: 'stockBalance',
+        key: 'stockBalance',
+        title: 'Balance Qty.',
+        width: 100,
+        onCell: row => ({
+          colSpan: row.isGroup ? 0 : 1,
+          rowSpan: row.countNumber === 1 ? row.rowspan : 0,
+        }),
+        align: 'right',
+        render: (_, row) => {
           const balStock = row.stockBalance
           const stock = balStock ? `${numeral(balStock).format('0.0')}` : '-'
           return (
@@ -1042,193 +1259,31 @@ const Main = props => {
             </Tooltip>
           )
         },
-        align: 'right',
       },
       {
-        columnName: 'stockFK',
-        width: 100,
-        sortingEnabled: false,
-        type: 'codeSelect',
-        labelField: 'batchNo',
-        valueField: 'id',
-        options: row => {
-          const { codetable } = props
-          const {
-            inventorymedication = [],
-            inventoryconsumable = [],
-          } = codetable
-          let stockList = []
-          if (row.invoiceItemTypeFK === 1) {
-            const medication = inventorymedication.find(
-              m => m.id === row.inventoryFK,
-            )
-            if (medication) {
-              stockList = (medication.medicationStock || []).filter(
-                s =>
-                  s.isDefault ||
-                  (s.stock > 0 &&
-                    (!s.expiryDate ||
-                      moment(s.expiryDate).startOf('day') >=
-                        moment().startOf('day'))),
-              )
-            }
-          } else {
-            const consumable = inventoryconsumable.find(
-              m => m.id === row.inventoryFK,
-            )
-            if (consumable) {
-              stockList = (consumable.consumableStock || []).filter(
-                s =>
-                  s.isDefault ||
-                  (s.stock > 0 &&
-                    (!s.expiryDate ||
-                      moment(s.expiryDate).startOf('day') >=
-                        moment().startOf('day'))),
-              )
-            }
-          }
-          stockList = _.orderBy(stockList, ['expiryDate'], ['asc'])
-          if (row.stockFK) {
-            const selectStock = stockList.find(sl => sl.id === row.stockFK)
-            if (!selectStock) {
-              return [
-                {
-                  id: row.stockFK,
-                  batchNo: row.batchNo,
-                  expiryDate: row.expiryDate,
-                  isDefault: row.isDefault,
-                },
-                ...stockList,
-              ]
-            } else {
-              return [
-                { ...selectStock },
-                ...stockList.filter(sl => sl.id !== row.stockFK),
-              ]
-            }
-          }
-          return stockList
-        },
-        dropdownMatchSelectWidth: false,
-        dropdownStyle: {
-          width: '200px!important',
-        },
-        renderDropdown: option => {
-          const batchtext = option.expiryDate
-            ? `${option.batchNo}, Exp.: ${moment(option.expiryDate).format(
-                'DD MMM YYYY',
-              )}`
-            : option.batchNo
-          return (
-            <Tooltip title={batchtext}>
-              <div
-                style={{
-                  display: 'inline-block',
-                  whiteSpace: 'nowrap',
-                  textOverflow: 'ellipsis',
-                  overflow: 'hidden',
-                  width: 230,
-                }}
-              >
-                {batchtext}
-              </div>
-            </Tooltip>
-          )
-        },
-        isDisabled: row =>
-          (pharmacyDetails.fromModule === 'Main' &&
-            row.statusFK !== PHARMACY_STATUS.NEW) ||
-          !row.allowToDispense ||
-          type === 'CompletedItems',
-        onChange: ({ option, row }) => {
-          if (option) {
-            row.stockFK = option.id
-            row.batchNo = option.batchNo
-            row.expiryDate = option.expiryDate
-            row.isDefault = option.isDefault
-            row.stock = option.stock
-          } else {
-            row.stockFK = undefined
-            row.batchNo = undefined
-            row.expiryDate = undefined
-            row.isDefault = false
-            row.stock = 0
-            row.dispenseQuantity = 0
-          }
-        },
-        render: row => {
-          const isExpire =
-            ((pharmacyDetails.fromModule === 'Main' &&
-              row.statusFK === PHARMACY_STATUS.NEW) ||
-              type === 'PendingItems') &&
-            row.expiryDate &&
-            moment(row.expiryDate).startOf('day') < moment().startOf('day')
-
-          return (
-            <div>
-              <Tooltip title={row.batchNo}>
-                <div
-                  style={{
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >
-                  {row.batchNo || '-'}
-                </div>
-              </Tooltip>
-              {isExpire && <p style={{ color: 'red' }}>EXPIRED!</p>}
-            </div>
-          )
-        },
+        dataIndex: 'instruction',
+        key: 'instruction',
+        title: `Instruction${
+          secondaryPrintoutLanguage !== '' ? `(${showLanguage})` : ''
+        }`,
+        width: 180,
+        onCell: row => ({
+          colSpan: row.isGroup ? 0 : 1,
+          rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,
+        }),
       },
       {
-        columnName: 'expiryDate',
-        width: 110,
-        sortingEnabled: false,
-        type: 'date',
-        isDisabled: row =>
-          (pharmacyDetails.fromModule === 'Main' &&
-            row.statusFK !== PHARMACY_STATUS.NEW) ||
-          !row.isDefault ||
-          type === 'CompletedItems',
-        render: row => {
-          const expiryDate = row.expiryDate
-            ? moment(row.expiryDate).format('DD MMM YYYY')
-            : '-'
-          const isExpire =
-            ((pharmacyDetails.fromModule === 'Main' &&
-              row.statusFK === PHARMACY_STATUS.NEW) ||
-              type === 'PendingItems') &&
-            row.expiryDate &&
-            moment(row.expiryDate).startOf('day') < moment().startOf('day')
-          return (
-            <Tooltip title={expiryDate}>
-              <span style={{ color: isExpire ? 'red' : 'black' }}>
-                {expiryDate}
-              </span>
-            </Tooltip>
-          )
-        },
-      },
-      {
-        columnName: 'instruction',
-        sortingEnabled: false,
-        disabled: true,
-        render: row => {
-          const instruction = getInstruction(row)
-          return (
-            <Tooltip title={instruction}>
-              <span>{instruction}</span>
-            </Tooltip>
-          )
-        },
-      },
-      {
-        columnName: 'drugInteraction',
-        sortingEnabled: false,
-        disabled: true,
-        render: row => {
+        dataIndex: 'drugInteraction',
+        key: 'drugInteraction',
+        title: `Drug Interaction${
+          secondaryPrintoutLanguage !== '' ? `(${showLanguage})` : ''
+        }`,
+        onCell: row => ({
+          colSpan: row.isGroup ? 0 : 1,
+          rowSpan: row.countNumber === 1 ? row.rowspan : 0,
+        }),
+        width: 180,
+        render: (_, row) => {
           const interaction = getDrugInteraction(row)
           return (
             <Tooltip title={interaction}>
@@ -1238,10 +1293,17 @@ const Main = props => {
         },
       },
       {
-        columnName: 'drugContraindication',
-        sortingEnabled: false,
-        disabled: true,
-        render: row => {
+        dataIndex: 'drugContraindication',
+        key: 'drugContraindication',
+        title: `Contraindication${
+          secondaryPrintoutLanguage !== '' ? `(${showLanguage})` : ''
+        }`,
+        width: 180,
+        onCell: row => ({
+          colSpan: row.isGroup ? 0 : 1,
+          rowSpan: row.countNumber === 1 ? row.rowspan : 0,
+        }),
+        render: (_, row) => {
           const contraIndication = getDrugContraIndication(row)
           return (
             <Tooltip title={contraIndication}>
@@ -1251,10 +1313,14 @@ const Main = props => {
         },
       },
       {
-        columnName: 'remarks',
-        sortingEnabled: false,
-        disabled: true,
-        render: row => {
+        dataIndex: 'remarks',
+        key: 'remarks',
+        title: 'Remarks',
+        onCell: row => ({
+          colSpan: row.isGroup ? 0 : 1,
+          rowSpan: row.countNumber === 1 ? row.rowspan : 0,
+        }),
+        render: (_, row) => {
           const existsDrugLabelRemarks =
             showDrugLabelRemark &&
             row.drugLabelRemarks &&
@@ -1302,84 +1368,11 @@ const Main = props => {
           )
         },
       },
-      {
-        columnName: 'action',
-        width: 60,
-        sortingEnabled: false,
-        render: row => {
-          return (
-            <Button justIcon color='primary'>
-              <MenuOutlined />
-            </Button>
-          )
-        },
-      },
-    ]
-  }
-
-  const getColumns = (type = 'PendingItems') => {
-    let columns = [
-      { name: 'dispenseGroupId', title: '' },
-      { name: 'invoiceItemTypeFK', title: 'Type' },
-      { name: 'itemCode', title: 'Code' },
-      { name: 'itemName', title: 'Name' },
-      { name: 'dispenseUOM', title: 'UOM' },
-      {
-        name: 'quantity',
-        title: (
-          <div>
-            <p style={{ height: 16 }}>Ordered</p>
-            <p style={{ height: 16 }}>Qty.</p>
-          </div>
-        ),
-      },
-      {
-        name: 'dispenseQuantity',
-        title: (
-          <div>
-            <p style={{ height: 16 }}>Dispensed</p>
-            <p style={{ height: 16 }}>Qty.</p>
-          </div>
-        ),
-      },
-      {
-        name: 'stock',
-        title: 'Stock Qty.',
-      },
-      { name: 'stockFK', title: 'Batch No.' },
-      { name: 'expiryDate', title: 'Expiry Date' },
-      {
-        name: 'stockBalance',
-        title: 'Balance Qty.',
-      },
-      {
-        name: 'instruction',
-        title: `Instruction${
-          secondaryPrintoutLanguage !== '' ? `(${showLanguage})` : ''
-        }`,
-      },
-      {
-        name: 'drugInteraction',
-        title: `Drug Interaction${
-          secondaryPrintoutLanguage !== '' ? `(${showLanguage})` : ''
-        }`,
-      },
-      {
-        name: 'drugContraindication',
-        title: `Contraindication${
-          secondaryPrintoutLanguage !== '' ? `(${showLanguage})` : ''
-        }`,
-      },
-      { name: 'remarks', title: 'Remarks' },
       //{ name: 'action', title: 'Action' },
     ]
 
-    if (
-      (pharmacyDetails.fromModule === 'Main' &&
-        workitem.statusFK !== PHARMACY_STATUS.NEW) ||
-      type === 'CompletedItems'
-    ) {
-      columns = columns.filter(c => c.name !== 'stock')
+    if (isHiddenStock) {
+      columns = columns.filter(c => c.dataIndex !== 'stock')
     }
 
     return columns
@@ -1627,6 +1620,73 @@ const Main = props => {
     return false
   }
 
+  const onPendingValueChange = (uid, valueField, value) => {
+    const { setFieldValue } = props
+    const newItems = [...values.orderItems]
+    const editRow = newItems.find(r => r.uid === uid)
+    if (valueField === 'stockFK') {
+      if (value) {
+        editRow.stockFK = value.id
+        editRow.batchNo = value.batchNo
+        editRow.expiryDate = value.expiryDate
+        editRow.isDefault = value.isDefault
+        editRow.stock = value.stock
+      } else {
+        editRow.stockFK = undefined
+        editRow.batchNo = undefined
+        editRow.expiryDate = undefined
+        editRow.isDefault = false
+        editRow.stock = 0
+        editRow.dispenseQuantity = 0
+      }
+    } else {
+      editRow[valueField] = value
+    }
+    if (valueField === 'dispenseQuantity' || valueField === 'stockFK') {
+      let matchItems = []
+      if (editRow.isDrugMixture) {
+        matchItems = newItems.filter(
+          r => r.drugMixtureFK === editRow.drugMixtureFK,
+        )
+      } else {
+        matchItems = newItems.filter(
+          r => r.type === editRow.type && r.id === editRow.id,
+        )
+      }
+      const balanceQty =
+        editRow.quantity - _.sumBy(matchItems, 'dispenseQuantity')
+      matchItems.forEach(item => (item.stockBalance = balanceQty))
+    }
+    setFieldValue('orderItems', newItems)
+  }
+
+  const getGroupDispenseItem = (type = 'CompletedItems') => {
+    const items =
+      type === 'CompletedItems'
+        ? values.completedItems || []
+        : values.orderItems || []
+    let newItem = []
+    var groupId = _.uniqBy(items, 'dispenseGroupId')
+    groupId.forEach(item => {
+      newItem = newItem.concat({
+        uid: item.dispenseGroupId,
+        isGroup: true,
+        groupName: item.isDrugMixture
+          ? item.drugMixtureName
+          : item.dispenseGroupId,
+        groupNumber: 1,
+        groupRowSpan: 1,
+        countNumber: 1,
+        rowspan: 1,
+      })
+
+      newItem = newItem.concat([
+        ...items.filter(x => x.dispenseGroupId === item.dispenseGroupId),
+      ])
+    })
+
+    return newItem
+  }
   return (
     <div>
       <GridContainer>
@@ -1785,56 +1845,42 @@ const Main = props => {
             />
           )}
         </GridItem>
-        {(pharmacyDetails.fromModule === 'Main' ||
-          (values.orderItems || []).length > 0) && (
-          <GridItem style={{ marginTop: 8 }} container>
-            {pharmacyDetails.fromModule === 'History' && (
-              <div style={{ fontWeight: 600, margin: '3px 0px' }}>
-                Pending Items
-              </div>
-            )}
-            <EditableTableGrid
-              oddEven={false}
-              forceRender
-              size='sm'
-              EditingProps={{
-                showCommandColumn: false,
-                onCommitChanges: commitChanges,
-              }}
-              FuncProps={getFuncProps('PendingItems')}
-              rows={props.values.orderItems || []}
-              getRowId={r => r.uid}
-              columns={getColumns('PendingItems')}
-              columnExtensions={columnExtensions('PendingItems')}
-              TableProps={{
-                rowComponent: p => orderItemRow(p, 'PendingItems'),
-              }}
-            />
-          </GridItem>
-        )}
-        {pharmacyDetails.fromModule === 'History' && (
-          <GridItem style={{ marginTop: 8 }} container>
-            {(values.orderItems || []).length > 0 && (
-              <div style={{ fontWeight: 600, margin: '3px 0px' }}>
-                Completed Items
-              </div>
-            )}
-            <CommonTableGrid
-              oddEven={false}
-              forceRender
-              size='sm'
-              FuncProps={getFuncProps('CompletedItems')}
-              rows={props.values.completedItems || []}
-              getRowId={r => r.uid}
-              columns={getColumns('CompletedItems')}
-              columnExtensions={columnExtensions('CompletedItems')}
-              TableProps={{
-                rowComponent: p => orderItemRow(p, 'CompletedItems'),
-              }}
-            />
-          </GridItem>
-        )}
       </GridContainer>
+      {(pharmacyDetails.fromModule === 'Main' ||
+        (values.orderItems || []).length > 0) && (
+        <div style={{ margin: '8px 8px 0px 8px' }}>
+          {pharmacyDetails.fromModule === 'History' && (
+            <div style={{ fontWeight: 600, margin: '3px 0px' }}>
+              Pending Items
+            </div>
+          )}
+          <AntdTable
+            className={customtyles.table}
+            size='small'
+            bordered
+            pagination={false}
+            dataSource={getGroupDispenseItem('PendingItems')}
+            columns={getColumns('PendingItems', onPendingValueChange)}
+          />
+        </div>
+      )}
+      {pharmacyDetails.fromModule === 'History' && (
+        <div style={{ margin: '8px 8px 0px 8px' }}>
+          {(values.orderItems || []).length > 0 && (
+            <div style={{ fontWeight: 600, margin: '3px 0px' }}>
+              Completed Items
+            </div>
+          )}
+          <AntdTable
+            className={customtyles.table}
+            size='small'
+            bordered
+            pagination={false}
+            dataSource={getGroupDispenseItem('CompletedItems')}
+            columns={getColumns('CompletedItems', onPendingValueChange)}
+          />
+        </div>
+      )}
       <GridContainer style={{ marginTop: 10 }}>
         <GridItem md={8}>
           <div style={{ position: 'relative' }}>

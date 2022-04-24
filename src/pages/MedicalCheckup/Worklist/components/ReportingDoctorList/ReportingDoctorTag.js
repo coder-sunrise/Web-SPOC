@@ -30,6 +30,7 @@ const styles = theme => ({
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
     padding: '2px 6px',
+    fontSize: 14,
   },
 })
 
@@ -53,12 +54,12 @@ const ReportingDoctorTag = ({
       }
     })
   }
-  let reportingDoctorColor = '#CC0033'
+  let reportingDoctorColor = '#354497'
   if (
     medicalCheckupDoctor.status === REPORTINGDOCTOR_STATUS.COMMENTVERIFYING ||
     medicalCheckupDoctor.status === REPORTINGDOCTOR_STATUS.VERIFIED
   ) {
-    reportingDoctorColor = '#33CC00'
+    reportingDoctorColor = '#008B00'
   }
   const isDoctor =
     user.data.clinicianProfile.userProfile.role?.clinicRoleFK === 1
@@ -76,8 +77,11 @@ const ReportingDoctorTag = ({
               )
             }
             className={classes.tag}
-            style={{ cursor: isShowMessage ? 'pointer' : 'default' }}
-            color={reportingDoctorColor}
+            style={{
+              cursor: isShowMessage ? 'pointer' : 'default',
+              color: reportingDoctorColor,
+              border: `1px solid ${reportingDoctorColor}`,
+            }}
           >
             {medicalCheckupDoctor.shortName || medicalCheckupDoctor.name}
           </Tag>

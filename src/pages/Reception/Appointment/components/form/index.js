@@ -1398,7 +1398,7 @@ class Form extends React.PureComponent {
                         handleSelectCannedText={cannedText => {
                           const remarks = currentAppointment.appointmentRemarks
                           const newRemaks = `${
-                            remarks ? remarks + ' ' : ''
+                            remarks ? remarks + '\n' : ''
                           }${cannedText.text || ''}`.substring(0, 2000)
                           setFieldValue(
                             'currentAppointment.appointmentRemarks',

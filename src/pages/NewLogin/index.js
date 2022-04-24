@@ -165,7 +165,7 @@ const submitKey = 'login/getToken'
           await versionCheck()
           history.push(loginDestination)
 
-          dispatch({ type: 'appNotification/loadNotifications' })
+          dispatch({ type: 'appNotification/loadNotifications', payload:{ isRead: false} })
         }
       })
       .catch(error => {

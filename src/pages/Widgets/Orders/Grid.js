@@ -529,8 +529,8 @@ export default ({
     }
   }
   const GetService = currentVisitOrderTemplate => {
-    const { fullService } = orders
-    var service = fullService.find(
+    const { ctservice = [] } = codetable 
+    var service = ctservice.find(
       t =>
         t.serviceCenter_ServiceId ===
         currentVisitOrderTemplate.visitOrderTemplateServiceItemDto
@@ -1174,15 +1174,17 @@ export default ({
     const { visitOrderTemplate } = visit
     const { visitOrderTemplateItemDtos } = visitOrderTemplate
 
-    let removedTemplateItems = visitOrderTemplateItemDtos.filter(t => {
-      if (
-        rows.filter(
-          x => x.isDeleted === false && x.visitOrderTemplateItemFK === t.id,
-        ).length > 0
-      ) {
-        return undefined
-      } else return t
-    })
+    let removedTemplateItems = visitOrderTemplateItemDtos
+      .filter(t => t.orderable)
+      .filter(t => {
+        if (
+          rows.filter(
+            x => x.isDeleted === false && x.visitOrderTemplateItemFK === t.id,
+          ).length > 0
+        ) {
+          return undefined
+        } else return t
+      })
     if (visit.visitPurposeFK === VISIT_TYPE.OTC) {
       removedTemplateItems = removedTemplateItems.filter(
         t => t.inventoryItemTypeFK != 3,
@@ -1255,20 +1257,24 @@ export default ({
         size='sm'
         style={{ margin: 0 }}
         forceRender
-        rows={(rows || []).map(r => {
-          return {
-            ...r,
-            currentTotal:
-              (!r.isPreOrder && !r.hasPaid) || r.isChargeToday
-                ? r.totalAfterItemAdjustment
-                : 0,
-            isEditingEntity: isEditingEntity,
-            isEnableEditOrder: isEnableEditOrder,
-          }
-        })}
+        rows={(rows || [])
+          .filter(x => !x.isDeleted)
+          .map((r, index) => {
+            return {
+              ...r,
+              currentTotal:
+                (!r.isPreOrder && !r.hasPaid) || r.isChargeToday
+                  ? r.totalAfterItemAdjustment
+                  : 0,
+              isEditingEntity: isEditingEntity,
+              isEnableEditOrder: isEnableEditOrder,
+              number: index + 1,
+            }
+          })}
         onRowDoubleClick={editRow}
         getRowId={r => r.uid}
         columns={[
+          { name: 'number', title: 'No.' },
           { name: 'type', title: 'Type' },
           { name: 'subject', title: 'Name' },
           { name: 'priority', title: 'Urgent' },
@@ -1352,7 +1358,7 @@ export default ({
                 if (isExistPackage) {
                   newChildren = [
                     <Table.Cell
-                      colSpan={4}
+                      colSpan={5}
                       key={1}
                       style={{ position: 'relative' }}
                     >
@@ -1381,7 +1387,7 @@ export default ({
                         </div>
                       )}
                     </Table.Cell>,
-                    React.cloneElement(children[7], {
+                    React.cloneElement(children[8], {
                       colSpan: 3,
                       ...restProps,
                     }),
@@ -1389,7 +1395,7 @@ export default ({
                 } else {
                   newChildren = [
                     <Table.Cell
-                      colSpan={3}
+                      colSpan={4}
                       key={1}
                       style={{
                         position: 'relative',
@@ -1421,7 +1427,7 @@ export default ({
                         </div>
                       )}
                     </Table.Cell>,
-                    React.cloneElement(children[6], {
+                    React.cloneElement(children[7], {
                       colSpan: 2,
                       ...restProps,
                     }),
@@ -1526,6 +1532,10 @@ export default ({
           },
         }}
         columnExtensions={[
+          {
+            columnName: 'number',
+            width: 40,
+          },
           {
             columnName: 'type',
             width: 135,
@@ -1695,7 +1705,7 @@ export default ({
           },
           {
             columnName: 'description',
-            width: isFullScreen ? 300 : isExistPackage ? 120 : 150,
+            width: isFullScreen ? 300 : isExistPackage ? 110 : 140,
             observeFields: ['instruction', 'remark', 'remarks'],
             render: row => {
               return (
@@ -1725,7 +1735,7 @@ export default ({
           {
             columnName: 'quantity',
             type: 'number',
-            width: 100,
+            width: 80,
             render: row => {
               let qty = '0.0'
               if (row.type === '1' || row.type === '5' || row.type === '2') {
@@ -1982,6 +1992,7 @@ export default ({
       >
         <VisitOrderTemplateRevert
           data={removedVisitOrderTemplateItem}
+          dispatch={dispatch}
           confirmRevert={confirmRevert}
         ></VisitOrderTemplateRevert>
       </CommonModal>

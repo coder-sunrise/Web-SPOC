@@ -76,22 +76,12 @@ class Checklist extends React.Component {
   }
 
   componentDidMount() {
-    this.props
-      .dispatch({
-        type: 'settingChecklist/query',
-        payload: {
-          isActive: true,
-        },
-      })
-      .then(r => {
-        if (r.data) {
-          this.setState({
-            checklistGroups: r.data.filter(
-              g => g.checklistCategoryFK === this.props.checklistCategory,
-            ),
-          })
-        }
-      })
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctchecklist',
+      },
+    })
   }
 
   toggleVisibleChange = () =>
@@ -110,7 +100,7 @@ class Checklist extends React.Component {
   setChecklist = item => {
     this.setState(ps => {
       return {
-        template: ps.checklistGroups.find(c => c.id === item),
+        template: this.getCurrentChecklistGroup().find(c => c.id === item),
       }
     })
   }
@@ -149,14 +139,23 @@ class Checklist extends React.Component {
     this.props.onChecklistConfirm(output)
   }
 
+  getCurrentChecklistGroup = () => {
+    const { ctchecklist } = this.props.codetable
+
+    return (ctchecklist || []).filter(
+      g => g.checklistCategoryFK === this.props.checklistCategory,
+    )
+  }
+
   render() {
     const {
       classes,
-      settingChecklist,
+
       onChecklistConfirm,
       buttonStyle,
       buttonProps,
     } = this.props
+
     return (
       <React.Fragment>
         <Popover
@@ -168,7 +167,7 @@ class Checklist extends React.Component {
           content={
             <div className={classes.popoverContainer}>
               <div className={classes.listContainer}>
-                {this.state.checklistGroups.map((item, i) => {
+                {this.getCurrentChecklistGroup().map((item, i) => {
                   return (
                     <ListItem
                       key={`checklist-${item.id}`}
@@ -216,7 +215,7 @@ class Checklist extends React.Component {
 
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ settingChecklist }) => ({
-    settingChecklist,
+  connect(({ codetable }) => ({
+    codetable,
   })),
 )(Checklist)

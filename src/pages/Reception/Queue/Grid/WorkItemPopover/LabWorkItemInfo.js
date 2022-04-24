@@ -98,111 +98,121 @@ const LabWorkItemInfo = props => {
               <th style={{ minWidth: '200px' }}>Test Panels</th>
               <th style={{ minWidth: '120px' }}>Status</th>
             </tr>
-
-            {workItemDetails.map((labWorkitem, index) => (
-              <tr style={{ borderBottom: '1px solid #eeeeee' }}>
-                {!labWorkitem.ishide && (
-                  <td
-                    rowspan={labWorkitem.rowspan}
-                    style={{
-                      width: '35px',
-                      wordBreak: 'break-word',
-                      verticalAlign: 'top',
-                    }}
-                  >
-                    {labWorkitem.number}
-                  </td>
-                )}
-                {!labWorkitem.ishide && (
-                  <td
-                    rowspan={labWorkitem.rowspan}
-                    style={{
-                      width: '150px',
-                      wordBreak: 'break-word',
-                      verticalAlign: 'top',
-                    }}
-                  >
-                    {labWorkitem.name || '-'}
-                  </td>
-                )}
-                {!labWorkitem.ishide && (
-                  <td
-                    rowspan={labWorkitem.rowspan}
-                    style={{
-                      width: '150px',
-                      wordBreak: 'break-word',
-                      verticalAlign: 'top',
-                    }}
-                  >
-                    {labWorkitem.instructions || '-'}
-                  </td>
-                )}
-                {!labWorkitem.ishide && (
-                  <td
-                    rowspan={labWorkitem.rowspan}
-                    style={{
-                      width: '150px',
-                      wordBreak: 'break-word',
-                      verticalAlign: 'top',
-                    }}
-                  >
-                    {labWorkitem.remarks || '-'}
-                  </td>
-                )}
-                {!labWorkitem.ishide && (
-                  <td
-                    rowspan={labWorkitem.rowspan}
-                    style={{
-                      width: '65px',
-                      wordBreak: 'break-word',
-                      color:
-                        labWorkitem.priority === 'Urgent' ? 'red' : 'black',
-                      verticalAlign: 'top',
-                    }}
-                  >
-                    {labWorkitem.priority || '-'}
-                  </td>
-                )}
-                <td style={{ width: 200, verticalAlign: 'top' }}>
-                  {labWorkitem.testPanelName}
-                </td>
-                <td
-                  style={{
-                    width: 120,
-                    verticalAlign: 'top',
-                    wordBreak: 'break-word',
-                    color:
-                      labWorkitem.statusFK === LAB_WORKITEM_STATUS.COMPLETED
-                        ? 'green'
-                        : 'black',
-                  }}
-                >
-                  <span>{getQueueLabWorkitemStatus(labWorkitem)}</span>
-                  {labWorkitem.isAcknowledged && (
-                    <Tooltip
-                      title={`Acknowledged By: ${
-                        labWorkitem.acknowledgeByUserTitle
-                          ? labWorkitem.acknowledgeByUserTitle + ', '
-                          : ''
-                      }${labWorkitem.acknowledgeBy}, ${moment(
-                        labWorkitem.acknowledgeDate,
-                      ).format('DD MMM YYYY, HH:mm')}`}
-                    >
-                      <CheckCircleOutlined
-                        style={{
-                          color: 'green',
-                          position: 'relative',
-                          top: 3,
-                          float: 'right',
-                          marginLeft: 10,
-                        }}
-                      />
-                    </Tooltip>
-                  )}
-                </td>
-              </tr>
-            ))}
           </table>
+          <div style={{ maxHeight: 400, overflowY: 'auto' }}>
+            <table
+              style={{
+                fontSize: 14,
+                marginTop: 5,
+              }}
+            >
+              <tbody>
+                {workItemDetails.map((labWorkitem, index) => (
+                  <tr style={{ borderBottom: '1px solid #eeeeee' }}>
+                    {!labWorkitem.ishide && (
+                      <td
+                        rowspan={labWorkitem.rowspan}
+                        style={{
+                          width: '35px',
+                          wordBreak: 'break-word',
+                          verticalAlign: 'top',
+                        }}
+                      >
+                        {labWorkitem.number}
+                      </td>
+                    )}
+                    {!labWorkitem.ishide && (
+                      <td
+                        rowspan={labWorkitem.rowspan}
+                        style={{
+                          width: '150px',
+                          wordBreak: 'break-word',
+                          verticalAlign: 'top',
+                        }}
+                      >
+                        {labWorkitem.name || '-'}
+                      </td>
+                    )}
+                    {!labWorkitem.ishide && (
+                      <td
+                        rowspan={labWorkitem.rowspan}
+                        style={{
+                          width: '150px',
+                          wordBreak: 'break-word',
+                          verticalAlign: 'top',
+                        }}
+                      >
+                        {labWorkitem.instructions || '-'}
+                      </td>
+                    )}
+                    {!labWorkitem.ishide && (
+                      <td
+                        rowspan={labWorkitem.rowspan}
+                        style={{
+                          width: '150px',
+                          wordBreak: 'break-word',
+                          verticalAlign: 'top',
+                        }}
+                      >
+                        {labWorkitem.remarks || '-'}
+                      </td>
+                    )}
+                    {!labWorkitem.ishide && (
+                      <td
+                        rowspan={labWorkitem.rowspan}
+                        style={{
+                          width: '65px',
+                          wordBreak: 'break-word',
+                          color:
+                            labWorkitem.priority === 'Urgent' ? 'red' : 'black',
+                          verticalAlign: 'top',
+                        }}
+                      >
+                        {labWorkitem.priority || '-'}
+                      </td>
+                    )}
+                    <td style={{ width: 200, verticalAlign: 'top' }}>
+                      {labWorkitem.testPanelName}
+                    </td>
+                    <td
+                      style={{
+                        width: 120,
+                        verticalAlign: 'top',
+                        wordBreak: 'break-word',
+                        color:
+                          labWorkitem.statusFK === LAB_WORKITEM_STATUS.COMPLETED
+                            ? 'green'
+                            : 'black',
+                      }}
+                    >
+                      <span>{getQueueLabWorkitemStatus(labWorkitem)}</span>
+                      {labWorkitem.isAcknowledged && (
+                        <Tooltip
+                          title={`Acknowledged by ${
+                            labWorkitem.acknowledgeByUserTitle
+                              ? labWorkitem.acknowledgeByUserTitle + '. '
+                              : ''
+                          }${labWorkitem.acknowledgeBy} on ${moment(
+                            labWorkitem.acknowledgeDate,
+                          ).format('DD MMM YYYY HH:mm')}`}
+                        >
+                          <CheckCircleOutlined
+                            style={{
+                              color: 'green',
+                              position: 'relative',
+                              top: 3,
+                              float: 'right',
+                              marginLeft: 10,
+                            }}
+                          />
+                        </Tooltip>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       }
     >

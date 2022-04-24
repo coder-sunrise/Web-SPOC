@@ -36,16 +36,19 @@ export const commonExt = appointmentTypes => {
           </div>
         )
       },
+      width: 140,
     },
     {
       columnName: 'appointmentDate',
       format: dateFormatLong,
       type: 'date',
+      width: 100,
     },
     {
       columnName: 'startTime',
       type: 'time',
       sortingEnabled: false,
+      width: 80,
     },
     {
       columnName: 'calendarResourceFK',
@@ -56,6 +59,7 @@ export const commonExt = appointmentTypes => {
     },
     {
       columnName: 'cancellationReason',
+      sortingEnabled: false,
       render: row => {
         const { cancellationReason = '', rescheduleReason = '' } = row
         let reasons = []
@@ -85,6 +89,7 @@ export const commonExt = appointmentTypes => {
           />
         )
       },
+      width: 120,
     },
     {
       columnName: 'updateByUser',

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Chip, withStyles } from '@material-ui/core'
 import { Button, Popover } from '@/components'
 
-const styles = (theme) => ({
+const styles = theme => ({
   popoverContainer: {
     textAlign: 'center',
   },
@@ -20,10 +20,7 @@ const AttachmentChipWithPopover = ({
   title,
   contentText,
 }) => {
-  const [
-    show,
-    setShow,
-  ] = useState(false)
+  const [show, setShow] = useState(false)
 
   const toggleVisibleChange = () => setShow(!show)
   const handleDelete = !isReadOnly ? toggleVisibleChange : null
@@ -33,6 +30,7 @@ const AttachmentChipWithPopover = ({
         key={attachment.id}
         size='small'
         variant='outlined'
+        style={{ maxWidth: '100%' }}
         label={attachment.fileName}
         color={attachment.id ? 'primary' : ''}
         onClick={() => onClickAttachment(attachment)}
