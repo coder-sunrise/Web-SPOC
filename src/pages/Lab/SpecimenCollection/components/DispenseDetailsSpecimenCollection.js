@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'umi'
 import _, { curry } from 'lodash'
-import { Space, Typography } from 'antd'
+import { Space, Typography, Table } from 'antd'
 import PropTypes from 'prop-types'
 import TableData from '@/pages/Dispense/DispenseDetails/TableData'
 import Authorized from '@/utils/Authorized'
@@ -31,11 +31,13 @@ import { useCodeTable } from '@/utils/hooks'
 import { DiscardSpecimen } from '../../Worklist/components'
 import { SpecimenDetails } from '../../Worklist/SpecimenDetails'
 import PrintSpecimenLabel, { usePrintSpecimenLabel } from './PrintSpecimenLabel'
+import customtyles from '@/pages/Dispense/DispenseDetails/Style.less'
 
 const DispenseDetailsSpecimenCollection = ({
   visitId,
   handlePrint,
   patient = {},
+  classes,
   ...restProps
 }) => {
   const dispatch = useDispatch()
@@ -77,6 +79,126 @@ const DispenseDetailsSpecimenCollection = ({
       name: 'accessionNo',
     },
     { name: 'action', title: 'Action' },
+  ]
+
+  const columns1 = [
+    {
+      dataIndex: 'serviceName',
+      key: 'serviceName',
+      title: 'Service Name',
+      width: 300,
+    },
+    {
+      dataIndex: 'testPanelNames',
+      key: 'testPanelNames',
+      title: 'Test Panels',
+    },
+    {
+      dataIndex: 'specimenType',
+      key: 'specimenType',
+      title: 'Specimen Type',
+      width: 180,
+    },
+    {
+      dataIndex: 'accessionNo',
+      key: 'accessionNo',
+      title: 'Accession No.',
+      width: 110,
+      render: (_, row) => {
+        if (row.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW) {
+          return Authorized.check('queue.collectspecimen').rights ===
+            'enable' ? (
+            <Link
+              component='button'
+              onClick={() => {
+                setCollectSpecimenPara({
+                  visitId,
+                  labSpecimenId: row.labSpecimenFK,
+                  open: true,
+                  mode: 'edit',
+                })
+              }}
+            >
+              {row.accessionNo}
+            </Link>
+          ) : (
+            <div>{row.accessionNo}</div>
+          )
+        } else if (row.specimenStatusFK === LAB_SPECIMEN_STATUS.DISCARDED) {
+          return (
+            <Tooltip
+              useTooltip2
+              title={
+                <div>
+                  <div>
+                    Discarded by {row.specimenDiscardedClinicianName} at{' '}
+                    {row.lastUpdatedDate?.format(dateFormatLongWithTimeNoSec)}
+                  </div>
+                  <div>Reason: {row.specimenDiscardReason}</div>
+                </div>
+              }
+            >
+              <div>
+                <Typography.Text delete>{row.accessionNo}</Typography.Text>
+              </div>
+            </Tooltip>
+          )
+        } else {
+          return <span>{row.accessionNo}</span>
+        }
+      },
+    },
+    {
+      dataIndex: 'action',
+      key: 'action',
+      title: 'Action',
+      width: 120,
+      render: (_, row) => (
+        <Space size='small' align='center'>
+          {Authorized.check('queue.labspecimendetails').rights &&
+            Authorized.check('queue.labspecimendetails').rights !== 'hidden' &&
+            row.dateReceived &&
+            row.specimenStatusFK !== LAB_SPECIMEN_STATUS.DISCARDED && (
+              <Tooltip title='Lab Specimen Details'>
+                <Button
+                  onClick={() => {
+                    setSpecimenDetailsPara({
+                      open: true,
+                      id: row.labSpecimenFK,
+                    })
+                  }}
+                  justIcon
+                  color='primary'
+                  size='sm'
+                >
+                  <UnorderedListOutlined />
+                </Button>
+              </Tooltip>
+            )}
+          {row.specimenStatusFK !== LAB_SPECIMEN_STATUS.DISCARDED && (
+            <PrintSpecimenLabel id={row.labSpecimenFK} />
+          )}
+          {Authorized.check('queue.discardspecimen').rights === 'enable' &&
+            row.specimenStatusFK === LAB_SPECIMEN_STATUS.NEW && (
+              <Tooltip title='Discard Specimen'>
+                <Button
+                  onClick={() => {
+                    setDiscardSpecimenPara({
+                      open: true,
+                      id: row.labSpecimenFK,
+                    })
+                  }}
+                  justIcon
+                  color='danger'
+                  size='sm'
+                >
+                  <Icon type='flask-empty' />
+                </Button>
+              </Tooltip>
+            )}
+        </Space>
+      ),
+    },
   ]
 
   const columnExtensions = [
@@ -276,18 +398,33 @@ const DispenseDetailsSpecimenCollection = ({
 
   return (
     <React.Fragment>
-      <TableData
-        title='Lab Specimen Collection'
-        forceRender
-        oddEven={false}
-        onSelectionChange={value => {
-          handleSelectionChange('Service', value)
-        }}
-        idPrefix='Service'
-        columns={columns}
-        colExtensions={columnExtensions}
-        data={labSpecimens}
-      />
+      <div className={classes.tableContainer}>
+        <div>
+          <h5>Lab Specimen Collection</h5>
+        </div>
+        <Table
+          className={customtyles.table}
+          size='small'
+          bordered
+          pagination={false}
+          dataSource={labSpecimens}
+          columns={columns1}
+        />
+      </div>
+      {false && (
+        <TableData
+          title='Lab Specimen Collection'
+          forceRender
+          oddEven={false}
+          onSelectionChange={value => {
+            handleSelectionChange('Service', value)
+          }}
+          idPrefix='Service'
+          columns={columns}
+          colExtensions={columnExtensions}
+          data={labSpecimens}
+        />
+      )}
       {Authorized.check('queue.collectspecimen').rights === 'enable' &&
         newLabWorkitems &&
         newLabWorkitems.length > 0 && (
@@ -336,6 +473,7 @@ const DispenseDetailsSpecimenCollection = ({
         onConfirm={() => {
           closeSpecimenDetails()
         }}
+        isDisposePatientEntity={false}
         isReadonly={true}
       />
     </React.Fragment>

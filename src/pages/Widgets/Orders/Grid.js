@@ -529,8 +529,8 @@ export default ({
     }
   }
   const GetService = currentVisitOrderTemplate => {
-    const { fullService } = orders
-    var service = fullService.find(
+    const { ctservice = [] } = codetable 
+    var service = ctservice.find(
       t =>
         t.serviceCenter_ServiceId ===
         currentVisitOrderTemplate.visitOrderTemplateServiceItemDto
@@ -1174,15 +1174,17 @@ export default ({
     const { visitOrderTemplate } = visit
     const { visitOrderTemplateItemDtos } = visitOrderTemplate
 
-    let removedTemplateItems = visitOrderTemplateItemDtos.filter(t => {
-      if (
-        rows.filter(
-          x => x.isDeleted === false && x.visitOrderTemplateItemFK === t.id,
-        ).length > 0
-      ) {
-        return undefined
-      } else return t
-    })
+    let removedTemplateItems = visitOrderTemplateItemDtos
+      .filter(t => t.orderable)
+      .filter(t => {
+        if (
+          rows.filter(
+            x => x.isDeleted === false && x.visitOrderTemplateItemFK === t.id,
+          ).length > 0
+        ) {
+          return undefined
+        } else return t
+      })
     if (visit.visitPurposeFK === VISIT_TYPE.OTC) {
       removedTemplateItems = removedTemplateItems.filter(
         t => t.inventoryItemTypeFK != 3,
@@ -1990,6 +1992,7 @@ export default ({
       >
         <VisitOrderTemplateRevert
           data={removedVisitOrderTemplateItem}
+          dispatch={dispatch}
           confirmRevert={confirmRevert}
         ></VisitOrderTemplateRevert>
       </CommonModal>

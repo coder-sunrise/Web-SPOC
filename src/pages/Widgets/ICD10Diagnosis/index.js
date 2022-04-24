@@ -8,6 +8,7 @@ import Add from '@material-ui/icons/Add'
 import { AuthorizedContext, Button } from '@/components'
 import Authorized from '@/utils/Authorized'
 import ICD10DiagnosisItem from './item'
+import { USER_PREFERENCE_TYPE } from '@/utils/constants'
 
 const styles = theme => ({
   diagnosisRow: {
@@ -23,28 +24,7 @@ const styles = theme => ({
 class ICD10Diagnosis extends PureComponent {
   componentDidMount() {
     const { dispatch } = this.props
-    dispatch({
-      type: 'diagnosis/getUserPreference',
-      payload: {
-        type: '7',
-      },
-    })
-    dispatch({
-      type: 'diagnosis/getUserPreference',
-      payload: {
-        type: '8',
-      },
-    }).then(response => {
-      if (response) {
-        const { favouriteDiagnosisLanguage: favouriteLanguage } = response
-        this.props.dispatch({
-          type: 'diagnosis/updateState',
-          payload: {
-            favouriteDiagnosisLanguage: favouriteLanguage || 'EN',
-          },
-        })
-      }
-    })
+    this.fetchCodeTables()
   }
 
   componentWillReceiveProps(nextProps) {
@@ -66,6 +46,35 @@ class ICD10Diagnosis extends PureComponent {
         },
       })
     }
+  }
+
+  fetchCodeTables = async () => {
+    const { dispatch } = this.props
+    await Promise.all([
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctComplication',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'userpreference' },
+      }),
+    ]).then(() => {
+      dispatch({
+        type: 'diagnosis/getUserPreference',
+        payload: {
+          type: USER_PREFERENCE_TYPE.FAVOURITEICD10DIAGNOSISSETTING,
+        },
+      })
+      dispatch({
+        type: 'diagnosis/getUserPreference',
+        payload: {
+          type: USER_PREFERENCE_TYPE.FAVOURITEDIAGNOSISLANGUAGESETTING,
+        },
+      })
+    })
   }
 
   addDiagnosis = index => {
@@ -178,8 +187,9 @@ class ICD10Diagnosis extends PureComponent {
   }
 
   render() {
-    const { rights, diagnosis } = this.props
+    const { rights, diagnosis, dispatch } = this.props
 
+    const favLang = diagnosis.favouriteDiagnosisLanguage || 'EN'
     return (
       <div>
         <FieldArray
@@ -194,7 +204,7 @@ class ICD10Diagnosis extends PureComponent {
                 this.addDiagnosis(1)
                 return null
               }
-            } 
+            }
             return this.diagnosis.map((v, i) => {
               if (v.isDeleted === true) return null
               return (
@@ -213,7 +223,7 @@ class ICD10Diagnosis extends PureComponent {
                       favouriteDiagnosisMessage={v.favouriteDiagnosisMessage}
                       favouriteDiagnosis={diagnosis.favouriteDiagnosis || []}
                       defaultLanguage={
-                        diagnosis.favouriteDiagnosisLanguage || 'EN'
+                        diagnosis.favouriteDiagnosisLanguage || favLang
                       }
                     />
                   </div>

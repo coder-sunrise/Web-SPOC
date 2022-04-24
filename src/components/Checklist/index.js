@@ -77,9 +77,9 @@ class Checklist extends React.Component {
 
   componentDidMount() {
     this.props.dispatch({
-      type: 'settingChecklist/query',
+      type: 'codetable/fetchCodes',
       payload: {
-        isActive: true,
+        code: 'ctchecklist',
       },
     })
   }
@@ -140,10 +140,9 @@ class Checklist extends React.Component {
   }
 
   getCurrentChecklistGroup = () => {
-    const { settingChecklist } = this.props
-    const { list = [] } = settingChecklist
+    const { ctchecklist } = this.props.codetable
 
-    return list.filter(
+    return (ctchecklist || []).filter(
       g => g.checklistCategoryFK === this.props.checklistCategory,
     )
   }
@@ -216,7 +215,7 @@ class Checklist extends React.Component {
 
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ settingChecklist }) => ({
-    settingChecklist,
+  connect(({ codetable }) => ({
+    codetable,
   })),
 )(Checklist)

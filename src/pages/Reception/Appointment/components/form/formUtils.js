@@ -171,7 +171,9 @@ export const mapPropsToValues = ({
     bookedByUser: `${_title}${user.clinicianProfile.name}`,
     bookedByUserFK: user.id,
     currentAppointment: {
-      appointmentDate: moment((selectedSlot || {}).start).formatUTC(),
+      appointmentDate: moment((selectedSlot || {}).start)
+        .startOf('day')
+        .formatUTC(),
       appointments_Resources: [
         constructDefaultNewRow(
           selectedSlot,
@@ -233,11 +235,13 @@ export const mapPropsToValues = ({
         } = updateEvent
         isUpdated = true
         if (
-          (view === CALENDAR_VIEWS.MONTH || view === CALENDAR_VIEWS.WEEK) &&
-          moment(newStartTime).formatUTC() !==
-            moment(appointment.appointmentDate)
+          moment(newStartTime)
+            .startOf('day')
+            .formatUTC() !== moment(appointment.appointmentDate)
         ) {
-          appointmentDate = moment(newStartTime).formatUTC()
+          appointmentDate = moment(newStartTime)
+            .startOf('day')
+            .formatUTC()
         }
         let updateResource = apptResources.find(
           r => r.id === updateApptResourceId,
@@ -321,7 +325,9 @@ export const mapPropsToValues = ({
         currentAppointment: {
           ...appointment,
           appointments_Resources: apptResources,
-          appointmentDate: moment(appointmentDate).formatUTC(),
+          appointmentDate: moment(appointmentDate)
+            .startOf('day')
+            .formatUTC(),
           // appointmentDate,
         },
         appointmentStatusFk: appointment.appointmentStatusFk,
@@ -396,12 +402,16 @@ export const generateRecurringAppointments = (
             appointments_Resources: restAppointmentValues.appointments_Resources.map(
               ({ appointmentFK, ...restItem }) => ({ ...restItem }),
             ),
-            appointmentDate: moment(date).formatUTC(),
+            appointmentDate: moment(date)
+              .startOf('day')
+              .formatUTC(),
           }
         : {
             ...restAppointmentValues,
             id,
-            appointmentDate: moment(date).formatUTC(),
+            appointmentDate: moment(date)
+              .startOf('day')
+              .formatUTC(),
           },
     )
   }

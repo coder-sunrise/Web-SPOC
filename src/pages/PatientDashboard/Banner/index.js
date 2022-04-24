@@ -129,11 +129,13 @@ class Banner extends PureComponent {
   }
 
   componentWillUnmount() {
-    const { dispatch } = this.props
-    dispatch({
-      type: 'patient/updateState',
-      payload: { entity: null },
-    })
+    const { dispatch, isDisposePatientEntity = true } = this.props
+    if (isDisposePatientEntity) {
+      dispatch({
+        type: 'patient/updateState',
+        payload: { entity: null },
+      })
+    }
   }
 
   getAllergyData() {
@@ -935,7 +937,6 @@ class Banner extends PureComponent {
   render() {
     const { props } = this
     const {
-      // patientInfo = {},
       extraCmt,
       preOrderCmt,
       from = '',

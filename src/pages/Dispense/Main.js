@@ -584,8 +584,11 @@ class Main extends Component {
     }
     const { entity = {} } = visitRegistration
     const { visit = {} } = entity
-    const { otherOrder = [], prescription = [], packageItem = [] } = values
-    const isEmptyDispense = otherOrder.length === 0 && prescription.length === 0
+    const { service = [], prescription = [], consumable = [] } = values
+    const isEmptyDispense =
+      service.length === 0 &&
+      prescription.length === 0 &&
+      consumable.length === 0
     const noClinicalObjectRecord = !values.clinicalObjectRecordFK
     if (visit.visitPurposeFK === VISIT_TYPE.OTC && isEmptyDispense) {
       this.setState(
@@ -617,8 +620,18 @@ class Main extends Component {
 
     const { entity = {} } = visitRegistration
     const { visit = {} } = entity
-    const { otherOrder = [], prescription = [], packageItem = [] } = values
-    const isEmptyDispense = otherOrder.length === 0 && prescription.length === 0
+    const {
+      service = [],
+      prescription = [],
+      consumable = [],
+      vaccination = [],
+      packageItem = [],
+    } = values
+    const isEmptyDispense =
+      service.length === 0 &&
+      prescription.length === 0 &&
+      consumable.length === 0 &&
+      vaccination.length === 0
     const accessRights = Authorized.check('queue.dispense.editorder')
     const noClinicalObjectRecord = !values.clinicalObjectRecordFK
     if (

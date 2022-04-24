@@ -219,6 +219,22 @@ const Detail = ({
               </GridItem>
               <GridItem xs={12}>
                 <FastField
+                  name='manufacturerFK'
+                  render={args => (
+                    <CodeSelect
+                      label={formatMessage({
+                        id: 'inventory.master.medication.manufacturer',
+                      })}
+                      code='ctManufacturer'
+                      labelField='displayValue'
+                      max={10}
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
+              <GridItem xs={12}>
+                <FastField
                   name='uomfk'
                   render={args => (
                     <CodeSelect

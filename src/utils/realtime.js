@@ -89,12 +89,16 @@ const initStream = () => {
       } = getState()
       if (sender !== user.data.clinicianProfile.name) {
         const { notifications = [] } = header
-      if (type == 'AppNotification')
-      {
+      if (type == 'AppNotification') {
         const notification = list.find(x => x.toUserFK === user.data.id)
-        if(notification) notifications.push(notification)
-      }
-      else notifications.push(response)
+        if (notification) {
+          notifications.unshift(notification)
+          dispatch({
+            type: 'appNotification/receiveMessage',
+            payload: notification,
+          })
+        }
+      } else notifications.push(response)
         dispatch({
           type: 'header/updateState',
           payload: notifications,

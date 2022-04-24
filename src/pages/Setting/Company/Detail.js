@@ -170,6 +170,11 @@ class Detail extends PureComponent {
   render() {
     const { props } = this
 
+    const editManufacturerAccessRight = Authorized.check(
+      'settings.manufacturer.manufacturerdetails',
+    ) || {
+      rights: 'hidden',
+    }
     const {
       theme,
       footer,
@@ -524,6 +529,7 @@ class Detail extends PureComponent {
               confirmBtnText: 'Save',
               confirmProps: {
                 disabled: false,
+                hidden: editManufacturerAccessRight.rights == 'disable',
               },
             })}
         </AuthorizedContext.Provider>

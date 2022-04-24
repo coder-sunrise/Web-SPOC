@@ -566,7 +566,7 @@ const LabResults = ({
       <CommonModal
         open={showModal}
         onClose={onCloseReport}
-        title='Lab Result Report'
+        title='Laboratory Test Report'
         maxWidth='lg'
       >
         <ReportViewer

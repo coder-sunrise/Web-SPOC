@@ -129,12 +129,16 @@ export const RadiographerTag = ({
           style={{ width: 150 }}
           size={'small'}
           onChange={handleInputConfirm}
-          onSearch={v => setNewTagInput(v)}
+          
           onBlur={e => handleInputCancel(e)}
           onDropdownVisibleChange={open => {
             setDropdownOpen(open)
           }}
           options={assignableRadiographers}
+          optionFilterProp='label'
+          filterOption={(input, options) =>
+            options.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+          }
         />
       )}
       {!readonly && !inputVisible && (

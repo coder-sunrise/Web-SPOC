@@ -424,8 +424,15 @@ export default createListViewModel({
           }),
           itemIdentifier: payload.itemIdentifier,
           type: payload.type,
-        })
+        }) 
         if (r === 204) {
+          window.g_app._store.dispatch({
+            type: 'codetable/refreshCodes',
+            payload: {
+              code: 'userpreference',
+              force: true,
+            },
+          })
           yield put({
             type: 'updateState',
             payload: {
@@ -450,6 +457,7 @@ export default createListViewModel({
             .map(vt => vt.id)
 
           let newVisitType = [-99, ...activeVisitType]
+          let doctor = []
           if (data) {
             const filterBar = JSON.parse(data)
             let queueFilterBar
@@ -458,7 +466,7 @@ export default createListViewModel({
             }
             const queue = queueFilterBar?.value || {}
             const { visitType } = queue
-            const { doctor } = queue
+            doctor = queue.doctor || []
 
             if (visitType) {
               newVisitType = visitType.filter(
@@ -482,7 +490,10 @@ export default createListViewModel({
             yield put({
               type: 'updateState',
               payload: {
-                queueFilterBar: { visitType: newVisitType, doctor: doctor },
+                queueFilterBar: {
+                  visitType: newVisitType,
+                  doctor: doctor,
+                },
               },
             })
           }

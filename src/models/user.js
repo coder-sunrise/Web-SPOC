@@ -249,6 +249,13 @@ export default {
             gridSetting,
           },
         })
+        window.g_app._store.dispatch({
+          type: 'codetable/refreshCodes',
+          payload: {
+            code: 'userpreference',
+            force: true,
+          },
+        })
       }
     },
   },

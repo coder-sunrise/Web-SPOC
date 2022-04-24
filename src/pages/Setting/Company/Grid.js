@@ -286,6 +286,7 @@ class Grid extends PureComponent {
                   ) || {
                     rights: 'hidden',
                   }
+
                   return (
                     <div>
                       {editDetailAccessRight.rights !== 'hidden' && (
@@ -320,32 +321,72 @@ class Grid extends PureComponent {
                 ) || {
                   rights: 'hidden',
                 }
+                const editManufacturerAccessRight = Authorized.check(
+                  'settings.manufacturer.manufacturerdetails',
+                ) || {
+                  rights: 'hidden',
+                }
                 return (
                   <Fragment>
-                    {editSupplierDetailAccessRight.rights !== 'hidden' && (
-                      <Tooltip title='Edit Supplier' placement='bottom'>
+                    {name == 'manufacturer' ? (
+                      <Fragment>
+                        {editManufacturerAccessRight.rights !== 'hidden' && (
+                          <Tooltip
+                            title={`Edit ${name.charAt(0).toUpperCase() +
+                              name.slice(1)}`}
+                            placement='bottom'
+                          >
+                            <Button
+                              size='sm'
+                              onClick={() => {
+                                this.editRow(row)
+                              }}
+                              justIcon
+                              color='primary'
+                            >
+                              <Edit />
+                            </Button>
+                          </Tooltip>
+                        )}
+                      </Fragment>
+                    ) : (
+                      <Fragment>
+                        {editSupplierDetailAccessRight.rights !== 'hidden' && (
+                          <Tooltip
+                            title={`Edit ${name.charAt(0).toUpperCase() +
+                              name.slice(1)}`}
+                            placement='bottom'
+                          >
+                            <Button
+                              size='sm'
+                              onClick={() => {
+                                this.editRow(row)
+                              }}
+                              justIcon
+                              color='primary'
+                            >
+                              <Edit />
+                            </Button>
+                          </Tooltip>
+                        )}
+                      </Fragment>
+                    )}
+                    {name !== 'manufacturer' && (
+                      <Tooltip
+                        title={`Print ${name.charAt(0).toUpperCase() +
+                          name.slice(1)} Label`}
+                        placement='bottom'
+                      >
                         <Button
                           size='sm'
-                          onClick={() => {
-                            this.editRow(row)
-                          }}
                           justIcon
                           color='primary'
+                          onClick={() => this.handleClick(row.id)}
                         >
-                          <Edit />
+                          <Print />
                         </Button>
                       </Tooltip>
                     )}
-                    <Tooltip title='Print Supplier Label' placement='bottom'>
-                      <Button
-                        size='sm'
-                        justIcon
-                        color='primary'
-                        onClick={() => this.handleClick(row.id)}
-                      >
-                        <Print />
-                      </Button>
-                    </Tooltip>
                   </Fragment>
                 )
               },

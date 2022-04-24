@@ -24,6 +24,7 @@ const Detail = ({
   clinicSettings,
   handleSubmit,
   values,
+  codetable,
   setFieldValue,
 }) => {
   const {
@@ -31,6 +32,7 @@ const Detail = ({
     secondaryPrintoutLanguage = '',
   } = clinicSettings
   const isUseSecondLanguage = secondaryPrintoutLanguage !== ''
+  const { ctexaminationcategory } = codetable
   const [
     translation,
     getValue,
@@ -148,6 +150,18 @@ const Detail = ({
                   label='Examination'
                   code='ctexaminationitem'
                   labelField='displayValue'
+                  renderDropdown={option => {
+                    const cateogry = option.examinationCategoryFK
+                      ? ctexaminationcategory.find(
+                          x => x.id === option.examinationCategoryFK,
+                        ).name + ' - '
+                      : ''
+                    return (
+                      <div>
+                        <span>{`${cateogry}${option.displayValue}`}</span>
+                      </div>
+                    )
+                  }}
                   {...args}
                 />
               )}

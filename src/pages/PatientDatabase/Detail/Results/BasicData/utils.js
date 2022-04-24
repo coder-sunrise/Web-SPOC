@@ -232,7 +232,7 @@ export const defaultData = [
   },
   {
     id: 28,
-    type: '5m (R)',
+    type: '5m Bare (R)',
     tableName: 'eyeExaminations',
     fieldName: 'rightBareEye5',
     format: '0.0',
@@ -249,7 +249,7 @@ export const defaultData = [
   },
   {
     id: 30,
-    type: '5m (L)',
+    type: '5m Bare (L)',
     tableName: 'eyeExaminations',
     fieldName: 'leftBareEye5',
     format: '0.0',
@@ -266,7 +266,7 @@ export const defaultData = [
   },
   {
     id: 32,
-    type: '50cm (R)',
+    type: '50cm Bare (R)',
     tableName: 'eyeExaminations',
     fieldName: 'rightBareEye50',
     format: '0.0',
@@ -283,7 +283,7 @@ export const defaultData = [
   },
   {
     id: 34,
-    type: '50cm (L)',
+    type: '50cm Bare (L)',
     tableName: 'eyeExaminations',
     fieldName: 'leftBareEye50',
     format: '0.0',
@@ -486,13 +486,13 @@ export const defaultColumns = genderFK => {
         return (
           <div
             style={{
-              paddingLeft: isSub ? 36 : 4,
+              paddingLeft: 4,
               paddingTop: 2,
               paddingBottom: 2,
             }}
           >
             <Tooltip title={row.typeTootip}>
-              <span> {isSub ? 'Corrected' : row.type}</span>
+              <span> {row.type}</span>
             </Tooltip>
           </div>
         )

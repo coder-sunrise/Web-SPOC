@@ -56,6 +56,11 @@ class Filter extends PureComponent {
     ) || {
       rights: 'hidden',
     }
+    const newManufacturerAccessRight = Authorized.check(
+      'settings.manufacturer.newmanufacturer',
+    ) || {
+      rights: 'hidden',
+    }
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -135,61 +140,62 @@ class Filter extends PureComponent {
                 >
                   <FormattedMessage id='form.search' />
                 </ProgressButton>
-                {isCopayer ? (
-                  newCopayerAccessRight.rights === 'enable' && (
-                    <Button
-                      color='primary'
-                      onClick={() => {
-                        this.props.dispatch({
-                          type: 'copayerDetail/updateState',
-                          payload: {
-                            entity: undefined,
-                          },
-                        })
-                        history.push('/finance/copayer/newcopayer')
-                      }}
-                    >
-                      <Add />
-                      Add New
-                    </Button>
-                  )
-                ) : isSupplier ? (
-                  newSupplierAccessRight.rights === 'enable' && (
-                    <Button
-                      color='primary'
-                      onClick={() => {
-                        this.props.dispatch({
-                          type: 'settingCompany/updateState',
-                          payload: {
-                            entity: undefined,
-                          },
-                        })
-                        this.props.toggleModal()
-                      }}
-                    >
-                      <Add />
-                      Add New
-                    </Button>
-                  )
-                ) : (
-                  <Authorized authority='settings.manufacturer.newmanufacturer'>
-                    <Button
-                      color='primary'
-                      onClick={() => {
-                        this.props.dispatch({
-                          type: 'settingCompany/updateState',
-                          payload: {
-                            entity: undefined,
-                          },
-                        })
-                        this.props.toggleModal()
-                      }}
-                    >
-                      <Add />
-                      Add New
-                    </Button>
-                  </Authorized>
-                )}
+                {isCopayer
+                  ? newCopayerAccessRight.rights === 'enable' && (
+                      <Button
+                        color='primary'
+                        onClick={() => {
+                          this.props.dispatch({
+                            type: 'copayerDetail/updateState',
+                            payload: {
+                              entity: undefined,
+                            },
+                          })
+                          history.push('/finance/copayer/newcopayer')
+                        }}
+                      >
+                        <Add />
+                        Add New
+                      </Button>
+                    )
+                  : isSupplier
+                  ? newSupplierAccessRight.rights === 'enable' && (
+                      <Button
+                        color='primary'
+                        onClick={() => {
+                          this.props.dispatch({
+                            type: 'settingCompany/updateState',
+                            payload: {
+                              entity: undefined,
+                            },
+                          })
+                          this.props.toggleModal()
+                        }}
+                      >
+                        <Add />
+                        Add New
+                      </Button>
+                    )
+                  : !(
+                      newManufacturerAccessRight.rights == 'disable' ||
+                      newManufacturerAccessRight.rights == 'hidden'
+                    ) && (
+                      <Button
+                        color='primary'
+                        onClick={() => {
+                          this.props.dispatch({
+                            type: 'settingCompany/updateState',
+                            payload: {
+                              entity: undefined,
+                            },
+                          })
+                          this.props.toggleModal()
+                        }}
+                      >
+                        <Add />
+                        Add New
+                      </Button>
+                    )}
               </div>
             </GridItem>
           </GridContainer>

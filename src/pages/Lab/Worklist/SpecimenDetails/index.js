@@ -45,8 +45,6 @@ const { Panel } = Collapse
 const { TextArea } = Input
 
 const ActionButtons = ({ specimenStatusFK, onStart, onRetest, onVerify }) => {
-  console.log('Authorized.check(lab.retest)', Authorized.check('lab.retest'))
-  debugger
   return (
     <React.Fragment>
       {specimenStatusFK === LAB_SPECIMEN_STATUS.NEW &&
@@ -91,6 +89,7 @@ export const SpecimenDetails = ({
   id,
   onClose,
   onConfirm,
+  isDisposePatientEntity = true,
   isReadonly = false,
 }) => {
   const dispatch = useDispatch()
@@ -224,48 +223,19 @@ export const SpecimenDetails = ({
       ) {
         const values = await form.validateFields()
 
-        if (
-          values.labWorkitemResults.filter(
-            x =>
-              x.finalResult === null ||
-              x.finalResult === undefined ||
-              x.finalResult === '',
-          ).length > 0
-        ) {
-          dispatch({
-            type: 'global/updateAppState',
-            payload: {
-              openConfirm: true,
-              openConfirmContent:
-                'Some final result fields are empty. \r\n Confirm to proceed?',
-              onConfirmSave: () => {
-                saveVerify()
-              },
-            },
-          })
-
-          return
-        }
-
-        saveVerify()
+        dispatch({
+          type: 'worklistSpecimenDetails/verifyLabTest',
+          payload: { ...entity, ...values },
+        }).then(result => {
+          if (result) {
+            setShowModal(false)
+            onConfirm && onConfirm()
+          }
+        })
       }
     } catch (errInfo) {
       console.log('Save failed:', errInfo)
     }
-  }
-
-  const saveVerify = async () => {
-    const values = await form.validateFields()
-
-    dispatch({
-      type: 'worklistSpecimenDetails/verifyLabTest',
-      payload: { ...entity, ...values },
-    }).then(result => {
-      if (result) {
-        setShowModal(false)
-        onConfirm && onConfirm()
-      }
-    })
   }
 
   const handleSave = async () => {
@@ -415,7 +385,7 @@ export const SpecimenDetails = ({
                 <React.Fragment>
                   <GridItem md={12}>
                     <div style={{ padding: 8 }}>
-                      <Banner />
+                      <Banner isDisposePatientEntity={isDisposePatientEntity} />
                     </div>
                   </GridItem>
                   <GridItem md={12}>

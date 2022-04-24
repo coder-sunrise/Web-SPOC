@@ -278,7 +278,7 @@ const autoPrintSelection = async (action, props) => {
                       Token: token,
                       BaseUrl: process.env.url,
                     }))
-                    handlePrint(JSON.stringify(printedData))              
+                    handlePrint(JSON.stringify(printedData))
                     dispatch({ type: 'consultation/closeModal' })
                   })
                 } else {
@@ -290,7 +290,7 @@ const autoPrintSelection = async (action, props) => {
                     Token: token,
                     BaseUrl: process.env.url,
                   }))
-                  handlePrint(JSON.stringify(printedData))              
+                  handlePrint(JSON.stringify(printedData))
                   dispatch({ type: 'consultation/closeModal' })
                 }
               } else {
@@ -550,7 +550,15 @@ const pauseConsultation = async ({
   ) {
     newValues.patientMedicalHistory.patientProfileFK = patient.entity.id
   }
-  if(!(await autoPrintSelection('pause', {dispatch,patient,values,consultation,...rest}))){
+  if (
+    !(await autoPrintSelection('pause', {
+      dispatch,
+      patient,
+      values,
+      consultation,
+      ...rest,
+    }))
+  ) {
     dispatch({
       type: `consultation/pause`,
       payload: newValues,
@@ -680,7 +688,7 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
     if (isEnablePharmacyModule) {
       values.isPharmacyOrderUpdated = isPharmacyOrderUpdated(orders)
     }
-    if (!(await autoPrintSelection('sign', {values,...props}))){
+    if (!(await autoPrintSelection('sign', { values, ...props }))) {
       saveConsultation({
         props: {
           values,
@@ -714,8 +722,12 @@ class Main extends React.Component {
     recording: true,
   }
 
+  constructor(props) {
+    super(props)
+    this.fetchCodeTables()
+  }
   componentDidMount() {
-    initRoomAssignment()
+    // initRoomAssignment()
     setTimeout(() => {
       this.props.setFieldValue('fakeField', 'setdirty')
     }, 500)
@@ -733,18 +745,6 @@ class Main extends React.Component {
         saveDraftDoctorNote(this.props)
       }, autoSaveClinicNoteInterval * 1000)
     }
-
-    this.props.dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctservice',
-      },
-    })
-
-    this.props.dispatch({
-      type: 'codetable/fetchCodes',
-      payload: { code: 'inventoryconsumable' },
-    })
   }
 
   componentWillUnmount() {
@@ -760,7 +760,7 @@ class Main extends React.Component {
         entity: undefined,
       },
     })
-    window.g_app._store.dispatch({
+    this.props.dispatch({
       type: 'global/updateAppState',
       payload: {
         isShowSecondConfirmButton: undefined,
@@ -773,6 +773,22 @@ class Main extends React.Component {
     }
   }
 
+  fetchCodeTables = async () => {
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctservice',
+      },
+    })
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'inventoryconsumable' },
+    })
+    await this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'userpreference' },
+    })
+  }
   shouldComponentUpdate = nextProps => {
     if (nextProps.values.id !== this.props.values.id) return true
     if (nextProps.consultation.version !== this.props.consultation.version)
@@ -842,7 +858,7 @@ class Main extends React.Component {
     const isFormValid = await validateForm()
     if (!_.isEmpty(isFormValid)) {
       handleSubmit()
-    } else if (!(await autoPrintSelection('pause', this.props))){
+    } else if (!(await autoPrintSelection('pause', this.props))) {
       saveConsultation({
         props: this.props,
         confirmMessage: 'Pause consultation?',
@@ -1260,7 +1276,7 @@ class Main extends React.Component {
       .then(o => {
         if (o)
           notification.success({
-            message: 'My favourite widget layout saved',
+            message: 'Favourite widget layout saved successfully.',
           })
       })
   }
@@ -1292,7 +1308,7 @@ class Main extends React.Component {
           }
         },
         notification.success({
-          message: 'My Favourite diagnosis language saved',
+          message: 'Favourite widget layout saved successfully.',
         }),
       )
   }

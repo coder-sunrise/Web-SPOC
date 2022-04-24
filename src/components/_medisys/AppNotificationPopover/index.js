@@ -59,7 +59,7 @@ const AppNotificationPopover = ({
     var notification = {
       ...row,
       isAcknowledged: true,
-      acknowledgeDate: moment().formatUTC(false),
+      // acknowledgeDate: moment().formatUTC(false),
     }
     dispatch({
       type: 'appNotification/upsert',

@@ -386,7 +386,7 @@ class AttachmentWithThumbnail extends Component {
               })
             }}
           >
-            <div>
+            <div style={{ marginBottom: 5 }}>
               <Button
                 type='primary'
                 size='small'

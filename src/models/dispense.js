@@ -630,15 +630,12 @@ export default createFormViewModel({
             patientID: payload.pid,
           },
         })
-
-        if (
-          payload.pid &&
-          (!patientState.entity || patientState.entity.id !== payload.pid)
-        ) {
+        if (payload.pid) {
           yield put({
             type: 'patient/query',
             payload: {
               id: payload.pid,
+              version: Date.now(),
             },
           })
           yield take('patient/query/@@end')
@@ -658,13 +655,6 @@ export default createFormViewModel({
           },
         })
         yield take('query/@@end')
-
-        yield put({
-          type: 'dispense/updateState',
-          payload: {
-            queryCodeTablesDone: true,
-          },
-        })
         yield put({
           type: 'getServingPersons',
           payload: { visitFK: visitID },

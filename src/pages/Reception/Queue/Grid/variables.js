@@ -23,6 +23,7 @@ import RadioWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/Radi
 import LabWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/LabWorkItemInfo'
 import { VISIT_TYPE, WORK_ITEM_TYPES } from '@/utils/constants'
 import DoctorConsultationStatus from './DoctorConsultationStatus'
+import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 
 const compareString = (a, b) => a.localeCompare(b)
 const compareDoctor = (a, b) => {
@@ -381,6 +382,16 @@ export const QueueColumnExtensions = props => {
     {
       columnName: 'visitOrderTemplate',
       width: 180,
+      render: row => {
+        return row.visitOrderTemplate ? (
+          <VisitOrderTemplateIndicateString
+            oneline
+            visitOrderTemplateDetails={row.visitOrderTemplate}
+          ></VisitOrderTemplateIndicateString>
+        ) : (
+          <span>-</span>
+        )
+      },
     },
     {
       columnName: 'workItemSummary',

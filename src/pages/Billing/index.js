@@ -573,7 +573,11 @@ class Billing extends Component {
     }
   }
 
-  upsertBilling = async (callback = null, noValidation = false) => {
+  upsertBilling = async (
+    callback = null,
+    noValidation = false,
+    backtoQueue = false,
+  ) => {
     const { dispatch, values, resetForm, patient } = this.props
     const {
       visitStatus,
@@ -587,15 +591,23 @@ class Billing extends Component {
       if (isSchemesValid) {
         const payload = constructPayload(values)
         const defaultCallback = async () => {
-          notification.success({
-            message: 'Billing Saved',
-          })
           if (visitStatus === VISIT_STATUS.COMPLETED) {
-            this.setState(preState => ({
-              submitCount: preState.submitCount + 1,
-            }))
+            notification.success({
+              message: backtoQueue ? 'Billing Completed' : 'Billing Saved',
+            })
+            if (!backtoQueue) {
+              this.setState(preState => ({
+                submitCount: preState.submitCount + 1,
+              }))
+            }
             await this.printAfterComplete(autoPrintReportsOnCompletePayment)
+            if (backtoQueue) {
+              history.push('/reception/queue')
+            }
           } else {
+            notification.success({
+              message: 'Billing Saved',
+            })
             dispatch({
               type: 'patient/query',
               payload: { id: patient.id },
@@ -644,7 +656,7 @@ class Billing extends Component {
       case INVOICE_REPORT_TYPES.CLAIMABLEITEMINVOICE:
         return 'Claimable Item Invoice'
       case INVOICE_REPORT_TYPES.INDIVIDUALINVOICE:
-        return 'Invocie'
+        return 'Invoice'
       case INVOICE_REPORT_TYPES.ITEMCATEGORYINVOICE:
         return 'Item Category Invoice'
       case INVOICE_REPORT_TYPES.SUMMARYINVOICE:
@@ -779,11 +791,13 @@ class Billing extends Component {
           openConfirmText: 'Confirm',
           openConfirmContent:
             'Invoice is overpaid. Confirm to complete billing?',
-          onConfirmSave: this.upsertBilling,
+          onConfirmSave: () => {
+            this.upsertBilling(null, null, true)
+          },
         },
       })
     }
-    return this.upsertBilling()
+    return this.upsertBilling(null, null, true)
   }
 
   onCompletePaymentClick = async () => {

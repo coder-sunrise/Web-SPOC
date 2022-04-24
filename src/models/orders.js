@@ -38,7 +38,6 @@ const initialState = {
   defaultMedication: {
     ...sharedMedicationValue,
   },
-  fullService: [],
   defaultService: {
     unitPrice: 0,
     isMinus: true,
@@ -107,27 +106,6 @@ export default createListViewModel({
           pathname.indexOf('/reception/queue/dispense') === 0 ||
           pathname.indexOf('/pharmacy/worklist') === 0
         ) {
-          dispatch({
-            type: 'codetable/fetchCodes',
-            payload: {
-              code: 'ctservice',
-              force: true,
-              filter: {
-                'serviceFKNavigation.IsActive': true,
-                'serviceCenterFKNavigation.IsActive': true,
-                combineCondition: 'and',
-              },
-            },
-          }).then(list => {
-            if (list) {
-              dispatch({
-                type: 'updateState',
-                payload: {
-                  fullService: list,
-                },
-              })
-            }
-          })
         }
       })
     },
@@ -433,7 +411,7 @@ export default createListViewModel({
             corVaccinationCert: getCertificate(uid),
           }
           rows.push(newRow)
-        } 
+        }
         return {
           ...state,
           rows,

@@ -14,7 +14,6 @@ const { Panel } = Collapse
 const styles = theme => ({})
 export const LabExaminations = props => {
   const { data, acknowledge } = props
-  console.log(data)
   const dispatch = useDispatch()
   const genExtra = lab => (
     <div>
