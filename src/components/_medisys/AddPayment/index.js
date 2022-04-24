@@ -235,17 +235,22 @@ class AddPayment extends Component {
   }
 
   getPopulateAmount = paymentMode => {
-    const { values, patient, isGroupPayment, visitGroupStatusDetails } = this.props
-    let amount = values.outstandingAfterPayment
     const { id: type } = paymentMode
-    if (parseInt(type, 10) !== PAYMENT_MODE.DEPOSIT) return amount
+    const {
+      values: { outstandingAfterPayment, invoiceOSAmount = 0 },
+      patient,
+      isGroupPayment,
+      visitGroupStatusDetails,
+    } = this.props
+
+    if (parseInt(type, 10) !== PAYMENT_MODE.DEPOSIT) return outstandingAfterPayment
 
     const { patientDeposit } = patient
     if (patientDeposit) {
       const { balance = 0 } = patientDeposit
-      if (isGroupPayment)
-        amount -= _.sumBy(visitGroupStatusDetails.filter(x=>x.invoiceFK !== values.id),'outstandingBalance') || 0
-      return Math.min(balance,amount)
+      if(isGroupPayment)
+        return Math.min(balance, Math.min(outstandingAfterPayment, invoiceOSAmount))
+      return Math.min(balance, outstandingAfterPayment)
     }
   }
 

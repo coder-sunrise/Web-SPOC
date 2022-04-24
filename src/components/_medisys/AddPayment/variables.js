@@ -1,6 +1,7 @@
 import * as Yup from 'yup'
 import { PAYMENT_MODE } from '@/utils/constants'
 import { roundTo } from '@/utils/utils'
+import { IsoRounded } from '@material-ui/icons'
 
 const requiredMsg = 'This is a required field'
 export const ValidationSchema = Yup.object().shape({
@@ -28,38 +29,51 @@ export const ValidationSchema = Yup.object().shape({
       'invoiceOSAmount'
     ],
     (finalPayable, totalAmtPaid, isGroupPayment, invoiceOSAmount, schema) => {
-      let min = 0.01
-      let max = finalPayable
-      let minMsg = 'Amount must be greater than $0.00'
-      const isFullPayment = isGroupPayment && totalAmtPaid < finalPayable
-      if(isFullPayment) {
-        min = finalPayable
-        minMsg = 'Outstanding balance of current visit group must to be fully paid.'
+      const min = 0.01
+      const minMsg = 'Amount must be greater than $0.00'
+      const minMsg_FullyPaid = 'Outstanding balance of current visit group must to be fully paid.'
+      const max = finalPayable
+      const maxMsg = 'paid cannot exceed'
+      
+      const isOverpaid = totalAmtPaid > finalPayable
+      const isOutstanding = totalAmtPaid < finalPayable
+
+      if (isGroupPayment) {
+        return schema.of(
+          Yup.object().shape({
+            id: Yup.number(),
+            paymentModeFK: Yup.number().required(),
+            amt: Yup.number().when(['isDeposit'], (isDeposit, schema) => {
+              const newMinMsg = isOutstanding ? minMsg_FullyPaid : minMsg
+              if (isDeposit) {
+                const newMin = isOutstanding ? invoiceOSAmount : min
+                const newMax = invoiceOSAmount
+                return schema
+                  .min(newMin, newMinMsg)
+                  .max(newMax, `Deposit ${maxMsg} $${roundTo(newMax)}`)
+                  .required()
+              }
+              const newMin = isOutstanding ? finalPayable : min
+              const newMax = isOverpaid ? min : finalPayable
+              return schema
+                .min(newMin, newMinMsg)
+                .max(newMax, `Total amount ${maxMsg} $${roundTo(finalPayable)}`)
+                .required()
+            }),
+            creditCardPayment: Yup.object().when('paymentModeFK', {
+              is: val => val === PAYMENT_MODE.CREDIT_CARD,
+              then: Yup.object().shape({
+                creditCardTypeFK: Yup.string().required(),
+              }),
+            }),
+          }),
+        )
       }
       return schema.of(
         Yup.object().shape({
           id: Yup.number(),
           paymentModeFK: Yup.number().required(),
-          amt: Yup.number().when(['isDeposit'], (isDeposit, schema) => {
-            let minAmt = min
-            let maxAmt = max
-            let maxMsg = 'Total amount paid cannot exceed'
-            if(isGroupPayment && isDeposit){
-               minAmt = invoiceOSAmount
-               maxAmt = invoiceOSAmount
-               maxMsg = 'Amount paid cannot exceed'
-            }
-            if (totalAmtPaid > finalPayable){
-              return schema
-                .min(minAmt, minMsg)
-                .max(0.01, `${maxMsg} $${roundTo(maxAmt)}`)
-                .required()
-            }
-            return schema
-              .min(minAmt, minMsg)
-              .max(maxAmt, `${maxMsg} $${roundTo(maxAmt)}`)
-              .required()
-          }),
+          amt: Yup.number().min(min,minMsg).max(isOverpaid ? min : max, `Total amount ${maxMsg} $${roundTo(max)}`),
           creditCardPayment: Yup.object().when('paymentModeFK', {
             is: val => val === PAYMENT_MODE.CREDIT_CARD,
             then: Yup.object().shape({
