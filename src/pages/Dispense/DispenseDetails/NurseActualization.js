@@ -10,18 +10,17 @@ import {
   CommonModal,
   Tooltip,
 } from '@/components'
-import { NURSE_WORKITEM_STATUS, RADIOLOGY_WORKITEM_STATUS } from '@/utils/constants'
+import {
+  NURSE_WORKITEM_STATUS,
+  RADIOLOGY_WORKITEM_STATUS,
+} from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 import moment from 'moment'
 import DeleteConfirmation from './DeleteConfirmation'
 
 const dateTimeFormat = 'DD MMM YYYY HH:mm'
 const localDateTime = value => {
-  return value
-    ? moment(value)
-        .utc()
-        .format(dateTimeFormat)
-    : '-'
+  return value ? moment(value).format(dateTimeFormat) : '-'
 }
 
 const detailsColumns = [
@@ -44,14 +43,27 @@ const actualizedColumns = [
 const colDetailsExtensions = [
   { columnName: 'type', width: 100 },
   { columnName: 'name' },
-  { columnName: 'qty', width: 80, align: 'right', render: r=> `${r.qty}${(r.uom && r.uom.trim() !== '' ? ` ${r.uom}` : '')}` },
+  {
+    columnName: 'qty',
+    width: 80,
+    align: 'right',
+    render: r => `${r.qty}${r.uom && r.uom.trim() !== '' ? ` ${r.uom}` : ''}`,
+  },
   { columnName: 'orderBy', width: 130 },
-  { columnName: 'orderDate', width: 140, render: r => localDateTime(r.orderDate) },
+  {
+    columnName: 'orderDate',
+    width: 140,
+    render: r => localDateTime(r.orderDate),
+  },
   { columnName: 'instructions' },
-  { columnName: 'accessionNo', width:130  },
+  { columnName: 'accessionNo', width: 130 },
   { columnName: 'orderRemarks' },
   { columnName: 'actulizeByUser', width: 130 },
-  { columnName: 'actulizeDate', width: 140, render: r => localDateTime(r.actulizeDate) },
+  {
+    columnName: 'actulizeDate',
+    width: 140,
+    render: r => localDateTime(r.actulizeDate),
+  },
   { columnName: 'actulizeRemarks' },
 ]
 
@@ -75,17 +87,34 @@ const historyColumns = [
 const historyColumnExtensions = [
   { columnName: 'type', width: 100 },
   { columnName: 'name' },
-  { columnName: 'qty', width: 80, align: 'right', render: r=> `${r.qty}${(r.uom && r.uom.trim() !== '' ? ` ${r.uom}` : '')}`},
+  {
+    columnName: 'qty',
+    width: 80,
+    align: 'right',
+    render: r => `${r.qty}${r.uom && r.uom.trim() !== '' ? ` ${r.uom}` : ''}`,
+  },
   { columnName: 'orderBy', width: 130 },
-  { columnName: 'orderDate', width: 135, render: r => localDateTime(r.orderDate) },
-  { columnName: 'instructions' , width: 130},
-  { columnName: 'accessionNo', width:125 },
+  {
+    columnName: 'orderDate',
+    width: 135,
+    render: r => localDateTime(r.orderDate),
+  },
+  { columnName: 'instructions', width: 130 },
+  { columnName: 'accessionNo', width: 125 },
   { columnName: 'orderRemarks' },
   { columnName: 'actualizeByUser', width: 130 },
-  { columnName: 'actualizeDate', width: 135, render: r => localDateTime(r.actualizeDate) },
+  {
+    columnName: 'actualizeDate',
+    width: 135,
+    render: r => localDateTime(r.actualizeDate),
+  },
   { columnName: 'actualizeRemarks' },
-  { columnName: 'cancelByUser', width: 130},
-  { columnName: 'cancelDate', width: 135, render: r => localDateTime(r.cancelDate) },
+  { columnName: 'cancelByUser', width: 130 },
+  {
+    columnName: 'cancelDate',
+    width: 135,
+    render: r => localDateTime(r.cancelDate),
+  },
   { columnName: 'cancelReasons' },
 ]
 
@@ -99,7 +128,7 @@ class NurseActualization extends React.PureComponent {
   }
 
   componentWillMount = () => {
-    const { dispatch, nurseWorkitemIds='', status = 0 } = this.props
+    const { dispatch, nurseWorkitemIds = '', status = 0 } = this.props
     dispatch({
       type: 'dispense/getActualize',
       payload: { status, nurseWorkitemIds },
@@ -142,7 +171,7 @@ class NurseActualization extends React.PureComponent {
     this.setState({ showCancelConfirmation: true })
   }
 
-  confirmCancel = (reasons) => {
+  confirmCancel = reasons => {
     this.props
       .dispatch({
         type: 'dispense/cancelActualize',
@@ -174,13 +203,26 @@ class NurseActualization extends React.PureComponent {
     const cancelBtnViewable = NURSE_WORKITEM_STATUS.ACTUALIZED === status
 
     const actualizeRight = Authorized.check('dispense.actualizeorderitems')
-    const cancelActualizeRight = Authorized.check('dispense.cancelactualizeorderitems')
-    const isDisabledActualize = actualizeRight && actualizeRight.rights === 'disable'
-    const isDisabledCancelActualize = cancelActualizeRight && cancelActualizeRight.rights === 'disable' 
-    const radiologyCancellableActualizeStatus = [RADIOLOGY_WORKITEM_STATUS.NEW, RADIOLOGY_WORKITEM_STATUS.CANCELLED]
-    const isEnableCancelActualizeByRadiology = actualize.some(x=> !x.radiologyWorkitemStatusFK || radiologyCancellableActualizeStatus.includes(x.radiologyWorkitemStatusFK))
+    const cancelActualizeRight = Authorized.check(
+      'dispense.cancelactualizeorderitems',
+    )
+    const isDisabledActualize =
+      actualizeRight && actualizeRight.rights === 'disable'
+    const isDisabledCancelActualize =
+      cancelActualizeRight && cancelActualizeRight.rights === 'disable'
+    const radiologyCancellableActualizeStatus = [
+      RADIOLOGY_WORKITEM_STATUS.NEW,
+      RADIOLOGY_WORKITEM_STATUS.CANCELLED,
+    ]
+    const isEnableCancelActualizeByRadiology = actualize.some(
+      x =>
+        !x.radiologyWorkitemStatusFK ||
+        radiologyCancellableActualizeStatus.includes(
+          x.radiologyWorkitemStatusFK,
+        ),
+    )
 
-      return (
+    return (
       <div>
         {actualizeViewable && (
           <GridContainer style={{ marginBottom: 20 }}>
@@ -251,26 +293,38 @@ class NurseActualization extends React.PureComponent {
             <div style={{ marginTop: 8, marginBottom: 10 }} align='right'>
               {actualizeViewable && actualizeBtnViewable && (
                 <Authorized authorized='dispense.actualizeorderitems'>
-                  <Button color='success' onClick={this.actualize} disabled={isDisabledActualize}>
+                  <Button
+                    color='success'
+                    onClick={this.actualize}
+                    disabled={isDisabledActualize}
+                  >
                     Actualize
                   </Button>
                 </Authorized>
               )}
               {actualizeViewable && cancelBtnViewable && (
                 <Authorized authorized='dispense.cancelactualizeorderitems'>
-                  {
-                    !isEnableCancelActualizeByRadiology ?
-                        <Tooltip title='Workitem has been started, cancel actualization is not supported.'>
-                          <span>
-                            <Button color='warning' onClick={this.cancel} disabled={true}>
-                              Cancel Actualization
-                            </Button>
-                          </span>
-                        </Tooltip>
-                      : <Button color='warning' onClick={this.cancel} disabled={isDisabledCancelActualize}>
+                  {!isEnableCancelActualizeByRadiology ? (
+                    <Tooltip title='Workitem has been started, cancel actualization is not supported.'>
+                      <span>
+                        <Button
+                          color='warning'
+                          onClick={this.cancel}
+                          disabled={true}
+                        >
                           Cancel Actualization
                         </Button>
-                  }
+                      </span>
+                    </Tooltip>
+                  ) : (
+                    <Button
+                      color='warning'
+                      onClick={this.cancel}
+                      disabled={isDisabledCancelActualize}
+                    >
+                      Cancel Actualization
+                    </Button>
+                  )}
                 </Authorized>
               )}
               {!actualizeViewable && (
