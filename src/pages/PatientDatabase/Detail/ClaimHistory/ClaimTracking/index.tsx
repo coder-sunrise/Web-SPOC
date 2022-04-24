@@ -412,19 +412,18 @@ const ClaimTracking = ({
           return (
             <Tooltip
               title={
-                <div style={{ whiteSpace: 'pre-wrap' }}>{row.remarks}</div>
+                <div
+                  style={{
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden',
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  {row.remarks}
+                </div>
               }
             >
-              <div
-                style={{
-                  textOverflow: 'ellipsis',
-                  overflow: 'hidden',
-                  whiteSpace: 'nowrap',
-                  width: 184,
-                }}
-              >
-                {row.remarks || '-'}
-              </div>
+              <span className='oneline_textblock'>{row.remarks || '-'}</span>
             </Tooltip>
           )
         },

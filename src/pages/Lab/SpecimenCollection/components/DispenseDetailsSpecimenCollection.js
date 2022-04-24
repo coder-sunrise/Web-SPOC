@@ -86,6 +86,7 @@ const DispenseDetailsSpecimenCollection = ({
       dataIndex: 'serviceName',
       key: 'serviceName',
       title: 'Service Name',
+      width: 300,
     },
     {
       dataIndex: 'testPanelNames',

@@ -159,6 +159,7 @@ const lowStockIndicator = (row, itemIdFieldName, right) => {
       sourceType={currentType.name.toLowerCase()}
       values={values}
       right={right}
+      style={{}}
     />
   )
 }
@@ -554,12 +555,14 @@ export const DispenseItemsColumns1 = (
               wordWrap: 'break-word',
               whiteSpace: 'pre-wrap',
               paddingRight,
+              position: 'relative',
+              top: 2,
             }}
           >
             <Tooltip title={row.name}>
               <span>{row.name}</span>
             </Tooltip>
-            <div style={{ position: 'relative', top: 2 }}>
+            <div style={{ position: 'absolute', top: 0, right: '-10px' }}>
               {lowStockIndicator(
                 {
                   ...row,
@@ -710,15 +713,7 @@ export const DispenseItemsColumns1 = (
           return (
             <div>
               <Tooltip title={row.batchNo}>
-                <div
-                  style={{
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >
-                  {row.batchNo || '-'}
-                </div>
+                <div>{row.batchNo || '-'}</div>
               </Tooltip>
               {isExpire && <p style={{ color: 'red' }}>EXPIRED!</p>}
             </div>
@@ -860,41 +855,35 @@ export const DispenseItemsColumns1 = (
           <div style={{ position: 'relative' }}>
             <div
               style={{
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
                 paddingRight: existsDrugLabelRemarks ? 10 : 0,
                 minHeight: 20,
               }}
             >
               <Tooltip title={row.remarks || ''}>
-                <span>{row.remarks || ' '}</span>
+                <span className='oneline_textblock'>{row.remarks || ' '}</span>
               </Tooltip>
             </div>
-            <div style={{ position: 'relative', top: 6 }}>
-              {existsDrugLabelRemarks && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: 2,
-                    right: -8,
-                  }}
+
+            {existsDrugLabelRemarks && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 6,
+                  right: -8,
+                }}
+              >
+                <Tooltip
+                  title={
+                    <div>
+                      <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
+                      <div>{row.drugLabelRemarks}</div>
+                    </div>
+                  }
                 >
-                  <Tooltip
-                    title={
-                      <div>
-                        <div style={{ fontWeight: 500 }}>
-                          Drug Label Remarks
-                        </div>
-                        <div>{row.drugLabelRemarks}</div>
-                      </div>
-                    }
-                  >
-                    <FileCopySharp style={{ color: '#4255bd' }} />
-                  </Tooltip>
-                </div>
-              )}
-            </div>
+                  <FileCopySharp style={{ color: '#4255bd' }} />
+                </Tooltip>
+              </div>
+            )}
           </div>
         )
       },

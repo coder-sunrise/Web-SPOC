@@ -874,6 +874,14 @@ textarea[class*='MuiInputBase-input-'] {
   overflow: hidden;
 }
 
+.oneline_textblock {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  white-space: pre-wrap;
+  overflow: hidden;
+}
+
 .ant-list-split .ant-list-item {
   border-bottom: 1px solid #c0c0c0;
 }
