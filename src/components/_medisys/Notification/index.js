@@ -35,11 +35,15 @@ const NotificationComponent = ({
     })
   }
 
-  const [
-    showNotification,
-    setShowNotification,
-  ] = useState(false)
+  const refreshNotifications = () => {
+    dispatch({
+      type: 'appNotification/loadNotifications',
+      payload: { source: activeKey },
+    })
+  }
 
+  const [showNotification, setShowNotification] = useState(false)
+  const [activeKey, setActiveKey] = useState(undefined)
   const { totalUnReadCount = 0 } = systemMessage
 
   const toggleVisibleChange = () => {
@@ -50,6 +54,11 @@ const NotificationComponent = ({
     <div style={{ position: 'relative', width: 600 }}>
       <Tabs
         type='line'
+        onChange={key => {
+          console.log(key,TYPES.find(t => t.id == key))
+          const tab = TYPES.find(t => t.id == key).name
+          setActiveKey(tab)
+        }}
         options={TYPES.map((o) => {
           const list = notifications.filter((m) => !o.id || m.type === o.id)
           let unReadCounts =
@@ -84,7 +93,7 @@ const NotificationComponent = ({
       />
       <IconButton
         style={{ top: 12, right: 12, position: 'absolute' }}
-        onClick={refreshQueueListing}
+        onClick={refreshNotifications}
       >
         <Refresh />
       </IconButton>
@@ -106,7 +115,9 @@ const NotificationComponent = ({
       <Badge
         badgeContent={
           notifications.filter(
-            (o) => TYPES.find((t) => !t.id || o.type === t.id) && !o.read,
+            o =>
+              TYPES.find(t => !t.excludeBadgeCount && (!t.id || o.type === t.id)) &&
+              !o.read,
           ).length + totalUnReadCount
         }
         color='primary'

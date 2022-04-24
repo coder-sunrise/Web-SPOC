@@ -68,6 +68,8 @@ class AppNotificationContent extends Component {
       toUserFK,
       toUser,
       generateDate,
+      isRead,
+      patientName,
     } = notification
 
     const { internalContent = content } = this.state
@@ -88,8 +90,19 @@ class AppNotificationContent extends Component {
               />
             </div>
           ) : (
-            <div style={{ whiteSpace: 'pre-wrap', fontWeight: 'bold' }}>
+            <div
+              style={{
+                whiteSpace: 'pre-wrap',
+                fontWeight: isRead ? 'unset' : 'bold',
+              }}
+            >
               {internalContent}
+              {patientName ? (
+                <span>
+                  {' '}
+                  Patient: <strong>{patientName}</strong>
+                </span>
+              ) : null}
             </div>
           )}
         </div>
