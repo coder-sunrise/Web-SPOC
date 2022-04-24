@@ -91,6 +91,7 @@ export const SpecimenDetails = ({
   id,
   onClose,
   onConfirm,
+  isDisposePatientEntity = true,
   isReadonly = false,
 }) => {
   const dispatch = useDispatch()
@@ -386,7 +387,7 @@ export const SpecimenDetails = ({
                 <React.Fragment>
                   <GridItem md={12}>
                     <div style={{ padding: 8 }}>
-                      <Banner />
+                      <Banner isDisposePatientEntity={isDisposePatientEntity} />
                     </div>
                   </GridItem>
                   <GridItem md={12}>

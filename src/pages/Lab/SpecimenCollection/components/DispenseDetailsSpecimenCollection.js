@@ -472,6 +472,7 @@ const DispenseDetailsSpecimenCollection = ({
         onConfirm={() => {
           closeSpecimenDetails()
         }}
+        isDisposePatientEntity={false}
         isReadonly={true}
       />
     </React.Fragment>
