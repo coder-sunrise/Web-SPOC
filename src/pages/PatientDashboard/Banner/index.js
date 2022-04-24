@@ -126,8 +126,8 @@ class Banner extends PureComponent {
       type: 'codetable/fetchCodes',
       payload: { code: 'ctg6pd' },
     })
-  } 
- 
+  }
+
   componentWillUnmount() {
     const { dispatch, isDisposePatientEntity = true } = this.props
     if (isDisposePatientEntity) {
@@ -936,7 +936,7 @@ class Banner extends PureComponent {
 
   render() {
     const { props } = this
-    const { 
+    const {
       extraCmt,
       preOrderCmt,
       from = '',
