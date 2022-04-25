@@ -92,7 +92,7 @@ const AppNotificationList = ({
     upsertNotification({
       ...notification,
       isRead: true,
-      // readDate: moment().formatUTC(false),
+      isAcknowledged: true,
     })
   }
 
@@ -102,9 +102,7 @@ const AppNotificationList = ({
       payload: notifications.map(x => ({
         id: x.id,
         isRead: true,
-        // readDate: moment().formatUTC(false),
         isAcknowledged: true,
-        // acknowledgeDate: moment().formatUTC(false),
       })),
     }).then(r => {
       if (r == 204) loadNotifications()
@@ -115,9 +113,7 @@ const AppNotificationList = ({
     upsertNotification({
       ...notification,
       isRead: true,
-      // readDate: moment().formatUTC(false),
       isAcknowledged: true,
-      // acknowledgeDate: moment().formatUTC(false),
     })
   }
 
@@ -152,6 +148,7 @@ const AppNotificationList = ({
                       dispatch={dispatch}
                       notification={notification}
                       currentUserFK={user.data.id}
+                      showAcknowledge={false}
                       {...actions}
                     />
                   }

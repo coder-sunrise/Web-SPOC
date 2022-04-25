@@ -56,6 +56,7 @@ class AppNotificationContent extends Component {
       onSave,
       onAcknowledge,
       customeStyle = {},
+      showAcknowledge = true,
     } = this.props
     const {
       isNew,
@@ -73,7 +74,8 @@ class AppNotificationContent extends Component {
     } = notification
 
     const { internalContent = content } = this.state
-
+    const isSender = currentUserFK == fromUserFK
+    const isReceiver = !isSender
     return (
       <div style={{ ...customeStyle }}>
         <div>
@@ -98,7 +100,7 @@ class AppNotificationContent extends Component {
             >
               {internalContent}
               {patientName ? (
-                <span style={{marginLeft:20}}>
+                <span style={{ marginLeft: 20 }}>
                   Patient: <strong>{patientName}</strong>
                 </span>
               ) : null}
@@ -143,13 +145,8 @@ class AppNotificationContent extends Component {
             </div>
           ) : (
             <div style={{ position: 'relative', height: 24 }}>
-              {isAcknowledgeRequired &&
-                (currentUserFK != fromUserFK || isAcknowledged) &&
-                (isAcknowledged ? (
-                  <div style={{ width: 22, height: 22, padding: 3 }}>
-                    <Done style={{ color: '#389e0d' }} />
-                  </div>
-                ) : (
+              {showAcknowledge &&
+                (isReceiver && !isAcknowledged ? (
                   <Tooltip title='Acknowledge Message'>
                     <Button
                       justIcon
@@ -164,8 +161,12 @@ class AppNotificationContent extends Component {
                       <Done />
                     </Button>
                   </Tooltip>
-                ))}
-              {currentUserFK == fromUserFK && (
+                ) : isAcknowledged ? (
+                  <div style={{ width: 22, height: 22, padding: 3 }}>
+                    <Done style={{ color: '#389e0d' }} />
+                  </div>
+                ) : null)}
+              {isSender && (
                 <div
                   style={{
                     position: 'absolute',
@@ -175,7 +176,7 @@ class AppNotificationContent extends Component {
                   }}
                 >{`To: ${toUser}`}</div>
               )}
-              {currentUserFK != fromUserFK && (
+              {isReceiver && (
                 <div
                   style={{
                     position: 'absolute',
