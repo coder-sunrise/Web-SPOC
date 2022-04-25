@@ -117,7 +117,7 @@ const styles = theme => ({
       isMatchRole(values.clinicRoleFK, m.clinicRoleBitValue),
     )
     if (!values.id) {
-      result.roleClientAccessRight = roleClientAccessRight.map(d => {
+      result.roleClientAccessRight = result.roleClientAccessRight.map(d => {
         const { id, ...data } = d
         return data
       })

@@ -268,17 +268,18 @@ const RadiologyDetails = () => {
             !showOnlyCloseButton ? renderStatusButtons() : undefined,
             renderPrintButton(),
           ],
-          onConfirm:
-            !showOnlyCloseButton &&
-            (
-              Authorized.check('radiologyworklist.saveexamination') || {
-                rights: 'hidden',
-              }
-            )?.rights === 'enable'
-              ? () => {
-                  handleSave()
+          onConfirm: () => {
+            handleSave()
+          },
+          confirmProps: {
+            disabled:
+              showOnlyCloseButton ||
+              (
+                Authorized.check('radiologyworklist.saveexamination') || {
+                  rights: 'hidden',
                 }
-              : undefined,
+              )?.rights !== 'enable',
+          },
         }}
         confirmProps={{ disable: true }}
         maxWidth='lg'
