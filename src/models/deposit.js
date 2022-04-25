@@ -38,6 +38,11 @@ export default createListViewModel({
         const response = yield call(service.upsertDeposit, payload)
         return response
       },
+
+      *getPatientDeposit({ payload }, { call, put }) {
+        const response = yield call(service.getPatientDeposit, payload)
+        return response
+      },
       *deleteTransaction({ payload }, { call, put }) {
         const result = yield call(service.deleteTransaction, payload)
         if (result === 204) {

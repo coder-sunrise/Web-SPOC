@@ -535,6 +535,7 @@ class PaymentDetails extends Component {
         >
           <TransferToDepositModal
             isDeposit
+            {...this.props}
             invoicePayerFK={selectedInvoicePayerFK}
             maxTranseferAmount={-(outStanding || 0)}
           />

@@ -16,6 +16,15 @@ const fns = {
     })
     return r
   },
+  getPatientDeposit: async params => {
+    const r = await request(`${url}/patient`, {
+      method: 'GET',
+      body: {
+        ...params,
+      },
+    })
+    return r
+  },
   deleteTransaction: async params => {
     const r = await request(`${url}/transaction/${params.id}`, {
       method: 'DELETE',
