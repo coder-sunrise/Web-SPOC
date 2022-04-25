@@ -210,7 +210,7 @@ const CollectSpecimen = ({
         <Space align='start' style={{ display: 'flex', marginBottom: 12 }}>
           <Form.Item
             name='specimenTypeFK'
-            rules={[{ required: true, message: 'Specimen type is reqired.' }]}
+            rules={[{ required: true, message: 'Specimen type is required.' }]}
           >
             <Select
               label='Specimen Type'
