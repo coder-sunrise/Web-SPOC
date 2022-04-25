@@ -529,7 +529,7 @@ export default ({
     }
   }
   const GetService = currentVisitOrderTemplate => {
-    const { ctservice = [] } = codetable 
+    const { ctservice = [] } = codetable
     var service = ctservice.find(
       t =>
         t.serviceCenter_ServiceId ===
@@ -1175,7 +1175,13 @@ export default ({
     const { visitOrderTemplateItemDtos } = visitOrderTemplate
 
     let removedTemplateItems = visitOrderTemplateItemDtos
-      .filter(t => t.orderable)
+      .filter(
+        t =>
+          t.inventoryItemTypeFK === 3 ||
+          t.inventoryItemTypeFK === 4 ||
+          ((t.inventoryItemTypeFK === 2 || t.inventoryItemTypeFK === 1) &&
+            t.orderable),
+      )
       .filter(t => {
         if (
           rows.filter(
