@@ -42,7 +42,7 @@ const showMoney = (v = 0) => {
     return (
       <span
         style={{ fontWeight: 'bold', color: 'red' }}
-      >{`(${currencySymbol}${numeral(v).format('0.00')})`}</span>
+      >{`(${currencySymbol}${numeral(v * -1.0).format('0.00')})`}</span>
     )
   return (
     <span
