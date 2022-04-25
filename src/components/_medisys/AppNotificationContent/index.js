@@ -98,8 +98,7 @@ class AppNotificationContent extends Component {
             >
               {internalContent}
               {patientName ? (
-                <span>
-                  {' '}
+                <span style={{marginLeft:20}}>
                   Patient: <strong>{patientName}</strong>
                 </span>
               ) : null}
