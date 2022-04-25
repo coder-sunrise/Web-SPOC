@@ -160,9 +160,7 @@ const Examination = props => {
         dataIndex: `valueColumn${index + 1}`,
         title: (
           <div style={{ padding: 4 }}>
-            {index === 0
-              ? 'Current'
-              : moment(item.visitDate).format(dateFormatLong)}
+            {moment(item.visitDate).format(dateFormatLong)}
           </div>
         ),
         width: 200,
