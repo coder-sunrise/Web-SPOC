@@ -22,7 +22,7 @@ import AuthorizedContext from '@/components/Context/Authorized'
 import BrowseImage from './BrowseImage'
 import SettingParameter from './SettingParameter'
 
-const styles = (theme) => ({
+const styles = theme => ({
   container: {
     marginBottom: theme.spacing(2),
   },
@@ -51,7 +51,7 @@ const styles = (theme) => ({
   },
 })
 
-const errorMessage = (v) => {
+const errorMessage = v => {
   return `The value must between ${v} and 5.0`
 }
 
@@ -72,57 +72,62 @@ const errorMessage = (v) => {
 
   validationSchema: Yup.object().shape({
     customLetterHeadHeight: Yup.number().when('isDisplayCustomLetterHead', {
-      is: (v) => v === true,
+      is: v => v === true,
       then: Yup.number()
         .required()
         .min(0.1, errorMessage(0.1))
         .max(5, errorMessage(0.1)),
     }),
     standardHeaderInfoHeight: Yup.number().when('isDisplayStandardHeader', {
-      is: (v) => v === true,
+      is: v => v === true,
       then: Yup.number()
         .required()
         .min(0.1, errorMessage(0.1))
         .max(5, errorMessage(0.1)),
     }),
     contentDisclaimerHeight: Yup.number().when('isDisplayContentDisclaimer', {
-      is: (v) => v === true,
+      is: v => v === true,
       then: Yup.number()
         .required()
         .min(0.1, errorMessage(0.1))
         .max(5, errorMessage(0.1)),
-    }),    
+    }),
     footerInfoHeight: Yup.number().when('isDisplayFooterInfo', {
-      is: (v) => v === true,
+      is: v => v === true,
       then: Yup.number()
         .required()
         .min(0.1, errorMessage(0.1))
         .max(5, errorMessage(0.1)),
     }),
     footerDisclaimerHeight: Yup.number().when('isDisplayFooterInfoDisclaimer', {
-      is: (v) => v === true,
+      is: v => v === true,
       then: Yup.number()
         .required()
         .min(0.1, errorMessage(0.1))
         .max(5, errorMessage(0.1)),
     }),
     customLetterHeadImage: Yup.string().when('isDisplayCustomLetterHead', {
-      is: (v) => v === true,
+      is: v => v === true,
       then: Yup.string().required('Letter Head Image is required.'),
     }),
     contentDisclaimerImage: Yup.string().when('isDisplayContentDisclaimer', {
-      is: (v) => v === true,
+      is: v => v === true,
       then: Yup.string().required('Disclaimer Image is required.'),
     }),
     footerDisclaimerImage: Yup.string().when('isDisplayFooterInfoDisclaimer', {
-      is: (v) => v === true,
+      is: v => v === true,
       then: Yup.string().required('Footer Image is required.'),
     }),
   }),
   handleSubmit: (values, { props }) => {
     const { dispatch } = props
-    const { customLetterHeadImage, contentDisclaimerImage, footerDisclaimerImage, reportFK } = values
-    const noHeaderBase64 = (v) => {
+    const {
+      customLetterHeadImage,
+      contentDisclaimerImage,
+      footerDisclaimerImage,
+      reportFK,
+    } = values
+    const noHeaderBase64 = v => {
       if (v) return v.split(',')[1] || v
       return undefined
     }
@@ -134,7 +139,7 @@ const errorMessage = (v) => {
         contentDisclaimerImage: noHeaderBase64(contentDisclaimerImage),
         footerDisclaimerImage: noHeaderBase64(footerDisclaimerImage),
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         dispatch({
           type: 'printoutSetting/query',
@@ -162,15 +167,10 @@ class printoutSetting extends PureComponent {
   }
 
   setImageBase64 = (type, v) => {
-    this.props.setFieldValue(
-      [
-        type,
-      ],
-      v,
-    )
+    this.props.setFieldValue([type], v)
   }
 
-  checkFormIsDirty = (e) => {
+  checkFormIsDirty = e => {
     const { formik, dispatch, setFieldValue } = this.props
     if (this.setState.prevSelectedIndex === 0) {
       return
@@ -197,7 +197,7 @@ class printoutSetting extends PureComponent {
     }
   }
 
-  getSelectedReportSetting = (e) => {
+  getSelectedReportSetting = e => {
     const { dispatch } = this.props
 
     if (e) {
@@ -206,7 +206,7 @@ class printoutSetting extends PureComponent {
         payload: {
           id: e,
         },
-      }).then((v) => {
+      }).then(v => {
         if (v) {
           this.setState(() => {
             return {
@@ -240,7 +240,7 @@ class printoutSetting extends PureComponent {
     // })
   }
 
-  render () {
+  render() {
     const {
       form,
       classes,
@@ -255,7 +255,8 @@ class printoutSetting extends PureComponent {
 
     const letterHeadImgRequired = this.props.errors.customLetterHeadImage
     const footerDisclaimerImgRequired = this.props.errors.footerDisclaimerImage
-    const contentDisclaimerImgRequired = this.props.errors.contentDisclaimerImage
+    const contentDisclaimerImgRequired = this.props.errors
+      .contentDisclaimerImage
     const { reportSettingParameter = [] } = values
 
     return (
@@ -267,7 +268,7 @@ class printoutSetting extends PureComponent {
                 name='reportFK'
                 render={args => (
                   <CodeSelect
-                    label='Select Printout'
+                    label='Select Printout2'
                     code='report'
                     allowClear={false}
                     {...args}
@@ -386,8 +387,8 @@ class printoutSetting extends PureComponent {
               ) : (
                 ''
               )}
-              
-              {[15,89].some(r=> r === values.reportFK) && (
+
+              {[15, 89].some(r => r === values.reportFK) && (
                 <React.Fragment>
                   <GridContainer className={classes.verticalSpacing}>
                     <GridItem md={2}>
