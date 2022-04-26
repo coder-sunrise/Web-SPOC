@@ -30,7 +30,9 @@ import Contact from './Contact'
   validationSchema: ({ settingCompany }) =>
     Yup.object().shape({
       code: Yup.string().when('settingCompany', {
-        is: () => settingCompany.companyType.id === 2,
+        is: () =>
+          settingCompany.companyType.id === 2 ||
+          settingCompany.companyType.id === 3,
         then: Yup.string().required(),
       }),
       displayValue: Yup.string().required(),

@@ -121,7 +121,8 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                     noDefaultValue
                     mode='multiple'
                     temp={false}
-                    maxTagPlaceholder='Order By'
+                    maxTagPlaceholder='options '
+                    
                     {...args}
                   />
                 </Tooltip>
