@@ -293,22 +293,22 @@ export const QueueColumnExtensions = props => {
                 <span>{row.patientName}</span>
               </Tooltip>
             </div>
-            <div style={{ width: 20 }}>
-              <Tooltip title='For Invoice Replacement'>
-                <span
-                  style={{
-                    display: 'inline-block',
-                    position: 'relative',
-                    top: 3,
-                    marginLeft: 3,
-                  }}
-                >
-                  {row.isForInvoiceReplacement && (
+            {row.isForInvoiceReplacement && (
+              <div style={{ width: 20 }}>
+                <Tooltip title='For Invoice Replacement'>
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      position: 'relative',
+                      top: 3,
+                      marginLeft: 3,
+                    }}
+                  >
                     <InvoiceReplacement></InvoiceReplacement>
-                  )}
-                </span>
-              </Tooltip>
-            </div>
+                  </span>
+                </Tooltip>
+              </div>
+            )}
           </div>
         )
       },

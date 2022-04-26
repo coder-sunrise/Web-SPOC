@@ -116,33 +116,33 @@ class Grid extends PureComponent {
   }
 
   editRow = async (row, isDeposit) => {
-                                        const { dispatch, deposit } = this.props
-                                        const { list } = deposit
+    const { dispatch, deposit } = this.props
+    const { list } = deposit
 
-                                        if (row.patientDepositFK > 0) {
-                                          await dispatch({
-                                            type: 'deposit/queryOne',
-                                            payload: {
-                                              id: row.patientDepositFK,
-                                            },
-                                          })
-                                        } else {
-                                          dispatch({
-                                            type: 'deposit/updateState',
-                                            payload: {
-                                              showModal: true,
-                                              entity: list.find(
-                                                o => o.id === row.id,
-                                              ),
-                                            },
-                                          })
-                                        }
+    if (row.patientDepositFK > 0) {
+      await dispatch({
+        type: 'deposit/queryOne',
+        payload: {
+          id: row.patientDepositFK,
+        },
+      })
+    } else {
+      const currentDeposit = list.find(o => o.id === row.id)
+      const { patientProfileFK } = currentDeposit
+      dispatch({
+        type: 'deposit/updateState',
+        payload: {
+          showModal: true,
+          entity: { patientProfileFK },
+        },
+      })
+    }
 
-                                        this.setState({
-                                          showDepositRefundModal: true,
-                                          isDeposit,
-                                        })
-                                      }
+    this.setState({
+      showDepositRefundModal: true,
+      isDeposit,
+    })
+  }
 
   toggleModal = () => {
     this.setState(prevState => ({

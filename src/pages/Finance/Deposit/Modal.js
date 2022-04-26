@@ -373,7 +373,7 @@ class Modal extends PureComponent {
 
     return (
       <React.Fragment>
-        <div>
+        <div style={{ margin: 20 }}>
           <GridContainer>
             <GridItem xs={12}>
               <Field
