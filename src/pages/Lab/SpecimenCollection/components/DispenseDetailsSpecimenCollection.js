@@ -40,6 +40,7 @@ const DispenseDetailsSpecimenCollection = ({
   classes,
   ...restProps
 }) => {
+  if (!visitId) return ''
   const dispatch = useDispatch()
   const [labSpecimens, setLabSpecimens] = useState([])
   const [newLabWorkitems, setNewLabWorkitems] = useState([])
@@ -56,8 +57,6 @@ const DispenseDetailsSpecimenCollection = ({
     open: false,
     id: undefined,
   })
-  const cttestpanel = useCodeTable('cttestpanel')
-  const ctspecimentype = useCodeTable('ctspecimentype')
   const printSpecimenLabel = usePrintSpecimenLabel(handlePrint)
 
   const columns = [
@@ -323,10 +322,9 @@ const DispenseDetailsSpecimenCollection = ({
   }
 
   useEffect(() => {
-    if (visitId && cttestpanel.length > 0 && ctspecimentype.length > 0)
-      getVisitSpecimenCollection()
+    if (visitId) getVisitSpecimenCollection()
     return () => cleanUpStates()
-  }, [visitId, cttestpanel, ctspecimentype])
+  }, [visitId])
 
   const cleanUpStates = () => {
     setLabSpecimens([])
@@ -372,17 +370,12 @@ const DispenseDetailsSpecimenCollection = ({
           .map(x => x.serviceName)
           .join(', ')
 
-        const specimenType = ctspecimentype.find(
-          specimenType => specimenType.id === item.specimenTypeFK,
-        ).name
+        const specimenType = item.specimenTypeName
 
         const testPanelNames = _.uniq(
-          curSpecimenLabWorkitems.map(innerItem => {
-            const testPanelName = cttestpanel.find(
-              item => item.id === innerItem.testPanelFK,
-            )?.displayValue
-            return testPanelName ? testPanelName : ''
-          }),
+          curSpecimenLabWorkitems.map(
+            innerItem => innerItem.testPanelName || '',
+          ),
         ).join(', ')
 
         return {

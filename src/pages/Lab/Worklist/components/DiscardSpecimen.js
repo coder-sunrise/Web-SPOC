@@ -21,9 +21,9 @@ import {
 import { useCodeTable } from '@/utils/hooks'
 
 export const DiscardSpecimen = ({ open, id, onClose, onConfirm }) => {
+  if (!open) return ''
   const [showModal, setShowModal] = useState(false)
   const [hasDiscardReason, setHasDiscardReason] = useState(false)
-  const ctspecimentype = useCodeTable('ctspecimentype')
   const { entity } = useSelector(s => s.worklistSpecimenDetails)
   const { entity: patient } = useSelector(s => s.patient)
   const dispatch = useDispatch()
@@ -93,10 +93,7 @@ export const DiscardSpecimen = ({ open, id, onClose, onConfirm }) => {
             {entity.accessionNo}
           </Descriptions.Item>
           <Descriptions.Item label='Specimen Type'>
-            {
-              ctspecimentype.find(item => item.id === entity.specimenTypeFK)
-                ?.name
-            }
+            {entity.specimenTypeName}
           </Descriptions.Item>
         </Descriptions>
         <Form
