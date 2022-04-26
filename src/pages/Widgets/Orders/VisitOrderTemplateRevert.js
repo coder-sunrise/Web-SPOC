@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import _ from 'lodash'
 import { Typography, Card, Table } from 'antd'
+import { useEffect } from 'react'
 
 import {
   GridContainer,
@@ -19,26 +20,27 @@ const VisitOrderTemplateRevert = props => {
   const [enableConfirm, setEnableConfirm] = useState(true)
   const [selectedRows, setSelectedRows] = useState([])
 
-  const codeTableNameArray = [
-    'inventorymedication',
-    'ctservice',
-    'inventoryconsumable',
-    'ctMedicationUnitOfMeasurement',
-    'ctMedicationFrequency',
-    'ctgender',
-    'inventoryvaccination',
-    'ctvaccinationusage',
-    'ctmedicationdosage',
-    'ctvaccinationunitofmeasurement',
-    'ctmedicationusage',
-    'ctmedicationprecaution',
-  ]
-  dispatch({
-    type: 'codetable/batchFetch',
-    payload: {
-      codes: codeTableNameArray,
-    },
-  })
+  useEffect(() => {
+    const codeTableNameArray = [
+      'inventorymedication',
+      'ctservice',
+      'inventoryconsumable',
+      'ctMedicationUnitOfMeasurement',
+      'ctMedicationFrequency',
+      'inventoryvaccination',
+      'ctvaccinationusage',
+      'ctmedicationdosage',
+      'ctvaccinationunitofmeasurement',
+      'ctmedicationusage',
+      'ctmedicationprecaution',
+    ]
+    dispatch({
+      type: 'codetable/batchFetch',
+      payload: {
+        codes: codeTableNameArray,
+      },
+    })
+  }, [])
 
   const columns = [
     {
