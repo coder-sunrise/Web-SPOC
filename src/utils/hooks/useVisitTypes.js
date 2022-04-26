@@ -7,17 +7,21 @@ export function useVisitTypes(allTypes) {
   const dispatch = useDispatch()
   const [ctvisitpurpose, setCtVisitPurpose] = useState([])
   const { visitTypeSetting } = useSelector(st => st.clinicSettings.settings)
+  const codetable = useSelector(st => st.codetable)
 
+  console.log('codetable.ctvisitpurpose', codetable.ctvisitpurpose)
   useEffect(() => {
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctvisitpurpose',
-      },
-    }).then(v => {
-      setCtVisitPurpose(v)
-    })
-  }, [])
+    !codetable.ctvisitpurpose || codetable.ctvisitpurpose.length === 0
+      ? dispatch({
+          type: 'codetable/fetchCodes',
+          payload: {
+            code: 'ctvisitpurpose',
+          },
+        }).then(v => {
+          setCtVisitPurpose(v)
+        })
+      : setCtVisitPurpose(codetable.ctvisitpurpose)
+  }, [codetable])
 
   let visitTypeSettingsObj = undefined
   let visitTypes = []
