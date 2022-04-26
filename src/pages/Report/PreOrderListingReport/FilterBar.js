@@ -97,6 +97,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                     <ItemSelect
                       {...args}
                       label='Item List'
+                      maxTagCount={0}
                       mode='multiple'
                       labelField='displayValue'
                       itemType={form.values.itemType}
@@ -122,7 +123,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                     mode='multiple'
                     temp={false}
                     maxTagPlaceholder='options '
-                    
+                    maxTagCount={0}
                     {...args}
                   />
                 </Tooltip>
