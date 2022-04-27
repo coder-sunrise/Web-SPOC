@@ -268,7 +268,7 @@ class printoutSetting extends PureComponent {
                 name='reportFK'
                 render={args => (
                   <CodeSelect
-                    label='Select Printout2'
+                    label='Select Printout'
                     code='report'
                     allowClear={false}
                     {...args}
