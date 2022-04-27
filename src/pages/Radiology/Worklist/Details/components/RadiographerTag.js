@@ -129,7 +129,6 @@ export const RadiographerTag = ({
           style={{ width: 150 }}
           size={'small'}
           onChange={handleInputConfirm}
-          
           onBlur={e => handleInputCancel(e)}
           onDropdownVisibleChange={open => {
             setDropdownOpen(open)
@@ -143,7 +142,7 @@ export const RadiographerTag = ({
       )}
       {!readonly && !inputVisible && (
         <Tag className='site-tag-plus' onClick={showInput}>
-          <PlusOutlined /> New Radiographer
+          <PlusOutlined /> New Technologist
         </Tag>
       )}
     </div>
