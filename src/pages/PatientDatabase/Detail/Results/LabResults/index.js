@@ -394,6 +394,8 @@ const LabResults = ({
             <Tooltip title={title} placement='right'>
               <span
                 style={{
+                  display: 'inline-block',
+                  width: '100%',
                   color: row[`v_${visitColumn.visitId}_shouldFlag`]
                     ? 'red'
                     : 'inherit',
