@@ -9,7 +9,6 @@ export function useVisitTypes(allTypes) {
   const { visitTypeSetting } = useSelector(st => st.clinicSettings.settings)
   const codetable = useSelector(st => st.codetable)
 
-  console.log('codetable.ctvisitpurpose', codetable.ctvisitpurpose)
   useEffect(() => {
     !codetable.ctvisitpurpose || codetable.ctvisitpurpose.length === 0
       ? dispatch({

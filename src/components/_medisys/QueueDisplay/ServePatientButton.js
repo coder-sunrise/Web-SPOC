@@ -51,14 +51,14 @@ const ServePatientButton = ({
     return null
 
   const btn = !justIcon ? (
-    <ProgressButton
+    <Button
       color='primary'
       size='sm'
       onClick={handleServingBy}
       icon={<PersonAdd style={{transform:'rotateY(180deg)'}}/>}
     >
       Serve Patient
-    </ProgressButton>
+    </Button>
   ) : (
     <Button
       color='primary'
