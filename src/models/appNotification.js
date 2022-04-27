@@ -58,7 +58,7 @@ export default createBasicModel({
         const appNotificationSate = yield select(st => st.appNotification)
         const { pageSize, morePageSize } = appNotificationSate
         const { source, loadMore, isRead } = payload
-        const currentPageSize = loadMore ? pageSize + morePageSize : pageSize
+        const currentPageSize = loadMore ? pageSize +  morePageSize : pageSize
         var user = yield select(st => st.user)
         var response = yield call(service.queryList, {
           toUserFK: user.data.id,
@@ -115,12 +115,11 @@ export default createBasicModel({
         }
       },
       receiveMessage(st, { payload }) {
-        const notifications = [payload, ...st.notifications]
+        const rows = [payload.id, ...st.rows]
         return {
           ...st,
-          notifications,
-          rows: notifications.map(x => x.id),
-          pageSize: notifications.length
+          rows: rows,
+          pageSize: rows.length
         }
       },
     },
