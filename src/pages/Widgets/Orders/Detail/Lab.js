@@ -700,7 +700,7 @@ class Lab extends PureComponent {
               >
                 <div className={classes.groupPanel}>
                   {filterServices.length
-                    ? filterServices.map(r => {
+                    ? _.take(filterServices, 500).map(r => {
                         const isCheckedBefore = !_.isEmpty(
                           labItems.find(ri => ri.serviceFK === r.value),
                         )

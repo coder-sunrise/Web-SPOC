@@ -697,7 +697,7 @@ class Radiology extends PureComponent {
               >
                 <div className={classes.groupPanel}>
                   {filterServices.length
-                    ? filterServices.map(r => {
+                    ? _.take(filterServices, 500).map(r => {
                         const isCheckedBefore = !_.isEmpty(
                           radiologyItems.find(ri => ri.serviceFK === r.value),
                         )

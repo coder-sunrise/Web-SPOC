@@ -698,7 +698,7 @@ class Service extends PureComponent {
               >
                 <div className={classes.groupPanel}>
                   {filterServices.length
-                    ? _.take(filterServices, 200).map(r => {
+                    ? _.take(filterServices, 500).map(r => {
                         const isCheckedBefore = !_.isEmpty(
                           serviceItems.find(ri => ri.serviceFK === r.value),
                         )
