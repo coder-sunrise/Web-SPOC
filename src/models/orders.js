@@ -39,11 +39,12 @@ const initialState = {
     ...sharedMedicationValue,
   },
   defaultService: {
-    unitPrice: 0,
-    isMinus: true,
-    adjValue: 0,
-    isExactAmount: true,
-    isNurseActualizeRequired: false,
+    editServiceId: undefined,
+    isEdit: false,
+    serviceItems: [],
+    selectCategory: 'All',
+    selectTag: 'All',
+    filterService: '',
   },
   defaultVaccination: {
     vaccinationGivenDate: moment(),
