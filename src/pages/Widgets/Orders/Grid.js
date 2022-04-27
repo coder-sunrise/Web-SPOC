@@ -758,6 +758,24 @@ export default ({
           type: row.type,
         },
       })
+    } else if (row.type === ORDER_TYPES.SERVICE) {
+      dispatch({
+        type: 'orders/updateState',
+        payload: {
+          entity: {
+            serviceItems: [{ ...row }],
+            editServiceId: row.serviceFK,
+            selectCategory: 'All',
+            selectTag: 'All',
+            filterService: '',
+            serviceCenterFK: row.serviceCenterFK,
+            quantity: row.quantity,
+            total: row.total,
+            totalAfterItemAdjustment: row.totalAfterItemAdjustment,
+          },
+          type: row.type,
+        },
+      })
     } else {
       dispatch({
         type: 'orders/updateState',

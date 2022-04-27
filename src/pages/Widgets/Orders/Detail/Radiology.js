@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import _ from 'lodash'
 import { isNumber } from 'util'
 import { Link } from 'umi'
-import { Tag } from 'antd'
+import { Tag, Checkbox } from 'antd'
 import { withStyles } from '@material-ui/core'
 import {
   GridContainer,
@@ -13,7 +13,6 @@ import {
   NumberInput,
   withFormikExtend,
   Switch,
-  Checkbox,
   RadioGroup,
   FastField,
   Field,
@@ -68,8 +67,12 @@ const styles = theme => ({
   tag: {
     border: '1px solid rgba(0, 0, 0, 0.42)',
     fontSize: '0.85rem',
-    padding: '3px 10px',
+    padding: '3px 6px',
     marginBottom: 2,
+    maxWidth: 100,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   groupPanel: {
     margin: '0px 5px',
@@ -99,10 +102,9 @@ const styles = theme => ({
   },
   checkServiceCheckBox: {
     display: 'inline-block',
-    marginRight: '-16px',
     position: 'absolute',
-    top: '-3px',
-    right: 0,
+    top: 2,
+    right: 2,
   },
   legend: {
     width: 'fit-content',
@@ -110,6 +112,19 @@ const styles = theme => ({
     margin: `${theme.spacing(1)}px ${theme.spacing(1)}px 0px`,
     padding: `0px ${theme.spacing(1)}px`,
     fontWeight: 500,
+  },
+  tagsGroupPanel: {
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    maxHeight: 105,
+  },
+  selectedServiceLabel: {
+    maxWidth: 155,
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    display: 'inline-block',
+    marginRight: 6,
   },
 })
 
@@ -150,11 +165,11 @@ const getVisitDoctorUserId = props => {
       then: Yup.number().required(),
     }),
     quantity: Yup.number().when('editServiceId', {
-      is: val => val,
+      is: val => val && val !== '',
       then: Yup.number().required(),
     }),
     total: Yup.number().when('editServiceId', {
-      is: val => val,
+      is: val => val && val !== '',
       then: Yup.number().required(),
     }),
     totalAfterItemAdjustment: Yup.number().when('editServiceId', {
@@ -210,8 +225,8 @@ class Radiology extends PureComponent {
       services: [],
       serviceCenters: [],
       serviceCenterServices: [],
-      serviceTags: [],
-      serviceCatetorys: [],
+      serviceTags: [{ value: 'All', name: 'All' }],
+      serviceCatetorys: [{ value: 'All', name: 'All' }],
       isPreOrderItemExists: false,
     }
 
@@ -378,7 +393,9 @@ class Radiology extends PureComponent {
       radiologyItems.filter(
         r =>
           r.serviceCenterFK &&
+          r.quantity !== '' &&
           r.quantity >= 0 &&
+          r.total !== '' &&
           r.total >= 0 &&
           r.totalAfterItemAdjustment >= 0,
       ).length !== radiologyItems.length
@@ -398,7 +415,9 @@ class Radiology extends PureComponent {
     }
     if (
       checkedRadiology.serviceCenterFK &&
+      checkedRadiology.quantity !== '' &&
       checkedRadiology.quantity >= 0 &&
+      checkedRadiology.total !== '' &&
       checkedRadiology.total >= 0 &&
       checkedRadiology.totalAfterItemAdjustment >= 0
     ) {
@@ -501,6 +520,11 @@ class Radiology extends PureComponent {
               s.name.toUpperCase().indexOf(filterService.toUpperCase()) >= 0)),
       )
     }
+    filterServices = _.orderBy(
+      filterServices,
+      [item => (item.name || '').toUpperCase()],
+      ['asc'],
+    )
     const isDisabledHasPaidPreOrder =
       editService?.actualizedPreOrderItemFK && editService?.hasPaid == true
         ? true
@@ -524,6 +548,16 @@ class Radiology extends PureComponent {
       ].indexOf(radiologyWorkitem.statusFK) >= 0 ||
         nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED)
 
+    const debouncedFilterChangeAction = _.debounce(
+      e => {
+        setFieldValue('filterService', e.target.value)
+      },
+      100,
+      {
+        leading: true,
+        trailing: false,
+      },
+    )
     return (
       <Authorized
         authority={GetOrderItemAccessRight(
@@ -543,7 +577,7 @@ class Radiology extends PureComponent {
                 >
                   Category:
                 </div>
-                <div>
+                <div className={classes.tagsGroupPanel}>
                   {serviceCatetorys.map(category =>
                     isEdit ? (
                       <Tag
@@ -560,7 +594,9 @@ class Radiology extends PureComponent {
                             : undefined
                         }
                       >
-                        {category.name}
+                        <Tooltip title={category.name}>
+                          <span>{category.name}</span>
+                        </Tooltip>
                       </Tag>
                     ) : (
                       <CheckableTag
@@ -578,7 +614,9 @@ class Radiology extends PureComponent {
                             setFieldValue('selectCategory', category.value)
                         }}
                       >
-                        {category.name}
+                        <Tooltip title={category.name}>
+                          <span>{category.name}</span>
+                        </Tooltip>
                       </CheckableTag>
                     ),
                   )}
@@ -586,16 +624,14 @@ class Radiology extends PureComponent {
               </div>
             </GridItem>
             <GridItem xs={12}>
-              <div
-                style={{ marginTop: 10, position: 'relative', paddingLeft: 70 }}
-              >
+              <div style={{ position: 'relative', paddingLeft: 70 }}>
                 <div
                   className={classes.subTitle}
                   style={{ position: 'absolute', left: 0, top: 2 }}
                 >
                   Tag:
                 </div>
-                <div>
+                <div className={classes.tagsGroupPanel}>
                   {serviceTags.map(tag =>
                     isEdit ? (
                       <Tag
@@ -608,7 +644,9 @@ class Radiology extends PureComponent {
                         }}
                         color={selectTag === tag.value ? '#4255bd' : undefined}
                       >
-                        {tag.name}
+                        <Tooltip title={tag.name}>
+                          <span>{tag.name}</span>
+                        </Tooltip>
                       </Tag>
                     ) : (
                       <CheckableTag
@@ -626,7 +664,9 @@ class Radiology extends PureComponent {
                             setFieldValue('selectTag', tag.value)
                         }}
                       >
-                        {tag.name}
+                        <Tooltip title={tag.name}>
+                          <span>{tag.name}</span>
+                        </Tooltip>
                       </CheckableTag>
                     ),
                   )}
@@ -640,9 +680,7 @@ class Radiology extends PureComponent {
                   return (
                     <TextField
                       label='Filter by service code, name'
-                      onChange={e => {
-                        setFieldValue('filterService', e.target.value)
-                      }}
+                      onChange={debouncedFilterChangeAction}
                       disabled={isEdit}
                       {...args}
                     />
@@ -658,151 +696,178 @@ class Radiology extends PureComponent {
                 style={{ fontSize: '0.85rem' }}
               >
                 <div className={classes.groupPanel}>
-                  {filterServices.map(r => {
-                    return (
-                      <div
-                        style={{
-                          backgroundColor:
-                            editServiceId === r.value ? 'lightgreen' : 'white',
-                          borderColor: this.isValidate(r) ? '#99CC99' : 'red',
-                        }}
-                        className={classes.checkServiceItem}
-                        onClick={() => {
-                          const selectRadiology = radiologyItems.find(
-                            item => item.serviceFK === r.value,
-                          )
-                          if (selectRadiology) {
-                            this.setSelectRadilogy(selectRadiology)
-                          }
-                        }}
-                      >
-                        <Tooltip
-                          title={
-                            <div>
+                  {filterServices.length
+                    ? _.take(filterServices, 500).map(r => {
+                        const isCheckedBefore = !_.isEmpty(
+                          radiologyItems.find(ri => ri.serviceFK === r.value),
+                        )
+                        return (
+                          <Tooltip
+                            title={
                               <div>
-                                Service Code: <span>{r.code}</span>
+                                <div>
+                                  Service Code: <span>{r.code}</span>
+                                </div>
+                                <div>
+                                  Service Name: <span>{r.name}</span>
+                                </div>
+                                <div>
+                                  Unit Price:{' '}
+                                  <span>{`${currencySymbol}${r.unitPrice.toFixed(
+                                    2,
+                                  )}`}</span>
+                                </div>
                               </div>
-                              <div>
-                                Service Name: <span>{r.name}</span>
-                              </div>
-                              <div>
-                                Unit Price:{' '}
-                                <span>{`${currencySymbol}${r.unitPrice.toFixed(
-                                  2,
-                                )}`}</span>
+                            }
+                          >
+                            <div
+                              style={{
+                                backgroundColor:
+                                  editServiceId === r.value
+                                    ? 'lightgreen'
+                                    : 'white',
+                                borderColor: this.isValidate(r)
+                                  ? '#99CC99'
+                                  : 'red',
+                              }}
+                              className={classes.checkServiceItem}
+                              onClick={() => {
+                                if (editServiceId === r.value) return
+                                const selectRadiology = radiologyItems.find(
+                                  item => item.serviceFK === r.value,
+                                )
+                                if (selectRadiology) {
+                                  this.setSelectRadilogy(selectRadiology)
+                                }
+                              }}
+                            >
+                              <span className={classes.checkServiceLabel}>
+                                {r.name}
+                              </span>
+                              <div className={classes.checkServiceCheckBox}>
+                                <Checkbox
+                                  disabled={isEdit}
+                                  label=''
+                                  inputLabel=''
+                                  checked={isCheckedBefore}
+                                  onClick={e => {
+                                    if (!isCheckedBefore) {
+                                      let newService = {
+                                        serviceFK: r.value,
+                                        serviceName: r.name,
+                                        serviceCode: r.code,
+                                        priority: 'Normal',
+                                        type,
+                                        packageGlobalId: '',
+                                        performingUserFK: getVisitDoctorUserId(
+                                          this.props,
+                                        ),
+                                        isDisplayValueChangable:
+                                          r.isDisplayValueChangable,
+                                        isNurseActualizeRequired:
+                                          r.isNurseActualizable,
+                                      }
+                                      if (isPreOrderItemExists)
+                                        this.setState({
+                                          isPreOrderItemExists: false,
+                                        })
+
+                                      this.getServiceCenterService(newService)
+                                      setFieldValue('radiologyItems', [
+                                        ...radiologyItems,
+                                        newService,
+                                      ])
+                                      setFieldValue(
+                                        'editServiceId',
+                                        newService.serviceFK,
+                                      )
+                                      setFieldValue(
+                                        'serviceCenterFK',
+                                        newService.serviceCenterFK,
+                                      )
+                                      setFieldValue(
+                                        'quantity',
+                                        newService.quantity,
+                                      )
+                                      setFieldValue('total', newService.total)
+                                      setFieldValue(
+                                        'totalAfterItemAdjustment',
+                                        newService.totalAfterItemAdjustment,
+                                      )
+                                    } else {
+                                      setFieldValue('radiologyItems', [
+                                        ...radiologyItems.filter(
+                                          item => item.serviceFK !== r.value,
+                                        ),
+                                      ])
+                                      setFieldValue('editServiceId', undefined)
+                                      setFieldValue(
+                                        'serviceCenterFK',
+                                        undefined,
+                                      )
+                                      setFieldValue('quantity', undefined)
+                                      setFieldValue('total', undefined)
+                                      setFieldValue(
+                                        'totalAfterItemAdjustment',
+                                        undefined,
+                                      )
+                                      if (isPreOrderItemExists)
+                                        this.setState({
+                                          isPreOrderItemExists: false,
+                                        })
+                                    }
+                                  }}
+                                />
                               </div>
                             </div>
-                          }
-                        >
-                          <span className={classes.checkServiceLabel}>
-                            {r.name}
-                          </span>
-                        </Tooltip>
-                        <div className={classes.checkServiceCheckBox}>
-                          <Checkbox
-                            disabled={isEdit}
-                            label=''
-                            inputLabel=''
-                            checked={
-                              !_.isEmpty(
-                                radiologyItems.find(
-                                  ri => ri.serviceFK === r.value,
-                                ),
-                              )
-                            }
-                            onChange={e => {
-                              if (e.target.value) {
-                                let newService = {
-                                  serviceFK: r.value,
-                                  serviceName: r.name,
-                                  serviceCode: r.code,
-                                  priority: 'Normal',
-                                  type,
-                                  packageGlobalId: '',
-                                  performingUserFK: getVisitDoctorUserId(
-                                    this.props,
-                                  ),
-                                  isDisplayValueChangable:
-                                    r.isDisplayValueChangable,
-                                  isNurseActualizeRequired:
-                                    r.isNurseActualizable,
-                                }
-                                if (isPreOrderItemExists)
-                                  this.setState({ isPreOrderItemExists: false })
-
-                                this.getServiceCenterService(newService)
-                                setFieldValue('radiologyItems', [
-                                  ...radiologyItems,
-                                  newService,
-                                ])
-                                setFieldValue(
-                                  'editServiceId',
-                                  newService.serviceFK,
-                                )
-                                setFieldValue(
-                                  'serviceCenterFK',
-                                  newService.serviceCenterFK,
-                                )
-                                setFieldValue('quantity', newService.quantity)
-                                setFieldValue('total', newService.total)
-                                setFieldValue(
-                                  'totalAfterItemAdjustment',
-                                  newService.totalAfterItemAdjustment,
-                                )
-                              } else {
-                                setFieldValue('radiologyItems', [
-                                  ...radiologyItems.filter(
-                                    item => item.serviceFK !== r.value,
-                                  ),
-                                ])
-                                setFieldValue('editServiceId', undefined)
-                                setFieldValue('serviceCenterFK', undefined)
-                                setFieldValue('quantity', undefined)
-                                setFieldValue('total', undefined)
-                                setFieldValue(
-                                  'totalAfterItemAdjustment',
-                                  undefined,
-                                )
-                                if (isPreOrderItemExists)
-                                  this.setState({ isPreOrderItemExists: false })
-                              }
-                            }}
-                          />
-                        </div>
-                      </div>
-                    )
-                  })}
+                          </Tooltip>
+                        )
+                      })
+                    : 'No records'}
                 </div>
               </FieldSet>
             </GridItem>
             <GridItem xs={12}>
-              <div>
+              <div
+                style={{
+                  marginTop: 10,
+                  position: 'relative',
+                  paddingLeft: 65,
+                }}
+              >
                 <div
                   style={{
-                    marginTop: 5,
-                    display: 'inline-block',
                     fontSize: '0.85rem',
                     fontWeight: 500,
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
                   }}
                 >
                   Selected:
                 </div>
-                {radiologyItems.map(ri => {
-                  return (
-                    <div style={{ display: 'inline-block', marginLeft: 10 }}>
-                      <Link
-                        onClick={e => {
-                          e.preventDefault()
-                          this.setSelectRadilogy(ri)
-                        }}
-                      >
-                        <span style={{ textDecoration: 'underline' }}>
-                          {ri.serviceName}
-                        </span>
-                      </Link>
-                    </div>
-                  )
-                })}
+                {radiologyItems.length ? (
+                  radiologyItems.map(ri => {
+                    return (
+                      <div className={classes.selectedServiceLabel}>
+                        <Link
+                          onClick={e => {
+                            e.preventDefault()
+                            this.setSelectRadilogy(ri)
+                          }}
+                        >
+                          <Tooltip title={ri.serviceName}>
+                            <span style={{ textDecoration: 'underline' }}>
+                              {ri.serviceName}
+                            </span>
+                          </Tooltip>
+                        </Link>
+                      </div>
+                    )
+                  })
+                ) : (
+                  <div style={{ height: 29 }}> No records</div>
+                )}
               </div>
             </GridItem>
           </GridContainer>
@@ -1137,35 +1202,34 @@ class Radiology extends PureComponent {
                         isStartedRadiology ||
                         isDisabledNoPaidPreOrder
                       }
-                      style={{ position: 'absolute', bottom: 2 }}
                       label='Pre-Order'
-                      onChange={e => {
-                        editService.isPreOrder = e.target.value
-                        if (!e.target.value) {
+                      onClick={e => {
+                        const newIsPreOrder = !editService.isPreOrder
+                        editService.isPreOrder = newIsPreOrder
+                        if (!newIsPreOrder) {
                           editService.isChargeToday = false
                         }
                         this.checkIsPreOrderItemExistsInListing(
                           editServiceId,
-                          e.target.value,
+                          newIsPreOrder,
                         )
                         setFieldValue('radiologyItems', [...radiologyItems])
                       }}
-                    />
+                    >
+                      Pre-Order
+                    </Checkbox>
                     {editService.isPreOrder && (
                       <Checkbox
                         checked={editService.isChargeToday || false}
                         disabled={!editServiceId || isStartedRadiology}
-                        style={{
-                          position: 'absolute',
-                          bottom: 2,
-                          left: '380px',
-                        }}
                         label='Charge Today'
-                        onChange={e => {
-                          editService.isChargeToday = e.target.value
+                        onClick={e => {
+                          editService.isChargeToday = !editService.isChargeToday
                           setFieldValue('radiologyItems', [...radiologyItems])
                         }}
-                      />
+                      >
+                        Charge Today
+                      </Checkbox>
                     )}
                     {isPreOrderItemExists && (
                       <Alert
@@ -1257,29 +1321,51 @@ class Radiology extends PureComponent {
                         isStartedRadiology ||
                         isDisabledNoPaidPreOrder
                       }
-                      style={{ position: 'absolute', bottom: 0 }}
                       label='Pre-Order'
-                      onChange={e => {
-                        editService.isPreOrder = e.target.value
-                        if (!e.target.value) {
+                      onClick={e => {
+                        const newIsPreOrder = !editService.isPreOrder
+                        editService.isPreOrder = newIsPreOrder
+                        if (!newIsPreOrder) {
                           editService.isChargeToday = false
                         }
+                        this.checkIsPreOrderItemExistsInListing(
+                          editServiceId,
+                          newIsPreOrder,
+                        )
                         setFieldValue('radiologyItems', [...radiologyItems])
                       }}
-                    />
+                    >
+                      Pre-Order
+                    </Checkbox>
                     {editService.isPreOrder && (
                       <Checkbox
                         checked={editService.isChargeToday || false}
                         disabled={!editServiceId || isStartedRadiology}
+                        label='Charge Today'
+                        onClick={e => {
+                          editService.isChargeToday = !editService.isChargeToday
+                          setFieldValue('radiologyItems', [...radiologyItems])
+                        }}
+                      >
+                        Charge Today
+                      </Checkbox>
+                    )}
+                    {isPreOrderItemExists && (
+                      <Alert
+                        message={
+                          "Item exists in Pre-Order. Plesae check patient's Pre-Order."
+                        }
+                        type='warning'
                         style={{
                           position: 'absolute',
-                          bottom: 0,
-                          left: '380px',
-                        }}
-                        label='Charge Today'
-                        onChange={e => {
-                          editService.isChargeToday = e.target.value
-                          setFieldValue('radiologyItems', [...radiologyItems])
+                          top: 45,
+                          left: 200,
+                          whiteSpace: 'nowrap',
+                          textOverflow: 'ellipsis',
+                          display: 'inline-block',
+                          overflow: 'hidden',
+                          lineHeight: '25px',
+                          fontSize: '0.85rem',
                         }}
                       />
                     )}
