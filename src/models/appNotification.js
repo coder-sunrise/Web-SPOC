@@ -116,7 +116,6 @@ export default createBasicModel({
       },
       receiveMessage(st, { payload }) {
         const notifications = [payload, ...st.notifications]
-        console.log(notifications)
         return {
           ...st,
           notifications,
