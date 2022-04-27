@@ -49,6 +49,8 @@ import RedispenseForm from '../../Components/RedispenseForm'
 import DrugLeafletSelection from '../../Components/DrugLeafletSelection'
 import DrugLabelSelection from '@/pages/Dispense/DispenseDetails/DrugLabelSelection'
 import customtyles from '@/pages/Dispense/DispenseDetails/Style.less'
+import VisitGroupIcon from '@/pages/Radiology/Components/VisitGroupIcon'
+import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 
 const styles = theme => ({
   wrapCellTextStyle: {
@@ -1721,10 +1723,17 @@ const Main = props => {
         <ContentGridItem title='Order Created Time:'>
           {moment(workitem.generateDate).format('DD MMM YYYY HH:mm')}
         </ContentGridItem>
-        <ContentGridItem title='Group:'>
-          {workitem.visitGroup && workitem.visitGroup.trim().length
-            ? workitem.visitGroup
-            : '-'}
+        <ContentGridItem title='Visit Group No.:'>
+          {hasValue(workitem.visitGroup) &&
+          workitem.visitGroup.trim().length ? (
+            <VisitGroupIcon
+              visitGroup={workitem.visitGroup}
+              visitFK={workitem.visitFK}
+              isQueueNoDecimal={isQueueNoDecimal}
+            />
+          ) : (
+            '-'
+          )}
         </ContentGridItem>
         <ContentGridItem title='Family History:'>
           {workitem.familyHistory && workitem.familyHistory.trim().length
