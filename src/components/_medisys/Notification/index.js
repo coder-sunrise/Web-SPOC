@@ -55,7 +55,6 @@ const NotificationComponent = ({
       <Tabs
         type='line'
         onChange={key => {
-          console.log(key,TYPES.find(t => t.id == key))
           const tab = TYPES.find(t => t.id == key).name
           setActiveKey(tab)
         }}

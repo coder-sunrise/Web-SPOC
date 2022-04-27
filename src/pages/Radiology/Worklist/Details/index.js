@@ -230,9 +230,7 @@ const RadiologyDetails = () => {
       })
   }
 
-  useEffect(() => {
-    console.log('isDirty', isDirty)
-  }, [isDirty])
+  useEffect(() => {}, [isDirty])
 
   const showOnlyCloseButton =
     isReadOnly ||

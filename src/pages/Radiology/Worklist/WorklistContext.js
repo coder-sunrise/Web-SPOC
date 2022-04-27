@@ -25,7 +25,7 @@ export const WorklistContextProvider = props => {
 
   const stopTimer = () => {
     clearInterval(timer.current)
-    console.log('WorklistContext - Timer Stopped.', timer.current, new Date())
+    // console.log('WorklistContext - Timer Stopped.', timer.current, new Date())
   }
 
   const startTimer = () => {
@@ -34,7 +34,7 @@ export const WorklistContextProvider = props => {
       refreshWorklist()
     }, autoRefreshRadiologyWorklistInterval * 1000)
 
-    console.log('WorklistContext - Timer Started.', timer.current, new Date())
+    // console.log('WorklistContext - Timer Started.', timer.current, new Date())
   }
 
   useEffect(() => {

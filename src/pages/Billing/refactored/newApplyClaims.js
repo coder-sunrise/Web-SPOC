@@ -90,7 +90,7 @@ const ApplyClaims = ({
     visitPurposeFK = 1,
     visitOrderTemplateFK,
   } = values
-  console.log(values, 'visitOrderTemplateFK')
+
   const [showErrorPrompt, setShowErrorPrompt] = useState(false)
 
   const [errorMessage, setErrorMessage] = useState([])

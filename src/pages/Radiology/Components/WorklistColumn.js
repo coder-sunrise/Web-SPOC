@@ -201,7 +201,6 @@ const WorklistColumnBody = ({ data, renderWorkitem }) => {
   }
 
   const calculateCurrentIndex = () => {
-    console.log('calculateCurrentIndex')
     const scrollTop = viewPortRef.current.scrollTop
     const newIndex = Math.trunc(scrollTop / offsetHeight)
     if (newIndex != currentIndex) setCurrentIndex(newIndex)

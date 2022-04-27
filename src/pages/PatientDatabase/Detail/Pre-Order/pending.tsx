@@ -239,15 +239,14 @@ const PendingPreOrder: React.FC = (props: any) => {
     if (!e.option) {
       return
     }
-
     const { option, row } = e
-    ;(row.quantity = 1),
-      (row.amount = 0),
-      (row.itemName = undefined),
-      (row.preOrderVaccinationItem = undefined),
-      (row.preOrderServiceItem = undefined),
-      (row.preOrderMedicationItem = undefined),
-      (row.preOrderConsumableItem = undefined)
+    row.quantity = 1
+    row.amount = 0
+    row.itemName = undefined
+    row.preOrderVaccinationItem = undefined
+    row.preOrderServiceItem = undefined
+    row.preOrderMedicationItem = undefined
+    row.preOrderConsumableItem = undefined
   }
   const handleItemChanged = (e: any) => {
     const { row, option } = e
@@ -277,12 +276,12 @@ const PendingPreOrder: React.FC = (props: any) => {
       row.preOrderItemType == preOrderItemCategory[5].value
     )
       row.preOrderServiceItem = { ServiceCenterServiceFK: option?.id }
-    row.quantity = undefined
+    row.quantity = 1
     row.amount = 0
     row.remarks = undefined
   }
 
-  const handelQuantityChanged = e => {
+  const handelQuantityChanged = (e:any) => {
     const { row, value } = e
     const {
       preOrderItemType,
