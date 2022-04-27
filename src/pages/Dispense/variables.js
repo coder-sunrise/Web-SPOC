@@ -1643,7 +1643,6 @@ export const ServiceColumns1 = (
               whiteSpace: 'pre-wrap',
               display: 'flex',
               justifyContent: 'space-between',
-              padding: 5,
             }}
           >
             <span style={{ width: 80 }}>{row.type}</span>
@@ -2024,7 +2023,6 @@ export const OtherOrdersColumnExtensions = (
             whiteSpace: 'pre-wrap',
             display: 'flex',
             justifyContent: 'space-between',
-            padding: 5,
           }}
         >
           <span style={{ width: 80 }}>{row.type}</span>

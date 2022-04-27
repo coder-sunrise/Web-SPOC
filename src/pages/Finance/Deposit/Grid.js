@@ -148,12 +148,20 @@ class Grid extends PureComponent {
     this.setState(prevState => ({
       showDepositRefundModal: !prevState.showDepositRefundModal,
     }))
+    const { queryDepositListing } = this.props
+    if (queryDepositListing) {
+      queryDepositListing()
+    }
   }
 
   togglePatientDepositModal = () => {
     this.setState(prevState => ({
       showPatientDeposit: !prevState.showPatientDeposit,
     }))
+    const { queryDepositListing } = this.props
+    if (queryDepositListing) {
+      queryDepositListing()
+    }
   }
 
   rowDoubleClick = row => {

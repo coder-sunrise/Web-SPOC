@@ -420,7 +420,9 @@ class AddCrNote extends Component {
     let CrNoteColumns = [
       { name: 'itemType', title: 'Type' },
       { name: 'itemName', title: 'Name' },
-      { name: 'totalAfterGST', title: 'Total Amount ($)' },
+      { name: 'totalAfterGST', title: 'Payable Amount ($)' },
+      { name: 'totalAfterGST1', title: 'Total CN Amount ($)' },
+      { name: 'totalAfterGST2', title: 'Current CN Amount ($)' },
       { name: 'action', title: 'Action' },
     ]
 
@@ -627,6 +629,17 @@ class AddCrNote extends Component {
                 )
               },
             },
+
+            {
+              columnName: 'totalAfterGST1',
+              width: 180,
+              align: 'right',
+            },
+            {
+              columnName: 'totalAfterGST2',
+              width: 180,
+              align: 'right',
+            },
             {
               columnName: 'totalAfterGST',
               width: 150,
@@ -695,12 +708,12 @@ class AddCrNote extends Component {
           showGST={invoiceDetail.gstValue >= 0}
           invoiceDetail={invoiceDetail}
         />
-        <MiscCrNote
+        {/* <MiscCrNote
           handleAddMiscItem={this.handleAddMiscItem}
           handleCalcFinalTotal={this.handleCalcCrNoteItem}
           gstValue={values.gstValue}
           // {...this.props}
-        />
+        /> */}
 
         <GridContainer>
           <GridItem md={9}>

@@ -68,10 +68,17 @@ export const OrderDetailsTable = props => {
         size='small'
         title={() => {
           return (
-            <p>
-              <h5 style={{ display: 'inline-block', fontWeight: '500' }}>
+            <p style={{ marginTop: 10 }}>
+              <span
+                style={{
+                  display: 'inline-block',
+                  color: '#4255bd',
+                  fontWeight: '500',
+                  fontSize: 14,
+                }}
+              >
                 Order Details
-              </h5>
+              </span>
             </p>
           )
         }}

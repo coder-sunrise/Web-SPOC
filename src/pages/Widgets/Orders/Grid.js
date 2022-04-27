@@ -156,7 +156,43 @@ export default ({
     }
     return instruction
   }
-  const GetNewMedication = currentVisitOrderTemplate => {
+  const GetNewMedication = async currentVisitOrderTemplate => {
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventorymedication',
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctMedicationUnitOfMeasurement',
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctMedicationFrequency',
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctmedicationdosage',
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctmedicationusage',
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctmedicationprecaution',
+      },
+    })
     const inventoryMedicationFK =
       currentVisitOrderTemplate.visitOrderTemplateMedicationItemDto
         .inventoryMedicationFK
@@ -394,7 +430,37 @@ export default ({
     }
   }
 
-  const GetNewVaccination = currentVisitOrderTemplate => {
+  const GetNewVaccination = async currentVisitOrderTemplate => {
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventoryvaccination',
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctvaccinationusage',
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctvaccinationunitofmeasurement',
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctgender',
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctmedicationdosage',
+      },
+    })
     const inventoryVaccinationFK =
       currentVisitOrderTemplate.visitOrderTemplateVaccinationItemDto
         .inventoryVaccinationFK
@@ -528,7 +594,13 @@ export default ({
       corVaccinationCert: newCORVaccinationCert,
     }
   }
-  const GetService = currentVisitOrderTemplate => {
+  const GetService = async currentVisitOrderTemplate => {
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctservice',
+      },
+    })
     const { ctservice = [] } = codetable
     var service = ctservice.find(
       t =>
@@ -585,7 +657,13 @@ export default ({
       visitOrderTemplateItemFK: currentVisitOrderTemplate.id,
     }
   }
-  const GetConsumable = currentVisitOrderTemplate => {
+  const GetConsumable = async currentVisitOrderTemplate => {
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventoryconsumable',
+      },
+    })
     const { inventoryconsumable = [] } = codetable
     var consumable = inventoryconsumable.find(
       t =>
@@ -1218,8 +1296,8 @@ export default ({
     setRemovedVisitOrderTemplateItem(removedTemplateItems)
     setShowRevertVisitPurposeItem(true)
   }
-  const confirmRevert = data => {
-    var newDrugItems = data.map(templateItem => {
+  const confirmRevert = async data => {
+    var newDrugItems = await data.map(async templateItem => {
       if (templateItem.visitOrderTemplateMedicationItemDto) {
         try {
           const newDrug = GetNewMedication(templateItem)
@@ -1260,7 +1338,7 @@ export default ({
         }
       } else if (templateItem.visitOrderTemplateServiceItemDto) {
         try {
-          const newService = GetService(templateItem)
+          const newService = await GetService(templateItem)
           dispatch({
             type: 'orders/upsertRow',
             payload: newService,
@@ -2017,6 +2095,7 @@ export default ({
         <VisitOrderTemplateRevert
           data={removedVisitOrderTemplateItem}
           dispatch={dispatch}
+          open={showRevertVisitPurposeItem}
           confirmRevert={confirmRevert}
         ></VisitOrderTemplateRevert>
       </CommonModal>

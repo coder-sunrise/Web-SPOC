@@ -375,8 +375,7 @@ const LabResults = ({
             <div>
               {row[`v_${visitColumn.visitId}_originalResult`] && (
                 <div>
-                  Raw Result:
-                  {row[`v_${visitColumn.visitId}_originalResult`]}
+                  Raw Result: {row[`v_${visitColumn.visitId}_originalResult`]}
                 </div>
               )}
               {row[`v_${visitColumn.visitId}_finalResult`] && (
@@ -395,6 +394,8 @@ const LabResults = ({
             <Tooltip title={title} placement='right'>
               <span
                 style={{
+                  display: 'inline-block',
+                  width: '100%',
                   color: row[`v_${visitColumn.visitId}_shouldFlag`]
                     ? 'red'
                     : 'inherit',

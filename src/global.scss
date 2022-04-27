@@ -940,3 +940,37 @@ textarea[class*='MuiInputBase-input-'] {
 .ant-pro-global-header .ant-breadcrumb ol {
   padding-left: 0;
 }
+.ant-collapse-header {
+  font-size: 14px;
+  color: #363636 !important;
+  font-weight: 550;
+  background-color: #daecf5 !important;
+}
+
+.ant-collapse-item {
+  margin-bottom: 5px;
+}
+
+.ant-table-small .ant-table-thead>tr>th {
+  background-color: white;
+}
+
+.ant-collapse>.ant-collapse-item>.ant-collapse-header {
+  padding: 8px 16px
+}
+
+.ant-table-footer {
+  background-color: white;
+}
+
+.ant-table-row {
+  line-height: 25px;
+}
+
+.ant-table-tbody tr:nth-child(odd) {
+  background-color: #f0f5ff !important;
+}
+
+.ant-table-tbody tr:nth-child(odd) td {
+  background-color: #f0f5ff !important;
+}
