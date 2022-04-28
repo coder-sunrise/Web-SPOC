@@ -41,10 +41,16 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
     <SizeContainer>
       <React.Fragment>
         <GridContainer>
-          <GridItem xs={6} md={2}>
+          <GridItem xs={6} md={1}>
             <FastField
               name='invoiceNo'
-              render={args => <TextField label='Invoice No' {...args} />}
+              render={args => (
+                <TextField
+                  style={{ width: '105%' }}
+                  label='Invoice No'
+                  {...args}
+                />
+              )}
             />
           </GridItem>
           <GridItem md={1}>
@@ -81,10 +87,16 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
           <GridItem xs={6} md={1}>
             <FastField
               name='patientAccountNo'
+              render={args => <TextField label='Patient Acc. No.' {...args} />}
+            />
+          </GridItem>
+          <GridItem xs={6} md={2}>
+            <FastField
+              name='patientName'
               render={args => (
                 <TextField
-                  style={{ width: '105%' }}
-                  label='Patient Acc. No.'
+                  style={{ width: '95%' }}
+                  label='Patient Name'
                   {...args}
                 />
               )}
@@ -92,21 +104,14 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
           </GridItem>
           <GridItem xs={6} md={1}>
             <FastField
-              name='patientName'
-              render={args => (
-                <TextField
-                  style={{ width: '105%' }}
-                  label='Patient Name'
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs={6} md={2}>
-            <FastField
               name='session'
               render={args => (
-                <Select label='Session' options={sessionOptions} {...args} />
+                <Select
+                  style={{ width: '105%' }}
+                  label='Session'
+                  options={sessionOptions}
+                  {...args}
+                />
               )}
             />
           </GridItem>
