@@ -1,7 +1,7 @@
 import React from 'react'
 import PromiseRender from './PromiseRender'
 import { CURRENT } from './renderAuthorize'
-import Authorized from '@/utils/Authorized'
+import Authorized, { HiddenWhenDisable } from '@/utils/Authorized'
 
 function isPromise(obj) {
   return (
@@ -52,7 +52,7 @@ const checkSinglePermission = (
 
     match = r.find(o => ['readonly', 'disable'].indexOf(o.rights) >= 0)
     if (match) {
-      match.rights = 'disable'
+      match.rights = HiddenWhenDisable.some(a => a === match.name) ? 'hidden' : 'disable'
 
       if (type === 'decorator') return match
 
