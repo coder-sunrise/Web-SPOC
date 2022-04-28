@@ -186,7 +186,7 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
           />
         </GridItem>
         <GridItem md={12}>
-          <span>Pre Order : {preOrderStr}</span>
+          <span>Pre-Order : {preOrderStr}</span>
         </GridItem>
       </GridContainer>
     </div>
