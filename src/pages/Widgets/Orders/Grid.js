@@ -1934,7 +1934,7 @@ export default ({
                   )[0]
                   if (deleteEnable) {
                     deleteEnable = false
-                    deleteMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
+                    deleteMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Deletion allowed after nurse cancel actualization`
                   }
                 }
               }
