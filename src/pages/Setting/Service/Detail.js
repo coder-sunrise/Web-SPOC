@@ -852,7 +852,7 @@ class Detail extends PureComponent {
                               <CodeSelect
                                 label='Medical Checkup Examination'
                                 code='ctexaminationitem'
-                                labelField='displayValue'
+                                labelField='displayValueWithCategory'
                                 allClear={true}
                                 maxTagCount={0}
                                 mode='multiple'

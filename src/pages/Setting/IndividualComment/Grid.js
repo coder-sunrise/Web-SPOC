@@ -34,7 +34,7 @@ class Grid extends PureComponent {
   }
 
   render() {
-    const { height, clinicSettings } = this.props
+    const { height, codetable, clinicSettings } = this.props
     const {
       primaryPrintoutLanguage = 'EN',
       secondaryPrintoutLanguage = '',
@@ -52,7 +52,10 @@ class Grid extends PureComponent {
         name: 'translatedDisplayValue',
         title: `Display Value (${secondaryPrintoutLanguage})`,
       },
-      { name: 'examinationItem', title: 'Examination' },
+      {
+        name: 'examinationItem',
+        title: 'Examination',
+      },
       { name: 'groupNo', title: 'Comment Group' },
       { name: 'sortOrder', title: 'Sort Order' },
       {
@@ -84,19 +87,19 @@ class Grid extends PureComponent {
           {
             columnName: 'examinationItem',
             sortBy: 'examinationItemFKNavigation.DisplayValue',
-            width: 200,
+            width: 300,
           },
           {
             columnName: 'groupNo',
-            width: 150,
+            width: 130,
           },
           {
             columnName: 'code',
-            width: 200,
+            width: 150,
           },
           {
             columnName: 'sortOrder',
-            width: 120,
+            width: 100,
             render: row => {
               return <p>{row.sortOrder === undefined ? '-' : row.sortOrder}</p>
             },

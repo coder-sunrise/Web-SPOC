@@ -42,7 +42,7 @@ class Filter extends PureComponent {
                 <CodeSelect
                   label='Examination'
                   code='ctexaminationitem'
-                  labelField='displayValue'
+                  labelField='displayValueWithCategory'
                   {...args}
                 />
               )}

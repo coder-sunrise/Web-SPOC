@@ -29,14 +29,17 @@ const styles = theme => ({
 class IndividualComment extends PureComponent {
   state = {}
   componentDidMount() {
+    this.fetchCodes()
+  }
+  fetchCodes = async () => {
     const { dispatch } = this.props
-    dispatch({
+    await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctexaminationcategory',
       },
     })
-    dispatch({
+    await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctexaminationitem',
