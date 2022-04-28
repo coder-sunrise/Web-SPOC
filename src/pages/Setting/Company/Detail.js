@@ -531,7 +531,9 @@ class Detail extends PureComponent {
               confirmBtnText: 'Save',
               confirmProps: {
                 disabled: false,
-                hidden: editManufacturerAccessRight.rights == 'disable',
+                hidden: settingCompany.entity
+                  ? editManufacturerAccessRight.rights == 'disable'
+                  : null,
               },
             })}
         </AuthorizedContext.Provider>
