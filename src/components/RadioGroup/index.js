@@ -31,12 +31,18 @@ class RadioGroup extends React.Component {
     return null
   }
 
-  handleChange = event => {
-    this.setState({ selectedValue: event.target.value })
+  handleChange = value => {
+    let newValue = value
+    if (this.state.selectedValue === newValue) {
+      const { isAllowReset = false } = this.props
+      if (!isAllowReset) return
+      newValue = undefined
+    }
+    this.setState({ selectedValue: newValue })
     const { form, field, onChange } = this.props
     const v = {
       target: {
-        value: event.target.value,
+        value: newValue,
         name: field ? field.name : '',
       },
     }
@@ -71,14 +77,19 @@ class RadioGroup extends React.Component {
         style={{ width: '100%', height: 'auto' }}
         //{...props}
       >
-        <Radio.Group
-          onChange={this.handleChange}
-          value={this.state.selectedValue}
-          disabled={disabled}
-        >
+        <Radio.Group value={this.state.selectedValue} disabled={disabled}>
           <Space direction={vertical ? 'vertical' : 'horizontal'}>
             {options.map(o => {
-              return <Radio value={o[valueField]}>{o[textField]}</Radio>
+              return (
+                <Radio
+                  value={o[valueField]}
+                  onClick={() => {
+                    this.handleChange(o[valueField])
+                  }}
+                >
+                  {o[textField]}
+                </Radio>
+              )
             })}
           </Space>
         </Radio.Group>
