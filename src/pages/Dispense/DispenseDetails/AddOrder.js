@@ -569,6 +569,7 @@ export default compose(
                   isDeleted: o.isDeleted,
                   drugLabelRemarks: o.drugLabelRemarks,
                   isExclusive: o.isExclusive,
+                  visitOrderTemplateItemFK: o.visitOrderTemplateItemFK,
                   retailPrescriptionItem: {
                     ...restO,
                     drugName: o.drugName,
@@ -622,6 +623,7 @@ export default compose(
                   concurrencyToken: o.innerLayerConcurrencyToken,
                   serviceCenterServiceFK: o.serviceCenterServiceFK,
                   isDeleted: restValues.isDeleted,
+                  visitOrderTemplateItemFK: restValues.visitOrderTemplateItemFK,
                   retailService: {
                     unitPrice: roundTo(o.total) || 0,
                     ...restValues,
@@ -661,6 +663,7 @@ export default compose(
                   expiryDate: o.expiryDate,
                   batchNo: o.batchNo,
                   isDeleted: restValues.isDeleted,
+                  visitOrderTemplateItemFK: restValues.visitOrderTemplateItemFK,
                   retailConsumable: {
                     unitOfMeasurement: uom.name,
                     unitofMeasurementFK: uom.id,
