@@ -69,7 +69,7 @@ class Grid extends React.Component {
       nextProps.filter !== StatusIndicator.APPOINTMENT &&
       this.props.queueList !== nextProps.queueList
     )
-      return true 
+      return true
     return false
   }
 
@@ -129,9 +129,12 @@ class Grid extends React.Component {
         if (!item.doctor && !isServePatientEnable) return false
         const {
           doctor: { id },
+          visitDoctor = [],
         } = item
         return clinicianProfile.doctorProfile
-          ? id === clinicianProfile.doctorProfile.id
+          ? visitDoctor.filter(
+              d => d.doctorProfileFK === clinicianProfile.doctorProfile.id,
+            ).length > 0 || id === clinicianProfile.doctorProfile.id
           : item.servingByList.filter(o => o.servingByUserFK === userFK)
               .length > 0
       })
