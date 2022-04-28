@@ -45,6 +45,8 @@ const initialState = {
     selectCategory: 'All',
     selectTag: 'All',
     filterService: '',
+    isMinus: true,
+    isExactAmount: true,
   },
   defaultVaccination: {
     vaccinationGivenDate: moment(),
@@ -80,6 +82,8 @@ const initialState = {
     selectCategory: 'All',
     selectTag: 'All',
     filterService: '',
+    isMinus: true,
+    isExactAmount: true,
   },
   defaultLab: {
     editServiceId: undefined,
@@ -88,6 +92,8 @@ const initialState = {
     selectCategory: 'All',
     selectTag: 'All',
     filterService: '',
+    isMinus: true,
+    isExactAmount: true,
   },
 }
 export default createListViewModel({
