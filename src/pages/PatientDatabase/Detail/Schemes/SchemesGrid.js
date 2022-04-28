@@ -388,7 +388,7 @@ class SchemesGrid extends PureComponent {
           const patCoPaymentScheme = copaymentscheme.find(
             item => item.id === row.coPaymentSchemeFK,
           )
-          row.copayerFK = option.copayerFK
+          row.copayerFK = option?.copayerFK
           if (!patCoPaymentScheme.isActive) {
             row.coPaymentSchemeFK = undefined
             notification.error({
