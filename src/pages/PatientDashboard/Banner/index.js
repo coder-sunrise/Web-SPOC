@@ -143,7 +143,9 @@ class Banner extends PureComponent {
     const { entity } = patient
     const { info } = entity
     const { patientAllergy = [], patientAllergyMetaData = [] } = entity
-    const da = _.orderBy(patientAllergy, ['type'], ['asc'])
+    const da = _.orderBy(patientAllergy, ['type'], ['asc']).filter(
+      t => t.patientAllergyStatusFK === 1,
+    )
     const allergyData = da.reduce((data, current) => {
       if (!data) return current.allergyName
       return `${data}, ${current.allergyName}`
