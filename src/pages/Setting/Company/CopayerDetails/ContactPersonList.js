@@ -559,7 +559,7 @@ export const ContactPersonList = props => {
         }
 
         //=== Editing ===//
-        useEffect(() => {}, [editingHasError])
+        // useEffect(() => {}, [editingHasError])
 
         return (
           <React.Fragment>
