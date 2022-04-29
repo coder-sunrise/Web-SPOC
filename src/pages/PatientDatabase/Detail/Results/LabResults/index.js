@@ -559,6 +559,7 @@ const LabResults = ({
       <Table
         size='small'
         bordered
+        className='noBgTable'
         pagination={false}
         columns={onlyMC ? filteredAllColumns : allColumns}
         dataSource={finalData}

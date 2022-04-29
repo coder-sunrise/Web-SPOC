@@ -173,6 +173,7 @@ const testPanelSchema = Yup.object().shape({
         ),
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
+        examinationItems: restValues.examinationItems.filter(v => v !== -99),
       },
     }).then(r => {
       if (r) {
@@ -366,9 +367,7 @@ class Detail extends PureComponent {
     })
   }
 
-
   initMedisaveSetting = () => {
-    
     const { settingClinicService } = this.props
     if (settingClinicService.entity) {
       this.setState({
@@ -647,6 +646,7 @@ class Detail extends PureComponent {
   }
 
   handleExaminationItemChange = examinationItems => {
+    examinationItems = examinationItems.filter(v => v !== -99)
     const { setFieldValue } = this.props
     const {
       ctService_ExaminationItem: originalExaminationItems = [],
@@ -681,8 +681,6 @@ class Detail extends PureComponent {
     const hiddenFields = []
     const { settingClinicService, clinicSettings, setFieldValue } = this.props
     const { serviceCenterList = [], entity } = settingClinicService
-
-
 
     const { isEnableNurseWorkItem } = clinicSettings.settings
 
@@ -1106,47 +1104,48 @@ class Detail extends PureComponent {
               </React.Fragment>
             )}
 
-            {(!hiddenFields.includes('ctService_TestPanel') && settings.isEnableLabModule) && (
-              <React.Fragment>
-                <h4 style={{ fontWeight: 400 }}>
-                  <b>Lab Test Panel Settings</b>
-                </h4>
-                {testPanelErrMsg && (
-                  <p className={classes.serviceSettingStyle}>
-                    {testPanelErrMsg}
-                  </p>
-                )}
-                <EditableTableGrid
-                  forceRender
-                  style={{
-                    marginTop: theme.spacing(1),
-                    margin: theme.spacing(2),
-                  }}
-                  rows={this.state.testPanels}
-                  FuncProps={{
-                    pagerConfig: {
-                      containerExtraComponent: this.PagerContent,
-                    },
-                  }}
-                  EditingProps={{
-                    showAddCommand: true,
-                    onCommitChanges: this.commitTestPanelChanges,
-                    isDeletable: row => {
-                      if (row.id && row.id <= 0) return true //Newly added row can be deletable before saving.
+            {!hiddenFields.includes('ctService_TestPanel') &&
+              settings.isEnableLabModule && (
+                <React.Fragment>
+                  <h4 style={{ fontWeight: 400 }}>
+                    <b>Lab Test Panel Settings</b>
+                  </h4>
+                  {testPanelErrMsg && (
+                    <p className={classes.serviceSettingStyle}>
+                      {testPanelErrMsg}
+                    </p>
+                  )}
+                  <EditableTableGrid
+                    forceRender
+                    style={{
+                      marginTop: theme.spacing(1),
+                      margin: theme.spacing(2),
+                    }}
+                    rows={this.state.testPanels}
+                    FuncProps={{
+                      pagerConfig: {
+                        containerExtraComponent: this.PagerContent,
+                      },
+                    }}
+                    EditingProps={{
+                      showAddCommand: true,
+                      onCommitChanges: this.commitTestPanelChanges,
+                      isDeletable: row => {
+                        if (row.id && row.id <= 0) return true //Newly added row can be deletable before saving.
 
-                      const isUsedByOthers =
-                        (serviceSettings ?? []).findIndex(
-                          s => s.isUsedByOthers,
-                        ) !== -1
+                        const isUsedByOthers =
+                          (serviceSettings ?? []).findIndex(
+                            s => s.isUsedByOthers,
+                          ) !== -1
 
-                      return !isUsedByOthers
-                    },
-                  }}
-                  schema={testPanelSchema}
-                  {...this.testPanelTableParas}
-                />
-              </React.Fragment>
-            )}
+                        return !isUsedByOthers
+                      },
+                    }}
+                    schema={testPanelSchema}
+                    {...this.testPanelTableParas}
+                  />
+                </React.Fragment>
+              )}
           </div>
         </div>
         {/* </SizeContainer> */}

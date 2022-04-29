@@ -964,16 +964,16 @@ textarea[class*='MuiInputBase-input-'] {
 }
 
 .ant-table-tbody tr:nth-child(odd) {
-  background-color: #f0f5ff !important;
+  background-color: #f0f5ff;
 }
 
 .ant-table-tbody tr:nth-child(odd) td {
-  background-color: #f0f5ff !important;
+  background-color: #f0f5ff;
 }
 .noBgTable .ant-table-tbody tr:nth-child(odd) {
-  background-color: white !important;
+  background-color: transparent;
 }
 
 .noBgTable .ant-table-tbody tr:nth-child(odd) td {
-  background-color: white !important;
+  background-color: transparent;
 }
