@@ -85,9 +85,9 @@ class Grid extends PureComponent {
           columns={
             name === 'copayer'
               ? [
-                  { name: 'code', title: 'Co-Payer Code' },
-                  { name: 'displayValue', title: 'Co-Payer Name' },
-                  { name: 'coPayerTypeName', title: 'Co-Payer Type' },
+                  { name: 'code', title: 'Code' },
+                  { name: 'displayValue', title: 'Name' },
+                  { name: 'coPayerTypeName', title: 'Type' },
                   { name: 'copayerContactPerson', title: 'Contact Person' },
                   { name: 'contactNo', title: 'Contact No.' },
                   { name: 'copayerContactPersonEmail', title: 'Email' },
@@ -98,8 +98,8 @@ class Grid extends PureComponent {
                 ]
               : name === 'supplier'
               ? [
-                  { name: 'code', title: 'Company Code' },
-                  { name: 'displayValue', title: 'Company Name' },
+                  { name: 'code', title: 'Code' },
+                  { name: 'displayValue', title: 'Name' },
                   { name: 'contactPerson', title: 'Contact Person' },
                   { name: 'contactNo', title: 'Contact No.' },
                   { name: 'officeNum', title: 'Office Number' },
@@ -109,8 +109,8 @@ class Grid extends PureComponent {
                   { name: 'action', title: 'Action' },
                 ]
               : [
-                  { name: 'code', title: 'Company Code' },
-                  { name: 'displayValue', title: 'Company Name' },
+                  { name: 'code', title: 'Code' },
+                  { name: 'displayValue', title: 'Name' },
                   { name: 'contactPerson', title: 'Contact Person' },
                   { name: 'contactNo', title: 'Contact No.' },
                   { name: 'officeNum', title: 'Office Number' },
@@ -124,6 +124,16 @@ class Grid extends PureComponent {
               columnName: 'remark',
               sortingEnabled: false,
               width: 200,
+              render: row => {
+                const title = (
+                  <span style={{ whiteSpace: 'pre-wrap' }}>{row.remark}</span>
+                )
+                return (
+                  <Tooltip title={title}>
+                    <span>{row.remark}</span>
+                  </Tooltip>
+                )
+              },
             },
             {
               columnName: 'coPayerTypeName',
