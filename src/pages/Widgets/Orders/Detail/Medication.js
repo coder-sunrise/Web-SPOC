@@ -930,6 +930,7 @@ class Medication extends PureComponent {
           precaution.code,
         )
         setFieldValue(`corPrescriptionItemPrecaution[${i}].sequence`, i)
+        setFieldValue(`corPrescriptionItemPrecaution[${i}].uid`, getUniqueId())
       })
     } else {
       const defaultPrecaution = {
