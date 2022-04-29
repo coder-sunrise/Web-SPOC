@@ -42,6 +42,24 @@ const ItemSelect = ({ codetable, itemType, ...props }) => {
         temp: true,
       },
     })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventorymedication',
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventoryconsumable',
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventoryvaccination',
+      },
+    })
   }
 
   const labsFilter =
