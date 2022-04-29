@@ -879,14 +879,46 @@ class PatientHistory extends Component {
               )
             })}
             {isFromEditOrder && (
-              <div
-                style={{ marginBottom: 6 }}
-              >{`Edit Order Reason: ${editDispenseType}${
-                WidgetConfig.hasValue(editDispenseReason) &&
-                editDispenseReason.trim().length
-                  ? `, ${editDispenseReason}`
-                  : ''
-              }`}</div>
+              <div style={{ marginBottom: 6 }}>
+                <div style={{ position: 'relative' }}>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      textAlign: 'right',
+                    }}
+                  >
+                    Edit Order Type:
+                  </div>
+                  <div style={{ paddingLeft: 130, whiteSpace: 'pre-wrap' }}>
+                    {editDispenseType}
+                  </div>
+                </div>
+                {WidgetConfig.hasValue(editDispenseReason) &&
+                  editDispenseReason.trim().length && (
+                    <div style={{ position: 'relative' }}>
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          textAlign: 'right',
+                        }}
+                      >
+                        Edit Order Reason:
+                      </div>
+                      <div
+                        style={{
+                          paddingLeft: 130,
+                          whiteSpace: 'pre-wrap',
+                        }}
+                      >
+                        {editDispenseReason}
+                      </div>
+                    </div>
+                  )}
+              </div>
             )}
           </div>
         ) : (
