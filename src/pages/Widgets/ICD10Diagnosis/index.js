@@ -16,10 +16,11 @@ const styles = theme => ({
     padding: theme.spacing(0.5),
   },
 })
-@connect(({ diagnosis, codetable, consultation }) => ({
+@connect(({ diagnosis, codetable, consultation, orders }) => ({
   diagnosis,
   codetable,
   consultation,
+  orders,
 }))
 class ICD10Diagnosis extends PureComponent {
   componentDidMount() {
