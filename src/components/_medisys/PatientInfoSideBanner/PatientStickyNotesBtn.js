@@ -42,7 +42,7 @@ const styles = theme => ({
     '& > Div > Div': {
       fontSize: '14px !important',
       padding: '5px !important',
-      '& > textarea': {
+      '& textarea:first-child': {
         top: 'unset !important',
         position: 'unset !important',
         marginBottom: 'unset !important',
@@ -311,7 +311,6 @@ class PatientStickyNotesBtn extends Component {
                     whiteSpace: 'pre-wrap',
                     color: textContentColor,
                     margin: 0,
-                    whiteSpace: 'pre',
                   }}
                 >
                   {note.notes}
