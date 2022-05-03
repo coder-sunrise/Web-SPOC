@@ -163,15 +163,12 @@ const WebSocketWrapper = ({
     copies,
   }) => {
     if (withoutPrintPreview.includes(type)) {
-      if (type === CONSTANTS.PATIENT_LABEL) {
-        let printResult = await getPrintResult(type, copies)
-        if (printData && printData.length > 0)
-          printResult = (printResult || []).concat(printData)
-
-        if (!printResult || printResult.length <= 0) return
-        await handlePrint(JSON.stringify(printResult))
-      }
-      if (type === CONSTANTS.LAB_LABEL) {
+      var filter = [
+        CONSTANTS.PATIENT_LABEL,
+        CONSTANTS.LAB_LABEL,
+        CONSTANTS.ALL_DRUG_LABEL,
+      ]
+      if (filter.includes(type)) {
         let printResult = await getPrintResult(type, copies)
         if (printData && printData.length > 0)
           printResult = (printResult || []).concat(printData)

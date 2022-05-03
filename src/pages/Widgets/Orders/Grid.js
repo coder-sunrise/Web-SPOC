@@ -814,6 +814,9 @@ export default ({
             quantity: row.quantity,
             total: row.total,
             totalAfterItemAdjustment: row.totalAfterItemAdjustment,
+            isMinus: row.isMinus,
+            adjValue: row.adjValue,
+            adjType: row.adjType,
           },
           type: row.type,
         },
@@ -832,6 +835,9 @@ export default ({
             quantity: row.quantity,
             total: row.total,
             totalAfterItemAdjustment: row.totalAfterItemAdjustment,
+            isMinus: row.isMinus,
+            adjValue: row.adjValue,
+            adjType: row.adjType,
           },
           type: row.type,
         },
@@ -850,6 +856,9 @@ export default ({
             quantity: row.quantity,
             total: row.total,
             totalAfterItemAdjustment: row.totalAfterItemAdjustment,
+            isMinus: row.isMinus,
+            adjValue: row.adjValue,
+            adjType: row.adjType,
           },
           type: row.type,
         },
@@ -1361,7 +1370,7 @@ export default ({
         forceRender
         rows={(rows || [])
           .filter(x => !x.isDeleted)
-          .map((r, index) => {
+          .map(r => {
             return {
               ...r,
               currentTotal:
@@ -1370,13 +1379,11 @@ export default ({
                   : 0,
               isEditingEntity: isEditingEntity,
               isEnableEditOrder: isEnableEditOrder,
-              number: index + 1,
             }
           })}
         onRowDoubleClick={editRow}
         getRowId={r => r.uid}
         columns={[
-          { name: 'number', title: 'No.' },
           { name: 'type', title: 'Type' },
           { name: 'subject', title: 'Name' },
           { name: 'priority', title: 'Urgent' },
@@ -1460,7 +1467,7 @@ export default ({
                 if (isExistPackage) {
                   newChildren = [
                     <Table.Cell
-                      colSpan={5}
+                      colSpan={4}
                       key={1}
                       style={{ position: 'relative' }}
                     >
@@ -1489,7 +1496,7 @@ export default ({
                         </div>
                       )}
                     </Table.Cell>,
-                    React.cloneElement(children[8], {
+                    React.cloneElement(children[7], {
                       colSpan: 3,
                       ...restProps,
                     }),
@@ -1497,7 +1504,7 @@ export default ({
                 } else {
                   newChildren = [
                     <Table.Cell
-                      colSpan={4}
+                      colSpan={3}
                       key={1}
                       style={{
                         position: 'relative',
@@ -1529,7 +1536,7 @@ export default ({
                         </div>
                       )}
                     </Table.Cell>,
-                    React.cloneElement(children[7], {
+                    React.cloneElement(children[6], {
                       colSpan: 2,
                       ...restProps,
                     }),
@@ -1634,10 +1641,6 @@ export default ({
           },
         }}
         columnExtensions={[
-          {
-            columnName: 'number',
-            width: 40,
-          },
           {
             columnName: 'type',
             width: 135,
@@ -1807,7 +1810,7 @@ export default ({
           },
           {
             columnName: 'description',
-            width: isFullScreen ? 300 : isExistPackage ? 110 : 140,
+            width: isFullScreen ? 300 : isExistPackage ? 120 : 150,
             observeFields: ['instruction', 'remark', 'remarks'],
             render: row => {
               return (
@@ -1837,7 +1840,7 @@ export default ({
           {
             columnName: 'quantity',
             type: 'number',
-            width: 80,
+            width: 90,
             render: row => {
               let qty = '0.0'
               if (row.type === '1' || row.type === '5' || row.type === '2') {
@@ -1925,7 +1928,7 @@ export default ({
                   )[0]
                   if (deleteEnable) {
                     deleteEnable = false
-                    deleteMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
+                    deleteMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Deletion allowed after nurse cancel actualization`
                   }
                 }
               }

@@ -502,14 +502,15 @@ export const QueueColumnExtensions = props => {
                 </span>
               </Tooltip>
               <div>
-                {row.visitFK &&
-                  Authorized.check('queue.servepatient').rights == 'enable' && (
+                {row.visitFK && (
+                  <Authorized authority='queue.servepatient'>
                     <ServePatientButton
                       visitFK={row.visitFK}
                       servingPersons={row.servingByList}
                       patientName={row.patientName}
                     />
-                  )}
+                  </Authorized>
+                )}
               </div>
             </div>
           </Fragment>

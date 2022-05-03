@@ -55,6 +55,7 @@ import {
   withFormikExtend,
   FastField,
   Select,
+  notification,
 } from '@/components'
 import _ from 'lodash'
 import {
@@ -235,7 +236,12 @@ class ScribbleTemplateItem extends React.Component {
                 <Button
                   {...this.buttonProps}
                   onClick={() => {
-                    if (!description || !description.trim()) return
+                    if (!description || !description.trim()) {
+                      notification.warning({
+                        message: 'Template name is mandatory.',
+                      })
+                      return
+                    }
                     const savedItem = { ...item, description }
                     this.setState({
                       isEdit: false,

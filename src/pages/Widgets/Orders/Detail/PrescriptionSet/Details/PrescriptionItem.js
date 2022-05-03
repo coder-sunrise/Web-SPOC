@@ -597,6 +597,7 @@ class Detail extends PureComponent {
           precaution.code,
         )
         setFieldValue(`prescriptionSetItemPrecaution[${i}].sequence`, i)
+        setFieldValue(`prescriptionSetItemPrecaution[${i}].uid`, getUniqueId())
       })
     } else {
       const defaultPrecaution = {

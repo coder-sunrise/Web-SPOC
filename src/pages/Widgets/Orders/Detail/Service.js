@@ -153,6 +153,15 @@ const getVisitDoctorUserId = props => {
     const v = {
       ...(orders.entity || orders.defaultService),
     }
+    if (orders.entity) {
+      if (v.adjValue < 0) {
+        v.adjValue = Math.abs(v.adjValue || 0)
+        v.isMinus = true
+      } else {
+        v.isMinus = false
+      }
+      v.isExactAmount = v.adjType !== 'Percentage'
+    }
     return {
       ...v,
       type,
@@ -431,6 +440,9 @@ class Service extends PureComponent {
     setFieldValue('editServiceId', selectService.serviceFK)
     setFieldValue('serviceCenterFK', selectService.serviceCenterFK)
     setFieldValue('quantity', selectService.quantity)
+    setFieldValue('isMinus', selectService.isMinus)
+    setFieldValue('adjValue', selectService.adjValue)
+    setFieldValue('isExactAmount', selectService.isExactAmount)
     setFieldValue('total', selectService.total)
     setFieldValue(
       'totalAfterItemAdjustment',
@@ -733,7 +745,6 @@ class Service extends PureComponent {
                               }}
                               className={classes.checkServiceItem}
                               onClick={() => {
-                                if (editServiceId === r.value) return
                                 const selectService = serviceItems.find(
                                   item => item.serviceFK === r.value,
                                 )
@@ -752,7 +763,7 @@ class Service extends PureComponent {
                                   inputLabel=''
                                   checked={isCheckedBefore}
                                   onClick={e => {
-                                    e.preventDefault()
+                                    e.stopPropagation()
                                     if (!isCheckedBefore) {
                                       let newService = {
                                         serviceFK: r.value,
@@ -796,6 +807,18 @@ class Service extends PureComponent {
                                         'totalAfterItemAdjustment',
                                         newService.totalAfterItemAdjustment,
                                       )
+                                      setFieldValue(
+                                        'isMinus',
+                                        newService.isMinus,
+                                      )
+                                      setFieldValue(
+                                        'adjValue',
+                                        newService.adjValue,
+                                      )
+                                      setFieldValue(
+                                        'isExactAmount',
+                                        newService.isExactAmount,
+                                      )
                                     } else {
                                       setFieldValue('serviceItems', [
                                         ...serviceItems.filter(
@@ -808,6 +831,9 @@ class Service extends PureComponent {
                                         undefined,
                                       )
                                       setFieldValue('quantity', undefined)
+                                      setFieldValue('isMinus', true)
+                                      setFieldValue('adjValue', undefined)
+                                      setFieldValue('isExactAmount', true)
                                       setFieldValue('total', undefined)
                                       setFieldValue(
                                         'totalAfterItemAdjustment',
@@ -1043,105 +1069,127 @@ class Service extends PureComponent {
                 <div
                   style={{ marginTop: theme.spacing(2), position: 'absolute' }}
                 >
-                  <Switch
-                    value={!editServiceId ? true : editService.isMinus}
-                    checkedChildren='-'
-                    unCheckedChildren='+'
-                    label=''
-                    onChange={value => {
-                      editService.isMinus = value
-                      this.onAdjustmentConditionChange(editService)
-                      setFieldValue('serviceItems', [...serviceItems])
-                      setFieldValue(
-                        'totalAfterItemAdjustment',
-                        editService.totalAfterItemAdjustment,
+                  <Field
+                    name='isMinus'
+                    render={args => {
+                      return (
+                        <Switch
+                          checkedChildren='-'
+                          unCheckedChildren='+'
+                          label=''
+                          onChange={value => {
+                            editService.isMinus = value
+                            this.onAdjustmentConditionChange(editService)
+                            setFieldValue('serviceItems', [...serviceItems])
+                            setFieldValue(
+                              'totalAfterItemAdjustment',
+                              editService.totalAfterItemAdjustment,
+                            )
+                          }}
+                          disabled={
+                            totalPriceReadonly ||
+                            !editServiceId ||
+                            isDisabledHasPaidPreOrder
+                          }
+                          {...args}
+                        />
                       )
                     }}
-                    disabled={
-                      totalPriceReadonly ||
-                      !editServiceId ||
-                      isDisabledHasPaidPreOrder
-                    }
                   />
                 </div>
 
-                {editService.isExactAmount ? (
-                  <NumberInput
-                    value={editService.adjValue}
-                    style={{
-                      marginLeft: theme.spacing(7),
-                      paddingRight: theme.spacing(6),
-                    }}
-                    min={0}
-                    currency
-                    noSuffix
-                    label='Adjustment'
-                    onChange={e => {
-                      editService.adjValue = e.target.value
-                      this.onAdjustmentConditionChange(editService)
-                      setFieldValue('serviceItems', [...serviceItems])
-                      setFieldValue(
-                        'totalAfterItemAdjustment',
-                        editService.totalAfterItemAdjustment,
+                <Field
+                  name='adjValue'
+                  render={args => {
+                    args.min = 0
+                    if (values.isExactAmount)
+                      return (
+                        <NumberInput
+                          style={{
+                            marginLeft: theme.spacing(7),
+                            paddingRight: theme.spacing(6),
+                          }}
+                          min={0}
+                          currency
+                          noSuffix
+                          label='Adjustment'
+                          onChange={e => {
+                            editService.adjValue = e.target.value
+                            this.onAdjustmentConditionChange(editService)
+                            setFieldValue('serviceItems', [...serviceItems])
+                            setFieldValue(
+                              'totalAfterItemAdjustment',
+                              editService.totalAfterItemAdjustment,
+                            )
+                          }}
+                          disabled={
+                            totalPriceReadonly ||
+                            !editServiceId ||
+                            isDisabledHasPaidPreOrder
+                          }
+                          {...args}
+                        />
                       )
-                    }}
-                    disabled={
-                      totalPriceReadonly ||
-                      !editServiceId ||
-                      isDisabledHasPaidPreOrder
-                    }
-                  />
-                ) : (
-                  <NumberInput
-                    value={editService.adjValue}
-                    style={{
-                      marginLeft: theme.spacing(7),
-                      paddingRight: theme.spacing(6),
-                    }}
-                    percentage
-                    max={100}
-                    noSuffix
-                    min={0}
-                    label='Adjustment'
-                    onChange={e => {
-                      editService.adjValue = e.target.value
-                      this.onAdjustmentConditionChange(editService)
-                      setFieldValue('serviceItems', [...serviceItems])
-                      setFieldValue(
-                        'totalAfterItemAdjustment',
-                        editService.totalAfterItemAdjustment,
-                      )
-                    }}
-                    disabled={
-                      totalPriceReadonly ||
-                      !editServiceId ||
-                      isDisabledHasPaidPreOrder
-                    }
-                  />
-                )}
+                    return (
+                      <NumberInput
+                        style={{
+                          marginLeft: theme.spacing(7),
+                          paddingRight: theme.spacing(6),
+                        }}
+                        percentage
+                        max={100}
+                        noSuffix
+                        min={0}
+                        label='Adjustment'
+                        onChange={e => {
+                          editService.adjValue = e.target.value
+                          this.onAdjustmentConditionChange(editService)
+                          setFieldValue('serviceItems', [...serviceItems])
+                          setFieldValue(
+                            'totalAfterItemAdjustment',
+                            editService.totalAfterItemAdjustment,
+                          )
+                        }}
+                        disabled={
+                          totalPriceReadonly ||
+                          !editServiceId ||
+                          isDisabledHasPaidPreOrder
+                        }
+                        {...args}
+                      />
+                    )
+                  }}
+                />
               </div>
             </GridItem>
             <GridItem xs={1} className={classes.editor}>
               <div style={{ marginTop: theme.spacing(2) }}>
-                <Switch
-                  value={!editServiceId ? true : editService.isExactAmount}
-                  checkedChildren='$'
-                  unCheckedChildren='%'
-                  label=''
-                  onChange={value => {
-                    editService.isExactAmount = value
-                    this.onAdjustmentConditionChange(editService)
-                    setFieldValue('serviceItems', [...serviceItems])
-                    setFieldValue(
-                      'totalAfterItemAdjustment',
-                      editService.totalAfterItemAdjustment,
+                <Field
+                  name='isExactAmount'
+                  render={args => {
+                    return (
+                      <Switch
+                        checkedChildren='$'
+                        unCheckedChildren='%'
+                        label=''
+                        onChange={value => {
+                          editService.isExactAmount = value
+                          this.onAdjustmentConditionChange(editService)
+                          setFieldValue('serviceItems', [...serviceItems])
+                          setFieldValue(
+                            'totalAfterItemAdjustment',
+                            editService.totalAfterItemAdjustment,
+                          )
+                        }}
+                        disabled={
+                          totalPriceReadonly ||
+                          !editServiceId ||
+                          isDisabledHasPaidPreOrder
+                        }
+                        {...args}
+                      />
                     )
                   }}
-                  disabled={
-                    totalPriceReadonly ||
-                    !editServiceId ||
-                    isDisabledHasPaidPreOrder
-                  }
                 />
               </div>
             </GridItem>

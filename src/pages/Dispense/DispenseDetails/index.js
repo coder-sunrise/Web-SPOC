@@ -168,6 +168,8 @@ const DispenseDetails = ({
     visitStatus,
     hasAnySpecimenCollected,
     id: visitId,
+    medicalCheckupWorkitemStatusFK,
+    isClinicSessionClosed,
   } = values || {
     invoice: { invoiceItem: [] },
   }
@@ -1042,7 +1044,10 @@ const DispenseDetails = ({
                 />
               </Authorized>
             }
-            {!isFromMedicalCheckup &&
+            {(!isFromMedicalCheckup ||
+              (medicalCheckupWorkitemStatusFK !== 3 &&
+                medicalCheckupWorkitemStatusFK !== 4 &&
+                !isClinicSessionClosed)) &&
               !isRetailVisit &&
               visitStatus !== VISIT_STATUS.PAUSED && (
                 <Authorized authority='queue.dispense.editorder'>
