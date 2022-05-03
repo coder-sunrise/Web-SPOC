@@ -138,7 +138,7 @@ const WorkitemBody = ({ item }) => {
     dateFormatLongWithTimeNoSec,
     false,
   )
-
+  
   const clinicSettings = useSelector(s => s.clinicSettings)
   const { isQueueNoDecimal } = clinicSettings.settings || {}
   const queueNo =
@@ -198,6 +198,17 @@ const WorkitemBody = ({ item }) => {
           {orderDate}
         </LeftLabel>
         <RightLabel width={140}>
+          {item.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW && (
+            <Tooltip title='Appointment Time'>
+              <div
+                style={{
+                  color: 'rgb(0, 153, 51)',
+                }}
+              >
+                {item.appointmentTime}
+              </div>
+            </Tooltip>
+          )}
           {item.statusFK !== RADIOLOGY_WORKITEM_STATUS.NEW && (
             <Tooltip title={statusUpdateDateTooltip[`${item.statusFK}`]}>
               <div
