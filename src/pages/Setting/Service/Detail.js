@@ -697,7 +697,7 @@ class Detail extends PureComponent {
         radioAndLabServiceCenterIds.includes(sc.serviceCenterFK),
       ) === -1
     ) {
-      hiddenFields.push('ctService_Tag')
+      //hiddenFields.push('ctService_Tag')
     }
 
     const hasInternalLabServiceCenter = checkAnyInternalLabServiceCenter(
@@ -956,6 +956,19 @@ class Detail extends PureComponent {
                         />
                       </GridItem>
                     )}
+                    <GridItem xs={4}>
+                      <Field
+                        name='isAutoDisplayInOrderCart'
+                        render={args => {
+                          return (
+                            <Switch
+                              label='Show in order cart as a priority'
+                              {...args}
+                            />
+                          )
+                        }}
+                      />
+                    </GridItem>
                   </GridContainer>
                 </GridItem>
               </GridContainer>

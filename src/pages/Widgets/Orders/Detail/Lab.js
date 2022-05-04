@@ -28,6 +28,7 @@ import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
 import { CANNED_TEXT_TYPE, SERVICE_CENTER_CATEGORY } from '@/utils/constants'
 import { LAB_WORKITEM_STATUS } from '@/utils/constants'
 import CannedTextButton from './CannedTextButton'
+import { CloseCircleOutlined } from '@ant-design/icons'
 
 const { CheckableTag } = Tag
 
@@ -72,7 +73,7 @@ const styles = theme => ({
   },
   groupPanel: {
     margin: '0px 5px',
-    maxHeight: 170,
+    maxHeight: 175,
     overflowY: 'auto',
     overflowX: 'hidden',
   },
@@ -115,12 +116,12 @@ const styles = theme => ({
     maxHeight: 105,
   },
   selectedServiceLabel: {
-    maxWidth: 155,
+    maxWidth: 170,
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     display: 'inline-block',
-    marginRight: 6,
+    marginRight: 10,
   },
 })
 
@@ -225,15 +226,20 @@ class Lab extends PureComponent {
   constructor(props) {
     super(props)
     const { dispatch } = props
-
+    this.scroll = React.createRef()
     this.state = {
       services: [],
       serviceCenters: [],
       serviceCenterServices: [],
-      serviceTags: [{ value: 'All', name: 'All' }],
-      serviceCategories: [{ value: 'All', name: 'All' }],
-      serviceTestCategories: [{ value: 'All', name: 'All' }],
+      serviceTestCategories: [
+        {
+          value: 'All',
+          name: 'All',
+          serviceTags: [],
+        },
+      ],
       isPreOrderItemExists: false,
+      currentPage: 1,
     }
 
     dispatch({
@@ -253,7 +259,6 @@ class Lab extends PureComponent {
         services = [],
         serviceCenters = [],
         serviceCenterServices = [],
-        serviceCategories = [],
         serviceTags = [],
         serviceTestCategories,
       } = getServices(list)
@@ -279,17 +284,31 @@ class Lab extends PureComponent {
         services: newServices,
         serviceCenters,
         serviceCenterServices,
-        serviceTags: [{ value: 'All', name: 'All' }, ...serviceTags],
-        serviceCategories: [
-          { value: 'All', name: 'All' },
-          ...serviceCategories,
-        ],
         serviceTestCategories: [
-          { value: 'All', name: 'All' },
+          { value: 'All', name: 'All', serviceTags: [...serviceTags] },
           ...serviceTestCategories,
         ],
       })
     })
+  }
+
+  componentDidMount() {
+    if (this.scroll) {
+      this.scroll.addEventListener('scroll', e => {
+        const { clientHeight, scrollHeight, scrollTop } = e.target
+        const isBottom = scrollTop + clientHeight + 20 > scrollHeight
+        if (
+          isBottom &&
+          this.state.currentPage * 50 < this.getFilterServices().length
+        ) {
+          this.setState(pre => {
+            return { currentPage: pre.currentPage + 1 }
+          })
+        }
+      })
+
+      this.resetPage()
+    }
   }
 
   getServiceCenterService = editService => {
@@ -416,12 +435,13 @@ class Lab extends PureComponent {
     )
       return
     handleSubmit()
+    this.resetPage()
   }
 
-  isValidate = service => {
+  isValidate = serviceFK => {
     const { values } = this.props
     const { labItems = [] } = values
-    let checkedLab = labItems.find(r => r.serviceFK === service.value)
+    let checkedLab = labItems.find(r => r.serviceFK === serviceFK)
     if (!checkedLab) {
       return true
     }
@@ -487,6 +507,62 @@ class Lab extends PureComponent {
     }
   }
 
+  getFilterServices = () => {
+    const { values = {} } = this.props
+    const { services = [] } = this.state
+
+    const {
+      isEdit,
+      editServiceId,
+      filterService = '',
+      selectCategory,
+      selectTag,
+    } = values
+    let filterServices = []
+
+    if (isEdit) {
+      filterServices = services.filter(s => s.value === editServiceId)
+    } else {
+      filterServices = services.filter(
+        s =>
+          (selectTag === 'All' ||
+            s.serviceTags.find(st => st.value === selectTag)) &&
+          (selectCategory === 'All' ||
+            s.serviceTestCategories.find(p => p.value === selectCategory)) &&
+          (s.code.toUpperCase().indexOf(filterService.toUpperCase()) >= 0 ||
+            s.name.toUpperCase().indexOf(filterService.toUpperCase()) >= 0),
+      )
+    }
+    filterServices = _.orderBy(
+      filterServices,
+      ['isAutoDisplayInOrderCart', item => (item.name || '').toUpperCase()],
+      ['desc', 'asc'],
+    )
+    return filterServices
+  }
+
+  resetSelectItem = () => {
+    const { setFieldValue } = this.props
+    const { isPreOrderItemExists } = this.state
+    setFieldValue('editServiceId', undefined)
+    setFieldValue('serviceCenterFK', undefined)
+    setFieldValue('quantity', undefined)
+    setFieldValue('isMinus', true)
+    setFieldValue('adjValue', undefined)
+    setFieldValue('isExactAmount', true)
+    setFieldValue('total', undefined)
+    setFieldValue('totalAfterItemAdjustment', undefined)
+    if (isPreOrderItemExists)
+      this.setState({
+        isPreOrderItemExists: false,
+      })
+  }
+
+  resetPage = () => {
+    this.scroll.scrollTo(0, 0)
+    this.setState({ currentPage: 1 })
+  }
+
   render() {
     const {
       theme,
@@ -500,10 +576,9 @@ class Lab extends PureComponent {
     const {
       services = [],
       serviceCenters = [],
-      serviceCategories = [],
       serviceTestCategories = [],
-      serviceTags = [],
       isPreOrderItemExists,
+      currentPage = 1,
     } = this.state
     const {
       labItems = [],
@@ -520,27 +595,6 @@ class Lab extends PureComponent {
 
     const selectService = labItems.map(r => r.serviceName).join(', ')
     const editService = labItems.find(r => r.serviceFK === editServiceId) || {}
-    let filterServices = []
-
-    if (isEdit) {
-      filterServices = services.filter(s => s.value === editServiceId)
-    } else {
-      filterServices = services.filter(
-        s =>
-          labItems.find(r => r.serviceFK === s.value) ||
-          ((selectTag === 'All' ||
-            s.serviceTags.find(st => st.value === selectTag)) &&
-            (selectCategory === 'All' ||
-              s.serviceTestCategories.find(p => p.value === selectCategory)) &&
-            (s.code.toUpperCase().indexOf(filterService.toUpperCase()) >= 0 ||
-              s.name.toUpperCase().indexOf(filterService.toUpperCase()) >= 0)),
-      )
-    }
-    filterServices = _.orderBy(
-      filterServices,
-      [item => (item.name || '').toUpperCase()],
-      ['asc'],
-    )
 
     const isDisabledHasPaidPreOrder =
       editService?.actualizedPreOrderItemFK && editService?.hasPaid == true
@@ -566,6 +620,7 @@ class Lab extends PureComponent {
     const debouncedFilterChangeAction = _.debounce(
       e => {
         setFieldValue('filterService', e.target.value)
+        this.resetPage()
       },
       100,
       {
@@ -573,6 +628,11 @@ class Lab extends PureComponent {
         trailing: false,
       },
     )
+    const filterServices = this.getFilterServices()
+    let showItemCount = currentPage * 50
+    if (showItemCount > filterServices.length) {
+      showItemCount = filterServices.length
+    }
     return (
       <Authorized
         authority={GetOrderItemAccessRight(
@@ -625,8 +685,11 @@ class Lab extends PureComponent {
                               : '1px solid rgba(0, 0, 0, 0.42)',
                         }}
                         onChange={checked => {
-                          if (!isEdit && checked)
+                          if (!isEdit && checked) {
                             setFieldValue('selectCategory', category.value)
+                            setFieldValue('selectTag', 'All')
+                            this.resetPage()
+                          }
                         }}
                       >
                         <Tooltip title={category.name}>
@@ -647,7 +710,12 @@ class Lab extends PureComponent {
                   Tag:
                 </div>
                 <div className={classes.tagsGroupPanel}>
-                  {serviceTags.map(tag =>
+                  {[
+                    { value: 'All', name: 'All' },
+                    ...(serviceTestCategories.find(
+                      c => c.value === selectCategory,
+                    )?.serviceTags || []),
+                  ].map(tag =>
                     isEdit ? (
                       <Tag
                         className={classes.tag}
@@ -675,8 +743,10 @@ class Lab extends PureComponent {
                               : '1px solid rgba(0, 0, 0, 0.42)',
                         }}
                         onChange={checked => {
-                          if (!isEdit && checked)
+                          if (!isEdit && checked) {
                             setFieldValue('selectTag', tag.value)
+                            this.resetPage()
+                          }
                         }}
                       >
                         <Tooltip title={tag.name}>
@@ -688,12 +758,13 @@ class Lab extends PureComponent {
                 </div>
               </div>
             </GridItem>
-            <GridItem xs={12}>
+            <GridItem xs={12} container>
               <Field
                 name='filterService'
                 render={args => {
                   return (
                     <TextField
+                      style={{ width: 300, display: 'inline-block' }}
                       label='Filter by service code, name'
                       onChange={debouncedFilterChangeAction}
                       disabled={isEdit}
@@ -702,6 +773,16 @@ class Lab extends PureComponent {
                   )
                 }}
               />
+              {!isEdit && (
+                <div
+                  style={{
+                    position: 'relative',
+                    top: 22,
+                    display: 'inline-block',
+                    marginLeft: 6,
+                  }}
+                >{`${showItemCount} items displayed, ${filterServices.length} items in total.`}</div>
+              )}
             </GridItem>
             <GridItem xs={12}>
               <FieldSet
@@ -710,9 +791,12 @@ class Lab extends PureComponent {
                 title='Service'
                 style={{ fontSize: '0.85rem' }}
               >
-                <div className={classes.groupPanel}>
+                <div
+                  className={classes.groupPanel}
+                  ref={e => (this.scroll = e)}
+                >
                   {filterServices.length
-                    ? _.take(filterServices, 500).map(r => {
+                    ? _.take(filterServices, showItemCount).map(r => {
                         const isCheckedBefore = !_.isEmpty(
                           labItems.find(ri => ri.serviceFK === r.value),
                         )
@@ -741,7 +825,7 @@ class Lab extends PureComponent {
                                   editServiceId === r.value
                                     ? 'lightgreen'
                                     : 'white',
-                                borderColor: this.isValidate(r)
+                                borderColor: this.isValidate(r.value)
                                   ? '#99CC99'
                                   : 'red',
                               }}
@@ -827,24 +911,7 @@ class Lab extends PureComponent {
                                           item => item.serviceFK !== r.value,
                                         ),
                                       ])
-                                      setFieldValue('editServiceId', undefined)
-                                      setFieldValue(
-                                        'serviceCenterFK',
-                                        undefined,
-                                      )
-                                      setFieldValue('isMinus', true)
-                                      setFieldValue('adjValue', undefined)
-                                      setFieldValue('isExactAmount', true)
-                                      setFieldValue('quantity', undefined)
-                                      setFieldValue('total', undefined)
-                                      setFieldValue(
-                                        'totalAfterItemAdjustment',
-                                        undefined,
-                                      )
-                                      if (isPreOrderItemExists)
-                                        this.setState({
-                                          isPreOrderItemExists: false,
-                                        })
+                                      this.resetSelectItem()
                                     }
                                   }}
                                 />
@@ -879,7 +946,10 @@ class Lab extends PureComponent {
                 {labItems.length ? (
                   labItems.map(ri => {
                     return (
-                      <div className={classes.selectedServiceLabel}>
+                      <div
+                        className={classes.selectedServiceLabel}
+                        style={{ position: 'relative', paddingRight: 16 }}
+                      >
                         <Link
                           onClick={e => {
                             e.preventDefault()
@@ -887,11 +957,45 @@ class Lab extends PureComponent {
                           }}
                         >
                           <Tooltip title={ri.serviceName}>
-                            <span style={{ textDecoration: 'underline' }}>
+                            <span
+                              style={{
+                                textDecoration: 'underline',
+                                color: this.isValidate(ri.serviceFK)
+                                  ? '#4255bd'
+                                  : 'red',
+                                fontWeight:
+                                  ri.serviceFK === editServiceId ? 'bold' : 400,
+                              }}
+                            >
                               {ri.serviceName}
                             </span>
                           </Tooltip>
                         </Link>
+                        {!isEdit && (
+                          <Tooltip title='Remove item'>
+                            <div
+                              style={{
+                                position: 'absolute',
+                                right: 0,
+                                top: 0,
+                              }}
+                            >
+                              <CloseCircleOutlined
+                                style={{ color: 'red', cursor: 'pointer' }}
+                                onClick={() => {
+                                  setFieldValue('labItems', [
+                                    ...labItems.filter(
+                                      item => item.serviceFK !== ri.serviceFK,
+                                    ),
+                                  ])
+                                  if (editServiceId === ri.serviceFK) {
+                                    this.resetSelectItem()
+                                  }
+                                }}
+                              />
+                            </div>
+                          </Tooltip>
+                        )}
                       </div>
                     )
                   })
