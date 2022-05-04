@@ -286,7 +286,7 @@ class Grid extends React.Component {
                 ...queueColumns,
                 {
                   columnName: 'visitStatus',
-                  width: 200,
+                  width: 180,
                   render: row => (
                     <VisitStatusTag
                       row={row}

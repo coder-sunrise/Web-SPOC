@@ -1,4 +1,5 @@
 import React, { Fragment, memo } from 'react'
+import { Row, Col, Divider } from 'antd'
 import { connect } from 'umi'
 // umi locale
 import { FormattedMessage, formatMessage } from 'umi'
@@ -51,12 +52,8 @@ const Filterbar = props => {
   const servePatientRight = Authorized.check('queue.servepatient')
   return (
     <div className='div-reception-header'>
-      <GridContainer
-        className={classes.actionBar}
-        justify='flex-start'
-        alignItems='center'
-      >
-        <GridItem xs={12} sm={12} md={5} lg={5}>
+      <Row wrap={false}>
+        <Col flex='auto'>
           <Fragment>
             <FastField
               name='visitType'
@@ -66,7 +63,7 @@ const Filterbar = props => {
                     label='Visit Type'
                     {...args}
                     mode='multiple'
-                    style={{ width: 180, marginRight: 10 }}
+                    style={{ width: 180, marginRight: 10, marginLeft: 10 }}
                     maxTagPlaceholder='Visit Types'
                     allowClear={true}
                     onChange={(v, op = {}) => {
@@ -143,82 +140,93 @@ const Filterbar = props => {
                     onChange={e => setSearch(e.target.value)}
                     bind='patientSearch/query'
                     useLeading={false}
-                    style={{ width: 280, position: 'relative', top: -9 }}
+                    style={{
+                      width: 290,
+                      position: 'relative',
+                      top: -9,
+                    }}
                     debounceDuration={500}
                   />
                 </Tooltip>
               )}
             />
-          </Fragment>
-        </GridItem>
-        <GridItem xs={7} sm={7} md={7} lg={3}>
-          <Authorized authority='queue.registervisit'>
-            <ProgressButton
-              variant='contained'
-              color='primary'
-              icon={
-                <Hidden mdDown>
-                  <Add />
-                </Hidden>
-              }
-              onClick={() => {
-                handleSubmit()
-                setTimeout(() => {
-                  setFieldValue('search', '')
-                  setSearch('')
-                }, 1000)
+            <div
+              style={{
+                display: 'inline-block',
+                position: 'relative',
+                top: -10,
+                marginLeft: 10,
               }}
-              size='sm'
-              submitKey='patientSearch/query'
             >
-              New Visit
-            </ProgressButton>
-          </Authorized>
-          <Authorized authority='patientdatabase.newpatient'>
-            <Button
-              icon={null}
-              color='primary'
-              size='sm'
-              onClick={() => {
-                toggleNewPatient()
-                setFieldValue('search', '')
-                setSearch('')
-              }}
-              disabled={loading.global}
-            >
-              <Hidden mdDown>
-                <PersonAdd />
-              </Hidden>
-              <FormattedMessage id='reception.queue.createPatient' />
-            </Button>
-          </Authorized>
+              <Authorized authority='queue.registervisit'>
+                <ProgressButton
+                  variant='contained'
+                  color='primary'
+                  icon={
+                    <Hidden mdDown>
+                      <Add />
+                    </Hidden>
+                  }
+                  onClick={() => {
+                    handleSubmit()
+                    setTimeout(() => {
+                      setFieldValue('search', '')
+                      setSearch('')
+                    }, 1000)
+                  }}
+                  size='sm'
+                  submitKey='patientSearch/query'
+                >
+                  New Visit
+                </ProgressButton>
+              </Authorized>
+              <Authorized authority='patientdatabase.newpatient'>
+                <Button
+                  icon={null}
+                  color='primary'
+                  size='sm'
+                  onClick={() => {
+                    toggleNewPatient()
+                    setFieldValue('search', '')
+                    setSearch('')
+                  }}
+                  disabled={loading.global}
+                >
+                  <Hidden mdDown>
+                    <PersonAdd />
+                  </Hidden>
+                  <FormattedMessage id='reception.queue.createPatient' />
+                </Button>
+              </Authorized>
 
-          {((clinicRoleFK === 1 && !hideSelfOnlyFilter) ||
-            (clinicRoleFK === 6 &&
-              servePatientRight &&
-              servePatientRight.rights !== 'hidden')) && (
-            <div className={classes.switch}>
-              <Checkbox
-                label='My Patient'
-                onChange={onSwitchClick}
-                checked={selfOnly}
-              />
+              {((clinicRoleFK === 1 && !hideSelfOnlyFilter) ||
+                (clinicRoleFK === 6 &&
+                  servePatientRight &&
+                  servePatientRight.rights !== 'hidden')) && (
+                <div className={classes.switch}>
+                  <Checkbox
+                    label='My Patient'
+                    onChange={onSwitchClick}
+                    checked={selfOnly}
+                  />
+                </div>
+              )}
             </div>
-          )}
-        </GridItem>
-        <GridItem
-          xs={12}
-          sm={12}
-          md={12}
-          lg={4}
-          container
-          justify='flex-end'
-          alignItems='center'
-          style={{ paddingRight: 0 }}
-        >
-          <StatusFilterButton />
-        </GridItem>
-      </GridContainer>
+          </Fragment>
+        </Col>
+        <Col flex='none'>
+          <div
+            style={{
+              width: 650,
+              display: 'flex',
+              marginTop: 5,
+              justifyContent: 'flex-end',
+            }}
+          >
+            <StatusFilterButton />
+          </div>
+        </Col>
+      </Row>
     </div>
   )
 }
