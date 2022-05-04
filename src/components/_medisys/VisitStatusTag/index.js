@@ -41,9 +41,9 @@ const styles = () => ({
   },
   green: {
     borderLeft: '5px',
-    backgroundColor: '#098257',
+    backgroundColor: '#389e0d',
     '&:hover': {
-      backgroundColor: color('#098257')
+      backgroundColor: color('#389e0d')
         .darken(0.2)
         .hex(),
     },
@@ -68,6 +68,14 @@ const styles = () => ({
     backgroundColor: '#999',
     '&:hover': {
       backgroundColor: color('#999')
+        .darken(0.2)
+        .hex(),
+    },
+  },
+  orange: {
+    backgroundColor: '#ff9800',
+    '&:hover': {
+      backgroundColor: color('#ff9800')
         .darken(0.2)
         .hex(),
     },
@@ -99,8 +107,10 @@ const VisitStatusTag = props => {
       colorTag = 'blue'
       break
     case VISIT_STATUS.DISPENSE:
-    case VISIT_STATUS.BILLING:
     case VISIT_STATUS.ORDER_UPDATED:
+      colorTag = 'orange'
+      break
+    case VISIT_STATUS.BILLING:
       colorTag = 'green'
       break
     case VISIT_STATUS.IN_CONS:

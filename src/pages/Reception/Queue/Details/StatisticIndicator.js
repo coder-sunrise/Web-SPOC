@@ -7,7 +7,13 @@ import Check from '@material-ui/icons/ArrowForward'
 // common component
 import { Button } from '@/components'
 // styling
-import { primaryColor, dangerColor, grayColor } from 'mui-pro-jss'
+import {
+  primaryColor,
+  dangerColor,
+  warningColor,
+  grayColor,
+  successColor,
+} from 'mui-pro-jss'
 // variables
 import { flattenAppointmentDateToCalendarEvents } from '../../BigCalendar'
 import { StatusIndicator } from '../variables'
@@ -29,13 +35,16 @@ const StatisticStyles = () => ({
     color: '#000',
   },
   statusInProgress: {
-    color: dangerColor,
+    color: warningColor,
   },
   statusCompleted: {
     color: grayColor,
   },
   statusWaiting: {
     color: primaryColor,
+  },
+  statusBilling: {
+    color: successColor,
   },
   status: { padding: '0px 10px', margin: '5px 0px', fontWeight: 400 },
 })
@@ -46,10 +55,7 @@ const StatisticIndicator = ({
   queueLog: { currentFilter, list },
   dispatch,
 }) => {
-  const [
-    numOfcalendarData,
-    setNumOfcalendarData,
-  ] = useState(0)
+  const [numOfcalendarData, setNumOfcalendarData] = useState(0)
 
   useEffect(() => {
     const flattenedCalendarData = appointments
@@ -58,7 +64,7 @@ const StatisticIndicator = ({
     setNumOfcalendarData(flattenedCalendarData.length)
   }, [])
 
-  const onButtonClick = (event) => {
+  const onButtonClick = event => {
     // const { dispatch } = this.props
     const { id } = event.currentTarget
 
@@ -79,12 +85,7 @@ const StatisticIndicator = ({
   return (
     <React.Fragment>
       <Paper elevation={6} className={classnames(classes.container)}>
-        <h4
-          className={classnames([
-            classes.number,
-            classes.statusAll,
-          ])}
-        >
+        <h4 className={classnames([classes.number, classes.statusAll])}>
           {statistic.all}
         </h4>
         <Divider variant='fullWidth' />
@@ -103,12 +104,7 @@ const StatisticIndicator = ({
       </Paper>
 
       <Paper elevation={6} className={classnames(classes.container)}>
-        <h4
-          className={classnames([
-            classes.number,
-            classes.statusWaiting,
-          ])}
-        >
+        <h4 className={classnames([classes.number, classes.statusWaiting])}>
           {statistic.waiting}
         </h4>
         <Divider variant='fullWidth' />
@@ -125,12 +121,7 @@ const StatisticIndicator = ({
         </Button>
       </Paper>
       <Paper elevation={6} className={classnames(classes.container)}>
-        <h4
-          className={classnames([
-            classes.number,
-            classes.statusInProgress,
-          ])}
-        >
+        <h4 className={classnames([classes.number, classes.statusInProgress])}>
           {statistic.inProgress}
         </h4>
         <Divider variant='fullWidth' />
@@ -147,12 +138,7 @@ const StatisticIndicator = ({
         </Button>
       </Paper>
       <Paper elevation={6} className={classnames(classes.container)}>
-        <h4
-          className={classnames([
-            classes.number,
-            classes.statusCompleted,
-          ])}
-        >
+        <h4 className={classnames([classes.number, classes.statusCompleted])}>
           {statistic.completed}
         </h4>
         <Divider variant='fullWidth' />
@@ -168,12 +154,7 @@ const StatisticIndicator = ({
         </Button>
       </Paper>
       <Paper elevation={6} className={classnames(classes.container)}>
-        <h4
-          className={classnames([
-            classes.number,
-            classes.statusAll,
-          ])}
-        >
+        <h4 className={classnames([classes.number, classes.statusAll])}>
           {statistic.appointment}
         </h4>
         <Divider variant='fullWidth' />

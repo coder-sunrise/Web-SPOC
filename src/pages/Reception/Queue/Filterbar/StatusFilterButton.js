@@ -4,7 +4,12 @@ import classnames from 'classnames'
 // material ui
 import { Divider, Paper, withStyles } from '@material-ui/core'
 // common component
-import { primaryColor, dangerColor, grayColor } from 'mui-pro-jss'
+import {
+  primaryColor,
+  warningColor,
+  successColor,
+  grayColor,
+} from 'mui-pro-jss'
 import { Button } from '@/components'
 // styling
 // variables
@@ -15,14 +20,15 @@ import { getCount, todayOnly } from '../utils'
 const styles = () => ({
   container: {
     textAlign: 'center',
-    marginLeft: '5px',
-    marginRight: '5px',
-    width: 100,
+    marginLeft: '4px',
+    marginRight: '4px',
+    width: 95,
     minWidth: 'auto',
     '& button': {
       borderRadius: '0px !important',
       borderBottomRightRadius: '4px !important',
       borderBottomLeftRadius: '4px !important',
+      padding: '3px 0px!important',
     },
     cursor: 'pointer',
   },
@@ -38,10 +44,13 @@ const styles = () => ({
     color: '#000',
   },
   statusInProgress: {
-    color: dangerColor,
+    color: warningColor,
   },
   statusCompleted: {
     color: grayColor,
+  },
+  statusBilling: {
+    color: successColor,
   },
   statusWaiting: {
     color: primaryColor,
@@ -53,6 +62,7 @@ const initialStatusCount = {
   all: 0,
   waiting: 0,
   inProgress: 0,
+  billing: 0,
   completed: 0,
   appointment: 0,
 }
@@ -63,12 +73,9 @@ const StatusFilterButton = ({
   appointments = [],
   queueLog: { currentFilter, list },
 }) => {
-  const [
-    statusCount,
-    setStatusCount,
-  ] = useState({ ...initialStatusCount })
+  const [statusCount, setStatusCount] = useState({ ...initialStatusCount })
 
-  const onButtonClick = (event) => {
+  const onButtonClick = event => {
     const { id } = event.currentTarget
 
     dispatch({
@@ -77,22 +84,17 @@ const StatusFilterButton = ({
     })
   }
 
-  useEffect(
-    () => {
-      const count = {
-        all: getCount(StatusIndicator.ALL, list),
-        waiting: getCount(StatusIndicator.WAITING, list),
-        inProgress: getCount(StatusIndicator.IN_PROGRESS, list),
-        completed: getCount(StatusIndicator.COMPLETED, list),
-        appointment: appointments.length,
-      }
-      setStatusCount(count)
-    },
-    [
-      list,
-      appointments,
-    ],
-  )
+  useEffect(() => {
+    const count = {
+      all: getCount(StatusIndicator.ALL, list),
+      waiting: getCount(StatusIndicator.WAITING, list),
+      inProgress: getCount(StatusIndicator.IN_PROGRESS, list),
+      billing: getCount(StatusIndicator.BILLING, list),
+      completed: getCount(StatusIndicator.COMPLETED, list),
+      appointment: appointments.length,
+    }
+    setStatusCount(count)
+  }, [list, appointments])
 
   return (
     <React.Fragment>
@@ -102,12 +104,7 @@ const StatusFilterButton = ({
         id={StatusIndicator.ALL}
         onClick={onButtonClick}
       >
-        <h4
-          className={classnames([
-            classes.number,
-            classes.statusAll,
-          ])}
-        >
+        <h4 className={classnames([classes.number, classes.statusAll])}>
           {statusCount.all}
         </h4>
         <Divider variant='fullWidth' />
@@ -116,6 +113,7 @@ const StatusFilterButton = ({
           color='primary'
           size='sm'
           block
+          style={{ height: 28, minWidth: 95 }}
           id={StatusIndicator.ALL}
           onClick={onButtonClick}
           variant={
@@ -132,12 +130,7 @@ const StatusFilterButton = ({
         id={StatusIndicator.WAITING}
         onClick={onButtonClick}
       >
-        <h4
-          className={classnames([
-            classes.number,
-            classes.statusWaiting,
-          ])}
-        >
+        <h4 className={classnames([classes.number, classes.statusWaiting])}>
           {statusCount.waiting}
         </h4>
         <Divider variant='fullWidth' />
@@ -146,6 +139,7 @@ const StatusFilterButton = ({
           className={classes.button}
           color='primary'
           size='sm'
+          style={{ height: 28, minWidth: 95 }}
           block
           id={StatusIndicator.WAITING}
           onClick={onButtonClick}
@@ -163,28 +157,22 @@ const StatusFilterButton = ({
         id={StatusIndicator.IN_PROGRESS}
         onClick={onButtonClick}
       >
-        <h4
-          className={classnames([
-            classes.number,
-            classes.statusInProgress,
-          ])}
-        >
+        <h4 className={classnames([classes.number, classes.statusInProgress])}>
           {statusCount.inProgress}
         </h4>
         <Divider variant='fullWidth' />
 
         <Button
-          color='danger'
+          color='warning'
           size='sm'
           block
+          style={{ height: 28, minWidth: 95 }}
           id={StatusIndicator.IN_PROGRESS}
           onClick={onButtonClick}
           variant={
-            currentFilter === StatusIndicator.IN_PROGRESS ? (
-              'contained'
-            ) : (
-              'outlined'
-            )
+            currentFilter === StatusIndicator.IN_PROGRESS
+              ? 'contained'
+              : 'outlined'
           }
         >
           {/* currentFilter === StatusIndicator.IN_PROGRESS && <Check /> */}
@@ -194,15 +182,35 @@ const StatusFilterButton = ({
       <Paper
         elevation={6}
         className={classnames(classes.container)}
+        id={StatusIndicator.BILLING}
+        onClick={onButtonClick}
+      >
+        <h4 className={classnames([classes.number, classes.statusBilling])}>
+          {statusCount.billing}
+        </h4>
+        <Divider variant='fullWidth' />
+
+        <Button
+          color='success'
+          size='sm'
+          block
+          style={{ height: 28, minWidth: 95 }}
+          id={StatusIndicator.BILLING}
+          onClick={onButtonClick}
+          variant={
+            currentFilter === StatusIndicator.BILLING ? 'contained' : 'outlined'
+          }
+        >
+          {StatusIndicator.BILLING}
+        </Button>
+      </Paper>
+      <Paper
+        elevation={6}
+        className={classnames(classes.container)}
         id={StatusIndicator.COMPLETED}
         onClick={onButtonClick}
       >
-        <h4
-          className={classnames([
-            classes.number,
-            classes.statusCompleted,
-          ])}
-        >
+        <h4 className={classnames([classes.number, classes.statusCompleted])}>
           {statusCount.completed}
         </h4>
         <Divider variant='fullWidth' />
@@ -210,14 +218,13 @@ const StatusFilterButton = ({
         <Button
           size='sm'
           block
+          style={{ height: 28, minWidth: 95 }}
           onClick={onButtonClick}
           id={StatusIndicator.COMPLETED}
           variant={
-            currentFilter === StatusIndicator.COMPLETED ? (
-              'contained'
-            ) : (
-              'outlined'
-            )
+            currentFilter === StatusIndicator.COMPLETED
+              ? 'contained'
+              : 'outlined'
           }
         >
           {StatusIndicator.COMPLETED}
@@ -232,12 +239,7 @@ const StatusFilterButton = ({
         id={StatusIndicator.APPOINTMENT}
         onClick={onButtonClick}
       >
-        <h4
-          className={classnames([
-            classes.number,
-            classes.statusAll,
-          ])}
-        >
+        <h4 className={classnames([classes.number, classes.statusAll])}>
           {statusCount.appointment}
         </h4>
         <Divider variant='fullWidth' />
@@ -246,14 +248,13 @@ const StatusFilterButton = ({
           color='primary'
           size='sm'
           block
+          style={{ height: 28, minWidth: 95 }}
           id={StatusIndicator.APPOINTMENT}
           onClick={onButtonClick}
           variant={
-            currentFilter === StatusIndicator.APPOINTMENT ? (
-              'contained'
-            ) : (
-              'outlined'
-            )
+            currentFilter === StatusIndicator.APPOINTMENT
+              ? 'contained'
+              : 'outlined'
           }
         >
           {StatusIndicator.APPOINTMENT}
