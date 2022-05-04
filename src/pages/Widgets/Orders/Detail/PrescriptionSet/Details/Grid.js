@@ -21,6 +21,7 @@ const rightIcon = {
   cursor: 'pointer',
   display: 'inline-block',
   margin: '0px 1px',
+  lineHeight: '16px',
 }
 
 const Grid = ({ prescriptionSet, dispatch }) => {

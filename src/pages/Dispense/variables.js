@@ -492,6 +492,7 @@ export const DispenseItemsColumns1 = (
                       height: 20,
                       display: 'inline-block',
                       margin: '0px 1px',
+                      lineHeight: '16px',
                     }}
                   >
                     Pre
@@ -512,6 +513,7 @@ export const DispenseItemsColumns1 = (
                       height: 20,
                       display: 'inline-block',
                       margin: '0px 1px',
+                      lineHeight: '16px',
                     }}
                   >
                     Excl.
@@ -1040,6 +1042,7 @@ export const DispenseItemsColumnExtensions = (
                       height: 20,
                       display: 'inline-block',
                       margin: '0px 1px',
+                      lineHeight: '16px',
                     }}
                   >
                     Pre
@@ -1060,6 +1063,7 @@ export const DispenseItemsColumnExtensions = (
                       height: 20,
                       display: 'inline-block',
                       margin: '0px 1px',
+                      lineHeight: '16px',
                     }}
                   >
                     Excl.
@@ -1665,6 +1669,7 @@ export const ServiceColumns1 = (
                       fontSize: '0.7rem',
                       padding: '2px 3px',
                       height: 20,
+                      lineHeight: '16px',
                     }}
                   >
                     Pre
@@ -2045,6 +2050,7 @@ export const OtherOrdersColumnExtensions = (
                     fontSize: '0.7rem',
                     padding: '2px 3px',
                     height: 20,
+                    lineHeight: '16px',
                   }}
                 >
                   Pre
@@ -2319,6 +2325,7 @@ export const PackageColumnExtensions = (onPrint, showDrugLabelRemark) => [
                     height: 20,
                     display: 'inline-block',
                     margin: '0px 1px',
+                    lineHeight: '16px',
                   }}
                 >
                   Excl.
