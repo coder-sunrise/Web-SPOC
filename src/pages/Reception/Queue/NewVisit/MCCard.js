@@ -36,10 +36,9 @@ const MCCard = ({
   validateReportLanguage,
 }) => {
   const commitChanges = ({ rows }) => {
-    setFieldValue('visitDoctor', rows)
-    return rows
-  }
-  console.log(values)
+                                        setFieldValue('visitDoctor', rows)
+                                        return rows
+                                      }
 
   const getReportLanguage = () => {
     const {
