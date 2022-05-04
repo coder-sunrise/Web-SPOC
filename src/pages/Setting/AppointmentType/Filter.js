@@ -66,6 +66,10 @@ const Filter = ({ classes, dispatch, values, toggleModal }) => {
                       combineCondition: 'or',
                     },
                   ],
+                  sorting: [
+                    { columnName: 'isDefault', direction: 'desc' },
+                    { columnName: 'displayValue', direction: 'asc' },
+                  ],
                 },
               })
             }}
