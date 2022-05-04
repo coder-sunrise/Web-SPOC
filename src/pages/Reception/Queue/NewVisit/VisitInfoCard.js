@@ -129,8 +129,10 @@ const VisitInfoCard = ({
       return 'Queue No. already existed in current queue list'
     return ''
   }
- 
+
+  console.log(values)
   const isPrimaryDoctorConsultated =
+    restProps.values?.visitPrimaryDoctor &&
     restProps.values?.visitPrimaryDoctor?.consultationStatus !== 'Waiting'
   const getVisitOrderTemplateTotal = (vType, template) => {
     let activeItemTotal = 0
