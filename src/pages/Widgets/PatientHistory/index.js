@@ -120,6 +120,7 @@ const styles = theme => ({
     height: 20,
     cursor: 'pointer',
     margin: '0px 1px',
+    lineHeight: '16px',
   },
 })
 @connect(
