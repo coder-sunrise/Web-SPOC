@@ -118,25 +118,25 @@ class index extends PureComponent {
         [`${type}${updateFiled}`]: updateValue,
       }
 
-      let newAverageResult = undefined
-      const firstResult = newValue[`${type}FirstResult`]
-      const secondResult = newValue[`${type}SecondResult`]
-      const thirdResult = newValue[`${type}ThirdResult`]
-      if (
-        hasValue(firstResult) &&
-        hasValue(secondResult) &&
-        hasValue(thirdResult)
-      ) {
-        newAverageResult = _.round(
-          (firstResult + secondResult + thirdResult) / 3,
-          1,
-        )
-      }
+      // let newAverageResult = undefined
+      // const firstResult = newValue[`${type}FirstResult`]
+      // const secondResult = newValue[`${type}SecondResult`]
+      // const thirdResult = newValue[`${type}ThirdResult`]
+      // if (
+      //   hasValue(firstResult) &&
+      //   hasValue(secondResult) &&
+      //   hasValue(thirdResult)
+      // ) {
+      //   newAverageResult = _.round(
+      //     (firstResult + secondResult + thirdResult) / 3,
+      //     1,
+      //   )
+      // }
 
-      setFieldValue(
-        `corEyeExaminations[0].${type}AverageResult`,
-        newAverageResult,
-      )
+      // setFieldValue(
+      //   `corEyeExaminations[0].${type}AverageResult`,
+      //   newAverageResult,
+      // )
       setFieldValue(`corEyeExaminations[0].${type}${updateFiled}`, updateValue)
     }
   }

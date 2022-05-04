@@ -143,7 +143,7 @@ export default ({
         align: 'center',
         precision: 1,
         sortingEnabled: false,
-        isDisabled: () => true,
+        // isDisabled: () => true,
       },
     ],
   }
