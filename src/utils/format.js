@@ -66,8 +66,6 @@ const additionalShortcutFormats = [
   'DD MM YYYY',
   'DDMMYYYY',
   'D/MM/YYYY',
-  'D-MM-YYYY',
-  'D MM YYYY',
   'DD/M/YYYY',
   'DD-M-YYYY',
   'DD M YYYY',

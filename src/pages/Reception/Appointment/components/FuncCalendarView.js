@@ -104,6 +104,7 @@ const maxTime = new Date(
 )
 
 const applyFilter = (filter, data, isDayView, ctcalendarresource) => {
+  return data
   const {
     filterByApptType = [],
     filterByDoctor = [],

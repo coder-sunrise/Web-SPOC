@@ -1926,7 +1926,7 @@ const Main = props => {
               <Print />
               Prescription
             </Button>
-            {secondaryPrintoutLanguage !== '' && (
+            {/* {secondaryPrintoutLanguage !== '' && (
               <CheckboxGroup
                 value={printlanguage}
                 style={{
@@ -1942,7 +1942,7 @@ const Main = props => {
                   setPrintlanguage(v.target.value)
                 }}
               />
-            )}
+            )} */}
           </div>
         </GridItem>
         <GridItem

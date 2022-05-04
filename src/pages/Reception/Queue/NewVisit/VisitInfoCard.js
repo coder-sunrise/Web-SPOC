@@ -129,7 +129,9 @@ const VisitInfoCard = ({
       return 'Queue No. already existed in current queue list'
     return ''
   }
-
+ 
+  const isPrimaryDoctorConsultated =
+    restProps.values?.visitPrimaryDoctor?.consultationStatus !== 'Waiting'
   const getVisitOrderTemplateTotal = (vType, template) => {
     let activeItemTotal = 0
     visitOrderTemplateItemTypes.forEach(type => {
@@ -345,7 +347,9 @@ const VisitInfoCard = ({
             name={FormField['visit.doctorProfileFk']}
             render={args => (
               <DoctorProfileSelect
-                disabled={isVisitReadonlyAfterSigned || isDoctorConsulted}
+                disabled={
+                  isVisitReadonlyAfterSigned || isPrimaryDoctorConsultated
+                }
                 authority='none'
                 onChange={(v, op = {}) => handleDoctorChange(v, op)}
                 label={
