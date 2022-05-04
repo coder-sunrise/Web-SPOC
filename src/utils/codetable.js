@@ -621,6 +621,7 @@ const getServices = data => {
         value: o[0].serviceId,
         code: o[0].code,
         name: o[0].displayValue,
+        isAutoDisplayInOrderCart: o[0].isAutoDisplayInOrderCart,
         serviceCategoryFK: o[0].serviceCategoryFK,
         isNurseActualizable: o[0].isNurseActualizable,
         serviceCenters: o.map(m => {
@@ -678,6 +679,29 @@ const getServices = data => {
     ['asc'],
   )
 
+  serviceCatetorys.forEach(category => {
+    const items = data.filter(x => x.serviceCategoryFK === category.value)
+    let newServiceTags = []
+    items.forEach(service => {
+      ;(service.serviceTag || []).forEach(tag => {
+        newServiceTags = newServiceTags.concat({
+          value: tag.tagFK,
+          name: tag.tagDisplayValue,
+        })
+      })
+    })
+    category.serviceTags = _.orderBy(
+      Object.values(_.groupBy(newServiceTags, 'value')).map(o => {
+        return {
+          value: o[0].value,
+          name: o[0].name,
+        }
+      }),
+      ['name'],
+      ['asc'],
+    )
+  })
+
   let serviceTags = []
   data.forEach(service => {
     ;(service.serviceTag || []).forEach(tag => {
@@ -717,6 +741,30 @@ const getServices = data => {
     ['name'],
     ['asc'],
   )
+  serviceTestCategories.forEach(category => {
+    const items = data.filter(x =>
+      (x.serviceTestPanel || []).find(x => x.testCategoryFK === category.value),
+    )
+    let newServiceTags = []
+    items.forEach(service => {
+      ;(service.serviceTag || []).forEach(tag => {
+        newServiceTags = newServiceTags.concat({
+          value: tag.tagFK,
+          name: tag.tagDisplayValue,
+        })
+      })
+    })
+    category.serviceTags = _.orderBy(
+      Object.values(_.groupBy(newServiceTags, 'value')).map(o => {
+        return {
+          value: o[0].value,
+          name: o[0].name,
+        }
+      }),
+      ['name'],
+      ['asc'],
+    )
+  })
 
   return {
     serviceCenterServices: data,

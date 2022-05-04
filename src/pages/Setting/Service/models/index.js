@@ -17,6 +17,7 @@ export default createListViewModel({
         ctServiceCenter_ServiceNavigation: [],
         description: '',
         isAutoOrder: false,
+        isAutoDisplayInOrderCart: true,
       },
     },
     subscriptions: ({ dispatch, history }) => {
