@@ -113,16 +113,10 @@ class PreOrderList extends PureComponent {
         render: row => {
           return (
             <Tooltip
-              title={
-                row.amount && row.paid === 'Yes'
-                  ? `$${row.amount.toFixed(2)}`
-                  : '-'
-              }
+              title={row.paid === 'Yes' ? `$${row.amount.toFixed(2)}` : '-'}
             >
               <span>
-                {row.amount && row.paid === 'Yes'
-                  ? `$${row.amount.toFixed(2)}`
-                  : '-'}
+                {row.paid === 'Yes' ? `$${row.amount.toFixed(2)}` : '-'}
               </span>
             </Tooltip>
           )
