@@ -147,7 +147,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       valueType: 'dateTime',
       render: (_dom: any, entity: any) =>
         entity.orderTime?.format('DD MMM YYYY HH:mm') || '-',
-      sortBy: 'createDate',
+      sortBy: 'WorkitemFKNavigation.GenerateDate',
       sorter: true,
       search: false,
       width: 145,
