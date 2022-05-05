@@ -41,7 +41,11 @@ class VitalSignCard extends PureComponent {
   }
 
   calculateStandardWeight = () => {
-    const { setFieldValue, values } = this.props
+    const { setFieldValue, values, patientInfo = {} } = this.props
+    const getAgeType = calculateAgeType(patientInfo.dob)
+    if (getAgeType !== AGETYPE.ADULT) {
+      return
+    }
     const { heightCM } = values.visitBasicExaminations[0]
     if (heightCM) {
       const heightM = heightCM / 100

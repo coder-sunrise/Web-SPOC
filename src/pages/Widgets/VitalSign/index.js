@@ -79,6 +79,11 @@ class index extends PureComponent {
   }
 
   calculateStandardWeight = () => {
+    const { patientInfo = {} } = this.props
+    const getAgeType = calculateAgeType(patientInfo.dob)
+    if (getAgeType !== AGETYPE.ADULT) {
+      return
+    }
     const { form } = this.arrayHelpers
     const { heightCM } = form.values.corPatientNoteVitalSign[0]
     const { setFieldValue, setFieldTouched } = form
