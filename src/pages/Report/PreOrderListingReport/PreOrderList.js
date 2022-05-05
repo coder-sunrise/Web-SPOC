@@ -139,13 +139,13 @@ class PreOrderList extends PureComponent {
             <Tooltip
               title={
                 row.actualizedDate
-                  ? moment(row.actualizedDate).format('DD MMM YYYY hh:mm')
+                  ? moment(row.actualizedDate).format('DD MMM YYYY HH:mm')
                   : '-'
               }
             >
               <span>
                 {row.actualizedDate
-                  ? moment(row.actualizedDate).format('DD MMM YYYY hh:mm')
+                  ? moment(row.actualizedDate).format('DD MMM YYYY HH:mm')
                   : '-'}
               </span>
             </Tooltip>
