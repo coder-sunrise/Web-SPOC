@@ -260,6 +260,7 @@ class PastMedication extends PureComponent {
         let isDispensedByPharmacy
         let isNurseActualizeRequired
         let isExclusive
+        let orderable
         if (item.inventoryMedicationFK) {
           // Normal Drug
           let drug = inventorymedication.find(
@@ -351,6 +352,7 @@ class PastMedication extends PureComponent {
           isDispensedByPharmacy = drug.isDispensedByPharmacy
           isNurseActualizeRequired = drug.isNurseActualizable
           isExclusive = drug.isExclusive
+          orderable = drug.orderable
         } else if (item.isDrugMixture) {
           // Drug Mixture
           itemExpiryDate = item.expiryDate
@@ -464,6 +466,7 @@ class PastMedication extends PureComponent {
                   inventoryDispenseUOMFK: drug.dispensingUOM.id,
                   inventoryPrescribingUOMFK: drug.prescribingUOM.id,
                   isActive: drug.isActive,
+                  orderable: drug.orderable,
                 }
               }),
             )
@@ -523,6 +526,7 @@ class PastMedication extends PureComponent {
           isDispensedByPharmacy,
           isNurseActualizeRequired,
           isExclusive,
+          orderable,
         }
       }),
     )
