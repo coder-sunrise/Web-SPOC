@@ -118,7 +118,7 @@ const styles = theme => ({
           userProfile: Yup.object().shape({
             userName: Yup.string()
               .matches(
-                /(^[a-zA-Z0-9]+$)/,
+                /(^[a-zA-Z0-9]{2,}$)/,
                 'Must have at least 2 letter, do not contains whitespace and special characters.',
               )
               .required('Login ID is a required field'),
