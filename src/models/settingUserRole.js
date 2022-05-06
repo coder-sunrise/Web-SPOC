@@ -13,6 +13,23 @@ const compare = (a, b) => {
   return a.sortOrder - b.sortOrder
 }
 
+const getClinicRoleBitValues = clinicRoleBitValue => {
+  let items = []
+  let values = []
+  let x = clinicRoleBitValue
+  while (x > 0) {
+    items.push(x % 2)
+    x = parseInt(x / 2, 10)
+  }
+
+  items.forEach((item, index) => {
+    if (item === 1) {
+      values.push(2 ** index)
+    }
+  })
+  return values
+}
+
 export default createListViewModel({
   namespace: 'settingUserRole',
   config: {
@@ -27,7 +44,7 @@ export default createListViewModel({
       },
     },
     effects: {
-      *fetchUserRoleByID ({ payload }, { call, put }) {
+      *fetchUserRoleByID({ payload }, { call, put }) {
         const response = yield call(service.getUserRoleById, payload)
         const { isEdit } = payload
         let { data = {}, status } = response
@@ -43,16 +60,14 @@ export default createListViewModel({
         data = result
         return yield put({
           type: 'loadAccessRight',
-          data: [
-            ...data.roleClientAccessRight,
-          ],
+          data: [...data.roleClientAccessRight],
         })
       },
-      *fetchDefaultAccessRight ({ payload }, { call, put }) {
+      *fetchDefaultAccessRight({ payload }, { call, put }) {
         const response = yield call(service.getAccessRight)
         const { data = [], status } = response
 
-        const resultData = data.map((d) => {
+        const resultData = data.map(d => {
           const permission =
             (d.type === 'Module' && 'ReadWrite') ||
             (d.type === 'Action' && 'Enable') ||
@@ -66,12 +81,10 @@ export default createListViewModel({
 
         return yield put({
           type: 'loadAccessRight',
-          data: [
-            ...resultData,
-          ],
+          data: [...resultData],
         })
       },
-      *fetchActiveUsers ({ payload }, { call, put }) {
+      *fetchActiveUsers({ payload }, { call, put }) {
         try {
           const response = yield call(service.getActiveUsers)
           const { data } = response
@@ -84,20 +97,33 @@ export default createListViewModel({
     },
 
     reducers: {
-      updateUserRole (state, { data }) {
+      updateUserRole(state, { data }) {
         return {
           ...state,
           currentSelectedUserRole: {
             ...data,
+            roleClientAccessRight: data.roleClientAccessRight
+              .sort(compare)
+              .map(item => ({
+                ...item,
+                clinicRoleBitValues: getClinicRoleBitValues(
+                  item.clinicRoleBitValue,
+                ),
+              })),
           },
         }
       },
-      loadAccessRight (state, { data }) {
+      loadAccessRight(state, { data }) {
         return {
           ...state,
           currentSelectedUserRole: {
             isUserMaintainable: true,
-            roleClientAccessRight: data.sort(compare),
+            roleClientAccessRight: data.sort(compare).map(item => ({
+              ...item,
+              clinicRoleBitValues: getClinicRoleBitValues(
+                item.clinicRoleBitValue,
+              ),
+            })),
             ...defaultDates,
           },
         }
