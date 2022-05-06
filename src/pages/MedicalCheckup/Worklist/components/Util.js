@@ -38,7 +38,10 @@ export const getMedicalCheckupReportPayload = data => {
     IndividualComment: individualComment,
     SummaryComment: summaryComment,
     LabTestPanel: labTestPanel,
-    ReportingDoctor: reportingDoctor,
+    ReportingDoctor: reportingDoctor.map(x => ({
+      ...x,
+      japaneseName: x.japaneseName || '',
+    })),
     ReportContext: reportContext.map(o => {
       const {
         customLetterHeadHeight = 0,
@@ -64,6 +67,7 @@ export const getMedicalCheckupReportPayload = data => {
       }
     }),
   }
+  console.log('11111', printData)
   const payload = [
     {
       ReportId: 93,
