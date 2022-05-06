@@ -25,6 +25,7 @@ export const ResultTable = props => {
     {
       title: 'Result',
       dataIndex: 'FinalResult',
+      align: 'right',
       width: 200,
       render: (text, row) => {
         const title = (
@@ -39,7 +40,12 @@ export const ResultTable = props => {
           return (
             <Tooltip placement='right' title={title}>
               <span
-                style={{ color: 'red', display: 'inline-block', width: '100%' }}
+                style={{
+                  color: 'red',
+                  display: 'inline-block',
+                  textAlign: 'right',
+                  width: '100%',
+                }}
               >
                 <span style={{ marginRight: 10, display: 'inline-block' }}>
                   {text}
@@ -56,7 +62,11 @@ export const ResultTable = props => {
             <Tooltip
               title={title}
               placement='right'
-              style={{ display: 'inline-block', width: '100%' }}
+              style={{
+                display: 'inline-block',
+                textAlign: 'right',
+                width: '100%',
+              }}
             >
               <span>
                 {text}

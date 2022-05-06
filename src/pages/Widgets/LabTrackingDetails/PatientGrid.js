@@ -38,8 +38,8 @@ class PatientGrid extends PureComponent {
           const { visitPurpose } = this.props
           const pupose = visitPurpose.find(x => x.id === row.visitPurposeFK)
           return (
-            <Tooltip title={pupose.displayValue}>
-              <span>{pupose.code}</span>
+            <Tooltip title={pupose?.displayValue}>
+              <span>{pupose?.code}</span>
             </Tooltip>
           )
         },
