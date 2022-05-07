@@ -483,6 +483,13 @@ const DispenseDetails = ({
 
   const onNurseActualizationClose = () => {
     setShowActualization(false)
+    dispatch({
+      type: 'dispense/query',
+      payload: {
+        id: values.id,
+        version: Date.now(),
+      },
+    })
   }
 
   const { labelPrinterSize } = settings
@@ -1397,17 +1404,7 @@ const DispenseDetails = ({
             .filter(x => x)
             .join(',')}
           dispatch={dispatch}
-          handleSubmit={() => {
-            onNurseActualizationClose()
-            const version = Date.now()
-            dispatch({
-              type: 'dispense/query',
-              payload: {
-                id: values.id,
-                version: version,
-              },
-            })
-          }}
+          handleSubmit={onNurseActualizationClose}
         />
       </CommonModal>
       <RadiologyDetails />

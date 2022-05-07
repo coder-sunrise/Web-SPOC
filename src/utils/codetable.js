@@ -363,6 +363,13 @@ const tenantCodesMap = new Map([
       sorting: [],
     },
   ],
+  [
+    'ltclinicalrole',
+    {
+      pagesize: 99999,
+      sorting: [{ columnName: 'sortOrder', direction: 'asc' }],
+    },
+  ],
 ])
 
 // always get latest codetable

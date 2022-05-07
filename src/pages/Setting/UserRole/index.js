@@ -208,6 +208,7 @@ class UserRole extends React.Component {
                     {...args}
                     label='Clinical Role'
                     code='ltclinicalrole'
+                    labelField='displayValue'
                     localFilter={item => {
                       return filterArray.includes(item.id)
                     }}

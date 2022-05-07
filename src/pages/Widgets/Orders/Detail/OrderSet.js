@@ -311,6 +311,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           isDispensedByPharmacy: inventoryMedication.isDispensedByPharmacy,
           isNurseActualizeRequired: inventoryMedication.isNurseActualizable,
           isExclusive: inventoryMedication.isExclusive,
+          orderable: inventoryMedication.orderable,
         }
       }
       return item

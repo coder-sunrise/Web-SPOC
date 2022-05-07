@@ -104,7 +104,7 @@ class PrescriptionSetList extends PureComponent {
         } else {
           nextStepdose = ''
         }
- 
+
         let itemDuration = item.duration ? ` For ${item.duration} day(s)` : ''
         let separator = nextStepdose
         if (language === 'JP') {
@@ -248,6 +248,7 @@ class PrescriptionSetList extends PureComponent {
             let isExclusive
             let inventoryDispenseUOMFK
             let inventoryPrescribingUOMFK
+            let orderable
 
             const precautions = item.prescriptionSetItemPrecaution
             if (precautions && precautions.length > 0) {
@@ -319,6 +320,7 @@ class PrescriptionSetList extends PureComponent {
               isExclusive = drug.isExclusive
               inventoryDispenseUOMFK = drug.dispensingUOM.id
               inventoryPrescribingUOMFK = drug.prescribingUOM.id
+              orderable = drug.orderable
             } else if (item.isDrugMixture) {
               // Drug Mixture
               itemCostPrice = item.costPrice || 0
@@ -399,6 +401,7 @@ class PrescriptionSetList extends PureComponent {
                       inventoryDispenseUOMFK: drug.dispensingUOM.id,
                       inventoryPrescribingUOMFK: drug.prescribingUOM.id,
                       isActive: drug.isActive,
+                      orderable: drug.orderable,
                     }
                   }),
                 )
@@ -457,6 +460,7 @@ class PrescriptionSetList extends PureComponent {
               isExclusive,
               inventoryDispenseUOMFK,
               inventoryPrescribingUOMFK,
+              orderable,
             }
           }),
       )

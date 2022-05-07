@@ -9,7 +9,6 @@ import { withStyles, Divider } from '@material-ui/core'
 import Banner from '@/pages/PatientDashboard/Banner'
 import { LoadingWrapper } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
-import EditOrder from '@/pages/Dispense/EditOrder'
 import SummaryComment from './SummaryComment'
 import TestResult from './TestResult'
 import ReportHistory from './ReportHistory'
@@ -67,14 +66,7 @@ const ReportingDetails = props => {
   )
   const [showReportHistory, setShowReportHistory] = useState(false)
   const [showResultDetails, setShowResultDetails] = useState(false)
-  const [editingOrder, setEditingOrder] = useState(false)
   const [placement, setPlacement] = useState('right')
-  const closeEditOrder = () => {
-    refreshMedicalCheckup()
-    querySummaryCommentHistory()
-    queryIndividualCommentHistory()
-    setEditingOrder(false)
-  }
   const generateReport = (reportType, message) => {
     dispatch({
       type: 'medicalCheckupReportingDetails/generateReport',
@@ -388,74 +380,6 @@ const ReportingDetails = props => {
     if (modifyOthersCommentAccessRight.rights === 'enable') return true
     return false
   }
-
-  const isEditOrderEnable = () => {
-    if (medicalCheckupReportingDetails.entity?.isClinicSessionClosed)
-      return false
-    if (
-      reportingStatus !== MEDICALCHECKUP_WORKITEM_STATUS.REPORTING &&
-      reportingStatus !== MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS
-    )
-      return false
-    const accessRight = Authorized.check(
-      'medicalcheckupworklist.editorder',
-    ) || { rights: 'hidden' }
-    return accessRight.rights === 'enable'
-  }
-
-  const editOrder = e => {
-    const _editOrder = () => {
-      if (medicalCheckupReportingDetails.entity?.visitFK) {
-        dispatch({
-          type: `consultation/editOrder`,
-          payload: {
-            id: medicalCheckupReportingDetails.entity?.visitFK,
-            queueID: medicalCheckupReportingDetails.entity?.visitFK,
-            version: Date.now(),
-          },
-        }).then(r => {
-          if (r) {
-            dispatch({
-              type: 'dispense/query',
-              payload: {
-                id: medicalCheckupReportingDetails.entity?.visitFK,
-                version: Date.now(),
-              },
-            }).then(r => {
-              setEditingOrder(true)
-            })
-          }
-        })
-      }
-    }
-    if (
-      window.dirtyForms['SummaryCommentDetails'] ||
-      window.dirtyForms['IndividualCommentDetails']
-    ) {
-      dispatch({
-        type: 'global/updateAppState',
-        payload: {
-          openConfirm: true,
-          openConfirmContent: formatMessage({
-            id: 'app.general.leave-without-save',
-          }),
-          onConfirmSave: _editOrder,
-          openConfirmText: 'Confirm',
-          onConfirmClose: () => {
-            dispatch({
-              type: 'global/updateAppState',
-              payload: {
-                openConfirm: false,
-              },
-            })
-          },
-        },
-      })
-    } else {
-      _editOrder()
-    }
-  }
-
   return (
     <div>
       <div style={{ marginTop: '-20px' }}>
@@ -469,150 +393,123 @@ const ReportingDetails = props => {
         />
       </div>
       <SizeContainer size='sm'>
-        <React.Fragment>
-          {!editingOrder ? (
-            <div
-              style={{
-                border: '1px solid #CCCCCC',
-                backgroundColor: 'white',
-              }}
-            >
-              <GridContainer style={{ height: contentHeight }}>
-                <GridItem md={7} style={{ padding: 0 }}>
-                  <TestResult
-                    {...props}
-                    height={contentHeight}
-                    selectedLanguage={selectedLanguage}
-                    querySummaryCommentHistory={querySummaryCommentHistory}
-                    queryIndividualCommentHistory={
-                      queryIndividualCommentHistory
-                    }
-                    refreshMedicalCheckup={refreshMedicalCheckup}
-                    setShowResultDetails={onShowShowResultDetails}
-                    isEditEnable={getEditEnable()}
-                    isModifyCommentEnable={isModifyCommentEnable()}
-                    isModifyOthersCommentEnable={isModifyOthersCommentEnable()}
-                    genderFK={patient?.genderFK}
-                  />
-                </GridItem>
-                <GridItem md={5} style={{ padding: 0 }}>
-                  <SummaryComment
-                    {...props}
-                    height={contentHeight}
-                    selectedLanguage={selectedLanguage}
-                    setSelectedLanguage={setSelectedLanguage}
-                    querySummaryCommentHistory={querySummaryCommentHistory}
-                    queryIndividualCommentHistory={
-                      queryIndividualCommentHistory
-                    }
-                    refreshMedicalCheckup={refreshMedicalCheckup}
-                    clearEditComment={clearEditComment}
-                    isEditEnable={getEditEnable()}
-                    isModifyCommentEnable={isModifyCommentEnable()}
-                    isModifyOthersCommentEnable={isModifyOthersCommentEnable()}
-                  />
-                </GridItem>
-              </GridContainer>
-              <div
+        <div
+          style={{
+            border: '1px solid #CCCCCC',
+            backgroundColor: 'white',
+          }}
+        >
+          <GridContainer style={{ height: contentHeight }}>
+            <GridItem md={7} style={{ padding: 0 }}>
+              <TestResult
+                {...props}
+                height={contentHeight}
+                selectedLanguage={selectedLanguage}
+                querySummaryCommentHistory={querySummaryCommentHistory}
+                queryIndividualCommentHistory={queryIndividualCommentHistory}
+                refreshMedicalCheckup={refreshMedicalCheckup}
+                setShowResultDetails={onShowShowResultDetails}
+                isEditEnable={getEditEnable()}
+                isModifyCommentEnable={isModifyCommentEnable()}
+                isModifyOthersCommentEnable={isModifyOthersCommentEnable()}
+                genderFK={patient?.genderFK}
+              />
+            </GridItem>
+            <GridItem md={5} style={{ padding: 0 }}>
+              <SummaryComment
+                {...props}
+                height={contentHeight}
+                selectedLanguage={selectedLanguage}
+                setSelectedLanguage={setSelectedLanguage}
+                querySummaryCommentHistory={querySummaryCommentHistory}
+                queryIndividualCommentHistory={queryIndividualCommentHistory}
+                refreshMedicalCheckup={refreshMedicalCheckup}
+                clearEditComment={clearEditComment}
+                isEditEnable={getEditEnable()}
+                isModifyCommentEnable={isModifyCommentEnable()}
+                isModifyOthersCommentEnable={isModifyOthersCommentEnable()}
+              />
+            </GridItem>
+          </GridContainer>
+          <div
+            style={{
+              position: 'relative',
+              padding: '0px 8px',
+              margin: '10px 0px',
+            }}
+          >
+            <Link>
+              <span
                 style={{
-                  position: 'relative',
-                  padding: '0px 8px',
-                  margin: '10px 0px',
+                  textDecoration: 'underline',
+                }}
+                onClick={e => {
+                  e.preventDefault()
+                  toggleReportHistory()
                 }}
               >
-                <Link>
-                  <span
-                    style={{
-                      textDecoration: 'underline',
-                    }}
-                    onClick={e => {
-                      e.preventDefault()
-                      toggleReportHistory()
-                    }}
-                  >
-                    {`Report History (${medicalCheckupReportingDetails.entity
-                      ?.medicalCheckupReport?.length || 0})`}
-                  </span>
-                </Link>
-                <div style={{ position: 'absolute', right: 3, top: 0 }}>
-                  <Button
-                    size='small'
-                    type='danger'
-                    style={{ margin: '0px 5px' }}
-                    onClick={onClose}
-                  >
-                    Close
-                  </Button>
-                  {isEditOrderEnable() && (
-                    <Button
-                      style={{
-                        margin: '0px 5px',
-                        backgroundColor: '#389e0d',
-                        color: 'white',
-                      }}
-                      size='small'
-                      onClick={editOrder}
-                    >
-                      Edit Order
-                    </Button>
-                  )}
-                  {isShowCompleteComment() && (
-                    <Button
-                      size='small'
-                      style={{
-                        margin: '0px 5px',
-                        backgroundColor: '#389e0d',
-                        color: 'white',
-                      }}
-                      onClick={onCompleteComment}
-                    >
-                      Complete Comment
-                    </Button>
-                  )}
-                  {isShowGenerateTemporaryReport() && (
-                    <Button
-                      size='small'
-                      type='primary'
-                      style={{ margin: '0px 5px' }}
-                      onClick={() => checkUnsaveChange(genrateTemporaryReport)}
-                    >
-                      Generate Temporary Report
-                    </Button>
-                  )}
-                  {isShowGenerateFinalReport() && (
-                    <Button
-                      size='small'
-                      type='primary'
-                      style={{ margin: '0px 5px' }}
-                      onClick={() => checkUnsaveChange(genrateFinalReport)}
-                    >
-                      Generate Report
-                    </Button>
-                  )}
-                  {isShowUnlockReport() && (
-                    <Button
-                      size='small'
-                      style={{
-                        margin: '0px 5px',
-                        backgroundColor: '#389e0d',
-                        color: 'white',
-                      }}
-                      onClick={onUnlock}
-                    >
-                      Unlock
-                    </Button>
-                  )}
-                </div>
-              </div>
+                {`Report History (${medicalCheckupReportingDetails.entity
+                  ?.medicalCheckupReport?.length || 0})`}
+              </span>
+            </Link>
+            <div style={{ position: 'absolute', right: 3, top: 0 }}>
+              <Button
+                size='small'
+                type='danger'
+                style={{ margin: '0px 5px' }}
+                onClick={onClose}
+              >
+                Close
+              </Button>
+              {isShowCompleteComment() && (
+                <Button
+                  size='small'
+                  style={{
+                    margin: '0px 5px',
+                    backgroundColor: '#389e0d',
+                    color: 'white',
+                  }}
+                  onClick={onCompleteComment}
+                >
+                  Complete Comment
+                </Button>
+              )}
+              {isShowGenerateTemporaryReport() && (
+                <Button
+                  size='small'
+                  type='primary'
+                  style={{ margin: '0px 5px' }}
+                  onClick={() => checkUnsaveChange(genrateTemporaryReport)}
+                >
+                  Generate Temporary Report
+                </Button>
+              )}
+              {isShowGenerateFinalReport() && (
+                <Button
+                  size='small'
+                  type='primary'
+                  style={{ margin: '0px 5px' }}
+                  onClick={() => checkUnsaveChange(genrateFinalReport)}
+                >
+                  Generate Report
+                </Button>
+              )}
+              {isShowUnlockReport() && (
+                <Button
+                  size='small'
+                  style={{
+                    margin: '0px 5px',
+                    backgroundColor: '#389e0d',
+                    color: 'white',
+                  }}
+                  onClick={onUnlock}
+                >
+                  Unlock
+                </Button>
+              )}
             </div>
-          ) : (
-            <EditOrder
-              from='MedicalCheckup'
-              {...props}
-              closeEditOrder={closeEditOrder}
-            />
-          )}
-        </React.Fragment>
+          </div>
+        </div>
       </SizeContainer>
 
       <Drawer
@@ -699,24 +596,12 @@ export default compose(
       medicalCheckupReportingDetails,
       user,
       clinicSettings,
-      visitRegistration,
-      forms,
-      dispense,
-      consultation,
-      consultationDocument,
-      orders,
     }) => ({
       patient: patient.entity || {},
       loading,
       medicalCheckupReportingDetails,
       user,
       clinicSettings,
-      visitRegistration,
-      forms,
-      dispense,
-      consultation,
-      consultationDocument,
-      orders,
     }),
   ),
 )(ReportingDetails)

@@ -7,7 +7,6 @@ const fns = {
   queryBasicDataList: params =>
     service.queryList(`${url}/basicHistory`, params),
   queryExaminationsList: async params => {
-    console.log(params)
     return await request(`${url}/examinations`, {
       method: 'GET',
       body: params,

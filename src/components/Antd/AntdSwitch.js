@@ -32,12 +32,15 @@ const STYLES = () => {
 
     switchUnchecked: {
       backgroundColor: `${primaryColor} !important`,
+      backgroundImage: `none !important`,
     },
     minusChecked: {
       backgroundColor: `${dangerColor} !important`,
+      backgroundImage: `none !important`,
     },
     plusChecked: {
       backgroundColor: `${successColor} !important`,
+      backgroundImage: `none !important`,
     },
   }
 }
@@ -86,7 +89,14 @@ class AntdSwitch extends React.PureComponent {
   }
 
   handleValueChange = checked => {
-    const { form, field, onChange, checkedValue, unCheckedValue, preventToggle } = this.props
+    const {
+      form,
+      field,
+      onChange,
+      checkedValue,
+      unCheckedValue,
+      preventToggle,
+    } = this.props
     // console.log(checkedValue, field.value)
 
     if (form && field) {
@@ -96,7 +106,7 @@ class AntdSwitch extends React.PureComponent {
     if (onChange) {
       onChange(checked ? checkedValue : unCheckedValue)
     }
-    if(!preventToggle)
+    if (!preventToggle)
       this.setState({
         value: checked,
       })

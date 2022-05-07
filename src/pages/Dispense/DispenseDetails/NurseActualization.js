@@ -134,9 +134,18 @@ class NurseActualization extends React.PureComponent {
       payload: { status, nurseWorkitemIds },
     }).then(r => {
       if (r && r.data) {
+        const isActualized = status == NURSE_WORKITEM_STATUS.ACTUALIZED
+        const statusGroup = _.groupBy(r.data.nurseActualize, x=>x.nurseWorkitemStatusFK == NURSE_WORKITEM_STATUS.ACTUALIZED)
+        let currentStatus = status
+        let nurseActualize = statusGroup[isActualized] || []
+        if(nurseActualize.length == 0 && r.data.nurseActualize.length > 0)
+        {
+          nurseActualize = statusGroup[!isActualized]
+          currentStatus = isActualized ? NURSE_WORKITEM_STATUS.NEW : NURSE_WORKITEM_STATUS.ACTUALIZED
+        }
         this.setState({
-          status: status,
-          actualize: r.data.nurseActualize,
+          status: currentStatus,
+          actualize: nurseActualize,
           history: r.data.nurseWorkitemHistory,
         })
       }

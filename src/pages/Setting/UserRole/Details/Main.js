@@ -28,8 +28,10 @@ import {
 import { getBizSession } from '@/services/queue'
 import { navigateDirtyCheck, getModuleSequence } from '@/utils/utils'
 import { CLINICAL_ROLE } from '@/utils/constants'
-const isMatchRole = (clinicRoleFK, clinicRoleBitValue) => {
-  return !clinicRoleFK || clinicRoleBitValue >= 2 ** (clinicRoleFK - 1)
+const isMatchRole = (clinicRoleBitValue, clinicRoleBitValues = []) => {
+  return (
+    !clinicRoleBitValue || clinicRoleBitValues.indexOf(clinicRoleBitValue) >= 0
+  )
 }
 
 const styles = theme => ({
@@ -114,7 +116,7 @@ const styles = theme => ({
     const { roleClientAccessRight, ...restValues } = values
     let result = _.cloneDeep(restValues)
     result.roleClientAccessRight = roleClientAccessRight.filter(m =>
-      isMatchRole(values.clinicRoleFK, m.clinicRoleBitValue),
+      isMatchRole(values.clinicRoleBitValue, m.clinicRoleBitValues),
     )
     if (!values.id) {
       result.roleClientAccessRight = result.roleClientAccessRight.map(d => {
@@ -210,7 +212,7 @@ class Main extends React.Component {
     }
   }
 
-  handleSearch = async e => {
+  handleSearch = (e, option) => {
     const { values } = this.props
     const { roleClientAccessRight, ...restValues } = values
     let result = _.cloneDeep(restValues)
@@ -218,7 +220,7 @@ class Main extends React.Component {
     if (typeof e === 'number') {
       result.clinicRoleFK = e
     }
-
+    result.clinicRoleBitValue = option?.clinicRoleBitValue
     this.props.dispatch({
       type: 'settingUserRole/updateState',
       payload: {
@@ -266,7 +268,6 @@ class Main extends React.Component {
   onClickAll = (type, newValue, moduleName) => {
     const { values, setFieldValue } = this.props
     let { roleClientAccessRight = [], clinicRoleFK } = values
-
     roleClientAccessRight = _.orderBy(
       roleClientAccessRight,
       ['sortOrder'],
@@ -275,7 +276,7 @@ class Main extends React.Component {
 
     const updateRoleClientAccessRight = roleClientAccessRight.filter(
       m =>
-        isMatchRole(clinicRoleFK, m.clinicRoleBitValue) &&
+        isMatchRole(values.clinicRoleBitValue, m.clinicRoleBitValues) &&
         m.module === moduleName &&
         m.type === type,
     )
@@ -283,8 +284,10 @@ class Main extends React.Component {
     const updateChildrenAccessRight = clientAccessRightFK => {
       let currenAccessRight = roleClientAccessRight.filter(accessRight => {
         return (
-          isMatchRole(clinicRoleFK, accessRight.clinicRoleBitValue) &&
-          accessRight.parentClientAccessRightFK === clientAccessRightFK
+          isMatchRole(
+            values.clinicRoleBitValue,
+            accessRight.clinicRoleBitValues,
+          ) && accessRight.parentClientAccessRightFK === clientAccessRightFK
         )
       })
       currenAccessRight.forEach(r => {
@@ -306,7 +309,7 @@ class Main extends React.Component {
       if (r.permission !== newValue) {
         if (
           !this.isOverParentAccessRight(
-            values.clinicRoleFK,
+            values.clinicRoleBitValue,
             r,
             newValue,
             roleClientAccessRight,
@@ -331,7 +334,7 @@ class Main extends React.Component {
     const { values } = this.props
     const { roleClientAccessRight = [] } = values
     const currentRoleClientAccessRight = roleClientAccessRight.filter(m =>
-      isMatchRole(values.clinicRoleFK, m.clinicRoleBitValue),
+      isMatchRole(values.clinicRoleBitValue, m.clinicRoleBitValues),
     )
     const checkParentSelect = currentClientAccessRightId => {
       if (
@@ -363,7 +366,7 @@ class Main extends React.Component {
     const { roleClientAccessRight = [] } = values
     const currentRoleClientAccessRight = roleClientAccessRight.filter(
       m =>
-        isMatchRole(values.clinicRoleFK, m.clinicRoleBitValue) &&
+        isMatchRole(values.clinicRoleBitValue, m.clinicRoleBitValues) &&
         m.module === mudule &&
         m.type === type &&
         m.displayValue
@@ -382,12 +385,13 @@ class Main extends React.Component {
     if (item.permission === newValue) return
     const { values, setFieldValue } = this.props
     let { roleClientAccessRight = [], clinicRoleFK } = values
-
     const updateChildrenAccessRight = clientAccessRightFK => {
       let currenAccessRight = roleClientAccessRight.filter(accessRight => {
         return (
-          isMatchRole(clinicRoleFK, accessRight.clinicRoleBitValue) &&
-          accessRight.parentClientAccessRightFK === clientAccessRightFK
+          isMatchRole(
+            values.clinicRoleBitValue,
+            accessRight.clinicRoleBitValues,
+          ) && accessRight.parentClientAccessRightFK === clientAccessRightFK
         )
       })
       currenAccessRight.forEach(r => {
@@ -407,8 +411,10 @@ class Main extends React.Component {
 
     let selectAccessRight = roleClientAccessRight.find(accessRight => {
       return (
-        isMatchRole(clinicRoleFK, accessRight.clinicRoleBitValue) &&
-        accessRight.clientAccessRightFK === item.clientAccessRightFK
+        isMatchRole(
+          values.clinicRoleBitValue,
+          accessRight.clinicRoleBitValues,
+        ) && accessRight.clientAccessRightFK === item.clientAccessRightFK
       )
     })
     selectAccessRight.permission = newValue
@@ -421,7 +427,7 @@ class Main extends React.Component {
   }
 
   isOverParentAccessRight = (
-    clinicRoleFK,
+    clinicRoleBitValue,
     accessRight,
     accessValue,
     roleClientAccessRight,
@@ -430,7 +436,7 @@ class Main extends React.Component {
 
     const parentRoleClientAccessRight = roleClientAccessRight.find(
       m =>
-        isMatchRole(clinicRoleFK, m.clinicRoleBitValue) &&
+        isMatchRole(clinicRoleBitValue, m.clinicRoleBitValues) &&
         m.clientAccessRightFK === accessRight.parentClientAccessRightFK,
     )
     if (parentRoleClientAccessRight) {
@@ -451,7 +457,7 @@ class Main extends React.Component {
     let { roleClientAccessRight = [] } = values
     if (accessValue === 'Hidden') return false
     return this.isOverParentAccessRight(
-      values.clinicRoleFK,
+      values.clinicRoleBitValue,
       accessRight,
       accessValue,
       roleClientAccessRight,
@@ -750,6 +756,7 @@ class Main extends React.Component {
                     {...args}
                     label='Clinical Role'
                     code='ltclinicalrole'
+                    labelField='displayValue'
                     disabled={isEdit}
                     localFilter={item => {
                       return filterArray.includes(item.id)

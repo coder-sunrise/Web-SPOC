@@ -314,6 +314,7 @@ import { CollectionsOutlined } from '@material-ui/icons'
           isDispensedByPharmacy: medication.isDispensedByPharmacy,
           isNurseActualizeRequired: medication.isNurseActualizable,
           isExclusive: medication.isExclusive,
+          orderable: medication.orderable,
         }
       }
       return item

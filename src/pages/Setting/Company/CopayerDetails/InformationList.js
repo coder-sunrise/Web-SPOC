@@ -460,7 +460,7 @@ export const InformationList = props => {
         }
 
         //=== Editing ===//
-        useEffect(() => {}, [editingHasError])
+        // useEffect(() => {}, [editingHasError])
 
         return (
           <React.Fragment>
