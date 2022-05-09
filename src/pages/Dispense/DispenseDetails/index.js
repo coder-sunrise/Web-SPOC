@@ -482,6 +482,8 @@ const DispenseDetails = ({
   }
 
   const onNurseActualizationClose = () => {
+    setSelectedAll(false)
+    setSelectedServiceAll(false)
     setShowActualization(false)
     dispatch({
       type: 'dispense/query',
@@ -1097,24 +1099,6 @@ const DispenseDetails = ({
                       )}
                 </div>
                 <div style={{ position: 'relative' }}>
-                  <div
-                    style={{
-                      position: 'absolute',
-                      left: 18,
-                      top: 14,
-                      zIndex: 1,
-                    }}
-                  >
-                    {isShowDispenseActualie && !viewOnly && (
-                      <Checkbox
-                        checked={selectedAll}
-                        onClick={e => {
-                          setSelectedAll(!selectedAll)
-                          onChangeSelectAll(!selectedAll)
-                        }}
-                      />
-                    )}
-                  </div>
                   <AntdTable
                     className={customtyles.table}
                     size='small'
@@ -1131,6 +1115,23 @@ const DispenseDetails = ({
                       isFromMedicalCheckup,
                     )}
                   />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: 18,
+                      top: 14,
+                    }}
+                  >
+                    {isShowDispenseActualie && !viewOnly && (
+                      <Checkbox
+                        checked={selectedAll}
+                        onClick={e => {
+                          setSelectedAll(!selectedAll)
+                          onChangeSelectAll(!selectedAll)
+                        }}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1143,24 +1144,6 @@ const DispenseDetails = ({
                   : actualizeSelectedItemButton('Service', service)}
               </div>
               <div style={{ position: 'relative' }}>
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: 18,
-                    top: 8,
-                    zIndex: 1,
-                  }}
-                >
-                  {isShowServiceActualie && !viewOnly && (
-                    <Checkbox
-                      checked={selectedServiceAll}
-                      onClick={e => {
-                        setSelectedServiceAll(!selectedServiceAll)
-                        onChangeSelectServiceAll(!selectedServiceAll)
-                      }}
-                    />
-                  )}
-                </div>
                 <AntdTable
                   className={customtyles.table}
                   size='small'
@@ -1178,6 +1161,23 @@ const DispenseDetails = ({
                     isShowServiceActualie,
                   )}
                 />
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: 18,
+                    top: 8,
+                  }}
+                >
+                  {isShowServiceActualie && !viewOnly && (
+                    <Checkbox
+                      checked={selectedServiceAll}
+                      onClick={e => {
+                        setSelectedServiceAll(!selectedServiceAll)
+                        onChangeSelectServiceAll(!selectedServiceAll)
+                      }}
+                    />
+                  )}
+                </div>
               </div>
             </div>
 
@@ -1395,7 +1395,9 @@ const DispenseDetails = ({
         title='Actualization'
         open={showActualization}
         observe='DispenseDetails'
-        onClose={onNurseActualizationClose}
+        onClose={() => {
+          setShowActualization(false)
+        }}
       >
         <NurseActualization
           status={actualizationStatus}
