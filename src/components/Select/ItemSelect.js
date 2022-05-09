@@ -7,7 +7,7 @@ import { fetchCodeTable } from '@/utils/codetable'
 import { withStyles, Divider } from '@material-ui/core'
 import { set } from '@umijs/deps/compiled/lodash'
 import { preOrderItemCategory } from '@/utils/codes'
-import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
+import { RADIOLOGY_CATEGORY, LAB_CATEGORY } from '@/utils/constants'
 const ItemSelect = ({ codetable, itemType, ...props }) => {
   const {
     inventorymedication,
@@ -65,18 +65,14 @@ const ItemSelect = ({ codetable, itemType, ...props }) => {
   const labsFilter =
     ctservice.length > 0
       ? ctservice.filter(
-          c =>
-            c.serviceCenterCategoryFK ===
-            SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER,
+          c => LAB_CATEGORY.indexOf(c.serviceCenterCategoryFK) >= 0,
         )
       : []
 
   const radiologysFilter =
     ctservice.length > 0
       ? ctservice.filter(
-          c =>
-            c.serviceCenterCategoryFK ===
-            SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
+          c => RADIOLOGY_CATEGORY.indexOf(c.serviceCenterCategoryFK) >= 0,
         )
       : []
 
@@ -84,10 +80,8 @@ const ItemSelect = ({ codetable, itemType, ...props }) => {
     ctservice.length > 0
       ? ctservice.filter(
           c =>
-            c.serviceCenterCategoryFK !==
-              SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER &&
-            c.serviceCenterCategoryFK !==
-              SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
+            LAB_CATEGORY.indexOf(c.serviceCenterCategoryFK) < 0 &&
+            RADIOLOGY_CATEGORY.indexOf(c.serviceCenterCategoryFK) < 0,
         )
       : []
 

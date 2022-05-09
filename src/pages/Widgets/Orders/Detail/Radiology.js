@@ -33,6 +33,7 @@ import {
 import CannedTextButton from './CannedTextButton'
 import { Alert } from 'antd'
 import { CloseCircleOutlined } from '@ant-design/icons'
+import { queryList } from '@/services/common'
 
 const { CheckableTag } = Tag
 
@@ -239,26 +240,47 @@ class Radiology extends PureComponent {
       currentPage: 1,
     }
 
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctservice',
-        force: true,
-        filter: {
-          'serviceFKNavigation.IsActive': true,
-          'serviceCenterFKNavigation.IsActive': true,
-          combineCondition: 'and',
-          apiCriteria: { ServiceCenterType: 'Radiology' },
-        },
-      },
-    }).then(list => {
+    this.setResource()
+  }
+
+  componentDidMount() {
+    if (this.scroll) {
+      this.scroll.addEventListener('scroll', e => {
+        const { clientHeight, scrollHeight, scrollTop } = e.target
+        const isBottom = scrollTop + clientHeight + 20 > scrollHeight
+        if (
+          isBottom &&
+          this.state.currentPage * 50 < this.getFilterServices().length
+        ) {
+          this.setState(pre => {
+            return { currentPage: pre.currentPage + 1 }
+          })
+        }
+      })
+
+      this.resetPage()
+    }
+  }
+
+  setResource = async () => {
+    const response = await queryList('/api/ctservice', {
+      'serviceFKNavigation.IsActive': true,
+      'serviceCenterFKNavigation.IsActive': true,
+      combineCondition: 'and',
+      apiCriteria: { ServiceCenterType: 'Radiology' },
+      sorting: [
+        { columnName: 'serviceFKNavigation.displayValue', direction: 'asc' },
+      ],
+      pagesize: 99999,
+    })
+    if (response.status === '200') {
       const {
         services = [],
         serviceCenters = [],
         serviceCenterServices = [],
         serviceCatetorys = [],
         serviceTags = [],
-      } = getServices(list)
+      } = getServices(response.data.data || [])
 
       const newServices = services.reduce((p, c) => {
         const { value: serviceFK, name } = c
@@ -290,25 +312,6 @@ class Radiology extends PureComponent {
           ...serviceCatetorys,
         ],
       })
-    })
-  }
-
-  componentDidMount() {
-    if (this.scroll) {
-      this.scroll.addEventListener('scroll', e => {
-        const { clientHeight, scrollHeight, scrollTop } = e.target
-        const isBottom = scrollTop + clientHeight + 20 > scrollHeight
-        if (
-          isBottom &&
-          this.state.currentPage * 50 < this.getFilterServices().length
-        ) {
-          this.setState(pre => {
-            return { currentPage: pre.currentPage + 1 }
-          })
-        }
-      })
-
-      this.resetPage()
     }
   }
 

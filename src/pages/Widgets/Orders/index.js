@@ -69,13 +69,16 @@ const styles = theme => ({
   },
 })
 // @skeleton()
-@connect(({ orders, codetable, clinicInfo, patient, user }) => ({
-  orders,
-  codetable,
-  patient,
-  user,
-  clinicInfo,
-}))
+@connect(
+  ({ orders, codetable, clinicInfo, patient, user, consultationDocument }) => ({
+    orders,
+    codetable,
+    patient,
+    user,
+    clinicInfo,
+    consultationDocument,
+  }),
+)
 class Orders extends PureComponent {
   state = {
     total: 0,

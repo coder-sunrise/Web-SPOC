@@ -15,6 +15,8 @@ import {
   REVENUE_CATEGORY,
   NOTIFICATION_TYPE,
   NOTIFICATION_STATUS,
+  RADIOLOGY_CATEGORY,
+  LAB_CATEGORY,
 } from '@/utils/constants'
 import { roundTo, getUniqueId } from '@/utils/utils'
 import { isPharmacyOrderUpdated } from '@/pages/Consultation/utils'
@@ -137,6 +139,7 @@ const AddOrder = ({
               ...o.retailVisitInvoiceService,
               ...o.retailVisitInvoiceService.retailService,
               isActive: serviceItem?.isActive,
+              serviceCenterCategoryFK: serviceItem.serviceCenterCategoryFK,
             }
             break
           }
@@ -164,6 +167,7 @@ const AddOrder = ({
               v => v.displayValue === o.itemName && v.isActive,
             )
             obj = {
+              type: ORDER_TYPE_TAB.VACCINATION,
               _itemId: vaccinationItem?.id,
               _itemType: INVOICE_ITEM_TYPE_BY_NAME.VACCINATION,
               _caution: vaccinationItem?.caution,
@@ -209,8 +213,17 @@ const AddOrder = ({
       )
 
       const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
-      const isVaccinationExist =
-        clinicTypeFK === CLINIC_TYPE.GP ? newRows.filter(row => !row.type) : []
+      const removeItems =
+        clinicTypeFK === CLINIC_TYPE.GP
+          ? newRows.filter(
+              row =>
+                row.type === ORDER_TYPE_TAB.VACCINATION ||
+                (row.type === ORDER_TYPE_TAB.SERVICE &&
+                  (LAB_CATEGORY.indexOf(row.serviceCenterCategoryFK) >= 0 ||
+                    RADIOLOGY_CATEGORY.indexOf(row.serviceCenterCategoryFK) >=
+                      0)),
+            )
+          : []
 
       const cuationItems = []
       if (isFirstLoad) {
@@ -230,11 +243,7 @@ const AddOrder = ({
             }
           })
 
-        if (
-          isVaccinationExist.length ||
-          cuationItems.length ||
-          drugAllergies.length
-        ) {
+        if (removeItems.length || cuationItems.length || drugAllergies.length) {
           dispatch({
             type: 'global/updateAppState',
             payload: {
@@ -248,7 +257,7 @@ const AddOrder = ({
                   }
                 }),
                 drugAllergies,
-                isVaccinationExist,
+                removeItems,
               ),
               alignContent: 'left',
               isInformType: true,
@@ -258,8 +267,14 @@ const AddOrder = ({
         }
       }
 
-      const rowsWithoutVaccination = newRows
-        .filter(row => row.type)
+      const activeRows = newRows
+        .filter(
+          row =>
+            row.type !== ORDER_TYPE_TAB.VACCINATION &&
+            (row.type !== ORDER_TYPE_TAB.SERVICE ||
+              (LAB_CATEGORY.indexOf(row.serviceCenterCategoryFK) < 0 &&
+                RADIOLOGY_CATEGORY.indexOf(row.serviceCenterCategoryFK) < 0)),
+        )
         .map(row => {
           return {
             ...row,
@@ -269,8 +284,8 @@ const AddOrder = ({
       dispatch({
         type: 'orders/updateState',
         payload: {
-          rows: rowsWithoutVaccination,
-          _originalRows: rowsWithoutVaccination.map(r => ({ ...r })),
+          rows: activeRows,
+          _originalRows: activeRows.map(r => ({ ...r })),
           finalAdjustments: newRetailInvoiceAdjustment,
           isGSTInclusive: r.isGSTInclusive,
           gstValue: r.gstValue,
