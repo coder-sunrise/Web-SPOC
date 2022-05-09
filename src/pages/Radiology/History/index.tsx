@@ -48,10 +48,8 @@ const api = {
 
 const style = theme => ({})
 
-const orderDateForm = moment()
-  .add(-1, 'week')
-  .toDate()
-const orderDateTo = moment().toDate()
+const orderDateForm = moment(moment().add(-1, 'week').toDate()).formatUTC()
+const orderDateTo = moment().endOf('day').formatUTC(false)
 
 const saveColumnsSetting = (dispatch, columnsSetting) => {
   dispatch({
@@ -702,8 +700,8 @@ const RadiologyWorklistHistoryIndex = ({
               ...values,
               apiCriteria: {
                 accessionNo: searchAccessionNo,
-                orderDateForm: searchOrderDateForm,
-                orderDateTo: searchOrderDateTo,
+                orderDateForm: searchOrderDateForm ? moment(moment(searchOrderDateForm).toDate()).formatUTC(): undefined ,
+                orderDateTo: searchOrderDateTo ? moment(searchOrderDateTo).endOf('day').formatUTC(false) : undefined ,
                 searchValue: searchPatient,
                 visitType:
                   searchVisitType?.indexOf(-99) > -1
