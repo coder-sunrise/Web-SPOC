@@ -18,6 +18,7 @@ jobs:
     pool:
       name: 'Medicloud'
       demands:
+      - EnableBuild # Check if exists
       - EnableBuild -equals True
     workspace:
       clean: all
@@ -71,6 +72,9 @@ jobs:
   - job: buildUATJob
     pool:
       name: 'Medicloud'
+      demands:
+      - EnableBuild # Check if exists
+      - EnableBuild -equals True
     workspace:
       clean: all
     steps:
@@ -123,6 +127,9 @@ jobs:
   - job: buildProdJob
     pool:
       name: 'Medicloud'
+      demands:
+      - EnableBuild # Check if exists
+      - EnableBuild -equals True
     workspace:
       clean: all
     steps:
