@@ -27,7 +27,7 @@ const styles = theme => ({
 })
 const OrderText = ({ orders, classes, onSelectItem }) => {
   const [orderList, setOrderList] = useState([])
-  useEffect(() => {
+  const getOrderList = () => {
     let newOrderList = []
     const activeRows = (orders.rows || []).filter(row => !row.isDeleted)
     const drugMixture = activeRows.filter(
@@ -135,7 +135,7 @@ const OrderText = ({ orders, classes, onSelectItem }) => {
       })
     }
     setOrderList(newOrderList)
-  }, [orders.rows])
+  }
   return (
     <Popover
       icon={null}
@@ -179,12 +179,7 @@ const OrderText = ({ orders, classes, onSelectItem }) => {
         </div>
       }
     >
-      <Button
-        size='sm'
-        justIcon
-        color='transparent'
-        //disabled={disabled}
-      >
+      <Button size='sm' justIcon color='transparent' onClick={getOrderList}>
         <ListAlt />
       </Button>
     </Popover>
