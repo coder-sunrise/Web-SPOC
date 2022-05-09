@@ -62,6 +62,7 @@ import schema from './schema'
 import styles from './style'
 import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
 import { getRawData } from '@/services/report'
+import * as config from '@/utils/config'
 
 const discardMessage = 'Discard consultation?'
 const onPageLeaveMessage = 'Do you want to save consultation notes?'
@@ -260,24 +261,49 @@ const autoPrintSelection = async (action, props) => {
                     visitFK,
                     patientProfileFK,
                   }).then(r => {
-                    printedData = printedData.map(item => ({
-                      ReportId: item.ReportId,
-                      DocumentName:
-                        item.ReportId === REPORT_ID.PRESCRIPTION
-                          ? item.description
-                          : `${item.item}(${item.description})`,
-                      ReportData:
-                        item.ReportId === REPORT_ID.PRESCRIPTION
-                          ? JSON.stringify(
-                              (delete r.ReportSettingParameter,
-                              delete r.ReportContext,
-                              r),
-                            )
-                          : item.ReportData,
-                      Copies: item.Copies,
-                      Token: token,
-                      BaseUrl: process.env.url,
-                    }))
+                    const { getClinic } = config
+                    const { systemTimeZoneInt = 0 } = getClinic() || {}
+                    printedData = printedData.map(item => {
+                      return {
+                        ReportId: item.ReportId,
+                        DocumentName:
+                          item.ReportId === REPORT_ID.PRESCRIPTION
+                            ? item.description
+                            : `${item.item}(${item.description})`,
+                        ReportData:
+                          item.ReportId === REPORT_ID.PRESCRIPTION
+                            ? JSON.stringify(
+                                (delete r.ReportSettingParameter,
+                                delete r.ReportContext,
+                                {
+                                  ...r,
+                                  PatientInfo: r.PatientInfo.map(x => ({
+                                    ...x,
+                                    dob: moment(x.dob)
+                                      .add(-systemTimeZoneInt, 'hour')
+                                      .formatUTC(false),
+                                    orderDate: moment(x.orderDate)
+                                      .add(-systemTimeZoneInt, 'hour')
+                                      .formatUTC(false),
+                                    _dobIn: false,
+                                    _orderDateIn : false,
+                                  })),
+                                  PrescriptionInfo: r.PrescriptionInfo.map(
+                                    x => ({
+                                      ...x,
+                                      updateDate: moment(x.updateDate)
+                                        .add(-systemTimeZoneInt, 'hour')
+                                        .formatUTC(false),
+                                      _updateDateIn : false,
+                                    }),
+                                  ),
+                                }),
+                              )
+                            : item.ReportData,
+                        Copies: item.Copies,
+                        Token: token,
+                        BaseUrl: process.env.url,
+                      }})
                     handlePrint(JSON.stringify(printedData))
                     dispatch({ type: 'consultation/closeModal' })
                   })
