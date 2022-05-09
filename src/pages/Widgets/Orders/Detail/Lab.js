@@ -83,13 +83,10 @@ const styles = theme => ({
     borderRadius: 4,
     margin: 3,
     padding: '0px 6px',
-    width: 185,
-    alignItems: 'right',
-    position: 'relative',
     height: 28,
   },
   checkServiceLabel: {
-    width: 155,
+    maxWidth: 150,
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -99,9 +96,9 @@ const styles = theme => ({
   },
   checkServiceCheckBox: {
     display: 'inline-block',
-    position: 'absolute',
-    top: 2,
-    right: 2,
+    marginLeft: 6,
+    position: 'relative',
+    top: '-6px',
   },
   legend: {
     width: 'fit-content',
@@ -116,10 +113,6 @@ const styles = theme => ({
     maxHeight: 105,
   },
   selectedServiceLabel: {
-    maxWidth: 170,
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
     display: 'inline-block',
     marginRight: 10,
   },
@@ -946,38 +939,48 @@ class Lab extends PureComponent {
                 {labItems.length ? (
                   labItems.map(ri => {
                     return (
-                      <div
-                        className={classes.selectedServiceLabel}
-                        style={{ position: 'relative', paddingRight: 16 }}
-                      >
-                        <Link
-                          onClick={e => {
-                            e.preventDefault()
-                            this.setSelectLab(ri)
+                      <div className={classes.selectedServiceLabel}>
+                        <div
+                          style={{
+                            maxWidth: 150,
+                            display: 'inline-block',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
                           }}
                         >
-                          <Tooltip title={ri.serviceName}>
-                            <span
-                              style={{
-                                textDecoration: 'underline',
-                                color: this.isValidate(ri.serviceFK)
-                                  ? '#4255bd'
-                                  : 'red',
-                                fontWeight:
-                                  ri.serviceFK === editServiceId ? 'bold' : 400,
-                              }}
-                            >
-                              {ri.serviceName}
-                            </span>
-                          </Tooltip>
-                        </Link>
+                          <Link
+                            onClick={e => {
+                              e.preventDefault()
+                              this.setSelectLab(ri)
+                            }}
+                          >
+                            <Tooltip title={ri.serviceName}>
+                              <span
+                                style={{
+                                  textDecoration: 'underline',
+                                  color: this.isValidate(ri.serviceFK)
+                                    ? '#4255bd'
+                                    : 'red',
+                                  fontWeight:
+                                    ri.serviceFK === editServiceId
+                                      ? 'bold'
+                                      : 400,
+                                }}
+                              >
+                                {ri.serviceName}
+                              </span>
+                            </Tooltip>
+                          </Link>
+                        </div>
                         {!isEdit && (
                           <Tooltip title='Remove item'>
                             <div
                               style={{
-                                position: 'absolute',
-                                right: 0,
-                                top: 0,
+                                display: 'inline-block',
+                                position: 'relative',
+                                marginLeft: 4,
+                                top: '-6px',
                               }}
                             >
                               <CloseCircleOutlined
