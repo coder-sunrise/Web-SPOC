@@ -93,7 +93,13 @@ class Detail extends PureComponent {
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
-          <GridContainer>
+          <GridContainer
+            style={{
+              height: 700,
+              alignItems: 'start',
+              overflowY: 'scroll',
+            }}
+          >
             <GridItem md={6}>
               <FastField
                 name='code'

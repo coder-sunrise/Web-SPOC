@@ -27,15 +27,12 @@ Yup.addMethod(Yup.string, 'NRIC', function(message) {
         if (firstChar === 'F')
           // prettier-ignore
           outputChars = ['X','W','U','T','R','Q','P','N','M','L','K']
-        else if (firstChar === 'G')
-        {
+        else if (firstChar === 'G') {
           // prettier-ignore
           outputChars = ['X','W','U','T','R','Q','P','N','M','L','K']
           // outputChars = ['R','Q','P','N','M','L','K','X','W','U','T']
           weight = 4
-        }
-        else if (firstChar === 'M')
-        {
+        } else if (firstChar === 'M') {
           // prettier-ignore
           outputChars = ['X','W','U','T','R','Q','P','N','J','L','K']
           weight = 3
@@ -46,8 +43,7 @@ Yup.addMethod(Yup.string, 'NRIC', function(message) {
         if (firstChar === 'S')
           // prettier-ignore
           outputChars = ['J', 'Z', 'I', 'H', 'G', 'F', 'E', 'D', 'C', 'B', 'A']
-        else if (firstChar === 'T')
-        {
+        else if (firstChar === 'T') {
           // prettier-ignore
           outputChars = ['J','Z','I','H','G','F','E','D','C','B','A']
           // outputChars = ['G','F','E','D','C','B','A','J','Z','I','H']
@@ -302,6 +298,16 @@ const schema = props => {
       contactEmailAddress: Yup.object().shape({
         emailAddress: Yup.string().email(),
       }),
+      contactAddress: Yup.array().of(
+        Yup.object().shape({
+          street: clinicSettings.isEnableAddAddress
+            ? Yup.string().required()
+            : Yup.string(),
+          countryFK: clinicSettings.isEnableAddAddress
+            ? Yup.string().required()
+            : Yup.string(),
+        }),
+      ),
       mobileContactNumber: Yup.object().shape({
         number: Yup.string(),
         countryCodeFK: Yup.string(),
@@ -312,6 +318,16 @@ const schema = props => {
       contactEmailAddress: Yup.object().shape({
         emailAddress: Yup.string().email(),
       }),
+      contactAddress: Yup.array().of(
+        Yup.object().shape({
+          street: clinicSettings.isEnableAddAddress
+            ? Yup.string().required()
+            : Yup.string(),
+          countryFK: clinicSettings.isEnableAddAddress
+            ? Yup.string().required()
+            : Yup.string(),
+        }),
+      ),
       mobileContactNumber: Yup.object().shape({
         number: Yup.string().required(),
         countryCodeFK: Yup.string().required(),
