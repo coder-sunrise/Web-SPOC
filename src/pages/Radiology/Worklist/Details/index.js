@@ -193,6 +193,7 @@ const RadiologyDetails = () => {
         ...payload,
       },
     }).then(value => {
+      setIsDirty(false)
       if (closeAfterSave) {
         setDetailsId(null)
         setShowDetails(false)
@@ -242,8 +243,6 @@ const RadiologyDetails = () => {
         }
       })
   }
-
-  useEffect(() => {}, [isDirty])
 
   const showOnlyCloseButton =
     isReadOnly ||
