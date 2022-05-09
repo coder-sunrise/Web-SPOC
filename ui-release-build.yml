@@ -17,6 +17,8 @@ jobs:
   - job: buildInternalTestingJob
     pool:
       name: 'Medicloud'
+      demands:
+      - EnableBuild -equals True
     workspace:
       clean: all
     steps:
