@@ -12,16 +12,30 @@ import {
 } from '@syncfusion/ej2-react-documenteditor'
 
 DocumentEditorContainerComponent.Inject(Toolbar)
-
+const pageFitType = {
+  FitOnePage: 'FitOnePage',
+  FitPageWidth: 'FitPageWidth',
+}
 class DocumentEditor extends SampleBase {
   constructor() {
     super(...arguments)
     this.onLoadDefault = () => {
-      const { documentName, document, enableTitleBar } = this.props
+      const { documentName, document, enableTitleBar, zoomTarget } = this.props
       this.container.documentEditor.open(document)
       this.container.documentEditor.documentName = documentName
       if (enableTitleBar) {
         this.titleBar.updateDocumentTitle()
+      }
+      if (zoomTarget) {
+        if (pageFitType[zoomTarget]) {
+          this.container.documentEditor.fitPage(zoomTarget)
+        } else {
+          const zoomValue = parseInt(zoomTarget, 10)
+          console.log('zoomValue',zoomTarget,zoomValue)
+          if (zoomValue < 0) return
+          this.container.documentEditor.zoomFactor = zoomValue / 100
+        }
+        this.container.documentEditor.notify('internalZoomFactorChange') //trigger updateZoomContent();
       }
     }
   }
