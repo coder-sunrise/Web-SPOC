@@ -213,7 +213,10 @@ const getDispenseItems = (clinicSettings, entity = {}) => {
 
   const generateFromNormalMedication = item => {
     const groupName = 'NormalDispense'
-    if (item.isPreOrder) {
+    if (
+      (item.isPreOrder && !item.isChargeToday) ||
+      (!item.isPreOrder && item.hasPaid)
+    ) {
       orderItems.push({
         ...defaultItem(item, groupName),
         groupNumber: 1,
@@ -343,7 +346,10 @@ const getDispenseItems = (clinicSettings, entity = {}) => {
 
   const generateFromNormalConsumable = item => {
     const groupName = 'NormalDispense'
-    if (item.isPreOrder) {
+    if (
+      (item.isPreOrder && !item.isChargeToday) ||
+      (!item.isPreOrder && item.hasPaid)
+    ) {
       orderItems.push({
         ...defaultItem(item, groupName),
         groupNumber: 1,
@@ -456,7 +462,10 @@ const getDispenseItems = (clinicSettings, entity = {}) => {
 
   const generateFromNormalVaccination = item => {
     const groupName = 'NormalDispense'
-    if (item.isPreOrder) {
+    if (
+      (item.isPreOrder && !item.isChargeToday) ||
+      (!item.isPreOrder && item.hasPaid)
+    ) {
       orderItems.push({
         ...defaultItem(item, groupName),
         groupNumber: 1,
