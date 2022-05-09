@@ -30,7 +30,8 @@ import {
 import {
   DURATION_UNIT,
   ORDER_TYPES,
-  SERVICE_CENTER_CATEGORY,
+  LAB_CATEGORY,
+  RADIOLOGY_CATEGORY,
 } from '@/utils/constants'
 import {
   isMatchInstructionRule,
@@ -556,18 +557,10 @@ import { CollectionsOutlined } from '@material-ui/icons'
       if (newOrder) {
         let type = packageItems[index].type
         if (packageItems[index].type === '3') {
-          if (
-            newOrder.serviceCenterCategoryFK ===
-              SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER ||
-            newOrder.serviceCenterCategoryFK ===
-              SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE
-          ) {
+          if (LAB_CATEGORY.indexOf(newOrder.serviceCenterCategoryFK) >= 0) {
             type = ORDER_TYPES.LAB
           } else if (
-            newOrder.serviceCenterCategoryFK ===
-              SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER ||
-            newOrder.serviceCenterCategoryFK ===
-              SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE
+            RADIOLOGY_CATEGORY.indexOf(newOrder.serviceCenterCategoryFK) >= 0
           ) {
             type = ORDER_TYPES.RADIOLOGY
           }
@@ -923,18 +916,10 @@ class Package extends PureComponent {
               item => item.id === o.serviceCenterServiceFK,
             )
             let typeName = 'Service'
-            if (
-              service.serviceCenterCategoryFK ===
-                SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER ||
-              service.serviceCenterCategoryFK ===
-                SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE
-            ) {
+            if (LAB_CATEGORY.indexOf(service.serviceCenterCategoryFK) >= 0) {
               typeName = 'Lab'
             } else if (
-              service.serviceCenterCategoryFK ===
-                SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER ||
-              service.serviceCenterCategoryFK ===
-                SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE
+              RADIOLOGY_CATEGORY.indexOf(service.serviceCenterCategoryFK) >= 0
             ) {
               typeName = 'Radiology'
             }

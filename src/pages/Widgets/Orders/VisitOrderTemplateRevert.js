@@ -13,12 +13,18 @@ import {
   CheckboxGroup,
   CommonTableGrid,
 } from '@/components'
-import { INVOICE_ITEM_TYPE } from '@/utils/constants'
+import {
+  INVOICE_ITEM_TYPE,
+  ORDER_TYPES,
+  RADIOLOGY_CATEGORY,
+  LAB_CATEGORY,
+} from '@/utils/constants'
+import { orderTypes } from '@/pages/Consultation/utils'
 
 const VisitOrderTemplateRevert = props => {
   const { footer, data, confirmRevert, dispatch, open, ...restProps } = props
   const [enableConfirm, setEnableConfirm] = useState(true)
-  const [selectedRows, setSelectedRows] = useState([]) 
+  const [selectedRows, setSelectedRows] = useState([])
 
   const columns = [
     {
@@ -46,6 +52,24 @@ const VisitOrderTemplateRevert = props => {
       columnName: 'inventoryItemTypeFK',
       width: 100,
       render: row => {
+        if (INVOICE_ITEM_TYPE[row.inventoryItemTypeFK] === 'Service') {
+          let type = ORDER_TYPES.SERVICE
+          if (
+            RADIOLOGY_CATEGORY.indexOf(
+              row.visitOrderTemplateServiceItemDto.serviceCenterCategoryFK,
+            ) >= 0
+          ) {
+            type = ORDER_TYPES.RADIOLOGY
+          } else if (
+            LAB_CATEGORY.indexOf(
+              row.visitOrderTemplateServiceItemDto.serviceCenterCategoryFK,
+            ) >= 0
+          ) {
+            type = ORDER_TYPES.LAB
+          }
+          const otype = orderTypes.find(o => o.value === type)
+          return otype.name
+        }
         return INVOICE_ITEM_TYPE[row.inventoryItemTypeFK]
       },
     },
