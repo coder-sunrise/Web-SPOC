@@ -39,6 +39,7 @@ export default createListViewModel({
     service,
     state: {
       default: {},
+      ableToEditConsultation: true,
       invoiceHistory: {
         list: [],
       },
@@ -48,6 +49,18 @@ export default createListViewModel({
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
+        const { pathname, search, query = {} } = loct
+        // if patient history open from any consultation(cid) then disallow to edit consultation
+        dispatch({
+          type: 'updateState',
+          payload: {
+            ableToEditConsultation: !(
+              pathname.indexOf('/reception/queue/consultation') === 0 &&
+              Number(query.cid) &&
+              Number(query.pid)
+            ),
+          },
+        })
         // const { pathname, search, query = {} } = loct
         // if (
         //   pathname.indexOf('/reception/queue/patientdashboard') === 0 ||
