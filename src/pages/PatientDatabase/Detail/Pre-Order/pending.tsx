@@ -8,6 +8,7 @@ import { FastEditableTableGrid, Tooltip } from '@/components'
 import Loading from '@/components/PageLoading/index'
 import { preOrderItemCategory } from '@/utils/codes'
 import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
+import { NumberInput } from '@/components'
 import Yup from '@/utils/yup'
 // interface IPendingPreOrderProps {
 // }
@@ -281,7 +282,7 @@ const PendingPreOrder: React.FC = (props: any) => {
     row.remarks = undefined
   }
 
-  const handelQuantityChanged = (e:any) => {
+  const handelQuantityChanged = (e: any) => {
     const { row, value } = e
     const {
       preOrderItemType,
@@ -460,7 +461,11 @@ const PendingPreOrder: React.FC = (props: any) => {
         sortingEnabled: false,
         isDisabled: () => true,
         render: row => {
-          return row.hasPaid ? row.amount : '-'
+          return row.hasPaid ? (
+            <NumberInput currency text value={row.amount} rightAlign readonly />
+          ) : (
+            '-'
+          )
         },
       },
       {
@@ -532,7 +537,7 @@ const PendingPreOrder: React.FC = (props: any) => {
                   preOrderMedicationItem: undefined,
                   preOrderConsumableItem: undefined,
                   prescribingUOMFK: undefined,
-                  quantity:1,
+                  quantity: 1,
                   ...o,
                 }
               })
