@@ -61,14 +61,7 @@ class BasicData extends Component {
     dispatch({
       type: 'patientResults/queryBasicDataList',
       payload: {
-        apiCriteria: { VisitFK: visitFK },
-        sort: [
-          {
-            sortby: 'visitDate',
-            order: 'desc',
-          },
-        ],
-        patientProfileFK,
+        apiCriteria: { visitFK, patientProfileFK },
         current: this.state.currentPage + 1,
       },
     }).then(response => {
@@ -105,25 +98,7 @@ class BasicData extends Component {
     )
 
     const showData = this.state.loadedData.filter(
-      c =>
-        (!this.state.isOnlySearchMC || c.visitPurposeFK === 4) &&
-        newData.find(row => {
-          if (row.isGroup) return false
-          if (row.tableName && row.fieldName) {
-            const entity = c[row.tableName]
-            if (entity) {
-              if (
-                row.testCode === TESTTYPES.WAIST &&
-                (entity.isChild || entity.isPregnancy)
-              ) {
-                return true
-              } else {
-                return hasValue(entity[row.fieldName])
-              }
-            }
-          }
-          return false
-        }),
+      c => !this.state.isOnlySearchMC || c.visitPurposeFK === 4,
     )
 
     newData = newData.map(row => {
@@ -131,17 +106,14 @@ class BasicData extends Component {
       let index = 0
       showData.forEach(data => {
         let value
-        if (!row.isGroup && row.tableName && row.fieldName) {
-          const entity = data[row.tableName]
-          if (entity) {
-            if (
-              row.testCode === TESTTYPES.WAIST &&
-              (entity.isChild || entity.isPregnancy)
-            ) {
-              value = 'NA'
-            } else {
-              value = entity[row.fieldName]
-            }
+        if (!row.isGroup && row.fieldName) {
+          if (
+            row.testCode === TESTTYPES.WAIST &&
+            (data.isChild || data.isPregnancy)
+          ) {
+            value = 'NA'
+          } else {
+            value = data[row.fieldName]
           }
         }
         insertVisit = {
@@ -149,10 +121,9 @@ class BasicData extends Component {
           [`valueColumn${index + 1}`]: value,
         }
         if (row.testCode === TESTTYPES.COLORVISIONTEST) {
-          const entity = data[row.tableName]
           insertVisit = {
             ...insertVisit,
-            [`colorVisionRemarksColumn${index + 1}`]: entity?.remarks,
+            [`colorVisionRemarksColumn${index + 1}`]: data?.remarks,
           }
         }
         index = index + 1
@@ -188,7 +159,7 @@ class BasicData extends Component {
             <div style={{ height: 16 }}>
               {moment(data.visitDate).format(dateFormatLong)}
             </div>
-            <div style={{ height: 16 }}>({visitPurpose.code})</div>
+            <div style={{ height: 16 }}>({visitPurpose?.code})</div>
           </div>
         ),
         width: 100,
