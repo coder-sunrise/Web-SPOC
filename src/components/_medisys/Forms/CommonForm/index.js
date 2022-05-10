@@ -177,7 +177,8 @@ class CommonForm extends PureComponent {
           documentName={formName}
           document={content}
           ref={r => (this.DEContainer = r?.container)}
-          height={'60vh'}
+          zoomTarget='FitPageWidth'
+          height={'78vh'}
           showPropertiesPane={false}
           enableToolbar={false}
           restrictEditing={disableEdit}

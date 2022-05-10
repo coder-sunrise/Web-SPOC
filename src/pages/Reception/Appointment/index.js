@@ -858,6 +858,7 @@ class Appointment extends React.PureComponent {
       endTime,
       view,
       isFromCopy,
+      isAffectAllResource,
     } = event
 
     const viewApptAccessRight = Authorized.check(
@@ -999,6 +1000,7 @@ class Appointment extends React.PureComponent {
                   newStartTime: startTime,
                   newEndTime: endTime,
                   view: view,
+                  isAffectAllResource,
                 },
                 isDragging: false,
               })

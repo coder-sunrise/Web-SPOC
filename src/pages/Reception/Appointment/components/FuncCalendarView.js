@@ -684,6 +684,7 @@ const CalendarView = ({
             view: calendarView,
             startTime,
             endTime,
+            isAffectAllResource: true,
           })
           setEventAction(undefined)
         }}
@@ -753,6 +754,7 @@ const CalendarView = ({
             startTime,
             endTime,
             isFromCopy: eventAction.type === 'Copy',
+            isAffectAllResource: eventAction.type === 'Copy' ? false : true,
           })
           setEventAction(undefined)
         }}
