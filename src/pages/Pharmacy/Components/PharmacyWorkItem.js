@@ -251,9 +251,13 @@ const WorkitemBody = props => {
 
 const PharmacyWorkItem = props => {
   const { item, classes } = props
+  const { setDetailsId } = useContext(WorklistContext)
   return (
     <div
       key={item.id}
+      onDoubleClick={() => {
+        setDetailsId(item.id)
+      }}
       className={classes.mainPanel}
       style={{
         backgroundColor: item.isPaid ? '#D3FED1' : 'white',

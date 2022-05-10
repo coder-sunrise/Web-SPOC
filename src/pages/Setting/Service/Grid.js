@@ -4,7 +4,7 @@ import { status, isAutoOrder } from '@/utils/codes'
 import { CommonTableGrid, Button, Tooltip } from '@/components'
 
 class Grid extends PureComponent {
-  editRow = async (row) => {
+  editRow = async row => {
     const { dispatch } = this.props
     const serviceList = await dispatch({
       type: 'settingClinicService/queryOne',
@@ -15,7 +15,7 @@ class Grid extends PureComponent {
 
     if (serviceList) {
       let serviceInfo = serviceList
-      serviceInfo.ctServiceCenter_ServiceNavigation.map((x) => {
+      serviceInfo.ctServiceCenter_ServiceNavigation.map(x => {
         delete x.serviceCenterFKNavigation
       })
 
@@ -38,12 +38,12 @@ class Grid extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
-        getRowId={(r) => r.serviceCenter_ServiceId}
+        getRowId={r => r.serviceCenter_ServiceId}
         type='settingClinicService'
         onRowDoubleClick={this.editRow}
         TableProps={{
@@ -99,7 +99,7 @@ class Grid extends PureComponent {
             columnName: 'action',
             align: 'center',
             width: 80,
-            render: (row) => {
+            render: row => {
               return (
                 <Tooltip title='Edit Service'>
                   <Button

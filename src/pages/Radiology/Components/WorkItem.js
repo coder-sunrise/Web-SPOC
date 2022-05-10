@@ -283,22 +283,28 @@ const WorkitemBody = ({ item }) => {
   )
 }
 
-export const Workitem = (item, style) => (
-  <div
-    key={item.radiologyWorkitemId}
-    style={{
-      borderRadius: 10,
-      backgroundColor:
-        (item.isNurseActualized || !item.isNurseActualizeRequired) &&
-        (item.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW ||
-          item.statusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS)
-          ? '#d3fed1'
-          : 'white',
-      border: '#cdcdcd solid 2px',
-      ...style,
-    }}
-  >
-    <WorkitemTitle item={item} />
-    <WorkitemBody item={item} />
-  </div>
-)
+export const Workitem = (item, style) => {
+  const { setDetailsId } = useContext(WorklistContext)
+  return (
+    <div
+      onDoubleClick={() => {
+        setDetailsId(item.radiologyWorkitemId)
+      }}
+      key={item.radiologyWorkitemId}
+      style={{
+        borderRadius: 10,
+        backgroundColor:
+          (item.isNurseActualized || !item.isNurseActualizeRequired) &&
+          (item.statusFK === RADIOLOGY_WORKITEM_STATUS.NEW ||
+            item.statusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS)
+            ? '#d3fed1'
+            : 'white',
+        border: '#cdcdcd solid 2px',
+        ...style,
+      }}
+    >
+      <WorkitemTitle item={item} />
+      <WorkitemBody item={item} />
+    </div>
+  )
+}

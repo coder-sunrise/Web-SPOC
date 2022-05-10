@@ -300,10 +300,10 @@ const schema = props => {
       }),
       contactAddress: Yup.array().of(
         Yup.object().shape({
-          street: clinicSettings.isEnableAddAddress
+          street: clinicSettings.isPatientAddressMandatory
             ? Yup.string().required()
             : Yup.string(),
-          countryFK: clinicSettings.isEnableAddAddress
+          countryFK: clinicSettings.isPatientAddressMandatory
             ? Yup.string().required()
             : Yup.string(),
         }),
@@ -320,10 +320,10 @@ const schema = props => {
       }),
       contactAddress: Yup.array().of(
         Yup.object().shape({
-          street: clinicSettings.isEnableAddAddress
+          street: clinicSettings.isPatientAddressMandatory
             ? Yup.string().required()
             : Yup.string(),
-          countryFK: clinicSettings.isEnableAddAddress
+          countryFK: clinicSettings.isPatientAddressMandatory
             ? Yup.string().required()
             : Yup.string(),
         }),

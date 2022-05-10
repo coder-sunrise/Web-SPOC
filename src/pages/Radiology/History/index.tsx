@@ -640,6 +640,13 @@ const RadiologyWorklistHistoryIndex = ({
     <Fragment>
       <PageContainer pageHeaderRender={false}>
         <ProTable
+          onRow={row => {
+            return {
+              onDoubleClick: () => {
+                setDetailsId(row.id)
+              },
+            }
+          }}
           rowSelection={false}
           columns={columns}
           api={api}

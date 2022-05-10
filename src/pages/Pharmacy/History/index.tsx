@@ -368,6 +368,13 @@ const PharmacyWorklistHistoryIndex = ({
         <ProTable
           actionRef={actionRef}
           rowSelection={false}
+          onRow={row => {
+            return {
+              onDoubleClick: () => {
+                setDetailsId(row.id)
+              },
+            }
+          }}
           columns={columns}
           api={api}
           search={{
