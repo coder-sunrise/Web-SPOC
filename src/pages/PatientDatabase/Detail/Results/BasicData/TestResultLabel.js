@@ -75,7 +75,12 @@ const TestResultLabel = ({
   return (
     <span>
       <Tooltip title={tooltip}>
-        <span style={{ color: showWarnning ? 'red' : 'black' }}>
+        <span
+          style={{
+            color: showWarnning ? 'red' : 'black',
+            cursor: tooltip ? 'pointer' : 'default',
+          }}
+        >
           {showValue}
         </span>
       </Tooltip>
