@@ -141,7 +141,7 @@ export default ({
         columnName: 'AverageResult',
         type: 'number',
         align: 'center',
-        precision: 1,
+        precision: 0,
         sortingEnabled: false,
         // isDisabled: () => true,
       },
