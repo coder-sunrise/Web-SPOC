@@ -28,14 +28,24 @@ class OverallGrid extends PureComponent {
     ],
     columnExtensions: [
       { columnName: 'visitDate', type: 'date', width: 100 },
-      { columnName: 'referreceNo', width: 90 },
+      {
+        columnName: 'referreceNo',
+        width: 90,
+        sortBy:
+          'VisitFKNavigation.PatientProfileFkNavigation.PatientReferenceNo',
+      },
       { columnName: 'patientAccountNo', width: 100 },
       { columnName: 'patientName', width: 180 },
       { columnName: 'estimateReceiveDate', type: 'date', width: 130 },
       { columnName: 'orderedDate', type: 'date', width: 100 },
       { columnName: 'receivedDate', type: 'date', width: 105 },
       { columnName: 'serviceName', width: 200 },
-      { columnName: 'serviceCenterName', width: 200 },
+      {
+        columnName: 'serviceCenterName',
+        width: 200,
+        sortBy:
+          'ServiceCenterServiceFKNavigation.ServiceCenterFKNavigation.DisplayValue',
+      },
       { columnName: 'supplierName', width: 150 },
       { columnName: 'labTrackingStatusDisplayValue', width: 80 },
       { columnName: 'remarks', width: 200 },
@@ -53,12 +63,13 @@ class OverallGrid extends PureComponent {
       {
         columnName: 'visitPurposeFK',
         width: 80,
+        sortBy: 'VisitFKNavigation.VisitPurposeFK',
         render: row => {
           const { visitPurpose } = this.props
           var pupose = visitPurpose.find(x => x.id === row.visitPurposeFK)
           return (
-            <Tooltip title={pupose.displayValue}>
-              <span>{pupose.code}</span>
+            <Tooltip title={pupose?.displayValue}>
+              <span>{pupose?.code}</span>
             </Tooltip>
           )
         },

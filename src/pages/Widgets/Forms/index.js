@@ -66,12 +66,12 @@ const styles = theme => ({
   },
 
   popoverContainer: {
-    width: 200,
+    width: 250,
     textAlign: 'left',
     marginTop: -10,
   },
   listContainer: {
-    maxHeight: 132,
+    maxHeight: 230,
     overflowY: 'auto',
   },
 })
@@ -177,13 +177,7 @@ export const viewReport = (row, props) => {
   displayName: 'Forms',
 })
 class Forms extends PureComponent {
-  componentWillMount() {
-    const { dispatch } = this.props
-    dispatch({
-      type: 'formListing/initState',
-      payload: { formCategory: FORM_CATEGORY.CORFORM },
-    })
-  }
+  componentWillMount() {}
 
   constructor(props) {
     super(props)
@@ -236,13 +230,30 @@ class Forms extends PureComponent {
     )
   }
 
-  toggleVisibleChange = () =>
-    this.setState(ps => {
-      return {
-        ...ps,
-        openFormType: !ps.openFormType,
-      }
-    })
+  toggleVisibleChange = async () => {
+    const { dispatch, formListing } = this.props
+    const { formTemplates = [] } = formListing
+    if (formTemplates.length == 0) {
+      await dispatch({
+        type: 'formListing/initState',
+        payload: { formCategory: FORM_CATEGORY.CORFORM },
+      }).then(r => {
+        this.setState(ps => {
+          return {
+            ...ps,
+            openFormType: !ps.openFormType,
+          }
+        })
+      })
+    } else {
+      this.setState(ps => {
+        return {
+          ...ps,
+          openFormType: !ps.openFormType,
+        }
+      })
+    }
+  }
 
   setFilterFormTemplate = val => {
     this.setState({ filterFormTemplate: val })
@@ -318,7 +329,10 @@ class Forms extends PureComponent {
   }
 
   printRow = row => {
-    DocumentEditor.print({ documentName: row.formName, document: row.formData.content })
+    DocumentEditor.print({
+      documentName: row.formName,
+      document: row.formData.content,
+    })
   }
 
   getFormAccessRight = () => {
@@ -425,8 +439,9 @@ class Forms extends PureComponent {
             {
               columnName: 'updateDate',
               render: r => {
-                const updateDate = moment(r.lastUpdatedDate || r.updateDate)
-                  .format('DD MMM YYYY HH:mm')
+                const updateDate = moment(
+                  r.lastUpdatedDate || r.updateDate,
+                ).format('DD MMM YYYY HH:mm')
                 return (
                   <Tooltip title={updateDate}>
                     <span>{updateDate}</span>

@@ -149,19 +149,7 @@ const Detail = ({
                 <CodeSelect
                   label='Examination'
                   code='ctexaminationitem'
-                  labelField='displayValue'
-                  renderDropdown={option => {
-                    const cateogry = option.examinationCategoryFK
-                      ? ctexaminationcategory.find(
-                          x => x.id === option.examinationCategoryFK,
-                        ).name + ' - '
-                      : ''
-                    return (
-                      <div>
-                        <span>{`${cateogry}${option.displayValue}`}</span>
-                      </div>
-                    )
-                  }}
+                  labelField='displayValueWithCategory'
                   {...args}
                 />
               )}
@@ -258,8 +246,19 @@ export default compose(
         if (r) {
           resetForm()
           if (onConfirm) onConfirm()
+          const { codeDisplayValue, groupNo, examinationItemFK } = values
+          const { secondaryPrintoutLanguage = '' } = clinicSettings
           dispatch({
             type: 'settingIndividualComment/query',
+            payload: {
+              groupNo,
+              examinationItemFK,
+              apiCriteria: {
+                Language: secondaryPrintoutLanguage,
+                Key: 'displayValue',
+                SearchValue: codeDisplayValue,
+              },
+            },
           })
         }
       })

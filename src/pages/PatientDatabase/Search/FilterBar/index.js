@@ -44,6 +44,20 @@ const styles = theme => ({
   },
 })
 class FilterBar extends PureComponent {
+  onSearchPatientClick = () => {
+    const { search, dob } = this.props.values
+    const prefix = this.props.values.isExactSearch ? 'eql_' : 'like_'
+    this.props.dispatch({
+      type: 'patientSearch/query',
+      payload: {
+        apiCriteria: {
+          searchValue: search,
+          dob: dob,
+          includeinactive: window.location.pathname.includes('patient'),
+        },
+      },
+    })
+  }
   render() {
     const { classes, dispatch, disableAdd, simple } = this.props
 
@@ -61,6 +75,13 @@ class FilterBar extends PureComponent {
                       label={formatMessage({
                         id: 'reception.queue.patientSearchPlaceholder',
                       })}
+                      onKeyUp={e => {
+                        if ([13].includes(e.which)) {
+                          setTimeout(() => {
+                            this.onSearchPatientClick()
+                          }, 1)
+                        }
+                      }}
                       {...args}
                     />
                   )
@@ -77,32 +98,14 @@ class FilterBar extends PureComponent {
           <GridItem md={12} lg={5}>
             <div className={classes.filterBtn}>
               <Authorized authority='patientdatabase/searchpatient'>
-                <ProgressButton
+                <Button
                   variant='contained'
                   color='primary'
-                  icon={<Search />}
                   size='sm'
-                  onClick={() => {
-                    const { search, dob } = this.props.values
-                    const prefix = this.props.values.isExactSearch
-                      ? 'eql_'
-                      : 'like_'
-                    this.props.dispatch({
-                      type: 'patientSearch/query',
-                      payload: {
-                        apiCriteria: {
-                          searchValue: search,
-                          dob: dob,
-                          includeinactive: window.location.pathname.includes(
-                            'patient',
-                          ),
-                        },
-                      },
-                    })
-                  }}
+                  onClick={this.onSearchPatientClick}
                 >
-                  <FormattedMessage id='form.search' />
-                </ProgressButton>
+                  <Search /> <FormattedMessage id='form.search' />
+                </Button>
               </Authorized>
               <Authorized authority='patientdatabase.newpatient'>
                 {!disableAdd && (

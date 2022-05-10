@@ -230,7 +230,14 @@ class Form extends PureComponent {
                 color='success'
                 icon={null}
                 onClick={() => {
-                  this.onSubmitButtonClicked('finalize')
+                  this.props.dispatch({
+                    type: 'global/updateAppState',
+                    payload: {
+                      openConfirm: true,
+                      openConfirmContent: `Signed form is not editable after Finalized. Confirm to proceed ?`,
+                      onConfirmSave: ()=> this.onSubmitButtonClicked('finalize'),
+                    },
+                  })
                 }}
               >
                 Finalize

@@ -30,7 +30,11 @@ import {
   isMatchInstructionRule,
   getDrugAllergy,
 } from '@/pages/Widgets/Orders/utils'
-import { ORDER_TYPES, SERVICE_CENTER_CATEGORY } from '@/utils/constants'
+import {
+  ORDER_TYPES,
+  RADIOLOGY_CATEGORY,
+  LAB_CATEGORY,
+} from '@/utils/constants'
 import { getClinicianProfile } from '../../ConsultationDocument/utils'
 
 @connect(
@@ -311,6 +315,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           isDispensedByPharmacy: inventoryMedication.isDispensedByPharmacy,
           isNurseActualizeRequired: inventoryMedication.isNurseActualizable,
           isExclusive: inventoryMedication.isExclusive,
+          orderable: inventoryMedication.orderable,
         }
       }
       return item
@@ -519,18 +524,10 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       if (newOrder) {
         let type = orderSetItems[index].type
         if (orderSetItems[index].type === '3') {
-          if (
-            newOrder.serviceCenterCategoryFK ===
-              SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER ||
-            newOrder.serviceCenterCategoryFK ===
-              SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE
-          ) {
+          if (LAB_CATEGORY.indexOf(newOrder.serviceCenterCategoryFK) >= 0) {
             type = ORDER_TYPES.LAB
           } else if (
-            newOrder.serviceCenterCategoryFK ===
-              SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER ||
-            newOrder.serviceCenterCategoryFK ===
-              SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE
+            RADIOLOGY_CATEGORY.indexOf(newOrder.serviceCenterCategoryFK) >= 0
           ) {
             type = ORDER_TYPES.RADIOLOGY
           }
@@ -781,17 +778,13 @@ class OrderSet extends PureComponent {
               service.ctServiceCenter_ServiceNavigation[0]
             const serviceCenter = serviceCenterService.serviceCenterFKNavigation
             if (
-              serviceCenter.serviceCenterCategoryFK ===
-                SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER ||
-              serviceCenter.serviceCenterCategoryFK ===
-                SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE
+              LAB_CATEGORY.indexOf(serviceCenter.serviceCenterCategoryFK) >= 0
             ) {
               typeName = 'Lab'
             } else if (
-              serviceCenter.serviceCenterCategoryFK ===
-                SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER ||
-              serviceCenter.serviceCenterCategoryFK ===
-                SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE
+              RADIOLOGY_CATEGORY.indexOf(
+                serviceCenter.serviceCenterCategoryFK,
+              ) >= 0
             ) {
               typeName = 'Radiology'
             }

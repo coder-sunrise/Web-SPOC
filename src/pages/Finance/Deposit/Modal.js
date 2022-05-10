@@ -137,7 +137,7 @@ const style = () => ({
     })
   },
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, codetable, isDeposit } = props
+    const { dispatch, onConfirm, codetable, deposit, isDeposit } = props
     const {
       balanceAfter,
       patientDepositTransaction,
@@ -167,10 +167,8 @@ const style = () => ({
       type: 'deposit/updateDeposit',
       payload: {
         ...values,
-        id: hasTransactionBefore ? values.id : undefined,
-        concurrencyToken: hasTransactionBefore
-          ? values.concurrencyToken
-          : undefined,
+        id: deposit?.entity?.id || undefined,
+        concurrencyToken: deposit?.entity?.concurrencyToken,
         balance: balanceAfter,
         patientDepositTransaction: {
           ...restDepositTransaction,
@@ -195,7 +193,10 @@ const style = () => ({
         })
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'deposit/query',
+          type: 'deposit/updateState',
+          payload: {
+            entity: r,
+          },
         })
       }
     })
@@ -213,8 +214,23 @@ class Modal extends PureComponent {
   }
 
   componentDidMount() {
-    const { dispatch, isDeposit } = this.props
-
+    const { dispatch, isDeposit, patient } = this.props
+    // if entry from invoice history - deposit, then need to get by patient.
+    if (patient?.entity?.id) {
+      dispatch({
+        type: 'deposit/getPatientDeposit',
+        payload: {
+          patientProfileFK: patient?.entity?.id,
+        },
+      }).then(r => {
+        dispatch({
+          type: 'deposit/updateState',
+          payload: {
+            entity: r.data,
+          },
+        })
+      })
+    }
     this.fetchLatestBizSessions()
     dispatch({
       type: 'codetable/fetchCodes',
@@ -357,7 +373,7 @@ class Modal extends PureComponent {
 
     return (
       <React.Fragment>
-        <div>
+        <div style={{ margin: 20 }}>
           <GridContainer>
             <GridItem xs={12}>
               <Field

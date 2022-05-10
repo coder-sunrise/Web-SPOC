@@ -113,16 +113,10 @@ class PreOrderList extends PureComponent {
         render: row => {
           return (
             <Tooltip
-              title={
-                row.amount && row.paid === 'Yes'
-                  ? `$${row.amount.toFixed(2)}`
-                  : '-'
-              }
+              title={row.paid === 'Yes' ? `$${row.amount.toFixed(2)}` : '-'}
             >
               <span>
-                {row.amount && row.paid === 'Yes'
-                  ? `$${row.amount.toFixed(2)}`
-                  : '-'}
+                {row.paid === 'Yes' ? `$${row.amount.toFixed(2)}` : '-'}
               </span>
             </Tooltip>
           )
@@ -139,13 +133,13 @@ class PreOrderList extends PureComponent {
             <Tooltip
               title={
                 row.actualizedDate
-                  ? moment(row.actualizedDate).format('DD MMM YYYY hh:mm')
+                  ? moment(row.actualizedDate).format('DD MMM YYYY HH:mm')
                   : '-'
               }
             >
               <span>
                 {row.actualizedDate
-                  ? moment(row.actualizedDate).format('DD MMM YYYY hh:mm')
+                  ? moment(row.actualizedDate).format('DD MMM YYYY HH:mm')
                   : '-'}
               </span>
             </Tooltip>

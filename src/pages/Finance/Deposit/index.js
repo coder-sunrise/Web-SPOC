@@ -22,14 +22,14 @@ const styles = () => ({
   mainDivHeight: global.mainDivHeight,
 }))
 class Deposit extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       hasActiveSession: true,
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.checkHasActiveSession()
     this.queryDepositListing()
   }
@@ -38,7 +38,7 @@ class Deposit extends Component {
     const bizSessionPayload = {
       IsClinicSessionClosed: false,
     }
-    getBizSession(bizSessionPayload).then((result) => {
+    getBizSession(bizSessionPayload).then(result => {
       if (result) {
         const { data } = result.data
         this.setState({ hasActiveSession: data.length > 0 })
@@ -52,14 +52,24 @@ class Deposit extends Component {
       payload: {
         apiCriteria: {
           OnlyWithDeposit: false,
-          startDate: moment().add(-1, 'month').formatUTC(),
-          endDate: moment().endOf('day').formatUTC(false),
+          startDate: moment()
+            .add(-1, 'month')
+            .formatUTC(),
+          endDate: moment()
+            .endOf('day')
+            .formatUTC(false),
         },
       },
     })
   }
+  queryDepositListingOrigin = () => {
+    this.props.dispatch({
+      type: 'deposit/query',
+      payload: {},
+    })
+  }
 
-  render () {
+  render() {
     const { props } = this
     const { classes, mainDivHeight = 700, ...restProps } = props
 
@@ -86,6 +96,7 @@ class Deposit extends Component {
         </div>
         <Grid
           {...restProps}
+          queryDepositListing={this.queryDepositListingOrigin}
           hasActiveSession={this.state.hasActiveSession}
           height={height}
         />

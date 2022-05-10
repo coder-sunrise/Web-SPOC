@@ -5,6 +5,8 @@ import ReactHtmlParser from 'react-html-parser'
 import { withStyles } from '@material-ui/core'
 import { createFromIconfontCN } from '@ant-design/icons'
 import defaultSettings from '@/defaultSettings'
+import ScribbleNote from '@/pages/Shared/ScribbleNote/ScribbleNote'
+import { GridContainer, GridItem, CommonModal, Tooltip } from '@/components'
 
 const styles = () => ({
   '.ant-list-header': {
@@ -20,6 +22,9 @@ const ResultDetails = props => {
   let IconFont = createFromIconfontCN({
     scriptUrl: defaultSettings.iconfontUrl,
   })
+  const [scribbleNoteSelectedData, setSribbleNoteSelectedData] = useState({})
+  const [isShowScribbleNote, setIsShowScribbleNote] = useState(false)
+  const base64Prefix = 'data:image/jpeg;base64,'
   useEffect(() => {
     if (!loaded && showResultDetails && visitId) {
       setLoaded(true)
@@ -31,6 +36,82 @@ const ResultDetails = props => {
       })
     }
   }, [showResultDetails])
+
+  const scribbleLink = scribbleNotes => {
+    if (!scribbleNotes) return null
+    return scribbleNotes.map(o => {
+      let src
+      if (o.thumbnail && o.thumbnail !== '') {
+        src = `${base64Prefix}${o.thumbnail}`
+      }
+      return (
+        <div
+          style={{
+            marginRight: 10,
+            fontSize: '0.85rem',
+          }}
+        >
+          <Tooltip title={o.subject}>
+            <span
+              style={{
+                width: 277,
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                display: 'inline-block',
+                overflow: 'hidden',
+              }}
+            >
+              {o.subject}
+            </span>
+          </Tooltip>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid #CCCCCC',
+              width: 277,
+              height: 152,
+              cursor: 'pointer',
+            }}
+            onClick={() => {
+              viewScribbleNote(o)
+            }}
+          >
+            {src ? (
+              <img src={src} alt={o.subject} width={275} height={150} />
+            ) : (
+              <span>No Image</span>
+            )}
+          </div>
+        </div>
+      )
+    })
+  }
+
+  const viewScribbleNote = scribbleNote => {
+    setSribbleNoteSelectedData(scribbleNote)
+    setIsShowScribbleNote(true)
+    window.g_app._store.dispatch({
+      type: 'scriblenotes/updateState',
+      payload: {
+        showViewScribbleModal: true,
+        isReadonly: true,
+        entity: scribbleNote,
+      },
+    })
+  }
+  const toggleScribbleModal = () => {
+    setIsShowScribbleNote(false)
+    window.g_app._store.dispatch({
+      type: 'scriblenotes/updateState',
+      payload: {
+        showViewScribbleModal: isShowScribbleNote,
+        isReadonly: false,
+      },
+    })
+  }
+
   return (
     <div style={{ height: '100%', overflow: 'auto' }}>
       {data?.labResultDetails && (
@@ -153,11 +234,14 @@ const ResultDetails = props => {
                         </div>
                         <div style={{ display: 'inline-block' }}>
                           {ReactHtmlParser(item.findings)}
+                          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                            {scribbleLink(item.scribbleNotes)}
+                          </div>
                         </div>
                       </div>
                     )}
                     {item.examinationComments && (
-                      <div style={{ color: 'black' }}>
+                      <div style={{ color: 'black', marginTop: 20 }}>
                         <div
                           style={{ fontWeight: 'bold', fontStyle: 'italic' }}
                         >
@@ -175,6 +259,20 @@ const ResultDetails = props => {
           )}
         />
       )}
+      <CommonModal
+        open={isShowScribbleNote}
+        title='Scribble'
+        fullScreen
+        bodyNoPadding
+        observe='ScribbleNotePage'
+        onClose={toggleScribbleModal}
+      >
+        <ScribbleNote
+          {...props}
+          toggleScribbleModal={toggleScribbleModal}
+          scribbleData={scribbleNoteSelectedData}
+        />
+      </CommonModal>
     </div>
   )
 }

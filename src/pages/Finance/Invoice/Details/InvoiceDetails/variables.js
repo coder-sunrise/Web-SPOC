@@ -73,6 +73,7 @@ export const DataGridColExtensions = [
                       height: 20,
                       margin: '0px 1px',
                       display: 'inline-block',
+                      lineHeight: '16px',
                     }}
                   >
                     Pre

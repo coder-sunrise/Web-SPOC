@@ -39,11 +39,14 @@ const initialState = {
     ...sharedMedicationValue,
   },
   defaultService: {
-    unitPrice: 0,
+    editServiceId: undefined,
+    isEdit: false,
+    serviceItems: [],
+    selectCategory: 'All',
+    selectTag: 'All',
+    filterService: '',
     isMinus: true,
-    adjValue: 0,
     isExactAmount: true,
-    isNurseActualizeRequired: false,
   },
   defaultVaccination: {
     vaccinationGivenDate: moment(),
@@ -79,6 +82,8 @@ const initialState = {
     selectCategory: 'All',
     selectTag: 'All',
     filterService: '',
+    isMinus: true,
+    isExactAmount: true,
   },
   defaultLab: {
     editServiceId: undefined,
@@ -87,6 +92,8 @@ const initialState = {
     selectCategory: 'All',
     selectTag: 'All',
     filterService: '',
+    isMinus: true,
+    isExactAmount: true,
   },
 }
 export default createListViewModel({

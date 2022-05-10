@@ -413,16 +413,18 @@ const isPharmacyOrderUpdated = orders => {
     }
   }
 
-  const isPrecationEqual = (newPrecaution = [], currentPrecaution = []) => {
+  const isPrecationEqual = (prePrecaution = [], currentPrecaution = []) => {
     if (
-      newPrecaution.find(x => (!x.id && !x.isDeleted) || (x.id && x.isDeleted))
+      currentPrecaution.find(
+        x => (!x.id && !x.isDeleted) || (x.id && x.isDeleted),
+      )
     ) {
       return false
     }
 
     if (
-      currentPrecaution.find(x =>
-        newPrecaution.find(
+      prePrecaution.find(x =>
+        currentPrecaution.find(
           n =>
             n.id === x.id &&
             n.medicationPrecautionFK !== x.medicationPrecautionFK,

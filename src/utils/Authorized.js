@@ -10,6 +10,9 @@ const reloadAuthorized = () => {
   Authorized = RenderAuthorized(newRights)
 }
 // console.log('RenderAuthorized', RenderAuthorized)
-
-export { reloadAuthorized }
+const HiddenWhenDisable = [
+  'queue.consultation.form',
+  'queue.servepatient',
+]
+export { reloadAuthorized, HiddenWhenDisable }
 export default Authorized

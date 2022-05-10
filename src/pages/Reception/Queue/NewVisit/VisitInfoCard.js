@@ -130,6 +130,10 @@ const VisitInfoCard = ({
     return ''
   }
 
+  console.log(values)
+  const isPrimaryDoctorConsultated =
+    restProps.values?.visitPrimaryDoctor &&
+    restProps.values?.visitPrimaryDoctor?.consultationStatus !== 'Waiting'
   const getVisitOrderTemplateTotal = (vType, template) => {
     let activeItemTotal = 0
     visitOrderTemplateItemTypes.forEach(type => {
@@ -345,7 +349,9 @@ const VisitInfoCard = ({
             name={FormField['visit.doctorProfileFk']}
             render={args => (
               <DoctorProfileSelect
-                disabled={isVisitReadonlyAfterSigned || isDoctorConsulted}
+                disabled={
+                  isVisitReadonlyAfterSigned || isPrimaryDoctorConsultated
+                }
                 authority='none'
                 onChange={(v, op = {}) => handleDoctorChange(v, op)}
                 label={

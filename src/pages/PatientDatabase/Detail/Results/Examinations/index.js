@@ -14,6 +14,7 @@ const Examinations = props => {
   const [category, setCategory] = useState('Lab')
   const [currentPage, setCurrentPage] = useState(1)
   const [data, setData] = useState([])
+  const [activeKey, setActiveKey] = useState([])
   const [allRetrieved, setAllRetrieved] = useState(false)
   const [firstLoad, setFirstLoad] = useState(false)
   const [filterCondition, setFilterCondition] = useState(undefined)
@@ -69,18 +70,33 @@ const Examinations = props => {
             })
           } else {
             setData([])
+            setActiveKey([])
           }
         } else {
           if (response.data?.length < 10) {
             setAllRetrieved(true)
           }
-          if (append) setData(_.concat(data, response.data))
-          else {
+
+          if (append) {
+            setData(_.concat(data, response.data))
+            setActiveKey(
+              _.concat(
+                activeKey,
+                response.data.filter(t => !t.isAcknowledged).map(x => x.id),
+              ),
+            )
+          } else {
             setData(response.data)
+            setActiveKey(
+              response.data.filter(t => !t.isAcknowledged).map(x => x.id),
+            )
           }
         }
       }
     })
+  }
+  const examinationPanelOnChange = key => {
+    setActiveKey(key)
   }
   const loadMore = () => {
     const newPage = currentPage + 1
@@ -152,6 +168,8 @@ const Examinations = props => {
           <LabExaminations
             acknowledge={acknowledge}
             data={data}
+            activeKey={activeKey}
+            examinationPanelOnChange={examinationPanelOnChange}
           ></LabExaminations>
         )}
         {category === 'Radiology' && (

@@ -466,6 +466,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
           }
         }}
         bordered
+        className='noBgTable'
         columns={columns}
         dataSource={groupedTestPanels}
         pagination={false}

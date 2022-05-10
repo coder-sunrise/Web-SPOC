@@ -54,10 +54,17 @@ export const SpecimenTable = props => {
         size='small'
         title={() => {
           return (
-            <p>
-              <h5 style={{ display: 'inline-block', fontWeight: '500' }}>
+            <p style={{ marginTop: 10 }}>
+              <span
+                style={{
+                  display: 'inline-block',
+                  color: '#4255bd',
+                  fontSize: 14,
+                  fontWeight: '500',
+                }}
+              >
                 Specimen Details
-              </h5>
+              </span>
             </p>
           )
         }}

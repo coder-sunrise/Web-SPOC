@@ -40,7 +40,7 @@ import { getClinicianProfile } from './utils'
   validationSchema: Yup.object().shape({
     referralDate: Yup.date().required(),
     referredByUserFK: Yup.number().required(),
-    to: Yup.string().required(),
+    // to: Yup.string().required(),
     // address: Yup.string().required(),
     subject: Yup.string().required(),
     content: Yup.string().required(),
@@ -65,12 +65,12 @@ class ReferralLetter extends PureComponent {
     editorReferece: {},
   }
 
-  setEditorReference = (ref) => {
+  setEditorReference = ref => {
     this.setState({ editorReferece: ref })
     // this.editorReferece = ref
   }
 
-  render () {
+  render() {
     const {
       currentType,
       footer,
@@ -86,7 +86,7 @@ class ReferralLetter extends PureComponent {
           <GridItem xs={6}>
             <FastField
               name='referralDate'
-              render={(args) => {
+              render={args => {
                 return <DatePicker label='Date' autoFocus {...args} />
               }}
             />
@@ -96,7 +96,7 @@ class ReferralLetter extends PureComponent {
           <GridItem xs={6}>
             <FastField
               name='to'
-              render={(args) => {
+              render={args => {
                 return <TextField label='To' {...args} />
               }}
             />
@@ -104,7 +104,7 @@ class ReferralLetter extends PureComponent {
           <GridItem xs={6}>
             <FastField
               name='referredByUserFK'
-              render={(args) => {
+              render={args => {
                 return <ClinicianSelect label='From' disabled {...args} />
               }}
             />
@@ -112,7 +112,7 @@ class ReferralLetter extends PureComponent {
           <GridItem xs={12}>
             <FastField
               name='address'
-              render={(args) => {
+              render={args => {
                 return (
                   <TextField label='Address' multiline rowsMax={3} {...args} />
                 )
@@ -122,7 +122,7 @@ class ReferralLetter extends PureComponent {
           <GridItem xs={12}>
             <FastField
               name='subject'
-              render={(args) => {
+              render={args => {
                 return <TextField label='Subject' {...args} />
               }}
             />
@@ -137,7 +137,7 @@ class ReferralLetter extends PureComponent {
 
             <FastField
               name='content'
-              render={(args) => {
+              render={args => {
                 const cfg = {}
                 if (height && height > 495) {
                   cfg.height = height - 545

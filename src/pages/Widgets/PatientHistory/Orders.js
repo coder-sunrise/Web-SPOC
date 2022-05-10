@@ -40,7 +40,19 @@ const urgentIndicator = (row, right) => {
     )
   )
 }
-
+const showCurrency = (value = 0) => {
+  if (value >= 0)
+    return (
+      <div style={{ color: 'darkBlue', fontWeight: 500 }}>
+        {`${currencySymbol}${numeral(value).format('0,0.00')}`}
+      </div>
+    )
+  return (
+    <div style={{ color: 'red', fontWeight: 500 }}>
+      {`(${currencySymbol}${numeral(value * -1).format('0,0.00')})`}
+    </div>
+  )
+}
 export default ({ current, classes, showDrugLabelRemark }) => {
   return (
     <div style={{ marginBottom: 8, marginTop: 8 }}>
@@ -174,15 +186,14 @@ export default ({ current, classes, showDrugLabelRemark }) => {
                 <div style={{ position: 'relative' }}>
                   <div
                     style={{
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
                       paddingRight: existsDrugLabelRemarks ? 10 : 0,
                       minHeight: 20,
                     }}
                   >
                     <Tooltip title={row.remarks || ' '}>
-                      <span> {row.remarks || ' '}</span>
+                      <span className='oneline_textblock'>
+                        {row.remarks || ' '}
+                      </span>
                     </Tooltip>
                   </div>
                   <div style={{ position: 'relative', top: 6 }}>
@@ -250,38 +261,19 @@ export default ({ current, classes, showDrugLabelRemark }) => {
             title: 'Adj.',
             width: 100,
             align: 'right',
-            render: (text, row) => (
-              <div
-                style={{
-                  color: 'darkBlue',
-                  fontWeight: 500,
-                }}
-              >
-                {`${currencySymbol}${numeral(row.adjAmt || 0).format(
-                  '0,0.00',
-                )}`}
-              </div>
-            ),
+            render: (text, row) => showCurrency(row.adjAmt),
           },
           {
             dataIndex: 'totalAfterItemAdjustment',
             title: 'Total',
             width: 100,
             align: 'right',
-            render: (text, row) => (
-              <div
-                style={{
-                  color: 'darkBlue',
-                  fontWeight: 500,
-                }}
-              >
-                {`${currencySymbol}${numeral(
-                  (row.isPreOrder && !row.isChargeToday) || row.hasPaid
-                    ? 0
-                    : row.totalAfterItemAdjustment || 0,
-                ).format('0,0.00')}`}
-              </div>
-            ),
+            render: (text, row) =>
+              showCurrency(
+                (row.isPreOrder && !row.isChargeToday) || row.hasPaid
+                  ? 0
+                  : row.totalAfterItemAdjustment,
+              ),
           },
         ]}
         dataSource={current.orders || []}

@@ -874,6 +874,14 @@ textarea[class*='MuiInputBase-input-'] {
   overflow: hidden;
 }
 
+.oneline_textblock {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  white-space: pre-wrap;
+  overflow: hidden;
+}
+
 .ant-list-split .ant-list-item {
   border-bottom: 1px solid #c0c0c0;
 }
@@ -928,4 +936,44 @@ textarea[class*='MuiInputBase-input-'] {
 
 .custom_pro .ant-table-tbody tr:nth-child(odd) td {
   background-color: #f0f5ff !important;
+}
+.ant-pro-global-header .ant-breadcrumb ol {
+  padding-left: 0;
+}
+.ant-collapse-header {
+  font-size: 14px;
+  color: #363636 !important;
+  font-weight: 550;
+  background-color: #daecf5 !important;
+}
+
+.ant-collapse-item {
+  margin-bottom: 5px;
+}
+
+.ant-table-small .ant-table-thead>tr>th {
+  background-color: white;
+}
+
+.ant-collapse>.ant-collapse-item>.ant-collapse-header {
+  padding: 8px 16px
+}
+
+.ant-table-footer {
+  background-color: white;
+}
+
+.ant-table-tbody tr:nth-child(odd) {
+  background-color: #f0f5ff;
+}
+
+.ant-table-tbody tr:nth-child(odd) td {
+  background-color: #f0f5ff;
+}
+.noBgTable .ant-table-tbody tr:nth-child(odd) {
+  background-color: transparent;
+}
+
+.noBgTable .ant-table-tbody tr:nth-child(odd) td {
+  background-color: transparent;
 }

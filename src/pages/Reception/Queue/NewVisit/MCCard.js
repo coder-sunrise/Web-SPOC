@@ -36,9 +36,9 @@ const MCCard = ({
   validateReportLanguage,
 }) => {
   const commitChanges = ({ rows }) => {
-    setFieldValue('visitDoctor', rows)
-    return rows
-  }
+                                        setFieldValue('visitDoctor', rows)
+                                        return rows
+                                      }
 
   const getReportLanguage = () => {
     const {
@@ -88,17 +88,25 @@ const MCCard = ({
     },
   ]
 
-  if (!fromMedicalCheckupReporting && !isDoctorConsulted) {
-    columns.push({ name: 'action', title: ' ' })
-  }
-
+  const mcWorkItemInProgress =
+    values?.medicalCheckupWorkitem &&
+    values?.medicalCheckupWorkitem.length > 0 &&
+    (values?.medicalCheckupWorkitem[0].statusFK === 1 ||
+      values?.medicalCheckupWorkitem[0].statusFK === 2)
+  columns.push({ name: 'action', title: ' ' })
   const columnExtension = [
     {
       columnName: 'doctorProfileFK',
       sortingEnabled: false,
       type: 'codeSelect',
       code: 'doctorprofile',
-      isDisabled: row => fromMedicalCheckupReporting || isDoctorConsulted,
+      isDisabled: row => {
+        // As long as current reporting doctor is not in Waiting status then able to edit and remove.
+        if (row.id > 0 && row.consultationStatus !== 'Waiting') {
+          return true
+        }
+        return false
+      },
       labelField: 'clinicianProfile.name',
       localFilter: o => o.clinicianProfile.isActive,
       renderDropdown: option => <DoctorLabel doctor={option} />,
@@ -107,11 +115,17 @@ const MCCard = ({
       columnName: 'action',
       width: 60,
       isReactComponent: true,
+      isDisabled: row => {
+        return true
+      },
       sortingEnabled: false,
       render: e => {
         const { row, columnConfig } = e
         const { control } = columnConfig
         const { commitChanges } = control
+        if (row.id > 0 && row.consultationStatus !== 'Waiting') {
+          return ''
+        }
         return (
           <Popconfirm
             title='Confirm to delete?'
@@ -133,6 +147,11 @@ const MCCard = ({
       },
     },
   ]
+  // As long as MC visit still in Reporting / In Progress status
+  // and edit visit from MC reporting page then allow user to add reporting doctor.
+  let showAddCommand = fromMedicalCheckupReporting
+    ? mcWorkItemInProgress
+    : !isVisitReadonlyAfterSigned && !isDoctorConsulted
   return (
     <GridContainer alignItems='center'>
       <GridItem xs md={12} container>
@@ -205,9 +224,7 @@ const MCCard = ({
           rows={values.visitDoctor}
           EditingProps={{
             showCommandColumn: false,
-            showAddCommand: fromMedicalCheckupReporting
-              ? false
-              : !isVisitReadonlyAfterSigned && !isDoctorConsulted,
+            showAddCommand: showAddCommand,
             onCommitChanges: commitChanges,
           }}
           schema={reportingDoctorSchema}

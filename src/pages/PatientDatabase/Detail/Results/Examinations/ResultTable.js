@@ -25,19 +25,57 @@ export const ResultTable = props => {
     {
       title: 'Result',
       dataIndex: 'FinalResult',
-      width: 150,
+      align: 'right',
+      width: 200,
       render: (text, row) => {
+        const title = (
+          <div>
+            <div>Final Result: {text}</div>
+            {row.ResultBeforeInterpretation && (
+              <div>Raw Result: {row.ResultBeforeInterpretation || '-'}</div>
+            )}
+          </div>
+        )
         if (row.ShouldFlag) {
           return (
-            <span style={{ color: 'red' }}>
-              <span style={{ marginRight: 10, display: 'inline-block' }}>
-                {text}
+            <Tooltip placement='right' title={title}>
+              <span
+                style={{
+                  color: 'red',
+                  display: 'inline-block',
+                  textAlign: 'right',
+                  width: '100%',
+                }}
+              >
+                <span style={{ marginRight: 10, display: 'inline-block' }}>
+                  {text}
+                  {row.ResultBeforeInterpretation && (
+                    <span>{` (${row.ResultBeforeInterpretation || '-'})`}</span>
+                  )}
+                </span>
+                <span>*</span>
               </span>
-              <span>*</span>
-            </span>
+            </Tooltip>
           )
         } else {
-          return <span>{text}</span>
+          return (
+            <Tooltip
+              title={title}
+              placement='right'
+              style={{
+                display: 'inline-block',
+                textAlign: 'right',
+                width: '100%',
+              }}
+            >
+              <span>
+                {text}
+                {row.ResultBeforeInterpretation && (
+                  <span>{` (${row.ResultBeforeInterpretation || '-'})`}</span>
+                )}
+              </span>
+            </Tooltip>
+          )
         }
       },
     },
@@ -95,18 +133,27 @@ export const ResultTable = props => {
             <div
               style={{
                 display: 'flex',
+                marginTop: 10,
                 flexDirection: 'row',
                 justifyContent: 'space-between',
               }}
             >
               <div>
-                <h5 style={{ display: 'inline-block', fontWeight: '500' }}>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    color: '#4255bd',
+                    fontSize: 14,
+                    fontWeight: '500',
+                  }}
+                >
                   Result
-                </h5>
+                </span>
                 <Checkbox
                   style={{
                     display: 'inline-block',
                     marginLeft: 10,
+                    display: 'none',
                     marginRight: 10,
                   }}
                   label='Display Raw Data'
@@ -115,7 +162,9 @@ export const ResultTable = props => {
                     setShowRowData(e.target.value)
                   }}
                 />
-                Last Verified By:
+                <span style={{ display: 'inline-block', marginLeft: 10 }}>
+                  Last Verified By:
+                </span>
                 <span style={{ display: 'inline-block', marginLeft: 10 }}>
                   {data.lastVerifiedBy}
                 </span>
@@ -128,6 +177,7 @@ export const ResultTable = props => {
                       <Button
                         color='primary'
                         size='sm'
+                        style={{ position: 'relative', top: -5 }}
                         onClick={() => {
                           acknowledge(data.id)
                         }}

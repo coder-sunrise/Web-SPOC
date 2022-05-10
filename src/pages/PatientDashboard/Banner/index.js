@@ -129,11 +129,13 @@ class Banner extends PureComponent {
   }
 
   componentWillUnmount() {
-    const { dispatch } = this.props
-    dispatch({
-      type: 'patient/updateState',
-      payload: { entity: null },
-    })
+    const { dispatch, isDisposePatientEntity = true } = this.props
+    if (isDisposePatientEntity) {
+      dispatch({
+        type: 'patient/updateState',
+        payload: { entity: null },
+      })
+    }
   }
 
   getAllergyData() {
@@ -141,7 +143,9 @@ class Banner extends PureComponent {
     const { entity } = patient
     const { info } = entity
     const { patientAllergy = [], patientAllergyMetaData = [] } = entity
-    const da = _.orderBy(patientAllergy, ['type'], ['asc'])
+    const da = _.orderBy(patientAllergy, ['type'], ['asc']).filter(
+      t => t.patientAllergyStatusFK === 1,
+    )
     const allergyData = da.reduce((data, current) => {
       if (!data) return current.allergyName
       return `${data}, ${current.allergyName}`

@@ -7,6 +7,9 @@ trigger: none
 
 pool:
   name: 'Medicloud'
+  demands:
+  - EnableBuild # Check if exists
+  - EnableBuild -equals True
 
 variables:
   #override the npm_config_cache environment variable to the custom path

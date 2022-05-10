@@ -366,7 +366,9 @@ export default createListViewModel({
         const { status, data } = result
         if (parseInt(status, 10) === 200) {
           const { id, recurrenceDto, recurrenceFK, ...restData } = data
-          let appointmentDate = moment().formatUTC()
+          let appointmentDate = moment()
+            .startOf('day')
+            .formatUTC()
           let apptResources = [...data.appointments[0].appointments_Resources]
           if (updateReource) {
             const codetable = yield select(st => st.codetable)
@@ -379,7 +381,9 @@ export default createListViewModel({
               view,
             } = updateReource
 
-            appointmentDate = moment(newStartTime).formatUTC()
+            appointmentDate = moment(newStartTime)
+              .startOf('day')
+              .formatUTC()
             let updateResource = apptResources.find(
               r => r.id === updateApptResourceId,
             )

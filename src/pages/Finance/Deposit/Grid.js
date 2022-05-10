@@ -127,11 +127,13 @@ class Grid extends PureComponent {
         },
       })
     } else {
+      const currentDeposit = list.find(o => o.id === row.id)
+      const { patientProfileFK } = currentDeposit
       dispatch({
         type: 'deposit/updateState',
         payload: {
           showModal: true,
-          entity: list.find(o => o.id === row.id),
+          entity: { patientProfileFK },
         },
       })
     }
@@ -146,12 +148,20 @@ class Grid extends PureComponent {
     this.setState(prevState => ({
       showDepositRefundModal: !prevState.showDepositRefundModal,
     }))
+    const { queryDepositListing } = this.props
+    if (queryDepositListing) {
+      queryDepositListing()
+    }
   }
 
   togglePatientDepositModal = () => {
     this.setState(prevState => ({
       showPatientDeposit: !prevState.showPatientDeposit,
     }))
+    const { queryDepositListing } = this.props
+    if (queryDepositListing) {
+      queryDepositListing()
+    }
   }
 
   rowDoubleClick = row => {

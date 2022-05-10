@@ -18,6 +18,8 @@ import {
   RadioGroup,
 } from '@/components'
 import { ICD10DiagnosisSelect } from '@/components/_medisys'
+import OrderText from './OrderText'
+import { hasValue } from '../PatientHistory/config'
 
 const ICD10DiagnosisItem = ({
   dispatch,
@@ -32,6 +34,7 @@ const ICD10DiagnosisItem = ({
   uid,
   icD10DiagnosisCode,
   defaultLanguage,
+  orders,
 }) => {
   const [show, setShow] = useState(false)
 
@@ -305,7 +308,11 @@ const ICD10DiagnosisItem = ({
             }}
           />
         </GridItem>
-        <GridItem xs={12}>
+        <GridItem
+          xs={12}
+          container
+          style={{ paddingRight: 40, position: 'relative' }}
+        >
           <FastField
             name={`corDiagnosis[${index}].remarks`}
             render={args => {
@@ -314,6 +321,25 @@ const ICD10DiagnosisItem = ({
               )
             }}
           />
+          <div style={{ position: 'absolute', bottom: 2, right: 10 }}>
+            <OrderText
+              orders={orders}
+              onSelectItem={selectItem => {
+                const remarks = form.values.corDiagnosis[index].remarks
+                if (hasValue(remarks) && remarks.trim().length !== '') {
+                  form.setFieldValue(
+                    `corDiagnosis[${index}].remarks`,
+                    `${remarks} ${selectItem}`,
+                  )
+                } else {
+                  form.setFieldValue(
+                    `corDiagnosis[${index}].remarks`,
+                    selectItem,
+                  )
+                }
+              }}
+            />
+          </div>
         </GridItem>
       </GridContainer>
     </Paper>

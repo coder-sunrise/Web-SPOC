@@ -156,6 +156,7 @@ export default ({
           render={args => (
             <RadioGroup
               label='Vision Correction Method'
+              isAllowReset
               options={[
                 { value: 'Contact Lens', label: 'Contact Lens' },
                 { value: 'Glasses', label: 'Glasses' },
@@ -211,6 +212,7 @@ export default ({
               name={`corEyeExaminations[0].colorVisionTestResult`}
               render={args => (
                 <RadioGroup
+                  isAllowReset
                   label='Color Vision Test Result'
                   options={[
                     { value: 'Normal', label: 'Normal' },

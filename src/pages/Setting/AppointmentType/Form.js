@@ -169,6 +169,12 @@ export default withFormikExtend({
           if (onConfirm) onConfirm()
           dispatch({
             type: 'settingAppointmentType/query',
+            payload:{
+              sorting: [
+                { columnName: 'isDefault', direction: 'desc' },
+                { columnName: 'displayValue', direction: 'asc' },
+              ],
+            }
           })
         }
       })

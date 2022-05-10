@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import _ from 'lodash'
 import { isNumber } from 'util'
 import { Link } from 'umi'
-import { Tag, Alert } from 'antd'
+import { Tag, Alert, Checkbox } from 'antd'
 import { withStyles } from '@material-ui/core'
 import {
   GridContainer,
@@ -13,7 +13,6 @@ import {
   NumberInput,
   withFormikExtend,
   Switch,
-  Checkbox,
   RadioGroup,
   FastField,
   Field,
@@ -29,6 +28,8 @@ import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
 import { CANNED_TEXT_TYPE, SERVICE_CENTER_CATEGORY } from '@/utils/constants'
 import { LAB_WORKITEM_STATUS } from '@/utils/constants'
 import CannedTextButton from './CannedTextButton'
+import { CloseCircleOutlined } from '@ant-design/icons'
+import { queryList } from '@/services/common'
 
 const { CheckableTag } = Tag
 
@@ -64,12 +65,16 @@ const styles = theme => ({
   tag: {
     border: '1px solid rgba(0, 0, 0, 0.42)',
     fontSize: '0.85rem',
-    padding: '3px 10px',
+    padding: '3px 6px',
     marginBottom: 2,
+    maxWidth: 100,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   groupPanel: {
     margin: '0px 5px',
-    maxHeight: 170,
+    maxHeight: 175,
     overflowY: 'auto',
     overflowX: 'hidden',
   },
@@ -79,13 +84,10 @@ const styles = theme => ({
     borderRadius: 4,
     margin: 3,
     padding: '0px 6px',
-    width: 185,
-    alignItems: 'right',
-    position: 'relative',
     height: 28,
   },
   checkServiceLabel: {
-    width: 155,
+    maxWidth: 150,
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -95,10 +97,9 @@ const styles = theme => ({
   },
   checkServiceCheckBox: {
     display: 'inline-block',
-    marginRight: '-16px',
-    position: 'absolute',
-    top: '-3px',
-    right: 0,
+    marginLeft: 6,
+    position: 'relative',
+    top: '-6px',
   },
   legend: {
     width: 'fit-content',
@@ -106,6 +107,15 @@ const styles = theme => ({
     margin: `${theme.spacing(1)}px ${theme.spacing(1)}px 0px`,
     padding: `0px ${theme.spacing(1)}px`,
     fontWeight: 500,
+  },
+  tagsGroupPanel: {
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    maxHeight: 105,
+  },
+  selectedServiceLabel: {
+    display: 'inline-block',
+    marginRight: 10,
   },
 })
 
@@ -133,6 +143,15 @@ const getVisitDoctorUserId = props => {
     const v = {
       ...(orders.entity || orders.defaultLab),
     }
+    if (orders.entity) {
+      if (v.adjValue <= 0) {
+        v.adjValue = Math.abs(v.adjValue || 0)
+        v.isMinus = true
+      } else {
+        v.isMinus = false
+      }
+      v.isExactAmount = v.adjType !== 'Percentage'
+    }
     return {
       ...v,
       type,
@@ -146,11 +165,11 @@ const getVisitDoctorUserId = props => {
       then: Yup.number().required(),
     }),
     quantity: Yup.number().when('editServiceId', {
-      is: val => val,
+      is: val => val && val !== '',
       then: Yup.number().required(),
     }),
     total: Yup.number().when('editServiceId', {
-      is: val => val,
+      is: val => val && val !== '',
       then: Yup.number().required(),
     }),
     totalAfterItemAdjustment: Yup.number().when('editServiceId', {
@@ -201,38 +220,62 @@ class Lab extends PureComponent {
   constructor(props) {
     super(props)
     const { dispatch } = props
-
+    this.scroll = React.createRef()
     this.state = {
       services: [],
       serviceCenters: [],
       serviceCenterServices: [],
-      serviceTags: [],
-      serviceCategories: [],
-      serviceTestCategories: [],
-      isPreOrderItemExists: false,
-    }
-
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctservice',
-        force: true,
-        filter: {
-          'serviceFKNavigation.IsActive': true,
-          'serviceCenterFKNavigation.IsActive': true,
-          combineCondition: 'and',
-          apiCriteria: { ServiceCenterType: 'Lab' },
+      serviceTestCategories: [
+        {
+          value: 'All',
+          name: 'All',
+          serviceTags: [],
         },
-      },
-    }).then(list => {
+      ],
+      isPreOrderItemExists: false,
+      currentPage: 1,
+    }
+    this.setResource()
+  }
+
+  componentDidMount() {
+    if (this.scroll) {
+      this.scroll.addEventListener('scroll', e => {
+        const { clientHeight, scrollHeight, scrollTop } = e.target
+        const isBottom = scrollTop + clientHeight + 20 > scrollHeight
+        if (
+          isBottom &&
+          this.state.currentPage * 50 < this.getFilterServices().length
+        ) {
+          this.setState(pre => {
+            return { currentPage: pre.currentPage + 1 }
+          })
+        }
+      })
+
+      this.resetPage()
+    }
+  }
+
+  setResource = async () => {
+    const response = await queryList('/api/ctservice', {
+      'serviceFKNavigation.IsActive': true,
+      'serviceCenterFKNavigation.IsActive': true,
+      combineCondition: 'and',
+      apiCriteria: { ServiceCenterType: 'Lab' },
+      sorting: [
+        { columnName: 'serviceFKNavigation.displayValue', direction: 'asc' },
+      ],
+      pagesize: 99999,
+    })
+    if (response.status === '200') {
       const {
         services = [],
         serviceCenters = [],
         serviceCenterServices = [],
-        serviceCategories = [],
         serviceTags = [],
         serviceTestCategories,
-      } = getServices(list)
+      } = getServices(response.data.data || [])
 
       const newServices = services.reduce((p, c) => {
         const { value: serviceFK, name } = c
@@ -255,17 +298,12 @@ class Lab extends PureComponent {
         services: newServices,
         serviceCenters,
         serviceCenterServices,
-        serviceTags: [{ value: 'All', name: 'All' }, ...serviceTags],
-        serviceCategories: [
-          { value: 'All', name: 'All' },
-          ...serviceCategories,
-        ],
         serviceTestCategories: [
-          { value: 'All', name: 'All' },
+          { value: 'All', name: 'All', serviceTags: [...serviceTags] },
           ...serviceTestCategories,
         ],
       })
-    })
+    }
   }
 
   getServiceCenterService = editService => {
@@ -383,25 +421,30 @@ class Lab extends PureComponent {
       labItems.filter(
         r =>
           r.serviceCenterFK &&
+          r.quantity !== '' &&
           r.quantity >= 0 &&
+          r.total !== '' &&
           r.total >= 0 &&
           r.totalAfterItemAdjustment >= 0,
       ).length !== labItems.length
     )
       return
     handleSubmit()
+    this.resetPage()
   }
 
-  isValidate = service => {
+  isValidate = serviceFK => {
     const { values } = this.props
     const { labItems = [] } = values
-    let checkedLab = labItems.find(r => r.serviceFK === service.value)
+    let checkedLab = labItems.find(r => r.serviceFK === serviceFK)
     if (!checkedLab) {
       return true
     }
     if (
       checkedLab.serviceCenterFK &&
+      checkedLab.quantity !== '' &&
       checkedLab.quantity >= 0 &&
+      checkedLab.total !== '' &&
       checkedLab.total >= 0 &&
       checkedLab.totalAfterItemAdjustment >= 0
     ) {
@@ -415,6 +458,9 @@ class Lab extends PureComponent {
     setFieldValue('editServiceId', selectLab.serviceFK)
     setFieldValue('serviceCenterFK', selectLab.serviceCenterFK)
     setFieldValue('quantity', selectLab.quantity)
+    setFieldValue('isMinus', selectLab.isMinus)
+    setFieldValue('adjValue', selectLab.adjValue)
+    setFieldValue('isExactAmount', selectLab.isExactAmount)
     setFieldValue('total', selectLab.total)
     setFieldValue(
       'totalAfterItemAdjustment',
@@ -456,6 +502,62 @@ class Lab extends PureComponent {
     }
   }
 
+  getFilterServices = () => {
+    const { values = {} } = this.props
+    const { services = [] } = this.state
+
+    const {
+      isEdit,
+      editServiceId,
+      filterService = '',
+      selectCategory,
+      selectTag,
+    } = values
+    let filterServices = []
+
+    if (isEdit) {
+      filterServices = services.filter(s => s.value === editServiceId)
+    } else {
+      filterServices = services.filter(
+        s =>
+          (selectTag === 'All' ||
+            s.serviceTags.find(st => st.value === selectTag)) &&
+          (selectCategory === 'All' ||
+            s.serviceTestCategories.find(p => p.value === selectCategory)) &&
+          (s.code.toUpperCase().indexOf(filterService.toUpperCase()) >= 0 ||
+            s.name.toUpperCase().indexOf(filterService.toUpperCase()) >= 0),
+      )
+    }
+    filterServices = _.orderBy(
+      filterServices,
+      ['isAutoDisplayInOrderCart', item => (item.name || '').toUpperCase()],
+      ['desc', 'asc'],
+    )
+    return filterServices
+  }
+
+  resetSelectItem = () => {
+    const { setFieldValue } = this.props
+    const { isPreOrderItemExists } = this.state
+    setFieldValue('editServiceId', undefined)
+    setFieldValue('serviceCenterFK', undefined)
+    setFieldValue('quantity', undefined)
+    setFieldValue('isMinus', true)
+    setFieldValue('adjValue', undefined)
+    setFieldValue('isExactAmount', true)
+    setFieldValue('total', undefined)
+    setFieldValue('totalAfterItemAdjustment', undefined)
+    if (isPreOrderItemExists)
+      this.setState({
+        isPreOrderItemExists: false,
+      })
+  }
+
+  resetPage = () => {
+    this.scroll.scrollTo(0, 0)
+    this.setState({ currentPage: 1 })
+  }
+
   render() {
     const {
       theme,
@@ -469,10 +571,9 @@ class Lab extends PureComponent {
     const {
       services = [],
       serviceCenters = [],
-      serviceCategories = [],
       serviceTestCategories = [],
-      serviceTags = [],
       isPreOrderItemExists,
+      currentPage = 1,
     } = this.state
     const {
       labItems = [],
@@ -489,22 +590,6 @@ class Lab extends PureComponent {
 
     const selectService = labItems.map(r => r.serviceName).join(', ')
     const editService = labItems.find(r => r.serviceFK === editServiceId) || {}
-    let filterServices = []
-
-    if (isEdit) {
-      filterServices = services.filter(s => s.value === editServiceId)
-    } else {
-      filterServices = services.filter(
-        s =>
-          labItems.find(r => r.serviceFK === s.value) ||
-          ((selectTag === 'All' ||
-            s.serviceTags.find(st => st.value === selectTag)) &&
-            (selectCategory === 'All' ||
-              s.serviceTestCategories.find(p => p.value === selectCategory)) &&
-            (s.code.toUpperCase().indexOf(filterService.toUpperCase()) >= 0 ||
-              s.name.toUpperCase().indexOf(filterService.toUpperCase()) >= 0)),
-      )
-    }
 
     const isDisabledHasPaidPreOrder =
       editService?.actualizedPreOrderItemFK && editService?.hasPaid == true
@@ -527,8 +612,22 @@ class Lab extends PureComponent {
       labWorkitems.filter(item => item.statusFK !== LAB_WORKITEM_STATUS.NEW)
         .length > 0
 
-    console.log('Lab-module logs: edit service', editService, isStartedLab)
-
+    const debouncedFilterChangeAction = _.debounce(
+      e => {
+        setFieldValue('filterService', e.target.value)
+        this.resetPage()
+      },
+      100,
+      {
+        leading: true,
+        trailing: false,
+      },
+    )
+    const filterServices = this.getFilterServices()
+    let showItemCount = currentPage * 50
+    if (showItemCount > filterServices.length) {
+      showItemCount = filterServices.length
+    }
     return (
       <Authorized
         authority={GetOrderItemAccessRight(
@@ -548,7 +647,7 @@ class Lab extends PureComponent {
                 >
                   Category:
                 </div>
-                <div>
+                <div className={classes.tagsGroupPanel}>
                   {serviceTestCategories.map(category =>
                     isEdit ? (
                       <Tag
@@ -565,7 +664,9 @@ class Lab extends PureComponent {
                             : undefined
                         }
                       >
-                        {category.name}
+                        <Tooltip title={category.name}>
+                          <span>{category.name}</span>
+                        </Tooltip>
                       </Tag>
                     ) : (
                       <CheckableTag
@@ -579,11 +680,16 @@ class Lab extends PureComponent {
                               : '1px solid rgba(0, 0, 0, 0.42)',
                         }}
                         onChange={checked => {
-                          if (!isEdit && checked)
+                          if (!isEdit && checked) {
                             setFieldValue('selectCategory', category.value)
+                            setFieldValue('selectTag', 'All')
+                            this.resetPage()
+                          }
                         }}
                       >
-                        {category.name}
+                        <Tooltip title={category.name}>
+                          <span>{category.name}</span>
+                        </Tooltip>
                       </CheckableTag>
                     ),
                   )}
@@ -591,17 +697,20 @@ class Lab extends PureComponent {
               </div>
             </GridItem>
             <GridItem xs={12}>
-              <div
-                style={{ marginTop: 10, position: 'relative', paddingLeft: 70 }}
-              >
+              <div style={{ position: 'relative', paddingLeft: 70 }}>
                 <div
                   className={classes.subTitle}
                   style={{ position: 'absolute', left: 0, top: 2 }}
                 >
                   Tag:
                 </div>
-                <div>
-                  {serviceTags.map(tag =>
+                <div className={classes.tagsGroupPanel}>
+                  {[
+                    { value: 'All', name: 'All' },
+                    ...(serviceTestCategories.find(
+                      c => c.value === selectCategory,
+                    )?.serviceTags || []),
+                  ].map(tag =>
                     isEdit ? (
                       <Tag
                         className={classes.tag}
@@ -613,7 +722,9 @@ class Lab extends PureComponent {
                         }}
                         color={selectTag === tag.value ? '#4255bd' : undefined}
                       >
-                        {tag.name}
+                        <Tooltip title={tag.name}>
+                          <span>{tag.name}</span>
+                        </Tooltip>
                       </Tag>
                     ) : (
                       <CheckableTag
@@ -627,33 +738,46 @@ class Lab extends PureComponent {
                               : '1px solid rgba(0, 0, 0, 0.42)',
                         }}
                         onChange={checked => {
-                          if (!isEdit && checked)
+                          if (!isEdit && checked) {
                             setFieldValue('selectTag', tag.value)
+                            this.resetPage()
+                          }
                         }}
                       >
-                        {tag.name}
+                        <Tooltip title={tag.name}>
+                          <span>{tag.name}</span>
+                        </Tooltip>
                       </CheckableTag>
                     ),
                   )}
                 </div>
               </div>
             </GridItem>
-            <GridItem xs={12}>
+            <GridItem xs={12} container>
               <Field
                 name='filterService'
                 render={args => {
                   return (
                     <TextField
+                      style={{ width: 300, display: 'inline-block' }}
                       label='Filter by service code, name'
-                      onChange={e => {
-                        setFieldValue('filterService', e.target.value)
-                      }}
+                      onChange={debouncedFilterChangeAction}
                       disabled={isEdit}
                       {...args}
                     />
                   )
                 }}
               />
+              {!isEdit && (
+                <div
+                  style={{
+                    position: 'relative',
+                    top: 22,
+                    display: 'inline-block',
+                    marginLeft: 6,
+                  }}
+                >{`${showItemCount} items displayed, ${filterServices.length} items in total.`}</div>
+              )}
             </GridItem>
             <GridItem xs={12}>
               <FieldSet
@@ -662,150 +786,227 @@ class Lab extends PureComponent {
                 title='Service'
                 style={{ fontSize: '0.85rem' }}
               >
-                <div className={classes.groupPanel}>
-                  {filterServices.map(r => {
-                    return (
-                      <div
-                        style={{
-                          backgroundColor:
-                            editServiceId === r.value ? 'lightgreen' : 'white',
-                          borderColor: this.isValidate(r) ? '#99CC99' : 'red',
-                        }}
-                        className={classes.checkServiceItem}
-                        onClick={() => {
-                          const selectLab = labItems.find(
-                            item => item.serviceFK === r.value,
-                          )
-                          if (selectLab) {
-                            this.setSelectLab(selectLab)
-                          }
-                        }}
-                      >
-                        <Tooltip
-                          title={
-                            <div>
+                <div
+                  className={classes.groupPanel}
+                  ref={e => (this.scroll = e)}
+                >
+                  {filterServices.length
+                    ? _.take(filterServices, showItemCount).map(r => {
+                        const isCheckedBefore = !_.isEmpty(
+                          labItems.find(ri => ri.serviceFK === r.value),
+                        )
+                        return (
+                          <Tooltip
+                            title={
                               <div>
-                                Service Code: <span>{r.code}</span>
+                                <div>
+                                  Service Code: <span>{r.code}</span>
+                                </div>
+                                <div>
+                                  Service Name: <span>{r.name}</span>
+                                </div>
+                                <div>
+                                  Unit Price:{' '}
+                                  <span>{`${currencySymbol}${r.unitPrice.toFixed(
+                                    2,
+                                  )}`}</span>
+                                </div>
                               </div>
-                              <div>
-                                Service Name: <span>{r.name}</span>
-                              </div>
-                              <div>
-                                Unit Price:{' '}
-                                <span>{`${currencySymbol}${r.unitPrice.toFixed(
-                                  2,
-                                )}`}</span>
+                            }
+                          >
+                            <div
+                              style={{
+                                backgroundColor:
+                                  editServiceId === r.value
+                                    ? 'lightgreen'
+                                    : 'white',
+                                borderColor: this.isValidate(r.value)
+                                  ? '#99CC99'
+                                  : 'red',
+                              }}
+                              className={classes.checkServiceItem}
+                              onClick={() => {
+                                const selectLab = labItems.find(
+                                  item => item.serviceFK === r.value,
+                                )
+                                if (selectLab) {
+                                  this.setSelectLab(selectLab)
+                                }
+                              }}
+                            >
+                              <span className={classes.checkServiceLabel}>
+                                {r.name}
+                              </span>
+                              <div className={classes.checkServiceCheckBox}>
+                                <Checkbox
+                                  disabled={isEdit}
+                                  label=''
+                                  inputLabel=''
+                                  checked={isCheckedBefore}
+                                  onClick={e => {
+                                    e.stopPropagation()
+                                    if (!isCheckedBefore) {
+                                      let newService = {
+                                        serviceFK: r.value,
+                                        serviceName: r.name,
+                                        serviceCode: r.code,
+                                        priority: 'Normal',
+                                        type,
+                                        packageGlobalId: '',
+                                        performingUserFK: getVisitDoctorUserId(
+                                          this.props,
+                                        ),
+                                        isDisplayValueChangable:
+                                          r.isDisplayValueChangable,
+                                        isNurseActualizeRequired:
+                                          r.isNurseActualizable,
+                                      }
+                                      if (isPreOrderItemExists)
+                                        this.setState({
+                                          isPreOrderItemExists: false,
+                                        })
+
+                                      this.getServiceCenterService(newService)
+                                      setFieldValue('labItems', [
+                                        ...labItems,
+                                        newService,
+                                      ])
+                                      setFieldValue(
+                                        'editServiceId',
+                                        newService.serviceFK,
+                                      )
+                                      setFieldValue(
+                                        'serviceCenterFK',
+                                        newService.serviceCenterFK,
+                                      )
+                                      setFieldValue(
+                                        'quantity',
+                                        newService.quantity,
+                                      )
+                                      setFieldValue('total', newService.total)
+                                      setFieldValue(
+                                        'totalAfterItemAdjustment',
+                                        newService.totalAfterItemAdjustment,
+                                      )
+                                      setFieldValue(
+                                        'isMinus',
+                                        newService.isMinus,
+                                      )
+                                      setFieldValue(
+                                        'adjValue',
+                                        newService.adjValue,
+                                      )
+                                      setFieldValue(
+                                        'isExactAmount',
+                                        newService.isExactAmount,
+                                      )
+                                    } else {
+                                      setFieldValue('labItems', [
+                                        ...labItems.filter(
+                                          item => item.serviceFK !== r.value,
+                                        ),
+                                      ])
+                                      this.resetSelectItem()
+                                    }
+                                  }}
+                                />
                               </div>
                             </div>
-                          }
-                        >
-                          <span className={classes.checkServiceLabel}>
-                            {r.name}
-                          </span>
-                        </Tooltip>
-                        <div className={classes.checkServiceCheckBox}>
-                          <Checkbox
-                            disabled={isEdit}
-                            label=''
-                            inputLabel=''
-                            checked={
-                              !_.isEmpty(
-                                labItems.find(ri => ri.serviceFK === r.value),
-                              )
-                            }
-                            onChange={e => {
-                              if (e.target.value) {
-                                let newService = {
-                                  serviceFK: r.value,
-                                  serviceName: r.name,
-                                  serviceCode: r.code,
-                                  priority: 'Normal',
-                                  type,
-                                  packageGlobalId: '',
-                                  performingUserFK: getVisitDoctorUserId(
-                                    this.props,
-                                  ),
-                                  isDisplayValueChangable:
-                                    r.isDisplayValueChangable,
-                                  isNurseActualizeRequired:
-                                    r.isNurseActualizable,
-                                }
-                                if (isPreOrderItemExists)
-                                  this.setState({ isPreOrderItemExists: false })
-
-                                this.getServiceCenterService(newService)
-                                setFieldValue('labItems', [
-                                  ...labItems,
-                                  newService,
-                                ])
-                                setFieldValue(
-                                  'editServiceId',
-                                  newService.serviceFK,
-                                )
-                                setFieldValue(
-                                  'serviceCenterFK',
-                                  newService.serviceCenterFK,
-                                )
-                                setFieldValue('quantity', newService.quantity)
-                                setFieldValue('total', newService.total)
-                                setFieldValue(
-                                  'totalAfterItemAdjustment',
-                                  newService.totalAfterItemAdjustment,
-                                )
-                              } else {
-                                setFieldValue('labItems', [
-                                  ...labItems.filter(
-                                    item => item.serviceFK !== r.value,
-                                  ),
-                                ])
-                                setFieldValue('editServiceId', undefined)
-                                setFieldValue('serviceCenterFK', undefined)
-                                setFieldValue('quantity', undefined)
-                                setFieldValue('total', undefined)
-                                setFieldValue(
-                                  'totalAfterItemAdjustment',
-                                  undefined,
-                                )
-                                if (isPreOrderItemExists)
-                                  this.setState({ isPreOrderItemExists: false })
-                              }
-                            }}
-                          />
-                        </div>
-                      </div>
-                    )
-                  })}
+                          </Tooltip>
+                        )
+                      })
+                    : 'No records'}
                 </div>
               </FieldSet>
             </GridItem>
             <GridItem xs={12}>
-              <div>
+              <div
+                style={{
+                  marginTop: 10,
+                  position: 'relative',
+                  paddingLeft: 65,
+                }}
+              >
                 <div
                   style={{
-                    marginTop: 5,
-                    display: 'inline-block',
                     fontSize: '0.85rem',
                     fontWeight: 500,
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
                   }}
                 >
                   Selected:
                 </div>
-                {labItems.map(ri => {
-                  return (
-                    <div style={{ display: 'inline-block', marginLeft: 10 }}>
-                      <Link
-                        onClick={e => {
-                          e.preventDefault()
-                          this.setSelectLab(ri)
-                        }}
-                      >
-                        <span style={{ textDecoration: 'underline' }}>
-                          {ri.serviceName}
-                        </span>
-                      </Link>
-                    </div>
-                  )
-                })}
+                {labItems.length ? (
+                  labItems.map(ri => {
+                    return (
+                      <div className={classes.selectedServiceLabel}>
+                        <div
+                          style={{
+                            maxWidth: 150,
+                            display: 'inline-block',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <Link
+                            onClick={e => {
+                              e.preventDefault()
+                              this.setSelectLab(ri)
+                            }}
+                          >
+                            <Tooltip title={ri.serviceName}>
+                              <span
+                                style={{
+                                  textDecoration: 'underline',
+                                  color: this.isValidate(ri.serviceFK)
+                                    ? '#4255bd'
+                                    : 'red',
+                                  fontWeight:
+                                    ri.serviceFK === editServiceId
+                                      ? 'bold'
+                                      : 400,
+                                }}
+                              >
+                                {ri.serviceName}
+                              </span>
+                            </Tooltip>
+                          </Link>
+                        </div>
+                        {!isEdit && (
+                          <Tooltip title='Remove item'>
+                            <div
+                              style={{
+                                display: 'inline-block',
+                                position: 'relative',
+                                marginLeft: 4,
+                                top: '-6px',
+                              }}
+                            >
+                              <CloseCircleOutlined
+                                style={{ color: 'red', cursor: 'pointer' }}
+                                onClick={() => {
+                                  setFieldValue('labItems', [
+                                    ...labItems.filter(
+                                      item => item.serviceFK !== ri.serviceFK,
+                                    ),
+                                  ])
+                                  if (editServiceId === ri.serviceFK) {
+                                    this.resetSelectItem()
+                                  }
+                                }}
+                              />
+                            </div>
+                          </Tooltip>
+                        )}
+                      </div>
+                    )
+                  })
+                ) : (
+                  <div style={{ height: 29 }}> No records</div>
+                )}
               </div>
             </GridItem>
           </GridContainer>
@@ -973,105 +1174,126 @@ class Lab extends PureComponent {
                 <div
                   style={{ marginTop: theme.spacing(2), position: 'absolute' }}
                 >
-                  <Switch
-                    value={!editServiceId ? true : editService.isMinus}
-                    checkedChildren='-'
-                    unCheckedChildren='+'
-                    label=''
-                    onChange={value => {
-                      editService.isMinus = value
-                      this.onAdjustmentConditionChange(editService)
-                      setFieldValue('labItems', [...labItems])
-                      setFieldValue(
-                        'totalAfterItemAdjustment',
-                        editService.totalAfterItemAdjustment,
+                  <Field
+                    name='isMinus'
+                    render={args => {
+                      return (
+                        <Switch
+                          checkedChildren='-'
+                          unCheckedChildren='+'
+                          label=''
+                          onChange={value => {
+                            editService.isMinus = value
+                            this.onAdjustmentConditionChange(editService)
+                            setFieldValue('labItems', [...labItems])
+                            setFieldValue(
+                              'totalAfterItemAdjustment',
+                              editService.totalAfterItemAdjustment,
+                            )
+                          }}
+                          disabled={
+                            totalPriceReadonly ||
+                            !editServiceId ||
+                            isDisabledHasPaidPreOrder
+                          }
+                          {...args}
+                        />
                       )
                     }}
-                    disabled={
-                      totalPriceReadonly ||
-                      !editServiceId ||
-                      isDisabledHasPaidPreOrder
-                    }
                   />
                 </div>
-
-                {editService.isExactAmount ? (
-                  <NumberInput
-                    value={editService.adjValue}
-                    style={{
-                      marginLeft: theme.spacing(7),
-                      paddingRight: theme.spacing(6),
-                    }}
-                    min={0}
-                    currency
-                    noSuffix
-                    label='Adjustment'
-                    onChange={e => {
-                      editService.adjValue = e.target.value
-                      this.onAdjustmentConditionChange(editService)
-                      setFieldValue('labItems', [...labItems])
-                      setFieldValue(
-                        'totalAfterItemAdjustment',
-                        editService.totalAfterItemAdjustment,
+                <Field
+                  name='adjValue'
+                  render={args => {
+                    args.min = 0
+                    if (values.isExactAmount)
+                      return (
+                        <NumberInput
+                          style={{
+                            marginLeft: theme.spacing(7),
+                            paddingRight: theme.spacing(6),
+                          }}
+                          min={0}
+                          currency
+                          noSuffix
+                          label='Adjustment'
+                          onChange={e => {
+                            editService.adjValue = e.target.value
+                            this.onAdjustmentConditionChange(editService)
+                            setFieldValue('labItems', [...labItems])
+                            setFieldValue(
+                              'totalAfterItemAdjustment',
+                              editService.totalAfterItemAdjustment,
+                            )
+                          }}
+                          disabled={
+                            totalPriceReadonly ||
+                            !editServiceId ||
+                            isDisabledHasPaidPreOrder
+                          }
+                          {...args}
+                        />
                       )
-                    }}
-                    disabled={
-                      totalPriceReadonly ||
-                      !editServiceId ||
-                      isDisabledHasPaidPreOrder
-                    }
-                  />
-                ) : (
-                  <NumberInput
-                    value={editService.adjValue}
-                    style={{
-                      marginLeft: theme.spacing(7),
-                      paddingRight: theme.spacing(6),
-                    }}
-                    noSuffix
-                    percentage
-                    max={100}
-                    min={0}
-                    label='Adjustment'
-                    onChange={e => {
-                      editService.adjValue = e.target.value
-                      this.onAdjustmentConditionChange(editService)
-                      setFieldValue('labItems', [...labItems])
-                      setFieldValue(
-                        'totalAfterItemAdjustment',
-                        editService.totalAfterItemAdjustment,
-                      )
-                    }}
-                    disabled={
-                      totalPriceReadonly ||
-                      !editServiceId ||
-                      isDisabledHasPaidPreOrder
-                    }
-                  />
-                )}
+                    return (
+                      <NumberInput
+                        style={{
+                          marginLeft: theme.spacing(7),
+                          paddingRight: theme.spacing(6),
+                        }}
+                        noSuffix
+                        percentage
+                        max={100}
+                        min={0}
+                        label='Adjustment'
+                        onChange={e => {
+                          editService.adjValue = e.target.value
+                          this.onAdjustmentConditionChange(editService)
+                          setFieldValue('labItems', [...labItems])
+                          setFieldValue(
+                            'totalAfterItemAdjustment',
+                            editService.totalAfterItemAdjustment,
+                          )
+                        }}
+                        disabled={
+                          totalPriceReadonly ||
+                          !editServiceId ||
+                          isDisabledHasPaidPreOrder
+                        }
+                        {...args}
+                      />
+                    )
+                  }}
+                />
               </div>
             </GridItem>
             <GridItem xs={1} className={classes.editor}>
               <div style={{ marginTop: theme.spacing(2) }}>
-                <Switch
-                  value={!editServiceId ? true : editService.isExactAmount}
-                  checkedChildren='$'
-                  unCheckedChildren='%'
-                  label=''
-                  onChange={value => {
-                    editService.isExactAmount = value
-                    this.onAdjustmentConditionChange(editService)
-                    setFieldValue('labItems', [...labItems])
-                    setFieldValue(
-                      'totalAfterItemAdjustment',
-                      editService.totalAfterItemAdjustment,
+                <Field
+                  name='isExactAmount'
+                  render={args => {
+                    return (
+                      <Switch
+                        checkedChildren='$'
+                        unCheckedChildren='%'
+                        label=''
+                        onChange={value => {
+                          editService.isExactAmount = value
+                          this.onAdjustmentConditionChange(editService)
+                          setFieldValue('labItems', [...labItems])
+                          setFieldValue(
+                            'totalAfterItemAdjustment',
+                            editService.totalAfterItemAdjustment,
+                          )
+                        }}
+                        disabled={
+                          totalPriceReadonly ||
+                          !editServiceId ||
+                          isDisabledHasPaidPreOrder
+                        }
+                        {...args}
+                      />
                     )
                   }}
-                  disabled={
-                    totalPriceReadonly ||
-                    !editServiceId ||
-                    isDisabledHasPaidPreOrder
-                  }
                 />
               </div>
             </GridItem>
@@ -1136,35 +1358,34 @@ class Lab extends PureComponent {
                         isStartedLab ||
                         isDisabledNoPaidPreOrder
                       }
-                      style={{ position: 'absolute', bottom: 2 }}
                       label='Pre-Order'
-                      onChange={e => {
-                        editService.isPreOrder = e.target.value
-                        if (!e.target.value) {
+                      onClick={e => {
+                        const newIsPreOrder = !editService.isPreOrder
+                        editService.isPreOrder = newIsPreOrder
+                        if (!newIsPreOrder) {
                           editService.isChargeToday = false
                         }
                         this.checkIsPreOrderItemExistsInListing(
                           editServiceId,
-                          e.target.value,
+                          newIsPreOrder,
                         )
                         setFieldValue('labItems', [...labItems])
                       }}
-                    />
+                    >
+                      Pre-Order
+                    </Checkbox>
                     {editService.isPreOrder && (
                       <Checkbox
                         checked={editService.isChargeToday || false}
                         disabled={!editServiceId || isStartedLab}
-                        style={{
-                          position: 'absolute',
-                          bottom: 2,
-                          left: '380px',
-                        }}
                         label='Charge Today'
-                        onChange={e => {
-                          editService.isChargeToday = e.target.value
+                        onClick={e => {
+                          editService.isChargeToday = !editService.isChargeToday
                           setFieldValue('labItems', [...labItems])
                         }}
-                      />
+                      >
+                        Charge Today
+                      </Checkbox>
                     )}
                     {isPreOrderItemExists && (
                       <Alert
@@ -1256,29 +1477,51 @@ class Lab extends PureComponent {
                     <Checkbox
                       checked={editService.isPreOrder || false}
                       disabled={!editServiceId || isStartedLab}
-                      style={{ position: 'absolute', bottom: 0 }}
                       label='Pre-Order'
-                      onChange={e => {
-                        editService.isPreOrder = e.target.value
-                        if (!e.target.value) {
+                      onClick={e => {
+                        const newIsPreOrder = !editService.isPreOrder
+                        editService.isPreOrder = newIsPreOrder
+                        if (!newIsPreOrder) {
                           editService.isChargeToday = false
                         }
+                        this.checkIsPreOrderItemExistsInListing(
+                          editServiceId,
+                          newIsPreOrder,
+                        )
                         setFieldValue('labItems', [...labItems])
                       }}
-                    />
+                    >
+                      Pre-Order
+                    </Checkbox>
                     {editService.isPreOrder && (
                       <Checkbox
                         checked={editService.isChargeToday || false}
                         disabled={!editServiceId || isStartedLab}
+                        label='Charge Today'
+                        onClick={e => {
+                          editService.isChargeToday = !editService.isChargeToday
+                          setFieldValue('labItems', [...labItems])
+                        }}
+                      >
+                        Charge Today
+                      </Checkbox>
+                    )}
+                    {isPreOrderItemExists && (
+                      <Alert
+                        message={
+                          "Item exists in Pre-Order. Plesae check patient's Pre-Order."
+                        }
+                        type='warning'
                         style={{
                           position: 'absolute',
-                          bottom: 0,
-                          left: '380px',
-                        }}
-                        label='Charge Today'
-                        onChange={e => {
-                          editService.isChargeToday = e.target.value
-                          setFieldValue('labItems', [...labItems])
+                          top: 45,
+                          left: 200,
+                          whiteSpace: 'nowrap',
+                          textOverflow: 'ellipsis',
+                          display: 'inline-block',
+                          overflow: 'hidden',
+                          lineHeight: '25px',
+                          fontSize: '0.85rem',
                         }}
                       />
                     )}

@@ -54,12 +54,12 @@ const styles = (theme) => ({
     },
   },
   popoverContainer: {
-    width: 200,
+    width: 250,
     textAlign: 'left',
     marginTop: -10,
   },
   listContainer: {
-    maxHeight: 132,
+    maxHeight: 230,
     overflowY: 'auto',
   },
 })

@@ -158,6 +158,17 @@ const RadiologyDetails = () => {
   const toggleReport = () => {
     setShowReport(!showReport)
   }
+  const saveAndPrint = () => {
+    handleSave(undefined, false)
+    dispatch({
+      type: 'radiologyDetails/query',
+      payload: { id: detailsId },
+    }).then(val => {
+      if (val) {
+        toggleReport()
+      }
+    })
+  }
   const renderPrintButton = () => {
     if (!details || !details.entity) return
     const { statusFK: currentStatusFK } = details.entity
@@ -166,13 +177,13 @@ const RadiologyDetails = () => {
         RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED,
         RADIOLOGY_WORKITEM_STATUS.COMPLETED,
       ].includes(currentStatusFK) && (
-        <Button color='primary' onClick={toggleReport}>
+        <Button color='primary' onClick={saveAndPrint}>
           Print
         </Button>
       )
     )
   }
-  const handleSave = (payload = {}) => {
+  const handleSave = (payload = {}, closeAfterSave = true) => {
     dispatch({
       type: 'radiologyDetails/updateRadiologyWorkitem',
       payload: {
@@ -182,8 +193,11 @@ const RadiologyDetails = () => {
         ...payload,
       },
     }).then(value => {
-      setDetailsId(null)
-      setShowDetails(false)
+      setIsDirty(false)
+      if (closeAfterSave) {
+        setDetailsId(null)
+        setShowDetails(false)
+      }
     })
   }
 
@@ -230,10 +244,6 @@ const RadiologyDetails = () => {
       })
   }
 
-  useEffect(() => {
-    console.log('isDirty', isDirty)
-  }, [isDirty])
-
   const showOnlyCloseButton =
     isReadOnly ||
     workitem.statusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
@@ -268,17 +278,18 @@ const RadiologyDetails = () => {
             !showOnlyCloseButton ? renderStatusButtons() : undefined,
             renderPrintButton(),
           ],
-          onConfirm:
-            !showOnlyCloseButton &&
-            (
-              Authorized.check('radiologyworklist.saveexamination') || {
-                rights: 'hidden',
-              }
-            )?.rights === 'enable'
-              ? () => {
-                  handleSave()
+          onConfirm: () => {
+            handleSave()
+          },
+          confirmProps: {
+            disabled:
+              showOnlyCloseButton ||
+              (
+                Authorized.check('radiologyworklist.saveexamination') || {
+                  rights: 'hidden',
                 }
-              : undefined,
+              )?.rights !== 'enable',
+          },
         }}
         confirmProps={{ disable: true }}
         maxWidth='lg'

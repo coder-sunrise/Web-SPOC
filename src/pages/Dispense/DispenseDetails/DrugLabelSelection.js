@@ -204,7 +204,7 @@ class DrugLabelSelection extends React.PureComponent {
             }),
         ),
         language: lan,
-        visitId: dispense.visitID || visitid,
+        visitId: visitid || dispense.visitID,
       })
       let finalDrugLabelDetails = []
       data.DrugLabelDetails.forEach(t => {

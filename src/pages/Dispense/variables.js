@@ -42,7 +42,7 @@ const showMoney = (v = 0) => {
     return (
       <span
         style={{ fontWeight: 'bold', color: 'red' }}
-      >{`(${currencySymbol}${numeral(v).format('0.00')})`}</span>
+      >{`(${currencySymbol}${numeral(v * -1.0).format('0.00')})`}</span>
     )
   return (
     <span
@@ -159,6 +159,7 @@ const lowStockIndicator = (row, itemIdFieldName, right) => {
       sourceType={currentType.name.toLowerCase()}
       values={values}
       right={right}
+      style={{}}
     />
   )
 }
@@ -491,6 +492,7 @@ export const DispenseItemsColumns1 = (
                       height: 20,
                       display: 'inline-block',
                       margin: '0px 1px',
+                      lineHeight: '16px',
                     }}
                   >
                     Pre
@@ -511,6 +513,7 @@ export const DispenseItemsColumns1 = (
                       height: 20,
                       display: 'inline-block',
                       margin: '0px 1px',
+                      lineHeight: '16px',
                     }}
                   >
                     Excl.
@@ -554,12 +557,14 @@ export const DispenseItemsColumns1 = (
               wordWrap: 'break-word',
               whiteSpace: 'pre-wrap',
               paddingRight,
+              position: 'relative',
+              top: 2,
             }}
           >
             <Tooltip title={row.name}>
               <span>{row.name}</span>
             </Tooltip>
-            <div style={{ position: 'relative', top: 2 }}>
+            <div style={{ position: 'absolute', top: 0, right: '-10px' }}>
               {lowStockIndicator(
                 {
                   ...row,
@@ -710,15 +715,7 @@ export const DispenseItemsColumns1 = (
           return (
             <div>
               <Tooltip title={row.batchNo}>
-                <div
-                  style={{
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >
-                  {row.batchNo || '-'}
-                </div>
+                <div>{row.batchNo || '-'}</div>
               </Tooltip>
               {isExpire && <p style={{ color: 'red' }}>EXPIRED!</p>}
             </div>
@@ -860,41 +857,35 @@ export const DispenseItemsColumns1 = (
           <div style={{ position: 'relative' }}>
             <div
               style={{
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
                 paddingRight: existsDrugLabelRemarks ? 10 : 0,
                 minHeight: 20,
               }}
             >
               <Tooltip title={row.remarks || ''}>
-                <span>{row.remarks || ' '}</span>
+                <span className='oneline_textblock'>{row.remarks || ' '}</span>
               </Tooltip>
             </div>
-            <div style={{ position: 'relative', top: 6 }}>
-              {existsDrugLabelRemarks && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: 2,
-                    right: -8,
-                  }}
+
+            {existsDrugLabelRemarks && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 6,
+                  right: -8,
+                }}
+              >
+                <Tooltip
+                  title={
+                    <div>
+                      <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
+                      <div>{row.drugLabelRemarks}</div>
+                    </div>
+                  }
                 >
-                  <Tooltip
-                    title={
-                      <div>
-                        <div style={{ fontWeight: 500 }}>
-                          Drug Label Remarks
-                        </div>
-                        <div>{row.drugLabelRemarks}</div>
-                      </div>
-                    }
-                  >
-                    <FileCopySharp style={{ color: '#4255bd' }} />
-                  </Tooltip>
-                </div>
-              )}
-            </div>
+                  <FileCopySharp style={{ color: '#4255bd' }} />
+                </Tooltip>
+              </div>
+            )}
           </div>
         )
       },
@@ -1051,6 +1042,7 @@ export const DispenseItemsColumnExtensions = (
                       height: 20,
                       display: 'inline-block',
                       margin: '0px 1px',
+                      lineHeight: '16px',
                     }}
                   >
                     Pre
@@ -1071,6 +1063,7 @@ export const DispenseItemsColumnExtensions = (
                       height: 20,
                       display: 'inline-block',
                       margin: '0px 1px',
+                      lineHeight: '16px',
                     }}
                   >
                     Excl.
@@ -1654,7 +1647,6 @@ export const ServiceColumns1 = (
               whiteSpace: 'pre-wrap',
               display: 'flex',
               justifyContent: 'space-between',
-              padding: 5,
             }}
           >
             <span style={{ width: 80 }}>{row.type}</span>
@@ -1677,6 +1669,7 @@ export const ServiceColumns1 = (
                       fontSize: '0.7rem',
                       padding: '2px 3px',
                       height: 20,
+                      lineHeight: '16px',
                     }}
                   >
                     Pre
@@ -2035,7 +2028,6 @@ export const OtherOrdersColumnExtensions = (
             whiteSpace: 'pre-wrap',
             display: 'flex',
             justifyContent: 'space-between',
-            padding: 5,
           }}
         >
           <span style={{ width: 80 }}>{row.type}</span>
@@ -2058,6 +2050,7 @@ export const OtherOrdersColumnExtensions = (
                     fontSize: '0.7rem',
                     padding: '2px 3px',
                     height: 20,
+                    lineHeight: '16px',
                   }}
                 >
                   Pre
@@ -2332,6 +2325,7 @@ export const PackageColumnExtensions = (onPrint, showDrugLabelRemark) => [
                     height: 20,
                     display: 'inline-block',
                     margin: '0px 1px',
+                    lineHeight: '16px',
                   }}
                 >
                   Excl.

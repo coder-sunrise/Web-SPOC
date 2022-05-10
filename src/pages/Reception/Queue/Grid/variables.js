@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react'
 import moment from 'moment'
+import { InvoiceReplacement } from '@/components/Icon/customIcons'
 // components
 import {
   DoctorLabel,
@@ -276,6 +277,41 @@ export const QueueColumnExtensions = props => {
       columnName: 'patientName',
       width: 250,
       compare: compareString,
+      render: row => {
+        return (
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <div
+              style={{
+                width: '100%',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                marginTop: 1,
+              }}
+            >
+              <Tooltip title={row.patientName}>
+                <span>{row.patientName}</span>
+              </Tooltip>
+            </div>
+            {row.isForInvoiceReplacement && (
+              <div style={{ width: 20 }}>
+                <Tooltip title='For Invoice Replacement'>
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      position: 'relative',
+                      top: 3,
+                      marginLeft: 3,
+                    }}
+                  >
+                    <InvoiceReplacement></InvoiceReplacement>
+                  </span>
+                </Tooltip>
+              </div>
+            )}
+          </div>
+        )
+      },
     },
     {
       columnName: 'orderCreateTime',

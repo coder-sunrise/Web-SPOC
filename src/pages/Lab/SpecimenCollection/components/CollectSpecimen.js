@@ -39,6 +39,7 @@ const CollectSpecimen = ({
   onConfirm,
   onClose,
 }) => {
+  if (!open) return ''
   const classes = useStyles()
   const dispatch = useDispatch()
   const [workItemsByTestCategory, setWorkitemsByTestCategory] = useState([])
@@ -46,7 +47,6 @@ const CollectSpecimen = ({
   const [copies, setCopies] = useState(1)
   const [testPanelValidationError, setTestPanelValidationError] = useState('')
   const [showModal, setShowModal] = useState(false)
-  const ctTestCategory = useCodeTable('cttestcategory')
   const ctspecimentype = useCodeTable('ctspecimentype')
   const [form] = Form.useForm()
 
@@ -145,8 +145,7 @@ const CollectSpecimen = ({
       _(
         labWorkitems.map(item => ({
           testCategoryFK: item.testCategoryFK,
-          testCategory: ctTestCategory.find(c => c.id === item.testCategoryFK)
-            .name,
+          testCategory: item.testCategoryName,
           workItems: _.sortBy(
             labWorkitems.filter(w => w.testCategoryFK === item.testCategoryFK),
             'id',
@@ -210,7 +209,7 @@ const CollectSpecimen = ({
         <Space align='start' style={{ display: 'flex', marginBottom: 12 }}>
           <Form.Item
             name='specimenTypeFK'
-            rules={[{ required: true, message: 'Specimen type is reqired.' }]}
+            rules={[{ required: true, message: 'Specimen type is required.' }]}
           >
             <Select
               label='Specimen Type'

@@ -173,6 +173,7 @@ const testPanelSchema = Yup.object().shape({
         ),
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
+        examinationItems: restValues.examinationItems.filter(v => v !== -99),
       },
     }).then(r => {
       if (r) {
@@ -645,6 +646,7 @@ class Detail extends PureComponent {
   }
 
   handleExaminationItemChange = examinationItems => {
+    examinationItems = examinationItems.filter(v => v !== -99)
     const { setFieldValue } = this.props
     const {
       ctService_ExaminationItem: originalExaminationItems = [],
@@ -695,7 +697,7 @@ class Detail extends PureComponent {
         radioAndLabServiceCenterIds.includes(sc.serviceCenterFK),
       ) === -1
     ) {
-      hiddenFields.push('ctService_Tag')
+      //hiddenFields.push('ctService_Tag')
     }
 
     const hasInternalLabServiceCenter = checkAnyInternalLabServiceCenter(
@@ -921,10 +923,16 @@ class Detail extends PureComponent {
                           name='isAutoOrder'
                           render={args => {
                             return (
-                              <Switch
-                                label='Consultation Auto Order'
-                                onChange={e => this.handleAutoOrder(e)}
-                                // disabled={this.handleDisableAutoOrder()}
+                              <CodeSelect
+                                label='Medical Checkup Examination'
+                                code='ctexaminationitem'
+                                labelField='displayValueWithCategory'
+                                allClear={true}
+                                maxTagCount={0}
+                                mode='multiple'
+                                onChange={v => {
+                                  this.handleExaminationItemChange(v)
+                                }}
                                 {...args}
                               />
                             )
@@ -949,22 +957,112 @@ class Detail extends PureComponent {
                           }}
                         />
                       </GridItem>
-                      {!hiddenFields.includes('isNurseActualizable') && (
-                        <GridItem xs={4}>
-                          <Field
-                            name='isNurseActualizable'
-                            render={args => {
-                              return (
-                                <Switch label='Actualized by Nurse' {...args} />
-                              )
-                            }}
-                          />
-                        </GridItem>
-                      )}
+                      <GridItem xs={4}>
+                        <Field
+                          name='isAutoDisplayInOrderCart'
+                          render={args => {
+                            return (
+                              <Switch
+                                label='Show in order cart as a priority'
+                                {...args}
+                              />
+                            )
+                          }}
+                        />
+                      </GridItem>
                     </GridContainer>
                   </GridItem>
                 </GridContainer>
               </div>
+              {settings.isEnableMedisave && ddlIsCdmpClaimable && (
+                <div style={{ margin: theme.spacing(1, 2) }}>
+                  <h4 style={{ fontWeight: 400 }}>
+                    <b>Medisave Settings</b>
+                  </h4>
+                  <div>
+                    <GridContainer>
+                      <GridItem
+                        xs={1}
+                        className={classes.detailHeaderContainer}
+                        style={{
+                          paddingLeft: 20,
+                          paddingTop: 10,
+                        }}
+                      >
+                        <FastField
+                          name='isMedisaveHealthScreening'
+                          render={args => {
+                            return (
+                              <Checkbox
+                                style={{ verticalAlign: 'bottom' }}
+                                checked={ddlMedisaveHealthScreening}
+                                // formControlProps={{ className: classes.medisaveCheck }}
+                                onChange={e =>
+                                  this.onChangeMedisaveHealthScreening(e)
+                                }
+                                {...args}
+                              />
+                            )
+                          }}
+                        />
+                      </GridItem>
+                      <GridItem xs={8}>
+                        <FastField
+                          name='medisaveHealthScreeningDiagnosisFK'
+                          render={args => {
+                            return (
+                              <CodeSelect
+                                label='Medisave Health Screening'
+                                code='ctmedisavehealthscreeningdiagnosis'
+                                disabled={!ddlMedisaveHealthScreening}
+                                {...args}
+                              />
+                            )
+                          }}
+                        />
+                      </GridItem>
+                      <GridItem xs={3} />
+                      <GridItem
+                        xs={1}
+                        className={classes.detailHeaderContainer}
+                        style={{
+                          paddingLeft: 20,
+                          paddingTop: 10,
+                        }}
+                      >
+                        <FastField
+                          name='isOutpatientScan'
+                          render={args => {
+                            return (
+                              <Checkbox
+                                checked={ddlOutpatientScan}
+                                // formControlProps={{ className: classes.medisaveCheck }}
+                                onChange={e => this.onChangeOutpatientScan(e)}
+                              />
+                            )
+                          }}
+                        />
+                      </GridItem>
+                      <GridItem xs={8}>
+                        <FastField
+                          name='outPatientScanDiagnosisFK'
+                          render={args => {
+                            return (
+                              <CodeSelect
+                                label='Medisave Outpatient Scan'
+                                code='ctmedisaveoutpatientscandiagnosis'
+                                disabled={!ddlOutpatientScan}
+                                {...args}
+                              />
+                            )
+                          }}
+                        />
+                      </GridItem>
+                      <GridItem xs={3} />
+                    </GridContainer>
+                  </div>
+                </div>
+              )}
               {settings.isEnableMedisave && ddlIsCdmpClaimable && (
                 <div style={{ margin: theme.spacing(1, 2) }}>
                   <h4 style={{ fontWeight: 400 }}>

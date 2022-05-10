@@ -25,7 +25,8 @@ import {
   LAB_WORKITEM_STATUS,
   ORDER_TYPES,
   INVENTORY_TYPE,
-  SERVICE_CENTER_CATEGORY,
+  RADIOLOGY_CATEGORY,
+  LAB_CATEGORY,
   VISIT_TYPE,
 } from '@/utils/constants'
 import {
@@ -57,6 +58,7 @@ export default ({
   isFullScreen = false,
   isEnableEditOrder = true,
   visitRegistration,
+  consultationDocument,
 }) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
   const { total, gst, totalWithGST, subTotal } = summary
@@ -156,7 +158,45 @@ export default ({
     }
     return instruction
   }
-  const GetNewMedication = currentVisitOrderTemplate => {
+  const GetNewMedication = async (currentVisitOrderTemplate, sequence) => {
+    const codetables = await Promise.all([
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'inventorymedication',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctMedicationUnitOfMeasurement',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctMedicationFrequency',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctmedicationdosage',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctmedicationusage',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctmedicationprecaution',
+        },
+      }),
+    ])
     const inventoryMedicationFK =
       currentVisitOrderTemplate.visitOrderTemplateMedicationItemDto
         .inventoryMedicationFK
@@ -172,14 +212,12 @@ export default ({
       primaryPrintoutLanguage = 'EN',
       secondaryPrintoutLanguage = '',
     } = settings
-    const {
-      inventorymedication,
-      ctmedicationusage,
-      ctmedicationdosage,
-      ctmedicationunitofmeasurement,
-      ctmedicationfrequency,
-      ctmedicationprecaution,
-    } = codetable
+    const inventorymedication = codetables[0]
+    const ctmedicationusage = codetables[4]
+    const ctmedicationdosage = codetables[3]
+    const ctmedicationunitofmeasurement = codetables[1]
+    const ctmedicationfrequency = codetables[2]
+    const ctmedicationprecaution = codetables[5]
 
     const drug = inventorymedication.find(t => t.id == inventoryMedicationFK)
 
@@ -205,8 +243,6 @@ export default ({
     )
 
     let data = {}
-    let currentSequence =
-      (_.max(rows.filter(t => !t.isDeleted).map(t => t.sequence)) || 0) + 1
 
     const medicationfrequency = matchInstruction?.medicationFrequency
     const medicationdosage = matchInstruction?.prescribingDosage
@@ -342,7 +378,7 @@ export default ({
     isNurseActualizeRequired = drug.isNurseActualizable
     isExclusive = drug.isExclusive
 
-    return {
+    const newDrug = {
       type: ORDER_TYPES.MEDICATION,
       adjAmount: currentVisitOrderTemplate.adjAmt,
       adjType: currentVisitOrderTemplate.adjType,
@@ -376,7 +412,7 @@ export default ({
       isDeleted: false,
       quantity: newTotalQuantity,
       remarks: '',
-      sequence: currentSequence,
+      sequence: sequence,
       subject: itemDrugName,
       totalPrice: itemTotalPrice,
       totalAfterItemAdjustment: currentVisitOrderTemplate.totalAftAdj,
@@ -392,9 +428,54 @@ export default ({
       isExclusive,
       visitOrderTemplateItemFK: currentVisitOrderTemplate.id,
     }
+
+    return newDrug
   }
 
-  const GetNewVaccination = currentVisitOrderTemplate => {
+  const GetNewVaccination = async (
+    currentVisitOrderTemplate,
+    sequence,
+    vaccCertSequence,
+  ) => {
+    const codetables = await Promise.all([
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'inventoryvaccination',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctvaccinationusage',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctvaccinationunitofmeasurement',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctgender',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctmedicationdosage',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'documenttemplate',
+        },
+      }),
+    ])
+
     const inventoryVaccinationFK =
       currentVisitOrderTemplate.visitOrderTemplateVaccinationItemDto
         .inventoryVaccinationFK
@@ -402,25 +483,14 @@ export default ({
     const { visit } = entity
     const { visitOrderTemplate } = visit
     const { visitOrderTemplateItemDtos } = visitOrderTemplate
-    let sequence =
-      (_.max(rows.filter(t => !t.isDeleted).map(t => t.sequence)) || 0) + 1
-
     const { entity: visitEntity } = visitRegistration
     const { name, patientAccountNo, genderFK, dob } = patient.entity
-    const {
-      ctgender = [],
-      inventoryvaccination,
-      ctvaccinationusage,
-      ctmedicationdosage,
-      ctvaccinationunitofmeasurement,
-    } = codetable
+    const ctgender = codetables[3]
+    const inventoryvaccination = codetables[0]
+    const ctvaccinationusage = codetables[1]
+    const ctmedicationdosage = codetables[4]
+    const ctvaccinationunitofmeasurement = codetables[2]
     const gender = ctgender.find(o => o.id === genderFK) || {}
-    const allDocs = rows.filter(s => !s.isDeleted)
-    let nextSequence = 1
-    if (allDocs && allDocs.length > 0) {
-      const { sequence: documentSequence } = _.maxBy(allDocs, 'sequence')
-      nextSequence = documentSequence + 1
-    }
     let vaccination = inventoryvaccination.find(
       vacc => vacc.id === inventoryVaccinationFK,
     )
@@ -495,6 +565,7 @@ export default ({
       visitOrderTemplateItemFK: currentVisitOrderTemplate.id,
     }
     let newCORVaccinationCert = []
+    let isGenerateVaccCert = false
     if (newVaccination.isGenerateCertificate) {
       const { documenttemplate = [] } = codetable
       const defaultTemplate = documenttemplate.find(
@@ -514,43 +585,38 @@ export default ({
               defaultTemplate.templateContent,
               newVaccination,
             ),
-            sequence: nextSequence,
-            uid: getUniqueId(),
+            sequence: vaccCertSequence,
           },
         ]
-        nextSequence += 1
-      } else {
-        showNoTemplate = true
+        isGenerateVaccCert = true
       }
     }
-    return {
+    const newVaccine = {
       ...newVaccination,
       corVaccinationCert: newCORVaccinationCert,
     }
+    return { vaccination: newVaccine, isGenerateVaccCert: isGenerateVaccCert }
   }
-  const GetService = currentVisitOrderTemplate => {
-    const { ctservice = [] } = codetable 
+  const GetService = async (currentVisitOrderTemplate, sequence) => {
+    const ctservice = await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctservice',
+      },
+    })
     var service = ctservice.find(
       t =>
         t.serviceCenter_ServiceId ===
         currentVisitOrderTemplate.visitOrderTemplateServiceItemDto
           .serviceCenterServiceFK,
     )
-    let sequence =
-      (_.max(rows.filter(t => !t.isDeleted).map(t => t.sequence)) || 0) + 1
     let type = ORDER_TYPES.SERVICE
-    if (
-      service.serviceCenterCategoryFK ===
-      SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER
-    ) {
+    if (RADIOLOGY_CATEGORY.indexOf(service.serviceCenterCategoryFK) >= 0) {
       type = ORDER_TYPES.RADIOLOGY
-    } else if (
-      service.serviceCenterCategoryFK ===
-      SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER
-    ) {
+    } else if (LAB_CATEGORY.indexOf(service.serviceCenterCategoryFK) >= 0) {
       type = ORDER_TYPES.LAB
     }
-    return {
+    const newService = {
       adjAmount: currentVisitOrderTemplate.adjAmt,
       adjType: currentVisitOrderTemplate.adjType,
       adjValue: currentVisitOrderTemplate.value,
@@ -574,7 +640,7 @@ export default ({
       serviceCenterFK: service.serviceCenterId,
       serviceCenterServiceFK: service.serviceCenter_ServiceId,
       serviceCode: service.code,
-      serviceFK: service.id,
+      serviceFK: service.serviceId,
       serviceName: service.displayValue,
       subject: service.displayValue,
       total: currentVisitOrderTemplate.total,
@@ -584,9 +650,16 @@ export default ({
       visitPurposeFK: currentVisitOrderTemplate.visitOrderTemplateFK,
       visitOrderTemplateItemFK: currentVisitOrderTemplate.id,
     }
+    return newService
   }
-  const GetConsumable = currentVisitOrderTemplate => {
-    const { inventoryconsumable = [] } = codetable
+  const GetConsumable = async (currentVisitOrderTemplate, sequence) => {
+    const inventoryconsumable = await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventoryconsumable',
+      },
+    })
+
     var consumable = inventoryconsumable.find(
       t =>
         t.id ===
@@ -596,7 +669,7 @@ export default ({
     let defaultBatch = consumable?.consumableStock.find(
       o => o.isDefault === true,
     )
-    return {
+    const newConsumable = {
       adjAmount: currentVisitOrderTemplate.adjAmt,
       adjType: currentVisitOrderTemplate.adjType,
       adjValue: currentVisitOrderTemplate.value,
@@ -621,8 +694,7 @@ export default ({
       performingUserFK:
         user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
       quantity: currentVisitOrderTemplate.quantity,
-      sequence:
-        (_.max(rows.filter(t => !t.isDeleted).map(t => t.sequence)) || 0) + 1,
+      sequence: sequence,
       subject: consumable.displayValue,
       totalAfterItemAdjustment: currentVisitOrderTemplate.totalAftAdj,
       totalPrice: currentVisitOrderTemplate.total,
@@ -631,6 +703,8 @@ export default ({
       unitPrice: currentVisitOrderTemplate.unitPrice,
       visitOrderTemplateItemFK: currentVisitOrderTemplate.id,
     }
+
+    return newConsumable
   }
   useEffect(() => {
     setCheckedStatusIncldGST(orders.isGSTInclusive)
@@ -736,6 +810,9 @@ export default ({
             quantity: row.quantity,
             total: row.total,
             totalAfterItemAdjustment: row.totalAfterItemAdjustment,
+            isMinus: row.isMinus,
+            adjValue: row.adjValue,
+            adjType: row.adjType,
           },
           type: row.type,
         },
@@ -754,6 +831,30 @@ export default ({
             quantity: row.quantity,
             total: row.total,
             totalAfterItemAdjustment: row.totalAfterItemAdjustment,
+            isMinus: row.isMinus,
+            adjValue: row.adjValue,
+            adjType: row.adjType,
+          },
+          type: row.type,
+        },
+      })
+    } else if (row.type === ORDER_TYPES.SERVICE) {
+      dispatch({
+        type: 'orders/updateState',
+        payload: {
+          entity: {
+            serviceItems: [{ ...row }],
+            editServiceId: row.serviceFK,
+            selectCategory: 'All',
+            selectTag: 'All',
+            filterService: '',
+            serviceCenterFK: row.serviceCenterFK,
+            quantity: row.quantity,
+            total: row.total,
+            totalAfterItemAdjustment: row.totalAfterItemAdjustment,
+            isMinus: row.isMinus,
+            adjValue: row.adjValue,
+            adjType: row.adjType,
           },
           type: row.type,
         },
@@ -1175,7 +1276,13 @@ export default ({
     const { visitOrderTemplateItemDtos } = visitOrderTemplate
 
     let removedTemplateItems = visitOrderTemplateItemDtos
-      .filter(t => t.orderable)
+      .filter(
+        t =>
+          t.inventoryItemTypeFK === 3 ||
+          t.inventoryItemTypeFK === 4 ||
+          ((t.inventoryItemTypeFK === 2 || t.inventoryItemTypeFK === 1) &&
+            t.orderable),
+      )
       .filter(t => {
         if (
           rows.filter(
@@ -1186,23 +1293,49 @@ export default ({
         } else return t
       })
     if (visit.visitPurposeFK === VISIT_TYPE.OTC) {
-      removedTemplateItems = removedTemplateItems.filter(
-        t => t.inventoryItemTypeFK != 3,
-      )
+      removedTemplateItems = removedTemplateItems.filter(t => {
+        if (t.inventoryItemTypeFK !== 3 && t.inventoryItemTypeFK !== 4) {
+          return true
+        }
+        if (
+          t.inventoryItemTypeFK === 4 &&
+          LAB_CATEGORY.indexOf(
+            t.visitOrderTemplateServiceItemDto.serviceCenterCategoryFK,
+          ) < 0 &&
+          RADIOLOGY_CATEGORY.indexOf(
+            t.visitOrderTemplateServiceItemDto.serviceCenterCategoryFK,
+          ) < 0
+        ) {
+          return true
+        }
+        return false
+      })
     }
     _.sortBy(removedTemplateItems, 'inventoryItemTypeFK')
     setRemovedVisitOrderTemplateItem(removedTemplateItems)
     setShowRevertVisitPurposeItem(true)
   }
-  const confirmRevert = data => {
-    var newDrugItems = data.map(templateItem => {
+  const confirmRevert = async data => {
+    let newItems = []
+    let currentSequence =
+      (_.max(rows.filter(t => !t.isDeleted).map(t => t.sequence)) || 0) + 1
+
+    const allDocs = (consultationDocument.rows || []).filter(s => !s.isDeleted)
+    let vaccCertSequence = 1
+    if (allDocs && allDocs.length > 0) {
+      const { sequence: documentSequence } = _.maxBy(allDocs, 'sequence')
+      vaccCertSequence = documentSequence + 1
+    }
+
+    for (let index = 0; index < data.length; index++) {
+      let templateItem = data[index]
       if (templateItem.visitOrderTemplateMedicationItemDto) {
         try {
-          const newDrug = GetNewMedication(templateItem)
-          dispatch({
-            type: 'orders/upsertRow',
-            payload: newDrug,
-          })
+          const newMedication = await GetNewMedication(
+            templateItem,
+            currentSequence,
+          )
+          newItems.push(newMedication)
         } catch (error) {
           console.log(error)
           notification.error({
@@ -1211,11 +1344,15 @@ export default ({
         }
       } else if (templateItem.visitOrderTemplateVaccinationItemDto) {
         try {
-          const newVaccine = GetNewVaccination(templateItem)
-          dispatch({
-            type: 'orders/upsertRow',
-            payload: newVaccine,
-          })
+          const newVaccination = await GetNewVaccination(
+            templateItem,
+            currentSequence,
+            vaccCertSequence,
+          )
+          newItems.push(newVaccination.vaccination)
+          if (newVaccination.isGenerateVaccCert) {
+            vaccCertSequence = vaccCertSequence + 1
+          }
         } catch (error) {
           notification.error({
             message: `Revert vaccination ${templateItem?.inventoryItemName} failed.`,
@@ -1223,11 +1360,11 @@ export default ({
         }
       } else if (templateItem.visitOrderTemplateConsumableItemDto) {
         try {
-          const newConsumable = GetConsumable(templateItem)
-          dispatch({
-            type: 'orders/upsertRow',
-            payload: newConsumable,
-          })
+          const newConsumable = await GetConsumable(
+            templateItem,
+            currentSequence,
+          )
+          newItems.push(newConsumable)
         } catch (error) {
           console.log(error)
           notification.error({
@@ -1236,11 +1373,8 @@ export default ({
         }
       } else if (templateItem.visitOrderTemplateServiceItemDto) {
         try {
-          const newService = GetService(templateItem)
-          dispatch({
-            type: 'orders/upsertRow',
-            payload: newService,
-          })
+          const newService = await GetService(templateItem, currentSequence)
+          newItems.push(newService)
         } catch (error) {
           console.log(error)
           notification.error({
@@ -1248,6 +1382,11 @@ export default ({
           })
         }
       }
+      currentSequence = currentSequence + 1
+    }
+    dispatch({
+      type: 'orders/upsertRows',
+      payload: newItems,
     })
     setShowRevertVisitPurposeItem(false)
   }
@@ -1259,7 +1398,7 @@ export default ({
         forceRender
         rows={(rows || [])
           .filter(x => !x.isDeleted)
-          .map((r, index) => {
+          .map(r => {
             return {
               ...r,
               currentTotal:
@@ -1268,13 +1407,11 @@ export default ({
                   : 0,
               isEditingEntity: isEditingEntity,
               isEnableEditOrder: isEnableEditOrder,
-              number: index + 1,
             }
           })}
         onRowDoubleClick={editRow}
         getRowId={r => r.uid}
         columns={[
-          { name: 'number', title: 'No.' },
           { name: 'type', title: 'Type' },
           { name: 'subject', title: 'Name' },
           { name: 'priority', title: 'Urgent' },
@@ -1358,7 +1495,7 @@ export default ({
                 if (isExistPackage) {
                   newChildren = [
                     <Table.Cell
-                      colSpan={5}
+                      colSpan={4}
                       key={1}
                       style={{ position: 'relative' }}
                     >
@@ -1387,7 +1524,7 @@ export default ({
                         </div>
                       )}
                     </Table.Cell>,
-                    React.cloneElement(children[8], {
+                    React.cloneElement(children[7], {
                       colSpan: 3,
                       ...restProps,
                     }),
@@ -1395,7 +1532,7 @@ export default ({
                 } else {
                   newChildren = [
                     <Table.Cell
-                      colSpan={4}
+                      colSpan={3}
                       key={1}
                       style={{
                         position: 'relative',
@@ -1427,7 +1564,7 @@ export default ({
                         </div>
                       )}
                     </Table.Cell>,
-                    React.cloneElement(children[7], {
+                    React.cloneElement(children[6], {
                       colSpan: 2,
                       ...restProps,
                     }),
@@ -1532,10 +1669,6 @@ export default ({
           },
         }}
         columnExtensions={[
-          {
-            columnName: 'number',
-            width: 40,
-          },
           {
             columnName: 'type',
             width: 135,
@@ -1705,7 +1838,7 @@ export default ({
           },
           {
             columnName: 'description',
-            width: isFullScreen ? 300 : isExistPackage ? 110 : 140,
+            width: isFullScreen ? 300 : isExistPackage ? 120 : 150,
             observeFields: ['instruction', 'remark', 'remarks'],
             render: row => {
               return (
@@ -1735,7 +1868,7 @@ export default ({
           {
             columnName: 'quantity',
             type: 'number',
-            width: 80,
+            width: 90,
             render: row => {
               let qty = '0.0'
               if (row.type === '1' || row.type === '5' || row.type === '2') {
@@ -1823,7 +1956,7 @@ export default ({
                   )[0]
                   if (deleteEnable) {
                     deleteEnable = false
-                    deleteMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Modification allowed after nurse cancel actualization`
+                    deleteMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Deletion allowed after nurse cancel actualization`
                   }
                 }
               }
@@ -1993,6 +2126,7 @@ export default ({
         <VisitOrderTemplateRevert
           data={removedVisitOrderTemplateItem}
           dispatch={dispatch}
+          open={showRevertVisitPurposeItem}
           confirmRevert={confirmRevert}
         ></VisitOrderTemplateRevert>
       </CommonModal>

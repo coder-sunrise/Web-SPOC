@@ -89,11 +89,11 @@ export const SpecimenDetails = ({
   id,
   onClose,
   onConfirm,
+  isDisposePatientEntity = true,
   isReadonly = false,
 }) => {
+  if (!open) return ''
   const dispatch = useDispatch()
-  const cttestcategory = useCodeTable('cttestcategory')
-  const ctspecimentype = useCodeTable('ctspecimentype')
   const { entity } = useSelector(s => s.worklistSpecimenDetails)
   const [isResultFullScreen, setIsResultFullScreen] = useState(false)
   const [formValues, setFormValues] = useState({})
@@ -145,10 +145,6 @@ export const SpecimenDetails = ({
   }, [id])
 
   useEffect(() => {
-    if (!showModal) cleanUp()
-  }, [showModal])
-
-  useEffect(() => {
     form.resetFields() //to ensure to reset fields from previous item.
     form.setFieldsValue(entity)
     setFormValues(entity) //https://github.com/ant-design/ant-design/issues/21829
@@ -165,7 +161,7 @@ export const SpecimenDetails = ({
         payload: entity,
       }).then(result => {
         if (result) {
-          setShowModal(false)
+          cleanUp()
           onConfirm && onConfirm()
         }
       })
@@ -227,7 +223,7 @@ export const SpecimenDetails = ({
           payload: { ...entity, ...values },
         }).then(result => {
           if (result) {
-            setShowModal(false)
+            cleanUp()
             onConfirm && onConfirm()
           }
         })
@@ -245,7 +241,7 @@ export const SpecimenDetails = ({
         payload: { ...entity, ...values },
       }).then(result => {
         if (result) {
-          setShowModal(false)
+          cleanUp()
           onConfirm && onConfirm()
         }
       })
@@ -332,13 +328,13 @@ export const SpecimenDetails = ({
                   id: 'app.general.leave-without-save',
                 }),
                 onConfirmSave: () => {
-                  setShowModal(false)
+                  cleanUp()
                   onClose && onClose()
                 },
               },
             })
           } else {
-            setShowModal(false)
+            cleanUp()
             onClose && onClose()
           }
         }}
@@ -384,7 +380,7 @@ export const SpecimenDetails = ({
                 <React.Fragment>
                   <GridItem md={12}>
                     <div style={{ padding: 8 }}>
-                      <Banner />
+                      <Banner isDisposePatientEntity={isDisposePatientEntity} />
                     </div>
                   </GridItem>
                   <GridItem md={12}>

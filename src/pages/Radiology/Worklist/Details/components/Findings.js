@@ -9,6 +9,7 @@ import {
   convertFromHTML,
 } from 'draft-js'
 import draftToHtml from 'draftjs-to-html'
+import htmlToDraft from 'html-to-draftjs'
 import Authorized from '@/utils/Authorized'
 import {
   RichEditor,
@@ -75,7 +76,7 @@ export const Findings = ({
 
   useEffect(() => {
     if (defaultValue && defaultValue !== '') {
-      const blocksFromHTML = convertFromHTML(defaultValue)
+      const blocksFromHTML = htmlToDraft(defaultValue)
       if (blocksFromHTML && blocksFromHTML.contentBlocks !== null) {
         const newState = ContentState.createFromBlockArray(
           blocksFromHTML.contentBlocks,
@@ -89,8 +90,11 @@ export const Findings = ({
   const getHtmlFromEditorState = editorState => {
     const currentContent = editorState.getCurrentContent()
     if (currentContent.plainText === '') return
-
-    return draftToHtml(convertToRaw(currentContent))
+    const raw = convertToRaw(currentContent)
+    raw.blocks
+      .filter(b => b.type === 'unstyled' && b.text == '')
+      .forEach(b => (b.text = ' '))
+    return draftToHtml(raw)
   }
 
   const handleEditorStateChange = newEditorState => {
@@ -289,7 +293,7 @@ export const Findings = ({
     <div>
       <GridContainer>
         <GridItem sm={9} md={9}>
-          <Typography>Examination Findings</Typography>
+          <Typography style={{position:'relative',top:10}}>Examination Findings :</Typography>
         </GridItem>
         <GridItem sm={3} md={3}>
           <div

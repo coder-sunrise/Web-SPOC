@@ -34,6 +34,7 @@ const AppointmentType = ({
       type: 'settingAppointmentType/query',
       payload: {
         sorting: [
+          { columnName: 'isDefault', direction: 'desc' },
           { columnName: 'displayValue', direction: 'asc' },
         ],
       },

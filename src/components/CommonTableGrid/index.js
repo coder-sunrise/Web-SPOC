@@ -912,12 +912,7 @@ class CommonTableGrid extends PureComponent {
   render () {
     const {
       classes,
-      pageSizes = [
-        5,
-        10,
-        50,
-        100,
-      ],
+      pageSizes = [10, 20, 50, 100],
       columns = [],
       type,
       TableCell = DefaultTableCell,
@@ -933,14 +928,14 @@ class CommonTableGrid extends PureComponent {
       selection = [],
       errors = [],
       query,
-      getRowId = (row) => (row.Id ? row.Id : row.id),
-      onSelectionChange = (f) => f,
+      getRowId = row => (row.Id ? row.Id : row.id),
+      onSelectionChange = f => f,
       FuncProps = {},
       TableProps = {},
       ActionProps = {},
       FilteringProps: {
         defaultFilters = [],
-        onFiltersChange = (f) => f,
+        onFiltersChange = f => f,
         filterColumnExtensions = [],
       } = {},
       LoadingProps: { isLoading = false, loadingMessage = 'Retrieve data' } = {

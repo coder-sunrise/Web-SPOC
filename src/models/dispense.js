@@ -213,7 +213,10 @@ const getDispenseItems = (clinicSettings, entity = {}) => {
 
   const generateFromNormalMedication = item => {
     const groupName = 'NormalDispense'
-    if (item.isPreOrder) {
+    if (
+      (item.isPreOrder && !item.isChargeToday) ||
+      (!item.isPreOrder && item.hasPaid)
+    ) {
       orderItems.push({
         ...defaultItem(item, groupName),
         groupNumber: 1,
@@ -343,7 +346,10 @@ const getDispenseItems = (clinicSettings, entity = {}) => {
 
   const generateFromNormalConsumable = item => {
     const groupName = 'NormalDispense'
-    if (item.isPreOrder) {
+    if (
+      (item.isPreOrder && !item.isChargeToday) ||
+      (!item.isPreOrder && item.hasPaid)
+    ) {
       orderItems.push({
         ...defaultItem(item, groupName),
         groupNumber: 1,
@@ -456,7 +462,10 @@ const getDispenseItems = (clinicSettings, entity = {}) => {
 
   const generateFromNormalVaccination = item => {
     const groupName = 'NormalDispense'
-    if (item.isPreOrder) {
+    if (
+      (item.isPreOrder && !item.isChargeToday) ||
+      (!item.isPreOrder && item.hasPaid)
+    ) {
       orderItems.push({
         ...defaultItem(item, groupName),
         groupNumber: 1,
@@ -630,15 +639,12 @@ export default createFormViewModel({
             patientID: payload.pid,
           },
         })
-
-        if (
-          payload.pid &&
-          (!patientState.entity || patientState.entity.id !== payload.pid)
-        ) {
+        if (payload.pid) {
           yield put({
             type: 'patient/query',
             payload: {
               id: payload.pid,
+              version: Date.now(),
             },
           })
           yield take('patient/query/@@end')
@@ -658,13 +664,6 @@ export default createFormViewModel({
           },
         })
         yield take('query/@@end')
-
-        yield put({
-          type: 'dispense/updateState',
-          payload: {
-            queryCodeTablesDone: true,
-          },
-        })
         yield put({
           type: 'getServingPersons',
           payload: { visitFK: visitID },

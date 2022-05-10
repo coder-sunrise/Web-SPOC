@@ -49,6 +49,8 @@ import RedispenseForm from '../../Components/RedispenseForm'
 import DrugLeafletSelection from '../../Components/DrugLeafletSelection'
 import DrugLabelSelection from '@/pages/Dispense/DispenseDetails/DrugLabelSelection'
 import customtyles from '@/pages/Dispense/DispenseDetails/Style.less'
+import VisitGroupIcon from '@/pages/Radiology/Components/VisitGroupIcon'
+import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 
 const styles = theme => ({
   wrapCellTextStyle: {
@@ -64,6 +66,7 @@ const styles = theme => ({
     height: 20,
     cursor: 'pointer',
     margin: '0px 1px',
+    lineHeight: '16px',
   },
   subRow: {
     '& > td:first-child': {
@@ -1329,41 +1332,38 @@ const Main = props => {
             <div style={{ position: 'relative' }}>
               <div
                 style={{
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
                   paddingRight: existsDrugLabelRemarks ? 10 : 0,
                   minHeight: 20,
                 }}
               >
                 <Tooltip title={row.remarks || ''}>
-                  <span>{row.remarks || ' '}</span>
+                  <span className='oneline_textblock'>
+                    {row.remarks || ' '}
+                  </span>
                 </Tooltip>
               </div>
-              <div style={{ position: 'relative', top: 6 }}>
-                {existsDrugLabelRemarks && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: 2,
-                      right: -8,
-                    }}
-                  >
-                    <Tooltip
-                      title={
-                        <div>
-                          <div style={{ fontWeight: 600 }}>
-                            Drug Label Remarks
-                          </div>
-                          <div>{row.drugLabelRemarks}</div>
+              {existsDrugLabelRemarks && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 6,
+                    right: -8,
+                  }}
+                >
+                  <Tooltip
+                    title={
+                      <div>
+                        <div style={{ fontWeight: 600 }}>
+                          Drug Label Remarks
                         </div>
-                      }
-                    >
-                      <FileCopySharp style={{ color: '#4255bd' }} />
-                    </Tooltip>
-                  </div>
-                )}
-              </div>
+                        <div>{row.drugLabelRemarks}</div>
+                      </div>
+                    }
+                  >
+                    <FileCopySharp style={{ color: '#4255bd' }} />
+                  </Tooltip>
+                </div>
+              )}
             </div>
           )
         },
@@ -1724,10 +1724,17 @@ const Main = props => {
         <ContentGridItem title='Order Created Time:'>
           {moment(workitem.generateDate).format('DD MMM YYYY HH:mm')}
         </ContentGridItem>
-        <ContentGridItem title='Group:'>
-          {workitem.visitGroup && workitem.visitGroup.trim().length
-            ? workitem.visitGroup
-            : '-'}
+        <ContentGridItem title='Visit Group No.:'>
+          {hasValue(workitem.visitGroup) &&
+          workitem.visitGroup.trim().length ? (
+            <VisitGroupIcon
+              visitGroup={workitem.visitGroup}
+              visitFK={workitem.visitFK}
+              isQueueNoDecimal={isQueueNoDecimal}
+            />
+          ) : (
+            '-'
+          )}
         </ContentGridItem>
         <ContentGridItem title='Family History:'>
           {workitem.familyHistory && workitem.familyHistory.trim().length
@@ -1920,7 +1927,7 @@ const Main = props => {
               <Print />
               Prescription
             </Button>
-            {secondaryPrintoutLanguage !== '' && (
+            {/* {secondaryPrintoutLanguage !== '' && (
               <CheckboxGroup
                 value={printlanguage}
                 style={{
@@ -1936,7 +1943,7 @@ const Main = props => {
                   setPrintlanguage(v.target.value)
                 }}
               />
-            )}
+            )} */}
           </div>
         </GridItem>
         <GridItem

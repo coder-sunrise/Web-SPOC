@@ -930,6 +930,7 @@ class Medication extends PureComponent {
           precaution.code,
         )
         setFieldValue(`corPrescriptionItemPrecaution[${i}].sequence`, i)
+        setFieldValue(`corPrescriptionItemPrecaution[${i}].uid`, getUniqueId())
       })
     } else {
       const defaultPrecaution = {
@@ -1585,6 +1586,7 @@ class Medication extends PureComponent {
                 borderRadius: 4,
                 padding: '1px 3px',
                 fontWeight: 500,
+                lineHeight: '16px',
               }}
               title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'
             >

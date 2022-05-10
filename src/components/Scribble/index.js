@@ -55,6 +55,7 @@ import {
   withFormikExtend,
   FastField,
   Select,
+  notification,
 } from '@/components'
 import _ from 'lodash'
 import {
@@ -235,7 +236,12 @@ class ScribbleTemplateItem extends React.Component {
                 <Button
                   {...this.buttonProps}
                   onClick={() => {
-                    if (!description || !description.trim()) return
+                    if (!description || !description.trim()) {
+                      notification.warning({
+                        message: 'Template name is mandatory.',
+                      })
+                      return
+                    }
                     const savedItem = { ...item, description }
                     this.setState({
                       isEdit: false,
@@ -779,6 +785,7 @@ class Scribble extends React.Component {
       ['sortOrder'],
       ['asc'],
     )
+    const { isReadonly = false } = scriblenotes
     return (
       <div className={classes.layout}>
         <GridContainer>
@@ -1382,86 +1389,92 @@ class Scribble extends React.Component {
               />
             </div>
           </GridItem>
-          <GridItem xs={2} md={2}>
-            <div className={classes.imageTemplateArea}>
-              <GridContainer>
-                <GridItem xs={12} md={12}>
-                  <div style={{ position: 'relative' }}>
-                    <TextField
-                      label='Image Templates'
-                      maxLength={500}
-                      inputProps={{ maxLength: 500 }}
-                      style={{ paddingRight: 35 }}
-                      value={filterItem}
-                      onChange={e => {
-                        this.setState({ filterItem: e.target.value })
-                      }}
-                    />
-                    <Tooltip title='Upload image to save as image template'>
-                      <Button
-                        color='success'
-                        justIcon
-                        onClick={this.onUploadTemplateClick}
-                        style={{ position: 'absolute', right: -10, bottom: 10 }}
-                      >
-                        <CloudUploadOutlined />
-                      </Button>
-                    </Tooltip>
-                  </div>
-                  <div className={classes.templateImage}>
-                    <List>
-                      <div className={classes.imageOption}>
-                        {sortedTemplateList.map(item => (
-                          <ScribbleTemplateItem
-                            key={item.id}
-                            item={item}
-                            setTemplate={this._setTemplate}
-                            upsertTemplate={this.upsertTemplate}
-                            onEditingTemplate={this.handleEditingTemplate}
-                            isTemplateEditing={this.state.isTemplateEditing}
-                            classes={classes}
-                          />
-                        ))}
-                      </div>
-                    </List>
-                  </div>
-                </GridItem>
-              </GridContainer>
-              <GridContainer style={{ paddingTop: 10 }}>
-                <GridItem xs={12} md={12}>
-                  <Dropzone
-                    onDrop={this._onBackgroundImageDrop}
-                    accept='image/*'
-                    multiple={false}
-                  >
-                    {({ getRootProps, getInputProps }) => (
-                      <section>
-                        <div {...getRootProps()} style={styles.dropArea}>
-                          <input {...getInputProps()} />
-                          <p className={classes.dropArea}>
-                            Drag and drop some files here, <br />
-                            or click to select files
-                          </p>
+          {!isReadonly && (
+            <GridItem xs={2} md={2}>
+              <div className={classes.imageTemplateArea}>
+                <GridContainer>
+                  <GridItem xs={12} md={12}>
+                    <div style={{ position: 'relative' }}>
+                      <TextField
+                        label='Image Templates'
+                        maxLength={500}
+                        inputProps={{ maxLength: 500 }}
+                        style={{ paddingRight: 35 }}
+                        value={filterItem}
+                        onChange={e => {
+                          this.setState({ filterItem: e.target.value })
+                        }}
+                      />
+                      <Tooltip title='Upload image to save as image template'>
+                        <Button
+                          color='success'
+                          justIcon
+                          onClick={this.onUploadTemplateClick}
+                          style={{
+                            position: 'absolute',
+                            right: -10,
+                            bottom: 10,
+                          }}
+                        >
+                          <CloudUploadOutlined />
+                        </Button>
+                      </Tooltip>
+                    </div>
+                    <div className={classes.templateImage}>
+                      <List>
+                        <div className={classes.imageOption}>
+                          {sortedTemplateList.map(item => (
+                            <ScribbleTemplateItem
+                              key={item.id}
+                              item={item}
+                              setTemplate={this._setTemplate}
+                              upsertTemplate={this.upsertTemplate}
+                              onEditingTemplate={this.handleEditingTemplate}
+                              isTemplateEditing={this.state.isTemplateEditing}
+                              classes={classes}
+                            />
+                          ))}
                         </div>
-                      </section>
-                    )}
-                  </Dropzone>
-                </GridItem>
-                <GridItem xs={12} md={12}>
-                  <input
-                    style={{ display: 'none' }}
-                    type='file'
-                    accept='image/*'
-                    id='uploadTemplate'
-                    ref={this.inputEl}
-                    multiple={false}
-                    onChange={this.onFileChange}
-                    onClick={this.clearValue}
-                  />
-                </GridItem>
-              </GridContainer>
-            </div>
-          </GridItem>
+                      </List>
+                    </div>
+                  </GridItem>
+                </GridContainer>
+                <GridContainer style={{ paddingTop: 10 }}>
+                  <GridItem xs={12} md={12}>
+                    <Dropzone
+                      onDrop={this._onBackgroundImageDrop}
+                      accept='image/*'
+                      multiple={false}
+                    >
+                      {({ getRootProps, getInputProps }) => (
+                        <section>
+                          <div {...getRootProps()} style={styles.dropArea}>
+                            <input {...getInputProps()} />
+                            <p className={classes.dropArea}>
+                              Drag and drop some files here, <br />
+                              or click to select files
+                            </p>
+                          </div>
+                        </section>
+                      )}
+                    </Dropzone>
+                  </GridItem>
+                  <GridItem xs={12} md={12}>
+                    <input
+                      style={{ display: 'none' }}
+                      type='file'
+                      accept='image/*'
+                      id='uploadTemplate'
+                      ref={this.inputEl}
+                      multiple={false}
+                      onChange={this.onFileChange}
+                      onClick={this.clearValue}
+                    />
+                  </GridItem>
+                </GridContainer>
+              </div>
+            </GridItem>
+          )}
         </GridContainer>
       </div>
     )

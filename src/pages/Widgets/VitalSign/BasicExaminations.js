@@ -392,6 +392,7 @@ class BasicExaminations extends PureComponent {
                 name={`${fieldName}[0].isPregnancy`}
                 render={args => (
                   <RadioGroup
+                    isAllowReset
                     label={formatMessage({
                       id: 'reception.queue.visitRegistration.isPregnancy',
                     })}
@@ -412,6 +413,7 @@ class BasicExaminations extends PureComponent {
                 name={`${fieldName}[0].hepetitisVaccinationA`}
                 render={args => (
                   <RadioGroup
+                    isAllowReset
                     label={formatMessage({
                       id:
                         'reception.queue.visitRegistration.hepetitisVaccinationA',
@@ -427,6 +429,7 @@ class BasicExaminations extends PureComponent {
                 name={`${fieldName}[0].hepetitisVaccinationB`}
                 render={args => (
                   <RadioGroup
+                    isAllowReset
                     label={formatMessage({
                       id:
                         'reception.queue.visitRegistration.hepetitisVaccinationB',
@@ -442,6 +445,7 @@ class BasicExaminations extends PureComponent {
                 name={`${fieldName}[0].isFasting`}
                 render={args => (
                   <RadioGroup
+                    isAllowReset
                     label={formatMessage({
                       id: 'reception.queue.visitRegistration.isFasting',
                     })}
@@ -456,6 +460,7 @@ class BasicExaminations extends PureComponent {
                 name={`${fieldName}[0].isSmoking`}
                 render={args => (
                   <RadioGroup
+                    isAllowReset
                     label={formatMessage({
                       id: 'reception.queue.visitRegistration.isSmoking',
                     })}
@@ -470,6 +475,7 @@ class BasicExaminations extends PureComponent {
                 name={`${fieldName}[0].isAlcohol`}
                 render={args => (
                   <RadioGroup
+                    isAllowReset
                     label={formatMessage({
                       id: 'reception.queue.visitRegistration.isAlcohol',
                     })}
@@ -484,6 +490,7 @@ class BasicExaminations extends PureComponent {
                 name={`${fieldName}[0].isMensus`}
                 render={args => (
                   <RadioGroup
+                    isAllowReset
                     label={formatMessage({
                       id: 'reception.queue.visitRegistration.isMensus',
                     })}
@@ -516,7 +523,6 @@ class BasicExaminations extends PureComponent {
         <Accordion
           mode='multiple'
           collapses={this.getBasicExaminations()}
-          activedKeys={[0, 1]}
           onChange={(event, p, expanded) => {
             if (p.key === 0 && expanded && !this.state.expandedGeneral) {
               this.setState({ expandedGeneral: true })

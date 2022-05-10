@@ -591,9 +591,6 @@ class Billing extends Component {
       if (isSchemesValid) {
         const payload = constructPayload(values)
         const defaultCallback = async () => {
-          notification.success({
-            message: 'Billing Saved',
-          })
           if (visitStatus === VISIT_STATUS.COMPLETED) {
             notification.success({
               message: backtoQueue ? 'Billing Completed' : 'Billing Saved',
@@ -608,6 +605,9 @@ class Billing extends Component {
               history.push('/reception/queue')
             }
           } else {
+            notification.success({
+              message: 'Billing Saved',
+            })
             dispatch({
               type: 'patient/query',
               payload: { id: patient.id },
@@ -791,7 +791,9 @@ class Billing extends Component {
           openConfirmText: 'Confirm',
           openConfirmContent:
             'Invoice is overpaid. Confirm to complete billing?',
-          onConfirmSave: this.upsertBilling,
+          onConfirmSave: () => {
+            this.upsertBilling(null, null, true)
+          },
         },
       })
     }
