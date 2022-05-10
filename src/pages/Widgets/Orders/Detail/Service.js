@@ -151,7 +151,7 @@ const getVisitDoctorUserId = props => {
       ...(orders.entity || orders.defaultService),
     }
     if (orders.entity) {
-      if (v.adjValue < 0) {
+      if (v.adjValue <= 0) {
         v.adjValue = Math.abs(v.adjValue || 0)
         v.isMinus = true
       } else {
