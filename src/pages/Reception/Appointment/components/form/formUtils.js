@@ -232,6 +232,7 @@ export const mapPropsToValues = ({
           newEndTime,
           newResourceId,
           view,
+          isAffectAllResource,
         } = updateEvent
         isUpdated = true
         if (
@@ -247,6 +248,7 @@ export const mapPropsToValues = ({
           r => r.id === updateApptResourceId,
         )
 
+        let firstStartTime = updateResource.startTime
         if (view !== CALENDAR_VIEWS.MONTH) {
           const startTime = moment(newStartTime, timeFormat24Hour)
           const endTime = moment(newEndTime, timeFormat24Hour)
@@ -255,7 +257,21 @@ export const mapPropsToValues = ({
           updateResource.endTime = endTime.format(timeFormat24Hour)
           updateResource.apptDurationHour = hour
           updateResource.apptDurationMinute = minute
+          firstStartTime = newStartTime
         }
+
+        if (isAffectAllResource) {
+          apptResources.forEach(r => {
+            r.startTime = moment(firstStartTime, timeFormat24Hour).format(
+              timeFormat24Hour,
+            )
+            r.endTime = moment(firstStartTime, timeFormat24Hour)
+              .add(r.apptDurationHour, 'hours')
+              .add(r.apptDurationMinute, 'minutes')
+              .format(timeFormat24Hour)
+          })
+        }
+
         if (newResourceId) {
           const source = ctcalendarresource.find(
             source => source.id === newResourceId,
