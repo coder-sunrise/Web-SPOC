@@ -36,9 +36,9 @@ const MCCard = ({
   validateReportLanguage,
 }) => {
   const commitChanges = ({ rows }) => {
-                                        setFieldValue('visitDoctor', rows)
-                                        return rows
-                                      }
+    setFieldValue('visitDoctor', rows)
+    return rows
+  }
 
   const getReportLanguage = () => {
     const {
@@ -101,6 +101,7 @@ const MCCard = ({
       type: 'codeSelect',
       code: 'doctorprofile',
       isDisabled: row => {
+        if (!mcWorkItemInProgress) return true
         // As long as current reporting doctor is not in Waiting status then able to edit and remove.
         if (row.id > 0 && row.consultationStatus !== 'Waiting') {
           return true
@@ -120,6 +121,7 @@ const MCCard = ({
       },
       sortingEnabled: false,
       render: e => {
+        if (!mcWorkItemInProgress) return ''
         const { row, columnConfig } = e
         const { control } = columnConfig
         const { commitChanges } = control
