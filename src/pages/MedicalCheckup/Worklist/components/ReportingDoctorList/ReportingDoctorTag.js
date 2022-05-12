@@ -181,7 +181,10 @@ const ReportingDoctorTag = ({
           dispatch={dispatch}
           source={APPNOTIFICATION_SCHEMA.MC.name}
           sourceRecordId={medicalCheckupWorkitemId}
-          doctor={{ userFK: medicalCheckupDoctor.userProfileFK, name: name }}
+          doctor={{
+            userFK: medicalCheckupDoctor.userProfileFK,
+            name: medicalCheckupDoctor.name,
+          }}
           buttonProps={{ justIcon: true, style: { width: 24 } }}
           isMessageThreadEnable={isMessageThreadEnable()}
           exactControl={exactControl}

@@ -166,28 +166,24 @@ class AppNotificationContent extends Component {
                     <Done style={{ color: '#389e0d' }} />
                   </div>
                 ) : null)}
-              {isSender && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: 25,
-                    bottom: 0,
-                    fontSize: '0.75rem',
-                  }}
-                >{`To: ${toUser}`}</div>
-              )}
-              {isReceiver && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    right: 0,
-                    bottom: 0,
-                    fontSize: '0.75rem',
-                  }}
-                >
-                  {`From: ${fromUser}, ${formatDateTime(generateDate)}`}
-                </div>
-              )}
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 25,
+                  bottom: 0,
+                  fontSize: '0.75rem',
+                }}
+              >{`To: ${toUser}`}</div>
+              <div
+                style={{
+                  position: 'absolute',
+                  right: 0,
+                  bottom: 0,
+                  fontSize: '0.75rem',
+                }}
+              >
+                {`From: ${fromUser}, ${formatDateTime(generateDate)}`}
+              </div>
             </div>
           )}
         </div>
