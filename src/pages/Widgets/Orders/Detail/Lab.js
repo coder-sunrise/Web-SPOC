@@ -151,6 +151,11 @@ const getVisitDoctorUserId = props => {
         v.isMinus = false
       }
       v.isExactAmount = v.adjType !== 'Percentage'
+      if ((v.labItems || []).length) {
+        v.labItems[0].isMinus = v.isMinus
+        v.labItems[0].isExactAmount = v.isExactAmount
+        v.labItems[0].adjValue = v.adjValue
+      }
     }
     return {
       ...v,
@@ -776,7 +781,7 @@ class Lab extends PureComponent {
                     display: 'inline-block',
                     marginLeft: 6,
                   }}
-                >{`${showItemCount} items displayed, ${filterServices.length} items in total.`}</div>
+                >{`${showItemCount} item(s) displayed, ${filterServices.length} item(s) in total.`}</div>
               )}
             </GridItem>
             <GridItem xs={12}>

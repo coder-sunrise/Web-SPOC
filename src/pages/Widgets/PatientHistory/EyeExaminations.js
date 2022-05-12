@@ -67,7 +67,7 @@ const getIntraocularPressureTestRows = (corEyeExaminations = []) => {
         ? `${corEyeExaminations[0].rightThirdResult}`
         : '-',
       averageResult: hasValue(corEyeExaminations[0].rightAverageResult)
-        ? `${numeral(corEyeExaminations[0].rightAverageResult).format('0.0')}`
+        ? `${numeral(corEyeExaminations[0].rightAverageResult).format('0')}`
         : '-',
     },
     {
@@ -83,7 +83,7 @@ const getIntraocularPressureTestRows = (corEyeExaminations = []) => {
         ? `${corEyeExaminations[0].leftThirdResult}`
         : '-',
       averageResult: hasValue(corEyeExaminations[0].leftAverageResult)
-        ? `${numeral(corEyeExaminations[0].leftAverageResult).format('0.0')}`
+        ? `${numeral(corEyeExaminations[0].leftAverageResult).format('0')}`
         : '-',
     },
   ]
