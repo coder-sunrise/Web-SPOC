@@ -54,12 +54,13 @@ const styles = (theme) => ({
     },
   },
   popoverContainer: {
-    width: 250,
+    maxWidth: 400,
+    minWidth: 200,
     textAlign: 'left',
     marginTop: -10,
   },
   listContainer: {
-    maxHeight: 230,
+    maxHeight: 250,
     overflowY: 'auto',
   },
 })
@@ -154,7 +155,7 @@ class VisitFormGrid extends PureComponent {
   }
 
   printRow = row => {
-    DocumentEditor.print({ documentName: row.formName, document: row.formData.content })
+    DocumentEditor.print({ documentName: row.formName, document: row.formData.content, strWatermark:'VOIDED'})
   }
 
   VoidForm = ({ classes, dispatch, row, user }) => {
