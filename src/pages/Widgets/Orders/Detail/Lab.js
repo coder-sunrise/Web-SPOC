@@ -151,6 +151,11 @@ const getVisitDoctorUserId = props => {
         v.isMinus = false
       }
       v.isExactAmount = v.adjType !== 'Percentage'
+      if ((v.labItems || []).length) {
+        v.labItems[0].isMinus = v.isMinus
+        v.labItems[0].isExactAmount = v.isExactAmount
+        v.labItems[0].adjValue = v.adjValue
+      }
     }
     return {
       ...v,
