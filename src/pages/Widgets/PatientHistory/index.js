@@ -1197,10 +1197,10 @@ class PatientHistory extends Component {
     }
   }
 
-  getNoteContent = (note, selectNoteTypes, index) => {
-    if (selectNoteTypes.length > index) {
+  getNoteContent = (note, selectNoteTypes, showType) => {
+    if (selectNoteTypes.indexOf(showType) >= 0) {
       const notesType = WidgetConfig.notesTypes.find(
-        type => type.value === selectNoteTypes[index],
+        type => type.value === showType,
       )
       if (!notesType) return undefined
       return note[notesType.fieldName]
@@ -1233,27 +1233,36 @@ class PatientHistory extends Component {
         return {
           id: note.id,
           visitFK: current.currentId,
-          content1: this.getNoteContent(note, selectNoteTypes, 0) || '',
-          content2: this.getNoteContent(note, selectNoteTypes, 1) || '',
-          content3: this.getNoteContent(note, selectNoteTypes, 2) || '',
-          content4: this.getNoteContent(note, selectNoteTypes, 3) || '',
+          history:
+            this.getNoteContent(
+              note,
+              selectNoteTypes,
+              WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
+            ) || '',
+          chiefComplaints:
+            this.getNoteContent(
+              note,
+              selectNoteTypes,
+              WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
+            ) || '',
+          note:
+            this.getNoteContent(
+              note,
+              selectNoteTypes,
+              WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
+            ) || '',
+          plan:
+            this.getNoteContent(
+              note,
+              selectNoteTypes,
+              WidgetConfig.WIDGETS_ID.PLAN,
+            ) || '',
           doctor: noteUserName,
           updateDate: moment(note.signedDate).format(
             dateFormatLongWithTimeNoSec,
           ),
-          noteColumnCount: selectNoteTypes.length,
         }
       })
-  }
-
-  getNoteTitle = (selectNoteTypes, index) => {
-    if (selectNoteTypes.length > index) {
-      const notesType = WidgetConfig.notesTypes.find(
-        type => type.value === selectNoteTypes[index],
-      )
-      return notesType.title
-    }
-    return ''
   }
 
   showBasicExaminationsGeneral = (basicExaminations = []) => {
@@ -1378,10 +1387,6 @@ class PatientHistory extends Component {
         const { isNurseNote, nurseNotes = '', visitPurposeFK } = current
         let isShowDoctorNote = false
         const selectNoteTypes = this.getSelectNoteTypes()
-        const noteTitle1 = this.getNoteTitle(selectNoteTypes, 0)
-        const noteTitle2 = this.getNoteTitle(selectNoteTypes, 1)
-        const noteTitle3 = this.getNoteTitle(selectNoteTypes, 2)
-        const noteTitle4 = this.getNoteTitle(selectNoteTypes, 3)
         if (selectNoteTypes.length) {
           isShowDoctorNote = selectNoteTypes.find(noteType =>
             this.checkShowNoteInReport(
@@ -1523,10 +1528,6 @@ class PatientHistory extends Component {
             ...referral,
             ...restRefractionFormProps,
             ...eyeVisualAcuityTestDetails,
-            noteTitle1,
-            noteTitle2,
-            noteTitle3,
-            noteTitle4,
             patientGender: current.patientGender || '',
             isShowBasicExaminations: isShowBasicExaminations,
             isShowBasicExaminationsGeneral: this.showBasicExaminationsGeneral(
@@ -1727,7 +1728,7 @@ class PatientHistory extends Component {
                   rightAverageResult: WidgetConfig.hasValue(
                     o.rightAverageResult,
                   )
-                    ? `${numeral(o.rightAverageResult).format('0.0')}`
+                    ? `${numeral(o.rightAverageResult).format('0')}`
                     : '-',
                   leftFirstResult: WidgetConfig.hasValue(o.leftFirstResult)
                     ? `${o.leftFirstResult}`
@@ -1739,7 +1740,7 @@ class PatientHistory extends Component {
                     ? `${o.leftThirdResult}`
                     : '-',
                   leftAverageResult: WidgetConfig.hasValue(o.leftAverageResult)
-                    ? `${numeral(o.leftAverageResult).format('0.0')}`
+                    ? `${numeral(o.leftAverageResult).format('0')}`
                     : '-',
                   colorVisionTestResult: o.colorVisionTestResult || '',
                   remarks:

@@ -45,12 +45,11 @@ export default ({
   }
 
   const getColumns = () => {
-    if (!getSelectNoteTypes().length) return
     const selectNoteTypes = notesTypes.filter(
       n => getSelectNoteTypes().indexOf(n.value) >= 0,
     )
 
-    let columns = [
+    const columns = [
       {
         dataIndex: 'doctor',
         title: 'Doctor',
@@ -64,38 +63,40 @@ export default ({
           return <span>{noteUserName}</span>
         },
       },
-    ]
-
-    selectNoteTypes.forEach(noteType => {
-      columns.push({
-        dataIndex: noteType.fieldName,
-        title: noteType.title,
+      {
+        dataIndex: 'clinicNote',
+        title: 'clinic Notes',
+        render: (_, row) => (
+          <div>
+            {selectNoteTypes.map(noteType => {
+              return (
+                <div>
+                  <Notes
+                    classes={classes}
+                    current={row}
+                    scribbleNoteUpdateState={scribbleNoteUpdateState}
+                    fieldName={noteType.fieldName}
+                    title={noteType.title}
+                  />
+                </div>
+              )
+            })}
+          </div>
+        ),
+      },
+      {
+        dataIndex: 'signedDate',
+        title: 'Last Update Time',
+        width: 140,
         render: (text, row) => {
           return (
-            <Notes
-              classes={classes}
-              current={row}
-              scribbleNoteUpdateState={scribbleNoteUpdateState}
-              fieldName={noteType.fieldName}
-            />
+            <span>
+              {moment(row.signedDate).format(dateFormatLongWithTimeNoSec)}
+            </span>
           )
         },
-      })
-    })
-
-    columns.push({
-      dataIndex: 'signedDate',
-      title: 'Last Update Time',
-      width: 140,
-      render: (text, row) => {
-        return (
-          <span>
-            {moment(row.signedDate).format(dateFormatLongWithTimeNoSec)}
-          </span>
-        )
       },
-    })
-
+    ]
     return columns
   }
 

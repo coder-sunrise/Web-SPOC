@@ -787,7 +787,7 @@ class Radiology extends PureComponent {
                     display: 'inline-block',
                     marginLeft: 6,
                   }}
-                >{`${showItemCount} items displayed, ${filterServices.length} items in total.`}</div>
+                >{`${showItemCount} item(s) displayed, ${filterServices.length} item(s) in total.`}</div>
               )}
             </GridItem>
             <GridItem xs={12}>
