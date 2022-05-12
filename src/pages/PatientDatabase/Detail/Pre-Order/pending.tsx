@@ -7,7 +7,8 @@ import Authorized from '@/utils/Authorized'
 import { FastEditableTableGrid, Tooltip } from '@/components'
 import Loading from '@/components/PageLoading/index'
 import { preOrderItemCategory } from '@/utils/codes'
-import { RADIOLOGY_CATEGORY, LAB_CATEGORY } from '@/utils/constants'
+import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
+import { NumberInput } from '@/components'
 import Yup from '@/utils/yup'
 // interface IPendingPreOrderProps {
 // }
@@ -148,18 +149,26 @@ const PendingPreOrder: React.FC = (props: any) => {
         const retSerResponse = ctservice
           .filter(
             c =>
-              LAB_CATEGORY.indexOf(c.serviceCenterCategoryFK) < 0 &&
-              RADIOLOGY_CATEGORY.indexOf(c.serviceCenterCategoryFK) < 0,
+              c.serviceCenterCategoryFK !==
+                SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER &&
+              c.serviceCenterCategoryFK !==
+                SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
           )
           .reduce(itemWrapper, [])
         setServices(retSerResponse)
         const retLabResponse = ctservice
-          .filter(c => LAB_CATEGORY.indexOf(c.serviceCenterCategoryFK) >= 0)
+          .filter(
+            c =>
+              c.serviceCenterCategoryFK ===
+              SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER,
+          )
           .reduce(itemWrapper, [])
         setLabs(retLabResponse)
         const retRadiologyResponse = ctservice
           .filter(
-            c => RADIOLOGY_CATEGORY.indexOf(c.serviceCenterCategoryFK) >= 0,
+            c =>
+              c.serviceCenterCategoryFK ===
+              SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
           )
           .reduce(itemWrapper, [])
         setRadiology(retRadiologyResponse)
@@ -168,18 +177,26 @@ const PendingPreOrder: React.FC = (props: any) => {
           const retSerResponse = response
             .filter(
               c =>
-                LAB_CATEGORY.indexOf(c.serviceCenterCategoryFK) < 0 &&
-                RADIOLOGY_CATEGORY.indexOf(c.serviceCenterCategoryFK) < 0,
+                c.serviceCenterCategoryFK !==
+                  SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER &&
+                c.serviceCenterCategoryFK !==
+                  SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
             )
             .reduce(itemWrapper, [])
           setServices(retSerResponse)
           const retLabResponse = response
-            .filter(c => LAB_CATEGORY.indexOf(c.serviceCenterCategoryFK) >= 0)
+            .filter(
+              c =>
+                c.serviceCenterCategoryFK ===
+                SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER,
+            )
             .reduce(itemWrapper, [])
           setLabs(retLabResponse)
           const retRadiologyResponse = response
             .filter(
-              c => RADIOLOGY_CATEGORY.indexOf(c.serviceCenterCategoryFK) >= 0,
+              c =>
+                c.serviceCenterCategoryFK ===
+                SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
             )
             .reduce(itemWrapper, [])
           setRadiology(retRadiologyResponse)
@@ -444,7 +461,11 @@ const PendingPreOrder: React.FC = (props: any) => {
         sortingEnabled: false,
         isDisabled: () => true,
         render: row => {
-          return row.hasPaid ? row.amount : '-'
+          return row.hasPaid ? (
+            <NumberInput currency text value={row.amount} rightAlign readonly />
+          ) : (
+            '-'
+          )
         },
       },
       {

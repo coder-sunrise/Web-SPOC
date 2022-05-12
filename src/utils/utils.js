@@ -1041,7 +1041,7 @@ const calculateAmount = (
 ) => {
   let gst = 0
   rows
-    .filter(o => !o.isDeleted && o.isPreOrder && o.isChargeToday && !o.hasPaid)
+    .filter(o => !o.isDeleted && o.isPreOrder && !o.hasPaid)
     .forEach(r => {
       r[adjustedField] = r[totalField]
       r[gstField] = r[adjustedField]
