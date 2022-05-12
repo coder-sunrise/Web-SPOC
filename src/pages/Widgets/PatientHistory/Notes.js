@@ -3,12 +3,14 @@ import moment from 'moment'
 import { GridContainer, TextField } from '@/components'
 import { scribbleTypes } from '@/utils/codes'
 import tablestyles from './PatientHistoryStyle.less'
+import { hasValue } from './config'
 
 export default ({
   classes,
   current,
   scribbleNoteUpdateState,
   fieldName = '',
+  title,
 }) => {
   if (fieldName === 'visitRemarks') {
     return (
@@ -116,8 +118,15 @@ export default ({
       </div>
     )
   })
+
+  if (
+    (!hasValue(current[fieldName]) || !current[fieldName].trim().length) &&
+    !scribbleLink.length
+  )
+    return ''
   return (
     <div>
+      <div style={{ fontWeight: 'bold' }}>{title}</div>
       {current[fieldName] !== undefined ? (
         <div
           style={{ fontSize: '0.85rem' }}
