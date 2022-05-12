@@ -443,7 +443,14 @@ class Detail extends PureComponent {
                           render={args => (
                             <Checkbox
                               label='Enable GST'
-                              onChange={this.handleOnChange}
+                              onChange={({ target: { value } }) => {
+                                value
+                                  ? this.props.setFieldValue(
+                                      'gstValue',
+                                      clinicSettings.gSTPercentageInt,
+                                    )
+                                  : this.props.setFieldValue('gstValue', '')
+                              }}
                               {...args}
                             />
                           )}

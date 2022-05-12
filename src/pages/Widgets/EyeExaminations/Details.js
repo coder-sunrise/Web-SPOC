@@ -37,6 +37,9 @@ const gridIntraocularPressureTestValidationSchema = Yup.object().shape({
   ThirdResult: Yup.number()
     .min(0, messageIntraocularPressureTest)
     .max(40, messageIntraocularPressureTest),
+  AverageResult: Yup.number()
+    .min(0, messageIntraocularPressureTest)
+    .max(40, messageIntraocularPressureTest),
 })
 export default ({
   dispatch,

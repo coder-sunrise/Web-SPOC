@@ -20,10 +20,15 @@ import {
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     description: Yup.string().required(),
-    adjValue: Yup.number().required().notOneOf([0], 'Adjustment value cannot be 0.'),
+    adjValue: Yup.number()
+      .required()
+      .notOneOf([0], 'Adjustment value cannot be 0.'),
     adjType: Yup.string().required(),
     sortOrder: Yup.number().required(),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    effectiveDates: Yup.array()
+      .of(Yup.date())
+      .min(2)
+      .required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
@@ -36,7 +41,7 @@ import {
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         if (onConfirm) onConfirm()
         dispatch({
@@ -48,7 +53,7 @@ import {
   displayName: 'InvoiceAdjustmentDetail',
 })
 class Detail extends PureComponent {
-  render () {
+  render() {
     const { props } = this
     let { classes, theme, footer, values } = props
     return (
@@ -58,7 +63,7 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='code'
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       label='Code'
@@ -73,7 +78,7 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='displayValue'
-                render={(args) => {
+                render={args => {
                   return <TextField label='Display Value' {...args} />
                 }}
               />
@@ -81,7 +86,7 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='effectiveDates'
-                render={(args) => {
+                render={args => {
                   return (
                     <DateRangePicker
                       // showTime
@@ -96,10 +101,8 @@ class Detail extends PureComponent {
             <GridItem md={5}>
               <Field
                 name='adjValue'
-                render={(args) => {
-                  if (
-                    values.adjType === 'ExactAmount'
-                  ) {
+                render={args => {
+                  if (values.adjType === 'ExactAmount') {
                     return (
                       <NumberInput
                         currency
@@ -125,7 +128,7 @@ class Detail extends PureComponent {
             <GridItem md={1}>
               <Field
                 name='adjType'
-                render={(args) => (
+                render={args => (
                   <Switch
                     checkedChildren='$'
                     checkedValue='ExactAmount'
@@ -140,7 +143,7 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='description'
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       label='Remarks'
@@ -155,7 +158,7 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='sortOrder'
-                render={(args) => {
+                render={args => {
                   return (
                     <NumberInput
                       label='Sort Order'
