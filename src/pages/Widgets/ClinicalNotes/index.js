@@ -23,7 +23,7 @@ import { scribbleTypes } from '@/utils/codes'
 const styles = theme => ({
   editor: {
     width: '100%',
-    marginTop: theme.spacing(1),
+    // marginTop: theme.spacing(1),
     position: 'relative',
   },
   editorBtn: {
@@ -31,14 +31,14 @@ const styles = theme => ({
     zIndex: 1,
     left: 305,
     right: 0,
-    top: 25,
+    top: 3,
   },
   linkBtn: {
     position: 'absolute',
     zIndex: 1,
     left: 410,
     right: 0,
-    top: 25,
+    top: 3,
   },
   gridList: {
     flexWrap: 'nowrap',

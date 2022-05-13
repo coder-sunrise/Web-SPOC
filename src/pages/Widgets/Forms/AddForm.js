@@ -7,7 +7,7 @@ import { SizeContainer } from '@/components'
 import LCForm from './LCForm'
 import Form from './Form'
 
-const styles = (theme) => ({
+const styles = theme => ({
   editor: {
     position: 'relative',
   },
@@ -15,7 +15,7 @@ const styles = (theme) => ({
     position: 'absolute',
     zIndex: 1,
     right: 3,
-    top: 8,
+    top: 12,
   },
 })
 

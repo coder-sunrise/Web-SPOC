@@ -305,15 +305,15 @@ const loadFromCodesConfig = {
   ],
 }
 
-const styles = (theme) => ({
+const styles = theme => ({
   editor: {
     position: 'relative',
   },
   editorBtn: {
     position: 'absolute',
     zIndex: 1,
-    right: 3,
-    top: 8,
+    right: 10,
+    top: 14,
   },
 })
 const templateReg = /<a.*?data-value="(.*?)".*?<\/a>/gm
