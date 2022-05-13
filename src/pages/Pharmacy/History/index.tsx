@@ -87,8 +87,8 @@ const defaultColumns = (codetable, setDetailsId) => {
       search: false,
       fixed: 'left',
       width: 200,
-      sortBy:
-        'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.Name',
+      ellipsis: true,
+      sortBy: 'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.Name',
     },
     {
       key: 'patientReferenceNo',
