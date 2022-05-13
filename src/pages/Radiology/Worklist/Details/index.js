@@ -372,6 +372,9 @@ const RadiologyDetails = () => {
           reportParameters={{
             radiologyWorkitemId: detailsId,
             patientProfileFK,
+            _key: details
+              ? details.entity?.patientInfo?.patientReferenceNo
+              : '',
           }}
           defaultScale={1.5}
         />

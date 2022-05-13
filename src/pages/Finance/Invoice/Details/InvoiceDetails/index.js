@@ -254,6 +254,7 @@ class InvoiceDetails extends Component {
             reportParameters={{
               InvoiceID: values ? values.id : '',
               printType: this.state.invoiceReportType,
+              _key: values ? values.invoiceNo : '',
             }}
           />
         </CommonModal>
