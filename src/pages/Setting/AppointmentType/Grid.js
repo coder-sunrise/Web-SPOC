@@ -126,6 +126,7 @@ class Grid extends React.PureComponent {
         type='settingAppointmentType'
         onRowDoubleClick={this.editRow}
         columns={columns}
+        forceRender
         columnExtensions={this.state.columnExtensions}
         TableProps={{
           height,
