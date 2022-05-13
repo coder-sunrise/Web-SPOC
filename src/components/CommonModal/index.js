@@ -234,7 +234,7 @@ class CommonModal extends React.PureComponent {
     }
 
     if (this.props.onClose) {
-      this.props.onClose()
+      this.props.onClose(force === true)
     }
     // return true
   }
