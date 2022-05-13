@@ -118,15 +118,19 @@ const WorklistGrid = ({
   const showVisitForms = async row => {
     const {
       visitFK,
-      visitStatus,
-      doctor,
       patientAccountNo,
       patientName,
+      medicalCheckupWorkitemDoctor,
       patientGender,
       patientReferenceNo,
       patientDOB,
       doctorProfileFK,
     } = row
+    const primaryDoctor = (medicalCheckupWorkitemDoctor||[]).find(x=>x.isPrimaryDoctor)
+    const title =
+      primaryDoctor?.title && primaryDoctor.title !== 'Other'
+        ? `${primaryDoctor.title} `
+        : ''
     await dispatch({
       type: 'formListing/updateState',
       payload: {
@@ -135,6 +139,7 @@ const WorklistGrid = ({
           visitID: visitFK,
           doctorProfileFK: doctorProfileFK,
           patientName,
+          doctorName: primaryDoctor ? `${title}${primaryDoctor.name}` : '',
           patientAccountNo,
           patientGender: patientGender,
           patientDOB: patientDOB,

@@ -1,6 +1,7 @@
 // import { connect } from 'dva'
 import React, { PureComponent } from 'react'
 import { DocumentEditor, CommonModal, Button, notification } from '@/components'
+import { formatMessage, FormattedMessage } from 'umi'
 // import moment from 'moment'
 import AddPhotoAlternateIcon from '@material-ui/icons/AddPhotoAlternate'
 import HideImageIcon from '@material-ui/icons/Image'
@@ -60,8 +61,21 @@ class CommonForm extends PureComponent {
     this.setState({ signatureCounter: newSignatureCounter })
   }
 
-  closeSignature = () => {
-    this.setState({ showSignature: false })
+  signatureChange = dirty => {
+    this.signatureDirty = dirty
+  }
+
+  closeSignature = force => {
+    if (!force && this.signatureDirty) 
+      this.props.dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmContent: formatMessage({id: 'app.general.leave-without-save'}),
+          onConfirmSave: () => this.setState({ showSignature: false }),
+        },
+      })
+    else this.setState({ showSignature: false })
   }
 
   showHideHighligth(isShow) {
@@ -205,7 +219,7 @@ class CommonForm extends PureComponent {
           onClose={this.closeSignature}
         >
           {showSignature && (
-            <Signature updateSignature={this.updateSignature} />
+            <Signature onChange={this.signatureChange} updateSignature={this.updateSignature} />
           )}
         </CommonModal>
       </div>

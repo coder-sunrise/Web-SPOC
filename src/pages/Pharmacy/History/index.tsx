@@ -87,8 +87,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       search: false,
       fixed: 'left',
       width: 200,
-      sortBy:
-        'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.Name',
+      ellipsis: true,
     },
     {
       key: 'patientReferenceNo',
@@ -97,8 +96,6 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 100,
-      sortBy:
-        'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.PatientReferenceNo',
     },
     {
       key: 'patientAccountNo',
@@ -107,8 +104,6 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 100,
-      sortBy:
-        'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo',
     },
     {
       key: 'genderAge',
@@ -126,7 +121,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       key: 'orderBy',
       title: 'Ordered By',
       dataIndex: 'orderBy',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 160,
     },
@@ -135,7 +130,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       title: 'Order Time',
       dataIndex: 'orderDate',
       defaultSortOrder: 'descend',
-      sortBy: 'WorkitemFKNavigation.GenerateDate',
+      sortBy: 'orderTime',
       valueType: 'dateTime',
       render: (_dom: any, entity: any) =>
         entity.orderTime?.format('DD MMM YYYY HH:mm') || '-',
@@ -147,7 +142,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       key: 'preparedBy',
       title: 'Prepared By',
       dataIndex: 'preparedBy',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 130,
     },
@@ -158,7 +153,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       valueType: 'dateTime',
       render: (_dom: any, entity: any) =>
         entity.preparedTime?.format('DD MMM YYYY HH:mm') || '-',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 145,
     },
@@ -166,7 +161,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       key: 'verifiedBy',
       title: 'Verified By',
       dataIndex: 'verifiedBy',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 130,
     },
@@ -177,7 +172,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       valueType: 'dateTime',
       render: (_dom: any, entity: any) =>
         entity.verifiedTime?.format('DD MMM YYYY HH:mm') || '-',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 145,
     },
@@ -185,7 +180,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       key: 'dispensedBy',
       title: 'Dispensed By',
       dataIndex: 'dispensedBy',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 130,
     },
@@ -196,7 +191,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       valueType: 'dateTime',
       render: (_dom: any, entity: any) =>
         entity.dispensedTime?.format('DD MMM YYYY HH:mm') || '-',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 145,
     },
@@ -204,7 +199,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       key: 'status',
       title: 'Status',
       dataIndex: 'status',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 100,
       fixed: 'right',
