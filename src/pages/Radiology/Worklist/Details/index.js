@@ -304,7 +304,7 @@ const RadiologyDetails = () => {
               </div>
             </GridItem>
           )}
-          <GridItem md={12}>
+          <GridItem md={12} style={{ marginTop: 20 }}>
             <ExaminationSteps item={workitem} />
           </GridItem>
           <GridItem md={12}>
@@ -372,9 +372,7 @@ const RadiologyDetails = () => {
           reportParameters={{
             radiologyWorkitemId: detailsId,
             patientProfileFK,
-            _key: details
-              ? details.entity?.patientInfo?.patientReferenceNo
-              : '',
+            _key: details ? details.entity?.accessionNo : '',
           }}
           defaultScale={1.5}
         />
