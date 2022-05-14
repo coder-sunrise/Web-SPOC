@@ -161,7 +161,7 @@ export const SpecimenDetails = ({
         payload: entity,
       }).then(result => {
         if (result) {
-          cleanUp()
+          querySpecimenDetails()
           onConfirm && onConfirm()
         }
       })
@@ -170,7 +170,6 @@ export const SpecimenDetails = ({
 
   const handleRetest = async () => {
     const values = await form.validateFields()
-    console.log('handleRetest', values)
     setRetestSpecimenPara({
       open: true,
       retestSpecimen: { ...entity, ...values },
@@ -223,7 +222,7 @@ export const SpecimenDetails = ({
           payload: { ...entity, ...values },
         }).then(result => {
           if (result) {
-            cleanUp()
+            querySpecimenDetails()
             onConfirm && onConfirm()
           }
         })
@@ -241,7 +240,7 @@ export const SpecimenDetails = ({
         payload: { ...entity, ...values },
       }).then(result => {
         if (result) {
-          cleanUp()
+          querySpecimenDetails()
           onConfirm && onConfirm()
         }
       })

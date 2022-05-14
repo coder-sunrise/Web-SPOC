@@ -3,6 +3,7 @@ import { Edit } from '@material-ui/icons'
 import CommonTableGrid from '@/components/CommonTableGrid'
 import { Button, Tooltip } from '@/components'
 import PatientResultButton from './PatientResultPrintBtn'
+import Authorized from '@/utils/Authorized'
 
 class PatientGrid extends PureComponent {
   configs = {
@@ -50,7 +51,11 @@ class PatientGrid extends PureComponent {
         align: 'center',
         width: 100,
         render: row => {
-          const { clinicSettings, handlePrintClick, readOnly } = this.props
+          const { clinicSettings, handlePrintClick } = this.props
+          const accessRight = Authorized.check('reception/labtracking') || {
+            rights: 'hidden',
+          }
+          const readOnly = accessRight.rights !== 'enable'
           return (
             <React.Fragment>
               <PatientResultButton

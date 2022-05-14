@@ -556,9 +556,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
         onClose={() => {
           closeSpecimenDetails()
         }}
-        onConfirm={() => {
-          closeSpecimenDetails()
-        }}
+        onConfirm={() => {}}
       />
       <RetestDetails
         {...retestDetailsPara}
