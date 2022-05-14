@@ -2,9 +2,9 @@
 
 .rdw-option-wrapper {
   border: 1px solid $border-color;
-  padding: 5px;
-  min-width: 25px;
-  height: 20px;
+  // padding: 5px;
+  width: 25px;
+  height: 25px;
   border-radius: 2px;
   margin: 0 4px;
   display: flex;
@@ -28,7 +28,7 @@
   cursor: default;
 }
 .rdw-dropdown-wrapper {
-  height: 30px;
+  height: 25px;
   background: white;
   cursor: pointer;
   border: 1px solid $border-color;
@@ -108,8 +108,8 @@
 }
 .rdw-inline-wrapper {
   display: flex;
-  align-items: center;
-  margin-bottom: 6px;
+  // align-items: center;
+  // margin-bottom: 6px;
   flex-wrap: wrap;
 }
 .rdw-inline-dropdown {
@@ -844,7 +844,7 @@
   background: white;
   flex-wrap: wrap;
   font-size: 15px;
-  margin-bottom: 5px;
+  margin-bottom: 0px;
   user-select: none;
 }
 .public-DraftStyleDefault-block {

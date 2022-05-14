@@ -29,6 +29,7 @@ const styles = theme => ({
   },
   listItemRoot: {
     padding: 4,
+    fontWeight: 500,
     fontSize: '0.85em',
   },
   listItemText: {
@@ -226,7 +227,7 @@ class IndividualCommentDetails extends PureComponent {
         disablePadding
         onClick={() => {}}
       >
-        {listItems.map(item => {
+        {listItems.map((item, index) => {
           const showValue = item.translationData
             .find(l => l.language === selectedLanguage)
             ?.list?.find(l => (l.key = 'displayValue'))?.value
@@ -234,8 +235,13 @@ class IndividualCommentDetails extends PureComponent {
           const isSelected = selectedItem[group.groupNo]?.find(
             i => i.id === item.id,
           )
-
           const isItemEnable = hasValue(showValue) && showValue.trim().length
+          const bordertop =
+            index > 0
+              ? listItems[index - 1].showSeparaterInBelow
+                ? '1px solid rgba(0, 0, 0, 0.12)'
+                : 'none'
+              : 'none'
           return (
             <ListItem
               alignItems='flex-start'
@@ -248,6 +254,10 @@ class IndividualCommentDetails extends PureComponent {
               button
               disabled={!isModifyCommentEnable || !isItemEnable}
               onClick={() => this.onCategoryChange(group, item)}
+              style={{
+                marginBottom: item.showSeparaterInBelow ? 30 : 0,
+                borderTop: bordertop,
+              }}
             >
               <Tooltip title={showValue}>
                 <div className={this.props.classes.listItemText}>

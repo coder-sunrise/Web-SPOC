@@ -87,7 +87,7 @@ export const RetestHistory = ({ open, dataSource, onClose, onConfirm }) => {
   return (
     <CommonModal
       open={showModal}
-      title='Final Result History'
+      title='Result History'
       onClose={() => {
         setShowModal(false)
         onClose && onClose()

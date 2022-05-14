@@ -27,7 +27,9 @@ const styles = theme => ({
 }))
 @withSettingBase({ modelName: 'settingIndividualComment' })
 class IndividualComment extends PureComponent {
-  state = {}
+  state = {
+    currentPayload: {},
+  }
   componentDidMount() {
     this.fetchCodes()
   }
@@ -52,12 +54,19 @@ class IndividualComment extends PureComponent {
     })
   }
 
+  onQuery = payload => {
+    this.setState({ currentPayload: payload })
+  }
   toggleModal = () => {
     this.props.dispatch({
       type: 'settingIndividualComment/updateState',
       payload: {
         showModal: !this.props.settingIndividualComment.showModal,
       },
+    })
+    this.props.dispatch({
+      type: 'settingIndividualComment/query',
+      payload: this.state.currentPayload,
     })
   }
 
@@ -71,7 +80,7 @@ class IndividualComment extends PureComponent {
     return (
       <CardContainer hideHeader>
         <div className='filterBar'>
-          <Filter {...cfg} {...this.props} />
+          <Filter {...cfg} {...this.props} onQuery={this.onQuery} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />
         <CommonModal

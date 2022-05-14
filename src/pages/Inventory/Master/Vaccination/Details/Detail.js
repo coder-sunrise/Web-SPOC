@@ -225,7 +225,9 @@ const Detail = ({
                             tooltip:
                               'Item will generate task for nurse to actualize',
                             disabled:
-                              hasActiveSession && vaccinationDetail.entity?.id,
+                              hasActiveSession &&
+                              vaccinationDetail.entity?.id &&
+                              vaccinationDetail.entity?.isActive,
                             layoutConfig: {
                               style: {},
                             },
@@ -356,7 +358,9 @@ const Detail = ({
                       label='Effective Start Date'
                       label2='End Date'
                       disabled={
-                        !!(vaccinationDetail.entity && hasActiveSession)
+                        vaccinationDetail.entity &&
+                        hasActiveSession &&
+                        vaccinationDetail.entity.isActive
                       }
                       {...args}
                     />

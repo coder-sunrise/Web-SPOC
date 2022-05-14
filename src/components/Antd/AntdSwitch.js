@@ -22,7 +22,7 @@ const STYLES = () => {
       borderRadius: 3,
       '& .ant-switch-handle': {
         width: 20,
-        height: 20,
+        height: 16,
         '&::before': {
           borderRadius: 3,
           right: 2,

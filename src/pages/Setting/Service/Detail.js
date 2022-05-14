@@ -783,7 +783,8 @@ class Detail extends PureComponent {
                           label2='End Date'
                           disabled={
                             settingClinicService.entity
-                              ? this.state.hasActiveSession
+                              ? this.state.hasActiveSession &&
+                                settingClinicService.entity.isActive
                               : false
                           }
                           {...args}
