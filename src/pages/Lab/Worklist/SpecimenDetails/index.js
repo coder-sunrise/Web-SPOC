@@ -403,7 +403,7 @@ export const SpecimenDetails = ({
                           Final Result
                         </Typography.Text>
                         {entity.hasAnyRetest && (
-                          <Tooltip title='Final Result History'>
+                          <Tooltip title='Result History'>
                             <span
                               className='material-icons'
                               style={{ color: 'gray', cursor: 'pointer' }}

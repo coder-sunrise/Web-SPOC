@@ -1727,6 +1727,12 @@ export const ServiceColumns1 = (
       },
     },
     {
+      dataIndex: 'serviceCenter',
+      key: 'serviceCenter',
+      title: 'Service Center',
+      width: 200,
+    },
+    {
       dataIndex: 'instruction',
       key: 'instruction',
       title: 'Instructions',

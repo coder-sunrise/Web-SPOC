@@ -156,6 +156,9 @@ export default ({ current, classes, showDrugLabelRemark }) => {
                     {`Code: ${row.code}`}
                     <br />
                     {`Name: ${row.name}`}
+                    {row.type === 'Service' && (
+                      <div>Service Center: {row.serviceCenter}</div>
+                    )}
                   </div>
                 }
               >
