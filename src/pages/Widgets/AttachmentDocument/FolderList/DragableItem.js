@@ -85,7 +85,8 @@ class DragableItem extends Component {
       onItemChanged,
       isEditMode,
       readOnly,
-      isEnableEditDocument = true,
+      isEnableEditFolder = true,
+      isEnableDeleteFolder = true,
     } = this.props
 
     let opacity = isDragging ? 0.4 : 1
@@ -120,20 +121,21 @@ class DragableItem extends Component {
                       }}
                     />
                   </div>
-
-                  <Button
-                    type='danger'
-                    size='small'
-                    disabled={!item.isEmpty}
-                    style={{
-                      float: 'right',
-                      marginTop: 8,
-                    }}
-                    onClick={e => {
-                      onItemChanged({ ...item, isDeleted: true })
-                    }}
-                    icon={<DeleteFilled />}
-                  ></Button>
+                  {isEnableDeleteFolder && (
+                    <Button
+                      type='danger'
+                      size='small'
+                      disabled={!item.isEmpty}
+                      style={{
+                        float: 'right',
+                        marginTop: 8,
+                      }}
+                      onClick={e => {
+                        onItemChanged({ ...item, isDeleted: true })
+                      }}
+                      icon={<DeleteFilled />}
+                    ></Button>
+                  )}
                 </div>
               )
             ) : (
@@ -146,7 +148,7 @@ class DragableItem extends Component {
               >
                 {!readOnly &&
                   !isItemAll &&
-                  isEnableEditDocument &&
+                  isEnableEditFolder &&
                   connectDragSource(
                     <div style={{ cursor: 'move' }}>
                       <ListItemIcon style={{ minWidth: 25, marginTop: 5 }}>
@@ -177,7 +179,7 @@ class DragableItem extends Component {
                     style={{
                       marginRight: 15,
                       paddingLeft:
-                        isItemAll && !readOnly && isEnableEditDocument ? 25 : 0,
+                        isItemAll && !readOnly && isEnableEditFolder ? 25 : 0,
                       overflow: 'hidden',
                     }}
                   />

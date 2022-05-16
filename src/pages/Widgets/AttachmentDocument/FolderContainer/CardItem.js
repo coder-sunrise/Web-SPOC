@@ -158,6 +158,7 @@ class CardItem extends Component {
       modelName,
       isEnableDeleteDocument = true,
       isEnableEditDocument = true,
+      isEnableEditFolder = true,
     } = this.props
     const { loading, thumbnail } = this.state
     return (
@@ -190,6 +191,7 @@ class CardItem extends Component {
                     <SetFolderWithPopover
                       key={file.id}
                       folderList={folderList}
+                      isEnableEditFolder={isEnableEditFolder}
                       selectedFolderFKs={file.folderFKs || []}
                       onClose={selectedFolder => {
                         const originalFolders = _.sortedUniq(
