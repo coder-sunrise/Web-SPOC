@@ -128,6 +128,9 @@ const Examinations = props => {
           if (response.data?.length < 10) {
             setAllRetrieved(true)
           }
+           setActiveKey(
+             response.data.filter(t => !t.isAcknowledged).map(x => x.id),
+           )
         }
       })
     }

@@ -14,6 +14,7 @@ import {
   DateRangePicker,
   NumberInput,
   Select,
+  Checkbox,
   CodeSelect,
 } from '@/components'
 
@@ -155,6 +156,18 @@ const Detail = ({
               )}
             />
           </GridItem>
+          <GridItem md={4} style={{ marginTop: 20 }}>
+            <FastField
+              name='showSeparaterInBelow'
+              render={args => (
+                <Checkbox
+                  simple
+                  label='Show separater in below when reporting'
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
         </GridContainer>
       </div>
       {footer &&
@@ -246,20 +259,6 @@ export default compose(
         if (r) {
           resetForm()
           if (onConfirm) onConfirm()
-          const { codeDisplayValue, groupNo, examinationItemFK } = values
-          const { secondaryPrintoutLanguage = '' } = clinicSettings
-          dispatch({
-            type: 'settingIndividualComment/query',
-            payload: {
-              groupNo,
-              examinationItemFK,
-              apiCriteria: {
-                Language: secondaryPrintoutLanguage,
-                Key: 'displayValue',
-                SearchValue: codeDisplayValue,
-              },
-            },
-          })
         }
       })
     },

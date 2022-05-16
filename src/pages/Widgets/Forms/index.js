@@ -66,12 +66,13 @@ const styles = theme => ({
   },
 
   popoverContainer: {
-    width: 250,
+    maxWidth: 400,
+    minWidth: 200,
     textAlign: 'left',
     marginTop: -10,
   },
   listContainer: {
-    maxHeight: 230,
+    maxHeight: 250,
     overflowY: 'auto',
   },
 })

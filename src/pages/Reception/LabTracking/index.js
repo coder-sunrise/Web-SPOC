@@ -5,7 +5,6 @@ import { withStyles } from '@material-ui/core'
 import { CardContainer } from '@/components'
 import LabTrackingDetails from '@/pages/Widgets/LabTrackingDetails'
 import { PATIENT_LAB } from '@/utils/constants'
-import Authorized from '@/utils/Authorized'
 
 const styles = theme => ({
   bigviewBtn: {
@@ -26,16 +25,9 @@ const styles = theme => ({
 
 class LabTracking extends React.Component {
   render() {
-    const accessRight = Authorized.check('reception/labtracking')
-    let disabledByAccessRight = true
-    if (accessRight) disabledByAccessRight = accessRight.rights !== 'enable'
-
     return (
       <CardContainer hideHeader>
-        <LabTrackingDetails
-          resultType={PATIENT_LAB.LAB_TRACKING}
-          disabledByAccessRight={disabledByAccessRight}
-        />
+        <LabTrackingDetails resultType={PATIENT_LAB.LAB_TRACKING} />
       </CardContainer>
     )
   }

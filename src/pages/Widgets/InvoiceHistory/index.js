@@ -109,9 +109,10 @@ const InvoiceHistory = ({
   const [showReport, setShowReport] = useState({
     show: false,
     invoiceId: null,
+    invoiceNo: null,
     printType,
   })
-  const { show, invoiceId, printType } = showReport
+  const { show, invoiceId, printType, invoiceNo } = showReport
 
   const toggleReport = (row, invoiceReportType) => {
     const setShowValue = !show
@@ -119,6 +120,7 @@ const InvoiceHistory = ({
       ...showReport,
       show: setShowValue,
       invoiceId: setShowValue ? row.id : null,
+      invoiceNo: setShowValue ? row.invoiceNo : null,
       printType: invoiceReportType,
     })
   }
@@ -334,6 +336,7 @@ const InvoiceHistory = ({
             reportParameters={{
               InvoiceID: invoiceId || '',
               printType: printType,
+              _key: invoiceNo || '',
             }}
           />
         </CommonModal>

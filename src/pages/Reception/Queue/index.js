@@ -812,6 +812,11 @@ class Queue extends React.Component {
       patientReferenceNo,
       dob,
     } = row
+    const title =
+      doctor?.clinicianProfile.title &&
+      doctor.clinicianProfile.title !== 'Other'
+        ? `${doctor.clinicianProfile.title} `
+        : ''
     await this.props.dispatch({
       type: 'formListing/updateState',
       payload: {
@@ -820,6 +825,7 @@ class Queue extends React.Component {
           visitID: id,
           doctorProfileFK: doctor ? doctor.id : 0,
           patientName,
+          doctorName: doctor ? `${title}${doctor.clinicianProfile.name}` : '',
           patientAccountNo,
           patientGender: gender,
           patientDOB: dob,

@@ -15,6 +15,7 @@ import {
   Tooltip,
   CommonModal,
   DocumentEditor,
+  Popover,
 } from '@/components'
 import { tagList } from '@/utils/codes'
 import {
@@ -25,23 +26,6 @@ import { InfoTwoTone } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 
 const styles = theme => ({})
-
-const formFieldTips_Subject = 'Guidelines to use Forms Fields'
-const formFieldTips_Content =
-  "In order to add autofill feature, you must input the exact same instance into the name column. For example: To auto-populate patient's name, you need to key in" +
-  'PatientName into the name column in Forms Fields. Click on the light bulb icon for more autofill instances.'
-const formFieldTips_Tooltip =
-  "i.   Patient's Name:PatientName\n" +
-  "ii.  Patient's Gender:PatientGender\n" +
-  "iii. Patient's DOB：PatientDOB\n" +
-  "iv.  Patient's Age: PatientAge\n" +
-  "vi.  Patient's Reference Number:PatientRefNo\n" +
-  "vii. Today's Date:TodayDate\n" +
-  '\n\nif you would like to enter twice the same instance, please' +
-  'key in "<InstanceName>_<Number>".The number must be' +
-  'unique throughout a form.' +
-  'eg: for patient name,please enter "PatientName_2"'
-
 
 @withFormikExtend({
   mapPropsToValues: ({ settingDocumentTemplate }) =>
@@ -102,6 +86,21 @@ class Detail extends PureComponent {
 
   FormFieldTips = () => {
     const formFieldTips_Subject = 'Guidelines to use Forms Fields'
+    const formFieldTips_Tooltip =
+      "i.\tPatient's Name: PatientName\n" +
+      "ii.\tPatient's Gender: PatientGender\n" +
+      "iii.\tBoolean for Female: GenderFemale\n" +
+      "iv.\tBoolean for Male: GenderMale\n" +
+      "v.\tPatient's DOB: PatientDOB\n" +
+      "vi.\tPatient's Age: PatientAge\n" +
+      "vii.\tPatient's Reference Number: PatientRefNo\n" +
+      "viii.\tPatient's Account Number: PatientAccNo\n" +
+      "ix.\tDoctor's Name : DoctorName\n" +
+      "x.\tToday's Date: TodayDate\n" +
+      '\nif you would like to enter twice the same instance, please\n' +
+      'key in "<InstanceName>_<Number>".The number must be unique\n' +
+      'throughout a form.\n' +
+      'eg: for patient name,please enter "PatientName_2"'
     const formFieldTips_Content = (
       <span>
         In order to add autofill feature, you must input the exact same instance
@@ -114,26 +113,17 @@ class Detail extends PureComponent {
         icon for more autofill instances.
       </span>
     )
-    const formFieldTips_Tooltip =
-      "i.   Patient's Name:PatientName\n" +
-      "ii.  Patient's Gender:PatientGender\n" +
-      "iii. Patient's DOB：PatientDOB\n" +
-      "iv.  Patient's Age: PatientAge\n" +
-      "vi.  Patient's Reference Number:PatientRefNo\n" +
-      "vii. Today's Date:TodayDate\n" +
-      '\nif you would like to enter twice the same instance, please\n' +
-      'key in "<InstanceName>_<Number>".The number must be unique\n' +
-      'throughout a form.\n' +
-      'eg: for patient name,please enter "PatientName_2"'
+
     return (
       <div style={{marginLeft:10}}>
         <p>
-         <span style={{fontWeight:'bold',textDecoration:'underline'}}>{formFieldTips_Subject}</span>
-          <Tooltip useTooltip2 title={<pre>{formFieldTips_Tooltip}</pre>}>
-            <span>
+        <span style={{fontWeight:'bold',textDecoration:'underline'}}>{formFieldTips_Subject}</span>
+          <Popover icon={null}
+                   placement='topLeft'
+                   trigger='hover'
+                   content={<span style={{whiteSpace:'pre'}}>{formFieldTips_Tooltip}</span>}>
               <InfoTwoTone color='primary' style={{verticalAlign:'text-top'}}/>
-            </span>
-          </Tooltip>
+          </Popover>
         </p>
         <p>{formFieldTips_Content}</p>
       </div>
@@ -368,7 +358,7 @@ class Detail extends PureComponent {
                           }
                         ]}
                       />
-                     <this.FormFieldTips/>
+                      <this.FormFieldTips/>
                     </div>
                   ) : (
                     <RichEditor
