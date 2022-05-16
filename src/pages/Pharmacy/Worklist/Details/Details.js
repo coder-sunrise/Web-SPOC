@@ -116,7 +116,7 @@ const Details = props => {
       <LoadingWrapper
         loading={loading.models.dispense || loading.models.pharmacyDetails}
       >
-        <div style={{ padding: 8, marginTop: -20 }}>
+        <div style={{ paddingTop: 8, marginTop: -20 }}>
           <Banner
             from='Pharmacy'
             patientInfo={patient}

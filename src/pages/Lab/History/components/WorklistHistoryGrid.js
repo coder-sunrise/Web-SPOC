@@ -318,6 +318,21 @@ export const WorklistHistoryGrid = ({ labWorklistHistory }) => {
 
     return (
       <Table
+        onRow={record => {
+          if (
+            record.dateReceived &&
+            record.specimenStatusFK !== LAB_SPECIMEN_STATUS.DISCARDED
+          ) {
+            return {
+              onDoubleClick: () => {
+                setSpecimenDetailsPara({
+                  open: true,
+                  id: record.labSpecimenFK,
+                })
+              },
+            }
+          }
+        }}
         bordered
         columns={columns}
         dataSource={groupedTestPanels}

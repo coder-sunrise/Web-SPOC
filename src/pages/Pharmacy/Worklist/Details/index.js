@@ -102,7 +102,6 @@ const PharmacyDetails = ({
     <CommonModal
       open={showModal}
       title='Dispensary Details'
-      showFooter={true}
       onClose={() => {
         closeForm()
       }}
