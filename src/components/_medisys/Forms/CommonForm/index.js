@@ -8,8 +8,61 @@ import HideImageIcon from '@material-ui/icons/Image'
 import DownloadIcon from '@material-ui/icons/CloudDownload'
 import Print from '@material-ui/icons/Print'
 import Signature from '../Signature'
+import {
+  PdfBitmap,
+  PdfDocument,
+  PdfPageOrientation,
+  PdfPageSettings,
+  PdfSection,
+  SizeF,
+} from '@syncfusion/ej2-pdf-export'
 
 const base64Prefix = 'data:image/jpeg;base64,'
+
+const exportPDF = container => {
+  if (!container) return
+  let pdfdocument = new PdfDocument()
+  let count = container.documentEditor.pageCount
+  let loadedPage = 0
+  for (let i = 1; i <= count; i++) {
+    // setTimeout(() => 
+    {
+      let format = 'image/jpeg'
+      // Getting pages as image
+      let image = container.documentEditor.exportAsImage(i, format)
+      image.onload = function() {
+        let imageHeight = parseInt(
+          image.style.height.toString().replace('px', ''),
+        )
+        let imageWidth = parseInt(
+          image.style.width.toString().replace('px', ''),
+        )
+        let section = pdfdocument.sections.add()
+        let settings = new PdfPageSettings(0)
+        if (imageWidth > imageHeight) {
+          settings.orientation = PdfPageOrientation.Landscape
+        }
+        settings.size = new SizeF(imageWidth, imageHeight)
+        section.setPageSettings(settings)
+        let page = section.pages.add()
+        let graphics = page.graphics
+        let imageStr = image.src.replace('data:image/jpeg;base64,', '')
+        let pdfImage = new PdfBitmap(imageStr)
+        graphics.drawImage(pdfImage, 0, 0, imageWidth, imageHeight)
+        loadedPage++
+        if (loadedPage == count) {
+          // Exporting the document as pdf
+          pdfdocument.save(
+            (container.documentEditor.documentName === ''
+              ? 'document'
+              : container.documentEditor.documentName) + '.pdf',
+          )
+        }
+      }
+    }
+    // , 1)
+  }
+}
 
 class CommonForm extends PureComponent {
 
@@ -23,7 +76,7 @@ class CommonForm extends PureComponent {
     this.setState({ showSignature: true })
   }
 
-  notificationWarning = _.debounce(message => notification.warning(message),100)
+  notificationWarning = _.debounce(message => notification.warning(message),500)
 
   selectionChange = e => {
     const isImageSelected = e.source.documentEditor.selection.isImageSelected
@@ -87,7 +140,8 @@ class CommonForm extends PureComponent {
 
   download = () => {
     this.showHideHighligth(false)
-    this.DEContainer.documentEditor.save(this.props.values.formName, 'Docx')
+    // this.DEContainer.documentEditor.save(this.props.values.formName, 'Docx')
+    exportPDF(this.DEContainer);
     this.showHideHighligth(true)
   }
 
