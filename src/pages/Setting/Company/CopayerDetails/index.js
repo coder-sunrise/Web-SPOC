@@ -253,6 +253,8 @@ const Detail = props => {
             isEnableDeleteDocument={
               deleteDocumentAccessRight.rights === 'enable'
             }
+            isEnableEditFolder={addDocumentAccessRight.rights === 'enable'}
+            isEnableDeleteFolder={deleteDocumentAccessRight.rights === 'enable'}
           />
         </div>
       </CommonModal>

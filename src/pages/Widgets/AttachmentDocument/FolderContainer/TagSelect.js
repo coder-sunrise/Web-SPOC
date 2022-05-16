@@ -12,6 +12,8 @@ const TagSelect = ({
   onChange = () => {},
   saveAsNewTag = () => {},
   displayField = 'displayValue',
+  isEnableEditFolder = true,
+  isEnableEditDocument = true,
 }) => {
   const [inputVisible, setInputVisible] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -126,7 +128,8 @@ const TagSelect = ({
               {menu}
               {newTagInput !== undefined &&
                 newTagInput !== null &&
-                newTagInput.trim().length > 0 && (
+                newTagInput.trim().length > 0 &&
+                isEnableEditFolder && (
                   <div>
                     <Divider style={{ margin: '4px 0' }} />
                     <div
@@ -165,7 +168,7 @@ const TagSelect = ({
           ))}
         </Select>
       )}
-      {!disabled && !inputVisible && (
+      {!disabled && !inputVisible && isEnableEditDocument && (
         <Tag className='site-tag-plus' onClick={showInput}>
           <PlusOutlined /> New Tag
         </Tag>

@@ -248,10 +248,7 @@ class PatientDetail extends PureComponent {
       {
         id: '7',
         name: 'Patient Document',
-        access: [
-          'patientdatabase.newpatient',
-          'patientdatabase.patientprofiledetails',
-        ],
+        access: ['patientdatabase.patientprofiledetails.patientdocument'],
         component: Loadable({
           loader: () => import('./PatientDocument'),
           render: (loaded, p) => {

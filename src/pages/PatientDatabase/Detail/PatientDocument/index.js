@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core'
 import { CommonModal } from '@/components'
 import AttachmentDocument from '@/pages/Widgets/AttachmentDocument'
 import { FOLDER_TYPE } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
 
 const styles = () => ({
   container: {
@@ -38,6 +39,28 @@ class Document extends PureComponent {
       folder,
     } = this.props
 
+    const editDocumentAccessRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.patientdocument.viewpatientdocument.editpatientdocument',
+    ) || {
+      rights: 'hidden',
+    }
+    const deleteDocumentAccessRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.patientdocument.viewpatientdocument.deletepatientdocument',
+    ) || {
+      rights: 'hidden',
+    }
+
+    const editFolderAccessRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.patientdocument.viewpatientdocument.editfolder',
+    ) || {
+      rights: 'hidden',
+    }
+    const deleteFolderAccessRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.patientdocument.viewpatientdocument.deletefolder',
+    ) || {
+      rights: 'hidden',
+    }
+
     const patientIsActive = entity && entity.isActive
     return (
       <CommonModal
@@ -52,6 +75,10 @@ class Document extends PureComponent {
           type={FOLDER_TYPE.PATIENT}
           readOnly={!patientIsActive}
           modelName='patientAttachment'
+          isEnableEditDocument={editDocumentAccessRight.rights === 'enable'}
+          isEnableDeleteDocument={deleteDocumentAccessRight.rights === 'enable'}
+          isEnableEditFolder={editFolderAccessRight.rights === 'enable'}
+          isEnableDeleteFolder={deleteFolderAccessRight.rights === 'enable'}
         />
       </CommonModal>
     )

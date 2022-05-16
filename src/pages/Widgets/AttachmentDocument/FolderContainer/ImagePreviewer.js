@@ -323,6 +323,7 @@ class ImagePreviewer extends Component {
       onAddNewFolders,
       isEnableDeleteDocument = true,
       isEnableEditDocument = true,
+      isEnableEditFolder = true,
     } = this.props
     const selectedImage = this.state.imageList.find(s => s.isSelected) || {}
 
@@ -431,6 +432,8 @@ class ImagePreviewer extends Component {
                 <SetFolderWithPopover
                   key={selectedImage.id}
                   folderList={folderList}
+                  isEnableEditDocument={isEnableEditDocument}
+                  isEnableEditFolder={isEnableEditFolder}
                   selectedFolderFKs={selectedImage.folderFKs || []}
                   onClose={selectedFolder => {
                     const originalFolders = _.sortedUniq(

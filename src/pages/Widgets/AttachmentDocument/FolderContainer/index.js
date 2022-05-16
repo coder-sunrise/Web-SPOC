@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { CommonModal } from '@/components'
+import { CommonModal, notification } from '@/components'
 import printJS from 'print-js'
 import { getFileByFileID } from '@/services/file'
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
@@ -43,7 +43,13 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
       getFileByFileID(file.fileIndexFK).then(response => {
         const { data } = response
         const base64Result = arrayBufferToBase64(data)
-        printJS({ printable: base64Result, type: 'pdf', base64: true })
+        if (base64Result) {
+          printJS({ printable: base64Result, type: 'pdf', base64: true })
+        } else {
+          notification.error({
+            message: 'File Not Found.',
+          })
+        }
       })
     } else if (imageExt.includes(fileExtension)) {
       setShowImagePreview(true)
