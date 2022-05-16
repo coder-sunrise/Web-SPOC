@@ -96,6 +96,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 100,
+      ellipsis: true,
     },
     {
       key: 'patientAccountNo',
@@ -104,6 +105,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 100,
+      ellipsis: true,
     },
     {
       key: 'genderAge',
@@ -111,11 +113,12 @@ const defaultColumns = (codetable, setDetailsId) => {
       dataIndex: 'genderAge',
       sorter: false,
       search: false,
-      render: (_dom: any, entity: any) =>
+      renderText: (text: any, entity: any) =>
         `${entity.gender?.substring(0, 1)}/${Math.floor(
           entity.dob?.toDate()?.duration('year'),
         )}`,
       width: 100,
+      ellipsis: true,
     },
     {
       key: 'orderBy',
@@ -124,6 +127,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 160,
+      ellipsis: true,
     },
     {
       key: 'orderDate',
@@ -137,6 +141,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 145,
+      ellipsis: true,
     },
     {
       key: 'preparedBy',
@@ -145,6 +150,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 130,
+      ellipsis: true,
     },
     {
       key: 'preparedTime',
@@ -156,6 +162,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 145,
+      ellipsis: true,
     },
     {
       key: 'verifiedBy',
@@ -164,6 +171,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 130,
+      ellipsis: true,
     },
     {
       key: 'verifiedTime',
@@ -175,6 +183,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 145,
+      ellipsis: true,
     },
     {
       key: 'dispensedBy',
@@ -183,6 +192,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 130,
+      ellipsis: true,
     },
     {
       key: 'dispensedTime',
@@ -194,6 +204,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 145,
+      ellipsis: true,
     },
     {
       key: 'status',
@@ -203,6 +214,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       search: false,
       width: 100,
       fixed: 'right',
+      ellipsis: true,
     },
     {
       key: 'action',
