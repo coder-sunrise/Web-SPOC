@@ -26,6 +26,7 @@ import { filterData } from '../utils'
 import { StatusIndicator } from '../variables'
 import { compose } from 'redux'
 import Authorized from '@/utils/Authorized'
+import ConsReadySwitch from './ConsReadySwitch'
 
 const styles = theme => ({
   switchContainer: {
@@ -299,16 +300,10 @@ class Grid extends React.Component {
                   align: 'center',
                   render: row => {
                     return (
-                      <Switch
+                      <ConsReadySwitch
                         className={classes.switchContainer}
-                        value={row.consReady}
-                        preventToggle
-                        onClick={(checked, event) => {
-                          this.props.onQueueListing({
-                            ...row,
-                            consReady: checked,
-                          })
-                        }}
+                        row={row}
+                        {...this.props}
                         disabled={
                           showConsReady && showConsReady.rights !== 'enable'
                         }

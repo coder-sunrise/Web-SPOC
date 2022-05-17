@@ -19,13 +19,16 @@ import Contact from '@/pages/Setting/Company/Contact'
 @withFormikExtend({
   mapPropsToValues: ({ settingReferralPerson }) => {
     let entity = settingReferralPerson.entity || settingReferralPerson.default
-    let referralSourceIds = (entity.referralSources || []).map((x) => x.id)
+    let referralSourceIds = (entity.referralSources || []).map(x => x.id)
     return { ...entity, referralSourceIds }
   },
   validationSchema: Yup.object().shape({
     name: Yup.string().required(),
     referralSourceIds: Yup.string().required(),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    effectiveDates: Yup.array()
+      .of(Yup.date())
+      .min(2)
+      .required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
@@ -37,7 +40,7 @@ import Contact from '@/pages/Setting/Company/Contact'
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         resetForm()
         if (onConfirm) onConfirm()
@@ -55,51 +58,76 @@ import Contact from '@/pages/Setting/Company/Contact'
   displayName: 'ReferralPersonDetail',
 })
 class Detail extends PureComponent {
-  render () {
+  render() {
     const { props } = this
     const { theme, footer, settingReferralPerson, referralSource } = props
     return (
       <React.Fragment>
-        <div style={{ margin: theme.spacing(1) }}>
-          <GridContainer>
-            <GridItem md={6}>
-              <FastField
-                name="name"
-                render={(args) => (
-                  <TextField label="Name" autoFocus {...args} disabled={!!settingReferralPerson.entity} />
-                )}
-              />
-            </GridItem>
+        <GridContainer
+          style={{
+            height: 450,
+            alignItems: 'start',
+            overflowY: 'scroll',
+          }}
+        >
+          <div style={{ margin: theme.spacing(1) }}>
+            <GridContainer>
+              <GridItem md={6}>
+                <FastField
+                  name='name'
+                  render={args => (
+                    <TextField
+                      label='Name'
+                      autoFocus
+                      {...args}
+                      disabled={!!settingReferralPerson.entity}
+                    />
+                  )}
+                />
+              </GridItem>
 
-            <GridItem md={6}>
-              <Field
-                name="referralSourceIds"
-                render={(args) => (
-                  <CodeSelect
-                    {...args}
-                    options={referralSource}
-                    labelField="name"
-                    mode="multiple"
-                    label="Referral Source"
-                  />
-                )}
-              />
-            </GridItem>
+              <GridItem md={6}>
+                <Field
+                  name='referralSourceIds'
+                  render={args => (
+                    <CodeSelect
+                      {...args}
+                      options={referralSource}
+                      labelField='name'
+                      mode='multiple'
+                      label='Referral Source'
+                    />
+                  )}
+                />
+              </GridItem>
 
-            <GridItem md={6}>
-              <FastField
-                name="effectiveDates"
-                render={(args) => {
-                  return <DateRangePicker label="Effective Start Date" label2="End Date" {...args} />
-                }}
-              />
-            </GridItem>
-            <GridItem md={6}>
-              <FastField name="remarks" render={(args) => <TextField label="Remarks" multiline {...args} />} />
-            </GridItem>
-          </GridContainer>
-          <Contact theme={theme} type="referralperson" />
-        </div>
+              <GridItem md={6}>
+                <FastField
+                  name='effectiveDates'
+                  render={args => {
+                    return (
+                      <DateRangePicker
+                        label='Effective Start Date'
+                        label2='End Date'
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+              <GridItem md={6}>
+                <FastField
+                  name='remarks'
+                  render={args => (
+                    <TextField label='Remarks' multiline {...args} />
+                  )}
+                />
+              </GridItem>
+            </GridContainer>
+            <Contact theme={theme} type='referralperson' />
+          </div>
+        </GridContainer>
+
         {footer &&
           footer({
             onConfirm: props.handleSubmit,

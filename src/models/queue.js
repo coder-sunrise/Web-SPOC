@@ -389,17 +389,8 @@ export default createListViewModel({
       },
       *updateQueueListing({ payload }, { call, put }) {
         const response = yield call(service.updateQueueListing, payload)
-        if (response) {
-          yield put({
-            type: 'updateState',
-            payload: {
-              list: [],
-            },
-          })
-          yield put({
-            type: 'getSessionInfo',
-            payload,
-          })
+        if (!response) {
+          return false
         }
         return true
       },
@@ -424,7 +415,7 @@ export default createListViewModel({
           }),
           itemIdentifier: payload.itemIdentifier,
           type: payload.type,
-        }) 
+        })
         if (r === 204) {
           window.g_app._store.dispatch({
             type: 'codetable/refreshCodes',

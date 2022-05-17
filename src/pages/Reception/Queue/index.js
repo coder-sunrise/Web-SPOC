@@ -737,6 +737,8 @@ class Queue extends React.Component {
     dispatch({
       type: 'queueLog/updateQueueListing',
       payload: row,
+    }).then(r => {
+      !r ? row.changeState() : null
     })
   }
 
