@@ -226,8 +226,8 @@ const Detail = ({
                               'Item will generate task for nurse to actualize',
                             disabled:
                               hasActiveSession &&
-                              vaccinationDetail.entity?.id &&
-                              vaccinationDetail.entity?.isActive,
+                              values.isActive?.id &&
+                              values.isActive?.isActive,
                             layoutConfig: {
                               style: {},
                             },
