@@ -81,17 +81,6 @@ export default createFormViewModel({
               : [],
           }
         } else if (
-          payload.type === USER_PREFERENCE_TYPE.FAVOURITEICD10DIAGNOSISSETTING
-        ) {
-          favouriteDiagnosis = parsedFavouriteDiagnosisSetting.find(
-            o => o.Identifier === 'FavouriteICD10Diagnosis',
-          )
-          resultFavouriteDiagnosis = {
-            favouriteDiagnosis: favouriteDiagnosis
-              ? favouriteDiagnosis.value
-              : [],
-          }
-        } else if (
           payload.type ===
           USER_PREFERENCE_TYPE.FAVOURITEDIAGNOSISLANGUAGESETTING
         ) {

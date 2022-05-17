@@ -52,7 +52,7 @@ const ICD10DiagnosisItem = ({
       vals.corDiagnosis[index].icD10DiagnosisCode = op.code
       vals.corDiagnosis[index].icD10JpnDiagnosisDescription = op.JpnDisplayValue
     } else {
-      vals.corDiagnosis[index].iCD10DiagnosisCode = undefined
+      vals.corDiagnosis[index].icD10DiagnosisCode = undefined
     }
     setValues(vals)
     entity.corDiagnosis = vals.corDiagnosis
