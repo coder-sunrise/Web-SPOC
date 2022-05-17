@@ -146,7 +146,7 @@ const Detail = ({
                               disabled:
                                 hasActiveSession &&
                                 consumableDetail.entity?.id &&
-                                consumableDetail.entity.isActive,
+                                consumableDetail.entity?.isActive,
                               layoutConfig: {
                                 style: {},
                               },

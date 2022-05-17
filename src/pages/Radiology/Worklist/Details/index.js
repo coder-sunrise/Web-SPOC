@@ -159,7 +159,9 @@ const RadiologyDetails = () => {
     setShowReport(!showReport)
   }
   const saveAndPrint = () => {
-    handleSave(undefined, false)
+    if (details?.entity?.statusFK != 4 && details?.entity?.statusFK != 5) {
+      handleSave(undefined, false)
+    }
     dispatch({
       type: 'radiologyDetails/query',
       payload: { id: detailsId },

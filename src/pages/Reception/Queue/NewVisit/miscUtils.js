@@ -507,7 +507,8 @@ export const formikHandleSubmit = (
       return {
         ...d,
         sequence: index,
-        consultationStatus: VISITDOCTOR_CONSULTATIONSTATUS.WAITING,
+        consultationStatus:
+          d.consultationStatus || VISITDOCTOR_CONSULTATIONSTATUS.WAITING,
       }
     })
 

@@ -130,7 +130,7 @@ const General = ({
         id: 'orderable',
         name: 'Orderable',
         tooltip: 'Item is orderable and dispensable to patient',
-        disabled: hasActiveSession && values.id && entity.isActive,
+        disabled: hasActiveSession && values.id && values.isActive,
         layoutConfig: {
           style: {},
         },
