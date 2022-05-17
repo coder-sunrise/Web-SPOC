@@ -31,7 +31,6 @@ class DocumentEditor extends SampleBase {
           this.container.documentEditor.fitPage(zoomTarget)
         } else {
           const zoomValue = parseInt(zoomTarget, 10)
-          console.log('zoomValue',zoomTarget,zoomValue)
           if (zoomValue < 0) return
           this.container.documentEditor.zoomFactor = zoomValue / 100
         }
@@ -86,30 +85,31 @@ class DocumentEditor extends SampleBase {
     )
   }
 
+  static showHideHighligth(isShow) {
+    const selection = this.instance.documentEditor.editor.selection
+    const formFieldSettings = this.instance.documentEditorSettings.formFieldSettings
+    formFieldSettings.applyShading = isShow
+    selection.isHighlightEditRegion = isShow
+  }
+
   static instance = undefined
   static print = ({ ...printProps }) => {
     const { documentName, document: content } = printProps
-    if (!DocumentEditor.instance) {
-      const container = new DocumentEditorContainerComponent({
-        userColor: '#FFFFFF',
-        documentEditorSettings: {
-          // searchHighlightColor: '#FFFFFF',
-          formFieldSettings: {
-            shadingColor: '#FFFFFF',
-            // applyShading: false,
-            // selectionColor: '#FFFFFF',
-          },
-        },
-      })
+    if (!this.instance) {
+      const container = new DocumentEditorContainerComponent()
       container.element = document.createElement('div')
       container.preRender()
       container.render()
-      DocumentEditor.instance = container
+      this.instance = container
     }
-    const documentEditor = DocumentEditor.instance.documentEditor
+    const documentEditor = this.instance.documentEditor
     documentEditor.open(typeof content === 'object' ? JSON.stringify(content) : content)
     documentEditor.documentName = documentName
-    setTimeout(() => documentEditor.print(), 1)
+    setTimeout(() => {
+      this.showHideHighligth(false) 
+      documentEditor.print() 
+      this.showHideHighligth(true)
+    }, 1)
   }
 }
 
