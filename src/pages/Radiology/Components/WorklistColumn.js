@@ -4,6 +4,7 @@ import _ from 'lodash'
 import ProCard from '@ant-design/pro-card'
 import { columns } from '@/pages/Widgets/ClinicalNotes/CannedText/utils'
 import { RADIOLOGY_WORKITEM_STATUS } from '@/utils/constants'
+import { Empty } from 'antd'
 
 const defaultColumnStyle = {
   height: '100%',
@@ -213,14 +214,18 @@ const WorklistColumnBody = ({ data, renderWorkitem }) => {
       onScroll={calculateCurrentIndex}
     >
       <div style={{ height: containerHeight }}>
-        {columnData.map((item, i) =>
-          renderWorkitem(item, {
-            position: 'absolute',
-            top: marginTop + (currentIndex + i) * offsetHeight,
-            left: 5,
-            right: 5,
-            height: offsetHeight - marginTop,
-          }),
+        {columnData.length > 0 &&
+          columnData.map((item, i) =>
+            renderWorkitem(item, {
+              position: 'absolute',
+              top: marginTop + (currentIndex + i) * offsetHeight,
+              left: 5,
+              right: 5,
+              height: offsetHeight - marginTop,
+            }),
+          )}
+        {columnData.length === 0 && (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
         )}
       </div>
     </div>
