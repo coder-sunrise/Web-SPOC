@@ -18,17 +18,19 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    effectiveDates: Yup.array()
+      .of(Yup.date())
+      .min(2)
+      .required(),
   }),
   handleSubmit: (values, { props }) => {
-    if(values.rows.some(x=> !x.isDeleted && x.totalAftAdj < 0))
-      return;
+    if (values.rows.some(x => !x.isDeleted && x.totalAftAdj < 0)) return
     const { effectiveDates, rows, tempSelectedItem, ...restValues } = values
     const { dispatch, onConfirm } = props
 
     const maxSortOrderObj = _.maxBy(rows, 'sortOrder') || {}
     let maxSortOrder = maxSortOrderObj.sortOrder || 0
-    const assignedSortOrderArray = rows.map((row) => {
+    const assignedSortOrderArray = rows.map(row => {
       if (!row.sortOrder) maxSortOrder += 1
 
       return {
@@ -37,11 +39,11 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
       }
     })
     let itemTypesArray = []
-    visitOrderTemplateItemTypes.forEach((type) => {
+    visitOrderTemplateItemTypes.forEach(type => {
       const currentTypeRows = assignedSortOrderArray.filter(
-        (row) => row.type === type.id,
+        row => row.type === type.id,
       )
-      const updatedRows = currentTypeRows.map((row) => {
+      const updatedRows = currentTypeRows.map(row => {
         const total = row.quantity * row.unitPrice
         const totalAftAdj = row.totalAftAdj ? row.totalAftAdj : total
         return {
@@ -50,7 +52,7 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
           inventoryItemCode: row.code,
           inventoryItemName: row.name,
           total: total,
-          totalAftAdj: totalAftAdj,  
+          totalAftAdj: totalAftAdj,
           adjType: row.isExactAmount ? 'ExactAmount' : 'Percentage',
           [type.dtoName]: {
             ...row[type.dtoName],
@@ -59,10 +61,7 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
           },
         }
       })
-      itemTypesArray = [
-        ...itemTypesArray,
-        ...updatedRows,
-      ]
+      itemTypesArray = [...itemTypesArray, ...updatedRows]
     })
 
     const payload = {
@@ -74,7 +73,7 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
     dispatch({
       type: 'settingVisitOrderTemplate/upsert',
       payload,
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         if (onConfirm) onConfirm()
         dispatch({
@@ -86,83 +85,94 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
   displayName: 'VisitOrderTemplateDetail',
 })
 class Detail extends PureComponent {
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.dispatch({
       type: 'settingVisitOrderTemplate/reset',
     })
   }
 
-  render () {
+  render() {
     const { theme, footer, values, handleSubmit } = this.props
     return (
       <Fragment>
-        <div style={{ margin: theme.spacing(1) }}>
-          <GridContainer>
-            <GridItem md={6}>
-              <FastField
-                name='code'
-                render={(args) => {
-                  return (
-                    <TextField
-                      label='Code'
-                      autoFocus
-                      disabled={!!values.id}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={6}>
-              <FastField
-                name='displayValue'
-                render={(args) => {
-                  return <TextField label='Display Value' {...args} />
-                }}
-              />
-            </GridItem>
-            <GridItem md={6}>
-              <FastField
-                name='effectiveDates'
-                render={(args) => {
-                  return (
-                    <DateRangePicker
-                      label='Effective Start Date'
-                      label2='End Date'
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={12}>
-              <FastField
-                name='description'
-                render={(args) => {
-                  return (
-                    <TextField
-                      label='Description'
-                      multiline
-                      rowsMax={4}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-          </GridContainer>
+        <GridContainer
+          style={{
+            height: 500,
+            alignItems: 'start',
+            overflowY: 'scroll',
+          }}
+        >
+          <div style={{ margin: theme.spacing(1) }}>
+            <GridContainer>
+              <GridItem md={6}>
+                <FastField
+                  name='code'
+                  render={args => {
+                    return (
+                      <TextField
+                        label='Code'
+                        autoFocus
+                        disabled={!!values.id}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+              <GridItem md={6}>
+                <FastField
+                  name='displayValue'
+                  render={args => {
+                    return <TextField label='Display Value' {...args} />
+                  }}
+                />
+              </GridItem>
+              <GridItem md={6}>
+                <FastField
+                  name='effectiveDates'
+                  render={args => {
+                    return (
+                      <DateRangePicker
+                        label='Effective Start Date'
+                        label2='End Date'
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+              <GridItem md={12}>
+                <FastField
+                  name='description'
+                  render={args => {
+                    return (
+                      <TextField
+                        label='Description'
+                        multiline
+                        rowsMax={4}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            </GridContainer>
 
-          <InventoryItemList {...this.props} includeOrderSet />
-          <p style={{ marginTop: 10 }}>
-            * Inactive item(s) will not be added in the order list.
-          </p>
-        </div>
+            <InventoryItemList {...this.props} includeOrderSet />
+
+            <p style={{ marginTop: 10 }}>
+              * Inactive item(s) will not be added in the order list.
+            </p>
+          </div>
+        </GridContainer>
         {footer &&
           footer({
             onConfirm: handleSubmit,
             confirmBtnText: 'Save',
             confirmProps: {
-              disabled: values.rows.some(x=> !x.isDeleted && x.totalAftAdj < 0),
+              disabled: values.rows.some(
+                x => !x.isDeleted && x.totalAftAdj < 0,
+              ),
             },
           })}
       </Fragment>
