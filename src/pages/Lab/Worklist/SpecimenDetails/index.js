@@ -424,9 +424,12 @@ export const SpecimenDetails = ({
                         <span>Display Raw Data</span>
                       </Space>
                       <div style={{ flexGrow: 1, textAlign: 'right' }}>
-                        <Button type='link' onClick={resendOrder}>
-                          Resend Order
-                        </Button>
+                        {Authorized.check('lab.starttest')?.rights ===
+                          'enable' && (
+                          <Button type='link' onClick={resendOrder}>
+                            Resend Order
+                          </Button>
+                        )}
                         <Icon
                           type={
                             isResultFullScreen
