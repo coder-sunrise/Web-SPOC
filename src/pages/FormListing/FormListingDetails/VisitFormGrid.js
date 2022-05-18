@@ -118,7 +118,7 @@ class VisitFormGrid extends PureComponent {
     const { formListing, formCategory, formFrom, dispatch } = this.props
     const { visitDetail = {} } = formListing
     let { isCanEditForms = false } = visitDetail
-    if (row.statusFK === 3 || row.statusFK === 4 || !isCanEditForms) return
+    if (row.statusFK === 3 || row.statusFK === 4) return
     let response
     if (formCategory === FORM_CATEGORY.VISITFORM) {
       response = await this.props.dispatch({
@@ -239,7 +239,7 @@ class VisitFormGrid extends PureComponent {
 
     return (
       <div>
-        <Checkbox
+        {/* <Checkbox
           label='Include voided forms'
           value={this.state.includeVoidForms}
           onChange={() => {
@@ -250,7 +250,7 @@ class VisitFormGrid extends PureComponent {
               }
             })
           }}
-        />
+        /> */}
         <CommonTableGrid
           getRowId={r => r.id}
           forceRender
@@ -349,7 +349,7 @@ class VisitFormGrid extends PureComponent {
                         </Button>
                       </Tooltip>
                     )}
-                    {row.statusFK === 1 && (
+                    {!isHiddenModify && (
                       <Popconfirm
                         onConfirm={() => {
                           const { formCategory } = this.props
@@ -380,28 +380,26 @@ class VisitFormGrid extends PureComponent {
                           }
                         }}
                       >
-                        {!isHiddenModify && (
-                          <Tooltip title='Delete'>
-                            <Button
-                              disabled={!row.isCanEditForms}
-                              size='sm'
-                              color='danger'
-                              justIcon
-                            >
-                              <Delete />
-                            </Button>
-                          </Tooltip>
-                        )}
+                        <Tooltip title='Delete'>
+                          <Button
+                            disabled={!row.isCanEditForms}
+                            size='sm'
+                            color='danger'
+                            justIcon
+                          >
+                            <Delete />
+                          </Button>
+                        </Tooltip>
                       </Popconfirm>
                     )}
-                    {row.statusFK === 2 && !isHiddenVoid && (
+                    {/* {row.statusFK === 2 && !isHiddenVoid && (
                       <this.VoidForm
                         classes={classes}
                         dispatch={dispatch}
                         row={row}
                         user={user}
                       />
-                    )}
+                    )} */}
                   </React.Fragment>
                 )
               },
