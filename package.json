@@ -48,7 +48,7 @@
     "@microsoft/signalr": "^3.1.0",
     "@syncfusion/ej2-pdf-export": "20.1.55",
     "@syncfusion/ej2-react-calendars": "19.3.46",
-    "@syncfusion/ej2-react-documenteditor": "19.4.56",
+    "@syncfusion/ej2-react-documenteditor": "19.3.48",
     "@syncfusion/ej2-react-dropdowns": "19.3.48",
     "@syncfusion/ej2-react-navigations": "19.3.46",
     "@syncfusion/ej2-react-schedule": "19.3.48",
