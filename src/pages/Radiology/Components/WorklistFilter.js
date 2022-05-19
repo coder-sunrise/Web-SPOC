@@ -16,6 +16,7 @@ import {
   dateFormatLong,
   IconButton,
   Popover,
+  Tooltip,
   VisitTypeSelect,
 } from '@/components'
 import { formatMessage } from 'umi'
@@ -52,7 +53,7 @@ const DateFilterInfo = () => {
 export const WorklistFilter = () => {
   const [form] = Form.useForm()
   const dispatch = useDispatch()
-
+  const { doctorprofile = [] } = useSelector(s => s.codetable)
   const { detailsId, filterWorklist } = useContext(WorklistContext)
   const clinicianProfile = useSelector(
     state => state.user.data.clinicianProfile,
@@ -74,7 +75,7 @@ export const WorklistFilter = () => {
       <Form.Item name='searchValue'>
         <TextField
           label={formatMessage({ id: 'radiology.search.general' })}
-          style={{ width: 350 }}
+          style={{ width: 280 }}
         />
       </Form.Item>
       <Form.Item name='visitType' initialValue={[-99]}>
@@ -122,6 +123,24 @@ export const WorklistFilter = () => {
         />
       </Form.Item>
       <DateFilterInfo />
+      <Form.Item name='visitDoctor' initialValue={[-99]}>
+        <Tooltip
+          placement='right'
+          title='Select "All" will retrieve active and inactive doctors'
+        >
+          <Select
+            label={formatMessage({ id: 'radiology.search.visitDoctor' })}
+            options={doctorprofile.map(item => ({
+              value: item.id,
+              name: item.clinicianProfile.name,
+            }))}
+            style={{ width: 170 }}
+            mode='multiple'
+            maxTagCount={0}
+            maxTagPlaceholder='Visit Doctor'
+          />
+        </Tooltip>
+      </Form.Item>
       <Form.Item name='isUrgent' style={{ alignSelf: 'flex-end' }}>
         <Checkbox
           style={{ width: 65 }}
