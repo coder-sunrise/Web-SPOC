@@ -98,7 +98,7 @@ class NoteDetails extends Component {
             zIndex: 1,
             left: 305,
             right: 0,
-            top: 10,
+            top: 12,
           }}
         >
           <ScribbleNoteItem

@@ -28,6 +28,8 @@ import Authorized from '@/utils/Authorized'
       const { visitDetail = {} } = formListing
       const {
         patientName,
+        doctorName,
+        patientAccountNo,
         patientGender,
         patientDOB,
         patientAge,
@@ -36,10 +38,15 @@ import Authorized from '@/utils/Authorized'
       } = visitDetail
       const fillData = {
         patientName,
+        doctorName,
         patientGender: patientGender === 'F' ? 'Female' : patientGender === 'M' ? 'Male' : 'Unknown' ,
         patientDOB: moment(patientDOB).format('DD MMM YYYY'),
         patientAge: `${patientAge}`,
         patientRefNo,
+        patientNRIC: patientAccountNo,
+        patientAccNo: patientAccountNo,
+        genderMale: patientGender === 'M',
+        genderFemale: patientGender === 'F',
         todayDate: moment(todayDate).format('DD MMM YYYY'),
       }
       values = {

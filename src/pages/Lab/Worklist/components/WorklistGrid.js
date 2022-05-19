@@ -444,6 +444,27 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
 
     return (
       <Table
+        onRow={record => {
+          if (
+            record.dateReceived &&
+            record.specimenStatusFK !== LAB_SPECIMEN_STATUS.DISCARDED
+          ) {
+            return {
+              onDoubleClick: () => {
+                record.hasAnyPendingRetestResult
+                  ? setRetestDetailsPara({
+                      open: true,
+                      id: record.labSpecimenFK,
+                    })
+                  : setSpecimenDetailsPara({
+                      open: true,
+                      id: record.labSpecimenFK,
+                    })
+                setIsAnyWorklistModelOpened(true)
+              },
+            }
+          }
+        }}
         bordered
         className='noBgTable'
         columns={columns}
@@ -556,9 +577,7 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
         onClose={() => {
           closeSpecimenDetails()
         }}
-        onConfirm={() => {
-          closeSpecimenDetails()
-        }}
+        onConfirm={() => {}}
       />
       <RetestDetails
         {...retestDetailsPara}

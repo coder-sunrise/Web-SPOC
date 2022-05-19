@@ -20,7 +20,7 @@ import {
   withFormikExtend,
   ProgressButton,
   AutoSuggestion,
-  Tooltip
+  Tooltip,
 } from '@/components'
 import { getUniqueId } from '@/utils/utils'
 import { queryList } from '@/services/common'
@@ -35,15 +35,19 @@ class Address extends Component {
     postcode: '',
   }
 
-  handleAddressType = (e) => { }
+  handleAddressType = e => {}
 
-  deleteAddress = (id) => () => {
+  deleteAddress = id => () => {
     const contact = _.cloneDeep(this.props.values.contact)
     const { contactAddress } = contact
 
     const deleted = contactAddress.find((o, idx) => o.id === id)
     if (deleted) {
       deleted.isDeleted = true
+      let newContactAddress = contactAddress.filter(
+        item => item.isDeleted == false,
+      )
+      contact.contactAddress = newContactAddress
       this.props.setFieldValue('contact', contact)
     }
   }
@@ -59,33 +63,51 @@ class Address extends Component {
     return prefix
   }
 
-  renderOption = (option) => {
-    const textStyle = { overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }
-    return <div>
-      <GridContainer >
-        <GridItem xs={3} md={3} >
-          <Tooltip title={`Postal Code: ${option.postalCode || ''}`}>
-            <div style={textStyle}><span style={{ fontWeight: 500 }}>Postal Code: </span>{option.postalCode || '-'}</div>
-          </Tooltip>
-        </GridItem>
-        <GridItem xs={2} md={2} >
-          <Tooltip title={`Block No.: ${option.blkHseNo || ''}`}>
-            <div style={textStyle}><span style={{ fontWeight: 500 }}>Block No.: </span> {option.blkHseNo || '-'}</div>
-          </Tooltip>
-        </GridItem>
-        <GridItem xs={3} md={3} >
-          <Tooltip title={`Street: ${option.street || ''}`}>
-            <div style={textStyle}><span style={{ fontWeight: 500 }}>Street: </span>{option.street || '-'} </div>
-          </Tooltip>
-        </GridItem>
-        <GridItem xs={4} md={4} >
-          <Tooltip title={`Building Name: ${option.building || ''}`}>
-            <div style={textStyle}><span style={{ fontWeight: 500 }}>Building Name: </span>{option.building || '-'} </div>
-          </Tooltip>
-        </GridItem>
-      </GridContainer>
-      <Divider />
-    </div>
+  renderOption = option => {
+    const textStyle = {
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+    }
+    return (
+      <div>
+        <GridContainer>
+          <GridItem xs={3} md={3}>
+            <Tooltip title={`Postal Code: ${option.postalCode || ''}`}>
+              <div style={textStyle}>
+                <span style={{ fontWeight: 500 }}>Postal Code: </span>
+                {option.postalCode || '-'}
+              </div>
+            </Tooltip>
+          </GridItem>
+          <GridItem xs={2} md={2}>
+            <Tooltip title={`Block No.: ${option.blkHseNo || ''}`}>
+              <div style={textStyle}>
+                <span style={{ fontWeight: 500 }}>Block No.: </span>{' '}
+                {option.blkHseNo || '-'}
+              </div>
+            </Tooltip>
+          </GridItem>
+          <GridItem xs={3} md={3}>
+            <Tooltip title={`Street: ${option.street || ''}`}>
+              <div style={textStyle}>
+                <span style={{ fontWeight: 500 }}>Street: </span>
+                {option.street || '-'}{' '}
+              </div>
+            </Tooltip>
+          </GridItem>
+          <GridItem xs={4} md={4}>
+            <Tooltip title={`Building Name: ${option.building || ''}`}>
+              <div style={textStyle}>
+                <span style={{ fontWeight: 500 }}>Building Name: </span>
+                {option.building || '-'}{' '}
+              </div>
+            </Tooltip>
+          </GridItem>
+        </GridContainer>
+        <Divider />
+      </div>
+    )
   }
 
   searchAddress = async (value, type) => {
@@ -93,7 +115,7 @@ class Address extends Component {
       apiCriteria: {
         searchValue: value,
       },
-      pagesize: 50
+      pagesize: 50,
     })
     if (response && response.data) {
       return response.data.data || []
@@ -101,7 +123,7 @@ class Address extends Component {
     return []
   }
 
-  render () {
+  render() {
     const searchBtnUid = getUniqueId()
     const {
       addressIndex,
@@ -124,7 +146,7 @@ class Address extends Component {
     const onOptionSelected = (value, option) => {
       const { codetable, setFieldValue } = this.props
       const { ctcountry } = codetable
-      const country = ctcountry.find((c) => c.code === 'SG')
+      const country = ctcountry.find(c => c.code === 'SG')
       const { postalCode, blkHseNo, building, street } = option
       setFieldValue(`${prefix}postcode`, postalCode)
       setFieldValue(`${prefix}blockNo`, blkHseNo)
@@ -134,8 +156,8 @@ class Address extends Component {
     }
 
     return (
-      <div style={style} >
-        { isArray && (
+      <div style={style}>
+        {isArray && (
           <GridContainer>
             {hideCheckBox ? (
               <GridItem xs={6} md={5} />
@@ -144,14 +166,13 @@ class Address extends Component {
                 <GridItem xs={6} md={2}>
                   <Field
                     name={`${prefix}isMailing`}
-                    render={(args) => (
+                    render={args => (
                       <Checkbox
                         label='Mailing Address'
                         inputLabel=' '
                         disabled={
-                          !!addresses.find(
-                            (o) => o.isMailing && !o.isDeleted,
-                          ) && !addresses[addressIndex].isMailing
+                          !!addresses.find(o => o.isMailing && !o.isDeleted) &&
+                          !addresses[addressIndex].isMailing
                         }
                         {...args}
                       />
@@ -161,14 +182,13 @@ class Address extends Component {
                 <GridItem xs={6} md={3}>
                   <Field
                     name={`${prefix}isPrimary`}
-                    render={(args) => (
+                    render={args => (
                       <Checkbox
                         label='Primary Address'
                         inputLabel=' '
                         disabled={
-                          !!addresses.find(
-                            (o) => o.isPrimary && !o.isDeleted,
-                          ) && !addresses[addressIndex].isPrimary
+                          !!addresses.find(o => o.isPrimary && !o.isDeleted) &&
+                          !addresses[addressIndex].isPrimary
                         }
                         {...args}
                       />
@@ -178,15 +198,14 @@ class Address extends Component {
               </Fragment>
             )}
 
-            <GridItem xs={6} md={5}>
-            </GridItem>
+            <GridItem xs={6} md={5}></GridItem>
             <GridItem
               xs={6}
               md={2}
               align='right'
-              style={{ lineHeight: theme.props.rowHeight, }}
+              style={{ lineHeight: theme.props.rowHeight }}
             >
-              {addresses.filter((o) => !o.isDeleted).length > 1 && (
+              {addresses.filter(o => !o.isDeleted).length > 1 && (
                 <Popconfirm
                   title='Do you want to remove this address?'
                   onConfirm={this.deleteAddress(
@@ -207,38 +226,41 @@ class Address extends Component {
             </GridItem>
           </GridContainer>
         )}
-        {
-          !isArray && (
-            <GridContainer>
-              <GridItem xs={6} md={10} />
-
-            </GridContainer>
-          )
-        }
+        {!isArray && (
+          <GridContainer>
+            <GridItem xs={6} md={10} />
+          </GridContainer>
+        )}
         <GridContainer>
           <GridItem xs={12} md={4}>
             <FastField
               name={`${prefix}postcode`}
-              render={(args) => {
-                return <AutoSuggestion label='Postal Code'
-                  onOptionSelected={onOptionSelected}
-                  renderOption={this.renderOption}
-                  valuePath='postalCode'
-                  query={async (value) => { return await this.searchAddress(value, 'PostalCode') }}
-                  {...args}
-                />
-              }} />
+              render={args => {
+                return (
+                  <AutoSuggestion
+                    label='Postal Code'
+                    onOptionSelected={onOptionSelected}
+                    renderOption={this.renderOption}
+                    valuePath='postalCode'
+                    query={async value => {
+                      return await this.searchAddress(value, 'PostalCode')
+                    }}
+                    {...args}
+                  />
+                )
+              }}
+            />
           </GridItem>
           <GridItem xs={12} md={4}>
             <FastField
               name={`${prefix}blockNo`}
-              render={(args) => <TextField label='Block No.' {...args} />}
+              render={args => <TextField label='Block No.' {...args} />}
             />
           </GridItem>
           <GridItem xs={12} md={4}>
             <FastField
               name={`${prefix}unitNo`}
-              render={(args) => <TextField label='Unit No.' {...args} />}
+              render={args => <TextField label='Unit No.' {...args} />}
             />
           </GridItem>
         </GridContainer>
@@ -246,19 +268,19 @@ class Address extends Component {
           <GridItem xs={12} md={4}>
             <FastField
               name={`${prefix}buildingName`}
-              render={(args) => <TextField label='Building Name' {...args} />}
+              render={args => <TextField label='Building Name' {...args} />}
             />
           </GridItem>
           <GridItem xs={12} md={4}>
             <FastField
               name={`${prefix}street`}
-              render={(args) => <TextField label='Street' {...args} />}
+              render={args => <TextField label='Street' {...args} />}
             />
           </GridItem>
           <GridItem xs={12} md={4}>
             <FastField
               name={`${prefix}countryFK`}
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   label='Country'
                   code='ctCountry'
@@ -270,7 +292,7 @@ class Address extends Component {
             />
           </GridItem>
         </GridContainer>
-      </div >
+      </div>
     )
   }
 }

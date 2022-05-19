@@ -76,6 +76,8 @@ class SetFolderWithPopover extends Component {
       onAddNewFolders,
       justIcon,
       selectedFolderFKs,
+      isEnableEditFolder,
+      isEnableEditDocument,
     } = this.props
     const { folderFKs, newFolder } = this.state
 
@@ -85,6 +87,8 @@ class SetFolderWithPopover extends Component {
         content={
           <div style={{ width: 500 }}>
             <TagSelect
+              isEnableEditFolder={isEnableEditFolder}
+              isEnableEditDocument={isEnableEditDocument}
               saveAsNewTag={this.saveAsNewTag}
               tagList={folderList.filter(f => f.id !== -99)}
               defaultTagIds={selectedFolderFKs}

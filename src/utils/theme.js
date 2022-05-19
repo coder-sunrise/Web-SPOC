@@ -463,7 +463,9 @@ export const defaultTheme = createMuiTheme({
     RichEditor: {
       wrapper: {
         '& .rdw-editor-toolbar': {
-          zoom: '90%',
+          //  zoom: '90%',
+          // height: 35,
+          // padding: 5,
         },
       },
     },
@@ -692,7 +694,9 @@ export const smallTheme = createMuiTheme({
     RichEditor: {
       wrapper: {
         '& .rdw-editor-toolbar': {
-          zoom: '70%',
+          // zoom: '70%',
+          // height: 35,
+          // padding: 5,
         },
       },
     },

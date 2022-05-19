@@ -234,7 +234,6 @@ export default createListViewModel({
                 typeName: p.name,
                 ...o,
                 formData: JSON.parse(o.formData),
-                statusFK: 1,
                 isCanEditForms,
               }
               return d

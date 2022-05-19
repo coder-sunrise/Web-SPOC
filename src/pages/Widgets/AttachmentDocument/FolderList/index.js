@@ -21,6 +21,7 @@ import { AttachmentWithThumbnail } from '@/components/_medisys'
 import { FILE_CATEGORY, FILE_STATUS } from '@/utils/constants'
 import TextEditor from '../TextEditor'
 import DragableList from './DragableList'
+import Authorized from '@/utils/Authorized'
 
 class FolderList extends Component {
   state = {
@@ -214,114 +215,122 @@ class FolderList extends Component {
       updateAttachments,
       selectedFolderFK = -99,
       modelName,
+      isEnableEditFolder = true,
+      isEnableDeleteFolder = true,
       isEnableEditDocument = true,
     } = this.props
     const { showNewFolder, folderList, isEditMode } = this.state
 
     return (
       <GridContainer style={{ height: 'auto' }}>
-        {!readOnly && isEnableEditDocument && (
+        {!readOnly && (
           <GridItem md={12}>
             <div>
               <div style={{ display: 'flex', float: 'left' }}>
-                <Tooltip title='Add New Tag'>
-                  <Button
-                    type='primary'
-                    style={{ marginRight: 8, marginTop: 8 }}
-                    onClick={() => {
-                      this.setState({ showNewFolder: true })
-                    }}
-                    size='small'
-                    icon={<FolderAddFilled />}
-                  ></Button>
-                </Tooltip>
-                <div>
-                  <FastField
-                    name={`${modelName}`}
-                    render={args => {
-                      this.form = args.form
-                      return (
-                        <AttachmentWithThumbnail
-                          attachmentType={`${modelName}`}
-                          handleUpdateAttachments={att => {
-                            let { added = [] } = att
-                            const { selectedFolderFK: folderFK } = this.props
-                            if (folderFK > 0 && added.length > 0) {
-                              added = added.map(ad => {
-                                const { 0: fileDetails } = ad
-                                const retVal = {
-                                  ...ad,
-                                  ...fileDetails,
-                                  [`${modelName}_Folder`]: [{ folderFK }],
-                                }
-                                return retVal
-                              })
+                {isEnableEditFolder && (
+                  <Tooltip title='Add New Tag'>
+                    <Button
+                      type='primary'
+                      style={{ marginRight: 8, marginTop: 8 }}
+                      onClick={() => {
+                        this.setState({ showNewFolder: true })
+                      }}
+                      size='small'
+                      icon={<FolderAddFilled />}
+                    ></Button>
+                  </Tooltip>
+                )}
+                {isEnableEditDocument && (
+                  <div>
+                    <FastField
+                      name={`${modelName}`}
+                      render={args => {
+                        this.form = args.form
+                        return (
+                          <AttachmentWithThumbnail
+                            attachmentType={`${modelName}`}
+                            handleUpdateAttachments={att => {
+                              let { added = [] } = att
+                              const { selectedFolderFK: folderFK } = this.props
+                              if (folderFK > 0 && added.length > 0) {
+                                added = added.map(ad => {
+                                  const { 0: fileDetails } = ad
+                                  const retVal = {
+                                    ...ad,
+                                    ...fileDetails,
+                                    [`${modelName}_Folder`]: [{ folderFK }],
+                                  }
+                                  return retVal
+                                })
+                              }
+                              updateAttachments(args)({ ...att, added })
+                            }}
+                            attachments={args.field.value}
+                            fileCategory={
+                              modelName === 'patientAttachment'
+                                ? FILE_CATEGORY.PATIENT
+                                : FILE_CATEGORY.COPAYER
                             }
-                            updateAttachments(args)({ ...att, added })
-                          }}
-                          attachments={args.field.value}
-                          fileCategory={
-                            modelName === 'patientAttachment'
-                              ? FILE_CATEGORY.PATIENT
-                              : FILE_CATEGORY.COPAYER
-                          }
-                          fileStatus={FILE_STATUS.CONFIRMED}
-                          label=''
-                          thumbnailSize={{
-                            height: 256,
-                            width: 256,
-                          }}
-                        />
-                      )
-                    }}
-                  />
-                </div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  float: 'right',
-                  marginTop: 8,
-                }}
-              >
-                {isEditMode ? (
-                  <React.Fragment>
-                    <Tooltip title='Save'>
-                      <Button
-                        type='primary'
-                        size='small'
-                        onClick={() => {
-                          this.handleOnSave()
-                          this.setState({ isEditMode: false })
-                        }}
-                        style={{ marginRight: 8 }}
-                        icon={<SaveFilled />}
-                      ></Button>
-                    </Tooltip>
-                    <Tooltip title='Cancel'>
-                      <Button
-                        type='danger'
-                        size='small'
-                        onClick={() => {
-                          this.mapPropsToStates()
-                          this.setState({ isEditMode: false })
-                        }}
-                        icon={<CloseCircleFilled />}
-                      ></Button>
-                    </Tooltip>
-                  </React.Fragment>
-                ) : (
-                  <Button
-                    type='primary'
-                    size='small'
-                    onClick={() => {
-                      this.setState({ isEditMode: true })
-                    }}
-                    icon={<EditFilled />}
-                  ></Button>
+                            fileStatus={FILE_STATUS.CONFIRMED}
+                            label=''
+                            thumbnailSize={{
+                              height: 256,
+                              width: 256,
+                            }}
+                          />
+                        )
+                      }}
+                    />
+                  </div>
                 )}
               </div>
+              {isEnableEditFolder && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    float: 'right',
+                    marginTop: 8,
+                  }}
+                >
+                  {isEditMode ? (
+                    <React.Fragment>
+                      <Tooltip title='Save'>
+                        <Button
+                          type='primary'
+                          size='small'
+                          onClick={() => {
+                            this.handleOnSave()
+                            this.setState({ isEditMode: false })
+                          }}
+                          style={{ marginRight: 8 }}
+                          icon={<SaveFilled />}
+                        ></Button>
+                      </Tooltip>
+                      <Tooltip title='Cancel'>
+                        <Button
+                          type='danger'
+                          size='small'
+                          onClick={() => {
+                            this.mapPropsToStates()
+                            this.setState({ isEditMode: false })
+                          }}
+                          icon={<CloseCircleFilled />}
+                        ></Button>
+                      </Tooltip>
+                    </React.Fragment>
+                  ) : (
+                    <Button
+                      type='primary'
+                      size='small'
+                      onClick={() => {
+                        this.setState({ isEditMode: true })
+                      }}
+                      icon={<EditFilled />}
+                    ></Button>
+                  )}
+                </div>
+              )}
             </div>
           </GridItem>
         )}
@@ -349,7 +358,8 @@ class FolderList extends Component {
               onItemClick={this.onItemClick}
               onEndDrag={this.handleOnEndDrag}
               onItemChanged={this.onItemChanged}
-              isEnableEditDocument={isEnableEditDocument}
+              isEnableEditFolder={isEnableEditFolder}
+              isEnableDeleteFolder={isEnableDeleteFolder}
             />
           </div>
         </GridItem>

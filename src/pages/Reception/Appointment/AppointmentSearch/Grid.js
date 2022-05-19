@@ -41,12 +41,12 @@ class Grid extends PureComponent {
     const { classes, handleDoubleClick } = this.props
     const { row, children, tableRow } = p
     let newchildren = []
-    const middleColumns = children.slice(3, 9)
+    const middleColumns = children.slice(5, 10)
 
     if (row.countNumber === 1) {
       newchildren.push(
         children
-          .filter((value, index) => index < 3)
+          .filter((value, index) => index < 5)
           .map(item => ({
             ...item,
             props: {
@@ -60,7 +60,7 @@ class Grid extends PureComponent {
 
       newchildren.push(
         children
-          .filter((value, index) => index > 8)
+          .filter((value, index) => index > 9)
           .map(item => ({
             ...item,
             props: {
@@ -132,6 +132,7 @@ class Grid extends PureComponent {
           { name: 'patientAccountNo', title: 'Acc. No.' },
           { name: 'patientContactNo', title: 'Contact No.' },
           { name: 'appointmentDate', title: 'Appt Date' },
+          { name: 'apptTime', title: 'Appt Time' },
           { name: 'duration', title: 'Duration' },
           { name: 'resource', title: 'Resource' },
           { name: 'appointmentTypeFK', title: 'Appt Type' },
@@ -171,17 +172,20 @@ class Grid extends PureComponent {
           {
             columnName: 'appointmentDate',
             type: 'date',
-            width: 140,
-            render: row =>
-              `${moment(row.appointmentDate).format('DD MMM YYYY')} ${moment(
-                row.apptTime,
-                'HH:mm',
-              ).format('HH:mm')}`,
+            width: 100,
+            render: row => `${moment(row.appointmentDate).format('DD MMM YYYY')}`,
+          },
+          {
+            columnName: 'apptTime',
+            sortingEnabled: false,
+            type: 'time',
+            width: 80,
+            render: row => `${moment(row.apptTime, 'HH:mm').format('HH:mm')}`,
           },
           {
             columnName: 'duration',
             sortingEnabled: false,
-            width: 110,
+            width: 80,
           },
           {
             columnName: 'resource',

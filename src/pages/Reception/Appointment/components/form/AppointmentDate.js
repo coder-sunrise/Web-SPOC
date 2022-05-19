@@ -8,13 +8,66 @@ import {
   DatePicker,
   TextField,
   CodeSelect,
+  Tooltip,
 } from '@/components'
 import { APPOINTMENT_STATUSOPTIONS } from '@/utils/constants'
+import _ from 'lodash'
 
-const AppointmentDate = ({ values, disabled, visitOrderTemplateOptions }) => {
+const AppointmentDate = ({
+  values,
+  patientProfile,
+  disabled,
+  onVisitPurposeSelected,
+  visitOrderTemplateOptions,
+}) => {
   const status = APPOINTMENT_STATUSOPTIONS.find(
     x => x.id === values.appointmentStatusFk,
   )
+  var patientCopayers = patientProfile?.patientScheme
+    ?.filter(x => !x.isExpired)
+    ?.map(x => x.copayerFK)
+  let availableVisitOrderTemplate = []
+  if (patientProfile) {
+    visitOrderTemplateOptions.forEach(template => {
+      if ((template.visitOrderTemplate_Copayers || []).length === 0) {
+        availableVisitOrderTemplate.push({ ...template, type: 'general' })
+      } else {
+        if (
+          _.intersection(
+            template.visitOrderTemplate_Copayers.map(x => x.copayerFK),
+            patientCopayers,
+          ) > 0
+        ) {
+          availableVisitOrderTemplate.push({ ...template, type: 'copayer' })
+        }
+      }
+    })
+    availableVisitOrderTemplate = _.orderBy(
+      availableVisitOrderTemplate,
+      [
+        data => data?.type?.toLowerCase(),
+        data => data?.displayValue?.toLowerCase(),
+      ],
+      ['asc', 'asc'],
+    )
+  } else {
+    visitOrderTemplateOptions.forEach(template => {
+      // if haven't select patient profile, then only show general package
+      if ((template.visitOrderTemplate_Copayers || []).length === 0) {
+        availableVisitOrderTemplate.push({ ...template })
+      }
+    })
+    availableVisitOrderTemplate = _.orderBy(
+      availableVisitOrderTemplate,
+      [data => data?.displayValue?.toLowerCase()],
+      ['asc'],
+    )
+  }
+
+  const handleVisitOrderTemplateChange = opts => {
+    onVisitPurposeSelected(opts)
+  }
+
   return (
     <React.Fragment>
       <GridItem xs md={2}>
@@ -54,8 +107,77 @@ const AppointmentDate = ({ values, disabled, visitOrderTemplateOptions }) => {
             <CodeSelect
               {...args}
               label='Visit Purpose'
-              options={visitOrderTemplateOptions}
+              options={availableVisitOrderTemplate}
               disabled={disabled}
+              dropdownStyle={{ width: 500 }}
+              dropdownMatchSelectWidth={false}
+              renderDropdown={option => {
+                const copayers = _.sortBy(
+                  option.visitOrderTemplate_Copayers.map(x => x.copayerName),
+                  ['copayerName'],
+                ).join(', ')
+                const tooltip = (
+                  <div>
+                    <div>{option.name}</div>
+                    {(option.visitOrderTemplate_Copayers || []).length > 0 && (
+                      <div>Co-Payer(s): {copayers}</div>
+                    )}
+                    {(option.visitOrderTemplate_Copayers || []).length ===
+                      0 && (
+                      <div>
+                        <i>General</i>
+                      </div>
+                    )}
+                  </div>
+                )
+                return (
+                  <Tooltip placement='right' title={tooltip}>
+                    <div>
+                      <div
+                        style={{
+                          fontWeight: '550',
+                          width: '100%',
+                          textOverflow: 'ellipsis',
+                          overflow: 'hidden',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {option.name}
+                      </div>
+                      {(option.visitOrderTemplate_Copayers || []).length >
+                        0 && (
+                        <div
+                          style={{
+                            width: '100%',
+                            textOverflow: 'ellipsis',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          <span>Co-Payer(s): </span>
+                          <span style={{ color: '#4255bd' }}>{copayers}</span>
+                        </div>
+                      )}
+                      {(option.visitOrderTemplate_Copayers || []).length ===
+                        0 && (
+                        <div
+                          style={{
+                            width: '100%',
+                            textOverflow: 'ellipsis',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          <span style={{ color: 'green' }}>
+                            <i>General</i>
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </Tooltip>
+                )
+              }}
+              onChange={(e, opts) => handleVisitOrderTemplateChange(opts)}
             />
           )}
         />

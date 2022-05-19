@@ -117,6 +117,7 @@ export const WorklistContextProvider = props => {
       modality,
       dateFrom,
       dateTo,
+      visitDoctor,
       isUrgent,
       isMyPatientOnly,
     } = currentFilter
@@ -140,6 +141,10 @@ export const WorklistContextProvider = props => {
                 .endOf('day')
                 .formatUTC(false)
             : undefined,
+          visitDoctor:
+            visitDoctor && !visitDoctor.includes(-99)
+              ? visitDoctor.join(',')
+              : undefined,
           isUrgent: isUrgent,
           clinicianProfileId: isMyPatientOnly ? clinicianProfile.id : undefined,
         },

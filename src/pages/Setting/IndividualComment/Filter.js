@@ -73,20 +73,25 @@ class Filter extends PureComponent {
                     groupNo,
                     examinationItemFK,
                   } = this.props.values
-                  const { clinicSettings } = this.props
+                  const { clinicSettings, onQuery } = this.props
                   const { secondaryPrintoutLanguage = '' } = clinicSettings
-                  this.props.dispatch({
-                    type: 'settingIndividualComment/query',
-                    payload: {
-                      groupNo,
-                      examinationItemFK,
-                      apiCriteria: {
-                        Language: secondaryPrintoutLanguage,
-                        Key: 'displayValue',
-                        SearchValue: codeDisplayValue,
-                      },
+                  const payload = {
+                    groupNo,
+                    examinationItemFK,
+                    apiCriteria: {
+                      Language: secondaryPrintoutLanguage,
+                      Key: 'displayValue',
+                      SearchValue: codeDisplayValue,
                     },
-                  })
+                  }
+                  this.props
+                    .dispatch({
+                      type: 'settingIndividualComment/query',
+                      payload: payload,
+                    })
+                    .then(() => {
+                      onQuery(payload)
+                    })
                 }}
               >
                 <FormattedMessage id='form.search' />

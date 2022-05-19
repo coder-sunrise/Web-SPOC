@@ -204,6 +204,7 @@ class CommonTableGrid extends PureComponent {
 
   constructor (props) {
     super(props)
+    console.log(pHeight)
     const {
       classes,
       theme,

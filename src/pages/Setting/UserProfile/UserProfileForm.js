@@ -118,8 +118,8 @@ const styles = theme => ({
           userProfile: Yup.object().shape({
             userName: Yup.string()
               .matches(
-                /(^[a-zA-Z][a-zA-Z0-9]+$)/,
-                'Must have at least 2 letter, start with alphabet and do not contains whitespace and special characters.',
+                /(^[a-zA-Z0-9]{2,}$)/,
+                'Must have at least 2 letter, do not contains whitespace and special characters.',
               )
               .required('Login ID is a required field'),
             password: Yup.string().required('Password is a required field'),
@@ -196,7 +196,7 @@ const styles = theme => ({
       effectiveStartDate: values.effectiveDates[0],
       effectiveEndDate: values.effectiveDates[1],
       userProfile,
-      roomAssignment: undefined
+      roomAssignment: undefined,
     }
 
     if (payload.shortName === '') {

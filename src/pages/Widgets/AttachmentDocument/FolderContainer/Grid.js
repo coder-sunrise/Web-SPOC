@@ -56,6 +56,7 @@ class Grid extends PureComponent {
       modelName,
       isEnableEditDocument = true,
       isEnableDeleteDocument = true,
+      isEnableEditFolder = true,
       filterDocumentValue = '',
     } = this.props
 
@@ -173,6 +174,7 @@ class Grid extends PureComponent {
                       <SetFolderWithPopover
                         justIcon
                         key={row.id}
+                        isEnableEditFolder={isEnableEditFolder}
                         folderList={row.folderList}
                         selectedFolderFKs={row.folderFKs || []}
                         onClose={selectedFolder => {

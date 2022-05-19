@@ -144,7 +144,9 @@ const Detail = ({
                               tooltip:
                                 'Item is orderable and dispensable to patient',
                               disabled:
-                                hasActiveSession && consumableDetail.entity?.id,
+                                hasActiveSession &&
+                                consumableDetail.entity?.id &&
+                                consumableDetail.entity?.isActive,
                               layoutConfig: {
                                 style: {},
                               },
@@ -162,7 +164,8 @@ const Detail = ({
                                   "Item’s stock is deducted and dispense by pharmacy. If unchecked the setting, stock deduction will take place during finalization of patient's order",
                                 disabled:
                                   hasActiveSession &&
-                                  consumableDetail.entity?.id,
+                                  consumableDetail.entity?.id &&
+                                  consumableDetail.entity?.isActive,
                                 layoutConfig: {
                                   style: {},
                                 },
@@ -180,7 +183,8 @@ const Detail = ({
                                   'Item will generate task for nurse to actualize',
                                 disabled:
                                   hasActiveSession &&
-                                  consumableDetail.entity?.id,
+                                  consumableDetail.entity?.id &&
+                                  consumableDetail.entity?.isActive,
                                 layoutConfig: {
                                   style: {},
                                 },
@@ -284,7 +288,11 @@ const Detail = ({
                       format={dateFormatLong}
                       label='Effective Start Date'
                       label2='End Date'
-                      disabled={!!(consumableDetail.entity && hasActiveSession)}
+                      disabled={
+                        consumableDetail.entity &&
+                        hasActiveSession &&
+                        consumableDetail.entity.isActive
+                      }
                       {...args}
                     />
                   )}

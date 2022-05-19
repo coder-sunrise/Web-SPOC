@@ -1,7 +1,7 @@
 import { stringify } from 'qs'
 import request, { download } from '@/utils/request'
 import { convertToQuery, commonDataWriterTransform } from '@/utils/utils'
-import { REPORT_TYPE } from '@/utils/constants'
+import { REPORT_FILE_NAME } from '@/utils/constants'
 // static data
 // import { QueueListingDummyData } from '@/pages/Report/dummyData'
 const reportContextUrl = '/api/Reports/context'
@@ -15,9 +15,9 @@ export const getReportContext = async reportID => {
 export const getRawData = async (reportID, payload) => {
   const baseRawDataURL = '/api/reports/datas'
   return request(`${baseRawDataURL}/${reportID}`, {
-    method: 'GET',
-    keepNull: true,
-    body: {
+    method: 'POST',
+    contentType: 'application/x-www-form-urlencoded',
+    data: {
       reportParameters: JSON.stringify({
         ...commonDataWriterTransform(payload),
       }),
@@ -90,13 +90,17 @@ export const getCsv = async (reportID, payload, tableName) => {
 
 export const exportPdfReport = async (reportID, payload, subject) => {
   const baseURL = '/api/reports'
-  const _subject = subject || REPORT_TYPE[reportID]
+  const _subject = subject || REPORT_FILE_NAME[reportID]
 
   return download(
     `${baseURL}/${reportID}?reportFormat=pdf&ReportParameters=${JSON.stringify(
       payload,
     )}`,
-    { subject: _subject || 'Report', type: 'pdf' },
+    {
+      subject:
+        (_subject || 'Report') + `${payload._key ? '_' + payload._key : ''}`,
+      type: 'pdf',
+    },
   )
 }
 
@@ -106,7 +110,12 @@ export const exportExcelReport = async (reportID, payload) => {
     `${baseURL}/${reportID}?reportFormat=Excel&ReportParameters=${JSON.stringify(
       commonDataWriterTransform(payload),
     )}`,
-    { subject: REPORT_TYPE[reportID] || 'Report', type: 'xls' },
+    {
+      subject:
+        (REPORT_FILE_NAME[reportID] || 'Report') +
+        `${payload._key ? '_' + payload._key : ''}`,
+      type: 'xls',
+    },
   )
 }
 
@@ -128,7 +137,7 @@ export const exportUnsavedReport = (
   reportContent,
   subject,
 ) => {
-  const _subject = subject || REPORT_TYPE[reportID]
+  const _subject = subject || REPORT_FILE_NAME[reportID]
   let type = 'PDF'
   if (reportFormat === 'Excel') type = 'xlsx'
   download(

@@ -5,4 +5,5 @@ export default {
   'radiology.search.dateTo': 'To',
   'radiology.search.myPatientOnly': 'My Patient',
   'radiology.search.urgentOnly': 'Urgent',
+  'radiology.search.visitDoctor':'Visit Doctor'
 }

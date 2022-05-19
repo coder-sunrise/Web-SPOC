@@ -31,6 +31,8 @@ class Signature extends React.Component {
   }
 
   contentModifyed = () => {
+    if(this.props.onChange)
+      this.props.onChange(true)
     window.g_app._store.dispatch({
       type: 'formik/updateState',
       payload: {

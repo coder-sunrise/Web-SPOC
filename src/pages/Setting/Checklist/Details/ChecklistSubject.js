@@ -119,10 +119,13 @@ class ChecklistSubject extends PureComponent {
 
   add = () => {
     const newChecklistSubject = this.getChecklistSubject()
-
+    let newSortOrder = 0
+    if (newChecklistSubject && newChecklistSubject.length > 0) {
+      newSortOrder = _.maxBy(newChecklistSubject, 'sortOrder')?.sortOrder + 1
+    }
     const subjectLenth = newChecklistSubject.push({
       displayValue: 'Subject Title',
-      sortOrder: newChecklistSubject.length,
+      sortOrder: newSortOrder,
       isDeleted: false,
       key: `newTabIndex${this.newTabIndex++}`,
       checklistObservation: [],
@@ -241,8 +244,10 @@ class ChecklistSubject extends PureComponent {
 
     const checklistSubject = this.getChecklistSubject()
 
-    const displayChecklistSubject = checklistSubject.filter(
-      itemSubject => itemSubject.isDeleted === false,
+    const displayChecklistSubject = _.orderBy(
+      checklistSubject.filter(itemSubject => itemSubject.isDeleted === false),
+      ['sortOrder'],
+      ['asc'],
     )
 
     return (

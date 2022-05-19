@@ -31,39 +31,32 @@ const Grid = ({
   theme,
   ...restProps
 }) => {
-  const [
-    doctorOptions,
-    setDoctorOptions,
-  ] = useState([])
+  const [doctorOptions, setDoctorOptions] = useState([])
 
   useEffect(() => {
-    const formattedDoctorProfiles = doctorProfile.map((doctor) => {
+    const formattedDoctorProfiles = doctorProfile.map(doctor => {
       const { doctorMCRNo, clinicianProfile } = doctor
       const { id, title, name } = clinicianProfile
       return {
         value: id,
-        name: `${title || ''}${title ? ' ' : ''}${name} (${doctorMCRNo})`,
+        name:
+          doctorMCRNo == undefined || doctorMCRNo == ''
+            ? `${title || ''}${title ? ' ' : ''}${name}`
+            : `${title || ''}${title ? ' ' : ''}${name}(${doctorMCRNo})`,
       }
     })
     setDoctorOptions(formattedDoctorProfiles)
   }, [])
 
-  useEffect(
-    () => {
-      let tempDoctorOptions = [
-        ...doctorOptions,
-      ]
-      roomAssignRows.map((roomAssign) => {
-        tempDoctorOptions = tempDoctorOptions.filter(
-          (doctor) => doctor.value !== roomAssign.clinicianProfileFK,
-        )
-        return roomAssign
-      })
-    },
-    [
-      roomAssignRows,
-    ],
-  )
+  useEffect(() => {
+    let tempDoctorOptions = [...doctorOptions]
+    roomAssignRows.map(roomAssign => {
+      tempDoctorOptions = tempDoctorOptions.filter(
+        doctor => doctor.value !== roomAssign.clinicianProfileFK,
+      )
+      return roomAssign
+    })
+  }, [roomAssignRows])
 
   useEffect(() => {
     dispatch({
@@ -74,19 +67,17 @@ const Grid = ({
       },
     })
   }, [])
- 
-  const compareDoctor = function (a, b) {
-    let doctorA = doctorOptions.find((doctor) => doctor.value === a)
-    let doctorB = doctorOptions.find((doctor) => doctor.value === b) 
-    if (doctorA === undefined || doctorB === undefined)
-      return false
+
+  const compareDoctor = function(a, b) {
+    let doctorA = doctorOptions.find(doctor => doctor.value === a)
+    let doctorB = doctorOptions.find(doctor => doctor.value === b)
+    if (doctorA === undefined || doctorB === undefined) return false
     return doctorA.name.localeCompare(doctorB.name)
   }
-  const compareRoom = function (a, b) { 
-    let roomA = codetable.ctroom.find((room) => room.id === a)
-    let roomB = codetable.ctroom.find((room) => room.id === b)
-    if (roomA === undefined || roomB === undefined)
-      return false
+  const compareRoom = function(a, b) {
+    let roomA = codetable.ctroom.find(room => room.id === a)
+    let roomB = codetable.ctroom.find(room => room.id === b)
+    if (roomA === undefined || roomB === undefined) return false
     return roomA.name.localeCompare(roomB.name)
   }
   const tableParas = {
@@ -99,19 +90,16 @@ const Grid = ({
         columnName: 'clinicianProfileFK',
         width: 500,
         type: 'select',
-        options: (row) => {
+        options: row => {
           const currentRowDoctor = doctorOptions.find(
-            (doctor) => doctor.value === row.clinicianProfileFK,
+            doctor => doctor.value === row.clinicianProfileFK,
           )
 
           const newDoctorOptions = doctorOptions.filter(
-            (doctor) => doctor.value !== row.clinicianProfileFK,
+            doctor => doctor.value !== row.clinicianProfileFK,
           )
 
-          return [
-            ...newDoctorOptions,
-            currentRowDoctor,
-          ]
+          return [...newDoctorOptions, currentRowDoctor]
         },
         compare: compareDoctor,
       },
@@ -124,8 +112,8 @@ const Grid = ({
     ],
   }
 
-  const onAddedRowsChange = (addedRows) => {
-    return addedRows.map((row) => ({
+  const onAddedRowsChange = addedRows => {
+    return addedRows.map(row => ({
       patientAllergyStatusFK: 1,
       ...row,
       isConfirmed: true,
@@ -133,7 +121,7 @@ const Grid = ({
   }
 
   const onCommitChanges = ({ rows }) => {
-    const returnRows = rows.filter((r) => !(r.isNew && r.isDeleted))
+    const returnRows = rows.filter(r => !(r.isNew && r.isDeleted))
     setFieldValue('roomAssignRows', returnRows)
   }
   // console.log(window.$tempGridRow)
@@ -207,21 +195,19 @@ export default compose(
       const { roomAssignRows } = values
       const { dispatch, history } = props
 
-      const newRowAssignRows = roomAssignRows.map((room) => {
+      const newRowAssignRows = roomAssignRows.map(room => {
         return {
           ...room,
           effectiveEndDate: moment('2099-12-31T23:59:59').formatUTC(false),
           effectiveStartDate: moment().formatUTC(),
         }
       })
-      const payload = [
-        ...newRowAssignRows,
-      ]
+      const payload = [...newRowAssignRows]
       // console.log({ payload })
       dispatch({
         type: 'settingRoomAssignment/upsert',
         payload,
-      }).then((r) => {
+      }).then(r => {
         if (r) {
           resetForm()
 

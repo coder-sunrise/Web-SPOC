@@ -198,16 +198,13 @@ export const LabResultTable = ({
 
   const checkShouldFlag = (finalResult, refereneceRangeId, testPanelItemId) => {
     const testPanelItem = cttestpanelitem.find(x => x.id === testPanelItemId)
-    if (
-      finalResult === null ||
-      finalResult === undefined ||
-      finalResult === '' ||
-      refereneceRangeId === null ||
-      refereneceRangeId === undefined
-    )
+    if (finalResult === null || finalResult === undefined || finalResult === '')
       return false
 
     if (testPanelItem.resultTypeFK === LAB_RESULT_TYPE.NUMERIC) {
+      if (refereneceRangeId === null || refereneceRangeId === undefined)
+        return false
+
       const currentRange = ctnumericreferencerange.find(
         x => x.id === refereneceRangeId,
       )
@@ -226,7 +223,6 @@ export const LabResultTable = ({
           x.testPanelItemFK === testPanelItemId &&
           x.resultOption === finalResult,
       )
-
       return currentResultOption.shouldFlag
     } else {
       return false

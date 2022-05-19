@@ -1015,7 +1015,9 @@ class Banner extends PureComponent {
     const schemeDataList = []
     const notMedisaveSchemes =
       entity.patientScheme && entity.patientScheme.length > 0
-        ? entity.patientScheme.filter(o => !this.isMedisave(o.schemeTypeFK))
+        ? entity.patientScheme.filter(
+            o => !this.isMedisave(o.schemeTypeFK) && o.isSchemeActive,
+          )
         : null
     if (notMedisaveSchemes !== null)
       notMedisaveSchemes.forEach(row => {
@@ -1783,13 +1785,14 @@ class Banner extends PureComponent {
         >
           <SelectPreOrder
             disabled={
-              !(
-                from === 'Appointment' ||
-                (from === 'VisitReg' && !isReadOnly) ||
-                from === 'Consultation' ||
-                (from === 'Dispense' && editingOrder) ||
-                (from === 'Pharmacy' && editingOrder)
-              ) || actualizePreOrderAccessRight.rights !== 'enable'
+              (from === 'Pharmacy'
+                ? false
+                : !(
+                    from === 'Appointment' ||
+                    (from === 'VisitReg' && !isReadOnly) ||
+                    from === 'Consultation' ||
+                    (from === 'Dispense' && editingOrder)
+                  )) || actualizePreOrderAccessRight.rights !== 'enable'
             }
             onSelectPreOrder={select => {
               if (onSelectPreOrder) onSelectPreOrder(select)

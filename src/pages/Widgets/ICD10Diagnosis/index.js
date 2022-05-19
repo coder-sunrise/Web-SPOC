@@ -54,12 +54,6 @@ class ICD10Diagnosis extends PureComponent {
     await Promise.all([
       dispatch({
         type: 'codetable/fetchCodes',
-        payload: {
-          code: 'ctComplication',
-        },
-      }),
-      dispatch({
-        type: 'codetable/fetchCodes',
         payload: { code: 'userpreference' },
       }),
     ]).then(() => {
@@ -98,19 +92,19 @@ class ICD10Diagnosis extends PureComponent {
   }
 
   saveDiagnosisAsFavourite = (icD10DiagnosisCode, uid) => {
-    const { dispatch, diagnosis } = this.props
+    const { dispatch, diagnosis, codetable } = this.props
     let newFavouriteDiagnosis
     let addNewFavorite
     if (
-      (diagnosis.favouriteDiagnosis || []).find(d => d === icD10DiagnosisCode)
+      (this.getFavouriteDiagnosis() || []).find(d => d === icD10DiagnosisCode)
     ) {
-      newFavouriteDiagnosis = (diagnosis.favouriteDiagnosis || []).filter(
+      newFavouriteDiagnosis = (this.getFavouriteDiagnosis() || []).filter(
         d => d !== icD10DiagnosisCode,
       )
     } else {
       addNewFavorite = true
       newFavouriteDiagnosis = [
-        ...(diagnosis.favouriteDiagnosis || []),
+        ...(this.getFavouriteDiagnosis() || []),
         icD10DiagnosisCode,
       ]
     }
@@ -125,37 +119,25 @@ class ICD10Diagnosis extends PureComponent {
         type: '7',
       },
     }).then(r => {
-      if (r) {
-        dispatch({
-          type: 'diagnosis/getUserPreference',
-          payload: {
-            type: '7',
-          },
-        }).then(response => {
-          if (response) {
-            const { form } = this.arrayHelpers
-            const { values, setFieldValue } = form
-            setFieldValue(
-              'corDiagnosis',
-              (values.corDiagnosis || []).map(d => {
-                if (d.uid === uid) {
-                  return {
-                    ...d,
-                    favouriteDiagnosisMessage: addNewFavorite
-                      ? 'Add to favourite successfully'
-                      : 'Remove favourite successfully',
-                  }
-                }
-                return d
-              }),
-            )
-
-            setTimeout(() => {
-              this.clearFavouriteDiagnosisMessage(uid)
-            }, 3000)
+      const { form } = this.arrayHelpers
+      const { values, setFieldValue } = form
+      setFieldValue(
+        'corDiagnosis',
+        (values.corDiagnosis || []).map(d => {
+          if (d.uid === uid) {
+            return {
+              ...d,
+              favouriteDiagnosisMessage: addNewFavorite
+                ? 'Add to favourite successfully'
+                : 'Remove favourite successfully',
+            }
           }
-        })
-      }
+          return d
+        }),
+      )
+      setTimeout(() => {
+        this.clearFavouriteDiagnosisMessage(uid)
+      }, 3000)
     })
   }
 
@@ -185,6 +167,23 @@ class ICD10Diagnosis extends PureComponent {
       right = { rights: 'disable' }
     }
     return right
+  }
+
+  getFavouriteDiagnosis = () => {
+    const { codetable } = this.props
+    const { userpreference = [] } = codetable
+    let parsedFavouriteDiagnosisSetting
+    const userFavouriteICD10Diagnosis = userpreference.filter(
+      x =>
+        x.type === Number(USER_PREFERENCE_TYPE.FAVOURITEICD10DIAGNOSISSETTING),
+    )
+    if (userFavouriteICD10Diagnosis.length > 0) {
+      const { userPreferenceDetails } = userFavouriteICD10Diagnosis[0]
+      parsedFavouriteDiagnosisSetting = JSON.parse(userPreferenceDetails).find(
+        o => o.Identifier === 'FavouriteICD10Diagnosis',
+      ).value
+    }
+    return parsedFavouriteDiagnosisSetting
   }
 
   render() {
@@ -222,7 +221,7 @@ class ICD10Diagnosis extends PureComponent {
                       uid={v.uid}
                       icD10DiagnosisCode={v.icD10DiagnosisCode}
                       favouriteDiagnosisMessage={v.favouriteDiagnosisMessage}
-                      favouriteDiagnosis={diagnosis.favouriteDiagnosis || []}
+                      favouriteDiagnosis={this.getFavouriteDiagnosis() || []}
                       defaultLanguage={
                         diagnosis.favouriteDiagnosisLanguage || favLang
                       }

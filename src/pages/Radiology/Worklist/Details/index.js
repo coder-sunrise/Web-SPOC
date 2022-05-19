@@ -159,7 +159,9 @@ const RadiologyDetails = () => {
     setShowReport(!showReport)
   }
   const saveAndPrint = () => {
-    handleSave(undefined, false)
+    if (details?.entity?.statusFK != 4 && details?.entity?.statusFK != 5) {
+      handleSave(undefined, false)
+    }
     dispatch({
       type: 'radiologyDetails/query',
       payload: { id: detailsId },
@@ -193,6 +195,7 @@ const RadiologyDetails = () => {
         ...payload,
       },
     }).then(value => {
+      setIsDirty(false)
       if (closeAfterSave) {
         setDetailsId(null)
         setShowDetails(false)
@@ -242,8 +245,6 @@ const RadiologyDetails = () => {
         }
       })
   }
-
-  useEffect(() => {}, [isDirty])
 
   const showOnlyCloseButton =
     isReadOnly ||
@@ -305,7 +306,7 @@ const RadiologyDetails = () => {
               </div>
             </GridItem>
           )}
-          <GridItem md={12}>
+          <GridItem md={12} style={{ marginTop: 20 }}>
             <ExaminationSteps item={workitem} />
           </GridItem>
           <GridItem md={12}>
@@ -373,6 +374,7 @@ const RadiologyDetails = () => {
           reportParameters={{
             radiologyWorkitemId: detailsId,
             patientProfileFK,
+            _key: details ? details.entity?.accessionNo : '',
           }}
           defaultScale={1.5}
         />

@@ -48,10 +48,8 @@ const api = {
 
 const style = theme => ({})
 
-const orderDateForm = moment()
-  .add(-1, 'week')
-  .toDate()
-const orderDateTo = moment().toDate()
+const orderDateForm = moment(moment().add(-1, 'week').toDate()).formatUTC()
+const orderDateTo = moment().endOf('day').formatUTC(false)
 
 const saveColumnsSetting = (dispatch, columnsSetting) => {
   dispatch({
@@ -94,7 +92,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
                 overlay={
                   <div style={{ width: 381, padding: 5 }}>
                     <CommonTableGrid
-                      rows={entity.combinedOrders.map((o, i) => {
+                      rows={JSON.parse(entity.combinedOrders).map((o, i) => {
                         return { no: i + 1, ...o }
                       })}
                       columns={[
@@ -144,10 +142,10 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       key: 'orderDate',
       title: 'Order Date',
       dataIndex: 'orderDate',
+      sortBy: 'orderTime',
       valueType: 'dateTime',
       render: (_dom: any, entity: any) =>
         entity.orderTime?.format('DD MMM YYYY HH:mm') || '-',
-      sortBy: 'WorkitemFKNavigation.GenerateDate',
       sorter: true,
       search: false,
       width: 145,
@@ -157,7 +155,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       key: 'examination',
       title: 'Examination',
       dataIndex: 'examination',
-      sorter: false,
+      sorter: true,
       search: false,
       fixed: 'left',
       width: 160,
@@ -166,7 +164,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       key: 'patientName',
       title: 'Patient Name',
       dataIndex: 'patientName',
-      sorter: false,
+      sorter: true,
       search: false,
       fixed: 'left',
       width: 200,
@@ -175,7 +173,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       key: 'patientReferenceNo',
       title: 'Ref. No.',
       dataIndex: 'patientReferenceNo',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 100,
     },
@@ -183,7 +181,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       key: 'patientAccountNo',
       title: 'Acc. No.',
       dataIndex: 'patientAccountNo',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 100,
     },
@@ -203,7 +201,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       key: 'priority',
       title: 'Priority',
       dataIndex: 'priority',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 85,
       render: (_dom: any, entity: any) => {
@@ -218,7 +216,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       key: 'visitType',
       title: 'Visit Type',
       dataIndex: 'visitType',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 85,
       render: (_dom: any, entity: any) => {
@@ -230,7 +228,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       key: 'visitDoctor',
       title: 'Visit Doctor',
       dataIndex: 'visitDoctor',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 130,
     },
@@ -246,7 +244,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       key: 'modality',
       title: 'Modality',
       dataIndex: 'modality',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 130,
     },
@@ -257,7 +255,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       valueType: 'dateTime',
       render: (_dom: any, entity: any) =>
         entity.completedDate?.format('DD MMM YYYY HH:mm') || '-',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 145,
     },
@@ -268,7 +266,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       valueType: 'dateTime',
       render: (_dom: any, entity: any) =>
         entity.cancelledDate?.format('DD MMM YYYY HH:mm') || '-',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 145,
     },
@@ -276,7 +274,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       key: 'status',
       title: 'Status',
       dataIndex: 'status',
-      sorter: false,
+      sorter: true,
       search: false,
       renderText: (item, { type, defaultRender, ...rest }, form) =>
         Object.values(RADIOLOGY_WORKITEM_STATUS_TITLE)[item - 1],
@@ -640,6 +638,13 @@ const RadiologyWorklistHistoryIndex = ({
     <Fragment>
       <PageContainer pageHeaderRender={false}>
         <ProTable
+          onRow={row => {
+            return {
+              onDoubleClick: () => {
+                setDetailsId(row.id)
+              },
+            }
+          }}
           rowSelection={false}
           columns={columns}
           api={api}
@@ -701,32 +706,32 @@ const RadiologyWorklistHistoryIndex = ({
             return {
               ...values,
               apiCriteria: {
-                accessionNo: searchAccessionNo,
-                orderDateForm: searchOrderDateForm,
-                orderDateTo: searchOrderDateTo,
-                searchValue: searchPatient,
-                visitType:
+                _accessionNo: searchAccessionNo,
+                _orderDateForm: searchOrderDateForm ? moment(moment(searchOrderDateForm).toDate()).formatUTC(): undefined ,
+                _orderDateTo: searchOrderDateTo ? moment(searchOrderDateTo).endOf('day').formatUTC(false) : undefined ,
+                _searchValue: searchPatient,
+                _visitType:
                   searchVisitType?.indexOf(-99) > -1
                     ? null
                     : searchVisitType?.join(),
-                modality:
+                _modality:
                   searchModality?.indexOf(-99) > -1
                     ? null
                     : searchModality?.join(),
-                examination:
+                _examination:
                   searchExamination?.indexOf(-99) > -1
                     ? null
                     : searchExamination?.join(),
-                visitDoctor:
+                _visitDoctor:
                   searchVisitDoctor?.indexOf(-99) > -1
                     ? null
                     : searchVisitDoctor?.join(),
-                priority: searchPriority,
-                radiographer:
+                _priority: searchPriority,
+                _radiographer:
                   searchRadiographer?.indexOf(-99) > -1
                     ? null
                     : searchRadiographer?.join(),
-                status:
+                _status:
                   searchStatus?.indexOf(-99) > -1 ? null : searchStatus?.join(),
               },
             }

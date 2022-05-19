@@ -450,7 +450,7 @@ class PatientHistory extends Component {
       isExistsVerifiedReport,
     } = row
     const { settings = [] } = clinicSettings
-    const { patientID } = patientHistory
+    const { patientID, ableToEditConsultation } = patientHistory
     const isRetailVisit = visitPurposeFK === VISIT_TYPE.OTC
     const patientIsActive = patient.isActive
     const docotrName = userName
@@ -467,7 +467,6 @@ class PatientHistory extends Component {
         : undefined
     }
     const isSelect = !!this.state.selectItems.find(o => o === row.currentId)
-
     return (
       <div
         style={{
@@ -581,6 +580,7 @@ class PatientHistory extends Component {
                 visitStatus != VISIT_STATUS.PAUSED &&
                 fromModule !== 'Consultation' &&
                 fromModule !== 'History' &&
+                ableToEditConsultation &&
                 fromModule !== 'MedicalCheckup' && (
                   <Authorized authority='patientdashboard.editconsultation'>
                     <Tooltip title='Edit Consultation'>
@@ -2050,7 +2050,7 @@ class PatientHistory extends Component {
               onClick={this.printHandel}
             >
               <Print />
-              print
+              Print
             </Button>
           </div>
         </div>

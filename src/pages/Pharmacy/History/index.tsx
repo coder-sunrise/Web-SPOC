@@ -87,8 +87,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       search: false,
       fixed: 'left',
       width: 200,
-      sortBy:
-        'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.Name',
+      ellipsis: true,
     },
     {
       key: 'patientReferenceNo',
@@ -97,8 +96,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 100,
-      sortBy:
-        'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.PatientReferenceNo',
+      ellipsis: true,
     },
     {
       key: 'patientAccountNo',
@@ -107,8 +105,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       sorter: true,
       search: false,
       width: 100,
-      sortBy:
-        'WorkitemFKNavigation.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo',
+      ellipsis: true,
     },
     {
       key: 'genderAge',
@@ -116,40 +113,44 @@ const defaultColumns = (codetable, setDetailsId) => {
       dataIndex: 'genderAge',
       sorter: false,
       search: false,
-      render: (_dom: any, entity: any) =>
+      renderText: (text: any, entity: any) =>
         `${entity.gender?.substring(0, 1)}/${Math.floor(
           entity.dob?.toDate()?.duration('year'),
         )}`,
       width: 100,
+      ellipsis: true,
     },
     {
       key: 'orderBy',
       title: 'Ordered By',
       dataIndex: 'orderBy',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 160,
+      ellipsis: true,
     },
     {
       key: 'orderDate',
       title: 'Order Time',
       dataIndex: 'orderDate',
       defaultSortOrder: 'descend',
-      sortBy: 'WorkitemFKNavigation.GenerateDate',
+      sortBy: 'orderTime',
       valueType: 'dateTime',
       render: (_dom: any, entity: any) =>
         entity.orderTime?.format('DD MMM YYYY HH:mm') || '-',
       sorter: true,
       search: false,
       width: 145,
+      ellipsis: true,
     },
     {
       key: 'preparedBy',
       title: 'Prepared By',
       dataIndex: 'preparedBy',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 130,
+      ellipsis: true,
     },
     {
       key: 'preparedTime',
@@ -158,17 +159,19 @@ const defaultColumns = (codetable, setDetailsId) => {
       valueType: 'dateTime',
       render: (_dom: any, entity: any) =>
         entity.preparedTime?.format('DD MMM YYYY HH:mm') || '-',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 145,
+      ellipsis: true,
     },
     {
       key: 'verifiedBy',
       title: 'Verified By',
       dataIndex: 'verifiedBy',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 130,
+      ellipsis: true,
     },
     {
       key: 'verifiedTime',
@@ -177,17 +180,19 @@ const defaultColumns = (codetable, setDetailsId) => {
       valueType: 'dateTime',
       render: (_dom: any, entity: any) =>
         entity.verifiedTime?.format('DD MMM YYYY HH:mm') || '-',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 145,
+      ellipsis: true,
     },
     {
       key: 'dispensedBy',
       title: 'Dispensed By',
       dataIndex: 'dispensedBy',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 130,
+      ellipsis: true,
     },
     {
       key: 'dispensedTime',
@@ -196,18 +201,20 @@ const defaultColumns = (codetable, setDetailsId) => {
       valueType: 'dateTime',
       render: (_dom: any, entity: any) =>
         entity.dispensedTime?.format('DD MMM YYYY HH:mm') || '-',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 145,
+      ellipsis: true,
     },
     {
       key: 'status',
       title: 'Status',
       dataIndex: 'status',
-      sorter: false,
+      sorter: true,
       search: false,
       width: 100,
       fixed: 'right',
+      ellipsis: true,
     },
     {
       key: 'action',
@@ -368,6 +375,13 @@ const PharmacyWorklistHistoryIndex = ({
         <ProTable
           actionRef={actionRef}
           rowSelection={false}
+          onRow={row => {
+            return {
+              onDoubleClick: () => {
+                setDetailsId(row.id)
+              },
+            }
+          }}
           columns={columns}
           api={api}
           search={{

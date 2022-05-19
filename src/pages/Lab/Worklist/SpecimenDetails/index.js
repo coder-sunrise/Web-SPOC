@@ -161,7 +161,7 @@ export const SpecimenDetails = ({
         payload: entity,
       }).then(result => {
         if (result) {
-          cleanUp()
+          querySpecimenDetails()
           onConfirm && onConfirm()
         }
       })
@@ -170,7 +170,6 @@ export const SpecimenDetails = ({
 
   const handleRetest = async () => {
     const values = await form.validateFields()
-    console.log('handleRetest', values)
     setRetestSpecimenPara({
       open: true,
       retestSpecimen: { ...entity, ...values },
@@ -223,7 +222,7 @@ export const SpecimenDetails = ({
           payload: { ...entity, ...values },
         }).then(result => {
           if (result) {
-            cleanUp()
+            querySpecimenDetails()
             onConfirm && onConfirm()
           }
         })
@@ -241,7 +240,7 @@ export const SpecimenDetails = ({
         payload: { ...entity, ...values },
       }).then(result => {
         if (result) {
-          cleanUp()
+          querySpecimenDetails()
           onConfirm && onConfirm()
         }
       })
@@ -403,7 +402,7 @@ export const SpecimenDetails = ({
                           Final Result
                         </Typography.Text>
                         {entity.hasAnyRetest && (
-                          <Tooltip title='Final Result History'>
+                          <Tooltip title='Result History'>
                             <span
                               className='material-icons'
                               style={{ color: 'gray', cursor: 'pointer' }}
@@ -425,9 +424,12 @@ export const SpecimenDetails = ({
                         <span>Display Raw Data</span>
                       </Space>
                       <div style={{ flexGrow: 1, textAlign: 'right' }}>
-                        <Button type='link' onClick={resendOrder}>
-                          Resend Order
-                        </Button>
+                        {Authorized.check('lab.starttest')?.rights ===
+                          'enable' && (
+                          <Button type='link' onClick={resendOrder}>
+                            Resend Order
+                          </Button>
+                        )}
                         <Icon
                           type={
                             isResultFullScreen

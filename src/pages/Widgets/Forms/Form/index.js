@@ -14,12 +14,11 @@ import CommonForm from '@/components/_medisys/Forms/CommonForm/index'
 import Authorized from '@/utils/Authorized'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 
-@connect(({ patient, visitRegistration }) => ({
+@connect(({ patient}) => ({
   patient: patient.entity,
-  visit: visitRegistration.entity.visit,
 }))
 @withFormikExtend({
-  mapPropsToValues: ({ forms, codetable, patient, visit }) => {
+  mapPropsToValues: ({ forms, patient, visitEntity}) => {
     let values = {}
     if (forms.entity) {
       values = {
@@ -27,12 +26,23 @@ import { calculateAgeFromDOB } from '@/utils/dateUtils'
       }
     } else {
       const { formName, templateContent, defaultForm, formTemplateFK } = forms
+      const { visit: { visitDoctor }} = visitEntity
+      const primaryDoctor = (visitDoctor||[]).find(x=>x.isPrimaryDoctor)
+      const title =
+        primaryDoctor?.title && primaryDoctor.title !== 'Other'
+          ? `${primaryDoctor.title} `
+          : ''
       const fillData = {
         patientName: patient.name,
+        doctorName: primaryDoctor ? `${title}${primaryDoctor.name}` : '',
         patientGender: patient.genderFK === 1 ? 'Female' : patient.genderFK === 2 ? 'Male' : 'Unknown' ,
+        genderMale: patient.genderFK === 2,
+        genderFemale: patient.genderFK === 1,
         patientDOB: moment(patient.dob).format('DD MMM YYYY'),
         patientAge: `${calculateAgeFromDOB(moment(patient.dob))}`,
         patientRefNo: patient.patientReferenceNo,
+        patientAccNo: patient.patientAccountNo,
+        patientNRIC: patient.patientAccountNo,
         todayDate: moment().format('DD MMM YYYY'),
       }
       values = {
@@ -45,9 +55,6 @@ import { calculateAgeFromDOB } from '@/utils/dateUtils'
     }
     return values
   },
-  // validationSchema: Yup.object().shape({
-  //   formData: Yup.object().shape({}),
-  // }),
   displayName: 'Form',
 })
 class Form extends PureComponent {
@@ -158,7 +165,14 @@ class Form extends PureComponent {
                 color='success'
                 icon={null}
                 onClick={() => {
-                  this.onSubmitButtonClicked('finalize')
+                  this.props.dispatch({
+                    type: 'global/updateAppState',
+                    payload: {
+                      openConfirm: true,
+                      openConfirmContent: `Signed form is not editable after Finalized. Confirm to proceed ?`,
+                      onConfirmSave: ()=> this.onSubmitButtonClicked('finalize'),
+                    },
+                  })
                 }}
               >
                 Finalize

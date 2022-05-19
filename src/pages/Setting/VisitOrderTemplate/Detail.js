@@ -7,28 +7,43 @@ import {
   GridContainer,
   GridItem,
   TextField,
+  CodeSelect,
   DateRangePicker,
 } from '@/components'
 import { InventoryItemList } from '@/components/_medisys'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
+import { CALENDAR_RESOURCE } from '@/utils/constants'
 
+import { DoctorLabel } from '@/components/_medisys'
 @withFormikExtend({
-  mapPropsToValues: ({ settingVisitOrderTemplate }) =>
-    settingVisitOrderTemplate.entity || settingVisitOrderTemplate.default,
+  mapPropsToValues: ({ settingVisitOrderTemplate }) => {
+    return {
+      ...(settingVisitOrderTemplate.entity ||
+        settingVisitOrderTemplate.default),
+      selectedResources: (
+        settingVisitOrderTemplate.entity?.visitOrderTemplate_Resources || []
+      ).map(x => x.resourceFK),
+      selectedCopayers: (
+        settingVisitOrderTemplate.entity?.visitOrderTemplate_Copayers || []
+      ).map(x => x.copayerFK),
+    }
+  },
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    effectiveDates: Yup.array()
+      .of(Yup.date())
+      .min(2)
+      .required(),
   }),
   handleSubmit: (values, { props }) => {
-    if(values.rows.some(x=> !x.isDeleted && x.totalAftAdj < 0))
-      return;
+    if (values.rows.some(x => !x.isDeleted && x.totalAftAdj < 0)) return
     const { effectiveDates, rows, tempSelectedItem, ...restValues } = values
     const { dispatch, onConfirm } = props
 
     const maxSortOrderObj = _.maxBy(rows, 'sortOrder') || {}
     let maxSortOrder = maxSortOrderObj.sortOrder || 0
-    const assignedSortOrderArray = rows.map((row) => {
+    const assignedSortOrderArray = rows.map(row => {
       if (!row.sortOrder) maxSortOrder += 1
 
       return {
@@ -37,11 +52,11 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
       }
     })
     let itemTypesArray = []
-    visitOrderTemplateItemTypes.forEach((type) => {
+    visitOrderTemplateItemTypes.forEach(type => {
       const currentTypeRows = assignedSortOrderArray.filter(
-        (row) => row.type === type.id,
+        row => row.type === type.id,
       )
-      const updatedRows = currentTypeRows.map((row) => {
+      const updatedRows = currentTypeRows.map(row => {
         const total = row.quantity * row.unitPrice
         const totalAftAdj = row.totalAftAdj ? row.totalAftAdj : total
         return {
@@ -50,7 +65,7 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
           inventoryItemCode: row.code,
           inventoryItemName: row.name,
           total: total,
-          totalAftAdj: totalAftAdj,  
+          totalAftAdj: totalAftAdj,
           adjType: row.isExactAmount ? 'ExactAmount' : 'Percentage',
           [type.dtoName]: {
             ...row[type.dtoName],
@@ -59,10 +74,7 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
           },
         }
       })
-      itemTypesArray = [
-        ...itemTypesArray,
-        ...updatedRows,
-      ]
+      itemTypesArray = [...itemTypesArray, ...updatedRows]
     })
 
     const payload = {
@@ -74,7 +86,7 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
     dispatch({
       type: 'settingVisitOrderTemplate/upsert',
       payload,
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         if (onConfirm) onConfirm()
         dispatch({
@@ -86,22 +98,88 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
   displayName: 'VisitOrderTemplateDetail',
 })
 class Detail extends PureComponent {
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.dispatch({
       type: 'settingVisitOrderTemplate/reset',
     })
   }
+  renderDropdown = option => {
+    return option.displayValue
+  }
 
-  render () {
+  handleCopayerChanges = copayers => {
+    copayers = copayers.filter(v => v !== -99)
+    const { setFieldValue } = this.props
+    const {
+      visitOrderTemplate_Copayers: originalVisitOrderTemplate_Copayers = [],
+      id: id,
+    } = this.props.initialValues
+
+    const currentCopayers = copayers.map(t => {
+      return {
+        visitOrderTemplateFK: id,
+        copayerFK: t,
+        isDeleted: false,
+        ...originalVisitOrderTemplate_Copayers.find(x => x.copayerFK === t),
+      }
+    })
+
+    const deletedCopayers = originalVisitOrderTemplate_Copayers
+      .filter(t => !copayers.includes(t.copayerFK))
+      .map(t => {
+        return { ...t, isDeleted: true }
+      })
+
+    setFieldValue('visitOrderTemplate_Copayers', [
+      ...currentCopayers,
+      ...deletedCopayers,
+    ])
+  }
+
+  handleResourceChanges = resources => {
+    resources = resources.filter(v => v !== -99)
+    const { setFieldValue } = this.props
+    const {
+      visitOrderTemplate_Resources: originalVisitOrderTemplate_Resources = [],
+      id: id,
+    } = this.props.initialValues
+
+    const currentResources = resources.map(t => {
+      return {
+        visitOrderTemplateFK: id,
+        resourceFK: t,
+        isDeleted: false,
+        ...originalVisitOrderTemplate_Resources.find(x => x.resourceFK === t),
+      }
+    })
+
+    const deletedResources = originalVisitOrderTemplate_Resources
+      .filter(t => !resources.includes(t.resourceFK))
+      .map(t => {
+        return { ...t, isDeleted: true }
+      })
+
+    setFieldValue('visitOrderTemplate_Resources', [
+      ...currentResources,
+      ...deletedResources,
+    ])
+  }
+  render() {
     const { theme, footer, values, handleSubmit } = this.props
     return (
       <Fragment>
-        <div style={{ margin: theme.spacing(1) }}>
+        <div
+          style={{
+            maxHeight: 'calc(100vh - 200px)',
+            overflowY: 'auto',
+            margin: theme.spacing(1),
+          }}
+        >
           <GridContainer>
             <GridItem md={6}>
               <FastField
                 name='code'
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       label='Code'
@@ -116,7 +194,7 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='displayValue'
-                render={(args) => {
+                render={args => {
                   return <TextField label='Display Value' {...args} />
                 }}
               />
@@ -124,7 +202,7 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='effectiveDates'
-                render={(args) => {
+                render={args => {
                   return (
                     <DateRangePicker
                       label='Effective Start Date'
@@ -135,10 +213,10 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem md={12}>
+            <GridItem md={6}>
               <FastField
                 name='description'
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       label='Description'
@@ -150,8 +228,48 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='selectedCopayers'
+                render={args => (
+                  <CodeSelect
+                    {...args}
+                    code='ctcopayer'
+                    labelField='displayValue'
+                    mode='multiple'
+                    maxTagCount={0}
+                    label='Co-Payers'
+                    renderDropdown={this.renderDropdown}
+                    onChange={v => {
+                      this.handleCopayerChanges(v)
+                    }}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='selectedResources'
+                render={args => (
+                  <CodeSelect
+                    {...args}
+                    allValue={-99}
+                    label='Resources'
+                    labelField='displayValue'
+                    mode='multiple'
+                    localFilter={option => option.isActive}
+                    code='ctresource'
+                    valueField='id'
+                    maxTagCount={0}
+                    maxTagPlaceholder='resources'
+                    onChange={v => {
+                      this.handleResourceChanges(v)
+                    }}
+                  />
+                )}
+              />
+            </GridItem>
           </GridContainer>
-
           <InventoryItemList {...this.props} includeOrderSet />
           <p style={{ marginTop: 10 }}>
             * Inactive item(s) will not be added in the order list.
@@ -162,7 +280,9 @@ class Detail extends PureComponent {
             onConfirm: handleSubmit,
             confirmBtnText: 'Save',
             confirmProps: {
-              disabled: values.rows.some(x=> !x.isDeleted && x.totalAftAdj < 0),
+              disabled: values.rows.some(
+                x => !x.isDeleted && x.totalAftAdj < 0,
+              ),
             },
           })}
       </Fragment>
