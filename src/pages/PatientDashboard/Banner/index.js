@@ -1015,7 +1015,9 @@ class Banner extends PureComponent {
     const schemeDataList = []
     const notMedisaveSchemes =
       entity.patientScheme && entity.patientScheme.length > 0
-        ? entity.patientScheme.filter(o => !this.isMedisave(o.schemeTypeFK))
+        ? entity.patientScheme.filter(
+            o => !this.isMedisave(o.schemeTypeFK) && o.isSchemeActive,
+          )
         : null
     if (notMedisaveSchemes !== null)
       notMedisaveSchemes.forEach(row => {

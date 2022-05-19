@@ -92,14 +92,14 @@ class Detail extends PureComponent {
 
     return (
       <React.Fragment>
-        <div style={{ margin: theme.spacing(1) }}>
-          <GridContainer
-            style={{
-              height: 700,
-              alignItems: 'start',
-              overflowY: 'scroll',
-            }}
-          >
+        <div
+          style={{
+            margin: theme.spacing(1),
+            maxHeight: 700,
+            overflowY: 'auto',
+          }}
+        >
+          <GridContainer>
             <GridItem md={6}>
               <FastField
                 name='code'
@@ -171,6 +171,8 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
+          </GridContainer>
+          <GridContainer>
             <GridItem md={12}>
               <ChecklistSubject
                 {...props}
