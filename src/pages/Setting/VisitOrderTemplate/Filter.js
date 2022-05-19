@@ -11,6 +11,7 @@ import {
   Button,
   TextField,
   Select,
+  CodeSelect,
   ProgressButton,
 } from '@/components'
 
@@ -18,7 +19,7 @@ import {
   mapPropsToValues: ({ settingVisitOrderTemplate }) =>
     settingVisitOrderTemplate.filter || {},
   handleSubmit: (values, { props }) => {
-    const { codeDisplayValue, isActive } = values
+    const { codeDisplayValue, isActive, copayerFK } = values
     const { dispatch } = props
 
     dispatch({
@@ -32,6 +33,9 @@ import {
             combineCondition: 'or',
           },
         ],
+        apiCriteria: {
+          copayerFK: copayerFK,
+        },
       },
     })
   },
@@ -48,6 +52,20 @@ class Filter extends PureComponent {
               render={args => {
                 return <TextField label='Code / Display Value' {...args} />
               }}
+            />
+          </GridItem>
+          <GridItem xs={6} md={3}>
+            <FastField
+              name='copayerFK'
+              render={args => (
+                <CodeSelect
+                  {...args}
+                  code='ctcopayer'
+                  labelField='displayValue'
+                  maxTagCount={0}
+                  label='Co-Payers'
+                />
+              )}
             />
           </GridItem>
           <GridItem xs={6} md={2}>

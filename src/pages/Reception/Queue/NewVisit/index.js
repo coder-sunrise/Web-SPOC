@@ -126,7 +126,7 @@ class NewVisit extends PureComponent {
   }
 
   componentDidMount = async () => {
-    const { dispatch } = this.props
+    const { dispatch, patientInfo } = this.props
     const response = await dispatch({
       type: 'visitRegistration/getVisitOrderTemplateList',
       payload: {

@@ -7,14 +7,27 @@ import {
   GridContainer,
   GridItem,
   TextField,
+  CodeSelect,
   DateRangePicker,
 } from '@/components'
 import { InventoryItemList } from '@/components/_medisys'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
+import { CALENDAR_RESOURCE } from '@/utils/constants'
 
+import { DoctorLabel } from '@/components/_medisys'
 @withFormikExtend({
-  mapPropsToValues: ({ settingVisitOrderTemplate }) =>
-    settingVisitOrderTemplate.entity || settingVisitOrderTemplate.default,
+  mapPropsToValues: ({ settingVisitOrderTemplate }) => {
+    return {
+      ...(settingVisitOrderTemplate.entity ||
+        settingVisitOrderTemplate.default),
+      selectedResources: (
+        settingVisitOrderTemplate.entity?.visitOrderTemplate_Resources || []
+      ).map(x => x.resourceFK),
+      selectedCopayers: (
+        settingVisitOrderTemplate.entity?.visitOrderTemplate_Copayers || []
+      ).map(x => x.copayerFK),
+    }
+  },
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
@@ -90,81 +103,178 @@ class Detail extends PureComponent {
       type: 'settingVisitOrderTemplate/reset',
     })
   }
+  renderDropdown = option => {
+    return option.displayValue
+  }
 
+  handleCopayerChanges = copayers => {
+    copayers = copayers.filter(v => v !== -99)
+    const { setFieldValue } = this.props
+    const {
+      visitOrderTemplate_Copayers: originalVisitOrderTemplate_Copayers = [],
+      id: id,
+    } = this.props.initialValues
+
+    const currentCopayers = copayers.map(t => {
+      return {
+        visitOrderTemplateFK: id,
+        copayerFK: t,
+        isDeleted: false,
+        ...originalVisitOrderTemplate_Copayers.find(x => x.copayerFK === t),
+      }
+    })
+
+    const deletedCopayers = originalVisitOrderTemplate_Copayers
+      .filter(t => !copayers.includes(t.copayerFK))
+      .map(t => {
+        return { ...t, isDeleted: true }
+      })
+
+    setFieldValue('visitOrderTemplate_Copayers', [
+      ...currentCopayers,
+      ...deletedCopayers,
+    ])
+  }
+
+  handleResourceChanges = resources => {
+    resources = resources.filter(v => v !== -99)
+    const { setFieldValue } = this.props
+    const {
+      visitOrderTemplate_Resources: originalVisitOrderTemplate_Resources = [],
+      id: id,
+    } = this.props.initialValues
+
+    const currentResources = resources.map(t => {
+      return {
+        visitOrderTemplateFK: id,
+        resourceFK: t,
+        isDeleted: false,
+        ...originalVisitOrderTemplate_Resources.find(x => x.resourceFK === t),
+      }
+    })
+
+    const deletedResources = originalVisitOrderTemplate_Resources
+      .filter(t => !resources.includes(t.resourceFK))
+      .map(t => {
+        return { ...t, isDeleted: true }
+      })
+
+    setFieldValue('visitOrderTemplate_Resources', [
+      ...currentResources,
+      ...deletedResources,
+    ])
+  }
   render() {
     const { theme, footer, values, handleSubmit } = this.props
     return (
       <Fragment>
-        <GridContainer
+        <div
           style={{
-            height: 500,
-            alignItems: 'start',
-            overflowY: 'scroll',
+            maxHeight: 'calc(100vh - 200px)',
+            overflowY: 'auto',
+            margin: theme.spacing(1),
           }}
         >
-          <div style={{ margin: theme.spacing(1) }}>
-            <GridContainer>
-              <GridItem md={6}>
-                <FastField
-                  name='code'
-                  render={args => {
-                    return (
-                      <TextField
-                        label='Code'
-                        autoFocus
-                        disabled={!!values.id}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem md={6}>
-                <FastField
-                  name='displayValue'
-                  render={args => {
-                    return <TextField label='Display Value' {...args} />
-                  }}
-                />
-              </GridItem>
-              <GridItem md={6}>
-                <FastField
-                  name='effectiveDates'
-                  render={args => {
-                    return (
-                      <DateRangePicker
-                        label='Effective Start Date'
-                        label2='End Date'
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem md={12}>
-                <FastField
-                  name='description'
-                  render={args => {
-                    return (
-                      <TextField
-                        label='Description'
-                        multiline
-                        rowsMax={4}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-            </GridContainer>
-
-            <InventoryItemList {...this.props} includeOrderSet />
-
-            <p style={{ marginTop: 10 }}>
-              * Inactive item(s) will not be added in the order list.
-            </p>
-          </div>
-        </GridContainer>
+          <GridContainer>
+            <GridItem md={6}>
+              <FastField
+                name='code'
+                render={args => {
+                  return (
+                    <TextField
+                      label='Code'
+                      autoFocus
+                      disabled={!!values.id}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='displayValue'
+                render={args => {
+                  return <TextField label='Display Value' {...args} />
+                }}
+              />
+            </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='effectiveDates'
+                render={args => {
+                  return (
+                    <DateRangePicker
+                      label='Effective Start Date'
+                      label2='End Date'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='description'
+                render={args => {
+                  return (
+                    <TextField
+                      label='Description'
+                      multiline
+                      rowsMax={4}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='selectedCopayers'
+                render={args => (
+                  <CodeSelect
+                    {...args}
+                    code='ctcopayer'
+                    labelField='displayValue'
+                    mode='multiple'
+                    maxTagCount={0}
+                    label='Co-Payers'
+                    renderDropdown={this.renderDropdown}
+                    onChange={v => {
+                      this.handleCopayerChanges(v)
+                    }}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='selectedResources'
+                render={args => (
+                  <CodeSelect
+                    {...args}
+                    allValue={-99}
+                    label='Resources'
+                    labelField='displayValue'
+                    mode='multiple'
+                    localFilter={option => option.isActive}
+                    code='ctresource'
+                    valueField='id'
+                    maxTagCount={0}
+                    maxTagPlaceholder='resources'
+                    onChange={v => {
+                      this.handleResourceChanges(v)
+                    }}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <InventoryItemList {...this.props} includeOrderSet />
+          <p style={{ marginTop: 10 }}>
+            * Inactive item(s) will not be added in the order list.
+          </p>
+        </div>
         {footer &&
           footer({
             onConfirm: handleSubmit,

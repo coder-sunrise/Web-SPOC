@@ -99,7 +99,7 @@ const constructDefaultNewRow = (
   selectedSlot,
   apptTimeSlotDuration,
   appointmentTypes,
-  ctcalendarresource,
+  ctcalendarresource = [],
 ) => {
   let defaultNewRow = { id: getUniqueNumericId() }
   selectedSlot = selectedSlot || {}
