@@ -26,7 +26,7 @@ const amountProps = {
   normalText: true,
   text: true,
 }
-const customStyle = { position: 'relative', top: 10 }
+const customStyle = { position: 'relative', top: 8 }
 const InvoiceBanner = ({ classes, ...restProps }) => {
   const { values, patient = {} } = restProps
   const { entity = {} } = patient
@@ -80,19 +80,18 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
             <h5 className={classes.boldText}>Invoice No: </h5>
           </GridItem>
           <GridItem md={8}>
-            <h5 className={classes.normalText}>{values.invoiceNo}</h5>
+            <div style={{ ...customStyle }}>{values.invoiceNo}</div>
           </GridItem>
           <GridItem md={4}>
             <h5 className={classes.boldText}>Invoice Date:</h5>
           </GridItem>
           <GridItem md={8}>
-            <h5 className={classes.normalText}>
-              <DatePicker
-                text
-                format={dateFormatLong}
-                value={values.invoiceDate}
-              />
-            </h5>
+            <DatePicker
+              text
+              format={dateFormatLong}
+              value={values.invoiceDate}
+              style={{ ...customStyle }}
+            />
           </GridItem>
         </GridContainer>
 
@@ -142,7 +141,7 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
           <GridItem md={5}>
             <h5 className={classes.boldText}>Total Paid: </h5>
           </GridItem>
-          <GridItem md={3}>
+          <GridItem md={4}>
             <FastField
               name='totalPayment'
               render={args => (
@@ -154,11 +153,11 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
               )}
             />
           </GridItem>
-          <GridItem md={4} />
+          <GridItem md={3} />
           <GridItem md={5}>
             <h5 className={classes.boldText}>Credit Note: </h5>
           </GridItem>
-          <GridItem md={3}>
+          <GridItem md={4}>
             <FastField
               name='totalCreditNoteAmt'
               render={args => (
@@ -170,7 +169,7 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
               )}
             />
           </GridItem>
-          <GridItem md={4} />
+          <GridItem md={3} />
           <GridItem md={5}>
             <h5 className={classes.boldText}>&nbsp;</h5>
           </GridItem>
@@ -195,7 +194,7 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
               )}
             />
           </GridItem>
-          <GridItem md={4} />
+          <GridItem md={3} />
           <GridItem md={5}>
             <h5 className={classes.boldText}>&nbsp;</h5>
           </GridItem>

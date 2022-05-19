@@ -5,7 +5,7 @@ import { INVOICE_ITEM_TYPE } from '@/utils/constants'
 import { roundTo } from '@/utils/utils'
 
 export const SchemeInvoicePayerColumn = [
-  { name: 'invoiceItemTypeFK', title: 'Category' },
+  { name: 'itemType', title: 'Category' },
   { name: 'itemName', title: 'Name' },
   { name: 'coverage', title: 'Coverage' },
   { name: 'payableBalance', title: 'Payable Amount ($)' },
@@ -14,7 +14,7 @@ export const SchemeInvoicePayerColumn = [
 ]
 
 export const CompanyInvoicePayerColumn = [
-  { name: 'invoiceItemTypeFK', title: 'Category' },
+  { name: 'itemType', title: 'Category' },
   { name: 'itemName', title: 'Name' },
   { name: 'payableBalance', title: 'Payable Amount ($)' },
   { name: 'claimAmount', title: 'Claim Amount ($)' },
@@ -23,13 +23,8 @@ export const CompanyInvoicePayerColumn = [
 
 export const ApplyClaimsColumnExtension = [
   {
-    columnName: 'invoiceItemTypeFK',
+    columnName: 'itemType',
     width: 150,
-    render: (row) => {
-      if (row.itemType || row.invoiceItemTypeFK)
-        return row.itemType || INVOICE_ITEM_TYPE[row.invoiceItemTypeFK]
-      return ''
-    },
     disabled: true,
   },
   { columnName: 'itemName', disabled: true },
@@ -53,7 +48,7 @@ export const ApplyClaimsColumnExtension = [
     sortingEnabled: false,
     disabled: true,
     width: 60,
-    render: (row) => {
+    render: row => {
       if (row.error)
         return (
           <Tooltip title={row.error} placement='top'>
@@ -68,7 +63,7 @@ export const ApplyClaimsColumnExtension = [
 ]
 
 export const CoPayerColumns = [
-  { name: 'invoiceItemTypeFK', title: 'Category' },
+  { name: 'itemType', title: 'Category' },
   { name: 'itemName', title: 'Name' },
   { name: 'payableBalance', title: 'Payable Amount' },
   {
@@ -79,13 +74,7 @@ export const CoPayerColumns = [
 
 export const CoPayerColExtensions = [
   {
-    columnName: 'invoiceItemTypeFK',
-    // type: 'codeSelect',
-    // code: 'ltinvoiceitemtype',
-    render: (row) => {
-      if (row.invoiceItemTypeFK) return INVOICE_ITEM_TYPE[row.invoiceItemTypeFK]
-      return ''
-    },
+    columnName: 'itemType',
     disabled: true,
   },
   {
@@ -102,7 +91,7 @@ export const CoPayerColExtensions = [
     columnName: 'claimAmount',
     type: 'number',
     currency: true,
-    isDisabled: (row) => !row.isClaimable,
+    isDisabled: row => !row.isClaimable,
   },
 ]
 
@@ -110,10 +99,7 @@ export const validationSchema = Yup.object().shape({
   coverage: Yup.string(),
   payableBalance: Yup.number(),
   claimAmount: Yup.number().when(
-    [
-      'coverage',
-      'payableBalance',
-    ],
+    ['coverage', 'payableBalance'],
     (coverage, payableBalance, schema) => {
       const isPercentage = coverage.indexOf('%') > 0
       let _absoluteValue = 0
@@ -121,7 +107,7 @@ export const validationSchema = Yup.object().shape({
         const percentage = parseFloat(coverage.slice(0, -1))
         if (percentage === 100) {
           _absoluteValue = payableBalance
-        } else _absoluteValue = roundTo(payableBalance * percentage / 100, 4)
+        } else _absoluteValue = roundTo((payableBalance * percentage) / 100, 4)
       } else _absoluteValue = coverage.slice(1)
       const message =
         _absoluteValue === payableBalance

@@ -34,12 +34,12 @@ const Content = ({
   const patientIsActive = patientProfile && patientProfile.isActive
 
   const { settings = [] } = clinicSettings
-  const { isEnableVisitationInvoiceReport = false } = settings
+  const {
+    isEnableVisitationInvoiceReport = false,
+    isEditInvoiceBillingEnable = false,
+  } = settings
 
-  const [
-    active,
-    setActive,
-  ] = useState('1')
+  const [active, setActive] = useState('1')
 
   const isInvoiceCurrentBizSession = () => {
     const { id: bizSessionFK } = currentBizSessionInfo
@@ -81,25 +81,23 @@ const Content = ({
 
     // if there are some credit notes, write off or invoice claim(Approved/Submitted), can't edit invoice
     if (
-      (invoicePayment.entity || [])
-        .find(
-          (item) =>
-            item.creditNote.find((cn) => !cn.isCancelled) ||
-            item.invoicePayerWriteOff.find((w) => !w.isCancelled) ||
-            item.invoiceClaim.find(
-              (ic) =>
-                !ic.isCancelled &&
-                (ic.status === 'Approved' || ic.status === 'Submitted'),
-            ),
-        )
+      (invoicePayment.entity || []).find(
+        item =>
+          item.creditNote.find(cn => !cn.isCancelled) ||
+          item.invoicePayerWriteOff.find(w => !w.isCancelled) ||
+          item.invoiceClaim.find(
+            ic =>
+              !ic.isCancelled &&
+              (ic.status === 'Approved' || ic.status === 'Submitted'),
+          ),
+      )
     )
       return true
 
     // If there are package items, can't edit invoice
     if (entity && entity.invoiceItem) {
       const packageItems = entity.invoiceItem.filter(i => i.isPackage)
-      if (packageItems.length > 0)
-        return true
+      if (packageItems.length > 0) return true
     }
 
     return false
@@ -110,9 +108,9 @@ const Content = ({
       id: 1,
       name: 'Invoice',
       content: (
-        <InvoiceDetails 
-          values={values} 
-          dispatch={dispatch} 
+        <InvoiceDetails
+          values={values}
+          dispatch={dispatch}
           isEnableVisitationInvoiceReport={isEnableVisitationInvoiceReport}
         />
       ),
@@ -131,7 +129,7 @@ const Content = ({
     },
   ]
 
-  const switchMode = (mode) => {
+  const switchMode = mode => {
     dispatch({
       type: 'invoiceDetail/updateState',
       payload: {
@@ -153,17 +151,15 @@ const Content = ({
     if (
       (!editInvoiceWithPaymentRight ||
         editInvoiceWithPaymentRight.rights !== 'enable') &&
-      (invoicePayment.entity || [])
-        .find((item) =>
-          item.invoicePayment.find((payment) => !payment.isCancelled),
-        )
+      (invoicePayment.entity || []).find(item =>
+        item.invoicePayment.find(payment => !payment.isCancelled),
+      )
     )
       return editInvoiceWithPaymentRight
         ? editInvoiceWithPaymentRight.rights
         : 'hidden'
     return 'enable'
   }
-
   return (
     <React.Fragment>
       {invoiceDetail.mode === INVOICE_VIEW_MODE.DEFAULT && (
@@ -172,36 +168,40 @@ const Content = ({
             style={{ marginTop: 20 }}
             activeKey={active}
             defaultActivekey='1'
-            onChange={(e) => setActive(e)}
+            onChange={e => setActive(e)}
             options={InvoicePaymentTabOption}
           />
-          <AuthorizedContext.Provider
-            value={{
-              rights: checkEditInvoiceAccessRight(),
-            }}
-          >
+          {isEditInvoiceBillingEnable && (
+            <AuthorizedContext.Provider
+              value={{
+                rights: checkEditInvoiceAccessRight(),
+              }}
+            >
+              <Button
+                className={classes.editInvoiceButton}
+                color='primary'
+                onClick={() => {
+                  switchMode(INVOICE_VIEW_MODE.Edit_Invoice)
+                }}
+                disabled={disableEditInvoice()}
+              >
+                Edit Invoice
+              </Button>
+            </AuthorizedContext.Provider>
+          )}
+
+          {isEditInvoiceBillingEnable && (
             <Button
-              className={classes.editInvoiceButton}
+              className={classes.applySchemeButton}
               color='primary'
               onClick={() => {
-                switchMode(INVOICE_VIEW_MODE.Edit_Invoice)
+                switchMode(INVOICE_VIEW_MODE.APPLIED_SCHEME)
               }}
-              disabled={disableEditInvoice()}
+              disabled={isInvoiceCurrentBizSession() || !patientIsActive}
             >
-              Edit Invoice
+              Apply Scheme
             </Button>
-          </AuthorizedContext.Provider>
-
-          <Button
-            className={classes.applySchemeButton}
-            color='primary'
-            onClick={() => {
-              switchMode(INVOICE_VIEW_MODE.APPLIED_SCHEME)
-            }}
-            disabled={isInvoiceCurrentBizSession() || !patientIsActive}
-          >
-            Apply Scheme
-          </Button>
+          )}
         </div>
       )}
       {invoiceDetail.mode === INVOICE_VIEW_MODE.APPLIED_SCHEME && (

@@ -79,7 +79,6 @@ export const constructPayload = values => {
               invoiceItemFK,
               payableBalance,
               invoiceItemTypeFK,
-              itemType: INVOICE_ITEM_TYPE[invoiceItemTypeFK],
               itemName: itemDescription,
             }
             return _invoicePayerItem

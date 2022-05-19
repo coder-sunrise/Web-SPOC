@@ -226,35 +226,31 @@ class PaymentDetails extends Component {
     invoicePayerid,
     invoiceReportType,
   ) => {
-         const { invoicePayment } = this.props
+    const { invoicePayment } = this.props
 
-         switch (type) {
-           case 'Payment':
-             this.onShowReport(
-               29,
-               { InvoicePaymentId: itemID },
-               'Payment Receipt',
-             )
-             break
-           case 'Credit Note':
-             this.onShowReport(18, { CreditNoteId: itemID }, 'Credit Note')
-             break
-           case 'TaxInvoice':
-             this.onShowReport(
-               15,
-               {
-                 InvoiceId: invoicePayment ? invoicePayment.currentId : '',
-                 CopayerId: copayerID,
-                 InvoicePayerid: invoicePayerid,
-                 printType: invoiceReportType,
-               },
-               'Invoice',
-             )
-             break
-           default:
-             break
-         }
-       }
+    switch (type) {
+      case 'Payment':
+        this.onShowReport(29, { InvoicePaymentId: itemID }, 'Payment Receipt')
+        break
+      case 'Credit Note':
+        this.onShowReport(18, { CreditNoteId: itemID }, 'Credit Note')
+        break
+      case 'TaxInvoice':
+        this.onShowReport(
+          15,
+          {
+            InvoiceId: invoicePayment ? invoicePayment.currentId : '',
+            CopayerId: copayerID,
+            InvoicePayerid: invoicePayerid,
+            printType: invoiceReportType,
+          },
+          'Invoice',
+        )
+        break
+      default:
+        break
+    }
+  }
 
   onShowReport = (reportID, reportParameters, title) => {
     this.setState({
@@ -442,9 +438,10 @@ class PaymentDetails extends Component {
     } = this.props
     const { entity } = invoiceDetail
     const { hasActiveSession } = this.state
-
-    const isEnableWriteOffinInvoice =
-      clinicSettings.settings.enableWriteOffinInvoice
+    const {
+      enableWriteOffinInvoice: isEnableWriteOffinInvoice,
+      isEditInvoiceBillingEnable = false,
+    } = clinicSettings.settings
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
       handleAddCrNote: this.onAddCrNoteClick,
@@ -511,6 +508,7 @@ class PaymentDetails extends Component {
                     hasActiveSession={hasActiveSession}
                     isEnableWriteOffinInvoice={isEnableWriteOffinInvoice}
                     visitOrderTemplateFK={entity?.visitOrderTemplateFK}
+                    isEditInvoiceBillingEnable={isEditInvoiceBillingEnable}
                   />
                 )
               })
@@ -531,6 +529,7 @@ class PaymentDetails extends Component {
             invoice={{
               ...invoicePayerPayment,
             }}
+            patientPayer={invoiceDetail.entity?.patientPayer}
           />
         </CommonModal>
         <CommonModal
