@@ -2050,7 +2050,7 @@ class PatientHistory extends Component {
               onClick={this.printHandel}
             >
               <Print />
-              print
+              Print
             </Button>
           </div>
         </div>

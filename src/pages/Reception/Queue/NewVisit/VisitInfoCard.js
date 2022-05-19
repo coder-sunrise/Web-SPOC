@@ -106,7 +106,7 @@ const VisitInfoCard = ({
   handleUpdateAttachments,
   existingQNo,
   visitType,
-  visitOrderTemplateOptions,
+  visitOrderTemplateOptions = [],
   setFieldValue,
   ctinvoiceadjustment,
   copaymentScheme,
@@ -130,7 +130,6 @@ const VisitInfoCard = ({
     return ''
   }
 
-  console.log(values)
   const isPrimaryDoctorConsultated =
     restProps.values?.visitPrimaryDoctor &&
     restProps.values?.visitPrimaryDoctor?.consultationStatus !== 'Waiting'
@@ -324,6 +323,59 @@ const VisitInfoCard = ({
     else setVisitGroupMessage(null)
   }, [values, familyMembers])
 
+  const getAvailableOrderTemplate = () => {
+    let availableVisitOrderTemplate = []
+    var patientCopayers = patientInfo?.patientScheme
+      ?.filter(x => !x.isExpired)
+      ?.map(x => x.copayerFK)
+    if (patientInfo) {
+      visitOrderTemplateOptions
+        .filter(x => x.isActive)
+        .forEach(template => {
+          if ((template.visitOrderTemplate_Copayers || []).length === 0) {
+            availableVisitOrderTemplate.push({
+              ...template,
+              type: 'general',
+              value: template.id,
+              name: template.displayValue,
+            })
+          } else {
+            if (
+              _.intersection(
+                template.visitOrderTemplate_Copayers.map(x => x.copayerFK),
+                patientCopayers,
+              ) > 0
+            ) {
+              availableVisitOrderTemplate.push({
+                ...template,
+                type: 'copayer',
+                value: template.id,
+                name: template.displayValue,
+              })
+            }
+          }
+        })
+    } else {
+      visitOrderTemplateOptions
+        .fitler(x => x.isActive)
+        .forEach(template => {
+          // if haven't select patient profile, then only show general package
+          if ((template.visitOrderTemplate_Copayers || []).length === 0) {
+            availableVisitOrderTemplate.push({
+              ...template,
+              value: template.id,
+              name: template.displayValue,
+            })
+          }
+        })
+    }
+    availableVisitOrderTemplate = _.orderBy(
+      availableVisitOrderTemplate,
+      [data => data?.type?.toLowerCase(), data => data?.name?.toLowerCase()],
+      ['asc', 'asc'],
+    )
+    return availableVisitOrderTemplate
+  }
   return (
     <CommonCard title='Visit Information'>
       <GridContainer alignItems='center'>
@@ -442,16 +494,88 @@ const VisitInfoCard = ({
               return (
                 <Select
                   // disabled={isReadOnly}
-                  options={visitOrderTemplateOptions}
+                  options={getAvailableOrderTemplate()}
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.visitOrderTemplate',
                   })}
                   {...args}
+                  dropdownStyle={{ width: 500 }}
+                  dropdownMatchSelectWidth={false}
                   authority='none'
                   disabled={isVisitReadonlyAfterSigned}
                   onChange={(e, opts) =>
                     handleVisitOrderTemplateChange(visitType, opts)
                   }
+                  renderDropdown={option => {
+                    const copayers = _.orderBy(
+                      option.visitOrderTemplate_Copayers.map(
+                        x => x.copayerName,
+                      ),
+                      data => data.toLowerCase(),
+                      'asc',
+                    ).join(', ')
+                    const tooltip = (
+                      <div>
+                        <div>{option.name}</div>
+                        {(option.visitOrderTemplate_Copayers || []).length >
+                          0 && <div>Co-Payer(s): {copayers}</div>}
+                        {(option.visitOrderTemplate_Copayers || []).length ===
+                          0 && (
+                          <div>
+                            <i>General</i>
+                          </div>
+                        )}
+                      </div>
+                    )
+                    return (
+                      <Tooltip placement='right' title={tooltip}>
+                        <div>
+                          <div
+                            style={{
+                              fontWeight: '550',
+                              width: '100%',
+                              textOverflow: 'ellipsis',
+                              overflow: 'hidden',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {option.name}
+                          </div>
+                          {(option.visitOrderTemplate_Copayers || []).length >
+                            0 && (
+                            <div
+                              style={{
+                                width: '100%',
+                                textOverflow: 'ellipsis',
+                                overflow: 'hidden',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              <span>Co-Payer(s): </span>
+                              <span style={{ color: '#4255bd' }}>
+                                {copayers}
+                              </span>
+                            </div>
+                          )}
+                          {(option.visitOrderTemplate_Copayers || []).length ===
+                            0 && (
+                            <div
+                              style={{
+                                width: '100%',
+                                textOverflow: 'ellipsis',
+                                overflow: 'hidden',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              <span style={{ color: 'green' }}>
+                                <i>General</i>
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </Tooltip>
+                    )
+                  }}
                 />
               )
             }}
@@ -658,7 +782,10 @@ const VisitInfoCard = ({
                 if (t.adjType === 'ExactAmount') {
                   return (
                     <span
-                      style={{ display: 'inline-block', marginRight: '20px' }}
+                      style={{
+                        display: 'inline-block',
+                        marginRight: '20px',
+                      }}
                     >
                       <span style={{ fontWeight: '500' }}>
                         {t.displayValue}:
@@ -677,7 +804,10 @@ const VisitInfoCard = ({
                 if (t.adjValue > 0) {
                   return (
                     <span
-                      style={{ display: 'inline-block', marginRight: '20px' }}
+                      style={{
+                        display: 'inline-block',
+                        marginRight: '20px',
+                      }}
                     >
                       <span style={{ fontWeight: '500', fontSize: '14px' }}>
                         {t.displayValue}:{' '}
@@ -691,7 +821,10 @@ const VisitInfoCard = ({
 
                 return (
                   <span
-                    style={{ display: 'inline-block', marginRight: '20px' }}
+                    style={{
+                      display: 'inline-block',
+                      marginRight: '20px',
+                    }}
                   >
                     <span style={{ fontWeight: '500' }}>
                       {t.displayValue}:{' '}

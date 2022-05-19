@@ -54,6 +54,7 @@ import {
   sortDataGrid,
   getEndTime,
 } from './formUtils'
+import { getUniqueNumericId, roundTo } from '@/utils/utils'
 import styles from './style'
 
 const gridValidationSchema = Yup.object().shape({
@@ -94,6 +95,8 @@ const gridValidationSchema = Yup.object().shape({
     patientSearchResult: patientSearch.list,
     visitRegistration,
     ctcalendarresource: codetable.ctcalendarresource,
+    ctresource: codetable.ctresource,
+    codetable: codetable,
   }),
 )
 @withFormikExtend({
@@ -160,6 +163,14 @@ class Form extends React.PureComponent {
       dispatch({
         type: 'codetable/fetchCodes',
         payload: { code: 'ltcancelreasontype' },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'ctresource' },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'ctcalendarresource' },
       }),
     ])
 
@@ -1017,6 +1028,45 @@ class Form extends React.PureComponent {
     return false
   }
 
+  onVisitPurposeSelected = template => {
+    const { datagrid } = this.state
+    _.remove(datagrid, n => {
+      return n.id < 0 && n.templateFK
+    })
+    if (!template) {
+      return
+    }
+    const primaryResrouce = datagrid.find(x => x.isPrimaryClinician)
+    let sortOrder = _.maxBy(datagrid, 'sortOrder')?.sortOrder || 0
+    const { ctresource = [], ctcalendarresource = [] } = this.props.codetable
+    template.visitOrderTemplate_Resources.forEach(temp => {
+      sortOrder++
+      const resource = ctresource.find(
+        x => x.id === temp.resourceFK && x.isActive,
+      )
+      if (!resource) return
+      const calendarResource = ctcalendarresource.find(
+        source => source.id === resource.calendarResourceFK && source.isActive,
+      )
+      if (!calendarResource) return
+      const newResource = {
+        templateFK: template.id,
+        appointmentTypeFK: primaryResrouce?.appointmentTypeFK,
+        apptDurationHour: primaryResrouce?.apptDurationHour,
+        apptDurationMinute: primaryResrouce?.apptDurationMinute,
+        calendarResourceFK: calendarResource.id,
+        calendarResource: calendarResource
+          ? { ...calendarResource }
+          : undefined,
+        isPrimaryClinician: false,
+        sortOrder: sortOrder,
+        id: getUniqueNumericId(),
+        startTime: primaryResrouce?.startTime,
+        endTime: primaryResrouce?.endTime,
+      }
+      datagrid.push(newResource)
+    })
+  }
   onViewPatientProfile = () => {
     const { values, history } = this.props
     history.push(
@@ -1355,6 +1405,8 @@ class Form extends React.PureComponent {
                     visitOrderTemplateOptions={visitOrderTemplateOptions}
                     patientProfileFK={values.patientProfileFK}
                     values={values}
+                    onVisitPurposeSelected={this.onVisitPurposeSelected}
+                    patientProfile={patientProfile}
                   />
                   <GridItem xs md={12} className={classes.verticalSpacing}>
                     <AppointmentDataGrid

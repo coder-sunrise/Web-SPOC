@@ -662,11 +662,13 @@ class Detail extends PureComponent {
       }
     })
 
-    console.log(originalExaminationItems)
     const deletedExaminationItems = originalExaminationItems
       .filter(t => !examinationItems.includes(t.examinationItemFK))
       .map(t => {
-        return { ...t, isDeleted: true }
+        return {
+          ...t,
+          isDeleted: true,
+        }
       })
 
     console.log([...currentExaminations, ...deletedExaminationItems])
