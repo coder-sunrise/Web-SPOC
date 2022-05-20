@@ -1,15 +1,28 @@
 import React, { Component } from 'react'
 import moment from 'moment'
 import { connect } from 'dva'
+import * as Yup from 'yup'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { Button, GridContainer, GridItem, serverDateFormat, notification } from '@/components'
+import {
+  Button,
+  GridContainer,
+  GridItem,
+  serverDateFormat,
+  notification,
+  EditableTableGrid,
+} from '@/components'
 import withFormikExtend from '@/components/Decorator/withFormikExtend'
 // sub component
 import { roundTo } from '@/utils/utils'
-import { PAYMENT_MODE, INVOICE_PAYER_TYPE } from '@/utils/constants'
+import {
+  PAYMENT_MODE,
+  INVOICE_PAYER_TYPE,
+  INVOICE_ITEM_TYPE,
+} from '@/utils/constants'
 import { getBizSession } from '@/services/queue'
+import { Table } from '@devexpress/dx-react-grid-material-ui'
 import PayerHeader from './PayerHeader'
 import PaymentType from './PaymentType'
 import PaymentCard from './PaymentCard'
@@ -19,6 +32,7 @@ import PaymentDateAndBizSession from './PaymentDateAndBizSession'
 import styles from './styles'
 import { ValidationSchema, getLargestID } from './variables'
 import { rounding } from './utils'
+import _ from 'lodash'
 
 @connect(({ clinicSettings, patient, codetable }) => ({
   clinicSettings: clinicSettings.settings || clinicSettings.default,
@@ -33,7 +47,14 @@ import { rounding } from './utils'
     showPaymentDate,
     isGroupPayment,
     visitGroupStatusDetails = [],
+    patientPayer = {},
   }) => {
+    let invoicePayerItem = (patientPayer.invoicePayerItem || []).map(x => ({
+      ...x,
+      allowMaxPaid: x.outstanding > 0 ? x.outstanding : 0,
+      totalPaidAmount: x.outstanding > 0 ? x.outstanding : 0,
+      invoiceNo: invoice.invoiceNo,
+    }))
     let newValues = {
       ...invoice,
       showPaymentDate,
@@ -42,22 +63,48 @@ import { rounding } from './utils'
       cashRounding: 0,
       totalAmtPaid: 0,
       outstandingAfterPayment: invoice.outstandingBalance,
-      collectableAmount: invoice.outstandingBalance,
+      collectableAmount: 0,
       paymentList: [],
+      invoicePayerItem: !isGroupPayment ? invoicePayerItem : [],
+      selectedRows: !isGroupPayment
+        ? invoicePayerItem.filter(x => x.outstanding > 0).map(x => x.id)
+        : [],
+      remainOutstanding:
+        invoice.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT
+          ? _.sumBy(invoicePayerItem, 'outstanding')
+          : invoice.outstandingBalance,
     }
     if (isGroupPayment && visitGroupStatusDetails.length > 0) {
-      const outstandingBalance = roundTo(_.sumBy(
-        visitGroupStatusDetails,
-        'outstandingBalance',
-      ))
+      const outstandingBalance = roundTo(
+        _.sumBy(visitGroupStatusDetails, 'outstandingBalance'),
+      )
+      invoicePayerItem = []
+      visitGroupStatusDetails.forEach(i => {
+        if (i.invoicePayerItem.length) {
+          invoicePayerItem = invoicePayerItem.concat([
+            ...i.invoicePayerItem.map(x => ({
+              ...x,
+              allowMaxPaid: x.outstanding > 0 ? x.outstanding : 0,
+              totalPaidAmount: x.outstanding > 0 ? x.outstanding : 0,
+              invoiceNo: i.invoiceNo,
+              isGroupPayment,
+            })),
+          ])
+        }
+      })
       newValues = {
         ...newValues,
         outstandingAfterPayment: outstandingBalance,
-        collectableAmount: outstandingBalance,
+        collectableAmount: 0,
         finalPayable: outstandingBalance,
         outstandingBalance: outstandingBalance,
         invoiceOSAmount: invoice.outstandingBalance,
         isGroupPayment,
+        invoicePayerItem,
+        selectedRows: invoicePayerItem
+          .filter(x => x.outstanding > 0)
+          .map(x => x.id),
+        remainOutstanding: _.sumBy(invoicePayerItem, 'outstanding'),
       }
     }
     return newValues
@@ -75,6 +122,7 @@ import { rounding } from './utils'
       paymentReceivedDate,
       paymentReceivedBizSessionFK,
       paymentCreatedBizSessionFK,
+      invoicePayerItem = [],
     } = values
     const returnValue = {
       invoicePaymentMode: paymentList.map((payment, index) => ({
@@ -94,9 +142,17 @@ import { rounding } from './utils'
       paymentReceivedBizSessionFK,
       paymentCreatedBizSessionFK,
       isGroupPayment,
+      invoicePayment_InvoicePayerInfo:
+        values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT
+          ? invoicePayerItem
+              .filter(x => x.totalPaidAmount > 0)
+              .map(x => ({
+                invoicePayerInfoFK: x.id,
+                paidAmount: x.totalPaidAmount,
+              }))
+          : [],
     }
 
-    // console.log({ returnValue })
     handleSubmit(returnValue)
   },
 })
@@ -237,25 +293,37 @@ class AddPayment extends Component {
   getPopulateAmount = paymentMode => {
     const { id: type } = paymentMode
     const {
-      values: { outstandingAfterPayment, invoiceOSAmount = 0 },
+      values: { remainOutstanding, invoiceOSAmount = 0 },
       patient,
       isGroupPayment,
       visitGroupStatusDetails,
     } = this.props
 
-    if (parseInt(type, 10) !== PAYMENT_MODE.DEPOSIT) return outstandingAfterPayment
+    const outstanding = remainOutstanding < 0 ? 0 : remainOutstanding
+
+    if (parseInt(type, 10) !== PAYMENT_MODE.DEPOSIT) {
+      return outstanding
+    }
 
     const { patientDeposit } = patient
     if (patientDeposit) {
       const { balance = 0 } = patientDeposit
-      if(isGroupPayment)
-        return Math.min(balance, Math.min(outstandingAfterPayment, invoiceOSAmount))
-      return Math.min(balance, outstandingAfterPayment)
+      if (isGroupPayment) {
+        return Math.min(balance, Math.min(outstanding, invoiceOSAmount))
+      }
+      {
+        return Math.min(balance, outstanding)
+      }
     }
   }
 
   onPaymentTypeClick = async paymentMode => {
-    const { values, setFieldValue, isGroupPayment, visitGroupStatusDetails } = this.props
+    const {
+      values,
+      setFieldValue,
+      isGroupPayment,
+      visitGroupStatusDetails,
+    } = this.props
     const { id: type, displayValue } = paymentMode
     const amt = this.getPopulateAmount(paymentMode)
 
@@ -267,17 +335,20 @@ class AddPayment extends Component {
       amt: roundTo(amt),
     }
     if (isGroupPayment) {
-      const isDeposit = parseInt(type, 10) === PAYMENT_MODE.DEPOSIT 
+      const isDeposit = parseInt(type, 10) === PAYMENT_MODE.DEPOSIT
       const defaultRemark = isDeposit
         ? values.invoiceNo
         : values.paymentList.some(x => x.isDeposit)
-        ? visitGroupStatusDetails.filter(x => x.invoiceNo !== values.invoiceNo).map(x => x.invoiceNo).join('/')
+        ? visitGroupStatusDetails
+            .filter(x => x.invoiceNo !== values.invoiceNo)
+            .map(x => x.invoiceNo)
+            .join('/')
         : visitGroupStatusDetails.map(x => x.invoiceNo).join('/')
       payment = {
-          ...payment,
-          isDeposit,
-          remark: defaultRemark,
-        }
+        ...payment,
+        isDeposit,
+        remark: defaultRemark,
+      }
     }
     const newPaymentList = [...values.paymentList, payment]
     await setFieldValue('paymentList', newPaymentList)
@@ -295,8 +366,29 @@ class AddPayment extends Component {
   }
 
   calculatePayment = () => {
-    const { values, setFieldValue, clinicSettings, isGroupPayment, visitGroupStatusDetails = [] } = this.props
-    let { paymentList, outstandingBalance } = values
+    const {
+      values,
+      setFieldValue,
+      clinicSettings,
+      isGroupPayment,
+      visitGroupStatusDetails = [],
+    } = this.props
+    let {
+      paymentList,
+      outstandingBalance,
+      payerTypeFK,
+      invoicePayerItem = [],
+      selectedRows = [],
+    } = values
+
+    let outstanding = outstandingBalance
+    if (payerTypeFK === INVOICE_PAYER_TYPE.PATIENT) {
+      outstanding = _.sumBy(
+        invoicePayerItem.filter(x => selectedRows.indexOf(x.id) >= 0),
+        'totalPaidAmount',
+      )
+    }
+
     const totalPaid = roundTo(
       paymentList.reduce((total, payment) => total + (payment.amt || 0), 0),
     )
@@ -307,9 +399,7 @@ class AddPayment extends Component {
 
     let cashReturned = 0
     if (cashPayment) {
-      let cashAfterRounding = roundTo(
-        rounding(clinicSettings, cashPayment.amt),
-      )
+      let cashAfterRounding = roundTo(rounding(clinicSettings, cashPayment.amt))
       let collectableAmountAfterRounding = roundTo(
         rounding(clinicSettings, totalPaid),
       )
@@ -319,18 +409,20 @@ class AddPayment extends Component {
         )
         let tempOtherPayment = otherPayment
         //rouding os for per invoice then sum
-        const newCashAfterRounding = roundTo(_.sumBy(visitGroupStatusDetails, x => {
-          const paidAmt = roundTo(Math.min(tempOtherPayment, x.outstandingBalance))
-          const remainOS = roundTo(x.outstandingBalance - paidAmt)
-          tempOtherPayment -= paidAmt
-          if(remainOS > 0){
-            const newInvoiceOS = roundTo(rounding(clinicSettings, remainOS))
-            // console.log('invoice O/S after cash rounding','newInvoiceOS', newInvoiceOS,'remainOS',remainOS)
-            return newInvoiceOS
-          }
-          return 0
-        }))
-        //console.log('newCashAfterRounding',newCashAfterRounding,'cashAfterRounding',cashAfterRounding)
+        const newCashAfterRounding = roundTo(
+          _.sumBy(visitGroupStatusDetails, x => {
+            const paidAmt = roundTo(
+              Math.min(tempOtherPayment, x.outstandingBalance),
+            )
+            const remainOS = roundTo(x.outstandingBalance - paidAmt)
+            tempOtherPayment -= paidAmt
+            if (remainOS > 0) {
+              const newInvoiceOS = roundTo(rounding(clinicSettings, remainOS))
+              return newInvoiceOS
+            }
+            return 0
+          }),
+        )
         cashAfterRounding = newCashAfterRounding
         collectableAmountAfterRounding = otherPayment + newCashAfterRounding
       }
@@ -348,8 +440,8 @@ class AddPayment extends Component {
       setFieldValue('cashRounding', roundingAmt)
       setFieldValue('collectableAmount', collectableAmountAfterRounding)
 
-      if (totalPaid > outstandingBalance && cashPayment) {
-        cashReturned = roundTo(totalPaid - outstandingBalance)
+      if (totalPaid > outstanding && cashPayment) {
+        cashReturned = roundTo(totalPaid - outstanding)
         setFieldValue('cashReturned', cashReturned)
       } else {
         setFieldValue('cashReturned', 0)
@@ -367,6 +459,18 @@ class AddPayment extends Component {
       'outstandingAfterPayment',
       roundTo(outstandingBalance - totalPaid + cashReturned),
     )
+
+    if (payerTypeFK === INVOICE_PAYER_TYPE.PATIENT) {
+      setFieldValue(
+        'remainOutstanding',
+        roundTo(outstanding - totalPaid + cashReturned),
+      )
+    } else {
+      setFieldValue(
+        'remainOutstanding',
+        roundTo(outstanding - totalPaid + cashReturned),
+      )
+    }
   }
 
   handleAmountChange = () => {
@@ -409,7 +513,7 @@ class AddPayment extends Component {
       invoice = {},
       invoicePayerName = '',
       isGroupPayment,
-      visitGroupStatusDetails = []
+      visitGroupStatusDetails = [],
     } = this.props
     return {
       invoiceNo: isGroupPayment
@@ -433,6 +537,43 @@ class AddPayment extends Component {
         : invoice.payerTypeFK,
     }
   }
+  handleSelectionChange = selection => {
+    const { setFieldValue } = this.props
+    setFieldValue('selectedRows', selection)
+    setTimeout(() => this.calculatePayment(), 100)
+  }
+  SummaryRow = p => {
+    const { isGroupPayment } = this.props
+    const { children } = p
+    let countCol = children.find(c => {
+      if (!c.props.tableColumn.column) return false
+      return c.props.tableColumn.column.name === 'totalPaidAmount'
+    })
+    if (countCol) {
+      const newChildren = [
+        {
+          ...countCol,
+          props: {
+            ...countCol.props,
+            colSpan: 7,
+            tableColumn: {
+              ...countCol.props.tableColumn,
+              align: 'right',
+            },
+          },
+          key: 'totalPaidAmount-sumtotal',
+        },
+      ]
+      return <Table.Row {...p}>{newChildren}</Table.Row>
+    }
+    return <Table.Row {...p}>{children}</Table.Row>
+  }
+
+  handleCommitChanges = ({ rows }) => {
+    const { setFieldValue } = this.props
+    setFieldValue('invoicePayerItem', rows)
+    setTimeout(() => this.calculatePayment(), 100)
+  }
 
   render() {
     const {
@@ -445,7 +586,9 @@ class AddPayment extends Component {
       patient,
       showPaymentDate,
       disabledPayment,
+      isGroupPayment,
     } = this.props
+    const { selectedRows = [], invoicePayerItem = [] } = values
     const { bizSessionList, paymentModes } = this.state
     const payerHeaderProps = this.getPayerHeaderProps()
     return (
@@ -459,6 +602,134 @@ class AddPayment extends Component {
             />
           )}
           <GridContainer className={classes.paymentContent}>
+            {values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT && (
+              <GridItem md={12}>
+                <div>
+                  <div style={{ margin: '4px 0px' }}>
+                    Available invoice items under current invoice:
+                  </div>
+                  <EditableTableGrid
+                    size='sm'
+                    rows={invoicePayerItem}
+                    forceRender
+                    columns={[
+                      { name: 'itemType', title: 'Category' },
+                      { name: 'itemName', title: 'Name' },
+                      { name: 'invoiceNo', title: 'Invoice No.' },
+                      {
+                        name: 'claimAmount',
+                        title: 'Payable Amount',
+                      },
+                      {
+                        name: 'outstanding',
+                        title: 'Patient O/S',
+                      },
+                      {
+                        name: 'totalPaidAmount',
+                        title: 'Paid Amt.',
+                      },
+                    ]}
+                    columnExtensions={[
+                      {
+                        columnName: 'itemType',
+                        disabled: true,
+                        sortingEnabled: false,
+                        width: 140,
+                      },
+                      {
+                        columnName: 'itemName',
+                        disabled: true,
+                        sortingEnabled: false,
+                      },
+                      {
+                        columnName: 'invoiceNo',
+                        disabled: true,
+                        sortingEnabled: false,
+                        width: 100,
+                      },
+                      {
+                        columnName: 'claimAmount',
+                        type: 'number',
+                        currency: true,
+                        disabled: true,
+                        sortingEnabled: false,
+                        width: 130,
+                      },
+                      {
+                        columnName: 'outstanding',
+                        type: 'number',
+                        currency: true,
+                        disabled: true,
+                        sortingEnabled: false,
+                        width: 130,
+                      },
+                      {
+                        columnName: 'totalPaidAmount',
+                        type: 'number',
+                        currency: true,
+                        sortingEnabled: false,
+                        isDisabled: row =>
+                          row.isGroupPayment || row.outstanding <= 0,
+                        width: 130,
+                      },
+                    ]}
+                    selection={selectedRows}
+                    onSelectionChange={this.handleSelectionChange}
+                    FuncProps={{
+                      pager: false,
+                      selectable: true,
+                      summary: true,
+                      selectConfig: {
+                        showSelectAll: true,
+                        isSelectionEnabled: !isGroupPayment,
+                        rowSelectionEnabled: row => row.outstanding > 0,
+                      },
+
+                      summaryConfig: {
+                        state: {
+                          totalItems: [
+                            { columnName: 'totalPaidAmount', type: 'sum' },
+                          ],
+                        },
+                        integrated: {
+                          calculator: (type, rows, getValue) => {
+                            return rows
+                              .filter(r => selectedRows.includes(r.id))
+                              .reduce((pre, cur) => {
+                                const v = getValue(cur)
+                                return pre + (v || 0)
+                              }, 0)
+                          },
+                        },
+                        row: {
+                          totalRowComponent: this.SummaryRow,
+                          messages: {
+                            sum: 'Total Payment Amount',
+                          },
+                        },
+                      },
+                    }}
+                    EditingProps={{
+                      showAddCommand: false,
+                      showDeleteCommand: false,
+                      showCommandColumn: false,
+                      onCommitChanges: this.handleCommitChanges,
+                    }}
+                    TableProps={{
+                      height: invoicePayerItem.length > 4 ? 200 : undefined,
+                    }}
+                    schema={Yup.object().shape({
+                      totalPaidAmount: Yup.number()
+                        .min(0)
+                        .max(
+                          Yup.ref('allowMaxPaid'),
+                          'Paid Amount cannot exceed Patient Outstanding',
+                        ),
+                    })}
+                  />
+                </div>
+              </GridItem>
+            )}
             <GridItem md={12}>
               <h4>Payment Mode: </h4>
             </GridItem>
@@ -498,12 +769,22 @@ class AddPayment extends Component {
               </Button>
               <Button
                 color='primary'
-                onClick={()=>{
-                  if (this.props.isGroupPayment && values.outstandingAfterPayment > 0) {
-                    notification.warning({
-                      message:'Outstanding balance of current visit group must to be fully paid.',
-                    })
-                  }else handleSubmit()
+                onClick={() => {
+                  if (values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT) {
+                    if (values.remainOutstanding > 0) {
+                      notification.warning({
+                        message: 'Selected items must to be fully paid.',
+                      })
+                      return
+                    } else if (values.remainOutstanding < 0) {
+                      notification.warning({
+                        message:
+                          'Total payment should not more than selected amount.',
+                      })
+                      return
+                    }
+                  }
+                  handleSubmit()
                 }}
                 disabled={values.paymentList.length === 0 || disabledPayment}
               >

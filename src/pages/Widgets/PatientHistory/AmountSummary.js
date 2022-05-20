@@ -2,8 +2,21 @@ import React from 'react'
 import { withStyles, Divider } from '@material-ui/core'
 import { formatMessage } from 'umi'
 import numeral from 'numeral'
+import { currencySymbol } from '@/utils/config'
 import { GridContainer, GridItem, NumberInput, Tooltip } from '@/components'
-
+const showMoney = (v = 0) => {
+  if (v < 0)
+    return (
+      <span
+        style={{ fontWeight: 'bold', color: 'red' }}
+      >{`(${currencySymbol}${numeral(v * -1.0).format('0.00')})`}</span>
+    )
+  return (
+    <span
+      style={{ fontWeight: 'bold', color: 'darkblue' }}
+    >{`${currencySymbol}${numeral(v).format('0.00')}`}</span>
+  )
+}
 const amountProps = {
   showZero: true,
   noUnderline: true,
@@ -38,7 +51,7 @@ const AmountSummary = ({ classes, theme, invoice = {}, adjustments }) => {
     gstValue,
   } = invoice
   return (
-    <div className={classes.cls01}>
+    <div>
       <GridContainer style={{ marginBottom: 4 }}>
         <GridItem md={8} xs={8}>
           <div className={classes.subTitle}>
@@ -46,7 +59,7 @@ const AmountSummary = ({ classes, theme, invoice = {}, adjustments }) => {
           </div>
         </GridItem>
         <GridItem md={4} xs={4}>
-          <NumberInput {...amountProps} value={subTotal} />
+          <div style={{ textAlign: 'right' }}>{showMoney(subTotal)}</div>
         </GridItem>
       </GridContainer>
 
@@ -86,7 +99,9 @@ const AmountSummary = ({ classes, theme, invoice = {}, adjustments }) => {
                 </div>
               </GridItem>
               <GridItem xs={4}>
-                <NumberInput value={v.adjAmount} {...amountProps} />
+                <div style={{ textAlign: 'right' }}>
+                  {showMoney(v.adjAmount)}
+                </div>
               </GridItem>
             </GridContainer>
           )
@@ -102,13 +117,13 @@ const AmountSummary = ({ classes, theme, invoice = {}, adjustments }) => {
             </div>
           </GridItem>
           <GridItem md={4} xs={4}>
-            <NumberInput {...amountProps} value={gst} />
+            <div style={{ textAlign: 'right' }}>{showMoney(gst)}</div>
           </GridItem>
         </GridContainer>
       ) : (
         []
       )}
-      <Divider style={{ margin: theme.spacing(1) }} />
+      <Divider style={{ margin: '4px 8px' }} />
       <GridContainer>
         <GridItem md={8} xs={8}>
           <div className={classes.subTitle}>
@@ -120,7 +135,7 @@ const AmountSummary = ({ classes, theme, invoice = {}, adjustments }) => {
           </div>
         </GridItem>
         <GridItem md={4} xs={4}>
-          <NumberInput {...amountProps} text value={totalWithGST} />
+          <div style={{ textAlign: 'right' }}>{showMoney(totalWithGST)}</div>
         </GridItem>
       </GridContainer>
     </div>

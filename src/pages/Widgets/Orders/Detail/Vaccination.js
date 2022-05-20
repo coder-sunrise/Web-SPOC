@@ -966,10 +966,6 @@ class Vaccination extends PureComponent {
                     return (
                       <NumberInput
                         label='Quantity'
-                        style={{
-                          marginLeft: theme.spacing(7),
-                          paddingRight: theme.spacing(6),
-                        }}
                         step={1}
                         min={values.minQuantity}
                         onChange={e => {
@@ -1070,10 +1066,6 @@ class Vaccination extends PureComponent {
                   return (
                     <NumberInput
                       label='Total'
-                      style={{
-                        marginLeft: theme.spacing(7),
-                        paddingRight: theme.spacing(6),
-                      }}
                       currency
                       onChange={e => {
                         this.updateTotalPrice(e.target.value)
@@ -1319,10 +1311,6 @@ class Vaccination extends PureComponent {
                   return (
                     <NumberInput
                       label='Total After Adj'
-                      style={{
-                        marginLeft: theme.spacing(7),
-                        paddingRight: theme.spacing(6),
-                      }}
                       currency
                       disabled
                       {...args}

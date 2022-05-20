@@ -37,7 +37,7 @@ import {
 const styles = theme => ({
   gridRow: {
     margin: theme.spacing(1),
-    paddingBottom: theme.spacing(2),
+    paddingBottom: theme.spacing(1),
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(2),
 
@@ -222,7 +222,10 @@ const Scheme = ({
   const onPaymentDeleteClick = payment => {
     onPaymentVoidClick(index, payment)
   }
-  const { isEnableAddPaymentInBilling = false } = clinicSettings
+  const {
+    isEnableAddPaymentInBilling = false,
+    isEditInvoiceBillingEnable = false,
+  } = clinicSettings
 
   const isCHAS = schemeConfig && schemeConfig.copayerFK === 1
   const isMedisave = payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT
@@ -407,33 +410,37 @@ const Scheme = ({
         {fromBilling && isEnableAddPaymentInBilling && (
           <GridContainer>
             <GridItem md={12}>
-              <CardContainer hideHeader size='sm'>
-                {payments
-                  .sort((a, b) => moment(a.date) - moment(b.date))
-                  .map(payment => (
-                    <PaymentRow
-                      {...payment}
-                      handleVoidClick={onPaymentDeleteClick}
-                      handlePrinterClick={onPrinterClick}
-                      readOnly={shouldDisable()}
-                    />
-                  ))}
-              </CardContainer>
+              {payments.length > 0 && (
+                <CardContainer hideHeader size='sm'>
+                  {payments
+                    .sort((a, b) => moment(a.date) - moment(b.date))
+                    .map(payment => (
+                      <PaymentRow
+                        {...payment}
+                        handleVoidClick={onPaymentDeleteClick}
+                        handlePrinterClick={onPrinterClick}
+                        readOnly={shouldDisable()}
+                      />
+                    ))}
+                </CardContainer>
+              )}
             </GridItem>
-            <GridItem md={7}>
+            <GridItem md={7} style={{ marginTop: 6 }}>
               <div>
-                <Button
-                  {...ButtonProps}
-                  disabled={
-                    shouldDisable() ||
-                    isUpdatedAppliedInvoicePayerInfo ||
-                    showRefreshOrder
-                  }
-                  onClick={() => onAddPaymentClick(index)}
-                >
-                  <Add />
-                  Add Payment
-                </Button>
+                {isEditInvoiceBillingEnable && (
+                  <Button
+                    {...ButtonProps}
+                    disabled={
+                      shouldDisable() ||
+                      isUpdatedAppliedInvoicePayerInfo ||
+                      showRefreshOrder
+                    }
+                    onClick={() => onAddPaymentClick(index)}
+                  >
+                    <Add />
+                    Add Payment
+                  </Button>
+                )}
                 <Popover
                   icon={null}
                   trigger='click'
@@ -537,6 +544,7 @@ const Scheme = ({
               </div>
             </GridItem>
             <GridItem
+              style={{ marginTop: 6 }}
               md={5}
               container
               direction='column'
