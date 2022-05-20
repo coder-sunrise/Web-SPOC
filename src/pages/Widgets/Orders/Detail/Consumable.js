@@ -557,6 +557,7 @@ class Consumable extends PureComponent {
                         step={1}
                         min={1}
                         onChange={e => {
+                          const { values } = this.props
                           if (values.unitPrice) {
                             const total = e.target.value * values.unitPrice
                             setFieldValue('totalPrice', total)
