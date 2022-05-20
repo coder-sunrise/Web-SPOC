@@ -27,6 +27,7 @@ class Grid extends PureComponent {
       {
         columnName: 'copayers',
         width: 300,
+        sortingEnabled: false,
         render: row => {
           const copayers =
             row.visitOrderTemplate_Copayers.length > 0
