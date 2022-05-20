@@ -83,7 +83,6 @@ export default createFormViewModel({
         const bizSessionState = yield select(
           state => state.invoicePayment.currentBizSessionInfo,
         )
-        console.log({ payload, bizSessionState })
         const { invoicePaymentList, invoicePayerFK } = payload
         let addPaymentPayload = {}
         // let invoicePaymentMode = []
@@ -95,6 +94,7 @@ export default createFormViewModel({
           invoicePaymentMode,
           paymentReceivedDate,
           paymentReceivedBizSessionFK,
+          invoicePayment_InvoicePayerInfo = [],
         } = invoicePaymentList
 
         // invoicePaymentMode = invoicePaymentMode.concat(
@@ -122,6 +122,7 @@ export default createFormViewModel({
             paymentCreatedBizSessionFK: paymentReceivedBizSessionFK,
             invoicePayerFK,
             invoicePaymentMode,
+            invoicePayment_InvoicePayerInfo,
           },
         ]
 

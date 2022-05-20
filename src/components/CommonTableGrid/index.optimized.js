@@ -1095,6 +1095,7 @@ class CommonTableGrid extends PureComponent {
               {selectable && (
                 <SelectionState
                   selection={selection}
+                  disabled
                   onSelectionChange={onSelectionChange}
                 />
               )}
@@ -1126,6 +1127,7 @@ class CommonTableGrid extends PureComponent {
               {selectable && (
                 // <IntegratedSelection />
                 <PatchedIntegratedSelection
+                  disabled
                   rowSelectionEnabled={selectConfig.rowSelectionEnabled}
                 />
               )}
@@ -1163,6 +1165,7 @@ class CommonTableGrid extends PureComponent {
                   // selectByRowClick={allowSelectRowByClick}
                   showSelectionColumn
                   rowComponent={this.TableRow}
+                  selection={selection}
                   // rowSelectionEnabled={selectionConfig.rowSelectionEnabled}
                   {...selectConfig}
                 />

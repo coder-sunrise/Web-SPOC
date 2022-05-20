@@ -25,6 +25,7 @@ const PaymentActions = ({
   readOnly,
   isEnableWriteOffinInvoice,
   visitOrderTemplateFK,
+  isEditInvoiceBillingEnable,
 }) => {
   const [showPrintInvoiceMenu, setShowPrintInvoiceMenu] = useState(false)
   const ButtonProps = {
@@ -35,14 +36,16 @@ const PaymentActions = ({
   }
   return (
     <div>
-      <Button
-        onClick={() => handleAddPayment(invoicePayerFK)}
-        disabled={!handleAddPayment || readOnly}
-        {...ButtonProps}
-      >
-        <Add />
-        Add Payment
-      </Button>
+      {(type === PayerType.PATIENT || isEditInvoiceBillingEnable) && (
+        <Button
+          onClick={() => handleAddPayment(invoicePayerFK)}
+          disabled={!handleAddPayment || readOnly}
+          {...ButtonProps}
+        >
+          <Add />
+          Add Payment
+        </Button>
+      )}
       {ableToViewByAuthority('finance.addcreditnote') &&
         type !== PayerType.GOVT_COPAYER && (
           <Button
@@ -76,7 +79,7 @@ const PaymentActions = ({
             Write Off
           </Button>
         )}
-      {type === PayerType.COPAYER_REAL && (
+      {type === PayerType.COPAYER_REAL && isEditInvoiceBillingEnable && (
         <Button
           onClick={() => handleTransferClick(invoicePayerFK, type)}
           disabled={!handleTransferClick || readOnly}

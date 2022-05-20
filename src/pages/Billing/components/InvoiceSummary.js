@@ -139,9 +139,6 @@ const InvoiceSummary = ({
   )
   return (
     <React.Fragment>
-      <GridItem md={12}>
-        <h4 style={{ textAlign: 'center' }}>Invoice Summary: {invoiceNo}</h4>
-      </GridItem>
       <GridItem md={10}>
         <CardContainer hideHeader>
           <GridContainer justify='space-between'>

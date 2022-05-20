@@ -96,21 +96,21 @@ const PaymentCard = ({
   return (
     <CardContainer hideHeader>
       {_payerName}
-      <CardContainer hideHeader size='sm'>
-        {payments
-          ? payments
-              .sort((a, b) => moment(a.date) - moment(b.date))
-              .map(payment => (
-                <PaymentRow
-                  {...payment}
-                  isEnableWriteOffinInvoice={isEnableWriteOffinInvoice}
-                  handleVoidClick={handleVoidClick}
-                  handlePrinterClick={handlePrinterClick}
-                  readOnly={readOnly || !patientIsActive}
-                />
-              ))
-          : ''}
-      </CardContainer>
+      {(payments || []).length > 0 && (
+        <CardContainer hideHeader size='sm'>
+          {payments
+            .sort((a, b) => moment(a.date) - moment(b.date))
+            .map(payment => (
+              <PaymentRow
+                {...payment}
+                isEnableWriteOffinInvoice={isEnableWriteOffinInvoice}
+                handleVoidClick={handleVoidClick}
+                handlePrinterClick={handlePrinterClick}
+                readOnly={readOnly || !patientIsActive}
+              />
+            ))}
+        </CardContainer>
+      )}
       <GridContainer alignItems='center'>
         <GridItem md={7}>
           <PaymentActions

@@ -43,12 +43,14 @@ import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 import SchemeValidationPrompt from './components/SchemeValidationPrompt'
 import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
+import InvoicePaymentDetails from './components/InvoicePaymentDetails'
 // page utils
 import {
   constructPayload,
   validateApplySchemesWithPatientSchemes,
 } from './utils'
 import { subscribeNotification } from '@/utils/realtime'
+import { CollectionsOutlined } from '@material-ui/icons'
 
 const styles = theme => ({
   accordionContainer: {
@@ -67,7 +69,7 @@ const styles = theme => ({
   },
   dispenseContainer: {
     paddingTop: theme.spacing(1),
-    paddingBottom: theme.spacing(2),
+    paddingBottom: theme.spacing(1),
   },
 })
 
@@ -673,13 +675,24 @@ class Billing extends Component {
     })
   }
 
-  toggleAddPaymentModal = async isGroupPayment => {
-    const { showAddPaymentModal } = this.state
-    this.setState({
-      isGroupPayment,
+  toggleAddPaymentModal = () => {
+    this.setState(preState => ({
       disabledPayment: undefined,
-      showAddPaymentModal: !showAddPaymentModal,
-    })
+      showAddPaymentModal: !preState.showAddPaymentModal,
+    }))
+  }
+
+  onAddPaymentClick = async isGroupPayment => {
+    const callBack = () => {
+      this.setState(preState => ({
+        submitCount: preState.submitCount + 1,
+        isGroupPayment,
+        disabledPayment: undefined,
+        showAddPaymentModal: !preState.showAddPaymentModal,
+      }))
+    }
+
+    this.upsertBilling(callBack)
   }
 
   calculateOutstandingBalance = async invoicePayment => {
@@ -698,10 +711,9 @@ class Billing extends Component {
     })
   }
 
-  onExpandDispenseDetails = async () => {
+  onExpandDispenseDetails = async (event, p, expanded) => {
     const { dispense } = this.props
-
-    if (!dispense.entity) {
+    if (expanded && p.key === 0 && !dispense.entity) {
       await this.props.dispatch({
         type: 'billing/showDispenseDetails',
       })
@@ -776,7 +788,7 @@ class Billing extends Component {
     await setFieldValue('visitStatus', VISIT_STATUS.COMPLETED)
 
     const { invoice, invoicePayer = [] } = values
-    const { outstandingBalance = 0 } = invoice
+    const { outstandingBalance = 0, invoiceItems = [] } = invoice
 
     // check if invoice is OVERPAID and prompt user for confirmation
     if (
@@ -791,6 +803,38 @@ class Billing extends Component {
           openConfirmText: 'Confirm',
           openConfirmContent:
             'Invoice is overpaid. Confirm to complete billing?',
+          onConfirmSave: () => {
+            this.upsertBilling(null, null, true)
+          },
+        },
+      })
+    }
+
+    if (
+      invoiceItems.find(item => {
+        let totalClaim = 0
+        invoicePayer.forEach(payer => {
+          const selectInfo = (payer.invoicePayerItem || []).find(
+            x => x.invoiceItemFK === item.id,
+          )
+          if (selectInfo) {
+            totalClaim = totalClaim + selectInfo.claimAmount
+          }
+        })
+        if (item.totalAfterGst - totalClaim - item.paidAmount < 0) {
+          return true
+        }
+        return false
+      })
+    ) {
+      return dispatch({
+        type: 'global/updateState',
+        payload: {
+          openConfirm: true,
+          openConfirmTitle: '',
+          openConfirmText: 'Confirm',
+          openConfirmContent:
+            'Invoice Item is overpaid. Confirm to complete billing?',
           onConfirmSave: () => {
             this.upsertBilling(null, null, true)
           },
@@ -1266,6 +1310,7 @@ class Billing extends Component {
               onChange={this.onExpandDispenseDetails}
               collapses={[
                 {
+                  key: 0,
                   title: <h5 style={{ paddingLeft: 8 }}>Dispensing Details</h5>,
                   content: (
                     <div className={classes.dispenseContainer}>
@@ -1294,6 +1339,17 @@ class Billing extends Component {
                         selectedDrugs={this.state.selectedDrugs}
                         onPrintRef={this.onPrintRef}
                       />
+                    </div>
+                  ),
+                },
+                {
+                  key: 1,
+                  title: (
+                    <h5 style={{ paddingLeft: 8 }}>Invoice Payment Details</h5>
+                  ),
+                  content: (
+                    <div className={classes.dispenseContainer}>
+                      <InvoicePaymentDetails invoice={values.invoice} />
                     </div>
                   ),
                 },
@@ -1337,7 +1393,7 @@ class Billing extends Component {
             <GridContainer item md={4} justify='center' alignItems='flex-start'>
               <InvoiceSummary
                 disabled={this.state.isEditing || values.id === undefined}
-                handleAddPaymentClick={this.toggleAddPaymentModal}
+                handleAddPaymentClick={this.onAddPaymentClick}
                 handleDeletePaymentClick={this.handleDeletePayment}
                 handlePrintInvoiceClick={this.onPrintInvoiceClick}
                 handlePrintReceiptClick={this.onPrintReceiptClick}
@@ -1534,6 +1590,7 @@ class Billing extends Component {
                 finalPayable: values.finalPayable,
                 totalClaim: values.finalClaim,
               }}
+              patientPayer={values.patientPayer}
               disabledPayment={disabledPayment}
               isGroupPayment={isGroupPayment}
               visitGroupStatusDetails={values.visitGroupStatusDetails?.filter(

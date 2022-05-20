@@ -1914,9 +1914,15 @@ export default ({
               let deleteMessage = 'Delete'
               let editEnable = true
               let deleteEnable = true
+              if (row.isAnyPayment) {
+                deleteEnable = false
+                deleteMessage = 'Payment made. Item cannot be deleted.'
+              }
+
               if (!row.isPreOrder) {
                 if (row.type === ORDER_TYPES.RADIOLOGY) {
                   if (
+                    deleteEnable &&
                     [
                       RADIOLOGY_WORKITEM_STATUS.INPROGRESS,
                       RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED,
@@ -1935,6 +1941,7 @@ export default ({
                   }
                 } else if (row.type === ORDER_TYPES.LAB) {
                   if (
+                    deleteEnable &&
                     labWorkitems.filter(
                       item => item.statusFK !== LAB_WORKITEM_STATUS.NEW,
                     ).length > 0
@@ -1954,10 +1961,8 @@ export default ({
                     ['actulizeDate'],
                     ['desc'],
                   )[0]
-                  if (deleteEnable) {
-                    deleteEnable = false
-                    deleteMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Deletion allowed after nurse cancel actualization`
-                  }
+                  deleteEnable = false
+                  deleteMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Deletion allowed after nurse cancel actualization`
                 }
               }
               if (

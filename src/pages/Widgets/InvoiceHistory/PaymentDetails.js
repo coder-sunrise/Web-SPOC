@@ -383,6 +383,7 @@ class PaymentDetails extends Component {
       invoiceDetail,
       patientIsActive,
       clinicSettings,
+      patientPayer,
     } = this.props
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
@@ -409,9 +410,10 @@ class PaymentDetails extends Component {
       selectedInvoicePayerFK,
       outStanding,
     } = this.state
-
-    const isEnableWriteOffinInvoice =
-      clinicSettings.settings.enableWriteOffinInvoice
+    const {
+      enableWriteOffinInvoice: isEnableWriteOffinInvoice,
+      isEditInvoiceBillingEnable = false,
+    } = clinicSettings.settings
     const transferProps = {
       ...this.props,
     }
@@ -440,6 +442,7 @@ class PaymentDetails extends Component {
                     hasActiveSession={hasActiveSession}
                     patientIsActive={patientIsActive}
                     visitOrderTemplateFK={invoiceDetail?.visitOrderTemplateFK}
+                    isEditInvoiceBillingEnable={isEditInvoiceBillingEnable}
                   />
                 )
               })
@@ -460,6 +463,7 @@ class PaymentDetails extends Component {
             invoice={{
               ...invoicePayerPayment,
             }}
+            patientPayer={patientPayer}
           />
         </CommonModal>
         <CommonModal
