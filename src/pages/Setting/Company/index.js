@@ -40,6 +40,7 @@ class Supplier extends PureComponent {
     dispatch({
       type: 'settingCompany/query',
       payload: {
+        isActive:true,
         companyTypeFK: copayer ? 1 : supplier ? 2 : 3,
         sorting: copayer ? copayerSorting : suppSorting,
       },

@@ -26,6 +26,9 @@ class ServiceCategory extends PureComponent {
   componentDidMount() {
     this.props.dispatch({
       type: 'settingServiceCategory/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

@@ -26,6 +26,9 @@ class TreatmentCategory extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingTreatmentCategory/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

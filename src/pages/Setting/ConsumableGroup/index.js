@@ -25,6 +25,9 @@ class ConsumableGroup extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingConsumableGroup/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

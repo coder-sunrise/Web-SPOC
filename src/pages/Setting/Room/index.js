@@ -25,6 +25,9 @@ class Room extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingRoom/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

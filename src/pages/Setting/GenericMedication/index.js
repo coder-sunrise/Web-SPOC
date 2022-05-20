@@ -26,6 +26,9 @@ class GenericMedication extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingGenericMedication/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

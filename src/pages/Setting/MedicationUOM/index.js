@@ -28,6 +28,9 @@ class MedicationUOM extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingMedicationUOM/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

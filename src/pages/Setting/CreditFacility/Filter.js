@@ -16,7 +16,10 @@ import {
 
 @withFormikExtend({
   mapPropsToValues: ({ settingCreditFacility }) =>
-    settingCreditFacility.filter || {},
+  ({
+    ...(settingCreditFacility.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'ServiceCenterFilter',
 })

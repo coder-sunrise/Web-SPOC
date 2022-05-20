@@ -26,6 +26,9 @@ class CaseType extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingCaseType/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

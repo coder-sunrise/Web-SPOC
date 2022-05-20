@@ -15,7 +15,10 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingMedicationIngredient }) => settingMedicationIngredient.filter || {},
+  mapPropsToValues: ({ settingMedicationIngredient }) =>({
+    ...(settingMedicationIngredient.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'MedicationIngredientFilter',
 })

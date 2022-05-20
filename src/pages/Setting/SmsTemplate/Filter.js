@@ -15,7 +15,10 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingSmsTemplate }) => settingSmsTemplate.filter || {},
+  mapPropsToValues: ({ settingSmsTemplate }) => ({
+    ...(settingSmsTemplate.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'TemplateMessageFilter',
 })

@@ -17,7 +17,7 @@ import {
 
 @withFormikExtend({
   mapPropsToValues: ({ settingDrugAllergy }) => {
-    return { ...(settingDrugAllergy.filter || {}), type: false }
+    return { ...(settingDrugAllergy.filter || {}), type: false,isActive:true, }
   },
   handleSubmit: () => {},
   displayName: 'DrugAllergyFilter',

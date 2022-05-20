@@ -19,7 +19,10 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingCompany }) => settingCompany.filter || {},
+  mapPropsToValues: ({ settingCompany }) => ({
+    ...(settingCompany.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'CompanyFilter',
 })

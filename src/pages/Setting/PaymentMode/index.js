@@ -25,6 +25,9 @@ class Room extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingPaymentMode/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

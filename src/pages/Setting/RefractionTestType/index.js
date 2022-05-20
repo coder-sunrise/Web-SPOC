@@ -26,6 +26,9 @@ class RefractionTestType extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingRefractionTestType/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

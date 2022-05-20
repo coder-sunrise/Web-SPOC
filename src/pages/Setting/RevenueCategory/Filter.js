@@ -15,7 +15,10 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingRevenue }) => settingRevenue.filter || {},
+  mapPropsToValues: ({ settingRevenue }) => ({
+    ...(settingRevenue.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'RevenueFilter',
 })

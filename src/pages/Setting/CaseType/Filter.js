@@ -15,7 +15,10 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingCaseType }) => settingCaseType.filter || {},
+  mapPropsToValues: ({ settingCaseType }) => ({
+    ...(settingCaseType.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'CaseTypeFilter',
 })

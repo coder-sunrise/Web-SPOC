@@ -16,7 +16,10 @@ import {
 
 @withFormikExtend({
   mapPropsToValues: ({ settingConsumableGroup }) =>
-    settingConsumableGroup.filter || {},
+  ({
+    ...(settingConsumableGroup.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'ConsumableGroupFilter',
 })

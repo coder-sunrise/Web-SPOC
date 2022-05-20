@@ -7,7 +7,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -18,9 +18,12 @@ const styles = (theme) => ({
 class ParticipantRole extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingParticipantRole/query',
+      payload: {
+        isActive: true,
+      },
     })
   }
 
@@ -33,7 +36,7 @@ class ParticipantRole extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingParticipantRole } = this.props
 
     const cfg = {
@@ -48,11 +51,9 @@ class ParticipantRole extends PureComponent {
           open={settingParticipantRole.showModal}
           observe='ParticipantRoleDetail'
           title={
-            settingParticipantRole.entity ? (
-              'Edit Participant Role'
-            ) : (
-              'Add Participant Role'
-            )
+            settingParticipantRole.entity
+              ? 'Edit Participant Role'
+              : 'Add Participant Role'
           }
           maxWidth='md'
           bodyNoPadding

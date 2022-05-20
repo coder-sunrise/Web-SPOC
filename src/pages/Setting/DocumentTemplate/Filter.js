@@ -20,7 +20,10 @@ import Menu from '@material-ui/core/Menu'
 
 @withFormikExtend({
   mapPropsToValues: ({ settingDocumentTemplate }) =>
-    settingDocumentTemplate.filter || {},
+  ({
+    ...(settingDocumentTemplate.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'DocumentTemplateFilter',
 })

@@ -17,7 +17,10 @@ import {
 import { LTChecklistCategory } from './variables'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingChecklist }) => settingChecklist.filter || {},
+  mapPropsToValues: ({ settingChecklist }) => ({
+    ...(settingChecklist.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'ChecklistFilter',
 })

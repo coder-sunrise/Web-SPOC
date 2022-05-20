@@ -30,7 +30,10 @@ const recurrenceTypes = [
 ]
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingRoomBlock }) => settingRoomBlock.filter || {},
+  mapPropsToValues: ({ settingRoomBlock }) => ({
+    ...(settingRoomBlock.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'RoomFilter',
 })
