@@ -550,7 +550,6 @@ export const download = async (
     ...options,
   })
   if (data) {
-    console.log(data, subject)
     let a = document.createElement('a')
     let url = window.URL.createObjectURL(data)
     a.href = url

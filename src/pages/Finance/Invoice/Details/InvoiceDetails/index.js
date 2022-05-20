@@ -266,7 +266,10 @@ class InvoiceDetails extends Component {
         >
           <ReportViewer
             reportID={80}
-            reportParameters={{ InvoiceID: values ? values.id : '' }}
+            reportParameters={{
+              InvoiceID: values ? values.id : '',
+              _key: values ? values.invoiceNo : '',
+            }}
           />
         </CommonModal>
       </div>

@@ -907,11 +907,13 @@ class Billing extends Component {
         InvoicePayerid: invoicePayerid,
         printIndex: index,
         printType: invoiceReportType,
+        _key: values?.invoice?.invoiceNo || '',
       }
     } else {
       parametrPayload = {
         InvoiceId: values.invoice ? values.invoice.id : '',
         printType: invoiceReportType,
+        _key: values?.invoice?.invoiceNo || '',
       }
     }
     const saveAndPrint = () => {

@@ -112,10 +112,13 @@ const AppointmentDate = ({
               dropdownStyle={{ width: 500 }}
               dropdownMatchSelectWidth={false}
               renderDropdown={option => {
-                const copayers = _.sortBy(
-                  option.visitOrderTemplate_Copayers.map(x => x.copayerName),
-                  ['copayerName'],
-                ).join(', ')
+                const copayers = _.orderBy(
+                  option.visitOrderTemplate_Copayers,
+                  [data => data?.copayerName?.toLowerCase()],
+                  ['asc'],
+                )
+                  .map(x => x.copayerName)
+                  .join(', ')
                 const tooltip = (
                   <div>
                     <div>{option.name}</div>

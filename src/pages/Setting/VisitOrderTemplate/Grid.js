@@ -27,6 +27,7 @@ class Grid extends PureComponent {
       {
         columnName: 'copayers',
         width: 300,
+        sortingEnabled: false,
         render: row => {
           const copayers =
             row.visitOrderTemplate_Copayers.length > 0
@@ -100,6 +101,7 @@ class Grid extends PureComponent {
         style={{ margin: 0 }}
         type='settingVisitOrderTemplate'
         onRowDoubleClick={this.editRow}
+        forceRender
         TableProps={{
           height,
         }}

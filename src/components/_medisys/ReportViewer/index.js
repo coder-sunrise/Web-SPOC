@@ -46,44 +46,23 @@ const ReportViewer = ({
   showTopDivider = true,
   defaultScale = 1.75,
 }) => {
-  const [
-    exporting,
-    setExporting,
-  ] = useState(false)
-  const [
-    scale,
-    setScale,
-  ] = useState(defaultScale)
-  const [
-    screenSize,
-    setScreenSize,
-  ] = useState(defaultScreenSize)
+  const [exporting, setExporting] = useState(false)
+  const [scale, setScale] = useState(defaultScale)
+  const [screenSize, setScreenSize] = useState(defaultScreenSize)
 
-  const [
-    pdfData,
-    setPdfData,
-  ] = useState(undefined)
+  const [pdfData, setPdfData] = useState(undefined)
 
-  const [
-    pageNumber,
-    setPageNumber,
-  ] = useState(1)
+  const [pageNumber, setPageNumber] = useState(1)
 
-  const [
-    numOfPages,
-    setNumOfPages,
-  ] = useState(1)
+  const [numOfPages, setNumOfPages] = useState(1)
 
-  const [
-    showError,
-    setShowError,
-  ] = useState(false)
+  const [showError, setShowError] = useState(false)
 
   useEffect(() => {
     setScreenSize({ height: window.innerHeight, width: window.innerWidth })
     // fetchReport().then((result) => setPdfData(result))
     if (!unsavedReport) {
-      getPDF(reportID, reportParameters).then((result) => {
+      getPDF(reportID, reportParameters).then(result => {
         if (result) {
           const base64Result = arrayBufferToBase64(result)
           setPdfData(base64Result)
@@ -92,7 +71,7 @@ const ReportViewer = ({
         }
       })
     } else {
-      getUnsavedPDF(reportID, reportContent).then((result) => {
+      getUnsavedPDF(reportID, reportContent).then(result => {
         if (result) {
           const base64Result = arrayBufferToBase64(result)
           setPdfData(base64Result)
@@ -108,14 +87,14 @@ const ReportViewer = ({
     }
   }, [])
 
-  const zoom = (type) => () => {
+  const zoom = type => () => {
     const newScale = type === 0 ? scale + 0.25 : scale - 0.25
     if (newScale > maxScale || newScale < minScale) return
 
     setScale(newScale)
   }
 
-  const changePage = (offset) => setPageNumber(pageNumber + offset)
+  const changePage = offset => setPageNumber(pageNumber + offset)
 
   const onDocumentLoadSuccess = ({ numPages }) => setNumOfPages(numPages)
 
@@ -124,7 +103,11 @@ const ReportViewer = ({
   const onNextClick = () => changePage(1)
 
   const onPrintClick = () =>
-    printJS({ printable: pdfData, type: 'pdf', base64: true })
+    printJS({
+      printable: pdfData,
+      type: 'pdf',
+      base64: true,
+    })
 
   const onExportClick = async ({ key }) => {
     setExporting(true)

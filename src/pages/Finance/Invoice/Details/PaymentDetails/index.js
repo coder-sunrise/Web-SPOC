@@ -226,8 +226,7 @@ class PaymentDetails extends Component {
     invoicePayerid,
     invoiceReportType,
   ) => {
-    const { invoicePayment } = this.props
-
+    const { invoicePayment, invoiceDetail } = this.props
     switch (type) {
       case 'Payment':
         this.onShowReport(29, { InvoicePaymentId: itemID }, 'Payment Receipt')
@@ -243,6 +242,7 @@ class PaymentDetails extends Component {
             CopayerId: copayerID,
             InvoicePayerid: invoicePayerid,
             printType: invoiceReportType,
+            _key: invoiceDetail?.entity?.invoiceNo || '',
           },
           'Invoice',
         )
