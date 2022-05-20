@@ -72,10 +72,11 @@ class AppNotificationContent extends Component {
       isRead,
       patientName,
     } = notification
-
     const { internalContent = content } = this.state
     const isSender = currentUserFK == fromUserFK
-    const isReceiver = !isSender
+    const isReceiver = currentUserFK == toUserFK
+    const isOtherPRO = !isSender && !isReceiver
+    console.log({isSender,isReceiver,isOtherPRO,content})
     return (
       <div style={{ ...customeStyle }}>
         <div>
@@ -95,7 +96,7 @@ class AppNotificationContent extends Component {
             <div
               style={{
                 whiteSpace: 'pre-wrap',
-                fontWeight: isRead ? 'unset' : 'bold',
+                fontWeight: isRead || isOtherPRO ? 'unset' : 'bold',
               }}
             >
               {internalContent}
@@ -166,7 +167,7 @@ class AppNotificationContent extends Component {
                     <Done style={{ color: '#389e0d' }} />
                   </div>
                 ) : null)}
-              {isSender && (
+              {(isSender || isOtherPRO) && (
                 <div
                   style={{
                     position: 'absolute',
@@ -176,7 +177,7 @@ class AppNotificationContent extends Component {
                   }}
                 >{`To: ${toUser}`}</div>
               )}
-              {isReceiver && (
+              {(isReceiver || isOtherPRO) && (
                 <div
                   style={{
                     position: 'absolute',
