@@ -25,6 +25,9 @@ class InvoiceAdjustment extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingInvoiceAdjustment/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

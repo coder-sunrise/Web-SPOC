@@ -26,6 +26,9 @@ class ServiceCenter extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingMedicationPrecautions/query',
+      payload: {
+        isActive:true,
+      },
     })
 
     this.props.dispatch({

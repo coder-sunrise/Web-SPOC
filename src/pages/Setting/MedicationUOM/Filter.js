@@ -16,7 +16,11 @@ import {
 
 @withFormikExtend({
   mapPropsToValues: ({ settingMedicationUOM }) =>
-    settingMedicationUOM.filter || {},
+  
+  ({
+    ...(settingMedicationUOM.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => { },
   displayName: 'MedicationUOMFilter',
 })

@@ -25,6 +25,9 @@ class RevenueCategory extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingRevenue/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

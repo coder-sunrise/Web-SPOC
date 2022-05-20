@@ -16,7 +16,10 @@ import {
 
 @withFormikExtend({
   mapPropsToValues: ({ settingConsumableUOM }) =>
-    settingConsumableUOM.filter || {},
+  ({
+    ...(settingConsumableUOM.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'ConsumableUOMFilter',
 })

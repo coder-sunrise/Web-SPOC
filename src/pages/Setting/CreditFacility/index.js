@@ -26,6 +26,9 @@ class CreditFacility extends PureComponent {
   componentDidMount() {
     this.props.dispatch({
       type: 'settingCreditFacility/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

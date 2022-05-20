@@ -17,7 +17,10 @@ import {
 // for what use
 @withFormikExtend({
   mapPropsToValues: ({ settingTreatmentCategory }) =>
-    settingTreatmentCategory.filter || {},
+  ({
+    ...(settingTreatmentCategory.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
 })
 class Filter extends PureComponent {

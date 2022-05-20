@@ -15,7 +15,10 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingPaymentMode }) => settingPaymentMode.filter || {},
+  mapPropsToValues: ({ settingPaymentMode }) => ({
+    ...(settingPaymentMode.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'RoomFilter',
 })

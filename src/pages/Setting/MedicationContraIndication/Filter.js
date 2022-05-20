@@ -16,7 +16,10 @@ import {
 
 @withFormikExtend({
   mapPropsToValues: ({ settingMedicationContraIndication }) =>
-    settingMedicationContraIndication.filter || {},
+  ({
+    ...(settingMedicationContraIndication.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => { },
   displayName: 'MedicationContraIndicationFilter',
 })

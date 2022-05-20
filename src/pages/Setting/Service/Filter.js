@@ -54,6 +54,9 @@ const mapToFileDto = async file => {
 }
 
 @withFormik({
+  mapPropsToValues: () => ({
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'ServiceFilter',
 })

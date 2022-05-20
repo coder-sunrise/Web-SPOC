@@ -28,6 +28,9 @@ class Resource extends PureComponent {
   componentDidMount() {
     this.props.dispatch({
       type: 'settingResource/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

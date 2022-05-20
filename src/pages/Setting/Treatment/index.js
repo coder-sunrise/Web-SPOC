@@ -36,6 +36,9 @@ class Treatment extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingTreatment/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

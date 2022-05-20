@@ -17,7 +17,10 @@ import {
 
 @withFormikExtend({
   mapPropsToValues: ({ settingServiceCenter }) =>
-    settingServiceCenter.filter || {},
+  ({
+    ...(settingServiceCenter.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'ServiceCenterFilter',
 })

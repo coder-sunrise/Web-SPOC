@@ -15,7 +15,10 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingPackage }) => settingPackage.filter || {},
+  mapPropsToValues: ({ settingPackage }) => ({
+    ...(settingPackage.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: (values, { props }) => {
     const { code, displayValue, isActive } = values
     const { dispatch } = props

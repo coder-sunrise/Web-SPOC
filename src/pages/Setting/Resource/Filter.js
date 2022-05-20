@@ -15,7 +15,10 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingResource }) => settingResource.filter || {},
+  mapPropsToValues: ({ settingResource }) => ({
+    ...(settingResource.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'ResourceFilter',
 })

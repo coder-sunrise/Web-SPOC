@@ -102,6 +102,7 @@ const Consumable = ({
     dispatch({
       type: 'consumable/query',
       payload: {
+        isActive:true,
         sorting: [
           { columnName: 'effectiveEndDate', direction: 'desc' },
           { columnName: 'displayValue', direction: 'asc' },

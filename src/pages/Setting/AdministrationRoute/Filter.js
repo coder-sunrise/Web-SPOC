@@ -15,13 +15,15 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingAdministrationRoute }) =>
-    settingAdministrationRoute.filter || {},
-  handleSubmit: () => { },
+  mapPropsToValues: ({ settingAdministrationRoute }) => ({
+    ...(settingAdministrationRoute.filter || {}),
+    isActive: true,
+  }),
+  handleSubmit: () => {},
   displayName: 'AdministrationRouteFilter',
 })
 class Filter extends PureComponent {
-  render () {
+  render() {
     const { classes } = this.props
     return (
       <div className={classes.filterBar}>
@@ -60,7 +62,7 @@ class Filter extends PureComponent {
                       isActive,
                       apiCriteria: {
                         Language: secondaryPrintoutLanguage,
-                        Key: "displayValue",
+                        Key: 'displayValue',
                         SearchValue: codeDisplayValue,
                       },
                     },

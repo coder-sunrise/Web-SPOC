@@ -36,7 +36,10 @@ const styles = theme => ({
 
 @withFormikExtend({
   mapPropsToValues: ({ settingClinicBreakHour }) =>
-    settingClinicBreakHour.filter || {},
+  ({
+    ...(settingClinicBreakHour.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'ClinicBreakHourFilter',
 })

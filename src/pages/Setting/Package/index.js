@@ -23,6 +23,7 @@ class Package extends PureComponent {
       type: 'settingPackage/query',
       payload: {
         isUserMaintainable: true,
+        isActive:true,
       },
     })
   }

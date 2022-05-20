@@ -25,6 +25,9 @@ class Checklist extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingChecklist/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

@@ -26,6 +26,9 @@ class ClinicBreakHour extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingClinicBreakHour/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

@@ -23,6 +23,9 @@ class PublicHoliday extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingPublicHoliday/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

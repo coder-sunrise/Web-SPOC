@@ -16,7 +16,10 @@ import {
 
 @withFormikExtend({
   mapPropsToValues: ({ settingInvoiceAdjustment }) =>
-    settingInvoiceAdjustment.filter || {},
+  ({
+    ...(settingInvoiceAdjustment.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'InvoiceAdjustmentFilter',
 })

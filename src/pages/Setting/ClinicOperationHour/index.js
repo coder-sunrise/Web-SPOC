@@ -23,6 +23,9 @@ class ClinicOperationHour extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingClinicOperationHour/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 
