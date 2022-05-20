@@ -101,6 +101,7 @@ class Grid extends PureComponent {
         style={{ margin: 0 }}
         type='settingVisitOrderTemplate'
         onRowDoubleClick={this.editRow}
+        forceRender
         TableProps={{
           height,
         }}
