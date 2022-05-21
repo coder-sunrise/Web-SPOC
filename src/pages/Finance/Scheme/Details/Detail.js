@@ -47,7 +47,7 @@ const Detail = ({ height, ...props }) => {
               render={args => {
                 return (
                   <Tooltip
-                    title='Code will be generated automatically if no code is entered'
+                    title='Code will be generated automatically'
                     placement='bottom'
                   >
                     <span>
@@ -55,7 +55,7 @@ const Detail = ({ height, ...props }) => {
                         label={formatMessage({
                           id: 'finance.scheme.detail.code',
                         })}
-                        disabled={values.id}
+                        disabled={true}
                         {...args}
                       />
                     </span>
