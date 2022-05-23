@@ -500,16 +500,16 @@ class Scribble extends React.Component {
   _generateThumbnail = async () => {
     try {
       const result = this._sketch.exportToImageDataUrl()
-      const imgEle = document.createElement('img')
-      imgEle.src = result
-      await setTimeout(() => {
-        // wait for 1 milli second for img to set src successfully
-      }, 100)
-      const thumbnailSize = { width: 275, height: 150 }
-      const thumbnail = getThumbnail(imgEle, thumbnailSize)
-      const thumbnailData = thumbnail.toDataURL(`image/jpeg`)
+      // const imgEle = document.createElement('img')
+      // imgEle.src = result
+      // await setTimeout(() => {
+      //   // wait for 1 milli second for img to set src successfully
+      // }, 100)
+      // const thumbnailSize = { width: 1565, height: 768 }
+      // const thumbnail = getThumbnail(imgEle, thumbnailSize)
+      // const thumbnailData = thumbnail.toDataURL(`image/jpeg`)
 
-      return thumbnailData
+      return result
     } catch (error) {
       console.error(error)
       return null
