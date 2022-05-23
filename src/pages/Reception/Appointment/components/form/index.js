@@ -1066,6 +1066,7 @@ class Form extends React.PureComponent {
       }
       datagrid.push(newResource)
     })
+    this.validateDataGrid()
   }
   onViewPatientProfile = () => {
     const { values, history } = this.props
