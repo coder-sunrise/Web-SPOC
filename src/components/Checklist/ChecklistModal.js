@@ -84,12 +84,14 @@ const ChecklistModal = ({ selectedChecklist, onConfirm, onClose, open }) => {
                             <Checkbox.Group>
                               {orderedNature.map((nature, index) => {
                                 return (
-                                  <Checkbox
-                                    value={nature.displayValue}
-                                    style={{ lineHeight: '32px' }}
-                                  >
-                                    {nature.displayValue}
-                                  </Checkbox>
+                                  <div>
+                                    <Checkbox
+                                      value={nature.displayValue}
+                                      style={{ lineHeight: '32px' }}
+                                    >
+                                      {nature.displayValue}
+                                    </Checkbox>
+                                  </div>
                                 )
                               })}
                             </Checkbox.Group>

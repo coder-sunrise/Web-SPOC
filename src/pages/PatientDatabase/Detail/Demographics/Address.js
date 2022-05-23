@@ -25,6 +25,7 @@ import {
 import { getUniqueId } from '@/utils/utils'
 import { queryList } from '@/services/common'
 import { Divider } from '@material-ui/core'
+import { number } from 'prop-types'
 
 @connect(({ streetAddress, codetable }) => ({
   streetAddress,
@@ -43,11 +44,9 @@ class Address extends Component {
 
     const deleted = contactAddress.find((o, idx) => o.id === id)
     if (deleted) {
+      deleted.street = !null
+      deleted.countryFK = !null
       deleted.isDeleted = true
-      let newContactAddress = contactAddress.filter(
-        item => item.isDeleted == false,
-      )
-      contact.contactAddress = newContactAddress
       this.props.setFieldValue('contact', contact)
     }
   }
