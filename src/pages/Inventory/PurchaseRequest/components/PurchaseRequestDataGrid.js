@@ -60,6 +60,7 @@ const PurchaseRequestDataGrid = ({
         {
           columnName: 'requestBy',
           type: 'text',
+          sortBy: 'createByUserFkNavigation.clinicianProfile.name',
         },
         {
           columnName: 'remarks',
