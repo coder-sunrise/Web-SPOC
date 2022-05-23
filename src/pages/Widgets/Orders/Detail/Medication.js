@@ -1137,7 +1137,7 @@ class Medication extends PureComponent {
         const { inventorymedication = [] } = codetable
         let sequence = 0
         drugMixtureItems = corPrescriptionItemDrugMixture
-          .filter(o => !o.isDeleted)
+          .filter(o => o.id > 0 || !o.isDeleted)
           .map(m => {
             let drug =
               inventorymedication.find(f => f.id === m.inventoryMedicationFK) ||
@@ -1149,7 +1149,7 @@ class Medication extends PureComponent {
               caution: drug.caution,
             }
           })
-        if (drugMixtureItems.length < 2) {
+        if (drugMixtureItems.filter(o => !o.isDeleted).length < 2) {
           notification.warn({
             message: 'At least two medications are required',
           })

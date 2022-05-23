@@ -4,7 +4,7 @@ import moment from 'moment'
 import numeral from 'numeral'
 import { currencySymbol, currencyFormat } from '@/utils/config'
 import { GridContainer, GridItem, TextField, Tooltip } from '@/components'
-import { VISIT_TYPE } from '@/utils/constants'
+import { VISIT_TYPE, RADIOLOGY_CATEGORY, LAB_CATEGORY } from '@/utils/constants'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import AmountSummary from './AmountSummary'
 import tablestyles from './PatientHistoryStyle.less'
@@ -91,6 +91,13 @@ const baseColumns = classes => {
           paddingRight += 34
           urgentRight = -paddingRight - 4
         }
+        let type = row.itemType
+        if (row.isDrugMixture) type = 'Drug Mixture'
+        else if (row.isOpenPrescription) type = 'Open Prescription'
+        else if (LAB_CATEGORY.indexOf(row.serviceCenterCategoryFK) >= 0)
+          type = 'LAB'
+        else if (RADIOLOGY_CATEGORY.indexOf(row.serviceCenterCategoryFK) >= 0)
+          type = 'Radiology'
         return (
           <div style={{ position: 'relative' }}>
             <div
@@ -100,11 +107,7 @@ const baseColumns = classes => {
                 paddingRight: paddingRight,
               }}
             >
-              {row.isDrugMixture
-                ? 'Drug Mixture'
-                : row.isOpenPrescription
-                ? 'Open Prescription'
-                : row.itemType}
+              {type}
               <div style={{ position: 'absolute', top: '-1px', right: '-4px' }}>
                 <div
                   style={{

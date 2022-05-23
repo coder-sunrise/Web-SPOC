@@ -29,7 +29,7 @@ class VitalSignCard extends PureComponent {
         const rohrer = (weightKG / heightCM ** 3) * 10 ** 7
         setFieldValue('visitBasicExaminations[0].rohrer', _.round(rohrer, 1))
       } else if (getAgeType === AGETYPE.CHILD) {
-        const kaup = (weightKG / heightCM ** 2) * 10 ** 2
+        const kaup = (weightKG / heightCM ** 2) * 10 ** 4
         setFieldValue('visitBasicExaminations[0].kaup', _.round(kaup, 1))
       }
     } else {
