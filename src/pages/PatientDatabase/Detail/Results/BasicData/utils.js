@@ -93,7 +93,7 @@ export const defaultData = [
   {
     id: 12,
     testCode: TESTTYPES.KAUP,
-    type: 'Kaup (kg/cm\u00b2X10\u00b2)',
+    type: 'Kaup (kg/cm\u00b2X10\u2074)',
     refRange: '(15-18)',
     fieldName: 'kaup',
     format: '0.0',
@@ -422,7 +422,7 @@ export const defaultColumns = genderFK => {
                             id: 4,
                             testName: 'Kaup',
                             formula:
-                              'Weight (kg)/ Height (cm)\u00b2 X 10\u00b2',
+                              'Weight (kg)/ Height (cm)\u00b2 X 10\u2074',
                           },
                         ]}
                       />
