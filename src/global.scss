@@ -826,6 +826,9 @@ td[class='ant-table-cell ant-table-cell-ellipsis'] {
   }
 }
 
+label[class*='MuiInputLabel-root'] {
+  font-size: 1rem !important;
+}
 input[class*='MuiInputBase-input-'] {
   font-size: 14px !important;
 }
@@ -970,9 +973,13 @@ textarea[class*='MuiInputBase-input-'] {
   background-color: #f0f5ff;
 }
 .noBgTable .ant-table-tbody tr:nth-child(odd) {
-  background-color: transparent;
+  background-color: transparent !important;
 }
 
 .noBgTable .ant-table-tbody tr:nth-child(odd) td {
-  background-color: transparent;
+  background-color: transparent !important;
+}
+
+.e-listbox-wrapper .e-list-item:nth-child(even){
+  background-color: #f0f5ff;
 }
