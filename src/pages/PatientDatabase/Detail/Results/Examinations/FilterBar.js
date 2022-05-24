@@ -126,162 +126,155 @@ const FilterBar = props => {
     },
   ]
   return (
-    <SizeContainer size='sm'>
-      <React.Fragment>
-        <GridContainer alignItems='flex-end'>
-          <GridItem md={12}>
-            <Field
-              name='category'
-              render={args => {
-                const { form: fm } = args
-                return (
-                  <Select
-                    {...args}
-                    style={{ width: 140, marginRight: 10 }}
-                    label='Category'
-                    options={[
-                      { id: 1, name: 'Lab', value: 'Lab' },
-                      { id: 2, name: 'Radiology', value: 'Radiology' },
-                    ]}
-                    onChange={v => {
-                      setFieldValue('status', '')
-                      setCategory(v)
-                    }}
-                    allowClear={false}
-                  />
-                )
-              }}
-            />
-            <FastField
-              name='examinationName'
-              render={args => (
-                <TextField
-                  maxLength={50}
-                  style={{
-                    width: 200,
-                    position: 'relative',
-                    top: -5,
-                    marginRight: 10,
-                  }}
-                  label='Examination Name'
-                  {...args}
-                />
-              )}
-            />
-            <Field
-              name='visitDate'
-              render={args => {
-                return (
-                  <DateRangePicker
-                    style={{
-                      width: 280,
-                      position: 'relative',
-                      top: -5,
-                      marginRight: 10,
-                    }}
-                    disabled={values.allDate}
-                    label='Visit Date From'
-                    label2='To'
-                    {...args}
-                  />
-                )
-              }}
-            />
-            <Field
-              name='allDate'
-              render={args => {
-                return (
-                  <Checkbox
-                    style={{
-                      width: 70,
-                      position: 'relative',
-                      top: -5,
-                      marginRight: 10,
-                    }}
-                    inputLabel=' '
-                    label='All Date'
-                    {...args}
-                  />
-                )
-              }}
-            />
-            <FastField
-              name='doctorIDs'
-              render={args => (
-                <Tooltip
-                  placement='right'
-                  title='Select "All" will retrieve active and inactive doctors'
-                >
-                  <DoctorProfileSelect
-                    mode='multiple'
-                    {...args}
-                    style={{ width: 200, marginRight: 10 }}
-                    allValue={-99}
-                    allValueOption={{
-                      id: -99,
-                      clinicianProfile: {
-                        name: 'All',
-                      },
-                    }}
-                    maxTagCount={0}
-                    labelField='clinicianProfile.name'
-                  />
-                </Tooltip>
-              )}
-            />
-            {category === 'Lab' && (
-              <FastField
-                name='status'
-                render={args => {
-                  const { form } = args
-                  return (
-                    <CodeSelect
-                      {...args}
-                      style={{ width: 180, marginRight: 10 }}
-                      label='Status'
-                      options={labStatus}
-                      mode='multiple'
-                      labelField='name'
-                      maxTagCount={0}
-                      temp
-                    />
-                  )
+    <div>
+      <GridContainer alignItems='flex-end'>
+        <Field
+          name='category'
+          render={args => {
+            const { form: fm } = args
+            return (
+              <Select
+                {...args}
+                style={{ width: 140, marginRight: 10 }}
+                label='Category'
+                options={[
+                  { id: 1, name: 'Lab', value: 'Lab' },
+                  { id: 2, name: 'Radiology', value: 'Radiology' },
+                ]}
+                onChange={v => {
+                  setFieldValue('status', '')
+                  setCategory(v)
                 }}
+                allowClear={false}
               />
-            )}
-            {category === 'Radiology' && (
-              <FastField
-                name='status'
-                initialValue={[3, 4]}
-                render={args => {
-                  const { form } = args
-                  return (
-                    <CodeSelect
-                      {...args}
-                      style={{ width: 180, marginRight: 10 }}
-                      label='Status'
-                      options={radiologyStatus}
-                      maxTagCount={0}
-                      mode='multiple'
-                      labelField='name'
-                      temp
-                    />
-                  )
+            )
+          }}
+        />
+        <FastField
+          name='examinationName'
+          render={args => (
+            <TextField
+              maxLength={50}
+              style={{
+                width: 200,
+                position: 'relative',
+                marginRight: 10,
+              }}
+              label='Examination Name'
+              {...args}
+            />
+          )}
+        />
+        <Field
+          name='visitDate'
+          render={args => {
+            return (
+              <DateRangePicker
+                style={{
+                  width: 280,
+                  position: 'relative',
+                  marginRight: 10,
                 }}
+                disabled={values.allDate}
+                label='Visit Date From'
+                label2='To'
+                {...args}
               />
-            )}
-            <Button
-              color='primary'
-              style={{ position: 'relative', top: -8 }}
-              onClick={handleSubmit}
-              // disabled={isSubmitting}
+            )
+          }}
+        />
+        <Field
+          name='allDate'
+          render={args => {
+            return (
+              <Checkbox
+                style={{
+                  width: 80,
+                  position: 'relative',
+                  marginRight: 10,
+                }}
+                inputLabel=' '
+                label='All Date'
+                {...args}
+              />
+            )
+          }}
+        />
+        <FastField
+          name='doctorIDs'
+          render={args => (
+            <Tooltip
+              placement='right'
+              title='Select "All" will retrieve active and inactive doctors'
             >
-              Search
-            </Button>
-          </GridItem>
-        </GridContainer>
-      </React.Fragment>
-    </SizeContainer>
+              <DoctorProfileSelect
+                mode='multiple'
+                {...args}
+                style={{ width: 200, marginRight: 10 }}
+                allValue={-99}
+                allValueOption={{
+                  id: -99,
+                  clinicianProfile: {
+                    name: 'All',
+                  },
+                }}
+                maxTagCount={0}
+                labelField='clinicianProfile.name'
+              />
+            </Tooltip>
+          )}
+        />
+        {category === 'Lab' && (
+          <FastField
+            name='status'
+            render={args => {
+              const { form } = args
+              return (
+                <CodeSelect
+                  {...args}
+                  style={{ width: 180, marginRight: 10 }}
+                  label='Status'
+                  options={labStatus}
+                  mode='multiple'
+                  labelField='name'
+                  maxTagCount={0}
+                  temp
+                />
+              )
+            }}
+          />
+        )}
+        {category === 'Radiology' && (
+          <FastField
+            name='status'
+            initialValue={[3, 4]}
+            render={args => {
+              const { form } = args
+              return (
+                <CodeSelect
+                  {...args}
+                  style={{ width: 180, marginRight: 10 }}
+                  label='Status'
+                  options={radiologyStatus}
+                  maxTagCount={0}
+                  mode='multiple'
+                  labelField='name'
+                  temp
+                />
+              )
+            }}
+          />
+        )}
+        <Button
+          color='primary'
+          style={{ position: 'relative', top: -8 }}
+          onClick={handleSubmit}
+          // disabled={isSubmitting}
+        >
+          Search
+        </Button>
+      </GridContainer>
+    </div>
   )
 }
 export default memo(

@@ -1,7 +1,7 @@
-import { primaryColor } from 'mui-pro-jss'
+import { primaryColor, accordionColor, blackColor } from 'mui-pro-jss'
 import color from 'color'
 
-const accordionStyle = (theme) => ({
+const accordionStyle = theme => ({
   root: {
     flexGrow: 1,
     marginBottom: '20px',
@@ -24,17 +24,21 @@ const accordionStyle = (theme) => ({
     // borderTopRightRadius: '3px',
     // color: '#3C4858',
     '&:hover': {
-      color: primaryColor,
-      background: color(primaryColor).lighten(0.7).hex(),
+      color: blackColor,
+      background: color(accordionColor)
+        .darken(0.2)
+        .hex(),
       boxShadow:
         '0 14px 26px -12px rgba(28, 26, 124, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(28, 26, 124, 0.2)',
     },
-    color: primaryColor,
-    background: color(primaryColor).lighten(0.9).hex(),
+    color: blackColor,
+    background: color(accordionColor).hex(),
   },
   expansionPanelSummaryExpaned: {
-    color: primaryColor,
-    background: color(primaryColor).lighten(0.7).hex(),
+    color: blackColor,
+    background: color(accordionColor)
+      .darken(0.2)
+      .hex(),
     '& $expansionPanelSummaryExpandIcon': {
       [theme.breakpoints.up('md')]: {
         top: 'auto !important',
@@ -73,7 +77,7 @@ const accordionStyle = (theme) => ({
   expansionPanelSummaryExpandIconExpanded: {},
   title: {
     // fontSize: '15px',
-    fontWeight: 500,
+    fontWeight: 'bold',
     marginTop: '0',
     marginBottom: '0',
     color: 'inherit',

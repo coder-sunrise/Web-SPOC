@@ -128,6 +128,7 @@ const successColor = '#389e0d'
 const dangerColor = '#cf1322'
 const hoverColor = '#d6e4ff'
 const tableEvenRowColor = '#f0f5ff'
+const accordionColor = '#daecf5'
 
 const grayColors = [
   '#999',
@@ -397,4 +398,5 @@ export {
   border,
   headerHeight,
   tableEvenRowColor,
+  accordionColor,
 }
