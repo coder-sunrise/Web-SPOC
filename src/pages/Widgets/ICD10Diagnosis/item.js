@@ -317,24 +317,30 @@ const ICD10DiagnosisItem = ({
             name={`corDiagnosis[${index}].remarks`}
             render={args => {
               return (
-                <TextField label='Remarks' multiline rowMax={6} {...args} />
+                <TextField
+                  label='Remarks'
+                  multiline
+                  rowMax={6}
+                  maxLength={2000}
+                  {...args}
+                />
               )
             }}
           />
           <div style={{ position: 'absolute', bottom: 2, right: 10 }}>
             <OrderText
               orders={orders}
-              onSelectItem={selectItem => {
+              onSelectItem={(selectItem = '') => {
                 const remarks = form.values.corDiagnosis[index].remarks
                 if (hasValue(remarks) && remarks.trim().length !== '') {
                   form.setFieldValue(
                     `corDiagnosis[${index}].remarks`,
-                    `${remarks} ${selectItem}`,
+                    `${remarks} ${selectItem}`.substr(0, 2000),
                   )
                 } else {
                   form.setFieldValue(
                     `corDiagnosis[${index}].remarks`,
-                    selectItem,
+                    selectItem.substr(0, 2000),
                   )
                 }
               }}

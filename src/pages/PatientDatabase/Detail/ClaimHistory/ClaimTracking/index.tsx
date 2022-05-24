@@ -65,7 +65,7 @@ const ClaimTracking = ({
         render: (_dom, row) => {
           const vt = visitTypes.find(x => x.id === row.visitPurposeFK)
           return (
-            <Tooltip title={vt?.code}>
+            <Tooltip title={vt?.name}>
               <div>{vt?.code}</div>
             </Tooltip>
           )
