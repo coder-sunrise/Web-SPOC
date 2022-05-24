@@ -278,31 +278,21 @@ class ReferralCard extends PureComponent {
       values,
       handleUpdateAttachments,
       clinicSettings,
-      isVisitReadonlyAfterSigned,
       mode,
       patient,
-      fromMedicalCheckupReporting,
     } = this.props
+    let { disabled } = this.props
     const {
       referralList,
       referralPersonList,
       showAddReferralSource,
       showAddReferralPerson,
     } = this.state
-
     const isPatientProfileEdit = mode === 'patientprofile'
-    let disabled = true
-    if (
-      isPatientProfileEdit ||
-      values.visitStatus === VISIT_STATUS.WAITING ||
-      !isVisitReadonlyAfterSigned
-    ) {
+
+    if (isPatientProfileEdit) {
       disabled = false
     }
-    if (patient.entity && !patient.entity.isActive) {
-      disabled = true
-    }
-    if (fromMedicalCheckupReporting) disabled = true
     const cfg = {
       onAddReferralPersonClose: this.onAddReferralPersonClose,
       onAddReferralSourceClose: this.onAddReferralSourceClose,
@@ -331,6 +321,7 @@ class ReferralCard extends PureComponent {
       }
     }
     let padding = isPatientProfileEdit ? { padding: 0 } : { padding: '0 8px' }
+    // console.log(disabled)
     return (
       <div>
         <GridContainer>
