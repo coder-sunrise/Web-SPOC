@@ -187,7 +187,7 @@ const Detail = ({ height, ...props }) => {
                     id: 'finance.scheme.detail.coPayer',
                   })}
                   localFilter={item => item.coPayerTypeFK === copayerTypeFK}
-                  labelField='displayValue'
+                  labelField='displayValueWithCode'
                   max={50}
                   {...args}
                 />
