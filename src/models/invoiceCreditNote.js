@@ -1,5 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
+import { roundTo } from '@/utils/utils'
 import service from '@/services/invoicePayment'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
@@ -58,69 +59,51 @@ export default createFormViewModel({
           payerTypeFK,
           payerDistributedAmt,
           outStanding,
-          creditNote,
+          invoicePayerItem = [],
         } = filterInvPayment
 
         const creditNoteBalance =
           payerTypeFK === INVOICE_PAYER_TYPE.PATIENT
             ? payerDistributedAmt
             : outStanding
-
-        const filteredCreditNote = creditNote.filter(
-          x => x.invoicePayerFK === invoicePayerFK && !x.isCancelled,
-        )
-        const pastCreditNoteItems = filteredCreditNote
-          .reduce((filtered, item) => {
-            return [...filtered, ...item.creditNoteItem]
-          }, [])
-          .reduce(
-            (itemSubtotal, item) =>
-              itemSubtotal[item.itemCode] !== undefined
-                ? {
-                    ...itemSubtotal,
-                    [item.itemCode]:
-                      itemSubtotal[item.itemCode] + item.quantity,
-                  }
-                : { ...itemSubtotal, [item.itemCode]: item.quantity },
-            {},
+        const remainingItems = invoiceItem
+          .filter(item =>
+            invoicePayerItem.find(x => x.invoiceItemFK === item.id),
           )
+          .map(item => {
+            var payerItem = invoicePayerItem.find(
+              x => x.invoiceItemFK === item.id,
+            )
+            const remainQuantity = roundTo(
+              item.quantity - payerItem.creditNoteQuantity,
+              1,
+            )
+            const remainAmount = roundTo(
+              payerItem.claimAmount - payerItem.creditNoteAmount,
+              2,
+            )
+            return {
+              ...item,
+              invoiceItemFK: item.id,
+              itemTypeFK: item.invoiceItemTypeFK,
+              totalAfterItemAdjustment: item.quantity * item.unitPrice,
+              _totalAfterGST: roundTo(
+                payerItem.claimAmount - payerItem.creditNoteAmount,
+                2,
+              ),
+              _unitPriceAftGst:
+                remainQuantity > 0 ? remainAmount / remainQuantity : 0,
+              creditNoteQuantity: payerItem.creditNoteQuantity,
+              remainQuantity: remainQuantity,
+              currentQuantity: 0,
+              creditNoteAmount: payerItem.creditNoteAmount,
+              remainAmount: remainAmount,
+              currentAmount: 0,
+              itemType: payerItem.itemType,
+              claimAmount: payerItem.claimAmount,
+            }
+          })
 
-        const remainingItems = invoiceItem.map(item => {
-          // const pastItemQuantity = pastCreditNoteItems[item.itemCode]
-          // if (pastItemQuantity) {
-          //   const remainingQty = item.quantity - pastItemQuantity
-          //   return {
-          //     ...item,
-          //     invoiceItemFK: item.id,
-          //     itemTypeFK: item.invoiceItemTypeFK,
-          //     quantity: remainingQty,
-          //     originRemainingQty: remainingQty,
-          //     // totalAfterItemAdjustment: remaining quantity multiply unit price
-          //     totalAfterItemAdjustment:
-          //       (item.quantity - pastItemQuantity) * item.unitPrice,
-          //     _totalAfterGST: item.totalAfterGST,
-          //   }
-          // }
-          return {
-            ...item,
-            invoiceItemFK: item.id,
-            itemTypeFK: item.invoiceItemTypeFK,
-            originRemainingQty: item.quantity,
-            totalAfterItemAdjustment: item.quantity * item.unitPrice,
-            _totalAfterGST: item.totalAfterGST,
-            _unitPriceAftGst:
-              item.quantity && item.quantity > 0
-                ? item.totalAfterGST / item.quantity
-                : item.unitPrice,
-          }
-        })
-
-        let totalCreditNote
-        totalCreditNote =
-          filteredCreditNote.length > 0
-            ? sum(filteredCreditNote.map(x => Number(x.totalAftGST)))
-            : 0
-            
         return {
           ...InitialCreditNote,
           gstValue,
@@ -128,9 +111,7 @@ export default createFormViewModel({
           invoiceGSTAmt,
           invoicePayerFK,
           invoiceTotal: invoiceTotalAftGST,
-          creditNoteItem: remainingItems
-            ? remainingItems.filter(x => x.originRemainingQty > 0)
-            : [],
+          creditNoteItem: remainingItems,
           creditNoteBalance: creditNoteBalance,
         }
       },
