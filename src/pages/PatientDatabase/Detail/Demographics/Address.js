@@ -44,9 +44,10 @@ class Address extends Component {
 
     const deleted = contactAddress.find((o, idx) => o.id === id)
     if (deleted) {
-      deleted.street = !null
-      deleted.countryFK = !null
       deleted.isDeleted = true
+      contact.contactAddress = contactAddress.filter(
+        item => !item.isDeleted || item.id > 0,
+      )
       this.props.setFieldValue('contact', contact)
     }
   }

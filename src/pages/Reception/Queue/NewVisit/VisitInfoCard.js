@@ -379,99 +379,102 @@ const VisitInfoCard = ({
   return (
     <CommonCard title='Visit Information'>
       <GridContainer alignItems='center'>
-        <GridItem xs md={3}>
-          <Field
-            name={FormField['visit.visitType']}
-            render={args => (
-              <CodeSelect
-                // disabled={isReadOnly}
-                label={formatMessage({
-                  id: 'reception.queue.visitRegistration.visitType',
-                })}
-                onChange={(v, op = {}) => handleVisitTypeChange(v, op)}
-                options={visitPurpose || []}
-                allowClear={false}
-                {...args}
-              />
-            )}
-          />
-        </GridItem>
-        <GridItem xs md={3}>
-          <Field
-            name={FormField['visit.doctorProfileFk']}
-            render={args => (
-              <DoctorProfileSelect
-                disabled={
-                  isVisitReadonlyAfterSigned || isPrimaryDoctorConsultated
-                }
-                authority='none'
-                onChange={(v, op = {}) => handleDoctorChange(v, op)}
-                label={
-                  visitType === VISIT_TYPE.OTC
-                    ? formatMessage({
-                        id: 'reception.queue.visitRegistration.attendantDoctor',
-                      })
-                    : formatMessage({
-                        id: 'reception.queue.visitRegistration.doctor',
-                      })
-                }
-                {...args}
-              />
-            )}
-          />
-        </GridItem>
-        <GridItem xs md={3}>
-          <Field
-            name={FormField['visit.queueNo']}
-            validate={validateQNo}
-            render={args => (
-              <NumberInput
-                {...args}
-                // format={isQueueNoDecimal ? '0.0' : '0'}
-                precision={isQueueNoDecimal ? 1 : 0}
-                // disabled={isReadOnly}
-                label={formatMessage({
-                  id: 'reception.queue.visitRegistration.queueNo',
-                })}
-                formatter={value => {
-                  const isNaN = Number.isNaN(parseFloat(value))
-                  return isNaN
-                    ? value
-                    : parseFloat(value).toFixed(isQueueNoDecimal ? 1 : 0)
-                }}
-              />
-            )}
-          />
-        </GridItem>
-        <GridItem xs md={3}>
-          {isEnablePackage && (
+        <GridContainer>
+          <GridItem xs md={3}>
             <Field
-              name={FormField['visit.salesPersonUserFK']}
+              name={FormField['visit.visitType']}
               render={args => (
-                <ClinicianSelect
+                <CodeSelect
+                  // disabled={isReadOnly}
                   label={formatMessage({
-                    id: 'reception.queue.visitRegistration.salesPerson',
+                    id: 'reception.queue.visitRegistration.visitType',
                   })}
-                  disabled={isVisitReadonlyAfterSigned}
-                  authority='none'
+                  onChange={(v, op = {}) => handleVisitTypeChange(v, op)}
+                  options={visitPurpose || []}
+                  allowClear={false}
                   {...args}
                 />
               )}
             />
-          )}
-          <Field
-            name='isForInvoiceReplacement'
-            render={args => (
-              <Checkbox
-                style={{ position: 'relative', top: 5 }}
-                {...args}
-                tooltip='This visit is created for past invoice replacement.'
-                label='For Invoice Replacement'
-                onChange={handleIsForInvoiceReplacementChange}
+          </GridItem>
+          <GridItem xs md={3}>
+            <Field
+              name={FormField['visit.doctorProfileFk']}
+              render={args => (
+                <DoctorProfileSelect
+                  disabled={
+                    isVisitReadonlyAfterSigned || isPrimaryDoctorConsultated
+                  }
+                  authority='none'
+                  onChange={(v, op = {}) => handleDoctorChange(v, op)}
+                  label={
+                    visitType === VISIT_TYPE.OTC
+                      ? formatMessage({
+                          id:
+                            'reception.queue.visitRegistration.attendantDoctor',
+                        })
+                      : formatMessage({
+                          id: 'reception.queue.visitRegistration.doctor',
+                        })
+                  }
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem xs md={3}>
+            <Field
+              name={FormField['visit.queueNo']}
+              validate={validateQNo}
+              render={args => (
+                <NumberInput
+                  {...args}
+                  // format={isQueueNoDecimal ? '0.0' : '0'}
+                  precision={isQueueNoDecimal ? 1 : 0}
+                  // disabled={isReadOnly}
+                  label={formatMessage({
+                    id: 'reception.queue.visitRegistration.queueNo',
+                  })}
+                  formatter={value => {
+                    const isNaN = Number.isNaN(parseFloat(value))
+                    return isNaN
+                      ? value
+                      : parseFloat(value).toFixed(isQueueNoDecimal ? 1 : 0)
+                  }}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem xs md={3}>
+            {isEnablePackage && (
+              <Field
+                name={FormField['visit.salesPersonUserFK']}
+                render={args => (
+                  <ClinicianSelect
+                    label={formatMessage({
+                      id: 'reception.queue.visitRegistration.salesPerson',
+                    })}
+                    disabled={isVisitReadonlyAfterSigned}
+                    authority='none'
+                    {...args}
+                  />
+                )}
               />
             )}
-          />
-        </GridItem>
+            <Field
+              name='isForInvoiceReplacement'
+              render={args => (
+                <Checkbox
+                  style={{ position: 'relative', top: 5 }}
+                  {...args}
+                  tooltip='This visit is created for past invoice replacement.'
+                  label='For Invoice Replacement'
+                  onChange={handleIsForInvoiceReplacementChange}
+                />
+              )}
+            />
+          </GridItem>
+        </GridContainer>
         <GridItem xs md={3}>
           <Field
             name={FormField['visit.roomFK']}
