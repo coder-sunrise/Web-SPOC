@@ -21,7 +21,7 @@ import {
 // sub components
 import PaymentSummary from '@/pages/Finance/Invoice/Details/PaymentDetails/PaymentSummary'
 import PaymentRow from '@/pages/Finance/Invoice/Details/PaymentDetails/PaymentRow'
-import { roundTo } from '@/utils/utils'
+import { roundTo, ableToViewByAuthority } from '@/utils/utils'
 import MenuItem from '@material-ui/core/MenuItem'
 import MenuList from '@material-ui/core/MenuList'
 import MaxCap from './MaxCap'
@@ -222,10 +222,7 @@ const Scheme = ({
   const onPaymentDeleteClick = payment => {
     onPaymentVoidClick(index, payment)
   }
-  const {
-    isEnableAddPaymentInBilling = false,
-    isEditInvoiceBillingEnable = false,
-  } = clinicSettings
+  const { isEnableAddPaymentInBilling = false } = clinicSettings
 
   const isCHAS = schemeConfig && schemeConfig.copayerFK === 1
   const isMedisave = payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT
@@ -420,6 +417,12 @@ const Scheme = ({
                         handleVoidClick={onPaymentDeleteClick}
                         handlePrinterClick={onPrinterClick}
                         readOnly={shouldDisable()}
+                        isEnableDeletePayment={ableToViewByAuthority(
+                          'finance.deletecopayerpayment',
+                        )}
+                        isEnableDeleteCreditNote={ableToViewByAuthority(
+                          'finance.deletecopayercreditnote',
+                        )}
                       />
                     ))}
                 </CardContainer>
@@ -427,7 +430,7 @@ const Scheme = ({
             </GridItem>
             <GridItem md={7} style={{ marginTop: 6 }}>
               <div>
-                {isEditInvoiceBillingEnable && (
+                {ableToViewByAuthority('finance.addcopayerpayment') && (
                   <Button
                     {...ButtonProps}
                     disabled={

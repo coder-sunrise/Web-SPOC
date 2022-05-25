@@ -14,7 +14,7 @@ import {
   Popover,
 } from '@/components'
 // utils
-import { roundTo } from '@/utils/utils'
+import { roundTo, ableToViewByAuthority } from '@/utils/utils'
 import { INVOICE_REPORT_TYPES } from '@/utils/constants'
 import Payments from './Payments'
 import MenuItem from '@material-ui/core/MenuItem'
@@ -327,48 +327,50 @@ const InvoiceSummary = ({
             </GridItem>
 
             <GridItem md={3} className={classes.rightAlign}>
-              <Popover
-                icon={null}
-                trigger='click'
-                placement='right'
-                visible={showAddPaymentMenu}
-                onVisibleChange={() => {
-                  if (visitGroup) {
-                    setShowAddPaymentMenu(!showAddPaymentMenu)
-                  } else {
-                    handleAddPaymentClick()
+              {ableToViewByAuthority('finance.addpatientpayment') && (
+                <Popover
+                  icon={null}
+                  trigger='click'
+                  placement='right'
+                  visible={showAddPaymentMenu}
+                  onVisibleChange={() => {
+                    if (visitGroup) {
+                      setShowAddPaymentMenu(!showAddPaymentMenu)
+                    } else {
+                      handleAddPaymentClick()
+                    }
+                  }}
+                  content={
+                    <MenuList
+                      role='menu'
+                      onClick={() => setShowAddPaymentMenu(false)}
+                    >
+                      <MenuItem
+                        disabled={shouldDisableGroupPayment}
+                        onClick={() => handleAddPaymentClick(true)}
+                      >
+                        Group Payment
+                      </MenuItem>
+                      <MenuItem
+                        disabled={shouldDisableIndividualPayment}
+                        onClick={() => handleAddPaymentClick()}
+                      >
+                        Individual Payment
+                      </MenuItem>
+                    </MenuList>
                   }
-                }}
-                content={
-                  <MenuList
-                    role='menu'
-                    onClick={() => setShowAddPaymentMenu(false)}
-                  >
-                    <MenuItem
-                      disabled={shouldDisableGroupPayment}
-                      onClick={() => handleAddPaymentClick(true)}
-                    >
-                      Group Payment
-                    </MenuItem>
-                    <MenuItem
-                      disabled={shouldDisableIndividualPayment}
-                      onClick={() => handleAddPaymentClick()}
-                    >
-                      Individual Payment
-                    </MenuItem>
-                  </MenuList>
-                }
-              >
-                <Button
-                  color='primary'
-                  simple
-                  size='sm'
-                  className={classes.addPaymentButton}
-                  disabled={shouldDisableAddPayment}
                 >
-                  Add Payment
-                </Button>
-              </Popover>
+                  <Button
+                    color='primary'
+                    simple
+                    size='sm'
+                    className={classes.addPaymentButton}
+                    disabled={shouldDisableAddPayment}
+                  >
+                    Add Payment
+                  </Button>
+                </Popover>
+              )}
             </GridItem>
           </GridContainer>
         </CardContainer>

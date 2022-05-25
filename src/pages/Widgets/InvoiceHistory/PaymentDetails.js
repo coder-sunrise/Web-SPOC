@@ -412,7 +412,6 @@ class PaymentDetails extends Component {
     } = this.state
     const {
       enableWriteOffinInvoice: isEnableWriteOffinInvoice,
-      isEditInvoiceBillingEnable = false,
     } = clinicSettings.settings
     const transferProps = {
       ...this.props,
@@ -442,7 +441,6 @@ class PaymentDetails extends Component {
                     hasActiveSession={hasActiveSession}
                     patientIsActive={patientIsActive}
                     visitOrderTemplateFK={invoiceDetail?.visitOrderTemplateFK}
-                    isEditInvoiceBillingEnable={isEditInvoiceBillingEnable}
                   />
                 )
               })

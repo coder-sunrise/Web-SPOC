@@ -4,11 +4,11 @@ import { withStyles } from '@material-ui/core'
 import { Button, GridContainer, GridItem } from '@/components'
 import { PAYMENT_MODE } from '@/utils/constants'
 
-const styles = (theme) => ({
+const styles = theme => ({
   button: {
     padding: theme.spacing(1),
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
+    marginTop: 3,
+    marginBottom: 3,
     marginRight: 0,
     textAlign: 'left',
     textTransform: 'none !important',

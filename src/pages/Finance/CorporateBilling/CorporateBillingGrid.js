@@ -3,30 +3,27 @@ import { status } from '@/utils/codes'
 import MoreVert from '@material-ui/icons/MoreVert'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { Button, CommonTableGrid, Tooltip, dateFormatLong } from '@/components'
-import Authorized from '@/utils/Authorized'
 
 const CellBase = props => {
   const { column, row, onRowDoubleClick } = props
   if (column.name === 'Action') {
     return (
-      <Authorized authority='corporatebilling.corporatebillingdetails'>
-        <Table.Cell {...props}>
-          <Tooltip id='tooltip-left' title='View Details' placement='bottom'>
-            <Button
-              size='sm'
-              onClick={() => {
-                onRowDoubleClick(row)
-              }}
-              justIcon
-              round
-              color='primary'
-              style={{ marginRight: 5 }}
-            >
-              <MoreVert />
-            </Button>
-          </Tooltip>
-        </Table.Cell>
-      </Authorized>
+      <Table.Cell {...props}>
+        <Tooltip id='tooltip-left' title='View Details' placement='bottom'>
+          <Button
+            size='sm'
+            onClick={() => {
+              onRowDoubleClick(row)
+            }}
+            justIcon
+            round
+            color='primary'
+            style={{ marginRight: 5 }}
+          >
+            <MoreVert />
+          </Button>
+        </Tooltip>
+      </Table.Cell>
     )
   }
   return <Table.Cell {...props} />

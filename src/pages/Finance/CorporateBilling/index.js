@@ -6,7 +6,6 @@ import { withStyles } from '@material-ui/core/styles'
 import { CardContainer, notification } from '@/components'
 import FilterBar from './FilterBar'
 import CorporateBillingGrid from './CorporateBillingGrid'
-import Authorized from '@/utils/Authorized'
 
 const styles = () => ({})
 const CorporateBilling = ({
@@ -20,19 +19,6 @@ const CorporateBilling = ({
   if (height < 300) height = 300
 
   const onRowDoubleClick = row => {
-    const accessRight = Authorized.check(
-      'corporatebilling.corporatebillingdetails',
-    )
-
-    console.log('corporatebilling.corporatebillingdetails', accessRight)
-
-    if (accessRight && accessRight.rights !== 'enable') {
-      notification.error({
-        message: 'Current user is not authorized to access',
-      })
-      return
-    }
-
     history.push(`/finance/billing/details/${row.id}`)
   }
 

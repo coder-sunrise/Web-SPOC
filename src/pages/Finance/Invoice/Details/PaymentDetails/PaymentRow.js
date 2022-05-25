@@ -27,6 +27,8 @@ const PaymentRow = ({
   readOnly,
   isEnableWriteOffinInvoice,
   printDisabled = false,
+  isEnableDeletePayment = true,
+  isEnableDeleteCreditNote = true,
   ...payment
 }) => {
   const {
@@ -51,18 +53,20 @@ const PaymentRow = ({
 
   let tooltipMsg = ''
   let showVoidButton = true
-  if (type === 'Credit Note') {
-    showVoidButton = ableToViewByAuthority('finance.deletecreditnote')
-  } else if (type === 'Write Off') {
+  if (type === 'Write Off') {
     if (isEnableWriteOffinInvoice) {
       showVoidButton = ableToViewByAuthority('finance.deletewriteoff')
     } else {
       showVoidButton = false
     }
   }
-  if (type === 'Payment') tooltipMsg = 'Print Receipt'
-  else if (type === 'Credit Note') tooltipMsg = 'Print Credit Note'
-
+  if (type === 'Payment') {
+    showVoidButton = isEnableDeletePayment
+    tooltipMsg = 'Print Receipt'
+  } else if (type === 'Credit Note') {
+    showVoidButton = isEnableDeleteCreditNote
+    tooltipMsg = 'Print Credit Note'
+  }
   const getIconByType = () => {
     if (type === 'Payment' || type === 'Credit Note') {
       return (
