@@ -668,6 +668,7 @@ class AddPayment extends Component {
                         type: 'number',
                         currency: true,
                         sortingEnabled: false,
+                        min: 0,
                         isDisabled: row =>
                           row.isGroupPayment || row.outstanding <= 0,
                         width: 130,

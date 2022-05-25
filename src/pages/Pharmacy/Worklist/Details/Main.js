@@ -904,7 +904,7 @@ const Main = props => {
           if (row.isGroup)
             return {
               colSpan: mergeCell,
-              style: { backgroundColor: 'rgb(240, 248, 255)' },
+              style: { backgroundColor: 'rgb(218, 236, 245)' },
             }
           return {
             rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,

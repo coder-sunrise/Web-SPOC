@@ -500,12 +500,10 @@ export const WorklistGrid = ({ labWorklist, clinicSettings }) => {
               <Typography.Text strong>
                 {record.patientName} ({record.patientReferenceNo})
               </Typography.Text>
-              <Typography.Text type='secondary'>
-                {record.doctor}
-              </Typography.Text>
+              <Typography.Text>{record.doctor}</Typography.Text>
               <VisitTypeTag type={record.visitPurposeFK} />
             </Space>
-            <Space>
+            <Space style={{ fontWeight: 'bold' }}>
               <span>{getSpecimenCountByCategory(record.visitFK)}</span>
             </Space>
           </div>
