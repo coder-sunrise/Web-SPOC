@@ -214,6 +214,7 @@ class Queue extends React.Component {
       appointmentID,
       pdid: primaryClinicianFK,
       pdroomid: primaryClinicianRoomFK,
+      visitMode: 'edit',
     })
   }
 
@@ -231,6 +232,7 @@ class Queue extends React.Component {
     if (patient) {
       this.showVisitRegistration({
         patientID: patient.id,
+        visitMode: 'edit',
       })
     }
   }
@@ -758,6 +760,7 @@ class Queue extends React.Component {
     if (totalRecords === 1 && hasSearchQuery)
       return this.showVisitRegistration({
         patientID: patientSearchResult[0].id,
+        visitMode: 'edit',
       })
     if (totalRecords >= 1) {
       return this.togglePatientSearch()
