@@ -318,6 +318,7 @@ let temp = null
     const payload = {
       subject: values.subject,
       thumbnail: values.thumbnail,
+      origin: values.origin,
       temp,
     }
     // console.log({ payload })
@@ -500,16 +501,16 @@ class Scribble extends React.Component {
   _generateThumbnail = async () => {
     try {
       const result = this._sketch.exportToImageDataUrl()
-      // const imgEle = document.createElement('img')
-      // imgEle.src = result
-      // await setTimeout(() => {
-      //   // wait for 1 milli second for img to set src successfully
-      // }, 100)
-      // const thumbnailSize = { width: 1565, height: 768 }
-      // const thumbnail = getThumbnail(imgEle, thumbnailSize)
-      // const thumbnailData = thumbnail.toDataURL(`image/jpeg`)
+      const imgEle = document.createElement('img')
+      imgEle.src = result
+      await setTimeout(() => {
+        // wait for 1 milli second for img to set src successfully
+      }, 100)
+      const thumbnailSize = { width: 100, height: 49 }
+      const thumbnail = getThumbnail(imgEle, thumbnailSize)
+      const thumbnailData = thumbnail.toDataURL(`image/jpeg`)
 
-      return result
+      return { origin: result, thumbnail: thumbnailData }
     } catch (error) {
       console.error(error)
       return null
@@ -740,8 +741,10 @@ class Scribble extends React.Component {
 
   onSaveClick = async () => {
     temp = this._sketch.getAllLayerData()
-    const thumbnail = await this._generateThumbnail()
+    const { origin, thumbnail } = await this._generateThumbnail()
+    console.log({origin,thumbnail})
     await this.props.setFieldValue('thumbnail', thumbnail.split(',')[1])
+    await this.props.setFieldValue('origin', origin.split(',')[1])
     this.props.handleSubmit()
   }
 
