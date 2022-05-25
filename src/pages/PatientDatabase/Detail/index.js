@@ -762,9 +762,10 @@ class PatientDetail extends PureComponent {
                           key={o.name}
                           className={classes.menuItem}
                           selected={currentMenu.name === o.name}
-                          disabled={
-                            global.disableSave && currentMenu.name !== o.name
-                          }
+                          // #23376
+                          // disabled={
+                          //   global.disableSave && currentMenu.name !== o.name
+                          // }
                           onClick={e => {
                             onMenuClick(e, o)
                             dispatch({
@@ -856,14 +857,14 @@ class PatientDetail extends PureComponent {
               <Button color='danger' onClick={onClose}>
                 Close
               </Button>
-              <ProgressButton
+              <Button
                 color='primary'
                 onClick={
                   patientIsActiveOrCreating ? this.validatePatient : undefined
                 }
               >
                 Save
-              </ProgressButton>
+              </Button>
             </div>
           </GridItem>
           <CommonModal
