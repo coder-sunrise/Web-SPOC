@@ -130,7 +130,7 @@ class PatientSearch extends PureComponent {
 
   registerVisitClick = patientID => {
     const { handleRegisterVisitClick } = this.props
-    handleRegisterVisitClick({ patientID })
+    handleRegisterVisitClick({ patientID: patientID, visitMode: 'edit' })
   }
 
   viewPatientProfile = event => {

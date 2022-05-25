@@ -424,7 +424,7 @@ class PatientDetail extends PureComponent {
           })
           .then(() => {
             history.push(
-              `/reception/queue?md=visreg&pid=${this.props.patient.entity.id}`,
+              `/reception/queue?md=visreg&pid=${this.props.patient.entity.id}&visitMode=edit`,
             )
           })
       },
