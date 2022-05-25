@@ -139,7 +139,7 @@ export const Findings = ({
     })
   }
 
-  const scribbleNoteDrawing = ({ subject, temp, thumbnail = null }) => {
+  const scribbleNoteDrawing = ({ subject, temp, thumbnail = null, origin = null }) => {
     const { category, arrayName, categoryIndex } = scribbleNoteState
     const fields = [item]
 
@@ -184,6 +184,7 @@ export const Findings = ({
           }),
           subject,
           thumbnail,
+          origin,
         },
       })
 
@@ -195,6 +196,7 @@ export const Findings = ({
       const newData = {
         subject,
         thumbnail,
+        origin,
         scribbleNoteTypeFK: categoryIndex,
         scribbleNoteTypeName: category,
         scribbleNoteLayers: temp,
@@ -205,6 +207,7 @@ export const Findings = ({
       }).then(o => {
         if (o) {
           newData.scribbleNoteFK = o.id
+          newData.origin = undefined
         }
       })
 

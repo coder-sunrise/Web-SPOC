@@ -69,6 +69,8 @@ class CommonForm extends PureComponent {
   switchMode = () => {
     let isSigningMode = !this.state.isSigningMode
     this.DEContainer.documentEditor.editor.enforceProtection('', isSigningMode ? 'ReadOnly' : 'FormFieldsOnly')
+    if(isSigningMode)
+      this.DEContainer.documentEditor.selection.navigateToNextEditingRegion();
     this.setState({ isSigningMode })
   }
 
@@ -81,9 +83,15 @@ class CommonForm extends PureComponent {
   selectionChange = e => {
     const isImageSelected = e.source.documentEditor.selection.isImageSelected
     const isSelectionInEditRegion = e.source.documentEditor.selection.isSelectionInEditRegion()
+    let isSignatured = false
+    if(isSelectionInEditRegion) {
+      const { start, end } = e.source.documentEditor.selection
+      if(start.currentWidget.children.some(x=> x.constructor.name === 'ImageElementBox'))
+        isSignatured = true
+    }
     if (this.mouseClicked && this.props.values.statusFK !== 2 && !isImageSelected && !isSelectionInEditRegion && this.state.signatureCounter > 0)
       this.notificationWarning({ message: 'Please remove signatures to update form content.'})
-    this.setState({ isImageSelected, isSelectionInEditRegion })
+    this.setState({ isImageSelected, isSelectionInEditRegion, isSignatured })
     this.mouseClicked = false
   }
 
@@ -199,6 +207,7 @@ class CommonForm extends PureComponent {
       isSigningMode,
       isImageSelected,
       isSelectionInEditRegion,
+      isSignatured,
       signatureCounter,
     } = this.state
     const {
@@ -217,7 +226,7 @@ class CommonForm extends PureComponent {
             {isSigningMode ? 'Switch to Edit Mode' : 'Switch to Signing Mode'}
           </Button>
           <Button
-            disabled={disableEdit || !isSigningMode || !isSelectionInEditRegion}
+            disabled={disableEdit || !isSigningMode || !isSelectionInEditRegion || isSignatured}
             size='sm'
             color='primary'
             icon
