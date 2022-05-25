@@ -186,6 +186,7 @@ class Queue extends React.Component {
     appointmentID = undefined,
     pdid = undefined,
     pdroomid = undefined,
+    visitMode = undefined,
   }) => {
     const parameter = {
       md: 'visreg',
@@ -195,7 +196,9 @@ class Queue extends React.Component {
     if (appointmentID) parameter.apptid = appointmentID
     if (pdid) parameter.pdid = pdid
     if (pdroomid) parameter.pdroomid = pdroomid
+    if (visitMode) parameter.visitMode = visitMode
 
+    // console.log(parameter)
     this.togglePatientSearch(false)
     this.props.history.push(getAppendUrl(parameter))
   }
@@ -211,6 +214,7 @@ class Queue extends React.Component {
       appointmentID,
       pdid: primaryClinicianFK,
       pdroomid: primaryClinicianRoomFK,
+      visitMode: 'edit',
     })
   }
 
@@ -228,6 +232,7 @@ class Queue extends React.Component {
     if (patient) {
       this.showVisitRegistration({
         patientID: patient.id,
+        visitMode: 'edit',
       })
     }
   }
@@ -542,9 +547,15 @@ class Queue extends React.Component {
     })
     switch (id) {
       case '0': // edit visit
+        this.showVisitRegistration({
+          visitID: row.id,
+          visitMode: 'edit',
+        })
+        break
       case '0.1': // view visit
         this.showVisitRegistration({
           visitID: row.id,
+          visitMode: 'view',
         })
         break
       case '1': {
@@ -749,6 +760,7 @@ class Queue extends React.Component {
     if (totalRecords === 1 && hasSearchQuery)
       return this.showVisitRegistration({
         patientID: patientSearchResult[0].id,
+        visitMode: 'edit',
       })
     if (totalRecords >= 1) {
       return this.togglePatientSearch()

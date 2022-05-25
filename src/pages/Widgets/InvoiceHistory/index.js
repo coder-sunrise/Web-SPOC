@@ -26,6 +26,7 @@ import { INVOICE_REPORT_TYPES } from '@/utils/constants'
 import MenuItem from '@material-ui/core/MenuItem'
 import MenuList from '@material-ui/core/MenuList'
 import PaymentDetails from './PaymentDetails'
+import { primaryColor } from '@/assets/jss'
 
 const styles = () => ({
   totalOSStyle: {
@@ -38,9 +39,20 @@ const styles = () => ({
     display: 'flex',
   },
   title: {
-    marginRight: 30,
     marginTop: 5,
     fontWeight: 'normal',
+  },
+  titleOutput: {
+    marginRight: 30,
+    marginTop: 5,
+    fontWeight: 'bold',
+    color: primaryColor,
+  },
+  titleNumberOutput: {
+    marginRight: 30,
+    marginTop: 3,
+    fontWeight: 'bold',
+    width: 80,
   },
   titleBold: {
     marginRight: 30,
@@ -172,16 +184,25 @@ const InvoiceHistory = ({
       <GridContainer>
         <GridItem sm={12}>
           <div className={classes.titleContainer}>
-            <p className={classes.title}>Invoice No: {invoiceNo}</p>
             <p className={classes.title}>
-              Date: {moment(invoiceDate).format(dateFormatLong)}
+              Invoice No:{' '}
+              <span className={classes.titleOutput}>{invoiceNo}</span>
             </p>
             <p className={classes.title}>
-              Invoice Amount:{' '}
+              Date:{' '}
+              <span className={classes.titleOutput}>
+                {moment(invoiceDate).format(dateFormatLong)}
+              </span>
+            </p>
+            <p className={classes.title}>Invoice Amount: </p>
+            <span>&nbsp;</span>
+            <p className={classes.titleNumberOutput}>
               <NumberInput text currency value={invoiceTotalAftGST} />
             </p>
-            <p className={classes.title}>
-              Total Paid: <NumberInput text currency value={totalPayment} />
+            <p className={classes.title}>Total Paid: </p>
+            <span>&nbsp;</span>
+            <p className={classes.titleNumberOutput}>
+              <NumberInput text currency value={totalPayment} />
             </p>
             <p
               className={
@@ -307,6 +328,7 @@ const InvoiceHistory = ({
           )}
           <div className={classes.totalOSStyle}>
             Total Patient O/S Balance:
+            <span>&nbsp;</span>
             <NumberInput text currency value={getTotalPatientOS()} />
           </div>
         </div>

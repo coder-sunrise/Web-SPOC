@@ -26,8 +26,8 @@ class SMSTemplate extends PureComponent {
     this.props.dispatch({
       type: 'settingSmsTemplate/query',
       payload: {
-        isActive:true,
-      },settingRoomBlock
+        isActive: true,
+      },
     })
   }
 

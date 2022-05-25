@@ -31,7 +31,7 @@ const AppNotificationPopover = ({
   const [newNotification, setNewNotification] = useState(null)
 
   const isDoctorRole =
-    user.data.clinicianProfile.userProfile.role?.clinicRoleFK === 1
+    user.data.clinicianProfile.userProfile.role?.clinicRoleFK === 1 //1 is Doctor
 
   const handleItemNew = () => {
     const notice = {
@@ -47,8 +47,7 @@ const AppNotificationPopover = ({
       toUser: isDoctorRole ? 'All PRO' : doctor.name,
       isRead: false,
       readDate: undefined,
-      isAcknowledgeRequired:
-        user.data.clinicianProfile.userProfile.role.clinicRoleFK == 1, //1 is Doctor
+      isAcknowledgeRequired: isDoctorRole,
       isAcknowledged: undefined,
       acknowledgeDate: undefined,
     }
@@ -58,6 +57,7 @@ const AppNotificationPopover = ({
   const handleItemAcknowledge = row => {
     var notification = {
       ...row,
+      isRead: true,
       isAcknowledged: true,
       // acknowledgeDate: moment().formatUTC(false),
     }

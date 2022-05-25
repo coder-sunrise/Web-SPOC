@@ -293,6 +293,7 @@ class Banner extends PureComponent {
       md: 'visreg',
     }
     parameter.vis = this.props.visitRegistration?.entity?.visit?.id
+    parameter.visitMode = 'edit'
     history.push(getAppendUrl(parameter))
   }
   closeNotes = () => this.setState({ showNotesModal: false })
@@ -1785,14 +1786,13 @@ class Banner extends PureComponent {
         >
           <SelectPreOrder
             disabled={
-              (from === 'Pharmacy'
-                ? false
-                : !(
-                    from === 'Appointment' ||
-                    (from === 'VisitReg' && !isReadOnly) ||
-                    from === 'Consultation' ||
-                    (from === 'Dispense' && editingOrder)
-                  )) || actualizePreOrderAccessRight.rights !== 'enable'
+              !(
+                from === 'Appointment' ||
+                (from === 'VisitReg' && !isReadOnly) ||
+                from === 'Consultation' ||
+                (from === 'Dispense' && editingOrder) ||
+                (from === 'Pharmacy' && editingOrder)
+              ) || actualizePreOrderAccessRight.rights !== 'enable'
             }
             onSelectPreOrder={select => {
               if (onSelectPreOrder) onSelectPreOrder(select)

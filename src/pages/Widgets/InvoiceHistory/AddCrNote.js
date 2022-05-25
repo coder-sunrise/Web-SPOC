@@ -28,6 +28,7 @@ import Summary from '@/pages/Finance/Invoice/components/modal/AddCrNote/Summary'
 import MiscCrNote from '@/pages/Finance/Invoice/components/modal/AddCrNote/MiscCrNote'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import { mergeClasses } from '@material-ui/styles'
+import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 
 @connect(({ invoiceCreditNote }) => ({
   invoiceCreditNote,
@@ -73,22 +74,26 @@ import { mergeClasses } from '@material-ui/styles'
       total: finalCredit - gstAmount,
       totalAftGST: finalCredit,
       creditNoteItem: creditNoteItem
-        .filter(x => x.isSelected)
+        .filter(
+          x => x.isSelected && (x.currentQuantity > 0 || x.currentAmount > 0),
+        )
         .map(selectedItem => {
           const { id, concurrencyToken, ...restProps } = selectedItem
 
           const item = {
             ...restProps,
             isInventoryItem:
-              restProps.itemType.toLowerCase() !== 'misc' &&
-              restProps.itemType.toLowerCase() !== 'service',
+              restProps.itemType.toLowerCase() !== 'lab' &&
+              restProps.itemType.toLowerCase() !== 'radiology' &&
+              restProps.itemType.toLowerCase() !== 'service' &&
+              !restProps.isDrugMixture,
             subTotal: restProps.isPackage
               ? restProps.packageRemainingAmountAfterGST
-              : restProps.totalAfterGST,
+              : restProps.currentAmount || 0,
             itemDescription: restProps.itemName,
             quantity: restProps.isPackage
               ? restProps.packageRemainingQuantity
-              : restProps.quantity,
+              : restProps.currentQuantity || 0,
           }
           return { ...item }
         }),
@@ -169,10 +174,8 @@ class AddCrNote extends Component {
     const finalCreditTotal = creditNoteItem.reduce((total, item) => {
       if (rowSelection.includes(item.id)) {
         if (item.isPackage) return total + item.packageRemainingAmountAfterGST
-        return total + item.totalAfterGST
+        return total + item.currentAmount
       }
-      if (item.itemType.toLowerCase() === 'misc')
-        return total + item.totalAfterGST
       return total
     }, 0)
     setFieldValue('finalCredit', roundTo(finalCreditTotal))
@@ -234,106 +237,52 @@ class AddCrNote extends Component {
       }
     }
 
-    const newCreditNoteItem = values.creditNoteItem.map(item => ({
-      ...item,
-      isSelected: newSelection.includes(item.id),
-    }))
-    setFieldValue('creditNoteItem', newCreditNoteItem)
-    this.setState({ selectedRows: newSelection })
-
-    this.handleCalcCrNoteItem(newSelection)
-  }
-
-  onCommitChanges = ({ rows, deleted }) => {
-    const { setFieldValue, values } = this.props
-    const { creditNoteItem } = values
-
-    if (deleted) {
-      const selectedCrItem = creditNoteItem.find(
-        crItem => crItem.id === deleted[0],
+    const newUnSelectItems = this.state.selectedRows.filter(
+      i => !selection.includes(i),
+    )
+    const newSelectItems = selection.filter(
+      i => !this.state.selectedRows.includes(i),
+    )
+    const newCreditNoteItem = values.creditNoteItem.map(item => {
+      if (
+        !newUnSelectItems.find(x => x === item.id) &&
+        !newSelectItems.find(x => x === item.id)
       )
-      if (selectedCrItem.itemType.toLowerCase() !== 'misc') {
-        notification.destroy()
-        notification.error({
-          message: (
-            <div>
-              <h4> </h4>
-              <p>Sorry you are not allowed to delete this item.</p>
-            </div>
-          ),
-          duration: 3,
-        })
+        return item
+
+      if (newUnSelectItems.find(x => x === item.id)) {
+        return {
+          ...item,
+          currentQuantity: 0,
+          currentAmount: 0,
+          isSelected: false,
+        }
       } else {
-        const filteredRows = rows.filter(x => x.id !== selectedCrItem.id)
-        setFieldValue('creditNoteItem', filteredRows)
-        setTimeout(() => this.handleCalcCrNoteItem(), 100)
+        return {
+          ...item,
+          currentQuantity: item.remainQuantity,
+          currentAmount: item.remainAmount,
+          isSelected: true,
+        }
       }
-    }
+    })
 
-    return rows
+    setFieldValue('creditNoteItem', [...newCreditNoteItem])
+    this.setState({ selectedRows: newSelection }, this.handleCalcCrNoteItem)
   }
 
-  handleDeleteRow = row => {
-    if (row.itemType.toLowerCase() !== 'misc') {
-      showErrorNotification(
-        '',
-        'Sorry you are not allowed to delete this item.',
-      )
-      return row
-    }
-    const { values, setFieldValue } = this.props
-    const { creditNoteItem } = values
-    creditNoteItem.splice(row.rowIndex, 1)
-    setFieldValue('creditNoteItem', creditNoteItem)
-    this.handleCalcCrNoteItem()
-    return row
-  }
-
-  handleOnChangeQuantity = () => {
+  handleOnChangeQuantity = (id, value) => {
     const { values } = this.props
     const { creditNoteItem } = values
 
-    creditNoteItem.map(x => {
-      if (x.itemType === 'Misc') return x
-
-      if (x.quantity === x.originRemainingQty) {
-        x.totalAfterGST = x._totalAfterGST
-      } else {
-        x.totalAfterGST = roundTo(x.quantity * x._unitPriceAftGst)
-      }
-      return x
-    })
-
-    setTimeout(() => this.handleCalcCrNoteItem(), 100)
-  }
-
-  handleAddMiscItem = newItem => {
-    const { values, setFieldValue } = this.props
-    const { creditNoteItem } = values
-
-    const tempID = creditNoteItem.reduce((smallestNegativeID, item) => {
-      if (item.id < 0 && item.id < smallestNegativeID) return item.id
-      return smallestNegativeID
-    }, 0)
-    setFieldValue('creditNoteItem', [
-      ...creditNoteItem,
-      {
-        ...newItem,
-        id: tempID,
-        packageGlobalId: '',
-      },
-    ])
-    setTimeout(() => this.handleCalcCrNoteItem(), 100)
-
-    // Auto expand group for non packages
-    if (!this.state.expandedGroups.includes('')) {
-      const groups = this.state.expandedGroups
-      groups.push('')
-
-      this.setState({
-        expandedGroups: groups,
-      })
+    var updateItem = creditNoteItem.find(x => x.id === id)
+    if (value === updateItem.remainQuantity) {
+      updateItem.currentAmount = updateItem._totalAfterGST
+    } else {
+      updateItem.currentAmount = roundTo(value * updateItem._unitPriceAftGst)
     }
+
+    setTimeout(() => this.handleCalcCrNoteItem(), 1)
   }
 
   handleTotalChange = row => event => {
@@ -342,17 +291,16 @@ class AddCrNote extends Component {
     const { gstValue } = values
     let gstAmt = row.gstAmount
 
-    if (target && target.value && event.target.name !== '') {
-      const parseValue = Number(target.value)
-      gstAmt = roundTo(parseValue - parseValue / (1 + gstValue / 100)) || 0
-      const gstFieldName = `${target.name.split('.')[0]}.gstAmount`
-      setFieldValue(gstFieldName, gstAmt)
-      setTimeout(() => this.handleCalcCrNoteItem(), 100)
-    }
+    const parseValue =
+      hasValue(target.value) && target.value !== '' ? target.value : 0
+    gstAmt = roundTo(parseValue - parseValue / (1 + gstValue / 100)) || 0
+    const gstFieldName = `${target.name.split('.')[0]}.gstAmount`
+    setFieldValue(gstFieldName, gstAmt)
+    setTimeout(() => this.handleCalcCrNoteItem(), 1)
   }
 
   drugMixtureIndicator = (row, right) => {
-    if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
+    if (!row.isDrugMixture) return null
 
     return (
       <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
@@ -400,8 +348,9 @@ class AddCrNote extends Component {
     let CrNoteColumns = [
       { name: 'itemType', title: 'Type' },
       { name: 'itemName', title: 'Name' },
-      { name: 'totalAfterGST', title: 'Total Amount ($)' },
-      { name: 'action', title: 'Action' },
+      { name: 'claimAmount', title: 'Payable Amt. ($)' },
+      { name: 'creditNoteAmount', title: 'Total CN Amt. ($)' },
+      { name: 'currentAmount', title: 'Current CN Amt. ($)' },
     ]
 
     if (this.state.isExistPackage) {
@@ -423,7 +372,15 @@ class AddCrNote extends Component {
         title: 'Package',
       })
     } else {
-      CrNoteColumns.splice(2, 0, { name: 'quantity', title: 'Quantity' })
+      CrNoteColumns.splice(2, 0, { name: 'quantity', title: 'Total Qty.' })
+      CrNoteColumns.splice(3, 0, {
+        name: 'creditNoteQuantity',
+        title: 'Total CN Qty.',
+      })
+      CrNoteColumns.splice(4, 0, {
+        name: 'currentQuantity',
+        title: 'Current CN Qty.',
+      })
     }
 
     return (
@@ -434,9 +391,9 @@ class AddCrNote extends Component {
           FuncProps={{
             selectable: true,
             selectConfig: {
-              showSelectAll: false,
+              showSelectAll: true,
               rowSelectionEnabled: row =>
-                row.itemType !== 'Misc' &&
+                (row.remainQuantity > 0 || row.remainAmount > 0) &&
                 (!row.isPackage ||
                   (row.isPackage &&
                     !row.isPackageExpired &&
@@ -464,6 +421,7 @@ class AddCrNote extends Component {
             {
               columnName: 'itemType',
               width: 150,
+              sortingEnabled: false,
               render: row => {
                 let paddingRight = 0
                 if (row.isPreOrder) {
@@ -518,38 +476,72 @@ class AddCrNote extends Component {
               },
             },
             {
+              columnName: 'itemName',
+              sortingEnabled: false,
+            },
+            {
               columnName: 'quantity',
-              width: 150,
-              align: this.state.isExistPackage ? 'right' : 'left',
+              width: 100,
+              type: 'number',
+              sortingEnabled: false,
+            },
+            {
+              columnName: 'creditNoteQuantity',
+              width: 100,
+              type: 'number',
+              sortingEnabled: false,
+            },
+            {
+              columnName: 'currentQuantity',
+              width: 120,
+              align: 'right',
+              sortingEnabled: false,
               render: row => {
-                const { quantity, originRemainingQty, isPackage } = row
+                const { currentQuantity, remainQuantity, isPackage } = row
 
                 if (isPackage) {
                   return (
-                    <NumberInput size='sm' text value={quantity} format='0.0' />
+                    <NumberInput
+                      size='sm'
+                      text
+                      value={currentQuantity}
+                      format='0.0'
+                    />
                   )
                 }
 
                 return (
                   <Field
-                    name={`creditNoteItem[${row.rowIndex}].quantity`}
+                    name={`creditNoteItem[${row.rowIndex}].currentQuantity`}
                     render={args => {
+                      const selectItem =
+                        args.form.values.creditNoteItem[row.rowIndex]
                       return (
                         <SizeContainer size='sm'>
                           <NumberInput
                             size='sm'
-                            style={{ width: '92%' }}
-                            disabled={row.itemType.toLowerCase() === 'misc'}
-                            onChange={this.handleOnChangeQuantity}
-                            min={1}
+                            text={
+                              !selectItem.isSelected || row.remainQuantity === 0
+                            }
+                            onChange={e =>
+                              this.handleOnChangeQuantity(
+                                creditNoteItem[row.rowIndex].id,
+                                hasValue(e.target.value) &&
+                                  e.target.value !== ''
+                                  ? e.target.value
+                                  : 0,
+                              )
+                            }
+                            min={0}
+                            max={row.remainQuantity}
                             {...args}
                             format='0.0'
                           />
-                          {quantity > originRemainingQty ? (
+                          {currentQuantity > remainQuantity ? (
                             <Tooltip
                               title={
                                 <p style={{ color: 'red', fontSize: 12 }}>
-                                  {`Item exceed quantity limits. (Maximum: ${originRemainingQty})`}
+                                  {`Item exceed quantity limits. (Maximum: ${remainQuantity})`}
                                 </p>
                               }
                             >
@@ -571,6 +563,7 @@ class AddCrNote extends Component {
               columnName: 'packageConsumeQuantity',
               width: 150,
               align: 'right',
+              sortingEnabled: false,
               render: row => {
                 const { quantity, packageRemainingQuantity, isPackage } = row
                 const totalConsumedQuantity =
@@ -592,6 +585,7 @@ class AddCrNote extends Component {
               columnName: 'packageRemainingQuantity',
               width: 150,
               align: 'right',
+              sortingEnabled: false,
               render: row => {
                 const { packageRemainingQuantity } = row
 
@@ -606,9 +600,22 @@ class AddCrNote extends Component {
               },
             },
             {
-              columnName: 'totalAfterGST',
+              columnName: 'claimAmount',
+              width: 120,
+              type: 'currency',
+              sortingEnabled: false,
+            },
+            {
+              columnName: 'creditNoteAmount',
+              width: 125,
+              type: 'currency',
+              sortingEnabled: false,
+            },
+            {
+              columnName: 'currentAmount',
               width: 150,
               align: 'right',
+              sortingEnabled: false,
               render: row => {
                 if (row.isPackage) {
                   return (
@@ -623,46 +630,26 @@ class AddCrNote extends Component {
 
                 return (
                   <Field
-                    name={`creditNoteItem[${row.rowIndex}].totalAfterGST`}
-                    render={args => (
-                      <SizeContainer size='sm'>
-                        <NumberInput
-                          {...args}
-                          currency
-                          text={!row.isSelected}
-                          onChange={this.handleTotalChange(row)}
-                        />
-                      </SizeContainer>
-                    )}
+                    name={`creditNoteItem[${row.rowIndex}].currentAmount`}
+                    render={args => {
+                      const selectItem =
+                        args.form.values.creditNoteItem[row.rowIndex]
+                      return (
+                        <SizeContainer size='sm'>
+                          <NumberInput
+                            {...args}
+                            currency
+                            min={0}
+                            max={row.remainAmount}
+                            text={
+                              !selectItem.isSelected || row.remainAmount === 0
+                            }
+                            onChange={this.handleTotalChange(row)}
+                          />
+                        </SizeContainer>
+                      )
+                    }}
                   />
-                )
-              },
-            },
-
-            {
-              columnName: 'action',
-              align: 'center',
-              width: 78,
-              render: row => {
-                return (
-                  <div>
-                    {row.itemType.toLowerCase() === 'misc' ? (
-                      <Popconfirm
-                        title='Delete the selected item?'
-                        onConfirm={() => {
-                          this.handleDeleteRow(row)
-                        }}
-                      >
-                        <Tooltip title='Delete Misc. Item' placement='top-end'>
-                          <Button size='sm' justIcon color='danger'>
-                            <Delete />
-                          </Button>
-                        </Tooltip>
-                      </Popconfirm>
-                    ) : (
-                      ''
-                    )}
-                  </div>
                 )
               },
             },
@@ -670,12 +657,6 @@ class AddCrNote extends Component {
         />
 
         <Summary invoiceDetail={invoiceDetail} />
-        <MiscCrNote
-          handleAddMiscItem={this.handleAddMiscItem}
-          handleCalcFinalTotal={this.handleCalcCrNoteItem}
-          gstValue={values.gstValue}
-          // {...this.props}
-        />
 
         <GridContainer>
           <GridItem md={9}>
@@ -689,10 +670,11 @@ class AddCrNote extends Component {
               color='primary'
               onClick={handleSubmit}
               disabled={
-                finalCredit <= 0 ||
                 creditNoteItem.filter(
-                  x => x.quantity > x.originRemainingQty && x.isSelected,
-                ).length > 0
+                  x =>
+                    x.isSelected &&
+                    (x.currentQuantity > 0 || x.currentAmount > 0),
+                ).length <= 0
               }
             >
               Save

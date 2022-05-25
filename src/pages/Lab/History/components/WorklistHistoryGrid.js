@@ -333,6 +333,7 @@ export const WorklistHistoryGrid = ({ labWorklistHistory }) => {
             }
           }
         }}
+        className='noBgTable'
         bordered
         columns={columns}
         dataSource={groupedTestPanels}
@@ -366,13 +367,13 @@ export const WorklistHistoryGrid = ({ labWorklistHistory }) => {
               <Typography.Text strong>
                 {record.patientName} ({record.patientReferenceNo})
               </Typography.Text>
-              <Typography.Text type='secondary'>
+              <Typography.Text>
                 {record.doctor},{' '}
                 {record.visitDate.format(dateFormatLongWithTimeNoSec)}
               </Typography.Text>
               <VisitTypeTag type={record.visitPurposeFK} />
             </Space>
-            <Space>
+            <Space style={{ fontWeight: 'bold' }}>
               <span>{getSpecimenCountByCategory(record.visitFK)}</span>
             </Space>
           </div>
