@@ -293,6 +293,7 @@ class Banner extends PureComponent {
       md: 'visreg',
     }
     parameter.vis = this.props.visitRegistration?.entity?.visit?.id
+    parameter.visitMode = 'edit'
     history.push(getAppendUrl(parameter))
   }
   closeNotes = () => this.setState({ showNotesModal: false })
