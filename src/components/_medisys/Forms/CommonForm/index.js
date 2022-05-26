@@ -86,7 +86,10 @@ class CommonForm extends PureComponent {
     let isSignatured = false
     if(isSelectionInEditRegion) {
       const { start, end } = e.source.documentEditor.selection
-      if(start.currentWidget.children.some(x=> x.constructor.name === 'ImageElementBox'))
+      if(start.currentWidget.children.some(x=> {
+        console.log({currentWidget:x,className:x.constructor.name})
+        return x.constructor.name === 'ImageElementBox'
+      }))
         isSignatured = true
     }
     if (this.mouseClicked && this.props.values.statusFK !== 2 && !isImageSelected && !isSelectionInEditRegion && this.state.signatureCounter > 0)
