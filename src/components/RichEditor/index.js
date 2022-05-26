@@ -391,7 +391,8 @@ class RichEditor extends React.PureComponent {
           onFocus={this._onFocus}
           editorRef={this.setEditorReference}
           stripPastedStyles
-          // handlePastedText={this.handlePastedText}
+          //https://github.com/jpuri/react-draft-wysiwyg/issues/967
+          handlePastedText={() => false}
           {...metionCfg}
           {...this.editorCfg}
           {...this.props}
