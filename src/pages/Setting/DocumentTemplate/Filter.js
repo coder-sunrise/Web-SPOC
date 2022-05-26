@@ -131,13 +131,13 @@ class Filter extends PureComponent {
                     type: 'settingDocumentTemplate/query',
                     payload: {
                       isActive,
+                      documentTemplateTypeFK,
+                      documentCategoryFK,
                       group: [
                         {
                           code: codeDisplayValue,
                           displayValue: codeDisplayValue,
-                          documentTemplateTypeFK,
-                          documentCategoryFK,
-                          combineCondition: 'and',
+                          combineCondition: 'or',
                         },
                       ],
                     },
