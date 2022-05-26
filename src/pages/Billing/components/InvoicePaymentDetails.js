@@ -1,6 +1,7 @@
 import { Table } from 'antd'
 import numeral from 'numeral'
 import { currencySymbol } from '@/utils/config'
+import { roundTo } from '@/utils/utils'
 import { GridContainer, GridItem, Tooltip } from '@/components'
 import AmountSummary from '@/pages/Widgets/PatientHistory/AmountSummary'
 const showMoney = (v = 0) => {
@@ -30,7 +31,10 @@ const InvoicePaymentDetails = ({ invoice = {} }) => {
           pagination={false}
           dataSource={invoiceItems.map(item => ({
             ...item,
-            outstanding: item.totalAfterGst - item.totalClaim - item.paidAmount,
+            outstanding: roundTo(
+              item.totalAfterGst - item.totalClaim - item.paidAmount,
+              2,
+            ),
           }))}
           columns={[
             {

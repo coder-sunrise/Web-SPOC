@@ -190,18 +190,23 @@ class InvoiceListing extends PureComponent {
     const {
       values: { invoiceList },
       billingDetails: { selectedRows },
+      isEnableAddPayment,
     } = this.props
     return (
       <CommonTableGrid
         rows={invoiceList}
-        columns={columns}
+        columns={
+          isEnableAddPayment
+            ? columns
+            : columns.filter(x => x.name !== 'payAmount')
+        }
         columnExtensions={columnExtensions}
         getRowId={getRowId}
         forceRender
         FuncProps={{
           pager: false,
           filter: false,
-          selectable: true,
+          selectable: isEnableAddPayment,
           selectConfig: {
             showSelectAll: true,
             rowSelectionEnabled: row => {

@@ -25,7 +25,6 @@ const PaymentActions = ({
   readOnly,
   isEnableWriteOffinInvoice,
   visitOrderTemplateFK,
-  isEditInvoiceBillingEnable,
 }) => {
   const [showPrintInvoiceMenu, setShowPrintInvoiceMenu] = useState(false)
   const ButtonProps = {
@@ -34,9 +33,19 @@ const PaymentActions = ({
     color: 'primary',
     size: 'sm',
   }
+  const isEnableAddPayment = () => {
+    if (type === PayerType.PATIENT)
+      return ableToViewByAuthority('finance.addpatientpayment')
+    return ableToViewByAuthority('finance.addcopayerpayment')
+  }
+  const isEnableAddCreditNote = () => {
+    if (type === PayerType.PATIENT)
+      return ableToViewByAuthority('finance.addpatientcreditnote')
+    return ableToViewByAuthority('finance.addpatientcreditnote')
+  }
   return (
     <div>
-      {(type === PayerType.PATIENT || isEditInvoiceBillingEnable) && (
+      {isEnableAddPayment() && (
         <Button
           onClick={() => handleAddPayment(invoicePayerFK)}
           disabled={!handleAddPayment || readOnly}
@@ -46,17 +55,16 @@ const PaymentActions = ({
           Add Payment
         </Button>
       )}
-      {ableToViewByAuthority('finance.addcreditnote') &&
-        type !== PayerType.GOVT_COPAYER && (
-          <Button
-            onClick={() => handleAddCrNote(invoicePayerFK, type)}
-            disabled={!handleAddCrNote || readOnly}
-            {...ButtonProps}
-          >
-            <Add />
-            Add Cr. Note
-          </Button>
-        )}
+      {isEnableAddCreditNote() && type !== PayerType.GOVT_COPAYER && (
+        <Button
+          onClick={() => handleAddCrNote(invoicePayerFK, type)}
+          disabled={!handleAddCrNote || readOnly}
+          {...ButtonProps}
+        >
+          <Add />
+          Add Cr. Note
+        </Button>
+      )}
       {type === PayerType.PATIENT && (
         <Button
           onClick={() => handleTransferToDeposit(invoicePayerFK)}
@@ -79,16 +87,17 @@ const PaymentActions = ({
             Write Off
           </Button>
         )}
-      {type === PayerType.COPAYER_REAL && isEditInvoiceBillingEnable && (
-        <Button
-          onClick={() => handleTransferClick(invoicePayerFK, type)}
-          disabled={!handleTransferClick || readOnly}
-          {...ButtonProps}
-        >
-          <RepeatIcon />
-          Transfer
-        </Button>
-      )}
+      {type === PayerType.COPAYER_REAL &&
+        ableToViewByAuthority('finance.transfercopayerbalancetopatient') && (
+          <Button
+            onClick={() => handleTransferClick(invoicePayerFK, type)}
+            disabled={!handleTransferClick || readOnly}
+            {...ButtonProps}
+          >
+            <RepeatIcon />
+            Transfer
+          </Button>
+        )}
       <Popover
         icon={null}
         trigger='click'

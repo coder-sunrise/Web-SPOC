@@ -5,8 +5,7 @@ import { withStyles } from '@material-ui/core/styles'
 import { Button, Tabs } from '@/components'
 // utils
 import { INVOICE_VIEW_MODE } from '@/utils/constants'
-import Authorized from '@/utils/Authorized'
-import AuthorizedContext from '@/components/Context/Authorized'
+import { ableToViewByAuthority } from '@/utils/utils'
 // sub components
 import InvoiceDetails from './InvoiceDetails'
 import PaymentDetails from './PaymentDetails'
@@ -34,10 +33,7 @@ const Content = ({
   const patientIsActive = patientProfile && patientProfile.isActive
 
   const { settings = [] } = clinicSettings
-  const {
-    isEnableVisitationInvoiceReport = false,
-    isEditInvoiceBillingEnable = false,
-  } = settings
+  const { isEnableVisitationInvoiceReport = false } = settings
 
   const [active, setActive] = useState('1')
 
@@ -138,27 +134,22 @@ const Content = ({
     })
   }
 
-  const checkEditInvoiceAccessRight = () => {
-    const editInvoiceRight = Authorized.check('finance.editinvoice')
-
-    if (!editInvoiceRight || editInvoiceRight.rights !== 'enable') {
-      return editInvoiceRight ? editInvoiceRight.rights : 'hidden'
+  const isShowEditInvoice = () => {
+    const isEnableEditInvoice = ableToViewByAuthority('finance.editinvoice')
+    if (!isEnableEditInvoice) {
+      return false
     }
-
-    const editInvoiceWithPaymentRight = Authorized.check(
+    const isEnableEditInvoiceWithPayment = ableToViewByAuthority(
       'finance.editinvoice.editinvoicewithpayment',
     )
     if (
-      (!editInvoiceWithPaymentRight ||
-        editInvoiceWithPaymentRight.rights !== 'enable') &&
+      !isEnableEditInvoiceWithPayment &&
       (invoicePayment.entity || []).find(item =>
         item.invoicePayment.find(payment => !payment.isCancelled),
       )
     )
-      return editInvoiceWithPaymentRight
-        ? editInvoiceWithPaymentRight.rights
-        : 'hidden'
-    return 'enable'
+      return false
+    return true
   }
   return (
     <React.Fragment>
@@ -171,26 +162,19 @@ const Content = ({
             onChange={e => setActive(e)}
             options={InvoicePaymentTabOption}
           />
-          {isEditInvoiceBillingEnable && (
-            <AuthorizedContext.Provider
-              value={{
-                rights: checkEditInvoiceAccessRight(),
+          {isShowEditInvoice() && (
+            <Button
+              className={classes.editInvoiceButton}
+              color='primary'
+              onClick={() => {
+                switchMode(INVOICE_VIEW_MODE.Edit_Invoice)
               }}
+              disabled={disableEditInvoice()}
             >
-              <Button
-                className={classes.editInvoiceButton}
-                color='primary'
-                onClick={() => {
-                  switchMode(INVOICE_VIEW_MODE.Edit_Invoice)
-                }}
-                disabled={disableEditInvoice()}
-              >
-                Edit Invoice
-              </Button>
-            </AuthorizedContext.Provider>
+              Edit Invoice
+            </Button>
           )}
-
-          {isEditInvoiceBillingEnable && (
+          {ableToViewByAuthority('finance.applyscheme') && (
             <Button
               className={classes.applySchemeButton}
               color='primary'
