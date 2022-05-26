@@ -123,6 +123,7 @@ import _ from 'lodash'
       paymentReceivedBizSessionFK,
       paymentCreatedBizSessionFK,
       invoicePayerItem = [],
+      selectedRows = [],
     } = values
     const returnValue = {
       invoicePaymentMode: paymentList.map((payment, index) => ({
@@ -145,7 +146,9 @@ import _ from 'lodash'
       invoicePayment_InvoicePayerInfo:
         values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT
           ? invoicePayerItem
-              .filter(x => x.totalPaidAmount > 0)
+              .filter(
+                x => selectedRows.indexOf(x.id) >= 0 && x.totalPaidAmount > 0,
+              )
               .map(x => ({
                 invoicePayerInfoFK: x.id,
                 paidAmount: x.totalPaidAmount,
@@ -781,6 +784,20 @@ class AddPayment extends Component {
                       notification.warning({
                         message:
                           'Total payment should not more than selected amount.',
+                      })
+                      return
+                    }
+                    if (
+                      values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT &&
+                      invoicePayerItem.find(
+                        x =>
+                          selectedRows.indexOf(x.id) >= 0 &&
+                          x.totalPaidAmount > x.allowMaxPaid,
+                      )
+                    ) {
+                      notification.warning({
+                        message:
+                          'There are some overpaid item(s), please update.',
                       })
                       return
                     }
