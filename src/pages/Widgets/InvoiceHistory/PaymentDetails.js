@@ -451,6 +451,7 @@ class PaymentDetails extends Component {
           onConfirm={this.closeAddPaymentModal}
           onClose={this.closeAddPaymentModal}
           observe='AddPaymentForm'
+          maxWidth='lg'
         >
           <AddPayment
             handleSubmit={this.onSubmitAddPayment}
