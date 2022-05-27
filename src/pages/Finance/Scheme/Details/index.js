@@ -30,7 +30,7 @@ const styles = theme => ({
   },
   rdoInput: {
     marginBottom: 30,
-    marginLeft: 30,
+    marginLeft: 24,
   },
 })
 

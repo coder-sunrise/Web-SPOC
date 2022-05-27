@@ -81,14 +81,23 @@ class RadioGroup extends React.Component {
           <Space direction={vertical ? 'vertical' : 'horizontal'}>
             {options.map(o => {
               return (
-                <Radio
-                  value={o[valueField]}
-                  onClick={() => {
-                    this.handleChange(o[valueField])
-                  }}
+                <div
+                  className={`${classes.checkboxAndRadio} ${
+                    vertical
+                      ? classes.vertical
+                      : classes.checkboxAndRadioHorizontal
+                  }`}
+                  key={o[valueField]}
                 >
-                  {o[textField]}
-                </Radio>
+                  <Radio
+                    value={o[valueField]}
+                    onClick={() => {
+                      this.handleChange(o[valueField])
+                    }}
+                  >
+                    {o[textField]}
+                  </Radio>
+                </div>
               )
             })}
           </Space>
