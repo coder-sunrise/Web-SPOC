@@ -215,8 +215,8 @@ export const ExaminationDetails = ({
                 buttonType='text'
                 cannedTextTypeFK={CANNED_TEXT_TYPE.RADIOGRAPHERCOMMENT}
                 style={{
-                  marginRight: 0,
-                  marginBottom: 8,
+                  marginRight: 8,
+                  marginBottom: 0,
                 }}
                 handleSelectCannedText={cannedText => {
                   setComment((comment ? comment + '\n' : '') + cannedText.text)
@@ -225,15 +225,17 @@ export const ExaminationDetails = ({
               />
             </GridItem>
             <GridItem md={12}>
-              <Input.TextArea
-                maxLength={2000}
-                value={comment}
-                onChange={e => {
-                  setComment(e.target.value)
-                  setHasChanged(true)
-                }}
-                autoSize={{ minRows: 3, maxRows: 5 }}
-              />
+              <div style={{ margin: '0px 8px' }}>
+                <Input.TextArea
+                  maxLength={2000}
+                  value={comment}
+                  onChange={e => {
+                    setComment(e.target.value)
+                    setHasChanged(true)
+                  }}
+                  autoSize={{ minRows: 3, maxRows: 5 }}
+                />
+              </div>
             </GridItem>
             {workitem.statusFK ===
               RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED &&

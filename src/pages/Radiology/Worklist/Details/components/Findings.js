@@ -27,7 +27,7 @@ import { scribbleTypes } from '@/utils/codes'
 
 const useStyles = makeStyles(theme => ({
   editor: {
-    fontSize: '0.9rem',
+    fontSize: '14px',
     minHeight: '500px',
   },
 }))
