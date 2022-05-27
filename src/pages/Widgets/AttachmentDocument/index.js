@@ -76,7 +76,7 @@ class AttachmentDocument extends Component {
   }
 
   updateAttachments = args => ({ added, deleted }) => {
-    const { dispatch, modelName, type } = this.props
+    const { dispatch, modelName, type, coPayerFK } = this.props
     const { list = [] } = this.props[modelName]
     const { field } = args
 
@@ -122,7 +122,7 @@ class AttachmentDocument extends Component {
         if (type === FOLDER_TYPE.PATIENT) {
           payload = { ...payload, patientProfileFK: findGetParameter('pid') }
         } else {
-          payload = { ...payload, coPayerFK: findGetParameter('id') }
+          payload = { ...payload, coPayerFK: coPayerFK }
         }
         dispatch({
           type: `${modelName}/upsert`,

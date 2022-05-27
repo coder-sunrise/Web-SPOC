@@ -247,6 +247,7 @@ const Detail = props => {
           </div>
           <AttachmentDocument
             {...props}
+            coPayerFK={props.values.id}
             type={FOLDER_TYPE.COPAYER}
             modelName='coPayerAttachment'
             isEnableEditDocument={addDocumentAccessRight.rights === 'enable'}
