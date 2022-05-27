@@ -10,6 +10,7 @@ import {
   CardContainer,
 } from '@/components'
 import { withStyles, Paper } from '@material-ui/core'
+import { ableToViewByAuthority } from '@/utils/utils'
 import Header from './Header'
 import InvoiceListing from './InvoiceListing'
 import FilterBar from './FilterBar'
@@ -132,12 +133,21 @@ class CorporateBillingDetails extends PureComponent {
               <FilterBar {...this.props} searchInvoice={this.searchInvoice} />
             </div>
             <GridContainer style={{ marginTop: 18 }}>
-              <GridItem md={9}>
-                <InvoiceListing {...this.props} />
+              <GridItem
+                md={ableToViewByAuthority('finance.addcopayerpayment') ? 9 : 12}
+              >
+                <InvoiceListing
+                  {...this.props}
+                  isEnableAddPayment={ableToViewByAuthority(
+                    'finance.addcopayerpayment',
+                  )}
+                />
               </GridItem>
-              <GridItem md={3}>
-                <Payment {...this.props} searchCompany={this.searchCompany} />
-              </GridItem>
+              {ableToViewByAuthority('finance.addcopayerpayment') && (
+                <GridItem md={3}>
+                  <Payment {...this.props} searchCompany={this.searchCompany} />
+                </GridItem>
+              )}
             </GridContainer>
           </CardContainer>
         </Paper>

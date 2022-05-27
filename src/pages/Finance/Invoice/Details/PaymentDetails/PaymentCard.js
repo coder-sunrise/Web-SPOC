@@ -11,6 +11,7 @@ import {
 } from '@/components'
 // sub component
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+import { ableToViewByAuthority } from '@/utils/utils'
 import PaymentRow from './PaymentRow'
 import PaymentActions from './PaymentActions'
 import PaymentSummary from './PaymentSummary'
@@ -92,7 +93,16 @@ const PaymentCard = ({
       </p>
     )
   }
-
+  const isEnableDeletePayment = () => {
+    if (payerTypeFK === INVOICE_PAYER_TYPE.PATIENT)
+      return ableToViewByAuthority('finance.deletepatientpayment')
+    return ableToViewByAuthority('finance.deletecopayerpayment')
+  }
+  const isEnableDeleteCreditNote = () => {
+    if (payerTypeFK === INVOICE_PAYER_TYPE.PATIENT)
+      return ableToViewByAuthority('finance.deletepatientcreditnote')
+    return ableToViewByAuthority('finance.deletecopayercreditnote')
+  }
   return (
     <CardContainer hideHeader>
       {_payerName}
@@ -100,15 +110,19 @@ const PaymentCard = ({
         <CardContainer hideHeader size='sm'>
           {payments
             .sort((a, b) => moment(a.date) - moment(b.date))
-            .map(payment => (
-              <PaymentRow
-                {...payment}
-                isEnableWriteOffinInvoice={isEnableWriteOffinInvoice}
-                handleVoidClick={handleVoidClick}
-                handlePrinterClick={handlePrinterClick}
-                readOnly={readOnly || !patientIsActive}
-              />
-            ))}
+            .map(payment => {
+              return (
+                <PaymentRow
+                  {...payment}
+                  isEnableWriteOffinInvoice={isEnableWriteOffinInvoice}
+                  handleVoidClick={handleVoidClick}
+                  handlePrinterClick={handlePrinterClick}
+                  readOnly={readOnly || !patientIsActive}
+                  isEnableDeletePayment={isEnableDeletePayment()}
+                  isEnableDeleteCreditNote={isEnableDeleteCreditNote()}
+                />
+              )
+            })}
         </CardContainer>
       )}
       <GridContainer alignItems='center'>

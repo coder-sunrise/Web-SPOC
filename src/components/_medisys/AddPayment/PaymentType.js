@@ -17,12 +17,20 @@ const PayerHeader = ({
   patientInfo,
   currentPayments = [],
   currentOSAmount,
+  maxHeight,
 }) => {
   const disableCash = currentPayments.includes(PAYMENT_MODE.CASH)
-  const disableDeposit = currentPayments.includes(PAYMENT_MODE.DEPOSIT) || currentOSAmount <= 0
+  const disableDeposit =
+    currentPayments.includes(PAYMENT_MODE.DEPOSIT) || currentOSAmount <= 0
   return (
-    <CardContainer className={classes.paymentModeContainer} hideHeader>
-      {paymentModes.map((mode) => (
+    <CardContainer
+      hideHeader
+      className={classes.paymentModeContainer}
+      style={{
+        maxHeight: maxHeight,
+      }}
+    >
+      {paymentModes.map(mode => (
         <PaymentTypeRow
           mode={mode}
           hideDeposit={hideDeposit}

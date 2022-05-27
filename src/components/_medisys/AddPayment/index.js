@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import moment from 'moment'
 import { connect } from 'dva'
 import * as Yup from 'yup'
+import $ from 'jquery'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
@@ -123,6 +124,7 @@ import _ from 'lodash'
       paymentReceivedBizSessionFK,
       paymentCreatedBizSessionFK,
       invoicePayerItem = [],
+      selectedRows = [],
     } = values
     const returnValue = {
       invoicePaymentMode: paymentList.map((payment, index) => ({
@@ -145,7 +147,9 @@ import _ from 'lodash'
       invoicePayment_InvoicePayerInfo:
         values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT
           ? invoicePayerItem
-              .filter(x => x.totalPaidAmount > 0)
+              .filter(
+                x => selectedRows.indexOf(x.id) >= 0 && x.totalPaidAmount > 0,
+              )
               .map(x => ({
                 invoicePayerInfoFK: x.id,
                 paidAmount: x.totalPaidAmount,
@@ -575,6 +579,12 @@ class AddPayment extends Component {
     setTimeout(() => this.calculatePayment(), 100)
   }
 
+  getModeMaxHeight = () => {
+    const { height } = this.props
+    const maxHeight = height - $('.paymentItems').height() - 312
+    return maxHeight > 200 ? maxHeight : 200
+  }
+
   render() {
     const {
       classes,
@@ -602,11 +612,11 @@ class AddPayment extends Component {
             />
           )}
           <GridContainer className={classes.paymentContent}>
-            {values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT && (
-              <GridItem md={12}>
+            <GridItem md={12} className='paymentItems'>
+              {values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT && (
                 <div>
                   <div style={{ margin: '4px 0px' }}>
-                    Available invoice items under current invoice:
+                    Available payment items under current invoice:
                   </div>
                   <EditableTableGrid
                     size='sm'
@@ -729,10 +739,12 @@ class AddPayment extends Component {
                     })}
                   />
                 </div>
-              </GridItem>
-            )}
+              )}
+            </GridItem>
             <GridItem md={12}>
-              <h4>Payment Mode: </h4>
+              <div style={{ fontSize: '1.2rem', marginBottom: '-3px' }}>
+                Payment Mode:
+              </div>
             </GridItem>
             <GridItem md={3} className={classes.noPaddingLeft}>
               <PaymentType
@@ -744,15 +756,17 @@ class AddPayment extends Component {
                 patientInfo={patient}
                 handlePaymentTypeClick={this.onPaymentTypeClick}
                 currentOSAmount={values.invoiceOSAmount}
+                maxHeight={this.getModeMaxHeight()}
               />
             </GridItem>
-            <GridItem md={9}>
+            <GridItem md={9} className={classes.noPaddingLeft}>
               <PaymentCard
                 paymentList={values.paymentList}
                 handleDeletePayment={this.onDeleteClick}
                 handleAmountChange={this.handleAmountChange}
                 setFieldValue={this.props.setFieldValue}
                 patientInfo={patient}
+                maxHeight={this.getModeMaxHeight()}
               />
             </GridItem>
           </GridContainer>
@@ -781,6 +795,33 @@ class AddPayment extends Component {
                       notification.warning({
                         message:
                           'Total payment should not more than selected amount.',
+                      })
+                      return
+                    }
+                    if (
+                      values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT &&
+                      !invoicePayerItem.find(
+                        x =>
+                          selectedRows.indexOf(x.id) >= 0 &&
+                          x.totalPaidAmount > 0,
+                      )
+                    ) {
+                      notification.warning({
+                        message: 'Total payment amount should more than $0.00.',
+                      })
+                      return
+                    }
+                    if (
+                      values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT &&
+                      invoicePayerItem.find(
+                        x =>
+                          selectedRows.indexOf(x.id) >= 0 &&
+                          x.totalPaidAmount > x.allowMaxPaid,
+                      )
+                    ) {
+                      notification.warning({
+                        message:
+                          'There are some overpaid item(s), please update.',
                       })
                       return
                     }

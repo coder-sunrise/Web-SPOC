@@ -440,7 +440,6 @@ class PaymentDetails extends Component {
     const { hasActiveSession } = this.state
     const {
       enableWriteOffinInvoice: isEnableWriteOffinInvoice,
-      isEditInvoiceBillingEnable = false,
     } = clinicSettings.settings
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
@@ -508,7 +507,6 @@ class PaymentDetails extends Component {
                     hasActiveSession={hasActiveSession}
                     isEnableWriteOffinInvoice={isEnableWriteOffinInvoice}
                     visitOrderTemplateFK={entity?.visitOrderTemplateFK}
-                    isEditInvoiceBillingEnable={isEditInvoiceBillingEnable}
                   />
                 )
               })

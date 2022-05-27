@@ -15,15 +15,15 @@ import styles from './styles'
 import { PAYMENT_MODE } from '@/utils/constants'
 
 const MapPaymentType = {
-  [PAYMENT_MODE.CASH]: (props) => <CashPayment {...props} />,
-  [PAYMENT_MODE.NETS]: (props) => <NetsPayment {...props} />,
-  [PAYMENT_MODE.CREDIT_CARD]: (props) => <CreditCardPayment {...props} />,
-  [PAYMENT_MODE.CHEQUE]: (props) => <ChequePayment {...props} />,
-  [PAYMENT_MODE.GIRO]: (props) => <GiroPayment {...props} />,
-  [PAYMENT_MODE.DEPOSIT]: (props) => <DepositPayment {...props} />,
+  [PAYMENT_MODE.CASH]: props => <CashPayment {...props} />,
+  [PAYMENT_MODE.NETS]: props => <NetsPayment {...props} />,
+  [PAYMENT_MODE.CREDIT_CARD]: props => <CreditCardPayment {...props} />,
+  [PAYMENT_MODE.CHEQUE]: props => <ChequePayment {...props} />,
+  [PAYMENT_MODE.GIRO]: props => <GiroPayment {...props} />,
+  [PAYMENT_MODE.DEPOSIT]: props => <DepositPayment {...props} />,
 }
 
-const predefinedMode = Object.keys(PAYMENT_MODE).map((e) => {
+const predefinedMode = Object.keys(PAYMENT_MODE).map(e => {
   return PAYMENT_MODE[e]
 })
 
@@ -50,8 +50,8 @@ class PaymentCard extends Component {
     )
   }
 
-  render () {
-    const { classes, paymentList } = this.props
+  render() {
+    const { classes, paymentList, maxHeight } = this.props
     const noPayment = paymentList.length === 0
 
     const emptyStateClass = classnames({
@@ -60,7 +60,13 @@ class PaymentCard extends Component {
     })
 
     return (
-      <CardContainer hideHeader className={classes.paymentTypeContainer}>
+      <CardContainer
+        hideHeader
+        className={classes.paymentTypeContainer}
+        style={{
+          maxHeight: maxHeight,
+        }}
+      >
         {!noPayment ? (
           <GridContainer justify='space-between' alignItems='flex-end'>
             {paymentList.map(this.MapPaymentTypeToComponent)}
