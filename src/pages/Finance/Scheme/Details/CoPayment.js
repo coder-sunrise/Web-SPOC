@@ -104,8 +104,9 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
           render={args => (
             <RadioGroup
               label=''
-              inputClass={classes.rdoInput}
+              className={classes.rdoInput}
               onChange={onRadioButtonChange}
+              vertical
               options={[
                 {
                   value: 'all',
