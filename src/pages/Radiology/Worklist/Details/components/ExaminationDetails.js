@@ -207,7 +207,9 @@ export const ExaminationDetails = ({
 
             <GridItem md={2}>
               <RightAlignGridItem md={12}>
-                Technologist Comments :
+                <div style={{ position: 'relative', top: 10 }}>
+                  Technologist Comments :
+                </div>
               </RightAlignGridItem>
             </GridItem>
             <GridItem md={10} style={{ textAlign: 'right' }}>
