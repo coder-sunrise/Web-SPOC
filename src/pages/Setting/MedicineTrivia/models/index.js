@@ -24,12 +24,19 @@ export default createListViewModel({
     effects: {
       *query({ payload }, { put, select, call }) {
         const clinicSetting = yield select(st => st.clinicSettings)
-        const result = yield call(service.queryList, payload)
+        const settingMedicineTrivia = yield select(
+          st => st.settingMedicineTrivia,
+        )
+        const result = yield call(service.queryList, {
+          ...payload,
+          pageSize: settingMedicineTrivia.pagination.pagesize || 20,
+        })
 
         if (result.status === '200') {
           yield put({
             type: 'queryDone',
             payload: {
+              currentFilter: payload,
               clinicSetting,
               data: result.data,
             },
@@ -41,6 +48,7 @@ export default createListViewModel({
       queryDone(st, { payload }) {
         const {
           data,
+          currentFilter,
           clinicSetting: {
             settings: { secondaryPrintoutLanguage = '' },
           },
@@ -58,6 +66,7 @@ export default createListViewModel({
               ),
             }
           }),
+          currentFilter,
           pagination: {
             ...st.pagination,
             current: data.currentPage || 1,

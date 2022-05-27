@@ -30,13 +30,19 @@ export default createListViewModel({
     },
     effects: {
       *query({ payload }, { put, select, call }) {
-        const clinicSetting = yield select(st => st.clinicSettings) 
-        const result = yield call(service.queryList, payload)
-
+        const clinicSetting = yield select(st => st.clinicSettings)
+        const settingSummaryComment = yield select(
+          st => st.settingSummaryComment,
+        )
+        const result = yield call(service.queryList, {
+          ...payload,
+          pageSize: settingSummaryComment.pagination.pagesize || 20,
+        })
         if (result.status === '200') {
           yield put({
             type: 'queryDone',
             payload: {
+              currentFilter:payload,
               clinicSetting,
               data: result.data,
             },
@@ -48,6 +54,7 @@ export default createListViewModel({
       queryDone(st, { payload }) {
         const {
           data,
+          currentFilter,
           clinicSetting: {
             settings: { secondaryPrintoutLanguage = '' },
           },
@@ -66,6 +73,7 @@ export default createListViewModel({
               ),
             }
           }),
+          currentFilter,
           pagination: {
             ...st.pagination,
             current: data.currentPage || 1,

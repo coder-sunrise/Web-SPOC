@@ -29,25 +29,40 @@ export default createListViewModel({
       })
     },
     effects: {
-      *query ({ payload }, { put, select, call }) {
-
+      *query({ payload }, { put, select, call }) {
         const clinicSetting = yield select(st => st.clinicSettings)
-        const result = yield call(service.queryList, payload)
+        const settingMedicationPrecautions = yield select(
+          st => st.settingMedicationPrecautions,
+        )
+        const result = yield call(service.queryList, {
+          ...payload,
+          pageSize:
+            payload.pageSize ||
+            settingMedicationPrecautions.pagination.pagesize ||
+            20,
+        })
 
         if (result.status === '200') {
           yield put({
             type: 'queryDone',
             payload: {
+              currentFilter: payload,
               clinicSetting,
               data: result.data,
             },
           })
         }
-      }
+      },
     },
     reducers: {
-      queryDone (st, { payload }) {
-        const { data, clinicSetting: { settings: { secondaryPrintoutLanguage = '' } } } = payload
+      queryDone(st, { payload }) {
+        const {
+          currentFilter,
+          data,
+          clinicSetting: {
+            settings: { secondaryPrintoutLanguage = '' },
+          },
+        } = payload
 
         return {
           ...st,
@@ -55,9 +70,14 @@ export default createListViewModel({
             return {
               ...o,
               effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
-              translatedDisplayValue: getTranslationValue(o.translationData, secondaryPrintoutLanguage, "displayValue"),
+              translatedDisplayValue: getTranslationValue(
+                o.translationData,
+                secondaryPrintoutLanguage,
+                'displayValue',
+              ),
             }
           }),
+          currentFilter,
           pagination: {
             ...st.pagination,
             current: data.currentPage || 1,
