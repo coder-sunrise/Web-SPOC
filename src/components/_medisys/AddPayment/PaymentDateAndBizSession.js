@@ -6,26 +6,37 @@ import { DatePicker, Select, GridContainer, GridItem } from '@/components'
 const PaymentDateAndBizSession = ({ handleDateChange, bizSessionList }) => {
   return (
     <GridContainer>
-      <GridItem md={3}>
+      <GridItem
+        md={4}
+        container
+        style={{ paddingLeft: 100, position: 'relative' }}
+      >
+        <div style={{ position: 'absolute', left: 0, bottom: 4 }}>
+          Payment Date:
+        </div>
         <FastField
           name='paymentReceivedDate'
-          render={(args) => (
+          render={args => (
             <DatePicker
               {...args}
               allowClear={false}
-              disabledDate={(d) => !d || d.isAfter(moment())}
-              label='Payment Date'
+              disabledDate={d => !d || d.isAfter(moment())}
               onChange={handleDateChange}
             />
           )}
         />
       </GridItem>
-      <GridItem md={3}>
+      <GridItem
+        md={4}
+        container
+        style={{ paddingLeft: 100, position: 'relative' }}
+      >
+        <div style={{ position: 'absolute', left: 0, bottom: 4 }}>
+          Clinic Session:
+        </div>
         <Field
           name='paymentReceivedBizSessionFK'
-          render={(args) => (
-            <Select {...args} options={bizSessionList} label='Clinic Session' />
-          )}
+          render={args => <Select {...args} options={bizSessionList} />}
         />
       </GridItem>
     </GridContainer>

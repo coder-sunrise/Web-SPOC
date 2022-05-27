@@ -74,6 +74,10 @@ import _ from 'lodash'
         invoice.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT
           ? _.sumBy(invoicePayerItem, 'outstanding')
           : invoice.outstandingBalance,
+      currentPayable:
+        invoice.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT
+          ? _.sumBy(invoicePayerItem, 'outstanding')
+          : invoice.outstandingBalance,
     }
     if (isGroupPayment && visitGroupStatusDetails.length > 0) {
       const outstandingBalance = roundTo(
@@ -106,6 +110,7 @@ import _ from 'lodash'
           .filter(x => x.outstanding > 0)
           .map(x => x.id),
         remainOutstanding: _.sumBy(invoicePayerItem, 'outstanding'),
+        currentPayable: _.sumBy(invoicePayerItem, 'outstanding'),
       }
     }
     return newValues
@@ -391,6 +396,7 @@ class AddPayment extends Component {
         invoicePayerItem.filter(x => selectedRows.indexOf(x.id) >= 0),
         'totalPaidAmount',
       )
+      setFieldValue('currentPayable', outstanding)
     }
 
     const totalPaid = roundTo(
@@ -484,7 +490,7 @@ class AddPayment extends Component {
   handleCashReceivedChange = event => {
     const _cashReceived = event.target.value
     const { values, setFieldValue } = this.props
-    const { cashRounding, paymentList, finalPayable } = values
+    const { cashRounding, paymentList, currentPayable } = values
     const cashPayment = paymentList.find(
       payment => payment.paymentModeFK === PAYMENT_MODE.CASH,
     )
@@ -493,12 +499,12 @@ class AddPayment extends Component {
       0,
     )
 
-    if (totalPaid - cashPayment.amt + _cashReceived > finalPayable)
+    if (totalPaid - cashPayment.amt + _cashReceived > currentPayable)
       setFieldValue(
         'cashReturned',
         roundTo(_cashReceived - (cashPayment.amt + cashRounding)),
       )
-    else if (totalPaid < finalPayable) {
+    else if (totalPaid < currentPayable) {
       setFieldValue(
         'cashReturned',
         _cashReceived - (cashPayment.amt + cashRounding),
@@ -581,7 +587,7 @@ class AddPayment extends Component {
 
   getModeMaxHeight = () => {
     const { height } = this.props
-    const maxHeight = height - $('.paymentItems').height() - 312
+    const maxHeight = height - $('.paymentItems').height() - 326
     return maxHeight > 200 ? maxHeight : 200
   }
 
@@ -605,18 +611,12 @@ class AddPayment extends Component {
       <div>
         <PayerHeader {...payerHeaderProps} />
         <React.Fragment>
-          {showPaymentDate && (
-            <PaymentDateAndBizSession
-              bizSessionList={bizSessionList}
-              handleDateChange={this.handlePaymentDateChange}
-            />
-          )}
           <GridContainer className={classes.paymentContent}>
             <GridItem md={12} className='paymentItems'>
               {values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT && (
                 <div>
                   <div style={{ margin: '4px 0px' }}>
-                    Available payment items under current invoice:
+                    Available payment item(s):
                   </div>
                   <EditableTableGrid
                     size='sm'
@@ -741,9 +741,19 @@ class AddPayment extends Component {
                 </div>
               )}
             </GridItem>
-            <GridItem md={12}>
-              <div style={{ fontSize: '1.2rem', marginBottom: '-3px' }}>
+            <GridItem md={3} style={{ lineHeight: '39px' }}>
+              <div style={{ fontSize: '1.2rem', position: 'relative', top: 6 }}>
                 Payment Mode:
+              </div>
+            </GridItem>
+            <GridItem md={9}>
+              <div>
+                {showPaymentDate && (
+                  <PaymentDateAndBizSession
+                    bizSessionList={bizSessionList}
+                    handleDateChange={this.handlePaymentDateChange}
+                  />
+                )}
               </div>
             </GridItem>
             <GridItem md={3} className={classes.noPaddingLeft}>
@@ -791,44 +801,24 @@ class AddPayment extends Component {
                         message: 'Selected items must to be fully paid.',
                       })
                       return
-                    } else if (values.remainOutstanding < 0) {
-                      notification.warning({
-                        message:
-                          'Total payment should not more than selected amount.',
-                      })
-                      return
-                    }
-                    if (
-                      values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT &&
-                      !invoicePayerItem.find(
-                        x =>
-                          selectedRows.indexOf(x.id) >= 0 &&
-                          x.totalPaidAmount > 0,
-                      )
-                    ) {
-                      notification.warning({
-                        message: 'Total payment amount should more than $0.00.',
-                      })
-                      return
-                    }
-                    if (
-                      values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT &&
-                      invoicePayerItem.find(
-                        x =>
-                          selectedRows.indexOf(x.id) >= 0 &&
-                          x.totalPaidAmount > x.allowMaxPaid,
-                      )
-                    ) {
-                      notification.warning({
-                        message:
-                          'There are some overpaid item(s), please update.',
-                      })
-                      return
                     }
                   }
                   handleSubmit()
                 }}
-                disabled={values.paymentList.length === 0 || disabledPayment}
+                disabled={
+                  values.paymentList.length === 0 ||
+                  disabledPayment ||
+                  (values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT &&
+                    invoicePayerItem.find(
+                      x =>
+                        selectedRows.indexOf(x.id) >= 0 &&
+                        x.totalPaidAmount > x.allowMaxPaid,
+                    )) ||
+                  !invoicePayerItem.find(
+                    x =>
+                      selectedRows.indexOf(x.id) >= 0 && x.totalPaidAmount > 0,
+                  )
+                }
               >
                 Confirm
               </Button>

@@ -23,13 +23,13 @@ const CrNoteForm = ({ classes, payerType }) => {
           <GridItem md={12}>
             <FastField
               name='generatedDate'
-              render={(args) => <DatePicker {...args} autoFocus label='Date' />}
+              render={args => <DatePicker {...args} autoFocus label='Date' />}
             />
           </GridItem>
           <GridItem md={12}>
             <FastField
               name='invoiceTotal'
-              render={(args) => (
+              render={args => (
                 <NumberInput
                   {...args}
                   currency
@@ -42,14 +42,8 @@ const CrNoteForm = ({ classes, payerType }) => {
           <GridItem md={12}>
             <FastField
               name='isStockIn'
-              render={(args) => {
-                return (
-                  <Switch
-                    prefix='Update Inventory'
-                    disabled={payerType > INVOICE_PAYER_TYPE.PATIENT}
-                    {...args}
-                  />
-                )
+              render={args => {
+                return <Switch prefix='Update Inventory' {...args} />
               }}
             />
           </GridItem>
@@ -59,7 +53,7 @@ const CrNoteForm = ({ classes, payerType }) => {
         <GridItem md={12}>
           <FastField
             name='remark'
-            render={(args) => (
+            render={args => (
               <OutlinedTextField
                 {...args}
                 label='Remarks'

@@ -67,9 +67,13 @@ export default createFormViewModel({
             ? payerDistributedAmt
             : outStanding
         const remainingItems = invoiceItem
-          .filter(item =>
-            invoicePayerItem.find(x => x.invoiceItemFK === item.id),
-          )
+          .filter(item => {
+            var payerItem = invoicePayerItem.find(
+              x => x.invoiceItemFK === item.id,
+            )
+            if (payerItem && payerItem.claimAmount > 0) return true
+            return false
+          })
           .map(item => {
             var payerItem = invoicePayerItem.find(
               x => x.invoiceItemFK === item.id,
