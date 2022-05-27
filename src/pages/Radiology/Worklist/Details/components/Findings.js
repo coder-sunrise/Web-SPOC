@@ -27,7 +27,7 @@ import { scribbleTypes } from '@/utils/codes'
 
 const useStyles = makeStyles(theme => ({
   editor: {
-    fontSize: '0.9rem',
+    fontSize: '14px',
     minHeight: '500px',
   },
 }))
@@ -293,7 +293,9 @@ export const Findings = ({
     <div>
       <GridContainer>
         <GridItem sm={9} md={9}>
-          <Typography style={{position:'relative',top:10}}>Examination Findings :</Typography>
+          <Typography style={{ position: 'relative', top: 10 }}>
+            Examination Findings :
+          </Typography>
         </GridItem>
         <GridItem sm={3} md={3}>
           <div
