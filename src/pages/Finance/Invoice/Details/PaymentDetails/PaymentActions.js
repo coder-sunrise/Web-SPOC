@@ -41,7 +41,7 @@ const PaymentActions = ({
   const isEnableAddCreditNote = () => {
     if (type === PayerType.PATIENT)
       return ableToViewByAuthority('finance.addpatientcreditnote')
-    return ableToViewByAuthority('finance.addpatientcreditnote')
+    return ableToViewByAuthority('finance.addcopayercreditnote')
   }
   return (
     <div>

@@ -2,6 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 // formik
 import { FastField } from 'formik'
+import { ableToViewByAuthority } from '@/utils/utils'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Print from '@material-ui/icons/Print'
@@ -10,7 +11,7 @@ import { Button, GridItem, NumberInput, TextField, Danger } from '@/components'
 import DeleteWithPopover from './DeleteWithPopover'
 import PaymentDetailsPopover from './PaymentDetailsPopover'
 
-const styles = (theme) => ({
+const styles = theme => ({
   inline: {
     display: 'inline-block',
   },
@@ -48,7 +49,7 @@ const Payments = ({
       [classes.crossed]: item.isCancelled,
       [classes.inline]: true,
     })
- 
+
     const onPrintClick = () => handlePrintReceiptClick(item.id)
 
     return (
@@ -71,41 +72,43 @@ const Payments = ({
           </h5>
         </GridItem>
         <GridItem md={1}>
-          <DeleteWithPopover
-            index={item.id}
-            title='Cancel Payment'
-            contentText='Confirm to cancel this payment?'
-            extraCmd={
-              item.id ? (
-                <div className={classes.errorContainer}>
-                  <FastField
-                    name={`invoicePayment[${index}].cancelReason`}
-                    render={(args) => (
-                      <TextField
-                        label='Cancel Reason'
-                        autoFocus
-                        {...args}
-                        onChange={onCancelReasonChange}
-                      />
+          {ableToViewByAuthority('finance.deletepatientpayment') && (
+            <DeleteWithPopover
+              index={item.id}
+              title='Cancel Payment'
+              contentText='Confirm to cancel this payment?'
+              extraCmd={
+                item.id ? (
+                  <div className={classes.errorContainer}>
+                    <FastField
+                      name={`invoicePayment[${index}].cancelReason`}
+                      render={args => (
+                        <TextField
+                          label='Cancel Reason'
+                          autoFocus
+                          {...args}
+                          onChange={onCancelReasonChange}
+                        />
+                      )}
+                    />
+                    {showError && (
+                      <Danger>
+                        <span>{errorMessage}</span>
+                      </Danger>
                     )}
-                  />
-                  {showError && (
-                    <Danger>
-                      <span>{errorMessage}</span>
-                    </Danger>
-                  )}
-                </div>
-              ) : (
-                undefined
-              )
-            }
-            onCancelClick={handleCancelClick}
-            onConfirmDelete={handleConfirmDelete}
-            disabled={item.isCancelled || !!item.statementPaymentReceiptNo}
-          />
+                  </div>
+                ) : (
+                  undefined
+                )
+              }
+              onCancelClick={handleCancelClick}
+              onConfirmDelete={handleConfirmDelete}
+              disabled={item.isCancelled || !!item.statementPaymentReceiptNo}
+            />
+          )}
         </GridItem>
 
-        {item.invoicePaymentMode.map((payment) => (
+        {item.invoicePaymentMode.map(payment => (
           <PaymentDetailsPopover payment={payment} />
         ))}
       </React.Fragment>
