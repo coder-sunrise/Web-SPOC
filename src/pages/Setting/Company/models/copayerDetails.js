@@ -69,6 +69,7 @@ export default createFormViewModel({
           type: 'copayerDetailsResult',
           payload: response.status === '200' ? response.data : {},
         })
+        return response.data
       },
     },
     reducers: {
