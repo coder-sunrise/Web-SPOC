@@ -84,6 +84,7 @@ class CommonForm extends PureComponent {
     const isImageSelected = e.source.documentEditor.selection.isImageSelected
     const isSelectionInEditRegion = e.source.documentEditor.selection.isSelectionInEditRegion()
     let isSignatured = false
+    console.log('selection',e.source.documentEditor.selection)
     if(isSelectionInEditRegion) {
       const { start, end } = e.source.documentEditor.selection
       if(start.currentWidget.children.some(x=> {
