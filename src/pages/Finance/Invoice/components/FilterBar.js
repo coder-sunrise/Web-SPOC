@@ -11,6 +11,8 @@ import {
   GridItem,
   SizeContainer,
   TextField,
+  Tooltip,
+  CodeSelect,
   Select,
 } from '@/components'
 import { FilterBarDate } from '@/components/_medisys'
@@ -41,73 +43,69 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
     <SizeContainer>
       <React.Fragment>
         <GridContainer>
-          <GridItem xs={6} md={1}>
+          <GridItem xs={6} md={3}>
             <FastField
               name='invoiceNo'
               render={args => (
                 <TextField
-                  style={{ width: '105%' }}
+                  style={{ width: '100%' }}
                   label='Invoice No'
                   {...args}
                 />
               )}
             />
           </GridItem>
-          <GridItem md={1}>
-            <Field
-              name='invoiceStartDate'
-              render={args => (
-                <FilterBarDate
-                  args={args}
-                  label='Invoice Date From'
-                  formValues={{
-                    startDate: invoiceStartDate,
-                    endDate: invoiceEndDate,
-                  }}
-                />
-              )}
-            />
+          <GridItem xs={6} md={3}>
+            <div
+              style={{
+                width: '49%',
+                marginRight: '1%',
+                display: 'inline-block',
+              }}
+            >
+              <Field
+                name='invoiceStartDate'
+                render={args => (
+                  <FilterBarDate
+                    args={args}
+                    label='Invoice Date From'
+                    formValues={{
+                      startDate: invoiceStartDate,
+                      endDate: invoiceEndDate,
+                    }}
+                  />
+                )}
+              />
+            </div>
+            <div
+              style={{
+                width: '49%',
+                marginLeft: '1%',
+                display: 'inline-block',
+              }}
+            >
+              <Field
+                name='invoiceEndDate'
+                render={args => (
+                  <FilterBarDate
+                    args={args}
+                    label='Invoice Date To'
+                    isEndDate
+                    formValues={{
+                      startDate: invoiceStartDate,
+                      endDate: invoiceEndDate,
+                    }}
+                  />
+                )}
+              />
+            </div>
           </GridItem>
-          <GridItem md={1}>
-            <Field
-              name='invoiceEndDate'
-              render={args => (
-                <FilterBarDate
-                  args={args}
-                  label='Invoice Date To'
-                  isEndDate
-                  formValues={{
-                    startDate: invoiceStartDate,
-                    endDate: invoiceEndDate,
-                  }}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs={6} md={1}>
-            <FastField
-              name='patientAccountNo'
-              render={args => <TextField label='Patient Acc. No.' {...args} />}
-            />
-          </GridItem>
-          <GridItem xs={6} md={2}>
-            <FastField
-              name='patientName'
-              render={args => (
-                <TextField
-                  style={{ width: '95%' }}
-                  label='Patient Name'
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs={6} md={1}>
+          <GridItem xs={6} md={3}>
             <FastField
               name='session'
               render={args => (
                 <Select
-                  style={{ width: '105%' }}
+                  style={{ width: '100%' }}
                   label='Session'
                   options={sessionOptions}
                   {...args}
@@ -115,7 +113,7 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
               )}
             />
           </GridItem>
-          <GridItem xs={6} md={1}>
+          <GridItem xs={6} md={3}>
             <FastField
               name='outstandingBalanceStatus'
               render={args => {
@@ -128,6 +126,44 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
                 )
               }}
             />
+          </GridItem>
+          <GridItem xs={6} md={3}>
+            <FastField
+              name='patientAccountNo'
+              render={args => <TextField label='Patient Acc. No.' {...args} />}
+            />
+          </GridItem>
+          <GridItem xs={6} md={3}>
+            <FastField
+              name='patientName'
+              render={args => (
+                <TextField
+                  style={{ width: '100%' }}
+                  label='Patient Name'
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem xs={6} md={3}>
+            <Tooltip
+              placement='right'
+              title='select "All" will retrieve active and inactive co-payers'
+            >
+              <FastField
+                name='coPayerFk'
+                render={args => (
+                  <CodeSelect
+                    code='ctCopayer'
+                    labelField='displayValue'
+                    maxTagCount={0}
+                    maxTagPlaceholder='Co-Payer'
+                    label='Co-Payer'
+                    {...args}
+                  />
+                )}
+              />
+            </Tooltip>
           </GridItem>
           <div className={classes.searchButton}>
             <ProgressButton
@@ -159,6 +195,7 @@ export default withFormik({
       invoiceEndDate,
       outstandingBalanceStatus,
       session,
+      coPayerFk,
     } = values
     let SessionID
     let SessionType
@@ -184,6 +221,7 @@ export default withFormik({
       apiCriteria: {
         SessionID,
         SessionType,
+        coPayerFk
       },
       group: [
         {

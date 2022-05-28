@@ -1,4 +1,6 @@
-import { dateFormatLong } from '@/components'
+import { dateFormatLong, Tooltip } from '@/components'
+import React from 'react'
+import { render } from 'react-dom'
 
 export const TableConfig = {
   // FuncProps: { pager: false },
@@ -9,6 +11,7 @@ export const InvoiceGridColumns = [
   { name: 'invoiceDate', title: 'Invoice Date' },
   { name: 'patientAccountNo', title: 'Patient Acc. No.' },
   { name: 'patientName', title: 'Patient Name' },
+  { name: 'coPayers', title: 'Co-Payer' },
   { name: 'invoiceTotalAftGST', title: 'Total After GST' },
   { name: 'totalPayment', title: 'Total Payments' },
   { name: 'patientPayableAmount', title: 'Payable Amount' },
@@ -27,6 +30,17 @@ export const InvoiceGridColExtensions = [
   },
   { columnName: 'patientAccountNo', sortingEnabled: false },
   { columnName: 'patientName', sortingEnabled: false },
+  {
+    columnName: 'coPayers',
+    sortingEnabled: false,
+    render: (_dom, entity) => (
+      <Tooltip title={entity.row.coPayers} placement='top'>
+        <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {entity.row.coPayers || '-'}
+        </div>
+      </Tooltip>
+    ),
+  },
   {
     columnName: 'invoiceTotalAftGST',
     type: 'currency',
