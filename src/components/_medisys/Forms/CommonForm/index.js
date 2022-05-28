@@ -86,7 +86,9 @@ class CommonForm extends PureComponent {
     let isSignatured = false
     console.log('selection',e.source.documentEditor.selection)
     if(isSelectionInEditRegion) {
-      const { start, end } = e.source.documentEditor.selection
+      const { start, end, documentHelper } = e.source.documentEditor.selection
+      documentHelper.editableDiv.contentEditable = false
+      documentHelper.editableDiv.contenteditable = false
       if(start.currentWidget.children.some(x=> {
         console.log({currentWidget:x,className:x.constructor.name})
         return x.constructor.name === 'ImageElementBox'
