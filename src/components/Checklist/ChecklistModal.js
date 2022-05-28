@@ -99,12 +99,14 @@ const ChecklistModal = ({ selectedChecklist, onConfirm, onClose, open }) => {
                             <Radio.Group>
                               {orderedNature.map((nature, index) => {
                                 return (
-                                  <Radio
-                                    value={nature.displayValue}
-                                    style={{ lineHeight: '32px' }}
-                                  >
-                                    {nature.displayValue}
-                                  </Radio>
+                                  <div>
+                                    <Radio
+                                      value={nature.displayValue}
+                                      style={{ lineHeight: '32px' }}
+                                    >
+                                      {nature.displayValue}
+                                    </Radio>
+                                  </div>
                                 )
                               })}
                             </Radio.Group>
