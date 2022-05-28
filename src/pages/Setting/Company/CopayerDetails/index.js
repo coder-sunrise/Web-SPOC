@@ -132,6 +132,45 @@ const Detail = props => {
     ]
     handlePrint(JSON.stringify(payload))
   }
+  const printCoverPage = async (
+    copayerId,
+    contactPersonName,
+    coverPageCopies,
+  ) => {
+    const { dispatch, handlePrint } = props
+    dispatch({
+      type: 'copayerDetail/queryCopayerDetails',
+      payload: {
+        id: copayerId,
+      },
+    }).then(r => {
+      if (!r) return
+      const data = {}
+      let information = {}
+      information.Title = contactPersonName ? contactPersonName : r.displayValue
+      if (r.address) {
+        let address = r?.address || {}
+        information.Content = `${
+          contactPersonName ? r.displayValue + '\n' : ''
+        }${address.blockNo}${address.street ? ' ' + address.street : ''}${
+          address.blockNo || address.street ? '\n' : ''
+        }${address.unitNo}${
+          address.buildingName ? ' ' + address.buildingName : ''
+        }${address.unitNo || address.buildingName ? '\n' : ''}${
+          address.countryName ? address.countryName : ''
+        } ${address.postcode ? ' ' + address.postcode : ''}`
+      }
+      data.MailingInformation = [information]
+      const payload = [
+        {
+          ReportId: 95,
+          ReportData: JSON.stringify(data),
+          Copies: coverPageCopies,
+        },
+      ]
+      handlePrint(JSON.stringify(payload))
+    })
+  }
   const onEditingList = (listName, isEditing) => {
     let newEditingList = []
 
@@ -150,6 +189,7 @@ const Detail = props => {
 
   const compProps = {
     onPrint: printLabel,
+    OnPrintCoverPage: printCoverPage,
     onEditingListControl: onEditingList,
     ...props,
     height: fromCommonModal

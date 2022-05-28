@@ -12,6 +12,7 @@ class Schemes extends PureComponent {
   state = {
     showReplacementModal: false,
     refreshedSchemeData: {},
+    targetPrintId: undefined,
   }
 
   handleReplacementModalVisibility = (show = false) => {
@@ -67,9 +68,8 @@ class Schemes extends PureComponent {
     }
   }
 
-  isMedisave = (schemeTypeFK) => {
-    if(schemeTypeFK)
-      return [12,13,14].indexOf(schemeTypeFK) >= 0
+  isMedisave = schemeTypeFK => {
+    if (schemeTypeFK) return [12, 13, 14].indexOf(schemeTypeFK) >= 0
     return false
   }
 
@@ -103,7 +103,7 @@ class Schemes extends PureComponent {
         isSaveToDb,
         patientProfileId: id,
       },
-    }).then((result) => {
+    }).then(result => {
       this.prepareReplacementModel(
         result,
         oldSchemeTypeFK,
@@ -112,7 +112,7 @@ class Schemes extends PureComponent {
 
       if (result && result.schemeTypeFk) {
         let chasScheme = values.patientScheme.filter(
-          (x) => x.schemeTypeFK <= 6 && !x.isDeleted,
+          x => x.schemeTypeFK <= 6 && !x.isDeleted,
         )
         let isNewChasScheme = false
 
@@ -150,7 +150,7 @@ class Schemes extends PureComponent {
         }
       } else {
         let ChasScheme = values.patientScheme.filter(
-          (x) => x.schemeTypeFK <= 6 && !x.isDeleted,
+          x => x.schemeTypeFK <= 6 && !x.isDeleted,
         )
       }
 
@@ -163,7 +163,10 @@ class Schemes extends PureComponent {
     })
   }
 
-  render () {
+  onPrintButtonClick = id => {
+    this.setState({ targetPrintId: id })
+  }
+  render() {
     const {
       classes,
       schemes,
@@ -186,7 +189,7 @@ class Schemes extends PureComponent {
     let isSaveToDb = !isCreatingPatient
 
     const SchemeData = patientScheme.filter(
-      (o) => o.schemeTypeFK <= 6 && !o.isDeleted,
+      o => o.schemeTypeFK <= 6 && !o.isDeleted,
     )
     let tempPatientCoPaymentSchemeFK = 0
     let tempSchemeTypeFK = 0
@@ -208,11 +211,9 @@ class Schemes extends PureComponent {
             </GridItem>
             <GridItem md={4} style={{ color: 'red' }}>
               {this.state.refreshedSchemeData &&
-              !this.state.refreshedSchemeData.isSuccessful ? (
-                this.state.refreshedSchemeData.statusDescription
-              ) : (
-                ''
-              )}
+              !this.state.refreshedSchemeData.isSuccessful
+                ? this.state.refreshedSchemeData.statusDescription
+                : ''}
             </GridItem>
             <GridItem md={2}>
               <Button
@@ -224,7 +225,8 @@ class Schemes extends PureComponent {
                     tempPatientCoPaymentSchemeFK,
                     tempSchemeTypeFK,
                     isSaveToDb,
-                  )}
+                  )
+                }
                 disabled={disableSave}
               >
                 Get CHAS
@@ -236,6 +238,9 @@ class Schemes extends PureComponent {
           rows={values.patientScheme}
           schema={schema.patientScheme._subType}
           values={values}
+          targetPrintId={this.state.targetPrintId}
+          onPrintButtonClick={this.onPrintButtonClick}
+          entity={entity}
           {...restProps}
         />
         <CommonModal
@@ -253,8 +258,13 @@ class Schemes extends PureComponent {
         </CommonModal>
         <div
           style={{
-              display: values.patientScheme.filter((o) => this.isMedisave(o.schemeTypeFK) && !o.isDeleted).length > 0  ? '' : 'none',
-            }}
+            display:
+              values.patientScheme.filter(
+                o => this.isMedisave(o.schemeTypeFK) && !o.isDeleted,
+              ).length > 0
+                ? ''
+                : 'none',
+          }}
         >
           <h4
             style={{
@@ -265,14 +275,19 @@ class Schemes extends PureComponent {
             Medisave Payer
           </h4>
           <PayersGrid
-            enableAdd={values.patientScheme ? values.patientScheme.find((o) => this.isMedisave(o.schemeTypeFK) && !o.isDeleted) : false}
+            enableAdd={
+              values.patientScheme
+                ? values.patientScheme.find(
+                    o => this.isMedisave(o.schemeTypeFK) && !o.isDeleted,
+                  )
+                : false
+            }
             rows={values.schemePayer}
             schema={schema.schemePayer._subType}
             values={values}
             {...restProps}
           />
         </div>
-        
       </div>
     )
   }

@@ -12,13 +12,30 @@ import {
   CodeSelect,
   NumberInput,
   Switch,
+  Popover,
   DateRangePicker,
   dateFormatLong,
 } from '@/components'
-import { Table, Button, Input } from 'antd'
+import { InputNumber } from 'antd'
+import { MenuList, ClickAwayListener, MenuItem } from '@material-ui/core'
+import { Table, Input } from 'antd'
+import { Button } from '@/components'
+import Print from '@material-ui/icons/Print'
 
 export const General = props => {
-  const { clinicSettings, values, height, dispatch, setFieldValue } = props
+  const {
+    clinicSettings,
+    values,
+    height,
+    onPrint,
+    OnPrintCoverPage,
+    dispatch,
+    setFieldValue,
+    printCopayerLabel,
+  } = props
+  const [showPrintPoper, setShowPrintPoper] = useState(false)
+  const [copayerLabelCopies, setCopayerLabelCopies] = useState(1)
+  const [coverPageCopies, setCoverPageCopies] = useState(1)
   const {
     isUserMaintainable,
     isGSTEnabled,
@@ -27,9 +44,15 @@ export const General = props => {
     statementAdjustmentType,
     autoInvoiceAdjustmentType,
     adminChargeType,
+    id,
   } = values
   const { isEnableAutoGenerateStatement = true } = clinicSettings.settings
   const isNew = values.id ? false : true
+
+  const printCoverPage = () => {
+    setShowPrintPoper(true)
+  }
+
   return (
     <React.Fragment>
       <GridContainer>
@@ -424,6 +447,91 @@ export const General = props => {
               render={args => <TextField label='Website' {...args} />}
             />
           </GridItem>
+          {!isNew && (
+            <GridItem xs={12} md={3}>
+              <Popover
+                overlayClassName='noPaddingPopover'
+                visible={showPrintPoper}
+                placement='bottomLeft'
+                trigger='click'
+                transition
+                onVisibleChange={val => {
+                  if (!val) {
+                    setShowPrintPoper(false)
+                  }
+                }}
+                content={
+                  <MenuList role='menu'>
+                    <MenuItem>
+                      <Button
+                        color='primary'
+                        size='sm'
+                        style={{ width: 150 }}
+                        onClick={() => onPrint(values.id)}
+                        disabled={!Number.isInteger(copayerLabelCopies)}
+                      >
+                        Co-Payer Label
+                      </Button>
+                      <InputNumber
+                        size='small'
+                        min={1}
+                        max={10}
+                        value={copayerLabelCopies}
+                        onChange={value => setCopayerLabelCopies(value)}
+                        style={{ width: '50px', textAlign: 'right' }}
+                      />
+                      <span
+                        style={{
+                          fontSize: '0.75rem',
+                        }}
+                      >
+                        &nbsp;Copies
+                      </span>
+                    </MenuItem>
+                    <MenuItem>
+                      <Button
+                        color='primary'
+                        size='sm'
+                        style={{ width: 150 }}
+                        onClick={() =>
+                          OnPrintCoverPage(values.id, null, coverPageCopies)
+                        }
+                        disabled={!Number.isInteger(coverPageCopies)}
+                      >
+                        Co-Payer Cover Page
+                      </Button>
+                      <InputNumber
+                        size='small'
+                        min={1}
+                        max={10}
+                        value={coverPageCopies}
+                        onChange={value => setCoverPageCopies(value)}
+                        style={{ width: '50px', textAlign: 'right' }}
+                      />
+                      <span
+                        style={{
+                          fontSize: '0.75rem',
+                        }}
+                      >
+                        &nbsp;Copies
+                      </span>
+                    </MenuItem>
+                  </MenuList>
+                }
+              >
+                <Tooltip title='Print Co-Payer Labl and Mailing Cover Page'>
+                  <Button
+                    color='primary'
+                    onClick={printCoverPage}
+                    size='sm'
+                    style={{ height: 25, marginTop: 25 }}
+                  >
+                    <Print /> Print
+                  </Button>
+                </Tooltip>
+              </Popover>
+            </GridItem>
+          )}
         </GridContainer>
       </GridContainer>
     </React.Fragment>
