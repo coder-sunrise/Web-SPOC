@@ -609,7 +609,7 @@ class SchemesGrid extends PureComponent {
                     </MenuList>
                   }
                 >
-                  <Tooltip title="Print Patient's Co-Payer Label">
+                  <Tooltip title='Print Patient’s Co-Payer Label/Cover Page'>
                     <Button
                       size='sm'
                       justIcon

@@ -594,7 +594,11 @@ export const ContactPersonList = props => {
                           size='sm'
                           style={{ width: 150 }}
                           onClick={() =>
-                            OnPrintCoverPage(values.id, record.name, coverPageCopies)
+                            OnPrintCoverPage(
+                              values.id,
+                              record.name,
+                              coverPageCopies,
+                            )
                           }
                           disabled={!Number.isInteger(coverPageCopies)}
                         >
@@ -619,7 +623,7 @@ export const ContactPersonList = props => {
                     </MenuList>
                   }
                 >
-                  <Tooltip title='Print Co-Payer Labl and Mailing Cover Page'>
+                  <Tooltip title='Print Label/Cover Page With Contact Person'>
                     {/* <Button
                       color='primary'
                       onClick={printCoverPage}

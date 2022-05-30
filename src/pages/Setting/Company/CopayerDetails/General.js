@@ -519,7 +519,7 @@ export const General = props => {
                   </MenuList>
                 }
               >
-                <Tooltip title='Print Co-Payer Labl and Mailing Cover Page'>
+                <Tooltip title='Print Label/Cover Page Without Contact Person'>
                   <Button
                     color='primary'
                     onClick={printCoverPage}
