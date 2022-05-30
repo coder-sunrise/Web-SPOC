@@ -2,15 +2,32 @@ import React, { PureComponent, Fragment } from 'react'
 import Edit from '@material-ui/icons/Edit'
 import Print from '@material-ui/icons/Print'
 import { connect } from 'dva'
-import { CommonTableGrid, Button, Tooltip, notification } from '@/components'
+import {
+  CommonTableGrid,
+  Button,
+  Tooltip,
+  Popover,
+  notification,
+} from '@/components'
 import { status, gstEnabled } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
 import { ableToViewByAuthority } from '@/utils/utils'
+import { InputNumber } from 'antd'
+import { MenuList, ClickAwayListener, MenuItem } from '@material-ui/core'
 
 @connect(({ clinicSettings }) => ({
   clinicSettings,
 }))
 class Grid extends PureComponent {
+  constructor(props) {
+    super(props)
+    this.state = {
+      showPrintPoper: false,
+      copayerLabelCopies: 1,
+      coverPageCopies: 1,
+      targetPrintId: undefined,
+    }
+  }
   FuncConfig = {
     sort: true,
     sortConfig: {
@@ -63,7 +80,14 @@ class Grid extends PureComponent {
   handleClick = async copayerId => {
     const { onPrint } = this.props
     if (onPrint) {
-      onPrint(copayerId)
+      onPrint(copayerId, undefined, this.state.copayerLabelCopies)
+    }
+  }
+
+  handleCoverPageClick = async copayerId => {
+    const { onPrintCoverPage } = this.props
+    if (onPrintCoverPage) {
+      onPrintCoverPage(copayerId, this.state.coverPageCopies)
     }
   }
 
@@ -313,16 +337,106 @@ class Grid extends PureComponent {
                           </Button>
                         </Tooltip>
                       )}
-                      <Tooltip title='Print Co-Payer Label' placement='bottom'>
-                        <Button
-                          size='sm'
-                          justIcon
-                          color='primary'
-                          onClick={() => this.handleClick(row.id)}
-                        >
-                          <Print />
-                        </Button>
-                      </Tooltip>
+
+                      <Popover
+                        overlayClassName='noPaddingPopover'
+                        visible={
+                          this.state.showPrintPoper &&
+                          row.id === this.state.targetPrintId
+                        }
+                        placement='bottomLeft'
+                        trigger='click'
+                        transition
+                        onVisibleChange={val => {
+                          if (!val) {
+                            this.setState({ showPrintPoper: false })
+                          }
+                        }}
+                        content={
+                          <MenuList role='menu'>
+                            <MenuItem>
+                              <Button
+                                color='primary'
+                                size='sm'
+                                style={{ width: 150 }}
+                                onClick={() => this.handleClick(row.id)}
+                                disabled={
+                                  !Number.isInteger(
+                                    this.state.copayerLabelCopies,
+                                  )
+                                }
+                              >
+                                Co-Payer Label
+                              </Button>
+                              <InputNumber
+                                size='small'
+                                min={1}
+                                max={10}
+                                value={this.state.copayerLabelCopies}
+                                onChange={value =>
+                                  this.setState({ copayerLabelCopies: value })
+                                }
+                                style={{ width: '50px', textAlign: 'right' }}
+                              />
+                              <span
+                                style={{
+                                  fontSize: '0.75rem',
+                                }}
+                              >
+                                &nbsp;Copies
+                              </span>
+                            </MenuItem>
+                            <MenuItem>
+                              <Button
+                                color='primary'
+                                size='sm'
+                                style={{ width: 150 }}
+                                onClick={() =>
+                                  this.handleCoverPageClick(row.id)
+                                }
+                                disabled={
+                                  !Number.isInteger(this.state.coverPageCopies)
+                                }
+                              >
+                                Co-Payer Cover Page
+                              </Button>
+                              <InputNumber
+                                size='small'
+                                min={1}
+                                max={10}
+                                value={this.state.coverPageCopies}
+                                onChange={value =>
+                                  this.setState({ coverPageCopies: value })
+                                }
+                                style={{ width: '50px', textAlign: 'right' }}
+                              />
+                              <span
+                                style={{
+                                  fontSize: '0.75rem',
+                                }}
+                              >
+                                &nbsp;Copies
+                              </span>
+                            </MenuItem>
+                          </MenuList>
+                        }
+                      >
+                        <Tooltip title='Print Label/Cover Page Without Contact Person'>
+                          <Button
+                            color='primary'
+                            justIcon
+                            onClick={() => {
+                              this.setState({
+                                targetPrintId: row.id,
+                                showPrintPoper: true,
+                              })
+                            }}
+                            size='sm'
+                          >
+                            <Print />
+                          </Button>
+                        </Tooltip>
+                      </Popover>
                     </div>
                   )
                 }

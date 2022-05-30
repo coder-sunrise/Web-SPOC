@@ -159,7 +159,11 @@ const RadiologyDetails = () => {
     setShowReport(!showReport)
   }
   const saveAndPrint = () => {
-    if (details?.entity?.statusFK != 4 && details?.entity?.statusFK != 5) {
+    if (
+      details?.entity?.statusFK != 4 &&
+      details?.entity?.statusFK != 5 &&
+      isDirty
+    ) {
       handleSave(undefined, false)
     }
     dispatch({

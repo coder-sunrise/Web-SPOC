@@ -40,7 +40,7 @@ class Supplier extends PureComponent {
     dispatch({
       type: 'settingCompany/query',
       payload: {
-        isActive:true,
+        isActive: true,
         companyTypeFK: copayer ? 1 : supplier ? 2 : 3,
         sorting: copayer ? copayerSorting : suppSorting,
       },
@@ -56,7 +56,7 @@ class Supplier extends PureComponent {
     })
   }
 
-  printLabel = async (copayerId, contactPersonName) => {
+  printLabel = async (copayerId, contactPersonName, copies) => {
     if (!Number.isInteger(copayerId)) return
 
     const { handlePrint, clinicSettings } = this.props
@@ -96,9 +96,43 @@ class Supplier extends PureComponent {
         ReportData: JSON.stringify({
           ...data,
         }),
+        Copies: copies || 1,
       },
     ]
     handlePrint(JSON.stringify(payload))
+  }
+  printCoverPage = async (copayerId, coverPageCopies) => {
+    const { dispatch, handlePrint } = this.props
+    dispatch({
+      type: 'copayerDetail/queryCopayerDetails',
+      payload: {
+        id: copayerId,
+      },
+    }).then(r => {
+      if (!r) return
+      const data = {}
+      let information = {}
+      information.Title = r.displayValue
+      if (r.address) {
+        let address = r?.address || {}
+        information.Content = `${address.blockNo}${
+          address.street ? ' ' + address.street : ''
+        }${address.blockNo || address.street ? '\n' : ''}${address.unitNo}${
+          address.buildingName ? ' ' + address.buildingName : ''
+        }${address.unitNo || address.buildingName ? '\n' : ''}${
+          address.countryName ? address.countryName : ''
+        } ${address.postcode ? ' ' + address.postcode : ''}`
+      }
+      data.MailingInformation = [information]
+      const payload = [
+        {
+          ReportId: 95,
+          ReportData: JSON.stringify(data),
+          Copies: coverPageCopies,
+        },
+      ]
+      handlePrint(JSON.stringify(payload))
+    })
   }
   render() {
     const { settingCompany, route, mainDivHeight = 700 } = this.props
@@ -123,6 +157,7 @@ class Supplier extends PureComponent {
           {...cfg}
           {...this.props}
           onPrint={this.printLabel}
+          onPrintCoverPage={this.printCoverPage}
           height={height}
         />
 
