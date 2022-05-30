@@ -53,7 +53,7 @@ export default ({
       {
         dataIndex: 'doctor',
         title: 'Doctor',
-        width: 150,
+        width: 180,
         render: (text, row) => {
           const noteUserName = `${
             row.signedByUserTitle && row.signedByUserTitle.trim().length

@@ -1246,17 +1246,20 @@ class PatientHistory extends Component {
           WidgetConfig.hasValue(note[notesType.fieldName]) &&
           note[notesType.fieldName].trim().length
         ) {
-          newNote.push({
-            id: note.id,
-            visitFK: current.currentId,
-            noteType: notesType.title,
-            valueType: 'String',
-            stringValue: note[notesType.fieldName],
-            sortOrder: sortOrder,
-            doctor: noteUserName,
-            updateDate: updateDate,
+          const splites = note[notesType.fieldName].trim().split('\n')
+          splites.forEach(splite => {
+            newNote.push({
+              id: note.id,
+              visitFK: current.currentId,
+              noteType: notesType.title,
+              valueType: 'String',
+              stringValue: splite,
+              sortOrder: sortOrder,
+              doctor: noteUserName,
+              updateDate: updateDate,
+            })
+            sortOrder = sortOrder + 1
           })
-          sortOrder = sortOrder + 1
         }
 
         const scribbleType = scribbleTypes.find(

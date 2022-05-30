@@ -148,7 +148,7 @@ export default ({ current, classes, showDrugLabelRemark }) => {
           {
             dataIndex: 'name',
             title: 'Name',
-            width: 250,
+            width: 200,
             render: (text, row) => (
               <Tooltip
                 title={
@@ -174,8 +174,7 @@ export default ({ current, classes, showDrugLabelRemark }) => {
                 <div style={wrapCellTextStyle}>{text}</div>
               </Tooltip>
             ),
-
-            width: 250,
+            width: 200,
           },
           {
             dataIndex: 'remarks',
@@ -262,14 +261,14 @@ export default ({ current, classes, showDrugLabelRemark }) => {
           {
             dataIndex: 'adjAmt',
             title: 'Adj.',
-            width: 100,
+            width: 90,
             align: 'right',
             render: (text, row) => showCurrency(row.adjAmt),
           },
           {
             dataIndex: 'totalAfterItemAdjustment',
             title: 'Total',
-            width: 100,
+            width: 90,
             align: 'right',
             render: (text, row) =>
               showCurrency(

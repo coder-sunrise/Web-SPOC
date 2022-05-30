@@ -625,7 +625,7 @@ export const DispenseItemsColumns1 = (
           <p style={{ height: 16 }}>Qty.</p>
         </div>
       ),
-      width: 80,
+      width: 85,
       onCell: row => ({ colSpan: row.isGroup ? 0 : 1 }),
       align: 'right',
       render: (_, row) => {
