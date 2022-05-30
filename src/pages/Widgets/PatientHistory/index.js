@@ -1078,7 +1078,7 @@ class PatientHistory extends Component {
       )
       if (!notesType) return false
 
-      const { doctorNotes = [] } = current
+      const { doctorNotes = [], scribbleNotes = [] } = current
       const scribbleType = scribbleTypes.find(
         o => o.type === notesType.fieldName,
       )
@@ -1088,6 +1088,9 @@ class PatientHistory extends Component {
             note[notesType.fieldName] !== undefined &&
             note[notesType.fieldName] !== null &&
             note[notesType.fieldName].trim().length,
+        ) &&
+        !scribbleNotes.find(
+          sn => sn.scribbleNoteTypeFK === scribbleType?.typeFK,
         )
       ) {
         return false
@@ -1222,47 +1225,63 @@ class PatientHistory extends Component {
   }
 
   getNotes = (selectNoteTypes, current) => {
-    return current.doctorNotes
-      .filter(note => this.checkPrintNote(note, selectNoteTypes))
-      .map(note => {
-        const noteUserName = `${
-          note.signedByUserTitle && note.signedByUserTitle.trim().length
-            ? `${note.signedByUserTitle} ${note.signedByUserName || ''}`
-            : `${note.signedByUserName || ''}`
-        }`
-        return {
-          id: note.id,
-          visitFK: current.currentId,
-          history:
-            this.getNoteContent(
-              note,
-              selectNoteTypes,
-              WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
-            ) || '',
-          chiefComplaints:
-            this.getNoteContent(
-              note,
-              selectNoteTypes,
-              WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
-            ) || '',
-          note:
-            this.getNoteContent(
-              note,
-              selectNoteTypes,
-              WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
-            ) || '',
-          plan:
-            this.getNoteContent(
-              note,
-              selectNoteTypes,
-              WidgetConfig.WIDGETS_ID.PLAN,
-            ) || '',
-          doctor: noteUserName,
-          updateDate: moment(note.signedDate).format(
-            dateFormatLongWithTimeNoSec,
-          ),
+    const { doctorNotes = [], scribbleNotes = [] } = current
+    let newNote = []
+    const base64Prefix = 'data:image/jpeg;base64,'
+    doctorNotes.forEach(note => {
+      const noteUserName = `${
+        note.signedByUserTitle && note.signedByUserTitle.trim().length
+          ? `${note.signedByUserTitle} ${note.signedByUserName || ''}`
+          : `${note.signedByUserName || ''}`
+      }`
+      const updateDate = moment(note.signedDate).format(
+        dateFormatLongWithTimeNoSec,
+      )
+      selectNoteTypes.forEach(selectNoteType => {
+        const notesType = WidgetConfig.notesTypes.find(
+          type => type.value === selectNoteType,
+        )
+        let sortOrder = 0
+        if (
+          WidgetConfig.hasValue(note[notesType.fieldName]) &&
+          note[notesType.fieldName].trim().length
+        ) {
+          newNote.push({
+            id: note.id,
+            visitFK: current.currentId,
+            noteType: notesType.title,
+            valueType: 'String',
+            stringValue: note[notesType.fieldName],
+            sortOrder: sortOrder,
+            doctor: noteUserName,
+            updateDate: updateDate,
+          })
+          sortOrder = sortOrder + 1
         }
+
+        const scribbleType = scribbleTypes.find(
+          o => o.type === notesType.fieldName,
+        )
+        const filterScribbleNotes = scribbleNotes.filter(
+          sn => sn.scribbleNoteTypeFK === scribbleType?.typeFK,
+        )
+        filterScribbleNotes.forEach(scribbleNote => {
+          newNote.push({
+            id: note.id,
+            visitFK: current.currentId,
+            noteType: notesType.title,
+            valueType: 'Image',
+            imageTitle: scribbleNote.subject,
+            imageValue: scribbleNote.thumbnail,
+            sortOrder: sortOrder,
+            doctor: noteUserName,
+            updateDate: updateDate,
+          })
+          sortOrder = sortOrder + 1
+        })
       })
+    })
+    return newNote
   }
 
   showBasicExaminationsGeneral = (basicExaminations = []) => {
