@@ -26,6 +26,9 @@ class ServiceCenter extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingMedicationFrequency/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

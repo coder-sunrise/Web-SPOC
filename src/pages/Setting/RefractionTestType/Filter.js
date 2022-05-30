@@ -16,7 +16,10 @@ import {
 
 @withFormikExtend({
   mapPropsToValues: ({ settingRefractionTestType }) =>
-    settingRefractionTestType.filter || {},
+  ({
+    ...(settingRefractionTestType.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'RefractionTestTypeFilter',
 })

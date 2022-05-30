@@ -8,8 +8,20 @@ import {
   FastField,
   Field,
   Tooltip,
+  Popover,
 } from '@/components'
-import { Table, Radio, Input, Form, Popconfirm, Typography, Space } from 'antd'
+import { REPORT_ID } from '@/utils/constants'
+import { MenuList, ClickAwayListener, MenuItem } from '@material-ui/core'
+import {
+  Table,
+  Radio,
+  Input,
+  Form,
+  InputNumber,
+  Popconfirm,
+  Typography,
+  Space,
+} from 'antd'
 import {
   ExclamationCircleOutlined,
   PlusOutlined,
@@ -195,6 +207,7 @@ export const ContactPersonList = props => {
   const {
     dispatch,
     values,
+    OnPrintCoverPage,
     onEditingListControl,
     onPrint,
     enableEditDetails,
@@ -205,6 +218,10 @@ export const ContactPersonList = props => {
   const [editingKey, setEditingKey] = useState('')
   const [editingHasError, setEditingHasError] = useState(false)
   const [editingErrorFields, setEditingErrorFields] = useState([])
+  const [showPrintPoper, setShowPrintPoper] = useState(false)
+  const [copayerLabelCopies, setCopayerLabelCopies] = useState(1)
+  const [coverPageCopies, setCoverPageCopies] = useState(1)
+  const [contactPersonName, setContactPersonName] = useState(undefined)
 
   //--- Initialize contact person list state ---//
   const [data, setData] = useState([])
@@ -233,8 +250,12 @@ export const ContactPersonList = props => {
 
   const printCopayer = async record => {
     if (onPrint) {
-      console.log(record)
       onPrint(values.id, record.name)
+    }
+  }
+  const printCover = async record => {
+    if (OnPrintCoverPage) {
+      OnPrintCoverPage(values.id, record.name, coverPageCopies)
     }
   }
   const cancel = async record => {
@@ -528,12 +549,93 @@ export const ContactPersonList = props => {
                 </Typography.Link>
               )}
               {values.id > 0 && (
-                <Typography.Link
-                  color='primary'
-                  onClick={() => printCopayer(record)}
+                <Popover
+                  overlayClassName='noPaddingPopover'
+                  visible={showPrintPoper}
+                  placement='bottomLeft'
+                  trigger='click'
+                  transition
+                  onVisibleChange={val => {
+                    if (!val) {
+                      setShowPrintPoper(false)
+                    }
+                  }}
+                  content={
+                    <MenuList role='menu'>
+                      <MenuItem>
+                        <Button
+                          color='primary'
+                          size='sm'
+                          style={{ width: 150 }}
+                          onClick={() => printCopayer(record)}
+                          disabled={!Number.isInteger(copayerLabelCopies)}
+                        >
+                          Co-Payer Label
+                        </Button>
+                        <InputNumber
+                          size='small'
+                          min={1}
+                          max={10}
+                          value={copayerLabelCopies}
+                          onChange={value => setCopayerLabelCopies(value)}
+                          style={{ width: '50px', textAlign: 'right' }}
+                        />
+                        <span
+                          style={{
+                            fontSize: '0.75rem',
+                          }}
+                        >
+                          &nbsp;Copies
+                        </span>
+                      </MenuItem>
+                      <MenuItem>
+                        <Button
+                          color='primary'
+                          size='sm'
+                          style={{ width: 150 }}
+                          onClick={() =>
+                            OnPrintCoverPage(values.id, record.name, coverPageCopies)
+                          }
+                          disabled={!Number.isInteger(coverPageCopies)}
+                        >
+                          Co-Payer Cover Page
+                        </Button>
+                        <InputNumber
+                          size='small'
+                          min={1}
+                          max={10}
+                          value={coverPageCopies}
+                          onChange={value => setCoverPageCopies(value)}
+                          style={{ width: '50px', textAlign: 'right' }}
+                        />
+                        <span
+                          style={{
+                            fontSize: '0.75rem',
+                          }}
+                        >
+                          &nbsp;Copies
+                        </span>
+                      </MenuItem>
+                    </MenuList>
+                  }
                 >
-                  <PrinterFilled style={actionIconStyle} />
-                </Typography.Link>
+                  <Tooltip title='Print Co-Payer Labl and Mailing Cover Page'>
+                    {/* <Button
+                      color='primary'
+                      onClick={printCoverPage}
+                      size='sm'
+                      style={{ height: 25, marginTop: 25 }}
+                    >
+                      <Print /> Print
+                    </Button> */}
+                    <Typography.Link
+                      color='primary'
+                      onClick={() => printCoverPage(record)}
+                    >
+                      <PrinterFilled style={actionIconStyle} />
+                    </Typography.Link>
+                  </Tooltip>
+                </Popover>
               )}
             </div>
           )
@@ -622,6 +724,11 @@ export const ContactPersonList = props => {
       }),
     }
   })
+
+  const printCoverPage = record => {
+    setShowPrintPoper(true)
+    setContactPersonName(record.name || '')
+  }
 
   return (
     <React.Fragment>

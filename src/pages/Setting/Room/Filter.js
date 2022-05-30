@@ -15,7 +15,10 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingRoom }) => settingRoom.filter || {},
+  mapPropsToValues: ({ settingRoom }) => ({
+    ...(settingRoom.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'RoomFilter',
 })

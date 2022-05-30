@@ -97,11 +97,11 @@ export default compose(
   withStyles(styles, { withTheme: true }),
   withFormik({
     mapPropsToValues: () => ({
+      isActive:true,
       copayerFK: 'All Co-Payer',
     }),
     handleSubmit: (values, { props }) => {
       const { copayerFK, isActive, outstandingBalanceStatus } = values
-
       props.dispatch({
         type: 'corporateBilling/query',
         payload: {

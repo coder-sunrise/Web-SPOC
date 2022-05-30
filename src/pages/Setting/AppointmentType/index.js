@@ -33,6 +33,7 @@ const AppointmentType = ({
     dispatch({
       type: 'settingAppointmentType/query',
       payload: {
+        isActive:true,
         sorting: [
           { columnName: 'isDefault', direction: 'desc' },
           { columnName: 'displayValue', direction: 'asc' },

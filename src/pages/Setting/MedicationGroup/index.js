@@ -25,6 +25,9 @@ class MedicationGroup extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingMedicationGroup/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

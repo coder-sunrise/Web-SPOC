@@ -16,7 +16,10 @@ import {
 
 @withFormikExtend({
   mapPropsToValues: ({ settingMedicationSideEffect }) =>
-    settingMedicationSideEffect.filter || {},
+  ({
+    ...(settingMedicationSideEffect.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => { },
   displayName: 'MedicationSideEffectFilter',
 })

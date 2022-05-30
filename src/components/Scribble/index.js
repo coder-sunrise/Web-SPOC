@@ -318,6 +318,7 @@ let temp = null
     const payload = {
       subject: values.subject,
       thumbnail: values.thumbnail,
+      origin: values.origin,
       temp,
     }
     // console.log({ payload })
@@ -505,11 +506,11 @@ class Scribble extends React.Component {
       await setTimeout(() => {
         // wait for 1 milli second for img to set src successfully
       }, 100)
-      const thumbnailSize = { width: 275, height: 150 }
+      const thumbnailSize = { width: 100, height: 49 }
       const thumbnail = getThumbnail(imgEle, thumbnailSize)
       const thumbnailData = thumbnail.toDataURL(`image/jpeg`)
 
-      return thumbnailData
+      return { origin: result, thumbnail: thumbnailData }
     } catch (error) {
       console.error(error)
       return null
@@ -740,8 +741,10 @@ class Scribble extends React.Component {
 
   onSaveClick = async () => {
     temp = this._sketch.getAllLayerData()
-    const thumbnail = await this._generateThumbnail()
+    const { origin, thumbnail } = await this._generateThumbnail()
+    console.log({origin,thumbnail})
     await this.props.setFieldValue('thumbnail', thumbnail.split(',')[1])
+    await this.props.setFieldValue('origin', origin.split(',')[1])
     this.props.handleSubmit()
   }
 

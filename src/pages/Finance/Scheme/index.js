@@ -23,6 +23,9 @@ const Scheme = ({
   }
   useEffect(() => {
     dispatch({
+      payload: {
+        isActive:true,
+      },
       type: 'copaymentScheme/query',
     })
   }, [])

@@ -36,7 +36,10 @@ const styles = theme => ({
 
 @withFormikExtend({
   mapPropsToValues: ({ settingPublicHoliday }) =>
-    settingPublicHoliday.filter || {},
+  ({
+    ...(settingPublicHoliday.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'PublicHolidayFilter',
 })

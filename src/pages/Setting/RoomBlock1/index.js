@@ -24,6 +24,9 @@ class RoomBlock extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingRoomBlock/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

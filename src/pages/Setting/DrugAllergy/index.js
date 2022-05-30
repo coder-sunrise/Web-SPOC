@@ -32,6 +32,9 @@ class DrugAllergy extends PureComponent {
 
     this.props.dispatch({
       type: 'settingDrugAllergy/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

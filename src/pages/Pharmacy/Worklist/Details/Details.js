@@ -93,6 +93,7 @@ const Details = props => {
             user,
             clinicSettings,
           }),
+          editingOrder,
         },
       })
     } else {
@@ -108,6 +109,22 @@ const Details = props => {
           clinicSettings,
         }),
       })
+      dispatch({
+        type: 'pharmacyDetails/updateState',
+        payload: {
+          openOrderPopUpAfterActualize: true,
+          ordersData: getOrdersData({
+            selectPreOrder,
+            orders,
+            codetable,
+            visitRegistration,
+            patient,
+            user,
+            clinicSettings,
+          }),
+          editingOrder,
+        },
+      })
     }
   }
 
@@ -121,7 +138,9 @@ const Details = props => {
             from='Pharmacy'
             patientInfo={patient}
             editingOrder={
-              editingOrder || visit?.visitPurposeFK === VISIT_TYPE.OTC
+              editingOrder ||
+              (visit?.visitPurposeFK !== VISIT_TYPE.MC &&
+                pharmacyDetails.entity.statusFK === 1)
             }
             onSelectPreOrder={onSelectPreOrder}
             activePreOrderItems={draftPreOrderItem}

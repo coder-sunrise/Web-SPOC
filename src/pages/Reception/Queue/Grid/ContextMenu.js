@@ -72,10 +72,7 @@ const ContextMenu = ({
   clinicSettings,
 }) => {
   const isStatusWaiting = row.visitStatus === VISIT_STATUS.WAITING
-  const isVisitEditable =
-    isStatusWaiting ||
-    (clinicSettings.isVisitEditableAfterEndConsultation &&
-      row.isLastClinicalObjectRecordSigned)
+  const isVisitEditable = true
   const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
     row.visitStatus,
   )
@@ -156,13 +153,20 @@ const ContextMenu = ({
       })
     }
 
+    const editVisitRights = Authorized.check(
+      'queue.visitregistrationdetails',
+    ) || {
+      rights: 'hidden',
+    }
+
     return ContextMenuOptions.map(opt => {
       const isDisabled = rights === 'disable'
       switch (opt.id) {
         case 0: // edit visit
-          return { ...opt, hidden: !isVisitEditable }
+          return { ...opt, hidden: editVisitRights.rights !== 'enable' }
         case 0.1: // view visit
-          return { ...opt, hidden: isStatusWaiting || isVisitEditable }
+          // return { ...opt, hidden: false }
+          return { ...opt, hidden: editVisitRights.rights === 'enable' }
         case 1: // dispense
           return {
             ...opt,

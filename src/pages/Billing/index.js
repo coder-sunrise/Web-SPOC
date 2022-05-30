@@ -907,11 +907,13 @@ class Billing extends Component {
         InvoicePayerid: invoicePayerid,
         printIndex: index,
         printType: invoiceReportType,
+        _key: values?.invoice?.invoiceNo || '',
       }
     } else {
       parametrPayload = {
         InvoiceId: values.invoice ? values.invoice.id : '',
         printType: invoiceReportType,
+        _key: values?.invoice?.invoiceNo || '',
       }
     }
     const saveAndPrint = () => {
@@ -1311,7 +1313,11 @@ class Billing extends Component {
               collapses={[
                 {
                   key: 0,
-                  title: <h5 style={{ paddingLeft: 8 }}>Dispensing Details</h5>,
+                  title: (
+                    <h5 style={{ paddingLeft: 8, fontWeight: 'bold' }}>
+                      Dispensing Details
+                    </h5>
+                  ),
                   content: (
                     <div className={classes.dispenseContainer}>
                       <DispenseDetails
@@ -1345,7 +1351,9 @@ class Billing extends Component {
                 {
                   key: 1,
                   title: (
-                    <h5 style={{ paddingLeft: 8 }}>Invoice Payment Details</h5>
+                    <h5 style={{ paddingLeft: 8, fontWeight: 'bold' }}>
+                      Invoice Payment Details
+                    </h5>
                   ),
                   content: (
                     <div className={classes.dispenseContainer}>

@@ -7,9 +7,12 @@ import {
   notification,
   Popconfirm,
   Button,
+  Popover,
   Tooltip,
 } from '@/components'
+import { InputNumber } from 'antd'
 import Authorized from '@/utils/Authorized'
+import { MenuList, ClickAwayListener, MenuItem } from '@material-ui/core'
 
 import { getCodes } from '@/utils/codetable'
 import { SCHEME_TYPE } from '@/utils/constants'
@@ -33,6 +36,11 @@ class SchemesGrid extends PureComponent {
     editingRowIds: [],
     rowChanges: {},
     isPatientProfileSaved: false,
+    popperOpen: false,
+    printCopayerFK: undefined,
+    anchorEl: undefined,
+    copayerLabelCopies: 1,
+    copayerCoverPageCopies: 1,
   }
 
   componentDidMount = () => {
@@ -47,6 +55,7 @@ class SchemesGrid extends PureComponent {
       title,
       titleChildren,
       dispatch,
+      id,
       type,
       clinicSettings,
       values,
@@ -213,14 +222,82 @@ class SchemesGrid extends PureComponent {
         ReportData: JSON.stringify({
           ...data,
         }),
+        Copies: this.state.copayerLabelCopies,
       },
     ]
     handlePrint(JSON.stringify(payload))
   }
 
+  printCopayerCoverPage = async (row, copayerId) => {
+    if (!Number.isInteger(copayerId)) return
+
+    const { dispatch, handlePrint, clinicSettings, patient } = this.props
+    dispatch({
+      type: 'copayerDetail/queryCopayerDetails',
+      payload: {
+        id: copayerId,
+      },
+    }).then(r => {
+      if (!r) return
+      const data = {}
+      let information = {}
+      information.Title = patient?.entity?.name
+      if (r.address) {
+        let address = r?.address || {}
+        information.Content = `${r.displayValue}\n${address.blockNo}${
+          address.street ? ' ' + address.street : ''
+        }${address.blockNo || address.street ? '\n' : ''}${address.unitNo}${
+          address.buildingName ? ' ' + address.buildingName : ''
+        }${address.unitNo || address.buildingName ? '\n' : ''}${
+          address.countryName ? address.countryName : ''
+        } ${address.postcode ? ' ' + address.postcode : ''}`
+      }
+      data.MailingInformation = [information]
+      const payload = [
+        {
+          ReportId: 95,
+          ReportData: JSON.stringify(data),
+          Copies: this.state.copayerCoverPageCopies,
+        },
+      ]
+      handlePrint(JSON.stringify(payload))
+    })
+  }
+
+  openPopper = row => {
+    const { onPrintButtonClick } = this.props
+    if (onPrintButtonClick) onPrintButtonClick(row.id)
+  }
+  closePopper = () => {
+    this.setState({
+      copayerLabelCopies: 1,
+      copayerCoverPageCopies: 1,
+    })
+    const { onPrintButtonClick } = this.props
+    if (onPrintButtonClick) onPrintButtonClick(null)
+  }
+
+  handleCopyNoChange = (value, labelType) => {
+    if (labelType === 'Co-Payer Label') {
+      this.setState({ copayerLabelCopies: value || 1 })
+    } else {
+      this.setState({ copayerCoverPageCopies: value || 1 })
+    }
+  }
+
   render() {
-    const { editingRowIds, rowChanges } = this.state
-    const { type, rows, schema, values, errors, clinicSettings } = this.props
+    const labelTypes = ['Co-Payer Label', 'Co-Payer Cover Page']
+    const { editingRowIds, rowChanges, anchorEl } = this.state
+    const {
+      type,
+      rows,
+      schema,
+      sendingJob,
+      values,
+      errors,
+      printAnchorEl,
+      clinicSettings,
+    } = this.props
     const EditingProps = {
       showAddCommand: true,
       showCommandColumn: false,
@@ -416,36 +493,137 @@ class SchemesGrid extends PureComponent {
           const { commitChanges } = control
           return (
             <Fragment>
-              <Popconfirm
-                title='Confirm to delete?'
-                onConfirm={() => {
-                  commitChanges({
-                    changed: {
-                      [row.id]: {
-                        isDeleted: true,
-                      },
-                    },
-                  })
+              <div
+                style={{
+                  marginBottom: 8,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
-                <Button size='sm' justIcon color='danger'>
-                  <Delete />
-                </Button>
-              </Popconfirm>
-              <Tooltip title="Print Patient's Co-Payer Label">
-                <Button
-                  size='sm'
-                  justIcon
-                  color='primary'
-                  disabled={row.id < 1}
+                <Popconfirm
+                  title='Confirm to delete?'
+                  onConfirm={() => {
+                    commitChanges({
+                      changed: {
+                        [row.id]: {
+                          isDeleted: true,
+                        },
+                      },
+                    })
+                  }}
                 >
-                  <Print
-                    onClick={() => {
-                      this.printLabel(row.copayerFK)
-                    }}
-                  />
-                </Button>
-              </Tooltip>
+                  <Button size='sm' justIcon color='danger'>
+                    <Delete />
+                  </Button>
+                </Popconfirm>
+                <Popover
+                  overlayClassName='noPaddingPopover'
+                  visible={row.id === this.props.targetPrintId}
+                  placement='bottomLeft'
+                  trigger='click'
+                  transition
+                  onVisibleChange={val => {
+                    if (!val) {
+                      const { onPrintButtonClick } = this.props
+                      if (onPrintButtonClick) {
+                        onPrintButtonClick(undefined)
+                        this.setState({
+                          copayerCoverPageCopies: 1,
+                          copayerLabelCopies: 1,
+                        })
+                      }
+                    }
+                  }}
+                  content={
+                    <MenuList role='menu'>
+                      <MenuItem>
+                        <Button
+                          color='primary'
+                          size='sm'
+                          style={{ width: 150 }}
+                          onClick={() => this.printLabel(row.copayerFK)}
+                          disabled={
+                            !Number.isInteger(this.state.copayerLabelCopies) ||
+                            this.state.sendingJob
+                          }
+                        >
+                          Co-Payer Label
+                        </Button>
+                        <InputNumber
+                          size='small'
+                          min={1}
+                          max={10}
+                          value={this.state.copayerLabelCopies}
+                          onChange={value =>
+                            this.setState({
+                              copayerLabelCopies: value || 1,
+                            })
+                          }
+                          style={{ width: '50px', textAlign: 'right' }}
+                        />
+                        <span
+                          style={{
+                            fontSize: '0.75rem',
+                          }}
+                        >
+                          &nbsp;Copies
+                        </span>
+                      </MenuItem>
+                      <MenuItem>
+                        <Button
+                          color='primary'
+                          size='sm'
+                          style={{ width: 150 }}
+                          onClick={() =>
+                            this.printCopayerCoverPage(row, row.copayerFK)
+                          }
+                          disabled={
+                            !Number.isInteger(
+                              this.state.copayerCoverPageCopies,
+                            ) || this.state.sendingJob
+                          }
+                        >
+                          Co-Payer Cover Page
+                        </Button>
+                        <InputNumber
+                          size='small'
+                          min={1}
+                          max={10}
+                          value={this.state.copayerCoverPageCopies}
+                          onChange={value =>
+                            this.setState({
+                              copayerCoverPageCopies: value || 1,
+                            })
+                          }
+                          style={{ width: '50px', textAlign: 'right' }}
+                        />
+                        <span
+                          style={{
+                            fontSize: '0.75rem',
+                          }}
+                        >
+                          &nbsp;Copies
+                        </span>
+                      </MenuItem>
+                    </MenuList>
+                  }
+                >
+                  <Tooltip title="Print Patient's Co-Payer Label">
+                    <Button
+                      size='sm'
+                      justIcon
+                      color='primary'
+                      onClick={() => {
+                        this.openPopper(row)
+                      }}
+                      disabled={row.id < 1}
+                    >
+                      <Print />
+                    </Button>
+                  </Tooltip>
+                </Popover>
+              </div>
             </Fragment>
           )
         },
@@ -460,6 +638,7 @@ class SchemesGrid extends PureComponent {
         FuncProps={{ pager: false }}
         EditingProps={EditingProps}
         schema={schema}
+        forceRender
         columns={[
           { name: 'schemeTypeFK', title: 'Scheme Type' },
           { name: 'coPaymentSchemeFK', title: 'Scheme Name' },

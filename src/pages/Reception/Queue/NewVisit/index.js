@@ -473,6 +473,7 @@ class NewVisit extends PureComponent {
         errorState,
         visitOrderTemplateOptions,
         expandRefractionForm,
+        visitMode,
       },
       values,
       global,
@@ -489,6 +490,12 @@ class NewVisit extends PureComponent {
       global.showMedicalCheckupReportingDetails || false
     const { visitPreOrderItem = [] } = values
 
+    const vitalAccessRight = Authorized.check(
+      'queue.registervisit.vitalsign',
+    ) || { rights: 'hidden' }
+    const vitalSignEditAccessRight =
+      vitalAccessRight.rights === 'readwrite' ||
+      vitalAccessRight.rights === 'enable'
     if (expandRefractionForm) {
       let div = $(this.myRef.current).find('div[aria-expanded]:eq(1)')
       if (div.attr('aria-expanded') === 'false') div.click()
@@ -508,16 +515,7 @@ class NewVisit extends PureComponent {
       [],
     )
     const isReadOnly =
-      (values.visitStatus !== VISIT_STATUS.WAITING &&
-        values.visitStatus !== VISIT_STATUS.UPCOMING_APPT) ||
-      !patientInfo ||
-      !patientInfo.isActive ||
-      fromMedicalCheckupReporting
-    let isReadonlyAfterSigned =
-      clinicSettings.settings.isVisitEditableAfterEndConsultation &&
-      values.isLastClinicalObjectRecordSigned
-        ? false
-        : isReadOnly
+      !patientInfo || !patientInfo.isActive || visitMode === 'view'
     const isEdit = !!values.id
     const fetchingVisitInfo =
       loading.effects['visitRegistration/fetchVisitInfo']
@@ -562,6 +560,17 @@ class NewVisit extends PureComponent {
       ((values.medicalCheckupWorkitem || [{}])[0].reportLanguage || []).length >
         0
 
+    // console.log(values)
+    // console.log(this.props)
+    // console.log(
+    //   !vitalSignEditAccessRight ||
+    //     visitMode === 'view' ||
+    //     values.isDoctorConsulted,
+    // )
+    const isBasicExaminationDisabled =
+      !patientInfo || !patientInfo.isActive || visitMode === 'view'
+        ? true
+        : values.isDoctorConsulted
     return (
       <React.Fragment>
         <LoadingWrapper
@@ -608,10 +617,9 @@ class NewVisit extends PureComponent {
                           fromMedicalCheckupReporting={
                             fromMedicalCheckupReporting
                           }
-                          isVisitReadonlyAfterSigned={isReadonlyAfterSigned}
                           isDoctorConsulted={values.isDoctorConsulted}
-                          isSigned={values.isLastClinicalObjectRecordSigned}
                           existingQNo={existingQNo}
+                          visitMode={visitMode}
                           copaymentScheme={(
                             patientInfo?.patientScheme || []
                           ).filter(
@@ -621,6 +629,7 @@ class NewVisit extends PureComponent {
                                 SCHEME_TYPE.INSURANCE,
                               ].indexOf(t.schemeTypeFK) >= 0,
                           )}
+                          isReadOnly={isReadOnly}
                           handleUpdateAttachments={this.updateAttachments}
                           attachments={values.visitAttachment}
                           visitType={values.visitPurposeFK}
@@ -630,102 +639,73 @@ class NewVisit extends PureComponent {
                         />
                       </GridItem>
                     </Authorized.Context.Provider>
-                    <Authorized.Context.Provider
-                      value={{
-                        rights:
-                          (isReadOnly || isRetail) && isReadonlyAfterSigned
-                            ? 'disable'
-                            : 'enable',
-                      }}
-                    >
-                      <React.Fragment>
-                        <Authorized authority='queue.registervisit.vitalsign'>
-                          {({ rights: vitalAccessRight }) => (
-                            <Authorized.Context.Provider
-                              value={{
-                                rights:
-                                  (vitalAccessRight === 'readwrite' ||
-                                    vitalAccessRight === 'enable') &&
-                                  isReadonlyAfterSigned
-                                    ? 'disable'
-                                    : vitalAccessRight,
-                              }}
-                            >
-                              <GridItem xs={12} className={classes.row}>
-                                <VitalSignCard
-                                  // isReadOnly={isReadOnly}
-                                  disabled={
-                                    ((isReadOnly ||
-                                      isRetail ||
-                                      vitalAccessRight === 'enable') &&
-                                      isReadonlyAfterSigned) ||
-                                    vitalAccessRight !== 'enable'
-                                  }
+                    <React.Fragment>
+                      <GridItem xs={12} className={classes.row}>
+                        <Authorized.Context.Provider
+                          value={{
+                            rights: isBasicExaminationDisabled
+                              ? 'disable'
+                              : 'enable',
+                          }}
+                        >
+                          <VitalSignCard
+                            {...this.props}
+                            disabled={
+                              !vitalSignEditAccessRight ||
+                              visitMode === 'view' ||
+                              values.isDoctorConsulted
+                            }
+                          />
+                        </Authorized.Context.Provider>
+                      </GridItem>
+                      <GridItem xs={12} className={classes.row}>
+                        <CommonCard title='Referral'>
+                          <ReferralCard
+                            {...this.props}
+                            mode='visitregistration'
+                            visitMode={visitMode}
+                            disabled={isReadOnly}
+                            handleUpdateAttachments={this.updateAttachments}
+                            attachments={values.visitAttachment}
+                            dispatch={dispatch}
+                            values={values}
+                            referralType={referralType}
+                            setFieldValue={setFieldValue}
+                          />
+                        </CommonCard>
+                      </GridItem>
+                    </React.Fragment>
+                    {!isRetail && (
+                      <Authorized
+                        value={{
+                          rights: isReadOnly ? 'disable' : 'enable',
+                        }}
+                      >
+                        {values.visitPurposeFK === VISIT_TYPE.MC &&
+                          !values.isForInvoiceReplacement && (
+                            <GridItem xs={12} className={classes.row}>
+                              <CommonCard title='Medical Check Up'>
+                                <MCCard
                                   {...this.props}
+                                  mode='visitregistration'
+                                  isDoctorConsulted={values.isDoctorConsulted}
+                                  fromMedicalCheckupReporting={
+                                    fromMedicalCheckupReporting
+                                  }
+                                  visitMode={visitMode}
+                                  reportingDoctorSchema={reportingDoctorSchema}
+                                  validateReportLanguage={
+                                    validateReportLanguage
+                                  }
                                 />
-                              </GridItem>
-                            </Authorized.Context.Provider>
+                              </CommonCard>
+                            </GridItem>
                           )}
-                        </Authorized>
-                        <GridItem xs={12} className={classes.row}>
-                          <CommonCard title='Referral'>
-                            <ReferralCard
-                              {...this.props}
-                              mode='visitregistration'
-                              isVisitReadonlyAfterSigned={isReadonlyAfterSigned}
-                              isSigned={values.isLastClinicalObjectRecordSigned}
-                              fromMedicalCheckupReporting={
-                                fromMedicalCheckupReporting
-                              }
-                              handleUpdateAttachments={this.updateAttachments}
-                              attachments={values.visitAttachment}
-                              dispatch={dispatch}
-                              values={values}
-                              referralType={referralType}
-                              setFieldValue={setFieldValue}
-                            />
-                          </CommonCard>
-                        </GridItem>
-                      </React.Fragment>
-                    </Authorized.Context.Provider>
-                    <Authorized
-                      value={{
-                        rights:
-                          (isReadOnly || isRetail) && isReadonlyAfterSigned
-                            ? 'disable'
-                            : 'enable',
-                      }}
-                    >
-                      {values.visitPurposeFK === VISIT_TYPE.MC &&
-                        !values.isForInvoiceReplacement && (
-                          <GridItem xs={12} className={classes.row}>
-                            <CommonCard title='Medical Check Up'>
-                              <MCCard
-                                {...this.props}
-                                mode='visitregistration'
-                                isVisitReadonlyAfterSigned={
-                                  isReadonlyAfterSigned
-                                }
-                                isDoctorConsulted={values.isDoctorConsulted}
-                                isSigned={
-                                  values.isLastClinicalObjectRecordSigned
-                                }
-                                fromMedicalCheckupReporting={
-                                  fromMedicalCheckupReporting
-                                }
-                                reportingDoctorSchema={reportingDoctorSchema}
-                                validateReportLanguage={validateReportLanguage}
-                              />
-                            </CommonCard>
-                          </GridItem>
-                        )}
-                    </Authorized>
+                      </Authorized>
+                    )}
                     <Authorized.Context.Provider
                       value={{
-                        rights:
-                          (isReadOnly || isRetail) && isReadonlyAfterSigned
-                            ? 'disable'
-                            : 'enable',
+                        rights: isReadOnly || isRetail ? 'disable' : 'enable',
                       }}
                     >
                       {values.visitPreOrderItem &&
@@ -767,13 +747,6 @@ class NewVisit extends PureComponent {
                   </React.Fragment>
                 </SizeContainer>
               </ErrorWrapper>
-              {/*
-                <GridItem xs={12} container>
-                  <GridItem xs={12} className={classes.cardContent}>
-                    <ParticipantCard />
-                  </GridItem>
-                </GridItem>
-              */}
             </GridItem>
           </GridContainer>
         </LoadingWrapper>
@@ -783,10 +756,9 @@ class NewVisit extends PureComponent {
               confirmBtnText: isEdit ? 'Save' : 'Register Visit',
               onConfirm: this.validatePatient,
               confirmProps: {
-                disabled:
-                  !validateReportLanguage ||
-                  (!fromMedicalCheckupReporting &&
-                    (isReadonlyAfterSigned || !this.state.hasActiveSession)),
+                disabled: fromMedicalCheckupReporting
+                  ? false
+                  : !validateReportLanguage || visitMode === 'view',
               },
             })}
         </div>

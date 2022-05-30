@@ -33,7 +33,9 @@ class Service extends PureComponent {
   componentDidMount() {
     this.props.dispatch({
       type: 'settingClinicService/query',
-      payload: {},
+      payload: {
+        'ServiceFKNavigation.isActive': true,
+      },
     })
     this.props.dispatch({
       type: 'settingClinicService/getServiceCenter',

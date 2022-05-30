@@ -27,6 +27,9 @@ class Tag extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingTag/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

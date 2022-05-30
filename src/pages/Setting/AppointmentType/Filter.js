@@ -87,5 +87,7 @@ const Filter = ({ classes, dispatch, values, toggleModal }) => {
 }
 
 export default withFormikExtend({
-  mapPropsToValues: () => ({}),
+  mapPropsToValues: () => ({
+    isActive:true,
+  }),
 })(Filter)

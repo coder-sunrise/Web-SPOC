@@ -26,6 +26,9 @@ class MedicationDosage extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingMedicationDosage/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

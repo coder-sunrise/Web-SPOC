@@ -25,6 +25,9 @@ class VisitOrderTemplate extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingVisitOrderTemplate/query',
+      payload: {
+        isActive: true,
+      },
     })
   }
 

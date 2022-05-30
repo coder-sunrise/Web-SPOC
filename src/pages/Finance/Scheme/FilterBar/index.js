@@ -165,7 +165,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
 export default compose(
   withStyles(styles, { withTheme: true }),
   withFormik({
-    mapPropsToValues: () => {},
+    mapPropsToValues: () => ({ isActive: true }),
   }),
   React.memo,
 )(FilterBar)

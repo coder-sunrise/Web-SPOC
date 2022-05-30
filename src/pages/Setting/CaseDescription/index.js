@@ -26,6 +26,9 @@ class CaseDescription extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingCaseDescription/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

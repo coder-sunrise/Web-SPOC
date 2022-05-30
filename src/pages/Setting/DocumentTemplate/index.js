@@ -26,6 +26,9 @@ class DocumentTemplate extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingDocumentTemplate/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

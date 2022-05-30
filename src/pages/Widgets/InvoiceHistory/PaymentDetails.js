@@ -192,6 +192,7 @@ class PaymentDetails extends Component {
             CopayerId: copayerID,
             InvoicePayerid: invoicePayerid,
             printType: invoiceReportType,
+            _key: invoiceDetail?.invoiceNo || '',
           },
           'Invoice',
         )

@@ -15,7 +15,10 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingTreatment }) => settingTreatment.filter || {},
+  mapPropsToValues: ({ settingTreatment }) => ({
+    ...(settingTreatment.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'TreatmentFilter',
 })

@@ -16,7 +16,10 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingTag }) => settingTag.filter || {},
+  mapPropsToValues: ({ settingTag }) => ({
+    ...(settingTag.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'TagFilter',
 })

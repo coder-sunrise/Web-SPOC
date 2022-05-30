@@ -30,8 +30,8 @@ const MCCard = ({
   values,
   fromMedicalCheckupReporting = false,
   clinicSettings,
+  visitMode = 'view',
   ctlanguage = [],
-  isVisitReadonlyAfterSigned,
   isDoctorConsulted,
   validateReportLanguage,
 }) => {
@@ -40,6 +40,11 @@ const MCCard = ({
     return rows
   }
 
+  const mcWorkItemInProgress =
+    values?.medicalCheckupWorkitem &&
+    values?.medicalCheckupWorkitem.length > 0 &&
+    (values?.medicalCheckupWorkitem[0].statusFK === 1 ||
+      values?.medicalCheckupWorkitem[0].statusFK === 2)
   const getReportLanguage = () => {
     const {
       primaryPrintoutLanguage = 'EN',
@@ -62,7 +67,7 @@ const MCCard = ({
     }
 
     if (langueges.length === 1) return ''
-
+    // console.log(!mcWorkItemInProgress, visitMode === 'view')
     return (
       <div style={{ width: 180 }}>
         <Field
@@ -71,9 +76,7 @@ const MCCard = ({
             <CheckboxGroup
               label='Report Language'
               options={langueges}
-              disabled={
-                !fromMedicalCheckupReporting && isVisitReadonlyAfterSigned
-              }
+              disabled={!mcWorkItemInProgress || visitMode === 'view'}
               {...args}
             />
           )}
@@ -88,11 +91,6 @@ const MCCard = ({
     },
   ]
 
-  const mcWorkItemInProgress =
-    values?.medicalCheckupWorkitem &&
-    values?.medicalCheckupWorkitem.length > 0 &&
-    (values?.medicalCheckupWorkitem[0].statusFK === 1 ||
-      values?.medicalCheckupWorkitem[0].statusFK === 2)
   columns.push({ name: 'action', title: ' ' })
   const columnExtension = [
     {
@@ -153,7 +151,7 @@ const MCCard = ({
   // and edit visit from MC reporting page then allow user to add reporting doctor.
   let showAddCommand = fromMedicalCheckupReporting
     ? mcWorkItemInProgress
-    : !isVisitReadonlyAfterSigned && !isDoctorConsulted
+    : visitMode === 'edit'
   return (
     <GridContainer alignItems='center'>
       <GridItem xs md={12} container>
@@ -179,9 +177,7 @@ const MCCard = ({
                     label: 'Urgent',
                   },
                 ]}
-                disabled={
-                  !fromMedicalCheckupReporting && isVisitReadonlyAfterSigned
-                }
+                disabled={!mcWorkItemInProgress || visitMode === 'view'}
                 onChange={e => {
                   if (e.target.value !== 'Urgent') {
                     setFieldValue(
@@ -207,9 +203,7 @@ const MCCard = ({
                   rowsMax={3}
                   maxLength={2000}
                   authority='none'
-                  disabled={
-                    !fromMedicalCheckupReporting && isVisitReadonlyAfterSigned
-                  }
+                  disabled={!mcWorkItemInProgress || visitMode === 'view'}
                   label='Urgent Report Remarks'
                 />
               )}

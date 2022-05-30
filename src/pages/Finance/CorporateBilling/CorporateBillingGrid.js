@@ -158,7 +158,7 @@ class CorporateBillingGrid extends PureComponent {
       type: 'corporateBilling/query',
       payload: {
         id: undefined,
-        isActive: undefined,
+        isActive: true,
         apiCriteria: {
           outstandingBalanceStatus: undefined,
         },

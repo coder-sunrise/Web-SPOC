@@ -47,7 +47,7 @@ const Detail = ({
   errors,
   clinicSettings,
 }) => {
-  const [hasActiveSession, setHasActiveSession] = useState(false)
+  const [hasActiveSession, setHasActiveSession] = useState(undefined)
 
   const detailProps = {
     consumableDetail,
@@ -102,57 +102,30 @@ const Detail = ({
 
   return (
     <React.Fragment>
-      {/* <NavPills
-        color='primary'
-        onChange={(event, active) => {
-          history.push(
-            getAppendUrl({
-              t: active,
-            }),
-          )
-        }}
-        contentStyle={{ margin: '0 -5px' }}
-        tabs={[
-          {
-            tabButton: 'General',
-            tabContent: <DetailPanel {...detailProps} />,
-          },
-          {
-            tabButton: 'Pricing',
-            tabContent: <Pricing {...detailProps} />,
-          },
-          {
-            tabButton: 'Stock',
-            tabContent: (
-              <Stock
-                consumableDetail={consumableDetail}
-                values={values}
-                setFieldValue={setFieldValue}
-              />
-            ),
-          },
-        ]}
-      /> */}
-      <Tabs
-        style={{ marginTop: 20 }}
-        defaultActiveKey='0'
-        options={ConsumableDetailOption(detailProps, stockProps)}
-      />
-      <div className={classes.actionDiv}>
-        <Button
-          color='danger'
-          authority='none'
-          onClick={navigateDirtyCheck({
-            redirectUrl: '/inventory/master?t=1',
-          })}
-        >
-          Close
-        </Button>
-        <ProgressButton
-          submitKey='consumableDetail/submit'
-          onClick={handleSubmit}
-        />
-      </div>
+      {hasActiveSession !== undefined && (
+        <React.Fragment>
+          <Tabs
+            style={{ marginTop: 20 }}
+            defaultActiveKey='0'
+            options={ConsumableDetailOption({ ...detailProps }, stockProps)}
+          />
+          <div className={classes.actionDiv}>
+            <Button
+              color='danger'
+              authority='none'
+              onClick={navigateDirtyCheck({
+                redirectUrl: '/inventory/master?t=1',
+              })}
+            >
+              Close
+            </Button>
+            <ProgressButton
+              submitKey='consumableDetail/submit'
+              onClick={handleSubmit}
+            />
+          </div>
+        </React.Fragment>
+      )}
     </React.Fragment>
   )
 }

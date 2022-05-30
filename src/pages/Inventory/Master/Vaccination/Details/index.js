@@ -39,10 +39,7 @@ const Detail = ({
   setFieldValue,
   ...props
 }) => {
-  const [
-    hasActiveSession,
-    setHasActiveSession,
-  ] = useState(true)
+  const [hasActiveSession, setHasActiveSession] = useState(undefined)
 
   const detailProps = {
     vaccinationDetail,
@@ -86,7 +83,7 @@ const Detail = ({
         payload: {
           id: vaccinationDetail.currentId,
         },
-      }).then((vac) => {
+      }).then(vac => {
         const { sddfk } = vac
         if (sddfk) {
           dispatch({
@@ -94,7 +91,7 @@ const Detail = ({
             payload: {
               id: sddfk,
             },
-          }).then((sdd) => {
+          }).then(sdd => {
             // const { data } = sdd
             // const { code, name } = data[0]
             // setFieldValue('sddCode', code)
@@ -106,13 +103,15 @@ const Detail = ({
   }, [])
 
   const handelSave = () => {
-    const { values: { schemes = [] }, codetable } = props
+    const {
+      values: { schemes = [] },
+      codetable,
+    } = props
     const { documenttemplate = [] } = codetable
     if (
-      schemes.find((s) => s === 'isAutoGenerateCertificate') &&
+      schemes.find(s => s === 'isAutoGenerateCertificate') &&
       !documenttemplate.find(
-        (dt) =>
-          dt.isDefaultTemplate === true && dt.documentTemplateTypeFK === 3,
+        dt => dt.isDefaultTemplate === true && dt.documentTemplateTypeFK === 3,
       )
     ) {
       notification.warning({
@@ -124,26 +123,30 @@ const Detail = ({
 
   return (
     <React.Fragment>
-      <Tabs
-        style={{ marginTop: 20 }}
-        defaultActiveKey='0'
-        options={VaccinationDetailOption(detailProps, stockProps)}
-      />
-      <div className={classes.actionDiv}>
-        <Button
-          color='danger'
-          authority='none'
-          onClick={navigateDirtyCheck({
-            redirectUrl: '/inventory/master?t=2',
-          })}
-        >
-          Close
-        </Button>
-        <ProgressButton
-          submitKey='vaccinationDetail/submit'
-          onClick={handelSave}
-        />
-      </div>
+      {hasActiveSession !== undefined && (
+        <React.Fragment>
+          <Tabs
+            style={{ marginTop: 20 }}
+            defaultActiveKey='0'
+            options={VaccinationDetailOption(detailProps, stockProps)}
+          />
+          <div className={classes.actionDiv}>
+            <Button
+              color='danger'
+              authority='none'
+              onClick={navigateDirtyCheck({
+                redirectUrl: '/inventory/master?t=2',
+              })}
+            >
+              Close
+            </Button>
+            <ProgressButton
+              submitKey='vaccinationDetail/submit'
+              onClick={handelSave}
+            />
+          </div>
+        </React.Fragment>
+      )}
     </React.Fragment>
   )
 }

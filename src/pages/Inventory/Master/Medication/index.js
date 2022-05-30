@@ -104,6 +104,7 @@ const Medication = ({ dispatch, history, medication, values }) => {
     dispatch({
       type: 'medication/query',
       payload: {
+        isActive:true,
         sorting: [
           { columnName: 'effectiveEndDate', direction: 'desc' },
           { columnName: 'displayValue', direction: 'asc' },

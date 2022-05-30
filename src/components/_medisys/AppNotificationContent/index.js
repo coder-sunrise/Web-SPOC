@@ -72,10 +72,11 @@ class AppNotificationContent extends Component {
       isRead,
       patientName,
     } = notification
-
     const { internalContent = content } = this.state
     const isSender = currentUserFK == fromUserFK
-    const isReceiver = !isSender
+    const isReceiver = currentUserFK == toUserFK
+    const isOtherPRO = !isSender && !isReceiver
+    console.log({isSender,isReceiver,isOtherPRO,content})
     return (
       <div style={{ ...customeStyle }}>
         <div>
@@ -95,7 +96,7 @@ class AppNotificationContent extends Component {
             <div
               style={{
                 whiteSpace: 'pre-wrap',
-                fontWeight: isRead ? 'unset' : 'bold',
+                fontWeight: isRead || isOtherPRO ? 'unset' : 'bold',
               }}
             >
               {internalContent}
@@ -166,24 +167,28 @@ class AppNotificationContent extends Component {
                     <Done style={{ color: '#389e0d' }} />
                   </div>
                 ) : null)}
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 25,
-                  bottom: 0,
-                  fontSize: '0.75rem',
-                }}
-              >{`To: ${toUser}`}</div>
-              <div
-                style={{
-                  position: 'absolute',
-                  right: 0,
-                  bottom: 0,
-                  fontSize: '0.75rem',
-                }}
-              >
-                {`From: ${fromUser}, ${formatDateTime(generateDate)}`}
-              </div>
+              {(isSender || isOtherPRO) && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: 25,
+                    bottom: 0,
+                    fontSize: '0.75rem',
+                  }}
+                >{`To: ${toUser}`}</div>
+              )}
+              {(isReceiver || isOtherPRO) && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: 0,
+                    bottom: 0,
+                    fontSize: '0.75rem',
+                  }}
+                >
+                  {`From: ${fromUser}, ${formatDateTime(generateDate)}`}
+                </div>
+              )}
             </div>
           )}
         </div>

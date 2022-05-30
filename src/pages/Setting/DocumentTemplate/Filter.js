@@ -20,7 +20,10 @@ import Menu from '@material-ui/core/Menu'
 
 @withFormikExtend({
   mapPropsToValues: ({ settingDocumentTemplate }) =>
-    settingDocumentTemplate.filter || {},
+  ({
+    ...(settingDocumentTemplate.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'DocumentTemplateFilter',
 })
@@ -131,13 +134,13 @@ class Filter extends PureComponent {
                     type: 'settingDocumentTemplate/query',
                     payload: {
                       isActive,
+                      documentTemplateTypeFK,
+                      documentCategoryFK,
                       group: [
                         {
                           code: codeDisplayValue,
                           displayValue: codeDisplayValue,
-                          documentTemplateTypeFK,
-                          documentCategoryFK,
-                          combineCondition: 'and',
+                          combineCondition: 'or',
                         },
                       ],
                     },

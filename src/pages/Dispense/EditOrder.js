@@ -48,12 +48,19 @@ const discardConsultation = async ({
   dispense,
   from = 'Dispense',
   closeEditOrder,
+  orders,
 }) => {
   try {
     const consultationResult = await dispatch({
       type: 'consultation/discard',
       payload: {
         id: dispense.entity.clinicalObjectRecordFK,
+      },
+    })
+    dispatch({
+      type: 'orders/updateState',
+      payload: {
+        rows: orders._originalRows,
       },
     })
     if (consultationResult) {

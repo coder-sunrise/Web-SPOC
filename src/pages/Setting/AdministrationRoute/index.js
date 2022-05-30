@@ -25,6 +25,9 @@ class ServiceCenter extends PureComponent {
 
   componentDidMount () {
     this.props.dispatch({
+      payload: {
+        isActive:true,
+      },
       type: 'settingAdministrationRoute/query',
     })
   }

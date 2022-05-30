@@ -404,6 +404,7 @@ class PatientInfoSideBanner extends PureComponent {
             patientId={entity.id}
             clinicSettings={clinicSettings}
             isEnableScanner
+            {...this.props}
           />
           {allowChangePatientStatus &&
             (!this.state.patientIntoActiveSession || !entity.isActive) && (
@@ -617,11 +618,12 @@ class PatientInfoSideBanner extends PureComponent {
   }
 }
 const ConnectedPatientInfoSideBanner = connect(
-  ({ loading, clinicSettings }) => ({
+  ({ loading, clinicSettings, codetable }) => ({
     loading:
       loading.effects['patient/refreshChasBalance'] ||
       loading.effects['patient/refreshMedisaveBalance'],
     clinicSettings: clinicSettings.settings,
+    codetable: codetable,
   }),
 )(PatientInfoSideBanner)
 

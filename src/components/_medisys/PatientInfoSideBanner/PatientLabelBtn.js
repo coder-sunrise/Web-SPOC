@@ -21,6 +21,7 @@ const labelTypes = [
   'Patient_Label',
   'Patient_Lab_Label',
   'Patient_Address_Label',
+  'Patient_Cover_Page',
 ]
 
 const useStyles = makeStyles(() => ({
@@ -45,6 +46,8 @@ const PatientLabelButton = ({
   clinicSettings,
   sendingJob,
   iconOnly = false,
+  codetable,
+  ...restProps
 }) => {
   const classes = useStyles()
 
@@ -69,25 +72,58 @@ const PatientLabelButton = ({
   const handleClick = async labelType => {
     if (!Number.isInteger(copyNo[labelType])) return
 
-    const { labelPrinterSize } = clinicSettings
+    if (labelType !== 'Patient_Cover_Page') {
+      const { labelPrinterSize } = clinicSettings
 
-    const reportID =
-      REPORT_ID[
-        labelType
-          .concat('_')
-          .concat(sizeConverter(labelPrinterSize))
-          .toString()
-          .toUpperCase()
+      const reportID =
+        REPORT_ID[
+          labelType
+            .concat('_')
+            .concat(sizeConverter(labelPrinterSize))
+            .toString()
+            .toUpperCase()
+        ]
+      const data = await getRawData(reportID, { patientId })
+      const payload = [
+        {
+          ReportId: reportID,
+          Copies: copyNo[labelType],
+          ReportData: JSON.stringify(data),
+        },
       ]
-    const data = await getRawData(reportID, { patientId })
-    const payload = [
-      {
-        ReportId: reportID,
-        Copies: copyNo[labelType],
-        ReportData: JSON.stringify(data),
-      },
-    ]
-    handlePrint(JSON.stringify(payload))
+      handlePrint(JSON.stringify(payload))
+    } else {
+      const data = {}
+      const { ctcountry } = codetable
+      const { name } = restProps.entity
+      const { contactAddress = [] } = restProps.entity.contact
+      let address =
+        contactAddress.length > 0
+          ? contactAddress.find(x => x.isMailing) ||
+            contactAddress.find(x => x.isPrimary) ||
+            contactAddress[0]
+          : {}
+      data.MailingInformation = [
+        {
+          Title: name,
+          Content: `${address.blockNo}${
+            address.street ? ' ' + address.street : ''
+          }${address.blockNo || address.street ? '\n' : ''}${address.unitNo}${
+            address.buildingName ? ' ' + address.buildingName : ''
+          }${address.unitNo || address.buildingName ? '\n' : ''}${
+            ctcountry.find(x => x.id === address.countryFK)?.name
+          } ${address.postcode ? ' ' + address.postcode : ''}`,
+        },
+      ]
+      const payload = [
+        {
+          ReportId: 95,
+          Copies: copyNo[labelType],
+          ReportData: JSON.stringify(data),
+        },
+      ]
+      handlePrint(JSON.stringify(payload))
+    }
   }
 
   const handleCopyNoChange = (value, labelType) =>
@@ -143,7 +179,7 @@ const PatientLabelButton = ({
             size='sm'
             style={{ height: 25, marginTop: 2 }}
           >
-            <Print /> Label
+            <Print /> Print
           </Button>
         ) : (
           <IconButton

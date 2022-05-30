@@ -25,6 +25,9 @@ class ConsumableUOM extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingConsumableUOM/query',
+      payload: {
+        isActive:true,
+      },
     })
   }
 

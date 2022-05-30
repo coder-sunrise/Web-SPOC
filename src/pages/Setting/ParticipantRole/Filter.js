@@ -35,6 +35,9 @@ const styles = theme => ({
 })
 
 @withFormik({
+  mapPropsToValues: () => ({
+    isActive: true,
+  }),
   handleSubmit: () => {},
   displayName: 'ParticipantRoleFilter',
 })

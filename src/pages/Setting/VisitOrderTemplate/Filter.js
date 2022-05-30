@@ -16,8 +16,10 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingVisitOrderTemplate }) =>
-    settingVisitOrderTemplate.filter || {},
+  mapPropsToValues: ({ settingVisitOrderTemplate }) => ({
+    ...(settingVisitOrderTemplate.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: (values, { props }) => {
     const { codeDisplayValue, isActive, copayerFK } = values
     const { dispatch } = props

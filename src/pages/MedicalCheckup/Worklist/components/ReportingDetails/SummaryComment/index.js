@@ -486,7 +486,7 @@ const SummaryComment = props => {
       <Tabs
         options={commentOption}
         style={{ height: height - 230 }}
-        tabBarStyle={{ paddingRight: 8 }}
+        tabBarStyle={{ paddingRight: 8, fontWeight: 'bold' }}
         tabBarExtraContent={
           <Switch
             checkedChildren='EN'

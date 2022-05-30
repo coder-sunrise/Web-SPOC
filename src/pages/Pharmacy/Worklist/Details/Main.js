@@ -904,7 +904,7 @@ const Main = props => {
           if (row.isGroup)
             return {
               colSpan: mergeCell,
-              style: { backgroundColor: 'rgb(240, 248, 255)' },
+              style: { backgroundColor: 'rgb(218, 236, 245)' },
             }
           return {
             rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,
@@ -1578,28 +1578,60 @@ const Main = props => {
   }
 
   const actualizeEditOrder = () => {
-    dispatch({
-      type: 'orders/updateState',
-      payload: {
-        type: '1',
-        visitPurposeFK: visitPurposeFK,
-      },
-    })
-    dispatch({
-      type: 'dispense/updateState',
-      payload: { ordersData: pharmacyDetails.ordersData },
-    })
-    dispatch({
-      type: 'dispense/query',
-      payload: {
-        id: workitem.visitFK,
-        version: Date.now(),
-      },
-    }).then(r => {
-      if (r) {
-        setShowEditOrderModal(true)
+    if (pharmacyDetails.editingOrder === false) {
+      dispatch({
+        type: 'orders/updateState',
+        payload: {
+          type: '1',
+          visitPurposeFK: visitPurposeFK,
+        },
+      })
+      dispatch({
+        type: 'dispense/updateState',
+        payload: { ordersData: pharmacyDetails.ordersData },
+      })
+      if (visitPurposeFK === VISIT_TYPE.OTC) {
+        dispatch({
+          type: 'dispense/query',
+          payload: {
+            id: workitem.visitFK,
+            version: Date.now(),
+          },
+        }).then(r => {
+          if (r) {
+            setShowEditOrderModal(true)
+          }
+        })
+      } else {
+        dispatch({
+          type: `consultation/editOrder`,
+          payload: {
+            id: pharmacyDetails.entity?.visitFK,
+            queueID: pharmacyDetails.entity?.visitFK,
+            version: Date.now(),
+          },
+        }).then(r => {
+          if (r) {
+            dispatch({
+              type: 'dispense/query',
+              payload: {
+                id: workitem.visitFK,
+                version: Date.now(),
+              },
+            })
+              .then(r => {
+                setEditingOrder(true)
+              })
+              .then(r => {
+                dispatch({
+                  type: 'orders/upsertRows',
+                  payload: pharmacyDetails.ordersData,
+                })
+              })
+          }
+        })
       }
-    })
+    }
   }
 
   if (pharmacyDetails.openOrderPopUpAfterActualize) {
