@@ -209,14 +209,14 @@ const baseColumns = classes => {
     {
       dataIndex: 'adjAmt',
       title: 'Adj.',
-      width: 100,
+      width: 90,
       align: 'right',
       render: (text, row) => showCurrency(row.adjAmt),
     },
     {
       dataIndex: 'totalAfterItemAdjustment',
       title: 'Total',
-      width: 100,
+      width: 90,
       align: 'right',
       render: (text, row) =>
         showCurrency(
