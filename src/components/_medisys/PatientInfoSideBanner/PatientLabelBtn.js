@@ -95,7 +95,7 @@ const PatientLabelButton = ({
     } else {
       const data = {}
       const { ctcountry } = codetable
-      const { name } = restProps.entity
+      const { name, title } = restProps.entity
       const { contactAddress = [] } = restProps.entity.contact
       let address =
         contactAddress.length > 0
@@ -105,14 +105,21 @@ const PatientLabelButton = ({
           : {}
       data.MailingInformation = [
         {
-          Title: name,
-          Content: `${address.blockNo}${
-            address.street ? ' ' + address.street : ''
-          }${address.blockNo || address.street ? '\n' : ''}${address.unitNo}${
-            address.buildingName ? ' ' + address.buildingName : ''
-          }${address.unitNo || address.buildingName ? '\n' : ''}${
-            ctcountry.find(x => x.id === address.countryFK)?.name
-          } ${address.postcode ? ' ' + address.postcode : ''}`,
+          Title: `${title ? title + ' ' : ''}${name}`,
+          Content: `${address.blockNo || ''}${
+            address.street ? (address.blockNo ? ' ' : '') + address.street : ''
+          }${address.blockNo || address.street ? '\n' : ''}${address.unitNo ||
+            ''}${
+            address.buildingName
+              ? (address.unitNo ? ' ' : '') + address.buildingName
+              : ''
+          }${
+            address.unitNo || address.buildingName ? '\n' : ''
+          }${address.countryName || ''} ${
+            address.postcode
+              ? (address.countryName ? ' ' : '') + address.postcode
+              : ''
+          }`,
         },
       ]
       const payload = [

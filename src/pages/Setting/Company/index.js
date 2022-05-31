@@ -115,13 +115,20 @@ class Supplier extends PureComponent {
       information.Title = r.displayValue
       if (r.address) {
         let address = r?.address || {}
-        information.Content = `${address.blockNo}${
-          address.street ? ' ' + address.street : ''
-        }${address.blockNo || address.street ? '\n' : ''}${address.unitNo}${
-          address.buildingName ? ' ' + address.buildingName : ''
-        }${address.unitNo || address.buildingName ? '\n' : ''}${
-          address.countryName ? address.countryName : ''
-        } ${address.postcode ? ' ' + address.postcode : ''}`
+        information.Content = `${address.blockNo || ''}${
+          address.street ? (address.blockNo ? ' ' : '') + address.street : ''
+        }${address.blockNo || address.street ? '\n' : ''}${address.unitNo ||
+          ''}${
+          address.buildingName
+            ? (address.unitNo ? ' ' : '') + address.buildingName
+            : ''
+        }${
+          address.unitNo || address.buildingName ? '\n' : ''
+        }${address.countryName || ''} ${
+          address.postcode
+            ? (address.countryName ? ' ' : '') + address.postcode
+            : ''
+        }`
       }
       data.MailingInformation = [information]
       const payload = [

@@ -152,13 +152,20 @@ const Detail = props => {
         let address = r?.address || {}
         information.Content = `${
           contactPersonName ? r.displayValue + '\n' : ''
-        }${address.blockNo}${address.street ? ' ' + address.street : ''}${
-          address.blockNo || address.street ? '\n' : ''
-        }${address.unitNo}${
-          address.buildingName ? ' ' + address.buildingName : ''
-        }${address.unitNo || address.buildingName ? '\n' : ''}${
-          address.countryName ? address.countryName : ''
-        } ${address.postcode ? ' ' + address.postcode : ''}`
+        }${address.blockNo || ''}${
+          address.street ? (address.blockNo ? ' ' : '') + address.street : ''
+        }${address.blockNo || address.street ? '\n' : ''}${address.unitNo ||
+          ''}${
+          address.buildingName
+            ? (address.unitNo ? ' ' : '') + address.buildingName
+            : ''
+        }${
+          address.unitNo || address.buildingName ? '\n' : ''
+        }${address.countryName || ''} ${
+          address.postcode
+            ? (address.countryName ? ' ' : '') + address.postcode
+            : ''
+        }`
       }
       data.MailingInformation = [information]
       const payload = [

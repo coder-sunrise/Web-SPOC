@@ -241,16 +241,24 @@ class SchemesGrid extends PureComponent {
       if (!r) return
       const data = {}
       let information = {}
-      information.Title = patient?.entity?.name
+      const { name, title } = patient?.entity
+      information.Title = `${title ? title + ' ' : ''}${name}`
       if (r.address) {
         let address = r?.address || {}
-        information.Content = `${r.displayValue}\n${address.blockNo}${
-          address.street ? ' ' + address.street : ''
-        }${address.blockNo || address.street ? '\n' : ''}${address.unitNo}${
-          address.buildingName ? ' ' + address.buildingName : ''
-        }${address.unitNo || address.buildingName ? '\n' : ''}${
-          address.countryName ? address.countryName : ''
-        } ${address.postcode ? ' ' + address.postcode : ''}`
+        information.Content = `${r.displayValue}\n${address.blockNo || ''}${
+          address.street ? (address.blockNo ? ' ' : '') + address.street : ''
+        }${address.blockNo || address.street ? '\n' : ''}${address.unitNo ||
+          ''}${
+          address.buildingName
+            ? (address.unitNo ? ' ' : '') + address.buildingName
+            : ''
+        }${
+          address.unitNo || address.buildingName ? '\n' : ''
+        }${address.countryName || ''} ${
+          address.postcode
+            ? (address.countryName ? ' ' : '') + address.postcode
+            : ''
+        }`
       }
       data.MailingInformation = [information]
       const payload = [
