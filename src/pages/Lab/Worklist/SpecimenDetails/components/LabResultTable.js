@@ -177,14 +177,14 @@ export const LabResultTable = ({
       },
     },
     {
-      title: 'Raw Data',
-      dataIndex: 'resultBeforeInterpretation',
-      width: 150,
-    },
-    {
       title: 'Unit',
       dataIndex: 'unit',
       width: 100,
+    },
+    {
+      title: 'Raw Data',
+      dataIndex: 'resultBeforeInterpretation',
+      width: 150,
     },
     {
       title: 'Reference Range',
