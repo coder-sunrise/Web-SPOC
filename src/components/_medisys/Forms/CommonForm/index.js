@@ -16,6 +16,7 @@ import {
   PdfSection,
   SizeF,
 } from '@syncfusion/ej2-pdf-export'
+import { ImageElementBox } from '@syncfusion/ej2-react-documenteditor'
 
 const base64Prefix = 'data:image/jpeg;base64,'
 
@@ -69,8 +70,6 @@ class CommonForm extends PureComponent {
   switchMode = () => {
     let isSigningMode = !this.state.isSigningMode
     this.DEContainer.documentEditor.editor.enforceProtection('', isSigningMode ? 'ReadOnly' : 'FormFieldsOnly')
-    if(isSigningMode)
-      this.DEContainer.documentEditor.selection.navigateToNextEditingRegion();
     this.setState({ isSigningMode })
   }
 
@@ -84,32 +83,27 @@ class CommonForm extends PureComponent {
     const isImageSelected = e.source.documentEditor.selection.isImageSelected
     const isSelectionInEditRegion = e.source.documentEditor.selection.isSelectionInEditRegion()
     let isSignatured = false
-    console.log('selection',e.source.documentEditor.selection)
     if(isSelectionInEditRegion) {
       const { start, end, documentHelper } = e.source.documentEditor.selection
       documentHelper.editableDiv.contentEditable = false
       documentHelper.editableDiv.contenteditable = false
-      if(start.currentWidget.children.some(x=> {
-        console.log({currentWidget:x,className:x.constructor.name})
-        return x.constructor.name === 'ImageElementBox'
-      }))
+
+      if(start.currentWidget.children.some(x=> x instanceof ImageElementBox))
         isSignatured = true
     }
-    if (this.mouseClicked && this.props.values.statusFK !== 2 && !isImageSelected && !isSelectionInEditRegion && this.state.signatureCounter > 0)
+    if (this.mouseClicked && this.props.values.statusFK !== 2 && !isSelectionInEditRegion && this.state.signatureCounter > 0)
       this.notificationWarning({ message: 'Please remove signatures to update form content.'})
-    this.setState({ isImageSelected, isSelectionInEditRegion, isSignatured })
+    this.setState({ isSelectionInEditRegion, isImageSelected, isSignatured })
     this.mouseClicked = false
   }
 
   deleteSignature = () => {
     if (this.state.isImageSelected) {
       this.DEContainer.documentEditor.selection.isImageSelected = false
-      this.DEContainer.documentEditor.editor.deleteEditElement(
-        this.DEContainer.documentEditor.selection,
-      )
+      this.DEContainer.documentEditor.editor.deleteEditElement(this.DEContainer.documentEditor.selection)
+      this.setState({ isImageSelected: false })
+      this.updateSignatureCounter(-1)
     }
-    this.setState({ isImageSelected: false })
-    this.updateSignatureCounter(-1)
   }
 
   updateSignature = ({ thumbnail }) => {
@@ -197,12 +191,13 @@ class CommonForm extends PureComponent {
     if (!this.DEContainer) return
     this.fillFormFields()
     const { statusFK, formData:{ signatureCounter = 0 } } = this.props.values
-    this.setState({signatureCounter})
-    this.DEContainer.documentEditor.editor.enforceProtection('',statusFK === 2 || signatureCounter > 0 ? 'ReadOnly' : 'FormFieldsOnly')
+    const isSigningMode = statusFK === 2 || signatureCounter > 0
+    this.DEContainer.documentEditor.editor.enforceProtection('',isSigningMode ? 'ReadOnly' : 'FormFieldsOnly')
     this.DEContainer.documentEditor.showRestrictEditingPane(false)
     this.DEContainer.showHidePropertiesPane(false)
     const deElement = this.DEContainer.documentEditor.getDocumentEditorElement()
     deElement.addEventListener('click',this.documentClick.bind(this))
+    this.setState({isSigningMode,signatureCounter})
   }
 
   state = {}
