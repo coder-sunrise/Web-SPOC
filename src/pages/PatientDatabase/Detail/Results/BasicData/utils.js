@@ -380,52 +380,53 @@ export const defaultColumns = genderFK => {
                     icon={null}
                     placement='topLeft'
                     content={
-                      <Table
-                        size='small'
-                        bordered
-                        pagination={false}
-                        columns={[
-                          {
-                            dataIndex: 'testName',
-                            title: 'Test Name',
-                            width: 120,
-                          },
-                          {
-                            dataIndex: 'formula',
-                            title: 'Formula',
-                            width: 220,
-                          },
-                        ]}
-                        dataSource={[
-                          {
-                            id: 1,
-                            testName: 'Standard Weight',
-                            formula: 'Height (m) * Height (m) X 22',
-                          },
-                          {
-                            id: 2,
-                            testName: 'Body Fat Mass',
-                            formula: 'Weight (kg) X Body Fat %',
-                          },
-                          {
-                            id: 3,
-                            testName: 'BMI',
-                            formula: 'Weight (kg)/ Height (m)\u00b2',
-                          },
-                          {
-                            id: 4,
-                            testName: 'Rohrer',
-                            formula:
-                              'Weight (kg)/ Height (cm)\u00b3 X 10\u2077',
-                          },
-                          {
-                            id: 4,
-                            testName: 'Kaup',
-                            formula:
-                              'Weight (kg)/ Height (cm)\u00b2 X 10\u2074',
-                          },
-                        ]}
-                      />
+                      <div style={{ width: 350 }}>
+                        <Table
+                          size='small'
+                          bordered
+                          pagination={false}
+                          columns={[
+                            {
+                              dataIndex: 'testName',
+                              title: 'Test Name',
+                            },
+                            {
+                              dataIndex: 'formula',
+                              title: 'Formula',
+                              width: 220,
+                            },
+                          ]}
+                          dataSource={[
+                            {
+                              id: 1,
+                              testName: 'Standard Weight',
+                              formula: 'Height (m) * Height (m) X 22',
+                            },
+                            {
+                              id: 2,
+                              testName: 'Body Fat Mass',
+                              formula: 'Weight (kg) X Body Fat %',
+                            },
+                            {
+                              id: 3,
+                              testName: 'BMI',
+                              formula: 'Weight (kg)/ Height (m)\u00b2',
+                            },
+                            {
+                              id: 4,
+                              testName: 'Rohrer',
+                              formula:
+                                'Weight (kg)/ Height (cm)\u00b3 X 10\u2077',
+                            },
+                            {
+                              id: 4,
+                              testName: 'Kaup',
+                              formula:
+                                'Weight (kg)/ Height (cm)\u00b2 X 10\u2074',
+                            },
+                          ]}
+                        />
+                      </div>
                     }
                   >
                     <InfoCircleOutlined style={{ marginLeft: 6 }} />

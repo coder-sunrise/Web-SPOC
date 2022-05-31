@@ -16,7 +16,7 @@ const titleStyle = {
 
 const gridStyle = {
   position: 'relative',
-  paddingLeft: 124,
+  paddingLeft: 155,
 }
 
 const PayerHeader = ({
@@ -72,7 +72,7 @@ const PayerHeader = ({
       </GridItem>
       <GridItem md={4} style={{ textAlign: 'right' }}>
         <div style={gridStyle}>
-          <h5 style={titleStyle}>Total Payable: </h5>
+          <h5 style={titleStyle}>Total Payable Amt.: </h5>
           <NumberInput text currency value={totalAftGst} />
         </div>
       </GridItem>
@@ -99,7 +99,7 @@ const PayerHeader = ({
       <GridItem md={4} style={{ textAlign: 'right' }}>
         {totalClaim !== undefined && (
           <div style={gridStyle}>
-            <h5 style={titleStyle}>Total Claim: </h5>
+            <h5 style={titleStyle}>Total Co-Payer Amt.: </h5>
             <NumberInput text currency value={totalClaim} />
           </div>
         )}
@@ -107,7 +107,7 @@ const PayerHeader = ({
       {!showReferrenceNo && <GridItem md={4} />}
       <GridItem md={4} style={{ textAlign: 'right' }}>
         <div style={gridStyle}>
-          <h5 style={titleStyle}>Outstanding: </h5>
+          <h5 style={titleStyle}>Total O/S Amt.: </h5>
           <NumberInput text currency value={outstandingAfterPayment} />
         </div>
       </GridItem>
