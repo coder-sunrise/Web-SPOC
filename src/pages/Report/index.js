@@ -16,7 +16,7 @@ import {
 import Authorized from '@/utils/Authorized'
 import { menuData } from './variables'
 
-const styles = (theme) => ({
+const styles = theme => ({
   bigviewBtn: {
     // width: 180,
     marginRight: 0,
@@ -33,20 +33,27 @@ const styles = (theme) => ({
   },
 })
 
-const filterByAccessRight = (m) => {
+const filterByAccessRight = m => {
   const settings = JSON.parse(localStorage.getItem('clinicSettings'))
   const { isEnablePackage = false } = settings
-  if ((m.url === '/report/wiprevenue' || m.url === '/report/packageexpiry') && !isEnablePackage)
+  if (
+    (m.url === '/report/wiprevenue' || m.url === '/report/packageexpiry') &&
+    !isEnablePackage
+  )
     return false
 
   const accessRight = Authorized.check(m.authority)
-  if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
+  if (
+    !accessRight ||
+    (accessRight &&
+      (accessRight.rights === 'hidden' || accessRight.rights === 'disable'))
+  )
     return false
   return true
 }
 
 class Report extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.group = _.groupBy(menuData, 'title')
   }
@@ -55,13 +62,13 @@ class Report extends React.Component {
     searchText: '',
   }
 
-  onFilterChange = (event) => {
+  onFilterChange = event => {
     this.setState({
       searchText: event.target.value.toLowerCase(),
     })
   }
 
-  onButtonClick = (event) => {
+  onButtonClick = event => {
     const { currentTarget } = event
 
     currentTarget.id !== '' && this.props.history.push(currentTarget.id)
@@ -70,20 +77,21 @@ class Report extends React.Component {
   menus = () => {
     const { classes, theme } = this.props
 
-    return Object.keys(this.group).map((o) => {
-      const filtered = this.group[o].filter(filterByAccessRight).filter((m) => {
+    return Object.keys(this.group).map(o => {
+      const filtered = this.group[o].filter(filterByAccessRight).filter(m => {
         return (
           m.text.toLocaleLowerCase().indexOf(this.state.searchText) >= 0 ||
           !this.state.searchText
         )
       })
+      console.log(filtered)
       return {
         title: o,
         items: this.group[o],
         itemCount: filtered.length,
         content: (
           <GridContainer style={{ marginTop: theme.spacing(1) }} key={o}>
-            {filtered.map((item) => {
+            {filtered.map(item => {
               const accessRight = Authorized.check(item.authority)
               const isHidden =
                 accessRight &&
@@ -120,21 +128,22 @@ class Report extends React.Component {
     })
   }
 
-  render () {
-    const menus = this.menus().filter((item) => item.itemCount > 0)
+  render() {
+    const menus = this.menus().filter(item => item.itemCount > 0)
+    console.log(menus)
     return (
       <CardContainer hideHeader>
         <TextField prefix={<Search />} onChange={this.onFilterChange} />
         <Accordion
           defaultActive={0}
           mode={this.state.searchText.length > 0 ? 'multiple' : 'default'}
-          collapses={menus.filter((item) => {
+          collapses={menus.filter(item => {
             return (
               !this.state.searchText ||
               // item.title.toLocaleLowerCase().indexOf(this.state.searchText) >=
               //   0 ||
               item.items.find(
-                (m) =>
+                m =>
                   m.text.toLocaleLowerCase().indexOf(this.state.searchText) >=
                   0,
               )

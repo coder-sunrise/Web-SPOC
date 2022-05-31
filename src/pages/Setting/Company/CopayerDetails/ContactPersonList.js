@@ -222,6 +222,7 @@ export const ContactPersonList = props => {
   const [copayerLabelCopies, setCopayerLabelCopies] = useState(1)
   const [coverPageCopies, setCoverPageCopies] = useState(1)
   const [contactPersonName, setContactPersonName] = useState(undefined)
+  const [targetPrintRowId, setTargetPrintRowId] = useState(undefined)
 
   //--- Initialize contact person list state ---//
   const [data, setData] = useState([])
@@ -287,7 +288,10 @@ export const ContactPersonList = props => {
           contactPerson.recordStatus = 'New'
         }
 
-        newData.splice(index, 1, { ...contactPerson, ...row })
+        newData.splice(index, 1, {
+          ...contactPerson,
+          ...row,
+        })
         setData(newData)
         setEditingKey('')
 
@@ -348,7 +352,10 @@ export const ContactPersonList = props => {
         const contactPerson = newData[index]
         record.isDeleted = true
 
-        newData.splice(index, 1, { ...contactPerson, ...record })
+        newData.splice(index, 1, {
+          ...contactPerson,
+          ...record,
+        })
         setData(newData)
         if (record.isDefault) {
           var activeData = newData.filter(x => !x.isDeleted)
@@ -374,11 +381,15 @@ export const ContactPersonList = props => {
         const existingDefaultRecord = newData[currentDefaultIndex]
 
         newDefaultRecord.isDefault = true
-        newData.splice(index, 1, { ...newDefaultRecord })
+        newData.splice(index, 1, {
+          ...newDefaultRecord,
+        })
 
         if (existingDefaultRecord) {
           existingDefaultRecord.isDefault = false
-          newData.splice(currentDefaultIndex, 1, { ...existingDefaultRecord })
+          newData.splice(currentDefaultIndex, 1, {
+            ...existingDefaultRecord,
+          })
         }
 
         props.setFieldValue('contactPersons', newData)
@@ -416,7 +427,10 @@ export const ContactPersonList = props => {
       editable: true,
       inputType: 'text',
       editableRules: [
-        { required: true, message: 'This is a required field' },
+        {
+          required: true,
+          message: 'This is a required field',
+        },
         {
           max: 200,
           message: 'Contact Person Name should not exceed 200 characters',
@@ -432,7 +446,10 @@ export const ContactPersonList = props => {
       editable: true,
       inputType: 'text',
       editableRules: [
-        { max: 50, message: 'Contact No. should not exceed 50 characters' },
+        {
+          max: 50,
+          message: 'Contact No. should not exceed 50 characters',
+        },
       ],
     },
     {
@@ -444,7 +461,10 @@ export const ContactPersonList = props => {
       editable: true,
       inputType: 'text',
       editableRules: [
-        { max: 50, message: 'Office No. should not exceed 50 characters' },
+        {
+          max: 50,
+          message: 'Office No. should not exceed 50 characters',
+        },
       ],
     },
     {
@@ -456,7 +476,10 @@ export const ContactPersonList = props => {
       editable: true,
       inputType: 'text',
       editableRules: [
-        { max: 50, message: 'Fax No. should not exceed 50 characters' },
+        {
+          max: 50,
+          message: 'Fax No. should not exceed 50 characters',
+        },
       ],
     },
     {
@@ -467,7 +490,10 @@ export const ContactPersonList = props => {
       editable: true,
       inputType: 'text',
       editableRules: [
-        { type: 'email', message: 'Please enter valid Email address' },
+        {
+          type: 'email',
+          message: 'Please enter valid Email address',
+        },
       ],
     },
     {
@@ -527,6 +553,7 @@ export const ContactPersonList = props => {
           color: 'red',
         }
 
+        console.log(record.id, targetPrintRowId)
         //=== Not Editing ===//
         if (editingKey === '') {
           return (
@@ -551,7 +578,7 @@ export const ContactPersonList = props => {
               {values.id > 0 && (
                 <Popover
                   overlayClassName='noPaddingPopover'
-                  visible={showPrintPoper}
+                  visible={record.key === targetPrintRowId && showPrintPoper}
                   placement='bottomLeft'
                   trigger='click'
                   transition
@@ -566,7 +593,9 @@ export const ContactPersonList = props => {
                         <Button
                           color='primary'
                           size='sm'
-                          style={{ width: 150 }}
+                          style={{
+                            width: 150,
+                          }}
                           onClick={() => printCopayer(record)}
                           disabled={!Number.isInteger(copayerLabelCopies)}
                         >
@@ -578,7 +607,10 @@ export const ContactPersonList = props => {
                           max={10}
                           value={copayerLabelCopies}
                           onChange={value => setCopayerLabelCopies(value)}
-                          style={{ width: '50px', textAlign: 'right' }}
+                          style={{
+                            width: '50px',
+                            textAlign: 'right',
+                          }}
                         />
                         <span
                           style={{
@@ -592,7 +624,9 @@ export const ContactPersonList = props => {
                         <Button
                           color='primary'
                           size='sm'
-                          style={{ width: 150 }}
+                          style={{
+                            width: 150,
+                          }}
                           onClick={() =>
                             OnPrintCoverPage(
                               values.id,
@@ -610,7 +644,10 @@ export const ContactPersonList = props => {
                           max={10}
                           value={coverPageCopies}
                           onChange={value => setCoverPageCopies(value)}
-                          style={{ width: '50px', textAlign: 'right' }}
+                          style={{
+                            width: '50px',
+                            textAlign: 'right',
+                          }}
                         />
                         <span
                           style={{
@@ -730,6 +767,7 @@ export const ContactPersonList = props => {
   })
 
   const printCoverPage = record => {
+    setTargetPrintRowId(record?.key)
     setShowPrintPoper(true)
     setContactPersonName(record.name || '')
   }
@@ -745,7 +783,9 @@ export const ContactPersonList = props => {
           components={components}
           columns={columns}
           dataSource={filteredData}
-          pagination={{ position: ['none', 'none'] }}
+          pagination={{
+            position: ['none', 'none'],
+          }}
         />
       </Form>
 
@@ -756,7 +796,11 @@ export const ContactPersonList = props => {
             disabled={editingKey !== ''}
             onClick={addNew}
           >
-            <PlusOutlined style={{ marginRight: 6 }} />
+            <PlusOutlined
+              style={{
+                marginRight: 6,
+              }}
+            />
             New Contact Person
           </Typography.Link>
         </div>
