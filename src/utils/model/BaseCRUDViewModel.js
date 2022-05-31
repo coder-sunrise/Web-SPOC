@@ -11,6 +11,22 @@ import {
   cleanFieldValue,
 } from '@/utils/utils'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
+import { getTranslationValue } from '@/utils/utils'
+// Pages with a second print language
+const secondaryPrintoutLanguageArr = [
+  'settingMedicationContraIndication',
+  'settingMedicationUOM',
+  'settingMedicationDosage',
+  'settingMedicationFrequency',
+  'settingMedicationConsumptionMethod',
+  'settingMedicationInteraction',
+  'settingMedicationSideEffect',
+  'settingAdministrationRoute',
+  'settingSummaryComment',
+  'settingIndividualComment',
+  'settingMedicationPrecautions',
+  'settingMedicineTrivia',
+]
 
 let lastLocation = null
 export default class BaseCRUDViewModel {
@@ -56,7 +72,6 @@ export default class BaseCRUDViewModel {
     const { service } = param
     const { detailPath = '' } = setting
     if (!config.timer) config.timer = 2000
-    // console.log(config, namespace)
 
     return {
       query: [
@@ -116,9 +131,16 @@ export default class BaseCRUDViewModel {
           // console.log(filter)
 
           const response = yield call(service[queryFnName], filter)
-          // console.log(response)
           const { data, status, message } = response
           if (status === '200' || data) {
+            let isSecondaryPrintoutLanguagePage = secondaryPrintoutLanguageArr.includes(
+              namespace,
+            )
+            const clinicSetting = isSecondaryPrintoutLanguagePage
+              ? yield select(st => {
+                  return st.clinicSettings
+                })
+              : {}
             yield put({
               type: 'querySuccess',
               payload: {
@@ -129,15 +151,17 @@ export default class BaseCRUDViewModel {
               },
             })
             yield put({
-              type: 'queryDone',
+              type: isSecondaryPrintoutLanguagePage
+                ? 'multiLanguageSettingQueryDone'
+                : 'queryDone',
               payload: {
+                clinicSetting,
                 data,
               },
               history,
             })
           }
           return data
-          // }
         },
         { type: 'throttle', ms: 1000 },
       ],
@@ -422,6 +446,34 @@ export default class BaseCRUDViewModel {
         return {
           ...st,
           filter,
+        }
+      },
+      multiLanguageSettingQueryDone(st, { payload }) {
+        const {
+          data,
+          clinicSetting: {
+            settings: { secondaryPrintoutLanguage = '' },
+          },
+        } = payload
+        return {
+          ...st,
+          list: data.data.map(o => {
+            return {
+              ...o,
+              effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
+              translatedDisplayValue: getTranslationValue(
+                o.translationData,
+                secondaryPrintoutLanguage,
+                'displayValue',
+              ),
+            }
+          }),
+          pagination: {
+            ...st.pagination,
+            current: data.currentPage || 1,
+            pagesize: data.pageSize || 10,
+            totalRecords: data.totalRecords,
+          },
         }
       },
       save(st, { payload }) {

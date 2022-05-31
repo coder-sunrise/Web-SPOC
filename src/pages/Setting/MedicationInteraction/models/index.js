@@ -28,64 +28,6 @@ export default createListViewModel({
         const { pathname, search, query = {} } = loct
       })
     },
-    effects: {
-      *query({ payload }, { put, select, call }) {
-        const clinicSetting = yield select(st => st.clinicSettings)
-        const settingMedicationInteraction = yield select(
-          st => st.settingMedicationInteraction,
-        )
-        const result = yield call(service.queryList, {
-          ...payload,
-          pageSize:
-            payload.pageSize ||
-            settingMedicationInteraction.pagination.pagesize ||
-            20,
-        })
 
-        if (result.status === '200') {
-          yield put({
-            type: 'queryDone',
-            payload: {
-              currentFilter: payload,
-              clinicSetting,
-              data: result.data,
-            },
-          })
-        }
-      },
-    },
-    reducers: {
-      queryDone(st, { payload }) {
-        const {
-          data,
-          currentFilter,
-          clinicSetting: {
-            settings: { secondaryPrintoutLanguage = '' },
-          },
-        } = payload
-
-        return {
-          ...st,
-          list: data.data.map(o => {
-            return {
-              ...o,
-              effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
-              translatedDisplayValue: getTranslationValue(
-                o.translationData,
-                secondaryPrintoutLanguage,
-                'displayValue',
-              ),
-            }
-          }),
-          currentFilter,
-          pagination: {
-            ...st.pagination,
-            current: data.currentPage || 1,
-            pagesize: data.pageSize || 10,
-            totalRecords: data.totalRecords,
-          },
-        }
-      },
-    },
   },
 })
