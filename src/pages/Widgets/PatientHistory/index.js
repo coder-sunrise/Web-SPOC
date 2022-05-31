@@ -38,6 +38,7 @@ import { scribbleTypes } from '@/utils/codes'
 import { DoctorProfileSelect, ServePatientButton } from '@/components/_medisys'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import { getReportContext } from '@/services/report'
+import { getFileContentByFileID } from '@/services/file'
 import * as WidgetConfig from './config'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import HistoryDetails from './HistoryDetails'
@@ -1224,11 +1225,12 @@ class PatientHistory extends Component {
     })
   }
 
-  getNotes = (selectNoteTypes, current) => {
+  getNotes = async (selectNoteTypes, current) => {
     const { doctorNotes = [], scribbleNotes = [] } = current
     let newNote = []
     const base64Prefix = 'data:image/jpeg;base64,'
-    doctorNotes.forEach(note => {
+    for (let indexN = 0; indexN < doctorNotes.length; indexN++) {
+      const note = doctorNotes[indexN]
       const noteUserName = `${
         note.signedByUserTitle && note.signedByUserTitle.trim().length
           ? `${note.signedByUserTitle} ${note.signedByUserName || ''}`
@@ -1237,7 +1239,8 @@ class PatientHistory extends Component {
       const updateDate = moment(note.signedDate).format(
         dateFormatLongWithTimeNoSec,
       )
-      selectNoteTypes.forEach(selectNoteType => {
+      for (let index = 0; index < selectNoteTypes.length; index++) {
+        const selectNoteType = selectNoteTypes[index]
         const notesType = WidgetConfig.notesTypes.find(
           type => type.value === selectNoteType,
         )
@@ -1268,22 +1271,33 @@ class PatientHistory extends Component {
         const filterScribbleNotes = scribbleNotes.filter(
           sn => sn.scribbleNoteTypeFK === scribbleType?.typeFK,
         )
-        filterScribbleNotes.forEach(scribbleNote => {
+
+        for (let indexSN = 0; indexSN < filterScribbleNotes.length; indexSN++) {
+          const scribbleNote = filterScribbleNotes[indexSN]
+          let imageContent
+          if (scribbleNote.fileIndexFK) {
+            const result = await getFileContentByFileID(
+              scribbleNote.fileIndexFK,
+            )
+            if (result && result.status === 200 && result.data) {
+              imageContent = result.data.content
+            }
+          }
           newNote.push({
             id: note.id,
             visitFK: current.currentId,
             noteType: notesType.title,
             valueType: 'Image',
             imageTitle: scribbleNote.subject,
-            imageValue: scribbleNote.thumbnail,
+            imageValue: imageContent,
             sortOrder: sortOrder,
             doctor: noteUserName,
             updateDate: updateDate,
           })
           sortOrder = sortOrder + 1
-        })
-      })
-    })
+        }
+      }
+    }
     return newNote
   }
 
@@ -1384,464 +1398,454 @@ class PatientHistory extends Component {
     let corEyeExaminations = []
     let corAudiometryTest = []
 
-    loadVisits
-      .filter(visit => selectItems.find(item => item === visit.currentId))
-      .forEach(visit => {
-        let current = {
-          ...visit.patientHistoryDetail,
-          visitRemarks: visit.visitRemarks,
-          referralSourceFK: visit.referralSourceFK,
-          referralPersonFK: visit.referralPersonFK,
-          referralPatientProfileFK: visit.referralPatientProfileFK,
-          referralSource: visit.referralSource,
-          referralPerson: visit.referralPerson,
-          referralPatientName: visit.referralPatientName,
-          referralRemarks: visit.referralRemarks,
-          visitPurposeFK: visit.visitPurposeFK,
-          currentId: visit.currentId,
-          isNurseNote: visit.isNurseNote,
-          nurseNotes: visit.nurseNotes,
-          visitDate: visit.visitDate,
-          userName: visit.userName,
-          userTitle: visit.userTitle,
-          patientGender: visit.patientGender,
+    var printVisit = loadVisits.filter(visit =>
+      selectItems.find(item => item === visit.currentId),
+    )
+    for (let index = 0; index < printVisit.length; index++) {
+      const visit = printVisit[index]
+      let current = {
+        ...visit.patientHistoryDetail,
+        visitRemarks: visit.visitRemarks,
+        referralSourceFK: visit.referralSourceFK,
+        referralPersonFK: visit.referralPersonFK,
+        referralPatientProfileFK: visit.referralPatientProfileFK,
+        referralSource: visit.referralSource,
+        referralPerson: visit.referralPerson,
+        referralPatientName: visit.referralPatientName,
+        referralRemarks: visit.referralRemarks,
+        visitPurposeFK: visit.visitPurposeFK,
+        currentId: visit.currentId,
+        isNurseNote: visit.isNurseNote,
+        nurseNotes: visit.nurseNotes,
+        visitDate: visit.visitDate,
+        userName: visit.userName,
+        userTitle: visit.userTitle,
+        patientGender: visit.patientGender,
+      }
+      const { isNurseNote, nurseNotes = '', visitPurposeFK } = current
+      let isShowDoctorNote = false
+      const selectNoteTypes = this.getSelectNoteTypes()
+      if (selectNoteTypes.length) {
+        isShowDoctorNote = selectNoteTypes.find(noteType =>
+          this.checkShowNoteInReport(
+            noteType,
+            current,
+            visitPurposeFK,
+            isNurseNote,
+          ),
+        )
+      }
+      const isShowReferral = this.checkShowData(
+        WidgetConfig.WIDGETS_ID.REFERRAL,
+        current,
+        visitPurposeFK,
+        current.isNurseNote,
+      )
+      const isShowVisitRemarks = this.checkShowData(
+        WidgetConfig.WIDGETS_ID.VISITREMARKS,
+        current,
+        visitPurposeFK,
+        isNurseNote,
+      )
+      const isShowTreatment = this.checkShowData(
+        WidgetConfig.WIDGETS_ID.TREATMENT,
+        current,
+        visitPurposeFK,
+        isNurseNote,
+      )
+      const isShowDiagnosis = this.checkShowData(
+        WidgetConfig.WIDGETS_ID.DIAGNOSIS,
+        current,
+        visitPurposeFK,
+        isNurseNote,
+      )
+      const isShowEyeVisualAcuityTest = this.checkShowData(
+        WidgetConfig.WIDGETS_ID.VISUALACUITYTEST,
+        current,
+        visitPurposeFK,
+        isNurseNote,
+      )
+      const isShowRefractionForm = this.checkShowData(
+        WidgetConfig.WIDGETS_ID.REFRACTIONFORM,
+        current,
+        visitPurposeFK,
+        current.isNurseNote,
+      )
+      const isShowEyeExaminations = this.checkShowData(
+        WidgetConfig.WIDGETS_ID.EXAMINATIONFORM,
+        current,
+        visitPurposeFK,
+        current.isNurseNote,
+      )
+      const isShowBasicExaminations = this.checkShowData(
+        WidgetConfig.WIDGETS_ID.VITALSIGN,
+        current,
+        visitPurposeFK,
+        isNurseNote,
+      )
+      const isShowOrders = this.checkShowData(
+        WidgetConfig.WIDGETS_ID.ORDERS,
+        current,
+        visitPurposeFK,
+        isNurseNote,
+      )
+      const isShowConsultationDocument = this.checkShowData(
+        WidgetConfig.WIDGETS_ID.CONSULTATION_DOCUMENT,
+        current,
+        visitPurposeFK,
+        isNurseNote,
+      )
+      const isShowJGHEyeExaminations = this.checkShowData(
+        WidgetConfig.WIDGETS_ID.EYEEXAMINATIONS,
+        current,
+        visitPurposeFK,
+        isNurseNote,
+      )
+      const isShowAudiometryTest = this.checkShowData(
+        WidgetConfig.WIDGETS_ID.AUDIOMETRYTEST,
+        current,
+        visitPurposeFK,
+        isNurseNote,
+      )
+      if (
+        isNurseNote ||
+        isShowDoctorNote ||
+        isShowReferral ||
+        isShowVisitRemarks ||
+        isShowTreatment ||
+        isShowDiagnosis ||
+        isShowEyeVisualAcuityTest ||
+        isShowRefractionForm ||
+        isShowEyeExaminations ||
+        isShowBasicExaminations ||
+        isShowOrders ||
+        isShowConsultationDocument ||
+        isShowJGHEyeExaminations ||
+        isShowAudiometryTest
+      ) {
+        let referral = { isShowReferral: false }
+        if (isShowReferral) {
+          referral = this.getReferral(current)
         }
-        const { isNurseNote, nurseNotes = '', visitPurposeFK } = current
-        let isShowDoctorNote = false
-        const selectNoteTypes = this.getSelectNoteTypes()
-        if (selectNoteTypes.length) {
-          isShowDoctorNote = selectNoteTypes.find(noteType =>
-            this.checkShowNoteInReport(
-              noteType,
-              current,
-              visitPurposeFK,
-              isNurseNote,
-            ),
-          )
+        let refractionFormDetails = {
+          isRefractionForm: false,
+          eyeRefractionFormDominanceL: false,
+          eyeRefractionFormDominanceR: false,
         }
-        const isShowReferral = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.REFERRAL,
-          current,
-          visitPurposeFK,
-          current.isNurseNote,
-        )
-        const isShowVisitRemarks = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.VISITREMARKS,
-          current,
-          visitPurposeFK,
-          isNurseNote,
-        )
-        const isShowTreatment = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.TREATMENT,
-          current,
-          visitPurposeFK,
-          isNurseNote,
-        )
-        const isShowDiagnosis = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.DIAGNOSIS,
-          current,
-          visitPurposeFK,
-          isNurseNote,
-        )
-        const isShowEyeVisualAcuityTest = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.VISUALACUITYTEST,
-          current,
-          visitPurposeFK,
-          isNurseNote,
-        )
-        const isShowRefractionForm = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.REFRACTIONFORM,
-          current,
-          visitPurposeFK,
-          current.isNurseNote,
-        )
-        const isShowEyeExaminations = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.EXAMINATIONFORM,
-          current,
-          visitPurposeFK,
-          current.isNurseNote,
-        )
-        const isShowBasicExaminations = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.VITALSIGN,
-          current,
-          visitPurposeFK,
-          isNurseNote,
-        )
-        const isShowOrders = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.ORDERS,
-          current,
-          visitPurposeFK,
-          isNurseNote,
-        )
-        const isShowConsultationDocument = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.CONSULTATION_DOCUMENT,
-          current,
-          visitPurposeFK,
-          isNurseNote,
-        )
-        const isShowJGHEyeExaminations = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.EYEEXAMINATIONS,
-          current,
-          visitPurposeFK,
-          isNurseNote,
-        )
-        const isShowAudiometryTest = this.checkShowData(
-          WidgetConfig.WIDGETS_ID.AUDIOMETRYTEST,
-          current,
-          visitPurposeFK,
-          isNurseNote,
-        )
-        if (
-          isNurseNote ||
-          isShowDoctorNote ||
-          isShowReferral ||
-          isShowVisitRemarks ||
-          isShowTreatment ||
-          isShowDiagnosis ||
-          isShowEyeVisualAcuityTest ||
-          isShowRefractionForm ||
-          isShowEyeExaminations ||
-          isShowBasicExaminations ||
-          isShowOrders ||
-          isShowConsultationDocument ||
-          isShowJGHEyeExaminations ||
-          isShowAudiometryTest
-        ) {
-          let referral = { isShowReferral: false }
-          if (isShowReferral) {
-            referral = this.getReferral(current)
-          }
-          let refractionFormDetails = {
-            isRefractionForm: false,
-            eyeRefractionFormDominanceL: false,
-            eyeRefractionFormDominanceR: false,
-          }
-          if (isShowRefractionForm) {
-            refractionFormDetails = this.getRefractionForm(current)
-          }
+        if (isShowRefractionForm) {
+          refractionFormDetails = this.getRefractionForm(current)
+        }
 
-          let eyeVisualAcuityTestDetails = {
-            isEyeVisualAcuityTest: false,
-            isAided: false,
-            isOwnSpecs: false,
-            isRefractionOn: false,
-            isNoSpec: false,
-            specsAge: 0,
-          }
-          if (isShowEyeVisualAcuityTest) {
-            eyeVisualAcuityTestDetails = this.getEyeVisualAcuityTest(current)
-          }
+        let eyeVisualAcuityTestDetails = {
+          isEyeVisualAcuityTest: false,
+          isAided: false,
+          isOwnSpecs: false,
+          isRefractionOn: false,
+          isNoSpec: false,
+          specsAge: 0,
+        }
+        if (isShowEyeVisualAcuityTest) {
+          eyeVisualAcuityTestDetails = this.getEyeVisualAcuityTest(current)
+        }
 
-          const {
-            visitRefractionFormTests = [],
-            ...restRefractionFormProps
-          } = refractionFormDetails
+        const {
+          visitRefractionFormTests = [],
+          ...restRefractionFormProps
+        } = refractionFormDetails
 
-          // visitListing
-          visitListing.push({
-            currentId: current.currentId,
-            visitDate: moment(current.visitDate).format(
-              dateFormatLongWithTimeNoSec,
-            ),
-            doctor: `${current.userTitle || ''} ${current.userName || ''}`,
-            isNurseNote: isNurseNote || false,
-            nurseNotes,
-            visitRemarks: isShowVisitRemarks ? current.visitRemarks : '',
-            ...referral,
-            ...restRefractionFormProps,
-            ...eyeVisualAcuityTestDetails,
-            patientGender: current.patientGender || '',
-            isShowBasicExaminations: isShowBasicExaminations,
-            isShowBasicExaminationsGeneral: this.showBasicExaminationsGeneral(
-              current.patientNoteVitalSigns,
-            ),
-            isShowBasicExaminationsOther1: this.showBasicExaminationsOther1(
-              current.patientNoteVitalSigns,
-            ),
-            isShowBasicExaminationsOther2: this.showBasicExaminationsOther2(
-              current.patientNoteVitalSigns,
-            ),
-          })
+        // visitListing
+        visitListing.push({
+          currentId: current.currentId,
+          visitDate: moment(current.visitDate).format(
+            dateFormatLongWithTimeNoSec,
+          ),
+          doctor: `${current.userTitle || ''} ${current.userName || ''}`,
+          isNurseNote: isNurseNote || false,
+          nurseNotes,
+          visitRemarks: isShowVisitRemarks ? current.visitRemarks : '',
+          ...referral,
+          ...restRefractionFormProps,
+          ...eyeVisualAcuityTestDetails,
+          patientGender: current.patientGender || '',
+          isShowBasicExaminations: isShowBasicExaminations,
+          isShowBasicExaminationsGeneral: this.showBasicExaminationsGeneral(
+            current.patientNoteVitalSigns,
+          ),
+          isShowBasicExaminationsOther1: this.showBasicExaminationsOther1(
+            current.patientNoteVitalSigns,
+          ),
+          isShowBasicExaminationsOther2: this.showBasicExaminationsOther2(
+            current.patientNoteVitalSigns,
+          ),
+        })
 
-          // treatment
-          if (isShowTreatment) {
-            treatment = treatment.concat(
-              current.orders
-                .filter(o => o.type === 'Treatment')
-                .map(o => {
-                  return {
-                    visitFK: current.currentId,
-                    name: o.name,
-                    toothNumber: o.description,
-                    legend: o.legend,
-                    description: o.treatmentDescription,
-                  }
-                }),
-            )
-          }
-
-          // diagnosis
-          if (isShowDiagnosis) {
-            diagnosis = diagnosis.concat(
-              current.diagnosis.map(o => {
-                let currentComplication = o.corComplication.map(c => {
-                  const selectItem = ctcomplication.find(
-                    cc => cc.id === c.complicationFK,
-                  )
-                  return {
-                    ...c,
-                    name: selectItem ? selectItem.name : undefined,
-                  }
-                })
+        // treatment
+        if (isShowTreatment) {
+          treatment = treatment.concat(
+            current.orders
+              .filter(o => o.type === 'Treatment')
+              .map(o => {
                 return {
                   visitFK: current.currentId,
-                  diagnosisDescription: o.diagnosisDescription,
-                  complication: currentComplication
-                    .filter(c => c.name)
-                    .map(c => c.name)
-                    .join(', '),
-                }
-              }),
-            )
-          }
-
-          // Refraction Form Test
-          refractionFormTests = refractionFormTests.concat(
-            visitRefractionFormTests,
-          )
-
-          // Eye Examinations
-          if (isShowEyeExaminations) {
-            const { formData = {} } = current.corEyeExaminationForm
-            eyeExaminations = eyeExaminations.concat(
-              (formData.EyeExaminations || []).map(o => {
-                return {
-                  visitFK: current.currentId,
-                  rightEye: o.RightEye,
-                  eyeExaminationType: o.EyeExaminationType,
-                  leftEye: o.LeftEye,
-                }
-              }),
-            )
-          }
-
-          // Vital Sign
-          if (isShowBasicExaminations) {
-            vitalSign = vitalSign.concat(
-              current.patientNoteVitalSigns.map(o => {
-                return {
-                  visitFK: current.currentId,
-                  temperatureC: WidgetConfig.hasValue(o.temperatureC)
-                    ? `${numeral(o.temperatureC).format('0.0')} \u00b0C`
-                    : '-',
-                  bpSysMMHG: WidgetConfig.hasValue(o.bpSysMMHG)
-                    ? `${numeral(o.bpSysMMHG).format('0')} mmHg`
-                    : '-',
-                  bpDiaMMHG: WidgetConfig.hasValue(o.bpDiaMMHG)
-                    ? `${numeral(o.bpDiaMMHG).format('0')} mmHg`
-                    : '-',
-                  pulseRateBPM: WidgetConfig.hasValue(o.pulseRateBPM)
-                    ? `${numeral(o.pulseRateBPM).format('0')} bpm`
-                    : '-',
-                  weightKG: WidgetConfig.hasValue(o.weightKG)
-                    ? `${numeral(o.weightKG).format('0.0')} KG`
-                    : '-',
-                  heightCM: WidgetConfig.hasValue(o.heightCM)
-                    ? `${numeral(o.heightCM).format('0.0')} CM`
-                    : '-',
-                  bmi: WidgetConfig.hasValue(o.bmi)
-                    ? `${numeral(o.bmi).format('0.0')} kg/m\u00b2`
-                    : '-',
-                  saO2: WidgetConfig.hasValue(o.saO2)
-                    ? `${numeral(o.saO2).format('0')} %`
-                    : '-',
-                  bodyFatPercentage: WidgetConfig.hasValue(o.bodyFatPercentage)
-                    ? `${numeral(o.bodyFatPercentage).format('0.0')} %`
-                    : '-',
-                  degreeOfObesity: WidgetConfig.hasValue(o.degreeOfObesity)
-                    ? `${numeral(o.degreeOfObesity).format('0.0')} %`
-                    : '-',
-                  headCircumference: WidgetConfig.hasValue(o.headCircumference)
-                    ? `${numeral(o.headCircumference).format('0.0')} CM`
-                    : '-',
-                  chestCircumference: WidgetConfig.hasValue(
-                    o.chestCircumference,
-                  )
-                    ? `${numeral(o.chestCircumference).format('0.0')} CM`
-                    : '-',
-                  waistCircumference:
-                    o.isChild || o.isPregnancy
-                      ? 'Not Available'
-                      : WidgetConfig.hasValue(o.waistCircumference)
-                      ? `${numeral(o.waistCircumference).format('0.0')} CM`
-                      : '-',
-                  isPregnancy: WidgetConfig.getHistoryValueForBoolean(
-                    o.isPregnancy,
-                  ),
-                  hepetitisVaccinationA: WidgetConfig.getHistoryValueForBoolean(
-                    o.hepetitisVaccinationA,
-                  ),
-                  hepetitisVaccinationB: WidgetConfig.getHistoryValueForBoolean(
-                    o.hepetitisVaccinationB,
-                  ),
-                  isFasting: WidgetConfig.getHistoryValueForBoolean(
-                    o.isFasting,
-                  ),
-                  isSmoking: WidgetConfig.getHistoryValueForBoolean(
-                    o.isSmoking,
-                  ),
-                  isAlcohol: WidgetConfig.getHistoryValueForBoolean(
-                    o.isAlcohol,
-                  ),
-                  isMensus: WidgetConfig.getHistoryValueForBoolean(o.isMensus),
-                }
-              }),
-            )
-          }
-
-          // JGH Eye Examinations
-          if (isShowJGHEyeExaminations) {
-            corEyeExaminations = corEyeExaminations.concat(
-              current.corEyeExaminations.map(o => {
-                return {
-                  visitFK: current.currentId,
-                  visionCorrectionMethod: o.visionCorrectionMethod || '',
-                  rightBareEye5: WidgetConfig.hasValue(o.rightBareEye5)
-                    ? `${numeral(o.rightBareEye5).format('0.0')}`
-                    : '-',
-                  rightCorrectedVision5: WidgetConfig.hasValue(
-                    o.rightCorrectedVision5,
-                  )
-                    ? `${numeral(o.rightCorrectedVision5).format('0.0')}`
-                    : '-',
-                  rightBareEye50: WidgetConfig.hasValue(o.rightBareEye50)
-                    ? `${numeral(o.rightBareEye50).format('0.0')}`
-                    : '-',
-                  rightCorrectedVision50: WidgetConfig.hasValue(
-                    o.rightCorrectedVision50,
-                  )
-                    ? `${numeral(o.rightCorrectedVision50).format('0.0')}`
-                    : '-',
-                  leftBareEye5: WidgetConfig.hasValue(o.leftBareEye5)
-                    ? `${numeral(o.leftBareEye5).format('0.0')}`
-                    : '-',
-                  leftCorrectedVision5: WidgetConfig.hasValue(
-                    o.leftCorrectedVision5,
-                  )
-                    ? `${numeral(o.leftCorrectedVision5).format('0.0')}`
-                    : '-',
-                  leftBareEye50: WidgetConfig.hasValue(o.leftBareEye50)
-                    ? `${numeral(o.leftBareEye50).format('0.0')}`
-                    : '-',
-                  leftCorrectedVision50: WidgetConfig.hasValue(
-                    o.leftCorrectedVision50,
-                  )
-                    ? `${numeral(o.leftCorrectedVision50).format('0.0')}`
-                    : '-',
-                  rightFirstResult: WidgetConfig.hasValue(o.rightFirstResult)
-                    ? `${o.rightFirstResult}`
-                    : '-',
-                  rightSecondResult: WidgetConfig.hasValue(o.rightSecondResult)
-                    ? `${o.rightSecondResult}`
-                    : '-',
-                  rightThirdResult: WidgetConfig.hasValue(o.rightThirdResult)
-                    ? `${o.rightThirdResult}`
-                    : '-',
-                  rightAverageResult: WidgetConfig.hasValue(
-                    o.rightAverageResult,
-                  )
-                    ? `${numeral(o.rightAverageResult).format('0')}`
-                    : '-',
-                  leftFirstResult: WidgetConfig.hasValue(o.leftFirstResult)
-                    ? `${o.leftFirstResult}`
-                    : '-',
-                  leftSecondResult: WidgetConfig.hasValue(o.leftSecondResult)
-                    ? `${o.leftSecondResult}`
-                    : '-',
-                  leftThirdResult: WidgetConfig.hasValue(o.leftThirdResult)
-                    ? `${o.leftThirdResult}`
-                    : '-',
-                  leftAverageResult: WidgetConfig.hasValue(o.leftAverageResult)
-                    ? `${numeral(o.leftAverageResult).format('0')}`
-                    : '-',
-                  colorVisionTestResult: o.colorVisionTestResult || '',
-                  remarks:
-                    WidgetConfig.hasValue(o.remarks) && o.remarks.trim().length
-                      ? o.remarks
-                      : '-',
-                }
-              }),
-            )
-          }
-
-          //  Audiometry Test
-          if (isShowAudiometryTest) {
-            corAudiometryTest = corAudiometryTest.concat(
-              current.corAudiometryTest.map(o => {
-                return {
-                  visitFK: current.currentId,
-                  rightResult1000Hz: WidgetConfig.hasValue(o.rightResult1000Hz)
-                    ? `${o.rightResult1000Hz} dB`
-                    : '-',
-                  rightResult4000Hz: WidgetConfig.hasValue(o.rightResult4000Hz)
-                    ? `${o.rightResult4000Hz} dB`
-                    : '-',
-                  leftResult1000Hz: WidgetConfig.hasValue(o.leftResult1000Hz)
-                    ? `${o.leftResult1000Hz} dB`
-                    : '-',
-                  leftResult4000Hz: WidgetConfig.hasValue(o.leftResult4000Hz)
-                    ? `${o.leftResult4000Hz} dB`
-                    : '-',
-                }
-              }),
-            )
-          }
-
-          // orders
-          if (isShowOrders) {
-            orders = orders.concat(
-              current.orders.map(o => {
-                return {
-                  visitFK: current.currentId,
-                  type: o.isDrugMixture ? 'Drug Mixture' : o.type,
-                  isDrugMixture: o.isDrugMixture,
                   name: o.name,
-                  description: o.description,
-                  remarks: o.remarks,
-                  quantity: o.quantity,
-                  uom: o.dispenseUOMDisplayValue,
+                  toothNumber: o.description,
+                  legend: o.legend,
+                  description: o.treatmentDescription,
                 }
               }),
-            )
-          }
-
-          // Consultation Document
-          if (isShowConsultationDocument) {
-            consultationDocument = consultationDocument.concat(
-              current.documents.map(o => {
-                return {
-                  visitFK: current.currentId,
-                  type: o.type,
-                  subject: o.type === 'Others' ? o.title : o.subject,
-                }
-              }),
-            )
-          }
-
-          //show doctor notes
-          if (isShowDoctorNote) {
-            doctorNote = doctorNote.concat(
-              this.getNotes(selectNoteTypes, current),
-            )
-          }
+          )
         }
-      })
+
+        // diagnosis
+        if (isShowDiagnosis) {
+          diagnosis = diagnosis.concat(
+            current.diagnosis.map(o => {
+              let currentComplication = o.corComplication.map(c => {
+                const selectItem = ctcomplication.find(
+                  cc => cc.id === c.complicationFK,
+                )
+                return {
+                  ...c,
+                  name: selectItem ? selectItem.name : undefined,
+                }
+              })
+              return {
+                visitFK: current.currentId,
+                diagnosisDescription: o.diagnosisDescription,
+                complication: currentComplication
+                  .filter(c => c.name)
+                  .map(c => c.name)
+                  .join(', '),
+              }
+            }),
+          )
+        }
+
+        // Refraction Form Test
+        refractionFormTests = refractionFormTests.concat(
+          visitRefractionFormTests,
+        )
+
+        // Eye Examinations
+        if (isShowEyeExaminations) {
+          const { formData = {} } = current.corEyeExaminationForm
+          eyeExaminations = eyeExaminations.concat(
+            (formData.EyeExaminations || []).map(o => {
+              return {
+                visitFK: current.currentId,
+                rightEye: o.RightEye,
+                eyeExaminationType: o.EyeExaminationType,
+                leftEye: o.LeftEye,
+              }
+            }),
+          )
+        }
+
+        // Vital Sign
+        if (isShowBasicExaminations) {
+          vitalSign = vitalSign.concat(
+            current.patientNoteVitalSigns.map(o => {
+              return {
+                visitFK: current.currentId,
+                temperatureC: WidgetConfig.hasValue(o.temperatureC)
+                  ? `${numeral(o.temperatureC).format('0.0')} \u00b0C`
+                  : '-',
+                bpSysMMHG: WidgetConfig.hasValue(o.bpSysMMHG)
+                  ? `${numeral(o.bpSysMMHG).format('0')} mmHg`
+                  : '-',
+                bpDiaMMHG: WidgetConfig.hasValue(o.bpDiaMMHG)
+                  ? `${numeral(o.bpDiaMMHG).format('0')} mmHg`
+                  : '-',
+                pulseRateBPM: WidgetConfig.hasValue(o.pulseRateBPM)
+                  ? `${numeral(o.pulseRateBPM).format('0')} bpm`
+                  : '-',
+                weightKG: WidgetConfig.hasValue(o.weightKG)
+                  ? `${numeral(o.weightKG).format('0.0')} KG`
+                  : '-',
+                heightCM: WidgetConfig.hasValue(o.heightCM)
+                  ? `${numeral(o.heightCM).format('0.0')} CM`
+                  : '-',
+                bmi: WidgetConfig.hasValue(o.bmi)
+                  ? `${numeral(o.bmi).format('0.0')} kg/m\u00b2`
+                  : '-',
+                saO2: WidgetConfig.hasValue(o.saO2)
+                  ? `${numeral(o.saO2).format('0')} %`
+                  : '-',
+                bodyFatPercentage: WidgetConfig.hasValue(o.bodyFatPercentage)
+                  ? `${numeral(o.bodyFatPercentage).format('0.0')} %`
+                  : '-',
+                degreeOfObesity: WidgetConfig.hasValue(o.degreeOfObesity)
+                  ? `${numeral(o.degreeOfObesity).format('0.0')} %`
+                  : '-',
+                headCircumference: WidgetConfig.hasValue(o.headCircumference)
+                  ? `${numeral(o.headCircumference).format('0.0')} CM`
+                  : '-',
+                chestCircumference: WidgetConfig.hasValue(o.chestCircumference)
+                  ? `${numeral(o.chestCircumference).format('0.0')} CM`
+                  : '-',
+                waistCircumference:
+                  o.isChild || o.isPregnancy
+                    ? 'Not Available'
+                    : WidgetConfig.hasValue(o.waistCircumference)
+                    ? `${numeral(o.waistCircumference).format('0.0')} CM`
+                    : '-',
+                isPregnancy: WidgetConfig.getHistoryValueForBoolean(
+                  o.isPregnancy,
+                ),
+                hepetitisVaccinationA: WidgetConfig.getHistoryValueForBoolean(
+                  o.hepetitisVaccinationA,
+                ),
+                hepetitisVaccinationB: WidgetConfig.getHistoryValueForBoolean(
+                  o.hepetitisVaccinationB,
+                ),
+                isFasting: WidgetConfig.getHistoryValueForBoolean(o.isFasting),
+                isSmoking: WidgetConfig.getHistoryValueForBoolean(o.isSmoking),
+                isAlcohol: WidgetConfig.getHistoryValueForBoolean(o.isAlcohol),
+                isMensus: WidgetConfig.getHistoryValueForBoolean(o.isMensus),
+              }
+            }),
+          )
+        }
+
+        // JGH Eye Examinations
+        if (isShowJGHEyeExaminations) {
+          corEyeExaminations = corEyeExaminations.concat(
+            current.corEyeExaminations.map(o => {
+              return {
+                visitFK: current.currentId,
+                visionCorrectionMethod: o.visionCorrectionMethod || '',
+                rightBareEye5: WidgetConfig.hasValue(o.rightBareEye5)
+                  ? `${numeral(o.rightBareEye5).format('0.0')}`
+                  : '-',
+                rightCorrectedVision5: WidgetConfig.hasValue(
+                  o.rightCorrectedVision5,
+                )
+                  ? `${numeral(o.rightCorrectedVision5).format('0.0')}`
+                  : '-',
+                rightBareEye50: WidgetConfig.hasValue(o.rightBareEye50)
+                  ? `${numeral(o.rightBareEye50).format('0.0')}`
+                  : '-',
+                rightCorrectedVision50: WidgetConfig.hasValue(
+                  o.rightCorrectedVision50,
+                )
+                  ? `${numeral(o.rightCorrectedVision50).format('0.0')}`
+                  : '-',
+                leftBareEye5: WidgetConfig.hasValue(o.leftBareEye5)
+                  ? `${numeral(o.leftBareEye5).format('0.0')}`
+                  : '-',
+                leftCorrectedVision5: WidgetConfig.hasValue(
+                  o.leftCorrectedVision5,
+                )
+                  ? `${numeral(o.leftCorrectedVision5).format('0.0')}`
+                  : '-',
+                leftBareEye50: WidgetConfig.hasValue(o.leftBareEye50)
+                  ? `${numeral(o.leftBareEye50).format('0.0')}`
+                  : '-',
+                leftCorrectedVision50: WidgetConfig.hasValue(
+                  o.leftCorrectedVision50,
+                )
+                  ? `${numeral(o.leftCorrectedVision50).format('0.0')}`
+                  : '-',
+                rightFirstResult: WidgetConfig.hasValue(o.rightFirstResult)
+                  ? `${o.rightFirstResult}`
+                  : '-',
+                rightSecondResult: WidgetConfig.hasValue(o.rightSecondResult)
+                  ? `${o.rightSecondResult}`
+                  : '-',
+                rightThirdResult: WidgetConfig.hasValue(o.rightThirdResult)
+                  ? `${o.rightThirdResult}`
+                  : '-',
+                rightAverageResult: WidgetConfig.hasValue(o.rightAverageResult)
+                  ? `${numeral(o.rightAverageResult).format('0')}`
+                  : '-',
+                leftFirstResult: WidgetConfig.hasValue(o.leftFirstResult)
+                  ? `${o.leftFirstResult}`
+                  : '-',
+                leftSecondResult: WidgetConfig.hasValue(o.leftSecondResult)
+                  ? `${o.leftSecondResult}`
+                  : '-',
+                leftThirdResult: WidgetConfig.hasValue(o.leftThirdResult)
+                  ? `${o.leftThirdResult}`
+                  : '-',
+                leftAverageResult: WidgetConfig.hasValue(o.leftAverageResult)
+                  ? `${numeral(o.leftAverageResult).format('0')}`
+                  : '-',
+                colorVisionTestResult: o.colorVisionTestResult || '',
+                remarks:
+                  WidgetConfig.hasValue(o.remarks) && o.remarks.trim().length
+                    ? o.remarks
+                    : '-',
+              }
+            }),
+          )
+        }
+
+        //  Audiometry Test
+        if (isShowAudiometryTest) {
+          corAudiometryTest = corAudiometryTest.concat(
+            current.corAudiometryTest.map(o => {
+              return {
+                visitFK: current.currentId,
+                rightResult1000Hz: WidgetConfig.hasValue(o.rightResult1000Hz)
+                  ? `${o.rightResult1000Hz} dB`
+                  : '-',
+                rightResult4000Hz: WidgetConfig.hasValue(o.rightResult4000Hz)
+                  ? `${o.rightResult4000Hz} dB`
+                  : '-',
+                leftResult1000Hz: WidgetConfig.hasValue(o.leftResult1000Hz)
+                  ? `${o.leftResult1000Hz} dB`
+                  : '-',
+                leftResult4000Hz: WidgetConfig.hasValue(o.leftResult4000Hz)
+                  ? `${o.leftResult4000Hz} dB`
+                  : '-',
+              }
+            }),
+          )
+        }
+
+        // orders
+        if (isShowOrders) {
+          orders = orders.concat(
+            current.orders.map(o => {
+              return {
+                visitFK: current.currentId,
+                type: o.isDrugMixture ? 'Drug Mixture' : o.type,
+                isDrugMixture: o.isDrugMixture,
+                name: o.name,
+                description: o.description,
+                remarks: o.remarks,
+                quantity: o.quantity,
+                uom: o.dispenseUOMDisplayValue,
+              }
+            }),
+          )
+        }
+
+        // Consultation Document
+        if (isShowConsultationDocument) {
+          consultationDocument = consultationDocument.concat(
+            current.documents.map(o => {
+              return {
+                visitFK: current.currentId,
+                type: o.type,
+                subject: o.type === 'Others' ? o.title : o.subject,
+              }
+            }),
+          )
+        }
+
+        //show doctor notes
+        if (isShowDoctorNote) {
+          const newNote = await this.getNotes(selectNoteTypes, current)
+          doctorNote = doctorNote.concat(newNote)
+        }
+      }
+    }
 
     // for resolve print nothing when not any data in sub table(such as consultationDocument, treatment, diagnosis...)
     if (consultationDocument.length === 0) {
       consultationDocument = [{ visitFK: '' }]
     }
-
     const payload = {
       PatientInfo: this.getPatientInfo(),
       VisitListing: visitListing,

@@ -66,7 +66,7 @@ const styles = theme => ({
     consultation,
     visitRegistration,
     loading,
-    clinicSettings
+    clinicSettings,
   }) => ({
     clinicInfo,
     clinicalnotes,
@@ -136,7 +136,12 @@ class ClinicalNotes extends Component {
     }
   }
 
-  scribbleNoteDrawing = ({ subject, temp, thumbnail = null }) => {
+  scribbleNoteDrawing = ({
+    subject,
+    temp,
+    thumbnail = null,
+    origin = null,
+  }) => {
     const { scriblenotes, dispatch } = this.props
     const { category, arrayName, categoryIndex, config } = this.state
     const { fields } = config
@@ -171,15 +176,18 @@ class ClinicalNotes extends Component {
         type: 'scriblenotes/upsert',
         payload: {
           id: newArrayItems[scriblenotes.selectedIndex].scribbleNoteFK,
-          scribbleNoteTypeFK: newArrayItems[scriblenotes.selectedIndex].scribbleNoteTypeFK,
+          scribbleNoteTypeFK:
+            newArrayItems[scriblenotes.selectedIndex].scribbleNoteTypeFK,
           scribbleNoteLayers: temp.map(t => {
             return {
               ...t,
-              scribbleNoteFK: newArrayItems[scriblenotes.selectedIndex].scribbleNoteFK,
+              scribbleNoteFK:
+                newArrayItems[scriblenotes.selectedIndex].scribbleNoteFK,
             }
           }),
           subject,
           thumbnail,
+          origin,
         },
       })
 
@@ -191,6 +199,7 @@ class ClinicalNotes extends Component {
       const newData = {
         subject,
         thumbnail,
+        origin,
         scribbleNoteTypeFK: categoryIndex,
         scribbleNoteTypeName: category,
         scribbleNoteLayers: temp,
@@ -198,9 +207,10 @@ class ClinicalNotes extends Component {
       dispatch({
         type: 'scriblenotes/upsert',
         payload: newData,
-      }).then((o) => {
-        if(o) {
+      }).then(o => {
+        if (o) {
           newData.scribbleNoteFK = o.id
+          newData.origin = undefined
         }
       })
 
@@ -625,7 +635,10 @@ class ClinicalNotes extends Component {
             toggleScribbleModal={this.toggleScribbleModal}
             scribbleData={this.state.selectedData}
             deleteScribbleNote={this.deleteScribbleNote}
-            scribbleNoteType={scribbleTypes.find(x=>x.typeFK === this.state.categoryIndex)?.type}
+            scribbleNoteType={
+              scribbleTypes.find(x => x.typeFK === this.state.categoryIndex)
+                ?.type
+            }
           />
         </CommonModal>
       </div>
