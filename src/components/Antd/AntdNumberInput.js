@@ -136,20 +136,19 @@ class AntdNumberInput extends React.PureComponent {
 
   handleBlur = e => {
     this.debouncedOnChange.cancel()
-    // let v = e.target.value
-    // if (
-    //   !e.target.value &&
-    //   !this.props.allowEmpty &&
-    //   (this.props.min || this.props.min === 0)
-    // ) {
-    //   v = this.props.min
-    // }
-    // this._onChange(
-    //   v || v === 0
-    //     ? roundTo(Number(v), this.state.convertedPrecision)
-    //     : undefined,
-    // )
-    // this.debouncedOnChange.cancel()
+    let v = e.target.value
+    if (
+      !e.target.value &&
+      !this.props.allowEmpty &&
+      (this.props.min || this.props.min === 0)
+    ) {
+      v = this.props.min
+    }
+    this._onChange(
+      v || v === 0
+        ? roundTo(Number(v), this.state.convertedPrecision)
+        : undefined,
+    )
     // this.setState({
     //   focused: false,
     // })

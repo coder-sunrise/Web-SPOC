@@ -150,7 +150,7 @@ const InvoicePaymentDetails = ({ invoice = {} }) => {
             {
               dataIndex: 'status',
               title: 'Status',
-              width: 80,
+              width: 100,
               render: (_, row) => {
                 let status = 'Paid'
                 if (row.outstanding > 0) {

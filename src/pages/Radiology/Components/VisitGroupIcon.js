@@ -36,7 +36,7 @@ const VisitGroupIcon = props => {
           {
             dataIndex: 'gender',
             title: 'Gender',
-            width: 60,
+            width: 70,
             sortingEnabled: false,
           },
           {

@@ -55,6 +55,7 @@ import _ from 'lodash'
       allowMaxPaid: x.outstanding > 0 ? x.outstanding : 0,
       totalPaidAmount: x.outstanding > 0 ? x.outstanding : 0,
       invoiceNo: invoice.invoiceNo,
+      isSelected: x.outstanding > 0,
     }))
     let newValues = {
       ...invoice,
@@ -93,6 +94,7 @@ import _ from 'lodash'
               totalPaidAmount: x.outstanding > 0 ? x.outstanding : 0,
               invoiceNo: i.invoiceNo,
               isGroupPayment,
+              isSelected: x.outstanding > 0,
             })),
           ])
         }
@@ -212,17 +214,25 @@ class AddPayment extends Component {
     if (paymentModeObj) {
       const isCash = paymentModeObj.id === PAYMENT_MODE.CASH
       const isDeposit = paymentModeObj.id === PAYMENT_MODE.DEPOSIT
-      const hasCashPaymentAlready =
-        values.paymentList.filter(
-          item => item.paymentModeFK === PAYMENT_MODE.CASH,
-        ).length > 0
-
+      const disableCash = values.paymentList.length > 0
       const hasDeposit =
         patient.patientDeposit && patient.patientDeposit.balance > 0
+      const disableDeposit =
+        values.paymentList.find(
+          item =>
+            item.paymentModeFK === PAYMENT_MODE.CASH ||
+            item.paymentModeFK === PAYMENT_MODE.DEPOSIT,
+        ) || values.invoiceOSAmount <= 0
+
+      const disableAllMode = values.paymentList.find(
+        item => item.paymentModeFK === PAYMENT_MODE.CASH,
+      )
       if (
-        (isCash && hasCashPaymentAlready) ||
+        (isCash && disableCash) ||
         (isDeposit &&
-          (values.payerTypeFK !== INVOICE_PAYER_TYPE.PATIENT || !hasDeposit))
+          (values.payerTypeFK !== INVOICE_PAYER_TYPE.PATIENT ||
+            disableDeposit)) ||
+        disableAllMode
       )
         return
 
@@ -484,7 +494,7 @@ class AddPayment extends Component {
   }
 
   handleAmountChange = () => {
-    setTimeout(() => this.calculatePayment(), 100)
+    setTimeout(() => this.calculatePayment(), 1)
   }
 
   handleCashReceivedChange = event => {
@@ -548,9 +558,38 @@ class AddPayment extends Component {
     }
   }
   handleSelectionChange = selection => {
-    const { setFieldValue } = this.props
+    const { setFieldValue, values } = this.props
+    const newUnSelectItems = values.selectedRows.filter(
+      i => !selection.includes(i),
+    )
+    const newSelectItems = selection.filter(
+      i => !values.selectedRows.includes(i),
+    )
+    const newInvoicePayerItem = values.invoicePayerItem.map(item => {
+      if (
+        !newUnSelectItems.find(x => x === item.id) &&
+        !newSelectItems.find(x => x === item.id)
+      )
+        return item
+
+      if (newUnSelectItems.find(x => x === item.id)) {
+        return {
+          ...item,
+          totalPaidAmount: 0,
+          isSelected: false,
+        }
+      } else {
+        return {
+          ...item,
+          totalPaidAmount: item.allowMaxPaid,
+          isSelected: true,
+        }
+      }
+    })
+
+    setFieldValue('invoicePayerItem', [...newInvoicePayerItem])
     setFieldValue('selectedRows', selection)
-    setTimeout(() => this.calculatePayment(), 100)
+    setTimeout(() => this.calculatePayment(), 1)
   }
   SummaryRow = p => {
     const { isGroupPayment } = this.props
@@ -582,7 +621,7 @@ class AddPayment extends Component {
   handleCommitChanges = ({ rows }) => {
     const { setFieldValue } = this.props
     setFieldValue('invoicePayerItem', rows)
-    setTimeout(() => this.calculatePayment(), 100)
+    setTimeout(() => this.calculatePayment(), 1)
   }
 
   getModeMaxHeight = () => {
@@ -628,7 +667,7 @@ class AddPayment extends Component {
                       { name: 'invoiceNo', title: 'Invoice No.' },
                       {
                         name: 'claimAmount',
-                        title: 'Payable Amount',
+                        title: 'Payable Amt.',
                       },
                       {
                         name: 'outstanding',
@@ -636,7 +675,7 @@ class AddPayment extends Component {
                       },
                       {
                         name: 'totalPaidAmount',
-                        title: 'Paid Amt.',
+                        title: 'Payment Amt.',
                       },
                     ]}
                     columnExtensions={[
@@ -680,7 +719,9 @@ class AddPayment extends Component {
                         sortingEnabled: false,
                         min: 0,
                         isDisabled: row =>
-                          row.isGroupPayment || row.outstanding <= 0,
+                          row.isGroupPayment ||
+                          row.outstanding <= 0 ||
+                          !row.isSelected,
                         width: 130,
                       },
                     ]}
@@ -734,7 +775,7 @@ class AddPayment extends Component {
                         .min(0)
                         .max(
                           Yup.ref('allowMaxPaid'),
-                          'Paid Amount cannot exceed Patient Outstanding',
+                          'Payment Amount cannot exceed Patient Outstanding',
                         ),
                     })}
                   />
@@ -798,7 +839,8 @@ class AddPayment extends Component {
                   if (values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT) {
                     if (values.remainOutstanding > 0) {
                       notification.warning({
-                        message: 'Selected items must to be fully paid.',
+                        message:
+                          'Total selected item amount must equal to total payment amount.',
                       })
                       return
                     }
