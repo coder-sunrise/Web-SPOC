@@ -11,7 +11,7 @@ const url = '/api/files'
 //   "content": "{base64 content}",
 //   "IsConfirmed": "false"
 // }
-export const uploadFile = async (payload) => {
+export const uploadFile = async payload => {
   // console.log(payload)
   const response = await request(url, {
     method: 'POST',
@@ -21,7 +21,7 @@ export const uploadFile = async (payload) => {
   return response
 }
 
-export const getFileByFileID = async (fileID) => {
+export const getFileByFileID = async fileID => {
   const response = await axiosRequest(`${url}/${fileID}`, {
     method: 'GET',
     responseType: 'arraybuffer',
@@ -31,11 +31,7 @@ export const getFileByFileID = async (fileID) => {
 
 export const downloadFile = async (data, fileName) => {
   try {
-    const dataUrl = window.URL.createObjectURL(
-      new Blob([
-        data,
-      ]),
-    )
+    const dataUrl = window.URL.createObjectURL(new Blob([data]))
     const link = document.createElement('a')
     link.href = dataUrl
     link.setAttribute('download', fileName)
@@ -49,7 +45,7 @@ export const downloadFile = async (data, fileName) => {
   }
 }
 
-export const downloadAttachment = async (attachment) => {
+export const downloadAttachment = async attachment => {
   try {
     const { fileIndexFK, id } = attachment
     const response = await getFileByFileID(!fileIndexFK ? id : fileIndexFK)
@@ -62,7 +58,7 @@ export const downloadAttachment = async (attachment) => {
   }
 }
 
-export const getImagePreview = async (id) => {
+export const getImagePreview = async id => {
   try {
     const response = await getFileByFileID(id)
 
@@ -74,7 +70,14 @@ export const getImagePreview = async (id) => {
   return false
 }
 
-export const deleteFileByFileID = async (fileID) => {
+export const deleteFileByFileID = async fileID => {
   const response = await request(`${url}/${fileID}`, { method: 'DELETE' })
+  return response
+}
+
+export const getFileContentByFileID = async fileID => {
+  const response = await axiosRequest(`${url}/Content/${fileID}`, {
+    method: 'GET',
+  })
   return response
 }
