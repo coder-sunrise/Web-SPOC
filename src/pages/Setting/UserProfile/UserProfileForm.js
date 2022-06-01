@@ -364,6 +364,7 @@ class UserProfileForm extends React.PureComponent {
       hasActiveSession,
       height,
       ctRole,
+      setFieldValue,
     } = this.props
     const {
       currentPrimaryRegisteredDoctorFK,
@@ -379,6 +380,7 @@ class UserProfileForm extends React.PureComponent {
     const {
       userProfile: { role = [] },
       _oldRole,
+      specialtyFK,
     } = values
     const currentClinicalRole = ctRole?.find(
       item => item.id === (values.role || role.id),
@@ -507,6 +509,14 @@ class UserProfileForm extends React.PureComponent {
                           return item
                         }}
                         disabled={isMyAccount}
+                        onChange={(val, option) => {
+                          if (
+                            option.clinicalRoleName !== 'Doctor' &&
+                            specialtyFK
+                          ) {
+                            setFieldValue('specialtyFK', null)
+                          }
+                        }}
                       />
                     )}
                   />
@@ -648,10 +658,15 @@ class UserProfileForm extends React.PureComponent {
                   />
                 </GridItem>
                 <GridItem md={6}>
-                  <FastField
-                    name='dob'
+                  <Field
+                    name='specialtyFK'
                     render={args => (
-                      <DatePicker {...args} dobRestrict label='Date Of Birth' />
+                      <CodeSelect
+                        {...args}
+                        label='Specialty'
+                        code='ctspecialty'
+                        disabled={!canEditDoctorMCR}
+                      />
                     )}
                   />
                 </GridItem>
@@ -661,7 +676,15 @@ class UserProfileForm extends React.PureComponent {
                     render={args => <TextField {...args} label='Designation' />}
                   />
                 </GridItem>
-                <GridItem md={12}>
+                <GridItem md={6}>
+                  <FastField
+                    name='dob'
+                    render={args => (
+                      <DatePicker {...args} dobRestrict label='Date Of Birth' />
+                    )}
+                  />
+                </GridItem>
+                <GridItem md={6}>
                   <FastField
                     name='effectiveDates'
                     render={args => (
