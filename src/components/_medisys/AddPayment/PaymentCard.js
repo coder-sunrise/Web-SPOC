@@ -64,11 +64,12 @@ class PaymentCard extends Component {
         hideHeader
         className={classes.paymentTypeContainer}
         style={{
+          height: `${noPayment ? 50 : maxHeight}px`,
           maxHeight: maxHeight,
         }}
       >
         {!noPayment ? (
-          <GridContainer justify='space-between' alignItems='flex-end'>
+          <GridContainer justify='space-between' alignItems='flex-start'>
             {paymentList.map(this.MapPaymentTypeToComponent)}
           </GridContainer>
         ) : (
