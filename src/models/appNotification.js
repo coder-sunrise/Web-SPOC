@@ -100,6 +100,7 @@ export default createBasicModel({
           type: 'header/updateState',
           payload: {
             notifications,
+            unreadTotalRecords: response.data.currentPage
           },
         })
         return response
