@@ -13,18 +13,33 @@ const amountProps = {
   fullWidth: true,
 }
 
-const PaymentSummary = ({ payerDistributedAmt = 0.0, outstanding = 0.0 }) => {
+const PaymentSummary = ({
+  payerDistributedAmt = 0.0,
+  payerDistributedAmtBeforeGST = 0.0,
+  outstanding = 0.0,
+  gstAmount,
+}) => {
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
         <GridItem xs={6} md={12}>
           <NumberInput
             prefix='Payable Amount:'
-            value={payerDistributedAmt}
+            value={payerDistributedAmtBeforeGST}
             size='sm'
             {...amountProps}
           />
         </GridItem>
+        {gstAmount && (
+          <GridItem xs={6} md={12}>
+            <NumberInput
+              prefix='GST Amount:'
+              value={gstAmount}
+              size='sm'
+              {...amountProps}
+            />
+          </GridItem>
+        )}
         <GridItem xs={6} md={12}>
           <NumberInput
             prefix='Outstanding:'

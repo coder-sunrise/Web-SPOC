@@ -9,7 +9,7 @@ export const SchemeInvoicePayerColumn = [
   { name: 'itemName', title: 'Name' },
   { name: 'coverage', title: 'Coverage' },
   { name: 'payableBalance', title: 'Payable Amount ($)' },
-  { name: 'claimAmount', title: 'Claim Amount ($)' },
+  { name: 'claimAmountBeforeGST', title: 'Claim Amount ($)' },
   // { name: 'error', title: ' ' },
 ]
 
@@ -17,7 +17,7 @@ export const CompanyInvoicePayerColumn = [
   { name: 'itemType', title: 'Category' },
   { name: 'itemName', title: 'Name' },
   { name: 'payableBalance', title: 'Payable Amount ($)' },
-  { name: 'claimAmount', title: 'Claim Amount ($)' },
+  { name: 'claimAmountBeforeGST', title: 'Claim Amount ($)' },
   // { name: 'error', title: ' ' },
 ]
 
@@ -67,9 +67,14 @@ export const CoPayerColumns = [
   { name: 'itemName', title: 'Name' },
   { name: 'payableBalance', title: 'Payable Amount' },
   {
-    name: 'claimAmount',
+    name: 'claimAmountBeforeGST',
     title: 'Claim Amount',
   },
+  // {
+  //   hidden: true,
+  //   name: 'gstAmount',
+  //   title: 'GST Amount',
+  // },
 ]
 
 export const CoPayerColExtensions = [
@@ -88,7 +93,7 @@ export const CoPayerColExtensions = [
     disabled: true,
   },
   {
-    columnName: 'claimAmount',
+    columnName: 'claimAmountBeforeGST',
     type: 'number',
     currency: true,
     isDisabled: row => !row.isClaimable,
@@ -98,7 +103,7 @@ export const CoPayerColExtensions = [
 export const validationSchema = Yup.object().shape({
   coverage: Yup.string(),
   payableBalance: Yup.number(),
-  claimAmount: Yup.number().when(
+  claimAmountBeforeGST: Yup.number().when(
     ['coverage', 'payableBalance'],
     (coverage, payableBalance, schema) => {
       const isPercentage = coverage.indexOf('%') > 0
