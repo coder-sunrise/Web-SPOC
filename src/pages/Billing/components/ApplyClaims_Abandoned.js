@@ -153,7 +153,7 @@ const ApplyClaims = ({
         {
           ...item,
           invoiceItemTypeFK,
-          payableBalance: item.totalAfterGst,
+          payableBalance: item.totalBeforeGst,
           coverage,
           schemeCoverageType,
           schemeCoverage,
@@ -221,7 +221,7 @@ const ApplyClaims = ({
                       ? originalItem.id === item.invoiceItemFK
                       : originalItem.id === item.id,
                   )
-                return { ...item, payableBalance: original.totalAfterGst }
+                return { ...item, payableBalance: original.totalBeforeGst }
               }),
             },
           ]
@@ -243,7 +243,7 @@ const ApplyClaims = ({
             _i => _i.id === ip.id,
           )
 
-          if (!_existed) return { ...ip, payableBalance: ip.totalAfterGst }
+          if (!_existed) return { ...ip, payableBalance: ip.totalBeforeGst }
 
           return {
             ...ip,
@@ -950,22 +950,8 @@ const ApplyClaims = ({
               schemeCoverage: 100,
               schemeCoverageType: 'Percentage',
               payableBalance:
-                invoiceItem.totalAfterGst - (invoiceItem._claimedAmount || 0),
+                invoiceItem.totalBeforeGst - (invoiceItem._claimedAmount || 0),
             }))}
-          // invoiceItems={
-          //   tempInvoicePayer.length > 0 ? (
-          //     tempInvoicePayer.reduce(flattenInvoicePayersInvoiceItemList, [])
-          //   ) : (
-          //     invoice.invoiceItems.map((invoiceItem) => ({
-          //       ...invoiceItem,
-          //       claimAmount: 0,
-          //       itemName: invoiceItem.itemDescription,
-          //       schemeCoverage: 100,
-          //       schemeCoverageType: 'Percentage',
-          //       payableBalance: invoiceItem.totalAfterGst,
-          //     }))
-          //   )
-          // }
         />
       </CommonModal>
       <CommonModal

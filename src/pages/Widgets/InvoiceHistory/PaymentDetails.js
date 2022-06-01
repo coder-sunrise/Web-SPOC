@@ -423,20 +423,23 @@ class PaymentDetails extends Component {
         {invoicePayer.length > 0
           ? invoicePayer
               .sort((a, b) => a.payerTypeFK - b.payerTypeFK)
-              .map(payment => {
+              .map(ip => {
                 return (
                   <PaymentCard
-                    coPaymentSchemeFK={payment.coPaymentSchemeFK}
-                    companyFK={payment.companyFK}
-                    companyName={payment.companyName}
-                    patientName={payment.patientName}
-                    payerType={payment.payerType}
-                    payerTypeFK={payment.payerTypeFK}
-                    payments={payment.paymentTxnList}
+                    coPaymentSchemeFK={ip.coPaymentSchemeFK}
+                    companyFK={ip.companyFK}
+                    companyName={ip.companyName}
+                    patientName={ip.patientName}
+                    payerType={ip.payerType}
+                    payerTypeFK={ip.payerTypeFK}
+                    payments={ip.paymentTxnList}
                     isEnableWriteOffinInvoice={isEnableWriteOffinInvoice}
-                    payerDistributedAmt={payment.payerDistributedAmt}
-                    outstanding={payment.outStanding}
-                    invoicePayerFK={payment.id}
+                    payerDistributedAmt={ip.payerDistributedAmt}
+                    payerDistributedAmtBeforeGST={
+                      ip.payerDistributedAmtBeforeGST
+                    }
+                    outstanding={ip.outStanding}
+                    invoicePayerFK={ip.id}
                     actions={paymentActionsProps}
                     readOnly={readOnly}
                     hasActiveSession={hasActiveSession}

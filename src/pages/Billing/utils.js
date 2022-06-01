@@ -3,6 +3,7 @@ import { notification } from '@/components'
 import { INVOICE_ITEM_TYPE, INVOICE_PAYER_TYPE } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { SCHEME_TYPE } from '@/utils/constants'
+import { roundTo } from '@/utils/utils'
 
 export const constructPayload = values => {
   const {
@@ -35,7 +36,8 @@ export const constructPayload = values => {
       _invoicePayer[index].sequence = newsequence
     }
   }
-
+  let copayerTotalGstAmount = 0
+  let copayerTotalClaimedAmount = 0
   _invoicePayer = _invoicePayer
     .filter(payer => (payer.id ? payer.isModified : true))
     .map(payer => {
@@ -50,14 +52,21 @@ export const constructPayload = values => {
         isModified,
         ...restPayer
       } = payer
+      // let invoicePayerGstAmount = 0
       const _payer = {
         ...restPayer,
         isModified: restPayer.id ? isModified : false,
         invoicePayerItem: payer.invoicePayerItem
-          .filter(item => item.claimAmount > 0)
+          .filter(item => item.claimAmountBeforeGST > 0)
           .map(item => {
             if (typeof item.id !== 'string') {
-              return { ...item }
+              const gstAmount = roundTo(item.claimAmountBeforeGST * 0.07)
+              // invoicePayerGstAmount += gstAmount
+              return {
+                ...item,
+                claimAmount: item.claimAmountBeforeGST + gstAmount,
+                outstanding: item.claimAmountBeforeGST + gstAmount,
+              }
             }
             const {
               invoiceItemFK,
@@ -70,13 +79,18 @@ export const constructPayload = values => {
               itemDescription,
               coverage,
               payableBalance,
+              claimAmountBeforeGST,
               id,
               ...restItem
             } = item
-
+            const gstItemAmount = roundTo(claimAmountBeforeGST * 0.07)
+            // invoicePayerGstAmount += gstItemAmount
             const _invoicePayerItem = {
               ...restItem,
               invoiceItemFK,
+              claimAmountBeforeGST: claimAmountBeforeGST,
+              claimAmount: claimAmountBeforeGST + gstItemAmount,
+              outstanding: claimAmountBeforeGST + gstItemAmount,
               payableBalance,
               invoiceItemTypeFK,
               itemName: itemDescription,
@@ -84,6 +98,17 @@ export const constructPayload = values => {
             return _invoicePayerItem
           }),
       }
+
+      // copayerTotalGstAmount += invoicePayerGstAmount
+      // if (copayerTotalGstAmount > gstAmount) {
+      //   invoicePayerGstAmount = gstAmount - copayerTotalGstAmount
+      //   _payer.gstAmount = invoicePayerGstAmount
+      // } else {
+      //   _payer.gstAmount = invoicePayerGstAmount
+      // }
+      _payer.gstAmount = roundTo(_payer.payerDistributedAmtBeforeGST * 0.07)
+      _payer.payerDistributedAmt =
+        _payer.gstAmount + _payer.payerDistributedAmtBeforeGST
       return _payer
     })
 
