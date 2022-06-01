@@ -124,7 +124,7 @@ class Supplier extends PureComponent {
             : ''
         }${
           address.unitNo || address.buildingName ? '\n' : ''
-        }${address.countryName || ''} ${
+        }${address.countryName || ''}${
           address.postcode
             ? (address.countryName ? ' ' : '') + address.postcode
             : ''
