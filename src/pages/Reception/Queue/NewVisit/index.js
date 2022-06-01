@@ -42,6 +42,7 @@ import { VISIT_STATUS } from '../variables'
 import PreOrderCard from './PreOrderCard'
 import MCCard from './MCCard'
 import { preOrderItemCategory } from '@/utils/codes'
+import _ from 'lodash'
 
 const styles = theme => ({
   gridContainer: {
@@ -313,6 +314,19 @@ class NewVisit extends PureComponent {
     ) {
       notification.error({
         message: 'Primary doctor and reporting doctor cannot be the same.',
+      })
+      return
+    }
+
+    if (
+      visitDoctor.filter(x => !x.isDeleted).length !==
+      _.uniqBy(
+        visitDoctor.filter(x => !x.isDeleted),
+        'doctorProfileFK',
+      ).length
+    ) {
+      notification.error({
+        message: 'Can not select duplicate doctor.',
       })
       return
     }
