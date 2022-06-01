@@ -10,7 +10,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -23,11 +23,11 @@ const styles = (theme) => ({
 class ServiceCenter extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingMedicationPrecautions/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
 
@@ -46,7 +46,7 @@ class ServiceCenter extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingMedicationPrecautions, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
@@ -63,11 +63,9 @@ class ServiceCenter extends PureComponent {
           open={settingMedicationPrecautions.showModal}
           observe='MedicationPrecautionsDetail'
           title={
-            settingMedicationPrecautions.entity ? (
-              'Edit Medication Precaution'
-            ) : (
-              'Add Medication Precaution'
-            )
+            settingMedicationPrecautions.entity
+              ? 'Edit Medication Precaution'
+              : 'Add Medication Precaution'
           }
           maxWidth='md'
           bodyNoPadding
