@@ -76,7 +76,7 @@ class AppNotificationContent extends Component {
     const isSender = currentUserFK == fromUserFK
     const isReceiver = currentUserFK == toUserFK
     const isOtherPRO = !isSender && !isReceiver
-    console.log({isSender,isReceiver,isOtherPRO,content})
+
     return (
       <div style={{ ...customeStyle }}>
         <div>

@@ -189,7 +189,7 @@ class HeaderLinks extends React.Component {
       systemMessage,
     } = this.props
     const { openAccount } = this.state
-    const { signalRConnected, notifications } = header
+    const { signalRConnected, notifications, unreadTotalRecords } = header
 
     const dropdownItem = classNames(
       classes.dropdownItem,
@@ -222,6 +222,7 @@ class HeaderLinks extends React.Component {
                 dispatch={this.props.dispatch}
                 notifications={notifications}
                 systemMessage={systemMessage}
+                unreadTotalRecords={unreadTotalRecords}
               />
               {!signalRConnected && (
                 <Tooltip title='Real-time update signal is down. Please refresh manually.'>
