@@ -54,6 +54,7 @@ const defaultInvoicePayer = {
   copaymentSchemeFK: undefined,
   name: '',
   payerDistributedAmt: 0,
+  payerDistributedAmtBeforeGST: 0,
   invoicePayerItem: [],
   sequence: 0,
   invoicePayment: [],
@@ -189,7 +190,7 @@ const ApplyClaims = ({
     const newInvoicePayerAmt = newInvoicePayer.reduce((list, n) => {
       const newItems = n.invoicePayerItem.map(p => {
         let chasAmt = null
-        if (n.name.startsWith('CHAS')) chasAmt = p.claimAmount
+        if (n.name.startsWith('CHAS')) chasAmt = p.claimAmountBeforeGST
         if (n.medisaveVisitType === 'CDMP') chasAmt = p._chasAmount
         return {
           ...p,
@@ -333,7 +334,7 @@ const ApplyClaims = ({
     )
 
     const totalClaimed = payerInvoiceItems.reduce((oldTotal, newTotal) => {
-      return oldTotal + newTotal.claimAmount
+      return oldTotal + newTotal.claimAmountBeforeGST
     }, 0)
     const updatedPayer =
       payerInvoiceItems.length > 0 && totalClaimed > 0
@@ -439,8 +440,9 @@ const ApplyClaims = ({
         const payerItem = invoicePayerItem.find(
           ipi => item.id === ipi.invoiceItemFK,
         )
+        console.log(item, payerItem)
         if (payerItem) {
-          if (item.totalAfterGst !== payerItem.payableBalance) {
+          if (item.totalBeforeGst !== payerItem.payableBalance) {
             isUpdatedAppliedInvoicePayerInfo = true
           }
           break
@@ -532,7 +534,7 @@ const ApplyClaims = ({
         if (
           newItems &&
           newItems.filter(item => {
-            return item._claimedAmount >= item.totalAfterGst
+            return item._claimedAmount >= item.totalBeforeGst
           }).length >= newItems.length
         )
           return true
@@ -792,21 +794,21 @@ const ApplyClaims = ({
         (hasError, item) => (item.error ? true : hasError),
         false,
       )
+
+      const total = roundTo(
+        invoiceItems.reduce(
+          (total, item) => total + item.claimAmountBeforeGST,
+          0,
+        ),
+      )
+      const gstAmount = roundTo(total * 0.07)
       const updatedPayer = {
         ...tempInvoicePayer[index],
-        payerDistributedAmt: roundTo(
-          invoiceItems.reduce(
-            (subtotal, item) => subtotal + item.claimAmount,
-            0,
-          ),
-        ),
+        payerDistributedAmtBeforeGST: total,
+        gstAmount: gstAmount,
         payerOutstanding:
-          roundTo(
-            invoiceItems.reduce(
-              (subtotal, item) => subtotal + item.claimAmount,
-              0,
-            ),
-          ) -
+          total +
+          gstAmount -
           _.sumBy(
             (tempInvoicePayer[index].invoicePayment || []).filter(
               p => !p.isCancelled,
@@ -879,26 +881,26 @@ const ApplyClaims = ({
       )
 
       let eligibleAmount =
-        originalItem.totalAfterGst - originalItem._claimedAmount
+        originalItem.totalBeforeGst - originalItem._claimedAmount
       if (eligibleAmount === 0) {
         const currentEditItemClaimedAmount = tempInvoicePayer
           .filter((_rest, i) => i !== index)
           .reduce(flattenInvoicePayersInvoiceItemList, [])
           .reduce((remainingClaimable, item) => {
             if (item.invoiceItemFK === changedItem.invoiceItemFK)
-              return remainingClaimable + item.claimAmount
+              return remainingClaimable + item.claimAmountBeforeGST
 
             return remainingClaimable
           }, 0)
 
         eligibleAmount =
-          originalItem.totalAfterGst - currentEditItemClaimedAmount
+          originalItem.totalBeforeGst - currentEditItemClaimedAmount
       }
 
       let hasError = false
       const mapAndCompareCurrentChangesAmount = item => {
         if (item.id === id) {
-          const currentChangesClaimAmount = changed[id].claimAmount
+          const currentChangesClaimAmount = changed[id].claimAmountBeforeGST
           if (currentChangesClaimAmount <= eligibleAmount) {
             return { ...item, error: undefined }
           }
@@ -931,7 +933,13 @@ const ApplyClaims = ({
   const handleAddCoPayer = invoicePayer => {
     toggleCopayerModal()
     const newTempInvoicePayer = [...tempInvoicePayer, invoicePayer]
-    setTempInvoicePayer(newTempInvoicePayer)
+    // make sure the total gst of invoice payer will not over than invoice gst.
+    var totalGST = _.sumBy(newTempInvoicePayer, t => t.gstAmount)
+    if (totalGST > invoice.gstAmount) {
+      invoicePayer.gstAmount =
+        invoice.gstAmount - _.sumBy(tempInvoicePayer, t => t.gstAmount)
+    }
+    setTempInvoicePayer([...tempInvoicePayer, invoicePayer])
   }
 
   const handleAddClaimClick = () => {
@@ -1118,7 +1126,7 @@ const ApplyClaims = ({
           onClick={handleAddClaimClick}
         >
           <Add />
-          Claimable Schemes
+          Claimable Schemes1
         </Button>
         <Button
           color='primary'
@@ -1223,7 +1231,7 @@ const ApplyClaims = ({
             schemeCoverage: 100,
             schemeCoverageType: 'Percentage',
             payableBalance:
-              invoiceItem.totalAfterGst - (invoiceItem._claimedAmount || 0),
+              invoiceItem.totalBeforeGst - (invoiceItem._claimedAmount || 0),
           }))}
         />
       </CommonModal>

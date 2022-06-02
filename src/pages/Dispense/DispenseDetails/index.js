@@ -306,7 +306,7 @@ const DispenseDetails = ({
           ipi => item.id === ipi.invoiceItemFK,
         )
         if (payerItem) {
-          if (item.totalAfterGST !== payerItem.payableBalance) {
+          if (item.totalBeforeGst !== payerItem.payableBalance) {
             isUpdatedAppliedInvoicePayerInfo = true
           }
           break

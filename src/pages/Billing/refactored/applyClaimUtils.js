@@ -94,7 +94,7 @@ export const getApplicableClaimAmount = (
   } = scheme
   let returnClaimAmount = 0
   const payableBalance = roundTo(
-    invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0),
+    invoicePayerItem.totalBeforeGst - (invoicePayerItem._claimedAmount || 0),
   )
 
   if (payableBalance <= 0 || !scheme) return returnClaimAmount
@@ -197,7 +197,7 @@ export const getInvoiceItemsWithClaimAmount = (
     originalInvoiceItems
       .map(item => {
         return (
-          item.totalAfterGst -
+          item.totalBeforeGst -
           (allPayers ? item._chasAmount || 0 : item._claimedAmount || 0)
         )
       }) // fixed value if cdmp, based on chas claimed
@@ -217,7 +217,7 @@ export const getInvoiceItemsWithClaimAmount = (
   const invoiceItems = originalInvoiceItems.reduce((result, item) => {
     if (
       item.notClaimableBySchemeIds.includes(schemeConfig.id) ||
-      item.totalAfterGst <= 0
+      item.totalBeforeGst <= 0
     )
       return [...result]
 
@@ -232,7 +232,7 @@ export const getInvoiceItemsWithClaimAmount = (
 
     const { invoiceItemTypeFK } = item
     const pastItemClaimedAmount = roundTo(
-      result.reduce((total, i) => total + i.claimAmount, 0),
+      result.reduce((total, i) => total + i.claimAmountBeforeGST, 0),
     )
 
     // get claim amount of items based on other schemes
@@ -255,7 +255,9 @@ export const getInvoiceItemsWithClaimAmount = (
     // get claim amount of items based on current scheme
     const pastSchemeClaimedAmount =
       payers.length > 0
-        ? roundTo(payers.reduce((total, i) => total + i.claimAmount, 0))
+        ? roundTo(
+            payers.reduce((total, i) => total + i.claimAmountBeforeGST, 0),
+          )
         : 0
 
     let remainingCoverageMaxCap
@@ -265,7 +267,7 @@ export const getInvoiceItemsWithClaimAmount = (
       const pastTypeClaimedAmount = roundTo(
         result
           .filter(x => x.invoiceItemTypeFK === invoiceItemTypeFK)
-          .reduce((total, i) => total + i.claimAmount, 0),
+          .reduce((total, i) => total + i.claimAmountBeforeGST, 0),
       )
       if (invoiceItemTypeFK === 1) {
         if (isMedicationCoverageMaxCapCheckRequired)
@@ -315,7 +317,7 @@ export const getInvoiceItemsWithClaimAmount = (
           schemeCoverageType,
           schemeCoverage,
           itemName: existedItem.itemDescription,
-          claimAmount: _claimAmount,
+          claimAmountBeforeGST: _claimAmount,
         },
       ]
 
@@ -327,12 +329,12 @@ export const getInvoiceItemsWithClaimAmount = (
         id: item.invoiceItemFK ? item.id : getUniqueId(),
         invoiceItemFK: item.invoiceItemFK ? item.invoiceItemFK : item.id,
         invoiceItemTypeFK,
-        payableBalance: item.totalAfterGst,
+        payableBalance: item.totalBeforeGst,
         coverage,
         schemeCoverageType,
         schemeCoverage,
         itemName: item.itemDescription,
-        claimAmount: _claimAmount,
+        claimAmountBeforeGST: _claimAmount,
       },
     ]
   }, [])
@@ -344,7 +346,8 @@ export const computeTotalForAllSavedClaim = (sum, payer) =>
     ? sum +
       payer.invoicePayerItem.reduce(
         (subtotal, item) =>
-          subtotal + (item.claimAmount ? item.claimAmount : 0),
+          subtotal +
+          (item.claimAmountBeforeGST ? item.claimAmountBeforeGST : 0),
         0,
       )
     : sum
@@ -364,7 +367,7 @@ export const updateOriginalInvoiceItemList = (
       )
 
       if (_invoicePayerItem) {
-        return roundTo(subtotal + _invoicePayerItem.claimAmount)
+        return roundTo(subtotal + _invoicePayerItem.claimAmountBeforeGST)
       }
       return roundTo(subtotal)
     }
@@ -424,7 +427,7 @@ export const validateInvoicePayerItems = invoicePayerItem => {
       type = 'Coverage Amount'
     } else maxAmount = item.payableBalance
 
-    if (item.claimAmount > maxAmount) {
+    if (item.claimAmountBeforeGST > maxAmount) {
       return { ...item, error: `Claim Amount cannot exceed ${type}` }
     }
 
@@ -438,7 +441,7 @@ const getItemTypeSubtotal = (list, type) =>
     list.reduce(
       (subtotal, item) =>
         item.invoiceItemTypeFK === type
-          ? subtotal + item.claimAmount
+          ? subtotal + item.claimAmountBeforeGST
           : subtotal,
       0,
     ),
@@ -462,7 +465,7 @@ export const getMedisaveVisitClaimableAmount = (items, medisaveItems) => {
       medisaveServices.find(m => m.code === v.itemCode) ||
       medisaveMedications.find(m => m.code === v.itemCode)
     )
-      return total + v.totalAfterGst - v._chasAmount
+      return total + v.totalBeforeGst - v._chasAmount
     return total
   }, 0)
   return roundTo((claimableTotal * 15) / 100) // do not fix it
@@ -512,7 +515,7 @@ export const validateClaimAmount = (
 
   const totalClaimAmount = roundTo(
     invoicePayerItem.reduce(
-      (totalClaim, item) => totalClaim + (item.claimAmount || 0),
+      (totalClaim, item) => totalClaim + (item.claimAmountBeforeGST || 0),
       0,
     ),
   )
@@ -548,7 +551,7 @@ export const validateClaimAmount = (
           medisaveServices.find(m => m.code === v.itemCode) ||
           medisaveMedications.find(m => m.code === v.itemCode)
         )
-          return total + v.totalAfterGst - v._chasAmount
+          return total + v.totalBeforeGst - v._chasAmount
         return total
       }, 0)
       const claimedTotal = invoicePayerItem.reduce((total, v) => {
@@ -673,14 +676,17 @@ export const computeInvoiceItemPrevClaimedAmount = (invoiceItems, item) => {
     _i => _i.invoiceItemFK === item.invoiceItemFK,
   )
   if (!_existed)
-    return [...invoiceItems, { ...item, _prevClaimedAmount: item.claimAmount }]
+    return [
+      ...invoiceItems,
+      { ...item, _prevClaimedAmount: item.claimAmountBeforeGST },
+    ]
   return [
     ...invoiceItems.filter(_i => _i.invoiceItemFK !== item.invoiceItemFK),
     {
       ..._existed,
       _prevClaimedAmount: item.error
         ? _existed._prevClaimedAmount
-        : _existed._prevClaimedAmount + item.claimAmount,
+        : _existed._prevClaimedAmount + item.claimAmountBeforeGST,
     },
   ]
 }
@@ -695,14 +701,14 @@ export const updateInvoicePayerPayableBalance = (
     // dp nothing when payer isCancelled
     if (payer.isCancelled) return [..._payers, payer]
     let { isModified } = payer
-    // first payer use totalAfterGst as payable balance
+    // first payer use totalBeforeGst as payable balance
     if (index === 0) {
       const newInvoicePayerItem = payer.invoicePayerItem.map(item => {
         const original = originalInvoiceItems.find(
           oriInvoiceItem => oriInvoiceItem.id === item.invoiceItemFK,
         )
         const newPayableBalance = original
-          ? original.totalAfterGst
+          ? original.totalBeforeGst
           : item.payableBalance
         if (item.payableBalance !== newPayableBalance) {
           isModified = true
@@ -715,19 +721,17 @@ export const updateInvoicePayerPayableBalance = (
       })
       let autoApplyMessage = {}
       if (autoApply) {
+        const total = roundTo(
+          payer.invoicePayerItem.reduce(
+            (total, item) => total + item.claimAmountBeforeGST,
+            0,
+          ),
+        )
+        const gstAmount = roundTo(total * 0.07)
         autoApplyMessage = {
-          payerDistributedAmt: roundTo(
-            payer.invoicePayerItem.reduce(
-              (subtotal, item) => subtotal + item.claimAmount,
-              0,
-            ),
-          ),
-          payerOutstanding: roundTo(
-            payer.invoicePayerItem.reduce(
-              (subtotal, item) => subtotal + item.claimAmount,
-              0,
-            ),
-          ),
+          payerDistributedAmtBeforeGST: total,
+          gstAmount: gstAmount,
+          payerOutstanding: total + gstAmount,
           isModified: true,
           _isConfirmed: true,
           _isEditing: false,
@@ -763,7 +767,7 @@ export const updateInvoicePayerPayableBalance = (
           oriInvoiceItem => oriInvoiceItem.id === item.invoiceItemFK,
         )
         newPayableBalance = original
-          ? original.totalAfterGst
+          ? original.totalBeforeGst
           : item.payableBalance
       } else {
         newPayableBalance = _existed.error

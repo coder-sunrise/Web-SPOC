@@ -431,6 +431,7 @@ const getMedicalCheckupCWorkitemDoctor = (
     if (doctor) {
       item.isPrimaryDoctor = doctor.isPrimaryDoctor
       item.sequence = doctor.sequence
+      item.specialtyFK = doctor.specialtyFK
     }
   })
 

@@ -67,7 +67,6 @@ const MCCard = ({
     }
 
     if (langueges.length === 1) return ''
-    // console.log(!mcWorkItemInProgress, visitMode === 'view')
     return (
       <div style={{ width: 180 }}>
         <Field
@@ -89,6 +88,10 @@ const MCCard = ({
       name: 'doctorProfileFK',
       title: 'Reporting Doctor',
     },
+    {
+      name: 'specialtyFK',
+      title: 'Specialty',
+    },
   ]
 
   columns.push({ name: 'action', title: ' ' })
@@ -107,8 +110,20 @@ const MCCard = ({
         return false
       },
       labelField: 'clinicianProfile.name',
-      localFilter: o => o.clinicianProfile.isActive,
+      localFilter: o =>
+        o.clinicianProfile.isActive && o.clinicianProfile.specialtyFK,
       renderDropdown: option => <DoctorLabel doctor={option} />,
+      onChange: ({ row, option }) => {
+        row.specialtyFK = option?.clinicianProfile?.specialtyFK
+      },
+    },
+    {
+      columnName: 'specialtyFK',
+      sortingEnabled: false,
+      type: 'codeSelect',
+      code: 'ctspecialty',
+      width: 120,
+      isDisabled: () => false,
     },
     {
       columnName: 'action',

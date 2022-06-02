@@ -51,6 +51,7 @@ const PaymentCard = ({
   payerTypeFK = PayerType.PATIENT,
   payments = [],
   payerDistributedAmt,
+  payerDistributedAmtBeforeGST,
   outstanding,
   invoicePayerFK,
   readOnly,
@@ -148,6 +149,7 @@ const PaymentCard = ({
         >
           <PaymentSummary
             payerDistributedAmt={payerDistributedAmt}
+            payerDistributedAmtBeforeGST={payerDistributedAmtBeforeGST}
             outstanding={outstanding}
           />
         </GridItem>

@@ -66,7 +66,7 @@ const styles = theme => ({
 const validationSchema = Yup.object().shape({
   eligibleAmount: Yup.number(),
   payableBalance: Yup.number(),
-  claimAmount: Yup.number().when(
+  claimAmountBeforeGST: Yup.number().when(
     ['eligibleAmount', 'payableBalance'],
     (eligibleAmount, payableBalance) => {
       const _checkAmount = eligibleAmount || payableBalance
@@ -123,6 +123,8 @@ const Scheme = ({
     hasPayments = false,
     chasClaimStatuses = [],
     payerDistributedAmt,
+    payerDistributedAmtBeforeGST,
+    gstAmount,
     payerOutstanding,
     invoicePayment = [],
     schemePayerFK,
@@ -150,7 +152,7 @@ const Scheme = ({
   const columnExtensions = [
     ...ApplyClaimsColumnExtension,
     {
-      columnName: 'claimAmount',
+      columnName: 'claimAmountBeforeGST',
       align: 'right',
       type: 'currency',
       width: 150,
@@ -346,7 +348,7 @@ const Scheme = ({
                 columnExtensions={[
                   ...ApplyClaimsColumnExtension,
                   {
-                    columnName: 'claimAmount',
+                    columnName: 'claimAmountBeforeGST',
                     align: 'right',
                     type: 'currency',
                     currency: true,
@@ -556,7 +558,9 @@ const Scheme = ({
             >
               <PaymentSummary
                 payerDistributedAmt={payerDistributedAmt}
+                payerDistributedAmtBeforeGST={payerDistributedAmtBeforeGST}
                 outstanding={payerOutstanding}
+                gstAmount={gstAmount}
               />
             </GridItem>
           </GridContainer>

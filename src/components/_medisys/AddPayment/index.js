@@ -236,7 +236,10 @@ class AddPayment extends Component {
       )
         return
 
-      this.onPaymentTypeClick(paymentModeObj)
+      document.activeElement?.blur()
+      setTimeout(() => {
+        this.onPaymentTypeClick(paymentModeObj)
+      }, 100)
     }
   }
 
@@ -805,7 +808,11 @@ class AddPayment extends Component {
                 )}
                 hideDeposit={values.payerTypeFK !== INVOICE_PAYER_TYPE.PATIENT}
                 patientInfo={patient}
-                handlePaymentTypeClick={this.onPaymentTypeClick}
+                handlePaymentTypeClick={paymentModeObj => {
+                  setTimeout(() => {
+                    this.onPaymentTypeClick(paymentModeObj)
+                  }, 100)
+                }}
                 currentOSAmount={values.invoiceOSAmount}
                 maxHeight={this.getModeMaxHeight()}
               />
@@ -836,16 +843,18 @@ class AddPayment extends Component {
               <Button
                 color='primary'
                 onClick={() => {
-                  if (values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT) {
-                    if (values.remainOutstanding > 0) {
-                      notification.warning({
-                        message:
-                          'Total selected item amount must equal to total payment amount.',
-                      })
-                      return
+                  setTimeout(() => {
+                    if (values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT) {
+                      if (values.remainOutstanding > 0) {
+                        notification.warning({
+                          message:
+                            'Total selected item amount must equal to total payment amount.',
+                        })
+                        return
+                      }
                     }
-                  }
-                  handleSubmit()
+                    handleSubmit()
+                  }, 100)
                 }}
                 disabled={
                   values.paymentList.length === 0 ||

@@ -39,7 +39,7 @@ const styles = theme => ({
 
 const validationSchema = Yup.object().shape({
   payableBalance: Yup.number(),
-  claimAmount: Yup.number()
+  claimAmountBeforeGST: Yup.number()
     .min(0)
     .max(Yup.ref('payableBalance'), 'Claim Amount cannot exceed Total Payable'),
 })
@@ -96,9 +96,10 @@ class CoPayer extends Component {
     const selectedItems = invoiceItems.map(item => {
       if (
         selected.includes(item.id) &&
-        (item.claimAmount === 0 || item.claimAmount === undefined)
+        (item.claimAmountBeforeGST === 0 ||
+          item.claimAmountBeforeGST === undefined)
       )
-        return { ...item, claimAmount: item.payableBalance }
+        return { ...item, claimAmountBeforeGST: item.payableBalance }
       return { ...item }
     })
 
@@ -122,27 +123,30 @@ class CoPayer extends Component {
   ) => {
     const newitems = invoiceItems.map(i => {
       const payableAmount = i.payableBalance
-      let claimAmount = i.payableBalance || 0
+      let claimAmountBeforeGST = i.payableBalance || 0
 
-      if (!selectedRows.includes(i.id) || i.claimAmount === undefined) {
+      if (
+        !selectedRows.includes(i.id) ||
+        i.claimAmountBeforeGST === undefined
+      ) {
         return i
       }
 
       if (patientCopayAmount > 0 && payableAmount > 0) {
         if (patientCopayAmountType === 'Percentage') {
           const amt = roundTo((payableAmount * patientCopayAmount) / 100)
-          if (claimAmount > amt) {
-            claimAmount -= amt
-          } else claimAmount = 0
+          if (claimAmountBeforeGST > amt) {
+            claimAmountBeforeGST -= amt
+          } else claimAmountBeforeGST = 0
         } else if (payableAmount > patientCopayAmount) {
-          claimAmount -= patientCopayAmount
+          claimAmountBeforeGST -= patientCopayAmount
           patientCopayAmount = 0
         } else {
           patientCopayAmount -= payableAmount
-          claimAmount = 0
+          claimAmountBeforeGST = 0
         }
       }
-      return { ...i, claimAmount }
+      return { ...i, claimAmountBeforeGST }
     })
     return newitems
   }
@@ -192,17 +196,24 @@ class CoPayer extends Component {
       .map(item => ({ ...item, id: getUniqueId(), invoiceItemFK: item.id }))
     const copayerItem = codetable.ctcopayer.find(item => item.id === coPayer)
 
+    const totalClaimAmountBeforeGST = roundTo(
+      invoicePayerItem.reduce(
+        (total, item) => total + item.claimAmountBeforeGST,
+        0,
+      ),
+    )
+    const totalGst = roundTo(totalClaimAmountBeforeGST * 0.07)
+    // const totalGst = roundTo(
+    //   invoicePayerItem.reduce(
+    //     (total, item) => total + item.claimAmountBeforeGST * 0.07,
+    //     0,
+    //   ),
+    // )
     const returnValue = {
       invoicePayerItem,
-      payerDistributedAmt: roundTo(
-        invoicePayerItem.reduce((total, item) => total + item.claimAmount, 0),
-      ),
-      payerOutstanding: roundTo(
-        invoicePayerItem.reduce(
-          (subtotal, item) => subtotal + item.claimAmount,
-          0,
-        ),
-      ),
+      payerDistributedAmtBeforeGST: totalClaimAmountBeforeGST,
+      gstAmount: totalGst,
+      payerOutstanding: totalClaimAmountBeforeGST + totalGst,
       payerTypeFK: INVOICE_PAYER_TYPE.COMPANY,
       name: copayerItem.displayValue,
       companyFK: copayerItem.id,
@@ -237,7 +248,9 @@ class CoPayer extends Component {
     const { selectedRows, editingRowIds, invoiceItems } = this.state
     const subtotalAmount = invoiceItems.reduce(
       (subtotal, item) =>
-        item.claimAmount === undefined ? subtotal : subtotal + item.claimAmount,
+        item.claimAmountBeforeGST === undefined
+          ? subtotal
+          : subtotal + item.claimAmountBeforeGST,
       0,
     )
     const getErrorRows = row => row._errors && row._errors.length > 0
@@ -258,7 +271,7 @@ class CoPayer extends Component {
     const { children } = p
     let countCol = children.find(c => {
       if (!c.props.tableColumn.column) return false
-      return c.props.tableColumn.column.name === 'claimAmount'
+      return c.props.tableColumn.column.name === 'claimAmountBeforeGST'
     })
     if (countCol) {
       const newChildren = [
@@ -272,8 +285,20 @@ class CoPayer extends Component {
               align: 'right',
             },
           },
-          key: 'claimAmount-sumtotal',
+          key: 'claimAmountBeforeGST-sumtotal',
         },
+        // {
+        //   ...countCol,
+        //   props: {
+        //     ...countCol.props,
+        //     colSpan: 5,
+        //     tableColumn: {
+        //       ...countCol.props.tableColumn,
+        //       align: 'right',
+        //     },
+        //   },
+        //   key: 'claimAmountBeforeGST-gsttotal',
+        // },
       ]
       return <Table.Row {...p}>{newChildren}</Table.Row>
     }
@@ -376,7 +401,9 @@ class CoPayer extends Component {
 
                 summaryConfig: {
                   state: {
-                    totalItems: [{ columnName: 'claimAmount', type: 'sum' }],
+                    totalItems: [
+                      { columnName: 'claimAmountBeforeGST', type: 'sum' },
+                    ],
                   },
                   integrated: {
                     calculator: (type, rows, getValue) => {
