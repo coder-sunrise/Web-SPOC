@@ -1027,7 +1027,7 @@ const Main = props => {
           rowSpan: row.countNumber === 1 ? row.rowspan : 0,
         }),
         align: 'right',
-        width: 80,
+        width: 85,
         render: (_, row) => {
           const qty = numeral(row.quantity).format('0.0')
           return (
