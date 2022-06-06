@@ -165,6 +165,7 @@ const InvoiceHistory = ({
         patientIsActive={entity.isActive}
         dispatch={dispatch}
         patientPayer={o.invoiceDetail?.patientPayer}
+        isClinicSessionClosed={o.isClinicSessionClosed}
       />
     )
   }
