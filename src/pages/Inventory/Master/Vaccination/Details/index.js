@@ -76,8 +76,8 @@ const Detail = ({
         code: 'documenttemplate',
       },
     })
+    checkHasActiveSession()
     if (vaccinationDetail.currentId) {
-      checkHasActiveSession()
       dispatch({
         type: 'vaccinationDetail/query',
         payload: {
