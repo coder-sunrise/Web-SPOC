@@ -158,10 +158,7 @@ const RadiologyDetails = () => {
   const toggleReport = () => {
     setShowReport(!showReport)
   }
-  const saveAndPrint = () => {
-    if (details?.entity?.statusFK != 4 && details?.entity?.statusFK != 5) {
-      handleSave(undefined, false)
-    }
+  const queryRadiologyDetails = () =>{
     dispatch({
       type: 'radiologyDetails/query',
       payload: { id: detailsId },
@@ -170,6 +167,14 @@ const RadiologyDetails = () => {
         toggleReport()
       }
     })
+  }
+  const saveAndPrint = () => {
+    if (details?.entity?.statusFK != 4 && details?.entity?.statusFK != 5) {
+      handleSave(undefined, false, queryRadiologyDetails)
+    }
+    else {
+      queryRadiologyDetails()
+    }
   }
   const renderPrintButton = () => {
     if (!details || !details.entity) return
@@ -185,7 +190,7 @@ const RadiologyDetails = () => {
       )
     )
   }
-  const handleSave = (payload = {}, closeAfterSave = true) => {
+  const handleSave = (payload = {}, closeAfterSave = true, callback = null) => {
     dispatch({
       type: 'radiologyDetails/updateRadiologyWorkitem',
       payload: {
@@ -196,6 +201,7 @@ const RadiologyDetails = () => {
       },
     }).then(value => {
       setIsDirty(false)
+      if (callback) callback()
       if (closeAfterSave) {
         setDetailsId(null)
         setShowDetails(false)
