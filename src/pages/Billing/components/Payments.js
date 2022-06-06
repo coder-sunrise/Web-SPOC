@@ -72,7 +72,9 @@ const Payments = ({
           </h5>
         </GridItem>
         <GridItem md={1}>
-          {ableToViewByAuthority('finance.deletepatientpayment') && (
+          {ableToViewByAuthority(
+            'finance.deletecurrentsessionpatientpayment',
+          ) && (
             <DeleteWithPopover
               index={item.id}
               title='Cancel Payment'

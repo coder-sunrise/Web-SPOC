@@ -860,15 +860,16 @@ class AddPayment extends Component {
                   values.paymentList.length === 0 ||
                   disabledPayment ||
                   (values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT &&
-                    invoicePayerItem.find(
+                    (invoicePayerItem.find(
                       x =>
                         selectedRows.indexOf(x.id) >= 0 &&
                         x.totalPaidAmount > x.allowMaxPaid,
-                    )) ||
-                  !invoicePayerItem.find(
-                    x =>
-                      selectedRows.indexOf(x.id) >= 0 && x.totalPaidAmount > 0,
-                  )
+                    ) ||
+                      !invoicePayerItem.find(
+                        x =>
+                          selectedRows.indexOf(x.id) >= 0 &&
+                          x.totalPaidAmount > 0,
+                      )))
                 }
               >
                 Confirm

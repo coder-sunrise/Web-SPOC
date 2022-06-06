@@ -385,6 +385,7 @@ class PaymentDetails extends Component {
       patientIsActive,
       clinicSettings,
       patientPayer,
+      isClinicSessionClosed,
     } = this.props
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
@@ -445,6 +446,7 @@ class PaymentDetails extends Component {
                     hasActiveSession={hasActiveSession}
                     patientIsActive={patientIsActive}
                     visitOrderTemplateFK={invoiceDetail?.visitOrderTemplateFK}
+                    isFromPastSession={isClinicSessionClosed}
                   />
                 )
               })

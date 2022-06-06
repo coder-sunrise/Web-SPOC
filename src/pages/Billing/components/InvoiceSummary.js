@@ -327,7 +327,9 @@ const InvoiceSummary = ({
             </GridItem>
 
             <GridItem md={3} className={classes.rightAlign}>
-              {ableToViewByAuthority('finance.addpatientpayment') && (
+              {ableToViewByAuthority(
+                'finance.addcurrentsessionpatientpayment',
+              ) && (
                 <Popover
                   icon={null}
                   trigger='click'
