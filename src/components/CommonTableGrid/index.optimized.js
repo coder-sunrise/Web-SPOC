@@ -423,7 +423,7 @@ class CommonTableGrid extends PureComponent {
           table: {
             // tableLayout: 'auto',
 
-            borderCollapse: 'collapse',
+            // borderCollapse: 'collapse',
           },
           stickyTable: {
             ' & > thead > tr': {
