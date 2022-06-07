@@ -552,6 +552,14 @@ class InventoryItemList extends React.Component {
     this.getFinalAmount({ value, index })
   }
 
+  onAdjustmentConditionChangeDebounce = _.debounce(
+    idx =>
+      setTimeout(() => {
+        this.onAdjustmentConditionChange(idx)
+      }, 1),
+    300,
+  )
+
   getFinalAmount = ({ value, index } = {}) => {
     const { setFieldValue, values } = this.props
     const { rows = [] } = values
@@ -649,11 +657,8 @@ class InventoryItemList extends React.Component {
                 render={args => (
                   <NumberInput
                     {...args}
-                    onChange={() => {
-                      setTimeout(() => {
-                        this.onAdjustmentConditionChange(index)
-                      }, 1)
-                    }}
+                    debounceDuration={1}
+                    onChange={() => this.onAdjustmentConditionChangeDebounce(index)}
                     min={1}
                     precision={0}
                     positiveOnly
@@ -679,11 +684,8 @@ class InventoryItemList extends React.Component {
                 render={args => (
                   <NumberInput
                     {...args}
-                    onChange={() => {
-                      setTimeout(() => {
-                        this.onAdjustmentConditionChange(index)
-                      }, 1)
-                    }}
+                    debounceDuration={1}
+                    onChange={() => this.onAdjustmentConditionChangeDebounce(index)}
                     currency
                     positiveOnly
                     min={0}
@@ -722,11 +724,8 @@ class InventoryItemList extends React.Component {
                       checkedChildren='-'
                       unCheckedChildren='+'
                       label=''
-                      onChange={() => {
-                        setTimeout(() => {
-                          this.onAdjustmentConditionChange(index)
-                        }, 1)
-                      }}
+                      debounceDuration={1}
+                      onChange={() => this.onAdjustmentConditionChangeDebounce(index)}
                       {...args}
                       inputProps={{
                         onMouseUp: e => {
@@ -757,11 +756,8 @@ class InventoryItemList extends React.Component {
                           }}
                           original
                           label=''
-                          onChange={() => {
-                            setTimeout(() => {
-                              this.onAdjustmentConditionChange(index)
-                            }, 1)
-                          }}
+                          debounceDuration={1}
+                          onChange={() => this.onAdjustmentConditionChangeDebounce(index)}
                           min={0}
                           precision={2}
                           {...args}
@@ -789,11 +785,8 @@ class InventoryItemList extends React.Component {
                           original
                           max={100}
                           label=''
-                          onChange={() => {
-                            setTimeout(() => {
-                              this.onAdjustmentConditionChange(index)
-                            }, 1)
-                          }}
+                          debounceDuration={1}
+                          onChange={() => this.onAdjustmentConditionChangeDebounce(index)}
                           min={0}
                           precision={2}
                           {...args}
@@ -825,11 +818,8 @@ class InventoryItemList extends React.Component {
                       unCheckedChildren='%'
                       // unCheckedValue='Percentage'
                       label=''
-                      onChange={() => {
-                        setTimeout(() => {
-                          this.onAdjustmentConditionChange(index)
-                        }, 1)
-                      }}
+                      debounceDuration={1}
+                      onChange={() => this.onAdjustmentConditionChangeDebounce(index)}
                       {...args}
                       inputProps={{
                         onMouseUp: e => {
