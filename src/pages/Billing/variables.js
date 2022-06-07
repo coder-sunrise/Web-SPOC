@@ -8,17 +8,15 @@ export const SchemeInvoicePayerColumn = [
   { name: 'itemType', title: 'Category' },
   { name: 'itemName', title: 'Name' },
   { name: 'coverage', title: 'Coverage' },
-  { name: 'payableBalance', title: 'Payable Amount ($)' },
+  { name: 'payableBalance', title: 'Claimable Amount ($)' },
   { name: 'claimAmountBeforeGST', title: 'Claim Amount ($)' },
-  // { name: 'error', title: ' ' },
 ]
 
 export const CompanyInvoicePayerColumn = [
   { name: 'itemType', title: 'Category' },
   { name: 'itemName', title: 'Name' },
-  { name: 'payableBalance', title: 'Payable Amount ($)' },
+  { name: 'payableBalance', title: 'Claimable Amount ($)' },
   { name: 'claimAmountBeforeGST', title: 'Claim Amount ($)' },
-  // { name: 'error', title: ' ' },
 ]
 
 export const ApplyClaimsColumnExtension = [

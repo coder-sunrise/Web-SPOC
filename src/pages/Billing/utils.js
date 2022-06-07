@@ -21,7 +21,7 @@ export const constructPayload = values => {
     signature,
   } = values
   const { invoiceItems, ...restInvoice } = invoice
-
+  const gstValue = invoice.gstValue || 0
   let _invoicePayer = invoicePayer.filter(payer => {
     if (payer.id === undefined && payer.isCancelled) return false
     return true
@@ -60,7 +60,9 @@ export const constructPayload = values => {
           .filter(item => item.claimAmountBeforeGST > 0)
           .map(item => {
             if (typeof item.id !== 'string') {
-              const gstAmount = roundTo(item.claimAmountBeforeGST * 0.07)
+              const gstAmount = roundTo(
+                (item.claimAmountBeforeGST * gstValue) / 100,
+              )
               // invoicePayerGstAmount += gstAmount
               return {
                 ...item,
@@ -83,7 +85,9 @@ export const constructPayload = values => {
               id,
               ...restItem
             } = item
-            const gstItemAmount = roundTo(claimAmountBeforeGST * 0.07)
+            const gstItemAmount = roundTo(
+              (claimAmountBeforeGST * gstValue) / 100,
+            )
             // invoicePayerGstAmount += gstItemAmount
             const _invoicePayerItem = {
               ...restItem,
@@ -106,7 +110,9 @@ export const constructPayload = values => {
       // } else {
       //   _payer.gstAmount = invoicePayerGstAmount
       // }
-      _payer.gstAmount = roundTo(_payer.payerDistributedAmtBeforeGST * 0.07)
+      _payer.gstAmount = roundTo(
+        (_payer.payerDistributedAmtBeforeGST * gstValue) / 100,
+      )
       _payer.payerDistributedAmt =
         _payer.gstAmount + _payer.payerDistributedAmtBeforeGST
       return _payer

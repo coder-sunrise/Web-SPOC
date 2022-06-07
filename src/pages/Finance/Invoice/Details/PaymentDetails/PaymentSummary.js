@@ -24,13 +24,13 @@ const PaymentSummary = ({
       <React.Fragment>
         <GridItem xs={6} md={12}>
           <NumberInput
-            prefix='Payable Amount:'
+            prefix='Total Claim Amount:'
             value={payerDistributedAmtBeforeGST}
             size='sm'
             {...amountProps}
           />
         </GridItem>
-        {gstAmount && (
+        {gstAmount !== undefined && (
           <GridItem xs={6} md={12}>
             <NumberInput
               prefix='GST Amount:'

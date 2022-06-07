@@ -182,6 +182,8 @@ class CoPayer extends Component {
       },
       handleSubmit,
       validateForm,
+      invoice,
+      copayers,
     } = this.props
 
     const isFormValid = await validateForm()
@@ -189,7 +191,7 @@ class CoPayer extends Component {
       handleSubmit()
       return
     }
-
+    const gstValue = invoice.gstValue || 0
     const { selectedRows, invoiceItems } = this.state
     const invoicePayerItem = invoiceItems
       .filter(item => selectedRows.includes(item.id))
@@ -202,13 +204,7 @@ class CoPayer extends Component {
         0,
       ),
     )
-    const totalGst = roundTo(totalClaimAmountBeforeGST * 0.07)
-    // const totalGst = roundTo(
-    //   invoicePayerItem.reduce(
-    //     (total, item) => total + item.claimAmountBeforeGST * 0.07,
-    //     0,
-    //   ),
-    // )
+    const totalGst = roundTo((totalClaimAmountBeforeGST * gstValue) / 100) 
     const returnValue = {
       invoicePayerItem,
       payerDistributedAmtBeforeGST: totalClaimAmountBeforeGST,

@@ -179,11 +179,14 @@ const ApplyClaims = ({
     const invoicePayerWithUpdatedPayer = _list.map((payer, index) =>
       updatedIndex === index ? updatedPayer : payer,
     )
+    console.log(invoicePayerWithUpdatedPayer, 'ax')
     const newInvoicePayer = updateInvoicePayerPayableBalance(
       updatedInvoiceItems,
       invoicePayerWithUpdatedPayer,
       updatedIndex,
       autoApply,
+      invoice.gstValue || 0,
+      invoice,
     )
 
     // assume chas always apply first, add chas amount to payer
@@ -440,7 +443,6 @@ const ApplyClaims = ({
         const payerItem = invoicePayerItem.find(
           ipi => item.id === ipi.invoiceItemFK,
         )
-        console.log(item, payerItem)
         if (payerItem) {
           if (item.totalBeforeGst !== payerItem.payableBalance) {
             isUpdatedAppliedInvoicePayerInfo = true
@@ -801,7 +803,24 @@ const ApplyClaims = ({
           0,
         ),
       )
-      const gstAmount = roundTo(total * 0.07)
+      let gstAmount = roundTo((total * (invoice.gstValue || 0)) / 100)
+
+      const isFullyClaimed =
+        _.sumBy(
+          tempInvoicePayer.filter(t => !t.isCancelled),
+          'payerDistributedAmtBeforeGST',
+        ) === invoice.totalAftAdj
+
+      // make sure the total gst of invoice payer will not over than invoice gst.
+      if (index === tempInvoicePayer.length - 1 > isFullyClaimed) {
+        const otherPayerGST =
+          _.sumBy(
+            tempInvoicePayer.filter(t => t.isCancelled),
+            t => t.gstAmount,
+          ) - tempInvoicePayer[index].gstAmount
+        gstAmount = invoice.gstAmount - otherPayerGST
+      }
+
       const updatedPayer = {
         ...tempInvoicePayer[index],
         payerDistributedAmtBeforeGST: total,
@@ -933,12 +952,34 @@ const ApplyClaims = ({
   const handleAddCoPayer = invoicePayer => {
     toggleCopayerModal()
     const newTempInvoicePayer = [...tempInvoicePayer, invoicePayer]
-    // make sure the total gst of invoice payer will not over than invoice gst.
-    var totalGST = _.sumBy(newTempInvoicePayer, t => t.gstAmount)
-    if (totalGST > invoice.gstAmount) {
-      invoicePayer.gstAmount =
-        invoice.gstAmount - _.sumBy(tempInvoicePayer, t => t.gstAmount)
+
+    // recalculate GST
+    newTempInvoicePayer.forEach(payer => {
+      payer.gstAmount = roundTo(
+        (payer.payerDistributedAmtBeforeGST * invoice.gstValue) / 100,
+      )
+    })
+
+    const isFullyClaimed =
+      _.sumBy(
+        newTempInvoicePayer.filter(t => !t.isCancelled),
+        'payerDistributedAmtBeforeGST',
+      ) === invoice.totalAftAdj
+    if (isFullyClaimed) {
+      _.last(newTempInvoicePayer.filter(x => !x.isCancelled)).gstAmount =
+        invoice.gstAmount -
+        _.sumBy(
+          tempInvoicePayer.filter(x => !x.isCancelled),
+          'gstAmount',
+        )
     }
+    newTempInvoicePayer.forEach(payer => {
+      if (!payer.isCancelled) {
+        payer.payerOutstanding =
+          payer.payerDistributedAmtBeforeGST + payer.gstAmount
+      }
+    })
+
     setTempInvoicePayer([...tempInvoicePayer, invoicePayer])
   }
 
@@ -1233,6 +1274,7 @@ const ApplyClaims = ({
             payableBalance:
               invoiceItem.totalBeforeGst - (invoiceItem._claimedAmount || 0),
           }))}
+          invoice={invoice}
         />
       </CommonModal>
       <CommonModal
