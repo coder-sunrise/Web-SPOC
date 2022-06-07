@@ -704,6 +704,7 @@ class Billing extends Component {
       0,
     )
     const newOutstandingBalance = roundTo(values.finalPayable - totalPaid)
+    console.log(newOutstandingBalance)
     await setFieldValue('invoice', {
       ...values.invoice,
       outstandingBalance: newOutstandingBalance,

@@ -473,6 +473,7 @@ const ApplyClaims = ({
       ),
       temp,
     )
+    console.log(finalPayable)
     updateInvoiceItems(newInvoiceItemsCopy)
 
     const _values = {
@@ -825,6 +826,7 @@ const ApplyClaims = ({
         ...tempInvoicePayer[index],
         payerDistributedAmtBeforeGST: total,
         gstAmount: gstAmount,
+        payerDistributedAmt: total + gstAmount,
         payerOutstanding:
           total +
           gstAmount -
