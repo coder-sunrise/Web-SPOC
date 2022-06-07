@@ -88,20 +88,24 @@ const initStream = () => {
         header,
       } = getState()
       if (sender !== user.data.clinicianProfile.name) {
-        const { notifications = [] } = header
-      if (type == 'AppNotification') {
-        const notification = list.find(x => x.toUserFK === user.data.id)
-        if (notification) {
-          notifications.unshift(notification)
-          dispatch({
-            type: 'appNotification/receiveMessage',
-            payload: notification,
-          })
-        }
-      } else notifications.push(response)
+        let { notifications = [], unreadTotalRecords = 0 } = header
+        if (type == 'AppNotification') {
+          const notification = list.find(x => x.toUserFK === user.data.id)
+          if (notification) {
+            notifications.unshift(notification)
+            unreadTotalRecords += 1
+            dispatch({
+              type: 'appNotification/receiveMessage',
+              payload: notification,
+            })
+          }
+        } else notifications.push(response)
         dispatch({
           type: 'header/updateState',
-          payload: notifications,
+          payload: {
+            notifications,
+            unreadTotalRecords,
+          },
         })
         sessionStorage.setItem('notifications', JSON.stringify(notifications))
       }

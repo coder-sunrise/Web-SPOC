@@ -742,7 +742,7 @@ class Scribble extends React.Component {
   onSaveClick = async () => {
     temp = this._sketch.getAllLayerData()
     const { origin, thumbnail } = await this._generateThumbnail()
-    console.log({origin,thumbnail})
+    // console.log({origin,thumbnail})
     await this.props.setFieldValue('thumbnail', thumbnail.split(',')[1])
     await this.props.setFieldValue('origin', origin.split(',')[1])
     this.props.handleSubmit()
