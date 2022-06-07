@@ -1167,7 +1167,7 @@ const ApplyClaims = ({
           onClick={handleAddClaimClick}
         >
           <Add />
-          Claimable Schemes1
+          Claimable Schemes
         </Button>
         <Button
           color='primary'
