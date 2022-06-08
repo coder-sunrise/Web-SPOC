@@ -95,7 +95,6 @@ export const SpecimenDetails = ({
   if (!open) return ''
   const dispatch = useDispatch()
   const { entity } = useSelector(s => s.worklistSpecimenDetails)
-  const [isResultFullScreen, setIsResultFullScreen] = useState(false)
   const [formValues, setFormValues] = useState({})
   const [showReportRemarks, setShowReportRemarks] = useState(false)
   const [retestSpecimenPara, setRetestSpecimenPara] = useState({
@@ -123,7 +122,6 @@ export const SpecimenDetails = ({
     form.setFieldsValue({})
     form.resetFields()
     setFormValues({})
-    setIsResultFullScreen(false)
     setShowModal(false)
     setShowReportRemarks(false)
     setShowRawData(false)
@@ -375,21 +373,19 @@ export const SpecimenDetails = ({
                 overflowY: 'scroll',
               }}
             >
-              {!isResultFullScreen && (
-                <React.Fragment>
-                  <GridItem md={12}>
-                    <div style={{ padding: 8 }}>
-                      <Banner isDisposePatientEntity={isDisposePatientEntity} />
-                    </div>
-                  </GridItem>
-                  <GridItem md={12}>
-                    <SpecimenDetailsStep timeline={entity.timeline} />
-                  </GridItem>
-                  <GridItem md={12}>
-                    <HeaderInfo entity={entity} />
-                  </GridItem>
-                </React.Fragment>
-              )}
+              <React.Fragment>
+                <GridItem md={12}>
+                  <div style={{ padding: 8 }}>
+                    <Banner isDisposePatientEntity={isDisposePatientEntity} />
+                  </div>
+                </GridItem>
+                <GridItem md={12}>
+                  <SpecimenDetailsStep timeline={entity.timeline} />
+                </GridItem>
+                <GridItem md={12}>
+                  <HeaderInfo entity={entity} />
+                </GridItem>
+              </React.Fragment>
               {entity.specimenStatusFK !== LAB_SPECIMEN_STATUS.NEW && (
                 <GridItem md={12}>
                   <GridContainer>
@@ -430,20 +426,6 @@ export const SpecimenDetails = ({
                             Resend Order
                           </Button>
                         )}
-                        <Icon
-                          type={
-                            isResultFullScreen
-                              ? 'fullscreen-exit'
-                              : 'fullscreen'
-                          }
-                          style={{
-                            border: '1px solid',
-                            fontSize: '1rem',
-                          }}
-                          onClick={() =>
-                            setIsResultFullScreen(!isResultFullScreen)
-                          }
-                        />
                       </div>
                     </GridItem>
                     <GridItem md={12} style={{ paddingTop: 8 }}>
