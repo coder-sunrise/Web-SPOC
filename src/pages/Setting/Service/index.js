@@ -72,11 +72,11 @@ class Service extends PureComponent {
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height = mainDivHeight - 120 - ($('.filterServiceBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterServiceBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid

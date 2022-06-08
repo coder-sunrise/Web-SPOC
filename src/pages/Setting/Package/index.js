@@ -8,7 +8,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -18,12 +18,12 @@ const styles = (theme) => ({
 }))
 @withSettingBase({ modelName: 'settingPackage' })
 class Package extends PureComponent {
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingPackage/query',
       payload: {
         isUserMaintainable: true,
-        isActive:true,
+        isActive: true,
       },
     })
   }
@@ -37,16 +37,16 @@ class Package extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingPackage, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height = mainDivHeight - 120 - ($('.filterPackageBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterPackageBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />

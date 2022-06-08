@@ -145,12 +145,13 @@ class DailyResourceManagement extends PureComponent {
       height: mainDivHeight = 700,
       calendarResource,
     } = this.props
-    let height = mainDivHeight - 180 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 180 - ($('.filterDailyResourceBar').height() || 0)
     if (height < 300) height = 300
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
-          <div className='filterBar'>
+          <div className='filterDailyResourceBar'>
             <Filter
               {...this.props}
               queryDailyCapacity={this.queryDailyCapacity}

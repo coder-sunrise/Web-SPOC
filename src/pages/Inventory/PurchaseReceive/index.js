@@ -19,7 +19,7 @@ import DuplicatePO from './components/Modal/DuplicatePO'
 import { getPurchaseOrderStatusFK, getAccessRight } from './variables'
 import Authorized from '@/utils/Authorized'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
   buttonGroup: {
     marginTop: theme.spacing(2),
@@ -48,14 +48,12 @@ class PurchaseReceive extends Component {
     selectedRowId: '',
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch, purchaseReceiveList } = this.props
     dispatch({
       type: 'purchaseReceiveList/query',
       payload: {
-        sorting: [
-          { columnName: 'purchaseOrderNo', direction: 'desc' },
-        ],
+        sorting: [{ columnName: 'purchaseOrderNo', direction: 'desc' }],
         lgteql_purchaseOrderDate:
           purchaseReceiveList.filterSearch.transactionDates[0],
         lsteql_purchaseOrderDate:
@@ -64,22 +62,22 @@ class PurchaseReceive extends Component {
     })
   }
 
-  printPOReport = (rowId) => {
+  printPOReport = rowId => {
     this.setState({ selectedRowId: rowId })
     this.toggleReport()
   }
 
-  onSelectionChange = (selection) => this.setState({ selectedRows: selection })
+  onSelectionChange = selection => this.setState({ selectedRows: selection })
 
   onWriteOffClick = () => this.setState({ showWriteOff: true })
 
-  onDuplicatePOClick = (rowId) => {
+  onDuplicatePOClick = rowId => {
     const { dispatch, purchaseReceiveList } = this.props
     const { list } = purchaseReceiveList
     dispatch({
       type: 'purchaseReceiveList/updateState',
       payload: {
-        entity: list.find((o) => o.id === rowId),
+        entity: list.find(o => o.id === rowId),
       },
     })
     this.setState({ showDuplicatePO: true })
@@ -94,19 +92,19 @@ class PurchaseReceive extends Component {
 
   closeDuplicatePOModal = () => this.setState({ showDuplicatePO: false })
 
-  onSubmitWriteOff = (writeOffReason) => {
+  onSubmitWriteOff = writeOffReason => {
     this.handleLoadingVisibility(true)
     this.closeWriteOffModal()
     this.handleBatchWriteOff(writeOffReason)
   }
 
-  handleBatchWriteOff = async (writeOffReason) => {
+  handleBatchWriteOff = async writeOffReason => {
     const { selectedRows } = this.state
     const { dispatch, purchaseReceiveList } = this.props
     const { list } = purchaseReceiveList
 
     await selectedRows.map((item, index, arr) => {
-      const searchedPO = list.find((po) => po.id === item)
+      const searchedPO = list.find(po => po.id === item)
       dispatch({
         type: 'purchaseReceiveList/batchWriteOff',
         payload: {
@@ -126,7 +124,7 @@ class PurchaseReceive extends Component {
           // TotalAmount: 0,
           // supplierFK: 11,
         },
-      }).then((r) => {
+      }).then(r => {
         if (r) {
           //
         }
@@ -141,9 +139,7 @@ class PurchaseReceive extends Component {
           dispatch({
             type: 'purchaseReceiveList/query',
             payload: {
-              sorting: [
-                { columnName: 'purchaseOrderNo', direction: 'desc' },
-              ],
+              sorting: [{ columnName: 'purchaseOrderNo', direction: 'desc' }],
             },
           })
         }
@@ -177,12 +173,12 @@ class PurchaseReceive extends Component {
   }
 
   toggleReport = () => {
-    this.setState((preState) => ({
+    this.setState(preState => ({
       showReport: !preState.showReport,
     }))
   }
 
-  render () {
+  render() {
     const { classes, dispatch, mainDivHeight = 700 } = this.props
     const actionProps = {
       handleWriteOff: this.onWriteOffClick,
@@ -197,7 +193,8 @@ class PurchaseReceive extends Component {
       selectedRows,
       isLoading,
     } = this.state
-    let height = mainDivHeight - 170 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterPurchaseReceiveBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
@@ -206,7 +203,7 @@ class PurchaseReceive extends Component {
           loading={isLoading}
           text='Processing Write-Off...'
         >
-          <div className='filterBar'>
+          <div className='filterPurchaseReceiveBar'>
             <FilterBar
               actions={actionProps}
               dispatch={dispatch}

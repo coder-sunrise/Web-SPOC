@@ -58,7 +58,6 @@ const ClaimHistory = props => {
   return (
     <div style={{ minHeight: 500 }}>
       <Tabs
-        style={{ marginTop: theme.spacing(1) }}
         activeKey={activeTabIndex}
         options={tabOptions}
         onChange={key => {

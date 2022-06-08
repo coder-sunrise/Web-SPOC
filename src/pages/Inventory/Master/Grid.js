@@ -10,7 +10,7 @@ import Authorized from '@/utils/Authorized'
   mainDivHeight: global.mainDivHeight,
 }))
 class Grid extends React.Component {
-  render () {
+  render() {
     const {
       dispatch,
       namespace,
@@ -22,9 +22,9 @@ class Grid extends React.Component {
       disabled,
       mainDivHeight,
     } = this.props
-    const showDetail = (row) => () =>
+    const showDetail = row => () =>
       history.push(`/inventory/master/edit${namespace}?uid=${row.id}`)
-    const handleDoubleClick = (row) => {
+    const handleDoubleClick = row => {
       const accessRight = Authorized.check(
         'inventorymaster.inventoryitemdetails',
       )
@@ -66,16 +66,17 @@ class Grid extends React.Component {
       }
       return <Table.Cell {...p} />
     }
-    const TableCell = (p) => Cell({ ...p, dispatch })
+    const TableCell = p => Cell({ ...p, dispatch })
 
     const ActionProps = { TableCellComponent: TableCell }
-    let height = mainDivHeight - 180 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 195 - ($(`.filter${namespace}Bar`).height() || 0)
     if (height < 300) height = 300
     return (
       <CommonTableGrid
         type={`${namespace}`}
         rows={list}
-        onRowDoubleClick={(row) => handleDoubleClick(row)}
+        onRowDoubleClick={row => handleDoubleClick(row)}
         columnExtensions={colExtensions}
         defaultColumnWidths={columnWidths}
         ActionProps={ActionProps}

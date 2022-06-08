@@ -150,9 +150,10 @@ class ApprovedMedisave extends React.Component {
     const { showCollectPayment } = this.state
     const { selectedRows } = this.state
     let height =
-      mainDivHeight - 256 - $('.filterBar').height() ||
-      0 - $('.footerBar').height() ||
-      0
+      mainDivHeight -
+      185 -
+      ($('.filterMedisaveApprovedBar').height() || 0) -
+      ($('.footerMedisaveApprovedBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer
@@ -162,7 +163,7 @@ class ApprovedMedisave extends React.Component {
           marginRight: 5,
         }}
       >
-        <div className='filterBar'>
+        <div className='filterMedisaveApprovedBar'>
           <BaseSearchBar
             dispatch={dispatch}
             values={values}
@@ -192,14 +193,14 @@ class ApprovedMedisave extends React.Component {
                 height={height}
               />
             </GridItem>
-            <GridItem md={12} style={{ marginTop: 10 }}>
-              <p className={classes.footerNote}>
-                Approved Amt. only available for Paid claim status.
-              </p>
-            </GridItem>
           </GridContainer>
-          <div className='footerBar'>
+          <div className='footerMedisaveApprovedBar'>
             <GridContainer>
+              <GridItem md={12} style={{ marginTop: 10 }}>
+                <p className={classes.footerNote}>
+                  Approved Amt. only available for Paid claim status.
+                </p>
+              </GridItem>
               <GridItem md={12} className={classes.buttonGroup}>
                 <ProgressButton
                   icon={null}

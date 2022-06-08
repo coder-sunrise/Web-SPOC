@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import classnames from 'classnames'
 import _ from 'lodash'
+import $ from 'jquery'
 // material ui
 import ListAlt from '@material-ui/icons/ListAlt'
 import Search from '@material-ui/icons/Search'
@@ -207,7 +208,7 @@ class SystemSetting extends PureComponent {
   }
 
   render() {
-    const { classes, user, systemSetting } = this.props
+    const { classes, user, systemSetting, global } = this.props
     const { filterValues } = systemSetting
     const { actives, searchText } = filterValues
 
@@ -220,35 +221,42 @@ class SystemSetting extends PureComponent {
       : { active: actives[0] }
     const menus = this.menus().filter(item => item.itemCount > 0)
 
+    const { mainDivHeight = 700 } = global
+    let height = mainDivHeight - 50 - ($('.filterSettingBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <TextField
-          className={classes.searchField}
-          prefix={<Search />}
-          onChange={this.onSearchTextChange}
-          autoFocus
-          value={searchText}
-        />
-        <Accordion
-          defaultActive={0}
-          mode={isMultiple ? 'multiple' : 'default'}
-          {...activeConfig}
-          onChange={this.onAccordionChange}
-          collapses={menus.filter(item => {
-            const accessRight = accessRights.find(
-              menuItem => menuItem.name === item.authority,
-            )
-            const hide =
-              !accessRight || (accessRights && accessRights === 'hidden')
-            if (hide) return false
-            return (
-              !searchText ||
-              item.items.find(
-                m => m.text.toLocaleLowerCase().indexOf(searchText) >= 0,
+        <div className='filterSettingBar'>
+          <TextField
+            className={classes.searchField}
+            prefix={<Search />}
+            onChange={this.onSearchTextChange}
+            autoFocus
+            value={searchText}
+          />
+        </div>
+        <div style={{ maxHeight: height, overflow: 'auto' }}>
+          <Accordion
+            defaultActive={0}
+            mode={isMultiple ? 'multiple' : 'default'}
+            {...activeConfig}
+            onChange={this.onAccordionChange}
+            collapses={menus.filter(item => {
+              const accessRight = accessRights.find(
+                menuItem => menuItem.name === item.authority,
               )
-            )
-          })}
-        />
+              const hide =
+                !accessRight || (accessRights && accessRights === 'hidden')
+              if (hide) return false
+              return (
+                !searchText ||
+                item.items.find(
+                  m => m.text.toLocaleLowerCase().indexOf(searchText) >= 0,
+                )
+              )
+            })}
+          />
+        </div>
       </CardContainer>
     )
   }

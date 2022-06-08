@@ -30,7 +30,7 @@ import { primaryColor } from '@/assets/jss'
 
 const styles = () => ({
   totalOSStyle: {
-    float: 'right',
+    textAlign: 'right',
     fontWeight: 'bold',
     marginTop: 10,
     marginBottom: 10,
@@ -106,6 +106,7 @@ const InvoiceHistory = ({
   }
 
   const [showPrintInvoiceMenu, setShowPrintInvoiceMenu] = useState(undefined)
+  const [headerHeight, setHeaderHeight] = useState(0)
 
   const { settings = [] } = clinicSettings
   const { isEnableVisitationInvoiceReport = false } = settings
@@ -126,6 +127,10 @@ const InvoiceHistory = ({
   useEffect(() => {
     checkHasActiveSession()
     refreshInvoiceList()
+
+    if ($('.filterInvoiceHistoryBar').height()) {
+      setHeaderHeight($('.filterInvoiceHistoryBar').height())
+    }
   }, [])
 
   const [showReport, setShowReport] = useState({
@@ -318,12 +323,12 @@ const InvoiceHistory = ({
     }, 0)
   }
 
-  let height = mainDivHeight - 230 - ($('.filterBar').height() || 0)
+  let height = mainDivHeight - 260 - headerHeight
   if (height < 300) height = 300
   return (
     <div>
       <CardContainer hideHeader size='sm'>
-        <div className='filterBar'>
+        <div className='filterInvoiceHistoryBar'>
           {!hasActiveSession ? (
             <div style={{ paddingTop: 5 }}>
               <WarningSnackbar
@@ -341,7 +346,7 @@ const InvoiceHistory = ({
             <NumberInput text currency value={getTotalPatientOS()} />
           </div>
         </div>
-        <div style={{ height, marginTop: 50, overflow: 'auto' }}>
+        <div style={{ maxHeight: height, overflow: 'auto' }}>
           <Accordion
             mode='multiple'
             collapses={list.map(o => {

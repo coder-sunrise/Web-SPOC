@@ -9,10 +9,7 @@ import Grid from '../Grid'
 
 const styles = () => ({})
 const OrderSet = ({ dispatch, history, orderSet }) => {
-  const [
-    tableParas,
-    setTableParas,
-  ] = useState({
+  const [tableParas, setTableParas] = useState({
     columns: [
       { name: 'code', title: 'Code' },
       { name: 'displayValue', title: 'Name' },
@@ -22,10 +19,7 @@ const OrderSet = ({ dispatch, history, orderSet }) => {
     ],
     leftColumns: [],
   })
-  const [
-    colExtensions,
-    setColExtensions,
-  ] = useState([
+  const [colExtensions, setColExtensions] = useState([
     {
       columnName: 'isActive',
       sortingEnabled: false,
@@ -44,9 +38,9 @@ const OrderSet = ({ dispatch, history, orderSet }) => {
     history,
   }
 
-  const getPackList = (list) => {
+  const getPackList = list => {
     if (list) {
-      list.map((r) => {
+      list.map(r => {
         const {
           medicationOrderSetItem,
           consumableOrderSetItem,
@@ -54,16 +48,16 @@ const OrderSet = ({ dispatch, history, orderSet }) => {
           serviceOrderSetItem,
         } = r
         let sellingPrice = 0
-        medicationOrderSetItem.forEach((o) => {
+        medicationOrderSetItem.forEach(o => {
           sellingPrice += o.subTotal
         })
-        consumableOrderSetItem.forEach((o) => {
+        consumableOrderSetItem.forEach(o => {
           sellingPrice += o.subTotal
         })
-        vaccinationOrderSetItem.forEach((o) => {
+        vaccinationOrderSetItem.forEach(o => {
           sellingPrice += o.subTotal
         })
-        serviceOrderSetItem.forEach((o) => {
+        serviceOrderSetItem.forEach(o => {
           sellingPrice += o.subTotal
         })
         return {
@@ -90,7 +84,7 @@ const OrderSet = ({ dispatch, history, orderSet }) => {
     dispatch({
       type: 'orderSet/query',
       payload: {
-        isActive:true,
+        isActive: true,
         sorting: [
           { columnName: 'effectiveEndDate', direction: 'desc' },
           { columnName: 'displayValue', direction: 'asc' },
@@ -113,7 +107,9 @@ const OrderSet = ({ dispatch, history, orderSet }) => {
         marginRight: 5,
       }}
     >
-      <FilterBar {...filterProps} />
+      <div className='filterorderSetBar'>
+        <FilterBar {...filterProps} />
+      </div>
       <Grid {...gridProps} />
     </CardContainer>
   )

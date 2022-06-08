@@ -10,7 +10,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -22,11 +22,11 @@ const styles = (theme) => ({
 class ConsumableGroup extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingConsumableGroup/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
   }
@@ -40,16 +40,17 @@ class ConsumableGroup extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingConsumableGroup, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterConsumableGroupBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterConsumableGroupBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />
@@ -58,11 +59,9 @@ class ConsumableGroup extends PureComponent {
           open={settingConsumableGroup.showModal}
           observe='ConsumableGroupDetail'
           title={
-            settingConsumableGroup.entity ? (
-              'Edit Consumable Category'
-            ) : (
-              'Add Consumable Category'
-            )
+            settingConsumableGroup.entity
+              ? 'Edit Consumable Category'
+              : 'Add Consumable Category'
           }
           maxWidth='md'
           bodyNoPadding

@@ -10,7 +10,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -20,16 +20,16 @@ const styles = (theme) => ({
   clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 @withSettingBase({
-  modelName: 'settingMedicationUOM'
+  modelName: 'settingMedicationUOM',
 })
 class MedicationUOM extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingMedicationUOM/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
   }
@@ -43,16 +43,17 @@ class MedicationUOM extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingMedicationUOM, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterMedicationUOMBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterMedicationUOMBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />
@@ -61,11 +62,9 @@ class MedicationUOM extends PureComponent {
           open={settingMedicationUOM.showModal}
           observe='MedicationUOMDetail'
           title={
-            settingMedicationUOM.entity ? (
-              'Edit Medication UOM'
-            ) : (
-              'Add Medication UOM'
-            )
+            settingMedicationUOM.entity
+              ? 'Edit Medication UOM'
+              : 'Add Medication UOM'
           }
           maxWidth='md'
           bodyNoPadding

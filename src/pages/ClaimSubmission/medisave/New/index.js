@@ -120,9 +120,10 @@ class NewMedisave extends React.Component {
     const { isLoading, selectedRows } = this.state
     const { list } = medisaveClaimSubmissionNew || []
     let height =
-      mainDivHeight - 230 - $('.filterBar').height() ||
-      0 - $('.footerBar').height() ||
-      0
+      mainDivHeight -
+      185 -
+      ($('.filterMedisaveNewBar').height() || 0) -
+      ($('.footerMedisaveNewBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer
@@ -132,7 +133,7 @@ class NewMedisave extends React.Component {
           marginRight: 5,
         }}
       >
-        <div className='filterBar'>
+        <div className='filterMedisaveNewBar'>
           <BaseSearchBar
             dispatch={dispatch}
             values={values}
@@ -163,7 +164,7 @@ class NewMedisave extends React.Component {
               />
             </GridItem>
           </GridContainer>
-          <div className='footerBar'>
+          <div className='footerMedisaveNewBar'>
             <GridContainer>
               <GridItem md={12} className={classes.buttonGroup}>
                 <Tooltip

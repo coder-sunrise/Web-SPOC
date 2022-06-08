@@ -10,7 +10,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -23,11 +23,11 @@ const styles = (theme) => ({
 class CaseDescription extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingCaseDescription/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
   }
@@ -41,16 +41,17 @@ class CaseDescription extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingCaseDescription, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterCaseDescriptionBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterCaseDescriptionBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />
@@ -58,11 +59,9 @@ class CaseDescription extends PureComponent {
           open={settingCaseDescription.showModal}
           observe='CaseDescriptionDetail'
           title={
-            settingCaseDescription.entity ? (
-              'Edit Case Description'
-            ) : (
-              'Add Case Description'
-            )
+            settingCaseDescription.entity
+              ? 'Edit Case Description'
+              : 'Add Case Description'
           }
           maxWidth='md'
           bodyNoPadding

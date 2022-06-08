@@ -345,6 +345,7 @@ const PharmacyWorklistHistoryIndex = ({
   codetable,
   clinicSettings,
   classes,
+  mainDivHeight = 700,
 }) => {
   const dispatch = useDispatch()
   const { detailsId, setDetailsId } = useContext(WorklistContext)
@@ -368,7 +369,6 @@ const PharmacyWorklistHistoryIndex = ({
   }
 
   const columns = defaultColumns(codetable, setDetailsId)
-
   return (
     <Fragment>
       <PageContainer pageHeaderRender={false}>
@@ -453,7 +453,7 @@ const PharmacyWorklistHistoryIndex = ({
               },
             }
           }}
-          scroll={{ x: 1100 }}
+          scroll={{ x: 1100, y: mainDivHeight - 260 }}
         />
       </PageContainer>
       <PharmacyDetails refreshClick={refreshClick} fromModule='History' />
@@ -470,10 +470,11 @@ const HistoryIndex = props => (
 )
 
 const historyIndex = compose(
-  connect(({ pharmacyHisotry, codetable, clinicSettings }) => ({
+  connect(({ pharmacyHisotry, codetable, clinicSettings, global }) => ({
     pharmacyHisotry,
     codetable,
     clinicSettings: clinicSettings.settings || clinicSettings.default,
+    mainDivHeight: global.mainDivHeight,
   })),
 )(HistoryIndex)
 

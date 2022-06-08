@@ -10,7 +10,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -22,11 +22,11 @@ const styles = (theme) => ({
 class InvoiceAdjustment extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingInvoiceAdjustment/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
   }
@@ -40,16 +40,17 @@ class InvoiceAdjustment extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingInvoiceAdjustment, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterInvoiceAdjustmentBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterInvoiceAdjustmentBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...this.props} height={height} />
@@ -57,11 +58,9 @@ class InvoiceAdjustment extends PureComponent {
           open={settingInvoiceAdjustment.showModal}
           observe='InvoiceAdjustmentDetail'
           title={
-            settingInvoiceAdjustment.entity ? (
-              'Edit Invoice Adjustment'
-            ) : (
-              'Add Invoice Adjustment'
-            )
+            settingInvoiceAdjustment.entity
+              ? 'Edit Invoice Adjustment'
+              : 'Add Invoice Adjustment'
           }
           maxWidth='md'
           bodyNoPadding

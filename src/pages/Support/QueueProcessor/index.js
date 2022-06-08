@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
@@ -9,27 +9,34 @@ import { CardContainer } from '@/components'
 import Filter from './Filter'
 import Grid from './Grid'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
-@connect(({ queueProcessor }) => ({
+@connect(({ queueProcessor, global }) => ({
   queueProcessor,
+  mainDivHeight: global.mainDivHeight,
 }))
 class QueueProcessor extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'queueProcessor/query',
     })
   }
 
-  render () {
+  render() {
+    const { mainDivHeight = 700 } = this.props
+    let height =
+      mainDivHeight - 120 - ($('.filterQueueProcessorBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <Filter {...this.props} />
-        <Grid {...this.props} />
+        <div className='filterQueueProcessorBar'>
+          <Filter {...this.props} />
+        </div>
+        <Grid {...this.props} height={height} />
       </CardContainer>
     )
   }

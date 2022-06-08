@@ -24,17 +24,17 @@ const Scheme = ({
   useEffect(() => {
     dispatch({
       payload: {
-        isActive:true,
+        isActive: true,
       },
       type: 'copaymentScheme/query',
     })
   }, [])
 
-  let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+  let height = mainDivHeight - 120 - ($('.filterSchemeBar').height() || 0)
   if (height < 300) height = 300
   return (
     <CardContainer hideHeader>
-      <div className='filterBar'>
+      <div className='filterSchemeBar'>
         <FilterBar {...props} />
       </div>
       <Grid {...props} height={height} />

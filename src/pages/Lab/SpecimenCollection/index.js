@@ -67,6 +67,7 @@ const SpecimenCollection = ({
   specimenCollection: { specimenCollectionColumnSetting = [] },
   codetable,
   handlePrint,
+  mainDivHeight = 700,
 }) => {
   const dispatch = useDispatch()
   const visitTypes = useVisitTypes()
@@ -403,7 +404,7 @@ const SpecimenCollection = ({
               },
             }
           }}
-          scroll={{ x: 1100 }}
+          scroll={{ x: 1100, y: mainDivHeight - 315 }}
         />
       </PageContainer>
 
@@ -428,8 +429,9 @@ const SpecimenCollection = ({
 
 export default compose(
   withWebSocket(),
-  connect(({ specimenCollection, codetable }) => ({
+  connect(({ specimenCollection, codetable, global }) => ({
     specimenCollection,
     codetable,
+    mainDivHeight: global.mainDivHeight,
   })),
 )(SpecimenCollection)

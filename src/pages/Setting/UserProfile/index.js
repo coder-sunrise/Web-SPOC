@@ -148,11 +148,12 @@ class UserProfile extends React.Component {
 
   render() {
     const { classes, mainDivHeight = 700 } = this.props
-    let height = mainDivHeight - 100 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterUserProfileBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterUserProfileBar'>
           <GridContainer>
             <GridItem md={2}>
               <FastField

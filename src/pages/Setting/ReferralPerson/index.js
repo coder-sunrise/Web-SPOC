@@ -10,7 +10,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -26,7 +26,7 @@ class ReferralPerson extends PureComponent {
     referralSource: [],
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingReferralPerson/query',
     })
@@ -38,11 +38,11 @@ class ReferralPerson extends PureComponent {
           pagesize: 9999,
         },
       })
-      .then((response) => {
+      .then(response => {
         const { data } = response || []
         const templateOptions = data
-          .filter((template) => template.isActive)
-          .map((template) => {
+          .filter(template => template.isActive)
+          .map(template => {
             return {
               ...template,
               value: template.id,
@@ -62,17 +62,18 @@ class ReferralPerson extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingReferralPerson, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
       referralSource: this.state.referralSource,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterReferralPersonBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterReferralPersonBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />
@@ -81,11 +82,9 @@ class ReferralPerson extends PureComponent {
           open={settingReferralPerson.showModal}
           observe='ReferralPersonDetail'
           title={
-            settingReferralPerson.entity ? (
-              'Edit Referral Person'
-            ) : (
-              'Add Referral Person'
-            )
+            settingReferralPerson.entity
+              ? 'Edit Referral Person'
+              : 'Add Referral Person'
           }
           maxWidth='md'
           bodyNoPadding

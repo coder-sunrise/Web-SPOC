@@ -10,7 +10,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -23,11 +23,11 @@ const styles = (theme) => ({
 class ServiceCenter extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingMedicationSideEffect/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
   }
@@ -41,16 +41,17 @@ class ServiceCenter extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingMedicationSideEffect, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterMedicationSideEffectBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterMedicationSideEffectBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />
@@ -58,11 +59,9 @@ class ServiceCenter extends PureComponent {
           open={settingMedicationSideEffect.showModal}
           observe='MedicationSideEffectDetail'
           title={
-            settingMedicationSideEffect.entity ? (
-              'Edit Medication Side Effect'
-            ) : (
-              'Add Medication Side Effect'
-            )
+            settingMedicationSideEffect.entity
+              ? 'Edit Medication Side Effect'
+              : 'Add Medication Side Effect'
           }
           maxWidth='md'
           bodyNoPadding

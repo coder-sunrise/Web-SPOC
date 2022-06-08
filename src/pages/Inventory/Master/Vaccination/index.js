@@ -16,10 +16,7 @@ const Vaccination = ({
   values,
   setActiveTab,
 }) => {
-  const [
-    tableParas,
-    setTableParas,
-  ] = useState({
+  const [tableParas, setTableParas] = useState({
     columns: [
       { name: 'code', title: 'Code' },
       { name: 'displayValue', title: 'Name' },
@@ -34,10 +31,7 @@ const Vaccination = ({
     leftColumns: [],
   })
 
-  const [
-    colExtensions,
-    setColExtensions,
-  ] = useState([
+  const [colExtensions, setColExtensions] = useState([
     { columnName: 'code', width: 130 },
     { columnName: 'action', width: 80, align: 'center' },
     {
@@ -99,7 +93,7 @@ const Vaccination = ({
     dispatch({
       type: 'vaccination/query',
       payload: {
-        isActive:true,
+        isActive: true,
         sorting: [
           { columnName: 'effectiveEndDate', direction: 'desc' },
           { columnName: 'displayValue', direction: 'asc' },
@@ -123,7 +117,9 @@ const Vaccination = ({
         marginRight: 5,
       }}
     >
-      <FilterBar {...filterProps} />
+      <div className='filtervaccinationBar'>
+        <FilterBar {...filterProps} />
+      </div>
       <Grid {...gridProps} />
     </CardContainer>
   )

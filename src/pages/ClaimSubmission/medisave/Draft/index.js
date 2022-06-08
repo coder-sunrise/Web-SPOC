@@ -97,9 +97,10 @@ class DraftMedisave extends React.Component {
 
     const { selectedRows } = this.state
     let height =
-      mainDivHeight - 230 - $('.filterBar').height() ||
-      0 - $('.footerBar').height() ||
-      0
+      mainDivHeight -
+      185 -
+      ($('.filterMedisaveDraftBar').height() || 0) -
+      ($('.footerMedisaveDraftBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer
@@ -109,7 +110,7 @@ class DraftMedisave extends React.Component {
           marginRight: 5,
         }}
       >
-        <div className='filterBar'>
+        <div className='filterMedisaveDraftBar'>
           <BaseSearchBar
             hideInvoiceDate
             dispatch={dispatch}
@@ -140,7 +141,7 @@ class DraftMedisave extends React.Component {
             />
           </GridItem>
         </GridContainer>
-        <div className='footerBar'>
+        <div className='footerMedisaveDraftBar'>
           <GridContainer>
             <GridItem md={12} className={classes.buttonGroup}>
               <Tooltip

@@ -79,6 +79,7 @@ const WorklistGrid = ({
   medicalCheckupWorklist,
   user,
   handlePreviewReport,
+  height,
 }) => {
   const {
     list: originalWorklist = [],
@@ -126,7 +127,9 @@ const WorklistGrid = ({
       patientDOB,
       doctorProfileFK,
     } = row
-    const primaryDoctor = (medicalCheckupWorkitemDoctor||[]).find(x=>x.isPrimaryDoctor)
+    const primaryDoctor = (medicalCheckupWorkitemDoctor || []).find(
+      x => x.isPrimaryDoctor,
+    )
     const title =
       primaryDoctor?.title && primaryDoctor.title !== 'Other'
         ? `${primaryDoctor.title} `
@@ -587,7 +590,7 @@ const WorklistGrid = ({
     ]
   }
   const columns = defaultColumns()
-  const height = window.innerHeight - 310
+  const tableHeight = height - 50
   return (
     <div style={{ backgroundColor: 'white', paddingTop: 12, marginTop: 2 }}>
       <div style={{ textAlign: 'right' }}>
@@ -607,7 +610,7 @@ const WorklistGrid = ({
           onFilterChange={selected => setFilteredStatuses(selected)}
         />
       </div>
-      <div style={{ height: height + 95 }}>
+      <div style={{ height: tableHeight }}>
         <ProTable
           rowSelection={false}
           columns={columns}
@@ -625,7 +628,7 @@ const WorklistGrid = ({
               },
             }
           }}
-          scroll={{ x: 1100, y: height }}
+          scroll={{ x: 1100, y: tableHeight - 95 }}
         />
       </div>
       <div style={{ textAlign: 'right', marginRight: 100 }}>
