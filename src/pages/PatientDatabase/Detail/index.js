@@ -854,7 +854,12 @@ class PatientDetail extends PureComponent {
                 padding: 8,
               }}
             >
-              <Button color='danger' onClick={onClose}>
+              <Button
+                color='danger'
+                onClick={() => {
+                  ;(global.disableSave = false), onClose()
+                }}
+              >
                 Close
               </Button>
               <Button

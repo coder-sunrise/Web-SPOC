@@ -45,7 +45,7 @@ export const CombineOrderGrid = ({
       dataIndex: 'remark',
       key: 'remark',
       columnId: 'remark',
-      width: 200,
+      width: 180,
       align: 'left',
     },
     {
@@ -53,7 +53,7 @@ export const CombineOrderGrid = ({
       key: 'combine',
       columnId: 'isCombine',
       align: 'center',
-      width: 40,
+      width: 60,
       render: (text, record, index) => {
         if (
           record.radiologyWorkitemId === currentWorkitemid ||
